@@ -1,0 +1,17 @@
+git:
+  submodules: false
+
+env:
+  global:
+  - TERM: dumb
+  # Access token.
+  - secure: EryHh1gSsheLZcW/dnxGRwvVDRiJDgsGp13ylgve55wvatqM+H8toDFY70PwLW03YbJIHEjQCVraDxuc0dFtQfS7fMr7rUc9fgtxQapbQ1CAfpXe8FaSN4JbIRnqSnMq2dN1dpwRRVFIuW2H1axpfTFZ2NBVk7Y63HCrC2AUJLFb1O0EIr/R5G5FHzyQ7lAM7/ycuEdchso+XIi6uzPIBAUIR9H1si64+GzVpYskHhd83TSvo60AxVA7+BiwfrUKVfRo8HkJhvTMrVfLRcFnQK6TCYrvLXj8n5dJtfWgItRG5VLAe8gbjdXiC9uY14qP6WmRKCCEcYsTZWlVX5BCskrVVFS38V1uNFVRCaIeEKC00eDFyBn0+8HgXWB2yLHJWykm05zZGJ/Jg3anEM166bcHuT8BTK0E0V6C9lO+IpXO0jzh3YDe2xJW65uUl82oL955QniNml2Xijb+MiQCCcTKof2iRD4hSbnNWbLKa8xVFe2q22f7ihsJBxXAvh3jHaBmrYCQFFWRj6O+xM2pFFCnH2o32b45rhcqMpIKA5kkWbcWUcKXJhaDx46oT4+cEw+tCghtV0ehbwelLgTA9Za1Cs5voa8Pc1brYOEhv97WZQ5KNt0UGCkwj1DxXvlGpYCyAF36hkBv9me67ADNzTQa+udKwT156wULPMQBacY=
+
+language:
+  - csharp
+
+mono:
+  - latest
+
+script:
+  - ./scripts/build-docs.sh

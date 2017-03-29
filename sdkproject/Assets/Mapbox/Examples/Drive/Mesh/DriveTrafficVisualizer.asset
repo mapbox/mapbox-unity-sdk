@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 120e43a7012622e49aca0c9217acd1f9, type: 3}
+  m_Name: DriveTrafficVisualizer
+  m_EditorClassIdentifier: 
+  Active: 1
+  SmoothMeshes: 0
+  _classificationKey: congestion
+  _key: traffic
+  Filters: []
+  _defaultStack: {fileID: 11400000, guid: 5915928cb8624134a87d7604161e28ae, type: 2}
+  Stacks:
+  - Type: low
+    Stack: {fileID: 11400000, guid: 5915928cb8624134a87d7604161e28ae, type: 2}
+  - Type: moderate
+    Stack: {fileID: 11400000, guid: a59c8f5fd27fb10488bb71c65eb6b2cf, type: 2}
+  - Type: heavy
+    Stack: {fileID: 11400000, guid: 44cfe8ee8cdd1814fb9e4fcbe56a7db4, type: 2}
+  - Type: severe
+    Stack: {fileID: 11400000, guid: 407eb7a3e54e4f14c839da27883c39ba, type: 2}

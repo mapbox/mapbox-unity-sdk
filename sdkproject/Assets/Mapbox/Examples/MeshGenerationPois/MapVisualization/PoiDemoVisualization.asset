@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c66bbffbe36286f43ba04d55504d674c, type: 3}
+  m_Name: PoiDemoVisualization
+  m_EditorClassIdentifier: 
+  Factories:
+  - {fileID: 11400000, guid: 9972eb02ed9e42e48878484987eaa2eb, type: 2}
+  - {fileID: 11400000, guid: 8a779a8c55d17ff438268988b94222cc, type: 2}
+  - {fileID: 11400000, guid: b6db6e4901cc50246b1ed5c328d73872, type: 2}

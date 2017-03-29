@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8338f26893d62c1439f387800a8e1c9a, type: 3}
+  m_Name: StylingDemoTerrainFactory
+  m_EditorClassIdentifier: 
+  _createFlatBase: 0
+  _createRealTerrain: 1
+  _mapId: mapbox.terrain-rgb
+  _material: {fileID: 2100000, guid: 54786ac2b3525174ea0e235abe4aacf1, type: 2}
+  sampleCount: 40

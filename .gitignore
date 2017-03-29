@@ -1,0 +1,68 @@
+# Autosave files
+*~
+
+MapboxSDKforUnityCore*/
+
+/scriptcs
+/scriptcs_packages
+/packages
+
+# Documentation
+docfx.zip
+/docfx
+api
+_site
+src/Documentation/log.txt
+
+# build
+.vs/
+[Oo]bj/
+[Bb]in/
+packages/
+TestResults/
+StyleCop.Cache
+TestResult.xml
+
+#cake & nuget
+tools/Addins/
+
+# globs
+Makefile.in
+*.DS_Store
+*.sln.cache
+*.suo
+*.cache
+*.pidb
+*.userprefs
+*.usertasks
+config.log
+config.make
+config.status
+aclocal.m4
+install-sh
+autom4te.cache/
+*.user
+*.tar.gz
+tarballs/
+test-results/
+Thumbs.db
+
+# only requirement in tools is packages.config, ignore the rest
+tools/Cake/
+tools/nuget.exe
+tools/NUnit.ConsoleRunner/*
+tools/packages.config.md5sum
+
+# Mac bundle stuff
+*.dmg
+*.app
+
+# resharper
+*_Resharper.*
+*.Resharper
+
+# dotCover
+*.dotCover
+sdkproject/.idea/.idea.sdkproject/riderModule.iml
+sdkproject/.idea/.idea.sdkproject/.idea/modules.xml
+sdkproject/.idea/.idea.sdkproject/.idea/workspace.xml

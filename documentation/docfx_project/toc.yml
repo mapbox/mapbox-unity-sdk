@@ -1,0 +1,6 @@
+- name: API
+  tocHref: api/toc.yml
+  topicHref: api/
+
+- name: Documentation
+  tocHref: ../docs/toc.yml

@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25f09effe9db3dd4e9e825475d698ca3, type: 3}
+  m_Name: PoiDemoDefaultRoadStack
+  m_EditorClassIdentifier: 
+  MeshModifiers:
+  - {fileID: 11400000, guid: 4166fd45a375fee41873c46e4f82c8c6, type: 2}
+  - {fileID: 11400000, guid: fe9d2f19597fadb47aaba38ed7883cf0, type: 2}
+  GoModifiers:
+  - {fileID: 11400000, guid: 2eeb656796ce4b54b8f09cff7cc08f49, type: 2}
