@@ -542,7 +542,7 @@ PlayerSettings:
   XboxOne::VR::enabledDevices: []
   iOS::VR::enabledDevices: []
   tvOS::VR::enabledDevices: []
-  cloudProjectId: 0656d9c8-683e-446a-be6e-3688c67379df
-  projectName: sdkproject
+  cloudProjectId: f183eef4-72bf-420c-80e0-aaadeab22f30
+  projectName: Mapbox Unity SDK
   organizationId: mapbox-inc
   cloudEnabled: 0
