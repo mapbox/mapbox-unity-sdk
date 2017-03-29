@@ -161,7 +161,7 @@ if (!publishDocs) {
 
 //---------- unitypackage
 Console.WriteLine("creating unitypackage ...");
-if (!RunCommand(@"UnityPackager.exe unitypackage.config sdkproject\Assets\ mapbox-sdk-unity_LATEST.unitypackage", logOnErrorOnly: true)) {
+if (!RunCommand(@"UnityPackager.exe unitypackage.config sdkproject\Assets\ mapbox-unity-sdk_LATEST.unitypackage", logOnErrorOnly: true)) {
 	Console.Error.WriteLine("could not create unitypackage");
 	Environment.Exit(1);
 }
