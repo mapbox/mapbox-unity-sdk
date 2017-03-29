@@ -7,6 +7,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
     using Mapbox.Unity.MeshGeneration.Data;
     using Mapbox.Platform;
     using Mapbox.Unity.Utilities;
+    using Utils;
 
     [CreateAssetMenu(menuName = "Mapbox/Factories/Terrain Factory")]
     public class TerrainFactory : Factory
@@ -83,22 +84,22 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         {
             var go = tile.gameObject;
             var mesh = new Mesh();
-            var verts = new List<Vector3>();
+            var verts = new List<Vector3>(sampleCount* sampleCount);
 
             for (float x = 0; x < sampleCount; x++)
             {
                 for (float y = 0; y < sampleCount; y++)
                 {
-                    var xx = Mathf.Lerp(tile.Rect.xMin, (tile.Rect.xMin + tile.Rect.size.x),
+                    var xx = Mathd.Lerp(tile.Rect.Min.x, tile.Rect.Max.x,
                         x / (sampleCount - 1));
-                    var yy = Mathf.Lerp(tile.Rect.yMin, (tile.Rect.yMin + tile.Rect.size.y),
+                    var yy = Mathd.Lerp(tile.Rect.Min.y, tile.Rect.Max.y,
                         y / (sampleCount - 1));
 
                     verts.Add(new Vector3(
-                        (xx - tile.Rect.center.x),
+                        (float)(xx - tile.Rect.Center.x),
                         Conversions.GetRelativeHeightFromColor(texture.GetPixel((int)Mathf.Clamp((x / (sampleCount - 1) * 256), 0, 255),
                                                                                 (int)Mathf.Clamp((256 - (y / (sampleCount - 1) * 256)), 0, 255)), tile.RelativeScale),
-                        (yy - tile.Rect.center.y)));
+                        (float)(yy - tile.Rect.Center.y)));
                 }
             }
 
@@ -106,7 +107,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
             //we can read these from a hardcoded dictionary as well
             //no need to calculate this every single time unless we need a really high range for sampleCount
-            var trilist = new List<int>();
+            var trilist = new List<int>(sampleCount * sampleCount * 3);
             for (int y = 0; y < sampleCount - 1; y++)
             {
                 for (int x = 0; x < sampleCount - 1; x++)
@@ -122,7 +123,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             }
             mesh.SetTriangles(trilist, 0);
 
-            var uvlist = new List<Vector2>();
+            var uvlist = new List<Vector2>(sampleCount * sampleCount);
             var step = 1f / (sampleCount - 1);
             for (int i = 0; i < sampleCount; i++)
             {
@@ -134,7 +135,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             mesh.SetUVs(0, uvlist);
             mesh.RecalculateNormals();
             go.GetComponent<MeshFilter>().sharedMesh = mesh;
-            go.AddComponent<MeshCollider>();
+            
+            //go.AddComponent<MeshCollider>();
             //go.layer = LayerMask.NameToLayer("terrain");
         }
 
@@ -204,10 +206,18 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             var mesh = new Mesh();
             var verts = new List<Vector3>();
 
-            verts.Add((tile.Rect.min - tile.Rect.center).ToVector3xz());
-            verts.Add(new Vector3(tile.Rect.xMax - tile.Rect.center.x, 0, tile.Rect.yMin - tile.Rect.center.y));
-            verts.Add(new Vector3(tile.Rect.xMin - tile.Rect.center.x, 0, tile.Rect.yMax - tile.Rect.center.y));
-            verts.Add((tile.Rect.max - tile.Rect.center).ToVector3xz());
+            verts.Add((tile.Rect.Min - tile.Rect.Center).ToVector3xz());
+            verts.Add(
+                new Vector3(
+                    (float)(tile.Rect.Max.x - tile.Rect.Center.x),
+                    0,
+                    (float)(tile.Rect.Min.y - tile.Rect.Center.y)));
+            verts.Add(
+                new Vector3(
+                    (float)(tile.Rect.Min.x - tile.Rect.Center.x),
+                    0,
+                    (float)(tile.Rect.Max.y - tile.Rect.Center.y)));
+            verts.Add((tile.Rect.Max - tile.Rect.Center).ToVector3xz());
 
             mesh.SetVertices(verts);
             var trilist = new List<int>() { 0, 1, 2, 1, 3, 2 };

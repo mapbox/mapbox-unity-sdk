@@ -110,7 +110,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
                 }
 
                 //we'll run all visualizers on MeshData here 
-                var list = geometry.Select(x => Conversions.GeoToWorldPosition(x.Lat, x.Lng, tile.Rect.center).ToVector3xz()).ToList();
+                var list = geometry.Select(x => Conversions.GeoToWorldPosition(x.Lat, x.Lng, tile.Rect.Center).ToVector3xz()).ToList();
 
                 //long straight edges looks bad on bumpy terrain
                 if (_subdivideLongEdges)
@@ -143,7 +143,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
                 //we may move this into height modifier in the future
                 meshData.Vertices = list.Select(vertex =>
                 {
-                    var h = tile.QueryHeightData((vertex.x + tile.Rect.size.x / 2) / tile.Rect.size.x, (tile.Rect.size.y - (vertex.z + tile.Rect.size.y / 2)) / tile.Rect.size.y);
+                    var h = tile.QueryHeightData((float)((vertex.x + tile.Rect.Size.x / 2) / tile.Rect.Size.x), (float)((vertex.z + tile.Rect.Size.y / 2) / tile.Rect.Size.y));
                     vertex += new Vector3(0, h, 0);
 
                     if (feature.Properties.ContainsKey("min_height"))

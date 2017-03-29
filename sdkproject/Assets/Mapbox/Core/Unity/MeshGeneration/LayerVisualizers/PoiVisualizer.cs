@@ -41,8 +41,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
                 return;
 
             int selpos = feature.Points[0].Count / 2;
-            var met = Conversions.GeoToWorldPosition(feature.Points[0][selpos].Lat, feature.Points[0][selpos].Lng, tile.Rect.center).ToVector3xz();
-            if (Math.Abs(met.x) > Math.Abs(tile.Rect.size.x) / 2 || Math.Abs(met.y) > Math.Abs(tile.Rect.size.y) / 2)
+            var met = Conversions.GeoToWorldPosition(feature.Points[0][selpos].Lat, feature.Points[0][selpos].Lng, tile.Rect.Center).ToVector3xz();
+            if (Math.Abs(met.x) > Math.Abs(tile.Rect.Size.x) / 2 || Math.Abs(met.y) > Math.Abs(tile.Rect.Size.y) / 2)
                 return;
             if (!feature.Properties.ContainsKey("name"))
                 return;
@@ -50,9 +50,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
             var go = Instantiate(PoiPrefab);
             go.name = _key + " " + feature.Data.Id.ToString();
 
-            var rx = (met.x - tile.Rect.min.x) / tile.Rect.width;
-            var ry = 1 - (met.z - tile.Rect.min.y) / tile.Rect.height;
-            var h = tile.QueryHeightData(rx, ry);
+            var rx = (met.x - tile.Rect.Min.x) / tile.Rect.Size.x;
+            var ry = 1 - (met.z - tile.Rect.Min.y) / tile.Rect.Size.y;
+            var h = tile.QueryHeightData((float)rx, (float)ry);
             met.y += h;
             go.transform.position = met;
             go.transform.SetParent(parent.transform, false);

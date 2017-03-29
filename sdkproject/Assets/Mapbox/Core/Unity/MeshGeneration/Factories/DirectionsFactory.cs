@@ -24,7 +24,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             _directions = new Directions(fileSource);
         }
 
-        public void Query(List<GeoCoordinate> waypoints)
+        public void Query(List<Vector2d> waypoints)
         {
             var _directionResource = new DirectionResource(waypoints.ToArray(), RoutingProfile.Driving);
             _directionResource.Steps = true;
@@ -39,7 +39,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             {
                 foreach (var step in leg.Steps)
                 {
-                    meshData.Vertices.Add(Conversions.GeoToWorldPosition(step.Maneuver.Location.Latitude, step.Maneuver.Location.Longitude, MapController.ReferenceTileRect.center, MapController.WorldScaleFactor).ToVector3xz());
+                    meshData.Vertices.Add(Conversions.GeoToWorldPosition(step.Maneuver.Location.x, step.Maneuver.Location.y, MapController.ReferenceTileRect.Center, MapController.WorldScaleFactor).ToVector3xz());
                 }
             }
 

@@ -6,11 +6,12 @@ namespace Mapbox.Unity.MeshGeneration
     using Mapbox.Unity;
     using Mapbox.Platform;
     using Mapbox.Unity.Utilities;
+    using Utils;
 
     public class MapController : MonoBehaviour
     {
         private IFileSource _fileSource;
-        public static Rect ReferenceTileRect { get; set; }
+        public static RectD ReferenceTileRect { get; set; }
         public static float WorldScaleFactor { get; set; }
 
         public MapVisualization MapVisualization;
@@ -72,10 +73,10 @@ namespace Mapbox.Unity.MeshGeneration
 
             _root = new GameObject("worldRoot");
 
-            var v2 = Conversions.GeoToWorldPosition(lat, lng, new Vector2(0, 0));
+            var v2 = Conversions.GeoToWorldPosition(lat, lng, new Vector2d(0, 0));
             var tms = Conversions.MetersToTile(v2, zoom);
             ReferenceTileRect = Conversions.TileBounds(tms, zoom);
-            WorldScaleFactor = TileSize / ReferenceTileRect.width;
+            WorldScaleFactor = (float)(TileSize / ReferenceTileRect.Size.x);
             _root.transform.localScale = Vector3.one * WorldScaleFactor;
 
             for (int i = (int)(tms.x - frame.x); i <= (tms.x + frame.z); i++)
@@ -88,7 +89,7 @@ namespace Mapbox.Unity.MeshGeneration
                     tile.RelativeScale = Conversions.GetTileScaleInMeters(0, Zoom) / Conversions.GetTileScaleInMeters((float)lat, Zoom);
                     tile.TileCoordinate = new Vector2(i, j);
                     tile.Rect = Conversions.TileBounds(tile.TileCoordinate, zoom);
-                    tile.transform.position = new Vector3(tile.Rect.center.x - ReferenceTileRect.center.x, 0, tile.Rect.center.y - ReferenceTileRect.center.y);
+                    tile.transform.position = new Vector3((float)(tile.Rect.Center.x - ReferenceTileRect.Center.x), 0, (float)(tile.Rect.Center.y - ReferenceTileRect.Center.y));
                     tile.transform.SetParent(_root.transform, false);
                     MapVisualization.ShowTile(tile);
                 }
@@ -116,10 +117,10 @@ namespace Mapbox.Unity.MeshGeneration
                 tile.TileCoordinate = new Vector2(pos.x, pos.y);
                 tile.Rect = Conversions.TileBounds(tile.TileCoordinate, zoom);
                 tile.RelativeScale = Conversions.GetTileScaleInMeters(0, Zoom) /
-                    Conversions.GetTileScaleInMeters((float)Conversions.MetersToLatLon(tile.Rect.center).Latitude, Zoom);
-                tile.transform.localPosition = new Vector3(tile.Rect.center.x - ReferenceTileRect.center.x,
+                    Conversions.GetTileScaleInMeters((float)Conversions.MetersToLatLon(tile.Rect.Center).x, Zoom);
+                tile.transform.localPosition = new Vector3((float)(tile.Rect.Center.x - ReferenceTileRect.Center.x),
                                                            0,
-                                                           tile.Rect.center.y - ReferenceTileRect.center.y);
+                                                           (float)(tile.Rect.Center.y - ReferenceTileRect.Center.y));
                 MapVisualization.ShowTile(tile);
             }
         }
