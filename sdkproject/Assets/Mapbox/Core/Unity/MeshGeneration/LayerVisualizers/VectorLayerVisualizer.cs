@@ -110,7 +110,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
                 }
 
                 //we'll run all visualizers on MeshData here 
-                var list = geometry.Select(x => Conversions.GeoToWorldPosition(x.Lat, x.Lng, tile.Rect.Center).ToVector3xz()).ToList();
+                var list = geometry;
+                //.Select(x => Conversions.GeoToWorldPosition(x.Lat, x.Lng, tile.Rect.Center).ToVector3xz()).ToList();
 
                 //long straight edges looks bad on bumpy terrain
                 if (_subdivideLongEdges)
