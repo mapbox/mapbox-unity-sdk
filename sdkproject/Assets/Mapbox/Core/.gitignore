@@ -1,0 +1,9 @@
+# ignore everything
+/*
+
+# except:
+
+# Unity specific
+!Unity/
+
+!*.gitignore
