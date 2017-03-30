@@ -7,3 +7,4 @@
 !Unity/
 
 !*.gitignore
+!Unity.meta
