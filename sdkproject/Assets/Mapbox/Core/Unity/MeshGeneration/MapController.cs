@@ -10,7 +10,6 @@ namespace Mapbox.Unity.MeshGeneration
 
     public class MapController : MonoBehaviour
     {
-        private IFileSource _fileSource;
         public static RectD ReferenceTileRect { get; set; }
         public static float WorldScaleFactor { get; set; }
 
@@ -30,8 +29,7 @@ namespace Mapbox.Unity.MeshGeneration
 
         public void Awake()
         {
-            _fileSource = MapboxAccess.Instance;
-            MapVisualization.Initialize(this, _fileSource);
+            MapVisualization.Initialize(MapboxAccess.Instance);
             _tiles = new Dictionary<Vector2, UnityTile>();
         }
 

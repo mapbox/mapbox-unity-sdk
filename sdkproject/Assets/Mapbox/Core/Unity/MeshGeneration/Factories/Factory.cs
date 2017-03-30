@@ -8,7 +8,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
     {
         protected IFileSource FileSource;
 
-        public virtual void Initialize(MonoBehaviour mb, IFileSource fileSource)
+        public virtual void Initialize(IFileSource fileSource)
         {
             FileSource = fileSource;
         }
