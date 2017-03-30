@@ -41,7 +41,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
                 return;
 
             int selpos = feature.Points[0].Count / 2;
-            var met = Conversions.GeoToWorldPosition(feature.Points[0][selpos].Lat, feature.Points[0][selpos].Lng, tile.Rect.Center).ToVector3xz();
+            var met = feature.Points[0][selpos];
             if (Math.Abs(met.x) > Math.Abs(tile.Rect.Size.x) / 2 || Math.Abs(met.y) > Math.Abs(tile.Rect.Size.y) / 2)
                 return;
             if (!feature.Properties.ContainsKey("name"))
