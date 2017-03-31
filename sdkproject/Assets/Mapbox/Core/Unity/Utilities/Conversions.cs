@@ -21,14 +21,14 @@ namespace Mapbox.Unity.Utilities
         private const double OriginShift = 2 * Math.PI * EarthRadius / 2;
 
         /// <summary>
-        /// Converts <see cref="T:Mapbox.Utils.GeoCoordinate"/> struct, WGS84
+        /// Converts <see cref="T:Mapbox.Utils.Vector2d"/> struct, WGS84
         /// lat/lon to Spherical Mercator EPSG:900913 xy meters.
         /// </summary>
-        /// <param name="v"> The <see cref="T:Mapbox.Utils.GeoCoordinate"/>. </param>
-        /// <returns> A <see cref="T:UnityEngine.Vector2"/> of coordinates in meters. </returns>
-        private static Vector2 LatLonToMeters(GeoCoordinate v)
+        /// <param name="v"> The <see cref="T:Mapbox.Utils.Vector2d"/>. </param>
+        /// <returns> A <see cref="T:UnityEngine.Vector2d"/> of coordinates in meters. </returns>
+        private static Vector2d LatLonToMeters(Vector2d v)
         {
-            return LatLonToMeters(v.Latitude, v.Longitude);
+            return LatLonToMeters(v.x, v.y);
         }
 
         /// <summary>
@@ -37,46 +37,46 @@ namespace Mapbox.Unity.Utilities
         /// </summary>
         /// <param name="lat"> The latitude. </param>
         /// <param name="lon"> The longitude. </param>
-        /// <returns> A <see cref="T:UnityEngine.Vector2"/> of xy meters. </returns>
-        private static Vector2 LatLonToMeters(double lat, double lon)
+        /// <returns> A <see cref="T:UnityEngine.Vector2d"/> of xy meters. </returns>
+        private static Vector2d LatLonToMeters(double lat, double lon)
         {
             var posx = lon * OriginShift / 180;
             var posy = Math.Log(Math.Tan((90 + lat) * Math.PI / 360)) / (Math.PI / 180);
             posy = posy * OriginShift / 180;
             //losing precision by converting to float here if lat/lng is too high/low.
             //prefer using GeoToWorldPosition 
-            return new Vector2((float)posx, (float)posy);
+            return new Vector2d((float)posx, (float)posy);
         }
 
-        public static Vector2 GeoToWorldPosition(double lat, double lon, Vector2 refPoint, float scale = 1)
+        public static Vector2d GeoToWorldPosition(double lat, double lon, Vector2d refPoint, float scale = 1)
         {
             var posx = lon * OriginShift / 180;
             var posy = Math.Log(Math.Tan((90 + lat) * Math.PI / 360)) / (Math.PI / 180);
             posy = posy * OriginShift / 180;
-            return new Vector2((float)((posx - refPoint.x) * scale), (float)((posy - refPoint.y) * scale));
+            return new Vector2d((posx - refPoint.x) * scale, (posy - refPoint.y) * scale);
         }
 
         /// <summary>
         /// Converts Spherical Mercator EPSG:900913 in xy meters to WGS84 lat/lon.
         /// Inverse of LatLonToMeters.
         /// </summary>
-        /// <param name="m"> A <see cref="T:UnityEngine.Vector2"/> of coordinates in meters.  </param>
-        /// <returns> The <see cref="T:Mapbox.Utils.GeoCoordinate"/> in lat/lon. </returns>
-        public static GeoCoordinate MetersToLatLon(Vector2 m)
+        /// <param name="m"> A <see cref="T:UnityEngine.Vector2d"/> of coordinates in meters.  </param>
+        /// <returns> The <see cref="T:Mapbox.Utils.Vector2d"/> in lat/lon. </returns>
+        public static Vector2d MetersToLatLon(Vector2d m)
         {
             var vx = (m.x / OriginShift) * 180;
             var vy = (m.y / OriginShift) * 180;
             vy = 180 / Math.PI * (2 * Math.Atan(Math.Exp(vy * Math.PI / 180)) - Math.PI / 2);
-            return new GeoCoordinate(vy, vx);
+            return new Vector2d(vy, vx);
         }
 
         /// <summary>
         /// Gets the xy tile ID from Spherical Mercator EPSG:900913 xy coords.
         /// </summary>
-        /// <param name="m"> <see cref="T:UnityEngine.Vector2"/> XY coords in meters. </param>
+        /// <param name="m"> <see cref="T:UnityEngine.Vector2d"/> XY coords in meters. </param>
         /// <param name="zoom"> Zoom level. </param>
-        /// <returns> A <see cref="T:UnityEngine.Vector2"/> xy tile ID. </returns>
-        public static Vector2 MetersToTile(Vector2 m, int zoom)
+        /// <returns> A <see cref="T:UnityEngine.Vector2d"/> xy tile ID. </returns>
+        public static Vector2 MetersToTile(Vector2d m, int zoom)
         {
             var p = MetersToPixels(m, zoom);
             return PixelsToTile(p);
@@ -85,14 +85,14 @@ namespace Mapbox.Unity.Utilities
         /// <summary>
         /// Gets the tile bounds in Spherical Mercator EPSG:900913 meters from an xy tile ID.
         /// </summary>
-        /// <param name="t"> XY tile ID. </param>
+        /// <param name="tileCoordinate"> XY tile ID. </param>
         /// <param name="zoom"> Zoom level. </param>
         /// <returns> A <see cref="T:UnityEngine.Rect"/> in meters. </returns>
-        public static Rect TileBounds(Vector2 t, int zoom)
+        public static RectD TileBounds(Vector2 tileCoordinate, int zoom)
         {
-            var min = PixelsToMeters(new Vector2(t.x * TileSize, t.y * TileSize), zoom);
-            var max = PixelsToMeters(new Vector2((t.x + 1) * TileSize, (t.y + 1) * TileSize), zoom);
-            return new Rect(min, max - min);
+            var min = PixelsToMeters(new Vector2d(tileCoordinate.x * TileSize, tileCoordinate.y * TileSize), zoom);
+            var max = PixelsToMeters(new Vector2d((tileCoordinate.x + 1) * TileSize, (tileCoordinate.y + 1) * TileSize), zoom);
+            return new RectD(min, max - min);
         }
 
         /// <summary>
@@ -102,14 +102,14 @@ namespace Mapbox.Unity.Utilities
         /// <param name="latitude"> The latitude. </param>
         /// <param name="longitude"> The longitude. </param>
         /// <param name="zoom"> Zoom level. </param>
-        /// <returns> A <see cref="T:UnityEngine.Vector2"/> xy tile ID. </returns>
-        public static Vector2 LatitudeLongitudeToTileId(float latitude, float longitude, int zoom)
+        /// <returns> A <see cref="T:UnityEngine.Vector2d"/> xy tile ID. </returns>
+        public static Vector2d LatitudeLongitudeToTileId(float latitude, float longitude, int zoom)
         {
             var x = (int)Math.Floor((longitude + 180.0) / 360.0 * Math.Pow(2.0, zoom));
             var y = (int)Math.Floor((1.0 - Math.Log(Math.Tan(latitude * Math.PI / 180.0)
                     + 1.0 / Math.Cos(latitude * Math.PI / 180.0)) / Math.PI) / 2.0 * Math.Pow(2.0, zoom));
 
-            return new Vector2(x, y);
+            return new Vector2d(x, y);
         }
 
         /// <summary>
@@ -142,17 +142,17 @@ namespace Mapbox.Unity.Utilities
         }
 
         /// <summary>
-        /// Gets the <see cref="T:Mapbox.Utils.GeoCoordinateBounds"/> of a tile.
+        /// Gets the <see cref="T:Mapbox.Utils.Vector2dBounds"/> of a tile.
         /// </summary>
         /// <param name="x"> Tile X position. </param>
         /// <param name="y"> Tile Y position. </param>
         /// <param name="zoom"> Zoom level. </param>
-        /// <returns> The <see cref="T:Mapbox.Utils.GeoCoordinateBounds"/> of the tile. </returns>
-        public static GeoCoordinateBounds TileIdToBounds(int x, int y, int zoom)
+        /// <returns> The <see cref="T:Mapbox.Utils.Vector2dBounds"/> of the tile. </returns>
+        public static Vector2dBounds TileIdToBounds(int x, int y, int zoom)
         {
-            var sw = new GeoCoordinate(TileYToNWLatitude(y, zoom), TileXToNWLongitude(x + 1, zoom));
-            var ne = new GeoCoordinate(TileYToNWLatitude(y + 1, zoom), TileXToNWLongitude(x, zoom));
-            return new GeoCoordinateBounds(sw, ne);
+            var sw = new Vector2d(TileYToNWLatitude(y, zoom), TileXToNWLongitude(x + 1, zoom));
+            var ne = new Vector2d(TileYToNWLatitude(y + 1, zoom), TileXToNWLongitude(x, zoom));
+            return new Vector2dBounds(sw, ne);
         }
 
         /// <summary>
@@ -161,12 +161,12 @@ namespace Mapbox.Unity.Utilities
         /// <param name="x"> Tile X position. </param>
         /// <param name="y"> Tile Y position. </param>
         /// <param name="zoom"> Zoom level. </param>
-        /// <returns>A <see cref="T:UnityEngine.Vector2"/> of lat/lon coordinates.</returns>
-        public static Vector2 TileIdToCenterLatitudeLongitude(int x, int y, int zoom)
+        /// <returns>A <see cref="T:UnityEngine.Vector2d"/> of lat/lon coordinates.</returns>
+        public static Vector2d TileIdToCenterLatitudeLongitude(int x, int y, int zoom)
         {
             var bb = TileIdToBounds(x, y, zoom);
             var center = bb.Center;
-            return new Vector2((float)center.Latitude, (float)center.Longitude);
+            return new Vector2d((float)center.x, (float)center.y);
         }
 
         /// <summary>
@@ -208,23 +208,23 @@ namespace Mapbox.Unity.Utilities
             return InitialResolution / Math.Pow(2, zoom);
         }
 
-        private static Vector2 PixelsToMeters(Vector2 p, int zoom)
+        private static Vector2d PixelsToMeters(Vector2d p, int zoom)
         {
             var res = Resolution(zoom);
-            var met = new Vector2();
+            var met = new Vector2d();
             met.x = (float)(p.x * res - OriginShift);
             met.y = (float)-(p.y * res - OriginShift);
             return met;
         }
 
-        private static Vector2 MetersToPixels(Vector2 m, int zoom)
+        private static Vector2d MetersToPixels(Vector2d m, int zoom)
         {
             var res = Resolution(zoom);
-            var pix = new Vector2((float)((m.x + OriginShift) / res), (float)((-m.y + OriginShift) / res));
+            var pix = new Vector2d((float)((m.x + OriginShift) / res), (float)((-m.y + OriginShift) / res));
             return pix;
         }
 
-        private static Vector2 PixelsToTile(Vector2 p)
+        private static Vector2 PixelsToTile(Vector2d p)
         {
             var t = new Vector2((int)Math.Ceiling(p.x / (double)TileSize) - 1, (int)Math.Ceiling(p.y / (double)TileSize) - 1);
             return t;

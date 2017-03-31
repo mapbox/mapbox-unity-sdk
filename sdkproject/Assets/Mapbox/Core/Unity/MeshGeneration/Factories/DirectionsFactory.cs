@@ -18,13 +18,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         private Directions _directions;
         public List<MeshModifier> MeshModifiers;
 
-        public override void Initialize(MonoBehaviour mb, IFileSource fileSource)
+        public override void Initialize(IFileSource fileSource)
         {
-            base.Initialize(mb, fileSource);
-            _directions = new Directions(fileSource);
+            base.Initialize(fileSource);
+            _directions = MapboxAccess.Instance.Directions;
         }
 
-        public void Query(List<GeoCoordinate> waypoints)
+        public void Query(List<Vector2d> waypoints)
         {
             var _directionResource = new DirectionResource(waypoints.ToArray(), RoutingProfile.Driving);
             _directionResource.Steps = true;
@@ -39,7 +39,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             {
                 foreach (var step in leg.Steps)
                 {
-                    meshData.Vertices.Add(Conversions.GeoToWorldPosition(step.Maneuver.Location.Latitude, step.Maneuver.Location.Longitude, MapController.ReferenceTileRect.center, MapController.WorldScaleFactor).ToVector3xz());
+                    meshData.Vertices.Add(Conversions.GeoToWorldPosition(step.Maneuver.Location.x, step.Maneuver.Location.y, MapController.ReferenceTileRect.Center, MapController.WorldScaleFactor).ToVector3xz());
                 }
             }
 

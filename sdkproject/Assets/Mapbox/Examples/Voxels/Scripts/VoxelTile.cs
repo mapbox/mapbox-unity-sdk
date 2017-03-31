@@ -82,7 +82,7 @@ namespace Mapbox.Examples.Voxels
             _raster.Subscribe(this);
 
             // Torres Del Paine
-            FetchWorldData(new GeoCoordinate(-50.98306, -72.96639));
+            FetchWorldData(new Vector2d(-50.98306, -72.96639));
         }
 
         void GeocodeInput_OnGeocoderResponse(object sender, EventArgs e)
@@ -103,13 +103,13 @@ namespace Mapbox.Examples.Voxels
             }
         }
 
-        void FetchWorldData(GeoCoordinate coordinates)
+        void FetchWorldData(Vector2d coordinates)
         {
-            _tileScale = (_tileWidthInVoxels / 256f) / Conversions.GetTileScaleInMeters((float)coordinates.Latitude, _zoom);
-            var bounds = new GeoCoordinateBounds();
+            _tileScale = (_tileWidthInVoxels / 256f) / Conversions.GetTileScaleInMeters((float)coordinates.x, _zoom);
+            var bounds = new Vector2dBounds();
             bounds.Center = coordinates;
-            _raster.SetGeoCoordinateBoundsZoom(bounds, _zoom);
-            _elevation.SetGeoCoordinateBoundsZoom(bounds, _zoom);
+            _raster.SetVector2dBoundsZoom(bounds, _zoom);
+            _elevation.SetVector2dBoundsZoom(bounds, _zoom);
         }
 
         public void OnNext(RasterTile tile)

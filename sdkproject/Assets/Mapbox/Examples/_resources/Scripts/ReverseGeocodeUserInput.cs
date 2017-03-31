@@ -27,7 +27,7 @@ namespace Mapbox.Examples
 
 		Geocoder _geocoder;
 
-		GeoCoordinate _coordinate;
+		Vector2d _coordinate;
 
 		bool _hasResponse;
 		public bool HasResponse
@@ -66,8 +66,8 @@ namespace Mapbox.Examples
 			if (!string.IsNullOrEmpty(searchString))
 			{
 				var latLon = searchString.Split(',');
-				_coordinate.Latitude = double.Parse(latLon[0]);
-				_coordinate.Longitude = double.Parse(latLon[1]);
+				_coordinate.x = double.Parse(latLon[0]);
+				_coordinate.y = double.Parse(latLon[1]);
 				_resource.Query = _coordinate;
 				_geocoder.Geocode(_resource, HandleGeocoderResponse);
 			}

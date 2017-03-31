@@ -20,8 +20,8 @@ namespace Mapbox.Examples
 
         ForwardGeocodeResource _resource;
 
-        GeoCoordinate _coordinate;
-        public GeoCoordinate Coordinate
+        Vector2d _coordinate;
+        public Vector2d Coordinate
         {
             get
             {

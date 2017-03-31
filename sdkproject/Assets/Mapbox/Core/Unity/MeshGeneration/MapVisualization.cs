@@ -12,11 +12,11 @@ namespace Mapbox.Unity.MeshGeneration
     {
         public List<Factory> Factories;
 
-        public void Initialize(MonoBehaviour runner, IFileSource fs)
+        public void Initialize(IFileSource fs)
         {
             foreach (Factory fac in Factories.Where(x => x != null))
             {
-                fac.Initialize(runner, fs);
+                fac.Initialize(fs);
             }
         }
 

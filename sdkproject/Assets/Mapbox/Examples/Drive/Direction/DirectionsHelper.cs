@@ -21,10 +21,10 @@ namespace Mapbox.Examples.Drive
 
         public void Query()
         {
-            var waypoints = new List<GeoCoordinate>();
+            var waypoints = new List<Vector2d>();
             foreach (var wp in Waypoints)
             {
-                waypoints.Add(wp.transform.GetGeoPosition(MapController.ReferenceTileRect.center, MapController.WorldScaleFactor));
+                waypoints.Add(wp.transform.GetGeoPosition(MapController.ReferenceTileRect.Center, MapController.WorldScaleFactor));
             }
 
             Directions.Query(waypoints);
