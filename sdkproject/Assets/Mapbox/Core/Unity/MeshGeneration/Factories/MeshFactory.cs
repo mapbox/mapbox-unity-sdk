@@ -47,17 +47,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             if (tile.HeightDataState == TilePropertyState.Loading ||
                 tile.ImageDataState == TilePropertyState.Loading)
             {
-                tile.HeightDataChanged += (t, e) =>
-                {
-                    if (tile.ImageDataState != TilePropertyState.Loading)
-                        CreateMeshes(t, e);
-                };
-
-                tile.SatelliteDataChanged += (t, e) =>
-                {
-                    if (tile.HeightDataState != TilePropertyState.Loading)
-                        CreateMeshes(t, e);
-                };
+                tile.HeightDataChanged += HeightDataChangedHandler;
+                tile.ImageDataChanged += ImageDataChangedHandler;
             }
             else
             {
@@ -65,8 +56,23 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             }
         }
 
+        private void HeightDataChangedHandler(UnityTile t, object e)
+        {
+            if (t.ImageDataState != TilePropertyState.Loading)
+                CreateMeshes(t, e);
+        }
+
+        private void ImageDataChangedHandler(UnityTile t, object e)
+        {
+            if (t.HeightDataState != TilePropertyState.Loading)
+                CreateMeshes(t, e);
+        }
+
         private void CreateMeshes(UnityTile tile, object e)
         {
+            tile.HeightDataChanged -= HeightDataChangedHandler;
+            tile.ImageDataChanged -= ImageDataChangedHandler;
+
             var parameters = new Mapbox.Map.Tile.Parameters
             {
                 Fs = this.FileSource,

@@ -17,5 +17,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         {
 
         }
+
+        public virtual void Update()
+        {
+
+        }
     }
 }

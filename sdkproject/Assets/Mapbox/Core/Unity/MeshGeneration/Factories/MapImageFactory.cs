@@ -8,15 +8,24 @@ namespace Mapbox.Unity.MeshGeneration.Factories
     using Mapbox.Unity.MeshGeneration.Data;
     using Mapbox.Platform;
 
+    public enum MapImageType
+    {
+        BasicMapboxStyle,
+        Custom,
+        None
+    }
+
     [CreateAssetMenu(menuName = "Mapbox/Factories/Map Image Factory")]
     public class MapImageFactory : Factory
     {
         [SerializeField]
-        public string _mapId;
+        private MapImageType _mapIdType;
+        [SerializeField]
+        private string _customMapId = "";
+        [SerializeField]
+        private string _mapId = "";
         [SerializeField]
         public Material _baseMaterial;
-        [SerializeField]
-        private bool _createImagery = true;
 
         private Dictionary<Vector2, UnityTile> _tiles;
 
@@ -31,6 +40,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             base.Register(tile);
             _tiles.Add(tile.TileCoordinate, tile);
             Run(tile);
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            foreach (var tile in _tiles.Values)
+            {
+                Run(tile);
+            }
         }
 
         private void Run(UnityTile tile)
