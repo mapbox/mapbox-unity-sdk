@@ -97,10 +97,11 @@ bool publishDocs = commitMessage.IndexOf("[publish docs]", StringComparison.Inva
 bool triggerCloudBuild = commitMessage.IndexOf("[trigger cloudbuild]", StringComparison.InvariantCultureIgnoreCase) >= 0;
 
 string githubToken;
-if (publishDocs) {
+if (publishDocs || triggerCloudBuild) {
 	if (!GetEnvVariable("GITHUB_TOKEN", out githubToken)) {
 		publishDocs = false;
-		Console.Error.WriteLine("cannot publish docs without %GITHUB_TOKEN%");
+		triggerCloudBuild = false;
+		Console.Error.WriteLine("no %GITHUB_TOKEN% set, cannot publish docs or trigger Unity Cloud Build");
 		Environment.Exit(1);
 	}
 }
