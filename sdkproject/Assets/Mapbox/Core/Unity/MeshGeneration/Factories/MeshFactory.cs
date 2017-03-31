@@ -17,9 +17,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         private Dictionary<Vector2, UnityTile> _tiles;
         private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;
 
-        public override void Initialize(MonoBehaviour mb, IFileSource fs)
+        public override void Initialize(IFileSource fs)
         {
-            base.Initialize(mb, fs);
+            base.Initialize(fs);
             _tiles = new Dictionary<Vector2, UnityTile>();
             _layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
             foreach (LayerVisualizerBase factory in Visualizers)

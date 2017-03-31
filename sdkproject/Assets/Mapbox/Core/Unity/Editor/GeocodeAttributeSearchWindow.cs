@@ -81,7 +81,7 @@
 					for (int i = 0; i < _features.Count; i++)
 					{
 						Feature feature = _features[i];
-						string coordinates = feature.Center.Latitude + ", " + feature.Center.Longitude;
+						string coordinates = feature.Center.x + ", " + feature.Center.y;
 						string buttonContent = feature.Address + " (" + coordinates + ")";
 
 						if (GUILayout.Button(buttonContent))

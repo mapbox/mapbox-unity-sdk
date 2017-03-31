@@ -1,12 +1,13 @@
-using System.Collections.Generic;
-using UnityEngine;
-
 namespace Mapbox.Unity.MeshGeneration.Data
 {
+    using System.Collections.Generic;
+    using UnityEngine;
+    using Utils;
+
     public class MeshData
     {
         public Vector2 MercatorCenter { get; set; }
-        public Rect TileRect { get; set; }
+        public RectD TileRect { get; set; }
         public List<Vector3> Vertices { get; set; }
         public List<Vector3> Normals { get; set; }
         public List<List<int>> Triangles { get; set; }

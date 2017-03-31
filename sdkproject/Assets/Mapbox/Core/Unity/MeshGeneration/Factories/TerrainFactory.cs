@@ -43,9 +43,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         private Dictionary<Vector2, UnityTile> _tiles;
         private Vector2 _stitchTarget;
 
-        public override void Initialize(MonoBehaviour mb, IFileSource fs)
+        public override void Initialize(IFileSource fs)
         {
-            base.Initialize(mb, fs);
+            base.Initialize(fs);
             _tiles = new Dictionary<Vector2, UnityTile>();
         }
 

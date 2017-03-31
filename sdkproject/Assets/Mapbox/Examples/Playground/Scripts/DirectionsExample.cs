@@ -32,7 +32,7 @@ namespace Mapbox.Examples.Playground
 
         Directions _directions;
 
-        GeoCoordinate[] _coordinates;
+        Vector2d[] _coordinates;
 
         DirectionResource _directionResource;
 
@@ -42,7 +42,7 @@ namespace Mapbox.Examples.Playground
             _startLocationGeocoder.OnGeocoderResponse += StartLocationGeocoder_OnGeocoderResponse;
             _endLocationGeocoder.OnGeocoderResponse += EndLocationGeocoder_OnGeocoderResponse;
 
-            _coordinates = new GeoCoordinate[2];
+            _coordinates = new Vector2d[2];
 
             // Can we make routing profiles an enum?
             _directionResource = new DirectionResource(_coordinates, RoutingProfile.Driving);

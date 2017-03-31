@@ -5,6 +5,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
     using UnityEngine;
     using Mapbox.Unity.MeshGeneration.Enums;
     using Mapbox.Unity.Utilities;
+    using Utils;
 
     [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
     public class UnityTile : MonoBehaviour, INotifyPropertyChanged
@@ -77,7 +78,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
         public Vector2 TileCoordinate { get; set; }
         public int Zoom { get; set; }
-        public Rect Rect { get; set; }
+        public RectD Rect { get; set; }
         public float RelativeScale { get; set; }
 
         public float QueryHeightData(float x, float y)
