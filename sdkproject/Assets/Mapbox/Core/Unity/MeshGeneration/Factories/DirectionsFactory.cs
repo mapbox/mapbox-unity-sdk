@@ -18,9 +18,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         private Directions _directions;
         public List<MeshModifier> MeshModifiers;
 
-        public override void Initialize(MonoBehaviour mb, IFileSource fileSource)
+        public override void Initialize(IFileSource fileSource)
         {
-            base.Initialize(mb, fileSource);
+            base.Initialize(fileSource);
             _directions = MapboxAccess.Instance.Directions;
         }
 
