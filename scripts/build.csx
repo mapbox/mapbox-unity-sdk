@@ -170,8 +170,20 @@ if (!triggerCloudBuild) {
 	try {
 		string projectDir = Path.Combine(rootDir, "sdkproject");
 		Console.WriteLine($"sdkproject directory: {projectDir}");
-		Environment.CurrentDirectory = projectDir;
+
 		List<string> cmds = new List<string>(new string[]{
+			"git rm -r --cached sdkproject",
+			"git commit -m \"Removed sdkproject from repository\""
+		});
+		foreach (var cmd in cmds) {
+			if (!RunCommand(cmd)) {
+				Console.Error.WriteLine("triggering Unity Cloud Build failed");
+				Environment.Exit(1);
+			}
+		}
+
+		Environment.CurrentDirectory = projectDir;
+		cmds = new List<string>(new string[]{
 			"git init .",
 			"git add .",
 			$"git commit -m \"pushed via [{originalCommit}] by [{commitAuthor}]\"",
@@ -181,7 +193,7 @@ if (!triggerCloudBuild) {
 		});
 		foreach (var cmd in cmds) {
 			if (!RunCommand(cmd)) {
-				Console.Error.WriteLine("publishing docs failed");
+				Console.Error.WriteLine("triggering Unity Cloud Build failed");
 				Environment.Exit(1);
 			}
 		}
