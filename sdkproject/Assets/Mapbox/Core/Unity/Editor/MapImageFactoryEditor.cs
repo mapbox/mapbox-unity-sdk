@@ -42,6 +42,14 @@ public class MapImageFactoryEditor : FactoryEditor
         basicMaps_Prop = serializedObject.FindProperty("_basicMapIds");
 
         script = MonoScript.FromScriptableObject((MapImageFactory)target);
+        for (int i = 0; i < _basicMapIds.Length; i++)
+        {
+            if (_basicMapIds[i] == mapId_Prop.stringValue)
+            {
+                _choiceIndex = i;
+                break;
+            }
+        }        
     }
 
     public override void OnInspectorGUI()
