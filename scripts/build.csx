@@ -107,6 +107,7 @@ if (publishDocs || triggerCloudBuild) {
 }
 
 
+Console.WriteLine(string.Format("GITHUB_TOKEN: {0} set", string.IsNullOrWhiteSpace(githubToken) ? "not": "is"));
 Console.WriteLine($"%UNITYPACKAGER_RAISE_ERROR_ON_FAILURE%: {raiseErrorOnFailure}");
 Console.WriteLine($"%APPVEYOR_BUILD_FOLDER%: {rootDir}");
 Console.WriteLine($"%APPVEYOR_REPO_COMMIT_MESSAGE%: {commitMessage}");
@@ -114,64 +115,22 @@ Console.WriteLine($"publish docs: {publishDocs}");
 Console.WriteLine($"trigger Unity Cloud Build: {triggerCloudBuild}");
 
 
-//---------- documentation
-Console.WriteLine("downloading docfx ...");
-if (!RunCommand("powershell Invoke-WebRequest https://github.com/dotnet/docfx/releases/download/v2.14.1/docfx.zip -OutFile docfx.zip", true, true)) {
-	Console.Error.WriteLine("could not download docfx");
-	Environment.Exit(1);
-}
-
-Console.WriteLine("extracting docfx ...");
-if (!RunCommand("7z x docfx.zip -aoa -o%CD%\\docfx | %windir%\\system32\\find \"ing archive\"", true)) {
-	Console.Error.WriteLine("could not extract docfx");
-	Environment.Exit(1);
-}
-
-
-Console.WriteLine("building docs ....");
-
-if (!RunCommand(@"docfx documentation\docfx_project\docfx.json", true)) {
-	Console.Error.WriteLine("generating docs failed");
-	Environment.Exit(1);
-}
-Console.WriteLine("docs successfully generated");
-
-
-if (!publishDocs) {
-	Console.WriteLine("not publishing docs");
-} else {
-	try {
-		string docsDir = Path.Combine(rootDir, "documentation", "docfx_project", "_site");
-		Console.WriteLine($"docs directory: {docsDir}");
-		Environment.CurrentDirectory = docsDir;
-		List<string> cmds = new List<string>(new string[]{
-			"git init .",
-			"git add .",
-			$"git commit -m \"pushed via [{originalCommit}] by [{commitAuthor}]\"",
-			$"git remote add origin https://{githubToken}@github.com/{repoName}.git",
-			"git checkout -b gh-pages",
-			"git push -f origin gh-pages"
-		});
-		foreach (var cmd in cmds) {
-			if (!RunCommand(cmd)) {
-				Console.Error.WriteLine("publishing docs failed");
-				Environment.Exit(1);
-			}
-		}
-	} finally {
-		Environment.CurrentDirectory = rootDir;
-	}
-}
-
-
-//---------- trigger Unity Cloud Build
+//---------- trigger Unity Cloud Build: to this before generating docs to prevent some intermediate file to be part of this
 if (!triggerCloudBuild) {
 	Console.WriteLine("not triggering Unity Cloud Build");
 } else {
 	try {
+		Console.WriteLine("about to trigger Unity Cloud Build ...");
 		string projectDir = Path.Combine(rootDir, "sdkproject");
 		Console.WriteLine($"sdkproject directory: {projectDir}");
 
+		Environment.CurrentDirectory = projectDir;
+		if(!RunCommand("del /F /S /Q .gitignore")){
+			Console.Error.WriteLine("could not delete .gitignore");
+			Environment.Exit(1);
+		}
+
+		Environment.CurrentDirectory = rootDir;
 		List<string> cmds = new List<string>(new string[]{
 			"git rm -r --cached sdkproject",
 			"git commit -m \"Removed sdkproject from repository\""
@@ -202,6 +161,58 @@ if (!triggerCloudBuild) {
 		Environment.CurrentDirectory = rootDir;
 	}
 }
+
+
+//---------- documentation
+Console.WriteLine("downloading docfx ...");
+if (!RunCommand("powershell Invoke-WebRequest https://github.com/dotnet/docfx/releases/download/v2.14.1/docfx.zip -OutFile docfx.zip", true, true)) {
+	Console.Error.WriteLine("could not download docfx");
+	Environment.Exit(1);
+}
+
+Console.WriteLine("extracting docfx ...");
+if (!RunCommand("7z x docfx.zip -aoa -o%CD%\\docfx | %windir%\\system32\\find \"ing archive\"", true)) {
+	Console.Error.WriteLine("could not extract docfx");
+	Environment.Exit(1);
+}
+
+
+Console.WriteLine("building docs ....");
+
+if (!RunCommand(@"docfx documentation\docfx_project\docfx.json", true)) {
+	Console.Error.WriteLine("generating docs failed");
+	Environment.Exit(1);
+}
+Console.WriteLine("docs successfully generated");
+
+
+if (!publishDocs) {
+	Console.WriteLine("not publishing docs");
+} else {
+	try {
+		Console.WriteLine("about to publish docs...");
+		string docsDir = Path.Combine(rootDir, "documentation", "docfx_project", "_site");
+		Console.WriteLine($"docs directory: {docsDir}");
+		Environment.CurrentDirectory = docsDir;
+		List<string> cmds = new List<string>(new string[]{
+			"git init .",
+			"git add .",
+			$"git commit -m \"pushed via [{originalCommit}] by [{commitAuthor}]\"",
+			$"git remote add origin https://{githubToken}@github.com/{repoName}.git",
+			"git checkout -b gh-pages",
+			"git push -f origin gh-pages"
+		});
+		foreach (var cmd in cmds) {
+			if (!RunCommand(cmd)) {
+				Console.Error.WriteLine("publishing docs failed");
+				Environment.Exit(1);
+			}
+		}
+	} finally {
+		Environment.CurrentDirectory = rootDir;
+	}
+}
+
 
 
 //---------- unitypackage
