@@ -55,7 +55,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
             for (int i = 0; i < fc; i++)
             {
                 filterOut = false;
-                var feature = new VectorFeatureUnity(layer.GetFeature(i, 0), tile);
+                var feature = new VectorFeatureUnity(layer.GetFeature(i, 0), tile, layer.Extent);
                 foreach (var filter in Filters)
                 {
                     if (!string.IsNullOrEmpty(filter.Key) && !feature.Properties.ContainsKey(filter.Key))

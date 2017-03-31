@@ -30,7 +30,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
             var fc = layer.FeatureCount();
             for (int i = 0; i < fc; i++)
             {
-                var feature = new VectorFeatureUnity(layer.GetFeature(i, 0), tile);
+                var feature = new VectorFeatureUnity(layer.GetFeature(i, 0), tile, layer.Extent);
                 Build(feature, tile, _container);
             }
         }

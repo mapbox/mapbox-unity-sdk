@@ -8,12 +8,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
     public class VectorFeatureUnity
     {
-        private const float TileMax = 4096f;
         public VectorTileFeature Data { get; set; }
         public Dictionary<string, object> Properties { get; set; }
         public List<List<Vector3>> Points;
 
-        public VectorFeatureUnity(VectorTileFeature feature, UnityTile tile)
+        public VectorFeatureUnity(VectorTileFeature feature, UnityTile tile, float layerExtent)
         {
             Data = feature;
             Properties = Data.GetProperties();
@@ -25,7 +24,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
                 for (int j = 0; j < feature.Geometry[i].Count; j++)
                 {
                     var point = feature.Geometry[i][j];
-                    nl.Add(new Vector3((float)(point.X / TileMax * tile.Rect.Size.x - (tile.Rect.Size.x/2)), 0, (float)((TileMax - point.Y) / TileMax * tile.Rect.Size.y - (tile.Rect.Size.y / 2))));
+                    nl.Add(new Vector3((float)(point.X / layerExtent * tile.Rect.Size.x - (tile.Rect.Size.x/2)), 0, (float)((layerExtent - point.Y) / layerExtent * tile.Rect.Size.y - (tile.Rect.Size.y / 2))));
                 }
                 Points.Add(nl);
             }
