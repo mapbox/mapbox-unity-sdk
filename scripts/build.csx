@@ -120,6 +120,7 @@ if (!triggerCloudBuild) {
 	Console.WriteLine("not triggering Unity Cloud Build");
 } else {
 	try {
+		string cloudBuildRepo = "mapbox/mapbox-sdk-unity";
 		Console.WriteLine("about to trigger Unity Cloud Build ...");
 		string projectDir = Path.Combine(rootDir, "sdkproject");
 		Console.WriteLine($"sdkproject directory: {projectDir}");
@@ -147,9 +148,9 @@ if (!triggerCloudBuild) {
 			"git init .",
 			"git add .",
 			$"git commit -m \"pushed via [{originalCommit}] by [{commitAuthor}]\"",
-			$"git remote add origin https://{githubToken}@github.com/{repoName}.git",
-			"git checkout -b unity-cloud-build",
-			"git push -f origin unity-cloud-build"
+			$"git remote add origin https://{githubToken}@github.com/{cloudBuildRepo}.git",
+			"git checkout -b CloudBuild",
+			"git push -f origin CloudBuild"
 		});
 		foreach (var cmd in cmds) {
 			if (!RunCommand(cmd)) {
