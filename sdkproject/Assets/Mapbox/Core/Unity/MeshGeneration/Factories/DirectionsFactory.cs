@@ -21,7 +21,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         public override void Initialize(MonoBehaviour mb, IFileSource fileSource)
         {
             base.Initialize(mb, fileSource);
-            _directions = new Directions(fileSource);
+            _directions = MapboxAccess.Instance.Directions;
         }
 
         public void Query(List<Vector2d> waypoints)
