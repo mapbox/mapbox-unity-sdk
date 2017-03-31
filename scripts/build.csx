@@ -76,10 +76,25 @@ if (!GetEnvVariable("APPVEYOR_REPO_COMMIT_MESSAGE", out commitMessage)) { Enviro
 string commitMessageEx;
 if (GetEnvVariable("APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED", out commitMessageEx)) { commitMessage += commitMessageEx; }
 
+string commitAuthor = Environment.GetEnvironmentVariable("APPVEYOR_REPO_COMMIT_AUTHOR");
+if (string.IsNullOrWhiteSpace(commitAuthor)) {
+	commitAuthor = "no commit author available";
+}
+
+string originalCommit = Environment.GetEnvironmentVariable("APPVEYOR_REPO_COMMIT");
+string repoName = Environment.GetEnvironmentVariable("APPVEYOR_REPO_NAME");
+if (string.IsNullOrWhiteSpace(originalCommit)) {
+	originalCommit = "no SHA available";
+} else {
+	originalCommit = $"https://github.com/{repoName}/commit/{originalCommit}";
+}
+
 string raiseErrorOnFailure;
 GetEnvVariable("UNITYPACKAGER_RAISE_ERROR_ON_FAILURE", out raiseErrorOnFailure);
 
 bool publishDocs = commitMessage.IndexOf("[publish docs]", StringComparison.InvariantCultureIgnoreCase) >= 0;
+
+bool triggerCloudBuild = commitMessage.IndexOf("[trigger cloudbuild]", StringComparison.InvariantCultureIgnoreCase) >= 0;
 
 string githubToken;
 if (publishDocs) {
@@ -95,6 +110,7 @@ Console.WriteLine($"%UNITYPACKAGER_RAISE_ERROR_ON_FAILURE%: {raiseErrorOnFailure
 Console.WriteLine($"%APPVEYOR_BUILD_FOLDER%: {rootDir}");
 Console.WriteLine($"%APPVEYOR_REPO_COMMIT_MESSAGE%: {commitMessage}");
 Console.WriteLine($"publish docs: {publishDocs}");
+Console.WriteLine($"trigger Unity Cloud Build: {triggerCloudBuild}");
 
 
 //---------- documentation
@@ -119,23 +135,11 @@ if (!RunCommand(@"docfx documentation\docfx_project\docfx.json", true)) {
 }
 Console.WriteLine("docs successfully generated");
 
+
 if (!publishDocs) {
 	Console.WriteLine("not publishing docs");
 } else {
 	try {
-		string originalCommit = Environment.GetEnvironmentVariable("APPVEYOR_REPO_COMMIT");
-		string repoName = Environment.GetEnvironmentVariable("APPVEYOR_REPO_NAME");
-		if (string.IsNullOrWhiteSpace(originalCommit)) {
-			originalCommit = "no SHA available";
-		} else {
-			originalCommit = $"https://github.com/{repoName}/commit/{originalCommit}";
-		}
-
-		string commitAuthor = Environment.GetEnvironmentVariable("APPVEYOR_REPO_COMMIT_AUTHOR");
-		if (string.IsNullOrWhiteSpace(commitAuthor)) {
-			commitAuthor = "no commit author available";
-		}
-
 		string docsDir = Path.Combine(rootDir, "documentation", "docfx_project", "_site");
 		Console.WriteLine($"docs directory: {docsDir}");
 		Environment.CurrentDirectory = docsDir;
@@ -146,6 +150,34 @@ if (!publishDocs) {
 			$"git remote add origin https://{githubToken}@github.com/{repoName}.git",
 			"git checkout -b gh-pages",
 			"git push -f origin gh-pages"
+		});
+		foreach (var cmd in cmds) {
+			if (!RunCommand(cmd)) {
+				Console.Error.WriteLine("publishing docs failed");
+				Environment.Exit(1);
+			}
+		}
+	} finally {
+		Environment.CurrentDirectory = rootDir;
+	}
+}
+
+
+//---------- trigger Unity Cloud Build
+if (!triggerCloudBuild) {
+	Console.WriteLine("not triggering Unity Cloud Build");
+} else {
+	try {
+		string projectDir = Path.Combine(rootDir, "sdkproject");
+		Console.WriteLine($"sdkproject directory: {projectDir}");
+		Environment.CurrentDirectory = projectDir;
+		List<string> cmds = new List<string>(new string[]{
+			"git init .",
+			"git add .",
+			$"git commit -m \"pushed via [{originalCommit}] by [{commitAuthor}]\"",
+			$"git remote add origin https://{githubToken}@github.com/{repoName}.git",
+			"git checkout -b unity-cloud-build",
+			"git push -f origin unity-cloud-build"
 		});
 		foreach (var cmd in cmds) {
 			if (!RunCommand(cmd)) {
@@ -171,6 +203,7 @@ if (!RunCommand(@"UnityPackager.exe unitypackage.config sdkproject\Assets\ mapbo
 Console.WriteLine("====== summary =======");
 Console.WriteLine("  * docs created successfully");
 Console.WriteLine(string.Format("  * docs {0}", publishDocs ? "published successfully" : "not published"));
+Console.WriteLine(string.Format("  * Unity Cloud Build {0}", triggerCloudBuild ? "triggered" : "not triggered"));
 if (raiseErrorOnFailure == "0") {
 	Console.WriteLine("  * unitypackage created, but %UNITYPACKAGER_RAISE_ERROR_ON_FAILURE% was set to '0'!!!!!");
 	Console.WriteLine("  * unitypackage probably won't import into Unity !!!!!!!");
