@@ -106,6 +106,15 @@ if (publishDocs || triggerCloudBuild) {
 	}
 }
 
+string mapboxAccessToken;
+if (triggerCloudBuild) {
+	if (!GetEnvVariable("MAPBOX_ACCESS_TOKEN", out mapboxAccessToken)) {
+		triggerCloudBuild = false;
+		Console.Error.WriteLine("no %MAPBOX_ACCESS_TOKEN% set, cannot trigger Unity Cloud Build");
+		Environment.Exit(1);
+	}
+}
+
 
 Console.WriteLine(string.Format("GITHUB_TOKEN: {0} set", string.IsNullOrWhiteSpace(githubToken) ? "not": "is"));
 Console.WriteLine($"%UNITYPACKAGER_RAISE_ERROR_ON_FAILURE%: {raiseErrorOnFailure}");
@@ -146,6 +155,8 @@ if (!triggerCloudBuild) {
 		Environment.CurrentDirectory = projectDir;
 		cmds = new List<string>(new string[]{
 			"git init .",
+			"mkdir Assets/StreamingAssets",
+			$'echo {mapboxAccessToken} > Assets/StreamingAssets/MapboxAccess.text',
 			"git add .",
 			$"git commit -m \"pushed via [{originalCommit}] by [{commitAuthor}]\"",
 			$"git remote add origin https://{githubToken}@github.com/{cloudBuildRepo}.git",
