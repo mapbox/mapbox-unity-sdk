@@ -1,6 +1,6 @@
 branches:
   except:
-    - unity-cloud-build
+    - "unity-cloud-build"
 
 image: Visual Studio 2015
 
