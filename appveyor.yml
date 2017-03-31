@@ -1,9 +1,4 @@
 branches:
-# whitelist
-  #only:
-  #  - master
-  #  - production
-  # blacklist
   except:
     - unity-cloud-build
 
