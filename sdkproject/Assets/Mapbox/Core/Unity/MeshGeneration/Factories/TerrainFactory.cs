@@ -7,6 +7,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
     using Mapbox.Unity.MeshGeneration.Data;
     using Mapbox.Platform;
     using Mapbox.Unity.Utilities;
+    using Utils;
 
     public enum TerrainGenerationType
     {
@@ -133,16 +134,16 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                 {
                     var xrat = x / (_sampleCount - 1);
 
-                    var xx = Mathf.Lerp(tile.Rect.xMin, (tile.Rect.xMin + tile.Rect.size.x), xrat);
-                    var yy = Mathf.Lerp(tile.Rect.yMin, (tile.Rect.yMin + tile.Rect.size.y), yrat);
+                    var xx = Mathd.Lerp(tile.Rect.Min.x, (tile.Rect.Min.x + tile.Rect.Size.x), xrat);
+                    var yy = Mathd.Lerp(tile.Rect.Min.x, (tile.Rect.Min.x + tile.Rect.Size.y), yrat);
 
                     mesh.Vertices.Add(new Vector3(
-                        (xx - tile.Rect.center.x),
+                        (float)(xx - tile.Rect.Center.x),
                         heightMultiplier * Conversions.GetRelativeHeightFromColor(tile.HeightData.GetPixel(
                             (int)(xrat * 255),
                             (int)((1 - yrat) * 255)),
                             tile.RelativeScale),
-                        (yy - tile.Rect.center.y)));
+                        (float)(yy - tile.Rect.Center.y)));
                     mesh.Normals.Add(Vector3.up);
                     mesh.UV[0].Add(new Vector2(x * step, 1 - (y * step)));
                 }
@@ -209,10 +210,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             var mesh = new Mesh();
             var verts = new Vector3[4];
 
-            verts[0] = ((tile.Rect.min - tile.Rect.center).ToVector3xz());
-            verts[1] = (new Vector3(tile.Rect.xMax - tile.Rect.center.x, 0, tile.Rect.yMin - tile.Rect.center.y));
-            verts[2] = (new Vector3(tile.Rect.xMin - tile.Rect.center.x, 0, tile.Rect.yMax - tile.Rect.center.y));
-            verts[3] = ((tile.Rect.max - tile.Rect.center).ToVector3xz());
+            verts[0] = ((tile.Rect.Min - tile.Rect.Center).ToVector3xz());
+            verts[2] = (new Vector3((float)(tile.Rect.Min.x - tile.Rect.Center.x), 0, (float)(tile.Rect.Max.y - tile.Rect.Center.y)));
+            verts[1] = (new Vector3((float)(tile.Rect.Max.x - tile.Rect.Center.x), 0, (float)(tile.Rect.Min.y - tile.Rect.Center.y)));
+            verts[3] = ((tile.Rect.Max - tile.Rect.Center).ToVector3xz());
 
             mesh.vertices = verts;
             var trilist = new int[6] { 0, 1, 2, 1, 3, 2 };
