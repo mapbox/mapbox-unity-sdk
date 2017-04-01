@@ -155,8 +155,8 @@ if (!triggerCloudBuild) {
 		Environment.CurrentDirectory = projectDir;
 		cmds = new List<string>(new string[]{
 			"git init .",
-			"mkdir Assets/StreamingAssets",
-			$"echo {mapboxAccessToken} > Assets/StreamingAssets/MapboxAccess.text",
+			"mkdir Assets\StreamingAssets",
+			$"echo {mapboxAccessToken} > Assets\StreamingAssets\MapboxAccess.text",
 			"git add .",
 			$"git commit -m \"pushed via [{originalCommit}] by [{commitAuthor}]\"",
 			$"git remote add origin https://{githubToken}@github.com/{cloudBuildRepo}.git",
