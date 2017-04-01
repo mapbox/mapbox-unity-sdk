@@ -5,7 +5,7 @@ Tools for using Mapbox with Unity.
 
 ## Build `unitypackage`
 
-### On AppVeyor
+### On AppVeyor 
 
 - change version of `MapboxSDKforUnityCore` in `packages.config` to the one needed
 - push
