@@ -134,8 +134,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                 {
                     var xrat = x / (_sampleCount - 1);
 
-                    var xx = Mathd.Lerp(tile.Rect.Min.x, (tile.Rect.Min.x + tile.Rect.Size.x), xrat);
-                    var yy = Mathd.Lerp(tile.Rect.Min.x, (tile.Rect.Min.x + tile.Rect.Size.y), yrat);
+                    var xx = Mathd.Lerp(tile.Rect.Min.x, tile.Rect.Max.x, xrat);
+                    var yy = Mathd.Lerp(tile.Rect.Min.y, tile.Rect.Max.y, yrat);
 
                     mesh.Vertices.Add(new Vector3(
                         (float)(xx - tile.Rect.Center.x),
