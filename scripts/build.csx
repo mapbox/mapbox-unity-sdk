@@ -164,6 +164,8 @@ if (!triggerCloudBuild) {
 			"git push -f origin CloudBuild"
 		});
 		foreach (var cmd in cmds) {
+			Console.WriteLine("RUNNING COMMAND:");
+			Console.WriteLine(cmd);
 			if (!RunCommand(cmd)) {
 				Console.Error.WriteLine("triggering Unity Cloud Build failed");
 				Environment.Exit(1);
