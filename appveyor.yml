@@ -1,3 +1,7 @@
+branches:
+  except:
+    - "unity-cloud-build"
+
 image: Visual Studio 2015
 
 init:
@@ -9,6 +13,8 @@ clone_depth: 5
 environment:
   GITHUB_TOKEN:
     secure: lJJOC3O25ATwK7jNt2TeYC9LexbMpef6ZSJDS8J4OFYABWt53IDe8BPcBNuELiyJ
+  MAPBOX_ACCESS_TOKEN:
+    secure: dMZloaDRX0kslhjJRbDySkawDtY+1/42ke/v1B2LEQjSnvSp4RWTEkrxuyca3B4Y+Tw4dGg5KI9mL2WFvMQyI49UuIRoVACbIyr6s5pvn4bme5fKhbs/XxpecpzYOVSt
 
 install:
   - update-mapbox-unity-sdk-core.bat
