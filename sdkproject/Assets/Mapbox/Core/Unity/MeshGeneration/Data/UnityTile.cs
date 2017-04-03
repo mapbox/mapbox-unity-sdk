@@ -10,6 +10,31 @@ namespace Mapbox.Unity.MeshGeneration.Data
     [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
     public class UnityTile : MonoBehaviour, INotifyPropertyChanged
     {
+        private MeshRenderer _meshRenderer;
+        public MeshRenderer MeshRenderer
+        {
+            get
+            {
+                if (_meshRenderer == null)
+                    _meshRenderer = GetComponent<MeshRenderer>();
+                return _meshRenderer;
+            }
+
+        }
+
+        private MeshFilter _meshFilter;
+        public MeshFilter MeshFilter
+        {
+            get
+            {
+                if (_meshFilter == null)
+                    _meshFilter = GetComponent<MeshFilter>();
+                return _meshFilter;
+            }
+        }
+
+        public MeshData MeshData { get; set; }
+
         #region basic properties //move to a base class?
         [SerializeField]
         private Texture2D _heightData;
@@ -73,7 +98,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
         public delegate void TileEventArgs(UnityTile sender, object param);
         public event TileEventArgs HeightDataChanged;
-        public event TileEventArgs SatelliteDataChanged;
+        public event TileEventArgs ImageDataChanged;
         public event TileEventArgs VectorDataChanged;
 
         [NotifyPropertyChangedInvocator]
@@ -93,7 +118,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
         [NotifyPropertyChangedInvocator]
         protected virtual void OnSatelliteDataChanged()
         {
-            var handler = SatelliteDataChanged;
+            var handler = ImageDataChanged;
             if (handler != null) handler(this, null);
         }
 
