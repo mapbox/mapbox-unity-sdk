@@ -9,6 +9,9 @@
 
 - name: Examples
   href: 03-examples.md
+  
+- name: Visualization
+  href: 04-Visualization.md
 
 - name: HoloLens Development
   href: hololens-development.md
