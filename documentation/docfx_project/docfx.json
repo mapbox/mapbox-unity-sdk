@@ -115,7 +115,8 @@
         "src": "../docs/",
         "dest": "docs",
         "files": [
-          "images/**"
+          "images/**",
+		  "MeshGeneration/Factories/Images/**"
         ],
         "exclude": [
           "obj/**",

@@ -26,11 +26,14 @@ Terrain factory has three public methods; `Initialize`, `Register` and `Update` 
 
 `Update` method clears the mesh data for all tiles and recraetes them using current settings. Clearing the mesh data first is important for stitching tile edges to each other.
 
-And bunch of private methods;
 
-`Run` starts the processing of a tile and directs tile to different functions depending on the `Map Type` parameter. These methods can be extracted into external modules in the future.
+Private method `Run` starts the processing of a tile and directs tile to different functions depending on the `Map Type` parameter. These methods can be extracted into external modules in the future.
 
+`CreateTerrainHeight` fetches the data from the Mapbox server and passes it to `GenerateTerrainMesh` for mesh generation, which creates a grid and queries the data for height of each node in this grid. Mesh vertices, triangles, normals and UV map are all created and set in this function.
 
+`FixStitches` method stitches the edges of terrain tiles to make it look continuous and smooth.
+
+`CreateFlatMesh` creates a quad as base mesh and doesn't use resolution.
 
 
 ##Flat Terrain
