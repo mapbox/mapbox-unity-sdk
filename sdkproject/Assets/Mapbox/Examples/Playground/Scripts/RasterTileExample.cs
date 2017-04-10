@@ -77,6 +77,7 @@ namespace Mapbox.Examples.Playground
             _map.Center = _startLoc;
             _map.Zoom = (int)_zoomSlider.value;
             _map.Subscribe(this);
+            _map.Update();
         }
 
         /// <summary>
@@ -87,6 +88,7 @@ namespace Mapbox.Examples.Playground
         void SearchLocation_OnGeocoderResponse(object sender, EventArgs e)
         {
             _map.Center = _searchLocation.Coordinate;
+            _map.Update();
         }
 
         /// <summary>
@@ -96,6 +98,7 @@ namespace Mapbox.Examples.Playground
         void AdjustZoom(float value)
         {
             _map.Zoom = (int)_zoomSlider.value;
+            _map.Update();
         }
 
         /// <summary>
@@ -106,6 +109,7 @@ namespace Mapbox.Examples.Playground
         {
             _mapstyle = target;
             _map.MapId = _mapboxStyles[target];
+            _map.Update();
         }
 
         /// <summary>
