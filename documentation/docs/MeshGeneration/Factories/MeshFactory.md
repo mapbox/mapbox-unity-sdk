@@ -12,7 +12,21 @@ Creates visualization for polygon and line features in 3D space.
 
 Creates visualization for point features in 2D/3D space.
 
-##Mesh Modifiers
+##Modifier Stacks
+
+####[Modifier Stack](Modifiers/ModifierStack.md)
+
+Modifier stacks are pretty much styles for features. Stacks keep mesh & gameobject modifiers and run them on feature objects. This is the actual process creating visuals for features.
+
+
+####[Merged Modifier Stack](Modifiers/MergedModifierStack.md)
+
+Works just like regular stacks but merges the mesh outputs.
+
+##Modifiers
+
+
+###Mesh Modifiers
 
 Mesh Modifiers creates the data, like vertices, triangles, normals and UVs, to build meshes.
 
@@ -36,7 +50,7 @@ Pushes a polygon up depending on the features height value and creates side wall
 
 Creates UV map values for polygons. Works with Polygon Mesh Modifier.
 
-##Game Object Modifiers
+###Game Object Modifiers
 
 Game Object Modifiers works on and modifies an already existing game object with a mesh.
 
