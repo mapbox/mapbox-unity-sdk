@@ -1,3 +1,5 @@
+**Please Note: Current support is limited to Unity 5.4 and above!**
+
 ### Platform Support
 
 - UWP builds not currently working
