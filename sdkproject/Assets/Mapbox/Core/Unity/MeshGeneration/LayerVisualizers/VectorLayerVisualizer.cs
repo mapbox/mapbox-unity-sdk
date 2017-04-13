@@ -72,14 +72,18 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
                     Build(feature, tile, _container);
             }
 
-            if (_defaultStack is MergedModifierStack)
-                (_defaultStack as MergedModifierStack).End(tile, _container);
+            var mergedStack = _defaultStack as MergedModifierStack;
+            if (mergedStack != null)
+            {
+                mergedStack.End(tile, _container);
+            }
 
             for (int i = 0; i < Stacks.Count; i++)
             {
-                if(Stacks[i].Stack is MergedModifierStack)
+                mergedStack = Stacks[i].Stack as MergedModifierStack;
+                if (mergedStack != null)
                 {
-                    (Stacks[i].Stack as MergedModifierStack).End(tile, _container);
+                    mergedStack.End(tile, _container);
                 }
             }
         }
