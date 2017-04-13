@@ -8,20 +8,15 @@
 
 * Go to https://www.mapbox.com/unity/
 * Click `Download the SDK`
-* Assets—>Import package—>Custom Package **OR**
-* Double-click downloaded `.unityPackage`
+  * Assets—>Import package—>Custom Package (from the Unity editor menu) 
+
+    **OR**
+
+  * Double-click downloaded `.unityPackage`
 
 ## From Source
 
 * `git clone https://github.com/mapbox/mapbox-unity-sdk.git`
-
-## Configure API Access
-
-Copy your token from: https://www.mapbox.com/studio/account/tokens/.
-
-Click Mapbox—>Configure Access from the Unity Editor menu. Paste your token into the `Token` field. Assuming your token is valid, it will save to a text file in `StreamingAssets/MapboxAccess.text`. This file is ignored from the git repo to prevent contributors from accidentally comitting personal tokens. At runtime, the contents of this file will be read and cached for `FileSource` request purposes. See `MapboxAccess.cs` for details.
-
-Now that your access has been configured, check out [the included examples](https://mapbox.github.io/mapbox-unity-sdk/docs/03-examples.html).
 
 ## Issues
 
