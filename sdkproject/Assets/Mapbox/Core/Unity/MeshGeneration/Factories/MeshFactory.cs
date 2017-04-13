@@ -7,6 +7,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
     using Mapbox.Unity.MeshGeneration.Interfaces;
     using Mapbox.Platform;
 
+    /// <summary>
+    /// Uses vector tile api to visualize vector data.
+    /// Fetches the vector data for given tile and passes layer data to layer visualizers.
+    /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Factories/Mesh Factory")]
     public class MeshFactory : Factory
     {
@@ -17,6 +21,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         private Dictionary<Vector2, UnityTile> _tiles;
         private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;
 
+        /// <summary>
+        /// Sets up the Mesh Factory
+        /// </summary>
+        /// <param name="fs"></param>
         public override void Initialize(IFileSource fs)
         {
             base.Initialize(fs);
@@ -68,6 +76,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                 CreateMeshes(t, e);
         }
 
+
+        /// <summary>
+        /// Fetches the vector data and passes each layer to relevant layer visualizers
+        /// </summary>
+        /// <param name="tile"></param>
+        /// <param name="e"></param>
         private void CreateMeshes(UnityTile tile, object e)
         {
             tile.HeightDataChanged -= HeightDataChangedHandler;
