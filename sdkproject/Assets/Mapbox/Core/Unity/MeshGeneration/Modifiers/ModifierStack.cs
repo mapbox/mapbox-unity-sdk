@@ -7,12 +7,12 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     using Mapbox.Unity.MeshGeneration.Components;
 
     [CreateAssetMenu(menuName = "Mapbox/Modifiers/Modifier Stack")]
-    public class ModifierStack : ScriptableObject
+    public class ModifierStack : ModifierStackBase
     {
         public List<MeshModifier> MeshModifiers;
         public List<GameObjectModifier> GoModifiers;
 
-        public GameObject Execute(VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
+        public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
         {
             foreach (MeshModifier mod in MeshModifiers.Where(x => x.Active))
             {
