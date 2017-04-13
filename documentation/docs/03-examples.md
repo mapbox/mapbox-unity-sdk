@@ -94,7 +94,7 @@ Please see `DriveTrafficVisualizer.asset` to analyze how we styled low, moderate
 
 The ground layer was generated with a `flat` `TerrainFactory` and a `MapImageFactory` (for raster tiles) with the Mapbox Dark style applied. 
 
-To understand 3D building generation, please see `Mesh Generation Basics`.
+To understand 3D building generation, please see `Mesh Generation Basics`. One particular difference in this example, however, is the use of a `MergedModifierStack` for `DriveBuildingVisualizer.asset`. This `ModifierStack` is responsible for merging buildings during generation. This optimization reduces the number of transforms and draw calls in the scene, vastly improving the final frame rate.
 
 ### Slippy Vector Terrain
 
