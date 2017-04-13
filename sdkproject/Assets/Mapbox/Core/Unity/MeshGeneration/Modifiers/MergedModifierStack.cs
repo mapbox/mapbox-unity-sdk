@@ -84,7 +84,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
         public GameObject End(UnityTile tile, GameObject parent)
         {
-            GameObject go = null;
+
             var md = new MeshData();
             md.UV = new List<List<Vector2>>() { new List<Vector2>(), new List<Vector2>() };
             md.Triangles = new List<List<int>>() { new List<int>(), new List<int>() };
@@ -103,11 +103,17 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                     }
                 }
 
-                go = CreateGameObject(md, parent);
-                _cacheVertexCount[tile] = 0;
-                _cached[tile].Clear();
+                if (md.Vertices.Count > 3)
+                {
+                    GameObject go = null;
+                    go = CreateGameObject(md, parent);
+                    _cacheVertexCount[tile] = 0;
+                    _cached[tile].Clear();
+                    return go;
+                }
+                
             }
-            return go;
+            return null;
         }
     }
 }
