@@ -1,18 +1,18 @@
-using System;
-using UnityEngine;
-
-namespace Scripts.Location
+namespace Mapbox.Unity.Location
 {
-	public interface ILocationProvider
+    using System;
+    using Mapbox.Utils;
+
+    public interface ILocationProvider
 	{
 		event EventHandler<LocationUpdatedEventArgs> OnLocationUpdated;
 		event EventHandler<HeadingUpdatedEventArgs> OnHeadingUpdated;
-		Vector2 Location { get; }
+		Vector2d Location { get; }
 	}
 
 	public class LocationUpdatedEventArgs: EventArgs
 	{
-		public Vector2 Location;
+		public Vector2d Location;
 	}
 
 	public class HeadingUpdatedEventArgs : EventArgs

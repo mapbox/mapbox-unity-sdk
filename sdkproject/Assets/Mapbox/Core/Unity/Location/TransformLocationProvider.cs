@@ -1,15 +1,17 @@
-using System;
-using UnityEngine;
-using Assets.Scripts.Helpers;
-
-namespace Scripts.Location
+namespace Mapbox.Unity.Location
 {
-	public class TransformLocationProvider : MonoBehaviour, ILocationProvider
+    using System;
+    using Mapbox.Unity.Utilities;
+    using Mapbox.Utils;
+    using UnityEngine;
+    using Mapbox.Unity.MeshGeneration;
+
+    public class TransformLocationProvider : MonoBehaviour, ILocationProvider
 	{
-		[SerializeField]
+        [SerializeField]
 		Transform _targetTransform;
 
-		public Vector2 Location
+		public Vector2d Location
 		{
 			get
 			{
@@ -37,16 +39,13 @@ namespace Scripts.Location
 
 			if (OnLocationUpdated != null)
 			{
-				// TODO: optimize this. Use Vector2 OR GeoCoordinate?
 				OnLocationUpdated(this, new LocationUpdatedEventArgs() { Location = GetLocation() });
 			}
 		}
 
-		Vector2 GetLocation()
+		Vector2d GetLocation()
 		{
-			var geo = _targetTransform.GetGeoPosition();
-			var position = new Vector2((float)geo.Latitude, (float)geo.Longitude);
-			return position;
+            return _targetTransform.GetGeoPosition(MapController.ReferenceTileRect.Center, MapController.WorldScaleFactor);
 		}
 	}
 }

@@ -1,101 +1,54 @@
-using System;
-using System.Collections;
-using Mapbox.Geocoding;
-using Mapbox.Scripts.Utilities;
-using UnityEngine;
-
-namespace Scripts.Location
+namespace Mapbox.Unity.Location
 {
-	public class EditorLocationProvider : MonoBehaviour, ILocationProvider
-	{
-		[SerializeField]
-		string _forwardGeocodeQuery;
+    using System;
+    using Mapbox.Unity.Utilities;
+    using Mapbox.Utils;
+    using UnityEngine;
 
-		[SerializeField]
-		float _latitude;
+    public class EditorLocationProvider : MonoBehaviour, ILocationProvider
+    {
+        [SerializeField]
+        [Geocode]
+        string _latitudeLongitude;
 
-		[SerializeField]
-		float _longitude;
+        [SerializeField]
+        [Range(0, 359)]
+        float _heading;
 
-		[SerializeField]
-		[Range(0, 359)]
-		float _heading;
-
-		ForwardGeocodeResource _resource;
-
-		Coroutine _updateLocationRoutine;
-
-		Vector2 _location;
-		public Vector2 Location
-		{
-			get
-			{
-				return _location;
-			}
-		}
-
-		public event EventHandler<HeadingUpdatedEventArgs> OnHeadingUpdated;
-		public event EventHandler<LocationUpdatedEventArgs> OnLocationUpdated;
-
-		void Start()
-		{
-			_resource = new ForwardGeocodeResource("");
-
-			if (!string.IsNullOrEmpty(_forwardGeocodeQuery))
-			{
-				_resource.Query = _forwardGeocodeQuery;
-				MapboxConvenience.Instance.Geocoder.Geocode(_resource, HandleGeocoderResponse);
-			}
-            else
+        public Vector2d Location
+        {
+            get
             {
-                _updateLocationRoutine = StartCoroutine(UpdateLocationRoutine());
+                var split = _latitudeLongitude.Split(',');
+                return new Vector2d(double.Parse(split[0]), double.Parse(split[1]));
             }
-		}
+        }
 
-		void Update()
-		{
-			if (OnHeadingUpdated != null)
-			{
-				OnHeadingUpdated(this, new HeadingUpdatedEventArgs() { Heading = _heading });
-			}
-		}
+        public event EventHandler<HeadingUpdatedEventArgs> OnHeadingUpdated;
+        public event EventHandler<LocationUpdatedEventArgs> OnLocationUpdated;
 
-		void HandleGeocoderResponse(ForwardGeocodeResponse response)
-		{
-			var geocoords = response.Features[0].Center;
-			UpdateLocation((float)geocoords.Latitude, (float)geocoords.Longitude);
-		}
+#if UNITY_EDITOR
+        void Update()
+        {
+            SendHeadingUpdated();
+            SendLocationUpdated();
+        }
+#endif
 
-		IEnumerator UpdateLocationRoutine()
-		{
-			while (true)
-			{
-				_location = new Vector2(_latitude, _longitude);
-				SendLocationUpdated();
-				yield return new WaitForSeconds(1f);
-			}
-		}
+        void SendHeadingUpdated()
+        {
+            if (OnHeadingUpdated != null)
+            {
+                OnHeadingUpdated(this, new HeadingUpdatedEventArgs() { Heading = _heading });
+            }
+        }
 
-		[ContextMenu("Update location")]
-		public void UpdateLocation(float lat, float lon)
-		{
-			_latitude = lat;
-			_longitude = lon;
-
-			if (_updateLocationRoutine != null)
-			{
-				StopCoroutine(_updateLocationRoutine);
-				_updateLocationRoutine = null;
-			}
-			_updateLocationRoutine = StartCoroutine(UpdateLocationRoutine());
-		}
-
-		void SendLocationUpdated()
-		{
-			if (OnLocationUpdated != null)
-			{
-				OnLocationUpdated(this, new LocationUpdatedEventArgs() { Location = _location });
-			}
-		}
-	}
+        void SendLocationUpdated()
+        {
+            if (OnLocationUpdated != null)
+            {
+                OnLocationUpdated(this, new LocationUpdatedEventArgs() { Location = Location });
+            }
+        }
+    }
 }

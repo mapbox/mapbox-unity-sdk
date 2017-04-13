@@ -1,94 +1,109 @@
-using System.Collections;
-using UnityEngine;
-using Scripts.Location;
-using System;
-
-namespace Location
+namespace Mapbox.Unity.Location
 {
-	public class DeviceLocationProvider : MonoBehaviour, ILocationProvider
-	{
-		Coroutine _pollRoutine;
+    using System.Collections;
+    using UnityEngine;
+    using System;
+    using Mapbox.Utils;
 
-		float _lastHeading;
+    public class DeviceLocationProvider : MonoBehaviour, ILocationProvider
+    {
+        [SerializeField]
+        float _desiredAccuracyInMeters = 5f;
 
-		double _lastTimestamp;
+        [SerializeField]
+        float _updateDistanceInMeters = 5f;
 
-		Vector2 _location;
-		public Vector2 Location
-		{
-			get
-			{
-				return _location;
-			}
-		}
+        Coroutine _pollRoutine;
 
-		public event EventHandler<LocationUpdatedEventArgs> OnLocationUpdated;
-		public event EventHandler<HeadingUpdatedEventArgs> OnHeadingUpdated;
+        double _lastLocationTimestamp;
 
-		void Start()
-		{
-			if (_pollRoutine == null)
-			{
-				_pollRoutine = StartCoroutine(PollLocationRoutine());
-			}
-		}
+        double _lastHeadingTimestamp;
 
-		IEnumerator PollLocationRoutine()
-		{
-			if (!Input.location.isEnabledByUser)
-			{
-				yield break;
-			}
-			Input.location.Start(5f, 5f);
-			Input.compass.enabled = true;
+        WaitForSeconds _wait;
 
-			int maxWait = 20;
-			while (Input.location.status == LocationServiceStatus.Initializing && maxWait > 0)
-			{
-				yield return new WaitForSeconds(1);
-				maxWait--;
-			}
+        Vector2d _location;
+        public Vector2d Location
+        {
+            get
+            {
+                return _location;
+            }
+        }
 
-			if (maxWait < 1)
-			{
-				yield break;
-			}
+        public event EventHandler<LocationUpdatedEventArgs> OnLocationUpdated;
+        public event EventHandler<HeadingUpdatedEventArgs> OnHeadingUpdated;
 
-			if (Input.location.status == LocationServiceStatus.Failed)
-			{
-				yield break;
-			}
+        void Start()
+        {
+            _wait = new WaitForSeconds(1f);
+            if (_pollRoutine == null)
+            {
+                _pollRoutine = StartCoroutine(PollLocationRoutine());
+            }
+        }
 
-			while (true)
-			{
-				var heading = Input.compass.trueHeading;
-				SendHeadingUpdated(heading);
+        IEnumerator PollLocationRoutine()
+        {
+            if (!Input.location.isEnabledByUser)
+            {
+                yield break;
+            }
 
-				var timestamp = Input.location.lastData.timestamp;
-				if (Input.location.status == LocationServiceStatus.Running && timestamp > _lastTimestamp)
-				{
-					_location = new Vector2(Input.location.lastData.latitude, Input.location.lastData.longitude);
-					SendLocationUpdated(_location);
-					_lastTimestamp = timestamp;
-				}
-				yield return null;
-			}
-		}
+            Input.location.Start(_desiredAccuracyInMeters, _updateDistanceInMeters);
+            Input.compass.enabled = true;
 
-		void SendHeadingUpdated(float heading)
-		{
-			if (OnHeadingUpdated != null)
-			{
-				OnHeadingUpdated(this, new HeadingUpdatedEventArgs() { Heading = heading });
-			}
-		}
+            int maxWait = 20;
+            while (Input.location.status == LocationServiceStatus.Initializing && maxWait > 0)
+            {
+                yield return _wait;
+                maxWait--;
+            }
 
-		void SendLocationUpdated(Vector2 location)
-		{
-			if (OnLocationUpdated != null)
-			{
-				OnLocationUpdated(this, new LocationUpdatedEventArgs() { Location = location});
-			}
-		}
-	}
+            if (maxWait < 1)
+            {
+                yield break;
+            }
+
+            if (Input.location.status == LocationServiceStatus.Failed)
+            {
+                yield break;
+            }
+
+            while (true)
+            {
+                var timestamp = Input.compass.timestamp;
+                if (Input.compass.enabled && timestamp > _lastHeadingTimestamp)
+                {
+                    var heading = Input.compass.trueHeading;
+                    SendHeadingUpdated(heading);
+                    _lastHeadingTimestamp = timestamp;
+                }
+
+                timestamp = Input.location.lastData.timestamp;
+                if (Input.location.status == LocationServiceStatus.Running && timestamp > _lastLocationTimestamp)
+                {
+                    _location = new Vector2d(Input.location.lastData.latitude, Input.location.lastData.longitude);
+                    SendLocationUpdated(_location);
+                    _lastLocationTimestamp = timestamp;
+                }
+                yield return null;
+            }
+        }
+
+        void SendHeadingUpdated(float heading)
+        {
+            if (OnHeadingUpdated != null)
+            {
+                OnHeadingUpdated(this, new HeadingUpdatedEventArgs() { Heading = heading });
+            }
+        }
+
+        void SendLocationUpdated(Vector2d location)
+        {
+            if (OnLocationUpdated != null)
+            {
+                OnLocationUpdated(this, new LocationUpdatedEventArgs() { Location = location });
+            }
+        }
+    }
 }

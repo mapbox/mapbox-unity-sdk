@@ -1,82 +1,100 @@
-// HACK: Does this belong here?
 #if !UNITY_EDITOR
 #define NOT_UNITY_EDITOR
 #endif
 
-using System.Diagnostics;
-using Mapbox.Scripts.Utilities;
-using Location;
-using UnityEngine;
-
-namespace Scripts.Location
+namespace Mapbox.Unity.Location
 {
-	public class LocationProviderFactory : SingletonBehaviour<LocationProviderFactory>
-	{
-		[SerializeField]
-		DeviceLocationProvider _deviceLocationProvider;
+    using System.Diagnostics;
+    using UnityEngine;
 
-		[SerializeField]
-		EditorLocationProvider _editorLocationProvider;
+    public class LocationProviderFactory : MonoBehaviour
+    {
+        [SerializeField]
+        DeviceLocationProvider _deviceLocationProvider;
 
-		[SerializeField]
-		TransformLocationProvider _transformLocationProvider;
+        [SerializeField]
+        EditorLocationProvider _editorLocationProvider;
 
-		ILocationProvider _defaultLocationProvider;
-		public ILocationProvider DefaultLocationProvider
-		{
-			get
-			{
-				return _defaultLocationProvider;
-			}
-			set
-			{
-				_defaultLocationProvider = value;
-			}
-		}
+        [SerializeField]
+        TransformLocationProvider _transformLocationProvider;
 
-		public TransformLocationProvider TransformLocationProvider
-		{
-			get
-			{
-				return _transformLocationProvider;
-			}
-		}
+        private static LocationProviderFactory _instance;
+        public static LocationProviderFactory Instance
+        {
+            get
+            {
+                return _instance;
+            }
 
-		public EditorLocationProvider EditorLocationProvider
-		{
-			get
-			{
-				return _editorLocationProvider;
-			}
-		}
+            private set
+            {
+                _instance = value;
+            }
+        }
 
-		public DeviceLocationProvider DeviceLocationProvider
-		{
-			get
-			{
-				return _deviceLocationProvider;
-			}
-		}
+        ILocationProvider _defaultLocationProvider;
+        public ILocationProvider DefaultLocationProvider
+        {
+            get
+            {
+                return _defaultLocationProvider;
+            }
+            set
+            {
+                _defaultLocationProvider = value;
+            }
+        }
 
-		public override void Awake()
-		{
-			base.Awake();
-			InjectEditorLocationProvider();
-			InjectDeviceLocationProvider();
-		}
+        public TransformLocationProvider TransformLocationProvider
+        {
+            get
+            {
+                return _transformLocationProvider;
+            }
+        }
 
-		[Conditional("UNITY_EDITOR")]
-		void InjectEditorLocationProvider()
-		{
-			UnityEngine.Debug.Log("LocationProviderFactory: " + "Injected EDITOR Location Provider");
-			_defaultLocationProvider = _editorLocationProvider;
-		}
+        public EditorLocationProvider EditorLocationProvider
+        {
+            get
+            {
+                return _editorLocationProvider;
+            }
+        }
 
-		[Conditional("NOT_UNITY_EDITOR")]
-		void InjectDeviceLocationProvider()
-		{
-			UnityEngine.Debug.Log("LocationProviderFactory: " + "Injected DEVICE Location Provider");
-			_defaultLocationProvider = _deviceLocationProvider;
-		}
-	}
+        public DeviceLocationProvider DeviceLocationProvider
+        {
+            get
+            {
+                return _deviceLocationProvider;
+            }
+        }
+
+        private void Awake()
+        {
+            if (Instance != null)
+            {
+                DestroyImmediate(gameObject);
+                return;
+            }
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+
+            InjectEditorLocationProvider();
+            InjectDeviceLocationProvider();
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        void InjectEditorLocationProvider()
+        {
+            UnityEngine.Debug.Log("LocationProviderFactory: " + "Injected EDITOR Location Provider");
+            DefaultLocationProvider = _editorLocationProvider;
+        }
+
+        [Conditional("NOT_UNITY_EDITOR")]
+        void InjectDeviceLocationProvider()
+        {
+            UnityEngine.Debug.Log("LocationProviderFactory: " + "Injected DEVICE Location Provider");
+            DefaultLocationProvider = _deviceLocationProvider;
+        }
+    }
 }
