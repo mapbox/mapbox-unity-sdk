@@ -2,11 +2,11 @@
 
 For each example, associated scripts and resources can be found in the same root directory as the scene itself.
 
-### Playground
+## Playground
 
 These examples demonstrate how to request specific Mapbox data using our C# library.
 
-#### Forward Geocoder
+### Forward Geocoder
 
 *ForwardGeocoder.unity*
 
@@ -14,7 +14,7 @@ A forward geocoding request will fetch GeoJSON from a place name query. A new re
 
 Visit [our API documentation](https://www.mapbox.com/api-documentation/#geocoding) for more information.
 
-#### Reverse Geocoder
+### Reverse Geocoder
 
 *ReverseGeocoder.unity*
 
@@ -22,7 +22,7 @@ A reverse geocoding request will fetch GeoJSON from a location query. The locati
 
 Visit [our API documentation](https://www.mapbox.com/api-documentation/#geocoding) for more information.
 
-#### Directions
+### Directions
 
 *Directions.unity*
 
@@ -34,7 +34,7 @@ When the geocode requests have been completed, a directions request is executed.
 
 Directions results will be logged to the UI when they are available (in the form of JSON).
 
-#### Raster Tile
+### Raster Tile
 
 *RasterTile.unity*
 
@@ -44,7 +44,7 @@ See: https://www.mapbox.com/help/define-style/
 
 See: https://www.mapbox.com/api-documentation/#retrieve-raster-tiles-from-styles
 
-#### Vector Tile
+### Vector Tile
 
 *VectorTile.unity*
 
@@ -54,7 +54,7 @@ In this example, the result is GeoJSON with a feature collection.
 
 Visit [our API documentation](https://www.mapbox.com/api-documentation/#retrieve-features-from-vector-tiles) for more information.
 
-### Mesh Generation Basics
+## Mesh Generation Basics
 
 *MeshGeneration.unity*
 
@@ -68,7 +68,7 @@ See `MapImageFactory.asset` to customize the raster `MapId` you would like to us
 
 See `MeshFactory.asset` to see how specific layers are extracted from vector tiles. In this case, we are generating meshes for both `building` and `road`. Therefore, each layer has a `VectorLayerVisualizer` responsible for handling that layer's specific data (such as geometry).
 
-### Mesh Generataion Pois
+## Mesh Generataion Pois
 
 *PoiGeneration.unity*
 
@@ -76,13 +76,13 @@ With the exception of a `PoiVisualizer ` (`PoiDemoPoiVisualizer`) being added to
 
 `PoiDemoPoiVisualizer.asset` allows you to override which prefab to spawn for each `po_label` contained in the vector tile. This prefab should have a component that implements `ILabelVisualizationHelper` attached to it. This exists to inject feature data into (such as label and `Maki` icon).
 
-### Mesh Generation Styles
+## Mesh Generation Styles
 
 *StylingDemoMeshGeneration.unity*
 
 This example demonstrates how to use `TypeFilters` to filter specific features for processing. In this case, we have chosen to exclude `schools` from mesh generation. Additionally, you can use `ModifierStacks` to further customize specific features (to color banks differently, for example).
 
-### Drive
+## Drive
 
 *Drive.unity*
 
@@ -96,9 +96,9 @@ The ground layer was generated with a `flat` `TerrainFactory` and a `MapImageFac
 
 To understand 3D building generation, please see `Mesh Generation Basics`. One particular difference in this example, however, is the use of a `MergedModifierStack` for `DriveBuildingVisualizer.asset`. This `ModifierStack` is responsible for merging buildings during generation. This optimization reduces the number of transforms and draw calls in the scene, vastly improving the final frame rate.
 
-### Slippy Vector Terrain
+## Slippy Vector Terrain
 
-*SlippyDemo.Unity*
+*SlippyDemo.unity*
 
 This example demonstrates one way to create a [slippy map](http://wiki.openstreetmap.org/wiki/Slippy_Map). The `Slippy` component attached to the `MapController` game object is responsible for requesting new tiles as needed, based on the position of the camera relative to the map. This is achieved using `raycasting` and a dictionary of known (requested and fetched) tiles.
 
@@ -106,7 +106,7 @@ Use W, A, S, D keyboard controls to navigate the map at runtime.
 
 Please see `Mesh Generation Basics` to understand how features are customized. 
 
-### Voxels
+## Voxels
 
 *VoxelWorld.unity*
 
@@ -125,3 +125,33 @@ This Minecraft-inspired example demonstrates a less traditional way to consume M
 `Voxel Batch Count`: How many voxels to spawn at once. Keep this number low to prevent locking the main thread during construction. 
 
 Please read [the blog post](https://www.mapbox.com/blog/how-to-minecraft-unity/) describing how this was made for more information. 
+
+## LocationProvider
+
+*LocationProvider.unity*
+
+This example is to demonstrate how to:
+
+- Build a map for your current (device) location 
+- Update a virtual player's position and rotation based on a real or mock location and heading
+- Use mock location providers to test in the Unity editor
+- Convert between unity world space<—>earth space (latitude, longitude)
+
+The `LocationProvider` game object in this scene has three children. Each child corresponds to a specific type of `ILocationProvider`. Please [read more about LocationProviders](https://mapbox.github.io/mapbox-unity-sdk/api/unity/Mapbox.Unity.Location.html).
+
+The `MapController` game object has a `BuildMapAtLocation` component attached to it. This component is responsible for overriding the default center point of the `MapController` component, using the DefaultLocationProvider's location. In the Unity editor, this is the `EditorLocationProvider`—intended for mocking. On device, this is the `DeviceLocationProvider`—intended for real world location updates.
+
+To change the location for the map in the Editor, change `EditorLocationProvider`'s `LatitudeLongitude` field on the `Editor` game object. You can use the embedded `Search` button in the inspector to search for a place or address. The default location for this scene is the Metreon, in San Francisco, CA. 
+
+**Note: It is important that the `MapController` component be disabled to begin with.**
+
+Press play and observe the map being constructed. Click on the `Player` game object and note the attached components: `PositionWithLocationProvider` and `RotateWithLocationProvider`. These are responsible for updating the transform's position and rotation based on a specified `ILocationProvider`. Again, in the `EditorLocationProvider`, search for `Yerba Buena Gardens` and select the top result. Watch as the player's position updates!
+
+If you check `Use Transform Location Provider` for `PositionWithLocationProvider` and `RotateWithLocationProvider`, the mock `ILocationProvider` will be represented by the `Transform` game object. Press play once more with this toggle checked for both components. In the scene view, move and rotate the `Transform` game object and observe as the `Player` tries to follow that target. It is important to note that the location returned by the `TransformLocationProvider` is actually converted from the transform's world position to latitude, longitude. This is what that conversion looks like: 
+
+```cs
+return _targetTransform.GetGeoPosition(MapController.ReferenceTileRect.Center, MapController.WorldScaleFactor);
+```
+
+If you build to device, you should see a familiar map and can observe the player update with your own location. Because the camera is a child of `Player`, you should always be centered on the map.
+

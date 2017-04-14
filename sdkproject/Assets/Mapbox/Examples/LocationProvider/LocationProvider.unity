@@ -238,7 +238,7 @@ GameObject:
   - 4: {fileID: 433510108}
   - 114: {fileID: 433510107}
   m_Layer: 0
-  m_Name: _LocationProviderFactory
+  m_Name: LocationProvider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
