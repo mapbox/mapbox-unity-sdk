@@ -5,12 +5,29 @@
 
     public class RotateWithLocationProvider : MonoBehaviour
     {
+        /// <summary>
+        /// The rate at which the transform's rotation tries catch up to the provided heading.  
+        /// </summary>
         [SerializeField]
         float _rotationFollowFactor;
 
+        /// <summary>
+        /// Set this to true if you'd like to adjust the rotation of a RectTransform (in a UI canvas) with the heading.
+        /// </summary>
         [SerializeField]
         bool _rotateZ;
 
+        /// <summary>
+        /// Use a mock <see cref="T:Mapbox.Unity.Location.TransformLocationProvider"/>,
+        /// rather than a <see cref="T:Mapbox.Unity.Location.EditorLocationProvider"/>.   
+        /// </summary>
+        [SerializeField]
+        bool _useTransformLocationProvider;
+
+        /// <summary>
+        /// The location provider.
+        /// This is public so you change which concrete <see cref="ILocationProvider"/> to use at runtime.  
+        /// </summary>
         ILocationProvider _locationProvider;
         public ILocationProvider LocationProvider
         {
@@ -18,7 +35,8 @@
             {
                 if (_locationProvider == null)
                 {
-                    _locationProvider = LocationProviderFactory.Instance.DefaultLocationProvider;
+                    _locationProvider = _useTransformLocationProvider ?
+                        LocationProviderFactory.Instance.TransformLocationProvider : LocationProviderFactory.Instance.DefaultLocationProvider;
                 }
 
                 return _locationProvider;

@@ -6,46 +6,75 @@ namespace Mapbox.Unity.Location
     using UnityEngine;
     using Mapbox.Unity.MeshGeneration;
 
+    /// <summary>
+    /// The TransformLocationProvider is responsible for providing mock location and heading data
+    /// for testing purposes in the Unity editor.
+    /// This is achieved by querying a Unity <see href="https://docs.unity3d.com/ScriptReference/Transform.html">Transform</see> every frame.
+    /// You might use this to to update location based on a touched position, for example.
+    /// </summary>
     public class TransformLocationProvider : MonoBehaviour, ILocationProvider
-	{
+    {
+        /// <summary>
+        /// The transform that will be queried for location and heading data.
+        /// </summary>
         [SerializeField]
-		Transform _targetTransform;
+        Transform _targetTransform;
 
-		public Vector2d Location
-		{
-			get
-			{
-				return GetLocation();
-			}
-		}
+        /// <summary>
+        /// Gets the latitude, longitude of the transform.
+        /// This is converted from unity world space to real world geocoordinate space.
+        /// </summary>
+        /// <value>The location.</value>
+        public Vector2d Location
+        {
+            get
+            {
+                return GetLocation();
+            }
+        }
 
-		public Transform TargetTransform
-		{
-			set
-			{
-				_targetTransform = value;
-			}
-		}
+        /// <summary>
+        /// Sets the target transform.
+        /// Use this if you want to switch the transform at runtime.
+        /// </summary>
+        public Transform TargetTransform
+        {
+            set
+            {
+                _targetTransform = value;
+            }
+        }
 
-		public event EventHandler<HeadingUpdatedEventArgs> OnHeadingUpdated;
-		public event EventHandler<LocationUpdatedEventArgs> OnLocationUpdated;
+        /// <summary>
+        /// Occurs every frame.
+        /// </summary>
+        public event EventHandler<HeadingUpdatedEventArgs> OnHeadingUpdated;
 
-		void Update()
-		{
-			if (OnHeadingUpdated != null)
-			{
-				OnHeadingUpdated(this, new HeadingUpdatedEventArgs() { Heading = _targetTransform.eulerAngles.y });
-			}
+        /// <summary>
+        /// Occurs every frame.
+        /// </summary>
+        public event EventHandler<LocationUpdatedEventArgs> OnLocationUpdated;
 
-			if (OnLocationUpdated != null)
-			{
-				OnLocationUpdated(this, new LocationUpdatedEventArgs() { Location = GetLocation() });
-			}
-		}
+        void Update()
+        {
+            if (OnHeadingUpdated != null)
+            {
+                OnHeadingUpdated(this, new HeadingUpdatedEventArgs() { Heading = _targetTransform.eulerAngles.y });
+            }
 
-		Vector2d GetLocation()
-		{
+            if (OnLocationUpdated != null)
+            {
+                OnLocationUpdated(this, new LocationUpdatedEventArgs() { Location = GetLocation() });
+            }
+        }
+
+        Vector2d GetLocation()
+        {
+            if (MapController.ReferenceTileRect == null)
+            {
+                return LocationProviderFactory.Instance.DefaultLocationProvider.Location;
+            }
             return _targetTransform.GetGeoPosition(MapController.ReferenceTileRect.Center, MapController.WorldScaleFactor);
-		}
-	}
+        }
+    }
 }

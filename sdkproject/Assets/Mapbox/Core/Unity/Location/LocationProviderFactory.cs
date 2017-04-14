@@ -7,6 +7,10 @@ namespace Mapbox.Unity.Location
     using System.Diagnostics;
     using UnityEngine;
 
+    /// <summary>
+    /// Singleton factory to allow easy access to various LocationProviders.
+    /// This is meant to be attached to a game object.
+    /// </summary>
     public class LocationProviderFactory : MonoBehaviour
     {
         [SerializeField]
@@ -18,6 +22,9 @@ namespace Mapbox.Unity.Location
         [SerializeField]
         TransformLocationProvider _transformLocationProvider;
 
+        /// <summary>
+        /// The singleton instance of this factory.
+        /// </summary>
         private static LocationProviderFactory _instance;
         public static LocationProviderFactory Instance
         {
@@ -32,6 +39,23 @@ namespace Mapbox.Unity.Location
             }
         }
 
+        /// <summary>
+        /// The default location provider. 
+        /// Outside of the editor, this will be a <see cref="DeviceLocationProvider"/>.
+        /// In the Unity editor, this will be an <see cref="EditorLocationProvider"/>
+        /// </summary>
+        /// <example>
+        /// Fetch location to set a transform's position:
+        /// <code>
+        /// void Update()
+        /// {
+        /// 	var locationProvider = LocationProviderFactory.Instance.DefaultLocationProvider;
+        /// 	transform.position = Conversions.GeoToWorldPosition(locationProvider.Location,
+        /// 														MapController.ReferenceTileRect.Center,
+        /// 														MapController.WorldScaleFactor).ToVector3xz();
+        /// }
+        /// </code>
+        /// </example>
         ILocationProvider _defaultLocationProvider;
         public ILocationProvider DefaultLocationProvider
         {
@@ -45,6 +69,9 @@ namespace Mapbox.Unity.Location
             }
         }
 
+        /// <summary>
+        /// Returns the serialized <see cref="TransformLocationProvider"/>.
+        /// </summary>
         public TransformLocationProvider TransformLocationProvider
         {
             get
@@ -53,6 +80,9 @@ namespace Mapbox.Unity.Location
             }
         }
 
+        /// <summary>
+        /// Returns the serialized <see cref="EditorLocationProvider"/>.
+        /// </summary>
         public EditorLocationProvider EditorLocationProvider
         {
             get
@@ -61,6 +91,9 @@ namespace Mapbox.Unity.Location
             }
         }
 
+        /// <summary>
+        /// Returns the serialized <see cref="DeviceLocationProvider"/>
+        /// </summary>
         public DeviceLocationProvider DeviceLocationProvider
         {
             get
@@ -69,6 +102,9 @@ namespace Mapbox.Unity.Location
             }
         }
 
+        /// <summary>
+        /// Create singleton instance and inject the DefaulyLocationProvider upon initialization of this component. 
+        /// </summary>
         private void Awake()
         {
             if (Instance != null)
@@ -83,6 +119,10 @@ namespace Mapbox.Unity.Location
             InjectDeviceLocationProvider();
         }
 
+        /// <summary>
+        /// Injects the editor location provider.
+        /// Depending on the platform, this method and calls to it will be stripped during compile.
+        /// </summary>
         [Conditional("UNITY_EDITOR")]
         void InjectEditorLocationProvider()
         {
@@ -90,6 +130,10 @@ namespace Mapbox.Unity.Location
             DefaultLocationProvider = _editorLocationProvider;
         }
 
+        /// <summary>
+        /// Injects the device location provider.
+        /// Depending on the platform, this method and calls to it will be stripped during compile.
+        /// </summary>
         [Conditional("NOT_UNITY_EDITOR")]
         void InjectDeviceLocationProvider()
         {
