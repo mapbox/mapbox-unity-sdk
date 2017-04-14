@@ -39,24 +39,25 @@ namespace Mapbox.Unity.Location
             }
         }
 
+        ILocationProvider _defaultLocationProvider;
+
         /// <summary>
         /// The default location provider. 
-        /// Outside of the editor, this will be a <see cref="DeviceLocationProvider"/>.
-        /// In the Unity editor, this will be an <see cref="EditorLocationProvider"/>
+        /// Outside of the editor, this will be a <see cref="T:Mapbox.Unity.Location.DeviceLocationProvider"/>.
+        /// In the Unity editor, this will be an <see cref="T:Mapbox.Unity.Location.EditorLocationProvider"/>
         /// </summary>
         /// <example>
         /// Fetch location to set a transform's position:
         /// <code>
         /// void Update()
         /// {
-        /// 	var locationProvider = LocationProviderFactory.Instance.DefaultLocationProvider;
-        /// 	transform.position = Conversions.GeoToWorldPosition(locationProvider.Location,
-        /// 														MapController.ReferenceTileRect.Center,
-        /// 														MapController.WorldScaleFactor).ToVector3xz();
+        ///     var locationProvider = LocationProviderFactory.Instance.DefaultLocationProvider;
+        ///     transform.position = Conversions.GeoToWorldPosition(locationProvider.Location,
+        ///                                                         MapController.ReferenceTileRect.Center,
+        ///                                                         MapController.WorldScaleFactor).ToVector3xz();
         /// }
         /// </code>
         /// </example>
-        ILocationProvider _defaultLocationProvider;
         public ILocationProvider DefaultLocationProvider
         {
             get
@@ -70,7 +71,7 @@ namespace Mapbox.Unity.Location
         }
 
         /// <summary>
-        /// Returns the serialized <see cref="TransformLocationProvider"/>.
+        /// Returns the serialized <see cref="T:Mapbox.Unity.Location.TransformLocationProvider"/>.
         /// </summary>
         public TransformLocationProvider TransformLocationProvider
         {
@@ -81,7 +82,7 @@ namespace Mapbox.Unity.Location
         }
 
         /// <summary>
-        /// Returns the serialized <see cref="EditorLocationProvider"/>.
+        /// Returns the serialized <see cref="T:Mapbox.Unity.Location.EditorLocationProvider"/>.
         /// </summary>
         public EditorLocationProvider EditorLocationProvider
         {
@@ -92,7 +93,7 @@ namespace Mapbox.Unity.Location
         }
 
         /// <summary>
-        /// Returns the serialized <see cref="DeviceLocationProvider"/>
+        /// Returns the serialized <see cref="T:Mapbox.Unity.Location.DeviceLocationProvider"/>
         /// </summary>
         public DeviceLocationProvider DeviceLocationProvider
         {
@@ -103,7 +104,7 @@ namespace Mapbox.Unity.Location
         }
 
         /// <summary>
-        /// Create singleton instance and inject the DefaulyLocationProvider upon initialization of this component. 
+        /// Create singleton instance and inject the DefaultLocationProvider upon initialization of this component. 
         /// </summary>
         private void Awake()
         {
