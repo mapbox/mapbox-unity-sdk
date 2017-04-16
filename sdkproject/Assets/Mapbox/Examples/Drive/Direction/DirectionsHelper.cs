@@ -12,7 +12,6 @@ namespace Mapbox.Examples.Drive
     {
         private Transform _root;
         public MapController MapController;
-        public MapVisualization MapVisualization;
         public DirectionsFactory Directions;
         public List<Transform> Waypoints;
 
@@ -31,7 +30,7 @@ namespace Mapbox.Examples.Drive
             var waypoints = new List<Vector2d>();
             foreach (var wp in Waypoints)
             {
-                waypoints.Add(wp.transform.GetGeoPosition(MapVisualization.ReferenceMercatorRect.Center, _root.localScale.x));
+                waypoints.Add(wp.transform.GetGeoPosition(MapController.ReferenceMercatorRect.Center, _root.localScale.x));
             }
 
             Directions.Query(waypoints);

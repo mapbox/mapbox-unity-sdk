@@ -10,6 +10,7 @@ namespace Mapbox.Unity.MeshGeneration
 
     public class MapController : MonoBehaviour
     {
+        public RectD ReferenceMercatorRect;
         public MapVisualization MapVisualization;
         public float TileSize = 100;
 
@@ -23,11 +24,16 @@ namespace Mapbox.Unity.MeshGeneration
 
         public GameObject Root;
         private Dictionary<Vector2, UnityTile> _tiles;
+        private Vector2 _refTile;
 
         public void Awake()
         {
             var parm = LatLng.Split(',');
-            MapVisualization.Initialize(MapboxAccess.Instance, double.Parse(parm[0]), double.Parse(parm[1]), Zoom);
+            var v2 = Conversions.GeoToWorldPosition(double.Parse(parm[0]), double.Parse(parm[1]), new Vector2d(0, 0));
+            _refTile = Conversions.MetersToTile(v2, Zoom);
+            ReferenceMercatorRect = Conversions.TileBounds(_refTile, Zoom);
+
+            MapVisualization.Initialize(MapboxAccess.Instance);
             _tiles = new Dictionary<Vector2, UnityTile>();
         }
 
@@ -68,11 +74,11 @@ namespace Mapbox.Unity.MeshGeneration
             }
 
             Root = new GameObject("worldRoot");
-            Root.transform.localScale = Vector3.one * (float)(TileSize / MapVisualization.ReferenceMercatorRect.Size.x);
+            Root.transform.localScale = Vector3.one * (float)(TileSize / ReferenceMercatorRect.Size.x);
 
-            for (int i = (int)(MapVisualization.ReferenceTile.x - frame.x); i <= (MapVisualization.ReferenceTile.x + frame.z); i++)
+            for (int i = (int)(_refTile.x - frame.x); i <= (_refTile.x + frame.z); i++)
             {
-                for (int j = (int)(MapVisualization.ReferenceTile.y - frame.y); j <= (MapVisualization.ReferenceTile.y + frame.w); j++)
+                for (int j = (int)(_refTile.y - frame.y); j <= (_refTile.y + frame.w); j++)
                 {
                     var tile = new GameObject("Tile - " + i + " | " + j).AddComponent<UnityTile>();
                     _tiles.Add(new Vector2(i, j), tile);
@@ -80,7 +86,7 @@ namespace Mapbox.Unity.MeshGeneration
                     tile.RelativeScale = Conversions.GetTileScaleInMeters(0, Zoom) / Conversions.GetTileScaleInMeters((float)lat, Zoom);
                     tile.TileCoordinate = new Vector2(i, j);
                     tile.Rect = Conversions.TileBounds(tile.TileCoordinate, zoom);
-                    tile.transform.position = new Vector3((float)(tile.Rect.Center.x - MapVisualization.ReferenceMercatorRect.Center.x), 0, (float)(tile.Rect.Center.y - MapVisualization.ReferenceMercatorRect.Center.y));
+                    tile.transform.position = new Vector3((float)(tile.Rect.Center.x - ReferenceMercatorRect.Center.x), 0, (float)(tile.Rect.Center.y - ReferenceMercatorRect.Center.y));
                     tile.transform.SetParent(Root.transform, false);
                     MapVisualization.ShowTile(tile);
                 }
@@ -111,9 +117,9 @@ namespace Mapbox.Unity.MeshGeneration
                 tile.Rect = Conversions.TileBounds(tile.TileCoordinate, zoom);
                 tile.RelativeScale = Conversions.GetTileScaleInMeters(0, Zoom) /
                     Conversions.GetTileScaleInMeters((float)Conversions.MetersToLatLon(tile.Rect.Center).x, Zoom);
-                tile.transform.localPosition = new Vector3((float)(tile.Rect.Center.x - MapVisualization.ReferenceMercatorRect.Center.x),
+                tile.transform.localPosition = new Vector3((float)(tile.Rect.Center.x - ReferenceMercatorRect.Center.x),
                                                            0,
-                                                           (float)(tile.Rect.Center.y - MapVisualization.ReferenceMercatorRect.Center.y));
+                                                           (float)(tile.Rect.Center.y - ReferenceMercatorRect.Center.y));
                 MapVisualization.ShowTile(tile);
             }
         }
