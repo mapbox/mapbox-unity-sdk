@@ -481,6 +481,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab322f3f81267624dbd388daa9e37945, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MapVisualization: {fileID: 11400000, guid: 7f949b7bf234f3049adb4259192eda3d, type: 2}
   _range: 2
 --- !u!1 &1515605195
 GameObject:

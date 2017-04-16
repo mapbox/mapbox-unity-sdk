@@ -6,10 +6,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
     public class Factory : ScriptableObject
     {
+        //private IWorldParameter MapVisualization;
         protected IFileSource FileSource;
 
         public virtual void Initialize(IFileSource fileSource)
         {
+            //MapVisualization = vis;
             FileSource = fileSource;
         }
 

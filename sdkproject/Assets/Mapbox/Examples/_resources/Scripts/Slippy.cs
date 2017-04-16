@@ -7,6 +7,8 @@ namespace Mapbox.Examples
 
     public class Slippy : MonoBehaviour
     {
+        private Transform _root;
+        public MapVisualization MapVisualization;
         private MapController _mapController;
         private Camera _camera;
         [SerializeField]
@@ -24,15 +26,20 @@ namespace Mapbox.Examples
             _mapController = GetComponent<MapController>();
             _camera = Camera.main;
             _yPlane = new Plane(Vector3.up, Vector3.zero);
+            _root = _mapController.Root.transform;
+            _mapController.WorldCreated += (s, e) => { _root = e.transform; };
         }
 
         void Update()
         {
+            if (_root == null || MapVisualization == null)
+                return;
+
             _ray = _camera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             if (_yPlane.Raycast(_ray, out _hitDistance))
             {
-                _cameraTarget = _ray.GetPoint(_hitDistance) / MapController.WorldScaleFactor;
-                _currentTile = Conversions.MetersToTile(new Vector2d(MapController.ReferenceTileRect.Center.x + _cameraTarget.x, MapController.ReferenceTileRect.Center.y + _cameraTarget.z), _mapController.Zoom);
+                _cameraTarget = _ray.GetPoint(_hitDistance) / _root.localScale.x;
+                _currentTile = Conversions.MetersToTile(new Vector2d(MapVisualization.ReferenceMercatorRect.Center.x + _cameraTarget.x, MapVisualization.ReferenceMercatorRect.Center.y + _cameraTarget.z), _mapController.Zoom);
                 if (_currentTile != _cachedTile)
                 {
                     for (int i = -_range; i <= _range; i++)

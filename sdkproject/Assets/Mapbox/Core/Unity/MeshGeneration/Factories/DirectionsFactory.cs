@@ -39,7 +39,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             {
                 foreach (var point in response.Routes[0].Geometry)
                 {
-                    meshData.Vertices.Add(Conversions.GeoToWorldPosition(point.x, point.y, MapController.ReferenceTileRect.Center, MapController.WorldScaleFactor).ToVector3xz());
+                    //meshData.Vertices.Add(Conversions.GeoToWorldPosition(point.x, point.y, MapVisualization.ReferenceTileRect.Center, MapVisualization.WorldScaleFactor).ToVector3xz());
                 }
             }
 
