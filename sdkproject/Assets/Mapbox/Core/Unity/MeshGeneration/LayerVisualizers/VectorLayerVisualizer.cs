@@ -21,7 +21,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
     /// <summary>
     /// VectorLayerVisualizer is a specialized layer visualizer working on polygon and line based vector data (i.e. building, road, landuse) using modifier stacks.
     /// Each feature is preprocessed and passed down to a modifier stack, which will create and return a game object for that given feature.
+    /// Key is the name of the layer to be processed.
+    /// Classification Key is the property name to be used for stack selection.
     /// It also supports filters; objects that goes over features and decides if it'll be visualized or not.
+    /// Default Stack is the stack that'll be used for any feature that passes the filters but isn't matched to any special stack.
+    /// 
     /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Layer Visualizer/Vector Layer Visualizer")]
     public class VectorLayerVisualizer : LayerVisualizerBase

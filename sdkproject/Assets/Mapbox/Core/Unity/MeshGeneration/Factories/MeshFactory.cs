@@ -50,6 +50,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             Run(tile);
         }
 
+        /// <summary>
+        /// Mesh Factory waits for both Height and Image data to be processed if they are requested
+        /// </summary>
+        /// <param name="tile"></param>
         private void Run(UnityTile tile)
         {
             if (tile.HeightDataState == TilePropertyState.Loading ||
