@@ -14,7 +14,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
     public class TypeVisualizerTuple
     {
         public string Type;
-        public ModifierStack Stack;
+        public ModifierStackBase Stack;
     }
 
 
@@ -48,7 +48,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
         private List<FilterBase> Filters;
 
         [SerializeField]
-        private ModifierStack _defaultStack;
+        private ModifierStackBase _defaultStack;
         [SerializeField]
         private List<TypeVisualizerTuple> Stacks;
 
@@ -85,6 +85,21 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
                 if (!filterOut)
                     Build(feature, tile, _container);
+            }
+
+            var mergedStack = _defaultStack as MergedModifierStack;
+            if (mergedStack != null)
+            {
+                mergedStack.End(tile, _container);
+            }
+
+            for (int i = 0; i < Stacks.Count; i++)
+            {
+                mergedStack = Stacks[i].Stack as MergedModifierStack;
+                if (mergedStack != null)
+                {
+                    mergedStack.End(tile, _container);
+                }
             }
         }
 
@@ -181,12 +196,12 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
                 GameObject go;
                 if (mod != null)
                 {
-                    go = mod.Stack.Execute(feature, meshData, parent, mod.Type);
+                    go = mod.Stack.Execute(tile, feature, meshData, parent, mod.Type);
                 }
                 else
                 {
                     if (_defaultStack != null)
-                        go = _defaultStack.Execute(feature, meshData, parent, _key);
+                        go = _defaultStack.Execute(tile, feature, meshData, parent, _key);
                 }
                 //go.layer = LayerMask.NameToLayer(_key);
             }

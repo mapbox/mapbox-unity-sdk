@@ -20,7 +20,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
         public override void Run(FeatureBehaviour fb)
         {
-            var ts = fb.GameObject.AddComponent<TextureSelector>();
+            var ts = fb.gameObject.AddComponent<TextureSelector>();
             ts.Initialize(fb, _textureTop, _useSatelliteTexture, _topMaterials, _textureSides, _sideMaterials);
         }
     }

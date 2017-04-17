@@ -10,5 +10,8 @@
 - name: Examples
   href: 03-examples.md
 
+- name: Attribution
+  href: 04-attribution.md  
+
 - name: HoloLens Development
   href: hololens-development.md
