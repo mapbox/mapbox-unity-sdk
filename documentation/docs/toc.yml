@@ -13,5 +13,8 @@
 - name: Attribution
   href: 04-attribution.md  
 
+- name: Changelog
+  href: 05-changelog.md 
+
 - name: HoloLens Development
   href: hololens-development.md
