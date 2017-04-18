@@ -211,8 +211,8 @@ if (!publishDocs) {
 			"git add .",
 			$"git commit -m \"pushed via [{originalCommit}] by [{commitAuthor}]\"",
 			$"git remote add origin https://{githubToken}@github.com/{repoName}.git",
-			"git checkout -b gh-pages",
-			"git push -f origin gh-pages"
+			"git checkout -b mb-pages",
+			"git push -f origin mb-pages"
 		});
 		foreach (var cmd in cmds) {
 			if (!RunCommand(cmd)) {
