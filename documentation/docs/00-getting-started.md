@@ -20,4 +20,4 @@
 
 ## Issues
 
-If you run into any issues or have any feedback, please reach out to us at unity-beta@mapbox.com or check for issues in our repo: https://github.com/mapbox/mapbox-unity-sdk/issues.
+If you run into issues or have feedback, please contact us at https://www.mapbox.com/contact/ or check for issues in our repo: https://github.com/mapbox/mapbox-unity-sdk/issues.
