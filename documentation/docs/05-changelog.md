@@ -2,6 +2,8 @@
 
 #### v0.5.0
 
+- Added support for UWP 
+    - Share your Hololens creations with us! 
 - Fixed precision issue with tile conversions
     - Replaced `Geocoordinate` with `Vector2d`
 - Mapbox API Token is now stored in MapboxAccess.txt
