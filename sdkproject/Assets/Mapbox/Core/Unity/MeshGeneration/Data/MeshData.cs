@@ -1,6 +1,7 @@
 namespace Mapbox.Unity.MeshGeneration.Data
 {
     using System.Collections.Generic;
+    using TriangleNet.Geometry;
     using UnityEngine;
     using Utils;
 

@@ -12,35 +12,89 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     {
         public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
+        public bool IsClockwise(IList<Vector3> vertices)
+        {
+            double sum = 0.0;
+            for (int i = 0; i < vertices.Count; i++)
+            {
+                Vector3 v1 = vertices[i];
+                Vector3 v2 = vertices[(i + 1) % vertices.Count]; // % is the modulo operator
+                sum += (v2.x - v1.x) * (v2.z + v1.z);
+            }
+            return sum > 0.0;
+        }
+
         public override void Run(VectorFeatureUnity feature, MeshData md)
         {
-            if (md.Vertices.Distinct().Count() < 3)
+            if (feature.Points[0].Count() < 3)
                 return;
 
             var data = new List<int>();
-            var _mesh = new TriangleNet.Mesh();
-            var inp = new InputGeometry(md.Vertices.Count);
-            for (int i = 0; i < md.Vertices.Count; i++)
-            {
-                var v = md.Vertices[i];
-                inp.AddPoint(v.x, v.z);
-                inp.AddSegment(i, (i + 1) % md.Vertices.Count);
-            }
-            _mesh.Behavior.Algorithm = TriangulationAlgorithm.SweepLine;
-            _mesh.Behavior.Quality = true;
-            _mesh.Triangulate(inp);
+            var polygon = new Polygon();
+            Vertex firstVert = null;
+            Vertex nextVert = null;
+            Vertex currentVert = null;
 
-            foreach (var tri in _mesh.Triangles)
+            foreach (var sub in feature.Points)
             {
-                data.Add(tri.P1);
-                data.Add(tri.P0);
-                data.Add(tri.P2);
+                if(IsClockwise(sub))
+                {
+                    nextVert = null;
+                    var wist = new List<Vector3>();
+                    for (int i = 0; i < sub.Count; i++)
+                    {
+                        if (nextVert == null)
+                        {
+                            currentVert = new Vertex(sub[i].x, sub[i].z);
+                            nextVert = new Vertex(sub[i + 1].x, sub[i + 1].z);
+                        }
+                        else
+                        {
+                            currentVert = nextVert;
+                            if (i == sub.Count - 1)
+                            {
+                                nextVert = firstVert;
+                            }
+                            else
+                            {
+                                nextVert = new Vertex(sub[i + 1].x, sub[i + 1].z);
+                            }
+                        }
+
+                        if (i == 0)
+                            firstVert = currentVert;
+
+                        wist.Add(sub[i]);
+                        polygon.Add(currentVert);
+                        polygon.Add(new Segment(currentVert, nextVert));
+                    }
+                }
+                else
+                {
+                    var cont = new List<Vertex>();
+                    var wist = new List<Vector3>();
+                    for (int i = 0; i < sub.Count; i++)
+                    {
+                        wist.Add(sub[i]);
+                        cont.Add(new Vertex(sub[i].x, sub[i].z));
+                    }
+                    polygon.Add(new Contour(cont), true);
+                }
             }
 
-            if (_mesh.Vertices.Count != md.Vertices.Count)
+            var mesh = polygon.Triangulate();
+
+            foreach (var tri in mesh.Triangles)
+            {
+                data.Add(tri.GetVertexID(0));
+                data.Add(tri.GetVertexID(2));
+                data.Add(tri.GetVertexID(1));
+            }
+
+            if (mesh.Vertices.Count != md.Vertices.Count)
             {
                 md.Vertices.Clear();
-                using (var sequenceEnum = _mesh.Vertices.GetEnumerator())
+                using (var sequenceEnum = mesh.Vertices.GetEnumerator())
                 {
                     while (sequenceEnum.MoveNext())
                     {

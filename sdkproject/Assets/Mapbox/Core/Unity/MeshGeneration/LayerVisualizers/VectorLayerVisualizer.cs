@@ -88,103 +88,65 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
             }
         }
 
+        private bool IsFeatureValid(VectorFeatureUnity feature)
+        {
+            if (feature.Properties.ContainsKey("extrude") && !bool.Parse(feature.Properties["extrude"].ToString()))
+                return false;
+
+            if (feature.Points.Count < 1)
+                return false;
+
+            return true;
+        }
+
         private void Build(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
         {
-
-            if (feature.Properties.ContainsKey("extrude") && !bool.Parse(feature.Properties["extrude"].ToString()))
+            if (!IsFeatureValid(feature))
                 return;
 
-            //we're not cutting out the holes yet
-            foreach (var geometry in feature.Points)
+            //this will be improved in next version and will probably be replaced by filters
+            var styleSelectorKey = FindSelectorKey(feature);
+
+            var meshData = new MeshData();
+            meshData.TileRect = tile.Rect;
+            
+            //and finally, running the modifier stack on the feature
+            var mod = Stacks.FirstOrDefault(x => x.Type.Contains(styleSelectorKey));
+            GameObject go;
+            if (mod != null)
             {
-                var meshData = new MeshData();
-                meshData.TileRect = tile.Rect;
-
-                if (geometry.Count <= 1)
-                    continue;
-
-                //this will be improved in next version and will probably be replaced by filters
-                string styleSelectorKey = "";
-                if (string.IsNullOrEmpty(_classificationKey))
-                {
-                    if (feature.Properties.ContainsKey("type"))
-                    {
-                        styleSelectorKey = feature.Properties["type"].ToString().ToLowerInvariant();
-                    }
-                    else if (feature.Properties.ContainsKey("class"))
-                    {
-                        styleSelectorKey = feature.Properties["class"].ToString().ToLowerInvariant();
-                    }
-                }
-                else if (feature.Properties.ContainsKey(_classificationKey))
-                {
-                    if (feature.Properties.ContainsKey(_classificationKey))
-                    {
-                        styleSelectorKey = feature.Properties[_classificationKey].ToString().ToLowerInvariant();
-                    }
-                }
-
-                //we'll run all visualizers on MeshData here 
-                var list = geometry;
-                //.Select(x => Conversions.GeoToWorldPosition(x.Lat, x.Lng, tile.Rect.Center).ToVector3xz()).ToList();
-
-                //long straight edges looks bad on bumpy terrain
-                if (_subdivideLongEdges)
-                {
-                    var verts = new List<Vector3>();
-                    if (list.Count > 1)
-                    {
-                        for (int i = 0; i < list.Count - 1; i++)
-                        {
-                            verts.Add(list[i]);
-                            var dist = Vector3.Distance(list[i], list[i + 1]);
-                            var step = Math.Min(_maxEdgeSectionCount, dist / _preferredEdgeSectionLength);
-                            if (step > 1)
-                            {
-                                var counter = 1;
-                                while (counter < step)
-                                {
-                                    var nv = Vector3.Lerp(list[i], list[i + 1], Mathf.Min(1, counter / step));
-                                    verts.Add(nv);
-                                    counter++;
-                                }
-                            }
-                        }
-                    }
-                    verts.Add(list.Last());
-                    list = verts;
-                }
-
-                //adding terrain & building min_height to vertices
-                //we may move this into height modifier in the future
-                meshData.Vertices = list.Select(vertex =>
-                {
-                    var h = tile.QueryHeightData((float)((vertex.x + tile.Rect.Size.x / 2) / tile.Rect.Size.x), (float)((vertex.z + tile.Rect.Size.y / 2) / tile.Rect.Size.y));
-                    vertex += new Vector3(0, h, 0);
-
-                    if (feature.Properties.ContainsKey("min_height"))
-                    {
-                        var min_height = Convert.ToSingle(feature.Properties["min_height"]);
-                        vertex += new Vector3(0, min_height, 0);
-                    }
-
-                    return vertex;
-                }).ToList();
-
-                //and finally, running the modifier stack on the feature
-                var mod = Stacks.FirstOrDefault(x => x.Type.Contains(styleSelectorKey));
-                GameObject go;
-                if (mod != null)
-                {
-                    go = mod.Stack.Execute(tile, feature, meshData, parent, mod.Type);
-                }
-                else
-                {
-                    if (_defaultStack != null)
-                        go = _defaultStack.Execute(tile, feature, meshData, parent, _key);
-                }
-                //go.layer = LayerMask.NameToLayer(_key);
+                go = mod.Stack.Execute(tile, feature, meshData, parent, mod.Type);
             }
+            else
+            {
+                if (_defaultStack != null)
+                    go = _defaultStack.Execute(tile, feature, meshData, parent, _key);
+            }
+            //go.layer = LayerMask.NameToLayer(_key);
+        }
+
+        private string FindSelectorKey(VectorFeatureUnity feature)
+        {
+            if (string.IsNullOrEmpty(_classificationKey))
+            {
+                if (feature.Properties.ContainsKey("type"))
+                {
+                    return feature.Properties["type"].ToString().ToLowerInvariant();
+                }
+                else if (feature.Properties.ContainsKey("class"))
+                {
+                    return feature.Properties["class"].ToString().ToLowerInvariant();
+                }
+            }
+            else if (feature.Properties.ContainsKey(_classificationKey))
+            {
+                if (feature.Properties.ContainsKey(_classificationKey))
+                {
+                    return feature.Properties[_classificationKey].ToString().ToLowerInvariant();
+                }
+            }
+
+            return "";
         }
     }
 }
