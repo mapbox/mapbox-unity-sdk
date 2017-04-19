@@ -1,4 +1,6 @@
-# Visualization
+# Map Factory Framework
+
+This framework allows you to create and style your maps through factory and visualization abstractions. The system is intended to be designer-friendly by serializing configuration settings in `ScriptableObjects`.
 
 ## Map Controller
 
