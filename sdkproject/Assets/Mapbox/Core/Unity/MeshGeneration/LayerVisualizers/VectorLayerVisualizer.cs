@@ -109,7 +109,17 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
             var meshData = new MeshData();
             meshData.TileRect = tile.Rect;
-            
+
+            foreach (var sub in feature.Points)
+            {
+                for (int i = 0; i < sub.Count; i++)
+                {
+                    //sub[i].Set(sub[i].x, tile.QueryHeightData((float)((sub[i].x + tile.Rect.Size.x / 2) / tile.Rect.Size.x), (float)((sub[i].z + tile.Rect.Size.y / 2) / tile.Rect.Size.y)), sub[i].z);
+                    var h = tile.QueryHeightData((float)((sub[i].x + tile.Rect.Size.x / 2) / tile.Rect.Size.x), (float)((sub[i].z + tile.Rect.Size.y / 2) / tile.Rect.Size.y));
+                    sub[i] += new Vector3(0, h, 0);
+                }
+            }
+
             //and finally, running the modifier stack on the feature
             var mod = Stacks.FirstOrDefault(x => x.Type.Contains(styleSelectorKey));
             GameObject go;

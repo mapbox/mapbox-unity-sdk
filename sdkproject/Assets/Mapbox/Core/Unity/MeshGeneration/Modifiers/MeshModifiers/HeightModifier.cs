@@ -3,7 +3,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     using System.Collections.Generic;
     using UnityEngine;
     using Mapbox.Unity.MeshGeneration.Data;
-    
+
     public enum ExtrusionType
     {
         Wall,
@@ -21,31 +21,28 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
         public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
-        public override void Run(VectorFeatureUnity feature, MeshData md)
+        public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
         {
-            if (md.Vertices.Count == 0)
+            if (md.Vertices.Count == 0 || feature == null || feature.Points.Count < 1)
                 return;
 
             float hf = _height;
-            if (feature != null)
+            if (!_forceHeight)
             {
-                if (!_forceHeight)
+                if (feature.Properties.ContainsKey("height"))
                 {
-                    if (feature.Properties.ContainsKey("height"))
+                    if (float.TryParse(feature.Properties["height"].ToString(), out hf))
                     {
-                        if (float.TryParse(feature.Properties["height"].ToString(), out hf))
+                        if (feature.Properties.ContainsKey("min_height"))
                         {
-                            if (feature.Properties.ContainsKey("min_height"))
-                            {
-                                hf -= float.Parse(feature.Properties["min_height"].ToString());
-                            }
+                            hf -= float.Parse(feature.Properties["min_height"].ToString());
                         }
                     }
-                    if (feature.Properties.ContainsKey("ele"))
+                }
+                if (feature.Properties.ContainsKey("ele"))
+                {
+                    if (float.TryParse(feature.Properties["ele"].ToString(), out hf))
                     {
-                        if (float.TryParse(feature.Properties["ele"].ToString(), out hf))
-                        {
-                        }
                     }
                 }
             }
@@ -93,7 +90,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                     wallTri.Add(ind + 2);
                     wallTri.Add(ind + 3);
                 }
-                
+
                 v1 = md.Vertices[vertsStartCount];
                 v2 = md.Vertices[vertsStartCount + length - 1];
                 ind = md.Vertices.Count;

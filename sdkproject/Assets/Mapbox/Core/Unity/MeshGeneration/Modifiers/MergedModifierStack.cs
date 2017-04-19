@@ -22,6 +22,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
         public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
         {
+            base.Execute(tile, feature, meshData, parent, type);
+
             if (!_cacheVertexCount.ContainsKey(tile))
             {
                 _cacheVertexCount.Add(tile, 0);
@@ -32,7 +34,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
             _buildingCount[tile]++;
             foreach (MeshModifier mod in MeshModifiers.Where(x => x.Active))
             {
-                mod.Run(feature, meshData);
+                mod.Run(feature, meshData, tile);
             }
 
             GameObject go = null;

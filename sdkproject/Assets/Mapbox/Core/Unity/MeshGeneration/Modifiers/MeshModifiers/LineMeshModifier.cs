@@ -14,7 +14,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
         private float Width;
         public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
-        public override void Run(VectorFeatureUnity feature, MeshData md)
+        public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
         {
             if (md.Vertices.Count < 2)
                 return;

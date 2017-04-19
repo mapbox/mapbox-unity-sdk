@@ -24,7 +24,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
             return sum > 0.0;
         }
 
-        public override void Run(VectorFeatureUnity feature, MeshData md)
+        public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
         {
             if (feature.Points[0].Count() < 3)
                 return;
@@ -37,7 +37,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
             foreach (var sub in feature.Points)
             {
-                if(IsClockwise(sub))
+                if (IsClockwise(sub))
                 {
                     nextVert = null;
                     var wist = new List<Vector3>();
@@ -98,11 +98,18 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 {
                     while (sequenceEnum.MoveNext())
                     {
-                        md.Vertices.Add(new Vector3((float)sequenceEnum.Current.x, 0, (float)sequenceEnum.Current.y));
+                        var h = 0f;
+                        if (tile != null)
+                        {
+                            h = tile.QueryHeightData((float)((sequenceEnum.Current.x + tile.Rect.Size.x / 2) / tile.Rect.Size.x), (float)((sequenceEnum.Current.y + tile.Rect.Size.y / 2) / tile.Rect.Size.y));
+                        }
+                        md.Vertices.Add(new Vector3((float)sequenceEnum.Current.x, h, (float)sequenceEnum.Current.y));
                     }
                 }
             }
             md.Triangles.Add(data);
+
+
         }
     }
 }

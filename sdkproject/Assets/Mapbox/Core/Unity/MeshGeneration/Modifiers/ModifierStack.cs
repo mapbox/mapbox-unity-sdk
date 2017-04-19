@@ -16,7 +16,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
         {
             foreach (MeshModifier mod in MeshModifiers.Where(x => x.Active))
             {
-                mod.Run(feature, meshData);
+                mod.Run(feature, meshData, tile);
             }
 
             var go = CreateGameObject(meshData, parent);
