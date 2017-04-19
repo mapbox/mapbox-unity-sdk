@@ -11,7 +11,7 @@
 - Added `LocationProviders` and example scene to build maps or place objects based on a latitude/longitude
 - Mesh Generation:
     - General performance improvements (local tile geometry)
-    - Custom editors for tile factories
+    - Custom editors for map factories
     - Added new `MergedModifierStack` which will reduce the number of transforms and draw calls in dense maps
     - Continuous UVs for building facades
     - `DirectionsFactory` now draws full geometry, not just waypoints
