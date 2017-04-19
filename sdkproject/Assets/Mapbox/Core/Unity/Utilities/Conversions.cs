@@ -56,6 +56,11 @@ namespace Mapbox.Unity.Utilities
             return new Vector2d((posx - refPoint.x) * scale, (posy - refPoint.y) * scale);
         }
 
+        public static Vector2d GeoToWorldPosition(Vector2d latLong, Vector2d refPoint, float scale = 1)
+        {
+            return GeoToWorldPosition(latLong.x, latLong.y, refPoint, scale);
+        }
+
         /// <summary>
         /// Converts Spherical Mercator EPSG:900913 in xy meters to WGS84 lat/lon.
         /// Inverse of LatLonToMeters.

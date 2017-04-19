@@ -110,6 +110,8 @@ namespace Mapbox.Examples.Voxels
             bounds.Center = coordinates;
             _raster.SetVector2dBoundsZoom(bounds, _zoom);
             _elevation.SetVector2dBoundsZoom(bounds, _zoom);
+            _raster.Update();
+            _elevation.Update();
         }
 
         public void OnNext(RasterTile tile)

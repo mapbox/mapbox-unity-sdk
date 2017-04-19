@@ -45,6 +45,7 @@ namespace Mapbox.Examples.Playground
             // This marks us an an observer to map.
             // We will get each tile in OnNext(VectorTile tile) as they become available.
             _map.Subscribe(this);
+            _map.Update();
         }
 
         /// <summary>
@@ -70,6 +71,7 @@ namespace Mapbox.Examples.Playground
 
             //zoom in to get results for consecutive searches
             _map.Center = _searchLocation.Coordinate;
+            _map.Update();
         }
 
         /// <summary>

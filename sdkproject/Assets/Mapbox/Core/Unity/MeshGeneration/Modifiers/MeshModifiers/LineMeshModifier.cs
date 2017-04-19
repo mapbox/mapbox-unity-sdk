@@ -5,6 +5,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     using UnityEngine;
     using Mapbox.Unity.MeshGeneration.Data;
     
+    /// <summary>
+    /// Line Mesh Modifier creates line polygons from a list of vertices. It offsets the original vertices to both sides using Width parameter and triangulates them manually.
+    /// It also creates tiled UV mapping using the line length.
+    /// MergeStartEnd parameter connects both edges of the line segment and creates a closed loop which is useful for some cases like pavements around a building block.
+    /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Modifiers/Line Mesh Modifier")]
     public class LineMeshModifier : MeshModifier
     {
