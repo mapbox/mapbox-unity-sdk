@@ -15,6 +15,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         None
     }
 
+    /// <summary>
+    /// Uses raster image services to create materials & textures for terrain
+    /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Factories/Map Image Factory")]
     public class MapImageFactory : Factory
     {
@@ -51,6 +54,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             }
         }
 
+        /// <summary>
+        /// Fetches the image and applies it to tile material.
+        /// MapImage factory currently supports both new (RasterTile) and classic (ClassicRasterTile) Mapbox styles.
+        /// </summary>
+        /// <param name="tile"></param>
         private void Run(UnityTile tile)
         {
             if (!string.IsNullOrEmpty(_mapId))

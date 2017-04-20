@@ -22,6 +22,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         Custom
     }
 
+    /// <summary>
+    /// Uses Mapbox Terrain api and creates terrain meshes.
+    /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Factories/Terrain Factory")]
     public class TerrainFactory : Factory
     {
@@ -57,6 +60,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             Run(tile);
         }
 
+        /// <summary>
+        /// Clears the mesh data and re-runs the terrain creation procedure using current settings. Clearing the old mesh data is important as terrain stitching function checks if the data exists or not.
+        /// </summary>
         public override void Update()
         {
             base.Update();
@@ -69,7 +75,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                 Run(tile);
             }
         }
-
+        
         private void Run(UnityTile tile)
         {
             if (_generationType == TerrainGenerationType.Height)
@@ -86,6 +92,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             }
         }
 
+        /// <summary>
+        /// Creates the non-flat terrain using a height multiplier
+        /// </summary>
+        /// <param name="tile"></param>
+        /// <param name="heightMultiplier">Multiplier for queried height value</param>
         private void CreateTerrainHeight(UnityTile tile, float heightMultiplier = 1)
         {
             if (tile.HeightData == null)
@@ -120,6 +131,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             }
         }
 
+        /// <summary>
+        /// Creates the non-flat terrain mesh, using a grid by defined resolution (_sampleCount). Vertex order goes right & up. Normals are calculated manually and UV map is fitted/stretched 1-1.
+        /// Any additional scripts or logic, like MeshCollider or setting layer, can be done here.
+        /// </summary>
+        /// <param name="tile"></param>
+        /// <param name="heightMultiplier">Multiplier for queried height value</param>
         private void GenerateTerrainMesh(UnityTile tile, float heightMultiplier)
         {
             var go = tile.gameObject;
@@ -144,7 +161,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                             (int)((1 - yrat) * 255)),
                             tile.RelativeScale),
                         (float)(yy - tile.Rect.Center.y)));
-                    mesh.Normals.Add(Vector3.up);
                     mesh.UV[0].Add(new Vector2(x * step, 1 - (y * step)));
                 }
             }
@@ -205,6 +221,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             //go.layer = LayerMask.NameToLayer("terrain");
         }
 
+        /// <summary>
+        /// Creates a basic quad to be used as flat base mesh. Normals are up and UV is fitted to quad.
+        /// A quad is enough for basic usage but the resolution should be increased if any mesh deformation, like bending, to work.
+        /// </summary>
+        /// <param name="tile"></param>
         private void CreateFlatMesh(UnityTile tile)
         {
             var mesh = new Mesh();
@@ -236,6 +257,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             //go.layer = LayerMask.NameToLayer("terrain");
         }
 
+        /// <summary>
+        /// Checkes all neighbours of the given tile and stitches the edges to achieve a smooth mesh surface.
+        /// </summary>
+        /// <param name="tile"></param>
+        /// <param name="tmesh"></param>
         private void FixStitches(UnityTile tile, MeshData tmesh)
         {
             _stitchTarget.Set(tile.TileCoordinate.x, tile.TileCoordinate.y - 1);
