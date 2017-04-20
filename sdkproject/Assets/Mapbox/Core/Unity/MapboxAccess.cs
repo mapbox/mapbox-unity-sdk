@@ -9,11 +9,19 @@ namespace Mapbox.Unity
     using Mapbox.Platform;
     using Mapbox.Unity.Utilities;
 
+    /// <summary>
+    /// Object for retrieving an API token and making http requests.
+    /// Contains a lazy <see cref="T:Mapbox.Geocoding.Geocoder">Geocoder</see> and a lazy <see cref="T:Mapbox.Directions.Directions">Directions</see> for convenience.
+    /// </summary>
     public class MapboxAccess : IFileSource
     {
         readonly string _accessPath = Path.Combine(Application.streamingAssetsPath, Constants.Path.TOKEN_FILE);
 
         static MapboxAccess _instance = new MapboxAccess();
+
+        /// <summary>
+        /// The singleton instance.
+        /// </summary>
         public static MapboxAccess Instance
         {
             get
@@ -28,6 +36,10 @@ namespace Mapbox.Unity
             LoadAccessToken();
         }
 
+        /// <summary>
+        /// The Mapbox API access token. 
+        /// See <see href="https://www.mapbox.com/mapbox-unity-sdk/docs/01-mapbox-api-token.html">Mapbox API Congfiguration in Unity</see>.
+        /// </summary>
         string _accessToken;
         public string AccessToken
         {
@@ -53,6 +65,9 @@ namespace Mapbox.Unity
             }
         }
 
+        /// <summary>
+        /// Loads the access token from <see href="https://docs.unity3d.com/Manual/StreamingAssets.html">StreamingAssets</see>.
+        /// </summary>
         void LoadAccessToken()
         {
 #if  UNITY_EDITOR || !UNITY_ANDROID
@@ -62,6 +77,9 @@ namespace Mapbox.Unity
 #endif
         }
 
+        /// <summary>
+        /// Android-specific token file loading.
+        /// </summary>
         IEnumerator LoadMapboxAccess()
         {
             var request = new WWW(_accessPath);
@@ -72,6 +90,12 @@ namespace Mapbox.Unity
             AccessToken = request.text;
         }
 
+        /// <summary>
+        /// Makes an asynchronous url query.
+        /// </summary>
+        /// <returns>The request.</returns>
+        /// <param name="url">URL.</param>
+        /// <param name="callback">Callback.</param>
         public IAsyncRequest Request(string url, Action<Response> callback)
         {
             var uriBuilder = new UriBuilder(url);
@@ -97,10 +121,11 @@ namespace Mapbox.Unity
             }
         }
 
+        Geocoder _geocoder;
+
         /// <summary>
         /// Lazy geocoder.
         /// </summary>
-        Geocoder _geocoder;
         public Geocoder Geocoder
         {
             get
@@ -113,10 +138,11 @@ namespace Mapbox.Unity
             }
         }
 
+        Directions _directions;
+
         /// <summary>
         /// Lazy Directions.
         /// </summary>
-        Directions _directions;
         public Directions Directions
         {
             get
