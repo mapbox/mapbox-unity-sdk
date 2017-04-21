@@ -16,74 +16,81 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
         public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
         {
-            if (md.Vertices.Count < 2)
+            if (feature.Points.Count < 1)
                 return;
 
-            var count = md.Vertices.Count;
-            var newVerticeList = new Vector3[count * 2];
-            var uvList = new Vector2[count * 2];
-
-            Vector3 norm;
-            var lastUv = 0f;
-            var p1 = Vector3.zero;
-            var p2 = Vector3.zero;
-            var p3 = Vector3.zero;
-            for (int i = 1; i < count; i++)
+            foreach (var segment in feature.Points)
             {
-                p1 = md.Vertices[i - 1];
-                p2 = md.Vertices[i];
-                p3 = p2;
-                if (i + 1 < md.Vertices.Count)
-                    p3 = md.Vertices[i + 1];
+                var count = segment.Count;
+                var newVerticeList = new Vector3[count * 2];
+                var uvList = new Vector2[count * 2];
 
-                if (i == 1)
+                Vector3 norm;
+                var lastUv = 0f;
+                var p1 = Vector3.zero;
+                var p2 = Vector3.zero;
+                var p3 = Vector3.zero;
+                for (int i = 1; i < count; i++)
                 {
-                    norm = GetNormal(p1, p1, p2) * Width; //road width
-                    newVerticeList[0] = (p1 + norm);
-                    newVerticeList[count * 2 - 1] = (p1 - norm);
-                    uvList[0] = new Vector2(0, 0);
-                    uvList[count * 2 - 1] = new Vector2(1, 0);
+                    p1 = segment[i - 1];
+                    p2 = segment[i];
+                    p3 = p2;
+                    if (i + 1 < segment.Count)
+                        p3 = segment[i + 1];
+
+                    if (i == 1)
+                    {
+                        norm = GetNormal(p1, p1, p2) * Width; //road width
+                        newVerticeList[0] = (p1 + norm);
+                        newVerticeList[count * 2 - 1] = (p1 - norm);
+                        uvList[0] = new Vector2(0, 0);
+                        uvList[count * 2 - 1] = new Vector2(1, 0);
+                    }
+                    var dist = Vector3.Distance(p1, p2);
+                    lastUv += dist;
+                    norm = GetNormal(p1, p2, p3) * Width;
+                    newVerticeList[i] = (p2 + norm);
+                    newVerticeList[2 * count - 1 - i] = (p2 - norm);
+
+                    uvList[i] = new Vector2(0, lastUv);
+                    uvList[2 * count - 1 - i] = new Vector2(1, lastUv);
                 }
-                var dist = Vector3.Distance(p1, p2);
-                lastUv += dist;
-                norm = GetNormal(p1, p2, p3) * Width;
-                newVerticeList[i] = (p2 + norm);
-                newVerticeList[2 * count - 1 - i] = (p2 - norm);
 
-                uvList[i] = new Vector2(0, lastUv);
-                uvList[2 * count - 1 - i] = new Vector2(1, lastUv);
-            }
+                //if (_mergeStartEnd)
+                //{
+                //    //brnkhy -2 because first and last items are same
+                //    p1 = segment[count - 2];
+                //    p2 = segment[0];
+                //    p3 = segment[1];
 
-            if (_mergeStartEnd)
-            {
-                //brnkhy -2 because first and last items are same
-                p1 = md.Vertices[count - 2];
-                p2 = md.Vertices[0];
-                p3 = md.Vertices[1];
+                //    norm = GetNormal(p1, p2, p3) * Width;
+                //    newVerticeList[count - 1] = p2 + norm;
+                //    newVerticeList[0] = p2 + norm;
+                //    newVerticeList[count] = p2 - norm;
+                //    newVerticeList[2 * count - 1] = p2 - norm;
+                //}
 
-                norm = GetNormal(p1, p2, p3) * Width;
-                newVerticeList[count - 1] = p2 + norm;
-                newVerticeList[0] = p2 + norm;
-                newVerticeList[count] = p2 - norm;
-                newVerticeList[2 * count - 1] = p2 - norm;
-            }
+                var pcount = md.Vertices.Count;
+                md.Vertices.AddRange(newVerticeList);
+                md.UV[0].AddRange(uvList);
+                var lineTri = new List<int>();
+                var n = count;
 
-            md.Vertices = newVerticeList.ToList();
-            md.UV[0].AddRange(uvList);
-            var lineTri = new List<int>();
-            var n = md.Vertices.Count / 2;
+                for (int i = 0; i < n - 1; i++)
+                {
+                    lineTri.Add(pcount + i);
+                    lineTri.Add(pcount + i + 1);
+                    lineTri.Add(pcount + 2 * n - 1 - i);
+                                
+                    lineTri.Add(pcount + i + 1);
+                    lineTri.Add(pcount + 2 * n - i - 2);
+                    lineTri.Add(pcount + 2 * n - i - 1);
+                }
 
-            for (int i = 0; i < n - 1; i++)
-            {
-                lineTri.Add(i);
-                lineTri.Add(i + 1);
-                lineTri.Add(2 * n - 1 - i);
-
-                lineTri.Add(i + 1);
-                lineTri.Add(2 * n - i - 2);
-                lineTri.Add(2 * n - i - 1);
-            }
-            md.Triangles.Add(lineTri);
+                if (md.Triangles.Count < 1)
+                    md.Triangles.Add(new List<int>());
+                md.Triangles[0].AddRange(lineTri);
+            }            
         }
 
         private Vector3 GetNormal(Vector3 p1, Vector3 newPos, Vector3 p2)
