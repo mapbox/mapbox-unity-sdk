@@ -11,7 +11,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef7239c46ddb6ab469994291c9603c01, type: 3}
   m_Name: DriveMergedBuildingStack
   m_EditorClassIdentifier: 
+  _baseModifiers: []
   MeshModifiers:
+  - {fileID: 11400000, guid: 5d2129c4f45752d449951b9f6e8f5c3f, type: 2}
   - {fileID: 11400000, guid: 8d03f81530c3c1f4f9b1df48c9480748, type: 2}
   - {fileID: 11400000, guid: 43492f8eaa132d044995aecfc9c08b6e, type: 2}
   - {fileID: 11400000, guid: ead6d9ed3e6317b47a3719e7dfad3bcf, type: 2}

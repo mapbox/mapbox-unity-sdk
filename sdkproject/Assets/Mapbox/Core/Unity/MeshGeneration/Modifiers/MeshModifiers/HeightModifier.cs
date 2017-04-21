@@ -15,6 +15,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     public class HeightModifier : MeshModifier
     {
         [SerializeField]
+        private bool _flatTops;
+        [SerializeField]
         private float _height;
         [SerializeField]
         private bool _forceHeight;
@@ -47,11 +49,30 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 }
             }
 
-
-            for (int i = 0; i < md.Vertices.Count; i++)
+            var max = md.Vertices[0].y;
+            var min = md.Vertices[0].y;
+            if (_flatTops)
             {
-                md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + hf, md.Vertices[i].z);
+                for (int i = 0; i < md.Vertices.Count; i++)
+                {
+                    if (md.Vertices[i].y > max)
+                        max = md.Vertices[i].y;
+                    else if (md.Vertices[i].y < min)
+                        min = md.Vertices[i].y;
+                }
+                for (int i = 0; i < md.Vertices.Count; i++)
+                {
+                    md.Vertices[i] = new Vector3(md.Vertices[i].x, max + hf, md.Vertices[i].z);
+                }
+                hf += max - min;
             }
+            else
+            {
+                for (int i = 0; i < md.Vertices.Count; i++)
+                {
+                    md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + hf, md.Vertices[i].z);
+                }
+            }           
 
             var vertsStartCount = 0;
             var count = md.Vertices.Count;

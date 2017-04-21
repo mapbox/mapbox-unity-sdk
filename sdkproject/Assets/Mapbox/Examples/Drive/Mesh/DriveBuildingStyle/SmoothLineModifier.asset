@@ -8,10 +8,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a7dfb85d33966074ebf2acd2de263474, type: 3}
-  m_Name: DriveBuildingHeight
+  m_Script: {fileID: 11500000, guid: 9558f79dbf9b00d488e061a68f8394aa, type: 3}
+  m_Name: SmoothLineModifier
   m_EditorClassIdentifier: 
   Active: 1
-  _flatTops: 1
-  _height: 0
-  _forceHeight: 0
+  _maxEdgeSectionCount: 40
+  _preferredEdgeSectionLength: 10
