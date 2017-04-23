@@ -135,7 +135,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 //wallTri.Add(ind + 3);
                 //wallTri.Add(ind + 2);
 
-                vertsStartCount += length;
+                vertsStartCount += 2*length;
             }
             md.Triangles.Add(wallTri);
             md.UV[0].AddRange(wallUv);
