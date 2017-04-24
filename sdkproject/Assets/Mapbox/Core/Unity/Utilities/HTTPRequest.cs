@@ -50,7 +50,9 @@ namespace Mapbox.Unity.Utilities
                 yield return 0;
             }
             var response = new Response();
-            response.Error = this._request.error;
+
+            // TODO: fix me!
+            //response.Error = this._request.error;
             response.Data = this._request.downloadHandler.data;
 
             _callback(response);
