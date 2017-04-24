@@ -54,8 +54,11 @@ namespace Mapbox.Unity.Utilities
         /// </summary>
         private static void CreateInstance()
         {
-            if (typeof(MonoBehaviour).IsAssignableFrom(typeof(T)))
-            {
+#if NETFX_CORE
+            if (typeof(MonoBehaviour).GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo())) {
+#else
+            if (typeof(MonoBehaviour).IsAssignableFrom(typeof(T))) {
+#endif
                 string singletonName = "_" + typeof(T).Name;
 
                 GameObject singletonObject = GameObject.Find(singletonName);
