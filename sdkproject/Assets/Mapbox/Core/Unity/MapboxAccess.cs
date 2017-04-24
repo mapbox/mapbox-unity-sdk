@@ -1,22 +1,23 @@
 namespace Mapbox.Unity {
-	using System.IO;
-	using UnityEngine;
-	using System;
-	using Mapbox.Geocoding;
-	using Mapbox.Directions;
-	using Mapbox.Platform;
-	using System.Net;
+    using UnityEngine;
+    using System.IO;
+    using System;
+    using System.Net;
+    using Mapbox.Geocoding;
+    using Mapbox.Directions;
+    using Mapbox.Platform;
+    using Mapbox.Unity.Utilities;
 #if !NETFX_CORE
-	using System.Security.Cryptography.X509Certificates;
+    using System.Security.Cryptography.X509Certificates;
 #endif
-	using System.Net.Security;
+    using System.Net.Security;
 
 
-	/// <summary>
-	/// Object for retrieving an API token and making http requests.
-	/// Contains a lazy <see cref="T:Mapbox.Geocoding.Geocoder">Geocoder</see> and a lazy <see cref="T:Mapbox.Directions.Directions">Directions</see> for convenience.
-	/// </summary>
-	public class MapboxAccess : IFileSource {
+    /// <summary>
+    /// Object for retrieving an API token and making http requests.
+    /// Contains a lazy <see cref="T:Mapbox.Geocoding.Geocoder">Geocoder</see> and a lazy <see cref="T:Mapbox.Directions.Directions">Directions</see> for convenience.
+    /// </summary>
+    public class MapboxAccess : IFileSource {
 
 		private readonly string _accessPath = Path.Combine(Application.streamingAssetsPath, Constants.Path.TOKEN_FILE);
 
