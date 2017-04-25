@@ -18,7 +18,6 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
-using UnityEditor.Callbacks;
 
 /// Author: Pim de Witte (pimdewitte.com) and contributors
 /// <summary>
@@ -48,16 +47,6 @@ public class UnityMainThreadDispatcher : MonoBehaviour {
 		Enqueue(_instance.ActionWrapper(action));
 	}
 
-
-	/// <summary>
-	/// This ensures that there's exactly one UnityMainThreadDispatcher in every scene, so the singleton will exist no matter which scene you play from.
-	/// </summary>
-	[PostProcessScene]
-	private static void AddDispatcherToScene() {
-		var dispatcherContainer = new GameObject("UnityMainThreadDispatcher");
-		DontDestroyOnLoad(dispatcherContainer);
-		dispatcherContainer.AddComponent<UnityMainThreadDispatcher>();
-	}
 
 	private void Awake() {
 		if (_instance != null) {
