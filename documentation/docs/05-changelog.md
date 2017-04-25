@@ -1,6 +1,8 @@
 ## CHANGELOG
 
-#### v0.5.0 - 04/26/2017
+#### v0.5.0 
+
+*04/26/20178*
 
 - Added support for UWP 
     - Share your Hololens creations with us! 
