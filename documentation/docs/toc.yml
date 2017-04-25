@@ -16,5 +16,8 @@
 - name: Changelog
   href: 05-changelog.md 
 
+- name: Map Factory Framework
+  href: 06-map-factory-framework.md
+
 - name: HoloLens Development
   href: hololens-development.md
