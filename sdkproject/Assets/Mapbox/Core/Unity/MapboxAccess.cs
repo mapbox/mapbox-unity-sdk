@@ -111,7 +111,7 @@ namespace Mapbox.Unity
                 uriBuilder.Query = accessTokenQuery;
             }
 
-            return new HTTPRequest(uriBuilder.ToString(), callback);
+            return new Platform.HTTPRequest(uriBuilder.ToString(), callback);
         }
 
         class InvalidTokenException : Exception
