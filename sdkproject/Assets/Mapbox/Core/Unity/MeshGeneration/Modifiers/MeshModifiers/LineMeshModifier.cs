@@ -19,12 +19,19 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
             if (feature.Points.Count < 1)
                 return;
 
-            foreach (var segment in feature.Points)
+            foreach (var roadSegment in feature.Points)
             {
-                var count = segment.Count;
+                var count = roadSegment.Count;
+                for (int i = 1; i < count*2; i++)
+                {
+                    md.Edges.Add(md.Vertices.Count + i);
+                    md.Edges.Add(md.Vertices.Count + i - 1);
+                }
+                md.Edges.Add(md.Vertices.Count);
+                md.Edges.Add(md.Vertices.Count + (count*2) - 1);
+
                 var newVerticeList = new Vector3[count * 2];
                 var uvList = new Vector2[count * 2];
-
                 Vector3 norm;
                 var lastUv = 0f;
                 var p1 = Vector3.zero;
@@ -32,11 +39,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 var p3 = Vector3.zero;
                 for (int i = 1; i < count; i++)
                 {
-                    p1 = segment[i - 1];
-                    p2 = segment[i];
+                    p1 = roadSegment[i - 1];
+                    p2 = roadSegment[i];
                     p3 = p2;
-                    if (i + 1 < segment.Count)
-                        p3 = segment[i + 1];
+                    if (i + 1 < roadSegment.Count)
+                        p3 = roadSegment[i + 1];
 
                     if (i == 1)
                     {
@@ -51,7 +58,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                     norm = GetNormal(p1, p2, p3) * Width;
                     newVerticeList[i] = (p2 + norm);
                     newVerticeList[2 * count - 1 - i] = (p2 - norm);
-
+                    
                     uvList[i] = new Vector2(0, lastUv);
                     uvList[2 * count - 1 - i] = new Vector2(1, lastUv);
                 }

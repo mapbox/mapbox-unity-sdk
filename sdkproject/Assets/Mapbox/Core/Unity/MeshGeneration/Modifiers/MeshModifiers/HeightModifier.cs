@@ -83,60 +83,87 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
             var wallTri = new List<int>();
             var wallUv = new List<Vector2>();
-            for (int i = 0; i < feature.Points.Count; i++)
+
+            for (int i = 0; i < md.Edges.Count; i+=2)
             {
-                var length = feature.Points[i].Count;
-                for (int j = 1; j < 2*length; j++)
-                {
-                    v1 = md.Vertices[vertsStartCount + j - 1];
-                    v2 = md.Vertices[vertsStartCount + j];
-                    ind = md.Vertices.Count;
-                    md.Vertices.Add(v1);
-                    md.Vertices.Add(v2);
-                    md.Vertices.Add(new Vector3(v1.x, md.Vertices[j - 1].y - hf, v1.z));
-                    md.Vertices.Add(new Vector3(v2.x, md.Vertices[j].y - hf, v2.z));
+                v1 = md.Vertices[md.Edges[i]];
+                v2 = md.Vertices[md.Edges[i + 1]];
+                ind = md.Vertices.Count;
+                md.Vertices.Add(v1);
+                md.Vertices.Add(v2);
+                md.Vertices.Add(new Vector3(v1.x, v1.y - hf, v1.z));
+                md.Vertices.Add(new Vector3(v2.x, v2.y - hf, v2.z));
 
-                    d = (v2 - v1).magnitude;
+                d = (v2 - v1).magnitude;
 
-                    wallUv.Add(new Vector2(0, 0));
-                    wallUv.Add(new Vector2(d, 0));
-                    wallUv.Add(new Vector2(0, -hf));
-                    wallUv.Add(new Vector2(d, -hf));
+                wallUv.Add(new Vector2(0, 0));
+                wallUv.Add(new Vector2(d, 0));
+                wallUv.Add(new Vector2(0, -hf));
+                wallUv.Add(new Vector2(d, -hf));
 
-                    wallTri.Add(ind);
-                    wallTri.Add(ind + 2);
-                    wallTri.Add(ind + 1);
+                wallTri.Add(ind);
+                wallTri.Add(ind + 1);
+                wallTri.Add(ind + 2);
 
-                    wallTri.Add(ind + 1);
-                    wallTri.Add(ind + 2);
-                    wallTri.Add(ind + 3);
-                }
-
-                //v1 = md.Vertices[vertsStartCount];
-                //v2 = md.Vertices[vertsStartCount + length - 1];
-                //ind = md.Vertices.Count;
-                //md.Vertices.Add(v1);
-                //md.Vertices.Add(v2);
-                //md.Vertices.Add(new Vector3(v1.x, md.Vertices[ind].y - hf, v1.z));
-                //md.Vertices.Add(new Vector3(v2.x, md.Vertices[ind].y - hf, v2.z));
-
-                //d = (v2 - v1).magnitude;
-
-                //wallUv.Add(new Vector2(0, 0));
-                //wallUv.Add(new Vector2(d, 0));
-                //wallUv.Add(new Vector2(0, -hf));
-                //wallUv.Add(new Vector2(d, -hf));
-
-                //wallTri.Add(ind);
-                //wallTri.Add(ind + 1);
-                //wallTri.Add(ind + 2);
-
-                //wallTri.Add(ind + 1);
-                //wallTri.Add(ind + 3);
-                //wallTri.Add(ind + 2);
-
-                vertsStartCount += 2*length;
+                wallTri.Add(ind + 1);
+                wallTri.Add(ind + 3);
+                wallTri.Add(ind + 2);
             }
+
+            //for (int i = 0; i < feature.Points.Count; i++)
+            //{
+            //    var length = feature.Points[i].Count;
+            //    for (int j = 1; j < 2 * length; j++)
+            //    {
+            //        v1 = md.Vertices[vertsStartCount + j - 1];
+            //        v2 = md.Vertices[vertsStartCount + j];
+            //        ind = md.Vertices.Count;
+            //        md.Vertices.Add(v1);
+            //        md.Vertices.Add(v2);
+            //        md.Vertices.Add(new Vector3(v1.x, md.Vertices[j - 1].y - hf, v1.z));
+            //        md.Vertices.Add(new Vector3(v2.x, md.Vertices[j].y - hf, v2.z));
+
+            //        d = (v2 - v1).magnitude;
+
+            //        wallUv.Add(new Vector2(0, 0));
+            //        wallUv.Add(new Vector2(d, 0));
+            //        wallUv.Add(new Vector2(0, -hf));
+            //        wallUv.Add(new Vector2(d, -hf));
+
+            //        wallTri.Add(ind);
+            //        wallTri.Add(ind + 2);
+            //        wallTri.Add(ind + 1);
+
+            //        wallTri.Add(ind + 1);
+            //        wallTri.Add(ind + 2);
+            //        wallTri.Add(ind + 3);
+            //    }
+
+            //    //v1 = md.Vertices[vertsStartCount];
+            //    //v2 = md.Vertices[vertsStartCount + length - 1];
+            //    //ind = md.Vertices.Count;
+            //    //md.Vertices.Add(v1);
+            //    //md.Vertices.Add(v2);
+            //    //md.Vertices.Add(new Vector3(v1.x, md.Vertices[ind].y - hf, v1.z));
+            //    //md.Vertices.Add(new Vector3(v2.x, md.Vertices[ind].y - hf, v2.z));
+
+            //    //d = (v2 - v1).magnitude;
+
+            //    //wallUv.Add(new Vector2(0, 0));
+            //    //wallUv.Add(new Vector2(d, 0));
+            //    //wallUv.Add(new Vector2(0, -hf));
+            //    //wallUv.Add(new Vector2(d, -hf));
+
+            //    //wallTri.Add(ind);
+            //    //wallTri.Add(ind + 1);
+            //    //wallTri.Add(ind + 2);
+
+            //    //wallTri.Add(ind + 1);
+            //    //wallTri.Add(ind + 3);
+            //    //wallTri.Add(ind + 2);
+
+            //    vertsStartCount += 2 * length;
+            //}
             md.Triangles.Add(wallTri);
             md.UV[0].AddRange(wallUv);
 

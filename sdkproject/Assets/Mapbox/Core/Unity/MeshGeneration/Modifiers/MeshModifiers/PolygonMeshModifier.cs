@@ -91,6 +91,15 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 data.Add(tri.GetVertexID(1));
             }
 
+            foreach (var edge in mesh.Edges)
+            {
+                if (edge.Label == 0)
+                    continue;
+
+                md.Edges.Add(edge.P0);
+                md.Edges.Add(edge.P1);
+            }
+
             if (mesh.Vertices.Count != md.Vertices.Count)
             {
                 md.Vertices.Clear();
