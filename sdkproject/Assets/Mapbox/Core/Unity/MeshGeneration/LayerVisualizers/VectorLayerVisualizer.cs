@@ -17,6 +17,16 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
         public ModifierStackBase Stack;
     }
 
+
+    /// <summary>
+    /// VectorLayerVisualizer is a specialized layer visualizer working on polygon and line based vector data (i.e. building, road, landuse) using modifier stacks.
+    /// Each feature is preprocessed and passed down to a modifier stack, which will create and return a game object for that given feature.
+    /// Key is the name of the layer to be processed.
+    /// Classification Key is the property name to be used for stack selection.
+    /// It also supports filters; objects that goes over features and decides if it'll be visualized or not.
+    /// Default Stack is the stack that'll be used for any feature that passes the filters but isn't matched to any special stack.
+    /// 
+    /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Layer Visualizer/Vector Layer Visualizer")]
     public class VectorLayerVisualizer : LayerVisualizerBase
     {
@@ -44,6 +54,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
         private GameObject _container;
 
+        /// <summary>
+        /// Creates an object for each layer, extract and filter in/out the features and runs Build method on them.
+        /// </summary>
+        /// <param name="layer"></param>
+        /// <param name="tile"></param>
         public override void Create(VectorTileLayer layer, UnityTile tile)
         {
             _container = new GameObject(Key + " Container");
@@ -88,9 +103,14 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
             }
         }
 
+        /// <summary>
+        /// Preprocess features, finds the relevant modifier stack and passes the feature to that stack
+        /// </summary>
+        /// <param name="feature"></param>
+        /// <param name="tile"></param>
+        /// <param name="parent"></param>
         private void Build(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
         {
-
             if (feature.Properties.ContainsKey("extrude") && !bool.Parse(feature.Properties["extrude"].ToString()))
                 return;
 
