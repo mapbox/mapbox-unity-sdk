@@ -12,12 +12,23 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
         public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
         {
-            foreach (var sub in feature.Points)
+            if (md.Vertices.Count > 0)
             {
-                for (int i = 0; i < sub.Count; i++)
+                for (int i = 0; i < md.Vertices.Count; i++)
                 {
-                    var h = tile.QueryHeightData((float)((sub[i].x + tile.Rect.Size.x / 2) / tile.Rect.Size.x), (float)((sub[i].z + tile.Rect.Size.y / 2) / tile.Rect.Size.y));
-                    sub[i] += new Vector3(0, h, 0);
+                    var h = tile.QueryHeightData((float)((md.Vertices[i].x + tile.Rect.Size.x / 2) / tile.Rect.Size.x), (float)((md.Vertices[i].z + tile.Rect.Size.y / 2) / tile.Rect.Size.y));
+                    md.Vertices[i] += new Vector3(0, h, 0);
+                }
+            }
+            else
+            {
+                foreach (var sub in feature.Points)
+                {
+                    for (int i = 0; i < sub.Count; i++)
+                    {
+                        var h = tile.QueryHeightData((float)((sub[i].x + tile.Rect.Size.x / 2) / tile.Rect.Size.x), (float)((sub[i].z + tile.Rect.Size.y / 2) / tile.Rect.Size.y));
+                        sub[i] += new Vector3(0, h, 0);
+                    }
                 }
             }
         }

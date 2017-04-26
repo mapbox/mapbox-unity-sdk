@@ -6,11 +6,23 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     using TriangleNet.Geometry;
     using UnityEngine;
     using Mapbox.Unity.MeshGeneration.Data;
+    using TriangleNet.Meshing;
+    using System;
+    using TriangleNet.Smoothing;
 
     [CreateAssetMenu(menuName = "Mapbox/Modifiers/Polygon Mesh Modifier")]
     public class PolygonMeshModifier : MeshModifier
     {
         public override ModifierType Type { get { return ModifierType.Preprocess; } }
+        private ConstraintOptions options;
+        private QualityOptions quality;
+
+        public void OnEnable()
+        {
+            options = new ConstraintOptions() { ConformingDelaunay = true };
+            quality = new QualityOptions() { MinimumAngle = 25.0 };
+            quality.MaximumArea = 100;
+        }
 
         public bool IsClockwise(IList<Vector3> vertices)
         {
@@ -83,6 +95,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
             }
 
             var mesh = polygon.Triangulate();
+            //smoother mesh with smaller triangles and extra vertices in the middle
+            //var mesh = (TriangleNet.Mesh)polygon.Triangulate(options, quality);
 
             foreach (var tri in mesh.Triangles)
             {
@@ -100,25 +114,15 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 md.Edges.Add(edge.P1);
             }
 
-            if (mesh.Vertices.Count != md.Vertices.Count)
+            md.Vertices.Clear();
+            using (var sequenceEnum = mesh.Vertices.GetEnumerator())
             {
-                md.Vertices.Clear();
-                using (var sequenceEnum = mesh.Vertices.GetEnumerator())
+                while (sequenceEnum.MoveNext())
                 {
-                    while (sequenceEnum.MoveNext())
-                    {
-                        var h = 0f;
-                        if (tile != null)
-                        {
-                            h = tile.QueryHeightData((float)((sequenceEnum.Current.x + tile.Rect.Size.x / 2) / tile.Rect.Size.x), (float)((sequenceEnum.Current.y + tile.Rect.Size.y / 2) / tile.Rect.Size.y));
-                        }
-                        md.Vertices.Add(new Vector3((float)sequenceEnum.Current.x, h, (float)sequenceEnum.Current.y));
-                    }
+                    md.Vertices.Add(new Vector3((float)sequenceEnum.Current.x, 0, (float)sequenceEnum.Current.y));
                 }
             }
             md.Triangles.Add(data);
-
-
         }
     }
 }
