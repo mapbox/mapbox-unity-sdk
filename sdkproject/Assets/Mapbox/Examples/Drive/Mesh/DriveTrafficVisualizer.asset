@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Name: DriveTrafficVisualizer
   m_EditorClassIdentifier: 
   Active: 1
-  SmoothMeshes: 0
   _classificationKey: congestion
   _key: traffic
   Filters: []

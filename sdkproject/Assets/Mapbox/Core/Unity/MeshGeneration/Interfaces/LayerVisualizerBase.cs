@@ -4,6 +4,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
     using UnityEngine;
     using Mapbox.Unity.MeshGeneration.Data;
 
+    /// <summary>
+    /// Layer visualizers contains sytling logic and processes features
+    /// </summary>
     public abstract class LayerVisualizerBase : ScriptableObject
     {
         public bool Active = true;

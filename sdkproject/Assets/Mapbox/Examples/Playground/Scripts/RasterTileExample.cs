@@ -45,7 +45,7 @@ namespace Mapbox.Examples.Playground
         };
 
         // start location - San Francisco
-        GeoCoordinate _startLoc = new GeoCoordinate();
+        Vector2d _startLoc = new Vector2d();
 
         int _mapstyle = 0;
 
@@ -58,8 +58,8 @@ namespace Mapbox.Examples.Playground
             _zoomSlider.onValueChanged.AddListener(AdjustZoom);
 
             var parsed = _latLon.Split(',');
-            _startLoc.Latitude = double.Parse(parsed[0]);
-            _startLoc.Longitude = double.Parse(parsed[1]);
+            _startLoc.x = double.Parse(parsed[0]);
+            _startLoc.y = double.Parse(parsed[1]);
         }
 
         void OnDestroy()
@@ -77,6 +77,7 @@ namespace Mapbox.Examples.Playground
             _map.Center = _startLoc;
             _map.Zoom = (int)_zoomSlider.value;
             _map.Subscribe(this);
+            _map.Update();
         }
 
         /// <summary>
@@ -87,6 +88,7 @@ namespace Mapbox.Examples.Playground
         void SearchLocation_OnGeocoderResponse(object sender, EventArgs e)
         {
             _map.Center = _searchLocation.Coordinate;
+            _map.Update();
         }
 
         /// <summary>
@@ -96,6 +98,7 @@ namespace Mapbox.Examples.Playground
         void AdjustZoom(float value)
         {
             _map.Zoom = (int)_zoomSlider.value;
+            _map.Update();
         }
 
         /// <summary>
@@ -106,6 +109,7 @@ namespace Mapbox.Examples.Playground
         {
             _mapstyle = target;
             _map.MapId = _mapboxStyles[target];
+            _map.Update();
         }
 
         /// <summary>

@@ -10,12 +10,12 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: DefaultCompany
-  productName: sdkproject
+  companyName: Mapbox
+  productName: MBX SDK
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenStyle: 0
-  m_ShowUnitySplashScreen: 1
+  m_ShowUnitySplashScreen: 0
   m_VirtualRealitySplashScreen: {fileID: 0}
   defaultScreenWidth: 1024
   defaultScreenHeight: 768
@@ -32,7 +32,7 @@ PlayerSettings:
   tizenShowActivityIndicatorOnLoading: -1
   iosAppInBackgroundBehavior: 0
   displayResolutionDialog: 1
-  iosAllowHTTPDownload: 1
+  iosAllowHTTPDownload: 0
   allowedAutorotateToPortrait: 1
   allowedAutorotateToPortraitUpsideDown: 1
   allowedAutorotateToLandscapeRight: 1
@@ -42,7 +42,7 @@ PlayerSettings:
   disableDepthAndStencilBuffers: 0
   defaultIsFullScreen: 1
   defaultIsNativeResolution: 1
-  runInBackground: 0
+  runInBackground: 1
   captureSingleScreen: 0
   Override IPod Music: 0
   muteOtherAudioSources: 0
@@ -97,7 +97,7 @@ PlayerSettings:
     16:9: 1
     Others: 1
   bundleIdentifier: com.mapbox.sdkproject
-  bundleVersion: 1.0
+  bundleVersion: 0.4
   preloadedAssets: []
   metroEnableIndependentInputSource: 0
   xboxOneDisableKinectGpuReservation: 0
@@ -215,7 +215,7 @@ PlayerSettings:
   logObjCUncaughtExceptions: 1
   enableCrashReportAPI: 0
   cameraUsageDescription: 
-  locationUsageDescription: 
+  locationUsageDescription: For testing and development
   microphoneUsageDescription: 
   XboxTitleId: 
   XboxImageXexPath: 
@@ -424,6 +424,7 @@ PlayerSettings:
   XboxOneAllowedProductIds: []
   XboxOnePersistentLocalStorageSize: 0
   intPropertyNames:
+  - Android::ScriptingBackend
   - Standalone::ScriptingBackend
   - WebGL::ScriptingBackend
   - WebGL::audioCompressionFormat
@@ -431,6 +432,7 @@ PlayerSettings:
   - WebGL::memorySize
   - iOS::Architecture
   - iOS::ScriptingBackend
+  Android::ScriptingBackend: 0
   Standalone::ScriptingBackend: 0
   WebGL::ScriptingBackend: 1
   WebGL::audioCompressionFormat: 4
@@ -542,7 +544,7 @@ PlayerSettings:
   XboxOne::VR::enabledDevices: []
   iOS::VR::enabledDevices: []
   tvOS::VR::enabledDevices: []
-  cloudProjectId: 0656d9c8-683e-446a-be6e-3688c67379df
-  projectName: sdkproject
+  cloudProjectId: f183eef4-72bf-420c-80e0-aaadeab22f30
+  projectName: Mapbox Unity SDK
   organizationId: mapbox-inc
   cloudEnabled: 0

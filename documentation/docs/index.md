@@ -1,6 +1,6 @@
-# Mapbox SDK for Unity
+# Mapbox Unity SDK
 
-Welcome to the `Mapbox SDK for Unity`!
+Welcome to the `Mapbox Unity SDK`!
 
 Check out these links to get started:
 
@@ -9,7 +9,7 @@ Check out these links to get started:
 * [Known issues](02-known-issues.md)
 * [Examples](03-examples.md)
 
-This SDK uses
+This SDK uses:
 
 * `mapbox-sdk-cs` for interacting with the Mapbox API
   * documentation: https://mapbox.github.io/mapbox-sdk-cs/

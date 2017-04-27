@@ -8,21 +8,33 @@ namespace Mapbox.Unity.MeshGeneration.Factories
     using Mapbox.Unity.MeshGeneration.Data;
     using Mapbox.Platform;
 
+    public enum MapImageType
+    {
+        BasicMapboxStyle,
+        Custom,
+        None
+    }
+
+    /// <summary>
+    /// Uses raster image services to create materials & textures for terrain
+    /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Factories/Map Image Factory")]
     public class MapImageFactory : Factory
     {
         [SerializeField]
-        public string _mapId;
+        private MapImageType _mapIdType;
+        [SerializeField]
+        private string _customMapId = "";
+        [SerializeField]
+        private string _mapId = "";
         [SerializeField]
         public Material _baseMaterial;
-        [SerializeField]
-        private bool _createImagery = true;
 
         private Dictionary<Vector2, UnityTile> _tiles;
 
-        public override void Initialize(MonoBehaviour mb, IFileSource fs)
+        public override void Initialize(IFileSource fs)
         {
-            base.Initialize(mb, fs);
+            base.Initialize(fs);
             _tiles = new Dictionary<Vector2, UnityTile>();
         }
 
@@ -33,6 +45,20 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             Run(tile);
         }
 
+        public override void Update()
+        {
+            base.Update();
+            foreach (var tile in _tiles.Values)
+            {
+                Run(tile);
+            }
+        }
+
+        /// <summary>
+        /// Fetches the image and applies it to tile material.
+        /// MapImage factory currently supports both new (RasterTile) and classic (ClassicRasterTile) Mapbox styles.
+        /// </summary>
+        /// <param name="tile"></param>
         private void Run(UnityTile tile)
         {
             if (!string.IsNullOrEmpty(_mapId))

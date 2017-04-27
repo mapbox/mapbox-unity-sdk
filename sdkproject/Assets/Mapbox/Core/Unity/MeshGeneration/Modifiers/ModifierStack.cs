@@ -6,13 +6,17 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     using Mapbox.Unity.MeshGeneration.Data;
     using Mapbox.Unity.MeshGeneration.Components;
 
+    /// <summary>
+    /// Modifier Stack creates a game object from a feature using given modifiers.
+    /// It runs mesh modifiers, creates the game object and then run the game object modifiers.
+    /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Modifiers/Modifier Stack")]
-    public class ModifierStack : ScriptableObject
+    public class ModifierStack : ModifierStackBase
     {
         public List<MeshModifier> MeshModifiers;
         public List<GameObjectModifier> GoModifiers;
 
-        public GameObject Execute(VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
+        public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
         {
             foreach (MeshModifier mod in MeshModifiers.Where(x => x.Active))
             {

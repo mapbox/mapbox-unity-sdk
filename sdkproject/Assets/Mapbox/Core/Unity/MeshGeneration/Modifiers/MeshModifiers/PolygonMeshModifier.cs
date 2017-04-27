@@ -6,7 +6,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     using TriangleNet.Geometry;
     using UnityEngine;
     using Mapbox.Unity.MeshGeneration.Data;
-    
+
+    /// <summary>
+    /// Polygon modifier creates the polygon (vertex&triangles) using the original vertex list.
+    /// Currently uses Triangle.Net for triangulation, which occasionally adds extra vertices to maintain a good triangulation so output vertex list might not be exactly same as the original vertex list.
+    /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Modifiers/Polygon Mesh Modifier")]
     public class PolygonMeshModifier : MeshModifier
     {
@@ -17,20 +21,14 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
             if (md.Vertices.Distinct().Count() < 3)
                 return;
 
-            var verts = CreateRoofTriangulation(md.Vertices);
-            md.Triangles.Add(verts);
-        }
-
-        private List<int> CreateRoofTriangulation(List<Vector3> corners)
-        {
             var data = new List<int>();
             var _mesh = new TriangleNet.Mesh();
-            var inp = new InputGeometry(corners.Count);
-            for (int i = 0; i < corners.Count; i++)
+            var inp = new InputGeometry(md.Vertices.Count);
+            for (int i = 0; i < md.Vertices.Count; i++)
             {
-                var v = corners[i];
+                var v = md.Vertices[i];
                 inp.AddPoint(v.x, v.z);
-                inp.AddSegment(i, (i + 1) % corners.Count);
+                inp.AddSegment(i, (i + 1) % md.Vertices.Count);
             }
             _mesh.Behavior.Algorithm = TriangulationAlgorithm.SweepLine;
             _mesh.Behavior.Quality = true;
@@ -42,7 +40,19 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 data.Add(tri.P0);
                 data.Add(tri.P2);
             }
-            return data;
+
+            if (_mesh.Vertices.Count != md.Vertices.Count)
+            {
+                md.Vertices.Clear();
+                using (var sequenceEnum = _mesh.Vertices.GetEnumerator())
+                {
+                    while (sequenceEnum.MoveNext())
+                    {
+                        md.Vertices.Add(new Vector3((float)sequenceEnum.Current.x, 0, (float)sequenceEnum.Current.y));
+                    }
+                }
+            }
+            md.Triangles.Add(data);
         }
     }
 }

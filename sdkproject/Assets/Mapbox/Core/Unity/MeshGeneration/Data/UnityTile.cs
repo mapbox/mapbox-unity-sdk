@@ -5,10 +5,36 @@ namespace Mapbox.Unity.MeshGeneration.Data
     using UnityEngine;
     using Mapbox.Unity.MeshGeneration.Enums;
     using Mapbox.Unity.Utilities;
+    using Utils;
 
     [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
     public class UnityTile : MonoBehaviour, INotifyPropertyChanged
     {
+        private MeshRenderer _meshRenderer;
+        public MeshRenderer MeshRenderer
+        {
+            get
+            {
+                if (_meshRenderer == null)
+                    _meshRenderer = GetComponent<MeshRenderer>();
+                return _meshRenderer;
+            }
+
+        }
+
+        private MeshFilter _meshFilter;
+        public MeshFilter MeshFilter
+        {
+            get
+            {
+                if (_meshFilter == null)
+                    _meshFilter = GetComponent<MeshFilter>();
+                return _meshFilter;
+            }
+        }
+
+        public MeshData MeshData { get; set; }
+
         #region basic properties //move to a base class?
         [SerializeField]
         private Texture2D _heightData;
@@ -52,7 +78,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
         public Vector2 TileCoordinate { get; set; }
         public int Zoom { get; set; }
-        public Rect Rect { get; set; }
+        public RectD Rect { get; set; }
         public float RelativeScale { get; set; }
 
         public float QueryHeightData(float x, float y)
@@ -72,7 +98,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
         public delegate void TileEventArgs(UnityTile sender, object param);
         public event TileEventArgs HeightDataChanged;
-        public event TileEventArgs SatelliteDataChanged;
+        public event TileEventArgs ImageDataChanged;
         public event TileEventArgs VectorDataChanged;
 
         [NotifyPropertyChangedInvocator]
@@ -92,7 +118,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
         [NotifyPropertyChangedInvocator]
         protected virtual void OnSatelliteDataChanged()
         {
-            var handler = SatelliteDataChanged;
+            var handler = ImageDataChanged;
             if (handler != null) handler(this, null);
         }
 

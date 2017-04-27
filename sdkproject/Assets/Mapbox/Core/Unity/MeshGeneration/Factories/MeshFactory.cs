@@ -7,6 +7,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
     using Mapbox.Unity.MeshGeneration.Interfaces;
     using Mapbox.Platform;
 
+    /// <summary>
+    /// Uses vector tile api to visualize vector data.
+    /// Fetches the vector data for given tile and passes layer data to layer visualizers.
+    /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Factories/Mesh Factory")]
     public class MeshFactory : Factory
     {
@@ -17,9 +21,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         private Dictionary<Vector2, UnityTile> _tiles;
         private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;
 
-        public override void Initialize(MonoBehaviour mb, IFileSource fs)
+        /// <summary>
+        /// Sets up the Mesh Factory
+        /// </summary>
+        /// <param name="fs"></param>
+        public override void Initialize(IFileSource fs)
         {
-            base.Initialize(mb, fs);
+            base.Initialize(fs);
             _tiles = new Dictionary<Vector2, UnityTile>();
             _layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
             foreach (LayerVisualizerBase factory in Visualizers)
@@ -42,22 +50,17 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             Run(tile);
         }
 
+        /// <summary>
+        /// Mesh Factory waits for both Height and Image data to be processed if they are requested
+        /// </summary>
+        /// <param name="tile"></param>
         private void Run(UnityTile tile)
         {
             if (tile.HeightDataState == TilePropertyState.Loading ||
                 tile.ImageDataState == TilePropertyState.Loading)
             {
-                tile.HeightDataChanged += (t, e) =>
-                {
-                    if (tile.ImageDataState != TilePropertyState.Loading)
-                        CreateMeshes(t, e);
-                };
-
-                tile.SatelliteDataChanged += (t, e) =>
-                {
-                    if (tile.HeightDataState != TilePropertyState.Loading)
-                        CreateMeshes(t, e);
-                };
+                tile.HeightDataChanged += HeightDataChangedHandler;
+                tile.ImageDataChanged += ImageDataChangedHandler;
             }
             else
             {
@@ -65,8 +68,29 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             }
         }
 
+        private void HeightDataChangedHandler(UnityTile t, object e)
+        {
+            if (t.ImageDataState != TilePropertyState.Loading)
+                CreateMeshes(t, e);
+        }
+
+        private void ImageDataChangedHandler(UnityTile t, object e)
+        {
+            if (t.HeightDataState != TilePropertyState.Loading)
+                CreateMeshes(t, e);
+        }
+
+
+        /// <summary>
+        /// Fetches the vector data and passes each layer to relevant layer visualizers
+        /// </summary>
+        /// <param name="tile"></param>
+        /// <param name="e"></param>
         private void CreateMeshes(UnityTile tile, object e)
         {
+            tile.HeightDataChanged -= HeightDataChangedHandler;
+            tile.ImageDataChanged -= ImageDataChangedHandler;
+
             var parameters = new Mapbox.Map.Tile.Parameters
             {
                 Fs = this.FileSource,

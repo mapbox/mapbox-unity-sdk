@@ -15,7 +15,8 @@ if [ -d "$SDK_PATH/Plugins/Mapbox" ]; then rm -rf $SDK_PATH/Plugins/Mapbox; fi
 if [ -d "$SDK_PATH/Plugins/ThirdParty" ]; then rm -rf $SDK_PATH/Plugins/ThirdParty; fi
 
 # exclude copying these files
-echo "*project.json" > x.txt
+echo "*project.json" >> x.txt
+echo "*project.lock.json" >> x.txt
 echo "*.csproj" >> x.txt
 echo "*.snk" >> x.txt
 echo "*packages.config" >> x.txt
@@ -39,7 +40,7 @@ rsync -av --exclude-from=x.txt ./dependencies/vector-tile-cs/src/ $SDK_PATH/Plug
 
 echo "copying Mapbox.IO.Compression..."
 mkdir -p $SDK_PATH/Plugins/ThirdParty/Mapbox.IO.Compression/
-rsync -av --exclude-from=x.txt ./dependencies/Mapbox.IO.Compression/src/Mapbox.IO.Compression.Shared/ $SDK_PATH/Plugins/ThirdParty/Mapbox.IO.Compression/
+rsync -av --exclude-from=x.txt ./dependencies/Mapbox.IO.Compression-unity/src/Mapbox.IO.Compression.Shared/ $SDK_PATH/Plugins/ThirdParty/Mapbox.IO.Compression/
 
 echo "copying Mapbox.Json..."
 mkdir -p $SDK_PATH/Plugins/ThirdParty/Mapbox.Json/
@@ -47,7 +48,7 @@ rsync -av --exclude-from=x.txt ./dependencies/Mapbox.Json/ $SDK_PATH/Plugins/Thi
 
 echo "copying Triangle.NET..."
 mkdir -p $SDK_PATH/Plugins/ThirdParty/Triangle.NET/
-rsync -av --exclude-from=x.txt ./dependencies/Triangle.NET/Triangle.NET/Triangle/ $SDK_PATH/Plugins/ThirdParty/Triangle.NET/
+rsync -av --exclude-from=x.txt ./dependencies/triangle.net-uwp/Triangle.NET/Triangle/ $SDK_PATH/Plugins/ThirdParty/Triangle.NET/
 
 echo "copying aux files..."
 cp -v ./utils/link.xml $SDK_PATH/Plugins/

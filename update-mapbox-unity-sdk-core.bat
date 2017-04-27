@@ -18,7 +18,8 @@ IF EXIST %SDK_PATH%\Plugins\ThirdParty RD /Q /S %SDK_PATH%\Plugins\ThirdParty
 IF %ERRORLEVEL% NEQ 0 ECHO error during removal of existing mapbox-sdk-cs && EXIT /B 1
 
 REM file not to copy
-ECHO project.json>x.txt
+ECHO project.json>>x.txt
+ECHO project.lock.json>>x.txt
 ECHO .csproj>>x.txt
 ECHO .snk>>x.txt
 ECHO packages.config>>x.txt
@@ -41,7 +42,7 @@ xcopy /S /R /E /Y dependencies\vector-tile-cs\src\* %SDK_PATH%\Plugins\Mapbox\ve
 IF %ERRORLEVEL% NEQ 0 ECHO error during copying vector-tile-cs && EXIT /B 1
 
 ECHO ---- copying Mapbox.IO.Compression
-xcopy /S /R /E /Y dependencies\Mapbox.IO.Compression\src\Mapbox.IO.Compression.Shared\* %SDK_PATH%\Plugins\ThirdParty\Mapbox.IO.Compression\ /EXCLUDE:x.txt
+xcopy /S /R /E /Y dependencies\Mapbox.IO.Compression-unity\src\Mapbox.IO.Compression.Shared\* %SDK_PATH%\Plugins\ThirdParty\Mapbox.IO.Compression\ /EXCLUDE:x.txt
 IF %ERRORLEVEL% NEQ 0 ECHO error during copying Mapbox.IO.Compression && EXIT /B 1
 
 ECHO ---- copying Mapbox.Json
@@ -49,7 +50,7 @@ xcopy /S /R /E /Y dependencies\Mapbox.Json\* %SDK_PATH%\Plugins\ThirdParty\Mapbo
 IF %ERRORLEVEL% NEQ 0 ECHO error during copying Mapbox.Json && EXIT /B 1
 
 ECHO ---- copying Triangle.NET
-xcopy /S /R /E /Y dependencies\Triangle.NET\Triangle.NET\Triangle\* %SDK_PATH%\Plugins\ThirdParty\Triangle.NET\ /EXCLUDE:x.txt
+xcopy /S /R /E /Y dependencies\triangle.net-uwp\Triangle.NET\Triangle\* %SDK_PATH%\Plugins\ThirdParty\Triangle.NET\ /EXCLUDE:x.txt
 IF %ERRORLEVEL% NEQ 0 ECHO error during copying Triangle.NET && EXIT /B 1
 
 ECHO copying aux files

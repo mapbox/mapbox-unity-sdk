@@ -10,5 +10,14 @@
 - name: Examples
   href: 03-examples.md
 
+- name: Attribution
+  href: 04-attribution.md  
+
+- name: Changelog
+  href: 05-changelog.md 
+
+- name: Map Factory Framework
+  href: 06-map-factory-framework.md
+
 - name: HoloLens Development
   href: hololens-development.md

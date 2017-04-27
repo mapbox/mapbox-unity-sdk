@@ -2,7 +2,7 @@ namespace Mapbox.Examples
 {
     using UnityEngine;
     using Mapbox.Unity.MeshGeneration;
-    using Mapbox.Unity;
+    using Mapbox.Utils;
     using Mapbox.Unity.Utilities;
 
     public class Slippy : MonoBehaviour
@@ -32,7 +32,7 @@ namespace Mapbox.Examples
             if (_yPlane.Raycast(_ray, out _hitDistance))
             {
                 _cameraTarget = _ray.GetPoint(_hitDistance) / MapController.WorldScaleFactor;
-                _currentTile = Conversions.MetersToTile(_cameraTarget.ToVector2xz() + MapController.ReferenceTileRect.center, _mapController.Zoom);
+                _currentTile = Conversions.MetersToTile(new Vector2d(MapController.ReferenceTileRect.Center.x + _cameraTarget.x, MapController.ReferenceTileRect.Center.y + _cameraTarget.z), _mapController.Zoom);
                 if (_currentTile != _cachedTile)
                 {
                     for (int i = -_range; i <= _range; i++)

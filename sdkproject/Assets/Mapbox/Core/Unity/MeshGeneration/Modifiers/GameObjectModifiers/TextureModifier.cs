@@ -3,6 +3,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     using UnityEngine;
     using Mapbox.Unity.MeshGeneration.Components;
 
+    /// <summary>
+    /// Texture Modifier is a basic modifier which simply adds a TextureSelector script to the features.
+    /// Logic is all pushed into this TextureSelector mono behaviour to make it's easier to change it in runtime.
+    /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Modifiers/Texture Modifier")]
     public class TextureModifier : GameObjectModifier
     {
@@ -20,7 +24,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
         public override void Run(FeatureBehaviour fb)
         {
-            var ts = fb.GameObject.AddComponent<TextureSelector>();
+            var ts = fb.gameObject.AddComponent<TextureSelector>();
             ts.Initialize(fb, _textureTop, _useSatelliteTexture, _topMaterials, _textureSides, _sideMaterials);
         }
     }
