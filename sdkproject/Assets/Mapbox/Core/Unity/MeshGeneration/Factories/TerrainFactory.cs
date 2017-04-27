@@ -142,7 +142,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             var go = tile.gameObject;
             var mesh = new MeshData();
             mesh.Vertices = new List<Vector3>(_sampleCount * _sampleCount);
-            mesh.Normals = new List<Vector3>(_sampleCount * _sampleCount);
             var step = 1f / (_sampleCount - 1);
             for (float y = 0; y < _sampleCount; y++)
             {
@@ -161,12 +160,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                             (int)((1 - yrat) * 255)),
                             tile.RelativeScale),
                         (float)(yy - tile.Rect.Center.y)));
+                    mesh.Normals.Add(Vector3.up);
                     mesh.UV[0].Add(new Vector2(x * step, 1 - (y * step)));
                 }
             }
 
-            //we can read these from a hardcoded dictionary as well
-            //no need to calculate this every single time unless we need a really high range for sampleCount
             var trilist = new List<int>();
             var dir = Vector3.zero;
             int vertA, vertB, vertC;
