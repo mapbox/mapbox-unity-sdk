@@ -46,6 +46,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
         private Dictionary<Vector2, UnityTile> _tiles;
         private Vector2 _stitchTarget;
+        private readonly Vector3 _terrainUp = Vector3.up;
 
         public override void Initialize(IFileSource fs)
         {
@@ -160,7 +161,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                             (int)((1 - yrat) * 255)),
                             tile.RelativeScale),
                         (float)(yy - tile.Rect.Center.y)));
-                    mesh.Normals.Add(Vector3.up);
+                    mesh.Normals.Add(_terrainUp);
                     mesh.UV[0].Add(new Vector2(x * step, 1 - (y * step)));
                 }
             }
