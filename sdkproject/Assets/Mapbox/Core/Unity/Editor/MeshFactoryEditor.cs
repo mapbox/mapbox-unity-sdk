@@ -17,8 +17,12 @@ public class MeshFactoryEditor : FactoryEditor
         _visualizerList = serializedObject.FindProperty("Visualizers");
         script = MonoScript.FromScriptableObject(_factory);
     }
+
     public override void OnInspectorGUI()
     {
+        if (_factory == null || _factory.Visualizers == null)
+            return;
+
         serializedObject.Update();
 
         GUI.enabled = false;
@@ -28,7 +32,7 @@ public class MeshFactoryEditor : FactoryEditor
         EditorGUILayout.Space();
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Layer Visualizers");
-        
+
         EditorGUILayout.Space();
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.LabelField("Key");
@@ -37,7 +41,7 @@ public class MeshFactoryEditor : FactoryEditor
         for (int i = 0; i < _factory.Visualizers.Count; i++)
         {
             EditorGUILayout.BeginHorizontal();
-            if(_factory.Visualizers[i] != null)
+            if (_factory.Visualizers[i] != null)
                 _factory.Visualizers[i].Key = EditorGUILayout.TextField(_factory.Visualizers[i].Key, GUILayout.MaxWidth(100));
             _factory.Visualizers[i] = (LayerVisualizerBase)EditorGUILayout.ObjectField(_factory.Visualizers[i], typeof(LayerVisualizerBase));
 
@@ -53,7 +57,7 @@ public class MeshFactoryEditor : FactoryEditor
         {
             _factory.Visualizers.Add(null);
         }
-
+        EditorUtility.SetDirty(_factory);
         serializedObject.ApplyModifiedProperties();
     }
 }
