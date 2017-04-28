@@ -7,14 +7,18 @@ using Mapbox.Unity.MeshGeneration.Interfaces;
 [CustomEditor(typeof(MeshFactory))]
 public class MeshFactoryEditor : FactoryEditor
 {
+    private string _defaultMapId = "mapbox.mapbox-streets-v7";
     private MonoScript script;
     private MeshFactory _factory;
     SerializedProperty _visualizerList;
+    public SerializedProperty mapId_Prop, customMapId_Prop;
+
     private int ListSize;
     void OnEnable()
     {
         _factory = target as MeshFactory;
         _visualizerList = serializedObject.FindProperty("Visualizers");
+        mapId_Prop = serializedObject.FindProperty("_mapId");
         script = MonoScript.FromScriptableObject(_factory);
     }
     public override void OnInspectorGUI()
@@ -24,6 +28,14 @@ public class MeshFactoryEditor : FactoryEditor
         GUI.enabled = false;
         script = EditorGUILayout.ObjectField("Script", script, typeof(MonoScript), false) as MonoScript;
         GUI.enabled = true;
+
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.PropertyField(mapId_Prop, new GUIContent("Map Id"));
+        if (GUILayout.Button("R", GUILayout.Width(30)))
+        {
+            mapId_Prop.stringValue = _defaultMapId;
+        }
+        EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.Space();
         EditorGUILayout.Space();
