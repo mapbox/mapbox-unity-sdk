@@ -8,7 +8,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
     using Mapbox.Platform;
     using Mapbox.Unity.Utilities;
     using Utils;
-    using Assets.Mapbox.Core.Unity.Utilities;
 
     public enum TerrainGenerationType
     {
@@ -19,7 +18,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
     public enum MapIdType
     {
-        StandardHeight,
+        Standard,
         Custom
     }
 
@@ -161,7 +160,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                             (int)((1 - yrat) * 255)),
                             tile.RelativeScale),
                         (float)(yy - tile.Rect.Center.y)));
-                    mesh.Normals.Add(WorldConstants.WorldUp);
+                    mesh.Normals.Add(Unity.Constants.Math.Vector3Up);
                     mesh.UV[0].Add(new Vector2(x * step, 1 - (y * step)));
                 }
             }
