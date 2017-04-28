@@ -34,6 +34,8 @@ public class MeshFactoryEditor : FactoryEditor
         if (GUILayout.Button("R", GUILayout.Width(30)))
         {
             mapId_Prop.stringValue = _defaultMapId;
+            GUI.FocusControl(null);
+            Repaint();
         }
         EditorGUILayout.EndHorizontal();
 
