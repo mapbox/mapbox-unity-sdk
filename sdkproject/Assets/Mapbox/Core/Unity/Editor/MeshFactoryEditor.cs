@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using UnityEditor;
 using Mapbox.Unity.MeshGeneration.Factories;
@@ -20,6 +20,13 @@ public class MeshFactoryEditor : FactoryEditor
         _visualizerList = serializedObject.FindProperty("Visualizers");
         mapId_Prop = serializedObject.FindProperty("_mapId");
         script = MonoScript.FromScriptableObject(_factory);
+
+        if (string.IsNullOrEmpty(mapId_Prop.stringValue))
+        {
+            mapId_Prop.stringValue = _defaultMapId;
+            serializedObject.ApplyModifiedProperties();
+            Repaint();
+        }
     }
 
     public override void OnInspectorGUI()
