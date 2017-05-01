@@ -15,7 +15,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
     public class MeshFactory : Factory
     {
         [SerializeField]
-        private string _mapId = "mapbox.mapbox-streets-v7";
+        private string _mapId = "";
         public List<LayerVisualizerBase> Visualizers;
 
         private Dictionary<Vector2, UnityTile> _tiles;

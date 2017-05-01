@@ -57,7 +57,7 @@ public class TerrainFactoryEditor : FactoryEditor
                     EditorGUILayout.PropertyField(mapIdType_Prop);
                     switch ((MapIdType)mapIdType_Prop.enumValueIndex)
                     {
-                        case MapIdType.StandardHeight:
+                        case MapIdType.Standard:
                             GUI.enabled = false;
                             EditorGUILayout.PropertyField(mapId_Prop, new GUIContent("Map Id"));
                             mapId_Prop.stringValue = _defaultMapId;
@@ -74,7 +74,7 @@ public class TerrainFactoryEditor : FactoryEditor
                 EditorGUILayout.PropertyField(mapIdType_Prop);
                 switch ((MapIdType)mapIdType_Prop.enumValueIndex)
                 {
-                    case MapIdType.StandardHeight:
+                    case MapIdType.Standard:
                         GUI.enabled = false;
                         EditorGUILayout.PropertyField(mapId_Prop, new GUIContent("Map Id"));
                         mapId_Prop.stringValue = _defaultMapId;
