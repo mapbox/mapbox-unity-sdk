@@ -1,7 +1,5 @@
 # Getting Started
 
-The Mapbox Unity SDK is a C#-based wrapper for Mapbox's location APIs. It allows Unity developers to easily access and interact with our Maps, Geocoding, and Directions services from within the Unity platform.
-
 ## Installation from Unity Package
 
 1. Visit https://www.mapbox.com/unity/
