@@ -1,8 +1,16 @@
 ## CHANGELOG
 
+#### v0.5.1
+
+*05/01/2017*
+
+- Terrain height works as intended again (fixed out of range exception)
+- Fixed issue where visualizers for `MeshFactories` were not being serialized properly
+- Fixed null reference exception when creating a new `MeshFactory`
+
 #### v0.5.0 
 
-*04/26/20178*
+*04/26/2017*
 
 - Added support for UWP 
     - Share your Hololens creations with us! 
