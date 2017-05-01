@@ -15,11 +15,17 @@ namespace Mapbox.Unity.MeshGeneration.Factories
     public class MeshFactory : Factory
     {
         [SerializeField]
-        private string _mapId = "mapbox.mapbox-streets-v7";
+        private string _mapId = "";
         public List<LayerVisualizerBase> Visualizers;
 
         private Dictionary<Vector2, UnityTile> _tiles;
         private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;
+
+        public void OnEnable()
+        {
+            if (Visualizers == null)
+                Visualizers = new List<LayerVisualizerBase>();
+        }
 
         /// <summary>
         /// Sets up the Mesh Factory

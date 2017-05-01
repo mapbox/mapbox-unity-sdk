@@ -11,8 +11,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8338f26893d62c1439f387800a8e1c9a, type: 3}
   m_Name: TerrainDemoTerrainFactory
   m_EditorClassIdentifier: 
-  _createFlatBase: 0
-  _flatTileMaterial: {fileID: 0}
-  _createRealTerrain: 1
+  _generationType: 1
+  _baseMaterial: {fileID: 0}
+  _mapIdType: 0
+  _customMapId: mapbox.terrain-rgb
   _mapId: mapbox.terrain-rgb
-  sampleCount: 40
+  _heightModifier: 1
+  _sampleCount: 40
