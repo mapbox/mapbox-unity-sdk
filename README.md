@@ -8,7 +8,7 @@ This repo contains:
   - DocFX project for generateing API documentation
   - Written manuals and guides 
 
-# Docs
+# Documentation
 Documentation is generated using DocFX from this repo and is hosted at: https://www.mapbox.com/mapbox-unity-sdk/
 
 # Dependencies
