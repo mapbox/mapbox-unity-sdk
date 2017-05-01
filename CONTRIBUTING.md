@@ -24,10 +24,10 @@ If you want to contribute:
 
 # Updating the Mapbox Unity SDK Core
 
-This project includes git submodule dependcies. These dependencies are actively developed and maintained:
+This project includes git submodule dependencies. These dependencies are actively developed and maintained:
 
-https://github.com/mapbox/vector-tile-cs
-https://github.com/mapbox/mapbox-sdk-cs
+- https://github.com/mapbox/vector-tile-cs
+- https://github.com/mapbox/mapbox-sdk-cs
 
 Therefore, changes under `mapbox-sdk-unity/sdkproject/Assets/Mapbox/Core/Plugins` and `mapbox-sdk-unity/sdkproject/Assets/Mapbox/Core/mapbox-sdk-cs` should never be committed directly to this repo. Instead they should be made in their corresponding submodule repos and updated in the Unity project via a file transfer executable.
 
