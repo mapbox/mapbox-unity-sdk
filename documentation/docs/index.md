@@ -18,7 +18,7 @@ footer{
       <a class="version-link" href="docs/05-changelog.md">Version Notes</a><span>|</span><a class="github-link" href="https://github.com/mapbox/mapbox-unity-sdk">View in Github</a>
     </div>
     <div class="minitext">
-    The Mapbox Unity SDK is a C#-based wrapper for Mapbox&#39;s location APIs. It allows Unity developers to easily access and interact with our Maps, Geocoding, and Directions services from within the Unity 3D platform.
+    The Mapbox Unity SDK is a C#-based wrapper for Mapbox&#39;s location APIs. It allows Unity developers<br> to easily access and interact with our Maps, Geocoding, and Directions services from within the Unity 3D platform.
     </div>
     <div class="buttons-unit">
       <a href="docs/00-getting-started.html" class="button">Getting started</a>
@@ -33,10 +33,34 @@ footer{
 <div class="key-section">
   <div class="container">
     <div class="row">
-      <div class="col-md-8 col-md-offset-2 text-center">
-# Check out out our [blog](https://www.mapbox.com/blog/tags/unity/) for the latest of what we're building. 
-
-<!-- start feedwind code --> <script type="text/javascript" src="https://feed.mikle.com/js/fw-loader.js" data-fw-param="25373/"></script> <!-- end feedwind code -->
+      <div class="col-md-8 col-md-offset-2 text-left">
+      <p>
+<b>Quick start links: </b> <br>
+<ul>
+  <li>[Getting started](00-getting-started.md) </li> <br>
+  <li>[Mapbox API Token](01-mapbox-api-token.md) </li> <br>
+  <li>[Known issues](02-known-issues.md) </li><br>
+  <li>[Examples](03-examples.md) </li><br>
+</ul>
+    </p>
+    <p>
+<b>This SDK uses:  </b><br>
+</p>
+<p>
+ `mapbox-sdk-cs` for interacting with the Mapbox API <br>
+  <ul> 
+    <li>documentation: https://mapbox.github.io/mapbox-sdk-cs/ </li> <br>
+    <li>source: https://github.com/mapbox/mapbox-sdk-cs </li> <br>
+    <li>nuget: https://www.nuget.org/packages/MapboxSdkCs/ </li> <br> 
+  </ul>
+</p>
+<p>
+ `vector-tile-cs` for parsing vector tiles <br>
+  <ul> 
+   <li>source: https://github.com/mapbox/vector-tile-cs </li> <br>
+   <li>nuget: https://www.nuget.org/packages/Mapbox.VectorTile/ </li> <br>
+  </ul> 
+ </p>
       </div>
     </div>
   </div>
