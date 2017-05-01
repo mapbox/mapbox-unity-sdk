@@ -43,24 +43,7 @@ footer{
   <li>[Examples](03-examples.md) </li><br>
 </ul>
     </p>
-    <p>
-<b>This SDK uses:  </b><br>
-</p>
-<p>
- `mapbox-sdk-cs` for interacting with the Mapbox API <br>
-  <ul> 
-    <li>documentation: https://mapbox.github.io/mapbox-sdk-cs/ </li> <br>
-    <li>source: https://github.com/mapbox/mapbox-sdk-cs </li> <br>
-    <li>nuget: https://www.nuget.org/packages/MapboxSdkCs/ </li> <br> 
-  </ul>
-</p>
-<p>
- `vector-tile-cs` for parsing vector tiles <br>
-  <ul> 
-   <li>source: https://github.com/mapbox/vector-tile-cs </li> <br>
-   <li>nuget: https://www.nuget.org/packages/Mapbox.VectorTile/ </li> <br>
-  </ul> 
- </p>
+
       </div>
     </div>
   </div>
