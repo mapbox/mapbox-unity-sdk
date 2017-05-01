@@ -21,8 +21,12 @@ public class MeshFactoryEditor : FactoryEditor
         mapId_Prop = serializedObject.FindProperty("_mapId");
         script = MonoScript.FromScriptableObject(_factory);
     }
+
     public override void OnInspectorGUI()
     {
+        if (_factory == null)
+            return;
+
         serializedObject.Update();
 
         GUI.enabled = false;
@@ -42,32 +46,36 @@ public class MeshFactoryEditor : FactoryEditor
         EditorGUILayout.Space();
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Layer Visualizers");
-        
+
         EditorGUILayout.Space();
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.LabelField("Key");
         EditorGUILayout.LabelField("Visualizers");
         EditorGUILayout.EndHorizontal();
-        for (int i = 0; i < _factory.Visualizers.Count; i++)
+
+        if (_factory.Visualizers != null)
         {
-            EditorGUILayout.BeginHorizontal();
-            if(_factory.Visualizers[i] != null)
-                _factory.Visualizers[i].Key = EditorGUILayout.TextField(_factory.Visualizers[i].Key, GUILayout.MaxWidth(100));
-            _factory.Visualizers[i] = (LayerVisualizerBase)EditorGUILayout.ObjectField(_factory.Visualizers[i], typeof(LayerVisualizerBase));
-
-            if (GUILayout.Button("-", GUILayout.MaxWidth(20)))
+            for (int i = 0; i < _factory.Visualizers.Count; i++)
             {
-                _visualizerList.DeleteArrayElementAtIndex(i);
-            }
+                EditorGUILayout.BeginHorizontal();
+                if (_factory.Visualizers[i] != null)
+                    _factory.Visualizers[i].Key = EditorGUILayout.TextField(_factory.Visualizers[i].Key, GUILayout.MaxWidth(100));
+                _factory.Visualizers[i] = (LayerVisualizerBase)EditorGUILayout.ObjectField(_factory.Visualizers[i], typeof(LayerVisualizerBase));
 
-            EditorGUILayout.EndHorizontal();
+                if (GUILayout.Button("-", GUILayout.MaxWidth(20)))
+                {
+                    _visualizerList.DeleteArrayElementAtIndex(i);
+                }
+
+                EditorGUILayout.EndHorizontal();
+            }
         }
 
         if (GUILayout.Button("Add New Visualizer"))
         {
             _factory.Visualizers.Add(null);
         }
-
+        EditorUtility.SetDirty(_factory);
         serializedObject.ApplyModifiedProperties();
     }
 }
