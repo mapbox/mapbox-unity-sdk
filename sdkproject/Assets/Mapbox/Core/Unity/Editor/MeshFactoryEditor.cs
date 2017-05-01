@@ -20,7 +20,7 @@ public class MeshFactoryEditor : FactoryEditor
 
     public override void OnInspectorGUI()
     {
-        if (_factory == null || _factory.Visualizers == null)
+        if (_factory == null)
             return;
 
         serializedObject.Update();
@@ -38,19 +38,23 @@ public class MeshFactoryEditor : FactoryEditor
         EditorGUILayout.LabelField("Key");
         EditorGUILayout.LabelField("Visualizers");
         EditorGUILayout.EndHorizontal();
-        for (int i = 0; i < _factory.Visualizers.Count; i++)
+
+        if (_factory.Visualizers != null)
         {
-            EditorGUILayout.BeginHorizontal();
-            if (_factory.Visualizers[i] != null)
-                _factory.Visualizers[i].Key = EditorGUILayout.TextField(_factory.Visualizers[i].Key, GUILayout.MaxWidth(100));
-            _factory.Visualizers[i] = (LayerVisualizerBase)EditorGUILayout.ObjectField(_factory.Visualizers[i], typeof(LayerVisualizerBase));
-
-            if (GUILayout.Button("-", GUILayout.MaxWidth(20)))
+            for (int i = 0; i < _factory.Visualizers.Count; i++)
             {
-                _visualizerList.DeleteArrayElementAtIndex(i);
-            }
+                EditorGUILayout.BeginHorizontal();
+                if (_factory.Visualizers[i] != null)
+                    _factory.Visualizers[i].Key = EditorGUILayout.TextField(_factory.Visualizers[i].Key, GUILayout.MaxWidth(100));
+                _factory.Visualizers[i] = (LayerVisualizerBase)EditorGUILayout.ObjectField(_factory.Visualizers[i], typeof(LayerVisualizerBase));
 
-            EditorGUILayout.EndHorizontal();
+                if (GUILayout.Button("-", GUILayout.MaxWidth(20)))
+                {
+                    _visualizerList.DeleteArrayElementAtIndex(i);
+                }
+
+                EditorGUILayout.EndHorizontal();
+            }
         }
 
         if (GUILayout.Button("Add New Visualizer"))

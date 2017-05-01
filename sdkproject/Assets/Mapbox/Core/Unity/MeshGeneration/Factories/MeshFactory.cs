@@ -21,6 +21,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         private Dictionary<Vector2, UnityTile> _tiles;
         private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;
 
+        public void OnEnable()
+        {
+            if (Visualizers == null)
+                Visualizers = new List<LayerVisualizerBase>();
+        }
+
         /// <summary>
         /// Sets up the Mesh Factory
         /// </summary>
