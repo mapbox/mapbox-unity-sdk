@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using UnityEditor;
 using Mapbox.Unity.MeshGeneration.Factories;
@@ -12,8 +12,13 @@ public class MapImageFactoryEditor : FactoryEditor
         material_Prop,
         basicMaps_Prop,
         customMapId_Prop,
+        useMipMap_Prop,
+        textureFormat_Prop,
+        useRetina_Prop,
         mapId_Prop;
     private MonoScript script;
+
+    TextureFormat _textureFormat;
 
     private string[] _basicMapIds = new string[6] {
         "mapbox://styles/mapbox/streets-v10",
@@ -39,8 +44,15 @@ public class MapImageFactoryEditor : FactoryEditor
         mapIdType_Prop = serializedObject.FindProperty("_mapIdType");
         mapId_Prop = serializedObject.FindProperty("_mapId");
         material_Prop = serializedObject.FindProperty("_baseMaterial");
-        basicMaps_Prop = serializedObject.FindProperty("_basicMapIds");
-
+        useMipMap_Prop = serializedObject.FindProperty("_useMipMap");
+        textureFormat_Prop = serializedObject.FindProperty("_textureFormat");
+        useRetina_Prop = serializedObject.FindProperty("_useRetina");
+        _textureFormat = (TextureFormat)textureFormat_Prop.intValue;
+        if (textureFormat_Prop.enumValueIndex < 0)
+        {
+            textureFormat_Prop.intValue = (int)TextureFormat.DXT1;
+            _textureFormat = TextureFormat.DXT1;
+        }
         script = MonoScript.FromScriptableObject((MapImageFactory)target);
         for (int i = 0; i < _basicMapIds.Length; i++)
         {
@@ -49,7 +61,7 @@ public class MapImageFactoryEditor : FactoryEditor
                 _choiceIndex = i;
                 break;
             }
-        }        
+        }
     }
 
     public override void OnInspectorGUI()
@@ -65,7 +77,7 @@ public class MapImageFactoryEditor : FactoryEditor
         EditorGUILayout.Space();
         var st = (MapImageType)mapIdType_Prop.enumValueIndex;
         EditorGUI.indentLevel++;
-        
+
         switch (st)
         {
             case MapImageType.BasicMapboxStyle:
@@ -88,6 +100,31 @@ public class MapImageFactoryEditor : FactoryEditor
             case MapImageType.None:
                 break;
 
+        }
+        EditorGUI.indentLevel--;
+
+        EditorGUILayout.LabelField("Raster Tile Texture Settings");
+        EditorGUI.indentLevel++;
+        _textureFormat = (TextureFormat)EditorGUILayout.EnumPopup("Texture Format", _textureFormat);
+        textureFormat_Prop.intValue = (int)_textureFormat;
+        if (_textureFormat == TextureFormat.DXT1 || _textureFormat == TextureFormat.DXT5)
+        {
+            EditorGUILayout.HelpBox("Texture will be compressed. This will reduce image quality and lead to longer initialization times but save memory.", MessageType.Info);
+        }
+        else
+        {
+            EditorGUILayout.HelpBox("Use DXT format to save memory.", MessageType.Warning);
+        }
+
+        EditorGUILayout.PropertyField(useMipMap_Prop, new GUIContent("Create Mip Maps"));
+        if (useMipMap_Prop.boolValue)
+        {
+            EditorGUILayout.HelpBox("Mip maps will consume additional memory but reduce noise at increasing distances.", MessageType.Warning);
+        }
+        EditorGUILayout.PropertyField(useRetina_Prop, new GUIContent("Request Retina-resolution"));
+        if (useRetina_Prop.boolValue)
+        {
+            EditorGUILayout.HelpBox("Retina will consume additional memory but greatly improves visual quality.", MessageType.Warning);
         }
         EditorGUI.indentLevel--;
 

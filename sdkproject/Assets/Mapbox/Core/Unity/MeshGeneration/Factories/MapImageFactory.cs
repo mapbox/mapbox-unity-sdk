@@ -1,3 +1,4 @@
+using Mapbox.Unity.Utilities;
 namespace Mapbox.Unity.MeshGeneration.Factories
 {
     using System;
@@ -29,6 +30,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         private string _mapId = "";
         [SerializeField]
         public Material _baseMaterial;
+
+        [SerializeField]
+        TextureFormat _textureFormat;
+
+        [SerializeField]
+        bool _useMipMap = false;
+
+        [SerializeField]
+        bool _useRetina;
 
         private Dictionary<Vector2, UnityTile> _tiles;
 
@@ -69,7 +79,17 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                 parameters.MapId = _mapId;
 
                 tile.ImageDataState = TilePropertyState.Loading;
-                var rasterTile = parameters.MapId.StartsWith("mapbox://") ? new RasterTile() : new ClassicRasterTile();
+
+                RasterTile rasterTile;
+                if (parameters.MapId.StartsWith("mapbox://", StringComparison.Ordinal))
+                {
+                    rasterTile = _useRetina ? new RetinaRasterTile() : new RasterTile();
+                }
+                else 
+                {
+                    rasterTile = _useRetina ? new ClassicRetinaRasterTile() : new ClassicRasterTile();
+                }
+
                 rasterTile.Initialize(parameters, (Action)(() =>
                 {
                     if (rasterTile.Error != null)
@@ -80,8 +100,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
                     var rend = tile.GetComponent<MeshRenderer>();
                     rend.material = _baseMaterial;
-                    tile.ImageData = new Texture2D(256, 256, TextureFormat.RGB24, false);
-                    tile.ImageData.wrapMode = TextureWrapMode.Clamp;
+                    tile.ImageData = new Texture2D(0, 0, _textureFormat, _useMipMap);
                     tile.ImageData.LoadImage(rasterTile.Data);
                     rend.material.mainTexture = tile.ImageData;
                     tile.ImageDataState = TilePropertyState.Loaded;
