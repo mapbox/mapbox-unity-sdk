@@ -112,7 +112,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                 var pngRasterTile = new RawPngRasterTile();
                 pngRasterTile.Initialize(parameters, () =>
                 {
-                    if (pngRasterTile.Error != null)
+                    if (pngRasterTile.HasError)
                     {
                         tile.HeightDataState = TilePropertyState.Error;
                         return;

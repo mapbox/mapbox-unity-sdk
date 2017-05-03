@@ -1,17 +1,18 @@
 namespace Mapbox.Unity.MeshGeneration.Factories
 {
-    using System.Collections.Generic;
-    using UnityEngine;
-    using Mapbox.Unity.MeshGeneration.Enums;
-    using Mapbox.Unity.MeshGeneration.Data;
-    using Mapbox.Unity.MeshGeneration.Interfaces;
-    using Mapbox.Platform;
+	using System.Collections.Generic;
+	using UnityEngine;
+	using Mapbox.Unity.MeshGeneration.Enums;
+	using Mapbox.Unity.MeshGeneration.Data;
+	using Mapbox.Unity.MeshGeneration.Interfaces;
+	using Mapbox.Platform;
+	using System.Linq;
 
-    /// <summary>
-    /// Uses vector tile api to visualize vector data.
-    /// Fetches the vector data for given tile and passes layer data to layer visualizers.
-    /// </summary>
-    [CreateAssetMenu(menuName = "Mapbox/Factories/Mesh Factory")]
+	/// <summary>
+	/// Uses vector tile api to visualize vector data.
+	/// Fetches the vector data for given tile and passes layer data to layer visualizers.
+	/// </summary>
+	[CreateAssetMenu(menuName = "Mapbox/Factories/Mesh Factory")]
     public class MeshFactory : Factory
     {
         [SerializeField]
@@ -107,9 +108,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             var vectorTile = new Mapbox.Map.VectorTile();
             vectorTile.Initialize(parameters, () =>
             {
-                if (vectorTile.Error != null)
+                if (vectorTile.HasError)
                 {
-                    Debug.Log(vectorTile.Error);
+                    Debug.Log(string.Join(System.Environment.NewLine, vectorTile.Exceptions.Select(ex=>ex.Message).ToArray()));
                     return;
                 }
 
