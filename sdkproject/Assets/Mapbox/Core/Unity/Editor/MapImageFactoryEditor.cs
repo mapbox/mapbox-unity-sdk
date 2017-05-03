@@ -94,7 +94,8 @@ public class MapImageFactoryEditor : FactoryEditor
 
         }
         EditorGUI.indentLevel--;
-
+        EditorGUILayout.Space();
+        EditorGUILayout.Space();
         EditorGUILayout.LabelField("Raster Tile Texture Settings");
         EditorGUI.indentLevel++;
 
