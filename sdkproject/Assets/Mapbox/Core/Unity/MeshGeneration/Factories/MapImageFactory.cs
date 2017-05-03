@@ -72,7 +72,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                 var rasterTile = parameters.MapId.StartsWith("mapbox://") ? new RasterTile() : new ClassicRasterTile();
                 rasterTile.Initialize(parameters, (Action)(() =>
                 {
-                    if (rasterTile.Error != null)
+                    if (rasterTile.HasError)
                     {
                         tile.ImageDataState = TilePropertyState.Error;
                         return;

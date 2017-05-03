@@ -116,7 +116,7 @@ namespace Mapbox.Examples.Voxels
 
         public void OnNext(RasterTile tile)
         {
-            if (tile.CurrentState == Tile.State.Loaded && string.IsNullOrEmpty(tile.Error))
+            if (tile.CurrentState == Tile.State.Loaded && !tile.HasError)
             {
                 _rasterTexture = new Texture2D(2, 2);
                 _rasterTexture.LoadImage(tile.Data);
@@ -131,7 +131,7 @@ namespace Mapbox.Examples.Voxels
 
         public void OnNext(RawPngRasterTile tile)
         {
-            if (tile.CurrentState == Tile.State.Loaded && string.IsNullOrEmpty(tile.Error))
+            if (tile.CurrentState == Tile.State.Loaded && !tile.HasError)
             {
                 _elevationTexture = new Texture2D(2, 2);
                 _elevationTexture.LoadImage(tile.Data);
