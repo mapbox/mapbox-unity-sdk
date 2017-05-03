@@ -33,6 +33,7 @@ namespace UnityToolbag {
 		/// </summary>
 		/// <param name="action">The action to be queued.</param>
 		public static void InvokeAsync(Action action) {
+
 			if (!_instanceExists) {
 				Debug.LogError("No Dispatcher exists in the scene. Actions will not be invoked!");
 				return;
@@ -54,10 +55,12 @@ namespace UnityToolbag {
 		/// </summary>
 		/// <param name="action">The action to be queued.</param>
 		public static void Invoke(Action action) {
+
 			if (!_instanceExists) {
 				Debug.LogError("No Dispatcher exists in the scene. Actions will not be invoked!");
 				return;
 			}
+
 
 			bool hasRun = false;
 
@@ -68,7 +71,11 @@ namespace UnityToolbag {
 
 			// Lock until the action has run
 			while (!hasRun) {
+#if !NETFX_CORE
 				Thread.Sleep(5);
+#else
+				System.Threading.Tasks.Task.Delay(5).Wait();
+#endif
 			}
 		}
 
@@ -89,7 +96,7 @@ namespace UnityToolbag {
 			}
 		}
 
-		int cnt = 0;
+		//int cnt = 0;
 		void Update() {
 			//cnt++;
 			//if (cnt < 100) { return; }
