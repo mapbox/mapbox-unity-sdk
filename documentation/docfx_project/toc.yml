@@ -1,6 +1,6 @@
-- name: API
+- name: API Documentation
   tocHref: api/toc.yml
   topicHref: api/
 
-- name: Documentation
+- name: Tutorials & Guides
   tocHref: ../docs/toc.yml

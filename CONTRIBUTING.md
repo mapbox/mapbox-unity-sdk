@@ -1,44 +1,55 @@
 # Contributing code
 
-If you want to contribute code:
+If you want to contribute:
 
-1. Ensure that existing [pull requests](https://github.com/mapbox/mapbox-sdk-unity/pulls) and [issues](https://github.com/mapbox/mapbox-sdk-unity/issues) don’t already cover your contribution or question.
+1. Ensure that existing [pull requests](https://github.com/mapbox/mapbox-unity-sdk/pulls) and [issues](https://github.com/mapbox/mapbox-unity-sdk/issues) don’t already cover your contribution or question.
 
-2. Pull requests are gladly accepted. We require code reviews before merging PRs. When your tests pass, tag a project contributor (for example, @tmpsantos or @BergWerkGIS) and request a review.
+2. Pull requests are gladly accepted. We require code reviews before merging PRs. When your tests pass, tag a project contributor (for example, @isiyu, @BergWerkGIS, @brnky, or @david-rhodes) and request a review.
 
 # Requirements and installation
 
 #### Mac OS
 
-Use [Mono](http://www.mono-project.com/) to compile the SDK and to run executables. [Xamarin Studio](https://www.xamarin.com/download) is the recommended IDE.
+*Coming soon.*
+
+[Xamarin Studio](https://www.xamarin.com/download) is the recommended IDE.
 
 #### Linux
 
-Coming soon.
+*Coming soon.*
 
 ####  Windows
 
-Coming soon.
+*Coming soon.*
 
 # Updating the Mapbox Unity SDK Core
 
-Changes under `mapbox-sdk-unity/sdkproject/Assets/Mapbox/Core/` should never be committed directly to this repo. Instead they should be made in https://github.com/mapbox/mapbox-sdk-unity-core, and updates brought in via the generated nuget package. 
-The version of the Mapbox Core SDK can be found in the `packages.config` file at the root of the repo.
+This project includes git submodule dependencies. These dependencies are actively developed and maintained:
 
-To update the Mapbox Unity SDK Core, run the following command from the repo root. 
-```
-./update-mapbox-unity-sdk-core.sh [version number]
-```
-- requires the latest version of the [nuget cli](https://docs.nuget.org/ndocs/guides/install-nuget) 
-- to update nuget cli to latest via `nuget update -self`
-- version number coresponds to published nuget package versions https://www.nuget.org/packages/MapboxSDKforUnityCore/
-- `update-mapbox-unity-sdk-core.sh` has been tested on Windows, Ubuntu, and OSX
+- https://github.com/mapbox/vector-tile-cs
+- https://github.com/mapbox/mapbox-sdk-cs
 
-Once finished, you will need to `git add` any changes and/or files that were added in the update.
+Therefore, changes under `mapbox-sdk-unity/sdkproject/Assets/Mapbox/Core/Plugins` and `mapbox-sdk-unity/sdkproject/Assets/Mapbox/Core/mapbox-sdk-cs` should never be committed directly to this repo. Instead they should be made in their corresponding submodule repos and updated in the Unity project via a file transfer executable.
+
+To update the Mapbox Unity SDK Core, run the following command from the repo root:
+
+OSX
+```
+./update-mapbox-unity-sdk-core.sh
+```
+
+Windows
+```
+update-mapbox-unity-sdk-core.bat
+```
+
+This process copies releavant files from `mapbox-sdk-unity/dependencies` to `mapbox-sdk-unity/sdkproject/Assets/Mapbox/Core/`.  
 
 # Generating documentation
 
-Documentation for the the Mapbox Unity SDK is automatically generated from XML headers in code. *Instructions for generating documentation are coming soon*.
+Documentation for the the Mapbox Unity SDK is automatically generated from XML headers in code. 
+
+*Instructions for generating documentation are coming soon.*
 
 # Code of conduct
 

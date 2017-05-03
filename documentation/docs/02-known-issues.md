@@ -2,8 +2,7 @@
 
 ### Platform Support
 
-- UWP builds not currently working
-- WebGL builds not showing maps (build successful)
+- WebGL builds not showing maps (even though builds are successful)
 
 ### Vector Tile
 

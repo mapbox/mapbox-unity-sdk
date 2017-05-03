@@ -18,7 +18,8 @@ IF EXIST %SDK_PATH%\Plugins\ThirdParty RD /Q /S %SDK_PATH%\Plugins\ThirdParty
 IF %ERRORLEVEL% NEQ 0 ECHO error during removal of existing mapbox-sdk-cs && EXIT /B 1
 
 REM file not to copy
-ECHO project.json>x.txt
+ECHO project.json>>x.txt
+ECHO project.lock.json>>x.txt
 ECHO .csproj>>x.txt
 ECHO .snk>>x.txt
 ECHO packages.config>>x.txt
