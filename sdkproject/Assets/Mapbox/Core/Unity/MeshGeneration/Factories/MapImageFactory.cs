@@ -32,7 +32,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         public Material _baseMaterial;
 
         [SerializeField]
-        TextureFormat _textureFormat;
+        TextureFormat _textureFormat = TextureFormat.DXT1;
 
         [SerializeField]
         bool _useMipMap = false;

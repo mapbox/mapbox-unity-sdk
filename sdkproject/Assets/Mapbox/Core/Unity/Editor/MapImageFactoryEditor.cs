@@ -18,8 +18,6 @@ public class MapImageFactoryEditor : FactoryEditor
         mapId_Prop;
     private MonoScript script;
 
-    TextureFormat _textureFormat;
-
     private string[] _basicMapIds = new string[6] {
         "mapbox://styles/mapbox/streets-v10",
         "mapbox://styles/mapbox/outdoors-v10",
@@ -47,12 +45,6 @@ public class MapImageFactoryEditor : FactoryEditor
         useMipMap_Prop = serializedObject.FindProperty("_useMipMap");
         textureFormat_Prop = serializedObject.FindProperty("_textureFormat");
         useRetina_Prop = serializedObject.FindProperty("_useRetina");
-        _textureFormat = (TextureFormat)textureFormat_Prop.intValue;
-        if (textureFormat_Prop.enumValueIndex < 0)
-        {
-            textureFormat_Prop.intValue = (int)TextureFormat.DXT1;
-            _textureFormat = TextureFormat.DXT1;
-        }
         script = MonoScript.FromScriptableObject((MapImageFactory)target);
         for (int i = 0; i < _basicMapIds.Length; i++)
         {
@@ -105,9 +97,10 @@ public class MapImageFactoryEditor : FactoryEditor
 
         EditorGUILayout.LabelField("Raster Tile Texture Settings");
         EditorGUI.indentLevel++;
-        _textureFormat = (TextureFormat)EditorGUILayout.EnumPopup("Texture Format", _textureFormat);
-        textureFormat_Prop.intValue = (int)_textureFormat;
-        if (_textureFormat == TextureFormat.DXT1 || _textureFormat == TextureFormat.DXT5)
+
+        EditorGUILayout.PropertyField(textureFormat_Prop, new GUIContent("Texture Format"));
+        var textureFormat = (TextureFormat)textureFormat_Prop.intValue;
+        if (textureFormat == TextureFormat.DXT1 || textureFormat == TextureFormat.DXT5)
         {
             EditorGUILayout.HelpBox("Texture will be compressed. This will reduce image quality and lead to longer initialization times but save memory.", MessageType.Info);
         }
