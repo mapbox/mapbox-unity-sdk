@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+#### [Develop](https://github.com/mapbox/mapbox-unity-sdk/tree/develop)
+
+- Added new raster tiles that request retina resolution 
+- Added mipmap, texture format (and compression via DXT), and retina resolution support to `MapImageFactory`
+
 #### v0.5.1
 
 *05/01/2017*
