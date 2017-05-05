@@ -6,6 +6,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     using Mapbox.Unity.MeshGeneration.Data;
     using Mapbox.Unity.MeshGeneration.Components;
 
+    /// <summary>
+    /// Modifier Stack creates a game object from a feature using given modifiers.
+    /// It runs mesh modifiers, creates the game object and then run the game object modifiers.
+    /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Modifiers/Modifier Stack")]
     public class ModifierStack : ModifierStackBase
     {

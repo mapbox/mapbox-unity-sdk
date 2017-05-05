@@ -15,7 +15,8 @@ if [ -d "$SDK_PATH/Plugins/Mapbox" ]; then rm -rf $SDK_PATH/Plugins/Mapbox; fi
 if [ -d "$SDK_PATH/Plugins/ThirdParty" ]; then rm -rf $SDK_PATH/Plugins/ThirdParty; fi
 
 # exclude copying these files
-echo "*project.json" > x.txt
+echo "*project.json" >> x.txt
+echo "*project.lock.json" >> x.txt
 echo "*.csproj" >> x.txt
 echo "*.snk" >> x.txt
 echo "*packages.config" >> x.txt

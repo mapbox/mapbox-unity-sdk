@@ -4,6 +4,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     using UnityEngine;
     using Mapbox.Unity.MeshGeneration.Data;
     
+    /// <summary>
+    /// UV Modifier works only with (and right after) Polygon Modifier and not with Line Mesh Modifier.
+    /// If UseSatelliteRoof parameter is false, it creates a tiled UV map, otherwise it creates a stretched UV map.
+    /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Modifiers/UV Modifier")]
     public class UvModifier : MeshModifier
     {

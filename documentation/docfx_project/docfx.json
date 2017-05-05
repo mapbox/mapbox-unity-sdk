@@ -80,6 +80,32 @@
           "_site/**"
         ]
       },
+      {
+        "src": "../docs/MeshGeneration/Factories",
+        "dest": "docs/MeshGeneration/Factories",
+        "files": [
+          "*.md",
+          "*.yml",
+          "toc.yml"
+        ],
+        "exclude": [
+          "obj/**",
+          "_site/**"
+        ]
+      },
+      {
+        "src": "../docs/MeshGeneration/Factories/Modifiers",
+        "dest": "docs/MeshGeneration/Factories/Modifiers",
+        "files": [
+          "*.md",
+          "*.yml",
+          "toc.yml"
+        ],
+        "exclude": [
+          "obj/**",
+          "_site/**"
+        ]
+      },
       { //put docfx_project/toc.yml into _site root to get navigation bar on top
         "files": ["toc.yml"]
       }
@@ -89,7 +115,8 @@
         "src": "../docs/",
         "dest": "docs",
         "files": [
-          "images/**"
+          "images/**",
+		  "MeshGeneration/Factories/Images/**"
         ],
         "exclude": [
           "obj/**",
@@ -113,7 +140,8 @@
    "globalMetadataFiles": [],
     "fileMetadataFiles": [],
     "template": [
-      "default"
+      "default",
+      "template"
     ],
     "postProcessors": [],
     "noLangKeyword": false

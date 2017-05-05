@@ -12,6 +12,10 @@ namespace Mapbox.Unity.MeshGeneration
     {
         public List<Factory> Factories;
 
+        /// <summary>
+        /// Initializes the factories by passing the file source down, which's necessary for data (web/file) calls
+        /// </summary>
+        /// <param name="fs"></param>
         public void Initialize(IFileSource fs)
         {
             foreach (Factory fac in Factories.Where(x => x != null))
@@ -20,6 +24,10 @@ namespace Mapbox.Unity.MeshGeneration
             }
         }
 
+        /// <summary>
+        /// Registers requested tiles to the factories
+        /// </summary>
+        /// <param name="tile"></param>
         public void ShowTile(UnityTile tile)
         {
             foreach (var fac in Factories.Where(x => x != null))

@@ -8,6 +8,9 @@ namespace Mapbox.Unity.MeshGeneration
     using Mapbox.Unity.Utilities;
     using Utils;
 
+    /// <summary>
+    /// MapController is just an helper class imitating the game/app logic controlling the map. It creates and passes the tiles requests to MapVisualization.
+    /// </summary>
     public class MapController : MonoBehaviour
     {
         public static RectD ReferenceTileRect { get; set; }
@@ -27,6 +30,9 @@ namespace Mapbox.Unity.MeshGeneration
         private GameObject _root;
         private Dictionary<Vector2, UnityTile> _tiles;
 
+        /// <summary>
+        /// Resets the map controller and initializes the map visualization
+        /// </summary>
         public void Awake()
         {
             MapVisualization.Initialize(MapboxAccess.Instance);
@@ -38,6 +44,9 @@ namespace Mapbox.Unity.MeshGeneration
             Execute();
         }
 
+        /// <summary>
+        /// Pulls the root world object to origin for ease of use/view
+        /// </summary>
         public void Update()
         {
             if (_snapYToZero)
@@ -58,6 +67,13 @@ namespace Mapbox.Unity.MeshGeneration
             Execute(double.Parse(parm[0]), double.Parse(parm[1]), Zoom, Range);
         }
 
+        /// <summary>
+        /// World creation call used in the demos. Destroys and existing worlds and recreates another one. 
+        /// </summary>
+        /// <param name="lat">Latitude of the requested point</param>
+        /// <param name="lng">Longitude of the requested point</param>
+        /// <param name="zoom">Zoom/Detail level of the world</param>
+        /// <param name="frame">Tiles to load around central tile in each direction; west-north-east-south</param>
         public void Execute(double lat, double lng, int zoom, Vector4 frame)
         {
             //frame goes left-top-right-bottom here
@@ -104,6 +120,11 @@ namespace Mapbox.Unity.MeshGeneration
             Execute(lat, lng, zoom, new Vector4(range, range, range, range));
         }
 
+        /// <summary>
+        /// Used for loading new tiles on the existing world. Unlike Execute function, doesn't destroy the existing ones.
+        /// </summary>
+        /// <param name="pos">Tile coordinates of the requested tile</param>
+        /// <param name="zoom">Zoom/Detail level of the requested tile</param>
         public void Request(Vector2 pos, int zoom)
         {
             if (!_tiles.ContainsKey(pos))

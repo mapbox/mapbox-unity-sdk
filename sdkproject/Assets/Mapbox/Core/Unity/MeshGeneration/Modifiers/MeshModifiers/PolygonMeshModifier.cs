@@ -10,6 +10,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     using System;
     using TriangleNet.Smoothing;
 
+    /// <summary>
+    /// Polygon modifier creates the polygon (vertex&triangles) using the original vertex list.
+    /// Currently uses Triangle.Net for triangulation, which occasionally adds extra vertices to maintain a good triangulation so output vertex list might not be exactly same as the original vertex list.
+    /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Modifiers/Polygon Mesh Modifier")]
     public class PolygonMeshModifier : MeshModifier
     {

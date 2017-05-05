@@ -4,6 +4,11 @@ namespace Mapbox.Editor
     using UnityEditor;
     using Mapbox.Unity.Utilities;
 
+    /// <summary>
+    /// Custom property drawer for geocodes <para/>
+    /// Includes a search window to enable search of Lat/Lon via geocoder. 
+    /// Requires a Mapbox token be set for the project
+    /// </summary>
     [CustomPropertyDrawer(typeof(GeocodeAttribute))]
     public class GeocodeAttributeDrawer : PropertyDrawer
     {

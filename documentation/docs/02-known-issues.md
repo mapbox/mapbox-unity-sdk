@@ -2,8 +2,7 @@
 
 ### Platform Support
 
-- UWP builds not currently working
-- WebGL builds not showing maps (build successful)
+- WebGL builds not showing maps (even though builds are successful)
 
 ### Vector Tile
 
@@ -11,6 +10,7 @@
 - Buildings are split along tile borders (features duplicated across boundaries)
 - Building parts are not associated with specific buildings (other than spatially)
 - Some complex building data is not rendered correctly (cut out holes, floating pieces, etc.)
+- Building rooftops are not flat when placed on non-flat terrain
 
 ### Global Elevation Data
 
