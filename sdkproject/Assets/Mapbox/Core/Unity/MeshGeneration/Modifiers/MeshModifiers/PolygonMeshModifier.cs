@@ -61,8 +61,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                     {
                         if (nextVert == null)
                         {
-                            currentVert = new Vertex(sub[i].x, sub[i].z, sub[i].y);
-                            nextVert = new Vertex(sub[i + 1].x, sub[i + 1].z, sub[i].y);
+                            currentVert = new Vertex(sub[i].x, sub[i].y, sub[i].z);
+                            nextVert = new Vertex(sub[i + 1].x, sub[i].y, sub[i + 1].z);
                         }
                         else
                         {
@@ -73,7 +73,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                             }
                             else
                             {
-                                nextVert = new Vertex(sub[i + 1].x, sub[i + 1].z, sub[i + 1].y);
+                                nextVert = new Vertex(sub[i + 1].x, sub[i + 1].y, sub[i + 1].z);
                             }
                         }
 
@@ -92,7 +92,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                     for (int i = 0; i < sub.Count; i++)
                     {
                         wist.Add(sub[i]);
-                        cont.Add(new Vertex(sub[i].x, sub[i].z, sub[i].y));
+                        cont.Add(new Vertex(sub[i].x, sub[i].y, sub[i].z));
                     }
                     polygon.Add(new Contour(cont), true);
                 }
