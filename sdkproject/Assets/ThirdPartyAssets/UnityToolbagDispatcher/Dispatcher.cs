@@ -13,7 +13,8 @@ namespace UnityToolbag {
 
 		// We can't use the behaviour reference from other threads, so we use a separate bool
 		// to track the instance so we can use that on the other threads.
-		private static bool _instanceExists;
+		// edit by BergWerkGIS: make public to see if dispatcher is attached
+		public static bool _instanceExists;
 
 		private static Thread _mainThread;
 		private static object _lockObject = new object();
