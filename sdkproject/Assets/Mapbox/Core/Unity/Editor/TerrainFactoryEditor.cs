@@ -32,7 +32,6 @@ public class TerrainFactoryEditor : FactoryEditor
         material_Prop = serializedObject.FindProperty("_baseMaterial");
         collider_Prop = serializedObject.FindProperty("_addMeshCollider");
         addLayer_Prop = serializedObject.FindProperty("_addToLayer");
-        addLayer_Prop = serializedObject.FindProperty("_addToLayer");
         layerId_Prop = serializedObject.FindProperty("_layerId");
 
         script = MonoScript.FromScriptableObject((TerrainFactory)target);
