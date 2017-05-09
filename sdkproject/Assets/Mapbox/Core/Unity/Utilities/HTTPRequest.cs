@@ -49,12 +49,8 @@ namespace Mapbox.Unity.Utilities {
 			while (!_request.isDone) {
 				yield return 0;
 			}
-			var response = new Response();
-			// TODO: evalute _request more thoroughly and set properties of Response accordingly: status code, headers, etc.
-			if (!string.IsNullOrEmpty(_request.error)) {
-				response.AddException(new Exception(_request.error));
-			}
-			response.Data = this._request.downloadHandler.data;
+
+			var response = Response.FromWebResponse(this, _request, null);
 
 			_callback(response);
 			_request.Dispose();
