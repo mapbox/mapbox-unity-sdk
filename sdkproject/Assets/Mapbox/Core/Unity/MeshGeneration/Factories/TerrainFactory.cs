@@ -222,9 +222,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                 tile.MeshRenderer.material = _baseMaterial;
 
             if (_addMeshCollider)
+            {
                 go.AddComponent<MeshCollider>();
+            }
             if (_addToLayer)
+            {
                 go.layer = _layerId;
+            }
         }
 
         /// <summary>
@@ -259,9 +263,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                 tile.MeshRenderer.material = _baseMaterial;
 
             if (_addMeshCollider)
-                tile.gameObject.AddComponent<MeshCollider>();
+            {
+                var bc = tile.gameObject.AddComponent<BoxCollider>();
+            }
             if (_addToLayer)
+            {
                 tile.gameObject.layer = _layerId;
+            }
         }
 
         /// <summary>
