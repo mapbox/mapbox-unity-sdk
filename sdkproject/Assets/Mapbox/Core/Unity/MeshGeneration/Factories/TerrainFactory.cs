@@ -44,7 +44,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         [SerializeField]
         private int _sampleCount = 40;
         [SerializeField]
-        private bool _addMeshCollider = false;
+        private bool _addCollider = false;
         [SerializeField]
         private bool _addToLayer = false;
         [SerializeField]
@@ -118,7 +118,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                 var pngRasterTile = new RawPngRasterTile();
                 pngRasterTile.Initialize(parameters, () =>
                 {
-                    if (pngRasterTile.Error != null)
+                    if (pngRasterTile.HasError)
                     {
                         tile.HeightDataState = TilePropertyState.Error;
                         return;
@@ -221,7 +221,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             if (tile.MeshRenderer.material == null)
                 tile.MeshRenderer.material = _baseMaterial;
 
-            if (_addMeshCollider)
+            if (_addCollider)
             {
                 go.AddComponent<MeshCollider>();
             }
@@ -262,7 +262,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             if (tile.MeshRenderer.material == null)
                 tile.MeshRenderer.material = _baseMaterial;
 
-            if (_addMeshCollider)
+            if (_addCollider)
             {
                 var bc = tile.gameObject.AddComponent<BoxCollider>();
             }
