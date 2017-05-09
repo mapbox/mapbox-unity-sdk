@@ -84,12 +84,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories {
 						return;
 					}
 
-					var rend = tile.GetComponent<MeshRenderer>();
-					rend.material = _baseMaterial;
-					tile.ImageData = new Texture2D(0, 0, _textureFormat, _useMipMap);
-					tile.ImageData.LoadImage(rasterTile.Data);
-					rend.material.mainTexture = tile.ImageData;
-					tile.ImageDataState = TilePropertyState.Loaded;
+                    var rend = tile.GetComponent<MeshRenderer>();
+                    rend.material = _baseMaterial;
+                    tile.ImageData = new Texture2D(0, 0, _textureFormat, _useMipMap);
+                    tile.ImageData.wrapMode = TextureWrapMode.Clamp;
+                    tile.ImageData.LoadImage(rasterTile.Data);
+                    rend.material.mainTexture = tile.ImageData;
+                    tile.ImageDataState = TilePropertyState.Loaded;
 
 				}));
 			} else {
