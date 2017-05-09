@@ -43,6 +43,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         private float _heightModifier = 1f;
         [SerializeField]
         private int _sampleCount = 40;
+        [SerializeField]
+        private bool _addMeshCollider = false;
+        [SerializeField]
+        private bool _addToLayer = false;
+        [SerializeField]
+        private int _layerId = 0;
 
         private Dictionary<Vector2, UnityTile> _tiles;
         private Vector2 _stitchTarget;
@@ -214,9 +220,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
             if (tile.MeshRenderer.material == null)
                 tile.MeshRenderer.material = _baseMaterial;
-            //BRNKHY Optional stuff
-            //go.AddComponent<MeshCollider>();
-            //go.layer = LayerMask.NameToLayer("terrain");
+
+            if (_addMeshCollider)
+                go.AddComponent<MeshCollider>();
+            if (_addToLayer)
+                go.layer = _layerId;
         }
 
         /// <summary>
@@ -250,9 +258,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             if (tile.MeshRenderer.material == null)
                 tile.MeshRenderer.material = _baseMaterial;
 
-            //BRNKHY Optional stuff
-            //go.AddComponent<MeshCollider>();
-            //go.layer = LayerMask.NameToLayer("terrain");
+            if (_addMeshCollider)
+                tile.gameObject.AddComponent<MeshCollider>();
+            if (_addToLayer)
+                tile.gameObject.layer = _layerId;
         }
 
         /// <summary>
