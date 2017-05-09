@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 using UnityEditor;
 using Mapbox.Unity.MeshGeneration.Factories;
 
@@ -13,7 +12,7 @@ public class MapImageFactoryEditor : FactoryEditor
         basicMaps_Prop,
         customMapId_Prop,
         useMipMap_Prop,
-        textureFormat_Prop,
+    useCompression_Prop,
         useRetina_Prop,
         mapId_Prop;
     private MonoScript script;
@@ -43,7 +42,7 @@ public class MapImageFactoryEditor : FactoryEditor
         mapId_Prop = serializedObject.FindProperty("_mapId");
         material_Prop = serializedObject.FindProperty("_baseMaterial");
         useMipMap_Prop = serializedObject.FindProperty("_useMipMap");
-        textureFormat_Prop = serializedObject.FindProperty("_textureFormat");
+        useCompression_Prop = serializedObject.FindProperty("_useCompression");
         useRetina_Prop = serializedObject.FindProperty("_useRetina");
         script = MonoScript.FromScriptableObject((MapImageFactory)target);
         for (int i = 0; i < _basicMapIds.Length; i++)
@@ -99,15 +98,14 @@ public class MapImageFactoryEditor : FactoryEditor
         EditorGUILayout.LabelField("Raster Tile Texture Settings");
         EditorGUI.indentLevel++;
 
-        EditorGUILayout.PropertyField(textureFormat_Prop, new GUIContent("Texture Format"));
-        var textureFormat = (TextureFormat)textureFormat_Prop.intValue;
-        if (textureFormat == TextureFormat.DXT1 || textureFormat == TextureFormat.DXT5)
+        EditorGUILayout.PropertyField(useCompression_Prop, new GUIContent("Use Compression"));
+        if (useCompression_Prop.boolValue)
         {
             EditorGUILayout.HelpBox("Texture will be compressed. This will reduce image quality and lead to longer initialization times but save memory.", MessageType.Info);
         }
         else
         {
-            EditorGUILayout.HelpBox("Use DXT format to save memory.", MessageType.Warning);
+            EditorGUILayout.HelpBox("Use compression to save memory.", MessageType.Warning);
         }
 
         EditorGUILayout.PropertyField(useMipMap_Prop, new GUIContent("Create Mip Maps"));
@@ -118,7 +116,7 @@ public class MapImageFactoryEditor : FactoryEditor
         EditorGUILayout.PropertyField(useRetina_Prop, new GUIContent("Request Retina-resolution"));
         if (useRetina_Prop.boolValue)
         {
-            EditorGUILayout.HelpBox("Retina will consume additional memory but greatly improves visual quality.", MessageType.Warning);
+            EditorGUILayout.HelpBox("Retina will consume additional memory but can greatly improve visual quality.", MessageType.Warning);
         }
         EditorGUI.indentLevel--;
 
