@@ -30,7 +30,7 @@ namespace Mapbox.Examples.Drive
             var waypoints = new List<Vector2d>();
             foreach (var wp in Waypoints)
             {
-                waypoints.Add(wp.transform.GetGeoPosition(MapController.ReferenceMercatorRect.Center, _root.localScale.x));
+                waypoints.Add(wp.transform.GetGeoPosition(MapController.ReferenceTileRect.Center, _root.localScale.x));
             }
 
             Directions.Query(waypoints);

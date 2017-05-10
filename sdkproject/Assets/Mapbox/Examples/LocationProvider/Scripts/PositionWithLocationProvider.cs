@@ -7,6 +7,9 @@ namespace Mapbox.Examples.LocationProvider
 
     public class PositionWithLocationProvider : MonoBehaviour
 	{
+        [SerializeField]
+        private MapController _mapController;
+
         /// <summary>
         /// The rate at which the transform's position tries catch up to the provided location.
         /// </summary>
@@ -66,15 +69,15 @@ namespace Mapbox.Examples.LocationProvider
 
 		void LocationProvider_OnLocationUpdated(object sender, LocationUpdatedEventArgs e)
 		{
-            if (MapController.ReferenceTileRect == null)
+            if (_mapController.ReferenceTileRect == null)
             {
                 return;
             }
 
             _targetPosition = Conversions.GeoToWorldPosition(e.Location,
-                                                             MapController.ReferenceTileRect.Center, 
-                                                             MapController.WorldScaleFactor).ToVector3xz();
-		}
+                                                             _mapController.ReferenceTileRect.Center,
+                                                             _mapController.WorldScaleFactor).ToVector3xz();
+        }
 
 		void Update()
 		{

@@ -38,7 +38,7 @@ namespace Mapbox.Examples
             if (_yPlane.Raycast(_ray, out _hitDistance))
             {
                 _cameraTarget = _ray.GetPoint(_hitDistance) / _root.localScale.x;
-                _currentTile = Conversions.MetersToTile(new Vector2d(_mapController.ReferenceMercatorRect.Center.x + _cameraTarget.x, _mapController.ReferenceMercatorRect.Center.y + _cameraTarget.z), _mapController.Zoom);
+                _currentTile = Conversions.MetersToTile(new Vector2d(_mapController.ReferenceTileRect.Center.x + _cameraTarget.x, _mapController.ReferenceTileRect.Center.y + _cameraTarget.z), _mapController.Zoom);
                 if (_currentTile != _cachedTile)
                 {
                     for (int i = -_range; i <= _range; i++)

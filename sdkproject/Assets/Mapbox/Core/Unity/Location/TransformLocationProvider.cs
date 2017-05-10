@@ -14,6 +14,9 @@ namespace Mapbox.Unity.Location
     /// </summary>
     public class TransformLocationProvider : MonoBehaviour, ILocationProvider
     {
+        [SerializeField]
+        private MapController _mapController;
+
         /// <summary>
         /// The transform that will be queried for location and heading data.
         /// </summary>
@@ -70,11 +73,11 @@ namespace Mapbox.Unity.Location
 
         Vector2d GetLocation()
         {
-            if (MapController.ReferenceTileRect == null)
+            if (_mapController.ReferenceTileRect == null)
             {
                 return LocationProviderFactory.Instance.DefaultLocationProvider.Location;
             }
-            return _targetTransform.GetGeoPosition(MapController.ReferenceTileRect.Center, MapController.WorldScaleFactor);
+            return _targetTransform.GetGeoPosition(_mapController.ReferenceTileRect.Center, _mapController.WorldScaleFactor);
         }
     }
 }
