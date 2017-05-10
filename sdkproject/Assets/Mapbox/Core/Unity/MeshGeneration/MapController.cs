@@ -13,8 +13,8 @@ namespace Mapbox.Unity.MeshGeneration
     /// </summary>
     public class MapController : MonoBehaviour
     {
-        public RectD ReferenceTileRect;
-        public float WorldScaleFactor = 1;
+		public RectD ReferenceTileRect { get; private set; }
+		public float WorldScaleFactor { get; private set; }
 
         public MapVisualization MapVisualization;
         public float TileSize = 100;
@@ -31,11 +31,10 @@ namespace Mapbox.Unity.MeshGeneration
         private Dictionary<Vector2, UnityTile> _tiles;
         private Vector2 _refTile;
 
-
         /// <summary>
         /// Resets the map controller and initializes the map visualization
         /// </summary>
-        public void Awake()
+        public void Start()
         {
             var parm = LatLng.Split(',');
             var v2 = Conversions.GeoToWorldPosition(double.Parse(parm[0]), double.Parse(parm[1]), new Vector2d(0, 0));
@@ -44,11 +43,7 @@ namespace Mapbox.Unity.MeshGeneration
 
             MapVisualization.Initialize(MapboxAccess.Instance);
             _tiles = new Dictionary<Vector2, UnityTile>();
-        }
-
-        public void Start()
-        {
-            Execute();
+			Execute();
         }
 
         /// <summary>
