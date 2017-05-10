@@ -121,9 +121,10 @@ MonoBehaviour:
   MapVisualization: {fileID: 11400000, guid: 38f8ab26621bb424d86f009e3dce979f, type: 2}
   TileSize: 100
   _snapYToZero: 0
-  LatLng: 37.7648, -122.463
+  LatLng: injected from build map component
   Zoom: 15
   Range: {x: 1, y: 1, z: 1, w: 1}
+  Root: {fileID: 0}
 --- !u!4 &114606472
 Transform:
   m_ObjectHideFlags: 0
@@ -472,6 +473,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a034c4eeb3293418aab101c1895844a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _mapController: {fileID: 114606471}
   _targetTransform: {fileID: 1649127106}
 --- !u!4 &1649127106
 Transform:
@@ -528,6 +530,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bb39d89f6f3742418be7c93b4259637, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _mapController: {fileID: 114606471}
   _positionFollowFactor: 0.5
   _useTransformLocationProvider: 0
 --- !u!4 &1934621224
