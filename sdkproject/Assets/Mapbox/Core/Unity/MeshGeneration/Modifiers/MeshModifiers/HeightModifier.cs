@@ -11,6 +11,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
         FirstMidTopFloor
     }
 
+    /// <summary>
+    /// Height Modifier is responsible for the y axis placement of the feature. It pushes the original vertices upwards by "height" value and creates side walls around that new polygon down to "min_height" value.
+    /// It also checkes for "ele" (elevation) value used for contour lines in Mapbox Terrain data. 
+    /// Height Modifier also creates a continuous UV mapping for side walls.
+    /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Modifiers/Height Modifier")]
     public class HeightModifier : MeshModifier
     {

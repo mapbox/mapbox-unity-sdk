@@ -15,6 +15,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         None
     }
 
+    /// <summary>
+    /// Uses raster image services to create materials & textures for terrain
+    /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Factories/Map Image Factory")]
     public class MapImageFactory : Factory
     {
@@ -26,6 +29,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         private string _mapId = "";
         [SerializeField]
         public Material _baseMaterial;
+
+        [SerializeField]
+        bool _useCompression = true;
+
+        [SerializeField]
+        bool _useMipMap = false;
+
+        [SerializeField]
+        bool _useRetina;
 
         private Dictionary<Vector2, UnityTile> _tiles;
 
@@ -51,6 +63,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             }
         }
 
+        /// <summary>
+        /// Fetches the image and applies it to tile material.
+        /// MapImage factory currently supports both new (RasterTile) and classic (ClassicRasterTile) Mapbox styles.
+        /// </summary>
+        /// <param name="tile"></param>
         private void Run(UnityTile tile)
         {
             if (!string.IsNullOrEmpty(_mapId))
@@ -61,10 +78,20 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                 parameters.MapId = _mapId;
 
                 tile.ImageDataState = TilePropertyState.Loading;
-                var rasterTile = parameters.MapId.StartsWith("mapbox://") ? new RasterTile() : new ClassicRasterTile();
+
+                RasterTile rasterTile;
+                if (parameters.MapId.StartsWith("mapbox://", StringComparison.Ordinal))
+                {
+                    rasterTile = _useRetina ? new RetinaRasterTile() : new RasterTile();
+                }
+                else
+                {
+                    rasterTile = _useRetina ? new ClassicRetinaRasterTile() : new ClassicRasterTile();
+                }
+
                 rasterTile.Initialize(parameters, (Action)(() =>
                 {
-                    if (rasterTile.Error != null)
+                    if (rasterTile.HasError)
                     {
                         tile.ImageDataState = TilePropertyState.Error;
                         return;
@@ -72,9 +99,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
                     var rend = tile.GetComponent<MeshRenderer>();
                     rend.material = _baseMaterial;
-                    tile.ImageData = new Texture2D(256, 256, TextureFormat.RGB24, false);
+                    tile.ImageData = new Texture2D(0, 0, TextureFormat.RGB24, _useMipMap);
                     tile.ImageData.wrapMode = TextureWrapMode.Clamp;
                     tile.ImageData.LoadImage(rasterTile.Data);
+                    if (_useCompression)
+                    {
+                        // High quality = true seems to decrease image quality?
+                        tile.ImageData.Compress(false);
+                    }
                     rend.material.mainTexture = tile.ImageData;
                     tile.ImageDataState = TilePropertyState.Loaded;
 

@@ -4,6 +4,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
     using Mapbox.Unity.MeshGeneration.Data;
     using Mapbox.Platform;
 
+    /// <summary>
+    /// Corresponds to Mapbox Api end points like raster image, vector tile or directions. Makes the web calls and handles the response.
+    /// </summary>
     public class Factory : ScriptableObject
     {
         //private IWorldParameter MapVisualization;

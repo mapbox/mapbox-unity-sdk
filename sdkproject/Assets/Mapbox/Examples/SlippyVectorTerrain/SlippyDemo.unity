@@ -454,7 +454,7 @@ MonoBehaviour:
   MapVisualization: {fileID: 11400000, guid: 7f949b7bf234f3049adb4259192eda3d, type: 2}
   TileSize: 100
   _snapYToZero: 1
-  LatLng: 69.5419324, 20.5512521
+  LatLng: 69.551461, 20.566388
   Zoom: 12
   Range: {x: 0, y: 0, z: 0, w: 0}
 --- !u!4 &1461465688
@@ -481,8 +481,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab322f3f81267624dbd388daa9e37945, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MapVisualization: {fileID: 11400000, guid: 7f949b7bf234f3049adb4259192eda3d, type: 2}
-  _range: 2
+  _range: 1
 --- !u!1 &1515605195
 GameObject:
   m_ObjectHideFlags: 0

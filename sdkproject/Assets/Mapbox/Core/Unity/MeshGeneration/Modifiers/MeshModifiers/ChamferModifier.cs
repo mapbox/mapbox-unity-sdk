@@ -4,6 +4,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     using UnityEngine;
     using Mapbox.Unity.MeshGeneration.Data;
     
+    /// <summary>
+    /// Chamfer modifiers adds an extra vertex and a line segmet at each corner, making corners and line smoother.
+    /// Generally used for smoother building meshes and should be used before Polygon Mesh Modifier.
+    /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Modifiers/Chamfer Modifier")]
     public class ChamferModifier : MeshModifier
     {

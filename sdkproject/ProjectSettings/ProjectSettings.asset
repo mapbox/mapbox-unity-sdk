@@ -185,7 +185,7 @@ PlayerSettings:
   - m_BuildTarget: 
     m_Icons:
     - serializedVersion: 2
-      m_Icon: {fileID: 2800000, guid: 3389cd347a13e426f905f8bf5df76a93, type: 3}
+      m_Icon: {fileID: 0}
       m_Width: 128
       m_Height: 128
   m_BuildTargetBatching: []
@@ -424,6 +424,7 @@ PlayerSettings:
   XboxOneAllowedProductIds: []
   XboxOnePersistentLocalStorageSize: 0
   intPropertyNames:
+  - Android::ScriptingBackend
   - Standalone::ScriptingBackend
   - WebGL::ScriptingBackend
   - WebGL::audioCompressionFormat
@@ -431,6 +432,7 @@ PlayerSettings:
   - WebGL::memorySize
   - iOS::Architecture
   - iOS::ScriptingBackend
+  Android::ScriptingBackend: 0
   Standalone::ScriptingBackend: 0
   WebGL::ScriptingBackend: 1
   WebGL::audioCompressionFormat: 4

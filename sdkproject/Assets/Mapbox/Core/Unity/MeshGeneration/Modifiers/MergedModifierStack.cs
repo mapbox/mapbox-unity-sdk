@@ -10,6 +10,11 @@ using Mapbox.Unity.MeshGeneration.Components;
 
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
+    /// <summary>
+    /// Merged Modifier Stack, just like regular Modifier stack, creates a game object from features. But the difference is, regular modifier stack creates a game object for each given faeture meanwhile Merged Modifier Stack merges meshes and creates one game object for all features (until the 65k vertex limit).
+    /// It has extremely higher performance compared to regular modifier stack but since it merged all entities together, it also loses all individual entity data & makes it harder to interact with them.
+    /// It pools and merges objects based on the tile contains them.
+    /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Modifiers/Merged Modifier Stack")]
     public class MergedModifierStack : ModifierStackBase
     {
@@ -51,7 +56,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
         private GameObject CreateGameObject(MeshData data, GameObject main)
         {
-            //Debug.Log("building count " + _buildingCount[tile]);
             var go = new GameObject();
             var mesh = go.AddComponent<MeshFilter>().mesh;
             var rend = go.AddComponent<MeshRenderer>();
@@ -84,7 +88,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
         public GameObject End(UnityTile tile, GameObject parent)
         {
-
             var md = new MeshData();
             md.UV = new List<List<Vector2>>() { new List<Vector2>(), new List<Vector2>() };
             md.Triangles = new List<List<int>>() { new List<int>(), new List<int>() };
@@ -111,7 +114,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                     _cached[tile].Clear();
                     return go;
                 }
-                
             }
             return null;
         }

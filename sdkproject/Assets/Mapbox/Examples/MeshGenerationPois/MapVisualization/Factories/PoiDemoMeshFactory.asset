@@ -11,6 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63d97cb1cfb3f1b499c24763afa54873, type: 3}
   m_Name: PoiDemoMeshFactory
   m_EditorClassIdentifier: 
+  _mapId: mapbox.mapbox-streets-v7
   Visualizers:
   - {fileID: 11400000, guid: d7635a5805d9fde4abacec52b9484935, type: 2}
   - {fileID: 11400000, guid: 615891c00af941c4a97b2ce6797278d0, type: 2}
