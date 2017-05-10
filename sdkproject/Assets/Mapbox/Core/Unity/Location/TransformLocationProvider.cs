@@ -73,11 +73,11 @@ namespace Mapbox.Unity.Location
 
         Vector2d GetLocation()
         {
-            if (_mapController.ReferenceTileRect == null)
+            if (_mapController.WorldParameters.ReferenceTileRect == null)
             {
                 return LocationProviderFactory.Instance.DefaultLocationProvider.Location;
             }
-            return _targetTransform.GetGeoPosition(_mapController.ReferenceTileRect.Center, _mapController.WorldScaleFactor);
+            return _targetTransform.GetGeoPosition(_mapController.WorldParameters.ReferenceTileRect.Center, _mapController.WorldParameters.WorldScaleFactor);
         }
     }
 }

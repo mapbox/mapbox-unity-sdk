@@ -69,14 +69,14 @@ namespace Mapbox.Examples.LocationProvider
 
 		void LocationProvider_OnLocationUpdated(object sender, LocationUpdatedEventArgs e)
 		{
-            if (_mapController.ReferenceTileRect == null)
+            if (_mapController.WorldParameters == null)
             {
                 return;
             }
 
             _targetPosition = Conversions.GeoToWorldPosition(e.Location,
-                                                             _mapController.ReferenceTileRect.Center,
-                                                             _mapController.WorldScaleFactor).ToVector3xz();
+                                                             _mapController.WorldParameters.ReferenceTileRect.Center,
+                                                             _mapController.WorldParameters.WorldScaleFactor).ToVector3xz();
         }
 
 		void Update()

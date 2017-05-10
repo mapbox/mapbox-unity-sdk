@@ -41,9 +41,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
         private Dictionary<Vector2, UnityTile> _tiles;
 
-        public override void Initialize(IFileSource fs)
+        public override void Initialize(IFileSource fs, WorldParameters parameters)
         {
-            base.Initialize(fs);
+            base.Initialize(fs, parameters);
             _tiles = new Dictionary<Vector2, UnityTile>();
         }
 
