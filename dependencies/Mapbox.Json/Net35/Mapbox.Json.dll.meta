@@ -48,10 +48,6 @@ PluginImporter:
       enabled: 1
       settings:
         CPU: AnyCPU
-    Android:
-      enabled: 1
-      settings:
-        CPU: AnyCPU
     Win64:
       enabled: 1
       settings:

@@ -10,24 +10,23 @@ namespace Mapbox.Examples.Drive
 
     public class DirectionsHelper : MonoBehaviour
     {
+        private Transform _root;
+        public MapController MapController;
         public DirectionsFactory Directions;
         public List<Transform> Waypoints;
 
-        void Start()
+        void Awake()
         {
             // draw directions path at start
-            Query();
+            MapController.WorldCreated += (s, e) =>
+            {
+                Query();
+            };
         }
 
         public void Query()
         {
-            var waypoints = new List<Vector2d>();
-            foreach (var wp in Waypoints)
-            {
-                waypoints.Add(wp.transform.GetGeoPosition(MapController.ReferenceTileRect.Center, MapController.WorldScaleFactor));
-            }
-
-            Directions.Query(waypoints);
+            Directions.Query(Waypoints);
         }
     }
 }

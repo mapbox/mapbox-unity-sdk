@@ -8,14 +8,18 @@ namespace Mapbox.Unity.MeshGeneration
     using Mapbox.Unity.Utilities;
     using Utils;
 
+    public class WorldParameters
+    {
+        public RectD ReferenceTileRect;
+        public float WorldScaleFactor = 1;
+    }
+
     /// <summary>
     /// MapController is just an helper class imitating the game/app logic controlling the map. It creates and passes the tiles requests to MapVisualization.
     /// </summary>
     public class MapController : MonoBehaviour
     {
-        public static RectD ReferenceTileRect { get; set; }
-        public static float WorldScaleFactor { get; set; }
-
+        public WorldParameters WorldParameters;
         public MapVisualization MapVisualization;
         public float TileSize = 100;
 
@@ -27,21 +31,37 @@ namespace Mapbox.Unity.MeshGeneration
         public int Zoom;
         public Vector4 Range;
 
-        private GameObject _root;
+        public GameObject Root;
         private Dictionary<Vector2, UnityTile> _tiles;
+        private Vector2 _refTile;
+
 
         /// <summary>
         /// Resets the map controller and initializes the map visualization
         /// </summary>
-        public void Awake()
-        {
-            MapVisualization.Initialize(MapboxAccess.Instance);
-            _tiles = new Dictionary<Vector2, UnityTile>();
-        }
-
         public void Start()
         {
-            Execute();
+            var parm = LatLng.Split(',');
+            var v2 = Conversions.GeoToWorldPosition(double.Parse(parm[0]), double.Parse(parm[1]), new Vector2d(0, 0));
+            _refTile = Conversions.MetersToTile(v2, Zoom);
+            WorldParameters = new WorldParameters();
+            WorldParameters.ReferenceTileRect = Conversions.TileBounds(_refTile, Zoom);
+            if (Root != null)
+            {
+                foreach (Transform t in Root.transform)
+                {
+                    Destroy(t.gameObject);
+                }
+            }
+
+            WorldParameters.WorldScaleFactor = (float)(TileSize / WorldParameters.ReferenceTileRect.Size.x);
+            Root = new GameObject("worldRoot");
+            Root.transform.localScale = Vector3.one * WorldParameters.WorldScaleFactor;
+
+            MapVisualization.Initialize(MapboxAccess.Instance, WorldParameters);
+            _tiles = new Dictionary<Vector2, UnityTile>();
+
+			Execute();
         }
 
         /// <summary>
@@ -55,7 +75,7 @@ namespace Mapbox.Unity.MeshGeneration
                 RaycastHit rayhit;
                 if (Physics.Raycast(ray, out rayhit))
                 {
-                    _root.transform.position = new Vector3(0, -rayhit.point.y, 0);
+                    Root.transform.position = new Vector3(0, -rayhit.point.y, 0);
                     _snapYToZero = false;
                 }
             }
@@ -76,26 +96,9 @@ namespace Mapbox.Unity.MeshGeneration
         /// <param name="frame">Tiles to load around central tile in each direction; west-north-east-south</param>
         public void Execute(double lat, double lng, int zoom, Vector4 frame)
         {
-            //frame goes left-top-right-bottom here
-            if (_root != null)
+            for (int i = (int)(_refTile.x - frame.x); i <= (_refTile.x + frame.z); i++)
             {
-                foreach (Transform t in _root.transform)
-                {
-                    Destroy(t.gameObject);
-                }
-            }
-
-            _root = new GameObject("worldRoot");
-
-            var v2 = Conversions.GeoToWorldPosition(lat, lng, new Vector2d(0, 0));
-            var tms = Conversions.MetersToTile(v2, zoom);
-            ReferenceTileRect = Conversions.TileBounds(tms, zoom);
-            WorldScaleFactor = (float)(TileSize / ReferenceTileRect.Size.x);
-            _root.transform.localScale = Vector3.one * WorldScaleFactor;
-
-            for (int i = (int)(tms.x - frame.x); i <= (tms.x + frame.z); i++)
-            {
-                for (int j = (int)(tms.y - frame.y); j <= (tms.y + frame.w); j++)
+                for (int j = (int)(_refTile.y - frame.y); j <= (_refTile.y + frame.w); j++)
                 {
                     var tile = new GameObject("Tile - " + i + " | " + j).AddComponent<UnityTile>();
                     _tiles.Add(new Vector2(i, j), tile);
@@ -103,11 +106,13 @@ namespace Mapbox.Unity.MeshGeneration
                     tile.RelativeScale = Conversions.GetTileScaleInMeters(0, Zoom) / Conversions.GetTileScaleInMeters((float)lat, Zoom);
                     tile.TileCoordinate = new Vector2(i, j);
                     tile.Rect = Conversions.TileBounds(tile.TileCoordinate, zoom);
-                    tile.transform.position = new Vector3((float)(tile.Rect.Center.x - ReferenceTileRect.Center.x), 0, (float)(tile.Rect.Center.y - ReferenceTileRect.Center.y));
-                    tile.transform.SetParent(_root.transform, false);
+                    tile.transform.position = new Vector3((float)(tile.Rect.Center.x - WorldParameters.ReferenceTileRect.Center.x), 0, (float)(tile.Rect.Center.y - WorldParameters.ReferenceTileRect.Center.y));
+                    tile.transform.SetParent(Root.transform, false);
                     MapVisualization.ShowTile(tile);
                 }
             }
+
+            OnWorldCreated(Root);
         }
 
         public void Execute(double lat, double lng, int zoom, Vector2 frame)
@@ -131,17 +136,26 @@ namespace Mapbox.Unity.MeshGeneration
             {
                 var tile = new GameObject("Tile - " + pos.x + " | " + pos.y).AddComponent<UnityTile>();
                 _tiles.Add(pos, tile);
-                tile.transform.SetParent(_root.transform, false);
+                tile.transform.SetParent(Root.transform, false);
                 tile.Zoom = zoom;
                 tile.TileCoordinate = new Vector2(pos.x, pos.y);
                 tile.Rect = Conversions.TileBounds(tile.TileCoordinate, zoom);
                 tile.RelativeScale = Conversions.GetTileScaleInMeters(0, Zoom) /
                     Conversions.GetTileScaleInMeters((float)Conversions.MetersToLatLon(tile.Rect.Center).x, Zoom);
-                tile.transform.localPosition = new Vector3((float)(tile.Rect.Center.x - ReferenceTileRect.Center.x),
+                tile.transform.localPosition = new Vector3((float)(tile.Rect.Center.x - WorldParameters.ReferenceTileRect.Center.x),
                                                            0,
-                                                           (float)(tile.Rect.Center.y - ReferenceTileRect.Center.y));
+                                                           (float)(tile.Rect.Center.y - WorldParameters.ReferenceTileRect.Center.y));
                 MapVisualization.ShowTile(tile);
             }
+        }
+
+
+        public delegate void MapControllerEventArgs(MapController sender, GameObject root);
+        public event MapControllerEventArgs WorldCreated;
+        protected virtual void OnWorldCreated(GameObject root)
+        {
+            var handler = WorldCreated;
+            if (handler != null) handler(this, root);
         }
     }
 }
