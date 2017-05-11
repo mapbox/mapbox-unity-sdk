@@ -6,6 +6,8 @@ If you want to contribute:
 
 2. Pull requests are gladly accepted. We require code reviews before merging PRs. When your tests pass, tag a project contributor (for example, @isiyu, @BergWerkGIS, @brnky, or @david-rhodes) and request a review.
 
+3. Please adhere to our [coding style](https://github.com/mapbox/mapbox-unity-sdk/blob/develop/CODING-STYLE.md).
+
 # Requirements and installation
 
 #### Mac OS
