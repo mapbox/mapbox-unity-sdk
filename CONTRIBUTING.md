@@ -6,6 +6,8 @@ If you want to contribute:
 
 2. Pull requests are gladly accepted. We require code reviews before merging PRs. When your tests pass, tag a project contributor (for example, @isiyu, @BergWerkGIS, @brnky, or @david-rhodes) and request a review.
 
+3. Please adhere to our [coding style](CODING-STYLE.md).
+
 # Requirements and installation
 
 #### Mac OS
@@ -43,11 +45,11 @@ Windows
 update-mapbox-unity-sdk-core.bat
 ```
 
-This process copies releavant files from `mapbox-sdk-unity/dependencies` to `mapbox-sdk-unity/sdkproject/Assets/Mapbox/Core/`.  
+This process copies releavant files from `mapbox-sdk-unity/dependencies` to `mapbox-sdk-unity/sdkproject/Assets/Mapbox/Core/`.
 
 # Generating documentation
 
-Documentation for the the Mapbox Unity SDK is automatically generated from XML headers in code. 
+Documentation for the the Mapbox Unity SDK is automatically generated from XML headers in code.
 
 *Instructions for generating documentation are coming soon.*
 
