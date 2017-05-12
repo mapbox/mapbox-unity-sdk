@@ -1,19 +1,14 @@
-using Mapbox.Unity.MeshGeneration.Factories;
-using Mapbox.Unity.Map;
-using Mapbox.Map;
 namespace Mapbox.Unity.MeshGeneration
 {
+	using Mapbox.Unity.MeshGeneration.Factories;
+	using Mapbox.Unity.Map;
+	using Mapbox.Map;
 	using UnityEngine;
 	using Mapbox.Unity.Utilities;
 	using Utils;
 	using Mapbox.Unity.MeshGeneration.Data;
 
-	//public class WorldParameters
-	//{
-	//    public RectD ReferenceTileRect;
-	//    public float WorldScaleFactor = 1;
-	//}
-
+	// TODO: abstract this class to IMap + AbstractMap
 	public class MapController : MonoBehaviour
 	{
 		[Geocode]
@@ -22,9 +17,16 @@ namespace Mapbox.Unity.MeshGeneration
 
 		[SerializeField]
 		int _zoom;
+		public int Zoom
+		{
+			get
+			{
+				return _zoom;
+			}
+		}
 
 		[SerializeField]
-		RangeTileProvider _tileProvider;
+		AbstractTileProvider _tileProvider;
 
 		[SerializeField]
 		Factory[] _factories;
@@ -35,10 +37,6 @@ namespace Mapbox.Unity.MeshGeneration
 		MapboxAccess _fileSouce;
 
 		Vector2d _latitudeLongitude;
-
-		//private bool _snapYToZero = true;
-
-		//UnwrappedTileId _refTile;
 
 		RectD _referenceTileRect;
 		public RectD ReferenceTileRect
@@ -58,9 +56,19 @@ namespace Mapbox.Unity.MeshGeneration
 			}
 		}
 
+		UnwrappedTileId _refTile;
+		public UnwrappedTileId RefTile
+		{
+			get
+			{
+				return _refTile;
+			}
+		}
+
 		void Awake()
 		{
 			_tileProvider.OnTileAdded += TileProvider_OnTileAdded;
+			_tileProvider.OnTileRemoved += TileProvider_OnTileRemoved;
 			_fileSouce = MapboxAccess.Instance;
 		}
 
@@ -69,6 +77,7 @@ namespace Mapbox.Unity.MeshGeneration
 			if (_tileProvider != null)
 			{
 				_tileProvider.OnTileAdded -= TileProvider_OnTileAdded;
+				_tileProvider.OnTileAdded -= TileProvider_OnTileRemoved;
 			}
 		}
 
@@ -82,8 +91,8 @@ namespace Mapbox.Unity.MeshGeneration
 			var latLonSplit = _latitudeLongitudeString.Split(',');
 			_latitudeLongitude = new Vector2d(double.Parse(latLonSplit[0]), double.Parse(latLonSplit[1]));
 
-			var refTile = TileCover.CoordinateToTileId(_latitudeLongitude, _zoom);
-			_referenceTileRect = Conversions.TileBounds(refTile, _zoom);
+			_refTile = TileCover.CoordinateToTileId(_latitudeLongitude, _zoom);
+			_referenceTileRect = Conversions.TileBounds(_refTile, _zoom);
 			_worldScaleFactor = (float)(_unityTileSize / _referenceTileRect.Size.x);
 			transform.localScale = Vector3.one * _worldScaleFactor;
 
@@ -91,7 +100,7 @@ namespace Mapbox.Unity.MeshGeneration
 			{
 				factory.Initialize(_fileSouce);
 			}
-			_tileProvider.Initialize(refTile, _zoom);
+			_tileProvider.Initialize(this);
 		}
 
 		void TileProvider_OnTileAdded(object sender, Map.TileStateChangedEventArgs e)
@@ -107,6 +116,14 @@ namespace Mapbox.Unity.MeshGeneration
 			foreach (var factory in _factories)
 			{
 				factory.Register(tile);
+			}
+		}
+
+		void TileProvider_OnTileRemoved(object sender, TileStateChangedEventArgs e)
+		{
+			foreach (var factory in _factories)
+			{
+				//factory.Unregister(tile);
 			}
 		}
 	}
