@@ -47,6 +47,10 @@ update-mapbox-unity-sdk-core.bat
 
 This process copies releavant files from `mapbox-sdk-unity/dependencies` to `mapbox-sdk-unity/sdkproject/Assets/Mapbox/Core/`.
 
+# Contributing from your own project
+
+If you would prefer to make changes to the SDK from within your own Unity project, rather than the built-in `sdkproject`, we recommend that you symlink `sdkproject/Assets/Mapbox` into my `your-project/Assets/Mapbox`.
+
 # Generating documentation
 
 Documentation for the the Mapbox Unity SDK is automatically generated from XML headers in code.
