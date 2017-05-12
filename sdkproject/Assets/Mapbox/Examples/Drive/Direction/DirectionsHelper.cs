@@ -15,18 +15,18 @@ namespace Mapbox.Examples.Drive
         public DirectionsFactory Directions;
         public List<Transform> Waypoints;
 
-        void Awake()
-        {
-            // draw directions path at start
-            MapController.WorldCreated += (s, e) =>
-            {
-                Query();
-            };
-        }
+        //void Awake()
+        //{
+        //    // draw directions path at start
+        //    MapController.WorldCreated += (s, e) =>
+        //    {
+        //        Query();
+        //    };
+        //}
 
-        public void Query()
-        {
-            Directions.Query(Waypoints);
-        }
+        //public void Query()
+        //{
+        //    Directions.Query(Waypoints);
+        //}
     }
 }

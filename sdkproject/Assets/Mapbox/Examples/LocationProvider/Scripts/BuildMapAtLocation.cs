@@ -35,7 +35,7 @@
         void LocationProvider_OnLocationUpdated(object sender, Unity.Location.LocationUpdatedEventArgs e)
         {
             LocationProvider.OnLocationUpdated -= LocationProvider_OnLocationUpdated;
-            _mapController.LatLng = string.Format("{0}, {1}", e.Location.x, e.Location.y);
+			_mapController.SetLatitudeLongitude(string.Format("{0}, {1}", e.Location.x, e.Location.y));
             _mapController.enabled = true;
         }
     }

@@ -18,22 +18,22 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         private Directions _directions;
         public List<MeshModifier> MeshModifiers;
 
-        public override void Initialize(IFileSource fileSource, WorldParameters parameters)
+        public override void Initialize(IFileSource fileSource)
         {
-            base.Initialize(fileSource, parameters);
+            base.Initialize(fileSource);
             _directions = MapboxAccess.Instance.Directions;
         }
 
         public void Query(List<Transform> waypoints)
         {
-            var wp = new Vector2d[waypoints.Count];
-            for (int i = 0; i < waypoints.Count; i++)
-            {
-                wp[i] = waypoints[i].GetGeoPosition(Parameters.ReferenceTileRect.Center, Parameters.WorldScaleFactor);
-            }
-            var _directionResource = new DirectionResource(wp, RoutingProfile.Driving);
-            _directionResource.Steps = true;
-            _directions.Query(_directionResource, HandleDirectionsResponse);
+            //var wp = new Vector2d[waypoints.Count];
+            //for (int i = 0; i < waypoints.Count; i++)
+            //{
+            //    wp[i] = waypoints[i].GetGeoPosition(Parameters.ReferenceTileRect.Center, Parameters.WorldScaleFactor);
+            //}
+            //var _directionResource = new DirectionResource(wp, RoutingProfile.Driving);
+            //_directionResource.Steps = true;
+            //_directions.Query(_directionResource, HandleDirectionsResponse);
         }
 
         void HandleDirectionsResponse(DirectionsResponse response)
@@ -44,7 +44,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             {
                 foreach (var point in response.Routes[0].Geometry)
                 {
-                    meshData.Vertices.Add(Conversions.GeoToWorldPosition(point.x, point.y, Parameters.ReferenceTileRect.Center, Parameters.WorldScaleFactor).ToVector3xz());
+                    //meshData.Vertices.Add(Conversions.GeoToWorldPosition(point.x, point.y, Parameters.ReferenceTileRect.Center, Parameters.WorldScaleFactor).ToVector3xz());
                 }
             }
 

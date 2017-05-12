@@ -53,9 +53,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         private Dictionary<Vector2, UnityTile> _tiles;
         private Vector2 _stitchTarget;
 
-        public override void Initialize(IFileSource fs, WorldParameters parameters)
+        public override void Initialize(IFileSource fs)
         {
-            base.Initialize(fs, parameters);
+            base.Initialize(fs);
             _tiles = new Dictionary<Vector2, UnityTile>();
         }
 
@@ -123,7 +123,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                         tile.HeightDataState = TilePropertyState.Error;
                         return;
                     }
-                    var texture = new Texture2D(256, 256);
+                    var texture = new Texture2D(0, 0);
                     texture.wrapMode = TextureWrapMode.Clamp;
                     texture.LoadImage(pngRasterTile.Data);
                     tile.HeightData = texture;

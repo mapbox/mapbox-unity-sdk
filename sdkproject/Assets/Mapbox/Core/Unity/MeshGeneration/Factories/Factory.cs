@@ -11,13 +11,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
     {
         //private IWorldParameter MapVisualization;
         protected IFileSource FileSource;
-        protected WorldParameters Parameters;
+        //protected WorldParameters Parameters;
 
-        public virtual void Initialize(IFileSource fileSource, WorldParameters parameters)
+        public virtual void Initialize(IFileSource fileSource)
         {
-            //MapVisualization = vis;
             FileSource = fileSource;
-            Parameters = parameters;
         }
 
         public virtual void Register(UnityTile tile)
