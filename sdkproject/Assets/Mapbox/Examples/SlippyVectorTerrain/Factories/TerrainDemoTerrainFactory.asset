@@ -18,6 +18,6 @@ MonoBehaviour:
   _mapId: mapbox.terrain-rgb
   _heightModifier: 100
   _sampleCount: 10
-  _addCollider: 0
+  _addCollider: 1
   _addToLayer: 0
   _layerId: 0

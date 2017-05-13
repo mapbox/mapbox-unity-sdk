@@ -26,7 +26,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
     /// Uses Mapbox Terrain api and creates terrain meshes.
     /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Factories/Terrain Factory")]
-    public class TerrainFactory : Factory
+	public class TerrainFactory : TileFactory
     {
         [SerializeField]
         private TerrainGenerationType _generationType;
@@ -35,8 +35,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
         [SerializeField]
         private MapIdType _mapIdType;
-        [SerializeField]
+
+		// TODO: remove or fix?
+		[SerializeField]
         private string _customMapId = "mapbox.terrain-rgb";
+
         [SerializeField]
         private string _mapId = "";
         [SerializeField]
@@ -50,20 +53,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         [SerializeField]
         private int _layerId = 0;
 
-        private Dictionary<Vector2, UnityTile> _tiles;
         private Vector2 _stitchTarget;
 
         public override void Initialize(IFileSource fs)
         {
             base.Initialize(fs);
-            _tiles = new Dictionary<Vector2, UnityTile>();
-        }
-
-        public override void Register(UnityTile tile)
-        {
-            base.Register(tile);
-            _tiles.Add(tile.TileCoordinate, tile);
-            Run(tile);
         }
 
         /// <summary>
@@ -81,7 +75,16 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                 Run(tile);
             }
         }
+
+		internal override void OnRegistered(UnityTile tile)
+		{
+			Run(tile);
+		}
         
+		internal override void OnUnregistered(Data.UnityTile tile)
+		{
+		}
+
         private void Run(UnityTile tile)
         {
             if (_generationType == TerrainGenerationType.Height)
@@ -145,6 +148,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         /// <param name="heightMultiplier">Multiplier for queried height value</param>
         private void GenerateTerrainMesh(UnityTile tile, float heightMultiplier)
         {
+			// HACK: Handle tiles that have been requested and removed before getting response!
+			if (!_tiles.ContainsValue(tile))
+			{
+				return;
+			}
             var go = tile.gameObject;
             var mesh = new MeshData();
             mesh.Vertices = new List<Vector3>(_sampleCount * _sampleCount);
@@ -223,8 +231,16 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
             if (_addCollider)
             {
-                go.AddComponent<MeshCollider>();
-            }
+				var meshCollider = tile.GetComponent<MeshCollider>();
+				if (meshCollider)
+				{
+					meshCollider.sharedMesh = uMesh;
+				}
+				else
+				{
+					go.AddComponent<MeshCollider>();
+				}
+			}
             if (_addToLayer)
             {
                 go.layer = _layerId;

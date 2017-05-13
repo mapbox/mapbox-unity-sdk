@@ -74,12 +74,12 @@ namespace Mapbox.Unity.MeshGeneration.Data
         public TilePropertyState ImageDataState { get; set; }
         public TilePropertyState HeightDataState { get; set; }
         public TilePropertyState VectorDataState { get; set; }
-        #endregion
+		#endregion
 
-        public Vector2 TileCoordinate { get; set; }
-        public int Zoom { get; set; }
-        public RectD Rect { get; set; }
-        public float RelativeScale { get; set; }
+		public Vector2 TileCoordinate;
+		public int Zoom;
+		public RectD Rect;
+		public float RelativeScale;
 
         public float QueryHeightData(float x, float y)
         {

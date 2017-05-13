@@ -11,7 +11,7 @@
 
 		void Initialize(MapController mapController);
 
-		// TODO: add reset method?
+		// TODO: add reset/clear method?
 	}
 
 	public class TileStateChangedEventArgs : EventArgs

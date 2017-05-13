@@ -12,19 +12,20 @@ namespace Mapbox.Unity.MeshGeneration.Factories
     /// Fetches the vector data for given tile and passes layer data to layer visualizers.
     /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Factories/Mesh Factory")]
-    public class MeshFactory : Factory
+	public class MeshFactory : TileFactory
     {
         [SerializeField]
         private string _mapId = "";
         public List<LayerVisualizerBase> Visualizers;
 
-        private Dictionary<Vector2, UnityTile> _tiles;
         private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;
 
         public void OnEnable()
         {
-            if (Visualizers == null)
-                Visualizers = new List<LayerVisualizerBase>();
+			if (Visualizers == null)
+			{
+				Visualizers = new List<LayerVisualizerBase>();
+			}
         }
 
         /// <summary>
@@ -34,7 +35,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         public override void Initialize(IFileSource fs)
         {
             base.Initialize(fs);
-            _tiles = new Dictionary<Vector2, UnityTile>();
             _layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
             foreach (LayerVisualizerBase factory in Visualizers)
             {
@@ -49,13 +49,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             }
         }
 
-        public override void Register(UnityTile tile)
-        {
-            base.Register(tile);
-            _tiles.Add(tile.TileCoordinate, tile);
-            Run(tile);
-        }
+		internal override void OnRegistered(UnityTile tile)
+		{
+			Run(tile);
+		}
 
+		internal override void OnUnregistered(Data.UnityTile tile)
+		{
+			throw new System.NotImplementedException();
+		}
         /// <summary>
         /// Mesh Factory waits for both Height and Image data to be processed if they are requested
         /// </summary>

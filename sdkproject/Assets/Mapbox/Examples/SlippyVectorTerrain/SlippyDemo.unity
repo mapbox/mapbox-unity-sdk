@@ -432,7 +432,6 @@ GameObject:
   m_Component:
   - 4: {fileID: 1461465688}
   - 114: {fileID: 1461465687}
-  - 114: {fileID: 1461465689}
   - 114: {fileID: 1461465690}
   m_Layer: 0
   m_Name: MapController
@@ -472,18 +471,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
---- !u!114 &1461465689
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1461465686}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0695791daeb004752b5bdd0a35bd2c07, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _range: {x: 1, y: 1, z: 1, w: 1}
 --- !u!114 &1461465690
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -497,7 +484,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _camera: {fileID: 1281281116}
   _visibleBuffer: 2
-  _disposeBuffer: 5
+  _disposeBuffer: 7
 --- !u!1 &1515605195
 GameObject:
   m_ObjectHideFlags: 0

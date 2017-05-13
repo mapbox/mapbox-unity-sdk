@@ -19,12 +19,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
     /// Uses raster image services to create materials & textures for terrain
     /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Factories/Map Image Factory")]
-    public class MapImageFactory : Factory
+	public class MapImageFactory : TileFactory
     {
         [SerializeField]
         private MapImageType _mapIdType;
-        [SerializeField]
+
+		// TODO: fix or remove?
+		[SerializeField]
         private string _customMapId = "";
+
         [SerializeField]
         private string _mapId = "";
         [SerializeField]
@@ -39,19 +42,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         [SerializeField]
         bool _useRetina;
 
-        private Dictionary<Vector2, UnityTile> _tiles;
-
         public override void Initialize(IFileSource fs)
         {
             base.Initialize(fs);
             _tiles = new Dictionary<Vector2, UnityTile>();
-        }
-
-        public override void Register(UnityTile tile)
-        {
-            base.Register(tile);
-            _tiles.Add(tile.TileCoordinate, tile);
-            Run(tile);
         }
 
         public override void Update()
@@ -62,6 +56,16 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                 Run(tile);
             }
         }
+
+		internal override void OnRegistered(UnityTile tile)
+		{
+			Run(tile);
+		}
+
+		internal override void OnUnregistered(UnityTile tile)
+		{
+			//throw new NotImplementedException();
+		}
 
         /// <summary>
         /// Fetches the image and applies it to tile material.
@@ -91,12 +95,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
                 rasterTile.Initialize(parameters, (Action)(() =>
                 {
+					// FIXME: handle tile has been removed before response!
+					// We can do this by cancelling the tile if we can get a reference to it.
                     if (rasterTile.HasError)
                     {
                         tile.ImageDataState = TilePropertyState.Error;
                         return;
                     }
 
+					// TODO: Optimize--get from unitytile object?
                     var rend = tile.GetComponent<MeshRenderer>();
                     rend.material = _baseMaterial;
                     tile.ImageData = new Texture2D(0, 0, TextureFormat.RGB24, _useMipMap);
@@ -118,5 +125,5 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                 rend.material = _baseMaterial;
             }
         }
-    }
+	}
 }

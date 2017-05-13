@@ -24,7 +24,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		public virtual void Unregister(UnityTile tile)
 		{
-
+			// TODO: how can we get a reference to the tile request for cancelling?
 		}
 
 		public virtual void Update()

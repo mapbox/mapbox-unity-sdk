@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 namespace Mapbox.Unity.MeshGeneration
 {
 	using Mapbox.Unity.MeshGeneration.Factories;
@@ -37,6 +38,11 @@ namespace Mapbox.Unity.MeshGeneration
 		MapboxAccess _fileSouce;
 
 		Vector2d _latitudeLongitude;
+
+		UnityTile _tileTemplate;
+
+		// HACK: lookup to remove tiles.
+		Dictionary<UnwrappedTileId, UnityTile> _activeTiles = new Dictionary<UnwrappedTileId, UnityTile>();
 
 		RectD _referenceTileRect;
 		public RectD ReferenceTileRect
@@ -105,13 +111,32 @@ namespace Mapbox.Unity.MeshGeneration
 
 		void TileProvider_OnTileAdded(object sender, Map.TileStateChangedEventArgs e)
 		{
-			var tile = new GameObject(e.TileId.ToString()).AddComponent<UnityTile>();
-			tile.Zoom = _zoom;
-			tile.RelativeScale = Conversions.GetTileScaleInMeters(0, _zoom) / Conversions.GetTileScaleInMeters((float)_latitudeLongitude.x, _zoom);
+			// TODO delay any creation. Let factories handle this gameobject instantiation and such?
+			UnityTile tile;
+
+			if (_tileTemplate)
+			{
+				// Instantiate a duplicate of the last tile created. 
+				// This helps to hide tile loading visuals.
+				tile = Instantiate<UnityTile>(_tileTemplate);
+				tile.name = e.TileId.ToString();
+			}
+			else
+			{
+				tile = new GameObject(e.TileId.ToString()).AddComponent<UnityTile>();
+				tile.Zoom = _zoom;
+				tile.RelativeScale = Conversions.GetTileScaleInMeters(0, _zoom) / Conversions.GetTileScaleInMeters((float)_latitudeLongitude.x, _zoom);
+			}
+
 			tile.TileCoordinate = new Vector2(e.TileId.X, e.TileId.Y);
 			tile.Rect = Conversions.TileBounds(tile.TileCoordinate, _zoom);
-			tile.transform.localPosition = new Vector3((float)(tile.Rect.Center.x - ReferenceTileRect.Center.x), 0, (float)(tile.Rect.Center.y - ReferenceTileRect.Center.y));
 			tile.transform.SetParent(transform, false);
+			tile.transform.localPosition = new Vector3((float)(tile.Rect.Center.x - ReferenceTileRect.Center.x), 0, (float)(tile.Rect.Center.y - ReferenceTileRect.Center.y));
+
+			// TODO: fix how template is created?
+			_tileTemplate = tile;
+
+			_activeTiles.Add(e.TileId, tile);
 
 			foreach (var factory in _factories)
 			{
@@ -121,10 +146,19 @@ namespace Mapbox.Unity.MeshGeneration
 
 		void TileProvider_OnTileRemoved(object sender, TileStateChangedEventArgs e)
 		{
+			var unityTile = _activeTiles[e.TileId];
 			foreach (var factory in _factories)
 			{
-				//factory.Unregister(tile);
+				// TODO: implement! See below.
+				factory.Unregister(unityTile);
 			}
+
+			// TODO; destroy or recycle objects in factories, instead.
+			// Alternatively, have the tile provider generate UnityTile objects, instead?
+			_activeTiles.Remove(e.TileId);
+
+			// TODO: recycle!
+			Destroy(unityTile.gameObject);
 		}
 	}
 }
