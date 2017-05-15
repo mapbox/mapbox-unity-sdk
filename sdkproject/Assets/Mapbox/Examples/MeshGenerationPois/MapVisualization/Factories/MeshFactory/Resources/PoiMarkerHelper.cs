@@ -4,9 +4,9 @@ using Mapbox.Unity.MeshGeneration.Interfaces;
 using System;
 using System.Collections.Generic;
 
-public class PoiMarkerHelper : MonoBehaviour, ILabelVisualizationHelper
+public class PoiMarkerHelper : MonoBehaviour, IFeaturePropertySettable
 {
-    public void Initialize(Dictionary<string, object> props)
+    public void Set(Dictionary<string, object> props)
     {
         
     }

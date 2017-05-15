@@ -66,8 +66,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
             var bd = go.AddComponent<FeatureBehaviour>();
             bd.Init(feature);
 
-            var tm = go.GetComponent<ILabelVisualizationHelper>();
-            tm.Initialize(feature.Properties);
+            var tm = go.GetComponent<IFeaturePropertySettable>();
+            if(tm != null)
+                tm.Set(feature.Properties);
         }
 
         private float GetHeightFromColor(Color c)
