@@ -149,7 +149,6 @@ namespace Mapbox.Unity.MeshGeneration
 			var unityTile = _activeTiles[e.TileId];
 			foreach (var factory in _factories)
 			{
-				// TODO: implement! See below.
 				factory.Unregister(unityTile);
 			}
 

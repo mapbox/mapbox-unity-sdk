@@ -60,7 +60,7 @@
 				var tile = _activeTiles[i];
 				bool dispose = false;
 				dispose = tile.X > currentTile.X + _disposeBuffer || tile.X < _currentTile.X - _disposeBuffer;
-				dispose = dispose || tile.Y > _currentTile.Y + _disposeBuffer || _currentTile.Y < _currentTile.Y - _disposeBuffer;
+				dispose = dispose || tile.Y > _currentTile.Y + _disposeBuffer || tile.Y < _currentTile.Y - _disposeBuffer;
 
 				if (dispose)
 				{
