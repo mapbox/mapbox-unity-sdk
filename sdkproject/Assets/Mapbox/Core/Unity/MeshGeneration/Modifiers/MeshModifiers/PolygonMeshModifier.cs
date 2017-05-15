@@ -123,7 +123,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
             {
                 while (sequenceEnum.MoveNext())
                 {
-                    md.Vertices.Add(new Vector3((float)sequenceEnum.Current.x, 0, (float)sequenceEnum.Current.y));
+                    md.Vertices.Add(new Vector3((float)sequenceEnum.Current.x, (float)sequenceEnum.Current.z, (float)sequenceEnum.Current.y));
                 }
             }
             md.Triangles.Add(data);
