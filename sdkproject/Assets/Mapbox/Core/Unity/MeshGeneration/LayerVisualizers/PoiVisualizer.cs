@@ -22,6 +22,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
         public GameObject PoiPrefab;
         private GameObject _container;
 
+        [SerializeField]
+        private bool _scaleDownWithWorld = true;
+
         public override void Create(VectorTileLayer layer, UnityTile tile)
         {
             _container = new GameObject(Key + " Container");
@@ -56,6 +59,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
             met.y += h;
             go.transform.position = met;
             go.transform.SetParent(parent.transform, false);
+
+            if (!_scaleDownWithWorld)
+                go.transform.localScale = Vector3.one / go.transform.lossyScale.x;
 
             var bd = go.AddComponent<FeatureBehaviour>();
             bd.Init(feature);
