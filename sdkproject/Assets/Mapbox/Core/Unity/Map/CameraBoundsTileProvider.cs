@@ -4,6 +4,8 @@
 	using Mapbox.Map;
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Utils;
+	using System;
+	using System.Collections;
 
 	public class CameraBoundsTileProvider : AbstractTileProvider
 	{
@@ -16,6 +18,9 @@
 		[SerializeField]
 		int _disposeBuffer;
 
+		[SerializeField]
+		float _updateInterval;
+
 		Plane _groundPlane;
 		Ray _ray;
 		float _hitDistance;
@@ -24,31 +29,39 @@
 		UnwrappedTileId _cachedTile;
 		UnwrappedTileId _currentTile;
 
+		WaitForSeconds _wait;
+
 		internal override void OnInitialized()
 		{
 			_groundPlane = new Plane(Vector3.up, Vector3.zero);
+			_wait = new WaitForSeconds(_updateInterval);
+			StartCoroutine(UpdateTileCover());
 		}
 
-		void Update()
+		IEnumerator UpdateTileCover()
 		{
-			_ray = _camera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-			if (_groundPlane.Raycast(_ray, out _hitDistance))
+			while (true)
 			{
-				_currentLatitudeLongitude = _ray.GetPoint(_hitDistance).GetGeoPosition(_mapController.ReferenceTileRect.Center, _mapController.WorldScaleFactor);
-				_currentTile = TileCover.CoordinateToTileId(_currentLatitudeLongitude, _mapController.Zoom);
-
-				if (!_currentTile.Equals(_cachedTile))
+				_ray = _camera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+				if (_groundPlane.Raycast(_ray, out _hitDistance))
 				{
-					for (int x = _currentTile.X - _visibleBuffer; x <= (_currentTile.X + _visibleBuffer); x++)
+					_currentLatitudeLongitude = _ray.GetPoint(_hitDistance).GetGeoPosition(_mapController.ReferenceTileRect.Center, _mapController.WorldScaleFactor);
+					_currentTile = TileCover.CoordinateToTileId(_currentLatitudeLongitude, _mapController.Zoom);
+
+					if (!_currentTile.Equals(_cachedTile))
 					{
-						for (int y = _currentTile.Y - _visibleBuffer; y <= (_currentTile.Y + _visibleBuffer); y++)
+						for (int x = _currentTile.X - _visibleBuffer; x <= (_currentTile.X + _visibleBuffer); x++)
 						{
-							AddTile(new UnwrappedTileId(_mapController.Zoom, x, y));
+							for (int y = _currentTile.Y - _visibleBuffer; y <= (_currentTile.Y + _visibleBuffer); y++)
+							{
+								AddTile(new UnwrappedTileId(_mapController.Zoom, x, y));
+							}
 						}
+						_cachedTile = _currentTile;
+						Cleanup(_currentTile);
 					}
-					_cachedTile = _currentTile;
-					Cleanup(_currentTile);
 				}
+				yield return _wait;
 			}
 		}
 

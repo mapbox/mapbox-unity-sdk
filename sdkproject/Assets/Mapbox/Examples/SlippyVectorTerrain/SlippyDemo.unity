@@ -485,6 +485,7 @@ MonoBehaviour:
   _camera: {fileID: 1281281116}
   _visibleBuffer: 2
   _disposeBuffer: 7
+  _updateInterval: 1
 --- !u!1 &1515605195
 GameObject:
   m_ObjectHideFlags: 0
