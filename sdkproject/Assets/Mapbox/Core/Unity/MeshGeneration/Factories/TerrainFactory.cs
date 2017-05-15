@@ -81,7 +81,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                 Run(tile);
             }
         }
-        
+
         private void Run(UnityTile tile)
         {
             if (_generationType == TerrainGenerationType.Height)
@@ -159,12 +159,19 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                     var xx = Mathd.Lerp(tile.Rect.Min.x, tile.Rect.Max.x, xrat);
                     var yy = Mathd.Lerp(tile.Rect.Min.y, tile.Rect.Max.y, yrat);
 
+                    // Unavailable elevation data will have width less than 256
+                    // (usually 8?), therefore we render at zero height
+                    if (tile.HeightData.width < 256)
+                    {
+                        heightMultiplier = 0;
+                    }
+
                     mesh.Vertices.Add(new Vector3(
                         (float)(xx - tile.Rect.Center.x),
                         heightMultiplier * Conversions.GetRelativeHeightFromColor(tile.HeightData.GetPixel(
-                            (int)(xrat * 255),
-                            (int)((1 - yrat) * 255)),
-                            tile.RelativeScale),
+                        (int)(xrat * 255),
+                        (int)((1 - yrat) * 255)),
+                        tile.RelativeScale),
                         (float)(yy - tile.Rect.Center.y)));
                     mesh.Normals.Add(Unity.Constants.Math.Vector3Up);
                     mesh.UV[0].Add(new Vector2(x * step, 1 - (y * step)));
