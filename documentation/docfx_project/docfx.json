@@ -12,7 +12,7 @@
       { //Unity specific source
         "src": [
           {
-            "src": "../../sdkproject/Assets/Mapbox/Core/Unity/",
+            "src": "../../sdkproject/Assets/Mapbox/Unity/",
             "files": ["**/**.cs"]
           }
         ],

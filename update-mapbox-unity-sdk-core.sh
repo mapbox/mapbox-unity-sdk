@@ -7,9 +7,6 @@ git submodule update --init --recursive
 
 SDK_PATH=sdkproject/Assets/Mapbox/Core
 
-echo "deleting existing mapbox-sdk-cs..."
-if [ -d "$SDK_PATH/mapbox-sdk-cs" ]; then rm -rf $SDK_PATH/mapbox-sdk-cs; fi
-
 echo "deleting existing plugins..."
 if [ -d "$SDK_PATH/Plugins/Mapbox" ]; then rm -rf $SDK_PATH/Plugins/Mapbox; fi
 if [ -d "$SDK_PATH/Plugins/ThirdParty" ]; then rm -rf $SDK_PATH/Plugins/ThirdParty; fi
@@ -29,10 +26,6 @@ echo "Bench" >> x.txt
 echo "DemoConsoleApp" >> x.txt
 echo "VectorTiles.Tests" >> x.txt
 echo "VerifyNetFrameworkVersion" >> x.txt
-
-echo "copying mapbox-sdk-cs..."
-mkdir -p $SDK_PATH/mapbox-sdk-cs
-rsync -av --exclude-from=x.txt ./dependencies/mapbox-sdk-cs/src/ $SDK_PATH/mapbox-sdk-cs/
 
 echo "copying vector-tile-cs..."
 mkdir -p $SDK_PATH/Plugins/Mapbox/vector-tile-cs/

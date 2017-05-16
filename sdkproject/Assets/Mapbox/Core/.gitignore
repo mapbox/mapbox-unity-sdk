@@ -3,6 +3,9 @@
 
 # except:
 
+# mapbox-sdk-cs
+!mapbox-sdk-cs/
+
 # Unity specific
 !Unity/
 

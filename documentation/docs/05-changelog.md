@@ -3,7 +3,10 @@
 #### [Develop](https://github.com/mapbox/mapbox-unity-sdk/tree/develop)
 
 - Added new raster tiles that request retina resolution 
-- Added mipmap, texture format (and compression via DXT), and retina resolution support to `MapImageFactory`
+- Added mipmap, runtime compression (via DXT), and retina resolution support to `MapImageFactory`
+- Flat building rooftops (on top of terrain) are now rendered correctly
+- Complex building data should now be rendered correctly (cut out holes, floating pieces, etc.)
+- The `PoiGeneration` example now includes 3D world-space gameobject placement
 
 #### v0.5.1
 
