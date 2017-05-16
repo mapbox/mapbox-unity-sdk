@@ -70,7 +70,7 @@ namespace Mapbox.Unity.MeshGeneration
         private void SnapZero(UnityTile s, object e)
         {
             var h = Conversions.GetRelativeHeightFromColor(s.HeightData.GetPixel(127, 127), s.RelativeScale);
-            _root.transform.position = new Vector3(0, -h * WorldScaleFactor, 0);
+            Root.transform.position = new Vector3(0, -h * WorldParameters.WorldScaleFactor, 0);
             s.HeightDataChanged -= SnapZero;
         }
 
@@ -103,7 +103,7 @@ namespace Mapbox.Unity.MeshGeneration
                     tile.transform.SetParent(Root.transform, false);
                     MapVisualization.ShowTile(tile);
 
-                    if (_snapYToZero && j == tms.y && i == tms.x)
+                    if (_snapYToZero && j == _refTile.y && i == _refTile.x)
                     {
                         tile.HeightDataChanged += SnapZero;
                     }

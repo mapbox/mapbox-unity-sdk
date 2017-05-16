@@ -4,8 +4,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     using System.Linq;
     using UnityEngine;
     using Mapbox.Unity.MeshGeneration.Data;
-    using VectorTile.InteralClipperLib;
     using TriangleNet.Geometry;
+    using Mapbox.VectorTile.Geometry.InteralClipperLib;
 
     [CreateAssetMenu(menuName = "Mapbox/Modifiers/Clipper Line Mesh Modifier")]
     public class ClipperLineMeshModifier : MeshModifier

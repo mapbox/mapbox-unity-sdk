@@ -44,7 +44,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             {
                 foreach (var point in response.Routes[0].Geometry)
                 {
-                    dat.Add(Conversions.GeoToWorldPosition(point.x, point.y, MapController.ReferenceTileRect.Center, MapController.WorldScaleFactor).ToVector3xz());
+                    dat.Add(Conversions.GeoToWorldPosition(point.x, point.y, Parameters.ReferenceTileRect.Center, Parameters.WorldScaleFactor).ToVector3xz());
                 }
             }
 
