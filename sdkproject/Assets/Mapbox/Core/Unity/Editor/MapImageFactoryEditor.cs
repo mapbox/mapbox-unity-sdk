@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
+using UnityEngine;
 using UnityEditor;
 using Mapbox.Unity.MeshGeneration.Factories;
 
@@ -12,6 +11,9 @@ public class MapImageFactoryEditor : FactoryEditor
         material_Prop,
         basicMaps_Prop,
         customMapId_Prop,
+        useMipMap_Prop,
+    useCompression_Prop,
+        useRetina_Prop,
         mapId_Prop;
     private MonoScript script;
 
@@ -39,8 +41,9 @@ public class MapImageFactoryEditor : FactoryEditor
         mapIdType_Prop = serializedObject.FindProperty("_mapIdType");
         mapId_Prop = serializedObject.FindProperty("_mapId");
         material_Prop = serializedObject.FindProperty("_baseMaterial");
-        basicMaps_Prop = serializedObject.FindProperty("_basicMapIds");
-
+        useMipMap_Prop = serializedObject.FindProperty("_useMipMap");
+        useCompression_Prop = serializedObject.FindProperty("_useCompression");
+        useRetina_Prop = serializedObject.FindProperty("_useRetina");
         script = MonoScript.FromScriptableObject((MapImageFactory)target);
         for (int i = 0; i < _basicMapIds.Length; i++)
         {
@@ -49,7 +52,7 @@ public class MapImageFactoryEditor : FactoryEditor
                 _choiceIndex = i;
                 break;
             }
-        }        
+        }
     }
 
     public override void OnInspectorGUI()
@@ -65,7 +68,7 @@ public class MapImageFactoryEditor : FactoryEditor
         EditorGUILayout.Space();
         var st = (MapImageType)mapIdType_Prop.enumValueIndex;
         EditorGUI.indentLevel++;
-        
+
         switch (st)
         {
             case MapImageType.BasicMapboxStyle:
@@ -88,6 +91,32 @@ public class MapImageFactoryEditor : FactoryEditor
             case MapImageType.None:
                 break;
 
+        }
+        EditorGUI.indentLevel--;
+        EditorGUILayout.Space();
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Raster Tile Texture Settings");
+        EditorGUI.indentLevel++;
+
+        EditorGUILayout.PropertyField(useCompression_Prop, new GUIContent("Use Compression"));
+        if (useCompression_Prop.boolValue)
+        {
+            EditorGUILayout.HelpBox("Texture will be compressed. This will reduce image quality and lead to longer initialization times but save memory.", MessageType.Info);
+        }
+        else
+        {
+            EditorGUILayout.HelpBox("Use compression to save memory.", MessageType.Warning);
+        }
+
+        EditorGUILayout.PropertyField(useMipMap_Prop, new GUIContent("Create Mip Maps"));
+        if (useMipMap_Prop.boolValue)
+        {
+            EditorGUILayout.HelpBox("Mip maps will consume additional memory but reduce noise at increasing distances.", MessageType.Warning);
+        }
+        EditorGUILayout.PropertyField(useRetina_Prop, new GUIContent("Request Retina-resolution"));
+        if (useRetina_Prop.boolValue)
+        {
+            EditorGUILayout.HelpBox("Retina will consume additional memory but can greatly improve visual quality.", MessageType.Warning);
         }
         EditorGUI.indentLevel--;
 

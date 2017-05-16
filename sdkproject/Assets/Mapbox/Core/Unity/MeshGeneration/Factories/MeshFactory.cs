@@ -31,9 +31,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         /// Sets up the Mesh Factory
         /// </summary>
         /// <param name="fs"></param>
-        public override void Initialize(IFileSource fs)
+        public override void Initialize(IFileSource fs, WorldParameters parameters)
         {
-            base.Initialize(fs);
+            base.Initialize(fs, parameters);
             _tiles = new Dictionary<Vector2, UnityTile>();
             _layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
             foreach (LayerVisualizerBase factory in Visualizers)
@@ -107,9 +107,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             var vectorTile = new Mapbox.Map.VectorTile();
             vectorTile.Initialize(parameters, () =>
             {
-                if (vectorTile.Error != null)
+                if (vectorTile.HasError)
                 {
-                    Debug.Log(vectorTile.Error);
+                    Debug.Log(vectorTile.ExceptionsAsString);
                     return;
                 }
 

@@ -305,6 +305,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d8534d45be3bd44f84c41bc08827496, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MapController: {fileID: 199863780}
+  MapVisualization: {fileID: 11400000, guid: 4f4961d6f3e45f84f99bda9cdc9dbb2b, type: 2}
   Directions: {fileID: 11400000, guid: d370b4703777f8c48b26eead134f2edb, type: 2}
   Waypoints:
   - {fileID: 1553875871}

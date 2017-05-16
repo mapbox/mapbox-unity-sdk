@@ -15,7 +15,10 @@ public class TerrainFactoryEditor : FactoryEditor
          heightMod_Prop,
         customMapId_Prop,
         material_Prop,
-        mapId_Prop;
+        mapId_Prop,
+        collider_Prop,
+        addLayer_Prop,
+        layerId_Prop;
     private MonoScript script;
 
     void OnEnable()
@@ -26,9 +29,11 @@ public class TerrainFactoryEditor : FactoryEditor
         sampleCount_Prop = serializedObject.FindProperty("_sampleCount");
         heightMod_Prop = serializedObject.FindProperty("_heightModifier");
         mapId_Prop = serializedObject.FindProperty("_mapId");
-        material_Prop = serializedObject.FindProperty("_baseMaterial");
-
         customMapId_Prop = serializedObject.FindProperty("_customMapId");
+        material_Prop = serializedObject.FindProperty("_baseMaterial");
+        collider_Prop = serializedObject.FindProperty("_addCollider");
+        addLayer_Prop = serializedObject.FindProperty("_addToLayer");
+        layerId_Prop = serializedObject.FindProperty("_layerId");
 
         script = MonoScript.FromScriptableObject((TerrainFactory)target);
     }
@@ -97,6 +102,15 @@ public class TerrainFactoryEditor : FactoryEditor
         EditorGUILayout.LabelField("x  " + sampleCount_Prop.intValue);
         EditorGUILayout.EndHorizontal();
         EditorGUILayout.PropertyField(material_Prop, new GUIContent("Material"));
+
+        EditorGUILayout.Space();
+        collider_Prop.boolValue = EditorGUILayout.Toggle("Add Collider", collider_Prop.boolValue);
+        EditorGUILayout.Space();
+        addLayer_Prop.boolValue = EditorGUILayout.Toggle("Add To Layer", addLayer_Prop.boolValue);
+        if (addLayer_Prop.boolValue)
+        {
+            layerId_Prop.intValue = EditorGUILayout.LayerField("Layer", layerId_Prop.intValue);
+        }
 
         if (GUILayout.Button("Update"))
         {

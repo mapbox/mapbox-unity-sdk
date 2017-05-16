@@ -43,13 +43,19 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         private float _heightModifier = 1f;
         [SerializeField]
         private int _sampleCount = 40;
+        [SerializeField]
+        private bool _addCollider = false;
+        [SerializeField]
+        private bool _addToLayer = false;
+        [SerializeField]
+        private int _layerId = 0;
 
         private Dictionary<Vector2, UnityTile> _tiles;
         private Vector2 _stitchTarget;
 
-        public override void Initialize(IFileSource fs)
+        public override void Initialize(IFileSource fs, WorldParameters parameters)
         {
-            base.Initialize(fs);
+            base.Initialize(fs, parameters);
             _tiles = new Dictionary<Vector2, UnityTile>();
         }
 
@@ -75,7 +81,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                 Run(tile);
             }
         }
-        
+
         private void Run(UnityTile tile)
         {
             if (_generationType == TerrainGenerationType.Height)
@@ -112,7 +118,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                 var pngRasterTile = new RawPngRasterTile();
                 pngRasterTile.Initialize(parameters, () =>
                 {
-                    if (pngRasterTile.Error != null)
+                    if (pngRasterTile.HasError)
                     {
                         tile.HeightDataState = TilePropertyState.Error;
                         return;
@@ -153,12 +159,19 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                     var xx = Mathd.Lerp(tile.Rect.Min.x, tile.Rect.Max.x, xrat);
                     var yy = Mathd.Lerp(tile.Rect.Min.y, tile.Rect.Max.y, yrat);
 
+                    // Unavailable elevation data will have width less than 256
+                    // (usually 8?), therefore we render at zero height
+                    if (tile.HeightData.width < 256)
+                    {
+                        heightMultiplier = 0;
+                    }
+
                     mesh.Vertices.Add(new Vector3(
                         (float)(xx - tile.Rect.Center.x),
                         heightMultiplier * Conversions.GetRelativeHeightFromColor(tile.HeightData.GetPixel(
-                            (int)(xrat * 255),
-                            (int)((1 - yrat) * 255)),
-                            tile.RelativeScale),
+                        (int)(xrat * 255),
+                        (int)((1 - yrat) * 255)),
+                        tile.RelativeScale),
                         (float)(yy - tile.Rect.Center.y)));
                     mesh.Normals.Add(Unity.Constants.Math.Vector3Up);
                     mesh.UV[0].Add(new Vector2(x * step, 1 - (y * step)));
@@ -214,9 +227,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
             if (tile.MeshRenderer.material == null)
                 tile.MeshRenderer.material = _baseMaterial;
-            //BRNKHY Optional stuff
-            //go.AddComponent<MeshCollider>();
-            //go.layer = LayerMask.NameToLayer("terrain");
+
+            if (_addCollider)
+            {
+                go.AddComponent<MeshCollider>();
+            }
+            if (_addToLayer)
+            {
+                go.layer = _layerId;
+            }
         }
 
         /// <summary>
@@ -250,9 +269,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             if (tile.MeshRenderer.material == null)
                 tile.MeshRenderer.material = _baseMaterial;
 
-            //BRNKHY Optional stuff
-            //go.AddComponent<MeshCollider>();
-            //go.layer = LayerMask.NameToLayer("terrain");
+            if (_addCollider)
+            {
+                var bc = tile.gameObject.AddComponent<BoxCollider>();
+            }
+            if (_addToLayer)
+            {
+                tile.gameObject.layer = _layerId;
+            }
         }
 
         /// <summary>

@@ -18,15 +18,20 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         private Directions _directions;
         public List<MeshModifier> MeshModifiers;
 
-        public override void Initialize(IFileSource fileSource)
+        public override void Initialize(IFileSource fileSource, WorldParameters parameters)
         {
-            base.Initialize(fileSource);
+            base.Initialize(fileSource, parameters);
             _directions = MapboxAccess.Instance.Directions;
         }
 
-        public void Query(List<Vector2d> waypoints)
+        public void Query(List<Transform> waypoints)
         {
-            var _directionResource = new DirectionResource(waypoints.ToArray(), RoutingProfile.Driving);
+            var wp = new Vector2d[waypoints.Count];
+            for (int i = 0; i < waypoints.Count; i++)
+            {
+                wp[i] = waypoints[i].GetGeoPosition(Parameters.ReferenceTileRect.Center, Parameters.WorldScaleFactor);
+            }
+            var _directionResource = new DirectionResource(wp, RoutingProfile.Driving);
             _directionResource.Steps = true;
             _directions.Query(_directionResource, HandleDirectionsResponse);
         }
