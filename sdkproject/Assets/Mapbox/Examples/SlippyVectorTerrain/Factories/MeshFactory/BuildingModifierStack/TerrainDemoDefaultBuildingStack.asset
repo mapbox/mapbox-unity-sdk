@@ -13,7 +13,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _baseModifiers: []
   MeshModifiers:
-  - {fileID: 11400000, guid: 5d2129c4f45752d449951b9f6e8f5c3f, type: 2}
+  - {fileID: 11400000, guid: f07994411a271a2488d65887412818b9, type: 2}
   - {fileID: 11400000, guid: 22fdc44ee48832a4cb46adeb9123e5f7, type: 2}
   - {fileID: 11400000, guid: 99edcda8cdbf6da488c3da361c881bf8, type: 2}
   - {fileID: 11400000, guid: 941309cd0c1ac6949951075da621d483, type: 2}
