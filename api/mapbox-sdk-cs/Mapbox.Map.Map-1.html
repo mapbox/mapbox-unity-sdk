@@ -1,0 +1,489 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class Map&lt;T&gt;
+   | Mapbox SDK for Unity </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class Map&lt;T&gt;
+   | Mapbox SDK for Unity ">
+    <meta name="generator" content="docfx 2.14.1.0">
+    
+    <link rel="shortcut icon" href="../../docs/images/favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:newtab" content="true">
+  </head>
+  <body data-spy="scroll" data-target="#affix">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../docs/images/mapbox-logo.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content">
+              
+              
+              <h1 id="Mapbox_Map_Map_1" data-uid="Mapbox.Map.Map`1">Class Map&lt;T&gt;
+              </h1>
+              <div class="markdown level0 summary"><p>The Mapbox Map abstraction will take care of fetching and decoding
+data for a geographic bounding box at a certain zoom level.</p>
+</div>
+              <div class="markdown level0 conceptual"></div>
+              <div class="inheritance">
+                <h5>Inheritance</h5>
+                  <div class="level0"><span class="xref">System.Object</span></div>
+                  <div class="level1"><span class="xref">Map&lt;T&gt;</span></div>
+              </div>
+              <div class="inheritedMembers">
+                <h5>Inherited Members</h5>
+                <div>
+                  <span class="xref">System.Object.ToString()</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.Equals(System.Object)</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.GetHashCode()</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.GetType()</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.MemberwiseClone()</span>
+                </div>
+              </div>
+              <h6><strong>Namespace</strong>:Mapbox.Map</h6>
+              <h6><strong>Assembly</strong>:cs.temp.dll.dll</h6>
+              <h5 id="Mapbox_Map_Map_1_syntax">Syntax</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public sealed class Map&lt;T&gt; : IObservable&lt;T&gt; where T : Tile, new ()</code></pre>
+              </div>
+              <h5 class="typeParameters">Type Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="parametername">T</span></td>
+                    <td><p>The tile type, currently <span class="xref">Mapbox.Map.Vector</span> or
+<span class="xref">Mapbox.Map.Raster</span>.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 id="Mapbox_Map_Map_1_examples"><strong>Examples</strong></h5>
+              <p>Request a map of the whole world:</p>
+<pre><code>var map = new Map&lt;RasterTile&gt;(MapboxAccess.Instance);
+map.Zoom = 2
+map.Vector2dBounds = Vector2dBounds.World();
+map.MapId = "mapbox://styles/mapbox/streets-v10
+
+// Register for tile updates.
+map.Subscribe(this);
+
+// Trigger the request.
+map.Update();</code></pre>
+
+              <h3 id="constructors">Constructors
+              </h3>
+              
+              
+              <a id="Mapbox_Map_Map_1__ctor_" data-uid="Mapbox.Map.Map`1.#ctor*"></a>
+              <h4 id="Mapbox_Map_Map_1__ctor_Mapbox_Platform_IFileSource_" data-uid="Mapbox.Map.Map`1.#ctor(Mapbox.Platform.IFileSource)">Map(IFileSource)</h4>
+              <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Mapbox.Map.Map-1.html">Map&lt;T&gt;</a> class.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public Map(IFileSource fs)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Platform.IFileSource.html">IFileSource</a></td>
+                    <td><span class="parametername">fs</span></td>
+                    <td><p>The data source abstraction. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h3 id="fields">Fields
+              </h3>
+              
+              
+              <h4 id="Mapbox_Map_Map_1_TileMax" data-uid="Mapbox.Map.Map`1.TileMax">TileMax</h4>
+              <div class="markdown level1 summary"><p>Arbitrary limit of tiles this class will handle simultaneously.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public const int TileMax = 256</code></pre>
+              </div>
+              <h5 class="fieldValue">Field Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h3 id="properties">Properties
+              </h3>
+              
+              
+              <a id="Mapbox_Map_Map_1_Center_" data-uid="Mapbox.Map.Map`1.Center*"></a>
+              <h4 id="Mapbox_Map_Map_1_Center" data-uid="Mapbox.Map.Map`1.Center">Center</h4>
+              <div class="markdown level1 summary"><p>Gets or sets the central coordinate of the map.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public Vector2d Center { get; set; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Utils.Vector2d.html">Vector2d</a></td>
+                    <td><p>The central coordinate.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Map_Map_1_MapId_" data-uid="Mapbox.Map.Map`1.MapId*"></a>
+              <h4 id="Mapbox_Map_Map_1_MapId" data-uid="Mapbox.Map.Map`1.MapId">MapId</h4>
+              <div class="markdown level1 summary"><p>Gets or sets the tileset map ID. If not set, it will use the default
+map ID for the tile type. I.e. &quot;mapbox.satellite&quot; for raster tiles
+and &quot;mapbox.mapbox-streets-v7&quot; for vector tiles.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public string MapId { get; set; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><p>The tileset map ID, usually in the format &quot;user.mapid&quot;. Exceptionally,
+<a class="xref" href="Mapbox.Map.RasterTile.html">RasterTile</a> will take the full style URL
+from where the tile is composited from, like &quot;mapbox://styles/mapbox/streets-v9&quot;.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Map_Map_1_Tiles_" data-uid="Mapbox.Map.Map`1.Tiles*"></a>
+              <h4 id="Mapbox_Map_Map_1_Tiles" data-uid="Mapbox.Map.Map`1.Tiles">Tiles</h4>
+              <div class="markdown level1 summary"><p>Gets the tiles, vector or raster. Tiles might be
+in a incomplete state.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public HashSet&lt;T&gt; Tiles { get; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">HashSet</span>&lt;T&gt;</td>
+                    <td><p>The tiles. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Map_Map_1_Vector2dBounds_" data-uid="Mapbox.Map.Map`1.Vector2dBounds*"></a>
+              <h4 id="Mapbox_Map_Map_1_Vector2dBounds" data-uid="Mapbox.Map.Map`1.Vector2dBounds">Vector2dBounds</h4>
+              <div class="markdown level1 summary"><p>Gets or sets a geographic bounding box.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public Vector2dBounds Vector2dBounds { get; set; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Utils.Vector2dBounds.html">Vector2dBounds</a></td>
+                    <td><p>New geographic bounding box.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Map_Map_1_Zoom_" data-uid="Mapbox.Map.Map`1.Zoom*"></a>
+              <h4 id="Mapbox_Map_Map_1_Zoom" data-uid="Mapbox.Map.Map`1.Zoom">Zoom</h4>
+              <div class="markdown level1 summary"><p>Gets or sets the map zoom level.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public int Zoom { get; set; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><p>The new zoom level.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h3 id="methods">Methods
+              </h3>
+              
+              
+              <a id="Mapbox_Map_Map_1_SetVector2dBoundsZoom_" data-uid="Mapbox.Map.Map`1.SetVector2dBoundsZoom*"></a>
+              <h4 id="Mapbox_Map_Map_1_SetVector2dBoundsZoom_Mapbox_Utils_Vector2dBounds_System_Int32_" data-uid="Mapbox.Map.Map`1.SetVector2dBoundsZoom(Mapbox.Utils.Vector2dBounds,System.Int32)">SetVector2dBoundsZoom(Vector2dBounds, Int32)</h4>
+              <div class="markdown level1 summary"><p>Sets the coordinates bounds and zoom at once.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public void SetVector2dBoundsZoom(Vector2dBounds bounds, int zoom)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Utils.Vector2dBounds.html">Vector2dBounds</a></td>
+                    <td><span class="parametername">bounds</span></td>
+                    <td><p>Coordinates bounds. </p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">zoom</span></td>
+                    <td><p>Zoom level. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Map_Map_1_Subscribe_" data-uid="Mapbox.Map.Map`1.Subscribe*"></a>
+              <h4 id="Mapbox_Map_Map_1_Subscribe_Mapbox_Utils_IObserver__0__" data-uid="Mapbox.Map.Map`1.Subscribe(Mapbox.Utils.IObserver{`0})">Subscribe(IObserver&lt;T&gt;)</h4>
+              <div class="markdown level1 summary"><p>Add an <span class="xref">IObserver</span> to the observer list. </p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public void Subscribe(IObserver&lt;T&gt; observer)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Utils.IObserver-1.html">IObserver</a>&lt;T&gt;</td>
+                    <td><span class="parametername">observer</span></td>
+                    <td><p>The object subscribing to events. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Utils.IObservable-1.html#Mapbox_Utils_IObservable_1_Subscribe_Mapbox_Utils_IObserver__0__">IObservable&lt;T&gt;.Subscribe(IObserver&lt;T&gt;)</a></div>
+              
+              
+              <a id="Mapbox_Map_Map_1_Unsubscribe_" data-uid="Mapbox.Map.Map`1.Unsubscribe*"></a>
+              <h4 id="Mapbox_Map_Map_1_Unsubscribe_Mapbox_Utils_IObserver__0__" data-uid="Mapbox.Map.Map`1.Unsubscribe(Mapbox.Utils.IObserver{`0})">Unsubscribe(IObserver&lt;T&gt;)</h4>
+              <div class="markdown level1 summary"><p>Remove an <span class="xref">IObserver</span> to the observer list. </p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public void Unsubscribe(IObserver&lt;T&gt; observer)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Utils.IObserver-1.html">IObserver</a>&lt;T&gt;</td>
+                    <td><span class="parametername">observer</span></td>
+                    <td><p>The object unsubscribing to events. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Utils.IObservable-1.html#Mapbox_Utils_IObservable_1_Unsubscribe_Mapbox_Utils_IObserver__0__">IObservable&lt;T&gt;.Unsubscribe(IObserver&lt;T&gt;)</a></div>
+              
+              
+              <a id="Mapbox_Map_Map_1_Update_" data-uid="Mapbox.Map.Map`1.Update*"></a>
+              <h4 id="Mapbox_Map_Map_1_Update" data-uid="Mapbox.Map.Map`1.Update">Update()</h4>
+              <div class="markdown level1 summary"><p>Request tiles after changing map properties.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public void Update()</code></pre>
+              </div>
+                        </article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            &#0169; 2017 Mapbox
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,855 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class Conversions
+   | Mapbox SDK for Unity </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class Conversions
+   | Mapbox SDK for Unity ">
+    <meta name="generator" content="docfx 2.14.1.0">
+    
+    <link rel="shortcut icon" href="../../docs/images/favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:newtab" content="true">
+  </head>
+  <body data-spy="scroll" data-target="#affix">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../docs/images/mapbox-logo.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content">
+              
+              
+              <h1 id="Mapbox_Unity_Utilities_Conversions" data-uid="Mapbox.Unity.Utilities.Conversions">Class Conversions
+              </h1>
+              <div class="markdown level0 summary"><p>A set of Geo and Terrain Conversion utils.</p>
+</div>
+              <div class="markdown level0 conceptual"></div>
+              <div class="inheritance">
+                <h5>Inheritance</h5>
+                  <div class="level0"><span class="xref">System.Object</span></div>
+                  <div class="level1"><span class="xref">Conversions</span></div>
+              </div>
+              <div class="inheritedMembers">
+                <h5>Inherited Members</h5>
+                <div>
+                  <span class="xref">System.Object.ToString()</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.Equals(System.Object)</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.GetHashCode()</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.GetType()</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.MemberwiseClone()</span>
+                </div>
+              </div>
+              <h6><strong>Namespace</strong>:Mapbox.Unity.Utilities</h6>
+              <h6><strong>Assembly</strong>:cs.temp.dll.dll</h6>
+              <h5 id="Mapbox_Unity_Utilities_Conversions_syntax">Syntax</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public static class Conversions</code></pre>
+              </div>
+              <h3 id="methods">Methods
+              </h3>
+              
+              
+              <a id="Mapbox_Unity_Utilities_Conversions_GeoToWorldPosition_" data-uid="Mapbox.Unity.Utilities.Conversions.GeoToWorldPosition*"></a>
+              <h4 id="Mapbox_Unity_Utilities_Conversions_GeoToWorldPosition_System_Double_System_Double_Vector2d_System_Single_" data-uid="Mapbox.Unity.Utilities.Conversions.GeoToWorldPosition(System.Double,System.Double,Vector2d,System.Single)">GeoToWorldPosition(Double, Double, Vector2d, Single)</h4>
+              <div class="markdown level1 summary"><p>Converts WGS84 lat/lon to x/y meters in reference to a center point</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public static Vector2d GeoToWorldPosition(double lat, double lon, Vector2d refPoint, float scale = 1F)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Double</span></td>
+                    <td><span class="parametername">lat</span></td>
+                    <td><p>The latitude. </p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Double</span></td>
+                    <td><span class="parametername">lon</span></td>
+                    <td><p>The longitude. </p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">Vector2d</span></td>
+                    <td><span class="parametername">refPoint</span></td>
+                    <td><p>A <span class="xref">UnityEngine.Vector2d</span> center point to offset resultant xy</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">scale</span></td>
+                    <td><p>Scale in meters. (default scale = 1) </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">Vector2d</span></td>
+                    <td><p>A <span class="xref">UnityEngine.Vector2d</span> xy tile ID. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 id="Mapbox_Unity_Utilities_Conversions_GeoToWorldPosition_System_Double_System_Double_Vector2d_System_Single__examples">Examples</h5>
+              <p>Converts a Lat/Lon of (37.7749, 122.4194) into Unity coordinates for a map centered at (10,10) and a scale of 2.5 meters for every 1 Unity unit </p>
+<pre><code>var worldPosition = Conversions.GeoToWorldPosition(37.7749, 122.4194, new Vector2d(10, 10), (float)2.5);
+// worldPosition = ( 11369163.38585, 34069138.17805 )</code></pre>
+
+              
+              
+              <a id="Mapbox_Unity_Utilities_Conversions_GeoToWorldPosition_" data-uid="Mapbox.Unity.Utilities.Conversions.GeoToWorldPosition*"></a>
+              <h4 id="Mapbox_Unity_Utilities_Conversions_GeoToWorldPosition_Vector2d_Vector2d_System_Single_" data-uid="Mapbox.Unity.Utilities.Conversions.GeoToWorldPosition(Vector2d,Vector2d,System.Single)">GeoToWorldPosition(Vector2d, Vector2d, Single)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public static Vector2d GeoToWorldPosition(Vector2d latLong, Vector2d refPoint, float scale = 1F)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">Vector2d</span></td>
+                    <td><span class="parametername">latLong</span></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">Vector2d</span></td>
+                    <td><span class="parametername">refPoint</span></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">scale</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">Vector2d</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Utilities_Conversions_GetAbsoluteHeightFromColor_" data-uid="Mapbox.Unity.Utilities.Conversions.GetAbsoluteHeightFromColor*"></a>
+              <h4 id="Mapbox_Unity_Utilities_Conversions_GetAbsoluteHeightFromColor_Color_" data-uid="Mapbox.Unity.Utilities.Conversions.GetAbsoluteHeightFromColor(Color)">GetAbsoluteHeightFromColor(Color)</h4>
+              <div class="markdown level1 summary"><p>Specific formula for mapbox.terrain-rgb to decode height values from pixel values.
+See: <a href="https://www.mapbox.com/blog/terrain-rgb/">https://www.mapbox.com/blog/terrain-rgb/</a>.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public static float GetAbsoluteHeightFromColor(Color color)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">Color</span></td>
+                    <td><span class="parametername">color</span></td>
+                    <td><p>The <span class="xref">UnityEngine.Color</span>. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><p>Height in meters. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Utilities_Conversions_GetRelativeHeightFromColor_" data-uid="Mapbox.Unity.Utilities.Conversions.GetRelativeHeightFromColor*"></a>
+              <h4 id="Mapbox_Unity_Utilities_Conversions_GetRelativeHeightFromColor_Color_System_Single_" data-uid="Mapbox.Unity.Utilities.Conversions.GetRelativeHeightFromColor(Color,System.Single)">GetRelativeHeightFromColor(Color, Single)</h4>
+              <div class="markdown level1 summary"><p>Gets height from terrain-rgb adjusted for a given scale.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public static float GetRelativeHeightFromColor(Color color, float relativeScale)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">Color</span></td>
+                    <td><span class="parametername">color</span></td>
+                    <td><p>The <span class="xref">UnityEngine.Color</span>. </p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">relativeScale</span></td>
+                    <td><p>Relative scale. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><p>Adjusted height in meters. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Utilities_Conversions_GetTileScaleInMeters_" data-uid="Mapbox.Unity.Utilities.Conversions.GetTileScaleInMeters*"></a>
+              <h4 id="Mapbox_Unity_Utilities_Conversions_GetTileScaleInMeters_System_Single_System_Int32_" data-uid="Mapbox.Unity.Utilities.Conversions.GetTileScaleInMeters(System.Single,System.Int32)">GetTileScaleInMeters(Single, Int32)</h4>
+              <div class="markdown level1 summary"><p>Gets the meters per pixels at given latitude and zoom level for a 256x256 tile.
+See: <a href="http://wiki.openstreetmap.org/wiki/Zoom_levels">http://wiki.openstreetmap.org/wiki/Zoom_levels</a>.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public static float GetTileScaleInMeters(float latitude, int zoom)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">latitude</span></td>
+                    <td><p>The latitude. </p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">zoom</span></td>
+                    <td><p>Zoom level. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><p>Meters per pixel. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Utilities_Conversions_LatitudeLongitudeToTileId_" data-uid="Mapbox.Unity.Utilities.Conversions.LatitudeLongitudeToTileId*"></a>
+              <h4 id="Mapbox_Unity_Utilities_Conversions_LatitudeLongitudeToTileId_System_Single_System_Single_System_Int32_" data-uid="Mapbox.Unity.Utilities.Conversions.LatitudeLongitudeToTileId(System.Single,System.Single,System.Int32)">LatitudeLongitudeToTileId(Single, Single, Int32)</h4>
+              <div class="markdown level1 summary"><p>Gets the xy tile ID at the requested zoom that contains the WGS84 lat/lon point.
+See: <a href="http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames">http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames</a>.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public static Vector2d LatitudeLongitudeToTileId(float latitude, float longitude, int zoom)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">latitude</span></td>
+                    <td><p>The latitude. </p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">longitude</span></td>
+                    <td><p>The longitude. </p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">zoom</span></td>
+                    <td><p>Zoom level. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">Vector2d</span></td>
+                    <td><p>A <span class="xref">UnityEngine.Vector2d</span> xy tile ID. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Utilities_Conversions_MetersToLatLon_" data-uid="Mapbox.Unity.Utilities.Conversions.MetersToLatLon*"></a>
+              <h4 id="Mapbox_Unity_Utilities_Conversions_MetersToLatLon_Vector2d_" data-uid="Mapbox.Unity.Utilities.Conversions.MetersToLatLon(Vector2d)">MetersToLatLon(Vector2d)</h4>
+              <div class="markdown level1 summary"><p>Converts Spherical Mercator EPSG:900913 in xy meters to WGS84 lat/lon.
+Inverse of LatLonToMeters.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public static Vector2d MetersToLatLon(Vector2d m)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">Vector2d</span></td>
+                    <td><span class="parametername">m</span></td>
+                    <td><p>A <span class="xref">UnityEngine.Vector2d</span> of coordinates in meters.  </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">Vector2d</span></td>
+                    <td><p>The <a class="xref" href="../mapbox-sdk-cs/Mapbox.Utils.Vector2d.html">Vector2d</a> in lat/lon. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 id="Mapbox_Unity_Utilities_Conversions_MetersToLatLon_Vector2d__examples">Examples</h5>
+              <p>Converts EPSG:900913 xy meter coordinates to lat lon </p>
+<pre><code>var worldPosition =  new Vector2d (4547675.35434,13627665.27122);
+var latlon = Conversions.MetersToLatLon(worldPosition);
+// latlon = ( 37.77490, 122.41940 )</code></pre>
+
+              
+              
+              <a id="Mapbox_Unity_Utilities_Conversions_MetersToTile_" data-uid="Mapbox.Unity.Utilities.Conversions.MetersToTile*"></a>
+              <h4 id="Mapbox_Unity_Utilities_Conversions_MetersToTile_Vector2d_System_Int32_" data-uid="Mapbox.Unity.Utilities.Conversions.MetersToTile(Vector2d,System.Int32)">MetersToTile(Vector2d, Int32)</h4>
+              <div class="markdown level1 summary"><p>Gets the xy tile ID from Spherical Mercator EPSG:900913 xy coords.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public static Vector2 MetersToTile(Vector2d m, int zoom)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">Vector2d</span></td>
+                    <td><span class="parametername">m</span></td>
+                    <td><p><span class="xref">UnityEngine.Vector2d</span> XY coords in meters. </p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">zoom</span></td>
+                    <td><p>Zoom level. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">Vector2</span></td>
+                    <td><p>A <span class="xref">UnityEngine.Vector2d</span> xy tile ID. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 id="Mapbox_Unity_Utilities_Conversions_MetersToTile_Vector2d_System_Int32__examples">Examples</h5>
+              <p>Converts EPSG:900913 xy meter coordinates to web mercator tile XY coordinates at zoom 12.</p>
+<pre><code>var meterXYPosition = new Vector2d (4547675.35434,13627665.27122);
+var tileXY = Conversions.MetersToTile (meterXYPosition, 12);
+// tileXY = ( 655, 2512 )</code></pre>
+
+              
+              
+              <a id="Mapbox_Unity_Utilities_Conversions_TileBounds_" data-uid="Mapbox.Unity.Utilities.Conversions.TileBounds*"></a>
+              <h4 id="Mapbox_Unity_Utilities_Conversions_TileBounds_Vector2_System_Int32_" data-uid="Mapbox.Unity.Utilities.Conversions.TileBounds(Vector2,System.Int32)">TileBounds(Vector2, Int32)</h4>
+              <div class="markdown level1 summary"><p>Gets the tile bounds in Spherical Mercator EPSG:900913 meters from an xy tile ID.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public static RectD TileBounds(Vector2 tileCoordinate, int zoom)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">Vector2</span></td>
+                    <td><span class="parametername">tileCoordinate</span></td>
+                    <td><p>XY tile ID. </p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">zoom</span></td>
+                    <td><p>Zoom level. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">RectD</span></td>
+                    <td><p>A <span class="xref">UnityEngine.Rect</span> in meters. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Utilities_Conversions_TileIdToBounds_" data-uid="Mapbox.Unity.Utilities.Conversions.TileIdToBounds*"></a>
+              <h4 id="Mapbox_Unity_Utilities_Conversions_TileIdToBounds_System_Int32_System_Int32_System_Int32_" data-uid="Mapbox.Unity.Utilities.Conversions.TileIdToBounds(System.Int32,System.Int32,System.Int32)">TileIdToBounds(Int32, Int32, Int32)</h4>
+              <div class="markdown level1 summary"><p>Gets the <a class="xref" href="../mapbox-sdk-cs/Mapbox.Utils.Vector2dBounds.html">Vector2dBounds</a> of a tile.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public static Vector2dBounds TileIdToBounds(int x, int y, int zoom)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">x</span></td>
+                    <td><p>Tile X position. </p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">y</span></td>
+                    <td><p>Tile Y position. </p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">zoom</span></td>
+                    <td><p>Zoom level. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">Vector2dBounds</span></td>
+                    <td><p>The <a class="xref" href="../mapbox-sdk-cs/Mapbox.Utils.Vector2dBounds.html">Vector2dBounds</a> of the tile. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Utilities_Conversions_TileIdToCenterLatitudeLongitude_" data-uid="Mapbox.Unity.Utilities.Conversions.TileIdToCenterLatitudeLongitude*"></a>
+              <h4 id="Mapbox_Unity_Utilities_Conversions_TileIdToCenterLatitudeLongitude_System_Int32_System_Int32_System_Int32_" data-uid="Mapbox.Unity.Utilities.Conversions.TileIdToCenterLatitudeLongitude(System.Int32,System.Int32,System.Int32)">TileIdToCenterLatitudeLongitude(Int32, Int32, Int32)</h4>
+              <div class="markdown level1 summary"><p>Gets the WGS84 lat/lon of the center of a tile.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public static Vector2d TileIdToCenterLatitudeLongitude(int x, int y, int zoom)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">x</span></td>
+                    <td><p>Tile X position. </p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">y</span></td>
+                    <td><p>Tile Y position. </p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">zoom</span></td>
+                    <td><p>Zoom level. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">Vector2d</span></td>
+                    <td><p>A <span class="xref">UnityEngine.Vector2d</span> of lat/lon coordinates.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Utilities_Conversions_TileXToNWLongitude_" data-uid="Mapbox.Unity.Utilities.Conversions.TileXToNWLongitude*"></a>
+              <h4 id="Mapbox_Unity_Utilities_Conversions_TileXToNWLongitude_System_Int32_System_Int32_" data-uid="Mapbox.Unity.Utilities.Conversions.TileXToNWLongitude(System.Int32,System.Int32)">TileXToNWLongitude(Int32, Int32)</h4>
+              <div class="markdown level1 summary"><p>Gets the WGS84 longitude of the northwest corner from a tile&#39;s X position and zoom level.
+See: <a href="http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames">http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames</a>.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public static double TileXToNWLongitude(int x, int zoom)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">x</span></td>
+                    <td><p>Tile X position. </p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">zoom</span></td>
+                    <td><p>Zoom level. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Double</span></td>
+                    <td><p>NW Longitude. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Utilities_Conversions_TileYToNWLatitude_" data-uid="Mapbox.Unity.Utilities.Conversions.TileYToNWLatitude*"></a>
+              <h4 id="Mapbox_Unity_Utilities_Conversions_TileYToNWLatitude_System_Int32_System_Int32_" data-uid="Mapbox.Unity.Utilities.Conversions.TileYToNWLatitude(System.Int32,System.Int32)">TileYToNWLatitude(Int32, Int32)</h4>
+              <div class="markdown level1 summary"><p>Gets the WGS84 latitude of the northwest corner from a tile&#39;s Y position and zoom level.
+See: <a href="http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames">http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames</a>.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public static double TileYToNWLatitude(int y, int zoom)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">y</span></td>
+                    <td><p>Tile Y position. </p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">zoom</span></td>
+                    <td><p>Zoom level. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Double</span></td>
+                    <td><p>NW Latitude. </p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+                        </article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            &#0169; 2017 Mapbox
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>
