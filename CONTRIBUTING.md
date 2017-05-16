@@ -3,10 +3,9 @@
 If you want to contribute:
 
 1. Ensure that existing [pull requests](https://github.com/mapbox/mapbox-unity-sdk/pulls) and [issues](https://github.com/mapbox/mapbox-unity-sdk/issues) don’t already cover your contribution or question.
-
-2. Pull requests are gladly accepted. We require code reviews before merging PRs. When your tests pass, tag a project contributor (for example, @isiyu, @BergWerkGIS, @brnky, or @david-rhodes) and request a review.
-
-3. Please adhere to our [coding style](CODING-STYLE.md).
+2. Please see [known issues](https://www.mapbox.com/mapbox-unity-sdk/docs/02-known-issues.html) for contrubition ideas.
+3. Pull requests are gladly accepted. We require code reviews before merging PRs. When your tests pass, tag a project contributor (for example, @isiyu, @BergWerkGIS, @brnky, or @david-rhodes) and request a review.
+4. Please adhere to our [coding style](CODING-STYLE.md).
 
 # Requirements and installation
 
@@ -29,9 +28,11 @@ If you want to contribute:
 This project includes git submodule dependencies. These dependencies are actively developed and maintained:
 
 - https://github.com/mapbox/vector-tile-cs
-- https://github.com/mapbox/mapbox-sdk-cs
 
-Therefore, changes under `mapbox-sdk-unity/sdkproject/Assets/Mapbox/Core/Plugins` and `mapbox-sdk-unity/sdkproject/Assets/Mapbox/Core/mapbox-sdk-cs` should never be committed directly to this repo. Instead they should be made in their corresponding submodule repos and updated in the Unity project via a file transfer executable.
+**NOTE: As of May 16, 2017, the https://github.com/mapbox/mapbox-sdk-cs repo has been merged into this repo. These source files are now located here: `/sdkproject/Assets/Mapbox/Core/mapbox-sdk-cs`. Core `cs` changes will be backported on a case-by-case basis.**
+
+- Changes under `mapbox-sdk-unity/sdkproject/Assets/Mapbox/Core/Plugins` should never be committed directly to this repo. Instead they should be made in their corresponding submodule repos and updated in the Unity project via a file transfer executable.
+- Changes under and `mapbox-sdk-unity/sdkproject/Assets/Mapbox/Core/mapbox-sdk-cs` can be made directly to this repo, but please avoid any reference to Unity APIs. This will help enable a smooth backport to the `cs` repository.
 
 To update the Mapbox Unity SDK Core, run the following command from the repo root:
 
