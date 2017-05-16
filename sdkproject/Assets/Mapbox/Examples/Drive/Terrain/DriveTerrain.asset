@@ -11,8 +11,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8338f26893d62c1439f387800a8e1c9a, type: 3}
   m_Name: DriveTerrain
   m_EditorClassIdentifier: 
-  _createFlatBase: 0
-  _createRealTerrain: 1
+  _generationType: 0
+  _baseMaterial: {fileID: 0}
+  _mapIdType: 0
+  _customMapId: mapbox.terrain-rgb
   _mapId: mapbox.terrain-rgb
-  _material: {fileID: 2100000, guid: d59af6ef7d16a004eabbf169fe7d6995, type: 2}
-  sampleCount: 40
+  _heightModifier: 1
+  _sampleCount: 40

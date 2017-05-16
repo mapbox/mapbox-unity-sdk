@@ -39,18 +39,21 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         void HandleDirectionsResponse(DirectionsResponse response)
         {
             var meshData = new MeshData();
-
+            var dat = new List<Vector3>();
             foreach (var leg in response.Routes[0].Legs)
             {
                 foreach (var point in response.Routes[0].Geometry)
                 {
-                    meshData.Vertices.Add(Conversions.GeoToWorldPosition(point.x, point.y, Parameters.ReferenceTileRect.Center, Parameters.WorldScaleFactor).ToVector3xz());
+                    dat.Add(Conversions.GeoToWorldPosition(point.x, point.y, Parameters.ReferenceTileRect.Center, Parameters.WorldScaleFactor).ToVector3xz());
                 }
             }
 
+            var feat = new VectorFeatureUnity();
+            feat.Points.Add(dat);
+
             foreach (MeshModifier mod in MeshModifiers.Where(x => x.Active))
             {
-                mod.Run(null, meshData);
+                mod.Run(feat, meshData);
             }
 
             CreateGameObject(meshData);

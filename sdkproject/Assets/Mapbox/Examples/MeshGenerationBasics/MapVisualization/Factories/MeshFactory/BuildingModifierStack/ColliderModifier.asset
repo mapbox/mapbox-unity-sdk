@@ -8,9 +8,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e1e9c060b6589e4e8b990a9c709bcdd, type: 3}
-  m_Name: TerrainDemoRoadLineModifier
+  m_Script: {fileID: 11500000, guid: 288d05a2dbabb0f46a5fa6c85102780a, type: 3}
+  m_Name: ColliderModifier
   m_EditorClassIdentifier: 
   Active: 1
-  _mergeStartEnd: 0
-  Width: 22
+  _colliderType: 1

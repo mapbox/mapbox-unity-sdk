@@ -14,7 +14,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
         public override ModifierType Type { get { return ModifierType.Preprocess; } }
         public bool UseSatelliteRoof = false;
 
-        public override void Run(VectorFeatureUnity feature, MeshData md)
+        public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
         {
             var uv = new List<Vector2>();
             foreach (var c in md.Vertices)

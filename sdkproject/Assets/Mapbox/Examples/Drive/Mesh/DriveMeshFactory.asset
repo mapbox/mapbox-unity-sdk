@@ -13,5 +13,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mapId: mapbox.mapbox-traffic-v1,mapbox.mapbox-streets-v7
   Visualizers:
-  - {fileID: 11400000, guid: 3a02dddaa897fd444b76d6ed1339dab6, type: 2}
   - {fileID: 11400000, guid: 960fc9b7bdbc4f24b860f10bdfd7c165, type: 2}
+  - {fileID: 11400000, guid: 3a02dddaa897fd444b76d6ed1339dab6, type: 2}

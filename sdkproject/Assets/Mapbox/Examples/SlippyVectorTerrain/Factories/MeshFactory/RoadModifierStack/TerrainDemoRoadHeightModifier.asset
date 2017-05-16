@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Name: TerrainDemoRoadHeightModifier
   m_EditorClassIdentifier: 
   Active: 1
-  _height: 1
-  _forceHeight: 0
+  _flatTops: 0
+  _height: 21
+  _forceHeight: 1

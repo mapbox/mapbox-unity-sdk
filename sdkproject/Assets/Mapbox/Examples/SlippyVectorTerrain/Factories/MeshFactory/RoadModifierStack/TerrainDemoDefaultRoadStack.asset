@@ -11,7 +11,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25f09effe9db3dd4e9e825475d698ca3, type: 3}
   m_Name: TerrainDemoDefaultRoadStack
   m_EditorClassIdentifier: 
+  _baseModifiers: []
   MeshModifiers:
+  - {fileID: 11400000, guid: 86a20dba8c16aaa4c9eeed167327a764, type: 2}
   - {fileID: 11400000, guid: 4ef2eed850b24404faac9fb8d49350a7, type: 2}
   - {fileID: 11400000, guid: c5ef3557587c7a445bc8022429cc74bf, type: 2}
   GoModifiers:
