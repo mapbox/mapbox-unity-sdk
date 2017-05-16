@@ -7,9 +7,6 @@
 [submodule "dependencies/Mapbox.IO.Compression"]
 	path = dependencies/Mapbox.IO.Compression
 	url = https://github.com/mapbox/Mapbox.IO.Compression-unity
-[submodule "dependencies/Triangle.NET"]
-	path = dependencies/Triangle.NET
-	url = https://github.com/mapbox/triangle.net-uwp
 [submodule "dependencies/Mapbox.IO.Compression-unity"]
 	path = dependencies/Mapbox.IO.Compression-unity
 	url = https://github.com/mapbox/Mapbox.IO.Compression-unity
