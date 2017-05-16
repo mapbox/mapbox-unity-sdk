@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44692492, g: 0.4967869, b: 0.57508546, a: 1}
+  m_IndirectSpecularColor: {r: 0.44692504, g: 0.4967869, b: 0.57508504, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -185,7 +185,8 @@ MonoBehaviour:
   _snapYToZero: 1
   LatLng: 37.781169, -122.409955
   Zoom: 16
-  Range: {x: 3, y: 3, z: 3, w: 3}
+  Range: {x: 1, y: 1, z: 1, w: 1}
+  Root: {fileID: 0}
 --- !u!4 &199863781
 Transform:
   m_ObjectHideFlags: 0
@@ -306,7 +307,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MapController: {fileID: 199863780}
-  MapVisualization: {fileID: 11400000, guid: 4f4961d6f3e45f84f99bda9cdc9dbb2b, type: 2}
   Directions: {fileID: 11400000, guid: d370b4703777f8c48b26eead134f2edb, type: 2}
   Waypoints:
   - {fileID: 1553875871}
