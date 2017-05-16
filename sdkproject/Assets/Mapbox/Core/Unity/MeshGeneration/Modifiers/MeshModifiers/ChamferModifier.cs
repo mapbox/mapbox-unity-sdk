@@ -14,7 +14,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
         [SerializeField]
         private float _size;
 
-        public override void Run(VectorFeatureUnity feature, MeshData md)
+        public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
         {
             if (md.Vertices.Count == 0)
                 return;

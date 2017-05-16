@@ -136,6 +136,7 @@ MonoBehaviour:
   LatLng: 37.779147, -122.432676
   Zoom: 16
   Range: {x: 1, y: 1, z: 1, w: 1}
+  Root: {fileID: 0}
 --- !u!1 &653077314
 GameObject:
   m_ObjectHideFlags: 0

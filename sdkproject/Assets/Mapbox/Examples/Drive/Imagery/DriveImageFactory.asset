@@ -11,6 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b10536479dade041b6db9893fdf723a, type: 3}
   m_Name: DriveImageFactory
   m_EditorClassIdentifier: 
-  _createImagery: 1
+  _mapIdType: 0
+  _customMapId: 
   _mapId: mapbox://styles/mapbox/dark-v9
   _baseMaterial: {fileID: 2100000, guid: 06b583c58078c164eb45358a14a5c66b, type: 2}

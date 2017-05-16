@@ -5,14 +5,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using Mapbox.Unity.MeshGeneration.Interfaces;
 
-public class TerrainMakiHelper : MonoBehaviour, ILabelVisualizationHelper
+public class TerrainMakiHelper : MonoBehaviour, IFeaturePropertySettable
 {
     public static RectTransform Parent;
     public static GameObject UiPrefab;
 
     private GameObject _uiObject;
 
-    public void Initialize(Dictionary<string, object> props)
+    public void Set(Dictionary<string, object> props)
     {
         if (Parent == null)
         {
