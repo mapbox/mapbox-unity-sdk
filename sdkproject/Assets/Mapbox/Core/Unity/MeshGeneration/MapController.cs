@@ -47,18 +47,11 @@ namespace Mapbox.Unity.MeshGeneration
         /// <summary>
         /// Pulls the root world object to origin for ease of use/view
         /// </summary>
-        public void Update()
+        private void SnapZero(UnityTile s, object e)
         {
-            if (_snapYToZero)
-            {
-                var ray = new Ray(new Vector3(0, 1000, 0), Vector3.down);
-                RaycastHit rayhit;
-                if (Physics.Raycast(ray, out rayhit))
-                {
-                    _root.transform.position = new Vector3(0, -rayhit.point.y, 0);
-                    _snapYToZero = false;
-                }
-            }
+            var h = Conversions.GetRelativeHeightFromColor(s.HeightData.GetPixel(127, 127), s.RelativeScale);
+            _root.transform.position = new Vector3(0, -h * WorldScaleFactor, 0);
+            s.HeightDataChanged -= SnapZero;
         }
 
         public void Execute()
@@ -106,6 +99,11 @@ namespace Mapbox.Unity.MeshGeneration
                     tile.transform.position = new Vector3((float)(tile.Rect.Center.x - ReferenceTileRect.Center.x), 0, (float)(tile.Rect.Center.y - ReferenceTileRect.Center.y));
                     tile.transform.SetParent(_root.transform, false);
                     MapVisualization.ShowTile(tile);
+
+                    if (_snapYToZero && j == tms.y && i == tms.x)
+                    {
+                        tile.HeightDataChanged += SnapZero;
+                    }
                 }
             }
         }

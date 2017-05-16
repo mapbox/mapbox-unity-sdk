@@ -13,5 +13,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mapIdType: 0
   _customMapId: 
-  _mapId: mapbox://styles/mapbox/streets-v10
+  _mapId: mapbox://styles/mapbox/dark-v9
   _baseMaterial: {fileID: 2100000, guid: 06b583c58078c164eb45358a14a5c66b, type: 2}

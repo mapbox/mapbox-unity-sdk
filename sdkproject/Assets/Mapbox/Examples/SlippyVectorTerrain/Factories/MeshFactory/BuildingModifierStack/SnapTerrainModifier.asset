@@ -8,10 +8,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a7dfb85d33966074ebf2acd2de263474, type: 3}
-  m_Name: DriveBuildingHeight
+  m_Script: {fileID: 11500000, guid: 40bee3110109c0848bb86c9b5c436039, type: 3}
+  m_Name: SnapTerrainModifier
   m_EditorClassIdentifier: 
   Active: 1
-  _flatTops: 1
-  _height: 0
-  _forceHeight: 0
