@@ -1,4 +1,5 @@
 # Mapbox-unity-sdk
+### For Unity 5.4 and above
 
 Tools for using Mapbox APIs with C# / Unity. If you'd like to contribute to the project, [read CONTRIBUTING.md](CONTRIBUTING.md).
 
