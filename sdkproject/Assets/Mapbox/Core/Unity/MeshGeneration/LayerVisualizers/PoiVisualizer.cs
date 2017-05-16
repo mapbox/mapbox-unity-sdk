@@ -60,15 +60,19 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
             go.transform.position = met;
             go.transform.SetParent(parent.transform, false);
 
-            if (!_scaleDownWithWorld)
-                go.transform.localScale = Vector3.one / go.transform.lossyScale.x;
+			if (!_scaleDownWithWorld)
+			{
+				go.transform.localScale = Vector3.one / go.transform.lossyScale.x;
+			}
 
             var bd = go.AddComponent<FeatureBehaviour>();
             bd.Init(feature);
 
             var tm = go.GetComponent<IFeaturePropertySettable>();
-            if(tm != null)
-                tm.Set(feature.Properties);
+			if (tm != null)
+			{
+				tm.Set(feature.Properties);
+			}
         }
 
         private float GetHeightFromColor(Color c)
