@@ -5,7 +5,8 @@
 //-----------------------------------------------------------------------
 
 
-namespace Mapbox.Unity.Utilities {
+namespace Mapbox.Unity.Utilities
+{
 
 	using System;
 	using UnityEngine.Networking;
@@ -16,40 +17,51 @@ namespace Mapbox.Unity.Utilities {
 	using UnityEditor;
 #endif
 
-	internal sealed class HTTPRequest : IAsyncRequest {
-
+	internal sealed class HTTPRequest : IAsyncRequest
+	{
 		private UnityWebRequest _request;
 		private int _timeout;
 		private readonly Action<Response> _callback;
 
 		public bool IsCompleted { get; private set; }
 
-		public HTTPRequest(string url, Action<Response> callback, int timeout = 10) {
+		public HTTPRequest(string url, Action<Response> callback, int timeout = 10)
+		{
 			IsCompleted = false;
 			_timeout = timeout;
 			_request = UnityWebRequest.Get(url);
 			_callback = callback;
 
 #if UNITY_EDITOR
-			if (!EditorApplication.isPlaying) {
+			if (!EditorApplication.isPlaying)
+			{
 				Runnable.EnableRunnableInEditor();
 			}
 #endif
 			Runnable.Run(DoRequest());
 		}
 
-		public void Cancel() {
-			if (_request != null) {
+		public void Cancel()
+		{
+			if (_request != null)
+			{
+				if (_request.isDone)
+				{
+					// FIXME: this happens sometimes. Handle it?
+				}
 				_request.Abort();
 			}
 		}
 
-		private IEnumerator DoRequest() {
+		private IEnumerator DoRequest()
+		{
 			_request.Send();
-			while (!_request.isDone) {
-				yield return 0;
+			while (!_request.isDone)
+			{
+				yield return null;
 			}
 
+			// FIXME: any way to forward an aborted exception to response if request finished before cancel call?
 			var response = Response.FromWebResponse(this, _request, null);
 
 			_callback(response);
