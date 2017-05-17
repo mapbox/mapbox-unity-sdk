@@ -8,9 +8,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a0f20c9ab4a6f18479e70968cdde2019, type: 3}
+  m_Script: {fileID: 11500000, guid: 120e43a7012622e49aca0c9217acd1f9, type: 3}
   m_Name: TerrainDemoPoiVisualizer
   m_EditorClassIdentifier: 
   Active: 1
+  _classificationKey: 
   _key: poi_label
-  PoiPrefab: {fileID: 1000011742328300, guid: 3f08c06e951975e40922bea49fa48930, type: 2}
+  Filters: []
+  _defaultStack: {fileID: 11400000, guid: e91d380ee3bec2045ad4f7a7e06773e1, type: 2}
+  Stacks: []
