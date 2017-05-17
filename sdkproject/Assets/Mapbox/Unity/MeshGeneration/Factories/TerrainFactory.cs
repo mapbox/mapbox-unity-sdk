@@ -54,6 +54,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		private Vector2 _stitchTarget;
 
+		protected Dictionary<UnityTile, Tile> _tiles;
+
 		/// <summary>
 		/// Clears the mesh data and re-runs the terrain creation procedure using current settings. Clearing the old mesh data is important as terrain stitching function checks if the data exists or not.
 		/// </summary>
@@ -73,7 +75,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnInitialized()
 		{
-			// ?
+			_tiles = new Dictionary<UnityTile, Tile>();
 		}
 
 		internal override void OnRegistered(UnityTile tile)
@@ -83,7 +85,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnUnregistered(UnityTile tile)
 		{
-			// Cancel?
+			_tiles[tile].Cancel();
+			_tiles.Remove(tile);
 		}
 
 		private void Run(UnityTile tile)
@@ -120,9 +123,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 				tile.HeightDataState = TilePropertyState.Loading;
 				var pngRasterTile = new RawPngRasterTile();
+				_tiles.Add(tile, pngRasterTile);
 				pngRasterTile.Initialize(parameters, () =>
 				{
-					if (pngRasterTile.HasError)
+					if (pngRasterTile.HasError || pngRasterTile.CurrentState == Tile.State.Canceled)
 					{
 						tile.HeightDataState = TilePropertyState.Error;
 						return;
@@ -291,9 +295,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		private void FixStitches(UnityTile tile, MeshData tmesh)
 		{
 			_stitchTarget.Set(tile.TileCoordinate.x, tile.TileCoordinate.y - 1);
-			if (_tiles.ContainsKey(_stitchTarget) && _tiles[_stitchTarget].MeshData != null)
+			if (_unityTiles.ContainsKey(_stitchTarget) && _unityTiles[_stitchTarget].MeshData != null)
 			{
-				var t2mesh = _tiles[_stitchTarget].MeshData;
+				var t2mesh = _unityTiles[_stitchTarget].MeshData;
 
 				for (int i = 0; i < _sampleCount; i++)
 				{
@@ -309,9 +313,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 
 			_stitchTarget.Set(tile.TileCoordinate.x, tile.TileCoordinate.y + 1);
-			if (_tiles.ContainsKey(_stitchTarget) && _tiles[_stitchTarget].MeshData != null)
+			if (_unityTiles.ContainsKey(_stitchTarget) && _unityTiles[_stitchTarget].MeshData != null)
 			{
-				var t2mesh = _tiles[_stitchTarget].MeshData;
+				var t2mesh = _unityTiles[_stitchTarget].MeshData;
 				for (int i = 0; i < _sampleCount; i++)
 				{
 					tmesh.Vertices[tmesh.Vertices.Count - _sampleCount + i] = new Vector3(
@@ -327,9 +331,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 
 			_stitchTarget.Set(tile.TileCoordinate.x - 1, tile.TileCoordinate.y);
-			if (_tiles.ContainsKey(_stitchTarget) && _tiles[_stitchTarget].MeshData != null)
+			if (_unityTiles.ContainsKey(_stitchTarget) && _unityTiles[_stitchTarget].MeshData != null)
 			{
-				var t2mesh = _tiles[_stitchTarget].MeshData;
+				var t2mesh = _unityTiles[_stitchTarget].MeshData;
 				for (int i = 0; i < _sampleCount; i++)
 				{
 					tmesh.Vertices[i * _sampleCount] = new Vector3(
@@ -344,9 +348,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 
 			_stitchTarget.Set(tile.TileCoordinate.x + 1, tile.TileCoordinate.y);
-			if (_tiles.ContainsKey(_stitchTarget) && _tiles[_stitchTarget].MeshData != null)
+			if (_unityTiles.ContainsKey(_stitchTarget) && _unityTiles[_stitchTarget].MeshData != null)
 			{
-				var t2mesh = _tiles[_stitchTarget].MeshData;
+				var t2mesh = _unityTiles[_stitchTarget].MeshData;
 				for (int i = 0; i < _sampleCount; i++)
 				{
 					tmesh.Vertices[i * _sampleCount + _sampleCount - 1] = new Vector3(
@@ -361,9 +365,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 
 			_stitchTarget.Set(tile.TileCoordinate.x - 1, tile.TileCoordinate.y - 1);
-			if (_tiles.ContainsKey(_stitchTarget) && _tiles[_stitchTarget].MeshData != null)
+			if (_unityTiles.ContainsKey(_stitchTarget) && _unityTiles[_stitchTarget].MeshData != null)
 			{
-				var t2mesh = _tiles[_stitchTarget].MeshData;
+				var t2mesh = _unityTiles[_stitchTarget].MeshData;
 				tmesh.Vertices[0] = new Vector3(
 					tmesh.Vertices[0].x,
 					t2mesh.Vertices[t2mesh.Vertices.Count - 1].y,
@@ -375,9 +379,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 
 			_stitchTarget.Set(tile.TileCoordinate.x + 1, tile.TileCoordinate.y - 1);
-			if (_tiles.ContainsKey(_stitchTarget) && _tiles[_stitchTarget].MeshData != null)
+			if (_unityTiles.ContainsKey(_stitchTarget) && _unityTiles[_stitchTarget].MeshData != null)
 			{
-				var t2mesh = _tiles[_stitchTarget].MeshData;
+				var t2mesh = _unityTiles[_stitchTarget].MeshData;
 				tmesh.Vertices[_sampleCount - 1] = new Vector3(
 					tmesh.Vertices[_sampleCount - 1].x,
 					t2mesh.Vertices[t2mesh.Vertices.Count - _sampleCount].y,
@@ -389,9 +393,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 
 			_stitchTarget.Set(tile.TileCoordinate.x - 1, tile.TileCoordinate.y + 1);
-			if (_tiles.ContainsKey(_stitchTarget) && _tiles[_stitchTarget].MeshData != null)
+			if (_unityTiles.ContainsKey(_stitchTarget) && _unityTiles[_stitchTarget].MeshData != null)
 			{
-				var t2mesh = _tiles[_stitchTarget].MeshData;
+				var t2mesh = _unityTiles[_stitchTarget].MeshData;
 				tmesh.Vertices[tmesh.Vertices.Count - _sampleCount] = new Vector3(
 					tmesh.Vertices[tmesh.Vertices.Count - _sampleCount].x,
 					t2mesh.Vertices[_sampleCount - 1].y,
@@ -403,9 +407,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 
 			_stitchTarget.Set(tile.TileCoordinate.x + 1, tile.TileCoordinate.y + 1);
-			if (_tiles.ContainsKey(_stitchTarget) && _tiles[_stitchTarget].MeshData != null)
+			if (_unityTiles.ContainsKey(_stitchTarget) && _unityTiles[_stitchTarget].MeshData != null)
 			{
-				var t2mesh = _tiles[_stitchTarget].MeshData;
+				var t2mesh = _unityTiles[_stitchTarget].MeshData;
 				tmesh.Vertices[t2mesh.Vertices.Count - 1] = new Vector3(
 					tmesh.Vertices[t2mesh.Vertices.Count - 1].x,
 					t2mesh.Vertices[0].y,
