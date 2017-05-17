@@ -7,6 +7,7 @@
 	using UnityEngine;
 	using Mapbox.Map;
 
+	// TODO: need to be abstract?
 	public class AbstractMap : MonoBehaviour, IMap
 	{
 		[Geocode]

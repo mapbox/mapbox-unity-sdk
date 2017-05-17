@@ -71,6 +71,7 @@ namespace Mapbox.Unity.MeshGeneration
 			_activeTiles.Remove(tileId);
 
 			// TODO: recycle!
+			// FIXME: at some point game object is destroyed but should be visible? Race condition?
 			Destroy(unityTile.gameObject);
 
 		}

@@ -74,10 +74,10 @@ namespace Mapbox.Unity.Location
 
         Vector2d GetLocation()
         {
-            //if (_map.ReferenceTileRect == null)
-            //{
-            //    return LocationProviderFactory.Instance.DefaultLocationProvider.Location;
-            //}
+			//if (_map.CenterMercator)
+   //         {
+   //             return LocationProviderFactory.Instance.DefaultLocationProvider.Location;
+   //         }
 			return _targetTransform.GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
         }
     }

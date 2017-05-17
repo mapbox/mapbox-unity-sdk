@@ -3,6 +3,7 @@
 	using Mapbox.Utils;
 	using UnityEngine;
 
+	// TODO: split into read and write maps?
 	public interface IMap
 	{
 		Vector2d CenterLatitudeLongitude { get; set;}

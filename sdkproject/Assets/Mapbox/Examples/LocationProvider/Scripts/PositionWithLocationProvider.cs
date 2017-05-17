@@ -72,11 +72,11 @@ namespace Mapbox.Examples.LocationProvider
 		void LocationProvider_OnLocationUpdated(object sender, LocationUpdatedEventArgs e)
 		{
 			//if (_map.ReferenceTileRect == null)
-   //         {
-   //             return;
-   //         }
+			//         {
+			//             return;
+			//         }
 
-            _targetPosition = Conversions.GeoToWorldPosition(e.Location,
+			_targetPosition = Conversions.GeoToWorldPosition(e.Location,
 			                                                 _map.CenterMercator,
 			                                                 _map.WorldRelativeScale).ToVector3xz();
         }

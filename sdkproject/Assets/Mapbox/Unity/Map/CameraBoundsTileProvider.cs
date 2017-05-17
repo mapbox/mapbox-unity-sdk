@@ -48,7 +48,6 @@ namespace Mapbox.Unity.Map
 					_currentLatitudeLongitude = _ray.GetPoint(_hitDistance).GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
 					_currentTile = TileCover.CoordinateToTileId(_currentLatitudeLongitude, _map.Zoom);
 
-					// TODO: override?
 					if (!_currentTile.Equals(_cachedTile))
 					{
 						for (int x = _currentTile.X - _visibleBuffer; x <= (_currentTile.X + _visibleBuffer); x++)

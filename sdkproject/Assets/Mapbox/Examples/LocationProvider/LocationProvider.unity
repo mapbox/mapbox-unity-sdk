@@ -100,8 +100,9 @@ GameObject:
   - 4: {fileID: 114606472}
   - 114: {fileID: 114606471}
   - 114: {fileID: 114606473}
+  - 114: {fileID: 114606474}
   m_Layer: 0
-  m_Name: MapController
+  m_Name: Map
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -115,16 +116,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 114606470}
   m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c57173fef834bb94098b65581fb4f0e4, type: 3}
+  m_Script: {fileID: 11500000, guid: cd961b1c9541a4cee99686069ecce852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MapVisualization: {fileID: 11400000, guid: 38f8ab26621bb424d86f009e3dce979f, type: 2}
-  TileSize: 100
-  _snapYToZero: 0
-  LatLng: 37.7648, -122.463
-  Zoom: 15
-  Range: {x: 1, y: 1, z: 1, w: 1}
-  Root: {fileID: 114606470}
+  _latitudeLongitudeString: 37.7856, -122.403
+  _zoom: 15
+  _root: {fileID: 0}
+  _tileProvider: {fileID: 114606474}
+  _mapVisualization: {fileID: 11400000, guid: 38f8ab26621bb424d86f009e3dce979f, type: 2}
+  _unityTileSize: 100
 --- !u!4 &114606472
 Transform:
   m_ObjectHideFlags: 0
@@ -149,7 +149,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fdc49f4b978b4412949e77a41421ee2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mapController: {fileID: 114606471}
+  _map: {fileID: 114606471}
+--- !u!114 &114606474
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 114606470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d7ff8ed3b76a4ee5a451d64a5393e3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _range: {x: 1, y: 1, z: 1, w: 1}
 --- !u!1 &354925210
 GameObject:
   m_ObjectHideFlags: 0
@@ -473,7 +485,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a034c4eeb3293418aab101c1895844a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mapController: {fileID: 114606471}
+  _map: {fileID: 114606471}
   _targetTransform: {fileID: 1649127106}
 --- !u!4 &1649127106
 Transform:
@@ -518,7 +530,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rotationFollowFactor: 2
   _rotateZ: 0
-  _useTransformLocationProvider: 0
+  _useTransformLocationProvider: 1
 --- !u!114 &1934621223
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -530,9 +542,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bb39d89f6f3742418be7c93b4259637, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mapController: {fileID: 114606471}
+  _map: {fileID: 114606471}
   _positionFollowFactor: 0.5
-  _useTransformLocationProvider: 0
+  _useTransformLocationProvider: 1
 --- !u!4 &1934621224
 Transform:
   m_ObjectHideFlags: 0
