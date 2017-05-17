@@ -62,6 +62,7 @@ namespace Mapbox.Unity.MeshGeneration
 			unityTile.gameObject.name = tileId.ToString();
 #endif
 
+			// TODO: simplify this.
 			unityTile.Zoom = _map.Zoom;
 			unityTile.RelativeScale = Conversions.GetTileScaleInMeters(0, _map.Zoom) / Conversions.GetTileScaleInMeters((float)_map.CenterLatitudeLongitude.x, _map.Zoom);
 			unityTile.TileCoordinate = new Vector2(tileId.X, tileId.Y);

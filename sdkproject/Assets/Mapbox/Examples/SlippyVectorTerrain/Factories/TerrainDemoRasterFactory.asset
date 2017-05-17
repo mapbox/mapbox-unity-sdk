@@ -13,7 +13,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mapIdType: 0
   _customMapId: 
-  _mapId: mapbox://styles/mapbox/satellite-v9
+  _mapId: mapbox://styles/mapbox/outdoors-v10
   _baseMaterial: {fileID: 2100000, guid: fdf26842f5143fe47802eb3f1c072614, type: 2}
   _useCompression: 1
   _useMipMap: 0

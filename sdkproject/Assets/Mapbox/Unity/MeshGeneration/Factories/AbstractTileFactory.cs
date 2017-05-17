@@ -3,7 +3,6 @@
 	using System.Collections.Generic;
 	using Mapbox.Platform;
 	using Mapbox.Unity.MeshGeneration.Data;
-	using Mapbox.Map;
 	using UnityEngine;
 
 	public abstract class AbstractTileFactory : ScriptableObject

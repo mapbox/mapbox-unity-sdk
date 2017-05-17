@@ -8,7 +8,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	using Mapbox.Platform;
 	using Mapbox.Unity.Utilities;
 	using Utils;
-	using System;
 
 	public enum TerrainGenerationType
 	{
@@ -143,10 +142,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					}
 					_tiles.Remove(tile);
 
-					var texture = new Texture2D(256, 256);
-					texture.wrapMode = TextureWrapMode.Clamp;
-					texture.LoadImage(pngRasterTile.Data);
-					tile.HeightData = texture;
+					if (tile.HeightData == null)
+					{
+						tile.HeightData = new Texture2D(256, 256);
+						tile.HeightData.wrapMode = TextureWrapMode.Clamp;
+					}
+
+					tile.HeightData.LoadImage(pngRasterTile.Data);
 					tile.HeightDataState = TilePropertyState.Loaded;
 					GenerateTerrainMesh(tile, heightMultiplier);
 				});
@@ -239,12 +241,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			//FixStitches(tile, mesh);
 
 			tile.MeshData = mesh;
-			var uMesh = new Mesh();
-			uMesh.SetVertices(mesh.Vertices);
-			uMesh.SetUVs(0, mesh.UV[0]);
-			uMesh.SetNormals(mesh.Normals);
-			uMesh.SetTriangles(mesh.Triangles[0], 0);
-			tile.MeshFilter.sharedMesh = uMesh;
+
+			// Don't leak the mesh, just reuse it.
+			var unityMesh = tile.MeshFilter.sharedMesh ?? new Mesh();
+			unityMesh.SetVertices(mesh.Vertices);
+			unityMesh.SetUVs(0, mesh.UV[0]);
+			unityMesh.SetNormals(mesh.Normals);
+			unityMesh.SetTriangles(mesh.Triangles[0], 0);
+			unityMesh.RecalculateBounds();
+			tile.MeshFilter.sharedMesh = unityMesh;
 
 			if (tile.MeshRenderer.material == null)
 			{
@@ -253,13 +258,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			if (_addCollider)
 			{
-				if(tile.Collider == null)
+				if (tile.Collider == null)
 				{
 					go.AddComponent<MeshCollider>();
 				}
 				else
 				{
-					((MeshCollider)tile.Collider).sharedMesh = uMesh;
+					// Reuse the collider.
+					((MeshCollider)tile.Collider).sharedMesh = unityMesh;
 				}
 			}
 		}

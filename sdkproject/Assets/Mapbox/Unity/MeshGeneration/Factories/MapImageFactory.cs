@@ -24,12 +24,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField]
 		private MapImageType _mapIdType;
 
-		// TODO: fix or remove?
 		[SerializeField]
 		private string _customMapId = "";
 
 		[SerializeField]
 		private string _mapId = "";
+
 		[SerializeField]
 		public Material _baseMaterial;
 
@@ -66,6 +66,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnUnregistered(UnityTile tile)
 		{
+			// TODO: simplify this across tile factories? Cancel tile, but only if it needs to be cancelled.
 			if (_tiles.ContainsKey(tile))
 			{
 				_tiles[tile].Cancel();
@@ -80,60 +81,53 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// <param name="tile"></param>
 		private void Run(UnityTile tile)
 		{
-			if (!string.IsNullOrEmpty(_mapId))
+			var parameters = new Tile.Parameters();
+			parameters.Fs = this.FileSource;
+			parameters.Id = new CanonicalTileId(tile.Zoom, (int)tile.TileCoordinate.x, (int)tile.TileCoordinate.y);
+			parameters.MapId = _mapId;
+
+			tile.RasterDataState = TilePropertyState.Loading;
+
+			RasterTile rasterTile;
+			if (parameters.MapId.StartsWith("mapbox://", StringComparison.Ordinal))
 			{
-				var parameters = new Tile.Parameters();
-				parameters.Fs = this.FileSource;
-				parameters.Id = new CanonicalTileId(tile.Zoom, (int)tile.TileCoordinate.x, (int)tile.TileCoordinate.y);
-				parameters.MapId = _mapId;
-
-				tile.RasterDataState = TilePropertyState.Loading;
-
-				RasterTile rasterTile;
-				if (parameters.MapId.StartsWith("mapbox://", StringComparison.Ordinal))
-				{
-					rasterTile = _useRetina ? new RetinaRasterTile() : new RasterTile();
-				}
-				else
-				{
-					rasterTile = _useRetina ? new ClassicRetinaRasterTile() : new ClassicRasterTile();
-				}
-
-				_tiles.Add(tile, rasterTile);
-				rasterTile.Initialize(parameters, (Action)(() =>
-				{
-					// HACK: we need to check state because a cancel could have happened immediately following a response.
-					if (rasterTile.HasError || rasterTile.CurrentState == Tile.State.Canceled)
-					{
-						tile.RasterDataState = TilePropertyState.Error;
-						return;
-					}
-
-					_tiles.Remove(tile);
-
-					if (tile.ImageData == null)
-					{
-						tile.ImageData = new Texture2D(0, 0, TextureFormat.RGB24, _useMipMap);
-						tile.ImageData.wrapMode = TextureWrapMode.Clamp;
-						tile.MeshRenderer.material = _baseMaterial;
-						tile.MeshRenderer.material.mainTexture = tile.ImageData;
-					}
-
-					tile.ImageData.LoadImage(rasterTile.Data);
-					if (_useCompression)
-					{
-						// High quality = true seems to decrease image quality?
-						tile.ImageData.Compress(false);
-					}
-
-					tile.RasterDataState = TilePropertyState.Loaded;
-				}));
+				rasterTile = _useRetina ? new RetinaRasterTile() : new RasterTile();
 			}
 			else
 			{
-				var rend = tile.GetComponent<MeshRenderer>();
-				rend.material = _baseMaterial;
+				rasterTile = _useRetina ? new ClassicRetinaRasterTile() : new ClassicRasterTile();
 			}
+
+			_tiles.Add(tile, rasterTile);
+			rasterTile.Initialize(parameters, (Action)(() =>
+			{
+				// HACK: we need to check state because a cancel could have happened immediately following a response.
+				if (rasterTile.HasError || rasterTile.CurrentState == Tile.State.Canceled)
+				{
+					tile.RasterDataState = TilePropertyState.Error;
+					return;
+				}
+
+				_tiles.Remove(tile);
+
+				// Don't leak the texture, just reuse it.
+				if (tile.RasterData == null)
+				{
+					tile.RasterData = new Texture2D(0, 0, TextureFormat.RGB24, _useMipMap);
+					tile.RasterData.wrapMode = TextureWrapMode.Clamp;
+					tile.MeshRenderer.material = _baseMaterial;
+					tile.MeshRenderer.material.mainTexture = tile.RasterData;
+				}
+
+				tile.RasterData.LoadImage(rasterTile.Data);
+				if (_useCompression)
+				{
+					// High quality = true seems to decrease image quality?
+					tile.RasterData.Compress(false);
+				}
+
+				tile.RasterDataState = TilePropertyState.Loaded;
+			}));
 		}
 	}
 }

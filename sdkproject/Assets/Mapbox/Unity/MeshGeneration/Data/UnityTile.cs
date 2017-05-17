@@ -1,7 +1,5 @@
 namespace Mapbox.Unity.MeshGeneration.Data
 {
-	using System.ComponentModel;
-	using JetBrains.Annotations;
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Enums;
 	using Mapbox.Unity.Utilities;
@@ -11,6 +9,15 @@ namespace Mapbox.Unity.MeshGeneration.Data
 	[RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
 	public class UnityTile : MonoBehaviour
 	{
+		[SerializeField]
+		Texture2D _heightData;
+
+		[SerializeField]
+		Texture2D _rasterData;
+
+		[SerializeField]
+		string _vectorData;
+
 		private MeshRenderer _meshRenderer;
 		public MeshRenderer MeshRenderer
 		{
@@ -50,21 +57,12 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		public MeshData MeshData { get; set; }
-
-		[SerializeField]
-		private Texture2D _heightData;
-		[SerializeField]
-		private Texture2D _imageData;
-		[SerializeField]
-		private string _vectorData;
-
-		public Texture2D ImageData
+		public Texture2D RasterData
 		{
-			get { return _imageData; }
+			get { return _rasterData; }
 			set
 			{
-				_imageData = value;
+				_rasterData = value;
 				OnRasterDataChanged(this);
 			}
 		}
@@ -87,10 +85,13 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
+		public MeshData MeshData { get; set; }
+
 		public TilePropertyState RasterDataState { get; set; }
 		public TilePropertyState HeightDataState { get; set; }
 		public TilePropertyState VectorDataState { get; set; }
 
+		// TODO: pass in unwrapped tile or map to initialize?
 		public Vector2 TileCoordinate;
 		public int Zoom;
 		public RectD Rect;
@@ -99,7 +100,17 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public event Action<UnityTile> OnHeightDataChanged = delegate { };
 		public event Action<UnityTile> OnRasterDataChanged = delegate { };
 		public event Action<UnityTile> OnVectorDataChanged = delegate { };
-		
+
+		internal void Enable()
+		{
+			gameObject.SetActive(true);
+		}
+
+		internal void Disable()
+		{
+			gameObject.SetActive(false);
+		}
+
 		public float QueryHeightData(float x, float y)
 		{
 			if (HeightData != null)
@@ -110,16 +121,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 
 			return 0;
-		}
-
-		internal void Enable()
-		{
-			gameObject.SetActive(true);
-		}
-
-		internal void Disable()
-		{
-			gameObject.SetActive(false);
 		}
 	}
 }

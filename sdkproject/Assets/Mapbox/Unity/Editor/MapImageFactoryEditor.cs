@@ -85,6 +85,10 @@ public class MapImageFactoryEditor : FactoryEditor
                 {
                     EditorGUILayout.PropertyField(customMapId_Prop, new GUIContent("Map Id"));
                     mapId_Prop.stringValue = customMapId_Prop.stringValue;
+					if (string.IsNullOrEmpty(mapId_Prop.stringValue))
+					{
+						EditorGUILayout.HelpBox("Invalid MapID. This will cause invalid tile requests!", MessageType.Error);
+					}
                     EditorGUILayout.PropertyField(material_Prop, new GUIContent("Material"));
                     break;
                 }

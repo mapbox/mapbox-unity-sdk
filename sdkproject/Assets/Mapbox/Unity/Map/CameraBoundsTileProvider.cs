@@ -4,8 +4,6 @@ namespace Mapbox.Unity.Map
 	using Mapbox.Map;
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Utils;
-	using System;
-	using System.Collections;
 
 	public class CameraBoundsTileProvider : AbstractTileProvider
 	{
@@ -24,25 +22,33 @@ namespace Mapbox.Unity.Map
 		Plane _groundPlane;
 		Ray _ray;
 		float _hitDistance;
+		Vector3 _viewportTarget;
+		float _elapsedTime;
+		bool _shouldUpdate;
 
 		Vector2d _currentLatitudeLongitude;
 		UnwrappedTileId _cachedTile;
 		UnwrappedTileId _currentTile;
 
-		WaitForSeconds _wait;
-
 		internal override void OnInitialized()
 		{
 			_groundPlane = new Plane(Vector3.up, Vector3.zero);
-			_wait = new WaitForSeconds(_updateInterval);
-			StartCoroutine(UpdateTileCover());
+			_viewportTarget = new Vector3(0.5f, 0.5f, 0);
+			_shouldUpdate = true;
 		}
 
-		IEnumerator UpdateTileCover()
+		void Update()
 		{
-			while (true)
+			if (!_shouldUpdate)
 			{
-				_ray = _camera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+				return;
+			}
+
+			_elapsedTime += Time.deltaTime;
+			if (_elapsedTime >= _updateInterval)
+			{
+				_elapsedTime = 0f;
+				_ray = _camera.ViewportPointToRay(_viewportTarget);
 				if (_groundPlane.Raycast(_ray, out _hitDistance))
 				{
 					_currentLatitudeLongitude = _ray.GetPoint(_hitDistance).GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
@@ -61,7 +67,6 @@ namespace Mapbox.Unity.Map
 						Cleanup(_currentTile);
 					}
 				}
-				yield return _wait;
 			}
 		}
 
