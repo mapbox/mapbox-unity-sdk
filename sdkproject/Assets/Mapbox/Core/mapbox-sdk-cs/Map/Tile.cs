@@ -182,7 +182,11 @@ namespace Mapbox.Map {
 			}
 
 			_state = State.Loaded;
-			_callback();
+			// If tile has been removed from the map, the callback doesn't exist anymore
+			if (null != _callback)
+			{
+				_callback();
+			}
 		}
 
 
