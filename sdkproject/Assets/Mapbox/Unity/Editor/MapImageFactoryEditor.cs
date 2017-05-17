@@ -122,7 +122,8 @@ public class MapImageFactoryEditor : FactoryEditor
 
         if (GUILayout.Button("Update"))
         {
-            _factory.Update();
+            //_factory.Update();
+			Debug.Log("MapImageFactoryEditor: " + "FIX ME!");
         }
         serializedObject.ApplyModifiedProperties();
     }

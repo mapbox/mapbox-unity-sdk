@@ -4,22 +4,20 @@
 	using System.Collections.Generic;
 	using UnityEngine;
 	using Mapbox.Map;
-	using Mapbox.Unity.MeshGeneration;
 
 	public abstract class AbstractTileProvider : MonoBehaviour, ITileProvider
 	{
-		public event EventHandler<TileStateChangedEventArgs> OnTileAdded;
-		public event EventHandler<TileStateChangedEventArgs> OnTileRemoved;
+		public event Action<UnwrappedTileId> OnTileAdded = delegate { };
+		public event Action<UnwrappedTileId> OnTileRemoved = delegate { };
 
-		protected MapController _mapController;
+		protected IMap _map;
 
 		protected List<UnwrappedTileId> _activeTiles;
 
-		// HACK: decide dependency relationships! Right now it is cyclic.
-		public void Initialize(MapController mapController)
+		public void Initialize(IMap map)
 		{
 			_activeTiles = new List<UnwrappedTileId>();
-			_mapController = mapController;
+			_map = map;
 			OnInitialized();
 		}
 
@@ -31,10 +29,7 @@
 			}
 
 			_activeTiles.Add(tile);
-			if (OnTileAdded != null)
-			{
-				OnTileAdded(this, new TileStateChangedEventArgs() { TileId = tile });
-			}
+			OnTileAdded(tile);
 		}
 
 		protected void RemoveTile(UnwrappedTileId tile)
@@ -45,10 +40,7 @@
 			}
 
 			_activeTiles.Remove(tile);
-			if (OnTileRemoved != null)
-			{
-                OnTileRemoved(this, new TileStateChangedEventArgs() { TileId = tile });
-			}
+			OnTileRemoved(tile);
 		}
 
 		internal abstract void OnInitialized();

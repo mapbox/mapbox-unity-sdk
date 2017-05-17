@@ -1,15 +1,14 @@
 ﻿namespace Mapbox.Unity.Map
 {
 	using System;
-	using Mapbox.Unity.MeshGeneration;
 	using Mapbox.Map;
 
 	public interface ITileProvider
 	{
-		event EventHandler<TileStateChangedEventArgs> OnTileAdded;
-		event EventHandler<TileStateChangedEventArgs> OnTileRemoved;
+		event Action<UnwrappedTileId> OnTileAdded;
+		event Action<UnwrappedTileId> OnTileRemoved;
 
-		void Initialize(MapController mapController);
+		void Initialize(IMap map);
 
 		// TODO: add reset/clear method?
 	}

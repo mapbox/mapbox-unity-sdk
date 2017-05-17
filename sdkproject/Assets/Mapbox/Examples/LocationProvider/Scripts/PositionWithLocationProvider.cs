@@ -1,14 +1,16 @@
+using Mapbox.Unity.Map;
 namespace Mapbox.Examples.LocationProvider
 {
-    using Mapbox.Unity.Location;
-    using Mapbox.Unity.Utilities;
-    using Mapbox.Unity.MeshGeneration;
-    using UnityEngine;
+	using Mapbox.Unity.Location;
+	using Mapbox.Unity.Utilities;
+	using Mapbox.Unity.MeshGeneration;
+	using UnityEngine;
+	using Mapbox.Unity;
 
-    public class PositionWithLocationProvider : MonoBehaviour
+	public class PositionWithLocationProvider : MonoBehaviour
 	{
         [SerializeField]
-        private MapController _mapController;
+		private AbstractMap _map;
 
         /// <summary>
         /// The rate at which the transform's position tries catch up to the provided location.
@@ -69,14 +71,14 @@ namespace Mapbox.Examples.LocationProvider
 
 		void LocationProvider_OnLocationUpdated(object sender, LocationUpdatedEventArgs e)
 		{
-			if (_mapController.ReferenceTileRect == null)
-            {
-                return;
-            }
+			//if (_map.ReferenceTileRect == null)
+   //         {
+   //             return;
+   //         }
 
             _targetPosition = Conversions.GeoToWorldPosition(e.Location,
-                                                             _mapController.ReferenceTileRect.Center,
-                                                             _mapController.WorldScaleFactor).ToVector3xz();
+			                                                 _map.CenterMercator,
+			                                                 _map.WorldRelativeScale).ToVector3xz();
         }
 
 		void Update()

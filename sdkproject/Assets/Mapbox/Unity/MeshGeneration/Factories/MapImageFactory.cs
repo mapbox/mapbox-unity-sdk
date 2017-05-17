@@ -19,7 +19,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
     /// Uses raster image services to create materials & textures for terrain
     /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Factories/Map Image Factory")]
-	public class MapImageFactory : TileFactory
+	public class MapImageFactory : AbstractTileFactory
     {
         [SerializeField]
         private MapImageType _mapIdType;
@@ -42,20 +42,20 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         [SerializeField]
         bool _useRetina;
 
-        public override void Initialize(IFileSource fs)
-        {
-            base.Initialize(fs);
-            _tiles = new Dictionary<Vector2, UnityTile>();
-        }
+		// TODO: come back to this
+        //public override void Update()
+        //{
+        //    base.Update();
+        //    foreach (var tile in _tiles.Values)
+        //    {
+        //        Run(tile);
+        //    }
+        //}
 
-        public override void Update()
-        {
-            base.Update();
-            foreach (var tile in _tiles.Values)
-            {
-                Run(tile);
-            }
-        }
+		internal override void OnInitialized()
+		{
+			// ? 
+		}
 
 		internal override void OnRegistered(UnityTile tile)
 		{
@@ -64,7 +64,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnUnregistered(UnityTile tile)
 		{
-			//throw new NotImplementedException();
+			// ?
 		}
 
         /// <summary>

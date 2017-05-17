@@ -114,7 +114,8 @@ public class TerrainFactoryEditor : FactoryEditor
 
         if (GUILayout.Button("Update"))
         {
-            _factory.Update();
+            //_factory.Update();
+			Debug.Log("TerrainFactoryEditor: " + "FIX ME!");
         }
 
         serializedObject.ApplyModifiedProperties();

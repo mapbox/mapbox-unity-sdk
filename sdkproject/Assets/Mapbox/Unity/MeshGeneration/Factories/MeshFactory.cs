@@ -12,7 +12,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
     /// Fetches the vector data for given tile and passes layer data to layer visualizers.
     /// </summary>
     [CreateAssetMenu(menuName = "Mapbox/Factories/Mesh Factory")]
-	public class MeshFactory : TileFactory
+	public class MeshFactory : AbstractTileFactory
     {
         [SerializeField]
         private string _mapId = "";
@@ -32,9 +32,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         /// Sets up the Mesh Factory
         /// </summary>
         /// <param name="fs"></param>
-        public override void Initialize(IFileSource fs)
+        internal override void OnInitialized()
         {
-            base.Initialize(fs);
             _layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
             foreach (LayerVisualizerBase factory in Visualizers)
             {
@@ -56,7 +55,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnUnregistered(Data.UnityTile tile)
 		{
-			throw new System.NotImplementedException();
+			// ?
 		}
         /// <summary>
         /// Mesh Factory waits for both Height and Image data to be processed if they are requested

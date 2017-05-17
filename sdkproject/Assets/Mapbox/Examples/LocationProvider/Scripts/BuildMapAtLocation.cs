@@ -1,17 +1,19 @@
-﻿namespace Mapbox.Examples.LocationProvider
+using Mapbox.Unity.Map;
+namespace Mapbox.Examples.LocationProvider
 {
-    using UnityEngine;
-    using Mapbox.Unity.MeshGeneration;
-    using Mapbox.Unity.Location;
+	using UnityEngine;
+	using Mapbox.Unity.MeshGeneration;
+	using Mapbox.Unity.Location;
+	using Mapbox.Unity;
 
-    /// <summary>
-    /// Override the map center (latitude, longitude) for a MapController, based on the DefaultLocationProvider.
-    /// This will enable you to generate a map for your current location, for example.
-    /// </summary>
-    public class BuildMapAtLocation : MonoBehaviour
+	/// <summary>
+	/// Override the map center (latitude, longitude) for a MapController, based on the DefaultLocationProvider.
+	/// This will enable you to generate a map for your current location, for example.
+	/// </summary>
+	public class BuildMapAtLocation : MonoBehaviour
     {
         [SerializeField]
-        MapController _mapController;
+		AbstractMap _map;
 
         ILocationProvider _locationProvider;
         ILocationProvider LocationProvider
@@ -35,8 +37,8 @@
         void LocationProvider_OnLocationUpdated(object sender, Unity.Location.LocationUpdatedEventArgs e)
         {
             LocationProvider.OnLocationUpdated -= LocationProvider_OnLocationUpdated;
-			_mapController.SetLatitudeLongitude(string.Format("{0}, {1}", e.Location.x, e.Location.y));
-            _mapController.enabled = true;
+			_map.CenterLatitudeLongitude = e.Location;
+            _map.enabled = true;
         }
     }
 }

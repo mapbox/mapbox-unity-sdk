@@ -1,37 +1,40 @@
 ﻿namespace Mapbox.Unity.MeshGeneration.Factories
 {
 	using System.Collections.Generic;
+	using Mapbox.Platform;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using UnityEngine;
 
-	public abstract class TileFactory : Factory
+	public abstract class AbstractTileFactory : ScriptableObject
 	{
+		protected IFileSource FileSource;
 		protected Dictionary<Vector2, UnityTile> _tiles;
 
-		public override void Initialize(Platform.IFileSource fileSource)
+		public void Initialize(IFileSource fileSource)
 		{
-			base.Initialize(fileSource);
+			FileSource = fileSource;
 			_tiles = new Dictionary<Vector2, UnityTile>();
+			OnInitialized();
 		}
 
-		public override void Register(UnityTile tile)
+		public void Register(UnityTile tile)
 		{
-			base.Register(tile);
 			_tiles.Add(tile.TileCoordinate, tile);
 			OnRegistered(tile);
 		}
 
-		public override void Unregister(UnityTile tile)
+		public void Unregister(UnityTile tile)
 		{
-			base.Unregister(tile);
 			_tiles.Remove(tile.TileCoordinate);
+
 			// TODO: cancel tile requests!
 			OnUnregistered(tile);
 		}
 
+		internal abstract void OnInitialized();
+
 		internal abstract void OnRegistered(UnityTile tile);
 
-		// TODO: needed?
 		internal abstract void OnUnregistered(UnityTile tile);
 	}
 }
