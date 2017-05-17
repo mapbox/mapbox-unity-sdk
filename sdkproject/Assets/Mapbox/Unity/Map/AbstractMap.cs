@@ -100,6 +100,7 @@
 			}
 		}
 
+		// This is the part that is abstract?
 		protected virtual void Start()
 		{
 			var latLonSplit = _latitudeLongitudeString.Split(',');

@@ -252,7 +252,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9527fd56bc6a0c549a1e550219f9b16e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Speed: 1000
+  Speed: 300
 --- !u!1 &1378964790
 GameObject:
   m_ObjectHideFlags: 0
@@ -453,7 +453,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _latitudeLongitudeString: 40.037543, -105.232748
-  _zoom: 10
+  _zoom: 15
   _root: {fileID: 0}
   _tileProvider: {fileID: 1461465690}
   _mapVisualization: {fileID: 11400000, guid: 7f949b7bf234f3049adb4259192eda3d, type: 2}
@@ -496,8 +496,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _camera: {fileID: 1281281116}
   _visibleBuffer: 2
-  _disposeBuffer: 7
-  _updateInterval: 0.33
+  _disposeBuffer: 5
+  _updateInterval: 0.1
 --- !u!1 &1515605195
 GameObject:
   m_ObjectHideFlags: 0

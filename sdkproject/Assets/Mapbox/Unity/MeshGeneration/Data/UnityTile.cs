@@ -1,133 +1,125 @@
 namespace Mapbox.Unity.MeshGeneration.Data
 {
-    using System.ComponentModel;
-    using JetBrains.Annotations;
-    using UnityEngine;
-    using Mapbox.Unity.MeshGeneration.Enums;
-    using Mapbox.Unity.Utilities;
-    using Utils;
+	using System.ComponentModel;
+	using JetBrains.Annotations;
+	using UnityEngine;
+	using Mapbox.Unity.MeshGeneration.Enums;
+	using Mapbox.Unity.Utilities;
+	using Utils;
+	using System;
 
-    [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
-    public class UnityTile : MonoBehaviour, INotifyPropertyChanged
-    {
-        private MeshRenderer _meshRenderer;
-        public MeshRenderer MeshRenderer
-        {
-            get
-            {
-                if (_meshRenderer == null)
-                    _meshRenderer = GetComponent<MeshRenderer>();
-                return _meshRenderer;
-            }
+	[RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
+	public class UnityTile : MonoBehaviour
+	{
+		private MeshRenderer _meshRenderer;
+		public MeshRenderer MeshRenderer
+		{
+			get
+			{
+				if (_meshRenderer == null)
+				{
+					_meshRenderer = GetComponent<MeshRenderer>();
+				}
+				return _meshRenderer;
+			}
+		}
 
-        }
+		private MeshFilter _meshFilter;
+		public MeshFilter MeshFilter
+		{
+			get
+			{
+				if (_meshFilter == null)
+				{
+					_meshFilter = GetComponent<MeshFilter>();
+				}
+				return _meshFilter;
+			}
+		}
 
-        private MeshFilter _meshFilter;
-        public MeshFilter MeshFilter
-        {
-            get
-            {
-                if (_meshFilter == null)
-                    _meshFilter = GetComponent<MeshFilter>();
-                return _meshFilter;
-            }
-        }
+		private Collider _collider;
+		public Collider Collider
+		{
+			get
+			{
+				if (_collider == null)
+				{
+					_collider = GetComponent<Collider>();
+				}
+				return _collider;
+			}
+		}
 
-        public MeshData MeshData { get; set; }
+		public MeshData MeshData { get; set; }
 
-        #region basic properties //move to a base class?
-        [SerializeField]
-        private Texture2D _heightData;
-        [SerializeField]
-        private Texture2D _imageData;
-        [SerializeField]
-        private string _vectorData;
+		[SerializeField]
+		private Texture2D _heightData;
+		[SerializeField]
+		private Texture2D _imageData;
+		[SerializeField]
+		private string _vectorData;
 
-        public Texture2D ImageData
-        {
-            get { return _imageData; }
-            set
-            {
-                _imageData = value;
-                OnSatelliteDataChanged();
-            }
-        }
-        public Texture2D HeightData
-        {
-            get { return _heightData; }
-            set
-            {
-                _heightData = value;
-                OnHeightDataChanged();
-            }
-        }
-        public string VectorData
-        {
-            get { return _vectorData; }
-            set
-            {
-                _vectorData = value;
-                OnVectorDataChanged();
-            }
-        }
+		public Texture2D ImageData
+		{
+			get { return _imageData; }
+			set
+			{
+				_imageData = value;
+				OnRasterDataChanged(this);
+			}
+		}
+		public Texture2D HeightData
+		{
+			get { return _heightData; }
+			set
+			{
+				_heightData = value;
+				OnHeightDataChanged(this);
+			}
+		}
+		public string VectorData
+		{
+			get { return _vectorData; }
+			set
+			{
+				_vectorData = value;
+				OnVectorDataChanged(this);
+			}
+		}
 
-        public TilePropertyState ImageDataState { get; set; }
-        public TilePropertyState HeightDataState { get; set; }
-        public TilePropertyState VectorDataState { get; set; }
-		#endregion
+		public TilePropertyState RasterDataState { get; set; }
+		public TilePropertyState HeightDataState { get; set; }
+		public TilePropertyState VectorDataState { get; set; }
 
 		public Vector2 TileCoordinate;
 		public int Zoom;
 		public RectD Rect;
 		public float RelativeScale;
 
-        public float QueryHeightData(float x, float y)
-        {
-            if (HeightData != null)
-            {
-                return Conversions.GetRelativeHeightFromColor(HeightData.GetPixel(
-                        (int)Mathf.Clamp((x * 256), 0, 255),
-                        (int)Mathf.Clamp((y * 256), 0, 255)), RelativeScale);
-            }
+		public event Action<UnityTile> OnHeightDataChanged = delegate { };
+		public event Action<UnityTile> OnRasterDataChanged = delegate { };
+		public event Action<UnityTile> OnVectorDataChanged = delegate { };
+		
+		public float QueryHeightData(float x, float y)
+		{
+			if (HeightData != null)
+			{
+				return Conversions.GetRelativeHeightFromColor(HeightData.GetPixel(
+						(int)Mathf.Clamp((x * 256), 0, 255),
+						(int)Mathf.Clamp((y * 256), 0, 255)), RelativeScale);
+			}
 
-            return 0;
-        }
+			return 0;
+		}
 
-        #region Events //again move to base class?
-        public event PropertyChangedEventHandler PropertyChanged;
+		internal void Enable()
+		{
+			gameObject.SetActive(true);
+		}
 
-        public delegate void TileEventArgs(UnityTile sender, object param);
-        public event TileEventArgs HeightDataChanged;
-        public event TileEventArgs ImageDataChanged;
-        public event TileEventArgs VectorDataChanged;
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            var handler = PropertyChanged;
-            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnHeightDataChanged()
-        {
-            var handler = HeightDataChanged;
-            if (handler != null) handler(this, null);
-        }
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnSatelliteDataChanged()
-        {
-            var handler = ImageDataChanged;
-            if (handler != null) handler(this, null);
-        }
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnVectorDataChanged()
-        {
-            var handler = VectorDataChanged;
-            if (handler != null) handler(this, null);
-        }
-        #endregion
-    }
+		internal void Disable()
+		{
+			gameObject.SetActive(false);
+		}
+	}
 }

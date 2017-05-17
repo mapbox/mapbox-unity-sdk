@@ -80,13 +80,20 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnRegistered(UnityTile tile)
 		{
+			if (_addToLayer)
+			{
+				tile.gameObject.layer = _layerId;
+			}
 			Run(tile);
 		}
 
 		internal override void OnUnregistered(UnityTile tile)
 		{
-			_tiles[tile].Cancel();
-			_tiles.Remove(tile);
+			if (_tiles.ContainsKey(tile))
+			{
+				_tiles[tile].Cancel();
+				_tiles.Remove(tile);
+			}
 		}
 
 		private void Run(UnityTile tile)
@@ -112,7 +119,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// <param name="heightMultiplier">Multiplier for queried height value</param>
 		private void CreateTerrainHeight(UnityTile tile, float heightMultiplier = 1)
 		{
-			if (tile.HeightData == null)
+			// FIXME: when does this ever happen?
+			//if (tile.HeightData == null)
 			{
 				var parameters = new Tile.Parameters
 				{
@@ -124,13 +132,17 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				tile.HeightDataState = TilePropertyState.Loading;
 				var pngRasterTile = new RawPngRasterTile();
 				_tiles.Add(tile, pngRasterTile);
+
 				pngRasterTile.Initialize(parameters, () =>
 				{
+					// HACK: we need to check state because a cancel could have happened immediately following a response.
 					if (pngRasterTile.HasError || pngRasterTile.CurrentState == Tile.State.Canceled)
 					{
 						tile.HeightDataState = TilePropertyState.Error;
 						return;
 					}
+					_tiles.Remove(tile);
+
 					var texture = new Texture2D(256, 256);
 					texture.wrapMode = TextureWrapMode.Clamp;
 					texture.LoadImage(pngRasterTile.Data);
@@ -139,10 +151,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					GenerateTerrainMesh(tile, heightMultiplier);
 				});
 			}
-			else
-			{
-				GenerateTerrainMesh(tile, heightMultiplier);
-			}
+			//else
+			//{
+			//	GenerateTerrainMesh(tile, heightMultiplier);
+			//}
 		}
 
 		/// <summary>
@@ -223,7 +235,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				mesh.Normals[i].Normalize();
 			}
 
-			FixStitches(tile, mesh);
+			// FIXME - does not work with recycling?
+			//FixStitches(tile, mesh);
 
 			tile.MeshData = mesh;
 			var uMesh = new Mesh();
@@ -234,15 +247,20 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			tile.MeshFilter.sharedMesh = uMesh;
 
 			if (tile.MeshRenderer.material == null)
+			{
 				tile.MeshRenderer.material = _baseMaterial;
+			}
 
 			if (_addCollider)
 			{
-				go.AddComponent<MeshCollider>();
-			}
-			if (_addToLayer)
-			{
-				go.layer = _layerId;
+				if(tile.Collider == null)
+				{
+					go.AddComponent<MeshCollider>();
+				}
+				else
+				{
+					((MeshCollider)tile.Collider).sharedMesh = uMesh;
+				}
 			}
 		}
 
@@ -275,9 +293,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			mesh.RecalculateNormals();
 			tile.MeshFilter.sharedMesh = mesh;
 			if (tile.MeshRenderer.material == null)
+			{
 				tile.MeshRenderer.material = _baseMaterial;
+			}
 
-			if (_addCollider)
+			if (_addCollider && tile.Collider == null)
 			{
 				var bc = tile.gameObject.AddComponent<BoxCollider>();
 			}

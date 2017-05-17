@@ -20,6 +20,7 @@ namespace Mapbox.Unity.MeshGeneration
 		IMap _map;
 
 		Dictionary<UnwrappedTileId, UnityTile> _activeTiles;
+		Queue<UnityTile> _inactiveTiles;
 
 		/// <summary>
 		/// Initializes the factories by passing the file source down, which's necessary for data (web/file) calls
@@ -29,6 +30,7 @@ namespace Mapbox.Unity.MeshGeneration
 		{
 			_map = map;
 			_activeTiles = new Dictionary<UnwrappedTileId, UnityTile>();
+			_inactiveTiles = new Queue<UnityTile>();
 
 			foreach (var factory in _factories)
 			{
@@ -42,21 +44,36 @@ namespace Mapbox.Unity.MeshGeneration
 		/// <param name="tile"></param>
 		public void InitializeTile(UnwrappedTileId tileId)
 		{
-			// TODO delay any creation. Let factories handle this gameobject instantiation and such?
-			var tile = new GameObject(tileId.ToString()).AddComponent<UnityTile>();
-			tile.Zoom = _map.Zoom;
-			tile.RelativeScale = Conversions.GetTileScaleInMeters(0, _map.Zoom) / Conversions.GetTileScaleInMeters((float)_map.CenterLatitudeLongitude.x, _map.Zoom);
-			tile.TileCoordinate = new Vector2(tileId.X, tileId.Y);
-			tile.Rect = Conversions.TileBounds(tile.TileCoordinate, _map.Zoom);
-			tile.transform.SetParent(_map.Root, false);
-			tile.transform.localPosition = new Vector3((float)(tile.Rect.Center.x - _map.CenterMercator.x), 0, (float)(tile.Rect.Center.y - _map.CenterMercator.y));
+			UnityTile unityTile = null;
 
-			_activeTiles.Add(tileId, tile);
+			if (_inactiveTiles.Count > 0)
+			{
+				unityTile = _inactiveTiles.Dequeue();
+				unityTile.Enable();
+			}
+
+			if (unityTile == null)
+			{
+				unityTile = new GameObject().AddComponent<UnityTile>();
+				unityTile.transform.SetParent(_map.Root, false);
+			}
+
+#if UNITY_EDITOR
+			unityTile.gameObject.name = tileId.ToString();
+#endif
+
+			unityTile.Zoom = _map.Zoom;
+			unityTile.RelativeScale = Conversions.GetTileScaleInMeters(0, _map.Zoom) / Conversions.GetTileScaleInMeters((float)_map.CenterLatitudeLongitude.x, _map.Zoom);
+			unityTile.TileCoordinate = new Vector2(tileId.X, tileId.Y);
+			unityTile.Rect = Conversions.TileBounds(unityTile.TileCoordinate, _map.Zoom);
+			unityTile.transform.localPosition = new Vector3((float)(unityTile.Rect.Center.x - _map.CenterMercator.x), 0, (float)(unityTile.Rect.Center.y - _map.CenterMercator.y));
 
 			foreach (var factory in _factories)
 			{
-				factory.Register(tile);
+				factory.Register(unityTile);
 			}
+
+			_activeTiles.Add(tileId, unityTile);
 		}
 
 		public void DisposeTile(UnwrappedTileId tileId)
@@ -67,13 +84,9 @@ namespace Mapbox.Unity.MeshGeneration
 				factory.Unregister(unityTile);
 			}
 
-			// TODO; destroy or recycle objects in factories, instead.
+			unityTile.Disable();
 			_activeTiles.Remove(tileId);
-
-			// TODO: recycle!
-			// FIXME: at some point game object is destroyed but should be visible? Race condition?
-			Destroy(unityTile.gameObject);
-
+			_inactiveTiles.Enqueue(unityTile);
 		}
 	}
 }

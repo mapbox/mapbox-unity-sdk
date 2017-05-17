@@ -64,27 +64,27 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         private void Run(UnityTile tile)
         {
             if (tile.HeightDataState == TilePropertyState.Loading ||
-                tile.ImageDataState == TilePropertyState.Loading)
+                tile.RasterDataState == TilePropertyState.Loading)
             {
-                tile.HeightDataChanged += HeightDataChangedHandler;
-                tile.ImageDataChanged += ImageDataChangedHandler;
+                tile.OnHeightDataChanged += HeightDataChangedHandler;
+                tile.OnRasterDataChanged += ImageDataChangedHandler;
             }
             else
             {
-                CreateMeshes(tile, null);
+                CreateMeshes(tile);
             }
         }
 
-        private void HeightDataChangedHandler(UnityTile t, object e)
+        private void HeightDataChangedHandler(UnityTile t)
         {
-            if (t.ImageDataState != TilePropertyState.Loading)
-                CreateMeshes(t, e);
+            if (t.RasterDataState != TilePropertyState.Loading)
+                CreateMeshes(t);
         }
 
-        private void ImageDataChangedHandler(UnityTile t, object e)
+        private void ImageDataChangedHandler(UnityTile t)
         {
             if (t.HeightDataState != TilePropertyState.Loading)
-                CreateMeshes(t, e);
+                CreateMeshes(t);
         }
 
 
@@ -93,10 +93,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         /// </summary>
         /// <param name="tile"></param>
         /// <param name="e"></param>
-        private void CreateMeshes(UnityTile tile, object e)
+        private void CreateMeshes(UnityTile tile)
         {
-            tile.HeightDataChanged -= HeightDataChangedHandler;
-            tile.ImageDataChanged -= ImageDataChangedHandler;
+            tile.OnHeightDataChanged -= HeightDataChangedHandler;
+            tile.OnRasterDataChanged -= ImageDataChangedHandler;
 
             var parameters = new Mapbox.Map.Tile.Parameters
             {

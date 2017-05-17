@@ -66,8 +66,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnUnregistered(UnityTile tile)
 		{
-			_tiles[tile].Cancel();
-			_tiles.Remove(tile);
+			if (_tiles.ContainsKey(tile))
+			{
+				_tiles[tile].Cancel();
+				_tiles.Remove(tile);
+			}
 		}
 
 		/// <summary>
@@ -84,7 +87,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				parameters.Id = new CanonicalTileId(tile.Zoom, (int)tile.TileCoordinate.x, (int)tile.TileCoordinate.y);
 				parameters.MapId = _mapId;
 
-				tile.ImageDataState = TilePropertyState.Loading;
+				tile.RasterDataState = TilePropertyState.Loading;
 
 				RasterTile rasterTile;
 				if (parameters.MapId.StartsWith("mapbox://", StringComparison.Ordinal))
@@ -99,27 +102,31 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				_tiles.Add(tile, rasterTile);
 				rasterTile.Initialize(parameters, (Action)(() =>
 				{
-					// HACK: we don't need to check state if we can forward abort to error in response.
+					// HACK: we need to check state because a cancel could have happened immediately following a response.
 					if (rasterTile.HasError || rasterTile.CurrentState == Tile.State.Canceled)
 					{
-						tile.ImageDataState = TilePropertyState.Error;
+						tile.RasterDataState = TilePropertyState.Error;
 						return;
 					}
 
-					// TODO: Optimize--get from unitytile object?
-					var rend = tile.GetComponent<MeshRenderer>();
-					rend.material = _baseMaterial;
-					tile.ImageData = new Texture2D(0, 0, TextureFormat.RGB24, _useMipMap);
-					tile.ImageData.wrapMode = TextureWrapMode.Clamp;
+					_tiles.Remove(tile);
+
+					if (tile.ImageData == null)
+					{
+						tile.ImageData = new Texture2D(0, 0, TextureFormat.RGB24, _useMipMap);
+						tile.ImageData.wrapMode = TextureWrapMode.Clamp;
+						tile.MeshRenderer.material = _baseMaterial;
+						tile.MeshRenderer.material.mainTexture = tile.ImageData;
+					}
+
 					tile.ImageData.LoadImage(rasterTile.Data);
 					if (_useCompression)
 					{
 						// High quality = true seems to decrease image quality?
 						tile.ImageData.Compress(false);
 					}
-					rend.material.mainTexture = tile.ImageData;
-					tile.ImageDataState = TilePropertyState.Loaded;
 
+					tile.RasterDataState = TilePropertyState.Loaded;
 				}));
 			}
 			else
