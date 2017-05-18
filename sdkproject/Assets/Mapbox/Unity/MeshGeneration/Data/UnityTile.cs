@@ -6,7 +6,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 	using Utils;
 	using System;
 
-	[RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
+	//[RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
 	public class UnityTile : MonoBehaviour
 	{
 		float[] _heightData;
@@ -103,7 +103,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		internal void SetHeightData(byte[] data)
+		internal void SetHeightData(byte[] data, float heightMultiplier = 1f)
 		{
 			// HACK: compute height values for terrain. We could probably do this without a texture2d.
 			var heightTexture = new Texture2D(0, 0);
@@ -122,7 +122,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 			for (int i = 0; i < count; i++)
 			{
-				var height = Conversions.GetAbsoluteHeightFromColor32(colors[i]) * RelativeScale;
+				var height = Conversions.GetAbsoluteHeightFromColor32(colors[i]) * RelativeScale * heightMultiplier;
 				_heightData[i] = height;
 			}
 
@@ -160,6 +160,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				_rasterData.Compress(false);
 			}
 
+			RasterDataState = TilePropertyState.Loaded;
 			OnRasterDataChanged(this);
 		}
 

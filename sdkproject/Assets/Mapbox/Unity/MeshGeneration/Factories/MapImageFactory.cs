@@ -78,7 +78,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		private void Run(UnityTile tile)
 		{
 			var parameters = new Tile.Parameters();
-			parameters.Fs = this._fileSource;
+			parameters.Fs = _fileSource;
 			parameters.Id = new CanonicalTileId(tile.Zoom, (int)tile.TileCoordinate.x, (int)tile.TileCoordinate.y);
 			parameters.MapId = _mapId;
 
@@ -105,22 +105,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 
 				_tiles.Remove(tile);
-
-				//// Don't leak the texture, just reuse it.
-				//if (tile.RasterData == null)
-				//{
-				//	tile.RasterData = new Texture2D(0, 0, TextureFormat.RGB24, _useMipMap);
-				//	tile.RasterData.wrapMode = TextureWrapMode.Clamp;
-				//	tile.MeshRenderer.material = _baseMaterial;
-				//	tile.MeshRenderer.material.mainTexture = tile.RasterData;
-				//}
-
-				//tile.RasterData.LoadImage(rasterTile.Data);
-				//if (_useCompression)
-				//{
-				//	// High quality = true seems to decrease image quality?
-				//	tile.RasterData.Compress(false);
-				//}
 
 				tile.SetRasterData(rasterTile.Data, _useMipMap, _useCompression);
 				tile.RasterDataState = TilePropertyState.Loaded;

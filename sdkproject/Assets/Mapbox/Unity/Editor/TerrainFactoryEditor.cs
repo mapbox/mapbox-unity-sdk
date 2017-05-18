@@ -58,24 +58,6 @@ public class TerrainFactoryEditor : FactoryEditor
                 break;
 
             case TerrainGenerationType.Height:
-                {
-                    EditorGUILayout.PropertyField(mapIdType_Prop);
-                    switch ((MapIdType)mapIdType_Prop.enumValueIndex)
-                    {
-                        case MapIdType.Standard:
-                            GUI.enabled = false;
-                            EditorGUILayout.PropertyField(mapId_Prop, new GUIContent("Map Id"));
-                            mapId_Prop.stringValue = _defaultMapId;
-                            GUI.enabled = true;
-                            break;
-                        case MapIdType.Custom:
-                            EditorGUILayout.PropertyField(customMapId_Prop, new GUIContent("Map Id"));
-                            mapId_Prop.stringValue = customMapId_Prop.stringValue;
-                            break;
-                    }
-                    break;
-                }
-            case TerrainGenerationType.ModifiedHeight:
                 EditorGUILayout.PropertyField(mapIdType_Prop);
                 switch ((MapIdType)mapIdType_Prop.enumValueIndex)
                 {

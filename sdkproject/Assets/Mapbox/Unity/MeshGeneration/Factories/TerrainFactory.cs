@@ -12,8 +12,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	public enum TerrainGenerationType
 	{
 		Flat,
-		Height,
-		ModifiedHeight
+		Height
 	}
 
 	public enum MapIdType
@@ -85,10 +84,18 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				tile.gameObject.layer = _layerId;
 			}
-			if (tile.MeshRenderer.material == null)
+
+			if (tile.MeshRenderer == null)
 			{
+				var renderer = tile.gameObject.AddComponent<MeshRenderer>();
 				tile.MeshRenderer.material = _baseMaterial;
 			}
+
+			if (tile.MeshFilter == null)
+			{
+				tile.gameObject.AddComponent<MeshFilter>();
+			}
+
 			Run(tile);
 		}
 
@@ -103,17 +110,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		private void Run(UnityTile tile)
 		{
-			if (_generationType == TerrainGenerationType.Height)
-			{
-				CreateTerrainHeight(tile);
-			}
-			else if (_generationType == TerrainGenerationType.ModifiedHeight)
-			{
-				CreateTerrainHeight(tile, _heightModifier);
-			}
-			else if (_generationType == TerrainGenerationType.Flat)
+			if (_generationType == TerrainGenerationType.Flat)
 			{
 				CreateFlatMesh(tile);
+			}
+			else
+			{
+				CreateTerrainHeight(tile);
 			}
 		}
 
@@ -122,11 +125,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// </summary>
 		/// <param name="tile"></param>
 		/// <param name="heightMultiplier">Multiplier for queried height value</param>
-		private void CreateTerrainHeight(UnityTile tile, float heightMultiplier = 1)
+		private void CreateTerrainHeight(UnityTile tile)
 		{
 			var parameters = new Tile.Parameters
 			{
-				Fs = this._fileSource,
+				Fs = _fileSource,
 				Id = new CanonicalTileId(tile.Zoom, (int)tile.TileCoordinate.x, (int)tile.TileCoordinate.y),
 				MapId = _mapId
 			};
@@ -149,8 +152,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 				_tiles.Remove(tile);
 
-				tile.SetHeightData(pngRasterTile.Data);
-				GenerateTerrainMesh(tile, heightMultiplier);
+				tile.SetHeightData(pngRasterTile.Data, _heightModifier);
+				GenerateTerrainMesh(tile);
 			});
 		}
 
@@ -160,7 +163,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// </summary>
 		/// <param name="tile"></param>
 		/// <param name="heightMultiplier">Multiplier for queried height value</param>
-		private void GenerateTerrainMesh(UnityTile tile, float heightMultiplier)
+		private void GenerateTerrainMesh(UnityTile tile)
 		{
 			var mesh = new MeshData();
 			mesh.Vertices = new List<Vector3>(_sampleCount * _sampleCount);
@@ -177,7 +180,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 					mesh.Vertices.Add(new Vector3(
 						(float)(xx - tile.Rect.Center.x),
-						heightMultiplier * tile.QueryHeightData(xrat, 1 - yrat),
+						tile.QueryHeightData(xrat, 1 - yrat),
 						(float)(yy - tile.Rect.Center.y)));
 					mesh.Normals.Add(Unity.Constants.Math.Vector3Up);
 					mesh.UV[0].Add(new Vector2(x * step, 1 - (y * step)));
@@ -226,6 +229,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			tile.MeshData = mesh;
 
+			// FIXME: recycling tiles that were once quads causes issues!
 			// Don't leak the mesh, just reuse it.
 			//var unityMesh = new Mesh();
 			var unityMesh = tile.MeshFilter.sharedMesh ?? new Mesh();
