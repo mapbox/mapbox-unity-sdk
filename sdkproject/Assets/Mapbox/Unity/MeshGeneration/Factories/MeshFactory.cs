@@ -63,7 +63,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				_tiles[tile].Cancel();
 				_tiles.Remove(tile);
-
 			}
 
 			// We are no longer interested in this tile's notifications.
@@ -138,6 +137,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 
 				_tiles.Remove(tile);
+
+				// TODO: move unitytile state registrations to layer visualizers. Not everyone is interested in this data
+				// and we should not wait for it here!
 				foreach (var layerName in vectorTile.Data.LayerNames())
 				{
 					if (_layerBuilder.ContainsKey(layerName))

@@ -45,6 +45,7 @@ namespace Mapbox.Examples
 			}
 		}
 
+		// TODO: add acceleration!
 		void LeftMouseDrag()
 		{
 			Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition) - _panOrigin;

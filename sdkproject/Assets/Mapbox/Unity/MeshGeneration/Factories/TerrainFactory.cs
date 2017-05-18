@@ -88,7 +88,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			if (tile.MeshRenderer == null)
 			{
 				var renderer = tile.gameObject.AddComponent<MeshRenderer>();
-				tile.MeshRenderer.material = _baseMaterial;
+				renderer.material = _baseMaterial;
 			}
 
 			if (tile.MeshFilter == null)
@@ -293,6 +293,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				unityMesh.uv = uvlist;
 				unityMesh.RecalculateNormals();
 
+				// HACK: comment this out if you see rendering bugs related to elevation!
 				_cachedQuad = unityMesh;
 			}
 

@@ -6,7 +6,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 	using Utils;
 	using System;
 
-	//[RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
 	public class UnityTile : MonoBehaviour
 	{
 		float[] _heightData;
