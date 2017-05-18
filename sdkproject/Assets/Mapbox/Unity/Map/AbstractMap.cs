@@ -81,14 +81,7 @@
 			}
 		}
 
-		bool _isInitialized;
-		public bool IsInitialized
-		{
-			get
-			{
-				return _isInitialized;
-			}
-		}
+		public event Action OnInitialized = delegate { };
 
 		protected virtual void Awake()
 		{
@@ -125,7 +118,7 @@
 			_mapVisualizer.Initialize(this, _fileSouce);
 			_tileProvider.Initialize(this);
 
-			_isInitialized = true;
+			OnInitialized();
 		}
 
 		void TileProvider_OnTileAdded(UnwrappedTileId tileId)

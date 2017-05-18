@@ -25,6 +25,8 @@ namespace Mapbox.Examples.LocationProvider
         [SerializeField]
         bool _useTransformLocationProvider;
 
+		bool _isInitialized;
+
         /// <summary>
         /// The location provider.
         /// This is public so you change which concrete <see cref="T:Mapbox.Unity.Location.ILocationProvider"/> to use at runtime.
@@ -56,9 +58,10 @@ namespace Mapbox.Examples.LocationProvider
 
 		Vector3 _targetPosition;
 
-		void Start()
+		void Awake()
 		{
 			LocationProvider.OnLocationUpdated += LocationProvider_OnLocationUpdated;
+			_map.OnInitialized += () => _isInitialized = true;
 		}
 
 		void OnDestroy()
@@ -71,14 +74,12 @@ namespace Mapbox.Examples.LocationProvider
 
 		void LocationProvider_OnLocationUpdated(object sender, LocationUpdatedEventArgs e)
 		{
-			if (!_map.IsInitialized)
+			if (_isInitialized)
 			{
-				return;
+				_targetPosition = Conversions.GeoToWorldPosition(e.Location,
+																 _map.CenterMercator,
+																 _map.WorldRelativeScale).ToVector3xz();
 			}
-
-			_targetPosition = Conversions.GeoToWorldPosition(e.Location,
-			                                                 _map.CenterMercator,
-			                                                 _map.WorldRelativeScale).ToVector3xz();
         }
 
 		void Update()
