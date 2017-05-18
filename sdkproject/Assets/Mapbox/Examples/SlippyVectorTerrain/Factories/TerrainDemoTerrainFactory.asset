@@ -11,13 +11,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8338f26893d62c1439f387800a8e1c9a, type: 3}
   m_Name: TerrainDemoTerrainFactory
   m_EditorClassIdentifier: 
-  _generationType: 1
-  _baseMaterial: {fileID: 0}
+  _generationType: 0
+  _baseMaterial: {fileID: 2100000, guid: fdf26842f5143fe47802eb3f1c072614, type: 2}
   _mapIdType: 0
   _customMapId: mapbox.terrain-rgb
   _mapId: mapbox.terrain-rgb
   _heightModifier: 10
-  _sampleCount: 20
-  _addCollider: 1
-  _addToLayer: 1
+  _sampleCount: 80
+  _addCollider: 0
+  _addToLayer: 0
   _layerId: 8

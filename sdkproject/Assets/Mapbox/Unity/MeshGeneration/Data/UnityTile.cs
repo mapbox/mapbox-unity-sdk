@@ -50,17 +50,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		Texture2D _rasterData;
-		public Texture2D RasterData
-		{
-			get { return _rasterData; }
-			set
-			{
-				_rasterData = value;
-				OnRasterDataChanged(this);
-			}
-		}
-
 		string _vectorData;
 		public string VectorData
 		{
@@ -97,7 +86,12 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		{
 			gameObject.SetActive(false);
 
-			// TODO: reset states and such.
+			// Reset internal state.
+			RasterDataState = TilePropertyState.None;
+			HeightDataState = TilePropertyState.None;
+			VectorDataState = TilePropertyState.None;
+
+			// HACK: this is for vector layer features and such.
 			var childCount = transform.childCount;
 			if (childCount > 0)
 			{
@@ -108,8 +102,16 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		internal void SetHeightData(Color32[] colors)
+		internal void SetHeightData(byte[] data)
 		{
+			// HACK: compute height values for terrain. We could probably do this without a texture2d.
+			var heightTexture = new Texture2D(0, 0);
+			heightTexture.LoadImage(data);
+			var colors = heightTexture.GetPixels32();
+
+			// Get rid of this temporary texture. We don't need it, and we don't want to leak it.
+			Destroy(heightTexture);
+
 			var count = colors.Length;
 
 			if (_heightData == null)
@@ -123,6 +125,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				_heightData[i] = height;
 			}
 
+			HeightDataState = TilePropertyState.Loaded;
 			OnHeightDataChanged(this);
 		}
 
@@ -130,10 +133,38 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		{
 			if (_heightData != null)
 			{
-				return _heightData[(int)(y * 256 + x)];
+				var intX = (int)Mathf.Clamp(x * 256, 0, 255);
+				var intY = (int)Mathf.Clamp(y * 256, 0, 255);
+				return _heightData[intY * 256 + intX];
 			}
 
 			return 0;
+		}
+
+		Texture2D _rasterData;
+		public void SetRasterData(byte[] data, bool useMipMap, bool useCompression)
+		{
+			// Don't leak the texture, just reuse it.
+			if (_rasterData == null)
+			{
+				_rasterData = new Texture2D(0, 0, TextureFormat.RGB24, useMipMap);
+				_rasterData.wrapMode = TextureWrapMode.Clamp;
+				MeshRenderer.material.mainTexture = _rasterData;
+			}
+
+			_rasterData.LoadImage(data);
+			if (useCompression)
+			{
+				// High quality = true seems to decrease image quality?
+				_rasterData.Compress(false);
+			}
+
+			OnRasterDataChanged(this);
+		}
+
+		public Texture2D GetRasterData()
+		{
+			return _rasterData;
 		}
 	}
 }

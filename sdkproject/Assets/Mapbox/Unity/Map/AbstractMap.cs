@@ -42,7 +42,7 @@
 		AbstractTileProvider _tileProvider;
 
 		[SerializeField]
-		MapVisualization _mapVisualization;
+		MapVisualizer _mapVisualizer;
 
 		[SerializeField]
 		float _unityTileSize = 100;
@@ -112,18 +112,18 @@
 			_worldRelativeScale = (float)(_unityTileSize / referenceTileRect.Size.x);
 			Root.localScale = Vector3.one * _worldRelativeScale;
 
-			_mapVisualization.Initialize(this, _fileSouce);
+			_mapVisualizer.Initialize(this, _fileSouce);
 			_tileProvider.Initialize(this);
 		}
 
 		void TileProvider_OnTileAdded(UnwrappedTileId tileId)
 		{
-			_mapVisualization.LoadTile(tileId);
+			_mapVisualizer.LoadTile(tileId);
 		}
 
 		void TileProvider_OnTileRemoved(UnwrappedTileId tileId)
 		{
-			_mapVisualization.DisposeTile(tileId);
+			_mapVisualizer.DisposeTile(tileId);
 		}
 	}
 }

@@ -55,7 +55,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
             var rx = (met.x - tile.Rect.Min.x) / tile.Rect.Size.x;
             var ry = 1 - (met.z - tile.Rect.Min.y) / tile.Rect.Size.y;
-            var h = tile.QueryHeightData((float)rx, (float)ry);
+            var h = tile.QueryHeightData((int)rx, (int)ry);
             met.y += h;
             go.transform.position = met;
             go.transform.SetParent(parent.transform, false);

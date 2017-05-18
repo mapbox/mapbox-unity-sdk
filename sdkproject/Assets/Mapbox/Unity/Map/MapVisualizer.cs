@@ -12,7 +12,7 @@ namespace Mapbox.Unity.MeshGeneration
 	using Mapbox.Unity.Map;
 
 	[CreateAssetMenu(menuName = "Mapbox/MapVisualization")]
-	public class MapVisualization : ScriptableObject
+	public class MapVisualizer : ScriptableObject
 	{
 		[SerializeField]
 		AbstractTileFactory[] _factories;

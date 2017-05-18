@@ -53,6 +53,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		private Vector2 _stitchTarget;
 
+		Mesh _cachedQuad;
+
 		protected Dictionary<UnityTile, Tile> _tiles;
 
 		/// <summary>
@@ -79,9 +81,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnRegistered(UnityTile tile)
 		{
-			if (_addToLayer)
+			if (_addToLayer && tile.gameObject.layer != _layerId)
 			{
 				tile.gameObject.layer = _layerId;
+			}
+			if (tile.MeshRenderer.material == null)
+			{
+				tile.MeshRenderer.material = _baseMaterial;
 			}
 			Run(tile);
 		}
@@ -118,46 +124,34 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// <param name="heightMultiplier">Multiplier for queried height value</param>
 		private void CreateTerrainHeight(UnityTile tile, float heightMultiplier = 1)
 		{
-			// FIXME: when does this ever happen?
-			//if (tile.HeightData == null)
+			var parameters = new Tile.Parameters
 			{
-				var parameters = new Tile.Parameters
+				Fs = this.FileSource,
+				Id = new CanonicalTileId(tile.Zoom, (int)tile.TileCoordinate.x, (int)tile.TileCoordinate.y),
+				MapId = _mapId
+			};
+
+			tile.HeightDataState = TilePropertyState.Loading;
+
+			var pngRasterTile = new RawPngRasterTile();
+
+			_tiles.Add(tile, pngRasterTile);
+			pngRasterTile.Initialize(parameters, () =>
+			{
+				// HACK: we need to check state because a cancel could have happened immediately following a response.
+				if (pngRasterTile.HasError || pngRasterTile.CurrentState == Tile.State.Canceled)
 				{
-					Fs = this.FileSource,
-					Id = new CanonicalTileId(tile.Zoom, (int)tile.TileCoordinate.x, (int)tile.TileCoordinate.y),
-					MapId = _mapId
-				};
+					tile.HeightDataState = TilePropertyState.Error;
 
-				tile.HeightDataState = TilePropertyState.Loading;
-				var pngRasterTile = new RawPngRasterTile();
-				_tiles.Add(tile, pngRasterTile);
+					// HACK: handle missing tile from server (404)!
+					CreateFlatMesh(tile);
+					return;
+				}
+				_tiles.Remove(tile);
 
-				pngRasterTile.Initialize(parameters, () =>
-				{
-					// HACK: we need to check state because a cancel could have happened immediately following a response.
-					if (pngRasterTile.HasError || pngRasterTile.CurrentState == Tile.State.Canceled)
-					{
-						tile.HeightDataState = TilePropertyState.Error;
-
-						// HACK: handle missing tile from server (404)!
-						CreateFlatMesh(tile);
-						return;
-					}
-					_tiles.Remove(tile);
-
-					var heightTexture = new Texture2D(0, 0);
-					heightTexture.LoadImage(pngRasterTile.Data);
-					var colors = heightTexture.GetPixels32();
-					Destroy(heightTexture);
-					tile.SetHeightData(colors);
-					tile.HeightDataState = TilePropertyState.Loaded;
-					GenerateTerrainMesh(tile, heightMultiplier);
-				});
-			}
-			//else
-			//{
-			//	GenerateTerrainMesh(tile, heightMultiplier);
-			//}
+				tile.SetHeightData(pngRasterTile.Data);
+				GenerateTerrainMesh(tile, heightMultiplier);
+			});
 		}
 
 		/// <summary>
@@ -168,7 +162,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// <param name="heightMultiplier">Multiplier for queried height value</param>
 		private void GenerateTerrainMesh(UnityTile tile, float heightMultiplier)
 		{
-			var go = tile.gameObject;
 			var mesh = new MeshData();
 			mesh.Vertices = new List<Vector3>(_sampleCount * _sampleCount);
 			var step = 1f / (_sampleCount - 1);
@@ -184,7 +177,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 					mesh.Vertices.Add(new Vector3(
 						(float)(xx - tile.Rect.Center.x),
-						heightMultiplier * tile.QueryHeightData((int)(xrat * 255),(int)((1 - yrat) * 255)),
+						heightMultiplier * tile.QueryHeightData(xrat, 1 - yrat),
 						(float)(yy - tile.Rect.Center.y)));
 					mesh.Normals.Add(Unity.Constants.Math.Vector3Up);
 					mesh.UV[0].Add(new Vector2(x * step, 1 - (y * step)));
@@ -240,18 +233,20 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			unityMesh.SetNormals(mesh.Normals);
 			unityMesh.SetTriangles(mesh.Triangles[0], 0);
 			unityMesh.RecalculateBounds();
+
+			// TODO: should we recalculate normals here, too?
 			tile.MeshFilter.sharedMesh = unityMesh;
 
-			if (tile.MeshRenderer.material == null)
-			{
-				tile.MeshRenderer.material = _baseMaterial;
-			}
+			//if (tile.MeshRenderer.material == null)
+			//{
+			//tile.MeshRenderer.material = _baseMaterial;
+			//}
 
 			if (_addCollider)
 			{
 				if (tile.Collider == null)
 				{
-					go.AddComponent<MeshCollider>();
+					tile.gameObject.AddComponent<MeshCollider>();
 				}
 				else
 				{
@@ -268,39 +263,52 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// <param name="tile"></param>
 		private void CreateFlatMesh(UnityTile tile)
 		{
-			var mesh = new Mesh();
-			var verts = new Vector3[4];
-
-			verts[0] = ((tile.Rect.Min - tile.Rect.Center).ToVector3xz());
-			verts[2] = (new Vector3((float)(tile.Rect.Min.x - tile.Rect.Center.x), 0, (float)(tile.Rect.Max.y - tile.Rect.Center.y)));
-			verts[1] = (new Vector3((float)(tile.Rect.Max.x - tile.Rect.Center.x), 0, (float)(tile.Rect.Min.y - tile.Rect.Center.y)));
-			verts[3] = ((tile.Rect.Max - tile.Rect.Center).ToVector3xz());
-
-			mesh.vertices = verts;
-			var trilist = new int[6] { 0, 1, 2, 1, 3, 2 };
-			mesh.SetTriangles(trilist, 0);
-			var uvlist = new Vector2[4]
+			Mesh unityMesh = null;
+			if (_cachedQuad != null)
 			{
+				Debug.Log("TerrainFactory: " + "USING CACHE");
+				unityMesh = _cachedQuad;
+			}
+			else
+			{
+				unityMesh = new Mesh();
+				var verts = new Vector3[4];
+
+				verts[0] = ((tile.Rect.Min - tile.Rect.Center).ToVector3xz());
+				verts[2] = (new Vector3((float)(tile.Rect.Min.x - tile.Rect.Center.x), 0, (float)(tile.Rect.Max.y - tile.Rect.Center.y)));
+				verts[1] = (new Vector3((float)(tile.Rect.Max.x - tile.Rect.Center.x), 0, (float)(tile.Rect.Min.y - tile.Rect.Center.y)));
+				verts[3] = ((tile.Rect.Max - tile.Rect.Center).ToVector3xz());
+
+				unityMesh.vertices = verts;
+				var trilist = new int[6] { 0, 1, 2, 1, 3, 2 };
+				unityMesh.SetTriangles(trilist, 0);
+				var uvlist = new Vector2[4]
+				{
 				new Vector2(0,1),
 				new Vector2(1,1),
 				new Vector2(0,0),
 				new Vector2(1,0)
-			};
-			mesh.uv = uvlist;
-			mesh.RecalculateNormals();
-			tile.MeshFilter.sharedMesh = mesh;
-			if (tile.MeshRenderer.material == null)
-			{
-				tile.MeshRenderer.material = _baseMaterial;
+				};
+
+				unityMesh.uv = uvlist;
+				unityMesh.RecalculateNormals();
+
+				_cachedQuad = unityMesh;
 			}
 
-			if (_addCollider && tile.Collider == null)
+			tile.MeshFilter.sharedMesh = unityMesh;
+
+			if (_addCollider)
 			{
-				var bc = tile.gameObject.AddComponent<MeshCollider>();
-			}
-			if (_addToLayer)
-			{
-				tile.gameObject.layer = _layerId;
+				if (tile.Collider == null)
+				{
+					tile.gameObject.AddComponent<MeshCollider>();
+				}
+				else
+				{
+					// Reuse the collider.
+					tile.Collider.sharedMesh = unityMesh;
+				}
 			}
 		}
 

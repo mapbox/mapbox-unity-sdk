@@ -30,9 +30,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		private string _mapId = "";
 
 		[SerializeField]
-		public Material _baseMaterial;
-
-		[SerializeField]
 		bool _useCompression = true;
 
 		[SerializeField]
@@ -85,8 +82,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			parameters.Id = new CanonicalTileId(tile.Zoom, (int)tile.TileCoordinate.x, (int)tile.TileCoordinate.y);
 			parameters.MapId = _mapId;
 
-			tile.RasterDataState = TilePropertyState.Loading;
-
 			RasterTile rasterTile;
 			if (parameters.MapId.StartsWith("mapbox://", StringComparison.Ordinal))
 			{
@@ -97,8 +92,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				rasterTile = _useRetina ? new ClassicRetinaRasterTile() : new ClassicRasterTile();
 			}
 
+			tile.RasterDataState = TilePropertyState.Loading;
+
 			_tiles.Add(tile, rasterTile);
-			rasterTile.Initialize(parameters, (Action)(() =>
+			rasterTile.Initialize(parameters, () =>
 			{
 				// HACK: we need to check state because a cancel could have happened immediately following a response.
 				if (rasterTile.HasError || rasterTile.CurrentState == Tile.State.Canceled)
@@ -109,24 +106,25 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 				_tiles.Remove(tile);
 
-				// Don't leak the texture, just reuse it.
-				if (tile.RasterData == null)
-				{
-					tile.RasterData = new Texture2D(0, 0, TextureFormat.RGB24, _useMipMap);
-					tile.RasterData.wrapMode = TextureWrapMode.Clamp;
-					tile.MeshRenderer.material = _baseMaterial;
-					tile.MeshRenderer.material.mainTexture = tile.RasterData;
-				}
+				//// Don't leak the texture, just reuse it.
+				//if (tile.RasterData == null)
+				//{
+				//	tile.RasterData = new Texture2D(0, 0, TextureFormat.RGB24, _useMipMap);
+				//	tile.RasterData.wrapMode = TextureWrapMode.Clamp;
+				//	tile.MeshRenderer.material = _baseMaterial;
+				//	tile.MeshRenderer.material.mainTexture = tile.RasterData;
+				//}
 
-				tile.RasterData.LoadImage(rasterTile.Data);
-				if (_useCompression)
-				{
-					// High quality = true seems to decrease image quality?
-					tile.RasterData.Compress(false);
-				}
+				//tile.RasterData.LoadImage(rasterTile.Data);
+				//if (_useCompression)
+				//{
+				//	// High quality = true seems to decrease image quality?
+				//	tile.RasterData.Compress(false);
+				//}
 
+				tile.SetRasterData(rasterTile.Data, _useMipMap, _useCompression);
 				tile.RasterDataState = TilePropertyState.Loaded;
-			}));
+			});
 		}
 	}
 }

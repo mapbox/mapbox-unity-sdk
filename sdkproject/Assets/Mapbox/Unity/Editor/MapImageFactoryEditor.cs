@@ -8,7 +8,6 @@ public class MapImageFactoryEditor : FactoryEditor
     private MapImageFactory _factory;
     public SerializedProperty
         mapIdType_Prop,
-        material_Prop,
         basicMaps_Prop,
         customMapId_Prop,
         useMipMap_Prop,
@@ -40,7 +39,6 @@ public class MapImageFactoryEditor : FactoryEditor
         customMapId_Prop = serializedObject.FindProperty("_customMapId");
         mapIdType_Prop = serializedObject.FindProperty("_mapIdType");
         mapId_Prop = serializedObject.FindProperty("_mapId");
-        material_Prop = serializedObject.FindProperty("_baseMaterial");
         useMipMap_Prop = serializedObject.FindProperty("_useMipMap");
         useCompression_Prop = serializedObject.FindProperty("_useCompression");
         useRetina_Prop = serializedObject.FindProperty("_useRetina");
@@ -78,7 +76,6 @@ public class MapImageFactoryEditor : FactoryEditor
                     GUI.enabled = false;
                     EditorGUILayout.PropertyField(mapId_Prop, new GUIContent("Map Id"));
                     GUI.enabled = true;
-                    EditorGUILayout.PropertyField(material_Prop, new GUIContent("Material"));
                     break;
                 }
             case MapImageType.Custom:
@@ -89,7 +86,6 @@ public class MapImageFactoryEditor : FactoryEditor
 					{
 						EditorGUILayout.HelpBox("Invalid MapID. This will cause invalid tile requests!", MessageType.Error);
 					}
-                    EditorGUILayout.PropertyField(material_Prop, new GUIContent("Material"));
                     break;
                 }
             case MapImageType.None:
