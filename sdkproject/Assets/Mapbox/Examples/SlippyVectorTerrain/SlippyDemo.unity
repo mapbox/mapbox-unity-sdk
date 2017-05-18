@@ -234,10 +234,10 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1281281112}
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 2000, z: 0}
+  m_LocalRotation: {x: 0.5, y: 0, z: 0, w: 0.8660254}
+  m_LocalPosition: {x: 0, y: 200, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 60, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -252,7 +252,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9527fd56bc6a0c549a1e550219f9b16e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Speed: 300
+  Speed: 100
 --- !u!1 &1378964790
 GameObject:
   m_ObjectHideFlags: 0
@@ -433,7 +433,6 @@ GameObject:
   - 4: {fileID: 1461465688}
   - 114: {fileID: 1461465687}
   - 114: {fileID: 1461465690}
-  - 114: {fileID: 1461465689}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -452,8 +451,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd961b1c9541a4cee99686069ecce852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _latitudeLongitudeString: 40.037543, -105.232748
-  _zoom: 17
+  _latitudeLongitudeString: 69.551461, 20.566388
+  _zoom: 10
   _root: {fileID: 0}
   _tileProvider: {fileID: 1461465690}
   _mapVisualizer: {fileID: 11400000, guid: 78d4f9b7fc8ac45c487ad9ea051422e6, type: 2}
@@ -471,18 +470,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
---- !u!114 &1461465689
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1461465686}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d7ff8ed3b76a4ee5a451d64a5393e3f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _range: {x: 1, y: 1, z: 1, w: 1}
 --- !u!114 &1461465690
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -496,8 +483,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _camera: {fileID: 1281281116}
   _visibleBuffer: 1
-  _disposeBuffer: 10
-  _updateInterval: 0.1
+  _disposeBuffer: 5
+  _updateInterval: 0.33
 --- !u!1 &1515605195
 GameObject:
   m_ObjectHideFlags: 0

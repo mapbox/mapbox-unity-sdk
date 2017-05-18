@@ -27,6 +27,7 @@ namespace Mapbox.Unity.Utilities
 
 		public HTTPRequest(string url, Action<Response> callback, int timeout = 10)
 		{
+			//UnityEngine.Debug.Log("HTTPRequest: " + url);
 			IsCompleted = false;
 			_timeout = timeout;
 			_request = UnityWebRequest.Get(url);

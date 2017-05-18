@@ -11,5 +11,6 @@
 		Vector2d CenterMercator { get;}
 		float WorldRelativeScale { get; }
 		Transform Root { get; }
+		bool IsInitialized { get; }
 	}
 }

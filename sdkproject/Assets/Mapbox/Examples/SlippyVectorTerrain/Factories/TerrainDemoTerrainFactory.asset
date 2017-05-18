@@ -17,7 +17,7 @@ MonoBehaviour:
   _customMapId: mapbox.terrain-rgb
   _mapId: mapbox.terrain-rgb
   _heightModifier: 1
-  _sampleCount: 80
+  _sampleCount: 20
   _addCollider: 0
   _addToLayer: 0
   _layerId: 8

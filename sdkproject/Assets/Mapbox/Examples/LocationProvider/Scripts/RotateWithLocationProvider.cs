@@ -70,7 +70,7 @@
 
         void LocationProvider_OnHeadingUpdated(object sender, HeadingUpdatedEventArgs e)
         {
-            var euler = Vector3.zero;
+            var euler = Mapbox.Unity.Constants.Math.Vector3Zero;
             if (_rotateZ)
             {
                 euler.z = -e.Heading;

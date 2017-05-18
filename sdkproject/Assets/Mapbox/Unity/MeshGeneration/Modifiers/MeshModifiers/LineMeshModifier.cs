@@ -39,9 +39,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 var uvList = new Vector2[count * 2];
                 Vector3 norm;
                 var lastUv = 0f;
-                var p1 = Vector3.zero;
-                var p2 = Vector3.zero;
-                var p3 = Vector3.zero;
+                var p1 = Mapbox.Unity.Constants.Math.Vector3Zero;
+                var p2 = Mapbox.Unity.Constants.Math.Vector3Zero;
+                var p3 = Mapbox.Unity.Constants.Math.Vector3Zero;
                 for (int i = 1; i < count; i++)
                 {
                     p1 = roadSegment[i - 1];
@@ -117,7 +117,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
             var a = (p1 - newPos).normalized + newPos;
             var t = (b - a).normalized;
 
-            if (t == Vector3.zero)
+            if (t == Mapbox.Unity.Constants.Math.Vector3Zero)
             {
                 var n = (p2 - p1).normalized;
                 return new Vector3(-n.z, 0, n.x);

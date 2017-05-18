@@ -12,9 +12,12 @@ MonoBehaviour:
   m_Name: LocationProviderTerrainFactory
   m_EditorClassIdentifier: 
   _generationType: 0
-  _baseMaterial: {fileID: 0}
+  _baseMaterial: {fileID: 2100000, guid: 8ba055cb55bcc4488b727c601be0be29, type: 2}
   _mapIdType: 0
   _customMapId: mapbox.terrain-rgb
-  _mapId: 
+  _mapId: mapbox.terrain-rgb
   _heightModifier: 1
   _sampleCount: 2
+  _addCollider: 0
+  _addToLayer: 0
+  _layerId: 0

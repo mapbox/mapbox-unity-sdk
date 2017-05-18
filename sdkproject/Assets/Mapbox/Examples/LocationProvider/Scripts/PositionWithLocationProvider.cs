@@ -71,10 +71,10 @@ namespace Mapbox.Examples.LocationProvider
 
 		void LocationProvider_OnLocationUpdated(object sender, LocationUpdatedEventArgs e)
 		{
-			//if (_map.ReferenceTileRect == null)
-			//         {
-			//             return;
-			//         }
+			if (!_map.IsInitialized)
+			{
+				return;
+			}
 
 			_targetPosition = Conversions.GeoToWorldPosition(e.Location,
 			                                                 _map.CenterMercator,

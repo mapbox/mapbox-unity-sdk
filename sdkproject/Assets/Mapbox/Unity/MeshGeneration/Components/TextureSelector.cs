@@ -56,8 +56,6 @@ namespace Mapbox.Unity.MeshGeneration.Components
 				_meshRenderer.materials[0].mainTexture = _tile.GetRasterData();
                 _meshRenderer.materials[0].mainTextureScale = new Vector2(1f, 1f);
             }
-
-
         }
 
         //private void TextureTop(Material topmat)

@@ -11,4 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 526c8a90df31d41fe8057a6f85c7a3e4, type: 3}
   m_Name: StylingDemoMapVisualization
   m_EditorClassIdentifier: 
-  _factories: []
+  _factories:
+  - {fileID: 11400000, guid: 490bfb75ddc396c42a4cc0a3c8fab072, type: 2}
+  - {fileID: 11400000, guid: ded4ce3d76c3e824b858744eff47093e, type: 2}
+  - {fileID: 11400000, guid: 923119689e177024682db7c643a8d54b, type: 2}

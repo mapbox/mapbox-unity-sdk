@@ -58,6 +58,7 @@
 			}
 			set
 			{
+				_latitudeLongitudeString = string.Format("{0}, {1}", value.x, value.y);
 				_mapCenterLatitudeLongitude = value;
 			}
 		}
@@ -77,6 +78,15 @@
 			get
 			{
 				return _worldRelativeScale;
+			}
+		}
+
+		bool _isInitialized;
+		public bool IsInitialized
+		{
+			get
+			{
+				return _isInitialized;
 			}
 		}
 
@@ -114,6 +124,8 @@
 
 			_mapVisualizer.Initialize(this, _fileSouce);
 			_tileProvider.Initialize(this);
+
+			_isInitialized = true;
 		}
 
 		void TileProvider_OnTileAdded(UnwrappedTileId tileId)
