@@ -92,6 +92,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			VectorDataState = TilePropertyState.None;
 
 			// HACK: this is for vector layer features and such.
+			// It's slow and wasteful, but a better solution will be difficult.
 			var childCount = transform.childCount;
 			if (childCount > 0)
 			{

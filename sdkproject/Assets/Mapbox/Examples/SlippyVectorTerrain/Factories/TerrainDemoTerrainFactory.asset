@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8338f26893d62c1439f387800a8e1c9a, type: 3}
   m_Name: TerrainDemoTerrainFactory
   m_EditorClassIdentifier: 
-  _generationType: 0
+  _generationType: 2
   _baseMaterial: {fileID: 2100000, guid: fdf26842f5143fe47802eb3f1c072614, type: 2}
   _mapIdType: 0
   _customMapId: mapbox.terrain-rgb

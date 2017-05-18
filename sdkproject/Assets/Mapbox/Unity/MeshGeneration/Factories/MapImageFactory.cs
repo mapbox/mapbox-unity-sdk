@@ -78,7 +78,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		private void Run(UnityTile tile)
 		{
 			var parameters = new Tile.Parameters();
-			parameters.Fs = this.FileSource;
+			parameters.Fs = this._fileSource;
 			parameters.Id = new CanonicalTileId(tile.Zoom, (int)tile.TileCoordinate.x, (int)tile.TileCoordinate.y);
 			parameters.MapId = _mapId;
 

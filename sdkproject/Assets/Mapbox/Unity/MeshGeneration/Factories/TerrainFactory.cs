@@ -126,7 +126,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			var parameters = new Tile.Parameters
 			{
-				Fs = this.FileSource,
+				Fs = this._fileSource,
 				Id = new CanonicalTileId(tile.Zoom, (int)tile.TileCoordinate.x, (int)tile.TileCoordinate.y),
 				MapId = _mapId
 			};
@@ -185,7 +185,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 
 			var trilist = new List<int>();
-			var dir = Vector3.zero;
+			var dir = Unity.Constants.Math.Vector3Zero;
 			int vertA, vertB, vertC;
 			for (int y = 0; y < _sampleCount - 1; y++)
 			{
@@ -227,7 +227,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			tile.MeshData = mesh;
 
 			// Don't leak the mesh, just reuse it.
+			//var unityMesh = new Mesh();
 			var unityMesh = tile.MeshFilter.sharedMesh ?? new Mesh();
+
 			unityMesh.SetVertices(mesh.Vertices);
 			unityMesh.SetUVs(0, mesh.UV[0]);
 			unityMesh.SetNormals(mesh.Normals);
@@ -236,11 +238,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			// TODO: should we recalculate normals here, too?
 			tile.MeshFilter.sharedMesh = unityMesh;
-
-			//if (tile.MeshRenderer.material == null)
-			//{
-			//tile.MeshRenderer.material = _baseMaterial;
-			//}
 
 			if (_addCollider)
 			{
@@ -266,7 +263,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			Mesh unityMesh = null;
 			if (_cachedQuad != null)
 			{
-				Debug.Log("TerrainFactory: " + "USING CACHE");
 				unityMesh = _cachedQuad;
 			}
 			else

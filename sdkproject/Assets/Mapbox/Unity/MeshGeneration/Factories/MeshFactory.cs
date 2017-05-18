@@ -65,6 +65,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				_tiles.Remove(tile);
 
 			}
+
 			// We are no longer interested in this tile's notifications.
 			tile.OnHeightDataChanged -= HeightDataChangedHandler;
 			tile.OnRasterDataChanged -= ImageDataChangedHandler;
@@ -118,7 +119,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			var parameters = new Tile.Parameters
 			{
-				Fs = this.FileSource,
+				Fs = _fileSource,
 				Id = new CanonicalTileId(tile.Zoom, (int)tile.TileCoordinate.x, (int)tile.TileCoordinate.y),
 				MapId = _mapId
 			};

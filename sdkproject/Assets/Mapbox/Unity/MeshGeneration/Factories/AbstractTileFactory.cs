@@ -7,14 +7,14 @@
 
 	public abstract class AbstractTileFactory : ScriptableObject
 	{
-		protected IFileSource FileSource;
+		protected IFileSource _fileSource;
 
 		// TODO: can we change this dictionary? Do we need Vector2 key?
 		protected Dictionary<Vector2, UnityTile> _unityTiles;
 
 		public void Initialize(IFileSource fileSource)
 		{
-			FileSource = fileSource;
+			_fileSource = fileSource;
 			_unityTiles = new Dictionary<Vector2, UnityTile>();
 			OnInitialized();
 		}
