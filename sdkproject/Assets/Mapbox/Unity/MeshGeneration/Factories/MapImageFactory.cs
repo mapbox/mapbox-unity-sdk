@@ -6,7 +6,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Enums;
 	using Mapbox.Unity.MeshGeneration.Data;
-	using Mapbox.Platform;
 
 	public enum MapImageType
 	{

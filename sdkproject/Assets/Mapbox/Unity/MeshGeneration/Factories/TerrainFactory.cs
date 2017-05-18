@@ -138,17 +138,18 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					if (pngRasterTile.HasError || pngRasterTile.CurrentState == Tile.State.Canceled)
 					{
 						tile.HeightDataState = TilePropertyState.Error;
+
+						// HACK: handle missing tile from server (404)!
+						CreateFlatMesh(tile);
 						return;
 					}
 					_tiles.Remove(tile);
 
-					if (tile.HeightData == null)
-					{
-						tile.HeightData = new Texture2D(256, 256);
-						tile.HeightData.wrapMode = TextureWrapMode.Clamp;
-					}
-
-					tile.HeightData.LoadImage(pngRasterTile.Data);
+					var heightTexture = new Texture2D(0, 0);
+					heightTexture.LoadImage(pngRasterTile.Data);
+					var colors = heightTexture.GetPixels32();
+					Destroy(heightTexture);
+					tile.SetHeightData(colors);
 					tile.HeightDataState = TilePropertyState.Loaded;
 					GenerateTerrainMesh(tile, heightMultiplier);
 				});
@@ -181,19 +182,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					var xx = Mathd.Lerp(tile.Rect.Min.x, tile.Rect.Max.x, xrat);
 					var yy = Mathd.Lerp(tile.Rect.Min.y, tile.Rect.Max.y, yrat);
 
-					// Unavailable elevation data will have width less than 256
-					// (usually 8?), therefore we render at zero height
-					if (tile.HeightData.width < 256)
-					{
-						heightMultiplier = 0;
-					}
-
 					mesh.Vertices.Add(new Vector3(
 						(float)(xx - tile.Rect.Center.x),
-						heightMultiplier * Conversions.GetRelativeHeightFromColor(tile.HeightData.GetPixel(
-						(int)(xrat * 255),
-						(int)((1 - yrat) * 255)),
-						tile.RelativeScale),
+						heightMultiplier * tile.QueryHeightData((int)(xrat * 255),(int)((1 - yrat) * 255)),
 						(float)(yy - tile.Rect.Center.y)));
 					mesh.Normals.Add(Unity.Constants.Math.Vector3Up);
 					mesh.UV[0].Add(new Vector2(x * step, 1 - (y * step)));
@@ -265,7 +256,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				else
 				{
 					// Reuse the collider.
-					((MeshCollider)tile.Collider).sharedMesh = unityMesh;
+					tile.Collider.sharedMesh = unityMesh;
 				}
 			}
 		}
@@ -305,7 +296,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			if (_addCollider && tile.Collider == null)
 			{
-				var bc = tile.gameObject.AddComponent<BoxCollider>();
+				var bc = tile.gameObject.AddComponent<MeshCollider>();
 			}
 			if (_addToLayer)
 			{

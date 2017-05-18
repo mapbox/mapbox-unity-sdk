@@ -96,7 +96,7 @@
 			if (_tileProvider != null)
 			{
 				_tileProvider.OnTileAdded -= TileProvider_OnTileAdded;
-				_tileProvider.OnTileAdded -= TileProvider_OnTileRemoved;
+				_tileProvider.OnTileRemoved -= TileProvider_OnTileRemoved;
 			}
 		}
 
@@ -118,7 +118,7 @@
 
 		void TileProvider_OnTileAdded(UnwrappedTileId tileId)
 		{
-			_mapVisualization.InitializeTile(tileId);
+			_mapVisualization.LoadTile(tileId);
 		}
 
 		void TileProvider_OnTileRemoved(UnwrappedTileId tileId)

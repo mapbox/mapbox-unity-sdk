@@ -63,6 +63,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
         /// <param name="tile"></param>
         private void Run(UnityTile tile)
         {
+			// FIXME: we can make the request BEFORE getting a response from these!
             if (tile.HeightDataState == TilePropertyState.Loading ||
                 tile.RasterDataState == TilePropertyState.Loading)
             {

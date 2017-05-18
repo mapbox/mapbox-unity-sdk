@@ -9,14 +9,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 	[RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
 	public class UnityTile : MonoBehaviour
 	{
-		[SerializeField]
-		Texture2D _heightData;
-
-		[SerializeField]
-		Texture2D _rasterData;
-
-		[SerializeField]
-		string _vectorData;
+		float[] _heightData;
 
 		private MeshRenderer _meshRenderer;
 		public MeshRenderer MeshRenderer
@@ -44,19 +37,20 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		private Collider _collider;
-		public Collider Collider
+		private MeshCollider _collider;
+		public MeshCollider Collider
 		{
 			get
 			{
 				if (_collider == null)
 				{
-					_collider = GetComponent<Collider>();
+					_collider = GetComponent<MeshCollider>();
 				}
 				return _collider;
 			}
 		}
 
+		Texture2D _rasterData;
 		public Texture2D RasterData
 		{
 			get { return _rasterData; }
@@ -66,15 +60,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				OnRasterDataChanged(this);
 			}
 		}
-		public Texture2D HeightData
-		{
-			get { return _heightData; }
-			set
-			{
-				_heightData = value;
-				OnHeightDataChanged(this);
-			}
-		}
+
+		string _vectorData;
 		public string VectorData
 		{
 			get { return _vectorData; }
@@ -109,15 +96,41 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		internal void Disable()
 		{
 			gameObject.SetActive(false);
+
+			// TODO: reset states and such.
+			var childCount = transform.childCount;
+			if (childCount > 0)
+			{
+				for (int i = 0; i < childCount; i++)
+				{
+					Destroy(transform.GetChild(i).gameObject);
+				}
+			}
+		}
+
+		internal void SetHeightData(Color32[] colors)
+		{
+			var count = colors.Length;
+
+			if (_heightData == null)
+			{
+				_heightData = new float[count];
+			}
+
+			for (int i = 0; i < count; i++)
+			{
+				var height = Conversions.GetAbsoluteHeightFromColor32(colors[i]) * RelativeScale;
+				_heightData[i] = height;
+			}
+
+			OnHeightDataChanged(this);
 		}
 
 		public float QueryHeightData(float x, float y)
 		{
-			if (HeightData != null)
+			if (_heightData != null)
 			{
-				return Conversions.GetRelativeHeightFromColor(HeightData.GetPixel(
-						(int)Mathf.Clamp((x * 256), 0, 255),
-						(int)Mathf.Clamp((y * 256), 0, 255)), RelativeScale);
+				return _heightData[(int)(y * 256 + x)];
 			}
 
 			return 0;

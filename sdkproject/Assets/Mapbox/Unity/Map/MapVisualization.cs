@@ -41,8 +41,8 @@ namespace Mapbox.Unity.MeshGeneration
 		/// <summary>
 		/// Registers requested tiles to the factories
 		/// </summary>
-		/// <param name="tile"></param>
-		public void InitializeTile(UnwrappedTileId tileId)
+		/// <param name="tileId"></param>
+		public void LoadTile(UnwrappedTileId tileId)
 		{
 			UnityTile unityTile = null;
 
@@ -55,6 +55,8 @@ namespace Mapbox.Unity.MeshGeneration
 			if (unityTile == null)
 			{
 				unityTile = new GameObject().AddComponent<UnityTile>();
+
+				// TODO: don't parent if not editor. Instead, set localScale.
 				unityTile.transform.SetParent(_map.Root, false);
 			}
 

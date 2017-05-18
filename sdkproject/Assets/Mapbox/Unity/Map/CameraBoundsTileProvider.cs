@@ -56,6 +56,7 @@ namespace Mapbox.Unity.Map
 
 					if (!_currentTile.Equals(_cachedTile))
 					{
+						// FIXME: this results in bugs at world boundaries!
 						for (int x = _currentTile.X - _visibleBuffer; x <= (_currentTile.X + _visibleBuffer); x++)
 						{
 							for (int y = _currentTile.Y - _visibleBuffer; y <= (_currentTile.Y + _visibleBuffer); y++)
