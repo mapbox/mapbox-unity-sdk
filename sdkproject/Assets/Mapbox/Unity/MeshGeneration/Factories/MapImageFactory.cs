@@ -38,8 +38,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField]
 		bool _useRetina;
 
-		Dictionary<UnityTile, Tile> _tiles;
-
 		// TODO: come back to this
 		//public override void Update()
 		//{
@@ -52,30 +50,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnInitialized()
 		{
-			_tiles = new Dictionary<UnityTile, Tile>();
+
 		}
 
 		internal override void OnRegistered(UnityTile tile)
-		{
-			Run(tile);
-		}
-
-		internal override void OnUnregistered(UnityTile tile)
-		{
-			// TODO: simplify this across tile factories? Cancel tile, but only if it needs to be cancelled.
-			if (_tiles.ContainsKey(tile))
-			{
-				_tiles[tile].Cancel();
-				_tiles.Remove(tile);
-			}
-		}
-
-		/// <summary>
-		/// Fetches the image and applies it to tile material.
-		/// MapImage factory currently supports both new (RasterTile) and classic (ClassicRasterTile) Mapbox styles.
-		/// </summary>
-		/// <param name="tile"></param>
-		private void Run(UnityTile tile)
 		{
 			var parameters = new Tile.Parameters();
 			parameters.Fs = _fileSource;
@@ -109,6 +87,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				tile.SetRasterData(rasterTile.Data, _useMipMap, _useCompression);
 				tile.RasterDataState = TilePropertyState.Loaded;
 			});
+		}
+
+		internal override void OnUnregistered(UnityTile tile)
+		{
+
 		}
 	}
 }

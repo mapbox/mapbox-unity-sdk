@@ -19,7 +19,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		public List<LayerVisualizerBase> Visualizers;
 
 		private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;
-		Dictionary<UnityTile, Tile> _tiles;
 
 		public void OnEnable()
 		{
@@ -35,8 +34,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// <param name="fs"></param>
 		internal override void OnInitialized()
 		{
-			_tiles = new Dictionary<UnityTile, Tile>();
-
 			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
 			foreach (LayerVisualizerBase factory in Visualizers)
 			{
@@ -53,29 +50,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnRegistered(UnityTile tile)
 		{
-			Run(tile);
-		}
-
-		internal override void OnUnregistered(UnityTile tile)
-		{
-			// TODO: simplify this across tile factories? Cancel tile, but only if it needs to be cancelled.
-			if (_tiles.ContainsKey(tile))
-			{
-				_tiles[tile].Cancel();
-				_tiles.Remove(tile);
-			}
-
-			// We are no longer interested in this tile's notifications.
-			tile.OnHeightDataChanged -= HeightDataChangedHandler;
-			tile.OnRasterDataChanged -= ImageDataChangedHandler;
-		}
-
-		/// <summary>
-		/// Mesh Factory waits for both Height and Image data to be processed if they are requested
-		/// </summary>
-		/// <param name="tile"></param>
-		private void Run(UnityTile tile)
-		{
 			// FIXME: we can make the request BEFORE getting a response from these!
 			if (tile.HeightDataState == TilePropertyState.Loading ||
 				tile.RasterDataState == TilePropertyState.Loading)
@@ -85,8 +59,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 			else
 			{
-				CreateMeshes(tile);
+                CreateMeshes(tile);
 			}
+		}
+
+		internal override void OnUnregistered(UnityTile tile)
+		{
+			// We are no longer interested in this tile's notifications.
+			tile.OnHeightDataChanged -= HeightDataChangedHandler;
+			tile.OnRasterDataChanged -= ImageDataChangedHandler;
 		}
 
 		private void HeightDataChangedHandler(UnityTile t)

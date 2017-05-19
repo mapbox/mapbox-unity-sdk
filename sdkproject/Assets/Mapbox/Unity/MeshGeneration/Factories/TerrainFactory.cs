@@ -55,7 +55,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		Mesh _cachedQuad;
 
 		protected Dictionary<CanonicalTileId, MeshData> _meshData;
-		protected Dictionary<UnityTile, Tile> _tiles;
 
 		/// <summary>
 		/// Clears the mesh data and re-runs the terrain creation procedure using current settings. Clearing the old mesh data is important as terrain stitching function checks if the data exists or not.
@@ -77,7 +76,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		internal override void OnInitialized()
 		{
 			_meshData = new Dictionary<CanonicalTileId, MeshData>();
-			_tiles = new Dictionary<UnityTile, Tile>();
 		}
 
 		internal override void OnRegistered(UnityTile tile)
@@ -100,22 +98,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				tile.gameObject.AddComponent<MeshFilter>();
 			}
 
-			Run(tile);
-		}
-
-		internal override void OnUnregistered(UnityTile tile)
-		{
-			_meshData.Remove(tile.CanonicalTileId);
-
-			if (_tiles.ContainsKey(tile))
-			{
-				_tiles[tile].Cancel();
-				_tiles.Remove(tile);
-			}
-		}
-
-		private void Run(UnityTile tile)
-		{
 			if (_generationType == TerrainGenerationType.Flat)
 			{
 				CreateFlatMesh(tile);
@@ -124,6 +106,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				CreateTerrainHeight(tile);
 			}
+		}
+
+		internal override void OnUnregistered(UnityTile tile)
+		{
+			_meshData.Remove(tile.CanonicalTileId);
 		}
 
 		/// <summary>
