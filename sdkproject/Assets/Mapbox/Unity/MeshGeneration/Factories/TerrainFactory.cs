@@ -308,9 +308,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// Checkes all neighbours of the given tile and stitches the edges to achieve a smooth mesh surface.
 		/// </summary>
 		/// <param name="tile"></param>
-		/// <param name="tmesh"></param>
-		private void FixStitches(CanonicalTileId tileId, MeshData tmesh)
+		/// <param name="mesh"></param>
+		private void FixStitches(CanonicalTileId tileId, MeshData mesh)
 		{
+			var meshVertCount = mesh.Vertices.Count;
+			var targetVertCount = 0;
+
 			_stitchTarget = null;
 			_meshData.TryGetValue(tileId.South, out _stitchTarget);
 			if (_stitchTarget != null)
@@ -318,14 +321,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				for (int i = 0; i < _sampleCount; i++)
 				{
 					//just snapping the y because vertex pos is relative and we'll have to do tile pos + vertex pos for x&z otherwise
-					tmesh.Vertices[i] = new Vector3(
-						tmesh.Vertices[i].x,
-						_stitchTarget.Vertices[tmesh.Vertices.Count - _sampleCount + i].y,
-						tmesh.Vertices[i].z);
+					mesh.Vertices[i] = new Vector3(
+						mesh.Vertices[i].x,
+						_stitchTarget.Vertices[meshVertCount - _sampleCount + i].y,
+						mesh.Vertices[i].z);
 
-					tmesh.Normals[i] = new Vector3(_stitchTarget.Normals[tmesh.Vertices.Count - _sampleCount + i].x,
-						_stitchTarget.Normals[tmesh.Vertices.Count - _sampleCount + i].y,
-						_stitchTarget.Normals[tmesh.Vertices.Count - _sampleCount + i].z);
+					mesh.Normals[i] = new Vector3(_stitchTarget.Normals[meshVertCount - _sampleCount + i].x,
+						_stitchTarget.Normals[meshVertCount - _sampleCount + i].y,
+						_stitchTarget.Normals[meshVertCount - _sampleCount + i].z);
 				}
 			}
 
@@ -335,12 +338,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				for (int i = 0; i < _sampleCount; i++)
 				{
-					tmesh.Vertices[tmesh.Vertices.Count - _sampleCount + i] = new Vector3(
-						tmesh.Vertices[tmesh.Vertices.Count - _sampleCount + i].x,
+					mesh.Vertices[meshVertCount - _sampleCount + i] = new Vector3(
+						mesh.Vertices[meshVertCount - _sampleCount + i].x,
 						_stitchTarget.Vertices[i].y,
-						tmesh.Vertices[tmesh.Vertices.Count - _sampleCount + i].z);
+						mesh.Vertices[meshVertCount - _sampleCount + i].z);
 
-					tmesh.Normals[tmesh.Vertices.Count - _sampleCount + i] = new Vector3(
+					mesh.Normals[meshVertCount - _sampleCount + i] = new Vector3(
 						_stitchTarget.Normals[i].x,
 						_stitchTarget.Normals[i].y,
 						_stitchTarget.Normals[i].z);
@@ -353,12 +356,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				for (int i = 0; i < _sampleCount; i++)
 				{
-					tmesh.Vertices[i * _sampleCount] = new Vector3(
-						tmesh.Vertices[i * _sampleCount].x,
+					mesh.Vertices[i * _sampleCount] = new Vector3(
+						mesh.Vertices[i * _sampleCount].x,
 						_stitchTarget.Vertices[i * _sampleCount + _sampleCount - 1].y,
-						tmesh.Vertices[i * _sampleCount].z);
+						mesh.Vertices[i * _sampleCount].z);
 
-					tmesh.Normals[i * _sampleCount] = new Vector3(
+					mesh.Normals[i * _sampleCount] = new Vector3(
 						_stitchTarget.Normals[i * _sampleCount + _sampleCount - 1].x,
 						_stitchTarget.Normals[i * _sampleCount + _sampleCount - 1].y,
 						_stitchTarget.Normals[i * _sampleCount + _sampleCount - 1].z);
@@ -371,12 +374,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				for (int i = 0; i < _sampleCount; i++)
 				{
-					tmesh.Vertices[i * _sampleCount + _sampleCount - 1] = new Vector3(
-						tmesh.Vertices[i * _sampleCount + _sampleCount - 1].x,
+					mesh.Vertices[i * _sampleCount + _sampleCount - 1] = new Vector3(
+						mesh.Vertices[i * _sampleCount + _sampleCount - 1].x,
 						_stitchTarget.Vertices[i * _sampleCount].y,
-						tmesh.Vertices[i * _sampleCount + _sampleCount - 1].z);
+						mesh.Vertices[i * _sampleCount + _sampleCount - 1].z);
 
-					tmesh.Normals[i * _sampleCount + _sampleCount - 1] = new Vector3(
+					mesh.Normals[i * _sampleCount + _sampleCount - 1] = new Vector3(
 						_stitchTarget.Normals[i * _sampleCount].x,
 						_stitchTarget.Normals[i * _sampleCount].y,
 						_stitchTarget.Normals[i * _sampleCount].z);
@@ -387,42 +390,44 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_meshData.TryGetValue(tileId.SouthWest, out _stitchTarget);
 			if (_stitchTarget != null)
 			{
-				tmesh.Vertices[0] = new Vector3(
-					tmesh.Vertices[0].x,
-					_stitchTarget.Vertices[_stitchTarget.Vertices.Count - 1].y,
-					tmesh.Vertices[0].z);
+				targetVertCount = _stitchTarget.Vertices.Count;
+				mesh.Vertices[0] = new Vector3(
+					mesh.Vertices[0].x,
+					_stitchTarget.Vertices[targetVertCount - 1].y,
+					mesh.Vertices[0].z);
 
-				tmesh.Normals[0] = new Vector3(
-					_stitchTarget.Normals[_stitchTarget.Vertices.Count - 1].x,
-					_stitchTarget.Normals[_stitchTarget.Vertices.Count - 1].y,
-					_stitchTarget.Normals[_stitchTarget.Vertices.Count - 1].z);
+				mesh.Normals[0] = new Vector3(
+					_stitchTarget.Normals[targetVertCount - 1].x,
+					_stitchTarget.Normals[targetVertCount - 1].y,
+					_stitchTarget.Normals[targetVertCount - 1].z);
 			}
 
 			_stitchTarget = null;
 			_meshData.TryGetValue(tileId.SouthEast, out _stitchTarget);
 			if (_stitchTarget != null)
 			{
-				tmesh.Vertices[_sampleCount - 1] = new Vector3(
-					tmesh.Vertices[_sampleCount - 1].x,
-					_stitchTarget.Vertices[_stitchTarget.Vertices.Count - _sampleCount].y,
-					tmesh.Vertices[_sampleCount - 1].z);
+				targetVertCount = _stitchTarget.Vertices.Count;
+				mesh.Vertices[_sampleCount - 1] = new Vector3(
+					mesh.Vertices[_sampleCount - 1].x,
+					_stitchTarget.Vertices[targetVertCount - _sampleCount].y,
+					mesh.Vertices[_sampleCount - 1].z);
 
-				tmesh.Normals[_sampleCount - 1] = new Vector3(
-					_stitchTarget.Normals[_stitchTarget.Vertices.Count - _sampleCount].x,
-					_stitchTarget.Normals[_stitchTarget.Vertices.Count - _sampleCount].y,
-					_stitchTarget.Normals[_stitchTarget.Vertices.Count - _sampleCount].z);
+				mesh.Normals[_sampleCount - 1] = new Vector3(
+					_stitchTarget.Normals[targetVertCount - _sampleCount].x,
+					_stitchTarget.Normals[targetVertCount - _sampleCount].y,
+					_stitchTarget.Normals[targetVertCount - _sampleCount].z);
 			}
 
 			_stitchTarget = null;
 			_meshData.TryGetValue(tileId.NorthWest, out _stitchTarget);
 			if (_stitchTarget != null)
 			{
-				tmesh.Vertices[tmesh.Vertices.Count - _sampleCount] = new Vector3(
-					tmesh.Vertices[tmesh.Vertices.Count - _sampleCount].x,
+				mesh.Vertices[meshVertCount - _sampleCount] = new Vector3(
+					mesh.Vertices[meshVertCount - _sampleCount].x,
 					_stitchTarget.Vertices[_sampleCount - 1].y,
-					tmesh.Vertices[tmesh.Vertices.Count - _sampleCount].z);
+					mesh.Vertices[meshVertCount - _sampleCount].z);
 
-				tmesh.Normals[tmesh.Vertices.Count - _sampleCount] = new Vector3(
+				mesh.Normals[meshVertCount - _sampleCount] = new Vector3(
 					_stitchTarget.Normals[_sampleCount - 1].x,
 					_stitchTarget.Normals[_sampleCount - 1].y,
 					_stitchTarget.Normals[_sampleCount - 1].z);
@@ -432,12 +437,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_meshData.TryGetValue(tileId.NorthEast, out _stitchTarget);
 			if (_stitchTarget != null)
 			{
-				tmesh.Vertices[_stitchTarget.Vertices.Count - 1] = new Vector3(
-					tmesh.Vertices[_stitchTarget.Vertices.Count - 1].x,
+				targetVertCount = _stitchTarget.Vertices.Count;
+				mesh.Vertices[targetVertCount - 1] = new Vector3(
+					mesh.Vertices[targetVertCount - 1].x,
 					_stitchTarget.Vertices[0].y,
-					tmesh.Vertices[_stitchTarget.Vertices.Count - 1].z);
+					mesh.Vertices[targetVertCount - 1].z);
 
-				tmesh.Normals[_stitchTarget.Vertices.Count - 1] = new Vector3(
+				mesh.Normals[targetVertCount - 1] = new Vector3(
 					_stitchTarget.Normals[0].x,
 					_stitchTarget.Normals[0].y,
 					_stitchTarget.Normals[0].z);
