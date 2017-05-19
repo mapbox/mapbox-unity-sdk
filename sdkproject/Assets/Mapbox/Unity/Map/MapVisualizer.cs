@@ -72,6 +72,7 @@ namespace Mapbox.Unity.MeshGeneration
 		public void DisposeTile(UnwrappedTileId tileId)
 		{
 			var unityTile = _activeTiles[tileId];
+
 			foreach (var factory in _factories)
 			{
 				factory.Unregister(unityTile);

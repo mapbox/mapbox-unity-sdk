@@ -17,7 +17,7 @@ namespace Mapbox.Map {
 	///    bounding box. More info <see href="https://en.wikipedia.org/wiki/Tiled_web_map">
 	///    here </see>.
 	/// </summary>
-	public abstract class Tile {
+	public abstract class Tile : IAsyncRequest {
 
 
 		private CanonicalTileId _id;
@@ -89,6 +89,14 @@ namespace Mapbox.Map {
 		public State CurrentState {
 			get {
 				return _state;
+			}
+		}
+
+		public bool IsCompleted
+		{
+			get
+			{
+				return _state == State.Loaded;
 			}
 		}
 

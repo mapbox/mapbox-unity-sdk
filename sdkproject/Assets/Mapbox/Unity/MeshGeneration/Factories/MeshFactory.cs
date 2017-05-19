@@ -107,8 +107,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			tile.VectorDataState = TilePropertyState.Loading;
 
 			var vectorTile = new VectorTile();
-
-			_tiles.Add(tile, vectorTile);
+			tile.AsyncRequest = vectorTile;
+			
 			vectorTile.Initialize(parameters, () =>
 			{
 				if (vectorTile.HasError || vectorTile.CurrentState == Tile.State.Canceled)
@@ -116,8 +116,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					tile.VectorDataState = TilePropertyState.Error;
 					return;
 				}
-
-				_tiles.Remove(tile);
 
 				// TODO: move unitytile state registrations to layer visualizers. Not everyone is interested in this data
 				// and we should not wait for it here!

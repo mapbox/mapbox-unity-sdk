@@ -5,10 +5,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 	using Mapbox.Unity.Utilities;
 	using Utils;
 	using Mapbox.Map;
+	using Mapbox.Platform;
 	using System;
 	using Mapbox.Unity.Map;
 
-	public class UnityTile : MonoBehaviour
+	public class UnityTile : MonoBehaviour, IAsyncRequest
 	{
 		float[] _heightData;
 		Texture2D _rasterData;
@@ -64,7 +65,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				OnVectorDataChanged(this);
 			}
 		}
-
 		RectD _rect;
 		public RectD Rect
 		{
@@ -80,6 +80,23 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			get
 			{
 				return _canonicalTileId;
+			}
+		}
+
+		IAsyncRequest _asyncRequest;
+		public IAsyncRequest AsyncRequest
+		{
+			set
+			{
+				_asyncRequest = value;
+			}
+		}
+
+		public bool IsCompleted
+		{
+			get
+			{
+				return _asyncRequest.IsCompleted;
 			}
 		}
 
@@ -117,6 +134,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			RasterDataState = TilePropertyState.None;
 			HeightDataState = TilePropertyState.None;
 			VectorDataState = TilePropertyState.None;
+			_asyncRequest = null;
 
 			// HACK: this is for vector layer features and such.
 			// It's slow and wasteful, but a better solution will be difficult.
@@ -193,6 +211,14 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public Texture2D GetRasterData()
 		{
 			return _rasterData;
+		}
+
+		public void Cancel()
+		{
+			if (_asyncRequest != null)
+			{
+				_asyncRequest.Cancel();
+			}
 		}
 	}
 }

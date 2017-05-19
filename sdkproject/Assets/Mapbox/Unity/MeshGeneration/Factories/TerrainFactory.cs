@@ -1,3 +1,4 @@
+using UnityEditorInternal;
 namespace Mapbox.Unity.MeshGeneration.Factories
 {
 	using System.Collections.Generic;
@@ -80,8 +81,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnRegistered(UnityTile tile)
 		{
-			_meshData.Add(tile.CanonicalTileId, null);
-
 			if (_addToLayer && tile.gameObject.layer != _layerId)
 			{
 				tile.gameObject.layer = _layerId;
@@ -130,8 +129,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			tile.HeightDataState = TilePropertyState.Loading;
 
 			var pngRasterTile = new RawPngRasterTile();
+			tile.AsyncRequest = pngRasterTile;
 
-			_tiles.Add(tile, pngRasterTile);
 			pngRasterTile.Initialize(parameters, () =>
 			{
 				// HACK: we need to check state because a cancel could have happened immediately following a response.
@@ -143,7 +142,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					CreateFlatMesh(tile);
 					return;
 				}
-				_tiles.Remove(tile);
 
 				tile.SetHeightData(pngRasterTile.Data, _heightModifier);
 				GenerateTerrainMesh(tile);
