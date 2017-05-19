@@ -10,6 +10,7 @@ namespace Mapbox.Unity.Map
 		[SerializeField]
 		Camera _camera;
 
+		// TODO: change to Vector4 to optimize for different aspect ratios.
 		[SerializeField]
 		int _visibleBuffer;
 
@@ -56,7 +57,7 @@ namespace Mapbox.Unity.Map
 
 					if (!_currentTile.Equals(_cachedTile))
 					{
-						// FIXME: this results in bugs at world boundaries! Does not cleanly wrap.
+						// FIXME: this results in bugs at world boundaries! Does not cleanly wrap. Negative tileIds are bad.
 						for (int x = _currentTile.X - _visibleBuffer; x <= (_currentTile.X + _visibleBuffer); x++)
 						{
 							for (int y = _currentTile.Y - _visibleBuffer; y <= (_currentTile.Y + _visibleBuffer); y++)

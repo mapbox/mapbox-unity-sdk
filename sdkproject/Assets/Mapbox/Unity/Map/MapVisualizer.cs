@@ -57,11 +57,11 @@ namespace Mapbox.Unity.MeshGeneration
 				unityTile = new GameObject().AddComponent<UnityTile>();
 
 
-#if UNITY_EDITOR
+#if !UNITY_EDITOR
+				unityTile.transform.localScale = Unity.Constants.Math.Vector3One * _map.WorldRelativeScale;
+#else
 				unityTile.transform.SetParent(_map.Root, false);
 				unityTile.gameObject.name = tileId.ToString();
-#else
-				unityTile.transform.localScale = Unity.Constants.Math.Vector3One * _map.WorldRelativeScale;
 #endif
 			}
 

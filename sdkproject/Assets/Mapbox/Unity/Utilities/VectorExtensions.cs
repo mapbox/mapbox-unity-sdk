@@ -125,7 +125,6 @@ namespace Mapbox.Unity.Utilities
 			return Conversions.MetersToLatLon(pos);
 		}
 
-		// TODO: don't forget about me, either!
 		public static Vector2d GetGeoPosition(this Vector3 position, Vector2d refPoint, float scale = 1)
 		{
 			var pos = refPoint + (position / scale).ToVector2d();

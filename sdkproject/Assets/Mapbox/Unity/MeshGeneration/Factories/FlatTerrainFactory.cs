@@ -3,6 +3,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 {
 	public class FlatTerrainFactory
 	{
-		// TODO: implement
+		// TODO: extract this aspect from TerrainFactory. 
 	}
 }

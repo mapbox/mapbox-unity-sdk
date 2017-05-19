@@ -83,6 +83,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		internal void Disable()
 		{
+			// TODO: to hide potential visual artifacts, use placeholder mesh / texture?
+
 			gameObject.SetActive(false);
 
 			// Reset internal state.

@@ -46,10 +46,6 @@ namespace Mapbox.Unity.Utilities
 		{
 			if (_request != null)
 			{
-				if (_request.isDone)
-				{
-					// FIXME: this happens sometimes. Handle it?
-				}
 				_request.Abort();
 			}
 		}
@@ -62,7 +58,7 @@ namespace Mapbox.Unity.Utilities
 				yield return null;
 			}
 
-			// FIXME: any way to forward an aborted exception to response if request finished before cancel call?
+			// FIXME: forward an aborted exception to response if request finished before cancel call
 			var response = Response.FromWebResponse(this, _request, null);
 
 			_callback(response);

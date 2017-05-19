@@ -224,15 +224,18 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				mesh.Normals[i].Normalize();
 			}
 
-			// FIXME - does not work with recycling?
+			// FIXME - not currently working with recycling. What needs to be reset?
 			//FixStitches(tile, mesh);
 
 			tile.MeshData = mesh;
 
 			// FIXME: recycling tiles that were once quads causes issues!
 			// Don't leak the mesh, just reuse it.
-			//var unityMesh = new Mesh();
+
+			// HACK: comment this out if you see rendering bugs related to elevation!
 			var unityMesh = tile.MeshFilter.sharedMesh ?? new Mesh();
+			// And use this.
+			//var unityMesh = new Mesh();
 
 			unityMesh.SetVertices(mesh.Vertices);
 			unityMesh.SetUVs(0, mesh.UV[0]);
@@ -293,7 +296,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				unityMesh.uv = uvlist;
 				unityMesh.RecalculateNormals();
 
-				// HACK: comment this out if you see rendering bugs related to elevation!
 				_cachedQuad = unityMesh;
 			}
 
