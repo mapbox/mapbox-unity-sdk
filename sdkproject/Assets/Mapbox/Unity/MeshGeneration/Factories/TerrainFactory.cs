@@ -54,6 +54,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		Mesh _cachedQuad;
 
+		protected Dictionary<Vector2, UnityTile> _unityTiles;
 		protected Dictionary<UnityTile, Tile> _tiles;
 
 		/// <summary>
@@ -75,11 +76,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnInitialized()
 		{
+			_unityTiles = new Dictionary<Vector2, UnityTile>();
 			_tiles = new Dictionary<UnityTile, Tile>();
 		}
 
 		internal override void OnRegistered(UnityTile tile)
 		{
+			_unityTiles.Add(new Vector2(tile.CanonicalTileId.X, tile.CanonicalTileId.Y), tile);
+
 			if (_addToLayer && tile.gameObject.layer != _layerId)
 			{
 				tile.gameObject.layer = _layerId;
@@ -101,6 +105,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnUnregistered(UnityTile tile)
 		{
+			_unityTiles.Remove(new Vector2(tile.CanonicalTileId.X, tile.CanonicalTileId.Y));
+
 			if (_tiles.ContainsKey(tile))
 			{
 				_tiles[tile].Cancel();
@@ -130,7 +136,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			var parameters = new Tile.Parameters
 			{
 				Fs = _fileSource,
-				Id = new CanonicalTileId(tile.Zoom, (int)tile.TileCoordinate.x, (int)tile.TileCoordinate.y),
+				Id = tile.CanonicalTileId,
 				MapId = _mapId
 			};
 
@@ -225,7 +231,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 
 			// FIXME - not currently working with recycling. What needs to be reset?
-			//FixStitches(tile, mesh);
+			FixStitches(tile, mesh);
 
 			tile.MeshData = mesh;
 
@@ -322,7 +328,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// <param name="tmesh"></param>
 		private void FixStitches(UnityTile tile, MeshData tmesh)
 		{
-			_stitchTarget.Set(tile.TileCoordinate.x, tile.TileCoordinate.y - 1);
+			var x = tile.CanonicalTileId.X;
+			var y = tile.CanonicalTileId.Y;
+
+			_stitchTarget.Set(x, y - 1);
 			if (_unityTiles.ContainsKey(_stitchTarget) && _unityTiles[_stitchTarget].MeshData != null)
 			{
 				var t2mesh = _unityTiles[_stitchTarget].MeshData;
@@ -340,7 +349,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 			}
 
-			_stitchTarget.Set(tile.TileCoordinate.x, tile.TileCoordinate.y + 1);
+			_stitchTarget.Set(x, y + 1);
 			if (_unityTiles.ContainsKey(_stitchTarget) && _unityTiles[_stitchTarget].MeshData != null)
 			{
 				var t2mesh = _unityTiles[_stitchTarget].MeshData;
@@ -358,7 +367,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 			}
 
-			_stitchTarget.Set(tile.TileCoordinate.x - 1, tile.TileCoordinate.y);
+			_stitchTarget.Set(x - 1, y);
 			if (_unityTiles.ContainsKey(_stitchTarget) && _unityTiles[_stitchTarget].MeshData != null)
 			{
 				var t2mesh = _unityTiles[_stitchTarget].MeshData;
@@ -375,7 +384,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 			}
 
-			_stitchTarget.Set(tile.TileCoordinate.x + 1, tile.TileCoordinate.y);
+			_stitchTarget.Set(x + 1, y);
 			if (_unityTiles.ContainsKey(_stitchTarget) && _unityTiles[_stitchTarget].MeshData != null)
 			{
 				var t2mesh = _unityTiles[_stitchTarget].MeshData;
@@ -392,7 +401,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 			}
 
-			_stitchTarget.Set(tile.TileCoordinate.x - 1, tile.TileCoordinate.y - 1);
+			_stitchTarget.Set(x - 1, y - 1);
 			if (_unityTiles.ContainsKey(_stitchTarget) && _unityTiles[_stitchTarget].MeshData != null)
 			{
 				var t2mesh = _unityTiles[_stitchTarget].MeshData;
@@ -406,7 +415,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					t2mesh.Normals[t2mesh.Vertices.Count - 1].z);
 			}
 
-			_stitchTarget.Set(tile.TileCoordinate.x + 1, tile.TileCoordinate.y - 1);
+			_stitchTarget.Set(x + 1, y - 1);
 			if (_unityTiles.ContainsKey(_stitchTarget) && _unityTiles[_stitchTarget].MeshData != null)
 			{
 				var t2mesh = _unityTiles[_stitchTarget].MeshData;
@@ -420,7 +429,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					t2mesh.Normals[t2mesh.Vertices.Count - _sampleCount].z);
 			}
 
-			_stitchTarget.Set(tile.TileCoordinate.x - 1, tile.TileCoordinate.y + 1);
+			_stitchTarget.Set(x - 1, y + 1);
 			if (_unityTiles.ContainsKey(_stitchTarget) && _unityTiles[_stitchTarget].MeshData != null)
 			{
 				var t2mesh = _unityTiles[_stitchTarget].MeshData;
@@ -434,7 +443,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					t2mesh.Normals[_sampleCount - 1].z);
 			}
 
-			_stitchTarget.Set(tile.TileCoordinate.x + 1, tile.TileCoordinate.y + 1);
+			_stitchTarget.Set(x + 1, y + 1);
 			if (_unityTiles.ContainsKey(_stitchTarget) && _unityTiles[_stitchTarget].MeshData != null)
 			{
 				var t2mesh = _unityTiles[_stitchTarget].MeshData;

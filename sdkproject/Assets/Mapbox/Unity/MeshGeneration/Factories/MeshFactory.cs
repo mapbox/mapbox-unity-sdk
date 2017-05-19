@@ -119,7 +119,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			var parameters = new Tile.Parameters
 			{
 				Fs = _fileSource,
-				Id = new CanonicalTileId(tile.Zoom, (int)tile.TileCoordinate.x, (int)tile.TileCoordinate.y),
+				Id = tile.CanonicalTileId,
 				MapId = _mapId
 			};
 

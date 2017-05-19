@@ -109,7 +109,7 @@
 			var latLonSplit = _latitudeLongitudeString.Split(',');
 			_mapCenterLatitudeLongitude = new Vector2d(double.Parse(latLonSplit[0]), double.Parse(latLonSplit[1]));
 
-			var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(_mapCenterLatitudeLongitude, _zoom), _zoom);
+			var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(_mapCenterLatitudeLongitude, _zoom));
 			_mapCenterMercator = referenceTileRect.Center;
 
 			_worldRelativeScale = (float)(_unityTileSize / referenceTileRect.Size.x);

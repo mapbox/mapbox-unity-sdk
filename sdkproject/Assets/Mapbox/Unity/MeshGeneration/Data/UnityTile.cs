@@ -1,3 +1,4 @@
+using Mapbox.Map;
 namespace Mapbox.Unity.MeshGeneration.Data
 {
 	using UnityEngine;
@@ -5,12 +6,15 @@ namespace Mapbox.Unity.MeshGeneration.Data
 	using Mapbox.Unity.Utilities;
 	using Utils;
 	using System;
+	using Mapbox.Unity.Map;
 
 	public class UnityTile : MonoBehaviour
 	{
 		float[] _heightData;
+		Texture2D _rasterData;
+		float _relativeScale;
 
-		private MeshRenderer _meshRenderer;
+		MeshRenderer _meshRenderer;
 		public MeshRenderer MeshRenderer
 		{
 			get
@@ -49,6 +53,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
+		// TODO: should this be a string???
 		string _vectorData;
 		public string VectorData
 		{
@@ -60,34 +65,59 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
+		RectD _rect;
+		public RectD Rect
+		{
+			get
+			{
+				return _rect;
+			}
+		}
+
+		CanonicalTileId _canonicalTileId;
+		public CanonicalTileId CanonicalTileId
+		{
+			get
+			{
+				return _canonicalTileId;
+			}
+		}
+
+		// Only terrain uses this!
 		public MeshData MeshData { get; set; }
 
 		public TilePropertyState RasterDataState { get; set; }
 		public TilePropertyState HeightDataState { get; set; }
 		public TilePropertyState VectorDataState { get; set; }
 
-		// TODO: pass in unwrapped tile or map to initialize?
-		public Vector2 TileCoordinate;
-		public int Zoom;
-		public RectD Rect;
-		public float RelativeScale;
-
 		public event Action<UnityTile> OnHeightDataChanged = delegate { };
 		public event Action<UnityTile> OnRasterDataChanged = delegate { };
 		public event Action<UnityTile> OnVectorDataChanged = delegate { };
 
-		internal void Enable()
+		internal void Initialize(IMap map, UnwrappedTileId tileId)
 		{
+			_relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
+			_rect = Conversions.TileBounds(tileId);
+			_canonicalTileId = tileId.Canonical;
+			var position = new Vector3((float)(Rect.Center.x - map.CenterMercator.x), 0, (float)(Rect.Center.y - map.CenterMercator.y));
+
+#if !UNITY_EDITOR
+			position *= map.WorldRelativeScale;
+#else
+			gameObject.name = tileId.ToString();
+#endif
+			transform.localPosition = position;
 			gameObject.SetActive(true);
 		}
 
-		internal void Disable()
+		internal void Recycle()
 		{
 			// TODO: to hide potential visual artifacts, use placeholder mesh / texture?
 
 			gameObject.SetActive(false);
 
 			// Reset internal state.
+			MeshData = null;
 			RasterDataState = TilePropertyState.None;
 			HeightDataState = TilePropertyState.None;
 			VectorDataState = TilePropertyState.None;
@@ -123,7 +153,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 			for (int i = 0; i < count; i++)
 			{
-				var height = Conversions.GetAbsoluteHeightFromColor32(colors[i]) * RelativeScale * heightMultiplier;
+				var height = Conversions.GetAbsoluteHeightFromColor32(colors[i]) * _relativeScale * heightMultiplier;
 				_heightData[i] = height;
 			}
 
@@ -143,7 +173,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			return 0;
 		}
 
-		Texture2D _rasterData;
 		public void SetRasterData(byte[] data, bool useMipMap, bool useCompression)
 		{
 			// Don't leak the texture, just reuse it.

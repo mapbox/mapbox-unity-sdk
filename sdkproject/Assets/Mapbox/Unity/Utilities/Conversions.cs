@@ -44,9 +44,7 @@ namespace Mapbox.Unity.Utilities
 			var posx = lon * OriginShift / 180;
 			var posy = Math.Log(Math.Tan((90 + lat) * Math.PI / 360)) / (Math.PI / 180);
 			posy = posy * OriginShift / 180;
-			//losing precision by converting to float here if lat/lng is too high/low.
-			//prefer using GeoToWorldPosition 
-			return new Vector2d((float)posx, (float)posy);
+			return new Vector2d(posx, posy);
 		}
 
 		/// <summary>
@@ -134,10 +132,10 @@ namespace Mapbox.Unity.Utilities
 			return new RectD(min, max - min);
 		}
 
-		public static RectD TileBounds(UnwrappedTileId unwrappedTileId, int zoom)
+		public static RectD TileBounds(UnwrappedTileId unwrappedTileId)
 		{
-			var min = PixelsToMeters(new Vector2d(unwrappedTileId.X * TileSize, unwrappedTileId.Y * TileSize), zoom);
-			var max = PixelsToMeters(new Vector2d((unwrappedTileId.X + 1) * TileSize, (unwrappedTileId.Y + 1) * TileSize), zoom);
+			var min = PixelsToMeters(new Vector2d(unwrappedTileId.X * TileSize, unwrappedTileId.Y * TileSize), unwrappedTileId.Z);
+			var max = PixelsToMeters(new Vector2d((unwrappedTileId.X + 1) * TileSize, (unwrappedTileId.Y + 1) * TileSize), unwrappedTileId.Z);
 			return new RectD(min, max - min);
 		}
 

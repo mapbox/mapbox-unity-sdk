@@ -49,34 +49,20 @@ namespace Mapbox.Unity.MeshGeneration
 			if (_inactiveTiles.Count > 0)
 			{
 				unityTile = _inactiveTiles.Dequeue();
-				unityTile.Enable();
 			}
 
 			if (unityTile == null)
 			{
 				unityTile = new GameObject().AddComponent<UnityTile>();
 
-
 #if !UNITY_EDITOR
 				unityTile.transform.localScale = Unity.Constants.Math.Vector3One * _map.WorldRelativeScale;
 #else
 				unityTile.transform.SetParent(_map.Root, false);
-				unityTile.gameObject.name = tileId.ToString();
 #endif
 			}
 
-			// TODO: simplify this.
-			unityTile.Zoom = _map.Zoom;
-			unityTile.RelativeScale = Conversions.GetTileScaleInMeters(0, _map.Zoom) / Conversions.GetTileScaleInMeters((float)_map.CenterLatitudeLongitude.x, _map.Zoom);
-			unityTile.TileCoordinate = new Vector2(tileId.X, tileId.Y);
-			unityTile.Rect = Conversions.TileBounds(unityTile.TileCoordinate, _map.Zoom);
-
-			var position = new Vector3((float)(unityTile.Rect.Center.x - _map.CenterMercator.x), 0, (float)(unityTile.Rect.Center.y - _map.CenterMercator.y));
-
-#if !UNITY_EDITOR
-			position *= _map.WorldRelativeScale;
-#endif
-			unityTile.transform.localPosition = position;
+			unityTile.Initialize(_map, tileId);
 
 			foreach (var factory in _factories)
 			{
@@ -94,7 +80,7 @@ namespace Mapbox.Unity.MeshGeneration
 				factory.Unregister(unityTile);
 			}
 
-			unityTile.Disable();
+			unityTile.Recycle();
 			_activeTiles.Remove(tileId);
 			_inactiveTiles.Enqueue(unityTile);
 		}

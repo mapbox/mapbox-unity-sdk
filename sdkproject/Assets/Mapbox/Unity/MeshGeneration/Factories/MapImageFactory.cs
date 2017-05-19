@@ -79,7 +79,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			var parameters = new Tile.Parameters();
 			parameters.Fs = _fileSource;
-			parameters.Id = new CanonicalTileId(tile.Zoom, (int)tile.TileCoordinate.x, (int)tile.TileCoordinate.y);
+			parameters.Id = tile.CanonicalTileId;
 			parameters.MapId = _mapId;
 
 			RasterTile rasterTile;
