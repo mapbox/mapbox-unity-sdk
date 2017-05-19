@@ -1,6 +1,5 @@
 ﻿namespace Mapbox.Unity.MeshGeneration.Factories
 {
-	using System.Collections.Generic;
 	using Mapbox.Platform;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using UnityEngine;

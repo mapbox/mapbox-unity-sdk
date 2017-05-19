@@ -2,13 +2,10 @@ namespace Mapbox.Unity.MeshGeneration
 {
 	using Mapbox.Map;
 	using System.Collections.Generic;
-	using System.Linq;
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Platform;
-	using Utils;
-	using Utilities;
 	using Mapbox.Unity.Map;
 
 	[CreateAssetMenu(menuName = "Mapbox/MapVisualization")]

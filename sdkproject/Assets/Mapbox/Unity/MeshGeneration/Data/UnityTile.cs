@@ -1,10 +1,10 @@
-using Mapbox.Map;
 namespace Mapbox.Unity.MeshGeneration.Data
 {
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Enums;
 	using Mapbox.Unity.Utilities;
 	using Utils;
+	using Mapbox.Map;
 	using System;
 	using Mapbox.Unity.Map;
 
@@ -83,9 +83,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		// Only terrain uses this!
-		public MeshData MeshData { get; set; }
-
 		public TilePropertyState RasterDataState { get; set; }
 		public TilePropertyState HeightDataState { get; set; }
 		public TilePropertyState VectorDataState { get; set; }
@@ -117,7 +114,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			gameObject.SetActive(false);
 
 			// Reset internal state.
-			MeshData = null;
 			RasterDataState = TilePropertyState.None;
 			HeightDataState = TilePropertyState.None;
 			VectorDataState = TilePropertyState.None;

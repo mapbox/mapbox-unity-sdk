@@ -5,6 +5,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 	using UnityEngine;
 	using Utils;
 
+	// TODO: Do we need this class? Why not just use `Mesh`?
 	public class MeshData
 	{
 		public List<int> Edges { get; set; }
