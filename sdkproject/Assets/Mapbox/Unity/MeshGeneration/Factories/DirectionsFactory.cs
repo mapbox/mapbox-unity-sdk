@@ -4,6 +4,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	using Mapbox.Directions;
 	using System.Collections.Generic;
 	using System.Linq;
+	using Mapbox.Unity.Map;
 	using Data;
 	using Modifiers;
 	using Mapbox.Platform;
@@ -11,25 +12,41 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	using Mapbox.Unity.Utilities;
 
 	[CreateAssetMenu(menuName = "Mapbox/Factories/Direction Factory")]
-	public class DirectionsFactory : Factory
+	public class DirectionsFactory : MonoBehaviour
 	{
 		[SerializeField]
-		private Material _material;
-		private Directions _directions;
-		public List<MeshModifier> MeshModifiers;
+		AbstractMap _map;
 
-		public override void Initialize(IFileSource fileSource, WorldParameters parameters)
+		[SerializeField]
+		MeshModifier[] MeshModifiers;
+
+		[SerializeField]
+		Transform[] _waypoints;
+
+		[SerializeField]
+		Material _material;
+		
+		Directions _directions;
+
+		void Awake()
 		{
-			base.Initialize(fileSource, parameters);
 			_directions = MapboxAccess.Instance.Directions;
+			_map.OnInitialized += Query;
 		}
 
-		public void Query(List<Transform> waypoints)
+		void OnDestroy()
 		{
-			var wp = new Vector2d[waypoints.Count];
-			for (int i = 0; i < waypoints.Count; i++)
+			_map.OnInitialized -= Query;
+		}
+
+		void Query()
+		{
+			_map.OnInitialized -= Query;
+			var count = _waypoints.Length;
+			var wp = new Vector2d[count];
+			for (int i = 0; i < count; i++)
 			{
-				wp[i] = waypoints[i].GetGeoPosition(Parameters.ReferenceTileRect.Center, Parameters.WorldScaleFactor);
+				wp[i] = _waypoints[i].GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
 			}
 			var _directionResource = new DirectionResource(wp, RoutingProfile.Driving);
 			_directionResource.Steps = true;
@@ -38,17 +55,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		void HandleDirectionsResponse(DirectionsResponse response)
 		{
-			if (null == response.Routes)
-			{
-				return;
-			}
 			var meshData = new MeshData();
 			var dat = new List<Vector3>();
 			foreach (var leg in response.Routes[0].Legs)
 			{
 				foreach (var point in response.Routes[0].Geometry)
 				{
-					dat.Add(Conversions.GeoToWorldPosition(point.x, point.y, Parameters.ReferenceTileRect.Center, Parameters.WorldScaleFactor).ToVector3xz());
+					dat.Add(Conversions.GeoToWorldPosition(point.x, point.y, _map.CenterMercator, _map.WorldRelativeScale).ToVector3xz());
 				}
 			}
 
@@ -63,7 +76,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			CreateGameObject(meshData);
 		}
 
-		private GameObject CreateGameObject(MeshData data)
+		GameObject CreateGameObject(MeshData data)
 		{
 			var go = new GameObject("direction waypoint " + " entity");
 			var mesh = go.AddComponent<MeshFilter>().mesh;

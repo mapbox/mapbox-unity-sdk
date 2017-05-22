@@ -8,7 +8,6 @@ public class MapImageFactoryEditor : FactoryEditor
     private MapImageFactory _factory;
     public SerializedProperty
         mapIdType_Prop,
-        material_Prop,
         basicMaps_Prop,
         customMapId_Prop,
         useMipMap_Prop,
@@ -40,7 +39,6 @@ public class MapImageFactoryEditor : FactoryEditor
         customMapId_Prop = serializedObject.FindProperty("_customMapId");
         mapIdType_Prop = serializedObject.FindProperty("_mapIdType");
         mapId_Prop = serializedObject.FindProperty("_mapId");
-        material_Prop = serializedObject.FindProperty("_baseMaterial");
         useMipMap_Prop = serializedObject.FindProperty("_useMipMap");
         useCompression_Prop = serializedObject.FindProperty("_useCompression");
         useRetina_Prop = serializedObject.FindProperty("_useRetina");
@@ -78,14 +76,16 @@ public class MapImageFactoryEditor : FactoryEditor
                     GUI.enabled = false;
                     EditorGUILayout.PropertyField(mapId_Prop, new GUIContent("Map Id"));
                     GUI.enabled = true;
-                    EditorGUILayout.PropertyField(material_Prop, new GUIContent("Material"));
                     break;
                 }
             case MapImageType.Custom:
                 {
                     EditorGUILayout.PropertyField(customMapId_Prop, new GUIContent("Map Id"));
                     mapId_Prop.stringValue = customMapId_Prop.stringValue;
-                    EditorGUILayout.PropertyField(material_Prop, new GUIContent("Material"));
+					if (string.IsNullOrEmpty(mapId_Prop.stringValue))
+					{
+						EditorGUILayout.HelpBox("Invalid MapID. This will cause invalid tile requests!", MessageType.Error);
+					}
                     break;
                 }
             case MapImageType.None:
@@ -122,7 +122,8 @@ public class MapImageFactoryEditor : FactoryEditor
 
         if (GUILayout.Button("Update"))
         {
-            _factory.Update();
+            //_factory.Update();
+			Debug.Log("MapImageFactoryEditor: " + "FIX ME!");
         }
         serializedObject.ApplyModifiedProperties();
     }

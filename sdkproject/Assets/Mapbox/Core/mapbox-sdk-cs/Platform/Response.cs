@@ -240,7 +240,7 @@ namespace Mapbox.Platform {
 				response.AddException(apiEx);
 			}
 
-			if (!string.IsNullOrEmpty(apiResponse.error)) {
+			if (apiResponse.isError) {
 				response.AddException(new Exception(apiResponse.error));
 			}
 
