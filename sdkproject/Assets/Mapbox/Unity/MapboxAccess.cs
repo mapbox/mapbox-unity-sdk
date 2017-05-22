@@ -37,10 +37,7 @@ namespace Mapbox.Unity
 		{
 			ValidateMapboxAccessFile();
 			LoadAccessToken();
-			_fileSource = new CachingWebFileSource(AccessToken)
-				.AddCache(new MemoryCache(2))
-				.AddCache(new DiskCache(6)
-			);
+			_fileSource = new CachingWebFileSource(AccessToken).AddCache(new MemoryCache(500));
 		}
 
 

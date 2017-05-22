@@ -38,13 +38,13 @@ namespace Mapbox.Platform.Cache
 			{
 				if (_cachedResponses.Count >= _maxCacheSize)
 				{
-					UnityEngine.Debug.Log("MemCache: pruning " + _cachedResponses.OrderBy(c => c.Value.Timestamp).First().Key);
+					//UnityEngine.Debug.Log("MemCache: pruning " + _cachedResponses.OrderBy(c => c.Value.Timestamp).First().Key);
 					_cachedResponses.Remove(_cachedResponses.OrderBy(c => c.Value.Timestamp).First().Key);
 				}
 
 				if (!_cachedResponses.ContainsKey(key))
 				{
-					UnityEngine.Debug.Log("MemCache: adding " + key);
+					//UnityEngine.Debug.Log("MemCache: adding " + key);
 					_cachedResponses.Add(key, new CacheItem() { Timestamp = DateTime.Now.Ticks, Data = data });
 				}
 			}
@@ -57,10 +57,10 @@ namespace Mapbox.Platform.Cache
 			{
 				if (!_cachedResponses.ContainsKey(key))
 				{
-					UnityEngine.Debug.Log("MemCache: not found " + key);
+					//UnityEngine.Debug.Log("MemCache: not found " + key);
 					return null;
 				}
-				UnityEngine.Debug.Log("MemCache: returning " + key);
+				//UnityEngine.Debug.Log("MemCache: returning " + key);
 				return _cachedResponses[key].Data;
 			}
 		}

@@ -68,7 +68,7 @@
 					}
 				}
 
-				UnityEngine.Debug.Log("CachingWebFileSource: sending HTTPRequest " + uri);
+				//UnityEngine.Debug.Log("CachingWebFileSource: sending HTTPRequest " + uri);
 
 				return IAsyncRequestFactory.CreateRequest(
 					uriBuilder.ToString(),
