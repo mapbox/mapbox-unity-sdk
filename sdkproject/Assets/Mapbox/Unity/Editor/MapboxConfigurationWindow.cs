@@ -10,7 +10,7 @@ namespace Mapbox.Editor
 
     public class MapboxConfigurationWindow : EditorWindow
     {
-        static readonly string _accessPath = Path.Combine(Application.streamingAssetsPath, Mapbox.Unity.Constants.Path.TOKEN_FILE);
+		static string _accessPath;
         static string _accessToken;
         static string _lastAccessToken;
         static string _validationCode;
@@ -18,6 +18,8 @@ namespace Mapbox.Editor
         [MenuItem("Mapbox/Configure Access")]
         static void Init()
         {
+			_accessPath = Path.Combine(Application.streamingAssetsPath, Mapbox.Unity.Constants.Path.TOKEN_FILE);
+
             Runnable.EnableRunnableInEditor();
             if (!Directory.Exists(Application.streamingAssetsPath))
             {
@@ -29,7 +31,7 @@ namespace Mapbox.Editor
             }
 
             _accessToken = File.ReadAllText(_accessPath);
-            var window = (MapboxConfigurationWindow)GetWindow(typeof(MapboxConfigurationWindow));
+			var window = (MapboxConfigurationWindow)GetWindow(typeof(MapboxConfigurationWindow));
             window.Show();
         }
 
