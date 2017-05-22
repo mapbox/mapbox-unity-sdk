@@ -8,12 +8,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 120e43a7012622e49aca0c9217acd1f9, type: 3}
-  m_Name: PoiDemoUiPoiVisualizer
+  m_Script: {fileID: 11500000, guid: 40bee3110109c0848bb86c9b5c436039, type: 3}
+  m_Name: TerrainDemoSnapTerrainModifier
   m_EditorClassIdentifier: 
   Active: 1
-  _classificationKey: 
-  _key: poi_label
-  Filters: []
-  _defaultStack: {fileID: 11400000, guid: 493414ab78a4e1b4896fc10cd6be4fa1, type: 2}
-  Stacks: []
