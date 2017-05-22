@@ -78,5 +78,70 @@ namespace Mapbox.Map
 		{
 			return this.Z + "/" + this.X + "/" + this.Y;
 		}
+
+		// FIXME: ensure these wrap properly at world boundaries!
+		public CanonicalTileId North
+		{
+			get
+			{
+				return new CanonicalTileId(Z, X, Y + 1);
+			}
+		}
+
+		public CanonicalTileId East
+		{
+			get
+			{
+				return new CanonicalTileId(Z, X + 1, Y);
+			}
+		}
+
+		public CanonicalTileId South
+		{
+			get
+			{
+				return new CanonicalTileId(Z, X, Y - 1);
+			}
+		}
+
+		public CanonicalTileId West
+		{
+			get
+			{
+				return new CanonicalTileId(Z, X - 1, Y);
+			}
+		}
+
+		public CanonicalTileId NorthEast
+		{
+			get
+			{
+				return new CanonicalTileId(Z, X + 1, Y + 1);
+			}
+		}
+
+		public CanonicalTileId SouthEast
+		{
+			get
+			{
+				return new CanonicalTileId(Z, X + 1, Y - 1);
+			}
+		}
+
+		public CanonicalTileId NorthWest
+		{
+			get
+			{
+				return new CanonicalTileId(Z, X - 1, Y + 1);
+			}
+		}
+
+		public CanonicalTileId SouthWest
+		{
+			get
+			{
+				return new CanonicalTileId(Z, X - 1, Y - 1);
+			}
+		}
 	}
 }

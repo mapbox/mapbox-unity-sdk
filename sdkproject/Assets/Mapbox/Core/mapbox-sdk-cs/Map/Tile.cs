@@ -17,7 +17,7 @@ namespace Mapbox.Map {
 	///    bounding box. More info <see href="https://en.wikipedia.org/wiki/Tiled_web_map">
 	///    here </see>.
 	/// </summary>
-	public abstract class Tile {
+	public abstract class Tile : IAsyncRequest {
 
 
 		private CanonicalTileId _id;
@@ -92,6 +92,14 @@ namespace Mapbox.Map {
 			}
 		}
 
+		public bool IsCompleted
+		{
+			get
+			{
+				return _state == State.Loaded;
+			}
+		}
+
 
 		/// <summary>
 		///     Initializes the <see cref="T:Mapbox.Map.Tile"/> object. It will
@@ -104,8 +112,8 @@ namespace Mapbox.Map {
 
 			_state = State.Loading;
 			_id = param.Id;
-			_request = param.Fs.Request(MakeTileResource(param.MapId).GetUrl(), HandleTileResponse);
 			_callback = callback;
+			_request = param.Fs.Request(MakeTileResource(param.MapId).GetUrl(), HandleTileResponse);
 		}
 
 
@@ -181,7 +189,11 @@ namespace Mapbox.Map {
 				ParseTileData(response.Data);
 			}
 
-			_state = State.Loaded;
+			// Cancelled is not the same as loaded!
+			if (_state != State.Canceled)
+			{
+				_state = State.Loaded;
+			}
 			_callback();
 		}
 
