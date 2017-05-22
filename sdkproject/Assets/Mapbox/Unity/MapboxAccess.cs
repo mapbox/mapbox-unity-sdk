@@ -3,12 +3,11 @@ namespace Mapbox.Unity
 	using UnityEngine;
 	using System.IO;
 	using System;
-	using System.Net;
 	using Mapbox.Geocoding;
 	using Mapbox.Directions;
 	using Mapbox.Platform;
-	using Mapbox.Unity.Utilities;
 	using Mapbox.Platform.Cache;
+	using System.Runtime.InteropServices;
 
 	/// <summary>
 	/// Object for retrieving an API token and making http requests.
@@ -16,7 +15,15 @@ namespace Mapbox.Unity
 	/// </summary>
 	public class MapboxAccess : IFileSource
 	{
+#if UNITY_IOS && !UNITY_EDITOR
 
+	[DllImport("__Internal")]
+	private static extern void initialize(string accessToken, string userAgentBase);
+
+	[DllImport("__Internal")]
+	private static extern void sendTurnstyleEvent();
+
+#endif
 		private readonly string _accessPath = Path.Combine(Application.streamingAssetsPath, Constants.Path.TOKEN_FILE);
 
 		static MapboxAccess _instance = new MapboxAccess();
@@ -38,6 +45,11 @@ namespace Mapbox.Unity
 			ValidateMapboxAccessFile();
 			LoadAccessToken();
 			_fileSource = new CachingWebFileSource(AccessToken).AddCache(new MemoryCache(500));
+
+#if UNITY_IOS && !UNITY_EDITOR
+			initialize(AccessToken, "MapboxEventsUnityiOS");
+            sendTurnstyleEvent();
+#endif
 		}
 
 
@@ -66,7 +78,8 @@ namespace Mapbox.Unity
 		private void ValidateMapboxAccessFile()
 		{
 #if !UNITY_ANDROID
-			if (!Directory.Exists(Application.streamingAssetsPath) || !File.Exists(_accessPath)) {
+			if (!Directory.Exists(Application.streamingAssetsPath) || !File.Exists(_accessPath))
+			{
 				throw new InvalidTokenException("Please configure your access token in the menu!");
 			}
 #endif
@@ -91,7 +104,6 @@ namespace Mapbox.Unity
 		/// </summary>
 		private string LoadMapboxAccess()
 		{
-
 			var request = new WWW(_accessPath);
 
 			// Implement a custom timeout - just in case
@@ -118,7 +130,6 @@ namespace Mapbox.Unity
 		/// <param name="callback">Callback.</param>
 		public IAsyncRequest Request(string url, Action<Response> callback, int timeout = 10)
 		{
-
 			return _fileSource.Request(url, callback, timeout);
 		}
 
