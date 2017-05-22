@@ -46,6 +46,10 @@ namespace Mapbox.Platform {
 			get { return _exceptions == null ? false : _exceptions.Count > 0; }
 		}
 
+		public bool LoadedFromCache;
+
+		public string RequestUrl;
+
 
 		public int? StatusCode;
 
@@ -93,6 +97,14 @@ namespace Mapbox.Platform {
 			_exceptions.Add(ex);
 		}
 
+		// TODO: we should store timestamp of the cache!
+		public static Response FromCache(byte[] data)
+		{
+			Response response = new Response();
+			response.Data = data;
+			response.LoadedFromCache = true;
+			return response;
+		}
 
 #if !NETFX_CORE && !UNITY // full .NET Framework
 		public static Response FromWebResponse(IAsyncRequest request, HttpWebResponse apiResponse, Exception apiEx) {
@@ -228,7 +240,7 @@ namespace Mapbox.Platform {
 				response.AddException(apiEx);
 			}
 
-			if (!string.IsNullOrEmpty(apiResponse.error)) {
+			if (apiResponse.isError) {
 				response.AddException(new Exception(apiResponse.error));
 			}
 

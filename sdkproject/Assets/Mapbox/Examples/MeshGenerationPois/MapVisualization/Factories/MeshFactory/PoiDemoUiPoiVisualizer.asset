@@ -8,10 +8,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a0f20c9ab4a6f18479e70968cdde2019, type: 3}
+  m_Script: {fileID: 11500000, guid: 120e43a7012622e49aca0c9217acd1f9, type: 3}
   m_Name: PoiDemoUiPoiVisualizer
   m_EditorClassIdentifier: 
   Active: 1
+  _classificationKey: 
   _key: poi_label
-  PoiPrefab: {fileID: 1000011742328300, guid: 39c06c41287c07843b78097666be5c58, type: 2}
-  _scaleDownWithWorld: 0
+  Filters: []
+  _defaultStack: {fileID: 11400000, guid: 493414ab78a4e1b4896fc10cd6be4fa1, type: 2}
+  Stacks: []

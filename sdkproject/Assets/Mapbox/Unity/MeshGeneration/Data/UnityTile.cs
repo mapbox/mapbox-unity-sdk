@@ -1,133 +1,224 @@
 namespace Mapbox.Unity.MeshGeneration.Data
 {
-    using System.ComponentModel;
-    using JetBrains.Annotations;
-    using UnityEngine;
-    using Mapbox.Unity.MeshGeneration.Enums;
-    using Mapbox.Unity.Utilities;
-    using Utils;
+	using UnityEngine;
+	using Mapbox.Unity.MeshGeneration.Enums;
+	using Mapbox.Unity.Utilities;
+	using Utils;
+	using Mapbox.Map;
+	using Mapbox.Platform;
+	using System;
+	using Mapbox.Unity.Map;
 
-    [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
-    public class UnityTile : MonoBehaviour, INotifyPropertyChanged
-    {
-        private MeshRenderer _meshRenderer;
-        public MeshRenderer MeshRenderer
-        {
-            get
-            {
-                if (_meshRenderer == null)
-                    _meshRenderer = GetComponent<MeshRenderer>();
-                return _meshRenderer;
-            }
+	public class UnityTile : MonoBehaviour, IAsyncRequest
+	{
+		float[] _heightData;
+		Texture2D _rasterData;
+		float _relativeScale;
 
-        }
+		MeshRenderer _meshRenderer;
+		public MeshRenderer MeshRenderer
+		{
+			get
+			{
+				if (_meshRenderer == null)
+				{
+					_meshRenderer = GetComponent<MeshRenderer>();
+				}
+				return _meshRenderer;
+			}
+		}
 
-        private MeshFilter _meshFilter;
-        public MeshFilter MeshFilter
-        {
-            get
-            {
-                if (_meshFilter == null)
-                    _meshFilter = GetComponent<MeshFilter>();
-                return _meshFilter;
-            }
-        }
+		private MeshFilter _meshFilter;
+		public MeshFilter MeshFilter
+		{
+			get
+			{
+				if (_meshFilter == null)
+				{
+					_meshFilter = GetComponent<MeshFilter>();
+				}
+				return _meshFilter;
+			}
+		}
 
-        public MeshData MeshData { get; set; }
+		private MeshCollider _collider;
+		public MeshCollider Collider
+		{
+			get
+			{
+				if (_collider == null)
+				{
+					_collider = GetComponent<MeshCollider>();
+				}
+				return _collider;
+			}
+		}
 
-        #region basic properties //move to a base class?
-        [SerializeField]
-        private Texture2D _heightData;
-        [SerializeField]
-        private Texture2D _imageData;
-        [SerializeField]
-        private string _vectorData;
+		// TODO: should this be a string???
+		string _vectorData;
+		public string VectorData
+		{
+			get { return _vectorData; }
+			set
+			{
+				_vectorData = value;
+				OnVectorDataChanged(this);
+			}
+		}
+		RectD _rect;
+		public RectD Rect
+		{
+			get
+			{
+				return _rect;
+			}
+		}
 
-        public Texture2D ImageData
-        {
-            get { return _imageData; }
-            set
-            {
-                _imageData = value;
-                OnSatelliteDataChanged();
-            }
-        }
-        public Texture2D HeightData
-        {
-            get { return _heightData; }
-            set
-            {
-                _heightData = value;
-                OnHeightDataChanged();
-            }
-        }
-        public string VectorData
-        {
-            get { return _vectorData; }
-            set
-            {
-                _vectorData = value;
-                OnVectorDataChanged();
-            }
-        }
+		CanonicalTileId _canonicalTileId;
+		public CanonicalTileId CanonicalTileId
+		{
+			get
+			{
+				return _canonicalTileId;
+			}
+		}
 
-        public TilePropertyState ImageDataState { get; set; }
-        public TilePropertyState HeightDataState { get; set; }
-        public TilePropertyState VectorDataState { get; set; }
-        #endregion
+		IAsyncRequest _asyncRequest;
+		public IAsyncRequest AsyncRequest
+		{
+			set
+			{
+				_asyncRequest = value;
+			}
+		}
 
-        public Vector2 TileCoordinate { get; set; }
-        public int Zoom { get; set; }
-        public RectD Rect { get; set; }
-        public float RelativeScale { get; set; }
+		public bool IsCompleted
+		{
+			get
+			{
+				return _asyncRequest.IsCompleted;
+			}
+		}
 
-        public float QueryHeightData(float x, float y)
-        {
-            if (HeightData != null)
-            {
-                return Conversions.GetRelativeHeightFromColor(HeightData.GetPixel(
-                        (int)Mathf.Clamp((x * 256), 0, 255),
-                        (int)Mathf.Clamp((y * 256), 0, 255)), RelativeScale);
-            }
+		public TilePropertyState RasterDataState { get; set; }
+		public TilePropertyState HeightDataState { get; set; }
+		public TilePropertyState VectorDataState { get; set; }
 
-            return 0;
-        }
+		public event Action<UnityTile> OnHeightDataChanged = delegate { };
+		public event Action<UnityTile> OnRasterDataChanged = delegate { };
+		public event Action<UnityTile> OnVectorDataChanged = delegate { };
 
-        #region Events //again move to base class?
-        public event PropertyChangedEventHandler PropertyChanged;
+		internal void Initialize(IMap map, UnwrappedTileId tileId)
+		{
+			_relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
+			_rect = Conversions.TileBounds(tileId);
+			_canonicalTileId = tileId.Canonical;
+			var position = new Vector3((float)(Rect.Center.x - map.CenterMercator.x), 0, (float)(Rect.Center.y - map.CenterMercator.y));
 
-        public delegate void TileEventArgs(UnityTile sender, object param);
-        public event TileEventArgs HeightDataChanged;
-        public event TileEventArgs ImageDataChanged;
-        public event TileEventArgs VectorDataChanged;
+#if !UNITY_EDITOR
+			position *= map.WorldRelativeScale;
+#else
+			gameObject.name = tileId.ToString();
+#endif
+			transform.localPosition = position;
+			gameObject.SetActive(true);
+		}
 
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            var handler = PropertyChanged;
-            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
-        }
+		internal void Recycle()
+		{
+			// TODO: to hide potential visual artifacts, use placeholder mesh / texture?
 
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnHeightDataChanged()
-        {
-            var handler = HeightDataChanged;
-            if (handler != null) handler(this, null);
-        }
+			gameObject.SetActive(false);
 
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnSatelliteDataChanged()
-        {
-            var handler = ImageDataChanged;
-            if (handler != null) handler(this, null);
-        }
+			// Reset internal state.
+			RasterDataState = TilePropertyState.None;
+			HeightDataState = TilePropertyState.None;
+			VectorDataState = TilePropertyState.None;
+			_asyncRequest = null;
 
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnVectorDataChanged()
-        {
-            var handler = VectorDataChanged;
-            if (handler != null) handler(this, null);
-        }
-        #endregion
-    }
+			// HACK: this is for vector layer features and such.
+			// It's slow and wasteful, but a better solution will be difficult.
+			var childCount = transform.childCount;
+			if (childCount > 0)
+			{
+				for (int i = 0; i < childCount; i++)
+				{
+					Destroy(transform.GetChild(i).gameObject);
+				}
+			}
+		}
+
+		internal void SetHeightData(byte[] data, float heightMultiplier = 1f)
+		{
+			// HACK: compute height values for terrain. We could probably do this without a texture2d.
+			var heightTexture = new Texture2D(0, 0);
+			heightTexture.LoadImage(data);
+			var colors = heightTexture.GetPixels32();
+
+			// Get rid of this temporary texture. We don't need it, and we don't want to leak it.
+			Destroy(heightTexture);
+
+			var count = colors.Length;
+
+			if (_heightData == null)
+			{
+				_heightData = new float[count];
+			}
+
+			for (int i = 0; i < count; i++)
+			{
+				var height = Conversions.GetAbsoluteHeightFromColor32(colors[i]) * _relativeScale * heightMultiplier;
+				_heightData[i] = height;
+			}
+
+			HeightDataState = TilePropertyState.Loaded;
+			OnHeightDataChanged(this);
+		}
+
+		public float QueryHeightData(float x, float y)
+		{
+			if (_heightData != null)
+			{
+				var intX = (int)Mathf.Clamp(x * 256, 0, 255);
+				var intY = (int)Mathf.Clamp(y * 256, 0, 255);
+				return _heightData[intY * 256 + intX];
+			}
+
+			return 0;
+		}
+
+		public void SetRasterData(byte[] data, bool useMipMap, bool useCompression)
+		{
+			// Don't leak the texture, just reuse it.
+			if (_rasterData == null)
+			{
+				_rasterData = new Texture2D(0, 0, TextureFormat.RGB24, useMipMap);
+				_rasterData.wrapMode = TextureWrapMode.Clamp;
+				MeshRenderer.material.mainTexture = _rasterData;
+			}
+
+			_rasterData.LoadImage(data);
+			if (useCompression)
+			{
+				// High quality = true seems to decrease image quality?
+				_rasterData.Compress(false);
+			}
+
+			RasterDataState = TilePropertyState.Loaded;
+			OnRasterDataChanged(this);
+		}
+
+		public Texture2D GetRasterData()
+		{
+			return _rasterData;
+		}
+
+		public void Cancel()
+		{
+			if (_asyncRequest != null)
+			{
+				_asyncRequest.Cancel();
+			}
+		}
+	}
 }

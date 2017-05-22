@@ -8,10 +8,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c66bbffbe36286f43ba04d55504d674c, type: 3}
+  m_Script: {fileID: 11500000, guid: 526c8a90df31d41fe8057a6f85c7a3e4, type: 3}
   m_Name: FlatMapVisualization
   m_EditorClassIdentifier: 
-  Factories:
+  _factories:
   - {fileID: 11400000, guid: cb8b05cd0605ab3409113202791784c1, type: 2}
   - {fileID: 11400000, guid: 4304eeeba74ed4e48a435f96d9076abc, type: 2}
   - {fileID: 11400000, guid: ee4d24cec5a998543b716563b2b77dae, type: 2}

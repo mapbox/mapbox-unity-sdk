@@ -1,6 +1,6 @@
 ﻿namespace Mapbox.Utils
 {
-    public class RectD
+    public struct RectD
     {
         public Vector2d Min { get; private set; }
         public Vector2d Max { get; private set; }

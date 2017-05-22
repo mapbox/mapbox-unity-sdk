@@ -53,11 +53,9 @@ namespace Mapbox.Unity.MeshGeneration.Components
 
             if (_useSatelliteRoof)
             {
-                _meshRenderer.materials[0].mainTexture = _tile.ImageData;
+				_meshRenderer.materials[0].mainTexture = _tile.GetRasterData();
                 _meshRenderer.materials[0].mainTextureScale = new Vector2(1f, 1f);
             }
-
-
         }
 
         //private void TextureTop(Material topmat)
