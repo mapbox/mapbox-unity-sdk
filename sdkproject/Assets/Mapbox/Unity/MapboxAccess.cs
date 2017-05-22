@@ -64,7 +64,7 @@ namespace Mapbox.Unity
 			{
 				return _accessToken;
 			}
-			set
+			private set
 			{
 				if (string.IsNullOrEmpty(value))
 				{
