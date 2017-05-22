@@ -4,7 +4,8 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Mapbox.Platform {
+namespace Mapbox.Platform
+{
 
 
 	using System;
@@ -26,11 +27,12 @@ namespace Mapbox.Platform {
 	///     This implementation requires .NET 4.5 and later. The access token is expected to
 	///     be exported to the environment as MAPBOX_ACCESS_TOKEN.
 	/// </remarks>
-	public sealed class FileSource : IFileSource {
+	public sealed class FileSource : IFileSource
+	{
 
 
 		private readonly Dictionary<IAsyncRequest, int> _requests = new Dictionary<IAsyncRequest, int>();
-		private readonly string _accessToken = Environment.GetEnvironmentVariable("MAPBOX_ACCESS_TOKEN");
+		private readonly string _accessToken;
 		private readonly object _lock = new object();
 
 		/// <summary>Length of rate-limiting interval in seconds. https://www.mapbox.com/api-documentation/#rate-limits </summary>
@@ -41,6 +43,18 @@ namespace Mapbox.Platform {
 		private DateTime? XRateLimitReset;
 
 
+		public FileSource(string acessToken = null)
+		{
+			if (string.IsNullOrEmpty(acessToken))
+			{
+				_accessToken = Environment.GetEnvironmentVariable("MAPBOX_ACCESS_TOKEN");
+			}
+			else
+			{
+				_accessToken = acessToken;
+			}
+		}
+
 		/// <summary> Performs a request asynchronously. </summary>
 		/// <param name="url"> The HTTP/HTTPS url. </param>
 		/// <param name="callback"> Callback to be called after the request is completed. </param>
@@ -49,9 +63,22 @@ namespace Mapbox.Platform {
 		///     request. This handle can be completely ignored if there is no intention of ever
 		///     canceling the request.
 		/// </returns>
-		public IAsyncRequest Request(string url, Action<Response> callback, int timeout = 10) {
-			if (_accessToken != null) {
-				url += "?access_token=" + _accessToken;
+		public IAsyncRequest Request(string url, Action<Response> callback, int timeout = 10)
+		{
+			if (!string.IsNullOrEmpty(_accessToken))
+			{
+				var uriBuilder = new UriBuilder(url);
+				string accessTokenQuery = "access_token=" + _accessToken;
+				if (uriBuilder.Query != null && uriBuilder.Query.Length > 1)
+				{
+					uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery;
+				}
+				else
+				{
+					uriBuilder.Query = accessTokenQuery;
+				}
+
+				url = uriBuilder.ToString();
 			}
 
 			// TODO:
@@ -71,28 +98,35 @@ namespace Mapbox.Platform {
 
 		// TODO: look at requests and implement throttling if needed
 		//private IEnumerator<IAsyncRequest> proxyResponse(string url, Action<Response> callback) {
-		private IAsyncRequest proxyResponse(string url, Action<Response> callback) {
+		private IAsyncRequest proxyResponse(string url, Action<Response> callback)
+		{
 
 			// TODO: plugin caching somewhere around here
 
-			var request = IAsyncRequestFactory.CreateRequest(url, (Response response) => {
+			var request = IAsyncRequestFactory.CreateRequest(url, (Response response) =>
+			{
 				if (response.XRateLimitInterval.HasValue) { XRateLimitInterval = response.XRateLimitInterval; }
 				if (response.XRateLimitLimit.HasValue) { XRateLimitLimit = response.XRateLimitLimit; }
 				if (response.XRateLimitReset.HasValue) { XRateLimitReset = response.XRateLimitReset; }
 				callback(response);
-				lock (_lock) {
+				lock (_lock)
+				{
 					//another place to catch if request has been cancelled
-					try {
+					try
+					{
 						_requests.Remove(response.Request);
 					}
-					catch (Exception ex) {
+					catch (Exception ex)
+					{
 						System.Diagnostics.Debug.WriteLine(ex);
 					}
 				}
 			});
-			lock (_lock) {
+			lock (_lock)
+			{
 				//sometimes we get here after the request has already finished
-				if (!request.IsCompleted) {
+				if (!request.IsCompleted)
+				{
 					_requests.Add(request, 0);
 				}
 			}
@@ -104,17 +138,24 @@ namespace Mapbox.Platform {
 		/// <summary>
 		///     Block until all the requests are processed.
 		/// </summary>
-		public void WaitForAllRequests() {
+		public void WaitForAllRequests()
+		{
 			int waitTimeMs = 150;
-			while (_requests.Count > 0) {
-				lock (_lock) {
-					foreach (var req in _requests) {
-						if (((IAsyncRequest)req.Key).IsCompleted) {
+			while (_requests.Count > 0)
+			{
+				lock (_lock)
+				{
+					foreach (var req in _requests)
+					{
+						if (((IAsyncRequest)req.Key).IsCompleted)
+						{
 							// another place to watch out if request has been cancelled
-							try {
+							try
+							{
 								_requests.Remove(req.Key);
 							}
-							catch (Exception ex) {
+							catch (Exception ex)
+							{
 								System.Diagnostics.Debug.WriteLine(ex);
 							}
 						}
@@ -127,7 +168,8 @@ namespace Mapbox.Platform {
 				//System.Windows.Forms.Application.DoEvents();
 
 				var resetEvent = new ManualResetEvent(false);
-				ThreadPool.QueueUserWorkItem(new WaitCallback(delegate {
+				ThreadPool.QueueUserWorkItem(new WaitCallback(delegate
+				{
 					Thread.Sleep(waitTimeMs);
 					resetEvent.Set();
 				}), null);
