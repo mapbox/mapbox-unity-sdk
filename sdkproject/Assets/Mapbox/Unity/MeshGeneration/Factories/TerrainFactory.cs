@@ -1,4 +1,3 @@
-using UnityEditorInternal;
 namespace Mapbox.Unity.MeshGeneration.Factories
 {
 	using System.Collections.Generic;
