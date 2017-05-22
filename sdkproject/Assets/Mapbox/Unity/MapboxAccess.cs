@@ -141,7 +141,7 @@ namespace Mapbox.Unity
 			{
 				if (_geocoder == null)
 				{
-					_geocoder = new Geocoder(new FileSource());
+					_geocoder = new Geocoder(new FileSource(AccessToken));
 				}
 				return _geocoder;
 			}
@@ -158,7 +158,7 @@ namespace Mapbox.Unity
 			{
 				if (_directions == null)
 				{
-					_directions = new Directions(new FileSource());
+					_directions = new Directions(new FileSource(AccessToken));
 				}
 				return _directions;
 			}
