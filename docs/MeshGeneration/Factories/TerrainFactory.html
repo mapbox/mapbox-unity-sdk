@@ -1,11 +1,9 @@
-﻿<!DOCTYPE html>
-<!--[if IE]><![endif]-->
-<html>
+﻿<!DOCTYPE html><!--[if IE]><![endif]--><html>
   
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Terrain Factory | Mapbox SDK for Unity </title>
+    <title>Terrain Factory | Mapbox SDK for Unity</title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Terrain Factory | Mapbox SDK for Unity ">
     <meta name="generator" content="docfx 2.14.1.0">
@@ -26,17 +24,7 @@
         <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
           <div class="container">
             <div class="navbar-header">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              
-              <a class="navbar-brand" href="../../../index.html">
-                <img id="logo" class="svg" src="../../../docs/images/mapbox-logo.png" alt="">
-              </a>
-            </div>
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar"><span class="sr-only">切换导航</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><a class="navbar-brand" href="../../../index.html"><img id="logo" class="svg" src="../../../docs/images/mapbox-logo.png" alt=""></a></div>
             <div class="collapse navbar-collapse" id="navbar">
               <form class="navbar-form navbar-right" role="search" id="search">
                 <div class="form-group">
@@ -57,9 +45,7 @@
       </header>
       <div role="main" class="container body-content hide-when-search">
         
-        <div class="sidenav hide-when-search">
-          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
-          <div class="sidetoggle collapse" id="sidetoggle">
+        <div class="sidenav hide-when-search"><a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">显示/隐藏目录</a><div class="sidetoggle collapse" id="sidetoggle">
             <div id="sidetoc"></div>
           </div>
         </div>
@@ -68,29 +54,29 @@
             <article class="content wrap" id="_content" data-uid="">
               <h1 id="terrain-factory">Terrain Factory</h1>
               
-<p>Terrain Factory creates the world base mesh. It&#39;s able to create flat terrain, real height terrain or modified terrain where real height is multiplied by a factor.</p>
-<h4 id="parameters">Parameters</h4>
-<p><strong>Map Type</strong>: Flat, Height or Modified Height.</p>
-<p><strong>Map ID Type</strong>: Data source used in the <em>Height</em> and <em>Modified Height</em> map types. Default value is &quot;mapbox.terrain-rgb&quot;.</p>
-<p><strong>Height Multiplier</strong>: Used in <em>Modified Height</em> map type as a simple multiplier on queried terrain height.</p>
-<p><strong>Resolution</strong>: Terrain is generated as a grid mesh and resolution represents the sample count on each edge of this grid.</p>
-<p><strong>Material</strong>: Base material for the generated mesh. Will most likely be overridden by MapImageFactory but useful if you&#39;re not using it.</p>
-<p><strong>Update</strong>: Update function recreates the terrain using current parameters. </p>
-<h4 id="methods">Methods</h4>
-<p>Terrain factory has three public methods; <code>Initialize</code>, <code>Register</code> and <code>Update</code> coming from the base <code>Factory</code> class.</p>
-<p><code>Initialize</code> method clears and reinitalizes the registered tile list. Can be used as a reset method.</p>
-<p><code>Register</code> method adds new tiles to the registered tiles list to be processed.</p>
-<p><code>Update</code> method clears the mesh data for all tiles and recraetes them using current settings. Clearing the mesh data first is important for stitching tile edges to each other.</p>
-<p>Private method <code>Run</code> starts the processing of a tile and directs tile to different functions depending on the <code>Map Type</code> parameter. These methods can be extracted into external modules in the future.</p>
-<p><code>CreateTerrainHeight</code> fetches the data from the Mapbox server and passes it to <code>GenerateTerrainMesh</code> for mesh generation, which creates a grid and queries the data for height of each node in this grid. Mesh vertices, triangles, normals and UV map are all created and set in this function.</p>
-<p><code>FixStitches</code> method stitches the edges of terrain tiles to make it look continuous and smooth.</p>
-<p><code>CreateFlatMesh</code> creates a quad as base mesh and doesn&#39;t use resolution.</p>
+<p>Terrain Factory 创建地图底图网格。它能够创建平坦的地形，真实的高度地形或修改过的地形（用实际高度乘以一个因数）。</p>
+<h4 id="parameters">参数（Parameters）</h4>
+<p><strong>地图类型</strong> ：Flat（平坦），Height（高度）或 Modified Height（修改过的高度）。</p>
+<p><strong>地图 ID 类型</strong> ：用于<em>Height</em> 和 <em>Modified Height</em>地图类型的数据源。默认值为&ldquo;mapbox.terrain-rgb&rdquo;。</p>
+<p><strong>高度乘数（Height Multiplier）</strong> ：用于<em>Modified Height</em>地图类型作为查询地形高度的乘数。</p>
+<p><strong>分辨率（Resolution）</strong> ：地形生成为栅格，分辨率表示此网格每条边上的样本计数。</p>
+<p><strong>Material</strong> ：生成的网格的底图材料。很有可能被 MapImageFactory 覆盖，但如果没有使用 MapImageFactory，Material 将很有用。</p>
+<p><strong>更新</strong> ：更新功能使用当前参数重新创建地形。</p>
+<h4 id="methods">方法</h4>
+<p>Terrain Factory 有三种公用方法；<code>Initialize</code> ， <code>Register</code> 和 <code>Update</code>（来自底图 <code>Factory</code> 类）。</p>
+<p><code>Initialize</code>方法清除并重新初始化已注册的切片列表。可以用作复位方法。</p>
+<p><code>Register</code>方法将新的切片添加到待处理的已注册切片中。</p>
+<p><code>Update</code>方法清除所有切片的网格数据，并使用当前设置重新绘制。首先清除网格数据对于拼接瓦片边缘很重要。</p>
+<p>私有方法 <code>Run</code> 启动切片处理，并根据 <code>Map Type</code> 参数给切片添加不同的功能。这些方法将来可以提取到外部模块中。</p>
+<p><code>CreateTerrainHeight</code>从 Mapbox 服务器中获取数据，并将其传递给 <code>GenerateTerrainMesh</code> 进行网格生成，从而创建一个网格，并查询该网格中每个节点的高度数据。网格顶点，三角形，法向量和 UV 地图都在该函数中创建并设置。</p>
+<p><code>FixStitches</code> 方法可以拼接地形切片的边缘，使其连续且平滑。</p>
+<p><code>CreateFlatMesh</code> 创建一个四边形作为底图网格，同时不使用分辨率。</p>
 <h2 id="flat-terrain">Flat Terrain</h2>
-<p><img src="Images/flatterrain.png" alt="flat terrain"></p>
+<p><img src="Images/flatterrain.png" alt="平坦的地形"></p>
 <h2 id="real-height">Real Height</h2>
-<p><img src="Images/realheight.png" alt="real height terrain"></p>
+<p><img src="Images/realheight.png" alt="真正的高度地形"></p>
 <h2 id="modified-terrain-height">Modified Terrain Height</h2>
-<p><img src="Images/modifiedterrain.png" alt="modified terrain"></p>
+<p><img src="Images/modifiedterrain.png" alt="修改过的的地形"></p>
 
             </article>
           </div>
@@ -99,14 +85,10 @@
             <div class="sideaffix">
               <div class="contribution">
                 <ul class="nav">
-                  <li>
-                    <a href="https://github.com/mapbox/mapbox-unity-sdk/blob/develop/documentation/docs/MeshGeneration/Factories/TerrainFactory.md/#L1" class="contribution-link">Improve this Doc</a>
-                  </li>
+                  <li><a href="https://github.com/mapbox/mapbox-unity-sdk/blob/develop/documentation/docs/MeshGeneration/Factories/TerrainFactory.md/#L1" class="contribution-link">改进此文档</a></li>
                 </ul>
               </div>
-              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
-              </nav>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix"><!-- <p><a class="back-to-top" href="#top">Back to top</a><p> --></nav>
             </div>
           </div>
         </div>
@@ -115,13 +97,7 @@
       <footer>
         <div class="grad-bottom"></div>
         <div class="footer">
-          <div class="container">
-            <span class="pull-right">
-              <a href="#top">Back to top</a>
-            </span>
-            &#0169; 2017 Mapbox
-            
-          </div>
+          <div class="container"><span class="pull-right"><a href="#top">返回页首</a></span> © 2017 Mapbox</div>
         </div>
       </footer>
     </div>

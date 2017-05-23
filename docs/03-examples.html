@@ -1,11 +1,9 @@
-﻿<!DOCTYPE html>
-<!--[if IE]><![endif]-->
-<html>
+﻿<!DOCTYPE html><!--[if IE]><![endif]--><html>
   
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Included Examples | Mapbox SDK for Unity </title>
+    <title>示例|用于 Unity 的Mapbox SDK</title>
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Included Examples | Mapbox SDK for Unity ">
     <meta name="generator" content="docfx 2.14.1.0">
@@ -26,17 +24,7 @@
         <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
           <div class="container">
             <div class="navbar-header">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              
-              <a class="navbar-brand" href="../index.html">
-                <img id="logo" class="svg" src="../docs/images/mapbox-logo.png" alt="">
-              </a>
-            </div>
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar"><span class="sr-only">切换导航</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><a class="navbar-brand" href="../index.html"><img id="logo" class="svg" src="../docs/images/mapbox-logo.png" alt=""></a></div>
             <div class="collapse navbar-collapse" id="navbar">
               <form class="navbar-form navbar-right" role="search" id="search">
                 <div class="form-group">
@@ -57,97 +45,94 @@
       </header>
       <div role="main" class="container body-content hide-when-search">
         
-        <div class="sidenav hide-when-search">
-          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
-          <div class="sidetoggle collapse" id="sidetoggle">
+        <div class="sidenav hide-when-search"><a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">显示/隐藏目录</a><div class="sidetoggle collapse" id="sidetoggle">
             <div id="sidetoc"></div>
           </div>
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="">
-              <h1 id="included-examples">Included Examples</h1>
+              <h1 id="included-examples">示例</h1>
               
-<p>For each example, associated scripts and resources can be found in the same root directory as the scene itself.</p>
+<p>与示例关联的脚本和资源可以在与场景所在的相同的根目录中找到。</p>
 <h2 id="playground">Playground</h2>
-<p>These examples demonstrate how to request specific Mapbox data using our C# library.</p>
-<h3 id="forward-geocoder">Forward Geocoder</h3>
+<p>这些示例将演示如何使用我们的C＃库请求获取特定的 Mapbox 数据。</p>
+<h3 id="forward-geocoder">正向地理编码（Forward Geocoder）</h3>
 <p><em>ForwardGeocoder.unity</em></p>
-<p>A forward geocoding request will fetch GeoJSON from a place name query. A new request is sent every time the user input field is edited.</p>
-<p>Visit <a href="https://www.mapbox.com/api-documentation/#geocoding">our API documentation</a> for more information.</p>
-<h3 id="reverse-geocoder">Reverse Geocoder</h3>
+<p>正向地理编码请求将从地名查询中获取 GeoJSON。每次编辑用户输入字段后都会发送一个新的请求。</p>
+<p>访问<a href="https://www.mapbox.com/api-documentation/#geocoding">我们的 API 文档</a>以获取更多信息。</p>
+<h3 id="reverse-geocoder">反向地理编码（Reverse Geocoder）</h3>
 <p><em>ReverseGeocoder.unity</em></p>
-<p>A reverse geocoding request will fetch GeoJSON from a location query. The location query string must be in the format of <code>latitude, longitude</code>. A new request is sent every time the user input field is edited.</p>
-<p>Visit <a href="https://www.mapbox.com/api-documentation/#geocoding">our API documentation</a> for more information.</p>
+<p>反向地理编码请求将从位置查询获取GeoJSON。位置查询字符串的格式必须为<code>纬度，经度</code> 。每次编辑用户输入字段后都会发送一个新的请求。</p>
+<p>访问<a href="https://www.mapbox.com/api-documentation/#geocoding">我们的 API 文档</a>以获取更多信息。</p>
 <h3 id="directions">Directions</h3>
 <p><em>Directions.unity</em></p>
-<p>Enter a start location query (eg. &quot;San Francisco, CA&quot;), this is a forward geocode request.</p>
-<p>Enter a destination query (eg. &quot;Los Angeles, CA&quot;), this is also a forward geocode request.</p>
-<p>When the geocode requests have been completed, a directions request is executed. A new request is sent every time the start or destination user input fields are edited.</p>
-<p>Directions results will be logged to the UI when they are available (in the form of JSON).</p>
-<h3 id="raster-tile">Raster Tile</h3>
+<p>输入起始位置查询（例如&ldquo;San Francisco，CA&rdquo;），这是一个正向地理编码请求。</p>
+<p>输入目的地查询（例如&ldquo;Los Angeles, CA&rdquo;），这也是一个正向地理编码请求。</p>
+<p>当地理编码请求已经完成时，将执行 directions 请求。每次编辑了开始或目标用户输入字段后都会发送新的请求。</p>
+<p>Directions 结果（如果可用）将（以JSON的形式）被记录到用户界面。</p>
+<h3 id="raster-tile">栅格切片（raster tiles）</h3>
 <p><em>RasterTile.unity</em></p>
-<p>Uses a forward geocoder request to fetch a styled raster tile from a Map object. A new request is sent whenever the zoom or style are changed, or when the user input field is edited.</p>
-<p>See: <a href="https://www.mapbox.com/help/define-style/">https://www.mapbox.com/help/define-style/</a></p>
-<p>See: <a href="https://www.mapbox.com/api-documentation/#retrieve-raster-tiles-from-styles">https://www.mapbox.com/api-documentation/#retrieve-raster-tiles-from-styles</a></p>
-<h3 id="vector-tile">Vector Tile</h3>
+<p>使用正向地理编码请求从 Map 对象获取样式化了的栅格切片。每当更改缩放或样式时，或者当用户输入字段被编辑时，都会发送一个新的请求。</p>
+<p>参阅：<a href="https://www.mapbox.com/help/define-style/">https://www.mapbox.com/help/define-style/</a></p>
+<p>参阅：<a href="https://www.mapbox.com/api-documentation/#retrieve-raster-tiles-from-styles">https://www.mapbox.com/api-documentation/#retrieve-raster-tiles-from-styles</a></p>
+<h3 id="vector-tile">矢量切片</h3>
 <p><em>VectorTile.unity</em></p>
-<p>Uses a forward geocoder request to fetch GeoJSON from a vector tile. A new request is sent whenever the user input field is edited.</p>
-<p>In this example, the result is GeoJSON with a feature collection.</p>
-<p>Visit <a href="https://www.mapbox.com/api-documentation/#retrieve-features-from-vector-tiles">our API documentation</a> for more information.</p>
-<h2 id="mesh-generation-basics">Mesh Generation Basics</h2>
+<p>使用正向地理编码请求从矢量切片获取 GeoJSON。每次编辑用户输入字段时都会发送新的请求。</p>
+<p>在此示例中，结果是GeoJSON具有要素集合。</p>
+<p>访问<a href="https://www.mapbox.com/api-documentation/#retrieve-features-from-vector-tiles">我们的 API 文档</a>以获取更多信息。</p>
+<h2 id="mesh-generation-basics">网格生成基础知识（Mesh Generation Basics）</h2>
 <p><em>MeshGeneration.unity</em></p>
-<p>This example demonstates the basics of the Mapbox Unity SDK <code>MapVisualization</code> framework. Specifically, <code>TerrainFactory</code>, <code>MapImageFactory</code>, and <code>MeshFactory</code> are used together to generate a layered map.</p>
-<p><code>MapController</code> acts as the entry point. Here, you can specify the map center (<code>LatLng</code>) and range. Range <code>X</code>, <code>Y</code>, <code>Z</code>, <code>W</code> corresponds to the number of tiles (<code>int</code>) for North, East, South, and West, respectively.</p>
-<p>See <code>TerrainFactory.asset</code> to customize the base ground mesh. This can either be <code>Flat</code> (no elevation), or modified with the <a href="https://www.mapbox.com/blog/terrain-rgb/">Mapbox Global Elevation Layer</a>. The <code>Resolution</code> property specifies how vertices each tile&#39;s generated plane will have. <strong>Note: this factory is needed if you plan to also use a <code>MapImageFactory</code> (for texture application purposes).</strong></p>
-<p>See <code>MapImageFactory.asset</code> to customize the raster <code>MapId</code> you would like to use. Select <code>Custom</code> <code>Map Type</code> to use your own Mapbox Studio <code>Style URL</code>. </p>
-<p>See <code>MeshFactory.asset</code> to see how specific layers are extracted from vector tiles. In this case, we are generating meshes for both <code>building</code> and <code>road</code>. Therefore, each layer has a <code>VectorLayerVisualizer</code> responsible for handling that layer&#39;s specific data (such as geometry).</p>
+<p>这个例子说明了Mapbox Unity SDK <code>MapVisualization</code>框架的一些基础知识。具体来说， 需要同时使用 <code>TerrainFactory</code>，<code>MapImageFactory</code> 和 <code>MeshFactory</code> 来一起生成分层设色地图。</p>
+<p><code>MapController</code>作为入口点。在这里，您可以指定地图中心（ <code>LatLng</code> ）和范围。范围<code>X</code> ， <code>Y</code> ， <code>Z</code> ， <code>W</code>分别对应于北，东，南，西的切片数（ <code>int</code> ）。</p>
+<p>请参阅 <code>TerrainFactory.asset</code> 来自定义底图网格。这可以是 <code>Flat</code> （没有高度），也可以使用<a href="https://www.mapbox.com/blog/terrain-rgb/">Mapbox 全局高程（Mapbox Global Elevation）图层进行</a>修改。<code>Resolution</code> 属性指定每个切片的生成平面将具有的顶点。<strong>注意：如果您还要使用 <code>MapImageFactory</code> （用于纹理应用），那么也需要该 Factory。</strong></p>
+<p>请参阅 <code>MapImageFactory.asset</code> 来自定义您要使用的栅格 <code>MapId</code> 。选择<code>Custom</code> <code>Map Type</code>以使用您自己的 Mapbox Studio <code>Style URL</code> 。</p>
+<p>请参阅 <code>MeshFactory.asset</code> 了解怎样从矢量切片中提取特定的图层。在这个示例中，我们正在为 <code>building</code> 和 <code>road</code> 生成网格。因此，每个图层都有一个<code>VectorLayerVisualizer</code> 负责处理该层的特定数据（如几何图形）。</p>
 <h2 id="mesh-generataion-pois">Mesh Generataion Pois</h2>
 <p><em>PoiGeneration.unity</em></p>
-<p>With the exception of a <code>PoiVisualizer</code> (<code>PoiDemoPoiVisualizer</code>) being added to the <code>MeshFactory</code>, this example is identical to <code>Mesh Generation Basics</code>.</p>
-<p><code>PoiDemoPoiVisualizer.asset</code> allows you to override which prefab to spawn for each <code>po_label</code> contained in the vector tile. This prefab should have a component that implements <code>ILabelVisualizationHelper</code> attached to it. This exists to inject feature data into (such as label and <code>Maki</code> icon).</p>
-<h2 id="mesh-generation-styles">Mesh Generation Styles</h2>
+<p>除了要将 <code>PoiVisualizer</code>（<code>PoiDemoPoiVisualizer</code>）添加到 <code>MeshFactory</code> 这一点，其他的与 <code>Mesh Generation Basics</code> 相同 。</p>
+<p>可以用 <code>PoiDemoPoiVisualizer.asset</code> 覆盖矢量切片中包含的每个 <code>po_label</code> 生成的预设组（prefab）。这个预设组件应该附带一个执行 <code>ILabelVisualizationHelper</code> 的组件 。该组件用于插入要素数据（如标签和 <code>Maki</code> 图标）。</p>
+<h2 id="mesh-generation-styles">网格生成样式（Mesh Generation Styles）</h2>
 <p><em>StylingDemoMeshGeneration.unity</em></p>
-<p>This example demonstrates how to use <code>TypeFilters</code> to filter specific features for processing. In this case, we have chosen to exclude <code>schools</code> from mesh generation. Additionally, you can use <code>ModifierStacks</code> to further customize specific features (to color banks differently, for example).</p>
+<p>此示例演示如何使用 <code>TypeFilters</code> 筛选出特定要素来进行处理。在这里，我们选择在网格生成中排除 <code>schools</code>。此外，您可以使用 <code>ModifierStacks</code> 进一步自定义特定要素（例如，定制使用不同的颜色库）。</p>
 <h2 id="drive">Drive</h2>
 <p><em>Drive.unity</em></p>
-<p>This example demonstrates how to utilize <a href="https://www.mapbox.com/vector-tiles/mapbox-traffic-v1/">Mapbox Traffic</a> and <a href="https://www.mapbox.com/api-documentation/#directions">Mapbox Directions</a> data within the Mapbox Unity SDK <code>MapVisualization</code> framework.</p>
-<p><code>DirectionsHelper</code> is responsible for passing <code>Transform</code> positions to the <code>DirectionsFactory</code>, as waypoints, in the form of <code>Latitude/Longitude</code>.  You can use up to 25 waypoints. See <code>DriveDirectionFactory.asset</code> to analyze how the generated route is rendered.</p>
-<p>Please see <code>DriveTrafficVisualizer.asset</code> to analyze how we styled low, moderate, heavy, and severe traffic congestion. Each congestion feature uses a <code>ModifierStack</code> to customize its generated appearance (such as height, width, and material/color).</p>
-<p>The ground layer was generated with a <code>flat</code> <code>TerrainFactory</code> and a <code>MapImageFactory</code> (for raster tiles) with the Mapbox Dark style applied. </p>
-<p>To understand 3D building generation, please see <code>Mesh Generation Basics</code>. One particular difference in this example, however, is the use of a <code>MergedModifierStack</code> for <code>DriveBuildingVisualizer.asset</code>. This <code>ModifierStack</code> is responsible for merging buildings during generation. This optimization reduces the number of transforms and draw calls in the scene, vastly improving the final frame rate.</p>
+<p>本示例演示了如何在 Mapbox Unity SDK <code>MapVisualization</code> 框架内使用<a href="https://www.mapbox.com/vector-tiles/mapbox-traffic-v1/">Mapbox Traffic</a> 和 <a href="https://www.mapbox.com/api-documentation/#directions">Mapbox Directions</a> 数据。</p>
+<p><code>DirectionsHelper</code> 通过 <code>Latitude/Longitude</code> 的形式将<code>Transform</code>位置传递给 <code>DirectionsFactory</code> 作为航点（waypoint）。最多可以使用 25 个航点。请参阅 <code>DriveDirectionFactory.asset</code> 来分析生成的路线是如何被渲染的。</p>
+<p>请参阅 <code>DriveTrafficVisualizer.asset</code> 来分析我们如何用样式呈现低，中，重度，严重的交通拥堵的情况。每个表现交通拥堵的要素都使用 <code>ModifierStack</code> 来生成定制的外观（例如高度，宽度和材质/颜色）。</p>
+<p>底层图层由<code>flat </code>， <code>TerrainFactory</code> 和 <code>MapImageFactory</code> （用于栅格切片）生成，并应用了 Mapbox Dark 样式。</p>
+<p>要了解 3D 建筑生成，请参阅 <code>Mesh Generation Basics</code> 。但是，这个例子中的不同点是对 <code>DriveBuildingVisualizer.asset</code> 使用了<code>MergedModifierStack</code>。这个 <code>ModifierStack</code> 用于在生成网格期间把建筑物合并在一起。这个优化减少了场景中的转换次数和调用渲染（draw call），大大提高了最终的帧率。</p>
 <h2 id="slippy-vector-terrain">Slippy Vector Terrain</h2>
 <p><em>SlippyDemo.unity</em></p>
-<p>This example demonstrates one way to create a <a href="http://wiki.openstreetmap.org/wiki/Slippy_Map">slippy map</a>. The <code>Slippy</code> component attached to the <code>MapController</code> game object is responsible for requesting new tiles as needed, based on the position of the camera relative to the map. This is achieved using <code>raycasting</code> and a dictionary of known (requested and fetched) tiles.</p>
-<p>Use W, A, S, D keyboard controls to navigate the map at runtime.</p>
-<p>Please see <code>Mesh Generation Basics</code> to understand how features are customized. </p>
-<h2 id="voxels">Voxels</h2>
+<p>这个示例演示了创建 <a href="http://wiki.openstreetmap.org/wiki/Slippy_Map">slippy map</a> 的一种方法。附加到 <code>MapController</code> 游戏对象的 <code>Slippy</code> 组件负责根据地图中 Camera 的位置来请求获取新的切片。这是使用 <code>raycasting</code> 和已知（请求和获取的）切片字典（dictionary）来实现的。</p>
+<p>在运行时使用 W，A，S，D 键盘控件浏览地图。</p>
+<p>请参阅 <code>Mesh Generation Basics</code>，了解如何定制要素。</p>
+<h2 id="voxels">立体像素（Voxels）</h2>
 <p><em>VoxelWorld.unity</em></p>
-<p>This Minecraft-inspired example demonstrates a less traditional way to consume Mapbox data for maps or world construction.</p>
-<p><code>VoxelTile</code> is responsible for fetching both a styled raster tile and a <code>mapbox.terrain-rgb</code> (global elevation) tile. The styled raster pixels are sampled to determine which voxels to generate, via the <code>VoxelFetcher</code>. This is achieved using a <code>nearest color</code> formula. The elevation tile pixels are sampled to determine where to vertically place the voxels.</p>
-<p><code>Zoom</code>: what <a href="http://wiki.openstreetmap.org/wiki/Zoom_levels">zoom level</a> to request the tiles at.</p>
-<p><code>Elevation Multiplier</code>: use to exaggerate the real-world height.</p>
-<p><code>Voxel Depth Padding</code>: determine how many voxels to spawn below the designated height. This helps fill holes in environments with extreme elevation variations.</p>
-<p><code>Tile Width in Voxels</code>: How many voxels across each tile will generate. This will affect the detail of the world. Raster textures are downsampled according to this value.</p>
-<p><code>Voxel Batch Count</code>: How many voxels to spawn at once. Keep this number low to prevent locking the main thread during construction. </p>
-<p>Please read <a href="https://www.mapbox.com/blog/how-to-minecraft-unity/">the blog post</a> describing how this was made for more information. </p>
+<p>这个 Minecraft 风格的示例展示了如何通过与传统不大一样的方式，使用 Mapbox 数据来构建地图或游戏世界。</p>
+<p><code>VoxelTile</code> 用于获取样式化的栅格切片和 <code>mapbox.terrain-rgb</code> （全局高程）切片。样式化的栅格像素将被制作成样本，利用 <code>VoxelFetcher</code> 来确定需要生成哪些立体像素。这是使用 <code>nearest color</code> 公式来实现的。高程切片像素将被制作成样本，用以确定如何垂直放置立体像素。</p>
+<p><code>Zoom</code> ：在什么 <a href="http://wiki.openstreetmap.org/wiki/Zoom_levels">缩放级别</a> 下请求获取切片。</p>
+<p><code>Elevation Multiplier</code>：用于放大真实世界的高度。</p>
+<p><code>Voxel Depth Padding</code>：确定在指定高度以下产生多少立体像素。这有助于填充在高度变化非常大的环境中的孔洞。</p>
+<p><code>Tile Width in Voxels</code> ：每个切片将产生多少个立体像素。这将影响全局的细节呈现。栅格纹理根据此值进行降采样。</p>
+<p><code>Voxel Batch Count</code> ：一次产生多少个立体像素。使该数字保持低数值，以防止在构建过程中锁定主线程。</p>
+<p>请阅读这篇<a href="https://www.mapbox.com/blog/how-to-minecraft-unity/">博客文章</a>，了与此相关的更多信息。</p>
 <h2 id="locationprovider">LocationProvider</h2>
 <p><em>LocationProvider.unity</em></p>
-<p>This example is to demonstrate how to:</p>
+<p>这个例子是演示如何：</p>
 <ul>
-<li>Build a map for your current (device) location </li>
-<li>Update a virtual player&#39;s position and rotation based on a real or mock location and heading</li>
-<li>Use mock location providers to test in the Unity editor</li>
-<li>Convert between unity world space&lt;—&gt;earth space (latitude, longitude)</li>
+<li>构建您当前（设备）所在位置的地图</li>
+<li>基于真实的或模拟的位置和前进方向来更新虚拟播放器（virtual player）的位置和倾斜度（rotation）</li>
+<li>使用模拟位置提供程序（location providers）在 Unity 编辑器中进行测试</li>
+<li>Unity 游戏空间&lt;&mdash;&gt;地球空间（纬度，经度）之间的转换</li>
 </ul>
-<p>The <code>LocationProvider</code> game object in this scene has three children. Each child corresponds to a specific type of <code>ILocationProvider</code>. Please <a href="https://mapbox.github.io/mapbox-unity-sdk/api/unity/Mapbox.Unity.Location.html">read more about LocationProviders</a>.</p>
-<p>The <code>MapController</code> game object has a <code>BuildMapAtLocation</code> component attached to it. This component is responsible for overriding the default center point of the <code>MapController</code> component, using the DefaultLocationProvider&#39;s location. In the Unity editor, this is the <code>EditorLocationProvider</code>—intended for mocking. On device, this is the <code>DeviceLocationProvider</code>—intended for real world location updates.</p>
-<p>To change the location for the map in the Editor, change <code>EditorLocationProvider</code>&#39;s <code>LatitudeLongitude</code> field on the <code>Editor</code> game object. You can use the embedded <code>Search</code> button in the inspector to search for a place or address. The default location for this scene is the Metreon, in San Francisco, CA. </p>
-<p><strong>Note: It is important that the <code>MapController</code> component be disabled to begin with.</strong></p>
-<p>Press play and observe the map being constructed. Click on the <code>Player</code> game object and note the attached components: <code>PositionWithLocationProvider</code> and <code>RotateWithLocationProvider</code>. These are responsible for updating the transform&#39;s position and rotation based on a specified <code>ILocationProvider</code>. Again, in the <code>EditorLocationProvider</code>, search for <code>Yerba Buena Gardens</code> and select the top result. Watch as the player&#39;s position updates!</p>
-<p>If you check <code>Use Transform Location Provider</code> for <code>PositionWithLocationProvider</code> and <code>RotateWithLocationProvider</code>, the mock <code>ILocationProvider</code> will be represented by the <code>Transform</code> game object. Press play once more with this toggle checked for both components. In the scene view, move and rotate the <code>Transform</code> game object and observe as the <code>Player</code> tries to follow that target. It is important to note that the location returned by the <code>TransformLocationProvider</code> is actually converted from the transform&#39;s world position to latitude, longitude. This is what that conversion looks like: </p>
-<pre><code class="lang-cs">return _targetTransform.GetGeoPosition(MapController.ReferenceTileRect.Center, MapController.WorldScaleFactor);
-</code></pre><p>If you build to device, you should see a familiar map and can observe the player update with your own location. Because the camera is a child of <code>Player</code>, you should always be centered on the map.</p>
+<p>该场景中的 <code>LocationProvider</code> 游戏对象有三个子对象。每个子对象对应于特定类型的 <code>ILocationProvider</code> 。请<a href="https://mapbox.github.io/mapbox-unity-sdk/api/unity/Mapbox.Unity.Location.html">阅读更多关于 LocationProviders 的信息</a> 。</p>
+<p><code>MapController</code>游戏对象附有一个 <code>BuildMapAtLocation</code> 组件。该组件使用 DefaultLocationProvider 的位置覆盖 <code>MapController</code> 组件的默认中心点。在 Unity 编辑器中，该 <code>EditorLocationProvider</code>&mdash;&mdash;用于模拟。在设备上，该 <code>DeviceLocationProvider</code> &mdash;&mdash;用于真实世界位置的更新。</p>
+<p>要在 Editor 中更改地图的位置，请在<code>Editor</code> 游戏对象上更改<code>EditorLocationProvider</code> 的 <code>LatitudeLongitude</code> 字段。您可以使用嵌入在 Inspector 中的 <code>Search</code> 按钮来搜索地点或地址。该场景的默认位置是位于加州旧金山的 Metreon。</p>
+<p><strong><b>注意：</b>很重要的一点是在一开始要禁用 <code>MapController</code>组件。</strong></p>
+<p>按播放并观察正在构建的地图。点击 <code>Player</code> 游戏对象并留意附加的组件：<code>PositionWithLocationProvider</code>和<code>RotateWithLocationProvider</code> 。它们根据指定的 <code>ILocationProvider</code> 更新变换的位置和倾斜度。再次，在 <code>EditorLocationProvider</code> 中，搜索 <code>Yerba Buena Gardens</code> 并选择最佳结果。查看播放器的位置更新！</p>
+<p>如果您为 <code>PositionWithLocationProvider</code> 和 <code>RotateWithLocationProvider</code> 勾选了 <code>Use Transform Location Provider</code> ，则模拟 <code>ILocationProvider</code> 将由 <code>Transform</code> 游戏对象表示。再次按播放，两个组件都勾选该选项。在场景视图中，移动并旋转 <code>Transform</code> 游戏对象，并观察 <code>Player</code> 对该目标的跟踪。重要的是要注意，<code>TransformLocationProvider</code> 返回的位置实际上是从变换的游戏世界位置转换为纬度，经度表示的位置。转换示例如下：</p>
+<pre><code class="lang-cs">return _targetTransform.GetGeoPosition（MapController.ReferenceTileRect.Center，MapController.WorldScaleFactor）；</code></pre><p>如果你将其建立到设备上，你应该看到一个熟悉的地图，并看到播放器随着你的位置而更新。由于 Camera 是 <code>Player</code> 的子对象，所以您应该始终位于地图中心。</p>
 
             </article>
           </div>
@@ -156,14 +141,10 @@
             <div class="sideaffix">
               <div class="contribution">
                 <ul class="nav">
-                  <li>
-                    <a href="https://github.com/mapbox/mapbox-unity-sdk/blob/develop/documentation/docs/03-examples.md/#L1" class="contribution-link">Improve this Doc</a>
-                  </li>
+                  <li><a href="https://github.com/mapbox/mapbox-unity-sdk/blob/develop/documentation/docs/03-examples.md/#L1" class="contribution-link">改进此文档</a></li>
                 </ul>
               </div>
-              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
-              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
-              </nav>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix"><!-- <p><a class="back-to-top" href="#top">Back to top</a><p> --></nav>
             </div>
           </div>
         </div>
@@ -172,13 +153,7 @@
       <footer>
         <div class="grad-bottom"></div>
         <div class="footer">
-          <div class="container">
-            <span class="pull-right">
-              <a href="#top">Back to top</a>
-            </span>
-            &#0169; 2017 Mapbox
-            
-          </div>
+          <div class="container"><span class="pull-right"><a href="#top">返回页首</a></span> © 2017 Mapbox</div>
         </div>
       </footer>
     </div>
