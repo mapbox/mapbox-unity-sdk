@@ -114,7 +114,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					tile.HeightDataState = TilePropertyState.Error;
 
 					// Handle missing elevation from server (404)!
-					CreateFlatMesh(tile);
+					//CreateFlatMesh(tile);
 					return;
 				}
 
