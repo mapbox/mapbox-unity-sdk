@@ -5,15 +5,17 @@ namespace Mapbox.Unity.MeshGeneration.Data
 	using Mapbox.Unity.Utilities;
 	using Utils;
 	using Mapbox.Map;
-	using Mapbox.Platform;
 	using System;
 	using Mapbox.Unity.Map;
+	using System.Collections.Generic;
 
-	public class UnityTile : MonoBehaviour, IAsyncRequest
+	public class UnityTile : MonoBehaviour
 	{
 		float[] _heightData;
 		Texture2D _rasterData;
 		float _relativeScale;
+
+		List<Tile> _tiles = new List<Tile>();
 
 		MeshRenderer _meshRenderer;
 		public MeshRenderer MeshRenderer
@@ -83,44 +85,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		IAsyncRequest[] _asyncRequests;
-		public IAsyncRequest AsyncTerrainRequest
-		{
-			set
-			{
-                _asyncRequests[0] = value;
-			}
-		}
-
-        public IAsyncRequest AsyncImageRequest
-        {
-            set
-            {
-                _asyncRequests[1] = value;
-            }
-        }
-
-        public IAsyncRequest AsyncVectorRequest
-        {
-            set
-            {
-                _asyncRequests[2] = value;
-            }
-        }
-
-        public bool IsCompleted
-		{
-			get
-			{
-                for (int i = 0; i < 3; i++)
-                {
-                    if (_asyncRequests[i] != null && !_asyncRequests[i].IsCompleted)
-                        return false;
-                }
-                return true;
-			}
-		}
-
 		public TilePropertyState RasterDataState { get; set; }
 		public TilePropertyState HeightDataState { get; set; }
 		public TilePropertyState VectorDataState { get; set; }
@@ -128,12 +92,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public event Action<UnityTile> OnHeightDataChanged = delegate { };
 		public event Action<UnityTile> OnRasterDataChanged = delegate { };
 		public event Action<UnityTile> OnVectorDataChanged = delegate { };
-        public event Action<UnityTile> OnRecycled = delegate { };
+		public event Action<UnityTile> OnRecycled = delegate { };
 
-        internal void Initialize(IMap map, UnwrappedTileId tileId)
+		internal void Initialize(IMap map, UnwrappedTileId tileId)
 		{
-            _asyncRequests = new IAsyncRequest[3];
-            _relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
+			_relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
 			_rect = Conversions.TileBounds(tileId);
 			_canonicalTileId = tileId.Canonical;
 			var position = new Vector3((float)(Rect.Center.x - map.CenterMercator.x), 0, (float)(Rect.Center.y - map.CenterMercator.y));
@@ -157,7 +120,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			RasterDataState = TilePropertyState.None;
 			HeightDataState = TilePropertyState.None;
 			VectorDataState = TilePropertyState.None;
-            _asyncRequests = new IAsyncRequest[3];
+
+			Cancel();
+			_tiles.Clear();
 
 			// HACK: this is for vector layer features and such.
 			// It's slow and wasteful, but a better solution will be difficult.
@@ -170,9 +135,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				}
 			}
 
-            OnRecycled(this);
-
-        }
+			OnRecycled(this);
+		}
 
 		internal void SetHeightData(byte[] data, float heightMultiplier = 1f)
 		{
@@ -239,13 +203,18 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			return _rasterData;
 		}
 
+		internal void AddTile(Tile tile)
+		{
+			_tiles.Add(tile);
+		}
+
 		public void Cancel()
 		{
-            for (int i = 0; i < 3; i++)
-            {
-                if (_asyncRequests[i] != null)
-                    _asyncRequests[i].Cancel();
-            }
+			for (int i = 0, _tilesCount = _tiles.Count; i < _tilesCount; i++)
+			{
+				var tile = _tiles[i];
+				tile.Cancel();
+			}
 		}
 	}
 }

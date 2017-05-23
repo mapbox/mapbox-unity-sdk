@@ -121,7 +121,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             tile.HeightDataState = TilePropertyState.Loading;
 
             var pngRasterTile = new RawPngRasterTile();
-            tile.AsyncTerrainRequest = pngRasterTile;
+			tile.AddTile(pngRasterTile);
 
             pngRasterTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
             {
@@ -131,8 +131,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                     tile.HeightDataState = TilePropertyState.Error;
 
                     // HACK: handle missing tile from server (404)!
-                    CreateFlatMesh(tile);
-                    return;
+					//CreateFlatMesh(tile);
+					return;
                 }
 
                 tile.SetHeightData(pngRasterTile.Data, _heightModifier);
@@ -275,7 +275,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                 unityMesh.RecalculateNormals();
 
                 // HACK: comment this out if you see rendering errors related to terrain!
-                _cachedQuad = unityMesh;
+                //_cachedQuad = unityMesh;
             }
 
             tile.MeshFilter.sharedMesh = unityMesh;

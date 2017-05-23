@@ -73,14 +73,14 @@ namespace Mapbox.Unity.MeshGeneration
 		{
 			var unityTile = _activeTiles[tileId];
 
+			unityTile.Recycle();
+			_activeTiles.Remove(tileId);
+			_inactiveTiles.Enqueue(unityTile);
+
 			foreach (var factory in _factories)
 			{
 				factory.Unregister(unityTile);
 			}
-
-			unityTile.Recycle();
-			_activeTiles.Remove(tileId);
-			_inactiveTiles.Enqueue(unityTile);
 		}
 	}
 }

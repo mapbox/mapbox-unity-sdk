@@ -21,7 +21,6 @@
 
 		public void Unregister(UnityTile tile)
 		{
-			tile.Cancel();
 			OnUnregistered(tile);
 		}
 

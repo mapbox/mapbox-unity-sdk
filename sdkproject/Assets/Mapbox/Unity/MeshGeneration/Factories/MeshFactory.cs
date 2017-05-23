@@ -100,7 +100,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			tile.VectorDataState = TilePropertyState.Loading;
 
 			var vectorTile = new VectorTile();
-			tile.AsyncVectorRequest = vectorTile;
+			tile.AddTile(vectorTile);
 			
 			vectorTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
