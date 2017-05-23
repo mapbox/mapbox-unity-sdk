@@ -25,7 +25,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		[SerializeField]
 		Material _material;
-		
+
 		Directions _directions;
 
 		void Awake()
@@ -55,6 +55,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		void HandleDirectionsResponse(DirectionsResponse response)
 		{
+			if (null == response.Routes || response.Routes.Count < 1)
+			{
+				return;
+			}
+
 			var meshData = new MeshData();
 			var dat = new List<Vector3>();
 			foreach (var leg in response.Routes[0].Legs)
