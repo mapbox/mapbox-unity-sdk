@@ -143,22 +143,25 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			// HACK: compute height values for terrain. We could probably do this without a texture2d.
 			var heightTexture = new Texture2D(0, 0);
 			heightTexture.LoadImage(data);
-			var colors = heightTexture.GetPixels32();
+			byte[] rgbData = heightTexture.GetRawTextureData();
 
 			// Get rid of this temporary texture. We don't need it, and we don't want to leak it.
 			Destroy(heightTexture);
 
-			var count = colors.Length;
-
 			if (_heightData == null)
 			{
-				_heightData = new float[count];
+				_heightData = new float[256 * 256];
 			}
 
-			for (int i = 0; i < count; i++)
+			for (int xx = 0; xx < 256; ++xx)
 			{
-				var height = Conversions.GetAbsoluteHeightFromColor32(colors[i]) * _relativeScale * heightMultiplier;
-				_heightData[i] = height;
+				for (int yy = 0; yy < 256; ++yy)
+				{
+					float r = rgbData[(xx * 256 + yy) * 4 + 1];
+					float g = rgbData[(xx * 256 + yy) * 4 + 2];
+					float b = rgbData[(xx * 256 + yy) * 4 + 3];
+					_heightData[xx * 256 + yy] = Conversions.GetAbsoluteHeightFromColor(r, g, b) * _relativeScale * heightMultiplier;
+				}
 			}
 
 			HeightDataState = TilePropertyState.Loaded;
