@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEditor;
 using Mapbox.Unity.MeshGeneration.Factories;
 
@@ -9,10 +8,9 @@ public class TerrainFactoryEditor : FactoryEditor
 	private string _defaultMapId = "mapbox.terrain-rgb";
 	private TerrainFactory _factory;
 	public SerializedProperty
-		 state_Prop,
-		 sampleCount_Prop,
+		sampleCount_Prop,
 		mapIdType_Prop,
-		 heightMod_Prop,
+		heightMod_Prop,
 		customMapId_Prop,
 		material_Prop,
 		mapId_Prop,
@@ -24,7 +22,6 @@ public class TerrainFactoryEditor : FactoryEditor
 	void OnEnable()
 	{
 		_factory = target as TerrainFactory;
-		state_Prop = serializedObject.FindProperty("_generationType");
 		mapIdType_Prop = serializedObject.FindProperty("_mapIdType");
 		sampleCount_Prop = serializedObject.FindProperty("_sampleCount");
 		heightMod_Prop = serializedObject.FindProperty("_heightModifier");
@@ -47,42 +44,30 @@ public class TerrainFactoryEditor : FactoryEditor
 		GUI.enabled = true;
 		EditorGUILayout.Space();
 		EditorGUILayout.Space();
-		EditorGUILayout.PropertyField(state_Prop, new GUIContent("Map Type"));
 		EditorGUILayout.Space();
-		var st = (TerrainGenerationType)state_Prop.enumValueIndex;
 		EditorGUI.indentLevel++;
-		switch (st)
+
+		EditorGUILayout.Space();
+		EditorGUILayout.BeginHorizontal();
+		EditorGUILayout.PropertyField(sampleCount_Prop, new GUIContent("Resolution"));
+		EditorGUILayout.LabelField("x  " + sampleCount_Prop.intValue);
+		EditorGUILayout.EndHorizontal();
+		EditorGUILayout.PropertyField(mapIdType_Prop);
+
+		switch ((MapIdType)mapIdType_Prop.enumValueIndex)
 		{
-			case TerrainGenerationType.Flat:
-
+			case MapIdType.Standard:
+				GUI.enabled = false;
+				EditorGUILayout.PropertyField(mapId_Prop, new GUIContent("Map Id"));
+				mapId_Prop.stringValue = _defaultMapId;
+				GUI.enabled = true;
 				break;
-
-			case TerrainGenerationType.Height:
-				
-				EditorGUILayout.Space();
-				EditorGUILayout.BeginHorizontal();
-				EditorGUILayout.PropertyField(sampleCount_Prop, new GUIContent("Resolution"));
-				EditorGUILayout.LabelField("x  " + sampleCount_Prop.intValue);
-				EditorGUILayout.EndHorizontal();
-				EditorGUILayout.PropertyField(mapIdType_Prop);
-
-				switch ((MapIdType)mapIdType_Prop.enumValueIndex)
-				{
-					case MapIdType.Standard:
-						GUI.enabled = false;
-						EditorGUILayout.PropertyField(mapId_Prop, new GUIContent("Map Id"));
-						mapId_Prop.stringValue = _defaultMapId;
-						GUI.enabled = true;
-						break;
-					case MapIdType.Custom:
-						EditorGUILayout.PropertyField(customMapId_Prop, new GUIContent("Map Id"));
-						mapId_Prop.stringValue = customMapId_Prop.stringValue;
-						break;
-				}
-				EditorGUILayout.PropertyField(heightMod_Prop, new GUIContent("Height Multiplier"));
+			case MapIdType.Custom:
+				EditorGUILayout.PropertyField(customMapId_Prop, new GUIContent("Map Id"));
+				mapId_Prop.stringValue = customMapId_Prop.stringValue;
 				break;
-
 		}
+		EditorGUILayout.PropertyField(heightMod_Prop, new GUIContent("Height Multiplier"));
 
 		EditorGUI.indentLevel--;
 

@@ -43,14 +43,14 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		private MeshCollider _collider;
-		public MeshCollider Collider
+		private Collider _collider;
+		public Collider Collider
 		{
 			get
 			{
 				if (_collider == null)
 				{
-					_collider = GetComponent<MeshCollider>();
+					_collider = GetComponent<Collider>();
 				}
 				return _collider;
 			}
