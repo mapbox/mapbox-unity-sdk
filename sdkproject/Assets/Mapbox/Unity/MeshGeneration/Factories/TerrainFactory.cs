@@ -125,9 +125,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
             pngRasterTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
             {
-                if (tile.HeightDataState == TilePropertyState.None || !tile.CanonicalTileId.Equals(pngRasterTile.Id))
-                    return;
-
                 // HACK: we need to check state because a cancel could have happened immediately following a response.
                 if (pngRasterTile.HasError || pngRasterTile.CurrentState == Tile.State.Canceled)
                 {
