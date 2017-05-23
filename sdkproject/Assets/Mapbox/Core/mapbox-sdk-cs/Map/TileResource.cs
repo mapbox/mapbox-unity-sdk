@@ -10,11 +10,11 @@ namespace Mapbox.Map
 
     internal sealed class TileResource : IResource
     {
-        private readonly string query;
+        readonly string _query;
 
         internal TileResource(string query)
         {
-            this.query = query;
+            _query = query;
         }
 
         public static TileResource MakeRaster(CanonicalTileId id, string styleUrl)
@@ -49,7 +49,7 @@ namespace Mapbox.Map
 
         public string GetUrl()
         {
-            return this.query;
+			return _query + "?events=true";
         }
     }
 }
