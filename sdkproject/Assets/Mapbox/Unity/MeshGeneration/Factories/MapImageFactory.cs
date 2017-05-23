@@ -74,7 +74,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			tile.RasterDataState = TilePropertyState.Loading;
 
-			tile.AsyncRequest = rasterTile;
+			tile.AsyncImageRequest = rasterTile;
 			rasterTile.Initialize(parameters, () =>
 			{
 				// HACK: we need to check state because a cancel could have happened immediately following a response.
