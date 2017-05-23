@@ -132,6 +132,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			pngRasterTile.Initialize(parameters, () =>
 			{
+                if (tile.HeightDataState == TilePropertyState.None || !tile.CanonicalTileId.Equals(pngRasterTile.Id))
+                    return;
+
 				// HACK: we need to check state because a cancel could have happened immediately following a response.
 				if (pngRasterTile.HasError || pngRasterTile.CurrentState == Tile.State.Canceled)
 				{
@@ -141,6 +144,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					CreateFlatMesh(tile);
 					return;
 				}
+
+                if (tile.CanonicalTileId.X != parameters.Id.X)
+                    return;
 
 				tile.SetHeightData(pngRasterTile.Data, _heightModifier);
 				GenerateTerrainMesh(tile);
