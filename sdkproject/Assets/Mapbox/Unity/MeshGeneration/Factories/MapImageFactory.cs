@@ -70,8 +70,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			tile.AddTile(rasterTile);
 			rasterTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
-				// HACK: we need to check state because a cancel could have happened immediately following a response.
-				if (rasterTile.HasError || rasterTile.CurrentState == Tile.State.Canceled)
+				if (rasterTile.HasError)
 				{
 					tile.RasterDataState = TilePropertyState.Error;
 					return;

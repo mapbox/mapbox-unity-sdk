@@ -104,7 +104,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			
 			vectorTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
-				if (vectorTile.HasError || vectorTile.CurrentState == Tile.State.Canceled)
+				if (vectorTile.HasError)
 				{
 					tile.VectorDataState = TilePropertyState.Error;
 					return;

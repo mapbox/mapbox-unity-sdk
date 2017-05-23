@@ -22,6 +22,7 @@ namespace Mapbox.Unity.Utilities
 		private UnityWebRequest _request;
 		private int _timeout;
 		private readonly Action<Response> _callback;
+		bool _wasCancelled;
 
 		public bool IsCompleted { get; private set; }
 
@@ -44,6 +45,8 @@ namespace Mapbox.Unity.Utilities
 
 		public void Cancel()
 		{
+			_wasCancelled = true;
+
 			if (_request != null)
 			{
 				_request.Abort();
@@ -58,8 +61,7 @@ namespace Mapbox.Unity.Utilities
 				yield return null;
 			}
 
-			// FIXME: forward an aborted exception to response if request finished before cancel call
-			var response = Response.FromWebResponse(this, _request, null);
+			var response = Response.FromWebResponse(this, _request, _wasCancelled ? new Exception("Request Cancelled") : null);
 
 			_callback(response);
 			_request.Dispose();
