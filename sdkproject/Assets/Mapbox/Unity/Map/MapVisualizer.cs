@@ -19,7 +19,6 @@ namespace Mapbox.Unity.MeshGeneration
     [CreateAssetMenu(menuName = "Mapbox/MapVisualization")]
     public class MapVisualizer : ScriptableObject
     {
-        [SerializeField]
         private ModuleState _state;
         public ModuleState State
         {
@@ -27,7 +26,7 @@ namespace Mapbox.Unity.MeshGeneration
             {
                 return _state;
             }
-            set
+            private set
             {
                 if (_state != value)
                 {
@@ -81,6 +80,15 @@ namespace Mapbox.Unity.MeshGeneration
                 if (allFinished)
                     State = ModuleState.Finished;
             }           
+        }
+
+        internal void Destroy()
+        {
+            for (int i = 0; i < _factories.Length; i++)
+            {
+                if (_factories[i] != null)
+                    _factories[i].OnFactoryStateChanged -= UpdateState;
+            }
         }
 
         /// <summary>

@@ -101,7 +101,10 @@
 				_tileProvider.OnTileAdded -= TileProvider_OnTileAdded;
 				_tileProvider.OnTileRemoved -= TileProvider_OnTileRemoved;
 			}
-		}
+
+            _mapVisualizer.Destroy();
+
+        }
 
 		// This is the part that is abstract?
 		protected virtual void Start()

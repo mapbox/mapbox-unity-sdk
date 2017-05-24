@@ -8,9 +8,10 @@
     public abstract class AbstractTileFactory : ScriptableObject
     {
         public event Action<AbstractTileFactory> OnFactoryStateChanged = delegate { };
-        public ModuleState State;
+        public ModuleState State { get; private set; }
+
         private int _progress;
-        public int Progress
+        protected int Progress
         {
             get
             {
@@ -31,6 +32,7 @@
                 _progress = value;                
             }
         }
+
         protected IFileSource _fileSource;
 
         public void Initialize(IFileSource fileSource)
