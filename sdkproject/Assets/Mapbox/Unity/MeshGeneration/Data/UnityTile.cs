@@ -15,6 +15,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		Texture2D _rasterData;
 		float _relativeScale;
 
+		Texture2D _heightTexture;
+
 		List<Tile> _tiles = new List<Tile>();
 
 		MeshRenderer _meshRenderer;
@@ -141,12 +143,16 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		internal void SetHeightData(byte[] data, float heightMultiplier = 1f)
 		{
 			// HACK: compute height values for terrain. We could probably do this without a texture2d.
-			var heightTexture = new Texture2D(0, 0);
-			heightTexture.LoadImage(data);
-			byte[] rgbData = heightTexture.GetRawTextureData();
+			if (_heightTexture == null)
+			{
+				_heightTexture = new Texture2D(0, 0);
+			}
 
-			// Get rid of this temporary texture. We don't need it, and we don't want to leak it.
-			Destroy(heightTexture);
+			_heightTexture.LoadImage(data);
+			byte[] rgbData = _heightTexture.GetRawTextureData();
+
+			// Get rid of this temporary texture. We don't need to bloat memory.
+			_heightTexture.LoadImage(null);
 
 			if (_heightData == null)
 			{
