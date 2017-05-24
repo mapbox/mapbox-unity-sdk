@@ -252,7 +252,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9527fd56bc6a0c549a1e550219f9b16e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Speed: 1000
+  Speed: 150
 --- !u!1 &1378964790
 GameObject:
   m_ObjectHideFlags: 0
@@ -451,7 +451,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _latitudeLongitudeString: 36.058781, -112.109295
-  _zoom: 10
+  _zoom: 11
   _root: {fileID: 0}
   _tileProvider: {fileID: 1461465690}
   _mapVisualizer: {fileID: 11400000, guid: 78d4f9b7fc8ac45c487ad9ea051422e6, type: 2}
