@@ -185,7 +185,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					tile.HeightDataState = TilePropertyState.Error;
 
 					// Handle missing elevation from server (404)!
-					ResetToFlatMesh(tile);
+					// TODO: optimize this search!
+					if (pngRasterTile.ExceptionsAsString.Contains("404"))
+					{
+						ResetToFlatMesh(tile);
+					}
 					return;
 				}
 
