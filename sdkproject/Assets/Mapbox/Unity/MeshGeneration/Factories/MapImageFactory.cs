@@ -71,15 +71,16 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             Progress++;
             rasterTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
-                Progress--;
                 if (rasterTile.HasError)
 				{
 					tile.RasterDataState = TilePropertyState.Error;
-					return;
+                    Progress--;
+                    return;
 				}
 
 				tile.SetRasterData(rasterTile.Data, _useMipMap, _useCompression);
 				tile.RasterDataState = TilePropertyState.Loaded;
+                Progress--;
             });
 		}
 

@@ -181,7 +181,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
             pngRasterTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
-                Progress--;
                 if (pngRasterTile.HasError)
 				{
 					tile.HeightDataState = TilePropertyState.Error;
@@ -192,11 +191,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					{
 						ResetToFlatMesh(tile);
 					}
+                    Progress--;
                     return;
 				}
 
 				tile.SetHeightData(pngRasterTile.Data, _heightModifier);
 				GenerateTerrainMesh(tile);
+                Progress--;
             });
 		}
 

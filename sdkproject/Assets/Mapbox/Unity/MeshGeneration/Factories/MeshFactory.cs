@@ -105,11 +105,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
             Progress++;
             vectorTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
-                Progress--;
                 if (vectorTile.HasError)
 				{
 					tile.VectorDataState = TilePropertyState.Error;
-					return;
+                    Progress--;
+                    return;
 				}
 
 				// TODO: move unitytile state registrations to layer visualizers. Not everyone is interested in this data
@@ -129,7 +129,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 
 				tile.VectorDataState = TilePropertyState.Loaded;
-                
+                Progress--;
             });
 		}
 	}
