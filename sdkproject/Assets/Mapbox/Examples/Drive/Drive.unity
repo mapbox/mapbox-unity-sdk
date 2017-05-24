@@ -930,5 +930,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81f500634e518f74bbba30a8e7d186bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MapVisualizer: {fileID: 0}
-  Content: {fileID: 0}
+  MapVisualizer: {fileID: 11400000, guid: 4f4961d6f3e45f84f99bda9cdc9dbb2b, type: 2}
+  Content: {fileID: 1108233005}
