@@ -101,10 +101,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			var vectorTile = new VectorTile();
 			tile.AddTile(vectorTile);
-			
-			vectorTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
+
+            Progress++;
+            vectorTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
-				if (vectorTile.HasError)
+                Progress--;
+                if (vectorTile.HasError)
 				{
 					tile.VectorDataState = TilePropertyState.Error;
 					return;
@@ -127,7 +129,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 
 				tile.VectorDataState = TilePropertyState.Loaded;
-			});
+                
+            });
 		}
 	}
 }

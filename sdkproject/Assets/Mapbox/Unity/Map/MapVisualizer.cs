@@ -1,86 +1,134 @@
 namespace Mapbox.Unity.MeshGeneration
 {
-	using Mapbox.Map;
-	using System.Collections.Generic;
-	using UnityEngine;
-	using Mapbox.Unity.MeshGeneration.Data;
-	using Mapbox.Unity.MeshGeneration.Factories;
-	using Mapbox.Platform;
-	using Mapbox.Unity.Map;
+    using Mapbox.Map;
+    using System.Collections.Generic;
+    using UnityEngine;
+    using Mapbox.Unity.MeshGeneration.Data;
+    using Mapbox.Unity.MeshGeneration.Factories;
+    using Mapbox.Platform;
+    using Mapbox.Unity.Map;
+    using System;
 
-	[CreateAssetMenu(menuName = "Mapbox/MapVisualization")]
-	public class MapVisualizer : ScriptableObject
-	{
-		[SerializeField]
-		AbstractTileFactory[] _factories;
+    public enum ModuleState
+    {
+        Initialized,
+        Working,
+        Finished
+    }
 
-		IMap _map;
+    [CreateAssetMenu(menuName = "Mapbox/MapVisualization")]
+    public class MapVisualizer : ScriptableObject
+    {
+        [SerializeField]
+        private ModuleState _state;
+        public ModuleState State
+        {
+            get
+            {
+                return _state;
+            }
+            set
+            {
+                if (_state != value)
+                {
+                    _state = value;
+                    OnMapVisualizerStateChanged(_state);
+                }
+            }
+        }
+        public event Action<ModuleState> OnMapVisualizerStateChanged = delegate { };
 
-		Dictionary<UnwrappedTileId, UnityTile> _activeTiles;
-		Queue<UnityTile> _inactiveTiles;
+        [SerializeField]
+        AbstractTileFactory[] _factories;
 
-		/// <summary>
-		/// Initializes the factories by passing the file source down, which's necessary for data (web/file) calls
-		/// </summary>
-		/// <param name="fileSource"></param>
-		public void Initialize(IMap map, IFileSource fileSource)
-		{
-			_map = map;
-			_activeTiles = new Dictionary<UnwrappedTileId, UnityTile>();
-			_inactiveTiles = new Queue<UnityTile>();
+        IMap _map;
 
-			foreach (var factory in _factories)
-			{
-				factory.Initialize(fileSource);
-			}
-		}
+        Dictionary<UnwrappedTileId, UnityTile> _activeTiles;
+        Queue<UnityTile> _inactiveTiles;
 
-		/// <summary>
-		/// Registers requested tiles to the factories
-		/// </summary>
-		/// <param name="tileId"></param>
-		public void LoadTile(UnwrappedTileId tileId)
-		{
-			UnityTile unityTile = null;
+        /// <summary>
+        /// Initializes the factories by passing the file source down, which's necessary for data (web/file) calls
+        /// </summary>
+        /// <param name="fileSource"></param>
+        public void Initialize(IMap map, IFileSource fileSource)
+        {
+            _map = map;
+            _activeTiles = new Dictionary<UnwrappedTileId, UnityTile>();
+            _inactiveTiles = new Queue<UnityTile>();
+            State = ModuleState.Initialized;
 
-			if (_inactiveTiles.Count > 0)
-			{
-				unityTile = _inactiveTiles.Dequeue();
-			}
+            foreach (var factory in _factories)
+            {
+                factory.Initialize(fileSource);
+                factory.OnFactoryStateChanged += UpdateState;
+            }
+        }
 
-			if (unityTile == null)
-			{
-				unityTile = new GameObject().AddComponent<UnityTile>();
+        private void UpdateState(AbstractTileFactory factory)
+        {
+            if (State != ModuleState.Working && factory.State == ModuleState.Working)
+            {
+                State = ModuleState.Working;
+            }
+            else if(State != ModuleState.Finished && factory.State == ModuleState.Finished)
+            {
+                var allFinished = true;
+                for (int i = 0; i < _factories.Length; i++)
+                {
+                    if (_factories[i] != null)
+                        allFinished &= _factories[i].State != ModuleState.Working;
+                }
+                if (allFinished)
+                    State = ModuleState.Finished;
+            }           
+        }
+
+        /// <summary>
+        /// Registers requested tiles to the factories
+        /// </summary>
+        /// <param name="tileId"></param>
+        public void LoadTile(UnwrappedTileId tileId)
+        {
+            UnityTile unityTile = null;
+
+            if (_inactiveTiles.Count > 0)
+            {
+                unityTile = _inactiveTiles.Dequeue();
+            }
+
+            if (unityTile == null)
+            {
+                unityTile = new GameObject().AddComponent<UnityTile>();
 
 #if !UNITY_EDITOR
 				unityTile.transform.localScale = Unity.Constants.Math.Vector3One * _map.WorldRelativeScale;
 #else
-				unityTile.transform.SetParent(_map.Root, false);
+                unityTile.transform.SetParent(_map.Root, false);
 #endif
-			}
+            }
 
-			unityTile.Initialize(_map, tileId);
+            unityTile.Initialize(_map, tileId);
 
-			foreach (var factory in _factories)
-			{
-				factory.Register(unityTile);
-			}
+            foreach (var factory in _factories)
+            {
+                factory.Register(unityTile);
+            }
 
-			_activeTiles.Add(tileId, unityTile);
-		}
+            _activeTiles.Add(tileId, unityTile);
+        }
 
-		public void DisposeTile(UnwrappedTileId tileId)
-		{
-			var unityTile = _activeTiles[tileId];
+        public void DisposeTile(UnwrappedTileId tileId)
+        {
+            var unityTile = _activeTiles[tileId];
 
-			unityTile.Recycle();
-			_activeTiles.Remove(tileId);
-			_inactiveTiles.Enqueue(unityTile);
+            unityTile.Recycle();
+            _activeTiles.Remove(tileId);
+            _inactiveTiles.Enqueue(unityTile);
 
-			foreach (var factory in _factories)
-			{
-				factory.Unregister(unityTile);
-			}
-		}
-	}
+            foreach (var factory in _factories)
+            {
+                factory.Unregister(unityTile);
+            }
+        }
+    }
 }
