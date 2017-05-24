@@ -116,16 +116,25 @@ namespace Mapbox.Map {
 			_request = param.Fs.Request(MakeTileResource(param.MapId).GetUrl(), HandleTileResponse);
 		}
 
+        internal void Initialize(IFileSource fileSource, CanonicalTileId canonicalTileId, string mapId, Action p)
+        {
+            Cancel();
 
-		/// <summary>
-		///     Returns a <see cref="T:System.String"/> that represents the current
-		///     <see cref="T:Mapbox.Map.Tile"/>.
-		/// </summary>
-		/// <returns>
-		///     A <see cref="T:System.String"/> that represents the current
-		///     <see cref="T:Mapbox.Map.Tile"/>.
-		/// </returns>
-		public override string ToString() {
+            _state = State.Loading;
+            _id = canonicalTileId;
+            _callback = p;
+            _request = fileSource.Request(MakeTileResource(mapId).GetUrl(), HandleTileResponse);
+        }
+
+        /// <summary>
+        ///     Returns a <see cref="T:System.String"/> that represents the current
+        ///     <see cref="T:Mapbox.Map.Tile"/>.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="T:System.String"/> that represents the current
+        ///     <see cref="T:Mapbox.Map.Tile"/>.
+        /// </returns>
+        public override string ToString() {
 			return Id.ToString();
 		}
 

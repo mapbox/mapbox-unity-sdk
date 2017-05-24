@@ -8,15 +8,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8338f26893d62c1439f387800a8e1c9a, type: 3}
-  m_Name: TerrainDemoTerrainFactory
+  m_Script: {fileID: 11500000, guid: 0a6523094c07d4ee683da5d826fce510, type: 3}
+  m_Name: FlatTerrainFactory
   m_EditorClassIdentifier: 
   _baseMaterial: {fileID: 2100000, guid: fdf26842f5143fe47802eb3f1c072614, type: 2}
-  _mapIdType: 0
-  _customMapId: mapbox.terrain-rgb
-  _mapId: mapbox.terrain-rgb
-  _heightModifier: 1
-  _sampleCount: 20
   _addCollider: 0
   _addToLayer: 0
   _layerId: 8

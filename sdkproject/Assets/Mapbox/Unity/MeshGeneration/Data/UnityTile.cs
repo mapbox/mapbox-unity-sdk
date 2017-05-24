@@ -5,15 +5,19 @@ namespace Mapbox.Unity.MeshGeneration.Data
 	using Mapbox.Unity.Utilities;
 	using Utils;
 	using Mapbox.Map;
-	using Mapbox.Platform;
 	using System;
 	using Mapbox.Unity.Map;
+	using System.Collections.Generic;
 
-	public class UnityTile : MonoBehaviour, IAsyncRequest
+	public class UnityTile : MonoBehaviour
 	{
 		float[] _heightData;
 		Texture2D _rasterData;
 		float _relativeScale;
+
+		Texture2D _heightTexture;
+
+		List<Tile> _tiles = new List<Tile>();
 
 		MeshRenderer _meshRenderer;
 		public MeshRenderer MeshRenderer
@@ -41,14 +45,14 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		private MeshCollider _collider;
-		public MeshCollider Collider
+		private Collider _collider;
+		public Collider Collider
 		{
 			get
 			{
 				if (_collider == null)
 				{
-					_collider = GetComponent<MeshCollider>();
+					_collider = GetComponent<Collider>();
 				}
 				return _collider;
 			}
@@ -83,23 +87,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		IAsyncRequest _asyncRequest;
-		public IAsyncRequest AsyncRequest
-		{
-			set
-			{
-				_asyncRequest = value;
-			}
-		}
-
-		public bool IsCompleted
-		{
-			get
-			{
-				return _asyncRequest.IsCompleted;
-			}
-		}
-
 		public TilePropertyState RasterDataState { get; set; }
 		public TilePropertyState HeightDataState { get; set; }
 		public TilePropertyState VectorDataState { get; set; }
@@ -107,6 +94,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public event Action<UnityTile> OnHeightDataChanged = delegate { };
 		public event Action<UnityTile> OnRasterDataChanged = delegate { };
 		public event Action<UnityTile> OnVectorDataChanged = delegate { };
+		public event Action<UnityTile> OnRecycled = delegate { };
 
 		internal void Initialize(IMap map, UnwrappedTileId tileId)
 		{
@@ -134,7 +122,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			RasterDataState = TilePropertyState.None;
 			HeightDataState = TilePropertyState.None;
 			VectorDataState = TilePropertyState.None;
-			_asyncRequest = null;
+
+			Cancel();
+			_tiles.Clear();
 
 			// HACK: this is for vector layer features and such.
 			// It's slow and wasteful, but a better solution will be difficult.
@@ -146,29 +136,38 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					Destroy(transform.GetChild(i).gameObject);
 				}
 			}
+
+			OnRecycled(this);
 		}
 
 		internal void SetHeightData(byte[] data, float heightMultiplier = 1f)
 		{
 			// HACK: compute height values for terrain. We could probably do this without a texture2d.
-			var heightTexture = new Texture2D(0, 0);
-			heightTexture.LoadImage(data);
-			var colors = heightTexture.GetPixels32();
+			if (_heightTexture == null)
+			{
+				_heightTexture = new Texture2D(0, 0);
+			}
 
-			// Get rid of this temporary texture. We don't need it, and we don't want to leak it.
-			Destroy(heightTexture);
+			_heightTexture.LoadImage(data);
+			byte[] rgbData = _heightTexture.GetRawTextureData();
 
-			var count = colors.Length;
+			// Get rid of this temporary texture. We don't need to bloat memory.
+			_heightTexture.LoadImage(null);
 
 			if (_heightData == null)
 			{
-				_heightData = new float[count];
+				_heightData = new float[256 * 256];
 			}
 
-			for (int i = 0; i < count; i++)
+			for (int xx = 0; xx < 256; ++xx)
 			{
-				var height = Conversions.GetAbsoluteHeightFromColor32(colors[i]) * _relativeScale * heightMultiplier;
-				_heightData[i] = height;
+				for (int yy = 0; yy < 256; ++yy)
+				{
+					float r = rgbData[(xx * 256 + yy) * 4 + 1];
+					float g = rgbData[(xx * 256 + yy) * 4 + 2];
+					float b = rgbData[(xx * 256 + yy) * 4 + 3];
+					_heightData[xx * 256 + yy] = Conversions.GetAbsoluteHeightFromColor(r, g, b) * _relativeScale * heightMultiplier;
+				}
 			}
 
 			HeightDataState = TilePropertyState.Loaded;
@@ -213,11 +212,17 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			return _rasterData;
 		}
 
+		internal void AddTile(Tile tile)
+		{
+			_tiles.Add(tile);
+		}
+
 		public void Cancel()
 		{
-			if (_asyncRequest != null)
+			for (int i = 0, _tilesCount = _tiles.Count; i < _tilesCount; i++)
 			{
-				_asyncRequest.Cancel();
+				var tile = _tiles[i];
+				tile.Cancel();
 			}
 		}
 	}

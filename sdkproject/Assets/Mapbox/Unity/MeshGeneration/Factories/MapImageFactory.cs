@@ -55,15 +55,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnRegistered(UnityTile tile)
 		{
-			var parameters = new Tile.Parameters
-			{
-				Fs = _fileSource,
-				Id = tile.CanonicalTileId,
-				MapId = _mapId
-			};
-
 			RasterTile rasterTile;
-			if (parameters.MapId.StartsWith("mapbox://", StringComparison.Ordinal))
+			if (_mapId.StartsWith("mapbox://", StringComparison.Ordinal))
 			{
 				rasterTile = _useRetina ? new RetinaRasterTile() : new RasterTile();
 			}
@@ -74,11 +67,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			tile.RasterDataState = TilePropertyState.Loading;
 
-			tile.AsyncRequest = rasterTile;
-			rasterTile.Initialize(parameters, () =>
+			tile.AddTile(rasterTile);
+			rasterTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
-				// HACK: we need to check state because a cancel could have happened immediately following a response.
-				if (rasterTile.HasError || rasterTile.CurrentState == Tile.State.Canceled)
+				if (rasterTile.HasError)
 				{
 					tile.RasterDataState = TilePropertyState.Error;
 					return;

@@ -97,21 +97,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			tile.OnHeightDataChanged -= HeightDataChangedHandler;
 			tile.OnRasterDataChanged -= ImageDataChangedHandler;
 
-			var parameters = new Tile.Parameters
-			{
-				Fs = _fileSource,
-				Id = tile.CanonicalTileId,
-				MapId = _mapId
-			};
-
 			tile.VectorDataState = TilePropertyState.Loading;
 
 			var vectorTile = new VectorTile();
-			tile.AsyncRequest = vectorTile;
+			tile.AddTile(vectorTile);
 			
-			vectorTile.Initialize(parameters, () =>
+			vectorTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
-				if (vectorTile.HasError || vectorTile.CurrentState == Tile.State.Canceled)
+				if (vectorTile.HasError)
 				{
 					tile.VectorDataState = TilePropertyState.Error;
 					return;
