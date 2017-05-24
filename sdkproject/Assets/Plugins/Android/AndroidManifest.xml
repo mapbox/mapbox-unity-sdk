@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest>
+  <application>
+    <service android:name="com.mapbox.services.android.telemetry.service.TelemetryService"/>
+  </application>
+</manifest>
