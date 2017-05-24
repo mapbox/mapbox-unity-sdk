@@ -44,8 +44,7 @@
 				tile.gameObject.AddComponent<MeshFilter>();
 			}
 
-			var mesh = GetQuad(tile);
-			tile.MeshFilter.sharedMesh = _cachedQuad;
+			tile.MeshFilter.sharedMesh = GetQuad(tile);
 			if (_addCollider && tile.Collider == null)
 			{
 				tile.gameObject.AddComponent<BoxCollider>();
@@ -64,6 +63,11 @@
 				return _cachedQuad;
 			}
 
+			return BuildQuad(tile);
+		}
+
+		Mesh BuildQuad(UnityTile tile)
+		{
 			var unityMesh = new Mesh();
 			var verts = new Vector3[4];
 
