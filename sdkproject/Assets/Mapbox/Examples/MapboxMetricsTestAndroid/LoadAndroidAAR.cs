@@ -123,6 +123,20 @@ public class LoadAndroidAAR : MonoBehaviour
 			// don't know how to do: 'MainActivity.class.getSimpleName()' https://github.com/mapbox/mapbox-telemetry-android/blob/master/telemetry/app/src/main/java/com/mapbox/telemetry/MainActivity.java#L161
 			string simpleName = "UnityActivitySimpleName";
 
+			try
+			{
+				//AndroidJavaObject activityClass = _activityContext.CallStatic("getClass");
+				//AndroidJavaClass activityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+				//AndroidJavaObject ac = activityClass.Get<AndroidJavaObject>("class");
+				AndroidJavaObject ac = _activityContext.Get<AndroidJavaObject>("getClass");
+				simpleName = ac.Call<string>("getSimpleName");
+				Debug.Log("simpleName: " + simpleName);
+			}
+			catch (System.Exception ex)
+			{
+				Debug.LogError(ex);
+			}
+
 
 			using (AndroidJavaObject androidLocation = new AndroidJavaObject("android.location.Location", simpleName))
 			{
