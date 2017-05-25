@@ -25,7 +25,7 @@ namespace Mapbox.Unity.Telemetry
 			initialize(accessToken, "MapboxEventsUnityiOS", Constants.SDK_VERSION);
 		}
 
-		public void SendTurnstyle()
+		public void SendTurnstile()
 		{
 			sendTurnstyleEvent();
 		}

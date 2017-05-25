@@ -59,7 +59,7 @@ namespace Mapbox.Unity
 
 
 			_telemetryLibrary.Initialize(_accessToken);
-			_telemetryLibrary.SendTurnstyle();
+			_telemetryLibrary.SendTurnstile();
 		}
 
 		/// <summary>

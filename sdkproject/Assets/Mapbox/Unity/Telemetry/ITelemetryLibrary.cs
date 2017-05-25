@@ -1,8 +1,8 @@
-﻿namespace Mapbox.Unity.Telemetry
+namespace Mapbox.Unity.Telemetry
 {
 	public interface ITelemetryLibrary
 	{
 		void Initialize(string accessToken);
-		void SendTurnstyle();
+		void SendTurnstile();
 	}
 }

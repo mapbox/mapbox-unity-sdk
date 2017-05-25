@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Unity.Telemetry
+namespace Mapbox.Unity.Telemetry
 {
 	public class TelemetryDummy : ITelemetryLibrary
 	{
@@ -16,7 +16,7 @@
 			// empty.
 		}
 
-		public void SendTurnstyle()
+		public void SendTurnstile()
 		{
 			// empty.
 		}

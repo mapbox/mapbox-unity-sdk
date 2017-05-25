@@ -54,7 +54,7 @@ namespace Mapbox.Unity.Telemetry
 			}
 		}
 
-		public void SendTurnstyle()
+		public void SendTurnstile()
 		{
 			using (AndroidJavaClass MapboxAndroidEvent = new AndroidJavaClass("com.mapbox.services.android.telemetry.MapboxEvent"))
 			{
