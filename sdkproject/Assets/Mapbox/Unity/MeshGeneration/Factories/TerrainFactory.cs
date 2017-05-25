@@ -177,10 +177,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			var pngRasterTile = new RawPngRasterTile();
 
 			tile.AddTile(pngRasterTile);
+            Progress++;
 
-			pngRasterTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
+            pngRasterTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
-				if (pngRasterTile.HasError)
+                if (pngRasterTile.HasError)
 				{
 					tile.HeightDataState = TilePropertyState.Error;
 
@@ -190,12 +191,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					{
 						ResetToFlatMesh(tile);
 					}
-					return;
+                    Progress--;
+                    return;
 				}
 
 				tile.SetHeightData(pngRasterTile.Data, _heightModifier);
 				GenerateTerrainMesh(tile);
-			});
+                Progress--;
+            });
 		}
 
 		/// <summary>
