@@ -36,12 +36,17 @@ namespace Mapbox.Unity
 		{
 			ValidateMapboxAccessFile();
 			LoadAccessToken();
-			_fileSource = new CachingWebFileSource(AccessToken).AddCache(new MemoryCache(500));
+			_fileSource = new CachingWebFileSource(_accessToken).AddCache(new MemoryCache(500));
 
+			ConfigureTelemetry();
+		}
+
+		void ConfigureTelemetry()
+		{
 #if UNITY_EDITOR
 			_telemetryLibrary = TelemetryDummy.Instance;
 #elif UNITY_IOS
-			_telemetryLibrary = TelemetryIos;
+			_telemetryLibrary = TelemetryIos.Instance;
 #elif UNITY_ANDROID
 			_telemetryLibrary = TelemetryAndroid.Instance;
 #else
@@ -49,11 +54,9 @@ namespace Mapbox.Unity
 #endif
 
 
-			Debug.Log("MapboxAccess: " + _telemetryLibrary);
 			_telemetryLibrary.Initialize(_accessToken);
 			_telemetryLibrary.SendTurnstyle();
 		}
-
 
 		/// <summary>
 		/// The Mapbox API access token. 

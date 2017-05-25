@@ -1,5 +1,4 @@
 ﻿#if UNITY_ANDROID
-
 namespace Mapbox.Unity.Telemetry
 {
 	using UnityEngine;
