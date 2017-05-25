@@ -8,9 +8,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e1e9c060b6589e4e8b990a9c709bcdd, type: 3}
-  m_Name: DriveTrafficLine
+  m_Script: {fileID: 11500000, guid: 63d97cb1cfb3f1b499c24763afa54873, type: 3}
+  m_Name: MeshFactory
   m_EditorClassIdentifier: 
-  Active: 1
-  _mergeStartEnd: 0
-  Width: 1
+  _mapId: mapbox.mapbox-streets-v7
+  Visualizers:
+  - {fileID: 11400000, guid: c09ca94378f6d44fe8b87150fe88b224, type: 2}

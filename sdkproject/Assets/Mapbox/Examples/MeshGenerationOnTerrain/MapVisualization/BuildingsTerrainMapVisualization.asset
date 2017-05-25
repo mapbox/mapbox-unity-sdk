@@ -9,8 +9,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 526c8a90df31d41fe8057a6f85c7a3e4, type: 3}
-  m_Name: LocationProviderVisualization
+  m_Name: BuildingsTerrainMapVisualization
   m_EditorClassIdentifier: 
   _factories:
-  - {fileID: 11400000, guid: 682db3cef47054d2f9b87a2463e551bd, type: 2}
-  - {fileID: 11400000, guid: 70ae1b4720c0f4f3d8bd4e48b43f6945, type: 2}
+  - {fileID: 11400000, guid: 74ed94e68d943483b89421350156bef7, type: 2}
+  - {fileID: 11400000, guid: e4c27502735c942dca373c40a29e5a58, type: 2}
