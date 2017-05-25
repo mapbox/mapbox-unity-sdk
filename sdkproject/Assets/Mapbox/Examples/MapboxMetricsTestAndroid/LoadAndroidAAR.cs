@@ -8,6 +8,7 @@ public class LoadAndroidAAR : MonoBehaviour
 
 	private AndroidJavaObject _activityContext = null;
 	private AndroidJavaObject _telemInstance = null;
+	private AndroidJavaObject _mapLoadEvent = null;
 
 	void Start()
 	{
@@ -39,11 +40,35 @@ public class LoadAndroidAAR : MonoBehaviour
 				"initialize"
 				, _activityContext
 				, Mapbox.Unity.MapboxAccess.Instance.AccessToken
-				, "unity-sdk-android"
+				, "MapboxEventsUnityAndroid"
 			);
 			Debug.Log("======================= after _telemInstance.Call('initialize' =======================");
 
+			// MapboxTelemetry.getInstance().pushEvent(MapboxEvent.buildMapLoadEvent());
+			//_telemInstance.Call
 
+			Debug.Log("======================= get mapbox event call =======================");
+
+			///Hashtable<String, Object> event = MapboxEvent.buildMapLoadEvent();
+
+			using (AndroidJavaClass MapboxAndroidEvent= new AndroidJavaClass("com.mapbox.services.android.telemetry.MapboxEvent"))
+			{
+				if (null == MapboxAndroidEvent)
+				{
+					Debug.LogError("====== could not get class 'MapboxEvent'");
+					return;
+				}
+
+				Debug.Log("======================= before MapboxAndroidEvent CallStatic<AndroidJavaObject>('buildMapLoadEvent') =======================");
+				_mapLoadEvent = MapboxAndroidEvent.CallStatic<AndroidJavaObject>("buildMapLoadEvent");
+				Debug.Log("======================= after MapboxAndroidEvent CallStatic<AndroidJavaObject>('buildMapLoadEvent') =======================");
+
+				_telemInstance.Call ("pushEvent", _mapLoadEvent);
+
+				Debug.Log("======================= after _telemInstance Call<AndroidJavaObject>('pushEvent') =======================");
+			}
+				
+			Debug.Log("======================= after _telemInstance.Call('pushEvent' =======================");
 		}
 
 	}
