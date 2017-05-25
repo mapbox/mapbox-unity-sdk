@@ -158,7 +158,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			mesh.SetNormals(_newNormalList);
 			mesh.SetUVs(0, _newUvList);
 			mesh.SetTriangles(_newTriangleList, 0);
-			mesh.RecalculateBounds();
 		}
 
 		internal override void OnUnregistered(UnityTile tile)
@@ -259,8 +258,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			tile.MeshFilter.mesh.SetNormals(_currentTileMeshData.Normals);
 			tile.MeshFilter.mesh.SetVertices(_currentTileMeshData.Vertices);
-			tile.MeshFilter.mesh.SetNormals(_currentTileMeshData.Normals);
-
+			tile.MeshFilter.mesh.RecalculateBounds();
+			
 			if (!_meshData.ContainsKey(tile.CanonicalTileId))
 			{
 				_meshData.Add(tile.CanonicalTileId, tile.MeshFilter.mesh);
@@ -297,8 +296,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				_currentTileMeshData.Normals[i] = Unity.Constants.Math.Vector3Up;
 			}
 
-			tile.MeshFilter.mesh.SetVertices(_currentTileMeshData.Vertices);
 			tile.MeshFilter.mesh.SetNormals(_currentTileMeshData.Normals);
+			tile.MeshFilter.mesh.SetVertices(_currentTileMeshData.Vertices);
+			tile.MeshFilter.mesh.RecalculateBounds();
 		}
 
 		/// <summary>
