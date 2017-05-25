@@ -1,4 +1,4 @@
-﻿#if UNITY_ANDROID && !UNITY_EDITOR
+﻿
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,6 +14,7 @@ public class LoadAndroidAAR : MonoBehaviour
 	{
 		if (null != _telemInstance) { return; }
 
+		#if UNITY_ANDROID && !UNITY_EDITOR
 		using (AndroidJavaClass activityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
 		{
 			_activityContext = activityClass.GetStatic<AndroidJavaObject>("currentActivity");
@@ -70,7 +71,7 @@ public class LoadAndroidAAR : MonoBehaviour
 				
 			Debug.Log("======================= after _telemInstance.Call('pushEvent' =======================");
 		}
-
+		#endif
 	}
 
 	// Update is called once per frame
@@ -80,4 +81,3 @@ public class LoadAndroidAAR : MonoBehaviour
 	}
 }
 
-#endif
