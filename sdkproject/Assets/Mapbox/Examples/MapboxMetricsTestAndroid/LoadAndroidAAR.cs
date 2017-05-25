@@ -25,14 +25,14 @@ public class LoadAndroidAAR : MonoBehaviour
 		if (_previousSecond == second) { return; }
 		_previousSecond = second;
 
-		// beware only postive coordinates are generated
+		// beware: only postive coordinates (NE hemisphere) are generated
 		System.Random random = new System.Random((int)System.DateTime.Now.Ticks);
 		double lng = random.NextDouble() * 180d;
 		double lat = random.NextDouble() * 90d;
 		double zoom = System.Math.Floor(random.NextDouble() * 20d);
 
 		if (0 == second % 7) { TelemetryPushMapCllickEvent(lng, lat, zoom); }
-		if (0 == second % 11) { TelemetryPushMapDragEndEvent(); }
+		if (0 == second % 11) { TelemetryPushMapDragEndEvent(lng, lat, zoom); }
 	}
 
 
@@ -40,6 +40,7 @@ public class LoadAndroidAAR : MonoBehaviour
 	{
 		// Already initialized
 		if (null != _telemInstance) { return; }
+
 
 #if UNITY_ANDROID && !UNITY_EDITOR
 		using (AndroidJavaClass activityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
@@ -79,6 +80,7 @@ public class LoadAndroidAAR : MonoBehaviour
 	}
 
 
+
 	void TelemetryPushMapLoadEvent()
 	{
 		if (null == _telemInstance) { return; }
@@ -96,6 +98,7 @@ public class LoadAndroidAAR : MonoBehaviour
 		}
 
 	}
+
 
 
 	void TelemetryPushMapCllickEvent(double longitude, double latitude, double zoom)
@@ -136,19 +139,47 @@ public class LoadAndroidAAR : MonoBehaviour
 				_telemInstance.Call("pushEvent", mapClickEvent);
 			}
 		}
-
 	}
 
 
-	void TelemetryPushMapDragEndEvent()
+
+	void TelemetryPushMapDragEndEvent(double longitude, double latitude, double zoom)
 	{
-		Debug.Log("======== TelemetryPushMapDragEnd() ========");
+		Debug.Log(string.Format("======== TelemetryPushMapDragEnd() lng:{0} lat:{1} z:{2} ========", longitude, latitude, zoom));
 		if (null == _telemInstance)
 		{
 			Debug.LogError("Telemetry not initialized");
 			return;
 		}
 
+
+		using (AndroidJavaClass MapboxAndroidEvent = new AndroidJavaClass("com.mapbox.services.android.telemetry.MapboxEvent"))
+		{
+			if (null == MapboxAndroidEvent)
+			{
+				Debug.LogError("Could not get class 'MapboxEvent'");
+				return;
+			}
+
+
+			// don't know how to do: 'MainActivity.class.getSimpleName()' https://github.com/mapbox/mapbox-telemetry-android/blob/master/telemetry/app/src/main/java/com/mapbox/telemetry/MainActivity.java#L161
+			string simpleName = "UnityActivitySimpleName";
+
+
+			using (AndroidJavaObject androidLocation = new AndroidJavaObject("android.location.Location", simpleName))
+			{
+				androidLocation.Call("setLongitude", longitude);
+				androidLocation.Call("setLatitude", latitude);
+
+				AndroidJavaObject mapDragEndEvent = MapboxAndroidEvent.CallStatic<AndroidJavaObject>(
+					"buildMapDragEndEvent",
+					androidLocation,
+					zoom
+				);
+
+				_telemInstance.Call("pushEvent", mapDragEndEvent);
+			}
+		}
 	}
 
 
