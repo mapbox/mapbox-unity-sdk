@@ -6,7 +6,7 @@ namespace Mapbox.Unity.Telemetry
 	public class TelemetryIos : ITelemetryLibrary
 	{
 		[DllImport("__Internal")]
-		static extern void initialize(string accessToken, string userAgentBase);
+		private static extern void initialize(string accessToken, string userAgentBase, string hostSDKVersion);
 
 		[DllImport("__Internal")]
 		static extern void sendTurnstyleEvent();
@@ -22,7 +22,7 @@ namespace Mapbox.Unity.Telemetry
 
 		public void Initialize(string accessToken)
 		{
-			initialize(accessToken, "MapboxEventsUnityiOS");
+			initialize(accessToken, "MapboxEventsUnityiOS", Constants.SDK_VERSION);
 		}
 
 		public void SendTurnstyle()

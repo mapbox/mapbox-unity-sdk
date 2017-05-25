@@ -49,7 +49,7 @@ namespace Mapbox.Unity.Telemetry
 					"initialize"
 					, _activityContext
 					, accessToken
-					, "MapboxEventsUnityAndroid"
+					, "MapboxEventsUnityAndroid/" + Constants.SDK_VERSION
 				);
 			}
 		}

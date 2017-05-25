@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable instancetype)sharedManager;
 
-- (void)initializeWithAccessToken:(NSString *)accessToken userAgentBase:(NSString *)userAgentBase;
+- (void)initializeWithAccessToken:(NSString *)accessToken userAgentBase:(NSString *)userAgentBase hostSDKVersion:(NSString *)hostSDKVersion;
 
 - (void)sendTurnstileEvent;
 

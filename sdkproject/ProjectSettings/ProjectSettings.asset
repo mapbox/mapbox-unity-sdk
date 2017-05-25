@@ -97,7 +97,7 @@ PlayerSettings:
     16:9: 1
     Others: 1
   bundleIdentifier: com.mapbox.unitysdk
-  bundleVersion: 0.4
+  bundleVersion: 1.0.0
   preloadedAssets: []
   metroEnableIndependentInputSource: 0
   xboxOneDisableKinectGpuReservation: 0
@@ -111,7 +111,7 @@ PlayerSettings:
   stripEngineCode: 1
   iPhoneStrippingLevel: 0
   iPhoneScriptCallOptimization: 0
-  iPhoneBuildNumber: 0
+  iPhoneBuildNumber: 1
   ForceInternetPermission: 0
   ForceSDCardPermission: 0
   CreateWallpaper: 0

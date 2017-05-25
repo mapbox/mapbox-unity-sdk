@@ -36,9 +36,13 @@ namespace Mapbox.Unity
 		{
 			ValidateMapboxAccessFile();
 			LoadAccessToken();
-			_fileSource = new CachingWebFileSource(_accessToken).AddCache(new MemoryCache(500));
-
+			ConfigureFileSource();
 			ConfigureTelemetry();
+		}
+
+		void ConfigureFileSource()
+		{
+			_fileSource = new CachingWebFileSource(_accessToken).AddCache(new MemoryCache(500));
 		}
 
 		void ConfigureTelemetry()
