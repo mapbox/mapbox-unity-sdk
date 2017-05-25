@@ -422,6 +422,7 @@ GameObject:
   - 222: {fileID: 222000010158576028}
   - 114: {fileID: 114000010223518896}
   - 114: {fileID: 114000010598074150}
+  - 114: {fileID: 114000011838890462}
   m_Layer: 5
   m_Name: Disgaree
   m_TagString: Untagged
@@ -541,6 +542,7 @@ GameObject:
   - 222: {fileID: 222000012252638138}
   - 114: {fileID: 114000012653900312}
   - 114: {fileID: 114000011412483932}
+  - 114: {fileID: 114000012507710678}
   m_Layer: 5
   m_Name: Agree
   m_TagString: Untagged
@@ -1200,6 +1202,18 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114000011838890462
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000012879106734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 859a38e5f727a4ea7ad0839a89bcd655, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _booleanValue: 0
 --- !u!114 &114000011915122438
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1356,6 +1370,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _url: https://www.mapbox.com/telemetry/
+--- !u!114 &114000012507710678
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000013825489580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 859a38e5f727a4ea7ad0839a89bcd655, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _booleanValue: 1
 --- !u!114 &114000012514615580
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2331,8 +2357,8 @@ RectTransform:
   m_RootOrder: 1
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 151, y: -265}
-  m_SizeDelta: {x: 302, y: 39.333336}
+  m_AnchoredPosition: {x: 111, y: -265}
+  m_SizeDelta: {x: 222, y: 52.666664}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224000010289174704
 RectTransform:
@@ -2368,8 +2394,8 @@ RectTransform:
   m_RootOrder: 2
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 151, y: -330.33334}
-  m_SizeDelta: {x: 302, y: 39.333336}
+  m_AnchoredPosition: {x: 111, y: -323.66666}
+  m_SizeDelta: {x: 222, y: 52.666664}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224000010449021188
 RectTransform:
@@ -2387,8 +2413,8 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 151, y: -199.66667}
-  m_SizeDelta: {x: 302, y: 39.333336}
+  m_AnchoredPosition: {x: 111, y: -206.33333}
+  m_SizeDelta: {x: 222, y: 52.666664}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224000010566913724
 RectTransform:

@@ -10,6 +10,7 @@ namespace Mapbox.Unity
             /// Access token file name. Intended to be located in StreamingAssets.
             /// </summary>
             public const string TOKEN_FILE = "MapboxAccess.text";
+			public const string IS_TELEMETRY_ENABLED_KEY = "IS_MAPBOX_TELEMETRY_ENABLED";
         }
 
         /// <summary>
