@@ -100,6 +100,7 @@ GameObject:
   - 4: {fileID: 110210641}
   - 114: {fileID: 110210642}
   - 114: {fileID: 110210643}
+  - 114: {fileID: 110210644}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -137,6 +138,7 @@ MonoBehaviour:
   _tileProvider: {fileID: 110210643}
   _mapVisualizer: {fileID: 11400000, guid: cd4289970163d4a4780274ac22a6aee7, type: 2}
   _unityTileSize: 100
+  CenterHeight: -3.4028235e+38
 --- !u!114 &110210643
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -149,6 +151,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _range: {x: 1, y: 1, z: 1, w: 1}
+--- !u!114 &110210644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 110210640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cb6314445ca4a9428f2ea1639890b08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &817377086
 GameObject:
   m_ObjectHideFlags: 0
