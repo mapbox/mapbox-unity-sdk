@@ -72,6 +72,10 @@
 			}
 		}
 
+		[HideInInspector]
+		public float CenterHeight = float.MinValue;
+		private bool _centerTileSet = false;
+
 		float _worldRelativeScale;
 		public float WorldRelativeScale
 		{
@@ -82,6 +86,7 @@
 		}
 
 		public event Action OnInitialized = delegate { };
+		public event Action<AbstractMap> OnHeightChanged = delegate { };
 
 		protected virtual void Awake()
 		{
@@ -125,7 +130,16 @@
 
 		void TileProvider_OnTileAdded(UnwrappedTileId tileId)
 		{
-			_mapVisualizer.LoadTile(tileId);
+			var utile = _mapVisualizer.LoadTile(tileId);
+			if (!_centerTileSet)
+			{
+				_centerTileSet = true;
+				utile.OnHeightDataChanged += (s) =>
+				{
+					CenterHeight = s.QueryHeightData(.5f, .5f);
+					OnHeightChanged(this);
+				};				
+			}
 		}
 
 		void TileProvider_OnTileRemoved(UnwrappedTileId tileId)
