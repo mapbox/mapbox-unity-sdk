@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 066eb96836b694d168eff135bd2aeaca
-timeCreated: 1492442840
+guid: 82852ff66538d44ccb63c5afc39708a5
+timeCreated: 1495660437
 licenseType: Pro
 TextureImporter:
   fileIDToRecycleName: {}
@@ -26,10 +26,10 @@ TextureImporter:
   cubemapConvolutionSteps: 7
   cubemapConvolutionExponent: 1.5
   seamlessCubemap: 0
-  textureFormat: -1
+  textureFormat: -3
   maxTextureSize: 256
   textureSettings:
-    filterMode: -1
+    filterMode: 0
     aniso: -1
     mipBias: -1
     wrapMode: 1
@@ -53,7 +53,7 @@ TextureImporter:
     serializedVersion: 2
     sprites: []
     outline: []
-  spritePackingTag: 
+  spritePackingTag: MapboxAttribution
   userData: 
   assetBundleName: 
   assetBundleVariant: 
