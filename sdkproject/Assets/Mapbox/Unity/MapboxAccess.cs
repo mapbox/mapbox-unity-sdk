@@ -7,7 +7,7 @@ namespace Mapbox.Unity
 	using Mapbox.Directions;
 	using Mapbox.Platform;
 	using Mapbox.Platform.Cache;
-	using System.Runtime.InteropServices;
+	using Mapbox.Unity.Telemetry;
 
 	/// <summary>
 	/// Object for retrieving an API token and making http requests.
@@ -15,15 +15,7 @@ namespace Mapbox.Unity
 	/// </summary>
 	public class MapboxAccess : IFileSource
 	{
-#if UNITY_IOS && !UNITY_EDITOR
 
-	[DllImport("__Internal")]
-	private static extern void initialize(string accessToken, string userAgentBase);
-
-	[DllImport("__Internal")]
-	private static extern void sendTurnstyleEvent();
-
-#endif
 		private readonly string _accessPath = Path.Combine(Application.streamingAssetsPath, Constants.Path.TOKEN_FILE);
 
 		static MapboxAccess _instance = new MapboxAccess();
@@ -47,8 +39,11 @@ namespace Mapbox.Unity
 			_fileSource = new CachingWebFileSource(AccessToken).AddCache(new MemoryCache(500));
 
 #if UNITY_IOS && !UNITY_EDITOR
-			initialize(AccessToken, "MapboxEventsUnityiOS");
-            sendTurnstyleEvent();
+			TelemetryIos.SendTurnstyle(_accessToken);
+#endif
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+			TelemetryAndroid.SendTurnstyle(_accessToken);
 #endif
 		}
 
