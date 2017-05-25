@@ -1343,7 +1343,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Imrprove This Map
+  m_Text: Improve This Map
 --- !u!114 &114000012459593998
 MonoBehaviour:
   m_ObjectHideFlags: 1
