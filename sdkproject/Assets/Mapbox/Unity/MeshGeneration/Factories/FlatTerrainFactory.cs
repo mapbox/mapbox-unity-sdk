@@ -23,7 +23,7 @@
 
 		internal override void OnInitialized()
 		{
-
+			
 		}
 
 		internal override void OnRegistered(UnityTile tile)
@@ -44,7 +44,11 @@
 				tile.gameObject.AddComponent<MeshFilter>();
 			}
 
+			// HACK: This is here in to make the system trigger a finished state.
+			Progress++;
 			tile.MeshFilter.sharedMesh = GetQuad(tile);
+			Progress--;
+
 			if (_addCollider && tile.Collider == null)
 			{
 				tile.gameObject.AddComponent<BoxCollider>();

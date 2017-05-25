@@ -103,7 +103,6 @@
 			}
 
             _mapVisualizer.Destroy();
-
         }
 
 		// This is the part that is abstract?

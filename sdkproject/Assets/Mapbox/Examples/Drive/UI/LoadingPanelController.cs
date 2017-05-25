@@ -8,7 +8,7 @@ public class LoadingPanelController : MonoBehaviour
     public MapVisualizer MapVisualizer;
     public GameObject Content;
 
-    void Start()
+    void Awake()
     {
         MapVisualizer.OnMapVisualizerStateChanged += (s) =>
         {
