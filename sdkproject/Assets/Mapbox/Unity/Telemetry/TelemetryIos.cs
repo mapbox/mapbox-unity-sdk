@@ -3,18 +3,31 @@ namespace Mapbox.Unity.Telemetry
 {
 	using System.Runtime.InteropServices;
 
-	public static class TelemetryIos
+	public class TelemetryIos : ITelemetryLibrary
 	{
 		[DllImport("__Internal")]
-		private static extern void initialize(string accessToken, string userAgentBase);
+		static extern void initialize(string accessToken, string userAgentBase);
 
 		[DllImport("__Internal")]
-		private static extern void sendTurnstyleEvent();
+		static extern void sendTurnstyleEvent();
 
-		public static void SendTurnstyle(string accessToken)
+		static ITelemetryLibrary _instance = new TelemetryIos();
+		public static ITelemetryLibrary Instance
+		{
+			get
+			{
+				return _instance;
+			}
+		}
+
+		public void Initialize(string accessToken)
 		{
 			initialize(accessToken, "MapboxEventsUnityiOS");
-            sendTurnstyleEvent();
+		}
+
+		public void SendTurnstyle()
+		{
+			sendTurnstyleEvent();
 		}
 	}
 }

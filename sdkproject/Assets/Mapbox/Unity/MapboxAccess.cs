@@ -15,11 +15,11 @@ namespace Mapbox.Unity
 	/// </summary>
 	public class MapboxAccess : IFileSource
 	{
-
-		private readonly string _accessPath = Path.Combine(Application.streamingAssetsPath, Constants.Path.TOKEN_FILE);
+		readonly string _accessPath = Path.Combine(Application.streamingAssetsPath, Constants.Path.TOKEN_FILE);
 
 		static MapboxAccess _instance = new MapboxAccess();
-		private CachingWebFileSource _fileSource;
+		ITelemetryLibrary _telemetryLibrary;
+		CachingWebFileSource _fileSource;
 
 		/// <summary>
 		/// The singleton instance.
@@ -38,13 +38,20 @@ namespace Mapbox.Unity
 			LoadAccessToken();
 			_fileSource = new CachingWebFileSource(AccessToken).AddCache(new MemoryCache(500));
 
-#if UNITY_IOS && !UNITY_EDITOR
-			TelemetryIos.SendTurnstyle(_accessToken);
+#if UNITY_EDITOR
+			_telemetryLibrary = TelemetryDummy.Instance;
+#elif UNITY_IOS
+			_telemetryLibrary = TelemetryIos;
+#elif UNITY_ANDROID
+			_telemetryLibrary = TelemetryAndroid.Instance;
+#else
+			_telemetryLibrary = TelemetryDummy.Instance;
 #endif
 
-#if UNITY_ANDROID && !UNITY_EDITOR
-			TelemetryAndroid.SendTurnstyle(_accessToken);
-#endif
+
+			Debug.Log("MapboxAccess: " + _telemetryLibrary);
+			_telemetryLibrary.Initialize(_accessToken);
+			_telemetryLibrary.SendTurnstyle();
 		}
 
 

@@ -1,20 +1,73 @@
 ﻿#if UNITY_ANDROID
+
 namespace Mapbox.Unity.Telemetry
 {
-	using System.Runtime.InteropServices;
+	using UnityEngine;
 
-	public static class TelemetryAndroid
+	public class TelemetryAndroid : ITelemetryLibrary
 	{
-		[DllImport("__Internal")]
-		private static extern void initialize(string accessToken, string userAgentBase);
+		AndroidJavaObject _activityContext = null;
+		AndroidJavaObject _telemInstance = null;
 
-		[DllImport("__Internal")]
-		private static extern void sendTurnstyleEvent();
-
-		public static void SendTurnstyle(string accessToken)
+		static ITelemetryLibrary _instance = new TelemetryAndroid();
+		public static ITelemetryLibrary Instance
 		{
-			//initialize(accessToken, "MapboxEventsUnityiOS");
-   //         sendTurnstyleEvent();
+			get
+			{
+				return _instance;
+			}
+		}
+
+		public void Initialize(string accessToken)
+		{
+			using (AndroidJavaClass activityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+			{
+				_activityContext = activityClass.GetStatic<AndroidJavaObject>("currentActivity");
+			}
+
+			if (null == _activityContext)
+			{
+				Debug.LogError("Could not get current activity");
+				return;
+			}
+
+			using (AndroidJavaClass MapboxAndroidTelem = new AndroidJavaClass("com.mapbox.services.android.telemetry.MapboxTelemetry"))
+			{
+				if (null == MapboxAndroidTelem)
+				{
+					Debug.LogError("Could not get class 'MapboxTelemetry'");
+					return;
+				}
+
+				_telemInstance = MapboxAndroidTelem.CallStatic<AndroidJavaObject>("getInstance");
+				if (null == _telemInstance)
+				{
+					Debug.LogError("Could not get MapboxTelemetry instance");
+					return;
+				}
+
+				_telemInstance.Call(
+					"initialize"
+					, _activityContext
+					, accessToken
+					, "MapboxEventsUnityAndroid"
+				);
+			}
+		}
+
+		public void SendTurnstyle()
+		{
+			using (AndroidJavaClass MapboxAndroidEvent = new AndroidJavaClass("com.mapbox.services.android.telemetry.MapboxEvent"))
+			{
+				if (null == MapboxAndroidEvent)
+				{
+					Debug.LogError("Could not get class 'MapboxEvent'");
+					return;
+				}
+
+				AndroidJavaObject mapLoadEvent = MapboxAndroidEvent.CallStatic<AndroidJavaObject>("buildMapLoadEvent");
+				_telemInstance.Call("pushEvent", mapLoadEvent);
+			}
 		}
 	}
 }
