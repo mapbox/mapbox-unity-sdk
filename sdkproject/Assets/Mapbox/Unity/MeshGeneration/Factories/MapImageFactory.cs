@@ -68,17 +68,20 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			tile.RasterDataState = TilePropertyState.Loading;
 
 			tile.AddTile(rasterTile);
-			rasterTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
+            Progress++;
+            rasterTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
-				if (rasterTile.HasError)
+                if (rasterTile.HasError)
 				{
 					tile.RasterDataState = TilePropertyState.Error;
-					return;
+                    Progress--;
+                    return;
 				}
 
 				tile.SetRasterData(rasterTile.Data, _useMipMap, _useCompression);
 				tile.RasterDataState = TilePropertyState.Loaded;
-			});
+                Progress--;
+            });
 		}
 
 		internal override void OnUnregistered(UnityTile tile)

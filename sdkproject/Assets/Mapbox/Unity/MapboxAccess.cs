@@ -2,6 +2,7 @@ namespace Mapbox.Unity
 {
 	using UnityEngine;
 	using System.IO;
+	using Mapbox.Utils;
 	using System;
 	using Mapbox.Geocoding;
 	using Mapbox.Directions;
@@ -21,6 +22,9 @@ namespace Mapbox.Unity
 		ITelemetryLibrary _telemetryLibrary;
 		CachingWebFileSource _fileSource;
 
+		// Default on.
+		bool _isTelemetryEnabled = true;
+
 		/// <summary>
 		/// The singleton instance.
 		/// </summary>
@@ -36,7 +40,7 @@ namespace Mapbox.Unity
 		{
 			ValidateMapboxAccessFile();
 			LoadAccessToken();
-			ConfigureFileSource();
+            ConfigureFileSource();
 			ConfigureTelemetry();
 		}
 
@@ -47,6 +51,9 @@ namespace Mapbox.Unity
 
 		void ConfigureTelemetry()
 		{
+			// TODO: this will need to be settable at runtime as well? 
+            _isTelemetryEnabled = GetTelemetryCollectionState();
+			
 #if UNITY_EDITOR
 			_telemetryLibrary = TelemetryDummy.Instance;
 #elif UNITY_IOS
@@ -130,6 +137,14 @@ namespace Mapbox.Unity
 			return request.text;
 		}
 
+		bool GetTelemetryCollectionState()
+		{
+			if (!PlayerPrefs.HasKey(Constants.Path.IS_TELEMETRY_ENABLED_KEY))
+			{
+				PlayerPrefs.SetInt(Constants.Path.IS_TELEMETRY_ENABLED_KEY, 1);
+			}
+			return PlayerPrefs.GetInt(Constants.Path.IS_TELEMETRY_ENABLED_KEY) != 0;
+		}
 
 		/// <summary>
 		/// Makes an asynchronous url query.
