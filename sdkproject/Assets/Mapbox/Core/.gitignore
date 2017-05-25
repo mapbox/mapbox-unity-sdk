@@ -6,8 +6,5 @@
 # mapbox-sdk-cs
 !mapbox-sdk-cs/
 
-# Unity specific
-!Unity/
-
 !*.gitignore
-!Unity.meta
+!/**/*.meta
