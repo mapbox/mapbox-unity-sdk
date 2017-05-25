@@ -16,7 +16,7 @@ public class LoadAndroidAAR : MonoBehaviour
 	}
 
 
-	int _previousSecond=-1;
+	int _previousSecond = -1;
 	void Update()
 	{
 		// JUST FOR TESTING
@@ -25,8 +25,14 @@ public class LoadAndroidAAR : MonoBehaviour
 		if (_previousSecond == second) { return; }
 		_previousSecond = second;
 
-		if (0 == second % 21) { TelemetryPushMapCllickEvent(); }
-		if (0 == second % 27) { TelemetryPushMapDragEndEvent(); }
+		// beware only postive coordinates are generated
+		System.Random random = new System.Random((int)System.DateTime.Now.Ticks);
+		double lng = random.NextDouble() * 180d;
+		double lat = random.NextDouble() * 90d;
+		double zoom = System.Math.Floor(random.NextDouble() * 20d);
+
+		if (0 == second % 7) { TelemetryPushMapCllickEvent(lng, lat, zoom); }
+		if (0 == second % 11) { TelemetryPushMapDragEndEvent(); }
 	}
 
 
@@ -92,14 +98,45 @@ public class LoadAndroidAAR : MonoBehaviour
 	}
 
 
-	void TelemetryPushMapCllickEvent()
+	void TelemetryPushMapCllickEvent(double longitude, double latitude, double zoom)
 	{
-		Debug.Log("======== TelemetryPushMapCllickEvent() ========");
+		Debug.Log(string.Format("======== TelemetryPushMapCllickEvent() lng:{0} lat:{1} z:{2} ========", longitude, latitude, zoom));
 		if (null == _telemInstance)
 		{
 			Debug.LogError("Telemetry not initialized");
 			return;
 		}
+
+
+		using (AndroidJavaClass MapboxAndroidEvent = new AndroidJavaClass("com.mapbox.services.android.telemetry.MapboxEvent"))
+		{
+			if (null == MapboxAndroidEvent)
+			{
+				Debug.LogError("Could not get class 'MapboxEvent'");
+				return;
+			}
+
+
+			// don't know how to do: 'MainActivity.class.getSimpleName()' https://github.com/mapbox/mapbox-telemetry-android/blob/master/telemetry/app/src/main/java/com/mapbox/telemetry/MainActivity.java#L161
+			string simpleName = "UnityActivitySimpleName";
+
+
+			using (AndroidJavaObject androidLocation = new AndroidJavaObject("android.location.Location", simpleName))
+			{
+				androidLocation.Call("setLongitude", longitude);
+				androidLocation.Call("setLatitude", latitude);
+
+				AndroidJavaObject mapClickEvent = MapboxAndroidEvent.CallStatic<AndroidJavaObject>(
+					"buildMapClickEvent",
+					androidLocation,
+					"GESTURE_ID_CLICK",
+					zoom
+				);
+
+				_telemInstance.Call("pushEvent", mapClickEvent);
+			}
+		}
+
 	}
 
 
