@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Name: PoiDemoVisualization
   m_EditorClassIdentifier: 
   _factories:
-  - {fileID: 11400000, guid: 9972eb02ed9e42e48878484987eaa2eb, type: 2}
+  - {fileID: 11400000, guid: 682db3cef47054d2f9b87a2463e551bd, type: 2}
   - {fileID: 11400000, guid: 8a779a8c55d17ff438268988b94222cc, type: 2}
   - {fileID: 11400000, guid: b6db6e4901cc50246b1ed5c328d73872, type: 2}

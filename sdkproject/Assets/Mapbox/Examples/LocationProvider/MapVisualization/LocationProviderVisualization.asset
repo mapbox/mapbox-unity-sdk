@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Name: LocationProviderVisualization
   m_EditorClassIdentifier: 
   _factories:
-  - {fileID: 11400000, guid: 82b1ecdf2417242a98d0f32cb1cea955, type: 2}
+  - {fileID: 11400000, guid: 682db3cef47054d2f9b87a2463e551bd, type: 2}
   - {fileID: 11400000, guid: 70ae1b4720c0f4f3d8bd4e48b43f6945, type: 2}
