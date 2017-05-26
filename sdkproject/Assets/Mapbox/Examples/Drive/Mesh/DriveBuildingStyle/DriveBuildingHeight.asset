@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Name: DriveBuildingHeight
   m_EditorClassIdentifier: 
   Active: 1
+  _flatTops: 1
   _height: 0
   _forceHeight: 0
-  _closeEnd: 0
-  _flatTop: 0

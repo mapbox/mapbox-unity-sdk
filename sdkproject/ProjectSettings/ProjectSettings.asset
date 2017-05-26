@@ -96,22 +96,22 @@ PlayerSettings:
     16:10: 1
     16:9: 1
     Others: 1
-  bundleIdentifier: com.mapbox.sdkproject
-  bundleVersion: 0.4
+  bundleIdentifier: com.mapbox.unitysdk
+  bundleVersion: 1.0.0
   preloadedAssets: []
   metroEnableIndependentInputSource: 0
   xboxOneDisableKinectGpuReservation: 0
   singlePassStereoRendering: 0
   protectGraphicsMemory: 0
   AndroidBundleVersionCode: 1
-  AndroidMinSdkVersion: 9
+  AndroidMinSdkVersion: 16
   AndroidPreferredInstallLocation: 1
   aotOptions: 
   apiCompatibilityLevel: 2
   stripEngineCode: 1
   iPhoneStrippingLevel: 0
   iPhoneScriptCallOptimization: 0
-  iPhoneBuildNumber: 0
+  iPhoneBuildNumber: 1
   ForceInternetPermission: 0
   ForceSDCardPermission: 0
   CreateWallpaper: 0
@@ -354,7 +354,7 @@ PlayerSettings:
   psp2InfoBarColor: 0
   psp2UseDebugIl2cppLibs: 0
   psmSplashimage: {fileID: 0}
-  spritePackerPolicy: 
+  spritePackerPolicy: DefaultPackerPolicy
   scriptingDefineSymbols: {}
   metroPackageName: sdkproject
   metroPackageVersion: 
@@ -441,46 +441,12 @@ PlayerSettings:
   iOS::Architecture: 2
   iOS::ScriptingBackend: 1
   boolPropertyNames:
-  - Android::VR::enable
-  - Metro::VR::enable
-  - N3DS::VR::enable
-  - PS3::VR::enable
-  - PS4::VR::enable
-  - PSM::VR::enable
-  - PSP2::VR::enable
-  - SamsungTV::VR::enable
-  - Standalone::VR::enable
-  - Tizen::VR::enable
-  - WebGL::VR::enable
   - WebGL::analyzeBuildSize
   - WebGL::dataCaching
   - WebGL::useEmbeddedResources
-  - WebPlayer::VR::enable
-  - WiiU::VR::enable
-  - Xbox360::VR::enable
-  - XboxOne::VR::enable
-  - iOS::VR::enable
-  - tvOS::VR::enable
-  Android::VR::enable: 0
-  Metro::VR::enable: 0
-  N3DS::VR::enable: 0
-  PS3::VR::enable: 0
-  PS4::VR::enable: 0
-  PSM::VR::enable: 0
-  PSP2::VR::enable: 0
-  SamsungTV::VR::enable: 0
-  Standalone::VR::enable: 0
-  Tizen::VR::enable: 0
-  WebGL::VR::enable: 0
   WebGL::analyzeBuildSize: 0
   WebGL::dataCaching: 0
   WebGL::useEmbeddedResources: 0
-  WebPlayer::VR::enable: 0
-  WiiU::VR::enable: 0
-  Xbox360::VR::enable: 0
-  XboxOne::VR::enable: 0
-  iOS::VR::enable: 0
-  tvOS::VR::enable: 0
   stringPropertyNames:
   - Analytics_ServiceEnabled::Analytics_ServiceEnabled
   - Build_ServiceEnabled::Build_ServiceEnabled
@@ -506,44 +472,7 @@ PlayerSettings:
   WebGL::emscriptenArgs: 
   WebGL::template: APPLICATION:Default
   additionalIl2CppArgs::additionalIl2CppArgs: 
-  vectorPropertyNames:
-  - Android::VR::enabledDevices
-  - Metro::VR::enabledDevices
-  - N3DS::VR::enabledDevices
-  - PS3::VR::enabledDevices
-  - PS4::VR::enabledDevices
-  - PSM::VR::enabledDevices
-  - PSP2::VR::enabledDevices
-  - SamsungTV::VR::enabledDevices
-  - Standalone::VR::enabledDevices
-  - Tizen::VR::enabledDevices
-  - WebGL::VR::enabledDevices
-  - WebPlayer::VR::enabledDevices
-  - WiiU::VR::enabledDevices
-  - Xbox360::VR::enabledDevices
-  - XboxOne::VR::enabledDevices
-  - iOS::VR::enabledDevices
-  - tvOS::VR::enabledDevices
-  Android::VR::enabledDevices:
-  - Oculus
-  Metro::VR::enabledDevices: []
-  N3DS::VR::enabledDevices: []
-  PS3::VR::enabledDevices: []
-  PS4::VR::enabledDevices:
-  - PlayStationVR
-  PSM::VR::enabledDevices: []
-  PSP2::VR::enabledDevices: []
-  SamsungTV::VR::enabledDevices: []
-  Standalone::VR::enabledDevices:
-  - Oculus
-  Tizen::VR::enabledDevices: []
-  WebGL::VR::enabledDevices: []
-  WebPlayer::VR::enabledDevices: []
-  WiiU::VR::enabledDevices: []
-  Xbox360::VR::enabledDevices: []
-  XboxOne::VR::enabledDevices: []
-  iOS::VR::enabledDevices: []
-  tvOS::VR::enabledDevices: []
+  vectorPropertyNames: []
   cloudProjectId: f183eef4-72bf-420c-80e0-aaadeab22f30
   projectName: Mapbox Unity SDK
   organizationId: mapbox-inc

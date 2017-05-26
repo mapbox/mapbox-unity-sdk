@@ -12,7 +12,7 @@
       { //Unity specific source
         "src": [
           {
-            "src": "../../sdkproject/Assets/Mapbox/Core/Unity/",
+            "src": "../../sdkproject/Assets/Mapbox/Unity/",
             "files": ["**/**.cs"]
           }
         ],
@@ -140,7 +140,8 @@
    "globalMetadataFiles": [],
     "fileMetadataFiles": [],
     "template": [
-      "default"
+      "default",
+      "template"
     ],
     "postProcessors": [],
     "noLangKeyword": false

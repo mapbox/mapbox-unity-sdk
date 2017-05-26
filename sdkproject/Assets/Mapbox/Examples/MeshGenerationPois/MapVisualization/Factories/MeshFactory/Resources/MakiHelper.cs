@@ -5,18 +5,21 @@ using UnityEngine;
 using UnityEngine.UI;
 using Mapbox.Unity.MeshGeneration.Interfaces;
 
-public class MakiHelper : MonoBehaviour, ILabelVisualizationHelper
+public class MakiHelper : MonoBehaviour, IFeaturePropertySettable
 {
     public static RectTransform Parent;
     public static GameObject UiPrefab;
 
     private GameObject _uiObject;
 
-    public void Initialize(Dictionary<string, object> props)
+    public void Set(Dictionary<string, object> props)
     {
         if (Parent == null)
         {
-            Parent = GameObject.Find("Canvas/PoiContainer").GetComponent<RectTransform>();
+            var canv = GameObject.Find("Canvas");
+            var ob = new GameObject("PoiContainer");
+            ob.transform.SetParent(canv.transform);
+            Parent = ob.AddComponent<RectTransform>();
             UiPrefab = Resources.Load<GameObject>("MakiUiPrefab");
         }
         
@@ -25,7 +28,10 @@ public class MakiHelper : MonoBehaviour, ILabelVisualizationHelper
             _uiObject = Instantiate(UiPrefab);
             _uiObject.transform.SetParent(Parent);
             _uiObject.transform.Find("Image").GetComponent<Image>().sprite = Resources.Load<Sprite>("maki/" + props["maki"].ToString() + "-15");
-            _uiObject.GetComponentInChildren<Text>().text = props["name"].ToString();
+            if (props.ContainsKey("name"))
+            {
+                _uiObject.GetComponentInChildren<Text>().text = props["name"].ToString();
+            }
         }
     }
 

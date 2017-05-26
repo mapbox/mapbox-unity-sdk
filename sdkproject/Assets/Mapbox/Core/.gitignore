@@ -3,8 +3,8 @@
 
 # except:
 
-# Unity specific
-!Unity/
+# mapbox-sdk-cs
+!mapbox-sdk-cs/
 
 !*.gitignore
-!Unity.meta
+!/**/*.meta

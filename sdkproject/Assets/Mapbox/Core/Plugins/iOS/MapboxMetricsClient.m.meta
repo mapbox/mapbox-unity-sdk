@@ -1,0 +1,26 @@
+fileFormatVersion: 2
+guid: 4172b185b7b5c4f4ab2f6d7bd134ea29
+timeCreated: 1495158819
+licenseType: Free
+PluginImporter:
+  serializedVersion: 1
+  iconMap: {}
+  executionOrder: {}
+  isPreloaded: 0
+  platformData:
+    Editor:
+      enabled: 0
+      settings:
+        DefaultValueInitialized: true
+    data:
+      enabled: 0
+      settings: {}
+    iOS:
+      enabled: 1
+      settings: {}
+    tvOS:
+      enabled: 1
+      settings: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
