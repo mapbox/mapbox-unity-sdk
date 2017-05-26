@@ -7,7 +7,8 @@ Built-in Examples: https://www.mapbox.com/mapbox-unity-sdk/docs/03-examples.html
 Attribution: https://www.mapbox.com/mapbox-unity-sdk/docs/04-attribution.html
 API: https://www.mapbox.com/mapbox-unity-sdk/api/
 
-Current version: 0.5.1
+Current version: 1.0.0, as of 05/25/2017
+
 Changelog: https://www.mapbox.com/mapbox-unity-sdk/docs/05-changelog.html
 
 If you have issues or feedback, please contact us at https://www.mapbox.com/contact/ 
