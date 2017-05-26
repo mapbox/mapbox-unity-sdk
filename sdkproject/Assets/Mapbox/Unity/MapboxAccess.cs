@@ -8,7 +8,7 @@ namespace Mapbox.Unity
 	using Mapbox.Directions;
 	using Mapbox.Platform;
 	using Mapbox.Platform.Cache;
-	using System.Runtime.InteropServices;
+	using Mapbox.Unity.Telemetry;
 
 	/// <summary>
 	/// Object for retrieving an API token and making http requests.
@@ -16,19 +16,11 @@ namespace Mapbox.Unity
 	/// </summary>
 	public class MapboxAccess : IFileSource
 	{
-#if UNITY_IOS && !UNITY_EDITOR
-
-	[DllImport("__Internal")]
-	private static extern void initialize(string accessToken, string userAgentBase);
-
-	[DllImport("__Internal")]
-	private static extern void sendTurnstyleEvent();
-
-#endif
-		private readonly string _accessPath = Path.Combine(Application.streamingAssetsPath, Constants.Path.TOKEN_FILE);
+		readonly string _accessPath = Path.Combine(Application.streamingAssetsPath, Constants.Path.TOKEN_FILE);
 
 		static MapboxAccess _instance = new MapboxAccess();
-		private CachingWebFileSource _fileSource;
+		ITelemetryLibrary _telemetryLibrary;
+		CachingWebFileSource _fileSource;
 
 		// Default on.
 		bool _isTelemetryEnabled = true;
@@ -48,15 +40,34 @@ namespace Mapbox.Unity
 		{
 			ValidateMapboxAccessFile();
 			LoadAccessToken();
-			GetTelemetryConfiguration();
-			_fileSource = new CachingWebFileSource(AccessToken).AddCache(new MemoryCache(500));
-
-#if UNITY_IOS && !UNITY_EDITOR
-			initialize(AccessToken, "MapboxEventsUnityiOS");
-            sendTurnstyleEvent();
-#endif
+            ConfigureFileSource();
+			ConfigureTelemetry();
 		}
 
+		void ConfigureFileSource()
+		{
+			_fileSource = new CachingWebFileSource(_accessToken).AddCache(new MemoryCache(500));
+		}
+
+		void ConfigureTelemetry()
+		{
+			// TODO: this will need to be settable at runtime as well? 
+            _isTelemetryEnabled = GetTelemetryCollectionState();
+			
+#if UNITY_EDITOR
+			_telemetryLibrary = TelemetryDummy.Instance;
+#elif UNITY_IOS
+			_telemetryLibrary = TelemetryIos.Instance;
+#elif UNITY_ANDROID
+			_telemetryLibrary = TelemetryAndroid.Instance;
+#else
+			_telemetryLibrary = TelemetryDummy.Instance;
+#endif
+
+
+			_telemetryLibrary.Initialize(_accessToken);
+			_telemetryLibrary.SendTurnstile();
+		}
 
 		/// <summary>
 		/// The Mapbox API access token. 
@@ -126,18 +137,13 @@ namespace Mapbox.Unity
 			return request.text;
 		}
 
-		void GetTelemetryConfiguration()
+		bool GetTelemetryCollectionState()
 		{
-			if (PlayerPrefs.HasKey(Constants.Path.IS_TELEMETRY_ENABLED_KEY))
+			if (!PlayerPrefs.HasKey(Constants.Path.IS_TELEMETRY_ENABLED_KEY))
 			{
-				Debug.Log("MapboxAccess: " + "HAS KEY");
-				_isTelemetryEnabled = (PlayerPrefs.GetInt(Constants.Path.IS_TELEMETRY_ENABLED_KEY) != 0);
-			}
-			else
-			{
-				Debug.Log("MapboxAccess: " + "NO KEY");
 				PlayerPrefs.SetInt(Constants.Path.IS_TELEMETRY_ENABLED_KEY, 1);
 			}
+			return PlayerPrefs.GetInt(Constants.Path.IS_TELEMETRY_ENABLED_KEY) != 0;
 		}
 
 		/// <summary>
