@@ -11,7 +11,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	using Mapbox.Utils;
 	using Mapbox.Unity.Utilities;
 
-	[CreateAssetMenu(menuName = "Mapbox/Factories/Direction Factory")]
 	public class DirectionsFactory : MonoBehaviour
 	{
 		[SerializeField]
