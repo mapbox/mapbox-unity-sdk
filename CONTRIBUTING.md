@@ -50,7 +50,7 @@ This process copies releavant files from `mapbox-sdk-unity/dependencies` to `map
 
 # Contributing from your own project
 
-If you would prefer to make changes to the SDK from within your own Unity project, rather than the built-in `sdkproject`, we recommend that you symlink `sdkproject/Assets/Mapbox` into my `your-project/Assets/Mapbox`.
+If you would prefer to make changes to the SDK from within your own Unity project, rather than the built-in `sdkproject`, we recommend that you symlink `sdkproject/Assets/Mapbox` to `your-project/Assets/Mapbox`.
 
 # Generating documentation
 
