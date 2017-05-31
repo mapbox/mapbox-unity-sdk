@@ -209,8 +209,11 @@ if (!publishDocs) {
 		List<string> cmds = new List<string>(new string[]{
 			"git init .",
 			"git add .",
+			"echo 'finished git add'",
 			$"git commit -m \"pushed via [{originalCommit}] by [{commitAuthor}]\"",
+			"echo 'finished git commit'",
 			$"git remote add origin https://{githubToken}@github.com/{repoName}.git",
+			"echo 'finished git remote add'",
 			"git checkout -b mb-pages",
 			"git push -f origin mb-pages"
 		});
