@@ -93,7 +93,7 @@ namespace Mapbox.Unity
 
 		private void ValidateMapboxAccessFile()
 		{
-#if !UNITY_ANDROID
+#if !UNITY_ANDROID && !UNITY_WEBGL
 			if (!Directory.Exists(Application.streamingAssetsPath) || !File.Exists(_accessPath))
 			{
 				throw new InvalidTokenException("Please configure your access token in the menu!");
@@ -107,7 +107,7 @@ namespace Mapbox.Unity
 		/// </summary>
 		private void LoadAccessToken()
 		{
-#if UNITY_EDITOR || !UNITY_ANDROID
+#if UNITY_EDITOR || (!UNITY_ANDROID && !UNITY_WEBGL)
 			AccessToken = File.ReadAllText(_accessPath);
 #else
             AccessToken = LoadMapboxAccess();
