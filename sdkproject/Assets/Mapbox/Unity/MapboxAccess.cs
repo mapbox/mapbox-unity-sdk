@@ -38,9 +38,8 @@ namespace Mapbox.Unity
 
 		MapboxAccess()
 		{
-			ValidateMapboxAccessFile();
 			LoadAccessToken();
-            ConfigureFileSource();
+			ConfigureFileSource();
 			ConfigureTelemetry();
 		}
 
@@ -52,8 +51,8 @@ namespace Mapbox.Unity
 		void ConfigureTelemetry()
 		{
 			// TODO: this will need to be settable at runtime as well? 
-            _isTelemetryEnabled = GetTelemetryCollectionState();
-			
+			_isTelemetryEnabled = GetTelemetryCollectionState();
+
 #if UNITY_EDITOR
 			_telemetryLibrary = TelemetryDummy.Instance;
 #elif UNITY_IOS
@@ -91,51 +90,15 @@ namespace Mapbox.Unity
 		}
 
 
-		private void ValidateMapboxAccessFile()
-		{
-#if !UNITY_ANDROID && !UNITY_WEBGL
-			if (!Directory.Exists(Application.streamingAssetsPath) || !File.Exists(_accessPath))
-			{
-				throw new InvalidTokenException("Please configure your access token in the menu!");
-			}
-#endif
-		}
-
-
 		/// <summary>
-		/// Loads the access token from <see href="https://docs.unity3d.com/Manual/StreamingAssets.html">StreamingAssets</see>.
+		/// Loads the access token from <see href="https://docs.unity3d.com/Manual/BestPracticeUnderstandingPerformanceInUnity6.html">Resources folder</see>.
 		/// </summary>
 		private void LoadAccessToken()
 		{
-#if UNITY_EDITOR || (!UNITY_ANDROID && !UNITY_WEBGL)
-			AccessToken = File.ReadAllText(_accessPath);
-#else
-            AccessToken = LoadMapboxAccess();
-#endif
+			TextAsset taToken = Resources.Load<TextAsset>("MapboxAccess/MapboxAccess");
+			AccessToken = null != taToken ? taToken.text : "";
 		}
 
-
-		/// <summary>
-		/// Android-specific token file loading.
-		/// </summary>
-		private string LoadMapboxAccess()
-		{
-			var request = new WWW(_accessPath);
-
-			// Implement a custom timeout - just in case
-			var timeout = Time.realtimeSinceStartup + 5f;
-			while (!request.isDone)
-			{
-				if (Time.realtimeSinceStartup > timeout)
-				{
-					throw new InvalidTokenException("Could not load access token!");
-				}
-#if !NETFX_CORE
-				System.Threading.Thread.Sleep(10);
-#endif
-			}
-			return request.text;
-		}
 
 		bool GetTelemetryCollectionState()
 		{

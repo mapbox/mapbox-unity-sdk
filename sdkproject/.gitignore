@@ -30,3 +30,4 @@ sysinfo.txt
 
 # Configuration
 /Assets/StreamingAssets/MapboxAccess.*
+/Assets/Resources/MapboxAccess/*
