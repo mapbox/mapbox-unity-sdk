@@ -209,6 +209,8 @@ if (!publishDocs) {
 		List<string> cmds = new List<string>(new string[]{
 			"git init .",
 			"git add .",
+			"git config user.email \"appveyor\"",
+			"git config user.name \"appveyor\"",
 			$"git commit -m \"pushed via [{originalCommit}] by [{commitAuthor}]\"",
 			$"git remote add origin https://{githubToken}@github.com/{repoName}.git",
 			"git checkout -b mb-pages",
