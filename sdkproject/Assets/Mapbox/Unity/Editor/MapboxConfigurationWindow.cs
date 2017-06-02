@@ -15,6 +15,7 @@ namespace Mapbox.Editor
 		static MapboxConfiguration _mapboxConfiguration;
 		static string _accessToken;
 		static int _memoryCacheSize = 500;
+		static int _webRequestTimeout = 10;
 
 		string _lastAccessToken;
 		string _validationCode;
@@ -31,7 +32,7 @@ namespace Mapbox.Editor
 			}
 			if (!File.Exists(_configurationFile))
 			{
-				var json = JsonUtility.ToJson(new MapboxConfiguration { AccessToken = "", MemoryCacheSize = _memoryCacheSize });
+				var json = JsonUtility.ToJson(new MapboxConfiguration { AccessToken = "", MemoryCacheSize = _memoryCacheSize, DefaultTimeout = _webRequestTimeout });
 				File.WriteAllText(_configurationFile, json);
 			}
 
@@ -39,6 +40,7 @@ namespace Mapbox.Editor
 			_mapboxConfiguration = JsonUtility.FromJson<MapboxConfiguration>(configurationJson);
 			_accessToken = _mapboxConfiguration.AccessToken;
 			_memoryCacheSize = _mapboxConfiguration.MemoryCacheSize;
+			_webRequestTimeout = _mapboxConfiguration.DefaultTimeout;
 
 			var window = (MapboxConfigurationWindow)GetWindow(typeof(MapboxConfigurationWindow));
 			window.Show();
@@ -47,6 +49,7 @@ namespace Mapbox.Editor
 		void OnGUI()
 		{
 			_memoryCacheSize = EditorGUILayout.IntField("Mem Cache Size (# of tiles)", _memoryCacheSize);
+			_webRequestTimeout = EditorGUILayout.IntField("Default Web Request Timeout", _webRequestTimeout);
 
 			_accessToken = EditorGUILayout.TextField("Access Token", _accessToken);
 			if (string.IsNullOrEmpty(_accessToken))
@@ -68,7 +71,7 @@ namespace Mapbox.Editor
 				if (string.Equals(_validationCode, "TokenValid"))
 				{
 					messageType = MessageType.Info;
-					var json = JsonUtility.ToJson(new MapboxConfiguration { AccessToken = _accessToken, MemoryCacheSize = _memoryCacheSize });
+					var json = JsonUtility.ToJson(new MapboxConfiguration { AccessToken = _accessToken, MemoryCacheSize = _memoryCacheSize, DefaultTimeout = _webRequestTimeout });
 					File.WriteAllText(_configurationFile, json);
 					AssetDatabase.Refresh();
 					EditorGUILayout.HelpBox("TokenValid: saved to " + _configurationFile, messageType);

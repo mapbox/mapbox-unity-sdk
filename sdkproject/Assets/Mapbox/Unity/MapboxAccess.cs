@@ -118,7 +118,7 @@ namespace Mapbox.Unity
 		/// <param name="callback">Callback.</param>
 		public IAsyncRequest Request(string url, Action<Response> callback, int timeout = 10)
 		{
-			return _fileSource.Request(url, callback, timeout);
+			return _fileSource.Request(url, callback, _configuration.DefaultTimeout);
 		}
 
 
@@ -168,5 +168,6 @@ namespace Mapbox.Unity
 	{
 		public string AccessToken;
 		public int MemoryCacheSize;
+		public int DefaultTimeout;
 	}
 }
