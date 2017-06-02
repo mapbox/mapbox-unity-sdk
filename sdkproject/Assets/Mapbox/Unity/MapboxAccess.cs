@@ -40,20 +40,20 @@ namespace Mapbox.Unity
 		{
 			ValidateMapboxAccessFile();
 			LoadAccessToken();
-            ConfigureFileSource();
+			ConfigureFileSource();
 			ConfigureTelemetry();
 		}
 
 		void ConfigureFileSource()
 		{
-			_fileSource = new CachingWebFileSource(_accessToken).AddCache(new MemoryCache(500));
+			_fileSource = new CachingWebFileSource(_accessToken).AddCache(new MemoryCache(1)).AddCache(new MbTilesCache(1));
 		}
 
 		void ConfigureTelemetry()
 		{
 			// TODO: this will need to be settable at runtime as well? 
-            _isTelemetryEnabled = GetTelemetryCollectionState();
-			
+			_isTelemetryEnabled = GetTelemetryCollectionState();
+
 #if UNITY_EDITOR
 			_telemetryLibrary = TelemetryDummy.Instance;
 #elif UNITY_IOS
