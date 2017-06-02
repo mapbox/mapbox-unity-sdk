@@ -7,15 +7,14 @@
 
 namespace Mapbox.Unity.Utilities
 {
-
 	using System;
 	using UnityEngine.Networking;
 	using System.Collections;
 	using Mapbox.Platform;
+	using UnityEngine;
 
 #if UNITY_EDITOR
 	using UnityEditor;
-	using UnityEngine;
 #endif
 
 	internal sealed class HTTPRequest : IAsyncRequest
