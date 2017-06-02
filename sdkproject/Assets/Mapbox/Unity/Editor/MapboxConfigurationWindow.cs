@@ -46,7 +46,7 @@ namespace Mapbox.Editor
 
 		void OnGUI()
 		{
-			_memoryCacheSize = EditorGUILayout.IntField("Memory Cache Size", _memoryCacheSize);
+			_memoryCacheSize = EditorGUILayout.IntField("Mem Cache Size (# of tiles)", _memoryCacheSize);
 
 			_accessToken = EditorGUILayout.TextField("Access Token", _accessToken);
 			if (string.IsNullOrEmpty(_accessToken))
