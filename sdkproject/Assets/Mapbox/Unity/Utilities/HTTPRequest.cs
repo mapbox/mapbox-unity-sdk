@@ -15,6 +15,7 @@ namespace Mapbox.Unity.Utilities
 
 #if UNITY_EDITOR
 	using UnityEditor;
+	using UnityEngine;
 #endif
 
 	internal sealed class HTTPRequest : IAsyncRequest
@@ -56,12 +57,31 @@ namespace Mapbox.Unity.Utilities
 		private IEnumerator DoRequest()
 		{
 			_request.Send();
+
+			float timer = 0f;
+			bool didTimeout = false;
+
 			while (!_request.isDone)
 			{
 				yield return null;
+				timer += Time.deltaTime;
+				if (timer > _timeout)
+				{
+					_request.Abort();
+					didTimeout = true;
+					break;
+				}
 			}
 
-			var response = Response.FromWebResponse(this, _request, _wasCancelled ? new Exception("Request Cancelled") : null);
+			Response response;
+			if (didTimeout)
+			{
+				response = Response.FromWebResponse(this, _request, new Exception("Request Timed Out"));
+			}
+			else
+			{
+				response = Response.FromWebResponse(this, _request, _wasCancelled ? new Exception("Request Cancelled") : null);
+			}
 
 			_callback(response);
 			_request.Dispose();
