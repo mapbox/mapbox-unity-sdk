@@ -11,12 +11,35 @@ namespace Mapbox.Platform.MbTiles
 	{
 
 
+		public struct CacheKey
+		{
+			public string tileset;
+			public int zoom;
+			public long x;
+			public long y;
+			public override string ToString()
+			{
+				return string.Format("tileset:{0} z:{1} x:{2} y:{3} - {4}", tileset, zoom, x, y, DateTime.Now.Ticks);
+			}
+		}
+
+
 		private bool _disposed;
 		private SQLite.SQLiteDataService _sqlite;
 
 		public MbTiles(string tileset)
 		{
 			_sqlite = new SQLite.SQLiteDataService(tileset);
+			TableQuery<Tile> tblTiles = _sqlite.Table<Tile>();
+
+			//HACK: commented condition to create table on first run, find a nicer way to do it
+			if (null == tblTiles)
+			{
+				//hrmpf: multiple PKs not supported by sqlite.net
+				//https://github.com/praeclarum/sqlite-net/issues/282
+				//TODO: do it via plain SQL
+				_sqlite.CreateTable<Tile>();
+			}
 		}
 
 
@@ -76,6 +99,45 @@ namespace Mapbox.Platform.MbTiles
 				new MetaData{name="description", value=md.Description},
 				new MetaData{name="format", value=md.Format}
 			});
+		}
+
+
+		public void AddTile(CacheKey key, byte[] data)
+		{
+			_sqlite.Insert(new Tile
+			{
+				zoom_level = key.zoom,
+				tile_column = key.x,
+				tile_row = key.y,
+				tile_data = data
+			});
+		}
+
+
+		public byte[] GetTile(CacheKey key)
+		{
+			Tile tile = _sqlite
+				.Table<Tile>()
+				.Where(t => t.zoom_level == key.zoom && t.tile_column == key.x && t.tile_row == key.y)
+				.FirstOrDefault();
+
+			if (null == tile)
+			{
+				return null;
+			}
+			else
+			{
+				return tile.tile_data;
+			}
+		}
+
+
+		public bool TileExists(CacheKey key)
+		{
+			return null != _sqlite
+				.Table<Tile>()
+				.Where(t => t.zoom_level == key.zoom && t.tile_column == key.x && t.tile_row == key.y)
+				.FirstOrDefault();
 		}
 
 	}

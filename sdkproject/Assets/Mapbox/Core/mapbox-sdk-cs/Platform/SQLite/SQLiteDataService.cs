@@ -104,6 +104,18 @@ namespace Mapbox.Platform.SQLite
 		}
 
 
+		public void CreateTable<T>()
+		{
+			_connection.CreateTable<T>();
+		}
+
+
+		public void Insert(object o)
+		{
+			_connection.Insert(o);
+		}
+
+
 		public int InsertAll(System.Collections.IEnumerable objects)
 		{
 			return _connection.InsertAll(objects);
