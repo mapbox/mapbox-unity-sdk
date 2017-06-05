@@ -56,6 +56,18 @@ namespace Mapbox.Unity
 			}
 		}
 
+		public void DisposeCache()
+		{
+			Debug.Log("OnApplicationQuit");
+			CachingWebFileSource cwfs = _fileSource as CachingWebFileSource;
+			if (null != cwfs)
+			{
+				cwfs.Dispose();
+				cwfs = null;
+			}
+		}
+
+
 		void ConfigureFileSource()
 		{
 			_fileSource = new CachingWebFileSource(_accessToken).AddCache(new MemoryCache(1)).AddCache(new MbTilesCache(1));
