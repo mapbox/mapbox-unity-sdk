@@ -30,28 +30,37 @@ namespace Mapbox.Platform.MbTiles
 		public MbTiles(string tileset)
 		{
 			_sqlite = new SQLite.SQLiteDataService(tileset);
-			TableQuery<Tile> tblTiles = _sqlite.Table<Tile>();
 
-			//HACK: commented condition to create table on first run, find a nicer way to do it
-			if (null == tblTiles)
+
+			//hrmpf: multiple PKs not supported by sqlite.net
+			//https://github.com/praeclarum/sqlite-net/issues/282
+			//TODO: do it via plain SQL
+
+			List<SQLite4Unity3d.SQLiteConnection.ColumnInfo> colInfo = _sqlite.GetTableInfo("Tile");
+			if (0 == colInfo.Count)
 			{
-				//hrmpf: multiple PKs not supported by sqlite.net
-				//https://github.com/praeclarum/sqlite-net/issues/282
-				//TODO: do it via plain SQL
+				UnityEngine.Debug.Log("creating table 'Tile'");
 				_sqlite.CreateTable<Tile>();
 			}
 
 			//speed things up a bit :-)
-			try
+			string[] cmds = new string[]
 			{
-				_sqlite.Execute("PRAGMA synchronous=OFF");
-				_sqlite.Execute("PRAGMA count_changes=OFF");
-				_sqlite.Execute("PRAGMA journal_mode=MEMORY");
-				_sqlite.Execute("PRAGMA temp_store=MEMORY");
-			}
-			catch (Exception ex)
+				"PRAGMA synchronous=OFF",
+				"PRAGMA count_changes=OFF",
+				"PRAGMA journal_mode=MEMORY",
+				"PRAGMA temp_store=MEMORY"
+			};
+			foreach (var cmd in cmds)
 			{
-				UnityEngine.Debug.LogError(ex);
+				try
+				{
+					_sqlite.Execute(cmd);
+				}
+				catch (Exception ex)
+				{
+					UnityEngine.Debug.LogWarningFormat("{0}: {1}", cmd, ex);
+				}
 			}
 		}
 

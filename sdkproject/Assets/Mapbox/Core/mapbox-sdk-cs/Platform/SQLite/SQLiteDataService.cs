@@ -124,6 +124,11 @@ namespace Mapbox.Platform.SQLite
 		}
 
 
+		public List<SQLite4Unity3d.SQLiteConnection.ColumnInfo> GetTableInfo(string tableName)
+		{
+			return _connection.GetTableInfo(tableName);
+		}
+
 		public void Insert(object o)
 		{
 			_connection.Insert(o);
