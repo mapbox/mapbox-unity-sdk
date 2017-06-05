@@ -38,10 +38,22 @@ namespace Mapbox.Unity
 
 		MapboxAccess()
 		{
+			Debug.Log("MapboxAccess constructor");
 			ValidateMapboxAccessFile();
 			LoadAccessToken();
 			ConfigureFileSource();
 			ConfigureTelemetry();
+		}
+
+		~MapboxAccess()
+		{
+			Debug.Log("MapboxAccess destructor");
+			CachingWebFileSource cwfs = _fileSource as CachingWebFileSource;
+			if (null != cwfs)
+			{
+				cwfs.Dispose();
+				cwfs = null;
+			}
 		}
 
 		void ConfigureFileSource()

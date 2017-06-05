@@ -5,17 +5,58 @@
 	using System.Collections.Generic;
 	using Mapbox.Unity.Utilities;
 
-	public class CachingWebFileSource : IFileSource
+	public class CachingWebFileSource : IFileSource, IDisposable
 	{
 
 
+		private bool _disposed;
 		private List<ICache> _caches = new List<ICache>();
 		private string _accessToken;
+
 
 		public CachingWebFileSource(string accessToken)
 		{
 			_accessToken = accessToken;
 		}
+
+
+		#region idisposable
+
+
+		~CachingWebFileSource()
+		{
+			Dispose(false);
+		}
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool disposeManagedResources)
+		{
+			if (!_disposed)
+			{
+				if (disposeManagedResources)
+				{
+					for (int i = 0; i < _caches.Count; i++)
+					{
+						IDisposable cache = _caches[i] as IDisposable;
+						if (null != cache)
+						{
+							cache.Dispose();
+							cache = null;
+						}
+					}
+				}
+				_disposed = true;
+			}
+		}
+
+
+		#endregion
+
 
 		public CachingWebFileSource AddCache(ICache cache)
 		{
