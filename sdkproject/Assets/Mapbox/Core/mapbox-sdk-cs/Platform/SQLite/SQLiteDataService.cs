@@ -69,6 +69,9 @@ namespace Mapbox.Platform.SQLite
 
 
 
+		#region IDisposable
+
+
 		~SQLiteDataService()
 		{
 			Dispose(false);
@@ -96,6 +99,17 @@ namespace Mapbox.Platform.SQLite
 				_disposed = true;
 			}
 		}
+
+
+		#endregion
+
+
+
+		public int Execute(string query, params object[] args)
+		{
+			return _connection.Execute(query, args);
+		}
+
 
 
 		public TableQuery<T> Table<T>() where T : new()
