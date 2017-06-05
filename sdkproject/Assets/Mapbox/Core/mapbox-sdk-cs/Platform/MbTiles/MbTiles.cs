@@ -40,6 +40,19 @@ namespace Mapbox.Platform.MbTiles
 				//TODO: do it via plain SQL
 				_sqlite.CreateTable<Tile>();
 			}
+
+			//speed things up a bit :-)
+			try
+			{
+				_sqlite.Execute("PRAGMA synchronous=OFF");
+				_sqlite.Execute("PRAGMA count_changes=OFF");
+				_sqlite.Execute("PRAGMA journal_mode=MEMORY");
+				_sqlite.Execute("PRAGMA temp_store=MEMORY");
+			}
+			catch (Exception ex)
+			{
+				UnityEngine.Debug.LogError(ex);
+			}
 		}
 
 
