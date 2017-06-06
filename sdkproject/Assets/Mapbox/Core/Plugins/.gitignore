@@ -1,0 +1,15 @@
+# ignore everything
+/*
+
+# except:
+
+!*.gitignore
+!/**/*.meta
+
+
+# telemetry
+!Android/
+!iOS/
+
+# sqlite
+!sqlite/

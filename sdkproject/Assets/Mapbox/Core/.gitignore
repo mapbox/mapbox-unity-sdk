@@ -3,8 +3,10 @@
 
 # except:
 
+!/**/*.gitignore
+!/**/*.meta
+
 # mapbox-sdk-cs
 !mapbox-sdk-cs/
 
-!*.gitignore
-!/**/*.meta
+!PlugIns/
