@@ -87,20 +87,12 @@ namespace Mapbox.Platform.Cache
 			//UnityEngine.Debug.Log("diskcache, key:" + key);
 			//UnityEngine.Debug.Log("diskcache, cacheKey: " + cacheKey);
 
-			if (!_mbTiles.ContainsKey(cacheKey.tileset))
+			lock (_lock)
 			{
-				MbTiles.MbTiles mbt = new MbTiles.MbTiles(cacheKey.tileset + ".cache");
-				MetaDataRequired md = new MetaDataRequired()
+				if (!_mbTiles.ContainsKey(cacheKey.tileset))
 				{
-					TilesetName = cacheKey.tileset,
-					Description = "TODO: " + cacheKey.tileset,
-					Format = "TODO: " + cacheKey.tileset,
-					Type = "TODO: " + cacheKey.tileset,
-					Version = 1
-				};
-
-				_mbTiles[cacheKey.tileset] = mbt;
-
+					initializeMbTiles(cacheKey);
+				}
 			}
 
 			MbTiles.MbTiles currentMbTiles = _mbTiles[cacheKey.tileset];
@@ -110,6 +102,23 @@ namespace Mapbox.Platform.Cache
 				//UnityEngine.Debug.Log("MbTilesCache: adding " + key);
 				_mbTiles[cacheKey.tileset].AddTile(cacheKey, data);
 			}
+		}
+
+
+		private void initializeMbTiles(MbTiles.MbTiles.CacheKey cacheKey)
+		{
+			MbTiles.MbTiles mbt = new MbTiles.MbTiles(cacheKey.tileset + ".cache");
+			MetaDataRequired md = new MetaDataRequired()
+			{
+				TilesetName = cacheKey.tileset,
+				Description = "TODO: " + cacheKey.tileset,
+				Format = "TODO: " + cacheKey.tileset,
+				Type = "TODO: " + cacheKey.tileset,
+				Version = 1
+			};
+			mbt.CreateMetaData(md);
+
+			_mbTiles[cacheKey.tileset] = mbt;
 		}
 
 
@@ -151,9 +160,12 @@ namespace Mapbox.Platform.Cache
 		public byte[] Get(string key)
 		{
 			MbTiles.MbTiles.CacheKey cacheKey = extractCacheKey(key);
-			if (!_mbTiles.ContainsKey(cacheKey.tileset))
+			lock (_lock)
 			{
-				return null;
+				if (!_mbTiles.ContainsKey(cacheKey.tileset))
+				{
+					initializeMbTiles(cacheKey);
+				}
 			}
 
 			return _mbTiles[cacheKey.tileset].GetTile(cacheKey);

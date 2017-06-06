@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using SQLite4Unity3d;
 
 namespace Mapbox.Platform.MbTiles
 {
@@ -36,10 +35,10 @@ namespace Mapbox.Platform.MbTiles
 			//https://github.com/praeclarum/sqlite-net/issues/282
 			//TODO: do it via plain SQL
 
-			List<SQLite4Unity3d.SQLiteConnection.ColumnInfo> colInfo = _sqlite.GetTableInfo("Tile");
+			List<SQLite4Unity3d.SQLiteConnection.ColumnInfo> colInfo = _sqlite.GetTableInfo(typeof(Tile).Name);
 			if (0 == colInfo.Count)
 			{
-				UnityEngine.Debug.Log("creating table 'Tile'");
+				UnityEngine.Debug.LogFormat("creating table '{0}'", typeof(Tile).Name);
 				_sqlite.CreateTable<Tile>();
 			}
 
@@ -57,9 +56,16 @@ namespace Mapbox.Platform.MbTiles
 				{
 					_sqlite.Execute(cmd);
 				}
-				catch (Exception ex)
+				catch (SQLiteException ex)
 				{
-					UnityEngine.Debug.LogWarningFormat("{0}: {1}", cmd, ex);
+					// workaround for sqlite.net's exeception:
+					// https://stackoverflow.com/a/23839503
+					if (ex.Result != SQLite3.Result.Row)
+					{
+						UnityEngine.Debug.LogErrorFormat("{0}: {1}", cmd, ex);
+						// TODO: when mapbox-sdk-cs gets backported to its own repo -> throw
+						//throw; // to throw or not to throw???
+					}
 				}
 			}
 		}
@@ -109,10 +115,11 @@ namespace Mapbox.Platform.MbTiles
 
 		public void CreateMetaData(MetaDataRequired md)
 		{
-			TableQuery<MetaData> tq = _sqlite.Table<MetaData>();
-			// already exists -> return
-			if (null != tq) { return; }
+			List<SQLite4Unity3d.SQLiteConnection.ColumnInfo> colInfo = _sqlite.GetTableInfo(typeof(MetaData).Name);
+			if (0 != colInfo.Count) { return; }
 
+			UnityEngine.Debug.LogFormat("creating table '{0}'", typeof(MetaData).Name);
+			_sqlite.CreateTable<MetaData>();
 			_sqlite.InsertAll(new[]
 			{
 				new MetaData{ name="name", value=md.TilesetName},
@@ -145,6 +152,7 @@ namespace Mapbox.Platform.MbTiles
 
 			if (null == tile)
 			{
+				UnityEngine.Debug.LogWarningFormat("{0} not cached", key);
 				return null;
 			}
 			else
