@@ -124,6 +124,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
                 }
             }
 
+            tile.VectorDataState = TilePropertyState.Loaded;
+            Progress--;
+
             _cachedData.Remove(tile);
         }
     }
