@@ -25,6 +25,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
         private float _height;
         [SerializeField]
         private bool _forceHeight;
+        [SerializeField]
+        private bool _closeBottom;
 
         public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
@@ -55,6 +57,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                     }
                 }
             }
+
+            var topCount = md.Vertices.Count;
+            var uvCount = md.UV[0].Count;
+            var topTriCount = md.Triangles[0].Count;
 
             var max = md.Vertices[0].y;
             var min = md.Vertices[0].y;
@@ -119,6 +125,26 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
             md.Triangles.Add(wallTri);
             md.UV[0].AddRange(wallUv);
 
+            if (_closeBottom)
+            {
+                var midCount = md.Vertices.Count;
+                for (int i = 0; i < topCount; i++)
+                {
+                    md.Vertices.Add(new Vector3(md.Vertices[i].x, md.Vertices[i].y - hf, md.Vertices[i].z));
+                }
+
+                for (int i = 0; i < topTriCount; i += 3)
+                {
+                    md.Triangles[0].Add(midCount + md.Triangles[0][i + 2]);
+                    md.Triangles[0].Add(midCount + md.Triangles[0][i + 1]);
+                    md.Triangles[0].Add(midCount + md.Triangles[0][i]);
+                }
+
+                for (int i = 0; i < uvCount; i++)
+                {
+                    md.UV[0].Add(md.UV[0][i]);
+                }
+            }
         }
     }
 }
