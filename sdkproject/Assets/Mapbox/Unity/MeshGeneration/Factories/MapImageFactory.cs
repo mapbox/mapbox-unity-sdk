@@ -55,6 +55,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnRegistered(UnityTile tile)
 		{
+            if (_mapIdType == MapImageType.None)
+                return;
+
 			RasterTile rasterTile;
 			if (_mapId.StartsWith("mapbox://", StringComparison.Ordinal))
 			{
