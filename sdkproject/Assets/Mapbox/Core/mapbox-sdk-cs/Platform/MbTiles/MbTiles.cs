@@ -1,8 +1,10 @@
-﻿using SQLite4Unity3d;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
+using SQLite4Unity3d;
+using Mapbox.Utils;
 
 namespace Mapbox.Platform.MbTiles
 {
@@ -133,12 +135,18 @@ namespace Mapbox.Platform.MbTiles
 
 		public void AddTile(CacheKey key, byte[] data)
 		{
+			byte[] compressed = Compression.Compress(data);
+
+			UnityEngine.Debug.LogWarningFormat("{0} raw: {1}KB compressed:{2}", key, data.Length / 1024, compressed.Length / 1024);
+
+
 			_sqlite.Insert(new Tile
 			{
 				zoom_level = key.zoom,
 				tile_column = key.x,
 				tile_row = key.y,
-				tile_data = data
+				tile_data = compressed
+				//tile_data = data
 			});
 		}
 
@@ -152,12 +160,14 @@ namespace Mapbox.Platform.MbTiles
 
 			if (null == tile)
 			{
-				UnityEngine.Debug.LogWarningFormat("{0} not cached", key);
+				//UnityEngine.Debug.LogWarningFormat("{0} not yet cached", key);
 				return null;
 			}
 			else
 			{
-				return tile.tile_data;
+				//UnityEngine.Debug.LogWarningFormat("{0} size: {1}KB", key, tile.tile_data.Length / 1024);
+				//return tile.tile_data;
+				return Compression.Decompress(tile.tile_data);
 			}
 		}
 

@@ -68,5 +68,41 @@ namespace Mapbox.Utils
 
 			return buffer;
 		}
+
+
+		public static byte[] Compress(byte[] raw)
+		{
+			using (MemoryStream memory = new MemoryStream())
+			{
+				using (GZipStream gzip = new GZipStream(memory, CompressionMode.Compress, true))
+				{
+					gzip.Write(raw, 0, raw.Length);
+				}
+				return memory.ToArray();
+			}
+		}
+
+		public static byte[] Compress2(byte[] buffer)
+		{
+			if (buffer == null)
+			{
+				throw new System.ArgumentNullException("buffer is null");
+			}
+
+			int BUFFER_SIZE = 64 * 1024; //64kB
+
+			using (var ms = new MemoryStream())
+			{
+				using (var gzs = new BufferedStream(new GZipStream(ms, CompressionMode.Compress), BUFFER_SIZE))
+				{
+					gzs.Write(buffer, 0, buffer.Length);
+				}
+				return ms.ToArray();
+			}
+		}
+
+
+
+
 	}
 }
