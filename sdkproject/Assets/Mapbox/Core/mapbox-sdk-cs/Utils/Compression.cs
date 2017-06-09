@@ -70,7 +70,20 @@ namespace Mapbox.Utils
 		}
 
 
-		public static byte[] Compress(byte[] raw)
+		public static byte[] Compress3(byte[] raw)
+		{
+			using (MemoryStream memory = new MemoryStream())
+			{
+				//using (GZipStream gzip = new GZipStream(memory, CompressionLevel.Optimal))
+				using (GZipStream gzip = new GZipStream(memory, CompressionLevel.Fastest))
+				{
+					gzip.Write(raw, 0, raw.Length);
+				}
+				return memory.ToArray();
+			}
+		}
+
+		public static byte[] Compress2(byte[] raw)
 		{
 			using (MemoryStream memory = new MemoryStream())
 			{
@@ -82,14 +95,16 @@ namespace Mapbox.Utils
 			}
 		}
 
-		public static byte[] Compress2(byte[] buffer)
+		public static byte[] Compress(byte[] buffer)
 		{
 			if (buffer == null)
 			{
 				throw new System.ArgumentNullException("buffer is null");
 			}
 
-			int BUFFER_SIZE = 64 * 1024; //64kB
+			int BUFFER_SIZE = 256 * 1024; //256kB
+			//int BUFFER_SIZE = 64 * 1024; //64kB
+			//int BUFFER_SIZE = 8 * 1024; //8kB
 
 			using (var ms = new MemoryStream())
 			{
