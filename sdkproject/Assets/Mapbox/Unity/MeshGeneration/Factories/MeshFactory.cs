@@ -1,133 +1,133 @@
 namespace Mapbox.Unity.MeshGeneration.Factories
 {
-    using System.Collections.Generic;
-    using UnityEngine;
-    using Mapbox.Unity.MeshGeneration.Enums;
-    using Mapbox.Unity.MeshGeneration.Data;
-    using Mapbox.Unity.MeshGeneration.Interfaces;
-    using Mapbox.Map;
+	using System.Collections.Generic;
+	using UnityEngine;
+	using Mapbox.Unity.MeshGeneration.Enums;
+	using Mapbox.Unity.MeshGeneration.Data;
+	using Mapbox.Unity.MeshGeneration.Interfaces;
+	using Mapbox.Map;
 
-    /// <summary>
-    /// Uses vector tile api to visualize vector data.
-    /// Fetches the vector data for given tile and passes layer data to layer visualizers.
-    /// </summary>
-    [CreateAssetMenu(menuName = "Mapbox/Factories/Mesh Factory")]
-    public class MeshFactory : AbstractTileFactory
-    {
-        [SerializeField]
-        private string _mapId = "";
-        public List<LayerVisualizerBase> Visualizers;
+	/// <summary>
+	/// Uses vector tile api to visualize vector data.
+	/// Fetches the vector data for given tile and passes layer data to layer visualizers.
+	/// </summary>
+	[CreateAssetMenu(menuName = "Mapbox/Factories/Mesh Factory")]
+	public class MeshFactory : AbstractTileFactory
+	{
+		[SerializeField]
+		private string _mapId = "";
+		public List<LayerVisualizerBase> Visualizers;
 
-        private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;
-        private Dictionary<UnityTile, VectorTile> _cachedData = new Dictionary<UnityTile, VectorTile>();
+		private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;
+		private Dictionary<UnityTile, VectorTile> _cachedData = new Dictionary<UnityTile, VectorTile>();
 
-        public void OnEnable()
-        {
-            if (Visualizers == null)
-            {
-                Visualizers = new List<LayerVisualizerBase>();
-            }
-        }
+		public void OnEnable()
+		{
+			if (Visualizers == null)
+			{
+				Visualizers = new List<LayerVisualizerBase>();
+			}
+		}
 
-        /// <summary>
-        /// Sets up the Mesh Factory
-        /// </summary>
-        /// <param name="fs"></param>
-        internal override void OnInitialized()
-        {
-            _layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
-            foreach (LayerVisualizerBase factory in Visualizers)
-            {
-                if (_layerBuilder.ContainsKey(factory.Key))
-                {
-                    _layerBuilder[factory.Key].Add(factory);
-                }
-                else
-                {
-                    _layerBuilder.Add(factory.Key, new List<LayerVisualizerBase>() { factory });
-                }
-            }
-        }
-        
-        internal override void OnRegistered(UnityTile tile)
-        {
-            var vectorTile = new VectorTile();
-            tile.AddTile(vectorTile);
+		/// <summary>
+		/// Sets up the Mesh Factory
+		/// </summary>
+		/// <param name="fs"></param>
+		internal override void OnInitialized()
+		{
+			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
+			foreach (LayerVisualizerBase factory in Visualizers)
+			{
+				if (_layerBuilder.ContainsKey(factory.Key))
+				{
+					_layerBuilder[factory.Key].Add(factory);
+				}
+				else
+				{
+					_layerBuilder.Add(factory.Key, new List<LayerVisualizerBase>() { factory });
+				}
+			}
+		}
 
-            Progress++;
-            vectorTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
-            {
-                if (vectorTile.HasError)
-                {
-                    tile.VectorDataState = TilePropertyState.Error;
-                    Progress--;
-                    return;
-                }
+		internal override void OnRegistered(UnityTile tile)
+		{
+			var vectorTile = new VectorTile();
+			tile.AddTile(vectorTile);
 
-                _cachedData.Add(tile, vectorTile);
+			Progress++;
+			vectorTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
+			{
+				if (vectorTile.HasError)
+				{
+					tile.VectorDataState = TilePropertyState.Error;
+					Progress--;
+					return;
+				}
 
-                // FIXME: we can make the request BEFORE getting a response from these!
-                if (tile.HeightDataState == TilePropertyState.Loading ||
-                    tile.RasterDataState == TilePropertyState.Loading)
-                {
-                    tile.OnHeightDataChanged += DataChangedHandler;
-                    tile.OnRasterDataChanged += DataChangedHandler;
-                }
-                else
-                {
-                    CreateMeshes(tile);
-                }
-            });            
-        }
+				_cachedData.Add(tile, vectorTile);
 
-        internal override void OnUnregistered(UnityTile tile)
-        {
-            // We are no longer interested in this tile's notifications.
-            tile.OnHeightDataChanged -= DataChangedHandler;
-            tile.OnRasterDataChanged -= DataChangedHandler;
-        }
+				// FIXME: we can make the request BEFORE getting a response from these!
+				if (tile.HeightDataState == TilePropertyState.Loading ||
+					tile.RasterDataState == TilePropertyState.Loading)
+				{
+					tile.OnHeightDataChanged += DataChangedHandler;
+					tile.OnRasterDataChanged += DataChangedHandler;
+				}
+				else
+				{
+					CreateMeshes(tile);
+				}
+			});
+		}
 
-        private void DataChangedHandler(UnityTile t)
-        {
-            if (t.RasterDataState != TilePropertyState.Loading &&
-                t.HeightDataState != TilePropertyState.Loading)
-            {
-                CreateMeshes(t);
-            }
-        }
+		internal override void OnUnregistered(UnityTile tile)
+		{
+			// We are no longer interested in this tile's notifications.
+			tile.OnHeightDataChanged -= DataChangedHandler;
+			tile.OnRasterDataChanged -= DataChangedHandler;
+		}
 
-        /// <summary>
-        /// Fetches the vector data and passes each layer to relevant layer visualizers
-        /// </summary>
-        /// <param name="tile"></param>
-        /// <param name="e"></param>
-        private void CreateMeshes(UnityTile tile)
-        {
-            tile.OnHeightDataChanged -= DataChangedHandler;
-            tile.OnRasterDataChanged -= DataChangedHandler;
+		private void DataChangedHandler(UnityTile t)
+		{
+			if (t.RasterDataState != TilePropertyState.Loading &&
+				t.HeightDataState != TilePropertyState.Loading)
+			{
+				CreateMeshes(t);
+			}
+		}
 
-            tile.VectorDataState = TilePropertyState.Loading;
+		/// <summary>
+		/// Fetches the vector data and passes each layer to relevant layer visualizers
+		/// </summary>
+		/// <param name="tile"></param>
+		/// <param name="e"></param>
+		private void CreateMeshes(UnityTile tile)
+		{
+			tile.OnHeightDataChanged -= DataChangedHandler;
+			tile.OnRasterDataChanged -= DataChangedHandler;
 
-            // TODO: move unitytile state registrations to layer visualizers. Not everyone is interested in this data
-            // and we should not wait for it here!
-            foreach (var layerName in _cachedData[tile].Data.LayerNames())
-            {
-                if (_layerBuilder.ContainsKey(layerName))
-                {
-                    foreach (var builder in _layerBuilder[layerName])
-                    {
-                        if (builder.Active)
-                        {
-                            builder.Create(_cachedData[tile].Data.GetLayer(layerName), tile);
-                        }
-                    }
-                }
-            }
+			tile.VectorDataState = TilePropertyState.Loading;
 
-            tile.VectorDataState = TilePropertyState.Loaded;
-            Progress--;
+			// TODO: move unitytile state registrations to layer visualizers. Not everyone is interested in this data
+			// and we should not wait for it here!
+			foreach (var layerName in _cachedData[tile].Data.LayerNames())
+			{
+				if (_layerBuilder.ContainsKey(layerName))
+				{
+					foreach (var builder in _layerBuilder[layerName])
+					{
+						if (builder.Active)
+						{
+							builder.Create(_cachedData[tile].Data.GetLayer(layerName), tile);
+						}
+					}
+				}
+			}
 
-            _cachedData.Remove(tile);
-        }
-    }
+			tile.VectorDataState = TilePropertyState.Loaded;
+			Progress--;
+
+			_cachedData.Remove(tile);
+		}
+	}
 }
