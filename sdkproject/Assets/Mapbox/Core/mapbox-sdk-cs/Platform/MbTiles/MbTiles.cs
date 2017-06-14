@@ -8,7 +8,7 @@ using Mapbox.Utils;
 
 namespace Mapbox.Platform.MbTiles
 {
-	public class MbTiles : IDisposable
+	public class MbTilesDb : IDisposable
 	{
 
 
@@ -27,21 +27,46 @@ namespace Mapbox.Platform.MbTiles
 
 		private bool _disposed;
 		private SQLite.SQLiteDataService _sqlite;
+		private int? _maxTileCount;
+		/// <summary>check cache size only every '_pruneCacheDelta' calls to 'Add()' to avoid being too chatty with the database</summary>
+		private const int _pruneCacheDelta = 10;
+		/// <summary>counter to keep track of calls to `Add()`</summary>
+		private int _pruneCacheCounter = 0;
 
-		public MbTiles(string tileset)
+		public MbTilesDb(string tileset, int? maxTileCount = null)
 		{
-			_sqlite = new SQLite.SQLiteDataService(tileset);
 
+			_sqlite = new SQLite.SQLiteDataService(tileset);
+			_maxTileCount = maxTileCount;
 
 			//hrmpf: multiple PKs not supported by sqlite.net
 			//https://github.com/praeclarum/sqlite-net/issues/282
 			//TODO: do it via plain SQL
 
-			List<SQLite4Unity3d.SQLiteConnection.ColumnInfo> colInfo = _sqlite.GetTableInfo(typeof(Tile).Name);
+			List<SQLite4Unity3d.SQLiteConnection.ColumnInfo> colInfo = _sqlite.GetTableInfo(typeof(tiles).Name);
 			if (0 == colInfo.Count)
 			{
-				UnityEngine.Debug.LogFormat("creating table '{0}'", typeof(Tile).Name);
-				_sqlite.CreateTable<Tile>();
+				UnityEngine.Debug.LogFormat("creating table '{0}'", typeof(tiles).Name);
+				//sqlite does not support multiple PK columns, create table manually
+				//_sqlite.CreateTable<tiles>();
+
+				//
+				string cmdCreateTTbliles = @"CREATE TABLE tiles(
+zoom_level  INTEGER NOT NULL,
+tile_column BIGINT  NOT NULL,
+tile_row    BIGINT  NOT NULL,
+tile_data   BLOB    NOT NULL,
+timestamp   INTEGER NOT NULL,
+	PRIMARY KEY(
+		zoom_level ASC,
+		tile_column ASC,
+		tile_row ASC
+	)
+);";
+				_sqlite.Execute(cmdCreateTTbliles);
+
+				string cmdIdxTimestamp = "CREATE INDEX idx_timestamp ON tiles (timestamp ASC);";
+				_sqlite.Execute(cmdIdxTimestamp);
 			}
 
 			//speed things up a bit :-)
@@ -76,7 +101,7 @@ namespace Mapbox.Platform.MbTiles
 		#region idisposable
 
 
-		~MbTiles()
+		~MbTilesDb()
 		{
 			Dispose(false);
 		}
@@ -95,6 +120,8 @@ namespace Mapbox.Platform.MbTiles
 				{
 					if (null != _sqlite)
 					{
+						UnityEngine.Debug.Log("------------------ VACUUMING ----------------------");
+						_sqlite.Execute("VACUUM;");
 						_sqlite.Dispose();
 						_sqlite = null;
 					}
@@ -109,7 +136,7 @@ namespace Mapbox.Platform.MbTiles
 
 		public System.Collections.ObjectModel.ReadOnlyCollection<KeyValuePair<string, string>> MetaData()
 		{
-			TableQuery<MetaData> tq = _sqlite.Table<MetaData>();
+			TableQuery<metadata> tq = _sqlite.Table<metadata>();
 			if (null == tq) { return null; }
 			return tq.Select(r => new KeyValuePair<string, string>(r.name, r.value)).ToList().AsReadOnly();
 		}
@@ -117,44 +144,71 @@ namespace Mapbox.Platform.MbTiles
 
 		public void CreateMetaData(MetaDataRequired md)
 		{
-			List<SQLite4Unity3d.SQLiteConnection.ColumnInfo> colInfo = _sqlite.GetTableInfo(typeof(MetaData).Name);
+			List<SQLite4Unity3d.SQLiteConnection.ColumnInfo> colInfo = _sqlite.GetTableInfo(typeof(metadata).Name);
 			if (0 != colInfo.Count) { return; }
 
-			UnityEngine.Debug.LogFormat("creating table '{0}'", typeof(MetaData).Name);
-			_sqlite.CreateTable<MetaData>();
+			UnityEngine.Debug.LogFormat("creating table '{0}'", typeof(metadata).Name);
+			_sqlite.CreateTable<metadata>();
 			_sqlite.InsertAll(new[]
 			{
-				new MetaData{ name="name", value=md.TilesetName},
-				new MetaData{name="type", value=md.Type},
-				new MetaData{name="version", value=md.Version.ToString()},
-				new MetaData{name="description", value=md.Description},
-				new MetaData{name="format", value=md.Format}
+				new metadata{ name="name", value=md.TilesetName},
+				new metadata{name="type", value=md.Type},
+				new metadata{name="version", value=md.Version.ToString()},
+				new metadata{name="description", value=md.Description},
+				new metadata{name="format", value=md.Format}
 			});
 		}
 
 
 		public void AddTile(CacheKey key, byte[] data)
 		{
-			byte[] compressed = Compression.Compress(data);
-
-			UnityEngine.Debug.LogWarningFormat("{0} raw: {1}KB compressed:{2}", key, data.Length / 1024, compressed.Length / 1024);
-
-
-			_sqlite.Insert(new Tile
+			_sqlite.Insert(new tiles
 			{
 				zoom_level = key.zoom,
 				tile_column = key.x,
 				tile_row = key.y,
-				tile_data = compressed
-				//tile_data = data
+				tile_data = data,
+				timestamp = (int)UnixTimestampUtils.To(DateTime.Now)
 			});
+
+			_pruneCacheCounter++;
+			if (0 == _pruneCacheCounter % _pruneCacheDelta)
+			{
+				_pruneCacheCounter = 0;
+				prune();
+			}
+		}
+
+
+		private void prune()
+		{
+			if (!_maxTileCount.HasValue) { return; }
+
+			long tileCnt = _sqlite.ExecuteScalar<long>("SELECT COUNT(zoom_level) FROM tiles");
+
+			if (tileCnt < _maxTileCount.Value) { return; }
+
+			long toDelete = tileCnt - _maxTileCount.Value;
+
+			UnityEngine.Debug.LogFormat("pruning cache, maxTileCnt:{0} tileCnt:{1} 2del:{2} -{3}"
+				, _maxTileCount
+				, tileCnt
+				, toDelete
+				, DateTime.Now.Ticks
+			);
+
+			// no 'ORDER BY' or 'LIMIT' possible if sqlite hasn't been compiled with 'SQLITE_ENABLE_UPDATE_DELETE_LIMIT'
+			// https://sqlite.org/compile.html#enable_update_delete_limit
+			// int rowsAffected = _sqlite.Execute("DELETE FROM tiles ORDER BY timestamp ASC LIMIT ?", toDelete);
+			int rowsAffected = _sqlite.Execute("DELETE FROM tiles WHERE rowid IN ( SELECT rowid FROM tiles ORDER BY timestamp ASC LIMIT ? );", toDelete);
+			UnityEngine.Debug.LogFormat("tiles deleted:{0} -{1}", rowsAffected, DateTime.Now.Ticks);
 		}
 
 
 		public byte[] GetTile(CacheKey key)
 		{
-			Tile tile = _sqlite
-				.Table<Tile>()
+			tiles tile = _sqlite
+				.Table<tiles>()
 				.Where(t => t.zoom_level == key.zoom && t.tile_column == key.x && t.tile_row == key.y)
 				.FirstOrDefault();
 
@@ -165,9 +219,7 @@ namespace Mapbox.Platform.MbTiles
 			}
 			else
 			{
-				//UnityEngine.Debug.LogWarningFormat("{0} size: {1}KB", key, tile.tile_data.Length / 1024);
-				//return tile.tile_data;
-				return Compression.Decompress(tile.tile_data);
+				return tile.tile_data;
 			}
 		}
 
@@ -175,7 +227,7 @@ namespace Mapbox.Platform.MbTiles
 		public bool TileExists(CacheKey key)
 		{
 			return null != _sqlite
-				.Table<Tile>()
+				.Table<tiles>()
 				.Where(t => t.zoom_level == key.zoom && t.tile_column == key.x && t.tile_row == key.y)
 				.FirstOrDefault();
 		}

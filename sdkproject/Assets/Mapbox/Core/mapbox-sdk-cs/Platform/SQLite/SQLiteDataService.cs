@@ -120,7 +120,10 @@ namespace Mapbox.Platform.SQLite
 			return _connection.Execute(query, args);
 		}
 
-
+		public T ExecuteScalar<T>(string query, params object[] args)
+		{
+			return _connection.ExecuteScalar<T>(query, args);
+		}
 
 		public TableQuery<T> Table<T>() where T : new()
 		{

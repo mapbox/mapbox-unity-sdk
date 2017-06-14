@@ -8,8 +8,9 @@ namespace Mapbox.Platform.MbTiles
 
 	/// <summary>
 	/// https://github.com/mapbox/mbtiles-spec/blob/master/1.1/spec.md#tiles
+	/// Don't change the class name: sqlite-net uses it for table creation
 	/// </summary>
-	public class Tile
+	public class tiles
 	{
 
 		//hrmpf: multiple PKs not supported by sqlite.net
@@ -26,6 +27,7 @@ namespace Mapbox.Platform.MbTiles
 
 		public byte[] tile_data { get; set; }
 
-
+		/// <summary>Unix epoch for simple FIFO pruning </summary>
+		public int timestamp { get; set; }
 	}
 }
