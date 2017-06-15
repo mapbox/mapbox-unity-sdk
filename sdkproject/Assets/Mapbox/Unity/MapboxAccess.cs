@@ -33,64 +33,6 @@ namespace Mapbox.Unity
 			}
 		}
 
-		MapboxAccess()
-		{
-			Debug.Log("MapboxAccess constructor");
-			ValidateMapboxAccessFile();
-			LoadAccessToken();
-			ConfigureFileSource();
-			ConfigureTelemetry();
-		}
-
-		~MapboxAccess()
-		{
-			Debug.Log("MapboxAccess destructor");
-			CachingWebFileSource cwfs = _fileSource as CachingWebFileSource;
-			if (null != cwfs)
-			{
-				cwfs.Dispose();
-				cwfs = null;
-			}
-		}
-
-		public void DisposeCache()
-		{
-			Debug.Log("OnApplicationQuit");
-			CachingWebFileSource cwfs = _fileSource as CachingWebFileSource;
-			if (null != cwfs)
-			{
-				cwfs.Dispose();
-				cwfs = null;
-			}
-		}
-
-
-		void ConfigureFileSource()
-		{
-			_fileSource = new CachingWebFileSource(_accessToken)
-				.AddCache(new MemoryCache(200))
-				.AddCache(new MbTilesCache(3000));
-		}
-
-		void ConfigureTelemetry()
-		{
-			// TODO: this will need to be settable at runtime as well? 
-			_isTelemetryEnabled = GetTelemetryCollectionState();
-
-#if UNITY_EDITOR
-			_telemetryLibrary = TelemetryDummy.Instance;
-#elif UNITY_IOS
-			_telemetryLibrary = TelemetryIos.Instance;
-#elif UNITY_ANDROID
-			_telemetryLibrary = TelemetryAndroid.Instance;
-#else
-			_telemetryLibrary = TelemetryDummy.Instance;
-#endif
-
-
-			_telemetryLibrary.Initialize(_accessToken);
-			_telemetryLibrary.SendTurnstile();
-		}
 
 		/// <summary>
 		/// The Mapbox API access token. 
@@ -116,11 +58,34 @@ namespace Mapbox.Unity
 
 		MapboxAccess()
 		{
+			Debug.Log("MapboxAccess constructor");
 			LoadAccessToken();
 			ConfigureFileSource();
 			ConfigureTelemetry();
 		}
 
+
+		~MapboxAccess()
+		{
+			Debug.Log("MapboxAccess destructor");
+			CachingWebFileSource cwfs = _fileSource as CachingWebFileSource;
+			if (null != cwfs)
+			{
+				cwfs.Dispose();
+				cwfs = null;
+			}
+		}
+
+		public void DisposeCache()
+		{
+			Debug.Log("OnApplicationQuit");
+			CachingWebFileSource cwfs = _fileSource as CachingWebFileSource;
+			if (null != cwfs)
+			{
+				cwfs.Dispose();
+				cwfs = null;
+			}
+		}
 
 		/// <summary>
 		/// Loads the access token from <see href="https://docs.unity3d.com/Manual/BestPracticeUnderstandingPerformanceInUnity6.html">Resources folder</see>.
@@ -134,7 +99,9 @@ namespace Mapbox.Unity
 
 		void ConfigureFileSource()
 		{
-			_fileSource = new CachingWebFileSource(_configuration.AccessToken).AddCache(new MemoryCache(_configuration.MemoryCacheSize));
+			_fileSource = new CachingWebFileSource(_configuration.AccessToken)
+				.AddCache(new MemoryCache(_configuration.MemoryCacheSize))
+				.AddCache(new MbTilesCache(3000));
 		}
 
 
@@ -196,7 +163,7 @@ namespace Mapbox.Unity
 			}
 		}
 
-
+		
 		/// <summary>
 		/// Lazy Directions.
 		/// </summary>
