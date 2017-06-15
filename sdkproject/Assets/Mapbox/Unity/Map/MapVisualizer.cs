@@ -16,7 +16,7 @@ namespace Mapbox.Unity.MeshGeneration
 		Finished
 	}
 
-	[CreateAssetMenu(menuName = "Mapbox/MapVisualization")]
+	[CreateAssetMenu(menuName = "Mapbox/MapVisualizer")]
 	public class MapVisualizer : ScriptableObject
 	{
 		[SerializeField]

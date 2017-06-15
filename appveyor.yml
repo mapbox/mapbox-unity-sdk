@@ -1,6 +1,8 @@
 branches:
   except:
     - "unity-cloud-build"
+    - gh-pages
+    - mb-pages
 
 image: Visual Studio 2015
 

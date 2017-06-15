@@ -1,4 +1,3 @@
-using Mapbox.Platform;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +30,7 @@ namespace Mapbox.Platform.Cache
 		private object _lock = new object();
 		private Dictionary<string, CacheItem> _cachedResponses;
 
-
+		// TODO: handle _maxCacheSize of 0!
 		public void Add(string key, byte[] data)
 		{
 			lock (_lock)
