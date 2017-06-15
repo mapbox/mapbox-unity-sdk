@@ -71,8 +71,8 @@ namespace Mapbox.Unity
 		void ConfigureFileSource()
 		{
 			_fileSource = new CachingWebFileSource(_accessToken)
-				.AddCache(new MemoryCache(100))
-				.AddCache(new MbTilesCache(300));
+				.AddCache(new MemoryCache(200))
+				.AddCache(new MbTilesCache(3000));
 		}
 
 		void ConfigureTelemetry()

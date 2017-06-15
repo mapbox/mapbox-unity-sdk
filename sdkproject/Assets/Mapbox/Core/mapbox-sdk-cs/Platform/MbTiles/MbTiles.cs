@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 using SQLite4Unity3d;
 using Mapbox.Utils;
+using UnityEngine;
 
 namespace Mapbox.Platform.MbTiles
 {
@@ -26,7 +26,7 @@ namespace Mapbox.Platform.MbTiles
 
 
 		private bool _disposed;
-		private SQLite.SQLiteDataService _sqlite;
+		private SQLiteConnection _sqlite;
 		private int? _maxTileCount;
 		/// <summary>check cache size only every '_pruneCacheDelta' calls to 'Add()' to avoid being too chatty with the database</summary>
 		private const int _pruneCacheDelta = 10;
@@ -36,7 +36,7 @@ namespace Mapbox.Platform.MbTiles
 		public MbTilesDb(string tileset, int? maxTileCount = null)
 		{
 
-			_sqlite = new SQLite.SQLiteDataService(tileset);
+			openOrCreateDb(tileset);
 			_maxTileCount = maxTileCount;
 
 			//hrmpf: multiple PKs not supported by sqlite.net
@@ -132,6 +132,68 @@ timestamp   INTEGER NOT NULL,
 
 
 		#endregion
+
+
+		private void openOrCreateDb(string dbName)
+		{
+#if UNITY_EDITOR
+			var dbPath = string.Format(@"Assets/StreamingAssets/{0}", dbName);
+#else
+			// check if file exists in Application.persistentDataPath
+			var filepath = string.Format("{0}/{1}", Application.persistentDataPath, dbName);
+
+			Debug.LogFormat("filepath: {0}", filepath);
+
+			if (!File.Exists(filepath))
+			{
+				Debug.Log("Database not in Persistent path");
+				// if it doesn't ->
+				// open StreamingAssets directory and load the db ->
+
+#if UNITY_ANDROID
+				var loadDb = new WWW("jar:file://" + Application.dataPath + "!/assets/" + dbName);  // this is the path to your StreamingAssets in android
+				while (!loadDb.isDone) { }  // CAREFUL here, for safety reasons you shouldn't let this while loop unattended, place a timer and error check
+				// then save to Application.persistentDataPath
+				File.WriteAllBytes(filepath, loadDb.bytes);
+#elif UNITY_IOS
+				var loadDb = Application.dataPath + "/Raw/" + dbName;  // this is the path to your StreamingAssets in iOS
+				// then save to Application.persistentDataPath
+				File.Copy(loadDb, filepath);
+#elif UNITY_WP8
+				var loadDb = Application.dataPath + "/StreamingAssets/" + dbName;  // this is the path to your StreamingAssets in iOS
+				// then save to Application.persistentDataPath
+				File.Copy(loadDb, filepath);
+
+#elif UNITY_WINRT
+				var loadDb = Application.dataPath + "/StreamingAssets/" + dbName;  // this is the path to your StreamingAssets in iOS
+				// then save to Application.persistentDataPath
+				if (File.Exists(loadDb))
+				{
+					File.Copy(loadDb, filepath);
+				}
+#else
+				var loadDb = Application.dataPath + "/StreamingAssets/" + DatabaseName;  // this is the path to your StreamingAssets in iOS
+																						 // then save to Application.persistentDataPath
+				// only copy if db exists
+				if (File.Exists(loadDb))
+				{
+					File.Copy(loadDb, filepath);
+				}
+				Debug.LogErrorFormat("loadDb: {0}", loadDb);
+				Debug.LogErrorFormat("filepath: {0}", filepath);
+#endif
+
+				Debug.Log("Database written");
+			}
+
+			var dbPath = filepath;
+#endif
+			_sqlite = new SQLiteConnection(dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
+			Debug.Log("Final PATH: " + dbPath);
+
+		}
+
+
 
 
 		public System.Collections.ObjectModel.ReadOnlyCollection<KeyValuePair<string, string>> MetaData()
