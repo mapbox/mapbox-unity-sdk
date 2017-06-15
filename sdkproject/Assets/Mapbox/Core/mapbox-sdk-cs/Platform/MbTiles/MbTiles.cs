@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using SQLite4Unity3d;
@@ -46,11 +47,10 @@ namespace Mapbox.Platform.MbTiles
 			List<SQLite4Unity3d.SQLiteConnection.ColumnInfo> colInfo = _sqlite.GetTableInfo(typeof(tiles).Name);
 			if (0 == colInfo.Count)
 			{
-				UnityEngine.Debug.LogFormat("creating table '{0}'", typeof(tiles).Name);
+				//UnityEngine.Debug.LogFormat("creating table '{0}'", typeof(tiles).Name);
 				//sqlite does not support multiple PK columns, create table manually
 				//_sqlite.CreateTable<tiles>();
 
-				//
 				string cmdCreateTTbliles = @"CREATE TABLE tiles(
 zoom_level  INTEGER NOT NULL,
 tile_column BIGINT  NOT NULL,
@@ -136,61 +136,11 @@ timestamp   INTEGER NOT NULL,
 
 		private void openOrCreateDb(string dbName)
 		{
-#if UNITY_EDITOR
-			var dbPath = string.Format(@"Assets/StreamingAssets/{0}", dbName);
-#else
-			// check if file exists in Application.persistentDataPath
-			var filepath = string.Format("{0}/{1}", Application.persistentDataPath, dbName);
-
-			Debug.LogFormat("filepath: {0}", filepath);
-
-			if (!File.Exists(filepath))
-			{
-				Debug.Log("Database not in Persistent path");
-				// if it doesn't ->
-				// open StreamingAssets directory and load the db ->
-
-#if UNITY_ANDROID
-				var loadDb = new WWW("jar:file://" + Application.dataPath + "!/assets/" + dbName);  // this is the path to your StreamingAssets in android
-				while (!loadDb.isDone) { }  // CAREFUL here, for safety reasons you shouldn't let this while loop unattended, place a timer and error check
-				// then save to Application.persistentDataPath
-				File.WriteAllBytes(filepath, loadDb.bytes);
-#elif UNITY_IOS
-				var loadDb = Application.dataPath + "/Raw/" + dbName;  // this is the path to your StreamingAssets in iOS
-				// then save to Application.persistentDataPath
-				File.Copy(loadDb, filepath);
-#elif UNITY_WP8
-				var loadDb = Application.dataPath + "/StreamingAssets/" + dbName;  // this is the path to your StreamingAssets in iOS
-				// then save to Application.persistentDataPath
-				File.Copy(loadDb, filepath);
-
-#elif UNITY_WINRT
-				var loadDb = Application.dataPath + "/StreamingAssets/" + dbName;  // this is the path to your StreamingAssets in iOS
-				// then save to Application.persistentDataPath
-				if (File.Exists(loadDb))
-				{
-					File.Copy(loadDb, filepath);
-				}
-#else
-				var loadDb = Application.dataPath + "/StreamingAssets/" + DatabaseName;  // this is the path to your StreamingAssets in iOS
-																						 // then save to Application.persistentDataPath
-				// only copy if db exists
-				if (File.Exists(loadDb))
-				{
-					File.Copy(loadDb, filepath);
-				}
-				Debug.LogErrorFormat("loadDb: {0}", loadDb);
-				Debug.LogErrorFormat("filepath: {0}", filepath);
-#endif
-
-				Debug.Log("Database written");
-			}
-
-			var dbPath = filepath;
-#endif
+			string dbPath = Path.Combine(Application.persistentDataPath, "cache");
+			if (!Directory.Exists(dbPath)) { Directory.CreateDirectory(dbPath); }
+			dbPath = Path.Combine(dbPath, dbName);
 			_sqlite = new SQLiteConnection(dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
-			Debug.Log("Final PATH: " + dbPath);
-
+			Debug.LogFormat("MBTiles path ----> {0}", dbPath);
 		}
 
 
@@ -209,7 +159,7 @@ timestamp   INTEGER NOT NULL,
 			List<SQLite4Unity3d.SQLiteConnection.ColumnInfo> colInfo = _sqlite.GetTableInfo(typeof(metadata).Name);
 			if (0 != colInfo.Count) { return; }
 
-			UnityEngine.Debug.LogFormat("creating table '{0}'", typeof(metadata).Name);
+			//UnityEngine.Debug.LogFormat("creating table '{0}'", typeof(metadata).Name);
 			_sqlite.CreateTable<metadata>();
 			_sqlite.InsertAll(new[]
 			{
