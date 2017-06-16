@@ -99,6 +99,7 @@
 
 			byte[] data = null;
 
+			// go through existing caches and check if we already have the requested tile available
 			foreach (var cache in _caches)
 			{
 				data = cache.Get(mapId, tileId);
@@ -108,6 +109,7 @@
 				}
 			}
 
+			// if tile was available propagate to all other caches and return
 			if (null != data)
 			{
 				foreach (var cache in _caches)
@@ -120,7 +122,7 @@
 			}
 			else
 			{
-
+				// requested tile is not in any of the caches yet, get it
 				var uriBuilder = new UriBuilder(uri);
 
 				if (!string.IsNullOrEmpty(_accessToken))
@@ -136,13 +138,12 @@
 					}
 				}
 
-				//UnityEngine.Debug.Log("CachingWebFileSource: sending HTTPRequest " + uri);
-
 				return IAsyncRequestFactory.CreateRequest(
 					uriBuilder.ToString(),
 					(Response r) =>
 					{
-						if (!r.HasError)
+						// if the request was successful add tile to all caches
+						if (!r.HasError && null != r.Data)
 						{
 							foreach (var cache in _caches)
 							{
