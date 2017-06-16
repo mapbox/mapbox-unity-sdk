@@ -97,7 +97,10 @@ namespace Mapbox.Unity
 		{
 			_fileSource = new CachingWebFileSource(_configuration.AccessToken)
 				.AddCache(new MemoryCache(_configuration.MemoryCacheSize))
-				.AddCache(new MbTilesCache(3000));
+#if !UNITY_WEBGL
+				.AddCache(new MbTilesCache(3000))
+#endif
+				;
 		}
 
 
