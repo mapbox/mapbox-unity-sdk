@@ -6,6 +6,7 @@ using System.Text;
 using SQLite4Unity3d;
 using Mapbox.Utils;
 using UnityEngine;
+using Mapbox.Map;
 
 namespace Mapbox.Platform.MbTiles
 {
@@ -13,20 +14,8 @@ namespace Mapbox.Platform.MbTiles
 	{
 
 
-		public struct CacheKey
-		{
-			public string tileset;
-			public int zoom;
-			public long x;
-			public long y;
-			public override string ToString()
-			{
-				return string.Format("tileset:{0} z:{1} x:{2} y:{3} - {4}", tileset, zoom, x, y, DateTime.Now.Ticks);
-			}
-		}
-
-
 		private bool _disposed;
+		private string _dbPath;
 		private SQLiteConnection _sqlite;
 		private int? _maxTileCount;
 		/// <summary>check cache size only every '_pruneCacheDelta' calls to 'Add()' to avoid being too chatty with the database</summary>
@@ -136,11 +125,11 @@ timestamp   INTEGER NOT NULL,
 
 		private void openOrCreateDb(string dbName)
 		{
-			string dbPath = Path.Combine(Application.persistentDataPath, "cache");
-			if (!Directory.Exists(dbPath)) { Directory.CreateDirectory(dbPath); }
-			dbPath = Path.Combine(dbPath, dbName);
-			_sqlite = new SQLiteConnection(dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
-			Debug.LogFormat("MBTiles path ----> {0}", dbPath);
+			_dbPath = Path.Combine(Application.persistentDataPath, "cache");
+			if (!Directory.Exists(_dbPath)) { Directory.CreateDirectory(_dbPath); }
+			_dbPath = Path.Combine(_dbPath, dbName);
+			_sqlite = new SQLiteConnection(_dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
+			Debug.LogFormat("MBTiles path ----> {0}", _dbPath);
 		}
 
 
@@ -172,13 +161,13 @@ timestamp   INTEGER NOT NULL,
 		}
 
 
-		public void AddTile(CacheKey key, byte[] data)
+		public void AddTile(CanonicalTileId tileId, byte[] data)
 		{
 			_sqlite.Insert(new tiles
 			{
-				zoom_level = key.zoom,
-				tile_column = key.x,
-				tile_row = key.y,
+				zoom_level = tileId.Z,
+				tile_column = tileId.X,
+				tile_row = tileId.Y,
 				tile_data = data,
 				timestamp = (int)UnixTimestampUtils.To(DateTime.Now)
 			});
@@ -217,11 +206,11 @@ timestamp   INTEGER NOT NULL,
 		}
 
 
-		public byte[] GetTile(CacheKey key)
+		public byte[] GetTile(CanonicalTileId tileId)
 		{
 			tiles tile = _sqlite
 				.Table<tiles>()
-				.Where(t => t.zoom_level == key.zoom && t.tile_column == key.x && t.tile_row == key.y)
+				.Where(t => t.zoom_level == tileId.Z && t.tile_column == tileId.X && t.tile_row == tileId.Y)
 				.FirstOrDefault();
 
 			if (null == tile)
@@ -236,12 +225,21 @@ timestamp   INTEGER NOT NULL,
 		}
 
 
-		public bool TileExists(CacheKey key)
+		public bool TileExists(CanonicalTileId tileId)
 		{
 			return null != _sqlite
 				.Table<tiles>()
-				.Where(t => t.zoom_level == key.zoom && t.tile_column == key.x && t.tile_row == key.y)
+				.Where(t => t.zoom_level == tileId.Z && t.tile_column == tileId.X && t.tile_row == tileId.Y)
 				.FirstOrDefault();
+		}
+
+
+		public void Delete()
+		{
+			_sqlite.Close();
+			_sqlite.Dispose();
+			_sqlite = null;
+			File.Delete(_dbPath);
 		}
 
 	}

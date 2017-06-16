@@ -1,4 +1,4 @@
-﻿using Mapbox.Platform;
+﻿using Mapbox.Map;
 using Mapbox.Platform.MbTiles;
 using System;
 using System.Collections.Generic;
@@ -9,29 +9,9 @@ namespace Mapbox.Platform.Cache
 {
 
 
-
-	/// ///////////////
-	//////////////
-	/*
-
-		SAME IMPLEMENTATION AS MEMORYCACHE ---- JUST FOR TESTING 
-
-		*////////////////
-
-
 	public class MbTilesCache : ICache, IDisposable
 	{
 
-
-		private struct CacheItem
-		{
-			public long Timestamp;
-			public byte[] Data;
-		}
-
-
-
-		// TODO: add support for disposal strategy (timestamp, distance, etc.)
 		public MbTilesCache(int maxCacheSize)
 		{
 			_maxCacheSize = maxCacheSize;
@@ -81,137 +61,103 @@ namespace Mapbox.Platform.Cache
 		private Dictionary<string, MbTilesDb> _mbTiles;
 
 
-		public void Add(string key, byte[] data)
+		public void Add(string mapId, CanonicalTileId tileId, byte[] data)
 		{
-			MbTilesDb.CacheKey cacheKey = extractCacheKey(key);
-			//if (data.Length > 100000)
-			//{
-			//	//UnityEngine.Debug.LogFormat("size:{0} {1}", data.Length, key);
-			//	System.IO.File.WriteAllBytes(
-			//		string.Format(@"C:\mb\ConvertTerrainRGB\data\{0}-{1}-{2}.png", cacheKey.zoom, cacheKey.x, cacheKey.y)
-			//		, data
-			//	);
-			//}
+
+			mapId = cleanMapId(mapId);
 
 			lock (_lock)
 			{
-				if (!_mbTiles.ContainsKey(cacheKey.tileset))
+				if (!_mbTiles.ContainsKey(mapId))
 				{
-					initializeMbTiles(cacheKey);
+					initializeMbTiles(mapId);
 				}
 			}
 
-			MbTilesDb currentMbTiles = _mbTiles[cacheKey.tileset];
+			MbTilesDb currentMbTiles = _mbTiles[mapId];
 
-			if (!currentMbTiles.TileExists(cacheKey))
+			if (!currentMbTiles.TileExists(tileId))
 			{
-				_mbTiles[cacheKey.tileset].AddTile(cacheKey, data);
+				_mbTiles[mapId].AddTile(tileId, data);
 			}
 		}
 
 
-		private void initializeMbTiles(MbTilesDb.CacheKey cacheKey)
+		private void initializeMbTiles(string mapId)
 		{
-			MbTilesDb mbt = new MbTilesDb(cacheKey.tileset + ".cache", _maxCacheSize);
+			if (string.IsNullOrEmpty(mapId))
+			{
+				throw new Exception("Cannot intialize MbTilesCache without a map id");
+			}
+
+			mapId = cleanMapId(mapId);
+
+			MbTilesDb mbt = new MbTilesDb(mapId + ".cache", _maxCacheSize);
 			MetaDataRequired md = new MetaDataRequired()
 			{
-				TilesetName = cacheKey.tileset,
-				Description = "TODO: " + cacheKey.tileset,
-				Format = "TODO: " + cacheKey.tileset,
-				Type = "TODO: " + cacheKey.tileset,
+				TilesetName = mapId,
+				Description = "TODO: " + mapId,
+				Format = "TODO: " + mapId,
+				Type = "TODO: " + mapId,
 				Version = 1
 			};
 			mbt.CreateMetaData(md);
 
-			_mbTiles[cacheKey.tileset] = mbt;
+			_mbTiles[mapId] = mbt;
 		}
 
 
-		/// <summary>
-		/// TEMPORARY HACK TO GET TILESETNAME AND TILEID BACK OUT OF URL
-		/// </summary>
-		/// <param name="url"></param>
-		/// <returns></returns>
-		private MbTilesDb.CacheKey extractCacheKey(string url)
+
+		public byte[] Get(string mapId, CanonicalTileId tileId)
 		{
-			//UnityEngine.Debug.Log("url:" + url);
-			MbTilesDb.CacheKey ck = new MbTilesDb.CacheKey();
-
-
-			//https://api.mapbox.com:443/v4/mapbox.terrain-rgb/11/384/799.pngraw?events=true
-			//https://api.mapbox.com:443/v4/mapbox.satellite/11/384/799.png?events=true
-			//https://api.mapbox.com:443/styles/v1/mapbox/streets-v10/tiles/16/10474/25333?events=true
-			//https://api.mapbox.com:443/styles/v1/mapbox/dark-v9/tiles/16/10473/25332?events=true
-			//https://api.mapbox.com:443/v4/mapbox.mapbox-streets-v7/16/10474/25333.vector.pbf?events=true
-			//https://api.mapbox.com:443/styles/v1/mapbox/outdoors-v10/tiles/15/5241/12663?events=true
-
-			//if (url.Contains("mapbox.terrain-rgb")) { ck.tileset = "mapbox.terrain-rgb"; }
-			//if (url.Contains("mapbox.satellite")) { ck.tileset = "mapbox.satellite"; }
-			//if (url.Contains("streets-v10")) { ck.tileset = "mapbox.streets.style.v10"; }
-			//if (url.Contains("mapbox.mapbox-streets-v7")) { ck.tileset = "mapbox.streets.vt.v7"; }
-
-			if (url.Contains("mapbox.satellite"))
-			{
-				ck.tileset = "mapbox.satellite";
-			}
-			else
-			{
-				// my regex kung fu is baaaad
-				// eg 'mapbox.terrain-rgb' becomes just 'terrain-rgb'
-				// and 'mapbox.mapbox-streets-v7' -> 'mapbox-streets'
-				System.Text.RegularExpressions.Regex regexTileset = new System.Text.RegularExpressions.Regex(@"\w+[-]\w+");
-				System.Text.RegularExpressions.Match matchTileset = regexTileset.Match(url);
-				if (!matchTileset.Success)
-				{
-					throw new Exception(string.Format("could not extract tile id from url: {0}", url));
-				}
-				ck.tileset = matchTileset.Value;
-
-			}
-
-
-			System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex(@"\d+\/\d+\/\d+");
-			System.Text.RegularExpressions.Match match = regex.Match(url);
-			if (!match.Success)
-			{
-				throw new Exception(string.Format("could not extract tile id from url: {0}", url));
-			}
-			string tileId = match.Value;
-
-			string[] tokens = tileId.Split("/".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-			ck.zoom = Convert.ToInt32(tokens[0]);
-			ck.x = Convert.ToInt64(tokens[1]);
-			ck.y = Convert.ToInt64(tokens[2]);
-
-			if (string.IsNullOrEmpty(ck.tileset))
-			{
-				throw new Exception(string.Format("tileset not set: {0}", url));
-			}
-
-			return ck;
-		}
-
-
-		public byte[] Get(string key)
-		{
-			MbTiles.MbTilesDb.CacheKey cacheKey = extractCacheKey(key);
+			mapId = cleanMapId(mapId);
 			lock (_lock)
 			{
-				if (!_mbTiles.ContainsKey(cacheKey.tileset))
+				if (!_mbTiles.ContainsKey(mapId))
 				{
-					initializeMbTiles(cacheKey);
+					initializeMbTiles(mapId);
 				}
 			}
 
-			return _mbTiles[cacheKey.tileset].GetTile(cacheKey);
+			return _mbTiles[mapId].GetTile(tileId);
 		}
 
 
 		public void Clear()
 		{
-			throw new NotImplementedException("MbTilesCache: Clear is not implemented");
+			string[] toDelete = _mbTiles.Keys.ToArray();
+			foreach (var mapId in toDelete)
+			{
+				Clear(mapId);
+			}
 		}
 
+
+		public void Clear(string mapId)
+		{
+			mapId = cleanMapId(mapId);
+			lock (_lock)
+			{
+				if (!_mbTiles.ContainsKey(mapId)) { return; }
+
+				_mbTiles[mapId].Delete();
+				_mbTiles[mapId].Dispose();
+				_mbTiles[mapId] = null;
+				_mbTiles.Remove(mapId);
+			}
+		}
+
+
+		/// <summary>
+		/// Map ID (tile set name) could be somehting like 'mapbox://styles/mapbox/dark-v9.cache'.
+		/// This doesn't work as a file name
+		/// </summary>
+		/// <param name="mapId">Map ID, tile set name</param>
+		/// <returns></returns>
+		private string cleanMapId(string mapId)
+		{
+			return mapId.Substring(mapId.LastIndexOf('/') + 1);
+		}
 
 	}
 }

@@ -4,6 +4,7 @@
 	using Mapbox.Platform;
 	using System.Collections.Generic;
 	using Mapbox.Unity.Utilities;
+	using Mapbox.Map;
 
 	public class CachingWebFileSource : IFileSource, IDisposable
 	{
@@ -58,6 +59,11 @@
 		#endregion
 
 
+		/// <summary>
+		/// Add an ICache instance
+		/// </summary>
+		/// <param name="cache">Implementation of ICache</param>
+		/// <returns></returns>
 		public CachingWebFileSource AddCache(ICache cache)
 		{
 			_caches.Add(cache);
@@ -65,14 +71,37 @@
 		}
 
 
-		public IAsyncRequest Request(string uri, Action<Response> callback, int timeout = 10)
+		/// <summary>
+		/// Clear all caches
+		/// </summary>
+		public void Clear()
 		{
+			foreach (var cache in _caches)
+			{
+				cache.Clear();
+			}
+		}
+
+
+		public IAsyncRequest Request(
+			string uri
+			, Action<Response> callback
+			, int timeout = 10
+			, CanonicalTileId tileId = new CanonicalTileId()
+			, string mapId = null
+		)
+		{
+
+			if (string.IsNullOrEmpty(mapId))
+			{
+				throw new Exception("Cannot cache without a map id");
+			}
 
 			byte[] data = null;
 
 			foreach (var cache in _caches)
 			{
-				data = cache.Get(uri);
+				data = cache.Get(mapId, tileId);
 				if (null != data)
 				{
 					break;
@@ -83,7 +112,7 @@
 			{
 				foreach (var cache in _caches)
 				{
-					cache.Add(uri, data);
+					cache.Add(mapId, tileId, data);
 				}
 
 				callback(Response.FromCache(data));
@@ -91,8 +120,6 @@
 			}
 			else
 			{
-
-				string cacheKey = uri;
 
 				var uriBuilder = new UriBuilder(uri);
 
@@ -119,7 +146,7 @@
 						{
 							foreach (var cache in _caches)
 							{
-								cache.Add(cacheKey, r.Data);
+								cache.Add(mapId, tileId, r.Data);
 							}
 						}
 						callback(r);

@@ -1,3 +1,4 @@
+using Mapbox.Map;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,35 +32,36 @@ namespace Mapbox.Platform.Cache
 		private Dictionary<string, CacheItem> _cachedResponses;
 
 		// TODO: handle _maxCacheSize of 0!
-		public void Add(string key, byte[] data)
+		public void Add(string mapdId, CanonicalTileId tileId, byte[] data)
 		{
+			string key = mapdId + "||" + tileId;
+
 			lock (_lock)
 			{
 				if (_cachedResponses.Count >= _maxCacheSize)
 				{
-					//UnityEngine.Debug.Log("MemCache: pruning " + _cachedResponses.OrderBy(c => c.Value.Timestamp).First().Key);
 					_cachedResponses.Remove(_cachedResponses.OrderBy(c => c.Value.Timestamp).First().Key);
 				}
 
 				if (!_cachedResponses.ContainsKey(key))
 				{
-					//UnityEngine.Debug.Log("MemCache: adding " + key);
 					_cachedResponses.Add(key, new CacheItem() { Timestamp = DateTime.Now.Ticks, Data = data });
 				}
 			}
 		}
 
 
-		public byte[] Get(string key)
+		public byte[] Get(string mapId, CanonicalTileId tileId)
 		{
+			string key = mapId + "||" + tileId;
+
 			lock (_lock)
 			{
 				if (!_cachedResponses.ContainsKey(key))
 				{
-					//UnityEngine.Debug.Log("MemCache: not found " + key);
 					return null;
 				}
-				//UnityEngine.Debug.Log("MemCache: returning " + key);
+
 				return _cachedResponses[key].Data;
 			}
 		}
@@ -70,6 +72,20 @@ namespace Mapbox.Platform.Cache
 			lock (_lock)
 			{
 				_cachedResponses.Clear();
+			}
+		}
+
+
+		public void Clear(string mapId)
+		{
+			lock (_lock)
+			{
+				mapId += "||";
+				List<string> toDelete = _cachedResponses.Keys.Where(k => k.Contains(mapId)).ToList();
+				foreach (string key in toDelete)
+				{
+					_cachedResponses.Remove(key);
+				}
 			}
 		}
 

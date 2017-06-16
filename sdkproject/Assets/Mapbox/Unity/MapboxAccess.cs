@@ -7,6 +7,7 @@ namespace Mapbox.Unity
 	using Mapbox.Platform;
 	using Mapbox.Platform.Cache;
 	using Mapbox.Unity.Telemetry;
+	using Mapbox.Map;
 
 	/// <summary>
 	/// Object for retrieving an API token and making http requests.
@@ -68,12 +69,7 @@ namespace Mapbox.Unity
 		~MapboxAccess()
 		{
 			Debug.Log("MapboxAccess destructor");
-			CachingWebFileSource cwfs = _fileSource as CachingWebFileSource;
-			if (null != cwfs)
-			{
-				cwfs.Dispose();
-				cwfs = null;
-			}
+			DisposeCache();
 		}
 
 		public void DisposeCache()
@@ -86,6 +82,17 @@ namespace Mapbox.Unity
 				cwfs = null;
 			}
 		}
+
+
+		public void ClearCache()
+		{
+			CachingWebFileSource cwfs = _fileSource as CachingWebFileSource;
+			if (null != cwfs)
+			{
+				cwfs.Clear();
+			}
+		}
+
 
 		/// <summary>
 		/// Loads the access token from <see href="https://docs.unity3d.com/Manual/BestPracticeUnderstandingPerformanceInUnity6.html">Resources folder</see>.
@@ -141,9 +148,15 @@ namespace Mapbox.Unity
 		/// <returns>The request.</returns>
 		/// <param name="url">URL.</param>
 		/// <param name="callback">Callback.</param>
-		public IAsyncRequest Request(string url, Action<Response> callback, int timeout = 10)
+		public IAsyncRequest Request(
+			string url
+			, Action<Response> callback
+			, int timeout = 10
+			, CanonicalTileId tileId = new CanonicalTileId()
+			, string mapId = null
+		)
 		{
-			return _fileSource.Request(url, callback, _configuration.DefaultTimeout);
+			return _fileSource.Request(url, callback, _configuration.DefaultTimeout, tileId, mapId);
 		}
 
 

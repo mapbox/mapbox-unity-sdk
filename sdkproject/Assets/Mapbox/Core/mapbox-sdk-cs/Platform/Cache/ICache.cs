@@ -1,3 +1,4 @@
+using Mapbox.Map;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -9,11 +10,32 @@ namespace Mapbox.Platform.Cache
 	public interface ICache
 	{
 
-		void Add(string key, byte[] data);
+		/// <summary>
+		/// Add tile data to the cache
+		/// </summary>
+		/// <param name="mapId">Tile set name</param>
+		/// <param name="tileId">Tile ID</param>
+		/// <param name="data">Tile data</param>
+		void Add(string mapId, CanonicalTileId tileId, byte[] data);
 
-		byte[] Get(string key);
 
+		/// <summary>
+		/// Get tile
+		/// </summary>
+		/// <param name="mapId"></param>
+		/// <param name="tileId"></param>
+		/// <returns>byte[] with tile data. Null if requested tile is not in cache</returns>
+		byte[] Get(string mapId, CanonicalTileId tileId);
+
+
+		/// <summary>Clear cache for all tile sets</summary>
 		void Clear();
 
+
+		/// <summary>
+		/// Clear cache for one tile set
+		/// </summary>
+		/// <param name="mapId"></param>
+		void Clear(string mapId);
 	}
 }
