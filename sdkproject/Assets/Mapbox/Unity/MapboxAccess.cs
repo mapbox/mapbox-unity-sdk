@@ -59,31 +59,16 @@ namespace Mapbox.Unity
 
 		MapboxAccess()
 		{
-			Debug.Log("MapboxAccess constructor");
 			LoadAccessToken();
 			ConfigureFileSource();
 			ConfigureTelemetry();
 		}
 
 
-		~MapboxAccess()
-		{
-			Debug.Log("MapboxAccess destructor");
-			DisposeCache();
-		}
 
-		public void DisposeCache()
-		{
-			Debug.Log("OnApplicationQuit");
-			CachingWebFileSource cwfs = _fileSource as CachingWebFileSource;
-			if (null != cwfs)
-			{
-				cwfs.Dispose();
-				cwfs = null;
-			}
-		}
-
-
+		/// <summary>
+		/// Clear all existing tile caches. Deletes MBTiles database files.
+		/// </summary>
 		public void ClearCache()
 		{
 			CachingWebFileSource cwfs = _fileSource as CachingWebFileSource;
@@ -176,7 +161,7 @@ namespace Mapbox.Unity
 			}
 		}
 
-		
+
 		/// <summary>
 		/// Lazy Directions.
 		/// </summary>

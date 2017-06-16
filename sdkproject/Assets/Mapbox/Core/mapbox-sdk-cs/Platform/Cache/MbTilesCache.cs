@@ -1,12 +1,12 @@
-﻿using Mapbox.Map;
-using Mapbox.Platform.MbTiles;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-
-namespace Mapbox.Platform.Cache
+﻿namespace Mapbox.Platform.Cache
 {
+
+
+	using Mapbox.Map;
+	using Mapbox.Platform.MbTiles;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 
 
 	public class MbTilesCache : ICache, IDisposable
@@ -51,9 +51,9 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 
+
 		#endregion
-
-
+		
 
 		private bool _disposed;
 		private int _maxCacheSize;

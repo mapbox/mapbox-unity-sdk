@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using SQLite4Unity3d;
 using Mapbox.Utils;
 using UnityEngine;
 using Mapbox.Map;
 
+
 namespace Mapbox.Platform.MbTiles
 {
+
+
 	public class MbTilesDb : IDisposable
 	{
 
@@ -19,9 +21,10 @@ namespace Mapbox.Platform.MbTiles
 		private SQLiteConnection _sqlite;
 		private int? _maxTileCount;
 		/// <summary>check cache size only every '_pruneCacheDelta' calls to 'Add()' to avoid being too chatty with the database</summary>
-		private const int _pruneCacheDelta = 10;
+		private const int _pruneCacheDelta = 20;
 		/// <summary>counter to keep track of calls to `Add()`</summary>
 		private int _pruneCacheCounter = 0;
+
 
 		public MbTilesDb(string tileset, int? maxTileCount = null)
 		{
@@ -36,7 +39,6 @@ namespace Mapbox.Platform.MbTiles
 			List<SQLite4Unity3d.SQLiteConnection.ColumnInfo> colInfo = _sqlite.GetTableInfo(typeof(tiles).Name);
 			if (0 == colInfo.Count)
 			{
-				//UnityEngine.Debug.LogFormat("creating table '{0}'", typeof(tiles).Name);
 				//sqlite does not support multiple PK columns, create table manually
 				//_sqlite.CreateTable<tiles>();
 
@@ -58,7 +60,7 @@ timestamp   INTEGER NOT NULL,
 				_sqlite.Execute(cmdIdxTimestamp);
 			}
 
-			//speed things up a bit :-)
+			//some pragmas to speed things up a bit :-)
 			string[] cmds = new string[]
 			{
 				"PRAGMA synchronous=OFF",
@@ -109,8 +111,7 @@ timestamp   INTEGER NOT NULL,
 				{
 					if (null != _sqlite)
 					{
-						UnityEngine.Debug.Log("------------------ VACUUMING ----------------------");
-						_sqlite.Execute("VACUUM;");
+						_sqlite.Execute("VACUUM;"); // compact db to keep file size small
 						_sqlite.Dispose();
 						_sqlite = null;
 					}
@@ -191,21 +192,21 @@ timestamp   INTEGER NOT NULL,
 
 			long toDelete = tileCnt - _maxTileCount.Value;
 
-			UnityEngine.Debug.LogFormat("pruning cache, maxTileCnt:{0} tileCnt:{1} 2del:{2} -{3}"
-				, _maxTileCount
-				, tileCnt
-				, toDelete
-				, DateTime.Now.Ticks
-			);
-
 			// no 'ORDER BY' or 'LIMIT' possible if sqlite hasn't been compiled with 'SQLITE_ENABLE_UPDATE_DELETE_LIMIT'
 			// https://sqlite.org/compile.html#enable_update_delete_limit
 			// int rowsAffected = _sqlite.Execute("DELETE FROM tiles ORDER BY timestamp ASC LIMIT ?", toDelete);
 			int rowsAffected = _sqlite.Execute("DELETE FROM tiles WHERE rowid IN ( SELECT rowid FROM tiles ORDER BY timestamp ASC LIMIT ? );", toDelete);
-			UnityEngine.Debug.LogFormat("tiles deleted:{0} -{1}", rowsAffected, DateTime.Now.Ticks);
+
+			//string msg =string.Format("tiles deleted:{0} -{1}", rowsAffected, DateTime.Now.Ticks);
+			//UnityEngine.Debug.Log(msg);
 		}
 
 
+		/// <summary>
+		/// Returns the tile data, otherwise null
+		/// </summary>
+		/// <param name="tileId">Canonical tile id to identify the tile</param>
+		/// <returns>tile data as byte[], if tile is not cached returns null</returns>
 		public byte[] GetTile(CanonicalTileId tileId)
 		{
 			tiles tile = _sqlite
@@ -215,16 +216,18 @@ timestamp   INTEGER NOT NULL,
 
 			if (null == tile)
 			{
-				//UnityEngine.Debug.LogWarningFormat("{0} not yet cached", key);
 				return null;
 			}
-			else
-			{
-				return tile.tile_data;
-			}
+
+			return tile.tile_data;
 		}
 
 
+		/// <summary>
+		/// Check if tile exists
+		/// </summary>
+		/// <param name="tileId">Canonical tile id</param>
+		/// <returns>True if tile exists</returns>
 		public bool TileExists(CanonicalTileId tileId)
 		{
 			return null != _sqlite
@@ -234,11 +237,39 @@ timestamp   INTEGER NOT NULL,
 		}
 
 
+		/// <summary>
+		/// Delete the database file
+		/// </summary>
 		public void Delete()
 		{
+			//already disposed
+			if (null == _sqlite) { return; }
+
 			_sqlite.Close();
 			_sqlite.Dispose();
 			_sqlite = null;
+
+			UnityEngine.Debug.LogFormat("deleting {0}", _dbPath);
+
+			// try several times in case SQLite needs a bit more time to dispose
+			for (int i = 0; i < 5; i++)
+			{
+				try
+				{
+					File.Delete(_dbPath);
+					return;
+				}
+				catch
+				{
+#if !WINDOWS_UWP
+					System.Threading.Thread.Sleep(100);
+#else
+					System.Threading.Tasks.Task.Delay(100).Wait();
+#endif
+				}
+			}
+
+			// if we got till here, throw on last try
 			File.Delete(_dbPath);
 		}
 
