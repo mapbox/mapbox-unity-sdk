@@ -85,7 +85,11 @@ namespace Mapbox.Unity
 		private void LoadAccessToken()
 		{
 			TextAsset configurationTextAsset = Resources.Load<TextAsset>(Constants.Path.MAPBOX_RESOURCES_RELATIVE);
+#if !WINDOWS_UWP
 			Configuration = configurationTextAsset == null ? null : JsonUtility.FromJson<MapboxConfiguration>(configurationTextAsset.text);
+#else
+			Configuration = configurationTextAsset == null ? null : Mapbox.Json.JsonConvert.DeserializeObject<MapboxConfiguration>(configurationTextAsset.text);
+#endif
 		}
 
 
