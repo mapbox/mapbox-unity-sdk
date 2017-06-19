@@ -130,7 +130,7 @@ timestamp   INTEGER NOT NULL,
 			if (!Directory.Exists(_dbPath)) { Directory.CreateDirectory(_dbPath); }
 			_dbPath = Path.Combine(_dbPath, dbName);
 			_sqlite = new SQLiteConnection(_dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
-			Debug.LogFormat("MBTiles path ----> {0}", _dbPath);
+			//Debug.LogFormat("MBTiles path ----> {0}", _dbPath);
 		}
 
 

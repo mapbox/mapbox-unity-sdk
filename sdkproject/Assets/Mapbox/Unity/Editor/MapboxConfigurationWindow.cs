@@ -52,8 +52,9 @@ namespace Mapbox.Editor
 
 		void OnGUI()
 		{
-			_memoryCacheSize = EditorGUILayout.IntField("Mem Cache Size (# of tiles)", _memoryCacheSize);
-			_mbtilesCacheSize = EditorGUILayout.IntField("MBTiles Cache Size (# of tiles)", _mbtilesCacheSize);
+			EditorGUIUtility.labelWidth = 200f;
+			_memoryCacheSize = EditorGUILayout.IntSlider("Mem Cache Size (# of tiles)", _memoryCacheSize, 0, 1000);
+			_mbtilesCacheSize = EditorGUILayout.IntSlider("MBTiles Cache Size (# of tiles)", _mbtilesCacheSize, 0, 3000);
 			_webRequestTimeout = EditorGUILayout.IntField("Default Web Request Timeout", _webRequestTimeout);
 
 			_accessToken = EditorGUILayout.TextField("Access Token", _accessToken);
