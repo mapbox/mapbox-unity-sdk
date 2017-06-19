@@ -20,18 +20,24 @@ namespace Mapbox.Platform.Cache
 
 
 		// TODO: add support for disposal strategy (timestamp, distance, etc.)
-		public MemoryCache(int maxCacheSize)
+		public MemoryCache(uint maxCacheSize)
 		{
 			_maxCacheSize = maxCacheSize;
 			_cachedResponses = new Dictionary<string, CacheItem>();
 		}
 
 
-		private int _maxCacheSize;
+		private uint _maxCacheSize;
 		private object _lock = new object();
 		private Dictionary<string, CacheItem> _cachedResponses;
 
-		// TODO: handle _maxCacheSize of 0!
+
+		public uint MaxCacheSize
+		{
+			get { return _maxCacheSize; }
+		}
+
+
 		public void Add(string mapdId, CanonicalTileId tileId, byte[] data)
 		{
 			string key = mapdId + "||" + tileId;

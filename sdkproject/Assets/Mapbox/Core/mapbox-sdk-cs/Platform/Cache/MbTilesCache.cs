@@ -12,7 +12,7 @@
 	public class MbTilesCache : ICache, IDisposable
 	{
 
-		public MbTilesCache(int maxCacheSize)
+		public MbTilesCache(uint maxCacheSize)
 		{
 			_maxCacheSize = maxCacheSize;
 			_mbTiles = new Dictionary<string, MbTilesDb>();
@@ -56,9 +56,15 @@
 		
 
 		private bool _disposed;
-		private int _maxCacheSize;
+		private uint _maxCacheSize;
 		private object _lock = new object();
 		private Dictionary<string, MbTilesDb> _mbTiles;
+
+
+		public uint MaxCacheSize
+		{
+			get { return _maxCacheSize; }
+		}
 
 
 		public void Add(string mapId, CanonicalTileId tileId, byte[] data)

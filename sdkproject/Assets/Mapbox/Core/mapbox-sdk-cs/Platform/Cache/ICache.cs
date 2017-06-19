@@ -11,6 +11,11 @@ namespace Mapbox.Platform.Cache
 	{
 
 		/// <summary>
+		/// Maximum number of tiles to store 
+		/// </summary>
+		uint MaxCacheSize { get; }
+
+		/// <summary>
 		/// Add tile data to the cache
 		/// </summary>
 		/// <param name="mapId">Tile set name</param>

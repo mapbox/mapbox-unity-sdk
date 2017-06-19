@@ -66,6 +66,12 @@
 		/// <returns></returns>
 		public CachingWebFileSource AddCache(ICache cache)
 		{
+			// don't add cache when cache size is 0
+			if (0 == cache.MaxCacheSize)
+			{
+				return this;
+			}
+
 			_caches.Add(cache);
 			return this;
 		}

@@ -19,14 +19,14 @@ namespace Mapbox.Platform.MbTiles
 		private bool _disposed;
 		private string _dbPath;
 		private SQLiteConnection _sqlite;
-		private int? _maxTileCount;
+		private uint? _maxTileCount;
 		/// <summary>check cache size only every '_pruneCacheDelta' calls to 'Add()' to avoid being too chatty with the database</summary>
 		private const int _pruneCacheDelta = 20;
 		/// <summary>counter to keep track of calls to `Add()`</summary>
 		private int _pruneCacheCounter = 0;
 
 
-		public MbTilesDb(string tileset, int? maxTileCount = null)
+		public MbTilesDb(string tileset, uint? maxTileCount = null)
 		{
 
 			openOrCreateDb(tileset);
