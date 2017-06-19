@@ -14,7 +14,10 @@ namespace Mapbox.Editor
 		static string _configurationFile;
 		static MapboxConfiguration _mapboxConfiguration;
 		static string _accessToken;
+		[Range(0, 1000)]
 		static int _memoryCacheSize = 500;
+		[Range(0, 3000)]
+		static int _mbtilesCacheSize = 2000;
 		static int _webRequestTimeout = 10;
 
 		string _lastAccessToken;
@@ -32,14 +35,15 @@ namespace Mapbox.Editor
 			}
 			if (!File.Exists(_configurationFile))
 			{
-				var json = JsonUtility.ToJson(new MapboxConfiguration { AccessToken = "", MemoryCacheSize = _memoryCacheSize, DefaultTimeout = _webRequestTimeout });
+				var json = JsonUtility.ToJson(new MapboxConfiguration { AccessToken = "", MemoryCacheSize = (uint)_memoryCacheSize, MbTilesCacheSize = (uint)_mbtilesCacheSize, DefaultTimeout = _webRequestTimeout });
 				File.WriteAllText(_configurationFile, json);
 			}
 
 			var configurationJson = File.ReadAllText(_configurationFile);
 			_mapboxConfiguration = JsonUtility.FromJson<MapboxConfiguration>(configurationJson);
 			_accessToken = _mapboxConfiguration.AccessToken;
-			_memoryCacheSize = _mapboxConfiguration.MemoryCacheSize;
+			_memoryCacheSize = (int)_mapboxConfiguration.MemoryCacheSize;
+			_mbtilesCacheSize = (int)_mapboxConfiguration.MbTilesCacheSize;
 			_webRequestTimeout = _mapboxConfiguration.DefaultTimeout;
 
 			var window = (MapboxConfigurationWindow)GetWindow(typeof(MapboxConfigurationWindow));
@@ -49,6 +53,7 @@ namespace Mapbox.Editor
 		void OnGUI()
 		{
 			_memoryCacheSize = EditorGUILayout.IntField("Mem Cache Size (# of tiles)", _memoryCacheSize);
+			_mbtilesCacheSize = EditorGUILayout.IntField("MBTiles Cache Size (# of tiles)", _mbtilesCacheSize);
 			_webRequestTimeout = EditorGUILayout.IntField("Default Web Request Timeout", _webRequestTimeout);
 
 			_accessToken = EditorGUILayout.TextField("Access Token", _accessToken);
@@ -71,7 +76,7 @@ namespace Mapbox.Editor
 				if (string.Equals(_validationCode, "TokenValid"))
 				{
 					messageType = MessageType.Info;
-					var json = JsonUtility.ToJson(new MapboxConfiguration { AccessToken = _accessToken, MemoryCacheSize = _memoryCacheSize, DefaultTimeout = _webRequestTimeout });
+					var json = JsonUtility.ToJson(new MapboxConfiguration { AccessToken = _accessToken, MemoryCacheSize = (uint)_memoryCacheSize, MbTilesCacheSize = (uint)_mbtilesCacheSize, DefaultTimeout = _webRequestTimeout });
 					File.WriteAllText(_configurationFile, json);
 					AssetDatabase.Refresh();
 					EditorGUILayout.HelpBox("TokenValid: saved to " + _configurationFile, messageType);
