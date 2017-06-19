@@ -197,8 +197,8 @@ namespace Mapbox.Unity
 	public class MapboxConfiguration
 	{
 		public string AccessToken;
-		public uint MemoryCacheSize;
-		public uint MbTilesCacheSize;
-		public int DefaultTimeout;
+		public uint MemoryCacheSize = 500;
+		public uint MbTilesCacheSize = 2000;
+		public int DefaultTimeout = 10;
 	}
 }
