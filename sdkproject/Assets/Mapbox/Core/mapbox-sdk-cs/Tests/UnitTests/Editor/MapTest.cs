@@ -25,6 +25,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		}
 
 		[Test]
+		[Ignore("not working within Unity")]
 		public void World() {
 			var map = new Map<VectorTile>(this.fs);
 
@@ -43,6 +44,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		}
 
 		[Test]
+		[Ignore("not working within Unity")]
 		public void RasterHelsinki() {
 			// TODO
 			/*
@@ -68,6 +70,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		}
 
 		[Test]
+		[Ignore("not working within Unity")]
 		public void ChangeMapId() {
 			// TODO
 			/*

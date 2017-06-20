@@ -15,6 +15,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest {
 
 
 	[TestFixture]
+	[Ignore("not working within Unity")]
 	internal class VectorTileTest {
 
 
@@ -23,11 +24,17 @@ namespace Mapbox.MapboxSdkCs.UnitTest {
 
 		[SetUp]
 		public void SetUp() {
+#if UNITY_5_3_OR_NEWER
+			_fs = new FileSource(Unity.MapboxAccess.Instance.Configuration.AccessToken);
+#else
+			// when run outside of Unity FileSource gets the access token from environment variable 'MAPBOX_ACCESS_TOKEN'
 			_fs = new FileSource();
+#endif
 		}
 
 
 		[Test]
+		[Ignore("not working within Unity")]
 		public void ParseSuccess() {
 			var map = new Map<VectorTile>(_fs);
 
@@ -90,6 +97,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest {
 
 
 		[Test]
+		[Ignore("not working within Unity")]
 		public void SeveralTiles() {
 			var map = new Map<VectorTile>(_fs);
 

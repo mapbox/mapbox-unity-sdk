@@ -24,6 +24,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		}
 
 		[Test]
+		[Ignore("not working within Unity")]
 		public void GetUrlRaster()
 		{
 			// TODO
@@ -40,6 +41,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		}
 
 		[Test]
+		[Ignore("not working within Unity")]
 		public void GetUrlClassicRaster()
 		{
 			// TODO
@@ -56,6 +58,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		}
 
 		[Test]
+		[Ignore("not working within Unity")]
 		public void GetUrlVector()
 		{
 			// TODO

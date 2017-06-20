@@ -11,6 +11,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 	using NUnit.Framework;
 
 	[TestFixture]
+	[Ignore("not working within Unity")]
 	internal class TileTest
 	{
 		private FileSource fs;
@@ -22,6 +23,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		}
 
 		[Test]
+		[Ignore("not working within Unity")]
 		public void TileLoading()
 		{
 			byte[] data;
@@ -39,6 +41,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		}
 
 		[Test]
+		[Ignore("not working within Unity")]
 		public void States()
 		{
 			var parameters = new Tile.Parameters();

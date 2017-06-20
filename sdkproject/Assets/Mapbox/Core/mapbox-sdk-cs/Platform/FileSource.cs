@@ -9,6 +9,7 @@ namespace Mapbox.Platform
 	using Mapbox.Map;
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 	using System.Net;
 	using System.Net.Security;
 #if !NETFX_CORE
@@ -145,19 +146,20 @@ namespace Mapbox.Platform
 		/// </summary>
 		public void WaitForAllRequests()
 		{
-			int waitTimeMs = 150;
+			int waitTimeMs = 500;
 			while (_requests.Count > 0)
 			{
 				lock (_lock)
 				{
-					foreach (var req in _requests)
+					List<IAsyncRequest> reqs = _requests.Keys.ToList();
+					for (int i = reqs.Count - 1; i > -1; i--)
 					{
-						if (((IAsyncRequest)req.Key).IsCompleted)
+						if (reqs[i].IsCompleted)
 						{
 							// another place to watch out if request has been cancelled
 							try
 							{
-								_requests.Remove(req.Key);
+								_requests.Remove(reqs[i]);
 							}
 							catch (Exception ex)
 							{
