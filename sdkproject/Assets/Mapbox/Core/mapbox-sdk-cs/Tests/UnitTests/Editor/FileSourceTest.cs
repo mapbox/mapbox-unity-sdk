@@ -4,7 +4,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Mapbox.UnitTest {
+namespace Mapbox.MapboxSdkCs.UnitTest {
 	using System;
 	using Mapbox.Platform;
 	using NUnit.Framework;

@@ -4,64 +4,88 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Mapbox.UnitTest {
+namespace Mapbox.MapboxSdkCs.UnitTest
+{
+
 	using System;
 	using System.Collections.Generic;
+#if !UNITY_5_4_OR_NEWER
 	using System.Drawing;
+#endif
 	using System.IO;
 	using Mapbox.Map;
 	using Mapbox.Platform;
 
-	internal static class Utils {
-		internal class VectorMapObserver : Mapbox.Utils.IObserver<VectorTile> {
+	internal static class Utils
+	{
+		internal class VectorMapObserver : Mapbox.Utils.IObserver<VectorTile>
+		{
 			private List<VectorTile> tiles = new List<VectorTile>();
 
-			public List<VectorTile> Tiles {
-				get {
+			public List<VectorTile> Tiles
+			{
+				get
+				{
 					return tiles;
 				}
 			}
 
-			public void OnNext(VectorTile tile) {
-				if (tile.CurrentState == Tile.State.Loaded) {
+			public void OnNext(VectorTile tile)
+			{
+				if (tile.CurrentState == Tile.State.Loaded)
+				{
 					tiles.Add(tile);
 				}
 			}
 		}
 
-		internal class RasterMapObserver : Mapbox.Utils.IObserver<RasterTile> {
+#if !UNITY_5_4_OR_NEWER
+
+		internal class RasterMapObserver : Mapbox.Utils.IObserver<RasterTile>
+		{
 			private List<Image> tiles = new List<Image>();
 
-			public List<Image> Tiles {
-				get {
+			public List<Image> Tiles
+			{
+				get
+				{
 					return tiles;
 				}
 			}
 
-			public void OnNext(RasterTile tile) {
-				if (tile.CurrentState == Tile.State.Loaded && !tile.HasError) {
+			public void OnNext(RasterTile tile)
+			{
+				if (tile.CurrentState == Tile.State.Loaded && !tile.HasError)
+				{
 					var image = Image.FromStream(new MemoryStream(tile.Data));
 					tiles.Add(image);
 				}
 			}
 		}
 
-		internal class ClassicRasterMapObserver : Mapbox.Utils.IObserver<ClassicRasterTile> {
+		internal class ClassicRasterMapObserver : Mapbox.Utils.IObserver<ClassicRasterTile>
+		{
 			private List<Image> tiles = new List<Image>();
 
-			public List<Image> Tiles {
-				get {
+			public List<Image> Tiles
+			{
+				get
+				{
 					return tiles;
 				}
 			}
 
-			public void OnNext(ClassicRasterTile tile) {
-				if (tile.CurrentState == Tile.State.Loaded && !tile.HasError) {
+			public void OnNext(ClassicRasterTile tile)
+			{
+				if (tile.CurrentState == Tile.State.Loaded && !tile.HasError)
+				{
 					var image = Image.FromStream(new MemoryStream(tile.Data));
 					tiles.Add(image);
 				}
 			}
 		}
+#endif
+
 
 		//internal class MockFileSource : IFileSource {
 		//	private Dictionary<string, Response> responses = new Dictionary<string, Response>();

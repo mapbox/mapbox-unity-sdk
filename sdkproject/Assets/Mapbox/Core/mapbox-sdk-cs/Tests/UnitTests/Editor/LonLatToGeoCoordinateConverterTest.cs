@@ -4,7 +4,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Mapbox.UnitTest
+namespace Mapbox.MapboxSdkCs.UnitTest
 {
     using Mapbox.Json;
     using Mapbox.Utils;
