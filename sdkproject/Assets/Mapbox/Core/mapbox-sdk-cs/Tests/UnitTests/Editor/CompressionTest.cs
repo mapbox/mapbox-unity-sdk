@@ -11,38 +11,48 @@ namespace Mapbox.MapboxSdkCs.UnitTest {
 	using NUnit.Framework;
 
 	[TestFixture]
-	[Ignore("not working within Unity")]
 	internal class CompressionTest {
 
 
+		private FileSource _fs;
+
+
+		[SetUp]
+		public void SetUp()
+		{
+#if UNITY_5_3_OR_NEWER
+			_fs = new FileSource(Unity.MapboxAccess.Instance.Configuration.AccessToken);
+#else
+			// when run outside of Unity FileSource gets the access token from environment variable 'MAPBOX_ACCESS_TOKEN'
+			_fs = new FileSource();
+#endif
+		}
+
+
 		[Test]
-		[Ignore("not working within Unity")]
 		public void Empty() {
 			var buffer = new byte[] { };
 			Assert.AreEqual(buffer, Compression.Decompress(buffer));
 		}
 
 		[Test]
-		[Ignore("not working within Unity")]
 		public void NotCompressed() {
 			var buffer = Encoding.ASCII.GetBytes("foobar");
 			Assert.AreEqual(buffer, Compression.Decompress(buffer));
 		}
 
 		[Test]
-		[Ignore("not working within Unity")]
 		public void Corrupt() {
-			var fs = new FileSource();
 			var buffer = new byte[] { };
 
 			// Vector tiles are compressed.
-			fs.Request(
+			_fs.Request(
 				"https://api.mapbox.com/v4/mapbox.mapbox-streets-v7/0/0/0.vector.pbf",
 				(Response res) => {
 					buffer = res.Data;
 				});
 
-			fs.WaitForAllRequests();
+			_fs.WaitForAllRequests();
 
 			Assert.Greater(buffer.Length, 30);
 
@@ -56,17 +66,16 @@ namespace Mapbox.MapboxSdkCs.UnitTest {
 		[Test]
 		[Ignore("not working within Unity")]
 		public void Decompress() {
-			var fs = new FileSource();
 			var buffer = new byte[] { };
 
 			// Vector tiles are compressed.
-			fs.Request(
+			_fs.Request(
 				"https://api.mapbox.com/v4/mapbox.mapbox-streets-v7/0/0/0.vector.pbf",
 				(Response res) => {
 					buffer = res.Data;
 				});
 
-			fs.WaitForAllRequests();
+			_fs.WaitForAllRequests();
 
 			//tiles are automatically decompressed during HttpRequest on full .Net framework
 #if NETFX_CORE

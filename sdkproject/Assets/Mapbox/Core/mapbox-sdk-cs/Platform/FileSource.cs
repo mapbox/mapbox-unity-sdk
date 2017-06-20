@@ -7,7 +7,9 @@
 namespace Mapbox.Platform
 {
 	using Mapbox.Map;
+	using Mapbox.Unity.Utilities;
 	using System;
+	using System.Collections;
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Net;
@@ -15,8 +17,15 @@ namespace Mapbox.Platform
 #if !NETFX_CORE
 	using System.Security.Cryptography.X509Certificates;
 #endif
+#if !UNITY_5_3_OR_NEWER
 	using System.Threading;
-
+#endif
+#if UNITY_EDITOR
+	using UnityEditor;
+#endif
+#if UNITY_5_3_OR_NEWER
+	using UnityEngine;
+#endif
 
 	/// <summary>
 	///     Mono implementation of the FileSource class. It will use Mono's
@@ -141,12 +150,34 @@ namespace Mapbox.Platform
 		}
 
 
+#if UNITY_5_3_OR_NEWER
 		/// <summary>
 		///     Block until all the requests are processed.
 		/// </summary>
 		public void WaitForAllRequests()
 		{
-			int waitTimeMs = 500;
+#if UNITY_EDITOR
+			if (!EditorApplication.isPlaying)
+			{
+				Runnable.EnableRunnableInEditor();
+			}
+#endif
+			int id = Runnable.Run(wait());
+			//while (Runnable.IsRunning(id))
+			//{
+			//	UnityEngine.Debug.Log("running");
+			//}
+
+			//long milliseconds = 2000;
+			//var sw = System.Diagnostics.Stopwatch.StartNew();
+			//var ticks = (milliseconds * System.Diagnostics.Stopwatch.Frequency) / 1000;
+			//while (sw.ElapsedTicks < ticks) { }
+
+		}
+
+
+		private IEnumerator wait()
+		{
 			while (_requests.Count > 0)
 			{
 				lock (_lock)
@@ -169,7 +200,47 @@ namespace Mapbox.Platform
 					}
 				}
 
-#if !WINDOWS_UWP
+				yield return new WaitForSeconds(0.2f);
+			}
+		}
+
+
+#endif
+
+
+
+#if !UNITY_5_3_OR_NEWER
+		/// <summary>
+		///     Block until all the requests are processed.
+		/// </summary>
+		public void WaitForAllRequests()
+		{
+			int waitTimeMs = 200;
+			while (_requests.Count > 0)
+			{
+				lock (_lock)
+				{
+					List<IAsyncRequest> reqs = _requests.Keys.ToList();
+					for (int i = reqs.Count - 1; i > -1; i--)
+					{
+						if (reqs[i].IsCompleted)
+						{
+							// another place to watch out if request has been cancelled
+							try
+							{
+								_requests.Remove(reqs[i]);
+							}
+							catch (Exception ex)
+							{
+								System.Diagnostics.Debug.WriteLine(ex);
+							}
+						}
+					}
+				}
+
+#if WINDOWS_UWP
+				System.Threading.Tasks.Task.Delay(waitTimeMs).Wait();
+#else
 				//Thread.Sleep(50);
 				// TODO: get rid of DoEvents!!! and find non-blocking wait that works for Net3.5
 				//System.Windows.Forms.Application.DoEvents();
@@ -180,15 +251,15 @@ namespace Mapbox.Platform
 					Thread.Sleep(waitTimeMs);
 					resetEvent.Set();
 				}), null);
+				UnityEngine.Debug.Log("before waitOne " + DateTime.Now.Ticks);
 				resetEvent.WaitOne();
+				UnityEngine.Debug.Log("after waitOne " + DateTime.Now.Ticks);
 				resetEvent.Close();
 				resetEvent = null;
-
-#else
-				System.Threading.Tasks.Task.Delay(waitTimeMs).Wait();
 #endif
 			}
 		}
+#endif
 
 
 
