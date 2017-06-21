@@ -22,6 +22,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 
 
 		private FileSource _fs;
+		private int _timeout = 10;
 
 
 		[SetUp]
@@ -29,6 +30,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		{
 #if UNITY_5_3_OR_NEWER
 			_fs = new FileSource(Unity.MapboxAccess.Instance.Configuration.AccessToken);
+			_timeout = Unity.MapboxAccess.Instance.Configuration.DefaultTimeout;
 #else
 			// when run outside of Unity FileSource gets the access token from environment variable 'MAPBOX_ACCESS_TOKEN'
 			_fs = new FileSource();
@@ -65,8 +67,18 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				"https://api.mapbox.com/v4/mapbox.mapbox-streets-v7/0/0/0.vector.pbf",
 				(Response res) =>
 				{
+					if (res.HasError)
+					{
+#if UNITY_5_3_OR_NEWER
+						Debug.LogError(res.ExceptionsAsString);
+#else
+						System.Diagnostics.Debug.WriteLine(res.ExceptionsAsString);
+#endif
+					}
 					buffer = res.Data;
-				});
+				},
+				_timeout
+			);
 
 
 #if UNITY_5_3_OR_NEWER
@@ -101,8 +113,18 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				"https://api.mapbox.com/v4/mapbox.mapbox-streets-v7/0/0/0.vector.pbf",
 				(Response res) =>
 				{
+					if (res.HasError)
+					{
+#if UNITY_5_3_OR_NEWER
+						Debug.LogError(res.ExceptionsAsString);
+#else
+						System.Diagnostics.Debug.WriteLine(res.ExceptionsAsString);
+#endif
+					}
 					buffer = res.Data;
-				});
+				},
+				_timeout
+			);
 
 #if UNITY_5_3_OR_NEWER
 			IEnumerator enumerator = _fs.WaitForAllRequests();
@@ -112,8 +134,8 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 #endif
 
 			// tiles are automatically decompressed during HttpRequest on full .Net framework
-			// not on .NET Core / UWP
-#if NETFX_CORE
+			// not on .NET Core / UWP / Unity
+#if NETFX_CORE || UNITY_5_3_OR_NEWER
 			Assert.Less(buffer.Length, Compression.Decompress(buffer).Length);
 #else
 			Assert.AreEqual(buffer.Length, Compression.Decompress(buffer).Length);
