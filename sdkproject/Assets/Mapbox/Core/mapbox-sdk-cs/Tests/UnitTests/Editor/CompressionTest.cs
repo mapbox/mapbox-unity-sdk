@@ -4,14 +4,21 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Mapbox.MapboxSdkCs.UnitTest {
+namespace Mapbox.MapboxSdkCs.UnitTest
+{
 	using System.Text;
 	using Mapbox.Platform;
 	using Mapbox.Utils;
 	using NUnit.Framework;
+#if UNITY_5_3_OR_NEWER
+	using UnityEngine.TestTools;
+	using System.Collections;
+	using UnityEngine;
+#endif
 
 	[TestFixture]
-	internal class CompressionTest {
+	internal class CompressionTest
+	{
 
 
 		private FileSource _fs;
@@ -30,29 +37,44 @@ namespace Mapbox.MapboxSdkCs.UnitTest {
 
 
 		[Test]
-		public void Empty() {
+		public void Empty()
+		{
 			var buffer = new byte[] { };
 			Assert.AreEqual(buffer, Compression.Decompress(buffer));
 		}
 
 		[Test]
-		public void NotCompressed() {
+		public void NotCompressed()
+		{
 			var buffer = Encoding.ASCII.GetBytes("foobar");
 			Assert.AreEqual(buffer, Compression.Decompress(buffer));
 		}
 
+#if UNITY_5_3_OR_NEWER
+		[UnityTest]
+		public IEnumerator Corrupt()
+		{
+#else
 		[Test]
 		public void Corrupt() {
+#endif
 			var buffer = new byte[] { };
 
 			// Vector tiles are compressed.
 			_fs.Request(
 				"https://api.mapbox.com/v4/mapbox.mapbox-streets-v7/0/0/0.vector.pbf",
-				(Response res) => {
+				(Response res) =>
+				{
 					buffer = res.Data;
 				});
 
+
+#if UNITY_5_3_OR_NEWER
+			IEnumerator enumerator = _fs.WaitForAllRequests();
+			while (enumerator.MoveNext()) { yield return null; }
+#else
 			_fs.WaitForAllRequests();
+#endif
 
 			Assert.Greater(buffer.Length, 30);
 
@@ -63,21 +85,34 @@ namespace Mapbox.MapboxSdkCs.UnitTest {
 			Assert.AreEqual(buffer, Compression.Decompress(buffer));
 		}
 
+
+#if UNITY_5_3_OR_NEWER
+		[UnityTest]
+		public IEnumerator Decompress()
+		{
+#else
 		[Test]
-		[Ignore("not working within Unity")]
 		public void Decompress() {
+#endif
 			var buffer = new byte[] { };
 
 			// Vector tiles are compressed.
 			_fs.Request(
 				"https://api.mapbox.com/v4/mapbox.mapbox-streets-v7/0/0/0.vector.pbf",
-				(Response res) => {
+				(Response res) =>
+				{
 					buffer = res.Data;
 				});
 
+#if UNITY_5_3_OR_NEWER
+			IEnumerator enumerator = _fs.WaitForAllRequests();
+			while (enumerator.MoveNext()) { yield return null; }
+#else
 			_fs.WaitForAllRequests();
+#endif
 
-			//tiles are automatically decompressed during HttpRequest on full .Net framework
+			// tiles are automatically decompressed during HttpRequest on full .Net framework
+			// not on .NET Core / UWP
 #if NETFX_CORE
 			Assert.Less(buffer.Length, Compression.Decompress(buffer).Length);
 #else

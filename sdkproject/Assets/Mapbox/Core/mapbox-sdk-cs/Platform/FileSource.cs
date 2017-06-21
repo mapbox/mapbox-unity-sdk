@@ -154,29 +154,7 @@ namespace Mapbox.Platform
 		/// <summary>
 		///     Block until all the requests are processed.
 		/// </summary>
-		public void WaitForAllRequests()
-		{
-#if UNITY_EDITOR
-			if (!EditorApplication.isPlaying)
-			{
-				Runnable.EnableRunnableInEditor();
-			}
-#endif
-			int id = Runnable.Run(wait());
-			//while (Runnable.IsRunning(id))
-			//{
-			//	UnityEngine.Debug.Log("running");
-			//}
-
-			//long milliseconds = 2000;
-			//var sw = System.Diagnostics.Stopwatch.StartNew();
-			//var ticks = (milliseconds * System.Diagnostics.Stopwatch.Frequency) / 1000;
-			//while (sw.ElapsedTicks < ticks) { }
-
-		}
-
-
-		private IEnumerator wait()
+		public IEnumerator WaitForAllRequests()
 		{
 			while (_requests.Count > 0)
 			{
@@ -199,12 +177,9 @@ namespace Mapbox.Platform
 						}
 					}
 				}
-
 				yield return new WaitForSeconds(0.2f);
 			}
 		}
-
-
 #endif
 
 
