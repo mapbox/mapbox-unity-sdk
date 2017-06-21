@@ -107,36 +107,46 @@ namespace Mapbox.Platform
 
 			//return request;
 
-			return proxyResponse(url, callback);
+			return proxyResponse(url, callback, timeout, tileId, mapId);
 		}
 
 
 		// TODO: look at requests and implement throttling if needed
 		//private IEnumerator<IAsyncRequest> proxyResponse(string url, Action<Response> callback) {
-		private IAsyncRequest proxyResponse(string url, Action<Response> callback)
+		private IAsyncRequest proxyResponse(
+			string url
+			, Action<Response> callback
+			, int timeout
+			, CanonicalTileId tileId
+			, string mapId
+		)
 		{
 
 			// TODO: plugin caching somewhere around here
 
-			var request = IAsyncRequestFactory.CreateRequest(url, (Response response) =>
-			{
-				if (response.XRateLimitInterval.HasValue) { XRateLimitInterval = response.XRateLimitInterval; }
-				if (response.XRateLimitLimit.HasValue) { XRateLimitLimit = response.XRateLimitLimit; }
-				if (response.XRateLimitReset.HasValue) { XRateLimitReset = response.XRateLimitReset; }
-				callback(response);
-				lock (_lock)
+			var request = IAsyncRequestFactory.CreateRequest(
+				url
+				, (Response response) =>
 				{
-					//another place to catch if request has been cancelled
-					try
+					if (response.XRateLimitInterval.HasValue) { XRateLimitInterval = response.XRateLimitInterval; }
+					if (response.XRateLimitLimit.HasValue) { XRateLimitLimit = response.XRateLimitLimit; }
+					if (response.XRateLimitReset.HasValue) { XRateLimitReset = response.XRateLimitReset; }
+					callback(response);
+					lock (_lock)
 					{
-						_requests.Remove(response.Request);
-					}
-					catch (Exception ex)
-					{
-						System.Diagnostics.Debug.WriteLine(ex);
+						//another place to catch if request has been cancelled
+						try
+						{
+							_requests.Remove(response.Request);
+						}
+						catch (Exception ex)
+						{
+							System.Diagnostics.Debug.WriteLine(ex);
+						}
 					}
 				}
-			});
+				, timeout
+			);
 			lock (_lock)
 			{
 				//sometimes we get here after the request has already finished

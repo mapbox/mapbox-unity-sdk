@@ -21,6 +21,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 	{
 		private const string _url = "https://api.mapbox.com/geocoding/v5/mapbox.places/helsinki.json";
 		private FileSource _fs;
+		private int _timeout = 10;
 
 
 		[SetUp]
@@ -28,6 +29,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		{
 #if UNITY_5_3_OR_NEWER
 			_fs = new FileSource(Unity.MapboxAccess.Instance.Configuration.AccessToken);
+			_timeout = Unity.MapboxAccess.Instance.Configuration.DefaultTimeout;
 #else
 			// when run outside of Unity FileSource gets the access token from environment variable 'MAPBOX_ACCESS_TOKEN'
 			_fs = new FileSource();
@@ -55,7 +57,9 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				(Response res) =>
 				{
 					Assert.IsNotNull(res.Data, "No data received from the servers.");
-				});
+				}
+				, _timeout
+			);
 
 			_fs.WaitForAllRequests();
 		}
@@ -67,9 +71,9 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		{
 			int count = 0;
 
-			_fs.Request(_url, (Response res) => ++count);
-			_fs.Request(_url, (Response res) => ++count);
-			_fs.Request(_url, (Response res) => ++count);
+			_fs.Request(_url, (Response res) => ++count, _timeout);
+			_fs.Request(_url, (Response res) => ++count, _timeout);
+			_fs.Request(_url, (Response res) => ++count, _timeout);
 
 			_fs.WaitForAllRequests();
 
@@ -89,7 +93,9 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 					WebException wex = res.Exceptions[0] as WebException;
 					Assert.IsNotNull(wex);
 					Assert.AreEqual(wex.Status, WebExceptionStatus.RequestCanceled);
-				});
+				},
+				_timeout
+			);
 
 			request.Cancel();
 
@@ -106,7 +112,9 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				(Response res) =>
 				{
 					Assert.IsTrue(res.HasError);
-				});
+				},
+				_timeout
+			);
 
 			_fs.WaitForAllRequests();
 		}
@@ -124,7 +132,9 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				(Response res) =>
 				{
 					Assert.IsTrue(res.HasError);
-				});
+				},
+				_timeout
+			);
 
 			_fs.WaitForAllRequests();
 		}
