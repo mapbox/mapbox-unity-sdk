@@ -5,19 +5,19 @@ namespace Mapbox.Unity.Map
 
 	public class RangeTileProvider : AbstractTileProvider
 	{
-        [SerializeField]
-        private int _west;
-        [SerializeField]
-        private int _north;
-        [SerializeField]
-        private int _east;
-        [SerializeField]
-        private int _south;
+		[SerializeField]
+		private int _west;
+		[SerializeField]
+		private int _north;
+		[SerializeField]
+		private int _east;
+		[SerializeField]
+		private int _south;
 
-        internal override void OnInitialized()
+		internal override void OnInitialized()
 		{
 			var centerTile = TileCover.CoordinateToTileId(_map.CenterLatitudeLongitude, _map.Zoom);
-			for (int x = (int)(centerTile.X- _west); x <= (centerTile.X + _east); x++)
+			for (int x = (int)(centerTile.X - _west); x <= (centerTile.X + _east); x++)
 			{
 				for (int y = (int)(centerTile.Y - _north); y <= (centerTile.Y + _south); y++)
 				{
