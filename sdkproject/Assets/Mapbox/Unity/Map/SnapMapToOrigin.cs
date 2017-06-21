@@ -20,7 +20,7 @@ public class SnapMapToOrigin : MonoBehaviour
 		{
 			_map.Root.transform.position = new Vector3(
 				_map.Root.transform.position.x,
-				-s.CenterHeight * _map.Root.transform.localScale.x,
+				-s.CenterHeight * _map.WorldRelativeScale,
 				_map.Root.transform.position.z);
 		};
 	}
