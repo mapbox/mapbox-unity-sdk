@@ -9,6 +9,7 @@
 	{
 		public event Action<UnwrappedTileId> OnTileAdded = delegate { };
 		public event Action<UnwrappedTileId> OnTileRemoved = delegate { };
+		public event Action<UnwrappedTileId> OnCentralTileChanged = delegate { };
 
 		protected IMap _map;
 
@@ -19,6 +20,12 @@
 			_activeTiles = new List<UnwrappedTileId>();
 			_map = map;
 			OnInitialized();
+		}
+
+		protected void SetCentralTile(UnwrappedTileId tile)
+		{
+			_activeTiles.Add(tile);
+			OnCentralTileChanged(tile);
 		}
 
 		protected void AddTile(UnwrappedTileId tile)

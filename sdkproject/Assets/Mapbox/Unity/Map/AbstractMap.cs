@@ -92,6 +92,7 @@
 		protected virtual void Awake()
 		{
 			_fileSouce = MapboxAccess.Instance;
+			_tileProvider.OnCentralTileChanged += TileProvider_OnCentralTileChanged;
 			_tileProvider.OnTileAdded += TileProvider_OnTileAdded;
 			_tileProvider.OnTileRemoved += TileProvider_OnTileRemoved;
 			if (!_root)
@@ -100,10 +101,13 @@
 			}
 		}
 
+		
+
 		protected virtual void OnDestroy()
 		{
 			if (_tileProvider != null)
 			{
+				_tileProvider.OnCentralTileChanged -= TileProvider_OnCentralTileChanged;
 				_tileProvider.OnTileAdded -= TileProvider_OnTileAdded;
 				_tileProvider.OnTileRemoved -= TileProvider_OnTileRemoved;
 			}
@@ -129,20 +133,19 @@
 			OnInitialized();
 		}
 
-		void TileProvider_OnTileAdded(UnwrappedTileId tileId)
+		private void TileProvider_OnCentralTileChanged(UnwrappedTileId tileId)
 		{
 			var utile = _mapVisualizer.LoadTile(tileId);
-			if (!_centerTileSet)
+			utile.OnHeightDataChanged += (s) =>
 			{
-				_centerTileSet = true;
+				CenterHeight = s.QueryHeightData(.5f, .5f);
+				OnHeightChanged(this);
+			};
+		}
 
-				// FIXME: this is never unregistered!
-				utile.OnHeightDataChanged += (s) =>
-				{
-					CenterHeight = s.QueryHeightData(.5f, .5f);
-					OnHeightChanged(this);
-				};				
-			}
+		void TileProvider_OnTileAdded(UnwrappedTileId tileId)
+		{
+			_mapVisualizer.LoadTile(tileId);
 		}
 
 		void TileProvider_OnTileRemoved(UnwrappedTileId tileId)

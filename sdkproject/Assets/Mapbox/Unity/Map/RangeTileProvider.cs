@@ -11,6 +11,7 @@ namespace Mapbox.Unity.Map
 		internal override void OnInitialized()
 		{
 			var centerTile = TileCover.CoordinateToTileId(_map.CenterLatitudeLongitude, _map.Zoom);
+			SetCentralTile(centerTile);
 			for (int x = (int)(centerTile.X- _range.x); x <= (centerTile.X + _range.z); x++)
 			{
 				for (int y = (int)(centerTile.Y - _range.y); y <= (centerTile.Y + _range.w); y++)

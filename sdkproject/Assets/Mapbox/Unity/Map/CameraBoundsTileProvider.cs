@@ -36,6 +36,9 @@ namespace Mapbox.Unity.Map
 			_groundPlane = new Plane(Vector3.up, Mapbox.Unity.Constants.Math.Vector3Zero);
 			_viewportTarget = new Vector3(0.5f, 0.5f, 0);
 			_shouldUpdate = true;
+
+			_currentTile = TileCover.CoordinateToTileId(_currentLatitudeLongitude, _map.Zoom);
+			SetCentralTile(_currentTile);
 		}
 
 		void Update()
@@ -54,7 +57,7 @@ namespace Mapbox.Unity.Map
 				{
 					_currentLatitudeLongitude = _ray.GetPoint(_hitDistance).GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
 					_currentTile = TileCover.CoordinateToTileId(_currentLatitudeLongitude, _map.Zoom);
-
+					
 					if (!_currentTile.Equals(_cachedTile))
 					{
 						// FIXME: this results in bugs at world boundaries! Does not cleanly wrap. Negative tileIds are bad.

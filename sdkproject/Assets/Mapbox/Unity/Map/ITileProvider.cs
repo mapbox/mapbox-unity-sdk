@@ -5,6 +5,7 @@
 
 	public interface ITileProvider
 	{
+		event Action<UnwrappedTileId> OnCentralTileChanged;
 		event Action<UnwrappedTileId> OnTileAdded;
 		event Action<UnwrappedTileId> OnTileRemoved;
 
