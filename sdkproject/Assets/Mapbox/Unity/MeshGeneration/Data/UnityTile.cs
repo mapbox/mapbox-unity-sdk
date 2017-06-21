@@ -222,8 +222,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		{
 			for (int i = 0, _tilesCount = _tiles.Count; i < _tilesCount; i++)
 			{
-				var tile = _tiles[i];
-				tile.Cancel();
+				_tiles[i].Cancel();
 			}
 		}
 	}
