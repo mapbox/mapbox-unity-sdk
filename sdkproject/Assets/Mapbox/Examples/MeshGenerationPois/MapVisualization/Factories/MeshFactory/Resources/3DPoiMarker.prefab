@@ -20,6 +20,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 4000011600795030}
   - 114: {fileID: 114000012892046026}
+  - 136: {fileID: 136000010465999350}
   m_Layer: 0
   m_Name: 3DPoiMarker
   m_TagString: Untagged
@@ -36,9 +37,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 4000011627286898}
   - 33: {fileID: 33000011743106498}
-  - 136: {fileID: 136000010574680028}
   - 23: {fileID: 23000013778012456}
-  - 114: {fileID: 114000013187490696}
   m_Layer: 0
   m_Name: 3DPoiMarker
   m_TagString: Untagged
@@ -120,23 +119,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73a4653526c970849afac4be5c5930ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114000013187490696
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000012040836752}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 73a4653526c970849afac4be5c5930ba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!136 &136000010574680028
+--- !u!136 &136000010465999350
 CapsuleCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000012040836752}
+  m_GameObject: {fileID: 1000010288152912}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1

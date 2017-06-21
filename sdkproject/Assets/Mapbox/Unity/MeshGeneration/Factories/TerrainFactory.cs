@@ -158,7 +158,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			mesh.SetNormals(_newNormalList);
 			mesh.SetUVs(0, _newUvList);
 			mesh.SetTriangles(_newTriangleList, 0);
-			mesh.RecalculateBounds();
 		}
 
 		internal override void OnUnregistered(UnityTile tile)
@@ -177,11 +176,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			var pngRasterTile = new RawPngRasterTile();
 
 			tile.AddTile(pngRasterTile);
-            Progress++;
+			Progress++;
 
-            pngRasterTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
+			pngRasterTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
-                if (pngRasterTile.HasError)
+				if (pngRasterTile.HasError)
 				{
 					tile.HeightDataState = TilePropertyState.Error;
 
@@ -191,14 +190,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					{
 						ResetToFlatMesh(tile);
 					}
-                    Progress--;
-                    return;
+					Progress--;
+					return;
 				}
 
 				tile.SetHeightData(pngRasterTile.Data, _heightModifier);
 				GenerateTerrainMesh(tile);
-                Progress--;
-            });
+				Progress--;
+			});
 		}
 
 		/// <summary>
@@ -259,7 +258,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			tile.MeshFilter.mesh.SetNormals(_currentTileMeshData.Normals);
 			tile.MeshFilter.mesh.SetVertices(_currentTileMeshData.Vertices);
-			tile.MeshFilter.mesh.SetNormals(_currentTileMeshData.Normals);
+
+			tile.MeshFilter.mesh.RecalculateBounds();
 
 			if (!_meshData.ContainsKey(tile.CanonicalTileId))
 			{
@@ -299,6 +299,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			tile.MeshFilter.mesh.SetVertices(_currentTileMeshData.Vertices);
 			tile.MeshFilter.mesh.SetNormals(_currentTileMeshData.Normals);
+
+			tile.MeshFilter.mesh.RecalculateBounds();
 		}
 
 		/// <summary>

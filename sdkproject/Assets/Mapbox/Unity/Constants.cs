@@ -4,12 +4,14 @@ namespace Mapbox.Unity
 
     public static class Constants
     {
+		public const string SDK_VERSION = "1.0.0";
+			
         public static class Path
         {
-            /// <summary>
-            /// Access token file name. Intended to be located in StreamingAssets.
-            /// </summary>
-            public const string TOKEN_FILE = "MapboxAccess.text";
+			public const string CONFIG_FILE = "MapboxConfiguration.txt";
+			public const string IS_TELEMETRY_ENABLED_KEY = "IS_MAPBOX_TELEMETRY_ENABLED";
+			public static readonly string MAPBOX_RESOURCES_RELATIVE = System.IO.Path.Combine("Mapbox", "MapboxConfiguration");
+			public static readonly string MAPBOX_RESOURCES_ABSOLUTE = System.IO.Path.Combine(System.IO.Path.Combine(Application.dataPath, "Resources"), "Mapbox");
         }
 
         /// <summary>

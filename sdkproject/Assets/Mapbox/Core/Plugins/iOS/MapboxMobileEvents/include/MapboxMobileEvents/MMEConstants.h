@@ -16,6 +16,7 @@ extern NSString * const MMEEventTypeMapLoad;
 extern NSString * const MMEEventTypeMapTap;
 extern NSString * const MMEEventTypeMapDragEnd;
 extern NSString * const MMEEventTypeLocation;
+extern NSString * const MMEEventTypeLocalDebug;
 
 // Gestures
 extern NSString * const MMEEventGestureSingleTap;
@@ -48,6 +49,7 @@ extern NSString * const MMEEventKeySessionId;
 extern NSString * const MMEEventKeyApplicationState;
 extern NSString * const MMEEventKeyAltitude;
 extern NSString * const MMEEventHorizontalAccuracy;
+extern NSString * const MMEEventKeyLocalDebugDescription;
 
 // SDK event source
 extern NSString * const MMEEventSource;

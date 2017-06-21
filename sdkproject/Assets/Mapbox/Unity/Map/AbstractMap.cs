@@ -15,6 +15,7 @@
 		string _latitudeLongitudeString;
 
 		[SerializeField]
+		[Range(0, 22)]
 		int _zoom;
 		public int Zoom
 		{
