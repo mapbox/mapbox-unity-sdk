@@ -135,6 +135,8 @@
 			if (!_centerTileSet)
 			{
 				_centerTileSet = true;
+
+				// FIXME: this is never unregistered!
 				utile.OnHeightDataChanged += (s) =>
 				{
 					CenterHeight = s.QueryHeightData(.5f, .5f);

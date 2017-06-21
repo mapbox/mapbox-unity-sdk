@@ -297,8 +297,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				_currentTileMeshData.Normals[i] = Unity.Constants.Math.Vector3Up;
 			}
 
-			tile.MeshFilter.mesh.SetVertices(_currentTileMeshData.Vertices);
 			tile.MeshFilter.mesh.SetNormals(_currentTileMeshData.Normals);
+			tile.MeshFilter.mesh.SetVertices(_currentTileMeshData.Vertices);
 
 			tile.MeshFilter.mesh.RecalculateBounds();
 		}
