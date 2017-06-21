@@ -166,7 +166,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					float r = rgbData[(xx * 256 + yy) * 4 + 1];
 					float g = rgbData[(xx * 256 + yy) * 4 + 2];
 					float b = rgbData[(xx * 256 + yy) * 4 + 3];
-					_heightData[xx * 256 + yy] = Conversions.GetAbsoluteHeightFromColor(r, g, b) * _relativeScale * heightMultiplier;
+					_heightData[xx * 256 + yy] = Conversions.GetAbsoluteHeightFromColor(r, g, b) * heightMultiplier;
 				}
 			}
 
