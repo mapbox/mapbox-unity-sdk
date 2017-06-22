@@ -4,13 +4,17 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+// TODO: figure out how run tests outside of Unity with .NET framework, something like '#if !UNITY'
+#if UNITY_EDITOR
+#if UNITY_5_6_OR_NEWER
+
 namespace Mapbox.MapboxSdkCs.UnitTest
 {
 	using System.Text;
 	using Mapbox.Platform;
 	using Mapbox.Utils;
 	using NUnit.Framework;
-#if UNITY_5_3_OR_NEWER
+#if UNITY_5_6_OR_NEWER
 	using UnityEngine.TestTools;
 	using System.Collections;
 	using UnityEngine;
@@ -28,7 +32,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		[SetUp]
 		public void SetUp()
 		{
-#if UNITY_5_3_OR_NEWER
+#if UNITY_5_6_OR_NEWER
 			_fs = new FileSource(Unity.MapboxAccess.Instance.Configuration.AccessToken);
 			_timeout = Unity.MapboxAccess.Instance.Configuration.DefaultTimeout;
 #else
@@ -52,10 +56,9 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			Assert.AreEqual(buffer, Compression.Decompress(buffer));
 		}
 
-#if UNITY_5_3_OR_NEWER
+#if UNITY_5_6_OR_NEWER
 		[UnityTest]
-		public IEnumerator Corrupt()
-		{
+		public IEnumerator Corrupt() {
 #else
 		[Test]
 		public void Corrupt() {
@@ -69,7 +72,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				{
 					if (res.HasError)
 					{
-#if UNITY_5_3_OR_NEWER
+#if UNITY_5_6_OR_NEWER
 						Debug.LogError(res.ExceptionsAsString);
 #else
 						System.Diagnostics.Debug.WriteLine(res.ExceptionsAsString);
@@ -81,7 +84,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			);
 
 
-#if UNITY_5_3_OR_NEWER
+#if UNITY_5_6_OR_NEWER
 			IEnumerator enumerator = _fs.WaitForAllRequests();
 			while (enumerator.MoveNext()) { yield return null; }
 #else
@@ -98,7 +101,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		}
 
 
-#if UNITY_5_3_OR_NEWER
+#if UNITY_5_6_OR_NEWER
 		[UnityTest]
 		public IEnumerator Decompress()
 		{
@@ -115,7 +118,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				{
 					if (res.HasError)
 					{
-#if UNITY_5_3_OR_NEWER
+#if UNITY_5_6_OR_NEWER
 						Debug.LogError(res.ExceptionsAsString);
 #else
 						System.Diagnostics.Debug.WriteLine(res.ExceptionsAsString);
@@ -126,7 +129,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				_timeout
 			);
 
-#if UNITY_5_3_OR_NEWER
+#if UNITY_5_6_OR_NEWER
 			IEnumerator enumerator = _fs.WaitForAllRequests();
 			while (enumerator.MoveNext()) { yield return null; }
 #else
@@ -135,7 +138,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 
 			// tiles are automatically decompressed during HttpRequest on full .Net framework
 			// not on .NET Core / UWP / Unity
-#if NETFX_CORE || UNITY_5_3_OR_NEWER
+#if NETFX_CORE || UNITY_5_6_OR_NEWER
 			Assert.Less(buffer.Length, Compression.Decompress(buffer).Length);
 #else
 			Assert.AreEqual(buffer.Length, Compression.Decompress(buffer).Length);
@@ -143,3 +146,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		}
 	}
 }
+
+
+#endif
+#endif

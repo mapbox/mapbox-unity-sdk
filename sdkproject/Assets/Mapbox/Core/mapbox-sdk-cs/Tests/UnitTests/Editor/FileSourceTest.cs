@@ -4,6 +4,9 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+// TODO: figure out how run tests outside of Unity with .NET framework, something like '#if !UNITY'
+#if UNITY_EDITOR
+#if UNITY_5_6_OR_NEWER
 
 namespace Mapbox.MapboxSdkCs.UnitTest
 {
@@ -13,8 +16,10 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 	using Mapbox.Platform;
 	using NUnit.Framework;
 	using System.Net;
-	using System.Diagnostics;
-
+#if UNITY_5_6_OR_NEWER
+	using UnityEngine.TestTools;
+	using System.Collections;
+#endif
 
 	[TestFixture]
 	internal class FileSourceTest
@@ -27,7 +32,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		[SetUp]
 		public void SetUp()
 		{
-#if UNITY_5_3_OR_NEWER
+#if UNITY_5_6_OR_NEWER
 			_fs = new FileSource(Unity.MapboxAccess.Instance.Configuration.AccessToken);
 			_timeout = Unity.MapboxAccess.Instance.Configuration.DefaultTimeout;
 #else
@@ -37,37 +42,53 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		}
 
 
-#if !UNITY_5_3_OR_NEWER
+#if !UNITY_5_6_OR_NEWER
 		[Test]
 		public void AccessTokenSet()
 		{
 			Assert.IsNotNull(
 				Environment.GetEnvironmentVariable("MAPBOX_ACCESS_TOKEN"),
-				"MAPBOX_ACCESS_TOKEN not set in the environment.");
+				"MAPBOX_ACCESS_TOKEN not set in the environment."
+			);
 		}
 #endif
 
 
+#if UNITY_5_6_OR_NEWER
+		[UnityTest]
+		public IEnumerator Request()
+#else
 		[Test]
-		[Ignore("not working within Unity")]
 		public void Request()
+#endif
 		{
+			byte[] data = null;
 			_fs.Request(
 				_url,
 				(Response res) =>
 				{
-					Assert.IsNotNull(res.Data, "No data received from the servers.");
+					data = res.Data;
 				}
 				, _timeout
 			);
 
+#if UNITY_5_6_OR_NEWER
+			IEnumerator enumerator = _fs.WaitForAllRequests();
+			while (enumerator.MoveNext()) { yield return null; }
+#else
 			_fs.WaitForAllRequests();
+#endif
+			Assert.IsNotNull(data, "No data received from the servers.");
 		}
 
 
+#if UNITY_5_6_OR_NEWER
+		[UnityTest]
+		public IEnumerator MultipleRequests()
+#else
 		[Test]
-		[Ignore("not working within Unity")]
-		public void MultipleRequests()
+		public void Request() 
+#endif
 		{
 			int count = 0;
 
@@ -75,54 +96,88 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			_fs.Request(_url, (Response res) => ++count, _timeout);
 			_fs.Request(_url, (Response res) => ++count, _timeout);
 
+#if UNITY_5_6_OR_NEWER
+			IEnumerator enumerator = _fs.WaitForAllRequests();
+			while (enumerator.MoveNext()) { yield return null; }
+#else
 			_fs.WaitForAllRequests();
+#endif
 
 			Assert.AreEqual(count, 3, "Should have received 3 replies.");
 		}
 
 
+#if UNITY_5_6_OR_NEWER
+		[UnityTest]
+		public IEnumerator RequestCancel()
+#else
 		[Test]
-		[Ignore("not working within Unity")]
-		public void RequestCancel()
+		public void RequestCancel() 
+#endif
 		{
 			var request = _fs.Request(
 				_url,
 				(Response res) =>
 				{
 					Assert.IsTrue(res.HasError);
+#if UNITY_5_6_OR_NEWER
+					Assert.IsNotNull(res.Exceptions[0]);
+					Assert.AreEqual("Request Cancelled", res.Exceptions[0].Message);
+#else
 					WebException wex = res.Exceptions[0] as WebException;
 					Assert.IsNotNull(wex);
 					Assert.AreEqual(wex.Status, WebExceptionStatus.RequestCanceled);
+#endif
 				},
 				_timeout
 			);
 
 			request.Cancel();
 
+#if UNITY_5_6_OR_NEWER
+			IEnumerator enumerator = _fs.WaitForAllRequests();
+			while (enumerator.MoveNext()) { yield return null; }
+#else
 			_fs.WaitForAllRequests();
+#endif
 		}
 
 
+#if UNITY_5_6_OR_NEWER
+		[UnityTest]
+		public IEnumerator RequestDnsError()
+#else
 		[Test]
-		[Ignore("not working within Unity")]
-		public void RequestDnsError()
+		public void RequestDnsError() 
+#endif
 		{
 			_fs.Request(
 				"https://dnserror.shouldnotwork",
 				(Response res) =>
 				{
 					Assert.IsTrue(res.HasError);
+					// Attention: when using Fiddler to throttle requests message is "Failed to receive data"
+					Assert.AreEqual("Cannot resolve destination host", res.Exceptions[0].Message);
 				},
 				_timeout
 			);
 
+#if UNITY_5_6_OR_NEWER
+			IEnumerator enumerator = _fs.WaitForAllRequests();
+			while (enumerator.MoveNext()) { yield return null; }
+#else
 			_fs.WaitForAllRequests();
+#endif
 		}
 
 
+#if UNITY_5_6_OR_NEWER
+		[UnityTest]
+		public IEnumerator RequestForbidden()
+#else
 		[Test]
-		[Ignore("not working within Unity")]
-		public void RequestForbidden()
+		public void RequestForbidden() 
+#endif
 		{
 			// Mapbox servers will return a forbidden when attempting
 			// to access a page outside the API space with a token
@@ -132,22 +187,40 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				(Response res) =>
 				{
 					Assert.IsTrue(res.HasError);
+					Assert.AreEqual(403, res.StatusCode);
 				},
 				_timeout
 			);
 
+#if UNITY_5_6_OR_NEWER
+			IEnumerator enumerator = _fs.WaitForAllRequests();
+			while (enumerator.MoveNext()) { yield return null; }
+#else
 			_fs.WaitForAllRequests();
+#endif
 		}
 
 
+#if UNITY_5_6_OR_NEWER
+		[UnityTest]
+		public IEnumerator WaitWithNoRequests()
+#else
 		[Test]
-		[Ignore("not working within Unity")]
-		public void WaitWithNoRequests()
+		public void WaitWithNoRequests() 
+#endif
 		{
 			// This should simply not block.
+#if UNITY_5_6_OR_NEWER
+			IEnumerator enumerator = _fs.WaitForAllRequests();
+			while (enumerator.MoveNext()) { yield return null; }
+#else
 			_fs.WaitForAllRequests();
+#endif
 		}
 
 
 	}
 }
+
+#endif
+#endif
