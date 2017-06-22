@@ -7,14 +7,9 @@
 namespace Mapbox.MapboxSdkCs.UnitTest
 {
 
-	using System;
 	using System.Collections.Generic;
-#if !UNITY_5_4_OR_NEWER
-	using System.Drawing;
-#endif
-	using System.IO;
 	using Mapbox.Map;
-	using Mapbox.Platform;
+
 
 	internal static class Utils
 	{
@@ -39,13 +34,11 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			}
 		}
 
-#if !UNITY_5_4_OR_NEWER
-
 		internal class RasterMapObserver : Mapbox.Utils.IObserver<RasterTile>
 		{
-			private List<Image> tiles = new List<Image>();
+			private List<byte[]> tiles = new List<byte[]>();
 
-			public List<Image> Tiles
+			public List<byte[]> Tiles
 			{
 				get
 				{
@@ -57,17 +50,16 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			{
 				if (tile.CurrentState == Tile.State.Loaded && !tile.HasError)
 				{
-					var image = Image.FromStream(new MemoryStream(tile.Data));
-					tiles.Add(image);
+					tiles.Add(tile.Data);
 				}
 			}
 		}
 
 		internal class ClassicRasterMapObserver : Mapbox.Utils.IObserver<ClassicRasterTile>
 		{
-			private List<Image> tiles = new List<Image>();
+			private List<byte[]> tiles = new List<byte[]>();
 
-			public List<Image> Tiles
+			public List<byte[]> Tiles
 			{
 				get
 				{
@@ -79,66 +71,12 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			{
 				if (tile.CurrentState == Tile.State.Loaded && !tile.HasError)
 				{
-					var image = Image.FromStream(new MemoryStream(tile.Data));
-					tiles.Add(image);
+					tiles.Add(tile.Data);
 				}
 			}
 		}
-#endif
 
 
-		//internal class MockFileSource : IFileSource {
-		//	private Dictionary<string, Response> responses = new Dictionary<string, Response>();
-		//	private List<MockRequest> requests = new List<MockRequest>();
 
-		//	public IAsyncRequest Request(string uri, Action<Response> callback, Action<int> progress = null, Action finished = null, int timeout = 10) {
-		//		var response = new Response();
-		//		if (this.responses.ContainsKey(uri)) {
-		//			response = this.responses[uri];
-		//		}
-
-		//		var request = new MockRequest(response, callback);
-		//		this.requests.Add(request);
-
-		//		return request;
-		//	}
-
-		//	public void SetReponse(string uri, Response response) {
-		//		this.responses[uri] = response;
-		//	}
-
-		//	public void WaitForAllRequests() {
-		//		while (this.requests.Count > 0) {
-		//			var req = this.requests[0];
-		//			this.requests.RemoveAt(0);
-
-		//			req.Run();
-		//		}
-		//	}
-
-		//	public class MockRequest : IAsyncRequest {
-		//		public bool IsCompleted { get; private set; }
-		//		private Response response;
-		//		private Action<Response> callback;
-
-		//		public MockRequest(Response response, Action<Response> callback) {
-		//			this.response = response;
-		//			this.callback = callback;
-		//		}
-
-		//		public void Run() {
-		//			if (this.callback != null) {
-		//				this.callback(this.response);
-		//				this.callback = null;
-		//				IsCompleted = true;
-		//			}
-		//		}
-
-		//		public void Cancel() {
-		//			this.callback = null;
-		//			IsCompleted = true;
-		//		}
-		//	}
-		//}
 	}
 }

@@ -6,58 +6,64 @@
 
 namespace Mapbox.MapboxSdkCs.UnitTest
 {
-    using System;
-    using Mapbox.Utils;
-    using NUnit.Framework;
 
-    [TestFixture]
-    internal class ReverseGeocodeResourceTest
-    {
-        private const string Base = "https://api.mapbox.com/geocoding/v5/mapbox.places/";
-        private Vector2d query = new Vector2d(10, 10);
-        private string expectedQueryString = "10.00000,10.00000";
-        private Geocoding.ReverseGeocodeResource rgr;
+	using System;
+	using Mapbox.Utils;
+	using NUnit.Framework;
 
-        [SetUp]
-        public void SetUp()
-        {
-            this.rgr = new Geocoding.ReverseGeocodeResource(this.query);
-        }
 
-        public void BadType()
-        {
-            this.rgr.Types = new string[] { "fake" };
-        }
+	[TestFixture]
+	internal class ReverseGeocodeResourceTest
+	{
 
-        public void BadTypeWithGoodType()
-        {
-            this.rgr.Types = new string[] { "place", "fake" };
-        }
+		private const string _baseUrl = "https://api.mapbox.com/geocoding/v5/mapbox.places/";
+		private Vector2d _queryLocation = new Vector2d(10, 10);
+		private string _expectedQueryString = "10.00000,10.00000";
+		private Geocoding.ReverseGeocodeResource _reverseGeocodeResource;
 
-        [Test]
-        public void SetInvalidTypes()
-        {
-            Assert.Throws<Exception>(this.BadType);
-            Assert.Throws<Exception>(this.BadTypeWithGoodType);
-        }
 
-        [Test]
-        public void GetUrl()
-        {
-            // With only constructor
-            Assert.AreEqual(Base + this.expectedQueryString + ".json", this.rgr.GetUrl());
+		[SetUp]
+		public void SetUp()
+		{
+			_reverseGeocodeResource = new Geocoding.ReverseGeocodeResource(_queryLocation);
+		}
 
-            // With one types
-            this.rgr.Types = new string[] { "country" };
-            Assert.AreEqual(Base + this.expectedQueryString + ".json?types=country", this.rgr.GetUrl());
+		public void BadType()
+		{
+			_reverseGeocodeResource.Types = new string[] { "fake" };
+		}
 
-            // With multiple types
-            this.rgr.Types = new string[] { "country", "region" };
-            Assert.AreEqual(Base + this.expectedQueryString + ".json?types=country%2Cregion", this.rgr.GetUrl());
+		public void BadTypeWithGoodType()
+		{
+			_reverseGeocodeResource.Types = new string[] { "place", "fake" };
+		}
 
-            // Set all to null
-            this.rgr.Types = null;
-            Assert.AreEqual(Base + this.expectedQueryString + ".json", this.rgr.GetUrl());
-        }
-    }
+		[Test]
+		public void SetInvalidTypes()
+		{
+			Assert.Throws<Exception>(BadType);
+			Assert.Throws<Exception>(BadTypeWithGoodType);
+		}
+
+		[Test]
+		public void GetUrl()
+		{
+			// With only constructor
+			Assert.AreEqual(_baseUrl + _expectedQueryString + ".json", _reverseGeocodeResource.GetUrl());
+
+			// With one types
+			_reverseGeocodeResource.Types = new string[] { "country" };
+			Assert.AreEqual(_baseUrl + _expectedQueryString + ".json?types=country", _reverseGeocodeResource.GetUrl());
+
+			// With multiple types
+			_reverseGeocodeResource.Types = new string[] { "country", "region" };
+			Assert.AreEqual(_baseUrl + _expectedQueryString + ".json?types=country%2Cregion", _reverseGeocodeResource.GetUrl());
+
+			// Set all to null
+			_reverseGeocodeResource.Types = null;
+			Assert.AreEqual(_baseUrl + _expectedQueryString + ".json", _reverseGeocodeResource.GetUrl());
+		}
+
+
+	}
 }

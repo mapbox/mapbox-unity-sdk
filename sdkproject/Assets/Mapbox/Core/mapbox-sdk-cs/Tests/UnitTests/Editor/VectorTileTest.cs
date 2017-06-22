@@ -4,28 +4,40 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Mapbox.MapboxSdkCs.UnitTest {
-	using System;
-	using System.Collections.Generic;
+// TODO: figure out how run tests outside of Unity with .NET framework, something like '#if !UNITY'
+#if UNITY_EDITOR
+#if UNITY_5_6_OR_NEWER
+
+
+namespace Mapbox.MapboxSdkCs.UnitTest
+{
+
 	using System.Linq;
 	using Mapbox.Map;
 	using Mapbox.Platform;
 	using Mapbox.Utils;
 	using NUnit.Framework;
+#if UNITY_5_6_OR_NEWER
+	using UnityEngine.TestTools;
+	using System.Collections;
+#endif
 
 
 	[TestFixture]
-	[Ignore("not working within Unity")]
-	internal class VectorTileTest {
+	internal class VectorTileTest
+	{
 
 
 		private FileSource _fs;
+		private int _timeout = 10;
 
 
 		[SetUp]
-		public void SetUp() {
-#if UNITY_5_3_OR_NEWER
+		public void SetUp()
+		{
+#if UNITY_5_6_OR_NEWER
 			_fs = new FileSource(Unity.MapboxAccess.Instance.Configuration.AccessToken);
+			_timeout = Unity.MapboxAccess.Instance.Configuration.DefaultTimeout;
 #else
 			// when run outside of Unity FileSource gets the access token from environment variable 'MAPBOX_ACCESS_TOKEN'
 			_fs = new FileSource();
@@ -33,9 +45,15 @@ namespace Mapbox.MapboxSdkCs.UnitTest {
 		}
 
 
+
+#if UNITY_5_6_OR_NEWER
+		[UnityTest]
+		public IEnumerator ParseSuccess()
+#else
 		[Test]
-		[Ignore("not working within Unity")]
-		public void ParseSuccess() {
+		public void ParseSuccess()
+#endif
+		{
 			var map = new Map<VectorTile>(_fs);
 
 			var mapObserver = new Utils.VectorMapObserver();
@@ -44,16 +62,23 @@ namespace Mapbox.MapboxSdkCs.UnitTest {
 			// Helsinki city center.
 			map.Center = new Vector2d(60.163200, 24.937700);
 
-			for (int zoom = 15; zoom > 0; zoom--) {
+			for (int zoom = 15; zoom > 0; zoom--)
+			{
 				map.Zoom = zoom;
 				map.Update();
+#if UNITY_5_6_OR_NEWER
+				IEnumerator enumerator = _fs.WaitForAllRequests();
+				while (enumerator.MoveNext()) { yield return null; }
+#else
 				_fs.WaitForAllRequests();
+#endif
 			}
 
 			// We must have all the tiles for Helsinki from 0-15.
 			Assert.AreEqual(15, mapObserver.Tiles.Count);
 
-			foreach (var tile in mapObserver.Tiles) {
+			foreach (var tile in mapObserver.Tiles)
+			{
 				Assert.Greater(tile.LayerNames().Count, 0, "Tile contains at least one layer");
 				Mapbox.VectorTile.VectorTileLayer layer = tile.GetLayer("water");
 				Assert.NotNull(layer, "Tile contains 'water' layer. Layers: {0}", string.Join(",", tile.LayerNames().ToArray()));
@@ -67,38 +92,15 @@ namespace Mapbox.MapboxSdkCs.UnitTest {
 		}
 
 
-		//[Test]
-		//public void ParseFailure() {
-		//	var resource = TileResource.MakeVector(new CanonicalTileId(13, 5465, 2371), null);
 
-		//	var response = new Response();
-		//	response.Data = Enumerable.Repeat((byte)0, 5000).ToArray();
-
-		//	var mockFs = new Utils.MockFileSource();
-		//	mockFs.SetReponse(resource.GetUrl(), response);
-
-		//	var map = new Map<VectorTile>(mockFs);
-
-		//	var mapObserver = new Utils.VectorMapObserver();
-		//	map.Subscribe(mapObserver);
-
-		//	map.Center = new Vector2d(60.163200, 60.163200);
-		//	map.Zoom = 13;
-		//	map.Update();
-
-		//	mockFs.WaitForAllRequests();
-
-		//	// TODO: Assert.AreEqual("Parse error.", mapObserver.Error);
-		//	Assert.AreEqual(1, mapObserver.Tiles.Count);
-		//	Assert.IsNull(mapObserver.Tiles[0].Data);
-
-		//	map.Unsubscribe(mapObserver);
-		//}
-
-
+#if UNITY_5_6_OR_NEWER
+		[UnityTest]
+		public IEnumerator SeveralTiles()
+#else
 		[Test]
-		[Ignore("not working within Unity")]
-		public void SeveralTiles() {
+		public void ParseSuccess
+#endif
+		{
 			var map = new Map<VectorTile>(_fs);
 
 			var mapObserver = new Utils.VectorMapObserver();
@@ -108,14 +110,23 @@ namespace Mapbox.MapboxSdkCs.UnitTest {
 			map.Zoom = 3; // 64 tiles.
 			map.Update();
 
+#if UNITY_5_6_OR_NEWER
+			IEnumerator enumerator = _fs.WaitForAllRequests();
+			while (enumerator.MoveNext()) { yield return null; }
+#else
 			_fs.WaitForAllRequests();
+#endif
 
 			Assert.AreEqual(64, mapObserver.Tiles.Count);
 
-			foreach (var tile in mapObserver.Tiles) {
-				if (!tile.HasError) {
+			foreach (var tile in mapObserver.Tiles)
+			{
+				if (!tile.HasError)
+				{
 					Assert.Greater(tile.GeoJson.Length, 41);
-				} else {
+				}
+				else
+				{
 					Assert.GreaterOrEqual(tile.Exceptions.Count, 1, "not set enough exceptions set on 'Tile'");
 				}
 			}
@@ -126,3 +137,6 @@ namespace Mapbox.MapboxSdkCs.UnitTest {
 
 	}
 }
+
+#endif
+#endif

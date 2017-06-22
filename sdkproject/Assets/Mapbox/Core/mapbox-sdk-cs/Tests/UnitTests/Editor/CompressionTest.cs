@@ -58,7 +58,8 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 
 #if UNITY_5_6_OR_NEWER
 		[UnityTest]
-		public IEnumerator Corrupt() {
+		public IEnumerator Corrupt()
+		{
 #else
 		[Test]
 		public void Corrupt() {

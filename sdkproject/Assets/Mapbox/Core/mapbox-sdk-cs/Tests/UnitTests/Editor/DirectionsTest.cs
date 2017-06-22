@@ -23,6 +23,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		private Directions directions = new Directions(new FileSource());
 
 		[Test]
+		[Ignore("not working in Unity as 'Directions' is 'internal sealed' and mapbox-sdk-cs and tests end up in 2 different aseemblies")]
 		public void SerializesAndDeserializesBasic()
 		{
 

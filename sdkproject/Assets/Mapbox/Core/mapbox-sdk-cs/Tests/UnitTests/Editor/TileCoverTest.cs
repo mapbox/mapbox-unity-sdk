@@ -6,15 +6,19 @@
 
 namespace Mapbox.MapboxSdkCs.UnitTest
 {
-    using System;
-    using System.Collections.Generic;
-    using Mapbox.Map;
-    using Mapbox.Utils;
-    using NUnit.Framework;
 
-    [TestFixture]
+	using System;
+	using System.Collections.Generic;
+	using Mapbox.Map;
+	using Mapbox.Utils;
+	using NUnit.Framework;
+
+
+	[TestFixture]
 	internal class TileCoverTest
 	{
+
+
 		[Test]
 		public void World()
 		{
@@ -26,6 +30,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				Assert.AreEqual(Math.Pow(4, zoom), tiles.Count);
 			}
 		}
+
 
 		[Test]
 		public void Helsinki()
@@ -52,5 +57,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			var list3 = new List<CanonicalTileId>(set3);
 			Assert.AreEqual("0/0/0", list3[0].ToString());
 		}
+
+
 	}
 }
