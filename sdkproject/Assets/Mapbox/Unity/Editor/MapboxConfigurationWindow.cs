@@ -23,6 +23,14 @@ namespace Mapbox.Editor
 		string _lastAccessToken;
 		string _validationCode;
 
+		private static bool _validating = false;
+		private static bool _tokenSaved = false;
+		private static bool _savingConfig = false;
+		private static int _previousMemCacheSize = -1;
+		private static int _previousMbTilesCacheSize = -1;
+		private static int _previousWebRequestTimeout = -1;
+		private static System.Timers.Timer _timer = null;
+
 		[MenuItem("Mapbox/Configure")]
 		static void Init()
 		{
@@ -50,43 +58,19 @@ namespace Mapbox.Editor
 			window.Show();
 		}
 
-		private int _onGuiCnt = 0;
-		private int _validateCnt = 0;
-		private int _saveCnt = 0;
-
-
-		private static bool _validating = false;
-		private static bool _tokenSaved = false;
-		private static bool _savingConfig = false;
-		private static int _previousMemCacheSize = -1;
-		private static int _previousMbTilesCacheSize = -1;
-		private static int _previousWebRequestTimeout = -1;
-		private static System.Timers.Timer _timer = null;
-
 
 		// OnDestroy is called when the EditorWindow is closed
-		private void OnDestroy()
-		{
-			AssetDatabase.Refresh();
-		}
+		private void OnDestroy() { AssetDatabase.Refresh(); }
 
 		// This function is called when the object becomes disabled or inactive
-		private void OnDisable()
-		{
-			AssetDatabase.Refresh();
-		}
+		private void OnDisable() { AssetDatabase.Refresh(); }
 
 		// Called when the window loses keyboard focus
-		private void OnLostFocus()
-		{
-			AssetDatabase.Refresh();
-		}
-		
+		private void OnLostFocus() { AssetDatabase.Refresh(); }
+
 
 		void OnGUI()
 		{
-			_onGuiCnt++;
-			Debug.LogFormat("_onGuiCnt:{0} _validateCnt:{1} _saveCnt:{2}", _onGuiCnt, _validateCnt, _saveCnt);
 			EditorGUIUtility.labelWidth = 200f;
 			_memoryCacheSize = EditorGUILayout.IntSlider("Mem Cache Size (# of tiles)", _memoryCacheSize, 0, 1000);
 			_mbtilesCacheSize = EditorGUILayout.IntSlider("MBTiles Cache Size (# of tiles)", _mbtilesCacheSize, 0, 3000);
@@ -176,7 +160,6 @@ namespace Mapbox.Editor
 		{
 			try
 			{
-				_validateCnt++;
 				_validating = true;
 				_lastAccessToken = token;
 
@@ -213,7 +196,6 @@ namespace Mapbox.Editor
 			try
 			{
 				_savingConfig = true;
-				_saveCnt++;
 				var json = JsonUtility.ToJson(new MapboxConfiguration { AccessToken = _accessToken, MemoryCacheSize = (uint)_memoryCacheSize, MbTilesCacheSize = (uint)_mbtilesCacheSize, DefaultTimeout = _webRequestTimeout });
 				File.WriteAllText(_configurationFile, json);
 			}
