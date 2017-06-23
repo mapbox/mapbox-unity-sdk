@@ -50,8 +50,13 @@ namespace Mapbox.Editor
 			window.Show();
 		}
 
+		private int _onGuiCnt = 0;
+		private int _validateCnt = 0;
+		private int _saveCnt = 0;
 		void OnGUI()
 		{
+			_onGuiCnt++;
+			Debug.LogFormat("_onGuiCnt:{0} _validateCnt:{1} _saveCnt:{2}", _onGuiCnt, _validateCnt, _saveCnt);
 			EditorGUIUtility.labelWidth = 200f;
 			_memoryCacheSize = EditorGUILayout.IntSlider("Mem Cache Size (# of tiles)", _memoryCacheSize, 0, 1000);
 			_mbtilesCacheSize = EditorGUILayout.IntSlider("MBTiles Cache Size (# of tiles)", _mbtilesCacheSize, 0, 3000);
@@ -76,6 +81,7 @@ namespace Mapbox.Editor
 				var messageType = MessageType.Error;
 				if (string.Equals(_validationCode, "TokenValid"))
 				{
+					_saveCnt++;
 					messageType = MessageType.Info;
 					var json = JsonUtility.ToJson(new MapboxConfiguration { AccessToken = _accessToken, MemoryCacheSize = (uint)_memoryCacheSize, MbTilesCacheSize = (uint)_mbtilesCacheSize, DefaultTimeout = _webRequestTimeout });
 					File.WriteAllText(_configurationFile, json);
@@ -92,6 +98,7 @@ namespace Mapbox.Editor
 
 		IEnumerator ValidateToken(string token)
 		{
+			_validateCnt++;
 			_lastAccessToken = token;
 
 			var www = new WWW(Utils.Constants.BaseAPI + "tokens/v2?access_token=" + token);
