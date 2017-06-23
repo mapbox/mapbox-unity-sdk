@@ -236,19 +236,12 @@ namespace Mapbox.Platform
 					Thread.Sleep(waitTimeMs);
 					resetEvent.Set();
 				}), null);
-				UnityEngine.Debug.Log("before waitOne " + DateTime.Now.Ticks);
 				resetEvent.WaitOne();
-				UnityEngine.Debug.Log("after waitOne " + DateTime.Now.Ticks);
 				resetEvent.Close();
 				resetEvent = null;
 #endif
 			}
 		}
 #endif
-
-
-
-
-
 	}
 }
