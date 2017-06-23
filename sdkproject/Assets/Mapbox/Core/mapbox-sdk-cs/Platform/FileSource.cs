@@ -7,15 +7,25 @@
 namespace Mapbox.Platform
 {
 	using Mapbox.Map;
+	using Mapbox.Unity.Utilities;
 	using System;
+	using System.Collections;
 	using System.Collections.Generic;
+	using System.Linq;
 	using System.Net;
 	using System.Net.Security;
 #if !NETFX_CORE
 	using System.Security.Cryptography.X509Certificates;
 #endif
+#if !UNITY_5_3_OR_NEWER
 	using System.Threading;
-
+#endif
+#if UNITY_EDITOR
+	using UnityEditor;
+#endif
+#if UNITY_5_3_OR_NEWER
+	using UnityEngine;
+#endif
 
 	/// <summary>
 	///     Mono implementation of the FileSource class. It will use Mono's
@@ -97,36 +107,46 @@ namespace Mapbox.Platform
 
 			//return request;
 
-			return proxyResponse(url, callback);
+			return proxyResponse(url, callback, timeout, tileId, mapId);
 		}
 
 
 		// TODO: look at requests and implement throttling if needed
 		//private IEnumerator<IAsyncRequest> proxyResponse(string url, Action<Response> callback) {
-		private IAsyncRequest proxyResponse(string url, Action<Response> callback)
+		private IAsyncRequest proxyResponse(
+			string url
+			, Action<Response> callback
+			, int timeout
+			, CanonicalTileId tileId
+			, string mapId
+		)
 		{
 
 			// TODO: plugin caching somewhere around here
 
-			var request = IAsyncRequestFactory.CreateRequest(url, (Response response) =>
-			{
-				if (response.XRateLimitInterval.HasValue) { XRateLimitInterval = response.XRateLimitInterval; }
-				if (response.XRateLimitLimit.HasValue) { XRateLimitLimit = response.XRateLimitLimit; }
-				if (response.XRateLimitReset.HasValue) { XRateLimitReset = response.XRateLimitReset; }
-				callback(response);
-				lock (_lock)
+			var request = IAsyncRequestFactory.CreateRequest(
+				url
+				, (Response response) =>
 				{
-					//another place to catch if request has been cancelled
-					try
+					if (response.XRateLimitInterval.HasValue) { XRateLimitInterval = response.XRateLimitInterval; }
+					if (response.XRateLimitLimit.HasValue) { XRateLimitLimit = response.XRateLimitLimit; }
+					if (response.XRateLimitReset.HasValue) { XRateLimitReset = response.XRateLimitReset; }
+					callback(response);
+					lock (_lock)
 					{
-						_requests.Remove(response.Request);
-					}
-					catch (Exception ex)
-					{
-						System.Diagnostics.Debug.WriteLine(ex);
+						//another place to catch if request has been cancelled
+						try
+						{
+							_requests.Remove(response.Request);
+						}
+						catch (Exception ex)
+						{
+							System.Diagnostics.Debug.WriteLine(ex);
+						}
 					}
 				}
-			});
+				, timeout
+			);
 			lock (_lock)
 			{
 				//sometimes we get here after the request has already finished
@@ -140,24 +160,60 @@ namespace Mapbox.Platform
 		}
 
 
+#if UNITY_5_3_OR_NEWER
+		/// <summary>
+		///     Block until all the requests are processed.
+		/// </summary>
+		public IEnumerator WaitForAllRequests()
+		{
+			while (_requests.Count > 0)
+			{
+				lock (_lock)
+				{
+					List<IAsyncRequest> reqs = _requests.Keys.ToList();
+					for (int i = reqs.Count - 1; i > -1; i--)
+					{
+						if (reqs[i].IsCompleted)
+						{
+							// another place to watch out if request has been cancelled
+							try
+							{
+								_requests.Remove(reqs[i]);
+							}
+							catch (Exception ex)
+							{
+								System.Diagnostics.Debug.WriteLine(ex);
+							}
+						}
+					}
+				}
+				yield return new WaitForSeconds(0.2f);
+			}
+		}
+#endif
+
+
+
+#if !UNITY_5_3_OR_NEWER
 		/// <summary>
 		///     Block until all the requests are processed.
 		/// </summary>
 		public void WaitForAllRequests()
 		{
-			int waitTimeMs = 150;
+			int waitTimeMs = 200;
 			while (_requests.Count > 0)
 			{
 				lock (_lock)
 				{
-					foreach (var req in _requests)
+					List<IAsyncRequest> reqs = _requests.Keys.ToList();
+					for (int i = reqs.Count - 1; i > -1; i--)
 					{
-						if (((IAsyncRequest)req.Key).IsCompleted)
+						if (reqs[i].IsCompleted)
 						{
 							// another place to watch out if request has been cancelled
 							try
 							{
-								_requests.Remove(req.Key);
+								_requests.Remove(reqs[i]);
 							}
 							catch (Exception ex)
 							{
@@ -167,7 +223,9 @@ namespace Mapbox.Platform
 					}
 				}
 
-#if !WINDOWS_UWP
+#if WINDOWS_UWP
+				System.Threading.Tasks.Task.Delay(waitTimeMs).Wait();
+#else
 				//Thread.Sleep(50);
 				// TODO: get rid of DoEvents!!! and find non-blocking wait that works for Net3.5
 				//System.Windows.Forms.Application.DoEvents();
@@ -181,16 +239,9 @@ namespace Mapbox.Platform
 				resetEvent.WaitOne();
 				resetEvent.Close();
 				resetEvent = null;
-
-#else
-				System.Threading.Tasks.Task.Delay(waitTimeMs).Wait();
 #endif
 			}
 		}
-
-
-
-
-
+#endif
 	}
 }

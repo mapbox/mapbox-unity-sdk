@@ -28,7 +28,7 @@ namespace Mapbox.Unity.Utilities
 
 		// TODO: simplify timeout for Unity 5.6+
 		// https://docs.unity3d.com/ScriptReference/Networking.UnityWebRequest-timeout.html
-		public HTTPRequest(string url, Action<Response> callback, int timeout = 10)
+		public HTTPRequest(string url, Action<Response> callback, int timeout)
 		{
 			//UnityEngine.Debug.Log("HTTPRequest: " + url);
 			IsCompleted = false;
@@ -59,14 +59,13 @@ namespace Mapbox.Unity.Utilities
 		{
 			_request.Send();
 
-			float timer = 0f;
+			DateTime timeout = DateTime.Now.AddSeconds(_timeout);
 			bool didTimeout = false;
 
 			while (!_request.isDone)
 			{
 				yield return null;
-				timer += Time.deltaTime;
-				if (timer > _timeout)
+				if (DateTime.Now > timeout)
 				{
 					_request.Abort();
 					didTimeout = true;
