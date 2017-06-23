@@ -53,6 +53,12 @@ namespace Mapbox.Editor
 		private int _onGuiCnt = 0;
 		private int _validateCnt = 0;
 		private int _saveCnt = 0;
+
+
+		private bool _validating = false;
+		private bool _tokenSaved = false;
+
+
 		void OnGUI()
 		{
 			_onGuiCnt++;
@@ -63,9 +69,10 @@ namespace Mapbox.Editor
 			_webRequestTimeout = EditorGUILayout.IntField("Default Web Request Timeout", _webRequestTimeout);
 
 			_accessToken = EditorGUILayout.TextField("Access Token", _accessToken);
-			if (string.IsNullOrEmpty(_accessToken))
+
+			if (string.IsNullOrEmpty(_accessToken) || _accessToken.Length != 61)
 			{
-				EditorGUILayout.HelpBox("You must have an access token!", MessageType.Error);
+				EditorGUILayout.HelpBox("You must have a valid access token!", MessageType.Error);
 				if (GUILayout.Button("Get a token from mapbox.com for free"))
 				{
 					Application.OpenURL("https://www.mapbox.com/studio/account/tokens/");
@@ -73,43 +80,58 @@ namespace Mapbox.Editor
 			}
 			else
 			{
-				if (!string.Equals(_accessToken, _lastAccessToken) || string.IsNullOrEmpty(_validationCode))
+				if (
+					(!string.Equals(_accessToken, _lastAccessToken) || string.IsNullOrEmpty(_validationCode))
+					&& !_validating
+				)
 				{
 					Runnable.Run(ValidateToken(_accessToken));
 				}
 
-				var messageType = MessageType.Error;
-				if (string.Equals(_validationCode, "TokenValid"))
+				if (string.Equals(_validationCode, "TokenValid") && !_tokenSaved)
 				{
-					_saveCnt++;
-					messageType = MessageType.Info;
-					var json = JsonUtility.ToJson(new MapboxConfiguration { AccessToken = _accessToken, MemoryCacheSize = (uint)_memoryCacheSize, MbTilesCacheSize = (uint)_mbtilesCacheSize, DefaultTimeout = _webRequestTimeout });
-					File.WriteAllText(_configurationFile, json);
-					AssetDatabase.Refresh();
-					EditorGUILayout.HelpBox("TokenValid: saved to " + _configurationFile, messageType);
+					SaveConfiguration();
+					EditorGUILayout.HelpBox("TokenValid: saved to " + _configurationFile, MessageType.Info);
+					_tokenSaved = true;
+				}
+				else if (string.Equals(_validationCode, "TokenValid") && _tokenSaved)
+				{
+					EditorGUILayout.HelpBox("TokenValid: saved to " + _configurationFile, MessageType.Info);
+				}
+				else if (_validating)
+				{
+					EditorGUILayout.HelpBox("Verifying token!", MessageType.Error);
 				}
 				else
 				{
-					EditorGUILayout.HelpBox(_validationCode, messageType);
+					EditorGUILayout.HelpBox(_validationCode, MessageType.Error);
 				}
-				Repaint();
 			}
 		}
 
 		IEnumerator ValidateToken(string token)
 		{
-			_validateCnt++;
-			_lastAccessToken = token;
+			try
+			{
+				_validateCnt++;
+				_validating = true;
+				_lastAccessToken = token;
 
-			var www = new WWW(Utils.Constants.BaseAPI + "tokens/v2?access_token=" + token);
-			while (!www.isDone)
-			{
-				yield return 0;
+				var www = new WWW(Utils.Constants.BaseAPI + "tokens/v2?access_token=" + token);
+				while (!www.isDone)
+				{
+					yield return 0;
+				}
+				var json = www.text;
+				if (!string.IsNullOrEmpty(json))
+				{
+					ParseTokenResponse(json);
+				}
 			}
-			var json = www.text;
-			if (!string.IsNullOrEmpty(json))
+			finally
 			{
-				ParseTokenResponse(json);
+				_validating = false;
+				Repaint();
 			}
 		}
 
@@ -121,5 +143,15 @@ namespace Mapbox.Editor
 				_validationCode = dict["code"].ToString();
 			}
 		}
+
+
+		void SaveConfiguration()
+		{
+			_saveCnt++;
+			var json = JsonUtility.ToJson(new MapboxConfiguration { AccessToken = _accessToken, MemoryCacheSize = (uint)_memoryCacheSize, MbTilesCacheSize = (uint)_mbtilesCacheSize, DefaultTimeout = _webRequestTimeout });
+			File.WriteAllText(_configurationFile, json);
+			AssetDatabase.Refresh();
+		}
+
 	}
 }
