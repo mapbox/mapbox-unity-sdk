@@ -42,9 +42,9 @@ namespace Mapbox.Editor
 			var configurationJson = File.ReadAllText(_configurationFile);
 			_mapboxConfiguration = JsonUtility.FromJson<MapboxConfiguration>(configurationJson);
 			_accessToken = _mapboxConfiguration.AccessToken;
-			_memoryCacheSize = (int)_mapboxConfiguration.MemoryCacheSize;
-			_mbtilesCacheSize = (int)_mapboxConfiguration.MbTilesCacheSize;
-			_webRequestTimeout = _mapboxConfiguration.DefaultTimeout;
+			_memoryCacheSize = _previousMemCacheSize = (int)_mapboxConfiguration.MemoryCacheSize;
+			_mbtilesCacheSize = _previousMbTilesCacheSize = (int)_mapboxConfiguration.MbTilesCacheSize;
+			_webRequestTimeout = _previousWebRequestTimeout = _mapboxConfiguration.DefaultTimeout;
 
 			var window = (MapboxConfigurationWindow)GetWindow(typeof(MapboxConfigurationWindow));
 			window.Show();
@@ -55,9 +55,33 @@ namespace Mapbox.Editor
 		private int _saveCnt = 0;
 
 
-		private bool _validating = false;
-		private bool _tokenSaved = false;
+		private static bool _validating = false;
+		private static bool _tokenSaved = false;
+		private static bool _savingConfig = false;
+		private static int _previousMemCacheSize = -1;
+		private static int _previousMbTilesCacheSize = -1;
+		private static int _previousWebRequestTimeout = -1;
+		private static System.Timers.Timer _timer = null;
 
+
+		// OnDestroy is called when the EditorWindow is closed
+		private void OnDestroy()
+		{
+			AssetDatabase.Refresh();
+		}
+
+		// This function is called when the object becomes disabled or inactive
+		private void OnDisable()
+		{
+			AssetDatabase.Refresh();
+		}
+
+		// Called when the window loses keyboard focus
+		private void OnLostFocus()
+		{
+			AssetDatabase.Refresh();
+		}
+		
 
 		void OnGUI()
 		{
@@ -67,6 +91,10 @@ namespace Mapbox.Editor
 			_memoryCacheSize = EditorGUILayout.IntSlider("Mem Cache Size (# of tiles)", _memoryCacheSize, 0, 1000);
 			_mbtilesCacheSize = EditorGUILayout.IntSlider("MBTiles Cache Size (# of tiles)", _mbtilesCacheSize, 0, 3000);
 			_webRequestTimeout = EditorGUILayout.IntField("Default Web Request Timeout", _webRequestTimeout);
+
+
+			#region handle token verification
+
 
 			_accessToken = EditorGUILayout.TextField("Access Token", _accessToken);
 
@@ -107,7 +135,42 @@ namespace Mapbox.Editor
 					EditorGUILayout.HelpBox(_validationCode, MessageType.Error);
 				}
 			}
+
+
+			#endregion
+
+
+			if (
+				_memoryCacheSize != _previousMemCacheSize
+				|| _mbtilesCacheSize != _previousMbTilesCacheSize
+				|| _webRequestTimeout != _previousWebRequestTimeout
+			)
+			{
+				if (null != _timer)
+				{
+					_timer.Stop();
+					_timer.Elapsed -= Timer_Elapsed;
+					_timer.Dispose();
+					_timer = null;
+				}
+
+				_timer = new System.Timers.Timer(500);
+				_timer.AutoReset = true;
+				_timer.Elapsed += Timer_Elapsed;
+				_timer.Start();
+			}
+
+			_previousMemCacheSize = _memoryCacheSize;
+			_previousMbTilesCacheSize = _mbtilesCacheSize;
+			_previousWebRequestTimeout = _webRequestTimeout;
+
 		}
+
+		private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+		{
+			SaveConfiguration(); ;
+		}
+
 
 		IEnumerator ValidateToken(string token)
 		{
@@ -147,10 +210,17 @@ namespace Mapbox.Editor
 
 		void SaveConfiguration()
 		{
-			_saveCnt++;
-			var json = JsonUtility.ToJson(new MapboxConfiguration { AccessToken = _accessToken, MemoryCacheSize = (uint)_memoryCacheSize, MbTilesCacheSize = (uint)_mbtilesCacheSize, DefaultTimeout = _webRequestTimeout });
-			File.WriteAllText(_configurationFile, json);
-			AssetDatabase.Refresh();
+			try
+			{
+				_savingConfig = true;
+				_saveCnt++;
+				var json = JsonUtility.ToJson(new MapboxConfiguration { AccessToken = _accessToken, MemoryCacheSize = (uint)_memoryCacheSize, MbTilesCacheSize = (uint)_mbtilesCacheSize, DefaultTimeout = _webRequestTimeout });
+				File.WriteAllText(_configurationFile, json);
+			}
+			finally
+			{
+				_savingConfig = false;
+			}
 		}
 
 	}
