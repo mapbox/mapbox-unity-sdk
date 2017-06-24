@@ -245,10 +245,5 @@ namespace Mapbox.Platform
 			}
 		}
 #endif
-
-
-
-
-
 	}
 }
