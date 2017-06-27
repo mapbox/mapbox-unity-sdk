@@ -82,7 +82,15 @@ namespace Mapbox.Editor
 
 			_accessToken = EditorGUILayout.TextField("Access Token", _accessToken);
 
-			if (string.IsNullOrEmpty(_accessToken) || _accessToken.Length != 61)
+			bool matchSuccess = false;
+			if (!string.IsNullOrEmpty(_accessToken))
+			{
+				System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex(@"^[pst]k\.[0-9a-zA-Z-_]+\.[0-9a-zA-Z-_]+$");
+				System.Text.RegularExpressions.Match match = regex.Match(_accessToken);
+				matchSuccess = match.Success;
+			}
+
+			if (string.IsNullOrEmpty(_accessToken) || !matchSuccess)
 			{
 				EditorGUILayout.HelpBox("You must have a valid access token!", MessageType.Error);
 				if (GUILayout.Button("Get a token from mapbox.com for free"))
@@ -139,9 +147,10 @@ namespace Mapbox.Editor
 				}
 
 				_timer = new System.Timers.Timer(500);
-				_timer.AutoReset = true;
+				_timer.AutoReset = false;
 				_timer.Elapsed += Timer_Elapsed;
 				_timer.Start();
+
 			}
 
 			_previousMemCacheSize = _memoryCacheSize;
@@ -196,6 +205,11 @@ namespace Mapbox.Editor
 			try
 			{
 				_savingConfig = true;
+				// if access token is not valid, but save was triggered by changing other parameters, nuke it
+				if (!string.Equals(_validationCode, "TokenValid"))
+				{
+					_accessToken = "";
+				}
 				var json = JsonUtility.ToJson(new MapboxConfiguration { AccessToken = _accessToken, MemoryCacheSize = (uint)_memoryCacheSize, MbTilesCacheSize = (uint)_mbtilesCacheSize, DefaultTimeout = _webRequestTimeout });
 				File.WriteAllText(_configurationFile, json);
 			}
