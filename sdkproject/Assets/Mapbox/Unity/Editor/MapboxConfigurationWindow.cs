@@ -92,6 +92,7 @@ namespace Mapbox.Editor
 
 			if (string.IsNullOrEmpty(_accessToken) || !matchSuccess)
 			{
+				_tokenSaved = false;
 				EditorGUILayout.HelpBox("You must have a valid access token!", MessageType.Error);
 				if (GUILayout.Button("Get a token from mapbox.com for free"))
 				{
