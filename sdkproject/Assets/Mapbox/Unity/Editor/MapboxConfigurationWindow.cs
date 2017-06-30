@@ -74,7 +74,7 @@ namespace Mapbox.Editor
 			EditorGUIUtility.labelWidth = 200f;
 			_memoryCacheSize = EditorGUILayout.IntSlider("Mem Cache Size (# of tiles)", _memoryCacheSize, 0, 1000);
 			_mbtilesCacheSize = EditorGUILayout.IntSlider("MBTiles Cache Size (# of tiles)", _mbtilesCacheSize, 0, 3000);
-			_webRequestTimeout = EditorGUILayout.IntField("Default Web Request Timeout (ms)", _webRequestTimeout);
+			_webRequestTimeout = EditorGUILayout.IntField("Default Web Request Timeout (s)", _webRequestTimeout);
 
 
 			#region handle token verification
