@@ -11,6 +11,7 @@ public class TerrainFactoryEditor : FactoryEditor
 		sampleCount_Prop,
 		mapIdType_Prop,
 		heightMod_Prop,
+		relativeHeight_Prop,
 		customMapId_Prop,
 		material_Prop,
 		mapId_Prop,
@@ -25,6 +26,7 @@ public class TerrainFactoryEditor : FactoryEditor
 		mapIdType_Prop = serializedObject.FindProperty("_mapIdType");
 		sampleCount_Prop = serializedObject.FindProperty("_sampleCount");
 		heightMod_Prop = serializedObject.FindProperty("_heightModifier");
+		relativeHeight_Prop = serializedObject.FindProperty("_useRelativeHeight");
 		mapId_Prop = serializedObject.FindProperty("_mapId");
 		customMapId_Prop = serializedObject.FindProperty("_customMapId");
 		material_Prop = serializedObject.FindProperty("_baseMaterial");
@@ -68,6 +70,13 @@ public class TerrainFactoryEditor : FactoryEditor
 				break;
 		}
 		EditorGUILayout.PropertyField(heightMod_Prop, new GUIContent("Height Multiplier"));
+		EditorGUILayout.PropertyField(relativeHeight_Prop, new GUIContent("Use Relative Height"));
+		if (relativeHeight_Prop.boolValue)
+		{
+			EditorGUILayout.HelpBox("Height will be scaled to reflect elevation relative" +
+			                        " to the area the tile covers." +
+			                        " This improves perceived elevation at extreme latitudes.", MessageType.Info);
+		}
 
 		EditorGUI.indentLevel--;
 
