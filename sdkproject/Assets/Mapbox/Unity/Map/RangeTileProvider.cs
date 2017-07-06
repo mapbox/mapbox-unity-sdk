@@ -6,14 +6,20 @@ namespace Mapbox.Unity.Map
 	public class RangeTileProvider : AbstractTileProvider
 	{
 		[SerializeField]
-		Vector4 _range;
+		private int _west;
+		[SerializeField]
+		private int _north;
+		[SerializeField]
+		private int _east;
+		[SerializeField]
+		private int _south;
 
 		internal override void OnInitialized()
 		{
 			var centerTile = TileCover.CoordinateToTileId(_map.CenterLatitudeLongitude, _map.Zoom);
-			for (int x = (int)(centerTile.X- _range.x); x <= (centerTile.X + _range.z); x++)
+			for (int x = (int)(centerTile.X - _west); x <= (centerTile.X + _east); x++)
 			{
-				for (int y = (int)(centerTile.Y - _range.y); y <= (centerTile.Y + _range.w); y++)
+				for (int y = (int)(centerTile.Y - _north); y <= (centerTile.Y + _south); y++)
 				{
 					AddTile(new UnwrappedTileId(_map.Zoom, x, y));
 				}

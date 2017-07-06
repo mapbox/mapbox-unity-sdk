@@ -11,8 +11,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 	public class UnityTile : MonoBehaviour
 	{
-		float[] _heightData;
+		[SerializeField]
 		Texture2D _rasterData;
+
+		float[] _heightData;
+
 		float _relativeScale;
 
 		Texture2D _heightTexture;
@@ -135,7 +138,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			OnRecycled(this);
 		}
 
-		internal void SetHeightData(byte[] data, float heightMultiplier = 1f)
+		internal void SetHeightData(byte[] data, float heightMultiplier = 1f, bool useRelative = false)
 		{
 			// HACK: compute height values for terrain. We could probably do this without a texture2d.
 			if (_heightTexture == null)
@@ -154,6 +157,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				_heightData = new float[256 * 256];
 			}
 
+			var relativeScale = useRelative ? _relativeScale : 1f;
 			for (int xx = 0; xx < 256; ++xx)
 			{
 				for (int yy = 0; yy < 256; ++yy)
@@ -161,7 +165,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					float r = rgbData[(xx * 256 + yy) * 4 + 1];
 					float g = rgbData[(xx * 256 + yy) * 4 + 2];
 					float b = rgbData[(xx * 256 + yy) * 4 + 3];
-					_heightData[xx * 256 + yy] = Conversions.GetAbsoluteHeightFromColor(r, g, b) * _relativeScale * heightMultiplier;
+					_heightData[xx * 256 + yy] = relativeScale * heightMultiplier * Conversions.GetAbsoluteHeightFromColor(r, g, b);
 				}
 			}
 
