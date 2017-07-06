@@ -11,11 +11,13 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 	public class UnityTile : MonoBehaviour
 	{
-		float[] _heightData;
 		[SerializeField]
 		Texture2D _rasterData;
+
+		float[] _heightData;
+
 		float _relativeScale;
-		[SerializeField]
+
 		Texture2D _heightTexture;
 
 		List<Tile> _tiles = new List<Tile>();
