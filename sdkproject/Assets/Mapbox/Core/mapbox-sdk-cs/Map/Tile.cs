@@ -4,7 +4,8 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace Mapbox.Map {
+namespace Mapbox.Map
+{
 	using System;
 	using Mapbox.Platform;
 	using System.Linq;
@@ -17,7 +18,8 @@ namespace Mapbox.Map {
 	///    bounding box. More info <see href="https://en.wikipedia.org/wiki/Tiled_web_map">
 	///    here </see>.
 	/// </summary>
-	public abstract class Tile : IAsyncRequest {
+	public abstract class Tile : IAsyncRequest
+	{
 
 
 		private CanonicalTileId _id;
@@ -28,7 +30,8 @@ namespace Mapbox.Map {
 
 
 		/// <summary> Tile state. </summary>
-		public enum State {
+		public enum State
+		{
 			/// <summary> New tile, not yet initialized. </summary>
 			New,
 			/// <summary> Loading data. </summary>
@@ -41,29 +44,35 @@ namespace Mapbox.Map {
 
 		/// <summary> Gets the <see cref="T:Mapbox.Map.CanonicalTileId"/> identifier. </summary>
 		/// <value> The canonical tile identifier. </value>
-		public CanonicalTileId Id {
+		public CanonicalTileId Id
+		{
 			get { return _id; }
 			set { _id = value; }
 		}
 
 
 		/// <summary>Flag to indicate if the request was successful</summary>
-		public bool HasError {
-			get {
+		public bool HasError
+		{
+			get
+			{
 				return _exceptions == null ? false : _exceptions.Count > 0;
 			}
 		}
 
 
 		/// <summary> Exceptions that might have occured during creation of the tile. </summary>
-		public ReadOnlyCollection<Exception> Exceptions {
+		public ReadOnlyCollection<Exception> Exceptions
+		{
 			get { return null == _exceptions ? null : _exceptions.AsReadOnly(); }
 		}
 
 
 		/// <summary> Messages of exceptions otherwise empty string. </summary>
-		public string ExceptionsAsString {
-			get {
+		public string ExceptionsAsString
+		{
+			get
+			{
 				if (null == _exceptions || _exceptions.Count == 0) { return string.Empty; }
 				return string.Join(Environment.NewLine, _exceptions.Select(e => e.Message).ToArray());
 			}
@@ -74,7 +83,8 @@ namespace Mapbox.Map {
 		/// Sets the error message.
 		/// </summary>
 		/// <param name="errorMessage"></param>
-		internal void AddException(Exception ex) {
+		internal void AddException(Exception ex)
+		{
 			if (null == _exceptions) { _exceptions = new List<Exception>(); }
 			_exceptions.Add(ex);
 		}
@@ -86,8 +96,10 @@ namespace Mapbox.Map {
 		///     is accusing any error.
 		/// </summary>
 		/// <value> The tile state. </value>
-		public State CurrentState {
-			get {
+		public State CurrentState
+		{
+			get
+			{
 				return _state;
 			}
 		}
@@ -107,34 +119,36 @@ namespace Mapbox.Map {
 		/// </summary>
 		/// <param name="param"> Initialization parameters. </param>
 		/// <param name="callback"> The completion callback. </param>
-		public void Initialize(Parameters param, Action callback) {
+		public void Initialize(Parameters param, Action callback)
+		{
 			Cancel();
 
 			_state = State.Loading;
 			_id = param.Id;
 			_callback = callback;
-			_request = param.Fs.Request(MakeTileResource(param.MapId).GetUrl(), HandleTileResponse);
+			_request = param.Fs.Request(MakeTileResource(param.MapId).GetUrl(), HandleTileResponse, tileId: _id, mapId: param.MapId);
 		}
 
-        internal void Initialize(IFileSource fileSource, CanonicalTileId canonicalTileId, string mapId, Action p)
-        {
-            Cancel();
+		internal void Initialize(IFileSource fileSource, CanonicalTileId canonicalTileId, string mapId, Action p)
+		{
+			Cancel();
 
-            _state = State.Loading;
-            _id = canonicalTileId;
-            _callback = p;
-            _request = fileSource.Request(MakeTileResource(mapId).GetUrl(), HandleTileResponse);
-        }
+			_state = State.Loading;
+			_id = canonicalTileId;
+			_callback = p;
+			_request = fileSource.Request(MakeTileResource(mapId).GetUrl(), HandleTileResponse, tileId: _id, mapId: mapId);
+		}
 
-        /// <summary>
-        ///     Returns a <see cref="T:System.String"/> that represents the current
-        ///     <see cref="T:Mapbox.Map.Tile"/>.
-        /// </summary>
-        /// <returns>
-        ///     A <see cref="T:System.String"/> that represents the current
-        ///     <see cref="T:Mapbox.Map.Tile"/>.
-        /// </returns>
-        public override string ToString() {
+		/// <summary>
+		///     Returns a <see cref="T:System.String"/> that represents the current
+		///     <see cref="T:Mapbox.Map.Tile"/>.
+		/// </summary>
+		/// <returns>
+		///     A <see cref="T:System.String"/> that represents the current
+		///     <see cref="T:Mapbox.Map.Tile"/>.
+		/// </returns>
+		public override string ToString()
+		{
 			return Id.ToString();
 		}
 
@@ -163,8 +177,10 @@ namespace Mapbox.Map {
 		///	});
 		/// </code>
 		/// </example>
-		public void Cancel() {
-			if (_request != null) {
+		public void Cancel()
+		{
+			if (_request != null)
+			{
 				_request.Cancel();
 				_request = null;
 			}
@@ -185,11 +201,15 @@ namespace Mapbox.Map {
 		// a Worker class to abstract this, so on platforms that support threads (like Unity
 		// on the desktop, Android, etc) we can use worker threads and when building for
 		// the browser, we keep it single-threaded.
-		private void HandleTileResponse(Response response) {
+		private void HandleTileResponse(Response response)
+		{
 
-			if (response.HasError) {
+			if (response.HasError)
+			{
 				response.Exceptions.ToList().ForEach(e => AddException(e));
-			} else {
+			}
+			else
+			{
 				// only try to parse if request was successful
 
 				// current implementation doesn't need to check if parsing is successful:
@@ -218,7 +238,8 @@ namespace Mapbox.Map {
 		/// parameters.MapId = "mapbox.mapbox-streets-v7";
 		/// </code>
 		/// </example>
-		public struct Parameters {
+		public struct Parameters
+		{
 			/// <summary> The tile id. </summary>
 			public CanonicalTileId Id;
 

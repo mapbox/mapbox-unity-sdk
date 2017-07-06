@@ -56,7 +56,7 @@ namespace Mapbox.Examples.LocationProvider
 
 		Vector3 _targetPosition;
 
-		void Awake()
+		void Start()
 		{
 			LocationProvider.OnLocationUpdated += LocationProvider_OnLocationUpdated;
 			_map.OnInitialized += () => _isInitialized = true;

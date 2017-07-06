@@ -7,6 +7,7 @@ namespace Mapbox.Unity
 	using Mapbox.Platform;
 	using Mapbox.Platform.Cache;
 	using Mapbox.Unity.Telemetry;
+	using Mapbox.Map;
 
 	/// <summary>
 	/// Object for retrieving an API token and making http requests.
@@ -64,19 +65,42 @@ namespace Mapbox.Unity
 		}
 
 
+
+		/// <summary>
+		/// Clear all existing tile caches. Deletes MBTiles database files.
+		/// </summary>
+		public void ClearCache()
+		{
+			CachingWebFileSource cwfs = _fileSource as CachingWebFileSource;
+			if (null != cwfs)
+			{
+				cwfs.Clear();
+			}
+		}
+
+
 		/// <summary>
 		/// Loads the access token from <see href="https://docs.unity3d.com/Manual/BestPracticeUnderstandingPerformanceInUnity6.html">Resources folder</see>.
 		/// </summary>
 		private void LoadAccessToken()
 		{
 			TextAsset configurationTextAsset = Resources.Load<TextAsset>(Constants.Path.MAPBOX_RESOURCES_RELATIVE);
+#if !WINDOWS_UWP
 			Configuration = configurationTextAsset == null ? null : JsonUtility.FromJson<MapboxConfiguration>(configurationTextAsset.text);
+#else
+			Configuration = configurationTextAsset == null ? null : Mapbox.Json.JsonConvert.DeserializeObject<MapboxConfiguration>(configurationTextAsset.text);
+#endif
 		}
 
 
 		void ConfigureFileSource()
 		{
-			_fileSource = new CachingWebFileSource(_configuration.AccessToken).AddCache(new MemoryCache(_configuration.MemoryCacheSize));
+			_fileSource = new CachingWebFileSource(_configuration.AccessToken)
+				.AddCache(new MemoryCache(_configuration.MemoryCacheSize))
+#if !UNITY_WEBGL
+				.AddCache(new MbTilesCache(_configuration.MbTilesCacheSize))
+#endif
+				;
 		}
 
 
@@ -116,9 +140,15 @@ namespace Mapbox.Unity
 		/// <returns>The request.</returns>
 		/// <param name="url">URL.</param>
 		/// <param name="callback">Callback.</param>
-		public IAsyncRequest Request(string url, Action<Response> callback, int timeout = 10)
+		public IAsyncRequest Request(
+			string url
+			, Action<Response> callback
+			, int timeout = 10
+			, CanonicalTileId tileId = new CanonicalTileId()
+			, string mapId = null
+		)
 		{
-			return _fileSource.Request(url, callback, _configuration.DefaultTimeout);
+			return _fileSource.Request(url, callback, _configuration.DefaultTimeout, tileId, mapId);
 		}
 
 
@@ -167,7 +197,8 @@ namespace Mapbox.Unity
 	public class MapboxConfiguration
 	{
 		public string AccessToken;
-		public int MemoryCacheSize;
-		public int DefaultTimeout;
+		public uint MemoryCacheSize = 500;
+		public uint MbTilesCacheSize = 2000;
+		public int DefaultTimeout = 10;
 	}
 }
