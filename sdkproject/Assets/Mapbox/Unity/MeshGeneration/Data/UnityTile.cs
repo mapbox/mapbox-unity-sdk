@@ -101,13 +101,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			_relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
 			_rect = Conversions.TileBounds(tileId);
 			_canonicalTileId = tileId.Canonical;
-			var position = new Vector3((float)(Rect.Center.x - map.CenterMercator.x), 0, (float)(Rect.Center.y - map.CenterMercator.y));
-
-#if !UNITY_EDITOR
-			position *= map.WorldRelativeScale;
-#else
 			gameObject.name = tileId.ToString();
-#endif
+			var position = new Vector3((float)(Rect.Center.x - map.CenterMercator.x), 0, (float)(Rect.Center.y - map.CenterMercator.y));
 			transform.localPosition = position;
 			gameObject.SetActive(true);
 		}
