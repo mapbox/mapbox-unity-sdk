@@ -30,10 +30,12 @@ namespace Mapbox.Editor
 		private static int _previousMbTilesCacheSize = -1;
 		private static int _previousWebRequestTimeout = -1;
 		private static System.Timers.Timer _timer = null;
+		private static MapboxConfigurationWindow _configWindow = null;
 
 		[MenuItem("Mapbox/Configure")]
 		static void Init()
 		{
+
 			_configurationFile = Path.Combine(Unity.Constants.Path.MAPBOX_RESOURCES_ABSOLUTE, Unity.Constants.Path.CONFIG_FILE);
 
 			Runnable.EnableRunnableInEditor();
@@ -54,8 +56,8 @@ namespace Mapbox.Editor
 			_mbtilesCacheSize = _previousMbTilesCacheSize = (int)_mapboxConfiguration.MbTilesCacheSize;
 			_webRequestTimeout = _previousWebRequestTimeout = _mapboxConfiguration.DefaultTimeout;
 
-			var window = (MapboxConfigurationWindow)GetWindow(typeof(MapboxConfigurationWindow));
-			window.Show();
+			_configWindow = (MapboxConfigurationWindow)GetWindow(typeof(MapboxConfigurationWindow));
+			_configWindow.Show();
 		}
 
 
@@ -71,6 +73,12 @@ namespace Mapbox.Editor
 
 		void OnGUI()
 		{
+			if (null == _configWindow)
+			{
+				Init();
+				return;
+			}
+
 			EditorGUIUtility.labelWidth = 200f;
 			_memoryCacheSize = EditorGUILayout.IntSlider("Mem Cache Size (# of tiles)", _memoryCacheSize, 0, 1000);
 			_mbtilesCacheSize = EditorGUILayout.IntSlider("MBTiles Cache Size (# of tiles)", _mbtilesCacheSize, 0, 3000);
