@@ -1,106 +1,94 @@
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using TriangleNet;
-    using TriangleNet.Geometry;
-    using UnityEngine;
-    using Mapbox.Unity.MeshGeneration.Data;
-    using TriangleNet.Meshing;
-    using System;
-    using TriangleNet.Smoothing;
-    using Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers;
+	using System.Collections.Generic;
+	using System.Linq;
+	using TriangleNet;
+	using TriangleNet.Geometry;
+	using UnityEngine;
+	using Mapbox.Unity.MeshGeneration.Data;
+	using TriangleNet.Meshing;
+	using System;
+	using TriangleNet.Smoothing;
+	using Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers;
 
-    /// <summary>
-    /// Polygon modifier creates the polygon (vertex&triangles) using the original vertex list.
-    /// Currently uses Triangle.Net for triangulation, which occasionally adds extra vertices to maintain a good triangulation so output vertex list might not be exactly same as the original vertex list.
-    /// </summary>
-    [CreateAssetMenu(menuName = "Mapbox/Modifiers/Polygon Mesh Modifier")]
-    public class PolygonMeshModifier : MeshModifier
-    {
-        public override ModifierType Type { get { return ModifierType.Preprocess; } }
-        private int counter = 0;
+	/// <summary>
+	/// Polygon modifier creates the polygon (vertex&triangles) using the original vertex list.
+	/// Currently uses Triangle.Net for triangulation, which occasionally adds extra vertices to maintain a good triangulation so output vertex list might not be exactly same as the original vertex list.
+	/// </summary>
+	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Polygon Mesh Modifier")]
+	public class PolygonMeshModifier : MeshModifier
+	{
+		public override ModifierType Type { get { return ModifierType.Preprocess; } }
+		private int counter = 0;
 
-        public void OnEnable()
-        {
-            counter = 0;
-        }
+		public void OnEnable()
+		{
+			counter = 0;
+		}
 
-        public bool IsClockwise(IList<Vector3> vertices)
-        {
-            double sum = 0.0;
-            for (int i = 0; i < vertices.Count; i++)
-            {
-                Vector3 v1 = vertices[i];
-                Vector3 v2 = vertices[(i + 1) % vertices.Count];
-                sum += (v2.x - v1.x) * (v2.z + v1.z);
-            }
-            return sum > 0.0;
-        }
+		public bool IsClockwise(IList<Vector3> vertices)
+		{
+			double sum = 0.0;
+			for (int i = 0; i < vertices.Count; i++)
+			{
+				Vector3 v1 = vertices[i];
+				Vector3 v2 = vertices[(i + 1) % vertices.Count];
+				sum += (v2.x - v1.x) * (v2.z + v1.z);
+			}
+			return sum > 0.0;
+		}
 
-        public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
-        {
-            List<List<Vector3>> set = new List<List<Vector3>>();
-            Data data = null;
-            List<int> rest = null;
-            var st = 0;
-            md.Triangles.Add(new List<int>());
-            foreach (var sub in feature.Points)
-            {
-                if (IsClockwise(sub))
-                {
-                    if (md.Vertices.Count > 0)
-                    {
-                        data = EarcutLibrary.Flatten(set);
-                        rest = EarcutLibrary.Earcut(data.Vertices, data.Holes, data.Dim);
+		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
+		{
+			var subset = new List<List<Vector3>>();
+			Data flatData = null;
+			List<int> result = null;
+			var currentIndex = 0;
 
-						for (int i = 0; i < rest.Count; i++)
-						{
-							md.Triangles[0].Add(rest[i] + st);
-						}
-                        st = md.Vertices.Count;
+			List<int> triList = null;
 
-                        set.Clear();
-                        set.Add(sub);
-                        var c = md.Vertices.Count;
-                        for (int i = 0; i < sub.Count; i++)
-                        {
-                            md.Edges.Add(c + ((i + 1) % sub.Count));
-                            md.Edges.Add(c + i);
-                            md.Vertices.Add(sub[i]);
-                            md.Normals.Add(Constants.Math.Vector3Up);
-                        }
-                    }
-                    else
-                    {
-                        set.Add(sub);
-                        var c = md.Vertices.Count;
-                        for (int i = 0; i < sub.Count; i++)
-                        {
-                            md.Edges.Add(c + ((i + 1) % sub.Count));
-                            md.Edges.Add(c + i);
-                            md.Vertices.Add(sub[i]);
-                            md.Normals.Add(Constants.Math.Vector3Up);
-                        }
-                    }
-                }
-                else
-                {
-                    set.Add(sub);
-                    var c = md.Vertices.Count;
-                    for (int i = 0; i < sub.Count; i++)
-                    {
-                        md.Edges.Add(c + ((i + 1) % sub.Count));
-                        md.Edges.Add(c + i);
-                        md.Vertices.Add(sub[i]);
-                        md.Normals.Add(Constants.Math.Vector3Up);
-                    }
-                }
-            }
+			foreach (var sub in feature.Points)
+			{
+				//earcut is built to handle one polygon with multiple holes
+				//point data can contain multiple polygons though, so we're handling them separately here
+				if (IsClockwise(sub) && md.Vertices.Count > 0)
+				{
+					flatData = EarcutLibrary.Flatten(subset);
+					result = EarcutLibrary.Earcut(flatData.Vertices, flatData.Holes, flatData.Dim);
 
-            data = EarcutLibrary.Flatten(set);
-            rest = EarcutLibrary.Earcut(data.Vertices, data.Holes, data.Dim);
-            md.Triangles[0].AddRange(rest.Select(x => x + st).ToList());
-        }
-    }
+					if (triList == null)
+						triList = new List<int>(result.Count);
+
+					for (int i = 0; i < result.Count; i++)
+					{
+						triList.Add(result[i] + currentIndex);
+					}
+					currentIndex = md.Vertices.Count;
+					subset.Clear();
+				}
+
+				subset.Add(sub);
+				var c = md.Vertices.Count;
+				for (int i = 0; i < sub.Count; i++)
+				{
+					md.Edges.Add(c + ((i + 1) % sub.Count));
+					md.Edges.Add(c + i);
+					md.Vertices.Add(sub[i]);
+					md.Normals.Add(Constants.Math.Vector3Up);
+				}
+
+			}
+
+			flatData = EarcutLibrary.Flatten(subset);
+			result = EarcutLibrary.Earcut(flatData.Vertices, flatData.Holes, flatData.Dim);
+			if (triList == null)
+				triList = new List<int>(result.Count);
+			for (int i = 0; i < result.Count; i++)
+			{
+				triList.Add(result[i] + currentIndex);
+			}
+
+			md.Triangles.Add(triList);
+		}
+	}
 }

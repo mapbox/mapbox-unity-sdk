@@ -41,18 +41,15 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
             var go = new GameObject();
             var mesh = go.AddComponent<MeshFilter>().mesh;
             mesh.subMeshCount = data.Triangles.Count;
-
             mesh.SetVertices(data.Vertices);
             for (int i = 0; i < data.Triangles.Count; i++)
             {
-                var triangle = data.Triangles[i];
-                mesh.SetTriangles(triangle, i);
+                mesh.SetTriangles(data.Triangles[i], i);
             }
 
             for (int i = 0; i < data.UV.Count; i++)
             {
-                var uv = data.UV[i];
-                mesh.SetUVs(i, uv);
+                mesh.SetUVs(i, data.UV[i]);
             }
 
             mesh.RecalculateNormals();
