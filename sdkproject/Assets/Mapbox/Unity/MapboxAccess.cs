@@ -110,7 +110,7 @@ namespace Mapbox.Unity
 			_isTelemetryEnabled = GetTelemetryCollectionState();
 
 #if UNITY_EDITOR
-			_telemetryLibrary = TelemetryDummy.Instance;
+			_telemetryLibrary = TelemetryEditor.Instance;
 #elif UNITY_IOS
 			_telemetryLibrary = TelemetryIos.Instance;
 #elif UNITY_ANDROID
