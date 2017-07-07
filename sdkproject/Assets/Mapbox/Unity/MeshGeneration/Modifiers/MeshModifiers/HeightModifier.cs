@@ -79,18 +79,19 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 {
                     md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + minHeight + hf, md.Vertices[i].z);
                 }
-            }           
+            }
 
-            var count = md.Vertices.Count;
-            float d = 0f;
-            Vector3 v1;
-            Vector3 v2;
-            int ind = 0;
+			var count = md.Vertices.Count;
+			md.Vertices.Capacity = count + md.Edges.Count * 2;
+			float d = 0f;
+			Vector3 v1;
+			Vector3 v2;
+			int ind = 0;
 
-            var wallTri = new List<int>();
-            var wallUv = new List<Vector2>();
+			var wallTri = new List<int>(md.Edges.Count * 3);
+			var wallUv = new List<Vector2>(md.Edges.Count * 2);
 
-            for (int i = 0; i < md.Edges.Count; i+=2)
+			for (int i = 0; i < md.Edges.Count; i+=2)
             {
                 v1 = md.Vertices[md.Edges[i]];
                 v2 = md.Vertices[md.Edges[i + 1]];

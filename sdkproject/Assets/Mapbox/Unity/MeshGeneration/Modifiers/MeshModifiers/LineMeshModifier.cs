@@ -14,8 +14,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     public class LineMeshModifier : MeshModifier
     {
         [SerializeField]
-        private bool _mergeStartEnd;
-        [SerializeField]
         private float Width;
         public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
@@ -67,20 +65,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                     uvList[i] = new Vector2(0, lastUv);
                     uvList[2 * count - 1 - i] = new Vector2(1, lastUv);
                 }
-
-                //if (_mergeStartEnd)
-                //{
-                //    //brnkhy -2 because first and last items are same
-                //    p1 = segment[count - 2];
-                //    p2 = segment[0];
-                //    p3 = segment[1];
-
-                //    norm = GetNormal(p1, p2, p3) * Width;
-                //    newVerticeList[count - 1] = p2 + norm;
-                //    newVerticeList[0] = p2 + norm;
-                //    newVerticeList[count] = p2 - norm;
-                //    newVerticeList[2 * count - 1] = p2 - norm;
-                //}
 
                 var pcount = md.Vertices.Count;
                 md.Vertices.AddRange(newVerticeList);
