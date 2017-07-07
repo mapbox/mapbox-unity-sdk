@@ -60,7 +60,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
         {
             var go = new GameObject();
             var mesh = go.AddComponent<MeshFilter>().mesh;
-            var rend = go.AddComponent<MeshRenderer>();
             mesh.subMeshCount = data.Triangles.Count;
 
             mesh.SetVertices(data.Vertices);
