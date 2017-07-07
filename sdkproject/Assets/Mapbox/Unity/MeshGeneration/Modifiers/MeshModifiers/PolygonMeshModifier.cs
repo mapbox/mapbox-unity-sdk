@@ -53,7 +53,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                     {
                         data = EarcutLibrary.Flatten(set);
                         rest = EarcutLibrary.Earcut(data.Vertices, data.Holes, data.Dim);
-                        md.Triangles[0].AddRange(rest.Select(x => x + st).ToList());
+
+						for (int i = 0; i < rest.Count; i++)
+						{
+							md.Triangles[0].Add(rest[i] + st);
+						}
                         st = md.Vertices.Count;
 
                         set.Clear();
