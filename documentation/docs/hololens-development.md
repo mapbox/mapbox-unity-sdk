@@ -1,5 +1,8 @@
 # HoloLens development
 
+> [!NOTE]
+> Refer to [Exporting to Windows Store (UWP, HoloLens)](windowsstore-uwp-hololens.md) to meet the `sqlite3` requirement for `Windows Store` solutions.
+
 HoloLens requires code/assemblies to work with [Universal Windows Platform (UWP)](https://developer.microsoft.com/en-us/windows/apps).
 
 Reference: [dev.microsoft.com: Unity development overview, Configuring a Unity project for HoloLens](https://developer.microsoft.com/en-us/windows/holographic/unity_development_overview)

@@ -19,5 +19,8 @@
 - name: Map Factory Framework
   href: 06-map-factory-framework.md
 
+- name: Windows Store, UWP, HoloLens
+  href: windowsstore-uwp-hololens.md
+
 - name: HoloLens Development
   href: hololens-development.md
