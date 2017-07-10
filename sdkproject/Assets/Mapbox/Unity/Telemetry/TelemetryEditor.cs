@@ -9,6 +9,10 @@
 	using UnityEngine.Networking;
 	using System.Text;
 
+#if UNITY_EDITOR
+	using UnityEditor;
+#endif
+
 	public class TelemetryEditor : ITelemetryLibrary
 	{
 		string _url;
@@ -29,10 +33,9 @@
 
 		public void SendTurnstile()
 		{
-#if UNITY_EDITOR
-			Runnable.EnableRunnableInEditor();
-#endif
-			Runnable.Run(Post(_url, GetPostBody()));
+			// This is only needed for maps at design-time.
+			//Runnable.EnableRunnableInEditor();
+			Runnable.Run(PostWWW(_url, GetPostBody()));
 		}
 
 		string GetPostBody()
@@ -49,22 +52,52 @@
 			return jsonString;
 		}
 
+		// FIXME: maybe in a future Unity version, "user-agent" will be writable. 
 		IEnumerator Post(string url, string bodyJsonString)
 		{
 			var request = new UnityWebRequest(url, "POST");
 			byte[] bodyRaw = Encoding.UTF8.GetBytes(bodyJsonString);
 			request.uploadHandler = new UploadHandlerRaw(bodyRaw);
 
-			// FIXME: Why, Unity?!
-			//request.SetRequestHeader("user-agent", "MapboxEventsUnityEditor");
+			// FIXME: Why, Unity?! 
+			// https://docs.unity3d.com/2017.1/Documentation/ScriptReference/Networking.UnityWebRequest.SetRequestHeader.html
+			//request.SetRequestHeader("user-agent", GetUserAgent());
 
 			request.downloadHandler = new DownloadHandlerBuffer();
 			request.SetRequestHeader("Content-Type", "application/json");
 
 			yield return request.Send();
+		}
 
-			Debug.Log("Status Code: " + request.responseCode);
-			Debug.Log("Status Code: " + request.downloadHandler.text);
+		IEnumerator PostWWW(string url, string bodyJsonString)
+		{
+			byte[] bodyRaw = Encoding.UTF8.GetBytes(bodyJsonString);
+			var headers = new Dictionary<string, string>();
+			headers.Add("Content-Type", "application/json");
+			headers.Add("user-agent", GetUserAgent());
+
+			var www = new WWW(url, bodyRaw, headers);
+			yield return www;
+		}
+
+		static string GetUserAgent()
+		{
+#if UNITY_EDITOR
+			var userAgent = string.Format("{0}/{1}/{2} MapboxEventsUnityEditor/{3}",
+										  PlayerSettings.productName,
+										  PlayerSettings.bundleVersion,
+#if UNITY_IOS
+										  PlayerSettings.iOS.buildNumber,
+#elif UNITY_ANDROID
+			                              PlayerSettings.Android.bundleVersionCode,
+#else
+			                              "0",
+#endif
+										  Constants.SDK_VERSION
+										 );
+			return userAgent;
+#endif
+			return "MapboxEventsUnityEditor";
 		}
 	}
 }
