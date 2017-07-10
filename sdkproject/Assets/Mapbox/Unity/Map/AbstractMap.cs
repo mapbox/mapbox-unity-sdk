@@ -73,6 +73,10 @@
 			}
 		}
 
+		[HideInInspector]
+		public float CenterHeight = float.MinValue;
+		private bool _centerTileSet = false;
+
 		float _worldRelativeScale;
 		public float WorldRelativeScale
 		{
@@ -83,10 +87,12 @@
 		}
 
 		public event Action OnInitialized = delegate { };
+		public event Action<AbstractMap> OnHeightChanged = delegate { };
 
 		protected virtual void Awake()
 		{
 			_fileSouce = MapboxAccess.Instance;
+			_tileProvider.OnCentralTileChanged += TileProvider_OnCentralTileChanged;
 			_tileProvider.OnTileAdded += TileProvider_OnTileAdded;
 			_tileProvider.OnTileRemoved += TileProvider_OnTileRemoved;
 			if (!_root)
@@ -95,10 +101,13 @@
 			}
 		}
 
+		
+
 		protected virtual void OnDestroy()
 		{
 			if (_tileProvider != null)
 			{
+				_tileProvider.OnCentralTileChanged -= TileProvider_OnCentralTileChanged;
 				_tileProvider.OnTileAdded -= TileProvider_OnTileAdded;
 				_tileProvider.OnTileRemoved -= TileProvider_OnTileRemoved;
 			}
@@ -122,6 +131,16 @@
 			_tileProvider.Initialize(this);
 
 			OnInitialized();
+		}
+
+		private void TileProvider_OnCentralTileChanged(UnwrappedTileId tileId)
+		{
+			var utile = _mapVisualizer.LoadTile(tileId);
+			utile.OnHeightDataChanged += (s) =>
+			{
+				CenterHeight = s.QueryHeightData(.5f, .5f);
+				OnHeightChanged(this);
+			};
 		}
 
 		void TileProvider_OnTileAdded(UnwrappedTileId tileId)

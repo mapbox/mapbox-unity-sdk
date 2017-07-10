@@ -99,7 +99,7 @@ namespace Mapbox.Unity.MeshGeneration
 		/// Registers requested tiles to the factories
 		/// </summary>
 		/// <param name="tileId"></param>
-		public void LoadTile(UnwrappedTileId tileId)
+		public UnityTile LoadTile(UnwrappedTileId tileId)
 		{
 			UnityTile unityTile = null;
 
@@ -122,6 +122,8 @@ namespace Mapbox.Unity.MeshGeneration
 			}
 
 			_activeTiles.Add(tileId, unityTile);
+
+			return unityTile;
 		}
 
 		public void DisposeTile(UnwrappedTileId tileId)
