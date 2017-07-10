@@ -116,7 +116,7 @@ namespace Mapbox.Unity
 #elif UNITY_ANDROID
 			_telemetryLibrary = TelemetryAndroid.Instance;
 #else
-			_telemetryLibrary = TelemetryDummy.Instance;
+			_telemetryLibrary = TelemetryFallback.Instance;
 #endif
 
 
