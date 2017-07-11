@@ -14,7 +14,7 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 
         public override bool Try(VectorFeatureUnity feature)
         {
-            var check = _type.ToLowerInvariant().Contains(feature.Properties["type"].ToString().ToLowerInvariant());
+            var check = _type.ToLowerInvariant().Equals(feature.Properties["type"].ToString().ToLowerInvariant());
             return _behaviour == TypeFilterType.Include ? check : !check;
         }
 
