@@ -14,7 +14,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		[SerializeField]
 		private bool _forceHeight;
 		[SerializeField]
-		private float _offset;
+		[Range(0.1f,1)]
+		private float _offset = 0.2f;
 
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
@@ -228,7 +229,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 							(md.Vertices[current].z + (poi - (-v1 - v2)).normalized.z));
 					}
 
-					newVertices.Add(poi + new Vector3(0, _offset, 0) + new Vector3(0, md.Vertices[i].y, 0));
+					newVertices.Add(new Vector3(poi.x, poi.y + _offset + md.Vertices[current].y, poi.z));
 
 					newVertices.Add(md.Vertices[current] + v1);
 					newVertices.Add(md.Vertices[current] - v2);
