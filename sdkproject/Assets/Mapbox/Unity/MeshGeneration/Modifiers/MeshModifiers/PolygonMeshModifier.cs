@@ -2,13 +2,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
 	using System.Collections.Generic;
 	using System.Linq;
-	using TriangleNet;
-	using TriangleNet.Geometry;
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Data;
-	using TriangleNet.Meshing;
 	using System;
-	using TriangleNet.Smoothing;
 	using Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers;
 
 	/// <summary>
