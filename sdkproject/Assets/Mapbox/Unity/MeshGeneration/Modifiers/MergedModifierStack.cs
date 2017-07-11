@@ -63,6 +63,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
             mesh.subMeshCount = data.Triangles.Count;
 
             mesh.SetVertices(data.Vertices);
+			mesh.SetNormals(data.Normals);
             for (int i = 0; i < data.Triangles.Count; i++)
             {
                 var triangle = data.Triangles[i];
@@ -75,8 +76,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 mesh.SetUVs(i, uv);
             }
 
-            mesh.RecalculateNormals();
-            go.transform.SetParent(main.transform, false);
+			go.transform.SetParent(main.transform, false);
 
             var fb = go.AddComponent<FeatureBehaviour>();
             foreach (GameObjectModifier mod in GoModifiers.Where(x => x.Active))
@@ -98,6 +98,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 {
                     var st = md.Vertices.Count;
                     md.Vertices.AddRange(item.Vertices);
+					md.Normals.AddRange(item.Normals);
                     md.UV[0].AddRange(item.UV[0]);
                     if (item.UV.Count > 1)
                         md.UV[1].AddRange(item.UV[1]);

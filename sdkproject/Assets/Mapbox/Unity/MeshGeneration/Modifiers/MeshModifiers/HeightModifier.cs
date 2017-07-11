@@ -90,7 +90,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			var wallTri = new List<int>(md.Edges.Count * 3);
 			var wallUv = new List<Vector2>(md.Edges.Count * 2);
-
+			Vector3 norm = Vector3.zero;
 			for (int i = 0; i < md.Edges.Count; i+=2)
             {
                 v1 = md.Vertices[md.Edges[i]];
@@ -103,7 +103,13 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
                 d = (v2 - v1).magnitude;
 
-                wallUv.Add(new Vector2(0, 0));
+				norm = Vector3.Cross(v2 - v1, md.Vertices[ind + 2] - v1).normalized;
+				md.Normals.Add(norm);
+				md.Normals.Add(norm);
+				md.Normals.Add(norm);
+				md.Normals.Add(norm);
+
+				wallUv.Add(new Vector2(0, 0));
                 wallUv.Add(new Vector2(d, 0));
                 wallUv.Add(new Vector2(0, -hf));
                 wallUv.Add(new Vector2(d, -hf));

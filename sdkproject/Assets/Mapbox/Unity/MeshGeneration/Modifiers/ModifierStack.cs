@@ -42,6 +42,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
             var mesh = go.AddComponent<MeshFilter>().mesh;
             mesh.subMeshCount = data.Triangles.Count;
             mesh.SetVertices(data.Vertices);
+			mesh.SetNormals(data.Normals);
             for (int i = 0; i < data.Triangles.Count; i++)
             {
                 mesh.SetTriangles(data.Triangles[i], i);
@@ -52,7 +53,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 mesh.SetUVs(i, data.UV[i]);
             }
 
-            mesh.RecalculateNormals();
             go.transform.SetParent(main.transform, false);
 
             return go;

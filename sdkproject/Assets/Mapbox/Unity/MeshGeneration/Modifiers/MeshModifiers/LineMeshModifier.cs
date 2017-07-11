@@ -34,12 +34,13 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 md.Edges.Add(md.Vertices.Count + (count*2) - 1);
 
                 var newVerticeList = new Vector3[count * 2];
-                var uvList = new Vector2[count * 2];
+				var newNorms = new Vector3[count * 2];
+				var uvList = new Vector2[count * 2];
                 Vector3 norm;
                 var lastUv = 0f;
-                var p1 = Mapbox.Unity.Constants.Math.Vector3Zero;
-                var p2 = Mapbox.Unity.Constants.Math.Vector3Zero;
-                var p3 = Mapbox.Unity.Constants.Math.Vector3Zero;
+                var p1 = Constants.Math.Vector3Zero;
+                var p2 = Constants.Math.Vector3Zero;
+                var p3 = Constants.Math.Vector3Zero;
                 for (int i = 1; i < count; i++)
                 {
                     p1 = roadSegment[i - 1];
@@ -53,7 +54,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                         norm = GetNormal(p1, p1, p2) * Width; //road width
                         newVerticeList[0] = (p1 + norm);
                         newVerticeList[count * 2 - 1] = (p1 - norm);
-                        uvList[0] = new Vector2(0, 0);
+						newNorms[0] = Constants.Math.Vector3Up;
+						newNorms[count * 2 - 1] = Constants.Math.Vector3Up;
+						uvList[0] = new Vector2(0, 0);
                         uvList[count * 2 - 1] = new Vector2(1, 0);
                     }
                     var dist = Vector3.Distance(p1, p2);
@@ -61,13 +64,16 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                     norm = GetNormal(p1, p2, p3) * Width;
                     newVerticeList[i] = (p2 + norm);
                     newVerticeList[2 * count - 1 - i] = (p2 - norm);
-                    
-                    uvList[i] = new Vector2(0, lastUv);
+					newNorms[i] = Constants.Math.Vector3Up;
+					newNorms[2 * count - 1 - i] = Constants.Math.Vector3Up;
+
+					uvList[i] = new Vector2(0, lastUv);
                     uvList[2 * count - 1 - i] = new Vector2(1, lastUv);
                 }
 
                 var pcount = md.Vertices.Count;
                 md.Vertices.AddRange(newVerticeList);
+				md.Normals.AddRange(newNorms);
                 md.UV[0].AddRange(uvList);
                 var lineTri = new List<int>();
                 var n = count;
