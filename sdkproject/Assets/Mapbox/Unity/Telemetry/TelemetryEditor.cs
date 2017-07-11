@@ -103,7 +103,7 @@
 		{
 #if UNITY_EDITOR
 			var userAgent = string.Format("{0}/{1}/{2} MapboxEventsUnityEditor/{3}",
-										  PlayerSettings.productName,
+			                              PlayerSettings.bundleIdentifier,
 										  PlayerSettings.bundleVersion,
 #if UNITY_IOS
 										  PlayerSettings.iOS.buildNumber,

@@ -95,7 +95,7 @@
 		static string GetUserAgent()
 		{
 			var userAgent = string.Format("{0}/{1}/{2} MapboxEventsUnity{3}/{4}",
-			                              Application.productName,
+			                              Application.bundleIdentifier,
 			                              Application.version,
 			                              "0",
 			                              Application.platform,
