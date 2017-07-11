@@ -33,7 +33,7 @@
 			if (ShouldPostTurnstile(ticks))
 			{
 				Runnable.Run(PostWWW(_url, GetPostBody()));
-				PlayerPrefs.SetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS, ticks.ToString());
+				PlayerPrefs.SetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_FALLBACK, ticks.ToString());
 			}
 		}
 
@@ -56,7 +56,7 @@
 		{
 			var date = new DateTime(ticks);
 			var longAgo = DateTime.Now.AddDays(-100).Ticks.ToString();
-			var lastDateString = PlayerPrefs.GetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS, longAgo);
+			var lastDateString = PlayerPrefs.GetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_FALLBACK, longAgo);
 			long lastTicks = 0;
 			long.TryParse(lastDateString, out lastTicks);
 			var lastDate = new DateTime(lastTicks);
