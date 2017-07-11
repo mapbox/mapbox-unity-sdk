@@ -1,7 +1,6 @@
 namespace Mapbox.Unity.MeshGeneration.Data
 {
 	using System.Collections.Generic;
-	using TriangleNet.Meshing;
 	using UnityEngine;
 	using Utils;
 
@@ -9,7 +8,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 	public class MeshData
 	{
 		public List<int> Edges { get; set; }
-		public IMesh PolygonMesh { get; set; }
 		public Vector2 MercatorCenter { get; set; }
 		public RectD TileRect { get; set; }
 		public List<Vector3> Vertices { get; set; }
