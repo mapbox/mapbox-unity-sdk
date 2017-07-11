@@ -29,21 +29,39 @@
 
 		public void SendTurnstile()
 		{
-			Runnable.Run(PostWWW(_url, GetPostBody()));
+			var ticks = DateTime.Now.Ticks;
+			if (ShouldPostTurnstile(ticks))
+			{
+				Runnable.Run(PostWWW(_url, GetPostBody()));
+				PlayerPrefs.SetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS, ticks.ToString());
+			}
 		}
 
 		string GetPostBody()
 		{
 			List<Dictionary<string, object>> eventList = new List<Dictionary<string, object>>();
 			Dictionary<string, object> jsonDict = new Dictionary<string, object>();
+
 			jsonDict.Add("event", "appUserTurnstile");
-			jsonDict.Add("created", DateTime.UtcNow.ToString("o"));
+			jsonDict.Add("created", DateTime.Now.Ticks);
 			jsonDict.Add("userId", SystemInfo.deviceUniqueIdentifier);
 			jsonDict.Add("enabled.telemetry", false);
 			eventList.Add(jsonDict);
 
 			var jsonString = JsonConvert.SerializeObject(eventList);
 			return jsonString;
+		}
+
+		bool ShouldPostTurnstile(long ticks)
+		{
+			var date = new DateTime(ticks);
+			var longAgo = DateTime.Now.AddDays(-100).Ticks.ToString();
+			var lastDateString = PlayerPrefs.GetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS, longAgo);
+			long lastTicks = 0;
+			long.TryParse(lastDateString, out lastTicks);
+			var lastDate = new DateTime(lastTicks);
+			var timeSpan = date - lastDate;
+			return timeSpan.Days >= 1;
 		}
 
 		// FIXME: maybe in a future Unity version, "user-agent" will be writable. 
