@@ -8,14 +8,20 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	public class ChamferHeightModifier : MeshModifier
 	{
 		[SerializeField]
+		[Tooltip("Flattens the top polygon of the feature. Useful for buildings on terrain.")]
 		private bool _flatTops;
 		[SerializeField]
 		private float _height;
 		[SerializeField]
+		[Tooltip("Forces all entities to a certain height")]
 		private bool _forceHeight;
 		[SerializeField]
 		[Range(0.1f,1)]
+		[Tooltip("Floor height of zero will not craete any floors at all")]
 		private float _offset = 0.2f;
+		[SerializeField]
+		[Range(0, 10)]
+		private float _floorHeight = 0;
 
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
@@ -54,8 +60,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		private void Sides(VectorFeatureUnity feature, MeshData meshData, float hf, int originalVertexCount)
 		{
-
-
 			float d = 0f;
 			Vector3 v1;
 			Vector3 v2 = Vector3.zero;
@@ -67,27 +71,56 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			wallUv.Add(new Vector2(0, -hf));
 			meshData.Normals.Add(meshData.Normals[originalVertexCount - 1]);
 
+			Vector3 norm = Constants.Math.Vector3Zero;
+			var floor = (_floorHeight > 0) ? hf / _floorHeight : hf;
 			for (int i = 0; i < meshData.Edges.Count; i += 2)
 			{
 				v1 = meshData.Vertices[meshData.Edges[i]];
 				v2 = meshData.Vertices[meshData.Edges[i + 1]];
 				ind = meshData.Vertices.Count;
+
+				norm = new Vector3(-(v1.z - v2.z), 0, (v1.x - v2.x)).normalized;
 				meshData.Vertices.Add(v1);
 				meshData.Vertices.Add(v2);
-				meshData.Vertices.Add(new Vector3(v1.x, v1.y - hf, v1.z));
-				meshData.Vertices.Add(new Vector3(v2.x, v2.y - hf, v2.z));
+				wallUv.Add(new Vector2(0, 0));
+				wallUv.Add(new Vector2(d, 0));
 
 				meshData.Normals.Add(meshData.Normals[meshData.Edges[i]]);
 				meshData.Normals.Add(meshData.Normals[meshData.Edges[i + 1]]);
+				
+
+				for (int f = 1; f <= floor; f++)
+				{
+					meshData.Vertices.Add(new Vector3(v1.x, v1.y - (f * _floorHeight), v1.z));
+					meshData.Vertices.Add(new Vector3(v2.x, v2.y - (f * _floorHeight), v2.z));
+					meshData.Normals.Add(meshData.Normals[meshData.Edges[i]]);
+					meshData.Normals.Add(meshData.Normals[meshData.Edges[i + 1]]);
+
+					d = (v2 - v1).magnitude;
+					wallUv.Add(new Vector2(0, -(f * _floorHeight)));
+					wallUv.Add(new Vector2(d, -(f * _floorHeight)));
+
+
+					wallTri.Add(ind);
+					wallTri.Add(ind + 1);
+					wallTri.Add(ind + 2);
+
+					wallTri.Add(ind + 1);
+					wallTri.Add(ind + 3);
+					wallTri.Add(ind + 2);
+
+					ind += 2;
+				}
+
+				meshData.Vertices.Add(new Vector3(v1.x, v1.y - hf, v1.z));
+				meshData.Vertices.Add(new Vector3(v2.x, v2.y - hf, v2.z));
 				meshData.Normals.Add(meshData.Normals[meshData.Edges[i]]);
 				meshData.Normals.Add(meshData.Normals[meshData.Edges[i + 1]]);
 
 				d = (v2 - v1).magnitude;
-
-				wallUv.Add(new Vector2(0, 0));
-				wallUv.Add(new Vector2(d, 0));
 				wallUv.Add(new Vector2(0, -hf));
 				wallUv.Add(new Vector2(d, -hf));
+
 
 				wallTri.Add(ind);
 				wallTri.Add(ind + 1);
@@ -96,6 +129,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				wallTri.Add(ind + 1);
 				wallTri.Add(ind + 3);
 				wallTri.Add(ind + 2);
+
+				ind += 2;
 			}
 
 			meshData.Triangles.Add(wallTri);
@@ -218,9 +253,16 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					// See where the shifted lines ij and jk intersect.
 					bool lines_intersect, segments_intersect;
 
+
+					//uuugly
+					if (pij2 == pjk1)
+						poi = pij2;
+					else
 					FindIntersection(pij1, pij2, pjk1, pjk2,
 						out lines_intersect, out segments_intersect,
 						out poi, out close1, out close2);
+
+					
 
 					var d = Vector3.Distance(poi, pij2);
 					if (d > 10 * _offset)

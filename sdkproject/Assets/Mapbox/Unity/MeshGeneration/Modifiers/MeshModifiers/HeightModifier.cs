@@ -25,8 +25,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
         private float _height;
         [SerializeField]
         private bool _forceHeight;
+		[SerializeField]
+		[Range(0, 10)]
+		private float _floorHeight = 0;
 
-        public override ModifierType Type { get { return ModifierType.Preprocess; } }
+		public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
         public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
         {
@@ -90,42 +93,71 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			var wallTri = new List<int>(md.Edges.Count * 3);
 			var wallUv = new List<Vector2>(md.Edges.Count * 2);
-			Vector3 norm = Vector3.zero;
-			for (int i = 0; i < md.Edges.Count; i+=2)
-            {
-                v1 = md.Vertices[md.Edges[i]];
-                v2 = md.Vertices[md.Edges[i + 1]];
-                ind = md.Vertices.Count;
-                md.Vertices.Add(v1);
-                md.Vertices.Add(v2);
-                md.Vertices.Add(new Vector3(v1.x, v1.y - hf, v1.z));
-                md.Vertices.Add(new Vector3(v2.x, v2.y - hf, v2.z));
+			Vector3 norm = Constants.Math.Vector3Zero;
 
-                d = (v2 - v1).magnitude;
+			var floor = (_floorHeight > 0) ? hf / _floorHeight : hf;
+			for (int i = 0; i < md.Edges.Count; i += 2)
+			{
+				v1 = md.Vertices[md.Edges[i]];
+				v2 = md.Vertices[md.Edges[i + 1]];
+				ind = md.Vertices.Count;
 
-				norm = Vector3.Cross(v2 - v1, md.Vertices[ind + 2] - v1).normalized;
-				md.Normals.Add(norm);
-				md.Normals.Add(norm);
-				md.Normals.Add(norm);
-				md.Normals.Add(norm);
-
+				norm = new Vector3(-(v1.z - v2.z), 0, (v1.x - v2.x)).normalized;
+				md.Vertices.Add(v1);
+				md.Vertices.Add(v2);
 				wallUv.Add(new Vector2(0, 0));
-                wallUv.Add(new Vector2(d, 0));
-                wallUv.Add(new Vector2(0, -hf));
-                wallUv.Add(new Vector2(d, -hf));
+				wallUv.Add(new Vector2(d, 0));
+				md.Normals.Add(norm);
+				md.Normals.Add(norm);
 
-                wallTri.Add(ind);
-                wallTri.Add(ind + 1);
-                wallTri.Add(ind + 2);
+				for (int f = 1; f <= floor; f++)
+				{
+					md.Vertices.Add(new Vector3(v1.x, v1.y - (f * _floorHeight), v1.z));
+					md.Vertices.Add(new Vector3(v2.x, v2.y - (f * _floorHeight), v2.z));
+					md.Normals.Add(norm);
+					md.Normals.Add(norm);
 
-                wallTri.Add(ind + 1);
-                wallTri.Add(ind + 3);
-                wallTri.Add(ind + 2);
-            }
+					d = (v2 - v1).magnitude;
+					wallUv.Add(new Vector2(0, -(f * _floorHeight)));
+					wallUv.Add(new Vector2(d, -(f * _floorHeight)));
 
-            md.Triangles.Add(wallTri);
-            md.UV[0].AddRange(wallUv);
 
-        }
-    }
+					wallTri.Add(ind);
+					wallTri.Add(ind + 1);
+					wallTri.Add(ind + 2);
+
+					wallTri.Add(ind + 1);
+					wallTri.Add(ind + 3);
+					wallTri.Add(ind + 2);
+
+					ind += 2;
+				}
+
+				md.Vertices.Add(new Vector3(v1.x, v1.y - hf, v1.z));
+				md.Vertices.Add(new Vector3(v2.x, v2.y - hf, v2.z));
+				md.Normals.Add(norm);
+				md.Normals.Add(norm);
+
+				d = (v2 - v1).magnitude;
+				wallUv.Add(new Vector2(0, -hf));
+				wallUv.Add(new Vector2(d, -hf));
+
+
+				wallTri.Add(ind);
+				wallTri.Add(ind + 1);
+				wallTri.Add(ind + 2);
+
+				wallTri.Add(ind + 1);
+				wallTri.Add(ind + 3);
+				wallTri.Add(ind + 2);
+
+				ind += 2;
+			}
+
+
+			md.Triangles.Add(wallTri);
+			md.UV[0].AddRange(wallUv);
+
+		}
+	}
 }
