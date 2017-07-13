@@ -1,4 +1,9 @@
-﻿namespace Mapbox.Unity.MeshGeneration.Modifiers
+﻿// HACK:
+// This will work out of the box, but it's intended to be an example of how to approach
+// procedural decoration like this.
+// A better approach would be to operate on the geometry itself.
+
+namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
 	using Mapbox.Unity.MeshGeneration.Components;
 	using UnityEngine;
@@ -46,10 +51,10 @@
 				var ray = new Ray(bounds.center + new Vector3(x, 100, z), Vector3.down * 2000);
 
 				RaycastHit hit;
-				Debug.DrawRay(ray.origin, ray.direction * 1000, Color.yellow, 1000);
+				//Debug.DrawRay(ray.origin, ray.direction * 1000, Color.yellow, 1000);
 				if (Physics.Raycast(ray, out hit, 150, _layerMask))
 				{
-					Debug.DrawLine(ray.origin, hit.point, Color.red, 1000);
+					//Debug.DrawLine(ray.origin, hit.point, Color.red, 1000);
 					var index = Random.Range(0, _prefabs.Length);
 					var transform = ((GameObject)Instantiate(_prefabs[index], fb.transform, false)).transform;
 					transform.position = hit.point;
