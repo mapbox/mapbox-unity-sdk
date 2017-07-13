@@ -1,8 +1,7 @@
-﻿using UnityEngine;
-using System.Collections;
-
-namespace Mapbox.Unity.MeshGeneration.Components
+﻿namespace Mapbox.Unity.MeshGeneration.Components
 {
+	using UnityEngine;
+
 	public class VertexDebugger : MonoBehaviour
 	{
 		[Multiline(10)]
