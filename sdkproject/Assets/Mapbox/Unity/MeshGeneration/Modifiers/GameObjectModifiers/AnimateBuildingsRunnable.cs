@@ -1,34 +1,21 @@
 ﻿namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
 	using System.Collections;
-	using System.Linq;
 	using UnityEngine;
+	using Mapbox.Unity.Utilities;
 
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Animate Buildings")]
-	public class AnimateBuildingsRunnable : ScriptableObjectRunnable
+	public class AnimateBuildingsRunnable : SingletonScriptableObject<AnimateBuildingsRunnable>
 	{
 		[SerializeField]
 		AnimationCurve _curve;
-
-		static AnimateBuildingsRunnable _instance;
-		public static AnimateBuildingsRunnable Instance
-		{
-			get
-			{
-				if (_instance == null)
-				{
-					_instance = Resources.FindObjectsOfTypeAll<AnimateBuildingsRunnable>().FirstOrDefault();
-				}
-				return _instance;
-			}
-		}
 
 		float GetRandomTime()
 		{
 			return Random.Range(.01f, 1f);
 		}
 
-		public override IEnumerator Run(MonoBehaviour runner)
+		public IEnumerator Run(MonoBehaviour runner)
 		{
 			var transform = runner.transform;
 
