@@ -1,28 +1,28 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 namespace Mapbox.Unity.MeshGeneration.Components
 {
 	public class VertexDebugger : MonoBehaviour
 	{
+#if UNITY_EDITOR
+		[SerializeField]
+		float _radius = .2f;
+
+		[SerializeField]
+		Color _color = new Color(0, 1, 0, .5f);
+
 		[Multiline(10)]
 		public string Triangles;
+
+		Mesh _mesh;
 
 		void Start()
 		{
 			var mf = GetComponent<MeshFilter>();
 			if (mf)
 			{
-				var mesh = mf.mesh;
-				var verts = mesh.vertices;
-				for (int i = 0; i < verts.Length; i++)
-				{
-					var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-					go.name = i.ToString();
-					go.transform.SetParent(transform, false);
-					go.transform.localPosition = verts[i];
-				}
-				var tris = mesh.triangles;
+				_mesh = mf.mesh;
+				var tris = _mesh.triangles;
 				Triangles = "";
 				for (int i = 0; i < tris.Length; i += 3)
 				{
@@ -30,5 +30,19 @@ namespace Mapbox.Unity.MeshGeneration.Components
 				}
 			}
 		}
+
+		void OnDrawGizmosSelected()
+		{
+			if (_mesh)
+			{
+				var verts = _mesh.vertices;
+				for (int i = 0; i < verts.Length; i++)
+				{
+					Gizmos.color = _color;
+					Gizmos.DrawSphere(transform.position + verts[i] * transform.lossyScale.x, _radius);
+				}
+			}
+		}
+		}
+#endif
 	}
-}
