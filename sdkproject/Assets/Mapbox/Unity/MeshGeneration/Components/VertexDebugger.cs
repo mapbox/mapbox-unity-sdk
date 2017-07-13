@@ -39,7 +39,8 @@ namespace Mapbox.Unity.MeshGeneration.Components
 				for (int i = 0; i < verts.Length; i++)
 				{
 					Gizmos.color = _color;
-					Gizmos.DrawSphere(transform.position + verts[i] * transform.lossyScale.x, _radius);
+					Gizmos.DrawWireCube(transform.position + verts[i] * transform.lossyScale.x, Vector3.one * _radius);
+					//Gizmos.DrawSphere(transform.position + verts[i] * transform.lossyScale.x, _radius);
 				}
 			}
 		}
