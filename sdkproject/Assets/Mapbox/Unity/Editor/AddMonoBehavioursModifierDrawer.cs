@@ -17,8 +17,7 @@
 			position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
 			var scriptRect = new Rect(position.x, position.y, position.width, position.height - _offset);
 			var helpRect = new Rect(position.x, position.y + _offset / 2, position.width, _offset);
-
-			var typeStringProperty = property.FindPropertyRelative("_type");
+			var typeStringProperty = property.FindPropertyRelative("_typeString");
 			var monoscriptProperty = property.FindPropertyRelative("_script");
 
 			EditorGUI.BeginChangeCheck();

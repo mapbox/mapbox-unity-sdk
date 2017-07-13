@@ -11,10 +11,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	public class AddMonoBehavioursModifierType
 	{
 		[SerializeField]
-		string _type;
+		string _typeString;
+
+		Type _type;
 
 #if UNITY_EDITOR
-		// HACK: what is the implication of keeping this around? Memory?
 		[SerializeField]
 		MonoScript _script;
 #endif
@@ -23,7 +24,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		{
 			get
 			{
-				return Type.GetType(_type);
+				if (_type == null)
+				{
+					_type = Type.GetType(_typeString);
+				}
+				return _type;
 			}
 		}
 	}
