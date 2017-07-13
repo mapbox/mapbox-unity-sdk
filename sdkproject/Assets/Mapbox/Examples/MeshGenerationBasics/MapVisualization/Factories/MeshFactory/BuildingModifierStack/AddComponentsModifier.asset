@@ -13,5 +13,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Active: 1
   _types:
-  - _typeString: AnimateBuildings
+  - _typeString: Mapbox.Examples.AnimateBuildings
     _script: {fileID: 11500000, guid: aa94e41eb131a4c79809d739dae0e0b6, type: 3}

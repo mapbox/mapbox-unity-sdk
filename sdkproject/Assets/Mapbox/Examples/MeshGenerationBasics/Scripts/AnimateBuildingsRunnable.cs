@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Unity.MeshGeneration.Modifiers
+﻿namespace Mapbox.Examples
 {
 	using System.Collections;
 	using UnityEngine;
