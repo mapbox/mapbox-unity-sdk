@@ -96,12 +96,12 @@
 				for (int x = 0; x < _sampleCount - 1; x++)
 				{
 					trilist.Add((y * _sampleCount) + x);
-					trilist.Add((y * _sampleCount) + x + _sampleCount);
 					trilist.Add((y * _sampleCount) + x + _sampleCount + 1);
+					trilist.Add((y * _sampleCount) + x + _sampleCount);
 
 					trilist.Add((y * _sampleCount) + x);
-					trilist.Add((y * _sampleCount) + x + _sampleCount + 1);
 					trilist.Add((y * _sampleCount) + x + 1);
+					trilist.Add((y * _sampleCount) + x + _sampleCount + 1);
 				}
 			}
 
@@ -111,7 +111,7 @@
 			{
 				for (int j = 0; j < _sampleCount; j++)
 				{
-					uvlist.Add(new Vector2(i * step, 1 - (j * step)));
+					uvlist.Add(new Vector2(i * step, (j * step)));
 				}
 			}
 
@@ -119,6 +119,7 @@
 			tile.MeshFilter.mesh.SetTriangles(trilist, 0);
 			tile.MeshFilter.mesh.SetUVs(0, uvlist);
 			tile.MeshFilter.mesh.RecalculateBounds();
+			tile.MeshFilter.mesh.RecalculateNormals();
 
 			tile.transform.localPosition = Vector3.zero;
 		}
