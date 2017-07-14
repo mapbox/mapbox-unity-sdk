@@ -82,10 +82,13 @@
 			}
 		}
 
+		bool _worldHeightFixed = false;
+
 		public event Action OnInitialized = delegate { };
 
 		protected virtual void Awake()
 		{
+			_worldHeightFixed = false;
 			_fileSouce = MapboxAccess.Instance;
 			_tileProvider.OnTileAdded += TileProvider_OnTileAdded;
 			_tileProvider.OnTileRemoved += TileProvider_OnTileRemoved;
@@ -103,8 +106,8 @@
 				_tileProvider.OnTileRemoved -= TileProvider_OnTileRemoved;
 			}
 
-            _mapVisualizer.Destroy();
-        }
+			_mapVisualizer.Destroy();
+		}
 
 		// This is the part that is abstract?
 		protected virtual void Start()
@@ -126,7 +129,34 @@
 
 		void TileProvider_OnTileAdded(UnwrappedTileId tileId)
 		{
-			_mapVisualizer.LoadTile(tileId);
+			if (!_worldHeightFixed)
+			{
+				_worldHeightFixed = true;
+				var tile = _mapVisualizer.LoadTile(tileId);
+				if(tile.HeightDataState == MeshGeneration.Enums.TilePropertyState.Loaded)
+				{
+					var h = tile.QueryHeightData(.5f, .5f);
+					Root.transform.position = new Vector3(
+					 Root.transform.position.x,
+					 -h * WorldRelativeScale,
+					 Root.transform.position.z);
+				}
+				else
+				{
+					tile.OnHeightDataChanged += (s) =>
+					{
+						var h = s.QueryHeightData(.5f, .5f);
+						Root.transform.position = new Vector3(
+						 Root.transform.position.x,
+						 -h * WorldRelativeScale,
+						 Root.transform.position.z);
+					};
+				}
+			}
+			else
+			{
+				_mapVisualizer.LoadTile(tileId);
+			}
 		}
 
 		void TileProvider_OnTileRemoved(UnwrappedTileId tileId)
