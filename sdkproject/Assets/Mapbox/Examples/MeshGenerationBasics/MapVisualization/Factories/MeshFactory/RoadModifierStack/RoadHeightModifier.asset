@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Name: RoadHeightModifier
   m_EditorClassIdentifier: 
   Active: 1
-  _height: 1
+  _flatTops: 0
   _forceHeight: 0
-  _closeEnd: 1
-  _flatTop: 0
+  _height: 1
+  _createSideWalls: 0

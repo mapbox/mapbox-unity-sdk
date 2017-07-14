@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Name: StyledDefaultRoadStack
   m_EditorClassIdentifier: 
   MeshModifiers:
+  - {fileID: 11400000, guid: fb204a763807f47e19eb3f29694f2222, type: 2}
   - {fileID: 11400000, guid: c87de0ad57b91c445b1e831ddef883e2, type: 2}
   - {fileID: 11400000, guid: b5d1e51a365f45143868582439a079ce, type: 2}
   GoModifiers:
