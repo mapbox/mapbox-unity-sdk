@@ -11,9 +11,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b10536479dade041b6db9893fdf723a, type: 3}
   m_Name: TerrainDemoRasterFactory
   m_EditorClassIdentifier: 
-  _mapIdType: 1
+  _mapIdType: 0
   _customMapId: mapbox.satellite
-  _mapId: mapbox.satellite
+  _mapId: mapbox://styles/mapbox/light-v9
   _useCompression: 0
   _useMipMap: 0
   _useRetina: 0

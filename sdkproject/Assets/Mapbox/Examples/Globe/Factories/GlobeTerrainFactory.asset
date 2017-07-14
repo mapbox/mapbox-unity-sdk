@@ -9,11 +9,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c4360e10eeec64f0db20c0b383743cb1, type: 3}
-  m_Name: New Sphere Terrain Factory
+  m_Name: GlobeTerrainFactory
   m_EditorClassIdentifier: 
   _baseMaterial: {fileID: 2100000, guid: 19d72e9ae93c94dd0a35f1df498cfbee, type: 2}
   _radius: 1000
-  _sampleCount: 10
+  _sampleCount: 20
   _addCollider: 0
   _addToLayer: 0
   _layerId: 0
