@@ -97,7 +97,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public event Action<UnityTile> OnHeightDataChanged = delegate { };
 		public event Action<UnityTile> OnRasterDataChanged = delegate { };
 		public event Action<UnityTile> OnVectorDataChanged = delegate { };
-		public event Action<UnityTile> OnRecycled = delegate { };
 
 		internal void Initialize(IMap map, UnwrappedTileId tileId)
 		{
@@ -138,8 +137,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					Destroy(transform.GetChild(i).gameObject);
 				}
 			}
-
-			OnRecycled(this);
 		}
 
 		internal void SetHeightData(byte[] data, float heightMultiplier = 1f, bool useRelative = false)
