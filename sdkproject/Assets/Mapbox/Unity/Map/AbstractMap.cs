@@ -47,6 +47,8 @@
 
 		[SerializeField]
 		float _unityTileSize = 100;
+		[SerializeField]
+		bool _snapMapHeightToZero = true;
 
 		MapboxAccess _fileSouce;
 
@@ -129,7 +131,7 @@
 
 		void TileProvider_OnTileAdded(UnwrappedTileId tileId)
 		{
-			if (!_worldHeightFixed)
+			if (_snapMapHeightToZero && !_worldHeightFixed)
 			{
 				_worldHeightFixed = true;
 				var tile = _mapVisualizer.LoadTile(tileId);
