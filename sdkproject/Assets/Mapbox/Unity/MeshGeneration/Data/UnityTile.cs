@@ -121,10 +121,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			HeightDataState = TilePropertyState.None;
 			VectorDataState = TilePropertyState.None;
 
-			OnHeightDataChanged = null;
-			OnRasterDataChanged = null;
-			OnVectorDataChanged = null;
-			OnRecycled = null;
+			OnHeightDataChanged = delegate { };
+			OnRasterDataChanged = delegate { };
+			OnVectorDataChanged = delegate { };
 
 			Cancel();
 			_tiles.Clear();
