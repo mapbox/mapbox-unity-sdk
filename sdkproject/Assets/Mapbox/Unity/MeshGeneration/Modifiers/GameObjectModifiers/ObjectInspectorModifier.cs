@@ -2,18 +2,12 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Components;
-	using Mapbox.Unity.MeshGeneration.Interfaces;
 	using UnityEngine.UI;
 
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Object Inspector Modifier")]
 	public class ObjectInspectorModifier : GameObjectModifier
 	{
 		private FeatureUiMarker _marker;
-
-		public void OnEnable()
-		{
-			
-		}
 
 		public override void Run(FeatureBehaviour fb)
 		{
