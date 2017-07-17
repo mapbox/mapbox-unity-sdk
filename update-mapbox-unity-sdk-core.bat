@@ -41,10 +41,6 @@ ECHO ---- copying Mapbox.Json
 xcopy /S /R /E /Y dependencies\Mapbox.Json\* %SDK_PATH%\Plugins\ThirdParty\Mapbox.Json\ /EXCLUDE:x.txt
 IF %ERRORLEVEL% NEQ 0 ECHO error during copying Mapbox.Json && EXIT /B 1
 
-ECHO ---- copying Triangle.NET
-xcopy /S /R /E /Y dependencies\triangle.net-uwp\Triangle.NET\Triangle\* %SDK_PATH%\Plugins\ThirdParty\Triangle.NET\ /EXCLUDE:x.txt
-IF %ERRORLEVEL% NEQ 0 ECHO error during copying Triangle.NET && EXIT /B 1
-
 ECHO copying aux files
 COPY /Y utils\link.xml %SDK_PATH%\Plugins\
 IF %ERRORLEVEL% NEQ 0 ECHO error during copying link.xml && EXIT /B 1

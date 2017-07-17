@@ -148,7 +148,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d7ff8ed3b76a4ee5a451d64a5393e3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _range: {x: 1, y: 1, z: 1, w: 1}
+  _west: 1
+  _north: 1
+  _east: 1
+  _south: 1
 --- !u!1001 &361624725
 Prefab:
   m_ObjectHideFlags: 0

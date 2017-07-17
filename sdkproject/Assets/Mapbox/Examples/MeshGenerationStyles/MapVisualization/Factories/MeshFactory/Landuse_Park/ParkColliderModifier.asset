@@ -8,8 +8,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f336c96bbad10f4188e275dd470363e, type: 3}
-  m_Name: ClipperLineMeshModifier
+  m_Script: {fileID: 11500000, guid: 288d05a2dbabb0f46a5fa6c85102780a, type: 3}
+  m_Name: ParkColliderModifier
   m_EditorClassIdentifier: 
   Active: 1
-  Width: 5
+  _colliderType: 2
