@@ -70,20 +70,17 @@
 				{
 					var xx = Mathf.Lerp((float)tile.Rect.Min.x, ((float)tile.Rect.Min.x + (float)tile.Rect.Size.x),
 						x / (_sampleCount - 1));
-					var yy = Mathf.Lerp((float)tile.Rect.Min.y, ((float)tile.Rect.Min.y + (float)tile.Rect.Size.y),
+					var yy = Mathf.Lerp((float)tile.Rect.Max.y, ((float)tile.Rect.Max.y + (float)tile.Rect.Size.y),
 						y / (_sampleCount - 1));
 
 					var ll = Conversions.MetersToLatLon(new Vector2d(xx, yy));
 
-					var latitude = (float)(Mathf.PI * ll.x / 180);
-					var longitude = (float)(Mathf.PI * ll.y / 180);
+					var latitude = (float)(Mathf.Deg2Rad * ll.x);
+					var longitude = (float)(Mathf.Deg2Rad * ll.y);
 
-					// subtract 90 degrees (in radians)	
-					latitude -= 1.570795765134f;
-
-					float xPos = (_radius) * Mathf.Sin(latitude) * Mathf.Cos(longitude);
-					float zPos = (_radius) * Mathf.Sin(latitude) * Mathf.Sin(longitude);
-					float yPos = (_radius) * Mathf.Cos(latitude);
+					float xPos = (_radius) * Mathf.Cos(latitude) * Mathf.Cos(longitude);
+					float zPos = (_radius) * Mathf.Cos(latitude) * Mathf.Sin(longitude);
+					float yPos = (_radius) * Mathf.Sin(latitude);
 
 					var pp = new Vector3(xPos, yPos, zPos);
 					verts.Add(pp);
