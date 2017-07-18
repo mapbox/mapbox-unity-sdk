@@ -22,9 +22,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField]
 		private string _mapId = "";
 		[SerializeField]
-		private float _heightModifier = 1f;
+		private float _heightModifier = 2f;
 		[SerializeField]
-		private int _sampleCount = 40;
+		private int _sampleCount = 10;
 		[SerializeField]
 		private bool _addCollider = false;
 		[SerializeField]
@@ -144,11 +144,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			mesh.SetUVs(0, _newUvList);
 			mesh.SetTriangles(_newTriangleList, 0);
 			mesh.RecalculateBounds();
-
-			if (!_meshData.ContainsKey(tile.CanonicalTileId))
-			{
-				_meshData.Add(tile.CanonicalTileId, tile.MeshFilter.mesh);
-			}
 		}
 
 		internal override void OnUnregistered(UnityTile tile)
@@ -262,6 +257,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			FixStitches(tile.CanonicalTileId, _currentTileMeshData);
 			tile.MeshFilter.mesh.SetVertices(_currentTileMeshData.Vertices);
 			tile.MeshFilter.mesh.SetNormals(_currentTileMeshData.Normals);
+			
+			if (!_meshData.ContainsKey(tile.CanonicalTileId))
+			{
+				_meshData.Add(tile.CanonicalTileId, tile.MeshFilter.mesh);
+			}
 		}
 
 		private void ResetToFlatMesh(UnityTile tile)
