@@ -11,7 +11,7 @@
 	/// Uses vector tile api to visualize vector data.
 	/// Fetches the vector data for given tile and passes layer data to layer visualizers.
 	/// </summary>
-	[CreateAssetMenu(menuName = "Mapbox/Factories/Style Optimized Vector Tile Factory")]
+	[CreateAssetMenu(menuName = "Mapbox/Factories/Vector Tile Factory - Style Optimized")]
 	public class StyleOptimizedVectorTileFactory : AbstractTileFactory
 	{
 		[SerializeField]

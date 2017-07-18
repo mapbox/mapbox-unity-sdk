@@ -4,7 +4,7 @@
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.Utilities;
 
-	[CreateAssetMenu(menuName = "Mapbox/Factories/Flat Terrain Factory")]
+	[CreateAssetMenu(menuName = "Mapbox/Factories/Terrain Factory - Flat")]
 	public class FlatTerrainFactory : AbstractTileFactory
 	{
 		[SerializeField]
