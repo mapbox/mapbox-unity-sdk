@@ -31,6 +31,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		private bool _addToLayer = false;
 		[SerializeField]
 		private int _layerId = 0;
+		[SerializeField]
+		bool _useRelativeHeight;
 
 		Mesh _stitchTarget;
 
@@ -180,7 +182,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					return;
 				}
 
-				tile.SetHeightData(pngRasterTile.Data, _heightModifier);
+				tile.SetHeightData(pngRasterTile.Data, _heightModifier, _useRelativeHeight);
 				GenerateTerrainMesh(tile);
 				Progress--;
 			});
@@ -257,7 +259,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			FixStitches(tile.CanonicalTileId, _currentTileMeshData);
 			tile.MeshFilter.mesh.SetVertices(_currentTileMeshData.Vertices);
 			tile.MeshFilter.mesh.SetNormals(_currentTileMeshData.Normals);
-			
+			tile.MeshFilter.mesh.RecalculateBounds();
+
 			if (!_meshData.ContainsKey(tile.CanonicalTileId))
 			{
 				_meshData.Add(tile.CanonicalTileId, tile.MeshFilter.mesh);
