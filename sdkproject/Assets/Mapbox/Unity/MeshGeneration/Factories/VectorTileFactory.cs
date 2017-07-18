@@ -11,11 +11,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	/// Uses vector tile api to visualize vector data.
 	/// Fetches the vector data for given tile and passes layer data to layer visualizers.
 	/// </summary>
-	[CreateAssetMenu(menuName = "Mapbox/Factories/Mesh Factory")]
-	public class MeshFactory : AbstractTileFactory
+	[CreateAssetMenu(menuName = "Mapbox/Factories/Vector Tile Factory")]
+	public class VectorTileFactory : AbstractTileFactory
 	{
 		[SerializeField]
 		private string _mapId = "";
+
 		public List<LayerVisualizerBase> Visualizers;
 
 		private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;

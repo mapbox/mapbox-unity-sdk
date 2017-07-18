@@ -9,9 +9,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 63d97cb1cfb3f1b499c24763afa54873, type: 3}
-  m_Name: MeshFactory
+  m_Name: MeshOnTerrainVectorTileFactory
   m_EditorClassIdentifier: 
   _mapId: mapbox.mapbox-streets-v7
   Visualizers:
-  - {fileID: 11400000, guid: 49b5b5cab8982084a986f2d148acff42, type: 2}
-  - {fileID: 11400000, guid: e71aac5125636534886a86af764815c9, type: 2}
+  - {fileID: 11400000, guid: c09ca94378f6d44fe8b87150fe88b224, type: 2}
