@@ -46,6 +46,8 @@
 			{
 				window.Search(window._username);
 			}
+
+			Runnable.EnableRunnableInEditor();
 			Event e = Event.current;
 			Vector2 mousePos = GUIUtility.GUIToScreenPoint(e.mousePosition);
 			window.position = new Rect(mousePos.x - width, mousePos.y, width, height);
@@ -60,7 +62,7 @@
 		{
 			GUILayout.Label("Styles");
 
-			_username = GUILayout.TextField(_username);
+			_username = EditorGUILayout.TextField("Username: ", _username);
 
 			if (_username.Length == 0)
 			{
@@ -68,7 +70,6 @@
 			}
 			else
 			{
-				Debug.Log("StyleSearchWindow: " + "WTF");
 				if (GUILayout.Button("Search"))
 				{
 					Search(_username);
@@ -107,13 +108,6 @@
 						GUILayout.Label("No search results");
 				}
 			}
-
-			if (!hasSetFocus)
-			{
-				Debug.Log("StyleSearchWindow: " + "SET FOCUS");
-				GUI.FocusControl(searchFieldName);
-				hasSetFocus = true;
-			}
 		}
 
 		void Search(string searchString)
@@ -132,10 +126,8 @@
 			var www = new WWW(Utils.Constants.BaseAPI + string.Format("styles/v1/{0}?access_token={1}", _username, token));
 			while (!www.isDone)
 			{
-				Debug.Log("StyleSearchWindow: " + "BROKEN");
 				yield return 0;
 			}
-			Debug.Log("StyleSearchWindow: " + "DONE");
 			var json = www.text;
 			if (!string.IsNullOrEmpty(json))
 			{
@@ -159,7 +151,6 @@
 				_isSearching = false;
 				return;
 			}
-			Debug.Log("StyleSearchWindow: " + "PARSED!");
 			var settings = new JsonSerializerSettings();
 			settings.DateParseHandling = DateParseHandling.None;
 			var styleArray = JsonConvert.DeserializeObject<object[]>(json);
