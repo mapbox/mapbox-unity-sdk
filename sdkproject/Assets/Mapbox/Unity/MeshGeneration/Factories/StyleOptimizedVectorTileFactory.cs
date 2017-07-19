@@ -6,6 +6,8 @@
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.MeshGeneration.Interfaces;
 	using Mapbox.Map;
+	using Mapbox.Unity.Utilities;
+	using System;
 
 	/// <summary>
 	/// Uses vector tile api to visualize vector data.
@@ -18,10 +20,8 @@
 		private string _mapId = "";
 
 		[SerializeField]
-		private string _optimizedStyleId;
-
-		[SerializeField]
-		private string _modifiedDate;
+		[StyleSearch]
+		Style _optimizedStyle;
 
 		public List<LayerVisualizerBase> Visualizers;
 
@@ -58,7 +58,7 @@
 
 		internal override void OnRegistered(UnityTile tile)
 		{
-			var vectorTile = new StyleOptimizedVectorTile(_optimizedStyleId, _modifiedDate);
+			var vectorTile = new StyleOptimizedVectorTile(_optimizedStyle.Id, _optimizedStyle.Modified);
 			tile.AddTile(vectorTile);
 
 			Progress++;
@@ -136,5 +136,14 @@
 
 			_cachedData.Remove(tile);
 		}
+	}
+
+	[Serializable]
+	public class Style
+	{
+		public string Name;
+		public string Id;
+		public string Modified;
+		public string UserName;
 	}
 }

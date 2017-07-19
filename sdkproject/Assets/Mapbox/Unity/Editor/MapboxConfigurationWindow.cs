@@ -35,10 +35,8 @@ namespace Mapbox.Editor
 		[MenuItem("Mapbox/Configure")]
 		static void Init()
 		{
-
 			_configurationFile = Path.Combine(Unity.Constants.Path.MAPBOX_RESOURCES_ABSOLUTE, Unity.Constants.Path.CONFIG_FILE);
 
-			Runnable.EnableRunnableInEditor();
 			if (!Directory.Exists(Unity.Constants.Path.MAPBOX_RESOURCES_ABSOLUTE))
 			{
 				Directory.CreateDirectory(Unity.Constants.Path.MAPBOX_RESOURCES_ABSOLUTE);

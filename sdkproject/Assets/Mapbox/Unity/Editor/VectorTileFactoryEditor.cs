@@ -1,4 +1,4 @@
-namespace Mapbox.Unity.Editor
+namespace Mapbox.Editor
 {
 	using UnityEngine;
 	using UnityEditor;
@@ -12,7 +12,7 @@ namespace Mapbox.Unity.Editor
 		private MonoScript script;
 		private VectorTileFactory _factory;
 		SerializedProperty _visualizerList;
-		public SerializedProperty mapId_Prop, customMapId_Prop;
+		public SerializedProperty mapId_Prop;
 
 		private int ListSize;
 		void OnEnable()

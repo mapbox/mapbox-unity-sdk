@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Unity.Editor
+﻿namespace Mapbox.Editor
 {
 	using UnityEngine;
 	using UnityEditor;
@@ -12,7 +12,7 @@
 		private MonoScript script;
 		private StyleOptimizedVectorTileFactory _factory;
 		SerializedProperty _visualizerList;
-		public SerializedProperty mapId_Prop, customMapId_Prop, optimizedStyleId_Prop, modifiedDate_Prop;
+		public SerializedProperty mapId_Prop, style_Prop;
 
 		private int ListSize;
 		void OnEnable()
@@ -20,8 +20,7 @@
 			_factory = target as StyleOptimizedVectorTileFactory;
 			_visualizerList = serializedObject.FindProperty("Visualizers");
 			mapId_Prop = serializedObject.FindProperty("_mapId");
-			optimizedStyleId_Prop = serializedObject.FindProperty("_optimizedStyleId");
-			modifiedDate_Prop = serializedObject.FindProperty("_modifiedDate");
+			style_Prop = serializedObject.FindProperty("_optimizedStyle");
 			script = MonoScript.FromScriptableObject(_factory);
 
 			if (string.IsNullOrEmpty(mapId_Prop.stringValue))
@@ -55,8 +54,7 @@
 
 			EditorGUILayout.Space();
 
-			EditorGUILayout.PropertyField(optimizedStyleId_Prop, new GUIContent("Optimized Style Id"));
-			EditorGUILayout.PropertyField(modifiedDate_Prop, new GUIContent("Modified Timestamp"));
+			EditorGUILayout.PropertyField(style_Prop, new GUIContent("Optimized Style"));
 
 			EditorGUILayout.Space();
 			EditorGUILayout.Space();

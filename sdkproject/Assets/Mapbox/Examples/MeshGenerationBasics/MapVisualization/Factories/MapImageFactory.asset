@@ -11,9 +11,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b10536479dade041b6db9893fdf723a, type: 3}
   m_Name: MapImageFactory
   m_EditorClassIdentifier: 
-  _mapIdType: 0
+  _mapIdType: 1
   _customMapId: 
-  _mapId: mapbox://styles/mapbox/dark-v9
+  _customStyle:
+    Name: SciFi-Lime-v3
+    Id: mapbox://styles/davidrhodes/cj0bcmlvg001s2smcym0hm7b2
+    Modified: 2017-03-15T22:55:59.171Z
+    UserName: davidrhodes
+  _mapId: mapbox://styles/davidrhodes/cj0bcmlvg001s2smcym0hm7b2
   _useCompression: 0
   _useMipMap: 0
   _useRetina: 0

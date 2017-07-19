@@ -36,7 +36,7 @@ public class MapImageFactoryEditor : FactoryEditor
     void OnEnable()
     {
         _factory = target as MapImageFactory;
-        customMapId_Prop = serializedObject.FindProperty("_customMapId");
+        customMapId_Prop = serializedObject.FindProperty("_customStyle");
         mapIdType_Prop = serializedObject.FindProperty("_mapIdType");
         mapId_Prop = serializedObject.FindProperty("_mapId");
         useMipMap_Prop = serializedObject.FindProperty("_useMipMap");
@@ -80,8 +80,8 @@ public class MapImageFactoryEditor : FactoryEditor
                 }
             case MapImageType.Custom:
                 {
-                    EditorGUILayout.PropertyField(customMapId_Prop, new GUIContent("Map Id"));
-                    mapId_Prop.stringValue = customMapId_Prop.stringValue;
+                    EditorGUILayout.PropertyField(customMapId_Prop, new GUIContent("Style Id"));
+					mapId_Prop.stringValue = customMapId_Prop.FindPropertyRelative("Id").stringValue;
 					if (string.IsNullOrEmpty(mapId_Prop.stringValue))
 					{
 						EditorGUILayout.HelpBox("Invalid MapID. This will cause invalid tile requests!", MessageType.Error);

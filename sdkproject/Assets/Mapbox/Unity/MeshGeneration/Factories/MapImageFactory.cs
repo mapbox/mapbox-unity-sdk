@@ -1,11 +1,11 @@
 namespace Mapbox.Unity.MeshGeneration.Factories
 {
 	using System;
-	using System.Collections.Generic;
 	using Mapbox.Map;
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Enums;
 	using Mapbox.Unity.MeshGeneration.Data;
+	using Mapbox.Unity.Utilities;
 
 	public enum MapImageType
 	{
@@ -24,7 +24,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		private MapImageType _mapIdType;
 
 		[SerializeField]
-		private string _customMapId = "";
+		[StyleSearch]
+		Style _customStyle;
 
 		[SerializeField]
 		private string _mapId = "";
