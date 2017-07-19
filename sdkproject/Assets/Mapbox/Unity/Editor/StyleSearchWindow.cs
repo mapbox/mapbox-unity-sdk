@@ -102,7 +102,11 @@
 					}
 					else if (!string.IsNullOrEmpty(_errorString))
 					{
-						GUILayout.Label(_errorString);
+						EditorGUILayout.HelpBox(_errorString, MessageType.Error);
+						if (GUILayout.Button("Check username/get token with styles:list support"))
+						{
+							Application.OpenURL("https://www.mapbox.com/studio/account/tokens/");
+						}
 					}
 					else
 						GUILayout.Label("No search results");

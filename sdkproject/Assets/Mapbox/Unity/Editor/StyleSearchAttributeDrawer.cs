@@ -12,23 +12,31 @@
 	[CustomPropertyDrawer(typeof(StyleSearchAttribute))]
 	public class StyleSearchAttributeDrawer : PropertyDrawer
 	{
-		const string searchButtonContent = "Search";
-
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-
 		{
 			float buttonWidth = EditorGUIUtility.singleLineHeight * 4;
 
 			position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
 
-			if (GUI.Button(position, searchButtonContent))
+			if (GUILayout.Button("Search"))
 			{
 				StyleSearchWindow.Open(property);
 			}
 
-			EditorGUILayout.TextField("Id: ", property.FindPropertyRelative("Id").stringValue);
-			EditorGUILayout.TextField("Name: ", property.FindPropertyRelative("Name").stringValue);
-			EditorGUILayout.TextField("Modified: ", property.FindPropertyRelative("Modified").stringValue);
+			var id = property.FindPropertyRelative("Id");
+			var name = property.FindPropertyRelative("Name");
+			var modified = property.FindPropertyRelative("Modified");
+
+			id.stringValue = EditorGUILayout.TextField("Id: ", id.stringValue);
+			name.stringValue = EditorGUILayout.TextField("Name: ", name.stringValue);
+			modified.stringValue = EditorGUILayout.TextField("Modified: ", modified.stringValue);
+
+			if (GUILayout.Button("Clear"))
+			{
+				id.stringValue = "";
+				name.stringValue = "";
+				modified.stringValue = "";
+			}
 		}
 	}
 }
