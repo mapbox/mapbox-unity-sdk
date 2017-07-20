@@ -36,6 +36,7 @@
 		/// <param name="fs"></param>
 		internal override void OnInitialized()
 		{
+			Debug.LogWarning("MeshFactory is <color=red>obsolete</color>. Please use VectorTileFactory.");
 			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
 			foreach (LayerVisualizerBase factory in Visualizers)
 			{
