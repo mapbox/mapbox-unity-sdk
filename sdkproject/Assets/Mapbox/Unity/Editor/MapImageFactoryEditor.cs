@@ -120,11 +120,11 @@ public class MapImageFactoryEditor : FactoryEditor
         }
         EditorGUI.indentLevel--;
 
-        if (GUILayout.Button("Update"))
-        {
-            //_factory.Update();
-			Debug.Log("MapImageFactoryEditor: " + "FIX ME!");
-        }
+   //     if (GUILayout.Button("Update"))
+   //     {
+   //         //_factory.Update();
+			//Debug.Log("MapImageFactoryEditor: " + "FIX ME!");
+   //     }
         serializedObject.ApplyModifiedProperties();
     }
 }

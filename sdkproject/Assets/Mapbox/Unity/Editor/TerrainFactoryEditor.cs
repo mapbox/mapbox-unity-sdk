@@ -92,11 +92,11 @@ public class TerrainFactoryEditor : FactoryEditor
 			layerId_Prop.intValue = EditorGUILayout.LayerField("Layer", layerId_Prop.intValue);
 		}
 
-		if (GUILayout.Button("Update"))
-		{
-			//_factory.Update();
-			Debug.Log("TerrainFactoryEditor: " + "FIX ME!");
-		}
+		//if (GUILayout.Button("Update"))
+		//{
+		//	//_factory.Update();
+		//	Debug.Log("TerrainFactoryEditor: " + "FIX ME!");
+		//}
 
 		serializedObject.ApplyModifiedProperties();
 	}
