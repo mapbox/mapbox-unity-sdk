@@ -1,8 +1,9 @@
-namespace Mapbox.Unity.MeshGeneration.Modifiers
+namespace Mapbox.Examples
 {
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Components;
 	using UnityEngine.UI;
+	using Mapbox.Unity.MeshGeneration.Modifiers;
 
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Object Inspector Modifier")]
 	public class ObjectInspectorModifier : GameObjectModifier

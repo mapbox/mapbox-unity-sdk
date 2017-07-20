@@ -13,5 +13,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Active: 1
   _types:
-  - _typeString: HighlightFeature
+  - _typeString: Mapbox.Examples.HighlightFeature
     _script: {fileID: 11500000, guid: 64cb1b303dc6db64aa28a4229e62e9ed, type: 3}

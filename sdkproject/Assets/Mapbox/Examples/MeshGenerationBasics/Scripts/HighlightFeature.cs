@@ -1,34 +1,37 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
-
-public class HighlightFeature : MonoBehaviour
+﻿namespace Mapbox.Examples
 {
-	private List<Color> _original = new List<Color>();
-	private Color _highlight = Color.red;
-	private List<Material> _materials = new List<Material>();
+	using UnityEngine;
+	using System.Collections.Generic;
 
-	void Start()
+	public class HighlightFeature : MonoBehaviour
 	{
-		foreach (var item in GetComponent<MeshRenderer>().materials)
+		private List<Color> _original = new List<Color>();
+		private Color _highlight = Color.red;
+		private List<Material> _materials = new List<Material>();
+
+		void Start()
 		{
-			_materials.Add(item);
-			_original.Add(item.color);
+			foreach (var item in GetComponent<MeshRenderer>().materials)
+			{
+				_materials.Add(item);
+				_original.Add(item.color);
+			}
 		}
-	}
 
-	public void OnMouseEnter()
-	{
-		foreach (var item in _materials)
+		public void OnMouseEnter()
 		{
-			item.color = _highlight;
+			foreach (var item in _materials)
+			{
+				item.color = _highlight;
+			}
 		}
-	}
 
-	public void OnMouseExit()
-	{
-		for (int i = 0; i < _materials.Count; i++)
+		public void OnMouseExit()
 		{
-			_materials[i].color = _original[i];
+			for (int i = 0; i < _materials.Count; i++)
+			{
+				_materials[i].color = _original[i];
+			}
 		}
 	}
 }
