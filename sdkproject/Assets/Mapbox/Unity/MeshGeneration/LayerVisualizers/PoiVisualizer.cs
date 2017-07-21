@@ -8,6 +8,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
     using System;
     using Mapbox.Unity.Utilities;
 
+	[Obsolete("PoiVisualer is deprecated. Use regular VectorLayerVisualizer and Prefab Modifier to visualize pois.")]
     [CreateAssetMenu(menuName = "Mapbox/Layer Visualizer/Poi Layer Visualizer")]
     public class PoiVisualizer : LayerVisualizerBase
     {
