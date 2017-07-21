@@ -8,8 +8,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
     using System;
     using Mapbox.Unity.Utilities;
 
-	[Obsolete("PoiVisualer is deprecated. Use regular VectorLayerVisualizer and Prefab Modifier to visualize pois.")]
-    [CreateAssetMenu(menuName = "Mapbox/Layer Visualizer/Poi Layer Visualizer")]
+	[Obsolete("PoiVisualer is deprecated. Use regular VectorLayerVisualizer and PrefabModifier.")]
+	[CreateAssetMenu(menuName = "Mapbox/Layer Visualizer/Poi Layer Visualizer - Obsolete (use PrefabModifier)")]
     public class PoiVisualizer : LayerVisualizerBase
     {
         [SerializeField]
@@ -28,6 +28,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
         public override void Create(VectorTileLayer layer, UnityTile tile)
         {
+			Debug.LogWarning("PoiVisualer is deprecated. Use regular VectorLayerVisualizer and PrefabModifier.");
             _container = new GameObject(Key + " Container");
             _container.transform.SetParent(tile.transform, false);
 
