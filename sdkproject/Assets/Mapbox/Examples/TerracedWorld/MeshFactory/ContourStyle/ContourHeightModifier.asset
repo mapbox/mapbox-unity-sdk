@@ -8,11 +8,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 232ffe870b9f2df408d25ad59dbfe77c, type: 3}
+  m_Script: {fileID: 11500000, guid: a7dfb85d33966074ebf2acd2de263474, type: 3}
   m_Name: ContourHeightModifier
   m_EditorClassIdentifier: 
   Active: 1
   _flatTops: 0
-  _height: 0
   _forceHeight: 0
-  _offset: 2
+  _height: 0
+  _createSideWalls: 1
