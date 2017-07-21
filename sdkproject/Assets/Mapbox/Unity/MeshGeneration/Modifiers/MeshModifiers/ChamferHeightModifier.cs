@@ -14,7 +14,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		[SerializeField]
 		private bool _forceHeight;
 		[SerializeField]
-		[Range(0.1f,1)]
+		[Range(0.1f,2)]
 		private float _offset = 0.2f;
 
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
