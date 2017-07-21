@@ -18,10 +18,6 @@ namespace Mapbox.Unity
 		ITelemetryLibrary _telemetryLibrary;
 		CachingWebFileSource _fileSource;
 
-		// Default on.
-		bool _shouldCollectLocation = true;
-
-
 		static MapboxAccess _instance = new MapboxAccess();
 		/// <summary>
 		/// The singleton instance.
@@ -119,9 +115,8 @@ namespace Mapbox.Unity
 
 			_telemetryLibrary.Initialize(_configuration.AccessToken);
 
-			_shouldCollectLocation = GetTelemetryCollectionState();
-			Debug.Log("MapboxAccess: " + _shouldCollectLocation);
-			SetLocationCollectionState(_shouldCollectLocation);
+			Debug.Log("MapboxAccess: " + GetTelemetryCollectionState());
+			_telemetryLibrary.SetLocationCollectionState(GetTelemetryCollectionState());
 
 			_telemetryLibrary.SendTurnstile();
 		}
@@ -129,7 +124,7 @@ namespace Mapbox.Unity
 		public void SetLocationCollectionState(bool enable)
 		{
 			Debug.Log("MapboxAccess: " + "SET TELEM COLLECTION: " + enable);
-			_shouldCollectLocation = enable;
+			PlayerPrefs.SetInt(Constants.Path.SHOULD_COLLECT_LOCATION_KEY, (enable ? 1 : 0));
 			_telemetryLibrary.SetLocationCollectionState(enable);
 		}
 
