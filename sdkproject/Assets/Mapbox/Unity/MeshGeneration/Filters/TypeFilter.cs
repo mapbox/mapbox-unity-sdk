@@ -8,13 +8,20 @@ namespace Mapbox.Unity.MeshGeneration.Filters
     {
         public override string Key { get { return "type"; } }
         [SerializeField]
-        private string _type;
+        private string[] _types;
         [SerializeField]
         private TypeFilterType _behaviour;
 
         public override bool Try(VectorFeatureUnity feature)
         {
-            var check = _type.ToLowerInvariant().Contains(feature.Properties["type"].ToString().ToLowerInvariant());
+			var check = false;
+			for (int i = 0; i < _types.Length; i++)
+			{
+				if (_types[i].ToLowerInvariant() == feature.Properties["type"].ToString().ToLowerInvariant())
+				{
+					check = true;
+				}
+			}
             return _behaviour == TypeFilterType.Include ? check : !check;
         }
 
