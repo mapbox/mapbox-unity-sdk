@@ -16,6 +16,7 @@
 		private float _radius;
 
 		[SerializeField]
+		[Range(2,256)]
 		int _sampleCount;
 
 		[SerializeField]
