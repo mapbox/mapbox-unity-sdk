@@ -114,16 +114,12 @@ namespace Mapbox.Unity
 
 
 			_telemetryLibrary.Initialize(_configuration.AccessToken);
-
-			Debug.Log("MapboxAccess: " + GetTelemetryCollectionState());
 			_telemetryLibrary.SetLocationCollectionState(GetTelemetryCollectionState());
-
 			_telemetryLibrary.SendTurnstile();
 		}
 
 		public void SetLocationCollectionState(bool enable)
 		{
-			Debug.Log("MapboxAccess: " + "SET TELEM COLLECTION: " + enable);
 			PlayerPrefs.SetInt(Constants.Path.SHOULD_COLLECT_LOCATION_KEY, (enable ? 1 : 0));
 			_telemetryLibrary.SetLocationCollectionState(enable);
 		}
