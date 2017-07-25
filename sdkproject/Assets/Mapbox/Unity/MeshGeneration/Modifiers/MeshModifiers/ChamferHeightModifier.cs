@@ -8,13 +8,17 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	public class ChamferHeightModifier : MeshModifier
 	{
 		[SerializeField]
+		[Tooltip("Flatten top polygons to prevent unwanted slanted roofs because of the bumpy terrain")]
 		private bool _flatTops;
 		[SerializeField]
+		[Tooltip("Fixed height value for ForceHeight option")]
 		private float _height;
 		[SerializeField]
+		[Tooltip("Fix all features to certain height, suggested to be used for pushing roads above terrain level to prevent z-fighting.")]
 		private bool _forceHeight;
 		[SerializeField]
-		[Range(0.1f,1)]
+		[Range(0.1f,2)]
+		[Tooltip("Chamfer width value")]
 		private float _offset = 0.2f;
 
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
