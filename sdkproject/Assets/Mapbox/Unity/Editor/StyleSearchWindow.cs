@@ -23,6 +23,7 @@
 		const float height = 300f;
 
 		bool _isSearching = false;
+		Vector2 scrollPos;
 
 		void OnEnable()
 		{
@@ -39,7 +40,7 @@
 		public static void Open(SerializedProperty property)
 		{
 			StyleSearchWindow window = GetWindow<StyleSearchWindow>(true, "Search for style");
-
+			
 			window._property = property;
 			window._username = property.FindPropertyRelative("UserName").stringValue;
 			if (!string.IsNullOrEmpty(window._username))
@@ -51,6 +52,7 @@
 			Event e = Event.current;
 			Vector2 mousePos = GUIUtility.GUIToScreenPoint(e.mousePosition);
 			window.position = new Rect(mousePos.x - width, mousePos.y, width, height);
+			window.minSize = new Vector2(400,500);
 		}
 
 		void OnModeChanged()
@@ -60,9 +62,15 @@
 
 		void OnGUI()
 		{
-			GUILayout.Label("Styles");
+			var st = new GUIStyle();
+			st.padding = new RectOffset(15, 15, 15, 15);
+			EditorGUILayout.Space();
+			EditorGUILayout.Space();
+			EditorGUILayout.HelpBox("User styles are bound to usernames, enter your Mapbox Username to search for your personal styles.", MessageType.Info);
+			_username = EditorGUILayout.TextField("Mapbox Username: ", _username);
 
-			_username = EditorGUILayout.TextField("Username: ", _username);
+			
+			scrollPos = EditorGUILayout.BeginScrollView(scrollPos, st);
 
 			if (_username.Length == 0)
 			{
@@ -70,9 +78,12 @@
 			}
 			else
 			{
-				if (GUILayout.Button("Search"))
+				if (!_isSearching)
 				{
-					Search(_username);
+					if (GUILayout.Button("Search"))
+					{
+						Search(_username);
+					}
 				}
 
 				if (_styles != null && _styles.Count > 0)
@@ -98,10 +109,18 @@
 				{
 					if (_isSearching)
 					{
-						GUILayout.Label("Searching...");
+						GUI.enabled = false;
+						if (GUILayout.Button("Searching..."))
+						{
+						}
+						GUI.enabled = true;
 					}
 					else if (!string.IsNullOrEmpty(_errorString))
 					{
+						EditorGUILayout.Space();
+						EditorGUILayout.Space();
+						EditorGUILayout.Space();
+						EditorGUILayout.Space();
 						EditorGUILayout.HelpBox(_errorString, MessageType.Error);
 						if (GUILayout.Button("Check username/get token with styles:list support"))
 						{
@@ -112,6 +131,10 @@
 						GUILayout.Label("No search results");
 				}
 			}
+
+			EditorGUILayout.EndScrollView();
+
+			
 		}
 
 		void Search(string searchString)
@@ -144,7 +167,7 @@
 			_styles = new List<Style>();
 			if (json.Contains("This API requires a token with styles:list scope"))
 			{
-				_errorString = "This API requires a token with styles:list scope!";
+				_errorString = "The Mapbox Access Token you're using at the moment doesn't have \"styles: list\" scope this feature requires.\r\n\r\nYou can create a new token from link below and check \"styles: list\" in the Token Scopes list to enable this feature.";
 				_isSearching = false;
 				return;
 			}

@@ -26,11 +26,13 @@ namespace Mapbox.Editor
 		private static bool _validating = false;
 		private static bool _tokenSaved = false;
 		private static bool _savingConfig = false;
+		private static string _previousToken;
 		private static int _previousMemCacheSize = -1;
 		private static int _previousMbTilesCacheSize = -1;
 		private static int _previousWebRequestTimeout = -1;
 		private static System.Timers.Timer _timer = null;
 		private static MapboxConfigurationWindow _configWindow = null;
+		private static bool _reloadJson = false;
 
 		[MenuItem("Mapbox/Configure")]
 		static void Init()
@@ -87,7 +89,6 @@ namespace Mapbox.Editor
 
 			#region handle token verification
 
-
 			_accessToken = EditorGUILayout.TextField("Access Token", _accessToken);
 
 			bool matchSuccess = false;
@@ -142,7 +143,8 @@ namespace Mapbox.Editor
 
 
 			if (
-				_memoryCacheSize != _previousMemCacheSize
+				_accessToken != _previousToken
+				|| _memoryCacheSize != _previousMemCacheSize
 				|| _mbtilesCacheSize != _previousMbTilesCacheSize
 				|| _webRequestTimeout != _previousWebRequestTimeout
 			)
@@ -165,12 +167,12 @@ namespace Mapbox.Editor
 			_previousMemCacheSize = _memoryCacheSize;
 			_previousMbTilesCacheSize = _mbtilesCacheSize;
 			_previousWebRequestTimeout = _webRequestTimeout;
-
+			_previousToken = _accessToken;
 		}
 
 		private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
 		{
-			SaveConfiguration(); ;
+			SaveConfiguration();
 		}
 
 
@@ -221,6 +223,7 @@ namespace Mapbox.Editor
 				}
 				var json = JsonUtility.ToJson(new MapboxConfiguration { AccessToken = _accessToken, MemoryCacheSize = (uint)_memoryCacheSize, MbTilesCacheSize = (uint)_mbtilesCacheSize, DefaultTimeout = _webRequestTimeout });
 				File.WriteAllText(_configurationFile, json);
+				MapboxAccess.Instance.Set(_accessToken, (uint)_memoryCacheSize, (uint)_mbtilesCacheSize, _webRequestTimeout);
 			}
 			finally
 			{
