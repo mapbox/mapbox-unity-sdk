@@ -32,8 +32,7 @@ namespace Mapbox.Editor
 		private static int _previousWebRequestTimeout = -1;
 		private static System.Timers.Timer _timer = null;
 		private static MapboxConfigurationWindow _configWindow = null;
-		private static bool _reloadJson = false;
-
+		private static bool _setStuff = false;
 		[MenuItem("Mapbox/Configure")]
 		static void Init()
 		{
@@ -79,6 +78,12 @@ namespace Mapbox.Editor
 			{
 				Init();
 				return;
+			}
+
+			if(_setStuff)
+			{
+				_setStuff = false;
+				MapboxAccess.Instance.Set(_accessToken, (uint)_memoryCacheSize, (uint)_mbtilesCacheSize, _webRequestTimeout);
 			}
 
 			EditorGUIUtility.labelWidth = 200f;
@@ -223,7 +228,8 @@ namespace Mapbox.Editor
 				}
 				var json = JsonUtility.ToJson(new MapboxConfiguration { AccessToken = _accessToken, MemoryCacheSize = (uint)_memoryCacheSize, MbTilesCacheSize = (uint)_mbtilesCacheSize, DefaultTimeout = _webRequestTimeout });
 				File.WriteAllText(_configurationFile, json);
-				MapboxAccess.Instance.Set(_accessToken, (uint)_memoryCacheSize, (uint)_mbtilesCacheSize, _webRequestTimeout);
+				_setStuff = true;
+				
 			}
 			finally
 			{
