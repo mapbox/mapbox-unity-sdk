@@ -25,18 +25,16 @@ namespace Mapbox.Editor
 
 		private static bool _validating = false;
 		private static bool _tokenSaved = false;
-		private static bool _savingConfig = false;
-		private static string _previousToken;
 		private static int _previousMemCacheSize = -1;
 		private static int _previousMbTilesCacheSize = -1;
 		private static int _previousWebRequestTimeout = -1;
 		private static System.Timers.Timer _timer = null;
 		private static MapboxConfigurationWindow _configWindow = null;
-		private static bool _setStuff = false;
+		private static MapboxAccess _mapboxAccess;
+
 		[MenuItem("Mapbox/Configure")]
 		static void Init()
 		{
-
 			_configurationFile = Path.Combine(Unity.Constants.Path.MAPBOX_RESOURCES_ABSOLUTE, Unity.Constants.Path.CONFIG_FILE);
 
 			Runnable.EnableRunnableInEditor();
@@ -52,6 +50,10 @@ namespace Mapbox.Editor
 
 			var configurationJson = File.ReadAllText(_configurationFile);
 			_mapboxConfiguration = JsonUtility.FromJson<MapboxConfiguration>(configurationJson);
+
+			// HACK: this forces initialization before the threaded timer has a chance, which causes an issue with Resources.Load.
+			MapboxAccess.Instance.SetConfiguration(_mapboxConfiguration);
+
 			_accessToken = _mapboxConfiguration.AccessToken;
 			_memoryCacheSize = _previousMemCacheSize = (int)_mapboxConfiguration.MemoryCacheSize;
 			_mbtilesCacheSize = _previousMbTilesCacheSize = (int)_mapboxConfiguration.MbTilesCacheSize;
@@ -76,21 +78,13 @@ namespace Mapbox.Editor
 		{
 			if (null == _configWindow)
 			{
-				Init();
 				return;
-			}
-
-			if(_setStuff)
-			{
-				_setStuff = false;
-				MapboxAccess.Instance.Set(_accessToken, (uint)_memoryCacheSize, (uint)_mbtilesCacheSize, _webRequestTimeout);
 			}
 
 			EditorGUIUtility.labelWidth = 200f;
 			_memoryCacheSize = EditorGUILayout.IntSlider("Mem Cache Size (# of tiles)", _memoryCacheSize, 0, 1000);
 			_mbtilesCacheSize = EditorGUILayout.IntSlider("MBTiles Cache Size (# of tiles)", _mbtilesCacheSize, 0, 3000);
 			_webRequestTimeout = EditorGUILayout.IntField("Default Web Request Timeout (s)", _webRequestTimeout);
-
 
 			#region handle token verification
 
@@ -148,8 +142,7 @@ namespace Mapbox.Editor
 
 
 			if (
-				_accessToken != _previousToken
-				|| _memoryCacheSize != _previousMemCacheSize
+				_memoryCacheSize != _previousMemCacheSize
 				|| _mbtilesCacheSize != _previousMbTilesCacheSize
 				|| _webRequestTimeout != _previousWebRequestTimeout
 			)
@@ -172,7 +165,6 @@ namespace Mapbox.Editor
 			_previousMemCacheSize = _memoryCacheSize;
 			_previousMbTilesCacheSize = _mbtilesCacheSize;
 			_previousWebRequestTimeout = _webRequestTimeout;
-			_previousToken = _accessToken;
 		}
 
 		private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -218,24 +210,15 @@ namespace Mapbox.Editor
 
 		void SaveConfiguration()
 		{
-			try
+			// if access token is not valid, but save was triggered by changing other parameters, nuke it
+			if (!string.Equals(_validationCode, "TokenValid"))
 			{
-				_savingConfig = true;
-				// if access token is not valid, but save was triggered by changing other parameters, nuke it
-				if (!string.Equals(_validationCode, "TokenValid"))
-				{
-					_accessToken = "";
-				}
-				var json = JsonUtility.ToJson(new MapboxConfiguration { AccessToken = _accessToken, MemoryCacheSize = (uint)_memoryCacheSize, MbTilesCacheSize = (uint)_mbtilesCacheSize, DefaultTimeout = _webRequestTimeout });
-				File.WriteAllText(_configurationFile, json);
-				_setStuff = true;
-				
+				_accessToken = "";
 			}
-			finally
-			{
-				_savingConfig = false;
-			}
+			var configuration = new MapboxConfiguration { AccessToken = _accessToken, MemoryCacheSize = (uint)_memoryCacheSize, MbTilesCacheSize = (uint)_mbtilesCacheSize, DefaultTimeout = _webRequestTimeout };
+			var json = JsonUtility.ToJson(configuration);
+			File.WriteAllText(_configurationFile, json);
+			MapboxAccess.Instance.SetConfiguration(configuration);
 		}
-
 	}
 }
