@@ -81,6 +81,16 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
+		UnwrappedTileId _unwrappedTileId;
+		public UnwrappedTileId UnwrappedTileId
+		{
+			get
+			{
+				return _unwrappedTileId;
+
+			}
+		}
+
 		CanonicalTileId _canonicalTileId;
 		public CanonicalTileId CanonicalTileId
 		{
@@ -90,9 +100,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		public TilePropertyState RasterDataState { get; set; }
-		public TilePropertyState HeightDataState { get; set; }
-		public TilePropertyState VectorDataState { get; set; }
+		public TilePropertyState RasterDataState;
+		public TilePropertyState HeightDataState;
+		public TilePropertyState VectorDataState;
 
 		public event Action<UnityTile> OnHeightDataChanged = delegate { };
 		public event Action<UnityTile> OnRasterDataChanged = delegate { };
@@ -102,8 +112,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		{
 			_relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
 			_rect = Conversions.TileBounds(tileId);
+			_unwrappedTileId = tileId;
 			_canonicalTileId = tileId.Canonical;
-			gameObject.name = tileId.ToString();
+			gameObject.name = _canonicalTileId.ToString();
 			var position = new Vector3((float)(_rect.Center.x - map.CenterMercator.x), 0, (float)(_rect.Center.y - map.CenterMercator.y));
 			transform.localPosition = position;
 			gameObject.SetActive(true);
