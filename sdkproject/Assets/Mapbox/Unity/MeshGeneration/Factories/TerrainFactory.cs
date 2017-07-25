@@ -30,6 +30,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField]
 		private float _heightModifier = 1f;
 		[SerializeField]
+		[Range(2, 256)]
 		private int _sampleCount = 40;
 		[SerializeField]
 		private bool _addCollider = false;
