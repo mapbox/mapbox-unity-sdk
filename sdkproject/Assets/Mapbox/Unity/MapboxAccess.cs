@@ -63,8 +63,11 @@ namespace Mapbox.Unity
 			ConfigureFileSource();
 			ConfigureTelemetry();
 		}
-
-
+		
+		public void SetConfiguration(MapboxConfiguration configuration)
+		{
+			_configuration = configuration;
+		}
 
 		/// <summary>
 		/// Clear all existing tile caches. Deletes MBTiles database files.
@@ -192,6 +195,7 @@ namespace Mapbox.Unity
 			{
 			}
 		}
+
 	}
 
 	public class MapboxConfiguration

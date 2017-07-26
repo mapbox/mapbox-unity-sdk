@@ -9,9 +9,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 63d97cb1cfb3f1b499c24763afa54873, type: 3}
-  m_Name: DriveMeshFactory
+  m_Name: PoiVectorTileFactory
   m_EditorClassIdentifier: 
-  _mapId: mapbox.mapbox-traffic-v1,mapbox.mapbox-streets-v7
+  _mapId: mapbox.mapbox-streets-v7
   Visualizers:
-  - {fileID: 11400000, guid: 960fc9b7bdbc4f24b860f10bdfd7c165, type: 2}
-  - {fileID: 11400000, guid: 3a02dddaa897fd444b76d6ed1339dab6, type: 2}
+  - {fileID: 11400000, guid: d7635a5805d9fde4abacec52b9484935, type: 2}
+  - {fileID: 11400000, guid: 615891c00af941c4a97b2ce6797278d0, type: 2}
+  - {fileID: 11400000, guid: a493b030d561f34448a13f55bec8b7fc, type: 2}
+  - {fileID: 11400000, guid: 3395a1a7d9533a74591d5ae0381edbfe, type: 2}

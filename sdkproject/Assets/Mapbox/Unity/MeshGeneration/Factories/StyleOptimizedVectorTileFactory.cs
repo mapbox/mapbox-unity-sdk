@@ -6,23 +6,27 @@
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.MeshGeneration.Interfaces;
 	using Mapbox.Map;
+	using Mapbox.Unity.Utilities;
 	using System;
 
 	/// <summary>
 	/// Uses vector tile api to visualize vector data.
 	/// Fetches the vector data for given tile and passes layer data to layer visualizers.
 	/// </summary>
-	[Obsolete("MeshFactory is obsolete. Please use VectorTileFactory.")]
-	[CreateAssetMenu(menuName = "Mapbox/Factories/Mesh Factory - Obsolete (Use VectorTileFactory)")]
-	public class MeshFactory : AbstractTileFactory
+	[CreateAssetMenu(menuName = "Mapbox/Factories/Vector Tile Factory - Style Optimized")]
+	public class StyleOptimizedVectorTileFactory : AbstractTileFactory
 	{
 		[SerializeField]
 		private string _mapId = "";
 
+		[SerializeField]
+		[StyleSearch]
+		Style _optimizedStyle;
+
 		public List<LayerVisualizerBase> Visualizers;
 
 		private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;
-		private Dictionary<UnityTile, VectorTile> _cachedData = new Dictionary<UnityTile, VectorTile>();
+		private Dictionary<UnityTile, StyleOptimizedVectorTile> _cachedData = new Dictionary<UnityTile, StyleOptimizedVectorTile>();
 
 		public void OnEnable()
 		{
@@ -38,7 +42,6 @@
 		/// <param name="fs"></param>
 		internal override void OnInitialized()
 		{
-			Debug.LogWarning("MeshFactory is <color=red>obsolete</color>. Please use VectorTileFactory.");
 			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
 			foreach (LayerVisualizerBase factory in Visualizers)
 			{
@@ -55,7 +58,7 @@
 
 		internal override void OnRegistered(UnityTile tile)
 		{
-			var vectorTile = new VectorTile();
+			var vectorTile = new StyleOptimizedVectorTile(_optimizedStyle.Id, _optimizedStyle.Modified);
 			tile.AddTile(vectorTile);
 
 			Progress++;
@@ -133,5 +136,14 @@
 
 			_cachedData.Remove(tile);
 		}
+	}
+
+	[Serializable]
+	public class Style
+	{
+		public string Name;
+		public string Id;
+		public string Modified;
+		public string UserName;
 	}
 }
