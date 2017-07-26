@@ -5,53 +5,40 @@ namespace Mapbox.Examples
 	public class CameraMovement : MonoBehaviour
 	{
 		[SerializeField]
-		float Speed = 20;
+		float _panSpeed = 20f;
 
-		Vector3 _dragOrigin;
-		Vector3 _cameraPosition;
-		Vector3 _panOrigin;
+		[SerializeField]
+		float _zoomSpeed = 50f;
+
+		[SerializeField]
+		float _referenceScreenHeight = 1080f;
+
+		Quaternion _originalRotation;
+
+		void Awake()
+		{
+			_originalRotation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
+		}
 
 		void Update()
 		{
-			if (Input.GetKey(KeyCode.A))
-			{
-				transform.Translate(-1 * Speed * Time.deltaTime, 0, 0, Space.World);
-			}
-
-			if (Input.GetKey(KeyCode.W))
-			{
-				transform.Translate(0, 0, 1 * Speed * Time.deltaTime, Space.World);
-			}
-
-			if (Input.GetKey(KeyCode.S))
-			{
-				transform.Translate(0, 0, -1 * Speed * Time.deltaTime, Space.World);
-			}
-
-			if (Input.GetKey(KeyCode.D))
-			{
-				transform.Translate(1 * Speed * Time.deltaTime, 0, 0, Space.World);
-			}
-
-			if (Input.GetMouseButtonDown(0))
-			{
-				_cameraPosition = transform.position;
-				_panOrigin = Camera.main.ScreenToViewportPoint(Input.mousePosition);
-			}
+			var x = 0f;
+			var y = 0f;
+			var z = 0f;
 
 			if (Input.GetMouseButton(0))
 			{
-				LeftMouseDrag();
+				x = _panSpeed * -Input.GetAxis("Mouse X");
+				z = _panSpeed * -Input.GetAxis("Mouse Y") * (_referenceScreenHeight / Screen.height);
 			}
-		}
+			else
+			{
+				x = _panSpeed * Input.GetAxis("Horizontal");
+				z = _panSpeed * Input.GetAxis("Vertical") * (_referenceScreenHeight / Screen.height);
+				y = -Input.GetAxis("Mouse ScrollWheel") * _zoomSpeed;
+			}
 
-		// TODO: add acceleration!
-		void LeftMouseDrag()
-		{
-			Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition) - _panOrigin;
-			pos.z = pos.y;
-			pos.y = 0;
-			transform.position = _cameraPosition + -pos * Speed;
+			transform.localPosition += transform.forward * y + (_originalRotation * new Vector3(x, 0, z));
 		}
 	}
 }
