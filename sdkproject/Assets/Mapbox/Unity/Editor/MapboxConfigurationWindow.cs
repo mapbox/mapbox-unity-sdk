@@ -74,20 +74,15 @@ namespace Mapbox.Editor
 			_mbtilesCacheSize = EditorGUILayout.IntSlider("MBTiles Cache Size (# of tiles)", _mbtilesCacheSize, 0, 3000);
 			_webRequestTimeout = EditorGUILayout.IntField("Default Web Request Timeout (s)", _webRequestTimeout);
 			_accessToken = EditorGUILayout.TextField("Access Token", _accessToken);
+			EditorGUILayout.Space();
+			EditorGUILayout.Space();
+			
 
-			if (string.IsNullOrEmpty(_accessToken))
-			{
-				EditorGUILayout.HelpBox("You must have a valid access token!", MessageType.Error);
-				if (GUILayout.Button("Get a token from mapbox.com for free"))
-				{
-					Application.OpenURL("https://www.mapbox.com/studio/account/tokens/");
-				}
-			}
-			else
 			{
 				if (_validating)
 				{
-					EditorGUILayout.HelpBox("Verifying token!", MessageType.Warning);
+					//EditorGUILayout.HelpBox("Verifying token!", MessageType.Warning);
+					GUILayout.Button("Verifying token...");
 				}
 				else if (GUILayout.Button("Save"))
 				{
@@ -95,11 +90,23 @@ namespace Mapbox.Editor
 				}
 				else if (string.Equals(_validationCode, "TokenValid"))
 				{
-					EditorGUILayout.HelpBox("TokenValid: saved to " + _configurationFile, MessageType.Info);
+					EditorGUILayout.Space();
+					EditorGUILayout.Space();
+					EditorGUILayout.HelpBox("Token Valid: saved to " + _configurationFile, MessageType.Info);
 				}
 				else
 				{
+					EditorGUILayout.Space();
+					EditorGUILayout.Space();
 					EditorGUILayout.HelpBox(_validationCode, MessageType.Error);
+				}
+			}
+
+			if (string.IsNullOrEmpty(_accessToken))
+			{
+				if (GUILayout.Button("Get a token from mapbox.com for free"))
+				{
+					Application.OpenURL("https://www.mapbox.com/studio/account/tokens/");
 				}
 			}
 		}
