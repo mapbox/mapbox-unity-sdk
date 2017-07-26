@@ -1,5 +1,6 @@
 namespace Mapbox.Examples
 {
+	using System;
 	using UnityEngine;
 
 	public class CameraMovement : MonoBehaviour
@@ -9,6 +10,9 @@ namespace Mapbox.Examples
 
 		[SerializeField]
 		float _zoomSpeed = 50f;
+
+		[SerializeField]
+		float _referenceScreenWidth = 1920;
 
 		[SerializeField]
 		float _referenceScreenHeight = 1080f;
@@ -28,17 +32,24 @@ namespace Mapbox.Examples
 
 			if (Input.GetMouseButton(0))
 			{
-				x = _panSpeed * -Input.GetAxis("Mouse X");
-				z = _panSpeed * -Input.GetAxis("Mouse Y") * (_referenceScreenHeight / Screen.height);
+				x = -Input.GetAxis("Mouse X");
+				z = -Input.GetAxis("Mouse Y") * (_referenceScreenHeight / Screen.height);
+
+				// Handle device touches and Unity Remote.
+				if (Input.touchCount > 0)
+				{
+					x = -Input.GetTouch(0).deltaPosition.x / Screen.width;
+					z = -Input.GetTouch(0).deltaPosition.y / Screen.height * (_referenceScreenHeight / Screen.height);
+				}
 			}
 			else
 			{
-				x = _panSpeed * Input.GetAxis("Horizontal");
-				z = _panSpeed * Input.GetAxis("Vertical") * (_referenceScreenHeight / Screen.height);
+				x = Input.GetAxis("Horizontal");
+				z = Input.GetAxis("Vertical");// * (_referenceScreenHeight / Screen.height);
 				y = -Input.GetAxis("Mouse ScrollWheel") * _zoomSpeed;
 			}
 
-			transform.localPosition += transform.forward * y + (_originalRotation * new Vector3(x, 0, z));
+			transform.localPosition += transform.forward * y + (_originalRotation * new Vector3(x * _panSpeed, 0, z * _panSpeed));
 		}
 	}
 }
