@@ -49,7 +49,9 @@ namespace Mapbox.Editor
 			_mbtilesCacheSize = (int)_mapboxConfiguration.MbTilesCacheSize;
 			_webRequestTimeout = _mapboxConfiguration.DefaultTimeout;
 
-			GetWindow(typeof(MapboxConfigurationWindow)).Show();
+			var editorWindow = GetWindow(typeof(MapboxConfigurationWindow));
+			editorWindow.minSize = new Vector2(900, 200);
+			editorWindow.Show();
 		}
 
 		private void OnDestroy() { AssetDatabase.Refresh(); }
