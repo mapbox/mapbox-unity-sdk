@@ -11,5 +11,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb49207f63da8544d9f0a3f790016544, type: 3}
   m_Name: SchoolFilter
   m_EditorClassIdentifier: 
-  _type: school
+  _types:
+  - school
   _behaviour: 1

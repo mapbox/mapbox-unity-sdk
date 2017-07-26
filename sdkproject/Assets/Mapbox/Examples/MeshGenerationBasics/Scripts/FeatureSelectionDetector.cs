@@ -1,19 +1,22 @@
-﻿using UnityEngine;
-using Mapbox.Unity.MeshGeneration.Components;
-
-public class FeatureSelectionDetector : MonoBehaviour
+﻿namespace Mapbox.Examples
 {
-	private FeatureUiMarker _marker;
-	private FeatureBehaviour _feature;
-	
-	public void OnMouseUpAsButton()
-	{
-		_marker.Show(_feature);
-	}
+	using UnityEngine;
+	using Mapbox.Unity.MeshGeneration.Components;
 
-	internal void Initialize(FeatureUiMarker marker, FeatureBehaviour fb)
+	public class FeatureSelectionDetector : MonoBehaviour
 	{
-		_marker = marker;
-		_feature = fb;
+		private FeatureUiMarker _marker;
+		private FeatureBehaviour _feature;
+
+		public void OnMouseUpAsButton()
+		{
+			_marker.Show(_feature);
+		}
+
+		internal void Initialize(FeatureUiMarker marker, FeatureBehaviour fb)
+		{
+			_marker = marker;
+			_feature = fb;
+		}
 	}
 }
