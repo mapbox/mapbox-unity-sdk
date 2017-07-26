@@ -252,7 +252,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9527fd56bc6a0c549a1e550219f9b16e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Speed: 150
+  _panSpeed: 10
+  _zoomSpeed: 50
+  _referenceScreenHeight: 1080
 --- !u!1001 &1291380683
 Prefab:
   m_ObjectHideFlags: 0
@@ -556,6 +558,7 @@ MonoBehaviour:
   _tileProvider: {fileID: 1461465690}
   _mapVisualizer: {fileID: 11400000, guid: 78d4f9b7fc8ac45c487ad9ea051422e6, type: 2}
   _unityTileSize: 100
+  _snapMapHeightToZero: 1
 --- !u!4 &1461465688
 Transform:
   m_ObjectHideFlags: 0
