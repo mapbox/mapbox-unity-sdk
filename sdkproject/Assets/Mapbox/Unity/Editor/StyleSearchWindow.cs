@@ -35,8 +35,6 @@
 			EditorApplication.playmodeStateChanged -= OnModeChanged;
 		}
 
-		bool hasSetFocus = false;
-
 		public static void Open(SerializedProperty property)
 		{
 			StyleSearchWindow window = GetWindow<StyleSearchWindow>(true, "Search for style");

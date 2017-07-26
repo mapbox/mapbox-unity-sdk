@@ -1,10 +1,8 @@
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
 	using System.Collections.Generic;
-	using System.Linq;
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Data;
-	using System;
 	using Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers;
 
 	/// <summary>
@@ -15,12 +13,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	public class PolygonMeshModifier : MeshModifier
 	{
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
-		private int counter = 0;
-
-		public void OnEnable()
-		{
-			counter = 0;
-		}
 
 		public bool IsClockwise(IList<Vector3> vertices)
 		{

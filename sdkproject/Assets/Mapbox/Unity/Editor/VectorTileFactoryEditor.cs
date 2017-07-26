@@ -6,7 +6,7 @@ namespace Mapbox.Editor
 	using Mapbox.Unity.MeshGeneration.Interfaces;
 
 	[CustomEditor(typeof(VectorTileFactory))]
-	public class MeshFactoryEditor : FactoryEditor
+	public class VectorTileFactoryEditor : FactoryEditor
 	{
 		private string _defaultMapId = "mapbox.mapbox-streets-v7";
 		private MonoScript script;
@@ -67,8 +67,10 @@ namespace Mapbox.Editor
 				{
 					EditorGUILayout.BeginHorizontal();
 					if (_factory.Visualizers[i] != null)
+					{
 						_factory.Visualizers[i].Key = EditorGUILayout.TextField(_factory.Visualizers[i].Key, GUILayout.MaxWidth(100));
-					_factory.Visualizers[i] = (LayerVisualizerBase)EditorGUILayout.ObjectField(_factory.Visualizers[i], typeof(LayerVisualizerBase));
+					}
+					_factory.Visualizers[i] = (LayerVisualizerBase)EditorGUILayout.ObjectField(_factory.Visualizers[i], typeof(LayerVisualizerBase), false);
 
 					if (GUILayout.Button("-", GUILayout.MaxWidth(20)))
 					{
