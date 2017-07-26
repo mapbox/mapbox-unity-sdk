@@ -13,10 +13,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mapIdType: 0
   _customStyle:
-    Name: JustBuildings-copy
-    Id: mapbox://styles/davidrhodes/cj5bhr9wm7thd2sqld36o38y9
-    Modified: 2017-07-19T20:59:44.036Z
-    UserName: davidrhodes
+    Name: 
+    Id: 
+    Modified: 
+    UserName: 
   _mapId: mapbox://styles/mapbox/dark-v9
   _useCompression: 0
   _useMipMap: 0
