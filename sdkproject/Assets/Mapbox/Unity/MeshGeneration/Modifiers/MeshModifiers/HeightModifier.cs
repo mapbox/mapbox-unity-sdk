@@ -33,7 +33,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		[SerializeField]
 		[Tooltip("Create side walls from calculated height down to terrain level. Suggested for buildings, not suggested for roads.")]
-		private bool _createSideWalls;
+		private bool _createSideWalls = true;
 
         public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
