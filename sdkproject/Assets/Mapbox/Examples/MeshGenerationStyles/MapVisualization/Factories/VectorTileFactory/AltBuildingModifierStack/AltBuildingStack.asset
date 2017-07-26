@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Name: AltBuildingStack
   m_EditorClassIdentifier: 
   MeshModifiers:
-  - {fileID: 11400000, guid: a70a24f148fec5e4c939738adf37a054, type: 2}
   - {fileID: 11400000, guid: 0b2f23c3df2324e4cb08e27963021637, type: 2}
   - {fileID: 11400000, guid: 18bd2d56fdf88be4e8c12dded4ac3506, type: 2}
   - {fileID: 11400000, guid: 3dc1648e5503a9042a25c481920a71ab, type: 2}
