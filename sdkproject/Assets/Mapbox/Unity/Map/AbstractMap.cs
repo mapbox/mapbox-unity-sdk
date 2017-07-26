@@ -121,7 +121,6 @@
 			_mapCenterMercator = referenceTileRect.Center;
 
 			_worldRelativeScale = (float)(_unityTileSize / referenceTileRect.Size.x);
-			Root.localScale = Vector3.one * _worldRelativeScale;
 
 			_mapVisualizer.Initialize(this, _fileSouce);
 			_tileProvider.Initialize(this);

@@ -16,7 +16,33 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
         public List<MeshModifier> MeshModifiers;
         public List<GameObjectModifier> GoModifiers;
 
-        public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
+		internal override void PreInitialize(WorldProperties wp)
+		{
+			base.PreInitialize(wp);
+			foreach (var mod in MeshModifiers)
+			{
+				mod.PreInitialize(wp);
+			}
+			foreach (var mod in GoModifiers)
+			{
+				mod.PreInitialize(wp);
+			}
+		}
+
+		internal override void Initialize(WorldProperties wp)
+		{
+			base.Initialize(wp);
+			foreach (var mod in MeshModifiers)
+			{
+				mod.Initialize(wp);
+			}
+			foreach (var mod in GoModifiers)
+			{
+				mod.Initialize(wp);
+			}
+		}
+
+		public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
         {
             foreach (MeshModifier mod in MeshModifiers.Where(x => x.Active))
             {

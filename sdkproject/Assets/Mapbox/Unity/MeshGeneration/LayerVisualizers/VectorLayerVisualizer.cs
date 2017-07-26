@@ -16,8 +16,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
         public string Type;
         public ModifierStackBase Stack;
     }
-
-
+	
     /// <summary>
     /// VectorLayerVisualizer is a specialized layer visualizer working on polygon and line based vector data (i.e. building, road, landuse) using modifier stacks.
     /// Each feature is preprocessed and passed down to a modifier stack, which will create and return a game object for that given feature.
@@ -44,7 +43,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
             set { _key = value; }
         }
 
-        [SerializeField]
+		[SerializeField]
         private List<FilterBase> Filters;
 
         [SerializeField]
@@ -54,14 +53,36 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
         private GameObject _container;
 
-        /// <summary>
-        /// Creates an object for each layer, extract and filter in/out the features and runs Build method on them.
-        /// </summary>
-        /// <param name="layer"></param>
-        /// <param name="tile"></param>
-        public override void Create(VectorTileLayer layer, UnityTile tile)
+		internal override void PreInitialize(WorldProperties wp)
+		{
+			base.PreInitialize(wp);
+			if (_defaultStack != null)
+				_defaultStack.PreInitialize(wp);
+			foreach (var tup in Stacks)
+			{
+				tup.Stack.PreInitialize(wp);
+			}
+		}
+
+		internal override void Initialize(WorldProperties wp)
+		{
+			base.Initialize(wp);
+			if (_defaultStack != null)
+				_defaultStack.Initialize(wp);
+			foreach (var tup in Stacks)
+			{
+				tup.Stack.Initialize(wp);
+			}
+		}
+
+		/// <summary>
+		/// Creates an object for each layer, extract and filter in/out the features and runs Build method on them.
+		/// </summary>
+		/// <param name="layer"></param>
+		/// <param name="tile"></param>
+		public override void Create(VectorTileLayer layer, UnityTile tile)
         {
-            _container = new GameObject(Key + " Container");
+            _container = new GameObject(Key);
             _container.transform.SetParent(tile.transform, false);
 
             //testing each feature with filters
@@ -70,7 +91,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
             for (int i = 0; i < fc; i++)
             {
                 filterOut = false;
-                var feature = new VectorFeatureUnity(layer.GetFeature(i, 0), tile, layer.Extent);
+				var feature = new VectorFeatureUnity(layer.GetFeature(i, 0), tile, layer.Extent, _worldProperties.WorldRelativeScale);
                 foreach (var filter in Filters)
                 {
                     if (!string.IsNullOrEmpty(filter.Key) && !feature.Properties.ContainsKey(filter.Key))

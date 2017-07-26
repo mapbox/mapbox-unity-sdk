@@ -23,6 +23,12 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
+		internal override void Initialize(WorldProperties wp)
+		{
+			base.Initialize(wp);
+			_offset *= _worldProperties.WorldRelativeScale;
+		}
+
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
 			if (md.Vertices.Count == 0 || feature == null || feature.Points.Count < 1)
@@ -35,6 +41,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				GetHeightData(feature, ref minHeight, ref hf);
 			}
+
+			hf *= _worldProperties.WorldRelativeScale;
+			minHeight *= _worldProperties.WorldRelativeScale;
+			
 
 			var max = md.Vertices[0].y;
 			var min = md.Vertices[0].y;
