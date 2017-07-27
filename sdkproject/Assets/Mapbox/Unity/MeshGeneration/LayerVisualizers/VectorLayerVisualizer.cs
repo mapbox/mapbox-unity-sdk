@@ -33,7 +33,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
         private int _maxEdgeSectionCount = 40;
         private int _preferredEdgeSectionLength = 10;
 
-        [SerializeField]
+		[SerializeField]
+		private bool _useSatelliteImageryOnTop;
+		[SerializeField]
         private string _classificationKey;
         [SerializeField]
         private string _key;
@@ -56,6 +58,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		internal override void PreInitialize(WorldProperties wp)
 		{
 			base.PreInitialize(wp);
+			wp.UseSatelliteImageryForRoofs = _useSatelliteImageryOnTop;
 			if (_defaultStack != null)
 				_defaultStack.PreInitialize(wp);
 			foreach (var tup in Stacks)
@@ -103,6 +106,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
                         break;
                     }
                 }
+
+				//if (feature.Properties.ContainsKey("min_height") && float.Parse(feature.Properties["min_height"].ToString()) != )
+				//	continue;
 
                 if (!filterOut)
                     Build(feature, tile, _container);

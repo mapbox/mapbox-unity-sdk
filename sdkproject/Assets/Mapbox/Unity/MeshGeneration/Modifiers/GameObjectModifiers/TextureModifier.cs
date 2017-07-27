@@ -14,8 +14,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
         [SerializeField]
         private bool _textureTop;
         [SerializeField]
-        private bool _useSatelliteTexture;
-        [SerializeField]
         private Material[] _topMaterials;
 
 		[SerializeField]
@@ -42,7 +40,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			   };
 			}
 
-			if (_useSatelliteTexture)
+			if (_worldProperties.UseSatelliteImageryForRoofs)
 			{
 				var _tile = fb.gameObject.GetComponent<UnityTile>();
 				var t = fb.transform;

@@ -17,16 +17,17 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		[Tooltip("Fix all features to certain height, suggested to be used for pushing roads above terrain level to prevent z-fighting.")]
 		private bool _forceHeight;
 		[SerializeField]
-		[Range(0.1f,2)]
+		[Range(0.1f, 2)]
 		[Tooltip("Chamfer width value")]
 		private float _offset = 0.2f;
+		private float _scaledOffset = 0f;
 
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
 		internal override void Initialize(WorldProperties wp)
 		{
 			base.Initialize(wp);
-			_offset *= _worldProperties.WorldRelativeScale;
+			_scaledOffset = _offset * wp.WorldRelativeScale;
 		}
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
@@ -44,7 +45,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			hf *= _worldProperties.WorldRelativeScale;
 			minHeight *= _worldProperties.WorldRelativeScale;
-			
+
 
 			var max = md.Vertices[0].y;
 			var min = md.Vertices[0].y;
@@ -200,56 +201,62 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						next = start + j - 1 + count - 1; //another -1  as last item equals first
 					prev = start + j + 1;
 
-
-					v1 = new Vector3(
-							md.Vertices[current].x - md.Vertices[next].x, 0,
-							md.Vertices[current].z - md.Vertices[next].z);
-					v1.Normalize();
-					v1 *= -_offset;
-					n1 = new Vector3(-v1.z, 0, v1.x);
-
-					pij1 = new Vector3(
-						(float)(md.Vertices[next].x + n1.x), 0,
-						(float)(md.Vertices[next].z + n1.z));
-					pij2 = new Vector3(
-						(float)(md.Vertices[current].x + n1.x), 0,
-						(float)(md.Vertices[current].z + n1.z));
-
-					v2 = new Vector3(
-						md.Vertices[prev].x - md.Vertices[current].x, 0,
-						md.Vertices[prev].z - md.Vertices[current].z);
-
-					v2.Normalize();
-					v2 *= -_offset;
-					n2 = new Vector3(-v2.z, 0, v2.x);
-					pjk1 = new Vector3(
-						(float)(md.Vertices[current].x + n2.x), 0,
-						(float)(md.Vertices[current].z + n2.z));
-					pjk2 = new Vector3(
-						(float)(md.Vertices[prev].x + n2.x), 0,
-						(float)(md.Vertices[prev].z + n2.z));
-
-					// See where the shifted lines ij and jk intersect.
-					bool lines_intersect, segments_intersect;
-
-					FindIntersection(pij1, pij2, pjk1, pjk2,
-						out lines_intersect, out segments_intersect,
-						out poi, out close1, out close2);
-
-					var d = Vector3.Distance(poi, pij2);
-					if (d > 10 * _offset)
+					if (Mathf.Abs(Vector3.Angle(md.Vertices[next] - md.Vertices[current], md.Vertices[prev] - md.Vertices[current])) < 10)
 					{
-						poi = new Vector3((md.Vertices[current].x + (poi - (-v1 - v2)).normalized.x), 0,
-							(md.Vertices[current].z + (poi - (-v1 - v2)).normalized.z));
+						newVertices.Add(md.Vertices[current]);
+						newVertices.Add(md.Vertices[current]);
+						newVertices.Add(md.Vertices[current]);
+						md.Normals.Add(Constants.Math.Vector3Up);
+						md.Normals.Add(Constants.Math.Vector3Up);
+						md.Normals.Add(Constants.Math.Vector3Up);
+					}
+					else
+					{
+						v1 = new Vector3(
+								md.Vertices[current].x - md.Vertices[next].x, 0,
+								md.Vertices[current].z - md.Vertices[next].z);
+						v1.Normalize();
+						v1 *= -_scaledOffset;
+						n1 = new Vector3(-v1.z, 0, v1.x);
+
+						pij1 = new Vector3(
+							(float)(md.Vertices[next].x + n1.x), 0,
+							(float)(md.Vertices[next].z + n1.z));
+						pij2 = new Vector3(
+							(float)(md.Vertices[current].x + n1.x), 0,
+							(float)(md.Vertices[current].z + n1.z));
+
+						v2 = new Vector3(
+							md.Vertices[prev].x - md.Vertices[current].x, 0,
+							md.Vertices[prev].z - md.Vertices[current].z);
+
+						v2.Normalize();
+						v2 *= -_scaledOffset;
+						n2 = new Vector3(-v2.z, 0, v2.x);
+						pjk1 = new Vector3(
+							(float)(md.Vertices[current].x + n2.x), 0,
+							(float)(md.Vertices[current].z + n2.z));
+						pjk2 = new Vector3(
+							(float)(md.Vertices[prev].x + n2.x), 0,
+							(float)(md.Vertices[prev].z + n2.z));
+
+						// See where the shifted lines ij and jk intersect.
+						bool lines_intersect, segments_intersect;
+
+						FindIntersection(pij1, pij2, pjk1, pjk2,
+							out lines_intersect, out segments_intersect,
+							out poi, out close1, out close2);
+
+						newVertices.Add(new Vector3(poi.x, poi.y + _scaledOffset + md.Vertices[current].y, poi.z));
+
+						newVertices.Add(md.Vertices[current] + v1);
+						newVertices.Add(md.Vertices[current] - v2);
+
+						md.Normals.Add(Constants.Math.Vector3Up);
+						md.Normals.Add(-n1);
+						md.Normals.Add(-n2);
 					}
 
-					newVertices.Add(new Vector3(poi.x, poi.y + _offset + md.Vertices[current].y, poi.z));
-
-					newVertices.Add(md.Vertices[current] + v1);
-					newVertices.Add(md.Vertices[current] - v2);
-					md.Normals.Add(Constants.Math.Vector3Up);
-					md.Normals.Add(-n1);
-					md.Normals.Add(-n2);
 					newUV.Add(md.UV[0][current]);
 					newUV.Add(md.UV[0][current]);
 					newUV.Add(md.UV[0][current]);
