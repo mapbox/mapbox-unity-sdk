@@ -13,17 +13,35 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     [CreateAssetMenu(menuName = "Mapbox/Modifiers/Modifier Stack")]
     public class ModifierStack : ModifierStackBase
     {
+		[SerializeField]
+		private bool _moveTransformPosition;
+		private Vector3 _center = Vector3.zero;
+
         public List<MeshModifier> MeshModifiers;
         public List<GameObjectModifier> GoModifiers;
 
         public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
         {
+			if (_moveTransformPosition)
+			{
+				var f = feature.Points[0][0];
+				foreach (var item in feature.Points)
+				{
+					for (int i = 0; i < item.Count; i++)
+					{
+						item[i] = new Vector3(item[i].x - f.x, 0, item[i].z - f.z);
+					}
+				}
+				_center = f;
+			}
+
             foreach (MeshModifier mod in MeshModifiers.Where(x => x.Active))
             {
                 mod.Run(feature, meshData, tile);
             }
 
             var go = CreateGameObject(meshData, parent);
+			go.transform.localPosition = _center;
             go.name = type + " - " + feature.Data.Id;
             var bd = go.AddComponent<FeatureBehaviour>();
             bd.Init(feature);
