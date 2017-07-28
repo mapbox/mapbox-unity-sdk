@@ -9,7 +9,10 @@ namespace Mapbox.Unity.Telemetry
 		private static extern void initialize(string accessToken, string userAgentBase, string hostSDKVersion);
 
 		[DllImport("__Internal")]
-		static extern void sendTurnstyleEvent();
+		static extern void sendTurnstileEvent();
+
+		[DllImport("__Internal")]
+		private static extern void setLocationCollectionState(bool enable);
 
 		static ITelemetryLibrary _instance = new TelemetryIos();
 		public static ITelemetryLibrary Instance
@@ -27,7 +30,12 @@ namespace Mapbox.Unity.Telemetry
 
 		public void SendTurnstile()
 		{
-			sendTurnstyleEvent();
+			sendTurnstileEvent();
+		}
+
+		public void SetLocationCollectionState(bool enable)
+		{
+			setLocationCollectionState(enable);
 		}
 	}
 }

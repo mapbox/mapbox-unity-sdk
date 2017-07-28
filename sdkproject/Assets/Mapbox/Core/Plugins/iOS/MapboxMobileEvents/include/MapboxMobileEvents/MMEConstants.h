@@ -2,6 +2,7 @@
 
 extern NSString * const MMEAPIClientBaseURL;
 extern NSString * const MMETelemetryTestServerURL;
+extern NSString * const MMETelemetryStagingAccessToken;
 extern NSString * const MMEAPIClientEventsPath;
 extern NSString * const MMEAPIClientHeaderFieldUserAgentKey;
 extern NSString * const MMEAPIClientHeaderFieldContentTypeKey;
@@ -37,6 +38,7 @@ extern NSString * const MMEEventKeyEvent;
 extern NSString * const MMEEventKeyCreated;
 extern NSString * const MMEEventKeyVendorID;
 extern NSString * const MMEEventKeyModel;
+extern NSString * const MMEEventKeyDevice;
 extern NSString * const MMEEventKeyEnabledTelemetry;
 extern NSString * const MMEEventKeyOperatingSystem;
 extern NSString * const MMEEventKeyResolution;
@@ -49,7 +51,15 @@ extern NSString * const MMEEventKeySessionId;
 extern NSString * const MMEEventKeyApplicationState;
 extern NSString * const MMEEventKeyAltitude;
 extern NSString * const MMEEventHorizontalAccuracy;
+extern NSString * const MMEEventSDKIdentifier;
+extern NSString * const MMEEventSDKVersion;
 extern NSString * const MMEEventKeyLocalDebugDescription;
+extern NSString * const MMENavigationEventPrefix;
+extern NSString * const MMEEventTypeNavigationDepart;
+extern NSString * const MMEEventTypeNavigationArrive;
+extern NSString * const MMEEventTypeNavigationCancel;
+extern NSString * const MMEEventTypeNavigationFeedback;
+extern NSString * const MMEEventTypeNavigationReroute;
 
 // SDK event source
 extern NSString * const MMEEventSource;
