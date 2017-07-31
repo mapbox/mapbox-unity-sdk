@@ -1,6 +1,5 @@
 namespace Mapbox.Examples
 {
-	using System;
 	using UnityEngine;
 
 	public class CameraMovement : MonoBehaviour
@@ -12,19 +11,28 @@ namespace Mapbox.Examples
 		float _zoomSpeed = 50f;
 
 		[SerializeField]
-		float _referenceScreenWidth = 1920;
-
-		[SerializeField]
-		float _referenceScreenHeight = 1080f;
+		Camera _referenceCamera;
 
 		Quaternion _originalRotation;
+		Vector3 _origin;
+		Vector3 _delta;
+		bool _shouldDrag;
 
 		void Awake()
 		{
 			_originalRotation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
+
+			if (_referenceCamera == null)
+			{
+				_referenceCamera = GetComponent<Camera>();
+				if (_referenceCamera == null)
+				{
+					throw new System.Exception("You must have a reference camera assigned!");
+				}
+			}
 		}
 
-		void Update()
+		void LateUpdate()
 		{
 			var x = 0f;
 			var y = 0f;
@@ -32,24 +40,34 @@ namespace Mapbox.Examples
 
 			if (Input.GetMouseButton(0))
 			{
-				x = -Input.GetAxis("Mouse X");
-				z = -Input.GetAxis("Mouse Y") * (_referenceScreenHeight / Screen.height);
-
-				// Handle device touches and Unity Remote.
-				if (Input.touchCount > 0)
+				var mousePosition = Input.mousePosition;
+				mousePosition.z = _referenceCamera.transform.localPosition.y;
+				_delta = _referenceCamera.ScreenToWorldPoint(mousePosition) - _referenceCamera.transform.localPosition;
+				_delta.y = 0f;
+				if (_shouldDrag == false)
 				{
-					x = -Input.GetTouch(0).deltaPosition.x / Screen.width;
-					z = -Input.GetTouch(0).deltaPosition.y / Screen.height * (_referenceScreenHeight / Screen.height);
+					_shouldDrag = true;
+					_origin = _referenceCamera.ScreenToWorldPoint(mousePosition);
 				}
 			}
 			else
 			{
-				x = Input.GetAxis("Horizontal");
-				z = Input.GetAxis("Vertical");// * (_referenceScreenHeight / Screen.height);
-				y = -Input.GetAxis("Mouse ScrollWheel") * _zoomSpeed;
+				_shouldDrag = false;
 			}
 
-			transform.localPosition += transform.forward * y + (_originalRotation * new Vector3(x * _panSpeed, 0, z * _panSpeed));
+			if (_shouldDrag == true)
+			{
+				var offset = _origin - _delta;
+				offset.y = transform.localPosition.y;
+				transform.localPosition = offset;
+			}
+			else
+			{
+				x = Input.GetAxis("Horizontal");
+				z = Input.GetAxis("Vertical");
+				y = -Input.GetAxis("Mouse ScrollWheel") * _zoomSpeed;
+				transform.localPosition += transform.forward * y + (_originalRotation * new Vector3(x * _panSpeed, 0, z * _panSpeed));
+			}
 		}
 	}
 }
