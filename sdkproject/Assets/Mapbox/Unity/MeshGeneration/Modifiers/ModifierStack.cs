@@ -29,6 +29,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
         public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
         {
+			_center = Vector3.zero;
 			if (_moveFeaturePositionTo != PositionTargetType.TileCenter)
 			{
 				var f = Constants.Math.Vector3Zero;
