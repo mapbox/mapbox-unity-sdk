@@ -28,14 +28,14 @@
 
 			Debug.Log("Mapbox prebuild checks for target '" + target);
 
-			List<LibInfo> libInfo = new List<LibInfo>();
+			List<AndroidLibInfo> libInfo = new List<AndroidLibInfo>();
 			foreach (var file in Directory.GetFiles(Application.dataPath, "*.jar", SearchOption.AllDirectories))
 			{
-				libInfo.Add(new LibInfo(file));
+				libInfo.Add(new AndroidLibInfo(file));
 			}
 			foreach (var file in Directory.GetFiles(Application.dataPath, "*.aar", SearchOption.AllDirectories))
 			{
-				libInfo.Add(new LibInfo(file));
+				libInfo.Add(new AndroidLibInfo(file));
 			}
 
 			var stats = libInfo.GroupBy(li => li.BaseFileName).OrderBy(g => g.Key);
@@ -58,28 +58,28 @@
 				Debug.LogErrorFormat("DUPLICATE ANDROID PLUGINS FOUND - BUILD WILL MOST LIKELY FAIL!!!{0}Resolve to continue.{0}{1}", Environment.NewLine, sb);
 			}
 		}
+	}
 
 
-
-		private class LibInfo
+	public class AndroidLibInfo
+	{
+		public AndroidLibInfo(string fullPath)
 		{
-			public LibInfo(string fullPath)
-			{
-				FullPath = fullPath;
-				FullFileName = Path.GetFileName(fullPath);
-				// TODO: find a better way to extract base file name
-				// Mapbox telemetry lib uses different naming that other android libs
-				// <name>-<major>.<minor>.<patch> vs. <name>-<major>-<minor>-<patch>
-				// okio-1.13.0, support-v4-25.1.0 vs. mapbox-android-telemetry-2-1-0
-				BaseFileName = FullFileName.Substring(0, FullFileName.LastIndexOf("-"));
-				AssetPath = fullPath.Replace(Application.dataPath.Replace("Assets", ""), "");
-			}
-
-			public string FullPath { get; private set; }
-			public string FullFileName { get; private set; }
-			public string BaseFileName { get; private set; }
-			public string AssetPath { get; private set; }
+			FullPath = fullPath;
+			FullFileName = Path.GetFileName(fullPath);
+			// TODO: find a better way to extract base file name
+			// Mapbox telemetry lib uses different naming that other android libs
+			// <name>-<major>.<minor>.<patch> vs. <name>-<major>-<minor>-<patch>
+			// okio-1.13.0, support-v4-25.1.0 vs. mapbox-android-telemetry-2-1-0
+			BaseFileName = FullFileName.Substring(0, FullFileName.LastIndexOf("-"));
+			AssetPath = fullPath.Replace(Application.dataPath.Replace("Assets", ""), "");
 		}
 
+		public string FullPath { get; private set; }
+		public string FullFileName { get; private set; }
+		public string BaseFileName { get; private set; }
+		public string AssetPath { get; private set; }
 	}
+
+
 }
