@@ -78,12 +78,19 @@ namespace Mapbox.Editor
 			_accessToken = EditorGUILayout.TextField("Access Token", _accessToken);
 			EditorGUILayout.Space();
 			EditorGUILayout.Space();
-			
 
+			if (string.IsNullOrEmpty(_accessToken))
+			{
+				EditorGUILayout.HelpBox("You must have a valid access token!", MessageType.Error);
+				if (GUILayout.Button("Get a token from mapbox.com for free"))
+				{
+					Application.OpenURL("https://www.mapbox.com/studio/account/tokens/");
+				}
+			}
+			else
 			{
 				if (_validating)
 				{
-					//EditorGUILayout.HelpBox("Verifying token!", MessageType.Warning);
 					GUILayout.Button("Verifying token...");
 				}
 				else if (GUILayout.Button("Save"))
@@ -101,14 +108,6 @@ namespace Mapbox.Editor
 					EditorGUILayout.Space();
 					EditorGUILayout.Space();
 					EditorGUILayout.HelpBox(_validationCode, MessageType.Error);
-				}
-			}
-
-			if (string.IsNullOrEmpty(_accessToken))
-			{
-				if (GUILayout.Button("Get a token from mapbox.com for free"))
-				{
-					Application.OpenURL("https://www.mapbox.com/studio/account/tokens/");
 				}
 			}
 		}
