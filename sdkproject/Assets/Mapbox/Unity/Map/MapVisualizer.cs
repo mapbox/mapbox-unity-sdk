@@ -15,12 +15,7 @@ namespace Mapbox.Unity.MeshGeneration
 		Working,
 		Finished
 	}
-
-	public class WorldProperties
-	{
-		public float WorldRelativeScale = 1;
-	}
-
+	
 	[CreateAssetMenu(menuName = "Mapbox/MapVisualizer")]
 	public class MapVisualizer : ScriptableObject
 	{
