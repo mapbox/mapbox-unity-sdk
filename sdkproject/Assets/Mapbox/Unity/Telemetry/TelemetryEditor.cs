@@ -39,7 +39,7 @@ namespace Mapbox.Unity.Telemetry
 			if (ShouldPostTurnstile(ticks))
 			{
 				Runnable.Run(PostWWW(_url, GetPostBody()));
-				PlayerPrefs.SetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR, ticks.ToString());
+				PlayerPrefs.SetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR_KEY, ticks.ToString());
 			}
 		}
 
@@ -62,7 +62,7 @@ namespace Mapbox.Unity.Telemetry
 		{
 			var date = new DateTime(ticks);
 			var longAgo = DateTime.Now.AddDays(-100).Ticks.ToString();
-			var lastDateString = PlayerPrefs.GetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR, longAgo);
+			var lastDateString = PlayerPrefs.GetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR_KEY, longAgo);
 			long lastTicks = 0;
 			long.TryParse(lastDateString, out lastTicks);
 			var lastDate = new DateTime(lastTicks);
@@ -113,6 +113,11 @@ namespace Mapbox.Unity.Telemetry
 										  Constants.SDK_VERSION
 										 );
 			return userAgent;
+		}
+
+		public void SetLocationCollectionState(bool enable)
+		{
+			// Empty.
 		}
 	}
 }

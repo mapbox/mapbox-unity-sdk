@@ -10,4 +10,5 @@ FOUNDATION_EXPORT const unsigned char MapboxMobileMetricsVersionString[];
 
 #import <MapboxMobileEvents/MMEConstants.h>
 #import <MapboxMobileEvents/MMEEvent.h>
+#import <MapboxMobileEvents/MMETypes.h>
 #import <MapboxMobileEvents/MMEEventsManager.h>

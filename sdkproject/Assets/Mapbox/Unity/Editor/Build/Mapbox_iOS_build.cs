@@ -21,7 +21,7 @@ public class Mapbox_iOS_build : MonoBehaviour
 			string target = proj.TargetGuidByName("Unity-iPhone");
 
 			proj.AddBuildProperty(target, "HEADER_SEARCH_PATHS", "$(SRCROOT)/Libraries/Mapbox/Core/Plugins/iOS/MapboxMobileEvents/include");
-			proj.AddBuildProperty(target, "OTHER_LDFLAGS", "-ObjC");
+			proj.AddBuildProperty(target, "OTHER_LDFLAGS", "-ObjC -lz");
 
 			File.WriteAllText(projPath, proj.WriteToString());
 		}
