@@ -18,10 +18,6 @@ namespace Mapbox.Unity
 		ITelemetryLibrary _telemetryLibrary;
 		CachingWebFileSource _fileSource;
 
-		// Default on.
-		bool _isTelemetryEnabled = true;
-
-
 		static MapboxAccess _instance = new MapboxAccess();
 		/// <summary>
 		/// The singleton instance.
@@ -109,9 +105,6 @@ namespace Mapbox.Unity
 
 		void ConfigureTelemetry()
 		{
-			// TODO: this will need to be settable at runtime as well? 
-			_isTelemetryEnabled = GetTelemetryCollectionState();
-
 #if UNITY_EDITOR
 			_telemetryLibrary = TelemetryEditor.Instance;
 #elif UNITY_IOS
@@ -124,17 +117,23 @@ namespace Mapbox.Unity
 
 
 			_telemetryLibrary.Initialize(_configuration.AccessToken);
+			_telemetryLibrary.SetLocationCollectionState(GetTelemetryCollectionState());
 			_telemetryLibrary.SendTurnstile();
 		}
 
+		public void SetLocationCollectionState(bool enable)
+		{
+			PlayerPrefs.SetInt(Constants.Path.SHOULD_COLLECT_LOCATION_KEY, (enable ? 1 : 0));
+			_telemetryLibrary.SetLocationCollectionState(enable);
+		}
 
 		bool GetTelemetryCollectionState()
 		{
-			if (!PlayerPrefs.HasKey(Constants.Path.IS_TELEMETRY_ENABLED_KEY))
+			if (!PlayerPrefs.HasKey(Constants.Path.SHOULD_COLLECT_LOCATION_KEY))
 			{
-				PlayerPrefs.SetInt(Constants.Path.IS_TELEMETRY_ENABLED_KEY, 1);
+				PlayerPrefs.SetInt(Constants.Path.SHOULD_COLLECT_LOCATION_KEY, 1);
 			}
-			return PlayerPrefs.GetInt(Constants.Path.IS_TELEMETRY_ENABLED_KEY) != 0;
+			return PlayerPrefs.GetInt(Constants.Path.SHOULD_COLLECT_LOCATION_KEY) != 0;
 		}
 
 		/// <summary>
