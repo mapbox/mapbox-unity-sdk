@@ -1,8 +1,6 @@
 ﻿namespace Mapbox.Unity.UnitTest
 {
-	using Mapbox.Map;
 	using Mapbox.Unity.Editor;
-	using Mapbox.Utils;
 	using NUnit.Framework;
 	using System;
 	using System.Collections.Generic;
