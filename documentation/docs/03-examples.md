@@ -18,7 +18,7 @@ This example uses the `mapbox.mapbox-terrain-v2` data layer with a `VectorTileFa
 
 These examples demonstrate how to request specific Mapbox data using our C# library.
 
-### Forward Geocoder
+#### Forward Geocoder
 
 *ForwardGeocoder.unity*
 
@@ -26,7 +26,7 @@ A forward geocoding request will fetch GeoJSON from a place name query. A new re
 
 Visit [our API documentation](https://www.mapbox.com/api-documentation/#geocoding) for more information.
 
-### Reverse Geocoder
+#### Reverse Geocoder
 
 *ReverseGeocoder.unity*
 
@@ -34,7 +34,7 @@ A reverse geocoding request will fetch GeoJSON from a location query. The locati
 
 Visit [our API documentation](https://www.mapbox.com/api-documentation/#geocoding) for more information.
 
-### Directions
+#### Directions
 
 *Directions.unity*
 
@@ -46,7 +46,7 @@ When the geocode requests have been completed, a directions request is executed.
 
 Directions results will be logged to the UI when they are available (in the form of JSON).
 
-### Raster Tile
+#### Raster Tile
 
 *RasterTile.unity*
 
@@ -56,7 +56,7 @@ See: https://www.mapbox.com/help/define-style/
 
 See: https://www.mapbox.com/api-documentation/#retrieve-raster-tiles-from-styles
 
-### Vector Tile
+#### Vector Tile
 
 *VectorTile.unity*
 
@@ -91,8 +91,7 @@ With the exception of a `PoiVisualizer ` (`PoiDemoPoiVisualizer`) being added to
 
 `PoiDemoPoiVisualizer.asset` allows you to override which prefab to spawn for each `po_label` contained in the vector tile. This prefab should have a component that implements `ILabelVisualizationHelper` attached to it. This exists to inject feature data into (such as label and `Maki` icon).
 
-**New in v1.0.0*
-
+**New in v1.0.0:*
 Added 3d POI objects in addition to the 2d POI objects to demonstrate that you can easily map latitude longitude to unity coordinates.
 
 ## Mesh Generation Styles
@@ -101,8 +100,7 @@ Added 3d POI objects in addition to the 2d POI objects to demonstrate that you c
 
 This example demonstrates how to use `TypeFilters` to filter specific features for processing. In this case, we have chosen to exclude `schools` from mesh generation. Additionally, you can use `ModifierStacks` to further customize specific features (to color banks differently, for example).
 
-*New in v1.1.0
-
+**New in v1.1.0:*
 Using the `SpawnInsideModifier` to randomly distribute "bushes" inside of `park` `landuse` geometry (see `VectorLayerVisualizer`).
 
 ## Drive
