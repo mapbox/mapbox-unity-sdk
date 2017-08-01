@@ -28,7 +28,6 @@ namespace Mapbox.Editor
 		static void Init()
 		{
 			Runnable.EnableRunnableInEditor();
-
 			_configurationFile = Path.Combine(Unity.Constants.Path.MAPBOX_RESOURCES_ABSOLUTE, Unity.Constants.Path.CONFIG_FILE);
 
 			if (!Directory.Exists(Unity.Constants.Path.MAPBOX_RESOURCES_ABSOLUTE))
@@ -62,7 +61,7 @@ namespace Mapbox.Editor
 
 		void Update()
 		{
-			if (_justOpened)
+			if (_justOpened && !string.IsNullOrEmpty(_accessToken))
 			{
 				Runnable.Run(ValidateToken(_accessToken));
 				_justOpened = false;
@@ -78,12 +77,19 @@ namespace Mapbox.Editor
 			_accessToken = EditorGUILayout.TextField("Access Token", _accessToken);
 			EditorGUILayout.Space();
 			EditorGUILayout.Space();
-			
 
+			if (string.IsNullOrEmpty(_accessToken))
+			{
+				EditorGUILayout.HelpBox("You must have a valid access token!", MessageType.Error);
+				if (GUILayout.Button("Get a token from mapbox.com for free"))
+				{
+					Application.OpenURL("https://www.mapbox.com/studio/account/tokens/");
+				}
+			}
+			else
 			{
 				if (_validating)
 				{
-					//EditorGUILayout.HelpBox("Verifying token!", MessageType.Warning);
 					GUILayout.Button("Verifying token...");
 				}
 				else if (GUILayout.Button("Save"))
@@ -101,14 +107,6 @@ namespace Mapbox.Editor
 					EditorGUILayout.Space();
 					EditorGUILayout.Space();
 					EditorGUILayout.HelpBox(_validationCode, MessageType.Error);
-				}
-			}
-
-			if (string.IsNullOrEmpty(_accessToken))
-			{
-				if (GUILayout.Button("Get a token from mapbox.com for free"))
-				{
-					Application.OpenURL("https://www.mapbox.com/studio/account/tokens/");
 				}
 			}
 		}
@@ -141,6 +139,7 @@ namespace Mapbox.Editor
 			}
 
 			SaveConfiguration();
+
 		}
 
 
@@ -156,10 +155,10 @@ namespace Mapbox.Editor
 
 			var json = JsonUtility.ToJson(configuration);
 			File.WriteAllText(_configurationFile, json);
-			MapboxAccess.Instance.SetConfiguration(configuration);
-
-			Repaint();
 			AssetDatabase.Refresh();
+			Repaint();
+
+			MapboxAccess.Instance.SetConfiguration(configuration);
 		}
 	}
 }
