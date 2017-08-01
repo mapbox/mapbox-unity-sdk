@@ -194,7 +194,6 @@ namespace Mapbox.Unity
 			{
 			}
 		}
-
 	}
 
 	public class MapboxConfiguration

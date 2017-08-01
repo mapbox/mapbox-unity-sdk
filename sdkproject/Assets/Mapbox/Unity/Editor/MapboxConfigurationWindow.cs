@@ -28,7 +28,6 @@ namespace Mapbox.Editor
 		static void Init()
 		{
 			Runnable.EnableRunnableInEditor();
-
 			_configurationFile = Path.Combine(Unity.Constants.Path.MAPBOX_RESOURCES_ABSOLUTE, Unity.Constants.Path.CONFIG_FILE);
 
 			if (!Directory.Exists(Unity.Constants.Path.MAPBOX_RESOURCES_ABSOLUTE))
@@ -62,7 +61,7 @@ namespace Mapbox.Editor
 
 		void Update()
 		{
-			if (_justOpened)
+			if (_justOpened && !string.IsNullOrEmpty(_accessToken))
 			{
 				Runnable.Run(ValidateToken(_accessToken));
 				_justOpened = false;
@@ -140,6 +139,7 @@ namespace Mapbox.Editor
 			}
 
 			SaveConfiguration();
+
 		}
 
 
@@ -155,10 +155,10 @@ namespace Mapbox.Editor
 
 			var json = JsonUtility.ToJson(configuration);
 			File.WriteAllText(_configurationFile, json);
-			MapboxAccess.Instance.SetConfiguration(configuration);
-
-			Repaint();
 			AssetDatabase.Refresh();
+			Repaint();
+
+			MapboxAccess.Instance.SetConfiguration(configuration);
 		}
 	}
 }
