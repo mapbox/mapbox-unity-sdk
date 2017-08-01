@@ -4,6 +4,8 @@
 
 *08/01/2017*
 
+*Please note: our next release will end support for the Unity 5.x lifecycle. We look forward to taking advantage of Unity 2017 optimizations and features.*
+
 ##### Upgrade Instructions
 - As always, please remove older versions before installing!
 - `TypeFilter` now uses an array. You will need to update your filters!
