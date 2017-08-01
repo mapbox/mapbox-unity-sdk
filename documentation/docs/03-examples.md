@@ -2,6 +2,18 @@
 
 For each example, associated scripts and resources can be found in the same root directory as the scene itself.
 
+## Globe (v.1.1.0)
+
+*Globe.unity*
+
+This example uses a `GlobeTileProvider` to fetch the entire world bounds. Additionally, a `FlatSphereTerrainFactory` is used to spherically project terrain vertices to a sphere (radius).
+
+## TerracedWorld (v.1.1.0)
+
+*TerracedWorld.unity*
+
+This example uses the `mapbox.mapbox-terrain-v2` data layer with a `VectorTileFactory` to generate contoured terrain (also relevant: `HeightModifier` and `PolygonMeshModifier`).
+
 ## Playground
 
 These examples demonstrate how to request specific Mapbox data using our C# library.
@@ -68,6 +80,9 @@ See `MapImageFactory.asset` to customize the raster `MapId` you would like to us
 
 See `MeshFactory.asset` to see how specific layers are extracted from vector tiles. In this case, we are generating meshes for both `building` and `road`. Therefore, each layer has a `VectorLayerVisualizer` responsible for handling that layer's specific data (such as geometry).
 
+**New in v1.1.0:*
+Buildings contain a `FeatureSelectionDetector` and a `HighlightFeature` to show how colliders can be used to select/interact with buildings and show vector feature data.
+
 ## Mesh Generataion Pois
 
 *PoiGeneration.unity*
@@ -76,11 +91,19 @@ With the exception of a `PoiVisualizer ` (`PoiDemoPoiVisualizer`) being added to
 
 `PoiDemoPoiVisualizer.asset` allows you to override which prefab to spawn for each `po_label` contained in the vector tile. This prefab should have a component that implements `ILabelVisualizationHelper` attached to it. This exists to inject feature data into (such as label and `Maki` icon).
 
+**New in v1.0.0*
+
+Added 3d POI objects in addition to the 2d POI objects to demonstrate that you can easily map latitude longitude to unity coordinates.
+
 ## Mesh Generation Styles
 
 *StylingDemoMeshGeneration.unity*
 
 This example demonstrates how to use `TypeFilters` to filter specific features for processing. In this case, we have chosen to exclude `schools` from mesh generation. Additionally, you can use `ModifierStacks` to further customize specific features (to color banks differently, for example).
+
+*New in v1.1.0
+
+Using the `SpawnInsideModifier` to randomly distribute "bushes" inside of `park` `landuse` geometry (see `VectorLayerVisualizer`).
 
 ## Drive
 
@@ -154,4 +177,3 @@ return _targetTransform.GetGeoPosition(MapController.ReferenceTileRect.Center, M
 ```
 
 If you build to device, you should see a familiar map and can observe the player update with your own location. Because the camera is a child of `Player`, you should always be centered on the map.
-
