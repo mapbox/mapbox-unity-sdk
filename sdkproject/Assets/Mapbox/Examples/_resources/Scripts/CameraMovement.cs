@@ -5,53 +5,69 @@ namespace Mapbox.Examples
 	public class CameraMovement : MonoBehaviour
 	{
 		[SerializeField]
-		float Speed = 20;
+		float _panSpeed = 20f;
 
-		Vector3 _dragOrigin;
-		Vector3 _cameraPosition;
-		Vector3 _panOrigin;
+		[SerializeField]
+		float _zoomSpeed = 50f;
 
-		void Update()
+		[SerializeField]
+		Camera _referenceCamera;
+
+		Quaternion _originalRotation;
+		Vector3 _origin;
+		Vector3 _delta;
+		bool _shouldDrag;
+
+		void Awake()
 		{
-			if (Input.GetKey(KeyCode.A))
-			{
-				transform.Translate(-1 * Speed * Time.deltaTime, 0, 0, Space.World);
-			}
+			_originalRotation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
 
-			if (Input.GetKey(KeyCode.W))
+			if (_referenceCamera == null)
 			{
-				transform.Translate(0, 0, 1 * Speed * Time.deltaTime, Space.World);
-			}
-
-			if (Input.GetKey(KeyCode.S))
-			{
-				transform.Translate(0, 0, -1 * Speed * Time.deltaTime, Space.World);
-			}
-
-			if (Input.GetKey(KeyCode.D))
-			{
-				transform.Translate(1 * Speed * Time.deltaTime, 0, 0, Space.World);
-			}
-
-			if (Input.GetMouseButtonDown(0))
-			{
-				_cameraPosition = transform.position;
-				_panOrigin = Camera.main.ScreenToViewportPoint(Input.mousePosition);
-			}
-
-			if (Input.GetMouseButton(0))
-			{
-				LeftMouseDrag();
+				_referenceCamera = GetComponent<Camera>();
+				if (_referenceCamera == null)
+				{
+					throw new System.Exception("You must have a reference camera assigned!");
+				}
 			}
 		}
 
-		// TODO: add acceleration!
-		void LeftMouseDrag()
+		void LateUpdate()
 		{
-			Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition) - _panOrigin;
-			pos.z = pos.y;
-			pos.y = 0;
-			transform.position = _cameraPosition + -pos * Speed;
+			var x = 0f;
+			var y = 0f;
+			var z = 0f;
+
+			if (Input.GetMouseButton(0))
+			{
+				var mousePosition = Input.mousePosition;
+				mousePosition.z = _referenceCamera.transform.localPosition.y;
+				_delta = _referenceCamera.ScreenToWorldPoint(mousePosition) - _referenceCamera.transform.localPosition;
+				_delta.y = 0f;
+				if (_shouldDrag == false)
+				{
+					_shouldDrag = true;
+					_origin = _referenceCamera.ScreenToWorldPoint(mousePosition);
+				}
+			}
+			else
+			{
+				_shouldDrag = false;
+			}
+
+			if (_shouldDrag == true)
+			{
+				var offset = _origin - _delta;
+				offset.y = transform.localPosition.y;
+				transform.localPosition = offset;
+			}
+			else
+			{
+				x = Input.GetAxis("Horizontal");
+				z = Input.GetAxis("Vertical");
+				y = -Input.GetAxis("Mouse ScrollWheel") * _zoomSpeed;
+				transform.localPosition += transform.forward * y + (_originalRotation * new Vector3(x * _panSpeed, 0, z * _panSpeed));
+			}
 		}
 	}
 }

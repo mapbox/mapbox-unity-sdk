@@ -12,8 +12,12 @@ MonoBehaviour:
   m_Name: PoiDemoMapImageFactory
   m_EditorClassIdentifier: 
   _mapIdType: 0
-  _customMapId: 
+  _customStyle:
+    Name: 
+    Id: 
+    Modified: 
+    UserName: 
   _mapId: mapbox://styles/mapbox/streets-v10
   _useCompression: 0
   _useMipMap: 0
-  _useRetina: 1
+  _useRetina: 0

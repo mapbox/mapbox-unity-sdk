@@ -61,12 +61,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			var meshData = new MeshData();
 			var dat = new List<Vector3>();
-			foreach (var leg in response.Routes[0].Legs)
+			foreach (var point in response.Routes[0].Geometry)
 			{
-				foreach (var point in response.Routes[0].Geometry)
-				{
-					dat.Add(Conversions.GeoToWorldPosition(point.x, point.y, _map.CenterMercator, _map.WorldRelativeScale).ToVector3xz());
-				}
+				dat.Add(Conversions.GeoToWorldPosition(point.x, point.y, _map.CenterMercator, _map.WorldRelativeScale).ToVector3xz());
 			}
 
 			var feat = new VectorFeatureUnity();

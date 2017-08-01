@@ -195,10 +195,7 @@ timestamp   INTEGER NOT NULL,
 			// no 'ORDER BY' or 'LIMIT' possible if sqlite hasn't been compiled with 'SQLITE_ENABLE_UPDATE_DELETE_LIMIT'
 			// https://sqlite.org/compile.html#enable_update_delete_limit
 			// int rowsAffected = _sqlite.Execute("DELETE FROM tiles ORDER BY timestamp ASC LIMIT ?", toDelete);
-			int rowsAffected = _sqlite.Execute("DELETE FROM tiles WHERE rowid IN ( SELECT rowid FROM tiles ORDER BY timestamp ASC LIMIT ? );", toDelete);
-
-			//string msg =string.Format("tiles deleted:{0} -{1}", rowsAffected, DateTime.Now.Ticks);
-			//UnityEngine.Debug.Log(msg);
+			_sqlite.Execute("DELETE FROM tiles WHERE rowid IN ( SELECT rowid FROM tiles ORDER BY timestamp ASC LIMIT ? );", toDelete);
 		}
 
 
