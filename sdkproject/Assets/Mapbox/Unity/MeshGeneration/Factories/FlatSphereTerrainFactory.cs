@@ -6,8 +6,8 @@
 	using System.Collections.Generic;
 	using Mapbox.Utils;
 
-	[CreateAssetMenu(menuName = "Mapbox/Factories/Sphere Terrain Factory")]
-	public class SphereTerrainFactory : AbstractTileFactory
+	[CreateAssetMenu(menuName = "Mapbox/Factories/Terrain Factory - Flat Sphere")]
+	public class FlatSphereTerrainFactory : AbstractTileFactory
 	{
 		[SerializeField]
 		private Material _baseMaterial;

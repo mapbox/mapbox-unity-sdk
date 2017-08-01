@@ -38,12 +38,10 @@
 			}
 			else
 			{
-				float buttonWidth = EditorGUIUtility.singleLineHeight * 4;
 				if (GUILayout.Button("Search"))
 				{
 					StyleSearchWindow.Open(property);
 				}
-
 			}
 
 			if (GUILayout.Button("Clear", GUILayout.Width(100)))

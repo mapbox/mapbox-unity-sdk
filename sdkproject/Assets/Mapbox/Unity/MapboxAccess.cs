@@ -52,7 +52,6 @@ namespace Mapbox.Unity
 			}
 		}
 
-
 		MapboxAccess()
 		{
 			LoadAccessToken();
