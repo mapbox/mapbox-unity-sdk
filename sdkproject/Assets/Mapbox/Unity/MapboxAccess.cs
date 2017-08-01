@@ -52,7 +52,6 @@ namespace Mapbox.Unity
 			}
 		}
 
-
 		MapboxAccess()
 		{
 			LoadAccessToken();
@@ -194,7 +193,6 @@ namespace Mapbox.Unity
 			{
 			}
 		}
-
 	}
 
 	public class MapboxConfiguration

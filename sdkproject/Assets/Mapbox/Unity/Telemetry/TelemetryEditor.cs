@@ -1,3 +1,4 @@
+﻿#if UNITY_EDITOR
 namespace Mapbox.Unity.Telemetry
 {
 	using System.Collections.Generic;
@@ -9,9 +10,7 @@ namespace Mapbox.Unity.Telemetry
 	using UnityEngine.Networking;
 	using System.Text;
 
-#if UNITY_EDITOR
 	using UnityEditor;
-#endif
 
 	public class TelemetryEditor : ITelemetryLibrary
 	{
@@ -101,27 +100,25 @@ namespace Mapbox.Unity.Telemetry
 
 		static string GetUserAgent()
 		{
-#if UNITY_EDITOR
 			var userAgent = string.Format("{0}/{1}/{2} MapboxEventsUnityEditor/{3}",
-			                              PlayerSettings.bundleIdentifier,
+										  PlayerSettings.bundleIdentifier,
 										  PlayerSettings.bundleVersion,
 #if UNITY_IOS
 										  PlayerSettings.iOS.buildNumber,
 #elif UNITY_ANDROID
-			                              PlayerSettings.Android.bundleVersionCode,
+										  PlayerSettings.Android.bundleVersionCode,
 #else
 			                              "0",
 #endif
 										  Constants.SDK_VERSION
 										 );
 			return userAgent;
-#endif
-			return "MapboxEventsUnityEditor";
 		}
 
 		public void SetLocationCollectionState(bool enable)
 		{
-			// empty.
+			// Empty.
 		}
 	}
 }
+#endif

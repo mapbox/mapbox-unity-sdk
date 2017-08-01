@@ -6,7 +6,6 @@ using Mapbox.Unity.MeshGeneration.Factories;
 public class TerrainFactoryEditor : FactoryEditor
 {
 	private string _defaultMapId = "mapbox.terrain-rgb";
-	private TerrainFactory _factory;
 	public SerializedProperty
 		sampleCount_Prop,
 		mapIdType_Prop,
@@ -22,7 +21,6 @@ public class TerrainFactoryEditor : FactoryEditor
 
 	void OnEnable()
 	{
-		_factory = target as TerrainFactory;
 		mapIdType_Prop = serializedObject.FindProperty("_mapIdType");
 		sampleCount_Prop = serializedObject.FindProperty("_sampleCount");
 		heightMod_Prop = serializedObject.FindProperty("_heightModifier");
@@ -91,12 +89,6 @@ public class TerrainFactoryEditor : FactoryEditor
 		{
 			layerId_Prop.intValue = EditorGUILayout.LayerField("Layer", layerId_Prop.intValue);
 		}
-
-		//if (GUILayout.Button("Update"))
-		//{
-		//	//_factory.Update();
-		//	Debug.Log("TerrainFactoryEditor: " + "FIX ME!");
-		//}
 
 		serializedObject.ApplyModifiedProperties();
 	}

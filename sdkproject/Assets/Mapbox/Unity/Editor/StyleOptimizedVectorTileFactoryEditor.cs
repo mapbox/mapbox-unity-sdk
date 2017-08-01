@@ -72,8 +72,10 @@
 				{
 					EditorGUILayout.BeginHorizontal();
 					if (_factory.Visualizers[i] != null)
+					{
 						_factory.Visualizers[i].Key = EditorGUILayout.TextField(_factory.Visualizers[i].Key, GUILayout.MaxWidth(100));
-					_factory.Visualizers[i] = (LayerVisualizerBase)EditorGUILayout.ObjectField(_factory.Visualizers[i], typeof(LayerVisualizerBase));
+					}
+					_factory.Visualizers[i] = (LayerVisualizerBase)EditorGUILayout.ObjectField(_factory.Visualizers[i], typeof(LayerVisualizerBase), false);
 
 					if (GUILayout.Button("-", GUILayout.MaxWidth(20)))
 					{
