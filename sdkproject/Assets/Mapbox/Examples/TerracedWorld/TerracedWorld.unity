@@ -100,6 +100,7 @@ GameObject:
   - 4: {fileID: 110210641}
   - 114: {fileID: 110210642}
   - 114: {fileID: 110210643}
+  - 114: {fileID: 110210644}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -153,6 +154,18 @@ MonoBehaviour:
   _north: 3
   _east: 3
   _south: 3
+--- !u!114 &110210644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 110210640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce97be288e861a243b6c6df4cc790edc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShadowDistance: 3000
 --- !u!1 &147521524
 GameObject:
   m_ObjectHideFlags: 0
