@@ -9,6 +9,7 @@
 ### General
 
 - If you experience issues with tiles not refreshing as expected, please remember to clear the disk cache
+- `MapVisualizer` [incorrectly reports](https://github.com/mapbox/mapbox-unity-sdk/issues/194) `OnMapVisualizerStateChanged` `Finished` when loading tiles from disk
 - `foreach` is being used extensively (GC cost--this is not an issue in Unity 5.5+)
 
 ### Vector Tile
