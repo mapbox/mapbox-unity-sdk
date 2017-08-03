@@ -1,4 +1,5 @@
-﻿namespace Mapbox.Unity.Telemetry
+﻿#if UNITY_EDITOR
+namespace Mapbox.Unity.Telemetry
 {
 	using System.Collections.Generic;
 	using System.Collections;
@@ -9,9 +10,7 @@
 	using UnityEngine.Networking;
 	using System.Text;
 
-#if UNITY_EDITOR
 	using UnityEditor;
-#endif
 
 	public class TelemetryEditor : ITelemetryLibrary
 	{
@@ -40,7 +39,7 @@
 			if (ShouldPostTurnstile(ticks))
 			{
 				Runnable.Run(PostWWW(_url, GetPostBody()));
-				PlayerPrefs.SetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR, ticks.ToString());
+				PlayerPrefs.SetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR_KEY, ticks.ToString());
 			}
 		}
 
@@ -63,7 +62,7 @@
 		{
 			var date = new DateTime(ticks);
 			var longAgo = DateTime.Now.AddDays(-100).Ticks.ToString();
-			var lastDateString = PlayerPrefs.GetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR, longAgo);
+			var lastDateString = PlayerPrefs.GetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR_KEY, longAgo);
 			long lastTicks = 0;
 			long.TryParse(lastDateString, out lastTicks);
 			var lastDate = new DateTime(lastTicks);
@@ -101,22 +100,25 @@
 
 		static string GetUserAgent()
 		{
-#if UNITY_EDITOR
 			var userAgent = string.Format("{0}/{1}/{2} MapboxEventsUnityEditor/{3}",
-			                              PlayerSettings.bundleIdentifier,
+										  PlayerSettings.bundleIdentifier,
 										  PlayerSettings.bundleVersion,
 #if UNITY_IOS
 										  PlayerSettings.iOS.buildNumber,
 #elif UNITY_ANDROID
-			                              PlayerSettings.Android.bundleVersionCode,
+										  PlayerSettings.Android.bundleVersionCode,
 #else
 			                              "0",
 #endif
 										  Constants.SDK_VERSION
 										 );
 			return userAgent;
-#endif
-			return "MapboxEventsUnityEditor";
+		}
+
+		public void SetLocationCollectionState(bool enable)
+		{
+			// Empty.
 		}
 	}
 }
+#endif

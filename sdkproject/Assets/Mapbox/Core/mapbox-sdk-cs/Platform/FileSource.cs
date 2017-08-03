@@ -45,11 +45,13 @@ namespace Mapbox.Platform
 		private readonly object _lock = new object();
 
 		/// <summary>Length of rate-limiting interval in seconds. https://www.mapbox.com/api-documentation/#rate-limits </summary>
+#pragma warning disable 0414
 		private int? XRateLimitInterval;
 		/// <summary>Maximum number of requests you may make in the current interval before reaching the limit. https://www.mapbox.com/api-documentation/#rate-limits </summary>
 		private long? XRateLimitLimit;
 		/// <summary>Timestamp of when the current interval will end and the ratelimit counter is reset. https://www.mapbox.com/api-documentation/#rate-limits </summary>
 		private DateTime? XRateLimitReset;
+#pragma warning restore 0414
 
 
 		public FileSource(string acessToken = null)

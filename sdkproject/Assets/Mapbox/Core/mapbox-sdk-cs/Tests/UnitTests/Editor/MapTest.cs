@@ -26,7 +26,6 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 	{
 
 		private FileSource _fs;
-		private int _timeout = 10;
 
 
 		[SetUp]
@@ -34,7 +33,6 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		{
 #if UNITY_5_6_OR_NEWER
 			_fs = new FileSource(Unity.MapboxAccess.Instance.Configuration.AccessToken);
-			_timeout = Unity.MapboxAccess.Instance.Configuration.DefaultTimeout;
 #else
 			// when run outside of Unity FileSource gets the access token from environment variable 'MAPBOX_ACCESS_TOKEN'
 			_fs = new FileSource();

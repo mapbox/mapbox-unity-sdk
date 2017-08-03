@@ -1,11 +1,11 @@
 namespace Mapbox.Unity.MeshGeneration.Factories
 {
 	using System;
-	using System.Collections.Generic;
 	using Mapbox.Map;
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Enums;
 	using Mapbox.Unity.MeshGeneration.Data;
+	using Mapbox.Unity.Utilities;
 
 	public enum MapImageType
 	{
@@ -17,14 +17,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	/// <summary>
 	/// Uses raster image services to create materials & textures for terrain
 	/// </summary>
-	[CreateAssetMenu(menuName = "Mapbox/Factories/Map Image Factory")]
+	[CreateAssetMenu(menuName = "Mapbox/Factories/Image Factory")]
 	public class MapImageFactory : AbstractTileFactory
 	{
 		[SerializeField]
 		private MapImageType _mapIdType;
 
 		[SerializeField]
-		private string _customMapId = "";
+		[StyleSearch]
+		Style _customStyle;
 
 		[SerializeField]
 		private string _mapId = "";

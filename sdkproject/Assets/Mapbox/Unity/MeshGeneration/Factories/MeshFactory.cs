@@ -1,4 +1,4 @@
-namespace Mapbox.Unity.MeshGeneration.Factories
+﻿namespace Mapbox.Unity.MeshGeneration.Factories
 {
 	using System.Collections.Generic;
 	using UnityEngine;
@@ -7,16 +7,19 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	using Mapbox.Unity.MeshGeneration.Interfaces;
 	using Mapbox.Map;
 	using Mapbox.Platform;
+	using System;
 
 	/// <summary>
 	/// Uses vector tile api to visualize vector data.
 	/// Fetches the vector data for given tile and passes layer data to layer visualizers.
 	/// </summary>
-	[CreateAssetMenu(menuName = "Mapbox/Factories/Mesh Factory")]
+	[Obsolete("MeshFactory is obsolete. Please use VectorTileFactory.")]
+	[CreateAssetMenu(menuName = "Mapbox/Factories/Mesh Factory - Obsolete (Use VectorTileFactory)")]
 	public class MeshFactory : AbstractTileFactory
 	{
 		[SerializeField]
 		private string _mapId = "";
+
 		public List<LayerVisualizerBase> Visualizers;
 
 		private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;

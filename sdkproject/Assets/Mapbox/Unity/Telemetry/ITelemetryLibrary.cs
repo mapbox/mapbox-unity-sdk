@@ -4,5 +4,6 @@ namespace Mapbox.Unity.Telemetry
 	{
 		void Initialize(string accessToken);
 		void SendTurnstile();
+		void SetLocationCollectionState(bool enable);
 	}
 }

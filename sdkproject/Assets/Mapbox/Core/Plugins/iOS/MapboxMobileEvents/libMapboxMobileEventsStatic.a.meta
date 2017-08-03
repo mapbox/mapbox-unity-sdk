@@ -1,7 +1,7 @@
 fileFormatVersion: 2
-guid: 8c8da31e736314eaf895e83848a93274
-timeCreated: 1495342197
-licenseType: Pro
+guid: 902cd5fd1c6e74a17a41d7527de5b07b
+timeCreated: 1500504486
+licenseType: Free
 PluginImporter:
   serializedVersion: 1
   iconMap: {}
@@ -12,6 +12,9 @@ PluginImporter:
       enabled: 0
       settings:
         CPU: AnyCPU
+    Any:
+      enabled: 0
+      settings: {}
     Editor:
       enabled: 0
       settings:
@@ -42,9 +45,6 @@ PluginImporter:
       enabled: 0
       settings:
         CPU: AnyCPU
-    data:
-      enabled: 0
-      settings: {}
     iOS:
       enabled: 1
       settings:
