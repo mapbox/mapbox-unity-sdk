@@ -20,7 +20,7 @@ namespace Mapbox.Unity.MeshGeneration
 	public class MapVisualizer : ScriptableObject
 	{
 		[SerializeField]
-		AbstractTileFactory[] _factories;
+		public List<AbstractTileFactory> _factories;
 
 		IMap _map;
 		public Dictionary<UnwrappedTileId, UnityTile> Tiles;
@@ -72,7 +72,7 @@ namespace Mapbox.Unity.MeshGeneration
 			else if (State != ModuleState.Finished && factory.State == ModuleState.Finished)
 			{
 				var allFinished = true;
-				for (int i = 0; i < _factories.Length; i++)
+				for (int i = 0; i < _factories.Count; i++)
 				{
 					if (_factories[i] != null)
 					{
@@ -88,7 +88,7 @@ namespace Mapbox.Unity.MeshGeneration
 
 		internal void Destroy()
 		{
-			for (int i = 0; i < _factories.Length; i++)
+			for (int i = 0; i < _factories.Count; i++)
 			{
 				if (_factories[i] != null)
 					_factories[i].OnFactoryStateChanged -= UpdateState;
