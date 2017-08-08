@@ -27,6 +27,7 @@ public class Node
 	public List<Node> Children;
 
 	public ScriptableObject ScriptableObject;
+	public Rect spaceRect;
 	public Rect rect;
 	public string title;
 	public string subtitle;
@@ -87,13 +88,14 @@ public class Node
 			return 0f;
 
 		width = title.Length * 10;
+		spaceRect = new Rect(position.x + drag.x, position.y + drag.y, width, height);
 		rect = new Rect(position.x + drag.x, position.y + drag.y, width, height);
 		_propTopTest = 0;
 		foreach (var c in Children)
 		{
-			var h = c.Draw(new Vector2(rect.xMax + _padding.x, rect.yMin + _propTopTest), 100, _nodeHeight, drawModifiers);
+			var h = c.Draw(new Vector2(spaceRect.xMax + _padding.x, spaceRect.yMin + _propTopTest), 100, _nodeHeight, drawModifiers);
 			_propTopTest += h;
-			rect.height += h;
+			spaceRect.height += h;
 		}
 
 		if(!_isRoot)
@@ -101,7 +103,7 @@ public class Node
 		if (Children.Count > 0)
 		{
 			outPoint.Draw(false);
-			rect.height -= Math.Min(_propTopTest, _nodeHeight);
+			spaceRect.height -= Math.Min(_propTopTest, _nodeHeight);
 		}
 		//GUI.Box(rect, title, style);
 		GUILayout.BeginArea(rect, nodeStyle);
@@ -111,7 +113,7 @@ public class Node
 
 		DrawConnections();
 
-		return Math.Max(height, rect.height);
+		return Math.Max(height, spaceRect.height);
 	}
 
 	public bool ProcessEvents(Event e)
@@ -280,20 +282,19 @@ public class Node
 
 	public void ProcessNodeEvents(Event e)
 	{
-		if (Children != null)
+		bool guiChanged = ProcessEvents(e);
+		
+		foreach (var item in Children)
 		{
-			for (int i = Children.Count - 1; i >= 0; i--)
-			{
-				bool guiChanged = Children[i].ProcessEvents(e);
+			item.ProcessNodeEvents(e);
+		}
 
-				if (guiChanged)
-				{
-					GUI.changed = true;
-				}
+		if (isSelected)
+			Selection.objects = new UnityEngine.Object[1] { ScriptableObject };
 
-				if (Children[i].isSelected)
-					Selection.objects = new UnityEngine.Object[1] { Children[i].ScriptableObject };
-			}
+		if (guiChanged)
+		{
+			GUI.changed = true;
 		}
 	}
 }
