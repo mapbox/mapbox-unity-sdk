@@ -12,6 +12,8 @@ namespace Mapbox.Utils
 		/// <summary> Base URL for all the Mapbox APIs. </summary>
 		public const string BaseAPI = "https://api.mapbox.com/";
 
+		public const string EventsAPI = "https://events.mapbox.com/";
+
 		/// <summary> Mercator projection max latitude limit. </summary>
 		public const double LatitudeMax = 85.0511;
 
