@@ -86,7 +86,7 @@ public class NodeBasedEditor : EditorWindow
 		mapNode.subtitle = "Map Visualizer";
 		_rootNode = mapNode;
 
-		_rootNode.Dive(map, mapNode);
+		_rootNode.Dive(map);
 	}
 	
 	private void OnGUI()
@@ -128,6 +128,10 @@ public class NodeBasedEditor : EditorWindow
 			Parse();
 		}
 		GUILayout.FlexibleSpace();
+		if (GUILayout.Button("Reset Zoom", EditorStyles.miniButton, GUILayout.Width(100)))
+		{
+			zoomScale = 1;
+		}
 		if (GUILayout.Button("Options", EditorStyles.miniButton, GUILayout.Width(100)))
 		{
 			_showOptions = !_showOptions;

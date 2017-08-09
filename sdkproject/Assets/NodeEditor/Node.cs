@@ -9,21 +9,15 @@ using Mapbox.Unity.MeshGeneration.Modifiers;
 
 public class Node
 {
-	[NonSerialized]
 	private bool _isRoot = false;
-	[NonSerialized]
 	private Vector2 _panDelta;
-	[NonSerialized]
-	private float _nodeHeight = 50;
-	[NonSerialized]
 	private Vector2 _topLeft = new Vector2(50, 50);
-	[NonSerialized]
 	private Vector2 _padding = new Vector2(50, 100);
 	private Vector2 drag;
-	[NonSerialized]
 	private float _propTopTest = 0f;
 
 	public List<Connection> Connections;
+	public List<ConnectionPoint> ConnectionPoints;
 	public List<Node> Children;
 
 	public ScriptableObject ScriptableObject;
@@ -35,17 +29,18 @@ public class Node
 	public bool isSelected;
 
 	public ConnectionPoint inPoint;
-	public ConnectionPoint outPoint;
+	//public ConnectionPoint outPoint;
 
 	public GUIStyle nodeStyle;
 	public GUIStyle defaultNodeStyle;
 	public GUIStyle selectedNodeStyle;
 	public GUIStyle inPointStyle;
 	public GUIStyle outPointStyle;
-	
+
 	public Action<Node> OnRemoveNode;
 
-	private GUIStyle _titleStyle = new GUIStyle() {
+	private GUIStyle _titleStyle = new GUIStyle()
+	{
 		fontSize = 14,
 		fontStyle = FontStyle.Bold,
 		normal = new GUIStyleState() { textColor = Color.white }
@@ -58,12 +53,21 @@ public class Node
 		normal = new GUIStyleState() { textColor = Color.white }
 	};
 
+	[NonSerialized]
+	private float _headerHeight = 70;
+	[NonSerialized]
+	private float _propertyHeight = 25;
+	[NonSerialized]
+	private int _propCount = 0;
+
 	//Vector2 position, float width, float height
 	public Node(GUIStyle ns, GUIStyle ss, GUIStyle ips, GUIStyle ops, ScriptableObject so = null)
 	{
 		_propTopTest = 0f;
+		_propCount = 0;
 		Children = new List<Node>();
 		Connections = new List<Connection>();
+		ConnectionPoints = new List<ConnectionPoint>();
 		ScriptableObject = so;
 		//var w = width;
 		if (ScriptableObject != null)
@@ -74,46 +78,57 @@ public class Node
 		}
 		//rect = new Rect(position.x, position.y, w, height);
 		nodeStyle = ns;
-		inPoint = new ConnectionPoint(this, ConnectionPointType.In, ips);
-		outPoint = new ConnectionPoint(this, ConnectionPointType.Out, ops);
+		inPoint = new ConnectionPoint(this, "", 20, ConnectionPointType.In, ips);
+		//outPoint = new ConnectionPoint(this, ConnectionPointType.Out, ops);
 		defaultNodeStyle = ns;
 		selectedNodeStyle = ss;
 		this.inPointStyle = ips;
 		this.outPointStyle = ops;
 	}
-		
+
 	public float Draw(Vector2 position, float width, float height, bool drawModifiers)
 	{
 		if (!drawModifiers && ScriptableObject is ModifierBase)
 			return 0f;
 
 		width = title.Length * 10;
-		spaceRect = new Rect(position.x + drag.x, position.y + drag.y, width, height);
-		rect = new Rect(position.x + drag.x, position.y + drag.y, width, height);
+		var boxHeight = _headerHeight + _propCount * _propertyHeight;
+		spaceRect = new Rect(position.x + drag.x, position.y + drag.y, width, boxHeight);
+		rect = new Rect(position.x + drag.x, position.y + drag.y, width, boxHeight);
 		_propTopTest = 0;
 		foreach (var c in Children)
 		{
-			var h = c.Draw(new Vector2(spaceRect.xMax + _padding.x, spaceRect.yMin + _propTopTest), 100, _nodeHeight, drawModifiers);
+			var h = c.Draw(new Vector2(spaceRect.xMax + _padding.x, spaceRect.yMin + _propTopTest), 100, 0, drawModifiers);
 			_propTopTest += h;
 			spaceRect.height += h;
 		}
 
-		if(!_isRoot)
-			inPoint.Draw(true);
+		if (!_isRoot)
+			inPoint.Draw();
+
+		
+
+		spaceRect.height = Math.Max(height, Math.Max(spaceRect.height, boxHeight));
 		if (Children.Count > 0)
 		{
-			outPoint.Draw(false);
-			spaceRect.height -= Math.Min(_propTopTest, _nodeHeight);
+			spaceRect.height -= Math.Min(_propTopTest, boxHeight);
 		}
+		//rect = spaceRect;
+
 		//GUI.Box(rect, title, style);
 		GUILayout.BeginArea(rect, nodeStyle);
 		GUILayout.Label(title, _titleStyle);
 		GUILayout.Label(subtitle, _subtitleStyle);
 		GUILayout.EndArea();
 
+		foreach (var p in ConnectionPoints)
+		{
+			p.Draw();
+		}
+
 		DrawConnections();
 
-		return Math.Max(height, spaceRect.height);
+		return spaceRect.height;
 	}
 
 	public bool ProcessEvents(Event e)
@@ -125,6 +140,8 @@ public class Node
 				{
 					if (rect.Contains(e.mousePosition))
 					{
+						if (!isDragged)
+							Selection.objects = new UnityEngine.Object[1] { ScriptableObject };
 						isDragged = true;
 						GUI.changed = true;
 						isSelected = true;
@@ -149,14 +166,14 @@ public class Node
 				isDragged = false;
 				break;
 
-			//case EventType.MouseDrag:
-			//	if (e.button == 0 && isDragged)
-			//	{
-			//		rect.position += e.delta;
-			//		e.Use();
-			//		return true;
-			//	}
-			//	break;
+				//case EventType.MouseDrag:
+				//	if (e.button == 0 && isDragged)
+				//	{
+				//		rect.position += e.delta;
+				//		e.Use();
+				//		return true;
+				//	}
+				//	break;
 		}
 
 		return false;
@@ -188,7 +205,7 @@ public class Node
 		}
 	}
 
-	public void Dive(object obj, Node parent, int depth = 0)
+	public void Dive(object obj, int depth = 0)
 	{
 		_isRoot = depth == 0;
 
@@ -200,18 +217,14 @@ public class Node
 				var val = fi.GetValue(obj) as ScriptableObject;
 				if (val != null)
 				{
-					//if (!heightFixed)
-					//{
-					//	heightFixed = true;
-					//	parent.rect.height -= _nodeHeight;
-					//}
-
-					//new Vector2(parent.rect.xMax + _padding.x, parent.rect.yMin + propTop), 100, _nodeHeight, 
+					var conp = new ConnectionPoint(this, fi.Name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, outPointStyle);
+					ConnectionPoints.Add(conp);
 					var newNode = new Node(nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle, val);
 					Children.Add(newNode);
-					newNode.Connections.Add(new Connection(newNode.inPoint, parent.outPoint));
+					newNode.Connections.Add(new Connection(newNode.inPoint, conp));
 
-					newNode.Dive(val, newNode, depth + 1);
+					newNode.Dive(val, depth + 1);
+					_propCount++;
 				}
 			}
 
@@ -222,18 +235,19 @@ public class Node
 			{
 				if (typeof(ScriptableObject).IsAssignableFrom(type.GetGenericArguments()[0]))
 				{
+					var conp = new ConnectionPoint(this, fi.Name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, outPointStyle);
+					ConnectionPoints.Add(conp);
 					var val = fi.GetValue(obj);
 					if (val is IEnumerable)
 					{
 						foreach (ScriptableObject listitem in val as IEnumerable)
 						{
-							//new Vector2(parent.rect.xMax + _padding.x, parent.rect.yMin + propTop), 100, _nodeHeight, 
 							var newNode = new Node(nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle, listitem);
 							Children.Add(newNode);
-							newNode.Connections.Add(new Connection(newNode.inPoint, parent.outPoint));
-							newNode.Dive(listitem, newNode, depth + 1);
+							newNode.Connections.Add(new Connection(newNode.inPoint, conp));
+							newNode.Dive(listitem, depth + 1);
 						}
-
+						_propCount++;
 					}
 				}
 			}
@@ -247,11 +261,13 @@ public class Node
 				var val = pi.GetValue(obj, null) as ScriptableObject;
 				if (val != null)
 				{
-					//new Vector2(parent.rect.xMax + _padding.x, parent.rect.yMin + propTop + _padding.y), 100, _nodeHeight, 
+					var conp = new ConnectionPoint(this, pi.Name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, outPointStyle);
+					ConnectionPoints.Add(conp);
 					var newNode = new Node(nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle, val);
 					Children.Add(newNode);
-					newNode.Connections.Add(new Connection(newNode.inPoint, parent.outPoint));
-					newNode.Dive(val, newNode, depth + 1);
+					newNode.Connections.Add(new Connection(newNode.inPoint, conp));
+					newNode.Dive(val, depth + 1);
+					_propCount++;
 				}
 			}
 
@@ -262,18 +278,19 @@ public class Node
 			{
 				if (typeof(ScriptableObject).IsAssignableFrom(type.GetGenericArguments()[0]))
 				{
+					var conp = new ConnectionPoint(this, pi.Name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, outPointStyle);
+					ConnectionPoints.Add(conp);
 					var val = pi.GetValue(obj, null);
 					if (val is IEnumerable)
 					{
 						foreach (ScriptableObject listitem in val as IEnumerable)
 						{
-							//new Vector2(parent.rect.xMax + _padding.x, parent.rect.yMin + propTop), 100, _nodeHeight, 
 							var newNode = new Node(nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle, listitem);
 							Children.Add(newNode);
-							newNode.Connections.Add(new Connection(newNode.inPoint, parent.outPoint));
-							newNode.Dive(listitem, newNode, depth + 1);
+							newNode.Connections.Add(new Connection(newNode.inPoint, conp));
+							newNode.Dive(listitem, depth + 1);
 						}
-
+						_propCount++;
 					}
 				}
 			}
@@ -283,14 +300,11 @@ public class Node
 	public void ProcessNodeEvents(Event e)
 	{
 		bool guiChanged = ProcessEvents(e);
-		
+
 		foreach (var item in Children)
 		{
 			item.ProcessNodeEvents(e);
 		}
-
-		if (isSelected)
-			Selection.objects = new UnityEngine.Object[1] { ScriptableObject };
 
 		if (guiChanged)
 		{

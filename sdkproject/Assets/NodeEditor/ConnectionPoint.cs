@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 public enum ConnectionPointType { In, Out }
@@ -6,24 +7,33 @@ public enum ConnectionPointType { In, Out }
 public class ConnectionPoint
 {
 	public Rect rect;
-
+	public Rect labelRect;
 	public ConnectionPointType type;
-
 	public Node node;
-
 	public GUIStyle style;
 
-	public ConnectionPoint(Node node, ConnectionPointType type, GUIStyle style)
+	private string _name;
+	private float _deltaY;
+	private GUIStyle _labelStyle = new GUIStyle()
 	{
+		fontSize = 10,
+		normal = new GUIStyleState() { textColor = Color.white }
+	};
+
+	public ConnectionPoint(Node node, string name, float deltay, ConnectionPointType type, GUIStyle style)
+	{
+		this._name = Regex.Replace(name, "(\\B[A-Z])", " $1");
 		this.node = node;
 		this.type = type;
 		this.style = style;
+		_deltaY = deltay;
 		rect = new Rect(0, 0, 10f, 20f);
 	}
 
-	public void Draw(bool drawBox)
+	public void Draw()
 	{
-		rect.y = node.rect.y + (node.rect.height * 0.5f) - rect.height * 0.5f;
+		rect.y = node.rect.y + _deltaY - rect.height * 0.5f;
+		labelRect = new Rect(node.rect.xMax - 100, node.rect.y + _deltaY - 8f, 100, 25);
 
 		switch (type)
 		{
@@ -36,12 +46,14 @@ public class ConnectionPoint
 				break;
 		}
 
-		if (drawBox)
+		if(!string.IsNullOrEmpty(_name))
 		{
-			if (GUI.Button(rect, "", style))
-			{
+			GUI.Label(labelRect, _name, _labelStyle);
+		}
 
-			}
+		if (GUI.Button(rect, "", style))
+		{
+
 		}
 	}
 }
