@@ -24,7 +24,7 @@ namespace Mapbox.Unity.Telemetry
 
 		public void Initialize(string accessToken)
 		{
-			_url = string.Format("{0}events/v2?access_token={1}", Mapbox.Utils.Constants.BaseAPI, accessToken);
+			_url = string.Format("{0}events/v2?access_token={1}", Mapbox.Utils.Constants.EventsAPI, accessToken);
 		}
 
 		public void SendTurnstile()
@@ -42,8 +42,10 @@ namespace Mapbox.Unity.Telemetry
 			List<Dictionary<string, object>> eventList = new List<Dictionary<string, object>>();
 			Dictionary<string, object> jsonDict = new Dictionary<string, object>();
 
+			long unixTimestamp = (long)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+
 			jsonDict.Add("event", "appUserTurnstile");
-			jsonDict.Add("created", DateTime.Now.Ticks);
+			jsonDict.Add("created", unixTimestamp);
 			jsonDict.Add("userId", SystemInfo.deviceUniqueIdentifier);
 			jsonDict.Add("enabled.telemetry", false);
 			eventList.Add(jsonDict);
@@ -95,10 +97,10 @@ namespace Mapbox.Unity.Telemetry
 		static string GetUserAgent()
 		{
 			var userAgent = string.Format("{0}/{1}/{2} MapboxEventsUnity{3}/{4}",
-			                              Application.bundleIdentifier,
-			                              Application.version,
-			                              "0",
-			                              Application.platform,
+										  Application.bundleIdentifier,
+										  Application.version,
+										  "0",
+										  Application.platform,
 										  Constants.SDK_VERSION
 										 );
 			return userAgent;
