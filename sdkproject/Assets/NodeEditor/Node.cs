@@ -6,9 +6,12 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Collections;
 using Mapbox.Unity.MeshGeneration.Modifiers;
+using System.Linq;
 
 public class Node
 {
+	private bool _expanded = true;
+
 	private bool _isRoot = false;
 	private Vector2 _panDelta;
 	private Vector2 _topLeft = new Vector2(50, 50);
@@ -23,6 +26,7 @@ public class Node
 	public ScriptableObject ScriptableObject;
 	public Rect spaceRect;
 	public Rect rect;
+	public Rect buttonRect;
 	public string title;
 	public string subtitle;
 	public bool isDragged;
@@ -31,7 +35,7 @@ public class Node
 	public ConnectionPoint inPoint;
 	//public ConnectionPoint outPoint;
 
-	public GUIStyle nodeStyle;
+	//public GUIStyle nodeStyle;
 	public GUIStyle defaultNodeStyle;
 	public GUIStyle selectedNodeStyle;
 	public GUIStyle inPointStyle;
@@ -61,7 +65,7 @@ public class Node
 	private int _propCount = 0;
 
 	//Vector2 position, float width, float height
-	public Node(GUIStyle ns, GUIStyle ss, GUIStyle ips, GUIStyle ops, ScriptableObject so = null)
+	public Node(ScriptableObject so = null)
 	{
 		_propTopTest = 0f;
 		_propCount = 0;
@@ -69,21 +73,14 @@ public class Node
 		Connections = new List<Connection>();
 		ConnectionPoints = new List<ConnectionPoint>();
 		ScriptableObject = so;
-		//var w = width;
+		
 		if (ScriptableObject != null)
 		{
 			title = Regex.Replace(ScriptableObject.name, "(\\B[A-Z])", " $1");
 			subtitle = Regex.Replace(ScriptableObject.GetType().Name, "(\\B[A-Z])", " $1");
-			//w = title.Length * 10;
 		}
-		//rect = new Rect(position.x, position.y, w, height);
-		nodeStyle = ns;
-		inPoint = new ConnectionPoint(this, "", 20, ConnectionPointType.In, ips);
-		//outPoint = new ConnectionPoint(this, ConnectionPointType.Out, ops);
-		defaultNodeStyle = ns;
-		selectedNodeStyle = ss;
-		this.inPointStyle = ips;
-		this.outPointStyle = ops;
+
+		inPoint = new ConnectionPoint(this, "", 20, ConnectionPointType.In, NodeBasedEditor.inPointStyle);
 	}
 
 	public float Draw(Vector2 position, float width, float height, bool drawModifiers)
@@ -91,23 +88,27 @@ public class Node
 		if (!drawModifiers && ScriptableObject is ModifierBase)
 			return 0f;
 
+		//if(ScriptableObject is ModifierStackBase)
+
 		width = title.Length * 10;
 		var boxHeight = _headerHeight + _propCount * _propertyHeight;
 		spaceRect = new Rect(position.x + drag.x, position.y + drag.y, width, boxHeight);
 		rect = new Rect(position.x + drag.x, position.y + drag.y, width, boxHeight);
+		buttonRect = new Rect(rect.xMax - 25, rect.yMin + 10, 20, 20);
 		_propTopTest = 0;
-		foreach (var c in Children)
+		if (_expanded)
 		{
-			var h = c.Draw(new Vector2(spaceRect.xMax + _padding.x, spaceRect.yMin + _propTopTest), 100, 0, drawModifiers);
-			_propTopTest += h;
-			spaceRect.height += h;
+			foreach (var c in Children)
+			{
+				var h = c.Draw(new Vector2(spaceRect.xMax + _padding.x, spaceRect.yMin + _propTopTest), 100, 0, drawModifiers);
+				_propTopTest += h;
+				spaceRect.height += h;
+			}
 		}
 
 		if (!_isRoot)
 			inPoint.Draw();
-
 		
-
 		spaceRect.height = Math.Max(height, Math.Max(spaceRect.height, boxHeight));
 		if (Children.Count > 0)
 		{
@@ -116,7 +117,17 @@ public class Node
 		//rect = spaceRect;
 
 		//GUI.Box(rect, title, style);
-		GUILayout.BeginArea(rect, nodeStyle);
+		if (isSelected)
+		{
+			GUILayout.BeginArea(rect, NodeBasedEditor.selectedNodeStyle);
+		}
+		else
+		{
+			if (ScriptableObject is ModifierBase)
+				GUILayout.BeginArea(rect, NodeBasedEditor.leafNodeStyle);
+			else
+				GUILayout.BeginArea(rect, NodeBasedEditor.nodeStyle);
+		}
 		GUILayout.Label(title, _titleStyle);
 		GUILayout.Label(subtitle, _subtitleStyle);
 		GUILayout.EndArea();
@@ -127,6 +138,25 @@ public class Node
 		}
 
 		DrawConnections();
+
+		if(Children.Count > 0)
+		{
+			if (_expanded)
+			{
+				if (GUI.Button(buttonRect, "", (GUIStyle)"flow overlay foldout"))
+				{
+					_expanded = !_expanded;
+				}
+			}
+			else
+			{
+				if (GUI.Button(buttonRect, "", (GUIStyle)"IN FoldoutStatic"))
+				{
+					_expanded = !_expanded;
+				}
+			}
+		}
+
 
 		return spaceRect.height;
 	}
@@ -145,13 +175,13 @@ public class Node
 						isDragged = true;
 						GUI.changed = true;
 						isSelected = true;
-						nodeStyle = selectedNodeStyle;
+						//nodeStyle = selectedNodeStyle;
 					}
 					else
 					{
 						GUI.changed = true;
 						isSelected = false;
-						nodeStyle = defaultNodeStyle;
+						//nodeStyle = defaultNodeStyle;
 					}
 				}
 
@@ -209,7 +239,7 @@ public class Node
 	{
 		_isRoot = depth == 0;
 
-		foreach (FieldInfo fi in obj.GetType().GetFields())
+		foreach (FieldInfo fi in obj.GetType().GetFields().Where(prop => prop.IsDefined(typeof(NodeEditorElementAttribute), false)))
 		{
 			//field SO
 			if (typeof(ScriptableObject).IsAssignableFrom(fi.FieldType))
@@ -217,9 +247,10 @@ public class Node
 				var val = fi.GetValue(obj) as ScriptableObject;
 				if (val != null)
 				{
-					var conp = new ConnectionPoint(this, fi.Name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, outPointStyle);
+					var name = (fi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
+					var conp = new ConnectionPoint(this, name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, outPointStyle);
 					ConnectionPoints.Add(conp);
-					var newNode = new Node(nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle, val);
+					var newNode = new Node(val);
 					Children.Add(newNode);
 					newNode.Connections.Add(new Connection(newNode.inPoint, conp));
 
@@ -235,14 +266,15 @@ public class Node
 			{
 				if (typeof(ScriptableObject).IsAssignableFrom(type.GetGenericArguments()[0]))
 				{
-					var conp = new ConnectionPoint(this, fi.Name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, outPointStyle);
+					var name = (fi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
+					var conp = new ConnectionPoint(this, name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, outPointStyle);
 					ConnectionPoints.Add(conp);
 					var val = fi.GetValue(obj);
 					if (val is IEnumerable)
 					{
 						foreach (ScriptableObject listitem in val as IEnumerable)
 						{
-							var newNode = new Node(nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle, listitem);
+							var newNode = new Node(listitem);
 							Children.Add(newNode);
 							newNode.Connections.Add(new Connection(newNode.inPoint, conp));
 							newNode.Dive(listitem, depth + 1);
@@ -253,7 +285,7 @@ public class Node
 			}
 		}
 
-		foreach (PropertyInfo pi in obj.GetType().GetProperties())
+		foreach (PropertyInfo pi in obj.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(NodeEditorElementAttribute), false)))
 		{
 			//property SO
 			if (typeof(ScriptableObject).IsAssignableFrom(pi.PropertyType))
@@ -261,9 +293,10 @@ public class Node
 				var val = pi.GetValue(obj, null) as ScriptableObject;
 				if (val != null)
 				{
-					var conp = new ConnectionPoint(this, pi.Name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, outPointStyle);
+					var name = (pi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
+					var conp = new ConnectionPoint(this, name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, outPointStyle);
 					ConnectionPoints.Add(conp);
-					var newNode = new Node(nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle, val);
+					var newNode = new Node(val);
 					Children.Add(newNode);
 					newNode.Connections.Add(new Connection(newNode.inPoint, conp));
 					newNode.Dive(val, depth + 1);
@@ -278,14 +311,15 @@ public class Node
 			{
 				if (typeof(ScriptableObject).IsAssignableFrom(type.GetGenericArguments()[0]))
 				{
-					var conp = new ConnectionPoint(this, pi.Name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, outPointStyle);
+					var name = (pi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
+					var conp = new ConnectionPoint(this, name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, outPointStyle);
 					ConnectionPoints.Add(conp);
 					var val = pi.GetValue(obj, null);
 					if (val is IEnumerable)
 					{
 						foreach (ScriptableObject listitem in val as IEnumerable)
 						{
-							var newNode = new Node(nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle, listitem);
+							var newNode = new Node(listitem);
 							Children.Add(newNode);
 							newNode.Connections.Add(new Connection(newNode.inPoint, conp));
 							newNode.Dive(listitem, depth + 1);

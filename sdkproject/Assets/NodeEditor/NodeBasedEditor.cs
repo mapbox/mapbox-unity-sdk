@@ -23,11 +23,12 @@ public class NodeBasedEditor : EditorWindow
 	//private List<Connection> connections;
 	private Node _rootNode;
 
-	private GUIStyle nodeStyle;
-	private GUIStyle optionStyle;
-	private GUIStyle selectedNodeStyle;
-	private GUIStyle inPointStyle;
-	private GUIStyle outPointStyle;
+	public static GUIStyle nodeStyle;
+	public static GUIStyle leafNodeStyle;
+	public static GUIStyle optionStyle;
+	public static GUIStyle selectedNodeStyle;
+	public static GUIStyle inPointStyle;
+	public static GUIStyle outPointStyle;
 
 	private ConnectionPoint selectedInPoint;
 	private ConnectionPoint selectedOutPoint;
@@ -36,7 +37,7 @@ public class NodeBasedEditor : EditorWindow
 	private Vector2 drag;
 	private float zoomScale = 1;
 	private Vector2 zoomOrigin = new Vector2(0, 20);
-	private Rect _canvasWindowRect { get { return new Rect(0, 20, position.width, position.height -20); } }
+	private Rect _canvasWindowRect { get { return new Rect(0, 20, position.width, position.height - 20); } }
 	private Rect _optionsRect { get { return new Rect(position.width - 200, 20, 200, 40); } }
 	private bool _showOptions = false;
 	private bool _showModifiers = true;
@@ -60,10 +61,16 @@ public class NodeBasedEditor : EditorWindow
 		nodeStyle.padding = textOffset;
 
 		selectedNodeStyle = new GUIStyle();
-		selectedNodeStyle.normal.background = EditorGUIUtility.Load("builtin skins/darkskin/images/node1 on.png") as Texture2D;
+		selectedNodeStyle.normal.background = EditorGUIUtility.Load("builtin skins/darkskin/images/node5 on.png") as Texture2D;
 		selectedNodeStyle.border = new RectOffset(12, 12, 12, 12);
 		selectedNodeStyle.richText = true;
 		selectedNodeStyle.padding = textOffset;
+		
+		leafNodeStyle = new GUIStyle();
+		leafNodeStyle.normal.background = EditorGUIUtility.Load("builtin skins/darkskin/images/node2.png") as Texture2D;
+		leafNodeStyle.border = new RectOffset(12, 12, 12, 12);
+		leafNodeStyle.richText = true;
+		leafNodeStyle.padding = textOffset;
 
 		inPointStyle = new GUIStyle();
 		inPointStyle.normal.background = EditorGUIUtility.Load("builtin skins/darkskin/images/btn left.png") as Texture2D;
@@ -81,14 +88,14 @@ public class NodeBasedEditor : EditorWindow
 	private void Parse()
 	{
 		var map = FindObjectOfType<AbstractMap>().MapVisualizer;
-		var mapNode = new Node(nodeStyle, selectedNodeStyle, inPointStyle, outPointStyle, map as ScriptableObject);
+		var mapNode = new Node(map as ScriptableObject);
 		mapNode.title = map.name;
 		mapNode.subtitle = "Map Visualizer";
 		_rootNode = mapNode;
 
 		_rootNode.Dive(map);
 	}
-	
+
 	private void OnGUI()
 	{
 		if (optionStyle == null)
@@ -111,7 +118,7 @@ public class NodeBasedEditor : EditorWindow
 		if (GUI.changed) Repaint();
 		GUIScaleUtility.EndScale();
 
-		if(_showOptions)
+		if (_showOptions)
 		{
 			GUILayout.BeginArea(_optionsRect, optionStyle);
 			_showModifiers = EditorGUILayout.Toggle("Show Modifiers", _showModifiers);
@@ -138,6 +145,10 @@ public class NodeBasedEditor : EditorWindow
 		}
 
 		GUILayout.EndHorizontal();
+	}
+	void OnFocus()
+	{
+		//Parse();
 	}
 
 	private void DrawGrid(float gridSpacing, float gridOpacity, Color gridColor)
@@ -215,7 +226,7 @@ public class NodeBasedEditor : EditorWindow
 	{
 		_rootNode.ProcessNodeEvents(e);
 	}
-	
+
 	private void ClearConnectionSelection()
 	{
 		selectedInPoint = null;

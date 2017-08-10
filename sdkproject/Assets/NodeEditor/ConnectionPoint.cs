@@ -17,7 +17,8 @@ public class ConnectionPoint
 	private GUIStyle _labelStyle = new GUIStyle()
 	{
 		fontSize = 10,
-		normal = new GUIStyleState() { textColor = Color.white }
+		normal = new GUIStyleState() { textColor = Color.white },
+		alignment = TextAnchor.MiddleRight
 	};
 
 	public ConnectionPoint(Node node, string name, float deltay, ConnectionPointType type, GUIStyle style)
@@ -33,7 +34,7 @@ public class ConnectionPoint
 	public void Draw()
 	{
 		rect.y = node.rect.y + _deltaY - rect.height * 0.5f;
-		labelRect = new Rect(node.rect.xMax - 100, node.rect.y + _deltaY - 8f, 100, 25);
+		labelRect = new Rect(node.rect.xMin, node.rect.y + _deltaY - 15f, node.rect.width - 20, 25);
 
 		switch (type)
 		{
@@ -51,7 +52,7 @@ public class ConnectionPoint
 			GUI.Label(labelRect, _name, _labelStyle);
 		}
 
-		if (GUI.Button(rect, "", style))
+		if (GUI.Button(rect, "", NodeBasedEditor.outPointStyle))
 		{
 
 		}

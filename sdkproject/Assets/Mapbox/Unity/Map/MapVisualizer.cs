@@ -20,6 +20,7 @@ namespace Mapbox.Unity.MeshGeneration
 	public class MapVisualizer : ScriptableObject
 	{
 		[SerializeField]
+		[NodeEditorElementAttribute("Factories")]
 		public List<AbstractTileFactory> _factories;
 
 		IMap _map;
