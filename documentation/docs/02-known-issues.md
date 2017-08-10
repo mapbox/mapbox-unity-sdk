@@ -5,7 +5,7 @@
 - Minimum iOS version supported is 8
 - Minimum Android version supported is 15
 - Android duplicate library check is only performed automatically in Unity 5.6+ (run the unit test in older versions to check for duplicates)
-- For UPW, please read these [special notes](https://github.com/mapbox/mapbox-unity-sdk/blob/develop/documentation/docs/windowsstore-uwp-hololens.md).
+- For UWP, please read these [special notes](https://github.com/mapbox/mapbox-unity-sdk/blob/develop/documentation/docs/windowsstore-uwp-hololens.md).
 
 ### General
 
