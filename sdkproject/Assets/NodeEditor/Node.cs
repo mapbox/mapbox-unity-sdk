@@ -33,13 +33,6 @@ public class Node
 	public bool isSelected;
 
 	public ConnectionPoint inPoint;
-	//public ConnectionPoint outPoint;
-
-	//public GUIStyle nodeStyle;
-	public GUIStyle defaultNodeStyle;
-	public GUIStyle selectedNodeStyle;
-	public GUIStyle inPointStyle;
-	public GUIStyle outPointStyle;
 
 	public Action<Node> OnRemoveNode;
 
@@ -49,7 +42,6 @@ public class Node
 		fontStyle = FontStyle.Bold,
 		normal = new GUIStyleState() { textColor = Color.white }
 	};
-
 	private GUIStyle _subtitleStyle = new GUIStyle()
 	{
 		fontSize = 10,
@@ -57,11 +49,8 @@ public class Node
 		normal = new GUIStyleState() { textColor = Color.white }
 	};
 
-	[NonSerialized]
 	private float _headerHeight = 70;
-	[NonSerialized]
 	private float _propertyHeight = 25;
-	[NonSerialized]
 	private int _propCount = 0;
 
 	//Vector2 position, float width, float height
@@ -245,7 +234,7 @@ public class Node
 				if (val != null)
 				{
 					var name = (fi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
-					var conp = new ConnectionPoint(this, name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, outPointStyle);
+					var conp = new ConnectionPoint(this, name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
 					ConnectionPoints.Add(conp);
 					var newNode = new Node(val);
 					Children.Add(newNode);
@@ -264,7 +253,7 @@ public class Node
 				if (typeof(ScriptableObject).IsAssignableFrom(type.GetGenericArguments()[0]))
 				{
 					var name = (fi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
-					var conp = new ConnectionPoint(this, name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, outPointStyle);
+					var conp = new ConnectionPoint(this, name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
 					ConnectionPoints.Add(conp);
 					var val = fi.GetValue(obj);
 					if (val is IEnumerable)
@@ -291,7 +280,7 @@ public class Node
 				if (val != null)
 				{
 					var name = (pi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
-					var conp = new ConnectionPoint(this, name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, outPointStyle);
+					var conp = new ConnectionPoint(this, name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
 					ConnectionPoints.Add(conp);
 					var newNode = new Node(val);
 					Children.Add(newNode);
@@ -309,7 +298,7 @@ public class Node
 				if (typeof(ScriptableObject).IsAssignableFrom(type.GetGenericArguments()[0]))
 				{
 					var name = (pi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
-					var conp = new ConnectionPoint(this, name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, outPointStyle);
+					var conp = new ConnectionPoint(this, name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
 					ConnectionPoints.Add(conp);
 					var val = pi.GetValue(obj, null);
 					if (val is IEnumerable)

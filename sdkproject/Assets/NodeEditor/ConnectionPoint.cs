@@ -52,7 +52,7 @@ public class ConnectionPoint
 			GUI.Label(labelRect, _name, _labelStyle);
 		}
 
-		if (GUI.Button(rect, "", NodeBasedEditor.outPointStyle))
+		if (GUI.Button(rect, "", style))
 		{
 
 		}
