@@ -83,15 +83,12 @@ public class Node
 		inPoint = new ConnectionPoint(this, "", 20, ConnectionPointType.In, NodeBasedEditor.inPointStyle);
 	}
 
-	public float Draw(Vector2 position, float width, float height, bool drawModifiers)
+	public float Draw(Vector2 position, float width, float height)
 	{
-		if (!drawModifiers && ScriptableObject is ModifierBase)
-			return 0f;
-
-		//if(ScriptableObject is ModifierStackBase)
-
 		width = title.Length * 10;
 		var boxHeight = _headerHeight + _propCount * _propertyHeight;
+		if (ScriptableObject is ModifierBase)
+			boxHeight = 52;
 		spaceRect = new Rect(position.x + drag.x, position.y + drag.y, width, boxHeight);
 		rect = new Rect(position.x + drag.x, position.y + drag.y, width, boxHeight);
 		buttonRect = new Rect(rect.xMax - 25, rect.yMin + 10, 20, 20);
@@ -100,7 +97,7 @@ public class Node
 		{
 			foreach (var c in Children)
 			{
-				var h = c.Draw(new Vector2(spaceRect.xMax + _padding.x, spaceRect.yMin + _propTopTest), 100, 0, drawModifiers);
+				var h = c.Draw(new Vector2(spaceRect.xMax + _padding.x, spaceRect.yMin + _propTopTest), 100, 0);
 				_propTopTest += h;
 				spaceRect.height += h;
 			}
@@ -114,9 +111,7 @@ public class Node
 		{
 			spaceRect.height -= Math.Min(_propTopTest, boxHeight);
 		}
-		//rect = spaceRect;
 
-		//GUI.Box(rect, title, style);
 		if (isSelected)
 		{
 			GUILayout.BeginArea(rect, NodeBasedEditor.selectedNodeStyle);
@@ -235,9 +230,11 @@ public class Node
 		}
 	}
 
-	public void Dive(object obj, int depth = 0)
+	public void Dive(object obj, bool showModifiers = true, int depth = 0)
 	{
 		_isRoot = depth == 0;
+		if (ScriptableObject is ModifierStackBase)
+			_expanded = showModifiers;
 
 		foreach (FieldInfo fi in obj.GetType().GetFields().Where(prop => prop.IsDefined(typeof(NodeEditorElementAttribute), false)))
 		{
@@ -254,7 +251,7 @@ public class Node
 					Children.Add(newNode);
 					newNode.Connections.Add(new Connection(newNode.inPoint, conp));
 
-					newNode.Dive(val, depth + 1);
+					newNode.Dive(val, showModifiers, depth + 1);
 					_propCount++;
 				}
 			}
@@ -277,7 +274,7 @@ public class Node
 							var newNode = new Node(listitem);
 							Children.Add(newNode);
 							newNode.Connections.Add(new Connection(newNode.inPoint, conp));
-							newNode.Dive(listitem, depth + 1);
+							newNode.Dive(listitem, showModifiers, depth + 1);
 						}
 						_propCount++;
 					}
@@ -299,7 +296,7 @@ public class Node
 					var newNode = new Node(val);
 					Children.Add(newNode);
 					newNode.Connections.Add(new Connection(newNode.inPoint, conp));
-					newNode.Dive(val, depth + 1);
+					newNode.Dive(val, showModifiers, depth + 1);
 					_propCount++;
 				}
 			}
@@ -322,7 +319,7 @@ public class Node
 							var newNode = new Node(listitem);
 							Children.Add(newNode);
 							newNode.Connections.Add(new Connection(newNode.inPoint, conp));
-							newNode.Dive(listitem, depth + 1);
+							newNode.Dive(listitem, showModifiers, depth + 1);
 						}
 						_propCount++;
 					}

@@ -29,6 +29,7 @@ public class NodeBasedEditor : EditorWindow
 	public static GUIStyle selectedNodeStyle;
 	public static GUIStyle inPointStyle;
 	public static GUIStyle outPointStyle;
+	private GUIStyle _optionLabel;
 
 	private ConnectionPoint selectedInPoint;
 	private ConnectionPoint selectedOutPoint;
@@ -38,9 +39,8 @@ public class NodeBasedEditor : EditorWindow
 	private float zoomScale = 1;
 	private Vector2 zoomOrigin = new Vector2(0, 20);
 	private Rect _canvasWindowRect { get { return new Rect(0, 20, position.width, position.height - 20); } }
-	private Rect _optionsRect { get { return new Rect(position.width - 200, 20, 200, 40); } }
+	private Rect _optionsRect { get { return new Rect(position.width - 250, 20, 250, 60); } }
 	private bool _showOptions = false;
-	private bool _showModifiers = true;
 
 	[MenuItem("Window/Node Based Editor")]
 	private static void OpenWindow()
@@ -85,7 +85,7 @@ public class NodeBasedEditor : EditorWindow
 		Parse();
 	}
 
-	private void Parse()
+	private void Parse(bool showModifiers = true)
 	{
 		var map = FindObjectOfType<AbstractMap>().MapVisualizer;
 		var mapNode = new Node(map as ScriptableObject);
@@ -93,7 +93,7 @@ public class NodeBasedEditor : EditorWindow
 		mapNode.subtitle = "Map Visualizer";
 		_rootNode = mapNode;
 
-		_rootNode.Dive(map);
+		_rootNode.Dive(map, showModifiers);
 	}
 
 	private void OnGUI()
@@ -101,6 +101,7 @@ public class NodeBasedEditor : EditorWindow
 		if (optionStyle == null)
 		{
 			optionStyle = (GUIStyle)"ObjectPickerPreviewBackground";
+			optionStyle.padding = new RectOffset(10,10,10,10);
 		}
 
 		DrawGrid(20, 0.2f, Color.gray);
@@ -121,7 +122,20 @@ public class NodeBasedEditor : EditorWindow
 		if (_showOptions)
 		{
 			GUILayout.BeginArea(_optionsRect, optionStyle);
-			_showModifiers = EditorGUILayout.Toggle("Show Modifiers", _showModifiers);
+			GUILayout.BeginHorizontal();
+			if (GUILayout.Button("Hide Modifiers", (GUIStyle)"ButtonLeft", GUILayout.Width(115)))
+			{
+				Parse(false);
+			}
+			if (GUILayout.Button("Show Modifiers", (GUIStyle)"ButtonRight", GUILayout.Width(115)))
+			{
+				Parse(true);
+			}
+			GUILayout.EndHorizontal();
+			if (GUILayout.Button("Reset Zoom", EditorStyles.miniButton, GUILayout.Width(230)))
+			{
+				zoomScale = 1;
+			}
 			GUILayout.EndArea();
 		}
 	}
@@ -135,10 +149,7 @@ public class NodeBasedEditor : EditorWindow
 			Parse();
 		}
 		GUILayout.FlexibleSpace();
-		if (GUILayout.Button("Reset Zoom", EditorStyles.miniButton, GUILayout.Width(100)))
-		{
-			zoomScale = 1;
-		}
+		
 		if (GUILayout.Button("Options", EditorStyles.miniButton, GUILayout.Width(100)))
 		{
 			_showOptions = !_showOptions;
@@ -178,7 +189,7 @@ public class NodeBasedEditor : EditorWindow
 
 	private void DrawNodes()
 	{
-		_rootNode.Draw(_topLeft + _panDelta, 100, _nodeHeight, _showModifiers);
+		_rootNode.Draw(_topLeft + _panDelta, 100, _nodeHeight);
 		GUI.changed = true;
 	}
 
