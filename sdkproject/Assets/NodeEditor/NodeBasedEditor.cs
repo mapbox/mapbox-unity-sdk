@@ -21,7 +21,9 @@ public class NodeBasedEditor : EditorWindow
 
 	//private List<Node> nodes;
 	//private List<Connection> connections;
-	private Node _rootNode;
+	private int _activeMap = 0;
+	private List<Node> _maps;
+	//private Node _rootNode;
 
 	public static GUIStyle nodeStyle;
 	public static GUIStyle leafNodeStyle;
@@ -87,13 +89,24 @@ public class NodeBasedEditor : EditorWindow
 
 	private void Parse(bool showModifiers = true)
 	{
-		var map = FindObjectOfType<AbstractMap>().MapVisualizer;
-		var mapNode = new Node(map as ScriptableObject);
-		mapNode.title = map.name;
-		mapNode.subtitle = "Map Visualizer";
-		_rootNode = mapNode;
+		if(_maps == null)
+			_maps = new List<Node>();
+		else
+			_maps.Clear();
 
-		_rootNode.Dive(map, showModifiers);
+		var abstractMaps = FindObjectsOfType<AbstractMap>();
+		foreach (var abstractMap in abstractMaps)
+		{
+			if(abstractMap.MapVisualizer != null)
+			{
+				var map = abstractMap.MapVisualizer;
+				var mapNode = new Node(map as ScriptableObject);
+				mapNode.title = map.name;
+				mapNode.subtitle = "Map Visualizer";
+				_maps.Add(mapNode);
+				mapNode.Dive(map, showModifiers);
+			}
+		}		
 	}
 
 	private void OnGUI()
@@ -144,19 +157,39 @@ public class NodeBasedEditor : EditorWindow
 	{
 		GUILayout.BeginHorizontal(EditorStyles.toolbar);
 
-		if (GUILayout.Button("Refresh", EditorStyles.miniButton, GUILayout.Width(100)))
+		if (GUILayout.Button("Tools", EditorStyles.toolbarDropDown))
+		{
+			GenericMenu toolsMenu = new GenericMenu();
+			var i = 0;
+			foreach (var item in _maps)
+			{
+				toolsMenu.AddItem(new GUIContent(item.title), false, ChangeMap, i);
+				i++;
+			}
+			// Offset menu from right of editor window
+			toolsMenu.DropDown(new Rect(0, 0, 0, 16));
+			EditorGUIUtility.ExitGUI();
+		}
+
+		if (GUILayout.Button("Refresh", EditorStyles.toolbarButton, GUILayout.Width(100)))
 		{
 			Parse();
 		}
 		GUILayout.FlexibleSpace();
 		
-		if (GUILayout.Button("Options", EditorStyles.miniButton, GUILayout.Width(100)))
+		if (GUILayout.Button("Options", EditorStyles.toolbarButton, GUILayout.Width(100)))
 		{
 			_showOptions = !_showOptions;
 		}
 
 		GUILayout.EndHorizontal();
 	}
+
+	private void ChangeMap(object i)
+	{
+		_activeMap = (int)i;
+	}
+
 	void OnFocus()
 	{
 		//Parse();
@@ -189,7 +222,7 @@ public class NodeBasedEditor : EditorWindow
 
 	private void DrawNodes()
 	{
-		_rootNode.Draw(_topLeft + _panDelta, 100, _nodeHeight);
+		_maps[_activeMap].Draw(_topLeft + _panDelta, 100, _nodeHeight);
 		GUI.changed = true;
 	}
 
@@ -235,7 +268,7 @@ public class NodeBasedEditor : EditorWindow
 
 	private void ProcessNodeEvents(Event e)
 	{
-		_rootNode.ProcessNodeEvents(e);
+		_maps[_activeMap].ProcessNodeEvents(e);
 	}
 
 	private void ClearConnectionSelection()
