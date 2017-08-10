@@ -6,6 +6,10 @@ void initialize(const char* accessToken, const char* userAgentBase, const char* 
                                                   hostSDKVersion:[NSString stringWithUTF8String:hostSDKVersion]];
 }
 
-void sendTurnstyleEvent() {
+void sendTurnstileEvent() {
     [[MMEEventsManager sharedManager] sendTurnstileEvent];    
+}
+
+void setLocationCollectionState(bool enable) {
+	[MMEEventsManager sharedManager].metricsEnabled = enable;
 }

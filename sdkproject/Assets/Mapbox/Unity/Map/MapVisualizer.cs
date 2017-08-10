@@ -16,14 +16,14 @@ namespace Mapbox.Unity.MeshGeneration
 		Finished
 	}
 
-	[CreateAssetMenu(menuName = "Mapbox/MapVisualization")]
+	[CreateAssetMenu(menuName = "Mapbox/MapVisualizer")]
 	public class MapVisualizer : ScriptableObject
 	{
 		[SerializeField]
 		AbstractTileFactory[] _factories;
 
 		IMap _map;
-		Dictionary<UnwrappedTileId, UnityTile> _activeTiles;
+		public Dictionary<UnwrappedTileId, UnityTile> Tiles;
 		Queue<UnityTile> _inactiveTiles;
 
 		private ModuleState _state;
@@ -52,7 +52,7 @@ namespace Mapbox.Unity.MeshGeneration
 		public void Initialize(IMap map, IFileSource fileSource)
 		{
 			_map = map;
-			_activeTiles = new Dictionary<UnwrappedTileId, UnityTile>();
+			Tiles = new Dictionary<UnwrappedTileId, UnityTile>();
 			_inactiveTiles = new Queue<UnityTile>();
 			State = ModuleState.Initialized;
 
@@ -99,7 +99,7 @@ namespace Mapbox.Unity.MeshGeneration
 		/// Registers requested tiles to the factories
 		/// </summary>
 		/// <param name="tileId"></param>
-		public void LoadTile(UnwrappedTileId tileId)
+		public UnityTile LoadTile(UnwrappedTileId tileId)
 		{
 			UnityTile unityTile = null;
 
@@ -111,12 +111,7 @@ namespace Mapbox.Unity.MeshGeneration
 			if (unityTile == null)
 			{
 				unityTile = new GameObject().AddComponent<UnityTile>();
-
-#if !UNITY_EDITOR
-				unityTile.transform.localScale = Unity.Constants.Math.Vector3One * _map.WorldRelativeScale;
-#else
 				unityTile.transform.SetParent(_map.Root, false);
-#endif
 			}
 
 			unityTile.Initialize(_map, tileId);
@@ -126,15 +121,17 @@ namespace Mapbox.Unity.MeshGeneration
 				factory.Register(unityTile);
 			}
 
-			_activeTiles.Add(tileId, unityTile);
+			Tiles.Add(tileId, unityTile);
+
+			return unityTile;
 		}
 
 		public void DisposeTile(UnwrappedTileId tileId)
 		{
-			var unityTile = _activeTiles[tileId];
+			var unityTile = Tiles[tileId];
 
 			unityTile.Recycle();
-			_activeTiles.Remove(tileId);
+			Tiles.Remove(tileId);
 			_inactiveTiles.Enqueue(unityTile);
 
 			foreach (var factory in _factories)

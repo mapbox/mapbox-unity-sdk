@@ -10,12 +10,17 @@
 
 namespace Mapbox.Platform {
 
+	using Mapbox.Map;
 	using System;
 
 	/// <summary> A handle to an asynchronous request. </summary>
 	public static class IAsyncRequestFactory {
 
-		public static IAsyncRequest CreateRequest(string url, Action<Response> callback, int timeout = 10) {
+		public static IAsyncRequest CreateRequest(
+			string url
+			, Action<Response> callback
+			, int timeout
+		) {
 #if !UNITY
 			if (Environment.ProcessorCount > 2) {
 				return new HTTPRequestThreaded(url, callback, timeout);

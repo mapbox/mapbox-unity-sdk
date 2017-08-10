@@ -1,4 +1,4 @@
-namespace Mapbox.Unity.MeshGeneration.Factories
+﻿namespace Mapbox.Unity.MeshGeneration.Factories
 {
 	using System.Collections.Generic;
 	using UnityEngine;
@@ -6,19 +6,23 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.MeshGeneration.Interfaces;
 	using Mapbox.Map;
+	using System;
 
 	/// <summary>
 	/// Uses vector tile api to visualize vector data.
 	/// Fetches the vector data for given tile and passes layer data to layer visualizers.
 	/// </summary>
-	[CreateAssetMenu(menuName = "Mapbox/Factories/Mesh Factory")]
+	[Obsolete("MeshFactory is obsolete. Please use VectorTileFactory.")]
+	[CreateAssetMenu(menuName = "Mapbox/Factories/Mesh Factory - Obsolete (Use VectorTileFactory)")]
 	public class MeshFactory : AbstractTileFactory
 	{
 		[SerializeField]
 		private string _mapId = "";
+
 		public List<LayerVisualizerBase> Visualizers;
 
 		private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;
+		private Dictionary<UnityTile, VectorTile> _cachedData = new Dictionary<UnityTile, VectorTile>();
 
 		public void OnEnable()
 		{
@@ -34,6 +38,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// <param name="fs"></param>
 		internal override void OnInitialized()
 		{
+			Debug.LogWarning("MeshFactory is <color=red>obsolete</color>. Please use VectorTileFactory.");
 			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
 			foreach (LayerVisualizerBase factory in Visualizers)
 			{
@@ -50,38 +55,46 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnRegistered(UnityTile tile)
 		{
-			// FIXME: we can make the request BEFORE getting a response from these!
-			if (tile.HeightDataState == TilePropertyState.Loading ||
-				tile.RasterDataState == TilePropertyState.Loading)
+			var vectorTile = new VectorTile();
+			tile.AddTile(vectorTile);
+
+			Progress++;
+			vectorTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
-				tile.OnHeightDataChanged += HeightDataChangedHandler;
-				tile.OnRasterDataChanged += ImageDataChangedHandler;
-			}
-			else
-			{
-                CreateMeshes(tile);
-			}
+				if (vectorTile.HasError)
+				{
+					tile.VectorDataState = TilePropertyState.Error;
+					Progress--;
+					return;
+				}
+
+				_cachedData.Add(tile, vectorTile);
+
+				// FIXME: we can make the request BEFORE getting a response from these!
+				if (tile.HeightDataState == TilePropertyState.Loading ||
+					tile.RasterDataState == TilePropertyState.Loading)
+				{
+					tile.OnHeightDataChanged += DataChangedHandler;
+					tile.OnRasterDataChanged += DataChangedHandler;
+				}
+				else
+				{
+					CreateMeshes(tile);
+				}
+			});
 		}
 
 		internal override void OnUnregistered(UnityTile tile)
 		{
 			// We are no longer interested in this tile's notifications.
-			tile.OnHeightDataChanged -= HeightDataChangedHandler;
-			tile.OnRasterDataChanged -= ImageDataChangedHandler;
+			tile.OnHeightDataChanged -= DataChangedHandler;
+			tile.OnRasterDataChanged -= DataChangedHandler;
 		}
 
-		private void HeightDataChangedHandler(UnityTile t)
+		private void DataChangedHandler(UnityTile t)
 		{
-			// FIXME: Not all mesh factories care about these things. Why wait?
-			if (t.RasterDataState != TilePropertyState.Loading)
-			{
-				CreateMeshes(t);
-			}
-		}
-
-		private void ImageDataChangedHandler(UnityTile t)
-		{
-			if (t.HeightDataState != TilePropertyState.Loading)
+			if (t.RasterDataState != TilePropertyState.Loading &&
+				t.HeightDataState != TilePropertyState.Loading)
 			{
 				CreateMeshes(t);
 			}
@@ -94,43 +107,31 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// <param name="e"></param>
 		private void CreateMeshes(UnityTile tile)
 		{
-			tile.OnHeightDataChanged -= HeightDataChangedHandler;
-			tile.OnRasterDataChanged -= ImageDataChangedHandler;
+			tile.OnHeightDataChanged -= DataChangedHandler;
+			tile.OnRasterDataChanged -= DataChangedHandler;
 
 			tile.VectorDataState = TilePropertyState.Loading;
 
-			var vectorTile = new VectorTile();
-			tile.AddTile(vectorTile);
-
-            Progress++;
-            vectorTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
+			// TODO: move unitytile state registrations to layer visualizers. Not everyone is interested in this data
+			// and we should not wait for it here!
+			foreach (var layerName in _cachedData[tile].Data.LayerNames())
 			{
-                if (vectorTile.HasError)
+				if (_layerBuilder.ContainsKey(layerName))
 				{
-					tile.VectorDataState = TilePropertyState.Error;
-                    Progress--;
-                    return;
-				}
-
-				// TODO: move unitytile state registrations to layer visualizers. Not everyone is interested in this data
-				// and we should not wait for it here!
-				foreach (var layerName in vectorTile.Data.LayerNames())
-				{
-					if (_layerBuilder.ContainsKey(layerName))
+					foreach (var builder in _layerBuilder[layerName])
 					{
-						foreach (var builder in _layerBuilder[layerName])
+						if (builder.Active)
 						{
-							if (builder.Active)
-							{
-								builder.Create(vectorTile.Data.GetLayer(layerName), tile);
-							}
+							builder.Create(_cachedData[tile].Data.GetLayer(layerName), tile);
 						}
 					}
 				}
+			}
 
-				tile.VectorDataState = TilePropertyState.Loaded;
-                Progress--;
-            });
+			tile.VectorDataState = TilePropertyState.Loaded;
+			Progress--;
+
+			_cachedData.Remove(tile);
 		}
 	}
 }

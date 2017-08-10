@@ -2,15 +2,17 @@
 
 ### Platform Support
 
-- [WebGL builds not showing maps](https://github.com/mapbox/mapbox-unity-sdk/issues/19)
 - Minimum iOS version supported is 8
 - Minimum Android version supported is 15
+- Android duplicate library check is only performed automatically in Unity 5.6+ (run the unit test in older versions to check for duplicates)
+- For UWP, please read these [special notes](https://github.com/mapbox/mapbox-unity-sdk/blob/develop/documentation/docs/windowsstore-uwp-hololens.md).
 
 ### General
 
-- Maps generated with the `Map Factory Framework` [do not automatically snap](https://github.com/mapbox/mapbox-unity-sdk/issues/93) to `y = 0` upon generation—keep this in mind as you place your camera or map
-- Map/mesh generation is not yet threaded
-- [Tile caching to disk](https://github.com/mapbox/mapbox-unity-sdk/issues/34) is not yet implemented
+- [Mapbox Configuration does not appear to save settings occasionally](https://github.com/mapbox/mapbox-unity-sdk/issues/196)
+  - This appears to be a UI bug, but the token should be saved correctly
+- If you experience issues with tiles not refreshing as expected, please remember to clear the disk cache
+- `MapVisualizer` [incorrectly reports](https://github.com/mapbox/mapbox-unity-sdk/issues/194) `OnMapVisualizerStateChanged` `Finished` when loading tiles from disk
 - `foreach` is being used extensively (GC cost--this is not an issue in Unity 5.5+)
 
 ### Vector Tile
@@ -26,7 +28,6 @@
 ### Directions
 
 - [Cannot cancel direction queries](https://github.com/mapbox/mapbox-sdk-cs/issues/19)
-- [DirectionsResource `geometries`](https://github.com/mapbox/mapbox-unity-sdk/issues/33) property is not implemented 
 
 ### Traffic
 

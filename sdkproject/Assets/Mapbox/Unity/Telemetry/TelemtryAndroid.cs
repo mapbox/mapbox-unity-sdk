@@ -68,6 +68,14 @@ namespace Mapbox.Unity.Telemetry
 				_telemInstance.Call("pushEvent", mapLoadEvent);
 			}
 		}
+
+		public void SetLocationCollectionState(bool enable)
+		{
+			_telemInstance.Call(
+				"setTelemetryEnabled"
+				, enable
+			);
+		}
 	}
 }
 #endif

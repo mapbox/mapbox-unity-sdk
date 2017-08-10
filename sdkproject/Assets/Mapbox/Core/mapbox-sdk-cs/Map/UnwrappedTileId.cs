@@ -38,8 +38,10 @@ namespace Mapbox.Map
 
 		/// <summary> Gets the canonical tile identifier. </summary>
 		/// <value> The canonical tile identifier. </value>
-		public CanonicalTileId Canonical {
-			get {
+		public CanonicalTileId Canonical
+		{
+			get
+			{
 				return new CanonicalTileId(this);
 			}
 		}
@@ -55,6 +57,70 @@ namespace Mapbox.Map
 		public override string ToString()
 		{
 			return this.Z + "/" + this.X + "/" + this.Y;
+		}
+
+		public UnwrappedTileId North
+		{
+			get
+			{
+				return new UnwrappedTileId(Z, X, Y - 1);
+			}
+		}
+
+		public UnwrappedTileId East
+		{
+			get
+			{
+				return new UnwrappedTileId(Z, X + 1, Y);
+			}
+		}
+
+		public UnwrappedTileId South
+		{
+			get
+			{
+				return new UnwrappedTileId(Z, X, Y + 1);
+			}
+		}
+
+		public UnwrappedTileId West
+		{
+			get
+			{
+				return new UnwrappedTileId(Z, X - 1, Y);
+			}
+		}
+
+		public UnwrappedTileId NorthEast
+		{
+			get
+			{
+				return new UnwrappedTileId(Z, X + 1, Y - 1);
+			}
+		}
+
+		public UnwrappedTileId SouthEast
+		{
+			get
+			{
+				return new UnwrappedTileId(Z, X + 1, Y + 1);
+			}
+		}
+
+		public UnwrappedTileId NorthWest
+		{
+			get
+			{
+				return new UnwrappedTileId(Z, X - 1, Y - 1);
+			}
+		}
+
+		public UnwrappedTileId SouthWest
+		{
+			get
+			{
+				return new UnwrappedTileId(Z, X - 1, Y + 1);
+			}
 		}
 	}
 }

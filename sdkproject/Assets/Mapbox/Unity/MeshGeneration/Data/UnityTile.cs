@@ -11,8 +11,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 	public class UnityTile : MonoBehaviour
 	{
-		float[] _heightData;
+		[SerializeField]
 		Texture2D _rasterData;
+
+		float[] _heightData;
+
 		float _relativeScale;
 
 		Texture2D _heightTexture;
@@ -78,6 +81,16 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
+		UnwrappedTileId _unwrappedTileId;
+		public UnwrappedTileId UnwrappedTileId
+		{
+			get
+			{
+				return _unwrappedTileId;
+
+			}
+		}
+
 		CanonicalTileId _canonicalTileId;
 		public CanonicalTileId CanonicalTileId
 		{
@@ -87,27 +100,22 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		public TilePropertyState RasterDataState { get; set; }
-		public TilePropertyState HeightDataState { get; set; }
-		public TilePropertyState VectorDataState { get; set; }
+		public TilePropertyState RasterDataState;
+		public TilePropertyState HeightDataState;
+		public TilePropertyState VectorDataState;
 
 		public event Action<UnityTile> OnHeightDataChanged = delegate { };
 		public event Action<UnityTile> OnRasterDataChanged = delegate { };
 		public event Action<UnityTile> OnVectorDataChanged = delegate { };
-		public event Action<UnityTile> OnRecycled = delegate { };
 
 		internal void Initialize(IMap map, UnwrappedTileId tileId)
 		{
 			_relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
 			_rect = Conversions.TileBounds(tileId);
+			_unwrappedTileId = tileId;
 			_canonicalTileId = tileId.Canonical;
-			var position = new Vector3((float)(Rect.Center.x - map.CenterMercator.x), 0, (float)(Rect.Center.y - map.CenterMercator.y));
-
-#if !UNITY_EDITOR
-			position *= map.WorldRelativeScale;
-#else
-			gameObject.name = tileId.ToString();
-#endif
+			gameObject.name = _canonicalTileId.ToString();
+			var position = new Vector3((float)(_rect.Center.x - map.CenterMercator.x), 0, (float)(_rect.Center.y - map.CenterMercator.y));
 			transform.localPosition = position;
 			gameObject.SetActive(true);
 		}
@@ -123,6 +131,10 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			HeightDataState = TilePropertyState.None;
 			VectorDataState = TilePropertyState.None;
 
+			OnHeightDataChanged = delegate { };
+			OnRasterDataChanged = delegate { };
+			OnVectorDataChanged = delegate { };
+
 			Cancel();
 			_tiles.Clear();
 
@@ -136,11 +148,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					Destroy(transform.GetChild(i).gameObject);
 				}
 			}
-
-			OnRecycled(this);
 		}
 
-		internal void SetHeightData(byte[] data, float heightMultiplier = 1f)
+		internal void SetHeightData(byte[] data, float heightMultiplier = 1f, bool useRelative = false)
 		{
 			// HACK: compute height values for terrain. We could probably do this without a texture2d.
 			if (_heightTexture == null)
@@ -159,6 +169,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				_heightData = new float[256 * 256];
 			}
 
+			var relativeScale = useRelative ? _relativeScale : 1f;
 			for (int xx = 0; xx < 256; ++xx)
 			{
 				for (int yy = 0; yy < 256; ++yy)
@@ -166,7 +177,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					float r = rgbData[(xx * 256 + yy) * 4 + 1];
 					float g = rgbData[(xx * 256 + yy) * 4 + 2];
 					float b = rgbData[(xx * 256 + yy) * 4 + 3];
-					_heightData[xx * 256 + yy] = Conversions.GetAbsoluteHeightFromColor(r, g, b) * _relativeScale * heightMultiplier;
+					_heightData[xx * 256 + yy] = relativeScale * heightMultiplier * Conversions.GetAbsoluteHeightFromColor(r, g, b);
 				}
 			}
 
@@ -221,8 +232,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		{
 			for (int i = 0, _tilesCount = _tiles.Count; i < _tilesCount; i++)
 			{
-				var tile = _tiles[i];
-				tile.Cancel();
+				_tiles[i].Cancel();
 			}
 		}
 	}

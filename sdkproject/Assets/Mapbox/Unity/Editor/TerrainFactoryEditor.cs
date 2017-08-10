@@ -6,11 +6,11 @@ using Mapbox.Unity.MeshGeneration.Factories;
 public class TerrainFactoryEditor : FactoryEditor
 {
 	private string _defaultMapId = "mapbox.terrain-rgb";
-	private TerrainFactory _factory;
 	public SerializedProperty
 		sampleCount_Prop,
 		mapIdType_Prop,
 		heightMod_Prop,
+		relativeHeight_Prop,
 		customMapId_Prop,
 		material_Prop,
 		mapId_Prop,
@@ -21,10 +21,10 @@ public class TerrainFactoryEditor : FactoryEditor
 
 	void OnEnable()
 	{
-		_factory = target as TerrainFactory;
 		mapIdType_Prop = serializedObject.FindProperty("_mapIdType");
 		sampleCount_Prop = serializedObject.FindProperty("_sampleCount");
 		heightMod_Prop = serializedObject.FindProperty("_heightModifier");
+		relativeHeight_Prop = serializedObject.FindProperty("_useRelativeHeight");
 		mapId_Prop = serializedObject.FindProperty("_mapId");
 		customMapId_Prop = serializedObject.FindProperty("_customMapId");
 		material_Prop = serializedObject.FindProperty("_baseMaterial");
@@ -68,6 +68,13 @@ public class TerrainFactoryEditor : FactoryEditor
 				break;
 		}
 		EditorGUILayout.PropertyField(heightMod_Prop, new GUIContent("Height Multiplier"));
+		EditorGUILayout.PropertyField(relativeHeight_Prop, new GUIContent("Use Relative Height"));
+		if (relativeHeight_Prop.boolValue)
+		{
+			EditorGUILayout.HelpBox("Height will be scaled to reflect elevation relative" +
+			                        " to the area the tile covers." +
+			                        " This improves perceived elevation at extreme latitudes.", MessageType.Info);
+		}
 
 		EditorGUI.indentLevel--;
 
@@ -81,12 +88,6 @@ public class TerrainFactoryEditor : FactoryEditor
 		if (addLayer_Prop.boolValue)
 		{
 			layerId_Prop.intValue = EditorGUILayout.LayerField("Layer", layerId_Prop.intValue);
-		}
-
-		if (GUILayout.Button("Update"))
-		{
-			//_factory.Update();
-			Debug.Log("TerrainFactoryEditor: " + "FIX ME!");
 		}
 
 		serializedObject.ApplyModifiedProperties();

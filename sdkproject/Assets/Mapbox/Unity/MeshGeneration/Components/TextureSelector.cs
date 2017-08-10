@@ -12,7 +12,6 @@ namespace Mapbox.Unity.MeshGeneration.Components
         private bool _textureSides;
 
         private UnityTile _tile;
-        private FeatureBehaviour _feature;
         private MeshRenderer _meshRenderer;
         private Material[] _topTextures;
         private Material[] _sideTextures;
@@ -30,7 +29,6 @@ namespace Mapbox.Unity.MeshGeneration.Components
                 t = t.parent;
                 _tile = t.GetComponent<UnityTile>();
             }
-            _feature = feature;
             _topTextures = topTextures;
             _sideTextures = sideTextures;
             _meshRenderer = GetComponent<MeshRenderer>();

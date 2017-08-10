@@ -7,11 +7,11 @@
 
 namespace Mapbox.Unity.Utilities
 {
-
 	using System;
 	using UnityEngine.Networking;
 	using System.Collections;
 	using Mapbox.Platform;
+	using UnityEngine;
 
 #if UNITY_EDITOR
 	using UnityEditor;
@@ -26,7 +26,9 @@ namespace Mapbox.Unity.Utilities
 
 		public bool IsCompleted { get; private set; }
 
-		public HTTPRequest(string url, Action<Response> callback, int timeout = 10)
+		// TODO: simplify timeout for Unity 5.6+
+		// https://docs.unity3d.com/ScriptReference/Networking.UnityWebRequest-timeout.html
+		public HTTPRequest(string url, Action<Response> callback, int timeout)
 		{
 			//UnityEngine.Debug.Log("HTTPRequest: " + url);
 			IsCompleted = false;
@@ -56,12 +58,30 @@ namespace Mapbox.Unity.Utilities
 		private IEnumerator DoRequest()
 		{
 			_request.Send();
+
+			DateTime timeout = DateTime.Now.AddSeconds(_timeout);
+			bool didTimeout = false;
+
 			while (!_request.isDone)
 			{
 				yield return null;
+				if (DateTime.Now > timeout)
+				{
+					_request.Abort();
+					didTimeout = true;
+					break;
+				}
 			}
 
-			var response = Response.FromWebResponse(this, _request, _wasCancelled ? new Exception("Request Cancelled") : null);
+			Response response;
+			if (didTimeout)
+			{
+				response = Response.FromWebResponse(this, _request, new Exception("Request Timed Out"));
+			}
+			else
+			{
+				response = Response.FromWebResponse(this, _request, _wasCancelled ? new Exception("Request Cancelled") : null);
+			}
 
 			_callback(response);
 			_request.Dispose();

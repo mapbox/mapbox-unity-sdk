@@ -39,10 +39,6 @@ echo "copying Mapbox.Json..."
 mkdir -p $SDK_PATH/Plugins/ThirdParty/Mapbox.Json/
 rsync -av --exclude-from=x.txt ./dependencies/Mapbox.Json/ $SDK_PATH/Plugins/ThirdParty/Mapbox.Json/
 
-echo "copying Triangle.NET..."
-mkdir -p $SDK_PATH/Plugins/ThirdParty/Triangle.NET/
-rsync -av --exclude-from=x.txt ./dependencies/triangle.net-uwp/Triangle.NET/Triangle/ $SDK_PATH/Plugins/ThirdParty/Triangle.NET/
-
 echo "copying aux files..."
 cp -v ./utils/link.xml $SDK_PATH/Plugins/
 

@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Name: TerrainDemoRasterFactory
   m_EditorClassIdentifier: 
   _mapIdType: 1
-  _customMapId: mapbox.satellite
+  _customStyle:
+    Name: 
+    Id: mapbox.satellite
+    Modified: 
+    UserName: 
   _mapId: mapbox.satellite
   _useCompression: 0
   _useMipMap: 0

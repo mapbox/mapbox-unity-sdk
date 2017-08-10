@@ -16,7 +16,7 @@
 
 		void SetPlayerPref()
 		{
-			PlayerPrefs.SetInt(Constants.Path.IS_TELEMETRY_ENABLED_KEY, (_booleanValue ? 1 : 0));
+			MapboxAccess.Instance.SetLocationCollectionState(_booleanValue);
 			PlayerPrefs.Save();
 		}
 	}

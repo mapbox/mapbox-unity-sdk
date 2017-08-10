@@ -20,11 +20,20 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     public class HeightModifier : MeshModifier
     {
         [SerializeField]
+		[Tooltip("Flatten top polygons to prevent unwanted slanted roofs because of the bumpy terrain")]
         private bool _flatTops;
+        
         [SerializeField]
-        private float _height;
-        [SerializeField]
-        private bool _forceHeight;
+		[Tooltip("Fix all features to certain height, suggested to be used for pushing roads above terrain level to prevent z-fighting.")]
+		private bool _forceHeight;
+
+		[SerializeField]
+		[Tooltip("Fixed height value for ForceHeight option")]
+		private float _height;
+
+		[SerializeField]
+		[Tooltip("Create side walls from calculated height down to terrain level. Suggested for buildings, not suggested for roads.")]
+		private bool _createSideWalls = true;
 
         public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
@@ -79,46 +88,55 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 {
                     md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + minHeight + hf, md.Vertices[i].z);
                 }
-            }           
-
-            var count = md.Vertices.Count;
-            float d = 0f;
-            Vector3 v1;
-            Vector3 v2;
-            int ind = 0;
-
-            var wallTri = new List<int>();
-            var wallUv = new List<Vector2>();
-
-            for (int i = 0; i < md.Edges.Count; i+=2)
-            {
-                v1 = md.Vertices[md.Edges[i]];
-                v2 = md.Vertices[md.Edges[i + 1]];
-                ind = md.Vertices.Count;
-                md.Vertices.Add(v1);
-                md.Vertices.Add(v2);
-                md.Vertices.Add(new Vector3(v1.x, v1.y - hf, v1.z));
-                md.Vertices.Add(new Vector3(v2.x, v2.y - hf, v2.z));
-
-                d = (v2 - v1).magnitude;
-
-                wallUv.Add(new Vector2(0, 0));
-                wallUv.Add(new Vector2(d, 0));
-                wallUv.Add(new Vector2(0, -hf));
-                wallUv.Add(new Vector2(d, -hf));
-
-                wallTri.Add(ind);
-                wallTri.Add(ind + 1);
-                wallTri.Add(ind + 2);
-
-                wallTri.Add(ind + 1);
-                wallTri.Add(ind + 3);
-                wallTri.Add(ind + 2);
             }
 
-            md.Triangles.Add(wallTri);
-            md.UV[0].AddRange(wallUv);
+			var count = md.Vertices.Count;
+			md.Vertices.Capacity = count + md.Edges.Count * 2;
+			float d = 0f;
+			Vector3 v1;
+			Vector3 v2;
+			int ind = 0;
 
+			if (_createSideWalls)
+			{
+				var wallTri = new List<int>(md.Edges.Count * 3);
+				var wallUv = new List<Vector2>(md.Edges.Count * 2);
+				Vector3 norm = Vector3.zero;
+				for (int i = 0; i < md.Edges.Count; i += 2)
+				{
+					v1 = md.Vertices[md.Edges[i]];
+					v2 = md.Vertices[md.Edges[i + 1]];
+					ind = md.Vertices.Count;
+					md.Vertices.Add(v1);
+					md.Vertices.Add(v2);
+					md.Vertices.Add(new Vector3(v1.x, v1.y - hf, v1.z));
+					md.Vertices.Add(new Vector3(v2.x, v2.y - hf, v2.z));
+
+					d = (v2 - v1).magnitude;
+
+					norm = Vector3.Cross(v2 - v1, md.Vertices[ind + 2] - v1).normalized;
+					md.Normals.Add(norm);
+					md.Normals.Add(norm);
+					md.Normals.Add(norm);
+					md.Normals.Add(norm);
+
+					wallUv.Add(new Vector2(0, 0));
+					wallUv.Add(new Vector2(d, 0));
+					wallUv.Add(new Vector2(0, -hf));
+					wallUv.Add(new Vector2(d, -hf));
+
+					wallTri.Add(ind);
+					wallTri.Add(ind + 1);
+					wallTri.Add(ind + 2);
+
+					wallTri.Add(ind + 1);
+					wallTri.Add(ind + 3);
+					wallTri.Add(ind + 2);
+				}
+
+				md.Triangles.Add(wallTri);
+				md.UV[0].AddRange(wallUv);
+			}
         }
     }
 }

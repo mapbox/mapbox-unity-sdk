@@ -1,11 +1,11 @@
 namespace Mapbox.Unity.MeshGeneration.Factories
 {
 	using System;
-	using System.Collections.Generic;
 	using Mapbox.Map;
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Enums;
 	using Mapbox.Unity.MeshGeneration.Data;
+	using Mapbox.Unity.Utilities;
 
 	public enum MapImageType
 	{
@@ -17,14 +17,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	/// <summary>
 	/// Uses raster image services to create materials & textures for terrain
 	/// </summary>
-	[CreateAssetMenu(menuName = "Mapbox/Factories/Map Image Factory")]
+	[CreateAssetMenu(menuName = "Mapbox/Factories/Image Factory")]
 	public class MapImageFactory : AbstractTileFactory
 	{
 		[SerializeField]
 		private MapImageType _mapIdType;
 
 		[SerializeField]
-		private string _customMapId = "";
+		[StyleSearch]
+		Style _customStyle;
 
 		[SerializeField]
 		private string _mapId = "";
@@ -55,6 +56,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnRegistered(UnityTile tile)
 		{
+			if (_mapIdType == MapImageType.None)
+				return;
+
 			RasterTile rasterTile;
 			if (_mapId.StartsWith("mapbox://", StringComparison.Ordinal))
 			{
@@ -68,20 +72,20 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			tile.RasterDataState = TilePropertyState.Loading;
 
 			tile.AddTile(rasterTile);
-            Progress++;
-            rasterTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
+			Progress++;
+			rasterTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
-                if (rasterTile.HasError)
+				if (rasterTile.HasError)
 				{
 					tile.RasterDataState = TilePropertyState.Error;
-                    Progress--;
-                    return;
+					Progress--;
+					return;
 				}
 
 				tile.SetRasterData(rasterTile.Data, _useMipMap, _useCompression);
 				tile.RasterDataState = TilePropertyState.Loaded;
-                Progress--;
-            });
+				Progress--;
+			});
 		}
 
 		internal override void OnUnregistered(UnityTile tile)

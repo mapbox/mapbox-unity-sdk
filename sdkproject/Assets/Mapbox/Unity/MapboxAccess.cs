@@ -1,14 +1,13 @@
 namespace Mapbox.Unity
 {
 	using UnityEngine;
-	using System.IO;
-	using Mapbox.Utils;
 	using System;
 	using Mapbox.Geocoding;
 	using Mapbox.Directions;
 	using Mapbox.Platform;
 	using Mapbox.Platform.Cache;
 	using Mapbox.Unity.Telemetry;
+	using Mapbox.Map;
 
 	/// <summary>
 	/// Object for retrieving an API token and making http requests.
@@ -16,15 +15,10 @@ namespace Mapbox.Unity
 	/// </summary>
 	public class MapboxAccess : IFileSource
 	{
-		readonly string _accessPath = Path.Combine(Application.streamingAssetsPath, Constants.Path.TOKEN_FILE);
-
-		static MapboxAccess _instance = new MapboxAccess();
 		ITelemetryLibrary _telemetryLibrary;
 		CachingWebFileSource _fileSource;
 
-		// Default on.
-		bool _isTelemetryEnabled = true;
-
+		static MapboxAccess _instance = new MapboxAccess();
 		/// <summary>
 		/// The singleton instance.
 		/// </summary>
@@ -36,114 +30,109 @@ namespace Mapbox.Unity
 			}
 		}
 
-		MapboxAccess()
-		{
-			ValidateMapboxAccessFile();
-			LoadAccessToken();
-            ConfigureFileSource();
-			ConfigureTelemetry();
-		}
-
-		void ConfigureFileSource()
-		{
-			_fileSource = new CachingWebFileSource(_accessToken).AddCache(new MemoryCache(500));
-		}
-
-		void ConfigureTelemetry()
-		{
-			// TODO: this will need to be settable at runtime as well? 
-            _isTelemetryEnabled = GetTelemetryCollectionState();
-			
-#if UNITY_EDITOR
-			_telemetryLibrary = TelemetryDummy.Instance;
-#elif UNITY_IOS
-			_telemetryLibrary = TelemetryIos.Instance;
-#elif UNITY_ANDROID
-			_telemetryLibrary = TelemetryAndroid.Instance;
-#else
-			_telemetryLibrary = TelemetryDummy.Instance;
-#endif
-
-
-			_telemetryLibrary.Initialize(_accessToken);
-			_telemetryLibrary.SendTurnstile();
-		}
 
 		/// <summary>
 		/// The Mapbox API access token. 
 		/// See <see href="https://www.mapbox.com/mapbox-unity-sdk/docs/01-mapbox-api-token.html">Mapbox API Congfiguration in Unity</see>.
 		/// </summary>
-		private string _accessToken;
-		public string AccessToken
+		MapboxConfiguration _configuration;
+		public MapboxConfiguration Configuration
 		{
 			get
 			{
-				return _accessToken;
+				return _configuration;
 			}
 			private set
 			{
-				if (string.IsNullOrEmpty(value))
+				if (value == null)
 				{
-					throw new InvalidTokenException("Please configure your access token in the menu!");
+					throw new InvalidTokenException("Please configure your access token from the Mapbox menu!");
 				}
-				_accessToken = value;
+				_configuration = value;
 			}
 		}
 
-
-		private void ValidateMapboxAccessFile()
+		MapboxAccess()
 		{
-#if !UNITY_ANDROID
-			if (!Directory.Exists(Application.streamingAssetsPath) || !File.Exists(_accessPath))
+			LoadAccessToken();
+			ConfigureFileSource();
+			ConfigureTelemetry();
+		}
+		
+		public void SetConfiguration(MapboxConfiguration configuration)
+		{
+			_configuration = configuration;
+		}
+
+		/// <summary>
+		/// Clear all existing tile caches. Deletes MBTiles database files.
+		/// </summary>
+		public void ClearCache()
+		{
+			CachingWebFileSource cwfs = _fileSource as CachingWebFileSource;
+			if (null != cwfs)
 			{
-				throw new InvalidTokenException("Please configure your access token in the menu!");
+				cwfs.Clear();
 			}
-#endif
 		}
 
 
 		/// <summary>
-		/// Loads the access token from <see href="https://docs.unity3d.com/Manual/StreamingAssets.html">StreamingAssets</see>.
+		/// Loads the access token from <see href="https://docs.unity3d.com/Manual/BestPracticeUnderstandingPerformanceInUnity6.html">Resources folder</see>.
 		/// </summary>
 		private void LoadAccessToken()
 		{
-#if UNITY_EDITOR || !UNITY_ANDROID
-			AccessToken = File.ReadAllText(_accessPath);
+			TextAsset configurationTextAsset = Resources.Load<TextAsset>(Constants.Path.MAPBOX_RESOURCES_RELATIVE);
+#if !WINDOWS_UWP
+			Configuration = configurationTextAsset == null ? null : JsonUtility.FromJson<MapboxConfiguration>(configurationTextAsset.text);
 #else
-            AccessToken = LoadMapboxAccess();
+			Configuration = configurationTextAsset == null ? null : Mapbox.Json.JsonConvert.DeserializeObject<MapboxConfiguration>(configurationTextAsset.text);
 #endif
 		}
 
 
-		/// <summary>
-		/// Android-specific token file loading.
-		/// </summary>
-		private string LoadMapboxAccess()
+		void ConfigureFileSource()
 		{
-			var request = new WWW(_accessPath);
-
-			// Implement a custom timeout - just in case
-			var timeout = Time.realtimeSinceStartup + 5f;
-			while (!request.isDone)
-			{
-				if (Time.realtimeSinceStartup > timeout)
-				{
-					throw new InvalidTokenException("Could not load access token!");
-				}
-#if !NETFX_CORE
-				System.Threading.Thread.Sleep(10);
+			_fileSource = new CachingWebFileSource(_configuration.AccessToken)
+				.AddCache(new MemoryCache(_configuration.MemoryCacheSize))
+#if !UNITY_WEBGL
+				.AddCache(new MbTilesCache(_configuration.MbTilesCacheSize))
 #endif
-			}
-			return request.text;
+				;
+		}
+
+
+		void ConfigureTelemetry()
+		{
+#if UNITY_EDITOR
+			_telemetryLibrary = TelemetryEditor.Instance;
+#elif UNITY_IOS
+			_telemetryLibrary = TelemetryIos.Instance;
+#elif UNITY_ANDROID
+			_telemetryLibrary = TelemetryAndroid.Instance;
+#else
+			_telemetryLibrary = TelemetryFallback.Instance;
+#endif
+
+
+			_telemetryLibrary.Initialize(_configuration.AccessToken);
+			_telemetryLibrary.SetLocationCollectionState(GetTelemetryCollectionState());
+			_telemetryLibrary.SendTurnstile();
+		}
+
+		public void SetLocationCollectionState(bool enable)
+		{
+			PlayerPrefs.SetInt(Constants.Path.SHOULD_COLLECT_LOCATION_KEY, (enable ? 1 : 0));
+			_telemetryLibrary.SetLocationCollectionState(enable);
 		}
 
 		bool GetTelemetryCollectionState()
 		{
-			if (!PlayerPrefs.HasKey(Constants.Path.IS_TELEMETRY_ENABLED_KEY))
+			if (!PlayerPrefs.HasKey(Constants.Path.SHOULD_COLLECT_LOCATION_KEY))
 			{
-				PlayerPrefs.SetInt(Constants.Path.IS_TELEMETRY_ENABLED_KEY, 1);
+				PlayerPrefs.SetInt(Constants.Path.SHOULD_COLLECT_LOCATION_KEY, 1);
 			}
-			return PlayerPrefs.GetInt(Constants.Path.IS_TELEMETRY_ENABLED_KEY) != 0;
+			return PlayerPrefs.GetInt(Constants.Path.SHOULD_COLLECT_LOCATION_KEY) != 0;
 		}
 
 		/// <summary>
@@ -152,17 +141,15 @@ namespace Mapbox.Unity
 		/// <returns>The request.</returns>
 		/// <param name="url">URL.</param>
 		/// <param name="callback">Callback.</param>
-		public IAsyncRequest Request(string url, Action<Response> callback, int timeout = 10)
+		public IAsyncRequest Request(
+			string url
+			, Action<Response> callback
+			, int timeout = 10
+			, CanonicalTileId tileId = new CanonicalTileId()
+			, string mapId = null
+		)
 		{
-			return _fileSource.Request(url, callback, timeout);
-		}
-
-
-		class InvalidTokenException : Exception
-		{
-			public InvalidTokenException(string message) : base(message)
-			{
-			}
+			return _fileSource.Request(url, callback, _configuration.DefaultTimeout, tileId, mapId);
 		}
 
 
@@ -176,7 +163,7 @@ namespace Mapbox.Unity
 			{
 				if (_geocoder == null)
 				{
-					_geocoder = new Geocoder(new FileSource(AccessToken));
+					_geocoder = new Geocoder(new FileSource(_configuration.AccessToken));
 				}
 				return _geocoder;
 			}
@@ -193,10 +180,26 @@ namespace Mapbox.Unity
 			{
 				if (_directions == null)
 				{
-					_directions = new Directions(new FileSource(AccessToken));
+					_directions = new Directions(new FileSource(_configuration.AccessToken));
 				}
 				return _directions;
 			}
 		}
+
+
+		class InvalidTokenException : Exception
+		{
+			public InvalidTokenException(string message) : base(message)
+			{
+			}
+		}
+	}
+
+	public class MapboxConfiguration
+	{
+		public string AccessToken;
+		public uint MemoryCacheSize = 500;
+		public uint MbTilesCacheSize = 2000;
+		public int DefaultTimeout = 10;
 	}
 }

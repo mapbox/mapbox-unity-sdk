@@ -20,16 +20,21 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	public class TerrainFactory : AbstractTileFactory
 	{
 		[SerializeField]
-		private Material _baseMaterial;
+		private Material _baseMaterial = null;
 		[SerializeField]
 		private MapIdType _mapIdType;
+
 		[SerializeField]
+#pragma warning disable 0414
 		private string _customMapId = "mapbox.terrain-rgb";
+#pragma warning restore 0414
+
 		[SerializeField]
 		private string _mapId = "";
 		[SerializeField]
 		private float _heightModifier = 1f;
 		[SerializeField]
+		[Range(2, 256)]
 		private int _sampleCount = 40;
 		[SerializeField]
 		private bool _addCollider = false;
@@ -37,10 +42,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		private bool _addToLayer = false;
 		[SerializeField]
 		private int _layerId = 0;
+		[SerializeField]
+		bool _useRelativeHeight = true;
 
 		Mesh _stitchTarget;
 
-		protected Dictionary<CanonicalTileId, Mesh> _meshData;
+		protected Dictionary<UnwrappedTileId, Mesh> _meshData;
 		private MeshData _currentTileMeshData;
 		private MeshData _stitchTargetMeshData;
 
@@ -70,7 +77,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnInitialized()
 		{
-			_meshData = new Dictionary<CanonicalTileId, Mesh>();
+			_meshData = new Dictionary<UnwrappedTileId, Mesh>();
 			_currentTileMeshData = new MeshData();
 			_stitchTargetMeshData = new MeshData();
 			_newVertexList = new List<Vector3>(_sampleCount * _sampleCount);
@@ -162,7 +169,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnUnregistered(UnityTile tile)
 		{
-			_meshData.Remove(tile.CanonicalTileId);
+			_meshData.Remove(tile.UnwrappedTileId);
 		}
 
 		/// <summary>
@@ -194,7 +201,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					return;
 				}
 
-				tile.SetHeightData(pngRasterTile.Data, _heightModifier);
+				tile.SetHeightData(pngRasterTile.Data, _heightModifier, _useRelativeHeight);
 				GenerateTerrainMesh(tile);
 				Progress--;
 			});
@@ -254,16 +261,16 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 			}
 
-			FixStitches(tile.CanonicalTileId, _currentTileMeshData);
+			FixStitches(tile.UnwrappedTileId, _currentTileMeshData);
 
 			tile.MeshFilter.mesh.SetNormals(_currentTileMeshData.Normals);
 			tile.MeshFilter.mesh.SetVertices(_currentTileMeshData.Vertices);
 
 			tile.MeshFilter.mesh.RecalculateBounds();
 
-			if (!_meshData.ContainsKey(tile.CanonicalTileId))
+			if (!_meshData.ContainsKey(tile.UnwrappedTileId))
 			{
-				_meshData.Add(tile.CanonicalTileId, tile.MeshFilter.mesh);
+				_meshData.Add(tile.UnwrappedTileId, tile.MeshFilter.mesh);
 			}
 
 			if (_addCollider)
@@ -308,11 +315,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// </summary>
 		/// <param name="tile"></param>
 		/// <param name="mesh"></param>
-		private void FixStitches(CanonicalTileId tileId, MeshData mesh)
+		private void FixStitches(UnwrappedTileId tileId, MeshData mesh)
 		{
 			var meshVertCount = mesh.Vertices.Count;
 			_stitchTarget = null;
-			_meshData.TryGetValue(tileId.South, out _stitchTarget);
+			_meshData.TryGetValue(tileId.North, out _stitchTarget);
 			if (_stitchTarget != null)
 			{
 #if UNITY_5_5_OR_NEWER
@@ -339,7 +346,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 
 			_stitchTarget = null;
-			_meshData.TryGetValue(tileId.North, out _stitchTarget);
+			_meshData.TryGetValue(tileId.South, out _stitchTarget);
 			if (_stitchTarget != null)
 			{
 #if UNITY_5_5_OR_NEWER
@@ -421,7 +428,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 
 			_stitchTarget = null;
-			_meshData.TryGetValue(tileId.SouthWest, out _stitchTarget);
+			_meshData.TryGetValue(tileId.NorthWest, out _stitchTarget);
 
 			if (_stitchTarget != null)
 			{
@@ -446,7 +453,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 
 			_stitchTarget = null;
-			_meshData.TryGetValue(tileId.SouthEast, out _stitchTarget);
+			_meshData.TryGetValue(tileId.NorthEast, out _stitchTarget);
 
 			if (_stitchTarget != null)
 			{
@@ -471,7 +478,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 
 			_stitchTarget = null;
-			_meshData.TryGetValue(tileId.NorthWest, out _stitchTarget);
+			_meshData.TryGetValue(tileId.SouthWest, out _stitchTarget);
 
 			if (_stitchTarget != null)
 			{
@@ -496,7 +503,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 
 			_stitchTarget = null;
-			_meshData.TryGetValue(tileId.NorthEast, out _stitchTarget);
+			_meshData.TryGetValue(tileId.SouthEast, out _stitchTarget);
 
 			if (_stitchTarget != null)
 			{
