@@ -4,9 +4,8 @@ using System.Collections.Generic;
 using System;
 using System.Reflection;
 
-namespace NodeEditorFramework.Utilities
+namespace NodeEditorNamespace
 {
-
 	public static class GUIScaleUtility
 	{
 		// General
