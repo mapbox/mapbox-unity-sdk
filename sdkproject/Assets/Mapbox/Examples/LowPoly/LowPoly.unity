@@ -132,7 +132,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _latitudeLongitudeString: 46.085959, 11.070484
-  _zoom: 13
+  _zoom: 14
   _root: {fileID: 0}
   _tileProvider: {fileID: 110210643}
   _mapVisualizer: {fileID: 11400000, guid: d433be534b826be43a567cd39e414283, type: 2}
