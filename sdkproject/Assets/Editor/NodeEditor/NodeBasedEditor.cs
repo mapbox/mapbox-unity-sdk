@@ -123,11 +123,11 @@ namespace NodeEditorNamespace
 			OnGUIToolBar();
 
 			var test = _canvasWindowRect;
-			GUIScaleUtility.BeginScale(ref test, zoomOrigin, zoomScale, true, true);
+			var sc = GUIScaleUtility.BeginScale(ref test, zoomOrigin, zoomScale, false);
 
 			if (_activeMap < _maps.Count)
 			{
-				DrawNodes();
+				DrawNodes(sc);
 
 				ProcessNodeEvents(Event.current);
 				ProcessEvents(Event.current);
@@ -224,9 +224,9 @@ namespace NodeEditorNamespace
 			Handles.EndGUI();
 		}
 
-		private void DrawNodes()
+		private void DrawNodes(Vector2 sc)
 		{
-			_maps[_activeMap].Draw(_topLeft + _panDelta, 100, _nodeHeight);
+			_maps[_activeMap].Draw(_topLeft + _panDelta + sc, 100, _nodeHeight);
 			GUI.changed = true;
 		}
 
