@@ -9,8 +9,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 526c8a90df31d41fe8057a6f85c7a3e4, type: 3}
-  m_Name: TerrainVisualization
+  m_Name: PoiDemoVisualization
   m_EditorClassIdentifier: 
   _factories:
-  - {fileID: 11400000, guid: 74ed94e68d943483b89421350156bef7, type: 2}
-  - {fileID: 11400000, guid: 8aa6dfef55a93474fbc6cdfbb145b7d1, type: 2}
+  - {fileID: 11400000, guid: 6b6c6a798b018ed449bccff86fbf6fd8, type: 2}
+  - {fileID: 11400000, guid: 4304eeeba74ed4e48a435f96d9076abc, type: 2}
+  - {fileID: 11400000, guid: b6db6e4901cc50246b1ed5c328d73872, type: 2}
