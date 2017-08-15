@@ -19,9 +19,9 @@ namespace NodeEditorNamespace
 		public void Draw()
 		{
 			Handles.DrawBezier(
-				inPoint.rect.center,
+				inPoint.left,
 				outPoint.rect.center,
-				inPoint.rect.center + Vector2.left * 50f,
+				inPoint.left + Vector2.left * 50f,
 				outPoint.rect.center - Vector2.left * 50f,
 				Color.white,
 				null,

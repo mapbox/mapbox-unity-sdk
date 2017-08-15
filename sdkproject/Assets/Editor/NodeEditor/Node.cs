@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Collections;
 using Mapbox.Unity.MeshGeneration.Modifiers;
 using System.Linq;
+using Mapbox.Unity.MeshGeneration.Interfaces;
 
 namespace NodeEditorNamespace
 {
@@ -18,7 +19,6 @@ namespace NodeEditorNamespace
 		private Vector2 _panDelta;
 		private Vector2 _topLeft = new Vector2(50, 50);
 		private Vector2 _padding = new Vector2(50, 100);
-		private Vector2 drag;
 		private float _propTopTest = 0f;
 
 		public List<Connection> Connections;
@@ -54,6 +54,7 @@ namespace NodeEditorNamespace
 		private float _headerHeight = 70;
 		private float _propertyHeight = 25;
 		private int _propCount = 0;
+		private float _inbuff;
 
 		//Vector2 position, float width, float height
 		public Node(ScriptableObject so = null)
@@ -71,7 +72,10 @@ namespace NodeEditorNamespace
 				subtitle = Regex.Replace(ScriptableObject.GetType().Name, "(\\B[A-Z])", " $1");
 			}
 
-			inPoint = new ConnectionPoint(this, "", 20, ConnectionPointType.In, NodeBasedEditor.inPointStyle);
+			var inlabel = "";
+			if (ScriptableObject is LayerVisualizerBase)
+				inlabel = (ScriptableObject as VectorLayerVisualizer).Key;
+			inPoint = new ConnectionPoint(this, inlabel, "", 20, ConnectionPointType.In, NodeBasedEditor.inPointStyle);
 		}
 
 		public float Draw(Vector2 position, float width, float height)
@@ -81,9 +85,11 @@ namespace NodeEditorNamespace
 			var boxHeight = _headerHeight + _propCount * _propertyHeight;
 			if (ScriptableObject is ModifierBase)
 				boxHeight = 52;
-			spaceRect = new Rect(position.x + drag.x, position.y + drag.y, width, boxHeight);
-			rect = new Rect(position.x + drag.x, position.y + drag.y, width, boxHeight);
-			buttonRect = new Rect(rect.xMax - 25, rect.yMin + 10, 20, 20);
+			_inbuff = (string.IsNullOrEmpty(inPoint.inLabel) ? 0 : 100);
+			spaceRect = new Rect(position.x + _inbuff, position.y, width, boxHeight);
+			rect = new Rect(position.x + _inbuff, position.y, width, boxHeight);
+			buttonRect = new Rect(rect.xMax - 25, rect.yMin + 10, 20, 20);		
+
 			_propTopTest = 0;
 			if (_expanded)
 			{
@@ -95,9 +101,17 @@ namespace NodeEditorNamespace
 				}
 			}
 
-			if (!_isRoot)
+			var so = ScriptableObject as VectorLayerVisualizer;
+			if (so != null)
+			{
+				inPoint.inLabel = so.Key;
 				inPoint.Draw();
-
+			}
+			else
+			{
+				if (!_isRoot)
+					inPoint.Draw();
+			}
 			spaceRect.height = Math.Max(height, Math.Max(spaceRect.height, boxHeight));
 			if (Children.Count > 0)
 			{
@@ -237,7 +251,7 @@ namespace NodeEditorNamespace
 					if (val != null)
 					{
 						var name = (fi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
-						var conp = new ConnectionPoint(this, name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
+						var conp = new ConnectionPoint(this, "", name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
 						ConnectionPoints.Add(conp);
 						var newNode = new Node(val);
 						Children.Add(newNode);
@@ -256,7 +270,7 @@ namespace NodeEditorNamespace
 					if (typeof(ScriptableObject).IsAssignableFrom(type.GetGenericArguments()[0]))
 					{
 						var name = (fi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
-						var conp = new ConnectionPoint(this, name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
+						var conp = new ConnectionPoint(this, "", name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
 						ConnectionPoints.Add(conp);
 						var val = fi.GetValue(obj);
 						if (val is IEnumerable)
@@ -282,8 +296,9 @@ namespace NodeEditorNamespace
 					var val = pi.GetValue(obj, null) as ScriptableObject;
 					if (val != null)
 					{
+						
 						var name = (pi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
-						var conp = new ConnectionPoint(this, name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
+						var conp = new ConnectionPoint(this, "", name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
 						ConnectionPoints.Add(conp);
 						var newNode = new Node(val);
 						Children.Add(newNode);
@@ -300,10 +315,11 @@ namespace NodeEditorNamespace
 				{
 					if (typeof(ScriptableObject).IsAssignableFrom(type.GetGenericArguments()[0]))
 					{
-						var name = (pi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
-						var conp = new ConnectionPoint(this, name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
-						ConnectionPoints.Add(conp);
 						var val = pi.GetValue(obj, null);
+						
+						var name = (pi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
+						var conp = new ConnectionPoint(this, "", name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
+						ConnectionPoints.Add(conp);
 						if (val is IEnumerable)
 						{
 							foreach (ScriptableObject listitem in val as IEnumerable)
