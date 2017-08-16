@@ -234,7 +234,6 @@ namespace NodeEditorNamespace
 		private void ProcessEvents(Event e)
 		{
 			drag = Vector2.zero;
-
 			switch (e.type)
 			{
 				case EventType.MouseDown:
@@ -248,8 +247,10 @@ namespace NodeEditorNamespace
 				case EventType.MouseDrag:
 					if (e.button == 0)
 					{
-						if(_canvasWindowRect.Contains(_clickedPosition))
+						if (_canvasWindowRect.Contains(_clickedPosition))
+						{
 							_panDelta += e.delta;
+						}
 					}
 					break;
 
@@ -268,6 +269,13 @@ namespace NodeEditorNamespace
 
 						Event.current.Use();
 
+					}
+					break;
+
+				case EventType.MouseUp:
+					if (e.button == 0)
+					{
+						_clickedPosition = new Vector2(Mathf.Infinity, Mathf.Infinity);
 					}
 					break;
 			}
