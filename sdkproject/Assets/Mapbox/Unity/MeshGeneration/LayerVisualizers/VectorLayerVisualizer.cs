@@ -14,6 +14,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 	public class TypeVisualizerTuple
 	{
 		public string Type;
+		[SerializeField]
 		public ModifierStackBase Stack;
 	}
 
@@ -49,8 +50,10 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		[SerializeField]
 		public List<TypeVisualizerTuple> Stacks;
 
+		[SerializeField]
 		[NodeEditorElementAttribute("Custom Stacks")]
 		public List<ModifierStackBase> _stackValues { get { return Stacks.Select(x => x.Stack).ToList(); } }
+		public List<string> _stackKeys { get { return Stacks.Select(x => x.Type).ToList(); } }
 
 		private GameObject _container;
 
@@ -93,9 +96,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				mergedStack.End(tile, _container);
 			}
 
-			for (int i = 0; i < Stacks.Count; i++)
+			foreach (var item in Stacks)
 			{
-				mergedStack = Stacks[i].Stack as MergedModifierStack;
+				mergedStack = item.Stack as MergedModifierStack;
 				if (mergedStack != null)
 				{
 					mergedStack.End(tile, _container);
@@ -132,16 +135,18 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			meshData.TileRect = tile.Rect;
 
 			//and finally, running the modifier stack on the feature
-			var mod = Stacks.FirstOrDefault(x => x.Type.Contains(styleSelectorKey));
-			if (mod != null)
+			foreach (var item in Stacks)
 			{
-				mod.Stack.Execute(tile, feature, meshData, parent, mod.Type);
-			}
-			else
-			{
-				if (_defaultStack != null)
+				if(item.Type.Contains(styleSelectorKey))	
 				{
-					_defaultStack.Execute(tile, feature, meshData, parent, _key);
+					item.Stack.Execute(tile, feature, meshData, parent, item.Type);
+				}
+				else
+				{
+					if (_defaultStack != null)
+					{
+						_defaultStack.Execute(tile, feature, meshData, parent, _key);
+					}
 				}
 			}
 		}

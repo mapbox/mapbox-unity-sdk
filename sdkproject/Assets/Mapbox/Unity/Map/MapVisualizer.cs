@@ -8,12 +8,23 @@ namespace Mapbox.Unity.MeshGeneration
 	using Mapbox.Platform;
 	using Mapbox.Unity.Map;
 	using System;
+	using Mapbox;
 
 	public enum ModuleState
 	{
 		Initialized,
 		Working,
 		Finished
+	}
+
+	public class AssignmentTypeAttribute : PropertyAttribute
+	{
+		public System.Type Type;
+
+		public AssignmentTypeAttribute(System.Type t)
+		{
+			Type = t;
+		}
 	}
 
 	[CreateAssetMenu(menuName = "Mapbox/MapVisualizer")]

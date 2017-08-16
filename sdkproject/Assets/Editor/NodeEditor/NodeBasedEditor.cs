@@ -44,6 +44,7 @@ namespace NodeEditorNamespace
 		private Rect _canvasWindowRect { get { return new Rect(0, 20, position.width, position.height - 20); } }
 		private Rect _optionsRect { get { return new Rect(position.width - 250, 20, 250, 60); } }
 		private bool _showOptions = false;
+		private Vector2 _clickedPosition;
 
 		[MenuItem("Mapbox/Map Editor")]
 		private static void OpenWindow()
@@ -239,6 +240,7 @@ namespace NodeEditorNamespace
 				case EventType.MouseDown:
 					if (e.button == 0)
 					{
+						_clickedPosition = e.mousePosition;
 						ClearConnectionSelection();
 					}
 					break;
@@ -246,7 +248,8 @@ namespace NodeEditorNamespace
 				case EventType.MouseDrag:
 					if (e.button == 0)
 					{
-						_panDelta += e.delta;
+						if(_canvasWindowRect.Contains(_clickedPosition))
+							_panDelta += e.delta;
 					}
 					break;
 

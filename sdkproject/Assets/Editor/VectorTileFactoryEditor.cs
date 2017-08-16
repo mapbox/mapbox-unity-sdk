@@ -11,11 +11,13 @@ namespace Mapbox.NodeEditor
 	[CustomEditor(typeof(VectorTileFactory))]
 	public class VectorTileFactoryEditor : UnityEditor.Editor
 	{
+		private VectorTileFactory _factory;
 		private MonoScript script;
 
 		private void OnEnable()
 		{
 			script = MonoScript.FromScriptableObject((VectorTileFactory)target);
+			_factory = target as VectorTileFactory;
 		}
 
 		public override void OnInspectorGUI()
@@ -33,7 +35,15 @@ namespace Mapbox.NodeEditor
 				var ind = i;
 				EditorGUILayout.BeginHorizontal();
 				GUI.enabled = false;
-				facs.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(i).objectReferenceValue, typeof(LayerVisualizerBase)) as ScriptableObject;
+				if (_factory.Visualizers[i] != null)
+				{
+					_factory.Visualizers[i].Key = EditorGUILayout.TextField(_factory.Visualizers[i].Key, GUILayout.MaxWidth(100));
+				}
+				//facs.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(i).objectReferenceValue, typeof(LayerVisualizerBase)) as ScriptableObject;
+				if (_factory.Visualizers[i] == null)
+					EditorGUILayout.TextField("null");
+				else
+					EditorGUILayout.ObjectField(_factory.Visualizers[i], typeof(LayerVisualizerBase));
 				GUI.enabled = true;
 
 				if (GUILayout.Button(new GUIContent("E"), GUILayout.Width(20)))
@@ -42,6 +52,7 @@ namespace Mapbox.NodeEditor
 				}
 				if (GUILayout.Button(new GUIContent("-"), GUILayout.Width(20)))
 				{
+					facs.DeleteArrayElementAtIndex(ind);
 					facs.DeleteArrayElementAtIndex(ind);
 				}
 				EditorGUILayout.EndHorizontal();

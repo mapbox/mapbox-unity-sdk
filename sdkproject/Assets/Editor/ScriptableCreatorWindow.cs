@@ -102,13 +102,13 @@ namespace Mapbox.NodeEditor
 				if (_showElement[i])
 				{
 					EditorGUILayout.Space();
-					EditorGUI.indentLevel += 5;
+					EditorGUI.indentLevel += 2;
 					GUI.enabled = false;
 					var ed = UnityEditor.Editor.CreateEditor(asset);
 					ed.hideFlags = HideFlags.NotEditable;
 					ed.OnInspectorGUI();
 					GUI.enabled = true;
-					EditorGUI.indentLevel -= 5;
+					EditorGUI.indentLevel -= 2;
 					EditorGUILayout.Space();
 				}
 				EditorGUILayout.Space();
