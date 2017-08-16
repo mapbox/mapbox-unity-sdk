@@ -34,11 +34,25 @@
 			List<AndroidLibInfo> libInfo = new List<AndroidLibInfo>();
 			foreach (var file in Directory.GetFiles(Application.dataPath, "*.jar", SearchOption.AllDirectories))
 			{
-				libInfo.Add(new AndroidLibInfo(file));
+				try
+				{
+					libInfo.Add(new AndroidLibInfo(file));
+				}
+				catch
+				{
+					Debug.LogWarningFormat("could not extract version from file name: [{0}]", file);
+				}
 			}
 			foreach (var file in Directory.GetFiles(Application.dataPath, "*.aar", SearchOption.AllDirectories))
 			{
-				libInfo.Add(new AndroidLibInfo(file));
+				try
+				{
+					libInfo.Add(new AndroidLibInfo(file));
+				}
+				catch
+				{
+					Debug.LogWarningFormat("could not extract version from file name: [{0}]", file);
+				}
 			}
 
 			var stats = libInfo.GroupBy(li => li.BaseFileName).OrderBy(g => g.Key);
