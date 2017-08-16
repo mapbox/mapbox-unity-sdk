@@ -17,6 +17,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField]
 		private string _mapId = "";
 
+		[NodeEditorElementAttribute("Layer Visalizers")]
 		public List<LayerVisualizerBase> Visualizers;
 
 		private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;

@@ -44,9 +44,13 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		private List<FilterBase> Filters;
 
 		[SerializeField]
-		private ModifierStackBase _defaultStack;
+		[NodeEditorElementAttribute("Default Stack")]
+		public ModifierStackBase _defaultStack;
 		[SerializeField]
-		private List<TypeVisualizerTuple> Stacks;
+		public List<TypeVisualizerTuple> Stacks;
+
+		[NodeEditorElementAttribute("Custom Stacks")]
+		public List<ModifierStackBase> _stackValues { get { return Stacks.Select(x => x.Stack).ToList(); } }
 
 		private GameObject _container;
 
