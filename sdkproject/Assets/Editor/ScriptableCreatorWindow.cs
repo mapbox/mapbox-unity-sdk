@@ -14,11 +14,12 @@ namespace Mapbox.NodeEditor
 		SerializedProperty _finalize;
 		const float width = 620f;
 		const float height = 600f;
-		string[] _assets;
+		List<ScriptableObject> _assets;
 		bool[] _showElement;
 		Vector2 scrollPos;
 		int _index = -1;
 		private Action<UnityEngine.Object> _act;
+		int activeIndex = 0;
 
 		GUIStyle headerFoldout = new GUIStyle("Foldout");
 		GUIStyle header = new GUIStyle("ShurikenModuleTitle")
@@ -51,7 +52,16 @@ namespace Mapbox.NodeEditor
 			window._type = type;
 			window._finalize = p;
 			window.position = new Rect(500, 200, width, height);
-			window._assets = AssetDatabase.FindAssets("t:" + type.Name);
+			//window._assets 
+			var list = AssetDatabase.FindAssets("t:" + type.Name);
+			window._assets = new List<ScriptableObject>();
+			foreach (var item in list)
+			{
+				var ne = AssetDatabase.GUIDToAssetPath(item);
+				var asset = AssetDatabase.LoadAssetAtPath(ne, type) as ScriptableObject;
+				window._assets.Add(asset);
+			}
+			window._assets = window._assets.OrderBy(x => x.GetType().Name).ToList();
 			window._showElement = new bool[window._assets.Count()];
 			window._act = act;
 			if (index > -1)
@@ -65,15 +75,15 @@ namespace Mapbox.NodeEditor
 			var st = new GUIStyle();
 			st.padding = new RectOffset(15, 15, 15, 15);
 			scrollPos = EditorGUILayout.BeginScrollView(scrollPos, st);
-			for (int i = 0; i < _assets.Length; i++)
+			for (int i = 0; i < _assets.Count; i++)
 			{
-				var ne = AssetDatabase.GUIDToAssetPath(_assets[i]);
-				var asset = AssetDatabase.LoadAssetAtPath(ne, _type);
+				var asset = _assets[i];
 				GUILayout.BeginHorizontal();
 
-				_showElement[i] = Header(asset.name + " (" + asset.GetType().Name + ")", _showElement[i]);
+				var b = Header(asset.GetType().Name + " - " + asset.name, i == activeIndex);
 
-				//_showElement[i] = EditorGUILayout.Foldout(_showElement[i], new GUIContent(asset.name));
+				if (b)
+					activeIndex = i;
 				if (GUILayout.Button(new GUIContent("Select"), header, GUILayout.Width(80)))
 				{
 					if(_act != null)
@@ -99,7 +109,7 @@ namespace Mapbox.NodeEditor
 				}
 
 				GUILayout.EndHorizontal();
-				if (_showElement[i])
+				if (b)
 				{
 					EditorGUILayout.Space();
 					EditorGUI.indentLevel += 2;
