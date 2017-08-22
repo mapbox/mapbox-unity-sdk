@@ -21,11 +21,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	public class TerrainFactory : AbstractTileFactory
 	{
 		[SerializeField]
-		private Material _baseMaterial;
+		private Material _baseMaterial = null;
 		[SerializeField]
 		private MapIdType _mapIdType;
+
 		[SerializeField]
+#pragma warning disable 0414
 		private string _customMapId = "mapbox.terrain-rgb";
+#pragma warning restore 0414
+
 		[SerializeField]
 		private string _mapId = "";
 		[SerializeField]
@@ -40,7 +44,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField]
 		private int _layerId = 0;
 		[SerializeField]
-		bool _useRelativeHeight;
+		bool _useRelativeHeight = true;
 
 		Mesh _stitchTarget;
 

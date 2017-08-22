@@ -11,15 +11,19 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	/// <summary>
 	/// Uses Mapbox Terrain api and creates terrain meshes.
 	/// </summary>
-	[CreateAssetMenu(menuName = "Mapbox/Factories/Low Poly Terrain Factory")]
+	[CreateAssetMenu(menuName = "Mapbox/Factories/Terrain Factory - Low Poly")]
 	public class LowPolyTerrainFactory : AbstractTileFactory
 	{
 		[SerializeField]
-		private Material _baseMaterial;
+		private Material _baseMaterial = null;
 		[SerializeField]
 		private MapIdType _mapIdType;
+
 		[SerializeField]
+#pragma warning disable 0414
 		private string _customMapId = "mapbox.terrain-rgb";
+#pragma warning restore 0414
+
 		[SerializeField]
 		private string _mapId = "";
 		[SerializeField]
@@ -33,7 +37,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField]
 		private int _layerId = 0;
 		[SerializeField]
-		bool _useRelativeHeight;
+		bool _useRelativeHeight = true;
 
 		Mesh _stitchTarget;
 

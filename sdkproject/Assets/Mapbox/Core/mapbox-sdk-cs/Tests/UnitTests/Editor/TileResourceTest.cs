@@ -18,15 +18,15 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 	[TestFixture]
 	public class TileResourceTest
 	{
-
-		private string _api;
-		private CanonicalTileId _tileId;
+		//needed when tests can be enabled again
+		//private string _api;
+		//private CanonicalTileId _tileId;
 
 		[SetUp]
 		public void SetUp()
 		{
-			_api = Constants.BaseAPI;
-			_tileId = new CanonicalTileId(0, 0, 0);
+			//_api = Constants.BaseAPI;
+			//_tileId = new CanonicalTileId(0, 0, 0);
 		}
 
 		[Test]

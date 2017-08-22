@@ -1,4 +1,5 @@
-﻿namespace Mapbox.Unity.Telemetry
+﻿#if UNITY_EDITOR
+namespace Mapbox.Unity.Telemetry
 {
 	using System.Collections.Generic;
 	using System.Collections;
@@ -9,9 +10,7 @@
 	using UnityEngine.Networking;
 	using System.Text;
 
-#if UNITY_EDITOR
 	using UnityEditor;
-#endif
 
 	public class TelemetryEditor : ITelemetryLibrary
 	{
@@ -28,7 +27,7 @@
 
 		public void Initialize(string accessToken)
 		{
-			_url = string.Format("{0}events/v2?access_token={1}", Mapbox.Utils.Constants.BaseAPI, accessToken);
+			_url = string.Format("{0}events/v2?access_token={1}", Mapbox.Utils.Constants.EventsAPI, accessToken);
 		}
 
 		public void SendTurnstile()
@@ -40,7 +39,7 @@
 			if (ShouldPostTurnstile(ticks))
 			{
 				Runnable.Run(PostWWW(_url, GetPostBody()));
-				PlayerPrefs.SetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR, ticks.ToString());
+				PlayerPrefs.SetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR_KEY, ticks.ToString());
 			}
 		}
 
@@ -49,8 +48,10 @@
 			List<Dictionary<string, object>> eventList = new List<Dictionary<string, object>>();
 			Dictionary<string, object> jsonDict = new Dictionary<string, object>();
 
+			long unixTimestamp = (long)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+
 			jsonDict.Add("event", "appUserTurnstile");
-			jsonDict.Add("created", DateTime.Now.Ticks);
+			jsonDict.Add("created", unixTimestamp);
 			jsonDict.Add("userId", SystemInfo.deviceUniqueIdentifier);
 			jsonDict.Add("enabled.telemetry", false);
 			eventList.Add(jsonDict);
@@ -63,7 +64,7 @@
 		{
 			var date = new DateTime(ticks);
 			var longAgo = DateTime.Now.AddDays(-100).Ticks.ToString();
-			var lastDateString = PlayerPrefs.GetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR, longAgo);
+			var lastDateString = PlayerPrefs.GetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR_KEY, longAgo);
 			long lastTicks = 0;
 			long.TryParse(lastDateString, out lastTicks);
 			var lastDate = new DateTime(lastTicks);
@@ -101,22 +102,25 @@
 
 		static string GetUserAgent()
 		{
-#if UNITY_EDITOR
 			var userAgent = string.Format("{0}/{1}/{2} MapboxEventsUnityEditor/{3}",
-			                              PlayerSettings.bundleIdentifier,
+										  PlayerSettings.bundleIdentifier,
 										  PlayerSettings.bundleVersion,
 #if UNITY_IOS
 										  PlayerSettings.iOS.buildNumber,
 #elif UNITY_ANDROID
-			                              PlayerSettings.Android.bundleVersionCode,
+										  PlayerSettings.Android.bundleVersionCode,
 #else
-			                              "0",
+										  "0",
 #endif
 										  Constants.SDK_VERSION
 										 );
 			return userAgent;
-#endif
-			return "MapboxEventsUnityEditor";
+		}
+
+		public void SetLocationCollectionState(bool enable)
+		{
+			// Empty.
 		}
 	}
 }
+#endif

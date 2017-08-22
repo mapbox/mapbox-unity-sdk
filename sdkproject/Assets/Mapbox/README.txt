@@ -16,11 +16,11 @@ API: https://www.mapbox.com/mapbox-unity-sdk/api/
 
 
 
-Current version: 1.0.0, as of 05/25/2017
+Current version: 1.1.0, as of 08/01/2017
 
 Changelog: https://www.mapbox.com/mapbox-unity-sdk/docs/05-changelog.html
 
-IMPORTANT: If you intend to deploay for Android, please set your minimum version to 15 in PlayerSettings.
+IMPORTANT: If you intend to deploy for Android, please set your minimum version to 15 in PlayerSettings.
 For iOS, please set your minimum version to 8.
 
 If you have any other issues or feedback, please contact us at https://www.mapbox.com/contact/ 

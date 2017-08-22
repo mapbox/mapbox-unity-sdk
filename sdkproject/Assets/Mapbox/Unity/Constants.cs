@@ -4,14 +4,14 @@ namespace Mapbox.Unity
 
 	public static class Constants
 	{
-		public const string SDK_VERSION = "1.0.0";
+		public const string SDK_VERSION = "1.1.0";
 
 		public static class Path
 		{
 			public const string CONFIG_FILE = "MapboxConfiguration.txt";
-			public const string IS_TELEMETRY_ENABLED_KEY = "IS_MAPBOX_TELEMETRY_ENABLED";
-			public const string TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR = "MAPBOX_TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR";
-			public const string TELEMETRY_TURNSTILE_LAST_TICKS_FALLBACK = "MAPBOX_TELEMETRY_TURNSTILE_LAST_TICKS_FALLBACK";
+			public const string SHOULD_COLLECT_LOCATION_KEY = "MAPBOX_SHOULD_COLLECT_LOCATION";
+			public const string TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR_KEY = "MAPBOX_TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR";
+			public const string TELEMETRY_TURNSTILE_LAST_TICKS_FALLBACK_KEY = "MAPBOX_TELEMETRY_TURNSTILE_LAST_TICKS_FALLBACK";
 			public static readonly string MAPBOX_RESOURCES_RELATIVE = System.IO.Path.Combine("Mapbox", "MapboxConfiguration");
 			public static readonly string MAPBOX_RESOURCES_ABSOLUTE = System.IO.Path.Combine(System.IO.Path.Combine(Application.dataPath, "Resources"), "Mapbox");
 		}

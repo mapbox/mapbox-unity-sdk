@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Name: MapImageFactory
   m_EditorClassIdentifier: 
   _mapIdType: 0
-  _customMapId: 
+  _customStyle:
+    Name: 
+    Id: 
+    Modified: 
+    UserName: 
   _mapId: mapbox://styles/mapbox/dark-v9
   _useCompression: 0
   _useMipMap: 0

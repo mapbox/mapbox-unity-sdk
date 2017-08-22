@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Unity.Telemetry
+namespace Mapbox.Unity.Telemetry
 {
 	using System.Collections.Generic;
 	using System.Collections;
@@ -24,7 +24,7 @@
 
 		public void Initialize(string accessToken)
 		{
-			_url = string.Format("{0}events/v2?access_token={1}", Mapbox.Utils.Constants.BaseAPI, accessToken);
+			_url = string.Format("{0}events/v2?access_token={1}", Mapbox.Utils.Constants.EventsAPI, accessToken);
 		}
 
 		public void SendTurnstile()
@@ -33,7 +33,7 @@
 			if (ShouldPostTurnstile(ticks))
 			{
 				Runnable.Run(PostWWW(_url, GetPostBody()));
-				PlayerPrefs.SetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_FALLBACK, ticks.ToString());
+				PlayerPrefs.SetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_FALLBACK_KEY, ticks.ToString());
 			}
 		}
 
@@ -42,8 +42,10 @@
 			List<Dictionary<string, object>> eventList = new List<Dictionary<string, object>>();
 			Dictionary<string, object> jsonDict = new Dictionary<string, object>();
 
+			long unixTimestamp = (long)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+
 			jsonDict.Add("event", "appUserTurnstile");
-			jsonDict.Add("created", DateTime.Now.Ticks);
+			jsonDict.Add("created", unixTimestamp);
 			jsonDict.Add("userId", SystemInfo.deviceUniqueIdentifier);
 			jsonDict.Add("enabled.telemetry", false);
 			eventList.Add(jsonDict);
@@ -56,7 +58,7 @@
 		{
 			var date = new DateTime(ticks);
 			var longAgo = DateTime.Now.AddDays(-100).Ticks.ToString();
-			var lastDateString = PlayerPrefs.GetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_FALLBACK, longAgo);
+			var lastDateString = PlayerPrefs.GetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_FALLBACK_KEY, longAgo);
 			long lastTicks = 0;
 			long.TryParse(lastDateString, out lastTicks);
 			var lastDate = new DateTime(lastTicks);
@@ -95,13 +97,18 @@
 		static string GetUserAgent()
 		{
 			var userAgent = string.Format("{0}/{1}/{2} MapboxEventsUnity{3}/{4}",
-			                              Application.bundleIdentifier,
-			                              Application.version,
-			                              "0",
-			                              Application.platform,
+										  Application.bundleIdentifier,
+										  Application.version,
+										  "0",
+										  Application.platform,
 										  Constants.SDK_VERSION
 										 );
 			return userAgent;
+		}
+
+		public void SetLocationCollectionState(bool enable)
+		{
+			// empty.
 		}
 	}
 }

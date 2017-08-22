@@ -20,5 +20,10 @@ namespace Mapbox.Unity.Telemetry
 		{
 			// empty.
 		}
+
+		public void SetLocationCollectionState(bool enable)
+		{
+			// empty.
+		}
 	}
 }
