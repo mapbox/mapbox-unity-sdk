@@ -212,9 +212,9 @@ namespace NodeEditorNamespace
 
 		private void ProcessContextMenu()
 		{
-			GenericMenu genericMenu = new GenericMenu();
-			genericMenu.AddItem(new GUIContent("Remove node"), false, OnClickRemoveNode);
-			genericMenu.ShowAsContext();
+			//GenericMenu genericMenu = new GenericMenu();
+			//genericMenu.AddItem(new GUIContent("Remove node"), false, OnClickRemoveNode);
+			//genericMenu.ShowAsContext();
 		}
 
 		private void OnClickRemoveNode()
