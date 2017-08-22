@@ -8,6 +8,7 @@
 	using Mapbox.Map;
 	using Mapbox.Unity.Utilities;
 	using System;
+	using Mapbox.Platform;
 
 	/// <summary>
 	/// Uses vector tile api to visualize vector data.
@@ -36,22 +37,31 @@
 			}
 		}
 
-		/// <summary>
-		/// Sets up the Mesh Factory
-		/// </summary>
-		/// <param name="fs"></param>
-		internal override void OnInitialized()
+		internal override void PreInitialize(WorldProperties wp)
 		{
-			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
-			foreach (LayerVisualizerBase factory in Visualizers)
+			base.PreInitialize(wp);
+			foreach (LayerVisualizerBase layerviz in Visualizers)
 			{
-				if (_layerBuilder.ContainsKey(factory.Key))
+				layerviz.PreInitialize(wp);
+			}
+		}
+
+
+		internal override void Initialize(WorldProperties wp, IFileSource fileSource)
+		{
+			base.Initialize(wp, fileSource);
+
+			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
+			foreach (LayerVisualizerBase layerviz in Visualizers)
+			{
+				layerviz.Initialize(wp);
+				if (_layerBuilder.ContainsKey(layerviz.Key))
 				{
-					_layerBuilder[factory.Key].Add(factory);
+					_layerBuilder[layerviz.Key].Add(layerviz);
 				}
 				else
 				{
-					_layerBuilder.Add(factory.Key, new List<LayerVisualizerBase>() { factory });
+					_layerBuilder.Add(layerviz.Key, new List<LayerVisualizerBase>() { layerviz });
 				}
 			}
 		}
