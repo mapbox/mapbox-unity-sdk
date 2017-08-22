@@ -115,7 +115,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			_unwrappedTileId = tileId;
 			_canonicalTileId = tileId.Canonical;
 			gameObject.name = _canonicalTileId.ToString();
-			var position = new Vector3((float)(_rect.Center.x - map.CenterMercator.x), 0, (float)(_rect.Center.y - map.CenterMercator.y));
+			var position = new Vector3((float)(_rect.Center.x - map.CenterMercator.x), 0, (float)(_rect.Center.y - map.CenterMercator.y)) * map.WorldRelativeScale;
 			transform.localPosition = position;
 			gameObject.SetActive(true);
 		}

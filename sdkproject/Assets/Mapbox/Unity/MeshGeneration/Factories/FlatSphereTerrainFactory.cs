@@ -27,12 +27,7 @@
 
 		[SerializeField]
 		private int _layerId = 0;
-
-		internal override void OnInitialized()
-		{
-
-		}
-
+		
 		internal override void OnRegistered(UnityTile tile)
 		{
 			if (_addToLayer && tile.gameObject.layer != _layerId)

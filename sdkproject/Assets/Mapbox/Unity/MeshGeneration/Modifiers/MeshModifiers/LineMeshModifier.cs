@@ -13,11 +13,18 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     [CreateAssetMenu(menuName = "Mapbox/Modifiers/Line Mesh Modifier")]
     public class LineMeshModifier : MeshModifier
     {
-        [SerializeField]
-        private float Width;
+		[SerializeField]
+		private float Width;
+        private float _scaledWidth;
         public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
-        public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
+		internal override void Initialize(WorldProperties wp)
+		{
+			base.Initialize(wp);
+			_scaledWidth = Width * wp.WorldRelativeScale;
+		}
+
+		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
         {
             if (feature.Points.Count < 1)
                 return;
@@ -51,7 +58,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
                     if (i == 1)
                     {
-                        norm = GetNormal(p1, p1, p2) * Width; //road width
+                        norm = GetNormal(p1, p1, p2) * _scaledWidth; //road width
                         newVerticeList[0] = (p1 + norm);
                         newVerticeList[count * 2 - 1] = (p1 - norm);
 						newNorms[0] = Constants.Math.Vector3Up;
@@ -61,7 +68,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                     }
                     var dist = Vector3.Distance(p1, p2);
                     lastUv += dist;
-                    norm = GetNormal(p1, p2, p3) * Width;
+                    norm = GetNormal(p1, p2, p3) * _scaledWidth;
                     newVerticeList[i] = (p2 + norm);
                     newVerticeList[2 * count - 1 - i] = (p2 - norm);
 					newNorms[i] = Constants.Math.Vector3Up;

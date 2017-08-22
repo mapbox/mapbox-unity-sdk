@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Unity.MeshGeneration.Factories
+namespace Mapbox.Unity.MeshGeneration.Factories
 {
 	using System.Collections.Generic;
 	using UnityEngine;
@@ -6,19 +6,17 @@
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.MeshGeneration.Interfaces;
 	using Mapbox.Map;
-	using System;
+	using Mapbox.Platform;
 
 	/// <summary>
 	/// Uses vector tile api to visualize vector data.
 	/// Fetches the vector data for given tile and passes layer data to layer visualizers.
 	/// </summary>
-	[Obsolete("MeshFactory is obsolete. Please use VectorTileFactory.")]
-	[CreateAssetMenu(menuName = "Mapbox/Factories/Mesh Factory - Obsolete (Use VectorTileFactory)")]
+	[CreateAssetMenu(menuName = "Mapbox/Factories/Mesh Factory")]
 	public class MeshFactory : AbstractTileFactory
 	{
 		[SerializeField]
 		private string _mapId = "";
-
 		public List<LayerVisualizerBase> Visualizers;
 
 		private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;
@@ -32,23 +30,31 @@
 			}
 		}
 
-		/// <summary>
-		/// Sets up the Mesh Factory
-		/// </summary>
-		/// <param name="fs"></param>
-		internal override void OnInitialized()
+		internal override void PreInitialize(WorldProperties wp)
 		{
-			Debug.LogWarning("MeshFactory is <color=red>obsolete</color>. Please use VectorTileFactory.");
-			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
-			foreach (LayerVisualizerBase factory in Visualizers)
+			base.PreInitialize(wp);
+			foreach (LayerVisualizerBase layerviz in Visualizers)
 			{
-				if (_layerBuilder.ContainsKey(factory.Key))
+				layerviz.PreInitialize(wp);
+			}
+		}
+
+
+		internal override void Initialize(WorldProperties wp, IFileSource fileSource)
+		{
+			base.Initialize(wp, fileSource);
+
+			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
+			foreach (LayerVisualizerBase layerviz in Visualizers)
+			{
+				layerviz.Initialize(wp);
+				if (_layerBuilder.ContainsKey(layerviz.Key))
 				{
-					_layerBuilder[factory.Key].Add(factory);
+					_layerBuilder[layerviz.Key].Add(layerviz);
 				}
 				else
 				{
-					_layerBuilder.Add(factory.Key, new List<LayerVisualizerBase>() { factory });
+					_layerBuilder.Add(layerviz.Key, new List<LayerVisualizerBase>() { layerviz });
 				}
 			}
 		}

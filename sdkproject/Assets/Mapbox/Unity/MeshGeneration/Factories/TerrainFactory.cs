@@ -6,6 +6,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	using Mapbox.Unity.MeshGeneration.Enums;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Utils;
+	using Mapbox.Platform;
 
 	public enum MapIdType
 	{
@@ -57,7 +58,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		private List<int> _newTriangleList;
 		private Vector3 _newDir;
 		private int _vertA, _vertB, _vertC;
-
+		private float _worldScale = 1;
 		/// <summary>
 		/// Clears the mesh data and re-runs the terrain creation procedure using current settings. Clearing the old mesh data is important as terrain stitching function checks if the data exists or not.
 		/// </summary>
@@ -75,8 +76,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		//    }
 		//}
 
-		internal override void OnInitialized()
+		internal override void Initialize(WorldProperties wp, IFileSource fileSource)
 		{
+			base.Initialize(wp, fileSource);
+
+			_worldScale = wp.WorldRelativeScale;
 			_meshData = new Dictionary<UnwrappedTileId, Mesh>();
 			_currentTileMeshData = new MeshData();
 			_stitchTargetMeshData = new MeshData();
@@ -134,7 +138,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					_newVertexList.Add(new Vector3(
 						(float)(xx - tile.Rect.Center.x),
 						0,
-						(float)(yy - tile.Rect.Center.y)));
+						(float)(yy - tile.Rect.Center.y)) * _worldScale);
 					_newNormalList.Add(Unity.Constants.Math.Vector3Up);
 					_newUvList.Add(new Vector2(x * 1f / (_sampleCount - 1), 1 - (y * 1f / (_sampleCount - 1))));
 				}
@@ -231,7 +235,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				{
 					_currentTileMeshData.Vertices[(int)(y * _sampleCount + x)] = new Vector3(
 						_currentTileMeshData.Vertices[(int)(y * _sampleCount + x)].x,
-						tile.QueryHeightData(x / (_sampleCount - 1), 1 - y / (_sampleCount - 1)),
+						tile.QueryHeightData(x / (_sampleCount - 1), 1 - y / (_sampleCount - 1)) * _worldScale,
 						_currentTileMeshData.Vertices[(int)(y * _sampleCount + x)].z);
 					_currentTileMeshData.Normals[(int)(y * _sampleCount + x)] = Unity.Constants.Math.Vector3Zero;
 				}

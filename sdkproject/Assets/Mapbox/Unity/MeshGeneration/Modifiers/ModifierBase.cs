@@ -6,5 +6,16 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     {
         [SerializeField]
         public bool Active = true;
-    }
+
+		protected WorldProperties _worldProperties;
+
+		internal virtual void PreInitialize(WorldProperties wp)
+		{
+		}
+
+		internal virtual void Initialize(WorldProperties wp)
+		{
+			_worldProperties = wp;
+		}
+	}
 }

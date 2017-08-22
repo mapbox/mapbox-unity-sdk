@@ -36,12 +36,11 @@
 
 		public event Action<AbstractTileFactory> OnFactoryStateChanged = delegate { };
 
-        public void Initialize(IFileSource fileSource)
+		internal virtual void Initialize(WorldProperties wp, IFileSource fileSource)
         {
 			_progress = 0;
 			_fileSource = fileSource;
             State = ModuleState.Initialized;
-            OnInitialized();
         }
 
         public void Register(UnityTile tile)
@@ -54,9 +53,12 @@
             OnUnregistered(tile);
         }
 
-        internal abstract void OnInitialized();
+		internal virtual void PreInitialize(WorldProperties wp)
+		{
+			
+		}
 
-        internal abstract void OnRegistered(UnityTile tile);
+		internal abstract void OnRegistered(UnityTile tile);
 
         internal abstract void OnUnregistered(UnityTile tile);
     }

@@ -3,6 +3,7 @@
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.Utilities;
+	using Mapbox.Platform;
 
 	[CreateAssetMenu(menuName = "Mapbox/Factories/Terrain Factory - Flat")]
 	public class FlatTerrainFactory : AbstractTileFactory
@@ -18,12 +19,13 @@
 
 		[SerializeField]
 		private int _layerId = 0;
-
+		private float _worldScale = 1;
 		Mesh _cachedQuad;
 
-		internal override void OnInitialized()
+		internal override void Initialize(WorldProperties wp, IFileSource fileSource)
 		{
-			
+			base.Initialize(wp, fileSource);
+			_worldScale = wp.WorldRelativeScale;
 		}
 
 		internal override void OnRegistered(UnityTile tile)
@@ -75,10 +77,10 @@
 			var unityMesh = new Mesh();
 			var verts = new Vector3[4];
 
-			verts[0] = ((tile.Rect.Min - tile.Rect.Center).ToVector3xz());
-			verts[2] = (new Vector3((float)(tile.Rect.Min.x - tile.Rect.Center.x), 0, (float)(tile.Rect.Max.y - tile.Rect.Center.y)));
-			verts[1] = (new Vector3((float)(tile.Rect.Max.x - tile.Rect.Center.x), 0, (float)(tile.Rect.Min.y - tile.Rect.Center.y)));
-			verts[3] = ((tile.Rect.Max - tile.Rect.Center).ToVector3xz());
+			verts[0] = ((tile.Rect.Min - tile.Rect.Center).ToVector3xz() * _worldScale);
+			verts[2] = (new Vector3((float)(tile.Rect.Min.x - tile.Rect.Center.x), 0, (float)(tile.Rect.Max.y - tile.Rect.Center.y)) * _worldScale);
+			verts[1] = (new Vector3((float)(tile.Rect.Max.x - tile.Rect.Center.x), 0, (float)(tile.Rect.Min.y - tile.Rect.Center.y)) * _worldScale);
+			verts[3] = ((tile.Rect.Max - tile.Rect.Center).ToVector3xz() * _worldScale);
 
 			unityMesh.vertices = verts;
 			var trilist = new int[6] { 0, 1, 2, 1, 3, 2 };

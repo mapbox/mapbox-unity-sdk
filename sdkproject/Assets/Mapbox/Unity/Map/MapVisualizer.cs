@@ -15,7 +15,7 @@ namespace Mapbox.Unity.MeshGeneration
 		Working,
 		Finished
 	}
-
+	
 	[CreateAssetMenu(menuName = "Mapbox/MapVisualizer")]
 	public class MapVisualizer : ScriptableObject
 	{
@@ -56,9 +56,15 @@ namespace Mapbox.Unity.MeshGeneration
 			_inactiveTiles = new Queue<UnityTile>();
 			State = ModuleState.Initialized;
 
+			var wp = new WorldProperties();
+			wp.WorldRelativeScale = map.WorldRelativeScale;
 			foreach (var factory in _factories)
 			{
-				factory.Initialize(fileSource);
+				factory.PreInitialize(wp);
+			}
+			foreach (var factory in _factories)
+			{
+				factory.Initialize(wp, fileSource);
 				factory.OnFactoryStateChanged += UpdateState;
 			}
 		}

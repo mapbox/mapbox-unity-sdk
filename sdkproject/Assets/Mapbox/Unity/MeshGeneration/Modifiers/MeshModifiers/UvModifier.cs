@@ -12,17 +12,21 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     public class UvModifier : MeshModifier
     {
         public override ModifierType Type { get { return ModifierType.Preprocess; } }
-        public bool UseSatelliteRoof = false;
 
-        public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
+		internal override void Initialize(WorldProperties wp)
+		{
+			base.Initialize(wp);
+		}
+
+		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
         {
             var uv = new List<Vector2>();
             foreach (var c in md.Vertices)
             {
-                if (UseSatelliteRoof)
+                if (_worldProperties.UseSatelliteImageryForRoofs)
                 {
-                    var fromBottomLeft = new Vector2((float)((c.x + md.TileRect.Size.x / 2) / md.TileRect.Size.x),
-                        (float)((c.z + md.TileRect.Size.x / 2) / md.TileRect.Size.x));
+                    var fromBottomLeft = new Vector2((float)(((c.x/_worldProperties.WorldRelativeScale) + md.TileRect.Size.x / 2) / md.TileRect.Size.x),
+                        (float)(((c.z / _worldProperties.WorldRelativeScale) + md.TileRect.Size.x / 2) / md.TileRect.Size.x));
                     uv.Add(fromBottomLeft);
                 }
                 else

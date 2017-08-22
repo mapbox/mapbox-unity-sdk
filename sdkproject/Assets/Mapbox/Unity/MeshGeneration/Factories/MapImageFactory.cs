@@ -48,12 +48,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		//        Run(tile);
 		//    }
 		//}
-
-		internal override void OnInitialized()
-		{
-
-		}
-
+		
 		internal override void OnRegistered(UnityTile tile)
 		{
 			if (_mapIdType == MapImageType.None)

@@ -6,6 +6,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	using Mapbox.Unity.MeshGeneration.Enums;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Utils;
+	using Mapbox.Platform;
 
 	/// <summary>
 	/// Uses Mapbox Terrain api and creates terrain meshes.
@@ -51,8 +52,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		private Vector3 _newDir;
 		private int _vertA, _vertB, _vertC;
 
-		internal override void OnInitialized()
+		internal override void Initialize(WorldProperties wp, IFileSource fileSource)
 		{
+			base.Initialize(wp, fileSource);
+		
 			_meshData = new Dictionary<UnwrappedTileId, Mesh>();
 			_currentTileMeshData = new MeshData();
 			_stitchTargetMeshData = new MeshData();
