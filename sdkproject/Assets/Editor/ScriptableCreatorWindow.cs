@@ -51,15 +51,6 @@ namespace Mapbox.NodeEditor
 			window._type = type;
 			window._finalize = p;
 			window.position = new Rect(500, 200, width, height);
-			//window._assets 
-			var list = AssetDatabase.FindAssets("t:" + type.Name);
-			window._assets = new List<ScriptableObject>();
-			foreach (var item in list)
-			{
-				var ne = AssetDatabase.GUIDToAssetPath(item);
-				var asset = AssetDatabase.LoadAssetAtPath(ne, type) as ScriptableObject;
-				window._assets.Add(asset);
-			}
 			window._assets = window._assets.OrderBy(x => x.GetType().Name).ToList();
 			window._showElement = new bool[window._assets.Count()];
 			window._act = act;
@@ -71,6 +62,18 @@ namespace Mapbox.NodeEditor
 		
 		void OnGUI()
 		{
+			if(_assets.Count == 0)
+			{
+				var list = AssetDatabase.FindAssets("t:" + _type.Name);
+				_assets = new List<ScriptableObject>();
+				foreach (var item in list)
+				{
+					var ne = AssetDatabase.GUIDToAssetPath(item);
+					var asset = AssetDatabase.LoadAssetAtPath(ne, _type) as ScriptableObject;
+					_assets.Add(asset);
+				}
+			}
+
 			var st = new GUIStyle();
 			st.padding = new RectOffset(15, 15, 15, 15);
 			scrollPos = EditorGUILayout.BeginScrollView(scrollPos, st);

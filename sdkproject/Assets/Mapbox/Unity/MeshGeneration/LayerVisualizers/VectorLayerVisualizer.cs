@@ -48,13 +48,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		[NodeEditorElementAttribute("Default Stack")]
 		public ModifierStackBase _defaultStack;
 		[SerializeField]
-		public List<TypeVisualizerTuple> Stacks;
-
-		[SerializeField]
 		[NodeEditorElementAttribute("Custom Stacks")]
-		public List<ModifierStackBase> _stackValues { get { return Stacks.Select(x => x.Stack).ToList(); } }
-		public List<string> _stackKeys { get { return Stacks.Select(x => x.Type).ToList(); } }
-
+		public List<TypeVisualizerTuple> Stacks;
+		
 		private GameObject _container;
 
 		/// <summary>

@@ -115,17 +115,16 @@ namespace Mapbox.NodeEditor
 				{
 					var ind = i;
 					EditorGUILayout.BeginHorizontal();
-
-					if (_layerVis._stackValues[i] != null)
+					if (_layerVis.Stacks != null)
 					{
-						var nname = EditorGUILayout.TextField(_layerVis._stackKeys[i], GUILayout.MaxWidth(100));
+						var nname = EditorGUILayout.TextField(_layerVis.Stacks[i].Type, GUILayout.MaxWidth(100));
 						facs.GetArrayElementAtIndex(ind).FindPropertyRelative("Type").stringValue = nname;
 					}
 
 					EditorGUILayout.BeginVertical();
 					GUILayout.Space(5);
 					GUI.enabled = false;
-					EditorGUILayout.ObjectField(_layerVis._stackValues[i], typeof(ModifierStackBase));
+					EditorGUILayout.ObjectField(_layerVis.Stacks[i].Stack, typeof(ModifierStackBase));
 					GUI.enabled = true;
 					EditorGUILayout.EndVertical();
 

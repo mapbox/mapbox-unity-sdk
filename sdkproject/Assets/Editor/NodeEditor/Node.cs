@@ -88,7 +88,7 @@ namespace NodeEditorNamespace
 			_inbuff = (string.IsNullOrEmpty(inPoint.inLabel) ? 0 : 100);
 			spaceRect = new Rect(position.x + _inbuff, position.y, width, boxHeight);
 			rect = new Rect(position.x + _inbuff, position.y, width, boxHeight);
-			buttonRect = new Rect(rect.xMax - 25, rect.yMin + 10, 20, 20);		
+			buttonRect = new Rect(rect.xMax - 25, rect.yMin + 10, 20, 20);
 
 			_propTopTest = 0;
 			if (_expanded)
@@ -285,6 +285,24 @@ namespace NodeEditorNamespace
 							_propCount++;
 						}
 					}
+					else 
+					{
+						var val = fi.GetValue(obj);
+						if (val is List<TypeVisualizerTuple>)
+						{
+							foreach (TypeVisualizerTuple listitem in val as IEnumerable)
+							{
+								var name = (fi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
+								var cc = new ConnectionPoint(this, "", listitem.Type, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
+								ConnectionPoints.Add(cc);
+								_propCount++;
+								var newNode = new Node(listitem.Stack);
+								Children.Add(newNode);
+								newNode.Connections.Add(new Connection(newNode.inPoint, cc));
+								newNode.Dive(listitem, showModifiers, depth + 1);
+							}
+						}
+					}
 				}
 			}
 
@@ -296,7 +314,7 @@ namespace NodeEditorNamespace
 					var val = pi.GetValue(obj, null) as ScriptableObject;
 					if (val != null)
 					{
-						
+
 						var name = (pi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
 						var conp = new ConnectionPoint(this, "", name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
 						ConnectionPoints.Add(conp);
@@ -316,7 +334,7 @@ namespace NodeEditorNamespace
 					if (typeof(ScriptableObject).IsAssignableFrom(type.GetGenericArguments()[0]))
 					{
 						var val = pi.GetValue(obj, null);
-						
+
 						var name = (pi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
 						var conp = new ConnectionPoint(this, "", name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
 						ConnectionPoints.Add(conp);
