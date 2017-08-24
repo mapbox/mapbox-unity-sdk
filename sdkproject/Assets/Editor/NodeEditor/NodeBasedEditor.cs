@@ -32,6 +32,7 @@ namespace NodeEditorNamespace
 		public static GUIStyle selectedNodeStyle;
 		public static GUIStyle inPointStyle;
 		public static GUIStyle outPointStyle;
+		public static Texture2D magnifierTexture;
 		private GUIStyle _optionLabel;
 
 		private ConnectionPoint selectedInPoint;
@@ -56,6 +57,7 @@ namespace NodeEditorNamespace
 		private void OnEnable()
 		{
 			GUIScaleUtility.CheckInit();
+			magnifierTexture = EditorGUIUtility.FindTexture("d_ViewToolZoom");
 			var textOffset = new RectOffset(12, 0, 10, 0);
 
 			nodeStyle = new GUIStyle();

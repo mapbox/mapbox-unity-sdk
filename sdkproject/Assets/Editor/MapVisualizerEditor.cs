@@ -4,6 +4,7 @@ using UnityEditor;
 using System.ComponentModel;
 using Mapbox.Unity.MeshGeneration;
 using Mapbox.Unity.MeshGeneration.Factories;
+using NodeEditorNamespace;
 
 namespace Mapbox.NodeEditor
 {
@@ -31,15 +32,18 @@ namespace Mapbox.NodeEditor
 			{
 				var ind = i;
 				EditorGUILayout.BeginHorizontal();
+				EditorGUILayout.BeginVertical();
+				GUILayout.Space(5);
 				GUI.enabled = false;
 				facs.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(i).objectReferenceValue, typeof(AbstractTileFactory)) as ScriptableObject;
 				GUI.enabled = true;
+				EditorGUILayout.EndVertical();
 
-				if (GUILayout.Button(new GUIContent("E"), GUILayout.Width(20)))
+				if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
 				{
 					Mapbox.NodeEditor.ScriptableCreatorWindow.Open(typeof(AbstractTileFactory), facs, ind);
 				}
-				if (GUILayout.Button(new GUIContent("-"), GUILayout.Width(20)))
+				if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30), GUILayout.Height(22)))
 				{
 					facs.DeleteArrayElementAtIndex(ind);
 				}

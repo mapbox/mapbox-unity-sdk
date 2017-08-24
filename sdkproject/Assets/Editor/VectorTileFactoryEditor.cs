@@ -5,6 +5,7 @@ using System.ComponentModel;
 using Mapbox.Unity.MeshGeneration;
 using Mapbox.Unity.MeshGeneration.Factories;
 using Mapbox.Unity.MeshGeneration.Interfaces;
+using NodeEditorNamespace;
 
 namespace Mapbox.NodeEditor
 {
@@ -34,7 +35,11 @@ namespace Mapbox.NodeEditor
 			{
 				var ind = i;
 				EditorGUILayout.BeginHorizontal();
+
+				EditorGUILayout.BeginVertical();
+				GUILayout.Space(5);
 				GUI.enabled = false;
+				EditorGUILayout.BeginHorizontal();
 				if (_factory.Visualizers[i] != null)
 				{
 					_factory.Visualizers[i].Key = EditorGUILayout.TextField(_factory.Visualizers[i].Key, GUILayout.MaxWidth(100));
@@ -44,13 +49,15 @@ namespace Mapbox.NodeEditor
 					EditorGUILayout.TextField("null");
 				else
 					EditorGUILayout.ObjectField(_factory.Visualizers[i], typeof(LayerVisualizerBase));
+				EditorGUILayout.EndHorizontal();
 				GUI.enabled = true;
+				EditorGUILayout.EndVertical();
 
-				if (GUILayout.Button(new GUIContent("E"), GUILayout.Width(20)))
+				if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
 				{
 					Mapbox.NodeEditor.ScriptableCreatorWindow.Open(typeof(LayerVisualizerBase), facs, ind);
 				}
-				if (GUILayout.Button(new GUIContent("-"), GUILayout.Width(20)))
+				if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30), GUILayout.Height(22)))
 				{
 					facs.DeleteArrayElementAtIndex(ind);
 				}

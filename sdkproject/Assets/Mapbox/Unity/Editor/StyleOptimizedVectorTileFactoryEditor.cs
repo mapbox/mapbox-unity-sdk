@@ -4,6 +4,7 @@
 	using UnityEditor;
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Unity.MeshGeneration.Interfaces;
+	using NodeEditorNamespace;
 
 	[CustomEditor(typeof(StyleOptimizedVectorTileFactory))]
 	public class StyleOptimizedVectorTileFactoryEditor : FactoryEditor
@@ -58,37 +59,45 @@
 
 			EditorGUILayout.Space();
 			EditorGUILayout.Space();
-			EditorGUILayout.LabelField("Layer Visualizers");
 
-			EditorGUILayout.Space();
-			EditorGUILayout.BeginHorizontal();
-			EditorGUILayout.LabelField("Key");
 			EditorGUILayout.LabelField("Visualizers");
-			EditorGUILayout.EndHorizontal();
-
-			if (_factory.Visualizers != null)
+			var facs = serializedObject.FindProperty("Visualizers");
+			for (int i = 0; i < facs.arraySize; i++)
 			{
-				for (int i = 0; i < _factory.Visualizers.Count; i++)
+				var ind = i;
+				EditorGUILayout.BeginHorizontal();
+
+				EditorGUILayout.BeginVertical();
+				GUILayout.Space(5);
+				GUI.enabled = false;
+				EditorGUILayout.BeginHorizontal();
+				if (_factory.Visualizers[i] != null)
 				{
-					EditorGUILayout.BeginHorizontal();
-					if (_factory.Visualizers[i] != null)
-					{
-						_factory.Visualizers[i].Key = EditorGUILayout.TextField(_factory.Visualizers[i].Key, GUILayout.MaxWidth(100));
-					}
-					_factory.Visualizers[i] = (LayerVisualizerBase)EditorGUILayout.ObjectField(_factory.Visualizers[i], typeof(LayerVisualizerBase), false);
-
-					if (GUILayout.Button("-", GUILayout.MaxWidth(20)))
-					{
-						_visualizerList.DeleteArrayElementAtIndex(i);
-					}
-
-					EditorGUILayout.EndHorizontal();
+					_factory.Visualizers[i].Key = EditorGUILayout.TextField(_factory.Visualizers[i].Key, GUILayout.MaxWidth(100));
 				}
+				//facs.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(i).objectReferenceValue, typeof(LayerVisualizerBase)) as ScriptableObject;
+				if (_factory.Visualizers[i] == null)
+					EditorGUILayout.TextField("null");
+				else
+					EditorGUILayout.ObjectField(_factory.Visualizers[i], typeof(LayerVisualizerBase));
+				EditorGUILayout.EndHorizontal();
+				GUI.enabled = true;
+				EditorGUILayout.EndVertical();
+
+				if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
+				{
+					Mapbox.NodeEditor.ScriptableCreatorWindow.Open(typeof(LayerVisualizerBase), facs, ind);
+				}
+				if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30), GUILayout.Height(22)))
+				{
+					facs.DeleteArrayElementAtIndex(ind);
+				}
+				EditorGUILayout.EndHorizontal();
 			}
 
-			if (GUILayout.Button("Add New Visualizer"))
+			if (GUILayout.Button(new GUIContent("Add New")))
 			{
-				_factory.Visualizers.Add(null);
+				Mapbox.NodeEditor.ScriptableCreatorWindow.Open(typeof(LayerVisualizerBase), facs);
 			}
 			EditorUtility.SetDirty(_factory);
 			serializedObject.ApplyModifiedProperties();

@@ -33,7 +33,6 @@ namespace Mapbox.NodeEditor
 		void OnEnable()
 		{
 			EditorApplication.playmodeStateChanged += OnModeChanged;
-
 		}
 
 		void OnDisable()
@@ -125,15 +124,15 @@ namespace Mapbox.NodeEditor
 			}
 			EditorGUILayout.EndScrollView();
 
-			if (GUILayout.Button(new GUIContent("Create New Factory")))
-			{
-				//var fac = CreateInstance<Unity.MeshGeneration.Factories.TerrainFactory>();
-				var fac = CreateAsset<Unity.MeshGeneration.Factories.TerrainFactory>();
-				_finalize.arraySize++;
-				_finalize.GetArrayElementAtIndex(_finalize.arraySize - 1).objectReferenceValue = fac;
-				_finalize.serializedObject.ApplyModifiedProperties();
-				this.Close();
-			}
+			//if (GUILayout.Button(new GUIContent("Create New Factory")))
+			//{
+			//	//var fac = CreateInstance<Unity.MeshGeneration.Factories.TerrainFactory>();
+			//	var fac = CreateAsset<Unity.MeshGeneration.Factories.TerrainFactory>();
+			//	_finalize.arraySize++;
+			//	_finalize.GetArrayElementAtIndex(_finalize.arraySize - 1).objectReferenceValue = fac;
+			//	_finalize.serializedObject.ApplyModifiedProperties();
+			//	this.Close();
+			//}
 		}
 
 		public static T CreateAsset<T>() where T : ScriptableObject

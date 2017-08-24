@@ -7,6 +7,7 @@ using Mapbox.Unity.MeshGeneration.Factories;
 using Mapbox.Unity.MeshGeneration.Interfaces;
 using Mapbox.Unity.MeshGeneration.Modifiers;
 using Mapbox.Unity.MeshGeneration.Filters;
+using NodeEditorNamespace;
 
 namespace Mapbox.NodeEditor
 {
@@ -48,15 +49,18 @@ namespace Mapbox.NodeEditor
 					var ind = i;
 					EditorGUILayout.BeginHorizontal();
 
+					EditorGUILayout.BeginVertical();
+					GUILayout.Space(5);
 					GUI.enabled = false;
 					EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(ind).objectReferenceValue, typeof(FilterBase));
 					GUI.enabled = true;
+					EditorGUILayout.EndVertical();
 
-					if (GUILayout.Button(new GUIContent("E"), GUILayout.Width(20)))
+					if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
 					{
 						ScriptableCreatorWindow.Open(typeof(FilterBase), facs, ind);
 					}
-					if (GUILayout.Button(new GUIContent("-"), GUILayout.Width(20)))
+					if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30), GUILayout.Height(22)))
 					{
 						facs.DeleteArrayElementAtIndex(ind);
 					}
@@ -77,11 +81,14 @@ namespace Mapbox.NodeEditor
 				{
 					EditorGUILayout.BeginHorizontal();
 
+					EditorGUILayout.BeginVertical();
+					GUILayout.Space(5);
 					GUI.enabled = false;
 					EditorGUILayout.ObjectField(_layerVis._defaultStack, typeof(ModifierStackBase));
 					GUI.enabled = true;
+					EditorGUILayout.EndVertical();
 
-					if (GUILayout.Button(new GUIContent("E"), GUILayout.Width(20)))
+					if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
 					{
 						ScriptableCreatorWindow.Open(typeof(ModifierStackBase), null, 0, (asset) =>
 						{
@@ -89,7 +96,7 @@ namespace Mapbox.NodeEditor
 							serializedObject.ApplyModifiedProperties();
 						});
 					}
-					if (GUILayout.Button(new GUIContent("-"), GUILayout.Width(20)))
+					if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30), GUILayout.Height(22)))
 					{
 						def.objectReferenceValue = null;
 						serializedObject.ApplyModifiedProperties();
@@ -114,11 +121,15 @@ namespace Mapbox.NodeEditor
 						var nname = EditorGUILayout.TextField(_layerVis._stackKeys[i], GUILayout.MaxWidth(100));
 						facs.GetArrayElementAtIndex(ind).FindPropertyRelative("Type").stringValue = nname;
 					}
+
+					EditorGUILayout.BeginVertical();
+					GUILayout.Space(5);
 					GUI.enabled = false;
 					EditorGUILayout.ObjectField(_layerVis._stackValues[i], typeof(ModifierStackBase));
 					GUI.enabled = true;
+					EditorGUILayout.EndVertical();
 
-					if (GUILayout.Button(new GUIContent("E"), GUILayout.Width(20)))
+					if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
 					{
 						ScriptableCreatorWindow.Open(typeof(ModifierStackBase), facs, ind, (asset) =>
 						{
@@ -128,7 +139,7 @@ namespace Mapbox.NodeEditor
 							serializedObject.ApplyModifiedProperties();
 						});
 					}
-					if (GUILayout.Button(new GUIContent("-"), GUILayout.Width(20)))
+					if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30), GUILayout.Height(22)))
 					{
 						facs.DeleteArrayElementAtIndex(ind);
 					}
