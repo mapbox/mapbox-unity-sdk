@@ -135,21 +135,16 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			meshData.TileRect = tile.Rect;
 
 			//and finally, running the modifier stack on the feature
-			if(Stacks.Count == 0 && _defaultStack != null)
-				_defaultStack.Execute(tile, feature, meshData, parent, _key);
-
-			foreach (var item in Stacks)
+			var mod = Stacks.FirstOrDefault(x => x.Type.Contains(styleSelectorKey));
+			if (mod != null)
 			{
-				if(item.Type.Contains(styleSelectorKey))	
+				mod.Stack.Execute(tile, feature, meshData, parent, mod.Type);
+			}
+			else
+			{
+				if (_defaultStack != null)
 				{
-					item.Stack.Execute(tile, feature, meshData, parent, item.Type);
-				}
-				else
-				{
-					if (_defaultStack != null)
-					{
-						_defaultStack.Execute(tile, feature, meshData, parent, _key);
-					}
+					_defaultStack.Execute(tile, feature, meshData, parent, _key);
 				}
 			}
 		}

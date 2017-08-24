@@ -9,10 +9,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 25f09effe9db3dd4e9e825475d698ca3, type: 3}
-  m_Name: DriveSevereTrafficStack
+  m_Name: RedLineStack
   m_EditorClassIdentifier: 
+  _moveFeaturePositionTo: 0
   MeshModifiers:
-  - {fileID: 11400000, guid: 74130d5fe0c76d04baa5b1a97cb22a13, type: 2}
-  - {fileID: 11400000, guid: 7e0980e53b7b14a408467fc4386ed49f, type: 2}
+  - {fileID: 11400000, guid: 7c518d85eb2ed0440ac158307895eec4, type: 2}
+  - {fileID: 11400000, guid: 746927ff22b0c5247bc7d3e1c9b928d7, type: 2}
   GoModifiers:
   - {fileID: 11400000, guid: a5462f8181ab6604cb245bf6fbb4fec4, type: 2}

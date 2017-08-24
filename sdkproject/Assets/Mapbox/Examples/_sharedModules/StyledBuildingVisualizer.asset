@@ -18,7 +18,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e91169d62cb08f546aad375d626c1d51, type: 2}
   _defaultStack: {fileID: 11400000, guid: eb06f9324c5364f48a98112dcafcd891, type: 2}
   Stacks:
-  - Type: bank,apartment
+  - Type: residential
+    Stack: {fileID: 11400000, guid: 70166653a5881394c9dc697c1014376e, type: 2}
+  - Type: commercial
     Stack: {fileID: 11400000, guid: d234d20d9d280f84cb21cb7d8cac3cab, type: 2}
-  - Type: residential,church
-    Stack: {fileID: 11400000, guid: 8c7bd733341fc0a47bfbaea08b5f15ba, type: 2}

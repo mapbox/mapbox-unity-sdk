@@ -14,7 +14,7 @@ MonoBehaviour:
   _baseMaterial: {fileID: 0}
   _mapIdType: 0
   _customMapId: mapbox.terrain-rgb
-  _mapId: 
+  _mapId: mapbox.terrain-rgb
   _heightModifier: 1
   _sampleCount: 40
   _addCollider: 0

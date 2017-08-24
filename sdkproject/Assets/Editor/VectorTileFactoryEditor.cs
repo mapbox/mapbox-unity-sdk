@@ -53,7 +53,6 @@ namespace Mapbox.NodeEditor
 				if (GUILayout.Button(new GUIContent("-"), GUILayout.Width(20)))
 				{
 					facs.DeleteArrayElementAtIndex(ind);
-					facs.DeleteArrayElementAtIndex(ind);
 				}
 				EditorGUILayout.EndHorizontal();
 			}

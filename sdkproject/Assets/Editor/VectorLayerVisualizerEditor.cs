@@ -47,7 +47,7 @@ namespace Mapbox.NodeEditor
 				{
 					var ind = i;
 					EditorGUILayout.BeginHorizontal();
-					
+
 					GUI.enabled = false;
 					EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(ind).objectReferenceValue, typeof(FilterBase));
 					GUI.enabled = true;
@@ -137,7 +137,10 @@ namespace Mapbox.NodeEditor
 
 				if (GUILayout.Button(new GUIContent("Add New")))
 				{
-					ScriptableCreatorWindow.Open(typeof(ModifierStackBase), facs);
+					ScriptableCreatorWindow.Open(typeof(ModifierStackBase), facs, 0, (asset) =>
+					{
+						_layerVis.Stacks.Add(new TypeVisualizerTuple() { Stack = (ModifierStackBase)asset });
+					});
 				}
 			}
 
