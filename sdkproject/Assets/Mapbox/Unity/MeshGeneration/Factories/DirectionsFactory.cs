@@ -71,7 +71,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			foreach (MeshModifier mod in MeshModifiers.Where(x => x.Active))
 			{
-				mod.Run(feat, meshData);
+				mod.Run(feat, meshData, _map.WorldRelativeScale);
 			}
 
 			CreateGameObject(meshData);

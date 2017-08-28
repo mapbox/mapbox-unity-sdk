@@ -100,6 +100,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
+		public float TileScale { get; internal set; }
+
 		public TilePropertyState RasterDataState;
 		public TilePropertyState HeightDataState;
 		public TilePropertyState VectorDataState;
@@ -108,14 +110,15 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public event Action<UnityTile> OnRasterDataChanged = delegate { };
 		public event Action<UnityTile> OnVectorDataChanged = delegate { };
 
-		internal void Initialize(IMap map, UnwrappedTileId tileId)
+		internal void Initialize(IMap map, UnwrappedTileId tileId, float scale)
 		{
+			TileScale = scale;
 			_relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
 			_rect = Conversions.TileBounds(tileId);
 			_unwrappedTileId = tileId;
 			_canonicalTileId = tileId.Canonical;
 			gameObject.name = _canonicalTileId.ToString();
-			var position = new Vector3((float)(_rect.Center.x - map.CenterMercator.x), 0, (float)(_rect.Center.y - map.CenterMercator.y));
+			var position = new Vector3((float)(_rect.Center.x - map.CenterMercator.x) * TileScale, 0, (float)(_rect.Center.y - map.CenterMercator.y) * TileScale);
 			transform.localPosition = position;
 			gameObject.SetActive(true);
 		}
@@ -191,7 +194,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			{
 				var intX = (int)Mathf.Clamp(x * 256, 0, 255);
 				var intY = (int)Mathf.Clamp(y * 256, 0, 255);
-				return _heightData[intY * 256 + intX];
+				return _heightData[intY * 256 + intX] * TileScale;
 			}
 
 			return 0;
