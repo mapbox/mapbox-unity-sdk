@@ -22,13 +22,7 @@ namespace Mapbox.NodeEditor
 		int activeIndex = 0;
 
 		GUIStyle headerFoldout = new GUIStyle("Foldout");
-		GUIStyle header = new GUIStyle("ShurikenModuleTitle")
-		{
-			font = (new GUIStyle("Label")).font,
-			border = new RectOffset(15, 7, 4, 4),
-			fixedHeight = 22,
-			contentOffset = new Vector2(20f, -2f)
-		};
+		GUIStyle header;
 
 		void OnEnable()
 		{
@@ -51,18 +45,24 @@ namespace Mapbox.NodeEditor
 			window._type = type;
 			window._finalize = p;
 			window.position = new Rect(500, 200, width, height);
-			window._assets = window._assets.OrderBy(x => x.GetType().Name).ToList();
-			window._showElement = new bool[window._assets.Count()];
 			window._act = act;
 			if (index > -1)
 			{
 				window._index = index;
 			}
+
+			window.header = new GUIStyle("ShurikenModuleTitle")
+			{
+				font = (new GUIStyle("Label")).font,
+				border = new RectOffset(15, 7, 4, 4),
+				fixedHeight = 22,
+				contentOffset = new Vector2(20f, -2f)
+			};
 		}
-		
+
 		void OnGUI()
 		{
-			if(_assets.Count == 0)
+			if (_assets == null || _assets.Count == 0)
 			{
 				var list = AssetDatabase.FindAssets("t:" + _type.Name);
 				_assets = new List<ScriptableObject>();
@@ -73,6 +73,7 @@ namespace Mapbox.NodeEditor
 					_assets.Add(asset);
 				}
 			}
+
 
 			var st = new GUIStyle();
 			st.padding = new RectOffset(15, 15, 15, 15);
@@ -88,7 +89,7 @@ namespace Mapbox.NodeEditor
 					activeIndex = i;
 				if (GUILayout.Button(new GUIContent("Select"), header, GUILayout.Width(80)))
 				{
-					if(_act != null)
+					if (_act != null)
 					{
 						_act(asset);
 					}
@@ -106,7 +107,7 @@ namespace Mapbox.NodeEditor
 							_finalize.serializedObject.ApplyModifiedProperties();
 						}
 					}
-					
+
 					this.Close();
 				}
 
@@ -114,13 +115,13 @@ namespace Mapbox.NodeEditor
 				if (b)
 				{
 					EditorGUILayout.Space();
-					EditorGUI.indentLevel += 2;
+					EditorGUI.indentLevel += 4;
 					GUI.enabled = false;
 					var ed = UnityEditor.Editor.CreateEditor(asset);
 					ed.hideFlags = HideFlags.NotEditable;
 					ed.OnInspectorGUI();
 					GUI.enabled = true;
-					EditorGUI.indentLevel -= 2;
+					EditorGUI.indentLevel -= 4;
 					EditorGUILayout.Space();
 				}
 				EditorGUILayout.Space();

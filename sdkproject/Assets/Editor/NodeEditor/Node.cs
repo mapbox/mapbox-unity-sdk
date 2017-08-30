@@ -238,6 +238,9 @@ namespace NodeEditorNamespace
 
 		public void Dive(object obj, bool showModifiers = true, int depth = 0)
 		{
+			if (obj == null)
+				return;
+
 			_isRoot = depth == 0;
 			if (ScriptableObject is ModifierStackBase)
 				_expanded = showModifiers;

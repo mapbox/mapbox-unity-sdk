@@ -65,7 +65,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				_center = f;
 			}
 
-            foreach (MeshModifier mod in MeshModifiers.Where(x => x.Active))
+            foreach (MeshModifier mod in MeshModifiers.Where(x => x != null && x.Active))
             {
                 mod.Run(feature, meshData, tile);
             }

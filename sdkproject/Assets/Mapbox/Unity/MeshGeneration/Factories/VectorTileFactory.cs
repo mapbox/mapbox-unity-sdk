@@ -40,6 +40,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
 			foreach (LayerVisualizerBase factory in Visualizers)
 			{
+				if (factory == null)
+					continue;
+
 				if (_layerBuilder.ContainsKey(factory.Key))
 				{
 					_layerBuilder[factory.Key].Add(factory);

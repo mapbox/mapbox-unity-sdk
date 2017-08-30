@@ -130,7 +130,8 @@ namespace Mapbox.Unity.MeshGeneration
 
 			foreach (var factory in _factories)
 			{
-				factory.Register(unityTile);
+				if(factory != null)
+					factory.Register(unityTile);
 			}
 
 			Tiles.Add(tileId, unityTile);
