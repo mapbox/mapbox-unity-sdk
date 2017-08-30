@@ -23,10 +23,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			if (feature.Points.Count < 1)
 				return;
 
-			var _offset = 4;
-			var start = 0;
 			Vector3 v1, v2, n1, n2, pij1, pij2, pjk1, pjk2;
 			Vector3 poi, close1, close2;
+
+			if (feature.Points.Count > 1)
+				Debug.Log("here");
 
 			foreach (var roadSegment in feature.Points)
 			{
@@ -49,6 +50,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					{
 						prev = roadSegment[j - 1];
 					}
+
 					current = roadSegment[j];
 					next = current;
 					if (j + 1 < roadSegment.Count)
@@ -61,7 +63,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					}
 					if (j == 0)
 					{
-						prev = (current - next) + current;
+						prev = (current - next) + current + new Vector3(1, 0, 1);
 					}
 
 					foreach (Transform tr in Slice.transform)
