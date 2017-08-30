@@ -1,12 +1,12 @@
-﻿namespace Mapbox.Unity.UnitTest
+﻿namespace Mapbox.Editor.Tests
 {
-	using Mapbox.Unity.Editor;
 	using NUnit.Framework;
 	using System;
 	using System.Collections.Generic;
 	using System.IO;
 	using System.Linq;
 	using UnityEngine;
+	using Mapbox.Editor.Build;
 
 	[TestFixture]
 	internal class AndroidLibraries

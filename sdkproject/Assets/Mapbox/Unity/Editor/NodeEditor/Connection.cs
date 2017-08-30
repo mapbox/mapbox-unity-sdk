@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace NodeEditorNamespace
+namespace Mapbox.Editor.NodeEditor
 {
 	public class Connection
 	{

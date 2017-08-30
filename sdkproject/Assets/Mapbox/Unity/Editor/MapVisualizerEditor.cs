@@ -1,13 +1,11 @@
-﻿using UnityEngine;
-using System.Collections;
-using UnityEditor;
-using System.ComponentModel;
-using Mapbox.Unity.MeshGeneration;
-using Mapbox.Unity.MeshGeneration.Factories;
-using NodeEditorNamespace;
-
-namespace Mapbox.NodeEditor
+﻿namespace Mapbox.Editor
 {
+	using UnityEngine;
+	using UnityEditor;
+	using Mapbox.Unity.MeshGeneration;
+	using Mapbox.Unity.MeshGeneration.Factories;
+	using Mapbox.Editor.NodeEditor;
+
 	[CustomEditor(typeof(MapVisualizer))]
 	public class MapVisualizerEditor : UnityEditor.Editor
 	{
@@ -41,7 +39,7 @@ namespace Mapbox.NodeEditor
 
 				if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
 				{
-					Mapbox.NodeEditor.ScriptableCreatorWindow.Open(typeof(AbstractTileFactory), facs, ind);
+					ScriptableCreatorWindow.Open(typeof(AbstractTileFactory), facs, ind);
 				}
 				if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30), GUILayout.Height(22)))
 				{
@@ -52,7 +50,7 @@ namespace Mapbox.NodeEditor
 
 			if (GUILayout.Button(new GUIContent("Add New")))
 			{
-				Mapbox.NodeEditor.ScriptableCreatorWindow.Open(typeof(AbstractTileFactory), facs);
+				ScriptableCreatorWindow.Open(typeof(AbstractTileFactory), facs);
 			}
 
 			serializedObject.ApplyModifiedProperties();

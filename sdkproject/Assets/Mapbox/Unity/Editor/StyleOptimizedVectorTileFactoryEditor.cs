@@ -1,10 +1,10 @@
-﻿namespace Mapbox.Editor
+namespace Mapbox.Editor
 {
 	using UnityEngine;
 	using UnityEditor;
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Unity.MeshGeneration.Interfaces;
-	using NodeEditorNamespace;
+	using Mapbox.Editor.NodeEditor;
 
 	[CustomEditor(typeof(StyleOptimizedVectorTileFactory))]
 	public class StyleOptimizedVectorTileFactoryEditor : FactoryEditor
@@ -86,7 +86,7 @@
 
 				if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
 				{
-					Mapbox.NodeEditor.ScriptableCreatorWindow.Open(typeof(LayerVisualizerBase), facs, ind);
+					ScriptableCreatorWindow.Open(typeof(LayerVisualizerBase), facs, ind);
 				}
 				if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30), GUILayout.Height(22)))
 				{
@@ -97,7 +97,7 @@
 
 			if (GUILayout.Button(new GUIContent("Add New")))
 			{
-				Mapbox.NodeEditor.ScriptableCreatorWindow.Open(typeof(LayerVisualizerBase), facs);
+				ScriptableCreatorWindow.Open(typeof(LayerVisualizerBase), facs);
 			}
 			EditorUtility.SetDirty(_factory);
 			serializedObject.ApplyModifiedProperties();

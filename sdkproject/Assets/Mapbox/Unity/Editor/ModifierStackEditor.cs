@@ -1,19 +1,14 @@
-﻿using UnityEngine;
-using System.Collections;
-using UnityEditor;
-using System.ComponentModel;
-using Mapbox.Unity.MeshGeneration;
-using Mapbox.Unity.MeshGeneration.Factories;
-using Mapbox.Unity.MeshGeneration.Interfaces;
-using Mapbox.Unity.MeshGeneration.Modifiers;
-using NodeEditorNamespace;
-
-namespace Mapbox.NodeEditor
+﻿namespace Mapbox.Editor
 {
+	using UnityEngine;
+	using UnityEditor;
+	using Mapbox.Editor.NodeEditor;
+	using Mapbox.Unity.MeshGeneration.Modifiers;
+
 	[CustomEditor(typeof(ModifierStack))]
 	public class ModifierStackEditor : UnityEditor.Editor
 	{
-		
+
 		private MonoScript script;
 		private SerializedProperty _positionType;
 		private void OnEnable()
@@ -48,7 +43,7 @@ namespace Mapbox.NodeEditor
 				EditorGUILayout.EndVertical();
 				if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
 				{
-					Mapbox.NodeEditor.ScriptableCreatorWindow.Open(typeof(MeshModifier), facs, ind);
+					ScriptableCreatorWindow.Open(typeof(MeshModifier), facs, ind);
 				}
 				if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30), GUILayout.Height(22)))
 				{
@@ -59,7 +54,7 @@ namespace Mapbox.NodeEditor
 
 			if (GUILayout.Button(new GUIContent("Add New")))
 			{
-				Mapbox.NodeEditor.ScriptableCreatorWindow.Open(typeof(MeshModifier), facs);
+				ScriptableCreatorWindow.Open(typeof(MeshModifier), facs);
 			}
 
 			EditorGUILayout.Space();
@@ -78,7 +73,7 @@ namespace Mapbox.NodeEditor
 
 				if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
 				{
-					Mapbox.NodeEditor.ScriptableCreatorWindow.Open(typeof(GameObjectModifier), facs2, ind);
+					ScriptableCreatorWindow.Open(typeof(GameObjectModifier), facs2, ind);
 				}
 				if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30), GUILayout.Height(22)))
 				{
@@ -89,7 +84,7 @@ namespace Mapbox.NodeEditor
 
 			if (GUILayout.Button(new GUIContent("Add New")))
 			{
-				Mapbox.NodeEditor.ScriptableCreatorWindow.Open(typeof(GameObjectModifier), facs2);
+				ScriptableCreatorWindow.Open(typeof(GameObjectModifier), facs2);
 			}
 
 			serializedObject.ApplyModifiedProperties();

@@ -7,7 +7,7 @@ using System;
 using System.Linq;
 using System.Collections;
 
-namespace NodeEditorNamespace
+namespace Mapbox.Editor.NodeEditor
 {
 	public class NodeBasedEditor : EditorWindow
 	{

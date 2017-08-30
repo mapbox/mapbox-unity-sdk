@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Unity.Editor
+﻿namespace Mapbox.Editor.Build
 {
 	using System;
 	using System.IO;

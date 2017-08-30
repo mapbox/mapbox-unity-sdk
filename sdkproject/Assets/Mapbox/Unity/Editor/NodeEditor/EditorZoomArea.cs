@@ -1,10 +1,10 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
 using System.Reflection;
 
-namespace NodeEditorNamespace
+namespace Mapbox.Editor.NodeEditor
 {
 	public static class GUIScaleUtility
 	{

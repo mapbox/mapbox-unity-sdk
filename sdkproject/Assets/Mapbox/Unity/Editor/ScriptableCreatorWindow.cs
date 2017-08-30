@@ -1,13 +1,10 @@
-﻿using UnityEngine;
-using UnityEditor;
-using System.Collections.Generic;
-using Mapbox.Geocoding;
-using Mapbox.Unity;
-using System;
-using System.Linq;
-
-namespace Mapbox.NodeEditor
+﻿namespace Mapbox.Editor
 {
+	using UnityEngine;
+	using UnityEditor;
+	using System.Collections.Generic;
+	using System;
+
 	public class ScriptableCreatorWindow : EditorWindow
 	{
 		Type _type;

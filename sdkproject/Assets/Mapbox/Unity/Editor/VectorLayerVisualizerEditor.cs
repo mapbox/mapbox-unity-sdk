@@ -1,16 +1,12 @@
-﻿using UnityEngine;
-using System.Collections;
-using UnityEditor;
-using System.ComponentModel;
-using Mapbox.Unity.MeshGeneration;
-using Mapbox.Unity.MeshGeneration.Factories;
-using Mapbox.Unity.MeshGeneration.Interfaces;
-using Mapbox.Unity.MeshGeneration.Modifiers;
-using Mapbox.Unity.MeshGeneration.Filters;
-using NodeEditorNamespace;
-
-namespace Mapbox.NodeEditor
+﻿namespace Mapbox.Editor
 {
+	using UnityEngine;
+	using UnityEditor;
+	using Mapbox.Unity.MeshGeneration.Interfaces;
+	using Mapbox.Unity.MeshGeneration.Modifiers;
+	using Mapbox.Unity.MeshGeneration.Filters;
+	using Mapbox.Editor.NodeEditor;
+
 	[CustomEditor(typeof(VectorLayerVisualizer))]
 	public class VectorLayerVisualizerEditor : UnityEditor.Editor
 	{

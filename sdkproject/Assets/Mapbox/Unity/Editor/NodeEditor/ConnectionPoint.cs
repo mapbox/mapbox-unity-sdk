@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace NodeEditorNamespace
+namespace Mapbox.Editor.NodeEditor
 {
 	public enum ConnectionPointType { In, Out }
 

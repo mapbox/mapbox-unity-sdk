@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEditor;
 using UnityEngine;
 using System.Text.RegularExpressions;
@@ -9,7 +9,7 @@ using Mapbox.Unity.MeshGeneration.Modifiers;
 using System.Linq;
 using Mapbox.Unity.MeshGeneration.Interfaces;
 
-namespace NodeEditorNamespace
+namespace Mapbox.Editor.NodeEditor
 {
 	public class Node
 	{

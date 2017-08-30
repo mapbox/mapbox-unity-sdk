@@ -5,7 +5,7 @@
 //using System;
 //using Mapbox.Unity.MeshGeneration;
 
-//namespace Mapbox.NodeEditor
+//namespace Mapbox.Editor.NodeEditor
 //{
 //	[CustomPropertyDrawer(typeof(AssignmentTypeAttribute))]
 //	public class TypeAttributeDrawer : PropertyDrawer

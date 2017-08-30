@@ -1,32 +1,33 @@
-﻿using UnityEngine;
-using System.Collections;
-using UnityEditor;
-using Mapbox.Unity.MeshGeneration.Factories;
-using Mapbox.Unity.MeshGeneration.Modifiers;
-
-[CustomEditor(typeof(LayerModifier))]
-public class LayerModifierEditor : Editor
+﻿namespace Mapbox.Editor
 {
-    public SerializedProperty layerId_Prop;
-    private MonoScript script;
+	using UnityEngine;
+	using UnityEditor;
+	using Mapbox.Unity.MeshGeneration.Modifiers;
 
-    void OnEnable()
-    {
-        layerId_Prop = serializedObject.FindProperty("_layerId");
+	[CustomEditor(typeof(LayerModifier))]
+	public class LayerModifierEditor : Editor
+	{
+		public SerializedProperty layerId_Prop;
+		private MonoScript script;
 
-        script = MonoScript.FromScriptableObject((LayerModifier)target);
-    }
+		void OnEnable()
+		{
+			layerId_Prop = serializedObject.FindProperty("_layerId");
 
-    public override void OnInspectorGUI()
-    {
-        serializedObject.Update();
+			script = MonoScript.FromScriptableObject((LayerModifier)target);
+		}
 
-        GUI.enabled = false;
-        script = EditorGUILayout.ObjectField("Script", script, typeof(MonoScript), false) as MonoScript;
-        GUI.enabled = true;
+		public override void OnInspectorGUI()
+		{
+			serializedObject.Update();
 
-        layerId_Prop.intValue = EditorGUILayout.LayerField("Layer", layerId_Prop.intValue);
+			GUI.enabled = false;
+			script = EditorGUILayout.ObjectField("Script", script, typeof(MonoScript), false) as MonoScript;
+			GUI.enabled = true;
 
-        serializedObject.ApplyModifiedProperties();
-    }
+			layerId_Prop.intValue = EditorGUILayout.LayerField("Layer", layerId_Prop.intValue);
+
+			serializedObject.ApplyModifiedProperties();
+		}
+	}
 }
