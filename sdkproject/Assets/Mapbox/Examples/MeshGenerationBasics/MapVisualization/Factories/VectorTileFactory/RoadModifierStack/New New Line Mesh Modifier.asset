@@ -13,4 +13,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Active: 1
   Width: 0
-  Slice: {fileID: 1000012010722042, guid: 0ad4994aed5501c43a5b09afda45617f, type: 2}
+  Slice: {fileID: 1000012010722042, guid: b624a32e9876b0e4f8b78bb7933d5162, type: 2}
+  _closeEdges: 1

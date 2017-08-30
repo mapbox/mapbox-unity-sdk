@@ -4,6 +4,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using System.Linq;
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Data;
+	using Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers;
 
 	/// <summary>
 	/// Line Mesh Modifier creates line polygons from a list of vertices. It offsets the original vertices to both sides using Width parameter and triangulates them manually.
@@ -17,6 +18,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private float Width;
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
 		public GameObject Slice;
+		public bool _closeEdges = false;
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
@@ -25,9 +27,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			Vector3 v1, v2, n1, n2, pij1, pij2, pjk1, pjk2;
 			Vector3 poi, close1, close2;
-
-			if (feature.Points.Count > 1)
-				Debug.Log("here");
 
 			foreach (var roadSegment in feature.Points)
 			{
@@ -39,6 +38,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				var vl = new List<Vector3>();
 				var tl = new List<int>();
 				var nl = new List<Vector3>();
+				var edges = new List<Vector3>();
 
 				for (int j = 0; j < count; j++)
 				{
@@ -59,15 +59,17 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					}
 					else
 					{
-						next = (current - prev) + current + new Vector3(1,0,1);
+						next = (current - prev) + current + new Vector3(1, 0, 1);
 					}
 					if (j == 0)
 					{
 						prev = (current - next) + current + new Vector3(1, 0, 1);
 					}
 
+					var counter = 0;
 					foreach (Transform tr in Slice.transform)
 					{
+						counter++;
 						v1 = new Vector3(current.x - next.x, 0, current.z - next.z);
 						v1.Normalize();
 						var a = Vector3.Angle(v1, Vector3.forward) * Mathf.Sign(Vector3.Dot(Vector3.right, v1));
@@ -95,14 +97,22 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 							//var re = GameObject.CreatePrimitive(PrimitiveType.Cube);
 							//re.transform.position = poi + new Vector3(0, tr.position.y, 0);
 							//re.transform.SetParent(tile.transform, false);
-							vl.Add(poi + new Vector3(0, tr.position.y, 0));
+							poi += new Vector3(0, tr.position.y, 0);
 						}
 						else
 						{
 							//var re = GameObject.CreatePrimitive(PrimitiveType.Cube);
 							//re.transform.position = pjk1 + new Vector3(0, tr.position.y, 0);
 							//re.transform.SetParent(tile.transform, false);
-							vl.Add(pjk1 + new Vector3(0, tr.position.y, 0));
+							poi = pjk1 + new Vector3(0, tr.position.y, 0);
+						}
+						vl.Add(poi);
+						if (counter == 1)
+						{
+							var re = GameObject.CreatePrimitive(PrimitiveType.Cube);
+							re.transform.position = poi;
+							re.transform.SetParent(tile.transform, false);
+							edges.Add(poi);
 						}
 					}
 				}
@@ -135,81 +145,20 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					md.Triangles[0].Add(co + 3);
 					md.Triangles[0].Add(co + 2);
 				}
+
+				if (_closeEdges && edges.Count > 2)
+				{
+					var flatData = EarcutLibrary.Flatten(new List<List<Vector3>>() { edges });
+					var result = EarcutLibrary.Earcut(flatData.Vertices, flatData.Holes, flatData.Dim);
+
+					md.Triangles.Add(result.Select(x => md.Vertices.Count + x).ToList());
+					for (int i = 0; i < edges.Count; i++)
+					{
+						md.Vertices.Add(edges[i]);
+						md.Normals.Add(Vector3.up);
+					}
+				}
 			}
-
-
-
-			//        foreach (var roadSegment in feature.Points)
-			//        {
-			//            var count = roadSegment.Count;
-			//            for (int i = 1; i < count*2; i++)
-			//            {
-			//                md.Edges.Add(md.Vertices.Count + i);
-			//                md.Edges.Add(md.Vertices.Count + i - 1);
-			//            }
-			//            md.Edges.Add(md.Vertices.Count);
-			//            md.Edges.Add(md.Vertices.Count + (count*2) - 1);
-
-			//            var newVerticeList = new Vector3[count * 2];
-			//var newNorms = new Vector3[count * 2];
-			//var uvList = new Vector2[count * 2];
-			//            Vector3 norm;
-			//            var lastUv = 0f;
-			//            var p1 = Constants.Math.Vector3Zero;
-			//            var p2 = Constants.Math.Vector3Zero;
-			//            var p3 = Constants.Math.Vector3Zero;
-			//            for (int i = 1; i < count; i++)
-			//            {
-			//                p1 = roadSegment[i - 1];
-			//                p2 = roadSegment[i];
-			//                p3 = p2;
-			//                if (i + 1 < roadSegment.Count)
-			//                    p3 = roadSegment[i + 1];
-
-			//                if (i == 1)
-			//                {
-			//                    norm = GetNormal(p1, p1, p2) * Width; //road width
-			//                    newVerticeList[0] = (p1 + norm);
-			//                    newVerticeList[count * 2 - 1] = (p1 - norm);
-			//		newNorms[0] = Constants.Math.Vector3Up;
-			//		newNorms[count * 2 - 1] = Constants.Math.Vector3Up;
-			//		uvList[0] = new Vector2(0, 0);
-			//                    uvList[count * 2 - 1] = new Vector2(1, 0);
-			//                }
-			//                var dist = Vector3.Distance(p1, p2);
-			//                lastUv += dist;
-			//                norm = GetNormal(p1, p2, p3) * Width;
-			//                newVerticeList[i] = (p2 + norm);
-			//                newVerticeList[2 * count - 1 - i] = (p2 - norm);
-			//	newNorms[i] = Constants.Math.Vector3Up;
-			//	newNorms[2 * count - 1 - i] = Constants.Math.Vector3Up;
-
-			//	uvList[i] = new Vector2(0, lastUv);
-			//                uvList[2 * count - 1 - i] = new Vector2(1, lastUv);
-			//            }
-
-			//            var pcount = md.Vertices.Count;
-			//            md.Vertices.AddRange(newVerticeList);
-			//md.Normals.AddRange(newNorms);
-			//            md.UV[0].AddRange(uvList);
-			//            var lineTri = new List<int>();
-			//            var n = count;
-
-			//            for (int i = 0; i < n - 1; i++)
-			//            {
-			//                lineTri.Add(pcount + i);
-			//                lineTri.Add(pcount + i + 1);
-			//                lineTri.Add(pcount + 2 * n - 1 - i);
-
-			//                lineTri.Add(pcount + i + 1);
-			//                lineTri.Add(pcount + 2 * n - i - 2);
-			//                lineTri.Add(pcount + 2 * n - i - 1);
-			//            }
-
-			//            if (md.Triangles.Count < 1)
-			//                md.Triangles.Add(new List<int>());
-			//            md.Triangles[0].AddRange(lineTri);
-			//        }            
 		}
 
 		private Vector3 GetNormal(Vector3 p1, Vector3 newPos, Vector3 p2)
