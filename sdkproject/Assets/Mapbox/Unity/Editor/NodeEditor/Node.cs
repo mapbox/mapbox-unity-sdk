@@ -302,7 +302,7 @@ namespace Mapbox.Editor.NodeEditor
 								var newNode = new Node(listitem.Stack);
 								Children.Add(newNode);
 								newNode.Connections.Add(new Connection(newNode.inPoint, cc));
-								newNode.Dive(listitem, showModifiers, depth + 1);
+								newNode.Dive(listitem.Stack, showModifiers, depth + 1);
 							}
 						}
 					}
