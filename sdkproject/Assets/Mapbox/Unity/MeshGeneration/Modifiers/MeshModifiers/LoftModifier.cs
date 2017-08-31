@@ -107,11 +107,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 							poi = pjk1 + new Vector3(0, tr.position.y, 0);
 						}
 						vl.Add(poi);
-						if (counter == 1)
+						if (counter == dotCount)
 						{
-							var re = GameObject.CreatePrimitive(PrimitiveType.Cube);
-							re.transform.position = poi;
-							re.transform.SetParent(tile.transform, false);
+							//var re = GameObject.CreatePrimitive(PrimitiveType.Cube);
+							//re.transform.position = poi;
+							//re.transform.SetParent(tile.transform, false);
 							edges.Add(poi);
 						}
 					}
@@ -138,20 +138,22 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					md.Normals.Add(norm);
 
 					md.Triangles[0].Add(co);
-					md.Triangles[0].Add(co + 1);
 					md.Triangles[0].Add(co + 2);
+					md.Triangles[0].Add(co + 1);
 
 					md.Triangles[0].Add(co + 1);
-					md.Triangles[0].Add(co + 3);
 					md.Triangles[0].Add(co + 2);
+					md.Triangles[0].Add(co + 3);
 				}
 
+				if (md.Triangles.Count < 2)
+					md.Triangles.Add(new List<int>());
 				if (_closeEdges && edges.Count > 2)
 				{
 					var flatData = EarcutLibrary.Flatten(new List<List<Vector3>>() { edges });
 					var result = EarcutLibrary.Earcut(flatData.Vertices, flatData.Holes, flatData.Dim);
 
-					md.Triangles.Add(result.Select(x => md.Vertices.Count + x).ToList());
+					md.Triangles[1].AddRange(result.Select(x => md.Vertices.Count + x).ToList());
 					for (int i = 0; i < edges.Count; i++)
 					{
 						md.Vertices.Add(edges[i]);
