@@ -17,7 +17,8 @@ namespace Mapbox.Unity.Utilities
 	public static class Conversions
 	{
 		private const int TileSize = 256;
-		private const int EarthRadius = 6378137;
+		/// <summary>according to https://wiki.openstreetmap.org/wiki/Zoom_levels</summary>
+		private const double EarthRadius = 6372798.2;
 		private const double InitialResolution = 2 * Math.PI * EarthRadius / TileSize;
 		private const double OriginShift = 2 * Math.PI * EarthRadius / 2;
 
@@ -210,8 +211,28 @@ namespace Mapbox.Unity.Utilities
 		{
 			var bb = TileIdToBounds(x, y, zoom);
 			var center = bb.Center;
-			return new Vector2d((float)center.x, (float)center.y);
+			return new Vector2d(center.x, center.y);
 		}
+
+
+		/// <summary>
+		/// Gets the Web Mercator x/y of the center of a tile.
+		/// </summary>
+		/// <param name="x"> Tile X position. </param>
+		/// <param name="y"> Tile Y position. </param>
+		/// <param name="zoom"> Zoom level. </param>
+		/// <returns>A <see cref="T:UnityEngine.Vector2d"/> of lat/lon coordinates.</returns>
+		public static Vector2d TileIdToCenterWebMercator(int x, int y, int zoom)
+		{
+			double tileCnt = Math.Pow(2, zoom);
+			double centerX = x + 0.5;
+			double centerY = y + 0.5;
+
+			centerX = ((centerX / tileCnt * 2) - 1) * Constants.WebMercMax;
+			centerY = (1 - (centerY / tileCnt * 2)) * Constants.WebMercMax;
+			return new Vector2d(centerX, centerY);
+		}
+
 
 		/// <summary>
 		/// Gets the meters per pixels at given latitude and zoom level for a 256x256 tile.
@@ -222,7 +243,7 @@ namespace Mapbox.Unity.Utilities
 		/// <returns> Meters per pixel. </returns>
 		public static float GetTileScaleInMeters(float latitude, int zoom)
 		{
-			return 40075000 * Mathf.Cos(Mathf.Deg2Rad * latitude) / Mathf.Pow(2f, zoom + 8);
+			return (float)(40075016.685578d * Math.Cos(Mathf.Deg2Rad * latitude) / Math.Pow(2f, zoom + 8));
 		}
 
 		/// <summary>
@@ -266,15 +287,15 @@ namespace Mapbox.Unity.Utilities
 		{
 			var res = Resolution(zoom);
 			var met = new Vector2d();
-			met.x = (float)(p.x * res - OriginShift);
-			met.y = (float)-(p.y * res - OriginShift);
+			met.x = (p.x * res - OriginShift);
+			met.y = -(p.y * res - OriginShift);
 			return met;
 		}
 
 		private static Vector2d MetersToPixels(Vector2d m, int zoom)
 		{
 			var res = Resolution(zoom);
-			var pix = new Vector2d((float)((m.x + OriginShift) / res), (float)((-m.y + OriginShift) / res));
+			var pix = new Vector2d(((m.x + OriginShift) / res), ((-m.y + OriginShift) / res));
 			return pix;
 		}
 

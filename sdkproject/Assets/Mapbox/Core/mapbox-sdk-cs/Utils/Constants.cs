@@ -19,5 +19,9 @@ namespace Mapbox.Utils
 
 		/// <summary> Mercator projection max longitude limit. </summary>
 		public const double LongitudeMax = 180;
+
+		/// <summary> Mercator projection max meters</summary>
+		public const double WebMercMax = 20037508.342789244;
+
 	}
 }
