@@ -17,6 +17,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField]
 		private string _mapId = "";
 
+		[NodeEditorElementAttribute("Layer Visalizers")]
 		public List<LayerVisualizerBase> Visualizers;
 
 		private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;
@@ -39,6 +40,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
 			foreach (LayerVisualizerBase factory in Visualizers)
 			{
+				if (factory == null)
+					continue;
+
 				if (_layerBuilder.ContainsKey(factory.Key))
 				{
 					_layerBuilder[factory.Key].Add(factory);

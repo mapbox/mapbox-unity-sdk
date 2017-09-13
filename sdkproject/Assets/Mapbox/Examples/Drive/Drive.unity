@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.4469263, g: 0.4967888, b: 0.575086, a: 1}
+  m_IndirectSpecularColor: {r: 0.4469263, g: 0.49678868, b: 0.5750857, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -388,8 +388,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _map: {fileID: 199863780}
   MeshModifiers:
-  - {fileID: 11400000, guid: 74130d5fe0c76d04baa5b1a97cb22a13, type: 2}
-  - {fileID: 11400000, guid: 7e0980e53b7b14a408467fc4386ed49f, type: 2}
+  - {fileID: 11400000, guid: 28a12454e9306cd4186ba618f5034965, type: 2}
+  - {fileID: 11400000, guid: 746927ff22b0c5247bc7d3e1c9b928d7, type: 2}
   _waypoints:
   - {fileID: 742361313}
   - {fileID: 726737290}
