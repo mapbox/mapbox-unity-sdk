@@ -38,7 +38,13 @@
 
 		protected override void Start()
 		{
+			Root.localScale = Vector3.one;
+
 			base.Start();
+
+			Root.localScale = Vector3.one;
+
+
 
 			CenterWebMerc = Conversions.GeoToWorldPosition(CenterLatitudeLongitude, new Vector2d(0, 0));
 			CenterWebMerc = Conversions.LatLonToMeters(CenterLatitudeLongitude);

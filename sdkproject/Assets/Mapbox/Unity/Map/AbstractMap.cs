@@ -12,7 +12,7 @@
 	{
 		[Geocode]
 		[SerializeField]
-		string _latitudeLongitudeString;
+		internal string _latitudeLongitudeString;
 
 		[SerializeField]
 		[Range(0, 22)]
