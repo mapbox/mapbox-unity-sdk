@@ -16,6 +16,8 @@
 	public class DynamicZoomMapVisualizer : AbstractMapVisualizer
 	{
 
+		[SerializeField]
+		private Material _loadingIndicator;
 
 
 		/// <summary>
@@ -34,6 +36,7 @@
 			if (unityTile == null)
 			{
 				unityTile = new GameObject().AddComponent<UnityTile>();
+				unityTile.LoadingIndicatorMaterial = _loadingIndicator;
 				unityTile.transform.SetParent(_map.Root, false);
 				if (null == unityTile.MeshRenderer)
 				{
@@ -47,10 +50,12 @@
 			DynamicZoomMap map = _map as DynamicZoomMap;
 			//HACK: switch COORDINATES - there's a bug somewhere with switched x<->y
 			Vector2d centerWebMercDUMMY = new Vector2d(map.CenterWebMerc.y, map.CenterWebMerc.x);
+			//get the tile covering the center (Unity 0,0,0) of current extent
 			UnwrappedTileId centerTile = TileCover.WebMercatorToTileId(centerWebMercDUMMY, _map.Zoom);
+			//get center WebMerc corrdinates of tile covering the center (Unity 0,0,0)
 			Vector2d centerTileCenter = Conversions.TileIdToCenterWebMercator(centerTile.X, centerTile.Y, _map.Zoom);
+			//calculate distance between WebMerc center coordinates of center tile and WebMerc coordinates exactly at center
 			Vector2d shift = map.CenterWebMerc - centerTileCenter;
-			//float factor = Conversions.GetTileScaleInMeters((float)map.CenterLatitudeLongitude.x, map.Zoom) * 256 / ((DynamicZoomMap)_map).UnityTileSize;
 			int unityTileSize = map.UnityTileSize;
 			// get factor at equator to avoid shifting errors at higher latitudes
 			float factor = Conversions.GetTileScaleInMeters(0f, _map.Zoom) * 256 / unityTileSize;
@@ -67,7 +72,6 @@
 			);
 
 
-			//unityTile.Initialize(_map, tileId, 1f / factor/*, position*/);
 			unityTile.Initialize(_map, tileId);
 			unityTile.transform.localPosition = position;
 			unityTile.transform.localScale = unityTileScale;

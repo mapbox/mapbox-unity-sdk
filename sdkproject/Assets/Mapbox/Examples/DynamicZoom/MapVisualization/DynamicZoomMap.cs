@@ -65,6 +65,7 @@
 
 		private void Update()
 		{
+			//Update coordinates to show current center in the inspector
 			_webMerc = CenterWebMerc.ToString();
 			CenterLatitudeLongitude = Conversions.MetersToLatLon(CenterWebMerc);
 		}

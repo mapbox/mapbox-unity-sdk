@@ -14,7 +14,7 @@
 	public class DynamicZoomTileProvider : AbstractTileProvider
 	{
 
-		//[HideInInspector]
+		[HideInInspector]
 		public Camera _referenceCamera;
 
 
@@ -26,8 +26,10 @@
 		private Vector2dBounds _viewPortWebMercBounds;
 		/// <summary>min of y range camera is allowed to move in</summary>
 		private int _cameraZoomingRangeMinY;
+		public int CameraZoomingRangeMinY { get { return _cameraZoomingRangeMinY; } }
 		/// <summary>max of y range camera is allowed to move in</summary>
 		private int _cameraZoomingRangeMaxY;
+	public int CameraZoomingRangeMaxY { get { return _cameraZoomingRangeMaxY; } }
 
 		private Plane _groundPlane;
 		private DynamicZoomMap _dynamicZoomMap;
@@ -50,15 +52,6 @@
 			_cameraZoomingRangeMaxY = (int)(_dynamicZoomMap.UnityTileSize * 2.5f);
 			_cameraZoomingRangeMinY = (int)(_dynamicZoomMap.UnityTileSize * 1.25f);
 
-			//TODO: would probably be better suited to live in CameraMovement.cs
-			//put camera into the middle of the allowed y movement range
-			Vector3 localPosition = _referenceCamera.transform.position;
-			localPosition.x = 0;
-			localPosition.y = (_cameraZoomingRangeMaxY + _cameraZoomingRangeMinY) / 2;
-			localPosition.z = 0;
-			_referenceCamera.transform.localPosition = localPosition;
-			_referenceCamera.transform.rotation = new Quaternion(0.7f, 0, 0, 0.7f);
-
 		}
 
 		void Update()
@@ -77,7 +70,7 @@
 				&& !bboxChanged
 			)
 			{
-				Debug.Log("nothing's changed");
+				//Debug.Log("nothing's changed");
 				return;
 			}
 			//if (bboxChanged) { Debug.LogFormat("bbox changed: {0} vs. {1}", _viewPortLatLngBounds, currentViewPortLatLngBnds); }
@@ -89,14 +82,14 @@
 			//!!!BEWARE!!!: don't compare Vector2d via '==' use 'Equals()'
 			if (!_previousWebMercCenter.Equals(_dynamicZoomMap.CenterWebMerc))
 			{
-				Debug.Log("_previousWebMercCenter != _dynamicZoomMap.CenterWebMerc");
+				//Debug.Log("_previousWebMercCenter != _dynamicZoomMap.CenterWebMerc");
 				_previousWebMercCenter = _dynamicZoomMap.CenterWebMerc;
 				var remove = _activeTiles.ToList();
 				foreach (var r in remove) { RemoveTile(r); }
 			}
 			else
 			{
-				Debug.Log("center is the same");
+				//Debug.Log("center is the same");
 			}
 
 
@@ -131,14 +124,14 @@
 			_viewPortWebMercBounds = getcurrentViewPortWebMerc();
 
 			var tilesNeeded = TileCover.GetWithWebMerc(_viewPortWebMercBounds, _dynamicZoomMap.Zoom);
-			string msg = string.Format("{0}.{1}: adding {2} tiles", _className, new System.Diagnostics.StackFrame().GetMethod().Name, tilesNeeded.Count) + Environment.NewLine;
-			msg += string.Join(Environment.NewLine, tilesNeeded.Select(t => t.Canonical.ToString()).ToArray());
-			Debug.LogFormat(msg);
+			//string msg = string.Format("{0}.{1}: adding {2} tiles", _className, new System.Diagnostics.StackFrame().GetMethod().Name, tilesNeeded.Count) + Environment.NewLine;
+			//msg += string.Join(Environment.NewLine, tilesNeeded.Select(t => t.Canonical.ToString()).ToArray());
+			//Debug.LogFormat(msg);
 
 			List<UnwrappedTileId> toRemove = _activeTiles.Except(tilesNeeded).ToList();
 			foreach (var t2r in toRemove) { RemoveTile(t2r); }
 			var finalTilesNeeded = tilesNeeded.Except(_activeTiles);
-			Debug.LogFormat("final tiles needed: {0}", finalTilesNeeded.Count());
+			//Debug.LogFormat("final tiles needed: {0}", finalTilesNeeded.Count());
 			foreach (var tile in finalTilesNeeded)
 			{
 				AddTile(tile);

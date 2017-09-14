@@ -100,6 +100,10 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
+
+		public Material LoadingIndicatorMaterial;
+		public Material _cachedMaterial;
+
 		public TilePropertyState RasterDataState;
 		public TilePropertyState HeightDataState;
 		public TilePropertyState VectorDataState;
@@ -117,13 +121,15 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			gameObject.name = _canonicalTileId.ToString();
 			var position = new Vector3((float)(_rect.Center.x - map.CenterMercator.x), 0, (float)(_rect.Center.y - map.CenterMercator.y));
 			transform.localPosition = position;
+			_cachedMaterial = MeshRenderer.material;
 			gameObject.SetActive(true);
 		}
 
 		internal void Recycle()
 		{
 			// TODO: to hide potential visual artifacts, use placeholder mesh / texture?
-			MeshRenderer.enabled = false;
+			//MeshRenderer.enabled = false;
+			MeshRenderer.material = LoadingIndicatorMaterial;
 			gameObject.SetActive(false);
 
 			// Reset internal state.
@@ -199,6 +205,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void SetRasterData(byte[] data, bool useMipMap, bool useCompression)
 		{
+			MeshRenderer.material = _cachedMaterial;
 			// Don't leak the texture, just reuse it.
 			if (_rasterData == null)
 			{
@@ -214,6 +221,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				_rasterData.Compress(false);
 			}
 
+			MeshRenderer.material.mainTexture = _rasterData;
 			MeshRenderer.enabled = true;
 			RasterDataState = TilePropertyState.Loaded;
 			OnRasterDataChanged(this);

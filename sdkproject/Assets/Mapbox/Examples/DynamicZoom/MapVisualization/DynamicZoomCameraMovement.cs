@@ -10,9 +10,11 @@
 	{
 
 		[SerializeField]
+		[HideInInspector]
 		public float _zoomSpeed = 50f;
 
 		[SerializeField]
+		[HideInInspector]
 		public Camera _referenceCamera;
 
 		[HideInInspector]
@@ -30,12 +32,19 @@
 				if (null == _referenceCamera) { Debug.LogErrorFormat("{0}: reference camera not set", this.GetType().Name); }
 			}
 
+			if (null == Map) { Debug.LogErrorFormat("{0}: map==null", this.GetType().Name); }
 
-			transform.localPosition.Set(
-				transform.localPosition.x
-				, _referenceCamera.farClipPlane
-				, transform.localPosition.z
-			);
+			DynamicZoomTileProvider dzTileProvider = Map._tileProvider as DynamicZoomTileProvider;
+			//put camera into the middle of the allowed y movement range
+			Vector3 localPosition = _referenceCamera.transform.position;
+			localPosition.x = 0;
+			localPosition.y = (dzTileProvider.CameraZoomingRangeMaxY + dzTileProvider.CameraZoomingRangeMinY) / 2;
+			localPosition.z = 0;
+			_referenceCamera.transform.localPosition = localPosition;
+			_referenceCamera.transform.rotation = new Quaternion(0.7f, 0, 0, 0.7f);
+
+			//link zoomspeed to tilesize
+			_zoomSpeed = Map._unityTileSize / 2f;
 		}
 
 
@@ -46,7 +55,7 @@
 			if (null == Map) { return; }
 
 
-			//development short cut: reset center to 0/0 with right click
+			//development short cut: reset center to 0/0 via right click
 			if (Input.GetMouseButton(1))
 			{
 				Map.CenterWebMerc.x = Map.CenterWebMerc.y = 0;

@@ -18,6 +18,6 @@ MonoBehaviour:
     Modified: 
     UserName: 
   _mapId: mapbox://styles/mapbox/satellite-v9
-  _useCompression: 1
-  _useMipMap: 0
+  _useCompression: 0
+  _useMipMap: 1
   _useRetina: 0

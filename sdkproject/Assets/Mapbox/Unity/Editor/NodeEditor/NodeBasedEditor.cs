@@ -104,9 +104,8 @@ namespace Mapbox.Editor.NodeEditor
 				if (abstractMap.MapVisualizer != null)
 				{
 					var map = abstractMap.MapVisualizer;
-					var mapSo = map as ScriptableObject;
 					var mapNode = new Node(map as ScriptableObject);
-					mapNode.title = mapSo.name;
+					mapNode.title = map.name;
 					mapNode.subtitle = "Map Visualizer";
 					_maps.Add(mapNode);
 					mapNode.Dive(map, showModifiers);
