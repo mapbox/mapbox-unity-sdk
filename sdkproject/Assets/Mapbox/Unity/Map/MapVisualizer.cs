@@ -28,15 +28,25 @@ namespace Mapbox.Unity.MeshGeneration
 	}
 
 	[CreateAssetMenu(menuName = "Mapbox/MapVisualizer")]
-	public class MapVisualizer : ScriptableObject
+	public class MapVisualizer : ScriptableObject, IMapVisualizer
 	{
 		[SerializeField]
 		[NodeEditorElementAttribute("Factories")]
-		public List<AbstractTileFactory> _factories;
+		private List<AbstractTileFactory> _factories;
+		public List<AbstractTileFactory> Factories { get { return _factories; } }
 
-		IMap _map;
-		public Dictionary<UnwrappedTileId, UnityTile> Tiles;
-		Queue<UnityTile> _inactiveTiles;
+		private IMap _map;
+		public IMap Map { get { return _map; } }
+
+
+		private Dictionary<UnwrappedTileId, UnityTile> _tiles;
+		public Dictionary<UnwrappedTileId, UnityTile> Tiles { get { return _tiles; } }
+
+
+		private Queue<UnityTile> _inactiveTiles;
+		public Queue<UnityTile> InactiveTiles { get { return _inactiveTiles; } }
+
+
 
 		private ModuleState _state;
 		public ModuleState State
@@ -64,7 +74,7 @@ namespace Mapbox.Unity.MeshGeneration
 		public void Initialize(IMap map, IFileSource fileSource)
 		{
 			_map = map;
-			Tiles = new Dictionary<UnwrappedTileId, UnityTile>();
+			_tiles = new Dictionary<UnwrappedTileId, UnityTile>();
 			_inactiveTiles = new Queue<UnityTile>();
 			State = ModuleState.Initialized;
 
@@ -98,7 +108,7 @@ namespace Mapbox.Unity.MeshGeneration
 			}
 		}
 
-		internal void Destroy()
+		public void Destroy()
 		{
 			for (int i = 0; i < _factories.Count; i++)
 			{
@@ -130,21 +140,21 @@ namespace Mapbox.Unity.MeshGeneration
 
 			foreach (var factory in _factories)
 			{
-				if(factory != null)
+				if (factory != null)
 					factory.Register(unityTile);
 			}
 
-			Tiles.Add(tileId, unityTile);
+			_tiles.Add(tileId, unityTile);
 
 			return unityTile;
 		}
 
 		public void DisposeTile(UnwrappedTileId tileId)
 		{
-			var unityTile = Tiles[tileId];
+			var unityTile = _tiles[tileId];
 
 			unityTile.Recycle();
-			Tiles.Remove(tileId);
+			_tiles.Remove(tileId);
 			_inactiveTiles.Enqueue(unityTile);
 
 			foreach (var factory in _factories)

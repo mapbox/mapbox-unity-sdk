@@ -9,6 +9,7 @@ namespace Mapbox.Map
 	using System;
 	using System.Collections.Generic;
 	using Mapbox.Utils;
+	using UnityEngine;
 
 	/// <summary>
 	///     Helper funtions to get a tile cover, i.e. a set of tiles needed for
@@ -72,6 +73,45 @@ namespace Mapbox.Map
 			return tiles;
 		}
 
+
+		public static HashSet<UnwrappedTileId> GetWithWebMerc(Vector2dBounds bounds, int zoom)
+		{
+			HashSet<UnwrappedTileId> tiles = new HashSet<UnwrappedTileId>();
+			HashSet<CanonicalTileId> canonicalTiles = new HashSet<CanonicalTileId>();
+
+			if (bounds.IsEmpty()) { return tiles; }
+
+			//stay within WebMerc bounds
+			Vector2d swWebMerc = new Vector2d(Math.Max(bounds.SouthWest.x, -Constants.WebMercMax), Math.Max(bounds.SouthWest.y, -Constants.WebMercMax));
+			Vector2d neWebMerc = new Vector2d(Math.Min(bounds.NorthEast.x, Constants.WebMercMax), Math.Min(bounds.NorthEast.y, Constants.WebMercMax));
+
+			//UnityEngine.Debug.LogFormat("swWebMerc:{0}/{1} neWebMerc:{2}/{3}", swWebMerc.x, swWebMerc.y, neWebMerc.x, neWebMerc.y);
+
+			UnwrappedTileId swTile = WebMercatorToTileId(new Vector2d(swWebMerc.y, swWebMerc.x), zoom);
+			UnwrappedTileId neTile = WebMercatorToTileId(new Vector2d(neWebMerc.y, neWebMerc.x), zoom);
+
+			//UnityEngine.Debug.LogFormat("swTile:{0} neTile:{1}", swTile, neTile);
+
+			for (int x = swTile.X; x <= neTile.X; x++)
+			{
+				for (int y = neTile.Y; y <= swTile.Y; y++)
+				{
+					UnwrappedTileId uwtid = new UnwrappedTileId(zoom, x, y);
+					//hack: currently too many tiles are created at lower zoom levels
+					//investigate formulas, this worked before
+					if (!canonicalTiles.Contains(uwtid.Canonical))
+					{
+						//Debug.LogFormat("TileCover.GetWithWebMerc: {0}/{1}/{2}", zoom, x, y);
+						tiles.Add(uwtid);
+						canonicalTiles.Add(uwtid.Canonical);
+					}
+				}
+			}
+
+			return tiles;
+		}
+
+
 		/// <summary> Converts a coordinate to a tile identifier. </summary>
 		/// <param name="coord"> Geographic coordinate. </param>
 		/// <param name="zoom"> Zoom level. </param>
@@ -95,5 +135,40 @@ namespace Mapbox.Map
 
 			return new UnwrappedTileId(zoom, x, y);
 		}
+
+
+
+		/// <summary>
+		///  Converts a Web Mercator coordinate to a tile identifier. https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Derivation_of_tile_names
+		/// </summary>
+		/// <param name="webMerc">Web Mercator coordinate</param>
+		/// <param name="zoom">Zoom level</param>
+		/// <returns>The to tile identifier.</returns>
+		public static UnwrappedTileId WebMercatorToTileId(Vector2d webMerc, int zoom)
+		{
+			// See:  https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Derivation_of_tile_names
+			double tileCount = Math.Pow(2, zoom);
+
+			//this SDK defines Vector2d.x as latitude and Vector2d.y as longitude
+			//same for WebMerc, so we have to flip x/y to make this formula work
+			double dblX = webMerc.y / Constants.WebMercMax;
+			double dblY = webMerc.x / Constants.WebMercMax;
+
+			//dblX = 1 + dblX;
+			//dblY = 1 - dblY;
+			//dblX /= 2;
+			//dblY /= 2;
+			//dblX *= tileCount;
+			//dblY *= tileCount;
+			//int x = (int)Math.Floor(dblX);
+			//int y = (int)Math.Floor(dblY);
+			//return new UnwrappedTileId(zoom, x, y);
+
+			int x = (int)Math.Floor((1 + dblX) / 2 * tileCount);
+			int y = (int)Math.Floor((1 - dblY) / 2 * tileCount);
+			return new UnwrappedTileId(zoom, x, y);
+		}
+
+
 	}
 }
