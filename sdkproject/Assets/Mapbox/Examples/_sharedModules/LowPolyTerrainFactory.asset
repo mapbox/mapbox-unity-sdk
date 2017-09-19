@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ffef98732ebca048a22c90f6809321c, type: 3}
   m_Name: LowPolyTerrainFactory
   m_EditorClassIdentifier: 
-  _baseMaterial: {fileID: 2100000, guid: ec9cd9779b83801458ba75b800bdd8a9, type: 2}
+  _baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
   _mapIdType: 0
   _customMapId: mapbox.terrain-rgb
   _mapId: mapbox.terrain-rgb
