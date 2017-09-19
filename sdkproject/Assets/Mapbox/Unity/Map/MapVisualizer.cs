@@ -8,6 +8,7 @@ namespace Mapbox.Unity.MeshGeneration
 	using Mapbox.Platform;
 	using Mapbox.Unity.Map;
 	using System;
+	using Mapbox;
 
 	public enum ModuleState
 	{
@@ -16,11 +17,22 @@ namespace Mapbox.Unity.MeshGeneration
 		Finished
 	}
 
+	public class AssignmentTypeAttribute : PropertyAttribute
+	{
+		public System.Type Type;
+
+		public AssignmentTypeAttribute(System.Type t)
+		{
+			Type = t;
+		}
+	}
+
 	[CreateAssetMenu(menuName = "Mapbox/MapVisualizer")]
 	public class MapVisualizer : ScriptableObject
 	{
 		[SerializeField]
-		AbstractTileFactory[] _factories;
+		[NodeEditorElementAttribute("Factories")]
+		public List<AbstractTileFactory> _factories;
 
 		IMap _map;
 		public Dictionary<UnwrappedTileId, UnityTile> Tiles;
@@ -72,7 +84,7 @@ namespace Mapbox.Unity.MeshGeneration
 			else if (State != ModuleState.Finished && factory.State == ModuleState.Finished)
 			{
 				var allFinished = true;
-				for (int i = 0; i < _factories.Length; i++)
+				for (int i = 0; i < _factories.Count; i++)
 				{
 					if (_factories[i] != null)
 					{
@@ -88,7 +100,7 @@ namespace Mapbox.Unity.MeshGeneration
 
 		internal void Destroy()
 		{
-			for (int i = 0; i < _factories.Length; i++)
+			for (int i = 0; i < _factories.Count; i++)
 			{
 				if (_factories[i] != null)
 					_factories[i].OnFactoryStateChanged -= UpdateState;
@@ -118,7 +130,8 @@ namespace Mapbox.Unity.MeshGeneration
 
 			foreach (var factory in _factories)
 			{
-				factory.Register(unityTile);
+				if(factory != null)
+					factory.Register(unityTile);
 			}
 
 			Tiles.Add(tileId, unityTile);

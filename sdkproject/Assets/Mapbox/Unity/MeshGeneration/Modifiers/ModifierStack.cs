@@ -24,8 +24,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private PositionTargetType _moveFeaturePositionTo;
 		private Vector3 _center = Vector3.zero;
 		private int vertexIndex = 1;
+		[NodeEditorElement("Mesh Modifiers")]
         public List<MeshModifier> MeshModifiers;
-        public List<GameObjectModifier> GoModifiers;
+		[NodeEditorElement("Game Object Modifiers")]
+		public List<GameObjectModifier> GoModifiers;
 
         public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
         {
@@ -63,7 +65,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				_center = f;
 			}
 
-            foreach (MeshModifier mod in MeshModifiers.Where(x => x.Active))
+            foreach (MeshModifier mod in MeshModifiers.Where(x => x != null && x.Active))
             {
                 mod.Run(feature, meshData, tile);
             }

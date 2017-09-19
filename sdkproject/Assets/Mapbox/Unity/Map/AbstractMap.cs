@@ -44,6 +44,7 @@
 
 		[SerializeField]
 		MapVisualizer _mapVisualizer;
+		public MapVisualizer MapVisualizer { get { return _mapVisualizer; } }
 
 		[SerializeField]
 		float _unityTileSize = 100;
