@@ -33,7 +33,7 @@
 				EditorGUILayout.BeginVertical();
 				GUILayout.Space(5);
 				GUI.enabled = false;
-				facs.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(i).objectReferenceValue, typeof(AbstractTileFactory)) as ScriptableObject;
+				facs.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(i).objectReferenceValue, typeof(AbstractTileFactory), false) as ScriptableObject;
 				GUI.enabled = true;
 				EditorGUILayout.EndVertical();
 

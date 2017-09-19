@@ -11,7 +11,6 @@
 	{
 		[SerializeField]
 		private Material _baseMaterial;
-
 		[SerializeField]
 		private float _radius;
 

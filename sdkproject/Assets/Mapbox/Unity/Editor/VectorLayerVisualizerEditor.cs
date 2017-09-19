@@ -48,7 +48,7 @@
 					EditorGUILayout.BeginVertical();
 					GUILayout.Space(5);
 					GUI.enabled = false;
-					EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(ind).objectReferenceValue, typeof(FilterBase));
+					EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(ind).objectReferenceValue, typeof(FilterBase), false);
 					GUI.enabled = true;
 					EditorGUILayout.EndVertical();
 
@@ -80,7 +80,7 @@
 					EditorGUILayout.BeginVertical();
 					GUILayout.Space(5);
 					GUI.enabled = false;
-					EditorGUILayout.ObjectField(_layerVis._defaultStack, typeof(ModifierStackBase));
+					EditorGUILayout.ObjectField(_layerVis._defaultStack, typeof(ModifierStackBase), false);
 					GUI.enabled = true;
 					EditorGUILayout.EndVertical();
 
@@ -120,7 +120,7 @@
 					EditorGUILayout.BeginVertical();
 					GUILayout.Space(5);
 					GUI.enabled = false;
-					EditorGUILayout.ObjectField(_layerVis.Stacks[i].Stack, typeof(ModifierStackBase));
+					EditorGUILayout.ObjectField(_layerVis.Stacks[i].Stack, typeof(ModifierStackBase), false);
 					GUI.enabled = true;
 					EditorGUILayout.EndVertical();
 

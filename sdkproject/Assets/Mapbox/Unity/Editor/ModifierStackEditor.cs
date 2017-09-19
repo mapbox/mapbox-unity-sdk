@@ -38,7 +38,7 @@
 				GUI.enabled = false;
 				EditorGUILayout.BeginVertical();
 				GUILayout.Space(5);
-				facs.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(i).objectReferenceValue, typeof(MeshModifier)) as ScriptableObject;
+				facs.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(i).objectReferenceValue, typeof(MeshModifier), false) as ScriptableObject;
 				GUI.enabled = true;
 				EditorGUILayout.EndVertical();
 				if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
@@ -67,7 +67,7 @@
 				EditorGUILayout.BeginVertical();
 				GUILayout.Space(5);
 				GUI.enabled = false;
-				facs2.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(facs2.GetArrayElementAtIndex(i).objectReferenceValue, typeof(GameObjectModifier)) as ScriptableObject;
+				facs2.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(facs2.GetArrayElementAtIndex(i).objectReferenceValue, typeof(GameObjectModifier), false) as ScriptableObject;
 				GUI.enabled = true;
 				EditorGUILayout.EndVertical();
 
