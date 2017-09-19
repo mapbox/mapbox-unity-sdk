@@ -240,7 +240,7 @@ namespace Mapbox.Platform {
 				response.AddException(apiEx);
 			}
 
-			if (apiResponse.isError) {
+			if (apiResponse.isNetworkError) {
 				response.AddException(new Exception(apiResponse.error));
 			}
 
