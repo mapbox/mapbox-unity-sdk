@@ -831,7 +831,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _map: {fileID: 114606471}
   _positionFollowFactor: 0.5
-  _useTransformLocationProvider: 1
+  _useTransformLocationProvider: 0
 --- !u!4 &1934621224
 Transform:
   m_ObjectHideFlags: 0
