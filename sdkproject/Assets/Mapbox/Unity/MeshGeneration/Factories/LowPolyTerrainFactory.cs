@@ -200,7 +200,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// <param name="heightMultiplier">Multiplier for queried height value</param>
 		private void GenerateTerrainMesh(UnityTile tile)
 		{
-#if UNITY_5_5_OR_NEWER
+#if (UNITY_5_5_OR_NEWER && !UNITY_5_5_0 && !UNITY_5_5_1)
             tile.MeshFilter.mesh.GetVertices(_currentTileMeshData.Vertices);
             tile.MeshFilter.mesh.GetNormals(_currentTileMeshData.Normals);
 #else
@@ -273,7 +273,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		private void ResetToFlatMesh(UnityTile tile)
 		{
-#if UNITY_5_5_OR_NEWER
+#if (UNITY_5_5_OR_NEWER && !UNITY_5_5_0 && !UNITY_5_5_1)
             tile.MeshFilter.mesh.GetVertices(_currentTileMeshData.Vertices);
             tile.MeshFilter.mesh.GetNormals(_currentTileMeshData.Normals);
 #else
@@ -309,7 +309,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			var cap = _sampleCount - 1;
 			if (_stitchTarget != null)
 			{
-#if UNITY_5_5_OR_NEWER
+#if (UNITY_5_5_OR_NEWER && !UNITY_5_5_0 && !UNITY_5_5_1)
                 _stitchTarget.GetVertices(_stitchTargetMeshData.Vertices);
                 _stitchTarget.GetNormals(_stitchTargetMeshData.Normals);
 #else
@@ -339,7 +339,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_meshData.TryGetValue(tileId.South, out _stitchTarget);
 			if (_stitchTarget != null)
 			{
-#if UNITY_5_5_OR_NEWER
+#if (UNITY_5_5_OR_NEWER && !UNITY_5_5_0 && !UNITY_5_5_1)
                 _stitchTarget.GetVertices(_stitchTargetMeshData.Vertices);
                 _stitchTarget.GetNormals(_stitchTargetMeshData.Normals);
 #else
@@ -369,7 +369,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_meshData.TryGetValue(tileId.West, out _stitchTarget);
 			if (_stitchTarget != null)
 			{
-#if UNITY_5_5_OR_NEWER
+#if (UNITY_5_5_OR_NEWER && !UNITY_5_5_0 && !UNITY_5_5_1)
                 _stitchTarget.GetVertices(_stitchTargetMeshData.Vertices);
                 _stitchTarget.GetNormals(_stitchTargetMeshData.Normals);
 #else
@@ -402,7 +402,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			if (_stitchTarget != null)
 			{
-#if UNITY_5_5_OR_NEWER
+#if (UNITY_5_5_OR_NEWER && !UNITY_5_5_0 && !UNITY_5_5_1)
                 _stitchTarget.GetVertices(_stitchTargetMeshData.Vertices);
                 _stitchTarget.GetNormals(_stitchTargetMeshData.Normals);
 #else
@@ -435,7 +435,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			if (_stitchTarget != null)
 			{
-#if UNITY_5_5_OR_NEWER
+#if (UNITY_5_5_OR_NEWER && !UNITY_5_5_0 && !UNITY_5_5_1)
                 _stitchTarget.GetVertices(_stitchTargetMeshData.Vertices);
                 _stitchTarget.GetNormals(_stitchTargetMeshData.Normals);
 #else
@@ -455,7 +455,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			if (_stitchTarget != null)
 			{
-#if UNITY_5_5_OR_NEWER
+#if (UNITY_5_5_OR_NEWER && !UNITY_5_5_0 && !UNITY_5_5_1)
                 _stitchTarget.GetVertices(_stitchTargetMeshData.Vertices);
                 _stitchTarget.GetNormals(_stitchTargetMeshData.Normals);
 #else
@@ -480,7 +480,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			if (_stitchTarget != null)
 			{
-#if UNITY_5_5_OR_NEWER
+#if (UNITY_5_5_OR_NEWER && !UNITY_5_5_0 && !UNITY_5_5_1)
                 _stitchTarget.GetVertices(_stitchTargetMeshData.Vertices);
                 _stitchTarget.GetNormals(_stitchTargetMeshData.Normals);
 #else
@@ -505,7 +505,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			if (_stitchTarget != null)
 			{
-#if UNITY_5_5_OR_NEWER
+#if (UNITY_5_5_OR_NEWER && !UNITY_5_5_0 && !UNITY_5_5_1)
                 _stitchTarget.GetVertices(_stitchTargetMeshData.Vertices);
                 _stitchTarget.GetNormals(_stitchTargetMeshData.Normals);
 #else

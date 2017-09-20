@@ -23,6 +23,7 @@
 		[StyleSearch]
 		Style _optimizedStyle;
 
+		[NodeEditorElementAttribute("Layer Visalizers")]
 		public List<LayerVisualizerBase> Visualizers;
 
 		private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;
