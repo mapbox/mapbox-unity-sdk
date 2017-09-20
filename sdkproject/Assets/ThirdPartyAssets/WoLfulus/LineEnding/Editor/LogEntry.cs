@@ -96,6 +96,10 @@ namespace WoLfulus.LineEnding
 
                 var assembly = Assembly.GetAssembly(typeof(Editor));
                 _type = assembly.GetType("UnityEditorInternal.LogEntry");
+                if (_type == null) // 2017 Fix
+                {
+                    _type = assembly.GetType("UnityEditor.LogEntry");
+                }
 
                 _condition = _type.GetField("condition", flags);
                 _errorNum = _type.GetField("errorNum", flags);
