@@ -58,7 +58,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
             return go;
         }
 
-        private GameObject CreateGameObject(MeshData data, GameObject main)
+        private GameObject CreateGameObject(MeshData data, UnityTile tile, GameObject main)
         {
             var go = new GameObject();
             var mesh = go.AddComponent<MeshFilter>().mesh;
@@ -83,7 +83,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
             var fb = go.AddComponent<FeatureBehaviour>();
             foreach (GameObjectModifier mod in GoModifiers.Where(x => x.Active))
             {
-                mod.Run(fb);
+                mod.Run(fb, tile);
             }
 
             return go;
@@ -113,7 +113,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 if (md.Vertices.Count > 3)
                 {
                     GameObject go = null;
-                    go = CreateGameObject(md, parent);
+                    go = CreateGameObject(md, tile, parent);
                     _cacheVertexCount[tile] = 0;
                     _cached[tile].Clear();
                     return go;
