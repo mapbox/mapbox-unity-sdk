@@ -132,9 +132,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					var yy = Mathd.Lerp(tile.Rect.Min.y, tile.Rect.Max.y, yrat);
 
 					_newVertexList.Add(new Vector3(
-						(float)(xx - tile.Rect.Center.x),
+						(float)(xx - tile.Rect.Center.x) * tile.TileScale,
 						0,
-						(float)(yy - tile.Rect.Center.y)));
+						(float)(yy - tile.Rect.Center.y) * tile.TileScale));
 					_newNormalList.Add(Unity.Constants.Math.Vector3Up);
 					_newUvList.Add(new Vector2(x * 1f / (_sampleCount - 1), 1 - (y * 1f / (_sampleCount - 1))));
 				}

@@ -15,87 +15,105 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     {
         [SerializeField]
         private float Width;
+		private float _scaledWidth;
         public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
-        public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
-        {
-            if (feature.Points.Count < 1)
-                return;
+		private void OnEnable()
+		{
+			_scaledWidth = Width;
+		}
 
-            foreach (var roadSegment in feature.Points)
-            {
-                var count = roadSegment.Count;
-                for (int i = 1; i < count*2; i++)
-                {
-                    md.Edges.Add(md.Vertices.Count + i);
-                    md.Edges.Add(md.Vertices.Count + i - 1);
-                }
-                md.Edges.Add(md.Vertices.Count);
-                md.Edges.Add(md.Vertices.Count + (count*2) - 1);
+		public override void Run(VectorFeatureUnity feature, MeshData md, float scale)
+		{
+			_scaledWidth = Width * scale;
+			ExtureLine(feature, md);
+		}
 
-                var newVerticeList = new Vector3[count * 2];
+		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
+		{
+			_scaledWidth = tile != null ? Width * tile.TileScale : Width;
+			ExtureLine(feature, md);
+		}
+
+		private void ExtureLine(VectorFeatureUnity feature, MeshData md)
+		{
+			if (feature.Points.Count < 1)
+				return;
+
+			foreach (var roadSegment in feature.Points)
+			{
+				var count = roadSegment.Count;
+				for (int i = 1; i < count * 2; i++)
+				{
+					md.Edges.Add(md.Vertices.Count + i);
+					md.Edges.Add(md.Vertices.Count + i - 1);
+				}
+				md.Edges.Add(md.Vertices.Count);
+				md.Edges.Add(md.Vertices.Count + (count * 2) - 1);
+
+				var newVerticeList = new Vector3[count * 2];
 				var newNorms = new Vector3[count * 2];
 				var uvList = new Vector2[count * 2];
-                Vector3 norm;
-                var lastUv = 0f;
-                var p1 = Constants.Math.Vector3Zero;
-                var p2 = Constants.Math.Vector3Zero;
-                var p3 = Constants.Math.Vector3Zero;
-                for (int i = 1; i < count; i++)
-                {
-                    p1 = roadSegment[i - 1];
-                    p2 = roadSegment[i];
-                    p3 = p2;
-                    if (i + 1 < roadSegment.Count)
-                        p3 = roadSegment[i + 1];
+				Vector3 norm;
+				var lastUv = 0f;
+				var p1 = Constants.Math.Vector3Zero;
+				var p2 = Constants.Math.Vector3Zero;
+				var p3 = Constants.Math.Vector3Zero;
+				for (int i = 1; i < count; i++)
+				{
+					p1 = roadSegment[i - 1];
+					p2 = roadSegment[i];
+					p3 = p2;
+					if (i + 1 < roadSegment.Count)
+						p3 = roadSegment[i + 1];
 
-                    if (i == 1)
-                    {
-                        norm = GetNormal(p1, p1, p2) * Width; //road width
-                        newVerticeList[0] = (p1 + norm);
-                        newVerticeList[count * 2 - 1] = (p1 - norm);
+					if (i == 1)
+					{
+						norm = GetNormal(p1, p1, p2) * _scaledWidth; //road width
+						newVerticeList[0] = (p1 + norm);
+						newVerticeList[count * 2 - 1] = (p1 - norm);
 						newNorms[0] = Constants.Math.Vector3Up;
 						newNorms[count * 2 - 1] = Constants.Math.Vector3Up;
 						uvList[0] = new Vector2(0, 0);
-                        uvList[count * 2 - 1] = new Vector2(1, 0);
-                    }
-                    var dist = Vector3.Distance(p1, p2);
-                    lastUv += dist;
-                    norm = GetNormal(p1, p2, p3) * Width;
-                    newVerticeList[i] = (p2 + norm);
-                    newVerticeList[2 * count - 1 - i] = (p2 - norm);
+						uvList[count * 2 - 1] = new Vector2(1, 0);
+					}
+					var dist = Vector3.Distance(p1, p2);
+					lastUv += dist;
+					norm = GetNormal(p1, p2, p3) * _scaledWidth;
+					newVerticeList[i] = (p2 + norm);
+					newVerticeList[2 * count - 1 - i] = (p2 - norm);
 					newNorms[i] = Constants.Math.Vector3Up;
 					newNorms[2 * count - 1 - i] = Constants.Math.Vector3Up;
 
 					uvList[i] = new Vector2(0, lastUv);
-                    uvList[2 * count - 1 - i] = new Vector2(1, lastUv);
-                }
+					uvList[2 * count - 1 - i] = new Vector2(1, lastUv);
+				}
 
-                var pcount = md.Vertices.Count;
-                md.Vertices.AddRange(newVerticeList);
+				var pcount = md.Vertices.Count;
+				md.Vertices.AddRange(newVerticeList);
 				md.Normals.AddRange(newNorms);
-                md.UV[0].AddRange(uvList);
-                var lineTri = new List<int>();
-                var n = count;
+				md.UV[0].AddRange(uvList);
+				var lineTri = new List<int>();
+				var n = count;
 
-                for (int i = 0; i < n - 1; i++)
-                {
-                    lineTri.Add(pcount + i);
-                    lineTri.Add(pcount + i + 1);
-                    lineTri.Add(pcount + 2 * n - 1 - i);
-                                
-                    lineTri.Add(pcount + i + 1);
-                    lineTri.Add(pcount + 2 * n - i - 2);
-                    lineTri.Add(pcount + 2 * n - i - 1);
-                }
+				for (int i = 0; i < n - 1; i++)
+				{
+					lineTri.Add(pcount + i);
+					lineTri.Add(pcount + i + 1);
+					lineTri.Add(pcount + 2 * n - 1 - i);
 
-                if (md.Triangles.Count < 1)
-                    md.Triangles.Add(new List<int>());
-                md.Triangles[0].AddRange(lineTri);
-            }            
-        }
+					lineTri.Add(pcount + i + 1);
+					lineTri.Add(pcount + 2 * n - i - 2);
+					lineTri.Add(pcount + 2 * n - i - 1);
+				}
 
-        private Vector3 GetNormal(Vector3 p1, Vector3 newPos, Vector3 p2)
+				if (md.Triangles.Count < 1)
+					md.Triangles.Add(new List<int>());
+				md.Triangles[0].AddRange(lineTri);
+			}
+		}
+
+		private Vector3 GetNormal(Vector3 p1, Vector3 newPos, Vector3 p2)
         {
             if (newPos == p1 || newPos == p2)
             {

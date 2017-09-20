@@ -30,6 +30,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		[SerializeField]
 		[Tooltip("Fixed height value for ForceHeight option")]
 		private float _height;
+		private float _scale = 1;
 
 		[SerializeField]
 		[Tooltip("Create side walls from calculated height down to terrain level. Suggested for buildings, not suggested for roads.")]
@@ -37,22 +38,32 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
         public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
-        public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
+		public override void Run(VectorFeatureUnity feature, MeshData md, float scale)
+		{
+			_scale = scale;
+			Run(feature, md);
+		}
+
+		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
         {
             if (md.Vertices.Count == 0 || feature == null || feature.Points.Count < 1)
                 return;
 
-            var minHeight = 0f;
-            float hf = _height;
+			if (tile != null)
+				_scale = tile.TileScale;
+
+			var minHeight = 0f;
+            float hf = _height * _scale;
             if (!_forceHeight)
             {
                 if (feature.Properties.ContainsKey("height"))
                 {
                     if (float.TryParse(feature.Properties["height"].ToString(), out hf))
                     {
+						hf *= _scale;
                         if (feature.Properties.ContainsKey("min_height"))
                         {
-                            minHeight = float.Parse(feature.Properties["min_height"].ToString());
+                            minHeight = float.Parse(feature.Properties["min_height"].ToString()) * _scale;
                             hf -= minHeight;
                         }
                     }
@@ -61,6 +72,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
                 {
                     if (float.TryParse(feature.Properties["ele"].ToString(), out hf))
                     {
+						hf *= _scale;
                     }
                 }
             }

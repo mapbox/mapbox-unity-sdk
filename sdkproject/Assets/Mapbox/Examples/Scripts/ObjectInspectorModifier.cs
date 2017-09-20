@@ -1,5 +1,6 @@
 namespace Mapbox.Examples
 {
+	using Mapbox.Unity.MeshGeneration.Data;
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Components;
 	using UnityEngine.UI;
@@ -10,7 +11,7 @@ namespace Mapbox.Examples
 	{
 		private FeatureUiMarker _marker;
 
-		public override void Run(FeatureBehaviour fb)
+		public override void Run(FeatureBehaviour fb, UnityTile tile)
 		{
 			if(_marker == null)
 			{

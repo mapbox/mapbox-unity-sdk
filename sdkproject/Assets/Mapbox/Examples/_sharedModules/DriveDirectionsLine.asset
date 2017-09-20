@@ -8,9 +8,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd8aacc1880ff504d9531b4d61c86458, type: 3}
-  m_Name: PoiDemo3dPoiModifier
+  m_Script: {fileID: 11500000, guid: 9e1e9c060b6589e4e8b990a9c709bcdd, type: 3}
+  m_Name: DriveDirectionsLine
   m_EditorClassIdentifier: 
   Active: 1
-  _prefab: {fileID: 1000010288152912, guid: 44828d4325e8b544ca6ffec352cfe165, type: 2}
-  _scaleDownWithWorld: 1
+  Width: 4
