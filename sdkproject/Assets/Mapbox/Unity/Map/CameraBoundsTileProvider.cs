@@ -1,3 +1,4 @@
+using System.Linq;
 namespace Mapbox.Unity.Map
 {
 	using UnityEngine;
@@ -74,10 +75,10 @@ namespace Mapbox.Unity.Map
 
 		void Cleanup(UnwrappedTileId currentTile)
 		{
-			var count = _activeTiles.Count;
-			for (int i = count - 1; i >= 0; i--)
+			var keys = _activeTiles.Keys.ToList();
+			for (int i = 0; i < keys.Count; i++)
 			{
-				var tile = _activeTiles[i];
+				var tile = keys[i];
 				bool dispose = false;
 				dispose = tile.X > currentTile.X + _disposeBuffer || tile.X < _currentTile.X - _disposeBuffer;
 				dispose = dispose || tile.Y > _currentTile.Y + _disposeBuffer || tile.Y < _currentTile.Y - _disposeBuffer;
