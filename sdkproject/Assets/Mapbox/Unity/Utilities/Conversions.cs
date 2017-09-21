@@ -3,10 +3,10 @@
 //     Copyright (c) 2016 Mapbox. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
-using Mapbox.Map;
 
 namespace Mapbox.Unity.Utilities
 {
+	using Mapbox.Map;
 	using System;
 	using Mapbox.Utils;
 	using UnityEngine;

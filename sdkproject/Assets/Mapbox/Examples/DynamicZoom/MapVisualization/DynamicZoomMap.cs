@@ -16,6 +16,7 @@
 		[Range(0, 22)]
 		public int MaxZoom;
 
+		// TODO: remove?
 		public string _webMerc;
 
 		void Start()
@@ -35,8 +36,11 @@
 			_worldRelativeScale = (float)(1f / referenceTileRect.Size.x);
 			_mapVisualizer.Initialize(this, _fileSouce);
 			_tileProvider.Initialize(this);
+
+			SendInitialized();
 		}
 
+		// TODO: remove!
 		private void Update()
 		{
 			_webMerc = CenterMercator.ToString();

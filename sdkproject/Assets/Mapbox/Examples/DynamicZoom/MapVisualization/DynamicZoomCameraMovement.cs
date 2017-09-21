@@ -1,9 +1,7 @@
 ﻿namespace Mapbox.Unity.Examples.DynamicZoom
 {
-	using Mapbox.Unity.Map;
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Utils;
-	using System;
 	using UnityEngine;
 
 	public class DynamicZoomCameraMovement : MonoBehaviour
@@ -32,8 +30,6 @@
 				if (null == _referenceCamera) { Debug.LogErrorFormat("{0}: reference camera not set", this.GetType().Name); }
 			}
 
-			if (null == _dynamicZoomMap) { Debug.LogErrorFormat("{0}: map==null", this.GetType().Name); }
-
 			//put camera into the middle of the allowed y movement range
 			Vector3 localPosition = _referenceCamera.transform.position;
 			localPosition.x = 0;
@@ -45,7 +41,6 @@
 			//link zoomspeed to tilesize
 			_zoomSpeed = _dynamicZoomMap.UnityTileSize / 2f;
 		}
-
 
 
 		private void LateUpdate()

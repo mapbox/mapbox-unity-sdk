@@ -4,13 +4,13 @@
 	using Utils;
 	using Mapbox.Map;
 
-	public class MapOnStart : AbstractMap
+	public class BasicMap : AbstractMap
 	{
 		void Start()
 		{
 			Initialize();
 		}
-
+			
 		protected override void Initialize()
 		{
 			var latLonSplit = _latitudeLongitudeString.Split(',');
