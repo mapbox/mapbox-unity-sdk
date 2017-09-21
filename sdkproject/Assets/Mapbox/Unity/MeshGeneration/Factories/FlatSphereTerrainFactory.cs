@@ -27,6 +27,14 @@
 		[SerializeField]
 		private int _layerId = 0;
 
+		public float Radius
+		{
+			get
+			{
+				return _radius;
+			}
+		}
+
 		internal override void OnInitialized()
 		{
 
