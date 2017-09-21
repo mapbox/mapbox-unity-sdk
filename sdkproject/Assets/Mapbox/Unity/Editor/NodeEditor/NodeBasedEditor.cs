@@ -17,8 +17,8 @@ namespace Mapbox.Editor.NodeEditor
 		private float _nodeHeight = 50;
 		[NonSerialized]
 		private Vector2 _topLeft = new Vector2(50, 50);
-		[NonSerialized]
-		private Vector2 _padding = new Vector2(50, 100);
+		//[NonSerialized]
+		//private Vector2 _padding = new Vector2(50, 100);
 
 		//private List<Node> nodes;
 		//private List<Connection> connections;
@@ -35,8 +35,8 @@ namespace Mapbox.Editor.NodeEditor
 		public static Texture2D magnifierTexture;
 		private GUIStyle _optionLabel;
 
-		private ConnectionPoint selectedInPoint;
-		private ConnectionPoint selectedOutPoint;
+		//private ConnectionPoint selectedInPoint;
+		//private ConnectionPoint selectedOutPoint;
 
 		private Vector2 offset;
 		private Vector2 drag;
@@ -290,8 +290,8 @@ namespace Mapbox.Editor.NodeEditor
 
 		private void ClearConnectionSelection()
 		{
-			selectedInPoint = null;
-			selectedOutPoint = null;
+			//selectedInPoint = null;
+			//selectedOutPoint = null;
 		}
 	}
 }

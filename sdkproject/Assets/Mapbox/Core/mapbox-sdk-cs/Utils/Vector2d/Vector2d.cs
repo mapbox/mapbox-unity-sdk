@@ -3,6 +3,7 @@ namespace Mapbox.Utils
     using System;
     using System.Globalization;
 
+	[Serializable]
     public struct Vector2d
     {
         public const double kEpsilon = 1E-05d;

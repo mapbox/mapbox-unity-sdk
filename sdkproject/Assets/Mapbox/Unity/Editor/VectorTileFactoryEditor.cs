@@ -45,7 +45,7 @@
 				if (_factory.Visualizers[i] == null)
 					EditorGUILayout.TextField("null");
 				else
-					EditorGUILayout.ObjectField(_factory.Visualizers[i], typeof(LayerVisualizerBase));
+					EditorGUILayout.ObjectField(_factory.Visualizers[i], typeof(LayerVisualizerBase), false);
 				EditorGUILayout.EndHorizontal();
 				GUI.enabled = true;
 				EditorGUILayout.EndVertical();

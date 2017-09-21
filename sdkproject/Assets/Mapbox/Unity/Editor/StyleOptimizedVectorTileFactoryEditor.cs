@@ -12,14 +12,14 @@ namespace Mapbox.Editor
 		private string _defaultMapId = "mapbox.mapbox-streets-v7";
 		private MonoScript script;
 		private StyleOptimizedVectorTileFactory _factory;
-		SerializedProperty _visualizerList;
+		//SerializedProperty _visualizerList;
 		public SerializedProperty mapId_Prop, style_Prop;
 
 		private int ListSize;
 		void OnEnable()
 		{
 			_factory = target as StyleOptimizedVectorTileFactory;
-			_visualizerList = serializedObject.FindProperty("Visualizers");
+			//_visualizerList = serializedObject.FindProperty("Visualizers");
 			mapId_Prop = serializedObject.FindProperty("_mapId");
 			style_Prop = serializedObject.FindProperty("_optimizedStyle");
 			script = MonoScript.FromScriptableObject(_factory);
@@ -79,7 +79,7 @@ namespace Mapbox.Editor
 				if (_factory.Visualizers[i] == null)
 					EditorGUILayout.TextField("null");
 				else
-					EditorGUILayout.ObjectField(_factory.Visualizers[i], typeof(LayerVisualizerBase));
+					EditorGUILayout.ObjectField(_factory.Visualizers[i], typeof(LayerVisualizerBase), false);
 				EditorGUILayout.EndHorizontal();
 				GUI.enabled = true;
 				EditorGUILayout.EndVertical();
