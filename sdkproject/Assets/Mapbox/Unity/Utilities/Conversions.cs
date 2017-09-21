@@ -20,8 +20,8 @@ namespace Mapbox.Unity.Utilities
 		/// <summary>according to https://wiki.openstreetmap.org/wiki/Zoom_levels</summary>
 		private const double EarthRadius = 6372798.2;
 		private const double InitialResolution = 2 * Math.PI * EarthRadius / TileSize;
-		//private const double OriginShift = 2 * Math.PI * EarthRadius / 2;
-		private const double OriginShift = 20037508.34;
+		private const double OriginShift = 2 * Math.PI * EarthRadius / 2;
+		//private const double OriginShift = 20037508.34;
 
 		/// <summary>
 		/// Converts <see cref="T:Mapbox.Utils.Vector2d"/> struct, WGS84

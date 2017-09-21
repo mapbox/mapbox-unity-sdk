@@ -45,7 +45,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			for (int i = 0; i < count; i++)
 			{
 				wp[i] = _waypoints[i].GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
-				Debug.Log("DirectionsFactory: " + wp[i]);
 			}
 			var _directionResource = new DirectionResource(wp, RoutingProfile.Driving);
 			_directionResource.Steps = true;
