@@ -87,8 +87,8 @@ namespace Mapbox.Map
 
 			//UnityEngine.Debug.LogFormat("swWebMerc:{0}/{1} neWebMerc:{2}/{3}", swWebMerc.x, swWebMerc.y, neWebMerc.x, neWebMerc.y);
 
-			UnwrappedTileId swTile = WebMercatorToTileId(new Vector2d(swWebMerc.y, swWebMerc.x), zoom);
-			UnwrappedTileId neTile = WebMercatorToTileId(new Vector2d(neWebMerc.y, neWebMerc.x), zoom);
+			UnwrappedTileId swTile = WebMercatorToTileId(swWebMerc, zoom);
+			UnwrappedTileId neTile = WebMercatorToTileId(neWebMerc, zoom);
 
 			//UnityEngine.Debug.LogFormat("swTile:{0} neTile:{1}", swTile, neTile);
 
@@ -151,8 +151,8 @@ namespace Mapbox.Map
 
 			//this SDK defines Vector2d.x as latitude and Vector2d.y as longitude
 			//same for WebMerc, so we have to flip x/y to make this formula work
-			double dblX = webMerc.y / Constants.WebMercMax;
-			double dblY = webMerc.x / Constants.WebMercMax;
+			double dblX = webMerc.x / Constants.WebMercMax;
+			double dblY = webMerc.y / Constants.WebMercMax;
 
 			//dblX = 1 + dblX;
 			//dblY = 1 - dblY;
