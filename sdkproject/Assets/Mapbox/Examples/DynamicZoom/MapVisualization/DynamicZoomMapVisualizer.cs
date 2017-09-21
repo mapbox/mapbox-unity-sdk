@@ -11,7 +11,7 @@
 	[CreateAssetMenu(menuName = "Mapbox/DynamicZoomMapVisualizer")]
 	public class DynamicZoomMapVisualizer : AbstractMapVisualizer
 	{
-		protected override void PlaceTile(UnityTile tile, IMapReadable map)
+		protected override void PlaceTile(UnwrappedTileId tileId, UnityTile tile, IMapReadable map)
 		{
 			//get the tile covering the center (Unity 0,0,0) of current extent
 			UnwrappedTileId centerTile = TileCover.WebMercatorToTileId(map.CenterMercator, _map.Zoom);
@@ -28,7 +28,6 @@
 			//position the tile relative to the center tile of the current viewport using the tile id
 			//multiply by tile size Unity units (unityTileScale)
 			//shift by distance of current viewport center to center of center tile
-			var tileId = tile.UnwrappedTileId;
 			Vector3 position = new Vector3(
 				(tileId.X - centerTile.X) * unityTileSize - (float)shift.x / factor
 				, 0

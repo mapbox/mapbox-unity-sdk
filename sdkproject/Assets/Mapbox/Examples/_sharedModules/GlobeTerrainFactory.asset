@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 859bc316b9b734bffaf7288cb86ffc0c, type: 3}
   m_Name: GlobeTerrainFactory
   m_EditorClassIdentifier: 
-  _baseMaterial: {fileID: 2100000, guid: 19d72e9ae93c94dd0a35f1df498cfbee, type: 2}
+  _baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
   _radius: 1000
   _sampleCount: 20
   _addCollider: 0

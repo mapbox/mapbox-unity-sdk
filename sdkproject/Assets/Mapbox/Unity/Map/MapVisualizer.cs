@@ -1,9 +1,9 @@
 namespace Mapbox.Unity.MeshGeneration
 {
-	using Mapbox.Map;
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.Map;
+	using Mapbox.Map;
 
 	public enum ModuleState
 	{
@@ -25,7 +25,7 @@ namespace Mapbox.Unity.MeshGeneration
 	[CreateAssetMenu(menuName = "Mapbox/MapVisualizer")]
 	public class MapVisualizer : AbstractMapVisualizer
 	{
-		protected override void PlaceTile(UnityTile tile, IMapReadable map)
+		protected override void PlaceTile(UnwrappedTileId tileId, UnityTile tile, IMapReadable map)
 		{
 			var rect = tile.Rect;
 			var scale = tile.TileScale;

@@ -9,7 +9,7 @@
 	using Mapbox.Unity.Map;
 	using Mapbox.Platform;
 
-	public abstract class AbstractMapVisualizer : ScriptableObject, IMapVisualizer
+	public abstract class AbstractMapVisualizer : ScriptableObject
 	{
 		[SerializeField]
 		[NodeEditorElementAttribute("Factories")]
@@ -117,7 +117,7 @@
 			}
 
 			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale, _loadingTexture);
-			PlaceTile(unityTile, _map);
+			PlaceTile(tileId, unityTile, _map);
 
 #if UNITY_EDITOR
 			unityTile.gameObject.name = unityTile.CanonicalTileId.ToString();
@@ -147,6 +147,6 @@
 			}
 		}
 
-		protected abstract void PlaceTile(UnityTile tile, IMapReadable map);
+		protected abstract void PlaceTile(UnwrappedTileId tileId, UnityTile tile, IMapReadable map);
 	}
 }
