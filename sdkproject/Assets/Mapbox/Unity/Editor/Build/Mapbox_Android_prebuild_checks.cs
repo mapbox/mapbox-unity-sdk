@@ -3,21 +3,15 @@
 	using System;
 	using System.IO;
 	using System.Linq;
-	using System.Collections;
 	using System.Collections.Generic;
 	using UnityEngine;
 	using UnityEditor;
 	using System.Text;
-
-#if UNITY_5_6_OR_NEWER
 	using UnityEditor.Build;
-#endif
-
 
 	/// <summary>
 	/// Simple pre-build script to check for duplicate Android libraries
 	/// </summary>
-#if UNITY_5_6_OR_NEWER
 	public class PreBuildChecksEditor : IPreprocessBuild
 	{
 		public int callbackOrder { get { return 0; } }
@@ -76,8 +70,6 @@
 			}
 		}
 	}
-#endif
-
 
 	public class AndroidLibInfo
 	{

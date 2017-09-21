@@ -5,6 +5,7 @@
 
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
+	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.MeshGeneration.Components;
 	using UnityEngine;
 
@@ -34,7 +35,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		int _spawnedCount;
 
-		public override void Run(FeatureBehaviour fb)
+		public override void Run(FeatureBehaviour fb, UnityTile tile)
 		{
 			_spawnedCount = 0;
 			var collider = fb.GetComponent<Collider>();
@@ -64,7 +65,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					}
 					if (!_scaleDownWithWorld)
 					{
-						transform.localScale = Vector3.one / transform.lossyScale.x;
+						transform.localScale = Vector3.one / tile.TileScale;
 					}
 
 					if (_randomizeScale)

@@ -1,6 +1,7 @@
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
     using UnityEngine;
+	using Mapbox.Unity.MeshGeneration.Data;
     using Mapbox.Unity.MeshGeneration.Components;
     using Mapbox.Unity.MeshGeneration.Interfaces;
 
@@ -13,7 +14,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
         [SerializeField]
         private bool _scaleDownWithWorld = false;
 
-        public override void Run(FeatureBehaviour fb)
+        public override void Run(FeatureBehaviour fb, UnityTile tile)
         {
             int selpos = fb.Data.Points[0].Count / 2;
             var met = fb.Data.Points[0][selpos];
@@ -33,7 +34,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
             if (!_scaleDownWithWorld)
             {
-                go.transform.localScale = Vector3.one / go.transform.lossyScale.x;
+				go.transform.localScale = Vector3.one / tile.TileScale;
             }
         }
     }

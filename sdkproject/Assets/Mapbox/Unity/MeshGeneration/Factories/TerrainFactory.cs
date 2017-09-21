@@ -132,9 +132,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					var yy = Mathd.Lerp(tile.Rect.Min.y, tile.Rect.Max.y, yrat);
 
 					_newVertexList.Add(new Vector3(
-						(float)(xx - tile.Rect.Center.x),
+						(float)(xx - tile.Rect.Center.x) * tile.TileScale,
 						0,
-						(float)(yy - tile.Rect.Center.y)));
+						(float)(yy - tile.Rect.Center.y) * tile.TileScale));
 					_newNormalList.Add(Unity.Constants.Math.Vector3Up);
 					_newUvList.Add(new Vector2(x * 1f / (_sampleCount - 1), 1 - (y * 1f / (_sampleCount - 1))));
 				}
@@ -215,15 +215,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// <param name="heightMultiplier">Multiplier for queried height value</param>
 		private void GenerateTerrainMesh(UnityTile tile)
 		{
-#if (UNITY_5_5_OR_NEWER && !UNITY_5_5_0 && !UNITY_5_5_1)
 			tile.MeshFilter.mesh.GetVertices(_currentTileMeshData.Vertices);
 			tile.MeshFilter.mesh.GetNormals(_currentTileMeshData.Normals);
-#else
-			_currentTileMeshData.Vertices.Clear();
-			_currentTileMeshData.Vertices.AddRange(tile.MeshFilter.mesh.vertices);
-			_currentTileMeshData.Normals.Clear();
-			_currentTileMeshData.Normals.AddRange(tile.MeshFilter.mesh.normals);
-#endif
 
 			for (float y = 0; y < _sampleCount; y++)
 			{
@@ -285,15 +278,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		private void ResetToFlatMesh(UnityTile tile)
 		{
-#if (UNITY_5_5_OR_NEWER && !UNITY_5_5_0 && !UNITY_5_5_1)
 			tile.MeshFilter.mesh.GetVertices(_currentTileMeshData.Vertices);
 			tile.MeshFilter.mesh.GetNormals(_currentTileMeshData.Normals);
-#else
-			_currentTileMeshData.Vertices.Clear();
-			_currentTileMeshData.Vertices.AddRange(tile.MeshFilter.mesh.vertices);
-			_currentTileMeshData.Normals.Clear();
-			_currentTileMeshData.Normals.AddRange(tile.MeshFilter.mesh.normals);
-#endif
 
 			for (int i = 0; i < _currentTileMeshData.Vertices.Count; i++)
 			{
@@ -322,15 +308,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_meshData.TryGetValue(tileId.North, out _stitchTarget);
 			if (_stitchTarget != null)
 			{
-#if (UNITY_5_5_OR_NEWER && !UNITY_5_5_0 && !UNITY_5_5_1)
 				_stitchTarget.GetVertices(_stitchTargetMeshData.Vertices);
 				_stitchTarget.GetNormals(_stitchTargetMeshData.Normals);
-#else
-				_stitchTargetMeshData.Vertices.Clear();
-				_stitchTargetMeshData.Vertices.AddRange(_stitchTarget.vertices);
-				_stitchTargetMeshData.Normals.Clear();
-				_stitchTargetMeshData.Normals.AddRange(_stitchTarget.normals);
-#endif
+
 				for (int i = 0; i < _sampleCount; i++)
 				{
 					//just snapping the y because vertex pos is relative and we'll have to do tile pos + vertex pos for x&z otherwise
@@ -349,15 +329,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_meshData.TryGetValue(tileId.South, out _stitchTarget);
 			if (_stitchTarget != null)
 			{
-#if (UNITY_5_5_OR_NEWER && !UNITY_5_5_0 && !UNITY_5_5_1)
 				_stitchTarget.GetVertices(_stitchTargetMeshData.Vertices);
 				_stitchTarget.GetNormals(_stitchTargetMeshData.Normals);
-#else
-				_stitchTargetMeshData.Vertices.Clear();
-				_stitchTargetMeshData.Vertices.AddRange(_stitchTarget.vertices);
-				_stitchTargetMeshData.Normals.Clear();
-				_stitchTargetMeshData.Normals.AddRange(_stitchTarget.normals);
-#endif
+
 				for (int i = 0; i < _sampleCount; i++)
 				{
 					mesh.Vertices[meshVertCount - _sampleCount + i] = new Vector3(
@@ -376,15 +350,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_meshData.TryGetValue(tileId.West, out _stitchTarget);
 			if (_stitchTarget != null)
 			{
-#if (UNITY_5_5_OR_NEWER && !UNITY_5_5_0 && !UNITY_5_5_1)
 				_stitchTarget.GetVertices(_stitchTargetMeshData.Vertices);
 				_stitchTarget.GetNormals(_stitchTargetMeshData.Normals);
-#else
-				_stitchTargetMeshData.Vertices.Clear();
-				_stitchTargetMeshData.Vertices.AddRange(_stitchTarget.vertices);
-				_stitchTargetMeshData.Normals.Clear();
-				_stitchTargetMeshData.Normals.AddRange(_stitchTarget.normals);
-#endif
+
 				for (int i = 0; i < _sampleCount; i++)
 				{
 					mesh.Vertices[i * _sampleCount] = new Vector3(
@@ -404,15 +372,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			if (_stitchTarget != null)
 			{
-#if (UNITY_5_5_OR_NEWER && !UNITY_5_5_0 && !UNITY_5_5_1)
 				_stitchTarget.GetVertices(_stitchTargetMeshData.Vertices);
 				_stitchTarget.GetNormals(_stitchTargetMeshData.Normals);
-#else
-				_stitchTargetMeshData.Vertices.Clear();
-				_stitchTargetMeshData.Vertices.AddRange(_stitchTarget.vertices);
-				_stitchTargetMeshData.Normals.Clear();
-				_stitchTargetMeshData.Normals.AddRange(_stitchTarget.normals);
-#endif
+
 				for (int i = 0; i < _sampleCount; i++)
 				{
 					mesh.Vertices[i * _sampleCount + _sampleCount - 1] = new Vector3(
@@ -432,15 +394,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			if (_stitchTarget != null)
 			{
-#if (UNITY_5_5_OR_NEWER && !UNITY_5_5_0 && !UNITY_5_5_1)
 				_stitchTarget.GetVertices(_stitchTargetMeshData.Vertices);
 				_stitchTarget.GetNormals(_stitchTargetMeshData.Normals);
-#else
-				_stitchTargetMeshData.Vertices.Clear();
-				_stitchTargetMeshData.Vertices.AddRange(_stitchTarget.vertices);
-				_stitchTargetMeshData.Normals.Clear();
-				_stitchTargetMeshData.Normals.AddRange(_stitchTarget.normals);
-#endif
+
 				mesh.Vertices[0] = new Vector3(
 					mesh.Vertices[0].x,
 					_stitchTargetMeshData.Vertices[meshVertCount - 1].y,
@@ -457,15 +413,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			if (_stitchTarget != null)
 			{
-#if (UNITY_5_5_OR_NEWER && !UNITY_5_5_0 && !UNITY_5_5_1)
 				_stitchTarget.GetVertices(_stitchTargetMeshData.Vertices);
 				_stitchTarget.GetNormals(_stitchTargetMeshData.Normals);
-#else
-				_stitchTargetMeshData.Vertices.Clear();
-				_stitchTargetMeshData.Vertices.AddRange(_stitchTarget.vertices);
-				_stitchTargetMeshData.Normals.Clear();
-				_stitchTargetMeshData.Normals.AddRange(_stitchTarget.normals);
-#endif
+
 				mesh.Vertices[_sampleCount - 1] = new Vector3(
 					mesh.Vertices[_sampleCount - 1].x,
 					_stitchTargetMeshData.Vertices[meshVertCount - _sampleCount].y,
@@ -482,15 +432,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			if (_stitchTarget != null)
 			{
-#if (UNITY_5_5_OR_NEWER && !UNITY_5_5_0 && !UNITY_5_5_1)
 				_stitchTarget.GetVertices(_stitchTargetMeshData.Vertices);
 				_stitchTarget.GetNormals(_stitchTargetMeshData.Normals);
-#else
-				_stitchTargetMeshData.Vertices.Clear();
-				_stitchTargetMeshData.Vertices.AddRange(_stitchTarget.vertices);
-				_stitchTargetMeshData.Normals.Clear();
-				_stitchTargetMeshData.Normals.AddRange(_stitchTarget.normals);
-#endif
+
 				mesh.Vertices[meshVertCount - _sampleCount] = new Vector3(
 					mesh.Vertices[meshVertCount - _sampleCount].x,
 					_stitchTargetMeshData.Vertices[_sampleCount - 1].y,
@@ -507,15 +451,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			if (_stitchTarget != null)
 			{
-#if (UNITY_5_5_OR_NEWER && !UNITY_5_5_0 && !UNITY_5_5_1)
 				_stitchTarget.GetVertices(_stitchTargetMeshData.Vertices);
 				_stitchTarget.GetNormals(_stitchTargetMeshData.Normals);
-#else
-				_stitchTargetMeshData.Vertices.Clear();
-				_stitchTargetMeshData.Vertices.AddRange(_stitchTarget.vertices);
-				_stitchTargetMeshData.Normals.Clear();
-				_stitchTargetMeshData.Normals.AddRange(_stitchTarget.normals);
-#endif
+
 				mesh.Vertices[meshVertCount - 1] = new Vector3(
 					mesh.Vertices[meshVertCount - 1].x,
 					_stitchTargetMeshData.Vertices[0].y,

@@ -229,8 +229,7 @@ namespace Mapbox.Map
 
 				tile.Initialize(param, () => { this.NotifyNext(tile); });
 
-				this.tiles.Add(tile);
-				this.NotifyNext(tile);
+				this.tiles.Add(tile);				
 			}
 		}
 	}

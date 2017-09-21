@@ -77,6 +77,20 @@ namespace Mapbox.Unity.Utilities
 			return GeoToWorldPosition(latLong.x, latLong.y, refPoint, scale);
 		}
 
+		public static Vector3 GeoToWorldGlobePosition(double lat, double lon, float radius)
+		{
+			double xPos = (radius) * Math.Cos(Mathf.Deg2Rad * lat) * Math.Cos(Mathf.Deg2Rad * lon);
+			double zPos = (radius) * Math.Cos(Mathf.Deg2Rad * lat) * Math.Sin(Mathf.Deg2Rad * lon);
+			double yPos = (radius) * Math.Sin(Mathf.Deg2Rad * lat);
+
+			return new Vector3((float)xPos, (float)yPos, (float)zPos);
+		}
+
+		public static Vector3 GeoToWorldGlobePosition(Vector2d latLong, float radius)
+		{
+			return GeoToWorldGlobePosition(latLong.x, latLong.y, radius);
+		}
+
 		/// <summary>
 		/// Converts Spherical Mercator EPSG:900913 in xy meters to WGS84 lat/lon.
 		/// Inverse of LatLonToMeters.
@@ -149,7 +163,7 @@ namespace Mapbox.Unity.Utilities
 		/// <param name="longitude"> The longitude. </param>
 		/// <param name="zoom"> Zoom level. </param>
 		/// <returns> A <see cref="T:UnityEngine.Vector2d"/> xy tile ID. </returns>
-		public static Vector2d LatitudeLongitudeToTileId(float latitude, float longitude, int zoom)
+		public static Vector2d LatitudeLongitudeToTileId(double latitude, double longitude, int zoom)
 		{
 			var x = (int)Math.Floor((longitude + 180.0) / 360.0 * Math.Pow(2.0, zoom));
 			var y = (int)Math.Floor((1.0 - Math.Log(Math.Tan(latitude * Math.PI / 180.0)

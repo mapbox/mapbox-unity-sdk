@@ -17,7 +17,7 @@ namespace Mapbox.Editor.NodeEditor
 
 		private bool _isRoot = false;
 		private Vector2 _panDelta;
-		private Vector2 _topLeft = new Vector2(50, 50);
+		//private Vector2 _topLeft = new Vector2(50, 50);
 		private Vector2 _padding = new Vector2(50, 100);
 		private float _propTopTest = 0f;
 
@@ -295,7 +295,7 @@ namespace Mapbox.Editor.NodeEditor
 						{
 							foreach (TypeVisualizerTuple listitem in val as IEnumerable)
 							{
-								var name = (fi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
+								//var name = (fi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
 								var cc = new ConnectionPoint(this, "", listitem.Type, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
 								ConnectionPoints.Add(cc);
 								_propCount++;

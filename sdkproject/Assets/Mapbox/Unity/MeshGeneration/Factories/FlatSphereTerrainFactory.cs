@@ -11,7 +11,6 @@
 	{
 		[SerializeField]
 		private Material _baseMaterial;
-
 		[SerializeField]
 		private float _radius;
 
@@ -27,6 +26,14 @@
 
 		[SerializeField]
 		private int _layerId = 0;
+
+		public float Radius
+		{
+			get
+			{
+				return _radius;
+			}
+		}
 
 		internal override void OnInitialized()
 		{

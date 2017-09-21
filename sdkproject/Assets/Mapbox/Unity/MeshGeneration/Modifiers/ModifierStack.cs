@@ -78,7 +78,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
             foreach (GameObjectModifier mod in GoModifiers.Where(x => x.Active))
             {
-                mod.Run(bd);
+				mod.Run(bd, tile);
             }
 
             return go;

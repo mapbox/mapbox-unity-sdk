@@ -34,6 +34,10 @@ namespace WoLfulus.LineEnding
             {
                 Assembly assembly = Assembly.GetAssembly(typeof(Editor));
                 _type = assembly.GetType("UnityEditorInternal.LogEntries");
+                if (_type == null) // 2017 Fix
+                {
+                    _type = assembly.GetType("UnityEditor.LogEntries");
+                }
 
                 _consoleFlags = _type.GetProperty("consoleFlags", flags);
                 _SetConsoleFlag = _type.GetMethod("SetConsoleFlag", flags);

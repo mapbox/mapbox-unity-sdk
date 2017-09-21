@@ -30,7 +30,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
                 for (int j = 0; j < geom[i].Count; j++)
                 {
                     var point = geom[i][j];
-                    nl.Add(new Vector3((float)(point.X / layerExtent * tile.Rect.Size.x - (tile.Rect.Size.x / 2)), 0, (float)((layerExtent - point.Y) / layerExtent * tile.Rect.Size.y - (tile.Rect.Size.y / 2))));
+                    nl.Add(new Vector3((float)(point.X / layerExtent * tile.Rect.Size.x - (tile.Rect.Size.x / 2)) * tile.TileScale, 0, (float)((layerExtent - point.Y) / layerExtent * tile.Rect.Size.y - (tile.Rect.Size.y / 2)) * tile.TileScale));
                 }
                 Points.Add(nl);
             }
