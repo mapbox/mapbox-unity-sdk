@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657868, g: 0.49641263, b: 0.57481706, a: 1}
+  m_IndirectSpecularColor: {r: 0.44648886, g: 0.49632663, b: 0.5747252, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -137,17 +137,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c3dbbfecec45964f8a86d5d46a6f78c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _latitudeLongitudeString: 48.21840,16.39810
-  _zoom: 17
+  _latitudeLongitudeString: 0,0
+  _zoom: 2
   _root: {fileID: 161680363}
   _tileProvider: {fileID: 161680364}
   _mapVisualizer: {fileID: 11400000, guid: a8ff1149bc7f1814d8d453b7637f2896, type: 2}
-  _unityTileSize: 1
+  _unityTileSize: 100
   _snapMapHeightToZero: 1
   MinZoom: 0
   MaxZoom: 20
-  _cameraMovement: {fileID: 161680365}
-  _webMerc: 6143294.65989,1825394.22194
+  _webMerc: 
 --- !u!4 &161680363
 Transform:
   m_ObjectHideFlags: 0
@@ -186,7 +185,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _zoomSpeed: 0.5
   _referenceCamera: {fileID: 524273897}
-  Map: {fileID: 0}
+  _dynamicZoomTileProvider: {fileID: 161680364}
+  _dynamicZoomMap: {fileID: 161680362}
 --- !u!1 &524273893
 GameObject:
   m_ObjectHideFlags: 0
@@ -324,6 +324,20 @@ Light:
   m_Lightmapping: 4
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
+  m_FalloffTable:
+    m_Table[0]: 0
+    m_Table[1]: 0
+    m_Table[2]: 0
+    m_Table[3]: 0
+    m_Table[4]: 0
+    m_Table[5]: 0
+    m_Table[6]: 0
+    m_Table[7]: 0
+    m_Table[8]: 0
+    m_Table[9]: 0
+    m_Table[10]: 0
+    m_Table[11]: 0
+    m_Table[12]: 0
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
   m_ShadowRadius: 0

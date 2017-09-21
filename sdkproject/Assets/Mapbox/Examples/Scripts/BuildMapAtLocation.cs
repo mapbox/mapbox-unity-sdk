@@ -35,7 +35,7 @@ namespace Mapbox.Examples
 		void LocationProvider_OnLocationUpdated(object sender, Unity.Location.LocationUpdatedEventArgs e)
 		{
 			LocationProvider.OnLocationUpdated -= LocationProvider_OnLocationUpdated;
-			_map.CenterLatitudeLongitude = e.Location;
+			_map.SetCenterLatitudeLongitude(e.Location);
 			_map.enabled = true;
 		}
 	}

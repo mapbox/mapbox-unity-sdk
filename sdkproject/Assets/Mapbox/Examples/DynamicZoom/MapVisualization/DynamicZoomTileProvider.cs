@@ -42,7 +42,7 @@
 			if (null == _dynamicZoomMap) { Debug.LogErrorFormat("assigned tiled provider is not of type: {0}", this.GetType().Name); }
 
 
-			_previousWebMercCenter = _dynamicZoomMap.CenterWebMerc;
+			_previousWebMercCenter = _dynamicZoomMap.CenterMercator;
 
 			//set some defaults
 			_dynamicZoomMap.MaxZoom = _dynamicZoomMap.MaxZoom == 0 ? 10 : _dynamicZoomMap.MaxZoom;
@@ -76,10 +76,10 @@
 			//TODO: move active tiles on pan
 			//HACK: just deactivate all active tiles
 			//!!!BEWARE!!!: don't compare Vector2d via '==' use 'Equals()'
-			if (!_previousWebMercCenter.Equals(_dynamicZoomMap.CenterWebMerc))
+			if (!_previousWebMercCenter.Equals(_dynamicZoomMap.CenterMercator))
 			{
 				//Debug.Log("_previousWebMercCenter != _dynamicZoomMap.CenterWebMerc");
-				_previousWebMercCenter = _dynamicZoomMap.CenterWebMerc;
+				_previousWebMercCenter = _dynamicZoomMap.CenterMercator;
 				var remove = _activeTiles.Keys.ToList();
 				foreach (var r in remove) 
 				{ 
@@ -97,7 +97,8 @@
 			{
 				//already at highest level, don't do anything -> camera free to move closer
 				if (_dynamicZoomMap.Zoom == _dynamicZoomMap.MaxZoom) { return; }
-				_dynamicZoomMap.Zoom++;
+				_dynamicZoomMap.SetZoom(_dynamicZoomMap.Zoom + 1);
+				//_dynamicZoomMap.Zoom++;
 				//reposition camera at max distance
 				localPosition.y = _cameraZoomingRangeMaxY;
 				_referenceCamera.transform.localPosition = localPosition;
@@ -107,7 +108,8 @@
 			{
 				//already at lowest level, don't do anything -> camera free to move further away
 				if (_dynamicZoomMap.Zoom == _dynamicZoomMap.MinZoom) { return; }
-				_dynamicZoomMap.Zoom--;
+				_dynamicZoomMap.SetZoom(_dynamicZoomMap.Zoom - 1);
+				//_dynamicZoomMap.Zoom--;
 				//reposition camera at min distance
 				localPosition.y = _cameraZoomingRangeMinY;
 				_referenceCamera.transform.localPosition = localPosition;
@@ -159,12 +161,11 @@
 
 			//get tile scale at equator, otherwise calucations don't work at higher latitudes
 			double factor = Conversions.GetTileScaleInMeters(0, _dynamicZoomMap.Zoom) * 256 / _dynamicZoomMap.UnityTileSize;
-
 			//convert Unity units to WebMercator and LatLng to get real world bounding box
-			double llx = _dynamicZoomMap.CenterWebMerc.x + hitPntLL.x * factor;
-			double lly = _dynamicZoomMap.CenterWebMerc.y + hitPntLL.z * factor;
-			double urx = _dynamicZoomMap.CenterWebMerc.x + hitPntUR.x * factor;
-			double ury = _dynamicZoomMap.CenterWebMerc.y + hitPntUR.z * factor;
+			double llx = _dynamicZoomMap.CenterMercator.x + hitPntLL.x * factor;
+			double lly = _dynamicZoomMap.CenterMercator.y + hitPntLL.z * factor;
+			double urx = _dynamicZoomMap.CenterMercator.x + hitPntUR.x * factor;
+			double ury = _dynamicZoomMap.CenterMercator.y + hitPntUR.z * factor;
 			llx = llx > 0 ? Math.Min(llx, Mapbox.Utils.Constants.WebMercMax) : Math.Max(llx, -Mapbox.Utils.Constants.WebMercMax);
 			lly = lly > 0 ? Math.Min(lly, Mapbox.Utils.Constants.WebMercMax) : Math.Max(lly, -Mapbox.Utils.Constants.WebMercMax);
 			urx = urx > 0 ? Math.Min(urx, Mapbox.Utils.Constants.WebMercMax) : Math.Max(urx, -Mapbox.Utils.Constants.WebMercMax);

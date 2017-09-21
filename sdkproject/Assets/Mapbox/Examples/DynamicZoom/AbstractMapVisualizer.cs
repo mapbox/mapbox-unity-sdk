@@ -1,6 +1,5 @@
 ﻿namespace Mapbox.Unity.MeshGeneration
 {
-	using System.Collections;
 	using System.Collections.Generic;
 	using UnityEngine;
 	using Mapbox.Map;
@@ -12,18 +11,16 @@
 
 	public abstract class AbstractMapVisualizer : ScriptableObject, IMapVisualizer
 	{
-		public List<AbstractTileFactory> Factories { get { return _factories; } }
-
 		[SerializeField]
+		[NodeEditorElementAttribute("Factories")]
 		private List<AbstractTileFactory> _factories;
 
-		internal IMap _map;
-		public IMap Map { get { return _map; } internal set { _map = value; } }
+		[SerializeField]
+		Texture2D _loadingTexture;
 
-		public Queue<UnityTile> InactiveTiles { get; set; }
-
-
-		public Dictionary<UnwrappedTileId, UnityTile> Tiles { get; set; }
+		protected IMapReadable _map;
+		protected Dictionary<UnwrappedTileId, UnityTile> _activeTiles = new Dictionary<UnwrappedTileId, UnityTile>();
+		protected Queue<UnityTile> _inactiveTiles = new Queue<UnityTile>();
 
 		private ModuleState _state;
 		public ModuleState State
@@ -42,17 +39,21 @@
 			}
 		}
 
+		public List<AbstractTileFactory> Factories { get { return _factories; } }
+		public IMapReadable Map { get { return _map; } }
+		public Dictionary<UnwrappedTileId, UnityTile> ActiveTiles { get { return _activeTiles; } }
+
 		public event Action<ModuleState> OnMapVisualizerStateChanged = delegate { };
 
 		/// <summary>
-		/// Initializes the factories by passing the file source down, which's necessary for data (web/file) calls
+		/// Initializes the factories by passing the file source down, which is necessary for data (web/file) calls
 		/// </summary>
 		/// <param name="fileSource"></param>
-		public void Initialize(IMap map, IFileSource fileSource)
+		public void Initialize(IMapReadable map, IFileSource fileSource)
 		{
-			Map = map;
-			Tiles = new Dictionary<UnwrappedTileId, UnityTile>();
-			InactiveTiles = new Queue<UnityTile>();
+			_map = map;
+			_activeTiles.Clear();
+			_inactiveTiles.Clear();
 			State = ModuleState.Initialized;
 
 			foreach (var factory in Factories)
@@ -67,10 +68,11 @@
 			for (int i = 0; i < Factories.Count; i++)
 			{
 				if (Factories[i] != null)
+				{
 					Factories[i].OnFactoryStateChanged -= UpdateState;
+				}
 			}
 		}
-
 
 		internal void UpdateState(AbstractTileFactory factory)
 		{
@@ -95,7 +97,6 @@
 			}
 		}
 
-
 		/// <summary>
 		/// Registers requested tiles to the factories
 		/// </summary>
@@ -104,42 +105,48 @@
 		{
 			UnityTile unityTile = null;
 
-			if (InactiveTiles.Count > 0)
+			if (_inactiveTiles.Count > 0)
 			{
-				unityTile = InactiveTiles.Dequeue();
+				unityTile = _inactiveTiles.Dequeue();
 			}
 
 			if (unityTile == null)
 			{
 				unityTile = new GameObject().AddComponent<UnityTile>();
-				unityTile.transform.SetParent(Map.Root, false);
+				unityTile.transform.SetParent(_map.Root, false);
 			}
 
-			//unityTile.Initialize(_map, tileId, _map.WorldRelativeScale);
-			unityTile.Initialize(Map, tileId, _map.WorldRelativeScale);
+			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale, _loadingTexture);
+			PlaceTile(unityTile, _map);
+
+#if UNITY_EDITOR
+			unityTile.gameObject.name = unityTile.CanonicalTileId.ToString();
+#endif
 
 			foreach (var factory in Factories)
 			{
 				factory.Register(unityTile);
 			}
 
-			Tiles.Add(tileId, unityTile);
+			ActiveTiles.Add(tileId, unityTile);
 
 			return unityTile;
 		}
 
 		public void DisposeTile(UnwrappedTileId tileId)
 		{
-			var unityTile = Tiles[tileId];
+			var unityTile = ActiveTiles[tileId];
 
 			unityTile.Recycle();
-			Tiles.Remove(tileId);
-			InactiveTiles.Enqueue(unityTile);
+			ActiveTiles.Remove(tileId);
+			_inactiveTiles.Enqueue(unityTile);
 
 			foreach (var factory in Factories)
 			{
 				factory.Unregister(unityTile);
 			}
 		}
+
+		protected abstract void PlaceTile(UnityTile tile, IMapReadable map);
 	}
 }

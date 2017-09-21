@@ -7,30 +7,25 @@
 	using UnityEngine;
 	using Mapbox.Map;
 
-	// TODO: make abstract! For example: MapFromFile, MapFromLocationProvider, etc.
-	public class AbstractMap : MonoBehaviour, IMap
+	public abstract class AbstractMap : MonoBehaviour, IMap
 	{
 		[Geocode]
 		[SerializeField]
-		internal string _latitudeLongitudeString;
+		protected string _latitudeLongitudeString;
 
 		[SerializeField]
 		[Range(0, 22)]
-		int _zoom;
+		protected int _zoom;
 		public int Zoom
 		{
 			get
 			{
 				return _zoom;
 			}
-			set
-			{
-				_zoom = value;
-			}
 		}
 
 		[SerializeField]
-		Transform _root;
+		protected Transform _root;
 		public Transform Root
 		{
 			get
@@ -40,43 +35,54 @@
 		}
 
 		[SerializeField]
-		internal AbstractTileProvider _tileProvider;
+		protected AbstractTileProvider _tileProvider;
 
 		[SerializeField]
-		AbstractMapVisualizer _mapVisualizer;
-		public AbstractMapVisualizer MapVisualizer { get { return _mapVisualizer; } }
+		protected AbstractMapVisualizer _mapVisualizer;
+		public AbstractMapVisualizer MapVisualizer
+		{
+			get
+			{
+				return _mapVisualizer;
+			}
+		}
 
 		[SerializeField]
-		internal float _unityTileSize = 100;
+		protected float _unityTileSize = 100;
+		public float UnityTileSize
+		{
+			get
+			{
+				return _unityTileSize;
+			}
+		}
+
 		[SerializeField]
-		bool _snapMapHeightToZero = true;
+		protected bool _snapMapHeightToZero = true;
 
-		MapboxAccess _fileSouce;
+		bool _worldHeightFixed = false;
 
-		Vector2d _mapCenterLatitudeLongitude;
+		protected MapboxAccess _fileSouce;
+
+		protected Vector2d _centerLatitudeLongitude;
 		public Vector2d CenterLatitudeLongitude
 		{
 			get
 			{
-				return _mapCenterLatitudeLongitude;
-			}
-			set
-			{
-				_latitudeLongitudeString = string.Format("{0}, {1}", value.x, value.y);
-				_mapCenterLatitudeLongitude = value;
+				return _centerLatitudeLongitude;
 			}
 		}
 
-		Vector2d _mapCenterMercator;
+		protected Vector2d _centerMercator;
 		public Vector2d CenterMercator
 		{
 			get
 			{
-				return _mapCenterMercator;
+				return _centerMercator;
 			}
 		}
 
-		float _worldRelativeScale;
+		protected float _worldRelativeScale;
 		public float WorldRelativeScale
 		{
 			get
@@ -85,11 +91,25 @@
 			}
 		}
 
-		bool _worldHeightFixed = false;
+		public void SetCenterMercator(Vector2d centerMercator)
+		{
+			_centerMercator = centerMercator;
+		}
+
+		public void SetCenterLatitudeLongitude(Vector2d centerLatitudeLongitude)
+		{
+			_latitudeLongitudeString = string.Format("{0}, {1}", centerLatitudeLongitude.x, centerLatitudeLongitude.y);
+			_centerLatitudeLongitude = centerLatitudeLongitude;
+		}
+
+		public void SetZoom(int zoom)
+		{
+			_zoom = zoom;
+		}
 
 		public event Action OnInitialized = delegate { };
 
-		protected virtual void Awake()
+		void Awake()
 		{
 			_worldHeightFixed = false;
 			_fileSouce = MapboxAccess.Instance;
@@ -101,7 +121,8 @@
 			}
 		}
 
-		protected virtual void OnDestroy()
+		// TODO: implement IDisposable, instead?
+		void OnDestroy()
 		{
 			if (_tileProvider != null)
 			{
@@ -112,31 +133,13 @@
 			_mapVisualizer.Destroy();
 		}
 
-		// This is the part that is abstract?
-		protected virtual void Start()
-		{
-			var latLonSplit = _latitudeLongitudeString.Split(',');
-			_mapCenterLatitudeLongitude = new Vector2d(double.Parse(latLonSplit[0]), double.Parse(latLonSplit[1]));
-
-			var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(_mapCenterLatitudeLongitude, _zoom));
-			_mapCenterMercator = referenceTileRect.Center;
-
-			_worldRelativeScale = (float)(_unityTileSize / referenceTileRect.Size.x);
-			//Root.localScale = Vector3.one * _worldRelativeScale;
-
-			_mapVisualizer.Initialize(this, _fileSouce);
-			_tileProvider.Initialize(this);
-
-			OnInitialized();
-		}
-
 		void TileProvider_OnTileAdded(UnwrappedTileId tileId)
 		{
 			if (_snapMapHeightToZero && !_worldHeightFixed)
 			{
 				_worldHeightFixed = true;
 				var tile = _mapVisualizer.LoadTile(tileId);
-				if(tile.HeightDataState == MeshGeneration.Enums.TilePropertyState.Loaded)
+				if (tile.HeightDataState == MeshGeneration.Enums.TilePropertyState.Loaded)
 				{
 					var h = tile.QueryHeightData(.5f, .5f);
 					Root.transform.position = new Vector3(
@@ -150,9 +153,9 @@
 					{
 						var h = s.QueryHeightData(.5f, .5f);
 						Root.transform.position = new Vector3(
-						 Root.transform.position.x,
-						 -h * WorldRelativeScale,
-						 Root.transform.position.z);
+							 Root.transform.position.x,
+							 -h * WorldRelativeScale,
+							 Root.transform.position.z);
 					};
 				}
 			}
@@ -166,5 +169,12 @@
 		{
 			_mapVisualizer.DisposeTile(tileId);
 		}
+
+		protected void SendInitialized()
+		{
+			OnInitialized();
+		}
+
+		protected abstract void Initialize();
 	}
 }
