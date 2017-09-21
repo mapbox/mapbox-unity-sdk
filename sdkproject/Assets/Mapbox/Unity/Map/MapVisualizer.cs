@@ -1,8 +1,7 @@
-namespace Mapbox.Unity.MeshGeneration
+namespace Mapbox.Unity.Map
 {
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Data;
-	using Mapbox.Unity.Map;
 	using Mapbox.Map;
 
 	public enum ModuleState

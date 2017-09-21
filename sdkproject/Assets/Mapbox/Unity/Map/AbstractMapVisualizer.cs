@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Unity.MeshGeneration
+﻿namespace Mapbox.Unity.Map
 {
 	using System.Collections.Generic;
 	using UnityEngine;
@@ -6,8 +6,8 @@
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using System;
-	using Mapbox.Unity.Map;
 	using Mapbox.Platform;
+	using Mapbox.Unity.MeshGeneration;
 
 	public abstract class AbstractMapVisualizer : ScriptableObject
 	{

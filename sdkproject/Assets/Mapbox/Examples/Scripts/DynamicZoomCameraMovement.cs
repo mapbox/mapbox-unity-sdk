@@ -1,5 +1,6 @@
-﻿namespace Mapbox.Unity.Examples.DynamicZoom
+﻿namespace Mapbox.Examples
 {
+	using Mapbox.Unity.Map;
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Utils;
 	using UnityEngine;

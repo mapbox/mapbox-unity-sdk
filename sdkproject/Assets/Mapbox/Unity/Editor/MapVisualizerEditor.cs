@@ -2,9 +2,9 @@
 {
 	using UnityEngine;
 	using UnityEditor;
-	using Mapbox.Unity.MeshGeneration;
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Editor.NodeEditor;
+	using Mapbox.Unity.Map;
 
 	[CustomEditor(typeof(MapVisualizer))]
 	public class MapVisualizerEditor : UnityEditor.Editor
