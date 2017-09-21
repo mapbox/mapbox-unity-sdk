@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a6523094c07d4ee683da5d826fce510, type: 3}
   m_Name: DynamicZoomFlatTerrainFactory
   m_EditorClassIdentifier: 
-  _baseMaterial: {fileID: 2100000, guid: dc7d236928baa4caebc6bf7666d814c5, type: 2}
+  _baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
   _addCollider: 0
   _addToLayer: 0
   _layerId: 0

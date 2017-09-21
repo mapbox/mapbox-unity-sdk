@@ -116,7 +116,7 @@
 			}
 
 			//unityTile.Initialize(_map, tileId, _map.WorldRelativeScale);
-			unityTile.Initialize(Map, tileId);
+			unityTile.Initialize(Map, tileId, _map.WorldRelativeScale);
 
 			foreach (var factory in Factories)
 			{
@@ -141,9 +141,5 @@
 				factory.Unregister(unityTile);
 			}
 		}
-
-
-
-
 	}
 }

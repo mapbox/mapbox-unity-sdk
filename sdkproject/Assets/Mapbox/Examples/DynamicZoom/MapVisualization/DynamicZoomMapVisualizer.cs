@@ -15,10 +15,8 @@
 	[CreateAssetMenu(menuName = "Mapbox/DynamicZoomMapVisualizer")]
 	public class DynamicZoomMapVisualizer : AbstractMapVisualizer
 	{
-
 		[SerializeField]
 		private Material _loadingIndicator;
-
 
 		/// <summary>
 		/// Registers requested tiles to the factories
@@ -36,14 +34,14 @@
 			if (unityTile == null)
 			{
 				unityTile = new GameObject().AddComponent<UnityTile>();
-				unityTile.LoadingIndicatorMaterial = _loadingIndicator;
+				//unityTile.LoadingIndicatorMaterial = _loadingIndicator;
 				unityTile.transform.SetParent(_map.Root, false);
-				if (null == unityTile.MeshRenderer)
-				{
-					MeshRenderer mr = unityTile.gameObject.AddComponent<MeshRenderer>();
-					//avoid pink tiles on first use
-					mr.enabled = false;
-				}
+				//if (null == unityTile.MeshRenderer)
+				//{
+				//	MeshRenderer mr = unityTile.gameObject.AddComponent<MeshRenderer>();
+				//	//avoid pink tiles on first use
+				//	//mr.enabled = false;
+				//}
 				if (unityTile.MeshFilter == null) { unityTile.gameObject.AddComponent<MeshFilter>(); }
 			}
 
@@ -71,8 +69,7 @@
 				, (centerTile.Y - tileId.Y) * unityTileSize - (float)shift.y / factor
 			);
 
-
-			unityTile.Initialize(_map, tileId);
+			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale);
 			unityTile.transform.localPosition = position;
 			unityTile.transform.localScale = unityTileScale;
 
@@ -85,8 +82,5 @@
 
 			return unityTile;
 		}
-
-
-
 	}
 }

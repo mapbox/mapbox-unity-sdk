@@ -5,18 +5,14 @@
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Utils;
 	using System;
-	using System.Collections;
 	using System.Collections.Generic;
 	using System.Linq;
 	using UnityEngine;
 
-
 	public class DynamicZoomTileProvider : AbstractTileProvider
 	{
-
 		[HideInInspector]
 		public Camera _referenceCamera;
-
 
 		/// <summary>previous Camera.Y</summary>
 		private float _previousY = float.MinValue;
@@ -29,7 +25,8 @@
 		public int CameraZoomingRangeMinY { get { return _cameraZoomingRangeMinY; } }
 		/// <summary>max of y range camera is allowed to move in</summary>
 		private int _cameraZoomingRangeMaxY;
-	public int CameraZoomingRangeMaxY { get { return _cameraZoomingRangeMaxY; } }
+
+		public int CameraZoomingRangeMaxY { get { return _cameraZoomingRangeMaxY; } }
 
 		private Plane _groundPlane;
 		private DynamicZoomMap _dynamicZoomMap;
@@ -51,7 +48,6 @@
 			_dynamicZoomMap.MaxZoom = _dynamicZoomMap.MaxZoom == 0 ? 10 : _dynamicZoomMap.MaxZoom;
 			_cameraZoomingRangeMaxY = (int)(_dynamicZoomMap.UnityTileSize * 2.5f);
 			_cameraZoomingRangeMinY = (int)(_dynamicZoomMap.UnityTileSize * 1.25f);
-
 		}
 
 		void Update()
@@ -84,14 +80,16 @@
 			{
 				//Debug.Log("_previousWebMercCenter != _dynamicZoomMap.CenterWebMerc");
 				_previousWebMercCenter = _dynamicZoomMap.CenterWebMerc;
-				var remove = _activeTiles.ToList();
-				foreach (var r in remove) { RemoveTile(r); }
+				var remove = _activeTiles.Keys.ToList();
+				foreach (var r in remove) 
+				{ 
+					RemoveTile(r); 
+				}
 			}
 			else
 			{
 				//Debug.Log("center is the same");
 			}
-
 
 			Vector3 localPosition = _referenceCamera.transform.position;
 			//close to ground, zoom in
@@ -128,9 +126,10 @@
 			//msg += string.Join(Environment.NewLine, tilesNeeded.Select(t => t.Canonical.ToString()).ToArray());
 			//Debug.LogFormat(msg);
 
-			List<UnwrappedTileId> toRemove = _activeTiles.Except(tilesNeeded).ToList();
+			var activeTiles = _activeTiles.Keys.ToList();
+			List<UnwrappedTileId> toRemove = activeTiles.Except(tilesNeeded).ToList();
 			foreach (var t2r in toRemove) { RemoveTile(t2r); }
-			var finalTilesNeeded = tilesNeeded.Except(_activeTiles);
+			var finalTilesNeeded = tilesNeeded.Except(activeTiles);
 			//Debug.LogFormat("final tiles needed: {0}", finalTilesNeeded.Count());
 			foreach (var tile in finalTilesNeeded)
 			{
@@ -187,10 +186,5 @@
 			if (!_groundPlane.Raycast(ray, out distance)) { return Vector3.zero; }
 			return ray.GetPoint(distance);
 		}
-
-
-
-
 	}
-
 }
