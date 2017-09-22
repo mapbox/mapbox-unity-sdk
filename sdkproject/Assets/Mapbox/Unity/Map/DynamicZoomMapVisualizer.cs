@@ -6,7 +6,7 @@
 	using Mapbox.Utils;
 	using Mapbox.Unity.Utilities;
 
-	[CreateAssetMenu(menuName = "Mapbox/DynamicZoomMapVisualizer")]
+	[CreateAssetMenu(menuName = "Mapbox/MapVisualizer/DynamicZoomMapVisualizer")]
 	public class DynamicZoomMapVisualizer : AbstractMapVisualizer
 	{
 		protected override void PlaceTile(UnwrappedTileId tileId, UnityTile tile, IMapReadable map)
