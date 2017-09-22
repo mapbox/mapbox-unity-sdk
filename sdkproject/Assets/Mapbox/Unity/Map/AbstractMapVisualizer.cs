@@ -58,8 +58,15 @@
 
 			foreach (var factory in Factories)
 			{
-				factory.Initialize(fileSource);
-				factory.OnFactoryStateChanged += UpdateState;
+				if (null == factory)
+				{
+					Debug.LogError("AbstractMapVisualizer: Factory is NULL");
+				}
+				else
+				{
+					factory.Initialize(fileSource);
+					factory.OnFactoryStateChanged += UpdateState;
+				}
 			}
 		}
 
