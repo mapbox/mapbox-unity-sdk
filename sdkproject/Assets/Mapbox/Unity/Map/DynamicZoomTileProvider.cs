@@ -39,7 +39,7 @@
 			//ground plane for raycasting
 			_groundPlane = new Plane(Vector3.up, 0);
 			_dynamicZoomMap = _map as DynamicZoomMap;
-			if (null == _dynamicZoomMap) { Debug.LogErrorFormat("assigned tiled provider is not of type: {0}", this.GetType().Name); }
+			if (null == _dynamicZoomMap) { Debug.LogErrorFormat("{0}: assigned map is not of type 'DynamicZoomMap'", _className); }
 
 
 			_previousWebMercCenter = _dynamicZoomMap.CenterMercator;
