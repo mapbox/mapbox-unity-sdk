@@ -117,8 +117,8 @@ GameObject:
   m_Component:
   - component: {fileID: 114606472}
   - component: {fileID: 114606471}
-  - component: {fileID: 114606473}
   - component: {fileID: 114606474}
+  - component: {fileID: 114606473}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -132,13 +132,14 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 114606470}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd961b1c9541a4cee99686069ecce852, type: 3}
+  m_Script: {fileID: 11500000, guid: 58cb9a85be6f84591938618fa232ce85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _latitudeLongitudeString: set from build map comp
-  _zoom: 15
+  _initializeOnStart: 0
+  _latitudeLongitudeString: 37.7648, -122.463
+  _zoom: 16
   _root: {fileID: 0}
   _tileProvider: {fileID: 114606474}
   _mapVisualizer: {fileID: 11400000, guid: d037eb553509f489e9ba7a5a441b45dd, type: 2}
@@ -165,7 +166,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 114606470}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3fdc49f4b978b4412949e77a41421ee2, type: 3}
+  m_Script: {fileID: 11500000, guid: 96f0fa82f89d64bb9a6524c72d538179, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _map: {fileID: 114606471}
@@ -730,7 +731,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60712efc3153a4819b0c79437175846d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _latitudeLongitude: 37.784328, -122.40364
+  _latitudeLongitude: 37.7648, -122.463
   _heading: 0
 --- !u!4 &1628209263
 Transform:
@@ -772,7 +773,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a034c4eeb3293418aab101c1895844a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _map: {fileID: 114606471}
+  _map: {fileID: 0}
   _targetTransform: {fileID: 1649127106}
 --- !u!4 &1649127106
 Transform:

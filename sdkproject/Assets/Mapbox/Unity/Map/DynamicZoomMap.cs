@@ -1,7 +1,6 @@
 ﻿namespace Mapbox.Unity.Map
 {
 	using UnityEngine;
-	using Mapbox.Unity.Map;
 	using Mapbox.Utils;
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Map;
@@ -19,15 +18,9 @@
 		// TODO: remove?
 		public string _webMerc;
 
-		void Start()
+		public override void Initialize(Vector2d latLon)
 		{
-			Initialize();
-		}
-
-		protected override void Initialize()
-		{
-			var latLonSplit = _latitudeLongitudeString.Split(',');
-			_centerLatitudeLongitude = new Vector2d(double.Parse(latLonSplit[0]), double.Parse(latLonSplit[1]));
+			_centerLatitudeLongitude = latLon;
 
 			var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(_centerLatitudeLongitude, _zoom));
 			_centerMercator = Conversions.LatLonToMeters(_centerLatitudeLongitude);

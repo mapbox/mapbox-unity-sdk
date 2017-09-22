@@ -1,7 +1,6 @@
 ﻿namespace Mapbox.Unity.Map
 {
 	using System;
-	using Mapbox.Unity.MeshGeneration;
 	using Mapbox.Unity.Utilities;
 	using Utils;
 	using UnityEngine;
@@ -9,6 +8,9 @@
 
 	public abstract class AbstractMap : MonoBehaviour, IMap
 	{
+		[SerializeField]
+		bool _initializeOnStart = true;
+
 		[Geocode]
 		[SerializeField]
 		protected string _latitudeLongitudeString;
@@ -121,6 +123,15 @@
 			}
 		}
 
+		void Start()
+		{
+			if (_initializeOnStart)
+			{
+				var latLonSplit = _latitudeLongitudeString.Split(',');
+                Initialize(new Vector2d(double.Parse(latLonSplit[0]), double.Parse(latLonSplit[1])));
+			}
+		}
+
 		// TODO: implement IDisposable, instead?
 		void OnDestroy()
 		{
@@ -175,6 +186,6 @@
 			OnInitialized();
 		}
 
-		protected abstract void Initialize();
+		public abstract void Initialize(Vector2d latLon);
 	}
 }

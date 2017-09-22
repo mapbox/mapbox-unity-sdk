@@ -150,6 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58cb9a85be6f84591938618fa232ce85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _initializeOnStart: 1
   _latitudeLongitudeString: 37.7648, -122.463
   _zoom: 16
   _root: {fileID: 0}
@@ -553,10 +554,10 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 896775715}
-  m_LocalRotation: {x: 0, y: 0.94690216, z: -0.32152203, w: 0}
-  m_LocalPosition: {x: 5.770728, y: 279.6, z: 366.5775}
+  m_LocalRotation: {x: 0.32152203, y: 0, z: 0, w: 0.94690216}
+  m_LocalPosition: {x: 5.770728, y: 279.6, z: -366.5775}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 37.51, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: 37.51, y: 0, z: 0}

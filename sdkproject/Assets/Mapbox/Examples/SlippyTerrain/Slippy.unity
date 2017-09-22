@@ -586,9 +586,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1461465686}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 13615ec90b5f3490cadb2fb110ccec1a, type: 3}
+  m_Script: {fileID: 11500000, guid: 58cb9a85be6f84591938618fa232ce85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _initializeOnStart: 1
   _latitudeLongitudeString: 36.058781, -112.109295
   _zoom: 11
   _root: {fileID: 0}

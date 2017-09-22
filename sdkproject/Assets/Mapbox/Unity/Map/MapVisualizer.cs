@@ -27,7 +27,10 @@ namespace Mapbox.Unity.Map
 		protected override void PlaceTile(UnwrappedTileId tileId, UnityTile tile, IMapReadable map)
 		{
 			var rect = tile.Rect;
+
+			// TODO: this is constant for all tiles--cache.
 			var scale = tile.TileScale;
+
 			var position = new Vector3(
 				(float)(rect.Center.x - map.CenterMercator.x) * scale, 
 				0, 
