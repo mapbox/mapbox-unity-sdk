@@ -7,6 +7,7 @@
 
 	public class DynamicZoomMap : AbstractMap
 	{
+		// TODO: these could also live in AbstractMap, instead.
 		[SerializeField]
 		[Range(0, 22)]
 		public int MinZoom;
@@ -16,17 +17,19 @@
 		public int MaxZoom;
 
 		// TODO: remove?
-		public string _webMerc;
+		//public string _webMerc;
 
 		public override void Initialize(Vector2d latLon)
 		{
 			_centerLatitudeLongitude = latLon;
 
 			var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(_centerLatitudeLongitude, _zoom));
+
+			// FIXME: The only difference from BasicMap? Can we solve this another way?
 			_centerMercator = Conversions.LatLonToMeters(_centerLatitudeLongitude);
+			_worldRelativeScale = (float)(1f / referenceTileRect.Size.x);
 			Debug.LogFormat("center, latLng:{0} webMerc:{1}", _centerLatitudeLongitude, _centerMercator);
 
-			_worldRelativeScale = (float)(1f / referenceTileRect.Size.x);
 			_mapVisualizer.Initialize(this, _fileSouce);
 			_tileProvider.Initialize(this);
 
@@ -34,10 +37,10 @@
 		}
 
 		// TODO: remove!
-		private void Update()
-		{
-			_webMerc = CenterMercator.ToString();
-			SetCenterLatitudeLongitude(Conversions.MetersToLatLon(_centerMercator));
-		}
+		//private void Update()
+		//{
+			//_webMerc = CenterMercator.ToString();
+			//SetCenterLatitudeLongitude(Conversions.MetersToLatLon(_centerMercator));
+		//}
 	}
 }
