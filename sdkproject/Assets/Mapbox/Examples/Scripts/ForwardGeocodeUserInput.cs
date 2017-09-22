@@ -40,7 +40,8 @@ namespace Mapbox.Examples
 
 		public ForwardGeocodeResponse Response { get; private set; }
 
-		public event EventHandler<EventArgs> OnGeocoderResponse;
+		//public event Action<> OnGeocoderResponse = delegate { };
+		public event Action<ForwardGeocodeResponse> OnGeocoderResponse = delegate { };
 
 		void Awake()
 		{
@@ -64,13 +65,12 @@ namespace Mapbox.Examples
 			_hasResponse = true;
 			if (null != res.Features && res.Features.Count > 0)
 			{
+				var center = res.Features[0].Center;
+				_inputField.text = string.Format("{0},{1}", center.x, center.y);
 				_coordinate = res.Features[0].Center;
 			}
 			Response = res;
-			if (OnGeocoderResponse != null)
-			{
-				OnGeocoderResponse(this, EventArgs.Empty);
-			}
+			OnGeocoderResponse(res);
 		}
 	}
 }

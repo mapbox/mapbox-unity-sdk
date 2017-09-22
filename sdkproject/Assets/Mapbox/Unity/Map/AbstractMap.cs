@@ -128,7 +128,7 @@
 			if (_initializeOnStart)
 			{
 				var latLonSplit = _latitudeLongitudeString.Split(',');
-                Initialize(new Vector2d(double.Parse(latLonSplit[0]), double.Parse(latLonSplit[1])));
+				Initialize(new Vector2d(double.Parse(latLonSplit[0]), double.Parse(latLonSplit[1])), _zoom);
 			}
 		}
 
@@ -186,6 +186,6 @@
 			OnInitialized();
 		}
 
-		public abstract void Initialize(Vector2d latLon);
+		public abstract void Initialize(Vector2d latLon, int zoom);
 	}
 }

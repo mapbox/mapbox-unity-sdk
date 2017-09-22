@@ -1,5 +1,6 @@
 ﻿namespace Mapbox.Unity.Map
 {
+	using System.Linq;
 	using System.Collections.Generic;
 	using UnityEngine;
 	using Mapbox.Map;
@@ -7,7 +8,6 @@
 	using Mapbox.Unity.MeshGeneration.Data;
 	using System;
 	using Mapbox.Platform;
-	using Mapbox.Unity.MeshGeneration;
 
 	public abstract class AbstractMapVisualizer : ScriptableObject
 	{
@@ -52,8 +52,14 @@
 		public void Initialize(IMapReadable map, IFileSource fileSource)
 		{
 			_map = map;
-			_activeTiles.Clear();
-			_inactiveTiles.Clear();
+
+			// Allow for map re-use by recycling any active tiles.
+			var activeTiles = _activeTiles.Keys.ToList();
+			foreach (var tile in activeTiles)
+			{
+				DisposeTile(tile);
+			}
+
 			State = ModuleState.Initialized;
 
 			foreach (var factory in Factories)

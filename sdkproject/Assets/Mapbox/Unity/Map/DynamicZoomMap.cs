@@ -19,9 +19,10 @@
 		// TODO: remove?
 		//public string _webMerc;
 
-		public override void Initialize(Vector2d latLon)
+		public override void Initialize(Vector2d latLon, int zoom)
 		{
 			_centerLatitudeLongitude = latLon;
+			_zoom = zoom;
 
 			var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(_centerLatitudeLongitude, _zoom));
 

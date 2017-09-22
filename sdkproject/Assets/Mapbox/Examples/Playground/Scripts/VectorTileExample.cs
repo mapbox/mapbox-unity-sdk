@@ -3,10 +3,10 @@
 //     Copyright (c) 2016 Mapbox. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
-using Mapbox.Unity;
-using Mapbox.Platform;
-
-namespace Mapbox.Examples.Playground {
+namespace Mapbox.Examples.Playground
+{
+	using Mapbox.Unity;
+	using Mapbox.Platform;
 	using System;
 	using UnityEngine;
 	using UnityEngine.UI;
@@ -14,8 +14,10 @@ namespace Mapbox.Examples.Playground {
 	using Mapbox.Json;
 	using Mapbox.VectorTile.ExtensionMethods;
 	using Mapbox.Utils.JsonConverters;
+	using Mapbox.Geocoding;
 
-	public class VectorTileExample : MonoBehaviour, Mapbox.Utils.IObserver<VectorTile> {
+	public class VectorTileExample : MonoBehaviour, Mapbox.Utils.IObserver<VectorTile>
+	{
 		[SerializeField]
 		ForwardGeocodeUserInput _searchLocation;
 
@@ -24,17 +26,21 @@ namespace Mapbox.Examples.Playground {
 
 		Map<VectorTile> _map;
 
-		void Awake() {
+		void Awake()
+		{
 			_searchLocation.OnGeocoderResponse += SearchLocation_OnGeocoderResponse;
 		}
 
-		void OnDestroy() {
-			if (_searchLocation != null) {
+		void OnDestroy()
+		{
+			if (_searchLocation != null)
+			{
 				_searchLocation.OnGeocoderResponse -= SearchLocation_OnGeocoderResponse;
 			}
 		}
 
-		void Start() {
+		void Start()
+		{
 			_map = new Map<VectorTile>(new FileSource(MapboxAccess.Instance.Configuration.AccessToken));
 			_map.Zoom = 18;
 			// This marks us an an observer to map.
@@ -48,15 +54,18 @@ namespace Mapbox.Examples.Playground {
 		/// </summary>
 		/// <param name="sender">Sender.</param>
 		/// <param name="e">E.</param>
-		void SearchLocation_OnGeocoderResponse(object sender, EventArgs e) {
+		void SearchLocation_OnGeocoderResponse(ForwardGeocodeResponse response)
+		{
 			Redraw();
 		}
 
 		/// <summary>
 		/// Request _map to update its tile data with new coordinates.
 		/// </summary>
-		void Redraw() {
-			if (!_searchLocation.HasResponse) {
+		void Redraw()
+		{
+			if (!_searchLocation.HasResponse)
+			{
 				_resultsText.text = "no results";
 				return;
 			}
@@ -70,8 +79,10 @@ namespace Mapbox.Examples.Playground {
 		/// Handle tile data from _map as they become available.
 		/// </summary>
 		/// <param name="tile">Tile.</param>
-		public void OnNext(VectorTile tile) {
-			if (tile.CurrentState != Tile.State.Loaded || tile.HasError) {
+		public void OnNext(VectorTile tile)
+		{
+			if (tile.CurrentState != Tile.State.Loaded || tile.HasError)
+			{
 				return;
 			}
 

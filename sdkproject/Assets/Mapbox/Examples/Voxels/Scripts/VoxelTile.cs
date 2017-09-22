@@ -1,5 +1,6 @@
 namespace Mapbox.Examples.Voxels
 {
+	using Mapbox.Geocoding;
 	using Mapbox.Map;
 	using Mapbox.Unity;
 	using System.Collections.Generic;
@@ -86,7 +87,7 @@ namespace Mapbox.Examples.Voxels
 			FetchWorldData(new Vector2d(-50.98306, -72.96639));
 		}
 
-		void GeocodeInput_OnGeocoderResponse(object sender, EventArgs e)
+		void GeocodeInput_OnGeocoderResponse(ForwardGeocodeResponse response)
 		{
 			Cleanup();
 			FetchWorldData(_geocodeInput.Coordinate);

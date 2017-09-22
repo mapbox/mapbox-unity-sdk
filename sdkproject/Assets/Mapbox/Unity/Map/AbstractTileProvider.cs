@@ -4,6 +4,7 @@
 	using System.Collections.Generic;
 	using UnityEngine;
 	using Mapbox.Map;
+	using System.Linq;
 
 	public abstract class AbstractTileProvider : MonoBehaviour, ITileProvider
 	{
@@ -12,11 +13,11 @@
 
 		protected IMap _map;
 
-		protected Dictionary<UnwrappedTileId, byte> _activeTiles;
+		protected Dictionary<UnwrappedTileId, byte> _activeTiles = new Dictionary<UnwrappedTileId, byte>();
 
 		public void Initialize(IMap map)
 		{
-			_activeTiles = new Dictionary<UnwrappedTileId, byte>();
+			_activeTiles.Clear();
 			_map = map;
 			OnInitialized();
 		}
