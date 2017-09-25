@@ -18,10 +18,8 @@ namespace Mapbox.Unity.Utilities
 	{
 		private const int TileSize = 256;
 		/// <summary>according to https://wiki.openstreetmap.org/wiki/Zoom_levels</summary>
-		//private const double EarthRadius = 6372798.2;
 		private const int EarthRadius = 6378137; //no seams with globe example
 		private const double InitialResolution = 2 * Math.PI * EarthRadius / TileSize;
-		//private const double OriginShift = 20037508.34;
 		private const double OriginShift = 2 * Math.PI * EarthRadius / 2;
 
 		/// <summary>
