@@ -155,7 +155,7 @@
 					var h = tile.QueryHeightData(.5f, .5f);
 					Root.transform.position = new Vector3(
 					 Root.transform.position.x,
-					 -h * WorldRelativeScale,
+					 -h,
 					 Root.transform.position.z);
 				}
 				else
@@ -165,7 +165,7 @@
 						var h = s.QueryHeightData(.5f, .5f);
 						Root.transform.position = new Vector3(
 							 Root.transform.position.x,
-							 -h * WorldRelativeScale,
+							 -h,
 							 Root.transform.position.z);
 					};
 				}

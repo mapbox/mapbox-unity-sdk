@@ -66,29 +66,24 @@
 				&& !bboxChanged
 			)
 			{
-				//Debug.Log("nothing's changed");
+				//no changes, bail
 				return;
 			}
-			//if (bboxChanged) { Debug.LogFormat("bbox changed: {0} vs. {1}", _viewPortLatLngBounds, currentViewPortLatLngBnds); }
 
 			_viewPortWebMercBounds = currentViewPortWebMercBnds;
 
+			//panning
 			//TODO: move active tiles on pan
 			//HACK: just deactivate all active tiles
 			//!!!BEWARE!!!: don't compare Vector2d via '==' use 'Equals()'
 			if (!_previousWebMercCenter.Equals(_dynamicZoomMap.CenterMercator))
 			{
-				//Debug.Log("_previousWebMercCenter != _dynamicZoomMap.CenterWebMerc");
 				_previousWebMercCenter = _dynamicZoomMap.CenterMercator;
 				var remove = _activeTiles.Keys.ToList();
 				foreach (var r in remove) 
 				{ 
 					RemoveTile(r); 
 				}
-			}
-			else
-			{
-				//Debug.Log("center is the same");
 			}
 
 			Vector3 localPosition = _referenceCamera.transform.position;
@@ -98,7 +93,6 @@
 				//already at highest level, don't do anything -> camera free to move closer
 				if (_dynamicZoomMap.Zoom == _dynamicZoomMap.MaxZoom) { return; }
 				_dynamicZoomMap.SetZoom(_dynamicZoomMap.Zoom + 1);
-				//_dynamicZoomMap.Zoom++;
 				//reposition camera at max distance
 				localPosition.y = _cameraZoomingRangeMaxY;
 				_referenceCamera.transform.localPosition = localPosition;
@@ -109,30 +103,20 @@
 				//already at lowest level, don't do anything -> camera free to move further away
 				if (_dynamicZoomMap.Zoom == _dynamicZoomMap.MinZoom) { return; }
 				_dynamicZoomMap.SetZoom(_dynamicZoomMap.Zoom - 1);
-				//_dynamicZoomMap.Zoom--;
 				//reposition camera at min distance
 				localPosition.y = _cameraZoomingRangeMinY;
 				_referenceCamera.transform.localPosition = localPosition;
 			}
-			//else if (bboxChanged)
-			//{
-			//	loadTiles(_viewPortLatLngBounds, _currentZoomLevel);
-			//}
-
 
 			//update viewport in case it was changed by switching zoom level
 			_viewPortWebMercBounds = getcurrentViewPortWebMerc();
 
 			var tilesNeeded = TileCover.GetWithWebMerc(_viewPortWebMercBounds, _dynamicZoomMap.Zoom);
-			//string msg = string.Format("{0}.{1}: adding {2} tiles", _className, new System.Diagnostics.StackFrame().GetMethod().Name, tilesNeeded.Count) + Environment.NewLine;
-			//msg += string.Join(Environment.NewLine, tilesNeeded.Select(t => t.Canonical.ToString()).ToArray());
-			//Debug.LogFormat(msg);
 
 			var activeTiles = _activeTiles.Keys.ToList();
 			List<UnwrappedTileId> toRemove = activeTiles.Except(tilesNeeded).ToList();
 			foreach (var t2r in toRemove) { RemoveTile(t2r); }
 			var finalTilesNeeded = tilesNeeded.Except(activeTiles);
-			//Debug.LogFormat("final tiles needed: {0}", finalTilesNeeded.Count());
 			foreach (var tile in finalTilesNeeded)
 			{
 				AddTile(tile);

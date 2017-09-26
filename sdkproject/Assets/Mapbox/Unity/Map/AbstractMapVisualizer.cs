@@ -8,12 +8,14 @@
 	using Mapbox.Unity.MeshGeneration.Data;
 	using System;
 	using Mapbox.Platform;
+	using UnityEngine.Serialization;
 
 	public abstract class AbstractMapVisualizer : ScriptableObject
 	{
 		[SerializeField]
 		[NodeEditorElementAttribute("Factories")]
-		private List<AbstractTileFactory> _factories;
+		[FormerlySerializedAs("_factories")]
+		public List<AbstractTileFactory> Factories;
 
 		[SerializeField]
 		Texture2D _loadingTexture;
@@ -39,7 +41,6 @@
 			}
 		}
 
-		public List<AbstractTileFactory> Factories { get { return _factories; } }
 		public IMapReadable Map { get { return _map; } }
 		public Dictionary<UnwrappedTileId, UnityTile> ActiveTiles { get { return _activeTiles; } }
 
