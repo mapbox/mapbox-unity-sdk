@@ -1,7 +1,6 @@
 namespace Mapbox.Unity.MeshGeneration.Data
 {
 	using Mapbox.VectorTile;
-	using Mapbox.VectorTile.ExtensionMethods;
 	using System.Collections.Generic;
 	using Mapbox.VectorTile.Geometry;
 	using UnityEngine;
@@ -23,14 +22,19 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			Properties = Data.GetProperties();
 			Points = new List<List<Vector3>>();
 
-			List<List<Point2d<float>>> geom = feature.Geometry<float>(0);
-			for (int i = 0; i < geom.Count; i++)
+			double unityTileSizeX = tile.Rect.Size.x;
+			double unityTileSizeY = tile.Rect.Size.y;
+
+			List<List<Point2d<float>>> geom = feature.Geometry<float>();
+			var geomCount = geom.Count;
+			for (int i = 0; i < geomCount; i++)
 			{
-				var nl = new List<Vector3>(geom[i].Count);
-				for (int j = 0; j < geom[i].Count; j++)
+				var pointCount = geom[i].Count;
+				var nl = new List<Vector3>(pointCount);
+				for (int j = 0; j < pointCount; j++)
 				{
 					var point = geom[i][j];
-					nl.Add(new Vector3((float)(point.X / layerExtent * tile.Rect.Size.x - (tile.Rect.Size.x / 2)) * tile.TileScale, 0, (float)((layerExtent - point.Y) / layerExtent * tile.Rect.Size.y - (tile.Rect.Size.y / 2)) * tile.TileScale));
+					nl.Add(new Vector3((float)(point.X / layerExtent * unityTileSizeX - (unityTileSizeX / 2))* tile.TileScale, 0, (float)((layerExtent - point.Y) / layerExtent * unityTileSizeY - (unityTileSizeY / 2)) * tile.TileScale));
 				}
 				Points.Add(nl);
 			}
