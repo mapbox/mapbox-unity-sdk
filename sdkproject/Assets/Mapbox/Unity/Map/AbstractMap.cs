@@ -62,7 +62,7 @@
 		[SerializeField]
 		protected bool _snapMapHeightToZero = true;
 
-		bool _worldHeightFixed = false;
+		protected bool _worldHeightFixed = false;
 
 		protected MapboxAccess _fileSouce;
 
