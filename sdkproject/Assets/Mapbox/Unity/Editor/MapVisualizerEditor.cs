@@ -28,7 +28,7 @@
 
 			EditorGUILayout.Space();
 			EditorGUILayout.LabelField("Factories");
-			var facs = serializedObject.FindProperty("_factories");
+			var facs = serializedObject.FindProperty("Factories");
 			for (int i = 0; i < facs.arraySize; i++)
 			{
 				var ind = i;
