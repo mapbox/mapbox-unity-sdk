@@ -47,9 +47,7 @@
 
 					EditorGUILayout.BeginVertical();
 					GUILayout.Space(5);
-					GUI.enabled = false;
 					EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(ind).objectReferenceValue, typeof(FilterBase), false);
-					GUI.enabled = true;
 					EditorGUILayout.EndVertical();
 
 					if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
@@ -63,10 +61,19 @@
 					EditorGUILayout.EndHorizontal();
 				}
 
-				if (GUILayout.Button(new GUIContent("Add New")))
+
+				EditorGUILayout.Space();
+				EditorGUILayout.BeginHorizontal();
+				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
+				{
+					facs.arraySize++;
+					facs.GetArrayElementAtIndex(facs.arraySize - 1).objectReferenceValue = null;
+				}
+				if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
 				{
 					ScriptableCreatorWindow.Open(typeof(FilterBase), facs);
 				}
+				EditorGUILayout.EndHorizontal();
 			}
 
 			//DEFAULT STACK
@@ -79,9 +86,7 @@
 
 					EditorGUILayout.BeginVertical();
 					GUILayout.Space(5);
-					GUI.enabled = false;
-					EditorGUILayout.ObjectField(_layerVis._defaultStack, typeof(ModifierStackBase), false);
-					GUI.enabled = true;
+					EditorGUILayout.ObjectField(_layerVis._defaultStack, typeof(ModifierStackBase));
 					EditorGUILayout.EndVertical();
 
 					if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
@@ -119,9 +124,7 @@
 
 					EditorGUILayout.BeginVertical();
 					GUILayout.Space(5);
-					GUI.enabled = false;
-					EditorGUILayout.ObjectField(_layerVis.Stacks[i].Stack, typeof(ModifierStackBase), false);
-					GUI.enabled = true;
+					EditorGUILayout.ObjectField(_layerVis.Stacks[i].Stack, typeof(ModifierStackBase));
 					EditorGUILayout.EndVertical();
 
 					if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
@@ -141,7 +144,15 @@
 					EditorGUILayout.EndHorizontal();
 				}
 
-				if (GUILayout.Button(new GUIContent("Add New")))
+
+				EditorGUILayout.Space();
+				EditorGUILayout.BeginHorizontal();
+				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
+				{
+					facs.arraySize++;
+					facs.GetArrayElementAtIndex(facs.arraySize - 1).objectReferenceValue = null;
+				}
+				if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
 				{
 					ScriptableCreatorWindow.Open(typeof(ModifierStackBase), facs, 0, (asset) =>
 					{

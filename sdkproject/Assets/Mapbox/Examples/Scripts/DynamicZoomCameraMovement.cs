@@ -46,14 +46,12 @@
 
 		private void LateUpdate()
 		{
-			//if (null == Map) { Debug.LogErrorFormat("{0}: map not set", this.GetType().Name); }
 			if (null == _dynamicZoomMap) { return; }
 
 
 			//development short cut: reset center to 0/0 via right click
 			if (Input.GetMouseButton(1))
 			{
-				//Map.CenterMercator.x = Map.CenterMercator.y = 0;
 				_dynamicZoomMap.SetCenterMercator(Vector2d.zero);
 				return;
 			}
@@ -80,7 +78,6 @@
 				float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) * 256 / _dynamicZoomMap.UnityTileSize;
 				xMove *= factor;
 				zMove *= factor;
-				Debug.LogFormat("xMove:{0} zMove:{1}", xMove, zMove);
 				_dynamicZoomMap.SetCenterMercator(_dynamicZoomMap.CenterMercator + new Vector2d(xMove, zMove));
 			}
 
@@ -89,9 +86,9 @@
 			{
 				var mouseDownPosScreen = Input.mousePosition;
 				//assign distance of camera to ground plane to z, otherwise ScreenToWorldPoint() will always return the position of the camera
+				//http://answers.unity3d.com/answers/599100/view.html
 				mouseDownPosScreen.z = _referenceCamera.transform.localPosition.y;
 				_origin = _referenceCamera.ScreenToWorldPoint(mouseDownPosScreen);
-				Debug.LogFormat("button down, mousePosScreen:{0} mousePosWorld:{1}", mouseDownPosScreen, _origin);
 			}
 
 			if (Input.GetMouseButtonUp(0))
@@ -101,7 +98,6 @@
 				//http://answers.unity3d.com/answers/599100/view.html
 				mouseUpPosScreen.z = _referenceCamera.transform.localPosition.y;
 				var mouseUpPosWorld = _referenceCamera.ScreenToWorldPoint(mouseUpPosScreen);
-				Debug.LogFormat("button up, mousePosScreen:{0} mousePosWorld:{1}", mouseUpPosScreen, mouseUpPosWorld);
 
 				//has position changed?
 				if (_origin != mouseUpPosWorld)
@@ -112,13 +108,6 @@
 						float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) * 256 / _dynamicZoomMap.UnityTileSize;
 						var centerOld = _dynamicZoomMap.CenterMercator;
 						_dynamicZoomMap.SetCenterMercator(_dynamicZoomMap.CenterMercator + new Vector2d(offset.x * factor, offset.z * factor));
-						//double newX = _dynamicZoomMap.CenterMercator.x + offset.x * factor;
-						//double newY = _dynamicZoomMap.CenterMercator.y + offset.z * factor;
-						//_dynamicZoomMap.SetCenterMercator(new Vector2d(newX, newY));
-						//Map.CenterWebMerc.x += offset.x * factor;
-						//Map.CenterWebMerc.y += offset.z * factor;
-
-						Debug.LogFormat("old center:{1}{0}new center:{2}{0}offset:{3}{0}factor:{4}", System.Environment.NewLine, centerOld, _dynamicZoomMap.CenterMercator, offset, factor);
 					}
 				}
 			}
