@@ -841,11 +841,11 @@ RectTransform:
   m_Father: {fileID: 224709793726594912}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 269.33, y: 74.4}
-  m_Pivot: {x: 1, y: 0}
+  m_SizeDelta: {x: 269.33, y: 74.400024}
+  m_Pivot: {x: 0.5, y: 1}
 --- !u!224 &224048572454037920
 RectTransform:
   m_ObjectHideFlags: 1
