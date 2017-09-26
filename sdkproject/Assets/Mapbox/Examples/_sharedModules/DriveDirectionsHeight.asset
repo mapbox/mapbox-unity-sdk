@@ -15,4 +15,4 @@ MonoBehaviour:
   _flatTops: 0
   _forceHeight: 1
   _height: 4
-  _createSideWalls: 1
+  _createSideWalls: 0

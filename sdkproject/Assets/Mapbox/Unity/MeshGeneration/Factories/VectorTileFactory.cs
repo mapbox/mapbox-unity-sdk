@@ -23,6 +23,19 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;
 		private Dictionary<UnityTile, VectorTile> _cachedData = new Dictionary<UnityTile, VectorTile>();
 
+		public string MapId
+		{
+			get
+			{
+				return _mapId;
+			}
+
+			set
+			{
+				_mapId = value;
+			}
+		}
+
 		public void OnEnable()
 		{
 			if (Visualizers == null)

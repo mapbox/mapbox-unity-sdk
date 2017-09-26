@@ -51,6 +51,19 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		private Vector3 _newDir;
 		private int _vertA, _vertB, _vertC;
 
+		public string MapId
+		{
+			get
+			{
+				return _mapId;
+			}
+
+			set
+			{
+				_mapId = value;
+			}
+		}
+
 		internal override void OnInitialized()
 		{
 			_meshData = new Dictionary<UnwrappedTileId, Mesh>();

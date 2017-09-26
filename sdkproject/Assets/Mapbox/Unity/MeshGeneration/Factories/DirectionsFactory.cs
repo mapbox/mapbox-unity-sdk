@@ -7,7 +7,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	using Mapbox.Unity.Map;
 	using Data;
 	using Modifiers;
-	using Mapbox.Platform;
 	using Mapbox.Utils;
 	using Mapbox.Unity.Utilities;
 

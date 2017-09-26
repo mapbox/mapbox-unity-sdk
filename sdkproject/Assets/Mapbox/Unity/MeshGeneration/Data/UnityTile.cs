@@ -20,6 +20,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		Texture2D _heightTexture;
 
+		Texture2D _loadingTexture;
+
 		List<Tile> _tiles = new List<Tile>();
 
 		MeshRenderer _meshRenderer;
@@ -110,22 +112,24 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public event Action<UnityTile> OnRasterDataChanged = delegate { };
 		public event Action<UnityTile> OnVectorDataChanged = delegate { };
 
-		internal void Initialize(IMap map, UnwrappedTileId tileId, float scale)
+		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, float scale, Texture2D loadingTexture = null)
 		{
 			TileScale = scale;
 			_relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
 			_rect = Conversions.TileBounds(tileId);
 			_unwrappedTileId = tileId;
 			_canonicalTileId = tileId.Canonical;
-			gameObject.name = _canonicalTileId.ToString();
-			var position = new Vector3((float)(_rect.Center.x - map.CenterMercator.x) * TileScale, 0, (float)(_rect.Center.y - map.CenterMercator.y) * TileScale);
-			transform.localPosition = position;
+			_loadingTexture = loadingTexture;
+
 			gameObject.SetActive(true);
 		}
 
 		internal void Recycle()
 		{
-			// TODO: to hide potential visual artifacts, use placeholder mesh / texture?
+			if (_loadingTexture)
+			{
+				MeshRenderer.material.mainTexture = _loadingTexture;
+			}
 
 			gameObject.SetActive(false);
 
@@ -200,6 +204,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			return 0;
 		}
 
+		public void SetLoadingTexture(Texture2D texture)
+		{
+			MeshRenderer.material.mainTexture = texture;
+		}
+
 		public void SetRasterData(byte[] data, bool useMipMap, bool useCompression)
 		{
 			// Don't leak the texture, just reuse it.
@@ -207,7 +216,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			{
 				_rasterData = new Texture2D(0, 0, TextureFormat.RGB24, useMipMap);
 				_rasterData.wrapMode = TextureWrapMode.Clamp;
-				MeshRenderer.material.mainTexture = _rasterData;
 			}
 
 			_rasterData.LoadImage(data);
@@ -217,6 +225,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				_rasterData.Compress(false);
 			}
 
+			MeshRenderer.material.mainTexture = _rasterData;
 			RasterDataState = TilePropertyState.Loaded;
 			OnRasterDataChanged(this);
 		}

@@ -2,9 +2,9 @@
 {
 	using UnityEngine;
 	using UnityEditor;
-	using Mapbox.Unity.MeshGeneration;
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Editor.NodeEditor;
+	using Mapbox.Unity.Map;
 
 	[CustomEditor(typeof(MapVisualizer))]
 	public class MapVisualizerEditor : UnityEditor.Editor
@@ -23,9 +23,12 @@
 			script = EditorGUILayout.ObjectField("Script", script, typeof(MonoScript), false) as MonoScript;
 			GUI.enabled = true;
 
+			var texture = serializedObject.FindProperty("_loadingTexture");
+			EditorGUILayout.ObjectField(texture, typeof(Texture2D));
+
 			EditorGUILayout.Space();
 			EditorGUILayout.LabelField("Factories");
-			var facs = serializedObject.FindProperty("_factories");
+			var facs = serializedObject.FindProperty("Factories");
 			for (int i = 0; i < facs.arraySize; i++)
 			{
 				var ind = i;
