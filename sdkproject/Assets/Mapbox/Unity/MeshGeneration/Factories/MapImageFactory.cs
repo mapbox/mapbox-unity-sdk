@@ -39,6 +39,19 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField]
 		bool _useRetina;
 
+		public string MapId
+		{
+			get
+			{
+				return _mapId;
+			}
+
+			set
+			{
+				_mapId = value;
+			}
+		}
+
 		// TODO: come back to this
 		//public override void Update()
 		//{

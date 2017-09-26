@@ -1,6 +1,6 @@
-using System.Linq;
 namespace Mapbox.Unity.Map
 {
+	using System.Linq;
 	using UnityEngine;
 	using Mapbox.Map;
 	using Mapbox.Unity.Utilities;

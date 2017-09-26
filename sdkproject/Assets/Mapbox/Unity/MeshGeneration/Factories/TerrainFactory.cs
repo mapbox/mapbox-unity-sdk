@@ -58,6 +58,19 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		private Vector3 _newDir;
 		private int _vertA, _vertB, _vertC;
 
+		public string MapId
+		{
+			get
+			{
+				return _mapId;
+			}
+
+			set
+			{
+				_mapId = value;
+			}
+		}
+
 		/// <summary>
 		/// Clears the mesh data and re-runs the terrain creation procedure using current settings. Clearing the old mesh data is important as terrain stitching function checks if the data exists or not.
 		/// </summary>
