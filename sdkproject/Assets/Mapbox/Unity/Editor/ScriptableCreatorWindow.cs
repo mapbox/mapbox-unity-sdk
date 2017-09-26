@@ -80,7 +80,7 @@
 				var asset = _assets[i];
 				GUILayout.BeginHorizontal();
 
-				var b = Header(asset.GetType().Name + " - " + asset.name, i == activeIndex);
+				var b = Header(string.Format("{0,-40} - {1, -15}",  asset.GetType().Name , asset.name), i == activeIndex);
 
 				if (b)
 					activeIndex = i;
