@@ -132,7 +132,7 @@
 
 		void TileProvider_OnTileAdded(UnwrappedTileId tileId)
 		{
-			if (_snapMapHeightToZero && !_worldHeightFixed)
+			if (!_worldHeightFixed && _snapMapHeightToZero)
 			{
 				_worldHeightFixed = true;
 				var tile = _mapVisualizer.LoadTile(tileId);
