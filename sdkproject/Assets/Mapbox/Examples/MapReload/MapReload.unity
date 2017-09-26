@@ -556,7 +556,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1461465688}
   - component: {fileID: 1461465691}
-  - component: {fileID: 1461465690}
+  - component: {fileID: 1461465687}
   - component: {fileID: 1461465689}
   m_Layer: 0
   m_Name: Map
@@ -565,6 +565,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &1461465687
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1461465686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d7ff8ed3b76a4ee5a451d64a5393e3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _west: 2
+  _north: 2
+  _east: 2
+  _south: 2
 --- !u!4 &1461465688
 Transform:
   m_ObjectHideFlags: 0
@@ -592,21 +607,6 @@ MonoBehaviour:
   _map: {fileID: 1461465691}
   _forwardGeocoder: {fileID: 66435135}
   _zoomSlider: {fileID: 2119403479}
---- !u!114 &1461465690
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1461465686}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dae9a62a6a8194f49bab9128c9acffb7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _camera: {fileID: 1281281116}
-  _visibleBuffer: 2
-  _disposeBuffer: 6
-  _updateInterval: 0.33
 --- !u!114 &1461465691
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -622,7 +622,7 @@ MonoBehaviour:
   _latitudeLongitudeString: 36.058781, -112.109295
   _zoom: 15
   _root: {fileID: 0}
-  _tileProvider: {fileID: 1461465690}
+  _tileProvider: {fileID: 1461465687}
   _mapVisualizer: {fileID: 11400000, guid: 31950398144434b929cbc12fa5e1b00b, type: 2}
   _unityTileSize: 100
   _snapMapHeightToZero: 1
