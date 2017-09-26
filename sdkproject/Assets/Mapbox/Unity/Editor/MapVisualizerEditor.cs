@@ -35,9 +35,7 @@
 				EditorGUILayout.BeginHorizontal();
 				EditorGUILayout.BeginVertical();
 				GUILayout.Space(5);
-				GUI.enabled = false;
 				facs.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(i).objectReferenceValue, typeof(AbstractTileFactory), false) as ScriptableObject;
-				GUI.enabled = true;
 				EditorGUILayout.EndVertical();
 
 				if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
@@ -51,10 +49,18 @@
 				EditorGUILayout.EndHorizontal();
 			}
 
-			if (GUILayout.Button(new GUIContent("Add New")))
+			EditorGUILayout.Space();
+			EditorGUILayout.BeginHorizontal();
+			if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
+			{
+				facs.arraySize++;
+				facs.GetArrayElementAtIndex(facs.arraySize - 1).objectReferenceValue = null;
+			}
+			if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
 			{
 				ScriptableCreatorWindow.Open(typeof(AbstractTileFactory), facs);
 			}
+			EditorGUILayout.EndHorizontal();
 
 			serializedObject.ApplyModifiedProperties();
 		}

@@ -35,11 +35,9 @@
 			{
 				var ind = i;
 				EditorGUILayout.BeginHorizontal();
-				GUI.enabled = false;
 				EditorGUILayout.BeginVertical();
 				GUILayout.Space(5);
 				facs.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(i).objectReferenceValue, typeof(MeshModifier), false) as ScriptableObject;
-				GUI.enabled = true;
 				EditorGUILayout.EndVertical();
 				if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
 				{
@@ -52,10 +50,18 @@
 				EditorGUILayout.EndHorizontal();
 			}
 
-			if (GUILayout.Button(new GUIContent("Add New")))
+			EditorGUILayout.Space();
+			EditorGUILayout.BeginHorizontal();
+			if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
+			{
+				facs.arraySize++;
+				facs.GetArrayElementAtIndex(facs.arraySize - 1).objectReferenceValue = null;
+			}
+			if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
 			{
 				ScriptableCreatorWindow.Open(typeof(MeshModifier), facs);
 			}
+			EditorGUILayout.EndHorizontal();
 
 			EditorGUILayout.Space();
 			EditorGUILayout.LabelField("Game Object Modifiers");
@@ -66,9 +72,7 @@
 				EditorGUILayout.BeginHorizontal();
 				EditorGUILayout.BeginVertical();
 				GUILayout.Space(5);
-				GUI.enabled = false;
 				facs2.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(facs2.GetArrayElementAtIndex(i).objectReferenceValue, typeof(GameObjectModifier), false) as ScriptableObject;
-				GUI.enabled = true;
 				EditorGUILayout.EndVertical();
 
 				if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
@@ -82,10 +86,18 @@
 				EditorGUILayout.EndHorizontal();
 			}
 
-			if (GUILayout.Button(new GUIContent("Add New")))
+			EditorGUILayout.Space();
+			EditorGUILayout.BeginHorizontal();
+			if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
 			{
-				ScriptableCreatorWindow.Open(typeof(GameObjectModifier), facs2);
+				facs.arraySize++;
+				facs.GetArrayElementAtIndex(facs.arraySize - 1).objectReferenceValue = null;
 			}
+			if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
+			{
+				ScriptableCreatorWindow.Open(typeof(GameObjectModifier), facs);
+			}
+			EditorGUILayout.EndHorizontal();
 
 			serializedObject.ApplyModifiedProperties();
 		}
