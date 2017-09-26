@@ -48,7 +48,7 @@
 
 		private void Snap()
 		{
-			if (_targetVerts == null)
+			if (_targetVerts == null || _selectedFeature == null)
 				return;
 
 			var left = float.MaxValue;

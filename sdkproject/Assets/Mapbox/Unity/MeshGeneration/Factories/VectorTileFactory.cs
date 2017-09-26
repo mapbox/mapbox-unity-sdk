@@ -51,6 +51,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		internal override void OnInitialized()
 		{
 			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
+			_cachedData.Clear();
 			foreach (LayerVisualizerBase factory in Visualizers)
 			{
 				if (factory == null)
