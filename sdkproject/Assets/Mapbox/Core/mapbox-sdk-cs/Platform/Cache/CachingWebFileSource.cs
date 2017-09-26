@@ -124,6 +124,8 @@
 					cache.Add(mapId, tileId, data);
 				}
 
+				// Delay the cache one frame to "mock" time passing (we have some temporal coupling in various spots).
+				// This is a simple work around, for the time being.
 				Runnable.Run(DelayCachedResponse(callback, Response.FromCache(data)));
 
 				return new MemoryCacheAsyncRequest(uri);
