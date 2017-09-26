@@ -4,17 +4,23 @@
 	using Mapbox.Utils;
 	using UnityEngine;
 
-	// TODO: split into read and write maps?
-	public interface IMap
-	{
-		// Writable.
-		Vector2d CenterLatitudeLongitude { get; set; }
-		int Zoom { get; set; }
+	public interface IMap : IMapReadable, IMapWritable { }
 
-		// Readable.
+	public interface IMapReadable
+	{
 		Vector2d CenterMercator { get; }
 		float WorldRelativeScale { get; }
+		Vector2d CenterLatitudeLongitude { get; }
+		int Zoom { get; }
 		Transform Root { get; }
+		float UnityTileSize { get; }
 		event Action OnInitialized;
+	}
+
+	public interface IMapWritable
+	{
+		void SetCenterMercator(Vector2d centerMercator);
+		void SetCenterLatitudeLongitude(Vector2d centerLatitudeLongitude);
+		void SetZoom(int zoom);
 	}
 }

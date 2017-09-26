@@ -13,3 +13,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _factories:
   - {fileID: 11400000, guid: 99a5ed38fb057344493cad6cc2af7477, type: 2}
+  _loadingTexture: {fileID: 2800000, guid: e2896a92727704803a9c422b043eae89, type: 3}
