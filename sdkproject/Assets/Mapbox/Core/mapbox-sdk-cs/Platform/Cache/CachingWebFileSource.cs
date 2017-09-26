@@ -5,6 +5,7 @@
 	using System.Collections.Generic;
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Map;
+	using System.Collections;
 
 	public class CachingWebFileSource : IFileSource, IDisposable
 	{
@@ -123,7 +124,10 @@
 					cache.Add(mapId, tileId, data);
 				}
 
-				callback(Response.FromCache(data));
+				// Delay the cache one frame to "mock" time passing (we have some temporal coupling in various spots).
+				// This is a simple work around, for the time being.
+				Runnable.Run(DelayCachedResponse(callback, Response.FromCache(data)));
+
 				return new MemoryCacheAsyncRequest(uri);
 			}
 			else
@@ -191,7 +195,10 @@
 			}
 		}
 
-
-
+		IEnumerator DelayCachedResponse(Action<Response> callback, Response response)
+		{
+			yield return null;
+			callback(response);
+		}
 	}
 }
