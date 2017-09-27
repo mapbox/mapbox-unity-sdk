@@ -104,10 +104,6 @@ See `MapImageFactory.asset` to customize the raster `MapId` you would like to us
 
 See `MeshFactory.asset` to see how specific layers are extracted from vector tiles. In this case, we are generating meshes for both `building` and `road`. Therefore, each layer has a `VectorLayerVisualizer` responsible for handling that layer's specific data (such as geometry).
 
-~~**New in v1.1.0:**~~
-~~Buildings contain a `FeatureSelectionDetector` and a `HighlightFeature` to show how colliders can be used to select/interact with buildings and show vector feature data.~~
-  (Moved to StylingDemoMeshGeneration in v1.2.0)
-
 ## Mesh Generataion Pois
 
 *PoiGeneration.unity*
@@ -116,7 +112,7 @@ With the exception of a `PoiVisualizer ` (`PoiDemoPoiVisualizer`) being added to
 
 `PoiDemoPoiVisualizer.asset` allows you to override which prefab to spawn for each `po_label` contained in the vector tile. This prefab should have a component that implements `ILabelVisualizationHelper` attached to it. This exists to inject feature data into (such as label and `Maki` icon).
 
-**New in v1.0.0:*
+**New in v1.0.0:**
 - Added 3d POI objects in addition to the 2d POI objects to demonstrate that you can easily map latitude longitude to unity coordinates.
 
 ## Mesh Generation Styles
