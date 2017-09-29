@@ -25,7 +25,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			double unityTileSizeX = tile.Rect.Size.x;
 			double unityTileSizeY = tile.Rect.Size.y;
 
-			List<List<Point2d<float>>> geom = feature.Geometry<float>();
+			List<List<Point2d<float>>> geom = feature.Geometry<float>(0);
 			var geomCount = geom.Count;
 			for (int i = 0; i < geomCount; i++)
 			{
