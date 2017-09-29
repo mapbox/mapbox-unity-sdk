@@ -269,9 +269,19 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				_meshData.Add(tile.UnwrappedTileId, tile.MeshFilter.mesh);
 			}
-		}
 
-		private void ResetToFlatMesh(UnityTile tile)
+            if (_addCollider)
+            {
+                var meshCollider = tile.Collider as MeshCollider;
+                if (meshCollider)
+                {
+                    meshCollider.sharedMesh = tile.MeshFilter.mesh;
+                }
+            }
+
+        }
+
+        private void ResetToFlatMesh(UnityTile tile)
 		{
 #if UNITY_5_5_OR_NEWER
             tile.MeshFilter.mesh.GetVertices(_currentTileMeshData.Vertices);
