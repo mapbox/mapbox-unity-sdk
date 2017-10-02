@@ -29,7 +29,22 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		[NodeEditorElement("Game Object Modifiers")]
 		public List<GameObjectModifier> GoModifiers;
 
-        public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
+		public override void Initialize()
+		{
+			base.Initialize();
+
+			foreach (var mmod in MeshModifiers)
+			{
+				mmod.Initialize();
+			}
+
+			foreach (var gmod in GoModifiers)
+			{
+				gmod.Initialize();
+			}
+		}
+
+		public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
         {
 			_center = Vector3.zero;
 			if (_moveFeaturePositionTo != PositionTargetType.TileCenter)

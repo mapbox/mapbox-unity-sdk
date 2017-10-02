@@ -27,7 +27,25 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
         private Dictionary<UnityTile, List<MeshData>> _cached = new Dictionary<UnityTile, List<MeshData>>();
         private Dictionary<UnityTile, int> _buildingCount = new Dictionary<UnityTile, int>();
 
-        public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
+		public override void Initialize()
+		{
+			base.Initialize();
+			_cacheVertexCount.Clear();
+			_cached.Clear();
+			_buildingCount.Clear();
+
+			foreach (var mmod in MeshModifiers)
+			{
+				mmod.Initialize();
+			}
+
+			foreach (var gmod in GoModifiers)
+			{
+				gmod.Initialize();
+			}
+		}
+
+		public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
         {
             base.Execute(tile, feature, meshData, parent, type);
 

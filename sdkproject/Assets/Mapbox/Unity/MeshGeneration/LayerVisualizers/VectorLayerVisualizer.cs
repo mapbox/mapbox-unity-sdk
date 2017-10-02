@@ -53,6 +53,38 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		
 		private GameObject _container;
 
+		public override void Initialize()
+		{
+			base.Initialize();
+
+			foreach (var filter in Filters)
+			{
+				if (filter != null)
+				{
+					filter.Initialize();
+				}
+			}
+			foreach (var item in Stacks)
+			{
+				if (item != null && item.Stack != null)
+				{
+					item.Stack.Initialize();
+				}
+			}
+			if (_defaultStack != null)
+			{
+				_defaultStack.Initialize();
+			}
+
+			foreach (var item in Stacks)
+			{
+				if(item != null && item.Stack != null)
+				{
+					item.Stack.Initialize();
+				}
+			}
+		}
+
 		/// <summary>
 		/// Creates an object for each layer, extract and filter in/out the features and runs Build method on them.
 		/// </summary>

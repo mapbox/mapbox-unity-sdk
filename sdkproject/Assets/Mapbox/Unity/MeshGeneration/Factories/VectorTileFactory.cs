@@ -52,18 +52,19 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
 			_cachedData.Clear();
-			foreach (LayerVisualizerBase factory in Visualizers)
+			foreach (LayerVisualizerBase visualizer in Visualizers)
 			{
-				if (factory == null)
+				visualizer.Initialize();
+				if (visualizer == null)
 					continue;
 
-				if (_layerBuilder.ContainsKey(factory.Key))
+				if (_layerBuilder.ContainsKey(visualizer.Key))
 				{
-					_layerBuilder[factory.Key].Add(factory);
+					_layerBuilder[visualizer.Key].Add(visualizer);
 				}
 				else
 				{
-					_layerBuilder.Add(factory.Key, new List<LayerVisualizerBase>() { factory });
+					_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase>() { visualizer });
 				}
 			}
 		}
