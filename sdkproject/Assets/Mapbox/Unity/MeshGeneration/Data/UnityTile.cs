@@ -247,5 +247,18 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				_tiles[i].Cancel();
 			}
 		}
+
+		void OnDestroy()
+		{
+			Cancel();
+			if (_heightTexture != null)
+			{
+				Destroy(_heightTexture);
+			}
+			if (_rasterData != null)
+			{
+				Destroy(_rasterData);
+			}
+		}
 	}
 }

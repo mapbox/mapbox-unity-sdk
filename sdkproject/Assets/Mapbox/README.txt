@@ -1,5 +1,4 @@
-Thank you for downloading the Mapbox Unity SDK (for Unity 5.4 and above)! 
-
+Thank you for downloading the Mapbox Unity SDK (for Unity 2017.1+)! 
 
 
 Getting started: https://www.mapbox.com/mapbox-unity-sdk/docs/00-getting-started.html
@@ -16,11 +15,12 @@ API: https://www.mapbox.com/mapbox-unity-sdk/api/
 
 
 
-Current version: 1.1.0, as of 08/01/2017
+Current version: 1.2.0, as of 09/26/2017
 
 Changelog: https://www.mapbox.com/mapbox-unity-sdk/docs/05-changelog.html
 
-IMPORTANT: If you intend to deploy for Android, please set your minimum version to 15 in PlayerSettings.
+IMPORTANT: 
+If you intend to deploy for Android, please set your minimum version to 15 in PlayerSettings.
 For iOS, please set your minimum version to 8.
 
 If you have any other issues or feedback, please contact us at https://www.mapbox.com/contact/ 

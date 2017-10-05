@@ -1,19 +1,16 @@
-**Please Note: Current support is limited to Unity 5.4 and above!**
+**Please Note: Current support is limited to Unity 2017.1+**
 
 ### Platform Support
 
 - Minimum iOS version supported is 8
 - Minimum Android version supported is 15
-- Android duplicate library check is only performed automatically in Unity 5.6+ (run the unit test in older versions to check for duplicates)
 - For UWP, please read these [special notes](https://github.com/mapbox/mapbox-unity-sdk/blob/develop/documentation/docs/windowsstore-uwp-hololens.md).
+- Hololens builds are currently not working as expected
 
 ### General
 
-- [Mapbox Configuration does not appear to save settings occasionally](https://github.com/mapbox/mapbox-unity-sdk/issues/196)
-  - This appears to be a UI bug, but the token should be saved correctly
 - If you experience issues with tiles not refreshing as expected, please remember to clear the disk cache
-- `MapVisualizer` [incorrectly reports](https://github.com/mapbox/mapbox-unity-sdk/issues/194) `OnMapVisualizerStateChanged` `Finished` when loading tiles from disk
-- `foreach` is being used extensively (GC cost--this is not an issue in Unity 5.5+)
+  - You can do this from the Mapbox menu or with `MapboxAccess.Instance.ClearCache();`
 
 ### Vector Tile
 

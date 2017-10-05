@@ -90,6 +90,13 @@ namespace Mapbox.Unity.Utilities
 			return GeoToWorldGlobePosition(latLong.x, latLong.y, radius);
 		}
 
+		public static Vector2d GeoFromGlobePosition(Vector3 point, float radius)
+		{
+			float latitude = Mathf.Asin(point.y / radius);
+			float longitude = Mathf.Atan2(point.z, point.x);
+			return new Vector2d(latitude * Mathf.Rad2Deg, longitude * Mathf.Rad2Deg);
+		}
+
 		/// <summary>
 		/// Converts Spherical Mercator EPSG:900913 in xy meters to WGS84 lat/lon.
 		/// Inverse of LatLonToMeters.

@@ -81,6 +81,8 @@
 					if (GUILayout.Button("Search"))
 					{
 						Search(_username);
+						_property.FindPropertyRelative("UserName").stringValue = _username;
+						_property.serializedObject.ApplyModifiedProperties();
 					}
 				}
 

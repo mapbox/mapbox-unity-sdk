@@ -1,10 +1,12 @@
 # Mapbox-unity-sdk
-### For Unity 5.4 and above 
+### For Unity 2017.1+  
+
+(for 5.4x compatible versions, please use [this commit](https://github.com/mapbox/mapbox-unity-sdk/releases/tag/Last-official-Unity5x-support))
 
 Tools for using Mapbox APIs with C# / Unity. If you'd like to contribute to the project, [read CONTRIBUTING.md](CONTRIBUTING.md).
 
 This repo contains:
-  - Unity specific tools and libraries for processing Mapbox data
+- Unity specific tools and libraries for processing Mapbox data
   - Example projects using Mapbox Unity SDK
   - DocFX project for generateing API documentation
   - Written manuals and guides

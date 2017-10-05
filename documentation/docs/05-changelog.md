@@ -1,5 +1,51 @@
 ## CHANGELOG
 
+### v.1.2.0
+
+*08/26/2017*
+
+*Please note: this release marks the beginning of official support for the Unity 2017 lifecycle.*
+
+##### Upgrade Instructions
+- As always, please remove older versions before installing!
+- `AbstractMap` has officially been abstracted! This means that you must substitute, in your own scenes, a concrete implementation. We offer `BasicMap`, `MapAtSpecificLocation` and `DynamicZoomMap`.
+- MapVisualizer has also been abstracted for tile placement purposes. You may need to point your existing maps to the new concrete implementation (`MapVisualizer`) and re-serialize your references (`Factories`).
+
+##### Memory/Performance
+- General performance optimizations.
+
+##### New Features
+- `DynamicZoomMap`, `DynamicMapVisualizer` and `DynamicZoomTileProvider` demonstrate how to build web-like maps that can pan and zoom smoothly.
+- You can now convert latitude/longitude to a position on the sphere (see `Conversions.cs` and the `Globe` example).
+- Use the new `MapAtSpecificLocation` component to create a map that is centered precisely at a given location.
+- Use the new `RangeAroundTransformTileProvider` component to procedurally load tiles as a transform changes. This is useful for loading map content as a player avatar moves based on physical location. Check the `LocationProvider` example for more information.
+- Map Editor (Mapbox --> Map Editor)
+  - Allows navigation of any Map Factory Frameworks referenced in the current scene
+  - Selecting a node will select the corresponding asset for manipulation in the inspector
+  - Added new asset browsing capabilities to these nodes (factories, modifiers, etc.)
+
+![image](images/changelog/node-editor.gif)
+
+##### Bug Fixes
+- We now catch exceptions when parsing Android library file names (duplicate library check).
+- Fixed some wrong `Conversions` values and methods that would lead to improper positioning or gaps between tiles.
+- The Mapbox configuration window no longer gets stuck validating a token.
+- Wolfulus line ending fixer issues in Unity 2017 have been resolved.
+- Fixed broken `VectorTileExample`.
+- `AbstractMapVisualizer` state change events no longer fire improperly when loading tiles from cache.
+- Tiles should no longer appear all white or all black when using very small `UnityTileSize`.
+- `Map.cs` no longer executes the notify callback twice.
+
+##### Improvements
+- Maps can now be `Initialized` with a latitude/longitude and a zoom level, at any time!
+	- This means that you can re-use a map for a new location or zoom.
+- Scaling is now performed at a vertex level, which helps prevent floating-point imprecision and leads to a cleaner hierarchy.
+- `Vector2d` is now  serializable (for inspector purposes).
+- `MapId` and `Factories` are now public so that you can change them at runtime.
+
+##### New Examples
+- [See here for the latest.](https://www.mapbox.com/mapbox-unity-sdk/docs/03-examples.html)
+
 ### v.1.1.0
 
 *08/01/2017*
