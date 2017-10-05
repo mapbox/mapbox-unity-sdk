@@ -14,6 +14,7 @@ namespace Mapbox.Examples.Playground
 	using Mapbox.Directions;
 	using Mapbox.Utils;
 	using Mapbox.Utils.JsonConverters;
+	using Mapbox.Geocoding;
 
 	/// <summary>
 	/// Fetch directions JSON once start and end locations are provided.
@@ -67,7 +68,7 @@ namespace Mapbox.Examples.Playground
 		/// </summary>
 		/// <param name="sender">Sender.</param>
 		/// <param name="e">E.</param>
-		void StartLocationGeocoder_OnGeocoderResponse(object sender, EventArgs e)
+		void StartLocationGeocoder_OnGeocoderResponse(ForwardGeocodeResponse response)
 		{
 			_coordinates[0] = _startLocationGeocoder.Coordinate;
 			if (ShouldRoute())
@@ -81,7 +82,7 @@ namespace Mapbox.Examples.Playground
 		/// </summary>
 		/// <param name="sender">Sender.</param>
 		/// <param name="e">E.</param>
-		void EndLocationGeocoder_OnGeocoderResponse(object sender, EventArgs e)
+		void EndLocationGeocoder_OnGeocoderResponse(ForwardGeocodeResponse response)
 		{
 			_coordinates[1] = _endLocationGeocoder.Coordinate;
 			if (ShouldRoute())

@@ -1,23 +1,17 @@
-﻿namespace Mapbox.Unity.Editor
+﻿namespace Mapbox.Editor.Build
 {
 	using System;
 	using System.IO;
 	using System.Linq;
-	using System.Collections;
 	using System.Collections.Generic;
 	using UnityEngine;
 	using UnityEditor;
 	using System.Text;
-
-#if UNITY_5_6_OR_NEWER
 	using UnityEditor.Build;
-#endif
-
 
 	/// <summary>
 	/// Simple pre-build script to check for duplicate Android libraries
 	/// </summary>
-#if UNITY_5_6_OR_NEWER
 	public class PreBuildChecksEditor : IPreprocessBuild
 	{
 		public int callbackOrder { get { return 0; } }
@@ -34,11 +28,25 @@
 			List<AndroidLibInfo> libInfo = new List<AndroidLibInfo>();
 			foreach (var file in Directory.GetFiles(Application.dataPath, "*.jar", SearchOption.AllDirectories))
 			{
-				libInfo.Add(new AndroidLibInfo(file));
+				try
+				{
+					libInfo.Add(new AndroidLibInfo(file));
+				}
+				catch
+				{
+					Debug.LogWarningFormat("could not extract version from file name: [{0}]", file);
+				}
 			}
 			foreach (var file in Directory.GetFiles(Application.dataPath, "*.aar", SearchOption.AllDirectories))
 			{
-				libInfo.Add(new AndroidLibInfo(file));
+				try
+				{
+					libInfo.Add(new AndroidLibInfo(file));
+				}
+				catch
+				{
+					Debug.LogWarningFormat("could not extract version from file name: [{0}]", file);
+				}
 			}
 
 			var stats = libInfo.GroupBy(li => li.BaseFileName).OrderBy(g => g.Key);
@@ -62,8 +70,6 @@
 			}
 		}
 	}
-#endif
-
 
 	public class AndroidLibInfo
 	{

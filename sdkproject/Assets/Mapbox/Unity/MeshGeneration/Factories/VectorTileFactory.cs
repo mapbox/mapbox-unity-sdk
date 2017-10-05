@@ -17,10 +17,24 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField]
 		private string _mapId = "";
 
+		[NodeEditorElementAttribute("Layer Visalizers")]
 		public List<LayerVisualizerBase> Visualizers;
 
 		private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;
 		private Dictionary<UnityTile, VectorTile> _cachedData = new Dictionary<UnityTile, VectorTile>();
+
+		public string MapId
+		{
+			get
+			{
+				return _mapId;
+			}
+
+			set
+			{
+				_mapId = value;
+			}
+		}
 
 		public void OnEnable()
 		{
@@ -37,8 +51,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		internal override void OnInitialized()
 		{
 			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
+			_cachedData.Clear();
 			foreach (LayerVisualizerBase factory in Visualizers)
 			{
+				if (factory == null)
+					continue;
+
 				if (_layerBuilder.ContainsKey(factory.Key))
 				{
 					_layerBuilder[factory.Key].Add(factory);

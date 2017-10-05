@@ -103,7 +103,7 @@ namespace Mapbox.Unity.Telemetry
 		static string GetUserAgent()
 		{
 			var userAgent = string.Format("{0}/{1}/{2} MapboxEventsUnityEditor/{3}",
-										  PlayerSettings.bundleIdentifier,
+										  PlayerSettings.applicationIdentifier,
 										  PlayerSettings.bundleVersion,
 #if UNITY_IOS
 										  PlayerSettings.iOS.buildNumber,

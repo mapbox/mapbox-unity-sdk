@@ -1,29 +1,32 @@
 ﻿#if UNITY_IOS
-using UnityEngine;
-using UnityEditor;
-using UnityEditor.Callbacks;
-using UnityEditor.iOS.Xcode;
-using System.IO;
-
-public class Mapbox_iOS_build : MonoBehaviour
+namespace Mapbox.Editor.Build
 {
-	[PostProcessBuild]
-	public static void AppendBuildProperty(BuildTarget buildTarget, string pathToBuiltProject)
+	using UnityEngine;
+	using UnityEditor;
+	using UnityEditor.Callbacks;
+	using UnityEditor.iOS.Xcode;
+	using System.IO;
+
+	public class Mapbox_iOS_build : MonoBehaviour
 	{
-		if (buildTarget == BuildTarget.iOS)
+		[PostProcessBuild]
+		public static void AppendBuildProperty(BuildTarget buildTarget, string pathToBuiltProject)
 		{
-			PBXProject proj = new PBXProject();
-			// path to pbxproj file
-			string projPath = pathToBuiltProject + "/Unity-iPhone.xcodeproj/project.pbxproj";
+			if (buildTarget == BuildTarget.iOS)
+			{
+				PBXProject proj = new PBXProject();
+				// path to pbxproj file
+				string projPath = pathToBuiltProject + "/Unity-iPhone.xcodeproj/project.pbxproj";
 
-			var file = File.ReadAllText(projPath);
-			proj.ReadFromString(file);
-			string target = proj.TargetGuidByName("Unity-iPhone");
+				var file = File.ReadAllText(projPath);
+				proj.ReadFromString(file);
+				string target = proj.TargetGuidByName("Unity-iPhone");
 
-			proj.AddBuildProperty(target, "HEADER_SEARCH_PATHS", "$(SRCROOT)/Libraries/Mapbox/Core/Plugins/iOS/MapboxMobileEvents/include");
-			proj.AddBuildProperty(target, "OTHER_LDFLAGS", "-ObjC -lz");
+				proj.AddBuildProperty(target, "HEADER_SEARCH_PATHS", "$(SRCROOT)/Libraries/Mapbox/Core/Plugins/iOS/MapboxMobileEvents/include");
+				proj.AddBuildProperty(target, "OTHER_LDFLAGS", "-ObjC -lz");
 
-			File.WriteAllText(projPath, proj.WriteToString());
+				File.WriteAllText(projPath, proj.WriteToString());
+			}
 		}
 	}
 }

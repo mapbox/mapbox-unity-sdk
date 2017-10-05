@@ -4,39 +4,26 @@ namespace Mapbox.Editor
 	using UnityEditor;
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Unity.MeshGeneration.Interfaces;
+	using Mapbox.Editor.NodeEditor;
 
 	[CustomEditor(typeof(VectorTileFactory))]
-	public class VectorTileFactoryEditor : FactoryEditor
+	public class VectorTileFactoryEditor : UnityEditor.Editor
 	{
 		private string _defaultMapId = "mapbox.mapbox-streets-v7";
-		private MonoScript script;
-		private VectorTileFactory _factory;
-		SerializedProperty _visualizerList;
 		public SerializedProperty mapId_Prop;
+		private VectorTileFactory _factory;
+		private MonoScript script;
 
-		private int ListSize;
-		void OnEnable()
+		private void OnEnable()
 		{
-			_factory = target as VectorTileFactory;
-			_visualizerList = serializedObject.FindProperty("Visualizers");
+			script = MonoScript.FromScriptableObject((VectorTileFactory)target);
 			mapId_Prop = serializedObject.FindProperty("_mapId");
-			script = MonoScript.FromScriptableObject(_factory);
-
-			if (string.IsNullOrEmpty(mapId_Prop.stringValue))
-			{
-				mapId_Prop.stringValue = _defaultMapId;
-				serializedObject.ApplyModifiedProperties();
-				Repaint();
-			}
+			_factory = target as VectorTileFactory;
 		}
 
 		public override void OnInspectorGUI()
 		{
-			if (_factory == null)
-				return;
-
 			serializedObject.Update();
-
 			GUI.enabled = false;
 			script = EditorGUILayout.ObjectField("Script", script, typeof(MonoScript), false) as MonoScript;
 			GUI.enabled = true;
@@ -52,40 +39,52 @@ namespace Mapbox.Editor
 			EditorGUILayout.EndHorizontal();
 
 			EditorGUILayout.Space();
-			EditorGUILayout.Space();
-			EditorGUILayout.LabelField("Layer Visualizers");
+			EditorGUILayout.LabelField("Visualizers");
+			var facs = serializedObject.FindProperty("Visualizers");
+			for (int i = 0; i < facs.arraySize; i++)
+			{
+				var ind = i;
+				EditorGUILayout.BeginHorizontal();
+
+				EditorGUILayout.BeginVertical();
+				GUILayout.Space(5);
+				EditorGUILayout.BeginHorizontal();
+				if (_factory.Visualizers[i] != null)
+				{
+					_factory.Visualizers[i].Key = EditorGUILayout.TextField(_factory.Visualizers[i].Key, GUILayout.MaxWidth(100));
+				}
+				//facs.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(i).objectReferenceValue, typeof(LayerVisualizerBase)) as ScriptableObject;
+				if (_factory.Visualizers[i] == null)
+					EditorGUILayout.TextField("null");
+				else
+					EditorGUILayout.ObjectField(_factory.Visualizers[i], typeof(LayerVisualizerBase), false);
+				EditorGUILayout.EndHorizontal();
+				EditorGUILayout.EndVertical();
+
+				if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
+				{
+					ScriptableCreatorWindow.Open(typeof(LayerVisualizerBase), facs, ind);
+				}
+				if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30), GUILayout.Height(22)))
+				{
+					facs.DeleteArrayElementAtIndex(ind);
+				}
+				EditorGUILayout.EndHorizontal();
+			}
 
 			EditorGUILayout.Space();
 			EditorGUILayout.BeginHorizontal();
-			EditorGUILayout.LabelField("Key");
-			EditorGUILayout.LabelField("Visualizers");
+			if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
+			{
+				facs.arraySize++;
+				facs.GetArrayElementAtIndex(facs.arraySize - 1).objectReferenceValue = null;
+			}
+			if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
+			{
+				ScriptableCreatorWindow.Open(typeof(LayerVisualizerBase), facs);
+			}
 			EditorGUILayout.EndHorizontal();
 
-			if (_factory.Visualizers != null)
-			{
-				for (int i = 0; i < _factory.Visualizers.Count; i++)
-				{
-					EditorGUILayout.BeginHorizontal();
-					if (_factory.Visualizers[i] != null)
-					{
-						_factory.Visualizers[i].Key = EditorGUILayout.TextField(_factory.Visualizers[i].Key, GUILayout.MaxWidth(100));
-					}
-					_factory.Visualizers[i] = (LayerVisualizerBase)EditorGUILayout.ObjectField(_factory.Visualizers[i], typeof(LayerVisualizerBase), false);
-
-					if (GUILayout.Button("-", GUILayout.MaxWidth(20)))
-					{
-						_visualizerList.DeleteArrayElementAtIndex(i);
-					}
-
-					EditorGUILayout.EndHorizontal();
-				}
-			}
-
-			if (GUILayout.Button("Add New Visualizer"))
-			{
-				_factory.Visualizers.Add(null);
-			}
-			EditorUtility.SetDirty(_factory);
 			serializedObject.ApplyModifiedProperties();
 		}
 	}

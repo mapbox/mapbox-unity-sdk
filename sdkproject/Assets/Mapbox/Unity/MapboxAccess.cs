@@ -18,7 +18,8 @@ namespace Mapbox.Unity
 		ITelemetryLibrary _telemetryLibrary;
 		CachingWebFileSource _fileSource;
 
-		static MapboxAccess _instance = new MapboxAccess();
+		static MapboxAccess _instance;
+
 		/// <summary>
 		/// The singleton instance.
 		/// </summary>
@@ -26,6 +27,10 @@ namespace Mapbox.Unity
 		{
 			get
 			{
+				if (_instance == null)
+				{
+					_instance = new MapboxAccess();
+				}
 				return _instance;
 			}
 		}

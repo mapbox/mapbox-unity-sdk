@@ -14,6 +14,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 	public class TypeVisualizerTuple
 	{
 		public string Type;
+		[SerializeField]
 		public ModifierStackBase Stack;
 	}
 
@@ -44,10 +45,12 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		private List<FilterBase> Filters;
 
 		[SerializeField]
-		private ModifierStackBase _defaultStack;
+		[NodeEditorElementAttribute("Default Stack")]
+		public ModifierStackBase _defaultStack;
 		[SerializeField]
-		private List<TypeVisualizerTuple> Stacks;
-
+		[NodeEditorElementAttribute("Custom Stacks")]
+		public List<TypeVisualizerTuple> Stacks;
+		
 		private GameObject _container;
 
 		/// <summary>
@@ -89,9 +92,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				mergedStack.End(tile, _container);
 			}
 
-			for (int i = 0; i < Stacks.Count; i++)
+			foreach (var item in Stacks)
 			{
-				mergedStack = Stacks[i].Stack as MergedModifierStack;
+				mergedStack = item.Stack as MergedModifierStack;
 				if (mergedStack != null)
 				{
 					mergedStack.End(tile, _container);

@@ -1,11 +1,12 @@
 ﻿namespace Mapbox.Unity.MeshGeneration.Factories
 {
-    using Mapbox.Platform;
-    using Mapbox.Unity.MeshGeneration.Data;
-    using System;
-    using UnityEngine;
+	using Mapbox.Platform;
+	using Mapbox.Unity.MeshGeneration.Data;
+	using System;
+	using UnityEngine;
+	using Mapbox.Unity.Map;
 
-    public abstract class AbstractTileFactory : ScriptableObject
+	public abstract class AbstractTileFactory : ScriptableObject
     {
 		protected IFileSource _fileSource;
         

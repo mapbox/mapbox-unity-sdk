@@ -3,10 +3,10 @@
 //     Copyright (c) 2016 Mapbox. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
-using Mapbox.Map;
 
 namespace Mapbox.Unity.Utilities
 {
+	using Mapbox.Map;
 	using System;
 	using Mapbox.Utils;
 	using UnityEngine;
@@ -17,7 +17,8 @@ namespace Mapbox.Unity.Utilities
 	public static class Conversions
 	{
 		private const int TileSize = 256;
-		private const int EarthRadius = 6378137;
+		/// <summary>according to https://wiki.openstreetmap.org/wiki/Zoom_levels</summary>
+		private const int EarthRadius = 6378137; //no seams with globe example
 		private const double InitialResolution = 2 * Math.PI * EarthRadius / TileSize;
 		private const double OriginShift = 2 * Math.PI * EarthRadius / 2;
 
@@ -27,7 +28,7 @@ namespace Mapbox.Unity.Utilities
 		/// </summary>
 		/// <param name="v"> The <see cref="T:Mapbox.Utils.Vector2d"/>. </param>
 		/// <returns> A <see cref="T:UnityEngine.Vector2d"/> of coordinates in meters. </returns>
-		private static Vector2d LatLonToMeters(Vector2d v)
+		public static Vector2d LatLonToMeters(Vector2d v)
 		{
 			return LatLonToMeters(v.x, v.y);
 		}
@@ -39,7 +40,7 @@ namespace Mapbox.Unity.Utilities
 		/// <param name="lat"> The latitude. </param>
 		/// <param name="lon"> The longitude. </param>
 		/// <returns> A <see cref="T:UnityEngine.Vector2d"/> of xy meters. </returns>
-		private static Vector2d LatLonToMeters(double lat, double lon)
+		public static Vector2d LatLonToMeters(double lat, double lon)
 		{
 			var posx = lon * OriginShift / 180;
 			var posy = Math.Log(Math.Tan((90 + lat) * Math.PI / 360)) / (Math.PI / 180);
@@ -73,6 +74,27 @@ namespace Mapbox.Unity.Utilities
 		public static Vector2d GeoToWorldPosition(Vector2d latLong, Vector2d refPoint, float scale = 1)
 		{
 			return GeoToWorldPosition(latLong.x, latLong.y, refPoint, scale);
+		}
+
+		public static Vector3 GeoToWorldGlobePosition(double lat, double lon, float radius)
+		{
+			double xPos = (radius) * Math.Cos(Mathf.Deg2Rad * lat) * Math.Cos(Mathf.Deg2Rad * lon);
+			double zPos = (radius) * Math.Cos(Mathf.Deg2Rad * lat) * Math.Sin(Mathf.Deg2Rad * lon);
+			double yPos = (radius) * Math.Sin(Mathf.Deg2Rad * lat);
+
+			return new Vector3((float)xPos, (float)yPos, (float)zPos);
+		}
+
+		public static Vector3 GeoToWorldGlobePosition(Vector2d latLong, float radius)
+		{
+			return GeoToWorldGlobePosition(latLong.x, latLong.y, radius);
+		}
+
+		public static Vector2d GeoFromGlobePosition(Vector3 point, float radius)
+		{
+			float latitude = Mathf.Asin(point.y / radius);
+			float longitude = Mathf.Atan2(point.z, point.x);
+			return new Vector2d(latitude * Mathf.Rad2Deg, longitude * Mathf.Rad2Deg);
 		}
 
 		/// <summary>
@@ -147,7 +169,7 @@ namespace Mapbox.Unity.Utilities
 		/// <param name="longitude"> The longitude. </param>
 		/// <param name="zoom"> Zoom level. </param>
 		/// <returns> A <see cref="T:UnityEngine.Vector2d"/> xy tile ID. </returns>
-		public static Vector2d LatitudeLongitudeToTileId(float latitude, float longitude, int zoom)
+		public static Vector2d LatitudeLongitudeToTileId(double latitude, double longitude, int zoom)
 		{
 			var x = (int)Math.Floor((longitude + 180.0) / 360.0 * Math.Pow(2.0, zoom));
 			var y = (int)Math.Floor((1.0 - Math.Log(Math.Tan(latitude * Math.PI / 180.0)
@@ -210,8 +232,28 @@ namespace Mapbox.Unity.Utilities
 		{
 			var bb = TileIdToBounds(x, y, zoom);
 			var center = bb.Center;
-			return new Vector2d((float)center.x, (float)center.y);
+			return new Vector2d(center.x, center.y);
 		}
+
+
+		/// <summary>
+		/// Gets the Web Mercator x/y of the center of a tile.
+		/// </summary>
+		/// <param name="x"> Tile X position. </param>
+		/// <param name="y"> Tile Y position. </param>
+		/// <param name="zoom"> Zoom level. </param>
+		/// <returns>A <see cref="T:UnityEngine.Vector2d"/> of lat/lon coordinates.</returns>
+		public static Vector2d TileIdToCenterWebMercator(int x, int y, int zoom)
+		{
+			double tileCnt = Math.Pow(2, zoom);
+			double centerX = x + 0.5;
+			double centerY = y + 0.5;
+
+			centerX = ((centerX / tileCnt * 2) - 1) * Constants.WebMercMax;
+			centerY = (1 - (centerY / tileCnt * 2)) * Constants.WebMercMax;
+			return new Vector2d(centerX, centerY);
+		}
+
 
 		/// <summary>
 		/// Gets the meters per pixels at given latitude and zoom level for a 256x256 tile.
@@ -222,7 +264,7 @@ namespace Mapbox.Unity.Utilities
 		/// <returns> Meters per pixel. </returns>
 		public static float GetTileScaleInMeters(float latitude, int zoom)
 		{
-			return 40075000 * Mathf.Cos(Mathf.Deg2Rad * latitude) / Mathf.Pow(2f, zoom + 8);
+			return (float)(40075016.685578d * Math.Cos(Mathf.Deg2Rad * latitude) / Math.Pow(2f, zoom + 8));
 		}
 
 		/// <summary>
@@ -266,15 +308,15 @@ namespace Mapbox.Unity.Utilities
 		{
 			var res = Resolution(zoom);
 			var met = new Vector2d();
-			met.x = (float)(p.x * res - OriginShift);
-			met.y = (float)-(p.y * res - OriginShift);
+			met.x = (p.x * res - OriginShift);
+			met.y = -(p.y * res - OriginShift);
 			return met;
 		}
 
 		private static Vector2d MetersToPixels(Vector2d m, int zoom)
 		{
 			var res = Resolution(zoom);
-			var pix = new Vector2d((float)((m.x + OriginShift) / res), (float)((-m.y + OriginShift) / res));
+			var pix = new Vector2d(((m.x + OriginShift) / res), ((-m.y + OriginShift) / res));
 			return pix;
 		}
 

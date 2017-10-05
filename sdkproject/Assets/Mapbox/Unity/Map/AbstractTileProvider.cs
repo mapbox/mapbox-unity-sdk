@@ -4,6 +4,7 @@
 	using System.Collections.Generic;
 	using UnityEngine;
 	using Mapbox.Map;
+	using System.Linq;
 
 	public abstract class AbstractTileProvider : MonoBehaviour, ITileProvider
 	{
@@ -12,29 +13,29 @@
 
 		protected IMap _map;
 
-		protected List<UnwrappedTileId> _activeTiles;
+		protected Dictionary<UnwrappedTileId, byte> _activeTiles = new Dictionary<UnwrappedTileId, byte>();
 
 		public void Initialize(IMap map)
 		{
-			_activeTiles = new List<UnwrappedTileId>();
+			_activeTiles.Clear();
 			_map = map;
 			OnInitialized();
 		}
 
 		protected void AddTile(UnwrappedTileId tile)
 		{
-			if (_activeTiles.Contains(tile))
+			if (_activeTiles.ContainsKey(tile))
 			{
 				return;
 			}
 
-			_activeTiles.Add(tile);
+			_activeTiles.Add(tile, 0);
 			OnTileAdded(tile);
 		}
 
 		protected void RemoveTile(UnwrappedTileId tile)
 		{
-			if (!_activeTiles.Contains(tile))
+			if (!_activeTiles.ContainsKey(tile))
 			{
 				return;
 			}

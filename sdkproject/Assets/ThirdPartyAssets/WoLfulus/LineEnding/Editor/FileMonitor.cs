@@ -51,7 +51,7 @@ namespace WoLfulus.LineEnding
                 {
                     Menu.SetChecked(MenuUnix, true);
                 }
-                else if (type == "unix")
+                else if (type == "mac")
                 {
                     Menu.SetChecked(MenuMac, true);
                 }
@@ -153,6 +153,11 @@ namespace WoLfulus.LineEnding
             {
                 ending = MacStyle;
             }
+            else
+            {
+                Debug.Log("Line Endings Fixer settings not detected. You might want to select a line ending style.");
+                return;
+            }
 
             int filesFixed = 0;
 
@@ -167,7 +172,10 @@ namespace WoLfulus.LineEnding
                 var fileContents = File.ReadAllText(file).Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", ending);
                 File.WriteAllText(file, fileContents);
 
-                AssetDatabase.ImportAsset(file, ImportAssetOptions.ForceUpdate);
+                EditorApplication.delayCall += () =>
+                {
+                    AssetDatabase.ImportAsset(file, ImportAssetOptions.ForceUpdate);
+                };
 
                 filesFixed++;
             }
