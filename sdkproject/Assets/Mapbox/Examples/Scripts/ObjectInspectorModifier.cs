@@ -11,7 +11,7 @@ namespace Mapbox.Examples
 	{
 		private FeatureUiMarker _marker;
 
-		public override void Run(FeatureBehaviour fb, UnityTile tile)
+		public override void Run(VectorEntity ve, UnityTile tile)
 		{
 			if(_marker == null)
 			{
@@ -28,8 +28,8 @@ namespace Mapbox.Examples
 				_marker = sel.GetComponent<FeatureUiMarker>();
 			}
 
-			var det = fb.gameObject.AddComponent<FeatureSelectionDetector>();
-			det.Initialize(_marker, fb);
+			var det = ve.GameObject.AddComponent<FeatureSelectionDetector>();
+			det.Initialize(_marker, ve);
 		}
 	}
 }

@@ -9,6 +9,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
 	using Mapbox.Unity.Utilities;
+	using System.Collections;
 
 	[Serializable]
 	public class TypeVisualizerTuple
@@ -50,12 +51,20 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		[SerializeField]
 		[NodeEditorElementAttribute("Custom Stacks")]
 		public List<TypeVisualizerTuple> Stacks;
-		
-		private GameObject _container;
+
+		[NonSerialized]
+		private Dictionary<UnityTile, List<int>> _activeCoroutines;
+
+		[NonSerialized]
+		private int _entityPerCoroutine = 20;
+		[NonSerialized]
+		private int _entityInCurrentCoroutine = 0;
 
 		public override void Initialize()
 		{
 			base.Initialize();
+			_entityInCurrentCoroutine = 0;
+			_activeCoroutines = new Dictionary<UnityTile, List<int>>();
 
 			foreach (var filter in Filters)
 			{
@@ -85,16 +94,15 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 		}
 
-		/// <summary>
-		/// Creates an object for each layer, extract and filter in/out the features and runs Build method on them.
-		/// </summary>
-		/// <param name="layer"></param>
-		/// <param name="tile"></param>
 		public override void Create(VectorTileLayer layer, UnityTile tile)
 		{
-			_container = new GameObject(Key + " Container");
-			_container.transform.SetParent(tile.transform, false);
+			if (!_activeCoroutines.ContainsKey(tile))
+				_activeCoroutines.Add(tile, new List<int>());
+			_activeCoroutines[tile].Add(Runnable.Run(ProcessLayer(layer, tile)));
+		}
 
+		private IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile)
+		{
 			//testing each feature with filters
 			var fc = layer.FeatureCount();
 			var filterOut = false;
@@ -115,13 +123,23 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				}
 
 				if (!filterOut)
-					Build(feature, tile, _container);
+				{
+					Build(feature, tile, tile.gameObject);
+				}
+
+				_entityInCurrentCoroutine++;
+
+				if (_entityInCurrentCoroutine >= _entityPerCoroutine)
+				{
+					_entityInCurrentCoroutine = 0;
+					yield return null;
+				}
 			}
 
 			var mergedStack = _defaultStack as MergedModifierStack;
 			if (mergedStack != null)
 			{
-				mergedStack.End(tile, _container);
+				mergedStack.End(tile, tile.gameObject, layer.Name);
 			}
 
 			foreach (var item in Stacks)
@@ -129,7 +147,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				mergedStack = item.Stack as MergedModifierStack;
 				if (mergedStack != null)
 				{
-					mergedStack.End(tile, _container);
+					mergedStack.End(tile, tile.gameObject, layer.Name);
 				}
 			}
 		}
@@ -199,6 +217,31 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 
 			return "";
+		}
+
+		/// <summary>
+		/// Handle tile destruction event and propagate it to modifier stacks
+		/// </summary>
+		/// <param name="tile">Destroyed tile object</param>
+		public override void OnUnregisterTile(UnityTile tile)
+		{
+			base.OnUnregisterTile(tile);
+
+			if(_activeCoroutines.ContainsKey(tile))
+			{
+				foreach (var cor in _activeCoroutines[tile])
+				{
+					Runnable.Stop(cor);
+				}
+			}
+
+			if (_defaultStack != null)
+				_defaultStack.UnregisterTile(tile);
+			foreach (var val in Stacks)
+			{
+				if (val != null && val.Stack != null)
+					val.Stack.UnregisterTile(tile);
+			}
 		}
 	}
 }

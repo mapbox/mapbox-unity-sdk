@@ -23,9 +23,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
         [SerializeField]
         private Material[] _sideMaterials;
 
-		public override void Run(FeatureBehaviour fb, UnityTile tile)
+		public override void Run(VectorEntity ve, UnityTile tile)
         {
-			var _meshRenderer = fb.gameObject.AddComponent<MeshRenderer>();
+			var _meshRenderer = ve.MeshRenderer;
 			if (_textureSides && _sideMaterials.Length > 0)
 			{
 				_meshRenderer.materials = new Material[2]
@@ -44,21 +44,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			if (_useSatelliteTexture)
 			{
-				var _tile = fb.gameObject.GetComponent<UnityTile>();
-				var t = fb.transform;
-				while (_tile == null && t.parent != null)
-				{
-					t = t.parent;
-					_tile = t.GetComponent<UnityTile>();
-				}
-
-				_meshRenderer.materials[0].mainTexture = _tile.GetRasterData();
+				_meshRenderer.materials[0].mainTexture = tile.GetRasterData();
 				_meshRenderer.materials[0].mainTextureScale = new Vector2(1f, 1f);
 			}
-
-
-			//var ts = fb.gameObject.AddComponent<TextureSelector>();
-   //         ts.Initialize(fb, _textureTop, _useSatelliteTexture, _topMaterials, _textureSides, _sideMaterials);
         }
     }
 }

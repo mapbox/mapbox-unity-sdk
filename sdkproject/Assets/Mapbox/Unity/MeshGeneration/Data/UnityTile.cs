@@ -144,17 +144,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 			Cancel();
 			_tiles.Clear();
-
-			// HACK: this is for vector layer features and such.
-			// It's slow and wasteful, but a better solution will be difficult.
-			var childCount = transform.childCount;
-			if (childCount > 0)
-			{
-				for (int i = 0; i < childCount; i++)
-				{
-					Destroy(transform.GetChild(i).gameObject);
-				}
-			}
 		}
 
 		internal void SetHeightData(byte[] data, float heightMultiplier = 1f, bool useRelative = false)

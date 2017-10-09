@@ -84,7 +84,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					return;
 				}
 
-				_cachedData.Add(tile, vectorTile);
+				if (_cachedData.ContainsKey(tile))
+					_cachedData[tile] = vectorTile;
+				else
+					_cachedData.Add(tile, vectorTile);
 
 				// FIXME: we can make the request BEFORE getting a response from these!
 				if (tile.HeightDataState == TilePropertyState.Loading ||
@@ -105,6 +108,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			// We are no longer interested in this tile's notifications.
 			tile.OnHeightDataChanged -= DataChangedHandler;
 			tile.OnRasterDataChanged -= DataChangedHandler;
+
+			foreach (var vis in Visualizers)
+			{
+				vis.UnregisterTile(tile);
+			}
 		}
 
 		private void DataChangedHandler(UnityTile t)

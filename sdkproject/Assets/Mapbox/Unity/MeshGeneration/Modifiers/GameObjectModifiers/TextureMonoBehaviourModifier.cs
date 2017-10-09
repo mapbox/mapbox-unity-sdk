@@ -23,10 +23,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		[SerializeField]
 		private Material[] _sideMaterials;
 
-		public override void Run(FeatureBehaviour fb, UnityTile tile)
+		public override void Run(VectorEntity ve, UnityTile tile)
 		{
-			var ts = fb.gameObject.AddComponent<TextureSelector>();
-			ts.Initialize(fb, _textureTop, _useSatelliteTexture, _topMaterials, _textureSides, _sideMaterials);
+			var ts = ve.GameObject.AddComponent<TextureSelector>();
+			ts.Initialize(ve, _textureTop, _useSatelliteTexture, _topMaterials, _textureSides, _sideMaterials);
 		}
 	}
 }
