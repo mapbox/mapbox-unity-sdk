@@ -2,7 +2,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
 	using UnityEngine;
 	using System.Collections.Generic;
-	using System.Linq;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.MeshGeneration.Components;
 	using System;
@@ -21,36 +20,52 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Modifier Stack")]
 	public class ModifierStack : ModifierStackBase
 	{
-		[SerializeField]
-		private PositionTargetType _moveFeaturePositionTo;
+		[SerializeField] private PositionTargetType _moveFeaturePositionTo;
 		private Vector3 _center = Vector3.zero;
-		private int vertexIndex = 1;
-		[NodeEditorElement("Mesh Modifiers")]
-		public List<MeshModifier> MeshModifiers;
-		[NodeEditorElement("Game Object Modifiers")]
-		public List<GameObjectModifier> GoModifiers;
+		[NodeEditorElement("Mesh Modifiers")] public List<MeshModifier> MeshModifiers;
+		[NodeEditorElement("Game Object Modifiers")] public List<GameObjectModifier> GoModifiers;
 
-		[NonSerialized]
-		private Dictionary<UnityTile, List<VectorEntity>> _activeObjects;
-		[NonSerialized]
-		private Queue<VectorEntity> _pool;
+		[NonSerialized] private int vertexIndex = 1;
+		[NonSerialized] private Dictionary<UnityTile, List<VectorEntity>> _activeObjects;
+		[NonSerialized] private ObjectPool<VectorEntity> _pool;
+
+		[NonSerialized] private Vector3 _tempPoint;
+		[NonSerialized] private VectorEntity _tempVectorEntity;
+		[NonSerialized] private ObjectPool<List<VectorEntity>> _listPool;
 
 		private void OnEnable()
 		{
-			_pool = new Queue<VectorEntity>();
+			_pool = new ObjectPool<VectorEntity>(() =>
+			{
+				var go = new GameObject();
+				var mf = go.AddComponent<MeshFilter>();
+				var mr = go.AddComponent<MeshRenderer>();
+				_tempVectorEntity = new VectorEntity()
+				{
+					GameObject = go,
+					Transform = go.transform,
+					MeshFilter = mf,
+					MeshRenderer = mr,
+					Mesh = mf.mesh
+				};
+				return _tempVectorEntity;
+			});
+			_listPool = new ObjectPool<List<VectorEntity>>(() => { return new List<VectorEntity>(); });
 			_activeObjects = new Dictionary<UnityTile, List<VectorEntity>>();
 		}
 
 		public override void OnUnregisterTile(UnityTile tile)
 		{
-			if(_activeObjects.ContainsKey(tile))
+			if (_activeObjects.ContainsKey(tile))
 			{
-				foreach (var ve in _activeObjects[tile])
+				for (int i = 0; i < _activeObjects[tile].Count; i++)
 				{
-					ve.GameObject.SetActive(false);
-					_pool.Enqueue(ve);
+					_activeObjects[tile][i].GameObject.SetActive(false);
+					_pool.Put(_activeObjects[tile][i]);
 				}
 				_activeObjects[tile].Clear();
+				//pooling these lists as they'll reused anyway, saving hundreds of list instantiations
+				_listPool.Put(_activeObjects[tile]);
 				_activeObjects.Remove(tile);
 			}
 		}
@@ -58,110 +73,102 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		public override void Initialize()
 		{
 			base.Initialize();
-			
-			foreach (var mmod in MeshModifiers)
+
+			for (int i = 0; i < MeshModifiers.Count; i++)
 			{
-				mmod.Initialize();
+				MeshModifiers[i].Initialize();
 			}
 
-			foreach (var gmod in GoModifiers)
+			for (int i = 0; i < GoModifiers.Count; i++)
 			{
-				gmod.Initialize();
+				GoModifiers[i].Initialize();
 			}
 		}
+
 
 		public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
 		{
 			_center = Vector3.zero;
 			if (_moveFeaturePositionTo != PositionTargetType.TileCenter)
 			{
-				var f = Constants.Math.Vector3Zero;
+				_tempPoint = Constants.Math.Vector3Zero;
 				if (_moveFeaturePositionTo == PositionTargetType.FirstVertex)
 				{
-					f = feature.Points[0][0];
+					_tempPoint = feature.Points[0][0];
 				}
 				else if (_moveFeaturePositionTo == PositionTargetType.CenterOfVertices)
 				{
 					//this is not precisely the center because of the duplicates  (first/last vertex) but close to center
-					f = feature.Points[0][0];
+					_tempPoint = feature.Points[0][0];
 					vertexIndex = 1;
 					for (int i = 0; i < feature.Points.Count; i++)
 					{
 						for (int j = 0; j < feature.Points[i].Count; j++)
 						{
-							f += feature.Points[i][j];
+							_tempPoint += feature.Points[i][j];
 							vertexIndex++;
 						}
 					}
-					f /= vertexIndex;
+					_tempPoint /= vertexIndex;
 				}
 
-				foreach (var item in feature.Points)
+				for (int i = 0; i < feature.Points.Count; i++)
 				{
-					for (int i = 0; i < item.Count; i++)
+					for (int j = 0; j < feature.Points[i].Count; j++)
 					{
-						item[i] = new Vector3(item[i].x - f.x, 0, item[i].z - f.z);
+						feature.Points[i][j] = new Vector3(feature.Points[i][j].x - _tempPoint.x, 0, feature.Points[i][j].z - _tempPoint.z);
 					}
 				}
-				_center = f;
+				_center = _tempPoint;
 			}
 
-			foreach (MeshModifier mod in MeshModifiers.Where(x => x != null && x.Active))
+			for (int i = 0; i < MeshModifiers.Count; i++)
 			{
-				mod.Run(feature, meshData, tile);
+				if (MeshModifiers[i] != null && MeshModifiers[i].Active)
+				{
+					MeshModifiers[i].Run(feature, meshData, tile);
+				}
 			}
 
 
-			VectorEntity ve = null;
-			if (_pool.Count > 0)
-			{
-				ve = _pool.Dequeue();
-				ve.GameObject.SetActive(true);
-				ve.Mesh.Clear();
-			}
-			else
-			{
-				var go = new GameObject();
-				var mf = go.AddComponent<MeshFilter>();
-				var mr = go.AddComponent<MeshRenderer>();
-				ve = new VectorEntity() {
-					GameObject = go,
-					Transform = go.transform,
-					MeshFilter = mf,
-					MeshRenderer = mr,
-					Mesh = mf.mesh,
-					Feature = feature };
-			}
+			_tempVectorEntity = _pool.GetObject();
+			_tempVectorEntity.GameObject.SetActive(true);
+			_tempVectorEntity.Mesh.Clear();
 
-			ve.GameObject.name = type + " - " + feature.Data.Id;
-			ve.Mesh.subMeshCount = meshData.Triangles.Count;
-			ve.Mesh.SetVertices(meshData.Vertices);
-			ve.Mesh.SetNormals(meshData.Normals);
+			_tempVectorEntity.GameObject.name = type + " - " + feature.Data.Id;
+			_tempVectorEntity.Mesh.subMeshCount = meshData.Triangles.Count;
+			_tempVectorEntity.Mesh.SetVertices(meshData.Vertices);
+			_tempVectorEntity.Mesh.SetNormals(meshData.Normals);
 			for (int i = 0; i < meshData.Triangles.Count; i++)
 			{
-				ve.Mesh.SetTriangles(meshData.Triangles[i], i);
+				_tempVectorEntity.Mesh.SetTriangles(meshData.Triangles[i], i);
 			}
 
 			for (int i = 0; i < meshData.UV.Count; i++)
 			{
-				ve.Mesh.SetUVs(i, meshData.UV[i]);
+				_tempVectorEntity.Mesh.SetUVs(i, meshData.UV[i]);
 			}
 
-			ve.Transform.SetParent(parent.transform, false);
+			_tempVectorEntity.Transform.SetParent(parent.transform, false);
 
 			if (!_activeObjects.ContainsKey(tile))
-				_activeObjects.Add(tile, new List<VectorEntity>());
-			_activeObjects[tile].Add(ve);
-
-
-			ve.Transform.localPosition = _center;
-
-			foreach (GameObjectModifier mod in GoModifiers.Where(x => x.Active))
 			{
-				mod.Run(ve, tile);
+				_activeObjects.Add(tile, _listPool.GetObject());
+			}
+			_activeObjects[tile].Add(_tempVectorEntity);
+
+
+			_tempVectorEntity.Transform.localPosition = _center;
+
+			for (int i = 0; i < GoModifiers.Count; i++)
+			{
+				if (GoModifiers[i].Active)
+				{
+					GoModifiers[i].Run(_tempVectorEntity, tile);
+				}
 			}
 
-			return ve.GameObject;
+			return _tempVectorEntity.GameObject;
 		}
 	}
 }

@@ -9,12 +9,15 @@
 	[CustomEditor(typeof(VectorTileFactory))]
 	public class VectorTileFactoryEditor : UnityEditor.Editor
 	{
+		private string _defaultMapId = "mapbox.mapbox-streets-v7";
+		public SerializedProperty mapId_Prop;
 		private VectorTileFactory _factory;
 		private MonoScript script;
 
 		private void OnEnable()
 		{
 			script = MonoScript.FromScriptableObject((VectorTileFactory)target);
+			mapId_Prop = serializedObject.FindProperty("_mapId");
 			_factory = target as VectorTileFactory;
 		}
 
@@ -24,6 +27,16 @@
 			GUI.enabled = false;
 			script = EditorGUILayout.ObjectField("Script", script, typeof(MonoScript), false) as MonoScript;
 			GUI.enabled = true;
+
+			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.PropertyField(mapId_Prop, new GUIContent("Map Id"));
+			if (GUILayout.Button("R", GUILayout.Width(30)))
+			{
+				mapId_Prop.stringValue = _defaultMapId;
+				GUI.FocusControl(null);
+				Repaint();
+			}
+			EditorGUILayout.EndHorizontal();
 
 			EditorGUILayout.Space();
 			EditorGUILayout.LabelField("Visualizers");
@@ -71,7 +84,7 @@
 				ScriptableCreatorWindow.Open(typeof(LayerVisualizerBase), facs);
 			}
 			EditorGUILayout.EndHorizontal();
-			
+
 			serializedObject.ApplyModifiedProperties();
 		}
 	}

@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System;
 using Mapbox.Map;
 using Mapbox.Unity.MeshGeneration.Modifiers;
@@ -18,10 +17,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Merged Modifier Stack")]
 	public class MergedModifierStack : ModifierStackBase
 	{
-		[NodeEditorElement("Mesh Modifiers")]
-		public List<MeshModifier> MeshModifiers;
-		[NodeEditorElement("Mesh Modifiers")]
-		public List<GameObjectModifier> GoModifiers;
+		[NodeEditorElement("Mesh Modifiers")] public List<MeshModifier> MeshModifiers;
+		[NodeEditorElement("Mesh Modifiers")] public List<GameObjectModifier> GoModifiers;
 
 		[NonSerialized] private Dictionary<UnityTile, int> _cacheVertexCount = new Dictionary<UnityTile, int>();
 		[NonSerialized] private Dictionary<UnityTile, List<MeshData>> _cached = new Dictionary<UnityTile, List<MeshData>>();
@@ -65,10 +62,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			//removing all caches 
 			if (_activeObjects.ContainsKey(tile))
 			{
-				foreach (var ve in _activeObjects[tile])
+				for (int i = 0; i < _activeObjects[tile].Count; i++)
 				{
-					ve.GameObject.SetActive(false);
-					_pool.Put(ve);
+					_activeObjects[tile][i].GameObject.SetActive(false);
+					_pool.Put(_activeObjects[tile][i]);
 				}
 				_activeObjects[tile].Clear();
 				//pooling these lists as they'll reused anyway, saving hundreds of list instantiations
@@ -101,14 +98,14 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_cached.Clear();
 			_buildingCount.Clear();
 
-			foreach (var mmod in MeshModifiers)
+			for (int i = 0; i < MeshModifiers.Count; i++)
 			{
-				mmod.Initialize();
+				MeshModifiers[i].Initialize();
 			}
 
-			foreach (var gmod in GoModifiers)
+			for (int i = 0; i < GoModifiers.Count; i++)
 			{
-				gmod.Initialize();
+				GoModifiers[i].Initialize();
 			}
 		}
 
@@ -124,15 +121,19 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 
 			_buildingCount[tile]++;
-			foreach (MeshModifier mod in MeshModifiers.Where(x => x.Active))
+			for (int i = 0; i < MeshModifiers.Count; i++)
 			{
-				mod.Run(feature, meshData, tile);
+				if (MeshModifiers[i] != null && MeshModifiers[i].Active)
+				{
+					MeshModifiers[i].Run(feature, meshData, tile);
+				}
 			}
 
 			GameObject go = null;
-			if (_cacheVertexCount[tile] + meshData.Vertices.Count() < 64000)
+			//65000 is the vertex limit for meshes, keep stashing it until that
+			if (_cacheVertexCount[tile] + meshData.Vertices.Count < 65000)
 			{
-				_cacheVertexCount[tile] += meshData.Vertices.Count();
+				_cacheVertexCount[tile] += meshData.Vertices.Count;
 				_cached[tile].Add(meshData);
 			}
 			else
@@ -150,6 +151,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				_tempMeshData.Clear();
 
+				//concat mesh data into _tempMeshData
 				for (int i = 0; i < _cached[tile].Count; i++)
 				{
 					_temp2MeshData = _cached[tile][i];
@@ -163,7 +165,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					for (int j = 0; j < _temp2MeshData.UV.Count; j++)
 					{
 						if (_tempMeshData.UV.Count <= j)
+						{
 							_tempMeshData.UV.Add(new List<Vector2>(_temp2MeshData.UV[j].Count));
+						}
 					}
 
 					for (int j = 0; j < _temp2MeshData.UV.Count; j++)
@@ -174,15 +178,21 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					for (int j = 0; j < _temp2MeshData.Triangles.Count; j++)
 					{
 						if (_tempMeshData.Triangles.Count <= j)
+						{
 							_tempMeshData.Triangles.Add(new List<int>(_temp2MeshData.Triangles[j].Count));
+						}
 					}
 
 					for (int j = 0; j < _temp2MeshData.Triangles.Count; j++)
 					{
-						_tempMeshData.Triangles[j].AddRange(_temp2MeshData.Triangles[j].Select(x => x + st));
+						for (int k = 0; k < _temp2MeshData.Triangles[j].Count; k++)
+						{
+							_tempMeshData.Triangles[j].Add(_temp2MeshData.Triangles[j][k] + st);
+						}
 					}
 				}
 
+				//update pooled vector entity with new data
 				if (_tempMeshData.Vertices.Count > 3)
 				{
 					_tempVectorEntity = null;
