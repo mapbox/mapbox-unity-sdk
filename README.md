@@ -29,6 +29,7 @@ cd mapbox-unity-sdk
 ```
 
 Windows: `update-mapbox-unity-sdk-core.bat`
+
 Linux/Mac: `./update-mapbox-unity-sdk-core.sh`
 
 
