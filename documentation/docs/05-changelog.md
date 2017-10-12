@@ -2,7 +2,7 @@
 
 ### v.1.2.0
 
-*08/26/2017*
+*09/26/2017*
 
 *Please note: this release marks the beginning of official support for the Unity 2017 lifecycle.*
 
