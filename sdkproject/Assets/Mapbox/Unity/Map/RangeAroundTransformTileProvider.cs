@@ -21,7 +21,7 @@
 		private UnwrappedTileId _currentTile;
 		private UnwrappedTileId _cachedTile;
 
-		internal override void OnInitialized()
+		public override void OnInitialized()
 		{
 			if (_targetTransform == null)
 			{

@@ -32,7 +32,7 @@ namespace Mapbox.Unity.Map
 		UnwrappedTileId _cachedTile;
 		UnwrappedTileId _currentTile;
 
-		internal override void OnInitialized()
+		public override void OnInitialized()
 		{
 			_groundPlane = new Plane(Vector3.up, Mapbox.Unity.Constants.Math.Vector3Zero);
 			_viewportTarget = new Vector3(0.5f, 0.5f, 0);

@@ -44,6 +44,6 @@
 			OnTileRemoved(tile);
 		}
 
-		internal abstract void OnInitialized();
+		public abstract void OnInitialized();
 	}
 }
