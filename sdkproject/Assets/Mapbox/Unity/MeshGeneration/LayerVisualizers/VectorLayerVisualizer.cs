@@ -94,14 +94,14 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 		}
 
-		public override void Create(VectorTileLayer layer, UnityTile tile)
+		public override void Create(VectorTileLayer layer, UnityTile tile, Action callback)
 		{
 			if (!_activeCoroutines.ContainsKey(tile))
 				_activeCoroutines.Add(tile, new List<int>());
-			_activeCoroutines[tile].Add(Runnable.Run(ProcessLayer(layer, tile)));
+			_activeCoroutines[tile].Add(Runnable.Run(ProcessLayer(layer, tile, callback)));
 		}
 
-		private IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile)
+		private IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, Action callback = null)
 		{
 			//testing each feature with filters
 			var fc = layer.FeatureCount();
@@ -150,6 +150,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					mergedStack.End(tile, tile.gameObject, layer.Name);
 				}
 			}
+
+			if (callback != null)
+				callback();
 		}
 
 		/// <summary>

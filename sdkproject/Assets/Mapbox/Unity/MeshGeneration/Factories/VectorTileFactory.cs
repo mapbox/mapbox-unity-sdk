@@ -146,16 +146,19 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					{
 						if (builder.Active)
 						{
-							builder.Create(_cachedData[tile].Data.GetLayer(layerName), tile);
+							builder.Create(_cachedData[tile].Data.GetLayer(layerName), tile, DecreaseProgressCounter);
 						}
 					}
 				}
 			}
 
 			tile.VectorDataState = TilePropertyState.Loaded;
-			Progress--;
-
 			_cachedData.Remove(tile);
+		}
+
+		private void DecreaseProgressCounter()
+		{
+			Progress--;
 		}
 	}
 }
