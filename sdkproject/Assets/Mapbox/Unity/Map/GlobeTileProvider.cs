@@ -5,7 +5,7 @@
 
 	public class GlobeTileProvider : AbstractTileProvider
 	{
-		internal override void OnInitialized()
+		public override void OnInitialized()
 		{
 			// HACK: don't allow too many tiles to be requested.
 			if (_map.Zoom > 5)

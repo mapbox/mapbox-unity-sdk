@@ -14,7 +14,7 @@ namespace Mapbox.Unity.Map
 		[SerializeField]
 		private int _south;
 
-		internal override void OnInitialized()
+		public override void OnInitialized()
 		{
 			var centerTile = TileCover.CoordinateToTileId(_map.CenterLatitudeLongitude, _map.Zoom);
 			AddTile(new UnwrappedTileId(_map.Zoom, centerTile.X, centerTile.Y));
