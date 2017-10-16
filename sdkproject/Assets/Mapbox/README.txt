@@ -5,9 +5,11 @@ Getting started: https://www.mapbox.com/mapbox-unity-sdk/docs/00-getting-started
 
 Configuring your API token: https://www.mapbox.com/mapbox-unity-sdk/docs/01-mapbox-api-token.html
 
-Known Issues: https://www.mapbox.com/mapbox-unity-sdk/docs/02-known-issues.html
+Tutorials: https://www.mapbox.com/unity-sdk/tutorials/
 
 Built-in Examples: https://www.mapbox.com/mapbox-unity-sdk/docs/03-examples.html
+
+Known Issues: https://www.mapbox.com/mapbox-unity-sdk/docs/02-known-issues.html
 
 Attribution: https://www.mapbox.com/mapbox-unity-sdk/docs/04-attribution.html
 
