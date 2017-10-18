@@ -134,6 +134,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_tempVectorEntity = _pool.GetObject();
 			_tempVectorEntity.GameObject.SetActive(true);
 			_tempVectorEntity.Mesh.Clear();
+			_tempVectorEntity.Feature = feature;
 
 			_tempVectorEntity.GameObject.name = type + " - " + feature.Data.Id;
 			_tempVectorEntity.Mesh.subMeshCount = meshData.Triangles.Count;

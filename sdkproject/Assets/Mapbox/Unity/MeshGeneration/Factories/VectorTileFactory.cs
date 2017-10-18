@@ -56,7 +56,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				visualizer.Initialize();
 				if (visualizer == null)
+				{
 					continue;
+				}
 
 				if (_layerBuilder.ContainsKey(visualizer.Key))
 				{
@@ -85,9 +87,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 
 				if (_cachedData.ContainsKey(tile))
+				{
 					_cachedData[tile] = vectorTile;
+				}
 				else
+				{
 					_cachedData.Add(tile, vectorTile);
+				}
 
 				// FIXME: we can make the request BEFORE getting a response from these!
 				if (tile.HeightDataState == TilePropertyState.Loading ||
