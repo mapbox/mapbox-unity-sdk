@@ -34,6 +34,8 @@ namespace Mapbox.MapMatching
 		public string Message;
 		[JsonProperty("tracepoints")]
 		public Tracepoint[] Tracepoints;
+		[JsonProperty("matchings")]
+		public MatchObject[] Matchings;
 
 		/// <summary>Error occured during matching</summary>
 		public bool HasMatchingError { get { return !"ok".Equals(Code, StringComparison.InvariantCultureIgnoreCase); } }

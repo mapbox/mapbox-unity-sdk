@@ -24,6 +24,8 @@ namespace Mapbox.MapMatching
 		public const string Polyline = "polyline";
 		/// <summary>Precision 6.</summary>
 		public const string Polyline6 = "polyline6";
+		/// <summary>Default, precision 5.</summary>
+		public const string GeoJson = "geojson";
 	}
 
 

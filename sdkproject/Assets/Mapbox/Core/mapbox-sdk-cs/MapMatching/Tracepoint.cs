@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="Tracepoint.cs" company="Mapbox">
-//     Copyright (c) 2016 Mapbox. All rights reserved.
+//     Copyright (c) 2017 Mapbox. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 
