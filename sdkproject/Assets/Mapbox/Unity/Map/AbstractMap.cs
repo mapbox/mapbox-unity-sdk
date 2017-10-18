@@ -1,6 +1,7 @@
 ﻿namespace Mapbox.Unity.Map
 {
 	using System;
+	using System.Globalization;
 	using Mapbox.Unity.Utilities;
 	using Utils;
 	using UnityEngine;
@@ -128,7 +129,20 @@
 			if (_initializeOnStart)
 			{
 				var latLonSplit = _latitudeLongitudeString.Split(',');
-				Initialize(new Vector2d(double.Parse(latLonSplit[0]), double.Parse(latLonSplit[1])), _zoom);
+
+				double latitude, longitude;
+				CultureInfo locale = CultureInfo.CreateSpecificCulture ("en-US");
+				var hasError = !double.TryParse (latLonSplit [0], NumberStyles.Any, locale, out latitude);
+				hasError = hasError || !double.TryParse (latLonSplit [1], NumberStyles.Any, locale, out longitude);
+
+				if (!hasError)
+				{
+					Initialize (new Vector2d (latitude, longitude), _zoom);
+				} 
+				else 
+				{
+					Debug.LogErrorFormat("Invalid latitude and longitude coordinates: \"{0}\"", _latitudeLongitudeString);
+				}
 			}
 		}
 
