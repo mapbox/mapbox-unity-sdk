@@ -11,6 +11,7 @@ namespace Mapbox.MapMatching
 	using System.Linq;
 	using Mapbox.Platform;
 	using Mapbox.Utils;
+	using Mapbox.VectorTile.ExtensionMethods;
 
 	/// <summary> Base geocode class. </summary>
 	/// <typeparam name="T"> Type of Query field (either string or LatLng). </typeparam>
@@ -19,7 +20,7 @@ namespace Mapbox.MapMatching
 
 		private readonly string _apiEndpoint = "matching/v5/";
 
-		private string _profile = Profile.MapboxDriving;
+		private Profile _profile = Profile.MapboxDriving;
 		private Vector2d[] _coordinates;
 
 		private uint[] _radiuses;
@@ -54,7 +55,7 @@ namespace Mapbox.MapMatching
 		/// <para>Allowed values are: geojson (as LineString ), polyline with precision 5,  polyline6 (polyline with precision 6).</para>
 		/// <para>The default value is polyline.</para>
 		/// </summary>
-		public string Geometries;
+		public Nullable<Geometries> Geometries;
 
 
 		/// <summary>
@@ -91,7 +92,7 @@ namespace Mapbox.MapMatching
 		/// <para>Can be full (the most detailed geometry available), simplified (a simplified version of the full geometry), or none (no overview geometry).</para>
 		/// <para>The default is  simplified.</para>
 		/// </summary>
-		public string Overview;
+		public Nullable<Overview> Overview;
 
 
 		/// <summary>
@@ -116,8 +117,9 @@ namespace Mapbox.MapMatching
 		/// <para>Whether or not to return additional metadata along the route.</para>
 		/// <para>Possible values are: duration, distance and speed.</para>
 		/// <para>Several annotations can be used.</para>
+		/// <para>Combine via '|'.</para>
 		/// </summary>
-		public string[] Annotations;
+		public Nullable<Annotations> Annotations;
 
 
 		/// <summary>
@@ -132,31 +134,50 @@ namespace Mapbox.MapMatching
 		/// <para>Language of returned turn-by-turn text instructions.</para>
 		/// <para>The default is English.</para>
 		/// </summary>
-		public string Language;
+		public Nullable<InstructionLanguages> Language;
 
 
 		public override string GetUrl()
 		{
-
-
 			Dictionary<string, string> options = new Dictionary<string, string>();
 
-			if (!string.IsNullOrEmpty(Geometries)) { options.Add("geometries", Geometries); }
+			if (Geometries.HasValue) { options.Add("geometries", Geometries.Value.Description()); }
 			if (null != _radiuses) { options.Add("radiuses", GetUrlQueryFromArray(_radiuses, ";")); }
 			if (Steps.HasValue) { options.Add("steps", Steps.ToString().ToLower()); }
-			if (!string.IsNullOrEmpty(Overview)) { options.Add("overview", Overview); }
+			if (Overview.HasValue) { options.Add("overview", Overview.Value.Description()); }
 			if (null != _timestamps) { options.Add("timestamps", GetUrlQueryFromArray(_timestamps, ";")); }
-			if (null != Annotations) { options.Add("annotations", GetUrlQueryFromArray(Annotations, ",")); }
+			if (Annotations.HasValue) { options.Add("annotations", getUrlQueryForAnnotations(Annotations.Value, ",")); }
 			if (Tidy.HasValue) { options.Add("tidy", Tidy.Value.ToString().ToLower()); }
-			if (!string.IsNullOrEmpty(Language)) { options.Add("language", Language); }
+			if (Language.HasValue) { options.Add("language", Language.Value.Description()); }
 
 			return
 				Constants.BaseAPI
 				+ _apiEndpoint
-				+ _profile + "/"
+				+ _profile.Description() + "/"
 				+ GetUrlQueryFromArray<Vector2d>(_coordinates, ";")
 				+ ".json"
 				+ EncodeQueryString(options);
+		}
+
+
+		/// <summary>
+		/// Convert Annotations (several could be combined) into a string of their descriptions.
+		/// </summary>
+		/// <param name="annotation">Current annotation</param>
+		/// <param name="separator">Character to use for separating items in string.</param>
+		/// <returns></returns>
+		private string getUrlQueryForAnnotations(Annotations annotation, string separator)
+		{
+			List<string> annos = new List<string>();
+
+			//iterate through all possible values
+			foreach (var a in Enum.GetValues(typeof(Annotations)).Cast<Annotations>())
+			{
+				//if current value is set, add its description
+				if (a == (annotation & a)) { annos.Add(a.Description()); }
+			}
+
+			return string.Join(separator, annos.ToArray());
 		}
 	}
 }

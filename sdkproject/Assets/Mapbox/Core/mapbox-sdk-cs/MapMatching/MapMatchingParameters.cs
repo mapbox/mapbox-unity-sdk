@@ -4,79 +4,110 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System.ComponentModel;
+
 namespace Mapbox.MapMatching
 {
 
 	/// <summary>Directions profile id</summary>
-	public struct Profile
+	public enum Profile
 	{
-		public const string MapboxDriving = "mapbox/driving";
-		public const string MapboxDrivingTraffic = "mapbox/driving-traffic";
-		public const string MapboxWalking = "mapbox/walking";
-		public const string MapboxCycling = "mapbox/cycling";
+		[Description("mapbox/driving")]
+		MapboxDriving,
+		[Description("mapbox/driving-traffic")]
+		MapboxDrivingTraffic,
+		[Description("mapbox/walking")]
+		MapboxWalking,
+		[Description("mapbox/cycling")]
+		MapboxCycling
 	}
 
 
 	/// <summary>Format of the returned geometry. Default value 'Polyline' with precision 5.</summary>
-	public struct Geometries
+	public enum Geometries
 	{
 		/// <summary>Default, precision 5.</summary>
-		public const string Polyline = "polyline";
+		[Description("polyline")]
+		Polyline,
 		/// <summary>Precision 6.</summary>
-		public const string Polyline6 = "polyline6";
-		/// <summary>Default, precision 5.</summary>
-		public const string GeoJson = "geojson";
+		[Description("polyline6")]
+		Polyline6,
+		/// <summary>Geojson.</summary>
+		[Description("geojson")]
+		GeoJson
 	}
 
 
 	/// <summary>Type of returned overview geometry. </summary>
-	public struct Overview
+	public enum Overview
 	{
 		/// <summary>The most detailed geometry available </summary>
-		public const string Full= "full";
+		[Description("full")]
+		Full,
 		/// <summary>A simplified version of the full geometry</summary>
-		public const string Simplified = "simplified";
+		[Description("simplified")]
+		Simplified,
 		/// <summary>No overview geometry </summary>
-		public const string None = "false";
-
+		[Description("false")]
+		None
 	}
 
 
 	/// <summary>Whether or not to return additional metadata along the route. Several annotations can be used.</summary>
-	public struct Annotations
+	[System.Flags]
+	public enum Annotations
 	{
-		/// <summary></summary>
-		public const string Duration = "duration";
-		/// <summary></summary>
-		public const string Distance = "distance";
-		/// <summary></summary>
-		public const string Speed = "speed";
+		[Description("duration")]
+		Duration,
+		[Description("distance")]
+		Distance,
+		[Description("speed")]
+		Speed
 	}
 
 
 	/// <summary>
 	/// https://www.mapbox.com/api-documentation/#retrieve-directions
 	/// </summary>
-	public struct InstructionLanguages
+	public enum InstructionLanguages
 	{
-		public const string German= "de";
-		public const string English= "en";
-		public const string Esperanto= "eo";
-		public const string Spanish= "es";
-		public const string SpanishSpain= "es-ES";
-		public const string French= "fr";
-		public const string Indonesian= "id";
-		public const string Italian= "it";
-		public const string Dutch= "nl";
-		public const string Polish= "pl";
-		public const string PortugueseBrazil= "pt-BR";
-		public const string Romanian= "ro";
-		public const string Russian= "ru";
-		public const string Swedish= "sv";
-		public const string Turkish= "tr";
-		public const string Ukrainian = "uk";
-		public const string Vietnamese= "vi";
-		public const string ChineseSimplified= "zh-Hans";
+		[Description("de")]
+		German,
+		[Description("en")]
+		English,
+		[Description("eo")]
+		Esperanto,
+		[Description("es")]
+		Spanish,
+		[Description("es-ES")]
+		SpanishSpain,
+		[Description("fr")]
+		French,
+		[Description("id")]
+		Indonesian,
+		[Description("it")]
+		Italian,
+		[Description("nl")]
+		Dutch,
+		[Description("pl")]
+		Polish,
+		[Description("pt-BR")]
+		PortugueseBrazil,
+		[Description("ro")]
+		Romanian,
+		[Description("ru")]
+		Russian,
+		[Description("sv")]
+		Swedish,
+		[Description("tr")]
+		Turkish,
+		[Description("uk")]
+		Ukrainian,
+		[Description("vi")]
+		Vietnamese,
+		[Description("zh-Hans")]
+		ChineseSimplified
 	}
+
 
 }
