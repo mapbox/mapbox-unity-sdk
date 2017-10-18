@@ -62,7 +62,9 @@ namespace Mapbox.MapMatching
 		[Description("distance")]
 		Distance,
 		[Description("speed")]
-		Speed
+		Speed,
+		[Description("congestion")]
+		Congestion
 	}
 
 

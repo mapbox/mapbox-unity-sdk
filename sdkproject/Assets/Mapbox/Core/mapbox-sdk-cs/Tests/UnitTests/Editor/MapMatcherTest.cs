@@ -119,70 +119,6 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		}
 
 
-		[UnityTest]
-		public IEnumerator GeometriesWith5Digits()
-		{
-
-			MapMatchingResource resource = new MapMatchingResource();
-			resource.Coordinates = new Vector2d[]
-			{
-				new Vector2d(48.1974721043879,16.36202484369278),
-				new Vector2d(48.197922645046546,16.36285901069641)
-			};
-			//no extra parameters needed: 5 digits default
-
-			MapMatcher mapMatcher = new MapMatcher(_fs);
-			MapMatchingResponse matchingResponse = null;
-			mapMatcher.Match(
-				resource,
-				(MapMatchingResponse response) =>
-				{
-					matchingResponse = response;
-				}
-			);
-
-			IEnumerator enumerator = _fs.WaitForAllRequests();
-			while (enumerator.MoveNext()) { yield return null; }
-
-			commonBasicResponseAsserts(matchingResponse);
-
-			string locationX = matchingResponse.Matchings[0].Geometry[0].x.ToString(System.Globalization.CultureInfo.InvariantCulture);
-			locationX = locationX.Substring(locationX.IndexOf(".") + 1);
-			Assert.AreEqual(5, locationX.Length, "Precision not as expected");
-		}
-
-
-		[UnityTest]
-		public IEnumerator GeometriesWith6Digits()
-		{
-
-			MapMatchingResource resource = new MapMatchingResource();
-			resource.Coordinates = new Vector2d[]
-			{
-				new Vector2d(48.1974721043879,16.36202484369278),
-				new Vector2d(48.197922645046546,16.36285901069641)
-			};
-			resource.Geometries = Geometries.Polyline6;
-
-			MapMatcher mapMatcher = new MapMatcher(_fs);
-			MapMatchingResponse matchingResponse = null;
-			mapMatcher.Match(
-				resource,
-				(MapMatchingResponse response) =>
-				{
-					matchingResponse = response;
-				}
-			);
-
-			IEnumerator enumerator = _fs.WaitForAllRequests();
-			while (enumerator.MoveNext()) { yield return null; }
-
-			commonBasicResponseAsserts(matchingResponse);
-
-			string locationX = matchingResponse.Matchings[0].Geometry[0].x.ToString(System.Globalization.CultureInfo.InvariantCulture);
-			locationX = locationX.Substring(locationX.IndexOf(".") + 1);
-			Assert.AreEqual(6, locationX.Length, "Precision not as expected");
-		}
 
 
 		[UnityTest]
@@ -337,6 +273,151 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		}
 
 
+		[UnityTest]
+		public IEnumerator Timestamps()
+		{
+
+			MapMatchingResource resource = new MapMatchingResource();
+			resource.Coordinates = new Vector2d[]
+			{
+				new Vector2d(48.1974721043879,16.36202484369278),
+				new Vector2d(48.197922645046546,16.36285901069641)
+			};
+			resource.Timestamps = new long[]
+			{
+				946684800,
+				946684980
+			};
+
+			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatchingResponse matchingResponse = null;
+			mapMatcher.Match(
+				resource,
+				(MapMatchingResponse response) =>
+				{
+					matchingResponse = response;
+				}
+			);
+
+			IEnumerator enumerator = _fs.WaitForAllRequests();
+			while (enumerator.MoveNext()) { yield return null; }
+
+			commonBasicResponseAsserts(matchingResponse);
+		}
+
+
+		[UnityTest]
+		public IEnumerator Annotation()
+		{
+
+			MapMatchingResource resource = new MapMatchingResource();
+			resource.Coordinates = new Vector2d[]
+			{
+				new Vector2d(48.1974721043879,16.36202484369278),
+				new Vector2d(48.197922645046546,16.36285901069641)
+			};
+			//need to pass 'Overview.Full' to get 'Congestion'
+			resource.Overview = Overview.Full;
+			resource.Annotations = Annotations.Distance | Annotations.Duration | Annotations.Speed | Annotations.Congestion;
+
+			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatchingResponse matchingResponse = null;
+			mapMatcher.Match(
+				resource,
+				(MapMatchingResponse response) =>
+				{
+					matchingResponse = response;
+				}
+			);
+
+			IEnumerator enumerator = _fs.WaitForAllRequests();
+			while (enumerator.MoveNext()) { yield return null; }
+
+			commonBasicResponseAsserts(matchingResponse);
+
+			Directions.Leg leg =matchingResponse.Matchings[0].Legs[0];
+			Assert.IsNotNull(leg.Annotation, "Annotation is NULL");
+			Assert.IsNotNull(leg.Annotation.Distance, "Distance is NULL");
+			Assert.IsNotNull(leg.Annotation.Duration, "Duration is NULL");
+			Assert.IsNotNull(leg.Annotation.Speed, "Speed is NULL");
+			Assert.IsNotNull(leg.Annotation.Congestion, "Congestion is NULL");
+
+			Assert.GreaterOrEqual(leg.Annotation.Distance[1], 42, "Annotation has wrong distnce");
+		}
+
+
+
+		[UnityTest]
+		public IEnumerator LanguageEnglish()
+		{
+
+			MapMatchingResource resource = new MapMatchingResource();
+			resource.Coordinates = new Vector2d[]
+			{
+				new Vector2d(48.1974721043879,16.36202484369278),
+				new Vector2d(48.197922645046546,16.36285901069641)
+			};
+			//set Steps to true to get turn-by-turn-instructions
+			resource.Steps = true;
+			//no language parameter needed: English is default
+
+			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatchingResponse matchingResponse = null;
+			mapMatcher.Match(
+				resource,
+				(MapMatchingResponse response) =>
+				{
+					matchingResponse = response;
+				}
+			);
+
+			IEnumerator enumerator = _fs.WaitForAllRequests();
+			while (enumerator.MoveNext()) { yield return null; }
+
+			commonBasicResponseAsserts(matchingResponse);
+
+			Directions.Step step0= matchingResponse.Matchings[0].Legs[0].Steps[0];
+			Directions.Step step1 = matchingResponse.Matchings[0].Legs[0].Steps[1];
+			Assert.AreEqual("Head northeast on Rechte Wienzeile (B1)", step0.Maneuver.Instruction, "Step[0]:Instruction not as expected");
+			Assert.AreEqual("You have arrived at your destination", step1.Maneuver.Instruction, "Step[1]:Instruction not as expected");
+		}
+
+
+		[UnityTest]
+		public IEnumerator LanguageGerman()
+		{
+
+			MapMatchingResource resource = new MapMatchingResource();
+			resource.Coordinates = new Vector2d[]
+			{
+				new Vector2d(48.1974721043879,16.36202484369278),
+				new Vector2d(48.197922645046546,16.36285901069641)
+			};
+			//set Steps to true to get turn-by-turn-instructions
+			resource.Steps = true;
+			resource.Language = InstructionLanguages.German;
+
+			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatchingResponse matchingResponse = null;
+			mapMatcher.Match(
+				resource,
+				(MapMatchingResponse response) =>
+				{
+					matchingResponse = response;
+				}
+			);
+
+			IEnumerator enumerator = _fs.WaitForAllRequests();
+			while (enumerator.MoveNext()) { yield return null; }
+
+			commonBasicResponseAsserts(matchingResponse);
+
+			Directions.Step step0 = matchingResponse.Matchings[0].Legs[0].Steps[0];
+			Directions.Step step1 = matchingResponse.Matchings[0].Legs[0].Steps[1];
+			Assert.AreEqual("Fahren Sie Richtung Nordosten auf Rechte Wienzeile (B1)", step0.Maneuver.Instruction, "Step[0]:Instruction not as expected");
+			Assert.AreEqual("Sie haben Ihr Ziel erreicht", step1.Maneuver.Instruction, "Step[1]:Instruction not as expected");
+		}
+
 
 		[UnityTest]
 		public IEnumerator InvalidCoordinate()
@@ -386,6 +467,80 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			Assert.IsNotNull(matchingResponse.Matchings[0].Legs, "Legs are NULL");
 			Assert.GreaterOrEqual(matchingResponse.Matchings[0].Legs.Count, 1, "1st match has no legs");
 		}
+
+
+
+		#region disabledTests
+
+		//These tests don't work as we don't access the raw response and cannot verify the digits returned by the API
+		/*
+				[UnityTest]
+				public IEnumerator GeometriesWith5Digits()
+				{
+
+					MapMatchingResource resource = new MapMatchingResource();
+					resource.Coordinates = new Vector2d[]
+					{
+						new Vector2d(48.1974721043879,16.36202484369278),
+						new Vector2d(48.197922645046546,16.36285901069641)
+					};
+					//no extra parameters needed: 5 digits default
+
+					MapMatcher mapMatcher = new MapMatcher(_fs);
+					MapMatchingResponse matchingResponse = null;
+					mapMatcher.Match(
+						resource,
+						(MapMatchingResponse response) =>
+						{
+							matchingResponse = response;
+						}
+					);
+
+					IEnumerator enumerator = _fs.WaitForAllRequests();
+					while (enumerator.MoveNext()) { yield return null; }
+
+					commonBasicResponseAsserts(matchingResponse);
+
+					string locationX = matchingResponse.Matchings[0].Geometry[0].x.ToString(System.Globalization.CultureInfo.InvariantCulture);
+					locationX = locationX.Substring(locationX.IndexOf(".") + 1);
+					Assert.AreEqual(5, locationX.Length, "Precision not as expected");
+				}
+
+
+				[UnityTest]
+				public IEnumerator GeometriesWith6Digits()
+				{
+
+					MapMatchingResource resource = new MapMatchingResource();
+					resource.Coordinates = new Vector2d[]
+					{
+						new Vector2d(48.1974721043879,16.36202484369278),
+						new Vector2d(48.197922645046546,16.36285901069641)
+					};
+					resource.Geometries = Geometries.Polyline6;
+
+					MapMatcher mapMatcher = new MapMatcher(_fs);
+					MapMatchingResponse matchingResponse = null;
+					mapMatcher.Match(
+						resource,
+						(MapMatchingResponse response) =>
+						{
+							matchingResponse = response;
+						}
+					);
+
+					IEnumerator enumerator = _fs.WaitForAllRequests();
+					while (enumerator.MoveNext()) { yield return null; }
+
+					commonBasicResponseAsserts(matchingResponse);
+
+					string locationX = matchingResponse.Matchings[0].Geometry[0].x.ToString(System.Globalization.CultureInfo.InvariantCulture);
+					locationX = locationX.Substring(locationX.IndexOf(".") + 1);
+					Assert.AreEqual(6, locationX.Length, "Precision not as expected");
+				}
+		*/
+
+		#endregion
 
 
 	}
