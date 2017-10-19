@@ -19,10 +19,7 @@ namespace Mapbox.MapMatching
 	{
 
 		private readonly string _apiEndpoint = "matching/v5/";
-
-		private Profile _profile = Profile.MapboxDriving;
 		private Vector2d[] _coordinates;
-
 		private uint[] _radiuses;
 		private long[] _timestamps;
 
@@ -32,6 +29,10 @@ namespace Mapbox.MapMatching
 		{
 			get { return _apiEndpoint; }
 		}
+
+
+		/// <summary>A directions profile ID.</summary>
+		public Profile Profile = Profile.MapboxDriving;
 
 
 		/// <summary> Coordinate to visit in order; there can be between 2 and 100 coordinates. </summary>
@@ -124,6 +125,7 @@ namespace Mapbox.MapMatching
 
 		/// <summary>
 		/// <para>Whether or not to transparently remove clusters and re-sample traces for improved map matching results.</para>
+		/// <para>Removed tracepoints are set to 'null' in the response!</para>
 		/// <para>Can be true or false.</para>
 		/// <para>The default is false.</para>
 		/// </summary>
@@ -146,18 +148,19 @@ namespace Mapbox.MapMatching
 			if (Steps.HasValue) { options.Add("steps", Steps.ToString().ToLower()); }
 			if (Overview.HasValue) { options.Add("overview", Overview.Value.Description()); }
 			if (null != _timestamps) { options.Add("timestamps", GetUrlQueryFromArray(_timestamps, ";")); }
-			if (Annotations.HasValue) { options.Add("annotations", getUrlQueryForAnnotations(Annotations.Value, ",")); }
+			if (Annotations.HasValue) { options.Add("annotations", getUrlQueryFromAnnotations(Annotations.Value, ",")); }
 			if (Tidy.HasValue) { options.Add("tidy", Tidy.Value.ToString().ToLower()); }
 			if (Language.HasValue) { options.Add("language", Language.Value.Description()); }
 
 			return
 				Constants.BaseAPI
 				+ _apiEndpoint
-				+ _profile.Description() + "/"
+				+ Profile.Description() + "/"
 				+ GetUrlQueryFromArray<Vector2d>(_coordinates, ";")
 				+ ".json"
 				+ EncodeQueryString(options);
 		}
+
 
 
 		/// <summary>
@@ -166,18 +169,20 @@ namespace Mapbox.MapMatching
 		/// <param name="annotation">Current annotation</param>
 		/// <param name="separator">Character to use for separating items in string.</param>
 		/// <returns></returns>
-		private string getUrlQueryForAnnotations(Annotations annotation, string separator)
+		private string getUrlQueryFromAnnotations(Annotations anno, string separator) 
 		{
-			List<string> annos = new List<string>();
+			List<string> descriptions = new List<string>();
 
-			//iterate through all possible values
+			//iterate through all possible 'Annotations' values
 			foreach (var a in Enum.GetValues(typeof(Annotations)).Cast<Annotations>())
 			{
 				//if current value is set, add its description
-				if (a == (annotation & a)) { annos.Add(a.Description()); }
+				if (a == (anno & a)) { descriptions.Add(a.Description()); }
 			}
 
-			return string.Join(separator, annos.ToArray());
+			return string.Join(separator, descriptions.ToArray());
 		}
+
+
 	}
 }

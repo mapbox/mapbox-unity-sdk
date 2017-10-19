@@ -40,7 +40,7 @@ namespace Mapbox.MapMatching
 		{
 			string url = match.GetUrl();
 			return _fileSource.Request(
-				match.GetUrl(),
+				url,
 				(Response response) =>
 				{
 					var str = Encoding.UTF8.GetString(response.Data);

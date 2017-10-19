@@ -17,6 +17,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 	using NUnit.Framework;
 	using UnityEngine.TestTools;
 	using System.Collections;
+	using System.Collections.Generic;
 	using Mapbox.MapMatching;
 	using Mapbox.Utils;
 
@@ -80,6 +81,88 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			Assert.AreEqual("routability", matchingResponse.Matchings[0].WeightName, "Wrong WeightName");
 			Assert.AreEqual(6, matchingResponse.Matchings[0].Legs.Count, "Wrong number of legs");
 			Assert.AreEqual(8, matchingResponse.Matchings[0].Geometry.Count, "Wrong number of vertices in geometry");
+		}
+
+
+		[UnityTest]
+		public IEnumerator Profiles()
+		{
+			//walking
+			IEnumerator<MapMatchingResponse> enumerator = profile(Profile.MapboxWalking);
+			MapMatchingResponse matchingResponse = null;
+			while (enumerator.MoveNext())
+			{
+				matchingResponse = enumerator.Current;
+				yield return null;
+			}
+
+			Assert.GreaterOrEqual(matchingResponse.Matchings[0].Duration, 440, "'mapbox/walking' duration less than expected");
+
+			//cycling
+			enumerator = profile(Profile.MapboxCycling);
+			matchingResponse = null;
+			while (enumerator.MoveNext())
+			{
+				matchingResponse = enumerator.Current;
+				yield return null;
+			}
+			Assert.GreaterOrEqual(matchingResponse.Matchings[0].Duration, 150, "'mapbox/cycling' duration less than expected");
+
+			//driving traffic
+			enumerator = profile(Profile.MapboxDrivingTraffic);
+			matchingResponse = null;
+			while (enumerator.MoveNext())
+			{
+				matchingResponse = enumerator.Current;
+				yield return null;
+			}
+			Assert.GreaterOrEqual(matchingResponse.Matchings[0].Duration, 130, "'driving-traffic' duration less than expected");
+
+			//driving
+			enumerator = profile(Profile.MapboxDriving);
+			matchingResponse = null;
+			while (enumerator.MoveNext())
+			{
+				matchingResponse = enumerator.Current;
+				yield return null;
+			}
+			Assert.GreaterOrEqual(matchingResponse.Matchings[0].Duration, 130, "'driving' duration less than expected");
+		}
+
+
+		private IEnumerator<MapMatchingResponse> profile(Profile profile)
+		{
+			MapMatchingResource resource = new MapMatchingResource();
+			resource.Coordinates = new Vector2d[]
+			{
+				new Vector2d(48.27275388447381,16.34687304496765),
+				new Vector2d(48.271925526874405,16.344040632247925),
+				new Vector2d(48.27190410365491,16.343783140182495),
+				new Vector2d(48.27198265541583,16.343053579330444),
+				new Vector2d(48.27217546377159,16.342334747314453),
+				new Vector2d(48.27251823238551,16.341615915298462),
+				new Vector2d(48.27223259203358,16.3416588306427),
+				new Vector2d(48.27138280254541,16.34069323539734),
+				new Vector2d(48.27114714413402,16.34015679359436 )
+			};
+			resource.Profile = profile;
+
+			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatchingResponse matchingResponse = null;
+			mapMatcher.Match(
+				resource,
+				(MapMatchingResponse response) =>
+				{
+					matchingResponse = response;
+				}
+			);
+
+			IEnumerator enumerator = _fs.WaitForAllRequests();
+			while (enumerator.MoveNext()) { yield return null; }
+
+			commonBasicResponseAsserts(matchingResponse);
+
+			yield return matchingResponse;
 		}
 
 
@@ -335,7 +418,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 
 			commonBasicResponseAsserts(matchingResponse);
 
-			Directions.Leg leg =matchingResponse.Matchings[0].Legs[0];
+			Directions.Leg leg = matchingResponse.Matchings[0].Legs[0];
 			Assert.IsNotNull(leg.Annotation, "Annotation is NULL");
 			Assert.IsNotNull(leg.Annotation.Distance, "Distance is NULL");
 			Assert.IsNotNull(leg.Annotation.Duration, "Duration is NULL");
@@ -343,6 +426,48 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			Assert.IsNotNull(leg.Annotation.Congestion, "Congestion is NULL");
 
 			Assert.GreaterOrEqual(leg.Annotation.Distance[1], 42, "Annotation has wrong distnce");
+		}
+
+
+		[UnityTest]
+		public IEnumerator Tidy()
+		{
+
+			MapMatchingResource resource = new MapMatchingResource();
+			resource.Coordinates = new Vector2d[]
+			{
+				new Vector2d(48.187092481625704,16.312205493450165),
+				new Vector2d(48.187083540475875,16.312505900859833),
+				new Vector2d(48.18709426985548,16.312503218650818),
+				new Vector2d(48.18707281109407,16.312503218650818),
+				new Vector2d(48.18709605808517,16.312524676322937),
+				new Vector2d(48.18707817578527,16.312530040740967),
+				new Vector2d(48.1870656581716,16.312524676322937),
+				new Vector2d(48.187079964015524,16.312484443187714),
+				new Vector2d(48.18704598762968,16.312776803970337)
+			};
+			resource.Tidy = true;
+
+			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatchingResponse matchingResponse = null;
+			mapMatcher.Match(
+				resource,
+				(MapMatchingResponse response) =>
+				{
+					matchingResponse = response;
+				}
+			);
+
+			IEnumerator enumerator = _fs.WaitForAllRequests();
+			while (enumerator.MoveNext()) { yield return null; }
+
+			commonBasicResponseAsserts(matchingResponse);
+
+			Tracepoint[] tps = matchingResponse.Tracepoints;
+			//tracepoints removed by 'Tidy' are set to 'null'
+			Assert.IsNotNull(tps, "Tracepoints is NULL");
+			Assert.IsNull(tps[6], "Tracepoints is NULL");
+			Assert.IsNull(tps[7], "Tracepoints is NULL");
 		}
 
 
@@ -376,7 +501,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 
 			commonBasicResponseAsserts(matchingResponse);
 
-			Directions.Step step0= matchingResponse.Matchings[0].Legs[0].Steps[0];
+			Directions.Step step0 = matchingResponse.Matchings[0].Legs[0].Steps[0];
 			Directions.Step step1 = matchingResponse.Matchings[0].Legs[0].Steps[1];
 			Assert.AreEqual("Head northeast on Rechte Wienzeile (B1)", step0.Maneuver.Instruction, "Step[0]:Instruction not as expected");
 			Assert.AreEqual("You have arrived at your destination", step1.Maneuver.Instruction, "Step[1]:Instruction not as expected");
@@ -417,6 +542,63 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			Assert.AreEqual("Fahren Sie Richtung Nordosten auf Rechte Wienzeile (B1)", step0.Maneuver.Instruction, "Step[0]:Instruction not as expected");
 			Assert.AreEqual("Sie haben Ihr Ziel erreicht", step1.Maneuver.Instruction, "Step[1]:Instruction not as expected");
 		}
+
+
+
+		[UnityTest]
+		public IEnumerator AllParameters()
+		{
+
+			MapMatchingResource resource = new MapMatchingResource();
+			resource.Profile = Profile.MapboxWalking;
+			resource.Geometries = Geometries.Polyline6;
+			resource.Coordinates = new Vector2d[]
+			{
+				new Vector2d(48.28585,16.55267),
+				new Vector2d(48.28933,16.55211)
+			};
+			resource.Timestamps = new long[]
+			{
+				946684800,
+				946684980
+			};
+			resource.Radiuses = new uint[] { 50, 50 };
+			//set Steps to true to get turn-by-turn-instructions
+			resource.Steps = true;
+			//need to pass 'Overview.Full' to get 'Congestion'
+			resource.Overview = Overview.Full;
+			resource.Annotations = Annotations.Distance | Annotations.Duration | Annotations.Speed | Annotations.Congestion;
+			resource.Tidy = true;
+			resource.Language = InstructionLanguages.German;
+
+
+			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatchingResponse matchingResponse = null;
+			mapMatcher.Match(
+				resource,
+				(MapMatchingResponse response) =>
+				{
+					matchingResponse = response;
+				}
+			);
+
+			IEnumerator enumerator = _fs.WaitForAllRequests();
+			while (enumerator.MoveNext()) { yield return null; }
+
+			commonBasicResponseAsserts(matchingResponse);
+
+			Directions.Leg leg = matchingResponse.Matchings[0].Legs[0];
+			Assert.IsNotNull(leg.Annotation, "Annotation is NULL");
+			Assert.IsNotNull(leg.Annotation.Distance, "Distance is NULL");
+			Assert.IsNotNull(leg.Annotation.Duration, "Duration is NULL");
+			Assert.IsNotNull(leg.Annotation.Speed, "Speed is NULL");
+			Assert.IsNotNull(leg.Annotation.Congestion, "Congestion is NULL");
+
+			Directions.Step step1 = matchingResponse.Matchings[0].Legs[0].Steps[1];
+			Assert.IsTrue(step1.Maneuver.Instruction.Contains("Sie haben Ihr Ziel erreicht"), "Step[1]:Instruction not as expected");
+
+		}
+
 
 
 		[UnityTest]
