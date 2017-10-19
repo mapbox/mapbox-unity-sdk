@@ -32,7 +32,7 @@
 		private DynamicZoomMap _dynamicZoomMap;
 		private string _className;
 
-		internal override void OnInitialized()
+		public override void OnInitialized()
 		{
 			_className = this.GetType().Name;
 

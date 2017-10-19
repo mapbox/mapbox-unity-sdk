@@ -35,7 +35,7 @@ namespace Mapbox.Examples
 			}
 		}
 
-		public void Update()
+		public void LateUpdate()
 		{
 			if (_uiObject)
 				_uiObject.transform.position = Camera.main.WorldToScreenPoint(transform.position);

@@ -86,7 +86,7 @@
 
 					EditorGUILayout.BeginVertical();
 					GUILayout.Space(5);
-					EditorGUILayout.ObjectField(_layerVis._defaultStack, typeof(ModifierStackBase));
+					EditorGUILayout.ObjectField(_layerVis._defaultStack, typeof(ModifierStackBase), false);
 					EditorGUILayout.EndVertical();
 
 					if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
@@ -124,7 +124,7 @@
 
 					EditorGUILayout.BeginVertical();
 					GUILayout.Space(5);
-					EditorGUILayout.ObjectField(_layerVis.Stacks[i].Stack, typeof(ModifierStackBase));
+					EditorGUILayout.ObjectField(_layerVis.Stacks[i].Stack, typeof(ModifierStackBase), false);
 					EditorGUILayout.EndVertical();
 
 					if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
@@ -159,6 +159,7 @@
 						_layerVis.Stacks.Add(new TypeVisualizerTuple() { Stack = (ModifierStackBase)asset });
 					});
 				}
+				EditorGUILayout.EndHorizontal();
 			}
 
 			serializedObject.ApplyModifiedProperties();
