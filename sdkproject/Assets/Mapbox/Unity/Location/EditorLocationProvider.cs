@@ -9,7 +9,7 @@ namespace Mapbox.Unity.Location
     /// The EditorLocationProvider is responsible for providing mock location and heading data
     /// for testing purposes in the Unity editor.
     /// </summary>
-    public class EditorLocationProvider : MonoBehaviour, ILocationProvider
+	public class EditorLocationProvider : AbstractLocationProvider
     {
         /// <summary>
         /// The mock "latitude, longitude" location, respresented with a string.
@@ -27,11 +27,12 @@ namespace Mapbox.Unity.Location
         [Range(0, 359)]
         float _heading;
 
-        /// <summary>
-        /// Gets the current location, as specified in the inspector.
-        /// </summary>
-        /// <value>The location.</value>
-        public Vector2d Location
+		[SerializeField]
+		int _accuracy;
+
+		Location _currentLocation;
+
+		Vector2d LatitudeLongitude
         {
             get
             {
@@ -40,38 +41,16 @@ namespace Mapbox.Unity.Location
             }
         }
 
-        /// <summary>
-        /// Occurs every frame.
-        /// </summary>
-        public event EventHandler<HeadingUpdatedEventArgs> OnHeadingUpdated;
-
-        /// <summary>
-        /// Occurs every frame.
-        /// </summary>
-        public event EventHandler<LocationUpdatedEventArgs> OnLocationUpdated;
-
 #if UNITY_EDITOR
         void Update()
         {
-            SendHeadingUpdated();
-            SendLocationUpdated();
+			_currentLocation.Heading = _heading;
+			_currentLocation.LatitudeLongitude = LatitudeLongitude;
+			_currentLocation.Accuracy = _accuracy;
+			_currentLocation.Timestamp =DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+
+			SendLocation(_currentLocation);
         }
 #endif
-
-        void SendHeadingUpdated()
-        {
-            if (OnHeadingUpdated != null)
-            {
-                OnHeadingUpdated(this, new HeadingUpdatedEventArgs() { Heading = _heading });
-            }
-        }
-
-        void SendLocationUpdated()
-        {
-            if (OnLocationUpdated != null)
-            {
-                OnLocationUpdated(this, new LocationUpdatedEventArgs() { Location = Location });
-            }
-        }
     }
 }

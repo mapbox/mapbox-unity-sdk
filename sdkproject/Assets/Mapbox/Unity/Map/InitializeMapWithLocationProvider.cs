@@ -16,10 +16,10 @@
 			_locationProvider.OnLocationUpdated += LocationProvider_OnLocationUpdated;
 		}
 
-		void LocationProvider_OnLocationUpdated(object sender, Location.LocationUpdatedEventArgs e)
+		void LocationProvider_OnLocationUpdated(Location location)
 		{
 			_locationProvider.OnLocationUpdated -= LocationProvider_OnLocationUpdated;
-			_map.Initialize(e.Location, _map.Zoom);
+			_map.Initialize(location.LatitudeLongitude, _map.Zoom);
 		}
 	}
 }

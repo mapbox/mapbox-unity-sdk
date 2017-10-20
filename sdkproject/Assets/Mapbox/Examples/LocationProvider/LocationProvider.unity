@@ -1189,6 +1189,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _latitudeLongitude: 37.7648, -122.463
   _heading: 0
+  _accuracy: 5
 --- !u!4 &1628209263
 Transform:
   m_ObjectHideFlags: 0
@@ -1231,6 +1232,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _map: {fileID: 114606471}
   _targetTransform: {fileID: 1649127106}
+  _accuracy: 5
 --- !u!4 &1649127106
 Transform:
   m_ObjectHideFlags: 0

@@ -14,13 +14,13 @@ namespace Mapbox.Unity.Location
     public class LocationProviderFactory : MonoBehaviour
     {
         [SerializeField]
-        DeviceLocationProvider _deviceLocationProvider;
+		AbstractLocationProvider _deviceLocationProvider;
 
         [SerializeField]
-        EditorLocationProvider _editorLocationProvider;
+		AbstractLocationProvider _editorLocationProvider;
 
         [SerializeField]
-        TransformLocationProvider _transformLocationProvider;
+		AbstractLocationProvider _transformLocationProvider;
 
         /// <summary>
         /// The singleton instance of this factory.
@@ -73,7 +73,7 @@ namespace Mapbox.Unity.Location
         /// <summary>
         /// Returns the serialized <see cref="T:Mapbox.Unity.Location.TransformLocationProvider"/>.
         /// </summary>
-        public TransformLocationProvider TransformLocationProvider
+		public ILocationProvider TransformLocationProvider
         {
             get
             {
@@ -84,7 +84,7 @@ namespace Mapbox.Unity.Location
         /// <summary>
         /// Returns the serialized <see cref="T:Mapbox.Unity.Location.EditorLocationProvider"/>.
         /// </summary>
-        public EditorLocationProvider EditorLocationProvider
+		public ILocationProvider EditorLocationProvider
         {
             get
             {
@@ -95,7 +95,7 @@ namespace Mapbox.Unity.Location
         /// <summary>
         /// Returns the serialized <see cref="T:Mapbox.Unity.Location.DeviceLocationProvider"/>
         /// </summary>
-        public DeviceLocationProvider DeviceLocationProvider
+		public ILocationProvider DeviceLocationProvider
         {
             get
             {

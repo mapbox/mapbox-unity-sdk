@@ -2,7 +2,6 @@ namespace Mapbox.Unity.Location
 {
     using System.Collections;
     using UnityEngine;
-    using System;
     using Mapbox.Utils;
 
     /// <summary>
@@ -11,7 +10,7 @@ namespace Mapbox.Unity.Location
     /// This relies on Unity's <see href="https://docs.unity3d.com/ScriptReference/LocationService.html">LocationService</see> for location
     /// and <see href="https://docs.unity3d.com/ScriptReference/Compass.html">Compass</see> for heading.
     /// </summary>
-    public class DeviceLocationProvider : MonoBehaviour, ILocationProvider
+	public class DeviceLocationProvider : AbstractLocationProvider
     {
         /// <summary>
         /// Using higher value like 500 usually does not require to turn GPS chip on and thus saves battery power. 
@@ -27,6 +26,8 @@ namespace Mapbox.Unity.Location
         [SerializeField]
         float _updateDistanceInMeters = 5f;
 
+		Location _currentLocation;
+
         Coroutine _pollRoutine;
 
         double _lastLocationTimestamp;
@@ -34,29 +35,6 @@ namespace Mapbox.Unity.Location
         double _lastHeadingTimestamp;
 
         WaitForSeconds _wait;
-
-        Vector2d _location;
-        /// <summary>
-        /// Gets the current cached location.
-        /// </summary>
-        /// <value>The location.</value>
-        public Vector2d Location
-        {
-            get
-            {
-                return _location;
-            }
-        }
-
-        /// <summary>
-        /// Occurs when on location updates.
-        /// </summary>
-        public event EventHandler<LocationUpdatedEventArgs> OnLocationUpdated;
-
-        /// <summary>
-        /// Occurs when the compass updates.
-        /// </summary>
-        public event EventHandler<HeadingUpdatedEventArgs> OnHeadingUpdated;
 
         void Start()
         {
@@ -102,38 +80,26 @@ namespace Mapbox.Unity.Location
 
             while (true)
             {
-                var timestamp = Input.compass.timestamp;
+				var timestamp = Input.compass.timestamp;
                 if (Input.compass.enabled && timestamp > _lastHeadingTimestamp)
                 {
                     var heading = Input.compass.trueHeading;
-                    SendHeadingUpdated(heading);
+					_currentLocation.Heading = heading;
                     _lastHeadingTimestamp = timestamp;
                 }
 
                 timestamp = Input.location.lastData.timestamp;
                 if (Input.location.status == LocationServiceStatus.Running && timestamp > _lastLocationTimestamp)
                 {
-                    _location = new Vector2d(Input.location.lastData.latitude, Input.location.lastData.longitude);
-                    SendLocationUpdated(_location);
+					var lastData = Input.location.lastData;
+					_currentLocation.LatitudeLongitude = new Vector2d(lastData.latitude, lastData.longitude);
+					_currentLocation.Accuracy = (int)lastData.horizontalAccuracy;
+					_currentLocation.Timestamp = timestamp;
                     _lastLocationTimestamp = timestamp;
+					SendLocation(_currentLocation);
                 }
+
                 yield return null;
-            }
-        }
-
-        void SendHeadingUpdated(float heading)
-        {
-            if (OnHeadingUpdated != null)
-            {
-                OnHeadingUpdated(this, new HeadingUpdatedEventArgs() { Heading = heading });
-            }
-        }
-
-        void SendLocationUpdated(Vector2d location)
-        {
-            if (OnLocationUpdated != null)
-            {
-                OnLocationUpdated(this, new LocationUpdatedEventArgs() { Location = location });
             }
         }
     }

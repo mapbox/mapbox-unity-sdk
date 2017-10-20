@@ -4,6 +4,7 @@ namespace Mapbox.Examples
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Unity.Map;
 	using UnityEngine;
+	using System.Collections.Generic;
 
 	public class PositionWithLocationProvider : MonoBehaviour
 	{
@@ -70,13 +71,14 @@ namespace Mapbox.Examples
 			}
 		}
 
-		void LocationProvider_OnLocationUpdated(object sender, LocationUpdatedEventArgs e)
+		void LocationProvider_OnLocationUpdated(Location location)
 		{
 			if (_isInitialized)
 			{
-				_targetPosition = Conversions.GeoToWorldPosition(e.Location,
+				_targetPosition = Conversions.GeoToWorldPosition(location.LatitudeLongitude,
 																 _map.CenterMercator,
 																 _map.WorldRelativeScale).ToVector3xz();
+				_locations.Add(location);
 			}
 		}
 
