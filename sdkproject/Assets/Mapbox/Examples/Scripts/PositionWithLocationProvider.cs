@@ -4,7 +4,6 @@ namespace Mapbox.Examples
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Unity.Map;
 	using UnityEngine;
-	using System.Collections.Generic;
 
 	public class PositionWithLocationProvider : MonoBehaviour
 	{

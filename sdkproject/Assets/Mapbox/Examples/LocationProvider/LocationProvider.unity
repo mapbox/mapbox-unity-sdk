@@ -792,8 +792,8 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 952834219}
-  - component: {fileID: 952834218}
   - component: {fileID: 952834217}
+  - component: {fileID: 952834218}
   m_Layer: 0
   m_Name: Route
   m_TagString: Untagged
