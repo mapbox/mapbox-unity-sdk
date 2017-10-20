@@ -55,6 +55,15 @@
 				return;
 			}
 
+			if (response.HasRequestError)
+			{
+				foreach (var exception in response.RequestExceptions)
+				{
+					Debug.LogError("MapMatchingExample: " + exception);
+				}
+				return;
+			}
+
 			_lineRenderer.positionCount = 0;
 			for (int i = 0, responseTracepointsLength = response.Tracepoints.Length; i < responseTracepointsLength; i++)
 			{
