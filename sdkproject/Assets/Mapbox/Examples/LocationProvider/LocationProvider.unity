@@ -815,7 +815,7 @@ MonoBehaviour:
   _target: {fileID: 1934621224}
   _color: {r: 1, g: 0, b: 1, a: 1}
   _height: 1
-  _lineWidth: 0.3
+  _lineWidth: 0.6
   _updateInterval: 1
   _minDistance: 1
 --- !u!120 &952834218
@@ -967,7 +967,7 @@ LineRenderer:
   m_Positions: []
   m_Parameters:
     serializedVersion: 2
-    widthMultiplier: 0.3
+    widthMultiplier: 0.6
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -1030,6 +1030,7 @@ MonoBehaviour:
   _map: {fileID: 114606471}
   _lineRenderer: {fileID: 994191052}
   _originalRoute: {fileID: 952834217}
+  _profile: 2
 --- !u!4 &994191054
 Transform:
   m_ObjectHideFlags: 0
@@ -1292,7 +1293,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _map: {fileID: 114606471}
   _positionFollowFactor: 0.5
-  _useTransformLocationProvider: 0
+  _useTransformLocationProvider: 1
 --- !u!4 &1934621224
 Transform:
   m_ObjectHideFlags: 0
