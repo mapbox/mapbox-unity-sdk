@@ -52,6 +52,7 @@ namespace Mapbox.MapMatching
 					case "toomanycoordinates": return "There are to many points in the request.";
 					case "InvalidInput": return "Invalid input: 'message' will hold an explanation of the invalid input.";
 					case "ProfileNotFound": return "Invalid profile.";
+					case "nosegment": return "Could not find a matching segment for input coordinates.";
 					default:
 						return "Unexpected error: check 'message'";
 				}
