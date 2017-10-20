@@ -57,11 +57,11 @@ namespace Mapbox.MapMatching
 
 
 		/// <summary>
-		/// Deserialize the geocode response string into a <see cref="GeocodeResponse"/>.
+		/// Deserialize the map match response string into a <see cref="MapMatchingResponse"/>.
 		/// </summary>
 		/// <param name="str">JSON String.</param>
-		/// <returns>A <see cref="GeocodeResponse"/>.</returns>
-		/// <typeparam name="T">Forward or reverse geocode. </typeparam>
+		/// <returns>A <see cref="MapMatchingResponse"/>.</returns>
+		/// <typeparam name="T">Map Matcher. </typeparam>
 		internal T Deserialize<T>(string str)
 		{
 			return JsonConvert.DeserializeObject<T>(str, JsonConverters.Converters);
