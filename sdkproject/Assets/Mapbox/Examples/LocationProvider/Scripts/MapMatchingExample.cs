@@ -1,0 +1,74 @@
+﻿namespace Mapbox.Examples
+{
+	using Mapbox.Unity;
+	using Mapbox.Utils;
+	using Mapbox.Unity.Utilities;
+	using Mapbox.Unity.Map;
+	using System.Collections.Generic;
+	using Mapbox.MapMatching;
+	using UnityEngine;
+
+	public class MapMatchingExample : MonoBehaviour
+	{
+		[SerializeField]
+		AbstractMap _map;
+
+		[SerializeField]
+		LineRenderer _lineRenderer;
+
+		[SerializeField]
+		PlotRoute _originalRoute;
+
+		MapMatcher _mapMatcher;
+
+		void Awake()
+		{
+			_mapMatcher = MapboxAccess.Instance.MapMatcher;
+		}
+
+		[ContextMenu("Test")]
+		public void Match()
+		{
+			var resource = new MapMatchingResource();
+
+			var coordinates = new List<Vector2d>();
+			foreach (var position in _originalRoute.Positions)
+			{
+				var coord = position.GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
+				coordinates.Add(coord);
+				Debug.Log("MapMatchingExample: " + coord);
+			}
+
+			resource.Coordinates = coordinates.ToArray();
+			_mapMatcher.Match(resource, HandleMapMatchResponse);
+		}
+
+		void HandleMapMatchResponse(MapMatching.MapMatchingResponse response)
+		{
+			if (response.HasMatchingError)
+			{
+				Debug.LogWarning("MapMatchingExample: " + response.MatchingError);
+				Debug.Log("MapMatchingExample: " + response.Message);
+				return;
+			}
+
+			_lineRenderer.positionCount = 0;
+			for (int i = 0, responseTracepointsLength = response.Tracepoints.Length; i < responseTracepointsLength; i++)
+			{
+				var point = response.Tracepoints[i];
+
+				// FIXME: why/how can a point be null?
+				if (point == null)
+				{
+					continue;
+				}
+
+				_lineRenderer.positionCount++;
+				Debug.Log("MapMatchingExample: " + point.Name);
+				Debug.Log("MapMatchingExample: " + point.Location);
+				var position = Conversions.GeoToWorldPosition(point.Location, _map.CenterMercator, _map.WorldRelativeScale).ToVector3xz();
+				_lineRenderer.SetPosition(_lineRenderer.positionCount - 1, position);
+			}
+		}
+	}
+}
