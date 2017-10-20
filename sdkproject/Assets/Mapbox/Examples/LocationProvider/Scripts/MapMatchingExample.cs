@@ -19,6 +19,9 @@
 		[SerializeField]
 		PlotRoute _originalRoute;
 
+		[SerializeField]
+		Profile _profile;
+
 		MapMatcher _mapMatcher;
 
 		void Awake()
@@ -40,7 +43,7 @@
 			}
 
 			resource.Coordinates = coordinates.ToArray();
-			resource.Profile = Profile.MapboxWalking;
+			resource.Profile = _profile;
 			_mapMatcher.Match(resource, HandleMapMatchResponse);
 		}
 
@@ -48,8 +51,7 @@
 		{
 			if (response.HasMatchingError)
 			{
-				Debug.LogWarning("MapMatchingExample: " + response.MatchingError);
-				Debug.Log("MapMatchingExample: " + response.Message);
+				Debug.LogError("MapMatchingExample: " + response.MatchingError);
 				return;
 			}
 
@@ -67,6 +69,8 @@
 				_lineRenderer.positionCount++;
 				Debug.Log("MapMatchingExample: " + point.Name);
 				Debug.Log("MapMatchingExample: " + point.Location);
+				Debug.Log("MapMatchingExample: " + point.MatchingsIndex);
+				Debug.Log("MapMatchingExample: " + point.WaypointIndex);
 				var position = Conversions.GeoToWorldPosition(point.Location, _map.CenterMercator, _map.WorldRelativeScale).ToVector3xz();
 				_lineRenderer.SetPosition(_lineRenderer.positionCount - 1, position);
 			}
