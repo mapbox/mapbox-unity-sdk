@@ -142,6 +142,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			OnRasterDataChanged = delegate { };
 			OnVectorDataChanged = delegate { };
 
+			foreach (Transform item in transform)
+			{
+				item.gameObject.SetActive(false);
+			}
+
 			Cancel();
 			_tiles.Clear();
 		}

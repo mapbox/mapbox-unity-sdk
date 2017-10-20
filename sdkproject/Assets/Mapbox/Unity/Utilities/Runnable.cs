@@ -54,7 +54,7 @@ namespace Mapbox.Unity.Utilities
         /// <param name="ID">THe ID of the co-routine to stop.</param>
         public static void Stop(int ID)
         {
-            Routine r = null;
+			Routine r = null;
             if (Instance.m_Routines.TryGetValue(ID, out r))
                 r.Stop = true;
         }

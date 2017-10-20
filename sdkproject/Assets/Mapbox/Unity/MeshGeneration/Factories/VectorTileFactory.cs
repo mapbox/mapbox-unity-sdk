@@ -76,13 +76,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			var vectorTile = new VectorTile();
 			tile.AddTile(vectorTile);
 
-			Progress++;
+			
 			vectorTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
 				if (vectorTile.HasError)
 				{
 					tile.VectorDataState = TilePropertyState.Error;
-					Progress--;
 					return;
 				}
 
@@ -152,6 +151,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					{
 						if (builder.Active)
 						{
+							Progress++;
 							builder.Create(_cachedData[tile].Data.GetLayer(layerName), tile, DecreaseProgressCounter);
 						}
 					}

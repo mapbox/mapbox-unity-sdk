@@ -108,46 +108,53 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			var filterOut = false;
 			for (int i = 0; i < fc; i++)
 			{
-				filterOut = false;
-				var feature = new VectorFeatureUnity(layer.GetFeature(i, 0), tile, layer.Extent);
-				foreach (var filter in Filters)
+				if (_activeCoroutines.ContainsKey(tile))
 				{
-					if (!string.IsNullOrEmpty(filter.Key) && !feature.Properties.ContainsKey(filter.Key))
-						continue;
 
-					if (!filter.Try(feature))
+					filterOut = false;
+					var feature = new VectorFeatureUnity(layer.GetFeature(i, 0), tile, layer.Extent);
+					foreach (var filter in Filters)
 					{
-						filterOut = true;
-						break;
+						if (!string.IsNullOrEmpty(filter.Key) && !feature.Properties.ContainsKey(filter.Key))
+							continue;
+
+						if (!filter.Try(feature))
+						{
+							filterOut = true;
+							break;
+						}
+					}
+
+					if (!filterOut)
+					{
+						Build(feature, tile, tile.gameObject);
+					}
+
+					_entityInCurrentCoroutine++;
+
+					if (_entityInCurrentCoroutine >= _entityPerCoroutine)
+					{
+						_entityInCurrentCoroutine = 0;
+						yield return null;
 					}
 				}
-
-				if (!filterOut)
-				{
-					Build(feature, tile, tile.gameObject);
-				}
-
-				_entityInCurrentCoroutine++;
-
-				if (_entityInCurrentCoroutine >= _entityPerCoroutine)
-				{
-					_entityInCurrentCoroutine = 0;
-					yield return null;
-				}
 			}
 
-			var mergedStack = _defaultStack as MergedModifierStack;
-			if (mergedStack != null)
+			if (_activeCoroutines.ContainsKey(tile))
 			{
-				mergedStack.End(tile, tile.gameObject, layer.Name);
-			}
-
-			foreach (var item in Stacks)
-			{
-				mergedStack = item.Stack as MergedModifierStack;
+				var mergedStack = _defaultStack as MergedModifierStack;
 				if (mergedStack != null)
 				{
 					mergedStack.End(tile, tile.gameObject, layer.Name);
+				}
+
+				foreach (var item in Stacks)
+				{
+					mergedStack = item.Stack as MergedModifierStack;
+					if (mergedStack != null)
+					{
+						mergedStack.End(tile, tile.gameObject, layer.Name);
+					}
 				}
 			}
 
@@ -237,6 +244,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					Runnable.Stop(cor);
 				}
 			}
+			_activeCoroutines.Remove(tile);
 
 			if (_defaultStack != null)
 				_defaultStack.UnregisterTile(tile);

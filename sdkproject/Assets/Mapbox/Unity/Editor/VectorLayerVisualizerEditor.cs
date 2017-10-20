@@ -159,6 +159,7 @@
 						_layerVis.Stacks.Add(new TypeVisualizerTuple() { Stack = (ModifierStackBase)asset });
 					});
 				}
+				EditorGUILayout.EndHorizontal();
 			}
 
 			serializedObject.ApplyModifiedProperties();

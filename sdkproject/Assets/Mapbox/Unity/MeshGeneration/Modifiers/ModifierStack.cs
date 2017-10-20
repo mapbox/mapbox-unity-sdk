@@ -21,7 +21,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	public class ModifierStack : ModifierStackBase
 	{
 		[SerializeField] private PositionTargetType _moveFeaturePositionTo;
-		private Vector3 _center = Vector3.zero;
 		[NodeEditorElement("Mesh Modifiers")] public List<MeshModifier> MeshModifiers;
 		[NodeEditorElement("Game Object Modifiers")] public List<GameObjectModifier> GoModifiers;
 
@@ -88,7 +87,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
 		{
-			_center = Vector3.zero;
 			if (_moveFeaturePositionTo != PositionTargetType.TileCenter)
 			{
 				_tempPoint = Constants.Math.Vector3Zero;
@@ -119,9 +117,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						feature.Points[i][j] = new Vector3(feature.Points[i][j].x - _tempPoint.x, 0, feature.Points[i][j].z - _tempPoint.z);
 					}
 				}
-				_center = _tempPoint;
+				meshData.PositionInTile = _tempPoint;
 			}
 
+			meshData.PositionInTile = _tempPoint;
 			for (int i = 0; i < MeshModifiers.Count; i++)
 			{
 				if (MeshModifiers[i] != null && MeshModifiers[i].Active)
@@ -159,7 +158,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_activeObjects[tile].Add(_tempVectorEntity);
 
 
-			_tempVectorEntity.Transform.localPosition = _center;
+			_tempVectorEntity.Transform.localPosition = meshData.PositionInTile;
 
 			for (int i = 0; i < GoModifiers.Count; i++)
 			{

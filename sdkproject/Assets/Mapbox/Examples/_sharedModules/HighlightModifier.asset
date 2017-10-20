@@ -13,5 +13,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Active: 1
   _types:
-  - _typeString: Mapbox.Examples.HighlightFeature
-    _script: {fileID: 11500000, guid: 64cb1b303dc6db64aa28a4229e62e9ed, type: 3}
+  - _typeString: Scannable
+    _script: {fileID: 11500000, guid: 93eca2812acbadb43a6a4ebb2a716b1d, type: 3}
+  Anim: {fileID: 9100000, guid: 7b9762587005f984fb1bdd7711dce6f7, type: 2}

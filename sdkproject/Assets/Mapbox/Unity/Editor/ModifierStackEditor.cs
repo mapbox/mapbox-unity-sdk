@@ -90,12 +90,12 @@
 			EditorGUILayout.BeginHorizontal();
 			if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
 			{
-				facs.arraySize++;
-				facs.GetArrayElementAtIndex(facs.arraySize - 1).objectReferenceValue = null;
+				facs2.arraySize++;
+				facs2.GetArrayElementAtIndex(facs2.arraySize - 1).objectReferenceValue = null;
 			}
 			if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
 			{
-				ScriptableCreatorWindow.Open(typeof(GameObjectModifier), facs);
+				ScriptableCreatorWindow.Open(typeof(GameObjectModifier), facs2);
 			}
 			EditorGUILayout.EndHorizontal();
 

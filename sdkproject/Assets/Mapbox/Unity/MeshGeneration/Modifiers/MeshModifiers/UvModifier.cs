@@ -21,8 +21,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
             {
                 if (UseSatelliteRoof)
                 {
-                    var fromBottomLeft = new Vector2((float)((c.x + md.TileRect.Size.x / 2) / md.TileRect.Size.x),
-                        (float)((c.z + md.TileRect.Size.x / 2) / md.TileRect.Size.x));
+                    var fromBottomLeft = new Vector2((float)(((c.x + md.PositionInTile.x)/tile.TileScale + md.TileRect.Size.x / 2) / md.TileRect.Size.x),
+                        (float)(((c.z + md.PositionInTile.z) / tile.TileScale + md.TileRect.Size.x / 2) / md.TileRect.Size.x));
                     uv.Add(fromBottomLeft);
                 }
                 else
