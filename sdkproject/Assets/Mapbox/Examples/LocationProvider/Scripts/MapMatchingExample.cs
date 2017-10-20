@@ -69,7 +69,7 @@
 			{
 				var point = response.Tracepoints[i];
 
-				// FIXME: why/how can a point be null?
+				// Tracepoints can be null, so let's avoid trying to process those outliers.
 				if (point == null)
 				{
 					continue;
