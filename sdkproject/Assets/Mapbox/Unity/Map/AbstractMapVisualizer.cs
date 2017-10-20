@@ -134,9 +134,10 @@
 		public virtual UnityTile LoadTile(UnwrappedTileId tileId)
 		{
 			UnityTile unityTile = null;
-
+            //float scaleFactor = 
 			if (_inactiveTiles.Count > 0)
 			{
+                Debug.Log("Using inactiveTile");
 				unityTile = _inactiveTiles.Dequeue();
 			}
 
@@ -146,7 +147,7 @@
 				unityTile.transform.SetParent(_map.Root, false);
 			}
 
-			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale, _loadingTexture);
+			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale,_map.Zoom, _loadingTexture);
 			PlaceTile(tileId, unityTile, _map);
 
 #if UNITY_EDITOR

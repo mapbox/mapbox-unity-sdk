@@ -102,6 +102,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
+        public int InitialZoom { get; internal set; }
 		public float TileScale { get; internal set; }
 
 		public TilePropertyState RasterDataState;
@@ -112,8 +113,15 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public event Action<UnityTile> OnRasterDataChanged = delegate { };
 		public event Action<UnityTile> OnVectorDataChanged = delegate { };
 
-		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, float scale, Texture2D loadingTexture = null)
+        private bool firstInitialization = false; 
+
+		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, float scale, int zoom, Texture2D loadingTexture = null)
 		{
+            if (firstInitialization == false)
+            {
+                firstInitialization = true;
+                InitialZoom = zoom;
+            }
 			TileScale = scale;
 			_relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
 			_rect = Conversions.TileBounds(tileId);
@@ -121,6 +129,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			_canonicalTileId = tileId.Canonical;
 			_loadingTexture = loadingTexture;
 
+            if (firstInitialization)
+            {
+                var scaleFactor = Mathf.Pow(2, (InitialZoom - zoom));
+                gameObject.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+            }
 			gameObject.SetActive(true);
 		}
 

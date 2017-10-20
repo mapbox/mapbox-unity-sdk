@@ -25,6 +25,14 @@
 				return _zoom;
 			}
 		}
+        protected int _initialZoom;
+        public int InitialZoom
+        {
+            get
+            {
+                return _initialZoom;
+            }
+        }
 
 		[SerializeField]
 		protected Transform _root;
@@ -130,6 +138,7 @@
 				var latLonSplit = _latitudeLongitudeString.Split(',');
 				Initialize(new Vector2d(double.Parse(latLonSplit[0]), double.Parse(latLonSplit[1])), _zoom);
 			}
+            _initialZoom = _zoom;
 		}
 
 		// TODO: implement IDisposable, instead?
