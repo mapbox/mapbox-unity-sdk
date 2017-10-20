@@ -40,6 +40,7 @@
 			}
 
 			resource.Coordinates = coordinates.ToArray();
+			resource.Profile = Profile.MapboxWalking;
 			_mapMatcher.Match(resource, HandleMapMatchResponse);
 		}
 
