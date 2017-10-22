@@ -43,9 +43,13 @@
 
 			EditorGUILayout.Space();
 			EditorGUILayout.PropertyField(_projectImagery, new GUIContent("Project Map Imagery"));
+			EditorGUILayout.HelpBox("If checked, it'll use the map imagery (in Unity Tile saved by ImageFactory) on the first material. Sample usecase is to have satellite imagery on building roofs.", MessageType.Info);
 
 			EditorGUILayout.Space();
-			for(int i = 0; i < _materials.arraySize; i++)
+
+			EditorGUILayout.LabelField("Materials");
+			EditorGUILayout.HelpBox("Material Modifier will select and apply one material from each stack below to the submesh with same index. Default demos have top polygon (i.e. roofs) as first submesh and side polygons (i.e. walls) as second submesh.", MessageType.Info);
+			for (int i = 0; i < _materials.arraySize; i++)
 			{
 				GUILayout.BeginHorizontal();
 				_unfoldElements[i] = Header("Submesh " + i + " Material", _unfoldElements[i]);
