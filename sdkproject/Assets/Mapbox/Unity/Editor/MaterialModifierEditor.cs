@@ -23,15 +23,6 @@
 			script = MonoScript.FromScriptableObject((MaterialModifier)target);
 			_materials = serializedObject.FindProperty("_materials");
 			_projectImagery = serializedObject.FindProperty("_projectMapImagery");
-			headerFoldout = new GUIStyle("Foldout");
-			_unfoldElements = new bool[_materials.arraySize];
-			header = new GUIStyle("ShurikenModuleTitle")
-			{
-				font = (new GUIStyle("Label")).font,
-				border = new RectOffset(15, 7, 4, 4),
-				fixedHeight = 22,
-				contentOffset = new Vector2(20f, -2f)
-			};
 		}
 
 		public override void OnInspectorGUI()
@@ -40,6 +31,20 @@
 			GUI.enabled = false;
 			script = EditorGUILayout.ObjectField("Script", script, typeof(MonoScript), false) as MonoScript;
 			GUI.enabled = true;
+
+			if (header == null)
+			{
+				headerFoldout = new GUIStyle("Foldout");
+				_unfoldElements = new bool[_materials.arraySize];
+
+				header = new GUIStyle("ShurikenModuleTitle")
+				{
+					font = (new GUIStyle("Label")).font,
+					border = new RectOffset(15, 7, 4, 4),
+					fixedHeight = 22,
+					contentOffset = new Vector2(20f, -2f)
+				};
+			}
 
 			EditorGUILayout.Space();
 			EditorGUILayout.PropertyField(_projectImagery, new GUIContent("Project Map Imagery"));
@@ -79,7 +84,7 @@
 			if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
 			{
 				_materials.arraySize++;
-				var test = (bool[]) _unfoldElements.Clone();
+				var test = (bool[])_unfoldElements.Clone();
 				_unfoldElements = new bool[_materials.arraySize];
 				for (int i = 0; i < test.Length; i++)
 				{
