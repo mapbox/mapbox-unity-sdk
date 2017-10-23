@@ -7,6 +7,7 @@
 	using System.Collections.Generic;
 	using Mapbox.MapMatching;
 	using UnityEngine;
+	using System.Linq;
 
 	public class MapMatchingExample : MonoBehaviour
 	{
@@ -48,7 +49,8 @@
 			}
 			else
 			{
-				resource.Coordinates = coordinates.ToArray();
+				//API allows for max 100 coordinates, take newest
+				resource.Coordinates = coordinates.Skip(System.Math.Max(0, coordinates.Count - 100)).ToArray();
 				resource.Profile = _profile;
 				_mapMatcher.Match(resource, HandleMapMatchResponse);
 			}
