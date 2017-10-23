@@ -3,6 +3,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using System.Collections.Generic;
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Data;
+	using System;
+	using Mapbox.Utils;
 
 	/// <summary>
 	/// UV Modifier works only with (and right after) Polygon Modifier and not with Line Mesh Modifier.
@@ -14,23 +16,32 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
 		public bool UseSatelliteRoof = false;
 
+		[NonSerialized] private int _mdVertexCount;
+		[NonSerialized] private Vector2d _size;
+		[NonSerialized] private Vector3 _vert;
+		[NonSerialized] private List<Vector2> _uv = new List<Vector2>();
+
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
-			var uv = new List<Vector2>();
-			foreach (var c in md.Vertices)
+			_uv.Clear();
+			_mdVertexCount = md.Vertices.Count;
+			_size = md.TileRect.Size;
+
+			for (int i = 0; i < _mdVertexCount; i++)
 			{
+				_vert = md.Vertices[i];
 				if (UseSatelliteRoof)
 				{
-					var fromBottomLeft = new Vector2((float)(((c.x + md.PositionInTile.x) / tile.TileScale + md.TileRect.Size.x / 2) / md.TileRect.Size.x),
-						(float)(((c.z + md.PositionInTile.z) / tile.TileScale + md.TileRect.Size.x / 2) / md.TileRect.Size.x));
-					uv.Add(fromBottomLeft);
+					var fromBottomLeft = new Vector2((float)(((_vert.x + md.PositionInTile.x) / tile.TileScale + _size.x / 2) / _size.x),
+						(float)(((_vert.z + md.PositionInTile.z) / tile.TileScale + _size.x / 2) / _size.x));
+					_uv.Add(fromBottomLeft);
 				}
 				else
 				{
-					uv.Add(new Vector2(c.x, c.z));
+					_uv.Add(new Vector2(_vert.x, _vert.z));
 				}
 			}
-			md.UV[0].AddRange(uv);
+			md.UV[0].AddRange(_uv);
 		}
 	}
 }
