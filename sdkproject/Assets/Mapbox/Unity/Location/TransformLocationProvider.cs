@@ -11,7 +11,7 @@ namespace Mapbox.Unity.Location
 	/// This is achieved by querying a Unity <see href="https://docs.unity3d.com/ScriptReference/Transform.html">Transform</see> every frame.
 	/// You might use this to to update location based on a touched position, for example.
 	/// </summary>
-	public class TransformLocationProvider : AbstractLocationProvider
+	public class TransformLocationProvider : AbstractEditorLocationProvider
 	{
 		[SerializeField]
 		private AbstractMap _map;
@@ -21,11 +21,6 @@ namespace Mapbox.Unity.Location
 		/// </summary>
 		[SerializeField]
 		Transform _targetTransform;
-
-		[SerializeField]
-		int _accuracy;
-
-		Location _currentLocation;
 
 		/// <summary>
 		/// Sets the target transform.
@@ -39,16 +34,12 @@ namespace Mapbox.Unity.Location
 			}
 		}
 
-#if UNITY_EDITOR
-		void Update()
-        {
+		protected override void SetLocation()
+		{
 			_currentLocation.Heading = _targetTransform.eulerAngles.y;
 			_currentLocation.LatitudeLongitude = _targetTransform.GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
 			_currentLocation.Accuracy = _accuracy;
 			_currentLocation.Timestamp = DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
-
-			SendLocation(_currentLocation);
-        }
-#endif
-    }
+		}
+	}
 }

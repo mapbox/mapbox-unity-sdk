@@ -1188,9 +1188,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60712efc3153a4819b0c79437175846d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _accuracy: 5
+  _autoFireEvent: 1
+  _updateInterval: 1
+  _sendEvent: 0
   _latitudeLongitude: 37.7648, -122.463
   _heading: 0
-  _accuracy: 5
 --- !u!4 &1628209263
 Transform:
   m_ObjectHideFlags: 0
@@ -1231,9 +1234,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a034c4eeb3293418aab101c1895844a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _accuracy: 5
+  _autoFireEvent: 1
+  _updateInterval: 1
+  _sendEvent: 0
   _map: {fileID: 114606471}
   _targetTransform: {fileID: 1649127106}
-  _accuracy: 5
 --- !u!4 &1649127106
 Transform:
   m_ObjectHideFlags: 0
@@ -1296,7 +1302,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _map: {fileID: 114606471}
   _positionFollowFactor: 0.5
-  _useTransformLocationProvider: 1
+  _useTransformLocationProvider: 0
 --- !u!4 &1934621224
 Transform:
   m_ObjectHideFlags: 0
