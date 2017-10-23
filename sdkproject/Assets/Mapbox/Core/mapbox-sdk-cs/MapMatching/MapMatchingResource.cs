@@ -41,6 +41,10 @@ namespace Mapbox.MapMatching
 			get { return _coordinates; }
 			set
 			{
+				if (null == value)
+				{
+					throw new Exception("Coordinates cannot be null.");
+				}
 				if (value.Length < 2 || value.Length > 100)
 				{
 					throw new Exception("Must be between 2 and 100 elements in coordinates array");
@@ -72,6 +76,12 @@ namespace Mapbox.MapMatching
 			set
 			{
 				if (null == _coordinates) { throw new Exception("Coordinates not set"); }
+				//allow for nulling radiuses
+				if (null == value)
+				{
+					_radiuses = null;
+					return;
+				}
 				if (value.Length != _coordinates.Length) { throw new Exception("There must be as many radiuses as there are coordinates in the request."); }
 				if (value.Where(r => r == 0).Count() > 0) { throw new Exception("Radius must be greater than 0"); }
 
@@ -107,6 +117,12 @@ namespace Mapbox.MapMatching
 			set
 			{
 				if (null == _coordinates) { throw new Exception("Coordinates not set"); }
+				//allow for nulling timestamps
+				if (null == value)
+				{
+					_timestamps = null;
+					return;
+				}
 				if (value.Length != _coordinates.Length) { throw new Exception("There must be as many timestapms as there are coordinates in the request."); }
 
 				_timestamps = value;
@@ -141,6 +157,11 @@ namespace Mapbox.MapMatching
 
 		public override string GetUrl()
 		{
+			if (null == _coordinates)
+			{
+				throw new Exception("Coordinates cannot be null.");
+			}
+
 			Dictionary<string, string> options = new Dictionary<string, string>();
 
 			if (Geometries.HasValue) { options.Add("geometries", Geometries.Value.Description()); }
@@ -169,7 +190,7 @@ namespace Mapbox.MapMatching
 		/// <param name="annotation">Current annotation</param>
 		/// <param name="separator">Character to use for separating items in string.</param>
 		/// <returns></returns>
-		private string getUrlQueryFromAnnotations(Annotations anno, string separator) 
+		private string getUrlQueryFromAnnotations(Annotations anno, string separator)
 		{
 			List<string> descriptions = new List<string>();
 

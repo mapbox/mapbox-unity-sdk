@@ -235,7 +235,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			Assert.AreEqual(1, matchingResponse.Tracepoints[1].WaypointIndex, "Wrong WaypointIndex");
 
 			Assert.AreEqual(1, matchingResponse.Matchings.Length, "Wrong number of matchings");
-			Assert.AreEqual(22.5, matchingResponse.Matchings[0].Weight, "Wrong Weight");
+			Assert.GreaterOrEqual(matchingResponse.Matchings[0].Weight, 22.5, "Wrong Weight");
 			Assert.AreEqual("routability", matchingResponse.Matchings[0].WeightName, "Wrong WeightName");
 			Assert.AreEqual(1, matchingResponse.Matchings[0].Legs.Count, "Wrong number of legs");
 			Assert.AreEqual(2, matchingResponse.Matchings[0].Geometry.Count, "Wrong number of vertices in geometry");
@@ -597,6 +597,45 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			Directions.Step step1 = matchingResponse.Matchings[0].Legs[0].Steps[1];
 			Assert.IsTrue(step1.Maneuver.Instruction.Contains("Sie haben Ihr Ziel erreicht"), "Step[1]:Instruction not as expected");
 
+		}
+
+
+		[UnityTest]
+		public IEnumerator CoordinatesNull()
+		{
+
+			MapMatchingResource resource = new MapMatchingResource();
+			Assert.Throws(
+				typeof(System.Exception)
+				, () => resource.Coordinates = null
+				, "MapMatchingResource did not throw when setting null coordinates"
+			);
+
+			yield return null;
+
+
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
+			MapMatchingResponse matchingResponse = null;
+
+			Assert.Throws(
+				typeof(System.Exception)
+				, () =>
+				{
+					mapMatcher.Match(
+						resource,
+						(MapMatchingResponse response) =>
+						{
+							matchingResponse = response;
+						}
+					);
+				}
+				, "MapMatcher.Match did not throw with null coordinates"
+			);
+
+			IEnumerator enumerator = _fs.WaitForAllRequests();
+			while (enumerator.MoveNext()) { yield return null; }
+
+			Assert.IsNull(matchingResponse, "Matching response was expected to be null");
 		}
 
 
