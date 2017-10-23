@@ -103,8 +103,14 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		private IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, Action callback = null)
 		{
+			
 			//testing each feature with filters
 			var fc = layer.FeatureCount();
+			
+			//HACK to prevent request finishing on same frame which breaks modules started/finished events 
+			if(fc <= _entityPerCoroutine)
+				yield return null;
+
 			var filterOut = false;
 			for (int i = 0; i < fc; i++)
 			{
