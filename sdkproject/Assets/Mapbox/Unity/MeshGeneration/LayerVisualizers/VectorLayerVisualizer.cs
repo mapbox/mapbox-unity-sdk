@@ -87,7 +87,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			foreach (var item in Stacks)
 			{
-				if(item != null && item.Stack != null)
+				if (item != null && item.Stack != null)
 				{
 					item.Stack.Initialize();
 				}
@@ -124,7 +124,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 				if (!filterOut)
 				{
-					Build(feature, tile, tile.gameObject);
+					if (tile.VectorDataState != Enums.TilePropertyState.Cancelled)
+						Build(feature, tile, tile.gameObject);
 				}
 
 				_entityInCurrentCoroutine++;
@@ -229,8 +230,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		public override void OnUnregisterTile(UnityTile tile)
 		{
 			base.OnUnregisterTile(tile);
-
-			if(_activeCoroutines.ContainsKey(tile))
+			tile.VectorDataState = Enums.TilePropertyState.Cancelled;
+			if (_activeCoroutines.ContainsKey(tile))
 			{
 				foreach (var cor in _activeCoroutines[tile])
 				{
