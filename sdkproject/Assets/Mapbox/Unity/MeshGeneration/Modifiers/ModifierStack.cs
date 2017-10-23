@@ -32,6 +32,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		[NonSerialized] private VectorEntity _tempVectorEntity;
 		[NonSerialized] private ObjectPool<List<VectorEntity>> _listPool;
 
+		[NonSerialized] private int _counter;
+
 		private void OnEnable()
 		{
 			_pool = new ObjectPool<VectorEntity>(() =>
@@ -57,7 +59,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		{
 			if (_activeObjects.ContainsKey(tile))
 			{
-				for (int i = 0; i < _activeObjects[tile].Count; i++)
+				_counter = _activeObjects[tile].Count;
+				for (int i = 0; i < _counter; i++)
 				{
 					_activeObjects[tile][i].GameObject.SetActive(false);
 					_pool.Put(_activeObjects[tile][i]);
@@ -73,12 +76,14 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		{
 			base.Initialize();
 
-			for (int i = 0; i < MeshModifiers.Count; i++)
+			_counter = MeshModifiers.Count;
+			for (int i = 0; i < _counter; i++)
 			{
 				MeshModifiers[i].Initialize();
 			}
 
-			for (int i = 0; i < GoModifiers.Count; i++)
+			_counter = GoModifiers.Count;
+			for (int i = 0; i < _counter; i++)
 			{
 				GoModifiers[i].Initialize();
 			}
@@ -87,6 +92,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
 		{
+			_counter = feature.Points.Count;
+			var c2 = 0;
+
 			if (_moveFeaturePositionTo != PositionTargetType.TileCenter)
 			{
 				_tempPoint = Constants.Math.Vector3Zero;
@@ -99,9 +107,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					//this is not precisely the center because of the duplicates  (first/last vertex) but close to center
 					_tempPoint = feature.Points[0][0];
 					vertexIndex = 1;
-					for (int i = 0; i < feature.Points.Count; i++)
+										
+					for (int i = 0; i < _counter; i++)
 					{
-						for (int j = 0; j < feature.Points[i].Count; j++)
+						c2 = feature.Points[i].Count;
+						for (int j = 0; j < c2; j++)
 						{
 							_tempPoint += feature.Points[i][j];
 							vertexIndex++;
@@ -110,9 +120,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					_tempPoint /= vertexIndex;
 				}
 
-				for (int i = 0; i < feature.Points.Count; i++)
+				for (int i = 0; i < _counter; i++)
 				{
-					for (int j = 0; j < feature.Points[i].Count; j++)
+					c2 = feature.Points[i].Count;
+					for (int j = 0; j < c2; j++)
 					{
 						feature.Points[i][j] = new Vector3(feature.Points[i][j].x - _tempPoint.x, 0, feature.Points[i][j].z - _tempPoint.z);
 					}
@@ -121,7 +132,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 
 			meshData.PositionInTile = _tempPoint;
-			for (int i = 0; i < MeshModifiers.Count; i++)
+			_counter = MeshModifiers.Count;
+			for (int i = 0; i < _counter; i++)
 			{
 				if (MeshModifiers[i] != null && MeshModifiers[i].Active)
 				{
@@ -139,12 +151,14 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_tempVectorEntity.Mesh.subMeshCount = meshData.Triangles.Count;
 			_tempVectorEntity.Mesh.SetVertices(meshData.Vertices);
 			_tempVectorEntity.Mesh.SetNormals(meshData.Normals);
-			for (int i = 0; i < meshData.Triangles.Count; i++)
+
+			_counter = meshData.Triangles.Count;
+			for (int i = 0; i < _counter; i++)
 			{
 				_tempVectorEntity.Mesh.SetTriangles(meshData.Triangles[i], i);
 			}
-
-			for (int i = 0; i < meshData.UV.Count; i++)
+			_counter = meshData.UV.Count;
+			for (int i = 0; i < _counter; i++)
 			{
 				_tempVectorEntity.Mesh.SetUVs(i, meshData.UV[i]);
 			}
@@ -160,7 +174,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			_tempVectorEntity.Transform.localPosition = meshData.PositionInTile;
 
-			for (int i = 0; i < GoModifiers.Count; i++)
+			_counter = GoModifiers.Count;
+			for (int i = 0; i < _counter; i++)
 			{
 				if (GoModifiers[i].Active)
 				{

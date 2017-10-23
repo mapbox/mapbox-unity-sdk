@@ -34,6 +34,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		[NonSerialized] private ObjectPool<List<VectorEntity>> _listPool;
 		[NonSerialized] private ObjectPool<List<MeshData>> _meshDataPool;
 
+		[NonSerialized] private int _counter, _counter2;
+
 		private void OnEnable()
 		{
 			//we'll use this to concat building data until it reaches 65000 verts
@@ -62,7 +64,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			//removing all caches 
 			if (_activeObjects.ContainsKey(tile))
 			{
-				for (int i = 0; i < _activeObjects[tile].Count; i++)
+				_counter = _activeObjects[tile].Count;
+				for (int i = 0; i < _counter; i++)
 				{
 					_activeObjects[tile][i].GameObject.SetActive(false);
 					_pool.Put(_activeObjects[tile][i]);
@@ -98,12 +101,14 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_cached.Clear();
 			_buildingCount.Clear();
 
-			for (int i = 0; i < MeshModifiers.Count; i++)
+			_counter = MeshModifiers.Count;
+			for (int i = 0; i < _counter; i++)
 			{
 				MeshModifiers[i].Initialize();
 			}
 
-			for (int i = 0; i < GoModifiers.Count; i++)
+			_counter = GoModifiers.Count;
+			for (int i = 0; i < _counter; i++)
 			{
 				GoModifiers[i].Initialize();
 			}
@@ -121,7 +126,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 
 			_buildingCount[tile]++;
-			for (int i = 0; i < MeshModifiers.Count; i++)
+			_counter = MeshModifiers.Count;
+			for (int i = 0; i < _counter; i++)
 			{
 				if (MeshModifiers[i] != null && MeshModifiers[i].Active)
 				{
@@ -131,9 +137,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			GameObject go = null;
 			//65000 is the vertex limit for meshes, keep stashing it until that
-			if (_cacheVertexCount[tile] + meshData.Vertices.Count < 65000)
+			_counter = meshData.Vertices.Count;
+			if (_cacheVertexCount[tile] + _counter < 65000)
 			{
-				_cacheVertexCount[tile] += meshData.Vertices.Count;
+				_cacheVertexCount[tile] += _counter;
 				_cached[tile].Add(meshData);
 			}
 			else
@@ -147,12 +154,14 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public GameObject End(UnityTile tile, GameObject parent, string name = "")
 		{
+			var c2 = 0;
 			if (_cached.ContainsKey(tile))
 			{
 				_tempMeshData.Clear();
 
 				//concat mesh data into _tempMeshData
-				for (int i = 0; i < _cached[tile].Count; i++)
+				_counter = _cached[tile].Count;
+				for (int i = 0; i < _counter; i++)
 				{
 					_temp2MeshData = _cached[tile][i];
 					if (_temp2MeshData.Vertices.Count <= 3)
@@ -162,7 +171,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					_tempMeshData.Vertices.AddRange(_temp2MeshData.Vertices);
 					_tempMeshData.Normals.AddRange(_temp2MeshData.Normals);
 
-					for (int j = 0; j < _temp2MeshData.UV.Count; j++)
+					c2 = _temp2MeshData.UV.Count;
+					for (int j = 0; j < c2; j++)
 					{
 						if (_tempMeshData.UV.Count <= j)
 						{
@@ -170,12 +180,14 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						}
 					}
 
-					for (int j = 0; j < _temp2MeshData.UV.Count; j++)
+					c2 = _temp2MeshData.UV.Count;
+					for (int j = 0; j < c2; j++)
 					{
 						_tempMeshData.UV[j].AddRange(_temp2MeshData.UV[j]);
 					}
 
-					for (int j = 0; j < _temp2MeshData.Triangles.Count; j++)
+					c2 = _temp2MeshData.Triangles.Count;
+					for (int j = 0; j < c2; j++)
 					{
 						if (_tempMeshData.Triangles.Count <= j)
 						{
@@ -183,7 +195,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						}
 					}
 
-					for (int j = 0; j < _temp2MeshData.Triangles.Count; j++)
+					for (int j = 0; j < c2; j++)
 					{
 						for (int k = 0; k < _temp2MeshData.Triangles[j].Count; k++)
 						{
@@ -204,12 +216,15 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					_tempVectorEntity.Mesh.subMeshCount = _tempMeshData.Triangles.Count;
 					_tempVectorEntity.Mesh.SetVertices(_tempMeshData.Vertices);
 					_tempVectorEntity.Mesh.SetNormals(_tempMeshData.Normals);
-					for (int i = 0; i < _tempMeshData.Triangles.Count; i++)
+
+					_counter = _tempMeshData.Triangles.Count;
+					for (int i = 0; i < _counter; i++)
 					{
 						_tempVectorEntity.Mesh.SetTriangles(_tempMeshData.Triangles[i], i);
 					}
 
-					for (int i = 0; i < _tempMeshData.UV.Count; i++)
+					_counter = _tempMeshData.UV.Count;
+					for (int i = 0; i < _counter; i++)
 					{
 						_tempVectorEntity.Mesh.SetUVs(i, _tempMeshData.UV[i]);
 					}
@@ -222,7 +237,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					}
 					_activeObjects[tile].Add(_tempVectorEntity);
 
-					for (int i = 0; i < GoModifiers.Count; i++)
+					_counter = GoModifiers.Count;
+					for (int i = 0; i < _counter; i++)
 					{
 						if (GoModifiers[i].Active)
 						{
