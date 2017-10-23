@@ -8,6 +8,19 @@
 
 	public abstract class AbstractMap : MonoBehaviour, IMap
 	{
+        protected float _zoomRange;
+        public float ZoomRange
+        {
+            get 
+            {
+                return _zoomRange;
+            }
+        }
+
+        public void SetZoomRange(float zoom)
+        {
+            _zoomRange = zoom;
+        }
 		[SerializeField]
 		bool _initializeOnStart = true;
 

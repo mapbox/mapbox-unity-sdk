@@ -10,7 +10,8 @@
 	{
 		Vector2d CenterMercator { get; }
 		float WorldRelativeScale { get; }
-		Vector2d CenterLatitudeLongitude { get; }
+		Vector2d CenterLatitudeLongitude { get;}
+        float ZoomRange { get; }
         int InitialZoom { get; }
 		int Zoom { get; }
 		Transform Root { get; }
@@ -23,5 +24,6 @@
 		void SetCenterMercator(Vector2d centerMercator);
 		void SetCenterLatitudeLongitude(Vector2d centerLatitudeLongitude);
 		void SetZoom(int zoom);
+        void SetZoomRange(float zoom);
 	}
 }

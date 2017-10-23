@@ -13,36 +13,16 @@
         [SerializeField]
         Camera _camera;
 
-        // TODO: change to Vector4 to optimize for different aspect ratios.
-        [SerializeField]
-        int _visibleBuffer;
-
-        [SerializeField]
-        int _disposeBuffer;
 
         [SerializeField]
         float _updateInterval;
 
-        [SerializeField]
-        float _zoomSpeed = 10.0f;
-
-        Plane _groundPlane;
-        Ray _rayNE;
-        Ray _raySW;
-        float _hitDistanceNE;
-        float _hitDistanceSW;
+        Plane _groundPlane;    
         Vector3 _viewportSW;
         Vector3 _viewportNE;
         float _elapsedTime;
         bool _shouldUpdate;
         int _previousZoomLevel;
-        Vector2d _currentLatitudeLongitude;
-        HashSet<UnwrappedTileId> _cachedTiles;
-        HashSet<UnwrappedTileId> _currentTiles;
-
-        float _zoomSwitchDistance = 10.0f;
-
-
 
         public override void OnInitialized()
         {
@@ -53,9 +33,8 @@
             _previousZoomLevel = _map.Zoom;
         }
 
-        public void UpdateMapProperties(int diffZoom)
-        {
-            Debug.Log("Updating Map Properties.");
+        public void UpdateMapProperties(float diffZoom)
+        {            
             // Update the center based on current zoom level.
             var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(_map.CenterLatitudeLongitude, _map.Zoom));
             _map.SetCenterMercator(referenceTileRect.Center);
@@ -94,6 +73,18 @@
                     _previousZoomLevel = _map.Zoom;
                     UpdateMapProperties(diffZoom);
                 }
+
+                if (Math.Abs(_map.ZoomRange - _map.Zoom) > 0.0f)
+                {                    
+                    var diffZoom = _map.ZoomRange - _map.InitialZoom;
+                    if (Math.Abs(diffZoom) >= 1.0f)
+                    {
+                        _map.SetZoom((int) Math.Ceiling(_map.ZoomRange));
+                        _previousZoomLevel = _map.Zoom;
+                    }
+                    UpdateMapProperties(diffZoom);
+                }
+
 
                 //update viewport in case it was changed by switching zoom level
                 Vector2dBounds _viewPortWebMercBounds = getcurrentViewPortWebMerc();

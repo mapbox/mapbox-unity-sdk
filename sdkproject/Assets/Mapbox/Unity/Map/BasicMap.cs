@@ -5,13 +5,13 @@
 	using Mapbox.Map;
 
 	public class BasicMap : AbstractMap
-	{
+	{         
 		public override void Initialize(Vector2d latLon, int zoom)
 		{
 			_worldHeightFixed = false;
 			_centerLatitudeLongitude = latLon;
 			_zoom = zoom;
-
+            _zoomRange = zoom;
 			var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(_centerLatitudeLongitude, _zoom));
 			_centerMercator = referenceTileRect.Center;
 

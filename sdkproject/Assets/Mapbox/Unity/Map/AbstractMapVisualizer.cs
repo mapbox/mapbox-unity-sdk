@@ -136,8 +136,7 @@
 			UnityTile unityTile = null;
             //float scaleFactor = 
 			if (_inactiveTiles.Count > 0)
-			{
-                Debug.Log("Using inactiveTile");
+			{                
 				unityTile = _inactiveTiles.Dequeue();
 			}
 
