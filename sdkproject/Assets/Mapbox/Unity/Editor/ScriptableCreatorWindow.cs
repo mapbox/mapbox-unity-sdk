@@ -78,6 +78,8 @@
 			for (int i = 0; i < _assets.Count; i++)
 			{
 				var asset = _assets[i];
+				if (asset == null) //yea turns out this can happen
+					continue;
 				GUILayout.BeginHorizontal();
 
 				var b = Header(string.Format("{0,-40} - {1, -15}",  asset.GetType().Name , asset.name), i == activeIndex);
