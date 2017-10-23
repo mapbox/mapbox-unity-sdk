@@ -42,9 +42,16 @@
 				Debug.Log("MapMatchingExample: " + coord);
 			}
 
-			resource.Coordinates = coordinates.ToArray();
-			resource.Profile = _profile;
-			_mapMatcher.Match(resource, HandleMapMatchResponse);
+			if (coordinates.Count < 2)
+			{
+				Debug.Log("Need at least two coordinates for map matching.");
+			}
+			else
+			{
+				resource.Coordinates = coordinates.ToArray();
+				resource.Profile = _profile;
+				_mapMatcher.Match(resource, HandleMapMatchResponse);
+			}
 		}
 
 		void HandleMapMatchResponse(MapMatching.MapMatchingResponse response)
