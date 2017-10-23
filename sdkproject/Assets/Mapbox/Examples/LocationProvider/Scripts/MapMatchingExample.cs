@@ -70,6 +70,7 @@
 				var point = response.Tracepoints[i];
 
 				// Tracepoints can be null, so let's avoid trying to process those outliers.
+				// see https://www.mapbox.com/api-documentation/#match-response-object
 				if (point == null)
 				{
 					continue;
