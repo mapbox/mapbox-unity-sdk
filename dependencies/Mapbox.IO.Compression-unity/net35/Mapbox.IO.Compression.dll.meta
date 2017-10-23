@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 5702dec8310c4074e984765a688fa0d2
-timeCreated: 1508486394
+timeCreated: 1489780328
 licenseType: Pro
 PluginImporter:
   serializedVersion: 2
@@ -11,29 +11,11 @@ PluginImporter:
   platformData:
     data:
       first:
-        '': Any
-      second:
-        enabled: 0
-        settings:
-          Exclude Android: 0
-          Exclude Editor: 0
-          Exclude Linux: 0
-          Exclude Linux64: 0
-          Exclude LinuxUniversal: 0
-          Exclude OSXIntel: 0
-          Exclude OSXIntel64: 0
-          Exclude OSXUniversal: 0
-          Exclude WebGL: 0
-          Exclude Win: 0
-          Exclude Win64: 0
-          Exclude WindowsStoreApps: 1
-    data:
-      first:
         Android: Android
       second:
         enabled: 1
         settings:
-          CPU: ARMv7
+          CPU: AnyCPU
     data:
       first:
         Any: 
@@ -51,16 +33,22 @@ PluginImporter:
           OS: AnyOS
     data:
       first:
+        Facebook: WebGL
+      second:
+        enabled: 1
+        settings: {}
+    data:
+      first:
         Facebook: Win
       second:
-        enabled: 0
+        enabled: 1
         settings:
           CPU: AnyCPU
     data:
       first:
         Facebook: Win64
       second:
-        enabled: 0
+        enabled: 1
         settings:
           CPU: AnyCPU
     data:
@@ -82,7 +70,8 @@ PluginImporter:
         Standalone: LinuxUniversal
       second:
         enabled: 1
-        settings: {}
+        settings:
+          CPU: AnyCPU
     data:
       first:
         Standalone: OSXIntel
@@ -131,10 +120,14 @@ PluginImporter:
         enabled: 0
         settings:
           CPU: AnyCPU
-          DontProcess: False
-          PlaceholderPath: 
-          SDK: AnySDK
-          ScriptingBackend: AnyScriptingBackend
+    data:
+      first:
+        iPhone: iOS
+      second:
+        enabled: 1
+        settings:
+          CompileFlags: 
+          FrameworkDependencies: 
   userData: 
   assetBundleName: 
   assetBundleVariant: 
