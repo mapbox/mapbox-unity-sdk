@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Editor
+namespace Mapbox.Editor
 {
 	using UnityEngine;
 	using UnityEditor;

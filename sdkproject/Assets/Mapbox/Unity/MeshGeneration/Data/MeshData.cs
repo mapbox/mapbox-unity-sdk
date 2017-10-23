@@ -8,6 +8,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 	// TODO: Do we need this class? Why not just use `Mesh`?
 	public class MeshData
 	{
+		public Vector3 PositionInTile { get; set; }
 		public List<int> Edges { get; set; }
 		public Vector2 MercatorCenter { get; set; }
 		public RectD TileRect { get; set; }
