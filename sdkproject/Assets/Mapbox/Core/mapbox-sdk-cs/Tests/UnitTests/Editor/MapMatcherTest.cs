@@ -58,7 +58,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				new Vector2d(32.71254065549407,-117.17334151268004),
 			};
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -147,7 +147,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			};
 			resource.Profile = profile;
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -177,7 +177,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				new Vector2d(48.28933,16.55211)
 			};
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -216,7 +216,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			};
 			resource.Radiuses = new uint[] { 50, 50 };
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -256,7 +256,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			resource.Radiuses = new uint[] { 10, 30 };
 			resource.Steps = true;
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -300,7 +300,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			};
 			resource.Overview = Overview.Simplified;
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -337,7 +337,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			};
 			resource.Overview = Overview.Full;
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -372,7 +372,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				946684980
 			};
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -403,7 +403,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			resource.Overview = Overview.Full;
 			resource.Annotations = Annotations.Distance | Annotations.Duration | Annotations.Speed | Annotations.Congestion;
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -448,7 +448,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			};
 			resource.Tidy = true;
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -486,7 +486,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			resource.Steps = true;
 			//no language parameter needed: English is default
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -522,7 +522,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			resource.Steps = true;
 			resource.Language = InstructionLanguages.German;
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -572,7 +572,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			resource.Language = InstructionLanguages.German;
 
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -612,7 +612,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				new Vector2d(-117.17288821935652,32.712258556224),
 			};
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,

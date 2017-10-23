@@ -202,7 +202,7 @@ namespace Mapbox.Unity
 			{
 				if (_mapMatcher == null)
 				{
-					_mapMatcher = new MapMatcher(new FileSource(_configuration.AccessToken));
+					_mapMatcher = new MapMatcher(new FileSource(_configuration.AccessToken), _configuration.DefaultTimeout);
 				}
 				return _mapMatcher;
 			}
