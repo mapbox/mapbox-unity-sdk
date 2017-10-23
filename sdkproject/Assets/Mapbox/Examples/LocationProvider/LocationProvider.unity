@@ -1031,6 +1031,7 @@ MonoBehaviour:
   _lineRenderer: {fileID: 994191052}
   _originalRoute: {fileID: 952834217}
   _profile: 2
+  _height: 1
 --- !u!4 &994191054
 Transform:
   m_ObjectHideFlags: 0
@@ -1295,7 +1296,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _map: {fileID: 114606471}
   _positionFollowFactor: 0.5
-  _useTransformLocationProvider: 0
+  _useTransformLocationProvider: 1
 --- !u!4 &1934621224
 Transform:
   m_ObjectHideFlags: 0

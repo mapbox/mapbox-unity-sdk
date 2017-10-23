@@ -22,6 +22,9 @@
 		[SerializeField]
 		Profile _profile;
 
+		[SerializeField]
+		float _height;
+
 		MapMatcher _mapMatcher;
 
 		void Awake()
@@ -81,6 +84,7 @@
 				Debug.Log("MapMatchingExample: " + point.MatchingsIndex);
 				Debug.Log("MapMatchingExample: " + point.WaypointIndex);
 				var position = Conversions.GeoToWorldPosition(point.Location, _map.CenterMercator, _map.WorldRelativeScale).ToVector3xz();
+				position.y = _height;
 				_lineRenderer.SetPosition(_lineRenderer.positionCount - 1, position);
 			}
 		}
