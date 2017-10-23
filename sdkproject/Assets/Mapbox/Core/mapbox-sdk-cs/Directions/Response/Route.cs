@@ -44,5 +44,18 @@ namespace Mapbox.Directions
 		/// <value>The distance.</value>
 		[JsonProperty("distance")]
 		public double Distance { get; set; }
+
+		/// <summary>
+		/// Float indicating the weight in units described by 'weight_name'.
+		/// </summary>
+		[JsonProperty("weight")]
+		public float Weight { get; set; }
+
+		/// <summary>
+		/// String indicating which weight was used. The default is routability which is duration based, with additional penalties for less desirable maneuvers.
+		/// </summary>
+		[JsonProperty("weight_name")]
+		public string WeightName { get; set; }
+
 	}
 }

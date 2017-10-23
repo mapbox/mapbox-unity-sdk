@@ -8,6 +8,7 @@ namespace Mapbox.Unity
 	using Mapbox.Platform.Cache;
 	using Mapbox.Unity.Telemetry;
 	using Mapbox.Map;
+	using Mapbox.MapMatching;
 
 	/// <summary>
 	/// Object for retrieving an API token and making http requests.
@@ -63,7 +64,7 @@ namespace Mapbox.Unity
 			ConfigureFileSource();
 			ConfigureTelemetry();
 		}
-		
+
 		public void SetConfiguration(MapboxConfiguration configuration)
 		{
 			_configuration = configuration;
@@ -191,6 +192,21 @@ namespace Mapbox.Unity
 			}
 		}
 
+		/// <summary>
+		/// Lazy Map Matcher.
+		/// </summary>
+		MapMatcher _mapMatcher;
+		public MapMatcher MapMatcher
+		{
+			get
+			{
+				if (_mapMatcher == null)
+				{
+					_mapMatcher = new MapMatcher(new FileSource(_configuration.AccessToken), _configuration.DefaultTimeout);
+				}
+				return _mapMatcher;
+			}
+		}
 
 		class InvalidTokenException : Exception
 		{

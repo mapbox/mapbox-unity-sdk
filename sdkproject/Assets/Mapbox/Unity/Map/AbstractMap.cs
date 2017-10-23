@@ -127,8 +127,7 @@
 		{
 			if (_initializeOnStart)
 			{
-				var latLonSplit = _latitudeLongitudeString.Split(',');
-				Initialize(new Vector2d(double.Parse(latLonSplit[0]), double.Parse(latLonSplit[1])), _zoom);
+				Initialize(Conversions.StringToLatLon(_latitudeLongitudeString), _zoom);
 			}
 		}
 
