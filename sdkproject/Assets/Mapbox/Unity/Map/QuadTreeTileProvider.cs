@@ -16,19 +16,14 @@
 
         [SerializeField]
         float _updateInterval;
-
-        Plane _groundPlane;    
-        Vector3 _viewportSW;
-        Vector3 _viewportNE;
+        Plane _groundPlane; 
         float _elapsedTime;
         bool _shouldUpdate;
         int _previousZoomLevel;
 
         public override void OnInitialized()
         {
-            _groundPlane = new Plane(Vector3.up, Mapbox.Unity.Constants.Math.Vector3Zero);
-            _viewportSW = new Vector3(0.0f, 0.0f, 0);
-            _viewportNE = new Vector3(1.0f, 1.0f, 0);
+            _groundPlane = new Plane(Vector3.up, 0);
             _shouldUpdate = true;
             _previousZoomLevel = _map.Zoom;
         }
@@ -39,11 +34,8 @@
             var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(_map.CenterLatitudeLongitude, _map.Zoom));
             _map.SetCenterMercator(referenceTileRect.Center);
 
-            //Scale the map accordingly. 
-            if (Math.Abs(diffZoom) > 0.0f)
-            {
-                _map.Root.localScale = Vector3.one * Mathf.Pow(2, diffZoom);
-            }
+            //Scale the map accordingly.
+            _map.Root.localScale = Vector3.one * Mathf.Pow(2, diffZoom);
                 
         }
                            
@@ -70,13 +62,13 @@
             {
                 _elapsedTime = 0f;
 
-                if(_previousZoomLevel != _map.Zoom)
-                {
-                    var diffZoom = _map.Zoom - _map.InitialZoom;
-                    _map.SetZoom(_map.Zoom);
-                    _previousZoomLevel = _map.Zoom;
-                    UpdateMapProperties(diffZoom);
-                }
+                //if(_previousZoomLevel != _map.Zoom)
+                //{
+                //    var diffZoom = _map.Zoom - _map.InitialZoom;
+                //    _map.SetZoom(_map.Zoom);
+                //    _previousZoomLevel = _map.Zoom;
+                //    UpdateMapProperties(diffZoom);
+                //}
 
                 if (Math.Abs(_map.ZoomRange - _map.Zoom) > 0.0f)
                 {                    
@@ -89,6 +81,18 @@
                     UpdateMapProperties(diffZoom);
                 }
 
+                if(_map.MapPanned)
+                {
+                    Vector2d panRange = _map.PanRange;
+                    double xDelta = _map.CenterLatitudeLongitude.x + panRange.y;
+                    double zDelta = _map.CenterLatitudeLongitude.y + panRange.x;
+
+                    xDelta = xDelta > 0 ? Mathd.Min(xDelta, Mapbox.Utils.Constants.WebMercMax) : Mathd.Max(xDelta, -Mapbox.Utils.Constants.WebMercMax);
+                    zDelta = zDelta > 0 ? Mathd.Min(zDelta, Mapbox.Utils.Constants.WebMercMax) : Mathd.Max(zDelta, -Mapbox.Utils.Constants.WebMercMax);
+
+                    _map.SetCenterLatitudeLongitude(new Vector2d(xDelta, zDelta));
+                    UpdateMapProperties(0);
+                }
 
                 //update viewport in case it was changed by switching zoom level
                 Vector2dBounds _viewPortWebMercBounds = getcurrentViewPortWebMerc();
@@ -99,17 +103,21 @@
                 List<UnwrappedTileId> toRemove = activeTiles.Except(tilesToRequest).ToList();
                 foreach (var t2r in toRemove) { RemoveTile(t2r); }
                 var finalTilesNeeded = tilesToRequest.Except(activeTiles);
-                foreach (var tile in activeTiles)
+
+                if(_map.MapPanned)
                 {
-                    // Place Tiles in case we panned. 
+                    foreach (var tile in activeTiles)
+                    {
+                        // Reposition tiles in case we panned.
+                        RepositionTile(tile);
+                    }
+                    _map.SetPanRange(Vector2d.zero,true);
                 }
+
                 foreach (var tile in finalTilesNeeded)
                 {
                     AddTile(tile);
                 }
-
-
-
             }
         }
 

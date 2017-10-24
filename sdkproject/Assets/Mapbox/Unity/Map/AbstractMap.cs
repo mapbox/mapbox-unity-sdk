@@ -21,6 +21,32 @@
         {
             _zoomRange = zoom;
         }
+
+        protected Vector2d _panRange;
+        public Vector2d PanRange
+        {
+            get { return _panRange; }
+        }
+
+        public void SetPanRange(Vector2d pan, bool reset = false)
+        {
+            if (reset)
+            {
+                _mapPanned = false;
+                _panRange = Vector2d.zero;
+            }
+            else
+            {
+                _mapPanned = true;
+                _panRange = pan;
+            }
+        }
+        protected bool _mapPanned; 
+        public bool MapPanned
+        {
+            get { return _mapPanned; }
+        }
+
 		[SerializeField]
 		bool _initializeOnStart = true;
 
@@ -138,6 +164,7 @@
 			_fileSouce = MapboxAccess.Instance;
 			_tileProvider.OnTileAdded += TileProvider_OnTileAdded;
 			_tileProvider.OnTileRemoved += TileProvider_OnTileRemoved;
+            _tileProvider.OnTileRepositioned += TileProvider_OnTileRepositioned;
 			if (!_root)
 			{
 				_root = transform;
@@ -161,6 +188,7 @@
 			{
 				_tileProvider.OnTileAdded -= TileProvider_OnTileAdded;
 				_tileProvider.OnTileRemoved -= TileProvider_OnTileRemoved;
+                _tileProvider.OnTileRepositioned -= TileProvider_OnTileRepositioned;
 			}
 
 			_mapVisualizer.Destroy();
@@ -202,6 +230,11 @@
 		{
 			_mapVisualizer.DisposeTile(tileId);
 		}
+
+        void TileProvider_OnTileRepositioned(UnwrappedTileId tileId)
+        {
+            _mapVisualizer.RepositionTile(tileId);
+        }
 
 		protected void SendInitialized()
 		{

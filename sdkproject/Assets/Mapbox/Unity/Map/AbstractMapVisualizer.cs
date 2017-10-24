@@ -177,6 +177,15 @@
 			}
 		}
 
+        // TODO: Probably not the best place for this method !!
+        public void RepositionTile(UnwrappedTileId tileId)
+        {
+            UnityTile currentTile;
+            if(ActiveTiles.TryGetValue(tileId ,out currentTile))
+            {
+                PlaceTile(tileId, currentTile, _map);
+            }
+        }
 		protected abstract void PlaceTile(UnwrappedTileId tileId, UnityTile tile, IMapReadable map);
 	}
 }

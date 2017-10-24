@@ -90,19 +90,24 @@
 			float zMove = Input.GetAxis("Vertical");
             if (Math.Abs(xMove) > 0.0f || Math.Abs(zMove) > 0.0f)
             {
-                float factor = 10.0f;// Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) * 256.0f;
+                float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) / (2.0f * _dynamicZoomMap.UnityTileSize);
                 Debug.Log("Keyboard panning" + xMove  + " , " + zMove + " Factor : " + factor);
 
-                double xDelta = _dynamicZoomMap.CenterLatitudeLongitude.x - zMove * factor;
-                double zDelta = _dynamicZoomMap.CenterLatitudeLongitude.y - xMove * factor;
+                //TODO : Compare performance of panning in LateUpdate vs Update of TileProvider!
+                //double xDelta = _dynamicZoomMap.CenterLatitudeLongitude.x + zMove * factor;
+                //double zDelta = _dynamicZoomMap.CenterLatitudeLongitude.y + xMove * factor;
 
-                xDelta = xDelta > 0 ? Mathd.Min(xDelta, Mapbox.Utils.Constants.WebMercMax) : Mathd.Max(xDelta, -Mapbox.Utils.Constants.WebMercMax);
-                zDelta = zDelta > 0 ? Mathd.Min(zDelta, Mapbox.Utils.Constants.WebMercMax) : Mathd.Max(zDelta, -Mapbox.Utils.Constants.WebMercMax);
+                //xDelta = xDelta > 0 ? Mathd.Min(xDelta, Mapbox.Utils.Constants.WebMercMax) : Mathd.Max(xDelta, -Mapbox.Utils.Constants.WebMercMax);
+                //zDelta = zDelta > 0 ? Mathd.Min(zDelta, Mapbox.Utils.Constants.WebMercMax) : Mathd.Max(zDelta, -Mapbox.Utils.Constants.WebMercMax);
 
 
-                //_dynamicZoomMap.SetCenterMercator(_dynamicZoomMap.CenterMercator - new Vector2d(xMove, zMove));
-                _dynamicZoomMap.SetCenterLatitudeLongitude(new Vector2d(xDelta, zDelta));
-                _quadTreeTileProvider.UpdateMapProperties(0);
+                ////_dynamicZoomMap.SetCenterMercator(_dynamicZoomMap.CenterMercator - new Vector2d(xMove, zMove));
+                //_dynamicZoomMap.SetCenterLatitudeLongitude(new Vector2d(xDelta, zDelta));
+                //_quadTreeTileProvider.UpdateMapProperties(0);
+
+
+
+                _dynamicZoomMap.SetPanRange(new Vector2d(xMove * factor, zMove * factor));
 			}
 
 			//pan mouse
