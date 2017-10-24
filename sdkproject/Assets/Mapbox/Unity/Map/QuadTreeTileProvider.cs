@@ -40,7 +40,11 @@
             _map.SetCenterMercator(referenceTileRect.Center);
 
             //Scale the map accordingly. 
-            _map.Root.localScale = Vector3.one * Mathf.Pow(2, diffZoom);
+            if (Math.Abs(diffZoom) > 0.0f)
+            {
+                _map.Root.localScale = Vector3.one * Mathf.Pow(2, diffZoom);
+            }
+                
         }
                            
         void Update()
@@ -95,10 +99,17 @@
                 List<UnwrappedTileId> toRemove = activeTiles.Except(tilesToRequest).ToList();
                 foreach (var t2r in toRemove) { RemoveTile(t2r); }
                 var finalTilesNeeded = tilesToRequest.Except(activeTiles);
+                foreach (var tile in activeTiles)
+                {
+                    // Place Tiles in case we panned. 
+                }
                 foreach (var tile in finalTilesNeeded)
                 {
                     AddTile(tile);
                 }
+
+
+
             }
         }
 

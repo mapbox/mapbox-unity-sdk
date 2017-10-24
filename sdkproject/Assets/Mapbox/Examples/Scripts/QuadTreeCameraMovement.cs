@@ -86,15 +86,24 @@
 
 
 			//pan keyboard
-			//float xMove = Input.GetAxis("Horizontal");
-			//float zMove = Input.GetAxis("Vertical");
-			//if (0 != xMove || 0 != zMove)
-			//{
-			//	float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) * 256 / _dynamicZoomMap.UnityTileSize;
-			//	xMove *= factor;
-			//	zMove *= factor;
-			//	_dynamicZoomMap.SetCenterMercator(_dynamicZoomMap.CenterMercator + new Vector2d(xMove, zMove));
-			//}
+			float xMove = Input.GetAxis("Horizontal");
+			float zMove = Input.GetAxis("Vertical");
+            if (Math.Abs(xMove) > 0.0f || Math.Abs(zMove) > 0.0f)
+            {
+                float factor = 10.0f;// Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) * 256.0f;
+                Debug.Log("Keyboard panning" + xMove  + " , " + zMove + " Factor : " + factor);
+
+                double xDelta = _dynamicZoomMap.CenterLatitudeLongitude.x - zMove * factor;
+                double zDelta = _dynamicZoomMap.CenterLatitudeLongitude.y - xMove * factor;
+
+                xDelta = xDelta > 0 ? Mathd.Min(xDelta, Mapbox.Utils.Constants.WebMercMax) : Mathd.Max(xDelta, -Mapbox.Utils.Constants.WebMercMax);
+                zDelta = zDelta > 0 ? Mathd.Min(zDelta, Mapbox.Utils.Constants.WebMercMax) : Mathd.Max(zDelta, -Mapbox.Utils.Constants.WebMercMax);
+
+
+                //_dynamicZoomMap.SetCenterMercator(_dynamicZoomMap.CenterMercator - new Vector2d(xMove, zMove));
+                _dynamicZoomMap.SetCenterLatitudeLongitude(new Vector2d(xDelta, zDelta));
+                _quadTreeTileProvider.UpdateMapProperties(0);
+			}
 
 			//pan mouse
 			if (Input.GetMouseButton(0))
@@ -119,10 +128,10 @@
             if(_shouldDrag == true)
             {
                 var offset = _origin - _delta;
-                offset.y = _referenceCamera.transform.localPosition.y;
-                _referenceCamera.transform.localPosition = offset;
-                float factor = 20f; // Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) * 256 / _dynamicZoomMap.UnityTileSize;
-                //_dynamicZoomMap.SetCenterMercator(_dynamicZoomMap.CenterMercator + new Vector2d(offset.x * factor, offset.z * factor));
+                float factor = 20f;//Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) * 256 /uni;
+                _dynamicZoomMap.SetCenterLatitudeLongitude(_dynamicZoomMap.CenterLatitudeLongitude + new Vector2d(offset.x * factor, offset.z * factor));
+                //_dynamicZoomMap.SetCenterLatitudeLongitude(_dynamicZoomMap.CenterLatitudeLongitude + new Vector2d(xMove, zMove));
+                _quadTreeTileProvider.UpdateMapProperties(0);
                 UnityEngine.Debug.Log("Dragging");
             }
             else
