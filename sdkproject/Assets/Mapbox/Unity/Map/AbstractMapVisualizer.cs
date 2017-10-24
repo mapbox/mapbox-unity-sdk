@@ -45,6 +45,7 @@
 		public Dictionary<UnwrappedTileId, UnityTile> ActiveTiles { get { return _activeTiles; } }
 
 		public event Action<ModuleState> OnMapVisualizerStateChanged = delegate { };
+        public event Action<CanonicalTileId> OnTileError = delegate { };
 
 		/// <summary>
 		/// Initializes the factories by passing the file source down, which is necessary for data (web/file) calls
@@ -73,6 +74,7 @@
 				{
 					factory.Initialize(fileSource);
 					factory.OnFactoryStateChanged += UpdateState;
+                    factory.OnTileError += Factory_OnTileError;
 				}
 			}
 		}
@@ -84,6 +86,8 @@
 				if (Factories[i] != null)
 				{
 					Factories[i].OnFactoryStateChanged -= UpdateState;
+                    Factories[i].OnTileError -= Factory_OnTileError;
+
 				}
 			}
 
@@ -163,7 +167,15 @@
 			return unityTile;
 		}
 
-		public void DisposeTile(UnwrappedTileId tileId)
+        private void Factory_OnTileError(CanonicalTileId id)
+        {
+            if(OnTileError != null)
+            {
+                OnTileError(id);
+            }
+        }
+
+        public void DisposeTile(UnwrappedTileId tileId)
 		{
 			var unityTile = ActiveTiles[tileId];
 

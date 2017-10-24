@@ -28,7 +28,6 @@ namespace Mapbox.Map
 		private IAsyncRequest _request;
 		private Action _callback;
 
-
 		/// <summary> Tile state. </summary>
 		public enum State
 		{
@@ -112,6 +111,10 @@ namespace Mapbox.Map
 			}
 		}
 
+        /// <summary>
+        /// Occurs when there's a tile error. It bubbles up all the way up to  the AbstractTileFactory and MapVisualizer
+        /// </summary>
+        public event Action<CanonicalTileId> OnTileError = delegate { };
 
 		/// <summary>
 		///     Initializes the <see cref="T:Mapbox.Map.Tile"/> object. It will
@@ -126,6 +129,12 @@ namespace Mapbox.Map
 			_state = State.Loading;
 			_id = param.Id;
 			_callback = callback;
+
+            if (OnTileError!=null)
+            {
+                OnTileError(_id);
+            }
+
 			_request = param.Fs.Request(MakeTileResource(param.MapId).GetUrl(), HandleTileResponse, tileId: _id, mapId: param.MapId);
 		}
 

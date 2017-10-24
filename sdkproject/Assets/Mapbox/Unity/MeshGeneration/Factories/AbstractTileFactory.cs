@@ -5,6 +5,7 @@
 	using System;
 	using UnityEngine;
 	using Mapbox.Unity.Map;
+    using Mapbox.Map;
 
 	public abstract class AbstractTileFactory : ScriptableObject
     {
@@ -36,6 +37,11 @@
         }
 
 		public event Action<AbstractTileFactory> OnFactoryStateChanged = delegate { };
+        /// <summary>
+        /// The OnTileError event triggers when there's tile error.
+        /// It returns the Mapbox.Map.CanonicalTileId instance for the tile on which error occurred.
+        /// </summary>
+        public event Action<CanonicalTileId> OnTileError = delegate { };
 
         public void Initialize(IFileSource fileSource)
         {
@@ -48,11 +54,21 @@
         public void Register(UnityTile tile)
         {
             OnRegistered(tile);
+            tile.OnTileErrorEvent += Tile_OnTileErrorEvent;
         }
 
         public void Unregister(UnityTile tile)
         {
             OnUnregistered(tile);
+            tile.OnTileErrorEvent -= Tile_OnTileErrorEvent;
+        }
+
+        private void Tile_OnTileErrorEvent(CanonicalTileId id)
+        {
+            if (OnTileError != null)
+            {
+                OnTileError(id);
+            }
         }
 
         internal abstract void OnInitialized();
