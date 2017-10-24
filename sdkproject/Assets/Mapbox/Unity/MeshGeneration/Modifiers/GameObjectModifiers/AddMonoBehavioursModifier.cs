@@ -10,11 +10,11 @@
 		[SerializeField]
 		AddMonoBehavioursModifierType[] _types;
 
-		public override void Run(FeatureBehaviour fb, UnityTile tile)
+		public override void Run(VectorEntity ve, UnityTile tile)
 		{
 			foreach (var t in _types)
 			{
-				fb.gameObject.AddComponent(t.Type);
+				ve.GameObject.AddComponent(t.Type);
 			}
 		}
 	}

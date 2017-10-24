@@ -5,7 +5,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 	public class GameObjectModifier : ModifierBase
 	{
-		public virtual void Run(FeatureBehaviour fb, UnityTile tile)
+		public virtual void Run(VectorEntity ve, UnityTile tile)
 		{
 
 		}
