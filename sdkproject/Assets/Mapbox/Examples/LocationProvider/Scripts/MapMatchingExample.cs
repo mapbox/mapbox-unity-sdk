@@ -7,6 +7,7 @@
 	using System.Collections.Generic;
 	using Mapbox.MapMatching;
 	using UnityEngine;
+	using System.Linq;
 
 	public class MapMatchingExample : MonoBehaviour
 	{
@@ -45,9 +46,17 @@
 				Debug.Log("MapMatchingExample: " + coord);
 			}
 
-			resource.Coordinates = coordinates.ToArray();
-			resource.Profile = _profile;
-			_mapMatcher.Match(resource, HandleMapMatchResponse);
+			if (coordinates.Count < 2)
+			{
+				Debug.Log("Need at least two coordinates for map matching.");
+			}
+			else
+			{
+				//API allows for max 100 coordinates, take newest
+				resource.Coordinates = coordinates.Skip(System.Math.Max(0, coordinates.Count - 100)).ToArray();
+				resource.Profile = _profile;
+				_mapMatcher.Match(resource, HandleMapMatchResponse);
+			}
 		}
 
 		void HandleMapMatchResponse(MapMatching.MapMatchingResponse response)
@@ -73,6 +82,7 @@
 				var point = response.Tracepoints[i];
 
 				// Tracepoints can be null, so let's avoid trying to process those outliers.
+				// see https://www.mapbox.com/api-documentation/#match-response-object
 				if (point == null)
 				{
 					continue;

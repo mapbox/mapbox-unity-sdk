@@ -3,6 +3,7 @@
 //     Copyright (c) 2016 Mapbox. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
+using Mapbox.Unity.Utilities;
 
 namespace Mapbox.Examples
 {
@@ -65,9 +66,7 @@ namespace Mapbox.Examples
 			_hasResponse = false;
 			if (!string.IsNullOrEmpty(searchString))
 			{
-				var latLon = searchString.Split(',');
-				_coordinate.x = double.Parse(latLon[0]);
-				_coordinate.y = double.Parse(latLon[1]);
+				_coordinate = Conversions.StringToLatLon(searchString);
 				_resource.Query = _coordinate;
 				_geocoder.Geocode(_resource, HandleGeocoderResponse);
 			}

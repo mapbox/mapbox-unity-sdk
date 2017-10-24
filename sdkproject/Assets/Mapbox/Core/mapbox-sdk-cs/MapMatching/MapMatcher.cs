@@ -19,12 +19,14 @@ namespace Mapbox.MapMatching
 	public class MapMatcher
 	{
 		private readonly IFileSource _fileSource;
+		private int _timeout;
 
 		/// <summary> Initializes a new instance of the <see cref="MapMatcher" /> class. </summary>
 		/// <param name="fileSource"> Network access abstraction. </param>
-		public MapMatcher(IFileSource fileSource)
+		public MapMatcher(IFileSource fileSource, int timeout)
 		{
 			_fileSource = fileSource;
+			_timeout = timeout;
 		}
 
 		/// <summary> Performs asynchronously a geocoding lookup. </summary>
@@ -52,7 +54,9 @@ namespace Mapbox.MapMatching
 					}
 
 					callback(data);
-				});
+				},
+				_timeout
+				);
 		}
 
 

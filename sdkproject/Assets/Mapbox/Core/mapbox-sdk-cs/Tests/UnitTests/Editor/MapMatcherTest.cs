@@ -58,7 +58,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				new Vector2d(32.71254065549407,-117.17334151268004),
 			};
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -147,7 +147,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			};
 			resource.Profile = profile;
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -177,7 +177,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				new Vector2d(48.28933,16.55211)
 			};
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -216,7 +216,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			};
 			resource.Radiuses = new uint[] { 50, 50 };
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -235,7 +235,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			Assert.AreEqual(1, matchingResponse.Tracepoints[1].WaypointIndex, "Wrong WaypointIndex");
 
 			Assert.AreEqual(1, matchingResponse.Matchings.Length, "Wrong number of matchings");
-			Assert.AreEqual(22.5, matchingResponse.Matchings[0].Weight, "Wrong Weight");
+			Assert.GreaterOrEqual(matchingResponse.Matchings[0].Weight, 22.5, "Wrong Weight");
 			Assert.AreEqual("routability", matchingResponse.Matchings[0].WeightName, "Wrong WeightName");
 			Assert.AreEqual(1, matchingResponse.Matchings[0].Legs.Count, "Wrong number of legs");
 			Assert.AreEqual(2, matchingResponse.Matchings[0].Geometry.Count, "Wrong number of vertices in geometry");
@@ -256,7 +256,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			resource.Radiuses = new uint[] { 10, 30 };
 			resource.Steps = true;
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -300,7 +300,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			};
 			resource.Overview = Overview.Simplified;
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -337,7 +337,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			};
 			resource.Overview = Overview.Full;
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -372,7 +372,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				946684980
 			};
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -403,7 +403,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			resource.Overview = Overview.Full;
 			resource.Annotations = Annotations.Distance | Annotations.Duration | Annotations.Speed | Annotations.Congestion;
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -448,7 +448,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			};
 			resource.Tidy = true;
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -486,7 +486,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			resource.Steps = true;
 			//no language parameter needed: English is default
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -522,7 +522,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			resource.Steps = true;
 			resource.Language = InstructionLanguages.German;
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -572,7 +572,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			resource.Language = InstructionLanguages.German;
 
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
@@ -600,6 +600,45 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		}
 
 
+		[UnityTest]
+		public IEnumerator CoordinatesNull()
+		{
+
+			MapMatchingResource resource = new MapMatchingResource();
+			Assert.Throws(
+				typeof(System.Exception)
+				, () => resource.Coordinates = null
+				, "MapMatchingResource did not throw when setting null coordinates"
+			);
+
+			yield return null;
+
+
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
+			MapMatchingResponse matchingResponse = null;
+
+			Assert.Throws(
+				typeof(System.Exception)
+				, () =>
+				{
+					mapMatcher.Match(
+						resource,
+						(MapMatchingResponse response) =>
+						{
+							matchingResponse = response;
+						}
+					);
+				}
+				, "MapMatcher.Match did not throw with null coordinates"
+			);
+
+			IEnumerator enumerator = _fs.WaitForAllRequests();
+			while (enumerator.MoveNext()) { yield return null; }
+
+			Assert.IsNull(matchingResponse, "Matching response was expected to be null");
+		}
+
+
 
 		[UnityTest]
 		public IEnumerator InvalidCoordinate()
@@ -612,7 +651,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				new Vector2d(-117.17288821935652,32.712258556224),
 			};
 
-			MapMatcher mapMatcher = new MapMatcher(_fs);
+			MapMatcher mapMatcher = new MapMatcher(_fs, _timeout);
 			MapMatchingResponse matchingResponse = null;
 			mapMatcher.Match(
 				resource,
