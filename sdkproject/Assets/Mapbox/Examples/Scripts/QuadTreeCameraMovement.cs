@@ -128,7 +128,7 @@
             if (_shouldDrag == true)
             {
                 var offset = _origin - _delta;
-                float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) / (120.0f * _dynamicZoomMap.Zoom * _dynamicZoomMap.UnityTileSize);
+                float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) / (256.0f * _dynamicZoomMap.Zoom * _dynamicZoomMap.UnityTileSize);
                 _dynamicZoomMap.SetPanRange(new Vector2d(offset.x * factor, offset.z * factor));
 
                 UnityEngine.Debug.Log("Dragging : " + factor);
