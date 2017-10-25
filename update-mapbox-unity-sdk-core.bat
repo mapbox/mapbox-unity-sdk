@@ -34,7 +34,7 @@ xcopy /S /R /E /Y dependencies\vector-tile-cs\src\* %SDK_PATH%\Plugins\Mapbox\ve
 IF %ERRORLEVEL% NEQ 0 ECHO error during copying vector-tile-cs && EXIT /B 1
 
 ECHO ---- copying Mapbox.IO.Compression
-xcopy /S /R /E /Y dependencies\Mapbox.IO.Compression-unity\src\Mapbox.IO.Compression.Shared\* %SDK_PATH%\Plugins\ThirdParty\Mapbox.IO.Compression\ /EXCLUDE:x.txt
+xcopy /S /R /E /Y dependencies\Mapbox.IO.Compression-unity\* %SDK_PATH%\Plugins\ThirdParty\Mapbox.IO.Compression\ /EXCLUDE:x.txt
 IF %ERRORLEVEL% NEQ 0 ECHO error during copying Mapbox.IO.Compression && EXIT /B 1
 
 ECHO ---- copying Mapbox.Json
