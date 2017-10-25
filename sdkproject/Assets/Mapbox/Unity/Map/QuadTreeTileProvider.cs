@@ -33,8 +33,10 @@
             _map.SetCenterMercator(referenceTileRect.Center);
 
             //Scale the map accordingly.
-            _map.Root.localScale = Vector3.one * Mathf.Pow(2, diffZoom);
-                
+            if (Math.Abs(diffZoom) > 0.0f)
+            {
+                _map.Root.localScale = Vector3.one * Mathf.Pow(2, diffZoom);
+            }
         }
                            
         void Update()
