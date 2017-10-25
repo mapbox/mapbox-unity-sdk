@@ -19,13 +19,11 @@
         Plane _groundPlane; 
         float _elapsedTime;
         bool _shouldUpdate;
-        int _previousZoomLevel;
 
         public override void OnInitialized()
         {
             _groundPlane = new Plane(Vector3.up, 0);
             _shouldUpdate = true;
-            _previousZoomLevel = _map.Zoom;
         }
 
         public void UpdateMapProperties(float diffZoom)
@@ -62,21 +60,13 @@
             {
                 _elapsedTime = 0f;
 
-                //if(_previousZoomLevel != _map.Zoom)
-                //{
-                //    var diffZoom = _map.Zoom - _map.InitialZoom;
-                //    _map.SetZoom(_map.Zoom);
-                //    _previousZoomLevel = _map.Zoom;
-                //    UpdateMapProperties(diffZoom);
-                //}
-
                 if (Math.Abs(_map.ZoomRange - _map.Zoom) > 0.0f)
                 {                    
                     var diffZoom = _map.ZoomRange - _map.InitialZoom;
-                    if (Math.Abs(diffZoom) >= 1.0f)
+                    if (Math.Abs(diffZoom) > 0.5f)
                     {
                         _map.SetZoom((int) Math.Ceiling(_map.ZoomRange));
-                        _previousZoomLevel = _map.Zoom;
+                        //_previousZoomLevel = _map.Zoom;
                     }
                     UpdateMapProperties(diffZoom);
                 }
