@@ -22,8 +22,8 @@
 		DynamicZoomMap _dynamicZoomMap;
 
 		private Vector3 _origin;
-        Vector3 _mousePositionDelta;
-        bool _shouldDrag;
+		Vector3 _mousePositionDelta;
+		bool _shouldDrag;
 
 		void Start()
 		{
@@ -62,7 +62,7 @@
 			// zoom
 			var y = Input.GetAxis("Mouse ScrollWheel") * _zoomSpeed;
 			//avoid unnecessary translation
-            if (Mathf.Abs(y) > 0.0f)
+			if (Mathf.Abs(y) > 0.0f)
 			{
 				_referenceCamera.transform.Translate(new Vector3(0, y, 0), Space.World);
 
@@ -75,7 +75,7 @@
 			//pan keyboard
 			float xMove = Input.GetAxis("Horizontal");
 			float zMove = Input.GetAxis("Vertical");
-            if (Mathf.Abs(xMove) > 0.0f || Mathf.Abs(zMove) > 0.0f)
+			if (Mathf.Abs(xMove) > 0.0f || Mathf.Abs(zMove) > 0.0f)
 			{
 				float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) * 256 / _dynamicZoomMap.UnityTileSize;
 				xMove *= factor;
@@ -84,35 +84,35 @@
 			}
 
 			//pan mouse
-            if (Input.GetMouseButton(0))
-            {
-                var mouseDownPosScreen = Input.mousePosition;
-                //assign distance of camera to ground plane to z, otherwise ScreenToWorldPoint() will always return the position of the camera
-                //http://answers.unity3d.com/answers/599100/view.html
-                mouseDownPosScreen.z = _referenceCamera.transform.localPosition.y;
-                _mousePositionDelta = _referenceCamera.ScreenToWorldPoint(mouseDownPosScreen) - _referenceCamera.transform.localPosition;
-                _mousePositionDelta.y = 0f;
-                if (_shouldDrag == false)
-                {
-                    _shouldDrag = true;
-                    _origin = _referenceCamera.ScreenToWorldPoint(mouseDownPosScreen);
-                }
-            }
-            else
-            {
-                _shouldDrag = false;
-            }
+			if (Input.GetMouseButton(0))
+			{
+				var mouseDownPosScreen = Input.mousePosition;
+				//assign distance of camera to ground plane to z, otherwise ScreenToWorldPoint() will always return the position of the camera
+				//http://answers.unity3d.com/answers/599100/view.html
+				mouseDownPosScreen.z = _referenceCamera.transform.localPosition.y;
+				_mousePositionDelta = _referenceCamera.ScreenToWorldPoint(mouseDownPosScreen) - _referenceCamera.transform.localPosition;
+				_mousePositionDelta.y = 0f;
+				if (_shouldDrag == false)
+				{
+					_shouldDrag = true;
+					_origin = _referenceCamera.ScreenToWorldPoint(mouseDownPosScreen);
+				}
+			}
+			else
+			{
+				_shouldDrag = false;
+			}
 
-            if (_shouldDrag)
-            {
-                var offset = _origin - _mousePositionDelta;
-                if (null != _dynamicZoomMap)
-                {
-                    float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) * 256 / _dynamicZoomMap.UnityTileSize;
-                    var centerOld = _dynamicZoomMap.CenterMercator;
-                    _dynamicZoomMap.SetCenterMercator(_dynamicZoomMap.CenterMercator + new Vector2d(offset.x * factor, offset.z * factor));
-                }
-            }
+			if (_shouldDrag)
+			{
+				var offset = _origin - _mousePositionDelta;
+				if (null != _dynamicZoomMap)
+				{
+					float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) * 256 / _dynamicZoomMap.UnityTileSize;
+					var centerOld = _dynamicZoomMap.CenterMercator;
+					_dynamicZoomMap.SetCenterMercator(_dynamicZoomMap.CenterMercator + new Vector2d(offset.x * factor, offset.z * factor));
+				}
+			}
 		}
 	}
 }
