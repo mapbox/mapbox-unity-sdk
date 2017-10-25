@@ -16,7 +16,7 @@ namespace Mapbox.Unity.MeshGeneration.Components
         private Material[] _topTextures;
         private Material[] _sideTextures;
 
-        public void Initialize(FeatureBehaviour feature, bool doTextureTop, bool useSatelliteRoof, Material[] topTextures, bool doTextureSides, Material[] sideTextures)
+        public void Initialize(VectorEntity ve, bool doTextureTop, bool useSatelliteRoof, Material[] topTextures, bool doTextureSides, Material[] sideTextures)
         {
             _useSatelliteRoof = useSatelliteRoof;
             _textureTop = doTextureTop;

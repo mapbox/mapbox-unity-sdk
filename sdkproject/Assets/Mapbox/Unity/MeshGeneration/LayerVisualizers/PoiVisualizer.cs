@@ -26,7 +26,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
         [SerializeField]
         private bool _scaleDownWithWorld = true;
 
-        public override void Create(VectorTileLayer layer, UnityTile tile)
+        public override void Create(VectorTileLayer layer, UnityTile tile, Action callback = null)
         {
 			Debug.LogWarning("PoiVisualer is deprecated. Use regular VectorLayerVisualizer and PrefabModifier.");
             _container = new GameObject(Key + " Container");
@@ -38,7 +38,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
                 var feature = new VectorFeatureUnity(layer.GetFeature(i, 0), tile, layer.Extent);
                 Build(feature, tile, _container);
             }
-        }
+
+			if (callback != null)
+				callback();
+
+		}
 
         private void Build(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
         {

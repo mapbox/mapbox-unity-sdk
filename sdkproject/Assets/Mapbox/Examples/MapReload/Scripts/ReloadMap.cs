@@ -17,13 +17,17 @@
 		[SerializeField]
 		Slider _zoomSlider;
 
+		[SerializeField]
+		Button _button;
+
 		void Awake()
 		{
 			_camera = Camera.main;
 			_cameraStartPos = _camera.transform.position;
 			_map = FindObjectOfType<AbstractMap>();
 			_forwardGeocoder.OnGeocoderResponse += ForwardGeocoder_OnGeocoderResponse;
-			_zoomSlider.onValueChanged.AddListener(Reload);
+			//_zoomSlider.onValueChanged.AddListener(Reload);
+			_button.onClick.AddListener(Reload);
 		}
 
 		void ForwardGeocoder_OnGeocoderResponse(ForwardGeocodeResponse response)
@@ -32,10 +36,10 @@
 			_map.Initialize(response.Features[0].Center, (int)_zoomSlider.value);
 		}
 
-		void Reload(float value)
+		void Reload()
 		{
 			_camera.transform.position = _cameraStartPos;
-			_map.Initialize(_map.CenterLatitudeLongitude, (int)value);
+			_map.Initialize(_map.CenterLatitudeLongitude, (int)_zoomSlider.value);
 		}
 	}
 }

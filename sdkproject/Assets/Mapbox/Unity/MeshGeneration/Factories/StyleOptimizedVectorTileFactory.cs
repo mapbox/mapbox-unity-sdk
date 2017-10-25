@@ -139,7 +139,7 @@
 					{
 						if (builder.Active)
 						{
-							builder.Create(_cachedData[tile].Data.GetLayer(layerName), tile);
+							builder.Create(_cachedData[tile].Data.GetLayer(layerName), tile, DecreaseProgressCounter);
 						}
 					}
 				}
@@ -149,6 +149,11 @@
 			Progress--;
 
 			_cachedData.Remove(tile);
+		}
+		
+		private void DecreaseProgressCounter()
+		{
+			Progress--;
 		}
 	}
 

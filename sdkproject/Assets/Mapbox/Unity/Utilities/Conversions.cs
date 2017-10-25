@@ -10,6 +10,7 @@ namespace Mapbox.Unity.Utilities
 	using System;
 	using Mapbox.Utils;
 	using UnityEngine;
+	using System.Globalization;
 
 	/// <summary>
 	/// A set of Geo and Terrain Conversion utils.
@@ -31,6 +32,26 @@ namespace Mapbox.Unity.Utilities
 		public static Vector2d LatLonToMeters(Vector2d v)
 		{
 			return LatLonToMeters(v.x, v.y);
+		}
+
+		/// <summary>
+		/// Convert a simple string to a latitude longitude.
+		/// Expects format: latitude, longitude
+		/// </summary>
+		/// <returns>The lat/lon as Vector2d.</returns>
+		/// <param name="s">string.</param>
+		public static Vector2d StringToLatLon(string s)
+		{
+			var latLonSplit = s.Split(',');
+
+			double latitude = 0;
+			double longitude = 0;
+
+			var locale = CultureInfo.CreateSpecificCulture("en-US");
+			double.TryParse(latLonSplit[0], NumberStyles.Any, locale, out latitude);
+			double.TryParse(latLonSplit[1], NumberStyles.Any, locale, out longitude);
+
+			return new Vector2d(latitude, longitude);
 		}
 
 		/// <summary>
