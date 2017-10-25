@@ -2,6 +2,7 @@
 {
 	using Mapbox.Unity.Map;
 	using Mapbox.Unity.MeshGeneration.Data;
+	using System;
 	using UnityEngine;
 
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Snap Terrain Raycast Modifier")]
@@ -12,6 +13,8 @@
 		[SerializeField]
 		private LayerMask _terrainMask;
 
+		private int _counter;
+
 		public override ModifierType Type
 		{
 			get { return ModifierType.Preprocess; }
@@ -21,10 +24,11 @@
 		{
 			// TODO: Get this from tile as IMapReadable.
 			float worldScale = FindObjectOfType<AbstractMap>().WorldRelativeScale;
+			_counter = md.Vertices.Count;
 
-			if (md.Vertices.Count > 0)
+			if (_counter > 0)
 			{
-				for (int i = 0; i < md.Vertices.Count; i++)
+				for (int i = 0; i < _counter; i++)
 				{
 					var h = tile.QueryHeightData((float)((md.Vertices[i].x + tile.Rect.Size.x / 2) / tile.Rect.Size.x),
 						(float)((md.Vertices[i].z + tile.Rect.Size.y / 2) / tile.Rect.Size.y));
@@ -48,9 +52,11 @@
 			}
 			else
 			{
+
 				foreach (var sub in feature.Points)
 				{
-					for (int i = 0; i < sub.Count; i++)
+					_counter = sub.Count;
+					for (int i = 0; i < _counter; i++)
 					{
 						var h = tile.QueryHeightData((float)((sub[i].x + tile.Rect.Size.x / 2) / tile.Rect.Size.x),
 							(float)((sub[i].z + tile.Rect.Size.y / 2) / tile.Rect.Size.y));
