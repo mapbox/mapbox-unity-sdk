@@ -35,10 +35,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		int _spawnedCount;
 
-		public override void Run(FeatureBehaviour fb, UnityTile tile)
+		public override void Run(VectorEntity ve, UnityTile tile)
 		{
 			_spawnedCount = 0;
-			var collider = fb.GetComponent<Collider>();
+			var collider = ve.GameObject.GetComponent<Collider>();
 			var bounds = collider.bounds;
 			var center = bounds.center;
 			center.y = 0;
@@ -57,7 +57,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				{
 					//Debug.DrawLine(ray.origin, hit.point, Color.red, 1000);
 					var index = Random.Range(0, _prefabs.Length);
-					var transform = ((GameObject)Instantiate(_prefabs[index], fb.transform, false)).transform;
+					var transform = ((GameObject)Instantiate(_prefabs[index], ve.Transform, false)).transform;
 					transform.position = hit.point;
 					if (_randomizeRotation)
 					{

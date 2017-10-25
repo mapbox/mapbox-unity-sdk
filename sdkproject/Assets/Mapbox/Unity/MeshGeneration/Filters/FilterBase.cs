@@ -1,9 +1,10 @@
 namespace Mapbox.Unity.MeshGeneration.Filters
 {
-    using UnityEngine;
-    using Mapbox.Unity.MeshGeneration.Data;
+	using UnityEngine;
+	using Mapbox.Unity.MeshGeneration.Data;
+	using System;
 
-    public class FilterBase : ScriptableObject
+	public class FilterBase : ScriptableObject
     {
         public virtual string Key { get { return ""; } }
 
@@ -11,5 +12,10 @@ namespace Mapbox.Unity.MeshGeneration.Filters
         {
             return true;
         }
-    }
+
+		public virtual void Initialize()
+		{
+			
+		}
+	}
 }

@@ -10,9 +10,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
         [SerializeField]
         private int _layerId;
 
-		public override void Run(FeatureBehaviour fb, UnityTile tile)
+		public override void Run(VectorEntity ve, UnityTile tile)
         {
-            fb.gameObject.layer = _layerId;
+            ve.GameObject.layer = _layerId;
         }
     }
 }
