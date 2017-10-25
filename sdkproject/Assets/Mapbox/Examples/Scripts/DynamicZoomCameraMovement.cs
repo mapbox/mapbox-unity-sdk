@@ -22,7 +22,8 @@
 		DynamicZoomMap _dynamicZoomMap;
 
 		private Vector3 _origin;
-		Vector3 _mousePositionDelta;
+		Vector3 _mousePosition;
+		Vector3 _mousePositionPrevious;
 		bool _shouldDrag;
 
 		void Start()
@@ -43,6 +44,7 @@
 
 			//link zoomspeed to tilesize
 			_zoomSpeed = _dynamicZoomMap.UnityTileSize / 2f;
+			_mousePositionPrevious = Vector3.zero;
 		}
 
 
@@ -90,8 +92,8 @@
 				//assign distance of camera to ground plane to z, otherwise ScreenToWorldPoint() will always return the position of the camera
 				//http://answers.unity3d.com/answers/599100/view.html
 				mouseDownPosScreen.z = _referenceCamera.transform.localPosition.y;
-				_mousePositionDelta = _referenceCamera.ScreenToWorldPoint(mouseDownPosScreen) - _referenceCamera.transform.localPosition;
-				_mousePositionDelta.y = 0f;
+				_mousePosition = _referenceCamera.ScreenToWorldPoint(mouseDownPosScreen);
+				_mousePosition.y = 0f;
 				if (_shouldDrag == false)
 				{
 					_shouldDrag = true;
@@ -105,12 +107,20 @@
 
 			if (_shouldDrag)
 			{
-				var offset = _origin - _mousePositionDelta;
-				if (null != _dynamicZoomMap)
+				var changeFromPreviousPosition = _mousePositionPrevious - _mousePosition;
+				if (Mathf.Abs(changeFromPreviousPosition.x) > 0.0f || Mathf.Abs(changeFromPreviousPosition.z) > 0.0f)
 				{
-					float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) * 256 / _dynamicZoomMap.UnityTileSize;
-					var centerOld = _dynamicZoomMap.CenterMercator;
-					_dynamicZoomMap.SetCenterMercator(_dynamicZoomMap.CenterMercator + new Vector2d(offset.x * factor, offset.z * factor));
+					_mousePositionPrevious = _mousePosition;
+					var offset = _origin - _mousePosition;
+					if (Mathf.Abs(offset.x) > 0.0f || Mathf.Abs(offset.z) > 0.0f)
+					{
+						if (null != _dynamicZoomMap)
+						{
+							float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) * 256 / _dynamicZoomMap.UnityTileSize;
+							var centerOld = _dynamicZoomMap.CenterMercator;
+							_dynamicZoomMap.SetCenterMercator(_dynamicZoomMap.CenterMercator + new Vector2d(offset.x * factor, offset.z * factor));
+						}
+					}
 				}
 			}
 		}
