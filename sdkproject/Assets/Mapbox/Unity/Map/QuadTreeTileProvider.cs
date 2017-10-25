@@ -16,7 +16,7 @@
 
         [SerializeField]
         float _updateInterval;
-        Plane _groundPlane; 
+        Plane _groundPlane;
         float _elapsedTime;
         bool _shouldUpdate;
 
@@ -27,7 +27,7 @@
         }
 
         public void UpdateMapProperties(float diffZoom)
-        {            
+        {
             // Update the center based on current zoom level.
             var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(_map.CenterLatitudeLongitude, _map.Zoom));
             _map.SetCenterMercator(referenceTileRect.Center);
@@ -38,7 +38,7 @@
                 _map.Root.localScale = Vector3.one * Mathf.Pow(2, diffZoom);
             }
         }
-                           
+
         void Update()
         {
             //Camera Debugging
@@ -63,17 +63,17 @@
                 _elapsedTime = 0f;
 
                 if (Math.Abs(_map.ZoomRange - _map.Zoom) > 0.0f)
-                {                    
+                {
                     var diffZoom = _map.ZoomRange - _map.InitialZoom;
                     if (Math.Abs(diffZoom) > 0.5f)
                     {
-                        _map.SetZoom((int) Math.Ceiling(_map.ZoomRange));
+                        _map.SetZoom((int)Math.Ceiling(_map.ZoomRange));
                         //_previousZoomLevel = _map.Zoom;
                     }
                     UpdateMapProperties(diffZoom);
                 }
 
-                if(_map.MapPanned)
+                if (_map.MapPanned)
                 {
                     Vector2d panRange = _map.PanRange;
                     double xDelta = _map.CenterLatitudeLongitude.x + panRange.y;
@@ -96,14 +96,14 @@
                 foreach (var t2r in toRemove) { RemoveTile(t2r); }
                 var finalTilesNeeded = tilesToRequest.Except(activeTiles);
 
-                if(_map.MapPanned)
+                if (_map.MapPanned)
                 {
                     foreach (var tile in activeTiles)
                     {
                         // Reposition tiles in case we panned.
                         RepositionTile(tile);
                     }
-                    _map.SetPanRange(Vector2d.zero,true);
+                    _map.SetPanRange(Vector2d.zero, true);
                 }
 
                 foreach (var tile in finalTilesNeeded)
