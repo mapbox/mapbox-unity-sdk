@@ -74,7 +74,8 @@ Shader "Mapbox/Raster With Transparency"
 					fixed4 texColor = tex2D(_MainTex, uv);
 					
 					fixed4 color = o.color * texColor;
-					color.a =  ((texColor.r + texColor.g + texColor.b) * 0.33333f + _Color.a) * _Alpha;
+                    float threshold = step((texColor.r + texColor.g + texColor.b) * 0.33333f,0.1);
+					color.a =  (1 - ((threshold) * (1 -_Color.a))) * _Alpha;
 
 					return color;
 				}
