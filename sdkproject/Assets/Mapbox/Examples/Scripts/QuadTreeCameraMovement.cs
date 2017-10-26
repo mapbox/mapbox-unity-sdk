@@ -23,7 +23,8 @@
         AbstractMap _dynamicZoomMap;
 
         private Vector3 _origin;
-        Vector3 _delta;
+		Vector3 _mousePosition;
+		Vector3 _mousePositionPrevious;
         bool _shouldDrag;
         private Transform _originalCameraPosition;
 
@@ -112,8 +113,8 @@
                 //assign distance of camera to ground plane to z, otherwise ScreenToWorldPoint() will always return the position of the camera
                 //http://answers.unity3d.com/answers/599100/view.html
                 mousePosScreen.z = _referenceCamera.transform.localPosition.y;
-                _delta = _referenceCamera.ScreenToWorldPoint(mousePosScreen) - _referenceCamera.transform.localPosition;
-                _delta.y = 0f;
+                _mousePosition = _referenceCamera.ScreenToWorldPoint(mousePosScreen);
+                _mousePosition.y = 0f;
                 if (_shouldDrag == false)
                 {
                     _shouldDrag = true;
@@ -127,11 +128,22 @@
 
             if (_shouldDrag == true)
             {
-                var offset = _origin - _delta;
-                float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) / (256.0f * _dynamicZoomMap.Zoom * _dynamicZoomMap.UnityTileSize);
-                _dynamicZoomMap.SetPanRange(new Vector2d(offset.x * factor, offset.z * factor));
+				var changeFromPreviousPosition = _mousePositionPrevious - _mousePosition;
+				if (Mathf.Abs(changeFromPreviousPosition.x) > 0.0f || Mathf.Abs(changeFromPreviousPosition.z) > 0.0f)
+				{
+					_mousePositionPrevious = _mousePosition;
+					var offset = _origin - _mousePosition;
+					if (Mathf.Abs(offset.x) > 0.0f || Mathf.Abs(offset.z) > 0.0f)
+					{
+						if (null != _dynamicZoomMap)
+						{
+							float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) / (256.0f * _dynamicZoomMap.Zoom * _dynamicZoomMap.UnityTileSize);
+							_dynamicZoomMap.SetPanRange(new Vector2d(offset.x * factor, offset.z * factor));
 
-                UnityEngine.Debug.Log("Dragging : " + factor);
+							UnityEngine.Debug.Log("Dragging : " + factor);
+						}
+					}
+				}
             }
         }
     }
