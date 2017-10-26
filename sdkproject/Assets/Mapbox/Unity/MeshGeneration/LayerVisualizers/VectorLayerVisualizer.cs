@@ -177,9 +177,12 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		private void Build(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
 		{
-			if (!IsFeatureValid(feature))
+			if (feature.Properties.ContainsKey("extrude") && !Convert.ToBoolean(feature.Properties["extrude"]))
 				return;
 
+			if (feature.Points.Count < 1)
+				return;
+			
 			//this will be improved in next version and will probably be replaced by filters
 			var styleSelectorKey = FindSelectorKey(feature);
 
