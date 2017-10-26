@@ -44,7 +44,7 @@
             }
 
             //put camera facing down. 
-            _referenceCamera.transform.rotation = new Quaternion(0.7f, 0, 0, 0.7f);
+            //_referenceCamera.transform.rotation = new Quaternion(0.7f, 0, 0, 0.7f);
 
             //link zoomspeed to tilesize
             _zoomSpeed = _dynamicZoomMap.UnityTileSize / 2f;

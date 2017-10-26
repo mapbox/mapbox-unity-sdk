@@ -33,7 +33,7 @@
             _map.SetCenterMercator(referenceTileRect.Center);
 			_map.SetWorldRelativeScale((float)(_map.UnityTileSize / referenceTileRect.Size.x));
             //Scale the map accordingly.
-            if (Math.Abs(diffZoom) > 0.0f)
+			if (Math.Abs(diffZoom) > Constants.EpsilonFloatingPoint)
             {
                 _map.Root.localScale = Vector3.one * Mathf.Pow(2, diffZoom);
             }
@@ -62,10 +62,10 @@
             {
                 _elapsedTime = 0f;
 
-                if (Math.Abs(_map.ZoomRange - _map.Zoom) > 0.0f)
+                if (Math.Abs(_map.ZoomRange - _map.Zoom) > Constants.EpsilonFloatingPoint)
                 {
                     var diffZoom = _map.ZoomRange - _map.InitialZoom;
-                    if (Math.Abs(diffZoom) > 0.5f)
+                    if (Math.Abs(diffZoom) > 0.99f)
                     {
                         _map.SetZoom((int)Math.Ceiling(_map.ZoomRange));
                         //_previousZoomLevel = _map.Zoom;
