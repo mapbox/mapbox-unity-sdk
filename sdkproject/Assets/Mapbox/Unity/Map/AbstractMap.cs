@@ -155,7 +155,10 @@
 		{
 			_zoom = zoom;
 		}
-
+		public void SetWorldRelativeScale(float scale)
+		{
+			_worldRelativeScale = scale;
+		}
 		public event Action OnInitialized = delegate { };
 
 		void Awake()

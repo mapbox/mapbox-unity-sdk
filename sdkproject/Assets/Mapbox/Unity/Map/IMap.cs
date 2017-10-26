@@ -28,5 +28,6 @@
         void SetZoom(int zoom);
         void SetZoomRange(float zoom);
         void SetPanRange(Vector2d pan, bool reset = false);
+		void SetWorldRelativeScale(float scale);
     }
 }

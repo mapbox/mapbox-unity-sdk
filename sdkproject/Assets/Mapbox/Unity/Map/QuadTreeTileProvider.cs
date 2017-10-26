@@ -31,7 +31,7 @@
             // Update the center based on current zoom level.
             var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(_map.CenterLatitudeLongitude, _map.Zoom));
             _map.SetCenterMercator(referenceTileRect.Center);
-
+			_map.SetWorldRelativeScale((float)(_map.UnityTileSize / referenceTileRect.Size.x));
             //Scale the map accordingly.
             if (Math.Abs(diffZoom) > 0.0f)
             {
