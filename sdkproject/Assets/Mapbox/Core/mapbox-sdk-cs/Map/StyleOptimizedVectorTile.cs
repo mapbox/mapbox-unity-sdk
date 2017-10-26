@@ -44,7 +44,7 @@ namespace Mapbox.Map
 	{
 		// FIXME: Namespace here is very confusing and conflicts (sematically)
 		// with his class. Something has to be renamed here.
-		private Mapbox.VectorTile.VectorTile data;
+		private Mapbox.VectorTile.VectorTileData data;
 
 		string _optimizedStyleId;
 
@@ -54,7 +54,7 @@ namespace Mapbox.Map
 
 		/// <summary> Gets the vector decoded using Mapbox.VectorTile library. </summary>
 		/// <value> The GeoJson data. </value>
-		public Mapbox.VectorTile.VectorTile Data
+		public Mapbox.VectorTile.VectorTileData Data
 		{
 			get
 			{
@@ -177,7 +177,7 @@ namespace Mapbox.Map
 			try
 			{
 				var decompressed = Compression.Decompress(data);
-				this.data = new Mapbox.VectorTile.VectorTile(decompressed);
+				this.data = new Mapbox.VectorTile.VectorTileData(decompressed);
 
 				return true;
 			}
