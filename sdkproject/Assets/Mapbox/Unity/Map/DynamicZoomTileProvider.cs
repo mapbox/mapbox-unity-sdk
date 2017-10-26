@@ -37,7 +37,7 @@
 			_className = this.GetType().Name;
 
 			//ground plane for raycasting
-			_groundPlane = new Plane(Vector3.up, 0);
+			_groundPlane = new Plane(Mapbox.Unity.Constants.Math.Vector3Up, 0);
 			_dynamicZoomMap = _map as DynamicZoomMap;
 			if (null == _dynamicZoomMap) { Debug.LogErrorFormat("{0}: assigned map is not of type 'DynamicZoomMap'", _className); }
 
@@ -168,7 +168,7 @@
 		private Vector3 getGroundPlaneHitPoint(Ray ray)
 		{
 			float distance;
-			if (!_groundPlane.Raycast(ray, out distance)) { return Vector3.zero; }
+			if (!_groundPlane.Raycast(ray, out distance)) { return Mapbox.Unity.Constants.Math.Vector3Zero; }
 			return ray.GetPoint(distance);
 		}
 	}

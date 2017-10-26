@@ -34,7 +34,7 @@ namespace Mapbox.Unity.Map
 
 		public override void OnInitialized()
 		{
-			_groundPlane = new Plane(Vector3.up, Mapbox.Unity.Constants.Math.Vector3Zero);
+			_groundPlane = new Plane(Mapbox.Unity.Constants.Math.Vector3Up, Mapbox.Unity.Constants.Math.Vector3Zero);
 			_viewportTarget = new Vector3(0.5f, 0.5f, 0);
 			_shouldUpdate = true;
 		}

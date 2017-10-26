@@ -126,7 +126,7 @@
 			tile.MeshFilter.mesh.RecalculateBounds();
 			tile.MeshFilter.mesh.RecalculateNormals();
 
-			tile.transform.localPosition = Vector3.zero;
+			tile.transform.localPosition = Mapbox.Unity.Constants.Math.Vector3Zero;
 		}
 
 		internal override void OnUnregistered(UnityTile tile)

@@ -63,7 +63,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			float d = 0f;
 			Vector3 v1;
-			Vector3 v2 = Vector3.zero;
+			Vector3 v2 = Mapbox.Unity.Constants.Math.Vector3Zero;
 			int ind = 0;
 
 			var wallTri = new List<int>();

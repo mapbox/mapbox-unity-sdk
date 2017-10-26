@@ -143,7 +143,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			var sideVertBase = _newVertexList.Count;
 			
-			var bb = new List<Vector3>();
 			var lastRow = (_sampleCount - 1) * _sampleCount;
 			var baseTriList = new List<int>();
 			for (int x = 0; x < _sampleCount; x++)
@@ -156,8 +155,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					_newVertexList[x].x,
 					-_earthDepth,
 					_newVertexList[x].z));
-				_newNormalList.Add(Vector3.forward);
-				_newNormalList.Add(Vector3.forward);
+				_newNormalList.Add(Mapbox.Unity.Constants.Math.Vector3Forward);
+				_newNormalList.Add(Mapbox.Unity.Constants.Math.Vector3Forward);
 				_newUvList.Add(new Vector2(_newUvList[x * _sampleCount].y, 1));
 				_newUvList.Add(new Vector2(_newUvList[x * _sampleCount].y, 0));
 				 
