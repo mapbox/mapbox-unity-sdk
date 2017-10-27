@@ -70,10 +70,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						minHeight = Convert.ToSingle(feature.Properties["min_height"]) * _scale;
 						hf -= minHeight;
 					}
-
-				}
-				if (feature.Properties.ContainsKey("ele"))
+				} 
+				else if (feature.Properties.ContainsKey("ele"))
 				{
+					//"ele" is used in contour layer for elevation
 					hf = Convert.ToSingle(feature.Properties["ele"]);
 					hf *= _scale;
 				}

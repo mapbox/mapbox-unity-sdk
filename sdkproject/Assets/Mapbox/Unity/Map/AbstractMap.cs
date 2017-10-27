@@ -49,6 +49,8 @@
 			}
 		}
 
+		
+
 		[SerializeField]
 		protected float _unityTileSize = 100;
 		public float UnityTileSize
@@ -186,5 +188,10 @@
 		}
 
 		public abstract void Initialize(Vector2d latLon, int zoom);
+
+		public void Reset()
+		{
+			Initialize(Conversions.StringToLatLon(_latitudeLongitudeString), _zoom);
+		}
 	}
 }

@@ -90,7 +90,7 @@
 			// Cleanup gameobjects and clear lists!
 			// This scriptable object may be re-used, but it's gameobjects are likely 
 			// to be destroyed by a scene change, for example. 
-			foreach (var tile in _activeTiles.Values.ToList())
+			foreach (var tile in _activeTiles.Values)
 			{
 				Destroy(tile.gameObject);
 			}
