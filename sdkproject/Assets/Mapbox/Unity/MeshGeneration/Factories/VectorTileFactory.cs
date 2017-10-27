@@ -52,18 +52,21 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
 			_cachedData.Clear();
-			foreach (LayerVisualizerBase factory in Visualizers)
+			foreach (LayerVisualizerBase visualizer in Visualizers)
 			{
-				if (factory == null)
-					continue;
-
-				if (_layerBuilder.ContainsKey(factory.Key))
+				visualizer.Initialize();
+				if (visualizer == null)
 				{
-					_layerBuilder[factory.Key].Add(factory);
+					continue;
+				}
+
+				if (_layerBuilder.ContainsKey(visualizer.Key))
+				{
+					_layerBuilder[visualizer.Key].Add(visualizer);
 				}
 				else
 				{
-					_layerBuilder.Add(factory.Key, new List<LayerVisualizerBase>() { factory });
+					_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase>() { visualizer });
 				}
 			}
 		}
@@ -73,17 +76,23 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			var vectorTile = new VectorTile();
 			tile.AddTile(vectorTile);
 
-			Progress++;
+			
 			vectorTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
 				if (vectorTile.HasError)
 				{
 					tile.VectorDataState = TilePropertyState.Error;
-					Progress--;
 					return;
 				}
 
-				_cachedData.Add(tile, vectorTile);
+				if (_cachedData.ContainsKey(tile))
+				{
+					_cachedData[tile] = vectorTile;
+				}
+				else
+				{
+					_cachedData.Add(tile, vectorTile);
+				}
 
 				// FIXME: we can make the request BEFORE getting a response from these!
 				if (tile.HeightDataState == TilePropertyState.Loading ||
@@ -104,6 +113,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			// We are no longer interested in this tile's notifications.
 			tile.OnHeightDataChanged -= DataChangedHandler;
 			tile.OnRasterDataChanged -= DataChangedHandler;
+
+			foreach (var vis in Visualizers)
+			{
+				vis.UnregisterTile(tile);
+			}
 		}
 
 		private void DataChangedHandler(UnityTile t)
@@ -137,16 +151,20 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					{
 						if (builder.Active)
 						{
-							builder.Create(_cachedData[tile].Data.GetLayer(layerName), tile);
+							Progress++;
+							builder.Create(_cachedData[tile].Data.GetLayer(layerName), tile, DecreaseProgressCounter);
 						}
 					}
 				}
 			}
 
 			tile.VectorDataState = TilePropertyState.Loaded;
-			Progress--;
-
 			_cachedData.Remove(tile);
+		}
+
+		private void DecreaseProgressCounter()
+		{
+			Progress--;
 		}
 	}
 }

@@ -38,3 +38,8 @@
   ```
 
 - Prefer good variable and method naming over comments. The exception is using comments for documentation purposes or complex algorithms.
+
+<img width="307" alt="screen shot 2017-10-25 at 2 09 16 pm" src="https://user-images.githubusercontent.com/23202691/32020662-31ed7d82-b98e-11e7-8705-a3016d7f038b.png">
+
+__Example IDE settings (captured from Xamarin)__
+
