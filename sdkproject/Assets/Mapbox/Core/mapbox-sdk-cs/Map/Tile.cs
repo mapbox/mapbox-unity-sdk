@@ -114,7 +114,7 @@ namespace Mapbox.Map
         /// <summary>
         /// Occurs when there's a tile error. It bubbles up all the way up to  the AbstractTileFactory and MapVisualizer
         /// </summary>
-        public event Action<CanonicalTileId> OnTileError = delegate { };
+		public event Action<TileErrorEventArgs> OnTileError = delegate { };
 
 		/// <summary>
 		///     Initializes the <see cref="T:Mapbox.Map.Tile"/> object. It will
@@ -129,12 +129,6 @@ namespace Mapbox.Map
 			_state = State.Loading;
 			_id = param.Id;
 			_callback = callback;
-
-            if (OnTileError!=null)
-            {
-                OnTileError(_id);
-            }
-
 			_request = param.Fs.Request(MakeTileResource(param.MapId).GetUrl(), HandleTileResponse, tileId: _id, mapId: param.MapId);
 		}
 
@@ -216,6 +210,10 @@ namespace Mapbox.Map
 			if (response.HasError)
 			{
 				response.Exceptions.ToList().ForEach(e => AddException(e));
+				if (OnTileError != null)
+				{
+					OnTileError(new TileErrorEventArgs(_id,null,_exceptions));
+				}
 			}
 			else
 			{

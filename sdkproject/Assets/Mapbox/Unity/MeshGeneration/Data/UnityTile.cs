@@ -112,7 +112,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public event Action<UnityTile> OnRasterDataChanged = delegate { };
 		public event Action<UnityTile> OnVectorDataChanged = delegate { };
 
-        public event Action<CanonicalTileId> OnTileErrorEvent = delegate { };
+		public event Action<TileErrorEventArgs> OnTileError = delegate { };
 
 
 		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, float scale, Texture2D loadingTexture = null)
@@ -230,7 +230,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
         internal void AddTile(Tile tile)
 		{
 			_tiles.Add(tile);
-            tile.OnTileError += OnTileError;
+            tile.OnTileError += OnTileErrorHandler;
 		}
 
 		public void Cancel()
@@ -238,15 +238,15 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			for (int i = 0, _tilesCount = _tiles.Count; i < _tilesCount; i++)
 			{
 				_tiles[i].Cancel();
-                _tiles[i].OnTileError -= OnTileError;
+                _tiles[i].OnTileError -= OnTileErrorHandler;
 			}
 		}
 
         //OnTileError delegate handle method to bubble up the event all the way up to the chain to AbstractTileFactory and MapVisualizer
-        private void OnTileError(CanonicalTileId id){
-            if (OnTileErrorEvent != null)
+		private void OnTileErrorHandler(TileErrorEventArgs e){
+            if (OnTileError != null)
             {
-                OnTileErrorEvent(id);
+				OnTileError(new TileErrorEventArgs(e.TileId,this,e.Exceptions));
             }
         }
 

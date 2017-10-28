@@ -45,7 +45,7 @@
 		public Dictionary<UnwrappedTileId, UnityTile> ActiveTiles { get { return _activeTiles; } }
 
 		public event Action<ModuleState> OnMapVisualizerStateChanged = delegate { };
-        public event Action<CanonicalTileId> OnTileError = delegate { };
+		public event Action<TileErrorEventArgs> OnTileError = delegate { };
 
 		/// <summary>
 		/// Initializes the factories by passing the file source down, which is necessary for data (web/file) calls
@@ -167,11 +167,11 @@
 			return unityTile;
 		}
 
-        private void Factory_OnTileError(CanonicalTileId id)
+		private void Factory_OnTileError(TileErrorEventArgs e)
         {
             if(OnTileError != null)
             {
-                OnTileError(id);
+                OnTileError(e);
             }
         }
 

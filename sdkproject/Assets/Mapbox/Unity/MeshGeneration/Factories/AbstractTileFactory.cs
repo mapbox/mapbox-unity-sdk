@@ -41,7 +41,7 @@
         /// The OnTileError event triggers when there's tile error.
         /// It returns the Mapbox.Map.CanonicalTileId instance for the tile on which error occurred.
         /// </summary>
-        public event Action<CanonicalTileId> OnTileError = delegate { };
+		public event Action<TileErrorEventArgs> OnTileError = delegate { };
 
         public void Initialize(IFileSource fileSource)
         {
@@ -54,20 +54,20 @@
         public void Register(UnityTile tile)
         {
             OnRegistered(tile);
-            tile.OnTileErrorEvent += Tile_OnTileErrorEvent;
+            tile.OnTileError += Tile_OnTileErrorEvent;
         }
 
         public void Unregister(UnityTile tile)
         {
             OnUnregistered(tile);
-            tile.OnTileErrorEvent -= Tile_OnTileErrorEvent;
+            tile.OnTileError -= Tile_OnTileErrorEvent;
         }
 
-        private void Tile_OnTileErrorEvent(CanonicalTileId id)
+		private void Tile_OnTileErrorEvent(TileErrorEventArgs e)
         {
             if (OnTileError != null)
             {
-                OnTileError(id);
+                OnTileError(e);
             }
         }
 
