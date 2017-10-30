@@ -212,7 +212,7 @@ namespace Mapbox.Map
 				response.Exceptions.ToList().ForEach(e => AddException(e));
 				if (OnTileError != null)
 				{
-					OnTileError(new TileErrorEventArgs(_id,null,_exceptions));
+					OnTileError(new TileErrorEventArgs(_id,this.GetType(),null,_exceptions));
 				}
 			}
 			else

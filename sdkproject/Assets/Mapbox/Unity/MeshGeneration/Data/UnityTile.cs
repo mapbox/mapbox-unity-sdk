@@ -246,7 +246,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		private void OnTileErrorHandler(TileErrorEventArgs e){
             if (OnTileError != null)
             {
-				OnTileError(new TileErrorEventArgs(e.TileId,this,e.Exceptions));
+				e.UnityTileInstance = this;
+				OnTileError(e);
             }
         }
 
