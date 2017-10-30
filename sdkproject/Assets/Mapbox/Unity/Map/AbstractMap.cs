@@ -22,31 +22,6 @@
             _zoomRange = zoom;
         }
 
-        protected Vector2d _panRange;
-        public Vector2d PanRange
-        {
-            get { return _panRange; }
-        }
-
-        public void SetPanRange(Vector2d pan, bool reset = false)
-        {
-            if (reset)
-            {
-                _mapPanned = false;
-                _panRange = Vector2d.zero;
-            }
-            else
-            {
-                _mapPanned = true;
-                _panRange = pan;
-            }
-        }
-        protected bool _mapPanned; 
-        public bool MapPanned
-        {
-            get { return _mapPanned; }
-        }
-
 		[SerializeField]
 		bool _initializeOnStart = true;
 

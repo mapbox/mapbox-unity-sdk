@@ -20,6 +20,33 @@
         float _elapsedTime;
         bool _shouldUpdate;
 
+
+		protected Vector2d _panRange;
+		public Vector2d PanRange
+		{
+			get { return _panRange; }
+		}
+
+		public void SetPanRange(Vector2d pan, bool reset = false)
+		{
+			if (reset)
+			{
+				_mapPanned = false;
+				_panRange = Vector2d.zero;
+			}
+			else
+			{
+				_mapPanned = true;
+				_panRange = pan;
+			}
+		}
+
+		protected bool _mapPanned;
+		public bool MapPanned
+		{
+			get { return _mapPanned; }
+		}
+
         public override void OnInitialized()
         {
             _groundPlane = new Plane(Vector3.up, 0);
@@ -73,9 +100,9 @@
                     UpdateMapProperties(diffZoom);
                 }
 
-                if (_map.MapPanned)
+                if (MapPanned)
                 {
-                    Vector2d panRange = _map.PanRange;
+                    Vector2d panRange = PanRange;
                     double xDelta = _map.CenterLatitudeLongitude.x + panRange.y;
                     double zDelta = _map.CenterLatitudeLongitude.y + panRange.x;
 
@@ -96,14 +123,14 @@
                 foreach (var t2r in toRemove) { RemoveTile(t2r); }
                 var finalTilesNeeded = tilesToRequest.Except(activeTiles);
 
-                if (_map.MapPanned)
+                if (MapPanned)
                 {
                     foreach (var tile in activeTiles)
                     {
                         // Reposition tiles in case we panned.
                         RepositionTile(tile);
                     }
-                    _map.SetPanRange(Vector2d.zero, true);
+                    SetPanRange(Vector2d.zero, true);
                 }
 
                 foreach (var tile in finalTilesNeeded)

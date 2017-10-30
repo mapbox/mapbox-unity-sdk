@@ -103,7 +103,7 @@
 
 
 
-                _dynamicZoomMap.SetPanRange(new Vector2d(xMove * factor, zMove * factor));
+                _quadTreeTileProvider.SetPanRange(new Vector2d(xMove * factor, zMove * factor));
             }
 
             //pan mouse
@@ -138,7 +138,7 @@
 						if (null != _dynamicZoomMap)
 						{
 							float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) / (256.0f * _dynamicZoomMap.Zoom * _dynamicZoomMap.UnityTileSize);
-							_dynamicZoomMap.SetPanRange(new Vector2d(offset.x * factor, offset.z * factor));
+							_quadTreeTileProvider.SetPanRange(new Vector2d(offset.x * factor, offset.z * factor));
 
 							UnityEngine.Debug.Log("Dragging : " + factor);
 						}
