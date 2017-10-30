@@ -53,8 +53,10 @@
             _shouldUpdate = true;
         }
 
-        public void UpdateMapProperties(float diffZoom)
+		public void UpdateMapProperties(Vector2d centerLatitudeLongitude ,float diffZoom)
         {
+			//Update center latitude longitude
+			_map.SetCenterLatitudeLongitude(centerLatitudeLongitude);
             // Update the center based on current zoom level.
             var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(_map.CenterLatitudeLongitude, _map.Zoom));
             _map.SetCenterMercator(referenceTileRect.Center);
@@ -94,10 +96,9 @@
                     var diffZoom = _map.ZoomRange - _map.InitialZoom;
                     if (Math.Abs(diffZoom) > 0.99f)
                     {
-                        _map.SetZoom((int)Math.Ceiling(_map.ZoomRange));
-                        //_previousZoomLevel = _map.Zoom;
+                        _map.SetZoom((int)Math.Ceiling(_map.ZoomRange));                       
                     }
-                    UpdateMapProperties(diffZoom);
+                    UpdateMapProperties(_map.CenterLatitudeLongitude, diffZoom);
                 }
 
                 if (MapPanned)
@@ -108,9 +109,8 @@
 
                     xDelta = xDelta > 0 ? Mathd.Min(xDelta, Mapbox.Utils.Constants.WebMercMax) : Mathd.Max(xDelta, -Mapbox.Utils.Constants.WebMercMax);
                     zDelta = zDelta > 0 ? Mathd.Min(zDelta, Mapbox.Utils.Constants.WebMercMax) : Mathd.Max(zDelta, -Mapbox.Utils.Constants.WebMercMax);
-
-                    _map.SetCenterLatitudeLongitude(new Vector2d(xDelta, zDelta));
-                    UpdateMapProperties(0);
+					                  
+					UpdateMapProperties(new Vector2d(xDelta, zDelta), 0);
                 }
 
                 //update viewport in case it was changed by switching zoom level
