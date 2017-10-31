@@ -20,18 +20,20 @@ namespace Mapbox.Unity.Utilities
 	internal sealed class HTTPRequest : IAsyncRequest
 	{
 		private UnityWebRequest _request;
+		private int _timeout;
 		private readonly Action<Response> _callback;
 		bool _wasCancelled;
 
 		public bool IsCompleted { get; private set; }
 
-
+		// TODO: simplify timeout for Unity 5.6+
+		// https://docs.unity3d.com/ScriptReference/Networking.UnityWebRequest-timeout.html
 		public HTTPRequest(string url, Action<Response> callback, int timeout)
 		{
 			//UnityEngine.Debug.Log("HTTPRequest: " + url);
 			IsCompleted = false;
+			_timeout = timeout;
 			_request = UnityWebRequest.Get(url);
-			_request.timeout = timeout;
 			_callback = callback;
 
 #if UNITY_EDITOR
@@ -55,13 +57,26 @@ namespace Mapbox.Unity.Utilities
 
 		private IEnumerator DoRequest()
 		{
-			yield return _request.SendWebRequest();
+			_request.Send();
+
+			DateTime timeout = DateTime.Now.AddSeconds(_timeout);
+			bool didTimeout = false;
+
+			while (!_request.isDone)
+			{
+				yield return null;
+				if (DateTime.Now > timeout)
+				{
+					_request.Abort();
+					didTimeout = true;
+					break;
+				}
+			}
 
 			Response response;
-			if (_request.isHttpError || _request.isNetworkError)
+			if (didTimeout)
 			{
-				// no need to pass '_request.error' as exception, this will be assigned within 'Response.FromWebResponse()'
-				response = Response.FromWebResponse(this, _request, null);
+				response = Response.FromWebResponse(this, _request, new Exception("Request Timed Out"));
 			}
 			else
 			{
