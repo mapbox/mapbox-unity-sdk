@@ -23,7 +23,7 @@
     {
         void SetCenterMercator(Vector2d centerMercator);
         void SetCenterLatitudeLongitude(Vector2d centerLatitudeLongitude);
-        void SetZoom(int zoom);
+        //void SetZoom(int zoom);
         void SetZoomRange(float zoom);        
 		void SetWorldRelativeScale(float scale);
     }

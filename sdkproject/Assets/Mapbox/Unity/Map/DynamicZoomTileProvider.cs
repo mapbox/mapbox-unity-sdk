@@ -92,7 +92,7 @@
 			{
 				//already at highest level, don't do anything -> camera free to move closer
 				if (_dynamicZoomMap.Zoom == _dynamicZoomMap.MaxZoom) { return; }
-				_dynamicZoomMap.SetZoom(_dynamicZoomMap.Zoom + 1);
+				_dynamicZoomMap.SetZoomRange(_dynamicZoomMap.Zoom + 1);
 				//reposition camera at max distance
 				localPosition.y = _cameraZoomingRangeMaxY;
 				_referenceCamera.transform.localPosition = localPosition;
@@ -102,7 +102,7 @@
 			{
 				//already at lowest level, don't do anything -> camera free to move further away
 				if (_dynamicZoomMap.Zoom == _dynamicZoomMap.MinZoom) { return; }
-				_dynamicZoomMap.SetZoom(_dynamicZoomMap.Zoom - 1);
+				_dynamicZoomMap.SetZoomRange(_dynamicZoomMap.Zoom - 1);
 				//reposition camera at min distance
 				localPosition.y = _cameraZoomingRangeMinY;
 				_referenceCamera.transform.localPosition = localPosition;

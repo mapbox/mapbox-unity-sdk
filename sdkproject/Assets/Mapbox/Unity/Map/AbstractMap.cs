@@ -8,20 +8,20 @@
 
 	public abstract class AbstractMap : MonoBehaviour, IMap
 	{
-        protected float _zoomRange;
-        public float ZoomRange
-        {
-            get 
-            {
-                return _zoomRange;
-            }
-        }
-
-        public void SetZoomRange(float zoom)
-        {
-            _zoomRange = zoom;
-        }
-
+		[SerializeField]
+		[Range(0, 22)]
+		protected float _zoomRange;
+		public float ZoomRange
+		{
+			get
+			{
+				return _zoomRange;
+			}
+		}
+		public void SetZoomRange(float zoom)
+		{
+			_zoomRange = zoom;
+		}
 		[SerializeField]
 		bool _initializeOnStart = true;
 
@@ -29,14 +29,13 @@
 		[SerializeField]
 		protected string _latitudeLongitudeString;
 
-		[SerializeField]
-		[Range(0, 22)]
-		protected int _zoom;
+
+		//private int _zoom;
 		public int Zoom
 		{
 			get
 			{
-				return _zoom;
+				return (int)Math.Ceiling(ZoomRange);
 			}
 		}
         protected int _initialZoom;
@@ -126,10 +125,10 @@
 			_centerLatitudeLongitude = centerLatitudeLongitude;
 		}
 
-		public void SetZoom(int zoom)
-		{
-			_zoom = zoom;
-		}
+		//public void SetZoom(int zoom)
+		//{
+		//	_zoom = zoom;
+		//}
 		public void SetWorldRelativeScale(float scale)
 		{
 			_worldRelativeScale = scale;
@@ -153,9 +152,9 @@
 		{
 			if (_initializeOnStart)
 			{
-				Initialize(Conversions.StringToLatLon(_latitudeLongitudeString), _zoom);
+				Initialize(Conversions.StringToLatLon(_latitudeLongitudeString), Zoom);
 			}
-            _initialZoom = _zoom;
+            _initialZoom = Zoom;
 		}
 
 		// TODO: implement IDisposable, instead?

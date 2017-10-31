@@ -10,9 +10,9 @@
 		{
 			_worldHeightFixed = false;
 			_centerLatitudeLongitude = latLon;
-			_zoom = zoom;
+			//_zoom = zoom;
             _zoomRange = zoom;
-			var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(_centerLatitudeLongitude, _zoom));
+			var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(_centerLatitudeLongitude, Zoom));
 			_centerMercator = referenceTileRect.Center;
 
 			_worldRelativeScale = (float)(_unityTileSize / referenceTileRect.Size.x);
