@@ -1,6 +1,7 @@
 ﻿namespace Mapbox.Examples
 {
 	using System;
+	using System.Linq;
 	using Mapbox.Map;
 	using Mapbox.Unity.Map;
 	using UnityEngine;
@@ -19,7 +20,7 @@
 
 		void OnEnable()
 		{
-			if(_mapInstance==null)
+			if (_mapInstance == null)
 			{
 				_mapInstance = GetComponent<AbstractMap>();
 			}
@@ -29,10 +30,22 @@
 
 		private void _OnTileErrorHandler(TileErrorEventArgs e)
 		{
-			foreach (var exception in e.Exceptions)
+			//foreach (var exception in e.Exceptions)
+			//{
+			//	Debug.LogError(String.Format("Exception caused on the tile. Tile ID:{0} :: {1}", e.TileId, exception));
+			//}
+
+			if (e.Exceptions.Count > 0)
 			{
-				Debug.LogError(String.Format("Exception caused on the tile. Tile ID:{0} :: {1}", e.TileId, exception));
+				Debug.LogError(String.Format(
+					"{0} Exception(s) caused on the tile. Tile ID:{1}{2}{3}"
+					, e.Exceptions.Count
+					, e.TileId
+					, Environment.NewLine
+					, string.Join(Environment.NewLine, e.Exceptions.Select(ex => ex.Message).ToArray())
+				));
 			}
+
 
 			if (OnTileError != null)
 			{
