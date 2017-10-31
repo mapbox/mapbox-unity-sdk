@@ -12,10 +12,10 @@
 	/// </summary>
 	public class HandleTileErrorExample : MonoBehaviour
 	{
-		public TileErrorEvent OnTileError;
 
 		[SerializeField]
 		private AbstractMap _mapInstance;
+		public TileErrorEvent OnTileError;
 
 		void OnEnable()
 		{
