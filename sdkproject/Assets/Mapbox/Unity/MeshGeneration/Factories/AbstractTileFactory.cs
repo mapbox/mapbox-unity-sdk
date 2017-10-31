@@ -38,8 +38,8 @@
 
 		public event Action<AbstractTileFactory> OnFactoryStateChanged = delegate { };
         /// <summary>
-        /// The OnTileError event triggers when there's tile error.
-        /// It returns the Mapbox.Map.CanonicalTileId instance for the tile on which error occurred.
+		/// The  <c>OnTileError</c> event triggers when there's <c>Tile</c> error.
+		/// Returns a <see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance as a parameter, for the tile on which error occurred.
         /// </summary>
 		public event Action<TileErrorEventArgs> OnTileError = delegate { };
 

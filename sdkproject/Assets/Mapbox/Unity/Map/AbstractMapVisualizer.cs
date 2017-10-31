@@ -45,6 +45,11 @@
 		public Dictionary<UnwrappedTileId, UnityTile> ActiveTiles { get { return _activeTiles; } }
 
 		public event Action<ModuleState> OnMapVisualizerStateChanged = delegate { };
+
+		/// <summary>
+		/// The  <c>OnTileError</c> event triggers when there's a <c>Tile</c> error.
+		/// Returns a <see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance as a parameter, for the tile on which error occurred.
+        /// </summary>
 		public event Action<TileErrorEventArgs> OnTileError = delegate { };
 
 		/// <summary>

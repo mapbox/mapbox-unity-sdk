@@ -112,7 +112,7 @@ namespace Mapbox.Map
 		}
 
         /// <summary>
-        /// Occurs when there's a tile error. It bubbles up all the way up to  the AbstractTileFactory and MapVisualizer
+		/// Occurs when there's a <c>Tile<c/> error. It bubbles up all the way up to  the <see cref="T:Mapbox.Unity.Map.AbstractTileFactory"/> and <see cref="T:Mapbox.Unity.Map.AbstractMapVisualizer"/>
         /// </summary>
 		public event Action<TileErrorEventArgs> OnTileError = delegate { };
 
