@@ -73,13 +73,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					filter.Initialize();
 				}
 			}
-			foreach (var item in Stacks)
-			{
-				if (item != null && item.Stack != null)
-				{
-					item.Stack.Initialize();
-				}
-			}
+			
 			if (_defaultStack != null)
 			{
 				_defaultStack.Initialize();
