@@ -21,7 +21,6 @@ namespace Mapbox.Unity.Utilities
 	{
 		private UnityWebRequest _request;
 		private readonly Action<Response> _callback;
-		bool _wasCancelled;
 
 		public bool IsCompleted { get; private set; }
 
@@ -44,8 +43,6 @@ namespace Mapbox.Unity.Utilities
 
 		public void Cancel()
 		{
-			_wasCancelled = true;
-
 			if (_request != null)
 			{
 				_request.Abort();
@@ -54,14 +51,9 @@ namespace Mapbox.Unity.Utilities
 
 		private IEnumerator DoRequest()
 		{
-			 yield return _request.Send();
+			yield return _request.Send();
 
-			Response response;
-			if (_wasCancelled)
-			{
-				Debug.Log("HTTPRequest: " + _wasCancelled);
-			}
-			response = Response.FromWebResponse(this, _request, _wasCancelled ? new Exception("Request Cancelled") : null);
+			var response = Response.FromWebResponse(this, _request, null);
 
 			_callback(response);
 			_request.Dispose();
