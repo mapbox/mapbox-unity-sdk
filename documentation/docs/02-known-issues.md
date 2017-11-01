@@ -31,4 +31,7 @@
 - Traffic visualizer is not offsetting data for both sides of the street
 
 
+###Tile Error Callbacks
+- When a client sends a `Cancel()` / `Recycle()` request to a `UnityTile` instance, the `OnTileError` event handler method is unsubscribed from the `OnTileError` event. Followed by that, a "request aborted" exception is sent as a part of the response to the requested `Tile`. But, the `UnityTile` instance cannot listen to this exception since, it has already unsubscribed from the `OnTileError` event
+
 
