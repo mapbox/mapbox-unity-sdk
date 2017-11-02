@@ -30,10 +30,6 @@
 
 		private void _OnTileErrorHandler(TileErrorEventArgs e)
 		{
-			//foreach (var exception in e.Exceptions)
-			//{
-			//	Debug.LogError(String.Format("Exception caused on the tile. Tile ID:{0} :: {1}", e.TileId, exception));
-			//}
 
 			if (e.Exceptions.Count > 0)
 			{
