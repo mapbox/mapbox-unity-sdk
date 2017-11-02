@@ -117,12 +117,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, float scale, int zoom, Texture2D loadingTexture = null)
 		{
-			bool didWorldRelativeScaleChange = false;
-
-			if (Mathf.Abs(TileScale - scale) > 1E-05f)
-			{				
-				didWorldRelativeScaleChange = true;
-			}
 			TileScale = scale;
 			_relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
 			_rect = Conversions.TileBounds(tileId);
@@ -135,20 +129,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
             {
 				isInitialized = true;
                 InitialZoom = zoom;
-				//scaleFactor = Mathf.Pow(2, (map.InitialZoom - zoom));
-            }
-			else 
-            {
-				if(didWorldRelativeScaleChange)
-				{
-					scaleFactor = Mathf.Pow(2, (map.InitialZoom - zoom));
-				}
-				else
-				{
-					scaleFactor = Mathf.Pow(2, (InitialZoom - zoom));
-				}                
             }
 
+			scaleFactor = Mathf.Pow(2, (map.InitialZoom - zoom));
 			gameObject.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
 			gameObject.SetActive(true);
 		}
