@@ -81,8 +81,8 @@
 			double xDelta = centerLatitudeLongitude.x;
 			double zDelta = centerLatitudeLongitude.y;
 
-			xDelta = xDelta > 0 ? Mathd.Min(xDelta, Mapbox.Utils.Constants.WebMercMax) : Mathd.Max(xDelta, -Mapbox.Utils.Constants.WebMercMax);
-			zDelta = zDelta > 0 ? Mathd.Min(zDelta, Mapbox.Utils.Constants.WebMercMax) : Mathd.Max(zDelta, -Mapbox.Utils.Constants.WebMercMax);
+			xDelta = xDelta > 0 ? Mathd.Min(xDelta, Mapbox.Utils.Constants.LatitudeMax) : Mathd.Max(xDelta, -Mapbox.Utils.Constants.LatitudeMax);
+			zDelta = zDelta > 0 ? Mathd.Min(zDelta, Mapbox.Utils.Constants.LongitudeMax) : Mathd.Max(zDelta, -Mapbox.Utils.Constants.LongitudeMax);
 
 			_map.SetCenterLatitudeLongitude(new Vector2d(xDelta, zDelta));
 			// Update the center based on current zoom level.
@@ -118,11 +118,6 @@
 			if (_elapsedTime >= _updateInterval)
 			{
 				_elapsedTime = 0f;
-
-				if (Math.Abs(ZoomRange - _map.ZoomRange) > Constants.EpsilonFloatingPoint)
-				{
-					UpdateMapProperties(_map.CenterLatitudeLongitude, ZoomRange);
-				}
 
 				//update viewport in case it was changed by switching zoom level
 				Vector2dBounds _viewPortWebMercBounds = getcurrentViewPortWebMerc();
