@@ -11,9 +11,9 @@
         Vector2d CenterMercator { get; }
         float WorldRelativeScale { get; }
         Vector2d CenterLatitudeLongitude { get; }        
-        float ZoomRange { get; }
+        float Zoom { get; }
         int InitialZoom { get; }
-        int Zoom { get; }
+        int AbsoluteZoom { get; }
         Transform Root { get; }
         float UnityTileSize { get; }
         event Action OnInitialized;        

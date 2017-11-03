@@ -10,17 +10,17 @@
 	{
 		[SerializeField]
 		[Range(0, 22)]
-		protected float _zoomRange;
-		public float ZoomRange
+		protected float _zoom;
+		public float Zoom
 		{
 			get
 			{
-				return _zoomRange;
+				return _zoom;
 			}
 		}
 		public void SetZoomRange(float zoom)
 		{
-			_zoomRange = zoom;
+			_zoom = zoom;
 		}
 		[SerializeField]
 		bool _initializeOnStart = true;
@@ -29,23 +29,21 @@
 		[SerializeField]
 		protected string _latitudeLongitudeString;
 
-
-		//private int _zoom;
-		public int Zoom
+		public int AbsoluteZoom
 		{
 			get
 			{
-				return (int)Math.Ceiling(ZoomRange);
+				return (int)Math.Ceiling(Zoom);
 			}
 		}
-        protected int _initialZoom;
-        public int InitialZoom
-        {
-            get
-            {
-                return _initialZoom;
-            }
-        }
+		protected int _initialZoom;
+		public int InitialZoom
+		{
+			get
+			{
+				return _initialZoom;
+			}
+		}
 
 		[SerializeField]
 		protected Transform _root;
@@ -125,10 +123,6 @@
 			_centerLatitudeLongitude = centerLatitudeLongitude;
 		}
 
-		//public void SetZoom(int zoom)
-		//{
-		//	_zoom = zoom;
-		//}
 		public void SetWorldRelativeScale(float scale)
 		{
 			_worldRelativeScale = scale;
@@ -141,7 +135,7 @@
 			_fileSouce = MapboxAccess.Instance;
 			_tileProvider.OnTileAdded += TileProvider_OnTileAdded;
 			_tileProvider.OnTileRemoved += TileProvider_OnTileRemoved;
-            _tileProvider.OnTileRepositioned += TileProvider_OnTileRepositioned;
+			_tileProvider.OnTileRepositioned += TileProvider_OnTileRepositioned;
 			if (!_root)
 			{
 				_root = transform;
@@ -152,9 +146,9 @@
 		{
 			if (_initializeOnStart)
 			{
-				Initialize(Conversions.StringToLatLon(_latitudeLongitudeString), Zoom);
+				Initialize(Conversions.StringToLatLon(_latitudeLongitudeString), AbsoluteZoom);
 			}
-            _initialZoom = Zoom;
+			_initialZoom = AbsoluteZoom;
 		}
 
 		// TODO: implement IDisposable, instead?
@@ -164,7 +158,7 @@
 			{
 				_tileProvider.OnTileAdded -= TileProvider_OnTileAdded;
 				_tileProvider.OnTileRemoved -= TileProvider_OnTileRemoved;
-                _tileProvider.OnTileRepositioned -= TileProvider_OnTileRepositioned;
+				_tileProvider.OnTileRepositioned -= TileProvider_OnTileRepositioned;
 			}
 
 			_mapVisualizer.Destroy();
@@ -207,10 +201,10 @@
 			_mapVisualizer.DisposeTile(tileId);
 		}
 
-        void TileProvider_OnTileRepositioned(UnwrappedTileId tileId)
-        {
-            _mapVisualizer.RepositionTile(tileId);
-        }
+		void TileProvider_OnTileRepositioned(UnwrappedTileId tileId)
+		{
+			_mapVisualizer.RepositionTile(tileId);
+		}
 
 		protected void SendInitialized()
 		{

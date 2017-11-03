@@ -97,7 +97,7 @@
 
 			foreach (var tile in _inactiveTiles)
 			{
-                Destroy(tile.gameObject);
+				Destroy(tile.gameObject);
 			}
 
 			_activeTiles.Clear();
@@ -134,9 +134,9 @@
 		public virtual UnityTile LoadTile(UnwrappedTileId tileId)
 		{
 			UnityTile unityTile = null;
-            //float scaleFactor = 
+			//float scaleFactor = 
 			if (_inactiveTiles.Count > 0)
-			{                
+			{
 				unityTile = _inactiveTiles.Dequeue();
 			}
 
@@ -146,7 +146,7 @@
 				unityTile.transform.SetParent(_map.Root, false);
 			}
 
-			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale,_map.Zoom, _loadingTexture);
+			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale, _map.AbsoluteZoom, _loadingTexture);
 			PlaceTile(tileId, unityTile, _map);
 
 #if UNITY_EDITOR
@@ -177,15 +177,15 @@
 			}
 		}
 
-        // TODO: Probably not the best place for this method !!
-        public void RepositionTile(UnwrappedTileId tileId)
-        {
-            UnityTile currentTile;
-            if(ActiveTiles.TryGetValue(tileId ,out currentTile))
-            {
-                PlaceTile(tileId, currentTile, _map);
-            }
-        }
+		// TODO: Probably not the best place for this method !!
+		public void RepositionTile(UnwrappedTileId tileId)
+		{
+			UnityTile currentTile;
+			if (ActiveTiles.TryGetValue(tileId, out currentTile))
+			{
+				PlaceTile(tileId, currentTile, _map);
+			}
+		}
 		protected abstract void PlaceTile(UnwrappedTileId tileId, UnityTile tile, IMapReadable map);
 	}
 }

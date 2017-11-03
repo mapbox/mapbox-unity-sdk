@@ -64,17 +64,17 @@
 		{
 			_groundPlane = new Plane(Vector3.up, 0);
 			_shouldUpdate = true;
-			_zoomRange = _map.ZoomRange;
+			_zoomRange = _map.Zoom;
 		}
 
 		public void UpdateMapProperties(Vector2d centerLatitudeLongitude, float zoom)
 		{
 			float differenceInZoom = 0.0f;
 			SetZoomRange(zoom);
-			if (Math.Abs(_map.ZoomRange - ZoomRange) > Constants.EpsilonFloatingPoint)
+			if (Math.Abs(_map.Zoom - ZoomRange) > Constants.EpsilonFloatingPoint)
 			{
 				_map.SetZoomRange(zoom);
-				differenceInZoom = _map.ZoomRange - _map.InitialZoom;
+				differenceInZoom = _map.Zoom - _map.InitialZoom;
 			}
 
 			//Update center latitude longitude
@@ -86,7 +86,7 @@
 
 			_map.SetCenterLatitudeLongitude(new Vector2d(xDelta, zDelta));
 			// Update the center based on current zoom level.
-			var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(_map.CenterLatitudeLongitude, _map.Zoom));
+			var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(_map.CenterLatitudeLongitude, _map.AbsoluteZoom));
 			_map.SetCenterMercator(referenceTileRect.Center);
 			_map.SetWorldRelativeScale((float)(_map.UnityTileSize / referenceTileRect.Size.x));
 			//Scale the map accordingly.
@@ -122,7 +122,7 @@
 				//update viewport in case it was changed by switching zoom level
 				Vector2dBounds _viewPortWebMercBounds = getcurrentViewPortWebMerc();
 
-				var tilesToRequest = TileCover.GetWithWebMerc(_viewPortWebMercBounds, _map.Zoom);
+				var tilesToRequest = TileCover.GetWithWebMerc(_viewPortWebMercBounds, _map.AbsoluteZoom);
 
 				var activeTiles = _activeTiles.Keys.ToList();
 				List<UnwrappedTileId> toRemove = activeTiles.Except(tilesToRequest).ToList();
@@ -162,7 +162,7 @@
 			}
 
 			//get tile scale at equator, otherwise calucations don't work at higher latitudes
-			double factor = Conversions.GetTileScaleInMeters(0, _map.Zoom) * 256 / _map.UnityTileSize;
+			double factor = Conversions.GetTileScaleInMeters(0, _map.AbsoluteZoom) * 256 / _map.UnityTileSize;
 			//convert Unity units to WebMercator and LatLng to get real world bounding box
 			double llx = _map.CenterMercator.x + hitPntLL.x * factor;
 			double lly = _map.CenterMercator.y + hitPntLL.z * factor;

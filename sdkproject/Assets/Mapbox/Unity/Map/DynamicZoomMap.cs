@@ -20,10 +20,10 @@
 		{
 			_worldHeightFixed = false;
 			_centerLatitudeLongitude = latLon;
-			_zoomRange = zoom;
+			_zoom = zoom;
 			_initialZoom = zoom;
 
-			var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(_centerLatitudeLongitude, Zoom));
+			var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(_centerLatitudeLongitude, AbsoluteZoom));
 
 			// FIXME: The only difference from BasicMap? Can we solve this another way?
 			_centerMercator = Conversions.LatLonToMeters(_centerLatitudeLongitude);

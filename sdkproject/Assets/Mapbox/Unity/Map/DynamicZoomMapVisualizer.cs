@@ -12,14 +12,14 @@
 		protected override void PlaceTile(UnwrappedTileId tileId, UnityTile tile, IMapReadable map)
 		{
 			//get the tile covering the center (Unity 0,0,0) of current extent
-			UnwrappedTileId centerTile = TileCover.WebMercatorToTileId(map.CenterMercator, _map.Zoom);
+			UnwrappedTileId centerTile = TileCover.WebMercatorToTileId(map.CenterMercator, _map.AbsoluteZoom);
 			//get center WebMerc corrdinates of tile covering the center (Unity 0,0,0)
-			Vector2d centerTileCenter = Conversions.TileIdToCenterWebMercator(centerTile.X, centerTile.Y, _map.Zoom);
+			Vector2d centerTileCenter = Conversions.TileIdToCenterWebMercator(centerTile.X, centerTile.Y, _map.AbsoluteZoom);
 			//calculate distance between WebMerc center coordinates of center tile and WebMerc coordinates exactly at center
 			Vector2d shift = map.CenterMercator - centerTileCenter;
 			var unityTileSize = map.UnityTileSize;
 			// get factor at equator to avoid shifting errors at higher latitudes
-			float factor = Conversions.GetTileScaleInMeters(0f, _map.Zoom) * 256 / unityTileSize;
+			float factor = Conversions.GetTileScaleInMeters(0f, _map.AbsoluteZoom) * 256 / unityTileSize;
 
 			Vector3 unityTileScale = new Vector3(unityTileSize, 1, unityTileSize);
 

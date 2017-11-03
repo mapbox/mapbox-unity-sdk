@@ -91,8 +91,8 @@
 			if (cameraY < _cameraZoomingRangeMinY)
 			{
 				//already at highest level, don't do anything -> camera free to move closer
-				if (_dynamicZoomMap.Zoom == _dynamicZoomMap.MaxZoom) { return; }
-				_dynamicZoomMap.SetZoomRange(_dynamicZoomMap.Zoom + 1);
+				if (_dynamicZoomMap.AbsoluteZoom == _dynamicZoomMap.MaxZoom) { return; }
+				_dynamicZoomMap.SetZoomRange(_dynamicZoomMap.AbsoluteZoom + 1);
 				//reposition camera at max distance
 				localPosition.y = _cameraZoomingRangeMaxY;
 				_referenceCamera.transform.localPosition = localPosition;
@@ -101,8 +101,8 @@
 			else if (cameraY > _cameraZoomingRangeMaxY)
 			{
 				//already at lowest level, don't do anything -> camera free to move further away
-				if (_dynamicZoomMap.Zoom == _dynamicZoomMap.MinZoom) { return; }
-				_dynamicZoomMap.SetZoomRange(_dynamicZoomMap.Zoom - 1);
+				if (_dynamicZoomMap.AbsoluteZoom == _dynamicZoomMap.MinZoom) { return; }
+				_dynamicZoomMap.SetZoomRange(_dynamicZoomMap.AbsoluteZoom - 1);
 				//reposition camera at min distance
 				localPosition.y = _cameraZoomingRangeMinY;
 				_referenceCamera.transform.localPosition = localPosition;
@@ -111,7 +111,7 @@
 			//update viewport in case it was changed by switching zoom level
 			_viewPortWebMercBounds = getcurrentViewPortWebMerc();
 
-			var tilesNeeded = TileCover.GetWithWebMerc(_viewPortWebMercBounds, _dynamicZoomMap.Zoom);
+			var tilesNeeded = TileCover.GetWithWebMerc(_viewPortWebMercBounds, _dynamicZoomMap.AbsoluteZoom);
 
 			var activeTiles = _activeTiles.Keys.ToList();
 			List<UnwrappedTileId> toRemove = activeTiles.Except(tilesNeeded).ToList();
@@ -144,7 +144,7 @@
 			}
 
 			//get tile scale at equator, otherwise calucations don't work at higher latitudes
-			double factor = Conversions.GetTileScaleInMeters(0, _dynamicZoomMap.Zoom) * 256 / _dynamicZoomMap.UnityTileSize;
+			double factor = Conversions.GetTileScaleInMeters(0, _dynamicZoomMap.AbsoluteZoom) * 256 / _dynamicZoomMap.UnityTileSize;
 			//convert Unity units to WebMercator and LatLng to get real world bounding box
 			double llx = _dynamicZoomMap.CenterMercator.x + hitPntLL.x * factor;
 			double lly = _dynamicZoomMap.CenterMercator.y + hitPntLL.z * factor;

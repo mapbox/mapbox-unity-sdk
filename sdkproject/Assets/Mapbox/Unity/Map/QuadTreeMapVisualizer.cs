@@ -14,15 +14,15 @@ namespace Mapbox.Unity.Map
 			//get the tile covering the center (Unity 0,0,0) of current extent
 			var centerLatLong = map.CenterLatitudeLongitude;
 			var centerMerc = Conversions.LatLonToMeters(centerLatLong);
-			UnwrappedTileId centerTile = TileCover.CoordinateToTileId(centerLatLong, map.Zoom);
+			UnwrappedTileId centerTile = TileCover.CoordinateToTileId(centerLatLong, map.AbsoluteZoom);
 			//get center WebMerc corrdinates of tile covering the center (Unity 0,0,0)
-			Vector2d centerTileCenter = Conversions.TileIdToCenterWebMercator(centerTile.X, centerTile.Y, map.Zoom);
+			Vector2d centerTileCenter = Conversions.TileIdToCenterWebMercator(centerTile.X, centerTile.Y, map.AbsoluteZoom);
 			//calculate distance between WebMerc center coordinates of center tile and WebMerc coordinates exactly at center
 			Vector2d shift = centerMerc - centerTileCenter;
 			var unityTileSize = map.UnityTileSize;
 			// get factor at equator to avoid shifting errors at higher latitudes
-			float factor = Conversions.GetTileScaleInMeters(0f, _map.Zoom) * 256.0f / unityTileSize;
-			var scaleFactor = Mathf.Pow(2, (_map.InitialZoom - _map.Zoom));
+			float factor = Conversions.GetTileScaleInMeters(0f, _map.AbsoluteZoom) * 256.0f / unityTileSize;
+			var scaleFactor = Mathf.Pow(2, (_map.InitialZoom - _map.AbsoluteZoom));
 
 			//position the tile relative to the center tile of the current viewport using the tile id
 			//multiply by tile size Unity units (unityTileScale)
