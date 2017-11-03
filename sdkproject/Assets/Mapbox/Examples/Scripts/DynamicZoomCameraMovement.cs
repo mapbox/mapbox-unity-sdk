@@ -79,7 +79,7 @@
 			float zMove = Input.GetAxis("Vertical");
 			if (Mathf.Abs(xMove) > 0.0f || Mathf.Abs(zMove) > 0.0f)
 			{
-				float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) * 256 / _dynamicZoomMap.UnityTileSize;
+				float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.AbsoluteZoom) * 256 / _dynamicZoomMap.UnityTileSize;
 				xMove *= factor;
 				zMove *= factor;
 				_dynamicZoomMap.SetCenterMercator(_dynamicZoomMap.CenterMercator + new Vector2d(xMove, zMove));
@@ -116,7 +116,7 @@
 					{
 						if (null != _dynamicZoomMap)
 						{
-							float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) * 256 / _dynamicZoomMap.UnityTileSize;
+							float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.AbsoluteZoom) * 256 / _dynamicZoomMap.UnityTileSize;
 							var centerOld = _dynamicZoomMap.CenterMercator;
 							_dynamicZoomMap.SetCenterMercator(_dynamicZoomMap.CenterMercator + new Vector2d(offset.x * factor, offset.z * factor));
 						}

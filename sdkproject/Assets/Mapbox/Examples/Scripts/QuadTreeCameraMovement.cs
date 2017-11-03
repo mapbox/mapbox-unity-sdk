@@ -13,7 +13,6 @@
 		public float _zoomSpeed = 50f;
 
 		[SerializeField]
-		//[HideInInspector]
 		public Camera _referenceCamera;
 
 		[SerializeField]
@@ -23,18 +22,9 @@
 		AbstractMap _dynamicZoomMap;
 
 		private Vector3 _origin;
-		Vector3 _mousePosition;
-		Vector3 _mousePositionPrevious;
-		bool _shouldDrag;
-		private Transform _originalCameraPosition;
-
-		/// <summary>min of y range camera is allowed to move in</summary>
-		private int _cameraZoomingRangeMinY;
-		public int CameraZoomingRangeMinY { get { return _cameraZoomingRangeMinY; } }
-		/// <summary>max of y range camera is allowed to move in</summary>
-		private int _cameraZoomingRangeMaxY;
-
-		public int CameraZoomingRangeMaxY { get { return _cameraZoomingRangeMaxY; } }
+		private Vector3 _mousePosition;
+		private Vector3 _mousePositionPrevious;
+		private bool _shouldDrag;
 
 		void Start()
 		{
@@ -43,15 +33,6 @@
 				_referenceCamera = GetComponent<Camera>();
 				if (null == _referenceCamera) { Debug.LogErrorFormat("{0}: reference camera not set", this.GetType().Name); }
 			}
-
-			//put camera facing down. 
-			//_referenceCamera.transform.rotation = new Quaternion(0.7f, 0, 0, 0.7f);
-
-			//link zoomspeed to tilesize
-			_zoomSpeed = _dynamicZoomMap.UnityTileSize / 2f;
-
-			_cameraZoomingRangeMaxY = (int)(_dynamicZoomMap.UnityTileSize * 2.5f);
-			_cameraZoomingRangeMinY = (int)(_dynamicZoomMap.UnityTileSize * 1.25f);
 		}
 
 
@@ -59,36 +40,26 @@
 		{
 			if (null == _dynamicZoomMap) { return; }
 
-
-			//development short cut: reset center to 0/0 via right click
-			//if (Input.GetMouseButton(1))
-			//{
-			//	_dynamicZoomMap.SetCenterMercator(Vector2d.zero);
-			//	return;
-			//}
-
-
 			// zoom
 			var scrollDelta = Input.GetAxis("Mouse ScrollWheel");
 
 			if (scrollDelta > 0f)
 			{
-				_quadTreeTileProvider.UpdateMapProperties(_dynamicZoomMap.CenterLatitudeLongitude, Mathf.Min(_dynamicZoomMap.ZoomRange + 0.25f, 21.0f));
+				_quadTreeTileProvider.UpdateMapProperties(_dynamicZoomMap.CenterLatitudeLongitude, Mathf.Min(_dynamicZoomMap.Zoom + 0.25f, 21.0f));
 			}
 			else if (scrollDelta < 0f)
 			{
-				_quadTreeTileProvider.UpdateMapProperties(_dynamicZoomMap.CenterLatitudeLongitude, Mathf.Max(_dynamicZoomMap.ZoomRange - 0.25f, 0.0f));
+				_quadTreeTileProvider.UpdateMapProperties(_dynamicZoomMap.CenterLatitudeLongitude, Mathf.Max(_dynamicZoomMap.Zoom - 0.25f, 0.0f));
 			}
-
 
 			//pan keyboard
 			float xMove = Input.GetAxis("Horizontal");
 			float zMove = Input.GetAxis("Vertical");
 			if (Math.Abs(xMove) > 0.0f || Math.Abs(zMove) > 0.0f)
 			{
-				float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) / (2.0f * _dynamicZoomMap.Zoom * _dynamicZoomMap.UnityTileSize);
+				float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.AbsoluteZoom) / (2.0f * _dynamicZoomMap.AbsoluteZoom * _dynamicZoomMap.UnityTileSize);
 
-				_quadTreeTileProvider.UpdateMapProperties(new Vector2d(_dynamicZoomMap.CenterLatitudeLongitude.x + zMove * factor, _dynamicZoomMap.CenterLatitudeLongitude.y + xMove * factor), _dynamicZoomMap.ZoomRange);
+				_quadTreeTileProvider.UpdateMapProperties(new Vector2d(_dynamicZoomMap.CenterLatitudeLongitude.x + zMove * factor, _dynamicZoomMap.CenterLatitudeLongitude.y + xMove * factor), _dynamicZoomMap.Zoom);
 			}
 
 			//pan mouse
@@ -122,9 +93,9 @@
 					{
 						if (null != _dynamicZoomMap)
 						{
-							float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) / (256.0f * _dynamicZoomMap.Zoom * _dynamicZoomMap.UnityTileSize);
+							float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.AbsoluteZoom) / (256.0f * _dynamicZoomMap.AbsoluteZoom * _dynamicZoomMap.UnityTileSize);
 
-							_quadTreeTileProvider.UpdateMapProperties(new Vector2d(_dynamicZoomMap.CenterLatitudeLongitude.x + offset.z * factor, _dynamicZoomMap.CenterLatitudeLongitude.y + offset.x * factor), _dynamicZoomMap.ZoomRange);
+							_quadTreeTileProvider.UpdateMapProperties(new Vector2d(_dynamicZoomMap.CenterLatitudeLongitude.x + offset.z * factor, _dynamicZoomMap.CenterLatitudeLongitude.y + offset.x * factor), _dynamicZoomMap.Zoom);
 						}
 					}
 				}
