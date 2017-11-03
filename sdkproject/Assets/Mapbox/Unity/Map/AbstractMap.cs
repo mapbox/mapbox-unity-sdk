@@ -33,7 +33,7 @@
 		{
 			get
 			{
-				return (int)Math.Ceiling(Zoom);
+				return (int)Math.Floor(Zoom);
 			}
 		}
 		protected int _initialZoom;
