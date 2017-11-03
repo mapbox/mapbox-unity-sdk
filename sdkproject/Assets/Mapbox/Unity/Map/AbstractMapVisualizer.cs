@@ -177,7 +177,10 @@
 			}
 		}
 
-		// TODO: Probably not the best place for this method !!
+		/// <summary>
+		/// Repositions active tiles instead of recreating them. Useful for panning the map
+		/// </summary>
+		/// <param name="tileId"></param>
 		public void RepositionTile(UnwrappedTileId tileId)
 		{
 			UnityTile currentTile;
