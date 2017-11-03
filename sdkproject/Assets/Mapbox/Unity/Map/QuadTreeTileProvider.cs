@@ -73,7 +73,7 @@
 			SetZoomRange(zoom);
 			if (Math.Abs(_map.Zoom - ZoomRange) > Constants.EpsilonFloatingPoint)
 			{
-				_map.SetZoomRange(zoom);
+				_map.SetZoom(zoom);
 				differenceInZoom = _map.Zoom - _map.InitialZoom;
 			}
 

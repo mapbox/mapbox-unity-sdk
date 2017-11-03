@@ -18,7 +18,7 @@
 				return _zoom;
 			}
 		}
-		public void SetZoomRange(float zoom)
+		public void SetZoom(float zoom)
 		{
 			_zoom = zoom;
 		}
