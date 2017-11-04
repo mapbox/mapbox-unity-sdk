@@ -4,7 +4,7 @@
 	using Mapbox.Unity.MeshGeneration.Data;
 	using System.Collections.Generic;
 
-	public class TileErrorEventArgs {
+	public class TileErrorEventArgs:EventArgs {
 
 		/// <summary>
 		/// The tile identifier.

@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Examples
+﻿namespace Mapbox.Unity.Map
 {
 	using System;
 	using System.Linq;
@@ -11,7 +11,7 @@
 	/// Monobehavior Script to handle TileErrors. 
 	/// There's an OnTileError event on AbstractMapVisualizer, AbstractTileFactory and UnityTile classes that one can subscribe to to listen to tile errors
 	/// </summary>
-	public class HandleTileErrorExample : MonoBehaviour
+	public class TileErrorHandler : MonoBehaviour
 	{
 
 		[SerializeField]
@@ -28,7 +28,7 @@
 			_mapInstance.MapVisualizer.OnTileError += _OnTileErrorHandler;
 		}
 
-		private void _OnTileErrorHandler(TileErrorEventArgs e)
+		private void _OnTileErrorHandler(object sender, TileErrorEventArgs e)
 		{
 
 			if (e.Exceptions.Count > 0)

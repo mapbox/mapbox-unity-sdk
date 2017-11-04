@@ -111,10 +111,10 @@ namespace Mapbox.Map
 			}
 		}
 
-        /// <summary>
+		/// <summary>
 		/// Occurs when there's a <c>Tile<c/> error. It bubbles up all the way up to  the <see cref="T:Mapbox.Unity.Map.AbstractTileFactory"/> and <see cref="T:Mapbox.Unity.Map.AbstractMapVisualizer"/>
-        /// </summary>
-		public event Action<TileErrorEventArgs> OnTileError = delegate { };
+		/// </summary>
+		public event EventHandler<TileErrorEventArgs> OnTileError;
 
 		/// <summary>
 		///     Initializes the <see cref="T:Mapbox.Map.Tile"/> object. It will
@@ -210,9 +210,10 @@ namespace Mapbox.Map
 			if (response.HasError)
 			{
 				response.Exceptions.ToList().ForEach(e => AddException(e));
-				if (OnTileError != null)
+				EventHandler<TileErrorEventArgs> handler = OnTileError;
+				if (handler != null)
 				{
-					OnTileError(new TileErrorEventArgs(_id,this.GetType(),null,_exceptions));
+					handler(this, new TileErrorEventArgs(_id,this.GetType(),null,_exceptions));
 				}
 			}
 			else

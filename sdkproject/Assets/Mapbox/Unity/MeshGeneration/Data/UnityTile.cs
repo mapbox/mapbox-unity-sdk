@@ -116,7 +116,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		/// The <c>OnTileError</c> event triggers when there's <c>Tile</c> error.
 		/// Returns a <see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance as a parameter, for the tile on which error occurred.
 		/// </summary>
-		public event Action<TileErrorEventArgs> OnTileError = delegate { };
+		public event EventHandler<TileErrorEventArgs> OnTileError;
 
 
 		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, float scale, Texture2D loadingTexture = null)
@@ -247,12 +247,13 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		}
 
 		//OnTileError delegate handle method to bubble up the event all the way up to the chain to AbstractTileFactory and MapVisualizer
-		private void OnTileErrorHandler(TileErrorEventArgs e)
+		private void OnTileErrorHandler(object sender, TileErrorEventArgs e)
 		{
-			if (OnTileError != null)
+			EventHandler<TileErrorEventArgs> handler = OnTileError;
+			if (handler != null)
 			{
 				e.UnityTileInstance = this;
-				OnTileError(e);
+				handler(this, e);
 			}
 		}
 

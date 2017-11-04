@@ -49,8 +49,8 @@
 		/// <summary>
 		/// The  <c>OnTileError</c> event triggers when there's a <c>Tile</c> error.
 		/// Returns a <see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance as a parameter, for the tile on which error occurred.
-        /// </summary>
-		public event Action<TileErrorEventArgs> OnTileError = delegate { };
+		/// </summary>
+		public event EventHandler<TileErrorEventArgs> OnTileError;
 
 		/// <summary>
 		/// Initializes the factories by passing the file source down, which is necessary for data (web/file) calls
@@ -79,7 +79,7 @@
 				{
 					factory.Initialize(fileSource);
 					factory.OnFactoryStateChanged += UpdateState;
-                    factory.OnTileError += Factory_OnTileError;
+					factory.OnTileError += Factory_OnTileError;
 				}
 			}
 		}
@@ -91,7 +91,7 @@
 				if (Factories[i] != null)
 				{
 					Factories[i].OnFactoryStateChanged -= UpdateState;
-                    Factories[i].OnTileError -= Factory_OnTileError;
+					Factories[i].OnTileError -= Factory_OnTileError;
 
 				}
 			}
@@ -106,7 +106,7 @@
 
 			foreach (var tile in _inactiveTiles)
 			{
-                Destroy(tile.gameObject);
+				Destroy(tile.gameObject);
 			}
 
 			_activeTiles.Clear();
@@ -172,15 +172,16 @@
 			return unityTile;
 		}
 
-		private void Factory_OnTileError(TileErrorEventArgs e)
-        {
-            if(OnTileError != null)
-            {
-                OnTileError(e);
-            }
-        }
+		private void Factory_OnTileError(object sender, TileErrorEventArgs e)
+		{
+			EventHandler<TileErrorEventArgs> handler = OnTileError;
+			if(handler != null)
+			{
+				handler(this, e);
+			}
+		}
 
-        public void DisposeTile(UnwrappedTileId tileId)
+		public void DisposeTile(UnwrappedTileId tileId)
 		{
 			var unityTile = ActiveTiles[tileId];
 
