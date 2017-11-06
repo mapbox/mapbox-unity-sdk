@@ -90,7 +90,7 @@
 			}
 		}
 
-		[ContextMenu("Test")]
+		[ContextMenu("Map Match")]
 		public void Match()
 		{
 			if (_locations.Count < 2)
