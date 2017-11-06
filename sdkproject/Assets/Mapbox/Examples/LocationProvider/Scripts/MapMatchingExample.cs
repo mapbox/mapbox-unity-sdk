@@ -77,14 +77,17 @@
 
 		void LocationProvider_OnLocationUpdated(Location location)
 		{
-			_locations.Add(location);
-			var position = Conversions.GeoToWorldPosition(location.LatitudeLongitude,
-																 _map.CenterMercator,
-																 _map.WorldRelativeScale).ToVector3xz();
-			position.y = _lineHeight;
-			var count = _locations.Count;
-			_originalRoute.positionCount = count;
-			_originalRoute.SetPosition(count - 1, position);
+			if (location.IsLocationUpdated)
+			{
+				_locations.Add(location);
+				var position = Conversions.GeoToWorldPosition(location.LatitudeLongitude,
+																	 _map.CenterMercator,
+																	 _map.WorldRelativeScale).ToVector3xz();
+				position.y = _lineHeight;
+				var count = _locations.Count;
+				_originalRoute.positionCount = count;
+				_originalRoute.SetPosition(count - 1, position);
+			}
 		}
 
 		[ContextMenu("Test")]

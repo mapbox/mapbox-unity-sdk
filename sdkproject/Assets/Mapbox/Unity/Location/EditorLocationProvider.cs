@@ -41,6 +41,8 @@ namespace Mapbox.Unity.Location
 			_currentLocation.LatitudeLongitude = LatitudeLongitude;
 			_currentLocation.Accuracy = _accuracy;
 			_currentLocation.Timestamp = DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+			_currentLocation.IsLocationUpdated = true;
+			_currentLocation.IsHeadingUpdated = true;
 		}
 	}
 }
