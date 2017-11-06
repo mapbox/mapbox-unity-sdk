@@ -96,7 +96,6 @@ namespace Mapbox.Unity.Location
 					_currentLocation.Accuracy = (int)lastData.horizontalAccuracy;
 					_currentLocation.Timestamp = timestamp;
 					_lastLocationTimestamp = timestamp;
-					Debug.Log("DeviceLocationProvider: " + _currentLocation.LatitudeLongitude);
 				}
 
 				SendLocation(_currentLocation);
