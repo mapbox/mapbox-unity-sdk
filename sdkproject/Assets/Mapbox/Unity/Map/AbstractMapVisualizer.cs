@@ -23,6 +23,7 @@
 		protected IMapReadable _map;
 		protected Dictionary<UnwrappedTileId, UnityTile> _activeTiles = new Dictionary<UnwrappedTileId, UnityTile>();
 		protected Queue<UnityTile> _inactiveTiles = new Queue<UnityTile>();
+		private int _counter;
 
 		private ModuleState _state;
 		public ModuleState State
@@ -79,7 +80,8 @@
 
 		public void Destroy()
 		{
-			for (int i = 0; i < Factories.Count; i++)
+			_counter = Factories.Count;
+			for (int i = 0; i < _counter; i++)
 			{
 				if (Factories[i] != null)
 				{
@@ -113,7 +115,8 @@
 			else if (State != ModuleState.Finished && factory.State == ModuleState.Finished)
 			{
 				var allFinished = true;
-				for (int i = 0; i < Factories.Count; i++)
+				_counter = Factories.Count;
+				for (int i = 0; i < _counter; i++)
 				{
 					if (Factories[i] != null)
 					{
