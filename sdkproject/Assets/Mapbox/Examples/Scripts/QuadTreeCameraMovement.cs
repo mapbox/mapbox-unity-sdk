@@ -40,29 +40,86 @@
 		{
 			if (null == _dynamicZoomMap) { return; }
 
-			// zoom
-			var scrollDelta = Input.GetAxis("Mouse ScrollWheel");
+			if (Input.touchSupported)
+			{
+				HandleTouch();
+			}
+			else
+			{
+				HandleMouseAndKeyBoard();
+			}
+		}
 
-			if (scrollDelta > 0f)
-			{
-				_quadTreeTileProvider.UpdateMapProperties(_dynamicZoomMap.CenterLatitudeLongitude, Mathf.Min(_dynamicZoomMap.Zoom + 0.25f, 21.0f));
-			}
-			else if (scrollDelta < 0f)
-			{
-				_quadTreeTileProvider.UpdateMapProperties(_dynamicZoomMap.CenterLatitudeLongitude, Mathf.Max(_dynamicZoomMap.Zoom - 0.25f, 0.0f));
-			}
+		void HandleMouseAndKeyBoard()
+		{
+			// zoom
+			float scrollDelta = 0.0f;
+			scrollDelta = Input.GetAxis("Mouse ScrollWheel");
+			ZoomMapUsingTouchOrMouse(scrollDelta);
 
 			//pan keyboard
 			float xMove = Input.GetAxis("Horizontal");
 			float zMove = Input.GetAxis("Vertical");
+
+			PanMapUsingKeyBoard(xMove, zMove);
+
+
+			//pan mouse
+			PanMapUsingTouchOrMouse();
+		}
+
+		void HandleTouch()
+		{
+			float zoomFactor = 0.0f;
+			//pinch to zoom. 
+			switch (Input.touchCount)
+			{
+				case 1:
+					{
+						PanMapUsingTouchOrMouse();
+					}
+					break;
+				case 2:
+					{
+						// Store both touches.
+						Touch touchZero = Input.GetTouch(0);
+						Touch touchOne = Input.GetTouch(1);
+
+						// Find the position in the previous frame of each touch.
+						Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
+						Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
+
+						// Find the magnitude of the vector (the distance) between the touches in each frame.
+						float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
+						float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
+
+						// Find the difference in the distances between each frame.
+						zoomFactor = 0.01f * (touchDeltaMag - prevTouchDeltaMag);
+					}
+					ZoomMapUsingTouchOrMouse(zoomFactor);
+					break;
+				default:
+					break;
+			}
+		}
+
+		void ZoomMapUsingTouchOrMouse(float zoomFactor)
+		{
+			_quadTreeTileProvider.UpdateMapProperties(_dynamicZoomMap.CenterLatitudeLongitude, Mathf.Max(0.0f, Mathf.Min(_dynamicZoomMap.Zoom + zoomFactor * 0.25f, 21.0f)));
+		}
+
+		void PanMapUsingKeyBoard(float xMove, float zMove)
+		{
 			if (Math.Abs(xMove) > 0.0f || Math.Abs(zMove) > 0.0f)
 			{
 				float factor = (4.0f * (_dynamicZoomMap.AbsoluteZoom + 1)) / Mathf.Pow(2, _dynamicZoomMap.AbsoluteZoom + 1);
 
 				_quadTreeTileProvider.UpdateMapProperties(new Vector2d(_dynamicZoomMap.CenterLatitudeLongitude.x + zMove * factor * 2.0f, _dynamicZoomMap.CenterLatitudeLongitude.y + xMove * factor * 4.0f), _dynamicZoomMap.Zoom);
 			}
+		}
 
-			//pan mouse
+		void PanMapUsingTouchOrMouse()
+		{
 			if (Input.GetMouseButton(0))
 			{
 				var mousePosScreen = Input.mousePosition;
