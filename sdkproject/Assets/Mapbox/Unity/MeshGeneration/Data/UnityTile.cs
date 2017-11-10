@@ -124,12 +124,12 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			_canonicalTileId = tileId.Canonical;
 			_loadingTexture = loadingTexture;
 
-			float scaleFactor = 1.0f; 
-			if (isInitialized == false)
-            {
-				isInitialized = true;
-                InitialZoom = zoom;
-            }
+			float scaleFactor = 1.0f;
+			if (_isInitialized == false)
+			{
+				_isInitialized = true;
+				InitialZoom = zoom;
+			}
 
 			scaleFactor = Mathf.Pow(2, (map.InitialZoom - zoom));
 			gameObject.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
