@@ -93,8 +93,7 @@
 					{
 						if (null != _dynamicZoomMap)
 						{
-							float factor = (0.5f * (_dynamicZoomMap.AbsoluteZoom + 1)) / Mathf.Pow(2, _dynamicZoomMap.AbsoluteZoom + 1);//Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.AbsoluteZoom) / (256.0f * _dynamicZoomMap.AbsoluteZoom * _dynamicZoomMap.UnityTileSize);
-
+							float factor = _dynamicZoomMap.WorldRelativeScale * (Conversions.GetTileScaleInMeters(0, _dynamicZoomMap.AbsoluteZoom) / ((_dynamicZoomMap.AbsoluteZoom + 1) * (_dynamicZoomMap.AbsoluteZoom + 1)));
 							_quadTreeTileProvider.UpdateMapProperties(new Vector2d(_dynamicZoomMap.CenterLatitudeLongitude.x + offset.z * factor, _dynamicZoomMap.CenterLatitudeLongitude.y + offset.x * factor), _dynamicZoomMap.Zoom);
 						}
 					}
