@@ -146,7 +146,7 @@ MonoBehaviour:
   _latitudeLongitudeString: 36.058781, -112.109295
   _root: {fileID: 0}
   _tileProvider: {fileID: 555018385}
-  _mapVisualizer: {fileID: 11400000, guid: e54ca7c13cf7d4302ba7e2d5bb5b8d29, type: 2}
+  _mapVisualizer: {fileID: 11400000, guid: 84a94dcf8a4f944f8bc89a06e9e105d5, type: 2}
   _unityTileSize: 100
   _snapMapHeightToZero: 0
 --- !u!4 &555018384
