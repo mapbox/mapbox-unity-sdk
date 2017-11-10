@@ -10,7 +10,7 @@
 	{
 		public event Action<UnwrappedTileId> OnTileAdded = delegate { };
 		public event Action<UnwrappedTileId> OnTileRemoved = delegate { };
-        public event Action<UnwrappedTileId> OnTileRepositioned = delegate { };
+		public event Action<UnwrappedTileId> OnTileRepositioned = delegate { };
 
 		protected IMap _map;
 
@@ -45,16 +45,16 @@
 			OnTileRemoved(tile);
 		}
 
-        protected void RepositionTile(UnwrappedTileId tile)
-        {
-            if (!_activeTiles.ContainsKey(tile))
-            {
-                //TODO : Only active tiles should be repositioned ?
-                return;
-            }
+		protected void RepositionTile(UnwrappedTileId tile)
+		{
+			if (!_activeTiles.ContainsKey(tile))
+			{
+				//TODO : Only active tiles should be repositioned ?
+				return;
+			}
 
-            OnTileRepositioned(tile);
-        }
+			OnTileRepositioned(tile);
+		}
 
 		public abstract void OnInitialized();
 	}

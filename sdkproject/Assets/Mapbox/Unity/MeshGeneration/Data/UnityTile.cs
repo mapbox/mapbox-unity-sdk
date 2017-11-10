@@ -102,7 +102,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-        public int InitialZoom { get; internal set; }
+		public int InitialZoom { get; internal set; }
 		public float TileScale { get; internal set; }
 
 		public TilePropertyState RasterDataState;
@@ -113,7 +113,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public event Action<UnityTile> OnRasterDataChanged = delegate { };
 		public event Action<UnityTile> OnVectorDataChanged = delegate { };
 
-        private bool isInitialized = false; 
+		private bool _isInitialized = false;
 
 		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, float scale, int zoom, Texture2D loadingTexture = null)
 		{
