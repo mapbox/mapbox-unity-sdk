@@ -9,8 +9,9 @@
 	public class QuadTreeCameraMovement : MonoBehaviour
 	{
 		[SerializeField]
-		[HideInInspector]
-		public float _zoomSpeed = 50f;
+		[Range(1, 20)]
+		public float _panSpeed = 1.0f;
+
 
 		[SerializeField]
 		public Camera _referenceCamera;
@@ -112,8 +113,11 @@
 		{
 			if (Math.Abs(xMove) > 0.0f || Math.Abs(zMove) > 0.0f)
 			{
-				float factor = (4.0f * (_dynamicZoomMap.AbsoluteZoom + 1)) / Mathf.Pow(2, _dynamicZoomMap.AbsoluteZoom + 1);
-
+				// Get the number of degrees in a tile at the current zoom level. 
+				// Divide it by the tile width in pixels ( 256 in our case) 
+				// to get degrees represented by each pixel.
+				// Keyboard offset is in pixels, therefore multiply the factor with the offset to move the center.
+				float factor = _panSpeed * (Conversions.GetTileScaleInDegrees(_dynamicZoomMap.AbsoluteZoom) / 256.0f);
 				_quadTreeTileProvider.UpdateMapProperties(new Vector2d(_dynamicZoomMap.CenterLatitudeLongitude.x + zMove * factor * 2.0f, _dynamicZoomMap.CenterLatitudeLongitude.y + xMove * factor * 4.0f), _dynamicZoomMap.Zoom);
 			}
 		}
@@ -150,10 +154,15 @@
 					{
 						if (null != _dynamicZoomMap)
 						{
-							float factor = _dynamicZoomMap.WorldRelativeScale * (Conversions.GetTileScaleInMeters(0, _dynamicZoomMap.AbsoluteZoom) / ((_dynamicZoomMap.AbsoluteZoom + 1) * (_dynamicZoomMap.AbsoluteZoom + 1)));
+							// Get the number of degrees in a tile at the current zoom level. 
+							// Divide it by the tile width in pixels ( 256 in our case) 
+							// to get degrees represented by each pixel.
+							// Mouse offset is in pixels, therefore multiply the factor with the offset to move the center.
+							float factor = _panSpeed * (Conversions.GetTileScaleInDegrees(_dynamicZoomMap.AbsoluteZoom) / 256.0f);
 							_quadTreeTileProvider.UpdateMapProperties(new Vector2d(_dynamicZoomMap.CenterLatitudeLongitude.x + offset.z * factor, _dynamicZoomMap.CenterLatitudeLongitude.y + offset.x * factor), _dynamicZoomMap.Zoom);
 						}
 					}
+					_origin = _mousePosition;
 				}
 			}
 		}
