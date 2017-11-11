@@ -289,6 +289,17 @@ namespace Mapbox.Unity.Utilities
 		}
 
 		/// <summary>
+		/// Gets the degrees per tile at given zoom level for Web Mercator tile.
+		/// See: http://wiki.openstreetmap.org/wiki/Zoom_levels.
+		/// </summary>
+		/// <param name="zoom"> Zoom level. </param>
+		/// <returns> Degrees per tile. </returns>
+		public static float GetTileScaleInDegrees(int zoom)
+		{
+			return (float)(360.0f / Math.Pow(2f, zoom));
+		}
+
+		/// <summary>
 		/// Gets height from terrain-rgb adjusted for a given scale.
 		/// </summary>
 		/// <param name="color"> The <see cref="T:UnityEngine.Color"/>. </param>
