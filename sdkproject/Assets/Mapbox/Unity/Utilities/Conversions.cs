@@ -292,11 +292,12 @@ namespace Mapbox.Unity.Utilities
 		/// Gets the degrees per tile at given zoom level for Web Mercator tile.
 		/// See: http://wiki.openstreetmap.org/wiki/Zoom_levels.
 		/// </summary>
+		/// <param name="latitude"> The latitude. </param>
 		/// <param name="zoom"> Zoom level. </param>
 		/// <returns> Degrees per tile. </returns>
-		public static float GetTileScaleInDegrees(int zoom)
+		public static float GetTileScaleInDegrees(float latitude, int zoom)
 		{
-			return (float)(360.0f / Math.Pow(2f, zoom));
+			return (float)(360.0f * (Math.Cos(Mathf.Deg2Rad * latitude) / Math.Pow(2f, zoom)));
 		}
 
 		/// <summary>

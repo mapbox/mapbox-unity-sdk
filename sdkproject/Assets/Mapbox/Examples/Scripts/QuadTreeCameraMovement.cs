@@ -117,7 +117,7 @@
 				// Divide it by the tile width in pixels ( 256 in our case) 
 				// to get degrees represented by each pixel.
 				// Keyboard offset is in pixels, therefore multiply the factor with the offset to move the center.
-				float factor = _panSpeed * (Conversions.GetTileScaleInDegrees(_dynamicZoomMap.AbsoluteZoom) / 256.0f);
+				float factor = _panSpeed * (Conversions.GetTileScaleInDegrees((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.AbsoluteZoom) / 256.0f);
 				_quadTreeTileProvider.UpdateMapProperties(new Vector2d(_dynamicZoomMap.CenterLatitudeLongitude.x + zMove * factor * 2.0f, _dynamicZoomMap.CenterLatitudeLongitude.y + xMove * factor * 4.0f), _dynamicZoomMap.Zoom);
 			}
 		}
@@ -127,15 +127,11 @@
 			if (Input.GetMouseButton(0))
 			{
 				var mousePosScreen = Input.mousePosition;
-				//assign distance of camera to ground plane to z, otherwise ScreenToWorldPoint() will always return the position of the camera
-				//http://answers.unity3d.com/answers/599100/view.html
-				mousePosScreen.z = _referenceCamera.transform.localPosition.y;
-				_mousePosition = _referenceCamera.ScreenToWorldPoint(mousePosScreen);
-				_mousePosition.y = 0f;
+				_mousePosition = mousePosScreen;
 				if (_shouldDrag == false)
 				{
 					_shouldDrag = true;
-					_origin = _referenceCamera.ScreenToWorldPoint(mousePosScreen);
+					_origin = mousePosScreen;
 				}
 			}
 			else
@@ -146,11 +142,11 @@
 			if (_shouldDrag == true)
 			{
 				var changeFromPreviousPosition = _mousePositionPrevious - _mousePosition;
-				if (Mathf.Abs(changeFromPreviousPosition.x) > 0.0f || Mathf.Abs(changeFromPreviousPosition.z) > 0.0f)
+				if (Mathf.Abs(changeFromPreviousPosition.x) > 0.0f || Mathf.Abs(changeFromPreviousPosition.y) > 0.0f)
 				{
 					_mousePositionPrevious = _mousePosition;
 					var offset = _origin - _mousePosition;
-					if (Mathf.Abs(offset.x) > 0.0f || Mathf.Abs(offset.z) > 0.0f)
+					if (Mathf.Abs(offset.x) > 0.0f || Mathf.Abs(offset.y) > 0.0f)
 					{
 						if (null != _dynamicZoomMap)
 						{
@@ -158,10 +154,16 @@
 							// Divide it by the tile width in pixels ( 256 in our case) 
 							// to get degrees represented by each pixel.
 							// Mouse offset is in pixels, therefore multiply the factor with the offset to move the center.
-							float factor = _panSpeed * (Conversions.GetTileScaleInDegrees(_dynamicZoomMap.AbsoluteZoom) / 256.0f);
-							_quadTreeTileProvider.UpdateMapProperties(new Vector2d(_dynamicZoomMap.CenterLatitudeLongitude.x + offset.z * factor, _dynamicZoomMap.CenterLatitudeLongitude.y + offset.x * factor), _dynamicZoomMap.Zoom);
+							float factorX = _panSpeed * (Conversions.GetTileScaleInDegrees((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.AbsoluteZoom) / (256.0f));
+							float factorY = _panSpeed * (Conversions.GetTileScaleInDegrees((float)0, _dynamicZoomMap.AbsoluteZoom) / (256.0f));
+							_quadTreeTileProvider.UpdateMapProperties(new Vector2d(_dynamicZoomMap.CenterLatitudeLongitude.x + offset.y * factorY, _dynamicZoomMap.CenterLatitudeLongitude.y + offset.x * factorX), _dynamicZoomMap.Zoom);
 						}
 					}
+					_origin = _mousePosition;
+				}
+				else
+				{
+					_mousePositionPrevious = _mousePosition;
 					_origin = _mousePosition;
 				}
 			}
