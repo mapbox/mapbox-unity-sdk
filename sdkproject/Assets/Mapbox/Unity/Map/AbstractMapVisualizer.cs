@@ -134,7 +134,7 @@
 		public virtual UnityTile LoadTile(UnwrappedTileId tileId)
 		{
 			UnityTile unityTile = null;
-			//float scaleFactor = 
+
 			if (_inactiveTiles.Count > 0)
 			{
 				unityTile = _inactiveTiles.Dequeue();
