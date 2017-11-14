@@ -6,6 +6,8 @@
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Map;
 	using System.Collections;
+	using System.Linq;
+
 
 	public class CachingWebFileSource : IFileSource, IDisposable
 	{
@@ -104,57 +106,110 @@
 				throw new Exception("Cannot cache without a map id");
 			}
 
-			byte[] data = null;
+			CacheItem cachedItem = null;
 
 			// go through existing caches and check if we already have the requested tile available
 			foreach (var cache in _caches)
 			{
-				data = cache.Get(mapId, tileId);
-				if (null != data)
+				cachedItem = cache.Get(mapId, tileId);
+				if (null != cachedItem)
 				{
 					break;
 				}
 			}
 
-			// if tile was available propagate to all other caches and return
-			if (null != data)
+			var uriBuilder = new UriBuilder(uri);
+			if (!string.IsNullOrEmpty(_accessToken))
 			{
-				foreach (var cache in _caches)
+				string accessTokenQuery = "access_token=" + _accessToken;
+				if (uriBuilder.Query != null && uriBuilder.Query.Length > 1)
 				{
-					cache.Add(mapId, tileId, data);
+					uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery;
 				}
+				else
+				{
+					uriBuilder.Query = accessTokenQuery;
+				}
+			}
+			string finalUrl = uriBuilder.ToString();
 
-				callback(Response.FromCache(data));
+
+			// if tile was available propagate to all other caches and return data immediately
+			// continue afterwards to check if cache needs updating
+			if (null != cachedItem)
+			{
+				callback(Response.FromCache(cachedItem.Data));
+
+				IAsyncRequestFactory.CreateRequest(
+					finalUrl,
+					(Response headerOnly) =>
+					{
+						UnityEngine.Debug.LogFormat("{0} : {1}", cachedItem.ETag, headerOnly.Headers["ETag"]);
+						// data from cache is the same as on the web, don't force insert via cache.add()
+						if (cachedItem.ETag.Equals(headerOnly.Headers["ETag"]))
+						{
+							foreach (var cache in _caches)
+							{
+								cache.Add(mapId, tileId, cachedItem, false);
+							}
+						}
+						else
+						{
+							//TODO: new request, extract below method
+						}
+					}
+					, timeout
+					, HttpRequestType.Head
+				);
+
 				return new MemoryCacheAsyncRequest(uri);
 			}
 			else
 			{
 				// requested tile is not in any of the caches yet, get it
-				var uriBuilder = new UriBuilder(uri);
-
-				if (!string.IsNullOrEmpty(_accessToken))
-				{
-					string accessTokenQuery = "access_token=" + _accessToken;
-					if (uriBuilder.Query != null && uriBuilder.Query.Length > 1)
-					{
-						uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery;
-					}
-					else
-					{
-						uriBuilder.Query = accessTokenQuery;
-					}
-				}
 
 				return IAsyncRequestFactory.CreateRequest(
-					uriBuilder.ToString(),
+					finalUrl,
 					(Response r) =>
 					{
 						// if the request was successful add tile to all caches
 						if (!r.HasError && null != r.Data)
 						{
+							//UnityEngine.Debug.Log(uri);
+							string eTag = string.Empty;
+							DateTime? lastModified = null;
+
+							if (!r.Headers.ContainsKey("ETag"))
+							{
+								UnityEngine.Debug.LogWarningFormat("no 'ETag' header present in response for {0}", uri);
+							}
+							else
+							{
+								eTag = r.Headers["ETag"];
+							}
+
+							// not all APIs populate 'Last-Modified' header
+							if (!r.Headers.ContainsKey("Last-Modified"))
+							{
+								//UnityEngine.Debug.LogWarningFormat("no 'Last-Modified' header present in response for {0}", uri);
+							}
+							else
+							{
+								lastModified = DateTime.ParseExact(r.Headers["Last-Modified"], "r", null);
+								UnityEngine.Debug.LogFormat("{0}:{1}", r.Headers["Last-Modified"], lastModified);
+							}
+
+
 							foreach (var cache in _caches)
 							{
-								cache.Add(mapId, tileId, r.Data);
+								cache.Add(mapId, tileId, new CacheItem()
+								{
+									Data = r.Data,
+									ETag = eTag,
+									LastModified = lastModified
+								},
+								true
+								);
 							}
 						}
 						callback(r);
@@ -182,6 +237,9 @@
 					return true;
 				}
 			}
+
+
+			public HttpRequestType RequestType { get { return HttpRequestType.Get; } }
 
 
 			public void Cancel()

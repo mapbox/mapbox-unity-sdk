@@ -11,6 +11,7 @@ namespace Mapbox.Map
 	using System.Linq;
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
+	using Mapbox.Unity.Utilities;
 
 
 	/// <summary>
@@ -103,6 +104,10 @@ namespace Mapbox.Map
 				return _state;
 			}
 		}
+
+
+		public HttpRequestType RequestType { get { return _request.RequestType; } }
+
 
 		public bool IsCompleted
 		{

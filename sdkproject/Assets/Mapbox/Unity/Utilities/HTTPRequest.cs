@@ -17,23 +17,47 @@ namespace Mapbox.Unity.Utilities
 	using UnityEditor;
 #endif
 
+	public enum HttpRequestType
+	{
+		Get,
+		Head
+	}
+
+
 	internal sealed class HTTPRequest : IAsyncRequest
 	{
+
 		private UnityWebRequest _request;
+		private HttpRequestType _requestType;
 		private int _timeout;
 		private readonly Action<Response> _callback;
 		bool _wasCancelled;
 
 		public bool IsCompleted { get; private set; }
 
+		public HttpRequestType RequestType { get { return _requestType; } }
+
 		// TODO: simplify timeout for Unity 5.6+
 		// https://docs.unity3d.com/ScriptReference/Networking.UnityWebRequest-timeout.html
-		public HTTPRequest(string url, Action<Response> callback, int timeout)
+		public HTTPRequest(string url, Action<Response> callback, int timeout, HttpRequestType requestType = HttpRequestType.Get)
 		{
-			//UnityEngine.Debug.Log("HTTPRequest: " + url);
 			IsCompleted = false;
 			_timeout = timeout;
-			_request = UnityWebRequest.Get(url);
+			_requestType = requestType;
+
+			switch (_requestType)
+			{
+				case HttpRequestType.Get:
+					_request = UnityWebRequest.Get(url);
+					break;
+				case HttpRequestType.Head:
+					_request = UnityWebRequest.Head(url);
+					break;
+				default:
+					_request = UnityWebRequest.Get(url);
+					break;
+			}
+
 			_callback = callback;
 
 #if UNITY_EDITOR

@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using SQLite4Unity3d;
-using Mapbox.Utils;
-using UnityEngine;
-using Mapbox.Map;
-
-
-namespace Mapbox.Platform.MbTiles
+﻿namespace Mapbox.Platform.MbTiles
 {
 
+	using System;
+	using System.Collections.Generic;
+	using System.IO;
+	using System.Linq;
+	using SQLite4Unity3d;
+	using Mapbox.Utils;
+	using UnityEngine;
+	using Mapbox.Map;
+	using Mapbox.Platform.Cache;
 
 	public class MbTilesDb : IDisposable
 	{
@@ -43,11 +42,13 @@ namespace Mapbox.Platform.MbTiles
 				//_sqlite.CreateTable<tiles>();
 
 				string cmdCreateTTbliles = @"CREATE TABLE tiles(
-zoom_level  INTEGER NOT NULL,
-tile_column BIGINT  NOT NULL,
-tile_row    BIGINT  NOT NULL,
-tile_data   BLOB    NOT NULL,
-timestamp   INTEGER NOT NULL,
+zoom_level   INTEGER NOT NULL,
+tile_column  BIGINT  NOT NULL,
+tile_row     BIGINT  NOT NULL,
+tile_data    BLOB    NOT NULL,
+timestamp    INTEGER NOT NULL,
+etag         TEXT,
+lastmodified INTEGER,
 	PRIMARY KEY(
 		zoom_level ASC,
 		tile_column ASC,
@@ -162,15 +163,16 @@ timestamp   INTEGER NOT NULL,
 		}
 
 
-		public void AddTile(CanonicalTileId tileId, byte[] data)
+		public void AddTile(CanonicalTileId tileId, CacheItem item)
 		{
 			_sqlite.Insert(new tiles
 			{
 				zoom_level = tileId.Z,
 				tile_column = tileId.X,
 				tile_row = tileId.Y,
-				tile_data = data,
-				timestamp = (int)UnixTimestampUtils.To(DateTime.Now)
+				tile_data = item.Data,
+				timestamp = (int)UnixTimestampUtils.To(DateTime.Now),
+				etag = item.ETag
 			});
 
 			_pruneCacheCounter++;
@@ -204,7 +206,7 @@ timestamp   INTEGER NOT NULL,
 		/// </summary>
 		/// <param name="tileId">Canonical tile id to identify the tile</param>
 		/// <returns>tile data as byte[], if tile is not cached returns null</returns>
-		public byte[] GetTile(CanonicalTileId tileId)
+		public CacheItem GetTile(CanonicalTileId tileId)
 		{
 			tiles tile = _sqlite
 				.Table<tiles>()
@@ -216,7 +218,16 @@ timestamp   INTEGER NOT NULL,
 				return null;
 			}
 
-			return tile.tile_data;
+			DateTime? lastModified = null;
+			if (tile.lastmodified.HasValue) { lastModified = UnixTimestampUtils.From((double)tile.lastmodified.Value); }
+
+			return new CacheItem()
+			{
+				Data = tile.tile_data,
+				AddedToCacheTicksUtc = tile.timestamp,
+				ETag = tile.etag,
+				LastModified = lastModified
+			};
 		}
 
 

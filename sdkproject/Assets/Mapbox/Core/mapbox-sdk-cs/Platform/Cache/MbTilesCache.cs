@@ -53,7 +53,7 @@
 
 
 		#endregion
-		
+
 
 		private bool _disposed;
 		private uint _maxCacheSize;
@@ -67,7 +67,7 @@
 		}
 
 
-		public void Add(string mapId, CanonicalTileId tileId, byte[] data)
+		public void Add(string mapId, CanonicalTileId tileId, CacheItem item, bool forceInsert)
 		{
 
 			mapId = cleanMapId(mapId);
@@ -84,7 +84,8 @@
 
 			if (!currentMbTiles.TileExists(tileId))
 			{
-				_mbTiles[mapId].AddTile(tileId, data);
+				//TODO: force insert
+				_mbTiles[mapId].AddTile(tileId, item);
 			}
 		}
 
@@ -114,7 +115,7 @@
 
 
 
-		public byte[] Get(string mapId, CanonicalTileId tileId)
+		public CacheItem Get(string mapId, CanonicalTileId tileId)
 		{
 			mapId = cleanMapId(mapId);
 			lock (_lock)
@@ -125,7 +126,13 @@
 				}
 			}
 
-			return _mbTiles[mapId].GetTile(tileId);
+			CacheItem item = _mbTiles[mapId].GetTile(tileId);
+			if (null == item)
+			{
+				return null;
+			}
+
+			return item;
 		}
 
 
