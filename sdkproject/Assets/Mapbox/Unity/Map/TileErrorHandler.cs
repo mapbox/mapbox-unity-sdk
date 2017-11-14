@@ -34,11 +34,12 @@
 			if (e.Exceptions.Count > 0)
 			{
 				Debug.LogError(String.Format(
-					"{0} Exception(s) caused on the tile. Tile ID:{1}{2}{3}"
+					"{0} Exception(s) caused on the tile. Tile ID:{1} Tile Type:{4}{2}{3}"
 					, e.Exceptions.Count
 					, e.TileId
 					, Environment.NewLine
 					, string.Join(Environment.NewLine, e.Exceptions.Select(ex => ex.Message).ToArray())
+					, e.TileType
 				));
 			}
 
