@@ -36,7 +36,7 @@ namespace Mapbox.Unity.Location
 
 		WaitForSeconds _wait;
 
-		void Start()
+		void Awake()
 		{
 			_wait = new WaitForSeconds(1f);
 			if (_pollRoutine == null)

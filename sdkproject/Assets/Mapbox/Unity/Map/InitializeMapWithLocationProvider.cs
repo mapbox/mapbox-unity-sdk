@@ -1,5 +1,6 @@
 ﻿namespace Mapbox.Unity.Map
 {
+	using System.Collections;
 	using Mapbox.Unity.Location;
 	using UnityEngine;
 
@@ -10,8 +11,9 @@
 
 		ILocationProvider _locationProvider;
 
-		void Start()
+		IEnumerator Start()
 		{
+			yield return null;
 			_locationProvider = LocationProviderFactory.Instance.DefaultLocationProvider;
 			_locationProvider.OnLocationUpdated += LocationProvider_OnLocationUpdated;
 		}
