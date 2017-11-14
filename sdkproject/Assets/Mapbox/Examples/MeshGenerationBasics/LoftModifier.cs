@@ -5,12 +5,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers;
-
-	/// <summary>
-	/// Line Mesh Modifier creates line polygons from a list of vertices. It offsets the original vertices to both sides using Width parameter and triangulates them manually.
-	/// It also creates tiled UV mapping using the line length.
-	/// MergeStartEnd parameter connects both edges of the line segment and creates a closed loop which is useful for some cases like pavements around a building block.
-	/// </summary>
+	
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Loft Modifier")]
 	public class LoftModifier : MeshModifier
 	{
@@ -65,33 +60,23 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 				for (int j = 0; j < _counter; j++)
 				{
-					var prev = Constants.Math.Vector3Zero;
 					var current = Constants.Math.Vector3Zero;
-					var next = Constants.Math.Vector3Zero;
 
 					current = roadSegment[j];
-					Vector3 dirCurrent, dir1, dir2, norm2;
-					//float miter = 0f;
+					Vector3 dirCurrent, dir1, dir2;
 					if (j > 0 && j < (_counter - 1))
 					{
 						dir1 = (roadSegment[j] - roadSegment[j - 1]).normalized;
-						//norm1 = new Vector3(-dir1.z, 0, dir1.x);
 						dir2 = (roadSegment[j + 1] - roadSegment[j]).normalized;
-						norm2 = new Vector3(-dir2.z, 0, dir2.x);
 						dirCurrent = (dir2 + dir1).normalized;
-						//normCurrent = new Vector3(-dirCurrent.z, 0, dirCurrent.x);
-						//var cosHalfAngle = normCurrent.x * norm2.x + normCurrent.y * norm2.y;
-						//miter = (cosHalfAngle != 0 ? 1 / cosHalfAngle : 0) * tile.TileScale;
 					}
 					else if (j == 0) //first
 					{
 						dirCurrent = (roadSegment[j + 1] - roadSegment[j]).normalized;
-						//normCurrent = new Vector3(-dirCurrent.z, 0, dirCurrent.x);
 					}
 					else //last
 					{
 						dirCurrent = (roadSegment[j] - roadSegment[j - 1]).normalized;
-						//normCurrent = new Vector3(-dirCurrent.z, 0, dirCurrent.x);
 					}
 					var q = Quaternion.LookRotation(dirCurrent);
 
@@ -120,47 +105,47 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				float edMag = 0f, h = 0f;
 				co = 0;
 				Vector3 norm;
-				for (int i = 0; i < quadCounter; i++) //creating a quad for each point except last column and last in each row
+
+				for (int i = 0; i < _counter - 1; i++)
 				{
-					if ((i + 1) % _sliceCount == 0) //no quad for last vertex in the end of the line
+					for (int j = 0; j < _sliceCount - 1; j++)
 					{
-						uvDist += edMag;
-						continue;
+						var ind = i * _sliceCount + j;
+						var ed = vl[ind + _sliceCount] - vl[ind];
+						edMag = ed.magnitude;
+						co = md.Vertices.Count;
+						norm = Vector3.Cross(vl[ind] - vl[ind + 1], vl[ind + _sliceCount] - vl[ind]).normalized;
+						md.Vertices.Add(vl[ind]);
+						md.Vertices.Add(vl[ind + 1]);
+						md.Vertices.Add(vl[ind + _sliceCount]);
+						md.Vertices.Add(vl[ind + _sliceCount + 1]);
+
+						h = (vl[ind + 1] - vl[ind]).magnitude;
+
+						md.UV[0].Add(new Vector2(uvDist, 0));
+						md.UV[0].Add(new Vector2(uvDist, h));
+						md.UV[0].Add(new Vector2(uvDist + edMag, 0));
+						md.UV[0].Add(new Vector2(uvDist + edMag, h));
+
+						md.Tangents.Add(new Vector4(ed.normalized.x, ed.normalized.y, ed.normalized.z, 1));
+						md.Tangents.Add(new Vector4(ed.normalized.x, ed.normalized.y, ed.normalized.z, 1));
+						md.Tangents.Add(new Vector4(ed.normalized.x, ed.normalized.y, ed.normalized.z, 1));
+						md.Tangents.Add(new Vector4(ed.normalized.x, ed.normalized.y, ed.normalized.z, 1));
+
+						md.Normals.Add(norm);
+						md.Normals.Add(norm);
+						md.Normals.Add(norm);
+						md.Normals.Add(norm);
+
+						md.Triangles[0].Add(co);
+						md.Triangles[0].Add(co + 2);
+						md.Triangles[0].Add(co + 1);
+
+						md.Triangles[0].Add(co + 1);
+						md.Triangles[0].Add(co + 2);
+						md.Triangles[0].Add(co + 3);
 					}
-
-					var ed = vl[i + _sliceCount] - vl[i];
-					edMag = ed.magnitude;
-					co = md.Vertices.Count;
-					norm = Vector3.Cross(vl[i] - vl[i + 1], vl[i + _sliceCount] - vl[i]).normalized;
-					md.Vertices.Add(vl[i]);
-					md.Vertices.Add(vl[i + 1]);
-					md.Vertices.Add(vl[i + _sliceCount]);
-					md.Vertices.Add(vl[i + _sliceCount + 1]);
-
-					h = (vl[i + 1] - vl[i]).magnitude;
-
-					md.UV[0].Add(new Vector2(uvDist, 0));
-					md.UV[0].Add(new Vector2(uvDist, h));
-					md.UV[0].Add(new Vector2(uvDist + edMag, 0));
-					md.UV[0].Add(new Vector2(uvDist + edMag, h));
-
-					md.Tangents.Add(new Vector4(ed.normalized.x, ed.normalized.y, ed.normalized.z, 1));
-					md.Tangents.Add(new Vector4(ed.normalized.x, ed.normalized.y, ed.normalized.z, 1));
-					md.Tangents.Add(new Vector4(ed.normalized.x, ed.normalized.y, ed.normalized.z, 1));
-					md.Tangents.Add(new Vector4(ed.normalized.x, ed.normalized.y, ed.normalized.z, 1));
-
-					md.Normals.Add(norm);
-					md.Normals.Add(norm);
-					md.Normals.Add(norm);
-					md.Normals.Add(norm);
-
-					md.Triangles[0].Add(co);
-					md.Triangles[0].Add(co + 2);
-					md.Triangles[0].Add(co + 1);
-
-					md.Triangles[0].Add(co + 1);
-					md.Triangles[0].Add(co + 2);
-					md.Triangles[0].Add(co + 3);
+					uvDist += edMag;
 				}
 
 				if (_closeEdges && edges.Count > 2)
