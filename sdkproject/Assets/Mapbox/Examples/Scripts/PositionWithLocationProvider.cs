@@ -72,7 +72,7 @@ namespace Mapbox.Examples
 
 		void LocationProvider_OnLocationUpdated(Location location)
 		{
-			if (_isInitialized)
+			if (_isInitialized && location.IsLocationUpdated)
 			{
 				_targetPosition = Conversions.GeoToWorldPosition(location.LatitudeLongitude,
 																 _map.CenterMercator,
@@ -82,7 +82,7 @@ namespace Mapbox.Examples
 
 		void Update()
 		{
-			transform.position = Vector3.Lerp(transform.position, _targetPosition, Time.deltaTime * _positionFollowFactor);
+			transform.localPosition = Vector3.Lerp(transform.localPosition, _targetPosition, Time.deltaTime * _positionFollowFactor);
 		}
 	}
 }

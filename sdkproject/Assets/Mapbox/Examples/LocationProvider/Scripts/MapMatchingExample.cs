@@ -111,9 +111,7 @@
 			{
 				coords.Add(location.LatitudeLongitude);
 				radiuses.Add((uint)Mathf.Min(location.Accuracy, 30));
-				var timestamp = (long)location.Timestamp;
-				Debug.Log("MapMatchingExample: " + timestamp);
-				timestamps.Add(timestamp);
+				timestamps.Add((long)location.Timestamp);
 			}
 
 			resource.Coordinates = coords.ToArray();

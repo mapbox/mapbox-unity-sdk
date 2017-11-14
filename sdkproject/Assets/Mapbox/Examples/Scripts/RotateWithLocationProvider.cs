@@ -24,6 +24,8 @@ namespace Mapbox.Examples
 		[SerializeField]
 		bool _useTransformLocationProvider;
 
+		Quaternion _targetRotation;
+
 		/// <summary>
 		/// The location provider.
 		/// This is public so you change which concrete <see cref="ILocationProvider"/> to use at runtime.  
@@ -70,18 +72,25 @@ namespace Mapbox.Examples
 
 		void LocationProvider_OnLocationUpdated(Location location)
 		{
-			var euler = Mapbox.Unity.Constants.Math.Vector3Zero;
-			if (_rotateZ)
+			if (location.IsHeadingUpdated)
 			{
-				euler.z = -location.Heading;
-			}
-			else
-			{
-				euler.y = location.Heading;
-			}
+				var euler = Mapbox.Unity.Constants.Math.Vector3Zero;
+				if (_rotateZ)
+				{
+					euler.z = -location.Heading;
+				}
+				else
+				{
+					euler.y = location.Heading;
+				}
 
-			var rotation = Quaternion.Euler(euler);
-			transform.localRotation = Quaternion.Lerp(transform.localRotation, rotation, Time.deltaTime * _rotationFollowFactor);
+				_targetRotation = Quaternion.Euler(euler);
+			}
+		}
+
+		void Update()
+		{
+			transform.localRotation = Quaternion.Lerp(transform.localRotation, _targetRotation, Time.deltaTime * _rotationFollowFactor);
 		}
 	}
 }
