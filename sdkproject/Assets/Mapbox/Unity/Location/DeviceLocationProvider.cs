@@ -89,6 +89,7 @@ namespace Mapbox.Unity.Location
 					var heading = Input.compass.trueHeading;
 					_currentLocation.Heading = heading;
 					_lastHeadingTimestamp = timestamp;
+
 					_currentLocation.IsHeadingUpdated = true;
 				}
 
@@ -98,12 +99,17 @@ namespace Mapbox.Unity.Location
 				{
 					_currentLocation.LatitudeLongitude = new Vector2d(lastData.latitude, lastData.longitude);
 					_currentLocation.Accuracy = (int)lastData.horizontalAccuracy;
-					_currentLocation.IsLocationUpdated = true;
 					_currentLocation.Timestamp = timestamp;
 					_lastLocationTimestamp = timestamp;
+
+					_currentLocation.IsLocationUpdated = true;
 				}
 
-				SendLocation(_currentLocation);
+				if (_currentLocation.IsHeadingUpdated || _currentLocation.IsLocationUpdated)
+				{
+					SendLocation(_currentLocation);
+				}
+
 				yield return null;
 			}
 		}
