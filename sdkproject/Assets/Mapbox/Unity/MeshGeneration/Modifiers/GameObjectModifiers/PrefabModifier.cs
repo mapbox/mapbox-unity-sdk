@@ -22,6 +22,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
             go.name = ve.Feature.Data.Id.ToString();
             go.transform.position = met;
             go.transform.SetParent(ve.GameObject.transform, false);
+			go.transform.localScale = Constants.Math.Vector3One;
 
             var bd = go.AddComponent<FeatureBehaviour>();
             bd.Init(ve.Feature);
