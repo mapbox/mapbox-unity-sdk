@@ -134,8 +134,7 @@
 			string finalUrl = uriBuilder.ToString();
 
 
-			// if tile was available propagate to all other caches and return data immediately
-			// continue afterwards to check if cache needs updating
+			// if tile was available call callback with it, propagate to all other caches and check if a newer one is available
 			if (null != cachedItem)
 			{
 				callback(Response.FromCache(cachedItem.Data));
@@ -144,8 +143,14 @@
 					finalUrl,
 					(Response headerOnly) =>
 					{
-						UnityEngine.Debug.LogFormat("{0} : {1}", cachedItem.ETag, headerOnly.Headers["ETag"]);
-						// data from cache is the same as on the web, don't force insert via cache.add()
+						//just bail on error, we've returned the cached tile already
+						if (headerOnly.HasError)
+						{
+							return;
+						}
+
+						//UnityEngine.Debug.LogFormat("{0} : {1}", cachedItem.ETag, headerOnly.Headers["ETag"]);
+						// data from cache is the same as on the web, propagate to all other caches but don't force insert via cache.add()
 						if (cachedItem.ETag.Equals(headerOnly.Headers["ETag"]))
 						{
 							foreach (var cache in _caches)
@@ -155,7 +160,9 @@
 						}
 						else
 						{
-							//TODO: new request, extract below method
+							UnityEngine.Debug.LogWarningFormat("updating cached tile {0}", tileId);
+							// request updated tile, don't pass callback as we've responsed with the previously cached tile
+							requestTileAndCache(finalUrl, mapId, tileId, timeout, null);
 						}
 					}
 					, timeout
@@ -167,55 +174,63 @@
 			else
 			{
 				// requested tile is not in any of the caches yet, get it
+				return requestTileAndCache(finalUrl, mapId, tileId, timeout, callback);
+			}
+		}
 
-				return IAsyncRequestFactory.CreateRequest(
-					finalUrl,
-					(Response r) =>
+
+		private IAsyncRequest requestTileAndCache(string url, string mapId, CanonicalTileId tileId, int timeout, Action<Response> callback)
+		{
+			return IAsyncRequestFactory.CreateRequest(
+				url,
+				(Response r) =>
+				{
+					// if the request was successful add tile to all caches
+					if (!r.HasError && null != r.Data)
 					{
-						// if the request was successful add tile to all caches
-						if (!r.HasError && null != r.Data)
+						//UnityEngine.Debug.Log(uri);
+						string eTag = string.Empty;
+						DateTime? lastModified = null;
+
+						if (!r.Headers.ContainsKey("ETag"))
 						{
-							//UnityEngine.Debug.Log(uri);
-							string eTag = string.Empty;
-							DateTime? lastModified = null;
+							UnityEngine.Debug.LogWarningFormat("no 'ETag' header present in response for {0}", url);
+						}
+						else
+						{
+							eTag = r.Headers["ETag"];
+						}
 
-							if (!r.Headers.ContainsKey("ETag"))
-							{
-								UnityEngine.Debug.LogWarningFormat("no 'ETag' header present in response for {0}", uri);
-							}
-							else
-							{
-								eTag = r.Headers["ETag"];
-							}
+						// not all APIs populate 'Last-Modified' header
+						// don't log error if it's missing
+						if (r.Headers.ContainsKey("Last-Modified"))
+						{
+							lastModified = DateTime.ParseExact(r.Headers["Last-Modified"], "r", null);
+						}
 
-							// not all APIs populate 'Last-Modified' header
-							if (!r.Headers.ContainsKey("Last-Modified"))
-							{
-								//UnityEngine.Debug.LogWarningFormat("no 'Last-Modified' header present in response for {0}", uri);
-							}
-							else
-							{
-								lastModified = DateTime.ParseExact(r.Headers["Last-Modified"], "r", null);
-								UnityEngine.Debug.LogFormat("{0}:{1}", r.Headers["Last-Modified"], lastModified);
-							}
-
-
-							foreach (var cache in _caches)
-							{
-								cache.Add(mapId, tileId, new CacheItem()
+						// propagate to all caches forcing update
+						foreach (var cache in _caches)
+						{
+							cache.Add(
+								mapId
+								, tileId
+								, new CacheItem()
 								{
 									Data = r.Data,
 									ETag = eTag,
 									LastModified = lastModified
-								},
-								true
-								);
-							}
+								}
+								, true
+							);
 						}
+					}
+					if (null != callback)
+					{
 						callback(r);
-					}, timeout);
-			}
+					}
+				}, timeout);
 		}
+
 
 		class MemoryCacheAsyncRequest : IAsyncRequest
 		{
