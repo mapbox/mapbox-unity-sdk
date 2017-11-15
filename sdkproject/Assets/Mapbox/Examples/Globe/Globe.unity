@@ -388,6 +388,7 @@ GameObject:
   - component: {fileID: 1461465689}
   - component: {fileID: 1461465690}
   - component: {fileID: 1461465691}
+  - component: {fileID: 1461465692}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -471,3 +472,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _objectToRotate: {fileID: 1461465688}
   _multiplier: 1
+--- !u!114 &1461465692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1461465686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76a256726e16d4966a3f30b97a17e1d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mapInstance: {fileID: 1461465687}
+  OnTileError:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: Mapbox.Unity.Map.TileErrorEvent, Assembly-CSharp, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null

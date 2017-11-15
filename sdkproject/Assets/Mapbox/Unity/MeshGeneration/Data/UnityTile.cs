@@ -112,13 +112,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public event Action<UnityTile> OnRasterDataChanged = delegate { };
 		public event Action<UnityTile> OnVectorDataChanged = delegate { };
 
-		/// <summary>
-		/// The <c>OnTileError</c> event triggers when there's <c>Tile</c> error.
-		/// Returns a <see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance as a parameter, for the tile on which error occurred.
-		/// </summary>
-		public event EventHandler<TileErrorEventArgs> OnTileError;
-
-
 		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, float scale, Texture2D loadingTexture = null)
 		{
 			TileScale = scale;
@@ -234,7 +227,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		internal void AddTile(Tile tile)
 		{
 			_tiles.Add(tile);
-			tile.OnTileError += OnTileErrorHandler;
 		}
 
 		public void Cancel()
@@ -242,18 +234,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			for (int i = 0, _tilesCount = _tiles.Count; i < _tilesCount; i++)
 			{
 				_tiles[i].Cancel();
-				_tiles[i].OnTileError -= OnTileErrorHandler;
-			}
-		}
-
-		//OnTileError delegate handle method to bubble up the event all the way up to the chain to AbstractTileFactory and MapVisualizer
-		private void OnTileErrorHandler(object sender, TileErrorEventArgs e)
-		{
-			EventHandler<TileErrorEventArgs> handler = OnTileError;
-			if (handler != null)
-			{
-				e.UnityTileInstance = this;
-				handler(this, e);
 			}
 		}
 

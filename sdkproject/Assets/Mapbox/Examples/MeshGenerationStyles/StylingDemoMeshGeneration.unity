@@ -201,7 +201,7 @@ MonoBehaviour:
   OnTileError:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: Mapbox.Examples.TileErrorEvent, Assembly-CSharp, Version=0.0.0.0,
+    m_TypeName: Mapbox.Unity.Map.TileErrorEvent, Assembly-CSharp, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!1 &498507641
 GameObject:

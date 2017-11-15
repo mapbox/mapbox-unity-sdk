@@ -42,6 +42,14 @@ public abstract class AbstractTileFactory : ScriptableObject
 		/// Returns a <see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance as a parameter, for the tile on which error occurred.
 		/// </summary>
 		public event EventHandler<TileErrorEventArgs> OnTileError;
+		protected virtual void OnErrorOccurred(TileErrorEventArgs e)
+		{
+			EventHandler<TileErrorEventArgs> handler = OnTileError;
+			if (handler != null)
+			{
+				handler(this, e);
+			}
+		}
 
 		public void Initialize(IFileSource fileSource)
 		{
@@ -54,23 +62,21 @@ public abstract class AbstractTileFactory : ScriptableObject
 		public void Register(UnityTile tile)
 		{
 			OnRegistered(tile);
-			tile.OnTileError += Tile_OnTileErrorEvent;
 		}
 
 		public void Unregister(UnityTile tile)
 		{
 			OnUnregistered(tile);
-			tile.OnTileError -= Tile_OnTileErrorEvent;
 		}
 
-		private void Tile_OnTileErrorEvent(object sender, TileErrorEventArgs e)
-		{
-			EventHandler<TileErrorEventArgs> handler = OnTileError;
-			if (handler != null)
-			{
-				handler(this, e);
-			}
-		}
+		//internal void OnTileErrorEvent(TileErrorEventArgs e)
+		//{
+		//	EventHandler<TileErrorEventArgs> handler = OnTileError;
+		//	if (handler != null)
+		//	{
+		//		handler(this, e);
+		//	}
+		//}
 
 		internal abstract void OnInitialized();
 

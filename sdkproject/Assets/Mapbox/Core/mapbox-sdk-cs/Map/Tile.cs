@@ -112,11 +112,6 @@ namespace Mapbox.Map
 		}
 
 		/// <summary>
-		/// Occurs when there's a <c>Tile<c/> error. It bubbles up all the way up to  the <see cref="T:Mapbox.Unity.Map.AbstractTileFactory"/> and <see cref="T:Mapbox.Unity.Map.AbstractMapVisualizer"/>
-		/// </summary>
-		public event EventHandler<TileErrorEventArgs> OnTileError;
-
-		/// <summary>
 		///     Initializes the <see cref="T:Mapbox.Map.Tile"/> object. It will
 		///     start a network request and fire the callback when completed.
 		/// </summary>
@@ -204,17 +199,18 @@ namespace Mapbox.Map
 		// a Worker class to abstract this, so on platforms that support threads (like Unity
 		// on the desktop, Android, etc) we can use worker threads and when building for
 		// the browser, we keep it single-threaded.
+		List<string> ids = new List<string>();
 		private void HandleTileResponse(Response response)
 		{
 
 			if (response.HasError)
 			{
+				if (!ids.Contains(_id.ToString()))
+					ids.Add(_id.ToString());
+				else
+					return;
+				
 				response.Exceptions.ToList().ForEach(e => AddException(e));
-				EventHandler<TileErrorEventArgs> handler = OnTileError;
-				if (handler != null)
-				{
-					handler(this, new TileErrorEventArgs(_id,this.GetType(),null,_exceptions));
-				}
 			}
 			else
 			{
