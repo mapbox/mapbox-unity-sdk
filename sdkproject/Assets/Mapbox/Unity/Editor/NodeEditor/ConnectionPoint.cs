@@ -47,7 +47,14 @@ namespace Mapbox.Editor.NodeEditor
 
 		public ConnectionPoint(Node node, string inname, string name, float deltay, ConnectionPointType type, GUIStyle style)
 		{
-			this._outLabel = Regex.Replace(name, "(\\B[A-Z])", " $1");
+			if (!string.IsNullOrEmpty(name))
+			{
+				this._outLabel = Regex.Replace(name, "(\\B[A-Z])", " $1");
+			}
+			else
+			{
+				this._outLabel = "";
+			}
 			inLabel = inname;
 			this.node = node;
 			this.type = type;
