@@ -151,7 +151,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _initializeOnStart: 1
   _latitudeLongitudeString: 37.7648, -122.463
-  _zoom: 16
+  _zoom: 15
   _root: {fileID: 0}
   _tileProvider: {fileID: 110210643}
   _mapVisualizer: {fileID: 11400000, guid: 02a98fd6de7af4e4985b970acb849e8b, type: 2}
@@ -209,24 +209,24 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4382711576950822, guid: cef2154b086ac7244b859a4cb18fe659, type: 2}
       propertyPath: m_RootOrder
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: cef2154b086ac7244b859a4cb18fe659, type: 2}
   m_IsPrefabParent: 0
---- !u!1 &1235558823
+--- !u!1 &1351042186
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   serializedVersion: 5
   m_Component:
-  - component: {fileID: 1235558829}
-  - component: {fileID: 1235558828}
-  - component: {fileID: 1235558827}
-  - component: {fileID: 1235558826}
-  - component: {fileID: 1235558825}
-  - component: {fileID: 1235558824}
+  - component: {fileID: 1351042194}
+  - component: {fileID: 1351042193}
+  - component: {fileID: 1351042192}
+  - component: {fileID: 1351042191}
+  - component: {fileID: 1351042190}
+  - component: {fileID: 1351042189}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -234,12 +234,12 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1235558824
+--- !u!114 &1351042189
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1235558823}
+  m_GameObject: {fileID: 1351042186}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6dcd6f5cc95eb9643932299678d408f7, type: 3}
@@ -253,7 +253,7 @@ MonoBehaviour:
   mouseRotationMultiplier: 0.2
   mouseZoomMultiplier: 5
   minZoomDistance: 20
-  maxZoomDistance: 200
+  maxZoomDistance: 2001
   smoothingFactor: 0.1
   goToSpeed: 0.1
   useKeyboardInput: 1
@@ -267,34 +267,34 @@ MonoBehaviour:
   screenEdgeSize: 10
   screenEdgeSpeed: 1
   objectToFollow: {fileID: 0}
-  cameraTarget: {x: 0, y: 0, z: 0}
---- !u!81 &1235558825
+  cameraTarget: {x: 50.75393, y: 0.0000037638283, z: -21.440783}
+--- !u!81 &1351042190
 AudioListener:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1235558823}
+  m_GameObject: {fileID: 1351042186}
   m_Enabled: 1
---- !u!124 &1235558826
+--- !u!124 &1351042191
 Behaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1235558823}
+  m_GameObject: {fileID: 1351042186}
   m_Enabled: 1
---- !u!92 &1235558827
+--- !u!92 &1351042192
 Behaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1235558823}
+  m_GameObject: {fileID: 1351042186}
   m_Enabled: 1
---- !u!20 &1235558828
+--- !u!20 &1351042193
 Camera:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1235558823}
+  m_GameObject: {fileID: 1351042186}
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
@@ -306,10 +306,10 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 3333
   field of view: 20
-  orthographic: 0
-  orthographic size: 90
+  orthographic: 1
+  orthographic size: 143.6
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -320,23 +320,23 @@ Camera:
   m_TargetEye: 3
   m_HDR: 0
   m_AllowMSAA: 1
-  m_ForceIntoRT: 0
+  m_ForceIntoRT: 1
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
   m_StereoMirrorMode: 0
---- !u!4 &1235558829
+--- !u!4 &1351042194
 Transform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1235558823}
-  m_LocalRotation: {x: 0.32152212, y: 0, z: 0, w: 0.94690216}
-  m_LocalPosition: {x: 6.196149, y: 279.6, z: -370.6725}
+  m_GameObject: {fileID: 1351042186}
+  m_LocalRotation: {x: -0.3361031, y: 0.059829146, z: -0.02142585, w: -0.9396787}
+  m_LocalPosition: {x: 149.82108, y: 640.881, z: -796.4037}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 37.510002, y: 0, z: 0}
 --- !u!1 &1906963057
 GameObject:

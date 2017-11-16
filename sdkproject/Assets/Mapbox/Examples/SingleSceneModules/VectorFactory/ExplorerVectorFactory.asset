@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63d97cb1cfb3f1b499c24763afa54873, type: 3}
   m_Name: ExplorerVectorFactory
   m_EditorClassIdentifier: 
-  _mapId: mapbox.mapbox-streets-v7
+  _mapId: mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2,mapbox.mapbox-traffic-v1
   Visualizers:
   - {fileID: 11400000, guid: 1d2c597868e13c84b9c6c8e013ef80e5, type: 2}
   - {fileID: 11400000, guid: afa80ab007e84c0429862718768059e8, type: 2}
@@ -35,3 +35,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 00a096e07cdfcde40957f45541a93ad6, type: 2}
   - {fileID: 11400000, guid: 711d19f949ba80e40a313fcf84e51b15, type: 2}
   - {fileID: 11400000, guid: 93f8be3e38d52cb49b8321e16e9c0ecf, type: 2}
+  - {fileID: 11400000, guid: f1ff2b285816a314ca91887b82fc5901, type: 2}
+  - {fileID: 11400000, guid: 3b20f5ab134a5b844a01fc10963c7171, type: 2}
+  - {fileID: 11400000, guid: 4e4efb2d5605dca45b383e202df750ed, type: 2}
+  - {fileID: 11400000, guid: 441a0bada0e3f354a879121b619b6aff, type: 2}
