@@ -297,7 +297,7 @@ namespace Mapbox.Unity.Utilities
 		/// <returns> Degrees per tile. </returns>
 		public static float GetTileScaleInDegrees(float latitude, int zoom)
 		{
-			return (float)(360.0f * (Math.Cos(Mathf.Deg2Rad * latitude) / Math.Pow(2f, zoom)));
+			return (float)(360.0f / Math.Pow(2f, zoom + 8));
 		}
 
 		/// <summary>
