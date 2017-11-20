@@ -13,26 +13,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Active: 1
   _maxEdgeSectionCount: 40
-  _preferredEdgeSectionLength: 4
+  _preferredEdgeSectionLength: 1
   _centerSegments: 1
   _flatTops: 0
   _height: 7
   _forceHeight: 1
-  _floorHeight: 0.3
-  _firstFloorHeight: 0.3
-  Windows: {fileID: 114294706888588222, guid: b8ecb5bb7b3793640a6742bc0512c2ca, type: 2}
-  FirstFloor: {fileID: 114024657973738462, guid: b488f8d15dcf2f74c99e065d2ced2472,
+  _floorHeight: 1
+  _firstFloorHeight: 1
+  Windows: {fileID: 114294706888588222, guid: a8cf1a6068bcce244a683aa189f00b39, type: 2}
+  FirstFloor: {fileID: 114294706888588222, guid: a8cf1a6068bcce244a683aa189f00b39,
     type: 2}
   Material:
-  - {fileID: 2100000, guid: 62e25ef75a2216f418d06453c9ad15cb, type: 2}
-  - {fileID: 2100000, guid: a8e32d2cd442e564aa46c99f0ae7c0c8, type: 2}
-  - {fileID: 2100000, guid: c01b7c8cb1175b54aab24b670c2d58dd, type: 2}
-  - {fileID: 2100000, guid: 49ef76ea47782eb4b93ac08b234fd6c3, type: 2}
-  - {fileID: 2100000, guid: ee26ded8aeae32044836748251f93891, type: 2}
-  - {fileID: 2100000, guid: f145fd98abc7a354f83c3a2e8df80a75, type: 2}
-  - {fileID: 2100000, guid: 97942cb5527e6f24eb8b8f5c86f8744d, type: 2}
-  - {fileID: 2100000, guid: ae4870cba172f524491e4431ce936a9d, type: 2}
-  - {fileID: 2100000, guid: ac4517348fefb604bbf10afeb378a491, type: 2}
-  - {fileID: 2100000, guid: ee5d59fcc8497a641905c26644c20880, type: 2}
-  - {fileID: 2100000, guid: 912f300affe60c543ac3ac40ef980902, type: 2}
-  - {fileID: 2100000, guid: bb694a94be4a3c64ca9ef44c62415782, type: 2}
+  - {fileID: 2100000, guid: 2b84a62cd76517e47bce2891dc7687e8, type: 2}
+  - {fileID: 2100000, guid: cfeb481f2c9aa5f429e1a23117fe109d, type: 2}
+  - {fileID: 2100000, guid: 9574f0aa4a53fd54b9cd51d7fa2df9d4, type: 2}
+  - {fileID: 2100000, guid: 8c4ce0a8cb6cd73488aef26c9531be70, type: 2}

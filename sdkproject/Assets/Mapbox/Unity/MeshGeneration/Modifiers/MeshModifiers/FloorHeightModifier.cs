@@ -31,16 +31,17 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		[SerializeField]
 		[Range(0, 10)]
 		private float _floorHeight = 0;
+		private float _scaledFloorHeight = 0;
 		[SerializeField]
 		[Range(0, 10)]
 		private float _firstFloorHeight = 0;
+		private float _scaledFirstFloorHeight = 0;
 
 		public BuildingModuleHolder Windows;
 		public BuildingModuleHolder FirstFloor;
 
 		public Material[] Material;
 
-		private Material material;
 		private List<Vector3> edgeList;
 		float dist = 0;
 		float step = 0;
@@ -59,7 +60,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		List<Vector3> verts;
 		List<Vector3> norms;
 		List<Vector2> uvs;
-		List<int> tris;
+		List<List<int>> tris;
 		Mesh mesh;
 
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
@@ -73,7 +74,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
-			material = Material[UnityEngine.Random.Range(0, Material.Length)];
+			_scaledFloorHeight = tile.TileScale * _floorHeight;
+			_scaledFirstFloorHeight = tile.TileScale * _firstFloorHeight;
+
 			if (md.Vertices.Count == 0 || feature == null || feature.Points.Count < 1)
 				return;
 			float hf = _height;
@@ -88,7 +91,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + hf, md.Vertices[i].z);
 			}
-
+			
 			edgeList = new List<Vector3>();
 			dist = 0;
 			step = 0;
@@ -142,10 +145,14 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			verts = new List<Vector3>();
 			norms = new List<Vector3>();
 			uvs = new List<Vector2>();
-			tris = new List<int>();
+			tris = new List<List<int>>();
+			tris.Add(new List<int>());
+			tris.Add(new List<int>());
+			tris.Add(new List<int>());
+			tris.Add(new List<int>());
 			var indf = 0;
-			var floor = (_floorHeight > 0) ? (hf - _firstFloorHeight) / _floorHeight : hf;
-			var zmul = -1f;
+			var floor = (_scaledFloorHeight > 0) ? (hf - _scaledFirstFloorHeight) / _scaledFloorHeight : hf;
+			
 			for (int i = 0; i < edgeList.Count - 1; i += 2)
 			{
 				v1 = edgeList[i];
@@ -157,244 +164,74 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					continue;
 				var qua = Quaternion.LookRotation(norm);
 
-				float xmul;
-				float ymul;
+				//float xmul;
+				//float ymul;
 				var luck = UnityEngine.Random.value > 0.5;
 
-				if (d > 3 * tile.TileScale)
+				if (d > _preferredEdgeSectionLength * tile.TileScale)
 				{
-					xmul = (d / Windows.SegmentData.Size.x) * 1.01f;
-					ymul = _floorHeight / Windows.SegmentData.Size.y;
-					if (zmul == -1)
-					{
-						zmul = xmul;
-					}
-					for (int f = 1; f <= floor; f++)
-					{
-						if (verts.Count >= 60000)
-						{
-							mesh = new Mesh();
-							mesh.SetVertices(verts);
-							mesh.SetNormals(norms);
-							mesh.SetUVs(0, uvs);
-							mesh.SetTriangles(tris, 0);
-							mf.mesh = mesh;
-							mr.material = material;
-							go.transform.SetParent(tile.transform);
-							go.transform.position = tile.transform.position;
-
-							go = new GameObject();
-							mf = go.AddComponent<MeshFilter>();
-							mr = go.AddComponent<MeshRenderer>();
-							verts.Clear();
-							norms.Clear();
-							uvs.Clear();
-							tris.Clear();
-							indf = 0;
-						}
-
-						for (int k = 0; k < Windows.SegmentData.Vertices.Length; k++)
-						{
-							//var tra = qua * Windows.Vertices[k] * 10;
-							var tra = qua * new Vector3(Windows.SegmentData.Vertices[k].x * xmul, Windows.SegmentData.Vertices[k].y * ymul, Windows.SegmentData.Vertices[k].z * zmul);
-							verts.Add(new Vector3(tra.x + v1.x, tra.y + (v1.y - (f * _floorHeight)), tra.z + v1.z));
-						}
-
-						for (int k = 0; k < Windows.SegmentData.Normals.Length; k++)
-						{
-							norms.Add(qua * Windows.SegmentData.Normals[k]);
-						}
-
-						for (int k = 0; k < Windows.SegmentData.Uv.Length; k++)
-						{
-							uvs.Add(Windows.SegmentData.Uv[k]);
-						}
-
-						for (int k = 0; k < Windows.SegmentData.Triangles.Length; k++)
-						{
-							tris.Add(indf + Windows.SegmentData.Triangles[k]);
-						}
-
-						indf += Windows.SegmentData.Vertices.Length;
-					}
+					indf = CreateSegment(tile, Windows.SegmentData, indf, floor, qua);
 				}
 				else
 				{
-					xmul = (d / Windows.AlternativeData.Size.x) * 1.01f;
-					ymul = _floorHeight / Windows.AlternativeData.Size.y;
-					if (zmul == -1)
-					{
-						zmul = xmul;
-					}
-
 					if (Windows.AlternativeData != null)
 					{
-						for (int f = 1; f <= floor; f++)
-						{
-							if (verts.Count >= 60000)
-							{
-								mesh = new Mesh();
-								mesh.SetVertices(verts);
-								mesh.SetNormals(norms);
-								mesh.SetUVs(0, uvs);
-								mesh.SetTriangles(tris, 0);
-								mf.mesh = mesh;
-								mr.material = material;
-								go.transform.SetParent(tile.transform);
-								go.transform.position = tile.transform.position;
-
-								go = new GameObject();
-								mf = go.AddComponent<MeshFilter>();
-								mr = go.AddComponent<MeshRenderer>();
-								verts.Clear();
-								norms.Clear();
-								uvs.Clear();
-								tris.Clear();
-								indf = 0;
-							}
-
-							for (int k = 0; k < Windows.AlternativeData.Vertices.Length; k++)
-							{
-								var tra = qua * new Vector3(Windows.AlternativeData.Vertices[k].x * xmul, Windows.AlternativeData.Vertices[k].y * ymul, Windows.AlternativeData.Vertices[k].z * zmul);
-								verts.Add(new Vector3(tra.x + v1.x, tra.y + (v1.y - (f * _floorHeight)), tra.z + v1.z));
-							}
-
-							for (int k = 0; k < Windows.AlternativeData.Normals.Length; k++)
-							{
-								norms.Add(qua * Windows.AlternativeData.Normals[k]);
-							}
-
-							for (int k = 0; k < Windows.AlternativeData.Uv.Length; k++)
-							{
-								uvs.Add(Windows.AlternativeData.Uv[k]);
-							}
-
-							for (int k = 0; k < Windows.AlternativeData.Triangles.Length; k++)
-							{
-								tris.Add(indf + Windows.AlternativeData.Triangles[k]);
-							}
-
-							indf += Windows.AlternativeData.Vertices.Length;
-						}
+						indf = CreateSegment(tile, Windows.AlternativeData, indf, floor, qua);
 					}
 					else
 					{
-						verts.Add(v1);
-						verts.Add(v2);
-						uvs.Add(new Vector2(0.2f, 0.3f));
-						uvs.Add(new Vector2(0.2f, 0.3f));
-						norms.Add(norm);
-						norms.Add(norm);
-						indf += 2;
-
-						for (int f = 1; f <= floor; f++)
-						{
-							verts.Add(verts[verts.Count - 2]);
-							verts.Add(verts[verts.Count - 2]);
-							verts.Add(new Vector3(v1.x, v1.y - (f * _floorHeight), v1.z));
-							verts.Add(new Vector3(v2.x, v2.y - (f * _floorHeight), v2.z));
-
-							norms.Add(norm);
-							norms.Add(norm);
-							norms.Add(norm);
-							norms.Add(norm);
-
-							uvs.Add(new Vector2(0.2f, 0.3f));
-							uvs.Add(new Vector2(0.2f, 0.3f));
-							uvs.Add(new Vector2(0.2f, 0.3f));
-							uvs.Add(new Vector2(0.2f, 0.3f));
-
-							tris.Add(indf);
-							tris.Add(indf + 1);
-							tris.Add(indf + 2);
-
-							tris.Add(indf + 1);
-							tris.Add(indf + 3);
-							tris.Add(indf + 2);
-
-							indf += 4;
-						}
+						indf = CreateFlatWall(indf, floor);
 					}
 				}
 
 				if (verts.Count >= 60000)
 				{
-					mesh = new Mesh();
-					mesh.SetVertices(verts);
-					mesh.SetNormals(norms);
-					mesh.SetUVs(0, uvs);
-					mesh.SetTriangles(tris, 0);
-					mf.mesh = mesh;
-					mr.material = material;
-					go.transform.SetParent(tile.transform);
-					go.transform.position = tile.transform.position;
-
-					go = new GameObject();
-					mf = go.AddComponent<MeshFilter>();
-					mr = go.AddComponent<MeshRenderer>();
-					verts.Clear();
-					norms.Clear();
-					uvs.Clear();
-					tris.Clear();
+					CreateObject(tile);
 					indf = 0;
 				}
 
-				if (d > 3 * tile.TileScale)
+				if (d > _preferredEdgeSectionLength * tile.TileScale)
 				{
-					xmul = (d / FirstFloor.SegmentData.Size.x) * 1.01f;
-					ymul = ((hf % _floorHeight) + _firstFloorHeight) / FirstFloor.SegmentData.Size.y;
-
-					for (int k = 0; k < FirstFloor.SegmentData.Vertices.Length; k++)
-					{
-						//var tra = qua * Windows.Vertices[k] * 10;
-						var tra = qua * new Vector3(FirstFloor.SegmentData.Vertices[k].x * xmul, FirstFloor.SegmentData.Vertices[k].y * ymul, FirstFloor.SegmentData.Vertices[k].z * zmul);
-						verts.Add(new Vector3(tra.x + v1.x, tra.y, tra.z + v1.z));
-					}
-
-					for (int k = 0; k < FirstFloor.SegmentData.Normals.Length; k++)
-					{
-						norms.Add(qua * FirstFloor.SegmentData.Normals[k]);
-					}
-
-					for (int k = 0; k < FirstFloor.SegmentData.Uv.Length; k++)
-					{
-						uvs.Add(FirstFloor.SegmentData.Uv[k]);
-					}
-
-					for (int k = 0; k < FirstFloor.SegmentData.Triangles.Length; k++)
-					{
-						tris.Add(indf + FirstFloor.SegmentData.Triangles[k]);
-					}
-
-					indf += FirstFloor.SegmentData.Vertices.Length;
+					indf = CreateFirstFloor(hf, FirstFloor.SegmentData, indf, qua);
 				}
 				else
 				{
-					xmul = (d / FirstFloor.AlternativeData.Size.x) * 1.01f;
-					ymul = ((hf % _floorHeight) + _firstFloorHeight) / FirstFloor.AlternativeData.Size.y;
-
-					for (int k = 0; k < FirstFloor.AlternativeData.Vertices.Length; k++)
+					if (Windows.AlternativeData != null)
 					{
-						var tra = qua * new Vector3(FirstFloor.AlternativeData.Vertices[k].x * xmul, FirstFloor.AlternativeData.Vertices[k].y * ymul, FirstFloor.AlternativeData.Vertices[k].z * zmul);
-						verts.Add(new Vector3(tra.x + v1.x, tra.y, tra.z + v1.z));
+						indf = CreateFirstFloor(hf, FirstFloor.AlternativeData, indf, qua);
 					}
-
-					for (int k = 0; k < FirstFloor.AlternativeData.Normals.Length; k++)
+					else
 					{
-						norms.Add(qua * FirstFloor.AlternativeData.Normals[k]);
+						indf = CreateFlatWall(indf, floor);
 					}
+					//xmul = (d / FirstFloor.AlternativeData.Size.x) * 1.01f;
+					//ymul = ((hf % _floorHeight) + _firstFloorHeight) / FirstFloor.AlternativeData.Size.y;
 
-					for (int k = 0; k < FirstFloor.AlternativeData.Uv.Length; k++)
-					{
-						uvs.Add(FirstFloor.AlternativeData.Uv[k]);
-					}
+					//for (int k = 0; k < FirstFloor.AlternativeData.Vertices.Length; k++)
+					//{
+					//	var tra = qua * new Vector3(FirstFloor.AlternativeData.Vertices[k].x * xmul, FirstFloor.AlternativeData.Vertices[k].y * ymul, FirstFloor.AlternativeData.Vertices[k].z * zmul);
+					//	verts.Add(new Vector3(tra.x + v1.x, tra.y, tra.z + v1.z));
+					//}
 
-					for (int k = 0; k < FirstFloor.AlternativeData.Triangles.Length; k++)
-					{
-						tris.Add(indf + FirstFloor.AlternativeData.Triangles[k]);
-					}
+					//for (int k = 0; k < FirstFloor.AlternativeData.Normals.Length; k++)
+					//{
+					//	norms.Add(qua * FirstFloor.AlternativeData.Normals[k]);
+					//}
 
-					indf += FirstFloor.AlternativeData.Vertices.Length;
+					//for (int k = 0; k < FirstFloor.AlternativeData.Uv.Length; k++)
+					//{
+					//	uvs.Add(FirstFloor.AlternativeData.Uv[k]);
+					//}
+
+					//for (int k = 0; k < FirstFloor.AlternativeData.Triangles.Length; k++)
+					//{
+					//	for (int l = 0; l < FirstFloor.AlternativeData.Triangles[k].Length; l++)
+					//	{
+					//		tris[k].Add(indf + FirstFloor.AlternativeData.Triangles[k][l]);
+					//	}
+					//}
+
+					//indf += FirstFloor.AlternativeData.Vertices.Length;
 
 					//verts.Add(new Vector3(v1.x, v1.y - hf + (hf % _floorHeight) + _firstFloorHeight, v1.z));
 					//verts.Add(new Vector3(v2.x, v2.y - hf + (hf % _floorHeight) + _firstFloorHeight, v2.z));
@@ -426,9 +263,13 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			mesh.SetVertices(verts);
 			mesh.SetNormals(norms);
 			mesh.SetUVs(0, uvs);
-			mesh.SetTriangles(tris, 0);
+			mesh.subMeshCount = tris.Count;
+			for (int a = 0; a < tris.Count; a++)
+			{
+				mesh.SetTriangles(tris[a], a);
+			}
 			mf.mesh = mesh;
-			mr.material = material;
+			mr.materials = Material;
 			go.transform.SetParent(tile.transform);
 			go.transform.position = tile.transform.position;
 
@@ -440,6 +281,158 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			uvs.Clear();
 			tris.Clear();
 			indf = 0;
+		}
+
+		private int CreateFirstFloor(float hf, SegmentData segment, int indf, Quaternion qua)
+		{
+			var xmul = (d / segment.Size.x) * 1.01f;
+			var ymul = ((hf % _scaledFloorHeight) + _scaledFirstFloorHeight) / segment.Size.y;
+			for (int k = 0; k < segment.Vertices.Length; k++)
+			{
+				//var tra = qua * Windows.Vertices[k] * 10;
+				var tra = qua * new Vector3(segment.Vertices[k].x * xmul, segment.Vertices[k].y * ymul, segment.Vertices[k].z * xmul);
+				verts.Add(new Vector3(tra.x + v1.x, tra.y, tra.z + v1.z));
+			}
+
+			for (int k = 0; k < segment.Normals.Length; k++)
+			{
+				norms.Add(qua * segment.Normals[k]);
+			}
+
+			for (int k = 0; k < segment.Uv.Length; k++)
+			{
+				uvs.Add(segment.Uv[k]);
+			}
+
+			for (int k = 0; k < segment.Triangles.Length; k++)
+			{
+				if (segment.Triangles[k] == null)
+					continue;
+				for (int l = 0; l < segment.Triangles[k].Length; l++)
+				{
+					tris[k].Add(indf + segment.Triangles[k][l]);
+				}
+			}
+
+			indf += segment.Vertices.Length;
+			return indf;
+		}
+
+		private int CreateFlatWall(int indf, float floor)
+		{
+			verts.Add(v1);
+			verts.Add(v2);
+			uvs.Add(new Vector2(0.2f, 0.3f));
+			uvs.Add(new Vector2(0.2f, 0.3f));
+			norms.Add(norm);
+			norms.Add(norm);
+			indf += 2;
+
+			for (int f = 1; f <= floor; f++)
+			{
+				verts.Add(verts[verts.Count - 2]);
+				verts.Add(verts[verts.Count - 2]);
+				verts.Add(new Vector3(v1.x, v1.y - (f * _scaledFloorHeight), v1.z));
+				verts.Add(new Vector3(v2.x, v2.y - (f * _scaledFloorHeight), v2.z));
+
+				norms.Add(norm);
+				norms.Add(norm);
+				norms.Add(norm);
+				norms.Add(norm);
+
+				uvs.Add(new Vector2(0.2f, 0.3f));
+				uvs.Add(new Vector2(0.2f, 0.3f));
+				uvs.Add(new Vector2(0.2f, 0.3f));
+				uvs.Add(new Vector2(0.2f, 0.3f));
+
+				tris[0].Add(indf);
+				tris[0].Add(indf + 1);
+				tris[0].Add(indf + 2);
+
+				tris[0].Add(indf + 1);
+				tris[0].Add(indf + 3);
+				tris[0].Add(indf + 2);
+
+				indf += 4;
+			}
+
+			return indf;
+		}
+
+		private int CreateSegment(UnityTile tile, SegmentData segment, int indf, float floor, Quaternion qua)
+		{
+			float xmul = (d / segment.Size.x) * 1.01f;
+			float ymul = _scaledFloorHeight / segment.Size.y;
+			for (int f = 1; f <= floor; f++)
+			{
+				if (verts.Count >= 60000)
+				{
+					CreateObject(tile);
+					indf = 0;
+				}
+
+				for (int k = 0; k < segment.Vertices.Length; k++)
+				{
+					//var tra = qua * Windows.Vertices[k] * 10;
+					var tra = qua * new Vector3(segment.Vertices[k].x * xmul, segment.Vertices[k].y * ymul, segment.Vertices[k].z * xmul);
+					verts.Add(new Vector3(tra.x + v1.x, tra.y + (v1.y - (f * _scaledFloorHeight)), tra.z + v1.z));
+				}
+
+				for (int k = 0; k < segment.Normals.Length; k++)
+				{
+					norms.Add(qua * segment.Normals[k]);
+				}
+
+				for (int k = 0; k < segment.Uv.Length; k++)
+				{
+					uvs.Add(segment.Uv[k]);
+				}
+
+				for (int k = 0; k < segment.Triangles.Length; k++)
+				{
+					if (segment.Triangles[k] == null)
+						continue;
+					for (int l = 0; l < segment.Triangles[k].Length; l++)
+					{
+						tris[k].Add(indf + segment.Triangles[k][l]);
+					}
+				}
+
+				indf += segment.Vertices.Length;
+			}
+
+			return indf;
+		}
+
+		private void CreateObject(UnityTile tile)
+		{
+			mesh = new Mesh();
+			mesh.SetVertices(verts);
+			mesh.SetNormals(norms);
+			mesh.SetUVs(0, uvs);
+			
+			mesh.subMeshCount = tris.Count;
+			for (int a = 0; a < tris.Count; a++)
+			{
+				mesh.SetTriangles(tris[a], a);
+			}
+			mesh.RecalculateTangents();
+			mf.mesh = mesh;
+			mr.materials = Material;
+			go.transform.SetParent(tile.transform);
+			go.transform.position = tile.transform.position;
+
+			go = new GameObject();
+			mf = go.AddComponent<MeshFilter>();
+			mr = go.AddComponent<MeshRenderer>();
+			verts.Clear();
+			norms.Clear();
+			uvs.Clear();
+			tris.Clear();
+			tris.Add(new List<int>());
+			tris.Add(new List<int>());
+			tris.Add(new List<int>());
+			tris.Add(new List<int>());
 		}
 	}
 }
