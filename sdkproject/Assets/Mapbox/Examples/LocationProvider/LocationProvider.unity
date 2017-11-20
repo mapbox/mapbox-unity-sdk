@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44300494, g: 0.49219394, b: 0.5719221, a: 1}
+  m_IndirectSpecularColor: {r: 0.44300503, g: 0.49219406, b: 0.5719222, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -119,6 +119,7 @@ GameObject:
   - component: {fileID: 114606471}
   - component: {fileID: 114606474}
   - component: {fileID: 114606473}
+  - component: {fileID: 114606475}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -184,6 +185,23 @@ MonoBehaviour:
   _targetTransform: {fileID: 1934621224}
   _visibleBuffer: 1
   _disposeBuffer: 2
+--- !u!114 &114606475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 114606470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76a256726e16d4966a3f30b97a17e1d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mapInstance: {fileID: 114606471}
+  OnTileError:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: Mapbox.Unity.Map.TileErrorEvent, Assembly-CSharp, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
 --- !u!1 &246204471
 GameObject:
   m_ObjectHideFlags: 0
