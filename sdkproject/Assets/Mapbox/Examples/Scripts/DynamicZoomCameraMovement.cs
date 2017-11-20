@@ -22,6 +22,9 @@
 		DynamicZoomMap _dynamicZoomMap;
 
 		private Vector3 _origin;
+		Vector3 _mousePosition;
+		Vector3 _mousePositionPrevious;
+		bool _shouldDrag;
 
 		void Start()
 		{
@@ -41,6 +44,7 @@
 
 			//link zoomspeed to tilesize
 			_zoomSpeed = _dynamicZoomMap.UnityTileSize / 2f;
+			_mousePositionPrevious = Vector3.zero;
 		}
 
 
@@ -60,7 +64,7 @@
 			// zoom
 			var y = Input.GetAxis("Mouse ScrollWheel") * _zoomSpeed;
 			//avoid unnecessary translation
-			if (0 != y)
+			if (Mathf.Abs(y) > 0.0f)
 			{
 				_referenceCamera.transform.Translate(new Vector3(0, y, 0), Space.World);
 
@@ -73,7 +77,7 @@
 			//pan keyboard
 			float xMove = Input.GetAxis("Horizontal");
 			float zMove = Input.GetAxis("Vertical");
-			if (0 != xMove || 0 != zMove)
+			if (Mathf.Abs(xMove) > 0.0f || Mathf.Abs(zMove) > 0.0f)
 			{
 				float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) * 256 / _dynamicZoomMap.UnityTileSize;
 				xMove *= factor;
@@ -82,32 +86,40 @@
 			}
 
 			//pan mouse
-			if (Input.GetMouseButtonDown(0))
+			if (Input.GetMouseButton(0))
 			{
 				var mouseDownPosScreen = Input.mousePosition;
 				//assign distance of camera to ground plane to z, otherwise ScreenToWorldPoint() will always return the position of the camera
 				//http://answers.unity3d.com/answers/599100/view.html
 				mouseDownPosScreen.z = _referenceCamera.transform.localPosition.y;
-				_origin = _referenceCamera.ScreenToWorldPoint(mouseDownPosScreen);
+				_mousePosition = _referenceCamera.ScreenToWorldPoint(mouseDownPosScreen);
+				_mousePosition.y = 0f;
+				if (_shouldDrag == false)
+				{
+					_shouldDrag = true;
+					_origin = _referenceCamera.ScreenToWorldPoint(mouseDownPosScreen);
+				}
+			}
+			else
+			{
+				_shouldDrag = false;
 			}
 
-			if (Input.GetMouseButtonUp(0))
+			if (_shouldDrag)
 			{
-				var mouseUpPosScreen = Input.mousePosition;
-				//assign distance of camera to ground plane to z, otherwise ScreenToWorldPoint() will always return the position of the camera
-				//http://answers.unity3d.com/answers/599100/view.html
-				mouseUpPosScreen.z = _referenceCamera.transform.localPosition.y;
-				var mouseUpPosWorld = _referenceCamera.ScreenToWorldPoint(mouseUpPosScreen);
-
-				//has position changed?
-				if (_origin != mouseUpPosWorld)
+				var changeFromPreviousPosition = _mousePositionPrevious - _mousePosition;
+				if (Mathf.Abs(changeFromPreviousPosition.x) > 0.0f || Mathf.Abs(changeFromPreviousPosition.z) > 0.0f)
 				{
-					var offset = _origin - mouseUpPosWorld;
-					if (null != _dynamicZoomMap)
+					_mousePositionPrevious = _mousePosition;
+					var offset = _origin - _mousePosition;
+					if (Mathf.Abs(offset.x) > 0.0f || Mathf.Abs(offset.z) > 0.0f)
 					{
-						float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) * 256 / _dynamicZoomMap.UnityTileSize;
-						var centerOld = _dynamicZoomMap.CenterMercator;
-						_dynamicZoomMap.SetCenterMercator(_dynamicZoomMap.CenterMercator + new Vector2d(offset.x * factor, offset.z * factor));
+						if (null != _dynamicZoomMap)
+						{
+							float factor = Conversions.GetTileScaleInMeters((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.Zoom) * 256 / _dynamicZoomMap.UnityTileSize;
+							var centerOld = _dynamicZoomMap.CenterMercator;
+							_dynamicZoomMap.SetCenterMercator(_dynamicZoomMap.CenterMercator + new Vector2d(offset.x * factor, offset.z * factor));
+						}
 					}
 				}
 			}
