@@ -199,7 +199,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76a256726e16d4966a3f30b97a17e1d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mapInstance: {fileID: 0}
+  _mapInstance: {fileID: 555018383}
   OnTileError:
     m_PersistentCalls:
       m_Calls: []
