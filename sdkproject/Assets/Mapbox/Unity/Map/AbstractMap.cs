@@ -6,6 +6,7 @@
 	using UnityEngine;
 	using Mapbox.Map;
 
+	[RequireComponent (typeof(TileErrorHandler))]
 	public abstract class AbstractMap : MonoBehaviour, IMap
 	{
 		[SerializeField]
