@@ -143,12 +143,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _zoom: 6
   _initializeOnStart: 1
-  _latitudeLongitudeString: 36.058781, -112.109295
+  _latitudeLongitudeString: 37.7648, -122.463
   _root: {fileID: 0}
   _tileProvider: {fileID: 555018385}
   _mapVisualizer: {fileID: 11400000, guid: 84a94dcf8a4f944f8bc89a06e9e105d5, type: 2}
   _unityTileSize: 100
-  _snapMapHeightToZero: 0
+  _snapMapHeightToZero: 1
 --- !u!4 &555018384
 Transform:
   m_ObjectHideFlags: 0
@@ -186,10 +186,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c699b8e1864b4b248acb7a04ede9480, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _zoomSpeed: 50
+  _panSpeed: 1
   _referenceCamera: {fileID: 1787361574}
   _quadTreeTileProvider: {fileID: 555018385}
   _dynamicZoomMap: {fileID: 555018383}
+  _useDegreeMethod: 0
 --- !u!1 &1276875583
 GameObject:
   m_ObjectHideFlags: 0
