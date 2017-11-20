@@ -84,10 +84,12 @@
 			xDelta = xDelta > 0 ? Mathd.Min(xDelta, Mapbox.Utils.Constants.LatitudeMax) : Mathd.Max(xDelta, -Mapbox.Utils.Constants.LatitudeMax);
 			zDelta = zDelta > 0 ? Mathd.Min(zDelta, Mapbox.Utils.Constants.LongitudeMax) : Mathd.Max(zDelta, -Mapbox.Utils.Constants.LongitudeMax);
 
+			//Set Center in Latitude Longitude and Mercator. 
 			_map.SetCenterLatitudeLongitude(new Vector2d(xDelta, zDelta));
+			_map.SetCenterMercator(Conversions.LatLonToMeters(_map.CenterLatitudeLongitude));
 			// Update the center based on current zoom level.
 			var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(_map.CenterLatitudeLongitude, _map.AbsoluteZoom));
-			_map.SetCenterMercator(referenceTileRect.Center);
+			//_map.SetCenterMercator(Conversions.LatLonToMeters(_map.CenterLatitudeLongitude)); //referenceTileRect.Center);
 			_map.SetWorldRelativeScale((float)(_map.UnityTileSize / referenceTileRect.Size.x));
 			//Scale the map accordingly.
 			if (Math.Abs(differenceInZoom) > Constants.EpsilonFloatingPoint)
