@@ -199,7 +199,7 @@ namespace Mapbox.Editor.NodeEditor
 
 		void OnFocus()
 		{
-			//Parse();
+			Parse();
 		}
 
 		private void DrawGrid(float gridSpacing, float gridOpacity, Color gridColor)

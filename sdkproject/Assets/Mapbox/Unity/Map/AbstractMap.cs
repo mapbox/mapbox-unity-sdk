@@ -187,5 +187,6 @@
 		}
 
 		public abstract void Initialize(Vector2d latLon, int zoom);
+
 	}
 }
