@@ -53,6 +53,9 @@ namespace Mapbox.Unity.Location
 		/// <returns>The location routine.</returns>
 		IEnumerator PollLocationRoutine()
 		{
+#if UNITY_EDITOR
+			yield return StartCoroutine(WaitForRemoteConnection());
+#endif
 			if (!Input.location.isEnabledByUser)
 			{
 				yield break;
@@ -113,5 +116,15 @@ namespace Mapbox.Unity.Location
 				yield return null;
 			}
 		}
+
+#if UNITY_EDITOR
+		IEnumerator WaitForRemoteConnection()
+		{
+			while (!UnityEditor.EditorApplication.isRemoteConnected)
+			{
+				yield return null;
+			}
+		}
+#endif
 	}
 }
