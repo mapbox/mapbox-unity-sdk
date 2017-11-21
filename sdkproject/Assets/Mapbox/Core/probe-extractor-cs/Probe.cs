@@ -1,16 +1,17 @@
 namespace Mapbox.ProbeExtractorCs
 {
 
-	using System.Collections;
-	using System.Collections.Generic;
-
-
 	public struct TracePoint
 	{
 		public double Latitude;
 		public double Longitude;
 		public double Bearing;
 		public long Timestamp;
+
+		public static TracePoint FromLocation()
+		{
+			throw new System.NotImplementedException("TODO: after https://github.com/mapbox/mapbox-unity-sdk/pull/362 has been merged");
+		}
 	}
 
 

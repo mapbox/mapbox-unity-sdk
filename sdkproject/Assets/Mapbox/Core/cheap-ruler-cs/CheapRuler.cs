@@ -79,7 +79,7 @@
 		/// <param name="z">Zoom Level</param>
 		/// <param name="units"></param>
 		/// <returns></returns>
-		public static CheapRuler FromTile(int y, int z, CheapRulerUnits units)
+		public static CheapRuler FromTile(int y, int z, CheapRulerUnits units = CheapRulerUnits.Kilometers)
 		{
 			var n = Math.PI * (1 - 2 * (y + 0.5) / Math.Pow(2, z));
 			var lat = Math.Atan(0.5 * (Math.Exp(n) - Math.Exp(-n))) * 180 / Math.PI;
