@@ -3,6 +3,7 @@ namespace Mapbox.Unity.Location
 	using System;
 	using Mapbox.Unity.Map;
 	using Mapbox.Unity.Utilities;
+	using Mapbox.Utils;
 	using UnityEngine;
 
 	/// <summary>
@@ -39,7 +40,7 @@ namespace Mapbox.Unity.Location
 			_currentLocation.Heading = _targetTransform.eulerAngles.y;
 			_currentLocation.LatitudeLongitude = _targetTransform.GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
 			_currentLocation.Accuracy = _accuracy;
-			_currentLocation.Timestamp = DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+			_currentLocation.Timestamp = UnixTimestampUtils.To(DateTime.UtcNow);
 			_currentLocation.IsLocationUpdated = true;
 			_currentLocation.IsHeadingUpdated = true;
 		}
