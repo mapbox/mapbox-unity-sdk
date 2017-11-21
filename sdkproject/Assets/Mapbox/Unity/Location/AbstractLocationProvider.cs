@@ -1,4 +1,5 @@
-﻿namespace Mapbox.Unity.Location
+﻿using Mapbox.Utils;
+namespace Mapbox.Unity.Location
 {
 	using System;
 	using UnityEngine;
@@ -7,7 +8,7 @@
 	{
 		public event Action<Location> OnLocationUpdated = delegate { };
 
-		protected void SendLocation(Location location)
+		protected virtual void SendLocation(Location location)
 		{
 			OnLocationUpdated(location);
 		}

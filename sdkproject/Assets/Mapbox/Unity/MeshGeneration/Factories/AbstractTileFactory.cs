@@ -51,7 +51,7 @@ public abstract class AbstractTileFactory : ScriptableObject
 			}
 		}
 
-		public void Initialize(IFileSource fileSource)
+		public virtual void Initialize(IFileSource fileSource)
 		{
 			_progress = 0;
 			_fileSource = fileSource;
@@ -59,24 +59,15 @@ public abstract class AbstractTileFactory : ScriptableObject
 			OnInitialized();
 		}
 
-		public void Register(UnityTile tile)
+		public virtual void Register(UnityTile tile)
 		{
 			OnRegistered(tile);
 		}
 
-		public void Unregister(UnityTile tile)
+		public virtual void Unregister(UnityTile tile)
 		{
 			OnUnregistered(tile);
 		}
-
-		//internal void OnTileErrorEvent(TileErrorEventArgs e)
-		//{
-		//	EventHandler<TileErrorEventArgs> handler = OnTileError;
-		//	if (handler != null)
-		//	{
-		//		handler(this, e);
-		//	}
-		//}
 
 		internal abstract void OnInitialized();
 
