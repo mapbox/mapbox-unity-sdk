@@ -84,7 +84,7 @@
 					location.LatitudeLongitude,
 					_map.CenterMercator,
 					_map.WorldRelativeScale).ToVector3xz();
-				
+
 				position.y = _lineHeight;
 				var count = _locations.Count;
 				_originalRoute.positionCount = count;
@@ -153,16 +153,20 @@
 				}
 
 				_mapMatchRoute.positionCount = lineCount;
-				Debug.Log("MapMatchingExample: " + point.Name);
-				Debug.Log("MapMatchingExample: " + point.Location);
-				Debug.Log("MapMatchingExample: " + point.MatchingsIndex);
-				Debug.Log("MapMatchingExample: " + point.WaypointIndex);
+				Debug.Log(string.Format(
+					"MapMatchingExample: {1}{0}Location: {2}{0}MatchtingsIndex: {3}{0}WaypointIndex: {4}"
+					, Environment.NewLine
+					, point.Name
+					, point.Location
+					, point.MatchingsIndex
+					, point.WaypointIndex
+				));
 
 				var position = Conversions.GeoToWorldPosition(
-					point.Location, 
-					_map.CenterMercator, 
+					point.Location,
+					_map.CenterMercator,
 					_map.WorldRelativeScale).ToVector3xz();
-				
+
 				position.y = _lineHeight = 1f;
 				_mapMatchRoute.SetPosition(lineCount - 1, position);
 				lineCount++;
