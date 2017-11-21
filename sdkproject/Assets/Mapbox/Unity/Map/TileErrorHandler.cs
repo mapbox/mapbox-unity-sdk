@@ -1,6 +1,7 @@
 ﻿namespace Mapbox.Unity.Map
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Linq;
 	using Mapbox.Map;
 	using Mapbox.Unity.Map;
@@ -30,19 +31,44 @@
 
 		private void _OnTileErrorHandler(object sender, TileErrorEventArgs e)
 		{
+			var errors = new List<Exception>();
+			var warnings = new List<Exception>();
 
-			if (e.Exceptions.Count > 0)
+			foreach (var exception in e.Exceptions)
+			{
+				if (exception.Message.Contains("Request aborted"))
+				{
+					warnings.Add(exception);
+				}
+				else
+				{
+					errors.Add(exception);
+				}
+			}
+
+			if (errors.Count > 0)
 			{
 				Debug.LogError(String.Format(
 					"{0} Exception(s) caused on the tile. Tile ID:{1} Tile Type:{4}{2}{3}"
-					, e.Exceptions.Count
+					, errors.Count
 					, e.TileId
 					, Environment.NewLine
-					, string.Join(Environment.NewLine, e.Exceptions.Select(ex => ex.Message).ToArray())
+					, string.Join(Environment.NewLine, errors.Select(ex => ex.Message).ToArray())
 					, e.TileType
 				));
 			}
 
+			if (warnings.Count > 0)
+			{
+				Debug.LogWarning(String.Format(
+					"{0} Exception(s) caused on the tile. Tile ID:{1} Tile Type:{4}{2}{3}"
+					, warnings.Count
+					, e.TileId
+					, Environment.NewLine
+					, string.Join(Environment.NewLine, warnings.Select(ex => ex.Message).ToArray())
+					, e.TileType
+				));
+			}
 
 			if (OnTileError != null)
 			{
