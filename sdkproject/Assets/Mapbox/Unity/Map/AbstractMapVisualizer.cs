@@ -155,7 +155,7 @@
 				unityTile.transform.SetParent(_map.Root, false);
 			}
 
-			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale, _loadingTexture);
+			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale, _map.AbsoluteZoom, _loadingTexture);
 			PlaceTile(tileId, unityTile, _map);
 
 #if UNITY_EDITOR
@@ -195,6 +195,18 @@
 			}
 		}
 
+		/// <summary>
+		/// Repositions active tiles instead of recreating them. Useful for panning the map
+		/// </summary>
+		/// <param name="tileId"></param>
+		public void RepositionTile(UnwrappedTileId tileId)
+		{
+			UnityTile currentTile;
+			if (ActiveTiles.TryGetValue(tileId, out currentTile))
+			{
+				PlaceTile(tileId, currentTile, _map);
+			}
+		}
 		protected abstract void PlaceTile(UnwrappedTileId tileId, UnityTile tile, IMapReadable map);
 	}
 }

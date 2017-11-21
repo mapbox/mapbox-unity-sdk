@@ -19,7 +19,7 @@
 		void LocationProvider_OnLocationUpdated(object sender, Location.LocationUpdatedEventArgs e)
 		{
 			_locationProvider.OnLocationUpdated -= LocationProvider_OnLocationUpdated;
-			_map.Initialize(e.Location, _map.Zoom);
+			_map.Initialize(e.Location, _map.AbsoluteZoom);
 		}
 	}
 }

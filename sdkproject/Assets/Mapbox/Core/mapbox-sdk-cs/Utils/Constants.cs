@@ -23,5 +23,8 @@ namespace Mapbox.Utils
 		/// <summary> Mercator projection max meters</summary>
 		public const double WebMercMax = 20037508.342789244;
 
+		/// <summary> Epsilon to comapre floating point numbers</summary>
+		public const float EpsilonFloatingPoint = 1E-05f;
+
 	}
 }
