@@ -12,6 +12,8 @@
 		[Range(1, 20)]
 		public float _panSpeed = 1.0f;
 
+		[SerializeField]
+		float _zoomSpeed = 0.25f;
 
 		[SerializeField]
 		public Camera _referenceCamera;
@@ -109,7 +111,7 @@
 
 		void ZoomMapUsingTouchOrMouse(float zoomFactor)
 		{
-			_quadTreeTileProvider.UpdateMapProperties(_dynamicZoomMap.CenterLatitudeLongitude, Mathf.Max(0.0f, Mathf.Min(_dynamicZoomMap.Zoom + zoomFactor * 0.25f, 21.0f)));
+			_quadTreeTileProvider.UpdateMapProperties(_dynamicZoomMap.CenterLatitudeLongitude, Mathf.Max(0.0f, Mathf.Min(_dynamicZoomMap.Zoom + zoomFactor * _zoomSpeed, 21.0f)));
 		}
 
 		void PanMapUsingKeyBoard(float xMove, float zMove)
