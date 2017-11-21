@@ -37,6 +37,7 @@ namespace Mapbox.Unity.Map
 			_groundPlane = new Plane(Vector3.up, Mapbox.Unity.Constants.Math.Vector3Zero);
 			_viewportTarget = new Vector3(0.5f, 0.5f, 0);
 			_shouldUpdate = true;
+			_cachedTile = new UnwrappedTileId();
 		}
 
 		void Update()
