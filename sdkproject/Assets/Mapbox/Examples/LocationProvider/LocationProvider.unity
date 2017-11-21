@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44300503, g: 0.49219406, b: 0.5719222, a: 1}
+  m_IndirectSpecularColor: {r: 0.44300494, g: 0.49219394, b: 0.5719221, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -138,9 +138,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58cb9a85be6f84591938618fa232ce85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _zoom: 16
   _initializeOnStart: 0
   _latitudeLongitudeString: 37.7648, -122.463
-  _zoom: 16
   _root: {fileID: 0}
   _tileProvider: {fileID: 114606474}
   _mapVisualizer: {fileID: 11400000, guid: d037eb553509f489e9ba7a5a441b45dd, type: 2}
