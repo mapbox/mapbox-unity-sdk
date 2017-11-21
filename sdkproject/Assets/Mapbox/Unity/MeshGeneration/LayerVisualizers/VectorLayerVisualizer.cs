@@ -15,6 +15,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 	public class TypeVisualizerTuple
 	{
 		public string Type;
+		public string[] Types;
 		[SerializeField]
 		public ModifierStackBase Stack;
 	}
@@ -73,13 +74,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					filter.Initialize();
 				}
 			}
-			foreach (var item in Stacks)
-			{
-				if (item != null && item.Stack != null)
-				{
-					item.Stack.Initialize();
-				}
-			}
+			
 			if (_defaultStack != null)
 			{
 				_defaultStack.Initialize();
@@ -89,6 +84,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			{
 				if (item != null && item.Stack != null)
 				{
+					item.Types = item.Type.Split(',');
 					item.Stack.Initialize();
 				}
 			}
@@ -189,14 +185,25 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			var meshData = new MeshData();
 			meshData.TileRect = tile.Rect;
-
+			
 			//and finally, running the modifier stack on the feature
-			var mod = Stacks.FirstOrDefault(x => x.Type.Contains(styleSelectorKey));
-			if (mod != null)
+			var processed = false;
+			for (int i = 0; i < Stacks.Count; i++)
 			{
-				mod.Stack.Execute(tile, feature, meshData, parent, mod.Type);
+				foreach (var key in Stacks[i].Types)
+				{
+					if(key == styleSelectorKey)
+					{
+						processed = true;
+						Stacks[i].Stack.Execute(tile, feature, meshData, parent, styleSelectorKey);
+						break;
+					}
+				}
+
+				if (processed)
+					break;
 			}
-			else
+			if(!processed)
 			{
 				if (_defaultStack != null)
 				{

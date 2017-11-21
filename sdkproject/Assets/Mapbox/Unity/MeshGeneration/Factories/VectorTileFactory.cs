@@ -81,6 +81,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				if (vectorTile.HasError)
 				{
+					OnErrorOccurred(new TileErrorEventArgs(tile.CanonicalTileId, vectorTile.GetType(), tile, vectorTile.Exceptions));
 					tile.VectorDataState = TilePropertyState.Error;
 					return;
 				}
@@ -106,6 +107,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					CreateMeshes(tile);
 				}
 			});
+		}
+
+		/// <summary>
+		/// Method to be called when a tile error has occurred.
+		/// </summary>
+		/// <param name="e"><see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance/</param>
+		protected override void OnErrorOccurred(TileErrorEventArgs e)
+		{
+			base.OnErrorOccurred(e);
 		}
 
 		internal override void OnUnregistered(UnityTile tile)

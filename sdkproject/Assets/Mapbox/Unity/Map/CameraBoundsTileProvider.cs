@@ -54,7 +54,7 @@ namespace Mapbox.Unity.Map
 				if (_groundPlane.Raycast(_ray, out _hitDistance))
 				{
 					_currentLatitudeLongitude = _ray.GetPoint(_hitDistance).GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
-					_currentTile = TileCover.CoordinateToTileId(_currentLatitudeLongitude, _map.Zoom);
+					_currentTile = TileCover.CoordinateToTileId(_currentLatitudeLongitude, _map.AbsoluteZoom);
 
 					if (!_currentTile.Equals(_cachedTile))
 					{
@@ -63,7 +63,7 @@ namespace Mapbox.Unity.Map
 						{
 							for (int y = _currentTile.Y - _visibleBuffer; y <= (_currentTile.Y + _visibleBuffer); y++)
 							{
-								AddTile(new UnwrappedTileId(_map.Zoom, x, y));
+								AddTile(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
 							}
 						}
 						_cachedTile = _currentTile;

@@ -90,6 +90,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				if (rasterTile.HasError)
 				{
+					OnErrorOccurred(new TileErrorEventArgs(tile.CanonicalTileId,rasterTile.GetType(),tile, rasterTile.Exceptions));
 					tile.RasterDataState = TilePropertyState.Error;
 					Progress--;
 					return;
@@ -99,6 +100,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				tile.RasterDataState = TilePropertyState.Loaded;
 				Progress--;
 			});
+		}
+
+		/// <summary>
+		/// Method to be called when a tile error has occurred.
+		/// </summary>
+		/// <param name="e"><see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance/</param>
+		protected override void OnErrorOccurred(TileErrorEventArgs e)
+		{
+			base.OnErrorOccurred(e);
 		}
 
 		internal override void OnUnregistered(UnityTile tile)
