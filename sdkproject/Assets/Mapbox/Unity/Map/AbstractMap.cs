@@ -1,6 +1,7 @@
 ﻿namespace Mapbox.Unity.Map
 {
 	using System;
+	using System.Collections;
 	using Mapbox.Unity.Utilities;
 	using Utils;
 	using UnityEngine;
@@ -84,7 +85,7 @@
 
 		protected bool _worldHeightFixed = false;
 
-		protected MapboxAccess _fileSouce;
+		protected MapboxAccess _fileSource;
 
 		protected Vector2d _centerLatitudeLongitude;
 		public Vector2d CenterLatitudeLongitude
@@ -130,10 +131,9 @@
 		}
 		public event Action OnInitialized = delegate { };
 
-		void Awake()
+		protected virtual void Awake()
 		{
 			_worldHeightFixed = false;
-			_fileSouce = MapboxAccess.Instance;
 			_tileProvider.OnTileAdded += TileProvider_OnTileAdded;
 			_tileProvider.OnTileRemoved += TileProvider_OnTileRemoved;
 			_tileProvider.OnTileRepositioned += TileProvider_OnTileRepositioned;
@@ -143,8 +143,11 @@
 			}
 		}
 
-		void Start()
+		protected virtual IEnumerator Start()
 		{
+			_fileSource = MapboxAccess.Instance;
+			yield return new WaitUntil(() => MapboxAccess.Configured);
+			
 			if (_initializeOnStart)
 			{
 				Initialize(Conversions.StringToLatLon(_latitudeLongitudeString), AbsoluteZoom);
