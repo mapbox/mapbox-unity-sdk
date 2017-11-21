@@ -140,7 +140,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 
 			var mergedStack = _defaultStack as MergedModifierStack;
-			if (mergedStack != null)
+			if (mergedStack != null && tile != null)
 			{
 				mergedStack.End(tile, tile.gameObject, layer.Name);
 			}
