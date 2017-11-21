@@ -6,8 +6,23 @@
 	using UnityEngine;
 	using Mapbox.Map;
 
+	[RequireComponent (typeof(TileErrorHandler))]
 	public abstract class AbstractMap : MonoBehaviour, IMap
 	{
+		[SerializeField]
+		[Range(0, 22)]
+		protected float _zoom;
+		public float Zoom
+		{
+			get
+			{
+				return _zoom;
+			}
+		}
+		public void SetZoom(float zoom)
+		{
+			_zoom = zoom;
+		}
 		[SerializeField]
 		bool _initializeOnStart = true;
 
@@ -15,14 +30,19 @@
 		[SerializeField]
 		protected string _latitudeLongitudeString;
 
-		[SerializeField]
-		[Range(0, 22)]
-		protected int _zoom;
-		public int Zoom
+		public int AbsoluteZoom
 		{
 			get
 			{
-				return _zoom;
+				return (int)Math.Floor(Zoom);
+			}
+		}
+		protected int _initialZoom;
+		public int InitialZoom
+		{
+			get
+			{
+				return _initialZoom;
 			}
 		}
 
@@ -104,11 +124,10 @@
 			_centerLatitudeLongitude = centerLatitudeLongitude;
 		}
 
-		public void SetZoom(int zoom)
+		public void SetWorldRelativeScale(float scale)
 		{
-			_zoom = zoom;
+			_worldRelativeScale = scale;
 		}
-
 		public event Action OnInitialized = delegate { };
 
 		void Awake()
@@ -117,6 +136,7 @@
 			_fileSouce = MapboxAccess.Instance;
 			_tileProvider.OnTileAdded += TileProvider_OnTileAdded;
 			_tileProvider.OnTileRemoved += TileProvider_OnTileRemoved;
+			_tileProvider.OnTileRepositioned += TileProvider_OnTileRepositioned;
 			if (!_root)
 			{
 				_root = transform;
@@ -127,8 +147,9 @@
 		{
 			if (_initializeOnStart)
 			{
-				Initialize(Conversions.StringToLatLon(_latitudeLongitudeString), _zoom);
+				Initialize(Conversions.StringToLatLon(_latitudeLongitudeString), AbsoluteZoom);
 			}
+			_initialZoom = AbsoluteZoom;
 		}
 
 		// TODO: implement IDisposable, instead?
@@ -138,6 +159,7 @@
 			{
 				_tileProvider.OnTileAdded -= TileProvider_OnTileAdded;
 				_tileProvider.OnTileRemoved -= TileProvider_OnTileRemoved;
+				_tileProvider.OnTileRepositioned -= TileProvider_OnTileRepositioned;
 			}
 
 			_mapVisualizer.Destroy();
@@ -180,11 +202,17 @@
 			_mapVisualizer.DisposeTile(tileId);
 		}
 
+		void TileProvider_OnTileRepositioned(UnwrappedTileId tileId)
+		{
+			_mapVisualizer.RepositionTile(tileId);
+		}
+
 		protected void SendInitialized()
 		{
 			OnInitialized();
 		}
 
 		public abstract void Initialize(Vector2d latLon, int zoom);
+
 	}
 }

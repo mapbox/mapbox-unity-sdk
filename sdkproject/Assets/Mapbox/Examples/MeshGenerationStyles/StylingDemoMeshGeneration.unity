@@ -119,6 +119,7 @@ GameObject:
   - component: {fileID: 110210642}
   - component: {fileID: 110210643}
   - component: {fileID: 110210644}
+  - component: {fileID: 110210645}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -185,6 +186,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShadowDistance: 3000
+--- !u!114 &110210645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 110210640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76a256726e16d4966a3f30b97a17e1d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mapInstance: {fileID: 110210642}
+  OnTileError:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: Mapbox.Unity.Map.TileErrorEvent, Assembly-CSharp, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
 --- !u!1 &498507641
 GameObject:
   m_ObjectHideFlags: 0
