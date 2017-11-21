@@ -4,6 +4,7 @@
 	using System;
 	using System.Collections;
 	using System.Collections.Generic;
+	using System.Globalization;
 	using System.Linq;
 
 	public struct ProbeExtractorOptions
@@ -80,7 +81,7 @@
 		public List<Probe> ExtractProbes(List<TracePoint> trace)
 		{
 			int tracePntCnt = trace.Count;
-			double[] durations = new double[tracePntCnt - 1];
+			long[] durations = new long[tracePntCnt - 1];
 			double[] distances = new double[tracePntCnt - 1];
 			double[] speeds = new double[tracePntCnt - 1];
 			double[] bearings = new double[tracePntCnt - 1];
@@ -98,11 +99,14 @@
 				distances[insertIdx] = _ruler.Distance(currLocation, prevLocation);
 				speeds[insertIdx] = distances[insertIdx] / durations[insertIdx] * 3600; //kph
 
-				double[] currBearing = new double[] { current.Bearing, current.Bearing };
-				double[] prevBearing = new double[] { previous.Bearing, previous.Bearing };
-				double bearing = _ruler.Bearing(prevBearing, currBearing);
+				double bearing = _ruler.Bearing(prevLocation, currLocation);
 				bearings[insertIdx] = bearing < 0 ? 360 + bearing : bearing;
 			}
+
+			//UnityEngine.Debug.Log("durations:" + string.Join(", ", durations.Select(d => d.ToString(CultureInfo.InvariantCulture)).ToArray()));
+			//UnityEngine.Debug.Log("distances:" + string.Join(", ", distances.Select(d => d.ToString(CultureInfo.InvariantCulture)).ToArray()));
+			//UnityEngine.Debug.Log("speeds:" + string.Join(", ", speeds.Select(s => s.ToString(CultureInfo.InvariantCulture)).ToArray()));
+			//UnityEngine.Debug.Log("bearings:" + string.Join(", ", bearings.Select(b => b.ToString(CultureInfo.InvariantCulture)).ToArray()));
 
 
 			List<Probe> probes = new List<Probe>();
@@ -162,7 +166,7 @@
 				//	return new List<Probe>();
 				//}
 
-				UnityEngine.Debug.Log(string.Format("{0} good:{1}", i, isGood));
+				//UnityEngine.Debug.Log(string.Format("{0} good:{1}", i, isGood));
 
 				if (isGood || _options.OutputBadProbes)
 				{
@@ -177,11 +181,10 @@
 
 					probes.Add(new Probe()
 					{
-
 						Latitude = coords[1],
 						Longitude = coords[0],
 						// ?? makes sense: from previous point
-						StartTime = trace[i - 1].Timestamp,
+						StartTime = trace[i].Timestamp,
 						Duration = durations[i],
 						Distance = distances[i],
 						Speed = speeds[i],

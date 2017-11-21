@@ -20,7 +20,7 @@ namespace Mapbox.ProbeExtractorCs
 		public double Latitude;
 		public double Longitude;
 		public long StartTime;
-		public double Duration;
+		public long Duration;
 		public double Speed;
 		public double Bearing;
 		public double Distance;
