@@ -1,5 +1,4 @@
-﻿using Mapbox.Utils;
-namespace Mapbox.Unity.Location
+﻿namespace Mapbox.Unity.Location
 {
 	using System;
 	using UnityEngine;
