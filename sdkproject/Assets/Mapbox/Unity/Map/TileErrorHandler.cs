@@ -31,29 +31,20 @@
 
 		private void _OnTileErrorHandler(object sender, TileErrorEventArgs e)
 		{
-			var errors = new List<Exception>();
-			var warnings = new List<Exception>();
-
-			foreach (var exception in e.Exceptions)
+			// check if request has been aborted: show warning not error
+			if (e.Exceptions.Count > 0)
 			{
-				if (exception.Message.Contains("Request aborted"))
+				// aborted is always the first exception
+				// additional exceptions are always caused by the request being aborted
+				// show all of them as warnings
+				if (e.Exceptions[0].Message.Contains("Request aborted"))
 				{
-					warnings.Add(exception);
+					Debug.LogWarning(printMessage(e.Exceptions, e));
 				}
 				else
 				{
-					errors.Add(exception);
+					Debug.LogError(printMessage(e.Exceptions, e));
 				}
-			}
-
-			if (errors.Count > 0)
-			{
-				Debug.LogError(printMessage(errors, e));
-			}
-
-			if (warnings.Count > 0)
-			{
-				Debug.LogWarning(printMessage(warnings, e));
 			}
 
 			if (OnTileError != null)
