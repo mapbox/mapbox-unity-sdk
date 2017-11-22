@@ -1,140 +1,130 @@
 namespace Mapbox.Unity.Location
 {
-    using System.Collections;
-    using UnityEngine;
-    using System;
-    using Mapbox.Utils;
+	using System.Collections;
+	using UnityEngine;
+	using Mapbox.Utils;
 
-    /// <summary>
-    /// The DeviceLocationProvider is responsible for providing real world location and heading data,
-    /// served directly from native hardware and OS. 
-    /// This relies on Unity's <see href="https://docs.unity3d.com/ScriptReference/LocationService.html">LocationService</see> for location
-    /// and <see href="https://docs.unity3d.com/ScriptReference/Compass.html">Compass</see> for heading.
-    /// </summary>
-    public class DeviceLocationProvider : MonoBehaviour, ILocationProvider
-    {
-        /// <summary>
-        /// Using higher value like 500 usually does not require to turn GPS chip on and thus saves battery power. 
-        /// Values like 5-10 could be used for getting best accuracy.
-        /// </summary>
-        [SerializeField]
-        float _desiredAccuracyInMeters = 5f;
+	/// <summary>
+	/// The DeviceLocationProvider is responsible for providing real world location and heading data,
+	/// served directly from native hardware and OS. 
+	/// This relies on Unity's <see href="https://docs.unity3d.com/ScriptReference/LocationService.html">LocationService</see> for location
+	/// and <see href="https://docs.unity3d.com/ScriptReference/Compass.html">Compass</see> for heading.
+	/// </summary>
+	public class DeviceLocationProvider : AbstractLocationProvider
+	{
+		/// <summary>
+		/// Using higher value like 500 usually does not require to turn GPS chip on and thus saves battery power. 
+		/// Values like 5-10 could be used for getting best accuracy.
+		/// </summary>
+		[SerializeField]
+		float _desiredAccuracyInMeters = 5f;
 
-        /// <summary>
-        /// The minimum distance (measured in meters) a device must move laterally before Input.location property is updated. 
-        /// Higher values like 500 imply less overhead.
-        /// </summary>
-        [SerializeField]
-        float _updateDistanceInMeters = 5f;
+		/// <summary>
+		/// The minimum distance (measured in meters) a device must move laterally before Input.location property is updated. 
+		/// Higher values like 500 imply less overhead.
+		/// </summary>
+		[SerializeField]
+		float _updateDistanceInMeters = 5f;
 
-        Coroutine _pollRoutine;
+		Location _currentLocation;
 
-        double _lastLocationTimestamp;
+		Coroutine _pollRoutine;
 
-        double _lastHeadingTimestamp;
+		double _lastLocationTimestamp;
 
-        WaitForSeconds _wait;
+		double _lastHeadingTimestamp;
 
-        Vector2d _location;
-        /// <summary>
-        /// Gets the current cached location.
-        /// </summary>
-        /// <value>The location.</value>
-        public Vector2d Location
-        {
-            get
-            {
-                return _location;
-            }
-        }
+		WaitForSeconds _wait;
 
-        /// <summary>
-        /// Occurs when on location updates.
-        /// </summary>
-        public event EventHandler<LocationUpdatedEventArgs> OnLocationUpdated;
+		void Awake()
+		{
+			_wait = new WaitForSeconds(1f);
+			if (_pollRoutine == null)
+			{
+				_pollRoutine = StartCoroutine(PollLocationRoutine());
+			}
+		}
 
-        /// <summary>
-        /// Occurs when the compass updates.
-        /// </summary>
-        public event EventHandler<HeadingUpdatedEventArgs> OnHeadingUpdated;
+		/// <summary>
+		/// Enable location and compass services.
+		/// Sends continuous location and heading updates based on 
+		/// _desiredAccuracyInMeters and _updateDistanceInMeters.
+		/// </summary>
+		/// <returns>The location routine.</returns>
+		IEnumerator PollLocationRoutine()
+		{
+#if UNITY_EDITOR
+			yield return StartCoroutine(WaitForRemoteConnection());
+#endif
+			if (!Input.location.isEnabledByUser)
+			{
+				yield break;
+			}
 
-        void Start()
-        {
-            _wait = new WaitForSeconds(1f);
-            if (_pollRoutine == null)
-            {
-                _pollRoutine = StartCoroutine(PollLocationRoutine());
-            }
-        }
+			Input.location.Start(_desiredAccuracyInMeters, _updateDistanceInMeters);
+			Input.compass.enabled = true;
 
-        /// <summary>
-        /// Enable location and compass services.
-        /// Sends continuous location and heading updates based on 
-        /// _desiredAccuracyInMeters and _updateDistanceInMeters.
-        /// </summary>
-        /// <returns>The location routine.</returns>
-        IEnumerator PollLocationRoutine()
-        {
-            if (!Input.location.isEnabledByUser)
-            {
-                yield break;
-            }
+			int maxWait = 20;
+			while (Input.location.status == LocationServiceStatus.Initializing && maxWait > 0)
+			{
+				yield return _wait;
+				maxWait--;
+			}
 
-            Input.location.Start(_desiredAccuracyInMeters, _updateDistanceInMeters);
-            Input.compass.enabled = true;
+			if (maxWait < 1)
+			{
+				yield break;
+			}
 
-            int maxWait = 20;
-            while (Input.location.status == LocationServiceStatus.Initializing && maxWait > 0)
-            {
-                yield return _wait;
-                maxWait--;
-            }
+			if (Input.location.status == LocationServiceStatus.Failed)
+			{
+				yield break;
+			}
 
-            if (maxWait < 1)
-            {
-                yield break;
-            }
+			while (true)
+			{
+				_currentLocation.IsHeadingUpdated = false;
+				_currentLocation.IsLocationUpdated = false;
 
-            if (Input.location.status == LocationServiceStatus.Failed)
-            {
-                yield break;
-            }
+				var timestamp = Input.compass.timestamp;
+				if (Input.compass.enabled && timestamp > _lastHeadingTimestamp)
+				{
+					var heading = Input.compass.trueHeading;
+					_currentLocation.Heading = heading;
+					_lastHeadingTimestamp = timestamp;
 
-            while (true)
-            {
-                var timestamp = Input.compass.timestamp;
-                if (Input.compass.enabled && timestamp > _lastHeadingTimestamp)
-                {
-                    var heading = Input.compass.trueHeading;
-                    SendHeadingUpdated(heading);
-                    _lastHeadingTimestamp = timestamp;
-                }
+					_currentLocation.IsHeadingUpdated = true;
+				}
 
-                timestamp = Input.location.lastData.timestamp;
-                if (Input.location.status == LocationServiceStatus.Running && timestamp > _lastLocationTimestamp)
-                {
-                    _location = new Vector2d(Input.location.lastData.latitude, Input.location.lastData.longitude);
-                    SendLocationUpdated(_location);
-                    _lastLocationTimestamp = timestamp;
-                }
-                yield return null;
-            }
-        }
+				var lastData = Input.location.lastData;
+				timestamp = lastData.timestamp;
+				if (Input.location.status == LocationServiceStatus.Running && timestamp > _lastLocationTimestamp)
+				{
+					_currentLocation.LatitudeLongitude = new Vector2d(lastData.latitude, lastData.longitude);
+					_currentLocation.Accuracy = (int)lastData.horizontalAccuracy;
+					_currentLocation.Timestamp = timestamp;
+					_lastLocationTimestamp = timestamp;
 
-        void SendHeadingUpdated(float heading)
-        {
-            if (OnHeadingUpdated != null)
-            {
-                OnHeadingUpdated(this, new HeadingUpdatedEventArgs() { Heading = heading });
-            }
-        }
+					_currentLocation.IsLocationUpdated = true;
+				}
 
-        void SendLocationUpdated(Vector2d location)
-        {
-            if (OnLocationUpdated != null)
-            {
-                OnLocationUpdated(this, new LocationUpdatedEventArgs() { Location = location });
-            }
-        }
-    }
+				if (_currentLocation.IsHeadingUpdated || _currentLocation.IsLocationUpdated)
+				{
+					SendLocation(_currentLocation);
+				}
+
+				yield return null;
+			}
+		}
+
+#if UNITY_EDITOR
+		IEnumerator WaitForRemoteConnection()
+		{
+			while (!UnityEditor.EditorApplication.isRemoteConnected)
+			{
+				yield return null;
+			}
+		}
+#endif
+	}
 }

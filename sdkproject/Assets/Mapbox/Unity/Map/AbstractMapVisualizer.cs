@@ -47,6 +47,12 @@
 		public event Action<ModuleState> OnMapVisualizerStateChanged = delegate { };
 
 		/// <summary>
+		/// The  <c>OnTileError</c> event triggers when there's a <c>Tile</c> error.
+		/// Returns a <see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance as a parameter, for the tile on which error occurred.
+		/// </summary>
+		public event EventHandler<TileErrorEventArgs> OnTileError;
+
+		/// <summary>
 		/// Initializes the factories by passing the file source down, which is necessary for data (web/file) calls
 		/// </summary>
 		/// <param name="fileSource"></param>
@@ -73,6 +79,7 @@
 				{
 					factory.Initialize(fileSource);
 					factory.OnFactoryStateChanged += UpdateState;
+					factory.OnTileError += Factory_OnTileError;
 				}
 			}
 		}
@@ -84,6 +91,8 @@
 				if (Factories[i] != null)
 				{
 					Factories[i].OnFactoryStateChanged -= UpdateState;
+					Factories[i].OnTileError -= Factory_OnTileError;
+
 				}
 			}
 
@@ -97,7 +106,7 @@
 
 			foreach (var tile in _inactiveTiles)
 			{
-                Destroy(tile.gameObject);
+				Destroy(tile.gameObject);
 			}
 
 			_activeTiles.Clear();
@@ -146,7 +155,7 @@
 				unityTile.transform.SetParent(_map.Root, false);
 			}
 
-			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale, _loadingTexture);
+			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale, _map.AbsoluteZoom, _loadingTexture);
 			PlaceTile(tileId, unityTile, _map);
 
 #if UNITY_EDITOR
@@ -163,6 +172,15 @@
 			return unityTile;
 		}
 
+		private void Factory_OnTileError(object sender, TileErrorEventArgs e)
+		{
+			EventHandler<TileErrorEventArgs> handler = OnTileError;
+			if(handler != null)
+			{
+				handler(this, e);
+			}
+		}
+
 		public void DisposeTile(UnwrappedTileId tileId)
 		{
 			var unityTile = ActiveTiles[tileId];
@@ -177,6 +195,18 @@
 			}
 		}
 
+		/// <summary>
+		/// Repositions active tiles instead of recreating them. Useful for panning the map
+		/// </summary>
+		/// <param name="tileId"></param>
+		public void RepositionTile(UnwrappedTileId tileId)
+		{
+			UnityTile currentTile;
+			if (ActiveTiles.TryGetValue(tileId, out currentTile))
+			{
+				PlaceTile(tileId, currentTile, _map);
+			}
+		}
 		protected abstract void PlaceTile(UnwrappedTileId tileId, UnityTile tile, IMapReadable map);
 	}
 }
