@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Unity.Map
+namespace Mapbox.Unity.Map
 {
 	using Mapbox.Unity.Utilities;
 	using Utils;
@@ -17,7 +17,7 @@
 			_centerMercator = referenceTileRect.Center;
 
 			_worldRelativeScale = (float)(_unityTileSize / referenceTileRect.Size.x);
-			_mapVisualizer.Initialize(this, _fileSouce);
+			_mapVisualizer.Initialize(this, _fileSource);
 			_tileProvider.Initialize(this);
 
 			SendInitialized();

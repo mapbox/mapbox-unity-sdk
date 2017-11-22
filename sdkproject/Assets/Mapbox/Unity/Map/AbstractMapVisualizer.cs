@@ -53,10 +53,20 @@
 		public event EventHandler<TileErrorEventArgs> OnTileError;
 
 		/// <summary>
+		/// Gets the unity tile from unwrapped tile identifier.
+		/// </summary>
+		/// <returns>The unity tile from unwrapped tile identifier.</returns>
+		/// <param name="tileId">Tile identifier.</param>
+		public UnityTile GetUnityTileFromUnwrappedTileId(UnwrappedTileId tileId)
+		{
+			return _activeTiles[tileId];
+		}
+
+		/// <summary>
 		/// Initializes the factories by passing the file source down, which is necessary for data (web/file) calls
 		/// </summary>
 		/// <param name="fileSource"></param>
-		public void Initialize(IMapReadable map, IFileSource fileSource)
+		public virtual void Initialize(IMapReadable map, IFileSource fileSource)
 		{
 			_map = map;
 
@@ -84,7 +94,7 @@
 			}
 		}
 
-		public void Destroy()
+		public virtual void Destroy()
 		{
 			for (int i = 0; i < Factories.Count; i++)
 			{
@@ -113,7 +123,7 @@
 			_inactiveTiles.Clear();
 		}
 
-		internal void UpdateState(AbstractTileFactory factory)
+		void UpdateState(AbstractTileFactory factory)
 		{
 			if (State != ModuleState.Working && factory.State == ModuleState.Working)
 			{
@@ -158,6 +168,7 @@
 			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale, _map.AbsoluteZoom, _loadingTexture);
 			PlaceTile(tileId, unityTile, _map);
 
+			// Don't spend resources naming objects, as you shouldn't find objects by name anyway!
 #if UNITY_EDITOR
 			unityTile.gameObject.name = unityTile.CanonicalTileId.ToString();
 #endif
@@ -172,16 +183,7 @@
 			return unityTile;
 		}
 
-		private void Factory_OnTileError(object sender, TileErrorEventArgs e)
-		{
-			EventHandler<TileErrorEventArgs> handler = OnTileError;
-			if(handler != null)
-			{
-				handler(this, e);
-			}
-		}
-
-		public void DisposeTile(UnwrappedTileId tileId)
+		public virtual void DisposeTile(UnwrappedTileId tileId)
 		{
 			var unityTile = ActiveTiles[tileId];
 
@@ -199,7 +201,7 @@
 		/// Repositions active tiles instead of recreating them. Useful for panning the map
 		/// </summary>
 		/// <param name="tileId"></param>
-		public void RepositionTile(UnwrappedTileId tileId)
+		public virtual void RepositionTile(UnwrappedTileId tileId)
 		{
 			UnityTile currentTile;
 			if (ActiveTiles.TryGetValue(tileId, out currentTile))
@@ -207,6 +209,16 @@
 				PlaceTile(tileId, currentTile, _map);
 			}
 		}
+
+		private void Factory_OnTileError(object sender, TileErrorEventArgs e)
+		{
+			EventHandler<TileErrorEventArgs> handler = OnTileError;
+			if (handler != null)
+			{
+				handler(this, e);
+			}
+		}
+
 		protected abstract void PlaceTile(UnwrappedTileId tileId, UnityTile tile, IMapReadable map);
 	}
 }
