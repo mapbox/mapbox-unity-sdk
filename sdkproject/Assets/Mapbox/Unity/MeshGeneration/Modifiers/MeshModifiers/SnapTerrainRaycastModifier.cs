@@ -28,7 +28,7 @@
 			{
 				for (int i = 0; i < sub.Count; i++)
 				{
-					var h = tile.QueryHeightData((float)((sub[i].x + scaledX / 2) / scaledX), (float)((sub[i].z + scaledY / 2) / scaledY));
+					var h = tile.QueryHeightData((float)((sub[i].x + md.PositionInTile.x + scaledX / 2) / scaledX), (float)((sub[i].z + md.PositionInTile.z + scaledY / 2) / scaledY));
 
 					RaycastHit hit;
 					Vector3 rayCenter =
