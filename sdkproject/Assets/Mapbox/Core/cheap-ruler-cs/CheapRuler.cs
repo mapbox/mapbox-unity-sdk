@@ -27,7 +27,7 @@
 		/// Creates a ruler object that will approximate measurements around the given latitude. Units are one of: kilometers
 		/// </summary>
 		/// <param name="outputUnits"></param>
-		public CheapRuler(double latitude, CheapRulerUnits outputUnits)
+		public CheapRuler(double latitude, CheapRulerUnits outputUnits = CheapRulerUnits.Kilometers)
 		{
 
 			double factor;

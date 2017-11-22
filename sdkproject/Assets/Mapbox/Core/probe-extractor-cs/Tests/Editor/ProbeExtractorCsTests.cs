@@ -13,11 +13,12 @@ namespace Mapbox.ProbeExtractorCs.UnitTest
 	using Mapbox.Platform;
 	using NUnit.Framework;
 	using System.Collections.Generic;
+	using System.Globalization;
 	using System.IO;
 	using System.Text;
 	using System;
+	using System.Linq;
 	using UnityEngine;
-	using System.Globalization;
 	using Mapbox.CheapRulerCs;
 
 	[TestFixture]
@@ -25,12 +26,14 @@ namespace Mapbox.ProbeExtractorCs.UnitTest
 	{
 
 		private List<TracePoint> _trace;
+		private List<TracePoint> _footTrace;
 		private List<Probe> _probes;
 
 		[SetUp]
 		public void SetUp()
 		{
-			_trace = loadTraceFixture();
+			_trace = loadTraceFixture("trace.csv");
+			_footTrace = loadTraceFixture("trace-foot.csv");
 			_probes = loadProbeFixture();
 		}
 
@@ -49,13 +52,14 @@ namespace Mapbox.ProbeExtractorCs.UnitTest
 		{
 			CheapRuler ruler = CheapRuler.FromTile(49, 7);
 
-			ProbeExtractorOptions options = new ProbeExtractorOptions(
-				minTimeBetweenProbes: 1, // seconds
-				maxDistanceRatioJump: 3, // do not include probes when the distance is 3 times bigger than the previous one
-				maxDurationRatioJump: 3, // do not include probes when the duration is 3 times bigger than the previous one
-				maxAcceleration: 15, // meters per second per second
-				maxDeceleration: 18 // meters per second per second
-			);
+			ProbeExtractorOptions options = new ProbeExtractorOptions()
+			{
+				MinTimeBetweenProbes = 1, // seconds
+				MaxDistanceRatioJump = 3, // do not include probes when the distance is 3 times bigger than the previous one
+				MaxDurationRatioJump = 3, // do not include probes when the duration is 3 times bigger than the previous one
+				MaxAcceleration = 15, // meters per second per second
+				MaxDeceleration = 18 // meters per second per second
+			};
 
 			ProbeExtractor extractor = new ProbeExtractor(ruler, options);
 			List<Probe> extractedProbes = extractor.ExtractProbes(_trace);
@@ -93,12 +97,29 @@ namespace Mapbox.ProbeExtractorCs.UnitTest
 		}
 
 
-		private List<TracePoint> loadTraceFixture()
+		[Test]
+		public void ExtractFootTrace()
 		{
-			string fixture = Application.dataPath + "/Mapbox/Core/probe-extractor-cs/Tests/Editor/trace.csv";
+			CheapRuler ruler = new CheapRuler(_footTrace[0].Latitude);
+			ProbeExtractorOptions options = new ProbeExtractorOptions();
+
+			ProbeExtractor extractor = new ProbeExtractor(ruler, options);
+			List<Probe> extractedProbes = extractor.ExtractProbes(_footTrace);
+
+			Debug.Log(probesToGeojson(extractedProbes));
+
+			Assert.AreEqual(40, extractedProbes.Count);
+		}
+
+
+		private List<TracePoint> loadTraceFixture(string csvFile)
+		{
+			string fixture = Application.dataPath + "/Mapbox/Core/probe-extractor-cs/Tests/Editor/" + csvFile;
 			List<TracePoint> trace = new List<TracePoint>();
 			using (TextReader tw = new StreamReader(fixture, Encoding.UTF8))
 			{
+				// skip header
+				tw.ReadLine();
 				string line;
 				while (null != (line = tw.ReadLine()))
 				{
@@ -185,6 +206,34 @@ namespace Mapbox.ProbeExtractorCs.UnitTest
 		}
 
 
+		// quick hack for visualizing output of ProbeExtractor on http://geojson.io
+		private string probesToGeojson(List<Probe> probes)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			// line
+			sb.Append("{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"properties\":{},\"geometry\":{\"type\":\"LineString\",\"coordinates\":[");
+			sb.Append(string.Join(",", probes.Select(p => string.Format(CultureInfo.InvariantCulture, "[{0},{1}]", p.Longitude, p.Latitude)).ToArray()));
+			sb.Append("]}}");
+
+			//points - too much noise - find a way to just show small circles on vertices
+			/*
+			List<string> points = new List<string>();
+			foreach (var p in probes)
+			{
+				points.Add(string.Format(
+					CultureInfo.InvariantCulture
+					, "{{\"type\":\"Feature\",\"properties\":{{\"marker-size\":\"small\",\"marker-symbol\":\"star\"}},\"geometry\":{{\"type\":\"Point\",\"coordinates\":[{0},{1}]}}}}"
+					, p.Longitude
+					, p.Latitude
+				));
+			}
+			sb.Append("," + string.Join(",", points.ToArray()));
+			*/
+
+			sb.Append("]}");
+			return sb.ToString();
+		}
 
 	}
 }

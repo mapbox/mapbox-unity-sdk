@@ -1,16 +1,31 @@
+
 namespace Mapbox.ProbeExtractorCs
 {
 
+	using Mapbox.Unity.Location;
+
 	public struct TracePoint
 	{
+		public long Timestamp;
 		public double Latitude;
 		public double Longitude;
 		public double Bearing;
-		public long Timestamp;
+		public float? Elevation;
+		/// <summary> Horizontal dilution of precision </summary>
+		public float? HDop;
+		/// <summary> Vertical dilution of precision</summary>
+		public float? VDop;
 
-		public static TracePoint FromLocation()
+		public static TracePoint FromLocation(Location location)
 		{
-			throw new System.NotImplementedException("TODO: after https://github.com/mapbox/mapbox-unity-sdk/pull/362 has been merged");
+			return new TracePoint()
+			{
+				Timestamp = (long)location.Timestamp,
+				Latitude = location.LatitudeLongitude.x,
+				Longitude = location.LatitudeLongitude.y,
+				Bearing = location.Heading,
+				HDop = location.Accuracy
+			};
 		}
 	}
 

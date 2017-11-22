@@ -7,46 +7,23 @@
 	using System.Globalization;
 	using System.Linq;
 
-	public struct ProbeExtractorOptions
+
+	public class ProbeExtractorOptions
 	{
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="minTimeBetweenProbes">seconds</param>
-		/// <param name="maxDistanceRatioJump">do not include probes when the distance is X times bigger than the previous one</param>
-		/// <param name="maxDurationRatioJump">do not include probes when the duration is X times bigger than the previous one</param>
-		/// <param name="maxAcceleration">meters per second per second</param>
-		/// <param name="maxDeceleration">meters per second per second</param>
-		/// <param name="minProbes"></param>
-		/// <param name="ouputBadProbes"></param>
-		public ProbeExtractorOptions(
-			double minTimeBetweenProbes = 0,
-			double maxDistanceRatioJump = double.MaxValue,
-			double maxDurationRatioJump = double.MaxValue,
-			double maxAcceleration = double.MaxValue,
-			double maxDeceleration = double.MaxValue,
-			int minProbes = 2,
-			bool ouputBadProbes = false
-		)
-		{
-			MinTimeBetweenProbes = minTimeBetweenProbes;
-			MaxDistanceRatioJump = maxDistanceRatioJump;
-			MaxDurationRatioJump = maxDurationRatioJump;
-			MaxAcceleration = maxAcceleration;
-			MaxDeceleration = maxDeceleration;
-			MinProbes = minProbes;
-			OutputBadProbes = ouputBadProbes;
-		}
-
-		public double MinTimeBetweenProbes;
-		public double MaxDistanceRatioJump;
-		public double MaxDurationRatioJump;
-		public double MaxAcceleration;
-		public double MaxDeceleration;
-		public int MinProbes;
-		public bool OutputBadProbes;
-
+		/// <summary>Seconds</summary>
+		public double MinTimeBetweenProbes = 0;
+		/// <summary>Do not include probes when the distance is X times bigger than the previous one</summary>
+		public double MaxDistanceRatioJump = double.MaxValue;
+		/// <summary>Do not include probes when the duration is X times bigger than the previous one</summary>
+		public double MaxDurationRatioJump = double.MaxValue;
+		/// <summary>Meters per second per second</summary>
+		public double MaxAcceleration = double.MaxValue;
+		/// <summary>Meters per second per second</summary>
+		public double MaxDeceleration = double.MaxValue;
+		/// <summary>Minimum probes extracted data should contain</summary>
+		public int MinProbes = 2;
+		/// <summary>Also return probes deemed not good</summary>
+		public bool OutputBadProbes = false;
 	}
 
 
