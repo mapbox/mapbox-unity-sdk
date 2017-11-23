@@ -99,6 +99,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_newTriangleList = new List<int>();
 		}
 
+		// Had to add this as we need a way of getting what was set in the Inspector so we can calculate real-life altitude.
+		public float GetHeightModifier()
+		{
+			return _heightModifier;
+		}
+
 		internal override void OnRegistered(UnityTile tile)
 		{
 			if (_addToLayer && tile.gameObject.layer != _layerId)
