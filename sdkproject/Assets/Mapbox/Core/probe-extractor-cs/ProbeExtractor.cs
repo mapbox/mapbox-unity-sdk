@@ -1,11 +1,10 @@
 ﻿namespace Mapbox.ProbeExtractorCs
 {
+
+
 	using Mapbox.CheapRulerCs;
 	using System;
-	using System.Collections;
 	using System.Collections.Generic;
-	using System.Globalization;
-	using System.Linq;
 
 
 	public class ProbeExtractorOptions
@@ -80,6 +79,7 @@
 				bearings[insertIdx] = bearing < 0 ? 360 + bearing : bearing;
 			}
 
+
 			//UnityEngine.Debug.Log("durations:" + string.Join(", ", durations.Select(d => d.ToString(CultureInfo.InvariantCulture)).ToArray()));
 			//UnityEngine.Debug.Log("distances:" + string.Join(", ", distances.Select(d => d.ToString(CultureInfo.InvariantCulture)).ToArray()));
 			//UnityEngine.Debug.Log("speeds:" + string.Join(", ", speeds.Select(s => s.ToString(CultureInfo.InvariantCulture)).ToArray()));
@@ -138,29 +138,18 @@
 					}
 				}
 
-				//if (!isGood && !_options.OutputBadProbes)
-				//{
-				//	return new List<Probe>();
-				//}
-
-				//UnityEngine.Debug.Log(string.Format("{0} good:{1}", i, isGood));
-
 				if (isGood || _options.OutputBadProbes)
 				{
-					//why this??
-					double[] coords = _ruler.Destination(
-						//why previous coords: i-1???
-						new double[] { trace[i - 1].Longitude, trace[i - 1].Latitude },
-						//why half the distance?
-						distances[i] / 2,
-						bearings[i]
+					double[] coords = pointAtDistanceAndBearing(
+						trace[i - 1]
+						, distances[i] / 2
+						, bearings[i]
 					);
 
 					probes.Add(new Probe()
 					{
 						Latitude = coords[1],
 						Longitude = coords[0],
-						// ?? makes sense: from previous point
 						StartTime = trace[i].Timestamp,
 						Duration = durations[i],
 						Distance = distances[i],
@@ -184,7 +173,7 @@
 			}
 
 
-			// 2nd pass, what's this for???????
+			// 2nd pass
 
 			// require at least two probes
 			if (probes.Count > 1)
@@ -250,19 +239,19 @@
 
 				if (good || _options.OutputBadProbes)
 				{
-					// create first probe
-					//probe = createProbe(prevCoords[0], durations[0], distances[0], speeds[0], bearings[0], ruler, good);
 
-					// need to prepend to track ways
-					//probes.unshift(probe);   // prepend
+					double[] coords = pointAtDistanceAndBearing(
+						trace[0]
+						, distances[0]
+						, bearings[0]
+					);
 
-					UnityEngine.Debug.LogWarning("prepending probe: TODO: mingle coords as above ");
 					probes.Insert(
 						0,
 						new Probe()
 						{
-							Latitude = trace[0].Latitude,
-							Longitude = trace[0].Longitude,
+							Latitude = coords[1],
+							Longitude = coords[0],
 							StartTime = trace[0].Timestamp,
 							Duration = durations[0],
 							Distance = distances[0],
@@ -350,6 +339,22 @@
 			}
 
 			return false;
+		}
+
+
+
+		/// <summary>
+		/// Creates coordinate in between two trace points to smooth line
+		/// </summary>
+		/// <returns>double array containing lng/lat</returns>
+		private double[] pointAtDistanceAndBearing(TracePoint tracePoint, double distance, double bearing)
+		{
+			return _ruler.Destination(
+				new double[] { tracePoint.Longitude, tracePoint.Latitude }
+				, distance
+				, bearing
+			);
+
 		}
 
 	}

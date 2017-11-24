@@ -4,6 +4,10 @@ namespace Mapbox.ProbeExtractorCs
 
 	using Mapbox.Unity.Location;
 
+
+	/// <summary>
+	/// Represents a point of a GPS trace
+	/// </summary>
 	public struct TracePoint
 	{
 		public long Timestamp;
@@ -30,6 +34,9 @@ namespace Mapbox.ProbeExtractorCs
 	}
 
 
+	/// <summary>
+	/// Represents a probe extracted by ProbeExtractor
+	/// </summary>
 	public struct Probe
 	{
 		public double Latitude;
