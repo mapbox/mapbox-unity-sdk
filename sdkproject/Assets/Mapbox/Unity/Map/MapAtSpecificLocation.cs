@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Unity.Map
+namespace Mapbox.Unity.Map
 {
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Map;
@@ -21,7 +21,7 @@
 			// The magic line.
 			_root.localPosition = -Conversions.GeoToWorldPosition(_centerLatitudeLongitude.x, _centerLatitudeLongitude.y, _centerMercator, _worldRelativeScale).ToVector3xz();
 
-			_mapVisualizer.Initialize(this, _fileSouce);
+			_mapVisualizer.Initialize(this, _fileSource);
 			_tileProvider.Initialize(this);
 
 			SendInitialized();

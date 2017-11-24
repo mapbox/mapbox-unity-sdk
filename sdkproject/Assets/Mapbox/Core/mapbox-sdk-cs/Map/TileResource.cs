@@ -10,7 +10,11 @@ namespace Mapbox.Map
 
 	internal sealed class TileResource : IResource
 	{
+#if !UNITY_WEBGL
 		static readonly string _eventQuery = "events=true";
+#else
+		static readonly string _eventQuery = "events=false";
+#endif
 		readonly string _query;
 
 		internal TileResource(string query)

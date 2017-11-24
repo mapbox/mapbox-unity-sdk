@@ -32,6 +32,7 @@
 			{
 				_initialized = true;
 			}
+			_cachedTile = new UnwrappedTileId();
 		}
 
 		private void Update()

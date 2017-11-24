@@ -19,8 +19,8 @@ namespace Mapbox.Unity.Map
 			Vector2d shift = map.CenterMercator - centerTileCenter;
 			var unityTileSize = map.UnityTileSize;
 			// get factor at equator to avoid shifting errors at higher latitudes
-			float factor = Conversions.GetTileScaleInMeters(0f, _map.AbsoluteZoom) * 256.0f / unityTileSize;
-			var scaleFactor = Mathf.Pow(2, (_map.InitialZoom - _map.AbsoluteZoom));
+			float factor = Conversions.GetTileScaleInMeters(0f, map.AbsoluteZoom) * 256.0f / unityTileSize;
+			var scaleFactor = Mathf.Pow(2, (map.InitialZoom - map.AbsoluteZoom));
 
 			//position the tile relative to the center tile of the current viewport using the tile id
 			//multiply by tile size Unity units (unityTileScale)
