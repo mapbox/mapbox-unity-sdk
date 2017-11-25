@@ -6,6 +6,8 @@ namespace Mapbox.Editor.Build
 	using UnityEditor.Callbacks;
 	using UnityEditor.iOS.Xcode;
 	using System.IO;
+	using System.Linq;
+	using System.Text.RegularExpressions;
 
 	public class Mapbox_iOS_build : MonoBehaviour
 	{
@@ -22,7 +24,15 @@ namespace Mapbox.Editor.Build
 				proj.ReadFromString(file);
 				string target = proj.TargetGuidByName("Unity-iPhone");
 
-				proj.AddBuildProperty(target, "HEADER_SEARCH_PATHS", "$(SRCROOT)/Libraries/Mapbox/Core/Plugins/iOS/MapboxMobileEvents/include");
+				var defaultIncludePath = "Mapbox/Core/Plugins/iOS/MapboxMobileEvents/include";
+				var includePaths = Directory.GetDirectories(Application.dataPath, "include", SearchOption.AllDirectories);
+				var includePath = includePaths
+					.Select(path => Regex.Replace(path, Application.dataPath + "/", ""))
+					.Where(path => path.EndsWith(defaultIncludePath))
+					.DefaultIfEmpty(defaultIncludePath)
+					.First();
+
+				proj.AddBuildProperty(target, "HEADER_SEARCH_PATHS", "$(SRCROOT)/Libraries/" + includePath);
 				proj.AddBuildProperty(target, "OTHER_LDFLAGS", "-ObjC -lz");
 
 				File.WriteAllText(projPath, proj.WriteToString());
