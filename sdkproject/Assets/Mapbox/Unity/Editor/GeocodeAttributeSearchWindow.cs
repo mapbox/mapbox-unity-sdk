@@ -129,10 +129,6 @@
 			{
 				_features = res.Features;
 			}
-			else
-			{
-				_features.Clear();
-			}
 			_isSearching = false;
 			this.Repaint();
 
