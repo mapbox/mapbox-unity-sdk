@@ -207,6 +207,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				//update pooled vector entity with new data
 				if (_tempMeshData.Vertices.Count > 3)
 				{
+					_cached[tile].Clear();
+					_cacheVertexCount[tile] = 0;
 					_tempVectorEntity = null;
 					_tempVectorEntity = _pool.GetObject();
 					_tempVectorEntity.GameObject.SetActive(true);
