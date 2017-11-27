@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b10536479dade041b6db9893fdf723a, type: 3}
   m_Name: SatelliteImageFactory
   m_EditorClassIdentifier: 
-  _mapIdType: 1
+  _mapIdType: 0
   _customStyle:
     Name: 
     Id: mapbox.satellite
