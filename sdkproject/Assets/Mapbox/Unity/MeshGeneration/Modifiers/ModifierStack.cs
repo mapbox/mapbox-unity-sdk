@@ -141,7 +141,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				}
 			}
 
-
 			_tempVectorEntity = _pool.GetObject();
 			_tempVectorEntity.GameObject.SetActive(true);
 			_tempVectorEntity.Mesh.Clear();
@@ -151,6 +150,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_tempVectorEntity.Mesh.subMeshCount = meshData.Triangles.Count;
 			_tempVectorEntity.Mesh.SetVertices(meshData.Vertices);
 			_tempVectorEntity.Mesh.SetNormals(meshData.Normals);
+			if(meshData.Tangents.Count > 0)
+				_tempVectorEntity.Mesh.SetTangents(meshData.Tangents);
+
 
 			_counter = meshData.Triangles.Count;
 			for (int i = 0; i < _counter; i++)

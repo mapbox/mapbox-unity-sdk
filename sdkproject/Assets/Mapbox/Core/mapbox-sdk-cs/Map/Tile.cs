@@ -28,7 +28,6 @@ namespace Mapbox.Map
 		private IAsyncRequest _request;
 		private Action _callback;
 
-
 		/// <summary> Tile state. </summary>
 		public enum State
 		{
@@ -111,7 +110,6 @@ namespace Mapbox.Map
 				return _state == State.Loaded;
 			}
 		}
-
 
 		/// <summary>
 		///     Initializes the <see cref="T:Mapbox.Map.Tile"/> object. It will
@@ -201,11 +199,17 @@ namespace Mapbox.Map
 		// a Worker class to abstract this, so on platforms that support threads (like Unity
 		// on the desktop, Android, etc) we can use worker threads and when building for
 		// the browser, we keep it single-threaded.
+		List<string> ids = new List<string>();
 		private void HandleTileResponse(Response response)
 		{
 
 			if (response.HasError)
 			{
+				if (!ids.Contains(_id.ToString()))
+					ids.Add(_id.ToString());
+				else
+					return;
+				
 				response.Exceptions.ToList().ForEach(e => AddException(e));
 			}
 			else

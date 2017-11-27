@@ -5,6 +5,7 @@
 	using Mapbox.Unity.Utilities;
 	using System.Collections.Generic;
 	using Mapbox.Utils;
+	using Mapbox.Map;
 
 	[CreateAssetMenu(menuName = "Mapbox/Factories/Terrain Factory - Flat Sphere")]
 	public class FlatSphereTerrainFactory : AbstractTileFactory

@@ -104,6 +104,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			CreateTerrainHeight(tile);
 		}
 
+		/// <summary>
+		/// Method to be called when a tile error has occurred.
+		/// </summary>
+		/// <param name="e"><see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance/</param>
+		protected override void OnErrorOccurred(TileErrorEventArgs e)
+		{
+			base.OnErrorOccurred(e);
+		}
+
 		private void CreateBaseMesh(UnityTile tile)
 		{
 			//TODO use arrays instead of lists
@@ -189,6 +198,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				if (pngRasterTile.HasError)
 				{
+					OnErrorOccurred(new TileErrorEventArgs(tile.CanonicalTileId, pngRasterTile.GetType(), tile, pngRasterTile.Exceptions));
 					tile.HeightDataState = TilePropertyState.Error;
 
 					// Handle missing elevation from server (404)!

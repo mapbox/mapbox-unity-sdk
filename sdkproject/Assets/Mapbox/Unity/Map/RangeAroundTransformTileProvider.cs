@@ -33,13 +33,14 @@
 			{
 				_initialized = true;
 			}
+			_cachedTile = new UnwrappedTileId();
 		}
 
 		private void Update()
 		{
 			if (!_initialized) return;
 
-			_currentTile = TileCover.CoordinateToTileId(_targetTransform.localPosition.GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale), _map.Zoom);
+			_currentTile = TileCover.CoordinateToTileId(_targetTransform.localPosition.GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale), _map.AbsoluteZoom);
 
 			if (!_currentTile.Equals(_cachedTile))
 			{
@@ -47,7 +48,7 @@
 				{
 					for (int y = _currentTile.Y - _visibleBuffer; y <= (_currentTile.Y + _visibleBuffer); y++)
 					{
-						AddTile(new UnwrappedTileId(_map.Zoom, x, y));
+						AddTile(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
 					}
 				}
 				_cachedTile = _currentTile;
