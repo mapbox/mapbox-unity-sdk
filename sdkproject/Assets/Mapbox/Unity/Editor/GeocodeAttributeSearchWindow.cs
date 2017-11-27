@@ -125,9 +125,11 @@
 
 		void HandleGeocoderResponse(ForwardGeocodeResponse res)
 		{
-			_features = res.Features;
+			if (res != null) {
+				_features = res.Features;
+			}
 			_isSearching = false;
-			this.Repaint();
+			this.Repaint ();
 
 			//_hasResponse = true;
 			//_coordinate = res.Features[0].Center;
