@@ -129,8 +129,12 @@
 			{
 				_features = res.Features;
 			}
+			else
+			{
+				_features.Clear();
+			}
 			_isSearching = false;
-			this.Repaint ();
+			this.Repaint();
 
 			//_hasResponse = true;
 			//_coordinate = res.Features[0].Center;
