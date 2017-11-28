@@ -4,10 +4,16 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System.ComponentModel;
-
 namespace Mapbox.MapMatching
 {
+
+
+	using System.ComponentModel;
+#if NETFX_CORE || PORTABLE || WINDOWS_UWP
+	using Mapbox.VectorTile.Geometry; //contains custom 'DescriptionAttribute' implementation
+	using System.Reflection;
+	using System.Linq;
+#endif
 
 	/// <summary>Directions profile id</summary>
 	public enum Profile
