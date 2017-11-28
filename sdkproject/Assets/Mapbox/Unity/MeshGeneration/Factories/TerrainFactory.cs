@@ -32,7 +32,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField]
 		private string _mapId = "";
 		[SerializeField]
-		private float _heightModifier = 1f;
+		public float _heightModifier = 1f;
 		[SerializeField]
 		[Range(2, 256)]
 		private int _sampleCount = 40;
