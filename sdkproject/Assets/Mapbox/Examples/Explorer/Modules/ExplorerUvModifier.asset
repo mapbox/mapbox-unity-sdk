@@ -8,10 +8,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25f09effe9db3dd4e9e825475d698ca3, type: 3}
-  m_Name: ExplorerDefaultPointStack
+  m_Script: {fileID: 11500000, guid: cf1a49b7a5d29964093712def3d56475, type: 3}
+  m_Name: ExplorerUvModifier
   m_EditorClassIdentifier: 
-  _moveFeaturePositionTo: 1
-  MeshModifiers: []
-  GoModifiers:
-  - {fileID: 11400000, guid: ceca5248b4c18354d8089a76da2f7f45, type: 2}
+  Active: 1
+  UseSatelliteRoof: 0
