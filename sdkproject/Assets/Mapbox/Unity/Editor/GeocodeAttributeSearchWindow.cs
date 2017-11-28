@@ -125,7 +125,10 @@
 
 		void HandleGeocoderResponse(ForwardGeocodeResponse res)
 		{
-			_features = res.Features;
+			if (res != null)
+			{
+				_features = res.Features;
+			}
 			_isSearching = false;
 			this.Repaint();
 
