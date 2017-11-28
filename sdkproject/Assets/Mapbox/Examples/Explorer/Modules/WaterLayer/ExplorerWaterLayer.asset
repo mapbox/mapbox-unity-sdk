@@ -13,7 +13,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Active: 1
   _classificationKey: 
-  _key: landuse
+  _key: water
   Filters: []
   _defaultStack: {fileID: 11400000, guid: 37a023af0ce9d1448aebcd53bbfd5c3a, type: 2}
   Stacks: []

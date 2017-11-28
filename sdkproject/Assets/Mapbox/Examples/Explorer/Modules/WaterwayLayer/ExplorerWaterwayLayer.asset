@@ -13,7 +13,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Active: 1
   _classificationKey: 
-  _key: road
+  _key: waterway
   Filters: []
   _defaultStack: {fileID: 11400000, guid: be7a7b4a477f8be42b221ba7deb1d0e3, type: 2}
   Stacks: []
