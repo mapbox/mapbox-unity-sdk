@@ -21,7 +21,9 @@
 			{
 				for (int i = 0; i < _counter; i++)
 				{
-					var h = tile.QueryHeightData((float)((md.Vertices[i].x + scaledX / 2) / scaledX), (float)((md.Vertices[i].z + scaledY / 2) / scaledY));
+					var h = tile.QueryHeightData(
+						(float)((md.Vertices[i].x + md.PositionInTile.x + scaledX / 2) / scaledX),
+						(float)((md.Vertices[i].z + md.PositionInTile.z + scaledY / 2) / scaledY));
 					md.Vertices[i] += new Vector3(0, h, 0);
 				}
 			}
@@ -32,7 +34,9 @@
 					_counter = sub.Count;
 					for (int i = 0; i < _counter; i++)
 					{
-						var h = tile.QueryHeightData((float)((sub[i].x + scaledX / 2) / scaledX), (float)((sub[i].z + scaledY / 2) / scaledY));
+						var h = tile.QueryHeightData(
+							(float)((sub[i].x + md.PositionInTile.x + scaledX / 2) / scaledX), 
+							(float)((sub[i].z + md.PositionInTile.z + scaledY / 2) / scaledY));
 						sub[i] += new Vector3(0, h, 0);
 					}
 				}

@@ -70,19 +70,20 @@ namespace Mapbox.Examples
 			}
 		}
 
-		void LocationProvider_OnLocationUpdated(object sender, LocationUpdatedEventArgs e)
+		void LocationProvider_OnLocationUpdated(Location location)
 		{
-			if (_isInitialized)
+			if (_isInitialized && location.IsLocationUpdated)
 			{
-				_targetPosition = Conversions.GeoToWorldPosition(e.Location,
-																 _map.CenterMercator,
-																 _map.WorldRelativeScale).ToVector3xz();
+				_targetPosition = Conversions.GeoToWorldPosition(
+					location.LatitudeLongitude,
+					_map.CenterMercator,
+					_map.WorldRelativeScale).ToVector3xz();
 			}
 		}
 
 		void Update()
 		{
-			transform.position = Vector3.Lerp(transform.position, _targetPosition, Time.deltaTime * _positionFollowFactor);
+			transform.localPosition = Vector3.Lerp(transform.localPosition, _targetPosition, Time.deltaTime * _positionFollowFactor);
 		}
 	}
 }

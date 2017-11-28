@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Unity.Map
+namespace Mapbox.Unity.Map
 {
 	using Mapbox.Utils;
 	using Mapbox.Unity.Utilities;
@@ -15,13 +15,14 @@
 			_worldHeightFixed = false;
 			_centerLatitudeLongitude = latLon;
 			_zoom = zoom;
+			_initialZoom = zoom;
 
-			var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(_centerLatitudeLongitude, _zoom));
+			var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(_centerLatitudeLongitude, AbsoluteZoom));
 			_centerMercator = referenceTileRect.Center;
 
 			_worldRelativeScale = _useRelativeScale ? Mathf.Cos(Mathf.Deg2Rad * (float)_centerLatitudeLongitude.x) : 1f;
 
-			_mapVisualizer.Initialize(this, _fileSouce);
+			_mapVisualizer.Initialize(this, _fileSource);
 			_tileProvider.Initialize(this);
 
 			SendInitialized();

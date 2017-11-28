@@ -642,49 +642,18 @@ namespace Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers
 			}
 			return p;
 		}
-
-		public static Data Flatten(List<List<float[]>> data)
-		{
-			var dataCount = data.Count;
-			var dim = 0;
-			for (int i = 0; i < dataCount; i++)
-			{
-				dim += data[i].Count;
-			}
-
-			var result = new Data() { Dim = 2 };
-			result.Vertices = new List<float>(dim * 2);
-			dim = data[0][0].Length;
-			var holeIndex = 0;
-
-			for (var i = 0; i < dataCount; i++)
-			{
-				var subCount = data[i].Count;
-				for (var j = 0; j < subCount; j++)
-				{
-					for (var d = 0; d < dim; d++)
-						result.Vertices.Add(data[i][j][d]);
-				}
-				if (i > 0)
-				{
-					holeIndex += data[i - 1].Count;
-					result.Holes.Add(holeIndex);
-				}
-			}
-			return result;
-		}
-		
+				
 		public static Data Flatten(List<List<Vector3>> data)
 		{
 			var dataCount = data.Count;
-			var dim = 0;
+			var totalVertCount = 0;
 			for (int i = 0; i < dataCount; i++)
 			{
-				dim += data[i].Count;
+				totalVertCount += data[i].Count;
 			}
 
 			var result = new Data() { Dim = 2 };
-			result.Vertices = new List<float>(dim * 2);
+			result.Vertices = new List<float>(totalVertCount * 2);
 			var holeIndex = 0;
 
 			for (var i = 0; i < dataCount; i++)

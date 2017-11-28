@@ -157,10 +157,10 @@
 
 				EditorGUILayout.Space();
 				EditorGUILayout.BeginHorizontal();
+				SerializedProperty sp;
 				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
 				{
 					facs.arraySize++;
-					facs.GetArrayElementAtIndex(facs.arraySize - 1).objectReferenceValue = null;
 				}
 				if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
 				{

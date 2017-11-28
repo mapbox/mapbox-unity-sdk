@@ -501,6 +501,7 @@ GameObject:
   - component: {fileID: 1461465688}
   - component: {fileID: 1461465691}
   - component: {fileID: 1461465687}
+  - component: {fileID: 1461465689}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -536,6 +537,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1461465689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1461465686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76a256726e16d4966a3f30b97a17e1d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mapInstance: {fileID: 1461465691}
+  OnTileError:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: Mapbox.Unity.Map.TileErrorEvent, Assembly-CSharp, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
 --- !u!114 &1461465691
 MonoBehaviour:
   m_ObjectHideFlags: 0
