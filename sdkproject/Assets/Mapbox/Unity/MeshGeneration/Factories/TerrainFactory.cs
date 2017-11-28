@@ -32,7 +32,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField]
 		private string _mapId = "";
 		[SerializeField]
-		private float _heightModifier = 1f;
+		public float _heightModifier = 1f;
 		[SerializeField]
 		[Range(2, 256)]
 		private int _sampleCount = 40;
@@ -97,12 +97,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_newNormalList = new List<Vector3>(_sampleCount * _sampleCount);
 			_newUvList = new List<Vector2>(_sampleCount * _sampleCount);
 			_newTriangleList = new List<int>();
-		}
-
-		// Had to add this as we need a way of getting what was set in the Inspector so we can calculate real-life altitude.
-		public float GetHeightModifier()
-		{
-			return _heightModifier;
 		}
 
 		internal override void OnRegistered(UnityTile tile)
