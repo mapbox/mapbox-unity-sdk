@@ -5,6 +5,7 @@ namespace Mapbox.Unity.Map
 	using Mapbox.Map;
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Utils;
+	using System.Collections.Generic;
 
 	public class CameraBoundsTileProvider : AbstractTileProvider
 	{
@@ -31,6 +32,7 @@ namespace Mapbox.Unity.Map
 		Vector2d _currentLatitudeLongitude;
 		UnwrappedTileId _cachedTile;
 		UnwrappedTileId _currentTile;
+		List<UnwrappedTileId> toRemove;
 
 		public override void OnInitialized()
 		{
@@ -38,6 +40,7 @@ namespace Mapbox.Unity.Map
 			_viewportTarget = new Vector3(0.5f, 0.5f, 0);
 			_shouldUpdate = true;
 			_cachedTile = new UnwrappedTileId();
+			toRemove = new List<UnwrappedTileId>();
 		}
 
 		void Update()
@@ -76,6 +79,7 @@ namespace Mapbox.Unity.Map
 
 		void Cleanup(UnwrappedTileId currentTile)
 		{
+			toRemove.Clear();
 			foreach (var tile in _activeTiles)
 			{
 				bool dispose = false;
@@ -84,8 +88,13 @@ namespace Mapbox.Unity.Map
 
 				if (dispose)
 				{
-					RemoveTile(tile.Key);
+					toRemove.Add(tile.Key);
 				}
+			}
+
+			foreach (var item in toRemove)
+			{
+				RemoveTile(item);
 			}
 		}
 	}
