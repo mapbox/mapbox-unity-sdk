@@ -8,6 +8,7 @@ namespace Mapbox.Editor.Build
 	using System.IO;
 	using System.Linq;
 	using System.Text.RegularExpressions;
+	using System.Globalization;
 
 	public class Mapbox_iOS_build : MonoBehaviour
 	{
@@ -28,7 +29,7 @@ namespace Mapbox.Editor.Build
 				var includePaths = Directory.GetDirectories(Application.dataPath, "include", SearchOption.AllDirectories);
 				var includePath = includePaths
 					.Select(path => Regex.Replace(path, Application.dataPath + "/", ""))
-					.Where(path => path.EndsWith(defaultIncludePath))
+					.Where(path => path.EndsWith(defaultIncludePath, true, CultureInfo.InvariantCulture))
 					.DefaultIfEmpty(defaultIncludePath)
 					.First();
 
