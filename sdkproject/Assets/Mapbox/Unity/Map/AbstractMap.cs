@@ -6,7 +6,7 @@
 	using UnityEngine;
 	using Mapbox.Map;
 
-	[RequireComponent (typeof(TileErrorHandler))]
+	[RequireComponent(typeof(TileErrorHandler))]
 	public abstract class AbstractMap : MonoBehaviour, IMap
 	{
 		[SerializeField]
@@ -69,7 +69,7 @@
 			}
 		}
 
-		
+
 
 		[SerializeField]
 		protected float _unityTileSize = 100;
