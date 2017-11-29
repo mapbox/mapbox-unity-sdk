@@ -15,8 +15,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	{
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
-		[NonSerialized] private int _counter;
-		[NonSerialized] private Vector3 _v1, _v2;
 		public bool IsClockwise(IList<Vector3> vertices)
 		{
 			double sum = 0.0;
@@ -30,9 +28,13 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			return sum > 0.0;
 		}
 
+		private int _counter, _secondCounter;
+		private Vector3 _v1, _v2;
+
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
-			var subset = new List<List<Vector3>>();
+			_secondCounter = feature.Points.Count;
+			var subset = new List<List<Vector3>>(_secondCounter);
 			Data flatData = null;
 			List<int> result = null;
 			var currentIndex = 0;
@@ -40,7 +42,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			List<int> triList = null;
 			List<Vector3> sub = null;
 
-			for (int i = 0; i < feature.Points.Count; i++)
+			for (int i = 0; i < _secondCounter; i++)
 			{
 				sub = feature.Points[i];
 				//earcut is built to handle one polygon with multiple holes
@@ -53,7 +55,13 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					result = EarcutLibrary.Earcut(flatData.Vertices, flatData.Holes, flatData.Dim);
 					c2 = result.Count;
 					if (triList == null)
+					{
 						triList = new List<int>(c2);
+					}
+					else
+					{
+						triList.Capacity = triList.Count + c2;
+					}
 					
 					for (int j = 0; j < c2; j++)
 					{
@@ -66,6 +74,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				subset.Add(sub);
 
 				c2 = sub.Count;
+				md.Vertices.Capacity = md.Vertices.Count + c2;
+				md.Normals.Capacity = md.Normals.Count + c2;
+				md.Edges.Capacity = md.Edges.Count + c2 * 2;
 				for (int j = 0; j < c2; j++)
 				{
 					md.Edges.Add(vertCount + ((j+ 1) % c2));
@@ -80,7 +91,13 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			result = EarcutLibrary.Earcut(flatData.Vertices, flatData.Holes, flatData.Dim);
 			c2 = result.Count;
 			if (triList == null)
+			{
 				triList = new List<int>(c2);
+			}
+			else
+			{
+				triList.Capacity = triList.Count + c2;
+			}
 			for (int i = 0; i < c2; i++)
 			{
 				triList.Add(result[i] + currentIndex);

@@ -6,7 +6,7 @@
 	using UnityEngine;
 	using Mapbox.Map;
 
-	[RequireComponent (typeof(TileErrorHandler))]
+	[RequireComponent(typeof(TileErrorHandler))]
 	public abstract class AbstractMap : MonoBehaviour, IMap
 	{
 		[SerializeField]
@@ -68,6 +68,8 @@
 				return _mapVisualizer;
 			}
 		}
+
+
 
 		[SerializeField]
 		protected float _unityTileSize = 100;
@@ -213,5 +215,10 @@
 		}
 
 		public abstract void Initialize(Vector2d latLon, int zoom);
+
+		public void Reset()
+		{
+			Initialize(Conversions.StringToLatLon(_latitudeLongitudeString), (int)_zoom);
+		}
 	}
 }

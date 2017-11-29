@@ -16,10 +16,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
 		public bool UseSatelliteRoof = false;
 
-		[NonSerialized] private int _mdVertexCount;
-		[NonSerialized] private Vector2d _size;
-		[NonSerialized] private Vector3 _vert;
-		[NonSerialized] private List<Vector2> _uv = new List<Vector2>();
+		private int _mdVertexCount;
+		private Vector2d _size;
+		private Vector3 _vert;
+		private List<Vector2> _uv = new List<Vector2>();
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{

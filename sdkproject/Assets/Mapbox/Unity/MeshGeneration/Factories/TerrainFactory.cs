@@ -6,6 +6,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	using Mapbox.Unity.MeshGeneration.Enums;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Utils;
+	using System;
 
 	public enum MapIdType
 	{
@@ -57,6 +58,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		private List<int> _newTriangleList;
 		private Vector3 _newDir;
 		private int _vertA, _vertB, _vertC;
+		private int _counter;
 
 		public string MapId
 		{
@@ -304,7 +306,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			tile.MeshFilter.mesh.GetVertices(_currentTileMeshData.Vertices);
 			tile.MeshFilter.mesh.GetNormals(_currentTileMeshData.Normals);
 
-			for (int i = 0; i < _currentTileMeshData.Vertices.Count; i++)
+			_counter = _currentTileMeshData.Vertices.Count;
+			for (int i = 0; i < _counter; i++)
 			{
 				_currentTileMeshData.Vertices[i] = new Vector3(
 					_currentTileMeshData.Vertices[i].x,
