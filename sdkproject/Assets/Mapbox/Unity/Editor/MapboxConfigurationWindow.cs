@@ -8,6 +8,7 @@ namespace Mapbox.Editor
 	using Mapbox.Unity;
 	using Mapbox.Json;
 	using Mapbox.Unity.Utilities;
+	using UnityEditor.Callbacks;
 
 	public class MapboxConfigurationWindow : EditorWindow
 	{
@@ -23,6 +24,17 @@ namespace Mapbox.Editor
 		bool _justOpened = true;
 		string _validationCode = "";
 		bool _validating = false;
+
+		[DidReloadScripts]
+		static void Popup()
+		{
+			if (ShouldShowConfigurationWindow())
+			{
+				PlayerPrefs.SetInt(Constants.Path.DID_PROMPT_CONFIGURATION, 1);
+				PlayerPrefs.Save();
+				Init();
+			}
+		}
 
 		[MenuItem("Mapbox/Configure")]
 		static void Init()
@@ -67,6 +79,7 @@ namespace Mapbox.Editor
 				_justOpened = false;
 			}
 		}
+
 
 		void OnGUI()
 		{
@@ -139,7 +152,6 @@ namespace Mapbox.Editor
 			}
 
 			SaveConfiguration();
-
 		}
 
 
@@ -159,6 +171,16 @@ namespace Mapbox.Editor
 			Repaint();
 
 			MapboxAccess.Instance.SetConfiguration(configuration);
+		}
+
+		static bool ShouldShowConfigurationWindow()
+		{
+			if (!PlayerPrefs.HasKey(Constants.Path.DID_PROMPT_CONFIGURATION))
+			{
+				PlayerPrefs.SetInt(Constants.Path.DID_PROMPT_CONFIGURATION, 0);
+			}
+
+			return PlayerPrefs.GetInt(Constants.Path.DID_PROMPT_CONFIGURATION) == 0;
 		}
 	}
 }

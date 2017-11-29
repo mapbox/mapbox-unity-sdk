@@ -12,6 +12,7 @@ namespace Mapbox.Unity
 			public const string SHOULD_COLLECT_LOCATION_KEY = "MAPBOX_SHOULD_COLLECT_LOCATION";
 			public const string TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR_KEY = "MAPBOX_TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR";
 			public const string TELEMETRY_TURNSTILE_LAST_TICKS_FALLBACK_KEY = "MAPBOX_TELEMETRY_TURNSTILE_LAST_TICKS_FALLBACK";
+			public const string DID_PROMPT_CONFIGURATION = "MAPBOX_DID_PROMPT_CONFIGURATION";
 			public static readonly string MAPBOX_RESOURCES_RELATIVE = System.IO.Path.Combine("Mapbox", "MapboxConfiguration");
 			public static readonly string MAPBOX_RESOURCES_ABSOLUTE = System.IO.Path.Combine(System.IO.Path.Combine(Application.dataPath, "Resources"), "Mapbox");
 		}

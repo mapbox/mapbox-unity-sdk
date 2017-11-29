@@ -129,6 +129,7 @@ namespace Mapbox.Unity
 		public void SetLocationCollectionState(bool enable)
 		{
 			PlayerPrefs.SetInt(Constants.Path.SHOULD_COLLECT_LOCATION_KEY, (enable ? 1 : 0));
+			PlayerPrefs.Save();
 			_telemetryLibrary.SetLocationCollectionState(enable);
 		}
 
