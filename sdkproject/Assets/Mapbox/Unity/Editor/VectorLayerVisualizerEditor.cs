@@ -8,12 +8,14 @@
 	using Mapbox.Editor.NodeEditor;
 
 	[CustomEditor(typeof(VectorLayerVisualizer))]
-	public class VectorLayerVisualizerEditor : UnityEditor.Editor
+	public class VectorLayerVisualizerEditor : Editor
 	{
 		private VectorLayerVisualizer _layerVis;
 		private MonoScript script;
 		private SerializedProperty _classKeyProp;
 		private SerializedProperty _keyProp;
+		private SerializedProperty _useCoroutines;
+		private SerializedProperty _entityPerCoroutine;
 
 
 		private void OnEnable()
@@ -22,6 +24,8 @@
 			_layerVis = target as VectorLayerVisualizer;
 			_classKeyProp = serializedObject.FindProperty("_classificationKey");
 			_keyProp = serializedObject.FindProperty("_key");
+			_useCoroutines = serializedObject.FindProperty("_enableCoroutines");
+			_entityPerCoroutine = serializedObject.FindProperty("_entityPerCoroutine");
 		}
 
 		public override void OnInspectorGUI()
@@ -33,7 +37,13 @@
 
 			EditorGUILayout.PropertyField(_classKeyProp);
 			EditorGUILayout.PropertyField(_keyProp);
-
+			EditorGUILayout.PropertyField(_useCoroutines);
+			if(_useCoroutines.boolValue)
+			{
+				EditorGUI.indentLevel++;
+				EditorGUILayout.PropertyField(_entityPerCoroutine);
+				EditorGUI.indentLevel--;
+			}
 
 			//FILTERS
 			{

@@ -7,7 +7,7 @@
 	{
 		public event Action<Location> OnLocationUpdated = delegate { };
 
-		protected void SendLocation(Location location)
+		protected virtual void SendLocation(Location location)
 		{
 			OnLocationUpdated(location);
 		}

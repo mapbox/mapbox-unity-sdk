@@ -14,7 +14,7 @@ namespace Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers
 			var hasHoles = holeIndices.Count;
 			var outerLen = hasHoles > 0 ? holeIndices[0] * dim : data.Count;
 			var outerNode = linkedList(data, 0, outerLen, dim, true);
-			var triangles = new List<int>();
+			var triangles = new List<int>((int)(outerNode.i * 1.5));
 
 			if (outerNode == null) return triangles;
 			var minX = 0f;
@@ -388,7 +388,7 @@ namespace Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers
 			var start = 0;
 			var end = 0;
 			Node list = null;
-			var queue = new List<Node>();
+			var queue = new List<Node>(len);
 			for (i = 0; i < len; i++)
 			{
 				start = holeIndices[i] * dim;
@@ -642,38 +642,24 @@ namespace Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers
 			}
 			return p;
 		}
-
-		public static Data Flatten(List<List<float[]>> data)
-		{
-			var dim = data[0][0].Length;
-			var result = new Data() { Dim = dim };
-			var holeIndex = 0;
-
-			for (var i = 0; i < data.Count; i++)
-			{
-				for (var j = 0; j < data[i].Count; j++)
-				{
-					for (var d = 0; d < dim; d++)
-						result.Vertices.Add(data[i][j][d]);
-				}
-				if (i > 0)
-				{
-					holeIndex += data[i - 1].Count;
-					result.Holes.Add(holeIndex);
-				}
-			}
-			return result;
-		}
-		
+				
 		public static Data Flatten(List<List<Vector3>> data)
 		{
-			var dim = 2;
-			var result = new Data() { Dim = dim };
+			var dataCount = data.Count;
+			var totalVertCount = 0;
+			for (int i = 0; i < dataCount; i++)
+			{
+				totalVertCount += data[i].Count;
+			}
+
+			var result = new Data() { Dim = 2 };
+			result.Vertices = new List<float>(totalVertCount * 2);
 			var holeIndex = 0;
 
-			for (var i = 0; i < data.Count; i++)
+			for (var i = 0; i < dataCount; i++)
 			{
-				for (var j = 0; j < data[i].Count; j++)
+				var subCount = data[i].Count;
+				for (var j = 0; j < subCount; j++)
 				{
 					result.Vertices.Add(data[i][j][0]);
 					result.Vertices.Add(data[i][j][2]);
@@ -696,7 +682,6 @@ namespace Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers
 
 		public Data()
 		{
-			Vertices = new List<float>();
 			Holes = new List<int>();
 			Dim = 2;
 		}

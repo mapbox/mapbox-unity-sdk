@@ -88,7 +88,10 @@ namespace Mapbox.Unity.Telemetry
 			byte[] bodyRaw = Encoding.UTF8.GetBytes(bodyJsonString);
 			var headers = new Dictionary<string, string>();
 			headers.Add("Content-Type", "application/json");
+
+#if !UNITY_WEBGL
 			headers.Add("user-agent", GetUserAgent());
+#endif
 
 			var www = new WWW(url, bodyRaw, headers);
 			yield return www;

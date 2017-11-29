@@ -1,6 +1,7 @@
 ﻿namespace Mapbox.Unity.Map
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Linq;
 	using Mapbox.Map;
 	using Mapbox.Unity.Map;
@@ -30,24 +31,38 @@
 
 		private void _OnTileErrorHandler(object sender, TileErrorEventArgs e)
 		{
-
+			// check if request has been aborted: show warning not error
 			if (e.Exceptions.Count > 0)
 			{
-				Debug.LogError(String.Format(
-					"{0} Exception(s) caused on the tile. Tile ID:{1} Tile Type:{4}{2}{3}"
-					, e.Exceptions.Count
-					, e.TileId
-					, Environment.NewLine
-					, string.Join(Environment.NewLine, e.Exceptions.Select(ex => ex.Message).ToArray())
-					, e.TileType
-				));
+				// aborted is always the first exception
+				// additional exceptions are always caused by the request being aborted
+				// show all of them as warnings
+				if (e.Exceptions[0].Message.Contains("Request aborted"))
+				{
+					Debug.LogWarning(printMessage(e.Exceptions, e));
+				}
+				else
+				{
+					Debug.LogError(printMessage(e.Exceptions, e));
+				}
 			}
-
 
 			if (OnTileError != null)
 			{
 				OnTileError.Invoke(e);
 			}
+		}
+
+		private string printMessage(List<Exception> exceptions, TileErrorEventArgs e)
+		{
+			return string.Format(
+				"{0} Exception(s) caused on the tile. Tile ID:{1} Tile Type:{4}{2}{3}"
+				, exceptions.Count
+				, e.TileId
+				, Environment.NewLine
+				, string.Join(Environment.NewLine, exceptions.Select(ex => ex.Message).ToArray())
+				, e.TileType
+			);
 		}
 
 		void OnDisable()

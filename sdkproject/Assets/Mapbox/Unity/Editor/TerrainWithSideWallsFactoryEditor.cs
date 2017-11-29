@@ -7,7 +7,6 @@ using Mapbox.Editor;
 public class TerrainWithSideWallsFactoryEditor : FactoryEditor
 {
 	private string _defaultMapId = "mapbox.terrain-rgb";
-	private TerrainWithSideWallsFactory _factory;
 	public SerializedProperty
 		sampleCount_Prop,
 		mapIdType_Prop,
@@ -24,7 +23,6 @@ public class TerrainWithSideWallsFactoryEditor : FactoryEditor
 
 	void OnEnable()
 	{
-		_factory = target as TerrainWithSideWallsFactory;
 		mapIdType_Prop = serializedObject.FindProperty("_mapIdType");
 		sampleCount_Prop = serializedObject.FindProperty("_sampleCount");
 		heightMod_Prop = serializedObject.FindProperty("_heightModifier");

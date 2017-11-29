@@ -20,21 +20,21 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		[NodeEditorElement("Mesh Modifiers")] public List<MeshModifier> MeshModifiers;
 		[NodeEditorElement("Mesh Modifiers")] public List<GameObjectModifier> GoModifiers;
 
-		[NonSerialized] private Dictionary<UnityTile, int> _cacheVertexCount = new Dictionary<UnityTile, int>();
-		[NonSerialized] private Dictionary<UnityTile, List<MeshData>> _cached = new Dictionary<UnityTile, List<MeshData>>();
-		[NonSerialized] private Dictionary<UnityTile, int> _buildingCount = new Dictionary<UnityTile, int>();
+		private Dictionary<UnityTile, int> _cacheVertexCount = new Dictionary<UnityTile, int>();
+		private Dictionary<UnityTile, List<MeshData>> _cached = new Dictionary<UnityTile, List<MeshData>>();
+		private Dictionary<UnityTile, int> _buildingCount = new Dictionary<UnityTile, int>();
 
-		[NonSerialized] private Dictionary<UnityTile, List<VectorEntity>> _activeObjects = new Dictionary<UnityTile, List<VectorEntity>>();
-		[NonSerialized] private MeshData _tempMeshData;
-		[NonSerialized] private MeshFilter _tempMeshFilter;
-		[NonSerialized] private GameObject _tempGameObject;
-		[NonSerialized] private VectorEntity _tempVectorEntity;
-		[NonSerialized] private MeshData _temp2MeshData;
-		[NonSerialized] private ObjectPool<VectorEntity> _pool;
-		[NonSerialized] private ObjectPool<List<VectorEntity>> _listPool;
-		[NonSerialized] private ObjectPool<List<MeshData>> _meshDataPool;
+		private Dictionary<UnityTile, List<VectorEntity>> _activeObjects = new Dictionary<UnityTile, List<VectorEntity>>();
+		private MeshData _tempMeshData;
+		private MeshFilter _tempMeshFilter;
+		private GameObject _tempGameObject;
+		private VectorEntity _tempVectorEntity;
+		private MeshData _temp2MeshData;
+		private ObjectPool<VectorEntity> _pool;
+		private ObjectPool<List<VectorEntity>> _listPool;
+		private ObjectPool<List<MeshData>> _meshDataPool;
 
-		[NonSerialized] private int _counter, _counter2;
+		private int _counter, _counter2;
 
 		private void OnEnable()
 		{
@@ -207,6 +207,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				//update pooled vector entity with new data
 				if (_tempMeshData.Vertices.Count > 3)
 				{
+					_cached[tile].Clear();
+					_cacheVertexCount[tile] = 0;
 					_tempVectorEntity = null;
 					_tempVectorEntity = _pool.GetObject();
 					_tempVectorEntity.GameObject.SetActive(true);

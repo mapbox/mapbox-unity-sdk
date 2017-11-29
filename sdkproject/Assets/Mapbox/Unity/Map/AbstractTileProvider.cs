@@ -16,14 +16,14 @@
 
 		protected Dictionary<UnwrappedTileId, byte> _activeTiles = new Dictionary<UnwrappedTileId, byte>();
 
-		public void Initialize(IMap map)
+		public virtual void Initialize(IMap map)
 		{
 			_activeTiles.Clear();
 			_map = map;
 			OnInitialized();
 		}
 
-		protected void AddTile(UnwrappedTileId tile)
+		protected virtual void AddTile(UnwrappedTileId tile)
 		{
 			if (_activeTiles.ContainsKey(tile))
 			{
@@ -34,7 +34,7 @@
 			OnTileAdded(tile);
 		}
 
-		protected void RemoveTile(UnwrappedTileId tile)
+		protected virtual void RemoveTile(UnwrappedTileId tile)
 		{
 			if (!_activeTiles.ContainsKey(tile))
 			{
@@ -45,7 +45,7 @@
 			OnTileRemoved(tile);
 		}
 
-		protected void RepositionTile(UnwrappedTileId tile)
+		protected virtual void RepositionTile(UnwrappedTileId tile)
 		{
 			if (!_activeTiles.ContainsKey(tile))
 			{

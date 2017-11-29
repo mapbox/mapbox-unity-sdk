@@ -3,6 +3,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using System.Collections.Generic;
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Data;
+	using System;
 
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Smooth Height for Buildings Modifier")]
 	public class ChamferHeightModifier : MeshModifier
@@ -33,7 +34,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			if (!_forceHeight)
 			{
-				GetHeightData(feature, ref minHeight, ref hf);
+				GetHeightData(feature, tile.TileScale, ref minHeight, ref hf);
 			}
 
 			var max = md.Vertices[0].y;
@@ -62,7 +63,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			float d = 0f;
 			Vector3 v1;
-			Vector3 v2 = Vector3.zero;
+			Vector3 v2 = Mapbox.Unity.Constants.Math.Vector3Zero;
 			int ind = 0;
 
 			var wallTri = new List<int>();
@@ -122,24 +123,23 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			hf += max - min;
 		}
 
-		private static void GetHeightData(VectorFeatureUnity feature, ref float minHeight, ref float hf)
+		private static void GetHeightData(VectorFeatureUnity feature, float scale, ref float minHeight, ref float hf)
 		{
 			if (feature.Properties.ContainsKey("height"))
 			{
-				if (float.TryParse(feature.Properties["height"].ToString(), out hf))
+				hf = Convert.ToSingle(feature.Properties["height"]);
+				hf *= scale;
+				if (feature.Properties.ContainsKey("min_height"))
 				{
-					if (feature.Properties.ContainsKey("min_height"))
-					{
-						minHeight = float.Parse(feature.Properties["min_height"].ToString());
-						hf -= minHeight;
-					}
+					minHeight = Convert.ToSingle(feature.Properties["min_height"]) * scale;
+					hf -= minHeight;
 				}
+
 			}
 			if (feature.Properties.ContainsKey("ele"))
 			{
-				if (float.TryParse(feature.Properties["ele"].ToString(), out hf))
-				{
-				}
+				hf = Convert.ToSingle(feature.Properties["ele"]);
+				hf *= scale;
 			}
 		}
 

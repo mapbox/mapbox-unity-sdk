@@ -6,7 +6,7 @@
 	using UnityEngine;
 	using Mapbox.Map;
 
-	[RequireComponent (typeof(TileErrorHandler))]
+	[RequireComponent(typeof(TileErrorHandler))]
 	public abstract class AbstractMap : MonoBehaviour, IMap
 	{
 		[SerializeField]
@@ -69,6 +69,8 @@
 			}
 		}
 
+
+
 		[SerializeField]
 		protected float _unityTileSize = 100;
 		public float UnityTileSize
@@ -84,7 +86,7 @@
 
 		protected bool _worldHeightFixed = false;
 
-		protected MapboxAccess _fileSouce;
+		protected MapboxAccess _fileSource;
 
 		protected Vector2d _centerLatitudeLongitude;
 		public Vector2d CenterLatitudeLongitude
@@ -130,10 +132,10 @@
 		}
 		public event Action OnInitialized = delegate { };
 
-		void Awake()
+		protected virtual void Awake()
 		{
 			_worldHeightFixed = false;
-			_fileSouce = MapboxAccess.Instance;
+			_fileSource = MapboxAccess.Instance;
 			_tileProvider.OnTileAdded += TileProvider_OnTileAdded;
 			_tileProvider.OnTileRemoved += TileProvider_OnTileRemoved;
 			_tileProvider.OnTileRepositioned += TileProvider_OnTileRepositioned;
@@ -143,7 +145,7 @@
 			}
 		}
 
-		void Start()
+		protected virtual void Start()
 		{
 			if (_initializeOnStart)
 			{
@@ -153,7 +155,7 @@
 		}
 
 		// TODO: implement IDisposable, instead?
-		void OnDestroy()
+		protected virtual void OnDestroy()
 		{
 			if (_tileProvider != null)
 			{
@@ -165,7 +167,7 @@
 			_mapVisualizer.Destroy();
 		}
 
-		void TileProvider_OnTileAdded(UnwrappedTileId tileId)
+		protected virtual void TileProvider_OnTileAdded(UnwrappedTileId tileId)
 		{
 			if (_snapMapHeightToZero && !_worldHeightFixed)
 			{
@@ -197,12 +199,12 @@
 			}
 		}
 
-		void TileProvider_OnTileRemoved(UnwrappedTileId tileId)
+		protected virtual void TileProvider_OnTileRemoved(UnwrappedTileId tileId)
 		{
 			_mapVisualizer.DisposeTile(tileId);
 		}
 
-		void TileProvider_OnTileRepositioned(UnwrappedTileId tileId)
+		protected virtual void TileProvider_OnTileRepositioned(UnwrappedTileId tileId)
 		{
 			_mapVisualizer.RepositionTile(tileId);
 		}
@@ -214,5 +216,9 @@
 
 		public abstract void Initialize(Vector2d latLon, int zoom);
 
+		public void Reset()
+		{
+			Initialize(Conversions.StringToLatLon(_latitudeLongitudeString), (int)_zoom);
+		}
 	}
 }
