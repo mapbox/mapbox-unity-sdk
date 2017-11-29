@@ -13,7 +13,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Active: 1
   _classificationKey: 
-  _key: landuse
+  _key: landcover
   Filters: []
   _defaultStack: {fileID: 11400000, guid: 845537aead444ea48954ee0d1814ccbd, type: 2}
   Stacks: []

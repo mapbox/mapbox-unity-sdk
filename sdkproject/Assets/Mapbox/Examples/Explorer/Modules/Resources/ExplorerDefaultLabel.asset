@@ -9,7 +9,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 25f09effe9db3dd4e9e825475d698ca3, type: 3}
-  m_Name: ExplorerDefaultCountryLabel
+  m_Name: ExplorerDefaultLabel
   m_EditorClassIdentifier: 
   _moveFeaturePositionTo: 0
   MeshModifiers: []

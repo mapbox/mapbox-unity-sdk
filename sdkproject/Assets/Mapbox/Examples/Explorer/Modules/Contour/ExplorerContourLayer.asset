@@ -15,5 +15,5 @@ MonoBehaviour:
   _classificationKey: 
   _key: contour
   Filters: []
-  _defaultStack: {fileID: 11400000, guid: a0c57e4d169041b489c1d894b283c3f2, type: 2}
+  _defaultStack: {fileID: 11400000, guid: 1d05cb4dfed21d641beec914be1173c6, type: 2}
   Stacks: []
