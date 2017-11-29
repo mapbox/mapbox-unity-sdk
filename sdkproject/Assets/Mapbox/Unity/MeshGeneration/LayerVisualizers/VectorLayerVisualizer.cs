@@ -126,7 +126,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 				if (!filterOut)
 				{
-					if (tile.VectorDataState != Enums.TilePropertyState.Cancelled)
+					if (tile != null && tile.gameObject != null && tile.VectorDataState != Enums.TilePropertyState.Cancelled)
 						Build(feature, tile, tile.gameObject);
 				}
 
