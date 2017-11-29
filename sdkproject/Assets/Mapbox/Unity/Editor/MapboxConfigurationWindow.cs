@@ -26,9 +26,11 @@ namespace Mapbox.Editor
 		string _validationCode = "";
 		bool _validating = false;
 		bool _showConfigurationFoldout;
+		Vector2 _scrollPosition;
+		bool _isTokenValid;
 
 		[DidReloadScripts]
-		static void Popup()
+		static void ShowWindowOnImport()
 		{
 			if (ShouldShowConfigurationWindow())
 			{
@@ -84,18 +86,28 @@ namespace Mapbox.Editor
 
 		void OnGUI()
 		{
+			_scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, false, true);
 			EditorGUIUtility.labelWidth = 200f;
+
+			// Access token link.
 			EditorGUILayout.LabelField("Access Token");
 			EditorGUILayout.Space();
 			EditorGUILayout.Space();
-			
 			DrawAccessTokenLink();
+
+			// Access token entry and validation.
 			DrawAccessTokenField();
 			EditorGUILayout.Space();
 			EditorGUILayout.Space();
 
+			// Configuration.
 			DrawConfigurationSettings();
+			EditorGUILayout.Space();
+			EditorGUILayout.Space();
+
+			// Examples.
 			DrawExampleLinks();
+			EditorGUILayout.EndScrollView();
 		}
 
 		void DrawAccessTokenLink()
@@ -138,15 +150,13 @@ namespace Mapbox.Editor
 				}
 				else if (string.Equals(_validationCode, "TokenValid"))
 				{
-					//EditorGUI.BeginDisabledGroup(true);
 					EditorGUILayout.HelpBox("Valid", MessageType.Info);
-					//EditorGUI.EndDisabledGroup();
+					_isTokenValid = true;
 				}
 				else
 				{
-					//EditorGUI.BeginDisabledGroup(true);
 					EditorGUILayout.HelpBox("Invalid", MessageType.Error);
-					//EditorGUI.EndDisabledGroup();
+					_isTokenValid = false;
 				}
 			}
 			EditorGUILayout.EndHorizontal();
@@ -158,6 +168,7 @@ namespace Mapbox.Editor
 
 			if (_showConfigurationFoldout)
 			{
+				EditorGUI.indentLevel = 2;
 				_memoryCacheSize = EditorGUILayout.IntSlider("Mem Cache Size (# of tiles)", _memoryCacheSize, 0, 1000);
 				_mbtilesCacheSize = EditorGUILayout.IntSlider("MBTiles Cache Size (# of tiles)", _mbtilesCacheSize, 0, 3000);
 				_webRequestTimeout = EditorGUILayout.IntField("Default Web Request Timeout (s)", _webRequestTimeout);
@@ -166,7 +177,11 @@ namespace Mapbox.Editor
 
 		void DrawExampleLinks()
 		{
-
+			EditorGUI.BeginDisabledGroup(!_isTokenValid);
+			GUILayout.Button("thing1");
+			GUILayout.Button("thing2");
+			GUILayout.Button("thing3");
+			EditorGUI.EndDisabledGroup();
 		}
 
 		IEnumerator ValidateToken(string token)
