@@ -9,6 +9,7 @@ namespace Mapbox.Editor
 	using Mapbox.Json;
 	using Mapbox.Unity.Utilities;
 	using UnityEditor.Callbacks;
+	using System;
 
 	public class MapboxConfigurationWindow : EditorWindow
 	{
@@ -24,6 +25,7 @@ namespace Mapbox.Editor
 		bool _justOpened = true;
 		string _validationCode = "";
 		bool _validating = false;
+		bool _showConfigurationFoldout;
 
 		[DidReloadScripts]
 		static void Popup()
@@ -80,50 +82,92 @@ namespace Mapbox.Editor
 			}
 		}
 
-
 		void OnGUI()
 		{
 			EditorGUIUtility.labelWidth = 200f;
-			_memoryCacheSize = EditorGUILayout.IntSlider("Mem Cache Size (# of tiles)", _memoryCacheSize, 0, 1000);
-			_mbtilesCacheSize = EditorGUILayout.IntSlider("MBTiles Cache Size (# of tiles)", _mbtilesCacheSize, 0, 3000);
-			_webRequestTimeout = EditorGUILayout.IntField("Default Web Request Timeout (s)", _webRequestTimeout);
-			_accessToken = EditorGUILayout.TextField("Access Token", _accessToken);
+			EditorGUILayout.LabelField("Access Token");
+			EditorGUILayout.Space();
+			EditorGUILayout.Space();
+			
+			DrawAccessTokenLink();
+			DrawAccessTokenField();
 			EditorGUILayout.Space();
 			EditorGUILayout.Space();
 
+			DrawConfigurationSettings();
+			DrawExampleLinks();
+		}
+
+		void DrawAccessTokenLink()
+		{
 			if (string.IsNullOrEmpty(_accessToken))
 			{
-				EditorGUILayout.HelpBox("You must have a valid access token!", MessageType.Error);
-				if (GUILayout.Button("Get a token from mapbox.com for free"))
+				if (GUILayout.Button("Copy your free token from mapbox.com"))
 				{
-					Application.OpenURL("https://www.mapbox.com/studio/account/tokens/");
+					Application.OpenURL("https://www.mapbox.com/install/unity/permission/");
 				}
 			}
 			else
 			{
-				if (_validating)
+				if (GUILayout.Button("Manage your tokens at mapbox.com"))
 				{
-					GUILayout.Button("Verifying token...");
-				}
-				else if (GUILayout.Button("Save"))
-				{
-					Runnable.Run(ValidateToken(_accessToken));
-				}
-				else if (string.Equals(_validationCode, "TokenValid"))
-				{
-					EditorGUILayout.Space();
-					EditorGUILayout.Space();
-					EditorGUILayout.HelpBox("Token Valid: saved to " + _configurationFile, MessageType.Info);
-				}
-				else
-				{
-					EditorGUILayout.Space();
-					EditorGUILayout.Space();
-					EditorGUILayout.HelpBox(_validationCode, MessageType.Error);
+					Application.OpenURL("https://www.mapbox.com/studio/account/tokens/");
 				}
 			}
 		}
 
+		void DrawAccessTokenField()
+		{
+			EditorGUILayout.BeginHorizontal();
+			_accessToken = EditorGUILayout.TextField("", _accessToken);
+
+			if (!string.IsNullOrEmpty(_accessToken))
+			{
+				if (_validating)
+				{
+					EditorGUI.BeginDisabledGroup(true);
+					GUILayout.Button("Checking");
+					EditorGUI.EndDisabledGroup();
+
+				}
+				else if (GUILayout.Button("Submit"))
+				{
+					Debug.Log("MapboxConfigurationWindow: " + "?");
+					Runnable.Run(ValidateToken(_accessToken));
+
+				}
+				else if (string.Equals(_validationCode, "TokenValid"))
+				{
+					//EditorGUI.BeginDisabledGroup(true);
+					EditorGUILayout.HelpBox("Valid", MessageType.Info);
+					//EditorGUI.EndDisabledGroup();
+				}
+				else
+				{
+					//EditorGUI.BeginDisabledGroup(true);
+					EditorGUILayout.HelpBox("Invalid", MessageType.Error);
+					//EditorGUI.EndDisabledGroup();
+				}
+			}
+			EditorGUILayout.EndHorizontal();
+		}
+
+		void DrawConfigurationSettings()
+		{
+			_showConfigurationFoldout = EditorGUILayout.Foldout(_showConfigurationFoldout, "Configuration", true);
+
+			if (_showConfigurationFoldout)
+			{
+				_memoryCacheSize = EditorGUILayout.IntSlider("Mem Cache Size (# of tiles)", _memoryCacheSize, 0, 1000);
+				_mbtilesCacheSize = EditorGUILayout.IntSlider("MBTiles Cache Size (# of tiles)", _mbtilesCacheSize, 0, 3000);
+				_webRequestTimeout = EditorGUILayout.IntField("Default Web Request Timeout (s)", _webRequestTimeout);
+			}
+		}
+
+		void DrawExampleLinks()
+		{
+
+		}
 
 		IEnumerator ValidateToken(string token)
 		{
@@ -142,7 +186,6 @@ namespace Mapbox.Editor
 			_validating = false;
 		}
 
-
 		void ParseTokenResponse(string json)
 		{
 			var dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
@@ -153,7 +196,6 @@ namespace Mapbox.Editor
 
 			SaveConfiguration();
 		}
-
 
 		void SaveConfiguration()
 		{
