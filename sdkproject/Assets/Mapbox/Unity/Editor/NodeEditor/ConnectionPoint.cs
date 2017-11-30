@@ -1,5 +1,6 @@
 using System;
 using System.Text.RegularExpressions;
+using UnityEditor;
 using UnityEngine;
 
 namespace Mapbox.Editor.NodeEditor
@@ -12,9 +13,11 @@ namespace Mapbox.Editor.NodeEditor
 		public Rect rect;
 		public Rect labelRect;
 		public Rect inLabelRect;
+		public Rect toggleRect;
 		public ConnectionPointType type;
 		public Node node;
 		public GUIStyle style;
+		private SerializedProperty _activeProp;
 
 		private string _outLabel;
 		private string _inLabel;
@@ -45,7 +48,7 @@ namespace Mapbox.Editor.NodeEditor
 			alignment = TextAnchor.MiddleRight
 		};
 
-		public ConnectionPoint(Node node, string inname, string name, float deltay, ConnectionPointType type, GUIStyle style)
+		public ConnectionPoint(Node node, string inname, string name, float deltay, ConnectionPointType type, GUIStyle style, SerializedProperty activeProp = null)
 		{
 			if (!string.IsNullOrEmpty(name))
 			{
@@ -64,16 +67,30 @@ namespace Mapbox.Editor.NodeEditor
 			left = new Vector2(rect.x, rect.y + (rect.height / 2));
 			labelRect = new Rect(node.rect.xMin, node.rect.y + _deltaY - 15f, node.rect.width - 20, 25);
 			inLabelRect = new Rect(rect.x + 4, rect.y - 1, rect.width, rect.height);
+
+			_activeProp = activeProp;
 		}
 
 		public void Draw()
 		{
 			rect.y = node.rect.y + _deltaY - rect.height * 0.5f;
-			labelRect.x = node.rect.xMin;
+			labelRect.x = node.rect.xMin + (_activeProp != null ? -20 : 0);
 			labelRect.y = node.rect.y + _deltaY - 15f;
 			labelRect.width = node.rect.width - 20;
 			inLabelRect.x = rect.x + 4;
 			inLabelRect.y = rect.y - 1;
+
+			toggleRect.x = node.rect.xMin - 30 + node.rect.width;
+			toggleRect.width = 20;
+			toggleRect.y = labelRect.y + 5;
+			toggleRect.height = 20;
+
+			if (_activeProp != null)
+			{
+				_activeProp.boolValue = EditorGUI.Toggle(toggleRect, _activeProp.boolValue);
+				_activeProp.serializedObject.ApplyModifiedProperties();
+			}
+
 			switch (type)
 			{
 				case ConnectionPointType.In:

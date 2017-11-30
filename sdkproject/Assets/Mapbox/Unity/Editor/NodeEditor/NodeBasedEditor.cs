@@ -99,6 +99,24 @@ namespace Mapbox.Editor.NodeEditor
 				_maps.Clear();
 
 			var abstractMaps = FindObjectsOfType<AbstractMap>();
+
+			//foreach (var abstractMap in abstractMaps)
+			//{
+			//	foreach (FieldInfo fi in abstractMap.GetType().GetFields().Where(x => x.IsDefined(typeof(NodeEditorElementAttribute), true)))
+			//	{
+			//		var val = fi.GetValue(abstractMap) as ScriptableObject;
+			//		if (typeof(ScriptableObject).IsAssignableFrom(fi.FieldType) && val != null)
+			//		{
+			//			var map = abstractMap.MapVisualizer;
+			//			var mapNode = new Node(map as ScriptableObject);
+			//			mapNode.title = map.name;
+			//			mapNode.subtitle = "Map Visualizer";
+			//			_maps.Add(mapNode);
+			//			mapNode.Dive(map, showModifiers);
+			//		}
+			//	}
+			//}
+
 			foreach (var abstractMap in abstractMaps)
 			{
 				if (abstractMap.MapVisualizer != null)

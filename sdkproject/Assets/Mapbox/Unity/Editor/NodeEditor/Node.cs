@@ -13,6 +13,8 @@ namespace Mapbox.Editor.NodeEditor
 {
 	public class Node
 	{
+		private SerializedObject _serializedObject;
+
 		private bool _expanded = true;
 
 		private bool _isRoot = false;
@@ -236,6 +238,7 @@ namespace Mapbox.Editor.NodeEditor
 
 		public void Dive(object obj, bool showModifiers = true, int depth = 0)
 		{
+			_serializedObject = new SerializedObject(obj as ScriptableObject);
 			if (obj == null)
 				return;
 
@@ -278,7 +281,7 @@ namespace Mapbox.Editor.NodeEditor
 								foreach (VectorLayerVisualizer listitem in val as IEnumerable)
 								{
 									var prop = new SerializedObject(listitem);
-									var cc = new ConnectionPoint(this, "", listitem.Key, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
+									var cc = new ConnectionPoint(this, "", listitem.Key, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle, prop.FindProperty("Active"));
 									
 									ConnectionPoints.Add(cc);
 									_propCount++;
