@@ -46,7 +46,7 @@
 		{
 			if (null == _dynamicZoomMap) { return; }
 
-			if (Input.touchSupported)
+			if (Input.touchSupported && Input.touchCount > 0)
 			{
 				HandleTouch();
 			}

@@ -24,7 +24,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField]
 		Material _material;
 
-		Directions _directions;
+		private Directions _directions;
+		private int _counter;
 
 		void Awake()
 		{
@@ -83,13 +84,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			mesh.subMeshCount = data.Triangles.Count;
 
 			mesh.SetVertices(data.Vertices);
-			for (int i = 0; i < data.Triangles.Count; i++)
+			_counter = data.Triangles.Count;
+			for (int i = 0; i < _counter; i++)
 			{
 				var triangle = data.Triangles[i];
 				mesh.SetTriangles(triangle, i);
 			}
 
-			for (int i = 0; i < data.UV.Count; i++)
+			_counter = data.UV.Count;
+			for (int i = 0; i < _counter; i++)
 			{
 				var uv = data.UV[i];
 				mesh.SetUVs(i, uv);
