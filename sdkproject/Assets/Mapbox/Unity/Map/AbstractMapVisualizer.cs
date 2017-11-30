@@ -108,17 +108,12 @@
 				}
 			}
 
-			// Cleanup gameobjects and clear lists!
+			// Inform all downstream nodes that we no longer need to process these tiles.
 			// This scriptable object may be re-used, but it's gameobjects are likely 
 			// to be destroyed by a scene change, for example. 
-			foreach (var tile in _activeTiles.Values)
+			foreach (var tileId in _activeTiles.Keys.ToList())
 			{
-				Destroy(tile.gameObject);
-			}
-
-			foreach (var tile in _inactiveTiles)
-			{
-				Destroy(tile.gameObject);
+				DisposeTile(tileId);
 			}
 
 			_activeTiles.Clear();
