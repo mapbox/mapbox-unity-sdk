@@ -10,6 +10,7 @@ namespace Mapbox.Editor.NodeEditor
 	public class ConnectionPoint
 	{
 		public Vector2 left;
+		public Vector2 right;
 		public Rect rect;
 		public Rect labelRect;
 		public Rect inLabelRect;
@@ -18,6 +19,7 @@ namespace Mapbox.Editor.NodeEditor
 		public Node node;
 		public GUIStyle style;
 		private SerializedProperty _activeProp;
+		public bool isActive;
 
 		private string _outLabel;
 		private string _inLabel;
@@ -40,7 +42,6 @@ namespace Mapbox.Editor.NodeEditor
 			normal = new GUIStyleState() { textColor = Color.white },
 			alignment = TextAnchor.MiddleRight
 		};
-
 		private GUIStyle _inLabelStyle = new GUIStyle()
 		{
 			fontSize = 10,
@@ -48,8 +49,18 @@ namespace Mapbox.Editor.NodeEditor
 			alignment = TextAnchor.MiddleRight
 		};
 
+		private static Texture2D activeOutImage;
+		private static Texture2D inactiveOutImage;
+
 		public ConnectionPoint(Node node, string inname, string name, float deltay, ConnectionPointType type, GUIStyle style, SerializedProperty activeProp = null)
 		{
+			isActive = true;
+			if (activeOutImage == null)
+			{
+				activeOutImage = EditorGUIUtility.Load("builtin skins/darkskin/images/node3.png") as Texture2D;
+				inactiveOutImage = EditorGUIUtility.Load("builtin skins/darkskin/images/node6.png") as Texture2D;
+			}
+
 			if (!string.IsNullOrEmpty(name))
 			{
 				this._outLabel = Regex.Replace(name, "(\\B[A-Z])", " $1");
@@ -65,6 +76,7 @@ namespace Mapbox.Editor.NodeEditor
 			_deltaY = deltay;
 			rect = new Rect(0, 0, 10f + (string.IsNullOrEmpty(inLabel) ? 0 : 100), 20f);
 			left = new Vector2(rect.x, rect.y + (rect.height / 2));
+			
 			labelRect = new Rect(node.rect.xMin, node.rect.y + _deltaY - 15f, node.rect.width - 20, 25);
 			inLabelRect = new Rect(rect.x + 4, rect.y - 1, rect.width, rect.height);
 
@@ -73,6 +85,9 @@ namespace Mapbox.Editor.NodeEditor
 
 		public void Draw()
 		{
+			if (_activeProp != null)
+				isActive = _activeProp.boolValue;
+
 			rect.y = node.rect.y + _deltaY - rect.height * 0.5f;
 			labelRect.x = node.rect.xMin + (_activeProp != null ? -20 : 0);
 			labelRect.y = node.rect.y + _deltaY - 15f;
@@ -84,12 +99,6 @@ namespace Mapbox.Editor.NodeEditor
 			toggleRect.width = 20;
 			toggleRect.y = labelRect.y + 5;
 			toggleRect.height = 20;
-
-			if (_activeProp != null)
-			{
-				_activeProp.boolValue = EditorGUI.Toggle(toggleRect, _activeProp.boolValue);
-				_activeProp.serializedObject.ApplyModifiedProperties();
-			}
 
 			switch (type)
 			{
@@ -117,11 +126,37 @@ namespace Mapbox.Editor.NodeEditor
 			}
 			left.x = rect.x;
 			left.y = rect.y + (rect.height / 2);
-			if (GUI.Button(rect, "", style))
-			{
 
+			if (_activeProp != null)
+			{
+				rect.x -= 30;
+				rect.width = 45;
+				rect.y -= 1;
+				rect.height = 21;
+
+				if (_activeProp.boolValue)
+				{
+					GUI.DrawTexture(rect, activeOutImage);
+				}
+				else
+				{
+					GUI.DrawTexture(rect, inactiveOutImage);
+				}
 			}
-			
+			else
+			{
+				if (GUI.Button(rect, "", style))
+				{
+
+				}
+			}
+
+			if (_activeProp != null)
+			{
+				_activeProp.boolValue = EditorGUI.Toggle(toggleRect, _activeProp.boolValue);
+				_activeProp.serializedObject.ApplyModifiedProperties();
+			}
+
 			GUI.Label(inLabelRect, inLabel, _inLabelStyle);
 		}
 	}
