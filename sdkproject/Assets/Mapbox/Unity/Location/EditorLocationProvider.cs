@@ -35,8 +35,14 @@ namespace Mapbox.Unity.Location
 
 		protected override void Awake()
 		{
-			base.Awake();
 			_map.OnInitialized += Map_OnInitialized;
+
+			if (_targetTransform == null)
+			{
+				_targetTransform = transform;
+			}
+
+			base.Awake();
 		}
 
 		void Map_OnInitialized()
