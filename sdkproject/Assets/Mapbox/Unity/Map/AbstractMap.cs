@@ -214,6 +214,11 @@
 			OnInitialized();
 		}
 
+		public Vector2d getGeoPositionOfWorldPoint(Vector3 realworldPoint)
+		{
+			return (Quaternion.Inverse(_root.rotation) * (realworldPoint - _root.position)).GetGeoPosition(this.CenterMercator, this.WorldRelativeScale);
+		}
+
 		public abstract void Initialize(Vector2d latLon, int zoom);
 
 		public void Reset()
