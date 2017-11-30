@@ -67,7 +67,7 @@ namespace Mapbox.Editor.NodeEditor
 			nodeStyle.padding = textOffset;
 
 			selectedNodeStyle = new GUIStyle();
-			selectedNodeStyle.normal.background = EditorGUIUtility.Load("builtin skins/darkskin/images/node5 on.png") as Texture2D;
+			selectedNodeStyle.normal.background = EditorGUIUtility.Load("builtin skins/darkskin/images/node1 on.png") as Texture2D;
 			selectedNodeStyle.border = new RectOffset(12, 12, 12, 12);
 			selectedNodeStyle.richText = true;
 			selectedNodeStyle.padding = textOffset;
