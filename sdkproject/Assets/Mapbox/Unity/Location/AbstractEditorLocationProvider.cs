@@ -29,6 +29,9 @@
 
 		IEnumerator QueryLocation()
 		{
+			// HACK: Let others register before we send our first event. 
+			// Often this happens in Start.
+			yield return new WaitForSeconds(.1f);
 			while (true)
 			{
 				SetLocation();

@@ -194,7 +194,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58cb9a85be6f84591938618fa232ce85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _zoom: 16
+  _zoom: 15
   _initializeOnStart: 0
   _latitudeLongitudeString: 37.7648, -122.463
   _root: {fileID: 0}
@@ -954,35 +954,16 @@ Prefab:
       propertyPath: m_RootOrder
       value: 6
       objectReference: {fileID: 0}
-    - target: {fileID: 1852556985252580, guid: f836f513cfb284ad0b199b251a8d93a9, type: 2}
-      propertyPath: m_Name
-      value: LocationProvider
-      objectReference: {fileID: 0}
+    - target: {fileID: 114023304781792650, guid: f836f513cfb284ad0b199b251a8d93a9,
+        type: 2}
+      propertyPath: _map
+      value: 
+      objectReference: {fileID: 114606471}
     - target: {fileID: 114958662040910602, guid: f836f513cfb284ad0b199b251a8d93a9,
         type: 2}
       propertyPath: _map
       value: 
       objectReference: {fileID: 114606471}
-    - target: {fileID: 114023304781792650, guid: f836f513cfb284ad0b199b251a8d93a9,
-        type: 2}
-      propertyPath: _targetTransform
-      value: 
-      objectReference: {fileID: 1967619491}
-    - target: {fileID: 114023304781792650, guid: f836f513cfb284ad0b199b251a8d93a9,
-        type: 2}
-      propertyPath: _map
-      value: 
-      objectReference: {fileID: 114606471}
-    - target: {fileID: 114023304781792650, guid: f836f513cfb284ad0b199b251a8d93a9,
-        type: 2}
-      propertyPath: _updateInterval
-      value: 0.1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f836f513cfb284ad0b199b251a8d93a9, type: 2}
   m_IsPrefabParent: 0
---- !u!4 &1967619491 stripped
-Transform:
-  m_PrefabParentObject: {fileID: 4164410729340786, guid: f836f513cfb284ad0b199b251a8d93a9,
-    type: 2}
-  m_PrefabInternal: {fileID: 1967619490}
