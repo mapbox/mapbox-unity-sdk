@@ -17,12 +17,10 @@
 		[SerializeField]
 		bool _sendEvent;
 
-		protected Location _currentLocation;
-
 		WaitForSeconds _wait;
 
 #if UNITY_EDITOR
-		void Awake()
+		protected virtual void Awake()
 		{
 			_wait = new WaitForSeconds(_updateInterval);
 			StartCoroutine(QueryLocation());
