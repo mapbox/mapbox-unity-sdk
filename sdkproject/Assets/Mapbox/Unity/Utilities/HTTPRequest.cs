@@ -51,7 +51,9 @@ namespace Mapbox.Unity.Utilities
 
 		private IEnumerator DoRequest()
 		{
-			yield return _request.Send();
+			// DO NOT edit to: 'yield return _request.Send();' <- doesn't work in Editor when not in Play mode
+			_request.Send();
+			while (!_request.isDone) { yield return null; }
 
 			var response = Response.FromWebResponse(this, _request, null);
 
