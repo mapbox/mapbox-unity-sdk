@@ -100,6 +100,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_cacheVertexCount.Clear();
 			_cached.Clear();
 			_buildingCount.Clear();
+			_pool.Clear();
 
 			_counter = MeshModifiers.Count;
 			for (int i = 0; i < _counter; i++)
