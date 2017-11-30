@@ -39,7 +39,7 @@ namespace Mapbox.Unity.Location
 			}
 		}
 
-		ILocationProvider _defaultLocationProvider;
+		AbstractLocationProvider _defaultLocationProvider;
 
 		/// <summary>
 		/// The default location provider. 
@@ -58,7 +58,7 @@ namespace Mapbox.Unity.Location
 		/// }
 		/// </code>
 		/// </example>
-		public ILocationProvider DefaultLocationProvider
+		public AbstractLocationProvider DefaultLocationProvider
 		{
 			get
 			{
@@ -73,7 +73,7 @@ namespace Mapbox.Unity.Location
 		/// <summary>
 		/// Returns the serialized <see cref="T:Mapbox.Unity.Location.TransformLocationProvider"/>.
 		/// </summary>
-		public ILocationProvider TransformLocationProvider
+		public AbstractLocationProvider TransformLocationProvider
 		{
 			get
 			{
@@ -84,7 +84,7 @@ namespace Mapbox.Unity.Location
 		/// <summary>
 		/// Returns the serialized <see cref="T:Mapbox.Unity.Location.EditorLocationProvider"/>.
 		/// </summary>
-		public ILocationProvider EditorLocationProvider
+		public AbstractLocationProvider EditorLocationProvider
 		{
 			get
 			{
@@ -95,7 +95,7 @@ namespace Mapbox.Unity.Location
 		/// <summary>
 		/// Returns the serialized <see cref="T:Mapbox.Unity.Location.DeviceLocationProvider"/>
 		/// </summary>
-		public ILocationProvider DeviceLocationProvider
+		public AbstractLocationProvider DeviceLocationProvider
 		{
 			get
 			{
