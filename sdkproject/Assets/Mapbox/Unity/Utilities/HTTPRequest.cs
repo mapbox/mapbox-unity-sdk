@@ -51,9 +51,14 @@ namespace Mapbox.Unity.Utilities
 
 		private IEnumerator DoRequest()
 		{
-			// DO NOT edit to: 'yield return _request.Send();' <- doesn't work in Editor when not in Play mode
+#if UNITY_EDITOR
+			// otherwise requests don't work in Edit mode, eg geocoding
+			// also lot of EditMode tests fail otherwise
 			_request.Send();
 			while (!_request.isDone) { yield return null; }
+#else
+			yield return _request.Send();
+#endif
 
 			var response = Response.FromWebResponse(this, _request, null);
 
