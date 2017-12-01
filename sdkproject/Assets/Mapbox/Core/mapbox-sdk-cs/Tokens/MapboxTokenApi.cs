@@ -2,7 +2,10 @@
 
 namespace Mapbox.Tokens
 {
+
+
 	using Mapbox.Platform;
+	using System;
 	using System.ComponentModel;
 
 
@@ -22,41 +25,48 @@ namespace Mapbox.Tokens
 		TokenExpired,
 		/// <summary>the token's authorization has been revoked </summary>
 		[Description("the token's authorization has been revoked")]
-		TokenRevoked
+		TokenRevoked,
+		/// <summary>inital value </summary>
+		StatusNotYetSet
 	}
 
 
+	/// <summary>
+	/// Wrapper class to retrieve details about a token
+	/// </summary>
 	public class MapboxTokenApi
 	{
 
-		public MapboxTokenApi(FileSource fs)
+		public MapboxTokenApi() { }
+
+
+		// use internal FileSource without(!) passing access token from config into constructor
+		// otherwise access token would be appended to url twice
+		// https://www.mapbox.com/api-documentation/#retrieve-a-token
+		// if we should ever implement other API methods: creating, deleting, updating ... tokens
+		// we will need another FileSource with the token from the config
+		private FileSource _fs = new FileSource();
+
+
+		public void Retrieve(string accessToken, Action<MapboxToken> callback)
 		{
-			_fs = fs;
-		}
-
-
-		private FileSource _fs;
-
-
-		public MapboxToken Retrieve(string accessToken)
-		{
-
-			byte[] data = null;
 			_fs.Request(
 				Utils.Constants.BaseAPI + "tokens/v2?access_token=" + accessToken,
 				(Response response) =>
 				{
-					if (null != response.Data && !response.HasError)
+					if (response.HasError)
 					{
-						data = response.Data;
+						callback(new MapboxToken()
+						{
+							HasError = true,
+							ErrorMessage = response.ExceptionsAsString
+						});
+						return;
+
 					}
+					callback(MapboxToken.FromResponseData(response.Data));
 				}
 			);
-
-			_fs.WaitForAllRequests();
-
-
-			return MapboxToken.FromResponseData(data);
 		}
 
 	}
