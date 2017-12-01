@@ -8,7 +8,8 @@
 #define UNITY
 #endif
 
-namespace Mapbox.Platform {
+namespace Mapbox.Platform
+{
 
 	using System;
 	using System.Collections.Generic;
@@ -27,22 +28,27 @@ namespace Mapbox.Platform {
 #endif
 
 	/// <summary> A response from a <see cref="IFileSource" /> request. </summary>
-	public class Response {
+	public class Response
+	{
 
 
-		private Response() { }
+		private Response()
+		{
+		}
 
 
 		public IAsyncRequest Request { get; private set; }
 
 
-		public bool RateLimitHit {
+		public bool RateLimitHit
+		{
 			get { return StatusCode.HasValue ? 429 == StatusCode.Value : false; }
 		}
 
 
 		/// <summary>Flag to indicate if the request was successful</summary>
-		public bool HasError {
+		public bool HasError
+		{
 			get { return _exceptions == null ? false : _exceptions.Count > 0; }
 		}
 
@@ -70,16 +76,23 @@ namespace Mapbox.Platform {
 
 
 		private List<Exception> _exceptions;
+
 		/// <summary> Exceptions that might have occured during the request. </summary>
-		public ReadOnlyCollection<Exception> Exceptions {
+		public ReadOnlyCollection<Exception> Exceptions
+		{
 			get { return null == _exceptions ? null : _exceptions.AsReadOnly(); }
 		}
 
 
 		/// <summary> Messages of exceptions otherwise empty string. </summary>
-		public string ExceptionsAsString {
-			get {
-				if (null == _exceptions || _exceptions.Count == 0) { return string.Empty; }
+		public string ExceptionsAsString
+		{
+			get
+			{
+				if (null == _exceptions || _exceptions.Count == 0)
+				{
+					return string.Empty;
+				}
 				return string.Join(Environment.NewLine, _exceptions.Select(e => e.Message).ToArray());
 			}
 		}
@@ -92,8 +105,12 @@ namespace Mapbox.Platform {
 		/// <summary> Raw data fetched from the request. </summary>
 		public byte[] Data;
 
-		public void AddException(Exception ex) {
-			if (null == _exceptions) { _exceptions = new List<Exception>(); }
+		public void AddException(Exception ex)
+		{
+			if (null == _exceptions)
+			{
+				_exceptions = new List<Exception>();
+			}
 			_exceptions.Add(ex);
 		}
 
@@ -231,20 +248,24 @@ namespace Mapbox.Platform {
 #endif
 
 #if UNITY // within Unity or UWP build from Unity
-		public static Response FromWebResponse(IAsyncRequest request, UnityWebRequest apiResponse, Exception apiEx) {
+		public static Response FromWebResponse(IAsyncRequest request, UnityWebRequest apiResponse, Exception apiEx)
+		{
 
 			Response response = new Response();
 			response.Request = request;
 
-			if (null != apiEx) {
+			if (null != apiEx)
+			{
 				response.AddException(apiEx);
 			}
 
-			if (apiResponse.isNetworkError) {
+			if (apiResponse.isNetworkError)
+			{
 				response.AddException(new Exception(apiResponse.error));
 			}
 
-			if (null == apiResponse.downloadHandler.data) {
+			if (null == apiResponse.downloadHandler.data)
+			{
 				response.AddException(new Exception("Response has no data."));
 			}
 
@@ -255,24 +276,40 @@ namespace Mapbox.Platform {
 #endif
 
 			Dictionary<string, string> apiHeaders = apiResponse.GetResponseHeaders();
-			if (null != apiHeaders) {
+			if (null != apiHeaders)
+			{
 				response.Headers = new Dictionary<string, string>();
-				foreach (var apiHdr in apiHeaders) {
+				foreach (var apiHdr in apiHeaders)
+				{
 					string key = apiHdr.Key;
 					string val = apiHdr.Value;
 					response.Headers.Add(key, val);
-					if (key.Equals("X-Rate-Limit-Interval", stringComp)) {
+					if (key.Equals("X-Rate-Limit-Interval", stringComp))
+					{
 						int limitInterval;
-						if (int.TryParse(val, out limitInterval)) { response.XRateLimitInterval = limitInterval; }
-					} else if (key.Equals("X-Rate-Limit-Limit", stringComp)) {
+						if (int.TryParse(val, out limitInterval))
+						{
+							response.XRateLimitInterval = limitInterval;
+						}
+					}
+					else if (key.Equals("X-Rate-Limit-Limit", stringComp))
+					{
 						long limitLimit;
-						if (long.TryParse(val, out limitLimit)) { response.XRateLimitLimit = limitLimit; }
-					} else if (key.Equals("X-Rate-Limit-Reset", stringComp)) {
+						if (long.TryParse(val, out limitLimit))
+						{
+							response.XRateLimitLimit = limitLimit;
+						}
+					}
+					else if (key.Equals("X-Rate-Limit-Reset", stringComp))
+					{
 						double unixTimestamp;
-						if (double.TryParse(val, out unixTimestamp)) {
+						if (double.TryParse(val, out unixTimestamp))
+						{
 							response.XRateLimitReset = UnixTimestampUtils.From(unixTimestamp);
 						}
-					} else if (key.Equals("Content-Type", stringComp)) {
+					}
+					else if (key.Equals("Content-Type", stringComp))
+					{
 						response.ContentType = val;
 					}
 				}
@@ -281,10 +318,12 @@ namespace Mapbox.Platform {
 			int statusCode = (int)apiResponse.responseCode;
 			response.StatusCode = statusCode;
 
-			if (statusCode != 200) {
+			if (statusCode != 200)
+			{
 				response.AddException(new Exception(string.Format("Status Code {0}", apiResponse.responseCode)));
 			}
-			if (429 == statusCode) {
+			if (429 == statusCode)
+			{
 				response.AddException(new Exception("Rate limit hit"));
 			}
 
@@ -294,7 +333,100 @@ namespace Mapbox.Platform {
 		}
 #endif
 
+#if UNITY // within Unity or UWP build from Unity
+		public static Response FromWebResponse(IAsyncRequest request, HttpWebResponse apiResponse, Exception apiEx)
+		{
+			Response response = new Response();
+			response.Request = request;
+
+			if (null != apiEx)
+			{
+				response.AddException(apiEx);
+			}
+
+			BinaryReader reader = new BinaryReader(apiResponse.GetResponseStream());
+
+			byte[] lnByte = reader.ReadBytes(1 * 1024 * 1024 * 10);
+			reader.Close();
+
+			/*if (apiResponse.) {
+		response.AddException(new Exception(apiResponse.error));
+		}*/
+
+			if (null == lnByte)
+			{
+				response.AddException(new Exception("Response has no data."));
+			}
+
+#if NETFX_CORE
+		StringComparison stringComp = StringComparison.OrdinalIgnoreCase;
+#else
+			StringComparison stringComp = StringComparison.InvariantCultureIgnoreCase;
+#endif
+
+			WebHeaderCollection apiHeaders = apiResponse.Headers;
+			//Dictionary<string, string> apiHeaders = apiResponse.Headers();
+
+			if (null != apiHeaders)
+			{
+				response.Headers = new Dictionary<string, string>();
+
+				for (int n = 0; n < apiHeaders.Count; n++)
+				{
+					string key = apiHeaders.Keys[n];
+					string val = apiHeaders[n];
+
+					response.Headers.Add(key, val);
+					if (key.Equals("X-Rate-Limit-Interval", stringComp))
+					{
+						int limitInterval;
+						if (int.TryParse(val, out limitInterval))
+						{
+							response.XRateLimitInterval = limitInterval;
+						}
+					}
+					else if (key.Equals("X-Rate-Limit-Limit", stringComp))
+					{
+						long limitLimit;
+						if (long.TryParse(val, out limitLimit))
+						{
+							response.XRateLimitLimit = limitLimit;
+						}
+					}
+					else if (key.Equals("X-Rate-Limit-Reset", stringComp))
+					{
+						double unixTimestamp;
+						if (double.TryParse(val, out unixTimestamp))
+						{
+							response.XRateLimitReset = UnixTimestampUtils.From(unixTimestamp);
+						}
+					}
+					else if (key.Equals("Content-Type", stringComp))
+					{
+						response.ContentType = val;
+					}
+				}
+			}
+
+			int statusCode = (int)apiResponse.StatusCode;
+			response.StatusCode = statusCode;
+
+			if (statusCode != 200)
+			{
+				response.AddException(new Exception(string.Format("Status Code {0}", statusCode)));
+			}
+			if (429 == statusCode)
+			{
+				response.AddException(new Exception("Rate limit hit"));
+			}
 
 
+
+			//response.Data = apiResponse.downloadHandler.data;
+			response.Data = lnByte;
+
+			return response;
+		}
+#endif
 	}
 }
