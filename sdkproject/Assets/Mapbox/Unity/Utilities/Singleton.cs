@@ -30,7 +30,8 @@ namespace Mapbox.Unity.Utilities {
 	/// make a containing GameObject.  
 	/// </summary>
 	/// <typeparam name="T">The typename of the class to create as a singleton object.</typeparam>
-	public class Singleton<T> where T : class {
+	/// <remarks>An instance of this class needs to be of type <c>UnityEngine.Object</c> As long as this is used with UnityEngine classes, this should work fine. This is to resolve issue #116 <see href="https://github.com/mapbox/mapbox-unity-sdk/issues/116"/>	</remarks>
+	public class Singleton<T> where T : UnityEngine.Object {
 		#region Private Data
 		static private T sm_Instance = null;
 		#endregion
