@@ -23,6 +23,7 @@
 		protected IMapReadable _map;
 		protected Dictionary<UnwrappedTileId, UnityTile> _activeTiles = new Dictionary<UnwrappedTileId, UnityTile>();
 		protected Queue<UnityTile> _inactiveTiles = new Queue<UnityTile>();
+		private int _counter;
 
 		private ModuleState _state;
 		public ModuleState State
@@ -96,7 +97,8 @@
 
 		public virtual void Destroy()
 		{
-			for (int i = 0; i < Factories.Count; i++)
+			_counter = Factories.Count;
+			for (int i = 0; i < _counter; i++)
 			{
 				if (Factories[i] != null)
 				{
@@ -106,17 +108,12 @@
 				}
 			}
 
-			// Cleanup gameobjects and clear lists!
+			// Inform all downstream nodes that we no longer need to process these tiles.
 			// This scriptable object may be re-used, but it's gameobjects are likely 
 			// to be destroyed by a scene change, for example. 
-			foreach (var tile in _activeTiles.Values.ToList())
+			foreach (var tileId in _activeTiles.Keys.ToList())
 			{
-				Destroy(tile.gameObject);
-			}
-
-			foreach (var tile in _inactiveTiles)
-			{
-				Destroy(tile.gameObject);
+				DisposeTile(tileId);
 			}
 
 			_activeTiles.Clear();
@@ -132,7 +129,8 @@
 			else if (State != ModuleState.Finished && factory.State == ModuleState.Finished)
 			{
 				var allFinished = true;
-				for (int i = 0; i < Factories.Count; i++)
+				_counter = Factories.Count;
+				for (int i = 0; i < _counter; i++)
 				{
 					if (Factories[i] != null)
 					{

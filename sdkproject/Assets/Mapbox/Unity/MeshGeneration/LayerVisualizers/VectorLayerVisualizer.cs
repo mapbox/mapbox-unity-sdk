@@ -53,12 +53,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		[NodeEditorElementAttribute("Custom Stacks")]
 		public List<TypeVisualizerTuple> Stacks;
 
-		[NonSerialized]
 		private Dictionary<UnityTile, List<int>> _activeCoroutines;
-
-		[NonSerialized]
+		[SerializeField]
+		private bool _enableCoroutines = false;
+		[SerializeField]
 		private int _entityPerCoroutine = 20;
-		[NonSerialized]
 		private int _entityInCurrentCoroutine = 0;
 
 		public override void Initialize()
@@ -99,14 +98,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		private IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, Action callback = null)
 		{
-			
+			//HACK to prevent request finishing on same frame which breaks modules started/finished events 
+			yield return null;
+
 			//testing each feature with filters
 			var fc = layer.FeatureCount();
-			
-			//HACK to prevent request finishing on same frame which breaks modules started/finished events 
-			if(fc <= _entityPerCoroutine)
-				yield return null;
-
 			var filterOut = false;
 			for (int i = 0; i < fc; i++)
 			{
@@ -126,13 +122,13 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 				if (!filterOut)
 				{
-					if (tile.VectorDataState != Enums.TilePropertyState.Cancelled)
+					if (tile != null && tile.gameObject != null && tile.VectorDataState != Enums.TilePropertyState.Cancelled)
 						Build(feature, tile, tile.gameObject);
 				}
 
 				_entityInCurrentCoroutine++;
 
-				if (_entityInCurrentCoroutine >= _entityPerCoroutine)
+				if (_enableCoroutines && _entityInCurrentCoroutine >= _entityPerCoroutine)
 				{
 					_entityInCurrentCoroutine = 0;
 					yield return null;
@@ -140,7 +136,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 
 			var mergedStack = _defaultStack as MergedModifierStack;
-			if (mergedStack != null)
+			if (mergedStack != null && tile != null)
 			{
 				mergedStack.End(tile, tile.gameObject, layer.Name);
 			}
@@ -177,9 +173,12 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		private void Build(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
 		{
-			if (!IsFeatureValid(feature))
+			if (feature.Properties.ContainsKey("extrude") && !Convert.ToBoolean(feature.Properties["extrude"]))
 				return;
 
+			if (feature.Points.Count < 1)
+				return;
+			
 			//this will be improved in next version and will probably be replaced by filters
 			var styleSelectorKey = FindSelectorKey(feature);
 

@@ -6,7 +6,7 @@
 	using UnityEngine;
 	using Mapbox.Map;
 
-	[RequireComponent (typeof(TileErrorHandler))]
+	[RequireComponent(typeof(TileErrorHandler))]
 	public abstract class AbstractMap : MonoBehaviour, IMap
 	{
 		[SerializeField]
@@ -69,6 +69,8 @@
 				return _mapVisualizer;
 			}
 		}
+
+
 
 		[SerializeField]
 		protected float _unityTileSize = 100;
@@ -213,6 +215,21 @@
 			OnInitialized();
 		}
 
+		public Vector2d WorldToGeoPosition(Vector3 realworldPoint)
+		{
+			return (_root.InverseTransformPoint(realworldPoint)).GetGeoPosition(CenterMercator, WorldRelativeScale);
+		}
+
+		public Vector3 GeoToWorldPosition(Vector2d latitudeLongitude)
+		{
+			return _root.TransformPoint(Conversions.GeoToWorldPosition(latitudeLongitude, CenterMercator, WorldRelativeScale).ToVector3xz());
+		}
+
 		public abstract void Initialize(Vector2d latLon, int zoom);
+
+		public void Reset()
+		{
+			Initialize(Conversions.StringToLatLon(_latitudeLongitudeString), (int)_zoom);
+		}
 	}
 }

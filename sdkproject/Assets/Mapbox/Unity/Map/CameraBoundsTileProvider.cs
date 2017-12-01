@@ -5,6 +5,7 @@ namespace Mapbox.Unity.Map
 	using Mapbox.Map;
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Utils;
+	using System.Collections.Generic;
 
 	public class CameraBoundsTileProvider : AbstractTileProvider
 	{
@@ -31,13 +32,15 @@ namespace Mapbox.Unity.Map
 		Vector2d _currentLatitudeLongitude;
 		UnwrappedTileId _cachedTile;
 		UnwrappedTileId _currentTile;
+		List<UnwrappedTileId> toRemove;
 
 		public override void OnInitialized()
 		{
-			_groundPlane = new Plane(Vector3.up, Mapbox.Unity.Constants.Math.Vector3Zero);
+			_groundPlane = new Plane(Mapbox.Unity.Constants.Math.Vector3Up, Mapbox.Unity.Constants.Math.Vector3Zero);
 			_viewportTarget = new Vector3(0.5f, 0.5f, 0);
 			_shouldUpdate = true;
 			_cachedTile = new UnwrappedTileId();
+			toRemove = new List<UnwrappedTileId>();
 		}
 
 		void Update()
@@ -76,18 +79,22 @@ namespace Mapbox.Unity.Map
 
 		void Cleanup(UnwrappedTileId currentTile)
 		{
-			var keys = _activeTiles.Keys.ToList();
-			for (int i = 0; i < keys.Count; i++)
+			toRemove.Clear();
+			foreach (var tile in _activeTiles)
 			{
-				var tile = keys[i];
 				bool dispose = false;
-				dispose = tile.X > currentTile.X + _disposeBuffer || tile.X < _currentTile.X - _disposeBuffer;
-				dispose = dispose || tile.Y > _currentTile.Y + _disposeBuffer || tile.Y < _currentTile.Y - _disposeBuffer;
+				dispose = tile.Key.X > currentTile.X + _disposeBuffer || tile.Key.X < _currentTile.X - _disposeBuffer;
+				dispose = dispose || tile.Key.Y > _currentTile.Y + _disposeBuffer || tile.Key.Y < _currentTile.Y - _disposeBuffer;
 
 				if (dispose)
 				{
-					RemoveTile(tile);
+					toRemove.Add(tile.Key);
 				}
+			}
+
+			foreach (var item in toRemove)
+			{
+				RemoveTile(item);
 			}
 		}
 	}
