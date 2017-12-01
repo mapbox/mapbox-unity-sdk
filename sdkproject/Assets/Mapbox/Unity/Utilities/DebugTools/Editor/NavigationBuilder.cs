@@ -28,7 +28,7 @@ namespace Mapbox.Unity.Utilities.DebugTools
 
 		static void SaveSceneList()
 		{
-			ScenesList list = (ScenesList)AssetDatabase.LoadAssetAtPath("Assets/Mapbox/Resources/ScenesList.asset", typeof(ScenesList));
+			ScenesList list = (ScenesList)AssetDatabase.LoadAssetAtPath("Assets/Resources/Mapbox/ScenesList.asset", typeof(ScenesList));
 			if (list == null)
 			{
 				list = ScriptableObject.CreateInstance<ScenesList>();
