@@ -17,12 +17,10 @@
 		[SerializeField]
 		bool _sendEvent;
 
-		protected Location _currentLocation;
-
 		WaitForSeconds _wait;
 
 #if UNITY_EDITOR
-		void Awake()
+		protected virtual void Awake()
 		{
 			_wait = new WaitForSeconds(_updateInterval);
 			StartCoroutine(QueryLocation());
@@ -31,6 +29,9 @@
 
 		IEnumerator QueryLocation()
 		{
+			// HACK: Let others register before we send our first event. 
+			// Often this happens in Start.
+			yield return new WaitForSeconds(.1f);
 			while (true)
 			{
 				SetLocation();

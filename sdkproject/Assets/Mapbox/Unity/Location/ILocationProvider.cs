@@ -8,5 +8,6 @@ namespace Mapbox.Unity.Location
 	public interface ILocationProvider
 	{
 		event Action<Location> OnLocationUpdated;
+		Location CurrentLocation { get; }
 	}
 }
