@@ -25,9 +25,37 @@ namespace Mapbox.Editor
 		bool _justOpened = true;
 		string _validationCode = "";
 		bool _validating = false;
+        string _lastValidatedToken;
 		bool _showConfigurationFoldout;
+        bool _showChangelogFoldout;
 		Vector2 _scrollPosition;
 		bool _isTokenValid;
+
+        GUISkin _skin;
+        Color _defaultContentColor;
+        Color _defaultBackgroundColor;
+        GUIStyle _titleStyle;
+        GUIStyle _bodyStyle;
+        GUIStyle _linkStyle;
+
+        GUIStyle _textFieldStyle;
+        GUIStyle _submitButtonStyle;
+        GUIStyle _checkingButtonStyle;
+
+        GUIStyle _validFieldStyle;
+        GUIStyle _validButtonStyle;
+        Color _validContentColor;
+        Color _validBackgroundColor;
+
+        GUIStyle _invalidFieldStyle;
+        GUIStyle _invalidButtonStyle;
+        Color _invalidContentColor;
+        Color _invalidBackgroundColor;
+        GUIStyle _errorStyle;
+
+        GUIStyle _verticalGroup;
+        GUIStyle _horizontalGroup;
+        GUIStyle _scrollViewStyle;
 
 		[DidReloadScripts]
 		static void ShowWindowOnImport()
@@ -65,11 +93,11 @@ namespace Mapbox.Editor
 			_webRequestTimeout = _mapboxConfiguration.DefaultTimeout;
 
 			var editorWindow = GetWindow(typeof(MapboxConfigurationWindow));
-			editorWindow.minSize = new Vector2(900, 200);
+			editorWindow.minSize = new Vector2(600, 200);
 			editorWindow.Show();
 		}
 
-		private void OnDestroy() { AssetDatabase.Refresh(); }
+        private void OnDestroy() { AssetDatabase.Refresh(); }
 
 		private void OnDisable() { AssetDatabase.Refresh(); }
 
@@ -86,84 +114,235 @@ namespace Mapbox.Editor
 
 		void OnGUI()
 		{
-			_scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, false, true);
-			EditorGUIUtility.labelWidth = 200f;
+            InitStyles();
 
-			// Access token link.
-			EditorGUILayout.LabelField("Access Token");
-			EditorGUILayout.Space();
-			EditorGUILayout.Space();
-			DrawAccessTokenLink();
+			_scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition,_scrollViewStyle);
+            //EditorGUIUtility.labelWidth = 200f;
 
+            EditorGUILayout.BeginVertical(_verticalGroup);
+            // Access token link.
+            DrawAccessTokenLink();
 			// Access token entry and validation.
 			DrawAccessTokenField();
-			EditorGUILayout.Space();
-			EditorGUILayout.Space();
+            // Draw the validation error, if one exists
+            DrawError();
+            EditorGUILayout.EndVertical();
 
+            EditorGUILayout.BeginVertical(_verticalGroup);
+            //changelog
+            DrawChangelog();
 			// Configuration.
 			DrawConfigurationSettings();
-			EditorGUILayout.Space();
-			EditorGUILayout.Space();
+            EditorGUILayout.EndVertical();
 
 			// Examples.
 			DrawExampleLinks();
 			EditorGUILayout.EndScrollView();
 		}
 
+        void InitStyles()
+        {
+            _skin = (GUISkin)AssetDatabase.LoadAssetAtPath("Assets/GUItest/Mapbox_Skin.guiskin", typeof(GUISkin));
+
+            _defaultContentColor = GUI.contentColor;
+            _defaultBackgroundColor = GUI.backgroundColor;
+            //_defaultBackgroundColor = new Color(GUI.backgroundColor.r, GUI.backgroundColor.g, GUI.backgroundColor.b, GUI.backgroundColor.a);
+
+            _titleStyle = _skin.FindStyle("Title");
+            _bodyStyle = _skin.FindStyle("Body");
+            _linkStyle = _skin.FindStyle("Link");
+
+            _textFieldStyle = new GUIStyle(GUI.skin.FindStyle("TextField"));
+            _textFieldStyle.margin.right = 0;
+            _textFieldStyle.margin.top = 0;
+
+            _submitButtonStyle = new GUIStyle(GUI.skin.FindStyle("ButtonRight"));
+            _submitButtonStyle.padding.top = 0;
+            _submitButtonStyle.margin.top = 0;
+            _submitButtonStyle.fixedWidth = 200;
+
+            _checkingButtonStyle = new GUIStyle(_submitButtonStyle);
+
+            _validFieldStyle = new GUIStyle(_textFieldStyle);
+            _validButtonStyle = new GUIStyle(GUI.skin.FindStyle("LODSliderRange"));
+            _validButtonStyle.alignment = TextAnchor.MiddleCenter;
+            _validButtonStyle.padding = new RectOffset(0, 0, 0, 0);
+            _validButtonStyle.border = new RectOffset(0, 0, 5, -2);
+            RectOffset bdr = _validButtonStyle.padding;
+            Debug.Log("Left: " + bdr.left + " Right: " + bdr.right);
+            Debug.Log("Top: " + bdr.top + " Bottom: " + bdr.bottom);
+            _validButtonStyle.fixedWidth = 60;
+            _validContentColor = new Color(1, 1, 1, .7f);
+            _validBackgroundColor = new Color(.2f, .8f, .2f, 1);
+
+            _invalidContentColor = new Color(1, 1, 1, .7f);
+            _invalidBackgroundColor = new Color(.8f, .2f, .2f, 1);
+            _errorStyle = new GUIStyle(GUI.skin.FindStyle("ErrorLabel"));
+
+            _verticalGroup = new GUIStyle();
+            _verticalGroup.margin = new RectOffset(0, 0, 0, 30);
+
+            _horizontalGroup = _skin.FindStyle("HorizontalLayoutGroup");
+            _scrollViewStyle = _skin.FindStyle("scrollview");
+        }
+
 		void DrawAccessTokenLink()
 		{
+
+            EditorGUILayout.LabelField("Access Token", _titleStyle);
+
+
+            EditorGUILayout.BeginHorizontal(_horizontalGroup);
 			if (string.IsNullOrEmpty(_accessToken))
-			{
-				if (GUILayout.Button("Copy your free token from mapbox.com"))
+			{   
+                //fit box to text to create an 'inline link'
+                GUIContent labelContent = new GUIContent("Copy your free token from");
+                GUIContent linkContent = new GUIContent("mapbox.com");
+
+                EditorGUILayout.LabelField(labelContent, _bodyStyle, GUILayout.Width( _bodyStyle.CalcSize(labelContent).x ));
+               
+				if (GUILayout.Button(linkContent, _linkStyle))
 				{
 					Application.OpenURL("https://www.mapbox.com/install/unity/permission/");
 				}
+
+                //create link cursor
+                var rect = GUILayoutUtility.GetLastRect();
+                rect.width = _linkStyle.CalcSize(new GUIContent(linkContent)).x;
+                EditorGUIUtility.AddCursorRect(rect, MouseCursor.Link);
+
+                GUILayout.FlexibleSpace();
+
 			}
-			else
-			{
-				if (GUILayout.Button("Manage your tokens at mapbox.com"))
-				{
-					Application.OpenURL("https://www.mapbox.com/studio/account/tokens/");
-				}
-			}
+            else
+            {
+
+                GUIContent labelContent = new GUIContent("Manage your tokens at");
+                GUIContent linkContent = new GUIContent("mapbox.com/studio/accounts/tokens/");
+
+                EditorGUILayout.LabelField(labelContent, _bodyStyle, GUILayout.Width(_bodyStyle.CalcSize(labelContent).x));
+
+                if (GUILayout.Button(linkContent, _linkStyle))
+                {
+                    Application.OpenURL("https://www.mapbox.com/studio/account/tokens/");
+                }
+
+                //create link cursor
+                var rect = GUILayoutUtility.GetLastRect();
+                rect.width = _linkStyle.CalcSize(new GUIContent(linkContent)).x;
+                EditorGUIUtility.AddCursorRect(rect, MouseCursor.Link);
+
+                GUILayout.FlexibleSpace();
+
+            }
+            EditorGUILayout.EndHorizontal();
+
 		}
 
 		void DrawAccessTokenField()
 		{
-			EditorGUILayout.BeginHorizontal();
-			_accessToken = EditorGUILayout.TextField("", _accessToken);
+			EditorGUILayout.BeginHorizontal(_horizontalGroup);
 
-			if (!string.IsNullOrEmpty(_accessToken))
+            if( string.IsNullOrEmpty(_accessToken)){
+                _accessToken = EditorGUILayout.TextField("", _accessToken, _textFieldStyle);
+                EditorGUI.BeginDisabledGroup(true);
+                GUILayout.Button("Submit", _submitButtonStyle);
+                EditorGUI.EndDisabledGroup();
+            }
+            else
 			{
+                //string input, validating
 				if (_validating)
 				{
+                    _accessToken = EditorGUILayout.TextField("", _accessToken, _textFieldStyle);
 					EditorGUI.BeginDisabledGroup(true);
-					GUILayout.Button("Checking");
+					GUILayout.Button("Checking", _submitButtonStyle);
 					EditorGUI.EndDisabledGroup();
 
 				}
-				else if (GUILayout.Button("Submit"))
-				{
-					Debug.Log("MapboxConfigurationWindow: " + "?");
-					Runnable.Run(ValidateToken(_accessToken));
+                //string input, input is the same as the already validated token
+                else if(string.Equals(_lastValidatedToken, _accessToken))
+                {
+                    if (string.Equals(_validationCode, "TokenValid"))
+                    {
+                        GUI.backgroundColor = _validBackgroundColor;
+                        GUI.contentColor = _validContentColor;
 
-				}
-				else if (string.Equals(_validationCode, "TokenValid"))
-				{
-					EditorGUILayout.HelpBox("Valid", MessageType.Info);
-					_isTokenValid = true;
-				}
-				else
-				{
-					EditorGUILayout.HelpBox("Invalid", MessageType.Error);
-					_isTokenValid = false;
-				}
-			}
+                        _accessToken = EditorGUILayout.TextField("", _accessToken, _textFieldStyle);
+                        GUILayout.Button("Valid", _validButtonStyle);
+                        _isTokenValid = true;
+
+                        //restore default colors;
+                        GUI.contentColor = _defaultContentColor;
+                        GUI.backgroundColor = _defaultBackgroundColor;
+
+                    }
+                    else
+                    {
+
+                        GUI.contentColor = _invalidContentColor;
+                        GUI.backgroundColor = _invalidBackgroundColor;
+
+                        _accessToken = EditorGUILayout.TextField("", _accessToken, _textFieldStyle);
+                        GUILayout.Button("Invalid", _validButtonStyle);
+                        _isTokenValid = false;
+
+                        //restore default colors;
+                        GUI.contentColor = _defaultContentColor;
+                        GUI.backgroundColor = _defaultBackgroundColor;
+
+                    }
+
+                    if (GUILayout.Button("Submit", _submitButtonStyle))
+                    {
+                        Debug.Log("MapboxConfigurationWindow: " + "?");
+                        Runnable.Run(ValidateToken(_accessToken));
+                    }
+
+                }
+                //a token has been sent, but the current input doesn't match it.
+                else
+                {
+                    _accessToken = EditorGUILayout.TextField("", _accessToken, _textFieldStyle);
+                    
+                    if (GUILayout.Button("Submit", _submitButtonStyle))
+                    {
+                        Debug.Log("MapboxConfigurationWindow: " + "?");
+                        Runnable.Run(ValidateToken(_accessToken));
+                    }
+                }
+            }
+
 			EditorGUILayout.EndHorizontal();
+
 		}
+
+        void DrawError()
+        {
+            //draw the error message, if one exists
+            EditorGUILayout.BeginHorizontal();
+
+            if (!_isTokenValid && string.Equals(_lastValidatedToken, _accessToken) && !_validating)
+            {
+                EditorGUILayout.LabelField(_validationCode, _errorStyle);
+            }
+            else
+            {
+                EditorGUILayout.LabelField("", _errorStyle);
+            }
+
+            EditorGUILayout.EndHorizontal();
+
+        }
+
+        void DrawChangelog()
+        {
+            _showChangelogFoldout = EditorGUILayout.Foldout(_showChangelogFoldout, "Changelog", true);
+        }
 
 		void DrawConfigurationSettings()
 		{
+
 			_showConfigurationFoldout = EditorGUILayout.Foldout(_showConfigurationFoldout, "Configuration", true);
 
 			if (_showConfigurationFoldout)
@@ -173,6 +352,7 @@ namespace Mapbox.Editor
 				_mbtilesCacheSize = EditorGUILayout.IntSlider("MBTiles Cache Size (# of tiles)", _mbtilesCacheSize, 0, 3000);
 				_webRequestTimeout = EditorGUILayout.IntField("Default Web Request Timeout (s)", _webRequestTimeout);
 			}
+
 		}
 
 		void DrawExampleLinks()
@@ -187,6 +367,7 @@ namespace Mapbox.Editor
 		IEnumerator ValidateToken(string token)
 		{
 			_validating = true;
+            _lastValidatedToken = token;
 
 			var www = new WWW(Utils.Constants.BaseAPI + "tokens/v2?access_token=" + token);
 			while (!www.isDone)
