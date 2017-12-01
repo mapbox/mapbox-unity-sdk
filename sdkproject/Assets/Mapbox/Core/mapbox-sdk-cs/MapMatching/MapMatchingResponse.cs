@@ -38,7 +38,12 @@ namespace Mapbox.MapMatching
 		public MatchObject[] Matchings;
 
 		/// <summary>Error occured during matching</summary>
+
+#if NETFX_CORE
+		public bool HasMatchingError { get { return !"ok".Equals(Code, StringComparison.OrdinalIgnoreCase); } }
+#else
 		public bool HasMatchingError { get { return !"ok".Equals(Code, StringComparison.InvariantCultureIgnoreCase); } }
+#endif
 
 		public string MatchingError
 		{
