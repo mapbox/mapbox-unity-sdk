@@ -184,6 +184,8 @@ GameObject:
   - component: {fileID: 1351042192}
   - component: {fileID: 1351042191}
   - component: {fileID: 1351042190}
+  - component: {fileID: 1351042187}
+  - component: {fileID: 1351042188}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -191,6 +193,32 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &1351042187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1351042186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9527fd56bc6a0c549a1e550219f9b16e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _panSpeed: 5
+  _zoomSpeed: 20
+  _referenceCamera: {fileID: 0}
+--- !u!114 &1351042188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1351042186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce97be288e861a243b6c6df4cc790edc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShadowDistance: 500
 --- !u!81 &1351042190
 AudioListener:
   m_ObjectHideFlags: 0
@@ -231,7 +259,7 @@ Camera:
   near clip plane: 0.3
   far clip plane: 3333
   field of view: 20
-  orthographic: 1
+  orthographic: 0
   orthographic size: 143.6
   m_Depth: -1
   m_CullingMask:
@@ -254,8 +282,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1351042186}
-  m_LocalRotation: {x: -0.3361031, y: 0.059829146, z: -0.02142585, w: -0.9396787}
-  m_LocalPosition: {x: 149.82108, y: 640.881, z: -796.4037}
+  m_LocalRotation: {x: 0.32152212, y: 0, z: 0, w: 0.94690216}
+  m_LocalPosition: {x: 6.196149, y: 175, z: -234}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -295,7 +323,7 @@ Light:
     m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
-    m_Strength: 1
+    m_Strength: 0.5
     m_Bias: 0.05
     m_NormalBias: 0.4
     m_NearPlane: 0.2
