@@ -68,7 +68,7 @@ namespace Mapbox.Editor
 			}
 		}
 
-		[MenuItem("Mapbox/Configure")]
+		[MenuItem("Mapbox/Setup")]
 		static void Init()
 		{
 			Runnable.EnableRunnableInEditor();
@@ -94,6 +94,7 @@ namespace Mapbox.Editor
 
 			var editorWindow = GetWindow(typeof(MapboxConfigurationWindow));
 			editorWindow.minSize = new Vector2(600, 200);
+            editorWindow.titleContent = new GUIContent("Mapbox Setup");
 			editorWindow.Show();
 		}
 
@@ -142,15 +143,14 @@ namespace Mapbox.Editor
 
         void InitStyles()
         {
-            _skin = (GUISkin)AssetDatabase.LoadAssetAtPath("Assets/GUItest/Mapbox_Skin.guiskin", typeof(GUISkin));
-
             _defaultContentColor = GUI.contentColor;
             _defaultBackgroundColor = GUI.backgroundColor;
-            //_defaultBackgroundColor = new Color(GUI.backgroundColor.r, GUI.backgroundColor.g, GUI.backgroundColor.b, GUI.backgroundColor.a);
 
-            _titleStyle = _skin.FindStyle("Title");
-            _bodyStyle = _skin.FindStyle("Body");
-            _linkStyle = _skin.FindStyle("Link");
+            _titleStyle = new GUIStyle(GUI.skin.FindStyle("WhiteLabel"));
+            _bodyStyle = new GUIStyle(GUI.skin.FindStyle("WordWrapLabel"));
+            _linkStyle = new GUIStyle(GUI.skin.FindStyle("PR PrefabLabel"));
+            _linkStyle.padding.left = 0;
+            _linkStyle.padding.top = -1;
 
             _textFieldStyle = new GUIStyle(GUI.skin.FindStyle("TextField"));
             _textFieldStyle.margin.right = 0;
@@ -168,9 +168,6 @@ namespace Mapbox.Editor
             _validButtonStyle.alignment = TextAnchor.MiddleCenter;
             _validButtonStyle.padding = new RectOffset(0, 0, 0, 0);
             _validButtonStyle.border = new RectOffset(0, 0, 5, -2);
-            RectOffset bdr = _validButtonStyle.padding;
-            Debug.Log("Left: " + bdr.left + " Right: " + bdr.right);
-            Debug.Log("Top: " + bdr.top + " Bottom: " + bdr.bottom);
             _validButtonStyle.fixedWidth = 60;
             _validContentColor = new Color(1, 1, 1, .7f);
             _validBackgroundColor = new Color(.2f, .8f, .2f, 1);
@@ -181,9 +178,10 @@ namespace Mapbox.Editor
 
             _verticalGroup = new GUIStyle();
             _verticalGroup.margin = new RectOffset(0, 0, 0, 30);
-
-            _horizontalGroup = _skin.FindStyle("HorizontalLayoutGroup");
-            _scrollViewStyle = _skin.FindStyle("scrollview");
+            _horizontalGroup = new GUIStyle();
+            _horizontalGroup.padding = new RectOffset(0, 0, 4, 0);
+            _scrollViewStyle = new GUIStyle(GUI.skin.FindStyle("scrollview"));
+            _scrollViewStyle.padding = new RectOffset(20, 20, 40, 0);
         }
 
 		void DrawAccessTokenLink()
