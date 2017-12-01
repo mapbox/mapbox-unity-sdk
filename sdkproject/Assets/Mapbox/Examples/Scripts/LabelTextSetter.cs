@@ -1,18 +1,29 @@
-﻿using Mapbox.Unity.MeshGeneration.Interfaces;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System;
-
-public class LabelTextSetter : MonoBehaviour, IFeaturePropertySettable
+﻿namespace Mapbox.Examples
 {
-	public void Set(Dictionary<string, object> props)
+	using Mapbox.Unity.MeshGeneration.Interfaces;
+	using System.Collections.Generic;
+	using UnityEngine;
+
+	public class LabelTextSetter : MonoBehaviour, IFeaturePropertySettable
 	{
-		if (props.ContainsKey("name"))
-			GetComponentInChildren<TextMesh>().text = props["name"].ToString();
-		else if (props.ContainsKey("house_num"))
-			GetComponentInChildren<TextMesh>().text = props["house_num"].ToString();
-		else if (props.ContainsKey("type"))
-			GetComponentInChildren<TextMesh>().text = props["type"].ToString();
+		[SerializeField]
+		TextMesh _textMesh; 
+
+		public void Set(Dictionary<string, object> props)
+		{
+			//var _textMesh = GetComponentInChildren<TextMesh>();
+			if (props.ContainsKey("name"))
+			{
+				_textMesh.text = props["name"].ToString();
+			}
+			else if (props.ContainsKey("house_num"))
+			{
+				_textMesh.text = props["house_num"].ToString();
+			}
+			else if (props.ContainsKey("type"))
+			{
+				_textMesh.text = props["type"].ToString();
+			}
+		}
 	}
 }
