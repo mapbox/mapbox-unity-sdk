@@ -89,10 +89,22 @@
 				else
 				{
 					factory.Initialize(fileSource);
-					factory.OnFactoryStateChanged += UpdateState;
-					factory.OnTileError += Factory_OnTileError;
+					UnregisterEvents(factory);
+					RegisterEvents(factory);
 				}
 			}
+		}
+
+		private void RegisterEvents(AbstractTileFactory factory)
+		{
+			factory.OnFactoryStateChanged += UpdateState;
+			factory.OnTileError += Factory_OnTileError;
+		}
+
+		private void UnregisterEvents(AbstractTileFactory factory)
+		{
+			factory.OnFactoryStateChanged -= UpdateState;
+			factory.OnTileError -= Factory_OnTileError;
 		}
 
 		public virtual void Destroy()
@@ -102,9 +114,7 @@
 			{
 				if (Factories[i] != null)
 				{
-					Factories[i].OnFactoryStateChanged -= UpdateState;
-					Factories[i].OnTileError -= Factory_OnTileError;
-
+					UnregisterEvents(Factories[i]);
 				}
 			}
 
