@@ -33,7 +33,10 @@
 		void ForwardGeocoder_OnGeocoderResponse(ForwardGeocodeResponse response)
 		{
 			_camera.transform.position = _cameraStartPos;
-			_map.Initialize(response.Features[0].Center, (int)_zoomSlider.value);
+			if (null != response.Features && response.Features.Count > 0)
+			{
+				_map.Initialize(response.Features[0].Center, (int)_zoomSlider.value);
+			}
 		}
 
 		void Reload()
