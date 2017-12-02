@@ -60,7 +60,8 @@
 		protected AbstractTileProvider _tileProvider;
 
 		[SerializeField]
-		protected AbstractMapVisualizer _mapVisualizer;
+		[NodeEditorElement("MapVisualizer")]
+		public AbstractMapVisualizer _mapVisualizer;
 		public AbstractMapVisualizer MapVisualizer
 		{
 			get

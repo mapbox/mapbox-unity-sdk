@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25f09effe9db3dd4e9e825475d698ca3, type: 3}
+  m_Name: ExplorerDefaultContour
+  m_EditorClassIdentifier: 
+  _moveFeaturePositionTo: 0
+  MeshModifiers:
+  - {fileID: 11400000, guid: 7c518d85eb2ed0440ac158307895eec4, type: 2}
+  - {fileID: 11400000, guid: 51f99d677d3e0eb439d2967d1187478a, type: 2}
+  GoModifiers:
+  - {fileID: 11400000, guid: 30ddb3ac913e1d0468943db9bec06275, type: 2}
