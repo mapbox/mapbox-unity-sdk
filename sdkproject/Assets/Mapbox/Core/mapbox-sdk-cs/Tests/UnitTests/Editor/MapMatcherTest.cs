@@ -77,7 +77,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			Assert.AreEqual(3, matchingResponse.Tracepoints[3].WaypointIndex, "Wrong WaypointIndex");
 
 			Assert.AreEqual(1, matchingResponse.Matchings.Length, "Wrong number of matchings");
-			Assert.AreEqual(45, matchingResponse.Matchings[0].Weight, "Wrong Weight");
+			Assert.That(matchingResponse.Matchings[0].Weight > 35 && matchingResponse.Matchings[0].Weight < 45, "Wrong Weight");
 			Assert.AreEqual("routability", matchingResponse.Matchings[0].WeightName, "Wrong WeightName");
 			Assert.AreEqual(6, matchingResponse.Matchings[0].Legs.Count, "Wrong number of legs");
 			Assert.AreEqual(8, matchingResponse.Matchings[0].Geometry.Count, "Wrong number of vertices in geometry");

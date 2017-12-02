@@ -214,6 +214,16 @@
 			OnInitialized();
 		}
 
+		public Vector2d WorldToGeoPosition(Vector3 realworldPoint)
+		{
+			return (_root.InverseTransformPoint(realworldPoint)).GetGeoPosition(CenterMercator, WorldRelativeScale);
+		}
+
+		public Vector3 GeoToWorldPosition(Vector2d latitudeLongitude)
+		{
+			return _root.TransformPoint(Conversions.GeoToWorldPosition(latitudeLongitude, CenterMercator, WorldRelativeScale).ToVector3xz());
+		}
+
 		public abstract void Initialize(Vector2d latLon, int zoom);
 
 		public void Reset()

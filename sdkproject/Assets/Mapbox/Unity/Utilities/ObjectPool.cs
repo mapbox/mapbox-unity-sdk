@@ -26,5 +26,10 @@ public class ObjectPool<T>
 	{
 		_objects.Enqueue(item);
 	}
+
+	public void Clear()
+	{
+		_objects.Clear();
+	}
 }
 

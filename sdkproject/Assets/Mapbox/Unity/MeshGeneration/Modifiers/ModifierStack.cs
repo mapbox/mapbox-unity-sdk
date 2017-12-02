@@ -142,6 +142,15 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 
 			_tempVectorEntity = _pool.GetObject();
+
+			// It is possible that we changed scenes in the middle of map generation.
+			// This object can be null as a result of Unity cleaning up game objects in the scene.
+			// Let's bail if we don't have our object.
+			if (_tempVectorEntity.GameObject == null)
+			{
+				return null;
+			}
+
 			_tempVectorEntity.GameObject.SetActive(true);
 			_tempVectorEntity.Mesh.Clear();
 			_tempVectorEntity.Feature = feature;
