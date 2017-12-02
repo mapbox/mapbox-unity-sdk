@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Name: DriveDirectionsLine
   m_EditorClassIdentifier: 
   Active: 1
-  Width: 4
+  Width: 8

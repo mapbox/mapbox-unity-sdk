@@ -16,7 +16,7 @@ namespace Mapbox.Examples
 		{
 			if (Parent == null)
 			{
-				var canv = GameObject.Find("Canvas");
+				var canv = GameObject.Find("PoiCanvas");
 				var ob = new GameObject("PoiContainer");
 				ob.transform.SetParent(canv.transform);
 				Parent = ob.AddComponent<RectTransform>();
