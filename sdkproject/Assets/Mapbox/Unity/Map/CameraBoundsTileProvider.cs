@@ -80,15 +80,16 @@ namespace Mapbox.Unity.Map
 		void Cleanup(UnwrappedTileId currentTile)
 		{
 			toRemove.Clear();
-			foreach (var tile in _activeTiles)
+			var _activeTilesKeys = _activeTiles.Keys.ToList();
+			foreach (var tile in _activeTilesKeys)
 			{
 				bool dispose = false;
-				dispose = tile.Key.X > currentTile.X + _disposeBuffer || tile.Key.X < _currentTile.X - _disposeBuffer;
-				dispose = dispose || tile.Key.Y > _currentTile.Y + _disposeBuffer || tile.Key.Y < _currentTile.Y - _disposeBuffer;
+				dispose = tile.X > currentTile.X + _disposeBuffer || tile.X < _currentTile.X - _disposeBuffer;
+				dispose = dispose || tile.Y > _currentTile.Y + _disposeBuffer || tile.Y < _currentTile.Y - _disposeBuffer;
 
 				if (dispose)
 				{
-					toRemove.Add(tile.Key);
+					toRemove.Add(tile);
 				}
 			}
 
