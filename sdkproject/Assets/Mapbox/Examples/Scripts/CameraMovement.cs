@@ -1,6 +1,7 @@
 namespace Mapbox.Examples
 {
 	using UnityEngine;
+	using UnityEngine.EventSystems;
 
 	public class CameraMovement : MonoBehaviour
 	{
@@ -38,7 +39,7 @@ namespace Mapbox.Examples
 			var y = 0f;
 			var z = 0f;
 
-			if (Input.GetMouseButton(0))
+			if (Input.GetMouseButton(0) && !EventSystem.current.IsPointerOverGameObject())
 			{
 				var mousePosition = Input.mousePosition;
 				mousePosition.z = _referenceCamera.transform.localPosition.y;
@@ -63,6 +64,10 @@ namespace Mapbox.Examples
 			}
 			else
 			{
+				if(EventSystem.current.IsPointerOverGameObject())
+				{
+					return;
+				}
 				x = Input.GetAxis("Horizontal");
 				z = Input.GetAxis("Vertical");
 				y = -Input.GetAxis("Mouse ScrollWheel") * _zoomSpeed;
