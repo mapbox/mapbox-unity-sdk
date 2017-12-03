@@ -4,7 +4,7 @@ namespace Mapbox.Examples
 
 	public class ChangeShadowDistance : MonoBehaviour
 	{
-		public int ShadowDistance = 3000;
+		public int ShadowDistance;
 
 		void Start()
 		{
