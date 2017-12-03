@@ -1,17 +1,19 @@
-﻿using UnityEngine;
-using System.Collections;
-
-public class CameraBillboard : MonoBehaviour
+﻿namespace Mapbox.Examples
 {
-	public Camera _camera;
+	using UnityEngine;
 
-	public void Start()
+	public class CameraBillboard : MonoBehaviour
 	{
-		_camera = Camera.main;
-	}
+		public Camera _camera;
 
-	void Update()
-	{
-		transform.LookAt(transform.position + _camera.transform.rotation * Vector3.forward,	_camera.transform.rotation * Vector3.up);
+		public void Start()
+		{
+			_camera = Camera.main;
+		}
+
+		void Update()
+		{
+			transform.LookAt(transform.position + _camera.transform.rotation * Vector3.forward, _camera.transform.rotation * Vector3.up);
+		}
 	}
 }
