@@ -76,7 +76,7 @@ GameObject:
   - component: {fileID: 114699889412236512}
   m_Layer: 5
   m_Name: InfoCanvas
-  m_TagString: EditorOnly
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -396,7 +396,7 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 12800000, guid: bd1ea67ca2b5742d1a24fcbdc17c55e1, type: 3}
-    m_FontSize: 12
+    m_FontSize: 10
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 1
@@ -521,8 +521,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 114157230607012598}
   m_HandleRect: {fileID: 224907993215804030}
   m_Direction: 2
-  m_Value: 0.99999976
-  m_Size: 0.6107672
+  m_Value: 1
+  m_Size: 0.8113092
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
