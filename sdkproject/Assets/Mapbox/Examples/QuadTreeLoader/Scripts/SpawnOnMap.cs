@@ -3,6 +3,8 @@
 	using UnityEngine;
 	using Mapbox.Utils;
 	using Mapbox.Unity.Map;
+	using Mapbox.Unity.MeshGeneration.Factories;
+	using Mapbox.Unity.Utilities;
 	using System.Collections.Generic;
 
 	public class SpawnOnMap : MonoBehaviour
@@ -11,6 +13,8 @@
 		AbstractMap _map;
 
 		[SerializeField]
+		[Geocode]
+		string[] _locationStrings;
 		Vector2d[] _locations;
 
 		[SerializeField]
@@ -20,11 +24,14 @@
 
 		void Start()
 		{
+			_locations = new Vector2d[_locationStrings.Length];
 			_spawnedObjects = new List<GameObject>();
-			foreach (var location in _locations)
+			for (int i = 0; i < _locationStrings.Length; i++)
 			{
+				var locationString = _locationStrings[i];
+				_locations[i] = Conversions.StringToLatLon(locationString);
 				var instance = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-				instance.transform.localPosition = _map.GeoToWorldPosition(location);
+				instance.transform.localPosition = _map.GeoToWorldPosition(_locations[i]);
 				instance.transform.localScale = Vector3.one * _spawnScale;
 				_spawnedObjects.Add(instance);
 			}

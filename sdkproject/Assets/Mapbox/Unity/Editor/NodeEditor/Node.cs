@@ -13,6 +13,8 @@ namespace Mapbox.Editor.NodeEditor
 {
 	public class Node
 	{
+		private SerializedObject _serializedObject;
+
 		private bool _expanded = true;
 
 		private bool _isRoot = false;
@@ -157,8 +159,6 @@ namespace Mapbox.Editor.NodeEditor
 					}
 				}
 			}
-
-
 			return spaceRect.height;
 		}
 
@@ -238,6 +238,7 @@ namespace Mapbox.Editor.NodeEditor
 
 		public void Dive(object obj, bool showModifiers = true, int depth = 0)
 		{
+			_serializedObject = new SerializedObject(obj as ScriptableObject);
 			if (obj == null)
 				return;
 
@@ -272,23 +273,45 @@ namespace Mapbox.Editor.NodeEditor
 				{
 					if (typeof(ScriptableObject).IsAssignableFrom(type.GetGenericArguments()[0]))
 					{
-						var name = (fi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
-						var conp = new ConnectionPoint(this, "", name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
-						ConnectionPoints.Add(conp);
-						var val = fi.GetValue(obj);
-						if (val is IEnumerable)
+						if (typeof(LayerVisualizerBase).IsAssignableFrom(type.GetGenericArguments()[0]))
 						{
-							foreach (ScriptableObject listitem in val as IEnumerable)
+							var val = fi.GetValue(obj);
+							if (val is List<LayerVisualizerBase>)
 							{
-								var newNode = new Node(listitem);
-								Children.Add(newNode);
-								newNode.Connections.Add(new Connection(newNode.inPoint, conp));
-								newNode.Dive(listitem, showModifiers, depth + 1);
+								foreach (VectorLayerVisualizer listitem in val as IEnumerable)
+								{
+									var prop = new SerializedObject(listitem);
+									var cc = new ConnectionPoint(this, "", listitem.Key, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle, prop.FindProperty("Active"));
+									
+									ConnectionPoints.Add(cc);
+									_propCount++;
+									var newNode = new Node(listitem);
+									Children.Add(newNode);
+									newNode.Connections.Add(new Connection(newNode.inPoint, cc));
+									newNode.Dive(listitem, showModifiers, depth + 1);
+								}
 							}
-							_propCount++;
+						}
+						else
+						{
+							var name = (fi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
+							var conp = new ConnectionPoint(this, "", name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
+							ConnectionPoints.Add(conp);
+							var val = fi.GetValue(obj);
+							if (val is IEnumerable)
+							{
+								foreach (ScriptableObject listitem in val as IEnumerable)
+								{
+									var newNode = new Node(listitem);
+									Children.Add(newNode);
+									newNode.Connections.Add(new Connection(newNode.inPoint, conp));
+									newNode.Dive(listitem, showModifiers, depth + 1);
+								}
+								_propCount++;
+							}
 						}
 					}
-					else 
+					else
 					{
 						var val = fi.GetValue(obj);
 						if (val is List<TypeVisualizerTuple>)
