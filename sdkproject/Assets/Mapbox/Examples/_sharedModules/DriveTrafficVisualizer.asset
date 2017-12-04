@@ -18,10 +18,20 @@ MonoBehaviour:
   _defaultStack: {fileID: 11400000, guid: 5915928cb8624134a87d7604161e28ae, type: 2}
   Stacks:
   - Type: low
+    Types:
+    - low
     Stack: {fileID: 11400000, guid: 5915928cb8624134a87d7604161e28ae, type: 2}
   - Type: moderate
+    Types:
+    - moderate
     Stack: {fileID: 11400000, guid: a59c8f5fd27fb10488bb71c65eb6b2cf, type: 2}
   - Type: heavy
+    Types:
+    - heavy
     Stack: {fileID: 11400000, guid: 44cfe8ee8cdd1814fb9e4fcbe56a7db4, type: 2}
   - Type: severe
+    Types:
+    - severe
     Stack: {fileID: 11400000, guid: 407eb7a3e54e4f14c839da27883c39ba, type: 2}
+  _enableCoroutines: 0
+  _entityPerCoroutine: 20
