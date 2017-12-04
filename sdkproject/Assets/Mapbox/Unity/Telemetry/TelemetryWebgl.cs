@@ -1,4 +1,4 @@
-namespace Mapbox.Unity.Telemetry
+﻿namespace Mapbox.Unity.Telemetry
 {
 	using System.Collections.Generic;
 	using System.Collections;
@@ -8,7 +8,7 @@ namespace Mapbox.Unity.Telemetry
 	using UnityEngine;
 	using System.Text;
 
-	public class TelemetryFallback : ITelemetryLibrary
+	public class TelemetryWebgl : ITelemetryLibrary
 	{
 		string _url;
 
@@ -29,6 +29,7 @@ namespace Mapbox.Unity.Telemetry
 		public void SendTurnstile()
 		{
 			var ticks = DateTime.Now.Ticks;
+
 			if (ShouldPostTurnstile(ticks))
 			{
 				Runnable.Run(PostWWW(_url, GetPostBody()));
@@ -47,6 +48,10 @@ namespace Mapbox.Unity.Telemetry
 			jsonDict.Add("created", unixTimestamp);
 			jsonDict.Add("userId", SystemInfo.deviceUniqueIdentifier);
 			jsonDict.Add("enabled.telemetry", false);
+
+			// user-agent cannot be set from web broswer, so we send in payload, instead!
+			jsonDict.Add("userAgent", GetUserAgent());
+
 			eventList.Add(jsonDict);
 
 			var jsonString = JsonConvert.SerializeObject(eventList);
@@ -70,7 +75,6 @@ namespace Mapbox.Unity.Telemetry
 			byte[] bodyRaw = Encoding.UTF8.GetBytes(bodyJsonString);
 			var headers = new Dictionary<string, string>();
 			headers.Add("Content-Type", "application/json");
-			headers.Add("user-agent", GetUserAgent());
 
 			var www = new WWW(url, bodyRaw, headers);
 			yield return www;

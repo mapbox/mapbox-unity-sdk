@@ -110,17 +110,7 @@ namespace Mapbox.Unity
 
 		void ConfigureTelemetry()
 		{
-#if UNITY_EDITOR
-			_telemetryLibrary = TelemetryEditor.Instance;
-#elif UNITY_IOS
-			_telemetryLibrary = TelemetryIos.Instance;
-#elif UNITY_ANDROID
-			_telemetryLibrary = TelemetryAndroid.Instance;
-#else
-			_telemetryLibrary = TelemetryFallback.Instance;
-#endif
-
-
+			_telemetryLibrary = TelemetryFactory.GetTelemetryInstance();
 			_telemetryLibrary.Initialize(_configuration.AccessToken);
 			_telemetryLibrary.SetLocationCollectionState(GetTelemetryCollectionState());
 			_telemetryLibrary.SendTurnstile();
