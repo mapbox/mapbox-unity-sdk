@@ -74,6 +74,9 @@ namespace Mapbox.Unity
 			});
 
 			_configuration = configuration;
+
+			ConfigureFileSource();
+			ConfigureTelemetry();
 		}
 
 		/// <summary>
