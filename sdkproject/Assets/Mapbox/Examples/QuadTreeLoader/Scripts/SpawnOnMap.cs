@@ -3,8 +3,6 @@
 	using UnityEngine;
 	using Mapbox.Utils;
 	using Mapbox.Unity.Map;
-	using Mapbox.Unity.MeshGeneration.Factories;
-	using Mapbox.Unity.Utilities;
 	using System.Collections.Generic;
 
 	public class SpawnOnMap : MonoBehaviour
