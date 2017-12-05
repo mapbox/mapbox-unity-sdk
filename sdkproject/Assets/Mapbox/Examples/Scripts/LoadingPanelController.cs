@@ -12,6 +12,9 @@ namespace Mapbox.Examples
 		{
 			MapVisualizer.OnMapVisualizerStateChanged += (s) =>
 			{
+				if (this == null)
+					return;
+
 				if (s == ModuleState.Finished)
 				{
 					Content.SetActive(false);

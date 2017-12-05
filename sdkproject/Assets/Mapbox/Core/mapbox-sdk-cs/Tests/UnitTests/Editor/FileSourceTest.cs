@@ -127,7 +127,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 					Assert.IsTrue(res.HasError);
 #if UNITY_5_6_OR_NEWER
 					Assert.IsNotNull(res.Exceptions[0]);
-					Assert.AreEqual("Request Cancelled", res.Exceptions[0].Message);
+					Assert.AreEqual("Request aborted", res.Exceptions[0].Message);
 #else
 					WebException wex = res.Exceptions[0] as WebException;
 					Assert.IsNotNull(wex);

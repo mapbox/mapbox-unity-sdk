@@ -116,6 +116,18 @@
 			// We are no longer interested in this tile's notifications.
 			tile.OnHeightDataChanged -= DataChangedHandler;
 			tile.OnRasterDataChanged -= DataChangedHandler;
+
+			// clean up any pending request for this tile
+			if (_cachedData.ContainsKey(tile))
+			{
+				Progress--;
+				_cachedData.Remove(tile);
+			}
+
+			foreach (var vis in Visualizers)
+			{
+				vis.UnregisterTile(tile);
+			}
 		}
 
 		private void DataChangedHandler(UnityTile t)
@@ -160,7 +172,7 @@
 
 			_cachedData.Remove(tile);
 		}
-		
+
 		private void DecreaseProgressCounter()
 		{
 			Progress--;

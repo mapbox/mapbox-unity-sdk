@@ -4,4 +4,61 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Mapbox/Main.unity
+    guid: 643bfa26e0eed440db629d1f4fc9f6ed
+  - enabled: 1
+    path: Assets/Mapbox/Examples/Drive/Drive.unity
+    guid: cb65a9630fe16e14b8e73a8ee0725fae
+  - enabled: 1
+    path: Assets/Mapbox/Examples/Globe/Globe.unity
+    guid: 614e3e19125ae46c7af990b7e3debd36
+  - enabled: 1
+    path: Assets/Mapbox/Examples/LocationProvider/LocationProvider.unity
+    guid: 3f89098a339c744e88644a47f777dbf9
+  - enabled: 1
+    path: Assets/Mapbox/Examples/LowPoly/LowPoly.unity
+    guid: 4a4e4fc63d8c20845869405fbc6250bd
+  - enabled: 1
+    path: Assets/Mapbox/Examples/MapReload/MapReload.unity
+    guid: cfeb95faf95944036bf4fec24a782562
+  - enabled: 1
+    path: Assets/Mapbox/Examples/MeshGenerationBasics/MeshGeneration.unity
+    guid: f804e6882903c5f4595d554933b1cd94
+  - enabled: 1
+    path: Assets/Mapbox/Examples/MeshGenerationOnTerrain/MeshGenerationOnTerrain.unity
+    guid: c6e5371f61cf449d6a257725bc99a541
+  - enabled: 1
+    path: Assets/Mapbox/Examples/MeshGenerationPois/PoiGeneration.unity
+    guid: 37373eb31a4621d4bbde1ca457247103
+  - enabled: 1
+    path: Assets/Mapbox/Examples/MeshGenerationStyles/StylingDemoMeshGeneration.unity
+    guid: cd33e2be3cdb9b84088c50e024256556
+  - enabled: 1
+    path: Assets/Mapbox/Examples/Playground/Scenes/Directions.unity
+    guid: b650aa71f57a846dc83ef01c3c1755ad
+  - enabled: 1
+    path: Assets/Mapbox/Examples/Playground/Scenes/ForwardGeocoder.unity
+    guid: 9683d5465276540cd9a4c9e89d931293
+  - enabled: 1
+    path: Assets/Mapbox/Examples/Playground/Scenes/RasterTile.unity
+    guid: 893d0b4deb5544335b798dafd12ff9a7
+  - enabled: 1
+    path: Assets/Mapbox/Examples/Playground/Scenes/ReverseGeocoder.unity
+    guid: 9a904a5fcec05469db76712a52999b39
+  - enabled: 1
+    path: Assets/Mapbox/Examples/Playground/Scenes/VectorTile.unity
+    guid: 416b524fd28da493a9b8e35443dbd25b
+  - enabled: 1
+    path: Assets/Mapbox/Examples/QuadTreeLoader/QuadTreeLoader.unity
+    guid: 2c7147d54825142878b256c67aae5704
+  - enabled: 1
+    path: Assets/Mapbox/Examples/SlippyTerrain/Slippy.unity
+    guid: efcdf81fdae9ef1478b04b31da5816d5
+  - enabled: 1
+    path: Assets/Mapbox/Examples/TerracedWorld/TerracedWorld.unity
+    guid: 613b6975b6151d64ab70517948d9cc12
+  - enabled: 1
+    path: Assets/Mapbox/Examples/Voxels/Scenes/VoxelWorld.unity
+    guid: daabe3028a2c14661b829fff509af827

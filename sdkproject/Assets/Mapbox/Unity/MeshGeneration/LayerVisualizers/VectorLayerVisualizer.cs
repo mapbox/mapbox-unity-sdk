@@ -122,7 +122,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 				if (!filterOut)
 				{
-					if (tile.VectorDataState != Enums.TilePropertyState.Cancelled)
+					if (tile != null && tile.gameObject != null && tile.VectorDataState != Enums.TilePropertyState.Cancelled)
 						Build(feature, tile, tile.gameObject);
 				}
 
@@ -136,7 +136,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 
 			var mergedStack = _defaultStack as MergedModifierStack;
-			if (mergedStack != null)
+			if (mergedStack != null && tile != null)
 			{
 				mergedStack.End(tile, tile.gameObject, layer.Name);
 			}

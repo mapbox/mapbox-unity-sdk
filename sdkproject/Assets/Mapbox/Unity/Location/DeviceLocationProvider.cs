@@ -58,6 +58,7 @@ namespace Mapbox.Unity.Location
 #endif
 			if (!Input.location.isEnabledByUser)
 			{
+				Debug.LogError("DeviceLocationProvider: " + "Location is not enabled by user!");
 				yield break;
 			}
 
@@ -73,15 +74,19 @@ namespace Mapbox.Unity.Location
 
 			if (maxWait < 1)
 			{
+				Debug.LogError("DeviceLocationProvider: " + "Timed out trying to initialize location services!");
 				yield break;
 			}
 
 			if (Input.location.status == LocationServiceStatus.Failed)
 			{
+				Debug.LogError("DeviceLocationProvider: " + "Failed to initialize location services!");
 				yield break;
 			}
 
 #if UNITY_EDITOR
+			// HACK: this is to prevent Android devices, connected through Unity Remote, 
+			// from reporting a location of (0, 0), initially.
 			yield return _wait;
 #endif
 			while (true)
