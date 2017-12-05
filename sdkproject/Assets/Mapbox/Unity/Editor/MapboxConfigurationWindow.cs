@@ -8,6 +8,7 @@ namespace Mapbox.Editor
 	using Mapbox.Unity;
 	using Mapbox.Json;
 	using Mapbox.Unity.Utilities;
+    using Mapbox.Unity.Utilities.DebugTools;
 	using UnityEditor.Callbacks;
 	using System;
 
@@ -136,8 +137,11 @@ namespace Mapbox.Editor
 			DrawConfigurationSettings();
             EditorGUILayout.EndVertical();
 
+            EditorGUILayout.BeginVertical(_verticalGroup);
 			// Examples.
-			DrawExampleLinks();
+			//DrawExampleLinks();
+            EditorGUILayout.EndVertical();
+
 			EditorGUILayout.EndScrollView();
 		}
 
@@ -355,10 +359,30 @@ namespace Mapbox.Editor
 
 		void DrawExampleLinks()
 		{
+            int rowCount = 2;
+
+            NavigationBuilder.AddExampleScenesToBuildSettings();
+            ScenesList list = (ScenesList)AssetDatabase.LoadAssetAtPath("Assets/Resources/Mapbox/ScenesList.asset", typeof(ScenesList));
+
 			EditorGUI.BeginDisabledGroup(!_isTokenValid);
-			GUILayout.Button("thing1");
-			GUILayout.Button("thing2");
-			GUILayout.Button("thing3");
+            EditorGUILayout.BeginHorizontal(_horizontalGroup);
+
+            int currentRow = 0;
+            foreach( var scene in list.SceneList)
+            {
+                GUILayout.Button(scene);
+
+                currentRow++;
+                if (currentRow < rowCount)
+                {
+                    currentRow = 0;
+                    EditorGUILayout.EndHorizontal();
+                    EditorGUILayout.BeginHorizontal(_horizontalGroup);
+                }
+
+            }
+
+            EditorGUILayout.EndHorizontal();
 			EditorGUI.EndDisabledGroup();
 		}
 

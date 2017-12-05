@@ -5,7 +5,7 @@ namespace Mapbox.Unity.Utilities.DebugTools
 
 	public static class NavigationBuilder
 	{
-		[MenuItem("Mapbox/AddExamplesScenesToBuildSettings")]
+		//[MenuItem("Mapbox/AddExamplesScenesToBuildSettings")]
 		public static void AddExampleScenesToBuildSettings()
 		{
 			var allScenes = PathHelpers.AllScenes;
