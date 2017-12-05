@@ -19,21 +19,48 @@ namespace Mapbox.Examples
 		Vector3 _delta;
 		bool _shouldDrag;
 
-		void Awake()
+		void HandleTouch()
 		{
-			_originalRotation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
-
-			if (_referenceCamera == null)
+			float zoomFactor = 0.0f;
+			//pinch to zoom. 
+			switch (Input.touchCount)
 			{
-				_referenceCamera = GetComponent<Camera>();
-				if (_referenceCamera == null)
-				{
-					throw new System.Exception("You must have a reference camera assigned!");
-				}
+				case 1:
+					{
+						HandleMouseAndKeyBoard();
+					}
+					break;
+				case 2:
+					{
+						// Store both touches.
+						Touch touchZero = Input.GetTouch(0);
+						Touch touchOne = Input.GetTouch(1);
+
+						// Find the position in the previous frame of each touch.
+						Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
+						Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
+
+						// Find the magnitude of the vector (the distance) between the touches in each frame.
+						float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
+						float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
+
+						// Find the difference in the distances between each frame.
+						zoomFactor = 0.05f * (touchDeltaMag - prevTouchDeltaMag);
+					}
+					ZoomMapUsingTouchOrMouse(zoomFactor);
+					break;
+				default:
+					break;
 			}
 		}
 
-		void LateUpdate()
+		void ZoomMapUsingTouchOrMouse(float zoomFactor)
+		{
+			var y = zoomFactor * _zoomSpeed;
+			transform.localPosition += transform.forward * y;
+		}
+
+		void HandleMouseAndKeyBoard()
 		{
 			var x = 0f;
 			var y = 0f;
@@ -64,7 +91,7 @@ namespace Mapbox.Examples
 			}
 			else
 			{
-				if(EventSystem.current.IsPointerOverGameObject())
+				if (EventSystem.current.IsPointerOverGameObject())
 				{
 					return;
 				}
@@ -72,6 +99,33 @@ namespace Mapbox.Examples
 				z = Input.GetAxis("Vertical");
 				y = -Input.GetAxis("Mouse ScrollWheel") * _zoomSpeed;
 				transform.localPosition += transform.forward * y + (_originalRotation * new Vector3(x * _panSpeed, 0, z * _panSpeed));
+			}
+		}
+
+		void Awake()
+		{
+			_originalRotation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
+
+			if (_referenceCamera == null)
+			{
+				_referenceCamera = GetComponent<Camera>();
+				if (_referenceCamera == null)
+				{
+					throw new System.Exception("You must have a reference camera assigned!");
+				}
+			}
+		}
+
+		void LateUpdate()
+		{
+
+			if (Input.touchSupported && Input.touchCount > 0)
+			{
+				HandleTouch();
+			}
+			else
+			{
+				HandleMouseAndKeyBoard();
 			}
 		}
 	}
