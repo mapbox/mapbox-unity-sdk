@@ -6,7 +6,6 @@ namespace Mapbox.Unity.Telemetry
 	using System;
 	using Mapbox.Unity.Utilities;
 	using UnityEngine;
-	using UnityEngine.Networking;
 	using System.Text;
 
 	public class TelemetryFallback : ITelemetryLibrary
@@ -42,7 +41,7 @@ namespace Mapbox.Unity.Telemetry
 			List<Dictionary<string, object>> eventList = new List<Dictionary<string, object>>();
 			Dictionary<string, object> jsonDict = new Dictionary<string, object>();
 
-			long unixTimestamp = (long)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+			long unixTimestamp = (long)Mapbox.Utils.UnixTimestampUtils.To(DateTime.UtcNow);
 
 			jsonDict.Add("event", "appUserTurnstile");
 			jsonDict.Add("created", unixTimestamp);
@@ -66,32 +65,12 @@ namespace Mapbox.Unity.Telemetry
 			return timeSpan.Days >= 1;
 		}
 
-		// FIXME: maybe in a future Unity version, "user-agent" will be writable. 
-		IEnumerator Post(string url, string bodyJsonString)
-		{
-			var request = new UnityWebRequest(url, "POST");
-			byte[] bodyRaw = Encoding.UTF8.GetBytes(bodyJsonString);
-			request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-
-			// FIXME: Why, Unity?! 
-			// https://docs.unity3d.com/2017.1/Documentation/ScriptReference/Networking.UnityWebRequest.SetRequestHeader.html
-			//request.SetRequestHeader("user-agent", GetUserAgent());
-
-			request.downloadHandler = new DownloadHandlerBuffer();
-			request.SetRequestHeader("Content-Type", "application/json");
-
-			yield return request.Send();
-		}
-
 		IEnumerator PostWWW(string url, string bodyJsonString)
 		{
 			byte[] bodyRaw = Encoding.UTF8.GetBytes(bodyJsonString);
 			var headers = new Dictionary<string, string>();
 			headers.Add("Content-Type", "application/json");
-
-#if !UNITY_WEBGL
 			headers.Add("user-agent", GetUserAgent());
-#endif
 
 			var www = new WWW(url, bodyRaw, headers);
 			yield return www;

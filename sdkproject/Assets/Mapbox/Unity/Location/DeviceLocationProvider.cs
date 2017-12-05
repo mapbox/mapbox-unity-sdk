@@ -26,8 +26,6 @@ namespace Mapbox.Unity.Location
 		[SerializeField]
 		float _updateDistanceInMeters = 5f;
 
-		Location _currentLocation;
-
 		Coroutine _pollRoutine;
 
 		double _lastLocationTimestamp;

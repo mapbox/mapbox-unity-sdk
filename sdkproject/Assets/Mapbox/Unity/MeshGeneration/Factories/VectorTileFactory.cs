@@ -15,7 +15,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	public class VectorTileFactory : AbstractTileFactory
 	{
 		[SerializeField]
-		private string _mapId = "";
+		private string _mapId = "mapbox.mapbox-streets-v7";
 
 		[NodeEditorElementAttribute("Layer Visalizers")]
 		public List<LayerVisualizerBase> Visualizers;

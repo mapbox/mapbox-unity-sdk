@@ -9,32 +9,14 @@ EditorBuildSettings:
     path: Assets/Mapbox/Main.unity
     guid: 643bfa26e0eed440db629d1f4fc9f6ed
   - enabled: 1
-    path: Assets/Mapbox/Examples/Drive/Drive.unity
-    guid: cb65a9630fe16e14b8e73a8ee0725fae
+    path: Assets/Mapbox/Examples/Explorer/explorer.unity
+    guid: 23aa869f2d28da149b835ce1d36a5438
   - enabled: 1
     path: Assets/Mapbox/Examples/Globe/Globe.unity
     guid: 614e3e19125ae46c7af990b7e3debd36
   - enabled: 1
     path: Assets/Mapbox/Examples/LocationProvider/LocationProvider.unity
-    guid: 3f89098a339c744e88644a47f777dbf9
-  - enabled: 1
-    path: Assets/Mapbox/Examples/LowPoly/LowPoly.unity
-    guid: 4a4e4fc63d8c20845869405fbc6250bd
-  - enabled: 1
-    path: Assets/Mapbox/Examples/MapReload/MapReload.unity
-    guid: cfeb95faf95944036bf4fec24a782562
-  - enabled: 1
-    path: Assets/Mapbox/Examples/MeshGenerationBasics/MeshGeneration.unity
-    guid: f804e6882903c5f4595d554933b1cd94
-  - enabled: 1
-    path: Assets/Mapbox/Examples/MeshGenerationOnTerrain/MeshGenerationOnTerrain.unity
-    guid: c6e5371f61cf449d6a257725bc99a541
-  - enabled: 1
-    path: Assets/Mapbox/Examples/MeshGenerationPois/PoiGeneration.unity
-    guid: 37373eb31a4621d4bbde1ca457247103
-  - enabled: 1
-    path: Assets/Mapbox/Examples/MeshGenerationStyles/StylingDemoMeshGeneration.unity
-    guid: cd33e2be3cdb9b84088c50e024256556
+    guid: 69bd9826e5ce64552aae5bf0f4e3dc81
   - enabled: 1
     path: Assets/Mapbox/Examples/Playground/Scenes/Directions.unity
     guid: b650aa71f57a846dc83ef01c3c1755ad
@@ -51,14 +33,20 @@ EditorBuildSettings:
     path: Assets/Mapbox/Examples/Playground/Scenes/VectorTile.unity
     guid: 416b524fd28da493a9b8e35443dbd25b
   - enabled: 1
-    path: Assets/Mapbox/Examples/QuadTreeLoader/QuadTreeLoader.unity
-    guid: 2c7147d54825142878b256c67aae5704
+    path: Assets/Mapbox/Examples/VectorTileMaps/BasicVectorMap/BasicVectorMap.unity
+    guid: f804e6882903c5f4595d554933b1cd94
   - enabled: 1
-    path: Assets/Mapbox/Examples/SlippyTerrain/Slippy.unity
-    guid: efcdf81fdae9ef1478b04b31da5816d5
+    path: Assets/Mapbox/Examples/VectorTileMaps/InteractiveStyledVectorMap/InteractiveStyledVectorMap.unity
+    guid: 70e7c71bb9e4341109139d65148d82ff
   - enabled: 1
-    path: Assets/Mapbox/Examples/TerracedWorld/TerracedWorld.unity
-    guid: 613b6975b6151d64ab70517948d9cc12
+    path: Assets/Mapbox/Examples/VectorTileMaps/PoiVectorMap/PoiVectorMap.unity
+    guid: d8f424455a2bb4963b4df1469488ab87
   - enabled: 1
-    path: Assets/Mapbox/Examples/Voxels/Scenes/VoxelWorld.unity
+    path: Assets/Mapbox/Examples/VectorTileMaps/TerrainVectorMap/TerrainVectorMap.unity
+    guid: 22b55e3f56b6044b6bbd8476d27843e7
+  - enabled: 1
+    path: Assets/Mapbox/Examples/VoxelMap/VoxelMap.unity
     guid: daabe3028a2c14661b829fff509af827
+  - enabled: 1
+    path: Assets/Mapbox/Examples/ZoomableMap/ZoomableMap.unity
+    guid: 2c7147d54825142878b256c67aae5704

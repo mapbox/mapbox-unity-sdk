@@ -60,7 +60,8 @@
 		protected AbstractTileProvider _tileProvider;
 
 		[SerializeField]
-		protected AbstractMapVisualizer _mapVisualizer;
+		[NodeEditorElement("MapVisualizer")]
+		public AbstractMapVisualizer _mapVisualizer;
 		public AbstractMapVisualizer MapVisualizer
 		{
 			get
@@ -214,12 +215,12 @@
 			OnInitialized();
 		}
 
-		public Vector2d WorldToGeoPosition(Vector3 realworldPoint)
+		public virtual Vector2d WorldToGeoPosition(Vector3 realworldPoint)
 		{
 			return (_root.InverseTransformPoint(realworldPoint)).GetGeoPosition(CenterMercator, WorldRelativeScale);
 		}
 
-		public Vector3 GeoToWorldPosition(Vector2d latitudeLongitude)
+		public virtual Vector3 GeoToWorldPosition(Vector2d latitudeLongitude)
 		{
 			return _root.TransformPoint(Conversions.GeoToWorldPosition(latitudeLongitude, CenterMercator, WorldRelativeScale).ToVector3xz());
 		}

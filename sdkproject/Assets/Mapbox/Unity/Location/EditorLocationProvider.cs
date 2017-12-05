@@ -33,6 +33,7 @@ namespace Mapbox.Unity.Location
 
 		bool _mapInitialized;
 
+#if UNITY_EDITOR
 		protected override void Awake()
 		{
 			_map.OnInitialized += Map_OnInitialized;
@@ -44,6 +45,7 @@ namespace Mapbox.Unity.Location
 
 			base.Awake();
 		}
+#endif
 
 		void Map_OnInitialized()
 		{

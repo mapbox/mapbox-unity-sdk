@@ -18,4 +18,8 @@ MonoBehaviour:
   _defaultStack: {fileID: 0}
   Stacks:
   - Type: park
+    Types:
+    - park
     Stack: {fileID: 11400000, guid: 000166c0f999e4d44b968d47724ea242, type: 2}
+  _enableCoroutines: 1
+  _entityPerCoroutine: 1
