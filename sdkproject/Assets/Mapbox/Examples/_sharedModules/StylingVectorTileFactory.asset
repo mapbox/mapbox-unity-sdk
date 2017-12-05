@@ -14,5 +14,4 @@ MonoBehaviour:
   _mapId: mapbox.mapbox-streets-v7
   Visualizers:
   - {fileID: 11400000, guid: 69e43c5ee5f5f6b46a12bf3f1ba27039, type: 2}
-  - {fileID: 11400000, guid: c373e27f08ab6fd4e9d288f394bb6fd8, type: 2}
   - {fileID: 11400000, guid: 42d0c054e597a4590a29b5b66fbec4aa, type: 2}

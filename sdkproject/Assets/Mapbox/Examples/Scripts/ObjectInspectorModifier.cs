@@ -13,18 +13,15 @@ namespace Mapbox.Examples
 
 		public override void Run(VectorEntity ve, UnityTile tile)
 		{
-			if(_marker == null)
+			if (_marker == null)
 			{
-				var canv = FindObjectOfType<Canvas>();
-				if (canv == null)
-				{
-					var go = new GameObject("Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
-					canv = go.GetComponent<Canvas>();
-					canv.renderMode = RenderMode.ScreenSpaceOverlay;
-				}
+				Canvas canvas;
+				var go = new GameObject("InteractiveSelectionCanvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+				canvas = go.GetComponent<Canvas>();
+				canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 
 				var sel = Instantiate(Resources.Load<GameObject>("selector"));
-				sel.transform.SetParent(canv.transform);
+				sel.transform.SetParent(canvas.transform);
 				_marker = sel.GetComponent<FeatureUiMarker>();
 			}
 

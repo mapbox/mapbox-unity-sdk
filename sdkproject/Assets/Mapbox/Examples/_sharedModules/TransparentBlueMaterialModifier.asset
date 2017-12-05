@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76c93f3debdba4e48adb1b99cad0a0d2, type: 3}
+  m_Name: TransparentBlueMaterialModifier
+  m_EditorClassIdentifier: 
+  Active: 1
+  _projectMapImagery: 0
+  _materials:
+  - Materials:
+    - {fileID: 2100000, guid: 80bd19d68c4ef4a659db43cfb6b09b91, type: 2}
+  - Materials:
+    - {fileID: 2100000, guid: 80bd19d68c4ef4a659db43cfb6b09b91, type: 2}
