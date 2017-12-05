@@ -62,6 +62,14 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				_counter = _activeObjects[tile].Count;
 				for (int i = 0; i < _counter; i++)
 				{
+					foreach (Transform tr in _activeObjects[tile][i].Transform)
+					{
+						Destroy(tr.gameObject);
+					}
+					foreach (var item in _activeObjects[tile][i].GameObject.GetComponents<MonoBehaviour>())
+					{
+						Destroy(item);
+					}
 					_activeObjects[tile][i].GameObject.SetActive(false);
 					_pool.Put(_activeObjects[tile][i]);
 				}
