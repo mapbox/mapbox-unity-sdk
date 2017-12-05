@@ -690,7 +690,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Search
+  m_Text: Enter your location
 --- !u!114 &114632240689637620
 MonoBehaviour:
   m_ObjectHideFlags: 1
