@@ -119,6 +119,7 @@ MonoBehaviour:
   - {fileID: 4828678542497540}
   - {fileID: 4059629147633642}
   _material: {fileID: 2100000, guid: ef6c956ca085647fba4624a08c344419, type: 2}
+  _directionsLineWidth: 2
 --- !u!212 &212225065956172554
 SpriteRenderer:
   m_ObjectHideFlags: 1
