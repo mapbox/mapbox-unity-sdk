@@ -16,7 +16,7 @@
 				var button = Instantiate(_buttonPrefab) as GameObject;
 				button.transform.SetParent(GetComponentInChildren<VerticalLayoutGroup>().transform);
 				var text = button.GetComponentInChildren<Text>();
-				text.text = scene.Replace(".unity", "").Replace("Assets/", "");
+				text.text = scene.ScenePath.Replace(".unity", "").Replace("Assets/", "");
 			}
 		}
 	}
