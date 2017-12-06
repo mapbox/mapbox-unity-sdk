@@ -24,11 +24,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField]
 		Material _material;
 
+		[SerializeField]
+		float _directionsLineWidth;
+
 		private Directions _directions;
 		private int _counter;
 
 		GameObject _directionsGO;
-
 
 		void Awake()
 		{
@@ -47,7 +49,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		void Query()
 		{
-			//_map.OnInitialized -= Query;
 			var count = _waypoints.Length;
 			var wp = new Vector2d[count];
 			for (int i = 0; i < count; i++)
@@ -78,6 +79,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			foreach (MeshModifier mod in MeshModifiers.Where(x => x.Active))
 			{
+				var lineMod = mod as LineMeshModifier;
+				if (lineMod != null)
+				{
+					lineMod.Width = _directionsLineWidth / _map.WorldRelativeScale;
+				}
 				mod.Run(feat, meshData, _map.WorldRelativeScale);
 			}
 

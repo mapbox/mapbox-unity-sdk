@@ -17,3 +17,5 @@ MonoBehaviour:
   Filters: []
   _defaultStack: {fileID: 11400000, guid: 7c822e57e67d34f4e8e4bd06be099dc5, type: 2}
   Stacks: []
+  _enableCoroutines: 0
+  _entityPerCoroutine: 20

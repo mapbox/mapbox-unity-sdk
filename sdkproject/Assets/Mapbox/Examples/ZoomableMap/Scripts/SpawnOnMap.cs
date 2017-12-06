@@ -20,6 +20,9 @@
 		[SerializeField]
 		float _spawnScale = 100f;
 
+		[SerializeField]
+		GameObject _markerPrefab;
+
 		List<GameObject> _spawnedObjects;
 
 		void Start()
@@ -30,7 +33,7 @@
 			{
 				var locationString = _locationStrings[i];
 				_locations[i] = Conversions.StringToLatLon(locationString);
-				var instance = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+				var instance = Instantiate(_markerPrefab);
 				instance.transform.localPosition = _map.GeoToWorldPosition(_locations[i]);
 				instance.transform.localScale = Vector3.one * _spawnScale;
 				_spawnedObjects.Add(instance);

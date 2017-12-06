@@ -4,6 +4,8 @@
 	using UnityEngine.UI;
 	using Mapbox.Unity.Map;
 	using UnityEngine;
+	using System;
+	using System.Collections;
 
 	public class ReloadMap : MonoBehaviour
 	{
@@ -17,8 +19,9 @@
 		[SerializeField]
 		Slider _zoomSlider;
 
-		[SerializeField]
-		Button _button;
+		Coroutine _reloadRoutine;
+
+		WaitForSeconds _wait;
 
 		void Awake()
 		{
@@ -26,8 +29,8 @@
 			_cameraStartPos = _camera.transform.position;
 			_map = FindObjectOfType<AbstractMap>();
 			_forwardGeocoder.OnGeocoderResponse += ForwardGeocoder_OnGeocoderResponse;
-			//_zoomSlider.onValueChanged.AddListener(Reload);
-			_button.onClick.AddListener(Reload);
+			_zoomSlider.onValueChanged.AddListener(Reload);
+			_wait = new WaitForSeconds(.3f);
 		}
 
 		void ForwardGeocoder_OnGeocoderResponse(ForwardGeocodeResponse response)
@@ -39,10 +42,22 @@
 			}
 		}
 
-		void Reload()
+		void Reload(float value)
 		{
-			_camera.transform.position = _cameraStartPos;
-			_map.Initialize(_map.CenterLatitudeLongitude, (int)_zoomSlider.value);
+			if (_reloadRoutine != null)
+			{
+				StopCoroutine(_reloadRoutine);
+				_reloadRoutine = null;
+			}
+			_reloadRoutine = StartCoroutine(ReloadAfterDelay((int)value));
 		}
-	}
+
+		IEnumerator ReloadAfterDelay(int zoom)
+		{
+			yield return _wait;
+			_camera.transform.position = _cameraStartPos;
+			_map.Initialize(_map.CenterLatitudeLongitude, zoom);
+			_reloadRoutine = null;
+		}
+}
 }
