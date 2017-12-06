@@ -19,6 +19,7 @@ namespace Mapbox.Examples
 		{
 			var map = FindObjectOfType<AbstractMap>();
 			var visualizer = map.MapVisualizer;
+			_text.text = "LOADING";
 			visualizer.OnMapVisualizerStateChanged += (s) =>
 			{
 				if (this == null)

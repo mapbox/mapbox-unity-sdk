@@ -403,7 +403,7 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0.17492622
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -433,7 +433,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -121.20129
+      value: -60.088974
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -443,12 +443,12 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 222.40257
+      value: 100.17795
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 242.40257
+      value: 120.17795
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -464,6 +464,17 @@ Prefab:
         type: 2}
       propertyPath: m_SizeDelta.x
       value: -17
+      objectReference: {fileID: 0}
+    - target: {fileID: 114603753021256032, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_Text
+      value: '<b>Styling Based on Vector Tile Data</b>
+
+
+        This is a vector tile map where you can interact with individual buildings
+        to show their associated information (contained in the vector tile). This
+        example also shows how to procedurally decorate land use and how to render
+        building types differently based on their classification. '
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 98be219873e6d4dffb5949746f515a33, type: 2}
@@ -736,6 +747,66 @@ Prefab:
       propertyPath: m_AnchorMax.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 224178813210018432, guid: 00f5bf1ff996842fc82384f8f686fda6,
+        type: 2}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224178813210018432, guid: 00f5bf1ff996842fc82384f8f686fda6,
+        type: 2}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224178813210018432, guid: 00f5bf1ff996842fc82384f8f686fda6,
+        type: 2}
+      propertyPath: m_AnchoredPosition.x
+      value: 127.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224178813210018432, guid: 00f5bf1ff996842fc82384f8f686fda6,
+        type: 2}
+      propertyPath: m_AnchoredPosition.y
+      value: -18.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224178813210018432, guid: 00f5bf1ff996842fc82384f8f686fda6,
+        type: 2}
+      propertyPath: m_SizeDelta.x
+      value: 231
+      objectReference: {fileID: 0}
+    - target: {fileID: 224178813210018432, guid: 00f5bf1ff996842fc82384f8f686fda6,
+        type: 2}
+      propertyPath: m_SizeDelta.y
+      value: 23
+      objectReference: {fileID: 0}
+    - target: {fileID: 224538534500426518, guid: 00f5bf1ff996842fc82384f8f686fda6,
+        type: 2}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224538534500426518, guid: 00f5bf1ff996842fc82384f8f686fda6,
+        type: 2}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224538534500426518, guid: 00f5bf1ff996842fc82384f8f686fda6,
+        type: 2}
+      propertyPath: m_AnchoredPosition.x
+      value: 127.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224538534500426518, guid: 00f5bf1ff996842fc82384f8f686fda6,
+        type: 2}
+      propertyPath: m_AnchoredPosition.y
+      value: -45.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224538534500426518, guid: 00f5bf1ff996842fc82384f8f686fda6,
+        type: 2}
+      propertyPath: m_SizeDelta.x
+      value: 231
+      objectReference: {fileID: 0}
+    - target: {fileID: 224538534500426518, guid: 00f5bf1ff996842fc82384f8f686fda6,
+        type: 2}
+      propertyPath: m_SizeDelta.y
+      value: 23
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 00f5bf1ff996842fc82384f8f686fda6, type: 2}
   m_IsPrefabParent: 0
@@ -914,10 +985,6 @@ Prefab:
         type: 2}
       propertyPath: m_Pivot.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1393483683185582, guid: b95c449128f3b44bca8b83258c669aa5, type: 2}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b95c449128f3b44bca8b83258c669aa5, type: 2}

@@ -125,7 +125,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: LOADING
+  m_Text: PRESS PLAY
 --- !u!114 &114674943221688514
 MonoBehaviour:
   m_ObjectHideFlags: 1

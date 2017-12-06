@@ -22,7 +22,7 @@ namespace Mapbox.Unity
         CachingWebFileSource _fileSource;
 
         public delegate void TokenValidationEvent( MapboxTokenStatus response );
-        public static event TokenValidationEvent OnTokenValidation;
+        public event TokenValidationEvent OnTokenValidation;
 
         static MapboxAccess _instance;
 

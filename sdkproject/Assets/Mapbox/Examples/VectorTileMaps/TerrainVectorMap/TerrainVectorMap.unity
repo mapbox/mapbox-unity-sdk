@@ -417,7 +417,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1393483683185582, guid: b95c449128f3b44bca8b83258c669aa5, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b95c449128f3b44bca8b83258c669aa5, type: 2}
@@ -522,7 +522,7 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0.38923272
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -552,7 +552,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -163.72852
+      value: -71.7764
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -562,12 +562,39 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 307.45703
+      value: 123.5528
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 327.45703
+      value: 143.5528
+      objectReference: {fileID: 0}
+    - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_SizeDelta.x
+      value: -17
+      objectReference: {fileID: 0}
+    - target: {fileID: 114603753021256032, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_Text
+      value: '<b>Vector Data on Top of 3D Terrain</b>
+
+
+        This is a vector tile map with terrain data turned on (we use a separate terrain
+        factory and then we snap vector tile features to the extruded terrain mesh).
+        Mapbox has worldwide terrain data coverage. You can also use terrain data
+        with raster tiles to superimpose satellite imagery over the elevation data
+        to create real world elevation models. '
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 98be219873e6d4dffb5949746f515a33, type: 2}
@@ -712,7 +739,7 @@ Prefab:
     - target: {fileID: 224178813210018432, guid: 00f5bf1ff996842fc82384f8f686fda6,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -20.666668
+      value: -18.5
       objectReference: {fileID: 0}
     - target: {fileID: 224178813210018432, guid: 00f5bf1ff996842fc82384f8f686fda6,
         type: 2}
@@ -722,7 +749,7 @@ Prefab:
     - target: {fileID: 224178813210018432, guid: 00f5bf1ff996842fc82384f8f686fda6,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 27.333334
+      value: 23
       objectReference: {fileID: 0}
     - target: {fileID: 224538534500426518, guid: 00f5bf1ff996842fc82384f8f686fda6,
         type: 2}
@@ -742,7 +769,7 @@ Prefab:
     - target: {fileID: 224538534500426518, guid: 00f5bf1ff996842fc82384f8f686fda6,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -52.000004
+      value: -45.5
       objectReference: {fileID: 0}
     - target: {fileID: 224538534500426518, guid: 00f5bf1ff996842fc82384f8f686fda6,
         type: 2}
@@ -752,7 +779,7 @@ Prefab:
     - target: {fileID: 224538534500426518, guid: 00f5bf1ff996842fc82384f8f686fda6,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 27.333334
+      value: 23
       objectReference: {fileID: 0}
     - target: {fileID: 224930050147336736, guid: 00f5bf1ff996842fc82384f8f686fda6,
         type: 2}
