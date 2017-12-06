@@ -52,8 +52,10 @@ namespace Mapbox.Unity.Utilities.DebugTools
                 //todo text
                 TextAsset text = null;
 
+                SceneData scene = new SceneData { Name = name, ScenePath = scenePath, Image = image, Text = text };
+                AssetDatabase.AddObjectToAsset(scene, list);
+                list.SceneList[i] = scene;
 
-                list.SceneList[i] = new SceneData { Name = name, ScenePath = scenePath, Image = image, Text = text };
 
             }
 
