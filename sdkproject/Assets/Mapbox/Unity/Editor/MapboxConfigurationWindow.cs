@@ -2,10 +2,12 @@ namespace Mapbox.Editor
 {
 	using System.Collections.Generic;
 	using UnityEngine;
+    using UnityEditor.SceneManagement;
 	using UnityEditor;
 	using System.IO;
 	using System.Collections;
 	using Mapbox.Unity;
+    using Mapbox.Tokens;
 	using Mapbox.Json;
 	using Mapbox.Unity.Utilities;
     using Mapbox.Unity.Utilities.DebugTools;
@@ -14,24 +16,29 @@ namespace Mapbox.Editor
 
 	public class MapboxConfigurationWindow : EditorWindow
 	{
+        //default mapboxconfig
 		static string _configurationFile;
-		static MapboxConfiguration _mapboxConfiguration;
-		static string _accessToken;
+        static string _accessToken = "";
 		[Range(0, 1000)]
 		static int _memoryCacheSize = 500;
 		[Range(0, 3000)]
 		static int _mbtilesCacheSize = 2000;
 		static int _webRequestTimeout = 10;
 
-		bool _justOpened = true;
-		string _validationCode = "";
+        static MapboxTokenStatus _currentTokenStatus;
+
 		bool _validating = false;
         string _lastValidatedToken;
 		bool _showConfigurationFoldout;
         bool _showChangelogFoldout;
 		Vector2 _scrollPosition;
-		bool _isTokenValid;
+        int _selectedSample;
 
+        //samples
+        static ScenesList _sceneList;
+        static GUIContent[] _sampleContent;
+
+        //styles
         GUISkin _skin;
         Color _defaultContentColor;
         Color _defaultBackgroundColor;
@@ -58,6 +65,8 @@ namespace Mapbox.Editor
         GUIStyle _horizontalGroup;
         GUIStyle _scrollViewStyle;
 
+        GUIStyle _sampleButtonStyle;
+
 		[DidReloadScripts]
 		static void ShowWindowOnImport()
 		{
@@ -73,25 +82,41 @@ namespace Mapbox.Editor
 		static void Init()
 		{
 			Runnable.EnableRunnableInEditor();
-			_configurationFile = Path.Combine(Unity.Constants.Path.MAPBOX_RESOURCES_ABSOLUTE, Unity.Constants.Path.CONFIG_FILE);
 
-			if (!Directory.Exists(Unity.Constants.Path.MAPBOX_RESOURCES_ABSOLUTE))
-			{
-				Directory.CreateDirectory(Unity.Constants.Path.MAPBOX_RESOURCES_ABSOLUTE);
-			}
-			if (!File.Exists(_configurationFile))
-			{
-				var json = JsonUtility.ToJson(new MapboxConfiguration { AccessToken = "", MemoryCacheSize = (uint)_memoryCacheSize, MbTilesCacheSize = (uint)_mbtilesCacheSize, DefaultTimeout = _webRequestTimeout });
-				File.WriteAllText(_configurationFile, json);
-			}
+            _configurationFile = Path.Combine(Unity.Constants.Path.MAPBOX_RESOURCES_ABSOLUTE, Unity.Constants.Path.CONFIG_FILE);
+            if (!Directory.Exists(Unity.Constants.Path.MAPBOX_RESOURCES_ABSOLUTE))
+            {
+                Directory.CreateDirectory(Unity.Constants.Path.MAPBOX_RESOURCES_ABSOLUTE);
+            }
+            if (!File.Exists(_configurationFile))
+            {
+                var mapboxConfiguration = new MapboxConfiguration { AccessToken = _accessToken, MemoryCacheSize = (uint)_memoryCacheSize, MbTilesCacheSize = (uint)_mbtilesCacheSize, DefaultTimeout = _webRequestTimeout };
+                var json = JsonUtility.ToJson(mapboxConfiguration);
+                File.WriteAllText(_configurationFile, json);
 
-			var configurationJson = File.ReadAllText(_configurationFile);
-			_mapboxConfiguration = JsonUtility.FromJson<MapboxConfiguration>(configurationJson);
+                MapboxAccess.Instance.SetConfiguration(mapboxConfiguration);
+            }
 
-			_accessToken = _mapboxConfiguration.AccessToken;
-			_memoryCacheSize = (int)_mapboxConfiguration.MemoryCacheSize;
-			_mbtilesCacheSize = (int)_mapboxConfiguration.MbTilesCacheSize;
-			_webRequestTimeout = _mapboxConfiguration.DefaultTimeout;
+            _accessToken = MapboxAccess.Instance.Configuration.AccessToken;
+            _memoryCacheSize = (int)MapboxAccess.Instance.Configuration.MemoryCacheSize;
+            _mbtilesCacheSize = (int)MapboxAccess.Instance.Configuration.MbTilesCacheSize;
+            _webRequestTimeout = (int)MapboxAccess.Instance.Configuration.DefaultTimeout;
+
+            //cache sample scene gui content
+            NavigationBuilder.AddExampleScenesToBuildSettings();
+            _sceneList = ((ScenesList)AssetDatabase.LoadAssetAtPath("Assets/Resources/Mapbox/ScenesList.asset", typeof(ScenesList)));
+
+            //exclude scenes with no image data
+            var content = new List<SceneData>();
+            for (int i = 0; i < _sceneList.SceneList.Length; i++)
+            {
+                if (_sceneList.SceneList[i].Image != null) content.Add(_sceneList.SceneList[i]);
+            }
+            _sampleContent = new GUIContent[content.Count];
+            for (int i = 0; i < _sampleContent.Length; i++)
+            {
+                _sampleContent[i] = new GUIContent(content[i].Name, content[i].Image, content[i].ScenePath);
+            }
 
 			var editorWindow = GetWindow(typeof(MapboxConfigurationWindow));
 			editorWindow.minSize = new Vector2(600, 200);
@@ -99,28 +124,68 @@ namespace Mapbox.Editor
 			editorWindow.Show();
 		}
 
-        private void OnDestroy() { AssetDatabase.Refresh(); }
 
-		private void OnDisable() { AssetDatabase.Refresh(); }
+        /// <summary>
+        /// Unity Events
+        /// </summary>
+        private void OnEnable()
+        {
+            MapboxAccess.OnTokenValidation += HandleValidationResponse;
+            if (!string.IsNullOrEmpty(_accessToken))
+            {
+                SubmitConfiguration();
+            }
+
+        }
+
+		private void OnDisable() 
+        {
+            MapboxAccess.OnTokenValidation -= HandleValidationResponse;
+
+            //reset any unsaved changes
+            _accessToken = MapboxAccess.Instance.Configuration.AccessToken;
+            _memoryCacheSize = (int)MapboxAccess.Instance.Configuration.MemoryCacheSize;
+            _mbtilesCacheSize = (int)MapboxAccess.Instance.Configuration.MbTilesCacheSize;
+            _webRequestTimeout = (int)MapboxAccess.Instance.Configuration.DefaultTimeout;
+
+            _selectedSample = -1;
+
+            AssetDatabase.Refresh(); 
+        }
+
+        private void OnDestroy() { AssetDatabase.Refresh(); }
 
 		private void OnLostFocus() { AssetDatabase.Refresh(); }
 
-		void Update()
-		{
-			if (_justOpened && !string.IsNullOrEmpty(_accessToken))
-			{
-				Runnable.Run(ValidateToken(_accessToken));
-				_justOpened = false;
-			}
-		}
+
+        /// <summary>
+        /// Mapbox access
+        /// </summary>
+        private void SubmitConfiguration()
+        {
+            var mapboxConfiguration = new MapboxConfiguration { AccessToken = _accessToken, MemoryCacheSize = (uint)_memoryCacheSize, MbTilesCacheSize = (uint)_mbtilesCacheSize, DefaultTimeout = _webRequestTimeout };
+            MapboxAccess.Instance.SetConfiguration(mapboxConfiguration);
+            _validating = true;
+        }
+
+        private void HandleValidationResponse(MapboxTokenStatus status)
+        {
+            _currentTokenStatus = status;
+            _validating = false;
+            _lastValidatedToken = _accessToken;
+
+            //save the config
+            var json = JsonUtility.ToJson(MapboxAccess.Instance.Configuration);
+            File.WriteAllText(_configurationFile, json);
+        }
+
+
 
 		void OnGUI()
 		{
             InitStyles();
 
 			_scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition,_scrollViewStyle);
-            //EditorGUIUtility.labelWidth = 200f;
-
             EditorGUILayout.BeginVertical(_verticalGroup);
             // Access token link.
             DrawAccessTokenLink();
@@ -131,17 +196,16 @@ namespace Mapbox.Editor
             EditorGUILayout.EndVertical();
 
             EditorGUILayout.BeginVertical(_verticalGroup);
-            //changelog
+            // Changelog
             DrawChangelog();
-			// Configuration.
+			// Configuration
 			DrawConfigurationSettings();
             EditorGUILayout.EndVertical();
 
             EditorGUILayout.BeginVertical(_verticalGroup);
-			// Examples.
-			//DrawExampleLinks();
+			// Examples
+			DrawExampleLinks();
             EditorGUILayout.EndVertical();
-
 			EditorGUILayout.EndScrollView();
 		}
 
@@ -173,12 +237,14 @@ namespace Mapbox.Editor
             _validButtonStyle.padding = new RectOffset(0, 0, 0, 0);
             _validButtonStyle.border = new RectOffset(0, 0, 5, -2);
             _validButtonStyle.fixedWidth = 60;
+
             _validContentColor = new Color(1, 1, 1, .7f);
             _validBackgroundColor = new Color(.2f, .8f, .2f, 1);
-
             _invalidContentColor = new Color(1, 1, 1, .7f);
             _invalidBackgroundColor = new Color(.8f, .2f, .2f, 1);
+
             _errorStyle = new GUIStyle(GUI.skin.FindStyle("ErrorLabel"));
+            _errorStyle.padding.left = 5;
 
             _verticalGroup = new GUIStyle();
             _verticalGroup.margin = new RectOffset(0, 0, 0, 30);
@@ -186,13 +252,17 @@ namespace Mapbox.Editor
             _horizontalGroup.padding = new RectOffset(0, 0, 4, 0);
             _scrollViewStyle = new GUIStyle(GUI.skin.FindStyle("scrollview"));
             _scrollViewStyle.padding = new RectOffset(20, 20, 40, 0);
+
+            _sampleButtonStyle = new GUIStyle(GUI.skin.FindStyle("button"));
+            _sampleButtonStyle.imagePosition = ImagePosition.ImageAbove;
+            _sampleButtonStyle.padding = new RectOffset(0, 0, 5, 15);
+            _sampleButtonStyle.fontStyle = FontStyle.Bold;
         }
 
 		void DrawAccessTokenLink()
 		{
 
             EditorGUILayout.LabelField("Access Token", _titleStyle);
-
 
             EditorGUILayout.BeginHorizontal(_horizontalGroup);
 			if (string.IsNullOrEmpty(_accessToken))
@@ -245,6 +315,7 @@ namespace Mapbox.Editor
 		{
 			EditorGUILayout.BeginHorizontal(_horizontalGroup);
 
+            //_accessToken is empty
             if( string.IsNullOrEmpty(_accessToken)){
                 _accessToken = EditorGUILayout.TextField("", _accessToken, _textFieldStyle);
                 EditorGUI.BeginDisabledGroup(true);
@@ -253,32 +324,31 @@ namespace Mapbox.Editor
             }
             else
 			{
-                //string input, validating
-				if (_validating)
+                //_accessToken is being validated
+                if (_validating)
 				{
-                    _accessToken = EditorGUILayout.TextField("", _accessToken, _textFieldStyle);
 					EditorGUI.BeginDisabledGroup(true);
+                    _accessToken = EditorGUILayout.TextField("", _accessToken, _textFieldStyle);
 					GUILayout.Button("Checking", _submitButtonStyle);
 					EditorGUI.EndDisabledGroup();
-
 				}
-                //string input, input is the same as the already validated token
+                //_accessToken is the same as the already submitted token
                 else if(string.Equals(_lastValidatedToken, _accessToken))
                 {
-                    if (string.Equals(_validationCode, "TokenValid"))
+                    //valid token
+                    if (_currentTokenStatus == MapboxTokenStatus.TokenValid)
                     {
                         GUI.backgroundColor = _validBackgroundColor;
                         GUI.contentColor = _validContentColor;
 
                         _accessToken = EditorGUILayout.TextField("", _accessToken, _textFieldStyle);
                         GUILayout.Button("Valid", _validButtonStyle);
-                        _isTokenValid = true;
 
-                        //restore default colors;
                         GUI.contentColor = _defaultContentColor;
                         GUI.backgroundColor = _defaultBackgroundColor;
 
                     }
+                    //invalid token
                     else
                     {
 
@@ -287,30 +357,26 @@ namespace Mapbox.Editor
 
                         _accessToken = EditorGUILayout.TextField("", _accessToken, _textFieldStyle);
                         GUILayout.Button("Invalid", _validButtonStyle);
-                        _isTokenValid = false;
 
-                        //restore default colors;
                         GUI.contentColor = _defaultContentColor;
                         GUI.backgroundColor = _defaultBackgroundColor;
 
                     }
-
+                    //Submit button
                     if (GUILayout.Button("Submit", _submitButtonStyle))
                     {
-                        Debug.Log("MapboxConfigurationWindow: " + "?");
-                        Runnable.Run(ValidateToken(_accessToken));
+                        SubmitConfiguration();
                     }
 
                 }
-                //a token has been sent, but the current input doesn't match it.
+                //_accessToken is a new, unsubmitted token.
                 else
                 {
                     _accessToken = EditorGUILayout.TextField("", _accessToken, _textFieldStyle);
                     
                     if (GUILayout.Button("Submit", _submitButtonStyle))
                     {
-                        Debug.Log("MapboxConfigurationWindow: " + "?");
-                        Runnable.Run(ValidateToken(_accessToken));
+                        SubmitConfiguration();
                     }
                 }
             }
@@ -322,11 +388,13 @@ namespace Mapbox.Editor
         void DrawError()
         {
             //draw the error message, if one exists
-            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.BeginHorizontal(_horizontalGroup);
 
-            if (!_isTokenValid && string.Equals(_lastValidatedToken, _accessToken) && !_validating)
+            if (_currentTokenStatus != MapboxTokenStatus.TokenValid
+                && string.Equals(_lastValidatedToken, _accessToken) 
+                && !_validating)
             {
-                EditorGUILayout.LabelField(_validationCode, _errorStyle);
+                EditorGUILayout.LabelField(_currentTokenStatus.ToString(), _errorStyle);
             }
             else
             {
@@ -344,7 +412,6 @@ namespace Mapbox.Editor
 
 		void DrawConfigurationSettings()
 		{
-
 			_showConfigurationFoldout = EditorGUILayout.Foldout(_showConfigurationFoldout, "Configuration", true);
 
 			if (_showConfigurationFoldout)
@@ -353,84 +420,49 @@ namespace Mapbox.Editor
 				_memoryCacheSize = EditorGUILayout.IntSlider("Mem Cache Size (# of tiles)", _memoryCacheSize, 0, 1000);
 				_mbtilesCacheSize = EditorGUILayout.IntSlider("MBTiles Cache Size (# of tiles)", _mbtilesCacheSize, 0, 3000);
 				_webRequestTimeout = EditorGUILayout.IntField("Default Web Request Timeout (s)", _webRequestTimeout);
+
+                EditorGUILayout.BeginHorizontal(_horizontalGroup);
+                GUILayout.Space(35f);
+                if (GUILayout.Button("Save"))
+                {
+                    SubmitConfiguration();
+                }
+                EditorGUILayout.EndHorizontal();
 			}
 
 		}
 
 		void DrawExampleLinks()
 		{
+            EditorGUI.BeginDisabledGroup(_currentTokenStatus != MapboxTokenStatus.TokenValid);
+
+            if (_currentTokenStatus == MapboxTokenStatus.TokenValid)
+            {
+                EditorGUILayout.LabelField("Sample Scenes", _titleStyle);
+            }
+            else
+            {
+                EditorGUILayout.LabelField("Sample Scenes", "Paste your mapbox access token to get started", _titleStyle);
+            }
+
+
             int rowCount = 2;
-
-            NavigationBuilder.AddExampleScenesToBuildSettings();
-            ScenesList list = (ScenesList)AssetDatabase.LoadAssetAtPath("Assets/Resources/Mapbox/ScenesList.asset", typeof(ScenesList));
-
-			EditorGUI.BeginDisabledGroup(!_isTokenValid);
             EditorGUILayout.BeginHorizontal(_horizontalGroup);
 
-            int currentRow = 0;
-            foreach( var scene in list.SceneList)
+            _selectedSample = GUILayout.SelectionGrid(-1, _sampleContent, rowCount, _sampleButtonStyle);
+
+            if(_selectedSample != -1)
             {
-                GUILayout.Button(scene);
+                var scenePath = _sampleContent[_selectedSample].tooltip;
+                EditorSceneManager.OpenScene(scenePath);
+                EditorApplication.isPlaying = true;
 
-                currentRow++;
-                if (currentRow < rowCount)
-                {
-                    currentRow = 0;
-                    EditorGUILayout.EndHorizontal();
-                    EditorGUILayout.BeginHorizontal(_horizontalGroup);
-                }
-
+                var editorWindow = GetWindow(typeof(MapboxConfigurationWindow));
+                editorWindow.Close();
             }
 
             EditorGUILayout.EndHorizontal();
 			EditorGUI.EndDisabledGroup();
-		}
-
-		IEnumerator ValidateToken(string token)
-		{
-			_validating = true;
-            _lastValidatedToken = token;
-
-			var www = new WWW(Utils.Constants.BaseAPI + "tokens/v2?access_token=" + token);
-			while (!www.isDone)
-			{
-				yield return 0;
-			}
-			var json = www.text;
-			if (!string.IsNullOrEmpty(json))
-			{
-				ParseTokenResponse(json);
-			}
-			_validating = false;
-		}
-
-		void ParseTokenResponse(string json)
-		{
-			var dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
-			if (dict.ContainsKey("code"))
-			{
-				_validationCode = dict["code"].ToString();
-			}
-
-			SaveConfiguration();
-		}
-
-		void SaveConfiguration()
-		{
-			var configuration = new MapboxConfiguration
-			{
-				AccessToken = _accessToken,
-				MemoryCacheSize = (uint)_memoryCacheSize,
-				MbTilesCacheSize = (uint)_mbtilesCacheSize,
-				DefaultTimeout = _webRequestTimeout,
-			};
-
-			var json = JsonUtility.ToJson(configuration);
-			File.WriteAllText(_configurationFile, json);
-			AssetDatabase.Refresh();
-			Repaint();
-
-			MapboxAccess.Instance.SetConfiguration(configuration);
 		}
 
 		static bool ShouldShowConfigurationWindow()

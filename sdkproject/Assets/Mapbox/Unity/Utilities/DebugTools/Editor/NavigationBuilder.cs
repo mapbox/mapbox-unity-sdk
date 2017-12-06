@@ -2,10 +2,11 @@ namespace Mapbox.Unity.Utilities.DebugTools
 {
 	using UnityEngine;
 	using UnityEditor;
+    using System.IO;
+    using System.Collections.Generic;
 
 	public static class NavigationBuilder
 	{
-		[MenuItem("Mapbox/AddExamplesScenesToBuildSettings")]
 		public static void AddExampleScenesToBuildSettings()
 		{
 			var allScenes = PathHelpers.AllScenes;
@@ -17,12 +18,12 @@ namespace Mapbox.Unity.Utilities.DebugTools
 
 			for (int i = 0; i < allScenes.Count; i++)
 			{
-				var sceneToAdd = new EditorBuildSettingsScene(allScenes[i], true);
+				EditorBuildSettingsScene sceneToAdd = new EditorBuildSettingsScene(allScenes[i], true);
+                sceneToAdd.enabled = false;
 				buildScenes[i + 1] = sceneToAdd;
 			}
 
 			EditorBuildSettings.scenes = buildScenes;
-
 			SaveSceneList();
 		}
 
@@ -36,11 +37,25 @@ namespace Mapbox.Unity.Utilities.DebugTools
 			}
 
 			var scenes = EditorBuildSettings.scenes;
-			list.SceneList = new string[scenes.Length - 1];
-			for (int i = 0; i < scenes.Length - 1; ++i)
-			{
-				list.SceneList[i] = scenes[i + 1].path;
-			}
+			list.SceneList = new SceneData[scenes.Length - 1];
+            for (int i = 0; i < scenes.Length - 1; ++i)
+            {
+                string scenePath = scenes[i + 1].path;
+                string name = Path.GetFileNameWithoutExtension(scenePath);
+                string imagePath = Directory.GetParent(scenePath) + "/Screenshots/"+ name + ".png";
+                Texture2D image = null;
+                if (File.Exists(imagePath))
+                {
+                    image = (Texture2D)AssetDatabase.LoadAssetAtPath(imagePath, typeof(Texture2D));
+                }
+
+                //todo text
+                TextAsset text = null;
+
+
+                list.SceneList[i] = new SceneData { Name = name, ScenePath = scenePath, Image = image, Text = text };
+
+            }
 
 			EditorUtility.SetDirty(list);
 			AssetDatabase.SaveAssets();
