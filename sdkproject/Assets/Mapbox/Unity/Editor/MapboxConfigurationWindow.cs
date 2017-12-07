@@ -114,13 +114,16 @@ namespace Mapbox.Editor
 
 			//exclude scenes with no image data
 			var content = new List<SceneData>();
-			for (int i = 0; i < _sceneList.SceneList.Length; i++)
+			if (_sceneList != null)
 			{
-				if (File.Exists(_sceneList.SceneList[i].ScenePath))
+				for (int i = 0; i < _sceneList.SceneList.Length; i++)
 				{
-					if (_sceneList.SceneList[i].Image != null)
+					if (File.Exists(_sceneList.SceneList[i].ScenePath))
 					{
-						content.Add(_sceneList.SceneList[i]);
+						if (_sceneList.SceneList[i].Image != null)
+						{
+							content.Add(_sceneList.SceneList[i]);
+						}
 					}
 				}
 			}
