@@ -90,12 +90,12 @@ namespace Mapbox.Editor
 			}
 			if (!File.Exists(_configurationFile))
 			{
-				var mapboxConfiguration = new MapboxConfiguration 
-				{ 
-					AccessToken = _accessToken, 
-					MemoryCacheSize = (uint)_memoryCacheSize, 
-					MbTilesCacheSize = (uint)_mbtilesCacheSize, 
-					DefaultTimeout = _webRequestTimeout 
+				var mapboxConfiguration = new MapboxConfiguration
+				{
+					AccessToken = _accessToken,
+					MemoryCacheSize = (uint)_memoryCacheSize,
+					MbTilesCacheSize = (uint)_mbtilesCacheSize,
+					DefaultTimeout = _webRequestTimeout
 				};
 				var json = JsonUtility.ToJson(mapboxConfiguration);
 				File.WriteAllText(_configurationFile, json);
@@ -109,14 +109,17 @@ namespace Mapbox.Editor
 			_webRequestTimeout = (int)MapboxAccess.Instance.Configuration.DefaultTimeout;
 
 			//cache sample scene gui content
-			NavigationBuilder.AddExampleScenesToBuildSettings();
+			//NavigationBuilder.AddExampleScenesToBuildSettings();
 			_sceneList = ((ScenesList)AssetDatabase.LoadAssetAtPath("Assets/Resources/Mapbox/ScenesList.asset", typeof(ScenesList)));
 
 			//exclude scenes with no image data
 			var content = new List<SceneData>();
 			for (int i = 0; i < _sceneList.SceneList.Length; i++)
 			{
-				if (_sceneList.SceneList[i].Image != null) content.Add(_sceneList.SceneList[i]);
+				if (_sceneList.SceneList[i].Image != null)
+				{
+					content.Add(_sceneList.SceneList[i]);
+				}
 			}
 			_sampleContent = new GUIContent[content.Count];
 			for (int i = 0; i < _sampleContent.Length; i++)
@@ -125,7 +128,7 @@ namespace Mapbox.Editor
 			}
 
 			var editorWindow = GetWindow(typeof(MapboxConfigurationWindow));
-			editorWindow.minSize = new Vector2(600, 200);
+			editorWindow.minSize = new Vector2(800, 350);
 			editorWindow.titleContent = new GUIContent("Mapbox Setup");
 			editorWindow.Show();
 		}
@@ -170,7 +173,12 @@ namespace Mapbox.Editor
 		private void SubmitConfiguration()
 		{
 			var mapboxConfiguration = new MapboxConfiguration
-			{ AccessToken = _accessToken, MemoryCacheSize = (uint)_memoryCacheSize, MbTilesCacheSize = (uint)_mbtilesCacheSize, DefaultTimeout = _webRequestTimeout };
+			{
+				AccessToken = _accessToken,
+				MemoryCacheSize = (uint)_memoryCacheSize,
+				MbTilesCacheSize = (uint)_mbtilesCacheSize,
+				DefaultTimeout = _webRequestTimeout
+			};
 			MapboxAccess.Instance.SetConfiguration(mapboxConfiguration);
 			_validating = true;
 		}
@@ -207,6 +215,7 @@ namespace Mapbox.Editor
 			DrawChangelog();
 			// Configuration
 			DrawConfigurationSettings();
+
 			EditorGUILayout.EndVertical();
 
 			EditorGUILayout.BeginVertical(_verticalGroup);
@@ -424,6 +433,7 @@ namespace Mapbox.Editor
 
 			if (_showConfigurationFoldout)
 			{
+				EditorGUIUtility.labelWidth = 240f;
 				EditorGUI.indentLevel = 2;
 				_memoryCacheSize = EditorGUILayout.IntSlider("Mem Cache Size (# of tiles)", _memoryCacheSize, 0, 1000);
 				_mbtilesCacheSize = EditorGUILayout.IntSlider("MBTiles Cache Size (# of tiles)", _mbtilesCacheSize, 0, 3000);
@@ -435,6 +445,8 @@ namespace Mapbox.Editor
 				{
 					SubmitConfiguration();
 				}
+				EditorGUI.indentLevel = 0;
+				EditorGUIUtility.labelWidth = 0f;
 				EditorGUILayout.EndHorizontal();
 			}
 
