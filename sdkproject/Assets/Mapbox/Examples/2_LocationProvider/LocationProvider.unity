@@ -118,7 +118,6 @@ GameObject:
   - component: {fileID: 114606472}
   - component: {fileID: 114606471}
   - component: {fileID: 114606473}
-  - component: {fileID: 114606475}
   - component: {fileID: 114606476}
   - component: {fileID: 114606477}
   - component: {fileID: 114606474}
@@ -185,23 +184,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShadowDistance: 500
---- !u!114 &114606475
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 114606470}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76a256726e16d4966a3f30b97a17e1d5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _mapInstance: {fileID: 0}
-  OnTileError:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: Mapbox.Unity.Map.TileErrorEvent, Assembly-CSharp, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
 --- !u!114 &114606476
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1282,7 +1264,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -90.6989
+      value: -99.84669
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1292,12 +1274,12 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 161.3978
+      value: 179.69337
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 181.3978
+      value: 199.69337
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
