@@ -24,11 +24,20 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField]
 		Material _material;
 
+		[SerializeField]
+		float _directionsLineWidth;
+
 		private Directions _directions;
 		private int _counter;
 
+		GameObject _directionsGO;
+
 		void Awake()
 		{
+			if (_map == null)
+			{
+				_map = FindObjectOfType<AbstractMap>();
+			}
 			_directions = MapboxAccess.Instance.Directions;
 			_map.OnInitialized += Query;
 		}
@@ -40,7 +49,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		void Query()
 		{
-			_map.OnInitialized -= Query;
 			var count = _waypoints.Length;
 			var wp = new Vector2d[count];
 			for (int i = 0; i < count; i++)
@@ -71,6 +79,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			foreach (MeshModifier mod in MeshModifiers.Where(x => x.Active))
 			{
+				var lineMod = mod as LineMeshModifier;
+				if (lineMod != null)
+				{
+					lineMod.Width = _directionsLineWidth / _map.WorldRelativeScale;
+				}
 				mod.Run(feat, meshData, _map.WorldRelativeScale);
 			}
 
@@ -79,8 +92,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		GameObject CreateGameObject(MeshData data)
 		{
-			var go = new GameObject("direction waypoint " + " entity");
-			var mesh = go.AddComponent<MeshFilter>().mesh;
+			if (_directionsGO != null)
+			{
+				Destroy(_directionsGO);
+			}
+			_directionsGO = new GameObject("direction waypoint " + " entity");
+			var mesh = _directionsGO.AddComponent<MeshFilter>().mesh;
 			mesh.subMeshCount = data.Triangles.Count;
 
 			mesh.SetVertices(data.Vertices);
@@ -99,8 +116,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 
 			mesh.RecalculateNormals();
-			go.AddComponent<MeshRenderer>().material = _material;
-			return go;
+			_directionsGO.AddComponent<MeshRenderer>().material = _material;
+			return _directionsGO;
 		}
 	}
 

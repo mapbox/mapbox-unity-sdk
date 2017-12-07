@@ -58,7 +58,7 @@ namespace Mapbox.Editor
 				if (_factory.Visualizers[i] == null)
 					EditorGUILayout.TextField("null");
 				else
-					EditorGUILayout.ObjectField(_factory.Visualizers[i], typeof(LayerVisualizerBase), false);
+					_factory.Visualizers[i] = (LayerVisualizerBase)EditorGUILayout.ObjectField(_factory.Visualizers[i], typeof(LayerVisualizerBase), false);
 				EditorGUILayout.EndHorizontal();
 				EditorGUILayout.EndVertical();
 

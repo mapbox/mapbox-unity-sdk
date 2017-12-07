@@ -1,73 +1,91 @@
 namespace Mapbox.Unity
 {
-	using UnityEngine;
-	using System;
-	using Mapbox.Geocoding;
-	using Mapbox.Directions;
-	using Mapbox.Platform;
-	using Mapbox.Platform.Cache;
-	using Mapbox.Unity.Telemetry;
-	using Mapbox.Map;
-	using Mapbox.MapMatching;
+    using UnityEngine;
+    using System;
+    using System.IO;
+    using Mapbox.Geocoding;
+    using Mapbox.Directions;
+    using Mapbox.Platform;
+    using Mapbox.Platform.Cache;
+    using Mapbox.Unity.Telemetry;
+    using Mapbox.Map;
+    using Mapbox.MapMatching;
+    using Mapbox.Tokens;
 
-	/// <summary>
-	/// Object for retrieving an API token and making http requests.
-	/// Contains a lazy <see cref="T:Mapbox.Geocoding.Geocoder">Geocoder</see> and a lazy <see cref="T:Mapbox.Directions.Directions">Directions</see> for convenience.
-	/// </summary>
-	public class MapboxAccess : IFileSource
-	{
-		ITelemetryLibrary _telemetryLibrary;
-		CachingWebFileSource _fileSource;
+    /// <summary>
+    /// Object for retrieving an API token and making http requests.
+    /// Contains a lazy <see cref="T:Mapbox.Geocoding.Geocoder">Geocoder</see> and a lazy <see cref="T:Mapbox.Directions.Directions">Directions</see> for convenience.
+    /// </summary>
+    public class MapboxAccess : IFileSource
+    {
+        ITelemetryLibrary _telemetryLibrary;
+        CachingWebFileSource _fileSource;
 
-		static MapboxAccess _instance;
+        public delegate void TokenValidationEvent( MapboxTokenStatus response );
+        public event TokenValidationEvent OnTokenValidation;
 
-		/// <summary>
-		/// The singleton instance.
-		/// </summary>
-		public static MapboxAccess Instance
-		{
-			get
-			{
-				if (_instance == null)
-				{
-					_instance = new MapboxAccess();
-				}
-				return _instance;
-			}
-		}
+        static MapboxAccess _instance;
+
+        /// <summary>
+        /// The singleton instance.
+        /// </summary>
+        public static MapboxAccess Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new MapboxAccess();
+                }
+                return _instance;
+            }
+        }
 
 
+        MapboxConfiguration _configuration;
 		/// <summary>
 		/// The Mapbox API access token. 
 		/// See <see href="https://www.mapbox.com/mapbox-unity-sdk/docs/01-mapbox-api-token.html">Mapbox API Congfiguration in Unity</see>.
 		/// </summary>
-		MapboxConfiguration _configuration;
 		public MapboxConfiguration Configuration
 		{
 			get
 			{
 				return _configuration;
 			}
-			private set
-			{
-				if (value == null)
-				{
-					throw new InvalidTokenException("Please configure your access token from the Mapbox menu!");
-				}
-				_configuration = value;
-			}
 		}
 
 		MapboxAccess()
 		{
 			LoadAccessToken();
-			ConfigureFileSource();
-			ConfigureTelemetry();
 		}
 
 		public void SetConfiguration(MapboxConfiguration configuration)
 		{
+			if (configuration == null)
+			{
+				Debug.LogError("Please configure your access token from the Mapbox menu!");
+				return;
+
+			}
+
+			TokenValidator.Retrieve(configuration.AccessToken, (response) =>
+			{
+                if (OnTokenValidation != null)
+                {
+                    OnTokenValidation(response.Status);
+                }
+
+				if (response.Status != MapboxTokenStatus.TokenValid)
+				{
+					Debug.LogError(response.Status.ToString());
+				}
+			});
+
 			_configuration = configuration;
+
+			ConfigureFileSource();
+			ConfigureTelemetry();
 		}
 
 		/// <summary>
@@ -88,11 +106,13 @@ namespace Mapbox.Unity
 		/// </summary>
 		private void LoadAccessToken()
 		{
+           
 			TextAsset configurationTextAsset = Resources.Load<TextAsset>(Constants.Path.MAPBOX_RESOURCES_RELATIVE);
+
 #if !WINDOWS_UWP
-			Configuration = configurationTextAsset == null ? null : JsonUtility.FromJson<MapboxConfiguration>(configurationTextAsset.text);
+			SetConfiguration(configurationTextAsset == null ? null : JsonUtility.FromJson<MapboxConfiguration>(configurationTextAsset.text));
 #else
-			Configuration = configurationTextAsset == null ? null : Mapbox.Json.JsonConvert.DeserializeObject<MapboxConfiguration>(configurationTextAsset.text);
+			SetConfiguration(configurationTextAsset == null ? null : Mapbox.Json.JsonConvert.DeserializeObject<MapboxConfiguration>(configurationTextAsset.text));
 #endif
 		}
 
@@ -110,17 +130,7 @@ namespace Mapbox.Unity
 
 		void ConfigureTelemetry()
 		{
-#if UNITY_EDITOR
-			_telemetryLibrary = TelemetryEditor.Instance;
-#elif UNITY_IOS
-			_telemetryLibrary = TelemetryIos.Instance;
-#elif UNITY_ANDROID
-			_telemetryLibrary = TelemetryAndroid.Instance;
-#else
-			_telemetryLibrary = TelemetryFallback.Instance;
-#endif
-
-
+			_telemetryLibrary = TelemetryFactory.GetTelemetryInstance();
 			_telemetryLibrary.Initialize(_configuration.AccessToken);
 			_telemetryLibrary.SetLocationCollectionState(GetTelemetryCollectionState());
 			_telemetryLibrary.SendTurnstile();
@@ -129,6 +139,7 @@ namespace Mapbox.Unity
 		public void SetLocationCollectionState(bool enable)
 		{
 			PlayerPrefs.SetInt(Constants.Path.SHOULD_COLLECT_LOCATION_KEY, (enable ? 1 : 0));
+			PlayerPrefs.Save();
 			_telemetryLibrary.SetLocationCollectionState(enable);
 		}
 
@@ -159,10 +170,10 @@ namespace Mapbox.Unity
 		}
 
 
+		Geocoder _geocoder;
 		/// <summary>
 		/// Lazy geocoder.
 		/// </summary>
-		Geocoder _geocoder;
 		public Geocoder Geocoder
 		{
 			get
@@ -176,10 +187,10 @@ namespace Mapbox.Unity
 		}
 
 
+		Directions _directions;
 		/// <summary>
 		/// Lazy Directions.
 		/// </summary>
-		Directions _directions;
 		public Directions Directions
 		{
 			get
@@ -192,10 +203,10 @@ namespace Mapbox.Unity
 			}
 		}
 
+		MapMatcher _mapMatcher;
 		/// <summary>
 		/// Lazy Map Matcher.
 		/// </summary>
-		MapMatcher _mapMatcher;
 		public MapMatcher MapMatcher
 		{
 			get
@@ -207,6 +218,24 @@ namespace Mapbox.Unity
 				return _mapMatcher;
 			}
 		}
+
+
+		MapboxTokenApi _tokenValidator;
+		/// <summary>
+		/// Lazy token validator.
+		/// </summary>
+		public MapboxTokenApi TokenValidator
+		{
+			get
+			{
+				if (_tokenValidator == null)
+				{
+					_tokenValidator = new MapboxTokenApi();
+				}
+				return _tokenValidator;
+			}
+		}
+
 
 		class InvalidTokenException : Exception
 		{

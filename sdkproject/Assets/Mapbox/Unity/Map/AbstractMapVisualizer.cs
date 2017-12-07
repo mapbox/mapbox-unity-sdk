@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Unity.Map
+namespace Mapbox.Unity.Map
 {
 	using System.Linq;
 	using System.Collections.Generic;
@@ -10,6 +10,13 @@
 	using Mapbox.Platform;
 	using UnityEngine.Serialization;
 
+	/// <summary>
+	/// Map Visualizer
+	/// Represents a map.Doesn’t contain much logic and at the moment, it creates requested tiles and relays them to the factories 
+	/// under itself.It has a caching mechanism to reuse tiles and does the tile positioning in unity world.
+	/// Later we’ll most likely keep track of map features here as well to allow devs to query for features easier 
+	/// (i.e.query all buildings x meters around any restaurant etc).
+	/// </summary>
 	public abstract class AbstractMapVisualizer : ScriptableObject
 	{
 		[SerializeField]
@@ -89,10 +96,22 @@
 				else
 				{
 					factory.Initialize(fileSource);
-					factory.OnFactoryStateChanged += UpdateState;
-					factory.OnTileError += Factory_OnTileError;
+					UnregisterEvents(factory);
+					RegisterEvents(factory);
 				}
 			}
+		}
+
+		private void RegisterEvents(AbstractTileFactory factory)
+		{
+			factory.OnFactoryStateChanged += UpdateState;
+			factory.OnTileError += Factory_OnTileError;
+		}
+
+		private void UnregisterEvents(AbstractTileFactory factory)
+		{
+			factory.OnFactoryStateChanged -= UpdateState;
+			factory.OnTileError -= Factory_OnTileError;
 		}
 
 		public virtual void Destroy()
@@ -102,9 +121,7 @@
 			{
 				if (Factories[i] != null)
 				{
-					Factories[i].OnFactoryStateChanged -= UpdateState;
-					Factories[i].OnTileError -= Factory_OnTileError;
-
+					UnregisterEvents(Factories[i]);
 				}
 			}
 

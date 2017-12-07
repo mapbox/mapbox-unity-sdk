@@ -175,7 +175,7 @@ MonoBehaviour:
   _autoFireEvent: 1
   _updateInterval: 0.1
   _sendEvent: 0
-  _latitudeLongitude: 37.7648, -122.463
+  _latitudeLongitude: 37.784179, -122.401583
   _targetTransform: {fileID: 0}
   _map: {fileID: 0}
 --- !u!114 &114131115543525190
@@ -194,7 +194,7 @@ MonoBehaviour:
   _updateInterval: 2
   _sendEvent: 0
   _latitudeLongitude:
-  - 37.7648, -122.463
+  - 37.784179, -122.401583
   - 37.8045, -122.2714
   - 37.2751, -121.8261
   _heading: 0
@@ -242,3 +242,4 @@ MonoBehaviour:
   _deviceLocationProvider: {fileID: 114304334187956690}
   _editorLocationProvider: {fileID: 114023304781792650}
   _transformLocationProvider: {fileID: 114958662040910602}
+  _dontDestroyOnLoad: 0

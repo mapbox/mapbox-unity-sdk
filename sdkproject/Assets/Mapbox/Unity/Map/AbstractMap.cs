@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Unity.Map
+namespace Mapbox.Unity.Map
 {
 	using System;
 	using Mapbox.Unity.Utilities;
@@ -6,7 +6,15 @@
 	using UnityEngine;
 	using Mapbox.Map;
 
-	[RequireComponent(typeof(TileErrorHandler))]
+	/// <summary>
+	/// Abstract Map (Basic Map etc)
+	/// This is one of the few monobehaviours we use in the system and used mainly to tie scene and map visualization object/system 
+	/// together.It’s a replacement for the application (or map controller class in a project) in our demos.
+	/// Ideally devs should have their own map initializations and tile call logic in their app and make calls to 
+	/// map visualization object from their own controllers directly. It can also be used as an interface for 
+	/// small projects or tests.
+	/// </summary>
+
 	public abstract class AbstractMap : MonoBehaviour, IMap
 	{
 		[SerializeField]
@@ -215,12 +223,12 @@
 			OnInitialized();
 		}
 
-		public Vector2d WorldToGeoPosition(Vector3 realworldPoint)
+		public virtual Vector2d WorldToGeoPosition(Vector3 realworldPoint)
 		{
 			return (_root.InverseTransformPoint(realworldPoint)).GetGeoPosition(CenterMercator, WorldRelativeScale);
 		}
 
-		public Vector3 GeoToWorldPosition(Vector2d latitudeLongitude)
+		public virtual Vector3 GeoToWorldPosition(Vector2d latitudeLongitude)
 		{
 			return _root.TransformPoint(Conversions.GeoToWorldPosition(latitudeLongitude, CenterMercator, WorldRelativeScale).ToVector3xz());
 		}

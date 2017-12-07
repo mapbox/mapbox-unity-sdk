@@ -1,0 +1,238 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c331d4375e95e4050aadbf5ed3492bba, type: 3}
+  m_Name: ScenesList
+  m_EditorClassIdentifier: 
+  SceneList:
+  - {fileID: 114234950995636982}
+  - {fileID: 114577583598118538}
+  - {fileID: 114443015395501402}
+  - {fileID: 114368844526670842}
+  - {fileID: 114770432536400638}
+  - {fileID: 114346558032739136}
+  - {fileID: 114966843800083544}
+  - {fileID: 114954219246223724}
+  - {fileID: 114170779400257010}
+  - {fileID: 114677647864613418}
+  - {fileID: 114002949290964614}
+  - {fileID: 114968859643046018}
+  - {fileID: 114347139229932450}
+  - {fileID: 114988580738870090}
+--- !u!114 &114002949290964614
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: ForwardGeocoder
+  m_EditorClassIdentifier: 
+  Name: ForwardGeocoder
+  ScenePath: Assets/Mapbox/Examples/7_Playground/Scenes/ForwardGeocoder.unity
+  Image: {fileID: 0}
+  Text: {fileID: 0}
+--- !u!114 &114170779400257010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: Globe
+  m_EditorClassIdentifier: 
+  Name: Globe
+  ScenePath: Assets/Mapbox/Examples/6_Globe/Globe.unity
+  Image: {fileID: 2800000, guid: 31ea88f94a559415194f73d9ae78c4bb, type: 3}
+  Text: {fileID: 0}
+--- !u!114 &114234950995636982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: Explorer
+  m_EditorClassIdentifier: 
+  Name: Explorer
+  ScenePath: Assets/Mapbox/Examples/1_Explorer/Explorer.unity
+  Image: {fileID: 2800000, guid: 1b7a3200c45d3425bbf8e891123932d8, type: 3}
+  Text: {fileID: 0}
+--- !u!114 &114346558032739136
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: PoiVectorMap
+  m_EditorClassIdentifier: 
+  Name: PoiVectorMap
+  ScenePath: Assets/Mapbox/Examples/4_VectorTileMaps/PoiVectorMap/PoiVectorMap.unity
+  Image: {fileID: 0}
+  Text: {fileID: 0}
+--- !u!114 &114347139229932450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: ReverseGeocoder
+  m_EditorClassIdentifier: 
+  Name: ReverseGeocoder
+  ScenePath: Assets/Mapbox/Examples/7_Playground/Scenes/ReverseGeocoder.unity
+  Image: {fileID: 0}
+  Text: {fileID: 0}
+--- !u!114 &114368844526670842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: BasicVectorMap
+  m_EditorClassIdentifier: 
+  Name: BasicVectorMap
+  ScenePath: Assets/Mapbox/Examples/4_VectorTileMaps/BasicVectorMap/BasicVectorMap.unity
+  Image: {fileID: 0}
+  Text: {fileID: 0}
+--- !u!114 &114443015395501402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: VoxelMap
+  m_EditorClassIdentifier: 
+  Name: VoxelMap
+  ScenePath: Assets/Mapbox/Examples/3_VoxelMap/VoxelMap.unity
+  Image: {fileID: 2800000, guid: 805ed9e7e2bcd4071bd22b135125a912, type: 3}
+  Text: {fileID: 0}
+--- !u!114 &114577583598118538
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: LocationProvider
+  m_EditorClassIdentifier: 
+  Name: LocationProvider
+  ScenePath: Assets/Mapbox/Examples/2_LocationProvider/LocationProvider.unity
+  Image: {fileID: 2800000, guid: c65dd79f6e0c34f64a3724e0b9e00a98, type: 3}
+  Text: {fileID: 0}
+--- !u!114 &114677647864613418
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: Directions
+  m_EditorClassIdentifier: 
+  Name: Directions
+  ScenePath: Assets/Mapbox/Examples/7_Playground/Scenes/Directions.unity
+  Image: {fileID: 0}
+  Text: {fileID: 0}
+--- !u!114 &114770432536400638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: InteractiveStyledVectorMap
+  m_EditorClassIdentifier: 
+  Name: InteractiveStyledVectorMap
+  ScenePath: Assets/Mapbox/Examples/4_VectorTileMaps/InteractiveStyledVectorMap/InteractiveStyledVectorMap.unity
+  Image: {fileID: 2800000, guid: a0ce019e4c221466795c7d0a97fea3dd, type: 3}
+  Text: {fileID: 0}
+--- !u!114 &114954219246223724
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: ZoomableMap
+  m_EditorClassIdentifier: 
+  Name: ZoomableMap
+  ScenePath: Assets/Mapbox/Examples/5_ZoomableMap/ZoomableMap.unity
+  Image: {fileID: 2800000, guid: f1321adbaa6e24299bb58ab33ad3adf9, type: 3}
+  Text: {fileID: 0}
+--- !u!114 &114966843800083544
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: TerrainVectorMap
+  m_EditorClassIdentifier: 
+  Name: TerrainVectorMap
+  ScenePath: Assets/Mapbox/Examples/4_VectorTileMaps/TerrainVectorMap/TerrainVectorMap.unity
+  Image: {fileID: 0}
+  Text: {fileID: 0}
+--- !u!114 &114968859643046018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: RasterTile
+  m_EditorClassIdentifier: 
+  Name: RasterTile
+  ScenePath: Assets/Mapbox/Examples/7_Playground/Scenes/RasterTile.unity
+  Image: {fileID: 0}
+  Text: {fileID: 0}
+--- !u!114 &114988580738870090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: VectorTile
+  m_EditorClassIdentifier: 
+  Name: VectorTile
+  ScenePath: Assets/Mapbox/Examples/7_Playground/Scenes/VectorTile.unity
+  Image: {fileID: 0}
+  Text: {fileID: 0}
