@@ -14,8 +14,26 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	}
 
 	/// <summary>
-	/// Modifier Stack creates a game object from a feature using given modifiers.
-	/// It runs mesh modifiers, creates the game object and then run the game object modifiers.
+	/// Modifier Stacks
+	/// Modifier Stack can be thought as styles as as they contain all the data/settings for how the feature will be visualized.
+	/// They also create the game objects in default implementations in the sdk.
+	/// Currently there's two implementations of this; Modifier Stack and Merged Modifier Stack.They work almost exactly same 
+	/// (logically) with one difference; modifier stacks creates a game object for each feature while merged modifier stack, 
+	/// merges them up as the name suggest and create one game object for multiple(as many as possible) features.Both have 
+	/// their advantages but the main factor here is the performance.Regular modifier stack creates individual game object so 
+	/// it's easier to interact, move, animate etc features.But if you want to visualize whole San Francisco, that would mean 
+	/// just 200k-300k buildings which would hit performance really hard. In such a case, especially if you don't need 
+	/// individual interaction or something, you can use merged modifier stack, which will probably be able to create whole 
+	/// SF around a few hundred game objects.
+	/// They contain two lists; mesh modifier list and game object modifier list.These modifiers are used to create and 
+	/// decorate game objects.
+	/// Mesh modifiers generate data required for the game objects mesh. I.e.polygon mesh modifier triangulates the polygn, 
+	/// height modifier extrudes the polygon and adds volume etc, uv modifier changes UV mapping etc.
+	/// Game object modifiers decorate created game objects, like settings material, interaction scripts, animations etc. 
+	/// i.e.Material modifier sets materials to mesh and submeshes, highlight modifier adds mouse highlight to features, 
+	/// feature behaviour adds a script to keep feature data on game objects etc.
+	/// So the idea here is; run all mesh modifiers first, generate all the data required for mesh.Create game object 
+	/// using that mesh data.Run all game object modifiers to decorate that game object.
 	/// </summary>
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Modifier Stack")]
 	public class ModifierStack : ModifierStackBase
@@ -62,14 +80,18 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				_counter = _activeObjects[tile].Count;
 				for (int i = 0; i < _counter; i++)
 				{
-					foreach (Transform tr in _activeObjects[tile][i].Transform)
+					foreach (var item in GoModifiers)
 					{
-						Destroy(tr.gameObject);
+						item.OnPoolItem(_activeObjects[tile][i]);
 					}
-					foreach (var item in _activeObjects[tile][i].GameObject.GetComponents<MonoBehaviour>())
-					{
-						Destroy(item);
-					}
+					//foreach (Transform tr in _activeObjects[tile][i].Transform)
+					//{
+					//	Destroy(tr.gameObject);
+					//}
+					//foreach (var item in _activeObjects[tile][i].GameObject.GetComponents<MonoBehaviour>())
+					//{
+					//	Destroy(item);
+					//}
 					_activeObjects[tile][i].GameObject.SetActive(false);
 					_pool.Put(_activeObjects[tile][i]);
 				}
@@ -163,7 +185,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_tempVectorEntity.Mesh.Clear();
 			_tempVectorEntity.Feature = feature;
 
+#if UNITY_EDITOR
 			_tempVectorEntity.GameObject.name = type + " - " + feature.Data.Id;
+#endif
 			_tempVectorEntity.Mesh.subMeshCount = meshData.Triangles.Count;
 			_tempVectorEntity.Mesh.SetVertices(meshData.Vertices);
 			_tempVectorEntity.Mesh.SetNormals(meshData.Normals);
