@@ -84,18 +84,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					{
 						item.OnPoolItem(_activeObjects[tile][i]);
 					}
-					//foreach (Transform tr in _activeObjects[tile][i].Transform)
-					//{
-					//	Destroy(tr.gameObject);
-					//}
-					//foreach (var item in _activeObjects[tile][i].GameObject.GetComponents<MonoBehaviour>())
-					//{
-					//	Destroy(item);
-					//}
 					_activeObjects[tile][i].GameObject.SetActive(false);
 					_pool.Put(_activeObjects[tile][i]);
 				}
 				_activeObjects[tile].Clear();
+
 				//pooling these lists as they'll reused anyway, saving hundreds of list instantiations
 				_listPool.Put(_activeObjects[tile]);
 				_activeObjects.Remove(tile);
