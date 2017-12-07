@@ -11,6 +11,9 @@ namespace Mapbox.Unity.MeshGeneration.Components
 		public Transform Transform;
 		public VectorFeatureUnity Data;
 
+		[Multiline(5)]
+		public string DataString;
+
 		public void ShowDebugData()
 		{
 			DataString = string.Join("\r\n", Data.Properties.Select(x => x.Key + " - " + x.Value.ToString()).ToArray());
@@ -30,17 +33,14 @@ namespace Mapbox.Unity.MeshGeneration.Components
 			}
 		}
 
-		internal void Initialize(VectorEntity ve)
+		public void Initialize(VectorEntity ve)
 		{
 			VectorEntity = ve;
 			Transform = transform;
 			Data = ve.Feature;
 		}
 
-		[Multiline(5)]
-		public string DataString;
-
-		public void Init(VectorFeatureUnity feature)
+		public void Initialize(VectorFeatureUnity feature)
 		{
 			Transform = transform;
 			Data = feature;

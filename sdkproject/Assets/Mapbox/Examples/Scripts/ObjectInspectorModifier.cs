@@ -5,14 +5,18 @@ namespace Mapbox.Examples
 	using Mapbox.Unity.MeshGeneration.Components;
 	using UnityEngine.UI;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
+	using System.Collections.Generic;
 
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Object Inspector Modifier")]
 	public class ObjectInspectorModifier : GameObjectModifier
 	{
+		private Dictionary<GameObject, FeatureSelectionDetector> _detectors;
 		private FeatureUiMarker _marker;
+		private FeatureSelectionDetector _tempDetector;
 
-		public override void Run(VectorEntity ve, UnityTile tile)
+		public override void Initialize()
 		{
+			_detectors = new Dictionary<GameObject, FeatureSelectionDetector>();
 			if (_marker == null)
 			{
 				Canvas canvas;
@@ -24,9 +28,20 @@ namespace Mapbox.Examples
 				sel.transform.SetParent(canvas.transform);
 				_marker = sel.GetComponent<FeatureUiMarker>();
 			}
+		}
 
-			var det = ve.GameObject.AddComponent<FeatureSelectionDetector>();
-			det.Initialize(_marker, ve);
+		public override void Run(VectorEntity ve, UnityTile tile)
+		{
+			if (_detectors.ContainsKey(ve.GameObject))
+			{
+				_detectors[ve.GameObject].Initialize(_marker, ve);
+			}
+			else
+			{
+				_tempDetector = ve.GameObject.AddComponent<FeatureSelectionDetector>();
+				_detectors.Add(ve.GameObject, _tempDetector);
+				_tempDetector.Initialize(_marker, ve);
+			}
 		}
 	}
 }
