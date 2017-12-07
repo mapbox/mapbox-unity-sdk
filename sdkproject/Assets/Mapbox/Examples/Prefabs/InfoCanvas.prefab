@@ -407,14 +407,16 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "<b>MapReload</b>\n\r\nThis example demonstrates new Initialize functionality
-    in AbstractMap and AbstractMapVisualizer. There is a ReloadMap component which
-    can Initialize a map with a latitude/longitude and zoom level whenever the UI
-    is refreshed (upon forward geocode search result or zoom slider changed). Additionally,
-    a new concrete implementation of AbstractMap, MapAtSpecificLocation, is used to
-    offset the map root position so that the precise latitude/longitude requested
-    is at world origin. This provides a consistent map view even as the zoom level
-    changes!\r\n\r\n"
+  m_Text: "<b>Explorer</b>\n\nThis is a master example that allows you to explore
+    Mapbox\u2019s location data and the Map Editor. You can see a variety of data
+    layers associated with Mapbox\u2019s vector tiles, including building data, points
+    of interest (POIs), roads, and real-time traffic data. Each map vector tile includes
+    high levels of detail about a particular location or building in GeoJSON format
+    that you can leverage for procedurally generating experiences or styling. You
+    can toggle these data layers on and off as needed in the Map Editor (access through
+    the Mapbox menu). \n\nMapbox has worldwide data coverage so you can create truly
+    global game levels, AR experiences, and apps. Search anywhere in the world to
+    explore the maps and location data you have available to you. "
 --- !u!114 &114699889412236512
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -522,7 +524,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 224907993215804030}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.8113092
+  m_Size: 0.73050255
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -621,7 +623,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.559}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.678}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -885,7 +887,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.000012785196}
+  m_AnchoredPosition: {x: 0, y: -0.0000038146973}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!224 &224907856650798614

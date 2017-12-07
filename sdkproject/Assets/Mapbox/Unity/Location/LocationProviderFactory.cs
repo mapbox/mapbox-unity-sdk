@@ -22,6 +22,9 @@ namespace Mapbox.Unity.Location
 		[SerializeField]
 		AbstractLocationProvider _transformLocationProvider;
 
+		[SerializeField]
+		bool _dontDestroyOnLoad;
+
 		/// <summary>
 		/// The singleton instance of this factory.
 		/// </summary>
@@ -114,7 +117,11 @@ namespace Mapbox.Unity.Location
 				return;
 			}
 			Instance = this;
-			DontDestroyOnLoad(gameObject);
+
+			if (_dontDestroyOnLoad)
+			{
+				DontDestroyOnLoad(gameObject);
+			}
 
 			InjectEditorLocationProvider();
 			InjectDeviceLocationProvider();

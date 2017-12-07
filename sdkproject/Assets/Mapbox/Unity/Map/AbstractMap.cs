@@ -15,7 +15,6 @@ namespace Mapbox.Unity.Map
 	/// small projects or tests.
 	/// </summary>
 
-  [RequireComponent(typeof(TileErrorHandler))]
 	public abstract class AbstractMap : MonoBehaviour, IMap
 	{
 		[SerializeField]
