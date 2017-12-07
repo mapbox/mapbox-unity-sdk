@@ -110,7 +110,7 @@ namespace Mapbox.Editor
 
 			//cache sample scene gui content
 			//NavigationBuilder.AddExampleScenesToBuildSettings();
-			_sceneList = ((ScenesList)AssetDatabase.LoadAssetAtPath("Assets/Resources/Mapbox/ScenesList.asset", typeof(ScenesList)));
+			_sceneList = Resources.Load<ScenesList>("Mapbox/ScenesList");
 
 			//exclude scenes with no image data
 			var content = new List<SceneData>();

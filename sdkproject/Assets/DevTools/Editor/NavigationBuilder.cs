@@ -31,7 +31,7 @@ namespace Mapbox.Unity.Utilities.DebugTools
 		static void SaveSceneList()
 		{
 			var list = ScriptableObject.CreateInstance<ScenesList>();
-			AssetDatabase.CreateAsset(list, "Assets/Resources/Mapbox/ScenesList.asset");
+			AssetDatabase.CreateAsset(list, Constants.Path.SCENELIST);
 
 			var scenes = EditorBuildSettings.scenes;
 			list.SceneList = new SceneData[scenes.Length - 1];
@@ -67,7 +67,7 @@ namespace Mapbox.Unity.Utilities.DebugTools
 		static void Verify(string path)
 		{
 			Debug.Log("NavigationBuilder: " + path);
-			var scenes = Resources.Load<ScenesList>("ScenesList").SceneList;
+			var scenes = Resources.Load<ScenesList>("Mapbox/ScenesList").SceneList;
 			foreach (var scene in scenes)
 			{
 				Debug.Log("NavigationBuilder: " + scene);

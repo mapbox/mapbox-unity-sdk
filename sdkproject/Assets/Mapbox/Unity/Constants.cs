@@ -9,6 +9,7 @@ namespace Mapbox.Unity
 		public static class Path
 		{
 			public const string CONFIG_FILE = "MapboxConfiguration.txt";
+			public const string SCENELIST = "Assets/Mapbox/Resources/Mapbox/ScenesList.asset";
 			public const string SHOULD_COLLECT_LOCATION_KEY = "MAPBOX_SHOULD_COLLECT_LOCATION";
 			public const string TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR_KEY = "MAPBOX_TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR";
 			public const string TELEMETRY_TURNSTILE_LAST_TICKS_FALLBACK_KEY = "MAPBOX_TELEMETRY_TURNSTILE_LAST_TICKS_FALLBACK";
