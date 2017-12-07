@@ -96,7 +96,7 @@ Visit [our API documentation](https://www.mapbox.com/api-documentation/#retrieve
 
 *MeshGeneration.unity*
 
-This example demonstates the basics of the Mapbox Unity SDK `MapVisualization` framework. Specifically, `TerrainFactory`, `MapImageFactory`, and `MeshFactory` are used together to generate a layered map.
+This example demonstates the basics of the Mapbox Maps SDK for Unity `MapVisualization` framework. Specifically, `TerrainFactory`, `MapImageFactory`, and `MeshFactory` are used together to generate a layered map.
 
 `MapController` acts as the entry point. Here, you can specify the map center (`LatLng`) and range. Range `X`, `Y`, `Z`, `W` corresponds to the number of tiles (`int`) for North, East, South, and West, respectively.
 
@@ -134,7 +134,7 @@ This example demonstrates how to use `TypeFilters` to filter specific features f
 
 *Drive.unity*
 
-This example demonstrates how to utilize [Mapbox Traffic](https://www.mapbox.com/vector-tiles/mapbox-traffic-v1/) and [Mapbox Directions](https://www.mapbox.com/api-documentation/#directions) data within the Mapbox Unity SDK `MapVisualization` framework.
+This example demonstrates how to utilize [Mapbox Traffic](https://www.mapbox.com/vector-tiles/mapbox-traffic-v1/) and [Mapbox Directions](https://www.mapbox.com/api-documentation/#directions) data within the Mapbox Maps SDK for Unity `MapVisualization` framework.
 
 `DirectionsHelper` is responsible for passing `Transform` positions to the `DirectionsFactory`, as waypoints, in the form of `Latitude/Longitude`.  You can use up to 25 waypoints. See `DriveDirectionFactory.asset` to analyze how the generated route is rendered.
 

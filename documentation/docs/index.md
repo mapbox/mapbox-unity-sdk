@@ -1,5 +1,5 @@
 ---
-title: Welcome to Mapbox Unity SDK documentation!
+title: Welcome to Mapbox Maps SDK for Unity documentation!
 documentType: index
 ---
 
@@ -12,13 +12,13 @@ footer{
 <div class="hero">
   <div class="wrap">
     <div class="text">
-       Mapbox Unity SDK
+       Mapbox Maps SDK for Unity
     </div>
     <div class="buttons-unit-small">
       <a class="version-link" href="docs/05-changelog.html">Version Notes</a><span>|</span><a class="github-link" href="https://github.com/mapbox/mapbox-unity-sdk">View in Github</a>
     </div>
     <div class="minitext">
-    The Mapbox Unity SDK is a C#-based wrapper for Mapbox&#39;s location APIs. It allows Unity developers<br> to easily access and interact with our Maps, Geocoding, and Directions services from within the Unity 3D platform.
+    The Mapbox Maps SDK for Unity is a C#-based wrapper for Mapbox&#39;s location APIs. It allows Unity developers<br> to easily access and interact with our Maps, Geocoding, and Directions services from within the Unity 3D platform.
     </div>
     <div class="buttons-unit">
       <a href="docs/00-getting-started.html" class="button">Getting started</a>
