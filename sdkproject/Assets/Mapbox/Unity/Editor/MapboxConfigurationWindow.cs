@@ -201,7 +201,7 @@ namespace Mapbox.Editor
 			InitStyles();
 
 			_scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, _scrollViewStyle);
-			EditorGUILayout.BeginVertical(_verticalGroup);
+			EditorGUILayout.BeginVertical();
 			// Access token link.
 			DrawAccessTokenLink();
 			// Access token entry and validation.
@@ -211,10 +211,11 @@ namespace Mapbox.Editor
 			EditorGUILayout.EndVertical();
 
 			EditorGUILayout.BeginVertical(_verticalGroup);
-			// Changelog
-			DrawChangelog();
 			// Configuration
 			DrawConfigurationSettings();
+			GUILayout.Space(8);
+			// Changelog
+			DrawChangelog();
 
 			EditorGUILayout.EndVertical();
 
@@ -231,8 +232,11 @@ namespace Mapbox.Editor
 			_defaultBackgroundColor = GUI.backgroundColor;
 
 			_titleStyle = new GUIStyle(GUI.skin.FindStyle("WhiteLabel"));
+			//_titleStyle.fontSize = 16;
 			_bodyStyle = new GUIStyle(GUI.skin.FindStyle("WordWrapLabel"));
+			//_bodyStyle.fontSize = 14;
 			_linkStyle = new GUIStyle(GUI.skin.FindStyle("PR PrefabLabel"));
+			//_linkStyle.fontSize = 14;
 			_linkStyle.padding.left = 0;
 			_linkStyle.padding.top = -1;
 
@@ -263,15 +267,15 @@ namespace Mapbox.Editor
 			_errorStyle.padding.left = 5;
 
 			_verticalGroup = new GUIStyle();
-			_verticalGroup.margin = new RectOffset(0, 0, 0, 30);
+			_verticalGroup.margin = new RectOffset(0, 0, 0, 35);
 			_horizontalGroup = new GUIStyle();
-			_horizontalGroup.padding = new RectOffset(0, 0, 4, 0);
+			_horizontalGroup.padding = new RectOffset(0, 0, 4, 4);
 			_scrollViewStyle = new GUIStyle(GUI.skin.FindStyle("scrollview"));
 			_scrollViewStyle.padding = new RectOffset(20, 20, 40, 0);
 
 			_sampleButtonStyle = new GUIStyle(GUI.skin.FindStyle("button"));
 			_sampleButtonStyle.imagePosition = ImagePosition.ImageAbove;
-			_sampleButtonStyle.padding = new RectOffset(0, 0, 5, 15);
+			_sampleButtonStyle.padding = new RectOffset(0, 0, 5, 5);
 			_sampleButtonStyle.fontStyle = FontStyle.Bold;
 		}
 
@@ -415,7 +419,7 @@ namespace Mapbox.Editor
 			}
 			else
 			{
-				EditorGUILayout.LabelField("", _errorStyle);
+				//EditorGUILayout.LabelField("", _errorStyle);
 			}
 
 			EditorGUILayout.EndHorizontal();
@@ -424,7 +428,25 @@ namespace Mapbox.Editor
 
 		void DrawChangelog()
 		{
-			_showChangelogFoldout = EditorGUILayout.Foldout(_showChangelogFoldout, "Changelog", true);
+			//_showChangelogFoldout = EditorGUILayout.Foldout(_showChangelogFoldout, "v" + Constants.SDK_VERSION + " Changelog", true);
+
+			//if (_showChangelogFoldout)
+			//{
+				EditorGUI.indentLevel = 2;
+				//EditorGUILayout.BeginHorizontal(_horizontalGroup);
+			//	GUIContent labelContent = new GUIContent("SDK version " + Constants.SDK_VERSION + " changelog, and learn how to contribute at");
+				GUIContent linkContent = new GUIContent("v" + Constants.SDK_VERSION + " changelog");
+			//	EditorGUILayout.LabelField(labelContent, _bodyStyle, GUILayout.Width(_bodyStyle.CalcSize(labelContent).x));
+
+				if (GUILayout.Button(linkContent, _linkStyle))
+				{
+					Application.OpenURL("https://www.mapbox.com/mapbox-unity-sdk/docs/05-changelog.html");
+				}
+
+			//	GUILayout.FlexibleSpace();
+				//EditorGUILayout.EndHorizontal();
+				EditorGUI.indentLevel = 0;
+			//}
 		}
 
 		void DrawConfigurationSettings()
@@ -474,11 +496,20 @@ namespace Mapbox.Editor
 			if (_selectedSample != -1)
 			{
 				var scenePath = _sampleContent[_selectedSample].tooltip;
-				EditorSceneManager.OpenScene(scenePath);
-				EditorApplication.isPlaying = true;
 
-				var editorWindow = GetWindow(typeof(MapboxConfigurationWindow));
-				editorWindow.Close();
+				if(EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+				{
+					EditorSceneManager.OpenScene(scenePath);
+					EditorApplication.isPlaying = true;
+
+					var editorWindow = GetWindow(typeof(MapboxConfigurationWindow));
+					editorWindow.Close();
+
+				}
+				else
+				{
+					_selectedSample = -1;
+				}
 			}
 
 			EditorGUILayout.EndHorizontal();
