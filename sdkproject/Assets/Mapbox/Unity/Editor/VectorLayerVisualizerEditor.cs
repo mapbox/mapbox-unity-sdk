@@ -159,7 +159,6 @@
 
 				EditorGUILayout.Space();
 				EditorGUILayout.BeginHorizontal();
-				SerializedProperty sp;
 				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
 				{
 					facs.arraySize++;

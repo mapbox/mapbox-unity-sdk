@@ -21,7 +21,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField]
 		private MapIdType _mapIdType;
 		[SerializeField]
+#pragma warning disable 0414
 		private string _customMapId = "mapbox.terrain-rgb";
+#pragma warning restore 0414
 		[SerializeField]
 		private string _mapId = "";
 		[SerializeField]
