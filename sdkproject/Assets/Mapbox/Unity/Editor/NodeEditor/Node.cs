@@ -13,8 +13,6 @@ namespace Mapbox.Editor.NodeEditor
 {
 	public class Node
 	{
-		private SerializedObject _serializedObject;
-
 		private bool _expanded = true;
 
 		private bool _isRoot = false;
@@ -238,7 +236,6 @@ namespace Mapbox.Editor.NodeEditor
 
 		public void Dive(object obj, bool showModifiers = true, int depth = 0)
 		{
-			_serializedObject = new SerializedObject(obj as ScriptableObject);
 			if (obj == null)
 				return;
 
