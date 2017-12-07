@@ -65,6 +65,7 @@ namespace Mapbox.Unity
 			if (configuration == null)
 			{
 				Debug.LogError("Please configure your access token from the Mapbox menu!");
+				return;
 
 			}
 

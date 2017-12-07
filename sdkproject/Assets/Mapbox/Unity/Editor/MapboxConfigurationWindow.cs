@@ -412,6 +412,7 @@ namespace Mapbox.Editor
 			EditorGUILayout.BeginHorizontal(_horizontalGroup);
 
 			if (_currentTokenStatus != MapboxTokenStatus.TokenValid
+			    && _currentTokenStatus != MapboxTokenStatus.StatusNotYetSet
 				&& string.Equals(_lastValidatedToken, _accessToken)
 				&& !_validating)
 			{
