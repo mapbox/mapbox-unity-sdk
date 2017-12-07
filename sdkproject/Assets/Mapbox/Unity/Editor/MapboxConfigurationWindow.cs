@@ -116,11 +116,15 @@ namespace Mapbox.Editor
 			var content = new List<SceneData>();
 			for (int i = 0; i < _sceneList.SceneList.Length; i++)
 			{
-				if (_sceneList.SceneList[i].Image != null)
+				if (File.Exists(_sceneList.SceneList[i].ScenePath))
 				{
-					content.Add(_sceneList.SceneList[i]);
+					if (_sceneList.SceneList[i].Image != null)
+					{
+						content.Add(_sceneList.SceneList[i]);
+					}
 				}
 			}
+			
 			_sampleContent = new GUIContent[content.Count];
 			for (int i = 0; i < _sampleContent.Length; i++)
 			{
@@ -219,10 +223,12 @@ namespace Mapbox.Editor
 
 			EditorGUILayout.EndVertical();
 
-			EditorGUILayout.BeginVertical(_verticalGroup);
-			// Examples
-			DrawExampleLinks();
-			EditorGUILayout.EndVertical();
+			// Draw Example links if the scenelist asset is where it should be.
+			if(_sampleContent.Length > 0){
+				EditorGUILayout.BeginVertical(_verticalGroup);
+				DrawExampleLinks();
+				EditorGUILayout.EndVertical();
+			}
 			EditorGUILayout.EndScrollView();
 		}
 
