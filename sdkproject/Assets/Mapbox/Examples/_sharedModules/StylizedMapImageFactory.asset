@@ -14,10 +14,10 @@ MonoBehaviour:
   _mapIdType: 1
   _customStyle:
     Name: 
-    Id: mapbox://styles/davidrhodes/ciw6qftnc00072qpcmpn02y37
+    Id: mapbox://styles/mapbox/cjavyikad85yp2rmpo82bb9tn
     Modified: 
     UserName: 
-  _mapId: mapbox://styles/davidrhodes/ciw6qftnc00072qpcmpn02y37
+  _mapId: mapbox://styles/mapbox/cjavyikad85yp2rmpo82bb9tn
   _useCompression: 0
   _useMipMap: 0
   _useRetina: 1
