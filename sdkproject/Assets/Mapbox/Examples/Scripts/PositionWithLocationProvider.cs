@@ -74,10 +74,7 @@ namespace Mapbox.Examples
 		{
 			if (_isInitialized && location.IsLocationUpdated)
 			{
-				_targetPosition = Conversions.GeoToWorldPosition(
-					location.LatitudeLongitude,
-					_map.CenterMercator,
-					_map.WorldRelativeScale).ToVector3xz();
+				_targetPosition = _map.GeoToWorldPosition(location.LatitudeLongitude);
 			}
 		}
 

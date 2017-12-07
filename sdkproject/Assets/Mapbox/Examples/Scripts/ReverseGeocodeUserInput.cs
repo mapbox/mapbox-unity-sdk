@@ -3,8 +3,6 @@
 //     Copyright (c) 2016 Mapbox. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
-using Mapbox.Unity.Utilities;
-
 namespace Mapbox.Examples
 {
     using Mapbox.Unity;
@@ -13,6 +11,7 @@ namespace Mapbox.Examples
     using UnityEngine.UI;
     using Mapbox.Geocoding;
     using Mapbox.Utils;
+	using Mapbox.Unity.Utilities;
 
     /// <summary>
     /// Peforms a reverse geocoder request (search by latitude, longitude) whenever the InputField on *this*

@@ -138,7 +138,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		internal void Recycle()
 		{
-			if (_loadingTexture)
+			if (_loadingTexture && MeshRenderer != null)
 			{
 				MeshRenderer.material.mainTexture = _loadingTexture;
 			}

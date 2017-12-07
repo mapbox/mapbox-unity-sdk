@@ -4,6 +4,7 @@ namespace Mapbox.Unity.Location
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Utils;
 	using UnityEngine;
+	using Mapbox.Unity.Map;
 
 	/// <summary>
 	/// The EditorLocationProvider is responsible for providing mock location and heading data
@@ -21,23 +22,58 @@ namespace Mapbox.Unity.Location
 		string _latitudeLongitude;
 
 		/// <summary>
-		/// The mock heading value.
+		/// The transform that will be queried for location and heading data & ADDED to the mock latitude/longitude
+		/// Can be changed at runtime to simulate moving within the map.
 		/// </summary>
 		[SerializeField]
-		[Range(0, 359)]
-		float _heading;
+		Transform _targetTransform;
+
+		[SerializeField]
+		AbstractMap _map;
+
+		bool _mapInitialized;
+
+#if UNITY_EDITOR
+		protected override void Awake()
+		{
+			_map.OnInitialized += Map_OnInitialized;
+
+			if (_targetTransform == null)
+			{
+				_targetTransform = transform;
+			}
+
+			base.Awake();
+		}
+#endif
+
+		void Map_OnInitialized()
+		{
+			_map.OnInitialized -= Map_OnInitialized;
+			_mapInitialized = true;
+		}
 
 		Vector2d LatitudeLongitude
 		{
 			get
 			{
+				if (_mapInitialized)
+				{
+					var startingLatLong = Conversions.StringToLatLon(_latitudeLongitude);
+					var position = Conversions.GeoToWorldPosition(startingLatLong,
+																 _map.CenterMercator,
+																 _map.WorldRelativeScale).ToVector3xz();
+					position += _targetTransform.position;
+					return position.GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
+				}
+
 				return Conversions.StringToLatLon(_latitudeLongitude);
 			}
 		}
 
 		protected override void SetLocation()
 		{
-			_currentLocation.Heading = _heading;
+			_currentLocation.Heading = _targetTransform.eulerAngles.y;
 			_currentLocation.LatitudeLongitude = LatitudeLongitude;
 			_currentLocation.Accuracy = _accuracy;
 			_currentLocation.Timestamp = UnixTimestampUtils.To(DateTime.UtcNow);

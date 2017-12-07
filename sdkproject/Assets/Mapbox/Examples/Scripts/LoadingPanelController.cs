@@ -5,12 +5,13 @@ namespace Mapbox.Examples
 
 	public class LoadingPanelController : MonoBehaviour
 	{
-		public MapVisualizer MapVisualizer;
 		public GameObject Content;
 
 		void Awake()
 		{
-			MapVisualizer.OnMapVisualizerStateChanged += (s) =>
+			var map = FindObjectOfType<AbstractMap>();
+			var visualizer = map.MapVisualizer;
+			visualizer.OnMapVisualizerStateChanged += (s) =>
 			{
 				if (this == null)
 					return;
@@ -21,9 +22,10 @@ namespace Mapbox.Examples
 				}
 				else if (s == ModuleState.Working)
 				{
-					Content.SetActive(true);
+					// Uncommment me if you want the loading screen to show again
+					// when loading new tiles.
+					//Content.SetActive(true);
 				}
-
 			};
 		}
 	}

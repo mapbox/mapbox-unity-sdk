@@ -57,7 +57,7 @@
 
 					EditorGUILayout.BeginVertical();
 					GUILayout.Space(5);
-					EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(ind).objectReferenceValue, typeof(FilterBase), false);
+					facs.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(ind).objectReferenceValue, typeof(FilterBase), false);
 					EditorGUILayout.EndVertical();
 
 					if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
@@ -96,7 +96,7 @@
 
 					EditorGUILayout.BeginVertical();
 					GUILayout.Space(5);
-					EditorGUILayout.ObjectField(_layerVis._defaultStack, typeof(ModifierStackBase), false);
+					_layerVis._defaultStack = (ModifierStackBase)EditorGUILayout.ObjectField(_layerVis._defaultStack, typeof(ModifierStackBase), false);
 					EditorGUILayout.EndVertical();
 
 					if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
@@ -134,8 +134,9 @@
 
 					EditorGUILayout.BeginVertical();
 					GUILayout.Space(5);
-					EditorGUILayout.ObjectField(_layerVis.Stacks[i].Stack, typeof(ModifierStackBase), false);
+					_layerVis.Stacks[i].Stack = (ModifierStackBase)EditorGUILayout.ObjectField(_layerVis.Stacks[i].Stack, typeof(ModifierStackBase), true);
 					EditorGUILayout.EndVertical();
+
 
 					if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
 					{
@@ -151,6 +152,7 @@
 					{
 						facs.DeleteArrayElementAtIndex(ind);
 					}
+
 					EditorGUILayout.EndHorizontal();
 				}
 

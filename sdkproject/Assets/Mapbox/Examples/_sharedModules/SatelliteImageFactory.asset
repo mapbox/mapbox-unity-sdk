@@ -20,4 +20,4 @@ MonoBehaviour:
   _mapId: mapbox.satellite
   _useCompression: 0
   _useMipMap: 0
-  _useRetina: 0
+  _useRetina: 1

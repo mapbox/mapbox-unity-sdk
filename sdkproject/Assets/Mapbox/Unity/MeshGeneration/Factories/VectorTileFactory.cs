@@ -15,7 +15,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	public class VectorTileFactory : AbstractTileFactory
 	{
 		[SerializeField]
-		private string _mapId = "";
+		private string _mapId = "mapbox.mapbox-streets-v7";
 
 		[NodeEditorElementAttribute("Layer Visalizers")]
 		public List<LayerVisualizerBase> Visualizers;
@@ -76,7 +76,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			var vectorTile = new VectorTile();
 			tile.AddTile(vectorTile);
 
-			
+
 			vectorTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
 				if (vectorTile.HasError)
@@ -123,6 +123,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			// We are no longer interested in this tile's notifications.
 			tile.OnHeightDataChanged -= DataChangedHandler;
 			tile.OnRasterDataChanged -= DataChangedHandler;
+
+			// clean up any pending request for this tile
+			if (_cachedData.ContainsKey(tile))
+			{
+				Progress--;
+				_cachedData.Remove(tile);
+			}
 
 			foreach (var vis in Visualizers)
 			{
