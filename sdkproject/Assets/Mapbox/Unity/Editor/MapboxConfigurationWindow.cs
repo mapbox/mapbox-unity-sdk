@@ -23,7 +23,7 @@ namespace Mapbox.Editor
 		static int _memoryCacheSize = 500;
 		[Range(0, 3000)]
 		static int _mbtilesCacheSize = 2000;
-		static int _webRequestTimeout = 10;
+		static int _webRequestTimeout = 30;
 
 		static MapboxTokenStatus _currentTokenStatus;
 

@@ -250,6 +250,6 @@ namespace Mapbox.Unity
 		public string AccessToken;
 		public uint MemoryCacheSize = 500;
 		public uint MbTilesCacheSize = 2000;
-		public int DefaultTimeout = 10;
+		public int DefaultTimeout = 30;
 	}
 }
