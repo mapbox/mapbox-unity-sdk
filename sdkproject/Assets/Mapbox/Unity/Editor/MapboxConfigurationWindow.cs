@@ -268,7 +268,8 @@ namespace Mapbox.Editor
 			_defaultContentColor = GUI.contentColor;
 			_defaultBackgroundColor = GUI.backgroundColor;
 
-			_titleStyle = new GUIStyle(GUI.skin.FindStyle("WhiteLabel"));
+			_titleStyle = new GUIStyle(GUI.skin.FindStyle("IN TitleText"));
+			_titleStyle.padding.left = 3;
 			//_titleStyle.fontSize = 16;
 			_bodyStyle = new GUIStyle(GUI.skin.FindStyle("WordWrapLabel"));
 			//_bodyStyle.fontSize = 14;
