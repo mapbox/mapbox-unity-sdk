@@ -1,48 +1,48 @@
 namespace Mapbox.Unity
 {
-    using UnityEngine;
-    using System;
-    using System.IO;
-    using Mapbox.Geocoding;
-    using Mapbox.Directions;
-    using Mapbox.Platform;
-    using Mapbox.Platform.Cache;
-    using Mapbox.Unity.Telemetry;
-    using Mapbox.Map;
-    using Mapbox.MapMatching;
-    using Mapbox.Tokens;
+	using UnityEngine;
+	using System;
+	using System.IO;
+	using Mapbox.Geocoding;
+	using Mapbox.Directions;
+	using Mapbox.Platform;
+	using Mapbox.Platform.Cache;
+	using Mapbox.Unity.Telemetry;
+	using Mapbox.Map;
+	using Mapbox.MapMatching;
+	using Mapbox.Tokens;
 
-    /// <summary>
-    /// Object for retrieving an API token and making http requests.
-    /// Contains a lazy <see cref="T:Mapbox.Geocoding.Geocoder">Geocoder</see> and a lazy <see cref="T:Mapbox.Directions.Directions">Directions</see> for convenience.
-    /// </summary>
-    public class MapboxAccess : IFileSource
-    {
-        ITelemetryLibrary _telemetryLibrary;
-        CachingWebFileSource _fileSource;
+	/// <summary>
+	/// Object for retrieving an API token and making http requests.
+	/// Contains a lazy <see cref="T:Mapbox.Geocoding.Geocoder">Geocoder</see> and a lazy <see cref="T:Mapbox.Directions.Directions">Directions</see> for convenience.
+	/// </summary>
+	public class MapboxAccess : IFileSource
+	{
+		ITelemetryLibrary _telemetryLibrary;
+		CachingWebFileSource _fileSource;
 
-        public delegate void TokenValidationEvent( MapboxTokenStatus response );
-        public event TokenValidationEvent OnTokenValidation;
+		public delegate void TokenValidationEvent(MapboxTokenStatus response);
+		public event TokenValidationEvent OnTokenValidation;
 
-        static MapboxAccess _instance;
+		static MapboxAccess _instance;
 
-        /// <summary>
-        /// The singleton instance.
-        /// </summary>
-        public static MapboxAccess Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = new MapboxAccess();
-                }
-                return _instance;
-            }
-        }
+		/// <summary>
+		/// The singleton instance.
+		/// </summary>
+		public static MapboxAccess Instance
+		{
+			get
+			{
+				if (_instance == null)
+				{
+					_instance = new MapboxAccess();
+				}
+				return _instance;
+			}
+		}
 
 
-        MapboxConfiguration _configuration;
+		MapboxConfiguration _configuration;
 		/// <summary>
 		/// The Mapbox API access token. 
 		/// See <see href="https://www.mapbox.com/mapbox-unity-sdk/docs/01-mapbox-api-token.html">Mapbox API Congfiguration in Unity</see>.
@@ -64,21 +64,21 @@ namespace Mapbox.Unity
 		{
 			if (configuration == null)
 			{
-				Debug.LogError("Please configure your access token from the Mapbox menu!");
+				//Debug.LogError("Please configure your access token from the Mapbox menu!");
 				return;
 
 			}
 
 			TokenValidator.Retrieve(configuration.AccessToken, (response) =>
 			{
-                if (OnTokenValidation != null)
-                {
-                    OnTokenValidation(response.Status);
-                }
+				if (OnTokenValidation != null)
+				{
+					OnTokenValidation(response.Status);
+				}
 
 				if (response.Status != MapboxTokenStatus.TokenValid)
 				{
-					Debug.LogError(response.Status.ToString());
+					//Debug.LogError(response.Status.ToString());
 				}
 			});
 
@@ -106,7 +106,7 @@ namespace Mapbox.Unity
 		/// </summary>
 		private void LoadAccessToken()
 		{
-           
+
 			TextAsset configurationTextAsset = Resources.Load<TextAsset>(Constants.Path.MAPBOX_RESOURCES_RELATIVE);
 
 #if !WINDOWS_UWP

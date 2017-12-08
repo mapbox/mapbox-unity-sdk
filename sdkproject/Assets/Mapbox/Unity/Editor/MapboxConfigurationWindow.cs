@@ -25,12 +25,14 @@ namespace Mapbox.Editor
 		static int _mbtilesCacheSize = 2000;
 		static int _webRequestTimeout = 30;
 
+		static MapboxConfiguration _mapboxConfig;
 		static MapboxTokenStatus _currentTokenStatus;
 
 		bool _validating = false;
 		string _lastValidatedToken;
 		bool _showConfigurationFoldout;
 		bool _showChangelogFoldout;
+		bool _samplesReady = false;
 		Vector2 _scrollPosition;
 		int _selectedSample;
 
@@ -67,8 +69,7 @@ namespace Mapbox.Editor
 
 		GUIStyle _sampleButtonStyle;
 
-		[DidReloadScripts]
-		static void ShowWindowOnImport()
+		public static void ShowWindowOnImport()
 		{
 			if (ShouldShowConfigurationWindow())
 			{
@@ -103,15 +104,18 @@ namespace Mapbox.Editor
 				MapboxAccess.Instance.SetConfiguration(mapboxConfiguration);
 			}
 
-			_accessToken = MapboxAccess.Instance.Configuration.AccessToken;
-			_memoryCacheSize = (int)MapboxAccess.Instance.Configuration.MemoryCacheSize;
-			_mbtilesCacheSize = (int)MapboxAccess.Instance.Configuration.MbTilesCacheSize;
-			_webRequestTimeout = (int)MapboxAccess.Instance.Configuration.DefaultTimeout;
-
 			//cache sample scene gui content
 			//NavigationBuilder.AddExampleScenesToBuildSettings();
-			_sceneList = Resources.Load<ScenesList>("Mapbox/ScenesList");
+			GetSceneList();
 
+			var editorWindow = GetWindow(typeof(MapboxConfigurationWindow));
+			editorWindow.minSize = new Vector2(800, 350);
+			editorWindow.titleContent = new GUIContent("Mapbox Setup");
+			editorWindow.Show();
+		}
+
+		static void GetSceneList()
+		{
 			//exclude scenes with no image data
 			var content = new List<SceneData>();
 			if (_sceneList != null)
@@ -127,17 +131,13 @@ namespace Mapbox.Editor
 					}
 				}
 			}
-			
+
 			_sampleContent = new GUIContent[content.Count];
 			for (int i = 0; i < _sampleContent.Length; i++)
 			{
 				_sampleContent[i] = new GUIContent(content[i].Name, content[i].Image, content[i].ScenePath);
 			}
 
-			var editorWindow = GetWindow(typeof(MapboxConfigurationWindow));
-			editorWindow.minSize = new Vector2(800, 350);
-			editorWindow.titleContent = new GUIContent("Mapbox Setup");
-			editorWindow.Show();
 		}
 
 
@@ -146,6 +146,17 @@ namespace Mapbox.Editor
 		/// </summary>
 		private void OnEnable()
 		{
+			GetSceneList();
+			_mapboxConfig = MapboxAccess.Instance.Configuration;
+			if (_mapboxConfig != null)
+			{
+				_accessToken = _mapboxConfig.AccessToken;
+				_memoryCacheSize = (int)_mapboxConfig.MemoryCacheSize;
+				_mbtilesCacheSize = (int)_mapboxConfig.MbTilesCacheSize;
+				_webRequestTimeout = (int)_mapboxConfig.DefaultTimeout;
+
+			}
+
 			MapboxAccess.Instance.OnTokenValidation += HandleValidationResponse;
 			if (!string.IsNullOrEmpty(_accessToken))
 			{
@@ -154,15 +165,32 @@ namespace Mapbox.Editor
 
 		}
 
+		private void Update()
+		{
+			if(!_samplesReady)
+			{
+				_sceneList = Resources.Load<ScenesList>("Mapbox/ScenesList");
+				if(_sceneList != null)
+				{
+					_samplesReady = true;
+					GetSceneList();
+				}
+			}
+		}
+
 		private void OnDisable()
 		{
 			MapboxAccess.Instance.OnTokenValidation -= HandleValidationResponse;
 
 			//reset any unsaved changes
-			_accessToken = MapboxAccess.Instance.Configuration.AccessToken;
-			_memoryCacheSize = (int)MapboxAccess.Instance.Configuration.MemoryCacheSize;
-			_mbtilesCacheSize = (int)MapboxAccess.Instance.Configuration.MbTilesCacheSize;
-			_webRequestTimeout = (int)MapboxAccess.Instance.Configuration.DefaultTimeout;
+			if (_mapboxConfig != null)
+			{
+				_accessToken = _mapboxConfig.AccessToken;
+				_memoryCacheSize = (int)_mapboxConfig.MemoryCacheSize;
+				_mbtilesCacheSize = (int)_mapboxConfig.MbTilesCacheSize;
+				_webRequestTimeout = (int)_mapboxConfig.DefaultTimeout;
+
+			}
 
 			_selectedSample = -1;
 
@@ -202,7 +230,6 @@ namespace Mapbox.Editor
 		}
 
 
-
 		void OnGUI()
 		{
 			InitStyles();
@@ -227,7 +254,8 @@ namespace Mapbox.Editor
 			EditorGUILayout.EndVertical();
 
 			// Draw Example links if the scenelist asset is where it should be.
-			if(_sampleContent.Length > 0){
+			if (_sampleContent.Length > 0)
+			{
 				EditorGUILayout.BeginVertical(_verticalGroup);
 				DrawExampleLinks();
 				EditorGUILayout.EndVertical();
@@ -421,7 +449,7 @@ namespace Mapbox.Editor
 			EditorGUILayout.BeginHorizontal(_horizontalGroup);
 
 			if (_currentTokenStatus != MapboxTokenStatus.TokenValid
-			    && _currentTokenStatus != MapboxTokenStatus.StatusNotYetSet
+				&& _currentTokenStatus != MapboxTokenStatus.StatusNotYetSet
 				&& string.Equals(_lastValidatedToken, _accessToken)
 				&& !_validating)
 			{
@@ -442,20 +470,20 @@ namespace Mapbox.Editor
 
 			//if (_showChangelogFoldout)
 			//{
-				EditorGUI.indentLevel = 2;
-				//EditorGUILayout.BeginHorizontal(_horizontalGroup);
+			EditorGUI.indentLevel = 2;
+			//EditorGUILayout.BeginHorizontal(_horizontalGroup);
 			//	GUIContent labelContent = new GUIContent("SDK version " + Constants.SDK_VERSION + " changelog, and learn how to contribute at");
-				GUIContent linkContent = new GUIContent("v" + Constants.SDK_VERSION + " changelog");
+			GUIContent linkContent = new GUIContent("v" + Constants.SDK_VERSION + " changelog");
 			//	EditorGUILayout.LabelField(labelContent, _bodyStyle, GUILayout.Width(_bodyStyle.CalcSize(labelContent).x));
 
-				if (GUILayout.Button(linkContent, _linkStyle))
-				{
-					Application.OpenURL("https://www.mapbox.com/mapbox-unity-sdk/docs/05-changelog.html");
-				}
+			if (GUILayout.Button(linkContent, _linkStyle))
+			{
+				Application.OpenURL("https://www.mapbox.com/mapbox-unity-sdk/docs/05-changelog.html");
+			}
 
 			//	GUILayout.FlexibleSpace();
-				//EditorGUILayout.EndHorizontal();
-				EditorGUI.indentLevel = 0;
+			//EditorGUILayout.EndHorizontal();
+			EditorGUI.indentLevel = 0;
 			//}
 		}
 
@@ -507,7 +535,7 @@ namespace Mapbox.Editor
 			{
 				var scenePath = _sampleContent[_selectedSample].tooltip;
 
-				if(EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+				if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
 				{
 					EditorSceneManager.OpenScene(scenePath);
 					EditorApplication.isPlaying = true;
