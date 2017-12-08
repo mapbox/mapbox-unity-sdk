@@ -15,6 +15,6 @@ MonoBehaviour:
   _projectMapImagery: 0
   _materials:
   - Materials:
-    - {fileID: 2100000, guid: 497423d004c7f44f690e8f82bed81904, type: 2}
+    - {fileID: 2100000, guid: 8d222a6659da43e45b6274794e67d47a, type: 2}
   - Materials:
     - {fileID: 2100000, guid: 497423d004c7f44f690e8f82bed81904, type: 2}
