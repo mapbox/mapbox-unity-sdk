@@ -333,7 +333,7 @@ namespace Mapbox.Editor
 
 				if (GUILayout.Button(linkContent, _linkStyle))
 				{
-					Application.OpenURL("https://www.mapbox.com/install/unity/permission/");
+					Application.OpenURL("https://www.mapbox.com/studio/account/tokens/");
 				}
 
 				//create link cursor
