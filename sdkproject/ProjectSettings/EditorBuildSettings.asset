@@ -6,7 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Mapbox/Main.unity
+    path: Assets/MapboxDevTools/Main.unity
     guid: 643bfa26e0eed440db629d1f4fc9f6ed
   - enabled: 1
     path: Assets/Mapbox/Examples/1_Explorer/Explorer.unity
