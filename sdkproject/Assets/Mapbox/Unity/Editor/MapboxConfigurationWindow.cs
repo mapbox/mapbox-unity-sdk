@@ -101,11 +101,10 @@ namespace Mapbox.Editor
 				var json = JsonUtility.ToJson(mapboxConfiguration);
 				File.WriteAllText(_configurationFile, json);
 
-				MapboxAccess.Instance.SetConfiguration(mapboxConfiguration);
+				MapboxAccess.Instance.SetConfiguration(mapboxConfiguration, false);
 			}
 
 			//cache sample scene gui content
-			//NavigationBuilder.AddExampleScenesToBuildSettings();
 			GetSceneList();
 
 			var editorWindow = GetWindow(typeof(MapboxConfigurationWindow));
@@ -214,7 +213,7 @@ namespace Mapbox.Editor
 				MbTilesCacheSize = (uint)_mbtilesCacheSize,
 				DefaultTimeout = _webRequestTimeout
 			};
-			MapboxAccess.Instance.SetConfiguration(mapboxConfiguration);
+			MapboxAccess.Instance.SetConfiguration(mapboxConfiguration, false);
 			_validating = true;
 		}
 
