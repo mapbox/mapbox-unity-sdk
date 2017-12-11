@@ -35,6 +35,7 @@ namespace Mapbox.Editor
 		bool _samplesReady = false;
 		Vector2 _scrollPosition;
 		int _selectedSample;
+		string _sceneToOpen;
 
 		//samples
 		static ScenesList _sceneList;
@@ -514,7 +515,8 @@ namespace Mapbox.Editor
 
 		void DrawExampleLinks()
 		{
-			EditorGUI.BeginDisabledGroup(_currentTokenStatus != MapboxTokenStatus.TokenValid);
+			EditorGUI.BeginDisabledGroup(_currentTokenStatus != MapboxTokenStatus.TokenValid
+			                            || _validating);
 
 			if (_currentTokenStatus == MapboxTokenStatus.TokenValid)
 			{
@@ -533,25 +535,40 @@ namespace Mapbox.Editor
 
 			if (_selectedSample != -1)
 			{
-				var scenePath = _sampleContent[_selectedSample].tooltip;
+				EditorApplication.isPaused = false;
+				EditorApplication.isPlaying = false;
 
-				if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
-				{
-					EditorSceneManager.OpenScene(scenePath);
-					EditorApplication.isPlaying = true;
-
-					var editorWindow = GetWindow(typeof(MapboxConfigurationWindow));
-					editorWindow.Close();
-
-				}
-				else
-				{
-					_selectedSample = -1;
-				}
+				_sceneToOpen = _sampleContent[_selectedSample].tooltip;
+				EditorApplication.update += OpenAndPlayScene;
 			}
 
 			EditorGUILayout.EndHorizontal();
 			EditorGUI.EndDisabledGroup();
+		}
+
+		private void OpenAndPlayScene()
+		{
+			if( EditorApplication.isPlaying)
+			{
+				return;
+			}
+
+			EditorApplication.update -= OpenAndPlayScene;
+
+			if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+			{
+				EditorSceneManager.OpenScene(_sceneToOpen);
+				EditorApplication.isPlaying = true;
+
+				var editorWindow = GetWindow(typeof(MapboxConfigurationWindow));
+				editorWindow.Close();
+
+			}
+			else
+			{
+				_sceneToOpen = null;
+				_selectedSample = -1;
+			}
 		}
 
 		static bool ShouldShowConfigurationWindow()
