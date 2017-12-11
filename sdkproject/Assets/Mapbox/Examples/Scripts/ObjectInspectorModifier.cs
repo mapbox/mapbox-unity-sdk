@@ -16,7 +16,11 @@ namespace Mapbox.Examples
 
 		public override void Initialize()
 		{
-			_detectors = new Dictionary<GameObject, FeatureSelectionDetector>();
+			if (_detectors == null)
+			{
+				_detectors = new Dictionary<GameObject, FeatureSelectionDetector>();
+			}
+
 			if (_marker == null)
 			{
 				Canvas canvas;
