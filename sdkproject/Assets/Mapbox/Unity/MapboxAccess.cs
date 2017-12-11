@@ -60,11 +60,15 @@ namespace Mapbox.Unity
 			LoadAccessToken();
 		}
 
-		public void SetConfiguration(MapboxConfiguration configuration)
+		public void SetConfiguration(MapboxConfiguration configuration, bool throwExecptions = true)
 		{
 			if (configuration == null)
 			{
-				//Debug.LogError("Please configure your access token from the Mapbox menu!");
+				if (throwExecptions)
+				{
+					Debug.LogError("No configuration file found! Configure your access token from the Mapbox > Settings menu.");
+				}
+				configuration = new MapboxConfiguration();
 				return;
 
 			}
@@ -76,9 +80,10 @@ namespace Mapbox.Unity
 					OnTokenValidation(response.Status);
 				}
 
-				if (response.Status != MapboxTokenStatus.TokenValid)
+				if (response.Status != MapboxTokenStatus.TokenValid
+				   && throwExecptions)
 				{
-					//Debug.LogError(response.Status.ToString());
+					throw new InvalidTokenException(response.Status.ToString());
 				}
 			});
 

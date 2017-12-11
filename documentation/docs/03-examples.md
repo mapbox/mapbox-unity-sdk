@@ -4,7 +4,7 @@ For each example, associated scripts and resources can be found in the same root
 
 
 
-## Explorer: 
+## Explorer 
 
 This is a master example that allows you to explore Mapbox’s location data and the Map Editor. You can see a variety of data layers associated with Mapbox’s vector tiles, including building data, points of interest (POIs), roads, and real-time traffic data. Each map vector tile includes high levels of detail about a particular location or building in GeoJSON format that you can leverage for procedurally generating experiences or styling. You can toggle these data layers on and off as needed in the Map Editor (access through the Mapbox menu). 
 
