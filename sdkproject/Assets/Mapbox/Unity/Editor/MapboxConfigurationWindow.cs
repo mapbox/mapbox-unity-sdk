@@ -102,6 +102,10 @@ namespace Mapbox.Editor
 				var json = JsonUtility.ToJson(mapboxConfiguration);
 				File.WriteAllText(_configurationFile, json);
 
+				// HACK: this is needed so that Unity knows about the file when trying to load it from 
+				// MapboxAccess constructor!
+				AssetDatabase.Refresh();
+
 				MapboxAccess.Instance.SetConfiguration(mapboxConfiguration, false);
 			}
 
