@@ -86,4 +86,4 @@ MonoBehaviour:
   _voxelFetcher: {fileID: 114000012445315992}
   _camera: {fileID: 0}
   _voxelBatchCount: 500
-  _styleUrl: mapbox://styles/davidrhodes/cix2bbfub00242qt7hcjkhs1b
+  _styleUrl: mapbox://styles/mapbox/cjb3veyx9532a2tpjozhuv0u9
