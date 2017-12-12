@@ -32,11 +32,14 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		[Tooltip("Fixed height value for ForceHeight option")]
 		private float _height;
 		private float _scale = 1;
-		private bool _separateSubmesh = false;
 
 		[SerializeField]
 		[Tooltip("Create side walls from calculated height down to terrain level. Suggested for buildings, not suggested for roads.")]
 		private bool _createSideWalls = true;
+
+		[SerializeField]
+		[Tooltip("Create side walls as separate submesh.")]
+		private bool _separateSubmesh = true;
 
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
@@ -117,7 +120,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				_counter = md.Edges.Count;
 				var wallTri = new List<int>(_counter * 3);
 				var wallUv = new List<Vector2>(_counter * 2);
-				Vector3 norm = Mapbox.Unity.Constants.Math.Vector3Zero;
+				Vector3 norm = Constants.Math.Vector3Zero;
 
 				md.Vertices.Capacity = md.Vertices.Count + _counter * 2;
 				md.Normals.Capacity = md.Normals.Count + _counter * 2;
