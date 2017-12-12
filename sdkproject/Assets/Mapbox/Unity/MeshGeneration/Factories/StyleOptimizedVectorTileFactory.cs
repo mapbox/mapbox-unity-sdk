@@ -78,6 +78,11 @@
 			Progress++;
 			vectorTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
+				if (tile == null)
+				{
+					return;
+				}
+
 				if (vectorTile.HasError)
 				{
 					OnErrorOccurred(new TileErrorEventArgs(tile.CanonicalTileId, vectorTile.GetType(), tile, vectorTile.Exceptions));

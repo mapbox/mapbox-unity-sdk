@@ -212,6 +212,10 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void SetRasterData(byte[] data, bool useMipMap, bool useCompression)
 		{
+			if (MeshRenderer == null || MeshRenderer.material == null)
+			{
+				return;
+			}
 			// Don't leak the texture, just reuse it.
 			if (_rasterData == null)
 			{

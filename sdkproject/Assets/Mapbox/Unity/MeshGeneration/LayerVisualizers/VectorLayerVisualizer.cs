@@ -116,6 +116,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			//HACK to prevent request finishing on same frame which breaks modules started/finished events 
 			yield return null;
 
+			if (tile == null)
+			{
+				yield break;
+			}
+
 			//testing each feature with filters
 			var fc = layer.FeatureCount();
 			var filterOut = false;
