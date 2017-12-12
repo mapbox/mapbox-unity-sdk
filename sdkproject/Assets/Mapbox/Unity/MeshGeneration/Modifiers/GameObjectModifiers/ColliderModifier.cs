@@ -16,23 +16,28 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void Initialize()
 		{
-			switch (_colliderType)
+			//no need to reset strategy objects on map reinit as we're caching feature game objects as well
+			//creating a new one iff we don't already have one. if you want to reset/recreate you have to clear stuff inside current/old one first.
+			if (_colliderStrategy == null)
 			{
-				case ColliderType.None:
-					_colliderStrategy = null;
-					break;
-				case ColliderType.BoxCollider:
-					_colliderStrategy = new BoxColliderStrategy();
-					break;
-				case ColliderType.MeshCollider:
-					_colliderStrategy = new MeshColliderStrategy();
-					break;
-				case ColliderType.SphereCollider:
-					_colliderStrategy = new SphereColliderStrategy();
-					break;
-				default:
-					_colliderStrategy = null;
-					break;
+				switch (_colliderType)
+				{
+					case ColliderType.None:
+						_colliderStrategy = null;
+						break;
+					case ColliderType.BoxCollider:
+						_colliderStrategy = new BoxColliderStrategy();
+						break;
+					case ColliderType.MeshCollider:
+						_colliderStrategy = new MeshColliderStrategy();
+						break;
+					case ColliderType.SphereCollider:
+						_colliderStrategy = new SphereColliderStrategy();
+						break;
+					default:
+						_colliderStrategy = null;
+						break;
+				}
 			}
 		}
 

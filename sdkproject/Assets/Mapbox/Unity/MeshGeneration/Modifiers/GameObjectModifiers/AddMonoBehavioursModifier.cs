@@ -16,8 +16,11 @@
 
 		public override void Initialize()
 		{
-			_scripts = new HashSet<string>();
-			_tempId = string.Empty;
+			if (_scripts == null)
+			{
+				_scripts = new HashSet<string>();
+				_tempId = string.Empty;
+			}
 		}
 
 		public override void Run(VectorEntity ve, UnityTile tile)
