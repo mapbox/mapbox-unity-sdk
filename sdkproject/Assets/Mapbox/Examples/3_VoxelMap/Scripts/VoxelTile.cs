@@ -172,8 +172,15 @@ namespace Mapbox.Examples.Voxels
 				}
 			}
 
-			_camera.transform.position = new Vector3(_tileWidthInVoxels * .5f, 2f, _tileWidthInVoxels * .5f);
-			StartCoroutine(BuildRoutine());
+			if (_camera != null)
+			{
+				_camera.transform.position = new Vector3(_tileWidthInVoxels * .5f, 2f, _tileWidthInVoxels * .5f);
+			}
+
+			if (this != null)
+			{
+				StartCoroutine(BuildRoutine());
+			}
 		}
 
 		IEnumerator BuildRoutine()

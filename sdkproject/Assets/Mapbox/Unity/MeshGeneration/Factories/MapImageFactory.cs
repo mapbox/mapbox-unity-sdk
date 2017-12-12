@@ -88,6 +88,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			Progress++;
 			rasterTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
+				if (tile == null)
+				{
+					return;
+				}
+
 				if (rasterTile.HasError)
 				{
 					OnErrorOccurred(new TileErrorEventArgs(tile.CanonicalTileId,rasterTile.GetType(),tile, rasterTile.Exceptions));
