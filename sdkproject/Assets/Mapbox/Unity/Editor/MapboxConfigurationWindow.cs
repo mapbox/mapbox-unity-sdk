@@ -229,6 +229,7 @@ namespace Mapbox.Editor
 			_lastValidatedToken = _accessToken;
 
 			//save the config
+			_configurationFile = Path.Combine(Unity.Constants.Path.MAPBOX_RESOURCES_ABSOLUTE, Unity.Constants.Path.CONFIG_FILE);
 			var json = JsonUtility.ToJson(MapboxAccess.Instance.Configuration);
 			File.WriteAllText(_configurationFile, json);
 		}
