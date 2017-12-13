@@ -150,6 +150,7 @@ namespace Mapbox.Editor
 		/// </summary>
 		private void OnEnable()
 		{
+			_samplesReady = false;
 			GetSceneList();
 			_mapboxConfig = MapboxAccess.Instance.Configuration;
 			if (_mapboxConfig != null)
