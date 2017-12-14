@@ -20,7 +20,8 @@
 			}
 
 			_meshRenderer = GetComponent<MeshRenderer>();
-			foreach (var item in _meshRenderer.materials)
+			
+			foreach (var item in _meshRenderer.sharedMaterials)
 			{
 				_materials.Add(item);
 			}
