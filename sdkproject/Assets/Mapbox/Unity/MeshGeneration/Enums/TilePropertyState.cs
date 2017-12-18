@@ -5,6 +5,7 @@ namespace Mapbox.Unity.MeshGeneration.Enums
         None,
         Loading,
         Loaded,
-        Error
-    }
+        Error,
+		Cancelled,
+	}
 }

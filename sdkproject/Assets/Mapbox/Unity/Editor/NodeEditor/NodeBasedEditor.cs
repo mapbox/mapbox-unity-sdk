@@ -67,7 +67,7 @@ namespace Mapbox.Editor.NodeEditor
 			nodeStyle.padding = textOffset;
 
 			selectedNodeStyle = new GUIStyle();
-			selectedNodeStyle.normal.background = EditorGUIUtility.Load("builtin skins/darkskin/images/node5 on.png") as Texture2D;
+			selectedNodeStyle.normal.background = EditorGUIUtility.Load("builtin skins/darkskin/images/node1 on.png") as Texture2D;
 			selectedNodeStyle.border = new RectOffset(12, 12, 12, 12);
 			selectedNodeStyle.richText = true;
 			selectedNodeStyle.padding = textOffset;
@@ -99,6 +99,24 @@ namespace Mapbox.Editor.NodeEditor
 				_maps.Clear();
 
 			var abstractMaps = FindObjectsOfType<AbstractMap>();
+
+			//foreach (var abstractMap in abstractMaps)
+			//{
+			//	foreach (FieldInfo fi in abstractMap.GetType().GetFields().Where(x => x.IsDefined(typeof(NodeEditorElementAttribute), true)))
+			//	{
+			//		var val = fi.GetValue(abstractMap) as ScriptableObject;
+			//		if (typeof(ScriptableObject).IsAssignableFrom(fi.FieldType) && val != null)
+			//		{
+			//			var map = abstractMap.MapVisualizer;
+			//			var mapNode = new Node(map as ScriptableObject);
+			//			mapNode.title = map.name;
+			//			mapNode.subtitle = "Map Visualizer";
+			//			_maps.Add(mapNode);
+			//			mapNode.Dive(map, showModifiers);
+			//		}
+			//	}
+			//}
+
 			foreach (var abstractMap in abstractMaps)
 			{
 				if (abstractMap.MapVisualizer != null)
@@ -199,7 +217,7 @@ namespace Mapbox.Editor.NodeEditor
 
 		void OnFocus()
 		{
-			//Parse();
+			Parse();
 		}
 
 		private void DrawGrid(float gridSpacing, float gridOpacity, Color gridColor)

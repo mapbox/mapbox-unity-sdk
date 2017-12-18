@@ -11,9 +11,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 120e43a7012622e49aca0c9217acd1f9, type: 3}
   m_Name: PoiDemoUiPoiVisualizer
   m_EditorClassIdentifier: 
-  Active: 1
+  Active: 0
   _classificationKey: 
   _key: poi_label
   Filters: []
   _defaultStack: {fileID: 11400000, guid: 493414ab78a4e1b4896fc10cd6be4fa1, type: 2}
   Stacks: []
+  _enableCoroutines: 1
+  _entityPerCoroutine: 20

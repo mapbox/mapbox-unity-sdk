@@ -20,20 +20,16 @@ namespace Mapbox.Unity.Utilities
 	internal sealed class HTTPRequest : IAsyncRequest
 	{
 		private UnityWebRequest _request;
-		private int _timeout;
 		private readonly Action<Response> _callback;
-		bool _wasCancelled;
 
 		public bool IsCompleted { get; private set; }
 
-		// TODO: simplify timeout for Unity 5.6+
-		// https://docs.unity3d.com/ScriptReference/Networking.UnityWebRequest-timeout.html
 		public HTTPRequest(string url, Action<Response> callback, int timeout)
 		{
 			//UnityEngine.Debug.Log("HTTPRequest: " + url);
 			IsCompleted = false;
-			_timeout = timeout;
 			_request = UnityWebRequest.Get(url);
+			_request.timeout = timeout;
 			_callback = callback;
 
 #if UNITY_EDITOR
@@ -47,8 +43,6 @@ namespace Mapbox.Unity.Utilities
 
 		public void Cancel()
 		{
-			_wasCancelled = true;
-
 			if (_request != null)
 			{
 				_request.Abort();
@@ -57,31 +51,16 @@ namespace Mapbox.Unity.Utilities
 
 		private IEnumerator DoRequest()
 		{
+#if UNITY_EDITOR
+			// otherwise requests don't work in Edit mode, eg geocoding
+			// also lot of EditMode tests fail otherwise
 			_request.Send();
+			while (!_request.isDone) { yield return null; }
+#else
+			yield return _request.Send();
+#endif
 
-			DateTime timeout = DateTime.Now.AddSeconds(_timeout);
-			bool didTimeout = false;
-
-			while (!_request.isDone)
-			{
-				yield return null;
-				if (DateTime.Now > timeout)
-				{
-					_request.Abort();
-					didTimeout = true;
-					break;
-				}
-			}
-
-			Response response;
-			if (didTimeout)
-			{
-				response = Response.FromWebResponse(this, _request, new Exception("Request Timed Out"));
-			}
-			else
-			{
-				response = Response.FromWebResponse(this, _request, _wasCancelled ? new Exception("Request Cancelled") : null);
-			}
+			var response = Response.FromWebResponse(this, _request, null);
 
 			_callback(response);
 			_request.Dispose();

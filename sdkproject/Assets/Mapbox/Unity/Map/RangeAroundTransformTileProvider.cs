@@ -20,8 +20,9 @@
 		private bool _initialized = false;
 		private UnwrappedTileId _currentTile;
 		private UnwrappedTileId _cachedTile;
+		private int _counter;
 
-		internal override void OnInitialized()
+		public override void OnInitialized()
 		{
 			if (_targetTransform == null)
 			{
@@ -32,13 +33,14 @@
 			{
 				_initialized = true;
 			}
+			_cachedTile = new UnwrappedTileId();
 		}
 
 		private void Update()
 		{
 			if (!_initialized) return;
 
-			_currentTile = TileCover.CoordinateToTileId(_targetTransform.localPosition.GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale), _map.Zoom);
+			_currentTile = TileCover.CoordinateToTileId(_targetTransform.localPosition.GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale), _map.AbsoluteZoom);
 
 			if (!_currentTile.Equals(_cachedTile))
 			{
@@ -46,7 +48,7 @@
 				{
 					for (int y = _currentTile.Y - _visibleBuffer; y <= (_currentTile.Y + _visibleBuffer); y++)
 					{
-						AddTile(new UnwrappedTileId(_map.Zoom, x, y));
+						AddTile(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
 					}
 				}
 				_cachedTile = _currentTile;
@@ -56,10 +58,9 @@
 
 		private void Cleanup(UnwrappedTileId currentTile)
 		{
-			var keys = _activeTiles.Keys.ToList();
-			for (int i = 0; i < keys.Count; i++)
+			var _activeTilesKeys = _activeTiles.Keys.ToList();
+			foreach (var tile in _activeTilesKeys)
 			{
-				var tile = keys[i];
 				bool dispose = false;
 				dispose = tile.X > currentTile.X + _disposeBuffer || tile.X < _currentTile.X - _disposeBuffer;
 				dispose = dispose || tile.Y > _currentTile.Y + _disposeBuffer || tile.Y < _currentTile.Y - _disposeBuffer;

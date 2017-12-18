@@ -8,12 +8,14 @@
 	using Mapbox.Editor.NodeEditor;
 
 	[CustomEditor(typeof(VectorLayerVisualizer))]
-	public class VectorLayerVisualizerEditor : UnityEditor.Editor
+	public class VectorLayerVisualizerEditor : Editor
 	{
 		private VectorLayerVisualizer _layerVis;
 		private MonoScript script;
 		private SerializedProperty _classKeyProp;
 		private SerializedProperty _keyProp;
+		private SerializedProperty _useCoroutines;
+		private SerializedProperty _entityPerCoroutine;
 
 
 		private void OnEnable()
@@ -22,6 +24,8 @@
 			_layerVis = target as VectorLayerVisualizer;
 			_classKeyProp = serializedObject.FindProperty("_classificationKey");
 			_keyProp = serializedObject.FindProperty("_key");
+			_useCoroutines = serializedObject.FindProperty("_enableCoroutines");
+			_entityPerCoroutine = serializedObject.FindProperty("_entityPerCoroutine");
 		}
 
 		public override void OnInspectorGUI()
@@ -33,7 +37,13 @@
 
 			EditorGUILayout.PropertyField(_classKeyProp);
 			EditorGUILayout.PropertyField(_keyProp);
-
+			EditorGUILayout.PropertyField(_useCoroutines);
+			if(_useCoroutines.boolValue)
+			{
+				EditorGUI.indentLevel++;
+				EditorGUILayout.PropertyField(_entityPerCoroutine);
+				EditorGUI.indentLevel--;
+			}
 
 			//FILTERS
 			{
@@ -47,7 +57,7 @@
 
 					EditorGUILayout.BeginVertical();
 					GUILayout.Space(5);
-					EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(ind).objectReferenceValue, typeof(FilterBase), false);
+					facs.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(ind).objectReferenceValue, typeof(FilterBase), false);
 					EditorGUILayout.EndVertical();
 
 					if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
@@ -86,7 +96,7 @@
 
 					EditorGUILayout.BeginVertical();
 					GUILayout.Space(5);
-					EditorGUILayout.ObjectField(_layerVis._defaultStack, typeof(ModifierStackBase), false);
+					_layerVis._defaultStack = (ModifierStackBase)EditorGUILayout.ObjectField(_layerVis._defaultStack, typeof(ModifierStackBase), false);
 					EditorGUILayout.EndVertical();
 
 					if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
@@ -124,8 +134,9 @@
 
 					EditorGUILayout.BeginVertical();
 					GUILayout.Space(5);
-					EditorGUILayout.ObjectField(_layerVis.Stacks[i].Stack, typeof(ModifierStackBase), false);
+					_layerVis.Stacks[i].Stack = (ModifierStackBase)EditorGUILayout.ObjectField(_layerVis.Stacks[i].Stack, typeof(ModifierStackBase), true);
 					EditorGUILayout.EndVertical();
+
 
 					if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
 					{
@@ -141,6 +152,7 @@
 					{
 						facs.DeleteArrayElementAtIndex(ind);
 					}
+
 					EditorGUILayout.EndHorizontal();
 				}
 
@@ -150,7 +162,6 @@
 				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
 				{
 					facs.arraySize++;
-					facs.GetArrayElementAtIndex(facs.arraySize - 1).objectReferenceValue = null;
 				}
 				if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
 				{

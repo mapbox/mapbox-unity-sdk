@@ -19,6 +19,12 @@ MonoBehaviour:
   _defaultStack: {fileID: 11400000, guid: 70166653a5881394c9dc697c1014376e, type: 2}
   Stacks:
   - Type: residential
+    Types:
+    - residential
     Stack: {fileID: 11400000, guid: 8c7bd733341fc0a47bfbaea08b5f15ba, type: 2}
   - Type: commercial
+    Types:
+    - commercial
     Stack: {fileID: 11400000, guid: d234d20d9d280f84cb21cb7d8cac3cab, type: 2}
+  _enableCoroutines: 1
+  _entityPerCoroutine: 20

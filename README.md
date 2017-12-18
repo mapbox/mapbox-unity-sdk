@@ -11,11 +11,33 @@ This repo contains:
   - DocFX project for generateing API documentation
   - Written manuals and guides
 
+# Getting started
+
+## Versioned SDK (easy, current stable release)
+
+* Download `unitypackage` from https://www.mapbox.com/unity-sdk/#download
+* If you've installed the SDK before, delete `Assets/Mapbox` folder from your project
+* Within Unity: `Assets -> Import Package -> Custom Package... -> All -> Import`, wait :smirk:
+
+## From this Repository (advanced, latest development)
+
+**Downloading the repo as a `zip` does not work!**
+
+```
+git clone git@github.com:mapbox/mapbox-unity-sdk.git
+cd mapbox-unity-sdk
+```
+
+Windows: `update-mapbox-unity-sdk-core.bat`
+
+Linux/Mac: `./update-mapbox-unity-sdk-core.sh`
+
+
 # Documentation
 Documentation is generated using DocFX from this repo and is hosted at: https://www.mapbox.com/mapbox-unity-sdk/.
 
 # Dependencies
-This project includes git submodule dependcies outlined in [this gitmodules](https://github.com/mapbox/mapbox-unity-sdk/blob/develop/.gitmodules) file.
+This project includes git submodule dependencies outlined in [this gitmodules](https://github.com/mapbox/mapbox-unity-sdk/blob/develop/.gitmodules) file.
 
 To install/update the dependencies after `git clone`/`git pull` run `update-mapbox-unity-sdk-core.bat` or `update-mapbox-unity-sdk-core.sh` (depending on your OS).
 

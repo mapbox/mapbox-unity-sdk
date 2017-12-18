@@ -4,6 +4,7 @@
 	using UnityEditor;
 	using System.Collections.Generic;
 	using System;
+	using System.Linq;
 
 	public class ScriptableCreatorWindow : EditorWindow
 	{
@@ -69,15 +70,17 @@
 					var asset = AssetDatabase.LoadAssetAtPath(ne, _type) as ScriptableObject;
 					_assets.Add(asset);
 				}
+				_assets = _assets.OrderBy(x => x.GetType().Name).ThenBy(x => x.name).ToList();
 			}
-
-
+			
 			var st = new GUIStyle();
 			st.padding = new RectOffset(15, 15, 15, 15);
 			scrollPos = EditorGUILayout.BeginScrollView(scrollPos, st);
 			for (int i = 0; i < _assets.Count; i++)
 			{
 				var asset = _assets[i];
+				if (asset == null) //yea turns out this can happen
+					continue;
 				GUILayout.BeginHorizontal();
 
 				var b = Header(string.Format("{0,-40} - {1, -15}",  asset.GetType().Name , asset.name), i == activeIndex);

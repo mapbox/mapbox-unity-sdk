@@ -5,9 +5,11 @@ Getting started: https://www.mapbox.com/mapbox-unity-sdk/docs/00-getting-started
 
 Configuring your API token: https://www.mapbox.com/mapbox-unity-sdk/docs/01-mapbox-api-token.html
 
-Known Issues: https://www.mapbox.com/mapbox-unity-sdk/docs/02-known-issues.html
+Tutorials: https://www.mapbox.com/unity-sdk/tutorials/
 
 Built-in Examples: https://www.mapbox.com/mapbox-unity-sdk/docs/03-examples.html
+
+Known Issues: https://www.mapbox.com/mapbox-unity-sdk/docs/02-known-issues.html
 
 Attribution: https://www.mapbox.com/mapbox-unity-sdk/docs/04-attribution.html
 
@@ -15,7 +17,7 @@ API: https://www.mapbox.com/mapbox-unity-sdk/api/
 
 
 
-Current version: 1.2.0, as of 09/26/2017
+Current version: 1.3.0, as of 12/08/2017
 
 Changelog: https://www.mapbox.com/mapbox-unity-sdk/docs/05-changelog.html
 

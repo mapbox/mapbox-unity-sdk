@@ -3,7 +3,6 @@
 //     Copyright (c) 2016 Mapbox. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
-
 namespace Mapbox.Examples
 {
     using Mapbox.Unity;
@@ -12,6 +11,7 @@ namespace Mapbox.Examples
     using UnityEngine.UI;
     using Mapbox.Geocoding;
     using Mapbox.Utils;
+	using Mapbox.Unity.Utilities;
 
     /// <summary>
     /// Peforms a reverse geocoder request (search by latitude, longitude) whenever the InputField on *this*
@@ -65,9 +65,7 @@ namespace Mapbox.Examples
 			_hasResponse = false;
 			if (!string.IsNullOrEmpty(searchString))
 			{
-				var latLon = searchString.Split(',');
-				_coordinate.x = double.Parse(latLon[0]);
-				_coordinate.y = double.Parse(latLon[1]);
+				_coordinate = Conversions.StringToLatLon(searchString);
 				_resource.Query = _coordinate;
 				_geocoder.Geocode(_resource, HandleGeocoderResponse);
 			}

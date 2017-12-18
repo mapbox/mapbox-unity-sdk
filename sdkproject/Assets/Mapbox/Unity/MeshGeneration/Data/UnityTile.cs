@@ -102,6 +102,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
+		public int InitialZoom { get; internal set; }
 		public float TileScale { get; internal set; }
 
 		public TilePropertyState RasterDataState;
@@ -112,7 +113,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public event Action<UnityTile> OnRasterDataChanged = delegate { };
 		public event Action<UnityTile> OnVectorDataChanged = delegate { };
 
-		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, float scale, Texture2D loadingTexture = null)
+		private bool _isInitialized = false;
+
+		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, float scale, int zoom, Texture2D loadingTexture = null)
 		{
 			TileScale = scale;
 			_relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
@@ -121,12 +124,21 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			_canonicalTileId = tileId.Canonical;
 			_loadingTexture = loadingTexture;
 
+			float scaleFactor = 1.0f;
+			if (_isInitialized == false)
+			{
+				_isInitialized = true;
+				InitialZoom = zoom;
+			}
+
+			scaleFactor = Mathf.Pow(2, (map.InitialZoom - zoom));
+			gameObject.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
 			gameObject.SetActive(true);
 		}
 
 		internal void Recycle()
 		{
-			if (_loadingTexture)
+			if (_loadingTexture && MeshRenderer != null)
 			{
 				MeshRenderer.material.mainTexture = _loadingTexture;
 			}
@@ -144,17 +156,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 			Cancel();
 			_tiles.Clear();
-
-			// HACK: this is for vector layer features and such.
-			// It's slow and wasteful, but a better solution will be difficult.
-			var childCount = transform.childCount;
-			if (childCount > 0)
-			{
-				for (int i = 0; i < childCount; i++)
-				{
-					Destroy(transform.GetChild(i).gameObject);
-				}
-			}
 		}
 
 		internal void SetHeightData(byte[] data, float heightMultiplier = 1f, bool useRelative = false)
@@ -211,6 +212,10 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void SetRasterData(byte[] data, bool useMipMap, bool useCompression)
 		{
+			if (MeshRenderer == null || MeshRenderer.material == null)
+			{
+				return;
+			}
 			// Don't leak the texture, just reuse it.
 			if (_rasterData == null)
 			{

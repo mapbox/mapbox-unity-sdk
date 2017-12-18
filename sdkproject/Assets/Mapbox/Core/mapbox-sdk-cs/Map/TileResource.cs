@@ -7,10 +7,10 @@ namespace Mapbox.Map
 {
 	using Platform;
 	using System;
+	using Mapbox.Unity.Telemetry;
 
 	internal sealed class TileResource : IResource
 	{
-		static readonly string _eventQuery = "events=true";
 		readonly string _query;
 
 		internal TileResource(string query)
@@ -58,11 +58,11 @@ namespace Mapbox.Map
 			var uriBuilder = new UriBuilder(_query);
 			if (uriBuilder.Query != null && uriBuilder.Query.Length > 1)
 			{
-				uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + _eventQuery;
+				uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + TelemetryFactory.EventQuery;
 			}
 			else
 			{
-				uriBuilder.Query = _eventQuery;
+				uriBuilder.Query = TelemetryFactory.EventQuery;
 			}
 
 			return uriBuilder.ToString();

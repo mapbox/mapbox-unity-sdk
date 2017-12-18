@@ -6,5 +6,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     {
         [SerializeField]
         public bool Active = true;
+
+		public virtual void Initialize()
+		{
+
+		}
     }
 }

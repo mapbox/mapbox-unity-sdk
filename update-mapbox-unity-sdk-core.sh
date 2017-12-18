@@ -33,7 +33,7 @@ rsync -av --exclude-from=x.txt ./dependencies/vector-tile-cs/src/ $SDK_PATH/Plug
 
 echo "copying Mapbox.IO.Compression..."
 mkdir -p $SDK_PATH/Plugins/ThirdParty/Mapbox.IO.Compression/
-rsync -av --exclude-from=x.txt ./dependencies/Mapbox.IO.Compression-unity/src/Mapbox.IO.Compression.Shared/ $SDK_PATH/Plugins/ThirdParty/Mapbox.IO.Compression/
+rsync -av --exclude-from=x.txt ./dependencies/Mapbox.IO.Compression-unity/ $SDK_PATH/Plugins/ThirdParty/Mapbox.IO.Compression/
 
 echo "copying Mapbox.Json..."
 mkdir -p $SDK_PATH/Plugins/ThirdParty/Mapbox.Json/

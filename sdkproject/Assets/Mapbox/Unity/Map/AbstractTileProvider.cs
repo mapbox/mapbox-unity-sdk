@@ -10,19 +10,20 @@
 	{
 		public event Action<UnwrappedTileId> OnTileAdded = delegate { };
 		public event Action<UnwrappedTileId> OnTileRemoved = delegate { };
+		public event Action<UnwrappedTileId> OnTileRepositioned = delegate { };
 
 		protected IMap _map;
 
 		protected Dictionary<UnwrappedTileId, byte> _activeTiles = new Dictionary<UnwrappedTileId, byte>();
 
-		public void Initialize(IMap map)
+		public virtual void Initialize(IMap map)
 		{
 			_activeTiles.Clear();
 			_map = map;
 			OnInitialized();
 		}
 
-		protected void AddTile(UnwrappedTileId tile)
+		protected virtual void AddTile(UnwrappedTileId tile)
 		{
 			if (_activeTiles.ContainsKey(tile))
 			{
@@ -33,7 +34,7 @@
 			OnTileAdded(tile);
 		}
 
-		protected void RemoveTile(UnwrappedTileId tile)
+		protected virtual void RemoveTile(UnwrappedTileId tile)
 		{
 			if (!_activeTiles.ContainsKey(tile))
 			{
@@ -44,6 +45,17 @@
 			OnTileRemoved(tile);
 		}
 
-		internal abstract void OnInitialized();
+		protected virtual void RepositionTile(UnwrappedTileId tile)
+		{
+			if (!_activeTiles.ContainsKey(tile))
+			{
+				//TODO : Only active tiles should be repositioned ?
+				return;
+			}
+
+			OnTileRepositioned(tile);
+		}
+
+		public abstract void OnInitialized();
 	}
 }

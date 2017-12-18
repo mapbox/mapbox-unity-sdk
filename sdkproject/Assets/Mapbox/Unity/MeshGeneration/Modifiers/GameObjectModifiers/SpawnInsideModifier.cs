@@ -8,6 +8,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.MeshGeneration.Components;
 	using UnityEngine;
+	using System.Collections.Generic;
+	using System;
 
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Spawn Inside Modifier")]
 	public class SpawnInsideModifier : GameObjectModifier
@@ -35,10 +37,22 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		int _spawnedCount;
 
-		public override void Run(FeatureBehaviour fb, UnityTile tile)
+		private Dictionary<GameObject, List<GameObject>> _objects;
+		private Queue<GameObject> _pool;
+
+		public override void Initialize()
+		{
+			if (_objects == null || _pool == null)
+			{
+				_objects = new Dictionary<GameObject, List<GameObject>>();
+				_pool = new Queue<GameObject>();
+			}
+		}
+
+		public override void Run(VectorEntity ve, UnityTile tile)
 		{
 			_spawnedCount = 0;
-			var collider = fb.GetComponent<Collider>();
+			var collider = ve.GameObject.GetComponent<Collider>();
 			var bounds = collider.bounds;
 			var center = bounds.center;
 			center.y = 0;
@@ -47,8 +61,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			int spawnCount = Mathf.Min(area / _spawnRateInSquareMeters, _maxSpawn);
 			while (_spawnedCount < spawnCount)
 			{
-				var x = Random.Range(-bounds.extents.x, bounds.extents.x);
-				var z = Random.Range(-bounds.extents.z, bounds.extents.z);
+				var x = UnityEngine.Random.Range(-bounds.extents.x, bounds.extents.x);
+				var z = UnityEngine.Random.Range(-bounds.extents.z, bounds.extents.z);
 				var ray = new Ray(bounds.center + new Vector3(x, 100, z), Vector3.down * 2000);
 
 				RaycastHit hit;
@@ -56,12 +70,12 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				if (Physics.Raycast(ray, out hit, 150, _layerMask))
 				{
 					//Debug.DrawLine(ray.origin, hit.point, Color.red, 1000);
-					var index = Random.Range(0, _prefabs.Length);
-					var transform = ((GameObject)Instantiate(_prefabs[index], fb.transform, false)).transform;
+					var index = UnityEngine.Random.Range(0, _prefabs.Length);
+					var transform = GetObject(index, ve.GameObject).transform;
 					transform.position = hit.point;
 					if (_randomizeRotation)
 					{
-						transform.localEulerAngles = new Vector3(0, Random.Range(-180f, 180f), 0);
+						transform.localEulerAngles = new Vector3(0, UnityEngine.Random.Range(-180f, 180f), 0);
 					}
 					if (!_scaleDownWithWorld)
 					{
@@ -71,7 +85,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					if (_randomizeScale)
 					{
 						var scale = transform.localScale;
-						var y = Random.Range(scale.y * .7f, scale.y * 1.3f);
+						var y = UnityEngine.Random.Range(scale.y * .7f, scale.y * 1.3f);
 						scale.y = y;
 						transform.localScale = scale;
 					}
@@ -79,6 +93,45 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					_spawnedCount++;
 				}
 			}
+		}
+
+		public override void OnPoolItem(VectorEntity vectorEntity)
+		{
+			if(_objects.ContainsKey(vectorEntity.GameObject))
+			{
+				foreach (var item in _objects[vectorEntity.GameObject])
+				{
+					item.SetActive(false);
+					_pool.Enqueue(item);
+				}
+
+				_objects[vectorEntity.GameObject].Clear();
+				_objects.Remove(vectorEntity.GameObject);
+			}
+		}
+
+		private GameObject GetObject(int index, GameObject go)
+		{
+			GameObject ob;
+			if (_pool.Count > 0)
+			{
+				ob = _pool.Dequeue();
+				ob.SetActive(true);
+				ob.transform.SetParent(go.transform);
+			}
+			else
+			{
+				ob = ((GameObject)Instantiate(_prefabs[index], go.transform, false));
+			}
+			if (_objects.ContainsKey(go))
+			{
+				_objects[go].Add(ob);
+			}
+			else
+			{
+				_objects.Add(go, new List<GameObject>() { ob });
+			}
+			return ob;
 		}
 	}
 }

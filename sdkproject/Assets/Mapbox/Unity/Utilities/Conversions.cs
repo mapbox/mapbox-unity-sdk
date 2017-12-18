@@ -10,6 +10,7 @@ namespace Mapbox.Unity.Utilities
 	using System;
 	using Mapbox.Utils;
 	using UnityEngine;
+	using System.Globalization;
 
 	/// <summary>
 	/// A set of Geo and Terrain Conversion utils.
@@ -31,6 +32,36 @@ namespace Mapbox.Unity.Utilities
 		public static Vector2d LatLonToMeters(Vector2d v)
 		{
 			return LatLonToMeters(v.x, v.y);
+		}
+
+		/// <summary>
+		/// Convert a simple string to a latitude longitude.
+		/// Expects format: latitude, longitude
+		/// </summary>
+		/// <returns>The lat/lon as Vector2d.</returns>
+		/// <param name="s">string.</param>
+		public static Vector2d StringToLatLon(string s)
+		{
+			var latLonSplit = s.Split(',');
+			if (latLonSplit.Length != 2)
+			{
+				throw new ArgumentException("Wrong number of arguments");
+			}
+
+			double latitude = 0;
+			double longitude = 0;
+
+			if (!double.TryParse(latLonSplit[0], NumberStyles.Any, NumberFormatInfo.InvariantInfo, out latitude))
+			{
+				throw new Exception(string.Format("Could not convert latitude to double: {0}", latLonSplit[0]));
+			}
+
+			if (!double.TryParse(latLonSplit[1], NumberStyles.Any, NumberFormatInfo.InvariantInfo, out longitude))
+			{
+				throw new Exception(string.Format("Could not convert longitude to double: {0}", latLonSplit[0]));
+			}
+
+			return new Vector2d(latitude, longitude);
 		}
 
 		/// <summary>
@@ -265,6 +296,18 @@ namespace Mapbox.Unity.Utilities
 		public static float GetTileScaleInMeters(float latitude, int zoom)
 		{
 			return (float)(40075016.685578d * Math.Cos(Mathf.Deg2Rad * latitude) / Math.Pow(2f, zoom + 8));
+		}
+
+		/// <summary>
+		/// Gets the degrees per tile at given zoom level for Web Mercator tile.
+		/// See: http://wiki.openstreetmap.org/wiki/Zoom_levels.
+		/// </summary>
+		/// <param name="latitude"> The latitude. </param>
+		/// <param name="zoom"> Zoom level. </param>
+		/// <returns> Degrees per tile. </returns>
+		public static float GetTileScaleInDegrees(float latitude, int zoom)
+		{
+			return (float)(360.0f / Math.Pow(2f, zoom + 8));
 		}
 
 		/// <summary>
