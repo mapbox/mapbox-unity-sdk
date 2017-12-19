@@ -270,6 +270,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			pngRasterTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
+				if (tile == null)
+				{
+					return;
+				}
+
 				if (pngRasterTile.HasError)
 				{
 					OnErrorOccurred(new TileErrorEventArgs(tile.CanonicalTileId, pngRasterTile.GetType(), tile, pngRasterTile.Exceptions));

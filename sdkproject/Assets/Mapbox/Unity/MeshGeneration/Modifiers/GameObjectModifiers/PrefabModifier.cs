@@ -19,7 +19,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void Initialize()
 		{
-			_objects = new Dictionary<GameObject, GameObject>();
+			if (_objects == null)
+			{
+				_objects = new Dictionary<GameObject, GameObject>();
+			}
 		}
 
 		public override void Run(VectorEntity ve, UnityTile tile)

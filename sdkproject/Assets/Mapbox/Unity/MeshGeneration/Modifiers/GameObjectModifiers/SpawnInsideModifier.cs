@@ -42,8 +42,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void Initialize()
 		{
-			_objects = new Dictionary<GameObject, List<GameObject>>();
-			_pool = new Queue<GameObject>();
+			if (_objects == null || _pool == null)
+			{
+				_objects = new Dictionary<GameObject, List<GameObject>>();
+				_pool = new Queue<GameObject>();
+			}
 		}
 
 		public override void Run(VectorEntity ve, UnityTile tile)

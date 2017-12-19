@@ -117,7 +117,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				_counter = md.Edges.Count;
 				var wallTri = new List<int>(_counter * 3);
 				var wallUv = new List<Vector2>(_counter * 2);
+<<<<<<< HEAD
 				Vector3 norm = Mapbox.Unity.Constants.Math.Vector3Zero;
+=======
+				Vector3 norm = Constants.Math.Vector3Zero;
+>>>>>>> master
 
 				md.Vertices.Capacity = md.Vertices.Count + _counter * 2;
 				md.Normals.Capacity = md.Normals.Count + _counter * 2;

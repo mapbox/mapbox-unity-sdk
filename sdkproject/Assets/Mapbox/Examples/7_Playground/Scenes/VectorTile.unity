@@ -337,7 +337,11 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
+<<<<<<< HEAD:sdkproject/Assets/Mapbox/Examples/7_Playground/Scenes/VectorTile.unity
       value: 0.03640175
+=======
+      value: 0.07540035
+>>>>>>> master:sdkproject/Assets/Mapbox/Examples/7_Playground/Scenes/VectorTile.unity
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -367,7 +371,11 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
+<<<<<<< HEAD:sdkproject/Assets/Mapbox/Examples/7_Playground/Scenes/VectorTile.unity
       value: -103.77769
+=======
+      value: -108.154915
+>>>>>>> master:sdkproject/Assets/Mapbox/Examples/7_Playground/Scenes/VectorTile.unity
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -377,12 +385,20 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
+<<<<<<< HEAD:sdkproject/Assets/Mapbox/Examples/7_Playground/Scenes/VectorTile.unity
       value: 187.55537
+=======
+      value: 196.30983
+>>>>>>> master:sdkproject/Assets/Mapbox/Examples/7_Playground/Scenes/VectorTile.unity
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
+<<<<<<< HEAD:sdkproject/Assets/Mapbox/Examples/7_Playground/Scenes/VectorTile.unity
       value: 207.55537
+=======
+      value: 216.30983
+>>>>>>> master:sdkproject/Assets/Mapbox/Examples/7_Playground/Scenes/VectorTile.unity
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}

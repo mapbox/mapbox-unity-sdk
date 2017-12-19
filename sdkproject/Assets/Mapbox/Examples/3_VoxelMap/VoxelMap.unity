@@ -357,6 +357,39 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0
       objectReference: {fileID: 0}
+<<<<<<< HEAD:sdkproject/Assets/Mapbox/Examples/3_VoxelMap/VoxelMap.unity
+=======
+    - target: {fileID: 224673336321870232, guid: be407b770a1444c32b66d2c4ecd7331c,
+        type: 2}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224673336321870232, guid: be407b770a1444c32b66d2c4ecd7331c,
+        type: 2}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224673336321870232, guid: be407b770a1444c32b66d2c4ecd7331c,
+        type: 2}
+      propertyPath: m_AnchoredPosition.x
+      value: 127.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224673336321870232, guid: be407b770a1444c32b66d2c4ecd7331c,
+        type: 2}
+      propertyPath: m_AnchoredPosition.y
+      value: -17
+      objectReference: {fileID: 0}
+    - target: {fileID: 224673336321870232, guid: be407b770a1444c32b66d2c4ecd7331c,
+        type: 2}
+      propertyPath: m_SizeDelta.x
+      value: 231
+      objectReference: {fileID: 0}
+    - target: {fileID: 224673336321870232, guid: be407b770a1444c32b66d2c4ecd7331c,
+        type: 2}
+      propertyPath: m_SizeDelta.y
+      value: 20
+      objectReference: {fileID: 0}
+>>>>>>> master:sdkproject/Assets/Mapbox/Examples/3_VoxelMap/VoxelMap.unity
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: be407b770a1444c32b66d2c4ecd7331c, type: 2}
   m_IsPrefabParent: 0
@@ -706,6 +739,7 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0
       objectReference: {fileID: 0}
+<<<<<<< HEAD:sdkproject/Assets/Mapbox/Examples/3_VoxelMap/VoxelMap.unity
     - target: {fileID: 1611603657303738, guid: 98be219873e6d4dffb5949746f515a33, type: 2}
       propertyPath: m_Name
       value: InfoCanvas
@@ -714,6 +748,12 @@ Prefab:
         type: 2}
       propertyPath: m_AnchorMin.y
       value: 0.5584905
+=======
+    - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_AnchorMin.y
+      value: 0.6029062
+>>>>>>> master:sdkproject/Assets/Mapbox/Examples/3_VoxelMap/VoxelMap.unity
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -743,7 +783,11 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
+<<<<<<< HEAD:sdkproject/Assets/Mapbox/Examples/3_VoxelMap/VoxelMap.unity
       value: -226.49568
+=======
+      value: -251.82971
+>>>>>>> master:sdkproject/Assets/Mapbox/Examples/3_VoxelMap/VoxelMap.unity
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -753,11 +797,16 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
+<<<<<<< HEAD:sdkproject/Assets/Mapbox/Examples/3_VoxelMap/VoxelMap.unity
       value: 432.99136
+=======
+      value: 483.65942
+>>>>>>> master:sdkproject/Assets/Mapbox/Examples/3_VoxelMap/VoxelMap.unity
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
+<<<<<<< HEAD:sdkproject/Assets/Mapbox/Examples/3_VoxelMap/VoxelMap.unity
       value: 452.99136
       objectReference: {fileID: 0}
     - target: {fileID: 114603753021256032, guid: 98be219873e6d4dffb5949746f515a33,
@@ -794,6 +843,9 @@ Prefab:
 
         Voxel Batch Count: The number of voxels to spawn at once. Keep this number
         low to prevent locking the main thread during construction.'
+=======
+      value: 503.65942
+>>>>>>> master:sdkproject/Assets/Mapbox/Examples/3_VoxelMap/VoxelMap.unity
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
