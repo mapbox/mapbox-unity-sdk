@@ -1,7 +1,7 @@
 ﻿## CHANGELOG
 
 ### v.1.3.0
-*12/08/2017*
+*12/18/2017*
 
 ##### Upgrade Instructions 
 - As always, if you already have a project with a previous version of the SDK, please remove older versions before installing this new one!
