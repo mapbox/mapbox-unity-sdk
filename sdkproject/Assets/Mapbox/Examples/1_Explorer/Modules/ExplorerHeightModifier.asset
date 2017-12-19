@@ -16,3 +16,4 @@ MonoBehaviour:
   _forceHeight: 0
   _height: 0
   _createSideWalls: 1
+  _separateSubmesh: 1

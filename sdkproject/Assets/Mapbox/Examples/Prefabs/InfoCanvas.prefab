@@ -402,21 +402,42 @@ MonoBehaviour:
     m_MinSize: 1
     m_MaxSize: 40
     m_Alignment: 0
-    m_AlignByGeometry: 1
+    m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "<b>Explorer</b>\n\nThis is a master example that allows you to explore
-    Mapbox\u2019s location data and the Map Editor. You can see a variety of data
-    layers associated with Mapbox\u2019s vector tiles, including building data, points
-    of interest (POIs), roads, and real-time traffic data. Each map vector tile includes
-    high levels of detail about a particular location or building in GeoJSON format
-    that you can leverage for procedurally generating experiences or styling. You
-    can toggle these data layers on and off as needed in the Map Editor (access through
-    the Mapbox menu). \n\nMapbox has worldwide data coverage so you can create truly
-    global game levels, AR experiences, and apps. Search anywhere in the world to
-    explore the maps and location data you have available to you. "
+  m_Text: '<b>Real World Data, Minecraft-inspired Map</b>
+
+
+    This Minecraft-inspired example demonstrates a less traditional way to consume
+    Mapbox data for maps or world construction.
+
+
+    VoxelTile is responsible for fetching both a styled raster tile and a mapbox.terrain-rgb
+    (global elevation) tile. The styled raster pixels are sampled to determine which
+    voxels to generate, via the VoxelFetcher. This is achieved using a nearest color
+    formula. The elevation tile pixels are sampled to determine where to vertically
+    place the voxels.
+
+
+    Zoom: the zoom level at which to request the tiles.
+
+
+    Elevation Multiplier: used to exaggerate the real-world height.
+
+
+    Voxel Depth Padding: determine how many voxels to spawn below the designated height.
+    This helps fill holes in environments with extreme elevation variations.
+
+
+    Tile Width in Voxels: How many voxels to generate across each tile. This will
+    affect the detail of the world. Raster textures are downsampled according to this
+    value.
+
+
+    Voxel Batch Count: The number of voxels to spawn at once. Keep this number low
+    to prevent locking the main thread during construction.'
 --- !u!114 &114699889412236512
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -524,7 +545,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 224907993215804030}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.73050255
+  m_Size: 0.4183608
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -572,7 +593,7 @@ MonoBehaviour:
   m_Content: {fileID: 224857786874416376}
   m_Horizontal: 0
   m_Vertical: 1
-  m_MovementType: 1
+  m_MovementType: 2
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
@@ -887,7 +908,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.0000038146973}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!224 &224907856650798614

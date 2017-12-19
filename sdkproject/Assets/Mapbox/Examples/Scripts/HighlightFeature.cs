@@ -15,12 +15,13 @@
 		{
 			if (_highlightMaterial == null)
 			{
-				_highlightMaterial = new Material(Shader.Find("Unlit/Color"));
+				_highlightMaterial = Instantiate(GetComponent<MeshRenderer>().material);
 				_highlightMaterial.color = Color.red;
 			}
 
 			_meshRenderer = GetComponent<MeshRenderer>();
-			foreach (var item in _meshRenderer.materials)
+			
+			foreach (var item in _meshRenderer.sharedMaterials)
 			{
 				_materials.Add(item);
 			}

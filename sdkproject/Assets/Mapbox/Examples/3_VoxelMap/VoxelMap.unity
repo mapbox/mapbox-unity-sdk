@@ -357,6 +357,36 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 224673336321870232, guid: be407b770a1444c32b66d2c4ecd7331c,
+        type: 2}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224673336321870232, guid: be407b770a1444c32b66d2c4ecd7331c,
+        type: 2}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224673336321870232, guid: be407b770a1444c32b66d2c4ecd7331c,
+        type: 2}
+      propertyPath: m_AnchoredPosition.x
+      value: 127.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224673336321870232, guid: be407b770a1444c32b66d2c4ecd7331c,
+        type: 2}
+      propertyPath: m_AnchoredPosition.y
+      value: -17
+      objectReference: {fileID: 0}
+    - target: {fileID: 224673336321870232, guid: be407b770a1444c32b66d2c4ecd7331c,
+        type: 2}
+      propertyPath: m_SizeDelta.x
+      value: 231
+      objectReference: {fileID: 0}
+    - target: {fileID: 224673336321870232, guid: be407b770a1444c32b66d2c4ecd7331c,
+        type: 2}
+      propertyPath: m_SizeDelta.y
+      value: 20
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: be407b770a1444c32b66d2c4ecd7331c, type: 2}
   m_IsPrefabParent: 0
@@ -706,14 +736,10 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1611603657303738, guid: 98be219873e6d4dffb5949746f515a33, type: 2}
-      propertyPath: m_Name
-      value: InfoCanvas
-      objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0.5584905
+      value: 0.6029062
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -743,7 +769,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -226.49568
+      value: -251.82971
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -753,47 +779,13 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 432.99136
+      value: 483.65942
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 452.99136
-      objectReference: {fileID: 0}
-    - target: {fileID: 114603753021256032, guid: 98be219873e6d4dffb5949746f515a33,
-        type: 2}
-      propertyPath: m_Text
-      value: '<b>Real World Data, Minecraft-inspired Map</b>
 
-
-        This Minecraft-inspired example demonstrates a less traditional way to consume
-        Mapbox data for maps or world construction.
-
-
-        VoxelTile is responsible for fetching both a styled raster tile and a mapbox.terrain-rgb
-        (global elevation) tile. The styled raster pixels are sampled to determine
-        which voxels to generate, via the VoxelFetcher. This is achieved using a nearest
-        color formula. The elevation tile pixels are sampled to determine where to
-        vertically place the voxels.
-
-
-        Zoom: the zoom level at which to request the tiles.
-
-
-        Elevation Multiplier: used to exaggerate the real-world height.
-
-
-        Voxel Depth Padding: determine how many voxels to spawn below the designated
-        height. This helps fill holes in environments with extreme elevation variations.
-
-
-        Tile Width in Voxels: How many voxels to generate across each tile. This will
-        affect the detail of the world. Raster textures are downsampled according
-        to this value.
-
-
-        Voxel Batch Count: The number of voxels to spawn at once. Keep this number
-        low to prevent locking the main thread during construction.'
+      value: 503.65942
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}

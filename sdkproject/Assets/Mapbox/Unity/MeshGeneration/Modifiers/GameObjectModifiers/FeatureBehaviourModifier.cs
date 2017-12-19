@@ -13,7 +13,10 @@
 
 		public override void Initialize()
 		{
-			_features = new Dictionary<GameObject, FeatureBehaviour>();
+			if (_features == null)
+			{
+				_features = new Dictionary<GameObject, FeatureBehaviour>();
+			}
 		}
 
 		public override void Run(VectorEntity ve, UnityTile tile)
