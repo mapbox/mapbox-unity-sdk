@@ -3,11 +3,21 @@
 //     Copyright (c) 2017 Mapbox. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
-
+using System;
 using System.ComponentModel;
 
 namespace Mapbox.MapMatching
 {
+#if PORTABLE || WINDOWS_UWP
+	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
+	public class DescriptionAttribute : Attribute {
+		private readonly string description;
+		public string Description { get { return description; } }
+		public DescriptionAttribute(string description) {
+			this.description = description;
+		}
+	}
+#endif
 
 	/// <summary>Directions profile id</summary>
 	public enum Profile

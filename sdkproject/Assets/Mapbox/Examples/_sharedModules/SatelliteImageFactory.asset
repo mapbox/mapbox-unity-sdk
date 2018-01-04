@@ -17,7 +17,7 @@ MonoBehaviour:
     Id: mapbox.satellite
     Modified: 
     UserName: 
-  _mapId: mapbox://styles/mapbox/satellite-v9
+  _mapId: mapbox.satellite
   _useCompression: 0
   _useMipMap: 0
-  _useRetina: 0
+  _useRetina: 1

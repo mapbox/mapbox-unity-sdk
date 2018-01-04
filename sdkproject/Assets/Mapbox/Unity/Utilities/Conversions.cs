@@ -43,13 +43,23 @@ namespace Mapbox.Unity.Utilities
 		public static Vector2d StringToLatLon(string s)
 		{
 			var latLonSplit = s.Split(',');
+			if (latLonSplit.Length != 2)
+			{
+				throw new ArgumentException("Wrong number of arguments");
+			}
 
 			double latitude = 0;
 			double longitude = 0;
 
-			var locale = CultureInfo.CreateSpecificCulture("en-US");
-			double.TryParse(latLonSplit[0], NumberStyles.Any, locale, out latitude);
-			double.TryParse(latLonSplit[1], NumberStyles.Any, locale, out longitude);
+			if (!double.TryParse(latLonSplit[0], NumberStyles.Any, NumberFormatInfo.InvariantInfo, out latitude))
+			{
+				throw new Exception(string.Format("Could not convert latitude to double: {0}", latLonSplit[0]));
+			}
+
+			if (!double.TryParse(latLonSplit[1], NumberStyles.Any, NumberFormatInfo.InvariantInfo, out longitude))
+			{
+				throw new Exception(string.Format("Could not convert longitude to double: {0}", latLonSplit[0]));
+			}
 
 			return new Vector2d(latitude, longitude);
 		}
@@ -286,6 +296,18 @@ namespace Mapbox.Unity.Utilities
 		public static float GetTileScaleInMeters(float latitude, int zoom)
 		{
 			return (float)(40075016.685578d * Math.Cos(Mathf.Deg2Rad * latitude) / Math.Pow(2f, zoom + 8));
+		}
+
+		/// <summary>
+		/// Gets the degrees per tile at given zoom level for Web Mercator tile.
+		/// See: http://wiki.openstreetmap.org/wiki/Zoom_levels.
+		/// </summary>
+		/// <param name="latitude"> The latitude. </param>
+		/// <param name="zoom"> Zoom level. </param>
+		/// <returns> Degrees per tile. </returns>
+		public static float GetTileScaleInDegrees(float latitude, int zoom)
+		{
+			return (float)(360.0f / Math.Pow(2f, zoom + 8));
 		}
 
 		/// <summary>

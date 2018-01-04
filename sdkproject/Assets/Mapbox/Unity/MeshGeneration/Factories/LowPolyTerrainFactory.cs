@@ -6,6 +6,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	using Mapbox.Unity.MeshGeneration.Enums;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Utils;
+	using System;
 
 	/// <summary>
 	/// Uses Mapbox Terrain api and creates terrain meshes.
@@ -50,6 +51,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		private List<int> _newTriangleList;
 		private Vector3 _newDir;
 		private int _vertA, _vertB, _vertC;
+		private int _counter;
 
 		public string MapId
 		{
@@ -100,6 +102,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 
 			CreateTerrainHeight(tile);
+		}
+
+		/// <summary>
+		/// Method to be called when a tile error has occurred.
+		/// </summary>
+		/// <param name="e"><see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance/</param>
+		protected override void OnErrorOccurred(TileErrorEventArgs e)
+		{
+			base.OnErrorOccurred(e);
 		}
 
 		private void CreateBaseMesh(UnityTile tile)
@@ -185,8 +196,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			pngRasterTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
+				if (tile == null)
+				{
+					return;
+				}
+
 				if (pngRasterTile.HasError)
 				{
+					OnErrorOccurred(new TileErrorEventArgs(tile.CanonicalTileId, pngRasterTile.GetType(), tile, pngRasterTile.Exceptions));
 					tile.HeightDataState = TilePropertyState.Error;
 
 					// Handle missing elevation from server (404)!
@@ -291,7 +308,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			tile.MeshFilter.mesh.GetVertices(_currentTileMeshData.Vertices);
 			tile.MeshFilter.mesh.GetNormals(_currentTileMeshData.Normals);
 
-			for (int i = 0; i < _currentTileMeshData.Vertices.Count; i++)
+			_counter = _currentTileMeshData.Vertices.Count;
+			for (int i = 0; i < _counter; i++)
 			{
 				_currentTileMeshData.Vertices[i] = new Vector3(
 					_currentTileMeshData.Vertices[i].x,

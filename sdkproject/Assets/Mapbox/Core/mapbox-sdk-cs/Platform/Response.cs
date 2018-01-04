@@ -251,7 +251,9 @@ namespace Mapbox.Platform
 				response.AddException(apiEx);
 			}
 
-			if (apiResponse.isNetworkError)
+			// additional string.empty check for apiResponse.error:
+			// on UWP isNetworkError is sometimes set to true despite all being well
+			if (apiResponse.isNetworkError && !string.IsNullOrWhiteSpace(apiResponse.error))
 			{
 				response.AddException(new Exception(apiResponse.error));
 			}
@@ -265,6 +267,8 @@ namespace Mapbox.Platform
 			}
 
 #if NETFX_CORE
+			StringComparison stringComp = StringComparison.OrdinalIgnoreCase;
+#elif WINDOWS_UWP
 			StringComparison stringComp = StringComparison.OrdinalIgnoreCase;
 #else
 			StringComparison stringComp = StringComparison.InvariantCultureIgnoreCase;

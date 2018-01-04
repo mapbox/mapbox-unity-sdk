@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Unity.Map
+namespace Mapbox.Unity.Map
 {
 	using System.Linq;
 	using System.Collections.Generic;
@@ -10,6 +10,13 @@
 	using Mapbox.Platform;
 	using UnityEngine.Serialization;
 
+	/// <summary>
+	/// Map Visualizer
+	/// Represents a map.Doesn’t contain much logic and at the moment, it creates requested tiles and relays them to the factories 
+	/// under itself.It has a caching mechanism to reuse tiles and does the tile positioning in unity world.
+	/// Later we’ll most likely keep track of map features here as well to allow devs to query for features easier 
+	/// (i.e.query all buildings x meters around any restaurant etc).
+	/// </summary>
 	public abstract class AbstractMapVisualizer : ScriptableObject
 	{
 		[SerializeField]
@@ -23,6 +30,7 @@
 		protected IMapReadable _map;
 		protected Dictionary<UnwrappedTileId, UnityTile> _activeTiles = new Dictionary<UnwrappedTileId, UnityTile>();
 		protected Queue<UnityTile> _inactiveTiles = new Queue<UnityTile>();
+		private int _counter;
 
 		private ModuleState _state;
 		public ModuleState State
@@ -47,10 +55,26 @@
 		public event Action<ModuleState> OnMapVisualizerStateChanged = delegate { };
 
 		/// <summary>
+		/// The  <c>OnTileError</c> event triggers when there's a <c>Tile</c> error.
+		/// Returns a <see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance as a parameter, for the tile on which error occurred.
+		/// </summary>
+		public event EventHandler<TileErrorEventArgs> OnTileError;
+
+		/// <summary>
+		/// Gets the unity tile from unwrapped tile identifier.
+		/// </summary>
+		/// <returns>The unity tile from unwrapped tile identifier.</returns>
+		/// <param name="tileId">Tile identifier.</param>
+		public UnityTile GetUnityTileFromUnwrappedTileId(UnwrappedTileId tileId)
+		{
+			return _activeTiles[tileId];
+		}
+
+		/// <summary>
 		/// Initializes the factories by passing the file source down, which is necessary for data (web/file) calls
 		/// </summary>
 		/// <param name="fileSource"></param>
-		public void Initialize(IMapReadable map, IFileSource fileSource)
+		public virtual void Initialize(IMapReadable map, IFileSource fileSource)
 		{
 			_map = map;
 
@@ -72,39 +96,48 @@
 				else
 				{
 					factory.Initialize(fileSource);
-					factory.OnFactoryStateChanged += UpdateState;
+					UnregisterEvents(factory);
+					RegisterEvents(factory);
 				}
 			}
 		}
 
-		public void Destroy()
+		private void RegisterEvents(AbstractTileFactory factory)
 		{
-			for (int i = 0; i < Factories.Count; i++)
+			factory.OnFactoryStateChanged += UpdateState;
+			factory.OnTileError += Factory_OnTileError;
+		}
+
+		private void UnregisterEvents(AbstractTileFactory factory)
+		{
+			factory.OnFactoryStateChanged -= UpdateState;
+			factory.OnTileError -= Factory_OnTileError;
+		}
+
+		public virtual void Destroy()
+		{
+			_counter = Factories.Count;
+			for (int i = 0; i < _counter; i++)
 			{
 				if (Factories[i] != null)
 				{
-					Factories[i].OnFactoryStateChanged -= UpdateState;
+					UnregisterEvents(Factories[i]);
 				}
 			}
 
-			// Cleanup gameobjects and clear lists!
+			// Inform all downstream nodes that we no longer need to process these tiles.
 			// This scriptable object may be re-used, but it's gameobjects are likely 
 			// to be destroyed by a scene change, for example. 
-			foreach (var tile in _activeTiles.Values.ToList())
+			foreach (var tileId in _activeTiles.Keys.ToList())
 			{
-				Destroy(tile.gameObject);
-			}
-
-			foreach (var tile in _inactiveTiles)
-			{
-                Destroy(tile.gameObject);
+				DisposeTile(tileId);
 			}
 
 			_activeTiles.Clear();
 			_inactiveTiles.Clear();
 		}
 
-		internal void UpdateState(AbstractTileFactory factory)
+		void UpdateState(AbstractTileFactory factory)
 		{
 			if (State != ModuleState.Working && factory.State == ModuleState.Working)
 			{
@@ -113,7 +146,8 @@
 			else if (State != ModuleState.Finished && factory.State == ModuleState.Finished)
 			{
 				var allFinished = true;
-				for (int i = 0; i < Factories.Count; i++)
+				_counter = Factories.Count;
+				for (int i = 0; i < _counter; i++)
 				{
 					if (Factories[i] != null)
 					{
@@ -146,9 +180,10 @@
 				unityTile.transform.SetParent(_map.Root, false);
 			}
 
-			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale, _loadingTexture);
+			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale, _map.AbsoluteZoom, _loadingTexture);
 			PlaceTile(tileId, unityTile, _map);
 
+			// Don't spend resources naming objects, as you shouldn't find objects by name anyway!
 #if UNITY_EDITOR
 			unityTile.gameObject.name = unityTile.CanonicalTileId.ToString();
 #endif
@@ -163,7 +198,7 @@
 			return unityTile;
 		}
 
-		public void DisposeTile(UnwrappedTileId tileId)
+		public virtual void DisposeTile(UnwrappedTileId tileId)
 		{
 			var unityTile = ActiveTiles[tileId];
 
@@ -174,6 +209,28 @@
 			foreach (var factory in Factories)
 			{
 				factory.Unregister(unityTile);
+			}
+		}
+
+		/// <summary>
+		/// Repositions active tiles instead of recreating them. Useful for panning the map
+		/// </summary>
+		/// <param name="tileId"></param>
+		public virtual void RepositionTile(UnwrappedTileId tileId)
+		{
+			UnityTile currentTile;
+			if (ActiveTiles.TryGetValue(tileId, out currentTile))
+			{
+				PlaceTile(tileId, currentTile, _map);
+			}
+		}
+
+		private void Factory_OnTileError(object sender, TileErrorEventArgs e)
+		{
+			EventHandler<TileErrorEventArgs> handler = OnTileError;
+			if (handler != null)
+			{
+				handler(this, e);
 			}
 		}
 
