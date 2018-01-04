@@ -21,7 +21,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField]
 		private MapIdType _mapIdType;
 		[SerializeField]
+#pragma warning disable 0414
 		private string _customMapId = "mapbox.terrain-rgb";
+#pragma warning restore 0414
 		[SerializeField]
 		private string _mapId = "";
 		[SerializeField]
@@ -268,6 +270,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			pngRasterTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
+				if (tile == null)
+				{
+					return;
+				}
+
 				if (pngRasterTile.HasError)
 				{
 					OnErrorOccurred(new TileErrorEventArgs(tile.CanonicalTileId, pngRasterTile.GetType(), tile, pngRasterTile.Exceptions));

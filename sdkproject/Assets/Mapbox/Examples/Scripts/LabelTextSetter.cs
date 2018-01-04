@@ -11,7 +11,8 @@
 
 		public void Set(Dictionary<string, object> props)
 		{
-			//var _textMesh = GetComponentInChildren<TextMesh>();
+			_textMesh.text = "";
+
 			if (props.ContainsKey("name"))
 			{
 				_textMesh.text = props["name"].ToString();

@@ -5,35 +5,36 @@
 
 	public class HighlightFeature : MonoBehaviour
 	{
-		private List<Color> _original = new List<Color>();
-		private Color _highlight = Color.red;
+		static Material _highlightMaterial;
+
 		private List<Material> _materials = new List<Material>();
-		private int _counter;
+
+		MeshRenderer _meshRenderer;
 
 		void Start()
 		{
-			foreach (var item in GetComponent<MeshRenderer>().materials)
+			if (_highlightMaterial == null)
+			{
+				_highlightMaterial = Instantiate(GetComponent<MeshRenderer>().material);
+				_highlightMaterial.color = Color.red;
+			}
+
+			_meshRenderer = GetComponent<MeshRenderer>();
+			
+			foreach (var item in _meshRenderer.sharedMaterials)
 			{
 				_materials.Add(item);
-				_original.Add(item.color);
 			}
-			_counter = _materials.Count;
 		}
 
 		public void OnMouseEnter()
 		{
-			foreach (var item in _materials)
-			{
-				item.color = _highlight;
-			}
+			_meshRenderer.sharedMaterial = _highlightMaterial;
 		}
 
 		public void OnMouseExit()
 		{
-			for (int i = 0; i < _counter; i++)
-			{
-				_materials[i].color = _original[i];
-			}
+			_meshRenderer.materials = _materials.ToArray();
 		}
 	}
 }

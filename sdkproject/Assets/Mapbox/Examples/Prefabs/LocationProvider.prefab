@@ -242,3 +242,4 @@ MonoBehaviour:
   _deviceLocationProvider: {fileID: 114304334187956690}
   _editorLocationProvider: {fileID: 114023304781792650}
   _transformLocationProvider: {fileID: 114958662040910602}
+  _dontDestroyOnLoad: 0

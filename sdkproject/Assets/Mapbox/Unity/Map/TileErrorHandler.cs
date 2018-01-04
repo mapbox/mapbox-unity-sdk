@@ -34,10 +34,16 @@
 			// check if request has been aborted: show warning not error
 			if (e.Exceptions.Count > 0)
 			{
-				// aborted is always the first exception
-				// additional exceptions are always caused by the request being aborted
-				// show all of them as warnings
-				if (e.Exceptions[0].Message.Contains("Request aborted"))
+				// 1. aborted is always the first exception
+				//    additional exceptions are always caused by the request being aborted
+				//    show all of them as warnings
+				// 2. 'Unable to write data' is another exception associated 
+				//    with aborted requests: request finshed successfully but
+				//    was aborted during filling of local buffer, also show as warning
+				if (
+					e.Exceptions[0].Message.Contains("Request aborted")
+					|| e.Exceptions[0].Message.Equals("Unable to write data")
+				)
 				{
 					Debug.LogWarning(printMessage(e.Exceptions, e));
 				}

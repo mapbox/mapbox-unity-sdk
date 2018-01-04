@@ -55,7 +55,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 				var vl = new List<Vector3>(_sliceCount * _counter);
 				var edges = new List<Vector3>(_counter);
-				var uvs = new List<Vector2>(_sliceCount * _counter);
 				int co = 0;
 
 				for (int j = 0; j < _counter; j++)
@@ -100,7 +99,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				md.Normals.Capacity = md.Normals.Count + (vl.Count - _sliceCount) * 4;
 				md.Triangles.Capacity = md.Triangles.Count + (vl.Count - _sliceCount) * 6;
 				
-				var quadCounter = vl.Count - _sliceCount;
 				var uvDist = 0f;
 				float edMag = 0f, h = 0f;
 				co = 0;

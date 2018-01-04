@@ -95,6 +95,8 @@ namespace Mapbox.Examples
 				{
 					return;
 				}
+
+				// TODO: disable keyboard-specific input.
 				x = Input.GetAxis("Horizontal");
 				z = Input.GetAxis("Vertical");
 				y = -Input.GetAxis("Mouse ScrollWheel") * _zoomSpeed;

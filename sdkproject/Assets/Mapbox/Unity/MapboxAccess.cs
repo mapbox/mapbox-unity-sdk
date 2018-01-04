@@ -2,6 +2,7 @@ namespace Mapbox.Unity
 {
 	using UnityEngine;
 	using System;
+	using System.IO;
 	using Mapbox.Geocoding;
 	using Mapbox.Directions;
 	using Mapbox.Platform;
@@ -19,6 +20,9 @@ namespace Mapbox.Unity
 	{
 		ITelemetryLibrary _telemetryLibrary;
 		CachingWebFileSource _fileSource;
+
+		public delegate void TokenValidationEvent(MapboxTokenStatus response);
+		public event TokenValidationEvent OnTokenValidation;
 
 		static MapboxAccess _instance;
 
@@ -54,20 +58,28 @@ namespace Mapbox.Unity
 		MapboxAccess()
 		{
 			LoadAccessToken();
-			ConfigureFileSource();
-			ConfigureTelemetry();
 		}
 
-		public void SetConfiguration(MapboxConfiguration configuration)
+		public void SetConfiguration(MapboxConfiguration configuration, bool throwExecptions = true)
 		{
 			if (configuration == null)
 			{
-				throw new InvalidTokenException("Please configure your access token from the Mapbox menu!");
+				if (throwExecptions)
+				{
+					throw new InvalidTokenException("No configuration file found! Configure your access token from the Mapbox > Settings menu.");
+				}
+
 			}
 
 			TokenValidator.Retrieve(configuration.AccessToken, (response) =>
 			{
-				if (response.Status != MapboxTokenStatus.TokenValid)
+				if (OnTokenValidation != null)
+				{
+					OnTokenValidation(response.Status);
+				}
+
+				if (response.Status != MapboxTokenStatus.TokenValid
+				   && throwExecptions)
 				{
 					throw new InvalidTokenException(response.Status.ToString());
 				}
@@ -97,7 +109,9 @@ namespace Mapbox.Unity
 		/// </summary>
 		private void LoadAccessToken()
 		{
+
 			TextAsset configurationTextAsset = Resources.Load<TextAsset>(Constants.Path.MAPBOX_RESOURCES_RELATIVE);
+
 #if !WINDOWS_UWP
 			SetConfiguration(configurationTextAsset == null ? null : JsonUtility.FromJson<MapboxConfiguration>(configurationTextAsset.text));
 #else
@@ -128,6 +142,7 @@ namespace Mapbox.Unity
 		public void SetLocationCollectionState(bool enable)
 		{
 			PlayerPrefs.SetInt(Constants.Path.SHOULD_COLLECT_LOCATION_KEY, (enable ? 1 : 0));
+			PlayerPrefs.Save();
 			_telemetryLibrary.SetLocationCollectionState(enable);
 		}
 
@@ -238,6 +253,6 @@ namespace Mapbox.Unity
 		public string AccessToken;
 		public uint MemoryCacheSize = 500;
 		public uint MbTilesCacheSize = 2000;
-		public int DefaultTimeout = 10;
+		public int DefaultTimeout = 30;
 	}
 }

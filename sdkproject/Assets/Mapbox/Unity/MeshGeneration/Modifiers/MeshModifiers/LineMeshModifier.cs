@@ -1,7 +1,6 @@
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
     using System.Collections.Generic;
-    using System.Linq;
     using UnityEngine;
     using Mapbox.Unity.MeshGeneration.Data;
     
@@ -14,7 +13,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
     public class LineMeshModifier : MeshModifier
     {
         [SerializeField]
-        private float Width;
+        public float Width;
 		private float _scaledWidth;
         public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
