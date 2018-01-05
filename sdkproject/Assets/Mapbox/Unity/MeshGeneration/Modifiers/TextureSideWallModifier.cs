@@ -75,16 +75,22 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_scaledTopFloorHeight = tile.TileScale * _currentFacade.TopFloorHeight;
 
 			//read or force height
-			float hf = SetHeight(feature, md, tile);
+			float maxHeight = 1, minHeight = 0;
+			SetHeight(feature, md, tile, out maxHeight, out minHeight);
+			float height = maxHeight - minHeight;
+			for (int i = 0; i < md.Vertices.Count; i++)
+			{
+				md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + maxHeight, md.Vertices[i].z);
+			}
 
 			edgeList.Clear();
 			//cuts long edges into smaller ones using PreferredEdgeSectionLength
 			CalculateEdgeList(md, tile, _currentFacade.PreferredEdgeSectionLength);
 
 			//limiting section heights, first floor gets priority, then we draw top floor, then mid if we still have space
-			firstHeight = Mathf.Min(hf, _scaledFirstFloorHeight);
-			topHeight = Mathf.Min(hf - firstHeight, _scaledTopFloorHeight);
-			midHeight = Mathf.Max(0, hf - (firstHeight + topHeight));
+			firstHeight = Mathf.Min(height, _scaledFirstFloorHeight);
+			topHeight = Mathf.Min(height - firstHeight, _scaledTopFloorHeight);
+			midHeight = Mathf.Max(0, height - (firstHeight + topHeight));
 
 			//we're merging small mid sections to top and small top sections to first floor to avoid really short/compressed floors
 			//I think we need this but I'm not sure about implementation. I feel like mid height should be shared by top&bottom for example.
@@ -131,7 +137,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 				TopFloor(md);
 				MidFloors(md);
-				FirstFloor(md, hf);
+				FirstFloor(md, height);
 			}
 
 
@@ -290,22 +296,21 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
-		private float SetHeight(VectorFeatureUnity feature, MeshData md, UnityTile tile)
+		private void SetHeight(VectorFeatureUnity feature, MeshData md, UnityTile tile, out float topHeight, out float minHeight)
 		{
-			float hf = _height * tile.TileScale;
-			if (!_forceHeight && feature.Properties.ContainsKey("height"))
+			minHeight = 0;
+			topHeight = _height * tile.TileScale;
+			if (!_forceHeight)
 			{
-				if (float.TryParse(feature.Properties["height"].ToString(), out hf))
+				if (feature.Properties.ContainsKey("height"))
 				{
-					hf *= tile.TileScale;
+					topHeight = Convert.ToSingle(feature.Properties["height"]) * tile.TileScale;
+					if (feature.Properties.ContainsKey("min_height"))
+					{
+						minHeight = Convert.ToSingle(feature.Properties["min_height"]) * tile.TileScale;
+					}
 				}
 			}
-			for (int i = 0; i < md.Vertices.Count; i++)
-			{
-				md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + hf, md.Vertices[i].z);
-			}
-
-			return hf;
 		}
 	}
 }
