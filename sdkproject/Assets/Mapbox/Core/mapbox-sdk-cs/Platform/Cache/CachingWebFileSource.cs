@@ -149,9 +149,10 @@
 							return;
 						}
 
-						//UnityEngine.Debug.LogFormat("{0} : {1}", cachedItem.ETag, headerOnly.Headers["ETag"]);
+						// UnityEngine.Debug.LogFormat("{0} : {1}", cachedItem.ETag, headerOnly.Headers["ETag"]);
 						// data from cache is the same as on the web, propagate to all other caches but don't force insert via cache.add()
-						if (cachedItem.ETag.Equals(headerOnly.Headers["ETag"]))
+						// ETag empty check: backwards compability
+						if (!string.IsNullOrEmpty(cachedItem.ETag) && cachedItem.ETag.Equals(headerOnly.Headers["ETag"]))
 						{
 							foreach (var cache in _caches)
 							{
