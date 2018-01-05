@@ -57,7 +57,7 @@ namespace Mapbox.Unity.Map
 				_ray = _camera.ViewportPointToRay(_viewportTarget);
 				if (_groundPlane.Raycast(_ray, out _hitDistance))
 				{
-					_currentLatitudeLongitude = _ray.GetPoint(_hitDistance).GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
+					_currentLatitudeLongitude = transform.InverseTransformPoint(_ray.GetPoint(_hitDistance)).GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
 					_currentTile = TileCover.CoordinateToTileId(_currentLatitudeLongitude, _map.AbsoluteZoom);
 
 					if (!_currentTile.Equals(_cachedTile))
