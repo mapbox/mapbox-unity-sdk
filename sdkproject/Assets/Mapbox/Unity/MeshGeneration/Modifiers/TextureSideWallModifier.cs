@@ -132,8 +132,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				currentY = v1.y;
 
 				floorScaleRatio = Math.Min(1, midHeight / _scaledFloorHeight);
-				bottomOfMidUv = (1 - _currentFacade.TopSectionRatio) - (1f - _currentFacade.TopSectionRatio - _currentFacade.BottomSectionRatio) * Math.Min(1, ((float)(Math.Floor(floorScaleRatio * _currentFacade.MidFloorCount) + 1) / _currentFacade.MidFloorCount)); // midHeight < _scaledFloorHeight * 0.66 ? 0.5f : 0.125f;
-				topOfMidUv = 1 - _currentFacade.TopSectionRatio;
+				bottomOfMidUv = (_currentTextureRect.yMax - _currentFacade.TopSectionRatio) - (_currentTextureRect.height - _currentFacade.TopSectionRatio - _currentFacade.BottomSectionRatio) * Math.Min(1, ((float)(Math.Floor(floorScaleRatio * _currentFacade.MidFloorCount) + 1) / _currentFacade.MidFloorCount)); // midHeight < _scaledFloorHeight * 0.66 ? 0.5f : 0.125f;
+				topOfMidUv = _currentTextureRect.yMax - (_currentTextureRect.height * _currentFacade.TopSectionRatio);
 
 				TopFloor(md);
 				MidFloors(md);
