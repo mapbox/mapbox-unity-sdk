@@ -94,7 +94,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			//we're merging small mid sections to top and small top sections to first floor to avoid really short/compressed floors
 			//I think we need this but I'm not sure about implementation. I feel like mid height should be shared by top&bottom for example.
-			if (midHeight < _scaledFloorHeight / (_currentFacade.MidFloorCount*2))
+			if (midHeight < _scaledFloorHeight / (_currentFacade.MidFloorCount * 2))
 			{
 				topHeight += midHeight;
 				_scaledTopFloorHeight += midHeight;
@@ -278,20 +278,20 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						//first step, original point or another close point if sections are centered
 						start = fs + (wallDirection * (dif / 2));
 						//to compansate step-1 below, so if there's more than 2m to corner, go one more step
-						step++;
 					}
-					//edgeList.Add(start);
-
-					if (step > 1)
+					edgeList.Add(start);
+					edgeList.Add(start);
+				}
+				if (step > 1)
+				{
+					for (int s = 1; s < step; s++)
 					{
-						for (int s = 1; s < step - 1; s++)
-						{
-							var da = start + wallDirection * s * (preferredEdgeSectionLength * tile.TileScale);
-							edgeList.Add(da);
-							edgeList.Add(da);
-						}
+						var da = start + wallDirection * s * (preferredEdgeSectionLength * tile.TileScale);
+						edgeList.Add(da);
+						edgeList.Add(da);
 					}
 				}
+
 				edgeList.Add(sc);
 			}
 		}

@@ -15,4 +15,4 @@ MonoBehaviour:
   _height: 0
   _forceHeight: 0
   _centerSegments: 1
-  AtlasInfo: {fileID: 11400000, guid: 5cefb6828e6d07b4fbf860b1e2a5d436, type: 2}
+  AtlasInfo: {fileID: 11400000, guid: 83932d75a6a7e494f93fbc649c98434f, type: 2}

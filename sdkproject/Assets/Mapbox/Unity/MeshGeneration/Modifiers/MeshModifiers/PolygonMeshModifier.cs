@@ -82,6 +82,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					md.Edges.Add(vertCount + ((j+ 1) % c2));
 					md.Edges.Add(vertCount + j);
 					md.Vertices.Add(sub[j]);
+					md.Tangents.Add(Constants.Math.Vector3Forward);
 					md.Normals.Add(Constants.Math.Vector3Up);
 				}
 
