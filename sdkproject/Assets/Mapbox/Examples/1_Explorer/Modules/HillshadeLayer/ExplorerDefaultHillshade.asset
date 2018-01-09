@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25f09effe9db3dd4e9e825475d698ca3, type: 3}
+  m_Name: ExplorerDefaultHillshade
+  m_EditorClassIdentifier: 
+  _moveFeaturePositionTo: 0
+  MeshModifiers:
+  - {fileID: 11400000, guid: 42df5b13ebbfe2a4aa3f0ec75a7a5852, type: 2}
+  - {fileID: 11400000, guid: 23fec0796c24f584ca6c13522eb63102, type: 2}
+  - {fileID: 11400000, guid: 15401c4c2325f1047b2f3e428ec0bef8, type: 2}
+  GoModifiers:
+  - {fileID: 11400000, guid: 40ff3031d2180f742aa59a499f196302, type: 2}

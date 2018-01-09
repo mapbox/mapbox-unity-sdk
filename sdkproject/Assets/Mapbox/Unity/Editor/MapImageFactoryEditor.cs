@@ -22,7 +22,7 @@ namespace Mapbox.Editor
 		"mapbox://styles/mapbox/outdoors-v10",
 		"mapbox://styles/mapbox/dark-v9",
 		"mapbox://styles/mapbox/light-v9",
-		"mapbox://styles/mapbox/satellite-v9",
+		"mapbox.satellite",
 		"mapbox://styles/mapbox/satellite-streets-v10"};
 
 		private string[] _basicMapNames = new string[6] {

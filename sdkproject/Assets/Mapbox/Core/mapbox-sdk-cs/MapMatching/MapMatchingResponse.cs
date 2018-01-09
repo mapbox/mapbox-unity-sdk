@@ -36,9 +36,13 @@ namespace Mapbox.MapMatching
 		public Tracepoint[] Tracepoints;
 		[JsonProperty("matchings")]
 		public MatchObject[] Matchings;
-
+#if !WINDOWS_UWP
 		/// <summary>Error occured during matching</summary>
 		public bool HasMatchingError { get { return !"ok".Equals(Code, StringComparison.InvariantCultureIgnoreCase); } }
+#else
+		/// <summary>Error occured during matching</summary>
+		public bool HasMatchingError { get { return !"ok".Equals(Code, StringComparison.OrdinalIgnoreCase); } }
+#endif
 
 		public string MatchingError
 		{

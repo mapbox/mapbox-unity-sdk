@@ -1,10 +1,10 @@
 ﻿namespace Mapbox.Editor
 {
-    using UnityEngine;
-    using UnityEditor;
-    using System.Collections.Generic;
-    using Mapbox.Geocoding;
-    using Mapbox.Unity;
+	using UnityEngine;
+	using UnityEditor;
+	using System.Collections.Generic;
+	using Mapbox.Geocoding;
+	using Mapbox.Unity;
 
 	public class GeocodeAttributeSearchWindow : EditorWindow
 	{
@@ -59,10 +59,10 @@
 			GUILayout.Label("Search for a location");
 
 			string oldSearchInput = _searchInput;
-			
+
 			GUI.SetNextControlName(searchFieldName);
 			_searchInput = GUILayout.TextField(_searchInput);
-			
+
 			if (_searchInput.Length == 0)
 			{
 				GUILayout.Label("Type in a location to find it's latitude and longtitude");
@@ -70,8 +70,8 @@
 			else
 			{
 				bool changed = oldSearchInput != _searchInput;
-				if(changed)
-				{ 
+				if (changed)
+				{
 					HandleUserInput(_searchInput);
 				}
 
@@ -103,7 +103,7 @@
 						GUILayout.Label("No search results");
 				}
 			}
-			
+
 			if (!hasSetFocus)
 			{
 				GUI.FocusControl(searchFieldName);
@@ -119,13 +119,16 @@
 			if (!string.IsNullOrEmpty(searchString))
 			{
 				_resource.Query = searchString;
-                MapboxAccess.Instance.Geocoder.Geocode(_resource, HandleGeocoderResponse);
+				MapboxAccess.Instance.Geocoder.Geocode(_resource, HandleGeocoderResponse);
 			}
 		}
 
 		void HandleGeocoderResponse(ForwardGeocodeResponse res)
 		{
-			_features = res.Features;
+			if (res != null)
+			{
+				_features = res.Features;
+			}
 			_isSearching = false;
 			this.Repaint();
 

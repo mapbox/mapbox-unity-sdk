@@ -46,7 +46,7 @@
 		{
 			if (null == _dynamicZoomMap) { return; }
 
-			if (Input.touchSupported)
+			if (Input.touchSupported && Input.touchCount > 0)
 			{
 				HandleTouch();
 			}
@@ -172,7 +172,6 @@
 					{
 						if (null != _dynamicZoomMap)
 						{
-							var scaleFactor = Mathf.Pow(2, (_dynamicZoomMap.InitialZoom - _dynamicZoomMap.AbsoluteZoom));
 							float factor = Conversions.GetTileScaleInMeters((float)0, _dynamicZoomMap.AbsoluteZoom) * 256.0f / _dynamicZoomMap.UnityTileSize;
 							var latlongDelta = Conversions.MetersToLatLon(_dynamicZoomMap.CenterMercator + new Vector2d(offset.x * factor, offset.z * factor));
 							_quadTreeTileProvider.UpdateMapProperties(latlongDelta, _dynamicZoomMap.Zoom);

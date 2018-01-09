@@ -19,6 +19,8 @@ namespace Mapbox.Unity.Map
 			_worldRelativeScale = (float)(_unityTileSize / referenceTileRect.Size.x);
 
 			// The magic line.
+			// Because this offsets the map root, you must manually compensate for this offset with any future
+			// conversion operations (lat/lon <--> unity world space)!!!
 			_root.localPosition = -Conversions.GeoToWorldPosition(_centerLatitudeLongitude.x, _centerLatitudeLongitude.y, _centerMercator, _worldRelativeScale).ToVector3xz();
 
 			_mapVisualizer.Initialize(this, _fileSource);

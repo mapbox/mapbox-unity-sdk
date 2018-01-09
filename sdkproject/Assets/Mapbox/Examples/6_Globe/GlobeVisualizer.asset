@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 526c8a90df31d41fe8057a6f85c7a3e4, type: 3}
+  m_Name: GlobeVisualizer
+  m_EditorClassIdentifier: 
+  Factories:
+  - {fileID: 11400000, guid: 6dee93d9a198a4699800e20d1e1ea6b6, type: 2}
+  - {fileID: 11400000, guid: 8aa6dfef55a93474fbc6cdfbb145b7d1, type: 2}
+  _loadingTexture: {fileID: 2800000, guid: e2896a92727704803a9c422b043eae89, type: 3}
