@@ -84,9 +84,7 @@
 
 			if (!currentMbTiles.TileExists(tileId) || forceInsert)
 			{
-				continue work here
-				//TODO: force insert
-				_mbTiles[mapId].AddTile(tileId, item);
+				_mbTiles[mapId].AddTile(tileId, item, forceInsert);
 			}
 		}
 

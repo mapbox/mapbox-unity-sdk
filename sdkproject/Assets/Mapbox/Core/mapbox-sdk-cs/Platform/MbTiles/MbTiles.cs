@@ -174,9 +174,9 @@ lastmodified INTEGER,
 		}
 
 
-		public void AddTile(CanonicalTileId tileId, CacheItem item)
+		public void AddTile(CanonicalTileId tileId, CacheItem item, bool update = false)
 		{
-			_sqlite.Insert(new tiles
+			_sqlite.InsertOrReplace(new tiles
 			{
 				zoom_level = tileId.Z,
 				tile_column = tileId.X,
@@ -186,7 +186,11 @@ lastmodified INTEGER,
 				etag = item.ETag
 			});
 
-			_pruneCacheCounter++;
+			// update counter only when new tile gets inserted
+			if (!update)
+			{
+				_pruneCacheCounter++;
+			}
 			if (0 == _pruneCacheCounter % _pruneCacheDelta)
 			{
 				_pruneCacheCounter = 0;
