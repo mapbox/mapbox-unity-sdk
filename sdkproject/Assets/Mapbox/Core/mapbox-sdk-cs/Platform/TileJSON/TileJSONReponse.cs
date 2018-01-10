@@ -88,6 +88,7 @@
 		public string Format { get; set; }
 
 
+		/// <summary>Can be empty (for concatenated tilesets)</summary>
 		[JsonProperty("id")]
 		public string Id { get; set; }
 
@@ -138,6 +139,7 @@
 		public string Scheme { get; set; }
 
 
+		/// <summary>Can be empty</summary>
 		[JsonProperty("source")]
 		public string Source { get; set; }
 
@@ -154,6 +156,7 @@
 		public TileJSONObjectVectorLayer[] VectorLayers { get; set; }
 
 
+		/// <summary>Can be empty (for concatenated tilesets)</summary>
 		[JsonProperty("webpage")]
 		public string WebPage { get; set; }
 
