@@ -39,5 +39,12 @@ namespace Mapbox.Utils {
 		}
 
 
+		public static DateTime From(long timestamp)
+		{
+			//return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Add(TimeSpan.FromSeconds(timestamp)).ToLocalTime();
+			return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Add(TimeSpan.FromTicks(timestamp));
+		}
+
+
 	}
 }

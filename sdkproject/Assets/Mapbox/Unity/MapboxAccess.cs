@@ -11,6 +11,7 @@ namespace Mapbox.Unity
 	using Mapbox.Map;
 	using Mapbox.MapMatching;
 	using Mapbox.Tokens;
+	using Mapbox.Platform.TilesetTileJSON;
 
 	/// <summary>
 	/// Object for retrieving an API token and making http requests.
@@ -236,6 +237,23 @@ namespace Mapbox.Unity
 					_tokenValidator = new MapboxTokenApi();
 				}
 				return _tokenValidator;
+			}
+		}
+
+
+		TileJSON _tileJson;
+		/// <summary>
+		/// Lazy TileJSON wrapper: https://www.mapbox.com/api-documentation/#retrieve-tilejson-metadata
+		/// </summary>
+		public TileJSON TileJSON
+		{
+			get
+			{
+				if (_tileJson == null)
+				{
+					_tileJson = new TileJSON(new FileSource(_configuration.AccessToken), _configuration.DefaultTimeout);
+				}
+				return _tileJson;
 			}
 		}
 
