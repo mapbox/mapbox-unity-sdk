@@ -7,7 +7,7 @@ Tools for using Mapbox APIs with C# / Unity. If you'd like to contribute to the 
 
 This repo contains:
 - Unity specific tools and libraries for processing Mapbox data
-  - Example projects using Mapbox Unity SDK
+  - Example projects using Mapbox Maps SDK for Unity
   - DocFX project for generateing API documentation
   - Written manuals and guides
 
