@@ -203,6 +203,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				Assert.IsTrue(response.ModifiedUtc.HasValue, "'Modified not properly parsed'");
 			}
 
+			Assert.IsNotEmpty(response.Name, "'Name' not set properly");
 			Assert.IsFalse(response.Private, "'Private' not set properly");
 			Assert.AreEqual("xyz", response.Scheme, "'Scheme' not set properly");
 			Assert.IsNotEmpty(response.TileJSONVersion, "'TileJSONVersion not set properly");
