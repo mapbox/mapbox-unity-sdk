@@ -38,12 +38,8 @@ footer{
 <b>Quick start links: </b> <br>
 <ul>
   <li>[Getting started](00-getting-started.md) </li> <br>
-  <li>[Mapbox API Token](01-mapbox-api-token.md) </li> <br>
-
   <li>[Changelog](05-changelog.md) </li><br>
-
   <li>[Known issues](02-known-issues.md) </li><br>
-  <li>[Examples](03-examples.md) </li><br>
   <li>[API Documentation](api/) </li><br>
 </ul>
 

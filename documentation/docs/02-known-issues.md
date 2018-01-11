@@ -4,8 +4,6 @@
 
 - Minimum iOS version supported is 8
 - Minimum Android version supported is 15
-- For UWP, please read these [special notes](https://github.com/mapbox/mapbox-unity-sdk/blob/develop/documentation/docs/windowsstore-uwp-hololens.md).
-- Hololens builds are currently not working as expected
 
 ### General
 

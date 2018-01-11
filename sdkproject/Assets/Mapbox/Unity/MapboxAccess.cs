@@ -44,8 +44,7 @@ namespace Mapbox.Unity
 
 		MapboxConfiguration _configuration;
 		/// <summary>
-		/// The Mapbox API access token. 
-		/// See <see href="https://www.mapbox.com/mapbox-unity-sdk/docs/01-mapbox-api-token.html">Mapbox API Congfiguration in Unity</see>.
+		/// The Mapbox API access token.
 		/// </summary>
 		public MapboxConfiguration Configuration
 		{
