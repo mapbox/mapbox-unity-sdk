@@ -61,8 +61,11 @@ lastmodified INTEGER,
 				_sqlite.Execute(cmdIdxTimestamp);
 			}
 
-			// migrate old caches
-			if (null == colInfo.FirstOrDefault(ci => ci.Name.Equals("etag")))
+			// auto migrate old caches
+			if (
+				0 != colInfo.Count
+				&& null == colInfo.FirstOrDefault(ci => ci.Name.Equals("etag"))
+			)
 			{
 				UnityEngine.Debug.Log("adding column etag");
 				string sql = "ALTER TABLE tiles ADD COLUMN etag text;";

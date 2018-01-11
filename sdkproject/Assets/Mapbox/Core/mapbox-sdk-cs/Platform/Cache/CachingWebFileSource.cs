@@ -161,7 +161,14 @@
 						}
 						else
 						{
-							UnityEngine.Debug.LogWarningFormat("updating cached tile {0}", tileId);
+							UnityEngine.Debug.LogWarningFormat(
+								"updating cached tile {1} mapid:{2}{0}cached etag:{3}{0}remote etag:{4}"
+								, Environment.NewLine
+								, tileId
+								, mapId
+								, cachedItem.ETag
+								, headerOnly.Headers["ETag"]
+							);
 							// request updated tile, don't pass callback as we've responsed with the previously cached tile
 							requestTileAndCache(finalUrl, mapId, tileId, timeout, null);
 						}

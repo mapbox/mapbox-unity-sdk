@@ -29,16 +29,21 @@ namespace Mapbox.Utils {
 
 
 		/// <summary>
-		/// Convert from Unitx timestamp to DateTime
+		/// Convert from Unitx timestamp to DateTime. Uses TimeSpan.FromSeconds to caluclate offset since epoch 0
 		/// </summary>
 		/// <param name="timestamp"></param>
 		/// <returns></returns>
-		public static DateTime From(double timestamp) {
+		public static DateTime From(double timestamp)
+		{
 			//return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Add(TimeSpan.FromSeconds(timestamp)).ToLocalTime();
 			return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Add(TimeSpan.FromSeconds(timestamp));
 		}
 
-
+		/// <summary>
+		/// Convert from Unitx timestamp to DateTime. Uses TimeSpan.FromTicks to caluclate offset since epoch 0
+		/// </summary>
+		/// <param name="timestamp"></param>
+		/// <returns></returns>
 		public static DateTime From(long timestamp)
 		{
 			//return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Add(TimeSpan.FromSeconds(timestamp)).ToLocalTime();
