@@ -137,21 +137,33 @@
 			// if tile was available call callback with it, propagate to all other caches and check if a newer one is available
 			if (null != cachedItem)
 			{
+				// immediately return cached tile
 				callback(Response.FromCache(cachedItem.Data));
 
+				// check if tile on the web is newer than the one we already have locally
 				IAsyncRequestFactory.CreateRequest(
 					finalUrl,
 					(Response headerOnly) =>
 					{
-						//just bail on error, we've returned the cached tile already
+						// on error getting information from API just return. tile we have locally has already been returned above
 						if (headerOnly.HasError)
 						{
 							return;
 						}
 
-						// UnityEngine.Debug.LogFormat("{0} : {1}", cachedItem.ETag, headerOnly.Headers["ETag"]);
-						// data from cache is the same as on the web, propagate to all other caches but don't force insert via cache.add()
-						// ETag empty check: backwards compability
+						// TODO: remove Debug.Log before PR
+						//UnityEngine.Debug.LogFormat(
+						//	"{1}{0}cached:{2}{0}header:{3}"
+						//	, Environment.NewLine
+						//	, finalUrl
+						//	, cachedItem.ETag
+						//	, headerOnly.Headers["ETag"]
+						//);
+
+						// data from cache is the same as on the web:
+						//   * tile has already been returned above
+						//   * make sure all all other caches have it too, but don't force insert via cache.add(false)
+						// additional ETag empty check: for backwards compability with old caches
 						if (!string.IsNullOrEmpty(cachedItem.ETag) && cachedItem.ETag.Equals(headerOnly.Headers["ETag"]))
 						{
 							foreach (var cache in _caches)
@@ -161,16 +173,19 @@
 						}
 						else
 						{
+							// TODO: remove Debug.Log before PR
 							UnityEngine.Debug.LogWarningFormat(
-								"updating cached tile {1} mapid:{2}{0}cached etag:{3}{0}remote etag:{4}"
+								"updating cached tile {1} mapid:{2}{0}cached etag:{3}{0}remote etag:{4}{0}{5}"
 								, Environment.NewLine
 								, tileId
 								, mapId
 								, cachedItem.ETag
 								, headerOnly.Headers["ETag"]
+								, finalUrl
 							);
-							// request updated tile, don't pass callback as we've responsed with the previously cached tile
-							requestTileAndCache(finalUrl, mapId, tileId, timeout, null);
+
+							// request updated tile and pass callback to return new data to subscribers
+							requestTileAndCache(finalUrl, mapId, tileId, timeout, callback);
 						}
 					}
 					, timeout
@@ -228,7 +243,7 @@
 									ETag = eTag,
 									LastModified = lastModified
 								}
-								, true
+								, true // force insert/update
 							);
 						}
 					}
