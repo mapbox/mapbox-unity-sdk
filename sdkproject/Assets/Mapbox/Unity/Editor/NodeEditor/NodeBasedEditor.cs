@@ -32,7 +32,7 @@ namespace Mapbox.Editor.NodeEditor
 		public static GUIStyle selectedNodeStyle;
 		public static GUIStyle inPointStyle;
 		public static GUIStyle outPointStyle;
-		public static Texture2D _magnifierTexture;
+		private static Texture2D _magnifierTexture;
 		public static Texture2D magnifierTexture
 		{
 			get
