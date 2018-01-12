@@ -25,7 +25,7 @@ namespace Mapbox.Unity
 		public delegate void TokenValidationEvent(MapboxTokenStatus response);
 		public event TokenValidationEvent OnTokenValidation;
 
-		static MapboxAccess _instance;
+		private static MapboxAccess _instance;
 
 		/// <summary>
 		/// The singleton instance.
@@ -43,7 +43,10 @@ namespace Mapbox.Unity
 		}
 
 
-		MapboxConfiguration _configuration;
+		public static bool Configured;
+		public static string ConfigurationJSON;
+		private MapboxConfiguration _configuration;
+
 		/// <summary>
 		/// The Mapbox API access token. 
 		/// See <see href="https://www.mapbox.com/mapbox-unity-sdk/docs/01-mapbox-api-token.html">Mapbox API Congfiguration in Unity</see>.
@@ -90,6 +93,8 @@ namespace Mapbox.Unity
 
 			ConfigureFileSource();
 			ConfigureTelemetry();
+
+			Configured = true;
 		}
 
 		/// <summary>
@@ -111,12 +116,16 @@ namespace Mapbox.Unity
 		private void LoadAccessToken()
 		{
 
-			TextAsset configurationTextAsset = Resources.Load<TextAsset>(Constants.Path.MAPBOX_RESOURCES_RELATIVE);
+			if (string.IsNullOrEmpty(ConfigurationJSON))
+			{
+				TextAsset configurationTextAsset = Resources.Load<TextAsset>(Constants.Path.MAPBOX_RESOURCES_RELATIVE);
+				ConfigurationJSON = configurationTextAsset.text;
+			}
 
 #if !WINDOWS_UWP
-			SetConfiguration(configurationTextAsset == null ? null : JsonUtility.FromJson<MapboxConfiguration>(configurationTextAsset.text));
+			SetConfiguration(ConfigurationJSON == null ? null : JsonUtility.FromJson<MapboxConfiguration>(ConfigurationJSON));
 #else
-			SetConfiguration(configurationTextAsset == null ? null : Mapbox.Json.JsonConvert.DeserializeObject<MapboxConfiguration>(configurationTextAsset.text));
+			SetConfiguration(ConfigurationJSON == null ? null : Mapbox.Json.JsonConvert.DeserializeObject<MapboxConfiguration>(ConfigurationJSON));
 #endif
 		}
 

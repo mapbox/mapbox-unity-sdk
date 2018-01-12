@@ -5,6 +5,7 @@ namespace Mapbox.Unity.Map
 	using Utils;
 	using UnityEngine;
 	using Mapbox.Map;
+	using System.Collections;
 
 	/// <summary>
 	/// Abstract Map (Basic Map etc)
@@ -141,10 +142,13 @@ namespace Mapbox.Unity.Map
 		}
 		public event Action OnInitialized = delegate { };
 
-		protected virtual void Awake()
+		protected virtual IEnumerator Awake()
 		{
 			_worldHeightFixed = false;
 			_fileSource = MapboxAccess.Instance;
+
+			yield return new WaitUntil(() => MapboxAccess.Configured);
+
 			_tileProvider.OnTileAdded += TileProvider_OnTileAdded;
 			_tileProvider.OnTileRemoved += TileProvider_OnTileRemoved;
 			_tileProvider.OnTileRepositioned += TileProvider_OnTileRepositioned;
