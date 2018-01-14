@@ -142,13 +142,16 @@ namespace Mapbox.Unity.Map
 		}
 		public event Action OnInitialized = delegate { };
 
-		protected virtual IEnumerator Awake()
+		protected IEnumerator SetupAccess()
 		{
-			_worldHeightFixed = false;
 			_fileSource = MapboxAccess.Instance;
 
 			yield return new WaitUntil(() => MapboxAccess.Configured);
+		}
 
+		protected virtual void Awake()
+		{
+			_worldHeightFixed = false;
 			_tileProvider.OnTileAdded += TileProvider_OnTileAdded;
 			_tileProvider.OnTileRemoved += TileProvider_OnTileRemoved;
 			_tileProvider.OnTileRepositioned += TileProvider_OnTileRepositioned;
@@ -158,8 +161,10 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		protected virtual void Start()
+		protected void Start()
 		{
+			StartCoroutine("SetupAccess");
+
 			if (_initializeOnStart)
 			{
 				Initialize(Conversions.StringToLatLon(_latitudeLongitudeString), AbsoluteZoom);
