@@ -75,11 +75,16 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		private int _entityPerCoroutine = 20;
 		private int _entityInCurrentCoroutine = 0;
 
+		private HashSet<string> _activeIds;
+		private Dictionary<UnityTile, List<string>> _idPool; //necessary to keep _activeIds list up to date when unloading tiles
+
 		public override void Initialize()
 		{
 			base.Initialize();
 			_entityInCurrentCoroutine = 0;
 			_activeCoroutines = new Dictionary<UnityTile, List<int>>();
+			_activeIds = new HashSet<string>();
+			_idPool = new Dictionary<UnityTile, List<string>>();
 
 			foreach (var filter in Filters)
 			{
@@ -127,7 +132,26 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			for (int i = 0; i < fc; i++)
 			{
 				filterOut = false;
-				var feature = new VectorFeatureUnity(layer.GetFeature(i, 0), tile, layer.Extent);
+				var feature = new VectorFeatureUnity(layer.GetFeature(i), tile, layer.Extent);
+
+				//skip existing features, only works on tilesets with unique ids
+				if (!string.IsNullOrEmpty(feature.Id) && _activeIds.Contains(feature.Id))
+				{
+					continue;
+				}
+				else
+				{
+					_activeIds.Add(feature.Id);
+					if (!_idPool.ContainsKey(tile))
+					{
+						_idPool.Add(tile, new List<string>());
+					}
+					else
+					{
+						_idPool[tile].Add(feature.Id);
+					}
+				}
+
 				foreach (var filter in Filters)
 				{
 					if (!string.IsNullOrEmpty(filter.Key) && !feature.Properties.ContainsKey(filter.Key))
@@ -272,11 +296,24 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 
 			if (_defaultStack != null)
+			{
 				_defaultStack.UnregisterTile(tile);
+			}
+
 			foreach (var val in Stacks)
 			{
 				if (val != null && val.Stack != null)
 					val.Stack.UnregisterTile(tile);
+			}
+
+			//removing ids from activeIds list so they'll be recreated next time tile loads (necessary when you're unloading/loading tiles)
+			if (_idPool.ContainsKey(tile))
+			{
+				foreach (var item in _idPool[tile])
+				{
+					_activeIds.Remove(item);
+				}
+				_idPool[tile].Clear();
 			}
 		}
 	}
