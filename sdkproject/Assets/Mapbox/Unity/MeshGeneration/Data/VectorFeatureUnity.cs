@@ -31,15 +31,15 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			Points.Clear();
 
 			//this is a temp hack until we figure out how streets ids works
-			if (feature.Id > 10000)
+			if (feature.Id > 10000) //ids from building dataset is big ulongs 
 			{
 				Id = feature.Id.ToString();
-				_geom = feature.Geometry<float>();
+				_geom = feature.Geometry<float>(); //and we're not clipping by passing no parameters
 			}
-			else
+			else //streets ids, will require clipping
 			{
 				Id = string.Empty;
-				_geom = feature.Geometry<float>(0);
+				_geom = feature.Geometry<float>(0); //passing zero means clip at tile edge
 			}
 
 			_rectSizex = tile.Rect.Size.x;
