@@ -95,7 +95,7 @@ namespace Mapbox.Unity
 		/// <summary>
 		/// Clear all existing tile caches. Deletes MBTiles database files.
 		/// </summary>
-		public void ClearCache()
+		public void ClearSceneCache()
 		{
 			CachingWebFileSource cwfs = _fileSource as CachingWebFileSource;
 			if (null != cwfs)
@@ -104,6 +104,27 @@ namespace Mapbox.Unity
 			}
 		}
 
+
+		public void ClearAllCacheFiles()
+		{
+			// call ClearSceneCache to close any connections that might be open
+			ClearSceneCache();
+
+			string cacheDirectory = Path.Combine(Application.persistentDataPath, "cache");
+			if (!Directory.Exists(cacheDirectory)) { return; }
+
+			foreach (var file in Directory.GetFiles(cacheDirectory))
+			{
+				try
+				{
+					File.Delete(file);
+				}
+				catch (Exception deleteEx)
+				{
+					Debug.LogErrorFormat("Could not delete [{0}]: {1}", file, deleteEx);
+				}
+			}
+		}
 
 		/// <summary>
 		/// Loads the access token from <see href="https://docs.unity3d.com/Manual/BestPracticeUnderstandingPerformanceInUnity6.html">Resources folder</see>.
