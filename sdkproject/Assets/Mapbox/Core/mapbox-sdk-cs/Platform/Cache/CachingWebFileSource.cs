@@ -249,6 +249,7 @@
 					}
 					if (null != callback)
 					{
+						r.IsUpdate = true;
 						callback(r);
 					}
 				}, timeout);

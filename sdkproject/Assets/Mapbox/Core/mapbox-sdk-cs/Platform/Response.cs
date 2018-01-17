@@ -51,7 +51,11 @@ namespace Mapbox.Platform
 			get { return _exceptions == null ? false : _exceptions.Count > 0; }
 		}
 
+		/// <summary>Flag to indicate if the request was fullfilled from a local cache</summary>
 		public bool LoadedFromCache;
+
+		/// <summary>Flag to indicate if the request was issued before but was issued again and updated</summary>
+		public bool IsUpdate = false;
 
 		public string RequestUrl;
 

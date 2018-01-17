@@ -119,6 +119,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 				else
 				{
+					if (vectorTile.CurrentState == Tile.State.Updated)
+					{
+						// get rid of existing gameobjects
+						Debug.Log("data updated: get rid of existing gameobjects");
+					}
+
 					CreateMeshes(tile);
 				}
 			});
