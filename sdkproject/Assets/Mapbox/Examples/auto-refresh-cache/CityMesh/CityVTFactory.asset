@@ -14,3 +14,4 @@ MonoBehaviour:
   _mapId: lr1k.cjc20pmfj074e33myzbqroav2-5pwhs,mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7
   Visualizers:
   - {fileID: 11400000, guid: bebd17c07f969b445a90913a93da6b14, type: 2}
+  - {fileID: 11400000, guid: a493b030d561f34448a13f55bec8b7fc, type: 2}
