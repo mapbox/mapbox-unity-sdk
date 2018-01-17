@@ -5,4 +5,10 @@
   href: 02-known-issues.md
 
 - name: Changelog
-  href: 05-changelog.md 
+  href: 05-changelog.md
+
+- name: Windows Store, UWP, HoloLens
+  href: windowsstore-uwp-hololens.md
+
+- name: HoloLens Development
+  href: hololens-development.md 

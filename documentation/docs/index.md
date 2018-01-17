@@ -35,15 +35,16 @@ footer{
     <div class="row">
       <div class="col-md-8 col-md-offset-2 text-left">
       <p>
-<b>Quick start links: </b> <br>
-<ul>
-  <li>[Getting started](00-getting-started.md) </li> <br>
-  <li>[Changelog](05-changelog.md) </li><br>
-  <li>[Known issues](02-known-issues.md) </li><br>
-  <li>[API Documentation](api/) </li><br>
-</ul>
+        <b>Quick start links: </b> <br>
+        <ul>
+          <li>[Getting started](00-getting-started.md) </li> <br>
+          <li>[Changelog](05-changelog.md) </li><br>
+          <li>[Known issues](02-known-issues.md) </li><br>
+          <li>[API Documentation](api/) </li><br>
+          <li>[Unity SDK page](https://www.mapbox.com/unity-sdk/)</li>
+        </ul>
 
-    </p>
+      </p>
 
       </div>
     </div>
