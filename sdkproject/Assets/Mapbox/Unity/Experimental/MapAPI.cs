@@ -14,10 +14,24 @@ public enum MapType
 	WorldScale,
 }
 
+
+
+public enum MapDrawType
+{
+	// Camera bounds will mean 
+	// CameraBoundsTile Provider for all cases except Zoomable MapType
+	// For Zoomable map - QuadTreeTileProvider.
+	CameraBounds,
+	RangeAroundCenter,
+	RangeAroundTransform,
+	VirtualGlobe,
+}
+
 [System.Serializable]
 public class MapOptions
 {
-	public MapType type;
+	public MapType type = MapType.AtTileCenter;
+	public MapDrawType tileProviderType = MapDrawType.RangeAroundCenter;
 }
 
 public enum MapLayerType
@@ -163,6 +177,7 @@ public class MapLocationOptions
 {
 	[Geocode]
 	public string latitudeLongitude;
+	[Range(0, 22)]
 	public float zoom;
 }
 
@@ -176,6 +191,60 @@ public class MapAPI : MonoBehaviour
 
 	[SerializeField]
 	MapOptions _mapOptions;
+
+	void SetUpMap()
+	{
+		// Setup map based on type. 
+		switch (_mapOptions.type)
+		{
+			case MapType.AtTileCenter:
+				_map = gameObject.AddComponent<BasicMap>();
+				break;
+			case MapType.AtLocationCenter:
+				_map = gameObject.AddComponent<MapAtSpecificLocation>();
+				break;
+			case MapType.WorldScale:
+				_map = gameObject.AddComponent<MapAtWorldScale>();
+				break;
+			case MapType.Zoomable:
+				_map = gameObject.AddComponent<QuadTreeBasicMap>();
+				break;
+			default:
+				break;
+		}
+		// Setup tileprovider based on type. 
+		switch (_mapOptions.tileProviderType)
+		{
+			case MapDrawType.CameraBounds:
+				if (_mapOptions.type == MapType.Zoomable)
+				{
+					_tileProvider = gameObject.AddComponent<QuadTreeTileProvider>();
+				}
+				else
+				{
+					_tileProvider = gameObject.AddComponent<CameraBoundsTileProvider>();
+				}
+				break;
+			case MapDrawType.RangeAroundCenter:
+				_tileProvider = gameObject.AddComponent<RangeTileProvider>();
+				break;
+			case MapDrawType.RangeAroundTransform:
+				_tileProvider = gameObject.AddComponent<RangeAroundTransformTileProvider>();
+				break;
+			case MapDrawType.VirtualGlobe:
+				_tileProvider = gameObject.AddComponent<GlobeTileProvider>();
+				break;
+			default:
+				break;
+		}
+		// Setup a visualizer to get a "Starter" map. 
+
+		_map.TileProvider = _tileProvider;
+
+	}
+
+
+
 
 	// Use this for initialization
 	void Start()

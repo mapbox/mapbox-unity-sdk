@@ -66,6 +66,17 @@ namespace Mapbox.Unity.Map
 
 		[SerializeField]
 		protected AbstractTileProvider _tileProvider;
+		public AbstractTileProvider TileProvider
+		{
+			get
+			{
+				return _tileProvider;
+			}
+			set
+			{
+				_tileProvider = value;
+			}
+		}
 
 		[SerializeField]
 		[NodeEditorElement("MapVisualizer")]
