@@ -57,7 +57,6 @@ namespace Mapbox.Editor
 					obj.FindProperty("_key").stringValue = EditorGUILayout.TextField(obj.FindProperty("_key").stringValue, GUILayout.MaxWidth(100));
 					obj.ApplyModifiedProperties();
 				}
-				//facs.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(i).objectReferenceValue, typeof(LayerVisualizerBase)) as ScriptableObject;
 				if (_factory.Visualizers[i] == null)
 					EditorGUILayout.TextField("null");
 				else
