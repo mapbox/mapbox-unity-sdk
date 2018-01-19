@@ -7,8 +7,9 @@ Check out the official [Unity SDK page](https://www.mapbox.com/unity-sdk/) for i
 ## Installation from Git (source)
 
 1. `git clone https://github.com/mapbox/mapbox-unity-sdk.git`
-2. [Read about how the project is configured](https://github.com/mapbox/mapbox-unity-sdk/blob/develop/README.md) and [learn how to contribute](https://github.com/mapbox/mapbox-unity-sdk/blob/develop/CONTRIBUTING.md)
-3. The actual Unity project is nested in the `sdkproject` directory
+2. [Run the update script](https://github.com/mapbox/mapbox-unity-sdk/blob/develop/README.md#from-this-repository-advanced-latest-development).
+3. [Read about how the project is configured](https://github.com/mapbox/mapbox-unity-sdk/blob/develop/README.md) and [learn how to contribute](https://github.com/mapbox/mapbox-unity-sdk/blob/develop/CONTRIBUTING.md)
+4. The actual Unity project is nested in the `sdkproject` directory
 
 ## Next Steps
 
