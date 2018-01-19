@@ -88,8 +88,10 @@ namespace UnityEngine.XR.iOS
 
 		void OnDestroy()
 		{
-			#if UNITY_2017_1_OR_NEWER		
-			editorConnection.DisconnectAll ();
+			#if UNITY_2017_1_OR_NEWER
+			if(editorConnection != null) {
+				editorConnection.DisconnectAll ();
+			}
 			#endif
 		}
 

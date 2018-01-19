@@ -37,8 +37,13 @@ namespace UnityEngine.XR.iOS
 		void HandleEditorMessage(MessageEventArgs mea)
 		{
 			serializableFromEditorMessage sfem = mea.data.Deserialize<serializableFromEditorMessage>();
-			if (sfem != null && sfem.subMessageId == SubMessageIds.editorInitARKit) {
+			if (sfem != null && sfem.subMessageId == SubMessageIds.editorInitARKit) 
+			{
 				InitializeARKit ( sfem.arkitConfigMsg );
+			} 
+			else if (sfem != null && sfem.subMessageId == SubMessageIds.editorInitARKitFaceTracking) 
+			{
+				InitializeARKitFaceTracking( sfem.arkitConfigMsg);
 			}
 		}
 
@@ -57,6 +62,25 @@ namespace UnityEngine.XR.iOS
 			UnityARSessionNativeInterface.ARAnchorAddedEvent += ARAnchorAdded;
 			UnityARSessionNativeInterface.ARAnchorUpdatedEvent += ARAnchorUpdated;
 			UnityARSessionNativeInterface.ARAnchorRemovedEvent += ARAnchorRemoved;
+
+			#endif
+		}
+
+		void InitializeARKitFaceTracking(serializableARKitInit sai)
+		{
+			#if !UNITY_EDITOR
+
+			//get the config and runoption from editor and use them to initialize arkit for facetracking on device
+			Application.targetFrameRate = 60;
+			m_session = UnityARSessionNativeInterface.GetARSessionNativeInterface();
+			ARKitFaceTrackingConfiguration config = sai.config;
+			UnityARSessionRunOption runOptions = sai.runOption;
+			m_session.RunWithConfigAndOptions(config, runOptions);
+
+			UnityARSessionNativeInterface.ARFrameUpdatedEvent += ARFrameUpdated;
+			UnityARSessionNativeInterface.ARFaceAnchorAddedEvent += ARFaceAnchorAdded;
+			UnityARSessionNativeInterface.ARFaceAnchorUpdatedEvent += ARFaceAnchorUpdated;
+			UnityARSessionNativeInterface.ARFaceAnchorRemovedEvent += ARFaceAnchorRemoved;
 
 			#endif
 		}
@@ -84,6 +108,30 @@ namespace UnityEngine.XR.iOS
 		{
 			serializableUnityARPlaneAnchor serPlaneAnchor = planeAnchor;
 			SendToEditor (ConnectionMessageIds.removePlaneAnchorMsgeId, serPlaneAnchor);
+		}
+
+		public void ARFaceAnchorAdded(ARFaceAnchor faceAnchor)
+		{
+			#if !UNITY_EDITOR
+			serializableUnityARFaceAnchor serFaceAnchor = faceAnchor;
+			SendToEditor (ConnectionMessageIds.addFaceAnchorMsgeId, serFaceAnchor);
+			#endif
+		}
+
+		public void ARFaceAnchorUpdated(ARFaceAnchor faceAnchor)
+		{
+			#if !UNITY_EDITOR
+			serializableUnityARFaceAnchor serFaceAnchor = faceAnchor;
+			SendToEditor (ConnectionMessageIds.updateFaceAnchorMsgeId, serFaceAnchor);
+			#endif
+		}
+
+		public void ARFaceAnchorRemoved(ARFaceAnchor faceAnchor)
+		{
+			#if !UNITY_EDITOR
+			serializableUnityARFaceAnchor serFaceAnchor = faceAnchor;
+			SendToEditor (ConnectionMessageIds.removeFaceAnchorMsgeId, serFaceAnchor);
+			#endif
 		}
 
 		void EditorConnected(int playerID)

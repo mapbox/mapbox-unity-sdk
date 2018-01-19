@@ -89,12 +89,12 @@ namespace UnityARInterface
 
             m_PointCloudData = camera.pointCloudData;
             m_LightEstimate.capabilities = LightEstimateCapabilities.AmbientColorTemperature | LightEstimateCapabilities.AmbientIntensity;
-            m_LightEstimate.ambientColorTemperature = camera.lightEstimation.ambientColorTemperature;
+			m_LightEstimate.ambientColorTemperature = camera.lightData.arLightEstimate.ambientColorTemperature;
 
             // Convert ARKit intensity to Unity intensity
             // ARKit ambient intensity ranges 0-2000
             // Unity ambient intensity ranges 0-8 (for over-bright lights)
-            m_LightEstimate.ambientIntensity = camera.lightEstimation.ambientIntensity / 1000f;
+			m_LightEstimate.ambientIntensity = camera.lightData.arLightEstimate.ambientIntensity / 1000f;
 
 			//get display transform matrix sent up from sdk
 			m_DisplayTransform.SetColumn(0, camera.displayTransform.column0);

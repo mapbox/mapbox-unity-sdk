@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using UnityEngine;
 using UnityEngine.XR.iOS;
 using System.Text;
+using System.Collections.Generic;
 
 namespace Utils
 {
@@ -136,6 +137,99 @@ namespace Utils
 
 	};
 
+
+	[Serializable]
+	public class serializableSHC
+	{
+		public byte [] shcData;
+
+		public serializableSHC(byte [] inputSHCData)
+		{
+			shcData = inputSHCData;
+		}
+
+		public static implicit operator serializableSHC(float [] floatsSHC)
+		{
+			if (floatsSHC != null)
+			{
+				byte [] createBuf = new byte[floatsSHC.Length * sizeof(float)];
+				for(int i = 0; i < floatsSHC.Length; i++)
+				{
+					Buffer.BlockCopy( BitConverter.GetBytes( floatsSHC[i] ), 0, createBuf, (i)*sizeof(float), sizeof(float) );
+				}
+				return new serializableSHC (createBuf);
+			}
+			else 
+			{
+				return new serializableSHC(null);
+			}
+		}
+
+		public static implicit operator float [] (serializableSHC spc)
+		{
+			if (spc.shcData != null) 
+			{
+				int numFloats = spc.shcData.Length / (sizeof(float));
+				float [] shcFloats = new float[numFloats];
+				for (int i = 0; i < numFloats; i++) 
+				{
+					shcFloats [i] = BitConverter.ToSingle (spc.shcData, i * sizeof(float));
+				}
+				return shcFloats;
+			} 
+			else 
+			{
+				return null;
+			}
+		}
+
+
+	};
+
+	[Serializable]
+	public class serializableUnityARLightData
+	{
+		public LightDataType whichLight;
+		public serializableSHC lightSHC;
+		public SerializableVector4 primaryLightDirAndIntensity;
+		public float ambientIntensity;
+		public float ambientColorTemperature;
+
+		serializableUnityARLightData(UnityARLightData lightData)
+		{
+			whichLight = lightData.arLightingType;
+			if (whichLight == LightDataType.DirectionalLightEstimate) {
+				lightSHC = lightData.arDirectonalLightEstimate.sphericalHarmonicsCoefficients;
+				Vector3 lightDir = lightData.arDirectonalLightEstimate.primaryLightDirection;
+				float lightIntensity = lightData.arDirectonalLightEstimate.primaryLightIntensity;
+				primaryLightDirAndIntensity = new SerializableVector4 (lightDir.x, lightDir.y, lightDir.z, lightIntensity);
+			} else {
+				ambientIntensity = lightData.arLightEstimate.ambientIntensity;
+				ambientColorTemperature = lightData.arLightEstimate.ambientColorTemperature;
+			}
+		}
+
+		public static implicit operator serializableUnityARLightData(UnityARLightData rValue)
+		{
+			return new serializableUnityARLightData(rValue);
+		}
+
+		public static implicit operator UnityARLightData(serializableUnityARLightData rValue)
+		{
+			UnityARDirectionalLightEstimate udle = null;
+			UnityARLightEstimate ule = new UnityARLightEstimate (rValue.ambientIntensity, rValue.ambientColorTemperature);
+
+			if (rValue.whichLight == LightDataType.DirectionalLightEstimate) {
+				Vector3 lightDir = new Vector3 (rValue.primaryLightDirAndIntensity.x, rValue.primaryLightDirAndIntensity.y, rValue.primaryLightDirAndIntensity.z);
+				udle = new UnityARDirectionalLightEstimate (rValue.lightSHC, lightDir, rValue.primaryLightDirAndIntensity.w);
+			} 
+
+			return new UnityARLightData(rValue.whichLight, ule, udle);
+		}
+
+	}
+
+
 	[Serializable]  
 	public class serializableUnityARCamera
 	{
@@ -144,31 +238,31 @@ namespace Utils
 		public ARTrackingState trackingState;
 		public ARTrackingStateReason trackingReason;
 		public UnityVideoParams videoParams;
-		public UnityARLightEstimate lightEstimation;
+		public serializableUnityARLightData lightData;
 		public serializablePointCloud pointCloud;
 		public serializableUnityARMatrix4x4 displayTransform;
 
 
-		public serializableUnityARCamera( serializableUnityARMatrix4x4 wt, serializableUnityARMatrix4x4 pm, ARTrackingState ats, ARTrackingStateReason atsr, UnityVideoParams uvp, UnityARLightEstimate lightEst, serializableUnityARMatrix4x4 dt, serializablePointCloud spc)
+		public serializableUnityARCamera( serializableUnityARMatrix4x4 wt, serializableUnityARMatrix4x4 pm, ARTrackingState ats, ARTrackingStateReason atsr, UnityVideoParams uvp, UnityARLightData lightDat, serializableUnityARMatrix4x4 dt, serializablePointCloud spc)
 		{
 			worldTransform = wt;
 			projectionMatrix = pm;
 			trackingState = ats;
 			trackingReason = atsr;
 			videoParams = uvp;
-			lightEstimation = lightEst;
+			lightData = lightDat;
 			displayTransform = dt;
 			pointCloud = spc;
 		}
 
 		public static implicit operator serializableUnityARCamera(UnityARCamera rValue)
 		{
-			return new serializableUnityARCamera(rValue.worldTransform, rValue.projectionMatrix, rValue.trackingState, rValue.trackingReason, rValue.videoParams, rValue.lightEstimation, rValue.displayTransform, rValue.pointCloudData);
+			return new serializableUnityARCamera(rValue.worldTransform, rValue.projectionMatrix, rValue.trackingState, rValue.trackingReason, rValue.videoParams, rValue.lightData, rValue.displayTransform, rValue.pointCloudData);
 		}
 
 		public static implicit operator UnityARCamera(serializableUnityARCamera rValue)
 		{
-			return new UnityARCamera (rValue.worldTransform, rValue.projectionMatrix, rValue.trackingState, rValue.trackingReason, rValue.videoParams, rValue.lightEstimation, rValue.displayTransform, rValue.pointCloud);
+			return new UnityARCamera (rValue.worldTransform, rValue.projectionMatrix, rValue.trackingState, rValue.trackingReason, rValue.videoParams, rValue.lightData, rValue.displayTransform, rValue.pointCloud);
 		}
 
 
@@ -216,6 +310,135 @@ namespace Utils
 		}
 
 	};
+
+
+	[Serializable]
+	public class serializableFaceGeometry
+	{
+		public byte [] vertices;
+		public byte [] texCoords;
+		public byte [] triIndices;
+
+
+		public serializableFaceGeometry(byte [] inputVertices, byte [] inputTexCoords, byte [] inputTriIndices)
+		{
+			vertices = inputVertices;
+			texCoords = inputTexCoords;
+			triIndices = inputTriIndices;
+
+		}
+
+		#if !UNITY_EDITOR
+		public static implicit operator serializableFaceGeometry(ARFaceGeometry faceGeom)
+		{
+			if (faceGeom.vertexCount != 0 && faceGeom.textureCoordinateCount != 0 && faceGeom.triangleCount != 0)
+			{
+				Vector3 [] faceVertices = faceGeom.vertices;
+				byte [] cbVerts = new byte[faceGeom.vertexCount * sizeof(float) * 3];
+				Buffer.BlockCopy( faceVertices, 0, cbVerts, 0, faceGeom.vertexCount * sizeof(float) * 3 );
+				
+
+				Vector2 [] faceTexCoords = faceGeom.textureCoordinates;
+				byte [] cbTexCoords = new byte[faceGeom.textureCoordinateCount * sizeof(float) * 2];
+				Buffer.BlockCopy( faceTexCoords, 0, cbTexCoords, 0, faceGeom.textureCoordinateCount * sizeof(float) * 2 );
+
+
+				int [] triIndices = faceGeom.triangleIndices;
+				byte [] cbTriIndices = triIndices.SerializeToByteArray();
+
+				return new serializableFaceGeometry (cbVerts, cbTexCoords, cbTriIndices);
+			}
+			else 
+			{
+				return new serializableFaceGeometry(null, null, null);
+			}
+		}
+		#endif //!UNITY_EDITOR
+
+		public Vector3 [] Vertices {
+			get {
+				if (vertices != null) {
+					int numVectors = vertices.Length / (3 * sizeof(float));
+					Vector3[] verticesVec = new Vector3[numVectors];
+					for (int i = 0; i < numVectors; i++) {
+						int bufferStart = i * 3;
+						verticesVec [i].x = BitConverter.ToSingle (vertices, (bufferStart) * sizeof(float));
+						verticesVec [i].y = BitConverter.ToSingle (vertices, (bufferStart + 1) * sizeof(float));
+						verticesVec [i].z = BitConverter.ToSingle (vertices, (bufferStart + 2) * sizeof(float));
+
+					}
+					return verticesVec;
+				} else {
+					return null;
+				}
+			}
+		}
+
+		public Vector2 [] TexCoords {
+			get {
+				if (texCoords != null) {
+					int numVectors = texCoords.Length / (2 * sizeof(float));
+					Vector2[] texCoordVec = new Vector2[numVectors];
+					for (int i = 0; i < numVectors; i++) {
+						int bufferStart = i * 2;
+						texCoordVec [i].x = BitConverter.ToSingle (texCoords, (bufferStart) * sizeof(float));
+						texCoordVec [i].y = BitConverter.ToSingle (texCoords, (bufferStart + 1) * sizeof(float));
+
+					}
+					return texCoordVec;
+				} else {
+					return null;
+				}
+			}
+		}
+
+		public int [] TriangleIndices {
+			get {
+				if (triIndices != null) {
+					int[] triIndexVec = triIndices.Deserialize<int[]>();
+					return triIndexVec;
+				} else {
+					return null;
+				}
+			}
+		}
+
+	};
+
+
+	[Serializable]  
+	public class serializableUnityARFaceAnchor
+	{
+		public serializableUnityARMatrix4x4 worldTransform;
+		public serializableFaceGeometry faceGeometry;
+		public Dictionary<string, float> arBlendShapes;
+		public byte[] identifierStr;
+
+		public serializableUnityARFaceAnchor( serializableUnityARMatrix4x4 wt, serializableFaceGeometry fg, Dictionary<string, float> bs, byte [] idstr)
+		{
+			worldTransform = wt;
+			faceGeometry = fg;
+			arBlendShapes = bs;
+			identifierStr = idstr;
+		}
+
+
+		#if UNITY_EDITOR
+		public static implicit operator ARFaceAnchor(serializableUnityARFaceAnchor rValue)
+		{
+			return new ARFaceAnchor(rValue);
+		}
+		#else
+		public static implicit operator serializableUnityARFaceAnchor(ARFaceAnchor rValue)
+		{
+			serializableUnityARMatrix4x4 wt = rValue.transform;
+			serializableFaceGeometry sfg = rValue.faceGeometry;
+			byte[] idstr = Encoding.UTF8.GetBytes (rValue.identifierStr);
+			return new serializableUnityARFaceAnchor(wt, sfg, rValue.blendShapes, idstr);
+		}
+		#endif
+	};
+
 
 	[Serializable]
 	public class serializablePointCloud
@@ -296,6 +519,12 @@ namespace Utils
 		{
 			return new ARKitWorldTrackingSessionConfiguration (sasc.alignment, sasc.planeDetection, sasc.getPointCloudData, sasc.enableLightEstimation);
 		}
+
+		public static implicit operator ARKitFaceTrackingConfiguration (serializableARSessionConfiguration sasc)
+		{
+			return new ARKitFaceTrackingConfiguration (sasc.alignment, sasc.enableLightEstimation);
+		}
+
 	};
 
 	[Serializable]

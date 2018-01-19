@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Name: UvModifier
   m_EditorClassIdentifier: 
   Active: 1
-  UseSatelliteRoof: 1
+  UseSatelliteRoof: 0
