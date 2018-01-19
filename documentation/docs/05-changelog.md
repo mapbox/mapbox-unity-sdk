@@ -1,5 +1,11 @@
 ﻿## CHANGELOG
 
+### v.?.?.?
+*TBD*
+
+#####
+- Included EditorConfig file to enforce coding style
+
 ### v.1.3.0
 *12/18/2017*
 
