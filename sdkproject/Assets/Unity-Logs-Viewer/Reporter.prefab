@@ -21,7 +21,6 @@ GameObject:
   - component: {fileID: 4655610711091824}
   - component: {fileID: 114361692810914124}
   - component: {fileID: 114304697721860710}
-  - component: {fileID: 114991700350528310}
   m_Layer: 0
   m_Name: Reporter
   m_TagString: Untagged
@@ -102,17 +101,3 @@ MonoBehaviour:
   maxSize: 20
   numOfCircleToShow: 1
   Initialized: 0
---- !u!114 &114991700350528310
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1150749379920958}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cac68c003767bec459aa60dc282ff67d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  logTestCount: 100
-  threadLogTestCount: 100
-  logEverySecond: 1
