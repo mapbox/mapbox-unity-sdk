@@ -1,26 +1,14 @@
 - name: Getting Started
   href: 00-getting-started.md
 
-- name: Mapbox API Token
-  href: 01-mapbox-api-token.md
-
 - name: Known Issues
   href: 02-known-issues.md
 
-- name: Examples
-  href: 03-examples.md
-
-- name: Attribution
-  href: 04-attribution.md  
-
 - name: Changelog
-  href: 05-changelog.md 
-
-- name: Map Factory Framework
-  href: 06-map-factory-framework.md
+  href: 05-changelog.md
 
 - name: Windows Store, UWP, HoloLens
   href: windowsstore-uwp-hololens.md
 
 - name: HoloLens Development
-  href: hololens-development.md
+  href: hololens-development.md 
