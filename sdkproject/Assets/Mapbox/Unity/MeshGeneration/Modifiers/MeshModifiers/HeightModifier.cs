@@ -38,10 +38,21 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		[Tooltip("Create side walls from calculated height down to terrain level. Suggested for buildings, not suggested for roads.")]
 		private bool _createSideWalls = true;
 
+
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
 		private int _counter;
+		[SerializeField]
+		private string _heightPropertyName;
 
+		[SerializeField]
+		private int minimumHeight;
+
+		[SerializeField]
+		private int maxHeight;
+
+		[SerializeField]
+		private float _scaleCoefficient;
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, float scale)
 		{
@@ -61,7 +72,20 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			float hf = _height * _scale;
 			if (!_forceHeight)
 			{
-				if (feature.Properties.ContainsKey("height"))
+				if (feature.Properties.ContainsKey(_heightPropertyName))
+				{
+					if (float.TryParse(feature.Properties[_heightPropertyName].ToString(), out hf))
+					{
+						if (hf <= minimumHeight)
+							return;
+						hf += -minimumHeight; // to take care of negative values
+						hf *= _scale * _scaleCoefficient;
+
+						if (hf > maxHeight)
+							hf = maxHeight;
+					}
+				}
+				else if (feature.Properties.ContainsKey("height"))
 				{
 					hf = Convert.ToSingle(feature.Properties["height"]);
 					hf *= _scale;
@@ -70,7 +94,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						minHeight = Convert.ToSingle(feature.Properties["min_height"]) * _scale;
 						hf -= minHeight;
 					}
-				} 
+				}
 				else if (feature.Properties.ContainsKey("ele"))
 				{
 					//"ele" is used in contour layer for elevation
@@ -117,7 +141,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				_counter = md.Edges.Count;
 				var wallTri = new List<int>(_counter * 3);
 				var wallUv = new List<Vector2>(_counter * 2);
-				Vector3 norm = Constants.Math.Vector3Zero;
+				Vector3 norm = Mapbox.Unity.Constants.Math.Vector3Zero;
 
 				md.Vertices.Capacity = md.Vertices.Count + _counter * 2;
 				md.Normals.Capacity = md.Normals.Count + _counter * 2;
@@ -154,7 +178,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					wallTri.Add(ind + 2);
 				}
 
-				if(_separateSubmesh)
+				if (_separateSubmesh)
 				{
 					md.Triangles.Add(wallTri);
 				}

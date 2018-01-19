@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48797cd179dab4ada972032f960c4b7e, type: 3}
+  m_Name: DatasetMaterialModifier
+  m_EditorClassIdentifier: 
+  Active: 1
+  _materialTemplate: {fileID: 2100000, guid: d235aa3a694c2417f889c020cd988432, type: 2}
+  _propertyName: pkm2
+  max: 80000

@@ -6,6 +6,7 @@ using Mapbox.Map;
 using Mapbox.Unity.MeshGeneration.Modifiers;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Components;
+using System.Linq;
 
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
@@ -18,7 +19,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	public class MergedModifierStack : ModifierStackBase
 	{
 		[NodeEditorElement("Mesh Modifiers")] public List<MeshModifier> MeshModifiers;
-		[NodeEditorElement("Game Object Modifiers")] public List<GameObjectModifier> GoModifiers;
+		[NodeEditorElement("Mesh Modifiers")] public List<GameObjectModifier> GoModifiers;
+		public string HeightPropertyName = "Elevation";
+		public float ThresholdHeight = -33;
+		private float maxDataValue = 98;
+		//		public float MaxHeight = 30000;
 
 		private Dictionary<UnityTile, int> _cacheVertexCount = new Dictionary<UnityTile, int>();
 		private Dictionary<UnityTile, List<MeshData>> _cached = new Dictionary<UnityTile, List<MeshData>>();
@@ -33,7 +38,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private ObjectPool<VectorEntity> _pool;
 		private ObjectPool<List<VectorEntity>> _listPool;
 		private ObjectPool<List<MeshData>> _meshDataPool;
-
 		private int _counter, _counter2;
 
 		private void OnEnable()
@@ -117,6 +121,13 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
 		{
+			float hf = 0;
+			if (float.TryParse(feature.Properties["Elevation"].ToString(), out hf))
+			{
+				//if (hf <= ThresholdHeight)
+				//return null;
+			}
+
 			base.Execute(tile, feature, meshData, parent, type);
 
 			if (!_cacheVertexCount.ContainsKey(tile))
@@ -135,6 +146,15 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					MeshModifiers[i].Run(feature, meshData, tile);
 				}
 			}
+
+			//add colors to buildings
+			//float hue, saturation, value;
+			//Color baseColor = new Color(0.3f, 0, 1);
+			//Color.RGBToHSV(baseColor, out hue, out saturation, out value);
+			//float ramp = Convert.ToSingle(hf) / maxDataValue;
+
+			//Color newColor = Color.HSVToRGB(hue,1-ramp,value);
+			//meshData.Colors = Enumerable.Repeat(newColor, meshData.Vertices.Count).ToList();
 
 			GameObject go = null;
 			//65000 is the vertex limit for meshes, keep stashing it until that
@@ -171,6 +191,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					var st = _tempMeshData.Vertices.Count;
 					_tempMeshData.Vertices.AddRange(_temp2MeshData.Vertices);
 					_tempMeshData.Normals.AddRange(_temp2MeshData.Normals);
+					//_tempMeshData.Colors.AddRange(_temp2MeshData.Colors);
 
 					c2 = _temp2MeshData.UV.Count;
 					for (int j = 0; j < c2; j++)
@@ -231,6 +252,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					{
 						_tempVectorEntity.Mesh.SetUVs(i, _tempMeshData.UV[i]);
 					}
+
+					//setting vertex colors
+					//_tempVectorEntity.Mesh.SetColors(_tempMeshData.Colors);
+
+					//_tempVectorEntity.MeshRenderer.material = new Material(Shader.Find("Custom/VertexColoredDiffuse"));
 
 					_tempVectorEntity.GameObject.transform.SetParent(tile.transform, false);
 

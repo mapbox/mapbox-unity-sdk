@@ -47,7 +47,7 @@ You need an [access token](https://www.mapbox.com/help/define-access-token) to u
 
 Before reporting issues or contacting support, please follow these steps:
 
-1. Check that you are using the latest version of the [Mapbox Maps SDK for Unity](05-changelog.md)
+1. Check that you are using the latest version of the [Mapbox Unity SDK](05-changelog.md)
 2. Read about [Known Issues](02-known-issues.md)
 3. Check our [public respository for existing issues](https://github.com/mapbox/mapbox-unity-sdk/issues)
 

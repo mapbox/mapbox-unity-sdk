@@ -68,7 +68,6 @@ namespace Mapbox.Unity
 				{
 					throw new InvalidTokenException("No configuration file found! Configure your access token from the Mapbox > Settings menu.");
 				}
-
 			}
 
 			TokenValidator.Retrieve(configuration.AccessToken, (response) =>

@@ -7,7 +7,7 @@ Tools for using Mapbox APIs with C# / Unity. If you'd like to contribute to the 
 
 This repo contains:
 - Unity specific tools and libraries for processing Mapbox data
-  - Example projects using Mapbox Maps SDK for Unity
+  - Example projects using Mapbox Unity SDK
   - DocFX project for generateing API documentation
   - Written manuals and guides
 
@@ -37,7 +37,7 @@ Linux/Mac: `./update-mapbox-unity-sdk-core.sh`
 Documentation is generated using DocFX from this repo and is hosted at: https://www.mapbox.com/mapbox-unity-sdk/.
 
 # Dependencies
-This project includes git submodule dependencies outlined in [this gitmodules](https://github.com/mapbox/mapbox-unity-sdk/blob/develop/.gitmodules) file.
+This project includes git submodule dependcies outlined in [this gitmodules](https://github.com/mapbox/mapbox-unity-sdk/blob/develop/.gitmodules) file.
 
 To install/update the dependencies after `git clone`/`git pull` run `update-mapbox-unity-sdk-core.bat` or `update-mapbox-unity-sdk-core.sh` (depending on your OS).
 

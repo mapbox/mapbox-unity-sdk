@@ -23,7 +23,7 @@ If you want to contribute:
 
 *Coming soon.*
 
-# Updating the Mapbox Maps SDK for Unity Core
+# Updating the Mapbox Unity SDK Core
 
 This project includes git submodule dependencies. These dependencies are actively developed and maintained:
 
@@ -34,7 +34,7 @@ This project includes git submodule dependencies. These dependencies are activel
 - Changes under `/sdkproject/Assets/Mapbox/Core/Plugins` should never be committed directly to this repo. Instead they should be made in their corresponding submodule repos and updated in the Unity project via a file transfer executable.
 - Changes under `sdkproject/Assets/Mapbox/Core/mapbox-sdk-cs` can be made directly to this repo, but **please avoid any reference to Unity APIs**. This will help enable a smooth backport to the `cs` repository.
 
-To update the Mapbox Maps SDK for Unity Core, run the following command from the repo root:
+To update the Mapbox Unity SDK Core, run the following command from the repo root:
 
 OSX
 ```
@@ -54,7 +54,7 @@ If you would prefer to make changes to the SDK from within your own Unity projec
 
 # Generating documentation
 
-Documentation for the the Mapbox Maps SDK for Unity is automatically generated from XML headers in code.
+Documentation for the the Mapbox Unity SDK is automatically generated from XML headers in code.
 
 *Instructions for generating documentation are coming soon.*
 
