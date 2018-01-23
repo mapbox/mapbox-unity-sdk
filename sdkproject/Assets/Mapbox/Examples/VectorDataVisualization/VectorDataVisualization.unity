@@ -175,10 +175,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d7ff8ed3b76a4ee5a451d64a5393e3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _west: 0
-  _north: 0
-  _east: 0
-  _south: 0
+  _west: 3
+  _north: 3
+  _east: 3
+  _south: 3
 --- !u!114 &110210644
 MonoBehaviour:
   m_ObjectHideFlags: 0
