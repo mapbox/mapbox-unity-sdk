@@ -8,9 +8,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63d97cb1cfb3f1b499c24763afa54873, type: 3}
-  m_Name: BasicsVectorTileFactory
+  m_Script: {fileID: 11500000, guid: 90a9943575f6432458dbad2a88267cb2, type: 3}
+  m_Name: AddToCollectionModifier
   m_EditorClassIdentifier: 
-  _mapId: lr1k.b7wzke2r
-  Visualizers:
-  - {fileID: 11400000, guid: 49b5b5cab8982084a986f2d148acff42, type: 2}
+  Active: 1
+  _collection: {fileID: 11400000, guid: 0b76f10bbd23bfd429cf741817a1f608, type: 2}

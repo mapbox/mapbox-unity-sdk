@@ -12,4 +12,6 @@ public class VectorEntity
 	public MeshRenderer MeshRenderer;
 	public VectorFeatureUnity Feature;
 	public Transform Transform;
+	public float TileScale;
+	public RangeAnimator RangeAnimator;
 }

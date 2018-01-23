@@ -8,9 +8,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63d97cb1cfb3f1b499c24763afa54873, type: 3}
-  m_Name: BasicsVectorTileFactory
+  m_Script: {fileID: 11500000, guid: b4eb8c434e02898488f63b0f4abcbe9f, type: 3}
+  m_Name: New Kd Tree Collection
   m_EditorClassIdentifier: 
-  _mapId: lr1k.b7wzke2r
-  Visualizers:
-  - {fileID: 11400000, guid: 49b5b5cab8982084a986f2d148acff42, type: 2}

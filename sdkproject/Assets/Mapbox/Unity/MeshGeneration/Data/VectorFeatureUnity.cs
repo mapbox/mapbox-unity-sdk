@@ -7,6 +7,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 	public class VectorFeatureUnity
 	{
+		public string Id;
+
 		public VectorTileFeature Data;
 		public Dictionary<string, object> Properties;
 		public List<List<Vector3>> Points = new List<List<Vector3>>();
@@ -29,10 +31,21 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			Properties = Data.GetProperties();
 			Points.Clear();
 
+			if (feature.Id > 10000)
+			{
+				Id = feature.Id.ToString();
+				_geom = feature.Geometry<float>();
+			}
+			else
+			{
+				Id = string.Empty;
+				_geom = feature.Geometry<float>(0);
+			}
+
 			_rectSizex = tile.Rect.Size.x;
 			_rectSizey = tile.Rect.Size.y;
 
-			_geom = feature.Geometry<float>(0);
+			_geom = feature.Geometry<float>();
 			_geomCount = _geom.Count;
 			for (int i = 0; i < _geomCount; i++)
 			{
@@ -41,7 +54,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				for (int j = 0; j < _pointCount; j++)
 				{
 					var point = _geom[i][j];
-					_newPoints.Add(new Vector3((float)(point.X / layerExtent * _rectSizex - (_rectSizex / 2))* tile.TileScale, 0, (float)((layerExtent - point.Y) / layerExtent * _rectSizey - (_rectSizey / 2)) * tile.TileScale));
+					_newPoints.Add(new Vector3((float)(point.X / layerExtent * _rectSizex - (_rectSizex / 2)) * tile.TileScale, 0, (float)((layerExtent - point.Y) / layerExtent * _rectSizey - (_rectSizey / 2)) * tile.TileScale));
 				}
 				Points.Add(_newPoints);
 			}
