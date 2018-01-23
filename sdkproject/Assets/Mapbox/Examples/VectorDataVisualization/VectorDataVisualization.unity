@@ -123,8 +123,11 @@ GameObject:
   - component: {fileID: 110210642}
   - component: {fileID: 110210643}
   - component: {fileID: 110210644}
-  - component: {fileID: 110210645}
   - component: {fileID: 110210646}
+  - component: {fileID: 110210647}
+  - component: {fileID: 110210648}
+  - component: {fileID: 110210649}
+  - component: {fileID: 110210645}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -156,13 +159,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58cb9a85be6f84591938618fa232ce85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _zoom: 16
+  _zoom: 20
   _initializeOnStart: 1
   _latitudeLongitudeString: 37.82,-122.37
   _root: {fileID: 0}
-  _tileProvider: {fileID: 110210643}
+  _tileProvider: {fileID: 110210648}
   _mapVisualizer: {fileID: 11400000, guid: 5517cae62ed6444d3a5bc9ffc535069f, type: 2}
-  _unityTileSize: 100
+  _unityTileSize: 50
   _snapMapHeightToZero: 1
 --- !u!114 &110210643
 MonoBehaviour:
@@ -197,15 +200,17 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 110210640}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dae9a62a6a8194f49bab9128c9acffb7, type: 3}
+  m_Script: {fileID: 11500000, guid: 52d72cc6210cb7144a24acb7402222a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _camera: {fileID: 498507646}
-  _visibleBuffer: 3
-  _disposeBuffer: 10
-  _updateInterval: 0.1
+  IgnoreGuiFingers: 0
+  RequiredFingerCount: 0
+  RequiredSelectable: {fileID: 0}
+  Camera: {fileID: 354995994}
+  RotateAxis: {x: 0, y: -1, z: 0}
+  Relative: 0
 --- !u!114 &110210646
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -219,6 +224,53 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MapVisualizer: {fileID: 11400000, guid: 5517cae62ed6444d3a5bc9ffc535069f, type: 2}
   MoveDelta: {x: 0, y: 0, z: 0}
+--- !u!114 &110210647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 110210640}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76a256726e16d4966a3f30b97a17e1d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mapInstance: {fileID: 110210642}
+  OnTileError:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: Mapbox.Unity.Map.TileErrorEvent, Assembly-CSharp, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+--- !u!114 &110210648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 110210640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d5cc584a855041e79782eef5872fa10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _basicMap: {fileID: 110210642}
+  _targetTransform: {fileID: 2010033302}
+  _visibleBuffer: 1
+  _disposeBuffer: 2
+--- !u!114 &110210649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 110210640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eda371e5375f454490a86f21559ee38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IgnoreGuiFingers: 1
+  RequiredFingerCount: 0
+  RequiredSelectable: {fileID: 0}
+  Camera: {fileID: 0}
 --- !u!20 &354995994 stripped
 Camera:
   m_PrefabParentObject: {fileID: 20945382794571592, guid: 85f9b39438d88460bb2ccc6cc38b12b0,
@@ -249,7 +301,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 498507641}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9527fd56bc6a0c549a1e550219f9b16e, type: 3}
   m_Name: 
@@ -319,6 +371,28 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 37.5, y: 0, z: 0}
+--- !u!1 &668886546 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1603085209739848, guid: 85f9b39438d88460bb2ccc6cc38b12b0,
+    type: 2}
+  m_PrefabInternal: {fileID: 1347839931}
+--- !u!114 &668886547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 668886546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76a256726e16d4966a3f30b97a17e1d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mapInstance: {fileID: 110210642}
+  OnTileError:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: Mapbox.Unity.Map.TileErrorEvent, Assembly-CSharp, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
 --- !u!1001 &1022355433
 Prefab:
   m_ObjectHideFlags: 0
@@ -634,6 +708,58 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 85f9b39438d88460bb2ccc6cc38b12b0, type: 2}
   m_IsPrefabParent: 0
+--- !u!1001 &1383927957
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4969041474986164, guid: 1ab37704dc2704eb1bdcee6f12c52182, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4969041474986164, guid: 1ab37704dc2704eb1bdcee6f12c52182, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4969041474986164, guid: 1ab37704dc2704eb1bdcee6f12c52182, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4969041474986164, guid: 1ab37704dc2704eb1bdcee6f12c52182, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4969041474986164, guid: 1ab37704dc2704eb1bdcee6f12c52182, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4969041474986164, guid: 1ab37704dc2704eb1bdcee6f12c52182, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4969041474986164, guid: 1ab37704dc2704eb1bdcee6f12c52182, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4969041474986164, guid: 1ab37704dc2704eb1bdcee6f12c52182, type: 2}
+      propertyPath: m_RootOrder
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 114894650605161388, guid: 1ab37704dc2704eb1bdcee6f12c52182,
+        type: 2}
+      propertyPath: SwipeThreshold
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 114894650605161388, guid: 1ab37704dc2704eb1bdcee6f12c52182,
+        type: 2}
+      propertyPath: ReferenceDpi
+      value: 900
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: 1ab37704dc2704eb1bdcee6f12c52182, type: 2}
+  m_IsPrefabParent: 0
 --- !u!1001 &1796801198
 Prefab:
   m_ObjectHideFlags: 0
@@ -713,7 +839,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1812144955}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 777f388d4814541b8a1f1e073a0c9faf, type: 3}
   m_Name: 
@@ -812,3 +938,31 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 41.47, y: 232.6, z: 0}
+--- !u!1 &2010033301
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 2010033302}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2010033302
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2010033301}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -1, z: 2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

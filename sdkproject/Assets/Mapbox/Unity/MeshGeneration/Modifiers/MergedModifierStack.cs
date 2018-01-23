@@ -122,7 +122,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
 		{
 			float hf = 0;
-			if (float.TryParse(feature.Properties[HeightPropertyName].ToString(), out hf))
+			if (float.TryParse(feature.Properties["Elevation"].ToString(), out hf))
 			{
 				//if (hf <= ThresholdHeight)
 				//return null;

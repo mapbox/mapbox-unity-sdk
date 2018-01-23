@@ -17,7 +17,7 @@ MonoBehaviour:
     Id: mapbox://styles/mapbox/cjavylmncmgeb2rlnpimhp95q
     Modified: 
     UserName: 
-  _mapId: mapbox.satellite
+  _mapId: mapbox://styles/mapbox/satellite-streets-v10
   _useCompression: 0
   _useMipMap: 1
   _useRetina: 1

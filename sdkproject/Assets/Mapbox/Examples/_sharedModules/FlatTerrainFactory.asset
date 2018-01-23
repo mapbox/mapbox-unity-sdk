@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Name: FlatTerrainFactory
   m_EditorClassIdentifier: 
   _baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
+  _createSideWalls: 0
+  _sideWallHeight: 10
+  _sideWallMaterial: {fileID: 0}
   _addCollider: 0
   _addToLayer: 0
   _layerId: 0
