@@ -6,13 +6,13 @@ namespace Mapbox.Unity.Map
 	public class RangeTileProvider : AbstractTileProvider
 	{
 		[SerializeField]
-		private int _west;
+		private int _west = 2;
 		[SerializeField]
-		private int _north;
+		private int _north = 2;
 		[SerializeField]
-		private int _east;
+		private int _east = 2;
 		[SerializeField]
-		private int _south;
+		private int _south = 2;
 
 		public override void OnInitialized()
 		{

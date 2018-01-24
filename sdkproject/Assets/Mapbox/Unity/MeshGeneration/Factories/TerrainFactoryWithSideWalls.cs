@@ -25,7 +25,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		private string _customMapId = "mapbox.terrain-rgb";
 #pragma warning restore 0414
 		[SerializeField]
-		private string _mapId = "";
+		public string _mapId = "";
 		[SerializeField]
 		private float _heightModifier = 1f;
 		[SerializeField]
@@ -144,7 +144,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 
 			var sideVertBase = _newVertexList.Count;
-			
+
 			var lastRow = (_sampleCount - 1) * _sampleCount;
 			var baseTriList = new List<int>();
 			for (int x = 0; x < _sampleCount; x++)
@@ -161,7 +161,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				_newNormalList.Add(Mapbox.Unity.Constants.Math.Vector3Forward);
 				_newUvList.Add(new Vector2(_newUvList[x * _sampleCount].y, 1));
 				_newUvList.Add(new Vector2(_newUvList[x * _sampleCount].y, 0));
-				 
+
 				//--- 
 
 				_newVertexList.Add(_newVertexList[x * _sampleCount]);
@@ -435,7 +435,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 						mesh.Vertices[i].x,
 						_stitchTargetMeshData.Vertices[meshVertCount - _sampleCount + i].y,
 						mesh.Vertices[i].z);
-					mesh.Vertices[meshVertCount + (8*i)] = mesh.Vertices[i];
+					mesh.Vertices[meshVertCount + (8 * i)] = mesh.Vertices[i];
 
 					mesh.Normals[i] = new Vector3(_stitchTargetMeshData.Normals[meshVertCount - _sampleCount + i].x,
 						_stitchTargetMeshData.Normals[meshVertCount - _sampleCount + i].y,

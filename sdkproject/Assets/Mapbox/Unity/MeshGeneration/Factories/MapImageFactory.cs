@@ -6,6 +6,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	using Mapbox.Unity.MeshGeneration.Enums;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.Utilities;
+	using Mapbox.Unity.Map;
 
 	public enum MapImageType
 	{
@@ -21,34 +22,34 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	public class MapImageFactory : AbstractTileFactory
 	{
 		[SerializeField]
-		private MapImageType _mapIdType;
+		public ImagerySourceType _mapIdType;
 
 		[SerializeField]
 		[StyleSearch]
-		Style _customStyle;
+		public Style _customStyle;
+
+		//[SerializeField]
+		//private string _mapId = "";
 
 		[SerializeField]
-		private string _mapId = "";
+		public bool _useCompression = true;
 
 		[SerializeField]
-		bool _useCompression = true;
+		public bool _useMipMap = false;
 
 		[SerializeField]
-		bool _useMipMap = false;
-
-		[SerializeField]
-		bool _useRetina;
+		public bool _useRetina;
 
 		public string MapId
 		{
 			get
 			{
-				return _mapId;
+				return _customStyle.Id;
 			}
 
 			set
 			{
-				_mapId = value;
+				_customStyle.Id = value;
 			}
 		}
 
@@ -69,11 +70,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnRegistered(UnityTile tile)
 		{
-			if (_mapIdType == MapImageType.None)
+			if (_mapIdType == ImagerySourceType.None)
 				return;
-
+			Debug.Log("Image OnRegistered");
 			RasterTile rasterTile;
-			if (_mapId.StartsWith("mapbox://", StringComparison.Ordinal))
+			if (MapId.StartsWith("mapbox://", StringComparison.Ordinal))
 			{
 				rasterTile = _useRetina ? new RetinaRasterTile() : new RasterTile();
 			}
@@ -86,7 +87,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			tile.AddTile(rasterTile);
 			Progress++;
-			rasterTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
+			rasterTile.Initialize(_fileSource, tile.CanonicalTileId, MapId, () =>
 			{
 				if (tile == null)
 				{
@@ -95,7 +96,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 				if (rasterTile.HasError)
 				{
-					OnErrorOccurred(new TileErrorEventArgs(tile.CanonicalTileId,rasterTile.GetType(),tile, rasterTile.Exceptions));
+					OnErrorOccurred(new TileErrorEventArgs(tile.CanonicalTileId, rasterTile.GetType(), tile, rasterTile.Exceptions));
 					tile.RasterDataState = TilePropertyState.Error;
 					Progress--;
 					return;

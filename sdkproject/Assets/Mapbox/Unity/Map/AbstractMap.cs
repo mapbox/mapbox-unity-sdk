@@ -250,5 +250,18 @@ namespace Mapbox.Unity.Map
 		{
 			Initialize(Conversions.StringToLatLon(_latitudeLongitudeString), (int)_zoom);
 		}
+
+		public virtual void InitializeMap(MapOptions options)
+		{
+
+		}
+		public virtual void UpdateMap(MapLocationOptions options)
+		{
+
+		}
+		public virtual void ResetMap()
+		{
+
+		}
 	}
 }

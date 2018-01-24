@@ -4,7 +4,7 @@
 	using Mapbox.Utils;
 	using UnityEngine;
 
-	public interface IMap : IMapReadable, IMapWritable { }
+	public interface IMap : IMapReadable, IMapWritable, IUnifiedMap { }
 
 	public interface IMapReadable
 	{
