@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -45,7 +46,11 @@ namespace UnityARInterface
         public static Action<BoundedPlane> planeUpdated;
         public static Action<BoundedPlane> planeRemoved;
 
-        public abstract bool StartService(Settings settings);
+        public virtual bool IsRunning { get; protected set; } 
+
+        public virtual bool IsSupported { get { return true; } }
+
+        public abstract IEnumerator StartService(Settings settings);
 
         public abstract void StopService();
 
@@ -88,6 +93,14 @@ namespace UnityARInterface
         {
             if (planeRemoved != null)
                 planeRemoved(plane);
+        }
+
+        public virtual void ApplyAnchor(ARAnchor arAnchor)
+        {
+        }
+
+        public virtual void DestroyAnchor(ARAnchor arAnchor)
+        {
         }
 
         private static ARInterface m_Interface;

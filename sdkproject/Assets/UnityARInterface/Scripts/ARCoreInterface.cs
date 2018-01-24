@@ -1,168 +1,333 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using UnityEngine;
-using UnityEngine.XR;
 using GoogleARCore;
 using GoogleARCoreInternal;
-using ARCoreNative = GoogleAR.UnityNative;
+using System.Collections;
+using System.Runtime.InteropServices;
 
 namespace UnityARInterface
 {
     public class ARCoreInterface : ARInterface
     {
+       
+#region ARCoreCameraAPI
+        public const string ARCoreCameraUtilityAPI = "arcore_camera_utility";
+
+        //Texture size. Larger values are slower.
+        private const int k_ARCoreTextureWidth = 640;
+        private const int k_ARCoreTextureHeight = 480;
+
+        //If imageFormatType is set to ImageFormatColor, the buffer is converted to YUV2.
+        //If imageFormatType is set to ImageFormatGrayscale, the buffer is set to Y as is, 
+        //while the UV components remain null. Will appear pink using the remote
+        private const ImageFormatType k_ImageFormatType = ImageFormatType.ImageFormatColor;
+
+        [DllImport(ARCoreCameraUtilityAPI)]
+        public static extern void TextureReader_create(int format, int width, int height, bool keepAspectRatio);
+
+        [DllImport(ARCoreCameraUtilityAPI)]
+        public static extern void TextureReader_destroy();
+
+        [DllImport(ARCoreCameraUtilityAPI)]
+        public static extern IntPtr TextureReader_submitAndAcquire(
+            int textureId, int textureWidth, int textureHeight, ref int bufferSize);
+
+        private enum ImageFormatType
+        {
+            ImageFormatColor = 0,
+            ImageFormatGrayscale = 1
+        }
+
+        private byte[] pixelBuffer;
+
+#endregion
+
         private List<TrackedPlane> m_TrackedPlaneBuffer = new List<TrackedPlane>();
-        private System.Nullable<float> m_HorizontalFov;
-        private System.Nullable<float> m_VerticalFov;
         private ScreenOrientation m_CachedScreenOrientation;
         private Dictionary<TrackedPlane, BoundedPlane> m_TrackedPlanes = new Dictionary<TrackedPlane, BoundedPlane>();
-        private SessionComponent m_Session;
+        private SessionManager m_SessionManager;
+        private ARCoreSessionConfig m_ARCoreSessionConfig;
+        private ARCoreBackgroundRenderer m_BackgroundRenderer;
         private Matrix4x4 m_DisplayTransform = Matrix4x4.identity;
+        private List<Vector4> m_TempPointCloud = new List<Vector4>();
+        private Dictionary<ARAnchor, Anchor> m_Anchors = new Dictionary<ARAnchor, Anchor>();
 
-        public override bool StartService(Settings settings)
+        public override bool IsSupported
         {
-            if (m_Session == null)
+            get
             {
-                var sessionConfig = ScriptableObject.CreateInstance<SessionConfig>();
+                if (m_SessionManager == null)
+                    m_SessionManager = SessionManager.CreateSession();
 
-                // We're going to manage the camera separately, but this needs to be true
-                // so the ARCore native API knows we're going to use the camera.
-                sessionConfig.m_enableARBackground = true;
-                sessionConfig.m_enablePlaneFinding = settings.enablePlaneDetection;
-                sessionConfig.m_enablePointcloud = settings.enablePointCloud;
+                if (m_ARCoreSessionConfig == null)
+                    m_ARCoreSessionConfig = ScriptableObject.CreateInstance<ARCoreSessionConfig>();
 
-                var gameObject = new GameObject("Session Manager");
+                return m_SessionManager.CheckSupported((m_ARCoreSessionConfig));
+            }
+        }
 
-                // Deactivate the GameObject before adding the SessionComponent
-                // or else the Awake method will be called before we have set
-                // the session config.
-                gameObject.SetActive(false);
-                m_Session = gameObject.AddComponent<SessionComponent>();
-                m_Session.m_connectOnAwake = false;
-                m_Session.m_arSessionConfig = sessionConfig;
+        public override IEnumerator StartService(Settings settings)
+        {
+            if (m_ARCoreSessionConfig == null)
+                m_ARCoreSessionConfig = ScriptableObject.CreateInstance<ARCoreSessionConfig>();
 
-                // We are going to manage the camera separately, so
-                // intentionally leave null.
-                m_Session.m_firstPersonCamera = null;
-                gameObject.SetActive(true);
+            m_ARCoreSessionConfig.EnableLightEstimation = settings.enableLightEstimation;
+            m_ARCoreSessionConfig.EnablePlaneFinding = settings.enablePlaneDetection;
+            //Do we want to match framerate to the camera?
+            m_ARCoreSessionConfig.MatchCameraFramerate = false;
+
+            //Using the SessionManager instead of ARCoreSession allows us to check if the config is supported,
+            //And also using the session without the need for a GameObject or an additional MonoBehaviour.
+            if (m_SessionManager == null)
+            {
+                m_SessionManager = SessionManager.CreateSession();
+                if (!IsSupported){
+                    ARDebug.LogError("The requested ARCore session configuration is not supported.");
+                    yield break;
+                }
+
+                Session.Initialize(m_SessionManager);
+
+                if (Session.ConnectionState != SessionConnectionState.Uninitialized)
+                {
+                    ARDebug.LogError("Could not create an ARCore session.  The current Unity Editor may not support this " +
+                        "version of ARCore.");
+                    yield break;
+                }
+            }
+            //We ask for permission to use the camera and wait
+            var task = AskForPermissionAndConnect(m_ARCoreSessionConfig);
+            yield return task.WaitForCompletion();
+            //After the operation is done, we double check if the connection was successful
+            IsRunning = task.Result == SessionConnectionState.Connected;
+
+            if (IsRunning)
+                TextureReader_create((int)k_ImageFormatType, k_ARCoreTextureWidth, k_ARCoreTextureHeight, true);
+
+        }
+
+        //Checks if we can establish a connection, and ask for permission
+        private AsyncTask<SessionConnectionState> AskForPermissionAndConnect(ARCoreSessionConfig sessionConfig)
+        {
+            const string androidCameraPermissionName = "android.permission.CAMERA";
+
+            if (m_SessionManager == null)
+            {
+                ARDebug.LogError("Cannot connect because ARCoreSession failed to initialize.");
+                return new AsyncTask<SessionConnectionState>(SessionConnectionState.Uninitialized);
             }
 
-            m_Session.Connect();
-            return SessionManager.ConnectionState == SessionConnectionState.Connected;
+            if (sessionConfig == null)
+            {
+                ARDebug.LogError("Unable to connect ARSession session due to missing ARSessionConfig.");
+                m_SessionManager.ConnectionState = SessionConnectionState.MissingConfiguration;
+                return new AsyncTask<SessionConnectionState>(Session.ConnectionState);
+            }
+
+            // We have already connected at least once.
+            if (Session.ConnectionState != SessionConnectionState.Uninitialized)
+            {
+                ARDebug.LogError("Multiple attempts to connect to the ARSession.  Note that the ARSession connection " +
+                    "spans the lifetime of the application and cannot be reconfigured.  This will change in future " +
+                    "versions of ARCore.");
+                return new AsyncTask<SessionConnectionState>(Session.ConnectionState);
+            }
+
+            // Create an asynchronous task for the potential permissions flow and service connection.
+            Action<SessionConnectionState> onTaskComplete;
+            var returnTask = new AsyncTask<SessionConnectionState>(out onTaskComplete);
+            returnTask.ThenAction((connectionState) =>
+            {
+                m_SessionManager.ConnectionState = connectionState;
+            });
+
+            // Attempt service connection immediately if permissions are granted.
+            if (AndroidPermissionsManager.IsPermissionGranted(androidCameraPermissionName))
+            {
+                Connect(sessionConfig, onTaskComplete);
+                return returnTask;
+            }
+
+            // Request needed permissions and attempt service connection if granted.
+            AndroidPermissionsManager.RequestPermission(androidCameraPermissionName).ThenAction((requestResult) =>
+            {
+                if (requestResult.IsAllGranted)
+                {
+                    Connect(sessionConfig, onTaskComplete);
+                }
+                else
+                {
+                    ARDebug.LogError("ARCore connection failed because a needed permission was rejected.");
+                    onTaskComplete(SessionConnectionState.UserRejectedNeededPermission);
+                }
+            });
+
+            return returnTask;
+        }
+
+        //Connect is called once the permission to use the camera is granted.
+        private void Connect(ARCoreSessionConfig sessionConfig, Action<SessionConnectionState> onComplete)
+        {
+            if (!m_SessionManager.CheckSupported(sessionConfig))
+            {
+                ARDebug.LogError("The requested ARCore session configuration is not supported.");
+                onComplete(SessionConnectionState.InvalidConfiguration);
+                return;
+            }
+
+            if (!m_SessionManager.SetConfiguration(sessionConfig))
+            {
+                ARDebug.LogError("ARCore connection failed because the current configuration is not supported.");
+                onComplete(SessionConnectionState.InvalidConfiguration);
+                return;
+            }
+
+            Frame.Initialize(m_SessionManager.FrameManager);
+
+            // ArSession_resume needs to be called in the UI thread due to b/69682628.
+            AsyncTask.PerformActionInUIThread(() =>
+            {
+                if (!m_SessionManager.Resume())
+                {
+                    onComplete(SessionConnectionState.ConnectToServiceFailed);
+                }
+                else
+                {
+                    onComplete(SessionConnectionState.Connected);
+                }
+            });
         }
 
         public override void StopService()
         {
-            // Not implemented on ARCore.
-            return;
+            var anchors = m_Anchors.Keys;
+            foreach (var anchor in anchors)
+            {
+                DestroyAnchor(anchor);
+            }
+            Frame.Destroy();
+            Session.Destroy();
+            TextureReader_destroy();
+            IsRunning = false;
         }
 
         public override bool TryGetUnscaledPose(ref Pose pose)
         {
-            if (Frame.TrackingState != FrameTrackingState.Tracking)
+            if (Frame.TrackingState != TrackingState.Tracking)
                 return false;
 
-            ARCoreNative.PoseData poseData;
-
-            bool getPoseSuccess = ARCoreNative.InputTracking.TryGetPoseAtTime(
-                out poseData,
-                ARCoreNative.CoordinateFrame.StartOfService,
-                ARCoreNative.CoordinateFrame.CameraColor);
-
-            if (getPoseSuccess && (poseData.statusCode == ARCoreNative.PoseStatus.Valid))
-            {
-                pose.position = poseData.position;
-                pose.rotation = poseData.rotation;
-                return true;
-            }
-
-            return false;
+            pose.position = Frame.Pose.position;
+            pose.rotation = Frame.Pose.rotation;
+            return true;
         }
 
         public override bool TryGetCameraImage(ref CameraImage cameraImage)
         {
-            ARCoreNative.NativeImage nativeImage = new ARCoreNative.NativeImage();
-            if (ARCoreNative.Device.TryAcquireLatestImageBuffer(ref nativeImage))
+            if (Frame.TrackingState != TrackingState.Tracking)
+                return false;
+
+            if (Frame.CameraImage.Texture == null || Frame.CameraImage.Texture.GetNativeTexturePtr() == IntPtr.Zero)
+                return false;
+
+            //This is a GL texture ID
+            int textureId = Frame.CameraImage.Texture.GetNativeTexturePtr().ToInt32();
+            int bufferSize = 0;
+            //Ask the native plugin to start reading the image of the current frame, 
+            //and return the image read from the privous frame
+            IntPtr bufferPtr = TextureReader_submitAndAcquire(textureId, k_ARCoreTextureWidth, k_ARCoreTextureHeight, ref bufferSize);
+
+            //I think this is needed because of this bug
+            //https://github.com/google-ar/arcore-unity-sdk/issues/66
+            GL.InvalidateState();
+
+            if (bufferPtr == IntPtr.Zero || bufferSize == 0)
+                return false;
+
+            if (pixelBuffer == null || pixelBuffer.Length != bufferSize)
+                pixelBuffer = new byte[bufferSize];
+
+            //Copy buffer
+            Marshal.Copy(bufferPtr, pixelBuffer, 0, bufferSize);
+
+            //Convert to YUV data
+            PixelBuffertoYUV2(pixelBuffer ,k_ARCoreTextureWidth, k_ARCoreTextureHeight, 
+                              k_ImageFormatType, ref cameraImage.y, ref cameraImage.uv);
+
+            cameraImage.width = k_ARCoreTextureWidth;
+            cameraImage.height = k_ARCoreTextureHeight;
+
+            return true;
+        }
+
+
+        private void PixelBuffertoYUV2(byte[] rgba, int width, int height,ImageFormatType imageFormatType ,ref byte[] y, ref byte[] uv)
+        {
+            //in grayscale, it's a byte per pixel, which we can just assign to Y, and leave uv null
+            //Probably not the most accurate conversion, would save some performance
+            if (imageFormatType == ImageFormatType.ImageFormatGrayscale)
             {
-                cameraImage.width = (int)nativeImage.width;
-                cameraImage.height = (int)nativeImage.height;
-
-                var planeInfos = nativeImage.planeInfos;
-
-                // The Y plane is always the first one.
-                var yOffset = planeInfos[0].offset;
-                var numYBytes = planeInfos[0].size;
-                IntPtr yPlaneStart = new IntPtr(nativeImage.planeData.ToInt64() + yOffset);
-
-                if (cameraImage.y == null || cameraImage.y.Length != numYBytes)
-                    cameraImage.y = new byte[numYBytes];
-
-                Marshal.Copy(yPlaneStart, cameraImage.y, 0, (int)numYBytes);
-
-                // UV planes are not deterministic, but we want all the data in one go
-                // so the offset will be the min of the two planes.
-                int uvOffset = Mathf.Min(
-                    (int)nativeImage.planeInfos[1].offset,
-                    (int)nativeImage.planeInfos[2].offset);
-
-                // Find the end of the uv plane data
-                int uvDataEnd = 0;
-                for (int i = 1; i < planeInfos.Count; ++i)
-                {
-                    uvDataEnd = Mathf.Max(uvDataEnd, (int)planeInfos[i].offset + planeInfos[i].size);
-                }
-
-                // Finally, compute the number of bytes by subtracting the end from the beginning
-                var numUVBytes = uvDataEnd - uvOffset;
-                IntPtr uvPlaneStart = new IntPtr(nativeImage.planeData.ToInt64() + uvOffset);
-
-                if (cameraImage.uv == null || cameraImage.uv.Length != numUVBytes)
-                    cameraImage.uv = new byte[numUVBytes];
-
-                Marshal.Copy(uvPlaneStart, cameraImage.uv, 0, (int)numUVBytes);
-
-                ARCoreNative.Device.ReleaseImageBuffer(nativeImage);
-
-                // The data is usually provided as VU rather than UV,
-                // so we need to swap the bytes.
-                // There's no way to know this currently, but it's always
-                // been this way on every device so far.
-                for (int i = 1; i < numUVBytes; i += 2)
-                {
-                    var b = cameraImage.uv[i - 1];
-                    cameraImage.uv[i - 1] = cameraImage.uv[i];
-                    cameraImage.uv[i] = b;
-                }
-
-                return true;
+                y = rgba;
+                uv = null;
+                return;
             }
 
-            return false;
+            int pixelCount = width * height;
+
+            if (y == null || y.Length != pixelCount)
+                y = new byte[pixelCount];
+
+            if (uv == null || uv.Length != pixelCount / 2)
+                uv = new byte[pixelCount / 2];
+
+            int iY = 0;
+            int iUV = 0;
+            int iRGBA = 0;
+
+            for (int row = 0; row < height; row++)
+            {
+                for (int column = 0; column < width; column++)
+                {
+                    //Random magic starts here!
+                    //Convert every pixel to 1 byte Y
+                    y[iY++] = (byte)(((66 * rgba[iRGBA] + 129 * rgba[iRGBA + 1] + 25 * rgba[iRGBA + 2] + 128) >> 8) + 16);
+                    //Convert every pixel to 2 bytes UV at quarter resolution
+                    if (row % 2 == 0 && column % 2 == 0)
+                    {
+                        uv[iUV++] = (byte)(((-38 * rgba[iRGBA] - 74 * rgba[iRGBA + 1] + 112 * rgba[iRGBA + 2] + 128) >> 8) + 128);
+                        uv[iUV++] = (byte)(((112 * rgba[iRGBA] - 94 * rgba[iRGBA + 1] - 18 * rgba[iRGBA + 2] + 128) >> 8) + 128);
+                    }
+                    //To next pixel
+                    iRGBA += 4;
+                }
+            }
         }
 
         public override bool TryGetPointCloud(ref PointCloud pointCloud)
         {
+            if (Frame.TrackingState != TrackingState.Tracking)
+                return false;
+
             // Fill in the data to draw the point cloud.
-            GoogleARCore.PointCloud nativePointCloud = Frame.PointCloud;
-            if (nativePointCloud.PointCount == 0)
+            m_TempPointCloud.Clear();
+            Frame.PointCloud.CopyPoints(m_TempPointCloud);
+
+            if (m_TempPointCloud.Count == 0)
                 return false;
 
             if (pointCloud.points == null)
                 pointCloud.points = new List<Vector3>();
 
             pointCloud.points.Clear();
-
-            for (int i = 0; i < nativePointCloud.PointCount; i++)
-            {
-                pointCloud.points.Add(nativePointCloud.GetPoint(i));
-            }
+            foreach (Vector3 point in m_TempPointCloud)
+                pointCloud.points.Add(point);
 
             return true;
         }
 
         public override LightEstimate GetLightEstimate()
         {
-            if (SessionManager.ConnectionState == SessionConnectionState.Connected)
+            if (Session.ConnectionState == SessionConnectionState.Connected && Frame.LightEstimate.State == LightEstimateState.Valid)
             {
                 return new LightEstimate()
                 {
@@ -215,13 +380,10 @@ namespace UnityARInterface
 
         public override void SetupCamera(Camera camera)
         {
-            var backgroundRender = new ARBackgroundRenderer();
-            backgroundRender.backgroundMaterial =
-                Resources.Load("Materials/ARBackground", typeof(Material)) as Material;
-            backgroundRender.mode = ARRenderMode.MaterialAsBackground;
-            backgroundRender.camera = camera;
-
-            ARCoreNative.Device.backgroundRenderer = backgroundRender;
+            camera.gameObject.SetActive(false);
+            m_BackgroundRenderer = camera.gameObject.AddComponent<ARCoreBackgroundRenderer>();
+            m_BackgroundRenderer.BackgroundMaterial = Resources.Load("Materials/ARBackground", typeof(Material)) as Material;
+            camera.gameObject.SetActive(true);
         }
 
         public override void UpdateCamera(Camera camera)
@@ -230,70 +392,60 @@ namespace UnityARInterface
                 return;
 
             CalculateDisplayTransform();
-
             m_CachedScreenOrientation = Screen.orientation;
+        }
 
-            if (m_CachedScreenOrientation == ScreenOrientation.Portrait ||
-                m_CachedScreenOrientation == ScreenOrientation.PortraitUpsideDown)
-            {
-                if (m_HorizontalFov.HasValue)
-                {
-                    camera.fieldOfView = m_HorizontalFov.Value;
-                }
-                else
-                {
-                    float fieldOfView;
-                    if (ARCoreNative.Device.TryGetHorizontalFov(out fieldOfView))
-                    {
-                        m_HorizontalFov = fieldOfView;
-                        camera.fieldOfView = fieldOfView;
-                    }
-                }
-            }
-            else
-            {
-                if (m_VerticalFov.HasValue)
-                {
-                    camera.fieldOfView = m_VerticalFov.Value;
-                }
-                else
-                {
-                    float fieldOfView;
-                    if (ARCoreNative.Device.TryGetVerticalFov(out fieldOfView))
-                    {
-                        m_VerticalFov = fieldOfView;
-                        camera.fieldOfView = fieldOfView;
-                    }
-                }
-            }
+
+        private bool FloatCompare(float a, float b)
+        {
+            return Mathf.Abs(a - b) < 9.99999944E-11f;
+        }
+
+        private bool PlaneUpdated(TrackedPlane tp, BoundedPlane bp)
+        {
+            var extents = (!FloatCompare(tp.ExtentX, bp.extents.x) || !FloatCompare(tp.ExtentZ, bp.extents.y));
+            var rotation = tp.Rotation != bp.rotation;
+            var position = tp.Position != bp.center;
+            return (extents || rotation || position);
         }
 
         public override void Update()
         {
-            SessionManager.Instance.EarlyUpdate();
+            if (m_SessionManager == null)
+            {
+                return;
+            }
 
-            if (Frame.TrackingState != FrameTrackingState.Tracking)
+            AsyncTask.OnUpdate();
+
+            if (Frame.TrackingState != TrackingState.Tracking)
                 return;
 
-            Frame.GetAllPlanes(ref m_TrackedPlaneBuffer);
-
-            foreach (var trackedPlane in m_TrackedPlaneBuffer)
+            if(m_ARCoreSessionConfig.EnablePlaneFinding)
             {
-                if (trackedPlane.IsUpdated)
+                Frame.GetPlanes(m_TrackedPlaneBuffer);
+                foreach (var trackedPlane in m_TrackedPlaneBuffer)
                 {
                     BoundedPlane boundedPlane;
                     if (m_TrackedPlanes.TryGetValue(trackedPlane, out boundedPlane))
                     {
-                        if (trackedPlane.SubsumedBy == null)
-                        {
-                            OnPlaneUpdated(boundedPlane);
-                        }
-                        else
+                        // remove any subsumed planes
+                        if (trackedPlane.SubsumedBy != null)
                         {
                             OnPlaneRemoved(boundedPlane);
                             m_TrackedPlanes.Remove(trackedPlane);
                         }
+                        // update any planes with changed extents
+                        else if (PlaneUpdated(trackedPlane, boundedPlane))
+                        {
+                            boundedPlane.center = trackedPlane.Position;
+                            boundedPlane.rotation = trackedPlane.Rotation;
+                            boundedPlane.extents.x = trackedPlane.ExtentX;
+                            boundedPlane.extents.y = trackedPlane.ExtentZ;
+                            OnPlaneUpdated(boundedPlane);
+                        }
                     }
+                    // add any new planes
                     else
                     {
                         boundedPlane = new BoundedPlane()
@@ -301,34 +453,62 @@ namespace UnityARInterface
                             id = Guid.NewGuid().ToString(),
                             center = trackedPlane.Position,
                             rotation = trackedPlane.Rotation,
-                            extents = trackedPlane.Bounds
+                            extents = new Vector2(trackedPlane.ExtentX, trackedPlane.ExtentZ)
                         };
 
                         m_TrackedPlanes.Add(trackedPlane, boundedPlane);
                         OnPlaneAdded(boundedPlane);
                     }
                 }
-            }
 
-            // Check for planes that were removed from the tracked plane list
-            List<TrackedPlane> planesToRemove = new List<TrackedPlane>();
-            foreach (var kvp in m_TrackedPlanes)
-            {
-                var trackedPlane = kvp.Key;
-
-                if (!m_TrackedPlaneBuffer.Exists(x => x == trackedPlane))
+                // Check for planes that were removed from the tracked plane list
+                List<TrackedPlane> planesToRemove = new List<TrackedPlane>();
+                foreach (var kvp in m_TrackedPlanes)
                 {
-                    OnPlaneRemoved(kvp.Value);
-
-                    // Add to list here to avoid mutating the dictionary
-                    // while iterating over it.
-                    planesToRemove.Add(trackedPlane);
+                    var trackedPlane = kvp.Key;
+                    if (!m_TrackedPlaneBuffer.Exists(x => x == trackedPlane))
+                    {
+                        OnPlaneRemoved(kvp.Value);
+                        planesToRemove.Add(trackedPlane);
+                    }
                 }
+
+                foreach (var plane in planesToRemove)
+                    m_TrackedPlanes.Remove(plane);
+
             }
 
-            foreach (var plane in planesToRemove)
+            //Update Anchors
+            foreach(var anchor in m_Anchors){
+                anchor.Key.transform.position = anchor.Value.transform.position;
+                anchor.Key.transform.rotation = anchor.Value.transform.rotation;
+            }
+        }
+
+
+        public override void ApplyAnchor(ARAnchor arAnchor)
+        {
+            if (!IsRunning)
+                return;
+            //Since ARCore wants to create it's own GameObject, we can keep a reference to it and copy its Pose.
+            //Not the best, but probably will change when ARCore releases.
+            Anchor arCoreAnchor = Session.CreateWorldAnchor(new Pose(arAnchor.transform.position, arAnchor.transform.rotation));
+            arAnchor.anchorID = Guid.NewGuid().ToString();
+            m_Anchors[arAnchor] = arCoreAnchor;
+        }
+
+        public override void DestroyAnchor(ARAnchor arAnchor)
+        {
+            if (!string.IsNullOrEmpty(arAnchor.anchorID))
             {
-                m_TrackedPlanes.Remove(plane);
+                Anchor arCoreAnchor;
+                if(m_Anchors.TryGetValue(arAnchor, out arCoreAnchor)){
+                    UnityEngine.Object.Destroy(arCoreAnchor);
+                    m_Anchors.Remove(arAnchor);
+                }
+
+                arAnchor.anchorID = null;
+
             }
         }
     }

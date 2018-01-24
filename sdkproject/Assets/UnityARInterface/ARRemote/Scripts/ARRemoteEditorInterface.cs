@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.Networking.PlayerConnection;
 using Utils;
+using System.Collections;
 
 #if UNITY_EDITOR
 using UnityEditor.Networking.PlayerConnection;
@@ -38,8 +39,7 @@ namespace UnityARInterface
         public bool connected { get { return m_CurrentPlayerId != -1; } }
         public int playerId { get { return m_CurrentPlayerId; } }
 
-        private bool m_ServiceRunning = false;
-        public bool serviceRunning { get { return m_ServiceRunning; } }
+        public bool IsRemoteServiceRunning { get; protected set; } 
 
         Texture2D m_RemoteScreenYTexture;
         Texture2D m_RemoteScreenUVTexture;
@@ -100,7 +100,8 @@ namespace UnityARInterface
 
         public void ScreenCaptureUVMessageHandler(MessageEventArgs message)
         {
-            if (m_RemoteScreenUVTexture == null)
+            //In case of ARCore sending grayscale image, UV data would be null.
+            if (m_RemoteScreenUVTexture == null || message.data == null)
                 return;
 
             m_RemoteScreenUVTexture.LoadRawTextureData(message.data);
@@ -171,26 +172,27 @@ namespace UnityARInterface
             sendVideo = m_SendVideo;
             var serializedSettings = (SerializableARSettings)settings;
             SendToPlayer(ARMessageIds.SubMessageIds.startService, serializedSettings);
-            m_ServiceRunning = true;
+            IsRemoteServiceRunning = true;
         }
 
         public void StopRemoteService()
         {
             SendToPlayer(ARMessageIds.SubMessageIds.stopService, null);
-            m_ServiceRunning = false;
+            IsRemoteServiceRunning = false;
         }
 
         //
         // From the ARInterface
         //
-        public override bool StartService(Settings settings)
+        public override IEnumerator StartService(Settings settings)
         {
-            return true;
+            IsRunning = true;
+            return null;
         }
 
         public override void StopService()
         {
-
+            IsRunning = false;
         }
 
         public override void SetupCamera(Camera camera)

@@ -2,7 +2,6 @@ using System;
 using UnityEngine;
 using UnityEngine.XR.iOS;
 using System.Text;
-using System.Collections.Generic;
 
 namespace Utils
 {
@@ -311,135 +310,6 @@ namespace Utils
 
 	};
 
-
-	[Serializable]
-	public class serializableFaceGeometry
-	{
-		public byte [] vertices;
-		public byte [] texCoords;
-		public byte [] triIndices;
-
-
-		public serializableFaceGeometry(byte [] inputVertices, byte [] inputTexCoords, byte [] inputTriIndices)
-		{
-			vertices = inputVertices;
-			texCoords = inputTexCoords;
-			triIndices = inputTriIndices;
-
-		}
-
-		#if !UNITY_EDITOR
-		public static implicit operator serializableFaceGeometry(ARFaceGeometry faceGeom)
-		{
-			if (faceGeom.vertexCount != 0 && faceGeom.textureCoordinateCount != 0 && faceGeom.triangleCount != 0)
-			{
-				Vector3 [] faceVertices = faceGeom.vertices;
-				byte [] cbVerts = new byte[faceGeom.vertexCount * sizeof(float) * 3];
-				Buffer.BlockCopy( faceVertices, 0, cbVerts, 0, faceGeom.vertexCount * sizeof(float) * 3 );
-				
-
-				Vector2 [] faceTexCoords = faceGeom.textureCoordinates;
-				byte [] cbTexCoords = new byte[faceGeom.textureCoordinateCount * sizeof(float) * 2];
-				Buffer.BlockCopy( faceTexCoords, 0, cbTexCoords, 0, faceGeom.textureCoordinateCount * sizeof(float) * 2 );
-
-
-				int [] triIndices = faceGeom.triangleIndices;
-				byte [] cbTriIndices = triIndices.SerializeToByteArray();
-
-				return new serializableFaceGeometry (cbVerts, cbTexCoords, cbTriIndices);
-			}
-			else 
-			{
-				return new serializableFaceGeometry(null, null, null);
-			}
-		}
-		#endif //!UNITY_EDITOR
-
-		public Vector3 [] Vertices {
-			get {
-				if (vertices != null) {
-					int numVectors = vertices.Length / (3 * sizeof(float));
-					Vector3[] verticesVec = new Vector3[numVectors];
-					for (int i = 0; i < numVectors; i++) {
-						int bufferStart = i * 3;
-						verticesVec [i].x = BitConverter.ToSingle (vertices, (bufferStart) * sizeof(float));
-						verticesVec [i].y = BitConverter.ToSingle (vertices, (bufferStart + 1) * sizeof(float));
-						verticesVec [i].z = BitConverter.ToSingle (vertices, (bufferStart + 2) * sizeof(float));
-
-					}
-					return verticesVec;
-				} else {
-					return null;
-				}
-			}
-		}
-
-		public Vector2 [] TexCoords {
-			get {
-				if (texCoords != null) {
-					int numVectors = texCoords.Length / (2 * sizeof(float));
-					Vector2[] texCoordVec = new Vector2[numVectors];
-					for (int i = 0; i < numVectors; i++) {
-						int bufferStart = i * 2;
-						texCoordVec [i].x = BitConverter.ToSingle (texCoords, (bufferStart) * sizeof(float));
-						texCoordVec [i].y = BitConverter.ToSingle (texCoords, (bufferStart + 1) * sizeof(float));
-
-					}
-					return texCoordVec;
-				} else {
-					return null;
-				}
-			}
-		}
-
-		public int [] TriangleIndices {
-			get {
-				if (triIndices != null) {
-					int[] triIndexVec = triIndices.Deserialize<int[]>();
-					return triIndexVec;
-				} else {
-					return null;
-				}
-			}
-		}
-
-	};
-
-
-	[Serializable]  
-	public class serializableUnityARFaceAnchor
-	{
-		public serializableUnityARMatrix4x4 worldTransform;
-		public serializableFaceGeometry faceGeometry;
-		public Dictionary<string, float> arBlendShapes;
-		public byte[] identifierStr;
-
-		public serializableUnityARFaceAnchor( serializableUnityARMatrix4x4 wt, serializableFaceGeometry fg, Dictionary<string, float> bs, byte [] idstr)
-		{
-			worldTransform = wt;
-			faceGeometry = fg;
-			arBlendShapes = bs;
-			identifierStr = idstr;
-		}
-
-
-		#if UNITY_EDITOR
-		public static implicit operator ARFaceAnchor(serializableUnityARFaceAnchor rValue)
-		{
-			return new ARFaceAnchor(rValue);
-		}
-		#else
-		public static implicit operator serializableUnityARFaceAnchor(ARFaceAnchor rValue)
-		{
-			serializableUnityARMatrix4x4 wt = rValue.transform;
-			serializableFaceGeometry sfg = rValue.faceGeometry;
-			byte[] idstr = Encoding.UTF8.GetBytes (rValue.identifierStr);
-			return new serializableUnityARFaceAnchor(wt, sfg, rValue.blendShapes, idstr);
-		}
-		#endif
-	};
-
-
 	[Serializable]
 	public class serializablePointCloud
 	{
@@ -519,12 +389,6 @@ namespace Utils
 		{
 			return new ARKitWorldTrackingSessionConfiguration (sasc.alignment, sasc.planeDetection, sasc.getPointCloudData, sasc.enableLightEstimation);
 		}
-
-		public static implicit operator ARKitFaceTrackingConfiguration (serializableARSessionConfiguration sasc)
-		{
-			return new ARKitFaceTrackingConfiguration (sasc.alignment, sasc.enableLightEstimation);
-		}
-
 	};
 
 	[Serializable]

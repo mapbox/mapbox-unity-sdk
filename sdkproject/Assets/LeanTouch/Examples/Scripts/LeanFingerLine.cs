@@ -69,7 +69,7 @@ namespace Lean.Touch
 #if UNITY_OLD_LINE_RENDERER
 			line.SetVertexCount(2);
 #else
-			line.numPositions = 2;
+			line.positionCount = 2;
 #endif
 
 			line.SetPosition(0, start);

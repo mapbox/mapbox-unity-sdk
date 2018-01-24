@@ -21,8 +21,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		[NodeEditorElement("Mesh Modifiers")] public List<MeshModifier> MeshModifiers;
 		[NodeEditorElement("Mesh Modifiers")] public List<GameObjectModifier> GoModifiers;
 		public string HeightPropertyName = "Elevation";
-		public float ThresholdHeight = -33;
-		private float maxDataValue = 98;
+		public float minThresholdValue = -33;
+		private float maxValue = 50;
 		//		public float MaxHeight = 30000;
 
 		private Dictionary<UnityTile, int> _cacheVertexCount = new Dictionary<UnityTile, int>();
@@ -124,8 +124,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			float hf = 0;
 			if (float.TryParse(feature.Properties["Elevation"].ToString(), out hf))
 			{
-				//if (hf <= ThresholdHeight)
-				//return null;
+				if (hf <= minThresholdValue || hf >= maxValue)
+				return null;
 			}
 
 			base.Execute(tile, feature, meshData, parent, type);
@@ -151,7 +151,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			//float hue, saturation, value;
 			//Color baseColor = new Color(0.3f, 0, 1);
 			//Color.RGBToHSV(baseColor, out hue, out saturation, out value);
-			//float ramp = Convert.ToSingle(hf) / maxDataValue;
+			//float ramp = Convert.ToSingle(hf) / maxValue;
 
 			//Color newColor = Color.HSVToRGB(hue,1-ramp,value);
 			//meshData.Colors = Enumerable.Repeat(newColor, meshData.Vertices.Count).ToList();

@@ -62,7 +62,7 @@ namespace Lean.Touch
 #if UNITY_OLD_LINE_RENDERER
 			line.SetVertexCount(finger.Snapshots.Count);
 #else
-			line.numPositions = finger.Snapshots.Count;
+			line.positionCount = finger.Snapshots.Count;
 #endif
 			// Loop through all snapshots
 			for (var i = 0; i < finger.Snapshots.Count; i++)

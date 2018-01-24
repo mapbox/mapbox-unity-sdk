@@ -8,7 +8,7 @@ namespace UnityARInterface
         private ParticleSystem m_PointCloudParticlePrefab;
 
         [SerializeField]
-        private int m_MaxPointsToShow = 100;
+        private int m_MaxPointsToShow = 300;
 
         [SerializeField]
         private float m_ParticleSize = 1.0f;

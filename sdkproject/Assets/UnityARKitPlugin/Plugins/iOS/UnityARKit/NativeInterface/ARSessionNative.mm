@@ -157,7 +157,6 @@ typedef struct
     UnityLightData lightData;
     UnityARMatrix4x4 displayTransform;
     uint32_t getPointCloudData;
-    uint32_t getLightEstimation;
 } UnityARCamera;
 
 typedef struct
@@ -551,7 +550,6 @@ static UnityPixelBuffer s_UnityPixelBuffers;
     id <MTLDevice> _device;
     CVMetalTextureCacheRef _textureCache;
     BOOL _getPointCloudData;
-    BOOL _getLightEstimation;
 }
 @end
 
@@ -610,11 +608,7 @@ static CGAffineTransform s_CurAffineTransform;
     unityARCamera.videoParams.texCoordScale =  screenAspect / imageAspect;
     s_ShaderScale = screenAspect / imageAspect;
     
-    unityARCamera.getLightEstimation = _getLightEstimation;
-    if (_getLightEstimation)
-    {
-        UnityLightDataFromARFrame(unityARCamera.lightData, frame);
-    }
+    UnityLightDataFromARFrame(unityARCamera.lightData, frame);
 
     unityARCamera.videoParams.yWidth = (uint32_t)imageWidth;
     unityARCamera.videoParams.yHeight = (uint32_t)imageHeight;
@@ -888,7 +882,6 @@ extern "C" void StartWorldTrackingSessionWithOptions(void* nativeSession, ARKitW
     ARSessionRunOptions runOpts = GetARSessionRunOptionsFromUnityARSessionRunOptions(runOptions);
     GetARSessionConfigurationFromARKitWorldTrackingSessionConfiguration(unityConfig, config);
     session->_getPointCloudData = (BOOL) unityConfig.getPointCloudData;
-    session->_getLightEstimation = (BOOL) unityConfig.enableLightEstimation;
     [session->_session runWithConfiguration:config options:runOpts ];
     [session setupMetal];
 }
@@ -901,7 +894,6 @@ extern "C" void StartWorldTrackingSession(void* nativeSession, ARKitWorldTrackin
     ARWorldTrackingConfiguration* config = [ARWorldTrackingConfiguration new];
     GetARSessionConfigurationFromARKitWorldTrackingSessionConfiguration(unityConfig, config);
     session->_getPointCloudData = (BOOL) unityConfig.getPointCloudData;
-    session->_getLightEstimation = (BOOL) unityConfig.enableLightEstimation;
     [session->_session runWithConfiguration:config];
     [session setupMetal];
 }
@@ -913,7 +905,6 @@ extern "C" void StartSessionWithOptions(void* nativeSession, ARKitSessionConfigu
     ARSessionRunOptions runOpts = GetARSessionRunOptionsFromUnityARSessionRunOptions(runOptions);
     GetARSessionConfigurationFromARKitSessionConfiguration(unityConfig, config);
     session->_getPointCloudData = (BOOL) unityConfig.getPointCloudData;
-    session->_getLightEstimation = (BOOL) unityConfig.enableLightEstimation;
     [session->_session runWithConfiguration:config options:runOpts ];
     [session setupMetal];
 }
@@ -926,7 +917,6 @@ extern "C" void StartSession(void* nativeSession, ARKitSessionConfiguration unit
     ARConfiguration* config = [AROrientationTrackingConfiguration new];
     GetARSessionConfigurationFromARKitSessionConfiguration(unityConfig, config);
     session->_getPointCloudData = (BOOL) unityConfig.getPointCloudData;
-    session->_getLightEstimation = (BOOL) unityConfig.enableLightEstimation;
     [session->_session runWithConfiguration:config];
     [session setupMetal];
 }
@@ -938,7 +928,6 @@ extern "C" void StartFaceTrackingSessionWithOptions(void* nativeSession, ARKitFa
     ARConfiguration* config = [ARFaceTrackingConfiguration new];
     ARSessionRunOptions runOpts = GetARSessionRunOptionsFromUnityARSessionRunOptions(runOptions);
     GetARFaceConfigurationFromARKitFaceConfiguration(unityConfig, config);
-    session->_getLightEstimation = (BOOL) unityConfig.enableLightEstimation;
     [session->_session runWithConfiguration:config options:runOpts ];
     [session setupMetal];
 #else

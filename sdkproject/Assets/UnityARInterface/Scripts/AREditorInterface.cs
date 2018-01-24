@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -24,7 +25,7 @@ namespace UnityARInterface
         Vector3 m_EulerAngles;
         Vector3[] m_PointCloud;
 
-        public override bool StartService(Settings settings)
+        public override IEnumerator StartService(Settings settings)
         {
             m_CameraPose = Pose.identity;
             m_CameraPose.position.Set(0, 0, 0);
@@ -58,12 +59,13 @@ namespace UnityARInterface
                     UnityEngine.Random.Range(-2f, 2f));
             }
 
-            return true;
+            IsRunning = true;
+            return null;
         }
 
         public override void StopService()
         {
-
+            IsRunning = false;
         }
 
         public override bool TryGetUnscaledPose(ref Pose pose)

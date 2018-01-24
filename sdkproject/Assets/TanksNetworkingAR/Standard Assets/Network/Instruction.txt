@@ -1,0 +1,31 @@
+This is a drag'n drop lobby solution for your game! It allow to quickly add the
+capability to create game, either directly or through matchmaker, & join them.
+
+Requirement
+===========
+
+You will need a prefab of your player, using of course a NetworkBehaviour instead of a monobehaviour
+
+
+How to Use It
+=============
+
+- You will need 2 scenes : one for your lobby, one for your game.
+- Just drag'n drop Prefabs/LobbyUiCanvas prefab in your lobby scene
+- Setup the Lobby Scene & Play Scene of the lobby
+/!\ NOTE /!\ : Those scenes need to be in the build windows!
+
+- Setup the Game Player Prefab. This prefab is the one that will be instanciated
+when you go from the lobby to the game.
+
+
+Passing info from lobby to play
+===============================
+
+The script UnityStandardAssets.Network.Lobby (& PlayerEntry prefab) is used as
+the "Player Lobby", and have 2 parameters : color & name of the player
+
+You can pass those info to your game prefab using a script subclassing LobbyHook
+The function OnLobbyServerSceneLoadedForPlayer will be called with both as param
+
+(In the Pong Network Example, check PongLobbyHook for an example of how use it)
