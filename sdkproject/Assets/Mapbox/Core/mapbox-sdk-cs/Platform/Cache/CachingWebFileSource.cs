@@ -16,11 +16,13 @@
 		private bool _disposed;
 		private List<ICache> _caches = new List<ICache>();
 		private string _accessToken;
+		private bool _autoRefreshCache;
 
 
-		public CachingWebFileSource(string accessToken)
+		public CachingWebFileSource(string accessToken, bool autoRefreshCache)
 		{
 			_accessToken = accessToken;
+			_autoRefreshCache = autoRefreshCache;
 		}
 
 
@@ -140,57 +142,61 @@
 				// immediately return cached tile
 				callback(Response.FromCache(cachedItem.Data));
 
-				// check if tile on the web is newer than the one we already have locally
-				IAsyncRequestFactory.CreateRequest(
-					finalUrl,
-					(Response headerOnly) =>
-					{
-						// on error getting information from API just return. tile we have locally has already been returned above
-						if (headerOnly.HasError)
+				// check for updated tiles online if this is enabled in the settings
+				if (_autoRefreshCache)
+				{
+					// check if tile on the web is newer than the one we already have locally
+					IAsyncRequestFactory.CreateRequest(
+						finalUrl,
+						(Response headerOnly) =>
 						{
-							return;
-						}
-
-						// TODO: remove Debug.Log before PR
-						//UnityEngine.Debug.LogFormat(
-						//	"{1}{0}cached:{2}{0}header:{3}"
-						//	, Environment.NewLine
-						//	, finalUrl
-						//	, cachedItem.ETag
-						//	, headerOnly.Headers["ETag"]
-						//);
-
-						// data from cache is the same as on the web:
-						//   * tile has already been returned above
-						//   * make sure all all other caches have it too, but don't force insert via cache.add(false)
-						// additional ETag empty check: for backwards compability with old caches
-						if (!string.IsNullOrEmpty(cachedItem.ETag) && cachedItem.ETag.Equals(headerOnly.Headers["ETag"]))
-						{
-							foreach (var cache in _caches)
+							// on error getting information from API just return. tile we have locally has already been returned above
+							if (headerOnly.HasError)
 							{
-								cache.Add(mapId, tileId, cachedItem, false);
+								return;
+							}
+
+							// TODO: remove Debug.Log before PR
+							//UnityEngine.Debug.LogFormat(
+							//	"{1}{0}cached:{2}{0}header:{3}"
+							//	, Environment.NewLine
+							//	, finalUrl
+							//	, cachedItem.ETag
+							//	, headerOnly.Headers["ETag"]
+							//);
+
+							// data from cache is the same as on the web:
+							//   * tile has already been returned above
+							//   * make sure all all other caches have it too, but don't force insert via cache.add(false)
+							// additional ETag empty check: for backwards compability with old caches
+							if (!string.IsNullOrEmpty(cachedItem.ETag) && cachedItem.ETag.Equals(headerOnly.Headers["ETag"]))
+							{
+								foreach (var cache in _caches)
+								{
+									cache.Add(mapId, tileId, cachedItem, false);
+								}
+							}
+							else
+							{
+								// TODO: remove Debug.Log before PR
+								UnityEngine.Debug.LogWarningFormat(
+										"updating cached tile {1} mapid:{2}{0}cached etag:{3}{0}remote etag:{4}{0}{5}"
+										, Environment.NewLine
+										, tileId
+										, mapId
+										, cachedItem.ETag
+										, headerOnly.Headers["ETag"]
+										, finalUrl
+									);
+
+								// request updated tile and pass callback to return new data to subscribers
+								requestTileAndCache(finalUrl, mapId, tileId, timeout, callback);
 							}
 						}
-						else
-						{
-							// TODO: remove Debug.Log before PR
-							UnityEngine.Debug.LogWarningFormat(
-								"updating cached tile {1} mapid:{2}{0}cached etag:{3}{0}remote etag:{4}{0}{5}"
-								, Environment.NewLine
-								, tileId
-								, mapId
-								, cachedItem.ETag
-								, headerOnly.Headers["ETag"]
-								, finalUrl
-							);
-
-							// request updated tile and pass callback to return new data to subscribers
-							requestTileAndCache(finalUrl, mapId, tileId, timeout, callback);
-						}
-					}
-					, timeout
-					, HttpRequestType.Head
-				);
+						, timeout
+						, HttpRequestType.Head
+					);
+				}
 
 				return new MemoryCacheAsyncRequest(uri);
 			}
