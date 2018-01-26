@@ -3,8 +3,11 @@ osx_image: xcode9.1
 rvm:
 - 2.2
 before_install:
-- chmod a+x ./update-mapbox-unity-sdk-core.sh
+- chmod a+x ./scripts/install.sh
+- chmod a+x ./scripts/build.sh
+
 install:
+- ./update-mapbox-unity-sdk-core.sh
 - ./scripts/install.sh
 script:
 - ./scripts/build.sh
