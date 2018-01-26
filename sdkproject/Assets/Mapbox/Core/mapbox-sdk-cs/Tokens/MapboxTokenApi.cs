@@ -7,17 +7,7 @@ namespace Mapbox.Tokens
 	using Mapbox.Platform;
 	using System;
 	using System.ComponentModel;
-
-#if PORTABLE || WINDOWS_UWP
-	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-	public class DescriptionAttribute : Attribute {
-		private readonly string description;
-		public string Description { get { return description; } }
-		public DescriptionAttribute(string description) {
-			this.description = description;
-		}
-	}
-#endif
+	using Mapbox.VectorTile.Geometry;
 
 	public enum MapboxTokenStatus
 	{

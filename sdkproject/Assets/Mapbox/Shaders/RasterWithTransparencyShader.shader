@@ -62,7 +62,7 @@ Shader "Mapbox/Raster With Transparency"
 				{
 					vertexOut o;
 					o.pos = UnityObjectToClipPos (v.vertex);
-					o.color = v.color * _Color;
+					o.color = v.color;
 					o.uv = v.texcoord.xy;
 					o.screenspaceUv = o.pos.xy;
 					return o;
@@ -74,7 +74,12 @@ Shader "Mapbox/Raster With Transparency"
 					fixed4 texColor = tex2D(_MainTex, uv);
 					
 					fixed4 color = o.color * texColor;
-                    float threshold = step((texColor.r + texColor.g + texColor.b) * 0.33333f,0.1);
+					// check how much color used for transparency equals c.rgb in range 0..1
+					// 1=no match, 0=full match
+					fixed3 delta = texColor.rgb - _Color.rgb;
+					float match = dot(delta,delta);
+                    float threshold = step(match,0.1);
+
 					color.a =  (1 - ((threshold) * (1 -_Color.a))) * _Alpha;
 
 					return color;

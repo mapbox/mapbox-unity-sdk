@@ -252,7 +252,7 @@ namespace Mapbox.Platform
 
 			// additional string.empty check for apiResponse.error:
 			// on UWP isNetworkError is sometimes set to true despite all being well
-			if (apiResponse.isNetworkError && !string.IsNullOrWhiteSpace(apiResponse.error))
+			if (apiResponse.isNetworkError && !string.IsNullOrEmpty(apiResponse.error))
 			{
 				response.AddException(new Exception(apiResponse.error));
 			}

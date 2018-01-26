@@ -124,7 +124,7 @@
 - `MapId` and `Factories` are now public so that you can change them at runtime.
 
 ##### New Examples
-- [See here for the latest.](https://www.mapbox.com/mapbox-unity-sdk/docs/03-examples.html)
+- [See here for the latest.](https://www.mapbox.com/unity-sdk)
 
 ### v.1.1.0
 
