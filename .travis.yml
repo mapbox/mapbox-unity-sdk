@@ -1,5 +1,6 @@
 language: chsarp
 osx_image: xcode9.1
+sudo: required
 rvm:
 - 2.2
 before_install:
