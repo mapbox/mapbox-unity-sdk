@@ -1,4 +1,4 @@
-language: objective-c
+language: C#
 osx_image: xcode9.1
 rvm:
 - 2.2
