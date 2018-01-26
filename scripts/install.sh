@@ -1,5 +1,9 @@
 #! /bin/sh
 
+set -eu
+
+df -h
+
 BASE_URL=https://download.unity3d.com/download_unity
 HASH=472613c02cf7
 VERSION=2017.1.0f3
@@ -7,9 +11,9 @@ VERSION=2017.1.0f3
 download() {
   file=$1
   url="$BASE_URL/$HASH/$package"
+  localFile=`basename "$package"`
 
-  echo "Downloading from $url: "
-  curl -o `basename "$package"` "$url"
+  if [ ! -f "$localFile" ]; then echo "Downloading $url"  && curl -o "$localFile" "$url"; fi
 }
 
 install() {
