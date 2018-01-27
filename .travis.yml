@@ -4,13 +4,11 @@ os: osx
 osx_image: xcode9.2
 rvm:
 - 2.2
-before_install:
-- chmod a+x ./update-mapbox-unity-sdk-core.sh
-- chmod a+x ./scripts/install.sh
-- chmod a+x ./scripts/build.sh
 
 install:
 - ./update-mapbox-unity-sdk-core.sh
 - ./scripts/install.sh
+- travis_wait 30 mvn install
+
 script:
 - ./scripts/build.sh
