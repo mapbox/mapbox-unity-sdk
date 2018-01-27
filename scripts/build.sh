@@ -7,9 +7,10 @@ echo "Attempting to build $project for Windows"
   -batchmode 
   -nographics 
   -silent-crashes 
-  -logFile $(pwd)/unity.log 
-  -projectPath $(pwd) 
-  -buildWindowsPlayer "$(pwd)/Build/windows/$project.exe" 
+  -logFile "$(pwd)/windows-build.log" 
+  -projectPath "$(pwd)/$(project)"
+  -buildWindowsPlayer "$(pwd)/Build/windows/$project.exe"
+  -stackTraceLogType Full
   -quit 
 
 echo "Attempting to build $project for OS X"
@@ -17,14 +18,15 @@ echo "Attempting to build $project for OS X"
   -batchmode 
   -nographics 
   -silent-crashes 
-  -logFile $(pwd)/unity.log 
-  -projectPath $(pwd) 
-  -buildOSXUniversalPlayer "$(pwd)/Build/osx/$project.app" 
+  -logFile "$(pwd)/mac-build.log"
+  -projectPath "$(pwd)/$(project)"
+  -buildOSXUniversalPlayer "$(pwd)/Build/osx/$project.app"
+  -stackTraceLogType Full
   -quit
 
 echo 'Logs from build'
-cat $(pwd)/unity.log
-
+cat "$(pwd)/windows-build.log"
+cat "$(pwd)/mac-build.log"
 
 echo 'Attempting to zip builds'
 zip -r $(pwd)/Build/mac.zip $(pwd)/Build/osx/
