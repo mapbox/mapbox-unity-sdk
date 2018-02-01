@@ -30,3 +30,5 @@ install() {
 install "MacEditorInstaller/Unity-$VERSION.pkg"
 wait
 install "MacEditorTargetInstaller/UnitySetup-Windows-Support-for-Editor-$VERSION.pkg"
+wait
+install "MacEditorTargetInstaller/UnitySetup-iOS-Support-for-Editor-$VERSION.pkg"
