@@ -8,10 +8,19 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Unity Build
+          name: GIT Checkout
           command: |
-            echo "Getting this message! Yaay!!!"
+          ./update-mapbox-unity-sdk-core.sh
 
+      - run:
+          name: Installing Unity
+          command: |
+          ./scripts/install.sh
+
+      - run:
+          name: Building the project
+          command: |
+          ./scripts/build.sh
 
 workflows:
   version: 2
