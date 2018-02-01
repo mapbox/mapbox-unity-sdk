@@ -11,12 +11,10 @@ jobs:
           name: GIT Checkout
           command: |
           ./update-mapbox-unity-sdk-core.sh
-
       - run:
           name: Installing Unity
           command: |
           ./scripts/install.sh
-
       - run:
           name: Building the project
           command: |
