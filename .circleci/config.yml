@@ -9,16 +9,13 @@ jobs:
       - checkout
       - run:
           name: GIT Checkout
-          command: |
-          ./update-mapbox-unity-sdk-core.sh
+          command: ./update-mapbox-unity-sdk-core.sh
       - run:
           name: Installing Unity
-          command: |
-          ./scripts/install.sh
+          command: ./scripts/install.sh
       - run:
           name: Building the project
-          command: |
-          ./scripts/build.sh
+          command: ./scripts/build.sh
 
 workflows:
   version: 2
