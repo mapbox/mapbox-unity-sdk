@@ -9,7 +9,6 @@ install:
 - "travis_wait 30 sleep 1800 &"
 - ./update-mapbox-unity-sdk-core.sh
 - ./scripts/install.sh
-- travis_wait 30 mvn install
 
 script:
 - ./scripts/build.sh
