@@ -11,6 +11,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63d97cb1cfb3f1b499c24763afa54873, type: 3}
   m_Name: DatasetStylingVectorTileFactory
   m_EditorClassIdentifier: 
-  _mapId: allanwalker.9flmau42,mapbox.mapbox-streets-v7
+  _mapId: apavani.6nj2i99v,mapbox.mapbox-streets-v7
   Visualizers:
   - {fileID: 11400000, guid: 4db53b46c407a4622983b02dead7fb5a, type: 2}

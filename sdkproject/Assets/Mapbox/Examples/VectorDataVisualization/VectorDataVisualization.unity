@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 3
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: fb3b9b55c01d2194c816b2d469854e16, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -160,11 +160,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58cb9a85be6f84591938618fa232ce85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _zoom: 20
+  _zoom: 17
   _initializeOnStart: 1
-  _latitudeLongitudeString: 37.82,-122.37
+  _latitudeLongitudeString: 38.895, -77.0366
   _root: {fileID: 0}
-  _tileProvider: {fileID: 110210648}
+  _tileProvider: {fileID: 110210643}
   _mapVisualizer: {fileID: 11400000, guid: 5517cae62ed6444d3a5bc9ffc535069f, type: 2}
   _unityTileSize: 50
   _snapMapHeightToZero: 1
@@ -179,10 +179,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d7ff8ed3b76a4ee5a451d64a5393e3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _west: 3
-  _north: 3
-  _east: 3
-  _south: 3
+  _west: 2
+  _north: 2
+  _east: 2
+  _south: 2
 --- !u!114 &110210644
 MonoBehaviour:
   m_ObjectHideFlags: 0
