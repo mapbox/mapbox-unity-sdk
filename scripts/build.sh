@@ -33,7 +33,7 @@ echo "Attempting to build $project for iOS"
 -silent -crashes \
 -logFile "$(pwd)/ios-build.log" \
 -projectPath "$(pwd)/${project}" \
--buildTarget iOS \
+-executeMethod CIBuildScript.BuildForIOS
 -stackTraceLogType Full \
 -quit
 
