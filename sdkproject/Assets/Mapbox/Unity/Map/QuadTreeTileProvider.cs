@@ -167,25 +167,11 @@
 				hitPntUR = _camera.ViewportToWorldPoint(new Vector3(1, 1, _camera.transform.localPosition.y));
 			}
 
-			//get tile scale at equator, otherwise calucations don't work at higher latitudes
-			double factor = Conversions.GetTileScaleInMeters(0, _map.AbsoluteZoom) * 256 / _map.UnityTileSize;
-			//convert Unity units to WebMercator and LatLng to get real world bounding box
-			double llx = _map.CenterMercator.x + hitPntLL.x * factor;
-			double lly = _map.CenterMercator.y + hitPntLL.z * factor;
-			double urx = _map.CenterMercator.x + hitPntUR.x * factor;
-			double ury = _map.CenterMercator.y + hitPntUR.z * factor;
-			llx = llx > 0 ? Mathd.Min(llx, Mapbox.Utils.Constants.WebMercMax) : Mathd.Max(llx, -Mapbox.Utils.Constants.WebMercMax);
-			lly = lly > 0 ? Mathd.Min(lly, Mapbox.Utils.Constants.WebMercMax) : Mathd.Max(lly, -Mapbox.Utils.Constants.WebMercMax);
-			urx = urx > 0 ? Mathd.Min(urx, Mapbox.Utils.Constants.WebMercMax) : Mathd.Max(urx, -Mapbox.Utils.Constants.WebMercMax);
-			ury = ury > 0 ? Mathd.Min(ury, Mapbox.Utils.Constants.WebMercMax) : Mathd.Max(ury, -Mapbox.Utils.Constants.WebMercMax);
-			Vector2d llWebMerc = new Vector2d(llx, lly);
-			Vector2d urWebMerc = new Vector2d(urx, ury);
+			var llLatLong = _map.WorldToGeoPosition(hitPntLL);
+			var urLatLong = _map.WorldToGeoPosition(hitPntUR);
 
-
-			return new Vector2dBounds(
-				llWebMerc
-				, urWebMerc
-			);
+			Vector2dBounds tileBounds = new Vector2dBounds(Conversions.LatLonToMeters(llLatLong), Conversions.LatLonToMeters(urLatLong));
+			return tileBounds;
 		}
 
 
