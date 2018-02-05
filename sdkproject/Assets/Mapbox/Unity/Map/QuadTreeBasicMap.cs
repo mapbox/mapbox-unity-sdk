@@ -21,7 +21,7 @@
 			// For quadtree implementation of the map, the map scale needs to be compensated for. 
 			var scaleFactor = Mathf.Pow(2, (InitialZoom - AbsoluteZoom));
 
-			return (_root.InverseTransformPoint(realworldPoint)).GetGeoPosition(CenterMercator, WorldRelativeScale / scaleFactor);
+			return (_root.InverseTransformPoint(realworldPoint)).GetGeoPosition(CenterMercator, WorldRelativeScale * scaleFactor);
 		}
 	}
 }
