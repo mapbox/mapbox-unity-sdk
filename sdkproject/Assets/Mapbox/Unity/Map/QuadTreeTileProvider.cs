@@ -104,15 +104,15 @@
 
 		void Update()
 		{
-			//Camera Debugging
-			Vector3[] frustumCorners = new Vector3[4];
-			_camera.CalculateFrustumCorners(new Rect(0, 0, 1, 1), _camera.transform.position.y, Camera.MonoOrStereoscopicEye.Mono, frustumCorners);
+			////Camera Debugging
+			//Vector3[] frustumCorners = new Vector3[4];
+			//_camera.CalculateFrustumCorners(new Rect(0, 0, 1, 1), _camera.transform.position.y, Camera.MonoOrStereoscopicEye.Mono, frustumCorners);
 
-			for (int i = 0; i < 4; i++)
-			{
-				var worldSpaceCorner = _camera.transform.TransformVector(frustumCorners[i]);
-				Debug.DrawRay(_camera.transform.position, worldSpaceCorner, Color.blue);
-			}
+			//for (int i = 0; i < 4; i++)
+			//{
+			//	var worldSpaceCorner = _camera.transform.TransformVector(frustumCorners[i]);
+			//	Debug.DrawRay(_camera.transform.position, worldSpaceCorner, Color.blue);
+			//}
 
 			if (!_shouldUpdate)
 			{
@@ -150,31 +150,65 @@
 
 		private Vector2dBounds getcurrentViewPortWebMerc(bool useGroundPlane = true)
 		{
-			Vector3 hitPntLL;
-			Vector3 hitPntUR;
+			Vector3[] hitPnt = new Vector3[4];
 
 			if (useGroundPlane)
 			{
 				// rays from camera to groundplane: lower left and upper right
-				Ray rayLL = _camera.ViewportPointToRay(new Vector3(0, 0));
-				Ray rayUR = _camera.ViewportPointToRay(new Vector3(1, 1));
-				hitPntLL = getGroundPlaneHitPoint(rayLL);
-				hitPntUR = getGroundPlaneHitPoint(rayUR);
+				Ray ray00 = _camera.ViewportPointToRay(new Vector3(0, 0));
+				Ray ray01 = _camera.ViewportPointToRay(new Vector3(0, 1));
+				Ray ray10 = _camera.ViewportPointToRay(new Vector3(1, 0));
+				Ray ray11 = _camera.ViewportPointToRay(new Vector3(1, 1));
+				hitPnt[0] = getGroundPlaneHitPoint(ray00);
+				hitPnt[1] = getGroundPlaneHitPoint(ray01);
+				hitPnt[2] = getGroundPlaneHitPoint(ray10);
+				hitPnt[3] = getGroundPlaneHitPoint(ray11);
 			}
-			else
+
+			// Find min max bounding box. 
+			// TODO : Find a better way of doing this. 
+			float minX = float.MaxValue;
+			float minZ = float.MaxValue;
+			float maxX = float.MinValue;
+			float maxZ = float.MinValue;
+			for (int i = 0; i < 4; i++)
 			{
-				hitPntLL = _camera.ViewportToWorldPoint(new Vector3(0, 0, _camera.transform.localPosition.y));
-				hitPntUR = _camera.ViewportToWorldPoint(new Vector3(1, 1, _camera.transform.localPosition.y));
+				if (minX > hitPnt[i].x)
+				{
+					minX = hitPnt[i].x;
+				}
+
+				if (minZ > hitPnt[i].z)
+				{
+					minZ = hitPnt[i].z;
+				}
+
+				if (maxX < hitPnt[i].x)
+				{
+					maxX = hitPnt[i].x;
+				}
+
+				if (maxZ < hitPnt[i].z)
+				{
+					maxZ = hitPnt[i].z;
+				}
 			}
+
+			Vector3 hitPntLL = new Vector3(minX, 0, minZ);
+			Vector3 hitPntUR = new Vector3(maxX, 0, maxZ);
+
+			//Debug.Log(hitPntLL + " - " + hitPntUR);
 
 			var llLatLong = _map.WorldToGeoPosition(hitPntLL);
 			var urLatLong = _map.WorldToGeoPosition(hitPntUR);
 
 			Vector2dBounds tileBounds = new Vector2dBounds(Conversions.LatLonToMeters(llLatLong), Conversions.LatLonToMeters(urLatLong));
+
+			// Bounds debugging. 
+			Debug.DrawLine(_camera.transform.position, hitPntLL, Color.blue);
+			Debug.DrawLine(_camera.transform.position, hitPntUR, Color.red);
 			return tileBounds;
 		}
-
-
 		private Vector3 getGroundPlaneHitPoint(Ray ray)
 		{
 			float distance;
