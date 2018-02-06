@@ -4,11 +4,11 @@ using KDTree;
 using UnityEngine;
 using System.Diagnostics;
 using UnityEngine.UI;
+using Mapbox.Unity.Map;
 
 public class HighlightBuildings : MonoBehaviour
 {
 	public KdTreeCollection Collection;
-	public Transform Transform;
 	private Vector3 _bump = new Vector3(0, 5, 0);
 	public int MaxCount = 100;
 	public float Range = 10;
@@ -17,7 +17,6 @@ public class HighlightBuildings : MonoBehaviour
 	Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
 	Vector3 pos;
 	private NearestNeighbour<VectorEntity> pIter;
-	public double Time;
 	public Image ColorBox;
 
 	void Update()
