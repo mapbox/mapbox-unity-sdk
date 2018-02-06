@@ -53,26 +53,65 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mapOptions:
     locationOptions:
-      latitudeLongitude: 0,0
-      zoom: 4
+      latitudeLongitude: 37.7648, -122.463
+      zoom: 16
       coordinateSystemType: 0
     placementOptions:
       visualizationType: 0
-      placementType: 0
+      placementType: 1
       streamingType: 1
-      extentType: 1
+      extentOptions:
+        extentType: 0
+        cameraBoundsOptions:
+          camera: {fileID: 0}
+          visibleBuffer: 2
+          disposeBuffer: 2
+          updateInterval: 5
+        rangeAroundCenterOptions:
+          west: 2
+          north: 2
+          east: 2
+          south: 2
+        rangeAroundTransformOptions:
+          targetTransform: {fileID: 0}
+          visibleBuffer: 0
+          disposeBuffer: 0
     scalingOptions:
       scalingType: 1
       unitType: 0
       unityToMercatorConversionFactor: 100
   _imageryLayerProperties:
-    sourceType: 5
-    CustomStyle:
-      Name: 
-      Id: 
-      Modified: 
-      UserName: 
+    sourceType: 2
+    sourceOptions:
+      isActive: 1
+      layerSource:
+        Name: Streets
+        Id: mapbox://styles/mapbox/dark-v9
+        Modified: 
+        UserName: 
     rasterOptions:
       useCompression: 0
       useRetina: 1
       useMipMap: 0
+  _elevationLayerProperties:
+    sourceOptions:
+      isActive: 1
+      layerSource:
+        Name: 
+        Id: mapbox.terrain-rgb
+        Modified: 
+        UserName: 
+    elevationLayerOptions:
+      elevationLayerType: 2
+      baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
+      sampleCount: 10
+      addCollider: 0
+      exaggerationFactor: 1
+      useRelativeHeight: 1
+    unityLayerOptions:
+      addToLayer: 0
+      layerId: 0
+    sideWallOptions:
+      isActive: 1
+      wallHeight: 10.09
+      wallMaterial: {fileID: 2100000, guid: 1843a50abea6fa448a61d143054f2166, type: 2}

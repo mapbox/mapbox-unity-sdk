@@ -12,7 +12,7 @@ namespace Mapbox.Unity.Map
 		protected override void PlaceTile(UnwrappedTileId tileId, UnityTile tile, IMapReadable map)
 		{
 			//get the tile covering the center (Unity 0,0,0) of current extent
-			UnwrappedTileId centerTile = TileCover.WebMercatorToTileId(map.CenterMercator, map.AbsoluteZoom);
+			UnwrappedTileId centerTile = TileCover.CoordinateToTileId(map.CenterLatitudeLongitude, map.AbsoluteZoom);
 			//get center WebMerc corrdinates of tile covering the center (Unity 0,0,0)
 			Vector2d centerTileCenter = Conversions.TileIdToCenterWebMercator(centerTile.X, centerTile.Y, map.AbsoluteZoom);
 			//calculate distance between WebMerc center coordinates of center tile and WebMerc coordinates exactly at center

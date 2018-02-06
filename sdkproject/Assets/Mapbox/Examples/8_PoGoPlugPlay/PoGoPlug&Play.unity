@@ -187,13 +187,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1130064235}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 200, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1 &1369384450
 GameObject:
   m_ObjectHideFlags: 0
@@ -300,8 +300,48 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
         type: 2}
+      propertyPath: _mapOptions.placementOptions.extentOptions.cameraBoundsOptions.camera
+      value: 
+      objectReference: {fileID: 1130064238}
+    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
+        type: 2}
+      propertyPath: _mapOptions.placementOptions.extentOptions.extentType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
+        type: 2}
+      propertyPath: _mapOptions.scalingOptions.scalingType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
+        type: 2}
       propertyPath: _imageryLayerProperties.sourceType
-      value: 5
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
+        type: 2}
+      propertyPath: _elevationLayerProperties.sideWallOptions.wallHeight
+      value: 10.09
+      objectReference: {fileID: 0}
+    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
+        type: 2}
+      propertyPath: _imageryLayerProperties.sourceOptions.layerSource.Id
+      value: mapbox://styles/mapbox/dark-v9
+      objectReference: {fileID: 0}
+    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
+        type: 2}
+      propertyPath: _mapOptions.locationOptions.zoom
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
+        type: 2}
+      propertyPath: _elevationLayerProperties.elevationLayerOptions.elevationLayerType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
+        type: 2}
+      propertyPath: _mapOptions.locationOptions.latitudeLongitude
+      value: 36.0553, -112.122
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5d9d70850bf0149cdaf6854751efd25d, type: 2}

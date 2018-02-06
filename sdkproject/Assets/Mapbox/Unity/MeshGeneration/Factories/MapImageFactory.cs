@@ -72,7 +72,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			if (_mapIdType == ImagerySourceType.None)
 				return;
-			Debug.Log("Image OnRegistered");
 			RasterTile rasterTile;
 			if (MapId.StartsWith("mapbox://", StringComparison.Ordinal))
 			{

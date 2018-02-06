@@ -6,6 +6,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	using Mapbox.Unity.MeshGeneration.Enums;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Utils;
+	using Mapbox.Unity.Map;
 	using System;
 
 	/// <summary>
@@ -14,31 +15,32 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	[CreateAssetMenu(menuName = "Mapbox/Factories/Terrain Factory - Low Poly")]
 	public class LowPolyTerrainFactory : AbstractTileFactory
 	{
-		[SerializeField]
-		private Material _baseMaterial = null;
-		[SerializeField]
-		private MapIdType _mapIdType;
+		//		[SerializeField]
+		//		private Material _baseMaterial = null;
+		//		[SerializeField]
+		//		private MapIdType _mapIdType;
 
-		[SerializeField]
-#pragma warning disable 0414
-		private string _customMapId = "mapbox.terrain-rgb";
-#pragma warning restore 0414
+		//		[SerializeField]
+		//#pragma warning disable 0414
+		//		private string _customMapId = "mapbox.terrain-rgb";
+		//#pragma warning restore 0414
 
-		[SerializeField]
-		private string _mapId = "";
-		[SerializeField]
+		//[SerializeField]
+		//private string _mapId = "";
+		//[SerializeField]
 		private float _heightModifier = 2f;
-		[SerializeField]
-		private int _sampleCount = 10;
-		[SerializeField]
-		private bool _addCollider = false;
-		[SerializeField]
-		private bool _addToLayer = false;
-		[SerializeField]
-		private int _layerId = 0;
-		[SerializeField]
-		bool _useRelativeHeight = true;
+		//[SerializeField]
+		//private int _sampleCount = 10;
+		//[SerializeField]
+		//private bool _addCollider = false;
+		//[SerializeField]
+		//private bool _addToLayer = false;
+		//[SerializeField]
+		//private int _layerId = 0;
+		//[SerializeField]
+		//bool _useRelativeHeight = true;
 
+		ElevationLayerProperties _elevationOptions;
 		Mesh _stitchTarget;
 
 		protected Dictionary<UnwrappedTileId, Mesh> _meshData;
@@ -57,13 +59,18 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			get
 			{
-				return _mapId;
+				return _elevationOptions.sourceOptions.layerSource.Id;
 			}
 
 			set
 			{
-				_mapId = value;
+				_elevationOptions.sourceOptions.layerSource.Id = value;
 			}
+		}
+
+		public override void SetOptions(LayerProperties options)
+		{
+			_elevationOptions = (ElevationLayerProperties)options;
 		}
 
 		internal override void OnInitialized()
@@ -71,23 +78,24 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_meshData = new Dictionary<UnwrappedTileId, Mesh>();
 			_currentTileMeshData = new MeshData();
 			_stitchTargetMeshData = new MeshData();
-			_newVertexList = new List<Vector3>(_sampleCount * _sampleCount);
-			_newNormalList = new List<Vector3>(_sampleCount * _sampleCount);
-			_newUvList = new List<Vector2>(_sampleCount * _sampleCount);
+			var sampleCountSquare = _elevationOptions.elevationLayerOptions.sampleCount * _elevationOptions.elevationLayerOptions.sampleCount;
+			_newVertexList = new List<Vector3>(sampleCountSquare);
+			_newNormalList = new List<Vector3>(sampleCountSquare);
+			_newUvList = new List<Vector2>(sampleCountSquare);
 			_newTriangleList = new List<int>();
 		}
 
 		internal override void OnRegistered(UnityTile tile)
 		{
-			if (_addToLayer && tile.gameObject.layer != _layerId)
+			if (_elevationOptions.unityLayerOptions.addToLayer && tile.gameObject.layer != _elevationOptions.unityLayerOptions.layerId)
 			{
-				tile.gameObject.layer = _layerId;
+				tile.gameObject.layer = _elevationOptions.unityLayerOptions.layerId;
 			}
 
 			if (tile.MeshRenderer == null)
 			{
 				var renderer = tile.gameObject.AddComponent<MeshRenderer>();
-				renderer.material = _baseMaterial;
+				renderer.material = _elevationOptions.elevationLayerOptions.baseMaterial;
 			}
 
 			if (tile.MeshFilter == null)
@@ -96,7 +104,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				CreateBaseMesh(tile);
 			}
 
-			if (_addCollider && tile.Collider == null)
+			if (_elevationOptions.elevationLayerOptions.addCollider && tile.Collider == null)
 			{
 				tile.gameObject.AddComponent<MeshCollider>();
 			}
@@ -121,7 +129,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_newUvList.Clear();
 			_newTriangleList.Clear();
 
-			var cap = (_sampleCount - 1);
+			var cap = (_elevationOptions.elevationLayerOptions.sampleCount - 1);
 			for (float y = 0; y < cap; y++)
 			{
 				for (float x = 0; x < cap; x++)
@@ -185,7 +193,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// Creates the non-flat terrain using a height multiplier
 		/// </summary>
 		/// <param name="tile"></param>
-		/// <param name="heightMultiplier">Multiplier for queried height value</param>
+		// <param name="heightMultiplier">Multiplier for queried height value</param>
 		private void CreateTerrainHeight(UnityTile tile)
 		{
 			tile.HeightDataState = TilePropertyState.Loading;
@@ -194,7 +202,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			tile.AddTile(pngRasterTile);
 			Progress++;
 
-			pngRasterTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
+			pngRasterTile.Initialize(_fileSource, tile.CanonicalTileId, MapId, () =>
 			{
 				if (tile == null)
 				{
@@ -216,7 +224,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					return;
 				}
 
-				tile.SetHeightData(pngRasterTile.Data, _heightModifier, _useRelativeHeight);
+				tile.SetHeightData(pngRasterTile.Data, _elevationOptions.elevationLayerOptions.exaggerationFactor, _elevationOptions.elevationLayerOptions.useRelativeHeight);
 				GenerateTerrainMesh(tile);
 				Progress--;
 			});
@@ -227,13 +235,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// Any additional scripts or logic, like MeshCollider or setting layer, can be done here.
 		/// </summary>
 		/// <param name="tile"></param>
-		/// <param name="heightMultiplier">Multiplier for queried height value</param>
+		// <param name="heightMultiplier">Multiplier for queried height value</param>
 		private void GenerateTerrainMesh(UnityTile tile)
 		{
 			tile.MeshFilter.mesh.GetVertices(_currentTileMeshData.Vertices);
 			tile.MeshFilter.mesh.GetNormals(_currentTileMeshData.Normals);
 
-			var cap = (_sampleCount - 1);
+			var cap = (_elevationOptions.elevationLayerOptions.sampleCount - 1);
 			for (float y = 0; y < cap; y++)
 			{
 				for (float x = 0; x < cap; x++)
@@ -293,7 +301,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				_meshData.Add(tile.UnwrappedTileId, tile.MeshFilter.mesh);
 			}
 
-			if (_addCollider)
+			if (_elevationOptions.elevationLayerOptions.addCollider)
 			{
 				var meshCollider = tile.Collider as MeshCollider;
 				if (meshCollider)
@@ -325,14 +333,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// <summary>
 		/// Checkes all neighbours of the given tile and stitches the edges to achieve a smooth mesh surface.
 		/// </summary>
-		/// <param name="tile"></param>
+		/// <param name="tileId"></param>
 		/// <param name="mesh"></param>
 		private void FixStitches(UnwrappedTileId tileId, MeshData mesh)
 		{
 			var meshVertCount = mesh.Vertices.Count;
 			_stitchTarget = null;
 			_meshData.TryGetValue(tileId.North, out _stitchTarget);
-			var cap = _sampleCount - 1;
+			var cap = _elevationOptions.elevationLayerOptions.sampleCount - 1;
 			if (_stitchTarget != null)
 			{
 				_stitchTarget.GetVertices(_stitchTargetMeshData.Vertices);

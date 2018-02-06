@@ -65,7 +65,7 @@
 			_groundPlane = new Plane(Vector3.up, 0);
 			_shouldUpdate = true;
 			_zoomRange = _map.Zoom;
-			_map.SetCenterMercator(Conversions.LatLonToMeters(_map.CenterLatitudeLongitude));
+			//_map.SetCenterMercator(Conversions.LatLonToMeters(_map.CenterLatitudeLongitude));
 		}
 
 		public void UpdateMapProperties(Vector2d centerLatitudeLongitude, float zoom)
@@ -89,9 +89,10 @@
 
 				//Set Center in Latitude Longitude and Mercator. 
 				_map.SetCenterLatitudeLongitude(new Vector2d(xDelta, zDelta));
-				_map.SetCenterMercator(Conversions.LatLonToMeters(_map.CenterLatitudeLongitude));
+				//_map.SetCenterMercator(Conversions.LatLonToMeters(_map.CenterLatitudeLongitude));
 				// Update the center based on current zoom level.
 				var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(new Vector2d(xDelta, zDelta), _map.AbsoluteZoom));
+				_map.SetCenterMercator(referenceTileRect.Center);
 
 				_map.SetWorldRelativeScale((float)(_map.UnityTileSize / referenceTileRect.Size.x));
 				//Scale the map accordingly.
