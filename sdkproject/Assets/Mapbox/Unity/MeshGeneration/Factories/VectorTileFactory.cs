@@ -85,8 +85,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			var vectorTile = new VectorTile();
 			tile.AddTile(vectorTile);
-
-
+			
 			vectorTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
 			{
 				if (tile == null)
@@ -121,10 +120,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				{
 					if (vectorTile.CurrentState == Tile.State.Updated)
 					{
-						foreach (Transform t in tile.transform)
+						foreach (var vis in Visualizers)
 						{
-							Destroy(t.gameObject);
+							vis.UnregisterTile(tile);
 						}
+
+						//foreach (Transform t in tile.transform)
+						//{
+						//	Destroy(t.gameObject);
+						//}
 					}
 
 					CreateMeshes(tile);
