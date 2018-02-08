@@ -53,7 +53,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mapOptions:
     locationOptions:
-      latitudeLongitude: 37.7648, -122.463
+      latitudeLongitude: 37.784179, -122.401583
       zoom: 16
       coordinateSystemType: 0
     placementOptions:
@@ -68,10 +68,10 @@ MonoBehaviour:
           disposeBuffer: 2
           updateInterval: 5
         rangeAroundCenterOptions:
-          west: 2
-          north: 2
-          east: 2
-          south: 2
+          west: 0
+          north: 0
+          east: 0
+          south: 0
         rangeAroundTransformOptions:
           targetTransform: {fileID: 0}
           visibleBuffer: 0
@@ -81,17 +81,17 @@ MonoBehaviour:
       unitType: 0
       unityToMercatorConversionFactor: 100
   _imageryLayerProperties:
-    sourceType: 2
+    sourceType: 0
     sourceOptions:
       isActive: 1
       layerSource:
         Name: Streets
-        Id: mapbox://styles/mapbox/dark-v9
+        Id: mapbox://styles/mapbox/streets-v10
         Modified: 
         UserName: 
     rasterOptions:
       useCompression: 0
-      useRetina: 1
+      useRetina: 0
       useMipMap: 0
   _elevationLayerProperties:
     sourceOptions:
@@ -102,7 +102,7 @@ MonoBehaviour:
         Modified: 
         UserName: 
     elevationLayerOptions:
-      elevationLayerType: 2
+      elevationLayerType: 0
       baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
       sampleCount: 10
       addCollider: 0
@@ -112,6 +112,6 @@ MonoBehaviour:
       addToLayer: 0
       layerId: 0
     sideWallOptions:
-      isActive: 1
-      wallHeight: 10.09
-      wallMaterial: {fileID: 2100000, guid: 1843a50abea6fa448a61d143054f2166, type: 2}
+      isActive: 0
+      wallHeight: 10
+      wallMaterial: {fileID: 0}

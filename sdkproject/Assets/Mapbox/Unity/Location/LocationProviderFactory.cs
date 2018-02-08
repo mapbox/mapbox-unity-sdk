@@ -6,6 +6,7 @@ namespace Mapbox.Unity.Location
 {
 	using System.Diagnostics;
 	using UnityEngine;
+	using Mapbox.Unity.Map;
 
 	/// <summary>
 	/// Singleton factory to allow easy access to various LocationProviders.
@@ -13,6 +14,9 @@ namespace Mapbox.Unity.Location
 	/// </summary>
 	public class LocationProviderFactory : MonoBehaviour
 	{
+		[SerializeField]
+		public MapAPI mapManager;
+
 		[SerializeField]
 		AbstractLocationProvider _deviceLocationProvider;
 
@@ -24,6 +28,7 @@ namespace Mapbox.Unity.Location
 
 		[SerializeField]
 		bool _dontDestroyOnLoad;
+
 
 		/// <summary>
 		/// The singleton instance of this factory.

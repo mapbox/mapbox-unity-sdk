@@ -303,46 +303,6 @@ Prefab:
       propertyPath: _mapOptions.placementOptions.extentOptions.cameraBoundsOptions.camera
       value: 
       objectReference: {fileID: 1130064238}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _mapOptions.placementOptions.extentOptions.extentType
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _mapOptions.scalingOptions.scalingType
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _imageryLayerProperties.sourceType
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _elevationLayerProperties.sideWallOptions.wallHeight
-      value: 10.09
-      objectReference: {fileID: 0}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _imageryLayerProperties.sourceOptions.layerSource.Id
-      value: mapbox://styles/mapbox/dark-v9
-      objectReference: {fileID: 0}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _mapOptions.locationOptions.zoom
-      value: 16
-      objectReference: {fileID: 0}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _elevationLayerProperties.elevationLayerOptions.elevationLayerType
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _mapOptions.locationOptions.latitudeLongitude
-      value: 36.0553, -112.122
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5d9d70850bf0149cdaf6854751efd25d, type: 2}
   m_IsPrefabParent: 0

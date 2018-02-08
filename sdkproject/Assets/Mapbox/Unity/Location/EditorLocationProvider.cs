@@ -28,15 +28,16 @@ namespace Mapbox.Unity.Location
 		[SerializeField]
 		Transform _targetTransform;
 
-		[SerializeField]
-		AbstractMap _map;
+		//[SerializeField]
+		UnifiedMap _map;
 
 		bool _mapInitialized;
 
 #if UNITY_EDITOR
 		protected override void Awake()
 		{
-			_map.OnInitialized += Map_OnInitialized;
+			LocationProviderFactory.Instance.mapManager.OnInitialized += Map_OnInitialized;
+			//_map.OnInitialized += Map_OnInitialized;
 
 			if (_targetTransform == null)
 			{
@@ -49,8 +50,10 @@ namespace Mapbox.Unity.Location
 
 		void Map_OnInitialized()
 		{
-			_map.OnInitialized -= Map_OnInitialized;
+			LocationProviderFactory.Instance.mapManager.OnInitialized -= Map_OnInitialized;
+			//_map.OnInitialized -= Map_OnInitialized;
 			_mapInitialized = true;
+			_map = LocationProviderFactory.Instance.mapManager.Map;
 		}
 
 		Vector2d LatitudeLongitude

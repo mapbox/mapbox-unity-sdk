@@ -9,6 +9,7 @@
 	using Mapbox.Utils;
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Unity.MeshGeneration.Factories;
+	using Mapbox.Unity.MeshGeneration.Modifiers;
 
 
 	// Map related enums
@@ -71,8 +72,7 @@
 	{
 		Point,
 		Line,
-		Polygon,
-		Polyline,
+		Polygon
 	}
 	public enum ImagerySourceType
 	{
@@ -94,7 +94,22 @@
 		// TODO : Might want to reconsider this option. 
 		GlobeTerrain
 	}
+	public enum ExtrusionType
+	{
+		None,
+		PropertyHeight,
+		MinHeight,
+		MaxHeight,
+		AbsoluteHeight,
+	}
 
+	public enum ExtrusionGeometryType
+	{
+		None,
+		SideOnly,
+		RoofOnly,
+		RoofAndSide,
+	}
 	public static class MapboxDefaultImagery
 	{
 		public static Style GetParameters(ImagerySourceType defaultImagery)
@@ -339,10 +354,65 @@
 	}
 
 	[Serializable]
-	public class VectorLayerProperties : LayerProperties
+	public class PropertyValuePair
+	{
+		public string featureKey;
+		public string featureValue;
+	}
+
+	[Serializable]
+	public class LayerPerformanceOptions
+	{
+		public bool isEnabled = true;
+		public int entityPerCoroutine = 20;
+	}
+
+	[Serializable]
+	public class CoreVectorLayerProperties
 	{
 		public VectorPrimitiveType geometryType = VectorPrimitiveType.Polygon;
-		public Material vectorMaterial;
+		public string layerName;
+		public List<PropertyValuePair> propertyValuePairs;
+		public GeometryStylingOptions stylingOptions;
+	}
+
+	[Serializable]
+	public class GeometryExtrusionOptions
+	{
+		public ExtrusionType extrusionType = ExtrusionType.None;
+		public ExtrusionGeometryType extrusionGeometryType = ExtrusionGeometryType.RoofAndSide;
+		public string propertyName;
+		public float minimumHeight;
+		public float maximumHeight;
+	}
+
+	[Serializable]
+	public class GeometryStylingOptions
+	{
+		public bool isExtruded;
+		public GeometryExtrusionOptions extrusionOptions;
+		public GeometryMaterialOptions materialOptions;
+	}
+
+	[Serializable]
+	public class GeometryMaterialOptions
+	{
+		public bool _projectMapImagery;
+		public MaterialList[] _materials;
+	}
+
+	[Serializable]
+	public class VectorLayerProperties : LayerProperties
+	{
+		public LayerSourceOptions sourceOptions;
+		public LayerPerformanceOptions performanceOptions;
+		public List<VectorSubLayerProperties> vectorSubLayers = new List<VectorSubLayerProperties>();
+	}
+
+	[Serializable]
+	public class VectorSubLayerProperties : LayerProperties
+	{
+		public CoreVectorLayerProperties coreOptions;
 	}
 
 	[Serializable]
@@ -395,11 +465,6 @@
 		public bool addCollider = false;
 		public float exaggerationFactor = 1;
 		public bool useRelativeHeight = true;
-
-		//public ElevationModificationOptions()
-		//{
-		//	baseMaterial = Resources.Load("TerrainMaterial", typeof(Material)) as Material;
-		//}
 	}
 
 	[Serializable]
@@ -524,15 +589,7 @@
 				default:
 					break;
 			}
-
 			_elevationFactory.SetOptions(elevationLayerProperties);
-
-			//_imageFactory = ScriptableObject.CreateInstance<MapImageFactory>();
-			//_imageFactory._mapIdType = imageLayerProperties.sourceType;
-			//_imageFactory._customStyle = imageLayerProperties.CustomStyle;
-			//_imageFactory._useCompression = imageLayerProperties.rasterOptions.useCompression;
-			//_imageFactory._useMipMap = imageLayerProperties.rasterOptions.useMipMap;
-			//_imageFactory._useRetina = imageLayerProperties.rasterOptions.useRetina;
 		}
 
 		public void Remove()
@@ -642,6 +699,7 @@
 		private MapImageFactory _imageFactory;
 	}
 
+	[Serializable]
 	public class VectorLayer : IVectorDataLayer
 	{
 		public MapLayerType LayerType
@@ -696,7 +754,7 @@
 	{
 		protected UnifiedMap _map;
 		protected AbstractTileProvider _tileProvider;
-		protected AbstractTileFactory _elevationLayer;
+		//protected AbstractTileFactory _elevationLayer;
 
 		[SerializeField]
 		MapOptions _mapOptions = new MapOptions();
@@ -708,7 +766,23 @@
 		ElevationLayerProperties _elevationLayerProperties = new ElevationLayerProperties();
 
 		//[SerializeField]
-		VectorLayerProperties _vectorLayerProperties = new VectorLayerProperties();
+		//VectorLayerProperties _vectorLayerProperties = new VectorLayerProperties();
+
+		public event Action OnInitialized = delegate { };
+
+		public UnifiedMap Map
+		{
+			get
+			{
+				return _map;
+			}
+		}
+
+		void SendInitialized()
+		{
+			Debug.Log("MapManager Init");
+			OnInitialized();
+		}
 
 		void SetUpFlat2DMap()
 		{
@@ -738,6 +812,7 @@
 			}
 
 			_map = gameObject.AddComponent<UnifiedMap>();
+			_map.OnInitialized += SendInitialized;
 
 			ITileProviderOptions tileProviderOptions = _mapOptions.placementOptions.extentOptions.GetTileProviderOptions();
 			// Setup tileprovider based on type. 
@@ -795,6 +870,7 @@
 		// Use this for initialization
 		void Start()
 		{
+
 			switch (_mapOptions.placementOptions.visualizationType)
 			{
 				case MapVisualizationType.Flat2D:
