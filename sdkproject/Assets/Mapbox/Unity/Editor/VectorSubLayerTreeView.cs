@@ -1,0 +1,71 @@
+﻿namespace Mapbox.Editor
+{
+	using System.Collections;
+	using System.Collections.Generic;
+	using UnityEngine;
+	using UnityEditor.IMGUI.Controls;
+	using UnityEditor;
+	using Mapbox.Unity.Map;
+
+	public class VectorSubLayerTreeView : TreeView
+	{
+		public List<string> Layers;
+
+		public VectorSubLayerTreeView(TreeViewState state)
+			: base(state)
+		{
+			showAlternatingRowBackgrounds = true;
+			showBorder = true;
+			Reload();
+		}
+
+		protected override TreeViewItem BuildRoot()
+		{
+			// The root item is required to have a depth of -1, and the rest of the items increment from that.
+			var root = new TreeViewItem { id = -1, depth = -1, displayName = "Root" };
+
+			var items = new List<TreeViewItem>();
+			var index = 0;
+
+			//if (Layers != null)
+			//{
+			//	for (int i = 0; i < Layers.arraySize; i++)
+			//	{
+			//		var name = Layers.GetArrayElementAtIndex(i).FindPropertyRelative("layerName").stringValue;
+			//		items.Add(new TreeViewItem { id = index, depth = 0, displayName = name });
+			//		index++;
+			//	}
+			//}
+
+			if (Layers != null)
+			{
+				foreach (var layer in Layers)
+				{
+					items.Add(new TreeViewItem { id = index, depth = 0, displayName = layer });
+					index++;
+				}
+			}
+
+			// Utility method that initializes the TreeViewItem.children and .parent for all items.
+			SetupParentsAndChildrenFromDepths(root, items);
+
+			// Return root of the tree
+			return root;
+		}
+
+		protected override bool CanRename(TreeViewItem item)
+		{
+			return true;
+		}
+
+		protected override void RenameEnded(RenameEndedArgs args)
+		{
+			if (Layers != null)
+			{
+				var layer = Layers[args.itemID]; //Layers.GetArrayElementAtIndex(args.itemID);
+				layer = args.newName;
+				//layer.FindPropertyRelative("layerName").stringValue = args.newName;
+			}
+		}
+	}
+}
