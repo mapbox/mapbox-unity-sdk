@@ -15,7 +15,7 @@ jobs:
           command: HASH=472613c02cf7
       - run:
           name: Setting UNITY_VERSION
-          command: UNITY_VERSION: 2017.1.0f3
+          command: UNITY_VERSION=2017.1.0f3
       - run:
           name: Installing Unity
           command: ./scripts/install.sh ${HASH} ${UNITY_VERSION}
