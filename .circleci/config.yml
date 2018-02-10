@@ -1,5 +1,9 @@
 # .circleci/config.yml
 version: 2
+machine:
+  environment:
+    HASH:472613c02cf7
+    UNITY_VERSION:2017.1.0f3
 jobs:
   build-and-test:
     macos:
@@ -9,10 +13,17 @@ jobs:
       - checkout
       - run:
           name: GIT Checkout
-          command: ./update-mapbox-unity-sdk-core.sh
+          command: ./update-mapbox-unity-sdk-core.sh ${HASH} ${UNITY_VERSION}
       - run:
           name: Installing Unity
           command: ./scripts/install.sh
+      - save_cache:
+          key: unity-installer-cache
+          paths:
+            - Unity-${UNITY_VERSION}.pkg
+            - UnitySetup-Windows-Support-for-Editor-${UNITY_VERSION}.pkg
+            - UnitySetup-iOS-Support-for-Editor-${UNITY_VERSION}.pkg
+            
       - run:
           name: Building the project
           command: ./scripts/build.sh
