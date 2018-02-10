@@ -6,16 +6,12 @@ jobs:
       xcode: "9.2.0"
       
     environment:
-      - unityversion: 2017.1.0f3
-      - hashvalue: 472613c02cf7
+      - UNITYVERSION: 2017.1.0f3
+      - HASH: 472613c02cf7
 
     steps:
-      - run: echo 'export HASH="$unityversion"' >> $BASH_ENV
-      - run: echo ${HASH}
-      - run: echo 'export UNITY_VERSION="$hashvalue"' >> $BASH_ENV
-      - run: echo $UNITY_VERSION
       - restore_cache:
-          keys: unity-installer-cache-991
+          keys: unity-installer-cache-995
             
       - checkout
       - run:
@@ -24,14 +20,14 @@ jobs:
      
       - run:
           name: Installing Unity
-          command: ./scripts/install.sh ${HASH} ${UNITY_VERSION}
+          command: ./scripts/install.sh ${HASH} ${UNITYVERSION}
 
       - save_cache:
-          key: unity-installer-cache-991
+          key: unity-installer-cache-995
           paths:
-            - Unity-${UNITY_VERSION}.pkg
-            - UnitySetup-Windows-Support-for-Editor-${UNITY_VERSION}.pkg
-            - UnitySetup-iOS-Support-for-Editor-${UNITY_VERSION}.pkg
+            - Unity-${UNITYVERSION}.pkg
+            - UnitySetup-Windows-Support-for-Editor-${UNITYVERSION}.pkg
+            - UnitySetup-iOS-Support-for-Editor-${UNITYVERSION}.pkg
             
       - run:
           name: Building the project
