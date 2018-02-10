@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - restore_cache:
-          keys: unity-installer-cache-997
+          keys: unity-installer-cache-998
             
       - checkout
       - run:
@@ -23,7 +23,7 @@ jobs:
           command: ./scripts/install.sh ${HASH} ${UNITYVERSION}
 
       - save_cache:
-          key: unity-installer-cache-997
+          key: unity-installer-cache-998
           paths:
             - Unity-{{ .Environment.UNITYVERSION }}.pkg
             - UnitySetup-Windows-Support-for-Editor-{{ .Environment.UNITYVERSION }}.pkg
