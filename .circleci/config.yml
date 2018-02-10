@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - restore_cache:
-          keys: unity-installer-cache-995
+          keys: unity-installer-cache-996
             
       - checkout
       - run:
@@ -23,15 +23,13 @@ jobs:
           command: ./scripts/install.sh ${HASH} ${UNITYVERSION}
 
       - save_cache:
-          key: unity-installer-cache-995
+          key: unity-installer-cache-996
           paths:
-            - Unity-${UNITYVERSION}.pkg
-            - UnitySetup-Windows-Support-for-Editor-${UNITYVERSION}.pkg
-            - UnitySetup-iOS-Support-for-Editor-${UNITYVERSION}.pkg
+            - Unity-{{"${UNITYVERSION}"}}.pkg
+            - UnitySetup-Windows-Support-for-Editor-{{"${UNITYVERSION}"}}.pkg
+            - UnitySetup-iOS-Support-for-Editor-{{"${UNITYVERSION}"}}.pkg
             
-      - run:
-          name: Building the project
-          command: ./scripts/build.sh
+
 
 workflows:
   version: 2
