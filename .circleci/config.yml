@@ -13,10 +13,10 @@ jobs:
       - checkout
       - run:
           name: GIT Checkout
-          command: ./update-mapbox-unity-sdk-core.sh ${HASH} ${UNITY_VERSION}
+          command: ./update-mapbox-unity-sdk-core.sh
       - run:
           name: Installing Unity
-          command: ./scripts/install.sh
+          command: ./scripts/install.sh ${HASH} ${UNITY_VERSION}
       - save_cache:
           key: unity-installer-cache
           paths:
