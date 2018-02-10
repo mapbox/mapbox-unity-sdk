@@ -5,8 +5,8 @@ set -eu
 df -h
 
 BASE_URL=https://download.unity3d.com/download_unity
-HASH=472613c02cf7
-VERSION=$1
+HASH=$1
+VERSION=$2
 
 download() {
   file=$1
