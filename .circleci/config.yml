@@ -16,7 +16,7 @@ jobs:
           command: ./update-mapbox-unity-sdk-core.sh
       - run:
           name: Installing Unity
-          command: ./scripts/install.sh ${HASH} ${UNITY_VERSION}
+          command: echo "${HASH}"
       - save_cache:
           key: unity-installer-cache
           paths:
