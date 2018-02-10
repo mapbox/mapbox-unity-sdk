@@ -11,28 +11,27 @@ jobs:
 
     steps:
       - restore_cache:
-          keys: unity-installer-cache-989
-            
+          keys: unity-installer-cache-988
       - checkout
       - run:
           name: GIT Checkout
           command: ./update-mapbox-unity-sdk-core.sh
-     
       - run:
           name: Installing Unity
           command: ./scripts/install.sh ${HASH} ${UNITYVERSION}
-      
       - run:
           name: Renaming Files
           command: mv Unity-${UNITYVERSION}.pkg Unity-Mac.pkg && mv UnitySetup-Windows-Support-for-Editor-$UNITYVERSION.pkg UnitySetup-Windows-Support-for-Editor.pkg && mv UnitySetup-iOS-Support-for-Editor-$UNITYVERSION.pkg UnitySetup-iOS-Support-for-Editor.pkg
 
       - save_cache:
-          key: unity-installer-cache-989
+          key: unity-installer-cache-988
           paths:
             - Unity-Mac.pkg
             - UnitySetup-Windows-Support-for-Editor.pkg
             - UnitySetup-iOS-Support-for-Editor.pkg
-      
+      - run:
+          name: Building the project
+          command: ./scripts/build.sh
 
 
 workflows:
