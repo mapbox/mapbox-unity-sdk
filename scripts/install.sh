@@ -6,7 +6,7 @@ df -h
 
 BASE_URL=https://download.unity3d.com/download_unity
 HASH=472613c02cf7
-VERSION=2017.1.0f3
+VERSION=$1
 
 download() {
   file=$1
