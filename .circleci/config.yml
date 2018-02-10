@@ -4,14 +4,18 @@ jobs:
   build-and-test:
     macos:
       xcode: "9.2.0"
+      
+    environment:
+      - unityversion: 2017.1.0f3
+      - hashvalue: 472613c02cf7
 
     steps:
-      - run: echo 'export HASH="472613c02cf7"' >> $BASH_ENV
+      - run: echo 'export HASH="$unityversion"' >> $BASH_ENV
       - run: echo ${HASH}
-      - run: echo 'export UNITY_VERSION="2017.1.0f3"' >> $BASH_ENV
+      - run: echo 'export UNITY_VERSION="$hashvalue"' >> $BASH_ENV
       - run: echo $UNITY_VERSION
       - restore_cache:
-          keys: unity-installer-cache-999
+          keys: unity-installer-cache-991
             
       - checkout
       - run:
@@ -23,7 +27,7 @@ jobs:
           command: ./scripts/install.sh ${HASH} ${UNITY_VERSION}
 
       - save_cache:
-          key: unity-installer-cache-999
+          key: unity-installer-cache-991
           paths:
             - Unity-${UNITY_VERSION}.pkg
             - UnitySetup-Windows-Support-for-Editor-${UNITY_VERSION}.pkg
