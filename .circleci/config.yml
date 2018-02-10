@@ -33,7 +33,6 @@ jobs:
           name: Building the project
           command: ./scripts/build.sh
 
-
 workflows:
   version: 2
   build-and-test:
