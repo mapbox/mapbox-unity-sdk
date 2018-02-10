@@ -24,7 +24,7 @@ jobs:
       
       - run:
           name: Renaming Files
-          command: mv Unity-${UNITYVERSION}.pkg Unity-Mac.pkg | mv UnitySetup-Windows-Support-for-Editor-$UNITYVERSION.pkg UnitySetup-Windows-Support-for-Editor.pkg | mv UnitySetup-iOS-Support-for-Editor-$UNITYVERSION.pkg UnitySetup-iOS-Support-for-Editor.pkg
+          command: mv Unity-${UNITYVERSION}.pkg Unity-Mac.pkg && mv UnitySetup-Windows-Support-for-Editor-$UNITYVERSION.pkg UnitySetup-Windows-Support-for-Editor.pkg && mv UnitySetup-iOS-Support-for-Editor-$UNITYVERSION.pkg UnitySetup-iOS-Support-for-Editor.pkg
 
       - save_cache:
           key: unity-installer-cache-989
