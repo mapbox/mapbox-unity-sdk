@@ -13,7 +13,7 @@ jobs:
       - checkout
       - run:
           name: GIT Checkout
-          command: ./update-mapbox-unity-sdk-core.sh ${HASH} ${UNITY_VERSION}
+          command: echo "${HASH} ${UNITY_VERSION}"
       - run:
           name: Installing Unity
           command: ./scripts/install.sh
