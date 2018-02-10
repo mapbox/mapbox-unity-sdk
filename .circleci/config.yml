@@ -1,9 +1,5 @@
 # .circleci/config.yml
 version: 2
-machine:
-  environment:
-    HASH: 472613c02cf7
-    UNITY_VERSION: 2017.1.0f3
 jobs:
   build-and-test:
     macos:
@@ -15,8 +11,15 @@ jobs:
           name: GIT Checkout
           command: ./update-mapbox-unity-sdk-core.sh
       - run:
+          name: Setting HASH
+          command: HASH=472613c02cf7
+      - run:
+          name: Setting UNITY_VERSION
+          command: UNITY_VERSION: 2017.1.0f3
+      - run:
           name: Installing Unity
-          command: echo "${HASH}"
+          command: ./scripts/install.sh ${HASH} ${UNITY_VERSION}
+
       - save_cache:
           key: unity-installer-cache
           paths:
