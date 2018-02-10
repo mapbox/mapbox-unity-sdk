@@ -2,8 +2,8 @@
 version: 2
 machine:
   environment:
-    hash:472613c02cf7
-    unity_version:2017.1.0f3
+    hash: 472613c02cf7
+    unity_version: 2017.1.0f3
 jobs:
   build-and-test:
     macos:
