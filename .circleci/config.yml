@@ -2,8 +2,8 @@
 version: 2
 machine:
   environment:
-    hash: 472613c02cf7
-    unity_version: 2017.1.0f3
+    HASH: 472613c02cf7
+    UNITY_VERSION: 2017.1.0f3
 jobs:
   build-and-test:
     macos:
@@ -16,13 +16,13 @@ jobs:
           command: ./update-mapbox-unity-sdk-core.sh
       - run:
           name: Installing Unity
-          command: ./scripts/install.sh $hash $unity_version
+          command: ./scripts/install.sh ${HASH} ${UNITY_VERSION}
       - save_cache:
           key: unity-installer-cache
           paths:
-            - Unity-${unity_version}.pkg
-            - UnitySetup-Windows-Support-for-Editor-${unity_version}.pkg
-            - UnitySetup-iOS-Support-for-Editor-${unity_version}.pkg
+            - Unity-${UNITY_VERSION}.pkg
+            - UnitySetup-Windows-Support-for-Editor-${UNITY_VERSION}.pkg
+            - UnitySetup-iOS-Support-for-Editor-${UNITY_VERSION}.pkg
             
       - run:
           name: Building the project
