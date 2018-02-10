@@ -10,9 +10,9 @@ jobs:
       - run:
           name: GIT Checkout
           command: ./update-mapbox-unity-sdk-core.sh
-      - run: export HASH="472613c02cf7"  >> $BASH_ENV
+      - run: echo 'export HASH="472613c02cf7"' >> $BASH_ENV
       - run: echo ${HASH}
-      - run: export UNITY_VERSION="2017.1.0f3"  >> $BASH_ENV
+      - run: echo 'export UNITY_VERSION="2017.1.0f3"' >> $BASH_ENV
       - run: echo $UNITY_VERSION
       - run:
           name: Installing Unity
