@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - restore_cache:
-          keys: unity-installer-cache-992
+          keys: unity-installer-cache-989
             
       - checkout
       - run:
@@ -21,14 +21,18 @@ jobs:
       - run:
           name: Installing Unity
           command: ./scripts/install.sh ${HASH} ${UNITYVERSION}
+      
+      - run:
+          name: Renaming Files
+          command: mv Unity-${UNITYVERSION}.pkg Unity-Mac.pkg | mv UnitySetup-Windows-Support-for-Editor-$UNITYVERSION.pkg UnitySetup-Windows-Support-for-Editor.pkg | mv UnitySetup-iOS-Support-for-Editor-$UNITYVERSION.pkg UnitySetup-iOS-Support-for-Editor.pkg
 
       - save_cache:
-          key: unity-installer-cache-992
+          key: unity-installer-cache-989
           paths:
-            - Unity-$UNITYVERSION.pkg
-            - UnitySetup-Windows-Support-for-Editor-$UNITYVERSION.pkg
-            - UnitySetup-iOS-Support-for-Editor-$UNITYVERSION.pkg
-            
+            - Unity-Mac.pkg
+            - UnitySetup-Windows-Support-for-Editor.pkg
+            - UnitySetup-iOS-Support-for-Editor.pkg
+      
 
 
 workflows:
