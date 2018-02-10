@@ -25,9 +25,9 @@ jobs:
       - save_cache:
           key: unity-installer-cache-997
           paths:
-            - Unity-{{ "${UNITYVERSION}" }}.pkg
-            - UnitySetup-Windows-Support-for-Editor-{{ "${UNITYVERSION}" }}.pkg
-            - UnitySetup-iOS-Support-for-Editor-{{ "${UNITYVERSION}" }}.pkg
+            - Unity-{{ .Environment.UNITYVERSION }}.pkg
+            - UnitySetup-Windows-Support-for-Editor-{{ .Environment.UNITYVERSION }}.pkg
+            - UnitySetup-iOS-Support-for-Editor-{{ .Environment.UNITYVERSION }}.pkg
             
 
 
