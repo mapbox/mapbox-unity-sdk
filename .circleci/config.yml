@@ -9,10 +9,11 @@ jobs:
     environment:
       - UNITYVERSION: 2017.1.0f3
       - HASH: 472613c02cf7
+      - TEST: 977
 
     steps:
       - restore_cache:
-          keys: unity-installer-cache-988
+          keys: unity-installer-cache-$TEST
       - checkout
       - run:
           name: GIT Checkout
@@ -24,7 +25,7 @@ jobs:
           name: Renaming Files
           command: if [ ! -f "../project/Unity-Mac.pkg" ]; then mv Unity-${UNITYVERSION}.pkg Unity-Mac.pkg; fi && if [ ! -f "../project/UnitySetup-Windows-Support-for-Editor.pkg" ]; then mv UnitySetup-Windows-Support-for-Editor-$UNITYVERSION.pkg UnitySetup-Windows-Support-for-Editor.pkg; fi && if [ ! -f "../project/UnitySetup-iOS-Support-for-Editor.pkg" ]; then mv UnitySetup-iOS-Support-for-Editor-$UNITYVERSION.pkg UnitySetup-iOS-Support-for-Editor.pkg; fi
       - save_cache:
-          key: unity-installer-cache-988
+          key: unity-installer-cache-$TEST
           paths:
             - Unity-Mac.pkg
             - UnitySetup-Windows-Support-for-Editor.pkg
