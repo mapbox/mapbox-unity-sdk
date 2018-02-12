@@ -18,7 +18,6 @@ download() {
 
 install() {
   package=$1
-  download "$package"
 
   echo "Installing "`basename "$package"`
   sudo installer -dumplog -package `basename "$package"` -target /
@@ -27,8 +26,8 @@ install() {
 # See $BASE_URL/$HASH/unity-$VERSION-$PLATFORM.ini for complete list
 # of available packages, where PLATFORM is `osx` or `win`
 
-if [ ! -f "Unity-Mac.pkg" ]; then install "Unity-Mac.pkg"; else install "MacEditorInstaller/Unity-$VERSION.pkg"; fi
+if [ -f "Unity-Mac.pkg" ]; then install "Unity-Mac.pkg"; else download "MacEditorInstaller/Unity-$VERSION.pkg" && install "MacEditorInstaller/Unity-$VERSION.pkg"; fi
 wait
-if [ ! -f "UnitySetup-Windows-Support-for-Editor.pkg" ]; then install "UnitySetup-Windows-Support-for-Editor.pkg"; else install "MacEditorTargetInstaller/UnitySetup-Windows-Support-for-Editor-$VERSION.pkg"; fi
+if [ -f "UnitySetup-Windows-Support-for-Editor.pkg" ]; then install "UnitySetup-Windows-Support-for-Editor.pkg"; else download "MacEditorTargetInstaller/UnitySetup-Windows-Support-for-Editor-$VERSION.pkg" && install "MacEditorTargetInstaller/UnitySetup-Windows-Support-for-Editor-$VERSION.pkg"; fi
 wait
-if [ ! -f "UnitySetup-iOS-Support-for-Editor.pkg" ]; then install "UnitySetup-iOS-Support-for-Editor.pkg"; else install "MacEditorTargetInstaller/UnitySetup-iOS-Support-for-Editor-$VERSION.pkg"; fi
+if [ -f "UnitySetup-iOS-Support-for-Editor.pkg" ]; then install "UnitySetup-iOS-Support-for-Editor.pkg"; else download "MacEditorTargetInstaller/UnitySetup-iOS-Support-for-Editor-$VERSION.pkg" && install "MacEditorTargetInstaller/UnitySetup-iOS-Support-for-Editor-$VERSION.pkg"; fi
