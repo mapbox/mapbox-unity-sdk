@@ -27,7 +27,7 @@ install() {
 # See $BASE_URL/$HASH/unity-$VERSION-$PLATFORM.ini for complete list
 # of available packages, where PLATFORM is `osx` or `win`
 
-if[ ! -f "$Unity-Mac.pkg"]; then install "MacEditorInstaller/Unity-$VERSION.pkg" fi
+if[ ! -f "$Unity-Mac.pkg"]; then install "MacEditorInstaller/Unity-$VERSION.pkg"; fi
 wait
 if[ ! -f "UnitySetup-Windows-Support-for-Editor.pkg"]; then install "MacEditorTargetInstaller/UnitySetup-Windows-Support-for-Editor-$VERSION.pkg"; fi
 wait
