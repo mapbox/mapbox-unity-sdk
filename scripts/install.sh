@@ -29,6 +29,6 @@ install() {
 
 if[ ! -f "$Unity-Mac.pkg"]; then install "MacEditorInstaller/Unity-$VERSION.pkg" fi
 wait
-if[ ! -f "UnitySetup-Windows-Support-for-Editor.pkg"]; then install "MacEditorTargetInstaller/UnitySetup-Windows-Support-for-Editor-$VERSION.pkg" fi
+if[ ! -f "UnitySetup-Windows-Support-for-Editor.pkg"]; then install "MacEditorTargetInstaller/UnitySetup-Windows-Support-for-Editor-$VERSION.pkg"; fi
 wait
-if [ ! -f "UnitySetup-iOS-Support-for-Editor.pkg"]; then install "MacEditorTargetInstaller/UnitySetup-iOS-Support-for-Editor-$VERSION.pkg" fi
+if [ ! -f "UnitySetup-iOS-Support-for-Editor.pkg"]; then install "MacEditorTargetInstaller/UnitySetup-iOS-Support-for-Editor-$VERSION.pkg"; fi
