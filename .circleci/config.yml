@@ -22,7 +22,7 @@ jobs:
           command: ./scripts/install.sh ${HASH} ${UNITYVERSION}
       - run:
           name: Renaming Files
-          command: if [ ! -f "../$CIRCLE_WORKING_DIRECTORY/Unity-Mac.pkg" ]; then mv Unity-${UNITYVERSION}.pkg Unity-Mac.pkg; fi && if [ ! -f "../$CIRCLE_WORKING_DIRECTORY/UnitySetup-Windows-Support-for-Editor.pkg" ]; then mv UnitySetup-Windows-Support-for-Editor-$UNITYVERSION.pkg UnitySetup-Windows-Support-for-Editor.pkg; fi && if [ ! -f "../$CIRCLE_WORKING_DIRECTORY/UnitySetup-iOS-Support-for-Editor.pkg" ]; then mv UnitySetup-iOS-Support-for-Editor-$UNITYVERSION.pkg UnitySetup-iOS-Support-for-Editor.pkg; fi
+          command: if [ ! -f "../${CIRCLE_WORKING_DIRECTORY}/Unity-Mac.pkg" ]; then mv Unity-${UNITYVERSION}.pkg Unity-Mac.pkg; fi && if [ ! -f "../${CIRCLE_WORKING_DIRECTORY}/UnitySetup-Windows-Support-for-Editor.pkg" ]; then mv UnitySetup-Windows-Support-for-Editor-$UNITYVERSION.pkg UnitySetup-Windows-Support-for-Editor.pkg; fi && if [ ! -f "../$CIRCLE_WORKING_DIRECTORY/UnitySetup-iOS-Support-for-Editor.pkg" ]; then mv UnitySetup-iOS-Support-for-Editor-$UNITYVERSION.pkg UnitySetup-iOS-Support-for-Editor.pkg; fi
       - save_cache:
           key: unity-installer-cache-500
           paths:
