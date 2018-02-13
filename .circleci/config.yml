@@ -5,15 +5,14 @@ jobs:
     macos:
       xcode: "9.2.0"
       
-    working_directory: ~/ttt
+    working_directory: ~/tmp1000
     environment:
       - UNITYVERSION: 2017.1.0f3
       - HASH: 472613c02cf7
-      - TEST: 955
-
+      
     steps:
       - restore_cache:
-          keys: unity-installer-cache-{{ .Environment.TEST }}
+          keys: unity-installer-cache-1000
       - checkout
       - run:
           name: GIT Checkout
@@ -25,7 +24,7 @@ jobs:
           name: Renaming Files
           command: if [ ! -f "../project/Unity-Mac.pkg" ]; then mv Unity-${UNITYVERSION}.pkg Unity-Mac.pkg; fi && if [ ! -f "../project/UnitySetup-Windows-Support-for-Editor.pkg" ]; then mv UnitySetup-Windows-Support-for-Editor-$UNITYVERSION.pkg UnitySetup-Windows-Support-for-Editor.pkg; fi && if [ ! -f "../project/UnitySetup-iOS-Support-for-Editor.pkg" ]; then mv UnitySetup-iOS-Support-for-Editor-$UNITYVERSION.pkg UnitySetup-iOS-Support-for-Editor.pkg; fi
       - save_cache:
-          key: unity-installer-cache-{{ .Environment.TEST }}
+          key: unity-installer-cache-1000
           paths:
             - Unity-Mac.pkg
             - UnitySetup-Windows-Support-for-Editor.pkg
