@@ -25,7 +25,7 @@ install() {
 
 # See $BASE_URL/$HASH/unity-$VERSION-$PLATFORM.ini for complete list
 # of available packages, where PLATFORM is `osx` or `win`
-if [ -d "../project" ]; then cd .. && cd project; fi
+if [ -d "../$CIRCLE_WORKING_DIRECTORY" ]; then cd .. && cd $CIRCLE_WORKING_DIRECTORY; fi
 if [ -f "Unity-Mac.pkg" ]; then install "Unity-Mac.pkg"; else download "MacEditorInstaller/Unity-$VERSION.pkg" && install "MacEditorInstaller/Unity-$VERSION.pkg"; fi
 wait
 if [ -f "UnitySetup-Windows-Support-for-Editor.pkg" ]; then install "UnitySetup-Windows-Support-for-Editor.pkg"; else download "MacEditorTargetInstaller/UnitySetup-Windows-Support-for-Editor-$VERSION.pkg" && install "MacEditorTargetInstaller/UnitySetup-Windows-Support-for-Editor-$VERSION.pkg"; fi
