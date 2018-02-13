@@ -5,18 +5,18 @@ jobs:
     macos:
       xcode: "9.2.0"
       
-    working_directory: ~/temporarie
+    working_directory: ~/temporary
     environment:
       - UNITYVERSION: 2017.1.0f3
       - HASH: 472613c02cf7
       
     steps:
-      - restore_cache:
-          keys: unity-installer-cache-500
       - checkout
       - run:
           name: GIT Checkout
           command: ./update-mapbox-unity-sdk-core.sh
+      - restore_cache:
+          keys: unity-installer-cache-500
       - run:
           name: Installing Unity
           command: ./scripts/install.sh ${HASH} ${UNITYVERSION}
