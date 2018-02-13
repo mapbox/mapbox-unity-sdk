@@ -9,7 +9,7 @@ jobs:
     environment:
       - UNITYVERSION: 2017.1.0f3
       - HASH: 472613c02cf7
-      - TEST: 983
+      - TEST: 955
 
     steps:
       - restore_cache:
