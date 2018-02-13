@@ -14,7 +14,7 @@ jobs:
       - checkout
       - run:
           name: GIT Checkout
-          command: ls && ./update-mapbox-unity-sdk-core.sh
+          command: pwd && ./update-mapbox-unity-sdk-core.sh
       - restore_cache:
           keys: unity-installer-cache-500
       - run:
