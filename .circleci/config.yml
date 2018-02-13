@@ -14,7 +14,7 @@ jobs:
       - checkout
       - run:
           name: GIT Checkout
-          command: pwd && ./update-mapbox-unity-sdk-core.sh
+          command: ./update-mapbox-unity-sdk-core.sh
       - restore_cache:
           keys: unity-installer-cache-500
       - run:
@@ -22,7 +22,7 @@ jobs:
           command: ./scripts/install.sh ${HASH} ${UNITYVERSION}
       - run:
           name: Renaming Files
-          command: ls && if [ ! -f "${CIRCLE_WORKING_DIRECTORY}/Unity-Mac.pkg" ]; then mv Unity-${UNITYVERSION}.pkg Unity-Mac.pkg; fi && if [ ! -f "${CIRCLE_WORKING_DIRECTORY}/UnitySetup-Windows-Support-for-Editor.pkg" ]; then mv UnitySetup-Windows-Support-for-Editor-$UNITYVERSION.pkg UnitySetup-Windows-Support-for-Editor.pkg; fi && if [ ! -f "${CIRCLE_WORKING_DIRECTORY}/UnitySetup-iOS-Support-for-Editor.pkg" ]; then mv UnitySetup-iOS-Support-for-Editor-$UNITYVERSION.pkg UnitySetup-iOS-Support-for-Editor.pkg; fi
+          command: if [ ! -f "Unity-Mac.pkg" ]; then mv Unity-${UNITYVERSION}.pkg Unity-Mac.pkg; fi && if [ ! -f "UnitySetup-Windows-Support-for-Editor.pkg" ]; then mv UnitySetup-Windows-Support-for-Editor-$UNITYVERSION.pkg UnitySetup-Windows-Support-for-Editor.pkg; fi && if [ ! -f "UnitySetup-iOS-Support-for-Editor.pkg" ]; then mv UnitySetup-iOS-Support-for-Editor-$UNITYVERSION.pkg UnitySetup-iOS-Support-for-Editor.pkg; fi
       - save_cache:
           key: unity-installer-cache-500
           paths:
