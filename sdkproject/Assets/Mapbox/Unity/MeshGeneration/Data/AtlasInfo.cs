@@ -25,5 +25,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 	public class AtlasInfo : ScriptableObject
 	{
 		public List<AtlasEntity> Textures;
+		public List<AtlasEntity> Roofs;
 	}
 }
