@@ -26,7 +26,6 @@ namespace Mapbox.Editor
 			serializedObject.Update();
 			GUI.enabled = false;
 			script = EditorGUILayout.ObjectField("Script", script, typeof(MonoScript), false) as MonoScript;
-			EditorGUILayout.PropertyField(serializedObject.FindProperty("State"));
 			GUI.enabled = true;
 			EditorGUILayout.Space();
 			EditorGUILayout.BeginHorizontal();
