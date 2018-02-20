@@ -68,10 +68,10 @@ MonoBehaviour:
           disposeBuffer: 2
           updateInterval: 5
         rangeAroundCenterOptions:
-          west: 0
-          north: 0
-          east: 0
-          south: 0
+          west: 2
+          north: 2
+          east: 2
+          south: 2
         rangeAroundTransformOptions:
           targetTransform: {fileID: 0}
           visibleBuffer: 0
@@ -115,3 +115,42 @@ MonoBehaviour:
       isActive: 0
       wallHeight: 10
       wallMaterial: {fileID: 0}
+  _vectorLayerProperties:
+    sourceOptions:
+      isActive: 1
+      layerSource:
+        Name: 
+        Id: mapbox.mapbox-streets-v7
+        Modified: 
+        UserName: 
+    performanceOptions:
+      isEnabled: 0
+      entityPerCoroutine: 20
+    defaultStylingOptions:
+      isExtruded: 0
+    vectorSubLayers:
+    - coreOptions:
+        geometryType: 2
+        layerName: building
+        propertyValuePairs: []
+        groupFeatures: 0
+      extrusionOptions:
+        extrusionType: 0
+        extrusionGeometryType: 2
+        propertyName: 
+        minimumHeight: 0
+        maximumHeight: 0
+      materialOptions:
+        projectMapImagery: 0
+        materials:
+        - Materials:
+          - {fileID: 0}
+          - {fileID: 0}
+        - Materials: []
+      modifierOptions:
+        moveFeaturePositionTo: 0
+        MeshModifiers:
+        - {fileID: 0}
+        - {fileID: 0}
+        - {fileID: 0}
+        GoModifiers: []

@@ -10,6 +10,7 @@
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
+	using Mapbox.Unity.MeshGeneration.Interfaces;
 
 
 	// Map related enums
@@ -100,12 +101,12 @@
 		PropertyHeight,
 		MinHeight,
 		MaxHeight,
+		RangeHeight,
 		AbsoluteHeight,
 	}
 
 	public enum ExtrusionGeometryType
 	{
-		None,
 		SideOnly,
 		RoofOnly,
 		RoofAndSide,
@@ -347,6 +348,18 @@
 	{
 		public bool isActive;
 		public Style layerSource;
+
+		public string Id
+		{
+			get
+			{
+				return layerSource.Id;
+			}
+			set
+			{
+				layerSource.Id = value;
+			}
+		}
 	}
 
 	public abstract class LayerProperties
@@ -368,17 +381,35 @@
 	}
 
 	[Serializable]
-	public class CoreVectorLayerProperties
+	public class LayerModifierOptions
 	{
-		public VectorPrimitiveType geometryType = VectorPrimitiveType.Polygon;
-		public string layerName;
-		public List<PropertyValuePair> propertyValuePairs;
-		public GeometryStylingOptions stylingOptions;
+		public PositionTargetType moveFeaturePositionTo;
+		[NodeEditorElement("Mesh Modifiers")]
+		public List<MeshModifier> MeshModifiers;
+		[NodeEditorElement("Game Object Modifiers")]
+		public List<GameObjectModifier> GoModifiers;
 	}
 
 	[Serializable]
-	public class GeometryExtrusionOptions
+	public class CoreVectorLayerProperties
 	{
+		public VectorPrimitiveType geometryType = VectorPrimitiveType.Polygon;
+		public string layerName = "untitled";
+		public List<PropertyValuePair> propertyValuePairs;
+		public bool groupFeatures = false;
+
+	}
+
+	[Serializable]
+	public class GeometryExtrusionOptions : ModifierProperties
+	{
+		public override Type ModifierType
+		{
+			get
+			{
+				return typeof(HeightModifier);
+			}
+		}
 		public ExtrusionType extrusionType = ExtrusionType.None;
 		public ExtrusionGeometryType extrusionGeometryType = ExtrusionGeometryType.RoofAndSide;
 		public string propertyName;
@@ -390,15 +421,21 @@
 	public class GeometryStylingOptions
 	{
 		public bool isExtruded;
-		public GeometryExtrusionOptions extrusionOptions;
-		public GeometryMaterialOptions materialOptions;
+
 	}
 
 	[Serializable]
-	public class GeometryMaterialOptions
+	public class GeometryMaterialOptions : ModifierProperties
 	{
-		public bool _projectMapImagery;
-		public MaterialList[] _materials;
+		public override Type ModifierType
+		{
+			get
+			{
+				return typeof(MaterialModifier);
+			}
+		}
+		public bool projectMapImagery;
+		public MaterialList[] materials;
 	}
 
 	[Serializable]
@@ -406,13 +443,18 @@
 	{
 		public LayerSourceOptions sourceOptions;
 		public LayerPerformanceOptions performanceOptions;
-		public List<VectorSubLayerProperties> vectorSubLayers = new List<VectorSubLayerProperties>();
+		public GeometryStylingOptions defaultStylingOptions;
+		public List<VectorSubLayerProperties> vectorSubLayers = new List<VectorSubLayerProperties>(2);
 	}
 
 	[Serializable]
 	public class VectorSubLayerProperties : LayerProperties
 	{
 		public CoreVectorLayerProperties coreOptions;
+		public GeometryExtrusionOptions extrusionOptions;
+		public GeometryMaterialOptions materialOptions;
+		//public GeometryStylingOptions stylingOptions;
+		public LayerModifierOptions modifierOptions;
 	}
 
 	[Serializable]
@@ -736,7 +778,9 @@
 
 		public void Initialize(LayerProperties properties)
 		{
-			throw new System.NotImplementedException();
+			var vectorLayerProperties = (VectorLayerProperties)properties;
+			_vectorTileFactory = ScriptableObject.CreateInstance<VectorTileFactoryNew>();
+			_vectorTileFactory.SetOptions(vectorLayerProperties);
 		}
 
 		public void Remove()
@@ -748,6 +792,15 @@
 		{
 			throw new System.NotImplementedException();
 		}
+
+		public VectorTileFactoryNew VectorFactory
+		{
+			get
+			{
+				return _vectorTileFactory;
+			}
+		}
+		private VectorTileFactoryNew _vectorTileFactory;
 	}
 
 	public class MapAPI : MonoBehaviour
@@ -765,8 +818,8 @@
 		[SerializeField]
 		ElevationLayerProperties _elevationLayerProperties = new ElevationLayerProperties();
 
-		//[SerializeField]
-		//VectorLayerProperties _vectorLayerProperties = new VectorLayerProperties();
+		[SerializeField]
+		VectorLayerProperties _vectorLayerProperties = new VectorLayerProperties();
 
 		public event Action OnInitialized = delegate { };
 
@@ -852,11 +905,15 @@
 			mapElevationLayer.Initialize(_elevationLayerProperties);
 			//var terrainFactory = ScriptableObject.CreateInstance<TerrainWithSideWallsFactory>();
 			//terrainFactory._mapId = "mapbox.terrain-rgb";
+
+
+			//var mapVectorLayer = new VectorLayer();
+			//mapVectorLayer.Initialize(_vectorLayerProperties);
 			_mapVisualizer.Factories = new List<AbstractTileFactory>
 			{
 				mapElevationLayer.ElevationFactory,
-				mapImageryLayers.ImageFactory
-
+				mapImageryLayers.ImageFactory,
+				//mapVectorLayer.VectorFactory
 			};
 
 			_map.TileProvider = _tileProvider;
@@ -881,6 +938,15 @@
 				default:
 					break;
 			}
+
+			_vectorLayerProperties.vectorSubLayers = new List<VectorSubLayerProperties>();
+			_vectorLayerProperties.vectorSubLayers.Add(new VectorSubLayerProperties()
+			{
+				coreOptions = new CoreVectorLayerProperties()
+				{
+					layerName = "Building"
+				}
+			});
 		}
 
 		// Update is called once per frame

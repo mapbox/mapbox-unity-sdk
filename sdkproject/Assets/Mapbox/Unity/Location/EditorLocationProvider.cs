@@ -34,7 +34,7 @@ namespace Mapbox.Unity.Location
 		bool _mapInitialized;
 
 #if UNITY_EDITOR
-		protected override void Awake()
+		protected void Start()
 		{
 			LocationProviderFactory.Instance.mapManager.OnInitialized += Map_OnInitialized;
 			//_map.OnInitialized += Map_OnInitialized;
