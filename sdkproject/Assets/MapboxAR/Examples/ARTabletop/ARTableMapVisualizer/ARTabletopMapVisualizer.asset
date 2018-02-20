@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 526c8a90df31d41fe8057a6f85c7a3e4, type: 3}
+  m_Name: ARTabletopMapVisualizer
+  m_EditorClassIdentifier: 
+  Factories:
+  - {fileID: 11400000, guid: bb3f493c4b2e545dd993fb797dd21e97, type: 2}
+  - {fileID: 11400000, guid: 92275604a24ef45b5bc9f97d045e5de9, type: 2}
+  - {fileID: 11400000, guid: 578bee8d6ba444c12a4bbbadd051522c, type: 2}
+  _loadingTexture: {fileID: 2800000, guid: 70976333360a046c1bcf8dc7cb1f593c, type: 3}
