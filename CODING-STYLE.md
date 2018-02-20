@@ -1,3 +1,5 @@
+- Use an IDE that respects `.editorconfig` file (http://editorconfig.org/#download) and you won't have to worry about most of the stuff below :smirk:
+
 - Use tabs, not spaces, for indentation.
 
 - Private fields should be prefixed with an underscore (`_privateField`) and generally avoid `this` keyword.
