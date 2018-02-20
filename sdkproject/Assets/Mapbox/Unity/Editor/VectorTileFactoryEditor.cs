@@ -27,7 +27,7 @@ namespace Mapbox.Editor
 			GUI.enabled = false;
 			script = EditorGUILayout.ObjectField("Script", script, typeof(MonoScript), false) as MonoScript;
 			GUI.enabled = true;
-
+			EditorGUILayout.Space();
 			EditorGUILayout.BeginHorizontal();
 			EditorGUILayout.PropertyField(mapId_Prop, new GUIContent("Map Id"));
 			if (GUILayout.Button("R", GUILayout.Width(30)))
@@ -51,10 +51,11 @@ namespace Mapbox.Editor
 				EditorGUILayout.BeginHorizontal();
 				if (_factory.Visualizers[i] != null)
 				{
+					var obj = new SerializedObject(facs.GetArrayElementAtIndex(ind).objectReferenceValue);
 					_factory.Visualizers[i].Active = EditorGUILayout.Toggle(_factory.Visualizers[i].Active, GUILayout.MaxWidth(20));
-					_factory.Visualizers[i].Key = EditorGUILayout.TextField(_factory.Visualizers[i].Key, GUILayout.MaxWidth(100));
+					obj.FindProperty("_key").stringValue = EditorGUILayout.TextField(obj.FindProperty("_key").stringValue, GUILayout.MaxWidth(100));
+					obj.ApplyModifiedProperties();
 				}
-				//facs.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(i).objectReferenceValue, typeof(LayerVisualizerBase)) as ScriptableObject;
 				if (_factory.Visualizers[i] == null)
 					EditorGUILayout.TextField("null");
 				else
