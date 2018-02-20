@@ -91,6 +91,17 @@ namespace Mapbox.Unity
 			ConfigureTelemetry();
 		}
 
+
+		/// <summary>
+		/// Deprecated. Use 'ClearSceneCache' or 'ClearAllCacheFiles' instead.
+		/// </summary>
+		[Obsolete("Deprecated. Use 'ClearSceneCache' or 'ClearAllCacheFiles' instead.")]
+		public void ClearCache()
+		{
+			ClearSceneCache();
+		}
+
+
 		/// <summary>
 		/// Clear all existing tile caches. Deletes MBTiles database files.
 		/// </summary>

@@ -67,10 +67,8 @@ lastmodified INTEGER,
 				&& null == colInfo.FirstOrDefault(ci => ci.Name.Equals("etag"))
 			)
 			{
-				UnityEngine.Debug.Log("adding column etag");
 				string sql = "ALTER TABLE tiles ADD COLUMN etag text;";
 				_sqlite.Execute(sql);
-				UnityEngine.Debug.Log("adding column timestamp");
 				sql = "ALTER TABLE tiles ADD COLUMN lastmodified INTEGER;";
 				_sqlite.Execute(sql);
 			}
