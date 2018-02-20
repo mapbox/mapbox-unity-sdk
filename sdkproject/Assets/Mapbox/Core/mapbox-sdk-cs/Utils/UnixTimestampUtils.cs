@@ -33,7 +33,8 @@ namespace Mapbox.Utils {
 		/// </summary>
 		/// <param name="timestamp"></param>
 		/// <returns></returns>
-		public static DateTime From(double timestamp) {
+		public static DateTime From(double timestamp)
+		{
 			//return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Add(TimeSpan.FromSeconds(timestamp)).ToLocalTime();
 			return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Add(TimeSpan.FromSeconds(timestamp));
 		}
@@ -48,6 +49,7 @@ namespace Mapbox.Utils {
 			//return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Add(TimeSpan.FromSeconds(timestamp)).ToLocalTime();
 			return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Add(TimeSpan.FromTicks(timestamp));
 		}
+
 
 	}
 }

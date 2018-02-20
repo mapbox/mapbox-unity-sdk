@@ -30,6 +30,7 @@ namespace Mapbox.Editor
 		[Range(0, 3000)]
 		static int _mbtilesCacheSize = 2000;
 		static int _webRequestTimeout = 30;
+		static bool _autoRefreshCache = false;
 
 		//mapbox access callbacks
 		static bool _listeningForTokenValidation = false;
@@ -91,7 +92,7 @@ namespace Mapbox.Editor
 		[MenuItem("Mapbox/Setup")]
 		static void InitWhenLoaded()
 		{
-			if(EditorApplication.isCompiling && !_waitingToLoad)
+			if (EditorApplication.isCompiling && !_waitingToLoad)
 			{
 				//subscribe to updates
 				_waitingToLoad = true;
@@ -99,10 +100,10 @@ namespace Mapbox.Editor
 				return;
 			}
 
-			if(!EditorApplication.isCompiling)
+			if (!EditorApplication.isCompiling)
 			{
 				//unsubscribe from updates if waiting
-				if(_waitingToLoad)
+				if (_waitingToLoad)
 				{
 					EditorApplication.update -= InitWhenLoaded;
 					_waitingToLoad = false;
@@ -130,6 +131,7 @@ namespace Mapbox.Editor
 					AccessToken = _accessToken,
 					MemoryCacheSize = (uint)_memoryCacheSize,
 					MbTilesCacheSize = (uint)_mbtilesCacheSize,
+					AutoRefreshCache = _autoRefreshCache,
 					DefaultTimeout = _webRequestTimeout
 				};
 				var json = JsonUtility.ToJson(_mapboxConfig);
@@ -160,6 +162,7 @@ namespace Mapbox.Editor
 				_accessToken = _mapboxConfig.AccessToken;
 				_memoryCacheSize = (int)_mapboxConfig.MemoryCacheSize;
 				_mbtilesCacheSize = (int)_mapboxConfig.MbTilesCacheSize;
+				_autoRefreshCache = _mapboxConfig.AutoRefreshCache;
 				_webRequestTimeout = (int)_mapboxConfig.DefaultTimeout;
 
 			}
@@ -232,6 +235,7 @@ namespace Mapbox.Editor
 				AccessToken = _accessToken,
 				MemoryCacheSize = (uint)_memoryCacheSize,
 				MbTilesCacheSize = (uint)_mbtilesCacheSize,
+				AutoRefreshCache = _autoRefreshCache,
 				DefaultTimeout = _webRequestTimeout
 			};
 			_mapboxAccess.SetConfiguration(mapboxConfiguration, false);
@@ -531,6 +535,7 @@ namespace Mapbox.Editor
 				EditorGUI.indentLevel = 2;
 				_memoryCacheSize = EditorGUILayout.IntSlider("Mem Cache Size (# of tiles)", _memoryCacheSize, 0, 1000);
 				_mbtilesCacheSize = EditorGUILayout.IntSlider("MBTiles Cache Size (# of tiles)", _mbtilesCacheSize, 0, 3000);
+				_autoRefreshCache = EditorGUILayout.Toggle(new GUIContent("Auto refresh cache", "Automatically update tiles in the local ambient cache if there is a newer version available online. ATTENTION: for every tile displayed (even a cached one) a webrequest needs to be made to check for updates."), _autoRefreshCache);
 				_webRequestTimeout = EditorGUILayout.IntField("Default Web Request Timeout (s)", _webRequestTimeout);
 
 				EditorGUILayout.BeginHorizontal(_horizontalGroup);
@@ -549,7 +554,7 @@ namespace Mapbox.Editor
 		void DrawExampleLinks()
 		{
 			EditorGUI.BeginDisabledGroup(_currentTokenStatus != MapboxTokenStatus.TokenValid
-			                            || _validating);
+										|| _validating);
 
 			if (_currentTokenStatus == MapboxTokenStatus.TokenValid)
 			{
@@ -581,7 +586,7 @@ namespace Mapbox.Editor
 
 		private void OpenAndPlayScene()
 		{
-			if( EditorApplication.isPlaying)
+			if (EditorApplication.isPlaying)
 			{
 				return;
 			}
