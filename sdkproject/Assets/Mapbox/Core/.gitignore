@@ -10,3 +10,6 @@
 
 !*.gitignore
 !/**/*.meta
+
+# exlude obj.meta created by documentation creation
+obj.meta

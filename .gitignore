@@ -16,6 +16,7 @@ docfx.zip
 #api
 _site
 src/Documentation/log.txt
+obj.meta
 
 # build
 .vs/
