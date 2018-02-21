@@ -13,7 +13,7 @@ sdkproject/Assets/WSATestCertificate.pfx.meta
 # Documentation
 docfx.zip
 /docfx
-api
+#api
 _site
 src/Documentation/log.txt
 
