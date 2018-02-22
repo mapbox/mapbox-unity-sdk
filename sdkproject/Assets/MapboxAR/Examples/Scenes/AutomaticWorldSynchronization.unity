@@ -406,7 +406,7 @@ Prefab:
     - target: {fileID: 114020511733235004, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
       propertyPath: _minimumDesiredAccuracy
-      value: 25
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 114020511733235004, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
@@ -416,7 +416,7 @@ Prefab:
     - target: {fileID: 114182007959914852, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
       propertyPath: _desiredAccuracyInMeters
-      value: 25
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 114182007959914852, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
@@ -530,6 +530,11 @@ Prefab:
       propertyPath: _positionFollowFactor
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 114934843730069194, guid: 35e76f6e52f5c4252a0b703cc2019a37,
+        type: 2}
+      propertyPath: _camera
+      value: 
+      objectReference: {fileID: 1302821354}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 35e76f6e52f5c4252a0b703cc2019a37, type: 2}
   m_IsPrefabParent: 0
@@ -539,6 +544,11 @@ MonoBehaviour:
     type: 2}
   m_PrefabInternal: {fileID: 1002213147}
   m_Script: {fileID: 11500000, guid: b000a4c373a2e470986a96ce9dba73ed, type: 3}
+--- !u!20 &1302821354 stripped
+Camera:
+  m_PrefabParentObject: {fileID: 20908598969478380, guid: 35e76f6e52f5c4252a0b703cc2019a37,
+    type: 2}
+  m_PrefabInternal: {fileID: 1002213147}
 --- !u!114 &1313045318 stripped
 MonoBehaviour:
   m_PrefabParentObject: {fileID: 114182007959914852, guid: 35e76f6e52f5c4252a0b703cc2019a37,

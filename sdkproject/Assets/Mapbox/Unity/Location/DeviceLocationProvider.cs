@@ -17,6 +17,7 @@ namespace Mapbox.Unity.Location
 		/// Values like 5-10 could be used for getting best accuracy.
 		/// </summary>
 		[SerializeField]
+		[Tooltip("Using higher value like 500 usually does not require to turn GPS chip on and thus saves battery power. Values like 5-10 could be used for getting best accuracy.")]
 		float _desiredAccuracyInMeters = 5f;
 
 		/// <summary>
@@ -24,6 +25,7 @@ namespace Mapbox.Unity.Location
 		/// Higher values like 500 imply less overhead.
 		/// </summary>
 		[SerializeField]
+		[Tooltip("The minimum distance (measured in meters) a device must move laterally before Input.location property is updated. Higher values like 500 imply less overhead.")]
 		float _updateDistanceInMeters = 5f;
 
 		Coroutine _pollRoutine;
@@ -32,11 +34,11 @@ namespace Mapbox.Unity.Location
 
 		double _lastHeadingTimestamp;
 
-		WaitForSeconds _wait;
+		WaitForSeconds _wait1sec;
 
 		void Awake()
 		{
-			_wait = new WaitForSeconds(1f);
+			_wait1sec = new WaitForSeconds(1f);
 			if (_pollRoutine == null)
 			{
 				_pollRoutine = StartCoroutine(PollLocationRoutine());
@@ -52,7 +54,10 @@ namespace Mapbox.Unity.Location
 		IEnumerator PollLocationRoutine()
 		{
 #if UNITY_EDITOR
-			yield return new WaitWhile(() => !UnityEditor.EditorApplication.isRemoteConnected);
+			while (!UnityEditor.EditorApplication.isRemoteConnected)
+			{
+				yield return null;
+			}
 #endif
 			if (!Input.location.isEnabledByUser)
 			{
@@ -66,7 +71,7 @@ namespace Mapbox.Unity.Location
 			int maxWait = 20;
 			while (Input.location.status == LocationServiceStatus.Initializing && maxWait > 0)
 			{
-				yield return _wait;
+				yield return _wait1sec;
 				maxWait--;
 			}
 
@@ -85,8 +90,13 @@ namespace Mapbox.Unity.Location
 #if UNITY_EDITOR
 			// HACK: this is to prevent Android devices, connected through Unity Remote, 
 			// from reporting a location of (0, 0), initially.
-			yield return _wait;
+			yield return _wait1sec;
 #endif
+
+			float gpsInitializedTime = Time.realtimeSinceStartup;
+			// initially pass through all GPS locations
+			float gpsWarmupTime = 60f;
+
 			while (true)
 			{
 				_currentLocation.IsHeadingUpdated = false;
@@ -97,6 +107,8 @@ namespace Mapbox.Unity.Location
 				{
 					var heading = Input.compass.trueHeading;
 					_currentLocation.Heading = heading;
+					_currentLocation.HeadingMagnetic = Input.compass.magneticHeading;
+					_currentLocation.HeadingAccuracy = Input.compass.headingAccuracy;
 					_lastHeadingTimestamp = timestamp;
 
 					_currentLocation.IsHeadingUpdated = true;
@@ -104,7 +116,11 @@ namespace Mapbox.Unity.Location
 
 				var lastData = Input.location.lastData;
 				timestamp = lastData.timestamp;
-				if (Input.location.status == LocationServiceStatus.Running && timestamp > _lastLocationTimestamp)
+
+				if (1!=2 ||
+					(Input.location.status == LocationServiceStatus.Running && timestamp > _lastLocationTimestamp)
+					|| Time.realtimeSinceStartup < gpsInitializedTime + gpsWarmupTime
+				)
 				{
 					_currentLocation.LatitudeLongitude = new Vector2d(lastData.latitude, lastData.longitude);
 					_currentLocation.Accuracy = (int)lastData.horizontalAccuracy;
@@ -116,10 +132,15 @@ namespace Mapbox.Unity.Location
 
 				if (_currentLocation.IsHeadingUpdated || _currentLocation.IsLocationUpdated)
 				{
-					SendLocation(_currentLocation);
+					if (_currentLocation.LatitudeLongitude != Vector2d.zero)
+					{
+						SendLocation(_currentLocation);
+					}
 				}
 
-				yield return null;
+				// throttle pulling location data
+				// some Android devices show higher than actual accuracy values when not throttling
+				yield return _wait1sec;
 			}
 		}
 	}
