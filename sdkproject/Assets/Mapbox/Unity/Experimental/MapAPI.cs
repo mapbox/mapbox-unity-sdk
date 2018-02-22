@@ -907,13 +907,13 @@
 			//terrainFactory._mapId = "mapbox.terrain-rgb";
 
 
-			//var mapVectorLayer = new VectorLayer();
-			//mapVectorLayer.Initialize(_vectorLayerProperties);
+			var mapVectorLayer = new VectorLayer();
+			mapVectorLayer.Initialize(_vectorLayerProperties);
 			_mapVisualizer.Factories = new List<AbstractTileFactory>
 			{
 				mapElevationLayer.ElevationFactory,
 				mapImageryLayers.ImageFactory,
-				//mapVectorLayer.VectorFactory
+				mapVectorLayer.VectorFactory
 			};
 
 			_map.TileProvider = _tileProvider;

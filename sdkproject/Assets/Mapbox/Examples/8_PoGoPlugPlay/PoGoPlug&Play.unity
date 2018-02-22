@@ -285,6 +285,21 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
+        type: 2}
+      propertyPath: _vectorLayerProperties.vectorSubLayers.Array.data[0].modifierOptions.MeshModifiers.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
+        type: 2}
+      propertyPath: _vectorLayerProperties.vectorSubLayers.Array.data[0].materialOptions.materials.Array.data[0].Materials.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
+        type: 2}
+      propertyPath: _vectorLayerProperties.vectorSubLayers.Array.data[0].materialOptions.materials.Array.data[1].Materials.Array.size
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4250630666028124, guid: 5d9d70850bf0149cdaf6854751efd25d, type: 2}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -322,6 +337,51 @@ Prefab:
       propertyPath: _mapOptions.placementOptions.extentOptions.cameraBoundsOptions.camera
       value: 
       objectReference: {fileID: 1130064238}
+    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
+        type: 2}
+      propertyPath: _vectorLayerProperties.defaultStylingOptions.isExtruded
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
+        type: 2}
+      propertyPath: _vectorLayerProperties.vectorSubLayers.Array.data[0].extrusionOptions.extrusionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
+        type: 2}
+      propertyPath: _vectorLayerProperties.vectorSubLayers.Array.data[0].extrusionOptions.propertyName
+      value: height
+      objectReference: {fileID: 0}
+    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
+        type: 2}
+      propertyPath: _vectorLayerProperties.vectorSubLayers.Array.data[0].materialOptions.materials.Array.data[0].Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8403131cbac7ff94b9052e03e29b30c9, type: 2}
+    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
+        type: 2}
+      propertyPath: _vectorLayerProperties.vectorSubLayers.Array.data[0].materialOptions.materials.Array.data[1].Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: caa6c6f6f7879034992a27a6bc3794fd, type: 2}
+    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
+        type: 2}
+      propertyPath: _vectorLayerProperties.performanceOptions.isEnabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
+        type: 2}
+      propertyPath: _vectorLayerProperties.vectorSubLayers.Array.data[0].extrusionOptions.maximumHeight
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
+        type: 2}
+      propertyPath: _vectorLayerProperties.vectorSubLayers.Array.data[0].extrusionOptions.extrusionGeometryType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
+        type: 2}
+      propertyPath: _vectorLayerProperties.vectorSubLayers.Array.data[0].coreOptions.groupFeatures
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5d9d70850bf0149cdaf6854751efd25d, type: 2}
   m_IsPrefabParent: 0

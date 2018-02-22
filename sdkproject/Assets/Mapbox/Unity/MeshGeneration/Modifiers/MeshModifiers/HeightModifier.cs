@@ -43,7 +43,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
-		private int _counter;
+		private int _counter = 0;
 
 		class MinMaxPair
 		{
@@ -145,10 +145,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			var max = md.Vertices[0].y;
 			var min = md.Vertices[0].y;
-			_counter = md.Vertices.Count;
+
 
 			if (_options.extrusionGeometryType != ExtrusionGeometryType.SideOnly)
 			{
+				_counter = md.Vertices.Count;
 				switch (_options.extrusionType)
 				{
 					case ExtrusionType.None:
