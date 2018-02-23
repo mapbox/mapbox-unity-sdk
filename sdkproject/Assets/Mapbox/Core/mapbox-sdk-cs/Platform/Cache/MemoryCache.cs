@@ -15,11 +15,17 @@ namespace Mapbox.Platform.Cache
 		// TODO: add support for disposal strategy (timestamp, distance, etc.)
 		public MemoryCache(uint maxCacheSize)
 		{
+#if MAPBOX_DEBUG_CACHE
+			_className = this.GetType().Name;
+#endif
 			_maxCacheSize = maxCacheSize;
 			_cachedResponses = new Dictionary<string, CacheItem>();
 		}
 
 
+#if MAPBOX_DEBUG_CACHE
+		private string _className;
+#endif
 		private uint _maxCacheSize;
 		private object _lock = new object();
 		private Dictionary<string, CacheItem> _cachedResponses;
@@ -55,6 +61,11 @@ namespace Mapbox.Platform.Cache
 		public CacheItem Get(string mapId, CanonicalTileId tileId)
 		{
 			string key = mapId + "||" + tileId;
+
+#if MAPBOX_DEBUG_CACHE
+			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
+			UnityEngine.Debug.LogFormat("{0} {1}", methodName, key);
+#endif
 
 			lock (_lock)
 			{

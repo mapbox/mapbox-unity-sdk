@@ -1,20 +1,24 @@
 ﻿namespace Mapbox.Platform.MbTiles
 {
 
+	using Mapbox.Map;
+	using Mapbox.Platform.Cache;
+	using Mapbox.Utils;
+	using SQLite4Unity3d;
 	using System;
 	using System.Collections.Generic;
 	using System.IO;
 	using System.Linq;
-	using SQLite4Unity3d;
-	using Mapbox.Utils;
 	using UnityEngine;
-	using Mapbox.Map;
-	using Mapbox.Platform.Cache;
 
 	public class MbTilesDb : IDisposable
 	{
 
 
+#if MAPBOX_DEBUG_CACHE
+		private string _className;
+#endif
+		private string _tileset;
 		private bool _disposed;
 		private string _dbPath;
 		private SQLiteConnection _sqlite;
@@ -27,8 +31,11 @@
 
 		public MbTilesDb(string tileset, uint? maxTileCount = null)
 		{
-
-			openOrCreateDb(tileset);
+#if MAPBOX_DEBUG_CACHE
+			_className = this.GetType().Name;
+#endif
+			_tileset = tileset;
+			openOrCreateDb(_tileset);
 			_maxTileCount = maxTileCount;
 
 			//hrmpf: multiple PKs not supported by sqlite.net
@@ -102,7 +109,7 @@ lastmodified INTEGER,
 		}
 
 
-		#region idisposable
+#region idisposable
 
 
 		~MbTilesDb()
@@ -134,7 +141,7 @@ lastmodified INTEGER,
 		}
 
 
-		#endregion
+#endregion
 
 
 		private void openOrCreateDb(string dbName)
@@ -177,15 +184,27 @@ lastmodified INTEGER,
 
 		public void AddTile(CanonicalTileId tileId, CacheItem item, bool update = false)
 		{
-			_sqlite.InsertOrReplace(new tiles
+
+#if MAPBOX_DEBUG_CACHE
+			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
+			UnityEngine.Debug.LogFormat("{0} {1} {2} update:{3}", methodName, _tileset, tileId, update);
+#endif
+			try
 			{
-				zoom_level = tileId.Z,
-				tile_column = tileId.X,
-				tile_row = tileId.Y,
-				tile_data = item.Data,
-				timestamp = (int)UnixTimestampUtils.To(DateTime.Now),
-				etag = item.ETag
-			});
+				_sqlite.InsertOrReplace(new tiles
+				{
+					zoom_level = tileId.Z,
+					tile_column = tileId.X,
+					tile_row = tileId.Y,
+					tile_data = item.Data,
+					timestamp = (int)UnixTimestampUtils.To(DateTime.Now),
+					etag = item.ETag
+				});
+			}
+			catch (Exception ex)
+			{
+				Debug.LogErrorFormat("Error inserting {0} {1} {2} ", _tileset, tileId, ex);
+			}
 
 			// update counter only when new tile gets inserted
 			if (!update)
@@ -210,10 +229,22 @@ lastmodified INTEGER,
 
 			long toDelete = tileCnt - _maxTileCount.Value;
 
-			// no 'ORDER BY' or 'LIMIT' possible if sqlite hasn't been compiled with 'SQLITE_ENABLE_UPDATE_DELETE_LIMIT'
-			// https://sqlite.org/compile.html#enable_update_delete_limit
-			// int rowsAffected = _sqlite.Execute("DELETE FROM tiles ORDER BY timestamp ASC LIMIT ?", toDelete);
-			_sqlite.Execute("DELETE FROM tiles WHERE rowid IN ( SELECT rowid FROM tiles ORDER BY timestamp ASC LIMIT ? );", toDelete);
+#if MAPBOX_DEBUG_CACHE
+			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
+			Debug.LogFormat("{0} {1} about to prune()", methodName, _tileset);
+#endif
+
+			try
+			{
+				// no 'ORDER BY' or 'LIMIT' possible if sqlite hasn't been compiled with 'SQLITE_ENABLE_UPDATE_DELETE_LIMIT'
+				// https://sqlite.org/compile.html#enable_update_delete_limit
+				// int rowsAffected = _sqlite.Execute("DELETE FROM tiles ORDER BY timestamp ASC LIMIT ?", toDelete);
+				_sqlite.Execute("DELETE FROM tiles WHERE rowid IN ( SELECT rowid FROM tiles ORDER BY timestamp ASC LIMIT ? );", toDelete);
+			}
+			catch (Exception ex)
+			{
+				Debug.LogErrorFormat("error pruning: {0}", ex);
+			}
 		}
 
 
@@ -224,11 +255,24 @@ lastmodified INTEGER,
 		/// <returns>tile data as byte[], if tile is not cached returns null</returns>
 		public CacheItem GetTile(CanonicalTileId tileId)
 		{
-			tiles tile = _sqlite
-				.Table<tiles>()
-				.Where(t => t.zoom_level == tileId.Z && t.tile_column == tileId.X && t.tile_row == tileId.Y)
-				.FirstOrDefault();
+#if MAPBOX_DEBUG_CACHE
+			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
+			Debug.LogFormat("{0} {1} {2}", methodName, _tileset, tileId);
+#endif
+			tiles tile = null;
 
+			try
+			{
+				tile = _sqlite
+					.Table<tiles>()
+					.Where(t => t.zoom_level == tileId.Z && t.tile_column == tileId.X && t.tile_row == tileId.Y)
+					.FirstOrDefault();
+			}
+			catch (Exception ex)
+			{
+				Debug.LogErrorFormat("error getting tile {1} {2} from cache{0}{3}", Environment.NewLine, _tileset, tileId, ex);
+				return null;
+			}
 			if (null == tile)
 			{
 				return null;
