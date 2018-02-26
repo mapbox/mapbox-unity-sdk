@@ -147,6 +147,12 @@ lastmodified INTEGER,
 		private void openOrCreateDb(string dbName)
 		{
 			_dbPath = Path.Combine(Application.persistentDataPath, "cache");
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_WSA
+			// 1. workaround the 260 character MAX_PATH path and file name limit by prepeding `\\?\`
+			//    see https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx#maxpath
+			// 2. use `GetFullPath` on that to sanitize the path: replaces `/` returned by `Application.persistentDataPath` with `\`
+			_dbPath = Path.GetFullPath(@"\\?\" + _dbPath);
+#endif
 			if (!Directory.Exists(_dbPath)) { Directory.CreateDirectory(_dbPath); }
 			_dbPath = Path.Combine(_dbPath, dbName);
 			_sqlite = new SQLiteConnection(_dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
