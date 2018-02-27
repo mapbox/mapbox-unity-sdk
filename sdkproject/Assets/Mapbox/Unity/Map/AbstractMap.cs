@@ -159,7 +159,7 @@ namespace Mapbox.Unity.Map
 			}
 			catch (Exception ex)
 			{
-				Debug.LogErrorFormat("AbstractMap.Awake: {0}", ex);
+				Debug.LogErrorFormat("AbstractMap.Awake EXCEPTION: {0}", ex);
 			}
 			finally
 			{

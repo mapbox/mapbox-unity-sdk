@@ -165,10 +165,17 @@ namespace Mapbox.Unity
 
 		void ConfigureTelemetry()
 		{
-			_telemetryLibrary = TelemetryFactory.GetTelemetryInstance();
-			_telemetryLibrary.Initialize(_configuration.AccessToken);
-			_telemetryLibrary.SetLocationCollectionState(GetTelemetryCollectionState());
-			_telemetryLibrary.SendTurnstile();
+			try
+			{
+				try { Debug.LogWarning("GetTelemetryInstance()"); _telemetryLibrary = TelemetryFactory.GetTelemetryInstance(); } catch (Exception ex) { Debug.LogErrorFormat("GetTelemetryInstance():{0}", ex); }
+				try { Debug.LogWarning("Initialize()"); _telemetryLibrary.Initialize(_configuration.AccessToken); } catch (Exception ex) { Debug.LogErrorFormat("Initialize():{0}", ex); }
+				try { Debug.LogWarning("SetLocationCollectionState()"); _telemetryLibrary.SetLocationCollectionState(GetTelemetryCollectionState()); } catch (Exception ex) { Debug.LogErrorFormat("SetLocationCollectionState():{0}", ex); }
+				try { Debug.LogWarning("SendTurnstile()"); _telemetryLibrary.SendTurnstile(); } catch (Exception ex) { Debug.LogErrorFormat("SendTurnstile():{0}", ex); }
+			}
+			catch (Exception ex)
+			{
+				Debug.LogErrorFormat("ConfigureTelemetry() EXCEPTION: {0}", ex);
+			}
 		}
 
 		public void SetLocationCollectionState(bool enable)
