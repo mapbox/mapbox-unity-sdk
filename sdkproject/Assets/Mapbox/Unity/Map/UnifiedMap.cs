@@ -53,10 +53,7 @@ namespace Mapbox.Unity.Map
 	{
 		public void SetUpPlacement(UnifiedMap map)
 		{
-			var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(map.CenterLatitudeLongitude, map.AbsoluteZoom));
-			map.SetCenterMercator(referenceTileRect.Center);
-
-			map.transform.localPosition = -Conversions.GeoToWorldPosition(map.CenterLatitudeLongitude.x, map.CenterLatitudeLongitude.y, map.CenterMercator, map.WorldRelativeScale).ToVector3xz();
+			map.SetCenterMercator(Conversions.LatLonToMeters(map.CenterLatitudeLongitude));
 		}
 	}
 
@@ -195,8 +192,13 @@ namespace Mapbox.Unity.Map
 		{
 			get
 			{
-				throw new NotImplementedException();
+				return CurrentOptions.locationOptions.zoom;
 			}
+		}
+
+		public void SetZoom(float zoom)
+		{
+			CurrentOptions.locationOptions.zoom = zoom;
 		}
 
 		public Transform Root
@@ -223,16 +225,6 @@ namespace Mapbox.Unity.Map
 			_worldRelativeScale = scale;
 		}
 		public event Action OnInitialized = delegate { };
-
-		//protected virtual void Awake()
-		//{
-		//	Debug.Log("Awake Called");
-		//}
-
-		//protected virtual void Start()
-		//{
-		//	InitializeMap(_currentOptions);
-		//}
 
 		// TODO: implement IDisposable, instead?
 		protected virtual void OnDestroy()
@@ -295,34 +287,61 @@ namespace Mapbox.Unity.Map
 			OnInitialized();
 		}
 
-		public virtual Vector2d WorldToGeoPosition(Vector3 realworldPoint)
-		{
-			return (transform.InverseTransformPoint(realworldPoint)).GetGeoPosition(CenterMercator, WorldRelativeScale);
-		}
-
 		public virtual Vector3 GeoToWorldPosition(Vector2d latitudeLongitude)
 		{
-			return transform.TransformPoint(Conversions.GeoToWorldPosition(latitudeLongitude, CenterMercator, WorldRelativeScale).ToVector3xz());
+			// For quadtree implementation of the map, the map scale needs to be compensated for. 
+			var scaleFactor = Mathf.Pow(2, (InitialZoom - AbsoluteZoom));
+
+			var worldPos = Conversions.GeoToWorldPosition(latitudeLongitude, CenterMercator, WorldRelativeScale * scaleFactor).ToVector3xz();
+			return Root.TransformPoint(worldPos);
 		}
 
+		public virtual Vector2d WorldToGeoPosition(Vector3 realworldPoint)
+		{
+			// For quadtree implementation of the map, the map scale needs to be compensated for. 
+			var scaleFactor = Mathf.Pow(2, (InitialZoom - AbsoluteZoom));
+
+			return (Root.InverseTransformPoint(realworldPoint)).GetGeoPosition(CenterMercator, WorldRelativeScale * scaleFactor);
+		}
 		public virtual void Initialize(Vector2d latLon, int zoom)
 		{
 			//_worldHeightFixed = false;
 			//_fileSource = MapboxAccess.Instance;
 
 		}
+
 		public virtual void UpdateMap(MapLocationOptions options)
 		{
+			float differenceInZoom = 0.0f;
+			if (Math.Abs(Zoom - options.zoom) > Constants.EpsilonFloatingPoint)
+			{
+				SetZoom(options.zoom);
+				differenceInZoom = Zoom - InitialZoom;
+			}
+			//Update center latitude longitude
+			var centerLatitudeLongitude = Conversions.StringToLatLon(options.latitudeLongitude);
+			double xDelta = centerLatitudeLongitude.x;
+			double zDelta = centerLatitudeLongitude.y;
 
+			xDelta = xDelta > 0 ? Mathd.Min(xDelta, Mapbox.Utils.Constants.LatitudeMax) : Mathd.Max(xDelta, -Mapbox.Utils.Constants.LatitudeMax);
+			zDelta = zDelta > 0 ? Mathd.Min(zDelta, Mapbox.Utils.Constants.LongitudeMax) : Mathd.Max(zDelta, -Mapbox.Utils.Constants.LongitudeMax);
+
+			//Set Center in Latitude Longitude and Mercator. 
+			SetCenterLatitudeLongitude(new Vector2d(xDelta, zDelta));
+			CurrentOptions.scalingOptions.scalingStrategy.SetUpScaling(this);
+
+			CurrentOptions.placementOptions.placementStrategy.SetUpPlacement(this);
+
+			//Scale the map accordingly.
+			if (Math.Abs(differenceInZoom) > Constants.EpsilonFloatingPoint)
+			{
+				Root.localScale = Vector3.one * Mathf.Pow(2, differenceInZoom);
+			}
 		}
+
 		public void ResetMap()
 		{
 			Initialize(Conversions.StringToLatLon(_currentOptions.locationOptions.latitudeLongitude), (int)_currentOptions.locationOptions.zoom);
-		}
-
-		public void SetZoom(float zoom)
-		{
-			throw new NotImplementedException();
 		}
 	}
 }

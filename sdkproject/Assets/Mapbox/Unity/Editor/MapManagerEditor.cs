@@ -10,7 +10,13 @@
 	[CanEditMultipleObjects]
 	public class MapManagerEditor : Editor
 	{
+		//public override void OnInspectorGUI()
+		//{
+		//	GUILayout.BeginVertical();
+		//	EditorGUILayout.PropertyField(serializedObject.FindProperty("_mapOptions"), new GUIContent("Map Options"));
 
+		//	GUILayout.EndVertical();
+		//}
 
 	}
 }

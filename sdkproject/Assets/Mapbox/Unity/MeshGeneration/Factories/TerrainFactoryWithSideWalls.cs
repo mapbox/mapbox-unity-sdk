@@ -67,6 +67,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				_elevationOptions.sourceOptions.layerSource.Id = value;
 			}
 		}
+
 		public override void SetOptions(LayerProperties options)
 		{
 			_elevationOptions = (ElevationLayerProperties)options;

@@ -91,7 +91,7 @@
 	{
 		None,
 		LowPolygonTerrain,
-		TerrainWithSideWalls,
+		Terrain,
 		// TODO : Might want to reconsider this option. 
 		GlobeTerrain
 	}
@@ -393,11 +393,13 @@
 	[Serializable]
 	public class CoreVectorLayerProperties
 	{
+		public bool isActive = true;
+		public string sublayerName = "untitled";
 		public VectorPrimitiveType geometryType = VectorPrimitiveType.Polygon;
-		public string layerName = "untitled";
+		public string layerName = "layerName";
 		public List<PropertyValuePair> propertyValuePairs;
+		public bool snapToTerrain = true;
 		public bool groupFeatures = false;
-
 	}
 
 	[Serializable]
@@ -435,7 +437,14 @@
 			}
 		}
 		public bool projectMapImagery;
-		public MaterialList[] materials;
+		public MaterialList[] materials = new MaterialList[2];
+
+		public GeometryMaterialOptions()
+		{
+			materials = new MaterialList[2];
+			materials[0] = new MaterialList();
+			materials[1] = new MaterialList();
+		}
 	}
 
 	[Serializable]
@@ -452,7 +461,7 @@
 	{
 		public CoreVectorLayerProperties coreOptions;
 		public GeometryExtrusionOptions extrusionOptions;
-		public GeometryMaterialOptions materialOptions;
+		public GeometryMaterialOptions materialOptions = new GeometryMaterialOptions();
 		//public GeometryStylingOptions stylingOptions;
 		public LayerModifierOptions modifierOptions;
 	}
@@ -622,8 +631,17 @@
 				case ElevationLayerType.LowPolygonTerrain:
 					_elevationFactory = ScriptableObject.CreateInstance<LowPolyTerrainFactory>();
 					break;
-				case ElevationLayerType.TerrainWithSideWalls:
-					_elevationFactory = ScriptableObject.CreateInstance<TerrainWithSideWallsFactory>();
+				case ElevationLayerType.Terrain:
+					if (elevationLayerProperties.sideWallOptions.isActive)
+					{
+						_elevationFactory = ScriptableObject.CreateInstance<TerrainWithSideWallsFactory>();
+					}
+					else
+					{
+						Debug.Log("Setting Terrain Factory");
+						_elevationFactory = ScriptableObject.CreateInstance<TerrainFactory>();
+					}
+
 					break;
 				case ElevationLayerType.GlobeTerrain:
 					_elevationFactory = ScriptableObject.CreateInstance<FlatSphereTerrainFactory>();
@@ -710,7 +728,7 @@
 		public void Initialize(LayerProperties properties)
 		{
 			var imageLayerProperties = (ImageryLayerProperties)properties;
-			if (imageLayerProperties.sourceType != ImagerySourceType.Custom || imageLayerProperties.sourceType != ImagerySourceType.None)
+			if (imageLayerProperties.sourceType != ImagerySourceType.Custom && imageLayerProperties.sourceType != ImagerySourceType.None)
 			{
 				imageLayerProperties.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(imageLayerProperties.sourceType);
 			}
@@ -807,6 +825,7 @@
 	{
 		protected UnifiedMap _map;
 		protected AbstractTileProvider _tileProvider;
+		protected AbstractMapVisualizer _mapVisualizer;
 		//protected AbstractTileFactory _elevationLayer;
 
 		[SerializeField]
@@ -864,7 +883,7 @@
 					break;
 			}
 
-			_map = gameObject.AddComponent<UnifiedMap>();
+
 			_map.OnInitialized += SendInitialized;
 
 			ITileProviderOptions tileProviderOptions = _mapOptions.placementOptions.extentOptions.GetTileProviderOptions();
@@ -894,8 +913,6 @@
 			_tileProvider.SetOptions(tileProviderOptions);
 
 
-			// Setup a visualizer to get a "Starter" map.
-			var _mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
 
 			var mapImageryLayers = new ImageryLayer();
 			mapImageryLayers.Initialize(_imageryLayerProperties);
@@ -921,12 +938,16 @@
 
 			_map.InitializeMap(_mapOptions);
 
+			Debug.Log("Setup 2DMap done. ");
 		}
 
 
 		// Use this for initialization
 		void Start()
 		{
+			_map = gameObject.AddComponent<UnifiedMap>();
+			// Setup a visualizer to get a "Starter" map.
+			_mapVisualizer = ScriptableObject.CreateInstance<QuadTreeMapVisualizer>();
 
 			switch (_mapOptions.placementOptions.visualizationType)
 			{

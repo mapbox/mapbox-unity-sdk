@@ -17,6 +17,8 @@
 		IList<int> selectedLayers = new List<int>();
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			var labelBoldStyle = new GUIStyle { fontStyle = FontStyle.Bold };
+			var labelItalicCenteredStyle = new GUIStyle { fontStyle = FontStyle.Italic };
 
 			EditorGUI.BeginProperty(position, label, property);
 			position.height = lineHeight;
@@ -26,30 +28,29 @@
 			if (showPosition)
 			{
 				EditorGUI.indentLevel++;
-				position.y += lineHeight;
-				EditorGUI.PropertyField(position, property.FindPropertyRelative("sourceOptions"), new GUIContent("Source Option"));
-				position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sourceOptions"));
-				EditorGUI.PropertyField(position, property.FindPropertyRelative("performanceOptions"), new GUIContent("Perfomance Option"));
 
-				//GUILayout.Space(EditorGUIUtility.singleLineHeight);
+				EditorGUILayout.PropertyField(property.FindPropertyRelative("sourceOptions"), new GUIContent("Source Option"));
+				position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sourceOptions"));
+
+				EditorGUILayout.PropertyField(property.FindPropertyRelative("performanceOptions"), new GUIContent("Perfomance Option"));
 				position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("performanceOptions"));
 
-				var labelBoldStyle = new GUIStyle { fontStyle = FontStyle.Bold };
-				var labelItalicCenteredStyle = new GUIStyle { fontStyle = FontStyle.Italic };
-				EditorGUI.LabelField(position, "Layers", labelBoldStyle);
-				position.y += lineHeight;
+				GUILayout.Label("Visualizer Stack");
+
 				var subLayerArray = property.FindPropertyRelative("vectorSubLayers");
-				//Debug.Log("Array size : " + subLayerArray.arraySize);
-				var testRect = new Rect(position.x, position.y, position.width, (subLayerArray.arraySize + 1) * lineHeight);
+				var layersRect = GUILayoutUtility.GetRect(0, 500, Mathf.Max(subLayerArray.arraySize + 1, 1) * lineHeight, (subLayerArray.arraySize + 1) * lineHeight);
 
 
 				layerTreeView.Layers = subLayerArray;
 				layerTreeView.Reload();
-				layerTreeView.OnGUI(testRect);
+				layerTreeView.OnGUI(layersRect);
 
 				selectedLayers = layerTreeView.GetSelection();
-				GUILayout.BeginVertical();//
+
+				GUILayout.Space(EditorGUIUtility.singleLineHeight);
+
 				GUILayout.BeginHorizontal();
+
 				if (GUILayout.Button("Add Layer"))
 				{
 					//subLayerArray.arraySize++;
@@ -68,7 +69,9 @@
 					selectedLayers = new int[0];
 					layerTreeView.SetSelection(selectedLayers);
 				}
+
 				GUILayout.EndHorizontal();
+
 				GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
 				if (selectedLayers.Count == 1)
@@ -78,47 +81,51 @@
 					var layerProperty = subLayerArray.GetArrayElementAtIndex(index);
 
 					layerProperty.isExpanded = true;
-					position.y += (subLayerArray.arraySize + 3) * lineHeight;
-					EditorGUI.LabelField(position, "Layers Properties", labelBoldStyle);
-					position.y += lineHeight;
-					EditorGUI.PropertyField(position, layerProperty.FindPropertyRelative("coreOptions"), new GUIContent("Core Options"));
-					position.y += (EditorGUI.GetPropertyHeight(layerProperty.FindPropertyRelative("coreOptions")));
-					EditorGUI.PropertyField(position, layerProperty.FindPropertyRelative("extrusionOptions"));
-					position.y += (EditorGUI.GetPropertyHeight(layerProperty.FindPropertyRelative("extrusionOptions")));
-					EditorGUI.PropertyField(position, layerProperty.FindPropertyRelative("materialOptions"));
-					position.y += (EditorGUI.GetPropertyHeight(layerProperty.FindPropertyRelative("materialOptions")));
-					EditorGUI.PropertyField(position, layerProperty.FindPropertyRelative("modifierOptions"), new GUIContent("Modifier Options"));
+					//position.y += (subLayerArray.arraySize + 3) * lineHeight;
+					GUILayout.Label("Visualizer Stack Properties");
+					GUILayout.BeginVertical();
+
+					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("coreOptions"), new GUIContent("Core Options"));
+
+					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
+
+					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
+
+					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("modifierOptions"), new GUIContent("Modifier Options"));
+
+					GUILayout.EndVertical();
 				}
 				else
 				{
 					GUILayout.Label("Select a layer to see properties", labelItalicCenteredStyle);
 				}
-				GUILayout.EndVertical();
+
+				EditorGUI.indentLevel--;
 			}
 
 			EditorGUI.EndProperty();
 		}
 
-		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-		{
-			float height = 0.0f;
-			if (showPosition)
-			{
-				var subLayers = property.FindPropertyRelative("vectorSubLayers");
-				height += (4.0f * lineHeight);
-				height += (subLayers.arraySize) * lineHeight;
-				height += (selectedLayers.Count == 1) ? EditorGUI.GetPropertyHeight(subLayers.GetArrayElementAtIndex(selectedLayers[0]).FindPropertyRelative("coreOptions")) : lineHeight;
-				height += (selectedLayers.Count == 1) ? EditorGUI.GetPropertyHeight(subLayers.GetArrayElementAtIndex(selectedLayers[0]).FindPropertyRelative("modifierOptions")) : lineHeight;
-				height += (selectedLayers.Count == 1) ? EditorGUI.GetPropertyHeight(subLayers.GetArrayElementAtIndex(selectedLayers[0]).FindPropertyRelative("extrusionOptions")) : lineHeight;
-				height += (selectedLayers.Count == 1) ? EditorGUI.GetPropertyHeight(subLayers.GetArrayElementAtIndex(selectedLayers[0]).FindPropertyRelative("materialOptions")) : lineHeight;
-				height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("performanceOptions"));
-				height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sourceOptions"));
-			}
-			else
-			{
-				height = EditorGUIUtility.singleLineHeight;
-			}
-			return height;
-		}
+		//public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+		//{
+		//	float height = 0.0f;
+		//	if (showPosition)
+		//	{
+		//		var subLayers = property.FindPropertyRelative("vectorSubLayers");
+		//		height += (1.0f * lineHeight);
+		//		//height += (subLayers.arraySize) * lineHeight;
+		//		height += (selectedLayers.Count == 1) ? EditorGUI.GetPropertyHeight(subLayers.GetArrayElementAtIndex(selectedLayers[0]).FindPropertyRelative("coreOptions")) : lineHeight;
+		//		//height += (selectedLayers.Count == 1) ? EditorGUI.GetPropertyHeight(subLayers.GetArrayElementAtIndex(selectedLayers[0]).FindPropertyRelative("modifierOptions")) : lineHeight;
+		//		height += (selectedLayers.Count == 1) ? EditorGUI.GetPropertyHeight(subLayers.GetArrayElementAtIndex(selectedLayers[0]).FindPropertyRelative("extrusionOptions")) : lineHeight;
+		//		////height += (selectedLayers.Count == 1) ? EditorGUI.GetPropertyHeight(subLayers.GetArrayElementAtIndex(selectedLayers[0]).FindPropertyRelative("materialOptions")) : lineHeight;
+		//		//height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("performanceOptions"));
+		//		//height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sourceOptions"));
+		//	}
+		//	else
+		//	{
+		//		height = EditorGUIUtility.singleLineHeight;
+		//	}
+		//	return height;
+		//}
 	}
 }

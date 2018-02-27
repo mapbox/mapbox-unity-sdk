@@ -31,7 +31,7 @@
 			{
 				for (int i = 0; i < Layers.arraySize; i++)
 				{
-					var name = Layers.GetArrayElementAtIndex(i).FindPropertyRelative("coreOptions.layerName").stringValue;
+					var name = Layers.GetArrayElementAtIndex(i).FindPropertyRelative("coreOptions.sublayerName").stringValue;
 					//Debug.Log(name);
 					items.Add(new TreeViewItem { id = index, depth = 0, displayName = name });
 					index++;
@@ -66,7 +66,7 @@
 				//var layer = Layers[args.itemID]; //
 				//layer = args.newName;
 				var layer = Layers.GetArrayElementAtIndex(args.itemID);
-				layer.FindPropertyRelative("layerName").stringValue = args.newName;
+				layer.FindPropertyRelative("coreOptions.sublayerName").stringValue = args.newName;
 			}
 		}
 	}

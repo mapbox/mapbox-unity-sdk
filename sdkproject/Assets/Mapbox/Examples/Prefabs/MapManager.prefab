@@ -20,6 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4250630666028124}
   - component: {fileID: 114760888210307728}
+  - component: {fileID: 114925302620512902}
   m_Layer: 0
   m_Name: MapManager
   m_TagString: Untagged
@@ -54,19 +55,19 @@ MonoBehaviour:
   _mapOptions:
     locationOptions:
       latitudeLongitude: 37.784179, -122.401583
-      zoom: 16
+      zoom: 14.8
       coordinateSystemType: 0
     placementOptions:
       visualizationType: 0
       placementType: 1
-      streamingType: 1
+      streamingType: 0
       extentOptions:
         extentType: 0
         cameraBoundsOptions:
           camera: {fileID: 0}
           visibleBuffer: 2
           disposeBuffer: 2
-          updateInterval: 5
+          updateInterval: 0
         rangeAroundCenterOptions:
           west: 2
           north: 2
@@ -85,13 +86,13 @@ MonoBehaviour:
     sourceOptions:
       isActive: 1
       layerSource:
-        Name: Streets
+        Name: 
         Id: mapbox://styles/mapbox/streets-v10
         Modified: 
         UserName: 
     rasterOptions:
       useCompression: 0
-      useRetina: 0
+      useRetina: 1
       useMipMap: 0
   _elevationLayerProperties:
     sourceOptions:
@@ -102,11 +103,11 @@ MonoBehaviour:
         Modified: 
         UserName: 
     elevationLayerOptions:
-      elevationLayerType: 0
+      elevationLayerType: 2
       baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
       sampleCount: 10
       addCollider: 0
-      exaggerationFactor: 1
+      exaggerationFactor: 10
       useRelativeHeight: 1
     unityLayerOptions:
       addToLayer: 0
@@ -114,43 +115,34 @@ MonoBehaviour:
     sideWallOptions:
       isActive: 0
       wallHeight: 10
-      wallMaterial: {fileID: 0}
+      wallMaterial: {fileID: 2100000, guid: aaa94592a6eb9c8418d32b37b10f288d, type: 2}
   _vectorLayerProperties:
     sourceOptions:
-      isActive: 1
+      isActive: 0
       layerSource:
         Name: 
         Id: mapbox.mapbox-streets-v7
         Modified: 
         UserName: 
     performanceOptions:
-      isEnabled: 0
+      isEnabled: 1
       entityPerCoroutine: 20
     defaultStylingOptions:
       isExtruded: 0
-    vectorSubLayers:
-    - coreOptions:
-        geometryType: 2
-        layerName: building
-        propertyValuePairs: []
-        groupFeatures: 0
-      extrusionOptions:
-        extrusionType: 0
-        extrusionGeometryType: 2
-        propertyName: 
-        minimumHeight: 0
-        maximumHeight: 0
-      materialOptions:
-        projectMapImagery: 0
-        materials:
-        - Materials:
-          - {fileID: 0}
-          - {fileID: 0}
-        - Materials: []
-      modifierOptions:
-        moveFeaturePositionTo: 0
-        MeshModifiers:
-        - {fileID: 0}
-        - {fileID: 0}
-        - {fileID: 0}
-        GoModifiers: []
+    vectorSubLayers: []
+--- !u!114 &114925302620512902
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1680838159437694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c699b8e1864b4b248acb7a04ede9480, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _panSpeed: 1
+  _zoomSpeed: 0.25
+  _referenceCamera: {fileID: 0}
+  _mapManager: {fileID: 114760888210307728}
+  _useDegreeMethod: 0

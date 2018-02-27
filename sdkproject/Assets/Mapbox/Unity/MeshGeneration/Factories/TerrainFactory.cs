@@ -7,6 +7,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Utils;
 	using System;
+	using Mapbox.Unity.Map;
 
 	public enum MapIdType
 	{
@@ -20,32 +21,33 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	[CreateAssetMenu(menuName = "Mapbox/Factories/Terrain Factory")]
 	public class TerrainFactory : AbstractTileFactory
 	{
-		[SerializeField]
-		private Material _baseMaterial = null;
-		[SerializeField]
-		private MapIdType _mapIdType;
+		//		[SerializeField]
+		//		private Material _baseMaterial = null;
+		//		[SerializeField]
+		//		private MapIdType _mapIdType;
 
-		[SerializeField]
-#pragma warning disable 0414
-		private string _customMapId = "mapbox.terrain-rgb";
-#pragma warning restore 0414
+		//		[SerializeField]
+		//#pragma warning disable 0414
+		//		private string _customMapId = "mapbox.terrain-rgb";
+		//#pragma warning restore 0414
 
-		[SerializeField]
-		private string _mapId = "";
-		[SerializeField]
-		public float _heightModifier = 1f;
-		[SerializeField]
-		[Range(2, 256)]
-		private int _sampleCount = 40;
-		[SerializeField]
-		private bool _addCollider = false;
-		[SerializeField]
-		private bool _addToLayer = false;
-		[SerializeField]
-		private int _layerId = 0;
-		[SerializeField]
-		bool _useRelativeHeight = true;
+		//[SerializeField]
+		//private string _mapId = "";
+		//[SerializeField]
+		//public float _heightModifier = 1f;
+		//[SerializeField]
+		//[Range(2, 256)]
+		//private int _sampleCount = 40;
+		//[SerializeField]
+		//private bool _addCollider = false;
+		//[SerializeField]
+		//private bool _addToLayer = false;
+		//[SerializeField]
+		//private int _layerId = 0;
+		//[SerializeField]
+		//bool _useRelativeHeight = true;
 
+		ElevationLayerProperties _elevationOptions;
 		Mesh _stitchTarget;
 
 		protected Dictionary<UnwrappedTileId, Mesh> _meshData;
@@ -64,13 +66,18 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			get
 			{
-				return _mapId;
+				return _elevationOptions.sourceOptions.layerSource.Id;
 			}
 
 			set
 			{
-				_mapId = value;
+				_elevationOptions.sourceOptions.layerSource.Id = value;
 			}
+		}
+
+		public override void SetOptions(LayerProperties options)
+		{
+			_elevationOptions = (ElevationLayerProperties)options;
 		}
 
 		/// <summary>
@@ -95,23 +102,24 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_meshData = new Dictionary<UnwrappedTileId, Mesh>();
 			_currentTileMeshData = new MeshData();
 			_stitchTargetMeshData = new MeshData();
-			_newVertexList = new List<Vector3>(_sampleCount * _sampleCount);
-			_newNormalList = new List<Vector3>(_sampleCount * _sampleCount);
-			_newUvList = new List<Vector2>(_sampleCount * _sampleCount);
+			var sampleCountSquare = _elevationOptions.elevationLayerOptions.sampleCount * _elevationOptions.elevationLayerOptions.sampleCount;
+			_newVertexList = new List<Vector3>(sampleCountSquare);
+			_newNormalList = new List<Vector3>(sampleCountSquare);
+			_newUvList = new List<Vector2>(sampleCountSquare);
 			_newTriangleList = new List<int>();
 		}
 
 		internal override void OnRegistered(UnityTile tile)
 		{
-			if (_addToLayer && tile.gameObject.layer != _layerId)
+			if (_elevationOptions.unityLayerOptions.addToLayer && tile.gameObject.layer != _elevationOptions.unityLayerOptions.layerId)
 			{
-				tile.gameObject.layer = _layerId;
+				tile.gameObject.layer = _elevationOptions.unityLayerOptions.layerId;
 			}
 
 			if (tile.MeshRenderer == null)
 			{
 				var renderer = tile.gameObject.AddComponent<MeshRenderer>();
-				renderer.material = _baseMaterial;
+				renderer.material = _elevationOptions.elevationLayerOptions.baseMaterial;
 			}
 
 			if (tile.MeshFilter == null)
@@ -120,7 +128,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				CreateBaseMesh(tile);
 			}
 
-			if (_addCollider && tile.Collider == null)
+			if (_elevationOptions.elevationLayerOptions.addCollider && tile.Collider == null)
 			{
 				tile.gameObject.AddComponent<MeshCollider>();
 			}
@@ -136,6 +144,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_newUvList.Clear();
 			_newTriangleList.Clear();
 
+			var _sampleCount = _elevationOptions.elevationLayerOptions.sampleCount;
 			for (float y = 0; y < _sampleCount; y++)
 			{
 				var yrat = y / (_sampleCount - 1);
@@ -200,13 +209,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			tile.AddTile(pngRasterTile);
 			Progress++;
 
-			pngRasterTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
+			pngRasterTile.Initialize(_fileSource, tile.CanonicalTileId, MapId, () =>
 			{
 				if (tile == null)
 				{
 					return;
 				}
-				
+
 				if (pngRasterTile.HasError)
 				{
 					OnErrorOccurred(new TileErrorEventArgs(tile.CanonicalTileId, pngRasterTile.GetType(), tile, pngRasterTile.Exceptions));
@@ -222,7 +231,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					return;
 				}
 
-				tile.SetHeightData(pngRasterTile.Data, _heightModifier, _useRelativeHeight);
+				tile.SetHeightData(pngRasterTile.Data, _elevationOptions.elevationLayerOptions.exaggerationFactor, _elevationOptions.elevationLayerOptions.useRelativeHeight);
 				GenerateTerrainMesh(tile);
 				Progress--;
 			});
@@ -248,6 +257,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			tile.MeshFilter.mesh.GetVertices(_currentTileMeshData.Vertices);
 			tile.MeshFilter.mesh.GetNormals(_currentTileMeshData.Normals);
 
+			var _sampleCount = _elevationOptions.elevationLayerOptions.sampleCount;
 			for (float y = 0; y < _sampleCount; y++)
 			{
 				for (float x = 0; x < _sampleCount; x++)
@@ -296,7 +306,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				_meshData.Add(tile.UnwrappedTileId, tile.MeshFilter.mesh);
 			}
 
-			if (_addCollider)
+			if (_elevationOptions.elevationLayerOptions.addCollider)
 			{
 				var meshCollider = tile.Collider as MeshCollider;
 				if (meshCollider)
@@ -334,6 +344,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// <param name="mesh"></param>
 		private void FixStitches(UnwrappedTileId tileId, MeshData mesh)
 		{
+			var _sampleCount = _elevationOptions.elevationLayerOptions.sampleCount;
 			var meshVertCount = mesh.Vertices.Count;
 			_stitchTarget = null;
 			_meshData.TryGetValue(tileId.North, out _stitchTarget);
