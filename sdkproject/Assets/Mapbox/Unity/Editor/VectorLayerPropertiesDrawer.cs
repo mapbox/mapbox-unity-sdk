@@ -57,7 +57,7 @@
 					subLayerArray.InsertArrayElementAtIndex(subLayerArray.arraySize);
 
 					var subLayer = subLayerArray.GetArrayElementAtIndex(subLayerArray.arraySize - 1);
-					var subLayerName = subLayer.FindPropertyRelative("coreOptions.layerName");
+					var subLayerName = subLayer.FindPropertyRelative("coreOptions.sublayerName");
 					subLayerName.stringValue = "Untitled";
 				}
 				if (GUILayout.Button("Remove Selected"))

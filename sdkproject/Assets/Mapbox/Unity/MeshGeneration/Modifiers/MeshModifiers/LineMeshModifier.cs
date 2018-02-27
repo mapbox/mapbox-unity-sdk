@@ -1,21 +1,21 @@
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
-    using System.Collections.Generic;
-    using UnityEngine;
-    using Mapbox.Unity.MeshGeneration.Data;
-    
-    /// <summary>
-    /// Line Mesh Modifier creates line polygons from a list of vertices. It offsets the original vertices to both sides using Width parameter and triangulates them manually.
-    /// It also creates tiled UV mapping using the line length.
-    /// MergeStartEnd parameter connects both edges of the line segment and creates a closed loop which is useful for some cases like pavements around a building block.
-    /// </summary>
-    [CreateAssetMenu(menuName = "Mapbox/Modifiers/Line Mesh Modifier")]
-    public class LineMeshModifier : MeshModifier
-    {
-        [SerializeField]
-        public float Width;
+	using System.Collections.Generic;
+	using UnityEngine;
+	using Mapbox.Unity.MeshGeneration.Data;
+
+	/// <summary>
+	/// Line Mesh Modifier creates line polygons from a list of vertices. It offsets the original vertices to both sides using Width parameter and triangulates them manually.
+	/// It also creates tiled UV mapping using the line length.
+	/// MergeStartEnd parameter connects both edges of the line segment and creates a closed loop which is useful for some cases like pavements around a building block.
+	/// </summary>
+	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Line Mesh Modifier")]
+	public class LineMeshModifier : MeshModifier
+	{
+		[SerializeField]
+		public float Width = 3.0f;
 		private float _scaledWidth;
-        public override ModifierType Type { get { return ModifierType.Preprocess; } }
+		public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
 		private void OnEnable()
 		{
@@ -100,7 +100,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					lineTri.Add(mdVertexCount + i);
 					lineTri.Add(mdVertexCount + i + 1);
 					lineTri.Add(mdVertexCount + 2 * n - 1 - i);
-								
+
 					lineTri.Add(mdVertexCount + i + 1);
 					lineTri.Add(mdVertexCount + 2 * n - i - 2);
 					lineTri.Add(mdVertexCount + 2 * n - i - 1);
@@ -113,24 +113,24 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		}
 
 		private Vector3 GetNormal(Vector3 p1, Vector3 newPos, Vector3 p2)
-        {
-            if (newPos == p1 || newPos == p2)
-            {
-                var n = (p2 - p1).normalized;
-                return new Vector3(-n.z, 0, n.x);
-            }
+		{
+			if (newPos == p1 || newPos == p2)
+			{
+				var n = (p2 - p1).normalized;
+				return new Vector3(-n.z, 0, n.x);
+			}
 
-            var b = (p2 - newPos).normalized + newPos;
-            var a = (p1 - newPos).normalized + newPos;
-            var t = (b - a).normalized;
+			var b = (p2 - newPos).normalized + newPos;
+			var a = (p1 - newPos).normalized + newPos;
+			var t = (b - a).normalized;
 
-            if (t == Mapbox.Unity.Constants.Math.Vector3Zero)
-            {
-                var n = (p2 - p1).normalized;
-                return new Vector3(-n.z, 0, n.x);
-            }
+			if (t == Mapbox.Unity.Constants.Math.Vector3Zero)
+			{
+				var n = (p2 - p1).normalized;
+				return new Vector3(-n.z, 0, n.x);
+			}
 
-            return new Vector3(-t.z, 0, t.x);
-        }
-    }
+			return new Vector3(-t.z, 0, t.x);
+		}
+	}
 }

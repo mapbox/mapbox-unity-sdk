@@ -20,7 +20,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4250630666028124}
   - component: {fileID: 114760888210307728}
-  - component: {fileID: 114925302620512902}
   m_Layer: 0
   m_Name: MapManager
   m_TagString: Untagged
@@ -52,97 +51,81 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7ad850d4898441a3ad3229e0de1fc20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mapOptions:
-    locationOptions:
-      latitudeLongitude: 37.784179, -122.401583
-      zoom: 14.8
-      coordinateSystemType: 0
-    placementOptions:
-      visualizationType: 0
-      placementType: 1
-      streamingType: 0
-      extentOptions:
-        extentType: 0
-        cameraBoundsOptions:
-          camera: {fileID: 0}
-          visibleBuffer: 2
-          disposeBuffer: 2
-          updateInterval: 0
-        rangeAroundCenterOptions:
-          west: 2
-          north: 2
-          east: 2
-          south: 2
-        rangeAroundTransformOptions:
-          targetTransform: {fileID: 0}
-          visibleBuffer: 0
-          disposeBuffer: 0
-    scalingOptions:
-      scalingType: 1
-      unitType: 0
-      unityToMercatorConversionFactor: 100
-  _imageryLayerProperties:
-    sourceType: 0
-    sourceOptions:
-      isActive: 1
-      layerSource:
-        Name: 
-        Id: mapbox://styles/mapbox/streets-v10
-        Modified: 
-        UserName: 
-    rasterOptions:
-      useCompression: 0
-      useRetina: 1
-      useMipMap: 0
-  _elevationLayerProperties:
-    sourceOptions:
-      isActive: 1
-      layerSource:
-        Name: 
-        Id: mapbox.terrain-rgb
-        Modified: 
-        UserName: 
-    elevationLayerOptions:
-      elevationLayerType: 2
-      baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
-      sampleCount: 10
-      addCollider: 0
-      exaggerationFactor: 10
-      useRelativeHeight: 1
-    unityLayerOptions:
-      addToLayer: 0
-      layerId: 0
-    sideWallOptions:
-      isActive: 0
-      wallHeight: 10
-      wallMaterial: {fileID: 2100000, guid: aaa94592a6eb9c8418d32b37b10f288d, type: 2}
-  _vectorLayerProperties:
-    sourceOptions:
-      isActive: 0
-      layerSource:
-        Name: 
-        Id: mapbox.mapbox-streets-v7
-        Modified: 
-        UserName: 
-    performanceOptions:
-      isEnabled: 1
-      entityPerCoroutine: 20
-    defaultStylingOptions:
-      isExtruded: 0
-    vectorSubLayers: []
---- !u!114 &114925302620512902
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1680838159437694}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c699b8e1864b4b248acb7a04ede9480, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _panSpeed: 1
-  _zoomSpeed: 0.25
-  _referenceCamera: {fileID: 0}
-  _mapManager: {fileID: 114760888210307728}
-  _useDegreeMethod: 0
+  _unifiedMapOptions:
+    mapOptions:
+      locationOptions:
+        latitudeLongitude: 37.784179, -122.401583
+        zoom: 16
+        coordinateSystemType: 0
+      placementOptions:
+        visualizationType: 0
+        placementType: 1
+        extentOptions:
+          extentType: 0
+          cameraBoundsOptions:
+            camera: {fileID: 0}
+            visibleBuffer: 0
+            disposeBuffer: 0
+            updateInterval: 0
+          rangeAroundCenterOptions:
+            west: 0
+            north: 0
+            east: 0
+            south: 0
+          rangeAroundTransformOptions:
+            targetTransform: {fileID: 0}
+            visibleBuffer: 0
+            disposeBuffer: 0
+      scalingOptions:
+        scalingType: 1
+        unitType: 0
+        unityToMercatorConversionFactor: 100
+    imageryLayerProperties:
+      sourceType: 0
+      sourceOptions:
+        isActive: 1
+        layerSource:
+          Name: Streets
+          Id: mapbox://styles/mapbox/streets-v10
+          Modified: 
+          UserName: 
+      rasterOptions:
+        useCompression: 0
+        useRetina: 1
+        useMipMap: 0
+    elevationLayerProperties:
+      sourceOptions:
+        isActive: 1
+        layerSource:
+          Name: 
+          Id: mapbox.terrain-rgb
+          Modified: 
+          UserName: 
+      elevationLayerOptions:
+        elevationLayerType: 2
+        baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
+        sampleCount: 10
+        addCollider: 0
+        exaggerationFactor: 1
+        useRelativeHeight: 1
+      unityLayerOptions:
+        addToLayer: 0
+        layerId: 0
+      sideWallOptions:
+        isActive: 0
+        wallHeight: 10
+        wallMaterial: {fileID: 0}
+    vectorLayerProperties:
+      sourceOptions:
+        isActive: 0
+        layerSource:
+          Name: 
+          Id: mapbox.mapbox-streets-v7
+          Modified: 
+          UserName: 
+      performanceOptions:
+        isEnabled: 1
+        entityPerCoroutine: 20
+      defaultStylingOptions:
+        isExtruded: 0
+      vectorSubLayers: []

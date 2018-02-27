@@ -319,7 +319,7 @@
 	{
 		public MapVisualizationType visualizationType;
 		public MapPlacementType placementType;
-		public MapStreamingType streamingType;
+		//public MapStreamingType streamingType;
 		public MapExtentOptions extentOptions;
 
 		public IMapPlacementStrategy placementStrategy;
@@ -821,6 +821,15 @@
 		private VectorTileFactoryNew _vectorTileFactory;
 	}
 
+	[Serializable]
+	public class UnifiedMapOptions
+	{
+		public MapOptions mapOptions = new MapOptions();
+		public ImageryLayerProperties imageryLayerProperties = new ImageryLayerProperties();
+		public ElevationLayerProperties elevationLayerProperties = new ElevationLayerProperties();
+		public VectorLayerProperties vectorLayerProperties = new VectorLayerProperties();
+	}
+
 	public class MapAPI : MonoBehaviour
 	{
 		protected UnifiedMap _map;
@@ -829,16 +838,17 @@
 		//protected AbstractTileFactory _elevationLayer;
 
 		[SerializeField]
-		MapOptions _mapOptions = new MapOptions();
+		UnifiedMapOptions _unifiedMapOptions = new UnifiedMapOptions();
+		//MapOptions _mapOptions = new MapOptions();
 
-		[SerializeField]
-		ImageryLayerProperties _imageryLayerProperties = new ImageryLayerProperties();
+		//[SerializeField]
+		//ImageryLayerProperties _imageryLayerProperties = new ImageryLayerProperties();
 
-		[SerializeField]
-		ElevationLayerProperties _elevationLayerProperties = new ElevationLayerProperties();
+		//[SerializeField]
+		//ElevationLayerProperties _elevationLayerProperties = new ElevationLayerProperties();
 
-		[SerializeField]
-		VectorLayerProperties _vectorLayerProperties = new VectorLayerProperties();
+		//[SerializeField]
+		//VectorLayerProperties _vectorLayerProperties = new VectorLayerProperties();
 
 		public event Action OnInitialized = delegate { };
 
@@ -858,26 +868,26 @@
 
 		void SetUpFlat2DMap()
 		{
-			switch (_mapOptions.placementOptions.placementType)
+			switch (_unifiedMapOptions.mapOptions.placementOptions.placementType)
 			{
 				case MapPlacementType.AtTileCenter:
-					_mapOptions.placementOptions.placementStrategy = new MapPlacementAtTileCenterStrategy();
+					_unifiedMapOptions.mapOptions.placementOptions.placementStrategy = new MapPlacementAtTileCenterStrategy();
 					break;
 				case MapPlacementType.AtLocationCenter:
-					_mapOptions.placementOptions.placementStrategy = new MapPlacementAtLocationCenterStrategy();
+					_unifiedMapOptions.mapOptions.placementOptions.placementStrategy = new MapPlacementAtLocationCenterStrategy();
 					break;
 				default:
-					_mapOptions.placementOptions.placementStrategy = new MapPlacementAtTileCenterStrategy();
+					_unifiedMapOptions.mapOptions.placementOptions.placementStrategy = new MapPlacementAtTileCenterStrategy();
 					break;
 			}
 
-			switch (_mapOptions.scalingOptions.scalingType)
+			switch (_unifiedMapOptions.mapOptions.scalingOptions.scalingType)
 			{
 				case MapScalingType.WorldScale:
-					_mapOptions.scalingOptions.scalingStrategy = new MapScalingAtWorldScaleStrategy();
+					_unifiedMapOptions.mapOptions.scalingOptions.scalingStrategy = new MapScalingAtWorldScaleStrategy();
 					break;
 				case MapScalingType.Custom:
-					_mapOptions.scalingOptions.scalingStrategy = new MapScalingAtUnityScaleStrategy();
+					_unifiedMapOptions.mapOptions.scalingOptions.scalingStrategy = new MapScalingAtUnityScaleStrategy();
 					break;
 				default:
 					break;
@@ -886,19 +896,12 @@
 
 			_map.OnInitialized += SendInitialized;
 
-			ITileProviderOptions tileProviderOptions = _mapOptions.placementOptions.extentOptions.GetTileProviderOptions();
+			ITileProviderOptions tileProviderOptions = _unifiedMapOptions.mapOptions.placementOptions.extentOptions.GetTileProviderOptions();
 			// Setup tileprovider based on type. 
-			switch (_mapOptions.placementOptions.extentOptions.extentType)
+			switch (_unifiedMapOptions.mapOptions.placementOptions.extentOptions.extentType)
 			{
 				case MapExtentType.CameraBounds:
-					if (_mapOptions.placementOptions.streamingType == MapStreamingType.Zoomable)
-					{
-						_tileProvider = gameObject.AddComponent<QuadTreeTileProvider>();
-					}
-					else
-					{
-						_tileProvider = gameObject.AddComponent<CameraBoundsTileProvider>();
-					}
+					_tileProvider = gameObject.AddComponent<QuadTreeTileProvider>();
 					break;
 				case MapExtentType.RangeAroundCenter:
 					_tileProvider = gameObject.AddComponent<RangeTileProvider>();
@@ -915,17 +918,17 @@
 
 
 			var mapImageryLayers = new ImageryLayer();
-			mapImageryLayers.Initialize(_imageryLayerProperties);
+			mapImageryLayers.Initialize(_unifiedMapOptions.imageryLayerProperties);
 
 
 			var mapElevationLayer = new TerrainLayer();
-			mapElevationLayer.Initialize(_elevationLayerProperties);
+			mapElevationLayer.Initialize(_unifiedMapOptions.elevationLayerProperties);
 			//var terrainFactory = ScriptableObject.CreateInstance<TerrainWithSideWallsFactory>();
 			//terrainFactory._mapId = "mapbox.terrain-rgb";
 
 
 			var mapVectorLayer = new VectorLayer();
-			mapVectorLayer.Initialize(_vectorLayerProperties);
+			mapVectorLayer.Initialize(_unifiedMapOptions.vectorLayerProperties);
 			_mapVisualizer.Factories = new List<AbstractTileFactory>
 			{
 				mapElevationLayer.ElevationFactory,
@@ -936,7 +939,7 @@
 			_map.TileProvider = _tileProvider;
 			_map.MapVisualizer = _mapVisualizer;
 
-			_map.InitializeMap(_mapOptions);
+			_map.InitializeMap(_unifiedMapOptions.mapOptions);
 
 			Debug.Log("Setup 2DMap done. ");
 		}
@@ -949,7 +952,7 @@
 			// Setup a visualizer to get a "Starter" map.
 			_mapVisualizer = ScriptableObject.CreateInstance<QuadTreeMapVisualizer>();
 
-			switch (_mapOptions.placementOptions.visualizationType)
+			switch (_unifiedMapOptions.mapOptions.placementOptions.visualizationType)
 			{
 				case MapVisualizationType.Flat2D:
 					SetUpFlat2DMap();
@@ -960,8 +963,8 @@
 					break;
 			}
 
-			_vectorLayerProperties.vectorSubLayers = new List<VectorSubLayerProperties>();
-			_vectorLayerProperties.vectorSubLayers.Add(new VectorSubLayerProperties()
+			_unifiedMapOptions.vectorLayerProperties.vectorSubLayers = new List<VectorSubLayerProperties>();
+			_unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Add(new VectorSubLayerProperties()
 			{
 				coreOptions = new CoreVectorLayerProperties()
 				{

@@ -15,22 +15,10 @@
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
-			//EditorGUI.indentLevel++;
-			foreach (var item in property)
-			{
-				var subproperty = item as SerializedProperty;
-				position.height = lineHeight;
-				position.y += lineHeight;
-				EditorGUI.PropertyField(position, subproperty, true);
-			}
-			//EditorGUI.indentLevel--;
+			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("camera"));
+			position.y += lineHeight;
+			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("updateInterval"));
 			EditorGUI.EndProperty();
-		}
-		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-		{
-			// Reserve space for the total visible properties.
-			int rows = property.CountInProperty();
-			return (float)rows * lineHeight;
 		}
 	}
 
@@ -45,18 +33,12 @@
 			foreach (var item in property)
 			{
 				var subproperty = item as SerializedProperty;
+				EditorGUI.PropertyField(position, subproperty, true);
 				position.height = lineHeight;
 				position.y += lineHeight;
-				EditorGUI.PropertyField(position, subproperty, true);
 			}
 			//EditorGUI.indentLevel--;
 			EditorGUI.EndProperty();
-		}
-		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-		{
-			// Reserve space for the total visible properties.
-			int rows = property.CountInProperty();
-			return (float)rows * lineHeight;
 		}
 	}
 
@@ -72,18 +54,53 @@
 			foreach (var item in property)
 			{
 				var subproperty = item as SerializedProperty;
+				EditorGUI.PropertyField(position, subproperty, true);
 				position.height = lineHeight;
 				position.y += lineHeight;
-				EditorGUI.PropertyField(position, subproperty, true);
 			}
 			//EditorGUI.indentLevel--;
+			EditorGUI.EndProperty();
+		}
+	}
+
+
+	[CustomPropertyDrawer(typeof(MapPlacementOptions))]
+	public class MapPlacementOptionsDrawer : PropertyDrawer
+	{
+		static float lineHeight = EditorGUIUtility.singleLineHeight;
+		bool showPosition = true;
+
+		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+		{
+			EditorGUI.BeginProperty(position, label, property);
+
+			showPosition = EditorGUI.Foldout(new Rect(position.x, position.y, position.width, lineHeight), showPosition, label.text);
+			position.y += lineHeight;
+			//EditorGUI.indentLevel++;
+			if (showPosition)
+			{
+				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("placementType"), true);
+				position.y += lineHeight;
+				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("extentOptions"), true);
+				//EditorGUI.indentLevel--;
+			}
 			EditorGUI.EndProperty();
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
 			// Reserve space for the total visible properties.
-			int rows = property.CountInProperty();
-			return (float)rows * lineHeight;
+			float height = 0.0f;
+			if (showPosition)
+			{
+				height += (2.0f * lineHeight);
+				var extentOptionsProp = property.FindPropertyRelative("extentOptions");
+				height += EditorGUI.GetPropertyHeight(extentOptionsProp);
+			}
+			else
+			{
+				height = EditorGUIUtility.singleLineHeight;
+			}
+			return height;
 		}
 	}
 
