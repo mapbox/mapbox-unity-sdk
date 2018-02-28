@@ -247,26 +247,11 @@ Prefab:
       propertyPath: m_RootOrder
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 114539472779406036, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _referenceCamera
-      value: 
-      objectReference: {fileID: 1130064238}
     - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
         type: 2}
       propertyPath: _unifiedMapOptions.mapOptions.placementOptions.extentOptions.cameraBoundsOptions.camera
       value: 
       objectReference: {fileID: 1130064238}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].coreOptions.filters.Array.data[0].PropertyValue
-      value: conference_centre
-      objectReference: {fileID: 0}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _unifiedMapOptions.vectorLayerProperties.performanceOptions.isEnabled
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5d9d70850bf0149cdaf6854751efd25d, type: 2}
   m_IsPrefabParent: 0

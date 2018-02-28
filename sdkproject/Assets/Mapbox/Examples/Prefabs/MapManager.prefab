@@ -20,7 +20,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4250630666028124}
   - component: {fileID: 114760888210307728}
-  - component: {fileID: 114539472779406036}
   m_Layer: 0
   m_Name: MapManager
   m_TagString: Untagged
@@ -41,22 +40,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114539472779406036
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1680838159437694}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c699b8e1864b4b248acb7a04ede9480, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _panSpeed: 1
-  _zoomSpeed: 0.25
-  _referenceCamera: {fileID: 0}
-  _mapManager: {fileID: 114760888210307728}
-  _useDegreeMethod: 0
 --- !u!114 &114760888210307728
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -147,17 +130,22 @@ MonoBehaviour:
         isExtruded: 0
       vectorSubLayers:
       - coreOptions:
-          isActive: 0
+          isActive: 1
           sublayerName: MyBuilding
           geometryType: 2
           layerName: building
           filters:
           - Key: type
-            PropertyValue: school
+            PropertyValue: conference_centre
             Min: 0
             Max: 0
             filterOperator: 3
-          combinerType: 1
+          - Key: type
+            PropertyValue: parking
+            Min: 0
+            Max: 0
+            filterOperator: 3
+          combinerType: 0
           snapToTerrain: 1
           groupFeatures: 0
         extrusionOptions:
@@ -178,11 +166,16 @@ MonoBehaviour:
           MeshModifiers: []
           GoModifiers: []
       - coreOptions:
-          isActive: 0
+          isActive: 1
           sublayerName: MyRoads
           geometryType: 1
           layerName: road
-          filters: []
+          filters:
+          - Key: class
+            PropertyValue: primary
+            Min: 0
+            Max: 0
+            filterOperator: 3
           combinerType: 1
           snapToTerrain: 1
           groupFeatures: 1

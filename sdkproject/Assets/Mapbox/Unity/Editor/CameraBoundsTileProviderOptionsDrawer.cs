@@ -357,7 +357,6 @@
 				var featurePositionProperty = property.FindPropertyRelative("moveFeaturePositionTo");
 				featurePositionProperty.enumValueIndex = EditorGUI.Popup(typePosition, featurePositionProperty.enumValueIndex, featurePositionProperty.enumDisplayNames);
 
-				position.y += lineHeight;
 				EditorGUILayout.Space();
 				EditorGUILayout.LabelField("Mesh Modifiers");
 
@@ -368,7 +367,7 @@
 					var ind = i;
 					EditorGUILayout.BeginHorizontal();
 					EditorGUILayout.BeginVertical();
-					GUILayout.Space(5);
+					//GUILayout.Space(5);
 					meshfac.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(meshfac.GetArrayElementAtIndex(i).objectReferenceValue, typeof(MeshModifier), false) as ScriptableObject;
 					EditorGUILayout.EndVertical();
 					if (GUILayout.Button(new GUIContent("+"), (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
@@ -440,7 +439,7 @@
 			float height = 0.0f;
 			if (showPosition)
 			{
-				height += (3.0f * EditorGUIUtility.singleLineHeight);
+				height += (2.0f * EditorGUIUtility.singleLineHeight);
 			}
 			else
 			{
@@ -450,20 +449,81 @@
 			return height;
 		}
 	}
-	[CustomPropertyDrawer(typeof(LayerFilter))]
-	public class LayerFilterDrawer : PropertyDrawer
+
+	[CustomPropertyDrawer(typeof(CoreVectorLayerProperties))]
+	public class CoreVectorLayerPropertiesDrawer : PropertyDrawer
 	{
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		bool showPosition = true;
-		LayerFilterOperationType kind = LayerFilterOperationType.IsEqual;
-
+		bool showFilters = true;
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			var filterOperatorProp = property.FindPropertyRelative("filterOperator");
-
-
 			EditorGUI.BeginProperty(position, label, property);
 			position.height = lineHeight;
+			showPosition = EditorGUI.Foldout(position, showPosition, label.text);
+
+			if (showPosition)
+			{
+
+				position.y += lineHeight;
+				// Draw label.
+				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("isActive"));
+				position.y += lineHeight;
+				var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent("Primitive Type"));
+				var sourceTypeProperty = property.FindPropertyRelative("geometryType");
+				sourceTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, sourceTypeProperty.enumValueIndex, sourceTypeProperty.enumDisplayNames);
+
+				position.y += lineHeight;
+				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("layerName"));
+
+				position.y += lineHeight;
+				EditorGUI.PropertyField(position, property.FindPropertyRelative("snapToTerrain"));
+
+				position.y += lineHeight;
+				EditorGUI.PropertyField(position, property.FindPropertyRelative("groupFeatures"));
+
+				position.y += lineHeight;
+				showFilters = EditorGUI.Foldout(position, showFilters, "Filters");
+				if (showFilters)
+				{
+					var propertyFilters = property.FindPropertyRelative("filters");
+
+					for (int i = 0; i < propertyFilters.arraySize; i++)
+					{
+						DrawLayerFilter(propertyFilters, i);
+					}
+					EditorGUILayout.PropertyField(property.FindPropertyRelative("combinerType"));
+					EditorGUILayout.BeginHorizontal();
+					if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
+					{
+						propertyFilters.arraySize++;
+						//facs.GetArrayElementAtIndex(facs.arraySize - 1).objectReferenceValue = null;
+					}
+					EditorGUILayout.EndHorizontal();
+				}
+
+			}
+			EditorGUI.EndProperty();
+		}
+		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+		{
+			float height = 0.0f;
+			if (showPosition)
+			{
+				height += (7.0f * EditorGUIUtility.singleLineHeight);
+			}
+			else
+			{
+				height = EditorGUIUtility.singleLineHeight;
+			}
+
+			return height;
+		}
+
+		void DrawLayerFilter(SerializedProperty propertyFilters, int index)
+		{
+			var property = propertyFilters.GetArrayElementAtIndex(index);
+			var filterOperatorProp = property.FindPropertyRelative("filterOperator");
 
 			EditorGUILayout.BeginVertical();
 
@@ -516,95 +576,14 @@
 				default:
 					break;
 			}
+			if (GUILayout.Button(new GUIContent(" X "), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
+			{
+				propertyFilters.DeleteArrayElementAtIndex(index);
+			}
 			EditorGUILayout.EndHorizontal();
 
 			EditorGUILayout.EndVertical();
 
-			EditorGUI.EndProperty();
-		}
-		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-		{
-			return 2.0f * lineHeight;
-		}
-	}
-
-	[CustomPropertyDrawer(typeof(CoreVectorLayerProperties))]
-	public class CoreVectorLayerPropertiesDrawer : PropertyDrawer
-	{
-		static float lineHeight = EditorGUIUtility.singleLineHeight;
-		bool showPosition = true;
-		bool showFilters = true;
-		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-		{
-			EditorGUI.BeginProperty(position, label, property);
-			position.height = lineHeight;
-			showPosition = EditorGUI.Foldout(position, showPosition, label.text);
-
-			//EditorGUI.indentLevel++;
-			if (showPosition)
-			{
-
-				position.y += lineHeight;
-				// Draw label.
-				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("isActive"));
-				position.y += lineHeight;
-				var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent("Primitive Type"));
-				var sourceTypeProperty = property.FindPropertyRelative("geometryType");
-				sourceTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, sourceTypeProperty.enumValueIndex, sourceTypeProperty.enumDisplayNames);
-
-				position.y += lineHeight;
-				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("layerName"));
-
-				position.y += lineHeight;
-				EditorGUI.PropertyField(position, property.FindPropertyRelative("snapToTerrain"));
-
-				position.y += lineHeight;
-				EditorGUI.PropertyField(position, property.FindPropertyRelative("groupFeatures"));
-
-				position.y += lineHeight;
-				showFilters = EditorGUI.Foldout(position, showFilters, "Filters");
-				if (showFilters)
-				{
-					var propertyFilters = property.FindPropertyRelative("filters");
-					//if (propertyFilters.arraySize == 0)
-					//{
-					//	propertyFilters.arraySize = 1;
-					//}
-					for (int i = 0; i < propertyFilters.arraySize; i++)
-					{
-						var filter = propertyFilters.GetArrayElementAtIndex(i);
-						EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), propertyFilters.GetArrayElementAtIndex(i));
-						position.y += EditorGUI.GetPropertyHeight(filter);
-					}
-
-					EditorGUILayout.BeginHorizontal();
-					if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
-					{
-						propertyFilters.arraySize++;
-						//facs.GetArrayElementAtIndex(facs.arraySize - 1).objectReferenceValue = null;
-					}
-					EditorGUILayout.EndHorizontal();
-				}
-
-			}
-			//EditorGUI.indentLevel--;
-			EditorGUI.EndProperty();
-		}
-		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-		{
-			float height = 0.0f;
-			if (showPosition)
-			{
-				height += (7.0f * EditorGUIUtility.singleLineHeight);
-				//height += (property.FindPropertyRelative("filters").arraySize * lineHeight);
-				//height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("stylingOptions"));
-			}
-			else
-			{
-				height = EditorGUIUtility.singleLineHeight;
-			}
-
-			return height;
 		}
 	}
 
