@@ -28,8 +28,14 @@
 		}
 		public void SetProperties(VectorSubLayerProperties properties, LayerPerformanceOptions performanceOptions)
 		{
+			List<MeshModifier> defaultMeshModifierStack = new List<MeshModifier>();
+			List<GameObjectModifier> defaultGOModifierStack = new List<GameObjectModifier>();
+
 			_layerProperties = properties;
 			_performanceOptions = performanceOptions;
+
+			Active = _layerProperties.coreOptions.isActive;
+
 			if (properties.coreOptions.groupFeatures)
 			{
 				_defaultStack = ScriptableObject.CreateInstance<MergedModifierStack>();
@@ -41,8 +47,6 @@
 
 			_defaultStack.MeshModifiers = new List<MeshModifier>();
 			_defaultStack.GoModifiers = new List<GameObjectModifier>();
-			List<MeshModifier> defaultMeshModifierStack = new List<MeshModifier>();
-			List<GameObjectModifier> defaultGOModifierStack = new List<GameObjectModifier>();
 
 			switch (properties.coreOptions.geometryType)
 			{
@@ -141,7 +145,6 @@
 
 			//testing each feature with filters
 			var fc = layer.FeatureCount();
-			var filterOut = false;
 			//Get all filters in the array. 
 			var filters = _layerProperties.coreOptions.filters.Select(m => m.GetFilterComparer()).ToArray();
 
@@ -164,7 +167,6 @@
 
 			for (int i = 0; i < fc; i++)
 			{
-				filterOut = false;
 				var feature = new VectorFeatureUnity(layer.GetFeature(i, 0), tile, layer.Extent);
 
 				if (combiner.Try(feature))
