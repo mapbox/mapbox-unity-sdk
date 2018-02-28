@@ -20,6 +20,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		[SerializeField]
 		private bool _centerSegments = true;
+		[SerializeField]
+		private bool _separateSubmesh = false;
 
 		private List<Vector3> edgeList;
 		float dist = 0;
@@ -140,8 +142,15 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				FirstFloor(md, height);
 			}
 
-
-			md.Triangles.Add(wallTriangles);
+			if (_separateSubmesh)
+			{
+				md.Triangles.Add(wallTriangles);
+			}
+			else
+			{
+				md.Triangles.Capacity = md.Triangles.Count + wallTriangles.Count;
+				md.Triangles[0].AddRange(wallTriangles);
+			}
 		}
 
 		private void MidFloors(MeshData md)
