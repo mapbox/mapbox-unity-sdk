@@ -145,7 +145,6 @@ namespace Mapbox.Unity.Map
 		{
 			try
 			{
-				Debug.LogWarning("AbstractMap: AWAKE");
 				_worldHeightFixed = false;
 				_fileSource = MapboxAccess.Instance;
 				_tileProvider.OnTileAdded += TileProvider_OnTileAdded;
@@ -153,17 +152,12 @@ namespace Mapbox.Unity.Map
 				_tileProvider.OnTileRepositioned += TileProvider_OnTileRepositioned;
 				if (!_root)
 				{
-					Debug.LogWarningFormat("AbstractMap(Awake): assigning 'transform' [{0}] to '_root'", null == transform ? "TRANSFORM==NULL" : transform.ToString());
 					_root = transform;
 				}
 			}
 			catch (Exception ex)
 			{
 				Debug.LogErrorFormat("AbstractMap.Awake EXCEPTION: {0}", ex);
-			}
-			finally
-			{
-				Debug.LogWarningFormat("AbstractMap(Awake.finally), _root:{0}", null == _root ? "_ROOT==NULL" : _root.ToString());
 			}
 		}
 
