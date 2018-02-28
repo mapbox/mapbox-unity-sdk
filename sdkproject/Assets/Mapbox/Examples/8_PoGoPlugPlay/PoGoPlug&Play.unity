@@ -215,16 +215,6 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].coreOptions.filters.Array.size
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[1].coreOptions.filters.Array.size
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4250630666028124, guid: 5d9d70850bf0149cdaf6854751efd25d, type: 2}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -269,73 +259,13 @@ Prefab:
       objectReference: {fileID: 1130064238}
     - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
         type: 2}
-      propertyPath: _unifiedMapOptions.mapOptions.scalingOptions.unityToMercatorConversionFactor
-      value: 1000
+      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].coreOptions.filters.Array.data[0].PropertyValue
+      value: conference_centre
       objectReference: {fileID: 0}
     - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
         type: 2}
-      propertyPath: _unifiedMapOptions.mapOptions.placementOptions.placementType
+      propertyPath: _unifiedMapOptions.vectorLayerProperties.performanceOptions.isEnabled
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _unifiedMapOptions.mapOptions.scalingOptions.scalingType
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].coreOptions.filters.Array.data[0].filterOperator
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].materialOptions.projectMapImagery
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[1].coreOptions.filters.Array.data[0].filterOperator
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[1].coreOptions.snapToTerrain
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[1].coreOptions.groupFeatures
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].coreOptions.filters.Array.data[1].filterOperator
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].coreOptions.filters.Array.data[2].filterOperator
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].coreOptions.filters.Array.data[3].filterOperator
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].coreOptions.filters.Array.data[4].filterOperator
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].coreOptions.filters.Array.data[5].filterOperator
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 114760888210307728, guid: 5d9d70850bf0149cdaf6854751efd25d,
-        type: 2}
-      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].coreOptions.filters.Array.data[6].filterOperator
-      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5d9d70850bf0149cdaf6854751efd25d, type: 2}
