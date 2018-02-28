@@ -15,6 +15,7 @@
 		bool showPosition = false;
 		VectorSubLayerTreeView layerTreeView = new VectorSubLayerTreeView(new TreeViewState());
 		IList<int> selectedLayers = new List<int>();
+
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			var labelBoldStyle = new GUIStyle { fontStyle = FontStyle.Bold };

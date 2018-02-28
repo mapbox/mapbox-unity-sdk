@@ -262,21 +262,22 @@
 			//	}
 			//}
 			//else 
-			var size = _layerProperties.coreOptions.propertyValuePairs.Count;
-			for (int i = 0; i < size; i++)
-			{
-				var key = _layerProperties.coreOptions.propertyValuePairs[i].featureKey;
-				if (feature.Properties.ContainsKey(key))
-				{
-					if (feature.Properties.ContainsKey(key))
-					{
-						return feature.Properties[key].ToString().ToLowerInvariant();
-					}
-				}
-			}
+			//TODO: Come back to this. 
+			//var size = _layerProperties.coreOptions.propertyValuePairs.Count;
+			//for (int i = 0; i < size; i++)
+			//{
+			//	var key = _layerProperties.coreOptions.propertyValuePairs[i].featureKey;
+			//	if (feature.Properties.ContainsKey(key))
+			//	{
+			//		if (feature.Properties.ContainsKey(key))
+			//		{
+			//			return feature.Properties[key].ToString().ToLowerInvariant();
+			//		}
+			//	}
+			//}
 
 
-			return "";
+			return Key;
 		}
 
 		/// <summary>

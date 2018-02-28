@@ -18,11 +18,11 @@
 		[SerializeField]
 		public Camera _referenceCamera;
 
-		[SerializeField]
-		QuadTreeTileProvider _quadTreeTileProvider;
+		//[SerializeField]
+		//QuadTreeTileProvider _quadTreeTileProvider;
 
 		[SerializeField]
-		AbstractMap _dynamicZoomMap;
+		MapAPI _mapManager;
 
 		[SerializeField]
 		bool _useDegreeMethod;
@@ -31,20 +31,26 @@
 		private Vector3 _mousePosition;
 		private Vector3 _mousePositionPrevious;
 		private bool _shouldDrag;
+		private bool _isInitialized = false;
 
-		void Start()
+		void Awake()
 		{
 			if (null == _referenceCamera)
 			{
 				_referenceCamera = GetComponent<Camera>();
 				if (null == _referenceCamera) { Debug.LogErrorFormat("{0}: reference camera not set", this.GetType().Name); }
 			}
+			_mapManager.OnInitialized += () =>
+			{
+				_isInitialized = true;
+				Debug.Log("Camera Init");
+			};
 		}
 
 
 		private void LateUpdate()
 		{
-			if (null == _dynamicZoomMap) { return; }
+			if (!_isInitialized) { return; }
 
 			if (Input.touchSupported && Input.touchCount > 0)
 			{
@@ -63,15 +69,16 @@
 			scrollDelta = Input.GetAxis("Mouse ScrollWheel");
 			ZoomMapUsingTouchOrMouse(scrollDelta);
 
+
 			//pan keyboard
 			float xMove = Input.GetAxis("Horizontal");
 			float zMove = Input.GetAxis("Vertical");
 
-			PanMapUsingKeyBoard(xMove, zMove);
+			//PanMapUsingKeyBoard(xMove, zMove);
 
 
 			//pan mouse
-			PanMapUsingTouchOrMouse();
+			//PanMapUsingTouchOrMouse();
 		}
 
 		void HandleTouch()
@@ -111,7 +118,13 @@
 
 		void ZoomMapUsingTouchOrMouse(float zoomFactor)
 		{
-			_quadTreeTileProvider.UpdateMapProperties(_dynamicZoomMap.CenterLatitudeLongitude, Mathf.Max(0.0f, Mathf.Min(_dynamicZoomMap.Zoom + zoomFactor * _zoomSpeed, 21.0f)));
+			MapLocationOptions locationOptions = new MapLocationOptions();
+			{
+				locationOptions.latitudeLongitude = String.Format("{0},{1}", _mapManager.Map.CenterLatitudeLongitude.x, _mapManager.Map.CenterLatitudeLongitude.y);
+				locationOptions.zoom = Mathf.Max(0.0f, Mathf.Min(_mapManager.Map.Zoom + zoomFactor * _zoomSpeed, 21.0f));
+			}
+			_mapManager.Map.UpdateMap(locationOptions);
+			//.UpdateMapProperties(_mapManager.Map.CenterLatitudeLongitude, Mathf.Max(0.0f, Mathf.Min(_mapManager.Map.Zoom + zoomFactor * _zoomSpeed, 21.0f)));
 		}
 
 		void PanMapUsingKeyBoard(float xMove, float zMove)
@@ -122,8 +135,15 @@
 				// Divide it by the tile width in pixels ( 256 in our case) 
 				// to get degrees represented by each pixel.
 				// Keyboard offset is in pixels, therefore multiply the factor with the offset to move the center.
-				float factor = _panSpeed * (Conversions.GetTileScaleInDegrees((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.AbsoluteZoom));
-				_quadTreeTileProvider.UpdateMapProperties(new Vector2d(_dynamicZoomMap.CenterLatitudeLongitude.x + zMove * factor * 2.0f, _dynamicZoomMap.CenterLatitudeLongitude.y + xMove * factor * 4.0f), _dynamicZoomMap.Zoom);
+				float factor = _panSpeed * (Conversions.GetTileScaleInDegrees((float)_mapManager.Map.CenterLatitudeLongitude.x, _mapManager.Map.AbsoluteZoom));
+				MapLocationOptions locationOptions = new MapLocationOptions
+				{
+					latitudeLongitude = String.Format("{0},{1}", _mapManager.Map.CenterLatitudeLongitude.x + zMove * factor * 2.0f, _mapManager.Map.CenterLatitudeLongitude.y + xMove * factor * 4.0f),
+					zoom = _mapManager.Map.Zoom
+				};
+				_mapManager.Map.UpdateMap(locationOptions);
+
+				//_quadTreeTileProvider.UpdateMapProperties(new Vector2d(_mapManager.Map.CenterLatitudeLongitude.x + zMove * factor * 2.0f, _mapManager.Map.CenterLatitudeLongitude.y + xMove * factor * 4.0f), _mapManager.Map.Zoom);
 			}
 		}
 
@@ -170,11 +190,20 @@
 
 					if (Mathf.Abs(offset.x) > 0.0f || Mathf.Abs(offset.z) > 0.0f)
 					{
-						if (null != _dynamicZoomMap)
+						if (null != _mapManager.Map)
 						{
-							float factor = Conversions.GetTileScaleInMeters((float)0, _dynamicZoomMap.AbsoluteZoom) * 256.0f / _dynamicZoomMap.UnityTileSize;
-							var latlongDelta = Conversions.MetersToLatLon(_dynamicZoomMap.CenterMercator + new Vector2d(offset.x * factor, offset.z * factor));
-							_quadTreeTileProvider.UpdateMapProperties(latlongDelta, _dynamicZoomMap.Zoom);
+							float factor = Conversions.GetTileScaleInMeters((float)0, _mapManager.Map.AbsoluteZoom) * 256.0f / _mapManager.Map.UnityTileSize;
+							var latlongDelta = Conversions.MetersToLatLon(new Vector2d(offset.x * factor, offset.z * factor));
+							//Debug.Log("LatLong Delta : " + latlongDelta);
+							var newLatLong = _mapManager.Map.CenterLatitudeLongitude + latlongDelta;
+							MapLocationOptions locationOptions = new MapLocationOptions
+							{
+								latitudeLongitude = String.Format("{0},{1}", newLatLong.x, newLatLong.y),
+								zoom = _mapManager.Map.Zoom
+							};
+							//_mapManager.Map.UpdateMap(locationOptions);
+
+							//_quadTreeTileProvider.UpdateMapProperties(_mapManager.Map.CenterLatitudeLongitude + latlongDelta, _mapManager.Map.Zoom);
 						}
 					}
 					_origin = _mousePosition;
@@ -218,14 +247,20 @@
 
 					if (Mathf.Abs(offset.x) > 0.0f || Mathf.Abs(offset.z) > 0.0f)
 					{
-						if (null != _dynamicZoomMap)
+						if (null != _mapManager.Map)
 						{
 							// Get the number of degrees in a tile at the current zoom level. 
 							// Divide it by the tile width in pixels ( 256 in our case) 
 							// to get degrees represented by each pixel.
 							// Mouse offset is in pixels, therefore multiply the factor with the offset to move the center.
-							float factor = _panSpeed * Conversions.GetTileScaleInDegrees((float)_dynamicZoomMap.CenterLatitudeLongitude.x, _dynamicZoomMap.AbsoluteZoom) * 256.0f / _dynamicZoomMap.UnityTileSize;
-							_quadTreeTileProvider.UpdateMapProperties(new Vector2d(_dynamicZoomMap.CenterLatitudeLongitude.x + offset.z * factor, _dynamicZoomMap.CenterLatitudeLongitude.y + offset.x * factor), _dynamicZoomMap.Zoom);
+							float factor = _panSpeed * Conversions.GetTileScaleInDegrees((float)_mapManager.Map.CenterLatitudeLongitude.x, _mapManager.Map.AbsoluteZoom) * 256.0f / _mapManager.Map.UnityTileSize;
+							MapLocationOptions locationOptions = new MapLocationOptions
+							{
+								latitudeLongitude = String.Format("{0},{1}", _mapManager.Map.CenterLatitudeLongitude.x + offset.z * factor, _mapManager.Map.CenterLatitudeLongitude.y + offset.x * factor),
+								zoom = _mapManager.Map.Zoom
+							};
+							_mapManager.Map.UpdateMap(locationOptions);
+							//_quadTreeTileProvider.UpdateMapProperties(new Vector2d(_dynamicZoomMap.CenterLatitudeLongitude.x + offset.z * factor, _dynamicZoomMap.CenterLatitudeLongitude.y + offset.x * factor), _dynamicZoomMap.Zoom);
 						}
 					}
 					_origin = _mousePosition;

@@ -10,6 +10,7 @@
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
+	using Mapbox.Unity.MeshGeneration.Filters;
 	using Mapbox.Unity.MeshGeneration.Interfaces;
 
 
@@ -397,7 +398,7 @@
 		public string sublayerName = "untitled";
 		public VectorPrimitiveType geometryType = VectorPrimitiveType.Polygon;
 		public string layerName = "layerName";
-		public List<PropertyValuePair> propertyValuePairs;
+		public List<LayerFilter> filters;
 		public bool snapToTerrain = true;
 		public bool groupFeatures = false;
 	}
@@ -839,16 +840,6 @@
 
 		[SerializeField]
 		UnifiedMapOptions _unifiedMapOptions = new UnifiedMapOptions();
-		//MapOptions _mapOptions = new MapOptions();
-
-		//[SerializeField]
-		//ImageryLayerProperties _imageryLayerProperties = new ImageryLayerProperties();
-
-		//[SerializeField]
-		//ElevationLayerProperties _elevationLayerProperties = new ElevationLayerProperties();
-
-		//[SerializeField]
-		//VectorLayerProperties _vectorLayerProperties = new VectorLayerProperties();
 
 		public event Action OnInitialized = delegate { };
 
@@ -950,7 +941,7 @@
 		{
 			_map = gameObject.AddComponent<UnifiedMap>();
 			// Setup a visualizer to get a "Starter" map.
-			_mapVisualizer = ScriptableObject.CreateInstance<QuadTreeMapVisualizer>();
+			_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
 
 			switch (_unifiedMapOptions.mapOptions.placementOptions.visualizationType)
 			{

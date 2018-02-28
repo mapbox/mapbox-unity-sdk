@@ -20,6 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4250630666028124}
   - component: {fileID: 114760888210307728}
+  - component: {fileID: 114539472779406036}
   m_Layer: 0
   m_Name: MapManager
   m_TagString: Untagged
@@ -40,6 +41,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114539472779406036
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1680838159437694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c699b8e1864b4b248acb7a04ede9480, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _panSpeed: 1
+  _zoomSpeed: 0.25
+  _referenceCamera: {fileID: 0}
+  _mapManager: {fileID: 114760888210307728}
+  _useDegreeMethod: 0
 --- !u!114 &114760888210307728
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -55,7 +72,7 @@ MonoBehaviour:
     mapOptions:
       locationOptions:
         latitudeLongitude: 37.784179, -122.401583
-        zoom: 16
+        zoom: 14
         coordinateSystemType: 0
       placementOptions:
         visualizationType: 0
@@ -77,7 +94,7 @@ MonoBehaviour:
             visibleBuffer: 0
             disposeBuffer: 0
       scalingOptions:
-        scalingType: 1
+        scalingType: 0
         unitType: 0
         unityToMercatorConversionFactor: 100
     imageryLayerProperties:
@@ -112,7 +129,7 @@ MonoBehaviour:
         addToLayer: 0
         layerId: 0
       sideWallOptions:
-        isActive: 0
+        isActive: 1
         wallHeight: 10
         wallMaterial: {fileID: 0}
     vectorLayerProperties:
@@ -128,4 +145,54 @@ MonoBehaviour:
         entityPerCoroutine: 20
       defaultStylingOptions:
         isExtruded: 0
-      vectorSubLayers: []
+      vectorSubLayers:
+      - coreOptions:
+          isActive: 0
+          sublayerName: MyBuilding
+          geometryType: 2
+          layerName: building
+          propertyValuePairs: []
+          snapToTerrain: 0
+          groupFeatures: 0
+        extrusionOptions:
+          extrusionType: 1
+          extrusionGeometryType: 2
+          propertyName: height
+          minimumHeight: 0
+          maximumHeight: 0
+        materialOptions:
+          projectMapImagery: 0
+          materials:
+          - Materials:
+            - {fileID: 2100000, guid: 1843a50abea6fa448a61d143054f2166, type: 2}
+          - Materials:
+            - {fileID: 0}
+        modifierOptions:
+          moveFeaturePositionTo: 0
+          MeshModifiers: []
+          GoModifiers: []
+      - coreOptions:
+          isActive: 0
+          sublayerName: MyRoads
+          geometryType: 1
+          layerName: road
+          propertyValuePairs: []
+          snapToTerrain: 0
+          groupFeatures: 1
+        extrusionOptions:
+          extrusionType: 1
+          extrusionGeometryType: 2
+          propertyName: height
+          minimumHeight: 0
+          maximumHeight: 0
+        materialOptions:
+          projectMapImagery: 0
+          materials:
+          - Materials:
+            - {fileID: 2100000, guid: 0de83c8715792fe43aceecafcdbd8b24, type: 2}
+          - Materials:
+            - {fileID: 0}
+        modifierOptions:
+          moveFeaturePositionTo: 0
+          MeshModifiers: []
+          GoModifiers: []

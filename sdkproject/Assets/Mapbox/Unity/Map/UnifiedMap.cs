@@ -129,7 +129,7 @@ namespace Mapbox.Unity.Map
 		}
 
 		[SerializeField]
-		protected float _unityTileSize = 100;
+		protected float _unityTileSize = 1;
 		public float UnityTileSize
 		{
 			get

@@ -6,6 +6,7 @@
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
 	using Mapbox.Unity.MeshGeneration.Interfaces;
+	using Mapbox.Unity.MeshGeneration.Filters;
 	using Mapbox.Editor.NodeEditor;
 
 	[CustomPropertyDrawer(typeof(CameraBoundsTileProviderOptions))]
@@ -273,16 +274,6 @@
 				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), wallMat, new GUIContent("Wall Material"));
 				position.y += EditorGUI.GetPropertyHeight(wallMat);
 
-
-
-
-
-				//for (int i = 0; i < matList.arraySize; i++)
-				//{
-				//	var matInList = matList.GetArrayElementAtIndex(i);
-				//	EditorGUI.PropertyField(position, matInList);
-				//	position.y += EditorGUI.GetPropertyHeight(matInList);
-				//}
 			}
 			//EditorGUI.indentLevel--;
 			EditorGUI.EndProperty();
@@ -463,40 +454,222 @@
 			return height;
 		}
 	}
+	[CustomPropertyDrawer(typeof(LayerFilter))]
+	public class LayerFilterDrawer : PropertyDrawer
+	{
+		static float lineHeight = EditorGUIUtility.singleLineHeight;
+		bool showPosition = true;
+		LayerFilterOperationType kind = LayerFilterOperationType.IsEqual;
+
+		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+		{
+			var filterOperatorProp = property.FindPropertyRelative("filterOperator");
+
+
+			EditorGUI.BeginProperty(position, label, property);
+			position.height = lineHeight;
+
+			EditorGUILayout.BeginVertical();
+
+			EditorGUILayout.BeginHorizontal();
+
+			EditorGUILayout.LabelField("Key", GUILayout.MaxWidth(150));
+
+			switch ((LayerFilterOperationType)filterOperatorProp.enumValueIndex)
+			{
+				case LayerFilterOperationType.IsEqual:
+				case LayerFilterOperationType.IsGreater:
+				case LayerFilterOperationType.IsLess:
+					EditorGUILayout.LabelField("Operator", GUILayout.MaxWidth(150));
+					EditorGUILayout.LabelField("Num Value", GUILayout.MaxWidth(100));
+					break;
+				case LayerFilterOperationType.Contains:
+					EditorGUILayout.LabelField("Operator", GUILayout.MaxWidth(150));
+					EditorGUILayout.LabelField("Str Value", GUILayout.MaxWidth(100));
+					break;
+				case LayerFilterOperationType.IsInRange:
+					EditorGUILayout.LabelField("Operator", GUILayout.MaxWidth(150));
+					EditorGUILayout.LabelField("Min", GUILayout.MaxWidth(100));
+					EditorGUILayout.LabelField("Max", GUILayout.MaxWidth(100));
+					break;
+				default:
+					break;
+			}
+
+			EditorGUILayout.EndHorizontal();
+
+
+			EditorGUILayout.BeginHorizontal();
+			property.FindPropertyRelative("Key").stringValue = EditorGUILayout.TextField(property.FindPropertyRelative("Key").stringValue, GUILayout.MaxWidth(150));
+			filterOperatorProp.enumValueIndex = EditorGUILayout.Popup(filterOperatorProp.enumValueIndex, filterOperatorProp.enumDisplayNames, GUILayout.MaxWidth(150));
+
+			switch ((LayerFilterOperationType)filterOperatorProp.enumValueIndex)
+			{
+				case LayerFilterOperationType.IsEqual:
+				case LayerFilterOperationType.IsGreater:
+				case LayerFilterOperationType.IsLess:
+					property.FindPropertyRelative("Min").doubleValue = EditorGUILayout.DoubleField(property.FindPropertyRelative("Min").doubleValue, GUILayout.MaxWidth(100));
+					break;
+				case LayerFilterOperationType.Contains:
+					property.FindPropertyRelative("PropertyValue").stringValue = EditorGUILayout.TextField(property.FindPropertyRelative("PropertyValue").stringValue, GUILayout.MaxWidth(150));
+					break;
+				case LayerFilterOperationType.IsInRange:
+					property.FindPropertyRelative("Min").doubleValue = EditorGUILayout.DoubleField(property.FindPropertyRelative("Min").doubleValue, GUILayout.MaxWidth(100));
+					property.FindPropertyRelative("Max").doubleValue = EditorGUILayout.DoubleField(property.FindPropertyRelative("Max").doubleValue, GUILayout.MaxWidth(100));
+					break;
+				default:
+					break;
+			}
+			EditorGUILayout.EndHorizontal();
+
+			EditorGUILayout.EndVertical();
+			//showPosition = EditorGUI.Foldout(position, showPosition, label.text);
+
+			//if (showPosition)
+			//{
+			//	//FILTERS
+			//	{
+			//		EditorGUILayout.Space();
+			//		EditorGUILayout.LabelField("Filters");
+			//		var facs = property;//.FindProperty("Filters");
+			//							//for (int i = 0; i < facs.arraySize; i++)
+			//							//{
+			//							//	var ind = i;
+			//							//	EditorGUILayout.BeginHorizontal();
+
+			//		//	EditorGUILayout.BeginVertical();
+			//		//	GUILayout.Space(5);
+			//		//	facs.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(ind).objectReferenceValue, typeof(FilterBase), false);
+			//		//	EditorGUILayout.EndVertical();
+
+			//		//	if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
+			//		//	{
+			//		//		facs.InsertArrayElementAtIndex(ind);
+			//		//	}
+			//		//	if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30), GUILayout.Height(22)))
+			//		//	{
+			//		//		facs.DeleteArrayElementAtIndex(ind);
+			//		//	}
+			//		//	EditorGUILayout.EndHorizontal();
+			//		//}
+
+
+			//		EditorGUILayout.Space();
+			//		EditorGUILayout.BeginHorizontal();
+			//		if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
+			//		{
+			//			facs.arraySize++;
+			//			facs.GetArrayElementAtIndex(facs.arraySize - 1).objectReferenceValue = null;
+			//		}
+			//		EditorGUILayout.EndHorizontal();
+			//	}
+			//	//EditorGUI.indentLevel++;
+			//	//position.y += lineHeight;
+			//	//// Draw label.
+			//	//var typePosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent("Primitive Type"));
+			//	//var sourceTypeProperty = property.FindPropertyRelative("geometryType");
+			//	//sourceTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, sourceTypeProperty.enumValueIndex, sourceTypeProperty.enumDisplayNames);
+
+			//	//position.y += lineHeight;
+			//	//EditorGUI.PropertyField(position, property.FindPropertyRelative("layerName"));
+
+			//	//position.y += lineHeight;
+			//	//var propertyFilters = property.FindPropertyRelative("filters");
+			//	//if (propertyFilters.arraySize == 0)
+			//	//{
+			//	//	propertyFilters.arraySize = 1;
+			//	//}
+			//	//EditorGUI.PropertyField(position, propertyFilters);
+
+			//	//position.y += ((propertyFilters.arraySize) * lineHeight);
+			//	//EditorGUI.PropertyField(position, property.FindPropertyRelative("snapToTerrain"));
+
+			//	//position.y += lineHeight;
+			//	//EditorGUI.PropertyField(position, property.FindPropertyRelative("groupFeatures"));
+
+
+			//}
+			//EditorGUI.indentLevel--;
+			EditorGUI.EndProperty();
+		}
+		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+		{
+			//var filterOperatorProp = property.FindPropertyRelative("filterOperator");
+			//var kind = (LayerFilterOperationType)filterOperatorProp.enumValueIndex;
+			//int rows = 0;
+			//switch (kind)
+			//{
+			//	case LayerFilterOperationType.IsEqual:
+			//	case LayerFilterOperationType.IsGreater:
+			//	case LayerFilterOperationType.IsLess:
+			//	case LayerFilterOperationType.Contains:
+			//		rows = 2;
+			//		break;
+			//	case LayerFilterOperationType.IsInRange:
+			//		rows = 3;
+			//		break;
+			//	default:
+			//		break;
+			//}
+			return 2.0f * lineHeight;
+		}
+	}
 
 	[CustomPropertyDrawer(typeof(CoreVectorLayerProperties))]
 	public class CoreVectorLayerPropertiesDrawer : PropertyDrawer
 	{
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		bool showPosition = true;
+		bool showFilters = true;
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
 			position.height = lineHeight;
 			showPosition = EditorGUI.Foldout(position, showPosition, label.text);
+
 			//EditorGUI.indentLevel++;
 			if (showPosition)
 			{
 
 				position.y += lineHeight;
 				// Draw label.
-				var typePosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent("Primitive Type"));
+				var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent("Primitive Type"));
 				var sourceTypeProperty = property.FindPropertyRelative("geometryType");
 				sourceTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, sourceTypeProperty.enumValueIndex, sourceTypeProperty.enumDisplayNames);
 
 				position.y += lineHeight;
-				EditorGUI.PropertyField(position, property.FindPropertyRelative("layerName"));
+				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("layerName"));
 
 				position.y += lineHeight;
-				var propertyFilters = property.FindPropertyRelative("propertyValuePairs");
-				EditorGUI.PropertyField(position, propertyFilters);
-
-				position.y += ((propertyFilters.arraySize + 1) * lineHeight);
 				EditorGUI.PropertyField(position, property.FindPropertyRelative("snapToTerrain"));
 
-				position.y += ((propertyFilters.arraySize + 1) * lineHeight);
+				position.y += lineHeight;
 				EditorGUI.PropertyField(position, property.FindPropertyRelative("groupFeatures"));
 
+				position.y += lineHeight;
+				showFilters = EditorGUI.Foldout(position, showFilters, "Filters");
+				if (showFilters)
+				{
+					var propertyFilters = property.FindPropertyRelative("filters");
+					if (propertyFilters.arraySize == 0)
+					{
+						propertyFilters.arraySize = 1;
+					}
+					for (int i = 0; i < propertyFilters.arraySize; i++)
+					{
+						var filter = propertyFilters.GetArrayElementAtIndex(i);
+						EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), propertyFilters.GetArrayElementAtIndex(i));
+						position.y += EditorGUI.GetPropertyHeight(filter);
+					}
+
+					EditorGUILayout.BeginHorizontal();
+					if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
+					{
+						propertyFilters.arraySize++;
+						//facs.GetArrayElementAtIndex(facs.arraySize - 1).objectReferenceValue = null;
+					}
+					EditorGUILayout.EndHorizontal();
+				}
 
 			}
 			//EditorGUI.indentLevel--;
@@ -508,7 +681,7 @@
 			if (showPosition)
 			{
 				height += (6.0f * EditorGUIUtility.singleLineHeight);
-				height += (property.FindPropertyRelative("propertyValuePairs").arraySize * lineHeight * 2);
+				//height += (property.FindPropertyRelative("filters").arraySize * lineHeight);
 				//height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("stylingOptions"));
 			}
 			else
