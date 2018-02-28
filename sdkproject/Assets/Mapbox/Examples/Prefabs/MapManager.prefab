@@ -72,11 +72,11 @@ MonoBehaviour:
     mapOptions:
       locationOptions:
         latitudeLongitude: 37.784179, -122.401583
-        zoom: 14
+        zoom: 16
         coordinateSystemType: 0
       placementOptions:
         visualizationType: 0
-        placementType: 1
+        placementType: 0
         extentOptions:
           extentType: 0
           cameraBoundsOptions:
@@ -94,9 +94,9 @@ MonoBehaviour:
             visibleBuffer: 0
             disposeBuffer: 0
       scalingOptions:
-        scalingType: 0
+        scalingType: 1
         unitType: 0
-        unityToMercatorConversionFactor: 100
+        unityToMercatorConversionFactor: 1000
     imageryLayerProperties:
       sourceType: 0
       sourceOptions:
@@ -151,8 +151,14 @@ MonoBehaviour:
           sublayerName: MyBuilding
           geometryType: 2
           layerName: building
-          propertyValuePairs: []
-          snapToTerrain: 0
+          filters:
+          - Key: type
+            PropertyValue: school
+            Min: 0
+            Max: 0
+            filterOperator: 3
+          combinerType: 1
+          snapToTerrain: 1
           groupFeatures: 0
         extrusionOptions:
           extrusionType: 1
@@ -176,8 +182,9 @@ MonoBehaviour:
           sublayerName: MyRoads
           geometryType: 1
           layerName: road
-          propertyValuePairs: []
-          snapToTerrain: 0
+          filters: []
+          combinerType: 1
+          snapToTerrain: 1
           groupFeatures: 1
         extrusionOptions:
           extrusionType: 1

@@ -3,6 +3,7 @@
 	using System;
 	using System.Collections;
 	using System.Collections.Generic;
+	using System.Linq;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
 	using Mapbox.VectorTile;
@@ -141,29 +142,38 @@
 			//testing each feature with filters
 			var fc = layer.FeatureCount();
 			var filterOut = false;
+			//Get all filters in the array. 
+			var filters = _layerProperties.coreOptions.filters.Select(m => m.GetFilterComparer()).ToArray();
+
+			// Pass them to the combiner 
+			Filters.ILayerFeatureFilterComparer combiner = new Filters.LayerFilterComparer();
+			switch (_layerProperties.coreOptions.combinerType)
+			{
+				case Filters.LayerFilterCombinerOperationType.Any:
+					combiner = Filters.LayerFilterComparer.AnyOf(filters);
+					break;
+				case Filters.LayerFilterCombinerOperationType.All:
+					combiner = Filters.LayerFilterComparer.AllOf(filters);
+					break;
+				case Filters.LayerFilterCombinerOperationType.None:
+					combiner = Filters.LayerFilterComparer.NoneOf(filters);
+					break;
+				default:
+					break;
+			}
+
 			for (int i = 0; i < fc; i++)
 			{
 				filterOut = false;
 				var feature = new VectorFeatureUnity(layer.GetFeature(i, 0), tile, layer.Extent);
-				//foreach (var filter in Filters)
-				//{
-				//	if (!string.IsNullOrEmpty(filter.Key) && !feature.Properties.ContainsKey(filter.Key))
-				//		continue;
 
-				//	if (!filter.Try(feature))
-				//	{
-				//		filterOut = true;
-				//		break;
-				//	}
-				//}
-
-				if (!filterOut)
+				if (combiner.Try(feature))
 				{
 					if (tile != null && tile.gameObject != null && tile.VectorDataState != Enums.TilePropertyState.Cancelled)
 						Build(feature, tile, tile.gameObject);
-				}
 
-				_entityInCurrentCoroutine++;
+					_entityInCurrentCoroutine++;
+				}
 
 				if (_performanceOptions.isEnabled && _entityInCurrentCoroutine >= _performanceOptions.entityPerCoroutine)
 				{

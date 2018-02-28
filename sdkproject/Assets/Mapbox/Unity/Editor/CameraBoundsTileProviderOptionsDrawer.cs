@@ -651,10 +651,10 @@
 				if (showFilters)
 				{
 					var propertyFilters = property.FindPropertyRelative("filters");
-					if (propertyFilters.arraySize == 0)
-					{
-						propertyFilters.arraySize = 1;
-					}
+					//if (propertyFilters.arraySize == 0)
+					//{
+					//	propertyFilters.arraySize = 1;
+					//}
 					for (int i = 0; i < propertyFilters.arraySize; i++)
 					{
 						var filter = propertyFilters.GetArrayElementAtIndex(i);

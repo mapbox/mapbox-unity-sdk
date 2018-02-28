@@ -44,6 +44,36 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 		IsInRange,
 	}
 
+	public enum LayerFilterCombinerOperationType
+	{
+		Any,
+		All,
+		None,
+	}
+
+	[Serializable]
+	public class LayerFilterCombiner : ILayerFeatureFilterComparer
+	{
+		public List<ILayerFeatureFilterComparer> Filters;
+
+		public LayerFilterCombinerOperationType Type;
+
+		public bool Try(VectorFeatureUnity feature)
+		{
+			switch (Type)
+			{
+				case LayerFilterCombinerOperationType.Any:
+					return Filters.Any(m => m.Try(feature));
+				case LayerFilterCombinerOperationType.All:
+					return Filters.All(m => m.Try(feature));
+				case LayerFilterCombinerOperationType.None:
+					return !Filters.Any(m => m.Try(feature));
+				default:
+					return false;
+			}
+		}
+	}
+
 	public class LayerFilterComparer : ILayerFeatureFilterComparer
 	{
 		public virtual bool Try(VectorFeatureUnity feature)
@@ -51,6 +81,32 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 			return true;
 		}
 
+		public static ILayerFeatureFilterComparer AnyOf(params ILayerFeatureFilterComparer[] filters)
+		{
+			return new LayerFilterCombiner
+			{
+				Type = LayerFilterCombinerOperationType.Any,
+				Filters = filters.ToList(),
+			};
+		}
+
+		public static ILayerFeatureFilterComparer AllOf(params ILayerFeatureFilterComparer[] filters)
+		{
+			return new LayerFilterCombiner
+			{
+				Type = LayerFilterCombinerOperationType.All,
+				Filters = filters.ToList(),
+			};
+		}
+
+		public static ILayerFeatureFilterComparer NoneOf(params ILayerFeatureFilterComparer[] filters)
+		{
+			return new LayerFilterCombiner
+			{
+				Type = LayerFilterCombinerOperationType.None,
+				Filters = filters.ToList(),
+			};
+		}
 		public static ILayerFeatureFilterComparer HasProperty(string property)
 		{
 			return new LayerHasPropertyFilterComparer
@@ -117,8 +173,10 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 			object property;
 			if (feature.Properties.TryGetValue(Key, out property))
 			{
+				Debug.Log("feature Property : " + property.ToString());
 				return PropertyComparer(property);
 			}
+			Debug.Log("Returned False");
 			return false;
 		}
 
