@@ -349,7 +349,7 @@
 			EditorGUI.BeginProperty(position, label, property);
 			position.height = lineHeight;
 			showPosition = EditorGUI.Foldout(position, showPosition, label.text);
-			EditorGUI.indentLevel++;
+			//EditorGUI.indentLevel++;
 			if (showPosition)
 			{
 				position.y += lineHeight;
@@ -358,82 +358,81 @@
 				featurePositionProperty.enumValueIndex = EditorGUI.Popup(typePosition, featurePositionProperty.enumValueIndex, featurePositionProperty.enumDisplayNames);
 
 				position.y += lineHeight;
-				EditorGUI.LabelField(position, "Mesh Modifiers");
+				EditorGUILayout.Space();
+				EditorGUILayout.LabelField("Mesh Modifiers");
 
-				//var meshfac = property.FindPropertyRelative("MeshModifiers");
-				//position.y += lineHeight;
-				////.BeginArea(new Rect(position.x, position.y, position.width, 200));
+				var meshfac = property.FindPropertyRelative("MeshModifiers");
 
-				//for (int i = 0; i < meshfac.arraySize; i++)
-				//{
-				//	var ind = i;
-				//	EditorGUILayout.BeginHorizontal();
-				//	//EditorGUILayout.BeginVertical();
-				//	//GUILayout.Space(5);
-				//	meshfac.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(meshfac.GetArrayElementAtIndex(i).objectReferenceValue, typeof(MeshModifier), false) as ScriptableObject;
-				//	EditorGUILayout.EndVertical();
-				//	if (GUILayout.Button(new GUIContent("+"), (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
-				//	{
-				//		ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac, ind);
-				//	}
-				//	if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
-				//	{
-				//		meshfac.DeleteArrayElementAtIndex(ind);
-				//	}
-				//	EditorGUILayout.EndHorizontal();
-				//}
+				for (int i = 0; i < meshfac.arraySize; i++)
+				{
+					var ind = i;
+					EditorGUILayout.BeginHorizontal();
+					EditorGUILayout.BeginVertical();
+					GUILayout.Space(5);
+					meshfac.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(meshfac.GetArrayElementAtIndex(i).objectReferenceValue, typeof(MeshModifier), false) as ScriptableObject;
+					EditorGUILayout.EndVertical();
+					if (GUILayout.Button(new GUIContent("+"), (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
+					{
+						ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac, ind);
+					}
+					if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
+					{
+						meshfac.DeleteArrayElementAtIndex(ind);
+					}
+					EditorGUILayout.EndHorizontal();
+				}
 
-				//EditorGUILayout.Space();
-				//EditorGUILayout.BeginHorizontal();
-				//if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
-				//{
-				//	meshfac.arraySize++;
-				//	meshfac.GetArrayElementAtIndex(meshfac.arraySize - 1).objectReferenceValue = null;
-				//}
-				//if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
-				//{
-				//	ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac);
-				//}
-				//EditorGUILayout.EndHorizontal();
+				EditorGUILayout.Space();
+				EditorGUILayout.BeginHorizontal();
+				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
+				{
+					meshfac.arraySize++;
+					meshfac.GetArrayElementAtIndex(meshfac.arraySize - 1).objectReferenceValue = null;
+				}
+				if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
+				{
+					ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac);
+				}
+				EditorGUILayout.EndHorizontal();
 
-				//EditorGUILayout.Space();
-				//EditorGUILayout.LabelField("Game Object Modifiers");
-				//var gofac = property.FindPropertyRelative("GoModifiers");
-				//for (int i = 0; i < gofac.arraySize; i++)
-				//{
-				//	var ind = i;
-				//	EditorGUILayout.BeginHorizontal();
-				//	EditorGUILayout.BeginVertical();
-				//	GUILayout.Space(5);
-				//	gofac.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(gofac.GetArrayElementAtIndex(i).objectReferenceValue, typeof(GameObjectModifier), false) as ScriptableObject;
-				//	EditorGUILayout.EndVertical();
+				EditorGUILayout.Space();
+				EditorGUILayout.LabelField("Game Object Modifiers");
+				var gofac = property.FindPropertyRelative("GoModifiers");
+				for (int i = 0; i < gofac.arraySize; i++)
+				{
+					var ind = i;
+					EditorGUILayout.BeginHorizontal();
+					EditorGUILayout.BeginVertical();
+					GUILayout.Space(5);
+					gofac.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(gofac.GetArrayElementAtIndex(i).objectReferenceValue, typeof(GameObjectModifier), false) as ScriptableObject;
+					EditorGUILayout.EndVertical();
 
-				//	if (GUILayout.Button(new GUIContent("+"), (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
-				//	{
-				//		ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac, ind);
-				//	}
-				//	if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
-				//	{
-				//		gofac.DeleteArrayElementAtIndex(ind);
-				//	}
-				//	EditorGUILayout.EndHorizontal();
-				//}
+					if (GUILayout.Button(new GUIContent("+"), (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
+					{
+						ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac, ind);
+					}
+					if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
+					{
+						gofac.DeleteArrayElementAtIndex(ind);
+					}
+					EditorGUILayout.EndHorizontal();
+				}
 
-				//EditorGUILayout.Space();
-				//EditorGUILayout.BeginHorizontal();
-				//if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
-				//{
-				//	gofac.arraySize++;
-				//	gofac.GetArrayElementAtIndex(gofac.arraySize - 1).objectReferenceValue = null;
-				//}
-				//if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
-				//{
-				//	ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac);
-				//}
-				//EditorGUILayout.EndHorizontal();
+				EditorGUILayout.Space();
+				EditorGUILayout.BeginHorizontal();
+				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
+				{
+					gofac.arraySize++;
+					gofac.GetArrayElementAtIndex(gofac.arraySize - 1).objectReferenceValue = null;
+				}
+				if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
+				{
+					ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac);
+				}
+				EditorGUILayout.EndHorizontal();
 				//GUILayout.EndArea();
 			}
-			EditorGUI.indentLevel--;
+			//EditorGUI.indentLevel--;
 			EditorGUI.EndProperty();
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -441,14 +440,11 @@
 			float height = 0.0f;
 			if (showPosition)
 			{
-				height += (10.0f * EditorGUIUtility.singleLineHeight);
-				height += (property.FindPropertyRelative("MeshModifiers").arraySize * lineHeight * 2);
-				height += (property.FindPropertyRelative("GoModifiers").arraySize * lineHeight * 2);
-				//height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("stylingOptions"));
+				height += (3.0f * EditorGUIUtility.singleLineHeight);
 			}
 			else
 			{
-				height += (3.0f * EditorGUIUtility.singleLineHeight);
+				height += (1.0f * EditorGUIUtility.singleLineHeight);
 			}
 
 			return height;
@@ -523,94 +519,11 @@
 			EditorGUILayout.EndHorizontal();
 
 			EditorGUILayout.EndVertical();
-			//showPosition = EditorGUI.Foldout(position, showPosition, label.text);
 
-			//if (showPosition)
-			//{
-			//	//FILTERS
-			//	{
-			//		EditorGUILayout.Space();
-			//		EditorGUILayout.LabelField("Filters");
-			//		var facs = property;//.FindProperty("Filters");
-			//							//for (int i = 0; i < facs.arraySize; i++)
-			//							//{
-			//							//	var ind = i;
-			//							//	EditorGUILayout.BeginHorizontal();
-
-			//		//	EditorGUILayout.BeginVertical();
-			//		//	GUILayout.Space(5);
-			//		//	facs.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(facs.GetArrayElementAtIndex(ind).objectReferenceValue, typeof(FilterBase), false);
-			//		//	EditorGUILayout.EndVertical();
-
-			//		//	if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
-			//		//	{
-			//		//		facs.InsertArrayElementAtIndex(ind);
-			//		//	}
-			//		//	if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30), GUILayout.Height(22)))
-			//		//	{
-			//		//		facs.DeleteArrayElementAtIndex(ind);
-			//		//	}
-			//		//	EditorGUILayout.EndHorizontal();
-			//		//}
-
-
-			//		EditorGUILayout.Space();
-			//		EditorGUILayout.BeginHorizontal();
-			//		if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
-			//		{
-			//			facs.arraySize++;
-			//			facs.GetArrayElementAtIndex(facs.arraySize - 1).objectReferenceValue = null;
-			//		}
-			//		EditorGUILayout.EndHorizontal();
-			//	}
-			//	//EditorGUI.indentLevel++;
-			//	//position.y += lineHeight;
-			//	//// Draw label.
-			//	//var typePosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent("Primitive Type"));
-			//	//var sourceTypeProperty = property.FindPropertyRelative("geometryType");
-			//	//sourceTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, sourceTypeProperty.enumValueIndex, sourceTypeProperty.enumDisplayNames);
-
-			//	//position.y += lineHeight;
-			//	//EditorGUI.PropertyField(position, property.FindPropertyRelative("layerName"));
-
-			//	//position.y += lineHeight;
-			//	//var propertyFilters = property.FindPropertyRelative("filters");
-			//	//if (propertyFilters.arraySize == 0)
-			//	//{
-			//	//	propertyFilters.arraySize = 1;
-			//	//}
-			//	//EditorGUI.PropertyField(position, propertyFilters);
-
-			//	//position.y += ((propertyFilters.arraySize) * lineHeight);
-			//	//EditorGUI.PropertyField(position, property.FindPropertyRelative("snapToTerrain"));
-
-			//	//position.y += lineHeight;
-			//	//EditorGUI.PropertyField(position, property.FindPropertyRelative("groupFeatures"));
-
-
-			//}
-			//EditorGUI.indentLevel--;
 			EditorGUI.EndProperty();
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
-			//var filterOperatorProp = property.FindPropertyRelative("filterOperator");
-			//var kind = (LayerFilterOperationType)filterOperatorProp.enumValueIndex;
-			//int rows = 0;
-			//switch (kind)
-			//{
-			//	case LayerFilterOperationType.IsEqual:
-			//	case LayerFilterOperationType.IsGreater:
-			//	case LayerFilterOperationType.IsLess:
-			//	case LayerFilterOperationType.Contains:
-			//		rows = 2;
-			//		break;
-			//	case LayerFilterOperationType.IsInRange:
-			//		rows = 3;
-			//		break;
-			//	default:
-			//		break;
-			//}
 			return 2.0f * lineHeight;
 		}
 	}
@@ -633,6 +546,8 @@
 
 				position.y += lineHeight;
 				// Draw label.
+				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("isActive"));
+				position.y += lineHeight;
 				var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent("Primitive Type"));
 				var sourceTypeProperty = property.FindPropertyRelative("geometryType");
 				sourceTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, sourceTypeProperty.enumValueIndex, sourceTypeProperty.enumDisplayNames);
@@ -680,7 +595,7 @@
 			float height = 0.0f;
 			if (showPosition)
 			{
-				height += (6.0f * EditorGUIUtility.singleLineHeight);
+				height += (7.0f * EditorGUIUtility.singleLineHeight);
 				//height += (property.FindPropertyRelative("filters").arraySize * lineHeight);
 				//height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("stylingOptions"));
 			}
