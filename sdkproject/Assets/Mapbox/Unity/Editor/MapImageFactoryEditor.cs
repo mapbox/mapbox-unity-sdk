@@ -74,7 +74,7 @@ namespace Mapbox.Editor
 						_choiceIndex = EditorGUILayout.Popup("Style", _choiceIndex, _basicMapNames);
 						mapId_Prop.stringValue = _basicMapIds[_choiceIndex];
 						GUI.enabled = false;
-						EditorGUILayout.PropertyField(mapId_Prop, new GUIContent("Map Id"));
+						EditorGUILayout.PropertyField(mapId_Prop, new GUIContent("Style URL"));
 						GUI.enabled = true;
 						break;
 					}

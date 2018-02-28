@@ -3,15 +3,9 @@ Thank you for downloading the Mapbox Unity SDK (for Unity 2017.1+)!
 
 Getting started: https://www.mapbox.com/mapbox-unity-sdk/docs/00-getting-started.html
 
-Configuring your API token: https://www.mapbox.com/mapbox-unity-sdk/docs/01-mapbox-api-token.html
-
 Tutorials: https://www.mapbox.com/unity-sdk/tutorials/
 
-Built-in Examples: https://www.mapbox.com/mapbox-unity-sdk/docs/03-examples.html
-
 Known Issues: https://www.mapbox.com/mapbox-unity-sdk/docs/02-known-issues.html
-
-Attribution: https://www.mapbox.com/mapbox-unity-sdk/docs/04-attribution.html
 
 API: https://www.mapbox.com/mapbox-unity-sdk/api/
 

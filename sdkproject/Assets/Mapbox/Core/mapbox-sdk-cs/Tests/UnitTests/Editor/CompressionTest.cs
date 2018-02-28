@@ -139,7 +139,9 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 
 			// tiles are automatically decompressed during HttpRequest on full .Net framework
 			// not on .NET Core / UWP / Unity
-#if NETFX_CORE || UNITY_5_6_OR_NEWER
+#if UNITY_EDITOR_OSX
+			Assert.AreEqual(buffer.Length, Compression.Decompress(buffer).Length);
+#elif NETFX_CORE || UNITY_5_6_OR_NEWER
 			Assert.Less(buffer.Length, Compression.Decompress(buffer).Length);
 #else
 			Assert.AreEqual(buffer.Length, Compression.Decompress(buffer).Length);

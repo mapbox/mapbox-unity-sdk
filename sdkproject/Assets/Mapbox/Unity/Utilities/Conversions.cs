@@ -84,7 +84,7 @@ namespace Mapbox.Unity.Utilities
 		/// </summary>
 		/// <param name="lat"> The latitude. </param>
 		/// <param name="lon"> The longitude. </param>
-		/// <param name="refPoint"> A <see cref="T:UnityEngine.Vector2d"/> center point to offset resultant xy</param>
+		/// <param name="refPoint"> A <see cref="T:UnityEngine.Vector2d"/> center point to offset resultant xy, this is usually map's center mercator</param>
 		/// <param name="scale"> Scale in meters. (default scale = 1) </param>
 		/// <returns> A <see cref="T:UnityEngine.Vector2d"/> xy tile ID. </returns>
 		/// <example>

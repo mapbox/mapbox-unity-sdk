@@ -45,8 +45,7 @@ namespace Mapbox.Unity
 
 		MapboxConfiguration _configuration;
 		/// <summary>
-		/// The Mapbox API access token. 
-		/// See <see href="https://www.mapbox.com/mapbox-unity-sdk/docs/01-mapbox-api-token.html">Mapbox API Congfiguration in Unity</see>.
+		/// The Mapbox API access token.
 		/// </summary>
 		public MapboxConfiguration Configuration
 		{
@@ -92,10 +91,21 @@ namespace Mapbox.Unity
 			ConfigureTelemetry();
 		}
 
+
+		/// <summary>
+		/// Deprecated. Use 'ClearSceneCache' or 'ClearAllCacheFiles' instead.
+		/// </summary>
+		[Obsolete("Deprecated. Use 'ClearSceneCache' or 'ClearAllCacheFiles' instead.")]
+		public void ClearCache()
+		{
+			ClearSceneCache();
+		}
+
+
 		/// <summary>
 		/// Clear all existing tile caches. Deletes MBTiles database files.
 		/// </summary>
-		public void ClearCache()
+		public void ClearSceneCache()
 		{
 			CachingWebFileSource cwfs = _fileSource as CachingWebFileSource;
 			if (null != cwfs)
@@ -104,6 +114,27 @@ namespace Mapbox.Unity
 			}
 		}
 
+
+		public void ClearAllCacheFiles()
+		{
+			// call ClearSceneCache to close any connections that might be open
+			ClearSceneCache();
+
+			string cacheDirectory = Path.Combine(Application.persistentDataPath, "cache");
+			if (!Directory.Exists(cacheDirectory)) { return; }
+
+			foreach (var file in Directory.GetFiles(cacheDirectory))
+			{
+				try
+				{
+					File.Delete(file);
+				}
+				catch (Exception deleteEx)
+				{
+					Debug.LogErrorFormat("Could not delete [{0}]: {1}", file, deleteEx);
+				}
+			}
+		}
 
 		/// <summary>
 		/// Loads the access token from <see href="https://docs.unity3d.com/Manual/BestPracticeUnderstandingPerformanceInUnity6.html">Resources folder</see>.
@@ -123,7 +154,7 @@ namespace Mapbox.Unity
 
 		void ConfigureFileSource()
 		{
-			_fileSource = new CachingWebFileSource(_configuration.AccessToken)
+			_fileSource = new CachingWebFileSource(_configuration.AccessToken, _configuration.AutoRefreshCache)
 				.AddCache(new MemoryCache(_configuration.MemoryCacheSize))
 #if !UNITY_WEBGL
 				.AddCache(new MbTilesCache(_configuration.MbTilesCacheSize))
@@ -272,5 +303,6 @@ namespace Mapbox.Unity
 		public uint MemoryCacheSize = 500;
 		public uint MbTilesCacheSize = 2000;
 		public int DefaultTimeout = 30;
+		public bool AutoRefreshCache = false;
 	}
 }

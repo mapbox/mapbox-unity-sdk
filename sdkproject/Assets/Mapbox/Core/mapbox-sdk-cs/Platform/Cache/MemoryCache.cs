@@ -12,13 +12,6 @@ namespace Mapbox.Platform.Cache
 	{
 
 
-		private struct CacheItem
-		{
-			public long Timestamp;
-			public byte[] Data;
-		}
-
-
 		// TODO: add support for disposal strategy (timestamp, distance, etc.)
 		public MemoryCache(uint maxCacheSize)
 		{
@@ -38,7 +31,7 @@ namespace Mapbox.Platform.Cache
 		}
 
 
-		public void Add(string mapdId, CanonicalTileId tileId, byte[] data)
+		public void Add(string mapdId, CanonicalTileId tileId, CacheItem item, bool forceInsert)
 		{
 			string key = mapdId + "||" + tileId;
 
@@ -46,18 +39,20 @@ namespace Mapbox.Platform.Cache
 			{
 				if (_cachedResponses.Count >= _maxCacheSize)
 				{
-					_cachedResponses.Remove(_cachedResponses.OrderBy(c => c.Value.Timestamp).First().Key);
+					_cachedResponses.Remove(_cachedResponses.OrderBy(c => c.Value.AddedToCacheTicksUtc).First().Key);
 				}
 
+				// TODO: forceInsert
 				if (!_cachedResponses.ContainsKey(key))
 				{
-					_cachedResponses.Add(key, new CacheItem() { Timestamp = DateTime.Now.Ticks, Data = data });
+					item.AddedToCacheTicksUtc = DateTime.UtcNow.Ticks;
+					_cachedResponses.Add(key, item);
 				}
 			}
 		}
 
 
-		public byte[] Get(string mapId, CanonicalTileId tileId)
+		public CacheItem Get(string mapId, CanonicalTileId tileId)
 		{
 			string key = mapId + "||" + tileId;
 
@@ -68,7 +63,7 @@ namespace Mapbox.Platform.Cache
 					return null;
 				}
 
-				return _cachedResponses[key].Data;
+				return _cachedResponses[key];
 			}
 		}
 

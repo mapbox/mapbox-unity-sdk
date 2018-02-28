@@ -29,5 +29,11 @@ namespace Mapbox.Platform.MbTiles
 
 		/// <summary>Unix epoch for simple FIFO pruning </summary>
 		public int timestamp { get; set; }
+
+		/// <summary> ETag Header value of the reponse for auto updating cache</summary>
+		public string etag { get; set; }
+
+		/// <summary>Last-Modified header value of API response. Not all APIs populate it, will be -1 in that case. </summary>
+		public int? lastmodified { get; set; }
 	}
 }

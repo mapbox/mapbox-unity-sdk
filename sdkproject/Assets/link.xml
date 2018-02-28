@@ -1,0 +1,7 @@
+<linker>
+    <assembly fullname="System.Core">
+        <type fullname="System.Linq.Expressions.Expression`1">
+            <method name="Create"/>
+        </type>
+    </assembly>
+</linker>
