@@ -44,7 +44,7 @@
 				case ImagerySourceType.Satellite:
 					defaultStyle = new Style
 					{
-						Id = "mapbox://styles/mapbox/light-v9",
+						Id = "mapbox.satellite",
 						Name = "Satellite"
 					};
 
@@ -52,7 +52,7 @@
 				case ImagerySourceType.SatelliteStreet:
 					defaultStyle = new Style
 					{
-						Id = "mapbox.satellite",
+						Id = "mapbox://styles/mapbox/satellite-streets-v10",
 						Name = "Satellite Streets"
 					};
 
