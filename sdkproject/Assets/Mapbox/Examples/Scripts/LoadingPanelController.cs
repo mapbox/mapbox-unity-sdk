@@ -15,10 +15,16 @@ namespace Mapbox.Examples
 		[SerializeField]
 		AnimationCurve _curve;
 
+		UnifiedMap _map;
 		void Awake()
 		{
-			var map = FindObjectOfType<AbstractMap>();
-			var visualizer = map.MapVisualizer;
+			_map = FindObjectOfType<UnifiedMap>();
+			_map.OnInitialized += _map_OnInitialized;
+		}
+
+		void _map_OnInitialized()
+		{
+			var visualizer = _map.MapVisualizer;
 			_text.text = "LOADING";
 			visualizer.OnMapVisualizerStateChanged += (s) =>
 			{

@@ -115,12 +115,8 @@ namespace Mapbox.Unity.Map
 			var mapImageryLayers = new ImageryLayer();
 			mapImageryLayers.Initialize(_unifiedMapOptions.imageryLayerProperties);
 
-
 			var mapElevationLayer = new TerrainLayer();
 			mapElevationLayer.Initialize(_unifiedMapOptions.elevationLayerProperties);
-			//var terrainFactory = ScriptableObject.CreateInstance<TerrainWithSideWallsFactory>();
-			//terrainFactory._mapId = "mapbox.terrain-rgb";
-
 
 			var mapVectorLayer = new VectorLayer();
 			mapVectorLayer.Initialize(_unifiedMapOptions.vectorLayerProperties);
@@ -137,14 +133,15 @@ namespace Mapbox.Unity.Map
 			Debug.Log("Setup 2DMap done. ");
 		}
 
-
+		private void Awake()
+		{
+			// Setup a visualizer to get a "Starter" map.
+			_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
+		}
 		// Use this for initialization
 		void Start()
 		{
 			//_map = gameObject.AddComponent<UnifiedMap>();
-			// Setup a visualizer to get a "Starter" map.
-			_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
-
 			switch (_unifiedMapOptions.mapOptions.placementOptions.visualizationType)
 			{
 				case MapVisualizationType.Flat2D:
@@ -167,24 +164,6 @@ namespace Mapbox.Unity.Map
 			{
 				_currentOptions = value;
 			}
-		}
-
-		public void InitializeMap(MapOptions options)
-		{
-			CurrentOptions = options;
-			_worldHeightFixed = false;
-			_fileSource = MapboxAccess.Instance;
-			_centerLatitudeLongitude = Conversions.StringToLatLon(options.locationOptions.latitudeLongitude);
-			_initialZoom = (int)options.locationOptions.zoom;
-
-			options.scalingOptions.scalingStrategy.SetUpScaling(this);
-
-			options.placementOptions.placementStrategy.SetUpPlacement(this);
-
-			_mapVisualizer.Initialize(this, _fileSource);
-			_tileProvider.Initialize(this);
-
-			SendInitialized();
 		}
 
 		//[SerializeField]
@@ -214,17 +193,17 @@ namespace Mapbox.Unity.Map
 		//[SerializeField]
 		[NodeEditorElement("MapVisualizer")]
 		protected AbstractMapVisualizer _mapVisualizer;
-		//public AbstractMapVisualizer MapVisualizer
-		//{
-		//	get
-		//	{
-		//		return _mapVisualizer;
-		//	}
-		//	set
-		//	{
-		//		_mapVisualizer = value;
-		//	}
-		//}
+		public AbstractMapVisualizer MapVisualizer
+		{
+			get
+			{
+				return _mapVisualizer;
+			}
+			set
+			{
+				_mapVisualizer = value;
+			}
+		}
 
 		//[SerializeField]
 		protected float _unityTileSize = 1;
@@ -336,7 +315,23 @@ namespace Mapbox.Unity.Map
 
 			_mapVisualizer.Destroy();
 		}
+		public void InitializeMap(MapOptions options)
+		{
+			CurrentOptions = options;
+			_worldHeightFixed = false;
+			_fileSource = MapboxAccess.Instance;
+			_centerLatitudeLongitude = Conversions.StringToLatLon(options.locationOptions.latitudeLongitude);
+			_initialZoom = (int)options.locationOptions.zoom;
 
+			options.scalingOptions.scalingStrategy.SetUpScaling(this);
+
+			options.placementOptions.placementStrategy.SetUpPlacement(this);
+
+			_mapVisualizer.Initialize(this, _fileSource);
+			_tileProvider.Initialize(this);
+
+			SendInitialized();
+		}
 		protected virtual void TileProvider_OnTileAdded(UnwrappedTileId tileId)
 		{
 			//if (_snapMapHeightToZero && !_worldHeightFixed)
