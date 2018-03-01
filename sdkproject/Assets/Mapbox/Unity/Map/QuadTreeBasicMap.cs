@@ -12,8 +12,8 @@
 			// For quadtree implementation of the map, the map scale needs to be compensated for. 
 			var scaleFactor = Mathf.Pow(2, (InitialZoom - AbsoluteZoom));
 
-			var worldPos = Conversions.GeoToWorldPosition(latitudeLongitude, CenterMercator, WorldRelativeScale).ToVector3xz();
-			return _root.TransformPoint(worldPos) * scaleFactor;
+			var worldPos = Conversions.GeoToWorldPosition(latitudeLongitude, CenterMercator, WorldRelativeScale * scaleFactor).ToVector3xz();
+			return _root.TransformPoint(worldPos);
 		}
 
 		public override Vector2d WorldToGeoPosition(Vector3 realworldPoint)
@@ -21,7 +21,7 @@
 			// For quadtree implementation of the map, the map scale needs to be compensated for. 
 			var scaleFactor = Mathf.Pow(2, (InitialZoom - AbsoluteZoom));
 
-			return (_root.InverseTransformPoint(realworldPoint) / scaleFactor).GetGeoPosition(CenterMercator, WorldRelativeScale);
+			return (_root.InverseTransformPoint(realworldPoint)).GetGeoPosition(CenterMercator, WorldRelativeScale * scaleFactor);
 		}
 	}
 }

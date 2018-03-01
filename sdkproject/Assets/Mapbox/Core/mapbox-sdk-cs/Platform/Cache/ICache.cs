@@ -1,10 +1,9 @@
-using Mapbox.Map;
-using System.Collections;
-using System.Collections.Generic;
-
 
 namespace Mapbox.Platform.Cache
 {
+
+	using Mapbox.Map;
+	using System;
 
 
 	public interface ICache
@@ -20,8 +19,9 @@ namespace Mapbox.Platform.Cache
 		/// </summary>
 		/// <param name="mapId">Tile set name</param>
 		/// <param name="tileId">Tile ID</param>
-		/// <param name="data">Tile data</param>
-		void Add(string mapId, CanonicalTileId tileId, byte[] data);
+		/// <param name="item">Item to cache</param>
+		/// <param name="replaceIfExists">Force insert even if item already exists.</param>
+		void Add(string mapId, CanonicalTileId tileId, CacheItem item, bool replaceIfExists);
 
 
 		/// <summary>
@@ -30,7 +30,7 @@ namespace Mapbox.Platform.Cache
 		/// <param name="mapId"></param>
 		/// <param name="tileId"></param>
 		/// <returns>byte[] with tile data. Null if requested tile is not in cache</returns>
-		byte[] Get(string mapId, CanonicalTileId tileId);
+		CacheItem Get(string mapId, CanonicalTileId tileId);
 
 
 		/// <summary>Clear cache for all tile sets</summary>

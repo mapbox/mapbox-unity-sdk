@@ -9,12 +9,18 @@ namespace Mapbox.Editor
 	{
 
 
-		[MenuItem("Mapbox/Clear Caches")]
+		[MenuItem("Mapbox/Clear Caches/Current Scene")]
 		public static void ClearCachingFileSource()
 		{
-			Mapbox.Unity.MapboxAccess.Instance.ClearCache();
+			Mapbox.Unity.MapboxAccess.Instance.ClearSceneCache();
 		}
 
+
+		[MenuItem("Mapbox/Clear Caches/All")]
+		public static void ClearAllCachFiles()
+		{
+			Mapbox.Unity.MapboxAccess.Instance.ClearAllCacheFiles();
+		}
 
 
 	}

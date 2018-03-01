@@ -84,7 +84,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					{
 						item.OnPoolItem(_activeObjects[tile][i]);
 					}
-					_activeObjects[tile][i].GameObject.SetActive(false);
+					if (null != _activeObjects[tile][i].GameObject)
+					{
+						_activeObjects[tile][i].GameObject.SetActive(false);
+					}
 					_pool.Put(_activeObjects[tile][i]);
 				}
 				_activeObjects[tile].Clear();

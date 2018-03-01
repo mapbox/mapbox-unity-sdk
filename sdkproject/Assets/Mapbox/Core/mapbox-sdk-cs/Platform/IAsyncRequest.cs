@@ -4,7 +4,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+
 namespace Mapbox.Platform {
+
+	using Mapbox.Unity.Utilities;
 
 
 	/// <summary> A handle to an asynchronous request. </summary>
@@ -15,5 +18,8 @@ namespace Mapbox.Platform {
 
 		/// <summary> Cancel the ongoing request, preventing it from firing a callback. </summary>
 		void Cancel();
+
+		/// <summary>Type of request: GET, HEAD, ...</summary>
+		HttpRequestType RequestType { get; }
 	}
 }
