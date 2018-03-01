@@ -109,10 +109,12 @@
 			var vectorTile = new VectorTile();
 			tile.AddTile(vectorTile);
 
-			if (string.IsNullOrEmpty(MapId))
+			if (string.IsNullOrEmpty(MapId) || _properties.sourceOptions.isActive == false)
 			{
 				// Do nothing; 
 				Debug.Log(" Did nothing");
+				Progress++;
+				Progress--;
 			}
 			else
 			{
