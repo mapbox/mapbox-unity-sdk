@@ -6,7 +6,7 @@
 	using UnityEditor;
 	using Mapbox.Unity.Map;
 
-	[CustomEditor(typeof(MapAPI))]
+	[CustomEditor(typeof(UnifiedMap))]
 	[CanEditMultipleObjects]
 	public class MapManagerEditor : Editor
 	{

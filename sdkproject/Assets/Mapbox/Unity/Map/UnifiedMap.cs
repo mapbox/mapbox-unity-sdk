@@ -1,10 +1,12 @@
 namespace Mapbox.Unity.Map
 {
 	using System;
+	using System.Collections.Generic;
 	using Mapbox.Unity.Utilities;
 	using Utils;
 	using UnityEngine;
 	using Mapbox.Map;
+	using Mapbox.Unity.MeshGeneration.Factories;
 
 	public interface IUnifiedMap
 	{
@@ -59,6 +61,101 @@ namespace Mapbox.Unity.Map
 
 	public class UnifiedMap : MonoBehaviour, IMap
 	{
+		[SerializeField]
+		UnifiedMapOptions _unifiedMapOptions = new UnifiedMapOptions();
+
+		void SetUpFlat2DMap()
+		{
+			switch (_unifiedMapOptions.mapOptions.placementOptions.placementType)
+			{
+				case MapPlacementType.AtTileCenter:
+					_unifiedMapOptions.mapOptions.placementOptions.placementStrategy = new MapPlacementAtTileCenterStrategy();
+					break;
+				case MapPlacementType.AtLocationCenter:
+					_unifiedMapOptions.mapOptions.placementOptions.placementStrategy = new MapPlacementAtLocationCenterStrategy();
+					break;
+				default:
+					_unifiedMapOptions.mapOptions.placementOptions.placementStrategy = new MapPlacementAtTileCenterStrategy();
+					break;
+			}
+
+			switch (_unifiedMapOptions.mapOptions.scalingOptions.scalingType)
+			{
+				case MapScalingType.WorldScale:
+					_unifiedMapOptions.mapOptions.scalingOptions.scalingStrategy = new MapScalingAtWorldScaleStrategy();
+					break;
+				case MapScalingType.Custom:
+					_unifiedMapOptions.mapOptions.scalingOptions.scalingStrategy = new MapScalingAtUnityScaleStrategy();
+					break;
+				default:
+					break;
+			}
+
+			ITileProviderOptions tileProviderOptions = _unifiedMapOptions.mapOptions.placementOptions.extentOptions.GetTileProviderOptions();
+			// Setup tileprovider based on type. 
+			switch (_unifiedMapOptions.mapOptions.placementOptions.extentOptions.extentType)
+			{
+				case MapExtentType.CameraBounds:
+					TileProvider = gameObject.AddComponent<QuadTreeTileProvider>();
+					break;
+				case MapExtentType.RangeAroundCenter:
+					TileProvider = gameObject.AddComponent<RangeTileProvider>();
+					break;
+				case MapExtentType.RangeAroundTransform:
+					TileProvider = gameObject.AddComponent<RangeAroundTransformTileProvider>();
+					break;
+				default:
+					break;
+			}
+
+			TileProvider.SetOptions(tileProviderOptions);
+
+
+
+			var mapImageryLayers = new ImageryLayer();
+			mapImageryLayers.Initialize(_unifiedMapOptions.imageryLayerProperties);
+
+
+			var mapElevationLayer = new TerrainLayer();
+			mapElevationLayer.Initialize(_unifiedMapOptions.elevationLayerProperties);
+			//var terrainFactory = ScriptableObject.CreateInstance<TerrainWithSideWallsFactory>();
+			//terrainFactory._mapId = "mapbox.terrain-rgb";
+
+
+			var mapVectorLayer = new VectorLayer();
+			mapVectorLayer.Initialize(_unifiedMapOptions.vectorLayerProperties);
+
+			_mapVisualizer.Factories = new List<AbstractTileFactory>
+			{
+				mapElevationLayer.ElevationFactory,
+				mapImageryLayers.ImageFactory,
+				mapVectorLayer.VectorFactory
+			};
+
+			InitializeMap(_unifiedMapOptions.mapOptions);
+
+			Debug.Log("Setup 2DMap done. ");
+		}
+
+
+		// Use this for initialization
+		void Start()
+		{
+			//_map = gameObject.AddComponent<UnifiedMap>();
+			// Setup a visualizer to get a "Starter" map.
+			_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
+
+			switch (_unifiedMapOptions.mapOptions.placementOptions.visualizationType)
+			{
+				case MapVisualizationType.Flat2D:
+					SetUpFlat2DMap();
+					break;
+				case MapVisualizationType.Globe3D:
+					break;
+				default:
+					break;
+			}
+		}
 		private MapOptions _currentOptions;
 		public MapOptions CurrentOptions
 		{
@@ -71,6 +168,7 @@ namespace Mapbox.Unity.Map
 				_currentOptions = value;
 			}
 		}
+
 		public void InitializeMap(MapOptions options)
 		{
 			CurrentOptions = options;
@@ -89,7 +187,7 @@ namespace Mapbox.Unity.Map
 			SendInitialized();
 		}
 
-		[SerializeField]
+		//[SerializeField]
 		protected AbstractTileProvider _tileProvider;
 		public AbstractTileProvider TileProvider
 		{
@@ -113,22 +211,22 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		[SerializeField]
+		//[SerializeField]
 		[NodeEditorElement("MapVisualizer")]
-		public AbstractMapVisualizer _mapVisualizer;
-		public AbstractMapVisualizer MapVisualizer
-		{
-			get
-			{
-				return _mapVisualizer;
-			}
-			set
-			{
-				_mapVisualizer = value;
-			}
-		}
+		protected AbstractMapVisualizer _mapVisualizer;
+		//public AbstractMapVisualizer MapVisualizer
+		//{
+		//	get
+		//	{
+		//		return _mapVisualizer;
+		//	}
+		//	set
+		//	{
+		//		_mapVisualizer = value;
+		//	}
+		//}
 
-		[SerializeField]
+		//[SerializeField]
 		protected float _unityTileSize = 1;
 		public float UnityTileSize
 		{
@@ -154,7 +252,7 @@ namespace Mapbox.Unity.Map
 				return _initialZoom;
 			}
 		}
-		[SerializeField]
+		//[SerializeField]
 		protected bool _snapMapHeightToZero = true;
 
 		protected bool _worldHeightFixed = false;

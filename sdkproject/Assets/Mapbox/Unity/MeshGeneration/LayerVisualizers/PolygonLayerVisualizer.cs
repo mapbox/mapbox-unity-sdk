@@ -51,6 +51,10 @@
 			switch (properties.coreOptions.geometryType)
 			{
 				case VectorPrimitiveType.Point:
+					if (_layerProperties.coreOptions.snapToTerrain == true)
+					{
+						defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
+					}
 					break;
 				case VectorPrimitiveType.Line:
 					if (_layerProperties.coreOptions.snapToTerrain == true)
@@ -95,6 +99,10 @@
 
 			_defaultStack.MeshModifiers.AddRange(defaultMeshModifierStack);
 			_defaultStack.GoModifiers.AddRange(defaultGOModifierStack);
+
+			//Add any additional modifiers that were added. 
+			_defaultStack.MeshModifiers.AddRange(_layerProperties.modifierOptions.MeshModifiers);
+			_defaultStack.GoModifiers.AddRange(_layerProperties.modifierOptions.GoModifiers);
 
 		}
 		public override void Initialize()
@@ -169,12 +177,24 @@
 			{
 				var feature = new VectorFeatureUnity(layer.GetFeature(i, 0), tile, layer.Extent);
 
-				if (combiner.Try(feature))
+				if (filters.Length == 0)
 				{
+					// no filters, just build the features. 
 					if (tile != null && tile.gameObject != null && tile.VectorDataState != Enums.TilePropertyState.Cancelled)
 						Build(feature, tile, tile.gameObject);
 
 					_entityInCurrentCoroutine++;
+				}
+				else
+				{
+					// build features only if the filter returns true. 
+					if (combiner.Try(feature))
+					{
+						if (tile != null && tile.gameObject != null && tile.VectorDataState != Enums.TilePropertyState.Cancelled)
+							Build(feature, tile, tile.gameObject);
+
+						_entityInCurrentCoroutine++;
+					}
 				}
 
 				if (_performanceOptions.isEnabled && _entityInCurrentCoroutine >= _performanceOptions.entityPerCoroutine)

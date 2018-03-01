@@ -629,37 +629,11 @@
 			EditorGUI.BeginProperty(position, label, property);
 			position.height = lineHeight;
 			EditorGUI.PropertyField(position, property.FindPropertyRelative("layerSource"), true);
-			//showPosition = EditorGUI.Foldout(position, showPosition, label.text);
-
-			//EditorGUI.indentLevel++;
-
-			//if (showPosition)
-			//{
-			//	//position.y += lineHeight;
-			//	//EditorGUI.PropertyField(position, property.FindPropertyRelative("isActive"), true);
-
-			//	position.y += lineHeight;
-			//	EditorGUI.PropertyField(position, property.FindPropertyRelative("layerSource"), true);
-			//}
-
-			//EditorGUI.indentLevel--;
-
 			EditorGUI.EndProperty();
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
-			float height = 0.0f;
-			//if (showPosition)
-			//{
-			//	height += EditorGUIUtility.singleLineHeight;
-			//	height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("layerSource"), false);
-			//}
-			//else
-			//{
-			height = EditorGUIUtility.singleLineHeight;
-			//}
-
-			return height;
+			return lineHeight;
 		}
 	}
 

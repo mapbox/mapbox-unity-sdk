@@ -36,7 +36,7 @@
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("performanceOptions"), new GUIContent("Perfomance Option"));
 				position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("performanceOptions"));
 
-				GUILayout.Label("Visualizer Stack");
+				EditorGUILayout.LabelField("Visualizer Stack");
 
 				var subLayerArray = property.FindPropertyRelative("vectorSubLayers");
 				var layersRect = GUILayoutUtility.GetRect(0, 500, Mathf.Max(subLayerArray.arraySize + 1, 1) * lineHeight, (subLayerArray.arraySize + 1) * lineHeight);

@@ -48,13 +48,6 @@
 			}
 		}
 
-		public void OnEnable()
-		{
-			//if (Visualizers == null)
-			//{
-			//	Visualizers = new List<LayerVisualizerBase>();
-			//}
-		}
 
 		public override void SetOptions(LayerProperties options)
 		{
@@ -116,42 +109,49 @@
 			var vectorTile = new VectorTile();
 			tile.AddTile(vectorTile);
 
-
-			vectorTile.Initialize(_fileSource, tile.CanonicalTileId, MapId, () =>
+			if (string.IsNullOrEmpty(MapId))
 			{
-				if (tile == null)
+				// Do nothing; 
+				Debug.Log(" Did nothing");
+			}
+			else
+			{
+				vectorTile.Initialize(_fileSource, tile.CanonicalTileId, MapId, () =>
 				{
-					return;
-				}
+					if (tile == null)
+					{
+						return;
+					}
 
-				if (vectorTile.HasError)
-				{
-					OnErrorOccurred(new TileErrorEventArgs(tile.CanonicalTileId, vectorTile.GetType(), tile, vectorTile.Exceptions));
-					tile.VectorDataState = TilePropertyState.Error;
-					return;
-				}
+					if (vectorTile.HasError)
+					{
+						OnErrorOccurred(new TileErrorEventArgs(tile.CanonicalTileId, vectorTile.GetType(), tile, vectorTile.Exceptions));
+						tile.VectorDataState = TilePropertyState.Error;
+						return;
+					}
 
-				if (_cachedData.ContainsKey(tile))
-				{
-					_cachedData[tile] = vectorTile;
-				}
-				else
-				{
-					_cachedData.Add(tile, vectorTile);
-				}
+					if (_cachedData.ContainsKey(tile))
+					{
+						_cachedData[tile] = vectorTile;
+					}
+					else
+					{
+						_cachedData.Add(tile, vectorTile);
+					}
 
-				// FIXME: we can make the request BEFORE getting a response from these!
-				if (tile.HeightDataState == TilePropertyState.Loading ||
-					tile.RasterDataState == TilePropertyState.Loading)
-				{
-					tile.OnHeightDataChanged += DataChangedHandler;
-					tile.OnRasterDataChanged += DataChangedHandler;
-				}
-				else
-				{
-					CreateMeshes(tile);
-				}
-			});
+					// FIXME: we can make the request BEFORE getting a response from these!
+					if (tile.HeightDataState == TilePropertyState.Loading ||
+							tile.RasterDataState == TilePropertyState.Loading)
+					{
+						tile.OnHeightDataChanged += DataChangedHandler;
+						tile.OnRasterDataChanged += DataChangedHandler;
+					}
+					else
+					{
+						CreateMeshes(tile);
+					}
+				});
+			}
 		}
 
 		/// <summary>

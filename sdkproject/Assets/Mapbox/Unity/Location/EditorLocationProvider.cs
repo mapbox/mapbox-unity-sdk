@@ -53,7 +53,7 @@ namespace Mapbox.Unity.Location
 			LocationProviderFactory.Instance.mapManager.OnInitialized -= Map_OnInitialized;
 			//_map.OnInitialized -= Map_OnInitialized;
 			_mapInitialized = true;
-			_map = LocationProviderFactory.Instance.mapManager.Map;
+			_map = LocationProviderFactory.Instance.mapManager;
 		}
 
 		Vector2d LatitudeLongitude

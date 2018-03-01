@@ -19,6 +19,10 @@
 		public override void OnInitialized()
 		{
 			_cbtpOptions = (CameraBoundsTileProviderOptions)_options;
+			if (_cbtpOptions.camera == null)
+			{
+				_cbtpOptions.camera = Camera.main;
+			}
 			_groundPlane = new Plane(Vector3.up, 0);
 			_shouldUpdate = true;
 		}

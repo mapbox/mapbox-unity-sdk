@@ -37,7 +37,7 @@ namespace Mapbox.Unity.Location
 
 		protected override void SetLocation()
 		{
-			var _map = LocationProviderFactory.Instance.mapManager.Map;
+			var _map = LocationProviderFactory.Instance.mapManager;
 			_currentLocation.Heading = _targetTransform.eulerAngles.y;
 			_currentLocation.LatitudeLongitude = _targetTransform.GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
 			_currentLocation.Accuracy = _accuracy;
