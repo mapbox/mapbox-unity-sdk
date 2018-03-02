@@ -7,12 +7,13 @@
 	public class MapLocationOptions
 	{
 		[Geocode]
-		[SerializeField]
+		//[SerializeField]
 		public string latitudeLongitude = "0,0";
 		[Range(0, 22)]
 		public float zoom = 4.0f;
 
 		//TODO : Add Coordinate conversion class. 
+		[NonSerialized]
 		public MapCoordinateSystemType coordinateSystemType;
 	}
 }

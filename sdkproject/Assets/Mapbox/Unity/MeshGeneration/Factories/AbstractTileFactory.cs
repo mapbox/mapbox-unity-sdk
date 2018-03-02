@@ -57,11 +57,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				{
 					State = ModuleState.Working;
 					OnFactoryStateChanged(this);
+					Debug.Log("Working");
 				}
 				if (_progress > 0 && value == 0)
 				{
 					State = ModuleState.Finished;
 					OnFactoryStateChanged(this);
+					Debug.Log("Finished");
 				}
 				_progress = value;
 			}

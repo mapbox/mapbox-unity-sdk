@@ -5,6 +5,7 @@
 	[Serializable]
 	public class VectorLayerProperties : LayerProperties
 	{
+		public VectorSourceType sourceType = VectorSourceType.MapboxStreets;
 		public LayerSourceOptions sourceOptions;
 		public LayerPerformanceOptions performanceOptions;
 		public GeometryStylingOptions defaultStylingOptions;

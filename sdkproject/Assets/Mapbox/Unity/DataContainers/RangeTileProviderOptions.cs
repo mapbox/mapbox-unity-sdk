@@ -1,13 +1,19 @@
 ﻿namespace Mapbox.Unity.Map
 {
 	using System;
+	using UnityEngine;
+
 	[Serializable]
 	public class RangeTileProviderOptions : ITileProviderOptions
 	{
-		public int west;
-		public int north;
-		public int east;
-		public int south;
+		[Range(0, 10)]
+		public int west = 1;
+		[Range(0, 10)]
+		public int north = 1;
+		[Range(0, 10)]
+		public int east = 1;
+		[Range(0, 10)]
+		public int south = 1;
 
 
 		public void SetOptions(int northRange, int southRange, int eastRange, int westRange)

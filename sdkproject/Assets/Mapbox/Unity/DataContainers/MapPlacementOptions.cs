@@ -7,7 +7,7 @@
 		public MapVisualizationType visualizationType;
 		public MapPlacementType placementType;
 		//public MapStreamingType streamingType;
-		public MapExtentOptions extentOptions;
+
 
 		public IMapPlacementStrategy placementStrategy;
 	}

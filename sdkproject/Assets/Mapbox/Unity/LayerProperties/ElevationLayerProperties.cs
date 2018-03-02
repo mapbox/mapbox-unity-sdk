@@ -5,6 +5,7 @@
 	[Serializable]
 	public class ElevationLayerProperties : LayerProperties
 	{
+		public ElevationSourceType sourceType = ElevationSourceType.MapboxTerrain;
 		public LayerSourceOptions sourceOptions = new LayerSourceOptions()
 		{
 			layerSource = new Style()
@@ -13,7 +14,8 @@
 			},
 			isActive = true
 		};
-		public ElevationModificationOptions elevationLayerOptions;
+		public ElevationRequiredOptions requiredOptions;
+		public ElevationModificationOptions modificationOptions;
 		public UnityLayerOptions unityLayerOptions;
 		public TerrainSideWallOptions sideWallOptions;
 	}

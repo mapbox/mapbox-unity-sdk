@@ -91,9 +91,9 @@ namespace Mapbox.Unity.Map
 					break;
 			}
 
-			ITileProviderOptions tileProviderOptions = _unifiedMapOptions.mapOptions.placementOptions.extentOptions.GetTileProviderOptions();
+			ITileProviderOptions tileProviderOptions = _unifiedMapOptions.mapOptions.extentOptions.GetTileProviderOptions();
 			// Setup tileprovider based on type. 
-			switch (_unifiedMapOptions.mapOptions.placementOptions.extentOptions.extentType)
+			switch (_unifiedMapOptions.mapOptions.extentOptions.extentType)
 			{
 				case MapExtentType.CameraBounds:
 					TileProvider = gameObject.AddComponent<QuadTreeTileProvider>();

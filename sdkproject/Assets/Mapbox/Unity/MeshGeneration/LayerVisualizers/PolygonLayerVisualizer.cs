@@ -154,11 +154,11 @@
 			//testing each feature with filters
 			var fc = layer.FeatureCount();
 			//Get all filters in the array. 
-			var filters = _layerProperties.coreOptions.filters.Select(m => m.GetFilterComparer()).ToArray();
+			var filters = _layerProperties.filterOptions.filters.Select(m => m.GetFilterComparer()).ToArray();
 
 			// Pass them to the combiner 
 			Filters.ILayerFeatureFilterComparer combiner = new Filters.LayerFilterComparer();
-			switch (_layerProperties.coreOptions.combinerType)
+			switch (_layerProperties.filterOptions.combinerType)
 			{
 				case Filters.LayerFilterCombinerOperationType.Any:
 					combiner = Filters.LayerFilterComparer.AnyOf(filters);

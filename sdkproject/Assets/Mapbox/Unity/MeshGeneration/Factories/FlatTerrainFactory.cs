@@ -56,13 +56,13 @@
 				{
 					renderer.materials = new Material[2]
 					{
-						_elevationOptions.elevationLayerOptions.baseMaterial,
+						_elevationOptions.requiredOptions.baseMaterial,
 						_elevationOptions.sideWallOptions.wallMaterial
 					};
 				}
 				else
 				{
-					renderer.material = _elevationOptions.elevationLayerOptions.baseMaterial;
+					renderer.material = _elevationOptions.requiredOptions.baseMaterial;
 				}
 			}
 
@@ -76,7 +76,7 @@
 			tile.MeshFilter.sharedMesh = GetQuad(tile, _elevationOptions.sideWallOptions.isActive);
 			Progress--;
 
-			if (_elevationOptions.elevationLayerOptions.addCollider && tile.Collider == null)
+			if (_elevationOptions.requiredOptions.addCollider && tile.Collider == null)
 			{
 				tile.gameObject.AddComponent<BoxCollider>();
 			}

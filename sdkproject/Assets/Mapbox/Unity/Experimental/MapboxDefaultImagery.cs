@@ -68,4 +68,54 @@
 			return defaultStyle;
 		}
 	}
+
+	public static class MapboxDefaultElevation
+	{
+		public static Style GetParameters(ElevationSourceType defaultElevation)
+		{
+			Style defaultStyle = new Style();
+			switch (defaultElevation)
+			{
+				case ElevationSourceType.MapboxTerrain:
+					defaultStyle = new Style
+					{
+						Id = "mapbox.terrain - rgb",
+						Name = "Mapbox Terrain"
+					};
+
+					break;
+				case ElevationSourceType.Custom:
+					throw new Exception("Invalid type : Custom");
+				default:
+					break;
+			}
+
+			return defaultStyle;
+		}
+	}
+
+	public static class MapboxDefaultVector
+	{
+		public static Style GetParameters(VectorSourceType defaultElevation)
+		{
+			Style defaultStyle = new Style();
+			switch (defaultElevation)
+			{
+				case VectorSourceType.MapboxStreets:
+					defaultStyle = new Style
+					{
+						Id = "mapbox.mapbox-streets-v7",
+						Name = "Mapbox Terrain"
+					};
+
+					break;
+				case VectorSourceType.Custom:
+					throw new Exception("Invalid type : Custom");
+				default:
+					break;
+			}
+
+			return defaultStyle;
+		}
+	}
 }

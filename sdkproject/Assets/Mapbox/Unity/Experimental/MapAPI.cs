@@ -68,6 +68,7 @@
 		Line,
 		Polygon
 	}
+
 	public enum ImagerySourceType
 	{
 		Streets,
@@ -80,6 +81,18 @@
 		None
 	}
 
+	public enum ElevationSourceType
+	{
+		MapboxTerrain,
+		Custom,
+	}
+
+	public enum VectorSourceType
+	{
+		MapboxStreets,
+		Custom,
+		None
+	}
 	public enum ElevationLayerType
 	{
 		None,

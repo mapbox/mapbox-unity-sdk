@@ -60,7 +60,7 @@
 		{
 			var elevationLayerProperties = (ElevationLayerProperties)properties;
 
-			switch (elevationLayerProperties.elevationLayerOptions.elevationLayerType)
+			switch (elevationLayerProperties.requiredOptions.elevationLayerType)
 			{
 				case ElevationLayerType.None:
 					_elevationFactory = ScriptableObject.CreateInstance<FlatTerrainFactory>();
