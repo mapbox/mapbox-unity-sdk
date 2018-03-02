@@ -116,10 +116,11 @@ namespace Mapbox.Unity.Location
 
 				var lastData = Input.location.lastData;
 				timestamp = lastData.timestamp;
+				Debug.LogFormat("{0:yyyyMMdd HHmmss} {1} {2:R} {3:R}", UnixTimestampUtils.From(timestamp), lastData.horizontalAccuracy, lastData.latitude, lastData.longitude);
 
 				if (//1!=2 ||
 					(Input.location.status == LocationServiceStatus.Running && timestamp > _lastLocationTimestamp)
-					//|| Time.realtimeSinceStartup < gpsInitializedTime + gpsWarmupTime
+					|| Time.realtimeSinceStartup < gpsInitializedTime + gpsWarmupTime
 				)
 				{
 					_currentLocation.LatitudeLongitude = new Vector2d(lastData.latitude, lastData.longitude);
@@ -140,9 +141,8 @@ namespace Mapbox.Unity.Location
 
 				// throttle pulling location data
 				// some Android devices show higher than actual accuracy values when not throttling
-				//yield return _wait1sec;
-
-				yield return null;
+				yield return _wait1sec;
+				//yield return null;
 			}
 		}
 	}

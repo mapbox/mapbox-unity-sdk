@@ -2,6 +2,7 @@ namespace Mapbox.Unity.Ar
 {
 	using Mapbox.Unity.Map;
 	using Mapbox.Unity.Location;
+	using Mapbox.Utils;
 	using UnityARInterface;
 	using UnityEngine;
 	using Mapbox.Unity.Utilities;
@@ -127,9 +128,9 @@ namespace Mapbox.Unity.Ar
 		void LocationProvider_OnLocationUpdated(Location location)
 		{
 			string gpsLog = string.Format(
-				"{1} locationUpdated:{2} headingUpdated:{3}{0}GPS accuracy:{4:0.0}{0}heading(truenorth):{5:0.0}{0}heading(magnetic):{6:0.0}{0}heading accuracy:{7:0.0}{0}{8:0.00000} / {9:0.00000}"
+				"{1:yyyyMMdd HHmmss} {8:0.00000} / {9:0.00000}{0}locationUpdated:{2} headingUpdated:{3}{0}GPS accuracy:{4:0.0}{0}heading(truenorth):{5:0.0}{0}heading(magnetic):{6:0.0}{0}heading accuracy:{7:0.0}"
 				, Environment.NewLine
-				, location.Timestamp
+				, UnixTimestampUtils.From(location.Timestamp)
 				, location.IsLocationUpdated
 				, location.IsHeadingUpdated
 				, location.Accuracy
@@ -141,7 +142,7 @@ namespace Mapbox.Unity.Ar
 			);
 			Unity.Utilities.Console.Instance.LogGps(gpsLog);
 
-			if (location.IsLocationUpdated)
+			if (location.IsLocationUpdated || location.IsHeadingUpdated)
 			{
 				// With this line, we can control accuracy of Gps updates. 
 				// Be aware that we only get location information if it previously met
@@ -186,10 +187,12 @@ namespace Mapbox.Unity.Ar
 					_synchronizationContext.AddSynchronizationNodes(location, position, _arPositionReference.localPosition);
 
 					string positionLog = string.Format(
-						"location:{1}{0}latlng:{2}{0}centerMerc:{3}{0}relScale:{4}{0}pos:{5}{0}arPosRef:{6}"
+						"{1:yyyyMMdd HHmmss} {2}{0}hdop:{3} hding:{4}{0}centerMerc:{5}{0}relWorldScale:{6}{0}pos:{7}{0}arPosRef:{8}"
 						, Environment.NewLine
-						, location.IsLocationUpdated
+						, UnixTimestampUtils.From(location.Timestamp)
 						, latitudeLongitude
+						, location.Accuracy
+						, location.Heading
 						, _map.CenterMercator
 						, _map.WorldRelativeScale
 						, position

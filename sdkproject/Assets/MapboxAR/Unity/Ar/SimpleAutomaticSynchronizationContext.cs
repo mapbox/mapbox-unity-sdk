@@ -109,7 +109,8 @@
 
 		void ComputeAlignment()
 		{
-			var rotation = Vector3.SignedAngle(_currentAbsoluteGpsVector, _currentArVector, Vector3.up);
+			//var rotation = Vector3.SignedAngle(_currentAbsoluteGpsVector, _currentArVector, Vector3.up);
+			var rotation = _gpsNodes[_count - 1].Heading;
 			var headingQuaternion = Quaternion.Euler(0, rotation, 0);
 			var relativeGpsVector = headingQuaternion * _currentAbsoluteGpsVector;
 

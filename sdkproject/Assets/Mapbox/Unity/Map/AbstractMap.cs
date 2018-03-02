@@ -237,7 +237,6 @@ namespace Mapbox.Unity.Map
 
 		public virtual Vector3 GeoToWorldPosition(Vector2d latitudeLongitude)
 		{
-			Debug.LogWarningFormat("AbstractMap.GeoToWorldPosition, _root:{0}", null == _root ? "_ROOT==NULL" : _root.ToString());
 			return _root.TransformPoint(Conversions.GeoToWorldPosition(latitudeLongitude, CenterMercator, WorldRelativeScale).ToVector3xz());
 		}
 
