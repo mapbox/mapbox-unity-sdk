@@ -14,6 +14,6 @@
 
 		//TODO : Add Coordinate conversion class. 
 		[NonSerialized]
-		public MapCoordinateSystemType coordinateSystemType;
+		public MapCoordinateSystemType coordinateSystemType = MapCoordinateSystemType.WebMercator;
 	}
 }
