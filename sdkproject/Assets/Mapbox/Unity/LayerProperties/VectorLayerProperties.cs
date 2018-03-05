@@ -9,6 +9,6 @@
 		public LayerSourceOptions sourceOptions;
 		public LayerPerformanceOptions performanceOptions;
 		public GeometryStylingOptions defaultStylingOptions;
-		public List<VectorSubLayerProperties> vectorSubLayers = new List<VectorSubLayerProperties>(2);
+		public List<VectorSubLayerProperties> vectorSubLayers = new List<VectorSubLayerProperties>();
 	}
 }

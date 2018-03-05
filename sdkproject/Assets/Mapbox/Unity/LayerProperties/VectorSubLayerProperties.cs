@@ -4,11 +4,18 @@
 	[Serializable]
 	public class VectorSubLayerProperties : LayerProperties
 	{
-		public CoreVectorLayerProperties coreOptions;
-		public VectorFilterOptions filterOptions;
-		public GeometryExtrusionOptions extrusionOptions;
+		public CoreVectorLayerProperties coreOptions = new CoreVectorLayerProperties();
+		public VectorFilterOptions filterOptions = new VectorFilterOptions();
+		public GeometryExtrusionOptions extrusionOptions = new GeometryExtrusionOptions
+		{
+			extrusionType = ExtrusionType.None,
+			propertyName = "height",
+			extrusionGeometryType = ExtrusionGeometryType.RoofAndSide,
+
+		};
 		public GeometryMaterialOptions materialOptions = new GeometryMaterialOptions();
 		//public GeometryStylingOptions stylingOptions;
-		public LayerModifierOptions modifierOptions;
+		public LayerModifierOptions modifierOptions = new LayerModifierOptions();
+
 	}
 }

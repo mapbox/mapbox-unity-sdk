@@ -700,6 +700,7 @@
 
 		}
 	}
+
 	[CustomPropertyDrawer(typeof(CoreVectorLayerProperties))]
 	public class CoreVectorLayerPropertiesDrawer : PropertyDrawer
 	{
@@ -732,24 +733,25 @@
 				position.y += lineHeight;
 				EditorGUI.PropertyField(position, property.FindPropertyRelative("groupFeatures"));
 
+				if ((VectorPrimitiveType)sourceTypeProperty.enumValueIndex == VectorPrimitiveType.Line)
+				{
+					position.y += lineHeight;
+					EditorGUI.PropertyField(position, property.FindPropertyRelative("lineWidth"));
+				}
+
 			}
 			EditorGUI.EndProperty();
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
+			var sourceTypeProperty = property.FindPropertyRelative("geometryType");
+
 			float height = 0.0f;
-			//if (showPosition)
-			{
-				height += (5.0f * EditorGUIUtility.singleLineHeight);
-			}
-			//else
-			//{
-			//	height = EditorGUIUtility.singleLineHeight;
-			//}
+			height += (((((VectorPrimitiveType)sourceTypeProperty.enumValueIndex == VectorPrimitiveType.Line)) ? 6.0f : 5.0f) * EditorGUIUtility.singleLineHeight);
+
 			return height;
 		}
 	}
-
 
 	[CustomPropertyDrawer(typeof(ImageryRasterOptions))]
 	public class ImageryRasterOptionsDrawer : PropertyDrawer

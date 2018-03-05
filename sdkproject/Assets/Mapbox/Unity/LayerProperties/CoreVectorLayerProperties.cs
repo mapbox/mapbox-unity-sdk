@@ -12,12 +12,13 @@
 		public string layerName = "layerName";
 		public bool snapToTerrain = true;
 		public bool groupFeatures = false;
+		public float lineWidth = 1.0f;
 	}
 
 	[Serializable]
 	public class VectorFilterOptions
 	{
-		public List<LayerFilter> filters;
+		public List<LayerFilter> filters = new List<LayerFilter>();
 		public LayerFilterCombinerOperationType combinerType = LayerFilterCombinerOperationType.All;
 	}
 }

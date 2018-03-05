@@ -61,7 +61,10 @@
 					{
 						defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
 					}
+					var lineMeshMod = CreateInstance<LineMeshModifier>();
+					lineMeshMod.Width = _layerProperties.coreOptions.lineWidth;
 					defaultMeshModifierStack.Add(CreateInstance<LineMeshModifier>());
+
 					//defaultMeshModifierStack.Add(CreateInstance<UvModifier>());
 					if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
 					{

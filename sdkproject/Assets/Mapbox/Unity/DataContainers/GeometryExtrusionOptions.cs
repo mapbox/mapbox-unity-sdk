@@ -14,8 +14,8 @@
 		}
 		public ExtrusionType extrusionType = ExtrusionType.None;
 		public ExtrusionGeometryType extrusionGeometryType = ExtrusionGeometryType.RoofAndSide;
-		public string propertyName;
-		public float minimumHeight;
-		public float maximumHeight;
+		public string propertyName = "height";
+		public float minimumHeight = 0f;
+		public float maximumHeight = 0f;
 	}
 }
