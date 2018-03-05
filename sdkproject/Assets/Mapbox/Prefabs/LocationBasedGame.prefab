@@ -440,30 +440,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _unifiedMapOptions:
+    mapPreset: 0
     mapOptions:
       locationOptions:
         latitudeLongitude: 37.784179, -122.401583
-        zoom: 14
-        coordinateSystemType: 0
+        zoom: 16.5
+      extentOptions:
+        extentType: 1
+        cameraBoundsOptions:
+          camera: {fileID: 0}
+          visibleBuffer: 0
+          disposeBuffer: 0
+          updateInterval: 0
+        rangeAroundCenterOptions:
+          west: 2
+          north: 2
+          east: 2
+          south: 2
+        rangeAroundTransformOptions:
+          targetTransform: {fileID: 0}
+          visibleBuffer: 0
+          disposeBuffer: 0
       placementOptions:
         visualizationType: 0
         placementType: 1
-        extentOptions:
-          extentType: 0
-          cameraBoundsOptions:
-            camera: {fileID: 0}
-            visibleBuffer: 0
-            disposeBuffer: 0
-            updateInterval: 0
-          rangeAroundCenterOptions:
-            west: 2
-            north: 2
-            east: 2
-            south: 2
-          rangeAroundTransformOptions:
-            targetTransform: {fileID: 0}
-            visibleBuffer: 0
-            disposeBuffer: 0
       scalingOptions:
         scalingType: 1
         unitType: 0
@@ -482,19 +482,21 @@ MonoBehaviour:
         useRetina: 0
         useMipMap: 0
     elevationLayerProperties:
+      sourceType: 0
       sourceOptions:
         isActive: 1
         layerSource:
           Name: 
-          Id: mapbox.terrain-rgb
+          Id: mapbox.terrain - rgb
           Modified: 
           UserName: 
-      elevationLayerOptions:
+      requiredOptions:
         elevationLayerType: 0
-        baseMaterial: {fileID: 0}
-        sampleCount: 10
+        baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
         addCollider: 0
         exaggerationFactor: 1
+      modificationOptions:
+        sampleCount: 10
         useRelativeHeight: 1
       unityLayerOptions:
         addToLayer: 0
@@ -504,15 +506,16 @@ MonoBehaviour:
         wallHeight: 10
         wallMaterial: {fileID: 0}
     vectorLayerProperties:
+      sourceType: 2
       sourceOptions:
         isActive: 0
         layerSource:
           Name: 
-          Id: 
+          Id: mapbox.mapbox-streets-v7
           Modified: 
           UserName: 
       performanceOptions:
-        isEnabled: 1
+        isEnabled: 0
         entityPerCoroutine: 20
       defaultStylingOptions:
         isExtruded: 0
