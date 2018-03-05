@@ -14,6 +14,7 @@
 		bool showImage = false;
 		bool showTerrain = false;
 		bool showVector = false;
+		static int selected = 2;
 		public override void OnInspectorGUI()
 		{
 			serializedObject.Update();
@@ -21,9 +22,16 @@
 			GUILayout.BeginVertical();
 			EditorGUILayout.Space();
 
-			showGeneral = EditorGUILayout.Foldout(showGeneral, "GENERAL");
+			showGeneral = EditorGUILayout.Foldout(showGeneral, "GENERAL", EditorStyles.boldFont);
 			if (showGeneral)
 			{
+				EditorGUILayout.Space();
+				EditorGUILayout.LabelField("Presets");
+				selected = property.FindPropertyRelative("mapPreset").enumValueIndex;
+				var options = property.FindPropertyRelative("mapPreset").enumNames;
+				property.FindPropertyRelative("mapPreset").enumValueIndex = GUILayout.SelectionGrid(selected, options, options.Length);
+				EditorGUILayout.Space();
+
 				ShowSection(property, "mapOptions");
 			}
 

@@ -74,12 +74,26 @@
 
 			if (GUILayout.Button("Add Layer"))
 			{
-				//subLayerArray.arraySize++;
-				subLayerArray.InsertArrayElementAtIndex(subLayerArray.arraySize);
+				subLayerArray.arraySize++;
+				//subLayerArray.InsertArrayElementAtIndex(subLayerArray.arraySize);
 
 				var subLayer = subLayerArray.GetArrayElementAtIndex(subLayerArray.arraySize - 1);
 				var subLayerName = subLayer.FindPropertyRelative("coreOptions.sublayerName");
+				Debug.Log("Active status -> " + subLayer.FindPropertyRelative("coreOptions.isActive").boolValue.ToString());
 				subLayerName.stringValue = "Untitled";
+
+
+				// Set defaults here beacuse SerializedProperty copies the previous element. 
+				var subLayerCoreOptions = subLayer.FindPropertyRelative("coreOptions");
+				subLayerCoreOptions.FindPropertyRelative("isActive").boolValue = true;
+				subLayerCoreOptions.FindPropertyRelative("layerName").stringValue = "building";
+				subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex = (int)VectorPrimitiveType.Polygon;
+				subLayerCoreOptions.FindPropertyRelative("snapToTerrain").boolValue = true;
+				subLayerCoreOptions.FindPropertyRelative("groupFeatures").boolValue = false;
+
+				var subLayerExtrusionOptions = subLayer.FindPropertyRelative("extrusionOptions");
+				subLayerExtrusionOptions.FindPropertyRelative("propertyName").stringValue = "height";
+
 			}
 			if (GUILayout.Button("Remove Selected"))
 			{
@@ -117,12 +131,17 @@
 			GUILayout.Label("Visualizer Stack Properties");
 			GUILayout.BeginVertical();
 
-			EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("coreOptions"), new GUIContent("Core Options"));
+			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
+			VectorPrimitiveType primitiveTypeProp = (VectorPrimitiveType)subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex;
 
-			EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
+			EditorGUILayout.PropertyField(subLayerCoreOptions);
 
-			EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
+			if (primitiveTypeProp != VectorPrimitiveType.Point)
+			{
+				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
 
+				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
+			}
 			showOthers = EditorGUILayout.Foldout(showOthers, "Advanced");
 			if (showOthers)
 			{
@@ -132,30 +151,7 @@
 				EditorGUI.indentLevel--;
 			}
 
-			//EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("modifierOptions"), new GUIContent("Modifier Options"));
-
 			GUILayout.EndVertical();
 		}
-		//public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-		//{
-		//	float height = 0.0f;
-		//	if (showPosition)
-		//	{
-		//		var subLayers = property.FindPropertyRelative("vectorSubLayers");
-		//		height += (1.0f * lineHeight);
-		//		//height += (subLayers.arraySize) * lineHeight;
-		//		height += (selectedLayers.Count == 1) ? EditorGUI.GetPropertyHeight(subLayers.GetArrayElementAtIndex(selectedLayers[0]).FindPropertyRelative("coreOptions")) : lineHeight;
-		//		//height += (selectedLayers.Count == 1) ? EditorGUI.GetPropertyHeight(subLayers.GetArrayElementAtIndex(selectedLayers[0]).FindPropertyRelative("modifierOptions")) : lineHeight;
-		//		height += (selectedLayers.Count == 1) ? EditorGUI.GetPropertyHeight(subLayers.GetArrayElementAtIndex(selectedLayers[0]).FindPropertyRelative("extrusionOptions")) : lineHeight;
-		//		////height += (selectedLayers.Count == 1) ? EditorGUI.GetPropertyHeight(subLayers.GetArrayElementAtIndex(selectedLayers[0]).FindPropertyRelative("materialOptions")) : lineHeight;
-		//		//height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("performanceOptions"));
-		//		//height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sourceOptions"));
-		//	}
-		//	else
-		//	{
-		//		height = EditorGUIUtility.singleLineHeight;
-		//	}
-		//	return height;
-		//}
 	}
 }

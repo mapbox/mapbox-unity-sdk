@@ -11,6 +11,14 @@
 	using Mapbox.Unity.MeshGeneration.Interfaces;
 
 	// Map related enums
+	public enum MapPresetType
+	{
+		LocationBasedMap,
+		WorldSimulator,
+		ARTableTop,
+		ARWorldScale,
+	}
+
 	public enum MapVisualizationType
 	{
 		Flat2D,
@@ -113,9 +121,9 @@
 
 	public enum ExtrusionGeometryType
 	{
-		SideOnly,
-		RoofOnly,
 		RoofAndSide,
+		RoofOnly,
+		SideOnly,
 	}
 
 	[Serializable]
