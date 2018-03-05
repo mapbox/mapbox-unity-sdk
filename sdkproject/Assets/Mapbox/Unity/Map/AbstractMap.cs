@@ -5,6 +5,7 @@ namespace Mapbox.Unity.Map
 	using Utils;
 	using UnityEngine;
 	using Mapbox.Map;
+	using System.Collections;
 
 	/// <summary>
 	/// Abstract Map (Basic Map etc)
@@ -141,6 +142,13 @@ namespace Mapbox.Unity.Map
 		}
 		public event Action OnInitialized = delegate { };
 
+		protected IEnumerator SetupAccess()
+		{
+			_fileSource = MapboxAccess.Instance;
+
+			yield return new WaitUntil(() => MapboxAccess.Configured);
+		}
+
 		protected virtual void Awake()
 		{
 			try
@@ -161,8 +169,10 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		protected virtual void Start()
+		protected void Start()
 		{
+			StartCoroutine("SetupAccess");
+
 			if (_initializeOnStart)
 			{
 				Initialize(Conversions.StringToLatLon(_latitudeLongitudeString), AbsoluteZoom);
