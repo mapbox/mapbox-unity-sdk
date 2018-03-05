@@ -15,9 +15,19 @@
 		public Vector2d LatitudeLongitude;
 
 		/// <summary>
-		/// Heading represents a facing angle, generally between 0-359.
+		/// Heading represents a facing angle, generally between 0-359. Also need location services enabled via Input.location.Start()
 		/// </summary>
 		public float Heading;
+
+		/// <summary>
+		/// The heading in degrees relative to the magnetic North Pole.
+		/// </summary>
+		public float HeadingMagnetic;
+
+		/// <summary>
+		/// Accuracy of heading reading in degrees.
+		/// </summary>
+		public float HeadingAccuracy;
 
 		/// <summary>
 		/// Timestamp (in seconds since 1970) when location was last updated.

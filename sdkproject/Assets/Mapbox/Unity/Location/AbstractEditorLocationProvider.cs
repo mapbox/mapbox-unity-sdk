@@ -43,6 +43,15 @@
 			}
 		}
 
+
+		// Added to support TouchCamera script. 
+		public void SendLocationEvent()
+		{
+			SetLocation();
+			SendLocation(_currentLocation);
+		}
+
+
 		void OnValidate()
 		{
 			if (_sendEvent)

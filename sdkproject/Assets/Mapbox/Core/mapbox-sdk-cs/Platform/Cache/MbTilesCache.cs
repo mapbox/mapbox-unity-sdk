@@ -14,12 +14,15 @@
 
 		public MbTilesCache(uint maxCacheSize)
 		{
+#if MAPBOX_DEBUG_CACHE
+			_className = this.GetType().Name;
+#endif
 			_maxCacheSize = maxCacheSize;
 			_mbTiles = new Dictionary<string, MbTilesDb>();
 		}
 
 
-		#region IDisposable
+#region IDisposable
 
 
 		~MbTilesCache()
@@ -52,9 +55,12 @@
 		}
 
 
-		#endregion
+#endregion
 
 
+#if MAPBOX_DEBUG_CACHE
+		private string _className;
+#endif
 		private bool _disposed;
 		private uint _maxCacheSize;
 		private object _lock = new object();
@@ -71,6 +77,11 @@
 		{
 
 			mapId = cleanMapId(mapId);
+
+#if MAPBOX_DEBUG_CACHE
+			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
+			UnityEngine.Debug.LogFormat("{0} {1} {2} forceInsert:{3}", methodName, mapId, tileId, forceInsert);
+#endif
 
 			lock (_lock)
 			{
@@ -117,10 +128,19 @@
 		public CacheItem Get(string mapId, CanonicalTileId tileId)
 		{
 			mapId = cleanMapId(mapId);
+
+#if MAPBOX_DEBUG_CACHE
+			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
+			UnityEngine.Debug.LogFormat("{0} {1} {2}", methodName, mapId, tileId);
+#endif
+
 			lock (_lock)
 			{
 				if (!_mbTiles.ContainsKey(mapId))
 				{
+#if MAPBOX_DEBUG_CACHE
+					UnityEngine.Debug.LogFormat("initializing MbTiles {0}", mapId);
+#endif
 					initializeMbTiles(mapId);
 				}
 			}

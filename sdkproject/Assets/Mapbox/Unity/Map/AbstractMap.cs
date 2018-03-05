@@ -151,13 +151,21 @@ namespace Mapbox.Unity.Map
 
 		protected virtual void Awake()
 		{
-			_worldHeightFixed = false;
-			_tileProvider.OnTileAdded += TileProvider_OnTileAdded;
-			_tileProvider.OnTileRemoved += TileProvider_OnTileRemoved;
-			_tileProvider.OnTileRepositioned += TileProvider_OnTileRepositioned;
-			if (!_root)
+			try
 			{
-				_root = transform;
+				_worldHeightFixed = false;
+				_fileSource = MapboxAccess.Instance;
+				_tileProvider.OnTileAdded += TileProvider_OnTileAdded;
+				_tileProvider.OnTileRemoved += TileProvider_OnTileRemoved;
+				_tileProvider.OnTileRepositioned += TileProvider_OnTileRepositioned;
+				if (!_root)
+				{
+					_root = transform;
+				}
+			}
+			catch (Exception ex)
+			{
+				Debug.LogErrorFormat("AbstractMap.Awake EXCEPTION: {0}", ex);
 			}
 		}
 

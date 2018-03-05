@@ -174,10 +174,17 @@ namespace Mapbox.Unity
 
 		void ConfigureTelemetry()
 		{
-			_telemetryLibrary = TelemetryFactory.GetTelemetryInstance();
-			_telemetryLibrary.Initialize(_configuration.AccessToken);
-			_telemetryLibrary.SetLocationCollectionState(GetTelemetryCollectionState());
-			_telemetryLibrary.SendTurnstile();
+			try
+			{
+				_telemetryLibrary = TelemetryFactory.GetTelemetryInstance();
+				_telemetryLibrary.Initialize(_configuration.AccessToken);
+				_telemetryLibrary.SetLocationCollectionState(GetTelemetryCollectionState());
+				_telemetryLibrary.SendTurnstile();
+			}
+			catch (Exception ex)
+			{
+				Debug.LogErrorFormat("Error initializing telemetry: {0}", ex);
+			}
 		}
 
 		public void SetLocationCollectionState(bool enable)
