@@ -41,7 +41,7 @@
 		public void Initialize(LayerProperties properties)
 		{
 			var vectorLayerProperties = (VectorLayerProperties)properties;
-			_vectorTileFactory = ScriptableObject.CreateInstance<VectorTileFactoryNew>();
+			_vectorTileFactory = ScriptableObject.CreateInstance<VectorTileFactory>();
 			_vectorTileFactory.SetOptions(vectorLayerProperties);
 		}
 
@@ -55,13 +55,13 @@
 			throw new System.NotImplementedException();
 		}
 
-		public VectorTileFactoryNew VectorFactory
+		public VectorTileFactory VectorFactory
 		{
 			get
 			{
 				return _vectorTileFactory;
 			}
 		}
-		private VectorTileFactoryNew _vectorTileFactory;
+		private VectorTileFactory _vectorTileFactory;
 	}
 }
