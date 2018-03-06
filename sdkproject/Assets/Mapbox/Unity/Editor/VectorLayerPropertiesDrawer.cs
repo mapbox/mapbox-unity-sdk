@@ -32,28 +32,44 @@
 			var sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
 
 			position.y += lineHeight;
+			var sourceOptionsProperty = property.FindPropertyRelative("sourceOptions");
+			var isActiveProperty = sourceOptionsProperty.FindPropertyRelative("isActive");
 			switch (sourceTypeValue)
 			{
 				case VectorSourceType.MapboxStreets:
 					var sourcePropertyValue = MapboxDefaultVector.GetParameters(sourceTypeValue);
-					var sourceOptionsProperty = property.FindPropertyRelative("sourceOptions");
 					var layerSourceProperty = sourceOptionsProperty.FindPropertyRelative("layerSource");
 					var layerSourceId = layerSourceProperty.FindPropertyRelative("Id");
 					layerSourceId.stringValue = sourcePropertyValue.Id;
 					GUI.enabled = false;
 					EditorGUILayout.PropertyField(sourceOptionsProperty, new GUIContent("Source Option"));
 					GUI.enabled = true;
+					isActiveProperty.boolValue = true;
 					break;
 				case VectorSourceType.Custom:
 					EditorGUILayout.PropertyField(property.FindPropertyRelative("sourceOptions"), true);
+					isActiveProperty.boolValue = true;
+					break;
+				case VectorSourceType.None:
+					isActiveProperty.boolValue = false;
 					break;
 				default:
+					isActiveProperty.boolValue = false;
 					break;
 			}
 
 			position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sourceOptions"));
 
-			EditorGUILayout.PropertyField(property.FindPropertyRelative("performanceOptions"), new GUIContent("Perfomance Option"));
+			var isStyleOptimized = property.FindPropertyRelative("isStyleOptimized");
+			EditorGUILayout.PropertyField(isStyleOptimized);
+			position.y += lineHeight;
+
+			if (isStyleOptimized.boolValue)
+			{
+				EditorGUILayout.PropertyField(property.FindPropertyRelative("optimizedStyle"), new GUIContent("Style Options"));
+			}
+			position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("optimizedStyle"));
+			EditorGUILayout.PropertyField(property.FindPropertyRelative("performanceOptions"), new GUIContent("Perfomance Options"));
 			position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("performanceOptions"));
 
 			EditorGUILayout.LabelField("Visualizer Stack");

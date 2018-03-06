@@ -266,6 +266,26 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].materialOptions.materials.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].materialOptions.materials.Array.data[0].Materials.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].materialOptions.materials.Array.data[1].Materials.Array.size
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4601654966360252, guid: 35ce2bb4caba9434db5e656796b632b1, type: 2}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -297,6 +317,156 @@ Prefab:
     - target: {fileID: 4601654966360252, guid: 35ce2bb4caba9434db5e656796b632b1, type: 2}
       propertyPath: m_RootOrder
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.elevationLayerProperties.sideWallOptions.isActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.elevationLayerProperties.unityLayerOptions.addToLayer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.mapOptions.extentOptions.extentType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.mapOptions.extentOptions.cameraBoundsOptions.camera
+      value: 
+      objectReference: {fileID: 1130064238}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.elevationLayerProperties.elevationLayerType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.mapOptions.locationOptions.latitudeLongitude
+      value: 37.784179, -122.401583
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.mapOptions.locationOptions.zoom
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.imageryLayerProperties.sourceType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.imageryLayerProperties.sourceOptions.layerSource.Id
+      value: mapbox://styles/mapbox/dark-v9
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.imageryLayerProperties.rasterOptions.useRetina
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.imageryLayerProperties.rasterOptions.useMipMap
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.elevationLayerProperties.requiredOptions.exaggerationFactor
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.elevationLayerProperties.sourceOptions.layerSource.Id
+      value: mapbox.terrain-rgb
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.vectorLayerProperties.isStyleOptimized
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.vectorLayerProperties.sourceType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.vectorLayerProperties.optimizedStyle.UserName
+      value: atripathi-mb
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.vectorLayerProperties.optimizedStyle.Name
+      value: Basic
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.vectorLayerProperties.optimizedStyle.Id
+      value: mapbox://styles/atripathi-mb/cj9oknugh4h092rt6yywemku3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.vectorLayerProperties.optimizedStyle.Modified
+      value: 2017-11-06T19:20:52.058Z
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].coreOptions.isActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].coreOptions.sublayerName
+      value: Buildings
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].coreOptions.geometryType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].coreOptions.layerName
+      value: building
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].coreOptions.snapToTerrain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].extrusionOptions.propertyName
+      value: height
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].extrusionOptions.extrusionType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.vectorLayerProperties.sourceOptions.isActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].materialOptions.materials.Array.data[0].Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: c0be5c38e1944584b89f81505e3c4446, type: 2}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.vectorLayerProperties.vectorSubLayers.Array.data[0].materialOptions.materials.Array.data[1].Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: ab4ee1288a054a84b85ba5cf5a0abf34, type: 2}
+    - target: {fileID: 114276132085450664, guid: 35ce2bb4caba9434db5e656796b632b1,
+        type: 2}
+      propertyPath: _unifiedMapOptions.mapPreset
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 35ce2bb4caba9434db5e656796b632b1, type: 2}
