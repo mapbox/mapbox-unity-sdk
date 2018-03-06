@@ -130,16 +130,34 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				bottomOfTopUv = _currentTextureRect.yMax - (_currentTextureRect.size.y * _currentFacade.TopSectionRatio); //not doing that scaling thing for y axis and floors yet
 				topOfBottomUv = _currentTextureRect.yMin + (_currentTextureRect.size.y * _currentFacade.BottomSectionRatio); // * (Mathf.Max(1, (float)Math.Floor(tby * textureSection.TopSectionFloorCount)) / textureSection.TopSectionFloorCount);
 
+                /*
 				wallNormal = new Vector3(-(v1.z - v2.z), 0, (v1.x - v2.x)).normalized;
 				currentY = v1.y;
 
 				floorScaleRatio = Math.Min(1, midHeight / _scaledFloorHeight);
-				bottomOfMidUv = (_currentTextureRect.yMax - _currentFacade.TopSectionRatio) - (_currentTextureRect.height - _currentFacade.TopSectionRatio - _currentFacade.BottomSectionRatio) * Math.Min(1, ((float)(Math.Floor(floorScaleRatio * _currentFacade.MidFloorCount) + 1) / _currentFacade.MidFloorCount)); // midHeight < _scaledFloorHeight * 0.66 ? 0.5f : 0.125f;
-				topOfMidUv = _currentTextureRect.yMax - (_currentTextureRect.height * _currentFacade.TopSectionRatio);
+				//bottomOfMidUv = (_currentTextureRect.yMax - _currentFacade.TopSectionRatio) - (_currentTextureRect.height - _currentFacade.TopSectionRatio - _currentFacade.BottomSectionRatio) * Math.Min(1, ((float)(Math.Floor(floorScaleRatio * _currentFacade.MidFloorCount) + 1) / _currentFacade.MidFloorCount)); // midHeight < _scaledFloorHeight * 0.66 ? 0.5f : 0.125f;
+                //bottomOfMidUv = (_currentTextureRect.yMax - _currentFacade.TopSectionRatio) - (_currentTextureRect.height - _currentFacade.BottomSectionRatio) * Math.Min(1, ((float)(Math.Floor(floorScaleRatio * _currentFacade.MidFloorCount) + 1) / _currentFacade.MidFloorCount));
+
+                bottomOfMidUv = ((_currentTextureRect.yMax - _currentFacade.TopSectionRatio) - (_currentTextureRect.height - _currentFacade.BottomSectionRatio)) * Math.Min(1, ((float)(Math.Floor(floorScaleRatio * _currentFacade.MidFloorCount) + 1) / _currentFacade.MidFloorCount));
+                topOfMidUv = _currentTextureRect.yMax - (_currentTextureRect.height * _currentFacade.TopSectionRatio);
 
 				TopFloor(md);
 				MidFloors(md);
 				FirstFloor(md, height);
+				*/
+
+                wallNormal = new Vector3(-(v1.z - v2.z), 0, (v1.x - v2.x)).normalized;
+                currentY = v1.y;
+
+                floorScaleRatio = Math.Min(1, midHeight / _scaledFloorHeight);
+                var midSecHeight = (_currentTextureRect.height * (1 - _currentFacade.TopSectionRatio - _currentFacade.BottomSectionRatio));
+                var midFittedHeight = midSecHeight * Math.Min(1, ((float)(Math.Floor(floorScaleRatio * _currentFacade.MidFloorCount) + 1) / _currentFacade.MidFloorCount)); // midHeight < _scaledFloorHeight * 0.66 ? 0.5f : 0.125f;
+                bottomOfMidUv = (_currentTextureRect.yMax - (_currentTextureRect.height * _currentFacade.TopSectionRatio)) - midFittedHeight;
+                topOfMidUv = _currentTextureRect.yMax - (_currentTextureRect.height * _currentFacade.TopSectionRatio);
+
+                TopFloor(md);
+                MidFloors(md);
+                FirstFloor(md, height);
 			}
 
 			if (_separateSubmesh)
