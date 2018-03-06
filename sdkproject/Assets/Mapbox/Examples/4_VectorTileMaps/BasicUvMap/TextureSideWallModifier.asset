@@ -15,4 +15,5 @@ MonoBehaviour:
   _height: 0
   _forceHeight: 0
   _centerSegments: 1
-  AtlasInfo: {fileID: 11400000, guid: 83932d75a6a7e494f93fbc649c98434f, type: 2}
+  _separateSubmesh: 1
+  AtlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
