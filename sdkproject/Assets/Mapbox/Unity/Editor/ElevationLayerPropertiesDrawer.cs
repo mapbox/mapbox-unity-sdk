@@ -79,7 +79,7 @@
 			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
 			var sourceTypeValue = (ElevationSourceType)sourceTypeProperty.enumValueIndex;
 
-			float height = ((sourceTypeValue == ElevationSourceType.None) ? 3.0f : 4.0f) * lineHeight;
+			float height = ((sourceTypeValue == ElevationSourceType.None) ? 2.0f : 3.0f) * lineHeight;
 
 			height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sourceOptions"));
 			height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("requiredOptions"));
