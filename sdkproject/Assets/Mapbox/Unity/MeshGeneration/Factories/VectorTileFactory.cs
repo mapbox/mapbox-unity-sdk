@@ -64,7 +64,7 @@
 
 			foreach (var sublayer in _properties.vectorSubLayers)
 			{
-				var visualizer = CreateInstance<PolygonLayerVisualizer>();
+				var visualizer = CreateInstance<VectorLayerVisualizer>();
 				visualizer.SetProperties(sublayer, _properties.performanceOptions);
 
 				visualizer.Initialize();

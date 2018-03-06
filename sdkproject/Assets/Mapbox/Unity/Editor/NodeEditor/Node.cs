@@ -279,7 +279,7 @@ namespace Mapbox.Editor.NodeEditor
 								{
 									var prop = new SerializedObject(listitem);
 									var cc = new ConnectionPoint(this, "", listitem.Key, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle, prop.FindProperty("Active"));
-									
+
 									ConnectionPoints.Add(cc);
 									_propCount++;
 									var newNode = new Node(listitem);
@@ -311,20 +311,21 @@ namespace Mapbox.Editor.NodeEditor
 					else
 					{
 						var val = fi.GetValue(obj);
-						if (val is List<TypeVisualizerTuple>)
-						{
-							foreach (TypeVisualizerTuple listitem in val as IEnumerable)
-							{
-								//var name = (fi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
-								var cc = new ConnectionPoint(this, "", listitem.Type, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
-								ConnectionPoints.Add(cc);
-								_propCount++;
-								var newNode = new Node(listitem.Stack);
-								Children.Add(newNode);
-								newNode.Connections.Add(new Connection(newNode.inPoint, cc));
-								newNode.Dive(listitem.Stack, showModifiers, depth + 1);
-							}
-						}
+						//TODO : FIX THIS
+						//if (val is List<TypeVisualizerTuple>)
+						//{
+						//	foreach (TypeVisualizerTuple listitem in val as IEnumerable)
+						//	{
+						//		//var name = (fi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
+						//		var cc = new ConnectionPoint(this, "", listitem.Type, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
+						//		ConnectionPoints.Add(cc);
+						//		_propCount++;
+						//		var newNode = new Node(listitem.Stack);
+						//		Children.Add(newNode);
+						//		newNode.Connections.Add(new Connection(newNode.inPoint, cc));
+						//		newNode.Dive(listitem.Stack, showModifiers, depth + 1);
+						//	}
+						//}
 					}
 				}
 			}
