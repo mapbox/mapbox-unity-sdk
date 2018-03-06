@@ -33,13 +33,16 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		//[Tooltip("Fixed height value for ForceHeight option")]
 		//private float _height;
 		private float _scale = 1;
-		private bool _separateSubmesh = false;
 
 		//[SerializeField]
 		//[Tooltip("Create side walls from calculated height down to terrain level. Suggested for buildings, not suggested for roads.")]
 		//private bool _createSideWalls = true;
 
 		GeometryExtrusionOptions _options;
+
+		[SerializeField]
+		[Tooltip("Create side walls as separate submesh.")]
+		private bool _separateSubmesh = true;
 
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
 

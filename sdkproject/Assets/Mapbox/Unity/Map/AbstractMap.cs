@@ -5,6 +5,7 @@ namespace Mapbox.Unity.Map
 	using Utils;
 	using UnityEngine;
 	using Mapbox.Map;
+	using System.Collections;
 
 	/// <summary>
 	/// Abstract Map (Basic Map etc)
@@ -152,21 +153,37 @@ namespace Mapbox.Unity.Map
 		}
 		public event Action OnInitialized = delegate { };
 
+		protected IEnumerator SetupAccess()
+		{
+			_fileSource = MapboxAccess.Instance;
+
+			yield return new WaitUntil(() => MapboxAccess.Configured);
+		}
+
 		protected virtual void Awake()
 		{
-			_worldHeightFixed = false;
-			_fileSource = MapboxAccess.Instance;
-			_tileProvider.OnTileAdded += TileProvider_OnTileAdded;
-			_tileProvider.OnTileRemoved += TileProvider_OnTileRemoved;
-			_tileProvider.OnTileRepositioned += TileProvider_OnTileRepositioned;
-			if (!_root)
+			try
 			{
-				_root = transform;
+				_worldHeightFixed = false;
+				_fileSource = MapboxAccess.Instance;
+				_tileProvider.OnTileAdded += TileProvider_OnTileAdded;
+				_tileProvider.OnTileRemoved += TileProvider_OnTileRemoved;
+				_tileProvider.OnTileRepositioned += TileProvider_OnTileRepositioned;
+				if (!_root)
+				{
+					_root = transform;
+				}
+			}
+			catch (Exception ex)
+			{
+				Debug.LogErrorFormat("AbstractMap.Awake EXCEPTION: {0}", ex);
 			}
 		}
 
-		protected virtual void Start()
+		protected void Start()
 		{
+			StartCoroutine("SetupAccess");
+
 			if (_initializeOnStart)
 			{
 				Initialize(Conversions.StringToLatLon(_latitudeLongitudeString), AbsoluteZoom);
