@@ -15,7 +15,7 @@ namespace Mapbox.Unity.Location
 	public class LocationProviderFactory : MonoBehaviour
 	{
 		[SerializeField]
-		public UnifiedMap mapManager;
+		public AbstractMap mapManager;
 
 		[SerializeField]
 		AbstractLocationProvider _deviceLocationProvider;

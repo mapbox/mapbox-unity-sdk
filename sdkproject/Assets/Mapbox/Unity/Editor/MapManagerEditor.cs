@@ -7,7 +7,7 @@
 	using Mapbox.Unity.Map;
 	using Mapbox.VectorTile.ExtensionMethods;
 
-	[CustomEditor(typeof(UnifiedMap))]
+	[CustomEditor(typeof(AbstractMap))]
 	[CanEditMultipleObjects]
 	public class MapManagerEditor : Editor
 	{

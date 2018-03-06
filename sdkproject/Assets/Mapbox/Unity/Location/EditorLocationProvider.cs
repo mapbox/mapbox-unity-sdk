@@ -29,7 +29,7 @@ namespace Mapbox.Unity.Location
 		Transform _targetTransform;
 
 		//[SerializeField]
-		UnifiedMap _map;
+		AbstractMap _map;
 
 		bool _mapInitialized;
 
