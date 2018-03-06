@@ -469,17 +469,17 @@ MonoBehaviour:
         unitType: 0
         unityToMercatorConversionFactor: 100
     imageryLayerProperties:
-      sourceType: 0
+      sourceType: 2
       sourceOptions:
         isActive: 1
         layerSource:
           Name: Streets
-          Id: mapbox://styles/mapbox/streets-v10
+          Id: mapbox://styles/mapbox/dark-v9
           Modified: 
           UserName: 
       rasterOptions:
-        useCompression: 0
         useRetina: 0
+        useCompression: 0
         useMipMap: 0
     elevationLayerProperties:
       sourceType: 0
@@ -490,8 +490,8 @@ MonoBehaviour:
           Id: mapbox.terrain - rgb
           Modified: 
           UserName: 
+      elevationLayerType: 0
       requiredOptions:
-        elevationLayerType: 0
         baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
         addCollider: 0
         exaggerationFactor: 1
@@ -502,7 +502,7 @@ MonoBehaviour:
         addToLayer: 0
         layerId: 0
       sideWallOptions:
-        isActive: 0
+        isActive: 1
         wallHeight: 10
         wallMaterial: {fileID: 0}
     vectorLayerProperties:

@@ -3,6 +3,8 @@
 	using UnityEditor;
 	using UnityEngine;
 	using Mapbox.Unity.Map;
+	using Mapbox.VectorTile.ExtensionMethods;
+
 	[CustomPropertyDrawer(typeof(ElevationLayerProperties))]
 	public class ElevationLayerPropertiesDrawer : PropertyDrawer
 	{
@@ -13,11 +15,13 @@
 			EditorGUI.BeginProperty(position, label, property);
 			position.height = lineHeight;
 
-			var typePosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent("Style Name"));
 			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
+			var sourceTypeValue = (ElevationSourceType)sourceTypeProperty.enumValueIndex;
+
+			var typePosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Style Name", tooltip = EnumExtensions.Description(sourceTypeValue) });
 
 			sourceTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, sourceTypeProperty.enumValueIndex, sourceTypeProperty.enumDisplayNames);
-			var sourceTypeValue = (ElevationSourceType)sourceTypeProperty.enumValueIndex;
+			sourceTypeValue = (ElevationSourceType)sourceTypeProperty.enumValueIndex;
 
 			position.y += lineHeight;
 			switch (sourceTypeValue)
@@ -41,7 +45,22 @@
 
 
 			//EditorGUI.PropertyField(position, property.FindPropertyRelative("sourceOptions"), true);
-			position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sourceOptions"));
+			if (sourceTypeValue != ElevationSourceType.None)
+			{
+				position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sourceOptions"));
+			}
+			if (sourceTypeValue == ElevationSourceType.None)
+			{
+				GUI.enabled = false;
+			}
+			var elevationLayerType = property.FindPropertyRelative("elevationLayerType");
+			EditorGUI.PropertyField(position, elevationLayerType, new GUIContent { text = elevationLayerType.displayName, tooltip = EnumExtensions.Description((ElevationLayerType)elevationLayerType.enumValueIndex) });
+			position.y += lineHeight;
+			if (sourceTypeValue == ElevationSourceType.None)
+			{
+				GUI.enabled = true;
+			}
+
 			EditorGUI.PropertyField(position, property.FindPropertyRelative("requiredOptions"), true);
 			position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("requiredOptions"));
 			showPosition = EditorGUI.Foldout(position, showPosition, "Others");
@@ -49,7 +68,7 @@
 			{
 				position.y += lineHeight;
 				EditorGUI.PropertyField(position, property.FindPropertyRelative("sideWallOptions"), true);
-				position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("unityLayerOptions"));
+				position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sideWallOptions"));
 				EditorGUI.PropertyField(position, property.FindPropertyRelative("unityLayerOptions"), true);
 			}
 
@@ -57,7 +76,11 @@
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
-			float height = 3.0f * lineHeight;
+			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
+			var sourceTypeValue = (ElevationSourceType)sourceTypeProperty.enumValueIndex;
+
+			float height = ((sourceTypeValue == ElevationSourceType.None) ? 3.0f : 4.0f) * lineHeight;
+
 			height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sourceOptions"));
 			height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("requiredOptions"));
 			if (showPosition)

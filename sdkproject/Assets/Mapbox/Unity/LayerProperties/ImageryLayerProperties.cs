@@ -3,7 +3,7 @@
 	[System.Serializable]
 	public class ImageryLayerProperties : LayerProperties
 	{
-		public ImagerySourceType sourceType = ImagerySourceType.Streets;
+		public ImagerySourceType sourceType = ImagerySourceType.MapboxStreets;
 
 		//[StyleSearch]
 		// TODO : Do we really need a separate DS for default styles ??
@@ -12,7 +12,7 @@
 		public LayerSourceOptions sourceOptions = new LayerSourceOptions()
 		{
 			isActive = true,
-			layerSource = MapboxDefaultImagery.GetParameters(ImagerySourceType.Streets)
+			layerSource = MapboxDefaultImagery.GetParameters(ImagerySourceType.MapboxStreets)
 
 		};
 		public ImageryRasterOptions rasterOptions = new ImageryRasterOptions();

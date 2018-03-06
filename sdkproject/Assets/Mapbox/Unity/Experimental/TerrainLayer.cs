@@ -60,15 +60,15 @@
 		{
 			var elevationLayerProperties = (ElevationLayerProperties)properties;
 
-			switch (elevationLayerProperties.requiredOptions.elevationLayerType)
+			switch (elevationLayerProperties.elevationLayerType)
 			{
-				case ElevationLayerType.None:
+				case ElevationLayerType.FlatTerrain:
 					_elevationFactory = ScriptableObject.CreateInstance<FlatTerrainFactory>();
 					break;
 				case ElevationLayerType.LowPolygonTerrain:
 					_elevationFactory = ScriptableObject.CreateInstance<LowPolyTerrainFactory>();
 					break;
-				case ElevationLayerType.Terrain:
+				case ElevationLayerType.TerrainWithElevation:
 					if (elevationLayerProperties.sideWallOptions.isActive)
 					{
 						_elevationFactory = ScriptableObject.CreateInstance<TerrainWithSideWallsFactory>();

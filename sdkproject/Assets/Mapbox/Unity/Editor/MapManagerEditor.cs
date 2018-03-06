@@ -5,6 +5,7 @@
 	using UnityEngine;
 	using UnityEditor;
 	using Mapbox.Unity.Map;
+	using Mapbox.VectorTile.ExtensionMethods;
 
 	[CustomEditor(typeof(UnifiedMap))]
 	[CanEditMultipleObjects]
@@ -22,14 +23,22 @@
 			GUILayout.BeginVertical();
 			EditorGUILayout.Space();
 
-			showGeneral = EditorGUILayout.Foldout(showGeneral, "GENERAL", EditorStyles.boldFont);
+			showGeneral = EditorGUILayout.Foldout(showGeneral, new GUIContent { text = "GENERAL", tooltip = "Options related to map data" });
 			if (showGeneral)
 			{
 				EditorGUILayout.Space();
 				EditorGUILayout.LabelField("Presets");
 				selected = property.FindPropertyRelative("mapPreset").enumValueIndex;
-				var options = property.FindPropertyRelative("mapPreset").enumNames;
-				property.FindPropertyRelative("mapPreset").enumValueIndex = GUILayout.SelectionGrid(selected, options, options.Length);
+				var options = property.FindPropertyRelative("mapPreset").enumDisplayNames;
+
+				GUIContent[] content = new GUIContent[options.Length];
+				for (int i = 0; i < options.Length; i++)
+				{
+					content[i] = new GUIContent();
+					content[i].text = options[i];
+					content[i].tooltip = EnumExtensions.Description((MapPresetType)i);
+				}
+				property.FindPropertyRelative("mapPreset").enumValueIndex = GUILayout.SelectionGrid(selected, content, options.Length);
 				EditorGUILayout.Space();
 
 				ShowSection(property, "mapOptions");

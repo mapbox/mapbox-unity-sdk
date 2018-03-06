@@ -7,9 +7,10 @@
 	public class MapLocationOptions
 	{
 		[Geocode]
-		//[SerializeField]
+		[Tooltip("The coordinates to build a map around")]
 		public string latitudeLongitude = "0,0";
 		[Range(0, 22)]
+		[Tooltip("The zoom level of the map")]
 		public float zoom = 4.0f;
 
 		//TODO : Add Coordinate conversion class. 

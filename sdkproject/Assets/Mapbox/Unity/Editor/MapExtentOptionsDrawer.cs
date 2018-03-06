@@ -3,6 +3,7 @@
 	using UnityEditor;
 	using UnityEngine;
 	using Mapbox.Unity.Map;
+	using Mapbox.VectorTile.ExtensionMethods;
 
 	[CustomPropertyDrawer(typeof(MapExtentOptions))]
 	public class MapExtentOptionsDrawer : PropertyDrawer
@@ -16,12 +17,23 @@
 
 			position.height = lineHeight;
 
-			// Draw label.
-			var kindPosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
 
 			var kindProperty = property.FindPropertyRelative(extTypePropertyName);
+			var displayNames = kindProperty.enumDisplayNames;
+			int count = kindProperty.enumDisplayNames.Length;
+			GUIContent[] extentTypeContent = new GUIContent[count];
+			for (int extIdx = 0; extIdx < count; extIdx++)
+			{
+				extentTypeContent[extIdx] = new GUIContent
+				{
+					text = displayNames[extIdx],
+					tooltip = EnumExtensions.Description((MapExtentType)extIdx),
+				};
+			}
+			// Draw label.
+			var kindPosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = label.text, tooltip = EnumExtensions.Description((MapExtentType)kindProperty.enumValueIndex), });
 
-			kindProperty.enumValueIndex = EditorGUI.Popup(kindPosition, kindProperty.enumValueIndex, kindProperty.enumDisplayNames);
+			kindProperty.enumValueIndex = EditorGUI.Popup(kindPosition, kindProperty.enumValueIndex, extentTypeContent);
 
 			var kind = (MapExtentType)kindProperty.enumValueIndex;
 

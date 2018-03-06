@@ -9,7 +9,7 @@
 			Style defaultStyle = new Style();
 			switch (defaultImagery)
 			{
-				case ImagerySourceType.Streets:
+				case ImagerySourceType.MapboxStreets:
 					defaultStyle = new Style
 					{
 						Id = "mapbox://styles/mapbox/streets-v10",
@@ -17,7 +17,7 @@
 					};
 
 					break;
-				case ImagerySourceType.Outdoors:
+				case ImagerySourceType.MapboxOutdoors:
 					defaultStyle = new Style
 					{
 						Id = "mapbox://styles/mapbox/outdoors-v10",
@@ -25,7 +25,7 @@
 					};
 
 					break;
-				case ImagerySourceType.Dark:
+				case ImagerySourceType.MapboxDark:
 					defaultStyle = new Style
 					{
 						Id = "mapbox://styles/mapbox/dark-v9",
@@ -33,7 +33,7 @@
 					};
 
 					break;
-				case ImagerySourceType.Light:
+				case ImagerySourceType.MapboxLight:
 					defaultStyle = new Style
 					{
 						Id = "mapbox://styles/mapbox/light-v9",
@@ -41,7 +41,7 @@
 					};
 
 					break;
-				case ImagerySourceType.Satellite:
+				case ImagerySourceType.MapboxSatellite:
 					defaultStyle = new Style
 					{
 						Id = "mapbox.satellite",
@@ -49,7 +49,7 @@
 					};
 
 					break;
-				case ImagerySourceType.SatelliteStreet:
+				case ImagerySourceType.MapboxSatelliteStreet:
 					defaultStyle = new Style
 					{
 						Id = "mapbox://styles/mapbox/satellite-streets-v10",

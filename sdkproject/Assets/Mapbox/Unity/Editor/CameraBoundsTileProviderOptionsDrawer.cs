@@ -7,6 +7,7 @@
 	using Mapbox.Unity.MeshGeneration.Modifiers;
 	using Mapbox.Unity.MeshGeneration.Interfaces;
 	using Mapbox.Unity.MeshGeneration.Filters;
+	using Mapbox.VectorTile.ExtensionMethods;
 	using Mapbox.Editor.NodeEditor;
 
 	[CustomPropertyDrawer(typeof(CameraBoundsTileProviderOptions))]
@@ -16,9 +17,11 @@
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
-			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("camera"));
+			var camera = property.FindPropertyRelative("camera");
+			var updateInterval = property.FindPropertyRelative("updateInterval");
+			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), camera, new GUIContent { text = camera.displayName, tooltip = "Camera to control map extent." });
 			position.y += lineHeight;
-			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("updateInterval"));
+			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), updateInterval, new GUIContent { text = updateInterval.displayName, tooltip = "Time in ms between map extent update." });
 			EditorGUI.EndProperty();
 		}
 	}
@@ -99,7 +102,8 @@
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
-			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("placementType"), true);
+			var placementType = property.FindPropertyRelative("placementType");
+			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), placementType, new GUIContent { text = placementType.displayName, tooltip = EnumExtensions.Description((MapPlacementType)placementType.enumValueIndex) });
 			EditorGUI.EndProperty();
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -117,18 +121,36 @@
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
-			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("scalingType"), true);
-			position.y += lineHeight;
-			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("unitType"), true);
-			position.y += lineHeight;
-			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("unityToMercatorConversionFactor"), new GUIContent { text = "Unity to Mercator   1 : " });
+			var scalingType = property.FindPropertyRelative("scalingType");
 
+			var conversionFactor = EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight),
+														   scalingType,
+														   new GUIContent
+														   {
+															   text = scalingType.displayName,
+															   tooltip = EnumExtensions.Description((MapScalingType)scalingType.enumValueIndex)
+														   });
+			if ((MapScalingType)scalingType.enumValueIndex == MapScalingType.Custom)
+			{
+				position.y += lineHeight;
+				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("unitType"), true);
+				position.y += lineHeight;
+				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("unityToMercatorConversionFactor"), new GUIContent { text = "Unity to Mercator   1 : ", tooltip = "TODO : FIX DESCRIPTION - Unity Tile Size " });
+			}
 			EditorGUI.EndProperty();
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
 			// Reserve space for the total visible properties.
-			return 3.0f * lineHeight;
+			var scalingType = property.FindPropertyRelative("scalingType");
+			if ((MapScalingType)scalingType.enumValueIndex == MapScalingType.Custom)
+			{
+				return 3.0f * lineHeight;
+			}
+			else
+			{
+				return 1.0f * lineHeight;
+			}
 		}
 	}
 
@@ -140,8 +162,7 @@
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
-			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("elevationLayerType"));
-			position.y += lineHeight;
+
 			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("baseMaterial"));
 			position.y += lineHeight;
 			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("exaggerationFactor"));
@@ -153,7 +174,7 @@
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
 			// Reserve space for the total visible properties.
-			return 4.0f * lineHeight;
+			return 3.0f * lineHeight;
 		}
 	}
 
@@ -188,7 +209,7 @@
 			var isSidewallActiveProp = property.FindPropertyRelative("isActive");
 			EditorGUI.BeginProperty(position, label, property);
 
-			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), isSidewallActiveProp, new GUIContent { text = "Show Sidewalls" });
+			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), isSidewallActiveProp, new GUIContent("Show Sidewalls"));
 			if (isSidewallActiveProp.boolValue == true)
 			{
 				EditorGUI.indentLevel++;
@@ -789,7 +810,7 @@
 		{
 			EditorGUI.BeginProperty(position, label, property);
 			position.height = lineHeight;
-			EditorGUI.PropertyField(position, property.FindPropertyRelative("layerSource"), true);
+			EditorGUI.PropertyField(position, property.FindPropertyRelative("layerSource"), new GUIContent { tooltip = label.tooltip });
 			EditorGUI.EndProperty();
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -852,7 +873,7 @@
 
 			position.height = lineHeight;
 
-			EditorGUI.PropertyField(position, property.FindPropertyRelative("Id"), new GUIContent { text = "Source Id" });
+			EditorGUI.PropertyField(position, property.FindPropertyRelative("Id"), new GUIContent { text = "Map Id", tooltip = "Map Id corresponding to the tileset." });
 
 			EditorGUI.EndProperty();
 		}

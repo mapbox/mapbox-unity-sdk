@@ -3,6 +3,7 @@
 	using UnityEditor;
 	using UnityEngine;
 	using Mapbox.Unity.Map;
+	using Mapbox.VectorTile.ExtensionMethods;
 
 	[CustomPropertyDrawer(typeof(ImageryLayerProperties))]
 	public class ImageryLayerPropertiesDrawer : PropertyDrawer
@@ -15,28 +16,29 @@
 			position.height = lineHeight;
 
 			// Draw label.
-			var typePosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent("Style Name"));
 			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
+			var sourceTypeValue = (ImagerySourceType)sourceTypeProperty.enumValueIndex;
+			var typePosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Style Name", tooltip = EnumExtensions.Description(sourceTypeValue) });
 
 			sourceTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, sourceTypeProperty.enumValueIndex, sourceTypeProperty.enumDisplayNames);
-			var sourceTypeValue = (ImagerySourceType)sourceTypeProperty.enumValueIndex;
+			sourceTypeValue = (ImagerySourceType)sourceTypeProperty.enumValueIndex;
 
 			position.y += lineHeight;
 			switch (sourceTypeValue)
 			{
-				case ImagerySourceType.Streets:
-				case ImagerySourceType.Outdoors:
-				case ImagerySourceType.Dark:
-				case ImagerySourceType.Light:
-				case ImagerySourceType.Satellite:
-				case ImagerySourceType.SatelliteStreet:
+				case ImagerySourceType.MapboxStreets:
+				case ImagerySourceType.MapboxOutdoors:
+				case ImagerySourceType.MapboxDark:
+				case ImagerySourceType.MapboxLight:
+				case ImagerySourceType.MapboxSatellite:
+				case ImagerySourceType.MapboxSatelliteStreet:
 					var sourcePropertyValue = MapboxDefaultImagery.GetParameters(sourceTypeValue);
 					var sourceOptionsProperty = property.FindPropertyRelative("sourceOptions");
 					var layerSourceProperty = sourceOptionsProperty.FindPropertyRelative("layerSource");
 					var layerSourceId = layerSourceProperty.FindPropertyRelative("Id");
 					layerSourceId.stringValue = sourcePropertyValue.Id;
 					GUI.enabled = false;
-					EditorGUI.PropertyField(position, sourceOptionsProperty, new GUIContent("Source Option"));
+					EditorGUI.PropertyField(position, sourceOptionsProperty);
 					GUI.enabled = true;
 					break;
 				case ImagerySourceType.Custom:
@@ -47,19 +49,32 @@
 				default:
 					break;
 			}
-			position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sourceOptions"));
-			EditorGUI.PropertyField(position, property.FindPropertyRelative("rasterOptions"));
+			if (sourceTypeValue != ImagerySourceType.None)
+			{
+				position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sourceOptions"));
+				EditorGUI.PropertyField(position, property.FindPropertyRelative("rasterOptions"));
+			}
 
 			EditorGUI.EndProperty();
 
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
-			float height = 0.0f;
-			height += (1.0f * lineHeight);
-			height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("rasterOptions"));
-			height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sourceOptions"));
-			return height;
+			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
+			var sourceTypeValue = (ImagerySourceType)sourceTypeProperty.enumValueIndex;
+
+			if (sourceTypeValue == ImagerySourceType.None)
+			{
+				return lineHeight;
+			}
+			else
+			{
+				float height = 0.0f;
+				height += (1.0f * lineHeight);
+				height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("rasterOptions"));
+				height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sourceOptions"));
+				return height;
+			}
 		}
 	}
 }

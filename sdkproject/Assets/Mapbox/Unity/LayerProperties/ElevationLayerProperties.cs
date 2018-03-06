@@ -14,6 +14,7 @@
 			},
 			isActive = true
 		};
+		public ElevationLayerType elevationLayerType = ElevationLayerType.FlatTerrain;
 		public ElevationRequiredOptions requiredOptions;
 		public ElevationModificationOptions modificationOptions;
 		public UnityLayerOptions unityLayerOptions;
