@@ -79,7 +79,7 @@
 				case ElevationSourceType.MapboxTerrain:
 					defaultStyle = new Style
 					{
-						Id = "mapbox.terrain - rgb",
+						Id = "mapbox.terrain-rgb",
 						Name = "Mapbox Terrain"
 					};
 
