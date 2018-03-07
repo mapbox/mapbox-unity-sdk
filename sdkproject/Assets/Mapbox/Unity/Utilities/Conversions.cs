@@ -199,7 +199,7 @@ namespace Mapbox.Unity.Utilities
 		/// <param name="latitude"> The latitude. </param>
 		/// <param name="longitude"> The longitude. </param>
 		/// <param name="zoom"> Zoom level. </param>
-		/// <returns> A <see cref="T:UnityEngine.Vector2d"/> xy tile ID. </returns>
+		/// <returns> A <see cref="T:Mapbox.Map.UnwrappedTileId"/> xy tile ID. </returns>
 		public static UnwrappedTileId LatitudeLongitudeToTileId(double latitude, double longitude, int zoom)
 		{
 			var x = (int)Math.Floor((longitude + 180.0) / 360.0 * Math.Pow(2.0, zoom));
