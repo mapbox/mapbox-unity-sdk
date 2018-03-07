@@ -64,6 +64,13 @@ namespace Mapbox.Unity.Map
 	{
 		[SerializeField]
 		UnifiedMapOptions _unifiedMapOptions = new UnifiedMapOptions();
+		public UnifiedMapOptions MapOptions
+		{
+			get
+			{
+				return _unifiedMapOptions;
+			}
+		}
 
 		private void Awake()
 		{
@@ -329,6 +336,7 @@ namespace Mapbox.Unity.Map
 
 			_mapVisualizer.Destroy();
 		}
+
 		public void InitializeMap(MapOptions options)
 		{
 			CurrentOptions = options;

@@ -37,7 +37,7 @@ namespace Mapbox.Editor.NodeEditor
 		{
 			get
 			{
-				if(_magnifierTexture == null)
+				if (_magnifierTexture == null)
 				{
 					_magnifierTexture = EditorGUIUtility.FindTexture("d_ViewToolZoom");
 				}
@@ -130,12 +130,14 @@ namespace Mapbox.Editor.NodeEditor
 
 			foreach (var abstractMap in abstractMaps)
 			{
-				if (abstractMap.MapVisualizer != null)
+				if (abstractMap.MapOptions != null)
 				{
-					var map = abstractMap.MapVisualizer;
-					var mapNode = new Node(map as ScriptableObject);
-					mapNode.title = map.name;
-					mapNode.subtitle = "Map Visualizer";
+					var map = abstractMap.MapOptions;
+					var mapNode = new Node(map)
+					{
+						title = "Map Options",
+						subtitle = "Map Visualizer"
+					};
 					_maps.Add(mapNode);
 					mapNode.Dive(map, showModifiers);
 				}

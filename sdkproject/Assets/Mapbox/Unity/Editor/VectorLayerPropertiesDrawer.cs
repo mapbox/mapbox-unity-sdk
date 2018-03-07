@@ -7,6 +7,7 @@
 	using UnityEditor;
 	using Mapbox.Unity.Map;
 	using UnityEditor.IMGUI.Controls;
+	using Mapbox.Unity.MeshGeneration.Modifiers;
 
 	[CustomPropertyDrawer(typeof(VectorLayerProperties))]
 	public class VectorLayerPropertiesDrawer : PropertyDrawer
@@ -164,11 +165,101 @@
 			{
 				EditorGUI.indentLevel++;
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("filterOptions"), new GUIContent("Filters"));
-				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("modifierOptions"), new GUIContent("Modifiers"));
+				//EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("modifierOptions"), new GUIContent("Modifiers"));
+				DrawModifiers(layerProperty, new GUIContent("Modifier Options"));
 				EditorGUI.indentLevel--;
 			}
 
 			GUILayout.EndVertical();
+		}
+		void DrawModifiers(SerializedProperty property, GUIContent label)
+		{
+			showPosition = EditorGUILayout.Foldout(showPosition, label.text);
+			EditorGUILayout.BeginVertical();
+			if (showPosition)
+			{
+				EditorGUILayout.BeginHorizontal();
+				EditorGUILayout.PrefixLabel("Feature Position");
+				var featurePositionProperty = property.FindPropertyRelative("moveFeaturePositionTo");
+				featurePositionProperty.enumValueIndex = EditorGUILayout.Popup(featurePositionProperty.enumValueIndex, featurePositionProperty.enumDisplayNames);
+				EditorGUILayout.EndHorizontal();
+
+				EditorGUILayout.Space();
+				EditorGUILayout.LabelField("Mesh Modifiers");
+
+				var meshfac = property.FindPropertyRelative("MeshModifiers");
+
+				for (int i = 0; i < meshfac.arraySize; i++)
+				{
+					var ind = i;
+					EditorGUILayout.BeginHorizontal();
+					EditorGUILayout.BeginVertical();
+					//GUILayout.Space(5);
+					meshfac.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(meshfac.GetArrayElementAtIndex(i).objectReferenceValue, typeof(MeshModifier), false) as ScriptableObject;
+					EditorGUILayout.EndVertical();
+					if (GUILayout.Button(new GUIContent("+"), (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
+					{
+						ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac, ind);
+					}
+					if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
+					{
+						meshfac.DeleteArrayElementAtIndex(ind);
+					}
+					EditorGUILayout.EndHorizontal();
+				}
+
+				EditorGUILayout.Space();
+				EditorGUILayout.BeginHorizontal();
+				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
+				{
+					meshfac.arraySize++;
+					meshfac.GetArrayElementAtIndex(meshfac.arraySize - 1).objectReferenceValue = null;
+				}
+				if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
+				{
+					ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac);
+				}
+				EditorGUILayout.EndHorizontal();
+
+				EditorGUILayout.Space();
+				EditorGUILayout.LabelField("Game Object Modifiers");
+				var gofac = property.FindPropertyRelative("GoModifiers");
+				for (int i = 0; i < gofac.arraySize; i++)
+				{
+					var ind = i;
+					EditorGUILayout.BeginHorizontal();
+					EditorGUILayout.BeginVertical();
+					GUILayout.Space(5);
+					gofac.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(gofac.GetArrayElementAtIndex(i).objectReferenceValue, typeof(GameObjectModifier), false) as ScriptableObject;
+					EditorGUILayout.EndVertical();
+
+					if (GUILayout.Button(new GUIContent("+"), (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
+					{
+						ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac, ind);
+					}
+					if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
+					{
+						gofac.DeleteArrayElementAtIndex(ind);
+					}
+					EditorGUILayout.EndHorizontal();
+				}
+
+				EditorGUILayout.Space();
+				EditorGUILayout.BeginHorizontal();
+				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
+				{
+					gofac.arraySize++;
+					gofac.GetArrayElementAtIndex(gofac.arraySize - 1).objectReferenceValue = null;
+				}
+				if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
+				{
+					ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac);
+				}
+				EditorGUILayout.EndHorizontal();
+				//GUILayout.EndArea();
+			}
+			//EditorGUI.indentLevel--;
+			EditorGUILayout.EndVertical();
 		}
 	}
 }

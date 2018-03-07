@@ -104,8 +104,8 @@
 			_defaultStack.GoModifiers.AddRange(defaultGOModifierStack);
 
 			//Add any additional modifiers that were added. 
-			_defaultStack.MeshModifiers.AddRange(_layerProperties.modifierOptions.MeshModifiers);
-			_defaultStack.GoModifiers.AddRange(_layerProperties.modifierOptions.GoModifiers);
+			_defaultStack.MeshModifiers.AddRange(_layerProperties.MeshModifiers);
+			_defaultStack.GoModifiers.AddRange(_layerProperties.GoModifiers);
 
 		}
 		public override void Initialize()

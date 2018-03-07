@@ -438,7 +438,7 @@ MonoBehaviour:
     mapOptions:
       locationOptions:
         latitudeLongitude: 37.784179, -122.401583
-        zoom: 14
+        zoom: 16
       extentOptions:
         extentType: 0
         cameraBoundsOptions:
@@ -447,10 +447,10 @@ MonoBehaviour:
           disposeBuffer: 0
           updateInterval: 0
         rangeAroundCenterOptions:
-          west: 2
-          north: 2
-          east: 2
-          south: 2
+          west: 1
+          north: 1
+          east: 1
+          south: 1
         rangeAroundTransformOptions:
           targetTransform: {fileID: 0}
           visibleBuffer: 0
@@ -463,18 +463,18 @@ MonoBehaviour:
         unitType: 0
         unityToMercatorConversionFactor: 100
     imageryLayerProperties:
-      sourceType: 2
+      sourceType: 0
       sourceOptions:
         isActive: 1
         layerSource:
           Name: Streets
-          Id: mapbox://styles/mapbox/dark-v9
+          Id: mapbox://styles/mapbox/streets-v10
           Modified: 
           UserName: 
       rasterOptions:
-        useRetina: 1
+        useRetina: 0
         useCompression: 0
-        useMipMap: 1
+        useMipMap: 0
     elevationLayerProperties:
       sourceType: 0
       sourceOptions:
@@ -484,7 +484,7 @@ MonoBehaviour:
           Id: mapbox.terrain-rgb
           Modified: 
           UserName: 
-      elevationLayerType: 1
+      elevationLayerType: 0
       requiredOptions:
         baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
         addCollider: 0
@@ -500,54 +500,26 @@ MonoBehaviour:
         wallHeight: 10
         wallMaterial: {fileID: 0}
     vectorLayerProperties:
-      sourceType: 0
+      sourceType: 2
       sourceOptions:
-        isActive: 1
+        isActive: 0
         layerSource:
           Name: 
           Id: mapbox.mapbox-streets-v7
           Modified: 
           UserName: 
-      isStyleOptimized: 1
+      isStyleOptimized: 0
       optimizedStyle:
-        Name: Basic
-        Id: mapbox://styles/atripathi-mb/cj9oknugh4h092rt6yywemku3
-        Modified: 2017-11-06T19:20:52.058Z
-        UserName: atripathi-mb
+        Name: 
+        Id: 
+        Modified: 
+        UserName: 
       performanceOptions:
         isEnabled: 1
         entityPerCoroutine: 20
       defaultStylingOptions:
         isExtruded: 0
-      vectorSubLayers:
-      - coreOptions:
-          isActive: 1
-          sublayerName: Buildings
-          geometryType: 2
-          layerName: building
-          snapToTerrain: 1
-          groupFeatures: 0
-          lineWidth: 0
-        filterOptions:
-          filters: []
-          combinerType: 0
-        extrusionOptions:
-          extrusionType: 1
-          extrusionGeometryType: 0
-          propertyName: height
-          minimumHeight: 0
-          maximumHeight: 0
-        materialOptions:
-          projectMapImagery: 0
-          materials:
-          - Materials:
-            - {fileID: 2100000, guid: c0be5c38e1944584b89f81505e3c4446, type: 2}
-          - Materials:
-            - {fileID: 2100000, guid: ab4ee1288a054a84b85ba5cf5a0abf34, type: 2}
-        modifierOptions:
-          moveFeaturePositionTo: 0
-          MeshModifiers: []
-          GoModifiers: []
+      vectorSubLayers: []
 --- !u!114 &114375948512099040
 MonoBehaviour:
   m_ObjectHideFlags: 1

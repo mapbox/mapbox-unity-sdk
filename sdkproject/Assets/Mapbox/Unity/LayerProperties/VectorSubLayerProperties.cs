@@ -1,6 +1,9 @@
 ﻿namespace Mapbox.Unity.Map
 {
 	using System;
+	using System.Collections.Generic;
+	using Mapbox.Unity.MeshGeneration.Modifiers;
+
 	[Serializable]
 	public class VectorSubLayerProperties : LayerProperties
 	{
@@ -15,7 +18,13 @@
 		};
 		public GeometryMaterialOptions materialOptions = new GeometryMaterialOptions();
 		//public GeometryStylingOptions stylingOptions;
-		public LayerModifierOptions modifierOptions = new LayerModifierOptions();
+		//[NodeEditorElement("Modifiers")]
+		//public LayerModifierOptions modifierOptions = new LayerModifierOptions();
 
+		public PositionTargetType moveFeaturePositionTo;
+		[NodeEditorElement("Mesh Modifiers")]
+		public List<MeshModifier> MeshModifiers;
+		[NodeEditorElement("Game Object Modifiers")]
+		public List<GameObjectModifier> GoModifiers;
 	}
 }
