@@ -89,7 +89,7 @@
 
 		internal override void OnRegistered(UnityTile tile)
 		{
-			var vectorTile = (_properties.isStyleOptimized) ? new VectorTile(_properties.optimizedStyle.Id, _properties.optimizedStyle.Modified) : new VectorTile();
+			var vectorTile = (_properties.useOptimizedStyle) ? new VectorTile(_properties.optimizedStyle.Id, _properties.optimizedStyle.Modified) : new VectorTile();
 			tile.AddTile(vectorTile);
 
 			if (string.IsNullOrEmpty(MapId) || _properties.sourceOptions.isActive == false)

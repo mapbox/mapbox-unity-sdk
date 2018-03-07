@@ -259,21 +259,7 @@
 
 			//and finally, running the modifier stack on the feature
 			var processed = false;
-			//for (int i = 0; i < Stacks.Count; i++)
-			//{
-			//	foreach (var key in Stacks[i].Types)
-			//	{
-			//		if (key == styleSelectorKey)
-			//		{
-			//			processed = true;
-			//			Stacks[i].Stack.Execute(tile, feature, meshData, parent, styleSelectorKey);
-			//			break;
-			//		}
-			//	}
 
-			//	if (processed)
-			//		break;
-			//}
 			if (!processed)
 			{
 				if (_defaultStack != null)

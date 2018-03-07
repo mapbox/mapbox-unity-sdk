@@ -2,6 +2,8 @@
 {
 	using System;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
+	using UnityEngine;
+
 	[Serializable]
 	public class GeometryMaterialOptions : ModifierProperties
 	{
@@ -12,6 +14,7 @@
 				return typeof(MaterialModifier);
 			}
 		}
+		[Tooltip("Use image texture from the Imagery source as texture for roofs. ")]
 		public bool projectMapImagery;
 		public MaterialList[] materials = new MaterialList[2];
 

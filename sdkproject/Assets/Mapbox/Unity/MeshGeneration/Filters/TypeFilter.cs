@@ -284,10 +284,14 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 	[Serializable]
 	public class LayerFilter
 	{
+		[Tooltip("Name of the property to use as key. This property is case sensitive.")]
 		public string Key;
+		[Tooltip("Value to match using the operator. ")]
 		public string PropertyValue = string.Empty;
+		[Tooltip("Value to match using the operator. ")]
 		public float Min, Max;
 
+		[Tooltip("Filter operator to apply. ")]
 		public LayerFilterOperationType filterOperator;
 
 		public LayerFilter(LayerFilterOperationType filterOperation)

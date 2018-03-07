@@ -414,13 +414,13 @@
 		{
 			EditorGUI.BeginProperty(position, label, property);
 			//showPosition = EditorGUI.Foldout(new Rect(position.x, position.y, position.width, lineHeight), showPosition, label.text);
-			EditorGUI.LabelField(new Rect(position.x, position.y, position.width, lineHeight), "Material Options");
+			EditorGUI.LabelField(new Rect(position.x, position.y, position.width, lineHeight), new GUIContent { text = "Material Options", tooltip = "Unity materials to be used for features. " });
 			EditorGUI.indentLevel++;
 			//if (showPosition)
 			{
 				position.y += lineHeight;
 				var projectMapImg = property.FindPropertyRelative("projectMapImagery");
-				var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent("Project Imagery"));
+				var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Project Imagery", tooltip = "Use image texture from the Imagery source as texture for roofs. " });
 				projectMapImg.boolValue = EditorGUI.Toggle(typePosition, projectMapImg.boolValue);
 
 				//position.y += lineHeight;
@@ -432,11 +432,11 @@
 				}
 
 				var roofMat = matList.GetArrayElementAtIndex(0);
-				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), roofMat, new GUIContent("Roof Material"));
+				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), roofMat, new GUIContent { text = "Roof Material", tooltip = "Unity material to use for extruded roof/top mesh. " });
 				position.y += EditorGUI.GetPropertyHeight(roofMat);
 
 				var wallMat = matList.GetArrayElementAtIndex(1);
-				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), wallMat, new GUIContent("Wall Material"));
+				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), wallMat, new GUIContent { text = "Wall Material", tooltip = "Unity material to use for extruded wall/side mesh. " });
 				position.y += EditorGUI.GetPropertyHeight(wallMat);
 
 			}
@@ -504,128 +504,24 @@
 		}
 	}
 
-	[CustomPropertyDrawer(typeof(LayerModifierOptions))]
-	public class LayerModifierOptionsDrawer : PropertyDrawer
-	{
-		static float lineHeight = EditorGUIUtility.singleLineHeight;
-		bool showPosition = true;
-		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-		{
-			EditorGUI.BeginProperty(position, label, property);
-			position.height = lineHeight;
-			showPosition = EditorGUI.Foldout(position, showPosition, label.text);
-			//EditorGUI.indentLevel++;
-			if (showPosition)
-			{
-				position.y += lineHeight;
-				var typePosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent("Feature Position"));
-				var featurePositionProperty = property.FindPropertyRelative("moveFeaturePositionTo");
-				featurePositionProperty.enumValueIndex = EditorGUI.Popup(typePosition, featurePositionProperty.enumValueIndex, featurePositionProperty.enumDisplayNames);
-
-				EditorGUILayout.Space();
-				EditorGUILayout.LabelField("Mesh Modifiers");
-
-				var meshfac = property.FindPropertyRelative("MeshModifiers");
-
-				for (int i = 0; i < meshfac.arraySize; i++)
-				{
-					var ind = i;
-					EditorGUILayout.BeginHorizontal();
-					EditorGUILayout.BeginVertical();
-					//GUILayout.Space(5);
-					meshfac.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(meshfac.GetArrayElementAtIndex(i).objectReferenceValue, typeof(MeshModifier), false) as ScriptableObject;
-					EditorGUILayout.EndVertical();
-					if (GUILayout.Button(new GUIContent("+"), (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
-					{
-						ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac, ind);
-					}
-					if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
-					{
-						meshfac.DeleteArrayElementAtIndex(ind);
-					}
-					EditorGUILayout.EndHorizontal();
-				}
-
-				EditorGUILayout.Space();
-				EditorGUILayout.BeginHorizontal();
-				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
-				{
-					meshfac.arraySize++;
-					meshfac.GetArrayElementAtIndex(meshfac.arraySize - 1).objectReferenceValue = null;
-				}
-				if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
-				{
-					ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac);
-				}
-				EditorGUILayout.EndHorizontal();
-
-				EditorGUILayout.Space();
-				EditorGUILayout.LabelField("Game Object Modifiers");
-				var gofac = property.FindPropertyRelative("GoModifiers");
-				for (int i = 0; i < gofac.arraySize; i++)
-				{
-					var ind = i;
-					EditorGUILayout.BeginHorizontal();
-					EditorGUILayout.BeginVertical();
-					GUILayout.Space(5);
-					gofac.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(gofac.GetArrayElementAtIndex(i).objectReferenceValue, typeof(GameObjectModifier), false) as ScriptableObject;
-					EditorGUILayout.EndVertical();
-
-					if (GUILayout.Button(new GUIContent("+"), (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
-					{
-						ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac, ind);
-					}
-					if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
-					{
-						gofac.DeleteArrayElementAtIndex(ind);
-					}
-					EditorGUILayout.EndHorizontal();
-				}
-
-				EditorGUILayout.Space();
-				EditorGUILayout.BeginHorizontal();
-				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
-				{
-					gofac.arraySize++;
-					gofac.GetArrayElementAtIndex(gofac.arraySize - 1).objectReferenceValue = null;
-				}
-				if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
-				{
-					ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac);
-				}
-				EditorGUILayout.EndHorizontal();
-				//GUILayout.EndArea();
-			}
-			//EditorGUI.indentLevel--;
-			EditorGUI.EndProperty();
-		}
-		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-		{
-			float height = 0.0f;
-			if (showPosition)
-			{
-				height += (2.0f * EditorGUIUtility.singleLineHeight);
-			}
-			else
-			{
-				height += (1.0f * EditorGUIUtility.singleLineHeight);
-			}
-
-			return height;
-		}
-	}
-
 	[CustomPropertyDrawer(typeof(VectorFilterOptions))]
 	public class VectorFilterOptionsDrawer : PropertyDrawer
 	{
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		bool showFilters = true;
+
+		GUIContent operatorGui = new GUIContent { text = "Operator", tooltip = "Filter operator to apply. " };
+		GUIContent numValueGui = new GUIContent { text = "Num Value", tooltip = "Numeric value to match using the operator.  " };
+		GUIContent strValueGui = new GUIContent { text = "Str Value", tooltip = "String value to match using the operator.  " };
+		GUIContent minValueGui = new GUIContent { text = "Min", tooltip = "Minimum numeric value to match using the operator.  " };
+		GUIContent maxValueGui = new GUIContent { text = "Max", tooltip = "Maximum numeric value to match using the operator.  " };
+
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
 			position.height = lineHeight;
 
-			showFilters = EditorGUI.Foldout(position, showFilters, "Filters");
+			showFilters = EditorGUI.Foldout(position, showFilters, new GUIContent { text = "Filters", tooltip = "Filter features in a vector layer based on criterion specified.  " });
 			if (showFilters)
 			{
 				var propertyFilters = property.FindPropertyRelative("filters");
@@ -664,24 +560,25 @@
 
 			EditorGUILayout.BeginHorizontal();
 
-			EditorGUILayout.LabelField("Key", GUILayout.MaxWidth(150));
+			EditorGUILayout.LabelField(new GUIContent { text = "Key", tooltip = "Name of the property to use as key. This property is case sensitive." }, GUILayout.MaxWidth(150));
+
 
 			switch ((LayerFilterOperationType)filterOperatorProp.enumValueIndex)
 			{
 				case LayerFilterOperationType.IsEqual:
 				case LayerFilterOperationType.IsGreater:
 				case LayerFilterOperationType.IsLess:
-					EditorGUILayout.LabelField("Operator", GUILayout.MaxWidth(150));
-					EditorGUILayout.LabelField("Num Value", GUILayout.MaxWidth(100));
+					EditorGUILayout.LabelField(operatorGui, GUILayout.MaxWidth(150));
+					EditorGUILayout.LabelField(numValueGui, GUILayout.MaxWidth(100));
 					break;
 				case LayerFilterOperationType.Contains:
-					EditorGUILayout.LabelField("Operator", GUILayout.MaxWidth(150));
-					EditorGUILayout.LabelField("Str Value", GUILayout.MaxWidth(100));
+					EditorGUILayout.LabelField(operatorGui, GUILayout.MaxWidth(150));
+					EditorGUILayout.LabelField(strValueGui, GUILayout.MaxWidth(100));
 					break;
 				case LayerFilterOperationType.IsInRange:
-					EditorGUILayout.LabelField("Operator", GUILayout.MaxWidth(150));
-					EditorGUILayout.LabelField("Min", GUILayout.MaxWidth(100));
-					EditorGUILayout.LabelField("Max", GUILayout.MaxWidth(100));
+					EditorGUILayout.LabelField(operatorGui, GUILayout.MaxWidth(150));
+					EditorGUILayout.LabelField(minValueGui, GUILayout.MaxWidth(100));
+					EditorGUILayout.LabelField(maxValueGui, GUILayout.MaxWidth(100));
 					break;
 				default:
 					break;
@@ -741,9 +638,10 @@
 				// Draw label.
 				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("isActive"));
 				position.y += lineHeight;
-				var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent("Primitive Type"));
-				var sourceTypeProperty = property.FindPropertyRelative("geometryType");
-				sourceTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, sourceTypeProperty.enumValueIndex, sourceTypeProperty.enumDisplayNames);
+				var primitiveType = property.FindPropertyRelative("geometryType");
+				var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Primitive Type", tooltip = "Primitive geometry type of the visualizer , allowed primitives - point, line, polygon." });
+
+				primitiveType.enumValueIndex = EditorGUI.Popup(typePosition, primitiveType.enumValueIndex, primitiveType.enumDisplayNames);
 
 				position.y += lineHeight;
 				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("layerName"));
@@ -754,7 +652,7 @@
 				position.y += lineHeight;
 				EditorGUI.PropertyField(position, property.FindPropertyRelative("groupFeatures"));
 
-				if ((VectorPrimitiveType)sourceTypeProperty.enumValueIndex == VectorPrimitiveType.Line)
+				if ((VectorPrimitiveType)primitiveType.enumValueIndex == VectorPrimitiveType.Line)
 				{
 					position.y += lineHeight;
 					EditorGUI.PropertyField(position, property.FindPropertyRelative("lineWidth"));

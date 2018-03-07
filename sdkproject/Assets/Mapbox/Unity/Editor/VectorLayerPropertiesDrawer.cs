@@ -8,6 +8,7 @@
 	using Mapbox.Unity.Map;
 	using UnityEditor.IMGUI.Controls;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
+	using Mapbox.VectorTile.ExtensionMethods;
 
 	[CustomPropertyDrawer(typeof(VectorLayerProperties))]
 	public class VectorLayerPropertiesDrawer : PropertyDrawer
@@ -26,11 +27,13 @@
 			EditorGUI.BeginProperty(position, label, property);
 			position.height = lineHeight;
 
-			var typePosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent("Style Name"));
 			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
+			var sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
+
+			var typePosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Style Name", tooltip = EnumExtensions.Description(sourceTypeValue) });
 
 			sourceTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, sourceTypeProperty.enumValueIndex, sourceTypeProperty.enumDisplayNames);
-			var sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
+			sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
 
 			position.y += lineHeight;
 			var sourceOptionsProperty = property.FindPropertyRelative("sourceOptions");
@@ -62,7 +65,7 @@
 			{
 				position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sourceOptions"));
 
-				var isStyleOptimized = property.FindPropertyRelative("isStyleOptimized");
+				var isStyleOptimized = property.FindPropertyRelative("useOptimizedStyle");
 				EditorGUILayout.PropertyField(isStyleOptimized);
 				position.y += lineHeight;
 
@@ -74,7 +77,7 @@
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("performanceOptions"), new GUIContent("Perfomance Options"));
 				position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("performanceOptions"));
 
-				EditorGUILayout.LabelField("Visualizer Stack");
+				EditorGUILayout.LabelField(new GUIContent { text = "Vector Layer Visualizers", tooltip = "Visualizers for vector features contained in a layer. " });
 
 				var subLayerArray = property.FindPropertyRelative("vectorSubLayers");
 				var layersRect = GUILayoutUtility.GetRect(0, 500, Mathf.Max(subLayerArray.arraySize + 1, 1) * lineHeight, (subLayerArray.arraySize + 1) * lineHeight);
@@ -90,7 +93,7 @@
 
 				GUILayout.BeginHorizontal();
 
-				if (GUILayout.Button("Add Layer"))
+				if (GUILayout.Button("Add Visualizer"))
 				{
 					subLayerArray.arraySize++;
 					//subLayerArray.InsertArrayElementAtIndex(subLayerArray.arraySize);
@@ -138,7 +141,7 @@
 				}
 				else
 				{
-					GUILayout.Label("Select a layer to see properties", labelItalicCenteredStyle);
+					GUILayout.Label("Select a visualizer to see properties");
 				}
 			}
 			EditorGUI.EndProperty();
@@ -146,7 +149,7 @@
 
 		void DrawLayerVisualizerProperties(SerializedProperty layerProperty)
 		{
-			GUILayout.Label("Visualizer Stack Properties");
+			GUILayout.Label("Vector Layer Visualizer Properties");
 			GUILayout.BeginVertical();
 
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
@@ -166,12 +169,13 @@
 				EditorGUI.indentLevel++;
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("filterOptions"), new GUIContent("Filters"));
 				//EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("modifierOptions"), new GUIContent("Modifiers"));
-				DrawModifiers(layerProperty, new GUIContent("Modifier Options"));
+				DrawModifiers(layerProperty, new GUIContent { text = "Modifier Options", tooltip = "Additional Feature modifiers to apply to the visualizer. " });
 				EditorGUI.indentLevel--;
 			}
 
 			GUILayout.EndVertical();
 		}
+
 		void DrawModifiers(SerializedProperty property, GUIContent label)
 		{
 			showPosition = EditorGUILayout.Foldout(showPosition, label.text);
@@ -179,13 +183,13 @@
 			if (showPosition)
 			{
 				EditorGUILayout.BeginHorizontal();
-				EditorGUILayout.PrefixLabel("Feature Position");
+				EditorGUILayout.PrefixLabel(new GUIContent { text = "Feature Position", tooltip = "Position to place feature in the tile. " });
 				var featurePositionProperty = property.FindPropertyRelative("moveFeaturePositionTo");
 				featurePositionProperty.enumValueIndex = EditorGUILayout.Popup(featurePositionProperty.enumValueIndex, featurePositionProperty.enumDisplayNames);
 				EditorGUILayout.EndHorizontal();
 
 				EditorGUILayout.Space();
-				EditorGUILayout.LabelField("Mesh Modifiers");
+				EditorGUILayout.LabelField(new GUIContent { text = "Mesh Modifiers", tooltip = "Modifiers that manipulate the features mesh. " });
 
 				var meshfac = property.FindPropertyRelative("MeshModifiers");
 
@@ -222,7 +226,7 @@
 				EditorGUILayout.EndHorizontal();
 
 				EditorGUILayout.Space();
-				EditorGUILayout.LabelField("Game Object Modifiers");
+				EditorGUILayout.LabelField(new GUIContent { text = "Game Object Modifiers", tooltip = "Modifiers that manipulate the GameObject after mesh generation." });
 				var gofac = property.FindPropertyRelative("GoModifiers");
 				for (int i = 0; i < gofac.arraySize; i++)
 				{
