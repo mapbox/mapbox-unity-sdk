@@ -200,13 +200,13 @@ namespace Mapbox.Unity.Utilities
 		/// <param name="longitude"> The longitude. </param>
 		/// <param name="zoom"> Zoom level. </param>
 		/// <returns> A <see cref="T:UnityEngine.Vector2d"/> xy tile ID. </returns>
-		public static Vector2d LatitudeLongitudeToTileId(double latitude, double longitude, int zoom)
+		public static UnwrappedTileId LatitudeLongitudeToTileId(double latitude, double longitude, int zoom)
 		{
 			var x = (int)Math.Floor((longitude + 180.0) / 360.0 * Math.Pow(2.0, zoom));
 			var y = (int)Math.Floor((1.0 - Math.Log(Math.Tan(latitude * Math.PI / 180.0)
 					+ 1.0 / Math.Cos(latitude * Math.PI / 180.0)) / Math.PI) / 2.0 * Math.Pow(2.0, zoom));
 
-			return new Vector2d(x, y);
+			return new UnwrappedTileId(x, y, zoom);
 		}
 
 		/// <summary>
