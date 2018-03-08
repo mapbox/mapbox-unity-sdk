@@ -49,22 +49,32 @@
 
 				if (selected != previousSelection)
 				{
-					Debug.Log("Inside comdition : Selected -> " + selected + "Previous -> " + previousSelection);
 					previousSelection = selected;
 					property.FindPropertyRelative("mapPreset").enumValueIndex = selected;
-					if (selected == 0)
-					{
-						PresetLocationBased(property);
 
-						var locationProvider = _map.gameObject.GetComponent<LocationProviderFactory>();
-						Debug.Log("target -> " + ((locationProvider == null) ? "null" : "notnull"));
-						if (locationProvider == null)
-							(_map.gameObject).AddComponent<LocationProviderFactory>();
-					}
-					else
+					switch ((MapPresetType)selected)
 					{
-						PresetWorldSimulator(property);
+						case MapPresetType.LocationBasedMap:
+							PresetLocationBased(property);
+
+							//TODO : Get opinions on this UX. 
+							//var locationProvider = _map.gameObject.GetComponent<LocationProviderFactory>();
+							//Debug.Log("target -> " + ((locationProvider == null) ? "null" : "notnull"));
+							//if (locationProvider == null)
+							//(_map.gameObject).AddComponent<LocationProviderFactory>();
+							break;
+						case MapPresetType.WorldSimulator:
+							PresetWorldSimulator(property);
+							break;
+						case MapPresetType.ARTableTop:
+							break;
+						case MapPresetType.ARWorldScale:
+							PresetARWorldScale(property);
+							break;
+						default:
+							break;
 					}
+
 				}
 				EditorGUILayout.Space();
 
@@ -159,6 +169,29 @@
 			extentType.enumValueIndex = (int)MapExtentType.CameraBounds;
 
 			vectorSourceType.enumValueIndex = (int)VectorSourceType.MapboxStreets;
+		}
+
+		void PresetARTableTop(SerializedProperty unifiedMap)
+		{
+			//Set 
+			//placement = atLocationCenter, 
+			//scaling = custom
+			//turn on vector layers.
+			var mapOptionsProp = unifiedMap.FindPropertyRelative("mapOptions");
+			var vectorLayerProps = unifiedMap.FindPropertyRelative("vectorLayerProperties");
+			var placementType = mapOptionsProp.FindPropertyRelative("placementOptions.placementType");
+			var scalingType = mapOptionsProp.FindPropertyRelative("scalingOptions.scalingType");
+			var extentType = mapOptionsProp.FindPropertyRelative("extentOptions.extentType");
+			var vectorSourceType = vectorLayerProps.FindPropertyRelative("sourceType");
+
+			placementType.enumValueIndex = (int)MapPlacementType.AtLocationCenter;
+
+			scalingType.enumValueIndex = (int)MapScalingType.WorldScale;
+
+			extentType.enumValueIndex = (int)MapExtentType.CameraBounds;
+
+			vectorSourceType.enumValueIndex = (int)VectorSourceType.MapboxStreets;
+
 		}
 
 		void PresetARWorldScale(SerializedProperty unifiedMap)
