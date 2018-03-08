@@ -11,6 +11,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63d97cb1cfb3f1b499c24763afa54873, type: 3}
   m_Name: UvVectorTileFactory
   m_EditorClassIdentifier: 
-  _mapId: mapbox.mapbox-streets-v7
+  _mapId: lr1k.b7wzke2r
   Visualizers:
   - {fileID: 11400000, guid: 50796e9614e19d74e890930774e684b3, type: 2}

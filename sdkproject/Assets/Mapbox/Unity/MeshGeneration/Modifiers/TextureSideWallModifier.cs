@@ -20,6 +20,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		[SerializeField]
 		private bool _centerSegments = true;
+		[SerializeField]
+		private bool _separateSubmesh = false;
 
 		private List<Vector3> edgeList;
 		float dist = 0;

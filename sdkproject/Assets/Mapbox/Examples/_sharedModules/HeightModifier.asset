@@ -13,7 +13,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Active: 1
   _flatTops: 1
-  _forceHeight: 0
-  _height: 0
+  _forceHeight: 1
+  _height: 2
   _createSideWalls: 1
-  _separateSubmesh: 1
