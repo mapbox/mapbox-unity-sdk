@@ -423,6 +423,14 @@ namespace Mapbox.Unity.Map
 			//_fileSource = MapboxAccess.Instance;
 
 		}
+		public virtual float QueryHeightData(Vector2d latlong)
+		{
+			var _meters = Conversions.LatLonToMeters(latlong.x, latlong.y);
+			var tile = MapVisualizer.ActiveTiles[Conversions.LatitudeLongitudeToTileId(latlong.x, latlong.y, (int)Zoom)];
+			var _rect = tile.Rect;
+			var _worldPos = GeoToWorldPosition(new Vector2d(latlong.x, latlong.y));
+			return tile.QueryHeightData((float)((_meters - _rect.Min).x / _rect.Size.x), (float)((_meters.y - _rect.Max.y) / _rect.Size.y));
+		}
 
 		public virtual void UpdateMap(MapLocationOptions options)
 		{
