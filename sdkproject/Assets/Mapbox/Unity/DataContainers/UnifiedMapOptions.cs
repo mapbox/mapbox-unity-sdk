@@ -7,11 +7,11 @@
 	{
 		public MapPresetType mapPreset = MapPresetType.LocationBasedMap;
 		public MapOptions mapOptions = new MapOptions();
-		[NodeEditorElementAttribute("Image Layer")]
+		[NodeEditorElement("Image Layer")]
 		public ImageryLayerProperties imageryLayerProperties = new ImageryLayerProperties();
-		[NodeEditorElementAttribute("Terrain Layer")]
+		[NodeEditorElement("Terrain Layer")]
 		public ElevationLayerProperties elevationLayerProperties = new ElevationLayerProperties();
-		[NodeEditorElementAttribute("Vector Layer")]
+		[NodeEditorElement("Vector Layer")]
 		public VectorLayerProperties vectorLayerProperties = new VectorLayerProperties();
 	}
 }

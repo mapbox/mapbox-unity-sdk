@@ -6,7 +6,7 @@
 	{
 		public MapVisualizationType visualizationType = MapVisualizationType.Flat2D;
 		public MapPlacementType placementType = MapPlacementType.AtLocationCenter;
-
+		public bool snapMapToZero = false;
 		public IMapPlacementStrategy placementStrategy;
 	}
 }

@@ -356,35 +356,34 @@ namespace Mapbox.Unity.Map
 		}
 		protected virtual void TileProvider_OnTileAdded(UnwrappedTileId tileId)
 		{
-			//if (_snapMapHeightToZero && !_worldHeightFixed)
-			//{
-			//	//TODO : Fix this 
-			//	//_worldHeightFixed = true;
-			//	//var tile = _mapVisualizer.LoadTile(tileId);
-			//	//if (tile.HeightDataState == MeshGeneration.Enums.TilePropertyState.Loaded)
-			//	//{
-			//	//	var h = tile.QueryHeightData(.5f, .5f);
-			//	//	Root.transform.position = new Vector3(
-			//	//	 Root.transform.position.x,
-			//	//	 -h,
-			//	//	 Root.transform.position.z);
-			//	//}
-			//	//else
-			//	//{
-			//	//	tile.OnHeightDataChanged += (s) =>
-			//	//	{
-			//	//		var h = s.QueryHeightData(.5f, .5f);
-			//	//		Root.transform.position = new Vector3(
-			//	//			 Root.transform.position.x,
-			//	//			 -h,
-			//	//			 Root.transform.position.z);
-			//	//	};
-			//	//}
-			//}
-			//else
-			//{
-			_mapVisualizer.LoadTile(tileId);
-			//}
+			if (CurrentOptions.placementOptions.snapMapToZero)
+			{
+				_worldHeightFixed = true;
+				var tile = _mapVisualizer.LoadTile(tileId);
+				if (tile.HeightDataState == MeshGeneration.Enums.TilePropertyState.Loaded)
+				{
+					var h = tile.QueryHeightData(.5f, .5f);
+					Root.transform.position = new Vector3(
+					 Root.transform.position.x,
+					 -h,
+					 Root.transform.position.z);
+				}
+				else
+				{
+					tile.OnHeightDataChanged += (s) =>
+					{
+						var h = s.QueryHeightData(.5f, .5f);
+						Root.transform.position = new Vector3(
+							 Root.transform.position.x,
+							 -h,
+							 Root.transform.position.z);
+					};
+				}
+			}
+			else
+			{
+				_mapVisualizer.LoadTile(tileId);
+			}
 		}
 
 		protected virtual void TileProvider_OnTileRemoved(UnwrappedTileId tileId)

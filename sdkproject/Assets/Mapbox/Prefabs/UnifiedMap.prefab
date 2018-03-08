@@ -20,6 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4862064375303554}
   - component: {fileID: 114073028855145664}
+  - component: {fileID: 114411022637345166}
   m_Layer: 0
   m_Name: UnifiedMap
   m_TagString: Untagged
@@ -58,7 +59,7 @@ MonoBehaviour:
         latitudeLongitude: 37.784179, -122.401583
         zoom: 16
       extentOptions:
-        extentType: 1
+        extentType: 0
         cameraBoundsOptions:
           camera: {fileID: 0}
           visibleBuffer: 0
@@ -76,6 +77,7 @@ MonoBehaviour:
       placementOptions:
         visualizationType: 0
         placementType: 1
+        snapMapToZero: 0
       scalingOptions:
         scalingType: 1
         unitType: 0
@@ -126,9 +128,29 @@ MonoBehaviour:
           Id: mapbox.mapbox-streets-v7
           Modified: 
           UserName: 
+      useOptimizedStyle: 0
+      optimizedStyle:
+        Name: 
+        Id: 
+        Modified: 
+        UserName: 
       performanceOptions:
         isEnabled: 1
         entityPerCoroutine: 20
-      defaultStylingOptions:
-        isExtruded: 0
       vectorSubLayers: []
+--- !u!114 &114411022637345166
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1574082689241658}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b55f37f9a6f7e44f7bb35e6bc3863847, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mapManager: {fileID: 0}
+  _deviceLocationProvider: {fileID: 0}
+  _editorLocationProvider: {fileID: 0}
+  _transformLocationProvider: {fileID: 0}
+  _dontDestroyOnLoad: 0
