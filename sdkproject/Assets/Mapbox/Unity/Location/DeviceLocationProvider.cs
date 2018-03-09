@@ -93,9 +93,34 @@ namespace Mapbox.Unity.Location
 			yield return _wait1sec;
 #endif
 
+			// some devices seem to provide the last known location till a current location  becomes available
+			// wait a certain amount of time or continue if an updated location is available
+			float waitTimeForInitialLocation = 20f; //seconds
+			float initalWaitStartTime = Time.realtimeSinceStartup;
+			bool gotUptodateLocation = false;
+
+			while (
+				initalWaitStartTime + waitTimeForInitialLocation > Time.realtimeSinceStartup
+				&& !gotUptodateLocation
+				)
+			{
+				System.DateTime dtGPS = UnixTimestampUtils.From(Input.location.lastData.timestamp);
+				System.DateTime dtNow = System.DateTime.UtcNow;
+				// delta to take into account that GPS and device time migt not be in sync
+				if (System.Math.Abs(dtGPS.Subtract(dtNow).Minutes) < 5)
+				{
+					gotUptodateLocation = true;
+				}
+
+				yield return null;
+			}
+
+
+
 			float gpsInitializedTime = Time.realtimeSinceStartup;
 			// initially pass through all GPS locations
-			float gpsWarmupTime = 60f;
+			float gpsWarmupTime = 120f; //seconds
+			System.Globalization.CultureInfo invariantCulture = System.Globalization.CultureInfo.InvariantCulture;
 
 			while (true)
 			{
@@ -103,7 +128,10 @@ namespace Mapbox.Unity.Location
 				_currentLocation.IsLocationUpdated = false;
 
 				var timestamp = Input.compass.timestamp;
-				if (Input.compass.enabled && timestamp > _lastHeadingTimestamp)
+				if (
+					Input.compass.enabled && timestamp > _lastHeadingTimestamp
+					|| Time.realtimeSinceStartup < gpsInitializedTime + gpsWarmupTime
+				)
 				{
 					var heading = Input.compass.trueHeading;
 					_currentLocation.Heading = heading;
@@ -116,15 +144,20 @@ namespace Mapbox.Unity.Location
 
 				var lastData = Input.location.lastData;
 				timestamp = lastData.timestamp;
-				Debug.LogFormat("{0:yyyyMMdd HHmmss} {1} {2:R} {3:R}", UnixTimestampUtils.From(timestamp), lastData.horizontalAccuracy, lastData.latitude, lastData.longitude);
 
-				if (//1!=2 ||
+				if (
 					(Input.location.status == LocationServiceStatus.Running && timestamp > _lastLocationTimestamp)
 					|| Time.realtimeSinceStartup < gpsInitializedTime + gpsWarmupTime
 				)
 				{
-					_currentLocation.LatitudeLongitude = new Vector2d(lastData.latitude, lastData.longitude);
-					_currentLocation.Accuracy = (int)lastData.horizontalAccuracy;
+					//_currentLocation.LatitudeLongitude = new Vector2d(lastData.latitude, lastData.longitude);
+					// HACK to get back to double precision, does this even work?
+					// https://forum.unity.com/threads/precision-of-location-longitude-is-worse-when-longitude-is-beyond-100-degrees.133192/#post-1835164
+					double latitude = double.Parse(lastData.latitude.ToString("R", invariantCulture), invariantCulture);
+					double longitude = double.Parse(lastData.longitude.ToString("R", invariantCulture), invariantCulture);
+					_currentLocation.LatitudeLongitude = new Vector2d(latitude, longitude);
+
+					_currentLocation.Accuracy = (int)System.Math.Floor(lastData.horizontalAccuracy);
 					_currentLocation.Timestamp = timestamp;
 					_lastLocationTimestamp = timestamp;
 
@@ -139,10 +172,7 @@ namespace Mapbox.Unity.Location
 					}
 				}
 
-				// throttle pulling location data
-				// some Android devices show higher than actual accuracy values when not throttling
-				yield return _wait1sec;
-				//yield return null;
+				yield return null;
 			}
 		}
 	}

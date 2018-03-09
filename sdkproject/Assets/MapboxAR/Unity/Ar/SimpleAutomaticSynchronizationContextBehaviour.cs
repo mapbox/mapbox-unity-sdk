@@ -82,6 +82,7 @@ namespace Mapbox.Unity.Ar
 			}
 		}
 
+
 		void Start()
 		{
 			_alignmentStrategy.Register(this);
@@ -99,12 +100,14 @@ namespace Mapbox.Unity.Ar
 			ARInterface.planeAdded += PlaneAddedHandler;
 		}
 
+
 		void OnDestroy()
 		{
 			_alignmentStrategy.Unregister(this);
 			LocationProvider.OnLocationUpdated -= LocationProvider_OnLocationUpdated;
 			ARInterface.planeAdded -= PlaneAddedHandler;
 		}
+
 
 		void Map_OnInitialized()
 		{
@@ -114,11 +117,13 @@ namespace Mapbox.Unity.Ar
 			LocationProvider.OnLocationUpdated += LocationProvider_OnLocationUpdated;
 		}
 
+
 		void PlaneAddedHandler(BoundedPlane plane)
 		{
 			_lastHeight = plane.center.y;
 			//Unity.Utilities.Console.Instance.Log(string.Format("AR Plane Height: {0}", _lastHeight), "yellow");
 		}
+
 
 		//void UnityARSessionNativeInterface_ARSessionTrackingChanged(UnityEngine.XR.iOS.UnityARCamera camera)
 		//{
@@ -127,21 +132,6 @@ namespace Mapbox.Unity.Ar
 
 		void LocationProvider_OnLocationUpdated(Location location)
 		{
-			string gpsLog = string.Format(
-				"{1:yyyyMMdd HHmmss} {8:0.00000} / {9:0.00000}{0}locationUpdated:{2} headingUpdated:{3}{0}GPS accuracy:{4:0.0}{0}heading(truenorth):{5:0.0}{0}heading(magnetic):{6:0.0}{0}heading accuracy:{7:0.0}"
-				, Environment.NewLine
-				, UnixTimestampUtils.From(location.Timestamp)
-				, location.IsLocationUpdated
-				, location.IsHeadingUpdated
-				, location.Accuracy
-				, location.Heading
-				, location.HeadingMagnetic
-				, location.HeadingAccuracy
-				, location.LatitudeLongitude.x
-				, location.LatitudeLongitude.y
-			);
-			Unity.Utilities.Console.Instance.LogGps(gpsLog);
-
 			if (location.IsLocationUpdated || location.IsHeadingUpdated)
 			{
 				// With this line, we can control accuracy of Gps updates. 
@@ -162,15 +152,15 @@ namespace Mapbox.Unity.Ar
 				}
 				else
 				{
-					_kalman.Process(
-						location.LatitudeLongitude.x
-						, location.LatitudeLongitude.y
-						, location.Accuracy
-						, (long)location.Timestamp
-					);
-					location.LatitudeLongitude.x = _kalman.Lat;
-					location.LatitudeLongitude.y = _kalman.Lng;
-					location.Accuracy = (int)_kalman.Accuracy;
+					//_kalman.Process(
+					//	location.LatitudeLongitude.x
+					//	, location.LatitudeLongitude.y
+					//	, location.Accuracy
+					//	, (long)location.Timestamp
+					//);
+					//location.LatitudeLongitude.x = _kalman.Lat;
+					//location.LatitudeLongitude.y = _kalman.Lng;
+					//location.Accuracy = (int)_kalman.Accuracy;
 
 					var latitudeLongitude = location.LatitudeLongitude;
 					Unity.Utilities.Console.Instance.Log(
@@ -178,33 +168,18 @@ namespace Mapbox.Unity.Ar
 							"Location: {0},{1}\tAccuracy: {2}\tHeading: {3}"
 							, latitudeLongitude.x
 							, latitudeLongitude.y
-							, location.Accuracy, location.Heading
+							, location.Accuracy
+							, location.Heading
 						)
 						, "lightblue"
 					);
 
 					var position = Conversions.GeoToWorldPosition(latitudeLongitude, _map.CenterMercator, _map.WorldRelativeScale).ToVector3xz();
 					_synchronizationContext.AddSynchronizationNodes(location, position, _arPositionReference.localPosition);
-
-					string positionLog = string.Format(
-						"{1:yyyyMMdd HHmmss} {2}{0}hdop:{3} hding:{4}{0}centerMerc:{5}{0}relWorldScale:{6}{0}pos:{7}{0}arPosRef:{8}"
-						, Environment.NewLine
-						, UnixTimestampUtils.From(location.Timestamp)
-						, latitudeLongitude
-						, location.Accuracy
-						, location.Heading
-						, _map.CenterMercator
-						, _map.WorldRelativeScale
-						, position
-						, _arPositionReference.localPosition
-					);
-					Unity.Utilities.Console.Instance.LogPosition(positionLog);
 				}
-
-
 			}
-
 		}
+
 
 		void SynchronizationContext_OnAlignmentAvailable(Ar.Alignment alignment)
 		{

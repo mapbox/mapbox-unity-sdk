@@ -109,69 +109,58 @@
 
 		void ComputeAlignment()
 		{
-			//var rotation = Vector3.SignedAngle(_currentAbsoluteGpsVector, _currentArVector, Vector3.up);
-			//var headingQuaternion = Quaternion.Euler(0, rotation, 0);
-			//var relativeGpsVector = headingQuaternion * _currentAbsoluteGpsVector;
+			var rotation = Vector3.SignedAngle(_currentAbsoluteGpsVector, _currentArVector, Vector3.up);
+			var headingQuaternion = Quaternion.Euler(0, rotation, 0);
+			var relativeGpsVector = headingQuaternion * _currentAbsoluteGpsVector;
 
-			//_rotation = rotation;
-			//_isCalibrated = true;
+			_rotation = rotation;
+			_isCalibrated = true;
 
-			//var accuracy = _gpsNodes[_count - 1].Accuracy;
-			//var delta = _currentArVector - relativeGpsVector;
-			//var deltaDistance = delta.magnitude;
+			var accuracy = _gpsNodes[_count - 1].Accuracy;
+			var delta = _currentArVector - relativeGpsVector;
+			var deltaDistance = delta.magnitude;
 
-			//var bias = SynchronizationBias;
-			//if (UseAutomaticSynchronizationBias && _count > 2)
-			//{
-			//	// FIXME: This works fine, but a better approach would be to reset only after we favor GPS.
-			//	// In other words, don't reset every time we add a node.
-			//	// Generally speaking, this will slowly shift the bias up before resetting bias to 0.
-			//	bias = Mathf.Clamp01((.5f * (deltaDistance + ArTrustRange - accuracy)) / deltaDistance);
-			//}
+			var bias = SynchronizationBias;
+			if (UseAutomaticSynchronizationBias && _count > 2)
+			{
+				// FIXME: This works fine, but a better approach would be to reset only after we favor GPS.
+				// In other words, don't reset every time we add a node.
+				// Generally speaking, this will slowly shift the bias up before resetting bias to 0.
+				bias = Mathf.Clamp01((.5f * (deltaDistance + ArTrustRange - accuracy)) / deltaDistance);
+			}
 
-			//// Our new "origin" will be the difference offset between our last nodes (mapped into the same coordinate space).
-			//var originOffset = _previousArNode - headingQuaternion * _previousLocationPosition;
+			// Our new "origin" will be the difference offset between our last nodes (mapped into the same coordinate space).
+			var originOffset = _previousArNode - headingQuaternion * _previousLocationPosition;
 
-			//// Add the weighted delta.
-			//_position = (delta * bias) + originOffset;
+			// Add the weighted delta.
+			_position = (delta * bias) + originOffset;
 
-
-			_rotation = _gpsNodes[_count - 1].Heading;
-			_position = _gpsPositions[_count - 1];
-
+			//_rotation = _gpsNodes[_count - 1].Heading;
+			//_position = _gpsPositions[_count - 1];
 
 
 #if UNITY_EDITOR
-			//Debug.LogFormat(
-			//	"AR Vector:{0} GPS Vector:{1} HEADING:{2} HDOP:{3} Relative GPS Vector:{4} BIAS:{5} DISTANCE:{6} OFFSET:{7} BIASED DELTA:{8} OFFSET:{8}"
-			//	, _currentArVector
-			//	, _currentAbsoluteGpsVector
-			//	, rotation
-			//	, accuracy
-			//	, relativeGpsVector
-			//	, bias
-			//	, deltaDistance
-			//	, originOffset
-			//	, delta
-			//	, _position
-			//);
+			Debug.LogFormat(
+				"AR Vector:{0} GPS Vector:{1} HEADING:{2} HDOP:{3} Relative GPS Vector:{4} BIAS:{5} DISTANCE:{6} OFFSET:{7} BIASED DELTA:{8} OFFSET:{8}"
+				, _currentArVector
+				, _currentAbsoluteGpsVector
+				, rotation
+				, accuracy
+				, relativeGpsVector
+				, bias
+				, deltaDistance
+				, originOffset
+				, delta
+				, _position
+			);
 #endif
-			//Unity.Utilities.Console.Instance.Log(
-			//	string.Format(
-			//		"Offset: {0},\tHeading: {1},\tDisance: {2},\tBias: {3}"
-			//		, _position
-			//		, _rotation
-			//		, deltaDistance
-			//		, bias
-			//	)
-			//	, "orange"
-			//);
-
 			Unity.Utilities.Console.Instance.Log(
 				string.Format(
-					"Offset: {0},\tHeading: {1}"
+					"Offset: {0},\tHeading: {1},\tDisance: {2},\tBias: {3}"
 					, _position
 					, _rotation
+					, deltaDistance
+					, bias
 				)
 				, "orange"
 			);
