@@ -67,6 +67,8 @@
 			if (showPosition)
 			{
 				position.y += lineHeight;
+				EditorGUI.PropertyField(position, property.FindPropertyRelative("modificationOptions"), true);
+				position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("modificationOptions"));
 				EditorGUI.PropertyField(position, property.FindPropertyRelative("sideWallOptions"), true);
 				position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sideWallOptions"));
 				EditorGUI.PropertyField(position, property.FindPropertyRelative("unityLayerOptions"), true);
@@ -85,6 +87,7 @@
 			height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("requiredOptions"));
 			if (showPosition)
 			{
+				height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("modificationOptions"));
 				height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("unityLayerOptions"));
 				height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sideWallOptions"));
 			}

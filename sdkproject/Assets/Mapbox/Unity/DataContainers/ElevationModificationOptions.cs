@@ -6,5 +6,6 @@
 	{
 		public int sampleCount = 10;
 		public bool useRelativeHeight = true;
+		public float earthRadius = 1000f;
 	}
 }
