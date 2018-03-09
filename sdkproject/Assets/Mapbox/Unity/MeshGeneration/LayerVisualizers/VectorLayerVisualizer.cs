@@ -85,12 +85,30 @@
 						defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
 					}
 					defaultMeshModifierStack.Add(CreateInstance<PolygonMeshModifier>());
-					defaultMeshModifierStack.Add(CreateInstance<UvModifier>());
+					UVModifierOptions uvModOptions = new UVModifierOptions
+					{
+						texturingType = _layerProperties.materialOptions.texturingType,
+						atlasInfo = _layerProperties.materialOptions.atlasInfo
+					};
+					var uvMod = CreateInstance<UvModifier>();
+					uvMod.SetProperties(uvModOptions);
+					defaultMeshModifierStack.Add(uvMod);
+
 					if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
 					{
-						var heightMod = CreateInstance<HeightModifier>();
-						heightMod.SetProperties(_layerProperties.extrusionOptions);
-						defaultMeshModifierStack.Add(heightMod);
+						if (_layerProperties.materialOptions.texturingType == UvMapType.Atlas)
+						{
+							var atlasMod = CreateInstance<TextureSideWallModifier>();
+							GeometryExtrusionWithAtlasOptions atlasOptions = new GeometryExtrusionWithAtlasOptions(_layerProperties.extrusionOptions, uvModOptions);
+							atlasMod.SetProperties(atlasOptions);
+							defaultMeshModifierStack.Add(atlasMod);
+						}
+						else
+						{
+							var heightMod = CreateInstance<HeightModifier>();
+							heightMod.SetProperties(_layerProperties.extrusionOptions);
+							defaultMeshModifierStack.Add(heightMod);
+						}
 					}
 
 					var matMod = CreateInstance<MaterialModifier>();

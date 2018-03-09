@@ -53,7 +53,7 @@ GameObject:
   - component: {fileID: 4427621322831674}
   - component: {fileID: 114498049828617708}
   m_Layer: 0
-  m_Name: LocationProviderNew
+  m_Name: LocationProvider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

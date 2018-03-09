@@ -4,15 +4,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using System;
-	using Mapbox.Unity.Utilities;
+	using Mapbox.Unity.Map;
 	using Mapbox.Utils;
-
-	public enum UvMapType
-	{
-		Tiled,
-		Satellite,
-		Atlas
-	}
 
 	/// <summary>
 	/// UV Modifier works only with (and right after) Polygon Modifier and not with Line Mesh Modifier.
@@ -21,9 +14,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/UV Modifier")]
 	public class UvModifier : MeshModifier
 	{
-		public UvMapType UvType;
+		UVModifierOptions _options;
+		//public UvMapType UvType;
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
-		public bool UseSatelliteRoof = false;
 
 		private int _mdVertexCount;
 		private Vector2d _size;
@@ -31,12 +24,17 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private List<Vector2> _uv = new List<Vector2>();
 
 		//texture uv fields
-		public AtlasInfo AtlasInfo;
+		//public AtlasInfo AtlasInfo;
 		private AtlasEntity _currentFacade;
 		private Quaternion _textureDirection;
 		private Vector2[] _textureUvCoordinates;
 		private Vector3 _vertexRelativePos;
 		private Vector3 _firstVert;
+
+		public override void SetProperties(ModifierProperties properties)
+		{
+			_options = (UVModifierOptions)properties;
+		}
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
@@ -44,16 +42,16 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_mdVertexCount = md.Vertices.Count;
 			_size = md.TileRect.Size;
 
-			if (UvType != UvMapType.Atlas)
+			if (_options.texturingType != UvMapType.Atlas)
 			{
 				for (int i = 0; i < _mdVertexCount; i++)
 				{
 					_vert = md.Vertices[i];
-					if (UvType == UvMapType.Tiled)
+					if (_options.texturingType == UvMapType.Tiled)
 					{
 						_uv.Add(new Vector2(_vert.x, _vert.z));
 					}
-					else if (UvType == UvMapType.Satellite)
+					else if (_options.texturingType == UvMapType.Satellite)
 					{
 						var fromBottomLeft = new Vector2((float)(((_vert.x + md.PositionInTile.x) / tile.TileScale + _size.x / 2) / _size.x),
 							(float)(((_vert.z + md.PositionInTile.z) / tile.TileScale + _size.x / 2) / _size.x));
@@ -61,9 +59,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					}
 				}
 			}
-			else if (UvType == UvMapType.Atlas)
+			else if (_options.texturingType == UvMapType.Atlas)
 			{
-				_currentFacade = AtlasInfo.Roofs[UnityEngine.Random.Range(0, AtlasInfo.Roofs.Count)];
+				_currentFacade = _options.atlasInfo.Roofs[UnityEngine.Random.Range(0, _options.atlasInfo.Roofs.Count)];
 
 				float minx = float.MaxValue, miny = float.MaxValue, maxx = float.MinValue, maxy = float.MinValue;
 				_textureUvCoordinates = new Vector2[_mdVertexCount];

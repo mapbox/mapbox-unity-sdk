@@ -9,17 +9,17 @@ Prefab:
     m_Modifications: []
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 1366057432882186}
+  m_RootGameObject: {fileID: 1257486800756004}
   m_IsPrefabParent: 1
---- !u!1 &1056811091453280
+--- !u!1 &1257486800756004
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 5
   m_Component:
-  - component: {fileID: 4314056903416430}
-  - component: {fileID: 114981033887568564}
+  - component: {fileID: 4867834046800562}
+  - component: {fileID: 114478715909612932}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -27,65 +27,36 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!1 &1366057432882186
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 4927519923487070}
-  m_Layer: 0
-  m_Name: CitySimulator
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4314056903416430
+--- !u!4 &4867834046800562
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1056811091453280}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 4927519923487070}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &4927519923487070
-Transform:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1366057432882186}
+  m_GameObject: {fileID: 1257486800756004}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 4314056903416430}
+  m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114981033887568564
+--- !u!114 &114478715909612932
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1056811091453280}
+  m_GameObject: {fileID: 1257486800756004}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cd961b1c9541a4cee99686069ecce852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _unifiedMapOptions:
-    mapPreset: 0
+    mapPreset: 3
     mapOptions:
       locationOptions:
         latitudeLongitude: 37.7648, -122.463
-        zoom: 16
+        zoom: 10
       extentOptions:
         extentType: 1
         cameraBoundsOptions:
@@ -111,16 +82,16 @@ MonoBehaviour:
         unitType: 0
         unityToMercatorConversionFactor: 100
     imageryLayerProperties:
-      sourceType: 5
+      sourceType: 0
       sourceOptions:
         isActive: 1
         layerSource:
           Name: Streets
-          Id: mapbox://styles/mapbox/satellite-streets-v10
+          Id: mapbox://styles/mapbox/streets-v10
           Modified: 
           UserName: 
       rasterOptions:
-        useRetina: 1
+        useRetina: 0
         useCompression: 0
         useMipMap: 0
     elevationLayerProperties:
@@ -132,9 +103,9 @@ MonoBehaviour:
           Id: mapbox.terrain-rgb
           Modified: 
           UserName: 
-      elevationLayerType: 1
+      elevationLayerType: 0
       requiredOptions:
-        baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
+        baseMaterial: {fileID: 0}
         addCollider: 0
         exaggerationFactor: 1
       modificationOptions:
@@ -144,9 +115,9 @@ MonoBehaviour:
         addToLayer: 0
         layerId: 0
       sideWallOptions:
-        isActive: 1
+        isActive: 0
         wallHeight: 10
-        wallMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
+        wallMaterial: {fileID: 0}
     vectorLayerProperties:
       sourceType: 0
       sourceOptions:
@@ -187,9 +158,9 @@ MonoBehaviour:
           projectMapImagery: 0
           materials:
           - Materials:
-            - {fileID: 2100000, guid: c0be5c38e1944584b89f81505e3c4446, type: 2}
+            - {fileID: 0}
           - Materials:
-            - {fileID: 2100000, guid: 55643c4fd976d7e429bda0a90c976b14, type: 2}
+            - {fileID: 0}
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
@@ -214,7 +185,34 @@ MonoBehaviour:
           projectMapImagery: 0
           materials:
           - Materials:
-            - {fileID: 2100000, guid: aaa94592a6eb9c8418d32b37b10f288d, type: 2}
+            - {fileID: 0}
+          - Materials:
+            - {fileID: 0}
+        moveFeaturePositionTo: 0
+        MeshModifiers: []
+        GoModifiers: []
+      - coreOptions:
+          isActive: 1
+          sublayerName: Pois
+          geometryType: 0
+          layerName: building
+          snapToTerrain: 1
+          groupFeatures: 0
+          lineWidth: 0
+        filterOptions:
+          filters: []
+          combinerType: 0
+        extrusionOptions:
+          extrusionType: 0
+          extrusionGeometryType: 0
+          propertyName: height
+          minimumHeight: 0
+          maximumHeight: 0
+        materialOptions:
+          projectMapImagery: 0
+          materials:
+          - Materials:
+            - {fileID: 0}
           - Materials:
             - {fileID: 0}
         moveFeaturePositionTo: 0

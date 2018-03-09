@@ -163,14 +163,16 @@
 
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
 			}
+			EditorGUI.indentLevel--;
 			showOthers = EditorGUILayout.Foldout(showOthers, "Advanced");
+			EditorGUI.indentLevel++;
 			if (showOthers)
 			{
-				EditorGUI.indentLevel++;
+				//EditorGUI.indentLevel++;
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("filterOptions"), new GUIContent("Filters"));
 				//EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("modifierOptions"), new GUIContent("Modifiers"));
 				DrawModifiers(layerProperty, new GUIContent { text = "Modifier Options", tooltip = "Additional Feature modifiers to apply to the visualizer. " });
-				EditorGUI.indentLevel--;
+				//EditorGUI.indentLevel--;
 			}
 
 			GUILayout.EndVertical();

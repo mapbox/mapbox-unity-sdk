@@ -122,9 +122,8 @@ GameObject:
   m_Component:
   - component: {fileID: 37974370}
   - component: {fileID: 37974369}
-  - component: {fileID: 37974371}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Map
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -142,13 +141,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _unifiedMapOptions:
-    mapPreset: 0
+    mapPreset: 3
     mapOptions:
       locationOptions:
-        latitudeLongitude: 0,0
-        zoom: 4
+        latitudeLongitude: 40.762785, -73.979945
+        zoom: 16
       extentOptions:
-        extentType: 0
+        extentType: 1
         cameraBoundsOptions:
           camera: {fileID: 0}
           visibleBuffer: 0
@@ -195,7 +194,7 @@ MonoBehaviour:
           UserName: 
       elevationLayerType: 0
       requiredOptions:
-        baseMaterial: {fileID: 0}
+        baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
         addCollider: 0
         exaggerationFactor: 1
       modificationOptions:
@@ -209,12 +208,12 @@ MonoBehaviour:
         wallHeight: 10
         wallMaterial: {fileID: 0}
     vectorLayerProperties:
-      sourceType: 2
+      sourceType: 1
       sourceOptions:
-        isActive: 0
+        isActive: 1
         layerSource:
           Name: 
-          Id: 
+          Id: lr1k.b7wzke2r
           Modified: 
           UserName: 
       useOptimizedStyle: 0
@@ -226,7 +225,36 @@ MonoBehaviour:
       performanceOptions:
         isEnabled: 1
         entityPerCoroutine: 20
-      vectorSubLayers: []
+      vectorSubLayers:
+      - coreOptions:
+          isActive: 1
+          sublayerName: Buildings
+          geometryType: 2
+          layerName: building
+          snapToTerrain: 1
+          groupFeatures: 0
+          lineWidth: 0
+        filterOptions:
+          filters: []
+          combinerType: 0
+        extrusionOptions:
+          extrusionType: 1
+          extrusionGeometryType: 0
+          propertyName: height
+          minimumHeight: 0
+          maximumHeight: 0
+        materialOptions:
+          projectMapImagery: 0
+          texturingType: 0
+          materials:
+          - Materials:
+            - {fileID: 2100000, guid: 22d344a3ce7784456bad1224ad941bd3, type: 2}
+          - Materials:
+            - {fileID: 2100000, guid: f73ddb7c7047f49318de4ece56eaee68, type: 2}
+          atlasInfo: {fileID: 11400000, guid: 134e5f664f1cb4593b3365035dce26ad, type: 2}
+        moveFeaturePositionTo: 0
+        MeshModifiers: []
+        GoModifiers: []
 --- !u!4 &37974370
 Transform:
   m_ObjectHideFlags: 0
@@ -240,22 +268,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &37974371
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 37974368}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b55f37f9a6f7e44f7bb35e6bc3863847, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mapManager: {fileID: 0}
-  _deviceLocationProvider: {fileID: 0}
-  _editorLocationProvider: {fileID: 0}
-  _transformLocationProvider: {fileID: 0}
-  _dontDestroyOnLoad: 0
 --- !u!1 &1130064235
 GameObject:
   m_ObjectHideFlags: 0

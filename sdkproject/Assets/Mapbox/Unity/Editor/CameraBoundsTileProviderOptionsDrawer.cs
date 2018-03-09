@@ -422,12 +422,12 @@
 			//if (showPosition)
 			{
 				position.y += lineHeight;
-				var projectMapImg = property.FindPropertyRelative("projectMapImagery");
-				var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Project Imagery", tooltip = "Use image texture from the Imagery source as texture for roofs. " });
-				projectMapImg.boolValue = EditorGUI.Toggle(typePosition, projectMapImg.boolValue);
+				var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Texturing Type", tooltip = "Use image texture from the Imagery source as texture for roofs. " });
+				var texturingType = property.FindPropertyRelative("texturingType");
+				EditorGUI.indentLevel--;
+				texturingType.enumValueIndex = EditorGUI.Popup(typePosition, texturingType.enumValueIndex, texturingType.enumDisplayNames);
+				EditorGUI.indentLevel++;
 
-				//position.y += lineHeight;
-				//EditorGUI.PropertyField(position, property.FindPropertyRelative("materials"));
 				var matList = property.FindPropertyRelative("materials");
 				if (matList.arraySize == 0)
 				{
@@ -442,8 +442,14 @@
 				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), wallMat, new GUIContent { text = "Wall Material", tooltip = "Unity material to use for extruded wall/side mesh. " });
 				position.y += EditorGUI.GetPropertyHeight(wallMat);
 
+				if ((UvMapType)texturingType.enumValueIndex == UvMapType.Atlas)
+				{
+					position.y += lineHeight;
+					var atlasInfo = property.FindPropertyRelative("atlasInfo");
+					EditorGUI.ObjectField(new Rect(position.x, position.y, position.width, lineHeight), atlasInfo, new GUIContent { text = "Altas Info", tooltip = "Atlas information scriptable object, this defines how the texture roof and wall texture atlases will be used.  " });
+				}
 			}
-			EditorGUI.indentLevel--;
+			//EditorGUI.indentLevel--;
 			EditorGUI.EndProperty();
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -459,6 +465,11 @@
 				{
 					var matInList = matList.GetArrayElementAtIndex(i);
 					height += EditorGUI.GetPropertyHeight(matInList);
+				}
+				var texturingType = property.FindPropertyRelative("texturingType");
+				if ((UvMapType)texturingType.enumValueIndex == UvMapType.Atlas)
+				{
+					height += lineHeight;
 				}
 			}
 			else

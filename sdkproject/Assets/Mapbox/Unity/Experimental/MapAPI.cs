@@ -89,6 +89,16 @@
 		Polygon
 	}
 
+	public enum UvMapType
+	{
+		[Description("Use image texture using tiled UV.")]
+		Tiled,
+		[Description("Use image texture from the Imagery source as texture for roofs. ")]
+		Satellite,
+		[Description("Use an image texture atlas to define textures for roof & sides of buildings.")]
+		Atlas
+	}
+
 	public enum ImagerySourceType
 	{
 		[Description("Mapbox Streets is a comprehensive, general-purpose map that emphasizes accurate, legible styling of road and transit networks")]

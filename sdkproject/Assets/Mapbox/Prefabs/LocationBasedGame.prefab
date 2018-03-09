@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4771038816137298}
   - component: {fileID: 114276132085450664}
   m_Layer: 0
-  m_Name: UnifiedMap
+  m_Name: Map
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -458,6 +458,7 @@ MonoBehaviour:
       placementOptions:
         visualizationType: 0
         placementType: 1
+        snapMapToZero: 0
       scalingOptions:
         scalingType: 1
         unitType: 0
@@ -508,7 +509,7 @@ MonoBehaviour:
           Id: mapbox.mapbox-streets-v7
           Modified: 
           UserName: 
-      isStyleOptimized: 0
+      useOptimizedStyle: 0
       optimizedStyle:
         Name: 
         Id: 
@@ -517,8 +518,6 @@ MonoBehaviour:
       performanceOptions:
         isEnabled: 1
         entityPerCoroutine: 20
-      defaultStylingOptions:
-        isExtruded: 0
       vectorSubLayers: []
 --- !u!114 &114375948512099040
 MonoBehaviour:
