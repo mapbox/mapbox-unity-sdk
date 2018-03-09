@@ -184,8 +184,8 @@ MonoBehaviour:
   - TextureRect:
       serializedVersion: 2
       x: 0
-      y: 0.5
-      width: 0.25
+      y: 0
+      width: 0.5
       height: 0.5
     MidFloorCount: 0
     ColumnCount: 0
@@ -197,9 +197,23 @@ MonoBehaviour:
     TopFloorHeight: 0
   - TextureRect:
       serializedVersion: 2
-      x: 0.25
+      x: 0.5
+      y: 0
+      width: 0.5
+      height: 0.5
+    MidFloorCount: 0
+    ColumnCount: 0
+    TopSectionRatio: 0
+    BottomSectionRatio: 0
+    PreferredEdgeSectionLength: 0
+    FloorHeight: 0
+    FirstFloorHeight: 0
+    TopFloorHeight: 0
+  - TextureRect:
+      serializedVersion: 2
+      x: 0
       y: 0.5
-      width: 0.25
+      width: 0.5
       height: 0.5
     MidFloorCount: 0
     ColumnCount: 0
@@ -213,21 +227,7 @@ MonoBehaviour:
       serializedVersion: 2
       x: 0.5
       y: 0.5
-      width: 0.25
-      height: 0.5
-    MidFloorCount: 0
-    ColumnCount: 0
-    TopSectionRatio: 0
-    BottomSectionRatio: 0
-    PreferredEdgeSectionLength: 0
-    FloorHeight: 0
-    FirstFloorHeight: 0
-    TopFloorHeight: 0
-  - TextureRect:
-      serializedVersion: 2
-      x: 0.75
-      y: 0.5
-      width: 0.25
+      width: 0.5
       height: 0.5
     MidFloorCount: 0
     ColumnCount: 0
