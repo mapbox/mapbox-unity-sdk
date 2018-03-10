@@ -6,9 +6,9 @@
 	{
 		public MapExtentType extentType = MapExtentType.CameraBounds;
 
-		public CameraBoundsTileProviderOptions cameraBoundsOptions;
-		public RangeTileProviderOptions rangeAroundCenterOptions;
-		public RangeAroundTransformTileProviderOptions rangeAroundTransformOptions;
+		public CameraBoundsTileProviderOptions cameraBoundsOptions = new CameraBoundsTileProviderOptions();
+		public RangeTileProviderOptions rangeAroundCenterOptions = new RangeTileProviderOptions();
+		public RangeAroundTransformTileProviderOptions rangeAroundTransformOptions = new RangeAroundTransformTileProviderOptions();
 
 		public MapExtentOptions(MapExtentType type)
 		{

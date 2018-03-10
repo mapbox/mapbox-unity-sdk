@@ -200,6 +200,7 @@ MonoBehaviour:
       modificationOptions:
         sampleCount: 10
         useRelativeHeight: 1
+        earthRadius: 1000
       unityLayerOptions:
         addToLayer: 0
         layerId: 0
@@ -213,7 +214,7 @@ MonoBehaviour:
         isActive: 1
         layerSource:
           Name: 
-          Id: lr1k.b7wzke2r
+          Id: mapbox.3d-buildings
           Modified: 
           UserName: 
       useOptimizedStyle: 0
@@ -245,7 +246,7 @@ MonoBehaviour:
           maximumHeight: 0
         materialOptions:
           projectMapImagery: 0
-          texturingType: 0
+          texturingType: 2
           materials:
           - Materials:
             - {fileID: 2100000, guid: 22d344a3ce7784456bad1224ad941bd3, type: 2}

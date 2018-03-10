@@ -17,9 +17,6 @@
 
 		};
 		public GeometryMaterialOptions materialOptions = new GeometryMaterialOptions();
-		//public GeometryStylingOptions stylingOptions;
-		//[NodeEditorElement("Modifiers")]
-		//public LayerModifierOptions modifierOptions = new LayerModifierOptions();
 
 		public PositionTargetType moveFeaturePositionTo;
 		[NodeEditorElement("Mesh Modifiers")]
