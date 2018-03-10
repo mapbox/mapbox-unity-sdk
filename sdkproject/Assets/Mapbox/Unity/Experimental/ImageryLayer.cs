@@ -6,6 +6,17 @@
 	[Serializable]
 	public class ImageryLayer : IImageryLayer
 	{
+		[SerializeField]
+		ImageryLayerProperties _layerProperty = new ImageryLayerProperties();
+
+		[NodeEditorElement("Image Layer")]
+		public ImageryLayerProperties LayerProperty
+		{
+			get
+			{
+				return _layerProperty;
+			}
+		}
 		public MapLayerType LayerType
 		{
 			get
@@ -14,71 +25,96 @@
 			}
 		}
 
-		[SerializeField]
-		bool _isLayerActive;
 		public bool IsLayerActive
 		{
 			get
 			{
-				return _isLayerActive;
-			}
-			set
-			{
-				_isLayerActive = value;
+				return (_layerProperty.sourceType != ImagerySourceType.None);
 			}
 		}
 
-		[SerializeField]
-		string _layerSource;
 		public string LayerSource
 		{
 			get
 			{
-				return _layerSource;
+				return _layerProperty.sourceOptions.Id;
 			}
 			set
 			{
-				_layerSource = value;
+				_layerProperty.sourceOptions.Id = value;
 			}
 		}
 
-		[SerializeField]
-		ImageryLayerProperties _layerProperty;
-		public LayerProperties LayerProperty
+		public ImageryLayer()
 		{
-			get
+
+		}
+
+		public ImageryLayer(ImageryLayerProperties properties)
+		{
+			_layerProperty = properties;
+		}
+
+		public void SetLayerSource(ImagerySourceType imageSource)
+		{
+			if (imageSource != ImagerySourceType.Custom && imageSource != ImagerySourceType.None)
 			{
-				return _layerProperty;
+				_layerProperty.sourceType = imageSource;
+				_layerProperty.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(imageSource);
 			}
-			set
+			else
 			{
-				_layerProperty = (ImageryLayerProperties)value;
+				Debug.LogWarning("Invalid style - trying to set " + imageSource.ToString() + " as default style!");
 			}
+		}
+
+		public void SetLayerSource(string imageSource)
+		{
+			if (!string.IsNullOrEmpty(imageSource))
+			{
+				_layerProperty.sourceType = ImagerySourceType.Custom;
+				_layerProperty.sourceOptions.Id = imageSource;
+			}
+			else
+			{
+				_layerProperty.sourceType = ImagerySourceType.None;
+				Debug.LogWarning("Empty source - turning off imagery. ");
+			}
+		}
+
+		public void SetRasterOptions(ImageryRasterOptions rasterOptions)
+		{
+			_layerProperty.rasterOptions = rasterOptions;
 		}
 
 		public void Initialize(LayerProperties properties)
 		{
-			var imageLayerProperties = (ImageryLayerProperties)properties;
-			if (imageLayerProperties.sourceType != ImagerySourceType.Custom && imageLayerProperties.sourceType != ImagerySourceType.None)
+			_layerProperty = (ImageryLayerProperties)properties;
+			Initialize();
+		}
+
+		public void Initialize()
+		{
+			if (_layerProperty.sourceType != ImagerySourceType.Custom && _layerProperty.sourceType != ImagerySourceType.None)
 			{
-				imageLayerProperties.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(imageLayerProperties.sourceType);
+				Debug.Log("Image Source type : " + _layerProperty.sourceType);
+				_layerProperty.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(_layerProperty.sourceType);
 			}
 			_imageFactory = ScriptableObject.CreateInstance<MapImageFactory>();
-			_imageFactory._mapIdType = imageLayerProperties.sourceType;
-			_imageFactory._customStyle = imageLayerProperties.sourceOptions.layerSource;
-			_imageFactory._useCompression = imageLayerProperties.rasterOptions.useCompression;
-			_imageFactory._useMipMap = imageLayerProperties.rasterOptions.useMipMap;
-			_imageFactory._useRetina = imageLayerProperties.rasterOptions.useRetina;
+			_imageFactory.SetOptions(_layerProperty);
 		}
 
 		public void Remove()
 		{
-			throw new System.NotImplementedException();
+			_layerProperty = new ImageryLayerProperties
+			{
+				sourceType = ImagerySourceType.None
+			};
 		}
 
 		public void Update(LayerProperties properties)
 		{
-			throw new System.NotImplementedException();
+			Initialize(properties);
 		}
 		public MapImageFactory ImageFactory
 		{

@@ -7,6 +7,17 @@
 	[Serializable]
 	public class TerrainLayer : ITerrainLayer
 	{
+		[SerializeField]
+		[NodeEditorElement("Terrain Layer")]
+		ElevationLayerProperties _layerProperty = new ElevationLayerProperties();
+		[NodeEditorElement("Terrain Layer")]
+		public ElevationLayerProperties LayerProperty
+		{
+			get
+			{
+				return _layerProperty;
+			}
+		}
 		public MapLayerType LayerType
 		{
 			get
@@ -15,52 +26,102 @@
 			}
 		}
 
-		[SerializeField]
-		bool _isLayerActive;
 		public bool IsLayerActive
 		{
 			get
 			{
-				return _isLayerActive;
-			}
-			set
-			{
-				_isLayerActive = value;
+				return (_layerProperty.sourceType != ElevationSourceType.None);
 			}
 		}
 
-		[SerializeField]
-		string _layerSource;
 		public string LayerSource
 		{
 			get
 			{
-				return _layerSource;
-			}
-			set
-			{
-				_layerSource = value;
+				return _layerProperty.sourceOptions.Id;
 			}
 		}
-		[SerializeField]
-		ElevationLayerProperties _layerProperty;
-		public LayerProperties LayerProperty
+
+		public TerrainLayer()
 		{
-			get
+		}
+
+		public TerrainLayer(ElevationLayerProperties properties)
+		{
+			_layerProperty = properties;
+		}
+
+		public void SetLayerSource(ElevationSourceType terrainSource)
+		{
+			if (terrainSource != ElevationSourceType.Custom && terrainSource != ElevationSourceType.None)
 			{
-				return _layerProperty;
+				_layerProperty.sourceType = terrainSource;
+				_layerProperty.sourceOptions.layerSource = MapboxDefaultElevation.GetParameters(terrainSource);
 			}
-			set
+			else
 			{
-				_layerProperty = (ElevationLayerProperties)value;
+				Debug.LogWarning("Invalid style - trying to set " + terrainSource.ToString() + " as default style!");
 			}
+		}
+
+		public void SetLayerSource(string terrainSource)
+		{
+			if (!string.IsNullOrEmpty(terrainSource))
+			{
+				_layerProperty.sourceType = ElevationSourceType.Custom;
+				_layerProperty.sourceOptions.Id = terrainSource;
+			}
+			else
+			{
+				_layerProperty.sourceType = ElevationSourceType.None;
+				_layerProperty.elevationLayerType = ElevationLayerType.FlatTerrain;
+				Debug.LogWarning("Empty source - turning off terrain. ");
+			}
+		}
+
+		public void SetTerrainOptions(ElevationLayerType type, ElevationRequiredOptions requiredOptions = null, ElevationModificationOptions modificationOptions = null)
+		{
+			_layerProperty.elevationLayerType = type;
+			Debug.Log("Terrain Type : " + _layerProperty.elevationLayerType);
+			if (requiredOptions != null)
+			{
+				_layerProperty.requiredOptions = requiredOptions;
+			}
+
+			if (modificationOptions != null)
+			{
+				_layerProperty.modificationOptions = modificationOptions;
+			}
+		}
+
+		public void SetTerrainMaterial(Material baseMaterial)
+		{
+			_layerProperty.requiredOptions.baseMaterial = baseMaterial;
+		}
+
+		public void ShowSideWalls(float wallHeight, Material wallMaterial)
+		{
+			_layerProperty.sideWallOptions.isActive = true;
+			_layerProperty.sideWallOptions.wallHeight = wallHeight;
+			_layerProperty.sideWallOptions.wallMaterial = wallMaterial;
+		}
+
+		public void AddToUnityLayer(int layerId)
+		{
+			_layerProperty.unityLayerOptions.addToLayer = true;
+			_layerProperty.unityLayerOptions.layerId = layerId;
 		}
 
 		public void Initialize(LayerProperties properties)
 		{
-			var elevationLayerProperties = (ElevationLayerProperties)properties;
+			_layerProperty = (ElevationLayerProperties)properties;
 
-			switch (elevationLayerProperties.elevationLayerType)
+			Initialize();
+		}
+
+		public void Initialize()
+		{
+			switch (_layerProperty.elevationLayerType)
 			{
 				case ElevationLayerType.FlatTerrain:
 					_elevationFactory = ScriptableObject.CreateInstance<FlatTerrainFactory>();
@@ -69,7 +130,7 @@
 					_elevationFactory = ScriptableObject.CreateInstance<LowPolyTerrainFactory>();
 					break;
 				case ElevationLayerType.TerrainWithElevation:
-					if (elevationLayerProperties.sideWallOptions.isActive)
+					if (_layerProperty.sideWallOptions.isActive)
 					{
 						_elevationFactory = ScriptableObject.CreateInstance<TerrainWithSideWallsFactory>();
 					}
@@ -86,17 +147,20 @@
 				default:
 					break;
 			}
-			_elevationFactory.SetOptions(elevationLayerProperties);
+			_elevationFactory.SetOptions(_layerProperty);
 		}
 
 		public void Remove()
 		{
-			throw new System.NotImplementedException();
+			_layerProperty = new ElevationLayerProperties
+			{
+				sourceType = ElevationSourceType.None
+			};
 		}
 
 		public void Update(LayerProperties properties)
 		{
-			throw new System.NotImplementedException();
+			Initialize(properties);
 		}
 		public AbstractTileFactory ElevationFactory
 		{

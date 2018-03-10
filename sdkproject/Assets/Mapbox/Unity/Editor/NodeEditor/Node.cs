@@ -255,9 +255,9 @@ namespace Mapbox.Editor.NodeEditor
 			foreach (FieldInfo fi in obj.GetType().GetFields().Where(prop => prop.IsDefined(typeof(NodeEditorElementAttribute), false)))
 			{
 				//field SO
-				if (typeof(LayerProperties).IsAssignableFrom(fi.FieldType))
+				if (typeof(ILayer).IsAssignableFrom(fi.FieldType))
 				{
-					var val = fi.GetValue(obj) as LayerProperties;
+					var val = fi.GetValue(obj) as ILayer;
 					if (val != null)
 					{
 						var name = (fi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
@@ -359,12 +359,27 @@ namespace Mapbox.Editor.NodeEditor
 			foreach (PropertyInfo pi in obj.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(NodeEditorElementAttribute), false)))
 			{
 				//property SO
-				if (typeof(ScriptableObject).IsAssignableFrom(pi.PropertyType))
+				if (typeof(LayerProperties).IsAssignableFrom(pi.PropertyType))
 				{
-					var val = pi.GetValue(obj, null) as ScriptableObject;
+					var val = pi.GetValue(obj, null) as LayerProperties;
 					if (val != null)
 					{
+						var name = (pi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
+						var conp = new ConnectionPoint(this, "", name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
+						ConnectionPoints.Add(conp);
+						var newNode = new Node(val);
+						Children.Add(newNode);
+						newNode.Connections.Add(new Connection(newNode.inPoint, conp));
+						newNode.Dive(val, showModifiers, depth + 1);
+						_propCount++;
+					}
+				}
 
+				if (typeof(ILayer).IsAssignableFrom(pi.PropertyType))
+				{
+					var val = pi.GetValue(obj, null) as ILayer;
+					if (val != null)
+					{
 						var name = (pi.GetCustomAttributes(typeof(NodeEditorElementAttribute), true)[0] as NodeEditorElementAttribute).Name;
 						var conp = new ConnectionPoint(this, "", name, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle);
 						ConnectionPoints.Add(conp);
@@ -381,7 +396,7 @@ namespace Mapbox.Editor.NodeEditor
 				if (type.IsGenericType && type.GetGenericTypeDefinition()
 						== typeof(List<>))
 				{
-					if (typeof(ScriptableObject).IsAssignableFrom(type.GetGenericArguments()[0]))
+					if (typeof(LayerProperties).IsAssignableFrom(type.GetGenericArguments()[0]))
 					{
 						var val = pi.GetValue(obj, null);
 
@@ -390,7 +405,8 @@ namespace Mapbox.Editor.NodeEditor
 						ConnectionPoints.Add(conp);
 						if (val is IEnumerable)
 						{
-							foreach (ScriptableObject listitem in val as IEnumerable)
+
+							foreach (LayerProperties listitem in val as IEnumerable)
 							{
 								var newNode = new Node(listitem);
 								Children.Add(newNode);

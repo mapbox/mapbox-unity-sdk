@@ -130,14 +130,14 @@ namespace Mapbox.Editor.NodeEditor
 
 			foreach (var abstractMap in abstractMaps)
 			{
-				if (abstractMap.MapOptions != null)
+				if (abstractMap != null)
 				{
-					var map = abstractMap.MapOptions;
-					var mapNode = new Node(map)
-					{
-						title = "Map Options",
-						subtitle = "Map Visualizer"
-					};
+					var map = abstractMap;
+					var mapNode = new Node(map);
+					//{
+					//	title = "Map",
+					//	subtitle = "Map Visualizer"
+					//};
 					_maps.Add(mapNode);
 					mapNode.Dive(map, showModifiers);
 				}

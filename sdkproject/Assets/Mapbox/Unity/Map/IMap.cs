@@ -29,7 +29,7 @@
 		float UnityTileSize { get; }
 		event Action OnInitialized;
 		Vector2d WorldToGeoPosition(Vector3 realworldPoint);
-		Vector3 GeoToWorldPosition(Vector2d latitudeLongitude);
+		Vector3 GeoToWorldPosition(Vector2d latitudeLongitude, bool queryHeight = true);
 	}
 
 	public interface IMapWritable

@@ -160,12 +160,14 @@
 				Progress--;
 				_cachedData.Remove(tile);
 			}
-
-			foreach (var layer in _layerBuilder.Values)
+			if (_layerBuilder != null)
 			{
-				foreach (var visualizer in layer)
+				foreach (var layer in _layerBuilder.Values)
 				{
-					visualizer.UnregisterTile(tile);
+					foreach (var visualizer in layer)
+					{
+						visualizer.UnregisterTile(tile);
+					}
 				}
 			}
 		}

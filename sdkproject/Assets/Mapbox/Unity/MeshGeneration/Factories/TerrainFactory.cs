@@ -66,12 +66,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			get
 			{
-				return _elevationOptions.sourceOptions.layerSource.Id;
+				return _elevationOptions.sourceOptions.Id;
 			}
 
 			set
 			{
-				_elevationOptions.sourceOptions.layerSource.Id = value;
+				_elevationOptions.sourceOptions.Id = value;
 			}
 		}
 

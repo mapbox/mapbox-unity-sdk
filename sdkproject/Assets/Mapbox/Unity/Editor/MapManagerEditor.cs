@@ -24,7 +24,7 @@
 		{
 			serializedObject.Update();
 			_map = (AbstractMap)target;
-			var property = serializedObject.FindProperty("_unifiedMapOptions");
+			//var property = serializedObject.FindProperty("_unifiedMapOptions");
 			GUILayout.BeginVertical();
 			EditorGUILayout.Space();
 
@@ -76,9 +76,10 @@
 				//	}
 
 				//}
-				//EditorGUILayout.Space();
+				EditorGUILayout.Space();
+				EditorGUILayout.PropertyField(serializedObject.FindProperty("mapOptions"));
+				//ShowSection(property, "mapOptions");
 
-				ShowSection(property, "mapOptions");
 			}
 
 			ShowSepartor();
@@ -86,7 +87,7 @@
 			showImage = EditorGUILayout.Foldout(showImage, "IMAGE");
 			if (showImage)
 			{
-				ShowSection(property, "imageryLayerProperties");
+				ShowSection(serializedObject.FindProperty("_imagery"), "_layerProperty");
 			}
 
 			ShowSepartor();
@@ -94,7 +95,7 @@
 			showTerrain = EditorGUILayout.Foldout(showTerrain, "TERRAIN");
 			if (showTerrain)
 			{
-				ShowSection(property, "elevationLayerProperties");
+				ShowSection(serializedObject.FindProperty("_terrain"), "_layerProperty");
 			}
 
 			ShowSepartor();
@@ -102,7 +103,7 @@
 			showVector = EditorGUILayout.Foldout(showVector, "VECTOR");
 			if (showVector)
 			{
-				ShowSection(property, "vectorLayerProperties");
+				ShowSection(serializedObject.FindProperty("_vectorData"), "_layerProperty");
 			}
 			GUILayout.EndVertical();
 
