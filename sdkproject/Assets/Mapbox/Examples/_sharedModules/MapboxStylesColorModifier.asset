@@ -9,8 +9,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 56e8568e69143416293940ecb62ec734, type: 3}
-  m_Name: AddColorizeMapboxStyles
+  m_Name: MapboxStylesColorModifier
   m_EditorClassIdentifier: 
   Active: 1
-  m_scriptablePalette: {fileID: 11400000, guid: e46cd27485aca406d94a4a50976f5ac7,
+  m_scriptablePalette: {fileID: 11400000, guid: ef118b5e263da4b1fa4327ca1d3e0c7b,
     type: 2}
