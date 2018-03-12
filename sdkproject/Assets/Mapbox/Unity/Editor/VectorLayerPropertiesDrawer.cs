@@ -111,6 +111,7 @@
 					subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex = (int)VectorPrimitiveType.Polygon;
 					subLayerCoreOptions.FindPropertyRelative("snapToTerrain").boolValue = true;
 					subLayerCoreOptions.FindPropertyRelative("groupFeatures").boolValue = false;
+					subLayerCoreOptions.FindPropertyRelative("lineWidth").floatValue = 1.0f;
 
 					var subLayerExtrusionOptions = subLayer.FindPropertyRelative("extrusionOptions");
 					subLayerExtrusionOptions.FindPropertyRelative("propertyName").stringValue = "height";
@@ -157,15 +158,15 @@
 
 			EditorGUILayout.PropertyField(subLayerCoreOptions);
 
-			if (primitiveTypeProp != VectorPrimitiveType.Point)
+			if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
 			{
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
 
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
 			}
-			EditorGUI.indentLevel--;
+			//EditorGUI.indentLevel--;
 			showOthers = EditorGUILayout.Foldout(showOthers, "Advanced");
-			EditorGUI.indentLevel++;
+			//EditorGUI.indentLevel++;
 			if (showOthers)
 			{
 				//EditorGUI.indentLevel++;

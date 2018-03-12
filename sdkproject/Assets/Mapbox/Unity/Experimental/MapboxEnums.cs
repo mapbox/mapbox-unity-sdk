@@ -86,7 +86,8 @@
 	{
 		Point,
 		Line,
-		Polygon
+		Polygon,
+		Custom
 	}
 
 	public enum UvMapType

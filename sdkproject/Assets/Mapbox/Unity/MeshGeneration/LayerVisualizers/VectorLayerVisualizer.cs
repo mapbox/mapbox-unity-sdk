@@ -53,6 +53,8 @@
 			switch (properties.coreOptions.geometryType)
 			{
 				case VectorPrimitiveType.Point:
+				case VectorPrimitiveType.Custom:
+					// Let the user add anything that they want 
 					if (_layerProperties.coreOptions.snapToTerrain == true)
 					{
 						defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
@@ -114,7 +116,6 @@
 					var matMod = CreateInstance<MaterialModifier>();
 					matMod.SetProperties(_layerProperties.materialOptions);
 					defaultGOModifierStack.Add(matMod);
-
 					break;
 				default:
 					break;
@@ -138,27 +139,10 @@
 			_activeIds = new HashSet<string>();
 			_idPool = new Dictionary<UnityTile, List<string>>();
 
-			//foreach (var filter in Filters)
-			//{
-			//	if (filter != null)
-			//	{
-			//		filter.Initialize();
-			//	}
-			//}
-
 			if (_defaultStack != null)
 			{
 				_defaultStack.Initialize();
 			}
-
-			//foreach (var item in Stacks)
-			//{
-			//	if (item != null && item.Stack != null)
-			//	{
-			//		item.Types = item.Type.Split(',');
-			//		item.Stack.Initialize();
-			//	}
-			//}
 		}
 
 		public override void Create(VectorTileLayer layer, UnityTile tile, Action callback)
@@ -255,15 +239,6 @@
 				mergedStack.End(tile, tile.gameObject, layer.Name);
 			}
 
-			//foreach (var item in Stacks)
-			//{
-			//	mergedStack = item.Stack as MergedModifierStack;
-			//	if (mergedStack != null)
-			//	{
-			//		mergedStack.End(tile, tile.gameObject, layer.Name);
-			//	}
-			//}
-
 			if (callback != null)
 				callback();
 		}
@@ -313,6 +288,7 @@
 
 		private string FindSelectorKey(VectorFeatureUnity feature)
 		{
+			// TODO: FIX THIS!!
 			//if (string.IsNullOrEmpty(_classificationKey))
 			//{
 			//	if (feature.Properties.ContainsKey("type"))
@@ -363,12 +339,6 @@
 			{
 				_defaultStack.UnregisterTile(tile);
 			}
-
-			// foreach (var val in Stacks)
-			// {
-			// 	if (val != null && val.Stack != null)
-			// 		val.Stack.UnregisterTile(tile);
-			// }
 
 			//removing ids from activeIds list so they'll be recreated next time tile loads (necessary when you're unloading/loading tiles)
 			if (_idPool.ContainsKey(tile))

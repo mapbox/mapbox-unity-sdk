@@ -31,6 +31,6 @@
 
 	public interface IVectorDataLayer : ILayer
 	{
-		//VectorPrimitiveType PrimitiveType { get; set; }
+
 	}
 }
