@@ -145,7 +145,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					d = wallDirection.magnitude;
 
 					//this part minimizes stretching for narrow columns
-					//if texture has 3 columns, 33% (of preferred edge length) wide walls will get 1 window. 
+					//if texture has 3 columns, 33% (of preferred edge length) wide walls will get 1 window.
 					//0-33% gets 1 window, 33-66 gets 2, 66-100 gets all three
 					//we're not wrapping/repeating texture as it won't work with atlases
 					columnScaleRatio = Math.Min(1, d / (_currentFacade.PreferredEdgeSectionLength * tile.TileScale));
@@ -167,8 +167,15 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					FirstFloor(md, height);
 				}
 
-
-				md.Triangles.Add(wallTriangles);
+				if (_separateSubmesh)
+				{
+					md.Triangles.Add(wallTriangles);
+				}
+				else
+				{
+					md.Triangles.Capacity = md.Triangles.Count + wallTriangles.Count;
+					md.Triangles[0].AddRange(wallTriangles);
+				}
 			}
 		}
 
