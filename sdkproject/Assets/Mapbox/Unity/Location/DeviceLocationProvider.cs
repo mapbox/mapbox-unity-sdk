@@ -144,6 +144,7 @@ namespace Mapbox.Unity.Location
 
 				var lastData = Input.location.lastData;
 				timestamp = lastData.timestamp;
+				Debug.LogFormat("{0:yyyyMMdd-HHmmss} {1:0.00}", UnixTimestampUtils.From(timestamp), lastData.horizontalAccuracy);
 
 				if (
 					(Input.location.status == LocationServiceStatus.Running && timestamp > _lastLocationTimestamp)
