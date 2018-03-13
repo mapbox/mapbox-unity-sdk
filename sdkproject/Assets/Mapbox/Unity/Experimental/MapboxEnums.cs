@@ -1,15 +1,6 @@
 ﻿namespace Mapbox.Unity.Map
 {
-	using System;
 	using System.ComponentModel;
-	using System.Collections;
-	using System.Collections.Generic;
-	using UnityEngine;
-
-	using Mapbox.Unity.Map;
-	using Mapbox.Utils;
-	using Mapbox.Unity.MeshGeneration.Factories;
-	using Mapbox.Unity.MeshGeneration.Interfaces;
 
 	// Map related enums
 	public enum MapPresetType
@@ -24,24 +15,12 @@
 		ARWorldScale,
 	}
 
-	public enum MapVisualizationType
-	{
-		Flat2D,
-		Globe3D
-	}
-
 	public enum MapPlacementType
 	{
 		[Description("Map's root is located at the center of tile containing location specified.")]
 		AtTileCenter,
 		[Description("Map's root is located at the location specified.")]
 		AtLocationCenter
-	}
-
-	public enum MapStreamingType
-	{
-		Zoomable,
-		Static,
 	}
 
 	public enum MapScalingType
@@ -166,22 +145,11 @@
 
 	public enum ExtrusionGeometryType
 	{
+		[Description("Extrudes both roof and side wall geometry of the vector feature.")]
 		RoofAndSide,
+		[Description("Extrudes only roof geometry of the vector feature.")]
 		RoofOnly,
+		[Description("Extrudes only side wall geometry of the vector feature.")]
 		SideOnly,
-	}
-
-	[Serializable]
-	public class PropertyValuePair
-	{
-		public string featureKey;
-		public string featureValue;
-	}
-
-	[Serializable]
-	public class GeometryStylingOptions
-	{
-		public bool isExtruded;
-
 	}
 }

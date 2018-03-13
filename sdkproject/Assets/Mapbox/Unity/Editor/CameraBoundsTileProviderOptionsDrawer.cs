@@ -494,44 +494,6 @@
 		}
 	}
 
-	[CustomPropertyDrawer(typeof(GeometryStylingOptions))]
-	public class GeometryStylingOptionsDrawer : PropertyDrawer
-	{
-		static float lineHeight = EditorGUIUtility.singleLineHeight;
-		bool showPosition = true;
-		SerializedProperty isActiveProperty;
-		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-		{
-			isActiveProperty = property.FindPropertyRelative("isExtruded");
-
-			EditorGUI.BeginProperty(position, label, property);
-
-			EditorGUI.PropertyField(position, property.FindPropertyRelative("extrusionOptions"), false);
-			position.y += (EditorGUI.GetPropertyHeight(property.FindPropertyRelative("extrusionOptions")));
-			//}
-			//position.y += lineHeight;
-			EditorGUI.PropertyField(position, property.FindPropertyRelative("materialOptions"), false);
-			EditorGUI.EndProperty();
-
-		}
-		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-		{
-			float height = 0.0f;
-			if (showPosition)
-			{
-				height += (2.0f * EditorGUIUtility.singleLineHeight);
-				height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("extrusionOptions"), false);
-				height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("materialOptions"), false);
-			}
-			else
-			{
-				height = EditorGUIUtility.singleLineHeight;
-			}
-
-			return height;
-		}
-	}
-
 	[CustomPropertyDrawer(typeof(VectorFilterOptions))]
 	public class VectorFilterOptionsDrawer : PropertyDrawer
 	{

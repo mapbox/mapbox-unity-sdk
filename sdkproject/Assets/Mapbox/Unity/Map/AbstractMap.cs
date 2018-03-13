@@ -283,16 +283,7 @@ namespace Mapbox.Unity.Map
 			StartCoroutine("SetupAccess");
 			if (_initializeOnStart)
 			{
-				switch (mapOptions.placementOptions.visualizationType)
-				{
-					case MapVisualizationType.Flat2D:
-						SetUpMap();
-						break;
-					case MapVisualizationType.Globe3D:
-						break;
-					default:
-						break;
-				}
+				SetUpMap();
 			}
 		}
 
@@ -434,16 +425,7 @@ namespace Mapbox.Unity.Map
 			mapOptions.locationOptions.latitudeLongitude = String.Format("{0},{1}", latLon.x, latLon.y);
 			mapOptions.locationOptions.zoom = zoom;
 
-			switch (mapOptions.placementOptions.visualizationType)
-			{
-				case MapVisualizationType.Flat2D:
-					SetUpMap();
-					break;
-				case MapVisualizationType.Globe3D:
-					break;
-				default:
-					break;
-			}
+			SetUpMap();
 		}
 		/// <summary>
 		/// Updates the map.

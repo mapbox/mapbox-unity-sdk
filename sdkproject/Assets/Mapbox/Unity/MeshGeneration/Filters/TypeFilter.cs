@@ -37,10 +37,10 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 
 	public enum LayerFilterOperationType
 	{
+		Contains,
 		IsEqual,
 		IsGreater,
 		IsLess,
-		Contains,
 		IsInRange,
 	}
 
