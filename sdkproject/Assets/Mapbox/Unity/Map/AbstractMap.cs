@@ -8,6 +8,7 @@ namespace Mapbox.Unity.Map
 	using UnityEngine;
 	using Mapbox.Map;
 	using Mapbox.Unity.MeshGeneration.Factories;
+	using Mapbox.Unity.MeshGeneration.Data;
 
 	public interface IUnifiedMap
 	{
@@ -34,7 +35,7 @@ namespace Mapbox.Unity.Map
 		public void SetUpScaling(AbstractMap map)
 		{
 			var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(map.CenterLatitudeLongitude, map.AbsoluteZoom));
-			map.SetWorldRelativeScale((float)(map.Options.scalingOptions.unityToMercatorConversionFactor / referenceTileRect.Size.x));
+			map.SetWorldRelativeScale((float)(map.Options.scalingOptions.unityTileSize / referenceTileRect.Size.x));
 		}
 	}
 
@@ -571,10 +572,17 @@ namespace Mapbox.Unity.Map
 		public virtual float QueryHeightData(Vector2d latlong)
 		{
 			var _meters = Conversions.LatLonToMeters(latlong.x, latlong.y);
-			var tile = MapVisualizer.ActiveTiles[Conversions.LatitudeLongitudeToTileId(latlong.x, latlong.y, (int)Zoom)];
-			var _rect = tile.Rect;
-			var _worldPos = GeoToWorldPositionXZ(new Vector2d(latlong.x, latlong.y));
-			return tile.QueryHeightData((float)((_meters - _rect.Min).x / _rect.Size.x), (float)((_meters.y - _rect.Max.y) / _rect.Size.y));
+			UnityTile tile;
+			bool foundTile = MapVisualizer.ActiveTiles.TryGetValue(Conversions.LatitudeLongitudeToTileId(latlong.x, latlong.y, (int)Zoom), out tile);
+			if (foundTile)
+			{
+				var _rect = tile.Rect;
+				var _worldPos = GeoToWorldPositionXZ(new Vector2d(latlong.x, latlong.y));
+				return tile.QueryHeightData((float)((_meters - _rect.Min).x / _rect.Size.x), (float)((_meters.y - _rect.Max.y) / _rect.Size.y));
+			}
+			else
+				return 0f;
+
 		}
 
 

@@ -136,9 +136,7 @@
 			if ((MapScalingType)scalingType.enumValueIndex == MapScalingType.Custom)
 			{
 				position.y += lineHeight;
-				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("unitType"), true);
-				position.y += lineHeight;
-				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("unityToMercatorConversionFactor"), new GUIContent { text = "Unity to Mercator   1 : ", tooltip = "TODO : FIX DESCRIPTION - Unity Tile Size " });
+				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("unityTileSize"), new GUIContent { text = "Unity Tile Size", tooltip = "TODO : FIX DESCRIPTION - Unity Tile Size " });
 			}
 			EditorGUI.EndProperty();
 		}
@@ -148,7 +146,7 @@
 			var scalingType = property.FindPropertyRelative("scalingType");
 			if ((MapScalingType)scalingType.enumValueIndex == MapScalingType.Custom)
 			{
-				return 3.0f * lineHeight;
+				return 2.0f * lineHeight;
 			}
 			else
 			{

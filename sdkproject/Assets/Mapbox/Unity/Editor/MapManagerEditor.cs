@@ -15,7 +15,7 @@
 		bool showGeneral = true;
 		bool showImage = false;
 		bool showTerrain = false;
-		bool showVector = true;
+		bool showVector = false;
 		int selected = 0;
 		int previousSelection = -1;
 		AbstractMap _map;
@@ -24,7 +24,6 @@
 		{
 			serializedObject.Update();
 			_map = (AbstractMap)target;
-			//var property = serializedObject.FindProperty("_unifiedMapOptions");
 			GUILayout.BeginVertical();
 			EditorGUILayout.Space();
 
@@ -76,11 +75,9 @@
 				//	}
 
 				//}
-				EditorGUILayout.Space();
-				//EditorGUILayout.PropertyField(serializedObject.FindProperty("_options"));
-				DrawMapOptions(serializedObject);
-				//ShowSection(property, "mapOptions");
 
+				EditorGUILayout.Space();
+				DrawMapOptions(serializedObject);
 			}
 
 			ShowSepartor();
@@ -126,13 +123,9 @@
 		void DrawMapOptions(SerializedObject mapObject)
 		{
 			var property = mapObject.FindProperty("_options");
-			//EditorGUI.BeginProperty(position, label, property);
 
-			//position.height = lineHeight;
 			EditorGUILayout.LabelField("Location ");
-			//position.y += lineHeight;
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("locationOptions"));
-			//position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("locationOptions"));
 			var extentOptions = property.FindPropertyRelative("extentOptions");
 			var extentOptionsType = extentOptions.FindPropertyRelative("extentType");
 			if ((MapExtentType)extentOptionsType.enumValueIndex == MapExtentType.Custom)
@@ -141,25 +134,19 @@
 				var test = mapObject.FindProperty("_tileProvider");
 				EditorGUILayout.PropertyField(extentOptionsType);
 				EditorGUILayout.PropertyField(test);
-				//position.y += lineHeight;
 			}
 			else
 			{
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("extentOptions"));
-				//position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("extentOptions"));
 			}
 
 
 			showPosition = EditorGUILayout.Foldout(showPosition, "Others");
 			if (showPosition)
 			{
-				//position.y += lineHeight;
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("placementOptions"));
-				//position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("placementOptions"));
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("scalingOptions"));
 			}
-
-			//EditorGUI.EndProperty();
 		}
 
 		void PresetLocationBased(SerializedProperty unifiedMap)
