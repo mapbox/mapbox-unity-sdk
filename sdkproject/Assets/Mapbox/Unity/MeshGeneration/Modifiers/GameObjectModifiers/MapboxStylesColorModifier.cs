@@ -9,22 +9,22 @@
 
         public ScriptablePalette m_scriptablePalette;
 
-        private const string BASE_COLOR_NAME = "_BaseColor";
-        private const string DETAIL_ONE_COLOR_NAME = "_DetailColor1";
-        private const string DETAIL_TWO_COLOR_NAME = "_DetailColor2";
+        private const string _BASE_COLOR_NAME = "_BaseColor";
+        private const string _DETAIL_ONE_COLOR_NAME = "_DetailColor1";
+        private const string _DETAIL_TWO_COLOR_NAME = "_DetailColor2";
 
-        private int m_baseColorId;
-        private int m_detailOneColorId;
-        private int m_detailTWoColorId;
+        private int _baseColorId;
+        private int _detailOneColorId;
+        private int _detailTWoColorId;
 
         public override void Initialize()
         {
             Assert.IsNotNull(m_scriptablePalette, "No scriptable palette assigned.");
             Assert.IsTrue(m_scriptablePalette.m_colors.Length > 0, "No color palette defined in scriptable palette.");
 
-            m_baseColorId = Shader.PropertyToID(BASE_COLOR_NAME);
-            m_detailOneColorId = Shader.PropertyToID(DETAIL_ONE_COLOR_NAME);
-            m_detailTWoColorId = Shader.PropertyToID(DETAIL_TWO_COLOR_NAME);
+            _baseColorId = Shader.PropertyToID(_BASE_COLOR_NAME);
+            _detailOneColorId = Shader.PropertyToID(_DETAIL_ONE_COLOR_NAME);
+            _detailTWoColorId = Shader.PropertyToID(_DETAIL_TWO_COLOR_NAME);
         }
 
         private Color GetRandomColorFromPalette()
@@ -49,9 +49,9 @@
             Color detailColor1 = (m_scriptablePalette.m_setDetailColor1_Override) ? m_scriptablePalette.m_detailColor1_Override : GetRandomColorFromPalette();
             Color detailColor2 = (m_scriptablePalette.m_setDetailColor2_Override) ? m_scriptablePalette.m_detailColor2_Override : GetRandomColorFromPalette();
 
-            propBlock.SetColor(m_baseColorId, baseColor);
-            propBlock.SetColor(m_detailOneColorId, detailColor1);
-            propBlock.SetColor(m_detailTWoColorId, detailColor2);
+            propBlock.SetColor(_baseColorId, baseColor);
+            propBlock.SetColor(_detailOneColorId, detailColor1);
+            propBlock.SetColor(_detailTWoColorId, detailColor2);
 
             ve.MeshRenderer.SetPropertyBlock(propBlock);
         }
