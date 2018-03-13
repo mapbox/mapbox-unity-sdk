@@ -34,13 +34,13 @@ class AtlasTemplateGenerator : EditorWindow {
     public bool m_generateFacadesTemplate = true;
     public bool m_generateRoofsTemplate = false;
 
-    private int m_drawCount;
+    private int _drawCount;
 
-    private const int DEFAULT_TEX_SIZE = 2048;
-    private const int MIN_TEX_SIZE = 512;
-    private const int MAX_TEX_SIZE = 2048;
+    private const int _DEFAULT_TEX_SIZE = 2048;
+    private const int _MIN_TEX_SIZE = 512;
+    private const int _MAX_TEX_SIZE = 2048;
 
-    private const float m_cellRatioMargin = 0.01f;
+    private const float _cellRatioMargin = 0.01f;
 
     private void Awake()
     {
@@ -115,7 +115,7 @@ class AtlasTemplateGenerator : EditorWindow {
 
         EditorGUI.BeginChangeCheck();
 
-        m_textureResolution = Mathf.Clamp(EditorGUILayout.IntField("Texture resolution:", m_textureResolution), MIN_TEX_SIZE, MAX_TEX_SIZE);
+        m_textureResolution = Mathf.Clamp(EditorGUILayout.IntField("Texture resolution:", m_textureResolution), _MIN_TEX_SIZE, _MAX_TEX_SIZE);
 
         if (EditorGUI.EndChangeCheck())
         {
@@ -259,7 +259,7 @@ class AtlasTemplateGenerator : EditorWindow {
             PixelRect groundFloorPixelRect = ConvertUVRectToPixelRect(groundFloorRect);
             PixelRect topFloorPixelRect = ConvertUVRectToPixelRect(topFloorRect);
 
-            Color color = m_colors[m_drawCount];
+            Color color = m_colors[_drawCount];
             Color colorLight = (color + Color.white) / 2;
             Color colorDark = (color + Color.black) / 2;
 
@@ -278,7 +278,7 @@ class AtlasTemplateGenerator : EditorWindow {
 
             float midFloorBase = baseRect.y + bottomRatio;
 
-            float mrgn = m_cellRatioMargin;
+            float mrgn = _cellRatioMargin;
             float halfMrgn = mrgn / 2;
 
             for (int j = 0; j < numMidFloors; j++)
@@ -298,13 +298,13 @@ class AtlasTemplateGenerator : EditorWindow {
             }
             DrawCornerWatermarks(groundFloorPixelRect);
             DrawCornerWatermarks(topFloorPixelRect);
-            m_drawCount++;
+            _drawCount++;
         }
     }
 
     public void GenerateTemplate()
     {
-        m_drawCount = 0;
+        _drawCount = 0;
         if(m_generateFacadesTemplate)
         {
             DrawAtlasEntityData(m_atlasInfo.Textures);
