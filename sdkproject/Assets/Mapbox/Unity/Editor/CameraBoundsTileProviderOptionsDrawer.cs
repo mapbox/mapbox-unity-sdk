@@ -449,6 +449,15 @@
 					var atlasInfo = property.FindPropertyRelative("atlasInfo");
 					EditorGUI.ObjectField(new Rect(position.x, position.y, position.width, lineHeight), atlasInfo, new GUIContent { text = "Altas Info", tooltip = "Atlas information scriptable object, this defines how the texture roof and wall texture atlases will be used.  " });
 				}
+				if ((UvMapType)texturingType.enumValueIndex == UvMapType.AtlasWithColorPalette)
+				{
+					position.y += lineHeight;
+					var atlasInfo = property.FindPropertyRelative("atlasInfo");
+					EditorGUI.ObjectField(new Rect(position.x, position.y, position.width, lineHeight), atlasInfo, new GUIContent { text = "Altas Info", tooltip = "Atlas information scriptable object, this defines how the texture roof and wall texture atlases will be used.  " });
+					position.y += lineHeight;
+					var colorPalette = property.FindPropertyRelative("colorPallete");
+					EditorGUI.ObjectField(new Rect(position.x, position.y, position.width, lineHeight), colorPalette, new GUIContent { text = "Color Palette", tooltip = "Atlas information scriptable object, this defines how the texture roof and wall texture atlases will be used.  " });
+				}
 			}
 			//EditorGUI.indentLevel--;
 			EditorGUI.EndProperty();
@@ -471,6 +480,10 @@
 				if ((UvMapType)texturingType.enumValueIndex == UvMapType.Atlas)
 				{
 					height += lineHeight;
+				}
+				if ((UvMapType)texturingType.enumValueIndex == UvMapType.AtlasWithColorPalette)
+				{
+					height += (2.0f * lineHeight);
 				}
 			}
 			else

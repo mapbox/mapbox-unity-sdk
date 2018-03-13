@@ -105,6 +105,16 @@
 							atlasMod.SetProperties(atlasOptions);
 							defaultMeshModifierStack.Add(atlasMod);
 						}
+						else if (_layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette)
+						{
+							var atlasMod = CreateInstance<TextureSideWallModifier>();
+							GeometryExtrusionWithAtlasOptions atlasOptions = new GeometryExtrusionWithAtlasOptions(_layerProperties.extrusionOptions, uvModOptions);
+							atlasMod.SetProperties(atlasOptions);
+							var colorPalette = CreateInstance<MapboxStylesColorModifier>();
+							colorPalette.m_scriptablePalette = _layerProperties.materialOptions.colorPallete;
+
+							defaultMeshModifierStack.Add(atlasMod);
+						}
 						else
 						{
 							var heightMod = CreateInstance<HeightModifier>();

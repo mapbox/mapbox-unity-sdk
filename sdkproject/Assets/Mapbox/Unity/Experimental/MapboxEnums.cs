@@ -97,7 +97,9 @@
 		[Description("Use image texture from the Imagery source as texture for roofs. ")]
 		Satellite,
 		[Description("Use an image texture atlas to define textures for roof & sides of buildings.")]
-		Atlas
+		Atlas,
+		[Description("Use an image texture atlas and a color pallete to define textures for roof & sides of buildings.")]
+		AtlasWithColorPalette,
 	}
 
 	public enum ImagerySourceType
