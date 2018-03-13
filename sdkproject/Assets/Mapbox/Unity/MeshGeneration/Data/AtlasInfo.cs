@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Mapbox.Unity.MeshGeneration.Data
 {
@@ -25,5 +26,21 @@ namespace Mapbox.Unity.MeshGeneration.Data
 	public class AtlasInfo : ScriptableObject
 	{
 		public List<AtlasEntity> Textures;
+		public List<AtlasEntity> Roofs;
+
+        private UnityEvent m_OnValidate = new UnityEvent();
+
+        public void AddOnValidateEvent(UnityAction action)
+        {
+            m_OnValidate.AddListener(action);
+        }
+
+        private void OnValidate()
+        {
+            if(m_OnValidate != null)
+            {
+                m_OnValidate.Invoke();
+            }
+        }
 	}
 }
