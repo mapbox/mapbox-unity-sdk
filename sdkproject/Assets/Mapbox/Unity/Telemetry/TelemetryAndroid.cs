@@ -19,6 +19,11 @@ namespace Mapbox.Unity.Telemetry
 
 		public void Initialize(string accessToken)
 		{
+			if (string.IsNullOrEmpty(accessToken))
+			{
+				throw new System.ArgumentNullException("accessToken");
+			}
+
 			using (AndroidJavaClass activityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
 			{
 				_activityContext = activityClass.GetStatic<AndroidJavaObject>("currentActivity");

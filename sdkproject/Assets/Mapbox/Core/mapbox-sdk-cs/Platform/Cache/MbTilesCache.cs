@@ -14,12 +14,15 @@
 
 		public MbTilesCache(uint maxCacheSize)
 		{
+#if MAPBOX_DEBUG_CACHE
+			_className = this.GetType().Name;
+#endif
 			_maxCacheSize = maxCacheSize;
 			_mbTiles = new Dictionary<string, MbTilesDb>();
 		}
 
 
-		#region IDisposable
+#region IDisposable
 
 
 		~MbTilesCache()
@@ -52,9 +55,12 @@
 		}
 
 
-		#endregion
-		
+#endregion
 
+
+#if MAPBOX_DEBUG_CACHE
+		private string _className;
+#endif
 		private bool _disposed;
 		private uint _maxCacheSize;
 		private object _lock = new object();
@@ -67,10 +73,15 @@
 		}
 
 
-		public void Add(string mapId, CanonicalTileId tileId, byte[] data)
+		public void Add(string mapId, CanonicalTileId tileId, CacheItem item, bool forceInsert)
 		{
 
 			mapId = cleanMapId(mapId);
+
+#if MAPBOX_DEBUG_CACHE
+			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
+			UnityEngine.Debug.LogFormat("{0} {1} {2} forceInsert:{3}", methodName, mapId, tileId, forceInsert);
+#endif
 
 			lock (_lock)
 			{
@@ -82,9 +93,9 @@
 
 			MbTilesDb currentMbTiles = _mbTiles[mapId];
 
-			if (!currentMbTiles.TileExists(tileId))
+			if (!currentMbTiles.TileExists(tileId) || forceInsert)
 			{
-				_mbTiles[mapId].AddTile(tileId, data);
+				_mbTiles[mapId].AddTile(tileId, item, forceInsert);
 			}
 		}
 
@@ -114,18 +125,33 @@
 
 
 
-		public byte[] Get(string mapId, CanonicalTileId tileId)
+		public CacheItem Get(string mapId, CanonicalTileId tileId)
 		{
 			mapId = cleanMapId(mapId);
+
+#if MAPBOX_DEBUG_CACHE
+			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
+			UnityEngine.Debug.LogFormat("{0} {1} {2}", methodName, mapId, tileId);
+#endif
+
 			lock (_lock)
 			{
 				if (!_mbTiles.ContainsKey(mapId))
 				{
+#if MAPBOX_DEBUG_CACHE
+					UnityEngine.Debug.LogFormat("initializing MbTiles {0}", mapId);
+#endif
 					initializeMbTiles(mapId);
 				}
 			}
 
-			return _mbTiles[mapId].GetTile(tileId);
+			CacheItem item = _mbTiles[mapId].GetTile(tileId);
+			if (null == item)
+			{
+				return null;
+			}
+
+			return item;
 		}
 
 

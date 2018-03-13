@@ -1,5 +1,13 @@
 ﻿## CHANGELOG
 
+### v.?.?.?
+*TBD*
+
+#####
+- Added a API call on AbstractMap to query height at a certain latitude longitude.
+- Included EditorConfig file to enforce coding style
+- Integration of previously seperate AR support https://github.com/mapbox/mapbox-unity-sdk/pull/544
+
 ### v.1.3.0
 *12/18/2017*
 

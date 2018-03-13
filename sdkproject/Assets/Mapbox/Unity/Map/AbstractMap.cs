@@ -5,6 +5,7 @@ namespace Mapbox.Unity.Map
 	using Utils;
 	using UnityEngine;
 	using Mapbox.Map;
+	using System.Collections;
 
 	/// <summary>
 	/// Abstract Map (Basic Map etc)
@@ -141,21 +142,37 @@ namespace Mapbox.Unity.Map
 		}
 		public event Action OnInitialized = delegate { };
 
+		protected IEnumerator SetupAccess()
+		{
+			_fileSource = MapboxAccess.Instance;
+
+			yield return new WaitUntil(() => MapboxAccess.Configured);
+		}
+
 		protected virtual void Awake()
 		{
-			_worldHeightFixed = false;
-			_fileSource = MapboxAccess.Instance;
-			_tileProvider.OnTileAdded += TileProvider_OnTileAdded;
-			_tileProvider.OnTileRemoved += TileProvider_OnTileRemoved;
-			_tileProvider.OnTileRepositioned += TileProvider_OnTileRepositioned;
-			if (!_root)
+			try
 			{
-				_root = transform;
+				_worldHeightFixed = false;
+				_fileSource = MapboxAccess.Instance;
+				_tileProvider.OnTileAdded += TileProvider_OnTileAdded;
+				_tileProvider.OnTileRemoved += TileProvider_OnTileRemoved;
+				_tileProvider.OnTileRepositioned += TileProvider_OnTileRepositioned;
+				if (!_root)
+				{
+					_root = transform;
+				}
+			}
+			catch (Exception ex)
+			{
+				Debug.LogErrorFormat("AbstractMap.Awake EXCEPTION: {0}", ex);
 			}
 		}
 
-		protected virtual void Start()
+		protected void Start()
 		{
+			StartCoroutine("SetupAccess");
+
 			if (_initializeOnStart)
 			{
 				Initialize(Conversions.StringToLatLon(_latitudeLongitudeString), AbsoluteZoom);
@@ -231,6 +248,15 @@ namespace Mapbox.Unity.Map
 		public virtual Vector3 GeoToWorldPosition(Vector2d latitudeLongitude)
 		{
 			return _root.TransformPoint(Conversions.GeoToWorldPosition(latitudeLongitude, CenterMercator, WorldRelativeScale).ToVector3xz());
+		}
+
+		public virtual float QueryHeightData(Vector2d latlong)
+		{
+			var _meters = Conversions.LatLonToMeters(latlong.x, latlong.y);
+			var tile = MapVisualizer.ActiveTiles[Conversions.LatitudeLongitudeToTileId(latlong.x, latlong.y, (int)Zoom)];
+			var _rect = tile.Rect;
+			var _worldPos = GeoToWorldPosition(new Vector2d(latlong.x, latlong.y));
+			return tile.QueryHeightData((float)((_meters - _rect.Min).x / _rect.Size.x), (float)((_meters.y - _rect.Max.y) / _rect.Size.y));
 		}
 
 		public abstract void Initialize(Vector2d latLon, int zoom);
