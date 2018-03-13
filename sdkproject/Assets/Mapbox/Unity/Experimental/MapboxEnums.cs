@@ -45,7 +45,9 @@
 		[Description("Map extent defined by range of tiles around map's center tile.")]
 		RangeAroundCenter,
 		[Description("Map extent defined by range of tiles around a target transform.")]
-		RangeAroundTransform
+		RangeAroundTransform,
+		[Description("Map extent defined by custom tile provider.")]
+		Custom,
 	}
 
 	public enum MapCoordinateSystemType

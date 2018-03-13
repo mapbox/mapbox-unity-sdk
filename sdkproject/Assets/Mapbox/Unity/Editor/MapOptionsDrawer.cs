@@ -18,8 +18,21 @@
 			position.y += lineHeight;
 			EditorGUI.PropertyField(position, property.FindPropertyRelative("locationOptions"));
 			position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("locationOptions"));
-			EditorGUI.PropertyField(position, property.FindPropertyRelative("extentOptions"));
-			position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("extentOptions"));
+			var extentOptions = property.FindPropertyRelative("extentOptions");
+			var extentOptionsType = extentOptions.FindPropertyRelative("extentType");
+			if ((MapExtentType)extentOptionsType.enumValueIndex == MapExtentType.Custom)
+			{
+				var test = property.serializedObject.FindProperty("_tileProvider");
+
+				EditorGUI.PropertyField(position, test);
+				position.y += lineHeight;
+			}
+			else
+			{
+				EditorGUI.PropertyField(position, property.FindPropertyRelative("extentOptions"));
+				position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("extentOptions"));
+			}
+
 
 			showPosition = EditorGUI.Foldout(position, showPosition, "Others");
 			if (showPosition)
@@ -47,4 +60,14 @@
 		}
 	}
 
+	[CustomPropertyDrawer(typeof(AbstractTileProvider))]
+	public class AbstractTileProvider : PropertyDrawer
+	{
+		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+		{
+			EditorGUI.BeginProperty(position, label, property);
+			EditorGUI.ObjectField(position, property);
+			EditorGUI.EndProperty();
+		}
+	}
 }

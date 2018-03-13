@@ -17,7 +17,14 @@ namespace Mapbox.Unity.Map
 
 		public override void OnInitialized()
 		{
-			_rangeTileProviderOptions = (RangeTileProviderOptions)Options;
+			if (Options != null)
+			{
+				_rangeTileProviderOptions = (RangeTileProviderOptions)Options;
+			}
+			else
+			{
+				_rangeTileProviderOptions = new RangeTileProviderOptions();
+			}
 			var centerTile = TileCover.CoordinateToTileId(_map.CenterLatitudeLongitude, _map.AbsoluteZoom);
 			AddTile(new UnwrappedTileId(_map.AbsoluteZoom, centerTile.X, centerTile.Y));
 			for (int x = (int)(centerTile.X - _rangeTileProviderOptions.west); x <= (centerTile.X + _rangeTileProviderOptions.east); x++)
