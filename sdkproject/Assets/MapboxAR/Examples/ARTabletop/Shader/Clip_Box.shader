@@ -29,16 +29,12 @@ Shader "Clip/Box"
 {
 	Properties
 	{
-		_ConvertEmission("Convert Emission", Range(0,1)) = 0.5
-		_ConvertDistance("Conversion Distance", float) = 0.1
-		_Conversion("Conversion (RGB)", 2D) = "white" {}
-
+        _Color("Color", Color) = (1,1,1,1)
 		_MainTex("Main Texture", 2D) = "white" {}
-		_BumpMap("Bumpmap", 2D) = "bump" {}
 		_Glossiness("Smoothness", Range(0,1)) = 0.5
 		_Metallic("Metallic", Range(0,1)) = 0.0
-
 	}
+    
 	SubShader
 	{
 		Tags { "RenderType" = "Opaque" }
@@ -67,6 +63,8 @@ Shader "Clip/Box"
 		float3 _BoxSize;
 		float3 _BoxRotation;
 
+        fixed4 _Color;
+
 		sampler2D _MainTex;
 		sampler2D _BumpMap;
 		sampler2D _Conversion;
@@ -75,7 +73,6 @@ Shader "Clip/Box"
 		{
 			float3 dir = IN.worldPos - _Origin;
 			float3 rads = float3(radians(_BoxRotation.x), radians(_BoxRotation.y), radians(_BoxRotation.z));
-
 			// z
 			dir = cos(rads.z) * dir + sin(rads.z) * cross(float3(0,0,1.0f), dir) + (1.0f - cos(rads.z)) * dot(float3(0,0,1.0f), dir) * float3(0,0,1.0f);
 			// x
@@ -98,23 +95,13 @@ Shader "Clip/Box"
 			t = max(t, dist.z);
 			
 			clip(-1 * t);
-
-			float convert_mask = max(dist.x,max(dist.y, dist.z)) / _ConvertDistance;
-			convert_mask = clamp(convert_mask, 0, 1);
 			
 			fixed4 albedo = tex2D(_MainTex, IN.uv_MainTex);
-			albedo *= convert_mask;
-
-			fixed4 convert = tex2D(_Conversion, IN.uv_Conversion);
-			convert *= 1.0 - convert_mask;
-
-			o.Albedo = albedo.rgb + convert.rgb;
-			o.Emission = convert.rgb * _ConvertEmission;
-			o.Normal = UnpackNormal(tex2D(_BumpMap, IN.uv_BumpMap));
+            
+            o.Albedo = albedo.rgb * _Color;
 			o.Metallic = _Metallic;
 			o.Smoothness = _Glossiness;
-			o.Alpha = albedo.a + convert.a;
-
+            o.Alpha = albedo.a * _Color.a;
 		}
 			ENDCG
 	}
