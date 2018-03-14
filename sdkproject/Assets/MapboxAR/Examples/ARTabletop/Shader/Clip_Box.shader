@@ -102,6 +102,7 @@ Shader "Clip/Box"
 			o.Metallic = _Metallic;
 			o.Smoothness = _Glossiness;
             o.Alpha = albedo.a * _Color.a;
+
 		}
 			ENDCG
 	}
