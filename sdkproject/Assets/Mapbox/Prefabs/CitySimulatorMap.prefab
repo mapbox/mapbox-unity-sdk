@@ -9,72 +9,43 @@ Prefab:
     m_Modifications: []
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 1366057432882186}
+  m_RootGameObject: {fileID: 1290224484336908}
   m_IsPrefabParent: 1
---- !u!1 &1056811091453280
+--- !u!1 &1290224484336908
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 5
   m_Component:
-  - component: {fileID: 4314056903416430}
-  - component: {fileID: 114981033887568564}
+  - component: {fileID: 4187505068457818}
+  - component: {fileID: 114196496685157712}
   m_Layer: 0
-  m_Name: Map
+  m_Name: CitySimulatorMap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!1 &1366057432882186
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 4927519923487070}
-  m_Layer: 0
-  m_Name: CitySimulator
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4314056903416430
+--- !u!4 &4187505068457818
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1056811091453280}
+  m_GameObject: {fileID: 1290224484336908}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 4927519923487070}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &4927519923487070
-Transform:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1366057432882186}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 4314056903416430}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114981033887568564
+--- !u!114 &114196496685157712
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1056811091453280}
+  m_GameObject: {fileID: 1290224484336908}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cd961b1c9541a4cee99686069ecce852, type: 3}
@@ -130,14 +101,14 @@ MonoBehaviour:
           Id: mapbox.terrain-rgb
           Modified: 
           UserName: 
-      elevationLayerType: 0
+      elevationLayerType: 1
       requiredOptions:
         baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
         addCollider: 0
         exaggerationFactor: 1
       modificationOptions:
         sampleCount: 10
-        useRelativeHeight: 1
+        useRelativeHeight: 0
         earthRadius: 1000
       unityLayerOptions:
         addToLayer: 0
@@ -185,14 +156,15 @@ MonoBehaviour:
           maximumHeight: 0
         materialOptions:
           projectMapImagery: 0
-          texturingType: 0
+          texturingType: 2
           materials:
           - Materials:
-            - {fileID: 2100000, guid: 1843a50abea6fa448a61d143054f2166, type: 2}
+            - {fileID: 2100000, guid: d4d7464e3429a44e090f55a4ac17f110, type: 2}
           - Materials:
-            - {fileID: 2100000, guid: 31d8bd8fc9d4850408a1660cf3619850, type: 2}
-          atlasInfo: {fileID: 0}
-          colorPallete: {fileID: 0}
+            - {fileID: 2100000, guid: 55cc6edead802446b9106b2998406844, type: 2}
+          atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
+          colorPallete: {fileID: 11400000, guid: 3da751952f9a14bbdb3da2db7a7a675a,
+            type: 2}
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
