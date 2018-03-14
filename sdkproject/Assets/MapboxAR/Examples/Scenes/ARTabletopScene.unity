@@ -113,6 +113,146 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &1435294176 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1094368370565382, guid: a847df67eb9464c14a200540a3530fcc,
+    type: 2}
+  m_PrefabInternal: {fileID: 1945288882}
+--- !u!114 &1435294178
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1435294176}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd961b1c9541a4cee99686069ecce852, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _options:
+    locationOptions:
+      latitudeLongitude: 48.20833, 16.373064
+      zoom: 16
+    extentOptions:
+      extentType: 3
+      cameraBoundsOptions:
+        camera: {fileID: 0}
+        visibleBuffer: 0
+        disposeBuffer: 0
+        updateInterval: 0
+      rangeAroundCenterOptions:
+        west: 1
+        north: 1
+        east: 1
+        south: 1
+      rangeAroundTransformOptions:
+        targetTransform: {fileID: 0}
+        visibleBuffer: 0
+        disposeBuffer: 0
+    placementOptions:
+      placementType: 1
+      snapMapToZero: 0
+    scalingOptions:
+      scalingType: 1
+      unityTileSize: 1
+    loadingTexture: {fileID: 2800000, guid: e2896a92727704803a9c422b043eae89, type: 3}
+  _imagery:
+    _layerProperty:
+      sourceType: 0
+      sourceOptions:
+        isActive: 1
+        layerSource:
+          Name: Streets
+          Id: mapbox://styles/mapbox/streets-v10
+          Modified: 
+          UserName: 
+      rasterOptions:
+        useRetina: 0
+        useCompression: 0
+        useMipMap: 0
+  _terrain:
+    _layerProperty:
+      sourceType: 0
+      sourceOptions:
+        isActive: 1
+        layerSource:
+          Name: 
+          Id: mapbox.terrain-rgb
+          Modified: 
+          UserName: 
+      elevationLayerType: 0
+      requiredOptions:
+        baseMaterial: {fileID: 2100000, guid: ef6b4a925b8854a94acb4dc94dcc3d95, type: 2}
+        addCollider: 0
+        exaggerationFactor: 1
+      modificationOptions:
+        sampleCount: 10
+        useRelativeHeight: 1
+        earthRadius: 1000
+      unityLayerOptions:
+        addToLayer: 0
+        layerId: 0
+      sideWallOptions:
+        isActive: 0
+        wallHeight: 10
+        wallMaterial: {fileID: 0}
+  _vectorData:
+    _layerProperty:
+      sourceType: 1
+      sourceOptions:
+        isActive: 1
+        layerSource:
+          Name: Mapbox Streets
+          Id: mapbox.mapbox-streets-v7
+          Modified: 
+          UserName: 
+      useOptimizedStyle: 0
+      optimizedStyle:
+        Name: 
+        Id: 
+        Modified: 
+        UserName: 
+      performanceOptions:
+        isEnabled: 1
+        entityPerCoroutine: 20
+      vectorSubLayers:
+      - coreOptions:
+          isActive: 1
+          sublayerName: Buildings
+          geometryType: 2
+          layerName: building
+          snapToTerrain: 1
+          groupFeatures: 1
+          lineWidth: 1
+        filterOptions:
+          filters: []
+          combinerType: 0
+        extrusionOptions:
+          extrusionType: 1
+          extrusionGeometryType: 0
+          propertyName: height
+          minimumHeight: 0
+          maximumHeight: 0
+        materialOptions:
+          projectMapImagery: 0
+          texturingType: 0
+          materials:
+          - Materials:
+            - {fileID: 2100000, guid: aead03cf37aea4f7aa9a995040a5c8e3, type: 2}
+          - Materials:
+            - {fileID: 2100000, guid: 1483fff17cbcf44a591209316077c3c8, type: 2}
+          atlasInfo: {fileID: 0}
+          colorPallete: {fileID: 0}
+        moveFeaturePositionTo: 0
+        MeshModifiers: []
+        GoModifiers: []
+  _tileProvider: {fileID: 1435294179}
+--- !u!114 &1435294179 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114129590386002846, guid: a847df67eb9464c14a200540a3530fcc,
+    type: 2}
+  m_PrefabInternal: {fileID: 1945288882}
+  m_Script: {fileID: 11500000, guid: 1d5cc584a855041e79782eef5872fa10, type: 3}
 --- !u!1001 &1945288882
 Prefab:
   m_ObjectHideFlags: 0
@@ -161,6 +301,12 @@ Prefab:
       propertyPath: m_LocalPosition.y
       value: 0.001
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 114129590386002846, guid: a847df67eb9464c14a200540a3530fcc,
+        type: 2}
+      propertyPath: _basicMap
+      value: 
+      objectReference: {fileID: 1435294178}
+    m_RemovedComponents:
+    - {fileID: 114734213270344520, guid: a847df67eb9464c14a200540a3530fcc, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: a847df67eb9464c14a200540a3530fcc, type: 2}
   m_IsPrefabParent: 0
