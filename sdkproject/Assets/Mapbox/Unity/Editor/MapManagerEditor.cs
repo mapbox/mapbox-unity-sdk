@@ -12,10 +12,10 @@
 	[CanEditMultipleObjects]
 	public class MapManagerEditor : Editor
 	{
-		bool showGeneral = true;
-		bool showImage = false;
-		bool showTerrain = false;
-		bool showVector = false;
+		static bool showGeneral = true;
+		static bool showImage = false;
+		static bool showTerrain = false;
+		static bool showVector = false;
 		int selected = 0;
 		int previousSelection = -1;
 		AbstractMap _map;
