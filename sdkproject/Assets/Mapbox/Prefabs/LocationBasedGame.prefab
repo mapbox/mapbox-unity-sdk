@@ -439,7 +439,7 @@ MonoBehaviour:
       latitudeLongitude: 37.784179, -122.401583
       zoom: 16
     extentOptions:
-      extentType: 1
+      extentType: 0
       cameraBoundsOptions:
         camera: {fileID: 0}
         visibleBuffer: 0

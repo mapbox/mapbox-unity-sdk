@@ -18,9 +18,6 @@
 		[SerializeField]
 		public Camera _referenceCamera;
 
-		//[SerializeField]
-		//QuadTreeTileProvider _quadTreeTileProvider;
-
 		[SerializeField]
 		AbstractMap _mapManager;
 
@@ -74,11 +71,11 @@
 			float xMove = Input.GetAxis("Horizontal");
 			float zMove = Input.GetAxis("Vertical");
 
-			//PanMapUsingKeyBoard(xMove, zMove);
+			PanMapUsingKeyBoard(xMove, zMove);
 
 
 			//pan mouse
-			//PanMapUsingTouchOrMouse();
+			PanMapUsingTouchOrMouse();
 		}
 
 		void HandleTouch()
@@ -124,7 +121,6 @@
 				locationOptions.zoom = Mathf.Max(0.0f, Mathf.Min(_mapManager.Zoom + zoomFactor * _zoomSpeed, 21.0f));
 			}
 			_mapManager.UpdateMap(locationOptions);
-			//.UpdateMapProperties(_mapManager.CenterLatitudeLongitude, Mathf.Max(0.0f, Mathf.Min(_mapManager.Zoom + zoomFactor * _zoomSpeed, 21.0f)));
 		}
 
 		void PanMapUsingKeyBoard(float xMove, float zMove)
@@ -142,8 +138,6 @@
 					zoom = _mapManager.Zoom
 				};
 				_mapManager.UpdateMap(locationOptions);
-
-				//_quadTreeTileProvider.UpdateMapProperties(new Vector2d(_mapManager.CenterLatitudeLongitude.x + zMove * factor * 2.0f, _mapManager.CenterLatitudeLongitude.y + xMove * factor * 4.0f), _mapManager.Zoom);
 			}
 		}
 
@@ -192,7 +186,7 @@
 					{
 						if (null != _mapManager)
 						{
-							float factor = Conversions.GetTileScaleInMeters((float)0, _mapManager.AbsoluteZoom) * 256.0f / _mapManager.UnityTileSize;
+							float factor = _panSpeed * Conversions.GetTileScaleInMeters((float)0, _mapManager.AbsoluteZoom) / _mapManager.UnityTileSize;
 							var latlongDelta = Conversions.MetersToLatLon(new Vector2d(offset.x * factor, offset.z * factor));
 							//Debug.Log("LatLong Delta : " + latlongDelta);
 							var newLatLong = _mapManager.CenterLatitudeLongitude + latlongDelta;
@@ -201,9 +195,7 @@
 								latitudeLongitude = String.Format("{0},{1}", newLatLong.x, newLatLong.y),
 								zoom = _mapManager.Zoom
 							};
-							//_mapManager.UpdateMap(locationOptions);
-
-							//_quadTreeTileProvider.UpdateMapProperties(_mapManager.CenterLatitudeLongitude + latlongDelta, _mapManager.Zoom);
+							_mapManager.UpdateMap(locationOptions);
 						}
 					}
 					_origin = _mousePosition;
@@ -253,14 +245,13 @@
 							// Divide it by the tile width in pixels ( 256 in our case) 
 							// to get degrees represented by each pixel.
 							// Mouse offset is in pixels, therefore multiply the factor with the offset to move the center.
-							float factor = _panSpeed * Conversions.GetTileScaleInDegrees((float)_mapManager.CenterLatitudeLongitude.x, _mapManager.AbsoluteZoom) * 256.0f / _mapManager.UnityTileSize;
+							float factor = _panSpeed * Conversions.GetTileScaleInDegrees((float)_mapManager.CenterLatitudeLongitude.x, _mapManager.AbsoluteZoom) / _mapManager.UnityTileSize;
 							MapLocationOptions locationOptions = new MapLocationOptions
 							{
 								latitudeLongitude = String.Format("{0},{1}", _mapManager.CenterLatitudeLongitude.x + offset.z * factor, _mapManager.CenterLatitudeLongitude.y + offset.x * factor),
 								zoom = _mapManager.Zoom
 							};
 							_mapManager.UpdateMap(locationOptions);
-							//_quadTreeTileProvider.UpdateMapProperties(new Vector2d(_dynamicZoomMap.CenterLatitudeLongitude.x + offset.z * factor, _dynamicZoomMap.CenterLatitudeLongitude.y + offset.x * factor), _dynamicZoomMap.Zoom);
 						}
 					}
 					_origin = _mousePosition;
