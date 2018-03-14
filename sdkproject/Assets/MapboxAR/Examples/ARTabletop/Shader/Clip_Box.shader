@@ -25,16 +25,53 @@
 
 // clips any pixel in an area defined by size, rotation, and position
 
+
 Shader "Clip/Box"
 {
 	Properties
 	{
-        _Color("Color", Color) = (1,1,1,1)
+		_Color("Color", Color) = (1,1,1,1)
 		_MainTex("Main Texture", 2D) = "white" {}
 		_Glossiness("Smoothness", Range(0,1)) = 0.5
 		_Metallic("Metallic", Range(0,1)) = 0.0
 	}
-    
+
+	SubShader
+	{
+		Tags { "RenderType" = "Opaque" }
+		Cull Off
+		CGPROGRAM
+		// Physically based Standard lighting model, and enable shadows on all light types
+		#pragma surface surf Standard fullforwardshadows
+
+		// Use shader model 3.0 target, to get nicer looking lighting
+		#pragma target 3.0
+
+		struct Input
+		{
+			float2 uv_MainTex;
+			float2 uv_Conversion;
+			float2 uv_BumpMap;
+			float3 worldPos;
+		};
+
+		half _Glossiness;
+		half _Metallic;
+		half _ConvertDistance;
+		half _ConvertEmission;
+
+		float3 _Origin;
+		float3 _BoxSize;
+		float3 _BoxRotation;Shader "Clip/Box"
+{
+	Properties
+	{
+		_Color("Color", Color) = (1,1,1,1)
+		_MainTex("Main Texture", 2D) = "white" {}
+		_Glossiness("Smoothness", Range(0,1)) = 0.5
+		_Metallic("Metallic", Range(0,1)) = 0.0
+	}
+
 	SubShader
 	{
 		Tags { "RenderType" = "Opaque" }
@@ -63,7 +100,7 @@ Shader "Clip/Box"
 		float3 _BoxSize;
 		float3 _BoxRotation;
 
-        fixed4 _Color;
+		fixed4 _Color;
 
 		sampler2D _MainTex;
 		sampler2D _BumpMap;
@@ -97,11 +134,11 @@ Shader "Clip/Box"
 			clip(-1 * t);
 			
 			fixed4 albedo = tex2D(_MainTex, IN.uv_MainTex);
-            
-            o.Albedo = albedo.rgb * _Color;
+
+			o.Albedo = albedo.rgb * _Color;
 			o.Metallic = _Metallic;
 			o.Smoothness = _Glossiness;
-            o.Alpha = albedo.a * _Color.a;
+			o.Alpha = albedo.a * _Color.a;
 
 		}
 			ENDCG
