@@ -20,6 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4771038816137298}
   - component: {fileID: 114276132085450664}
+  - component: {fileID: 114946137324152330}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -459,6 +460,7 @@ MonoBehaviour:
     scalingOptions:
       scalingType: 1
       unityTileSize: 100
+    loadingTexture: {fileID: 2800000, guid: e2896a92727704803a9c422b043eae89, type: 3}
   _imagery:
     _layerProperty:
       sourceType: 0
@@ -506,7 +508,7 @@ MonoBehaviour:
         isActive: 1
         layerSource:
           Name: Mapbox Terrain
-          Id: mapbox.mapbox-streets-v7
+          Id: mapbox.3d-buildings,mapbox.mapbox-streets-v7
           Modified: 
           UserName: 
       useOptimizedStyle: 0
@@ -613,6 +615,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _desiredAccuracyInMeters: 5
   _updateDistanceInMeters: 5
+--- !u!114 &114946137324152330
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1144877731728236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96f0fa82f89d64bb9a6524c72d538179, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _map: {fileID: 114276132085450664}
 --- !u!135 &135585466744663760
 SphereCollider:
   m_ObjectHideFlags: 1

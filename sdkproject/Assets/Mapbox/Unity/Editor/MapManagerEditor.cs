@@ -146,6 +146,7 @@
 			{
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("placementOptions"));
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("scalingOptions"));
+				EditorGUILayout.PropertyField(property.FindPropertyRelative("loadingTexture"));
 			}
 		}
 

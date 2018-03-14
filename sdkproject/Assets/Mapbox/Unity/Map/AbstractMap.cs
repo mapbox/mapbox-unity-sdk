@@ -357,7 +357,7 @@ namespace Mapbox.Unity.Map
 			{
 				_imagery = new ImageryLayer();
 			}
-			_imagery.Initialize(new ImageryLayerProperties());
+			_imagery.Initialize();
 
 			if (_terrain == null)
 			{
@@ -371,6 +371,10 @@ namespace Mapbox.Unity.Map
 			}
 			_vectorData.Initialize();
 
+			if (Options.loadingTexture != null)
+			{
+				_mapVisualizer.SetLoadingTexture(Options.loadingTexture);
+			}
 			_mapVisualizer.Factories = new List<AbstractTileFactory>
 			{
 				_terrain.ElevationFactory,
@@ -582,10 +586,13 @@ namespace Mapbox.Unity.Map
 			}
 			else
 				return 0f;
-
 		}
 
-
+		public void SetLoadingTexture(Texture2D loadingTexture)
+		{
+			Options.loadingTexture = loadingTexture;
+			_mapVisualizer.SetLoadingTexture(loadingTexture);
+		}
 	}
 }
 

@@ -54,6 +54,11 @@ namespace Mapbox.Unity.Map
 
 		public event Action<ModuleState> OnMapVisualizerStateChanged = delegate { };
 
+		public void SetLoadingTexture(Texture2D loadingTexture)
+		{
+			_loadingTexture = loadingTexture;
+		}
+
 		/// <summary>
 		/// The  <c>OnTileError</c> event triggers when there's a <c>Tile</c> error.
 		/// Returns a <see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance as a parameter, for the tile on which error occurred.
