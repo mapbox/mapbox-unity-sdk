@@ -12,7 +12,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: Mapbox
-  productName: MBX SDK
+  productName: tabletop
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -161,7 +161,7 @@ PlayerSettings:
     Android: com.mapbox.unitysdk
     Standalone: unity.Mapbox.MBX SDK
     Tizen: com.mapbox.unitysdk
-    iOS: com.mapbox.unitysdk
+    iOS: com.mapbox.tabletop
     tvOS: com.mapbox.unitysdk
   buildNumber:
     iOS: 1
@@ -210,7 +210,6 @@ PlayerSettings:
   tvOSSmallIconLayers: []
   tvOSSmallIconLayers2x: []
   tvOSLargeIconLayers: []
-  tvOSLargeIconLayers2x: []
   tvOSTopShelfImageLayers: []
   tvOSTopShelfImageLayers2x: []
   tvOSTopShelfImageWideLayers: []
@@ -276,7 +275,7 @@ PlayerSettings:
     m_DynamicBatching: 0
   m_BuildTargetGraphicsAPIs:
   - m_BuildTarget: iOSSupport
-    m_APIs: 08000000
+    m_APIs: 10000000
     m_Automatic: 0
   m_BuildTargetVRSettings:
   - m_BuildTarget: Android
@@ -371,7 +370,7 @@ PlayerSettings:
   enableInternalProfiler: 0
   logObjCUncaughtExceptions: 1
   enableCrashReportAPI: 0
-  cameraUsageDescription: 
+  cameraUsageDescription: AR
   locationUsageDescription: For testing and development
   microphoneUsageDescription: 
   switchNetLibKey: 

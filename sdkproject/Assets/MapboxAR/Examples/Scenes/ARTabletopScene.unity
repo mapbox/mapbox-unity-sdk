@@ -131,7 +131,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _options:
     locationOptions:
-      latitudeLongitude: 48.20833, 16.373064
+      latitudeLongitude: 37.784179, -122.401583
       zoom: 16
     extentOptions:
       extentType: 3
@@ -151,7 +151,7 @@ MonoBehaviour:
         disposeBuffer: 0
     placementOptions:
       placementType: 1
-      snapMapToZero: 0
+      snapMapToZero: 1
     scalingOptions:
       scalingType: 1
       unityTileSize: 1
@@ -187,7 +187,7 @@ MonoBehaviour:
         exaggerationFactor: 1
       modificationOptions:
         sampleCount: 10
-        useRelativeHeight: 1
+        useRelativeHeight: 0
         earthRadius: 1000
       unityLayerOptions:
         addToLayer: 0
@@ -198,12 +198,12 @@ MonoBehaviour:
         wallMaterial: {fileID: 0}
   _vectorData:
     _layerProperty:
-      sourceType: 1
+      sourceType: 0
       sourceOptions:
         isActive: 1
         layerSource:
-          Name: Mapbox Streets
-          Id: mapbox.mapbox-streets-v7
+          Name: Mapbox Terrain
+          Id: mapbox.3d-buildings,mapbox.mapbox-streets-v7
           Modified: 
           UserName: 
       useOptimizedStyle: 0
@@ -218,7 +218,7 @@ MonoBehaviour:
       vectorSubLayers:
       - coreOptions:
           isActive: 1
-          sublayerName: Buildings
+          sublayerName: ExtrudedBuildings
           geometryType: 2
           layerName: building
           snapToTerrain: 1
@@ -235,14 +235,15 @@ MonoBehaviour:
           maximumHeight: 0
         materialOptions:
           projectMapImagery: 0
-          texturingType: 0
+          texturingType: 3
           materials:
           - Materials:
-            - {fileID: 2100000, guid: aead03cf37aea4f7aa9a995040a5c8e3, type: 2}
+            - {fileID: 2100000, guid: ed6f9ad81dc3a4e87864ef50526951c8, type: 2}
           - Materials:
-            - {fileID: 2100000, guid: 1483fff17cbcf44a591209316077c3c8, type: 2}
-          atlasInfo: {fileID: 0}
-          colorPallete: {fileID: 0}
+            - {fileID: 2100000, guid: 29ccb82811b0d43f8adac026781c4c15, type: 2}
+          atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
+          colorPallete: {fileID: 11400000, guid: ef118b5e263da4b1fa4327ca1d3e0c7b,
+            type: 2}
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
@@ -306,6 +307,26 @@ Prefab:
       propertyPath: _basicMap
       value: 
       objectReference: {fileID: 1435294178}
+    - target: {fileID: 114129590386002846, guid: a847df67eb9464c14a200540a3530fcc,
+        type: 2}
+      propertyPath: _visibleBuffer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114129590386002846, guid: a847df67eb9464c14a200540a3530fcc,
+        type: 2}
+      propertyPath: _disposeBuffer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114386941007542226, guid: a847df67eb9464c14a200540a3530fcc,
+        type: 2}
+      propertyPath: m_PointCloud
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114386941007542226, guid: a847df67eb9464c14a200540a3530fcc,
+        type: 2}
+      propertyPath: m_LightEstimation
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 114734213270344520, guid: a847df67eb9464c14a200540a3530fcc, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: a847df67eb9464c14a200540a3530fcc, type: 2}
