@@ -19,8 +19,10 @@
 
         public override void Initialize()
         {
-            Assert.IsNotNull(m_scriptablePalette, "No scriptable palette assigned.");
-            Assert.IsTrue(m_scriptablePalette.m_colors.Length > 0, "No color palette defined in scriptable palette.");
+            if(m_scriptablePalette == null)
+            {
+                return;
+            }
 
             _baseColorId = Shader.PropertyToID(_BASE_COLOR_NAME);
             _detailOneColorId = Shader.PropertyToID(_DETAIL_ONE_COLOR_NAME);
@@ -39,6 +41,11 @@
 
         public override void Run(VectorEntity ve, UnityTile tile)
         {
+            if (m_scriptablePalette == null)
+            {
+                return;
+            }
+
             MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
 
             ve.MeshRenderer.GetPropertyBlock(propBlock);
