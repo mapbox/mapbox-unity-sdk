@@ -42,7 +42,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_mdVertexCount = md.Vertices.Count;
 			_size = md.TileRect.Size;
 
-			if (_options.texturingType != UvMapType.Atlas)
+			if (_options.texturingType != UvMapType.Atlas && _options.texturingType != UvMapType.AtlasWithColorPalette)
 			{
 				for (int i = 0; i < _mdVertexCount; i++)
 				{
@@ -59,7 +59,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					}
 				}
 			}
-			else if (_options.texturingType == UvMapType.Atlas)
+			else if (_options.texturingType == UvMapType.Atlas || _options.texturingType == UvMapType.AtlasWithColorPalette)
 			{
 				_currentFacade = _options.atlasInfo.Roofs[UnityEngine.Random.Range(0, _options.atlasInfo.Roofs.Count)];
 

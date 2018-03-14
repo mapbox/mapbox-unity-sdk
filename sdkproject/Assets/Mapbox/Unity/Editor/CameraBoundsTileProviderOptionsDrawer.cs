@@ -336,8 +336,6 @@
 						position.y += lineHeight;
 						EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("extrusionGeometryType"));
 						position.y += lineHeight;
-						EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
-						position.y += lineHeight;
 						EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), maxHeightProperty, new GUIContent { text = "Height" });
 						break;
 					default:
@@ -365,11 +363,13 @@
 						break;
 					case Unity.Map.ExtrusionType.MinHeight:
 					case Unity.Map.ExtrusionType.MaxHeight:
-					case Unity.Map.ExtrusionType.AbsoluteHeight:
 						rows += 4;
 						break;
 					case Unity.Map.ExtrusionType.RangeHeight:
 						rows += 5;
+						break;
+					case Unity.Map.ExtrusionType.AbsoluteHeight:
+						rows += 3;
 						break;
 					default:
 						rows += 2;

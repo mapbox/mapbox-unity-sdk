@@ -13,7 +13,15 @@
 					defaultStyle = new Style
 					{
 						Id = "mapbox.mapbox-streets-v7",
-						Name = "Mapbox Terrain"
+						Name = "Mapbox Streets"
+					};
+
+					break;
+				case VectorSourceType.MapboxStreetsWithBuildingIds:
+					defaultStyle = new Style
+					{
+						Id = "mapbox.3d-buildings,mapbox.mapbox-streets-v7",
+						Name = "Mapbox Streets With Building Ids"
 					};
 
 					break;

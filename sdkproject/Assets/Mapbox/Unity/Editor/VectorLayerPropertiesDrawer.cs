@@ -41,6 +41,7 @@
 			switch (sourceTypeValue)
 			{
 				case VectorSourceType.MapboxStreets:
+				case VectorSourceType.MapboxStreetsWithBuildingIds:
 					var sourcePropertyValue = MapboxDefaultVector.GetParameters(sourceTypeValue);
 					var layerSourceProperty = sourceOptionsProperty.FindPropertyRelative("layerSource");
 					var layerSourceId = layerSourceProperty.FindPropertyRelative("Id");

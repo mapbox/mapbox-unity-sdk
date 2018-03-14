@@ -115,6 +115,8 @@
 
 	public enum VectorSourceType
 	{
+		[Description("Mapbox Streets along with unique identifiers for building features. Combines building footprints that may be in different tiles.")]
+		MapboxStreetsWithBuildingIds,
 		[Description("Mapbox Streets vector tiles are largely based on data from OpenStreetMap, a free & global source of geographic data built by volunteers.")]
 		MapboxStreets,
 		[Description("Use custom tilesets created using Mapbox studio. ")]
