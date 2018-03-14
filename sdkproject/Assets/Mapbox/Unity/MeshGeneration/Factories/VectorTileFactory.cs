@@ -92,11 +92,11 @@
 			var vectorTile = (_properties.useOptimizedStyle) ? new VectorTile(_properties.optimizedStyle.Id, _properties.optimizedStyle.Modified) : new VectorTile();
 			tile.AddTile(vectorTile);
 
-			if (string.IsNullOrEmpty(MapId) || _properties.sourceOptions.isActive == false)
+			Progress++;
+			if (string.IsNullOrEmpty(MapId) || _properties.sourceOptions.isActive == false || _properties.vectorSubLayers.Count == 0)
 			{
 				// Do nothing; 
 				Debug.Log(" Did nothing");
-				Progress++;
 				Progress--;
 			}
 			else
@@ -105,6 +105,7 @@
 				{
 					if (tile == null)
 					{
+						Progress--;
 						return;
 					}
 
@@ -112,6 +113,7 @@
 					{
 						OnErrorOccurred(new TileErrorEventArgs(tile.CanonicalTileId, vectorTile.GetType(), tile, vectorTile.Exceptions));
 						tile.VectorDataState = TilePropertyState.Error;
+						Progress--;
 						return;
 					}
 
