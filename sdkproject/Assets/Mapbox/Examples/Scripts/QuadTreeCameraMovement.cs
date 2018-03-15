@@ -115,12 +115,9 @@
 
 		void ZoomMapUsingTouchOrMouse(float zoomFactor)
 		{
-			MapLocationOptions locationOptions = new MapLocationOptions();
-			{
-				locationOptions.latitudeLongitude = String.Format("{0},{1}", _mapManager.CenterLatitudeLongitude.x, _mapManager.CenterLatitudeLongitude.y);
-				locationOptions.zoom = Mathf.Max(0.0f, Mathf.Min(_mapManager.Zoom + zoomFactor * _zoomSpeed, 21.0f));
-			}
-			_mapManager.UpdateMap(locationOptions);
+			var zoom = Mathf.Max(0.0f, Mathf.Min(_mapManager.Zoom + zoomFactor * _zoomSpeed, 21.0f));
+
+			_mapManager.UpdateMap(_mapManager.CenterLatitudeLongitude, zoom);
 		}
 
 		void PanMapUsingKeyBoard(float xMove, float zMove)
@@ -132,12 +129,11 @@
 				// to get degrees represented by each pixel.
 				// Keyboard offset is in pixels, therefore multiply the factor with the offset to move the center.
 				float factor = _panSpeed * (Conversions.GetTileScaleInDegrees((float)_mapManager.CenterLatitudeLongitude.x, _mapManager.AbsoluteZoom));
-				MapLocationOptions locationOptions = new MapLocationOptions
-				{
-					latitudeLongitude = String.Format("{0},{1}", _mapManager.CenterLatitudeLongitude.x + zMove * factor * 2.0f, _mapManager.CenterLatitudeLongitude.y + xMove * factor * 4.0f),
-					zoom = _mapManager.Zoom
-				};
-				_mapManager.UpdateMap(locationOptions);
+				//MapLocationOptions locationOptions = new MapLocationOptions
+				//{
+				var latitudeLongitude = new Vector2d(_mapManager.CenterLatitudeLongitude.x + zMove * factor * 2.0f, _mapManager.CenterLatitudeLongitude.y + xMove * factor * 4.0f);
+				//};
+				_mapManager.UpdateMap(latitudeLongitude, _mapManager.Zoom);
 			}
 		}
 
@@ -190,12 +186,12 @@
 							var latlongDelta = Conversions.MetersToLatLon(new Vector2d(offset.x * factor, offset.z * factor));
 							//Debug.Log("LatLong Delta : " + latlongDelta);
 							var newLatLong = _mapManager.CenterLatitudeLongitude + latlongDelta;
-							MapLocationOptions locationOptions = new MapLocationOptions
-							{
-								latitudeLongitude = String.Format("{0},{1}", newLatLong.x, newLatLong.y),
-								zoom = _mapManager.Zoom
-							};
-							_mapManager.UpdateMap(locationOptions);
+							//MapLocationOptions locationOptions = new MapLocationOptions
+							//{
+							//	latitudeLongitude = String.Format("{0},{1}", newLatLong.x, newLatLong.y),
+							//	zoom = _mapManager.Zoom
+							//};
+							_mapManager.UpdateMap(newLatLong, _mapManager.Zoom);
 						}
 					}
 					_origin = _mousePosition;
@@ -246,12 +242,13 @@
 							// to get degrees represented by each pixel.
 							// Mouse offset is in pixels, therefore multiply the factor with the offset to move the center.
 							float factor = _panSpeed * Conversions.GetTileScaleInDegrees((float)_mapManager.CenterLatitudeLongitude.x, _mapManager.AbsoluteZoom) / _mapManager.UnityTileSize;
-							MapLocationOptions locationOptions = new MapLocationOptions
-							{
-								latitudeLongitude = String.Format("{0},{1}", _mapManager.CenterLatitudeLongitude.x + offset.z * factor, _mapManager.CenterLatitudeLongitude.y + offset.x * factor),
-								zoom = _mapManager.Zoom
-							};
-							_mapManager.UpdateMap(locationOptions);
+							//MapLocationOptions locationOptions = new MapLocationOptions
+							//{
+							//	latitudeLongitude = String.Format("{0},{1}", _mapManager.CenterLatitudeLongitude.x + offset.z * factor, _mapManager.CenterLatitudeLongitude.y + offset.x * factor),
+							//	zoom = _mapManager.Zoom
+							//};
+							var latitudeLongitude = new Vector2d(_mapManager.CenterLatitudeLongitude.x + offset.z * factor, _mapManager.CenterLatitudeLongitude.y + offset.x * factor);
+							_mapManager.UpdateMap(latitudeLongitude, _mapManager.Zoom);
 						}
 					}
 					_origin = _mousePosition;

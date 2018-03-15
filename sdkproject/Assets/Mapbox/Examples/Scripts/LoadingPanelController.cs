@@ -28,6 +28,7 @@ namespace Mapbox.Examples
 			_text.text = "LOADING";
 			visualizer.OnMapVisualizerStateChanged += (s) =>
 			{
+
 				if (this == null)
 					return;
 
@@ -37,6 +38,7 @@ namespace Mapbox.Examples
 				}
 				else if (s == ModuleState.Working)
 				{
+
 					// Uncommment me if you want the loading screen to show again
 					// when loading new tiles.
 					//Content.SetActive(true);
