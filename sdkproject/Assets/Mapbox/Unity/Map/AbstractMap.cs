@@ -13,7 +13,7 @@ namespace Mapbox.Unity.Map
 	public interface IUnifiedMap
 	{
 		//void InitializeMap(MapOptions options);
-		void UpdateMap(MapLocationOptions options);
+		void UpdateMap(Vector2d latLon, float zoom);
 		void ResetMap();
 	}
 
@@ -137,7 +137,6 @@ namespace Mapbox.Unity.Map
 			}
 			set
 			{
-				Debug.Log("TileProvider set.");
 				if (_tileProvider != null)
 				{
 					_tileProvider.OnTileAdded -= TileProvider_OnTileAdded;
@@ -392,7 +391,6 @@ namespace Mapbox.Unity.Map
 
 			InitializeMap(_options);
 
-			Debug.Log("Setup 2DMap done. ");
 		}
 
 		// TODO: implement IDisposable, instead?
@@ -454,17 +452,18 @@ namespace Mapbox.Unity.Map
 		/// Update method should be used when panning, zooming or changing location of the map. 
 		/// This method avoid startup delays that might occur on re-initializing the map. 
 		/// </summary>
-		/// <param name="options">Options.</param>
-		public virtual void UpdateMap(MapLocationOptions options)
+		/// <param name="latLon">LatitudeLongitude.</param>
+		/// <param name="zoom">Zoom level.</param>
+		public virtual void UpdateMap(Vector2d latLon, float zoom)
 		{
 			float differenceInZoom = 0.0f;
-			if (Math.Abs(Zoom - options.zoom) > Constants.EpsilonFloatingPoint)
+			if (Math.Abs(Zoom - zoom) > Constants.EpsilonFloatingPoint)
 			{
-				SetZoom(options.zoom);
+				SetZoom(zoom);
 				differenceInZoom = Zoom - InitialZoom;
 			}
 			//Update center latitude longitude
-			var centerLatitudeLongitude = Conversions.StringToLatLon(options.latitudeLongitude);
+			var centerLatitudeLongitude = latLon;
 			double xDelta = centerLatitudeLongitude.x;
 			double zDelta = centerLatitudeLongitude.y;
 
