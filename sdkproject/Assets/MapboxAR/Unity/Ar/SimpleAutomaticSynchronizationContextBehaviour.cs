@@ -165,7 +165,8 @@ namespace Mapbox.Unity.Ar
 					var latitudeLongitude = location.LatitudeLongitude;
 					Unity.Utilities.Console.Instance.Log(
 						string.Format(
-							"Location: {0},{1}\tAccuracy: {2}\tHeading: {3}"
+							"Location[{0:yyyyMMdd-HHmmss}]: {1},{2}\tAccuracy: {3}\tHeading: {4}"
+							, UnixTimestampUtils.From(location.Timestamp)
 							, latitudeLongitude.x
 							, latitudeLongitude.y
 							, location.Accuracy

@@ -259,32 +259,32 @@ Prefab:
     - target: {fileID: 224409009942014400, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -60
       objectReference: {fileID: 0}
     - target: {fileID: 224913775248040422, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -160
       objectReference: {fileID: 0}
     - target: {fileID: 114020511733235004, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
       propertyPath: _minimumDesiredAccuracy
-      value: 40
+      value: 70
       objectReference: {fileID: 0}
     - target: {fileID: 114020511733235004, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
       propertyPath: _minimumDeltaDistance
-      value: 0.01
+      value: 0.00001
       objectReference: {fileID: 0}
     - target: {fileID: 114182007959914852, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
       propertyPath: _desiredAccuracyInMeters
-      value: 5
+      value: 70
       objectReference: {fileID: 0}
     - target: {fileID: 114182007959914852, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
       propertyPath: _updateDistanceInMeters
-      value: 0.001
+      value: 0.0001
       objectReference: {fileID: 0}
     - target: {fileID: 114589138177000676, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
@@ -329,7 +329,7 @@ Prefab:
     - target: {fileID: 114020511733235004, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
       propertyPath: _useAutomaticSynchronizationBias
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114979273059922282, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
@@ -418,6 +418,10 @@ Prefab:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1118953613582360, guid: 35e76f6e52f5c4252a0b703cc2019a37, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 114979273059922282, guid: 35e76f6e52f5c4252a0b703cc2019a37, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: 35e76f6e52f5c4252a0b703cc2019a37, type: 2}
@@ -479,10 +483,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1411284564}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 311c4221851624da08b865ffe0ad8a78, type: 3}
+  m_Script: {fileID: 11500000, guid: 0d2f95bcf49014079b9d10228e3006a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _transform: {fileID: 1411284568}
+  _followFactor: 0
 --- !u!1001 &1680096571
 Prefab:
   m_ObjectHideFlags: 0
