@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c331d4375e95e4050aadbf5ed3492bba, type: 3}
+  m_Name: PrefabList
+  m_EditorClassIdentifier: 
+  SceneList:
+  - {fileID: 114064637884178696, guid: 5424214e66dd94ac79007c7c31989849, type: 2}
+  - {fileID: 114207994171660972, guid: 5424214e66dd94ac79007c7c31989849, type: 2}
+  - {fileID: 114308819730444958}
+  - {fileID: 114247311498626294}
+--- !u!114 &114128613080724838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: ManualWorldSynchronization
+  m_EditorClassIdentifier: 
+  Name: ManualWorldSynchronization
+  ScenePath: Assets/MapboxAR/Examples/Scenes/ManualWorldSynchronization.unity
+  Image: {fileID: 2800000, guid: ef67c027bc2d14df2b999b22b8ca13cb, type: 3}
+  Text: {fileID: 0}
+--- !u!114 &114247311498626294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: AutomaticWorldSynchronization
+  m_EditorClassIdentifier: 
+  Name: AutomaticWorldSynchronization
+  ScenePath: Assets/MapboxAR/Examples/Scenes/AutomaticWorldSynchronization.unity
+  Image: {fileID: 2800000, guid: ef67c027bc2d14df2b999b22b8ca13cb, type: 3}
+  Text: {fileID: 0}
+--- !u!114 &114308819730444958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: ARTabletopScene
+  m_EditorClassIdentifier: 
+  Name: ARTabletopScene
+  ScenePath: Assets/MapboxAR/Examples/Scenes/ARTabletopScene.unity
+  Image: {fileID: 2800000, guid: ef67c027bc2d14df2b999b22b8ca13cb, type: 3}
+  Text: {fileID: 0}
