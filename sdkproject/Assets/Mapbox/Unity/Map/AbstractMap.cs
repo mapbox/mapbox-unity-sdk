@@ -375,12 +375,20 @@ namespace Mapbox.Unity.Map
 			{
 				_mapVisualizer.SetLoadingTexture(Options.loadingTexture);
 			}
-			_mapVisualizer.Factories = new List<AbstractTileFactory>
+
+			_mapVisualizer.Factories = new List<AbstractTileFactory>();
+			if (_terrain.IsLayerActive)
 			{
-				_terrain.ElevationFactory,
-				_imagery.ImageFactory,
-				_vectorData.VectorFactory
-			};
+				_mapVisualizer.Factories.Add(_terrain.Factory);
+			}
+			if (_imagery.IsLayerActive)
+			{
+				_mapVisualizer.Factories.Add(_imagery.Factory);
+			}
+			if (_vectorData.IsLayerActive)
+			{
+				_mapVisualizer.Factories.Add(_vectorData.Factory);
+			}
 
 			InitializeMap(_options);
 

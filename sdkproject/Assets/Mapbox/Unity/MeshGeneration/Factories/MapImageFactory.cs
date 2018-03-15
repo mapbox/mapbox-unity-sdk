@@ -80,7 +80,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		internal override void OnRegistered(UnityTile tile)
 		{
 			if (_properties.sourceType == ImagerySourceType.None)
+			{
+				Progress++;
+				Progress--;
 				return;
+			}
+
 			RasterTile rasterTile;
 			if (MapId.StartsWith("mapbox://", StringComparison.Ordinal))
 			{

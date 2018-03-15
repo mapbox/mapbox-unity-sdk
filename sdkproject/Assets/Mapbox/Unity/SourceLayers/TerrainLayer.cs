@@ -162,7 +162,7 @@
 		{
 			Initialize(properties);
 		}
-		public AbstractTileFactory ElevationFactory
+		public AbstractTileFactory Factory
 		{
 			get
 			{

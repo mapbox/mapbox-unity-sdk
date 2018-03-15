@@ -92,11 +92,12 @@
 			var vectorTile = (_properties.useOptimizedStyle) ? new VectorTile(_properties.optimizedStyle.Id, _properties.optimizedStyle.Modified) : new VectorTile();
 			tile.AddTile(vectorTile);
 
-			Progress++;
+
 			if (string.IsNullOrEmpty(MapId) || _properties.sourceOptions.isActive == false || _properties.vectorSubLayers.Count == 0)
 			{
 				// Do nothing; 
 				Debug.Log(" Did nothing");
+				Progress++;
 				Progress--;
 			}
 			else

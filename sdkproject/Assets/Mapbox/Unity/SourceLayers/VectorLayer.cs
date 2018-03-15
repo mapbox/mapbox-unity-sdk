@@ -112,7 +112,7 @@
 			Initialize(properties);
 		}
 
-		public VectorTileFactory VectorFactory
+		public VectorTileFactory Factory
 		{
 			get
 			{

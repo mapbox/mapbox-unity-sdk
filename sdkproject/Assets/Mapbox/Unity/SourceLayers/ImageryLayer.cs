@@ -116,7 +116,7 @@
 		{
 			Initialize(properties);
 		}
-		public MapImageFactory ImageFactory
+		public MapImageFactory Factory
 		{
 			get
 			{
