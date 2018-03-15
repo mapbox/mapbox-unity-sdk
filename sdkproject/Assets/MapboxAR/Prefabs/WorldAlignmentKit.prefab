@@ -660,6 +660,7 @@ GameObject:
   - component: {fileID: 114324711836664524}
   - component: {fileID: 114796010834667680}
   - component: {fileID: 114628498580757726}
+  - component: {fileID: 114993982846364826}
   m_Layer: 12
   m_Name: ArAlignedMap
   m_TagString: Untagged
@@ -1410,7 +1411,37 @@ MonoBehaviour:
       performanceOptions:
         isEnabled: 1
         entityPerCoroutine: 20
-      vectorSubLayers: []
+      vectorSubLayers:
+      - coreOptions:
+          isActive: 1
+          sublayerName: buildings
+          geometryType: 2
+          layerName: building
+          snapToTerrain: 1
+          groupFeatures: 0
+          lineWidth: 1
+        filterOptions:
+          filters: []
+          combinerType: 0
+        extrusionOptions:
+          extrusionType: 1
+          extrusionGeometryType: 0
+          propertyName: height
+          minimumHeight: 0
+          maximumHeight: 0
+        materialOptions:
+          projectMapImagery: 0
+          texturingType: 0
+          materials:
+          - Materials:
+            - {fileID: 2100000, guid: 5cc6a7dc3df7cc84693bdde07669ab5b, type: 2}
+          - Materials:
+            - {fileID: 2100000, guid: 5cc6a7dc3df7cc84693bdde07669ab5b, type: 2}
+          atlasInfo: {fileID: 0}
+          colorPallete: {fileID: 0}
+        moveFeaturePositionTo: 0
+        MeshModifiers: []
+        GoModifiers: []
   _tileProvider: {fileID: 0}
 --- !u!114 &114378234428259502
 MonoBehaviour:
@@ -2278,6 +2309,18 @@ MonoBehaviour:
   m_FirstSelected: {fileID: 0}
   m_sendNavigationEvents: 1
   m_DragThreshold: 5
+--- !u!114 &114993982846364826
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1990330683566314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96f0fa82f89d64bb9a6524c72d538179, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _map: {fileID: 114324711836664524}
 --- !u!114 &114997600080592712
 MonoBehaviour:
   m_ObjectHideFlags: 1
