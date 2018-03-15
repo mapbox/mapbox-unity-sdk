@@ -173,7 +173,6 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 			object property;
 			if (feature.Properties.TryGetValue(Key, out property))
 			{
-				Debug.Log("feature Property : " + property.ToString());
 				return PropertyComparer(property);
 			}
 			return false;

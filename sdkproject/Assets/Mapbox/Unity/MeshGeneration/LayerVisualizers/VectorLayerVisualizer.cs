@@ -75,7 +75,6 @@
 					}
 					if (_layerProperties.coreOptions.snapToTerrain == true)
 					{
-						Debug.Log("Added modifier");
 						defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
 					}
 					var lineMatMod = CreateInstance<MaterialModifier>();
