@@ -36,14 +36,29 @@ namespace Mapbox.Unity.Location
 
 		WaitForSeconds _wait1sec;
 
+
+		// Android 6+ permissions have to be granted during runtime
+		// these are the callbacks for requesting location permission
+		// TODO: show message to users in case they accidentallly denied permission
+#if UNITY_ANDROID
+		private bool _gotPermissionRequestResponse = false;
+
+		private void OnAllow() { _gotPermissionRequestResponse = true; }
+		private void OnDeny() { _gotPermissionRequestResponse = true; }
+		private void OnDenyAndNeverAskAgain() { _gotPermissionRequestResponse = true; }
+#endif
+
+
 		void Awake()
 		{
 			_wait1sec = new WaitForSeconds(1f);
+
 			if (_pollRoutine == null)
 			{
 				_pollRoutine = StartCoroutine(PollLocationRoutine());
 			}
 		}
+
 
 		/// <summary>
 		/// Enable location and compass services.
@@ -59,11 +74,25 @@ namespace Mapbox.Unity.Location
 				yield return null;
 			}
 #endif
+
+
+			//request runtime fine location permission on Android if not yet allowed
+#if UNITY_ANDROID
 			if (!Input.location.isEnabledByUser)
 			{
-				Debug.LogError("DeviceLocationProvider: " + "Location is not enabled by user!");
+				UniAndroidPermission.RequestPermission(AndroidPermission.ACCESS_FINE_LOCATION);
+				//wait for user to allow or deny
+				while (!_gotPermissionRequestResponse) { yield return _wait1sec; }
+			}
+#endif
+
+
+			if (!Input.location.isEnabledByUser)
+			{
+				Debug.LogError("DeviceLocationProvider: Location is not enabled by user!");
 				yield break;
 			}
+
 
 			Input.location.Start(_desiredAccuracyInMeters, _updateDistanceInMeters);
 			Input.compass.enabled = true;
@@ -144,7 +173,7 @@ namespace Mapbox.Unity.Location
 
 				var lastData = Input.location.lastData;
 				timestamp = lastData.timestamp;
-				Debug.LogFormat("{0:yyyyMMdd-HHmmss} {1:0.00}", UnixTimestampUtils.From(timestamp), lastData.horizontalAccuracy);
+				//Debug.LogFormat("{0:yyyyMMdd-HHmmss} acc:{1:0.00} {2} / {3}", UnixTimestampUtils.From(timestamp), lastData.horizontalAccuracy, lastData.latitude, lastData.longitude);
 
 				if (
 					(Input.location.status == LocationServiceStatus.Running && timestamp > _lastLocationTimestamp)
