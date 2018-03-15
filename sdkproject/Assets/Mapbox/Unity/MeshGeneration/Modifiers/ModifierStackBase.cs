@@ -7,16 +7,19 @@ using System;
 
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
-    public class ModifierStackBase : ScriptableObject
-    {
-        public virtual GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
-        {
-            return null;
-        }
+	public class ModifierStackBase : ScriptableObject
+	{
+		[NodeEditorElement("Mesh Modifiers")] public List<MeshModifier> MeshModifiers;
+		[NodeEditorElement("Game Object Modifiers")] public List<GameObjectModifier> GoModifiers;
+
+		public virtual GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
+		{
+			return null;
+		}
 
 		public virtual void Initialize()
 		{
-			
+
 		}
 
 		public void UnregisterTile(UnityTile tile)
@@ -26,7 +29,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public virtual void OnUnregisterTile(UnityTile tile)
 		{
-			
+
 		}
 	}
 }

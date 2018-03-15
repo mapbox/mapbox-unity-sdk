@@ -37,7 +37,6 @@ namespace Mapbox.Unity.Telemetry
 			if (ShouldPostTurnstile(ticks))
 			{
 				Runnable.Run(PostWWW(_url, GetPostBody()));
-				PlayerPrefs.SetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR_KEY, ticks.ToString());
 			}
 		}
 
@@ -79,22 +78,34 @@ namespace Mapbox.Unity.Telemetry
 
 			var www = new WWW(url, bodyRaw, headers);
 			yield return www;
+			while (!www.isDone) { yield return null; }
+
+			// www doesn't expose HTTP status code, relay on 'error' property
+			if (!string.IsNullOrEmpty(www.error))
+			{
+				PlayerPrefs.SetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR_KEY, "0");
+			}
+			else
+			{
+				PlayerPrefs.SetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR_KEY, DateTime.Now.Ticks.ToString());
+			}
 		}
 
 		static string GetUserAgent()
 		{
-			var userAgent = string.Format("{0}/{1}/{2} MapboxEventsUnityEditor/{3}",
-										  PlayerSettings.applicationIdentifier,
-										  PlayerSettings.bundleVersion,
+			var userAgent = string.Format(
+				"{0}/{1}/{2} MapboxEventsUnityEditor/{3}",
+				PlayerSettings.applicationIdentifier,
+				PlayerSettings.bundleVersion,
 #if UNITY_IOS
-										  PlayerSettings.iOS.buildNumber,
+				PlayerSettings.iOS.buildNumber,
 #elif UNITY_ANDROID
-										  PlayerSettings.Android.bundleVersionCode,
+				PlayerSettings.Android.bundleVersionCode,
 #else
-										  "0",
+				 "0",
 #endif
-										  Constants.SDK_VERSION
-										 );
+				 Constants.SDK_VERSION
+			);
 			return userAgent;
 		}
 

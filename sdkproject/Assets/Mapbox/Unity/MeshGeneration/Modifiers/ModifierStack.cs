@@ -39,8 +39,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	public class ModifierStack : ModifierStackBase
 	{
 		[SerializeField] private PositionTargetType _moveFeaturePositionTo;
-		[NodeEditorElement("Mesh Modifiers")] public List<MeshModifier> MeshModifiers;
-		[NodeEditorElement("Game Object Modifiers")] public List<GameObjectModifier> GoModifiers;
+
 
 		[NonSerialized] private int vertexIndex = 1;
 		[NonSerialized] private Dictionary<UnityTile, List<VectorEntity>> _activeObjects;

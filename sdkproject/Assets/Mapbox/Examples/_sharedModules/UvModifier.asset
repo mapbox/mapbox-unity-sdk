@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Name: UvModifier
   m_EditorClassIdentifier: 
   Active: 1
+  UvType: 2
   UseSatelliteRoof: 0
+  AtlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}

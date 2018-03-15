@@ -61,6 +61,7 @@ public class MapVisualizerPerformance : MonoBehaviour
 
 	public void Run()
 	{
-		_map.Reset();
+		//TODO : FIX THIS ERROR
+		//_map.Reset();
 	}
 }
