@@ -542,7 +542,7 @@ namespace Mapbox.Editor
 
 			if (GUILayout.Button(linkContent, _linkStyle))
 			{
-				Application.OpenURL("https://www.mapbox.com/mapbox-unity-sdk/docs/05-changelog.html");
+				Application.OpenURL("https://github.com/mapbox/mapbox-unity-sdk/blob/develop/documentation/docs/05-changelog.md");
 			}
 
 			//	GUILayout.FlexibleSpace();
@@ -592,7 +592,7 @@ namespace Mapbox.Editor
 			}
 
 
-			int rowCount = 2;
+			int rowCount = 4;
 			EditorGUILayout.BeginHorizontal(_horizontalGroup);
 
 			_selectedPrefab = GUILayout.SelectionGrid(-1, _prefabContent, rowCount, _sampleButtonStyle);
@@ -626,7 +626,7 @@ namespace Mapbox.Editor
 			}
 
 
-			int rowCount = 3;
+			int rowCount = 4;
 			EditorGUILayout.BeginHorizontal(_horizontalGroup);
 
 			_selectedSample = GUILayout.SelectionGrid(-1, _sampleContent, rowCount, _sampleButtonStyle);
