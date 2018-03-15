@@ -52,7 +52,7 @@
 					isActiveProperty.boolValue = true;
 					break;
 				case VectorSourceType.Custom:
-					EditorGUILayout.PropertyField(property.FindPropertyRelative("sourceOptions"), true);
+					EditorGUILayout.PropertyField(sourceOptionsProperty, new GUIContent("Source Option"));
 					isActiveProperty.boolValue = true;
 					break;
 				case VectorSourceType.None:

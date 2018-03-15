@@ -82,9 +82,6 @@
 					_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase>() { visualizer });
 				}
 			}
-
-			Debug.Log("Vector Factory Init");
-
 		}
 
 		internal override void OnRegistered(UnityTile tile)
