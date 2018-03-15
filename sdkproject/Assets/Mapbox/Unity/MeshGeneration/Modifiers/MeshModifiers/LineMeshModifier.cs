@@ -54,6 +54,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				var newVerticeList = new Vector3[roadSegmentCount * 2];
 				var newNorms = new Vector3[roadSegmentCount * 2];
 				var uvList = new Vector2[roadSegmentCount * 2];
+				var newTangents = new Vector4[roadSegmentCount * 2];
 				Vector3 norm;
 				var lastUv = 0f;
 				var p1 = Constants.Math.Vector3Zero;
@@ -76,6 +77,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						newNorms[roadSegmentCount * 2 - 1] = Constants.Math.Vector3Up;
 						uvList[0] = new Vector2(0, 0);
 						uvList[roadSegmentCount * 2 - 1] = new Vector2(1, 0);
+						newTangents[0] = p3 - p2;
 					}
 					var dist = Vector3.Distance(p1, p2);
 					lastUv += dist;
@@ -87,11 +89,14 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 					uvList[i] = new Vector2(0, lastUv);
 					uvList[2 * roadSegmentCount - 1 - i] = new Vector2(1, lastUv);
+
+					newTangents[i] = p2 - p1;
 				}
 
 				md.Vertices.AddRange(newVerticeList);
 				md.Normals.AddRange(newNorms);
 				md.UV[0].AddRange(uvList);
+				md.Tangents.AddRange(newTangents);
 				var lineTri = new List<int>();
 				var n = roadSegmentCount;
 
