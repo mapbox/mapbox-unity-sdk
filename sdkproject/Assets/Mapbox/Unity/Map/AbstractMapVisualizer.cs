@@ -9,6 +9,7 @@ namespace Mapbox.Unity.Map
 	using System;
 	using Mapbox.Platform;
 	using UnityEngine.Serialization;
+	using Mapbox.Unity.Utilities;
 
 	/// <summary>
 	/// Map Visualizer

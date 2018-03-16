@@ -4,6 +4,7 @@
 	using UnityEngine;
 	using System.Collections.Generic;
 	using Mapbox.Unity.MeshGeneration.Factories;
+	using Mapbox.Unity.Utilities;
 
 	[Serializable]
 	public class VectorLayer : IVectorDataLayer
