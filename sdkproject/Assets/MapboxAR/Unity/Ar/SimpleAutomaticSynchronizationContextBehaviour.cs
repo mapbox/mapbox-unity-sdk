@@ -41,7 +41,7 @@ namespace Mapbox.Unity.Ar
 
 		// TODO: move to "base" class SimpleAutomaticSynchronizationContext
 		// keep it here for now as map position is also calculated here
-		private KalmanLatLong _kalman = new KalmanLatLong(3); // 3:very fast walking
+		//private KalmanLatLong _kalman = new KalmanLatLong(3); // 3:very fast walking
 
 		ILocationProvider _locationProvider;
 

@@ -64,9 +64,9 @@ namespace Mapbox.Editor
 
 		GUIStyle _textFieldStyle;
 		GUIStyle _submitButtonStyle;
-		GUIStyle _checkingButtonStyle;
+		//GUIStyle _checkingButtonStyle;
 
-		GUIStyle _validFieldStyle;
+		//GUIStyle _validFieldStyle;
 		GUIStyle _validButtonStyle;
 		Color _validContentColor;
 		Color _validBackgroundColor;
@@ -353,9 +353,9 @@ namespace Mapbox.Editor
 			_submitButtonStyle.margin.top = 0;
 			_submitButtonStyle.fixedWidth = 200;
 
-			_checkingButtonStyle = new GUIStyle(_submitButtonStyle);
+			//_checkingButtonStyle = new GUIStyle(_submitButtonStyle);
 
-			_validFieldStyle = new GUIStyle(_textFieldStyle);
+			//_validFieldStyle = new GUIStyle(_textFieldStyle);
 			_validButtonStyle = new GUIStyle(GUI.skin.FindStyle("LODSliderRange"));
 			_validButtonStyle.alignment = TextAnchor.MiddleCenter;
 			_validButtonStyle.padding = new RectOffset(0, 0, 0, 0);

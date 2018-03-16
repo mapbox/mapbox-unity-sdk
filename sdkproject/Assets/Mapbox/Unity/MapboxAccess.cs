@@ -108,7 +108,7 @@ namespace Mapbox.Unity
 					}
 					else
 					{
-						_tokenValid = true;
+						_tokenValid = false;
 					}
 				});
 
