@@ -77,6 +77,7 @@
 				//}
 
 				EditorGUILayout.Space();
+				EditorGUILayout.PropertyField(serializedObject.FindProperty("_initializeOnStart"));
 				DrawMapOptions(serializedObject);
 			}
 

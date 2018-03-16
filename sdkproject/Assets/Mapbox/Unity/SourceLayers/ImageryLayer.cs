@@ -97,7 +97,6 @@
 		{
 			if (_layerProperty.sourceType != ImagerySourceType.Custom && _layerProperty.sourceType != ImagerySourceType.None)
 			{
-				Debug.Log("Image Source type : " + _layerProperty.sourceType);
 				_layerProperty.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(_layerProperty.sourceType);
 			}
 			_imageFactory = ScriptableObject.CreateInstance<MapImageFactory>();

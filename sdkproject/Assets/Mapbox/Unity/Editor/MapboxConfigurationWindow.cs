@@ -591,9 +591,12 @@ namespace Mapbox.Editor
 				EditorGUILayout.LabelField("Map Prefabs", "Paste your mapbox access token to get started", _titleStyle);
 			}
 
+			EditorGUILayout.BeginHorizontal(_horizontalGroup);
+			EditorGUILayout.LabelField("Choose a starting scene to see each location-based prefab in action, or go to the prefabs folder and add them to your existing scene.", _bodyStyle);
+			EditorGUILayout.EndHorizontal();
 
 			int rowCount = 4;
-			EditorGUILayout.BeginHorizontal(_horizontalGroup);
+			EditorGUILayout.BeginHorizontal();
 
 			_selectedPrefab = GUILayout.SelectionGrid(-1, _prefabContent, rowCount, _sampleButtonStyle);
 
