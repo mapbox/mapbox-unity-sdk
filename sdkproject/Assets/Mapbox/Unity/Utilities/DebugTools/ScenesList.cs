@@ -1,18 +1,21 @@
-﻿namespace Mapbox.Unity.Utilities.DebugTools
+namespace Mapbox.Unity.Utilities.DebugTools
 {
 	using UnityEngine;
+	#if UNITY_EDITOR
 	using UnityEditor;
-
+	#endif
 	public class ScenesList : ScriptableObject
 	{
-        public SceneData[] SceneList;
+		public SceneData[] SceneList;
 
 		//ensure that linked scenes are stored in this object
+		#if UNITY_EDITOR
+
 		public void LinkScenes()
 		{
 			for (int i = 0; i < SceneList.Length; i++)
 			{
-				if(!ThisAssetContainsScene( SceneList[i] ))
+				if (!ThisAssetContainsScene(SceneList[i]))
 				{
 					//duplicate the asset
 					var path = AssetDatabase.GetAssetPath(this);
@@ -35,7 +38,7 @@
 			}
 		}
 
-		private bool ThisAssetContainsScene( SceneData scene )
+		private bool ThisAssetContainsScene(SceneData scene)
 		{
 			var path = AssetDatabase.GetAssetPath(this);
 			Object[] assets = AssetDatabase.LoadAllAssetsAtPath(path);
@@ -51,5 +54,6 @@
 			return false;
 
 		}
+		#endif
 	}
 }
