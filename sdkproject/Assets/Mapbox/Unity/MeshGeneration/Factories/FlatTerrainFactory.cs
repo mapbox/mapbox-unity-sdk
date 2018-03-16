@@ -29,7 +29,7 @@
 		//private int _layerId = 0;
 
 		Mesh _cachedQuad;
-		ElevationLayerProperties _elevationOptions;
+		ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
 
 		public override void SetOptions(LayerProperties options)
 		{

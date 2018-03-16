@@ -40,7 +40,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		//[SerializeField]
 		//private float _earthDepth = 10;
 
-		ElevationLayerProperties _elevationOptions;
+		ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
 		Mesh _stitchTarget;
 
 		protected Dictionary<UnwrappedTileId, Mesh> _meshData;

@@ -47,7 +47,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		//[SerializeField]
 		//bool _useRelativeHeight = true;
 
-		ElevationLayerProperties _elevationOptions;
+		ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
 		Mesh _stitchTarget;
 
 		protected Dictionary<UnwrappedTileId, Mesh> _meshData;

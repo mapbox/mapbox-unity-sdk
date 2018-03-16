@@ -36,7 +36,7 @@
 			}
 		}
 
-		ElevationLayerProperties _elevationOptions;
+		ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
 		public override void SetOptions(LayerProperties options)
 		{
 			_elevationOptions = (ElevationLayerProperties)options;
