@@ -201,20 +201,23 @@ namespace Mapbox.Editor
 
 		}
 
-		static GUIContent[] LoadContent( ScenesList list )
+		static GUIContent[] LoadContent(ScenesList list)
 		{
 
 			//exclude scenes with no image data
 			var content = new List<SceneData>();
-			if (_sceneList != null)
+			if (list != null)
 			{
 				for (int i = 0; i < list.SceneList.Length; i++)
 				{
-					if (File.Exists(list.SceneList[i].ScenePath))
+					if (list.SceneList[i] != null)
 					{
-						if (list.SceneList[i].Image != null)
+						if (File.Exists(list.SceneList[i].ScenePath))
 						{
-							content.Add(list.SceneList[i]);
+							if (list.SceneList[i].Image != null)
+							{
+								content.Add(list.SceneList[i]);
+							}
 						}
 					}
 				}
@@ -308,7 +311,7 @@ namespace Mapbox.Editor
 			EditorGUILayout.EndVertical();
 
 			// Draw Prefab Examples
-			if(_prefabContent.Length > 0)
+			if (_prefabContent.Length > 0)
 			{
 				EditorGUILayout.BeginVertical(_verticalGroup);
 				DrawPrefabLinks();
@@ -611,7 +614,7 @@ namespace Mapbox.Editor
 
 			EditorGUILayout.EndHorizontal();
 			EditorGUI.EndDisabledGroup();
-			
+
 		}
 
 		void DrawExampleLinks()

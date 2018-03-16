@@ -38,7 +38,6 @@
 			_camera.transform.position = _cameraStartPos;
 			if (null != response.Features && response.Features.Count > 0)
 			{
-				Debug.Log("Response");
 				_map.UpdateMap(response.Features[0].Center, (int)_zoomSlider.value);
 			}
 		}
