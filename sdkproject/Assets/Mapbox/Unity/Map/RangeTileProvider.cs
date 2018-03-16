@@ -28,6 +28,19 @@ namespace Mapbox.Unity.Map
 				_rangeTileProviderOptions = new RangeTileProviderOptions();
 			}
 
+
+			//foreach (var tile in tilesToRequest)
+			//{
+			//	AddTile(tile);
+			//}
+		}
+
+		private void Update()
+		{
+			if (Options == null)
+			{
+				return;
+			}
 			var activeTiles = _activeTiles.Keys.ToList();
 
 			List<UnwrappedTileId> tilesToRequest = new List<UnwrappedTileId>();
@@ -42,25 +55,20 @@ namespace Mapbox.Unity.Map
 				}
 			}
 
-			//List<UnwrappedTileId> toRemove = activeTiles.Except(tilesToRequest).ToList();
-			//foreach (var t2r in toRemove) { RemoveTile(t2r); }
-			//var finalTilesNeeded = tilesToRequest.Except(activeTiles);
+			List<UnwrappedTileId> toRemove = activeTiles.Except(tilesToRequest).ToList();
+			foreach (var t2r in toRemove) { RemoveTile(t2r); }
+			var finalTilesNeeded = tilesToRequest.Except(activeTiles);
 
-			//foreach (var tile in activeTiles)
-			//{
-			//	// Reposition tiles in case we panned.
-			//	RepositionTile(tile);
-			//}
+			foreach (var tile in activeTiles)
+			{
+				// Reposition tiles in case we panned.
+				RepositionTile(tile);
+			}
 
-			//foreach (var tile in finalTilesNeeded)
-			//{
-			//	AddTile(tile);
-			//}
-			foreach (var tile in tilesToRequest)
+			foreach (var tile in finalTilesNeeded)
 			{
 				AddTile(tile);
 			}
-
 		}
 	}
 }
