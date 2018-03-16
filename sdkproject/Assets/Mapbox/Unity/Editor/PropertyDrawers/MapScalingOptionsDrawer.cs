@@ -25,7 +25,7 @@
 			if ((MapScalingType)scalingType.enumValueIndex == MapScalingType.Custom)
 			{
 				position.y += lineHeight;
-				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("unityTileSize"), new GUIContent { text = "Unity Tile Size", tooltip = "TODO : FIX DESCRIPTION - Unity Tile Size " });
+				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("unityTileSize"));
 			}
 			EditorGUI.EndProperty();
 		}

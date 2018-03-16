@@ -77,7 +77,6 @@
 				//}
 
 				EditorGUILayout.Space();
-				EditorGUILayout.PropertyField(serializedObject.FindProperty("_initializeOnStart"));
 				DrawMapOptions(serializedObject);
 			}
 
@@ -141,6 +140,7 @@
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("extentOptions"));
 			}
 
+			EditorGUILayout.PropertyField(serializedObject.FindProperty("_initializeOnStart"));
 
 			showPosition = EditorGUILayout.Foldout(showPosition, "Others");
 			if (showPosition)

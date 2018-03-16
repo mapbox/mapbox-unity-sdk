@@ -12,7 +12,7 @@
 		public bool isActive = true;
 		[Tooltip("Name of the visualizer. ")]
 		public string sublayerName = "untitled";
-		[Tooltip("Primitive geometry type of the visualizer , allowed primitives - point, line, polygon")]
+		[Tooltip("Primitive geometry type of the visualizer, allowed primitives - point, line, polygon")]
 		public VectorPrimitiveType geometryType = VectorPrimitiveType.Polygon;
 		[Tooltip("Name of the layer in the source tileset. This property is case sensitive.")]
 		public string layerName = "layerName";

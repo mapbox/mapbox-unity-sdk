@@ -105,7 +105,7 @@
 
 	public enum ElevationSourceType
 	{
-		[Description("Mapbox Terrain provides digital elevation model with world wide coverage. ")]
+		[Description("Mapbox Terrain provides digital elevation model with worldwide coverage. ")]
 		MapboxTerrain,
 		[Description("Use custom digital elevation model tileset.")]
 		Custom,
