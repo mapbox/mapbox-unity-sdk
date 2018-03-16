@@ -3,6 +3,8 @@
 	using System;
 	using System.Collections.Generic;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
+	using Mapbox.Unity.Utilities;
+
 	[Serializable]
 	public class LayerModifierOptions
 	{

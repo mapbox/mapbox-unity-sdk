@@ -1,6 +1,7 @@
 ﻿namespace Mapbox.Unity.Map
 {
 	using System;
+	using Mapbox.Unity.Utilities;
 
 	[Serializable]
 	public class UnifiedMapOptions

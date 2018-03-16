@@ -4,6 +4,7 @@ using Mapbox.Map;
 using Mapbox.Unity.MeshGeneration.Data;
 using System.Collections.Generic;
 using System;
+using Mapbox.Unity.Utilities;
 
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {

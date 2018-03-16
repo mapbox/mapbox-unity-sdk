@@ -3,6 +3,8 @@
 	using System;
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Factories;
+	using Mapbox.Unity.Utilities;
+
 	[Serializable]
 	public class ImageryLayer : IImageryLayer
 	{

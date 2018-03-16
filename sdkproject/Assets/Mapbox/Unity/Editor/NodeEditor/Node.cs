@@ -9,6 +9,7 @@ using Mapbox.Unity.MeshGeneration.Modifiers;
 using System.Linq;
 using Mapbox.Unity.MeshGeneration.Interfaces;
 using Mapbox.Unity.Map;
+using Mapbox.Unity.Utilities;
 
 namespace Mapbox.Editor.NodeEditor
 {
