@@ -15,8 +15,8 @@ EditorBuildSettings:
     path: Assets/Mapbox/Examples/0_PrefabScenes/LocationBasedGame.unity
     guid: 49f1ae7ff8c69466a9fd31117cca0599
   - enabled: 1
-    path: Assets/Mapbox/Examples/1_Explorer/Explorer.unity
-    guid: 23aa869f2d28da149b835ce1d36a5438
+    path: Assets/Mapbox/Examples/1_DataExplorer/DataExplorer.unity
+    guid: 028ca2c46390a4409bcf0fae61aef3b3
   - enabled: 1
     path: Assets/Mapbox/Examples/2_ZoomableMap/ZoomableMap.unity
     guid: 2c7147d54825142878b256c67aae5704
@@ -41,3 +41,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Mapbox/Examples/5_Playground/Scenes/VectorTile.unity
     guid: 416b524fd28da493a9b8e35443dbd25b
+  - enabled: 1
+    path: Assets/MapboxAR/Examples/Scenes/TabletopAR.unity
+    guid: a455922b0e2954431922c9fb6c5377e4
+  - enabled: 1
+    path: Assets/MapboxAR/Examples/Scenes/WorldScaleAR-ManualAlignment.unity
+    guid: d9ff170f22f0545c3970a889a592f312
+  - enabled: 1
+    path: Assets/MapboxAR/Examples/Scenes/WorldScaleAR.unity
+    guid: c60dfd6bb74264e44b3dbf93e9d129c4

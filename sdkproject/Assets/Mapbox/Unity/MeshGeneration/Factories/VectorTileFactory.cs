@@ -93,7 +93,6 @@
 			if (string.IsNullOrEmpty(MapId) || _properties.sourceOptions.isActive == false || _properties.vectorSubLayers.Count == 0)
 			{
 				// Do nothing; 
-				Debug.Log(" Did nothing");
 				Progress++;
 				Progress--;
 			}
