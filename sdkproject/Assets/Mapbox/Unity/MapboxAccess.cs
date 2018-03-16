@@ -47,7 +47,6 @@ namespace Mapbox.Unity
 		public static string ConfigurationJSON;
 		private MapboxConfiguration _configuration;
 		private string _tokenNotSetErrorMessage = "No configuration file found! Configure your access token from the Mapbox > Setup menu.";
-		private bool _tokenValid = false;
 
 		/// <summary>
 		/// The Mapbox API access token.
@@ -65,7 +64,6 @@ namespace Mapbox.Unity
 			LoadAccessToken();
 			if (null == _configuration || string.IsNullOrEmpty(_configuration.AccessToken))
 			{
-				_tokenValid = false;
 				Debug.LogError(_tokenNotSetErrorMessage);
 			}
 		}
@@ -76,7 +74,6 @@ namespace Mapbox.Unity
 			{
 				if (throwExecptions)
 				{
-					_tokenValid = false;
 					throw new InvalidTokenException(_tokenNotSetErrorMessage);
 				}
 
@@ -84,7 +81,6 @@ namespace Mapbox.Unity
 
 			if (null == configuration || string.IsNullOrEmpty(configuration.AccessToken))
 			{
-				_tokenValid = false;
 				Debug.LogError(_tokenNotSetErrorMessage);
 			}
 			else
@@ -101,14 +97,6 @@ namespace Mapbox.Unity
 					{
 						configuration.AccessToken = string.Empty;
 						Debug.LogError(new InvalidTokenException(response.Status.ToString().ToString()));
-					}
-					if (response.Status == MapboxTokenStatus.TokenValid)
-					{
-						_tokenValid = true;
-					}
-					else
-					{
-						_tokenValid = false;
 					}
 				});
 
@@ -177,7 +165,6 @@ namespace Mapbox.Unity
 				TextAsset configurationTextAsset = Resources.Load<TextAsset>(Constants.Path.MAPBOX_RESOURCES_RELATIVE);
 				if (null == configurationTextAsset)
 				{
-					_tokenValid = false;
 					throw new InvalidTokenException(_tokenNotSetErrorMessage);
 				}
 				ConfigurationJSON = configurationTextAsset.text;
