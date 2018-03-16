@@ -114,7 +114,7 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 			};
 		}
 
-		public static ILayerFeatureFilterComparer HasPropertyInRange(string property, double? min, double? max)
+		public static ILayerFeatureFilterComparer HasPropertyInRange(string property, double min, double max)
 		{
 			return new LayerPropertyInRangeFilterComparer
 			{
@@ -124,7 +124,7 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 			};
 		}
 
-		public static ILayerFeatureFilterComparer HasPropertyGreaterThan(string property, double? min)
+		public static ILayerFeatureFilterComparer HasPropertyGreaterThan(string property, double min)
 		{
 			return new LayerPropertyIsGreaterFilterComparer
 			{
@@ -133,7 +133,7 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 			};
 		}
 
-		public static ILayerFeatureFilterComparer HasPropertyLessThan(string property, double? min)
+		public static ILayerFeatureFilterComparer HasPropertyLessThan(string property, double min)
 		{
 			return new LayerPropertyIsLessFilterComparer
 			{
@@ -142,7 +142,7 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 			};
 		}
 
-		public static ILayerFeatureFilterComparer HasPropertyIsEqual(string property, double? min)
+		public static ILayerFeatureFilterComparer HasPropertyIsEqual(string property, double min)
 		{
 			return new LayerPropertyIsEqualFilterComparer
 			{
@@ -186,21 +186,21 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 	[Serializable]
 	public class LayerPropertyInRangeFilterComparer : LayerHasPropertyFilterComparer
 	{
-		public double? Min;
-		public double? Max;
+		public double Min;
+		public double Max;
 
 		protected override bool PropertyComparer(object property)
 		{
-			var propertyValue = property as double?;
-			if (propertyValue == null)
+			if (property == null)
 			{
 				return false;
 			}
-			if (Min != null && propertyValue < Min)
+			var propertyValue = Convert.ToDouble(property);
+			if (propertyValue < Min)
 			{
 				return false;
 			}
-			if (Max != null && propertyValue >= Max)
+			if (propertyValue >= Max)
 			{
 				return false;
 			}
@@ -211,16 +211,16 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 	[Serializable]
 	public class LayerPropertyIsGreaterFilterComparer : LayerHasPropertyFilterComparer
 	{
-		public double? Min;
+		public double Min;
 
 		protected override bool PropertyComparer(object property)
 		{
-			var propertyValue = property as double?;
-			if (propertyValue == null)
+			var propertyValue = Convert.ToDouble(property);
+			if (property == null)
 			{
 				return false;
 			}
-			if (Min != null && propertyValue > Min)
+			if (propertyValue > Min)
 			{
 				return true;
 			}
@@ -231,16 +231,18 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 	[Serializable]
 	public class LayerPropertyIsLessFilterComparer : LayerHasPropertyFilterComparer
 	{
-		public double? Min;
+		public double Min;
 
 		protected override bool PropertyComparer(object property)
 		{
-			var propertyValue = property as double?;
-			if (propertyValue == null)
+
+			if (property == null)
 			{
 				return false;
 			}
-			if (Min != null && propertyValue < Min)
+			var propertyValue = Convert.ToDouble(property);
+
+			if (propertyValue < Min)
 			{
 				return true;
 			}
@@ -251,16 +253,17 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 	[Serializable]
 	public class LayerPropertyIsEqualFilterComparer : LayerHasPropertyFilterComparer
 	{
-		public double? Min;
+		public double Min;
 
 		protected override bool PropertyComparer(object property)
 		{
-			var propertyValue = property as double?;
-			if (propertyValue == null)
+			if (property == null)
 			{
 				return false;
 			}
-			if (Min != null && propertyValue == Min)
+
+			var propertyValue = Convert.ToDouble(property);
+			if (propertyValue - Min < Mapbox.Utils.Constants.EpsilonFloatingPoint)
 			{
 				return true;
 			}

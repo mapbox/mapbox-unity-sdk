@@ -592,7 +592,7 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
       - coreOptions:
-          isActive: 0
+          isActive: 1
           sublayerName: PoiLabels
           geometryType: 0
           layerName: poi_label
@@ -600,7 +600,12 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
-          filters: []
+          filters:
+          - Key: localrank
+            PropertyValue: 
+            Min: 1
+            Max: 0
+            filterOperator: 1
           combinerType: 0
         extrusionOptions:
           extrusionType: 5
@@ -655,6 +660,7 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers:
         - {fileID: 11400000, guid: 873cf898fb44149798c637959fd811ba, type: 2}
+        - {fileID: 11400000, guid: 69c9fbc203d6e934ea944041d43ea709, type: 2}
   _tileProvider: {fileID: 0}
 --- !u!1 &165147574
 GameObject:
@@ -1884,7 +1890,7 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0.27251172
+      value: 0.33217764
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1914,7 +1920,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -137.45926
+      value: -149.74042
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1924,12 +1930,12 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 254.9185
+      value: 279.48083
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 274.91852
+      value: 299.48083
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1984,7 +1990,7 @@ Prefab:
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 0.000015258789
       objectReference: {fileID: 0}
     - target: {fileID: 114731470950229392, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
