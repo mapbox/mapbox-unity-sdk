@@ -47,7 +47,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			get
 			{
-				Debug.Log("Image Factory Source -> " + _properties.sourceOptions.Id);
 				return _properties.sourceOptions.Id;
 			}
 

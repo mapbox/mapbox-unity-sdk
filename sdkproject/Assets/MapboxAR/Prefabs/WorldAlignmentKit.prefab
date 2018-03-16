@@ -1399,6 +1399,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd961b1c9541a4cee99686069ecce852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _initializeOnStart: 0
   _options:
     locationOptions:
       latitudeLongitude: 48.20833, 16.373064
@@ -1775,7 +1776,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mapManager: {fileID: 114324711836664524}
   _deviceLocationProvider: {fileID: 114182007959914852}
-  _editorLocationProvider: {fileID: 114182007959914852}
+  _editorLocationProvider: {fileID: 114194964888021804}
   _transformLocationProvider: {fileID: 114758182935743998}
   _dontDestroyOnLoad: 0
 --- !u!114 &114598196512852412

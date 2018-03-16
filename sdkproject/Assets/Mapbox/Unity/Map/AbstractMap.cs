@@ -67,6 +67,7 @@ namespace Mapbox.Unity.Map
 	/// </summary>
 	public class AbstractMap : MonoBehaviour, IMap
 	{
+		[SerializeField]
 		private bool _initializeOnStart = true;
 		/// <summary>
 		/// The map options.
