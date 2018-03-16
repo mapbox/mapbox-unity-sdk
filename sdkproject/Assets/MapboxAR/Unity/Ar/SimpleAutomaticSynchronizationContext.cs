@@ -12,7 +12,6 @@
 
 	public class SimpleAutomaticSynchronizationContext : ISynchronizationContext
 	{
-		bool _isCalibrated;
 		float _rotation;
 		Vector3 _position;
 
@@ -114,7 +113,6 @@
 			var relativeGpsVector = headingQuaternion * _currentAbsoluteGpsVector;
 
 			_rotation = rotation;
-			_isCalibrated = true;
 
 			var accuracy = _gpsNodes[_count - 1].Accuracy;
 			var delta = _currentArVector - relativeGpsVector;

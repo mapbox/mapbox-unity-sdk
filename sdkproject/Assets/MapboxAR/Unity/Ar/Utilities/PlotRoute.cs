@@ -30,7 +30,7 @@
 		int _currentIndex = 0;
 		float _sqDistance;
 		Vector3 _lastPosition;
-		bool _isStable;
+
 
 		void Awake()
 		{
@@ -47,7 +47,6 @@
 		void AddAnchor(BoundedPlane anchorData)
 		{
 			ARInterface.planeAdded -= AddAnchor;
-			_isStable = true;
 			AddNode(_target.localPosition);
 		}
 
