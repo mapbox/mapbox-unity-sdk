@@ -18,8 +18,9 @@
 			if (addtoLayerProp.boolValue == true)
 			{
 				EditorGUI.indentLevel++;
-				position.y += lineHeight;
-				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("layerId"));
+				var layerId = property.FindPropertyRelative("layerId");
+				layerId.intValue = EditorGUILayout.LayerField("Layer", layerId.intValue);
+				//EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("layerId"));
 				EditorGUI.indentLevel--;
 			}
 
@@ -29,10 +30,10 @@
 		{
 			// Reserve space for the total visible properties.
 			var addtoLayerProp = property.FindPropertyRelative("addToLayer");
-			if (addtoLayerProp.boolValue == true)
-			{
-				return 2.0f * lineHeight;
-			}
+			//if (addtoLayerProp.boolValue == true)
+			//{
+			//	return 2.0f * lineHeight;
+			//}
 			return 1.0f * lineHeight;
 		}
 	}
