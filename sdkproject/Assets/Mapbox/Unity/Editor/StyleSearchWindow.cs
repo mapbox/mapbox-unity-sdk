@@ -27,12 +27,12 @@
 
 		void OnEnable()
 		{
-			EditorApplication.playmodeStateChanged += OnModeChanged;
+			EditorApplication.playModeStateChanged += OnModeChanged;
 		}
 
 		void OnDisable()
 		{
-			EditorApplication.playmodeStateChanged -= OnModeChanged;
+			EditorApplication.playModeStateChanged -= OnModeChanged;
 		}
 
 		public static void Open(SerializedProperty property)
@@ -53,7 +53,7 @@
 			window.minSize = new Vector2(400, 500);
 		}
 
-		void OnModeChanged()
+		void OnModeChanged(PlayModeStateChange state)
 		{
 			Close();
 		}

@@ -24,15 +24,15 @@
 
 		void OnEnable()
 		{
-			EditorApplication.playmodeStateChanged += OnModeChanged;
+			EditorApplication.playModeStateChanged += OnModeChanged;
 		}
 
 		void OnDisable()
 		{
-			EditorApplication.playmodeStateChanged -= OnModeChanged;
+			EditorApplication.playModeStateChanged -= OnModeChanged;
 		}
 
-		void OnModeChanged()
+		void OnModeChanged(PlayModeStateChange state)
 		{
 			Close();
 		}
@@ -72,7 +72,7 @@
 				}
 				_assets = _assets.OrderBy(x => x.GetType().Name).ThenBy(x => x.name).ToList();
 			}
-			
+
 			var st = new GUIStyle();
 			st.padding = new RectOffset(15, 15, 15, 15);
 			scrollPos = EditorGUILayout.BeginScrollView(scrollPos, st);
@@ -83,7 +83,7 @@
 					continue;
 				GUILayout.BeginHorizontal();
 
-				var b = Header(string.Format("{0,-40} - {1, -15}",  asset.GetType().Name , asset.name), i == activeIndex);
+				var b = Header(string.Format("{0,-40} - {1, -15}", asset.GetType().Name, asset.name), i == activeIndex);
 
 				if (b)
 					activeIndex = i;
