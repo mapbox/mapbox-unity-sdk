@@ -83,7 +83,7 @@ namespace Mapbox.Unity.Ar
 		}
 
 
-		void Start()
+		void Awake()
 		{
 			_alignmentStrategy.Register(this);
 			_synchronizationContext = new SimpleAutomaticSynchronizationContext();

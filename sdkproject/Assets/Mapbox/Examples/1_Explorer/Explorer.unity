@@ -427,7 +427,7 @@ MonoBehaviour:
           - Materials:
             - {fileID: 2100000, guid: 55cc6edead802446b9106b2998406844, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
-          colorPallete: {fileID: 11400000, guid: ef118b5e263da4b1fa4327ca1d3e0c7b,
+          colorPallete: {fileID: 11400000, guid: e1b79d6caac0144adada0c548ef06705,
             type: 2}
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -466,7 +466,7 @@ MonoBehaviour:
           - Materials:
             - {fileID: 2100000, guid: 55cc6edead802446b9106b2998406844, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
-          colorPallete: {fileID: 11400000, guid: ef118b5e263da4b1fa4327ca1d3e0c7b,
+          colorPallete: {fileID: 11400000, guid: e1b79d6caac0144adada0c548ef06705,
             type: 2}
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -510,7 +510,7 @@ MonoBehaviour:
           - Materials:
             - {fileID: 2100000, guid: 55cc6edead802446b9106b2998406844, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
-          colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
+          colorPallete: {fileID: 11400000, guid: e1b79d6caac0144adada0c548ef06705,
             type: 2}
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1851,7 +1851,7 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0.3466789
+      value: 0.29550618
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1881,7 +1881,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -153.06409
+      value: -141.94589
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1891,12 +1891,12 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 286.12817
+      value: 263.89178
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 306.12817
+      value: 283.89178
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -2134,7 +2134,7 @@ Light:
   m_SpotAngle: 30
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 2
+    m_Type: 1
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 0.5
