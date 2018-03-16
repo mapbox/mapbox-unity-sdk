@@ -38,7 +38,7 @@ namespace Mapbox.Editor
 		{
 			customMapId_Prop = serializedObject.FindProperty("_customStyle");
 			mapIdType_Prop = serializedObject.FindProperty("_mapIdType");
-			mapId_Prop = serializedObject.FindProperty("_mapId");
+			mapId_Prop = customMapId_Prop.FindPropertyRelative("Id");
 			useMipMap_Prop = serializedObject.FindProperty("_useMipMap");
 			useCompression_Prop = serializedObject.FindProperty("_useCompression");
 			useRetina_Prop = serializedObject.FindProperty("_useRetina");

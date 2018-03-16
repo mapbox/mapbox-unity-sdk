@@ -14,8 +14,8 @@ namespace Mapbox.Unity.Location
 	/// </summary>
 	public class TransformLocationProvider : AbstractEditorLocationProvider
 	{
-		[SerializeField]
-		private AbstractMap _map;
+		//[SerializeField]
+		//private AbstractMap _map;
 
 		/// <summary>
 		/// The transform that will be queried for location and heading data.
@@ -37,6 +37,7 @@ namespace Mapbox.Unity.Location
 
 		protected override void SetLocation()
 		{
+			var _map = LocationProviderFactory.Instance.mapManager;
 			_currentLocation.Heading = _targetTransform.eulerAngles.y;
 			_currentLocation.LatitudeLongitude = _targetTransform.GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
 			_currentLocation.Accuracy = _accuracy;

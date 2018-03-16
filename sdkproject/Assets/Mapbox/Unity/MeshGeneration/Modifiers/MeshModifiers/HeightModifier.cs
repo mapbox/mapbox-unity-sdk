@@ -4,12 +4,31 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using System;
+	using Mapbox.Unity.Map;
 
-	public enum ExtrusionType
+	public class MinMaxPair
 	{
-		Wall,
-		FirstMidFloor,
-		FirstMidTopFloor
+		public float min, max;
+
+		public static MinMaxPair GetMinMaxHeight(List<Vector3> vertices)
+		{
+			int counter = vertices.Count;
+			MinMaxPair returnValue = new MinMaxPair
+			{
+				max = float.MinValue,
+				min = float.MaxValue
+			};
+
+			for (int i = 0; i < counter; i++)
+			{
+				if (vertices[i].y > returnValue.max)
+					returnValue.max = vertices[i].y;
+				else if (vertices[i].y < returnValue.min)
+					returnValue.min = vertices[i].y;
+			}
+
+			return returnValue;
+		}
 	}
 
 	/// <summary>
@@ -20,22 +39,24 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Height Modifier")]
 	public class HeightModifier : MeshModifier
 	{
-		[SerializeField]
-		[Tooltip("Flatten top polygons to prevent unwanted slanted roofs because of the bumpy terrain")]
-		private bool _flatTops;
+		//[SerializeField]
+		//[Tooltip("Flatten top polygons to prevent unwanted slanted roofs because of the bumpy terrain")]
+		//private bool _flatTops;
 
-		[SerializeField]
-		[Tooltip("Fix all features to certain height, suggested to be used for pushing roads above terrain level to prevent z-fighting.")]
-		private bool _forceHeight;
+		//[SerializeField]
+		//[Tooltip("Fix all features to certain height, suggested to be used for pushing roads above terrain level to prevent z-fighting.")]
+		//private bool _forceHeight;
 
-		[SerializeField]
-		[Tooltip("Fixed height value for ForceHeight option")]
-		private float _height;
+		//[SerializeField]
+		//[Tooltip("Fixed height value for ForceHeight option")]
+		//private float _height;
 		private float _scale = 1;
 
-		[SerializeField]
-		[Tooltip("Create side walls from calculated height down to terrain level. Suggested for buildings, not suggested for roads.")]
-		private bool _createSideWalls = true;
+		//[SerializeField]
+		//[Tooltip("Create side walls from calculated height down to terrain level. Suggested for buildings, not suggested for roads.")]
+		//private bool _createSideWalls = true;
+
+		GeometryExtrusionOptions _options;
 
 		[SerializeField]
 		[Tooltip("Create side walls as separate submesh.")]
@@ -43,8 +64,13 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
-		private int _counter;
+		private int _counter = 0;
+		float height = 0.0f;
 
+		public override void SetProperties(ModifierProperties properties)
+		{
+			_options = (GeometryExtrusionOptions)properties;
+		}
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, float scale)
 		{
@@ -54,68 +80,35 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
+			_counter = 0;
 			if (md.Vertices.Count == 0 || feature == null || feature.Points.Count < 1)
 				return;
 
 			if (tile != null)
 				_scale = tile.TileScale;
 
-			var minHeight = 0f;
-			float hf = _height * _scale;
-			if (!_forceHeight)
-			{
-				if (feature.Properties.ContainsKey("height"))
-				{
-					hf = Convert.ToSingle(feature.Properties["height"]);
-					hf *= _scale;
-					if (feature.Properties.ContainsKey("min_height"))
-					{
-						minHeight = Convert.ToSingle(feature.Properties["min_height"]) * _scale;
-						hf -= minHeight;
-					}
-				} 
-				else if (feature.Properties.ContainsKey("ele"))
-				{
-					//"ele" is used in contour layer for elevation
-					hf = Convert.ToSingle(feature.Properties["ele"]);
-					hf *= _scale;
-				}
-			}
+			float maxHeight = 1.0f;
+			float minHeight = 0.0f;
+			QueryHeight(feature, md, tile, out maxHeight, out minHeight);
+			height = (maxHeight - minHeight) * _scale;
+			maxHeight = maxHeight * _scale;
+			minHeight = minHeight * _scale;
+			//Set roof height 
+			GenerateRoofMesh(md, minHeight, maxHeight);
 
-			var max = md.Vertices[0].y;
-			var min = md.Vertices[0].y;
-			_counter = md.Vertices.Count;
-			if (_flatTops)
-			{
-				for (int i = 0; i < _counter; i++)
-				{
-					if (md.Vertices[i].y > max)
-						max = md.Vertices[i].y;
-					else if (md.Vertices[i].y < min)
-						min = md.Vertices[i].y;
-				}
-				for (int i = 0; i < _counter; i++)
-				{
-					md.Vertices[i] = new Vector3(md.Vertices[i].x, max + minHeight + hf, md.Vertices[i].z);
-				}
-				hf += max - min;
-			}
-			else
-			{
-				for (int i = 0; i < _counter; i++)
-				{
-					md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + minHeight + hf, md.Vertices[i].z);
-				}
-			}
+			GenerateWallMesh(md);
 
-
+		}
+		private void GenerateWallMesh(MeshData md)
+		{
 			md.Vertices.Capacity = _counter + md.Edges.Count * 2;
 			float d = 0f;
 			Vector3 v1;
 			Vector3 v2;
 			int ind = 0;
+			Vector3 wallDir;
 
-			if (_createSideWalls)
+			if (_options.extrusionGeometryType != ExtrusionGeometryType.RoofOnly)
 			{
 				_counter = md.Edges.Count;
 				var wallTri = new List<int>(_counter * 3);
@@ -132,8 +125,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					ind = md.Vertices.Count;
 					md.Vertices.Add(v1);
 					md.Vertices.Add(v2);
-					md.Vertices.Add(new Vector3(v1.x, v1.y - hf, v1.z));
-					md.Vertices.Add(new Vector3(v2.x, v2.y - hf, v2.z));
+					md.Vertices.Add(new Vector3(v1.x, v1.y - height, v1.z));
+					md.Vertices.Add(new Vector3(v2.x, v2.y - height, v2.z));
 
 					//d = (v2 - v1).magnitude;
 					d = Mathf.Sqrt((v2.x - v1.x) + (v2.y - v1.y) + (v2.z - v1.z));
@@ -143,10 +136,16 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					md.Normals.Add(norm);
 					md.Normals.Add(norm);
 
+					wallDir = (v2 - v1).normalized;
+					md.Tangents.Add(wallDir);
+					md.Tangents.Add(wallDir);
+					md.Tangents.Add(wallDir);
+					md.Tangents.Add(wallDir);
+
 					wallUv.Add(new Vector2(0, 0));
 					wallUv.Add(new Vector2(d, 0));
-					wallUv.Add(new Vector2(0, -hf));
-					wallUv.Add(new Vector2(d, -hf));
+					wallUv.Add(new Vector2(0, -height));
+					wallUv.Add(new Vector2(d, -height));
 
 					wallTri.Add(ind);
 					wallTri.Add(ind + 1);
@@ -157,7 +156,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					wallTri.Add(ind + 2);
 				}
 
-				if(_separateSubmesh)
+				// TODO: Do we really need this?
+				if (_separateSubmesh)
 				{
 					md.Triangles.Add(wallTri);
 				}
@@ -167,6 +167,95 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					md.Triangles[0].AddRange(wallTri);
 				}
 				md.UV[0].AddRange(wallUv);
+			}
+		}
+
+		private void GenerateRoofMesh(MeshData md, float minHeight, float maxHeight)
+		{
+			var max = md.Vertices[0].y;
+			var min = md.Vertices[0].y;
+
+			if (_options.extrusionGeometryType != ExtrusionGeometryType.SideOnly)
+			{
+				_counter = md.Vertices.Count;
+				switch (_options.extrusionType)
+				{
+					case ExtrusionType.None:
+						break;
+					case ExtrusionType.PropertyHeight:
+						for (int i = 0; i < _counter; i++)
+						{
+							md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + maxHeight, md.Vertices[i].z);
+						}
+						break;
+					case ExtrusionType.MinHeight:
+						{
+							var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
+							for (int i = 0; i < _counter; i++)
+							{
+								md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.min + maxHeight, md.Vertices[i].z);
+							}
+						}
+						//hf += max - min;
+						break;
+					case ExtrusionType.MaxHeight:
+						{
+							var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
+							for (int i = 0; i < _counter; i++)
+							{
+								md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.max + maxHeight, md.Vertices[i].z);
+							}
+							height += (minmax.max - minmax.min);
+						}
+						break;
+					case ExtrusionType.RangeHeight:
+						break;
+					case ExtrusionType.AbsoluteHeight:
+						for (int i = 0; i < _counter; i++)
+						{
+							md.Vertices[i] = new Vector3(md.Vertices[i].x, maxHeight, md.Vertices[i].z);
+						}
+						break;
+					default:
+						break;
+				}
+			}
+		}
+
+		private void QueryHeight(VectorFeatureUnity feature, MeshData md, UnityTile tile, out float maxHeight, out float minHeight)
+		{
+			minHeight = 0.0f;
+			maxHeight = 0.0f;
+
+			switch (_options.extrusionType)
+			{
+				case ExtrusionType.None:
+					break;
+				case ExtrusionType.PropertyHeight:
+				case ExtrusionType.MinHeight:
+				case ExtrusionType.MaxHeight:
+					if (feature.Properties.ContainsKey(_options.propertyName))
+					{
+						maxHeight = Convert.ToSingle(feature.Properties[_options.propertyName]);
+						if (feature.Properties.ContainsKey("min_height"))
+						{
+							minHeight = Convert.ToSingle(feature.Properties["min_height"]);
+							//maxHeight -= minHeight;
+						}
+					}
+					break;
+				case ExtrusionType.RangeHeight:
+					if (feature.Properties.ContainsKey(_options.propertyName))
+					{
+						var featureHeight = Convert.ToSingle(feature.Properties[_options.propertyName]);
+						maxHeight = Math.Min(Math.Max(_options.minimumHeight, featureHeight), _options.maximumHeight);
+					}
+					break;
+				case ExtrusionType.AbsoluteHeight:
+					maxHeight = _options.maximumHeight;
+					break;
+				default:
+					break;
 			}
 		}
 	}
