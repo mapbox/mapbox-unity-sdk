@@ -1890,7 +1890,7 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0.33217764
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1920,7 +1920,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -149.74042
+      value: -96.58762
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1930,12 +1930,12 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 279.48083
+      value: 173.17525
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 299.48083
+      value: 193.17525
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1955,17 +1955,13 @@ Prefab:
     - target: {fileID: 114603753021256032, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_Text
-      value: "<b>Explorer</b>\n\nThis is a master example that allows you to explore
-        Mapbox\u2019s location data and the Map Editor. You can see a variety of data
-        layers associated with Mapbox\u2019s vector tiles, including building data,
-        points of interest (POIs), roads, and real-time traffic data. Each map vector
-        tile includes high levels of detail about a particular location or building
-        in GeoJSON format that you can leverage for procedurally generating experiences
-        or styling. You can toggle these data layers on and off as needed in the Map
-        Editor (access through the Mapbox menu). \n\nMapbox has worldwide data coverage
-        so you can create truly global game levels, AR experiences, and apps. Search
-        anywhere in the world to explore the maps and location data you have available
-        to you. "
+      value: "<b>Data Explorer</b>\n\nExplore Mapbox\u2019s location data. Each map
+        vector tile includes high levels of detail about a particular location or
+        building in GeoJSON format that you can leverage for procedurally generating
+        experiences or styling. The data layers include building data, points of interest
+        (POIs), roads, and real-time traffic data. You can filter these data layers
+        on and off as needed in the Map Editor (access through the Mapbox menu). Also,
+        note the POIs are shown both as labels and as prefabs."
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1990,7 +1986,7 @@ Prefab:
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000015258789
+      value: -0.000015258789
       objectReference: {fileID: 0}
     - target: {fileID: 114731470950229392, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
