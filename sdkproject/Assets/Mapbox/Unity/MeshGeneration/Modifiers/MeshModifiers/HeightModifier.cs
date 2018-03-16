@@ -172,9 +172,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		private void GenerateRoofMesh(MeshData md, float minHeight, float maxHeight)
 		{
-			var max = md.Vertices[0].y;
-			var min = md.Vertices[0].y;
-
 			if (_options.extrusionGeometryType != ExtrusionGeometryType.SideOnly)
 			{
 				_counter = md.Vertices.Count;

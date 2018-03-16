@@ -29,11 +29,6 @@
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
 			// Reserve space for the total visible properties.
-			var addtoLayerProp = property.FindPropertyRelative("addToLayer");
-			//if (addtoLayerProp.boolValue == true)
-			//{
-			//	return 2.0f * lineHeight;
-			//}
 			return 1.0f * lineHeight;
 		}
 	}

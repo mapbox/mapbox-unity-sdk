@@ -331,28 +331,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
-		private void SetHeight(VectorFeatureUnity feature, MeshData md, UnityTile tile, out float topHeight, out float minHeight)
-		{
-			minHeight = 0;
-			topHeight = height * tile.TileScale;
-			//if (!_forceHeight)
-			//{
-			//	if (feature.Properties.ContainsKey("height"))
-			//	{
-			//		topHeight = Convert.ToSingle(feature.Properties["height"]) * tile.TileScale;
-			//		if (feature.Properties.ContainsKey("min_height"))
-			//		{
-			//			minHeight = Convert.ToSingle(feature.Properties["min_height"]) * tile.TileScale;
-			//		}
-			//	}
-			//}
-		}
-
 		private void GenerateRoofMesh(MeshData md, float minHeight, float maxHeight)
 		{
-			var max = md.Vertices[0].y;
-			var min = md.Vertices[0].y;
-
 			if (_options.extrusionGeometryType != ExtrusionGeometryType.SideOnly)
 			{
 				_counter = md.Vertices.Count;

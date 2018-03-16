@@ -18,50 +18,26 @@ EditorBuildSettings:
     path: Assets/Mapbox/Examples/1_Explorer/Explorer.unity
     guid: 23aa869f2d28da149b835ce1d36a5438
   - enabled: 1
-    path: Assets/Mapbox/Examples/2_LocationProvider/LocationProvider.unity
-    guid: 69bd9826e5ce64552aae5bf0f4e3dc81
-  - enabled: 1
-    path: Assets/Mapbox/Examples/3_VoxelMap/VoxelMap.unity
-    guid: daabe3028a2c14661b829fff509af827
-  - enabled: 1
-    path: Assets/Mapbox/Examples/4_VectorTileMaps/BasicUvMap/BasicUvMap.unity
-    guid: 1fa2b4c43fde33b46a32fb724f7e0543
-  - enabled: 1
-    path: Assets/Mapbox/Examples/4_VectorTileMaps/BasicVectorMap/BasicVectorMap.unity
-    guid: f804e6882903c5f4595d554933b1cd94
-  - enabled: 1
-    path: Assets/Mapbox/Examples/4_VectorTileMaps/InteractiveStyledVectorMap/InteractiveStyledVectorMap.unity
-    guid: 70e7c71bb9e4341109139d65148d82ff
-  - enabled: 1
-    path: Assets/Mapbox/Examples/4_VectorTileMaps/PoiVectorMap/PoiVectorMap.unity
-    guid: d8f424455a2bb4963b4df1469488ab87
-  - enabled: 1
-    path: Assets/Mapbox/Examples/4_VectorTileMaps/TerrainVectorMap/TerrainVectorMap.unity
-    guid: 22b55e3f56b6044b6bbd8476d27843e7
-  - enabled: 1
-    path: Assets/Mapbox/Examples/5_ZoomableMap/ZoomableMap.unity
+    path: Assets/Mapbox/Examples/2_ZoomableMap/ZoomableMap.unity
     guid: 2c7147d54825142878b256c67aae5704
   - enabled: 1
-    path: Assets/Mapbox/Examples/6_Globe/Globe.unity
+    path: Assets/Mapbox/Examples/3_Globe/Globe.unity
     guid: 614e3e19125ae46c7af990b7e3debd36
   - enabled: 1
-    path: Assets/Mapbox/Examples/7_Playground/Scenes/Directions.unity
+    path: Assets/Mapbox/Examples/4_VoxelMap/VoxelMap.unity
+    guid: daabe3028a2c14661b829fff509af827
+  - enabled: 1
+    path: Assets/Mapbox/Examples/5_Playground/Scenes/Directions.unity
     guid: b650aa71f57a846dc83ef01c3c1755ad
   - enabled: 1
-    path: Assets/Mapbox/Examples/7_Playground/Scenes/ForwardGeocoder.unity
+    path: Assets/Mapbox/Examples/5_Playground/Scenes/ForwardGeocoder.unity
     guid: 9683d5465276540cd9a4c9e89d931293
   - enabled: 1
-    path: Assets/Mapbox/Examples/7_Playground/Scenes/RasterTile.unity
+    path: Assets/Mapbox/Examples/5_Playground/Scenes/RasterTile.unity
     guid: 893d0b4deb5544335b798dafd12ff9a7
   - enabled: 1
-    path: Assets/Mapbox/Examples/7_Playground/Scenes/ReverseGeocoder.unity
+    path: Assets/Mapbox/Examples/5_Playground/Scenes/ReverseGeocoder.unity
     guid: 9a904a5fcec05469db76712a52999b39
   - enabled: 1
-    path: Assets/Mapbox/Examples/7_Playground/Scenes/VectorTile.unity
+    path: Assets/Mapbox/Examples/5_Playground/Scenes/VectorTile.unity
     guid: 416b524fd28da493a9b8e35443dbd25b
-  - enabled: 1
-    path: Assets/Mapbox/Examples/8_PoGoPlugPlay/OriginalTest.unity
-    guid: b4dafd12e86144abeb04333cbb9e6af7
-  - enabled: 1
-    path: Assets/Mapbox/Examples/8_PoGoPlugPlay/PoGoPlug&Play.unity
-    guid: e3df390f96f7045b382432ffd000e1b4

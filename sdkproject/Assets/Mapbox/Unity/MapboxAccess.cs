@@ -89,7 +89,6 @@ namespace Mapbox.Unity
 			}
 			else
 			{
-				bool retrieved = false;
 				TokenValidator.Retrieve(configuration.AccessToken, (response) =>
 				{
 					if (OnTokenValidation != null)
@@ -103,7 +102,7 @@ namespace Mapbox.Unity
 						configuration.AccessToken = string.Empty;
 						Debug.LogError(new InvalidTokenException(response.Status.ToString().ToString()));
 					}
-					if(response.Status== MapboxTokenStatus.TokenValid)
+					if (response.Status == MapboxTokenStatus.TokenValid)
 					{
 						_tokenValid = true;
 					}
@@ -111,7 +110,6 @@ namespace Mapbox.Unity
 					{
 						_tokenValid = true;
 					}
-					retrieved = true;
 				});
 
 				_configuration = configuration;

@@ -9,7 +9,7 @@
 	public class ImageryLayerPropertiesDrawer : PropertyDrawer
 	{
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
-		bool showPosition = true;
+
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);

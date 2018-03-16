@@ -15,7 +15,7 @@
 			EditorGUI.BeginProperty(position, label, property);
 			var scalingType = property.FindPropertyRelative("scalingType");
 
-			var conversionFactor = EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight),
+			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight),
 														   scalingType,
 														   new GUIContent
 														   {

@@ -8,76 +8,70 @@
 	public class GeometryExtrusionOptionsDrawer : PropertyDrawer
 	{
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
-		bool showPosition = true;
+
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
-			//position.y = lineHeight;
 
-			//showPosition = EditorGUI.Foldout(new Rect(position.x, position.y, position.width, lineHeight), showPosition, label.text);
-			//position.y += lineHeight;
-			//EditorGUI.indentLevel++;
-			//if (showPosition)
+			var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent("Extrusion Type"));
+			var extrusionTypeProperty = property.FindPropertyRelative("extrusionType");
+
+			extrusionTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, extrusionTypeProperty.enumValueIndex, extrusionTypeProperty.enumDisplayNames);
+			var sourceTypeValue = (Unity.Map.ExtrusionType)extrusionTypeProperty.enumValueIndex;
+
+			var minHeightProperty = property.FindPropertyRelative("minimumHeight");
+			var maxHeightProperty = property.FindPropertyRelative("maximumHeight");
+
+			EditorGUI.indentLevel++;
+			switch (sourceTypeValue)
 			{
-				var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent("Extrusion Type"));
-				var extrusionTypeProperty = property.FindPropertyRelative("extrusionType");
-
-				extrusionTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, extrusionTypeProperty.enumValueIndex, extrusionTypeProperty.enumDisplayNames);
-				var sourceTypeValue = (Unity.Map.ExtrusionType)extrusionTypeProperty.enumValueIndex;
-
-				var minHeightProperty = property.FindPropertyRelative("minimumHeight");
-				var maxHeightProperty = property.FindPropertyRelative("maximumHeight");
-
-				EditorGUI.indentLevel++;
-				switch (sourceTypeValue)
-				{
-					case Unity.Map.ExtrusionType.None:
-						break;
-					case Unity.Map.ExtrusionType.PropertyHeight:
-						position.y += lineHeight;
-						EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("extrusionGeometryType"));
-						position.y += lineHeight;
-						EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
-						break;
-					case Unity.Map.ExtrusionType.MinHeight:
-						position.y += lineHeight;
-						EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("extrusionGeometryType"));
-						position.y += lineHeight;
-						EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
-						position.y += lineHeight;
-						EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), minHeightProperty);
-						//maxHeightProperty.floatValue = minHeightProperty.floatValue;
-						break;
-					case Unity.Map.ExtrusionType.MaxHeight:
-						position.y += lineHeight;
-						EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("extrusionGeometryType"));
-						position.y += lineHeight;
-						EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
-						position.y += lineHeight;
-						EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), maxHeightProperty);
-						//min.floatValue = minHeightProperty.floatValue;
-						break;
-					case Unity.Map.ExtrusionType.RangeHeight:
-						position.y += lineHeight;
-						EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("extrusionGeometryType"));
-						position.y += lineHeight;
-						EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
-						position.y += lineHeight;
-						EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), minHeightProperty);
-						position.y += lineHeight;
-						EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), maxHeightProperty);
-						break;
-					case Unity.Map.ExtrusionType.AbsoluteHeight:
-						position.y += lineHeight;
-						EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("extrusionGeometryType"));
-						position.y += lineHeight;
-						EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), maxHeightProperty, new GUIContent { text = "Height" });
-						break;
-					default:
-						break;
-				}
-				EditorGUI.indentLevel--;
+				case Unity.Map.ExtrusionType.None:
+					break;
+				case Unity.Map.ExtrusionType.PropertyHeight:
+					position.y += lineHeight;
+					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("extrusionGeometryType"));
+					position.y += lineHeight;
+					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
+					break;
+				case Unity.Map.ExtrusionType.MinHeight:
+					position.y += lineHeight;
+					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("extrusionGeometryType"));
+					position.y += lineHeight;
+					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
+					position.y += lineHeight;
+					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), minHeightProperty);
+					//maxHeightProperty.floatValue = minHeightProperty.floatValue;
+					break;
+				case Unity.Map.ExtrusionType.MaxHeight:
+					position.y += lineHeight;
+					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("extrusionGeometryType"));
+					position.y += lineHeight;
+					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
+					position.y += lineHeight;
+					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), maxHeightProperty);
+					//min.floatValue = minHeightProperty.floatValue;
+					break;
+				case Unity.Map.ExtrusionType.RangeHeight:
+					position.y += lineHeight;
+					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("extrusionGeometryType"));
+					position.y += lineHeight;
+					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
+					position.y += lineHeight;
+					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), minHeightProperty);
+					position.y += lineHeight;
+					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), maxHeightProperty);
+					break;
+				case Unity.Map.ExtrusionType.AbsoluteHeight:
+					position.y += lineHeight;
+					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("extrusionGeometryType"));
+					position.y += lineHeight;
+					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), maxHeightProperty, new GUIContent { text = "Height" });
+					break;
+				default:
+					break;
 			}
+			EditorGUI.indentLevel--;
+
 			EditorGUI.EndProperty();
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -114,29 +108,4 @@
 			return (float)rows * lineHeight;
 		}
 	}
-
-	//[CustomPropertyDrawer(typeof(TypeVisualizerTuple))]
-	//public class TypeVisualizerBaseDrawer : PropertyDrawer
-	//{
-	//	static float lineHeight = EditorGUIUtility.singleLineHeight;
-	//	bool showPosition = true;
-	//	public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-	//	{
-	//		EditorGUI.BeginProperty(position, label, property);
-
-	//		position.height = lineHeight;
-
-	//		EditorGUI.PropertyField(position, property.FindPropertyRelative("Stack"));
-
-	//		EditorGUI.EndProperty();
-	//	}
-	//	public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-	//	{
-	//		// Reserve space for the total visible properties.
-	//		int rows = 2;
-	//		//Debug.Log("Height - " + rows * lineHeight);
-	//		return (float)rows * lineHeight;
-	//	}
-	//}
-
 }

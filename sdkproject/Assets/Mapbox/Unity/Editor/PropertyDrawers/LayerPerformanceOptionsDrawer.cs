@@ -8,7 +8,6 @@
 	public class LayerPerformanceOptionsDrawer : PropertyDrawer
 	{
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
-		bool showPosition = true;
 
 		SerializedProperty isActiveProperty;
 

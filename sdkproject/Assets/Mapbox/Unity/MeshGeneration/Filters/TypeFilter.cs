@@ -6,7 +6,6 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 	using System.Linq;
 	using System.Collections.Generic;
 
-	[CreateAssetMenu(menuName = "Mapbox/Filters/Type Filter")]
 	public class TypeFilter : FilterBase
 	{
 		public override string Key { get { return "type"; } }

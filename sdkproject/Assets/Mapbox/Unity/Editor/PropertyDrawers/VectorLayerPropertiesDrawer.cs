@@ -21,9 +21,6 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			var labelBoldStyle = new GUIStyle { fontStyle = FontStyle.Bold };
-			var labelItalicCenteredStyle = new GUIStyle { fontStyle = FontStyle.Italic };
-
 			EditorGUI.BeginProperty(position, label, property);
 			position.height = lineHeight;
 

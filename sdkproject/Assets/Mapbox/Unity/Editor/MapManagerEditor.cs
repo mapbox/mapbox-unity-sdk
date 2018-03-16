@@ -16,14 +16,11 @@
 		static bool showImage = false;
 		static bool showTerrain = false;
 		static bool showVector = false;
-		int selected = 0;
-		int previousSelection = -1;
-		AbstractMap _map;
+
 		bool showPosition = false;
 		public override void OnInspectorGUI()
 		{
 			serializedObject.Update();
-			_map = (AbstractMap)target;
 			GUILayout.BeginVertical();
 			EditorGUILayout.Space();
 

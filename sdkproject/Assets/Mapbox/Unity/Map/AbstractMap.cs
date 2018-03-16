@@ -589,7 +589,6 @@ namespace Mapbox.Unity.Map
 			if (foundTile)
 			{
 				var _rect = tile.Rect;
-				var _worldPos = GeoToWorldPositionXZ(new Vector2d(latlong.x, latlong.y));
 				return tile.QueryHeightData((float)((_meters - _rect.Min).x / _rect.Size.x), (float)((_meters.y - _rect.Max.y) / _rect.Size.y));
 			}
 			else
