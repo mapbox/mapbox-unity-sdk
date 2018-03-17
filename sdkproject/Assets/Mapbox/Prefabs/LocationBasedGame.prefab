@@ -434,6 +434,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd961b1c9541a4cee99686069ecce852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _initializeOnStart: 0
   _options:
     locationOptions:
       latitudeLongitude: 37.784179, -122.401583
