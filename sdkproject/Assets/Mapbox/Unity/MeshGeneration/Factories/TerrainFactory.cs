@@ -62,18 +62,18 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		private int _vertA, _vertB, _vertC;
 		private int _counter;
 
-		public string MapId
-		{
-			get
-			{
-				return _elevationOptions.sourceOptions.Id;
-			}
+		//public string MapId
+		//{
+		//	get
+		//	{
+		//		return _elevationOptions.sourceOptions.Id;
+		//	}
 
-			set
-			{
-				_elevationOptions.sourceOptions.Id = value;
-			}
-		}
+		//	set
+		//	{
+		//		_elevationOptions.sourceOptions.Id = value;
+		//	}
+		//}
 
 		public override void SetOptions(LayerProperties options)
 		{
@@ -209,7 +209,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			tile.AddTile(pngRasterTile);
 			Progress++;
 
-			pngRasterTile.Initialize(_fileSource, tile.CanonicalTileId, MapId, () =>
+			pngRasterTile.Initialize(_fileSource, tile.CanonicalTileId, _elevationOptions.sourceOptions.Id, () =>
 			{
 				if (tile == null)
 				{
