@@ -18,7 +18,7 @@ namespace Mapbox.Editor
 	{
 		public static MapboxConfigurationWindow instance;
 		static MapboxConfiguration _mapboxConfig;
-		static MapboxTokenStatus _currentTokenStatus;
+		static MapboxTokenStatus _currentTokenStatus = MapboxTokenStatus.StatusNotYetSet;
 		static MapboxAccess _mapboxAccess;
 		static bool _waitingToLoad = false;
 
