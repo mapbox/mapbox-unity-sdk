@@ -118,7 +118,10 @@ namespace Mapbox.Examples.Voxels
 
 		public void OnNext(RasterTile tile)
 		{
-			if (tile.CurrentState == Tile.State.Loaded && !tile.HasError)
+			if (
+				!tile.HasError
+				&& (tile.CurrentState == Tile.State.Loaded || tile.CurrentState == Tile.State.Updated)
+			)
 			{
 				_rasterTexture = new Texture2D(2, 2);
 				_rasterTexture.LoadImage(tile.Data);
@@ -133,7 +136,10 @@ namespace Mapbox.Examples.Voxels
 
 		public void OnNext(RawPngRasterTile tile)
 		{
-			if (tile.CurrentState == Tile.State.Loaded && !tile.HasError)
+			if (
+				!tile.HasError
+				&& (tile.CurrentState == Tile.State.Loaded || tile.CurrentState == Tile.State.Updated)
+			)
 			{
 				_elevationTexture = new Texture2D(2, 2);
 				_elevationTexture.LoadImage(tile.Data);
@@ -153,14 +159,19 @@ namespace Mapbox.Examples.Voxels
 
 		void BuildVoxelWorld()
 		{
-			var baseHeight = (int)Conversions.GetRelativeHeightFromColor((_elevationTexture.GetPixel(_elevationTexture.width / 2, _elevationTexture.height / 2)),
-																		 _elevationMultiplier * _tileScale);
+			var baseHeight = (int)Conversions.GetRelativeHeightFromColor(
+				(_elevationTexture.GetPixel(_elevationTexture.width / 2, _elevationTexture.height / 2))
+				, _elevationMultiplier * _tileScale
+			);
+
 			for (int x = 0; x < _rasterTexture.width; x++)
 			{
 				for (int z = 0; z < _rasterTexture.height; z++)
 				{
-					var height = (int)Conversions.GetRelativeHeightFromColor(_elevationTexture.GetPixel(x, z),
-																			 _elevationMultiplier * _tileScale) - baseHeight;
+					var height = (int)Conversions.GetRelativeHeightFromColor(
+						_elevationTexture.GetPixel(x, z)
+						, _elevationMultiplier * _tileScale
+					) - baseHeight;
 
 					var startHeight = height - _voxelDepthPadding - 1;
 					var color = _rasterTexture.GetPixel(x, z);
