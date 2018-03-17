@@ -119,7 +119,10 @@ namespace Mapbox.Examples.Playground
 		/// <param name="tile">Tile.</param>
 		public void OnNext(RasterTile tile)
 		{
-			if (tile.CurrentState != Tile.State.Loaded || tile.HasError)
+			if (
+				tile.HasError
+				|| (tile.CurrentState != Tile.State.Loaded && tile.CurrentState != Tile.State.Updated)
+			)
 			{
 				return;
 			}
