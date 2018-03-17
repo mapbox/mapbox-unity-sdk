@@ -4,11 +4,7 @@
 	using UnityEngine;
 	using Mapbox.Unity.Location;
 	using System;
-	using Mapbox.Unity.Utilities;
 
-#if !UNITY_EDITOR
-	using Mapbox.Unity.Utilities;
-#endif
 
 	public class SimpleAutomaticSynchronizationContext : ISynchronizationContext
 	{

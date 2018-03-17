@@ -86,7 +86,9 @@ namespace Mapbox.Unity.Utilities
 #pragma warning restore 0618
 			while (!_request.isDone) { yield return null; }
 #else
+#pragma warning disable 0618
 			yield return _request.Send();
+#pragma warning restore 0618
 #endif
 
 			var response = Response.FromWebResponse(this, _request, null);
