@@ -12,156 +12,21 @@ MonoBehaviour:
   m_Name: ScenesList
   m_EditorClassIdentifier: 
   SceneList:
-  - {fileID: 114974058547396780}
-  - {fileID: 114161208796117588}
-  - {fileID: 114594069424742996}
-  - {fileID: 114911178913298918}
-  - {fileID: 114557317296652666}
-  - {fileID: 114020981201615384}
-  - {fileID: 114479456705564596}
-  - {fileID: 114852851928822796}
-  - {fileID: 114762199609759350}
-  - {fileID: 114329358162483614}
-  - {fileID: 114884605889214022}
-  - {fileID: 114306740262070236}
-  - {fileID: 114704991108294566}
-  - {fileID: 114534135900245356}
---- !u!114 &114020981201615384
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
-  m_Name: VoxelMap
-  m_EditorClassIdentifier: 
-  Name: VoxelMap
-  ScenePath: Assets/Mapbox/Examples/4_VoxelMap/VoxelMap.unity
-  Image: {fileID: 2800000, guid: 805ed9e7e2bcd4071bd22b135125a912, type: 3}
-  Text: {fileID: 0}
---- !u!114 &114161208796117588
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
-  m_Name: LocationBasedGame
-  m_EditorClassIdentifier: 
-  Name: LocationBasedGame
-  ScenePath: Assets/Mapbox/Examples/0_PrefabScenes/LocationBasedGame.unity
-  Image: {fileID: 0}
-  Text: {fileID: 0}
---- !u!114 &114306740262070236
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
-  m_Name: TabletopAR
-  m_EditorClassIdentifier: 
-  Name: TabletopAR
-  ScenePath: Assets/MapboxAR/Examples/Scenes/TabletopAR.unity
-  Image: {fileID: 0}
-  Text: {fileID: 0}
---- !u!114 &114329358162483614
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
-  m_Name: ReverseGeocoder
-  m_EditorClassIdentifier: 
-  Name: ReverseGeocoder
-  ScenePath: Assets/Mapbox/Examples/5_Playground/Scenes/ReverseGeocoder.unity
-  Image: {fileID: 0}
-  Text: {fileID: 0}
---- !u!114 &114479456705564596
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
-  m_Name: Directions
-  m_EditorClassIdentifier: 
-  Name: Directions
-  ScenePath: Assets/Mapbox/Examples/5_Playground/Scenes/Directions.unity
-  Image: {fileID: 0}
-  Text: {fileID: 0}
---- !u!114 &114534135900245356
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
-  m_Name: WorldScaleAR
-  m_EditorClassIdentifier: 
-  Name: WorldScaleAR
-  ScenePath: Assets/MapboxAR/Examples/Scenes/WorldScaleAR.unity
-  Image: {fileID: 0}
-  Text: {fileID: 0}
---- !u!114 &114557317296652666
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
-  m_Name: Globe
-  m_EditorClassIdentifier: 
-  Name: Globe
-  ScenePath: Assets/Mapbox/Examples/3_Globe/Globe.unity
-  Image: {fileID: 2800000, guid: 31ea88f94a559415194f73d9ae78c4bb, type: 3}
-  Text: {fileID: 0}
---- !u!114 &114594069424742996
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
-  m_Name: DataExplorer
-  m_EditorClassIdentifier: 
-  Name: DataExplorer
-  ScenePath: Assets/Mapbox/Examples/1_DataExplorer/DataExplorer.unity
-  Image: {fileID: 2800000, guid: 1b7a3200c45d3425bbf8e891123932d8, type: 3}
-  Text: {fileID: 0}
---- !u!114 &114704991108294566
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
-  m_Name: WorldScaleAR-ManualAlignment
-  m_EditorClassIdentifier: 
-  Name: WorldScaleAR-ManualAlignment
-  ScenePath: Assets/MapboxAR/Examples/Scenes/WorldScaleAR-ManualAlignment.unity
-  Image: {fileID: 0}
-  Text: {fileID: 0}
---- !u!114 &114762199609759350
+  - {fileID: 114460662713458228}
+  - {fileID: 114861251378261416}
+  - {fileID: 114498764422679708}
+  - {fileID: 114992998283942706}
+  - {fileID: 114157241326278288}
+  - {fileID: 114896722358723204}
+  - {fileID: 114136603894527846}
+  - {fileID: 114706869570287912}
+  - {fileID: 114112508014772766}
+  - {fileID: 114158660581070540}
+  - {fileID: 114499470065688132}
+  - {fileID: 114854759724035646}
+  - {fileID: 114127060692933406}
+  - {fileID: 114148720268525084}
+--- !u!114 &114112508014772766
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -176,7 +41,7 @@ MonoBehaviour:
   ScenePath: Assets/Mapbox/Examples/5_Playground/Scenes/RasterTile.unity
   Image: {fileID: 0}
   Text: {fileID: 0}
---- !u!114 &114852851928822796
+--- !u!114 &114127060692933406
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -185,13 +50,103 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
-  m_Name: ForwardGeocoder
+  m_Name: WorldScaleAR-ManualAlignment
   m_EditorClassIdentifier: 
-  Name: ForwardGeocoder
-  ScenePath: Assets/Mapbox/Examples/5_Playground/Scenes/ForwardGeocoder.unity
+  Name: WorldScaleAR-ManualAlignment
+  ScenePath: Assets/MapboxAR/Examples/Scenes/WorldScaleAR-ManualAlignment.unity
   Image: {fileID: 0}
   Text: {fileID: 0}
---- !u!114 &114884605889214022
+--- !u!114 &114136603894527846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: Directions
+  m_EditorClassIdentifier: 
+  Name: Directions
+  ScenePath: Assets/Mapbox/Examples/5_Playground/Scenes/Directions.unity
+  Image: {fileID: 0}
+  Text: {fileID: 0}
+--- !u!114 &114148720268525084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: WorldScaleAR
+  m_EditorClassIdentifier: 
+  Name: WorldScaleAR
+  ScenePath: Assets/MapboxAR/Examples/Scenes/WorldScaleAR.unity
+  Image: {fileID: 0}
+  Text: {fileID: 0}
+--- !u!114 &114157241326278288
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: Globe
+  m_EditorClassIdentifier: 
+  Name: Globe
+  ScenePath: Assets/Mapbox/Examples/3_Globe/Globe.unity
+  Image: {fileID: 2800000, guid: 31ea88f94a559415194f73d9ae78c4bb, type: 3}
+  Text: {fileID: 0}
+--- !u!114 &114158660581070540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: ReverseGeocoder
+  m_EditorClassIdentifier: 
+  Name: ReverseGeocoder
+  ScenePath: Assets/Mapbox/Examples/5_Playground/Scenes/ReverseGeocoder.unity
+  Image: {fileID: 0}
+  Text: {fileID: 0}
+--- !u!114 &114460662713458228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: CitySimulator
+  m_EditorClassIdentifier: 
+  Name: CitySimulator
+  ScenePath: Assets/Mapbox/Examples/0_PrefabScenes/CitySimulator.unity
+  Image: {fileID: 0}
+  Text: {fileID: 0}
+--- !u!114 &114498764422679708
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: DataExplorer
+  m_EditorClassIdentifier: 
+  Name: DataExplorer
+  ScenePath: Assets/Mapbox/Examples/1_DataExplorer/DataExplorer.unity
+  Image: {fileID: 2800000, guid: 1b7a3200c45d3425bbf8e891123932d8, type: 3}
+  Text: {fileID: 0}
+--- !u!114 &114499470065688132
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -206,7 +161,67 @@ MonoBehaviour:
   ScenePath: Assets/Mapbox/Examples/5_Playground/Scenes/VectorTile.unity
   Image: {fileID: 0}
   Text: {fileID: 0}
---- !u!114 &114911178913298918
+--- !u!114 &114706869570287912
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: ForwardGeocoder
+  m_EditorClassIdentifier: 
+  Name: ForwardGeocoder
+  ScenePath: Assets/Mapbox/Examples/5_Playground/Scenes/ForwardGeocoder.unity
+  Image: {fileID: 0}
+  Text: {fileID: 0}
+--- !u!114 &114854759724035646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: TabletopAR
+  m_EditorClassIdentifier: 
+  Name: TabletopAR
+  ScenePath: Assets/MapboxAR/Examples/Scenes/TabletopAR.unity
+  Image: {fileID: 0}
+  Text: {fileID: 0}
+--- !u!114 &114861251378261416
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: LocationBasedGame
+  m_EditorClassIdentifier: 
+  Name: LocationBasedGame
+  ScenePath: Assets/Mapbox/Examples/0_PrefabScenes/LocationBasedGame.unity
+  Image: {fileID: 0}
+  Text: {fileID: 0}
+--- !u!114 &114896722358723204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: VoxelMap
+  m_EditorClassIdentifier: 
+  Name: VoxelMap
+  ScenePath: Assets/Mapbox/Examples/4_VoxelMap/VoxelMap.unity
+  Image: {fileID: 2800000, guid: 805ed9e7e2bcd4071bd22b135125a912, type: 3}
+  Text: {fileID: 0}
+--- !u!114 &114992998283942706
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -220,19 +235,4 @@ MonoBehaviour:
   Name: ZoomableMap
   ScenePath: Assets/Mapbox/Examples/2_ZoomableMap/ZoomableMap.unity
   Image: {fileID: 2800000, guid: f1321adbaa6e24299bb58ab33ad3adf9, type: 3}
-  Text: {fileID: 0}
---- !u!114 &114974058547396780
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
-  m_Name: CitySimulator
-  m_EditorClassIdentifier: 
-  Name: CitySimulator
-  ScenePath: Assets/Mapbox/Examples/0_PrefabScenes/CitySimulator.unity
-  Image: {fileID: 0}
   Text: {fileID: 0}

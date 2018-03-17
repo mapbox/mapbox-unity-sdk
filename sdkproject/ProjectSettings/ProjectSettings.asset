@@ -161,7 +161,7 @@ PlayerSettings:
     Android: com.mapbox.unitysdk
     Standalone: unity.Mapbox.MBX SDK
     Tizen: com.mapbox.unitysdk
-    iOS: com.mapbox.ARworldScale
+    iOS: com.mapbox.MBX-SDK
     tvOS: com.mapbox.unitysdk
   buildNumber:
     iOS: 1

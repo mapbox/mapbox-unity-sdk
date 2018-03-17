@@ -336,7 +336,7 @@ MonoBehaviour:
     scalingOptions:
       scalingType: 1
       unityTileSize: 100
-    loadingTexture: {fileID: 2800000, guid: e2896a92727704803a9c422b043eae89, type: 3}
+    loadingTexture: {fileID: 0}
   _imagery:
     _layerProperty:
       sourceType: 7
@@ -379,12 +379,12 @@ MonoBehaviour:
         wallMaterial: {fileID: 0}
   _vectorData:
     _layerProperty:
-      sourceType: 2
+      sourceType: 0
       sourceOptions:
         isActive: 1
         layerSource:
           Name: Mapbox Streets
-          Id: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-terrain-v2,mapbox.mapbox-traffic-v1
+          Id: mapbox.3d-buildings,mapbox.mapbox-streets-v7
           Modified: 
           UserName: 
       useOptimizedStyle: 0
@@ -546,9 +546,9 @@ MonoBehaviour:
           texturingType: 0
           materials:
           - Materials:
-            - {fileID: 2100000, guid: d4d7464e3429a44e090f55a4ac17f110, type: 2}
+            - {fileID: 2100000, guid: 1843a50abea6fa448a61d143054f2166, type: 2}
           - Materials:
-            - {fileID: 2100000, guid: 55cc6edead802446b9106b2998406844, type: 2}
+            - {fileID: 2100000, guid: 1843a50abea6fa448a61d143054f2166, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
