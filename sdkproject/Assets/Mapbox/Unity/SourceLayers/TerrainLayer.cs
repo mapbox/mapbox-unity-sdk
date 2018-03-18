@@ -138,10 +138,8 @@
 					}
 					else
 					{
-						Debug.Log("Setting Terrain Factory");
 						_elevationFactory = ScriptableObject.CreateInstance<TerrainFactory>();
 					}
-
 					break;
 				case ElevationLayerType.GlobeTerrain:
 					_elevationFactory = ScriptableObject.CreateInstance<FlatSphereTerrainFactory>();

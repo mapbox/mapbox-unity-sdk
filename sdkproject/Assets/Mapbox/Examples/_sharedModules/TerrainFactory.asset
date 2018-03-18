@@ -11,13 +11,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8338f26893d62c1439f387800a8e1c9a, type: 3}
   m_Name: TerrainFactory
   m_EditorClassIdentifier: 
-  _baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
-  _mapIdType: 0
-  _customMapId: mapbox.terrain-rgb
-  _mapId: mapbox.terrain-rgb
-  _heightModifier: 1
-  _sampleCount: 10
-  _addCollider: 0
-  _addToLayer: 0
-  _layerId: 0
-  _useRelativeHeight: 1
+  _elevationOptions:
+    sourceType: 0
+    sourceOptions:
+      isActive: 1
+      layerSource:
+        Name: 
+        Id: mapbox.terrain-rgb
+        Modified: 
+        UserName: 
+    elevationLayerType: 1
+    requiredOptions:
+      baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
+      addCollider: 0
+      exaggerationFactor: 1
+    modificationOptions:
+      sampleCount: 10
+      useRelativeHeight: 0
+      earthRadius: 1000
+    unityLayerOptions:
+      addToLayer: 0
+      layerId: 0
+    sideWallOptions:
+      isActive: 0
+      wallHeight: 10
+      wallMaterial: {fileID: 0}
