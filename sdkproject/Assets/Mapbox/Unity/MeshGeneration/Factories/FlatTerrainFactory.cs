@@ -9,26 +9,9 @@
 	[CreateAssetMenu(menuName = "Mapbox/Factories/Terrain Factory - Flat")]
 	public class FlatTerrainFactory : AbstractTileFactory
 	{
-		//[SerializeField]
-		//private Material _baseMaterial;
-
-		//[SerializeField]
-		//private bool _createSideWalls = false;
-		//[SerializeField]
-		//private float _sideWallHeight = 10;
-		//[SerializeField]
-		//private Material _sideWallMaterial;
-
-		//[SerializeField]
-		//private bool _addCollider = false;
-
-		//[SerializeField]
-		//private bool _addToLayer = false;
-
-		//[SerializeField]
-		//private int _layerId = 0;
 
 		Mesh _cachedQuad;
+		[SerializeField]
 		ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
 
 		public override void SetOptions(LayerProperties options)

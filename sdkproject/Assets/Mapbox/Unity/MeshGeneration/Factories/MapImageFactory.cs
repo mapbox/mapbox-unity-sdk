@@ -84,6 +84,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				if (tile == null)
 				{
+					Progress--;
 					return;
 				}
 

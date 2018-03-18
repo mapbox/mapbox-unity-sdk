@@ -174,8 +174,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// <summary>
 		/// Creates the non-flat terrain using a height multiplier
 		/// </summary>
-		/// <param name="tile"></param>
-		/// <param name="heightMultiplier">Multiplier for queried height value</param>
+		/// <param name="tile">Tile.</param>
 		private void CreateTerrainHeight(UnityTile tile)
 		{
 			tile.HeightDataState = TilePropertyState.Loading;
@@ -188,6 +187,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				if (tile == null)
 				{
+					Progress--;
 					return;
 				}
 
@@ -226,7 +226,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// Any additional scripts or logic, like MeshCollider or setting layer, can be done here.
 		/// </summary>
 		/// <param name="tile"></param>
-		/// <param name="heightMultiplier">Multiplier for queried height value</param>
 		private void GenerateTerrainMesh(UnityTile tile)
 		{
 			tile.MeshFilter.mesh.GetVertices(_currentTileMeshData.Vertices);
@@ -315,7 +314,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// <summary>
 		/// Checkes all neighbours of the given tile and stitches the edges to achieve a smooth mesh surface.
 		/// </summary>
-		/// <param name="tile"></param>
+		/// <param name="tileId">UnwrappedTileId of the tile being processed.</param>
 		/// <param name="mesh"></param>
 		private void FixStitches(UnwrappedTileId tileId, MeshData mesh)
 		{

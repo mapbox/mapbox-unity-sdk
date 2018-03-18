@@ -54,9 +54,8 @@
 			_properties = (VectorLayerProperties)options;
 		}
 		/// <summary>
-		/// Sets up the Mesh Factory
+		/// Set up sublayers using VectorLayerVisualizers.
 		/// </summary>
-		/// <param name="fs"></param>
 		internal override void OnInitialized()
 		{
 			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
@@ -89,7 +88,6 @@
 			var vectorTile = (_properties.useOptimizedStyle) ? new VectorTile(_properties.optimizedStyle.Id, _properties.optimizedStyle.Modified) : new VectorTile();
 			tile.AddTile(vectorTile);
 
-
 			if (string.IsNullOrEmpty(MapId) || _properties.sourceOptions.isActive == false || _properties.vectorSubLayers.Count == 0)
 			{
 				// Do nothing; 
@@ -102,6 +100,7 @@
 				{
 					if (tile == null)
 					{
+						Progress++;
 						Progress--;
 						return;
 					}
@@ -110,6 +109,7 @@
 					{
 						OnErrorOccurred(new TileErrorEventArgs(tile.CanonicalTileId, vectorTile.GetType(), tile, vectorTile.Exceptions));
 						tile.VectorDataState = TilePropertyState.Error;
+						Progress++;
 						Progress--;
 						return;
 					}
@@ -184,7 +184,6 @@
 		/// Fetches the vector data and passes each layer to relevant layer visualizers
 		/// </summary>
 		/// <param name="tile"></param>
-		/// <param name="e"></param>
 		private void CreateMeshes(UnityTile tile)
 		{
 			tile.OnHeightDataChanged -= DataChangedHandler;
