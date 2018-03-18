@@ -10,23 +10,6 @@
 	[CreateAssetMenu(menuName = "Mapbox/Factories/Terrain Factory - Flat Sphere")]
 	public class FlatSphereTerrainFactory : AbstractTileFactory
 	{
-		//[SerializeField]
-		//private Material _baseMaterial;
-		//[SerializeField]
-		//private float _radius = 1000;
-
-		//[SerializeField]
-		//[Range(2,256)]
-		//int _sampleCount = 20;
-
-		//[SerializeField]
-		//private bool _addCollider = false;
-
-		//[SerializeField]
-		//private bool _addToLayer = false;
-
-		//[SerializeField]
-		//private int _layerId = 0;
 
 		public float Radius
 		{
@@ -35,7 +18,7 @@
 				return _elevationOptions.modificationOptions.earthRadius;
 			}
 		}
-
+		[SerializeField]
 		ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
 		public override void SetOptions(LayerProperties options)
 		{

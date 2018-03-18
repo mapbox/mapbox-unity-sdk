@@ -15,31 +15,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	[CreateAssetMenu(menuName = "Mapbox/Factories/Terrain Factory - Side Walls")]
 	public class TerrainWithSideWallsFactory : AbstractTileFactory
 	{
-		//		[SerializeField]
-		//		private Material _baseMaterial;
-		//		[SerializeField]
-		//		private Material _earthMaterial;
-		//		[SerializeField]
-		//		private MapIdType _mapIdType;
-		//		[SerializeField]
-		//#pragma warning disable 0414
-		//		private string _customMapId = "mapbox.terrain-rgb";
-		//#pragma warning restore 0414
-		//[SerializeField]
-		//public string _mapId = "";
-		//[SerializeField]
-		//private float _heightModifier = 1f;
-		//[SerializeField]
-		//private int _sampleCount = 40;
-		//[SerializeField]
-		//private bool _addCollider = false;
-		//[SerializeField]
-		//private bool _addToLayer = false;
-		//[SerializeField]
-		//private int _layerId = 0;
-		//[SerializeField]
-		//private float _earthDepth = 10;
-
+		[SerializeField]
 		ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
 		Mesh _stitchTarget;
 

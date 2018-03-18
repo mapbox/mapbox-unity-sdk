@@ -21,26 +21,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	[CreateAssetMenu(menuName = "Mapbox/Factories/Image Factory")]
 	public class MapImageFactory : AbstractTileFactory
 	{
-		//[SerializeField]
-		//public ImagerySourceType _mapIdType;
-
-		//[SerializeField]
-		//[StyleSearch]
-		//public Style _customStyle;
-
-		////[SerializeField]
-		////private string _mapId = "";
-
-		//[SerializeField]
-		//public bool _useCompression = true;
-
-		//[SerializeField]
-		//public bool _useMipMap = false;
-
-		//[SerializeField]
-		//public bool _useRetina;
-
-
+		[SerializeField]
 		ImageryLayerProperties _properties;
 
 		public string MapId

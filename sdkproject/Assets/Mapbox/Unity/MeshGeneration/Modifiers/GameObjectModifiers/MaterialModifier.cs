@@ -13,11 +13,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Material Modifier")]
 	public class MaterialModifier : GameObjectModifier
 	{
-		//[SerializeField]
-		//public bool _projectMapImagery;
-		//[SerializeField]
-		//public MaterialList[] _materials;
-
+		[SerializeField]
 		GeometryMaterialOptions _options;
 
 		public override void SetProperties(ModifierProperties properties)

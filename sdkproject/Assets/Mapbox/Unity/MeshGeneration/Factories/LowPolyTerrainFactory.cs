@@ -15,6 +15,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	[CreateAssetMenu(menuName = "Mapbox/Factories/Terrain Factory - Low Poly")]
 	public class LowPolyTerrainFactory : AbstractTileFactory
 	{
+		[SerializeField]
 		ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
 		Mesh _stitchTarget;
 

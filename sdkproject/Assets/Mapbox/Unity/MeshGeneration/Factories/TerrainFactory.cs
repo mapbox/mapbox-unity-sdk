@@ -21,32 +21,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	[CreateAssetMenu(menuName = "Mapbox/Factories/Terrain Factory")]
 	public class TerrainFactory : AbstractTileFactory
 	{
-		//		[SerializeField]
-		//		private Material _baseMaterial = null;
-		//		[SerializeField]
-		//		private MapIdType _mapIdType;
-
-		//		[SerializeField]
-		//#pragma warning disable 0414
-		//		private string _customMapId = "mapbox.terrain-rgb";
-		//#pragma warning restore 0414
-
-		//[SerializeField]
-		//private string _mapId = "";
-		//[SerializeField]
-		//public float _heightModifier = 1f;
-		//[SerializeField]
-		//[Range(2, 256)]
-		//private int _sampleCount = 40;
-		//[SerializeField]
-		//private bool _addCollider = false;
-		//[SerializeField]
-		//private bool _addToLayer = false;
-		//[SerializeField]
-		//private int _layerId = 0;
-		//[SerializeField]
-		//bool _useRelativeHeight = true;
-
+		[SerializeField]
 		ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
 		Mesh _stitchTarget;
 
