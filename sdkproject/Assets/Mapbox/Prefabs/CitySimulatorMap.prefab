@@ -51,6 +51,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd961b1c9541a4cee99686069ecce852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _initializeOnStart: 1
   _options:
     locationOptions:
       latitudeLongitude: 37.784179, -122.401583
@@ -166,6 +167,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: ef118b5e263da4b1fa4327ca1d3e0c7b,
             type: 2}
+        clipFeaturesAtTileBoundary: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
@@ -196,6 +198,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: 8e8afdee0a225a84282f04f2fb89b8b6, type: 2}
           atlasInfo: {fileID: 0}
           colorPallete: {fileID: 0}
+        clipFeaturesAtTileBoundary: 1
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
