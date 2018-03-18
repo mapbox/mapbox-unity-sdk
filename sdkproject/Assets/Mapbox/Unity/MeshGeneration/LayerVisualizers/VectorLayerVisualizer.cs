@@ -19,10 +19,11 @@
 		int _entityInCurrentCoroutine = 0;
 
 		ModifierStackBase _defaultStack;
-		private HashSet<string> _activeIds;
-		private Dictionary<UnityTile, List<string>> _idPool; //necessary to keep _activeIds list up to date when unloading tiles
+		private HashSet<ulong> _activeIds;
+		private Dictionary<UnityTile, List<ulong>> _idPool; //necessary to keep _activeIds list up to date when unloading tiles
 
 		private string _key;
+
 		public override string Key
 		{
 			get { return _layerProperties.coreOptions.layerName; }
@@ -144,8 +145,8 @@
 			base.Initialize();
 			_entityInCurrentCoroutine = 0;
 			_activeCoroutines = new Dictionary<UnityTile, List<int>>();
-			_activeIds = new HashSet<string>();
-			_idPool = new Dictionary<UnityTile, List<string>>();
+			_activeIds = new HashSet<ulong>();
+			_idPool = new Dictionary<UnityTile, List<ulong>>();
 
 			if (_defaultStack != null)
 			{
@@ -194,23 +195,24 @@
 
 			for (int i = 0; i < fc; i++)
 			{
-				var feature = new VectorFeatureUnity(layer.GetFeature(i), tile, layer.Extent);
+
+				var feature = new VectorFeatureUnity(layer.GetFeature(i), tile, layer.Extent, _layerProperties.clipFeaturesAtTileBoundary);
 
 				//skip existing features, only works on tilesets with unique ids
-				if (!string.IsNullOrEmpty(feature.Id) && _activeIds.Contains(feature.Id))
+				if (!_layerProperties.clipFeaturesAtTileBoundary && _activeIds.Contains(feature.Data.Id))
 				{
 					continue;
 				}
 				else
 				{
-					_activeIds.Add(feature.Id);
+					_activeIds.Add(feature.Data.Id);
 					if (!_idPool.ContainsKey(tile))
 					{
-						_idPool.Add(tile, new List<string>());
+						_idPool.Add(tile, new List<ulong>());
 					}
 					else
 					{
-						_idPool[tile].Add(feature.Id);
+						_idPool[tile].Add(feature.Data.Id);
 					}
 				}
 

@@ -167,7 +167,10 @@
 			//EditorGUI.indentLevel++;
 			if (showOthers)
 			{
-				//EditorGUI.indentLevel++;
+				if (primitiveTypeProp == VectorPrimitiveType.Polygon)
+				{
+					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("clipFeaturesAtTileBoundary"), new GUIContent("NEED A NICE NAME PROPERTY - IsClipped"));
+				}
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("filterOptions"), new GUIContent("Filters"));
 				//EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("modifierOptions"), new GUIContent("Modifiers"));
 				DrawModifiers(layerProperty, new GUIContent { text = "Modifier Options", tooltip = "Additional Feature modifiers to apply to the visualizer. " });

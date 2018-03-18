@@ -19,6 +19,7 @@
 		};
 		public GeometryMaterialOptions materialOptions = new GeometryMaterialOptions();
 
+		public bool clipFeaturesAtTileBoundary = true;
 		public PositionTargetType moveFeaturePositionTo;
 		[NodeEditorElement("Mesh Modifiers")]
 		public List<MeshModifier> MeshModifiers;
