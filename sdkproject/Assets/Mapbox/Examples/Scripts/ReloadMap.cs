@@ -38,7 +38,7 @@
 			_camera.transform.position = _cameraStartPos;
 			if (null != response.Features && response.Features.Count > 0)
 			{
-				_map.UpdateMap(response.Features[0].Center, (int)_zoomSlider.value);
+				_map.Initialize(response.Features[0].Center, (int)_zoomSlider.value);
 			}
 		}
 
@@ -56,9 +56,8 @@
 		{
 			yield return _wait;
 			_camera.transform.position = _cameraStartPos;
-			Debug.Log("Update");
-			_map.UpdateMap(_map.CenterLatitudeLongitude, zoom);
+			_map.Initialize(_map.CenterLatitudeLongitude, zoom);
 			_reloadRoutine = null;
 		}
-	}
+}
 }

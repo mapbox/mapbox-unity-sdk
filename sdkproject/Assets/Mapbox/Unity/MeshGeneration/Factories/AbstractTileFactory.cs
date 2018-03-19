@@ -35,15 +35,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		public ModuleState State { get; private set; }
 
-		protected LayerProperties _options;
-		public LayerProperties Options
-		{
-			get
-			{
-				return _options;
-			}
-		}
-
 		private int _progress;
 		protected int Progress
 		{
@@ -73,12 +64,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// Returns a <see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance as a parameter, for the tile on which error occurred.
 		/// </summary>
 		public event EventHandler<TileErrorEventArgs> OnTileError;
-
-		public virtual void SetOptions(LayerProperties options)
-		{
-			_options = options;
-		}
-
 		protected virtual void OnErrorOccurred(TileErrorEventArgs e)
 		{
 			EventHandler<TileErrorEventArgs> handler = OnTileError;

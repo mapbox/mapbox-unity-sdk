@@ -1,16 +1,13 @@
-namespace Mapbox.Unity.Utilities
+using UnityEngine;
+using System.Collections;
+using System;
+
+public class NodeEditorElementAttribute : Attribute
 {
-	using UnityEngine;
-	using System.Collections;
-	using System;
+	public string Name;
 
-	public class NodeEditorElementAttribute : Attribute
+	public NodeEditorElementAttribute(string s)
 	{
-		public string Name;
-
-		public NodeEditorElementAttribute(string s)
-		{
-			Name = s;
-		}
+		Name = s;
 	}
 }

@@ -1,7 +1,7 @@
 ﻿namespace Mapbox.Examples
 {
 	using UnityEngine;
-	using Mapbox.Unity.MeshGeneration.Data;
+	using Mapbox.Unity.MeshGeneration.Components;
 
 	public class FeatureSelectionDetector : MonoBehaviour
 	{

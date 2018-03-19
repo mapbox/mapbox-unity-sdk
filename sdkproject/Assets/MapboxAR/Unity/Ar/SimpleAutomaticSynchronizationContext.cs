@@ -4,10 +4,15 @@
 	using UnityEngine;
 	using Mapbox.Unity.Location;
 	using System;
+	using Mapbox.Unity.Utilities;
 
+#if !UNITY_EDITOR
+	using Mapbox.Unity.Utilities;
+#endif
 
 	public class SimpleAutomaticSynchronizationContext : ISynchronizationContext
 	{
+		bool _isCalibrated;
 		float _rotation;
 		Vector3 _position;
 
@@ -104,11 +109,13 @@
 
 		void ComputeAlignment()
 		{
-			var rotation = Vector3.SignedAngle(_currentAbsoluteGpsVector, _currentArVector, Vector3.up);
+			//var rotation = Vector3.SignedAngle(_currentAbsoluteGpsVector, _currentArVector, Vector3.up);
+			var rotation = _gpsNodes[_count - 1].Heading;
 			var headingQuaternion = Quaternion.Euler(0, rotation, 0);
 			var relativeGpsVector = headingQuaternion * _currentAbsoluteGpsVector;
 
 			_rotation = rotation;
+			_isCalibrated = true;
 
 			var accuracy = _gpsNodes[_count - 1].Accuracy;
 			var delta = _currentArVector - relativeGpsVector;
@@ -128,10 +135,6 @@
 
 			// Add the weighted delta.
 			_position = (delta * bias) + originOffset;
-
-			//_rotation = _gpsNodes[_count - 1].Heading;
-			//_position = _gpsPositions[_count - 1];
-
 
 #if UNITY_EDITOR
 			Debug.LogFormat(

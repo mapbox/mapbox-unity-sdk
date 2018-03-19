@@ -22,7 +22,7 @@
 		AbstractAlignmentStrategy _alignmentStrategy;
 
 		float _lastHeight;
-		float _lastHeading = 0;
+		float _lastHeading;
 
 		public event Action<Alignment> OnAlignmentAvailable = delegate { };
 

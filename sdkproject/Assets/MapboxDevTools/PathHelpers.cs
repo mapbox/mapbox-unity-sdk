@@ -1,4 +1,4 @@
-namespace Mapbox.Unity.Utilities.DebugTools
+﻿namespace Mapbox.Unity.Utilities.DebugTools
 {
 	using UnityEngine;
 	using System.Collections.Generic;
@@ -8,17 +8,12 @@ namespace Mapbox.Unity.Utilities.DebugTools
 	public static class PathHelpers
 	{
 		static readonly string kScenesPath = Path.Combine(Application.dataPath, "Mapbox/Examples");
-		static readonly string arScenesPath = Path.Combine(Application.dataPath, "MapboxAR/Examples");
-
 
 		public static List<string> AllScenes
 		{
 			get
 			{
 				List<FileInfo> files = DirSearch(new DirectoryInfo(kScenesPath), "*.unity");
-				List<FileInfo> arfiles = DirSearch(new DirectoryInfo(arScenesPath), "*.unity");
-				files.AddRange(arfiles);
-
 				List<string> assetRefs = new List<string>();
 				foreach (var fi in files)
 				{
