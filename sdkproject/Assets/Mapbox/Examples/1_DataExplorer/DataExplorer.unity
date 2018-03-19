@@ -399,80 +399,6 @@ MonoBehaviour:
       vectorSubLayers:
       - coreOptions:
           isActive: 1
-          sublayerName: ResidentialBuildings
-          geometryType: 2
-          layerName: building
-          snapToTerrain: 1
-          groupFeatures: 1
-          lineWidth: 1
-        filterOptions:
-          filters:
-          - Key: type
-            PropertyValue: residential
-            Min: 0
-            Max: 0
-            filterOperator: 0
-          combinerType: 0
-        extrusionOptions:
-          extrusionType: 1
-          extrusionGeometryType: 0
-          propertyName: height
-          minimumHeight: 0
-          maximumHeight: 0
-        materialOptions:
-          projectMapImagery: 0
-          texturingType: 3
-          materials:
-          - Materials:
-            - {fileID: 2100000, guid: d4d7464e3429a44e090f55a4ac17f110, type: 2}
-          - Materials:
-            - {fileID: 2100000, guid: 55cc6edead802446b9106b2998406844, type: 2}
-          atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
-          colorPallete: {fileID: 11400000, guid: e1b79d6caac0144adada0c548ef06705,
-            type: 2}
-        clipFeaturesAtTileBoundary: 0
-        moveFeaturePositionTo: 0
-        MeshModifiers: []
-        GoModifiers: []
-      - coreOptions:
-          isActive: 1
-          sublayerName: CommercialBuildings
-          geometryType: 2
-          layerName: building
-          snapToTerrain: 1
-          groupFeatures: 1
-          lineWidth: 1
-        filterOptions:
-          filters:
-          - Key: type
-            PropertyValue: commercial
-            Min: 0
-            Max: 0
-            filterOperator: 0
-          combinerType: 0
-        extrusionOptions:
-          extrusionType: 1
-          extrusionGeometryType: 0
-          propertyName: height
-          minimumHeight: 0
-          maximumHeight: 0
-        materialOptions:
-          projectMapImagery: 0
-          texturingType: 3
-          materials:
-          - Materials:
-            - {fileID: 2100000, guid: d4d7464e3429a44e090f55a4ac17f110, type: 2}
-          - Materials:
-            - {fileID: 2100000, guid: 55cc6edead802446b9106b2998406844, type: 2}
-          atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
-          colorPallete: {fileID: 11400000, guid: e1b79d6caac0144adada0c548ef06705,
-            type: 2}
-        clipFeaturesAtTileBoundary: 0
-        moveFeaturePositionTo: 0
-        MeshModifiers: []
-        GoModifiers: []
-      - coreOptions:
-          isActive: 1
           sublayerName: OtherBuildings
           geometryType: 2
           layerName: building
@@ -480,17 +406,7 @@ MonoBehaviour:
           groupFeatures: 1
           lineWidth: 1
         filterOptions:
-          filters:
-          - Key: type
-            PropertyValue: commercial
-            Min: 0
-            Max: 0
-            filterOperator: 0
-          - Key: type
-            PropertyValue: residential
-            Min: 0
-            Max: 0
-            filterOperator: 0
+          filters: []
           combinerType: 2
         extrusionOptions:
           extrusionType: 1
@@ -2476,13 +2392,13 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1351042186}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9527fd56bc6a0c549a1e550219f9b16e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _panSpeed: 5
-  _zoomSpeed: 20
+  _zoomSpeed: 0
   _referenceCamera: {fileID: 0}
 --- !u!114 &1351042188
 MonoBehaviour:
