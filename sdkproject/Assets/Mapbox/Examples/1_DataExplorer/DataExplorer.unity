@@ -398,7 +398,7 @@ MonoBehaviour:
         entityPerCoroutine: 20
       vectorSubLayers:
       - coreOptions:
-          isActive: 0
+          isActive: 1
           sublayerName: ResidentialBuildings
           geometryType: 2
           layerName: building
@@ -435,7 +435,7 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
       - coreOptions:
-          isActive: 0
+          isActive: 1
           sublayerName: CommercialBuildings
           geometryType: 2
           layerName: building
