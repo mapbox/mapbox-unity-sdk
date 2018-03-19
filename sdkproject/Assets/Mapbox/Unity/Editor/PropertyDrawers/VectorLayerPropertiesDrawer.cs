@@ -91,7 +91,7 @@
 
 				GUILayout.BeginHorizontal();
 
-				if (GUILayout.Button("Add Visualizer"))
+				if (GUILayout.Button(new GUIContent("Add Visualizer"), (GUIStyle)"minibuttonleft"))
 				{
 					subLayerArray.arraySize++;
 					//subLayerArray.InsertArrayElementAtIndex(subLayerArray.arraySize);
@@ -115,7 +115,7 @@
 					subLayerExtrusionOptions.FindPropertyRelative("propertyName").stringValue = "height";
 
 				}
-				if (GUILayout.Button("Remove Selected"))
+				if (GUILayout.Button(new GUIContent("Remove Selected"), (GUIStyle)"minibuttonright"))
 				{
 					foreach (var index in selectedLayers.OrderByDescending(i => i))
 					{

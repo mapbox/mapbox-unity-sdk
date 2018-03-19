@@ -179,8 +179,17 @@ namespace Mapbox.Editor.NodeEditor
 					{
 						if (rect.Contains(e.mousePosition))
 						{
-							//if (!isDragged)
-							//Selection.objects = new UnityEngine.Object[1] { ScriptableObject };
+							if (!isDragged)
+							{
+								if (ScriptableObject is ModifierBase)
+								{
+									Selection.objects = new UnityEngine.Object[1] { (ModifierBase)ScriptableObject };
+								}
+								if (ScriptableObject is AbstractMap)
+								{
+									Selection.objects = new UnityEngine.Object[1] { ((AbstractMap)ScriptableObject).gameObject };
+								}
+							}
 							isDragged = true;
 							GUI.changed = true;
 							isSelected = true;
@@ -250,8 +259,8 @@ namespace Mapbox.Editor.NodeEditor
 				return;
 
 			_isRoot = depth == 0;
-			//if (ScriptableObject is ModifierStackBase)
-			//_expanded = showModifiers;
+			if (ScriptableObject is ModifierStackBase)
+				_expanded = showModifiers;
 
 			foreach (FieldInfo fi in obj.GetType().GetFields().Where(prop => prop.IsDefined(typeof(NodeEditorElementAttribute), false)))
 			{
