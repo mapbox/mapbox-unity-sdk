@@ -14,8 +14,8 @@
 	public class VectorLayerPropertiesDrawer : PropertyDrawer
 	{
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
-		bool showPosition = false;
-		bool showOthers = false;
+		static bool showPosition = false;
+		static bool showOthers = false;
 		VectorSubLayerTreeView layerTreeView = new VectorSubLayerTreeView(new TreeViewState());
 		IList<int> selectedLayers = new List<int>();
 
