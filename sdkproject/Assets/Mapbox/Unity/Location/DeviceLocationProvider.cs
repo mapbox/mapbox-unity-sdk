@@ -90,6 +90,8 @@ namespace Mapbox.Unity.Location
 			if (!Input.location.isEnabledByUser)
 			{
 				Debug.LogError("DeviceLocationProvider: Location is not enabled by user!");
+				_currentLocation.IsLocationServiceEnabled = false;
+				SendLocation(_currentLocation);
 				yield break;
 			}
 
@@ -107,14 +109,21 @@ namespace Mapbox.Unity.Location
 			if (maxWait < 1)
 			{
 				Debug.LogError("DeviceLocationProvider: " + "Timed out trying to initialize location services!");
+				_currentLocation.IsLocationServiceEnabled = false;
+				SendLocation(_currentLocation);
 				yield break;
 			}
 
 			if (Input.location.status == LocationServiceStatus.Failed)
 			{
 				Debug.LogError("DeviceLocationProvider: " + "Failed to initialize location services!");
+				_currentLocation.IsLocationServiceEnabled = false;
+				SendLocation(_currentLocation);
 				yield break;
 			}
+
+			_currentLocation.IsLocationServiceEnabled = true;
+
 
 #if UNITY_EDITOR
 			// HACK: this is to prevent Android devices, connected through Unity Remote, 
@@ -122,32 +131,9 @@ namespace Mapbox.Unity.Location
 			yield return _wait1sec;
 #endif
 
-			// some devices seem to provide the last known location till a current location  becomes available
-			// wait a certain amount of time or continue if an updated location is available
-			float waitTimeForInitialLocation = 20f; //seconds
-			float initalWaitStartTime = Time.realtimeSinceStartup;
-			bool gotUptodateLocation = false;
-
-			while (
-				initalWaitStartTime + waitTimeForInitialLocation > Time.realtimeSinceStartup
-				&& !gotUptodateLocation
-				)
-			{
-				System.DateTime dtGPS = UnixTimestampUtils.From(Input.location.lastData.timestamp);
-				System.DateTime dtNow = System.DateTime.UtcNow;
-				// delta to take into account that GPS and device time migt not be in sync
-				if (System.Math.Abs(dtGPS.Subtract(dtNow).Minutes) < 5)
-				{
-					gotUptodateLocation = true;
-				}
-
-				yield return null;
-			}
-
-
 
 			float gpsInitializedTime = Time.realtimeSinceStartup;
-			// initially pass through all GPS locations
+			// initially pass through all locations that come available
 			float gpsWarmupTime = 120f; //seconds
 			System.Globalization.CultureInfo invariantCulture = System.Globalization.CultureInfo.InvariantCulture;
 
