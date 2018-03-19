@@ -96,6 +96,7 @@ namespace Mapbox.Unity.Location
 			}
 
 
+			_currentLocation.IsLocationServiceInitializing = true;
 			Input.location.Start(_desiredAccuracyInMeters, _updateDistanceInMeters);
 			Input.compass.enabled = true;
 
@@ -109,6 +110,7 @@ namespace Mapbox.Unity.Location
 			if (maxWait < 1)
 			{
 				Debug.LogError("DeviceLocationProvider: " + "Timed out trying to initialize location services!");
+				_currentLocation.IsLocationServiceInitializing = false;
 				_currentLocation.IsLocationServiceEnabled = false;
 				SendLocation(_currentLocation);
 				yield break;
@@ -117,13 +119,14 @@ namespace Mapbox.Unity.Location
 			if (Input.location.status == LocationServiceStatus.Failed)
 			{
 				Debug.LogError("DeviceLocationProvider: " + "Failed to initialize location services!");
+				_currentLocation.IsLocationServiceInitializing = false;
 				_currentLocation.IsLocationServiceEnabled = false;
 				SendLocation(_currentLocation);
 				yield break;
 			}
 
+			_currentLocation.IsLocationServiceInitializing = false;
 			_currentLocation.IsLocationServiceEnabled = true;
-
 
 #if UNITY_EDITOR
 			// HACK: this is to prevent Android devices, connected through Unity Remote, 
@@ -139,6 +142,8 @@ namespace Mapbox.Unity.Location
 
 			while (true)
 			{
+				_currentLocation.IsLocationServiceEnabled = true;
+
 				_currentLocation.IsHeadingUpdated = false;
 				_currentLocation.IsLocationUpdated = false;
 
