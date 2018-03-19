@@ -63,9 +63,11 @@ namespace Mapbox.Unity.Location
 				if (_mapInitialized)
 				{
 					var startingLatLong = Conversions.StringToLatLon(_latitudeLongitude);
-					var position = Conversions.GeoToWorldPosition(startingLatLong,
-																 _map.CenterMercator,
-																 _map.WorldRelativeScale).ToVector3xz();
+					var position = Conversions.GeoToWorldPosition(
+						startingLatLong,
+						_map.CenterMercator,
+						_map.WorldRelativeScale
+					).ToVector3xz();
 					position += _targetTransform.position;
 					return position.GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
 				}
@@ -82,6 +84,7 @@ namespace Mapbox.Unity.Location
 			_currentLocation.Timestamp = UnixTimestampUtils.To(DateTime.UtcNow);
 			_currentLocation.IsLocationUpdated = true;
 			_currentLocation.IsHeadingUpdated = true;
+			_currentLocation.IsLocationServiceEnabled = true;
 		}
 	}
 }
