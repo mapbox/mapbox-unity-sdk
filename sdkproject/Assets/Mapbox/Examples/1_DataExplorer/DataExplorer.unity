@@ -399,98 +399,14 @@ MonoBehaviour:
       vectorSubLayers:
       - coreOptions:
           isActive: 1
-          sublayerName: ResidentialBuildings
+          sublayerName: Buildings
           geometryType: 2
           layerName: building
           snapToTerrain: 1
           groupFeatures: 1
           lineWidth: 1
         filterOptions:
-          filters:
-          - Key: type
-            PropertyValue: residential
-            Min: 0
-            Max: 0
-            filterOperator: 0
-          combinerType: 0
-        extrusionOptions:
-          extrusionType: 1
-          extrusionGeometryType: 0
-          propertyName: height
-          minimumHeight: 0
-          maximumHeight: 0
-        materialOptions:
-          projectMapImagery: 0
-          texturingType: 3
-          materials:
-          - Materials:
-            - {fileID: 2100000, guid: d4d7464e3429a44e090f55a4ac17f110, type: 2}
-          - Materials:
-            - {fileID: 2100000, guid: 55cc6edead802446b9106b2998406844, type: 2}
-          atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
-          colorPallete: {fileID: 11400000, guid: e1b79d6caac0144adada0c548ef06705,
-            type: 2}
-        clipFeaturesAtTileBoundary: 0
-        moveFeaturePositionTo: 0
-        MeshModifiers: []
-        GoModifiers: []
-      - coreOptions:
-          isActive: 1
-          sublayerName: CommercialBuildings
-          geometryType: 2
-          layerName: building
-          snapToTerrain: 1
-          groupFeatures: 1
-          lineWidth: 1
-        filterOptions:
-          filters:
-          - Key: type
-            PropertyValue: commercial
-            Min: 0
-            Max: 0
-            filterOperator: 0
-          combinerType: 0
-        extrusionOptions:
-          extrusionType: 1
-          extrusionGeometryType: 0
-          propertyName: height
-          minimumHeight: 0
-          maximumHeight: 0
-        materialOptions:
-          projectMapImagery: 0
-          texturingType: 3
-          materials:
-          - Materials:
-            - {fileID: 2100000, guid: d4d7464e3429a44e090f55a4ac17f110, type: 2}
-          - Materials:
-            - {fileID: 2100000, guid: 55cc6edead802446b9106b2998406844, type: 2}
-          atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
-          colorPallete: {fileID: 11400000, guid: e1b79d6caac0144adada0c548ef06705,
-            type: 2}
-        clipFeaturesAtTileBoundary: 0
-        moveFeaturePositionTo: 0
-        MeshModifiers: []
-        GoModifiers: []
-      - coreOptions:
-          isActive: 1
-          sublayerName: OtherBuildings
-          geometryType: 2
-          layerName: building
-          snapToTerrain: 1
-          groupFeatures: 1
-          lineWidth: 1
-        filterOptions:
-          filters:
-          - Key: type
-            PropertyValue: commercial
-            Min: 0
-            Max: 0
-            filterOperator: 0
-          - Key: type
-            PropertyValue: residential
-            Min: 0
-            Max: 0
-            filterOperator: 0
+          filters: []
           combinerType: 2
         extrusionOptions:
           extrusionType: 1
@@ -2482,8 +2398,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _panSpeed: 5
-  _zoomSpeed: 20
-  _referenceCamera: {fileID: 0}
+  _zoomSpeed: 0
+  _referenceCamera: {fileID: 1351042193}
 --- !u!114 &1351042188
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2732,7 +2648,7 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0.000000059604645
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -2762,7 +2678,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -97.676285
+      value: -98.06799
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -2772,12 +2688,12 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 175.35257
+      value: 176.13599
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 196.13599
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
