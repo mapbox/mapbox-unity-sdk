@@ -40,6 +40,11 @@
 		public int Accuracy;
 
 		/// <summary>
+		/// Has the location service been enabled by the user?
+		/// </summary>
+		public bool IsLocationServiceEnabled;
+
+		/// <summary>
 		/// Has the location changed since last update?
 		/// </summary>
 		public bool IsLocationUpdated;
