@@ -36,14 +36,29 @@ namespace Mapbox.Unity.Location
 
 		WaitForSeconds _wait1sec;
 
+
+		// Android 6+ permissions have to be granted during runtime
+		// these are the callbacks for requesting location permission
+		// TODO: show message to users in case they accidentallly denied permission
+#if UNITY_ANDROID
+		private bool _gotPermissionRequestResponse = false;
+
+		private void OnAllow() { _gotPermissionRequestResponse = true; }
+		private void OnDeny() { _gotPermissionRequestResponse = true; }
+		private void OnDenyAndNeverAskAgain() { _gotPermissionRequestResponse = true; }
+#endif
+
+
 		void Awake()
 		{
 			_wait1sec = new WaitForSeconds(1f);
+
 			if (_pollRoutine == null)
 			{
 				_pollRoutine = StartCoroutine(PollLocationRoutine());
 			}
 		}
+
 
 		/// <summary>
 		/// Enable location and compass services.
@@ -59,12 +74,29 @@ namespace Mapbox.Unity.Location
 				yield return null;
 			}
 #endif
+
+
+			//request runtime fine location permission on Android if not yet allowed
+#if UNITY_ANDROID
 			if (!Input.location.isEnabledByUser)
 			{
-				Debug.LogError("DeviceLocationProvider: " + "Location is not enabled by user!");
+				UniAndroidPermission.RequestPermission(AndroidPermission.ACCESS_FINE_LOCATION);
+				//wait for user to allow or deny
+				while (!_gotPermissionRequestResponse) { yield return _wait1sec; }
+			}
+#endif
+
+
+			if (!Input.location.isEnabledByUser)
+			{
+				Debug.LogError("DeviceLocationProvider: Location is not enabled by user!");
+				_currentLocation.IsLocationServiceEnabled = false;
+				SendLocation(_currentLocation);
 				yield break;
 			}
 
+
+			_currentLocation.IsLocationServiceInitializing = true;
 			Input.location.Start(_desiredAccuracyInMeters, _updateDistanceInMeters);
 			Input.compass.enabled = true;
 
@@ -78,14 +110,23 @@ namespace Mapbox.Unity.Location
 			if (maxWait < 1)
 			{
 				Debug.LogError("DeviceLocationProvider: " + "Timed out trying to initialize location services!");
+				_currentLocation.IsLocationServiceInitializing = false;
+				_currentLocation.IsLocationServiceEnabled = false;
+				SendLocation(_currentLocation);
 				yield break;
 			}
 
 			if (Input.location.status == LocationServiceStatus.Failed)
 			{
 				Debug.LogError("DeviceLocationProvider: " + "Failed to initialize location services!");
+				_currentLocation.IsLocationServiceInitializing = false;
+				_currentLocation.IsLocationServiceEnabled = false;
+				SendLocation(_currentLocation);
 				yield break;
 			}
+
+			_currentLocation.IsLocationServiceInitializing = false;
+			_currentLocation.IsLocationServiceEnabled = true;
 
 #if UNITY_EDITOR
 			// HACK: this is to prevent Android devices, connected through Unity Remote, 
@@ -93,17 +134,24 @@ namespace Mapbox.Unity.Location
 			yield return _wait1sec;
 #endif
 
+
 			float gpsInitializedTime = Time.realtimeSinceStartup;
-			// initially pass through all GPS locations
-			float gpsWarmupTime = 60f;
+			// initially pass through all locations that come available
+			float gpsWarmupTime = 120f; //seconds
+			System.Globalization.CultureInfo invariantCulture = System.Globalization.CultureInfo.InvariantCulture;
 
 			while (true)
 			{
+				_currentLocation.IsLocationServiceEnabled = true;
+
 				_currentLocation.IsHeadingUpdated = false;
 				_currentLocation.IsLocationUpdated = false;
 
 				var timestamp = Input.compass.timestamp;
-				if (Input.compass.enabled && timestamp > _lastHeadingTimestamp)
+				if (
+					Input.compass.enabled && timestamp > _lastHeadingTimestamp
+					|| Time.realtimeSinceStartup < gpsInitializedTime + gpsWarmupTime
+				)
 				{
 					var heading = Input.compass.trueHeading;
 					_currentLocation.Heading = heading;
@@ -116,15 +164,21 @@ namespace Mapbox.Unity.Location
 
 				var lastData = Input.location.lastData;
 				timestamp = lastData.timestamp;
-				Debug.LogFormat("{0:yyyyMMdd HHmmss} {1} {2:R} {3:R}", UnixTimestampUtils.From(timestamp), lastData.horizontalAccuracy, lastData.latitude, lastData.longitude);
+				//Debug.LogFormat("{0:yyyyMMdd-HHmmss} acc:{1:0.00} {2} / {3}", UnixTimestampUtils.From(timestamp), lastData.horizontalAccuracy, lastData.latitude, lastData.longitude);
 
-				if (//1!=2 ||
+				if (
 					(Input.location.status == LocationServiceStatus.Running && timestamp > _lastLocationTimestamp)
 					|| Time.realtimeSinceStartup < gpsInitializedTime + gpsWarmupTime
 				)
 				{
-					_currentLocation.LatitudeLongitude = new Vector2d(lastData.latitude, lastData.longitude);
-					_currentLocation.Accuracy = (int)lastData.horizontalAccuracy;
+					//_currentLocation.LatitudeLongitude = new Vector2d(lastData.latitude, lastData.longitude);
+					// HACK to get back to double precision, does this even work?
+					// https://forum.unity.com/threads/precision-of-location-longitude-is-worse-when-longitude-is-beyond-100-degrees.133192/#post-1835164
+					double latitude = double.Parse(lastData.latitude.ToString("R", invariantCulture), invariantCulture);
+					double longitude = double.Parse(lastData.longitude.ToString("R", invariantCulture), invariantCulture);
+					_currentLocation.LatitudeLongitude = new Vector2d(latitude, longitude);
+
+					_currentLocation.Accuracy = (int)System.Math.Floor(lastData.horizontalAccuracy);
 					_currentLocation.Timestamp = timestamp;
 					_lastLocationTimestamp = timestamp;
 
@@ -139,10 +193,7 @@ namespace Mapbox.Unity.Location
 					}
 				}
 
-				// throttle pulling location data
-				// some Android devices show higher than actual accuracy values when not throttling
-				yield return _wait1sec;
-				//yield return null;
+				yield return null;
 			}
 		}
 	}

@@ -3,27 +3,20 @@
 	using UnityEngine;
 	using UnityEditor;
 	using Mapbox.Unity.MeshGeneration.Factories;
+	using Mapbox.Unity.Map;
 
 	[CustomEditor(typeof(FlatSphereTerrainFactory))]
 	public class FlatSphereTerrainFactoryEditor : FactoryEditor
 	{
-		public SerializedProperty
-			material_Prop,
-			collider_Prop,
-			addLayer_Prop,
-			radius_Prop,
-			sample_Prop,
-			layerId_Prop;
+		public SerializedProperty layerProperties;
+
 		private MonoScript script;
 
 		void OnEnable()
 		{
-			material_Prop = serializedObject.FindProperty("_baseMaterial");
-			collider_Prop = serializedObject.FindProperty("_addCollider");
-			addLayer_Prop = serializedObject.FindProperty("_addToLayer");
-			layerId_Prop = serializedObject.FindProperty("_layerId");
-			radius_Prop = serializedObject.FindProperty("_radius");
-			sample_Prop = serializedObject.FindProperty("_sampleCount");
+			layerProperties = serializedObject.FindProperty("_elevationOptions");
+			var terrainType = layerProperties.FindPropertyRelative("elevationLayerType");
+			terrainType.enumValueIndex = (int)ElevationLayerType.GlobeTerrain;
 
 			script = MonoScript.FromScriptableObject((FlatSphereTerrainFactory)target);
 		}
@@ -36,22 +29,8 @@
 			script = EditorGUILayout.ObjectField("Script", script, typeof(MonoScript), false) as MonoScript;
 			GUI.enabled = true;
 			EditorGUILayout.Space();
+			EditorGUILayout.PropertyField(layerProperties);
 			EditorGUILayout.Space();
-			radius_Prop.floatValue = EditorGUILayout.FloatField("Earth Radius", radius_Prop.floatValue);
-			EditorGUILayout.BeginHorizontal();
-			EditorGUILayout.PropertyField(sample_Prop, new GUIContent("Resolution"));
-			EditorGUILayout.LabelField("x  " + sample_Prop.intValue);
-			EditorGUILayout.EndHorizontal();
-			EditorGUILayout.Space();
-			EditorGUILayout.PropertyField(material_Prop, new GUIContent("Material"));
-
-			EditorGUILayout.Space();
-			collider_Prop.boolValue = EditorGUILayout.Toggle("Add Collider", collider_Prop.boolValue);
-			addLayer_Prop.boolValue = EditorGUILayout.Toggle("Add To Layer", addLayer_Prop.boolValue);
-			if (addLayer_Prop.boolValue)
-			{
-				layerId_Prop.intValue = EditorGUILayout.LayerField("Layer", layerId_Prop.intValue);
-			}
 
 			serializedObject.ApplyModifiedProperties();
 		}

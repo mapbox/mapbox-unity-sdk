@@ -10,108 +10,33 @@
 
 	public class QuadTreeTileProvider : AbstractTileProvider
 	{
-		[SerializeField]
-		Camera _camera;
-
-
-		[SerializeField]
-		float _updateInterval;
 		Plane _groundPlane;
 		float _elapsedTime;
 		bool _shouldUpdate;
 
-		protected float _zoomRange;
-		public float ZoomRange
-		{
-			get
-			{
-				return _zoomRange;
-			}
-		}
-
-		public void SetZoomRange(float zoom)
-		{
-			_zoomRange = zoom;
-		}
-
-		protected Vector2d _panRange;
-		public Vector2d PanRange
-		{
-			get { return _panRange; }
-		}
-
-		public void SetPanRange(Vector2d pan, bool reset = false)
-		{
-			if (reset)
-			{
-				_mapPanned = false;
-				_panRange = Vector2d.zero;
-			}
-			else
-			{
-				_mapPanned = true;
-				_panRange = pan;
-			}
-		}
-
-		protected bool _mapPanned;
-		public bool MapPanned
-		{
-			get { return _mapPanned; }
-		}
+		CameraBoundsTileProviderOptions _cbtpOptions;
 
 		public override void OnInitialized()
 		{
+			_cbtpOptions = (CameraBoundsTileProviderOptions)_options;
+			if (_cbtpOptions.camera == null)
+			{
+				_cbtpOptions.camera = Camera.main;
+			}
 			_groundPlane = new Plane(Vector3.up, 0);
 			_shouldUpdate = true;
-			_zoomRange = _map.Zoom;
-			_map.SetCenterMercator(Conversions.LatLonToMeters(_map.CenterLatitudeLongitude));
-		}
-
-		public void UpdateMapProperties(Vector2d centerLatitudeLongitude, float zoom)
-		{
-			if (_shouldUpdate)
-			{
-				float differenceInZoom = 0.0f;
-				SetZoomRange(zoom);
-				if (Math.Abs(_map.Zoom - ZoomRange) > Constants.EpsilonFloatingPoint)
-				{
-					_map.SetZoom(zoom);
-					differenceInZoom = _map.Zoom - _map.InitialZoom;
-				}
-
-				//Update center latitude longitude
-				double xDelta = centerLatitudeLongitude.x;
-				double zDelta = centerLatitudeLongitude.y;
-
-				xDelta = xDelta > 0 ? Mathd.Min(xDelta, Mapbox.Utils.Constants.LatitudeMax) : Mathd.Max(xDelta, -Mapbox.Utils.Constants.LatitudeMax);
-				zDelta = zDelta > 0 ? Mathd.Min(zDelta, Mapbox.Utils.Constants.LongitudeMax) : Mathd.Max(zDelta, -Mapbox.Utils.Constants.LongitudeMax);
-
-				//Set Center in Latitude Longitude and Mercator. 
-				_map.SetCenterLatitudeLongitude(new Vector2d(xDelta, zDelta));
-				_map.SetCenterMercator(Conversions.LatLonToMeters(_map.CenterLatitudeLongitude));
-				// Update the center based on current zoom level.
-				var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(new Vector2d(xDelta, zDelta), _map.AbsoluteZoom));
-
-				_map.SetWorldRelativeScale((float)(_map.UnityTileSize / referenceTileRect.Size.x));
-				//Scale the map accordingly.
-				if (Math.Abs(differenceInZoom) > Constants.EpsilonFloatingPoint)
-				{
-					_map.Root.localScale = Vector3.one * Mathf.Pow(2, differenceInZoom);
-				}
-			}
 		}
 
 		void Update()
 		{
-			////Camera Debugging
+			//Camera Debugging
 			//Vector3[] frustumCorners = new Vector3[4];
-			//_camera.CalculateFrustumCorners(new Rect(0, 0, 1, 1), _camera.transform.position.y, Camera.MonoOrStereoscopicEye.Mono, frustumCorners);
+			//_cbtpOptions.camera.CalculateFrustumCorners(new Rect(0, 0, 1, 1), _cbtpOptions.camera.transform.position.y, Camera.MonoOrStereoscopicEye.Mono, frustumCorners);
 
 			//for (int i = 0; i < 4; i++)
 			//{
-			//	var worldSpaceCorner = _camera.transform.TransformVector(frustumCorners[i]);
-			//	Debug.DrawRay(_camera.transform.position, worldSpaceCorner, Color.blue);
+			//	var worldSpaceCorner = _cbtpOptions.camera.transform.TransformVector(frustumCorners[i]);
+			//	Debug.DrawRay(_cbtpOptions.camera.transform.position, worldSpaceCorner, Color.blue);
 			//}
 
 			if (!_shouldUpdate)
@@ -121,7 +46,7 @@
 
 			_elapsedTime += Time.deltaTime;
 
-			if (_elapsedTime >= _updateInterval)
+			if (_elapsedTime >= _cbtpOptions.updateInterval)
 			{
 				_elapsedTime = 0f;
 
@@ -155,10 +80,10 @@
 			if (useGroundPlane)
 			{
 				// rays from camera to groundplane: lower left and upper right
-				Ray ray00 = _camera.ViewportPointToRay(new Vector3(0, 0));
-				Ray ray01 = _camera.ViewportPointToRay(new Vector3(0, 1));
-				Ray ray10 = _camera.ViewportPointToRay(new Vector3(1, 0));
-				Ray ray11 = _camera.ViewportPointToRay(new Vector3(1, 1));
+				Ray ray00 = _cbtpOptions.camera.ViewportPointToRay(new Vector3(0, 0));
+				Ray ray01 = _cbtpOptions.camera.ViewportPointToRay(new Vector3(0, 1));
+				Ray ray10 = _cbtpOptions.camera.ViewportPointToRay(new Vector3(1, 0));
+				Ray ray11 = _cbtpOptions.camera.ViewportPointToRay(new Vector3(1, 1));
 				hitPnt[0] = getGroundPlaneHitPoint(ray00);
 				hitPnt[1] = getGroundPlaneHitPoint(ray01);
 				hitPnt[2] = getGroundPlaneHitPoint(ray10);
@@ -205,8 +130,8 @@
 			Vector2dBounds tileBounds = new Vector2dBounds(Conversions.LatLonToMeters(llLatLong), Conversions.LatLonToMeters(urLatLong));
 
 			// Bounds debugging. 
-			Debug.DrawLine(_camera.transform.position, hitPntLL, Color.blue);
-			Debug.DrawLine(_camera.transform.position, hitPntUR, Color.red);
+			Debug.DrawLine(_cbtpOptions.camera.transform.position, hitPntLL, Color.blue);
+			Debug.DrawLine(_cbtpOptions.camera.transform.position, hitPntUR, Color.red);
 			return tileBounds;
 		}
 		private Vector3 getGroundPlaneHitPoint(Ray ray)

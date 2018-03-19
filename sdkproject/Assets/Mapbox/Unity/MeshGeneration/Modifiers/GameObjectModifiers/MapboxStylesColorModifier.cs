@@ -1,59 +1,64 @@
 ﻿namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
-    using Mapbox.Unity.MeshGeneration.Data;
-    using UnityEngine.Assertions;
-    using UnityEngine;
+	using Mapbox.Unity.MeshGeneration.Data;
+	using UnityEngine.Assertions;
+	using UnityEngine;
 
-    public class MapboxStylesColorModifier : GameObjectModifier
-    {
+	public class MapboxStylesColorModifier : GameObjectModifier
+	{
 
-        public ScriptablePalette m_scriptablePalette;
+		public ScriptablePalette m_scriptablePalette;
 
-        private const string _BASE_COLOR_NAME = "_BaseColor";
-        private const string _DETAIL_ONE_COLOR_NAME = "_DetailColor1";
-        private const string _DETAIL_TWO_COLOR_NAME = "_DetailColor2";
+		private const string _BASE_COLOR_NAME = "_BaseColor";
+		private const string _DETAIL_ONE_COLOR_NAME = "_DetailColor1";
+		private const string _DETAIL_TWO_COLOR_NAME = "_DetailColor2";
 
-        private int _baseColorId;
-        private int _detailOneColorId;
-        private int _detailTWoColorId;
+		private int _baseColorId;
+		private int _detailOneColorId;
+		private int _detailTWoColorId;
 
-        public override void Initialize()
-        {
-            Assert.IsNotNull(m_scriptablePalette, "No scriptable palette assigned.");
-            Assert.IsTrue(m_scriptablePalette.m_colors.Length > 0, "No color palette defined in scriptable palette.");
+		public override void Initialize()
+		{
+			if (m_scriptablePalette == null)
+			{
+				return;
+			}
 
-            _baseColorId = Shader.PropertyToID(_BASE_COLOR_NAME);
-            _detailOneColorId = Shader.PropertyToID(_DETAIL_ONE_COLOR_NAME);
-            _detailTWoColorId = Shader.PropertyToID(_DETAIL_TWO_COLOR_NAME);
-        }
+			_baseColorId = Shader.PropertyToID(_BASE_COLOR_NAME);
+			_detailOneColorId = Shader.PropertyToID(_DETAIL_ONE_COLOR_NAME);
+			_detailTWoColorId = Shader.PropertyToID(_DETAIL_TWO_COLOR_NAME);
+		}
 
-        private Color GetRandomColorFromPalette()
-        {
-            Color color = Color.white;
-            if (m_scriptablePalette.m_colors.Length > 0)
-            {
-                color = m_scriptablePalette.m_colors[Random.Range(0, m_scriptablePalette.m_colors.Length)];
-            }
-            return color;
-        }
+		private Color GetRandomColorFromPalette()
+		{
+			Color color = Color.white;
+			if (m_scriptablePalette.m_colors.Length > 0)
+			{
+				color = m_scriptablePalette.m_colors[Random.Range(0, m_scriptablePalette.m_colors.Length)];
+			}
+			return color;
+		}
 
-        public override void Run(VectorEntity ve, UnityTile tile)
-        {
-            MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+		public override void Run(VectorEntity ve, UnityTile tile)
+		{
+			if (m_scriptablePalette == null)
+			{
+				return;
+			}
 
-            ve.MeshRenderer.GetPropertyBlock(propBlock);
+			MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
 
-            Color[] colors = m_scriptablePalette.m_colors;
+			ve.MeshRenderer.GetPropertyBlock(propBlock);
 
-            Color baseColor = (m_scriptablePalette.m_setBaseColor_Override) ? m_scriptablePalette.m_baseColor_Override : GetRandomColorFromPalette();
-            Color detailColor1 = (m_scriptablePalette.m_setDetailColor1_Override) ? m_scriptablePalette.m_detailColor1_Override : GetRandomColorFromPalette();
-            Color detailColor2 = (m_scriptablePalette.m_setDetailColor2_Override) ? m_scriptablePalette.m_detailColor2_Override : GetRandomColorFromPalette();
+			Color baseColor = (m_scriptablePalette.m_setBaseColor_Override) ? m_scriptablePalette.m_baseColor_Override : GetRandomColorFromPalette();
+			Color detailColor1 = (m_scriptablePalette.m_setDetailColor1_Override) ? m_scriptablePalette.m_detailColor1_Override : GetRandomColorFromPalette();
+			Color detailColor2 = (m_scriptablePalette.m_setDetailColor2_Override) ? m_scriptablePalette.m_detailColor2_Override : GetRandomColorFromPalette();
 
-            propBlock.SetColor(_baseColorId, baseColor);
-            propBlock.SetColor(_detailOneColorId, detailColor1);
-            propBlock.SetColor(_detailTWoColorId, detailColor2);
+			propBlock.SetColor(_baseColorId, baseColor);
+			propBlock.SetColor(_detailOneColorId, detailColor1);
+			propBlock.SetColor(_detailTWoColorId, detailColor2);
 
-            ve.MeshRenderer.SetPropertyBlock(propBlock);
-        }
-    }
+			ve.MeshRenderer.SetPropertyBlock(propBlock);
+		}
+	}
 }

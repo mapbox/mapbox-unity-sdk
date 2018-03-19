@@ -40,16 +40,18 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				if (settable != null)
 				{
 					go = (settable as MonoBehaviour).gameObject;
-					go.name = ve.Feature.Data.Id.ToString();
-					go.transform.localPosition = met;
-					go.transform.localScale = Constants.Math.Vector3One;
 					settable.Set(ve.Feature.Properties);
-					if (!_scaleDownWithWorld)
-					{
-						go.transform.localScale = Vector3.one / tile.TileScale;
-					}
-					return;
 				}
+				// set gameObject transform
+				go.name = ve.Feature.Data.Id.ToString();
+				go.transform.localPosition = met;
+				go.transform.localScale = Constants.Math.Vector3One;
+
+				if (!_scaleDownWithWorld)
+				{
+					go.transform.localScale = Vector3.one / tile.TileScale;
+				}
+				return;
 			}
 			else
 			{

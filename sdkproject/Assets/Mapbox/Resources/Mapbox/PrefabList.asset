@@ -1,0 +1,93 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c331d4375e95e4050aadbf5ed3492bba, type: 3}
+  m_Name: PrefabList
+  m_EditorClassIdentifier: 
+  SceneList:
+  - {fileID: 114700025974298426}
+  - {fileID: 114727026839306020}
+  - {fileID: 114308819730444958}
+  - {fileID: 114247311498626294}
+--- !u!114 &114128613080724838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: ManualWorldSynchronization
+  m_EditorClassIdentifier: 
+  Name: ManualWorldSynchronization
+  ScenePath: Assets/MapboxAR/Examples/Scenes/ManualWorldSynchronization.unity
+  Image: {fileID: 2800000, guid: ef67c027bc2d14df2b999b22b8ca13cb, type: 3}
+  Text: {fileID: 0}
+--- !u!114 &114247311498626294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: AutomaticWorldSynchronization
+  m_EditorClassIdentifier: 
+  Name: WorldScaleAR
+  ScenePath: Assets/MapboxAR/Examples/Scenes/WorldScaleAR.unity
+  Image: {fileID: 2800000, guid: 544693615a8f3459c94a0a5a8930a702, type: 3}
+  Text: {fileID: 0}
+--- !u!114 &114308819730444958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: ARTabletopScene
+  m_EditorClassIdentifier: 
+  Name: TabletopAR
+  ScenePath: Assets/MapboxAR/Examples/Scenes/TabletopAR.unity
+  Image: {fileID: 2800000, guid: e96036a81f146439cb33587e192539c7, type: 3}
+  Text: {fileID: 0}
+--- !u!114 &114700025974298426
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: LocationBasedGame
+  m_EditorClassIdentifier: 
+  Name: Location Based Game
+  ScenePath: Assets/Mapbox/Examples/0_PrefabScenes/LocationBasedGame.unity
+  Image: {fileID: 2800000, guid: 5b405ed49599a452bb91b1492ee0a328, type: 3}
+  Text: {fileID: 0}
+--- !u!114 &114727026839306020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: CitySimulator
+  m_EditorClassIdentifier: 
+  Name: City Simulator
+  ScenePath: Assets/Mapbox/Examples/0_PrefabScenes/CitySimulator.unity
+  Image: {fileID: 2800000, guid: 53e90d032a2624ab1801469b8ce804e4, type: 3}
+  Text: {fileID: 0}

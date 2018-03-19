@@ -5,35 +5,24 @@
 	using Mapbox.Unity.Utilities;
 	using System.Collections.Generic;
 	using Mapbox.Utils;
-	using Mapbox.Map;
+	using Mapbox.Unity.Map;
 
 	[CreateAssetMenu(menuName = "Mapbox/Factories/Terrain Factory - Flat Sphere")]
 	public class FlatSphereTerrainFactory : AbstractTileFactory
 	{
-		[SerializeField]
-		private Material _baseMaterial;
-		[SerializeField]
-		private float _radius;
-
-		[SerializeField]
-		[Range(2,256)]
-		int _sampleCount;
-
-		[SerializeField]
-		private bool _addCollider = false;
-
-		[SerializeField]
-		private bool _addToLayer = false;
-
-		[SerializeField]
-		private int _layerId = 0;
 
 		public float Radius
 		{
 			get
 			{
-				return _radius;
+				return _elevationOptions.modificationOptions.earthRadius;
 			}
+		}
+		[SerializeField]
+		ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
+		public override void SetOptions(LayerProperties options)
+		{
+			_elevationOptions = (ElevationLayerProperties)options;
 		}
 
 		internal override void OnInitialized()
@@ -43,15 +32,15 @@
 
 		internal override void OnRegistered(UnityTile tile)
 		{
-			if (_addToLayer && tile.gameObject.layer != _layerId)
+			if (_elevationOptions.unityLayerOptions.addToLayer && tile.gameObject.layer != _elevationOptions.unityLayerOptions.layerId)
 			{
-				tile.gameObject.layer = _layerId;
+				tile.gameObject.layer = _elevationOptions.unityLayerOptions.layerId;
 			}
 
 			if (tile.MeshRenderer == null)
 			{
 				var renderer = tile.gameObject.AddComponent<MeshRenderer>();
-				renderer.material = _baseMaterial;
+				renderer.material = _elevationOptions.requiredOptions.baseMaterial;
 			}
 
 			if (tile.MeshFilter == null)
@@ -64,7 +53,7 @@
 			GenerateTerrainMesh(tile);
 			Progress--;
 
-			if (_addCollider && tile.Collider == null)
+			if (_elevationOptions.requiredOptions.addCollider && tile.Collider == null)
 			{
 				tile.gameObject.AddComponent<MeshCollider>();
 			}
@@ -73,6 +62,8 @@
 		void GenerateTerrainMesh(UnityTile tile)
 		{
 			var verts = new List<Vector3>();
+			var _sampleCount = _elevationOptions.modificationOptions.sampleCount;
+			var _radius = _elevationOptions.modificationOptions.earthRadius;
 			for (float x = 0; x < _sampleCount; x++)
 			{
 				for (float y = 0; y < _sampleCount; y++)

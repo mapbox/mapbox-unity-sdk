@@ -47,7 +47,6 @@
 		void AddAnchor(BoundedPlane anchorData)
 		{
 			ARInterface.planeAdded -= AddAnchor;
-			_isStable = true;
 			AddNode(_target.localPosition);
 		}
 
