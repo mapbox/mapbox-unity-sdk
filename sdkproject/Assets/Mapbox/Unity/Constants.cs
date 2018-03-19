@@ -4,7 +4,7 @@ namespace Mapbox.Unity
 
 	public static class Constants
 	{
-		public const string SDK_VERSION = "1.4.0";
+		public const string SDK_VERSION = "1.3.0";
 
 		public static class Path
 		{

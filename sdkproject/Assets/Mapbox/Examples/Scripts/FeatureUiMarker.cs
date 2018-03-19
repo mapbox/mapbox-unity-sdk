@@ -1,6 +1,6 @@
 ﻿namespace Mapbox.Examples
 {
-	using Mapbox.Unity.MeshGeneration.Data;
+	using Mapbox.Unity.MeshGeneration.Components;
 	using UnityEngine;
 	using UnityEngine.UI;
 	using System.Linq;

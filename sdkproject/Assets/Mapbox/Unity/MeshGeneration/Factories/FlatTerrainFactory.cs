@@ -4,20 +4,30 @@
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.Utilities;
 	using System.Collections.Generic;
-	using Mapbox.Unity.Map;
 
 	[CreateAssetMenu(menuName = "Mapbox/Factories/Terrain Factory - Flat")]
 	public class FlatTerrainFactory : AbstractTileFactory
 	{
+		[SerializeField]
+		private Material _baseMaterial;
+
+		[SerializeField]
+		private bool _createSideWalls = false;
+		[SerializeField]
+		private float _sideWallHeight = 10;
+		[SerializeField]
+		private Material _sideWallMaterial;
+
+		[SerializeField]
+		private bool _addCollider = false;
+
+		[SerializeField]
+		private bool _addToLayer = false;
+
+		[SerializeField]
+		private int _layerId = 0;
 
 		Mesh _cachedQuad;
-		[SerializeField]
-		ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
-
-		public override void SetOptions(LayerProperties options)
-		{
-			_elevationOptions = (ElevationLayerProperties)options;
-		}
 
 		internal override void OnInitialized()
 		{
@@ -26,26 +36,26 @@
 
 		internal override void OnRegistered(UnityTile tile)
 		{
-			if (_elevationOptions.unityLayerOptions.addToLayer && tile.gameObject.layer != _elevationOptions.unityLayerOptions.layerId)
+			if (_addToLayer && tile.gameObject.layer != _layerId)
 			{
-				tile.gameObject.layer = _elevationOptions.unityLayerOptions.layerId;
+				tile.gameObject.layer = _layerId;
 			}
 
 			if (tile.MeshRenderer == null)
 			{
 				var renderer = tile.gameObject.AddComponent<MeshRenderer>();
 
-				if (_elevationOptions.sideWallOptions.isActive)
+				if (_createSideWalls)
 				{
 					renderer.materials = new Material[2]
 					{
-						_elevationOptions.requiredOptions.baseMaterial,
-						_elevationOptions.sideWallOptions.wallMaterial
+						_baseMaterial,
+						_sideWallMaterial
 					};
 				}
 				else
 				{
-					renderer.material = _elevationOptions.requiredOptions.baseMaterial;
+					renderer.material = _baseMaterial;
 				}
 			}
 
@@ -56,10 +66,10 @@
 
 			// HACK: This is here in to make the system trigger a finished state.
 			Progress++;
-			tile.MeshFilter.sharedMesh = GetQuad(tile, _elevationOptions.sideWallOptions.isActive);
+			tile.MeshFilter.sharedMesh = GetQuad(tile, _createSideWalls);
 			Progress--;
 
-			if (_elevationOptions.requiredOptions.addCollider && tile.Collider == null)
+			if (_addCollider && tile.Collider == null)
 			{
 				tile.gameObject.AddComponent<BoxCollider>();
 			}
@@ -137,8 +147,8 @@
 			{
 				verts[4 * (i + 1)] = verts[i];
 				verts[4 * (i + 1) + 1] = verts[i + 1];
-				verts[4 * (i + 1) + 2] = verts[i] + new Vector3(0, -_elevationOptions.sideWallOptions.wallHeight, 0);
-				verts[4 * (i + 1) + 3] = verts[i + 1] + new Vector3(0, -_elevationOptions.sideWallOptions.wallHeight, 0);
+				verts[4 * (i + 1) + 2] = verts[i] + new Vector3(0, -_sideWallHeight, 0);
+				verts[4 * (i + 1) + 3] = verts[i + 1] + new Vector3(0, -_sideWallHeight, 0);
 
 				norm = Vector3.Cross(verts[4 * (i + 1) + 1] - verts[4 * (i + 1) + 2], verts[4 * (i + 1)] - verts[4 * (i + 1) + 1]).normalized;
 				norms[4 * (i + 1)] = norm;

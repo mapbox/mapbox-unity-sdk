@@ -18,7 +18,7 @@ namespace Mapbox.Editor
 	{
 		public static MapboxConfigurationWindow instance;
 		static MapboxConfiguration _mapboxConfig;
-		static MapboxTokenStatus _currentTokenStatus = MapboxTokenStatus.StatusNotYetSet;
+		static MapboxTokenStatus _currentTokenStatus;
 		static MapboxAccess _mapboxAccess;
 		static bool _waitingToLoad = false;
 
@@ -48,12 +48,6 @@ namespace Mapbox.Editor
 		static GUIContent[] _sampleContent;
 		string _sceneToOpen;
 
-		//prefabs
-		static int _selectedPrefab;
-		static ScenesList _prefabList;
-		static GUIContent[] _prefabContent;
-
-
 		//styles
 		GUISkin _skin;
 		Color _defaultContentColor;
@@ -64,9 +58,9 @@ namespace Mapbox.Editor
 
 		GUIStyle _textFieldStyle;
 		GUIStyle _submitButtonStyle;
-		//GUIStyle _checkingButtonStyle;
+		GUIStyle _checkingButtonStyle;
 
-		//GUIStyle _validFieldStyle;
+		GUIStyle _validFieldStyle;
 		GUIStyle _validButtonStyle;
 		Color _validContentColor;
 		Color _validBackgroundColor;
@@ -193,43 +187,29 @@ namespace Mapbox.Editor
 
 		static void GetSceneList()
 		{
-			_prefabList = Resources.Load<ScenesList>("Mapbox/PrefabList");
 			_sceneList = Resources.Load<ScenesList>("Mapbox/ScenesList");
-
-			_prefabContent = LoadContent(_prefabList);
-			_sampleContent = LoadContent(_sceneList);
-
-		}
-
-		static GUIContent[] LoadContent(ScenesList list)
-		{
 
 			//exclude scenes with no image data
 			var content = new List<SceneData>();
-			if (list != null)
+			if (_sceneList != null)
 			{
-				for (int i = 0; i < list.SceneList.Length; i++)
+				for (int i = 0; i < _sceneList.SceneList.Length; i++)
 				{
-					if (list.SceneList[i] != null)
+					if (File.Exists(_sceneList.SceneList[i].ScenePath))
 					{
-						if (File.Exists(list.SceneList[i].ScenePath))
+						if (_sceneList.SceneList[i].Image != null)
 						{
-							if (list.SceneList[i].Image != null)
-							{
-								content.Add(list.SceneList[i]);
-							}
+							content.Add(_sceneList.SceneList[i]);
 						}
 					}
 				}
 			}
 
-			var outputContent = new GUIContent[content.Count];
-			for (int i = 0; i < outputContent.Length; i++)
+			_sampleContent = new GUIContent[content.Count];
+			for (int i = 0; i < _sampleContent.Length; i++)
 			{
-				outputContent[i] = new GUIContent(content[i].Name, content[i].Image, content[i].ScenePath);
+				_sampleContent[i] = new GUIContent(content[i].Name, content[i].Image, content[i].ScenePath);
 			}
-
-			return outputContent;
 
 		}
 
@@ -310,15 +290,6 @@ namespace Mapbox.Editor
 
 			EditorGUILayout.EndVertical();
 
-			// Draw Prefab Examples
-			if (_prefabContent.Length > 0)
-			{
-				EditorGUILayout.BeginVertical(_verticalGroup);
-				DrawPrefabLinks();
-				EditorGUILayout.EndVertical();
-
-			}
-
 			// Draw Example links if the scenelist asset is where it should be.
 			if (_sampleContent.Length > 0)
 			{
@@ -353,9 +324,9 @@ namespace Mapbox.Editor
 			_submitButtonStyle.margin.top = 0;
 			_submitButtonStyle.fixedWidth = 200;
 
-			//_checkingButtonStyle = new GUIStyle(_submitButtonStyle);
+			_checkingButtonStyle = new GUIStyle(_submitButtonStyle);
 
-			//_validFieldStyle = new GUIStyle(_textFieldStyle);
+			_validFieldStyle = new GUIStyle(_textFieldStyle);
 			_validButtonStyle = new GUIStyle(GUI.skin.FindStyle("LODSliderRange"));
 			_validButtonStyle.alignment = TextAnchor.MiddleCenter;
 			_validButtonStyle.padding = new RectOffset(0, 0, 0, 0);
@@ -545,7 +516,7 @@ namespace Mapbox.Editor
 
 			if (GUILayout.Button(linkContent, _linkStyle))
 			{
-				Application.OpenURL("https://github.com/mapbox/mapbox-unity-sdk/blob/develop/documentation/docs/05-changelog.md");
+				Application.OpenURL("https://www.mapbox.com/mapbox-unity-sdk/docs/05-changelog.html");
 			}
 
 			//	GUILayout.FlexibleSpace();
@@ -580,43 +551,6 @@ namespace Mapbox.Editor
 
 		}
 
-		void DrawPrefabLinks()
-		{
-			EditorGUI.BeginDisabledGroup(_currentTokenStatus != MapboxTokenStatus.TokenValid
-										|| _validating);
-
-			if (_currentTokenStatus == MapboxTokenStatus.TokenValid)
-			{
-				EditorGUILayout.LabelField("Map Prefabs", _titleStyle);
-			}
-			else
-			{
-				EditorGUILayout.LabelField("Map Prefabs", "Paste your mapbox access token to get started", _titleStyle);
-			}
-
-			EditorGUILayout.BeginHorizontal(_horizontalGroup);
-			EditorGUILayout.LabelField("Choose a starting scene to see each location-based prefab in action, or go to the prefabs folder and add them to your existing scene.", _bodyStyle);
-			EditorGUILayout.EndHorizontal();
-
-			int rowCount = 4;
-			EditorGUILayout.BeginHorizontal();
-
-			_selectedPrefab = GUILayout.SelectionGrid(-1, _prefabContent, rowCount, _sampleButtonStyle);
-
-			if (_selectedPrefab != -1)
-			{
-				EditorApplication.isPaused = false;
-				EditorApplication.isPlaying = false;
-
-				_sceneToOpen = _prefabContent[_selectedPrefab].tooltip;
-				EditorApplication.update += OpenAndPlayScene;
-			}
-
-			EditorGUILayout.EndHorizontal();
-			EditorGUI.EndDisabledGroup();
-
-		}
-
 		void DrawExampleLinks()
 		{
 			EditorGUI.BeginDisabledGroup(_currentTokenStatus != MapboxTokenStatus.TokenValid
@@ -624,15 +558,15 @@ namespace Mapbox.Editor
 
 			if (_currentTokenStatus == MapboxTokenStatus.TokenValid)
 			{
-				EditorGUILayout.LabelField("Example Scenes", _titleStyle);
+				EditorGUILayout.LabelField("Sample Scenes", _titleStyle);
 			}
 			else
 			{
-				EditorGUILayout.LabelField("Example Scenes", _titleStyle);
+				EditorGUILayout.LabelField("Sample Scenes", "Paste your mapbox access token to get started", _titleStyle);
 			}
 
 
-			int rowCount = 4;
+			int rowCount = 2;
 			EditorGUILayout.BeginHorizontal(_horizontalGroup);
 
 			_selectedSample = GUILayout.SelectionGrid(-1, _sampleContent, rowCount, _sampleButtonStyle);
@@ -671,7 +605,6 @@ namespace Mapbox.Editor
 			else
 			{
 				_sceneToOpen = null;
-				_selectedPrefab = -1;
 				_selectedSample = -1;
 			}
 		}

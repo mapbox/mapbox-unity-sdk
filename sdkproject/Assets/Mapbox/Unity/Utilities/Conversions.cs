@@ -206,7 +206,7 @@ namespace Mapbox.Unity.Utilities
 			var y = (int)Math.Floor((1.0 - Math.Log(Math.Tan(latitude * Math.PI / 180.0)
 					+ 1.0 / Math.Cos(latitude * Math.PI / 180.0)) / Math.PI) / 2.0 * Math.Pow(2.0, zoom));
 
-			return new UnwrappedTileId(zoom, x, y);
+			return new UnwrappedTileId(x, y, zoom);
 		}
 
 		/// <summary>

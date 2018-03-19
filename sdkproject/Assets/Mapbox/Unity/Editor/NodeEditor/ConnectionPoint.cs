@@ -2,7 +2,6 @@ using System;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
-using Mapbox.Unity.Map;
 
 namespace Mapbox.Editor.NodeEditor
 {
@@ -19,7 +18,7 @@ namespace Mapbox.Editor.NodeEditor
 		public ConnectionPointType type;
 		public Node node;
 		public GUIStyle style;
-		private VectorSubLayerProperties _activeProp;
+		private SerializedProperty _activeProp;
 		public bool isActive;
 
 		private string _outLabel;
@@ -53,7 +52,7 @@ namespace Mapbox.Editor.NodeEditor
 		private static Texture2D activeOutImage;
 		private static Texture2D inactiveOutImage;
 
-		public ConnectionPoint(Node node, string inname, string name, float deltay, ConnectionPointType type, GUIStyle style, VectorSubLayerProperties activeProp = null)
+		public ConnectionPoint(Node node, string inname, string name, float deltay, ConnectionPointType type, GUIStyle style, SerializedProperty activeProp = null)
 		{
 			isActive = true;
 			if (activeOutImage == null)
@@ -77,7 +76,7 @@ namespace Mapbox.Editor.NodeEditor
 			_deltaY = deltay;
 			rect = new Rect(0, 0, 10f + (string.IsNullOrEmpty(inLabel) ? 0 : 100), 20f);
 			left = new Vector2(rect.x, rect.y + (rect.height / 2));
-
+			
 			labelRect = new Rect(node.rect.xMin, node.rect.y + _deltaY - 15f, node.rect.width - 20, 25);
 			inLabelRect = new Rect(rect.x + 4, rect.y - 1, rect.width, rect.height);
 
@@ -87,10 +86,10 @@ namespace Mapbox.Editor.NodeEditor
 		public void Draw()
 		{
 			if (_activeProp != null)
-				isActive = _activeProp.coreOptions.isActive;
+				isActive = _activeProp.boolValue;
 
 			rect.y = node.rect.y + _deltaY - rect.height * 0.5f;
-			labelRect.x = node.rect.xMin + (isActive ? -20 : 0);
+			labelRect.x = node.rect.xMin + (_activeProp != null ? -20 : 0);
 			labelRect.y = node.rect.y + _deltaY - 15f;
 			labelRect.width = node.rect.width - 20;
 			inLabelRect.x = rect.x + 4;
@@ -111,7 +110,7 @@ namespace Mapbox.Editor.NodeEditor
 					rect.x = node.rect.x + node.rect.width - 8f;
 					break;
 			}
-
+			
 			if (!string.IsNullOrEmpty(_outLabel))
 			{
 				GUI.Label(labelRect, _outLabel, _labelStyle);
@@ -135,7 +134,7 @@ namespace Mapbox.Editor.NodeEditor
 				rect.y -= 1;
 				rect.height = 21;
 
-				if (_activeProp.coreOptions.isActive)
+				if (_activeProp.boolValue)
 				{
 					GUI.DrawTexture(rect, activeOutImage);
 				}
@@ -154,8 +153,8 @@ namespace Mapbox.Editor.NodeEditor
 
 			if (_activeProp != null)
 			{
-				_activeProp.coreOptions.isActive = EditorGUI.Toggle(toggleRect, _activeProp.coreOptions.isActive);
-				//_activeProp.serializedObject.ApplyModifiedProperties();
+				_activeProp.boolValue = EditorGUI.Toggle(toggleRect, _activeProp.boolValue);
+				_activeProp.serializedObject.ApplyModifiedProperties();
 			}
 
 			GUI.Label(inLabelRect, inLabel, _inLabelStyle);
