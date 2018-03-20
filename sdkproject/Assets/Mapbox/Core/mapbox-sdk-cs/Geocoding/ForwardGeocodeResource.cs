@@ -9,6 +9,7 @@ namespace Mapbox.Geocoding
 	using System;
 	using System.Collections.Generic;
 	using Mapbox.Utils;
+	using UnityEngine;
 
 	/// <summary> A forward geocode request. </summary>
 	public sealed class ForwardGeocodeResource : GeocodeResource<string>
