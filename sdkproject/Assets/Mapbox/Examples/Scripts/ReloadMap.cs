@@ -35,6 +35,10 @@
 
 		void ForwardGeocoder_OnGeocoderResponse(ForwardGeocodeResponse response)
 		{
+			if(response == null)
+			{
+				return;
+			}
 			_camera.transform.position = _cameraStartPos;
 			if (null != response.Features && response.Features.Count > 0)
 			{
@@ -56,7 +60,6 @@
 		{
 			yield return _wait;
 			_camera.transform.position = _cameraStartPos;
-			Debug.Log("Update");
 			_map.UpdateMap(_map.CenterLatitudeLongitude, zoom);
 			_reloadRoutine = null;
 		}
