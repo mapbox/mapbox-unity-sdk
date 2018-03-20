@@ -223,6 +223,8 @@ namespace Mapbox.Unity.Map
 		}
 
 		protected float _worldRelativeScale;
+		private Vector3 _mapScaleFactor;
+
 		public float WorldRelativeScale
 		{
 			get
@@ -480,7 +482,9 @@ namespace Mapbox.Unity.Map
 			//Scale the map accordingly.
 			if (Math.Abs(differenceInZoom) > Constants.EpsilonFloatingPoint)
 			{
-				Root.localScale = Vector3.one * Mathf.Pow(2, differenceInZoom);
+				_mapScaleFactor = Vector3.one * Mathf.Pow(2, differenceInZoom);
+				_mapScaleFactor.y = 1;
+				Root.localScale = _mapScaleFactor;
 			}
 		}
 		/// <summary>
