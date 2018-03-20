@@ -34,30 +34,14 @@ namespace Mapbox.Platform
 			{
 				// we are seeing super weird crashes on some iOS devices:
 				// see 'ForwardGeocodeResource' for more details
+				var encodedValues = from p in values
 #if UNITY_IOS
-				var encodedValues = from p in values
-									let k = p.Key.Trim()
-									let v = p.Value
-									orderby k
-									select string.IsNullOrEmpty(v) ? k : string.Format("{0}={1}", k, v);
-				if (encodedValues.Count() == 0)
-				{
-					return string.Empty;
-				}
-				else
-				{
-					string query = "?" + string.Join(
-						"&", encodedValues.ToArray());
-
-					query = WWW.EscapeURL(query);
-
-					return query;
-				}
-
+									let k = WWW.EscapeURL(p.Key.Trim())
+									let v = WWW.EscapeURL(p.Value)
 #else
-				var encodedValues = from p in values
 									let k = Uri.EscapeDataString(p.Key.Trim())
 									let v = Uri.EscapeDataString(p.Value)
+#endif
 									orderby k
 									select string.IsNullOrEmpty(v) ? k : string.Format("{0}={1}", k, v);
 				if (encodedValues.Count() == 0)
@@ -69,7 +53,6 @@ namespace Mapbox.Platform
 					return "?" + string.Join(
 						"&", encodedValues.ToArray());
 				}
-#endif
 			}
 
 			return string.Empty;
