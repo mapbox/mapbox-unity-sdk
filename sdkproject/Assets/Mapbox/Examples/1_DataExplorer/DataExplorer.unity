@@ -425,7 +425,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: e1b79d6caac0144adada0c548ef06705,
             type: 2}
-        clipFeaturesAtTileBoundary: 0
+        buildingsWithUniqueIds: 1
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
@@ -462,7 +462,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
@@ -499,7 +499,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
@@ -536,7 +536,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
@@ -569,7 +569,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
@@ -603,7 +603,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
@@ -637,7 +637,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
@@ -671,7 +671,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
@@ -705,7 +705,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
@@ -739,7 +739,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 2
         MeshModifiers: []
         GoModifiers:
@@ -773,7 +773,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 1
         MeshModifiers: []
         GoModifiers:
@@ -807,7 +807,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
@@ -840,7 +840,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
@@ -873,7 +873,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
@@ -906,7 +906,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
@@ -939,7 +939,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
@@ -972,7 +972,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
@@ -1005,7 +1005,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
@@ -1038,7 +1038,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
@@ -1071,7 +1071,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
@@ -1104,7 +1104,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
@@ -1137,7 +1137,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
@@ -1170,7 +1170,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
@@ -1203,7 +1203,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
@@ -1235,7 +1235,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
@@ -1267,7 +1267,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
@@ -1304,7 +1304,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
@@ -1341,7 +1341,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
@@ -1378,7 +1378,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
@@ -1415,7 +1415,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
             type: 2}
-        clipFeaturesAtTileBoundary: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
@@ -2648,7 +2648,7 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 0.05100286
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -2693,7 +2693,7 @@ Prefab:
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 210.74881
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}

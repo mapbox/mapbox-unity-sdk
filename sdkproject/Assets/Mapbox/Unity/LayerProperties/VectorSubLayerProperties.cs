@@ -19,7 +19,7 @@
 		};
 		public GeometryMaterialOptions materialOptions = new GeometryMaterialOptions();
 
-		public bool clipFeaturesAtTileBoundary = true;
+		public bool buildingsWithUniqueIds = false;
 		public PositionTargetType moveFeaturePositionTo;
 		[NodeEditorElement("Mesh Modifiers")]
 		public List<MeshModifier> MeshModifiers;

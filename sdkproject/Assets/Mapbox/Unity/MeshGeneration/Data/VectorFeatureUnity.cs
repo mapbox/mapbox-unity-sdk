@@ -23,14 +23,14 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			Points = new List<List<Vector3>>();
 		}
 
-		public VectorFeatureUnity(VectorTileFeature feature, UnityTile tile, float layerExtent, bool isClipped = true)
+		public VectorFeatureUnity(VectorTileFeature feature, UnityTile tile, float layerExtent, bool buildingsWithUniqueIds = false)
 		{
 			Data = feature;
 			Properties = Data.GetProperties();
 			Points.Clear();
 
 			//this is a temp hack until we figure out how streets ids works
-			if (isClipped == false) //ids from building dataset is big ulongs 
+			if (buildingsWithUniqueIds == true) //ids from building dataset is big ulongs 
 			{
 				_geom = feature.Geometry<float>(); //and we're not clipping by passing no parameters
 			}
