@@ -679,53 +679,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!1001 &198701422
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4703605594296902, guid: 6c8a0b62ddd604e678d6081484a0c73b, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4703605594296902, guid: 6c8a0b62ddd604e678d6081484a0c73b, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4703605594296902, guid: 6c8a0b62ddd604e678d6081484a0c73b, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4703605594296902, guid: 6c8a0b62ddd604e678d6081484a0c73b, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4703605594296902, guid: 6c8a0b62ddd604e678d6081484a0c73b, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4703605594296902, guid: 6c8a0b62ddd604e678d6081484a0c73b, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4703605594296902, guid: 6c8a0b62ddd604e678d6081484a0c73b, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4703605594296902, guid: 6c8a0b62ddd604e678d6081484a0c73b, type: 2}
-      propertyPath: m_RootOrder
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 114186913096469506, guid: 6c8a0b62ddd604e678d6081484a0c73b,
-        type: 2}
-      propertyPath: _map
-      value: 
-      objectReference: {fileID: 110210642}
-    m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 100100000, guid: 6c8a0b62ddd604e678d6081484a0c73b, type: 2}
-  m_IsPrefabParent: 0
 --- !u!1 &202522069
 GameObject:
   m_ObjectHideFlags: 0
@@ -1850,7 +1803,7 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.y
-      value: 0.9462561
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
