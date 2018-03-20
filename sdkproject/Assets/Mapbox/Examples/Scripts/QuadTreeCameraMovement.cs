@@ -4,6 +4,7 @@
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Utils;
 	using UnityEngine;
+	using UnityEngine.EventSystems;
 	using System;
 
 	public class QuadTreeCameraMovement : MonoBehaviour
@@ -150,7 +151,7 @@
 
 		void UseMeterConversion()
 		{
-			if (Input.GetMouseButton(0))
+			if (Input.GetMouseButton(0) && !EventSystem.current.IsPointerOverGameObject())
 			{
 				var mousePosScreen = Input.mousePosition;
 				//assign distance of camera to ground plane to z, otherwise ScreenToWorldPoint() will always return the position of the camera
@@ -197,6 +198,10 @@
 				}
 				else
 				{
+					if (EventSystem.current.IsPointerOverGameObject())
+					{
+						return;
+					}
 					_mousePositionPrevious = _mousePosition;
 					_origin = _mousePosition;
 				}
@@ -205,7 +210,7 @@
 
 		void UseDegreeConversion()
 		{
-			if (Input.GetMouseButton(0))
+			if (Input.GetMouseButton(0) && !EventSystem.current.IsPointerOverGameObject())
 			{
 				var mousePosScreen = Input.mousePosition;
 				//assign distance of camera to ground plane to z, otherwise ScreenToWorldPoint() will always return the position of the camera
@@ -254,6 +259,10 @@
 				}
 				else
 				{
+					if (EventSystem.current.IsPointerOverGameObject())
+					{
+						return;
+					}
 					_mousePositionPrevious = _mousePosition;
 					_origin = _mousePosition;
 				}
