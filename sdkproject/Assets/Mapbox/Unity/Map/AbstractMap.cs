@@ -551,7 +551,7 @@ namespace Mapbox.Unity.Map
 			return Root.TransformPoint(worldPos);
 		}
 
-		internal virtual float QueryElevationAtInternal(Vector2d latlong, out float tileScale)
+		protected virtual float QueryElevationAtInternal(Vector2d latlong, out float tileScale)
 		{
 			var _meters = Conversions.LatLonToMeters(latlong.x, latlong.y);
 			UnityTile tile;
@@ -600,12 +600,24 @@ namespace Mapbox.Unity.Map
 
 			return (Root.InverseTransformPoint(realworldPoint)).GetGeoPosition(CenterMercator, WorldRelativeScale * scaleFactor);
 		}
+
 		/// <summary>
-		/// Queries the real world elevation data at a given latitude longitude.
+		/// Queries the real world elevation data in Unity units at a given latitude longitude.
 		/// </summary>
 		/// <returns>The height data.</returns>
 		/// <param name="latlong">Latlong.</param>
-		public virtual float QueryElevationAt(Vector2d latlong)
+		public virtual float QueryElevationInUnityUnitsAt(Vector2d latlong)
+		{
+			float tileScale = 1f;
+			return QueryElevationAtInternal(latlong, out tileScale);
+		}
+
+		/// <summary>
+		/// Queries the real world elevation data in Meters at a given latitude longitude.
+		/// </summary>
+		/// <returns>The height data.</returns>
+		/// <param name="latlong">Latlong.</param>
+		public virtual float QueryElevationInMetersAt(Vector2d latlong)
 		{
 			float tileScale = 1f;
 			float height = QueryElevationAtInternal(latlong, out tileScale);
