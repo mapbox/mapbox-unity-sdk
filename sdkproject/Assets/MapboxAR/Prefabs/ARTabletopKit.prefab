@@ -118,6 +118,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4580065472578918}
+  - component: {fileID: 114212010089517918}
   - component: {fileID: 114738352844512476}
   - component: {fileID: 114844694048032688}
   m_Layer: 0
@@ -491,6 +492,17 @@ MonoBehaviour:
   m_PointCloud: 1
   m_Scale: 1
   pointOfInterest: {x: 0, y: 0, z: 0}
+--- !u!114 &114212010089517918
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1731568082723032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36d7ad32f43dd40b99362ede5c2a1ce6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114282370371282284
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -630,6 +642,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPallete: {fileID: 11400000, guid: ef118b5e263da4b1fa4327ca1d3e0c7b,
             type: 2}
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
