@@ -6,17 +6,17 @@
 
 namespace Mapbox.Geocoding
 {
-    using System;
-    using System.Text;
-    using Mapbox.Json;
-    using Mapbox.Platform;
-    using Mapbox.Utils.JsonConverters;
+	using System;
+	using System.Text;
+	using Mapbox.Json;
+	using Mapbox.Platform;
+	using Mapbox.Utils.JsonConverters;
 
-    /// <summary>
-    ///     Wrapper around the <see href="https://www.mapbox.com/api-documentation/#geocoding">
-    ///     Mapbox Geocoding API</see>. The Geocoder does two things: geocoding and reverse geocoding.
-    /// </summary>
-    public sealed class Geocoder
+	/// <summary>
+	///     Wrapper around the <see href="https://www.mapbox.com/api-documentation/#geocoding">
+	///     Mapbox Geocoding API</see>. The Geocoder does two things: geocoding and reverse geocoding.
+	/// </summary>
+	public sealed class Geocoder
 	{
 		private readonly IFileSource fileSource;
 
