@@ -30,7 +30,7 @@ public class SetCameraHeight : MonoBehaviour
 	void Update()
 	{
 		var position = _referenceCamera.transform.position;
-		position.y = _map.QueryHeightData(_map.CenterLatitudeLongitude) + _cameraOffset;
+		position.y = _map.QueryElevationAt(_map.CenterLatitudeLongitude) + _cameraOffset;
 		_referenceCamera.transform.position = position;
 
 	}

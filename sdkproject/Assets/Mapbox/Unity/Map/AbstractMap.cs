@@ -550,12 +550,31 @@ namespace Mapbox.Unity.Map
 			var worldPos = Conversions.GeoToWorldPosition(latitudeLongitude, CenterMercator, WorldRelativeScale * scaleFactor).ToVector3xz();
 			return Root.TransformPoint(worldPos);
 		}
+
+		internal virtual float QueryElevationAtInternal(Vector2d latlong, out float tileScale)
+		{
+			var _meters = Conversions.LatLonToMeters(latlong.x, latlong.y);
+			UnityTile tile;
+			bool foundTile = MapVisualizer.ActiveTiles.TryGetValue(Conversions.LatitudeLongitudeToTileId(latlong.x, latlong.y, (int)Zoom), out tile);
+			if (foundTile)
+			{
+				tileScale = tile.TileScale;
+				var _rect = tile.Rect;
+				return tile.QueryHeightData((float)((_meters - _rect.Min).x / _rect.Size.x), (float)((_meters.y - _rect.Max.y) / _rect.Size.y));
+			}
+			else
+			{
+				tileScale = 1f;
+				return 0f;
+			}
+
+		}
 		/// <summary>
 		/// Converts a latitude longitude into map space position. 
 		/// </summary>
 		/// <returns>Position in map space.</returns>
 		/// <param name="latitudeLongitude">Latitude longitude.</param>
-		/// <param name="queryHeight">If set to <c>true</c> will return the terrain height at that point.</param>
+		/// <param name="queryHeight">If set to <c>true</c> will return the terrain height(in Unity units) at that point.</param>
 		public virtual Vector3 GeoToWorldPosition(Vector2d latitudeLongitude, bool queryHeight = true)
 		{
 			var worldPos = GeoToWorldPositionXZ(latitudeLongitude);
@@ -563,7 +582,8 @@ namespace Mapbox.Unity.Map
 			if (queryHeight)
 			{
 				//Query Height.
-				worldPos.y = QueryHeightData(latitudeLongitude);
+				float tileScale = 1f;
+				worldPos.y = QueryElevationAtInternal(latitudeLongitude, out tileScale);
 			}
 
 			return worldPos;
@@ -581,22 +601,15 @@ namespace Mapbox.Unity.Map
 			return (Root.InverseTransformPoint(realworldPoint)).GetGeoPosition(CenterMercator, WorldRelativeScale * scaleFactor);
 		}
 		/// <summary>
-		/// Queries the height data at a given latitude longitude.
+		/// Queries the real world elevation data at a given latitude longitude.
 		/// </summary>
 		/// <returns>The height data.</returns>
 		/// <param name="latlong">Latlong.</param>
-		public virtual float QueryHeightData(Vector2d latlong)
+		public virtual float QueryElevationAt(Vector2d latlong)
 		{
-			var _meters = Conversions.LatLonToMeters(latlong.x, latlong.y);
-			UnityTile tile;
-			bool foundTile = MapVisualizer.ActiveTiles.TryGetValue(Conversions.LatitudeLongitudeToTileId(latlong.x, latlong.y, (int)Zoom), out tile);
-			if (foundTile)
-			{
-				var _rect = tile.Rect;
-				return tile.QueryHeightData((float)((_meters - _rect.Min).x / _rect.Size.x), (float)((_meters.y - _rect.Max.y) / _rect.Size.y));
-			}
-			else
-				return 0f;
+			float tileScale = 1f;
+			float height = QueryElevationAtInternal(latlong, out tileScale);
+			return (height / tileScale);
 		}
 
 		public void SetLoadingTexture(Texture2D loadingTexture)

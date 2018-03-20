@@ -40,7 +40,6 @@
 			_mapManager.OnInitialized += () =>
 			{
 				_isInitialized = true;
-				Debug.Log("Camera Init");
 			};
 		}
 
