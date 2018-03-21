@@ -88,19 +88,19 @@ public class ScriptablePaletteEditor : Editor
 
         EditorGUILayout.Space();
 
-        sp.m_setBaseColor_Override = EditorGUILayout.Toggle("Override base color", sp.m_setBaseColor_Override);
+        sp.m_setBaseColor_Override = EditorGUILayout.Toggle("Override base", sp.m_setBaseColor_Override);
         if (sp.m_setBaseColor_Override)
         {
             sp.m_baseColor_Override = EditorGUILayout.ColorField("Base Color:", sp.m_baseColor_Override);
         }
 
-        sp.m_setDetailColor1_Override = EditorGUILayout.Toggle("Override detail color 1", sp.m_setDetailColor1_Override);
+        sp.m_setDetailColor1_Override = EditorGUILayout.Toggle("Override detail 1", sp.m_setDetailColor1_Override);
         if (sp.m_setDetailColor1_Override)
         {
             sp.m_detailColor1_Override = EditorGUILayout.ColorField("Detail 1 Color:", sp.m_detailColor1_Override);
         }
 
-        sp.m_setDetailColor2_Override = EditorGUILayout.Toggle("Override detail color 2", sp.m_setDetailColor2_Override);
+        sp.m_setDetailColor2_Override = EditorGUILayout.Toggle("Override detail 2", sp.m_setDetailColor2_Override);
         if (sp.m_setDetailColor2_Override)
         {
             sp.m_detailColor2_Override = EditorGUILayout.ColorField("Detail 2 Color:", sp.m_detailColor2_Override);

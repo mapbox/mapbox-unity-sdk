@@ -6,8 +6,14 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/MapboxDevTools/Main.unity
+    path: Assets/Mapbox/Main.unity
     guid: 643bfa26e0eed440db629d1f4fc9f6ed
+  - enabled: 1
+    path: Assets/Mapbox/Examples/0_PrefabScenes/CitySimulator.unity
+    guid: d24dbd32aba234c98826e2c59ebfdf84
+  - enabled: 1
+    path: Assets/Mapbox/Examples/0_PrefabScenes/LocationBasedGame.unity
+    guid: 49f1ae7ff8c69466a9fd31117cca0599
   - enabled: 1
     path: Assets/Mapbox/Examples/1_Explorer/Explorer.unity
     guid: 23aa869f2d28da149b835ce1d36a5438
@@ -17,6 +23,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Mapbox/Examples/3_VoxelMap/VoxelMap.unity
     guid: daabe3028a2c14661b829fff509af827
+  - enabled: 1
+    path: Assets/Mapbox/Examples/4_VectorTileMaps/BasicUvMap/BasicUvMap.unity
+    guid: 1fa2b4c43fde33b46a32fb724f7e0543
   - enabled: 1
     path: Assets/Mapbox/Examples/4_VectorTileMaps/BasicVectorMap/BasicVectorMap.unity
     guid: f804e6882903c5f4595d554933b1cd94
@@ -50,3 +59,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Mapbox/Examples/7_Playground/Scenes/VectorTile.unity
     guid: 416b524fd28da493a9b8e35443dbd25b
+  - enabled: 1
+    path: Assets/Mapbox/Examples/8_PoGoPlugPlay/OriginalTest.unity
+    guid: b4dafd12e86144abeb04333cbb9e6af7
+  - enabled: 1
+    path: Assets/Mapbox/Examples/8_PoGoPlugPlay/PoGoPlug&Play.unity
+    guid: e3df390f96f7045b382432ffd000e1b4

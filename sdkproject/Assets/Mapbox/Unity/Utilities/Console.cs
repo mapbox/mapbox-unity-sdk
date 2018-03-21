@@ -15,12 +15,6 @@ namespace Mapbox.Unity.Utilities
 		Text _logText;
 
 		[SerializeField]
-		Text _logGps;
-
-		[SerializeField]
-		Text _logPosition;
-
-		[SerializeField]
 		ScrollRect _logScroll;
 
 		static Console _instance;
@@ -57,15 +51,6 @@ namespace Mapbox.Unity.Utilities
 			_logScroll.verticalNormalizedPosition = 0f;
 		}
 
-		public void LogGps(string log)
-		{
-			_logGps.text = log;
-		}
-
-		public void LogPosition(string log)
-		{
-			_logPosition.text = log;
-		}
 
 		public void ToggleMenu()
 		{
