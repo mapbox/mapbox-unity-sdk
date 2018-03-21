@@ -6,6 +6,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	using Mapbox.Unity.MeshGeneration.Enums;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.Utilities;
+	using Mapbox.Unity.Map;
 
 	public enum MapImageType
 	{
@@ -21,35 +22,24 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	public class MapImageFactory : AbstractTileFactory
 	{
 		[SerializeField]
-		private MapImageType _mapIdType;
-
-		[SerializeField]
-		[StyleSearch]
-		Style _customStyle;
-
-		[SerializeField]
-		private string _mapId = "";
-
-		[SerializeField]
-		bool _useCompression = true;
-
-		[SerializeField]
-		bool _useMipMap = false;
-
-		[SerializeField]
-		bool _useRetina;
+		ImageryLayerProperties _properties;
 
 		public string MapId
 		{
 			get
 			{
-				return _mapId;
+				return _properties.sourceOptions.Id;
 			}
 
 			set
 			{
-				_mapId = value;
+				_properties.sourceOptions.Id = value;
 			}
+		}
+
+		public override void SetOptions(LayerProperties options)
+		{
+			_properties = (ImageryLayerProperties)options;
 		}
 
 		// TODO: come back to this
@@ -69,39 +59,44 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnRegistered(UnityTile tile)
 		{
-			if (_mapIdType == MapImageType.None)
+			if (_properties.sourceType == ImagerySourceType.None)
+			{
+				Progress++;
+				Progress--;
 				return;
+			}
 
 			RasterTile rasterTile;
-			if (_mapId.StartsWith("mapbox://", StringComparison.Ordinal))
+			if (MapId.StartsWith("mapbox://", StringComparison.Ordinal))
 			{
-				rasterTile = _useRetina ? new RetinaRasterTile() : new RasterTile();
+				rasterTile = _properties.rasterOptions.useRetina ? new RetinaRasterTile() : new RasterTile();
 			}
 			else
 			{
-				rasterTile = _useRetina ? new ClassicRetinaRasterTile() : new ClassicRasterTile();
+				rasterTile = _properties.rasterOptions.useRetina ? new ClassicRetinaRasterTile() : new ClassicRasterTile();
 			}
 
 			tile.RasterDataState = TilePropertyState.Loading;
 
 			tile.AddTile(rasterTile);
 			Progress++;
-			rasterTile.Initialize(_fileSource, tile.CanonicalTileId, _mapId, () =>
+			rasterTile.Initialize(_fileSource, tile.CanonicalTileId, MapId, () =>
 			{
 				if (tile == null)
 				{
+					Progress--;
 					return;
 				}
 
 				if (rasterTile.HasError)
 				{
-					OnErrorOccurred(new TileErrorEventArgs(tile.CanonicalTileId,rasterTile.GetType(),tile, rasterTile.Exceptions));
+					OnErrorOccurred(new TileErrorEventArgs(tile.CanonicalTileId, rasterTile.GetType(), tile, rasterTile.Exceptions));
 					tile.RasterDataState = TilePropertyState.Error;
 					Progress--;
 					return;
 				}
 
-				tile.SetRasterData(rasterTile.Data, _useMipMap, _useCompression);
+				tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
 				tile.RasterDataState = TilePropertyState.Loaded;
 				Progress--;
 			});

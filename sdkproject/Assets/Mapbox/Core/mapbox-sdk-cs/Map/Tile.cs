@@ -11,6 +11,7 @@ namespace Mapbox.Map
 	using System.Linq;
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
+	using Mapbox.Unity.Utilities;
 
 
 	/// <summary>
@@ -38,7 +39,9 @@ namespace Mapbox.Map
 			/// <summary> Data loaded and parsed. </summary>
 			Loaded,
 			/// <summary> Data loading cancelled. </summary>
-			Canceled
+			Canceled,
+			/// <summary> Data has been loaded before and got updated. </summary>
+			Updated
 		}
 
 		/// <summary> Gets the <see cref="T:Mapbox.Map.CanonicalTileId"/> identifier. </summary>
@@ -102,6 +105,10 @@ namespace Mapbox.Map
 				return _state;
 			}
 		}
+
+
+		public HttpRequestType RequestType { get { return _request.RequestType; } }
+
 
 		public bool IsCompleted
 		{
@@ -209,7 +216,7 @@ namespace Mapbox.Map
 					ids.Add(_id.ToString());
 				else
 					return;
-				
+
 				response.Exceptions.ToList().ForEach(e => AddException(e));
 			}
 			else
@@ -225,7 +232,14 @@ namespace Mapbox.Map
 			// Cancelled is not the same as loaded!
 			if (_state != State.Canceled)
 			{
-				_state = State.Loaded;
+				if (response.IsUpdate)
+				{
+					_state = State.Updated;
+				}
+				else
+				{
+					_state = State.Loaded;
+				}
 			}
 			_callback();
 		}

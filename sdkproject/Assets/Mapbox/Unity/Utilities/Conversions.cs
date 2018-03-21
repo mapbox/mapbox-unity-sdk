@@ -84,7 +84,7 @@ namespace Mapbox.Unity.Utilities
 		/// </summary>
 		/// <param name="lat"> The latitude. </param>
 		/// <param name="lon"> The longitude. </param>
-		/// <param name="refPoint"> A <see cref="T:UnityEngine.Vector2d"/> center point to offset resultant xy</param>
+		/// <param name="refPoint"> A <see cref="T:UnityEngine.Vector2d"/> center point to offset resultant xy, this is usually map's center mercator</param>
 		/// <param name="scale"> Scale in meters. (default scale = 1) </param>
 		/// <returns> A <see cref="T:UnityEngine.Vector2d"/> xy tile ID. </returns>
 		/// <example>
@@ -199,14 +199,14 @@ namespace Mapbox.Unity.Utilities
 		/// <param name="latitude"> The latitude. </param>
 		/// <param name="longitude"> The longitude. </param>
 		/// <param name="zoom"> Zoom level. </param>
-		/// <returns> A <see cref="T:UnityEngine.Vector2d"/> xy tile ID. </returns>
-		public static Vector2d LatitudeLongitudeToTileId(double latitude, double longitude, int zoom)
+		/// <returns> A <see cref="T:Mapbox.Map.UnwrappedTileId"/> xy tile ID. </returns>
+		public static UnwrappedTileId LatitudeLongitudeToTileId(double latitude, double longitude, int zoom)
 		{
 			var x = (int)Math.Floor((longitude + 180.0) / 360.0 * Math.Pow(2.0, zoom));
 			var y = (int)Math.Floor((1.0 - Math.Log(Math.Tan(latitude * Math.PI / 180.0)
 					+ 1.0 / Math.Cos(latitude * Math.PI / 180.0)) / Math.PI) / 2.0 * Math.Pow(2.0, zoom));
 
-			return new Vector2d(x, y);
+			return new UnwrappedTileId(zoom, x, y);
 		}
 
 		/// <summary>

@@ -1,21 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using SQLite4Unity3d;
-using Mapbox.Utils;
-using UnityEngine;
-using Mapbox.Map;
-
-
-namespace Mapbox.Platform.MbTiles
+﻿namespace Mapbox.Platform.MbTiles
 {
 
+	using Mapbox.Map;
+	using Mapbox.Platform.Cache;
+	using Mapbox.Utils;
+	using SQLite4Unity3d;
+	using System;
+	using System.Collections.Generic;
+	using System.IO;
+	using System.Linq;
+	using UnityEngine;
 
 	public class MbTilesDb : IDisposable
 	{
 
 
+#if MAPBOX_DEBUG_CACHE
+		private string _className;
+#endif
+		private string _tileset;
 		private bool _disposed;
 		private string _dbPath;
 		private SQLiteConnection _sqlite;
@@ -28,8 +31,11 @@ namespace Mapbox.Platform.MbTiles
 
 		public MbTilesDb(string tileset, uint? maxTileCount = null)
 		{
-
-			openOrCreateDb(tileset);
+#if MAPBOX_DEBUG_CACHE
+			_className = this.GetType().Name;
+#endif
+			_tileset = tileset;
+			openOrCreateDb(_tileset);
 			_maxTileCount = maxTileCount;
 
 			//hrmpf: multiple PKs not supported by sqlite.net
@@ -43,11 +49,13 @@ namespace Mapbox.Platform.MbTiles
 				//_sqlite.CreateTable<tiles>();
 
 				string cmdCreateTTbliles = @"CREATE TABLE tiles(
-zoom_level  INTEGER NOT NULL,
-tile_column BIGINT  NOT NULL,
-tile_row    BIGINT  NOT NULL,
-tile_data   BLOB    NOT NULL,
-timestamp   INTEGER NOT NULL,
+zoom_level   INTEGER NOT NULL,
+tile_column  BIGINT  NOT NULL,
+tile_row     BIGINT  NOT NULL,
+tile_data    BLOB    NOT NULL,
+timestamp    INTEGER NOT NULL,
+etag         TEXT,
+lastmodified INTEGER,
 	PRIMARY KEY(
 		zoom_level ASC,
 		tile_column ASC,
@@ -58,6 +66,18 @@ timestamp   INTEGER NOT NULL,
 
 				string cmdIdxTimestamp = "CREATE INDEX idx_timestamp ON tiles (timestamp ASC);";
 				_sqlite.Execute(cmdIdxTimestamp);
+			}
+
+			// auto migrate old caches
+			if (
+				0 != colInfo.Count
+				&& null == colInfo.FirstOrDefault(ci => ci.Name.Equals("etag"))
+			)
+			{
+				string sql = "ALTER TABLE tiles ADD COLUMN etag text;";
+				_sqlite.Execute(sql);
+				sql = "ALTER TABLE tiles ADD COLUMN lastmodified INTEGER;";
+				_sqlite.Execute(sql);
 			}
 
 			//some pragmas to speed things up a bit :-)
@@ -89,7 +109,7 @@ timestamp   INTEGER NOT NULL,
 		}
 
 
-		#region idisposable
+#region idisposable
 
 
 		~MbTilesDb()
@@ -121,12 +141,18 @@ timestamp   INTEGER NOT NULL,
 		}
 
 
-		#endregion
+#endregion
 
 
 		private void openOrCreateDb(string dbName)
 		{
 			_dbPath = Path.Combine(Application.persistentDataPath, "cache");
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_WSA
+			// 1. workaround the 260 character MAX_PATH path and file name limit by prepeding `\\?\`
+			//    see https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx#maxpath
+			// 2. use `GetFullPath` on that to sanitize the path: replaces `/` returned by `Application.persistentDataPath` with `\`
+			_dbPath = Path.GetFullPath(@"\\?\" + _dbPath);
+#endif
 			if (!Directory.Exists(_dbPath)) { Directory.CreateDirectory(_dbPath); }
 			_dbPath = Path.Combine(_dbPath, dbName);
 			_sqlite = new SQLiteConnection(_dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
@@ -162,18 +188,35 @@ timestamp   INTEGER NOT NULL,
 		}
 
 
-		public void AddTile(CanonicalTileId tileId, byte[] data)
+		public void AddTile(CanonicalTileId tileId, CacheItem item, bool update = false)
 		{
-			_sqlite.Insert(new tiles
-			{
-				zoom_level = tileId.Z,
-				tile_column = tileId.X,
-				tile_row = tileId.Y,
-				tile_data = data,
-				timestamp = (int)UnixTimestampUtils.To(DateTime.Now)
-			});
 
-			_pruneCacheCounter++;
+#if MAPBOX_DEBUG_CACHE
+			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
+			UnityEngine.Debug.LogFormat("{0} {1} {2} update:{3}", methodName, _tileset, tileId, update);
+#endif
+			try
+			{
+				_sqlite.InsertOrReplace(new tiles
+				{
+					zoom_level = tileId.Z,
+					tile_column = tileId.X,
+					tile_row = tileId.Y,
+					tile_data = item.Data,
+					timestamp = (int)UnixTimestampUtils.To(DateTime.Now),
+					etag = item.ETag
+				});
+			}
+			catch (Exception ex)
+			{
+				Debug.LogErrorFormat("Error inserting {0} {1} {2} ", _tileset, tileId, ex);
+			}
+
+			// update counter only when new tile gets inserted
+			if (!update)
+			{
+				_pruneCacheCounter++;
+			}
 			if (0 == _pruneCacheCounter % _pruneCacheDelta)
 			{
 				_pruneCacheCounter = 0;
@@ -192,10 +235,22 @@ timestamp   INTEGER NOT NULL,
 
 			long toDelete = tileCnt - _maxTileCount.Value;
 
-			// no 'ORDER BY' or 'LIMIT' possible if sqlite hasn't been compiled with 'SQLITE_ENABLE_UPDATE_DELETE_LIMIT'
-			// https://sqlite.org/compile.html#enable_update_delete_limit
-			// int rowsAffected = _sqlite.Execute("DELETE FROM tiles ORDER BY timestamp ASC LIMIT ?", toDelete);
-			_sqlite.Execute("DELETE FROM tiles WHERE rowid IN ( SELECT rowid FROM tiles ORDER BY timestamp ASC LIMIT ? );", toDelete);
+#if MAPBOX_DEBUG_CACHE
+			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
+			Debug.LogFormat("{0} {1} about to prune()", methodName, _tileset);
+#endif
+
+			try
+			{
+				// no 'ORDER BY' or 'LIMIT' possible if sqlite hasn't been compiled with 'SQLITE_ENABLE_UPDATE_DELETE_LIMIT'
+				// https://sqlite.org/compile.html#enable_update_delete_limit
+				// int rowsAffected = _sqlite.Execute("DELETE FROM tiles ORDER BY timestamp ASC LIMIT ?", toDelete);
+				_sqlite.Execute("DELETE FROM tiles WHERE rowid IN ( SELECT rowid FROM tiles ORDER BY timestamp ASC LIMIT ? );", toDelete);
+			}
+			catch (Exception ex)
+			{
+				Debug.LogErrorFormat("error pruning: {0}", ex);
+			}
 		}
 
 
@@ -204,19 +259,41 @@ timestamp   INTEGER NOT NULL,
 		/// </summary>
 		/// <param name="tileId">Canonical tile id to identify the tile</param>
 		/// <returns>tile data as byte[], if tile is not cached returns null</returns>
-		public byte[] GetTile(CanonicalTileId tileId)
+		public CacheItem GetTile(CanonicalTileId tileId)
 		{
-			tiles tile = _sqlite
-				.Table<tiles>()
-				.Where(t => t.zoom_level == tileId.Z && t.tile_column == tileId.X && t.tile_row == tileId.Y)
-				.FirstOrDefault();
+#if MAPBOX_DEBUG_CACHE
+			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
+			Debug.LogFormat("{0} {1} {2}", methodName, _tileset, tileId);
+#endif
+			tiles tile = null;
 
+			try
+			{
+				tile = _sqlite
+					.Table<tiles>()
+					.Where(t => t.zoom_level == tileId.Z && t.tile_column == tileId.X && t.tile_row == tileId.Y)
+					.FirstOrDefault();
+			}
+			catch (Exception ex)
+			{
+				Debug.LogErrorFormat("error getting tile {1} {2} from cache{0}{3}", Environment.NewLine, _tileset, tileId, ex);
+				return null;
+			}
 			if (null == tile)
 			{
 				return null;
 			}
 
-			return tile.tile_data;
+			DateTime? lastModified = null;
+			if (tile.lastmodified.HasValue) { lastModified = UnixTimestampUtils.From((double)tile.lastmodified.Value); }
+
+			return new CacheItem()
+			{
+				Data = tile.tile_data,
+				AddedToCacheTicksUtc = tile.timestamp,
+				ETag = tile.etag,
+				LastModified = lastModified
+			};
 		}
 
 

@@ -16,6 +16,15 @@
 
 		protected Dictionary<UnwrappedTileId, byte> _activeTiles = new Dictionary<UnwrappedTileId, byte>();
 
+		protected ITileProviderOptions _options;
+		public ITileProviderOptions Options
+		{
+			get
+			{
+				return _options;
+			}
+		}
+
 		public virtual void Initialize(IMap map)
 		{
 			_activeTiles.Clear();
@@ -57,5 +66,10 @@
 		}
 
 		public abstract void OnInitialized();
+
+		public virtual void SetOptions(ITileProviderOptions options)
+		{
+			_options = options;
+		}
 	}
 }

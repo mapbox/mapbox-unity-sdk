@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44648886, g: 0.49632663, b: 0.5747252, a: 1}
+  m_IndirectSpecularColor: {r: 0.4465785, g: 0.49641252, b: 0.574817, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -77,15 +77,18 @@ LightmapSettings:
     m_PVRDirectSampleCount: 32
     m_PVRSampleCount: 500
     m_PVRBounces: 2
-    m_PVRFiltering: 0
+    m_PVRFilterTypeDirect: 0
+    m_PVRFilterTypeIndirect: 0
+    m_PVRFilterTypeAO: 0
     m_PVRFilteringMode: 1
     m_PVRCulling: 1
     m_PVRFilteringGaussRadiusDirect: 1
     m_PVRFilteringGaussRadiusIndirect: 5
     m_PVRFilteringGaussRadiusAO: 2
-    m_PVRFilteringAtrousColorSigma: 1
-    m_PVRFilteringAtrousNormalSigma: 1
-    m_PVRFilteringAtrousPositionSigma: 1
+    m_PVRFilteringAtrousPositionSigmaDirect: 0.5
+    m_PVRFilteringAtrousPositionSigmaIndirect: 2
+    m_PVRFilteringAtrousPositionSigmaAO: 1
+    m_ShowResolutionOverlay: 1
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 0
 --- !u!196 &4
@@ -107,6 +110,8 @@ NavMeshSettings:
     manualTileSize: 0
     tileSize: 256
     accuratePlacement: 0
+    debug:
+      m_Flags: 0
   m_NavMeshData: {fileID: 0}
 --- !u!1 &346997811
 GameObject:
@@ -179,11 +184,11 @@ Camera:
   m_TargetEye: 3
   m_HDR: 0
   m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
-  m_StereoMirrorMode: 0
 --- !u!4 &346997816
 Transform:
   m_ObjectHideFlags: 0
@@ -239,7 +244,7 @@ Prefab:
     - target: {fileID: 224000014153367488, guid: ea74cde99741a41ffb7f1c039ed2cf3e,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0.604
+      value: 0.82850003
       objectReference: {fileID: 0}
     - target: {fileID: 224000014153367488, guid: ea74cde99741a41ffb7f1c039ed2cf3e,
         type: 2}
@@ -265,6 +270,16 @@ Prefab:
         type: 2}
       propertyPath: m_SizeDelta.x
       value: -17
+      objectReference: {fileID: 0}
+    - target: {fileID: 224000010490796762, guid: ea74cde99741a41ffb7f1c039ed2cf3e,
+        type: 2}
+      propertyPath: m_AnchoredPosition.y
+      value: -50
+      objectReference: {fileID: 0}
+    - target: {fileID: 224000010490796762, guid: ea74cde99741a41ffb7f1c039ed2cf3e,
+        type: 2}
+      propertyPath: m_SizeDelta.y
+      value: -100
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ea74cde99741a41ffb7f1c039ed2cf3e, type: 2}
@@ -379,20 +394,6 @@ Light:
   m_Lightmapping: 4
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
-  m_FalloffTable:
-    m_Table[0]: 0
-    m_Table[1]: 0
-    m_Table[2]: 0
-    m_Table[3]: 0
-    m_Table[4]: 0
-    m_Table[5]: 0
-    m_Table[6]: 0
-    m_Table[7]: 0
-    m_Table[8]: 0
-    m_Table[9]: 0
-    m_Table[10]: 0
-    m_Table[11]: 0
-    m_Table[12]: 0
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
   m_ShadowRadius: 0
@@ -520,12 +521,12 @@ Prefab:
     - target: {fileID: 224000012829708240, guid: f4ba4b55d2a344072b0b40aa0eec1e5e,
         type: 2}
       propertyPath: m_AnchoredPosition.x
-      value: 40
+      value: 75
       objectReference: {fileID: 0}
     - target: {fileID: 224000012829708240, guid: f4ba4b55d2a344072b0b40aa0eec1e5e,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -38.5
       objectReference: {fileID: 0}
     - target: {fileID: 224000012829708240, guid: f4ba4b55d2a344072b0b40aa0eec1e5e,
         type: 2}
@@ -535,17 +536,62 @@ Prefab:
     - target: {fileID: 224000012829708240, guid: f4ba4b55d2a344072b0b40aa0eec1e5e,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 27
       objectReference: {fileID: 0}
     - target: {fileID: 224000011474196270, guid: f4ba4b55d2a344072b0b40aa0eec1e5e,
         type: 2}
       propertyPath: m_SizeDelta.x
-      value: 80
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 224000011474196270, guid: f4ba4b55d2a344072b0b40aa0eec1e5e,
         type: 2}
       propertyPath: m_SizeDelta.y
+      value: 77
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000012885553438, guid: f4ba4b55d2a344072b0b40aa0eec1e5e,
+        type: 2}
+      propertyPath: m_Padding.m_Left
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000012885553438, guid: f4ba4b55d2a344072b0b40aa0eec1e5e,
+        type: 2}
+      propertyPath: m_Padding.m_Top
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000012885553438, guid: f4ba4b55d2a344072b0b40aa0eec1e5e,
+        type: 2}
+      propertyPath: m_ChildAlignment
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000012885553438, guid: f4ba4b55d2a344072b0b40aa0eec1e5e,
+        type: 2}
+      propertyPath: m_ChildControlHeight
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000012885553438, guid: f4ba4b55d2a344072b0b40aa0eec1e5e,
+        type: 2}
+      propertyPath: m_Padding.m_Bottom
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000012885553438, guid: f4ba4b55d2a344072b0b40aa0eec1e5e,
+        type: 2}
+      propertyPath: m_Padding.m_Right
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000012885553438, guid: f4ba4b55d2a344072b0b40aa0eec1e5e,
+        type: 2}
+      propertyPath: m_Spacing
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224000011474196270, guid: f4ba4b55d2a344072b0b40aa0eec1e5e,
+        type: 2}
+      propertyPath: m_AnchoredPosition.x
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 224000011474196270, guid: f4ba4b55d2a344072b0b40aa0eec1e5e,
+        type: 2}
+      propertyPath: m_AnchoredPosition.y
+      value: -25
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f4ba4b55d2a344072b0b40aa0eec1e5e, type: 2}

@@ -153,7 +153,7 @@ QualitySettings:
     shadowResolution: 2
     shadowProjection: 0
     shadowCascades: 4
-    shadowDistance: 2000
+    shadowDistance: 1000
     shadowNearPlaneOffset: 2
     shadowCascade2Split: 0.33333334
     shadowCascade4Split: {x: 0.06666667, y: 0.19999999, z: 0.46666664}
@@ -174,8 +174,4 @@ QualitySettings:
     asyncUploadBufferSize: 4
     resolutionScalingFixedDPIFactor: 1
     excludedTargetPlatforms: []
-  m_PerPlatformDefaultQuality:
-    Android: 0
-    Standalone: 0
-    WebGL: 0
-    iPhone: 0
+  m_PerPlatformDefaultQuality: {}

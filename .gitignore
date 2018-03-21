@@ -3,6 +3,9 @@
 
 MapboxSDKforUnityCore*/
 
+sdkproject/Assets/WSATestCertificate.pfx
+sdkproject/Assets/WSATestCertificate.pfx.meta
+
 /scriptcs
 /scriptcs_packages
 /packages
@@ -10,9 +13,10 @@ MapboxSDKforUnityCore*/
 # Documentation
 docfx.zip
 /docfx
-api
+#api
 _site
 src/Documentation/log.txt
+obj.meta
 
 # build
 .vs/

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76c93f3debdba4e48adb1b99cad0a0d2, type: 3}
+  m_Name: MapBoxStylesMaterialModifier
+  m_EditorClassIdentifier: 
+  Active: 1
+  _options:
+    projectMapImagery: 0
+    texturingType: 3
+    materials:
+    - Materials:
+      - {fileID: 2100000, guid: d4d7464e3429a44e090f55a4ac17f110, type: 2}
+    - Materials:
+      - {fileID: 2100000, guid: 55cc6edead802446b9106b2998406844, type: 2}
+    atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
+    colorPallete: {fileID: 11400000, guid: e1b79d6caac0144adada0c548ef06705, type: 2}

@@ -12,21 +12,20 @@ namespace Mapbox.Platform.Cache
 	{
 
 
-		private struct CacheItem
-		{
-			public long Timestamp;
-			public byte[] Data;
-		}
-
-
 		// TODO: add support for disposal strategy (timestamp, distance, etc.)
 		public MemoryCache(uint maxCacheSize)
 		{
+#if MAPBOX_DEBUG_CACHE
+			_className = this.GetType().Name;
+#endif
 			_maxCacheSize = maxCacheSize;
 			_cachedResponses = new Dictionary<string, CacheItem>();
 		}
 
 
+#if MAPBOX_DEBUG_CACHE
+		private string _className;
+#endif
 		private uint _maxCacheSize;
 		private object _lock = new object();
 		private Dictionary<string, CacheItem> _cachedResponses;
@@ -38,7 +37,7 @@ namespace Mapbox.Platform.Cache
 		}
 
 
-		public void Add(string mapdId, CanonicalTileId tileId, byte[] data)
+		public void Add(string mapdId, CanonicalTileId tileId, CacheItem item, bool forceInsert)
 		{
 			string key = mapdId + "||" + tileId;
 
@@ -46,20 +45,27 @@ namespace Mapbox.Platform.Cache
 			{
 				if (_cachedResponses.Count >= _maxCacheSize)
 				{
-					_cachedResponses.Remove(_cachedResponses.OrderBy(c => c.Value.Timestamp).First().Key);
+					_cachedResponses.Remove(_cachedResponses.OrderBy(c => c.Value.AddedToCacheTicksUtc).First().Key);
 				}
 
+				// TODO: forceInsert
 				if (!_cachedResponses.ContainsKey(key))
 				{
-					_cachedResponses.Add(key, new CacheItem() { Timestamp = DateTime.Now.Ticks, Data = data });
+					item.AddedToCacheTicksUtc = DateTime.UtcNow.Ticks;
+					_cachedResponses.Add(key, item);
 				}
 			}
 		}
 
 
-		public byte[] Get(string mapId, CanonicalTileId tileId)
+		public CacheItem Get(string mapId, CanonicalTileId tileId)
 		{
 			string key = mapId + "||" + tileId;
+
+#if MAPBOX_DEBUG_CACHE
+			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
+			UnityEngine.Debug.LogFormat("{0} {1}", methodName, key);
+#endif
 
 			lock (_lock)
 			{
@@ -68,7 +74,7 @@ namespace Mapbox.Platform.Cache
 					return null;
 				}
 
-				return _cachedResponses[key].Data;
+				return _cachedResponses[key];
 			}
 		}
 

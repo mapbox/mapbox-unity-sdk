@@ -77,7 +77,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			Assert.AreEqual(3, matchingResponse.Tracepoints[3].WaypointIndex, "Wrong WaypointIndex");
 
 			Assert.AreEqual(1, matchingResponse.Matchings.Length, "Wrong number of matchings");
-			Assert.That(matchingResponse.Matchings[0].Weight > 35 && matchingResponse.Matchings[0].Weight < 45, "Wrong Weight");
+			Assert.That(matchingResponse.Matchings[0].Weight > 0 && matchingResponse.Matchings[0].Weight < 100, "Wrong Weight: {0}", matchingResponse.Matchings[0].Weight);
 			Assert.AreEqual("routability", matchingResponse.Matchings[0].WeightName, "Wrong WeightName");
 			Assert.AreEqual(6, matchingResponse.Matchings[0].Legs.Count, "Wrong number of legs");
 			Assert.AreEqual(8, matchingResponse.Matchings[0].Geometry.Count, "Wrong number of vertices in geometry");
@@ -96,7 +96,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				yield return null;
 			}
 
-			Assert.GreaterOrEqual(matchingResponse.Matchings[0].Duration, 440, "'mapbox/walking' duration less than expected");
+			Assert.GreaterOrEqual(matchingResponse.Matchings[0].Duration, 300, "'mapbox/walking' duration [{0}] less than expected", matchingResponse.Matchings[0].Duration);
 
 			//cycling
 			enumerator = profile(Profile.MapboxCycling);
@@ -106,7 +106,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				matchingResponse = enumerator.Current;
 				yield return null;
 			}
-			Assert.GreaterOrEqual(matchingResponse.Matchings[0].Duration, 150, "'mapbox/cycling' duration less than expected");
+			Assert.GreaterOrEqual(matchingResponse.Matchings[0].Duration, 100, "'mapbox/cycling' duration less than expected");
 
 			//driving traffic
 			enumerator = profile(Profile.MapboxDrivingTraffic);
@@ -116,7 +116,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				matchingResponse = enumerator.Current;
 				yield return null;
 			}
-			Assert.GreaterOrEqual(matchingResponse.Matchings[0].Duration, 130, "'driving-traffic' duration less than expected");
+			Assert.GreaterOrEqual(matchingResponse.Matchings[0].Duration, 100, "'driving-traffic' duration less than expected");
 
 			//driving
 			enumerator = profile(Profile.MapboxDriving);
@@ -126,7 +126,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				matchingResponse = enumerator.Current;
 				yield return null;
 			}
-			Assert.GreaterOrEqual(matchingResponse.Matchings[0].Duration, 130, "'driving' duration less than expected");
+			Assert.GreaterOrEqual(matchingResponse.Matchings[0].Duration, 100, "'driving' duration less than expected");
 		}
 
 

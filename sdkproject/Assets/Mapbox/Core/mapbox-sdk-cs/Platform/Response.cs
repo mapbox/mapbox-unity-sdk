@@ -25,6 +25,7 @@ namespace Mapbox.Platform
 #endif
 #if UNITY
 	using UnityEngine.Networking;
+	using Mapbox.Unity.Utilities;
 #endif
 
 	/// <summary> A response from a <see cref="IFileSource" /> request. </summary>
@@ -50,7 +51,11 @@ namespace Mapbox.Platform
 			get { return _exceptions == null ? false : _exceptions.Count > 0; }
 		}
 
+		/// <summary>Flag to indicate if the request was fullfilled from a local cache</summary>
 		public bool LoadedFromCache;
+
+		/// <summary>Flag to indicate if the request was issued before but was issued again and updated</summary>
+		public bool IsUpdate = false;
 
 		public string RequestUrl;
 
@@ -250,14 +255,19 @@ namespace Mapbox.Platform
 				response.AddException(apiEx);
 			}
 
-			if (apiResponse.isNetworkError)
+			// additional string.empty check for apiResponse.error:
+			// on UWP isNetworkError is sometimes set to true despite all being well
+			if (apiResponse.isNetworkError && !string.IsNullOrEmpty(apiResponse.error))
 			{
 				response.AddException(new Exception(apiResponse.error));
 			}
 
-			if (null == apiResponse.downloadHandler.data)
+			if (request.RequestType != HttpRequestType.Head)
 			{
-				response.AddException(new Exception("Response has no data."));
+				if (null == apiResponse.downloadHandler.data)
+				{
+					response.AddException(new Exception("Response has no data."));
+				}
 			}
 
 #if NETFX_CORE
@@ -314,7 +324,10 @@ namespace Mapbox.Platform
 				response.AddException(new Exception("Rate limit hit"));
 			}
 
-			response.Data = apiResponse.downloadHandler.data;
+			if (request.RequestType != HttpRequestType.Head)
+			{
+				response.Data = apiResponse.downloadHandler.data;
+			}
 
 			return response;
 		}

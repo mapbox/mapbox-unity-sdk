@@ -6,7 +6,7 @@
 	using Mapbox.Unity;
 	using Mapbox.Json;
 	using Mapbox.Unity.Utilities;
-	using Mapbox.Unity.MeshGeneration.Factories;
+	using Mapbox.Unity.Map;
 	using System.Collections;
 
 	public class StyleSearchWindow : EditorWindow
@@ -27,18 +27,18 @@
 
 		void OnEnable()
 		{
-			EditorApplication.playmodeStateChanged += OnModeChanged;
+			EditorApplication.playModeStateChanged += OnModeChanged;
 		}
 
 		void OnDisable()
 		{
-			EditorApplication.playmodeStateChanged -= OnModeChanged;
+			EditorApplication.playModeStateChanged -= OnModeChanged;
 		}
 
 		public static void Open(SerializedProperty property)
 		{
 			StyleSearchWindow window = GetWindow<StyleSearchWindow>(true, "Search for style");
-			
+
 			window._property = property;
 			window._username = property.FindPropertyRelative("UserName").stringValue;
 			if (!string.IsNullOrEmpty(window._username))
@@ -50,10 +50,10 @@
 			Event e = Event.current;
 			Vector2 mousePos = GUIUtility.GUIToScreenPoint(e.mousePosition);
 			window.position = new Rect(mousePos.x - width, mousePos.y, width, height);
-			window.minSize = new Vector2(400,500);
+			window.minSize = new Vector2(400, 500);
 		}
 
-		void OnModeChanged()
+		void OnModeChanged(PlayModeStateChange state)
 		{
 			Close();
 		}
@@ -67,7 +67,7 @@
 			EditorGUILayout.HelpBox("User styles are bound to usernames, enter your Mapbox Username to search for your personal styles.", MessageType.Info);
 			_username = EditorGUILayout.TextField("Mapbox Username: ", _username);
 
-			
+
 			scrollPos = EditorGUILayout.BeginScrollView(scrollPos, st);
 
 			if (_username.Length == 0)
@@ -134,7 +134,7 @@
 
 			EditorGUILayout.EndScrollView();
 
-			
+
 		}
 
 		void Search(string searchString)

@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Text;
 
 public bool RunCommand(string cmd, bool showCmd = false, bool logOnErrorOnly = false) {
@@ -116,7 +117,7 @@ if (triggerCloudBuild) {
 }
 
 
-Console.WriteLine(string.Format("GITHUB_TOKEN: {0} set", string.IsNullOrWhiteSpace(githubToken) ? "not": "is"));
+Console.WriteLine(string.Format("GITHUB_TOKEN: {0} set", string.IsNullOrWhiteSpace(githubToken) ? "not" : "is"));
 Console.WriteLine($"%UNITYPACKAGER_RAISE_ERROR_ON_FAILURE%: {raiseErrorOnFailure}");
 Console.WriteLine($"%APPVEYOR_BUILD_FOLDER%: {rootDir}");
 Console.WriteLine($"%APPVEYOR_REPO_COMMIT_MESSAGE%: {commitMessage}");
@@ -135,7 +136,7 @@ if (!triggerCloudBuild) {
 		Console.WriteLine($"sdkproject directory: {projectDir}");
 
 		Environment.CurrentDirectory = projectDir;
-		if(!RunCommand("del /F /S /Q .gitignore")){
+		if (!RunCommand("del /F /S /Q .gitignore")) {
 			Console.Error.WriteLine("could not delete .gitignore");
 			Environment.Exit(1);
 		}
@@ -177,8 +178,17 @@ if (!triggerCloudBuild) {
 
 //---------- documentation
 Console.WriteLine("downloading docfx ...");
-if (!RunCommand("powershell Invoke-WebRequest https://github.com/dotnet/docfx/releases/download/v2.14.1/docfx.zip -OutFile docfx.zip", true, true)) {
-	Console.Error.WriteLine("could not download docfx");
+try {
+	ServicePointManager.Expect100Continue = true;
+	ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+	using (WebClient wc = new WebClient()) {
+		wc.DownloadFile(
+			"https://github.com/dotnet/docfx/releases/download/v2.14.1/docfx.zip"
+			, "docfx.zip"
+		);
+	}
+} catch (Exception ex) {
+	Console.Error.WriteLine("could not download docfx: " + ex.ToString());
 	Environment.Exit(1);
 }
 

@@ -9,18 +9,18 @@ namespace Mapbox.Unity.Map
 
 	public class CameraBoundsTileProvider : AbstractTileProvider
 	{
-		[SerializeField]
-		Camera _camera;
+		//[SerializeField]
+		//Camera _camera;
 
-		// TODO: change to Vector4 to optimize for different aspect ratios.
-		[SerializeField]
-		int _visibleBuffer;
+		//// TODO: change to Vector4 to optimize for different aspect ratios.
+		//[SerializeField]
+		//int _visibleBuffer;
 
-		[SerializeField]
-		int _disposeBuffer;
+		//[SerializeField]
+		//int _disposeBuffer;
 
-		[SerializeField]
-		float _updateInterval;
+		//[SerializeField]
+		//float _updateInterval;
 
 		Plane _groundPlane;
 		Ray _ray;
@@ -34,8 +34,11 @@ namespace Mapbox.Unity.Map
 		UnwrappedTileId _currentTile;
 		List<UnwrappedTileId> toRemove;
 
+		CameraBoundsTileProviderOptions _cbtpOptions;
+
 		public override void OnInitialized()
 		{
+			_cbtpOptions = (CameraBoundsTileProviderOptions)Options;
 			_groundPlane = new Plane(Mapbox.Unity.Constants.Math.Vector3Up, Mapbox.Unity.Constants.Math.Vector3Zero);
 			_viewportTarget = new Vector3(0.5f, 0.5f, 0);
 			_shouldUpdate = true;
@@ -51,21 +54,21 @@ namespace Mapbox.Unity.Map
 			}
 
 			_elapsedTime += Time.deltaTime;
-			if (_elapsedTime >= _updateInterval)
+			if (_elapsedTime >= _cbtpOptions.updateInterval)
 			{
 				_elapsedTime = 0f;
-				_ray = _camera.ViewportPointToRay(_viewportTarget);
+				_ray = _cbtpOptions.camera.ViewportPointToRay(_viewportTarget);
 				if (_groundPlane.Raycast(_ray, out _hitDistance))
 				{
-					_currentLatitudeLongitude = _ray.GetPoint(_hitDistance).GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
+					_currentLatitudeLongitude = _map.WorldToGeoPosition(_ray.GetPoint(_hitDistance));
 					_currentTile = TileCover.CoordinateToTileId(_currentLatitudeLongitude, _map.AbsoluteZoom);
 
 					if (!_currentTile.Equals(_cachedTile))
 					{
 						// FIXME: this results in bugs at world boundaries! Does not cleanly wrap. Negative tileIds are bad.
-						for (int x = _currentTile.X - _visibleBuffer; x <= (_currentTile.X + _visibleBuffer); x++)
+						for (int x = _currentTile.X - _cbtpOptions.visibleBuffer; x <= (_currentTile.X + _cbtpOptions.visibleBuffer); x++)
 						{
-							for (int y = _currentTile.Y - _visibleBuffer; y <= (_currentTile.Y + _visibleBuffer); y++)
+							for (int y = _currentTile.Y - _cbtpOptions.visibleBuffer; y <= (_currentTile.Y + _cbtpOptions.visibleBuffer); y++)
 							{
 								AddTile(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
 							}
@@ -84,8 +87,8 @@ namespace Mapbox.Unity.Map
 			foreach (var tile in _activeTilesKeys)
 			{
 				bool dispose = false;
-				dispose = tile.X > currentTile.X + _disposeBuffer || tile.X < _currentTile.X - _disposeBuffer;
-				dispose = dispose || tile.Y > _currentTile.Y + _disposeBuffer || tile.Y < _currentTile.Y - _disposeBuffer;
+				dispose = tile.X > currentTile.X + _cbtpOptions.disposeBuffer || tile.X < _currentTile.X - _cbtpOptions.disposeBuffer;
+				dispose = dispose || tile.Y > _currentTile.Y + _cbtpOptions.disposeBuffer || tile.Y < _currentTile.Y - _cbtpOptions.disposeBuffer;
 
 				if (dispose)
 				{

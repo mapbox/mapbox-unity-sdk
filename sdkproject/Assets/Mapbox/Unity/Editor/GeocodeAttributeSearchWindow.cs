@@ -27,12 +27,12 @@
 		void OnEnable()
 		{
 			_resource = new ForwardGeocodeResource("");
-			EditorApplication.playmodeStateChanged += OnModeChanged;
+			EditorApplication.playModeStateChanged += OnModeChanged;
 		}
 
 		void OnDisable()
 		{
-			EditorApplication.playmodeStateChanged -= OnModeChanged;
+			EditorApplication.playModeStateChanged -= OnModeChanged;
 		}
 
 		bool hasSetFocus = false;
@@ -49,7 +49,7 @@
 			window.position = new Rect(mousePos.x - width, mousePos.y, width, height);
 		}
 
-		void OnModeChanged()
+		void OnModeChanged(PlayModeStateChange state)
 		{
 			Close();
 		}
