@@ -154,7 +154,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					wallTri.Add(ind + 2);
 				}
 
-				if(_separateSubmesh)
+				if(false)
 				{
 					md.Triangles.Add(wallTri);
 				}
