@@ -9,11 +9,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Textured Side Wall Modifier")]
 	public class TextureSideWallModifier : MeshModifier
 	{
-		//[SerializeField]
-		//private float _height;
-		//[SerializeField]
-		//private bool _forceHeight;
-
 		private float _scaledFloorHeight = 0;
 		private float _scaledFirstFloorHeight = 0;
 		private float _scaledTopFloorHeight = 0;
@@ -367,6 +362,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						}
 						break;
 					case ExtrusionType.RangeHeight:
+						for (int i = 0; i < _counter; i++)
+						{
+							md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + maxHeight, md.Vertices[i].z);
+						}
 						break;
 					case ExtrusionType.AbsoluteHeight:
 						for (int i = 0; i < _counter; i++)
@@ -407,6 +406,12 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					{
 						var featureHeight = Convert.ToSingle(feature.Properties[_options.propertyName]);
 						maxHeight = Math.Min(Math.Max(_options.minimumHeight, featureHeight), _options.maximumHeight);
+						if (feature.Properties.ContainsKey("min_height"))
+						{
+							var featureMinHeight = Convert.ToSingle(feature.Properties["min_height"]);
+							minHeight = Math.Min(Math.Max(_options.minimumHeight, featureMinHeight), _options.maximumHeight);
+							//maxHeight -= minHeight;
+						}
 					}
 					break;
 				case ExtrusionType.AbsoluteHeight:

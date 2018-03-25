@@ -39,17 +39,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Height Modifier")]
 	public class HeightModifier : MeshModifier
 	{
-		//[SerializeField]
-		//[Tooltip("Flatten top polygons to prevent unwanted slanted roofs because of the bumpy terrain")]
-		//private bool _flatTops;
-
-		//[SerializeField]
-		//[Tooltip("Fix all features to certain height, suggested to be used for pushing roads above terrain level to prevent z-fighting.")]
-		//private bool _forceHeight;
-
-		//[SerializeField]
-		//[Tooltip("Fixed height value for ForceHeight option")]
-		//private float _height;
 		private float _scale = 1;
 
 		//[SerializeField]
@@ -99,7 +88,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			GenerateWallMesh(md);
 
 		}
-		private void GenerateWallMesh(MeshData md)
+
+		protected virtual void GenerateWallMesh(MeshData md)
 		{
 			md.Vertices.Capacity = _counter + md.Edges.Count * 2;
 			float d = 0f;
@@ -170,7 +160,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
-		private void GenerateRoofMesh(MeshData md, float minHeight, float maxHeight)
+		protected virtual void GenerateRoofMesh(MeshData md, float minHeight, float maxHeight)
 		{
 			if (_options.extrusionGeometryType != ExtrusionGeometryType.SideOnly)
 			{
@@ -206,6 +196,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						}
 						break;
 					case ExtrusionType.RangeHeight:
+						for (int i = 0; i < _counter; i++)
+						{
+							md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + maxHeight, md.Vertices[i].z);
+						}
 						break;
 					case ExtrusionType.AbsoluteHeight:
 						for (int i = 0; i < _counter; i++)
@@ -219,7 +213,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
-		private void QueryHeight(VectorFeatureUnity feature, MeshData md, UnityTile tile, out float maxHeight, out float minHeight)
+		protected virtual void QueryHeight(VectorFeatureUnity feature, MeshData md, UnityTile tile, out float maxHeight, out float minHeight)
 		{
 			minHeight = 0.0f;
 			maxHeight = 0.0f;
@@ -246,6 +240,12 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					{
 						var featureHeight = Convert.ToSingle(feature.Properties[_options.propertyName]);
 						maxHeight = Math.Min(Math.Max(_options.minimumHeight, featureHeight), _options.maximumHeight);
+						if (feature.Properties.ContainsKey("min_height"))
+						{
+							var featureMinHeight = Convert.ToSingle(feature.Properties["min_height"]);
+							minHeight = Math.Min(Math.Max(_options.minimumHeight, featureMinHeight), _options.maximumHeight);
+							//maxHeight -= minHeight;
+						}
 					}
 					break;
 				case ExtrusionType.AbsoluteHeight:
