@@ -70,6 +70,8 @@
 				default:
 					break;
 			}
+			position.y += lineHeight;
+			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("extrusionScaleFactor"), new GUIContent { text = "Scale Factor" });
 			EditorGUI.indentLevel--;
 
 			EditorGUI.EndProperty();
@@ -79,7 +81,7 @@
 			var extrusionTypeProperty = property.FindPropertyRelative("extrusionType");
 			var sourceTypeValue = (Unity.Map.ExtrusionType)extrusionTypeProperty.enumValueIndex;
 
-			int rows = 0;
+			int rows = 1;
 			//if (showPosition)
 			{
 				switch (sourceTypeValue)

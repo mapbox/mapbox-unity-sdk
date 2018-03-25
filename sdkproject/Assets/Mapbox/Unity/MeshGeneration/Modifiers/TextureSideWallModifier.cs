@@ -87,17 +87,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			//read or force height
 			float maxHeight = 1, minHeight = 0;
-			//SetHeight(feature, md, tile, out maxHeight, out minHeight);
-			//height = maxHeight - minHeight;
-			//for (int i = 0; i < md.Vertices.Count; i++)
-			//{
-			//	md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + maxHeight, md.Vertices[i].z);
-			//}
 
 			QueryHeight(feature, md, tile, out maxHeight, out minHeight);
-			height = (maxHeight - minHeight) * _scale;
-			maxHeight = maxHeight * _scale;
-			minHeight = minHeight * _scale;
+			maxHeight = maxHeight * _options.extrusionScaleFactor * _scale;
+			minHeight = minHeight * _options.extrusionScaleFactor * _scale;
+			height = (maxHeight - minHeight);
 
 			GenerateRoofMesh(md, minHeight, maxHeight);
 

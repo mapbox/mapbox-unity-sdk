@@ -19,6 +19,7 @@
 		public string propertyName = "height";
 		public float minimumHeight = 0f;
 		public float maximumHeight = 0f;
+		public float extrusionScaleFactor = 1f;
 	}
 
 	[Serializable]
@@ -38,6 +39,7 @@
 		public string propertyName = "height";
 		public float minimumHeight = 0f;
 		public float maximumHeight = 0f;
+		public float extrusionScaleFactor = 1f;
 
 		public GeometryExtrusionWithAtlasOptions()
 		{
@@ -50,6 +52,7 @@
 			propertyName = extrusionOptions.propertyName;
 			minimumHeight = extrusionOptions.minimumHeight;
 			maximumHeight = extrusionOptions.maximumHeight;
+			extrusionScaleFactor = extrusionOptions.extrusionScaleFactor;
 
 			texturingType = uvOptions.texturingType;
 			atlasInfo = uvOptions.atlasInfo;
