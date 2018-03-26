@@ -44,7 +44,7 @@
 		{
 			if (!_initialized) return;
 
-			_currentTile = TileCover.CoordinateToTileId(_rangeTileProviderOptions.targetTransform.localPosition.GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale), _map.AbsoluteZoom);
+			_currentTile = TileCover.CoordinateToTileId(_map.WorldToGeoPosition(_rangeTileProviderOptions.targetTransform.localPosition), _map.AbsoluteZoom);
 
 			if (!_currentTile.Equals(_cachedTile))
 			{
