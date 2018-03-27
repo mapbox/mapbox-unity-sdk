@@ -11,13 +11,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b10536479dade041b6db9893fdf723a, type: 3}
   m_Name: StylizedMapImageFactory
   m_EditorClassIdentifier: 
-  _mapIdType: 1
-  _customStyle:
-    Name: 
-    Id: mapbox://styles/mapbox/cjavyikad85yp2rmpo82bb9tn
-    Modified: 
-    UserName: 
-  _mapId: mapbox://styles/mapbox/cjavyikad85yp2rmpo82bb9tn
-  _useCompression: 0
-  _useMipMap: 0
-  _useRetina: 1
+  _properties:
+    sourceType: 6
+    sourceOptions:
+      isActive: 1
+      layerSource:
+        Name: Streets
+        Id: mapbox://styles/mapbox/cjavyikad85yp2rmpo82bb9tn
+        Modified: 
+        UserName: 
+    rasterOptions:
+      useRetina: 0
+      useCompression: 0
+      useMipMap: 0

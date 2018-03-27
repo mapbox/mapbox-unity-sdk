@@ -11,13 +11,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b10536479dade041b6db9893fdf723a, type: 3}
   m_Name: ScenicMapImageFactory
   m_EditorClassIdentifier: 
-  _mapIdType: 1
-  _customStyle:
-    Name: 
-    Id: mapbox://styles/mapbox/cjavylmncmgeb2rlnpimhp95q
-    Modified: 
-    UserName: 
-  _mapId: mapbox://styles/mapbox/cjavylmncmgeb2rlnpimhp95q
-  _useCompression: 0
-  _useMipMap: 1
-  _useRetina: 1
+  _properties:
+    sourceType: 6
+    sourceOptions:
+      isActive: 1
+      layerSource:
+        Name: Streets
+        Id: examples.a4c252ab
+        Modified: 
+        UserName: 
+    rasterOptions:
+      useRetina: 1
+      useCompression: 0
+      useMipMap: 1

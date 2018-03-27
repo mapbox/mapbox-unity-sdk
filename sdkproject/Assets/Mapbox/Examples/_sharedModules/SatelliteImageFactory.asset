@@ -11,13 +11,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b10536479dade041b6db9893fdf723a, type: 3}
   m_Name: SatelliteImageFactory
   m_EditorClassIdentifier: 
-  _mapIdType: 0
-  _customStyle:
-    Name: 
-    Id: mapbox.satellite
-    Modified: 
-    UserName: 
-  _mapId: mapbox.satellite
-  _useCompression: 0
-  _useMipMap: 0
-  _useRetina: 1
+  _properties:
+    sourceType: 4
+    sourceOptions:
+      isActive: 1
+      layerSource:
+        Name: Streets
+        Id: mapbox.satellite
+        Modified: 
+        UserName: 
+    rasterOptions:
+      useRetina: 1
+      useCompression: 0
+      useMipMap: 0

@@ -13,6 +13,9 @@
 	{
 
 
+#if MAPBOX_DEBUG_CACHE
+		private string _className;
+#endif
 		private bool _disposed;
 		private List<ICache> _caches = new List<ICache>();
 		private string _accessToken;
@@ -21,12 +24,15 @@
 
 		public CachingWebFileSource(string accessToken, bool autoRefreshCache)
 		{
+#if MAPBOX_DEBUG_CACHE
+			_className = this.GetType().Name;
+#endif
 			_accessToken = accessToken;
 			_autoRefreshCache = autoRefreshCache;
 		}
 
 
-		#region idisposable
+#region idisposable
 
 
 		~CachingWebFileSource()
@@ -61,7 +67,7 @@
 		}
 
 
-		#endregion
+#endregion
 
 
 		/// <summary>
@@ -135,10 +141,16 @@
 			}
 			string finalUrl = uriBuilder.ToString();
 
+#if MAPBOX_DEBUG_CACHE
+			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
+#endif
 
 			// if tile was available call callback with it, propagate to all other caches and check if a newer one is available
 			if (null != cachedItem)
 			{
+#if MAPBOX_DEBUG_CACHE
+				UnityEngine.Debug.LogFormat("{0} {1} {2} {3}", methodName, mapId, tileId, null != cachedItem.Data ? cachedItem.Data.Length.ToString() : "cachedItem.Data is NULL");
+#endif
 				// immediately return cached tile
 				callback(Response.FromCache(cachedItem.Data));
 
@@ -203,6 +215,9 @@
 			else
 			{
 				// requested tile is not in any of the caches yet, get it
+#if MAPBOX_DEBUG_CACHE
+				UnityEngine.Debug.LogFormat("{0} {1} {2} not cached", methodName, mapId, tileId);
+#endif
 				return requestTileAndCache(finalUrl, mapId, tileId, timeout, callback);
 			}
 		}

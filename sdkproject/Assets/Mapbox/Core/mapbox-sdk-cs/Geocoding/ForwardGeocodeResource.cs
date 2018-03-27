@@ -6,12 +6,13 @@
 
 namespace Mapbox.Geocoding
 {
-    using System;
-    using System.Collections.Generic;
-    using Mapbox.Utils;
+	using System;
+	using System.Collections.Generic;
+	using Mapbox.Utils;
+	using UnityEngine;
 
-    /// <summary> A forward geocode request. </summary>
-    public sealed class ForwardGeocodeResource : GeocodeResource<string>
+	/// <summary> A forward geocode request. </summary>
+	public sealed class ForwardGeocodeResource : GeocodeResource<string>
 	{
 		/// <summary>
 		///     ISO 3166-1 alpha-2 country codes.
@@ -45,23 +46,29 @@ namespace Mapbox.Geocoding
 		}
 
 		/// <summary> Gets or sets the place name for forward geocoding. </summary>
-		public override string Query {
-			get {
+		public override string Query
+		{
+			get
+			{
 				return this.query;
 			}
 
-			set {
+			set
+			{
 				this.query = value;
 			}
 		}
 
 		/// <summary> Gets or sets the autocomplete option. </summary>
-		public bool? Autocomplete {
-			get {
+		public bool? Autocomplete
+		{
+			get
+			{
 				return this.autocomplete;
 			}
 
-			set {
+			set
+			{
 				this.autocomplete = value;
 			}
 		}
@@ -70,12 +77,15 @@ namespace Mapbox.Geocoding
 		///     Gets or sets the bounding box option. Bounding box is a rectangle within which to
 		///     limit results, given as <see cref="Bbox"/>.
 		/// </summary>
-		public Vector2dBounds? Bbox {
-			get {
+		public Vector2dBounds? Bbox
+		{
+			get
+			{
 				return this.bbox;
 			}
 
-			set {
+			set
+			{
 				this.bbox = value;
 			}
 		}
@@ -84,12 +94,15 @@ namespace Mapbox.Geocoding
 		///     Gets or sets the country option. Country is an Array of ISO 3166 alpha 2 country codes.
 		///     For all possible values, <see cref="CountryCodes"/>.
 		/// </summary>
-		public string[] Country {
-			get {
+		public string[] Country
+		{
+			get
+			{
 				return this.country;
 			}
 
-			set {
+			set
+			{
 				if (value == null)
 				{
 					this.country = value;
@@ -113,12 +126,15 @@ namespace Mapbox.Geocoding
 		///     Gets or sets the proximity option, which is a location around which to bias results,
 		///     given as <see cref="Vector2d"/>.
 		/// </summary>
-		public Vector2d? Proximity {
-			get {
+		public Vector2d? Proximity
+		{
+			get
+			{
 				return this.proximity;
 			}
 
-			set {
+			set
+			{
 				this.proximity = value;
 			}
 		}
@@ -156,12 +172,31 @@ namespace Mapbox.Geocoding
 				opts.Add("types", GetUrlQueryFromArray(this.Types));
 			}
 
-			return Constants.BaseAPI +
-							this.ApiEndpoint +
-							this.Mode +
-							Uri.EscapeDataString(this.Query) +
-							".json" +
-							EncodeQueryString(opts);
+			// !!!!!!!!!! HACK !!!!!!!
+			// we are seeing super weird behaviour on some iOS devices:
+			// crashes with properly escaped whitespaces %20 and commas %2C - and other special characters
+			// 'NSAllowsArbitraryLoads' and 'NSURLConnection finished with error - code - 1002'
+			// Use 'CFNETWORK_DIAGNOSTICS=1' in XCode to get more details https://stackoverflow.com/a/46748461
+
+			// trying to get rid of at least the most common characters - other will still crash
+#if UNITY_IOS
+			Query = Query
+				.Replace(",", " ")
+				.Replace(".", " ")
+				.Replace("-", " ");
+#endif
+
+			return
+				Constants.BaseAPI +
+				ApiEndpoint +
+				Mode +
+#if UNITY_IOS
+				WWW.EscapeURL(Query) +
+#else
+				Uri.EscapeDataString(Query) +
+#endif
+				".json" +
+				EncodeQueryString(opts);
 		}
 	}
 }

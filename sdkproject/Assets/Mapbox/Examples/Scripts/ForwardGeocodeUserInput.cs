@@ -63,10 +63,14 @@ namespace Mapbox.Examples
 		void HandleGeocoderResponse(ForwardGeocodeResponse res)
 		{
 			_hasResponse = true;
-			if (null != res.Features && res.Features.Count > 0)
+			if (null == res)
+			{
+				_inputField.text = "no geocode response";
+			}
+			else if (null != res.Features && res.Features.Count > 0)
 			{
 				var center = res.Features[0].Center;
-				_inputField.text = string.Format("{0},{1}", center.x, center.y);
+				//_inputField.text = string.Format("{0},{1}", center.x, center.y);
 				_coordinate = res.Features[0].Center;
 			}
 			Response = res;

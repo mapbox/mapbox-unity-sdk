@@ -6,8 +6,8 @@
 
 	public class ImmediatePositionWithLocationProvider : MonoBehaviour
 	{
-		[SerializeField]
-		private AbstractMap _map;
+		//[SerializeField]
+		//private UnifiedMap _map;
 
 		bool _isInitialized;
 
@@ -29,14 +29,15 @@
 
 		void Start()
 		{
-			_map.OnInitialized += () => _isInitialized = true;
+			LocationProviderFactory.Instance.mapManager.OnInitialized += () => _isInitialized = true;
 		}
 
 		void LateUpdate()
 		{
 			if (_isInitialized)
 			{
-				transform.localPosition = _map.GeoToWorldPosition(LocationProvider.CurrentLocation.LatitudeLongitude);
+				var map = LocationProviderFactory.Instance.mapManager;
+				transform.localPosition = map.GeoToWorldPosition(LocationProvider.CurrentLocation.LatitudeLongitude);
 			}
 		}
 	}

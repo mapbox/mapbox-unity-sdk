@@ -12,9 +12,13 @@ MonoBehaviour:
   m_Name: TransparentGreyMaterialModifier
   m_EditorClassIdentifier: 
   Active: 1
-  _projectMapImagery: 0
-  _materials:
-  - Materials:
-    - {fileID: 2100000, guid: 497423d004c7f44f690e8f82bed81904, type: 2}
-  - Materials:
-    - {fileID: 2100000, guid: 497423d004c7f44f690e8f82bed81904, type: 2}
+  _options:
+    projectMapImagery: 0
+    texturingType: 0
+    materials:
+    - Materials:
+      - {fileID: 2100000, guid: 497423d004c7f44f690e8f82bed81904, type: 2}
+    - Materials:
+      - {fileID: 2100000, guid: 497423d004c7f44f690e8f82bed81904, type: 2}
+    atlasInfo: {fileID: 0}
+    colorPallete: {fileID: 0}

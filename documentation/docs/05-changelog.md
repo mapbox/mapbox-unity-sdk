@@ -1,10 +1,17 @@
 ﻿## CHANGELOG
 
-### v.?.?.?
-*TBD*
+### v.1.4.0
+*03/20/2018*
 
 #####
+- Drag and drop prefabs for most common use cases. 
+- New Abstract Map UI
+- Style development - colorization and atlas template generator 
+- Use texture atlas for building geometries.
+- Merge buildings with unique ids using the experimental 3D buildings tileset. 
+- Added a API call on AbstractMap to query height at a certain latitude longitude.
 - Included EditorConfig file to enforce coding style
+- Integration of previously seperate AR support https://github.com/mapbox/mapbox-unity-sdk/pull/544
 
 ### v.1.3.0
 *12/18/2017*
