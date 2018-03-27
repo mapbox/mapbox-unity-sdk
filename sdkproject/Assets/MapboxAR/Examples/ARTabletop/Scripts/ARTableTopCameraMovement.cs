@@ -159,10 +159,15 @@
 				if (Mathf.Abs(changeFromPreviousPosition.x) > 0.0f || Mathf.Abs(changeFromPreviousPosition.y) > 0.0f)
 				{
 					_mousePositionPrevious = _mousePosition;
-					var offset = _origin - _mousePosition;
+
+					var offsetDelta = _origin - _mousePosition;
+					var offset = new Vector3(offsetDelta.x, 0f, offsetDelta.y);
+					offset = Camera.main.transform.rotation * offset;
+					offset.y = 0;
+
 					if (Mathf.Abs(offset.x) > 0.0f || Mathf.Abs(offset.z) > 0.0f)
 					{
-						PanMapUsingKeyBoard(offset.x, offset.y);
+						PanMapUsingKeyBoard(offset.x, offset.z);
 					}
 					_origin = _mousePosition;
 				}
