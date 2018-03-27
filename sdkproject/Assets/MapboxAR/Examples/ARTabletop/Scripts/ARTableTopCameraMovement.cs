@@ -163,7 +163,6 @@
 					var offsetDelta = _origin - _mousePosition;
 					var offset = new Vector3(offsetDelta.x, 0f, offsetDelta.y);
 					offset = Camera.main.transform.rotation * offset;
-					offset.y = 0;
 
 					if (Mathf.Abs(offset.x) > 0.0f || Mathf.Abs(offset.z) > 0.0f)
 					{
