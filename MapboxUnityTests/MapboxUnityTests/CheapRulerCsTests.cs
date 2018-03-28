@@ -10,20 +10,14 @@ namespace Mapbox.CheapRulerCs.UnitTest
 {
 
 
-	using Mapbox.Platform;
 	using NUnit.Framework;
 	using System.Collections.Generic;
-	using System.Globalization;
-	using System.IO;
-	using System.Text;
-	using System;
-	using System.Linq;
 	using UnityEngine;
 	using Mapbox.CheapRulerCs;
 	using Mapbox.Json.Linq;
 
 	[TestFixture]
-	internal class ProbeExtractorCsTest
+	internal class CheapRulerCsTest
 	{
 
 
@@ -59,7 +53,7 @@ namespace Mapbox.CheapRulerCs.UnitTest
 			double distKm = ruler.Distance(new double[] { 30.5, 32.8351 }, new double[] { 30.51, 32.8451 });
 			double distMiles = rulerMiles.Distance(new double[] { 30.5, 32.8351 }, new double[] { 30.51, 32.8451 });
 
-			Assert.AreEqual(1.609344, distKm / distMiles, 1e-12, "wrong distance in miles");
+			Assert.AreEqual(100.609344, distKm / distMiles, 1e-12, "wrong distance in miles");
 		}
 
 
@@ -67,11 +61,8 @@ namespace Mapbox.CheapRulerCs.UnitTest
 
 		private List<line> loadFixtures()
 		{
-			string fixturePath = Application.dataPath + "/Mapbox/Core/cheap-ruler-cs/Tests/Editor/lines.json";
-			string fixtureAsText;
-			using (TextReader tw = new StreamReader(fixturePath, Encoding.UTF8)) { fixtureAsText = tw.ReadToEnd(); }
-
-			var json = JArray.Parse(fixtureAsText);
+			TextAsset fixturesAsset = Resources.Load<TextAsset>("ChearRulerCsTestsFixtures");
+			var json = JArray.Parse(fixturesAsset.text);
 			List<line> fixtures = new List<line>();
 
 			foreach (var line in json)
