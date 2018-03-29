@@ -278,7 +278,7 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 
 		protected override bool PropertyComparer(object property)
 		{
-			return ValueSet.Contains(property);
+			return ValueSet.Contains(property.ToString().ToLower());
 		}
 	}
 
@@ -316,7 +316,7 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 					filterComparer = LayerFilterComparer.HasPropertyLessThan(Key, Min);
 					break;
 				case LayerFilterOperationType.Contains:
-					filterComparer = LayerFilterComparer.PropertyContainsValue(Key, PropertyValue.Split(','));
+					filterComparer = LayerFilterComparer.PropertyContainsValue(Key, PropertyValue.ToLower().Split(','));
 					break;
 				case LayerFilterOperationType.IsInRange:
 					filterComparer = LayerFilterComparer.HasPropertyInRange(Key, Min, Max);
