@@ -182,17 +182,23 @@
 
 		void DrawModifiers(SerializedProperty property, GUIContent label)
 		{
+			var groupFeaturesProperty = property.FindPropertyRelative("coreOptions").FindPropertyRelative("groupFeatures");
 			showPosition = EditorGUILayout.Foldout(showPosition, label.text);
 			EditorGUILayout.BeginVertical();
 			if (showPosition)
 			{
+
 				EditorGUILayout.BeginHorizontal();
-				EditorGUILayout.PrefixLabel(new GUIContent { text = "Feature Position", tooltip = "Position to place feature in the tile. " });
-				var featurePositionProperty = property.FindPropertyRelative("moveFeaturePositionTo");
-				featurePositionProperty.enumValueIndex = EditorGUILayout.Popup(featurePositionProperty.enumValueIndex, featurePositionProperty.enumDisplayNames);
+				if (groupFeaturesProperty.boolValue == false)
+				{
+					EditorGUILayout.PrefixLabel(new GUIContent { text = "Feature Position", tooltip = "Position to place feature in the tile. " });
+					var featurePositionProperty = property.FindPropertyRelative("moveFeaturePositionTo");
+					featurePositionProperty.enumValueIndex = EditorGUILayout.Popup(featurePositionProperty.enumValueIndex, featurePositionProperty.enumDisplayNames);
+				}
 				EditorGUILayout.EndHorizontal();
 
 				EditorGUILayout.Space();
+
 				EditorGUILayout.LabelField(new GUIContent { text = "Mesh Modifiers", tooltip = "Modifiers that manipulate the features mesh. " });
 
 				var meshfac = property.FindPropertyRelative("MeshModifiers");

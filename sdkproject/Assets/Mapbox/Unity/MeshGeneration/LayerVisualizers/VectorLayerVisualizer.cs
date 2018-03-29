@@ -46,6 +46,7 @@
 			else
 			{
 				_defaultStack = ScriptableObject.CreateInstance<ModifierStack>();
+				((ModifierStack)_defaultStack).moveFeaturePositionTo = _layerProperties.moveFeaturePositionTo;
 			}
 
 			_defaultStack.MeshModifiers = new List<MeshModifier>();
