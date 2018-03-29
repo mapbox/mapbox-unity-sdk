@@ -61,7 +61,7 @@ namespace Mapbox.CheapRulerCs.UnitTest
 
 		private List<line> loadFixtures()
 		{
-			TextAsset fixturesAsset = Resources.Load<TextAsset>("ChearRulerCsTestsFixtures");
+			TextAsset fixturesAsset = Resources.Load<TextAsset>("ChearRulerCs_fixtures");
 			var json = JArray.Parse(fixturesAsset.text);
 			List<line> fixtures = new List<line>();
 

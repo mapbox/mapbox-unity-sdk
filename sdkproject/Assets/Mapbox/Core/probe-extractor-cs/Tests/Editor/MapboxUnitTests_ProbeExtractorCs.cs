@@ -32,9 +32,9 @@ namespace Mapbox.ProbeExtractorCs.UnitTest
 		[SetUp]
 		public void SetUp()
 		{
-			_trace = loadTraceFixture("trace.csv");
-			_footTrace = loadTraceFixture("trace-foot.csv");
-			_probes = loadProbeFixture();
+			_trace = loadTraceFixture("ProbeExtractorCs_fixture_trace");
+			_footTrace = loadTraceFixture("ProbeExtractorCs_fixture_trace-foot");
+			_probes = loadProbeFixture("ProbeExtractorCs_fixture_probes");
 		}
 
 
@@ -106,22 +106,22 @@ namespace Mapbox.ProbeExtractorCs.UnitTest
 			ProbeExtractor extractor = new ProbeExtractor(ruler, options);
 			List<Probe> extractedProbes = extractor.ExtractProbes(_footTrace);
 
-			Debug.Log(probesToGeojson(extractedProbes));
+			//Debug.Log(probesToGeojson(extractedProbes));
 
 			Assert.AreEqual(40, extractedProbes.Count);
 		}
 
 
-		private List<TracePoint> loadTraceFixture(string csvFile)
+		private List<TracePoint> loadTraceFixture(string fixtureName)
 		{
-			string fixture = Application.dataPath + "/Mapbox/Core/probe-extractor-cs/Tests/Editor/" + csvFile;
+			TextAsset fixtureAsset = Resources.Load<TextAsset>(fixtureName);
 			List<TracePoint> trace = new List<TracePoint>();
-			using (TextReader tw = new StreamReader(fixture, Encoding.UTF8))
+			using (StringReader sr = new StringReader(fixtureAsset.text))
 			{
 				// skip header
-				tw.ReadLine();
+				sr.ReadLine();
 				string line;
-				while (null != (line = tw.ReadLine()))
+				while (null != (line = sr.ReadLine()))
 				{
 					string[] tokens = line.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
 					if (tokens.Length != 4)
@@ -153,16 +153,16 @@ namespace Mapbox.ProbeExtractorCs.UnitTest
 		}
 
 
-		private List<Probe> loadProbeFixture()
+		private List<Probe> loadProbeFixture(string fixtureName)
 		{
-			string fixture = Application.dataPath + "/Mapbox/Core/probe-extractor-cs/Tests/Editor/probes.csv";
+			TextAsset fixtureAsset = Resources.Load<TextAsset>(fixtureName);
 			List<Probe> probes = new List<Probe>();
-			using (TextReader tw = new StreamReader(fixture, Encoding.UTF8))
+			using (StringReader sr = new StringReader(fixtureAsset.text))
 			{
 				// skip header
-				tw.ReadLine();
+				sr.ReadLine();
 				string line;
-				while (null != (line = tw.ReadLine()))
+				while (null != (line = sr.ReadLine()))
 				{
 					string[] tokens = line.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
 					if (tokens.Length != 8)
