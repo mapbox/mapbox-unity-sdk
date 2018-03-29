@@ -6,10 +6,12 @@ using UnityEngine;
 namespace Mapbox.Tests
 {
 
-	[InitializeOnLoad]
-	public static class CopyEditModeTests
+	public class CopyEditModeTests : MonoBehaviour
 	{
 
+		/// <summary>
+		/// Copies EditMode tests to a *not* 'Editior' folder to make them available in PlayMode
+		/// </summary>
 		[MenuItem("Mapbox/DevTools/Copy EditMode tests to PlayMode tests")]
 		private static void CopyEditModeTestFiles()
 		{
@@ -39,40 +41,29 @@ namespace Mapbox.Tests
 				{
 					string oldTestAssetPath = AssetDatabase.GUIDToAssetPath(oldTestAssetGuid);
 					Debug.LogFormat("deleting old test file: [{0}]", oldTestAssetPath);
-					if (!FileUtil.DeleteFileOrDirectory(oldTestAssetPath))
+
+					if (!AssetDatabase.DeleteAsset(oldTestAssetPath))
 					{
 						Debug.LogErrorFormat("failed to delete: [{0}]", oldTestAssetPath);
 					}
-					// also delete .meta files to avoid warnings console
-					string metaFile = oldTestAssetPath + ".meta";
-					if (!FileUtil.DeleteFileOrDirectory(metaFile))
-					{
-						Debug.LogErrorFormat("failed to delete: [{0}]", metaFile);
-					}
 				}
-
-				// force synchronous update, otherwise scripts get compiled asynchronously
-				AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 			}
 
+
 			// copy test files according to naming convention
-			string[] editModeTestAssetGuids = AssetDatabase.FindAssets("Tests t:Script");
+			string[] editModeTestAssetGuids = AssetDatabase.FindAssets("MapboxUnitTests_ t:Script");
 			foreach (var testAssetGuid in editModeTestAssetGuids)
 			{
 				string testAssetSourcePath = AssetDatabase.GUIDToAssetPath(testAssetGuid);
+				string fileName = System.IO.Path.GetFileName(testAssetSourcePath);
 				Debug.LogFormat("copying [{0}]", testAssetSourcePath);
-				try
+				if (!AssetDatabase.CopyAsset(testAssetSourcePath, destinationFolderPath + "/" + fileName))
 				{
-					string fileName = System.IO.Path.GetFileName(testAssetSourcePath);
-					FileUtil.CopyFileOrDirectory(testAssetSourcePath, destinationFolderPath + "/" + fileName);
-				}
-				catch (Exception ex)
-				{
-					Debug.LogErrorFormat("failed to copy [{0}]{1}{2}", testAssetSourcePath, Environment.NewLine, ex);
+					Debug.LogErrorFormat("failed to copy [{0}]", testAssetSourcePath);
 				}
 			}
-
-			AssetDatabase.Refresh();
 		}
+
+
 	}
 }
