@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Examples
+namespace Mapbox.Examples
 {
 	using UnityEngine;
 	using Mapbox.Utils;
@@ -6,6 +6,7 @@
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Unity.Utilities;
 	using System.Collections.Generic;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	public class SpawnOnMap : MonoBehaviour
 	{

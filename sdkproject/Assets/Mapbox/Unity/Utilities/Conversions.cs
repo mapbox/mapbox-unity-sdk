@@ -11,6 +11,7 @@ namespace Mapbox.Unity.Utilities
 	using Mapbox.Utils;
 	using UnityEngine;
 	using System.Globalization;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	/// <summary>
 	/// A set of Geo and Terrain Conversion utils.

@@ -7,6 +7,7 @@
 namespace Mapbox.Utils
 {
 	using System.Globalization;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	/// <summary> Represents a geographic coordinate. </summary>
 	//public struct Vector2d

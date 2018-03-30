@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="Map.cs" company="Mapbox">
 //     Copyright (c) 2016 Mapbox. All rights reserved.
 // </copyright>
@@ -10,6 +10,7 @@ namespace Mapbox.Map
 	using System.Collections.Generic;
 	using Mapbox.Platform;
 	using Mapbox.Utils;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	/// <summary>
 	///     The Mapbox Map abstraction will take care of fetching and decoding

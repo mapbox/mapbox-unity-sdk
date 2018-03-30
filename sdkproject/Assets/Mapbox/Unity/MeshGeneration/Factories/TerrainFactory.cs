@@ -8,6 +8,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	using Utils;
 	using System;
 	using Mapbox.Unity.Map;
+	using Mathd = Mapbox.Utils.Mathd;
 
 	public enum MapIdType
 	{

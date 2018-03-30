@@ -6,8 +6,8 @@
 
 namespace Mapbox.Unity.Utilities
 {
-	using Mapbox.Utils;
 	using UnityEngine;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	public static class VectorExtensions
 	{

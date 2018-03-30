@@ -9,6 +9,8 @@ namespace Mapbox.Unity.Map
 	using Mapbox.Map;
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Unity.MeshGeneration.Data;
+	using Vector2d = Mapbox.Utils.Vector2d;
+	using Mathd = Mapbox.Utils.Mathd;
 
 	public interface IUnifiedMap
 	{

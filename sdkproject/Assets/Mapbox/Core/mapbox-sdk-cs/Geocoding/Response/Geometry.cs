@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="Geometry.cs" company="Mapbox">
 //     Copyright (c) 2016 Mapbox. All rights reserved.
 // </copyright>
@@ -9,11 +9,12 @@ namespace Mapbox.Geocoding {
     using Mapbox.Json;
     using Mapbox.Utils;
     using Mapbox.Utils.JsonConverters;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
-    /// <summary> Point geometry representing location of geocode result. </summary>
+	/// <summary> Point geometry representing location of geocode result. </summary>
 #if !WINDOWS_UWP
-    //http://stackoverflow.com/a/12903628
-    [Serializable]
+	//http://stackoverflow.com/a/12903628
+	[Serializable]
 #endif
 	public class Geometry {
 		/// <summary>

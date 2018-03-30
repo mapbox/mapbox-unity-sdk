@@ -6,6 +6,7 @@ namespace Mapbox.Unity.Map
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Utils;
 	using System.Collections.Generic;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	public class CameraBoundsTileProvider : AbstractTileProvider
 	{

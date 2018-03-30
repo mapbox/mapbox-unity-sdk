@@ -5,6 +5,8 @@ namespace Mapbox.Unity.Map
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Utils;
 	using Mapbox.Unity.Utilities;
+	using Vector2d = Mapbox.Utils.Vector2d;
+
 	//TODO : obsolete.
 	[CreateAssetMenu(menuName = "Mapbox/MapVisualizer/QuadTreeMapVisualizer")]
 	public class QuadTreeMapVisualizer : AbstractMapVisualizer

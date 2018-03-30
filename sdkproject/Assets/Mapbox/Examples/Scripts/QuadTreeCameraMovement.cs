@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Examples
+namespace Mapbox.Examples
 {
 	using Mapbox.Unity.Map;
 	using Mapbox.Unity.Utilities;
@@ -6,6 +6,7 @@
 	using UnityEngine;
 	using UnityEngine.EventSystems;
 	using System;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	public class QuadTreeCameraMovement : MonoBehaviour
 	{

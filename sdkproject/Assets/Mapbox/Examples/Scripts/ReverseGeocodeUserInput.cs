@@ -12,13 +12,14 @@ namespace Mapbox.Examples
     using Mapbox.Geocoding;
     using Mapbox.Utils;
 	using Mapbox.Unity.Utilities;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
-    /// <summary>
-    /// Peforms a reverse geocoder request (search by latitude, longitude) whenever the InputField on *this*
-    /// gameObject is finished with an edit. 
-    /// Expects input in the form of "latitude, longitude"
-    /// </summary>
-    [RequireComponent(typeof(InputField))]
+	/// <summary>
+	/// Peforms a reverse geocoder request (search by latitude, longitude) whenever the InputField on *this*
+	/// gameObject is finished with an edit. 
+	/// Expects input in the form of "latitude, longitude"
+	/// </summary>
+	[RequireComponent(typeof(InputField))]
 	public class ReverseGeocodeUserInput : MonoBehaviour
 	{
 		InputField _inputField;

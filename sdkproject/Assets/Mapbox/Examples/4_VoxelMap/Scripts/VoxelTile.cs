@@ -11,6 +11,8 @@ namespace Mapbox.Examples.Voxels
 	using Mapbox.Utils;
 	using Mapbox.Platform;
 	using Mapbox.Unity.Utilities;
+	using Vector2d = Mapbox.Utils.Vector2d;
+
 	class VoxelTile : MonoBehaviour, Mapbox.Utils.IObserver<RasterTile>, Mapbox.Utils.IObserver<RawPngRasterTile>
 	{
 		[SerializeField]

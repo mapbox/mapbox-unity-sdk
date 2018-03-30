@@ -1,11 +1,11 @@
-﻿namespace Mapbox.Unity.MeshGeneration.Factories
+namespace Mapbox.Unity.MeshGeneration.Factories
 {
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.Utilities;
 	using System.Collections.Generic;
-	using Mapbox.Utils;
 	using Mapbox.Unity.Map;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	[CreateAssetMenu(menuName = "Mapbox/Factories/Terrain Factory - Flat Sphere")]
 	public class FlatSphereTerrainFactory : AbstractTileFactory
