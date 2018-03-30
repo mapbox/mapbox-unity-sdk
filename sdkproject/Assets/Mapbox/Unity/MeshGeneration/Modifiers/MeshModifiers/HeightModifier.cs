@@ -246,8 +246,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						if (feature.Properties.ContainsKey("min_height"))
 						{
 							var featureMinHeight = Convert.ToSingle(feature.Properties["min_height"]);
-							minHeight = Math.Min(Math.Max(_options.minimumHeight, featureMinHeight), _options.maximumHeight);
-							//maxHeight -= minHeight;
+							minHeight = Math.Min(featureMinHeight, _options.maximumHeight);
 						}
 					}
 					break;
