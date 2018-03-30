@@ -3,6 +3,7 @@ namespace Mapbox.Unity.Location
 	using System.Collections;
 	using UnityEngine;
 	using Mapbox.Utils;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	/// <summary>
 	/// The DeviceLocationProvider is responsible for providing real world location and heading data,

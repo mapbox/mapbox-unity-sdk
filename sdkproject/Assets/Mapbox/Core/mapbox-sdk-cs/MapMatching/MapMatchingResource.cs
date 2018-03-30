@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="MapMatchingResource.cs" company="Mapbox">
 //     Copyright (c) 2017 Mapbox. All rights reserved.
 // </copyright>
@@ -12,6 +12,7 @@ namespace Mapbox.MapMatching
 	using Mapbox.Platform;
 	using Mapbox.Utils;
 	using Mapbox.VectorTile.ExtensionMethods;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	/// <summary> Base geocode class. </summary>
 	/// <typeparam name="T"> Type of Query field (either string or LatLng). </typeparam>

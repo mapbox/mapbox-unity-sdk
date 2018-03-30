@@ -15,6 +15,7 @@ namespace Mapbox.Examples.Playground
 	using Mapbox.Utils;
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Geocoding;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	public class RasterTileExample : MonoBehaviour, Mapbox.Utils.IObserver<RasterTile>
 	{

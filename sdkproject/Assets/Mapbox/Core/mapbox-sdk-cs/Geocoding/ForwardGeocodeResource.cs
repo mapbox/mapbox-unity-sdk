@@ -10,6 +10,7 @@ namespace Mapbox.Geocoding
 	using System.Collections.Generic;
 	using Mapbox.Utils;
 	using UnityEngine;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	/// <summary> A forward geocode request. </summary>
 	public sealed class ForwardGeocodeResource : GeocodeResource<string>

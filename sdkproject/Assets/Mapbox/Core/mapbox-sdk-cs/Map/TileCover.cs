@@ -10,6 +10,7 @@ namespace Mapbox.Map
 	using System.Collections.Generic;
 	using Mapbox.Utils;
 	using UnityEngine;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	/// <summary>
 	///     Helper funtions to get a tile cover, i.e. a set of tiles needed for

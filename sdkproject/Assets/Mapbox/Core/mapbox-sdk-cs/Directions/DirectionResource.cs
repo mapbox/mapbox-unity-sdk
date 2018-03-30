@@ -10,6 +10,7 @@ namespace Mapbox.Directions
     using System.Collections.Generic;
     using Mapbox.Utils;
     using Platform;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
     /// <summary> A directions request. </summary>
     public class DirectionResource : Resource

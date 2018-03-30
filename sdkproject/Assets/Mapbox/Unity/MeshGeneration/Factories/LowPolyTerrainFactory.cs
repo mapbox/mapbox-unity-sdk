@@ -8,6 +8,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	using Utils;
 	using Mapbox.Unity.Map;
 	using System;
+	using Mathd = Mapbox.Utils.Mathd;
 
 	/// <summary>
 	/// Uses Mapbox Terrain api and creates terrain meshes.

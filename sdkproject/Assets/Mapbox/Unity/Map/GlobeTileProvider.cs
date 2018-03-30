@@ -2,6 +2,7 @@
 {
 	using Mapbox.Utils;
 	using Mapbox.Map;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	public class GlobeTileProvider : AbstractTileProvider
 	{

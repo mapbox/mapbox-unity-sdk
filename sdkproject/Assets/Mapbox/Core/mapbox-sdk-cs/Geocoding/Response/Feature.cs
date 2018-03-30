@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="Feature.cs" company="Mapbox">
 //     Copyright (c) 2016 Mapbox. All rights reserved.
 // </copyright>
@@ -10,11 +10,12 @@ namespace Mapbox.Geocoding {
     using Mapbox.Json;
     using Mapbox.Utils;
     using Mapbox.Utils.JsonConverters;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
-    /// <summary> A GeoJSON FeatureCollection of points returned by geocoding API.</summary>
+	/// <summary> A GeoJSON FeatureCollection of points returned by geocoding API.</summary>
 #if !WINDOWS_UWP
-    //http://stackoverflow.com/a/12903628
-    [Serializable]
+	//http://stackoverflow.com/a/12903628
+	[Serializable]
 #endif
 	public class Feature {
 		/// <summary> Gets or sets the id. Ids are unique in the Mapbox geocoder. </summary>

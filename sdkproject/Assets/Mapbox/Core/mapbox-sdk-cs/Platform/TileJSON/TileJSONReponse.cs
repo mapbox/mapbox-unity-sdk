@@ -4,6 +4,7 @@
 	using Mapbox.Json;
 	using Mapbox.Utils;
 	using System;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	public class TileJSONResponse
 	{

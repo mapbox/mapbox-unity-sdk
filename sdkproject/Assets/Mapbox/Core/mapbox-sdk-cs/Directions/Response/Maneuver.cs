@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="Maneuver.cs" company="Mapbox">
 //     Copyright (c) 2016 Mapbox. All rights reserved.
 // </copyright>
@@ -8,11 +8,12 @@ namespace Mapbox.Directions
 {
     using Mapbox.Json;
     using Mapbox.Utils;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
-    /// <summary>
-    /// A Maneuver from a directions API call.
-    /// </summary>
-    public class Maneuver
+	/// <summary>
+	/// A Maneuver from a directions API call.
+	/// </summary>
+	public class Maneuver
 	{
 		/// <summary>
 		/// Gets or sets the bearing after.

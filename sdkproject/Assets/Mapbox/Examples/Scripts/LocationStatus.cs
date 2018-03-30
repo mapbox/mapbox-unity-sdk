@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Examples
+namespace Mapbox.Examples
 {
 	using Mapbox.Unity.Location;
 	using Mapbox.Utils;
@@ -6,6 +6,7 @@
 	using System.Collections.Generic;
 	using UnityEngine;
 	using UnityEngine.UI;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	public class LocationStatus : MonoBehaviour
 	{

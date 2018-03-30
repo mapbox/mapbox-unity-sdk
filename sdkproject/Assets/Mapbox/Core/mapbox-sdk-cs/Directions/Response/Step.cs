@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="Step.cs" company="Mapbox">
 //     Copyright (c) 2016 Mapbox. All rights reserved.
 // </copyright>
@@ -10,11 +10,12 @@ namespace Mapbox.Directions
     using Mapbox.Json;
     using Mapbox.Utils;
     using Mapbox.Utils.JsonConverters;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
-    /// <summary>
-    /// A step from a Directions API call.
-    /// </summary>
-    public class Step
+	/// <summary>
+	/// A step from a Directions API call.
+	/// </summary>
+	public class Step
 	{
 		/// <summary>
 		/// Gets or sets the intersections.

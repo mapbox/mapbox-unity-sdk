@@ -1,7 +1,8 @@
-﻿namespace Mapbox.Unity.Location
+namespace Mapbox.Unity.Location
 {
 	using Mapbox.Utils;
-	
+	using Vector2d = Mapbox.Utils.Vector2d;
+
 	/// <summary>
 	/// Location contains heading, latitude, longitude, accuracy and a timestamp.
 	/// </summary>

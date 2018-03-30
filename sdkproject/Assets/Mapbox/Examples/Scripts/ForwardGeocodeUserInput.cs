@@ -12,6 +12,7 @@ namespace Mapbox.Examples
 	using System;
 	using Mapbox.Geocoding;
 	using Mapbox.Utils;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	[RequireComponent(typeof(InputField))]
 	public class ForwardGeocodeUserInput : MonoBehaviour

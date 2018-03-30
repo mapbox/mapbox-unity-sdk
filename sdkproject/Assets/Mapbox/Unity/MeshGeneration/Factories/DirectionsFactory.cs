@@ -7,8 +7,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	using Mapbox.Unity.Map;
 	using Data;
 	using Modifiers;
-	using Mapbox.Utils;
 	using Mapbox.Unity.Utilities;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	public class DirectionsFactory : MonoBehaviour
 	{

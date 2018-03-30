@@ -15,6 +15,7 @@ namespace Mapbox.Examples.Playground
 	using Mapbox.Utils;
 	using Mapbox.Utils.JsonConverters;
 	using Mapbox.Geocoding;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	/// <summary>
 	/// Fetch directions JSON once start and end locations are provided.

@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="ReverseGeocodeResource.cs" company="Mapbox">
 //     Copyright (c) 2016 Mapbox. All rights reserved.
 // </copyright>
@@ -8,9 +8,10 @@ namespace Mapbox.Geocoding
 {
     using System.Collections.Generic;
     using Mapbox.Utils;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
-    /// <summary> A reverse geocode request. </summary>
-    public sealed class ReverseGeocodeResource : GeocodeResource<Vector2d>
+	/// <summary> A reverse geocode request. </summary>
+	public sealed class ReverseGeocodeResource : GeocodeResource<Vector2d>
 	{
 		// Required
 		private Vector2d query;

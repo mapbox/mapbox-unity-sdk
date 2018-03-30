@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="CanonicalTileId.cs" company="Mapbox">
 //     Copyright (c) 2016 Mapbox. All rights reserved.
 // </copyright>
@@ -8,6 +8,7 @@ namespace Mapbox.Map
 {
 	using System;
 	using Mapbox.Utils;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	/// <summary>
 	/// Data type to store  <see href="https://en.wikipedia.org/wiki/Web_Mercator"> Web Mercator</see> tile scheme.

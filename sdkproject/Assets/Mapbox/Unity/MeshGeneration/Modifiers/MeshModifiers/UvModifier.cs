@@ -5,7 +5,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using Mapbox.Unity.MeshGeneration.Data;
 	using System;
 	using Mapbox.Unity.Map;
-	using Mapbox.Utils;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	/// <summary>
 	/// UV Modifier works only with (and right after) Polygon Modifier and not with Line Mesh Modifier.

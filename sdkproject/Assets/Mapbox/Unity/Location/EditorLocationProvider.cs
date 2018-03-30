@@ -5,6 +5,7 @@ namespace Mapbox.Unity.Location
 	using Mapbox.Utils;
 	using UnityEngine;
 	using Mapbox.Unity.Map;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	/// <summary>
 	/// The EditorLocationProvider is responsible for providing mock location and heading data

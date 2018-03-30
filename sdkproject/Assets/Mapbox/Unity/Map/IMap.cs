@@ -1,8 +1,9 @@
-﻿namespace Mapbox.Unity.Map
+namespace Mapbox.Unity.Map
 {
 	using System;
 	using Mapbox.Utils;
 	using UnityEngine;
+	using Vector2d = Mapbox.Utils.Vector2d;
 
 	public interface IMap : IMapReadable, IMapWritable, IUnifiedMap { }
 
