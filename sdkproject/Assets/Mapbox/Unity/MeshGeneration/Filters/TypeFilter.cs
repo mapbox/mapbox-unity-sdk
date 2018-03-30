@@ -294,7 +294,7 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 
 		[Tooltip("Filter operator to apply. ")]
 		public LayerFilterOperationType filterOperator;
-
+		private char[] _delimiters = new char[] { ',' };
 		public LayerFilter(LayerFilterOperationType filterOperation)
 		{
 			filterOperator = filterOperation;
@@ -302,6 +302,10 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 
 		public ILayerFeatureFilterComparer GetFilterComparer()
 		{
+			if (_delimiters == null)
+			{
+				_delimiters = new char[] { ',' };
+			}
 			ILayerFeatureFilterComparer filterComparer = new LayerFilterComparer();
 
 			switch (filterOperator)
@@ -316,7 +320,10 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 					filterComparer = LayerFilterComparer.HasPropertyLessThan(Key, Min);
 					break;
 				case LayerFilterOperationType.Contains:
-					filterComparer = LayerFilterComparer.PropertyContainsValue(Key, PropertyValue.ToLower().Split(','));
+					var matchList = PropertyValue.ToLower().Split(_delimiters, StringSplitOptions.RemoveEmptyEntries)
+												 .Select(p => p.Trim())
+												 .Where(tag => !string.IsNullOrEmpty(tag));
+					filterComparer = LayerFilterComparer.PropertyContainsValue(Key, matchList);
 					break;
 				case LayerFilterOperationType.IsInRange:
 					filterComparer = LayerFilterComparer.HasPropertyInRange(Key, Min, Max);
