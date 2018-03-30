@@ -11,4 +11,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82ed8ed837e25084bbe8a37d53c5b77b, type: 3}
   m_Name: BuildingCollection
   m_EditorClassIdentifier: 
-  Count: 2417
+  Count: 2406

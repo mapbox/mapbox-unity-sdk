@@ -33,7 +33,7 @@ namespace KDTree
         /// <summary>Current value distance.</summary>
         private double _CurrentDistance = -1;
         /// <summary>Current value reference.</summary>
-        public T _Current = default(T);
+        private T _Current = default(T);
 
         /// <summary>
         /// Construct a new nearest neighbour iterator.
@@ -201,6 +201,11 @@ namespace KDTree
             this.pPending = new MinHeap<KDNode<T>>();
             this.pPending.Insert(0, pRoot);
         }
+
+		public T Current
+		{
+			get { return _Current; }
+		}
 
         /// <summary>
         /// Return the distance of the current value to the search point.

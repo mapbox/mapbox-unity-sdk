@@ -10,7 +10,7 @@
 
 		}
 
-		public virtual void AddFeature(VectorEntity ve)
+		public virtual void AddFeature(double[] position, VectorEntity ve)
 		{
 
 		}

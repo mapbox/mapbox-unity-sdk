@@ -18,7 +18,7 @@
 
 		public override void Run(VectorEntity ve, UnityTile tile)
         {
-			_collection.AddFeature(ve);
+			_collection.AddFeature(new double[] { ve.Transform.position.x, ve.Transform.position.z }, ve);
 		}
     }
 }

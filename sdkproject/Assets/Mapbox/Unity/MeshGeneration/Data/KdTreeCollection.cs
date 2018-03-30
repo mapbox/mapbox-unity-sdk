@@ -3,6 +3,7 @@ namespace Mapbox.Unity.MeshGeneration
 	using UnityEngine;
 	using KDTree;
 	using Mapbox.Unity.MeshGeneration.Data;
+	using System;
 
 	/// <summary>
 	/// KdTree Collection is a feature collection using KdTree mainly for distance based searchs like "find all buildings 100m around
@@ -14,19 +15,24 @@ namespace Mapbox.Unity.MeshGeneration
 	[CreateAssetMenu(menuName = "Mapbox/Feature Collections/Kd Tree Collection")]
 	public class KdTreeCollection : FeatureCollectionBase
 	{
-		public KDTree<VectorEntity> Entities;
+		private KDTree<VectorEntity> _entities;
 		public int Count;
 
 		public override void Initialize()
 		{
 			base.Initialize();
-			Entities = new KDTree.KDTree<VectorEntity>(2);
+			_entities = new KDTree.KDTree<VectorEntity>(2);
 		}
 
-		public override void AddFeature(VectorEntity ve)
+		public override void AddFeature(double[] position, VectorEntity ve)
 		{
-			Entities.AddPoint(new double[] { ve.Transform.position.x, ve.Transform.position.z }, ve);
-			Count = Entities.Size;
+			_entities.AddPoint(position, ve);
+			Count = _entities.Size;
+		}
+
+		public NearestNeighbour<VectorEntity> NearestNeighbors(double[] v, int maxCount, float range)
+		{
+			return _entities.NearestNeighbors(v, maxCount, range);
 		}
 	}
 }
