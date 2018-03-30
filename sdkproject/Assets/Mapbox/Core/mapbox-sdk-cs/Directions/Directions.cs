@@ -59,5 +59,11 @@ namespace Mapbox.Directions
 		{
 			return JsonConvert.DeserializeObject<DirectionsResponse>(str, JsonConverters.Converters);
 		}
+
+		internal string Serialize(DirectionsResponse response)
+		{
+			return JsonConvert.SerializeObject(response, JsonConverters.Converters);
+		}
+
 	}
 }
