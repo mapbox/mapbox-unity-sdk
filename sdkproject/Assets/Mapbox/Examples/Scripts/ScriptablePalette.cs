@@ -47,7 +47,7 @@ public class ScriptablePalette : ScriptableObject
 
         for (int i = 0; i < m_numColors; i++)
         {
-            m_colors[i] = Random.ColorHSV(hueMin, hueMax, satMin, satMax, valMin, valMax);
+            m_colors[i] = UnityEngine.Random.ColorHSV(hueMin, hueMax, satMin, satMax, valMin, valMax);
         }
     }
 }
