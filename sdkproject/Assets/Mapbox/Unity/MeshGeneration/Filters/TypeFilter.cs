@@ -320,9 +320,11 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 					filterComparer = LayerFilterComparer.HasPropertyLessThan(Key, Min);
 					break;
 				case LayerFilterOperationType.Contains:
-					var matchList = PropertyValue.ToLower().Split(_delimiters, StringSplitOptions.RemoveEmptyEntries)
-												 .Select(p => p.Trim())
-												 .Where(tag => !string.IsNullOrEmpty(tag));
+					var matchList = PropertyValue.ToLower()
+						.Split(_delimiters, StringSplitOptions.RemoveEmptyEntries)
+						.Select(p => p.Trim())
+						.Where(p => !string.IsNullOrEmpty(p))
+						.ToArray();
 					filterComparer = LayerFilterComparer.PropertyContainsValue(Key, matchList);
 					break;
 				case LayerFilterOperationType.IsInRange:
