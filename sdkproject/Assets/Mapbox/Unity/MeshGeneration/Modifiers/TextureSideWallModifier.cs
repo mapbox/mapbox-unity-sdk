@@ -398,6 +398,13 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				case ExtrusionType.RangeHeight:
 					if (feature.Properties.ContainsKey(_options.propertyName))
 					{
+						if (_options.minimumHeight > _options.maximumHeight)
+						{
+							Debug.LogError("Maximum Height less than Minimum Height.Swapping values for extrusion.");
+							var temp = _options.minimumHeight;
+							_options.minimumHeight = _options.maximumHeight;
+							_options.maximumHeight = temp;
+						}
 						var featureHeight = Convert.ToSingle(feature.Properties[_options.propertyName]);
 						maxHeight = Math.Min(Math.Max(_options.minimumHeight, featureHeight), _options.maximumHeight);
 						if (feature.Properties.ContainsKey("min_height"))

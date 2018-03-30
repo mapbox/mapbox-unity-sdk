@@ -63,6 +63,11 @@
 					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), minHeightProperty);
 					position.y += lineHeight;
 					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), maxHeightProperty);
+					if (minHeightProperty.floatValue > maxHeightProperty.floatValue)
+					{
+						//position.y += lineHeight;
+						EditorGUILayout.HelpBox("Maximum Height less than Minimum Height!", MessageType.Error);
+					}
 					break;
 				case Unity.Map.ExtrusionType.AbsoluteHeight:
 					position.y += lineHeight;
