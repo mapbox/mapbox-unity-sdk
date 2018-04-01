@@ -88,20 +88,20 @@
 						rows += 1;
 						break;
 					case Unity.Map.ExtrusionType.PropertyHeight:
-						rows += 3;
+						rows += 4;
 						break;
 					case Unity.Map.ExtrusionType.MinHeight:
 					case Unity.Map.ExtrusionType.MaxHeight:
-						rows += 4;
-						break;
-					case Unity.Map.ExtrusionType.RangeHeight:
 						rows += 5;
 						break;
+					case Unity.Map.ExtrusionType.RangeHeight:
+						rows += 6;
+						break;
 					case Unity.Map.ExtrusionType.AbsoluteHeight:
-						rows += 3;
+						rows += 4;
 						break;
 					default:
-						rows += 2;
+						rows += 3;
 						break;
 				}
 			}

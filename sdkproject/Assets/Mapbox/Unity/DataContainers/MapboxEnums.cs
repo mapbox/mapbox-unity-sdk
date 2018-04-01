@@ -156,4 +156,16 @@
 		[Description("Extrudes only side wall geometry of the vector feature.")]
 		SideOnly,
 	}
+
+	public enum ColliderType
+	{
+		[Description("No collider added to the extruded geometry")]
+		None,
+		[Description("Box collider addded to the extruded geometry")]
+		BoxCollider,
+		[Description("Mesh collider added to the extruded geometry")]
+		MeshCollider,
+		[Description("Sphere collider added to the extruded geometry")]
+		SphereCollider,
+	}
 }

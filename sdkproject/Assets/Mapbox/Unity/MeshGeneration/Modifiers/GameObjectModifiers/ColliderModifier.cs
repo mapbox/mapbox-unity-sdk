@@ -5,6 +5,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using Mapbox.Unity.MeshGeneration.Components;
 	using System.Collections.Generic;
 	using System;
+	using Mapbox.Unity.Map;
 
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Collider Modifier")]
 	public class ColliderModifier : GameObjectModifier
@@ -13,6 +14,12 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private ColliderType _colliderType;
 		private IColliderStrategy _colliderStrategy;
 
+		GeometryExtrusionOptions _options;
+
+		public override void SetProperties(ModifierProperties properties)
+		{
+			_options = (GeometryExtrusionOptions)properties;
+		}
 
 		public override void Initialize()
 		{
@@ -48,14 +55,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				_colliderStrategy.AddColliderTo(ve);
 			}
 
-		}
-
-		public enum ColliderType
-		{
-			None,
-			BoxCollider,
-			MeshCollider,
-			SphereCollider
 		}
 
 		public class BoxColliderStrategy : IColliderStrategy

@@ -79,6 +79,11 @@
 					{
 						defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
 					}
+					//collider modifier options
+					var lineColliderMod = CreateInstance<ColliderModifier>();
+					lineColliderMod.SetProperties(_layerProperties.colliderOptions);
+					defaultGOModifierStack.Add(lineColliderMod);
+
 					var lineMatMod = CreateInstance<MaterialModifier>();
 					lineMatMod.SetProperties(_layerProperties.materialOptions);
 					defaultGOModifierStack.Add(lineMatMod);
@@ -114,6 +119,11 @@
 							defaultMeshModifierStack.Add(heightMod);
 						}
 					}
+
+					//collider modifier options
+					var polyColliderMod = CreateInstance<ColliderModifier>();
+					polyColliderMod.SetProperties(_layerProperties.colliderOptions);
+					defaultGOModifierStack.Add(polyColliderMod);
 
 					var matMod = CreateInstance<MaterialModifier>();
 					matMod.SetProperties(_layerProperties.materialOptions);

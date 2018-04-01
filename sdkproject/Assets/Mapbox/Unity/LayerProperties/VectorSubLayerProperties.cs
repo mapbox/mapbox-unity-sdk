@@ -17,6 +17,7 @@
 			extrusionGeometryType = ExtrusionGeometryType.RoofAndSide,
 
 		};
+		public ColliderOptions colliderOptions = new ColliderOptions();
 		public GeometryMaterialOptions materialOptions = new GeometryMaterialOptions();
 
 		public bool buildingsWithUniqueIds = false;
