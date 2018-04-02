@@ -5,6 +5,7 @@
 	using UnityEditor;
 	using UnityEngine;
 	using Mapbox.Unity.Map;
+	using Mapbox.VectorTile.ExtensionMethods;
 
 	[CustomPropertyDrawer(typeof(ColliderOptions))]
 	public class ColliderOptionsDrawer : PropertyDrawer
@@ -15,6 +16,7 @@
 			EditorGUI.BeginProperty(position, label, property);
 			var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent("Collider Type"));
 			var colliderTypeProperty = property.FindPropertyRelative("colliderType");
+			typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Collider Type", tooltip = EnumExtensions.Description((Unity.Map.ColliderType)colliderTypeProperty.enumValueIndex) });
 
 			colliderTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, colliderTypeProperty.enumValueIndex, colliderTypeProperty.enumDisplayNames);
 			var sourceTypeValue = (Unity.Map.ExtrusionType)colliderTypeProperty.enumValueIndex;
