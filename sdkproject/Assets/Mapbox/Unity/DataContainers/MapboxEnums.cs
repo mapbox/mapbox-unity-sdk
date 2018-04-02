@@ -159,13 +159,13 @@
 
 	public enum ColliderType
 	{
-		[Description("No collider")]
+		[Description("No collider.")]
 		None,
-		[Description("Box collider addded to the GameObject")]
+		[Description("Box collider addded to the GameObject.")]
 		BoxCollider,
-		[Description("Mesh collider added to the GameObject")]
+		[Description("Mesh collider added to the GameObject.")]
 		MeshCollider,
-		[Description("Sphere collider added to the GameObject")]
+		[Description("Sphere collider added to the GameObject.")]
 		SphereCollider,
 	}
 }
