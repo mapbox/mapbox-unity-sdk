@@ -15,8 +15,6 @@
 				return typeof(MaterialModifier);
 			}
 		}
-		[Tooltip("Use image texture from the Imagery source as texture for roofs. ")]
-		public bool projectMapImagery;
 		public UvMapType texturingType = UvMapType.Tiled;
 		public MaterialList[] materials = new MaterialList[2];
 		public AtlasInfo atlasInfo;

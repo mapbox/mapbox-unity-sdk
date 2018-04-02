@@ -26,7 +26,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			var min = Math.Min(_options.materials.Length, ve.MeshFilter.mesh.subMeshCount);
 			var mats = new Material[min];
 
-			if (!_options.projectMapImagery)
+			if (_options.texturingType != UvMapType.Satellite)
 			{
 				for (int i = 0; i < min; i++)
 				{
@@ -37,7 +37,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				for (int i = 0; i < min; i++)
 				{
-					mats[i] = Instantiate(_options.materials[i].Materials[UnityEngine.Random.Range(0, _options.materials[i].Materials.Length)]);
+					mats[i] = _options.materials[i].Materials[UnityEngine.Random.Range(0, _options.materials[i].Materials.Length)];
+					//Instantiate(_options.materials[i].Materials[UnityEngine.Random.Range(0, _options.materials[i].Materials.Length)]);
 				}
 
 				mats[0].mainTexture = tile.GetRasterData();
