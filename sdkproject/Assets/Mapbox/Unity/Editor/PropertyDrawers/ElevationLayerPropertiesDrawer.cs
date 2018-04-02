@@ -9,7 +9,19 @@
 	public class ElevationLayerPropertiesDrawer : PropertyDrawer
 	{
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
-		bool showPosition = false;
+
+		bool ShowPosition
+		{
+			get
+			{
+				return EditorPrefs.GetBool("ElevationLayerProperties_showPosition");
+			}
+			set
+			{
+				EditorPrefs.SetBool("ElevationLayerProperties_showPosition", value);
+			}
+		}
+
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
@@ -63,8 +75,8 @@
 
 			EditorGUI.PropertyField(position, property.FindPropertyRelative("requiredOptions"), true);
 			position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("requiredOptions"));
-			showPosition = EditorGUI.Foldout(position, showPosition, "Others");
-			if (showPosition)
+			ShowPosition = EditorGUI.Foldout(position, ShowPosition, "Others");
+			if (ShowPosition)
 			{
 				position.y += lineHeight;
 				EditorGUI.PropertyField(position, property.FindPropertyRelative("modificationOptions"), true);
@@ -85,7 +97,7 @@
 
 			height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sourceOptions"));
 			height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("requiredOptions"));
-			if (showPosition)
+			if (ShowPosition)
 			{
 				height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("modificationOptions"));
 				height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("unityLayerOptions"));

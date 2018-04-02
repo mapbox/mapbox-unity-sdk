@@ -14,8 +14,43 @@
 	public class VectorLayerPropertiesDrawer : PropertyDrawer
 	{
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
-		static bool showPosition = false;
-		static bool showOthers = false;
+
+		bool ShowPosition
+		{
+			get
+			{
+				return EditorPrefs.GetBool("VectorLayerProperties_showPosition");
+			}
+			set
+			{
+				EditorPrefs.SetBool("VectorLayerProperties_showPosition", value);
+			}
+		}
+
+		bool ShowOthers
+		{
+			get
+			{
+				return EditorPrefs.GetBool("VectorLayerProperties_showPosition");
+			}
+			set
+			{
+				EditorPrefs.SetBool("VectorLayerProperties_showPosition", value);
+			}
+		}
+
+		int SelectionIndex
+		{
+			get
+			{
+				return EditorPrefs.GetInt("VectorLayerProperties_selectionIndex");
+			}
+			set
+			{
+				EditorPrefs.SetInt("VectorLayerProperties_selectionIndex", value);
+			}
+		}
+
 		VectorSubLayerTreeView layerTreeView = new VectorSubLayerTreeView(new TreeViewState());
 		IList<int> selectedLayers = new List<int>();
 
@@ -131,9 +166,9 @@
 
 				if (selectedLayers.Count == 1)
 				{
-					var index = selectedLayers[0];
+					SelectionIndex = selectedLayers[0];
 
-					var layerProperty = subLayerArray.GetArrayElementAtIndex(index);
+					var layerProperty = subLayerArray.GetArrayElementAtIndex(SelectionIndex);
 
 					layerProperty.isExpanded = true;
 					DrawLayerVisualizerProperties(layerProperty);
@@ -163,9 +198,9 @@
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
 			}
 			//EditorGUI.indentLevel--;
-			showOthers = EditorGUILayout.Foldout(showOthers, "Advanced");
+			ShowOthers = EditorGUILayout.Foldout(ShowOthers, "Advanced");
 			//EditorGUI.indentLevel++;
-			if (showOthers)
+			if (ShowOthers)
 			{
 				if (primitiveTypeProp == VectorPrimitiveType.Polygon)
 				{
@@ -183,9 +218,9 @@
 		void DrawModifiers(SerializedProperty property, GUIContent label)
 		{
 			var groupFeaturesProperty = property.FindPropertyRelative("coreOptions").FindPropertyRelative("groupFeatures");
-			showPosition = EditorGUILayout.Foldout(showPosition, label.text);
+			ShowPosition = EditorGUILayout.Foldout(ShowPosition, label.text);
 			EditorGUILayout.BeginVertical();
-			if (showPosition)
+			if (ShowPosition)
 			{
 
 				EditorGUILayout.BeginHorizontal();
