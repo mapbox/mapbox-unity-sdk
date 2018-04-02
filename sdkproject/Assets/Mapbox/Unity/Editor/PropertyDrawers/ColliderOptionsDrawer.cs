@@ -1,15 +1,29 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
-
-[CustomPropertyDrawer(typeof(ColliderOptions))]
-public class ColliderOptionsDrawer : PropertyDrawer
+﻿namespace Mapbox.Editor
 {
+	using System.Collections;
+	using System.Collections.Generic;
+	using UnityEditor;
+	using UnityEngine;
+	using Mapbox.Unity.Map;
 
-	static float lineHeight = EditorGUIUtility.singleLineHeight;
-	public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+	[CustomPropertyDrawer(typeof(ColliderOptions))]
+	public class ColliderOptionsDrawer : PropertyDrawer
 	{
-		//logic to draw the property
+		static float lineHeight = EditorGUIUtility.singleLineHeight;
+		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+		{
+			EditorGUI.BeginProperty(position, label, property);
+			var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent("Collider Type"));
+			var colliderTypeProperty = property.FindPropertyRelative("colliderType");
+
+			colliderTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, colliderTypeProperty.enumValueIndex, colliderTypeProperty.enumDisplayNames);
+			var sourceTypeValue = (Unity.Map.ExtrusionType)colliderTypeProperty.enumValueIndex;
+			EditorGUI.EndProperty();
+		}
+
+		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+		{
+			return lineHeight;
+		}
 	}
 }

@@ -159,13 +159,13 @@
 
 	public enum ColliderType
 	{
-		[Description("No collider added to the extruded geometry")]
+		[Description("No collider")]
 		None,
-		[Description("Box collider addded to the extruded geometry")]
+		[Description("Box collider addded to the GameObject")]
 		BoxCollider,
-		[Description("Mesh collider added to the extruded geometry")]
+		[Description("Mesh collider added to the GameObject")]
 		MeshCollider,
-		[Description("Sphere collider added to the extruded geometry")]
+		[Description("Sphere collider added to the GameObject")]
 		SphereCollider,
 	}
 }
