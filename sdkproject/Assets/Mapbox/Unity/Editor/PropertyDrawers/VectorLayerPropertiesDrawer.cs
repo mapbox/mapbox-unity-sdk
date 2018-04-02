@@ -9,6 +9,7 @@
 	using UnityEditor.IMGUI.Controls;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
 	using Mapbox.VectorTile.ExtensionMethods;
+	using Mapbox.Unity.MeshGeneration.Filters;
 
 	[CustomPropertyDrawer(typeof(VectorLayerProperties))]
 	public class VectorLayerPropertiesDrawer : PropertyDrawer
@@ -136,7 +137,7 @@
 
 					subLayerName.stringValue = "Untitled";
 
-					// Set defaults here beacuse SerializedProperty copies the previous element. 
+					// Set defaults here because SerializedProperty copies the previous element. 
 					var subLayerCoreOptions = subLayer.FindPropertyRelative("coreOptions");
 					subLayerCoreOptions.FindPropertyRelative("isActive").boolValue = true;
 					subLayerCoreOptions.FindPropertyRelative("layerName").stringValue = "building";
@@ -146,7 +147,27 @@
 					subLayerCoreOptions.FindPropertyRelative("lineWidth").floatValue = 1.0f;
 
 					var subLayerExtrusionOptions = subLayer.FindPropertyRelative("extrusionOptions");
+					subLayerExtrusionOptions.FindPropertyRelative("extrusionType").enumValueIndex = (int)ExtrusionType.None;
+					subLayerExtrusionOptions.FindPropertyRelative("extrusionGeometryType").enumValueIndex = (int)ExtrusionGeometryType.RoofAndSide;
 					subLayerExtrusionOptions.FindPropertyRelative("propertyName").stringValue = "height";
+
+					var subLayerFilterOptions = subLayer.FindPropertyRelative("filterOptions");
+					subLayerFilterOptions.FindPropertyRelative("filters").ClearArray();
+					subLayerFilterOptions.FindPropertyRelative("combinerType").enumValueIndex = (int)LayerFilterCombinerOperationType.Any;
+
+					var subLayerMaterialOptions = subLayer.FindPropertyRelative("materialOptions");
+					subLayerMaterialOptions.FindPropertyRelative("materials").ClearArray();
+					subLayerMaterialOptions.FindPropertyRelative("materials").arraySize = 2;
+					subLayerMaterialOptions.FindPropertyRelative("atlasInfo").objectReferenceValue = null;
+					subLayerMaterialOptions.FindPropertyRelative("colorPallete").objectReferenceValue = null;
+					subLayerMaterialOptions.FindPropertyRelative("texturingType").enumValueIndex = (int)UvMapType.Tiled;
+
+					subLayer.FindPropertyRelative("buildingsWithUniqueIds").boolValue = false;
+					subLayer.FindPropertyRelative("moveFeaturePositionTo").enumValueIndex = (int)PositionTargetType.TileCenter;
+					subLayer.FindPropertyRelative("MeshModifiers").ClearArray();
+					subLayer.FindPropertyRelative("GoModifiers").ClearArray();
+
+
 
 				}
 				if (GUILayout.Button(new GUIContent("Remove Selected"), (GUIStyle)"minibuttonright"))
