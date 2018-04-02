@@ -123,30 +123,34 @@
 
 		public void Initialize()
 		{
+			_elevationFactory = ScriptableObject.CreateInstance<TerrainFactoryBase>();
 			switch (_layerProperty.elevationLayerType)
 			{
 				case ElevationLayerType.FlatTerrain:
-					_elevationFactory = ScriptableObject.CreateInstance<FlatTerrainFactory>();
+					_elevationFactory.Strategy = new FlatTerrainStrategy();
 					break;
 				case ElevationLayerType.LowPolygonTerrain:
-					_elevationFactory = ScriptableObject.CreateInstance<LowPolyTerrainFactory>();
+					_elevationFactory.Strategy = new LowPolyTerrainStrategy();
 					break;
 				case ElevationLayerType.TerrainWithElevation:
 					if (_layerProperty.sideWallOptions.isActive)
 					{
-						_elevationFactory = ScriptableObject.CreateInstance<TerrainWithSideWallsFactory>();
+						//_elevationFactory = ScriptableObject.CreateInstance<TerrainWithSideWallsFactory>();
 					}
 					else
 					{
-						_elevationFactory = ScriptableObject.CreateInstance<TerrainFactory>();
+						_elevationFactory.Strategy = new ElevatedTerrainStrategy();
 					}
 					break;
 				case ElevationLayerType.GlobeTerrain:
-					_elevationFactory = ScriptableObject.CreateInstance<FlatSphereTerrainFactory>();
+					_elevationFactory.Strategy = new FlatSphereTerrainStrategy();
+					//_elevationFactory = ScriptableObject.CreateInstance<FlatSphereTerrainFactory>();
 					break;
 				default:
 					break;
 			}
+
+			//(_elevationFactory as TerrainFactoryBase).Strategy = new ElevatedTerrainStrategy();
 			_elevationFactory.SetOptions(_layerProperty);
 		}
 
@@ -169,7 +173,7 @@
 				return _elevationFactory;
 			}
 		}
-		private AbstractTileFactory _elevationFactory;
+		private TerrainFactoryBase _elevationFactory;
 
 	}
 }
