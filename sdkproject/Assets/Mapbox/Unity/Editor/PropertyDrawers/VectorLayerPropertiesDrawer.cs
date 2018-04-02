@@ -133,9 +133,8 @@
 
 					var subLayer = subLayerArray.GetArrayElementAtIndex(subLayerArray.arraySize - 1);
 					var subLayerName = subLayer.FindPropertyRelative("coreOptions.sublayerName");
-					Debug.Log("Active status -> " + subLayer.FindPropertyRelative("coreOptions.isActive").boolValue.ToString());
-					subLayerName.stringValue = "Untitled";
 
+					subLayerName.stringValue = "Untitled";
 
 					// Set defaults here beacuse SerializedProperty copies the previous element. 
 					var subLayerCoreOptions = subLayer.FindPropertyRelative("coreOptions");
