@@ -160,9 +160,9 @@
 
 			if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
 			{
-				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
-
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("colliderOptions"));
+
+				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
 
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
 			}
