@@ -10,7 +10,7 @@
 	public class ARTableTopCameraMovement : MonoBehaviour
 	{
 		[SerializeField]
-		[Range(1, 20)]
+		[Range(.1f, 1)]
 		public float _panSpeed = 1.0f;
 
 		[SerializeField]
@@ -125,7 +125,7 @@
 				// Divide it by the tile width in pixels ( 256 in our case) 
 				// to get degrees represented by each pixel.
 				// Keyboard offset is in pixels, therefore multiply the factor with the offset to move the center.
-				float factor = _panSpeed * (Conversions.GetTileScaleInDegrees((float)_mapManager.CenterLatitudeLongitude.x, _mapManager.AbsoluteZoom));
+				float factor = (_panSpeed / 100) * (Conversions.GetTileScaleInDegrees((float)_mapManager.CenterLatitudeLongitude.x, _mapManager.AbsoluteZoom));
 				//MapLocationOptions locationOptions = new MapLocationOptions
 				//{
 				var latitudeLongitude = new Vector2d(_mapManager.CenterLatitudeLongitude.x + zMove * factor * 2.0f, _mapManager.CenterLatitudeLongitude.y + xMove * factor * 4.0f);
