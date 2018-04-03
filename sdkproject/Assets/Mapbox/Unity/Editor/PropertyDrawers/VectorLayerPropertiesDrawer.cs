@@ -114,6 +114,8 @@
 					var subLayerExtrusionOptions = subLayer.FindPropertyRelative("extrusionOptions");
 					subLayerExtrusionOptions.FindPropertyRelative("propertyName").stringValue = "height";
 
+					var subLayerColliderOptions = subLayer.FindPropertyRelative("colliderOptions");
+					subLayerColliderOptions.FindPropertyRelative("colliderType").enumValueIndex = (int)ColliderType.None;
 				}
 				if (GUILayout.Button(new GUIContent("Remove Selected"), (GUIStyle)"minibuttonright"))
 				{
@@ -148,7 +150,7 @@
 
 		void DrawLayerVisualizerProperties(SerializedProperty layerProperty)
 		{
-			GUILayout.Label("Vector Layer Visualizer Properties");
+ 			GUILayout.Label("Vector Layer Visualizer Properties");
 			GUILayout.BeginVertical();
 
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
@@ -158,6 +160,8 @@
 
 			if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
 			{
+				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("colliderOptions"));
+
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
 
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
