@@ -31,7 +31,7 @@
 				};
 			}
 			// Draw label.
-			var kindPosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = label.text, tooltip = EnumExtensions.Description((MapExtentType)kindProperty.enumValueIndex), });
+			var kindPosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = label.text, tooltip = "Options to determine the geographic extent of the world for which the map tiles will be requested.", });
 
 			kindProperty.enumValueIndex = EditorGUI.Popup(kindPosition, kindProperty.enumValueIndex, extentTypeContent);
 
