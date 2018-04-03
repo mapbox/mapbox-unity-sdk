@@ -4,6 +4,7 @@
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Unity.Utilities;
+	using Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies;
 
 	// Layer Concrete Implementation. 
 	[Serializable]
@@ -135,7 +136,7 @@
 				case ElevationLayerType.TerrainWithElevation:
 					if (_layerProperty.sideWallOptions.isActive)
 					{
-						//_elevationFactory = ScriptableObject.CreateInstance<TerrainWithSideWallsFactory>();
+						_elevationFactory.Strategy = new ElevatedTerrainWithSidesStrategy();
 					}
 					else
 					{
@@ -144,13 +145,11 @@
 					break;
 				case ElevationLayerType.GlobeTerrain:
 					_elevationFactory.Strategy = new FlatSphereTerrainStrategy();
-					//_elevationFactory = ScriptableObject.CreateInstance<FlatSphereTerrainFactory>();
 					break;
 				default:
 					break;
 			}
 
-			//(_elevationFactory as TerrainFactoryBase).Strategy = new ElevatedTerrainStrategy();
 			_elevationFactory.SetOptions(_layerProperty);
 		}
 

@@ -1,30 +1,21 @@
-﻿namespace Mapbox.Unity.MeshGeneration.Factories
+﻿using System.Collections.Generic;
+using UnityEngine;
+using Mapbox.Unity.MeshGeneration.Data;
+using Mapbox.Unity.Map;
+using Mapbox.Unity.Utilities;
+
+namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 {
-	using UnityEngine;
-	using Mapbox.Unity.MeshGeneration.Data;
-	using Mapbox.Unity.Utilities;
-	using System.Collections.Generic;
-	using Mapbox.Unity.Map;
-
-	[CreateAssetMenu(menuName = "Mapbox/Factories/Terrain Factory - Flat")]
-	public class FlatTerrainFactory : AbstractTileFactory
+	public class FlatTerrainStrategy : TerrainStrategy
 	{
-
 		Mesh _cachedQuad;
-		[SerializeField]
-		ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
 
-		public override void SetOptions(LayerProperties options)
+		public override void OnInitialized(ElevationLayerProperties elOptions)
 		{
-			_elevationOptions = (ElevationLayerProperties)options;
+			_elevationOptions = elOptions;
 		}
 
-		internal override void OnInitialized()
-		{
-
-		}
-
-		internal override void OnRegistered(UnityTile tile)
+		public override void OnRegistered(UnityTile tile)
 		{
 			if (_elevationOptions.unityLayerOptions.addToLayer && tile.gameObject.layer != _elevationOptions.unityLayerOptions.layerId)
 			{
@@ -55,19 +46,12 @@
 			}
 
 			// HACK: This is here in to make the system trigger a finished state.
-			Progress++;
 			tile.MeshFilter.sharedMesh = GetQuad(tile, _elevationOptions.sideWallOptions.isActive);
-			Progress--;
 
 			if (_elevationOptions.requiredOptions.addCollider && tile.Collider == null)
 			{
 				tile.gameObject.AddComponent<BoxCollider>();
 			}
-		}
-
-		internal override void OnUnregistered(UnityTile tile)
-		{
-
 		}
 
 		private Mesh GetQuad(UnityTile tile, bool buildSide)
@@ -89,10 +73,10 @@
 			verts[1] = tile.TileScale * (new Vector3((float)(tile.Rect.Max.x - tile.Rect.Center.x), 0, (float)(tile.Rect.Min.y - tile.Rect.Center.y)));
 			verts[2] = tile.TileScale * ((tile.Rect.Max - tile.Rect.Center).ToVector3xz());
 			verts[3] = tile.TileScale * (new Vector3((float)(tile.Rect.Min.x - tile.Rect.Center.x), 0, (float)(tile.Rect.Max.y - tile.Rect.Center.y)));
-			norms[0] = Constants.Math.Vector3Up;
-			norms[1] = Constants.Math.Vector3Up;
-			norms[2] = Constants.Math.Vector3Up;
-			norms[3] = Constants.Math.Vector3Up;
+			norms[0] = Mapbox.Unity.Constants.Math.Vector3Up;
+			norms[1] = Mapbox.Unity.Constants.Math.Vector3Up;
+			norms[2] = Mapbox.Unity.Constants.Math.Vector3Up;
+			norms[3] = Mapbox.Unity.Constants.Math.Vector3Up;
 
 			unityMesh.vertices = verts;
 			unityMesh.normals = norms;
@@ -123,16 +107,16 @@
 			verts[1] = tile.TileScale * (new Vector3((float)(tile.Rect.Max.x - tile.Rect.Center.x), 0, (float)(tile.Rect.Min.y - tile.Rect.Center.y)));
 			verts[2] = tile.TileScale * ((tile.Rect.Max - tile.Rect.Center).ToVector3xz());
 			verts[3] = tile.TileScale * (new Vector3((float)(tile.Rect.Min.x - tile.Rect.Center.x), 0, (float)(tile.Rect.Max.y - tile.Rect.Center.y)));
-			norms[0] = Constants.Math.Vector3Up;
-			norms[1] = Constants.Math.Vector3Up;
-			norms[2] = Constants.Math.Vector3Up;
-			norms[3] = Constants.Math.Vector3Up;
+			norms[0] = Mapbox.Unity.Constants.Math.Vector3Up;
+			norms[1] = Mapbox.Unity.Constants.Math.Vector3Up;
+			norms[2] = Mapbox.Unity.Constants.Math.Vector3Up;
+			norms[3] = Mapbox.Unity.Constants.Math.Vector3Up;
 
 			//verts goes
 			//01
 			//32
 			unityMesh.subMeshCount = 2;
-			Vector3 norm = Constants.Math.Vector3Up;
+			Vector3 norm = Mapbox.Unity.Constants.Math.Vector3Up;
 			for (int i = 0; i < 4; i++)
 			{
 				verts[4 * (i + 1)] = verts[i];

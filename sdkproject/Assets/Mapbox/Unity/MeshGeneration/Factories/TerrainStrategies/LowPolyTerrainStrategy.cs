@@ -1,28 +1,18 @@
-namespace Mapbox.Unity.MeshGeneration.Factories
+﻿using System.Collections.Generic;
+using UnityEngine;
+using Mapbox.Unity.MeshGeneration.Data;
+using Mapbox.Unity.Map;
+using Mapbox.Map;
+using Mapbox.Utils;
+
+namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 {
-	using System.Collections.Generic;
-	using UnityEngine;
-	using Mapbox.Map;
-	using Mapbox.Unity.MeshGeneration.Enums;
-	using Mapbox.Unity.MeshGeneration.Data;
-	using Utils;
-	using Mapbox.Unity.Map;
-	using System;
-
-	/// <summary>
-	/// Uses Mapbox Terrain api and creates terrain meshes.
-	/// </summary>
-	[CreateAssetMenu(menuName = "Mapbox/Factories/Terrain Factory - Low Poly")]
-	public class LowPolyTerrainFactory : AbstractTileFactory
+	public class LowPolyTerrainStrategy : TerrainStrategy, IElevationBasedTerrainStrategy
 	{
-		[SerializeField]
-		ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
-		Mesh _stitchTarget;
-
 		protected Dictionary<UnwrappedTileId, Mesh> _meshData;
+		private Mesh _stitchTarget;
 		private MeshData _currentTileMeshData;
 		private MeshData _stitchTargetMeshData;
-
 		private List<Vector3> _newVertexList;
 		private List<Vector3> _newNormalList;
 		private List<Vector2> _newUvList;
@@ -31,26 +21,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		private int _vertA, _vertB, _vertC;
 		private int _counter;
 
-		public string MapId
-		{
-			get
-			{
-				return _elevationOptions.sourceOptions.layerSource.Id;
-			}
 
-			set
-			{
-				_elevationOptions.sourceOptions.layerSource.Id = value;
-			}
-		}
-
-		public override void SetOptions(LayerProperties options)
+		public override void OnInitialized(ElevationLayerProperties elOptions)
 		{
-			_elevationOptions = (ElevationLayerProperties)options;
-		}
-
-		internal override void OnInitialized()
-		{
+			_elevationOptions = elOptions;
 			_meshData = new Dictionary<UnwrappedTileId, Mesh>();
 			_currentTileMeshData = new MeshData();
 			_stitchTargetMeshData = new MeshData();
@@ -61,7 +35,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_newTriangleList = new List<int>();
 		}
 
-		internal override void OnRegistered(UnityTile tile)
+		public override void OnUnregistered(UnityTile tile)
+		{
+			_meshData.Remove(tile.UnwrappedTileId);
+		}
+
+		public override void OnRegistered(UnityTile tile)
 		{
 			if (_elevationOptions.unityLayerOptions.addToLayer && tile.gameObject.layer != _elevationOptions.unityLayerOptions.layerId)
 			{
@@ -85,16 +64,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				tile.gameObject.AddComponent<MeshCollider>();
 			}
 
-			CreateTerrainHeight(tile);
-		}
-
-		/// <summary>
-		/// Method to be called when a tile error has occurred.
-		/// </summary>
-		/// <param name="e"><see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance/</param>
-		protected override void OnErrorOccurred(TileErrorEventArgs e)
-		{
-			base.OnErrorOccurred(e);
+			GenerateTerrainMesh(tile);
 		}
 
 		private void CreateBaseMesh(UnityTile tile)
@@ -124,13 +94,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					_newVertexList.Add(new Vector3(x2, 0, y2));
 					_newVertexList.Add(new Vector3(x1, 0, y2));
 
-					_newNormalList.Add(Unity.Constants.Math.Vector3Up);
-					_newNormalList.Add(Unity.Constants.Math.Vector3Up);
-					_newNormalList.Add(Unity.Constants.Math.Vector3Up);
+					_newNormalList.Add(Mapbox.Unity.Constants.Math.Vector3Up);
+					_newNormalList.Add(Mapbox.Unity.Constants.Math.Vector3Up);
+					_newNormalList.Add(Mapbox.Unity.Constants.Math.Vector3Up);
 					//--
-					_newNormalList.Add(Unity.Constants.Math.Vector3Up);
-					_newNormalList.Add(Unity.Constants.Math.Vector3Up);
-					_newNormalList.Add(Unity.Constants.Math.Vector3Up);
+					_newNormalList.Add(Mapbox.Unity.Constants.Math.Vector3Up);
+					_newNormalList.Add(Mapbox.Unity.Constants.Math.Vector3Up);
+					_newNormalList.Add(Mapbox.Unity.Constants.Math.Vector3Up);
 
 
 					_newUvList.Add(new Vector2(x / cap, 1 - y / cap));
@@ -160,51 +130,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			mesh.RecalculateBounds();
 		}
 
-		internal override void OnUnregistered(UnityTile tile)
-		{
-			_meshData.Remove(tile.UnwrappedTileId);
-		}
-
-		/// <summary>
-		/// Creates the non-flat terrain using a height multiplier
-		/// </summary>
-		/// <param name="tile"></param>
-		// <param name="heightMultiplier">Multiplier for queried height value</param>
-		private void CreateTerrainHeight(UnityTile tile)
-		{
-			tile.HeightDataState = TilePropertyState.Loading;
-			var pngRasterTile = new RawPngRasterTile();
-
-			tile.AddTile(pngRasterTile);
-			Progress++;
-
-			pngRasterTile.Initialize(_fileSource, tile.CanonicalTileId, MapId, () =>
-			{
-				if (tile == null)
-				{
-					return;
-				}
-
-				if (pngRasterTile.HasError)
-				{
-					OnErrorOccurred(new TileErrorEventArgs(tile.CanonicalTileId, pngRasterTile.GetType(), tile, pngRasterTile.Exceptions));
-					tile.HeightDataState = TilePropertyState.Error;
-
-					// Handle missing elevation from server (404)!
-					// TODO: optimize this search!
-					if (pngRasterTile.ExceptionsAsString.Contains("404"))
-					{
-						ResetToFlatMesh(tile);
-					}
-					Progress--;
-					return;
-				}
-
-				tile.SetHeightData(pngRasterTile.Data, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight);
-				GenerateTerrainMesh(tile);
-				Progress--;
-			});
-		}
 
 		/// <summary>
 		/// Creates the non-flat terrain mesh, using a grid by defined resolution (_sampleCount). Vertex order goes right & up. Normals are calculated manually and UV map is fitted/stretched 1-1.
@@ -299,7 +224,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					_currentTileMeshData.Vertices[i].x,
 					0,
 					_currentTileMeshData.Vertices[i].z);
-				_currentTileMeshData.Normals[i] = Unity.Constants.Math.Vector3Up;
+				_currentTileMeshData.Normals[i] = Mapbox.Unity.Constants.Math.Vector3Up;
 			}
 
 			tile.MeshFilter.mesh.SetVertices(_currentTileMeshData.Vertices);
