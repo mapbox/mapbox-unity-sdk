@@ -9,11 +9,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Textured Side Wall Modifier")]
 	public class TextureSideWallModifier : MeshModifier
 	{
-		//[SerializeField]
-		//private float _height;
-		//[SerializeField]
-		//private bool _forceHeight;
-
 		private float _scaledFloorHeight = 0;
 		private float _scaledFirstFloorHeight = 0;
 		private float _scaledTopFloorHeight = 0;
@@ -92,17 +87,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			//read or force height
 			float maxHeight = 1, minHeight = 0;
-			//SetHeight(feature, md, tile, out maxHeight, out minHeight);
-			//height = maxHeight - minHeight;
-			//for (int i = 0; i < md.Vertices.Count; i++)
-			//{
-			//	md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + maxHeight, md.Vertices[i].z);
-			//}
 
 			QueryHeight(feature, md, tile, out maxHeight, out minHeight);
-			height = (maxHeight - minHeight) * _scale;
-			maxHeight = maxHeight * _scale;
-			minHeight = minHeight * _scale;
+			maxHeight = maxHeight * _options.extrusionScaleFactor * _scale;
+			minHeight = minHeight * _options.extrusionScaleFactor * _scale;
+			height = (maxHeight - minHeight);
 
 			GenerateRoofMesh(md, minHeight, maxHeight);
 
@@ -367,6 +356,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						}
 						break;
 					case ExtrusionType.RangeHeight:
+						for (int i = 0; i < _counter; i++)
+						{
+							md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + maxHeight, md.Vertices[i].z);
+						}
 						break;
 					case ExtrusionType.AbsoluteHeight:
 						for (int i = 0; i < _counter; i++)
@@ -405,8 +398,21 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				case ExtrusionType.RangeHeight:
 					if (feature.Properties.ContainsKey(_options.propertyName))
 					{
+						if (_options.minimumHeight > _options.maximumHeight)
+						{
+							Debug.LogError("Maximum Height less than Minimum Height.Swapping values for extrusion.");
+							var temp = _options.minimumHeight;
+							_options.minimumHeight = _options.maximumHeight;
+							_options.maximumHeight = temp;
+						}
 						var featureHeight = Convert.ToSingle(feature.Properties[_options.propertyName]);
 						maxHeight = Math.Min(Math.Max(_options.minimumHeight, featureHeight), _options.maximumHeight);
+						if (feature.Properties.ContainsKey("min_height"))
+						{
+							var featureMinHeight = Convert.ToSingle(feature.Properties["min_height"]);
+							minHeight = Math.Min(featureMinHeight, _options.maximumHeight);
+							//maxHeight -= minHeight;
+						}
 					}
 					break;
 				case ExtrusionType.AbsoluteHeight:
