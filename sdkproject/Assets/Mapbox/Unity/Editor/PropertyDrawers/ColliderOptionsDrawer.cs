@@ -14,11 +14,18 @@
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
-			var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent("Collider Type"));
+			var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Collider Type", tooltip = "The type of collider added to game objects in this layer." });
 			var colliderTypeProperty = property.FindPropertyRelative("colliderType");
-			typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Collider Type", tooltip = EnumExtensions.Description((Unity.Map.ColliderType)colliderTypeProperty.enumValueIndex) });
 
-			colliderTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, colliderTypeProperty.enumValueIndex, colliderTypeProperty.enumDisplayNames);
+			List<GUIContent> enumContent = new List<GUIContent>();
+			foreach(var enumValue in colliderTypeProperty.enumDisplayNames)
+			{
+				var guiContent =  new GUIContent { text = enumValue, tooltip =  EnumExtensions.Description((Unity.Map.ColliderType)colliderTypeProperty.enumValueIndex)} ;
+				enumContent.Add(guiContent);
+			}
+
+
+			colliderTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, colliderTypeProperty.enumValueIndex, enumContent.ToArray());
 			var sourceTypeValue = (Unity.Map.ExtrusionType)colliderTypeProperty.enumValueIndex;
 			EditorGUI.EndProperty();
 		}
