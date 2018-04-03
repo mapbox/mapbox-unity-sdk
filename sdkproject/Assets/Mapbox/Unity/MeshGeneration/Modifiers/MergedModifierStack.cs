@@ -6,6 +6,7 @@ using Mapbox.Map;
 using Mapbox.Unity.MeshGeneration.Modifiers;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Components;
+using System.Linq;
 
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
@@ -122,6 +123,13 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		{
 			base.Execute(tile, feature, meshData, parent, type);
 
+			float hf = 0;
+			if (float.TryParse(feature.Properties["pkm2"].ToString(), out hf))
+			{
+				if (hf <= 10)
+					return null;
+			}
+
 			if (!_cacheVertexCount.ContainsKey(tile))
 			{
 				_cacheVertexCount.Add(tile, 0);
@@ -138,6 +146,15 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					MeshModifiers[i].Run(feature, meshData, tile);
 				}
 			}
+
+			//add colors to buildings
+			float hue, saturation, value;
+			Color baseColor = new Color(0.3f, 0, 1);
+			Color.RGBToHSV(baseColor, out hue, out saturation, out value);
+			float ramp = Convert.ToSingle(hf) / 500;
+
+			Color newColor = Color.HSVToRGB(hue, 1 - ramp, value);
+			meshData.Colors = Enumerable.Repeat(newColor, meshData.Vertices.Count).ToList();
 
 			GameObject go = null;
 			//65000 is the vertex limit for meshes, keep stashing it until that
@@ -174,6 +191,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					var st = _tempMeshData.Vertices.Count;
 					_tempMeshData.Vertices.AddRange(_temp2MeshData.Vertices);
 					_tempMeshData.Normals.AddRange(_temp2MeshData.Normals);
+					_tempMeshData.Colors.AddRange(_temp2MeshData.Colors);
 
 					c2 = _temp2MeshData.UV.Count;
 					for (int j = 0; j < c2; j++)
@@ -234,6 +252,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					{
 						_tempVectorEntity.Mesh.SetUVs(i, _tempMeshData.UV[i]);
 					}
+
+					//setting vertex colors
+					_tempVectorEntity.Mesh.SetColors(_tempMeshData.Colors);
+
+					_tempVectorEntity.MeshRenderer.material = new Material(Shader.Find("Custom/VertexColoredDiffuse"));
 
 					_tempVectorEntity.GameObject.transform.SetParent(tile.transform, false);
 
