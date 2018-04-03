@@ -50,6 +50,8 @@ namespace UnityARInterface
 
         public virtual bool IsSupported { get { return true; } }
 
+        public virtual bool BackgroundRendering { get { return false; } set{ } } 
+
         public abstract IEnumerator StartService(Settings settings);
 
         public abstract void StopService();
@@ -93,6 +95,14 @@ namespace UnityARInterface
         {
             if (planeRemoved != null)
                 planeRemoved(plane);
+        }
+
+        public virtual void ApplyAnchor(ARAnchor arAnchor)
+        {
+        }
+
+        public virtual void DestroyAnchor(ARAnchor arAnchor)
+        {
         }
 
         private static ARInterface m_Interface;
