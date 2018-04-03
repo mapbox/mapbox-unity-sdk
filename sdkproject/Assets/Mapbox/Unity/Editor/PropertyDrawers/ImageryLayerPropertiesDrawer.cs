@@ -10,17 +10,36 @@
 	{
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 
+		GUIContent[] sourceTypeContent;
+		bool isGUIContentSet = false;
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
 			position.height = lineHeight;
 
-			// Draw label.
 			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
 			var sourceTypeValue = (ImagerySourceType)sourceTypeProperty.enumValueIndex;
-			var typePosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Style Name", tooltip = EnumExtensions.Description(sourceTypeValue) });
 
-			sourceTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, sourceTypeProperty.enumValueIndex, sourceTypeProperty.enumDisplayNames);
+			var displayNames = sourceTypeProperty.enumDisplayNames;
+			int count = sourceTypeProperty.enumDisplayNames.Length;
+			if (!isGUIContentSet)
+			{
+				sourceTypeContent = new GUIContent[count];
+				for (int extIdx = 0; extIdx < count; extIdx++)
+				{
+					sourceTypeContent[extIdx] = new GUIContent
+					{
+						text = displayNames[extIdx],
+						tooltip = EnumExtensions.Description((ImagerySourceType)extIdx),
+					};
+				}
+				isGUIContentSet = true;
+			}
+			// Draw label.
+
+			var typePosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Style Name", tooltip = "Source tileset for Imagery." });
+
+			sourceTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, sourceTypeProperty.enumValueIndex, sourceTypeContent);
 			sourceTypeValue = (ImagerySourceType)sourceTypeProperty.enumValueIndex;
 
 			position.y += lineHeight;
