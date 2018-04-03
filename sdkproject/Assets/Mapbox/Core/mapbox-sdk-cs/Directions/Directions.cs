@@ -55,12 +55,12 @@ namespace Mapbox.Directions
 		/// </summary>
 		/// <param name="str">JSON String.</param>
 		/// <returns>A <see cref="DirectionsResponse"/>.</returns>
-		internal DirectionsResponse Deserialize(string str)
+		public DirectionsResponse Deserialize(string str)
 		{
 			return JsonConvert.DeserializeObject<DirectionsResponse>(str, JsonConverters.Converters);
 		}
 
-		internal string Serialize(DirectionsResponse response)
+		public string Serialize(DirectionsResponse response)
 		{
 			return JsonConvert.SerializeObject(response, JsonConverters.Converters);
 		}
