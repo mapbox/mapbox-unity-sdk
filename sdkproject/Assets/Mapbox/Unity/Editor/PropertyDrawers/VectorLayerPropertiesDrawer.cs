@@ -32,11 +32,11 @@
 		{
 			get
 			{
-				return EditorPrefs.GetBool("VectorLayerProperties_showPosition");
+				return EditorPrefs.GetBool("VectorLayerProperties_showOthers");
 			}
 			set
 			{
-				EditorPrefs.SetBool("VectorLayerProperties_showPosition", value);
+				EditorPrefs.SetBool("VectorLayerProperties_showOthers", value);
 			}
 		}
 
@@ -204,6 +204,7 @@
 		void DrawLayerVisualizerProperties(SerializedProperty layerProperty)
 		{
 			GUILayout.Label("Vector Layer Visualizer Properties");
+			EditorGUI.indentLevel++;
 			GUILayout.BeginVertical();
 
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
@@ -219,20 +220,22 @@
 			}
 			//EditorGUI.indentLevel--;
 			ShowOthers = EditorGUILayout.Foldout(ShowOthers, "Advanced");
-			//EditorGUI.indentLevel++;
+			EditorGUI.indentLevel++;
 			if (ShowOthers)
 			{
 				if (primitiveTypeProp == VectorPrimitiveType.Polygon)
 				{
+					EditorGUI.indentLevel--;
 					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("buildingsWithUniqueIds"), new GUIContent { text = "Buildings With Unique Ids", tooltip = "Turn on this setting only when rendering 3D buildings from the Mapbox Streets with Building Ids tileset. Using this setting with any other polygon layers or source will result in visual artifacts. " });
+					EditorGUI.indentLevel++;
 				}
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("filterOptions"), new GUIContent("Filters"));
 				//EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("modifierOptions"), new GUIContent("Modifiers"));
 				DrawModifiers(layerProperty, new GUIContent { text = "Modifier Options", tooltip = "Additional Feature modifiers to apply to the visualizer. " });
-				//EditorGUI.indentLevel--;
 			}
-
+			EditorGUI.indentLevel--;
 			GUILayout.EndVertical();
+			EditorGUI.indentLevel--;
 		}
 
 		void DrawModifiers(SerializedProperty property, GUIContent label)
@@ -263,7 +266,6 @@
 					var ind = i;
 					EditorGUILayout.BeginHorizontal();
 					EditorGUILayout.BeginVertical();
-					//GUILayout.Space(5);
 					meshfac.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(meshfac.GetArrayElementAtIndex(i).objectReferenceValue, typeof(MeshModifier), false) as ScriptableObject;
 					EditorGUILayout.EndVertical();
 					if (GUILayout.Button(new GUIContent("+"), (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
@@ -278,7 +280,9 @@
 				}
 
 				EditorGUILayout.Space();
+				EditorGUI.indentLevel++;
 				EditorGUILayout.BeginHorizontal();
+				GUILayout.Space(EditorGUI.indentLevel * 12);
 				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
 				{
 					meshfac.arraySize++;
@@ -289,7 +293,7 @@
 					ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac);
 				}
 				EditorGUILayout.EndHorizontal();
-
+				EditorGUI.indentLevel--;
 				EditorGUILayout.Space();
 				EditorGUILayout.LabelField(new GUIContent { text = "Game Object Modifiers", tooltip = "Modifiers that manipulate the GameObject after mesh generation." });
 				var gofac = property.FindPropertyRelative("GoModifiers");
@@ -314,7 +318,9 @@
 				}
 
 				EditorGUILayout.Space();
+				EditorGUI.indentLevel++;
 				EditorGUILayout.BeginHorizontal();
+				GUILayout.Space(EditorGUI.indentLevel * 12);
 				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
 				{
 					gofac.arraySize++;
@@ -325,9 +331,9 @@
 					ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac);
 				}
 				EditorGUILayout.EndHorizontal();
-				//GUILayout.EndArea();
+				EditorGUI.indentLevel--;
 			}
-			//EditorGUI.indentLevel--;
+			//
 			EditorGUILayout.EndVertical();
 		}
 	}

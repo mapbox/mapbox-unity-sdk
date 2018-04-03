@@ -139,12 +139,20 @@
 	}
 	public enum ExtrusionType
 	{
+		[Description("No extrusion.")]
 		None,
+		[Description("Extrude features using the property value.")]
 		PropertyHeight,
+		[Description("Extrude features using the property value. Extrusion from features minimum height value. Results in flat tops.")]
 		MinHeight,
+		[Description("Extrude features using the property value. Extrusion from features maximum height value. Results in flat tops.")]
 		MaxHeight,
+		[Description("Extrude features using the property value. Values are clamped in to min and max values if they are lower or greater than min,max values respectively.")]
 		RangeHeight,
+		[Description("Extrude all features using the fixed value.")]
 		AbsoluteHeight,
+
+
 	}
 
 	public enum ExtrusionGeometryType
