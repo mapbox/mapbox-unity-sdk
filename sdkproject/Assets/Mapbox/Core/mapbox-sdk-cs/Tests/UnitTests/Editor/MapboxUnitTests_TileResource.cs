@@ -17,75 +17,61 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 	[TestFixture]
 	public class TileResourceTest
 	{
-#if !UNITY_EDITOR
+
 		private string _api;
 		private CanonicalTileId _tileId;
-#endif
+
 
 		[SetUp]
 		public void SetUp()
 		{
-#if !UNITY_EDITOR
 			_api = Constants.BaseAPI;
 			_tileId = new CanonicalTileId(0, 0, 0);
-#endif
 		}
 
 
 		[Test]
-#if UNITY_EDITOR
-		[Ignore("not working in Unity as 'TileResource' is 'internal sealed' and mapbox-sdk-cs and tests end up in 2 different aseemblies")]
-#endif
 		public void GetUrlRaster()
 		{
-#if !UNITY_EDITOR
 			var res1 = TileResource.MakeRaster(_tileId, null);
-			Assert.AreEqual(_api + "styles/v1/mapbox/satellite-v9/tiles/0/0/0", res1.GetUrl());
+			Assert.AreEqual(_api + "styles/v1/mapbox/satellite-v9/tiles/0/0/0", res1.GetUrl().Split("?".ToCharArray())[0]);
 
 			var res2 = TileResource.MakeRaster(_tileId, "mapbox://styles/mapbox/basic-v9");
-			Assert.AreEqual(_api + "styles/v1/mapbox/basic-v9/tiles/0/0/0", res2.GetUrl());
+			Assert.AreEqual(_api + "styles/v1/mapbox/basic-v9/tiles/0/0/0", res2.GetUrl().Split("?".ToCharArray())[0]);
 
 			var res3 = TileResource.MakeRaster(_tileId, "https://api.mapbox.com/styles/v1/penny/penny-map/tiles");
-			Assert.AreEqual(_api + "styles/v1/penny/penny-map/tiles/0/0/0", res3.GetUrl());
-#endif
+			Assert.AreEqual(_api + "styles/v1/penny/penny-map/tiles/0/0/0", res3.GetUrl().Split("?".ToCharArray())[0]);
 		}
 
 
 		[Test]
-#if UNITY_EDITOR
-		[Ignore("not working in Unity as 'TileResource' is 'internal sealed' and mapbox-sdk-cs and tests end up in 2 different aseemblies")]
-#endif
 		public void GetUrlClassicRaster()
 		{
-#if !UNITY_EDITOR
 			var res1 = TileResource.MakeClassicRaster(_tileId, null);
-			Assert.AreEqual(_api + "v4/mapbox.satellite/0/0/0.png", res1.GetUrl());
+			Assert.AreEqual(_api + "v4/mapbox.satellite/0/0/0.png", res1.GetUrl().Split("?".ToCharArray())[0]);
 
 			var res2 = TileResource.MakeClassicRaster(_tileId, "foobar");
-			Assert.AreEqual(_api + "v4/foobar/0/0/0.png", res2.GetUrl());
+			Assert.AreEqual(_api + "v4/foobar/0/0/0.png", res2.GetUrl().Split("?".ToCharArray())[0]);
 
 			var res3 = TileResource.MakeClassicRaster(_tileId, "test");
-			Assert.AreEqual(_api + "v4/test/0/0/0.png", res3.GetUrl());
-#endif
+			Assert.AreEqual(_api + "v4/test/0/0/0.png", res3.GetUrl().Split("?".ToCharArray())[0]);
 		}
 
 		[Test]
-#if UNITY_EDITOR
-		[Ignore("not working in Unity as 'TileResource' is 'internal sealed' and mapbox-sdk-cs and tests end up in 2 different aseemblies")]
-#endif
 		public void GetUrlVector()
 		{
-#if !UNITY_EDITOR
 			var res1 = TileResource.MakeVector(_tileId, null);
-			Assert.AreEqual(_api + "v4/mapbox.mapbox-streets-v7/0/0/0.vector.pbf", res1.GetUrl());
+			Assert.AreEqual(_api + "v4/mapbox.mapbox-streets-v7/0/0/0.vector.pbf", res1.GetUrl().Split("?".ToCharArray())[0]);
 
 			var res2 = TileResource.MakeVector(_tileId, "foobar");
-			Assert.AreEqual(_api + "v4/foobar/0/0/0.vector.pbf", res2.GetUrl());
+			Assert.AreEqual(_api + "v4/foobar/0/0/0.vector.pbf", res2.GetUrl().Split("?".ToCharArray())[0]);
 
 			var res3 = TileResource.MakeVector(_tileId, "test");
-			Assert.AreEqual(_api + "v4/test/0/0/0.vector.pbf", res3.GetUrl());
-#endif
+			Assert.AreEqual(_api + "v4/test/0/0/0.vector.pbf", res3.GetUrl().Split("?".ToCharArray())[0]);
 		}
+
+
+
 	}
 }
 
