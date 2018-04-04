@@ -183,7 +183,7 @@
 					subLayerMaterialOptions.FindPropertyRelative("materials").ClearArray();
 					subLayerMaterialOptions.FindPropertyRelative("materials").arraySize = 2;
 					subLayerMaterialOptions.FindPropertyRelative("atlasInfo").objectReferenceValue = null;
-					subLayerMaterialOptions.FindPropertyRelative("colorPallete").objectReferenceValue = null;
+					subLayerMaterialOptions.FindPropertyRelative("colorPalette").objectReferenceValue = null;
 					subLayerMaterialOptions.FindPropertyRelative("texturingType").enumValueIndex = (int)UvMapType.Tiled;
 
 					subLayer.FindPropertyRelative("buildingsWithUniqueIds").boolValue = false;

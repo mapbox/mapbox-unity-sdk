@@ -20,7 +20,7 @@
 		public UvMapType texturingType = UvMapType.Tiled;
 		public MaterialList[] materials = new MaterialList[2];
 		public AtlasInfo atlasInfo;
-		public ScriptablePalette colorPallete;
+		public ScriptablePalette colorPalette;
 
 		public GeometryMaterialOptions()
 		{
