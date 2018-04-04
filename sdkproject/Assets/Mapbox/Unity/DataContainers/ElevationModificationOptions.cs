@@ -6,7 +6,7 @@
 	[Serializable]
 	public class ElevationModificationOptions
 	{
-		[Tooltip("Number of samples to use for terrain mesh.")]
+		[Tooltip("Mesh resolution of terrain, results in n x n grid")]
 		public int sampleCount = 10;
 		[Tooltip("Use world relative scale to scale terrain height.")]
 		public bool useRelativeHeight = false;
