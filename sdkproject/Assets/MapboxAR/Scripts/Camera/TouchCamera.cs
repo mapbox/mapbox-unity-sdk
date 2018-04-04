@@ -35,7 +35,7 @@
 				{
 					if (_locationProvider != null)
 					{
-						//_locationProvider.SendLocationEvent();
+						_locationProvider.SendLocationEvent();
 					}
 					_wasTouching = false;
 				}
