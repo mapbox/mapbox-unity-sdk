@@ -339,12 +339,12 @@ MonoBehaviour:
     loadingTexture: {fileID: 0}
   _imagery:
     _layerProperty:
-      sourceType: 6
+      sourceType: 1
       sourceOptions:
         isActive: 1
         layerSource:
           Name: Streets
-          Id: 
+          Id: mapbox://styles/mapbox/outdoors-v10
           Modified: 
           UserName: 
       rasterOptions:
@@ -1902,7 +1902,7 @@ Prefab:
     - target: {fileID: 114731470950229392, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_Value
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 98be219873e6d4dffb5949746f515a33, type: 2}
