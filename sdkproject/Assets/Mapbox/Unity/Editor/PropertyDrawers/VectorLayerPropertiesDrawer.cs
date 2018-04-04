@@ -1,6 +1,6 @@
 ﻿namespace Mapbox.Editor
 {
-	using System.Collections;
+	using System;
 	using System.Collections.Generic;
 	using System.Linq;
 	using UnityEngine;
@@ -14,9 +14,9 @@
 	[CustomPropertyDrawer(typeof(VectorLayerProperties))]
 	public class VectorLayerPropertiesDrawer : PropertyDrawer
 	{
-		static float lineHeight = EditorGUIUtility.singleLineHeight;
-		GUIContent[] sourceTypeContent;
-		bool isGUIContentSet = false;
+		static float _lineHeight = EditorGUIUtility.singleLineHeight;
+		GUIContent[] _sourceTypeContent;
+		bool _isGUIContentSet = false;
 
 		bool ShowPosition
 		{
@@ -54,55 +54,62 @@
 			}
 		}
 
+		private GUIContent _mapIdGui = new GUIContent
+		{
+			text = "Map Id",
+			tooltip = "Map Id corresponding to the tileset."
+		};
+
 		VectorSubLayerTreeView layerTreeView = new VectorSubLayerTreeView(new TreeViewState());
 		IList<int> selectedLayers = new List<int>();
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
-			position.height = lineHeight;
+			position.height = _lineHeight;
 
 			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
 			var sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
 
 			var displayNames = sourceTypeProperty.enumDisplayNames;
 			int count = sourceTypeProperty.enumDisplayNames.Length;
-			if (!isGUIContentSet)
+			if (!_isGUIContentSet)
 			{
-				sourceTypeContent = new GUIContent[count];
+				_sourceTypeContent = new GUIContent[count];
 				for (int extIdx = 0; extIdx < count; extIdx++)
 				{
-					sourceTypeContent[extIdx] = new GUIContent
+					_sourceTypeContent[extIdx] = new GUIContent
 					{
 						text = displayNames[extIdx],
-						tooltip = EnumExtensions.Description((VectorSourceType)extIdx),
+						tooltip = ((VectorSourceType)extIdx).Description(),
 					};
 				}
-				isGUIContentSet = true;
+				_isGUIContentSet = true;
 			}
-			var typePosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Style Name", tooltip = "Source tileset for Vector Data" });
+			var typePosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Data Source", tooltip = "Source tileset for Vector Data" });
 
-			sourceTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, sourceTypeProperty.enumValueIndex, sourceTypeContent);
+			sourceTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, sourceTypeProperty.enumValueIndex, _sourceTypeContent);
 			sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
 
-			position.y += lineHeight;
+			position.y += _lineHeight;
 			var sourceOptionsProperty = property.FindPropertyRelative("sourceOptions");
+			var layerSourceProperty = sourceOptionsProperty.FindPropertyRelative("layerSource");
+			var layerSourceId = layerSourceProperty.FindPropertyRelative("Id");
 			var isActiveProperty = sourceOptionsProperty.FindPropertyRelative("isActive");
 			switch (sourceTypeValue)
 			{
 				case VectorSourceType.MapboxStreets:
 				case VectorSourceType.MapboxStreetsWithBuildingIds:
 					var sourcePropertyValue = MapboxDefaultVector.GetParameters(sourceTypeValue);
-					var layerSourceProperty = sourceOptionsProperty.FindPropertyRelative("layerSource");
-					var layerSourceId = layerSourceProperty.FindPropertyRelative("Id");
 					layerSourceId.stringValue = sourcePropertyValue.Id;
 					GUI.enabled = false;
-					EditorGUILayout.PropertyField(sourceOptionsProperty, new GUIContent("Source Option"));
+					EditorGUILayout.PropertyField(sourceOptionsProperty, _mapIdGui);
 					GUI.enabled = true;
 					isActiveProperty.boolValue = true;
 					break;
 				case VectorSourceType.Custom:
-					EditorGUILayout.PropertyField(sourceOptionsProperty, new GUIContent("Source Option"));
+					layerSourceId.stringValue = string.Empty;
+					EditorGUILayout.PropertyField(sourceOptionsProperty, _mapIdGui);
 					isActiveProperty.boolValue = true;
 					break;
 				case VectorSourceType.None:
@@ -118,7 +125,7 @@
 
 				var isStyleOptimized = property.FindPropertyRelative("useOptimizedStyle");
 				EditorGUILayout.PropertyField(isStyleOptimized);
-				position.y += lineHeight;
+				position.y += _lineHeight;
 
 				if (isStyleOptimized.boolValue)
 				{
@@ -131,7 +138,7 @@
 				EditorGUILayout.LabelField(new GUIContent { text = "Vector Layer Visualizers", tooltip = "Visualizers for vector features contained in a layer. " });
 
 				var subLayerArray = property.FindPropertyRelative("vectorSubLayers");
-				var layersRect = GUILayoutUtility.GetRect(0, 500, Mathf.Max(subLayerArray.arraySize + 1, 1) * lineHeight, (subLayerArray.arraySize + 1) * lineHeight);
+				var layersRect = GUILayoutUtility.GetRect(0, 500, Mathf.Max(subLayerArray.arraySize + 1, 1) * _lineHeight, (subLayerArray.arraySize + 1) * _lineHeight);
 
 
 				layerTreeView.Layers = subLayerArray;
@@ -154,7 +161,7 @@
 
 					subLayerName.stringValue = "Untitled";
 
-					// Set defaults here because SerializedProperty copies the previous element. 
+					// Set defaults here because SerializedProperty copies the previous element.
 					var subLayerCoreOptions = subLayer.FindPropertyRelative("coreOptions");
 					subLayerCoreOptions.FindPropertyRelative("isActive").boolValue = true;
 					subLayerCoreOptions.FindPropertyRelative("layerName").stringValue = "building";

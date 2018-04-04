@@ -13,7 +13,7 @@
 		{
 			EditorGUI.BeginProperty(position, label, property);
 			position.height = lineHeight;
-			EditorGUI.PropertyField(position, property.FindPropertyRelative("layerSource"), new GUIContent { tooltip = label.tooltip });
+			EditorGUI.PropertyField(position, property.FindPropertyRelative("layerSource"), label);
 			EditorGUI.EndProperty();
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)

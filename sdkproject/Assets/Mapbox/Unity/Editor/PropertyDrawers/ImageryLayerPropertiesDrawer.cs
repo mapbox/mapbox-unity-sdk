@@ -12,6 +12,13 @@
 
 		GUIContent[] sourceTypeContent;
 		bool isGUIContentSet = false;
+
+		private GUIContent _mapIdGui = new GUIContent
+		{
+			text = "Map Id",
+			tooltip = "Map Id corresponding to the tileset."
+		};
+
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
@@ -30,19 +37,23 @@
 					sourceTypeContent[extIdx] = new GUIContent
 					{
 						text = displayNames[extIdx],
-						tooltip = EnumExtensions.Description((ImagerySourceType)extIdx),
+						tooltip = ((ImagerySourceType)extIdx).Description(),
 					};
 				}
 				isGUIContentSet = true;
 			}
 			// Draw label.
 
-			var typePosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Style Name", tooltip = "Source tileset for Imagery." });
+			var typePosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Data Source", tooltip = "Source tileset for Imagery." });
 
 			sourceTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, sourceTypeProperty.enumValueIndex, sourceTypeContent);
 			sourceTypeValue = (ImagerySourceType)sourceTypeProperty.enumValueIndex;
 
 			position.y += lineHeight;
+			var sourceOptionsProperty = property.FindPropertyRelative("sourceOptions");
+			var layerSourceProperty = sourceOptionsProperty.FindPropertyRelative("layerSource");
+			var layerSourceId = layerSourceProperty.FindPropertyRelative("Id");
+
 			switch (sourceTypeValue)
 			{
 				case ImagerySourceType.MapboxStreets:
@@ -52,16 +63,14 @@
 				case ImagerySourceType.MapboxSatellite:
 				case ImagerySourceType.MapboxSatelliteStreet:
 					var sourcePropertyValue = MapboxDefaultImagery.GetParameters(sourceTypeValue);
-					var sourceOptionsProperty = property.FindPropertyRelative("sourceOptions");
-					var layerSourceProperty = sourceOptionsProperty.FindPropertyRelative("layerSource");
-					var layerSourceId = layerSourceProperty.FindPropertyRelative("Id");
 					layerSourceId.stringValue = sourcePropertyValue.Id;
 					GUI.enabled = false;
-					EditorGUI.PropertyField(position, sourceOptionsProperty);
+					EditorGUI.PropertyField(position, sourceOptionsProperty,_mapIdGui);
 					GUI.enabled = true;
 					break;
 				case ImagerySourceType.Custom:
-					EditorGUI.PropertyField(position, property.FindPropertyRelative("sourceOptions"), new GUIContent("Source Options"));
+					layerSourceId.stringValue = string.Empty;
+					EditorGUI.PropertyField(position, sourceOptionsProperty, new GUIContent{text = "Map Id / Style URL", tooltip = _mapIdGui.tooltip} );
 					break;
 				case ImagerySourceType.None:
 					break;
