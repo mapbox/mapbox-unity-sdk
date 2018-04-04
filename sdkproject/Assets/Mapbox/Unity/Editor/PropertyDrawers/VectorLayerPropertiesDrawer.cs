@@ -191,7 +191,8 @@
 					subLayer.FindPropertyRelative("MeshModifiers").ClearArray();
 					subLayer.FindPropertyRelative("GoModifiers").ClearArray();
 
-
+					selectedLayers = new int[1]{subLayerArray.arraySize -1};
+					layerTreeView.SetSelection(selectedLayers);
 
 				}
 				if (GUILayout.Button(new GUIContent("Remove Selected"), (GUIStyle)"minibuttonright"))

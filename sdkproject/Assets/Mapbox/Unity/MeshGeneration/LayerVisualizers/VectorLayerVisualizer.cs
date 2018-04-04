@@ -56,7 +56,7 @@
 			{
 				case VectorPrimitiveType.Point:
 				case VectorPrimitiveType.Custom:
-					// Let the user add anything that they want 
+					// Let the user add anything that they want
 					if (_layerProperties.coreOptions.snapToTerrain == true)
 					{
 						defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
@@ -122,7 +122,7 @@
 					if (_layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette)
 					{
 						var colorPaletteMod = CreateInstance<MapboxStylesColorModifier>();
-						colorPaletteMod.m_scriptablePalette = _layerProperties.materialOptions.colorPallete;
+						colorPaletteMod.m_scriptablePalette = _layerProperties.materialOptions.colorPalette;
 
 						defaultGOModifierStack.Add(colorPaletteMod);
 					}
@@ -134,7 +134,7 @@
 			_defaultStack.MeshModifiers.AddRange(defaultMeshModifierStack);
 			_defaultStack.GoModifiers.AddRange(defaultGOModifierStack);
 
-			//Add any additional modifiers that were added. 
+			//Add any additional modifiers that were added.
 			_defaultStack.MeshModifiers.AddRange(_layerProperties.MeshModifiers);
 			_defaultStack.GoModifiers.AddRange(_layerProperties.GoModifiers);
 
@@ -164,7 +164,7 @@
 
 		private IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, Action callback = null)
 		{
-			//HACK to prevent request finishing on same frame which breaks modules started/finished events 
+			//HACK to prevent request finishing on same frame which breaks modules started/finished events
 			yield return null;
 
 			if (tile == null)
@@ -174,10 +174,10 @@
 
 			//testing each feature with filters
 			var fc = layer.FeatureCount();
-			//Get all filters in the array. 
+			//Get all filters in the array.
 			var filters = _layerProperties.filterOptions.filters.Select(m => m.GetFilterComparer()).ToArray();
 
-			// Pass them to the combiner 
+			// Pass them to the combiner
 			Filters.ILayerFeatureFilterComparer combiner = new Filters.LayerFilterComparer();
 			switch (_layerProperties.filterOptions.combinerType)
 			{
@@ -219,7 +219,7 @@
 
 				if (filters.Length == 0)
 				{
-					// no filters, just build the features. 
+					// no filters, just build the features.
 					if (tile != null && tile.gameObject != null && tile.VectorDataState != Enums.TilePropertyState.Cancelled)
 						Build(feature, tile, tile.gameObject);
 
@@ -227,7 +227,7 @@
 				}
 				else
 				{
-					// build features only if the filter returns true. 
+					// build features only if the filter returns true.
 					if (combiner.Try(feature))
 					{
 						if (tile != null && tile.gameObject != null && tile.VectorDataState != Enums.TilePropertyState.Cancelled)
@@ -311,8 +311,8 @@
 			//		return feature.Properties["class"].ToString().ToLowerInvariant();
 			//	}
 			//}
-			//else 
-			//TODO: Come back to this. 
+			//else
+			//TODO: Come back to this.
 			//var size = _layerProperties.coreOptions.propertyValuePairs.Count;
 			//for (int i = 0; i < size; i++)
 			//{
