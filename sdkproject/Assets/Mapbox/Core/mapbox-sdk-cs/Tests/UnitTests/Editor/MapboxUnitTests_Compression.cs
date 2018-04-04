@@ -5,7 +5,6 @@
 //-----------------------------------------------------------------------
 
 // TODO: figure out how run tests outside of Unity with .NET framework, something like '#if !UNITY'
-#if UNITY_EDITOR
 #if UNITY_5_6_OR_NEWER
 
 namespace Mapbox.MapboxSdkCs.UnitTest
@@ -137,11 +136,17 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			_fs.WaitForAllRequests();
 #endif
 
-			// tiles are automatically decompressed during HttpRequest on full .Net framework
-			// not on .NET Core / UWP / Unity
-#if UNITY_EDITOR_OSX
+            // tiles are automatically decompressed during HttpRequest on full .Net framework
+            // not on .NET Core / UWP / Unity
+#if UNITY_EDITOR_OSX && UNITY_IOS
+            Assert.AreEqual(buffer.Length, Compression.Decompress(buffer).Length); // EditMode on OSX
+#elif UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID) // PlayMode tests in Editor
+            Debug.Log("EditMode tests in Editor");
+			Assert.Less(buffer.Length, Compression.Decompress(buffer).Length);
+#elif !UNITY_EDITOR && (UNITY_EDITOR_OSX || UNITY_IOS || UNITY_ANDROID) // PlayMode tests on device
+			Debug.Log("PlayMode tests on device");
 			Assert.AreEqual(buffer.Length, Compression.Decompress(buffer).Length);
-#elif NETFX_CORE || UNITY_5_6_OR_NEWER
+#elif NETFX_CORE
 			Assert.Less(buffer.Length, Compression.Decompress(buffer).Length);
 #else
 			Assert.AreEqual(buffer.Length, Compression.Decompress(buffer).Length);
@@ -151,5 +156,4 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 }
 
 
-#endif
 #endif
