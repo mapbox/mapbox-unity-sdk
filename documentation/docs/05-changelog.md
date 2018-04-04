@@ -1,8 +1,12 @@
 ﻿## CHANGELOG
-### v.1.4.0
+### v.1.4.1
 *??/??/2018*
 
 #####
+- Add two new modules, KdTreeCollection and AddToCollection Gameobject modifier.
+- Add Collider option for vector features.
+- Fix to make filter values case insensitive.
+- Fix issue where position vector features was not being set.
 - Fix `Range Property` extrusion option for vector features.
 - Add scale factor for extrusion value derived from feature property.
 
