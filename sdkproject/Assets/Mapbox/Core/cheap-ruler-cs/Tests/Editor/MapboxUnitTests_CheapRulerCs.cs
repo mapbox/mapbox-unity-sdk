@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // <copyright file="FileSourceTest.cs" company="Mapbox">
 //     Copyright (c) 2016 Mapbox. All rights reserved.
 // </copyright>
@@ -10,20 +10,14 @@ namespace Mapbox.CheapRulerCs.UnitTest
 {
 
 
-	using Mapbox.Platform;
 	using NUnit.Framework;
 	using System.Collections.Generic;
-	using System.Globalization;
-	using System.IO;
-	using System.Text;
-	using System;
-	using System.Linq;
 	using UnityEngine;
 	using Mapbox.CheapRulerCs;
 	using Mapbox.Json.Linq;
 
 	[TestFixture]
-	internal class ProbeExtractorCsTest
+	internal class CheapRulerCsTest
 	{
 
 
@@ -67,11 +61,8 @@ namespace Mapbox.CheapRulerCs.UnitTest
 
 		private List<line> loadFixtures()
 		{
-			string fixturePath = Application.dataPath + "/Mapbox/Core/cheap-ruler-cs/Tests/Editor/lines.json";
-			string fixtureAsText;
-			using (TextReader tw = new StreamReader(fixturePath, Encoding.UTF8)) { fixtureAsText = tw.ReadToEnd(); }
-
-			var json = JArray.Parse(fixtureAsText);
+			TextAsset fixturesAsset = Resources.Load<TextAsset>("ChearRulerCs_fixtures");
+			var json = JArray.Parse(fixturesAsset.text);
 			List<line> fixtures = new List<line>();
 
 			foreach (var line in json)

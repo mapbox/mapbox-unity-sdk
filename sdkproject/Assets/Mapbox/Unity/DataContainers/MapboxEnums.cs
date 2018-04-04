@@ -139,11 +139,17 @@
 	}
 	public enum ExtrusionType
 	{
+		[Description("No extrusion.")]
 		None,
+		[Description("Extrude features using the property value.")]
 		PropertyHeight,
+		[Description("Extrude features using the property value. Values lower than min value are clamped at min value.")]
 		MinHeight,
+		[Description("Extrude features using the property value. Values higher than max value are clamped at max value.")]
 		MaxHeight,
+		[Description("Extrude features using the property value. Values are clamped in to min and max values if they are lower or greater than min,max values respectively.")]
 		RangeHeight,
+		[Description("Extrude all features using the fixed value.")]
 		AbsoluteHeight,
 	}
 
@@ -155,5 +161,17 @@
 		RoofOnly,
 		[Description("Extrudes only side wall geometry of the vector feature.")]
 		SideOnly,
+	}
+
+	public enum ColliderType
+	{
+		[Description("No collider.")]
+		None,
+		[Description("Box collider addded to the GameObject.")]
+		BoxCollider,
+		[Description("Mesh collider added to the GameObject.")]
+		MeshCollider,
+		[Description("Sphere collider added to the GameObject.")]
+		SphereCollider,
 	}
 }

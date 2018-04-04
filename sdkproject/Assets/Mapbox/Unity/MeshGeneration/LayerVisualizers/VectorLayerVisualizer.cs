@@ -79,6 +79,15 @@
 					{
 						defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
 					}
+
+					//collider modifier options
+					if (_layerProperties.colliderOptions.colliderType != ColliderType.None)
+					{
+						var lineColliderMod = CreateInstance<ColliderModifier>();
+						lineColliderMod.SetProperties(_layerProperties.colliderOptions);
+						defaultGOModifierStack.Add(lineColliderMod);
+					}
+
 					var lineMatMod = CreateInstance<MaterialModifier>();
 					lineMatMod.SetProperties(_layerProperties.materialOptions);
 					defaultGOModifierStack.Add(lineMatMod);
@@ -113,6 +122,14 @@
 							heightMod.SetProperties(_layerProperties.extrusionOptions);
 							defaultMeshModifierStack.Add(heightMod);
 						}
+					}
+
+					//collider modifier options
+					if (_layerProperties.colliderOptions.colliderType != ColliderType.None)
+					{
+						var polyColliderMod = CreateInstance<ColliderModifier>();
+						polyColliderMod.SetProperties(_layerProperties.colliderOptions);
+						defaultGOModifierStack.Add(polyColliderMod);
 					}
 
 					var matMod = CreateInstance<MaterialModifier>();
