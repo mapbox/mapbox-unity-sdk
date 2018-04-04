@@ -1,36 +1,34 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using KDTree;
-using UnityEngine;
-using System.Diagnostics;
-using UnityEngine.UI;
-using Mapbox.Unity.Map;
-using Mapbox.Unity.MeshGeneration;
-using Mapbox.Unity.MeshGeneration.Data;
-
-public class HighlightBuildings : MonoBehaviour
+﻿namespace Mapbox.Examples
 {
-	public KdTreeCollection Collection;
-	public int MaxCount = 100;
-	public float Range = 10;
-	Ray ray;
-	Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
-	Vector3 pos;
-	float rayDistance;
-	private NearestNeighbour<VectorEntity> pIter;
+	using KDTree;
+	using UnityEngine;
+	using Mapbox.Unity.MeshGeneration;
+	using Mapbox.Unity.MeshGeneration.Data;
 
-	void Update()
+	public class HighlightBuildings : MonoBehaviour
 	{
-		if (Input.GetMouseButton(0))
+		public KdTreeCollection Collection;
+		public int MaxCount = 100;
+		public float Range = 10;
+		Ray ray;
+		Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
+		Vector3 pos;
+		float rayDistance;
+		private NearestNeighbour<VectorEntity> pIter;
+
+		void Update()
 		{
-			ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			if (groundPlane.Raycast(ray, out rayDistance))
+			if (Input.GetMouseButton(0))
 			{
-				pos = ray.GetPoint(rayDistance);
-				pIter = Collection.NearestNeighbors(new double[] { pos.x, pos.z }, MaxCount, Range);
-				while (pIter.MoveNext())
+				ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+				if (groundPlane.Raycast(ray, out rayDistance))
 				{
-					pIter.Current.Transform.localScale = Vector3.zero;
+					pos = ray.GetPoint(rayDistance);
+					pIter = Collection.NearestNeighbors(new double[] { pos.x, pos.z }, MaxCount, Range);
+					while (pIter.MoveNext())
+					{
+						pIter.Current.Transform.localScale = Vector3.zero;
+					}
 				}
 			}
 		}
