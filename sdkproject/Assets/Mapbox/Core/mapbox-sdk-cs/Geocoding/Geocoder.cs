@@ -79,7 +79,7 @@ namespace Mapbox.Geocoding
 		/// <param name="str">JSON String.</param>
 		/// <returns>A <see cref="GeocodeResponse"/>.</returns>
 		/// <typeparam name="T">Forward or reverse geocode. </typeparam>
-		internal T Deserialize<T>(string str)
+		public T Deserialize<T>(string str)
 		{
 			return JsonConvert.DeserializeObject<T>(str, JsonConverters.Converters);
 		}
