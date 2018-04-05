@@ -160,9 +160,9 @@ PlayerSettings:
   applicationIdentifier:
     Android: com.mapbox.unitysdk
     Standalone: unity.Mapbox.MBX SDK
-    Tizen: com.mapbox.unitysdk
+    Tizen: com.mapbox.MBX-SDK
     iOS: com.mapbox.MBX-SDK
-    tvOS: com.mapbox.unitysdk
+    tvOS: com.mapbox.MBX-SDK
   buildNumber:
     iOS: 1
   AndroidBundleVersionCode: 1
