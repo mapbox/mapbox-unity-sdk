@@ -8,6 +8,7 @@
 - Add scale factor for extrusion value derived from feature property.
 
 ##### Bug Fixes
+- Remove `buildingsWithUniqueIds` setting for `Mapbox Streets` data source.
 - Change `Style Name` to `Data Source`
 - Fix to make filter values case insensitive.
 - Fix issue where position vector features was not being set.
