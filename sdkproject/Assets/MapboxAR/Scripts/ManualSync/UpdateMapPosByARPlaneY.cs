@@ -1,23 +1,23 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityARInterface;
-
-public class UpdateMapPosByARPlaneY : MonoBehaviour
+﻿namespace Mapbox.Examples
 {
-	[SerializeField]
-	Transform _mapRoot;
+	using UnityEngine;
+	using UnityARInterface;
 
-
-	void Start()
+	public class UpdateMapPosByARPlaneY : MonoBehaviour
 	{
-		ARInterface.planeAdded += UpdateMapPosOnY;
-		ARInterface.planeUpdated += UpdateMapPosOnY;
-	}
+		[SerializeField]
+		Transform _mapRoot;
 
-	void UpdateMapPosOnY(BoundedPlane plane)
-	{
-		var pos = _mapRoot.position;
-		_mapRoot.position = new Vector3(pos.x, plane.center.y, pos.z);
+		void Start()
+		{
+			ARInterface.planeAdded += UpdateMapPosOnY;
+			ARInterface.planeUpdated += UpdateMapPosOnY;
+		}
+
+		void UpdateMapPosOnY(BoundedPlane plane)
+		{
+			var pos = _mapRoot.position;
+			_mapRoot.position = new Vector3(pos.x, plane.center.y, pos.z);
+		}
 	}
 }
