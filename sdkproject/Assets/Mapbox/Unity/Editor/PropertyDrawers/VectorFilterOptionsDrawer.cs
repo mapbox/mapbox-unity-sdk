@@ -35,14 +35,16 @@
 				{
 					EditorGUILayout.PropertyField(property.FindPropertyRelative("combinerType"));
 				}
-
+				EditorGUI.indentLevel++;
 				EditorGUILayout.BeginHorizontal();
+				GUILayout.Space(EditorGUI.indentLevel * 12);
 				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibutton"))
 				{
 					propertyFilters.arraySize++;
 					//propertyFilters.GetArrayElementAtIndex(propertyFilters.arraySize - 1) = null;
 				}
 				EditorGUILayout.EndHorizontal();
+				EditorGUI.indentLevel--;
 			}
 
 			EditorGUI.EndProperty();

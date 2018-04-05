@@ -15,8 +15,7 @@ MonoBehaviour:
   MeshModifiers:
   - {fileID: 11400000, guid: 4fe5c136889ae0347af431be7e59e489, type: 2}
   - {fileID: 11400000, guid: b432bf85b0df280468dcfdaf5a9b90d0, type: 2}
-  - {fileID: 11400000, guid: 97f59348b2a022d4eb425de65a1f8ce5, type: 2}
-  - {fileID: 11400000, guid: c1c619f43a2cb5b4a8cbc80e9e814804, type: 2}
+  - {fileID: 11400000, guid: a49403503b2b1534f832833cbd477437, type: 2}
   GoModifiers:
-  - {fileID: 11400000, guid: 85d7acaaafb33410dbbc83cfad604f86, type: 2}
-  - {fileID: 11400000, guid: af0e85fdc76cf4bceb25d8ad0bfa2ace, type: 2}
+  - {fileID: 11400000, guid: f79ee57901cdf483e87c86d4ce3e7247, type: 2}
+  - {fileID: 11400000, guid: d534c6a861f735c4dab3990ac3c05158, type: 2}
