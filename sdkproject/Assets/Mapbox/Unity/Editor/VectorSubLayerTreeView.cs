@@ -38,15 +38,6 @@
 				}
 			}
 
-			//if (Layers != null)
-			//{
-			//	foreach (var layer in Layers)
-			//	{
-			//		items.Add(new TreeViewItem { id = index, depth = 0, displayName = layer });
-			//		index++;
-			//	}
-			//}
-
 			// Utility method that initializes the TreeViewItem.children and .parent for all items.
 			SetupParentsAndChildrenFromDepths(root, items);
 
@@ -66,7 +57,14 @@
 				//var layer = Layers[args.itemID]; //
 				//layer = args.newName;
 				var layer = Layers.GetArrayElementAtIndex(args.itemID);
-				layer.FindPropertyRelative("coreOptions.sublayerName").stringValue = args.newName;
+				if (string.IsNullOrEmpty(args.newName.Trim()))
+				{
+					layer.FindPropertyRelative("coreOptions.sublayerName").stringValue = args.originalName;
+				}
+				else
+				{
+					layer.FindPropertyRelative("coreOptions.sublayerName").stringValue = args.newName;
+				}
 			}
 		}
 	}

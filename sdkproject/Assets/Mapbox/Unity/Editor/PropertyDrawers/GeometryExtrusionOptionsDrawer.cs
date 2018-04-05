@@ -9,15 +9,36 @@
 	public class GeometryExtrusionOptionsDrawer : PropertyDrawer
 	{
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
+		GUIContent[] sourceTypeContent;
+		bool isGUIContentSet = false;
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
 			var extrusionTypeProperty = property.FindPropertyRelative("extrusionType");
-			var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Extrusion Type", tooltip = EnumExtensions.Description((Unity.Map.ExtrusionType)extrusionTypeProperty.enumValueIndex) });
+
+			var displayNames = extrusionTypeProperty.enumDisplayNames;
+			int count = extrusionTypeProperty.enumDisplayNames.Length;
+			if (!isGUIContentSet)
+			{
+				sourceTypeContent = new GUIContent[count];
+				for (int extIdx = 0; extIdx < count; extIdx++)
+				{
+					sourceTypeContent[extIdx] = new GUIContent
+					{
+						text = displayNames[extIdx],
+						tooltip = EnumExtensions.Description((ExtrusionType)extIdx),
+					};
+				}
+				isGUIContentSet = true;
+			}
+
+			var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Extrusion Type", tooltip = "Type of geometry extrusion" });
 
 
-			extrusionTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, extrusionTypeProperty.enumValueIndex, extrusionTypeProperty.enumDisplayNames);
+			EditorGUI.indentLevel--;
+			extrusionTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, extrusionTypeProperty.enumValueIndex, sourceTypeContent);
+			EditorGUI.indentLevel++;
 			var sourceTypeValue = (Unity.Map.ExtrusionType)extrusionTypeProperty.enumValueIndex;
 
 			var minHeightProperty = property.FindPropertyRelative("minimumHeight");
@@ -41,18 +62,12 @@
 					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), extrusionGeometryType, extrusionGeometryGUI);
 					position.y += lineHeight;
 					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
-					position.y += lineHeight;
-					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), minHeightProperty);
-					//maxHeightProperty.floatValue = minHeightProperty.floatValue;
 					break;
 				case Unity.Map.ExtrusionType.MaxHeight:
 					position.y += lineHeight;
 					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), extrusionGeometryType, extrusionGeometryGUI);
 					position.y += lineHeight;
 					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
-					position.y += lineHeight;
-					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), maxHeightProperty);
-					//min.floatValue = minHeightProperty.floatValue;
 					break;
 				case Unity.Map.ExtrusionType.RangeHeight:
 					position.y += lineHeight;
@@ -98,11 +113,9 @@
 						rows += 1;
 						break;
 					case Unity.Map.ExtrusionType.PropertyHeight:
-						rows += 3;
-						break;
 					case Unity.Map.ExtrusionType.MinHeight:
 					case Unity.Map.ExtrusionType.MaxHeight:
-						rows += 4;
+						rows += 3;
 						break;
 					case Unity.Map.ExtrusionType.RangeHeight:
 						rows += 5;

@@ -15,7 +15,7 @@
 
 			position.height = lineHeight;
 
-			EditorGUI.PropertyField(position, property.FindPropertyRelative("Id"), new GUIContent { text = "Map Id", tooltip = "Map Id corresponding to the tileset." });
+			EditorGUI.PropertyField(position, property.FindPropertyRelative("Id"), label);
 
 			EditorGUI.EndProperty();
 		}
