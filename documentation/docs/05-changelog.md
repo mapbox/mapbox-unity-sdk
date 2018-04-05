@@ -6,6 +6,7 @@
 - Add two new modules, KdTreeCollection and AddToCollection Gameobject modifier.
 - Add Collider option for vector features.
 - Add scale factor for extrusion value derived from feature property.
+- Add camera script with zoom & pan support for TabletopAR scene.
 
 ##### Bug Fixes
 - Change `Style Name` to `Data Source`
