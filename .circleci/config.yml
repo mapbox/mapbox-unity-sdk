@@ -3,7 +3,7 @@ version: 2
 general:
   branches:
     only:
-      - CI-Test 
+      - develop 
 jobs:
   build-and-test:
     macos:
