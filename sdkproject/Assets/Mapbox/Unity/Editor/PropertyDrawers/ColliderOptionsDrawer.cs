@@ -20,13 +20,13 @@
 			List<GUIContent> enumContent = new List<GUIContent>();
 			foreach(var enumValue in colliderTypeProperty.enumDisplayNames)
 			{
-				var guiContent =  new GUIContent { text = enumValue, tooltip =  EnumExtensions.Description((Unity.Map.ColliderType)colliderTypeProperty.enumValueIndex)} ;
+				var guiContent =  new GUIContent { text = enumValue, tooltip =  ((Unity.Map.ColliderType)colliderTypeProperty.enumValueIndex).Description()} ;
 				enumContent.Add(guiContent);
 			}
 
-
+			EditorGUI.indentLevel--;
 			colliderTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, colliderTypeProperty.enumValueIndex, enumContent.ToArray());
-			var sourceTypeValue = (Unity.Map.ExtrusionType)colliderTypeProperty.enumValueIndex;
+			EditorGUI.indentLevel++;
 			EditorGUI.EndProperty();
 		}
 

@@ -415,6 +415,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 0
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 3
@@ -453,6 +455,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 0
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 2
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -467,7 +471,6 @@ MonoBehaviour:
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
-        - {fileID: 11400000, guid: 203d61015a4124744bf28f4502b286fc, type: 2}
         - {fileID: 11400000, guid: 3505ec4e61e3f4c4d88fc3c5548e7144, type: 2}
         - {fileID: 11400000, guid: d5cfd67d46b2f4892ae231737f3a95f8, type: 2}
         - {fileID: 11400000, guid: 14ec972a1cec2dc429f5eca7d22b572f, type: 2}
@@ -490,6 +493,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 0.5
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -527,6 +532,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 0.5
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -560,6 +567,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 0.5
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -594,6 +603,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 0.4
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -607,9 +618,7 @@ MonoBehaviour:
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
-        GoModifiers:
-        - {fileID: 11400000, guid: 873cf898fb44149798c637959fd811ba, type: 2}
-        - {fileID: 11400000, guid: 69c9fbc203d6e934ea944041d43ea709, type: 2}
+        GoModifiers: []
       - coreOptions:
           isActive: 0
           sublayerName: Waterway
@@ -628,6 +637,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 0.5
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -641,9 +652,7 @@ MonoBehaviour:
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
-        GoModifiers:
-        - {fileID: 11400000, guid: 873cf898fb44149798c637959fd811ba, type: 2}
-        - {fileID: 11400000, guid: 69c9fbc203d6e934ea944041d43ea709, type: 2}
+        GoModifiers: []
       - coreOptions:
           isActive: 0
           sublayerName: Aeroway
@@ -662,6 +671,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 0.5
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -675,9 +686,7 @@ MonoBehaviour:
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
-        GoModifiers:
-        - {fileID: 11400000, guid: 873cf898fb44149798c637959fd811ba, type: 2}
-        - {fileID: 11400000, guid: 69c9fbc203d6e934ea944041d43ea709, type: 2}
+        GoModifiers: []
       - coreOptions:
           isActive: 0
           sublayerName: BarrierLine
@@ -696,6 +705,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 1
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -709,9 +720,7 @@ MonoBehaviour:
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
-        GoModifiers:
-        - {fileID: 11400000, guid: 873cf898fb44149798c637959fd811ba, type: 2}
-        - {fileID: 11400000, guid: 69c9fbc203d6e934ea944041d43ea709, type: 2}
+        GoModifiers: []
       - coreOptions:
           isActive: 0
           sublayerName: LanduseOverlay
@@ -730,6 +739,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 1
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 2
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -743,9 +754,7 @@ MonoBehaviour:
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 2
         MeshModifiers: []
-        GoModifiers:
-        - {fileID: 11400000, guid: 873cf898fb44149798c637959fd811ba, type: 2}
-        - {fileID: 11400000, guid: 69c9fbc203d6e934ea944041d43ea709, type: 2}
+        GoModifiers: []
       - coreOptions:
           isActive: 0
           sublayerName: Admin
@@ -764,6 +773,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -777,9 +788,7 @@ MonoBehaviour:
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 1
         MeshModifiers: []
-        GoModifiers:
-        - {fileID: 11400000, guid: 873cf898fb44149798c637959fd811ba, type: 2}
-        - {fileID: 11400000, guid: 69c9fbc203d6e934ea944041d43ea709, type: 2}
+        GoModifiers: []
       - coreOptions:
           isActive: 0
           sublayerName: CountryLabel
@@ -798,6 +807,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -831,6 +842,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -864,6 +877,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -897,6 +912,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -930,6 +947,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -963,6 +982,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -996,6 +1017,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -1029,6 +1052,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -1062,6 +1087,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -1095,6 +1122,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -1128,6 +1157,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -1161,6 +1192,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -1194,6 +1227,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 0.2
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -1226,6 +1261,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -1258,6 +1295,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 0.5
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -1295,6 +1334,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 1
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -1332,6 +1373,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 1
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -1369,6 +1412,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 1
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -1406,6 +1451,8 @@ MonoBehaviour:
           minimumHeight: 0
           maximumHeight: 1
           extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -2679,7 +2726,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -98.203285
+      value: -98.25222
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -2689,7 +2736,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 176.40657
+      value: 176.50444
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
