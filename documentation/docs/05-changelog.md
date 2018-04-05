@@ -2,13 +2,22 @@
 ### v.1.4.1
 *??/??/2018*
 
-#####
+##### New Features
 - Add two new modules, KdTreeCollection and AddToCollection Gameobject modifier.
 - Add Collider option for vector features.
+- Add scale factor for extrusion value derived from feature property.
+
+##### Bug Fixes
+- Change `Style Name` to `Data Source`
 - Fix to make filter values case insensitive.
 - Fix issue where position vector features was not being set.
 - Fix `Range Property` extrusion option for vector features.
-- Add scale factor for extrusion value derived from feature property.
+- Select newly created layer visualizer.
+- Fix typo in colorPalette.
+- Add defaults for all sublayer properties to not carry over any options from the previous layer.
+- Don't allow empty names for layer visualizers.
+- Fix foldouts not retaining states between play mode & editor.
+- Add missing tooltips.
 
 ### v.1.4.0
 *03/20/2018*
