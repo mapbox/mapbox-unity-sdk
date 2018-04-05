@@ -19,6 +19,7 @@
 - Don't allow empty names for layer visualizers.
 - Fix foldouts not retaining states between play mode & editor.
 - Add missing tooltips.
+- Fix issue with Satellite TextureType.
 
 ### v.1.4.0
 *03/20/2018*
