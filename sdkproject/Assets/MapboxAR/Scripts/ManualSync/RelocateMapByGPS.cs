@@ -25,7 +25,7 @@
 		private void UpdateMapLocation()
 		{
 			var location = LocationProviderFactory.Instance.DefaultLocationProvider.CurrentLocation;
-			_map.SetCenterLatitudeLongitude(location.LatitudeLongitude);
+			_map.UpdateMap(location.LatitudeLongitude,_map.AbsoluteZoom);
 			var playerPos = Camera.main.transform.position;
 			_mapTransform.position = new Vector3(playerPos.x, _mapTransform.position.y, playerPos.z);
 		}
