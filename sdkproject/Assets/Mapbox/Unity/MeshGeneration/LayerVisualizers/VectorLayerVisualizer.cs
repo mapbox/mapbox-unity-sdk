@@ -214,10 +214,13 @@
 			for (int i = 0; i < fc; i++)
 			{
 
-				var feature = new VectorFeatureUnity(layer.GetFeature(i), tile, layer.Extent, _layerProperties.buildingsWithUniqueIds);
+				var buildingsWithUniqueIds =
+					(_layerProperties.honorBuildingIdSetting) && _layerProperties.buildingsWithUniqueIds;
+
+				var feature = new VectorFeatureUnity(layer.GetFeature(i), tile, layer.Extent, buildingsWithUniqueIds);
 
 				//skip existing features, only works on tilesets with unique ids
-				if (_layerProperties.buildingsWithUniqueIds && _activeIds.Contains(feature.Data.Id))
+				if (buildingsWithUniqueIds && _activeIds.Contains(feature.Data.Id))
 				{
 					continue;
 				}

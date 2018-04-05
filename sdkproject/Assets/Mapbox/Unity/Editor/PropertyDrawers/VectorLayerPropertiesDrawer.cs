@@ -218,7 +218,7 @@
 					var layerProperty = subLayerArray.GetArrayElementAtIndex(SelectionIndex);
 
 					layerProperty.isExpanded = true;
-					DrawLayerVisualizerProperties(layerProperty);
+					DrawLayerVisualizerProperties(sourceTypeValue,layerProperty);
 				}
 				else
 				{
@@ -228,7 +228,7 @@
 			EditorGUI.EndProperty();
 		}
 
-		void DrawLayerVisualizerProperties(SerializedProperty layerProperty)
+		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty)
 		{
 			EditorGUI.indentLevel++;
 			GUILayout.Label("Vector Layer Visualizer Properties");
@@ -252,11 +252,16 @@
 			EditorGUI.indentLevel++;
 			if (ShowOthers)
 			{
-				if (primitiveTypeProp == VectorPrimitiveType.Polygon)
+				if (primitiveTypeProp == VectorPrimitiveType.Polygon && sourceType != VectorSourceType.MapboxStreets)
 				{
 					EditorGUI.indentLevel--;
+					layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue = true;
 					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("buildingsWithUniqueIds"), new GUIContent { text = "Buildings With Unique Ids", tooltip = "Turn on this setting only when rendering 3D buildings from the Mapbox Streets with Building Ids tileset. Using this setting with any other polygon layers or source will result in visual artifacts. " });
 					EditorGUI.indentLevel++;
+				}
+				else
+				{
+					layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue = false;
 				}
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("filterOptions"), new GUIContent("Filters"));
 				//EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("modifierOptions"), new GUIContent("Modifiers"));

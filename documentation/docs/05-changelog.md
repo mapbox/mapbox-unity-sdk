@@ -9,6 +9,7 @@
 - Add camera script with zoom & pan support for TabletopAR scene.
 
 ##### Bug Fixes
+- Remove `buildingsWithUniqueIds` setting for `Mapbox Streets` data source.
 - Change `Style Name` to `Data Source`
 - Fix to make filter values case insensitive.
 - Fix issue where position vector features was not being set.
