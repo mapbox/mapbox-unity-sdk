@@ -40,7 +40,7 @@
 			_cachedTile = new UnwrappedTileId();
 		}
 
-		private void Update()
+		protected virtual void Update()
 		{
 			if (!_initialized) return;
 

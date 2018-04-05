@@ -27,7 +27,7 @@
 			_shouldUpdate = true;
 		}
 
-		void Update()
+		protected virtual void Update()
 		{
 			//Camera Debugging
 			//Vector3[] frustumCorners = new Vector3[4];

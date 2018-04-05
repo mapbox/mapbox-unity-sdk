@@ -13,7 +13,7 @@
 				throw new System.Exception("Too many tiles! Use a lower zoom level!");
 			}
 		}
-		private void Update()
+		protected virtual void Update()
 		{
 			if (_map.AbsoluteZoom > 5)
 			{

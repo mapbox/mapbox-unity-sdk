@@ -11,7 +11,7 @@
 
 		ILocationProvider _locationProvider;
 
-		IEnumerator Start()
+		protected virtual IEnumerator Start()
 		{
 			yield return null;
 			_locationProvider = LocationProviderFactory.Instance.DefaultLocationProvider;

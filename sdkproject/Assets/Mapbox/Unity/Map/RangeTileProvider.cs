@@ -35,7 +35,7 @@ namespace Mapbox.Unity.Map
 			//}
 		}
 
-		private void Update()
+		protected virtual void Update()
 		{
 			if (Options == null)
 			{

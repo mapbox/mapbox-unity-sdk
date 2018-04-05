@@ -32,7 +32,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		GameObject _directionsGO;
 
-		void Awake()
+		protected virtual void Awake()
 		{
 			if (_map == null)
 			{
@@ -42,7 +42,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_map.OnInitialized += Query;
 		}
 
-		void OnDestroy()
+		protected virtual void OnDestroy()
 		{
 			_map.OnInitialized -= Query;
 		}

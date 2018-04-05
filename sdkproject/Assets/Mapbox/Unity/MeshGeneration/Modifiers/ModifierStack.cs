@@ -51,7 +51,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		[NonSerialized] private int _counter;
 		[NonSerialized] private int _secondCounter;
-		private void OnEnable()
+		protected virtual void OnEnable()
 		{
 			_pool = new ObjectPool<VectorEntity>(() =>
 			{
