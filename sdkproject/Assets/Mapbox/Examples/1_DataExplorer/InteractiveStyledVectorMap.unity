@@ -556,7 +556,7 @@ MonoBehaviour:
           maximumHeight: 0
           extrusionScaleFactor: 1
         colliderOptions:
-          colliderType: 0
+          colliderType: 2
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -571,7 +571,6 @@ MonoBehaviour:
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
-        - {fileID: 11400000, guid: 203d61015a4124744bf28f4502b286fc, type: 2}
         - {fileID: 11400000, guid: 3505ec4e61e3f4c4d88fc3c5548e7144, type: 2}
         - {fileID: 11400000, guid: d5cfd67d46b2f4892ae231737f3a95f8, type: 2}
         - {fileID: 11400000, guid: 14ec972a1cec2dc429f5eca7d22b572f, type: 2}
@@ -1820,7 +1819,7 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0.000000059604645
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1850,7 +1849,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -71.06381
+      value: -68.64264
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1860,7 +1859,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 122.12763
+      value: 117.28527
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1916,7 +1915,7 @@ Prefab:
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -0.000015258789
+      value: 0.000015258789
       objectReference: {fileID: 0}
     - target: {fileID: 114731470950229392, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
