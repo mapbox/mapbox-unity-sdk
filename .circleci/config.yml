@@ -1,5 +1,9 @@
 # .circleci/config.yml
 version: 2
+general:
+  branches:
+    only:
+      - CI-Test 
 jobs:
   build-and-test:
     macos:
