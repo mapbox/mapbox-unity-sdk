@@ -339,12 +339,12 @@ MonoBehaviour:
     loadingTexture: {fileID: 0}
   _imagery:
     _layerProperty:
-      sourceType: 1
+      sourceType: 6
       sourceOptions:
         isActive: 1
         layerSource:
           Name: Streets
-          Id: mapbox://styles/mapbox/outdoors-v10
+          Id: examples.a4c252ab
           Modified: 
           UserName: 
       rasterOptions:
@@ -419,7 +419,6 @@ MonoBehaviour:
           propertyName: height
           minimumHeight: 0
           maximumHeight: 0
-          extrusionScaleFactor: 1
         materialOptions:
           projectMapImagery: 0
           texturingType: 3
@@ -429,7 +428,7 @@ MonoBehaviour:
           - Materials:
             - {fileID: 2100000, guid: 55cc6edead802446b9106b2998406844, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
-          colorPalette: {fileID: 11400000, guid: e1b79d6caac0144adada0c548ef06705,
+          colorPallete: {fileID: 11400000, guid: e1b79d6caac0144adada0c548ef06705,
             type: 2}
         buildingsWithUniqueIds: 1
         moveFeaturePositionTo: 0
@@ -460,7 +459,6 @@ MonoBehaviour:
           propertyName: height
           minimumHeight: 0
           maximumHeight: 0
-          extrusionScaleFactor: 1
         materialOptions:
           projectMapImagery: 0
           texturingType: 3
@@ -470,7 +468,7 @@ MonoBehaviour:
           - Materials:
             - {fileID: 2100000, guid: 55cc6edead802446b9106b2998406844, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
-          colorPalette: {fileID: 11400000, guid: e1b79d6caac0144adada0c548ef06705,
+          colorPallete: {fileID: 11400000, guid: e1b79d6caac0144adada0c548ef06705,
             type: 2}
         buildingsWithUniqueIds: 1
         moveFeaturePositionTo: 0
@@ -506,7 +504,6 @@ MonoBehaviour:
           propertyName: height
           minimumHeight: 0
           maximumHeight: 0
-          extrusionScaleFactor: 1
         materialOptions:
           projectMapImagery: 0
           texturingType: 3
@@ -516,15 +513,16 @@ MonoBehaviour:
           - Materials:
             - {fileID: 2100000, guid: 55cc6edead802446b9106b2998406844, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
-          colorPalette: {fileID: 11400000, guid: e1b79d6caac0144adada0c548ef06705,
+          colorPallete: {fileID: 11400000, guid: e1b79d6caac0144adada0c548ef06705,
             type: 2}
         buildingsWithUniqueIds: 0
-        moveFeaturePositionTo: 0
+        moveFeaturePositionTo: 2
         MeshModifiers: []
         GoModifiers:
         - {fileID: 11400000, guid: b7b664c5d0b1dfd4ea8bf239a71912ef, type: 2}
         - {fileID: 11400000, guid: 14ec972a1cec2dc429f5eca7d22b572f, type: 2}
         - {fileID: 11400000, guid: aa354e89f869a4db0a6c3ceb3c79d0be, type: 2}
+        - {fileID: 11400000, guid: d534c6a861f735c4dab3990ac3c05158, type: 2}
       - coreOptions:
           isActive: 1
           sublayerName: Parks
@@ -547,7 +545,6 @@ MonoBehaviour:
           propertyName: height
           minimumHeight: 0
           maximumHeight: 0
-          extrusionScaleFactor: 1
         materialOptions:
           projectMapImagery: 0
           texturingType: 0
@@ -557,7 +554,8 @@ MonoBehaviour:
           - Materials:
             - {fileID: 2100000, guid: 1843a50abea6fa448a61d143054f2166, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
-          colorPalette: {fileID: 0}
+          colorPallete: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
+            type: 2}
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1527,6 +1525,7 @@ GameObject:
   - component: {fileID: 1351042190}
   - component: {fileID: 1351042187}
   - component: {fileID: 1351042188}
+  - component: {fileID: 1351042189}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1560,6 +1559,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShadowDistance: 1000
+--- !u!114 &1351042189
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1351042186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f64621ccb8a60114c83bbd39e5fdc145, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Collection: {fileID: 11400000, guid: f11fd5ce183f93846858df725d8eab7b, type: 2}
+  MaxCount: 100
+  Range: 10
 --- !u!81 &1351042190
 AudioListener:
   m_ObjectHideFlags: 0
@@ -1796,7 +1809,7 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 0.000000059604645
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1826,7 +1839,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -71.06381
+      value: -70.363434
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1836,7 +1849,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 122.12763
+      value: 120.72687
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1892,7 +1905,7 @@ Prefab:
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -0.000015258789
       objectReference: {fileID: 0}
     - target: {fileID: 114731470950229392, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1902,7 +1915,7 @@ Prefab:
     - target: {fileID: 114731470950229392, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_Value
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 98be219873e6d4dffb5949746f515a33, type: 2}
