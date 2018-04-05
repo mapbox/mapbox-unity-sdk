@@ -57,7 +57,8 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 
 			// With multiple types
 			_reverseGeocodeResource.Types = new string[] { "country", "region" };
-			Assert.AreEqual(_baseUrl + _expectedQueryString + ".json?types=country%2Cregion", _reverseGeocodeResource.GetUrl());
+			// ToLower is need to make test pass on OSX
+			Assert.AreEqual((_baseUrl + _expectedQueryString + ".json?types=country%2Cregion").ToLower(), _reverseGeocodeResource.GetUrl().ToLower());
 
 			// Set all to null
 			_reverseGeocodeResource.Types = null;

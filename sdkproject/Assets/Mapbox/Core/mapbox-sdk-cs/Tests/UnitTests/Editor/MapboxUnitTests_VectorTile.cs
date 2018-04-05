@@ -5,7 +5,6 @@
 //-----------------------------------------------------------------------
 
 // TODO: figure out how run tests outside of Unity with .NET framework, something like '#if !UNITY'
-#if UNITY_EDITOR
 #if UNITY_5_6_OR_NEWER
 
 
@@ -136,5 +135,4 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 	}
 }
 
-#endif
 #endif

@@ -10,7 +10,8 @@
 	{
 		static string extTypePropertyName = "extentType";
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
-
+		GUIContent[] extentTypeContent;
+		bool isGUIContentSet = false;
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
@@ -21,17 +22,21 @@
 			var kindProperty = property.FindPropertyRelative(extTypePropertyName);
 			var displayNames = kindProperty.enumDisplayNames;
 			int count = kindProperty.enumDisplayNames.Length;
-			GUIContent[] extentTypeContent = new GUIContent[count];
-			for (int extIdx = 0; extIdx < count; extIdx++)
+			if (!isGUIContentSet)
 			{
-				extentTypeContent[extIdx] = new GUIContent
+				extentTypeContent = new GUIContent[count];
+				for (int extIdx = 0; extIdx < count; extIdx++)
 				{
-					text = displayNames[extIdx],
-					tooltip = EnumExtensions.Description((MapExtentType)extIdx),
-				};
+					extentTypeContent[extIdx] = new GUIContent
+					{
+						text = displayNames[extIdx],
+						tooltip = EnumExtensions.Description((MapExtentType)extIdx),
+					};
+				}
+				isGUIContentSet = true;
 			}
 			// Draw label.
-			var kindPosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = label.text, tooltip = EnumExtensions.Description((MapExtentType)kindProperty.enumValueIndex), });
+			var kindPosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = label.text, tooltip = "Options to determine the geographic extent of the world for which the map tiles will be requested.", });
 
 			kindProperty.enumValueIndex = EditorGUI.Popup(kindPosition, kindProperty.enumValueIndex, extentTypeContent);
 

@@ -1,31 +1,94 @@
 ﻿namespace Mapbox.Editor
 {
-	using System.Collections;
-	using System.Collections.Generic;
 	using UnityEngine;
 	using UnityEditor;
 	using Mapbox.Unity.Map;
-	using Mapbox.VectorTile.ExtensionMethods;
-	using Mapbox.Unity.Location;
 
 	[CustomEditor(typeof(AbstractMap))]
 	[CanEditMultipleObjects]
 	public class MapManagerEditor : Editor
 	{
-		static bool showGeneral = true;
-		static bool showImage = false;
-		static bool showTerrain = false;
-		static bool showVector = false;
+		/// <summary>
+		/// Gets or sets a value indicating whether to show general section <see cref="T:Mapbox.Editor.MapManagerEditor"/>.
+		/// </summary>
+		/// <value><c>true</c> then show general section; otherwise hide, <c>false</c>.</value>
+		bool ShowGeneral
+		{
+			get
+			{
+				return EditorPrefs.GetBool("MapManagerEditor_showGeneral");
+			}
+			set
+			{
+				EditorPrefs.SetBool("MapManagerEditor_showGeneral", value);
+			}
+		}
+		/// <summary>
+		/// Gets or sets a value to show or hide Image section<see cref="T:Mapbox.Editor.MapManagerEditor"/>.
+		/// </summary>
+		/// <value><c>true</c> if show image; otherwise, <c>false</c>.</value>
+		bool ShowImage
+		{
+			get
+			{
+				return EditorPrefs.GetBool("MapManagerEditor_showImage");
+			}
+			set
+			{
+				EditorPrefs.SetBool("MapManagerEditor_showImage", value);
+			}
+		}
+		/// <summary>
+		/// Gets or sets a value to show or hide Terrain section <see cref="T:Mapbox.Editor.MapManagerEditor"/>
+		/// </summary>
+		/// <value><c>true</c> if show terrain; otherwise, <c>false</c>.</value>
+		bool ShowTerrain
+		{
+			get
+			{
+				return EditorPrefs.GetBool("MapManagerEditor_showTerrain");
+			}
+			set
+			{
+				EditorPrefs.SetBool("MapManagerEditor_showTerrain", value);
+			}
+		}
+		/// <summary>
+		/// Gets or sets a value to show or hide Vector section <see cref="T:Mapbox.Editor.MapManagerEditor"/>.
+		/// </summary>
+		/// <value><c>true</c> if show vector; otherwise, <c>false</c>.</value>
+		bool ShowVector
+		{
+			get
+			{
+				return EditorPrefs.GetBool("MapManagerEditor_showVector");
+			}
+			set
+			{
+				EditorPrefs.SetBool("MapManagerEditor_showVector", value);
+			}
+		}
 
-		bool showPosition = false;
+		bool ShowPosition
+		{
+			get
+			{
+				return EditorPrefs.GetBool("MapManagerEditor_showPosition");
+			}
+			set
+			{
+				EditorPrefs.SetBool("MapManagerEditor_showPosition", value);
+			}
+		}
+
 		public override void OnInspectorGUI()
 		{
 			serializedObject.Update();
 			GUILayout.BeginVertical();
 			EditorGUILayout.Space();
 
-			showGeneral = EditorGUILayout.Foldout(showGeneral, new GUIContent { text = "GENERAL", tooltip = "Options related to map data" });
-			if (showGeneral)
+			ShowGeneral = EditorGUILayout.Foldout(ShowGeneral, new GUIContent { text = "GENERAL", tooltip = "Options related to map data" });
+			if (ShowGeneral)
 			{
 				//EditorGUILayout.Space();
 				//EditorGUILayout.LabelField("Presets");
@@ -79,24 +142,24 @@
 
 			ShowSepartor();
 
-			showImage = EditorGUILayout.Foldout(showImage, "IMAGE");
-			if (showImage)
+			ShowImage = EditorGUILayout.Foldout(ShowImage, "IMAGE");
+			if (ShowImage)
 			{
 				ShowSection(serializedObject.FindProperty("_imagery"), "_layerProperty");
 			}
 
 			ShowSepartor();
 
-			showTerrain = EditorGUILayout.Foldout(showTerrain, "TERRAIN");
-			if (showTerrain)
+			ShowTerrain = EditorGUILayout.Foldout(ShowTerrain, "TERRAIN");
+			if (ShowTerrain)
 			{
 				ShowSection(serializedObject.FindProperty("_terrain"), "_layerProperty");
 			}
 
 			ShowSepartor();
 
-			showVector = EditorGUILayout.Foldout(showVector, "VECTOR");
-			if (showVector)
+			ShowVector = EditorGUILayout.Foldout(ShowVector, "VECTOR");
+			if (ShowVector)
 			{
 				ShowSection(serializedObject.FindProperty("_vectorData"), "_layerProperty");
 			}
@@ -139,8 +202,8 @@
 
 			EditorGUILayout.PropertyField(serializedObject.FindProperty("_initializeOnStart"));
 
-			showPosition = EditorGUILayout.Foldout(showPosition, "Others");
-			if (showPosition)
+			ShowPosition = EditorGUILayout.Foldout(ShowPosition, "Others");
+			if (ShowPosition)
 			{
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("placementOptions"));
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("scalingOptions"));
