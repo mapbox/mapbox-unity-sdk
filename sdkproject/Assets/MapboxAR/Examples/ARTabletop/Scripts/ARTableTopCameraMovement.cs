@@ -10,7 +10,7 @@
 	public class ARTableTopCameraMovement : MonoBehaviour
 	{
 		[SerializeField]
-		[Range(.1f, 1)]
+		[Range(.1f, 10f)]
 		public float _panSpeed = 1.0f;
 
 		[SerializeField]
@@ -63,14 +63,6 @@
 			scrollDelta = Input.GetAxis("Mouse ScrollWheel");
 			ZoomMapUsingTouchOrMouse(scrollDelta);
 
-
-			//pan keyboard
-			float xMove = Input.GetAxis("Horizontal");
-			float zMove = Input.GetAxis("Vertical");
-
-			PanMapUsingKeyBoard(xMove, zMove);
-
-
 			//pan mouse
 			PanMapUsingTouchOrMouse();
 		}
@@ -78,7 +70,7 @@
 		void HandleTouch()
 		{
 			float zoomFactor = 0.0f;
-			//pinch to zoom. 
+			//pinch to zoom.
 			switch (Input.touchCount)
 			{
 				case 1:
@@ -121,15 +113,12 @@
 		{
 			if (Math.Abs(xMove) > 0.0f || Math.Abs(zMove) > 0.0f)
 			{
-				// Get the number of degrees in a tile at the current zoom level. 
-				// Divide it by the tile width in pixels ( 256 in our case) 
+				// Get the number of degrees in a tile at the current zoom level.
+				// Divide it by the tile width in pixels ( 256 in our case)
 				// to get degrees represented by each pixel.
 				// Keyboard offset is in pixels, therefore multiply the factor with the offset to move the center.
 				float factor = (_panSpeed / 100) * (Conversions.GetTileScaleInDegrees((float)_mapManager.CenterLatitudeLongitude.x, _mapManager.AbsoluteZoom));
-				//MapLocationOptions locationOptions = new MapLocationOptions
-				//{
 				var latitudeLongitude = new Vector2d(_mapManager.CenterLatitudeLongitude.x + zMove * factor * 2.0f, _mapManager.CenterLatitudeLongitude.y + xMove * factor * 4.0f);
-				//};
 				_mapManager.UpdateMap(latitudeLongitude, _mapManager.Zoom);
 			}
 		}
@@ -139,12 +128,12 @@
 			if (Input.GetMouseButton(0) && !EventSystem.current.IsPointerOverGameObject())
 			{
 				var mousePosScreen = Input.mousePosition;
-				_mousePosition = mousePosScreen; //_referenceCamera.ScreenToWorldPoint(mousePosScreen);
+				_mousePosition = mousePosScreen;
 
 				if (_shouldDrag == false)
 				{
 					_shouldDrag = true;
-					_origin = mousePosScreen;//_referenceCamera.ScreenToWorldPoint(mousePosScreen);
+					_origin = mousePosScreen;
 				}
 			}
 			else

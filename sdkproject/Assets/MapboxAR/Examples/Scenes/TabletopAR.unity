@@ -243,7 +243,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -93.339355
+      value: -95.28874
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -253,12 +253,12 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 166.67871
+      value: 170.57748
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 186.67871
+      value: 190.57748
       objectReference: {fileID: 0}
     - target: {fileID: 114603753021256032, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -461,6 +461,17 @@ Prefab:
         type: 2}
       propertyPath: _options.extentOptions.rangeAroundTransformOptions.disposeBuffer
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114378541491328834, guid: c0ce4c9dacbd84ff09f18011abded7e6,
+        type: 2}
+      propertyPath: _vectorData._layerProperty.vectorSubLayers.Array.data[0].materialOptions.colorPalette
+      value: 
+      objectReference: {fileID: 11400000, guid: ef118b5e263da4b1fa4327ca1d3e0c7b,
+        type: 2}
+    - target: {fileID: 114378541491328834, guid: c0ce4c9dacbd84ff09f18011abded7e6,
+        type: 2}
+      propertyPath: _vectorData._layerProperty.vectorSubLayers.Array.data[0].buildingsWithUniqueIds
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 114978445388900478, guid: c0ce4c9dacbd84ff09f18011abded7e6, type: 2}
