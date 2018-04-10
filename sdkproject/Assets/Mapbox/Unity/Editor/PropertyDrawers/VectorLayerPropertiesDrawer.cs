@@ -174,6 +174,7 @@
 					subLayerExtrusionOptions.FindPropertyRelative("extrusionType").enumValueIndex = (int)ExtrusionType.None;
 					subLayerExtrusionOptions.FindPropertyRelative("extrusionGeometryType").enumValueIndex = (int)ExtrusionGeometryType.RoofAndSide;
 					subLayerExtrusionOptions.FindPropertyRelative("propertyName").stringValue = "height";
+					subLayerExtrusionOptions.FindPropertyRelative("extrusionScaleFactor").floatValue = 1f;
 
 					var subLayerFilterOptions = subLayer.FindPropertyRelative("filterOptions");
 					subLayerFilterOptions.FindPropertyRelative("filters").ClearArray();
