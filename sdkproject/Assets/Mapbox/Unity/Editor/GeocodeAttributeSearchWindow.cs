@@ -5,6 +5,7 @@
 	using System.Collections.Generic;
 	using Mapbox.Geocoding;
 	using Mapbox.Unity;
+	using System.Globalization;
 
 	public class GeocodeAttributeSearchWindow : EditorWindow
 	{
