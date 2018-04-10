@@ -81,7 +81,8 @@
 					for (int i = 0; i < _features.Count; i++)
 					{
 						Feature feature = _features[i];
-						string coordinates = feature.Center.x + ", " + feature.Center.y;
+						string coordinates = feature.Center.x.ToString(CultureInfo.InvariantCulture) + ", " +
+						                     feature.Center.y.ToString(CultureInfo.InvariantCulture);
 						string buttonContent = feature.Address + " (" + coordinates + ")";
 
 						if (GUILayout.Button(buttonContent))
