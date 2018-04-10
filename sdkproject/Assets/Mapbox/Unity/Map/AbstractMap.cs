@@ -127,6 +127,7 @@ namespace Mapbox.Unity.Map
 				return _terrain;
 			}
 		}
+
 		/// <summary>
 		/// The vector data.
 		/// Options to control the vector data component of the map.
@@ -140,6 +141,15 @@ namespace Mapbox.Unity.Map
 			get
 			{
 				return _vectorData;
+			}
+		}
+
+		[NodeEditorElement("Layers")]
+		public LocationPrefabsLayer LocationPrefabs
+		{
+			get
+			{
+				return _vectorData.locationPrefabsLayer;
 			}
 		}
 
@@ -646,4 +656,3 @@ namespace Mapbox.Unity.Map
 		}
 	}
 }
-

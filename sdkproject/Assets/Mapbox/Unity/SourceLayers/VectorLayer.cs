@@ -97,6 +97,11 @@
 		public void Initialize()
 		{
 			_vectorTileFactory = ScriptableObject.CreateInstance<VectorTileFactory>();
+			if (_locationPrefabsLayer == null)
+			{
+				_locationPrefabsLayer = new LocationPrefabsLayer(this);
+			}
+			_locationPrefabsLayer.Initialize();
 			_vectorTileFactory.SetOptions(_layerProperty);
 		}
 
@@ -121,5 +126,15 @@
 			}
 		}
 		private VectorTileFactory _vectorTileFactory;
+
+
+		private LocationPrefabsLayer _locationPrefabsLayer;
+		public LocationPrefabsLayer locationPrefabsLayer
+		{
+			get
+			{
+				return _locationPrefabsLayer;
+			}
+		}
 	}
 }
