@@ -16,18 +16,13 @@
 		[SerializeField]
 		Transform _mapHolder;
 
-		float speed = 1f;
-
 		Vector2?[] _oldTouchPositions = { null, null };
 
 		Vector2 _oldTouchVector;
 		Vector3 _delta;
 		float _oldTouchDistance;
-		Vector3 _origin;
 
 		bool _wasTouching;
-
-		bool _shouldDrag;
 
 		void Update()
 		{
@@ -36,7 +31,6 @@
 			{
 				_oldTouchPositions[0] = null;
 				_oldTouchPositions[1] = null;
-				_shouldDrag = false;
 
 			}
 			else if (Input.touchCount == 1)
@@ -45,11 +39,6 @@
 				{
 					_oldTouchPositions[0] = Input.GetTouch(0).position;
 					_oldTouchPositions[1] = null;
-				}
-
-				if (Input.GetTouch(0).phase == TouchPhase.Began)
-				{
-					_origin = Input.GetTouch(0).position;
 				}
 
 				if (Input.GetTouch(0).phase == TouchPhase.Moved)
