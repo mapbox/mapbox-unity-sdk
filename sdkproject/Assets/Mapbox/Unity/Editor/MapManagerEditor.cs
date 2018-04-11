@@ -57,6 +57,22 @@
 		/// Gets or sets a value to show or hide Vector section <see cref="T:Mapbox.Editor.MapManagerEditor"/>.
 		/// </summary>
 		/// <value><c>true</c> if show vector; otherwise, <c>false</c>.</value>
+		bool ShowLocationPrefabs
+		{
+			get
+			{
+				return EditorPrefs.GetBool("MapManagerEditor_showLocationPrefabs");
+			}
+			set
+			{
+				EditorPrefs.SetBool("MapManagerEditor_showLocationPrefabs", value);
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets a value to show or hide Vector section <see cref="T:Mapbox.Editor.MapManagerEditor"/>.
+		/// </summary>
+		/// <value><c>true</c> if show vector; otherwise, <c>false</c>.</value>
 		bool ShowVector
 		{
 			get
@@ -68,6 +84,7 @@
 				EditorPrefs.SetBool("MapManagerEditor_showVector", value);
 			}
 		}
+	
 
 		bool ShowPosition
 		{
@@ -158,6 +175,15 @@
 
 			ShowSepartor();
 
+			SerializedProperty serializedProp = serializedObject.FindProperty("_vectorData");
+			ShowLocationPrefabs = EditorGUILayout.Foldout(ShowLocationPrefabs, "LOCATION PREFABS");
+			if (ShowLocationPrefabs)
+			{
+				ShowSection(serializedProp.FindPropertyRelative("_locationPrefabsLayer"), "_layerProperty");
+			}
+
+			ShowSepartor();
+
 			ShowVector = EditorGUILayout.Foldout(ShowVector, "VECTOR");
 			if (ShowVector)
 			{
@@ -170,10 +196,10 @@
 
 		void ShowSection(SerializedProperty property, string propertyName)
 		{
-			EditorGUILayout.Space();
+    		EditorGUILayout.Space();
 			EditorGUILayout.PropertyField(property.FindPropertyRelative(propertyName));
-
 		}
+
 		void ShowSepartor()
 		{
 			EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);

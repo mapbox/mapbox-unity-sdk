@@ -9,6 +9,12 @@
 	[Serializable]
 	public class VectorLayer : IVectorDataLayer
 	{
+
+		public VectorLayer()
+		{
+			_locationPrefabsLayer = new LocationPrefabsLayer(this);	
+		}
+
 		[SerializeField]
 		VectorLayerProperties _layerProperty = new VectorLayerProperties();
 
@@ -20,6 +26,7 @@
 				return _layerProperty;
 			}
 		}
+
 		public MapLayerType LayerType
 		{
 			get
@@ -71,6 +78,23 @@
 			}
 		}
 
+		public void AddLayerSource(string vectorSource)
+		{
+			if (!string.IsNullOrEmpty(vectorSource))
+			{
+				if (LayerSource.Contains(vectorSource))
+					return;
+
+				var newLayerSource = LayerSource + "," + vectorSource;	
+				_layerProperty.sourceType = VectorSourceType.Custom;
+				_layerProperty.sourceOptions.Id = newLayerSource;
+			}
+			else
+			{
+				Debug.LogError("Empty source. Nothing was added to the list of data sources");
+			}
+		}
+
 		public void AddVectorLayer(VectorSubLayerProperties subLayerProperties)
 		{
 			if (_layerProperty.vectorSubLayers == null)
@@ -97,11 +121,10 @@
 		public void Initialize()
 		{
 			_vectorTileFactory = ScriptableObject.CreateInstance<VectorTileFactory>();
-			if (_locationPrefabsLayer == null)
+			foreach(var item in _locationPrefabsLayer.LayerProperty.locationPrefabList)
 			{
-				_locationPrefabsLayer = new LocationPrefabsLayer(this);
+				AddVectorLayer(item);
 			}
-			_locationPrefabsLayer.Initialize();
 			_vectorTileFactory.SetOptions(_layerProperty);
 		}
 
@@ -127,7 +150,7 @@
 		}
 		private VectorTileFactory _vectorTileFactory;
 
-
+		[SerializeField]
 		private LocationPrefabsLayer _locationPrefabsLayer;
 		public LocationPrefabsLayer locationPrefabsLayer
 		{

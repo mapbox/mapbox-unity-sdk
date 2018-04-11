@@ -6,6 +6,7 @@ namespace Mapbox.Unity.Map
 	using Mapbox.Unity.Map;
 	using Mapbox.Unity.Utilities;
 
+	[Serializable]
 	public class LocationPrefabsLayer : IVectorDataLayer
 	{
 		public LocationPrefabsLayer(VectorLayer layer)
@@ -13,15 +14,22 @@ namespace Mapbox.Unity.Map
 			_vectorLayer = layer;
 		}
 
+
+		//Fixed source
+		private LayerSourceOptions defautlLayerSource = new LayerSourceOptions
+		{
+			layerSource = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets)	
+		};
+
 		[SerializeField]
-		LocationPrefabsLayerProperties _prefabsLayerProperty = new LocationPrefabsLayerProperties();
+		LocationPrefabsLayerProperties _layerProperty = new LocationPrefabsLayerProperties();
 
 		[NodeEditorElement(" Location Prefabs Layer ")]
 		public LocationPrefabsLayerProperties LayerProperty
 		{
 			get
 			{
-				return _prefabsLayerProperty;
+				return _layerProperty;
 			}
 		}
 		public MapLayerType LayerType
@@ -36,7 +44,7 @@ namespace Mapbox.Unity.Map
 		{
 			get
 			{
-				return _prefabsLayerProperty.locationPrefabList.Count > 0;
+				return _layerProperty.locationPrefabList.Count > 0;
 			}
 		}
 
@@ -44,57 +52,52 @@ namespace Mapbox.Unity.Map
 		{
 			get
 			{
-				return MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id;
+				return _vectorLayer.LayerSource;
 			}
 		}
 
 		//method used to set a common layer source for all the visualizers
 		public void SetLayerSource(string vectorSource)
 		{
-			if (!string.IsNullOrEmpty(vectorSource))
-			{
-				_prefabsLayerProperty.sourceOptions.Id = vectorSource;
-			}
-			else
-			{
-				_prefabsLayerProperty.locationPrefabList.Clear();
-				Debug.LogWarning("Empty source - turning off vector data. ");
-			}
+			_vectorLayer.AddLayerSource(vectorSource);
 		}
 
 
-		public void AddPrefabItem(PrefabItem item)
+		public void AddPrefabItem(PrefabItemOptions item)
 		{
-			if (_prefabsLayerProperty.locationPrefabList == null)
+			if (_layerProperty.locationPrefabList == null)
 			{
-				_prefabsLayerProperty.locationPrefabList = new List<PrefabItem>();
+				_layerProperty.locationPrefabList = new List<PrefabItemOptions>();
 			}
-			_prefabsLayerProperty.locationPrefabList.Add(item);
+			_layerProperty.locationPrefabList.Add(item);
+
+			_vectorLayer.AddLayerSource(defautlLayerSource.Id);
 		}
 
 		public void RemovePrefabItem(int index)
 		{
-			if (_prefabsLayerProperty.locationPrefabList != null)
+			if (_layerProperty.locationPrefabList != null)
 			{
-				_prefabsLayerProperty.locationPrefabList.RemoveAt(index);
+				_layerProperty.locationPrefabList.RemoveAt(index);
 			}
 		}
 
 		public void Initialize(LayerProperties properties)
 		{
-			_prefabsLayerProperty = (LocationPrefabsLayerProperties)properties;
+			_layerProperty = (LocationPrefabsLayerProperties)properties;
 			Initialize();
 		}
 
 		public void Initialize()
 		{
+			//set fixed properties
 			//TODO Implement the addition of prefab modifier using a setOptions method on that modifier
 			//_vectorTileFactory.SetOptions(_prefabsLayerProperty);
 		}
 
 		public void Remove()
 		{
-			_prefabsLayerProperty.locationPrefabList.Clear();
+			_layerProperty.locationPrefabList.Clear();
 		}
 
 		public void Update(LayerProperties properties)
