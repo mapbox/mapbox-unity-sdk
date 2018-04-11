@@ -5,11 +5,8 @@ namespace Mapbox.Editor
 	using UnityEditor;
 	using System.Collections.Generic;
 
-	[CustomPropertyDrawer(typeof(ColliderOptions))]
+	[CustomPropertyDrawer(typeof(PrefabItemOptions))]
 	public class PrefabItemOptionsDrawer : PropertyDrawer
 	{
-		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-		{
-		}
 	}
 }

@@ -8,6 +8,7 @@ namespace Mapbox.Unity.Map
 	[Serializable]
 	public class PrefabItemOptions : VectorSubLayerProperties
 	{
+		#region Private Fixed Properties
 		//Fixed primitiveType
 		private VectorPrimitiveType primitiveType = VectorPrimitiveType.Point;
 
@@ -30,6 +31,7 @@ namespace Mapbox.Unity.Map
 			{LocationPrefabFindBy.MapboxCategory, "maki"},
 			{LocationPrefabFindBy.POIName, "name"},
 		};
+		#endregion
 
 		public PrefabItemOptions()
 		{
@@ -65,10 +67,53 @@ namespace Mapbox.Unity.Map
 		#region Public Propeerties
 
 		/// <summary>
+		/// Gets or sets a value indicating whether this <see cref="T:Mapbox.Unity.Map.PrefabItemOptions"/> item is active.
+		/// </summary>
+		/// <value><c>true</c> if is active; otherwise, <c>false</c>.</value>
+		public bool isActive
+		{
+			get
+			{
+				return base.coreOptions.isActive;
+			}
+			set
+			{
+				base.coreOptions.isActive = value;
+			}
+		}
+
+		public bool snapToTerrain
+		{			
+			get
+			{
+				return base.coreOptions.snapToTerrain;
+			}
+			set
+			{
+				base.coreOptions.snapToTerrain = value;
+			}
+		}
+
+		public string prefabItemName
+		{			
+			get
+			{
+				return base.coreOptions.sublayerName;
+			}
+			set
+			{
+				base.coreOptions.sublayerName = value;
+			}
+		}
+
+		/// <summary>
 		/// The prefab to be spawned on the map
 		/// </summary>
 		public GameObject prefab;
 
+		/// <summary>
+		/// The FindbyType enum to specify the type of prefanb item in the list
+		/// </summary>
 		public LocationPrefabFindBy findByType = LocationPrefabFindBy.MapboxCategory;//default to Mapbox Category
 
 		#endregion
