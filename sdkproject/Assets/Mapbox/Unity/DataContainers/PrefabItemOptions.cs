@@ -4,6 +4,7 @@ namespace Mapbox.Unity.Map
 	using System.Collections;
 	using System;
 	using System.Collections.Generic;
+	using Mapbox.Unity.MeshGeneration.Modifiers;
 
 	[Serializable]
 	public class PrefabItemOptions : VectorSubLayerProperties
@@ -31,6 +32,9 @@ namespace Mapbox.Unity.Map
 			{LocationPrefabFindBy.MapboxCategory, "maki"},
 			{LocationPrefabFindBy.POIName, "name"},
 		};
+
+		private readonly PositionTargetType movePrefabFeaturePositionTo = PositionTargetType.FirstVertex;
+
 		#endregion
 
 		public PrefabItemOptions()
@@ -47,7 +51,9 @@ namespace Mapbox.Unity.Map
 			};
 
 			base.coreOptions.groupFeatures = groupFeatures;
+			base.moveFeaturePositionTo = moveFeaturePositionTo;
 		}
+
 
 		void _checkAndAddDefaultLayerAndProperty()
 		{
@@ -83,7 +89,7 @@ namespace Mapbox.Unity.Map
 		}
 
 		public bool snapToTerrain
-		{			
+		{
 			get
 			{
 				return base.coreOptions.snapToTerrain;
@@ -95,7 +101,7 @@ namespace Mapbox.Unity.Map
 		}
 
 		public string prefabItemName
-		{			
+		{
 			get
 			{
 				return base.coreOptions.sublayerName;
