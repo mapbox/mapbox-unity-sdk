@@ -8,5 +8,9 @@ namespace Mapbox.Editor
 	[CustomPropertyDrawer(typeof(PrefabItemOptions))]
 	public class PrefabItemOptionsDrawer : PropertyDrawer
 	{
+		void start()
+		{
+
+		}
 	}
 }

@@ -18,6 +18,8 @@ namespace Mapbox.Unity.Map
 
 		//No extrusion
 		private ExtrusionType extrusionType = ExtrusionType.None;
+
+		//Dictionary containing the layer names for each location prefab find by type
 		private readonly Dictionary<LocationPrefabFindBy, string> layerNameFromFindByTypeDictionary = new Dictionary<LocationPrefabFindBy, string>
 		{
 			{LocationPrefabFindBy.AddressOrLatLon, ""},
@@ -25,7 +27,7 @@ namespace Mapbox.Unity.Map
 			{LocationPrefabFindBy.POIName, "poi_label"},
 		};
 
-
+		//Dictionary containing the property names in the layer for each location prefab find by type
 		private readonly Dictionary<LocationPrefabFindBy, string> propertyNameFromFindByTypeDictionary = new Dictionary<LocationPrefabFindBy, string>
 		{
 			{LocationPrefabFindBy.AddressOrLatLon, ""},
@@ -33,8 +35,8 @@ namespace Mapbox.Unity.Map
 			{LocationPrefabFindBy.POIName, "name"},
 		};
 
+		//Force Move prefab feature position to the first vertex
 		private readonly PositionTargetType movePrefabFeaturePositionTo = PositionTargetType.FirstVertex;
-
 		#endregion
 
 		public PrefabItemOptions()

@@ -54,14 +54,13 @@ namespace Mapbox.Unity.Map
 				//subLayerArray.InsertArrayElementAtIndex(subLayerArray.arraySize);
 
 				var prefabItem = prefabItemArray.GetArrayElementAtIndex(prefabItemArray.arraySize - 1);
-				var prefabItemName = prefabItem.FindPropertyRelative("prefabItemName");
+				var prefabItemName = prefabItem.FindPropertyRelative("coreOptions.sublayerName");
 
 				prefabItemName.stringValue = "New Location";
 
 				// Set defaults here because SerializedProperty copies the previous element.
-				prefabItem.FindPropertyRelative("isActive").boolValue = true;
-				prefabItem.FindPropertyRelative("snapToTerrain").boolValue = true;
-				//prefabItem.FindPropertyRelative("moveFeaturePositionTo").enumValueIndex = (int)PositionTargetType.TileCenter;
+				prefabItem.FindPropertyRelative("coreOptions.isActive").boolValue = true;
+				prefabItem.FindPropertyRelative("coreOptions.snapToTerrain").boolValue = true;
 
 				selectedLayers = new int[1] { prefabItemArray.arraySize - 1 };
 				layerTreeView.SetSelection(selectedLayers);
