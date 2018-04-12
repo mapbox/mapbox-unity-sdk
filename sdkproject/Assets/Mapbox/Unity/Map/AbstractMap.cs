@@ -26,7 +26,8 @@ namespace Mapbox.Unity.Map
 	{
 		public void SetUpScaling(AbstractMap map)
 		{
-			map.SetWorldRelativeScale(Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x));
+			var scaleFactor = Mathf.Pow(2, (map.AbsoluteZoom - map.InitialZoom));
+			map.SetWorldRelativeScale(scaleFactor * Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x));
 		}
 	}
 
