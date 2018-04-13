@@ -421,9 +421,8 @@ MonoBehaviour:
           maximumHeight: 0
           extrusionScaleFactor: 1
         colliderOptions:
-          colliderType: 0
+          colliderType: 1
         materialOptions:
-          projectMapImagery: 0
           texturingType: 3
           materials:
           - Materials:
@@ -433,11 +432,11 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 11400000, guid: e1b79d6caac0144adada0c548ef06705,
             type: 2}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 1
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
-        - {fileID: 11400000, guid: b7b664c5d0b1dfd4ea8bf239a71912ef, type: 2}
         - {fileID: 11400000, guid: 14ec972a1cec2dc429f5eca7d22b572f, type: 2}
         - {fileID: 11400000, guid: aa354e89f869a4db0a6c3ceb3c79d0be, type: 2}
       - coreOptions:
@@ -464,9 +463,8 @@ MonoBehaviour:
           maximumHeight: 0
           extrusionScaleFactor: 1
         colliderOptions:
-          colliderType: 0
+          colliderType: 1
         materialOptions:
-          projectMapImagery: 0
           texturingType: 3
           materials:
           - Materials:
@@ -476,11 +474,11 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 11400000, guid: e1b79d6caac0144adada0c548ef06705,
             type: 2}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 1
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers:
-        - {fileID: 11400000, guid: b7b664c5d0b1dfd4ea8bf239a71912ef, type: 2}
         - {fileID: 11400000, guid: 14ec972a1cec2dc429f5eca7d22b572f, type: 2}
         - {fileID: 11400000, guid: aa354e89f869a4db0a6c3ceb3c79d0be, type: 2}
       - coreOptions:
@@ -512,9 +510,8 @@ MonoBehaviour:
           maximumHeight: 0
           extrusionScaleFactor: 1
         colliderOptions:
-          colliderType: 0
+          colliderType: 1
         materialOptions:
-          projectMapImagery: 0
           texturingType: 3
           materials:
           - Materials:
@@ -524,11 +521,11 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 11400000, guid: e1b79d6caac0144adada0c548ef06705,
             type: 2}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 2
         MeshModifiers: []
         GoModifiers:
-        - {fileID: 11400000, guid: b7b664c5d0b1dfd4ea8bf239a71912ef, type: 2}
         - {fileID: 11400000, guid: 14ec972a1cec2dc429f5eca7d22b572f, type: 2}
         - {fileID: 11400000, guid: aa354e89f869a4db0a6c3ceb3c79d0be, type: 2}
         - {fileID: 11400000, guid: d534c6a861f735c4dab3990ac3c05158, type: 2}
@@ -558,7 +555,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 2
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -567,6 +563,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: 1843a50abea6fa448a61d143054f2166, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1575,7 +1572,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1351042186}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f64621ccb8a60114c83bbd39e5fdc145, type: 3}
   m_Name: 
@@ -1819,7 +1816,7 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 0.000000059604645
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1849,7 +1846,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -68.64264
+      value: -69.38251
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1859,7 +1856,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 117.28527
+      value: 118.765015
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1915,7 +1912,7 @@ Prefab:
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000015258789
+      value: -0.000015258789
       objectReference: {fileID: 0}
     - target: {fileID: 114731470950229392, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
