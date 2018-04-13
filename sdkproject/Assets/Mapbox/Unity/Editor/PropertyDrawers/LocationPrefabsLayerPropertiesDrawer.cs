@@ -76,16 +76,15 @@ namespace Mapbox.Unity.Map
 			}
 
 			GUILayout.EndHorizontal();
-			GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
-			if (selectedLayers.Count == 1)
+			if (selectedLayers.Count == 1 && (SelectionIndex > 0 && (SelectionIndex <= prefabItemArray.arraySize - 1)))
 			{
 				SelectionIndex = selectedLayers[0];
 
 				var layerProperty = prefabItemArray.GetArrayElementAtIndex(SelectionIndex);
 
 				layerProperty.isExpanded = true;
-				//DrawLayerVisualizerProperties(sourceTypeValue, layerProperty);
+				DrawLayerLocationPrefabProperties(layerProperty);
 			}
 			else
 			{
@@ -93,5 +92,14 @@ namespace Mapbox.Unity.Map
 			}
 			EditorGUI.EndProperty();
 		}
+
+
+		void DrawLayerLocationPrefabProperties(SerializedProperty layerProperty)
+		{
+			EditorGUI.indentLevel++;
+			EditorGUILayout.PropertyField(layerProperty);
+			EditorGUI.indentLevel--;
+		}
+
 	} 
 }

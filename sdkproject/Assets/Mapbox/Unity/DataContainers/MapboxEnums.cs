@@ -186,4 +186,18 @@
 		[Description("Display points of interest at specific address or geographical co-ordinates on the map")]
 		AddressOrLatLon,
 	}
+
+	public enum Popularity
+	{
+		[Description("One")]
+		One,
+		[Description("Two")]
+		Two,
+		[Description("Three")]
+		Three,
+		[Description("Four")]
+		Four, 
+		[Description("Five")]
+		Five
+	}
 }

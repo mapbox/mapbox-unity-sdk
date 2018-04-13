@@ -57,7 +57,7 @@ namespace Mapbox.Unity.Map
 		}
 
 
-		void _checkAndAddDefaultLayerAndProperty()
+		private void _checkAndAddDefaultLayerAndProperty()
 		{
 			var layerName = "";
 			if (layerNameFromFindByTypeDictionary.TryGetValue(findByType, out layerName))
@@ -124,6 +124,7 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		public LocationPrefabFindBy findByType = LocationPrefabFindBy.MapboxCategory;//default to Mapbox Category
 
+		public Popularity popularity = Popularity.Five;
 		#endregion
 
 
