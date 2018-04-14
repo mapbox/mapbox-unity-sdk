@@ -3,6 +3,7 @@ namespace Mapbox.Editor
 	using UnityEngine;
 	using Mapbox.Unity.Map;
 	using UnityEditor;
+	using System;
 	using System.Collections.Generic;
 
 	[CustomPropertyDrawer(typeof(PrefabItemOptions))]
@@ -30,6 +31,11 @@ namespace Mapbox.Editor
 			tooltip = "The type of filter you would like to use for looking up POIs"
 		};
 
+		private GUIContent categoriesDropDown = new GUIContent
+		{
+			text = "Category",
+			tooltip = "Would you like to filter them by categories for the POI?"
+		};
 
 		private GUIContent  popularityDropDown = new GUIContent
 		{
@@ -51,17 +57,28 @@ namespace Mapbox.Editor
 			GUILayout.Label(prefabLocationsTitle);
 
 			//FindBy drop down
+			EditorGUILayout.BeginHorizontal();
 			EditorGUILayout.PrefixLabel(findByDropDown);
 			 
 			var findByProp = property.FindPropertyRelative("findByType");
 			findByProp.enumValueIndex = EditorGUILayout.Popup(findByProp.enumValueIndex, findByProp.enumDisplayNames);
+			EditorGUILayout.EndHorizontal();
 
+			//Category drop down
+			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.PrefixLabel(categoriesDropDown);
+
+			var categoryProp = property.FindPropertyRelative("categories");
+			categoryProp.intValue = (int)(LocationPrefabCategories)(EditorGUILayout.EnumFlagsField((LocationPrefabCategories)categoryProp.intValue));
+			EditorGUILayout.EndHorizontal();
 
 			//Popularity drop down
+			EditorGUILayout.BeginHorizontal();
 			EditorGUILayout.PrefixLabel(popularityDropDown);
 
 			var popularityProp = property.FindPropertyRelative("popularity");
 			popularityProp.enumValueIndex = EditorGUILayout.Popup(popularityProp.enumValueIndex, popularityProp.enumDisplayNames);
+			EditorGUILayout.EndHorizontal();
 		}
 
 		private Rect GetNewRect(Rect position)

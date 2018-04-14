@@ -124,7 +124,15 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		public LocationPrefabFindBy findByType = LocationPrefabFindBy.MapboxCategory;//default to Mapbox Category
 
-		public Popularity popularity = Popularity.Five;
+		/// <summary>
+		/// The category filter for the location marker
+		/// </summary>
+		public LocationPrefabCategories categories = LocationPrefabCategories.AnyCategory; 
+
+		/// <summary>
+		/// The popularity by which you want to filter the location marker
+		/// </summary>
+		public Popularity popularity = Popularity.AllLocations;
 		#endregion
 
 

@@ -189,15 +189,28 @@
 
 	public enum Popularity
 	{
-		[Description("One")]
-		One,
-		[Description("Two")]
-		Two,
-		[Description("Three")]
-		Three,
-		[Description("Four")]
-		Four, 
-		[Description("Five")]
-		Five
+		[Description("localrank = 1")]
+		MostPopularLocationsOnly,
+		[Description("localrank = 2")]
+		VeryPopular,
+		[Description("localrank = 3")]
+		Popular,
+		[Description("localrank = 4")]
+		SomewhatPopular, 
+		[Description("localrank = 5")]
+		AllLocations
+	}
+
+	public enum LocationPrefabCategories
+	{
+		None = 0,
+		AnyCategory = ~0,
+		Food = 1 << 0,
+		Nightlife = 1 << 1,
+		ArtsAndEntertainment = 1 << 2,
+		OutdoorsAndRecreation = 1 << 3,
+		Shops = 1 << 4,
+		Services = 1 << 5,
+		Transportation = 1 << 6
 	}
 }

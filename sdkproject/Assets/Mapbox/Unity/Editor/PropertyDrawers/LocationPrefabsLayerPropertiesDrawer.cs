@@ -77,7 +77,7 @@ namespace Mapbox.Unity.Map
 
 			GUILayout.EndHorizontal();
 
-			if (selectedLayers.Count == 1 && (SelectionIndex > 0 && (SelectionIndex <= prefabItemArray.arraySize - 1)))
+			if (selectedLayers.Count == 1 && prefabItemArray.arraySize!=0)//(SelectionIndex > 0 && (SelectionIndex <= subLayerArray.arraySize - 1))
 			{
 				SelectionIndex = selectedLayers[0];
 
@@ -100,6 +100,5 @@ namespace Mapbox.Unity.Map
 			EditorGUILayout.PropertyField(layerProperty);
 			EditorGUI.indentLevel--;
 		}
-
 	} 
 }

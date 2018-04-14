@@ -233,7 +233,7 @@
 
 				GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
-				if (selectedLayers.Count == 1 && (SelectionIndex > 0 && (SelectionIndex <= subLayerArray.arraySize - 1)))
+				if (selectedLayers.Count == 1 && subLayerArray.arraySize!=0)
 				{
 					SelectionIndex = selectedLayers[0];
 
