@@ -43,6 +43,12 @@ namespace Mapbox.Editor
 			tooltip = "Would you like to filter them by popularity of the POI?"
 		};
 
+		private GUIContent nameField = new GUIContent
+		{
+			text = "Name",
+			tooltip = "All the POIs containing this string will be shown on the map"
+		};
+
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
@@ -64,6 +70,24 @@ namespace Mapbox.Editor
 			findByProp.enumValueIndex = EditorGUILayout.Popup(findByProp.enumValueIndex, findByProp.enumDisplayNames);
 			EditorGUILayout.EndHorizontal();
 
+			switch((LocationPrefabFindBy)findByProp.enumValueIndex)
+			{
+				case (LocationPrefabFindBy.MapboxCategory):
+					ShowCategoryOptions(property);
+					break;
+				case(LocationPrefabFindBy.AddressOrLatLon):
+					ShowAddressOrLatLonUI(property);
+					break;
+				case (LocationPrefabFindBy.POIName):
+					ShowPOINames(property);
+					break;
+				default:
+					break;
+			}
+		}
+
+		private void ShowCategoryOptions(SerializedProperty property)
+		{
 			//Category drop down
 			EditorGUILayout.BeginHorizontal();
 			EditorGUILayout.PrefixLabel(categoriesDropDown);
@@ -72,6 +96,30 @@ namespace Mapbox.Editor
 			categoryProp.intValue = (int)(LocationPrefabCategories)(EditorGUILayout.EnumFlagsField((LocationPrefabCategories)categoryProp.intValue));
 			EditorGUILayout.EndHorizontal();
 
+			ShowPopularityDropDown(property);
+		}
+
+		private void ShowAddressOrLatLonUI(SerializedProperty property)
+		{
+			
+		}
+
+
+		private void ShowPOINames(SerializedProperty property)
+		{
+			//Name field
+			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.PrefixLabel(nameField);
+
+			var categoryProp = property.FindPropertyRelative("poiName");
+			categoryProp.stringValue = EditorGUILayout.TextField(categoryProp.stringValue);
+			EditorGUILayout.EndHorizontal();
+
+			ShowPopularityDropDown(property);
+		}
+
+		private void ShowPopularityDropDown(SerializedProperty property)
+		{
 			//Popularity drop down
 			EditorGUILayout.BeginHorizontal();
 			EditorGUILayout.PrefixLabel(popularityDropDown);
