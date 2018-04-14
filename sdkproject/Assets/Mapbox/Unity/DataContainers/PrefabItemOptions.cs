@@ -127,8 +127,7 @@ namespace Mapbox.Unity.Map
 		/// <summary>
 		/// The category filter for the location marker
 		/// </summary>
-		public LocationPrefabCategories categories = LocationPrefabCategories.AnyCategory;
-
+		public LocationPrefabCategories categories;
 		/// <summary>
 		/// All the POIs containing this name will be shown
 		/// </summary>
@@ -137,7 +136,7 @@ namespace Mapbox.Unity.Map
 		/// <summary>
 		/// The popularity by which you want to filter the location marker
 		/// </summary>
-		public Popularity popularity = Popularity.AllLocations;
+		public Popularity popularity;
 		#endregion
 
 
