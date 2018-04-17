@@ -13,12 +13,12 @@ namespace Mapbox.Unity.Map
 
 		private static Dictionary<LocationPrefabCategories, List<string>> CategoriesToMakiDictionary = new Dictionary<LocationPrefabCategories, List<string>>
 		{
-			{LocationPrefabCategories.Food,new List<string>{"cafe","bakery","fast-food","grocery","ice-cream","restaurant"}},
-			{LocationPrefabCategories.Nightlife,new List<string>{"bar","beer"}},
 			{LocationPrefabCategories.ArtsAndEntertainment,new List<string>{"art-gallery", "cinema", "stadium", "museum", "library", "zoo", "music", "theatre", "amusement-park"}},
+			{LocationPrefabCategories.Food,new List<string>{"cafe", "bakery", "fast-food", "grocery", "ice-cream", "restaurant"}},
+			{LocationPrefabCategories.Nightlife,new List<string>{"bar", "beer"}},
 			{LocationPrefabCategories.OutdoorsAndRecreation,new List<string>{"aquarium", "campsite", "attraction", "castle", "cemetery", "dog-park", "drinking-water", "garden", "golf", "monument", "park", "picnic-site", "playground", "swimming"}},
-			{LocationPrefabCategories.Shops,new List<string>{"alcohol-shop", "clothing-store", "shop"}},
 			{LocationPrefabCategories.Services,new List<string>{"bank", "dentist", "toilet", "veterinary", "pharmacy", "college", "school", "hospital", "place-of-worship", "religious-christian", "religious-jewish", "religious-muslim", "police", "post", "doctor", "fire-station", "information", "town-hall", "prison", "embassy", "fuel", "laundry", "lodging"}},
+			{LocationPrefabCategories.Shops,new List<string>{"alcohol-shop", "clothing-store", "shop"}},
 			{LocationPrefabCategories.Transportation,new List<string>{"bus", "car", "bicycle-share", "bicycle", "airfield", "ferry", "harbor", "heliport"}},
 		};
 
