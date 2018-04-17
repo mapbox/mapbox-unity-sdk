@@ -175,11 +175,10 @@
 
 			ShowSepartor();
 
-			SerializedProperty serializedProp = serializedObject.FindProperty("_vectorData");
 			ShowLocationPrefabs = EditorGUILayout.Foldout(ShowLocationPrefabs, "LOCATION PREFABS");
 			if (ShowLocationPrefabs)
 			{
-				ShowSection(serializedProp.FindPropertyRelative("_locationPrefabsLayer"), "_layerProperty");
+				ShowSection(serializedObject.FindProperty("_vectorData"), "_locationPrefabsLayerProperties");
 			}
 
 			ShowSepartor();

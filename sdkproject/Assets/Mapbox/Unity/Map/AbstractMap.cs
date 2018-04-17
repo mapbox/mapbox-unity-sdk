@@ -145,15 +145,6 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		[NodeEditorElement("Layers")]
-		public LocationPrefabsLayer LocationPrefabs
-		{
-			get
-			{
-				return _vectorData.locationPrefabsLayer;
-			}
-		}
-
 		[SerializeField]
 		protected AbstractTileProvider _tileProvider;
 		public AbstractTileProvider TileProvider

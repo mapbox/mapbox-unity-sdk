@@ -9,10 +9,9 @@
 	[Serializable]
 	public class VectorLayer : IVectorDataLayer
 	{
-
 		public VectorLayer()
 		{
-			_locationPrefabsLayer = new LocationPrefabsLayer(this);	
+			_locationPrefabsLayerProperties = new LocationPrefabsLayerProperties();	
 		}
 
 		[SerializeField]
@@ -120,11 +119,10 @@
 
 		public void Initialize()
 		{
-			_locationPrefabsLayer.Initialize();
 			_vectorTileFactory = ScriptableObject.CreateInstance<VectorTileFactory>();
-			foreach(var item in _locationPrefabsLayer.LayerProperty.locationPrefabList)
+			foreach(var item in _locationPrefabsLayerProperties.locationPrefabList)
 			{
-				//Add Location Prefab layer items as a Vector Layer
+				//Add PrefabItemOptions items as a VectorSubLayerProperties
 				AddVectorLayer(item);
 			}
 			_vectorTileFactory.SetOptions(_layerProperty);
@@ -153,12 +151,12 @@
 		private VectorTileFactory _vectorTileFactory;
 
 		[SerializeField]
-		private LocationPrefabsLayer _locationPrefabsLayer;
-		public LocationPrefabsLayer locationPrefabsLayer
+		LocationPrefabsLayerProperties _locationPrefabsLayerProperties;
+		LocationPrefabsLayerProperties LocationPrefabsLayerProperties
 		{
 			get
 			{
-				return _locationPrefabsLayer;
+				return _locationPrefabsLayerProperties;
 			}
 		}
 	}

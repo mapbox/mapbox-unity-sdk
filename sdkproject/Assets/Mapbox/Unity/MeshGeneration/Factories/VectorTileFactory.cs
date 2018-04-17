@@ -63,8 +63,18 @@
 
 			foreach (var sublayer in _properties.vectorSubLayers)
 			{
-				var visualizer = CreateInstance<VectorLayerVisualizer>();
-				visualizer.SetProperties(sublayer, _properties.performanceOptions);
+				//if its of type prefabitemoptions then separate the visualizer type
+				LayerVisualizerBase visualizer;
+				if (typeof(PrefabItemOptions).IsAssignableFrom(sublayer.GetType())) //to check that the instance is of type PrefabItemOptions
+				{
+					visualizer = CreateInstance<LocationPrefabsLayerVisualizer>();
+					((LocationPrefabsLayerVisualizer)visualizer).SetProperties((PrefabItemOptions)sublayer);
+				}
+				else
+				{
+					visualizer = CreateInstance<VectorLayerVisualizer>();
+					((VectorLayerVisualizer)visualizer).SetProperties(sublayer, _properties.performanceOptions);
+				}
 
 				visualizer.Initialize();
 				if (visualizer == null)
