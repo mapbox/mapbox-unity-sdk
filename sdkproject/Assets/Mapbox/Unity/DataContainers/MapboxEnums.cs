@@ -205,12 +205,12 @@
 	{
 		None = 0,
 		AnyCategory = ~0,
-		Food = 1 << 0,
-		Nightlife = 1 << 1,
-		ArtsAndEntertainment = 1 << 2,
+		ArtsAndEntertainment = 1 << 0,
+		Food = 1 << 1,
+		Nightlife = 1 << 2,
 		OutdoorsAndRecreation = 1 << 3,
-		Shops = 1 << 4,
-		Services = 1 << 5,
+		Services = 1 << 4,
+		Shops = 1 << 5,
 		Transportation = 1 << 6
 	}
 }
