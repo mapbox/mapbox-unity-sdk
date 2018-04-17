@@ -30,6 +30,18 @@
 			tooltip = "Map Id corresponding to the tileset."
 		};
 
+		string CustomSourceMapId
+		{
+			get
+			{
+				return EditorPrefs.GetString("ElevationLayerProperties_customSourceMapId");
+			}
+			set
+			{
+				EditorPrefs.SetString("ElevationLayerProperties_customSourceMapId", value);
+			}
+		}
+
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
@@ -73,8 +85,9 @@
 					GUI.enabled = true;
 					break;
 				case ElevationSourceType.Custom:
-					layerSourceId.stringValue = string.Empty;
+					layerSourceId.stringValue = CustomSourceMapId;
 					EditorGUI.PropertyField(position, sourceOptionsProperty, _mapIdGui);
+					CustomSourceMapId = layerSourceId.stringValue;
 					break;
 				default:
 					break;
