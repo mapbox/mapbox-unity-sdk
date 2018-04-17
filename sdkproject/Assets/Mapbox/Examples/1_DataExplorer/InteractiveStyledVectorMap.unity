@@ -344,7 +344,7 @@ MonoBehaviour:
         isActive: 1
         layerSource:
           Name: Streets
-          Id: examples.a4c252ab
+          Id: 
           Modified: 
           UserName: 
       rasterOptions:
@@ -522,7 +522,7 @@ MonoBehaviour:
           colorPalette: {fileID: 11400000, guid: e1b79d6caac0144adada0c548ef06705,
             type: 2}
         honorBuildingIdSetting: 1
-        buildingsWithUniqueIds: 0
+        buildingsWithUniqueIds: 1
         moveFeaturePositionTo: 2
         MeshModifiers: []
         GoModifiers:
@@ -1816,7 +1816,7 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0.000000059604645
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1846,7 +1846,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -69.38251
+      value: -67.57649
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1856,12 +1856,12 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 118.765015
+      value: 115.152985
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 135.15298
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
