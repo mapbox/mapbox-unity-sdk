@@ -22,6 +22,12 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public float TopFloorHeight;
 	}
 
+	public enum AtlasEntityType
+	{
+		TextureBased,
+		MeshGenBased
+	}
+
 	[CreateAssetMenu(menuName = "Mapbox/AtlasInfo")]
 	public class AtlasInfo : ScriptableObject
 	{
@@ -29,6 +35,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public List<AtlasEntity> Roofs;
 
         private UnityEvent m_OnValidate = new UnityEvent();
+
+		public AtlasEntityType AtlasEntityType;
 
         public void AddOnValidateEvent(UnityAction action)
         {
@@ -41,6 +49,25 @@ namespace Mapbox.Unity.MeshGeneration.Data
             {
                 m_OnValidate.Invoke();
             }
+
+			if(AtlasEntityType == AtlasEntityType.TextureBased)
+			{
+				foreach (var tex in Textures)
+				{
+
+					tex.FirstFloorHeight = tex.PreferredEdgeSectionLength * ((tex.TextureRect.height * tex.BottomSectionRatio) / tex.TextureRect.width);
+					tex.TopFloorHeight = tex.PreferredEdgeSectionLength * ((tex.TextureRect.height * tex.TopSectionRatio) / tex.TextureRect.width);
+				}
+			}
+			else
+			{
+				foreach (var tex in Textures)
+				{
+					tex.BottomSectionRatio = (tex.FirstFloorHeight / tex.PreferredEdgeSectionLength) * tex.TextureRect.width / tex.TextureRect.height;
+					tex.TopSectionRatio = (tex.TopFloorHeight / tex.PreferredEdgeSectionLength) * tex.TextureRect.width / tex.TextureRect.height;
+				}
+			}
+			
         }
 	}
 }
