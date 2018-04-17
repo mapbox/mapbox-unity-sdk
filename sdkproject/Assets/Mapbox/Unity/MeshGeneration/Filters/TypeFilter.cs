@@ -263,7 +263,7 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 			}
 
 			var propertyValue = Convert.ToDouble(property);
-			if (propertyValue - Min < Mapbox.Utils.Constants.EpsilonFloatingPoint)
+			if (Math.Abs(propertyValue - Min) < Mapbox.Utils.Constants.EpsilonFloatingPoint)
 			{
 				return true;
 			}
@@ -278,7 +278,7 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 
 		protected override bool PropertyComparer(object property)
 		{
-			return ValueSet.Contains(property);
+			return ValueSet.Contains(property.ToString().ToLower());
 		}
 	}
 
@@ -294,7 +294,7 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 
 		[Tooltip("Filter operator to apply. ")]
 		public LayerFilterOperationType filterOperator;
-
+		private char[] _delimiters = new char[] { ',' };
 		public LayerFilter(LayerFilterOperationType filterOperation)
 		{
 			filterOperator = filterOperation;
@@ -302,6 +302,10 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 
 		public ILayerFeatureFilterComparer GetFilterComparer()
 		{
+			if (_delimiters == null)
+			{
+				_delimiters = new char[] { ',' };
+			}
 			ILayerFeatureFilterComparer filterComparer = new LayerFilterComparer();
 
 			switch (filterOperator)
@@ -316,7 +320,12 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 					filterComparer = LayerFilterComparer.HasPropertyLessThan(Key, Min);
 					break;
 				case LayerFilterOperationType.Contains:
-					filterComparer = LayerFilterComparer.PropertyContainsValue(Key, PropertyValue.Split(','));
+					var matchList = PropertyValue.ToLower()
+						.Split(_delimiters, StringSplitOptions.RemoveEmptyEntries)
+						.Select(p => p.Trim())
+						.Where(p => !string.IsNullOrEmpty(p))
+						.ToArray();
+					filterComparer = LayerFilterComparer.PropertyContainsValue(Key, matchList);
 					break;
 				case LayerFilterOperationType.IsInRange:
 					filterComparer = LayerFilterComparer.HasPropertyInRange(Key, Min, Max);

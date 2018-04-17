@@ -1,14 +1,39 @@
 ﻿## CHANGELOG
+### v.1.4.1
+*04/17/2018*
+
+##### New Features
+- Add two new modules, KdTreeCollection and AddToCollection Gameobject modifier.
+- Add Collider option for vector features.
+- Add scale factor for extrusion value derived from feature property.
+- Add camera script with zoom & pan support for TabletopAR scene.
+
+##### Bug Fixes
+- Remove `buildingsWithUniqueIds` setting for `Mapbox Streets` data source.
+- Change `Style Name` to `Data Source`
+- Fix to make filter values case insensitive.
+- Fix issue where position vector features was not being set.
+- Fix `Range Property` extrusion option for vector features.
+- Select newly created layer visualizer.
+- Fix typo in colorPalette.
+- Add defaults for all sublayer properties to not carry over any options from the previous layer.
+- Don't allow empty names for layer visualizers.
+- Fix foldouts not retaining states between play mode & editor.
+- Add missing tooltips.
+- Fix issue with Satellite TextureType.
+- Added a check to prevent NRE on tile update because map was not initialized.
+- Added method to disable `InitializeOnStart` in the `Initialize With Location Provider` script.
+- Fix loop counter in `SpawnInsidePrefabModifier` which was causing an infinite loop.
 
 ### v.1.4.0
 *03/20/2018*
 
 #####
-- Drag and drop prefabs for most common use cases. 
+- Drag and drop prefabs for most common use cases.
 - New Abstract Map UI
-- Style development - colorization and atlas template generator 
+- Style development - colorization and atlas template generator
 - Use texture atlas for building geometries.
-- Merge buildings with unique ids using the experimental 3D buildings tileset. 
+- Merge buildings with unique ids using the experimental 3D buildings tileset.
 - Added a API call on AbstractMap to query height at a certain latitude longitude.
 - Included EditorConfig file to enforce coding style
 - Integration of previously seperate AR support https://github.com/mapbox/mapbox-unity-sdk/pull/544
@@ -16,7 +41,7 @@
 ### v.1.3.0
 *12/18/2017*
 
-##### Upgrade Instructions 
+##### Upgrade Instructions
 - As always, if you already have a project with a previous version of the SDK, please remove older versions before installing this new one!
 - `FeatureBehaviour` is no longer added to feature gameobjects by default. Use a `FeatureBehaviourModifier` to add this component (optimization).
 - `TextureModifier` is obsolete. Please use `MaterialModifier`.
@@ -31,7 +56,7 @@
 
 ##### New Features
 - Added convenience methods to `AbstractMap`  to convert between Lat/Lon ↔ Vector3. This also works for maps that have been translated, rotated, or scaled! #387
-- Added tile error exception events that you can hook into to know when specific tiles fail to load. We provide an example `TileErrorHandler` object that logs these to console. 
+- Added tile error exception events that you can hook into to know when specific tiles fail to load. We provide an example `TileErrorHandler` object that logs these to console.
 - Added C# wrapper for Mapbox Token API (to validate tokens).
 - Added transparency shader for raster tiles—this enables you to convert black to alpha from Mapbox studio styles (to render just road labels, for example).
 - Added new `LoftModifier`—use this to make complex geometry from line features.
@@ -43,7 +68,7 @@
 ##### Bug Fixes
 - It should now be safe to nest the Mapbox folder (SDK) in your own projects.
 - You can now properly change/load scenes at runtime. #381
-- Fixed token validation issues (validate token when initializing `MapboxAccess`). #430 
+- Fixed token validation issues (validate token when initializing `MapboxAccess`). #430
 - Custom inspectors now properly serialize assets assigned via built-in object browser.
 - Fix for certain tile providers not updating properly when re-initializing a map.
 - Fixed issue where clipped features would result in several new features. #398
@@ -67,7 +92,7 @@
   - Array support to mock a specific route (`LocationArrayEditorLocationProvider`).
   - Transform support on `EditorLocationProvider` to create simple offsets.
   - Use Unity Remote app to send location updates directly to the Unity editor from your device!
-- `DynamicZoom` example has been improved, see new `Zoomable` map example. 
+- `DynamicZoom` example has been improved, see new `Zoomable` map example.
 - Added string to lat/lon conversion method.
 - Various nodes in the map factory framework now have public fields to support run-time styling or modification before map generation (based on settings, for example).
 - Maps now support float values for zoom level—you can use this to inform camera controllers, for example.
@@ -214,7 +239,7 @@
 - Elevation textures are no longer held in memory and height data parsing and access is much faster
 - Added new `FlatTerrainFactory` that is optimized specifically for flat maps
 - Tiles can now be cached in memory—configure the cache size in `MapboxAccess.cs` (default size is 500)
-- Slippy maps now dispose tiles that determined to be "out of range" 
+- Slippy maps now dispose tiles that determined to be "out of range"
   - Tiles that are out of range before completion are properly cancelled
 - Terrain generation in Unity 5.5+ should be much faster and allocate less memory
 
@@ -256,12 +281,12 @@
 - Fixed issue where visualizers for `MeshFactories` were not being serialized properly
 - Fixed null reference exception when creating a new `MeshFactory`
 
-### v0.5.0 
+### v0.5.0
 
 *04/26/2017*
 
-- Added support for UWP 
-    - Share your Hololens creations with us! 
+- Added support for UWP
+    - Share your Hololens creations with us!
 - Fixed precision issue with tile conversions
     - Replaced `Geocoordinate` with `Vector2d`
 - Mapbox API Token is now stored in MapboxAccess.txt

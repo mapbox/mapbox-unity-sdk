@@ -18,6 +18,9 @@ EditorBuildSettings:
     path: Assets/Mapbox/Examples/1_DataExplorer/DataExplorer.unity
     guid: 028ca2c46390a4409bcf0fae61aef3b3
   - enabled: 1
+    path: Assets/Mapbox/Examples/1_DataExplorer/InteractiveStyledVectorMap.unity
+    guid: 52800afdfcee54908a3d4a475f2662bd
+  - enabled: 1
     path: Assets/Mapbox/Examples/2_ZoomableMap/ZoomableMap.unity
     guid: 2c7147d54825142878b256c67aae5704
   - enabled: 1
