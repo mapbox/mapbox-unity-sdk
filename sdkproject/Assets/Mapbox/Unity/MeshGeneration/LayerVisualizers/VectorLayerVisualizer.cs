@@ -55,6 +55,14 @@
 			switch (properties.coreOptions.geometryType)
 			{
 				case VectorPrimitiveType.Point:
+					if(typeof(PrefabItemOptions).IsAssignableFrom(_layerProperties.GetType())) //to check that the instance is of type PrefabItemOptions
+					{
+						var itemProperties = (PrefabItemOptions)_layerProperties;
+						var prefabModifier = ScriptableObject.CreateInstance<PrefabModifier>();
+						prefabModifier.SetProperties(itemProperties.spawnPrefabOptions);
+						defaultGOModifierStack.Add(prefabModifier);
+					}
+					break;
 				case VectorPrimitiveType.Custom:
 					// Let the user add anything that they want
 					if (_layerProperties.coreOptions.snapToTerrain == true)
@@ -156,7 +164,6 @@
 			_defaultStack.GoModifiers.AddRange(_layerProperties.GoModifiers);
 
 		}
-
 
 		public override void Initialize()
 		{

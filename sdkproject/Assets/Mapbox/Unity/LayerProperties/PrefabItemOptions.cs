@@ -5,22 +5,23 @@ namespace Mapbox.Unity.Map
 	using System;
 	using System.Collections.Generic;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
+	using Mapbox.Unity.MeshGeneration.Filters;
 
 	[Serializable]
 	public class PrefabItemOptions : VectorSubLayerProperties
 	{
-		#region Private Fixed Properties
+		#region Fixed Properties
 		//Fixed primitiveType
-		private VectorPrimitiveType primitiveType = VectorPrimitiveType.Point;
+		public readonly VectorPrimitiveType primitiveType = VectorPrimitiveType.Point;
 
 		//Group features turned off
-		private bool groupFeatures = false;
+		public readonly bool groupFeatures = false;
 
 		//No extrusion
-		private ExtrusionType extrusionType = ExtrusionType.None;
+		public readonly ExtrusionType extrusionType = ExtrusionType.None;
 
 		//Dictionary containing the layer names for each location prefab find by type
-		private readonly Dictionary<LocationPrefabFindBy, string> layerNameFromFindByTypeDictionary = new Dictionary<LocationPrefabFindBy, string>
+		public readonly Dictionary<LocationPrefabFindBy, string> layerNameFromFindByTypeDictionary = new Dictionary<LocationPrefabFindBy, string>
 		{
 			{LocationPrefabFindBy.AddressOrLatLon, ""},
 			{LocationPrefabFindBy.MapboxCategory, "poi_label"},
@@ -28,7 +29,7 @@ namespace Mapbox.Unity.Map
 		};
 
 		//Dictionary containing the property names in the layer for each location prefab find by type
-		private readonly Dictionary<LocationPrefabFindBy, string> propertyNameFromFindByTypeDictionary = new Dictionary<LocationPrefabFindBy, string>
+		public readonly Dictionary<LocationPrefabFindBy, string> propertyNameFromFindByTypeDictionary = new Dictionary<LocationPrefabFindBy, string>
 		{
 			{LocationPrefabFindBy.AddressOrLatLon, ""},
 			{LocationPrefabFindBy.MapboxCategory, "maki"},
@@ -36,43 +37,10 @@ namespace Mapbox.Unity.Map
 		};
 
 		//Force Move prefab feature position to the first vertex
-		private readonly PositionTargetType movePrefabFeaturePositionTo = PositionTargetType.FirstVertex;
+		public readonly PositionTargetType _movePrefabFeaturePositionTo = PositionTargetType.FirstVertex;
 		#endregion
 
-		public PrefabItemOptions()
-		{
-			base.coreOptions.geometryType = VectorPrimitiveType.Point;
-			if (findByType != LocationPrefabFindBy.AddressOrLatLon)
-			{
-				_checkAndAddDefaultLayerAndProperty();
-			}
-
-			base.extrusionOptions = new GeometryExtrusionOptions
-			{
-				extrusionType = extrusionType
-			};
-
-			base.coreOptions.groupFeatures = groupFeatures;
-			base.moveFeaturePositionTo = moveFeaturePositionTo;
-		}
-
-
-		private void _checkAndAddDefaultLayerAndProperty()
-		{
-			var layerName = "";
-			if (layerNameFromFindByTypeDictionary.TryGetValue(findByType, out layerName))
-			{
-				base.coreOptions.layerName = layerName;
-			}
-
-			var propertyName = "";
-			if (propertyNameFromFindByTypeDictionary.TryGetValue(findByType, out propertyName))
-			{
-				//TODO: assing filter options by cateory or name
-			}
-		}
-
-		#region Public Propeerties
+		#region User Choice Propeerties
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="T:Mapbox.Unity.Map.PrefabItemOptions"/> item is active.
@@ -82,11 +50,11 @@ namespace Mapbox.Unity.Map
 		{
 			get
 			{
-				return base.coreOptions.isActive;
+				return coreOptions.isActive;
 			}
 			set
 			{
-				base.coreOptions.isActive = value;
+				coreOptions.isActive = value;
 			}
 		}
 
@@ -94,11 +62,11 @@ namespace Mapbox.Unity.Map
 		{
 			get
 			{
-				return base.coreOptions.snapToTerrain;
+				return coreOptions.snapToTerrain;
 			}
 			set
 			{
-				base.coreOptions.snapToTerrain = value;
+				coreOptions.snapToTerrain = value;
 			}
 		}
 
@@ -106,18 +74,18 @@ namespace Mapbox.Unity.Map
 		{
 			get
 			{
-				return base.coreOptions.sublayerName;
+				return coreOptions.sublayerName;
 			}
 			set
 			{
-				base.coreOptions.sublayerName = value;
+				coreOptions.sublayerName = value;
 			}
 		}
 
 		/// <summary>
 		/// The prefab to be spawned on the map
 		/// </summary>
-		public GameObject prefab;
+		public SpawnPrefabOptions spawnPrefabOptions;
 
 		/// <summary>
 		/// The FindbyType enum to specify the type of prefanb item in the list
@@ -128,6 +96,7 @@ namespace Mapbox.Unity.Map
 		/// The category filter for the location marker
 		/// </summary>
 		public LocationPrefabCategories categories;
+
 		/// <summary>
 		/// All the POIs containing this name will be shown
 		/// </summary>
@@ -138,7 +107,5 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		public Popularity popularity;
 		#endregion
-
-
 	}
 }

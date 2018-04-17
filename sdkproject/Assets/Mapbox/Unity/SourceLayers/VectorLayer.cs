@@ -120,9 +120,11 @@
 
 		public void Initialize()
 		{
+			_locationPrefabsLayer.Initialize();
 			_vectorTileFactory = ScriptableObject.CreateInstance<VectorTileFactory>();
 			foreach(var item in _locationPrefabsLayer.LayerProperty.locationPrefabList)
 			{
+				//Add Location Prefab layer items as a Vector Layer
 				AddVectorLayer(item);
 			}
 			_vectorTileFactory.SetOptions(_layerProperty);

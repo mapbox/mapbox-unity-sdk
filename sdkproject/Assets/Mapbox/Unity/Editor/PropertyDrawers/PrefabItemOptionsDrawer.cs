@@ -11,13 +11,7 @@ namespace Mapbox.Editor
 	{
 
 		static float _lineHeight = EditorGUIUtility.singleLineHeight;
-
-		private GUIContent prefabContent = new GUIContent
-		{
-			text = "Prefab",
-			tooltip = "The prefab that will be spawned at the locations chosen below"
-		};
-
+		private int shiftLeftPixels = -22;
 		private GUIContent prefabLocationsTitle = new GUIContent
 		{
 			text = "Prefab Locations",
@@ -52,12 +46,18 @@ namespace Mapbox.Editor
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
-			//position.height = _lineHeight;
+
+			position.y += 1.2f*_lineHeight;
+
 			var prefabItemCoreOptions = property.FindPropertyRelative("coreOptions");
 			GUILayout.Label(prefabItemCoreOptions.FindPropertyRelative("sublayerName").stringValue + " Properties");
-			GUILayout.Space(1);
+			GUILayout.Space(2.5f*EditorGUIUtility.singleLineHeight);
+
 			//Prefab Game Object
-			EditorGUILayout.PropertyField(property.FindPropertyRelative("prefab"),prefabContent);
+			position.y += _lineHeight;
+			var spawnPrefabOptions = property.FindPropertyRelative("spawnPrefabOptions");
+			EditorGUI.PropertyField(new Rect(position.x, position.y,position.width,2*_lineHeight),spawnPrefabOptions);
+			GUILayout.Space(1);
 
 			//Prefab Locations title
 			GUILayout.Label(prefabLocationsTitle);
@@ -65,8 +65,8 @@ namespace Mapbox.Editor
 			//FindBy drop down
 			EditorGUILayout.BeginHorizontal();
 			EditorGUILayout.PrefixLabel(findByDropDown);
-			 
 			var findByProp = property.FindPropertyRelative("findByType");
+			GUILayout.Space(shiftLeftPixels);
 			findByProp.enumValueIndex = EditorGUILayout.Popup(findByProp.enumValueIndex, findByProp.enumDisplayNames);
 			EditorGUILayout.EndHorizontal();
 
@@ -84,6 +84,8 @@ namespace Mapbox.Editor
 				default:
 					break;
 			}
+
+			EditorGUI.EndProperty();
 		}
 
 		private void ShowCategoryOptions(SerializedProperty property)
@@ -93,6 +95,7 @@ namespace Mapbox.Editor
 			EditorGUILayout.PrefixLabel(categoriesDropDown);
 
 			var categoryProp = property.FindPropertyRelative("categories");
+			GUILayout.Space(shiftLeftPixels);
 			categoryProp.intValue = (int)(LocationPrefabCategories)(EditorGUILayout.EnumFlagsField((LocationPrefabCategories)categoryProp.intValue));
 			EditorGUILayout.EndHorizontal();
 
@@ -112,6 +115,8 @@ namespace Mapbox.Editor
 			EditorGUILayout.PrefixLabel(nameField);
 
 			var categoryProp = property.FindPropertyRelative("poiName");
+			GUILayout.Space(shiftLeftPixels);
+
 			categoryProp.stringValue = EditorGUILayout.TextField(categoryProp.stringValue);
 			EditorGUILayout.EndHorizontal();
 
@@ -123,6 +128,8 @@ namespace Mapbox.Editor
 			//Popularity drop down
 			EditorGUILayout.BeginHorizontal();
 			EditorGUILayout.PrefixLabel(popularityDropDown);
+
+			GUILayout.Space(shiftLeftPixels);
 
 			var popularityProp = property.FindPropertyRelative("popularity");
 			popularityProp.enumValueIndex = EditorGUILayout.Popup(popularityProp.enumValueIndex, popularityProp.enumDisplayNames);
