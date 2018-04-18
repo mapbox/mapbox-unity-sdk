@@ -10,7 +10,7 @@
 
 	public class GeocodeAttributeSearchWindow : EditorWindow
 	{
-		SerializedProperty _property;
+		SerializedProperty _coordinateProperty;
 
 		string _searchInput = "";
 
@@ -43,7 +43,7 @@
 		{
 			GeocodeAttributeSearchWindow window = EditorWindow.GetWindow<GeocodeAttributeSearchWindow>(true, "Search for location");
 
-			window._property = property;
+			window._coordinateProperty = property;
 
 			Event e = Event.current;
 			Vector2 mousePos = GUIUtility.GUIToScreenPoint(e.mousePosition);
@@ -83,8 +83,13 @@
 					for (int i = 0; i < _features.Count; i++)
 					{
 						Feature feature = _features[i];
-						string coordinates = feature.Center.x.ToString("F2", CultureInfo.InvariantCulture) + ", " +
-						                            feature.Center.y.ToString("F2",CultureInfo.InvariantCulture);
+						string coordinates = feature.Center.x.ToString(CultureInfo.InvariantCulture) + ", " +
+						                            feature.Center.y.ToString(CultureInfo.InvariantCulture);
+
+						//abreviated coords for display in the UI
+						string truncatedCoordinates = feature.Center.x.ToString("F2", CultureInfo.InvariantCulture) + ", " +
+							feature.Center.y.ToString("F2", CultureInfo.InvariantCulture);
+
 
 						string[] featureNameSplit = feature.PlaceName.Split(',');
 						string buttonContent = "";
@@ -106,16 +111,16 @@
 
 						if (buttonContent.Length < maxButtonContentLength + 15)
 						{
-							buttonContent = buttonContent + "," + " (" + coordinates + ")";
+							buttonContent = buttonContent + "," + " (" + truncatedCoordinates + ")";
 						}
 
 
 						if (GUILayout.Button(buttonContent))
 						{
-							_property.stringValue = coordinates;
+							_coordinateProperty.stringValue = coordinates;
 
-							_property.serializedObject.ApplyModifiedProperties();
-							EditorUtility.SetDirty(_property.serializedObject.targetObject);
+							_coordinateProperty.serializedObject.ApplyModifiedProperties();
+							EditorUtility.SetDirty(_coordinateProperty.serializedObject.targetObject);
 
 							Close();
 						}
