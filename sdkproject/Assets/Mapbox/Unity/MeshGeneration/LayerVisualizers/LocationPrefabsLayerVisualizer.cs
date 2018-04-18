@@ -211,19 +211,59 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		public override void Create(VectorTileLayer layer, UnityTile tile, Action callback)
 		{
-			//for layers using specific locations, use a different modifier stack
-			if( (SubLayerProperties as PrefabItemOptions).findByType == LocationPrefabFindBy.AddressOrLatLon)
+			//for layers using specific locations, ignore VectorTileLayer and
+			//pass coordinates to the modifierstack.
+			if( (SubLayerProperties as PrefabItemOptions).findByType 
+			   == LocationPrefabFindBy.AddressOrLatLon)
 			{
-				if (!_activeCoroutines.ContainsKey(tile))
-					_activeCoroutines.Add(tile, new List<int>());
-				_activeCoroutines[tile].Add(Runnable.Run(ProcessLayer(layer, tile, callback)));
+				BuildFeatureFromLatLon(layer, tile);
 			}
 			else
 			{
-				base.Create(layer, tile, callback)\;
+				base.Create(layer, tile, callback);
 
 			}
 
+		}
+
+		private void BuildFeatureFromLatLon(VectorTileLayer layer, UnityTile tile)
+		{
+			var coordinates = (SubLayerProperties as PrefabItemOptions).coordinates;
+
+			for (int i = 0; i < coordinates.Length; i++)
+			{
+				//check if the coordinate is in the tile
+				var coordinate = Conversions.StringToLatLon( coordinates[i] );
+				var coordinateTileId = Conversions.LatitudeLongitudeToTileId(
+					coordinate.x, coordinate.y, tile.InitialZoom);
+
+				if( coordinateTileId.Canonical.Equals(tile.CanonicalTileId))
+				{
+
+					//create new vector feature
+					var feature = new VectorFeatureUnity();
+					feature.Properties = new Dictionary<string, object>();
+					feature.Points = new List<List<Vector3>>();
+
+					//create a point in tilespace from coordinates
+					var latLonPoint = new List<Vector3>();
+					latLonPoint.Add(new Vector3(10, 0, 0));
+
+					//TODO: latlon to tile coordinates
+
+					//add coordinate feature to feature points
+					feature.Points.Add(latLonPoint);
+
+					//HACK: silence errors when modifiers access feature.Data
+					//this data has no relation to the features being drawn
+					feature.Data = layer.GetFeature(0);
+
+					//pass the feature to the mod stack
+					base.Build(feature, tile, tile.gameObject);
+
+				}
+
+			}
 		}
 
 	}

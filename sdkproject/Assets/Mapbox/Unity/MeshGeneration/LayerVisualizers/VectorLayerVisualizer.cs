@@ -316,7 +316,7 @@
 			return true;
 		}
 
-		private void Build(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
+		protected void Build(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
 		{
 			if (feature.Properties.ContainsKey("extrude") && !Convert.ToBoolean(feature.Properties["extrude"]))
 				return;
