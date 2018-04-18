@@ -15,6 +15,13 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		public void SetProperties(PrefabItemOptions item)
 		{
 			SubLayerProperties = item;
+
+			//Check to make sure that when Categories selection is none, the location prefab is disabled
+			if (item.findByType == LocationPrefabFindBy.MapboxCategory && item.categories == LocationPrefabCategories.None)
+			{
+				return;
+			}
+
 			//These are fixed properties
 			item.coreOptions.geometryType = item.primitiveType;
 			item.extrusionOptions = new GeometryExtrusionOptions
@@ -22,6 +29,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				extrusionType = item.extrusionType
 			};
 
+				
 			item.coreOptions.groupFeatures = item.groupFeatures;
 			item.moveFeaturePositionTo = item._movePrefabFeaturePositionTo;
 
@@ -40,13 +48,12 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				{
 					SetCategoryFilterOptions(item);
 				}
-				if(item.findByType == LocationPrefabFindBy.AddressOrLatLon)
+				if(item.findByType == LocationPrefabFindBy.POIName)
 				{
 					SetNameFilters(item);
 				}
 
 				SetDensityFilters(item);
-
 			}
 
 			switch (item.coreOptions.geometryType)
@@ -82,7 +89,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			if (item.findByType == LocationPrefabFindBy.MapboxCategory)
 			{
 				List<LocationPrefabCategories> categoriesList = GetSelectedCategoriesList(item.categories);
-				if (categoriesList.Contains(LocationPrefabCategories.None))
+				if (categoriesList == null || categoriesList.Count==0)
 					return;
 
 				List <string>stringsList = new List<string>();
@@ -164,6 +171,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 
 			item.filterOptions.filters.Add(filter);
+			item.filterOptions.combinerType = item._combinerType;
+
 		}
 
 		/// <summary>
@@ -176,9 +185,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			List<LocationPrefabCategories> containingCategories = new List<LocationPrefabCategories>();
 
 			var eligibleValues = Enum.GetValues(typeof(LocationPrefabCategories));
-			if (cat == LocationPrefabCategories.None)
+			if (cat == LocationPrefabCategories.None || cat == LocationPrefabCategories.AnyCategory)
 			{
-				containingCategories.Add(LocationPrefabCategories.None);
 				return containingCategories;
 			}
 

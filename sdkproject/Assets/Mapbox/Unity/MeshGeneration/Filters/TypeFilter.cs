@@ -278,7 +278,11 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 
 		protected override bool PropertyComparer(object property)
 		{
-			return ValueSet.Contains(property.ToString().ToLower());
+			foreach(var value in ValueSet)
+			{
+				return property.ToString().ToLower().Contains(value.ToString());
+			}
+			return false;
 		}
 	}
 

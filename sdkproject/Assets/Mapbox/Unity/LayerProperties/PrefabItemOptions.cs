@@ -54,6 +54,8 @@ namespace Mapbox.Unity.Map
 
 		//Force Move prefab feature position to the first vertex
 		public readonly PositionTargetType _movePrefabFeaturePositionTo = PositionTargetType.FirstVertex;
+
+		public readonly LayerFilterCombinerOperationType _combinerType = LayerFilterCombinerOperationType.All;
 		#endregion
 
 		#region User Choice Propeerties
