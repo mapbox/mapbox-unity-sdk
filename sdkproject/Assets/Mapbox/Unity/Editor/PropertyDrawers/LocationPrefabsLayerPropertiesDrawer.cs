@@ -64,8 +64,8 @@ namespace Mapbox.Unity.Map
 				var categories = prefabItem.FindPropertyRelative("categories");
 				categories.intValue = (int)(LocationPrefabCategories.AnyCategory);//To select any category option
 
-				var popularity = prefabItem.FindPropertyRelative("popularity");
-				popularity.enumValueIndex = (int)(Popularity.AllLocations);//To select all locations option
+				var density = prefabItem.FindPropertyRelative("density");
+				density.intValue = 15;//To select all locations option
 
 				selectedLayers = new int[1] { prefabItemArray.arraySize - 1 };
 				layerTreeView.SetSelection(selectedLayers);

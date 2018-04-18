@@ -31,10 +31,10 @@ namespace Mapbox.Editor
 			tooltip = "Would you like to filter them by categories for the POI?"
 		};
 
-		private GUIContent  popularityDropDown = new GUIContent
+		private GUIContent  densitySlider = new GUIContent
 		{
-			text = "Popularity",
-			tooltip = "Would you like to filter them by popularity of the POI?"
+			text = "Density",
+			tooltip = "This slider defines the density of POIs in a region"
 		};
 
 		private GUIContent nameField = new GUIContent
@@ -99,7 +99,7 @@ namespace Mapbox.Editor
 			categoryProp.intValue = (int)(LocationPrefabCategories)(EditorGUILayout.EnumFlagsField((LocationPrefabCategories)categoryProp.intValue));
 			EditorGUILayout.EndHorizontal();
 
-			ShowPopularityDropDown(property);
+			ShowDensitySlider(property);
 		}
 
 		private void ShowAddressOrLatLonUI(SerializedProperty property)
@@ -126,20 +126,22 @@ namespace Mapbox.Editor
 			categoryProp.stringValue = EditorGUILayout.TextField(categoryProp.stringValue);
 			EditorGUILayout.EndHorizontal();
 
-			ShowPopularityDropDown(property);
+			ShowDensitySlider(property);
 		}
 
-		private void ShowPopularityDropDown(SerializedProperty property)
+		private void ShowDensitySlider(SerializedProperty property)
 		{
-			//Popularity drop down
-			EditorGUILayout.BeginHorizontal();
-			EditorGUILayout.PrefixLabel(popularityDropDown);
+			//Density slider
+			var densityProp = property.FindPropertyRelative("density");
+			if (Application.isPlaying)
+			{
+				GUI.enabled = false;
+			}
 
-			GUILayout.Space(shiftLeftPixels);
-
-			var popularityProp = property.FindPropertyRelative("popularity");
-			popularityProp.enumValueIndex = EditorGUILayout.Popup(popularityProp.enumValueIndex, popularityProp.enumDisplayNames);
-			EditorGUILayout.EndHorizontal();
+			EditorGUILayout.PropertyField(densityProp, densitySlider);
+			var integ = densityProp.intValue;
+			GUI.enabled = true;
+			densityProp.serializedObject.ApplyModifiedProperties();
 		}
 
 		private Rect GetNewRect(Rect position)

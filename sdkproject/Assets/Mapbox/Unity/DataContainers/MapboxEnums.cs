@@ -187,6 +187,7 @@
 		AddressOrLatLon,
 	}
 
+	//unused enum for now
 	public enum Popularity
 	{
 		[Description("localrank = 1")]
