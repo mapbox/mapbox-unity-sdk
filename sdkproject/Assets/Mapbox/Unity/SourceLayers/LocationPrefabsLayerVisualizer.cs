@@ -34,7 +34,17 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			//These properties are dependent on user choices
 			if (item.findByType != LocationPrefabFindBy.AddressOrLatLon)
 			{
-				SetFilterOptions(item);
+				if(item.findByType == LocationPrefabFindBy.MapboxCategory)
+				{
+					SetCategoryFilterOptions(item);
+				}
+				if(item.findByType == LocationPrefabFindBy.AddressOrLatLon)
+				{
+					SetNameFilters(item);
+				}
+
+				SetDensityFilters(item);
+
 			}
 
 			switch (item.coreOptions.geometryType)
@@ -58,13 +68,16 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 		}
 
-		//Process UI Options
-		private void SetFilterOptions(PrefabItemOptions item)
+		/// <summary>
+		/// Sets the category filter options.
+		/// </summary>
+		/// <param name="item">Item.</param>
+		private void SetCategoryFilterOptions(PrefabItemOptions item)
 		{
 			var _filterOptions = new VectorFilterOptions();
 
 			string propertyName = "";
-			item.propertyNameFromFindByTypeDictionary.TryGetValue(item.findByType, out propertyName);
+			item.categoryPropertyFromFindByTypeDictionary.TryGetValue(item.findByType, out propertyName);
 
 			if (item.findByType == LocationPrefabFindBy.MapboxCategory)
 			{
@@ -91,14 +104,82 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				};
 				_filterOptions.filters.Add(filter);
 			}
-			else if (item.findByType == LocationPrefabFindBy.POIName)
-			{
 
-			}
-			item.filterOptions = _filterOptions;
+			MergeFiltersWithItem(item, _filterOptions);
 		}
 
+		/// <summary>
+		/// Sets the density filters.
+		/// </summary>
+		/// <param name="item">Item.</param>
+		private void SetDensityFilters(PrefabItemOptions item)
+		{
+			var _filterOptions = new VectorFilterOptions();
 
+			string propertyName = "";
+			item.densityPropertyFromFindByTypeDictionary.TryGetValue(item.findByType, out propertyName);
+
+			if (item.findByType == LocationPrefabFindBy.MapboxCategory || item.findByType == LocationPrefabFindBy.POIName)
+			{
+				LayerFilter filter = new LayerFilter(LayerFilterOperationType.IsLess)
+				{
+					Key = propertyName,
+					PropertyValue = item.density.ToString()
+				};
+				_filterOptions.filters.Add(filter);
+			}
+
+			MergeFiltersWithItem(item, _filterOptions);
+		}
+
+		/// <summary>
+		/// Sets the name filters.
+		/// </summary>
+		/// <param name="item">Item.</param>
+		private void SetNameFilters(PrefabItemOptions item)
+		{
+			if (string.IsNullOrEmpty(item.poiName))
+				return;
+			
+			var _filterOptions = new VectorFilterOptions();
+
+			string propertyName = "";
+			item.namePropertyFromFindByTypeDictionary.TryGetValue(item.findByType, out propertyName);
+
+			if (item.findByType == LocationPrefabFindBy.POIName)
+			{
+				LayerFilter filter = new LayerFilter(LayerFilterOperationType.Contains)
+				{
+					Key = propertyName,
+					PropertyValue = item.poiName
+				};
+				_filterOptions.filters.Add(filter);
+			}
+
+			MergeFiltersWithItem(item, _filterOptions);
+		}
+
+		/// <summary>
+		/// Merges the filters with item filters.
+		/// </summary>
+		/// <param name="item">Item.</param>
+		void MergeFiltersWithItem(PrefabItemOptions item, VectorFilterOptions filterOptions)
+		{
+			if (item.filterOptions == null || item.filterOptions.filters.Count == 0)
+			{
+				item.filterOptions = filterOptions;
+			}
+			else
+			{
+				item.filterOptions.filters.AddRange(filterOptions.filters);
+			}
+		}
+
+		/// <summary>
+		/// Gets the list of categories selected through the dropdown
+		/// </summary>
+		/// <returns>The selected categories list.</returns>
+		/// <param name="cat">Cat.</param>
 		private List<LocationPrefabCategories> GetSelectedCategoriesList(LocationPrefabCategories cat)
 		{
 			List<LocationPrefabCategories> containingCategories = new List<LocationPrefabCategories>();

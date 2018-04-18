@@ -29,10 +29,26 @@ namespace Mapbox.Unity.Map
 		};
 
 		//Dictionary containing the property names in the layer for each location prefab find by type
-		public readonly Dictionary<LocationPrefabFindBy, string> propertyNameFromFindByTypeDictionary = new Dictionary<LocationPrefabFindBy, string>
+		public readonly Dictionary<LocationPrefabFindBy, string> categoryPropertyFromFindByTypeDictionary = new Dictionary<LocationPrefabFindBy, string>
 		{
 			{LocationPrefabFindBy.AddressOrLatLon, ""},
 			{LocationPrefabFindBy.MapboxCategory, "maki"},
+			{LocationPrefabFindBy.POIName, "name"},
+		};
+
+		//Dictionary containing the density names in the layer for each location prefab find by type
+		public readonly Dictionary<LocationPrefabFindBy, string> densityPropertyFromFindByTypeDictionary = new Dictionary<LocationPrefabFindBy, string>
+		{
+			{LocationPrefabFindBy.AddressOrLatLon, ""},
+			{LocationPrefabFindBy.MapboxCategory, "localrank"},
+			{LocationPrefabFindBy.POIName, "localrank"},
+		};
+
+		//Dictionary containing the density names in the layer for each location prefab find by type
+		public readonly Dictionary<LocationPrefabFindBy, string> namePropertyFromFindByTypeDictionary = new Dictionary<LocationPrefabFindBy, string>
+		{
+			{LocationPrefabFindBy.AddressOrLatLon, ""},
+			{LocationPrefabFindBy.MapboxCategory, ""},
 			{LocationPrefabFindBy.POIName, "name"},
 		};
 
@@ -103,9 +119,11 @@ namespace Mapbox.Unity.Map
 		public string poiName = "POI Name";
 
 		/// <summary>
-		/// The popularity by which you want to filter the location marker
+		/// The density of pois in an area
 		/// </summary>
-		public Popularity popularity;
+		[Range(1, 30)]
+		public int density = 15;
+
 		#endregion
 	}
 }

@@ -197,7 +197,6 @@ namespace Mapbox.Map
 			{
 				var decompressed = Compression.Decompress(data);
 				this.data = new Mapbox.VectorTile.VectorTile(decompressed);
-				var datatype = this.data.GetLayer("poi_label").Data;
 				return true;
 			}
 			catch (Exception ex)
