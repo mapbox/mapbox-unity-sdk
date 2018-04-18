@@ -291,6 +291,7 @@ namespace Mapbox.Unity.Map
 			_worldRelativeScale = scale;
 		}
 		public event Action OnInitialized = delegate { };
+		public event Action OnUpdated = delegate { };
 
 		void Awake()
 		{
@@ -501,6 +502,11 @@ namespace Mapbox.Unity.Map
 				_mapScaleFactor = Vector3.one * Mathf.Pow(2, differenceInZoom);
 				_mapScaleFactor.y = 1;
 				Root.localScale = _mapScaleFactor;
+			}
+
+			if (OnUpdated != null)
+			{
+				OnUpdated();
 			}
 		}
 		/// <summary>
