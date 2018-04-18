@@ -39,7 +39,7 @@
 		}
 
 		LayerPerformanceOptions _performanceOptions;
-		private Dictionary<UnityTile, List<int>> _activeCoroutines;
+		protected Dictionary<UnityTile, List<int>> _activeCoroutines;
 		int _entityInCurrentCoroutine = 0;
 
 		protected ModifierStackBase _defaultStack;

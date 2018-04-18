@@ -104,7 +104,13 @@ namespace Mapbox.Editor
 
 		private void ShowAddressOrLatLonUI(SerializedProperty property)
 		{
-			
+
+			//TODO: update styling from specific-locations-modifiers branch
+			EditorGUILayout.BeginVertical();
+			var coordinateProperties = property.FindPropertyRelative("coordinates");
+			EditorGUILayout.PropertyField(coordinateProperties, true);
+			EditorGUILayout.EndVertical();
+
 		}
 
 

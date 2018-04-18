@@ -6,7 +6,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 	using Mapbox.Unity.MeshGeneration.Filters;
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
+	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.Map;
+	using Mapbox.VectorTile;
 
 	public class LocationPrefabsLayerVisualizer : VectorLayerVisualizer
 	{
@@ -126,5 +128,23 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			return containingCategories;
 		}
+
+		public override void Create(VectorTileLayer layer, UnityTile tile, Action callback)
+		{
+			//for layers using specific locations, use a different modifier stack
+			if( (SubLayerProperties as PrefabItemOptions).findByType == LocationPrefabFindBy.AddressOrLatLon)
+			{
+				if (!_activeCoroutines.ContainsKey(tile))
+					_activeCoroutines.Add(tile, new List<int>());
+				_activeCoroutines[tile].Add(Runnable.Run(ProcessLayer(layer, tile, callback)));
+			}
+			else
+			{
+				base.Create(layer, tile, callback)\;
+
+			}
+
+		}
+
 	}
 }

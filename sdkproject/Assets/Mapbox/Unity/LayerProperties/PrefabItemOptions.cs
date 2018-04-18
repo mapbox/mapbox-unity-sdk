@@ -5,6 +5,7 @@ namespace Mapbox.Unity.Map
 	using System;
 	using System.Collections.Generic;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
+	using Mapbox.Unity.Utilities;
 	using Mapbox.Unity.MeshGeneration.Filters;
 
 	[Serializable]
@@ -40,7 +41,7 @@ namespace Mapbox.Unity.Map
 		public readonly PositionTargetType _movePrefabFeaturePositionTo = PositionTargetType.FirstVertex;
 		#endregion
 
-		#region User Choice Propeerties
+		#region User Choice Properties
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="T:Mapbox.Unity.Map.PrefabItemOptions"/> item is active.
@@ -106,6 +107,12 @@ namespace Mapbox.Unity.Map
 		/// The popularity by which you want to filter the location marker
 		/// </summary>
 		public Popularity popularity;
+
+		/// <summary>
+		/// The coordinates to place prefabs when selecting address/latlon
+		/// </summary>
+		[Geocode]
+		public string[] coordinates;
 		#endregion
 	}
 }
