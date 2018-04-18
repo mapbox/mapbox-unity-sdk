@@ -10,6 +10,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 	public class LocationPrefabsLayerVisualizer : VectorLayerVisualizer
 	{
+		private int maxDensity = 30; //This value is same as the density's max range value in PrefabItemOptions
+
 		public void SetProperties(PrefabItemOptions item)
 		{
 			SubLayerProperties = item;
@@ -74,8 +76,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		/// <param name="item">Item.</param>
 		private void SetCategoryFilterOptions(PrefabItemOptions item)
 		{
-			var _filterOptions = new VectorFilterOptions();
-
 			string propertyName = "";
 			item.categoryPropertyFromFindByTypeDictionary.TryGetValue(item.findByType, out propertyName);
 
@@ -102,10 +102,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					Key = propertyName,
 					PropertyValue = concatenatedString
 				};
-				_filterOptions.filters.Add(filter);
+				AddFilterToItem(item, filter);
 			}
-
-			MergeFiltersWithItem(item, _filterOptions);
 		}
 
 		/// <summary>
@@ -114,8 +112,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		/// <param name="item">Item.</param>
 		private void SetDensityFilters(PrefabItemOptions item)
 		{
-			var _filterOptions = new VectorFilterOptions();
-
+			if (item.density >= maxDensity) // decided that the max value for density
+				return;
+			
 			string propertyName = "";
 			item.densityPropertyFromFindByTypeDictionary.TryGetValue(item.findByType, out propertyName);
 
@@ -124,12 +123,10 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				LayerFilter filter = new LayerFilter(LayerFilterOperationType.IsLess)
 				{
 					Key = propertyName,
-					PropertyValue = item.density.ToString()
+					Min = item.density
 				};
-				_filterOptions.filters.Add(filter);
+				AddFilterToItem(item, filter);
 			}
-
-			MergeFiltersWithItem(item, _filterOptions);
 		}
 
 		/// <summary>
@@ -141,8 +138,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			if (string.IsNullOrEmpty(item.poiName))
 				return;
 			
-			var _filterOptions = new VectorFilterOptions();
-
 			string propertyName = "";
 			item.namePropertyFromFindByTypeDictionary.TryGetValue(item.findByType, out propertyName);
 
@@ -153,26 +148,22 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					Key = propertyName,
 					PropertyValue = item.poiName
 				};
-				_filterOptions.filters.Add(filter);
+				AddFilterToItem(item, filter);
 			}
-
-			MergeFiltersWithItem(item, _filterOptions);
 		}
 
 		/// <summary>
 		/// Merges the filters with item filters.
 		/// </summary>
 		/// <param name="item">Item.</param>
-		void MergeFiltersWithItem(PrefabItemOptions item, VectorFilterOptions filterOptions)
+		void AddFilterToItem(PrefabItemOptions item, LayerFilter filter)
 		{
-			if (item.filterOptions == null || item.filterOptions.filters.Count == 0)
+			if (item.filterOptions == null)
 			{
-				item.filterOptions = filterOptions;
+				item.filterOptions = new VectorFilterOptions();
 			}
-			else
-			{
-				item.filterOptions.filters.AddRange(filterOptions.filters);
-			}
+
+			item.filterOptions.filters.Add(filter);
 		}
 
 		/// <summary>

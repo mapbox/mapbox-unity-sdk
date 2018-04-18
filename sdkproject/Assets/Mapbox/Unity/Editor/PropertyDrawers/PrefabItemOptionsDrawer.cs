@@ -131,7 +131,9 @@ namespace Mapbox.Editor
 			{
 				GUI.enabled = false;
 			}
+
 			EditorGUILayout.PropertyField(densityProp, densitySlider);
+			var integ = densityProp.intValue;
 			GUI.enabled = true;
 			densityProp.serializedObject.ApplyModifiedProperties();
 		}
