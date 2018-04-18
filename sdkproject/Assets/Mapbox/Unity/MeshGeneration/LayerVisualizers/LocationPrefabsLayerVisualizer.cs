@@ -252,10 +252,24 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 					//create a point in tilespace from coordinates
 					var latLonPoint = new List<Vector3>();
-					latLonPoint.Add(new Vector3(10, 0, 0));
 
-					//TODO: latlon to tile coordinates
+					//Create a feature point based on the coordinate
+					var _meters = Conversions.LatLonToMeters(coordinate);
+					var _rect = tile.Rect;
+					var _scale = tile.TileScale;
+					var _extent = layer.Extent;
 
+					//vectortile space point (0 - layerExtent)
+					var point = new Vector3((float)((_meters - _rect.Min).x / _rect.Size.x) * _extent, 
+					                        0, 
+					                        (float)((_meters - _rect.Max).y / _rect.Size.y) * _extent
+					                       );
+
+					//UnityTile space
+					latLonPoint.Add(new Vector3((float)(point.x / _extent * _rect.Size.x - (_rect.Size.x / 2)) * tile.TileScale, 
+					                            0, 
+					                            (float)((point.z) / _extent * _rect.Size.y - (_rect.Size.y / 2)) * tile.TileScale
+					                           ));
 
 					//add coordinate feature to feature points
 					feature.Points.Add(latLonPoint);
