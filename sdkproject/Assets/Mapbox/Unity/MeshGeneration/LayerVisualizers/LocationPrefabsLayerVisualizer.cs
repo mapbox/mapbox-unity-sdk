@@ -232,6 +232,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			for (int i = 0; i < coordinates.Length; i++)
 			{
+				if(String.IsNullOrEmpty(coordinates[i]))
+				{
+					return;
+				}
+
 				//check if the coordinate is in the tile
 				var coordinate = Conversions.StringToLatLon( coordinates[i] );
 				var coordinateTileId = Conversions.LatitudeLongitudeToTileId(
