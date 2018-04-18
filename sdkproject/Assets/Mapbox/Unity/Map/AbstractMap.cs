@@ -646,5 +646,96 @@ namespace Mapbox.Unity.Map
 			Options.loadingTexture = loadingTexture;
 			_mapVisualizer.SetLoadingTexture(loadingTexture);
 		}
+
+		#region Location Prefabs Methods
+
+		/// <summary>
+		/// Places a game object prefabs at the specified LatLon on the Map.
+		/// </summary>
+		/// <param name="prefab"> A Game Object Prefab.</param>
+		/// <param name="LatLon">A Vector2d(Latitude Longitude) object</param>
+		public void PlacePrefabAtGeoLocation(GameObject prefab, Vector2d LatLon, bool scaleDownWithWorld = true, string locationItemName = "New Location")
+		{
+			PrefabItemOptions item = new PrefabItemOptions()
+			{
+				findByType = LocationPrefabFindBy.AddressOrLatLon,
+				prefabItemName = locationItemName,
+				spawnPrefabOptions = new SpawnPrefabOptions()
+				{
+					prefab = prefab,
+					scaleDownWithWorld = scaleDownWithWorld
+				}
+			};
+		}
+
+		/// <summary>
+		/// Places the prefab for supplied categories.
+		/// For more than one category separate them by pipe. for eg: LocationPrefabCategories.Food | LocationPrefabCategories.Nightlife
+		/// Density value controls the number of POIs on the map. It's a value between 1 and 30, where 30 is max density
+		/// </summary>
+		/// <param name="prefab">GameObject Prefab</param>
+		/// <param name="categories"><see cref="LocationPrefabCategories"/> For more than one category separate them by pipe (eg: LocationPrefabCategories.Food | LocationPrefabCategories.Nightlife)</param>
+		/// <param name="density">Density (Integer value between 1 and 30)</param>
+		/// <param name="locationItemName">Name of this location prefab item for future reference</param>
+		/// <param name="scaleDownWithWorld">Should the prefab scale up/down along with the map game object?</param>
+		public void PlacePrefabForCategories(GameObject prefab, LocationPrefabCategories categories = LocationPrefabCategories.AnyCategory, int density = 30, bool scaleDownWithWorld = true, string locationItemName = "New Location")
+		{
+			PrefabItemOptions item = new PrefabItemOptions()
+			{
+				findByType = LocationPrefabFindBy.MapboxCategory,
+				categories = categories,
+				density = density,
+				prefabItemName = locationItemName,
+				spawnPrefabOptions = new SpawnPrefabOptions()
+				{
+					prefab = prefab,
+					scaleDownWithWorld = scaleDownWithWorld
+				}
+			};
+			if(_vectorData==null)
+			{
+				_vectorData = new VectorLayer();
+			}
+			if (_vectorData.LocationPrefabsLayerProperties.locationPrefabList == null)
+			{
+				_vectorData.LocationPrefabsLayerProperties.locationPrefabList = new List<PrefabItemOptions>();
+			}
+			_vectorData.LocationPrefabsLayerProperties.locationPrefabList.Add(item);
+		}
+
+		/// <summary>
+		/// Places the prefab at POI locations if its name contains the supplied string
+		/// <param name="prefab">GameObject Prefab</param>
+		/// <param name="nameString">This is the string that will be checked against the POI name to see if is contained in it, and ony those POIs will be spawned</param>
+		/// <param name="density">Density (Integer value between 1 and 30)</param>
+		/// <param name="locationItemName">Name of this location prefab item for future reference</param>
+		/// <param name="scaleDownWithWorld">Should the prefab scale up/down along with the map game object?</param>
+		/// </summary>
+		public void PlacePrefabIfPOIContainsName(GameObject prefab, string nameString, int density = 30, bool scaleDownWithWorld = true, string locationItemName = "New Location")
+		{
+			PrefabItemOptions item = new PrefabItemOptions()
+			{
+				findByType = LocationPrefabFindBy.POIName,
+				nameString = nameString, 
+				density = density,
+				prefabItemName = locationItemName,
+				spawnPrefabOptions = new SpawnPrefabOptions()
+				{
+					prefab = prefab,
+					scaleDownWithWorld = scaleDownWithWorld
+				}
+			};
+			if (_vectorData == null)
+			{
+				_vectorData = new VectorLayer();
+			}
+			if (_vectorData.LocationPrefabsLayerProperties.locationPrefabList == null)
+			{
+				_vectorData.LocationPrefabsLayerProperties.locationPrefabList = new List<PrefabItemOptions>();
+			}
+			_vectorData.LocationPrefabsLayerProperties.locationPrefabList.Add(item);
+		}
+
+  		#endregion
 	}
 }

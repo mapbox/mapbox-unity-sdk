@@ -117,9 +117,9 @@ namespace Mapbox.Unity.Map
 		public LocationPrefabCategories categories;
 
 		/// <summary>
-		/// All the POIs containing this name will be shown
+		/// All the POIs containing this name string will be shown
 		/// </summary>
-		public string poiName = "POI Name";
+		public string nameString = "POI Name";
 
 		/// <summary>
 		/// The density of pois in an area

@@ -144,7 +144,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		/// <param name="item">Item.</param>
 		private void SetNameFilters(PrefabItemOptions item)
 		{
-			if (string.IsNullOrEmpty(item.poiName))
+			if (string.IsNullOrEmpty(item.nameString))
 				return;
 			
 			string propertyName = "";
@@ -155,7 +155,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				LayerFilter filter = new LayerFilter(LayerFilterOperationType.Contains)
 				{
 					Key = propertyName,
-					PropertyValue = item.poiName
+					PropertyValue = item.nameString
 				};
 				AddFilterToItem(item, filter);
 			}

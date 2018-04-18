@@ -149,7 +149,7 @@ namespace Mapbox.Editor
 			EditorGUILayout.BeginHorizontal();
 			EditorGUILayout.PrefixLabel(nameField);
 
-			var categoryProp = property.FindPropertyRelative("poiName");
+			var categoryProp = property.FindPropertyRelative("nameString");
 			GUILayout.Space(shiftLeftPixels);
 
 			categoryProp.stringValue = EditorGUILayout.TextField(categoryProp.stringValue);

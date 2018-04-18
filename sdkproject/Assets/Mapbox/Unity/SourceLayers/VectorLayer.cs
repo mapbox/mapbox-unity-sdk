@@ -152,7 +152,7 @@
 
 		[SerializeField]
 		LocationPrefabsLayerProperties _locationPrefabsLayerProperties;
-		LocationPrefabsLayerProperties LocationPrefabsLayerProperties
+		public LocationPrefabsLayerProperties LocationPrefabsLayerProperties
 		{
 			get
 			{
