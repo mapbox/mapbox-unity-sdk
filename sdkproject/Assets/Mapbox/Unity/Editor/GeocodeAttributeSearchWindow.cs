@@ -2,6 +2,7 @@
 {
 	using UnityEngine;
 	using UnityEditor;
+	using System;
 	using System.Collections.Generic;
 	using Mapbox.Geocoding;
 	using Mapbox.Unity;
@@ -82,9 +83,32 @@
 					for (int i = 0; i < _features.Count; i++)
 					{
 						Feature feature = _features[i];
-						string coordinates = feature.Center.x.ToString(CultureInfo.InvariantCulture) + ", " +
-						                     feature.Center.y.ToString(CultureInfo.InvariantCulture);
-						string buttonContent = feature.Address + " (" + coordinates + ")";
+						string coordinates = feature.Center.x.ToString("F2", CultureInfo.InvariantCulture) + ", " +
+						                            feature.Center.y.ToString("F2",CultureInfo.InvariantCulture);
+
+						string[] featureNameSplit = feature.PlaceName.Split(',');
+						string buttonContent = "";
+						int maxButtonContentLength = 30;
+						for (int j = 0; j < featureNameSplit.Length; j++)
+						{
+							if(buttonContent.Length + featureNameSplit[j].Length < maxButtonContentLength)
+							{
+								if(String.IsNullOrEmpty(buttonContent))
+								{
+									buttonContent = featureNameSplit[j];
+								}
+								else
+								{
+									buttonContent = buttonContent + "," + featureNameSplit[j];
+								}
+							}
+						}
+
+						if (buttonContent.Length < maxButtonContentLength + 15)
+						{
+							buttonContent = buttonContent + "," + " (" + coordinates + ")";
+						}
+
 
 						if (GUILayout.Button(buttonContent))
 						{
