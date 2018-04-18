@@ -251,6 +251,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 					//TODO: latlon to tile coordinates
 
+
 					//add coordinate feature to feature points
 					feature.Points.Add(latLonPoint);
 

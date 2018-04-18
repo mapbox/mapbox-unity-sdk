@@ -105,10 +105,39 @@ namespace Mapbox.Editor
 		private void ShowAddressOrLatLonUI(SerializedProperty property)
 		{
 
-			//TODO: update styling from specific-locations-modifiers branch
+
 			EditorGUILayout.BeginVertical();
 			var coordinateProperties = property.FindPropertyRelative("coordinates");
-			EditorGUILayout.PropertyField(coordinateProperties, true);
+
+			for (int i = 0; i < coordinateProperties.arraySize; i++)
+			{
+				EditorGUILayout.BeginHorizontal();
+				//get the element to draw
+				var coordinate = coordinateProperties.GetArrayElementAtIndex(i);
+
+				//TODO: update coordinate property drawer from specific-locations-modifiers branch
+				//use the tagged property drawer for the coordinate layout
+				EditorGUILayout.PropertyField(coordinate);
+
+				//include a remove button in the row
+				if (GUILayout.Button(new GUIContent(" X "), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
+				{
+					coordinateProperties.DeleteArrayElementAtIndex(i);
+				}
+				EditorGUILayout.EndHorizontal();
+			}
+
+			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.PrefixLabel("       ");
+			GUILayout.Space(-5);
+			if(GUILayout.Button( "Add Location"))
+			{
+				
+				coordinateProperties.arraySize++;
+				var newElement = coordinateProperties.GetArrayElementAtIndex(coordinateProperties.arraySize - 1);
+				newElement.stringValue = "";
+			}
+			EditorGUILayout.EndHorizontal();
 			EditorGUILayout.EndVertical();
 
 		}
