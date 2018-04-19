@@ -218,6 +218,21 @@
 				}
 			}
 
+			//emptylayer for visualizers that don't depend on outside data sources
+			string emptyLayer = "";
+			if (_layerBuilder.ContainsKey(emptyLayer))
+			{
+				foreach (var builder in _layerBuilder[emptyLayer])
+				{
+					if(builder.Active)
+					{
+						Progress++;
+						//MEGA HACK just pass the first available layer - we should create a static null layer for this
+						builder.Create(_cachedData[tile].Data.GetLayer(_cachedData[tile].Data.LayerNames()[0]), tile, DecreaseProgressCounter);
+					}
+				}
+			}
+
 			tile.VectorDataState = TilePropertyState.Loaded;
 			_cachedData.Remove(tile);
 		}
