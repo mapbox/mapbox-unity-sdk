@@ -675,7 +675,7 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0.23828942
+      value: 0.17759454
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -795,7 +795,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -131.28345
+      value: -121.59452
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -805,12 +805,12 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 242.56691
+      value: 223.18904
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 262.5669
+      value: 243.18904
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -843,6 +843,10 @@ Prefab:
         type: 2}
       propertyPath: m_AnchoredPosition.y
       value: 0.000015258789
+      objectReference: {fileID: 0}
+    - target: {fileID: 1611603657303738, guid: 98be219873e6d4dffb5949746f515a33, type: 2}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 98be219873e6d4dffb5949746f515a33, type: 2}
@@ -1000,7 +1004,7 @@ MonoBehaviour:
     _locationPrefabsLayerProperties:
       locationPrefabList:
       - coreOptions:
-          isActive: 0
+          isActive: 1
           sublayerName: Arts and Enterinment
           geometryType: 0
           layerName: 
@@ -1038,9 +1042,9 @@ MonoBehaviour:
         nameString: POI Name
         popularity: 4
         coordinates: []
-        density: 15
+        density: 10
       - coreOptions:
-          isActive: 0
+          isActive: 1
           sublayerName: Food
           geometryType: 0
           layerName: 
@@ -1080,7 +1084,7 @@ MonoBehaviour:
         coordinates: []
         density: 15
       - coreOptions:
-          isActive: 0
+          isActive: 1
           sublayerName: Nightlife
           geometryType: 0
           layerName: 
@@ -1118,9 +1122,9 @@ MonoBehaviour:
         nameString: POI Name
         popularity: 4
         coordinates: []
-        density: 15
+        density: 10
       - coreOptions:
-          isActive: 0
+          isActive: 1
           sublayerName: Outdoors and Recreation
           geometryType: 0
           layerName: 
@@ -1158,9 +1162,9 @@ MonoBehaviour:
         nameString: POI Name
         popularity: 4
         coordinates: []
-        density: 15
+        density: 20
       - coreOptions:
-          isActive: 0
+          isActive: 1
           sublayerName: Services
           geometryType: 0
           layerName: 
@@ -1198,9 +1202,9 @@ MonoBehaviour:
         nameString: POI Name
         popularity: 4
         coordinates: []
-        density: 15
+        density: 5
       - coreOptions:
-          isActive: 0
+          isActive: 1
           sublayerName: Shops
           geometryType: 0
           layerName: 
@@ -1238,9 +1242,9 @@ MonoBehaviour:
         nameString: POI Name
         popularity: 4
         coordinates: []
-        density: 15
+        density: 10
       - coreOptions:
-          isActive: 0
+          isActive: 1
           sublayerName: Transportation
           geometryType: 0
           layerName: 
@@ -1278,7 +1282,7 @@ MonoBehaviour:
         nameString: POI Name
         popularity: 4
         coordinates: []
-        density: 15
+        density: 10
       - coreOptions:
           isActive: 0
           sublayerName: All Points of Interest (POIs)
