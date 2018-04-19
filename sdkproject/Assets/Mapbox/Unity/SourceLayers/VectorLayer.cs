@@ -125,6 +125,13 @@
 				//Add PrefabItemOptions items as a VectorSubLayerProperties
 				if(!_layerProperty.vectorSubLayers.Contains(item))
 				{
+					//Add PrefabItemOptions items as a VectorSubLayerProperties
+					if (_layerProperty.sourceType == VectorSourceType.Custom || _layerProperty.sourceType == VectorSourceType.None)
+					{
+						//This is the style id we need for instantiating POI location prefabs
+						//Style streetsVectorSource = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets);
+						//AddLayerSource(streetsVectorSource.Id);
+					}
 					AddVectorLayer(item);
 				}
 			}

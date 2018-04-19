@@ -727,7 +727,7 @@ namespace Mapbox.Unity.Map
 		/// <param name="density">Density (Integer value between 1 and 30)</param>
 		/// <param name="locationItemName">Name of this location prefab item for future reference</param>
 		/// <param name="scaleDownWithWorld">Should the prefab scale up/down along with the map game object?</param>
-		public void PlacePrefabForCategories(GameObject prefab, LocationPrefabCategories categories = LocationPrefabCategories.AnyCategory, int density = 30, bool scaleDownWithWorld = true, string locationItemName = "New Location")
+		public void PlacePrefabForCategories(GameObject prefab, LocationPrefabCategories categories = LocationPrefabCategories.AnyCategory, int density = 30, Action<List<GameObject>> callback = null, bool scaleDownWithWorld = true, string locationItemName = "New Location")
 		{
 			PrefabItemOptions item = new PrefabItemOptions()
 			{
@@ -750,6 +750,9 @@ namespace Mapbox.Unity.Map
 				_vectorData.LocationPrefabsLayerProperties.locationPrefabList = new List<PrefabItemOptions>();
 			}
 
+			if (callback != null)
+				item.OnAllPrefabsInstantiated += callback;
+			
 			if (!_vectorData.LayerProperty.vectorSubLayers.Contains(item))
 			{
 				_vectorData.LocationPrefabsLayerProperties.locationPrefabList.Add(item);
@@ -765,7 +768,7 @@ namespace Mapbox.Unity.Map
 		/// <param name="locationItemName">Name of this location prefab item for future reference</param>
 		/// <param name="scaleDownWithWorld">Should the prefab scale up/down along with the map game object?</param>
 		/// </summary>
-		public void PlacePrefabIfPOIContainsName(GameObject prefab, string nameString, int density = 30, bool scaleDownWithWorld = true, string locationItemName = "New Location")
+		public void PlacePrefabIfPOIContainsName(GameObject prefab, string nameString, int density = 30, Action<List<GameObject>> callback = null, bool scaleDownWithWorld = true, string locationItemName = "New Location")
 		{
 			PrefabItemOptions item = new PrefabItemOptions()
 			{
@@ -788,6 +791,9 @@ namespace Mapbox.Unity.Map
 				_vectorData.LocationPrefabsLayerProperties.locationPrefabList = new List<PrefabItemOptions>();
 			}
 
+			if (callback != null)
+				item.OnAllPrefabsInstantiated += callback;
+			
 			if (!_vectorData.LayerProperty.vectorSubLayers.Contains(item))
 			{
 				_vectorData.LocationPrefabsLayerProperties.locationPrefabList.Add(item);
