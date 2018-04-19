@@ -18,7 +18,7 @@ MonoBehaviour:
       y: 0
       width: 0.25
       height: 0.5
-    MidFloorCount: 2
+    MidFloorCount: 8
     ColumnCount: 2
     TopSectionRatio: 0.25
     BottomSectionRatio: 0.25

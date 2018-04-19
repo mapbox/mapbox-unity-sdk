@@ -38,7 +38,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private float firstHeight;
 		private float topHeight;
 		private float midHeight;
-		private int floorCount;
+		private int midFloorCount;
 		private float scaledFloorHeight;
 		private int ind;
 		private Vector3 wallNormal;
@@ -122,8 +122,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				//	topHeight = 0;
 				//}
 
-				scaledFloorHeight = _scaledPreferredWallLength * (1 - _currentFacade.TopSectionRatio - _currentFacade.BottomSectionRatio) * (_currentTextureRect.height / _currentTextureRect.width);
-				floorCount = (int)(midHeight / _scaledFloorHeight);
 				//scaledFloorHeight = midHeight / floorCount;
 				wallTriangles = new List<int>();
 
@@ -145,15 +143,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					bottomOfTopUv = _currentTextureRect.yMax - (_currentTextureRect.size.y * _currentFacade.TopSectionRatio); //not doing that scaling thing for y axis and floors yet
 					topOfBottomUv = _currentTextureRect.yMin + (_currentTextureRect.size.y * _currentFacade.BottomSectionRatio); // * (Mathf.Max(1, (float)Math.Floor(tby * textureSection.TopSectionFloorCount)) / textureSection.TopSectionFloorCount);
 
+					//common for all top/mid/bottom segments
 					wallNormal = new Vector3(-(v1.z - v2.z), 0, (v1.x - v2.x)).normalized;
+					//height of the left/right edges
 					currentY1 = v1.y;
 					currentY2 = v2.y;
-
-					floorScaleRatio = Math.Min(1, midHeight / _scaledFloorHeight);
-					var midSecHeight = (_currentTextureRect.height * (1 - _currentFacade.TopSectionRatio - _currentFacade.BottomSectionRatio));
-					var midFittedHeight = midSecHeight * Math.Min(1, ((float)(Math.Floor(floorScaleRatio * _currentFacade.MidFloorCount) + 1) / _currentFacade.MidFloorCount)); // midHeight < _scaledFloorHeight * 0.66 ? 0.5f : 0.125f;
-					bottomOfMidUv = (_currentTextureRect.yMax - (_currentTextureRect.height * _currentFacade.TopSectionRatio)) - midFittedHeight;
-					topOfMidUv = _currentTextureRect.yMax - (_currentTextureRect.height * _currentFacade.TopSectionRatio);
 
 					TopFloor(md);
 					MidFloors(md);
@@ -174,13 +168,24 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		private void MidFloors(MeshData md)
 		{
-			for (int f = 0; f < floorCount; f++)
-			{
-				currentY1 -= scaledFloorHeight;
-				currentY2 -= scaledFloorHeight;
+			var leftOver = midHeight;
+			var singleFloorHeight = _scaledFloorHeight / _currentFacade.MidFloorCount;
 
-				md.Vertices.Add(new Vector3(v1.x, currentY1 + scaledFloorHeight, v1.z));
-				md.Vertices.Add(new Vector3(v2.x, currentY2 + scaledFloorHeight, v2.z));
+			topOfMidUv = _currentTextureRect.yMax - (_currentTextureRect.height * _currentFacade.TopSectionRatio);
+			var midUvHeight = _currentTextureRect.height * (1 - _currentFacade.TopSectionRatio - _currentFacade.BottomSectionRatio);
+
+			while (leftOver > singleFloorHeight)
+			{
+				var singleFloorCount = (float)Math.Min(_currentFacade.MidFloorCount, Math.Floor(leftOver / singleFloorHeight));
+				var stepRatio = singleFloorCount / _currentFacade.MidFloorCount;
+
+				//top two vertices
+				md.Vertices.Add(new Vector3(v1.x, currentY1, v1.z));
+				md.Vertices.Add(new Vector3(v2.x, currentY2, v2.z));
+				//move offsets bottom
+				currentY1 -= (scaledFloorHeight * stepRatio);
+				currentY2 -= (scaledFloorHeight * stepRatio);
+				//bottom two vertices
 				md.Vertices.Add(new Vector3(v1.x, currentY1, v1.z));
 				md.Vertices.Add(new Vector3(v2.x, currentY2, v2.z));
 
@@ -188,8 +193,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				{
 					md.UV[0].Add(new Vector2(_currentTextureRect.xMin, topOfMidUv));
 					md.UV[0].Add(new Vector2(rightOfEdgeUv, topOfMidUv));
-					md.UV[0].Add(new Vector2(_currentTextureRect.xMin, bottomOfMidUv));
-					md.UV[0].Add(new Vector2(rightOfEdgeUv, bottomOfMidUv));
+					md.UV[0].Add(new Vector2(_currentTextureRect.xMin, topOfMidUv - midUvHeight * stepRatio));
+					md.UV[0].Add(new Vector2(rightOfEdgeUv, topOfMidUv - midUvHeight * stepRatio));
 				}
 				else
 				{
@@ -197,6 +202,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					md.UV[0].Add(new Vector2(rightOfEdgeUv, topOfMidUv));
 					md.UV[0].Add(new Vector2(rightOfEdgeUv, bottomOfMidUv));
 					md.UV[0].Add(new Vector2(rightOfEdgeUv, bottomOfMidUv));
+
 				}
 				md.Normals.Add(wallNormal);
 				md.Normals.Add(wallNormal);
@@ -217,7 +223,46 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				wallTriangles.Add(ind + 2);
 
 				ind += 4;
+				leftOver -= (singleFloorCount * singleFloorHeight);
 			}
+
+			scaledFloorHeight = _scaledPreferredWallLength * (1 - _currentFacade.TopSectionRatio - _currentFacade.BottomSectionRatio) * (_currentTextureRect.height / _currentTextureRect.width);
+
+			//leftover
+			md.Vertices.Add(new Vector3(v1.x, currentY1, v1.z));
+			md.Vertices.Add(new Vector3(v2.x, currentY2, v2.z));
+			//move offsets bottom
+			currentY1 -= leftOver;
+			currentY2 -= leftOver;
+			//bottom two vertices
+			md.Vertices.Add(new Vector3(v1.x, currentY1, v1.z));
+			md.Vertices.Add(new Vector3(v2.x, currentY2, v2.z));
+
+
+			md.UV[0].Add(new Vector2(_currentTextureRect.xMin, topOfMidUv));
+			md.UV[0].Add(new Vector2(rightOfEdgeUv, topOfMidUv));
+			md.UV[0].Add(new Vector2(_currentTextureRect.xMin, topOfMidUv));
+			md.UV[0].Add(new Vector2(rightOfEdgeUv, topOfMidUv));
+
+			md.Normals.Add(wallNormal);
+			md.Normals.Add(wallNormal);
+			md.Normals.Add(wallNormal);
+			md.Normals.Add(wallNormal);
+
+			md.Tangents.Add(wallDirection);
+			md.Tangents.Add(wallDirection);
+			md.Tangents.Add(wallDirection);
+			md.Tangents.Add(wallDirection);
+
+			wallTriangles.Add(ind);
+			wallTriangles.Add(ind + 1);
+			wallTriangles.Add(ind + 2);
+
+			wallTriangles.Add(ind + 1);
+			wallTriangles.Add(ind + 3);
+			wallTriangles.Add(ind + 2);
+
+			ind += 4;
 		}
 
 		private void TopFloor(MeshData md)
