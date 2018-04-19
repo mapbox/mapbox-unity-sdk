@@ -25,6 +25,20 @@ namespace UnityARInterface
             }
         }
 
+        public override bool BackgroundRendering
+        {
+            get { return base.BackgroundRendering; }
+
+            set
+            {
+                if (m_RemoteInterface != null)
+                {
+                    m_RemoteInterface.BackgroundRendering = base.BackgroundRendering = value;
+                }
+            }
+        }
+
+
         ARRemoteEditorInterface m_RemoteInterface;
         EditorConnection m_EditorConnection;
 
@@ -175,6 +189,7 @@ namespace UnityARInterface
             m_ARInterface = m_RemoteInterface;
             ARInterface.SetInterface(m_RemoteInterface);
             m_RemoteInterface.sendVideo = sendVideo;
+            m_RemoteInterface.BackgroundRendering = BackgroundRendering;
         }
 
         private void OnDisable()
