@@ -56,7 +56,7 @@
 			EditorGUI.BeginProperty(position, label, property);
 			position.height = _lineHeight;
 
-			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
+			var sourceTypeProperty = property.FindPropertyRelative("_sourceType");
 			var sourceTypeValue = (VectorSourceType) sourceTypeProperty.enumValueIndex;
 
 			var displayNames = sourceTypeProperty.enumDisplayNames;

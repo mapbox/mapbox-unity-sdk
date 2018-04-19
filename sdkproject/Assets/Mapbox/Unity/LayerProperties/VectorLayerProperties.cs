@@ -8,7 +8,34 @@
 	[Serializable]
 	public class VectorLayerProperties : LayerProperties
 	{
-		public VectorSourceType sourceType = VectorSourceType.MapboxStreets;
+		[SerializeField]
+		protected VectorSourceType _sourceType = VectorSourceType.MapboxStreets;
+		public VectorSourceType sourceType
+		{
+			get
+			{
+				return _sourceType;
+			}
+			set
+			{
+				if (value != VectorSourceType.Custom)
+				{
+					sourceOptions.Id = MapboxDefaultVector.GetParameters(value).Id;
+				}
+
+				if (value == VectorSourceType.None)
+				{
+					sourceOptions.isActive = false;
+				}
+				else
+				{
+					sourceOptions.isActive = true;
+				}
+
+				_sourceType = value;
+			}
+		}
+
 		public LayerSourceOptions sourceOptions = new LayerSourceOptions()
 		{
 			isActive = true,
