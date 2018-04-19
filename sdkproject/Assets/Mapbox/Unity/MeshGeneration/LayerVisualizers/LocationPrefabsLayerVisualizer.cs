@@ -75,6 +75,12 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 							_defaultStack.GoModifiers = new List<GameObjectModifier>();
 						}
 						_defaultStack.GoModifiers.Add(prefabModifier);
+
+						if( itemProperties.snapToTerrain == true )
+						{
+							_defaultStack.MeshModifiers.Add(ScriptableObject.CreateInstance<SnapTerrainModifier>());
+						}
+
 					}
 					break;
 				default:
