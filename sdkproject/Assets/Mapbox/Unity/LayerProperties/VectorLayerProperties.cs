@@ -13,7 +13,6 @@
 		{
 			isActive = true,
 			layerSource = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets)
-
 		};
 		[Tooltip("Use Mapbox style-optimized tilesets, remove any layers or features in the tile that are not represented by a Mapbox style. Style-optimized vector tiles are smaller, served over-the-wire, and a great way to reduce the size of offline caches.")]
 		public bool useOptimizedStyle = false;

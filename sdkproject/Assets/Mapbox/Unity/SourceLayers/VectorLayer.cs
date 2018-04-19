@@ -81,12 +81,16 @@
 		{
 			if (!string.IsNullOrEmpty(vectorSource))
 			{
-				if (LayerSource.Contains(vectorSource))
-					return;
-
-				var newLayerSource = LayerSource + "," + vectorSource;	
-				_layerProperty.sourceType = VectorSourceType.Custom;
-				_layerProperty.sourceOptions.Id = newLayerSource;
+				if (!_layerProperty.sourceOptions.Id.Contains(vectorSource))
+				{
+					if (string.IsNullOrEmpty(_layerProperty.sourceOptions.Id))
+					{
+						SetLayerSource(vectorSource);
+						return;
+					}
+					var newLayerSource = _layerProperty.sourceOptions.Id + "," + vectorSource;
+					SetLayerSource(newLayerSource);
+				}
 			}
 			else
 			{
@@ -128,9 +132,11 @@
 					//Add PrefabItemOptions items as a VectorSubLayerProperties
 					if (_layerProperty.sourceType == VectorSourceType.Custom || _layerProperty.sourceType == VectorSourceType.None)
 					{
+						if (_layerProperty.sourceType == VectorSourceType.None)
+							_layerProperty.sourceOptions.Id = "";
 						//This is the style id we need for instantiating POI location prefabs
-						//Style streetsVectorSource = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets);
-						//AddLayerSource(streetsVectorSource.Id);
+						Style streetsVectorSource = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets);
+						AddLayerSource(streetsVectorSource.Id);
 					}
 					AddVectorLayer(item);
 				}
