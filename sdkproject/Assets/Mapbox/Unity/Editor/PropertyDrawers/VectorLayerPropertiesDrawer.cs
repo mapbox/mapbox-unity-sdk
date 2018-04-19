@@ -151,12 +151,21 @@
 
 
 				selectedLayers = layerTreeView.GetSelection();
+
+				//if there are selected elements, set the selection index at the first element.
+				//if not, use the Selection index to persist the selection at the right index.
 				if (selectedLayers.Count > 0)
 				{
 					SelectionIndex = selectedLayers[0];
 				}
 				else
 				{
+					//make sure the selection index still exists, if it doesn't, move to the last element
+					if(SelectionIndex > subLayerArray.arraySize - 1)
+					{
+						SelectionIndex = subLayerArray.arraySize - 1;
+					}
+
 					selectedLayers = new int[1] {SelectionIndex};
 					if (SelectionIndex > 0 && (SelectionIndex <= subLayerArray.arraySize - 1))
 					{
