@@ -18,14 +18,14 @@ MonoBehaviour:
       y: 0
       width: 0.25
       height: 0.5
-    MidFloorCount: 1
-    ColumnCount: 4
-    TopSectionRatio: 0.125
-    BottomSectionRatio: 0.125
-    PreferredEdgeSectionLength: 100
-    FloorHeight: 10
-    FirstFloorHeight: 25
-    TopFloorHeight: 25
+    MidFloorCount: 2
+    ColumnCount: 2
+    TopSectionRatio: 0.25
+    BottomSectionRatio: 0.25
+    PreferredEdgeSectionLength: 40
+    FloorHeight: 40
+    FirstFloorHeight: 20
+    TopFloorHeight: 20
   Roofs:
   - TextureRect:
       serializedVersion: 2
@@ -83,3 +83,4 @@ MonoBehaviour:
     FloorHeight: 0
     FirstFloorHeight: 0
     TopFloorHeight: 0
+  AtlasEntityType: 0
