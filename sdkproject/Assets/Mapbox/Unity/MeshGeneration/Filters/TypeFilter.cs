@@ -280,9 +280,12 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 		{
 			foreach(var value in ValueSet)
 			{
-				return property.ToString().ToLower().Contains(value.ToString());
+				if (property.ToString().ToLower().Contains(value.ToString()))
+				{
+					return true;
+				}
 			}
-			return false;
+			return false;	
 		}
 	}
 
