@@ -18,6 +18,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		{
 			SubLayerProperties = item;
 
+			if (!item.isActive)
+				return;
+			
 			//Check to make sure that when Categories selection is none, the location prefab is disabled
 			if (item.findByType == LocationPrefabFindBy.MapboxCategory && item.categories == LocationPrefabCategories.None)
 			{
