@@ -136,6 +136,18 @@ namespace Mapbox.Unity.Map
 		[Range(1, 30)]
 		public int density = 15;
 
+		public Action<List<GameObject>> OnAllPrefabsInstantiated
+		{
+			get
+			{
+				return spawnPrefabOptions.AllPrefabsInstatiated;
+			}
+			set
+			{
+				spawnPrefabOptions.AllPrefabsInstatiated = value;
+			}
+		}
+
 		#endregion
 	}
 }

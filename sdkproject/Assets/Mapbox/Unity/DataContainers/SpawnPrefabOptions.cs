@@ -20,5 +20,7 @@ namespace Mapbox.Unity.Map
 
 		public GameObject prefab;
 		public bool scaleDownWithWorld = true;
+		[NonSerialized]
+		public Action<List<GameObject>> AllPrefabsInstatiated = delegate { };
 	}
 }

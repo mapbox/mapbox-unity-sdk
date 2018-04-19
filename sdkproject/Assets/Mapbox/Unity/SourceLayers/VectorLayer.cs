@@ -123,7 +123,10 @@
 			foreach(var item in _locationPrefabsLayerProperties.locationPrefabList)
 			{
 				//Add PrefabItemOptions items as a VectorSubLayerProperties
-				AddVectorLayer(item);
+				if(!_layerProperty.vectorSubLayers.Contains(item))
+				{
+					AddVectorLayer(item);
+				}
 			}
 			_vectorTileFactory.SetOptions(_layerProperty);
 		}
