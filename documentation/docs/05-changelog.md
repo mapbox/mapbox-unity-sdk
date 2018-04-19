@@ -1,4 +1,11 @@
 ﻿## CHANGELOG
+
+### v.?.?.?
+*??/??/????*
+
+##### Improvements
+- `UnityARInterface` updated to [commit 67351b6](https://github.com/Unity-Technologies/experimental-ARInterface/commit/67351b66ff9af28380e7dd5f5b2f4ba1bf802ca8) from March 1st 2018
+
 ### v.1.4.1
 *04/17/2018*
 
