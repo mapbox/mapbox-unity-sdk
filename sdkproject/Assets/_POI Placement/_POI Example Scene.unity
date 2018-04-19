@@ -665,6 +665,188 @@ CanvasRenderer:
     type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 790657048}
+--- !u!1001 &876292442
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_AnchorMin.y
+      value: 0.23828942
+      objectReference: {fileID: 0}
+    - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224315790701160254, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224315790701160254, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224315790701160254, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224315790701160254, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224315790701160254, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224315790701160254, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224315790701160254, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224315790701160254, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_RootOrder
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 224315790701160254, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224315790701160254, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224315790701160254, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224315790701160254, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224315790701160254, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224315790701160254, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224315790701160254, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224315790701160254, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224315790701160254, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224315790701160254, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_AnchoredPosition.x
+      value: 116.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_AnchoredPosition.y
+      value: -131.28345
+      objectReference: {fileID: 0}
+    - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_SizeDelta.x
+      value: 213
+      objectReference: {fileID: 0}
+    - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_SizeDelta.y
+      value: 242.56691
+      objectReference: {fileID: 0}
+    - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_SizeDelta.y
+      value: 262.5669
+      objectReference: {fileID: 0}
+    - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_SizeDelta.x
+      value: -17
+      objectReference: {fileID: 0}
+    - target: {fileID: 114603753021256032, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_Text
+      value: "<b>POI Placement</b>\n\nThis example showcases how to procedurally add
+        prefabs to a variety of locations. For example, you can choose to add prefabs
+        at all the cafes and restaurants in a city, at specific addresses, or at locations
+        with \"Starbucks\" in the name.\n\nTo get started, look at Map's Inspector
+        panel and open LOCATION PREFABS in the Abstract Map component. We've already
+        created a few prefab layers for you. Toggle them on and off to see how they
+        change the map. \n\nTo create your own, click \"Add Item\" and add the desired
+        prefab and rules. "
+      objectReference: {fileID: 0}
+    - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_AnchoredPosition.y
+      value: 0.000015258789
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: 98be219873e6d4dffb5949746f515a33, type: 2}
+  m_IsPrefabParent: 0
 --- !u!1 &967308905
 GameObject:
   m_ObjectHideFlags: 0
@@ -818,7 +1000,7 @@ MonoBehaviour:
     _locationPrefabsLayerProperties:
       locationPrefabList:
       - coreOptions:
-          isActive: 1
+          isActive: 0
           sublayerName: Arts and Enterinment
           geometryType: 0
           layerName: 
@@ -853,12 +1035,12 @@ MonoBehaviour:
           scaleDownWithWorld: 1
         findByType: 0
         categories: 1
-        poiName: Starbucks
+        nameString: POI Name
         popularity: 4
         coordinates: []
         density: 15
       - coreOptions:
-          isActive: 1
+          isActive: 0
           sublayerName: Food
           geometryType: 0
           layerName: 
@@ -893,12 +1075,12 @@ MonoBehaviour:
           scaleDownWithWorld: 1
         findByType: 0
         categories: 2
-        poiName: Starbucks
+        nameString: POI Name
         popularity: 4
         coordinates: []
         density: 15
       - coreOptions:
-          isActive: 1
+          isActive: 0
           sublayerName: Nightlife
           geometryType: 0
           layerName: 
@@ -933,12 +1115,12 @@ MonoBehaviour:
           scaleDownWithWorld: 1
         findByType: 0
         categories: 4
-        poiName: Starbucks
+        nameString: POI Name
         popularity: 4
         coordinates: []
         density: 15
       - coreOptions:
-          isActive: 1
+          isActive: 0
           sublayerName: Outdoors and Recreation
           geometryType: 0
           layerName: 
@@ -973,12 +1155,12 @@ MonoBehaviour:
           scaleDownWithWorld: 1
         findByType: 0
         categories: 8
-        poiName: Starbucks
+        nameString: POI Name
         popularity: 4
         coordinates: []
         density: 15
       - coreOptions:
-          isActive: 1
+          isActive: 0
           sublayerName: Services
           geometryType: 0
           layerName: 
@@ -1013,12 +1195,12 @@ MonoBehaviour:
           scaleDownWithWorld: 1
         findByType: 0
         categories: 16
-        poiName: Starbucks
+        nameString: POI Name
         popularity: 4
         coordinates: []
         density: 15
       - coreOptions:
-          isActive: 1
+          isActive: 0
           sublayerName: Shops
           geometryType: 0
           layerName: 
@@ -1053,12 +1235,12 @@ MonoBehaviour:
           scaleDownWithWorld: 1
         findByType: 0
         categories: 32
-        poiName: Starbucks
+        nameString: POI Name
         popularity: 4
         coordinates: []
         density: 15
       - coreOptions:
-          isActive: 1
+          isActive: 0
           sublayerName: Transportation
           geometryType: 0
           layerName: 
@@ -1093,7 +1275,7 @@ MonoBehaviour:
           scaleDownWithWorld: 1
         findByType: 0
         categories: 64
-        poiName: Starbucks
+        nameString: POI Name
         popularity: 4
         coordinates: []
         density: 15
@@ -1133,7 +1315,7 @@ MonoBehaviour:
           scaleDownWithWorld: 1
         findByType: 0
         categories: -1
-        poiName: Starbucks
+        nameString: POI Name
         popularity: 4
         coordinates: []
         density: 15
@@ -1747,6 +1929,7 @@ GameObject:
   - component: {fileID: 1681481103}
   - component: {fileID: 1681481102}
   - component: {fileID: 1681481100}
+  - component: {fileID: 1681481101}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1766,6 +1949,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShadowDistance: 1000
+--- !u!114 &1681481101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1681481099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9527fd56bc6a0c549a1e550219f9b16e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _panSpeed: 10
+  _zoomSpeed: 50
+  _referenceCamera: {fileID: 0}
 --- !u!81 &1681481102
 AudioListener:
   m_ObjectHideFlags: 0

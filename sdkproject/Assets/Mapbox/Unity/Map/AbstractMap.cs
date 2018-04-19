@@ -654,8 +654,10 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		/// <param name="prefab"> A Game Object Prefab.</param>
 		/// <param name="LatLon">A Vector2d(Latitude Longitude) object</param>
-		public void PlacePrefabAtGeoLocation(GameObject prefab, Vector2d LatLon, bool scaleDownWithWorld = true, string locationItemName = "New Location")
+		public void PlacePrefabAtGeoLocation(GameObject prefab, Vector2d LatLon, Action<List<GameObject>> callback = null, bool scaleDownWithWorld = true, string locationItemName = "New Location")
 		{
+			var coordinateArray = new string[] { LatLon.x + ", " + LatLon.y };
+
 			PrefabItemOptions item = new PrefabItemOptions()
 			{
 				findByType = LocationPrefabFindBy.AddressOrLatLon,
@@ -664,8 +666,55 @@ namespace Mapbox.Unity.Map
 				{
 					prefab = prefab,
 					scaleDownWithWorld = scaleDownWithWorld
-				}
+				},
+
+				coordinates = coordinateArray
 			};
+
+			if (callback != null)
+				item.OnAllPrefabsInstantiated += callback;
+
+			if(!_vectorData.LayerProperty.vectorSubLayers.Contains(item))
+			{
+				_vectorData.LocationPrefabsLayerProperties.locationPrefabList.Add(item);
+				_vectorData.AddVectorLayer(item);
+			}
+		}
+
+		/// <summary>
+		/// Places a game object prefabs all locations specified by the LatLon array.
+		/// </summary>
+		/// <param name="prefab"> A Game Object Prefab.</param>
+		/// <param name="LatLon">A Vector2d(Latitude Longitude) object</param>
+		public void PlacePrefabAtGeoLocation(GameObject prefab, Vector2d[] LatLon, Action<List<GameObject>> callback = null, bool scaleDownWithWorld = true, string locationItemName = "New Location")
+		{
+			var coordinateArray = new string[LatLon.Length];
+			for (int i = 0; i < LatLon.Length; i++)
+			{
+				coordinateArray[i] = LatLon[i].x + ", " + LatLon[i].y;
+			}
+
+			PrefabItemOptions item = new PrefabItemOptions()
+			{
+				findByType = LocationPrefabFindBy.AddressOrLatLon,
+				prefabItemName = locationItemName,
+				spawnPrefabOptions = new SpawnPrefabOptions()
+				{
+					prefab = prefab,
+					scaleDownWithWorld = scaleDownWithWorld
+				},
+
+				coordinates = coordinateArray
+			};
+
+			if (callback != null)
+				item.OnAllPrefabsInstantiated += callback;
+
+			if (!_vectorData.LayerProperty.vectorSubLayers.Contains(item))
+			{
+				_vectorData.LocationPrefabsLayerProperties.locationPrefabList.Add(item);
+				_vectorData.AddVectorLayer(item);
+			}
 		}
 
 		/// <summary>
@@ -700,7 +749,12 @@ namespace Mapbox.Unity.Map
 			{
 				_vectorData.LocationPrefabsLayerProperties.locationPrefabList = new List<PrefabItemOptions>();
 			}
-			_vectorData.LocationPrefabsLayerProperties.locationPrefabList.Add(item);
+
+			if (!_vectorData.LayerProperty.vectorSubLayers.Contains(item))
+			{
+				_vectorData.LocationPrefabsLayerProperties.locationPrefabList.Add(item);
+				_vectorData.AddVectorLayer(item);
+			}
 		}
 
 		/// <summary>
@@ -733,7 +787,12 @@ namespace Mapbox.Unity.Map
 			{
 				_vectorData.LocationPrefabsLayerProperties.locationPrefabList = new List<PrefabItemOptions>();
 			}
-			_vectorData.LocationPrefabsLayerProperties.locationPrefabList.Add(item);
+
+			if (!_vectorData.LayerProperty.vectorSubLayers.Contains(item))
+			{
+				_vectorData.LocationPrefabsLayerProperties.locationPrefabList.Add(item);
+				_vectorData.AddVectorLayer(item);
+			}
 		}
 
   		#endregion
