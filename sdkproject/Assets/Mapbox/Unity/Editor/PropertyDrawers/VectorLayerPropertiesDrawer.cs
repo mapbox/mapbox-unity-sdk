@@ -54,6 +54,18 @@
 			}
 		}
 
+		string CustomSourceMapId
+		{
+			get
+			{
+				return EditorPrefs.GetString("VectorLayerProperties_customSourceMapId");
+			}
+			set
+			{
+				EditorPrefs.SetString("VectorLayerProperties_customSourceMapId", value);
+			}
+		}
+
 		private GUIContent _mapIdGui = new GUIContent
 		{
 			text = "Map Id",
@@ -108,8 +120,9 @@
 					isActiveProperty.boolValue = true;
 					break;
 				case VectorSourceType.Custom:
-					layerSourceId.stringValue = string.Empty;
+					layerSourceId.stringValue = CustomSourceMapId;
 					EditorGUILayout.PropertyField(sourceOptionsProperty, _mapIdGui);
+					CustomSourceMapId = layerSourceId.stringValue;
 					isActiveProperty.boolValue = true;
 					break;
 				case VectorSourceType.None:
@@ -174,6 +187,7 @@
 					subLayerExtrusionOptions.FindPropertyRelative("extrusionType").enumValueIndex = (int)ExtrusionType.None;
 					subLayerExtrusionOptions.FindPropertyRelative("extrusionGeometryType").enumValueIndex = (int)ExtrusionGeometryType.RoofAndSide;
 					subLayerExtrusionOptions.FindPropertyRelative("propertyName").stringValue = "height";
+					subLayerExtrusionOptions.FindPropertyRelative("extrusionScaleFactor").floatValue = 1f;
 
 					var subLayerFilterOptions = subLayer.FindPropertyRelative("filterOptions");
 					subLayerFilterOptions.FindPropertyRelative("filters").ClearArray();
