@@ -27,6 +27,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				return;
 			}
 
+			if(item.spawnPrefabOptions.prefab==null)
+			{
+				Debug.LogError("No prefab found. Please assign a prefab to spawn it on the map");
+			}
+
 			//These are fixed properties
 			item.coreOptions.geometryType = item.primitiveType;
 			item.extrusionOptions = new GeometryExtrusionOptions
