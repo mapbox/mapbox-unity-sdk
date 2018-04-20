@@ -11,6 +11,12 @@
 
 		ILocationProvider _locationProvider;
 
+		private void Awake()
+		{
+			// Prevent double initialization of the map. 
+			_map.InitializeOnStart = false;
+		}
+
 		IEnumerator Start()
 		{
 			yield return null;

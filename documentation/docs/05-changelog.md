@@ -1,10 +1,29 @@
 ﻿## CHANGELOG
-### v.1.4.0
-*??/??/2018*
+### v.1.4.1
+*04/17/2018*
 
-#####
-- Fix `Range Property` extrusion option for vector features.
+##### New Features
+- Add two new modules, KdTreeCollection and AddToCollection Gameobject modifier.
+- Add Collider option for vector features.
 - Add scale factor for extrusion value derived from feature property.
+- Add camera script with zoom & pan support for TabletopAR scene.
+
+##### Bug Fixes
+- Remove `buildingsWithUniqueIds` setting for `Mapbox Streets` data source.
+- Change `Style Name` to `Data Source`
+- Fix to make filter values case insensitive.
+- Fix issue where position vector features was not being set.
+- Fix `Range Property` extrusion option for vector features.
+- Select newly created layer visualizer.
+- Fix typo in colorPalette.
+- Add defaults for all sublayer properties to not carry over any options from the previous layer.
+- Don't allow empty names for layer visualizers.
+- Fix foldouts not retaining states between play mode & editor.
+- Add missing tooltips.
+- Fix issue with Satellite TextureType.
+- Added a check to prevent NRE on tile update because map was not initialized.
+- Added method to disable `InitializeOnStart` in the `Initialize With Location Provider` script.
+- Fix loop counter in `SpawnInsidePrefabModifier` which was causing an infinite loop.
 
 ### v.1.4.0
 *03/20/2018*

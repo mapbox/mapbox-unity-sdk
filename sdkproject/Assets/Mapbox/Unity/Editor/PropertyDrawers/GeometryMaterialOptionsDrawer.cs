@@ -22,7 +22,9 @@
 				var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Texturing Type", tooltip = "Use image texture from the Imagery source as texture for roofs. " });
 				var texturingType = property.FindPropertyRelative("texturingType");
 				EditorGUI.indentLevel--;
+				EditorGUI.indentLevel--;
 				texturingType.enumValueIndex = EditorGUI.Popup(typePosition, texturingType.enumValueIndex, texturingType.enumDisplayNames);
+				EditorGUI.indentLevel++;
 				EditorGUI.indentLevel++;
 
 				var matList = property.FindPropertyRelative("materials");
@@ -51,7 +53,7 @@
 					var atlasInfo = property.FindPropertyRelative("atlasInfo");
 					EditorGUI.ObjectField(new Rect(position.x, position.y, position.width, lineHeight), atlasInfo, new GUIContent { text = "Altas Info", tooltip = "Atlas information scriptable object, this defines how the texture roof and wall texture atlases will be used.  " });
 					position.y += lineHeight;
-					var colorPalette = property.FindPropertyRelative("colorPallete");
+					var colorPalette = property.FindPropertyRelative("colorPalette");
 					EditorGUI.ObjectField(new Rect(position.x, position.y, position.width, lineHeight), colorPalette, new GUIContent { text = "Color Palette", tooltip = "Atlas information scriptable object, this defines how the texture roof and wall texture atlases will be used.  " });
 				}
 			}

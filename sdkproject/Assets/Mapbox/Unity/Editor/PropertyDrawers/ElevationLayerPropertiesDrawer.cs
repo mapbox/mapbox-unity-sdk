@@ -9,7 +9,39 @@
 	public class ElevationLayerPropertiesDrawer : PropertyDrawer
 	{
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
-		bool showPosition = false;
+		GUIContent[] sourceTypeContent;
+		bool isGUIContentSet = false;
+
+		bool ShowPosition
+		{
+			get
+			{
+				return EditorPrefs.GetBool("ElevationLayerProperties_showPosition");
+			}
+			set
+			{
+				EditorPrefs.SetBool("ElevationLayerProperties_showPosition", value);
+			}
+		}
+
+		private GUIContent _mapIdGui = new GUIContent
+		{
+			text = "Map Id",
+			tooltip = "Map Id corresponding to the tileset."
+		};
+
+		string CustomSourceMapId
+		{
+			get
+			{
+				return EditorPrefs.GetString("ElevationLayerProperties_customSourceMapId");
+			}
+			set
+			{
+				EditorPrefs.SetString("ElevationLayerProperties_customSourceMapId", value);
+			}
+		}
+
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
@@ -18,26 +50,44 @@
 			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
 			var sourceTypeValue = (ElevationSourceType)sourceTypeProperty.enumValueIndex;
 
-			var typePosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Style Name", tooltip = EnumExtensions.Description(sourceTypeValue) });
+			var displayNames = sourceTypeProperty.enumDisplayNames;
+			int count = sourceTypeProperty.enumDisplayNames.Length;
+			if (!isGUIContentSet)
+			{
+				sourceTypeContent = new GUIContent[count];
+				for (int extIdx = 0; extIdx < count; extIdx++)
+				{
+					sourceTypeContent[extIdx] = new GUIContent
+					{
+						text = displayNames[extIdx],
+						tooltip = ((ElevationSourceType)extIdx).Description(),
+					};
+				}
+				isGUIContentSet = true;
+			}
+			var typePosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Data Source", tooltip = "Source tileset for Terrain." });
 
-			sourceTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, sourceTypeProperty.enumValueIndex, sourceTypeProperty.enumDisplayNames);
+			sourceTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, sourceTypeProperty.enumValueIndex, sourceTypeContent);
 			sourceTypeValue = (ElevationSourceType)sourceTypeProperty.enumValueIndex;
 
 			position.y += lineHeight;
+
+			var sourceOptionsProperty = property.FindPropertyRelative("sourceOptions");
+			var layerSourceProperty = sourceOptionsProperty.FindPropertyRelative("layerSource");
+			var layerSourceId = layerSourceProperty.FindPropertyRelative("Id");
 			switch (sourceTypeValue)
 			{
 				case ElevationSourceType.MapboxTerrain:
 					var sourcePropertyValue = MapboxDefaultElevation.GetParameters(sourceTypeValue);
-					var sourceOptionsProperty = property.FindPropertyRelative("sourceOptions");
-					var layerSourceProperty = sourceOptionsProperty.FindPropertyRelative("layerSource");
-					var layerSourceId = layerSourceProperty.FindPropertyRelative("Id");
 					layerSourceId.stringValue = sourcePropertyValue.Id;
 					GUI.enabled = false;
-					EditorGUI.PropertyField(position, sourceOptionsProperty, new GUIContent("Source Option"));
+					EditorGUI.PropertyField(position, sourceOptionsProperty, _mapIdGui);
 					GUI.enabled = true;
 					break;
 				case ElevationSourceType.Custom:
-					EditorGUI.PropertyField(position, property.FindPropertyRelative("sourceOptions"), true);
+					layerSourceId.stringValue = CustomSourceMapId;
+					EditorGUI.PropertyField(position, sourceOptionsProperty, _mapIdGui);
+					CustomSourceMapId = layerSourceId.stringValue;
 					break;
 				default:
 					break;
@@ -54,7 +104,7 @@
 				GUI.enabled = false;
 			}
 			var elevationLayerType = property.FindPropertyRelative("elevationLayerType");
-			EditorGUI.PropertyField(position, elevationLayerType, new GUIContent { text = elevationLayerType.displayName, tooltip = EnumExtensions.Description((ElevationLayerType)elevationLayerType.enumValueIndex) });
+			EditorGUI.PropertyField(position, elevationLayerType, new GUIContent { text = elevationLayerType.displayName, tooltip = ((ElevationLayerType)elevationLayerType.enumValueIndex).Description() });
 			position.y += lineHeight;
 			if (sourceTypeValue == ElevationSourceType.None)
 			{
@@ -63,8 +113,8 @@
 
 			EditorGUI.PropertyField(position, property.FindPropertyRelative("requiredOptions"), true);
 			position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("requiredOptions"));
-			showPosition = EditorGUI.Foldout(position, showPosition, "Others");
-			if (showPosition)
+			ShowPosition = EditorGUI.Foldout(position, ShowPosition, "Others");
+			if (ShowPosition)
 			{
 				position.y += lineHeight;
 				EditorGUI.PropertyField(position, property.FindPropertyRelative("modificationOptions"), true);
@@ -85,7 +135,7 @@
 
 			height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sourceOptions"));
 			height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("requiredOptions"));
-			if (showPosition)
+			if (ShowPosition)
 			{
 				height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("modificationOptions"));
 				height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("unityLayerOptions"));
