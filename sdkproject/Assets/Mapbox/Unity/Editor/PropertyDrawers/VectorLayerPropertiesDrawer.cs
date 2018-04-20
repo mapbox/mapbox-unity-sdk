@@ -245,7 +245,10 @@
 
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
 
-				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
+				//EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
+
+				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("styleOptions"));
+
 			}
 			//EditorGUI.indentLevel--;
 			ShowOthers = EditorGUILayout.Foldout(ShowOthers, "Advanced");

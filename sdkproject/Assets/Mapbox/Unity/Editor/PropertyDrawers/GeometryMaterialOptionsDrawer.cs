@@ -46,6 +46,12 @@
 					position.y += lineHeight;
 					var atlasInfo = property.FindPropertyRelative("atlasInfo");
 					EditorGUI.ObjectField(new Rect(position.x, position.y, position.width, lineHeight), atlasInfo, new GUIContent { text = "Altas Info", tooltip = "Atlas information scriptable object, this defines how the texture roof and wall texture atlases will be used.  " });
+					if (atlasInfo.objectReferenceValue == null)
+					{
+						position.y += lineHeight;
+						EditorGUI.LabelField(new Rect(position.x, position.y, position.width, lineHeight), new GUIContent { text = "Assign a material below...", tooltip = "Unity materials to be used for features. " });
+						//position.y += lineHeight;
+					}				
 				}
 				if ((UvMapType)texturingType.enumValueIndex == UvMapType.AtlasWithColorPalette)
 				{
@@ -55,7 +61,12 @@
 					position.y += lineHeight;
 					var colorPalette = property.FindPropertyRelative("colorPalette");
 					EditorGUI.ObjectField(new Rect(position.x, position.y, position.width, lineHeight), colorPalette, new GUIContent { text = "Color Palette", tooltip = "Atlas information scriptable object, this defines how the texture roof and wall texture atlases will be used.  " });
+					position.y += lineHeight;
+					//var taco = property.FindPropertyRelative("taco");
+					//EditorGUI.ObjectField(new Rect(position.x, position.y, position.width, lineHeight), colorPalette, new GUIContent { text = "Taco", tooltip = "Atlas information scriptable object, this defines how the texture roof and wall texture atlases will be used.  " });
+
 				}
+
 			}
 			//EditorGUI.indentLevel--;
 			EditorGUI.EndProperty();

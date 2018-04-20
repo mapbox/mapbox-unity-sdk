@@ -88,9 +88,11 @@
 						defaultGOModifierStack.Add(lineColliderMod);
 					}
 
-					var lineMatMod = CreateInstance<MaterialModifier>();
-					lineMatMod.SetProperties(_layerProperties.materialOptions);
-					defaultGOModifierStack.Add(lineMatMod);
+					var lineStyleMod = CreateInstance<StyleModifier>();
+
+					lineStyleMod.SetProperties(_layerProperties.styleOptions);
+					defaultGOModifierStack.Add(lineStyleMod);
+
 					break;
 				case VectorPrimitiveType.Polygon:
 					if (_layerProperties.coreOptions.snapToTerrain == true)
@@ -132,9 +134,10 @@
 						defaultGOModifierStack.Add(polyColliderMod);
 					}
 
-					var matMod = CreateInstance<MaterialModifier>();
-					matMod.SetProperties(_layerProperties.materialOptions);
-					defaultGOModifierStack.Add(matMod);
+					var styleMod = CreateInstance<StyleModifier>();
+
+					styleMod.SetProperties(_layerProperties.styleOptions);
+					defaultGOModifierStack.Add(styleMod);
 
 					if (_layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette)
 					{

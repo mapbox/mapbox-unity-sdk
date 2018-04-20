@@ -1,6 +1,7 @@
 namespace Mapbox.Unity
 {
 	using UnityEngine;
+	using Mapbox.Unity.MeshGeneration.Data;
 
 	public static class Constants
 	{
@@ -30,6 +31,23 @@ namespace Mapbox.Unity
 			public static readonly Vector3 Vector3Forward = new Vector3(0, 0, 1);
 
 			public static Vector3 Vector3Right = new Vector3(1, 0, 0);
+		}
+
+		public static class StylePaths
+		{
+			
+			//public static string mapboxStylesDefaultShaderPath = ;
+			public static string mapboxStylesPath = "Assets/Mapbox/Resources/MapboxStyles/";
+			//path.combine...
+			public static string GetMapboxStylesDefaultAssetPath 
+			{
+				get
+				{
+					return string.Format("{0}/{1}", mapboxStylesPath);
+				}
+			}
+
+			//public static AtlasEntity defaultRoofAltasInfo;
 		}
 	}
 }
