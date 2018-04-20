@@ -23,6 +23,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	{
 		[SerializeField]
 		ImageryLayerProperties _properties;
+		protected ImageDataFetcher DataFetcher;
 
 		public string MapId
 		{
@@ -54,7 +55,22 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnInitialized()
 		{
+			DataFetcher = ScriptableObject.CreateInstance<ImageDataFetcher>();
+			DataFetcher.DataRecieved += (s, t) => { OnImageRecieved(t, s); };
+			DataFetcher.FetchingError += (e, t) => { OnDataError(t, e); };
+		}
 
+		private void OnImageRecieved(UnityTile tile, RasterTile rasterTile)
+		{
+			Progress--;
+			tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
+			tile.RasterDataState = TilePropertyState.Loaded;
+		}
+
+		//merge this with OnErrorOccurred?
+		private void OnDataError(UnityTile t, TileErrorEventArgs e)
+		{
+			OnErrorOccurred(e);
 		}
 
 		internal override void OnRegistered(UnityTile tile)
@@ -66,40 +82,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				return;
 			}
 
-			RasterTile rasterTile;
-			if (MapId.StartsWith("mapbox://", StringComparison.Ordinal))
-			{
-				rasterTile = _properties.rasterOptions.useRetina ? new RetinaRasterTile() : new RasterTile();
-			}
-			else
-			{
-				rasterTile = _properties.rasterOptions.useRetina ? new ClassicRetinaRasterTile() : new ClassicRasterTile();
-			}
-
-			tile.RasterDataState = TilePropertyState.Loading;
-
-			tile.AddTile(rasterTile);
-			Progress++;
-			rasterTile.Initialize(_fileSource, tile.CanonicalTileId, MapId, () =>
-			{
-				if (tile == null)
-				{
-					Progress--;
-					return;
-				}
-
-				if (rasterTile.HasError)
-				{
-					OnErrorOccurred(new TileErrorEventArgs(tile.CanonicalTileId, rasterTile.GetType(), tile, rasterTile.Exceptions));
-					tile.RasterDataState = TilePropertyState.Error;
-					Progress--;
-					return;
-				}
-
-				tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
-				tile.RasterDataState = TilePropertyState.Loaded;
-				Progress--;
-			});
+			Progress++;			
+			DataFetcher.FetchImage(tile.CanonicalTileId, MapId, tile, _properties.rasterOptions.useRetina);
 		}
 
 		/// <summary>

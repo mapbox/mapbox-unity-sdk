@@ -23,9 +23,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 		private int _vertA, _vertB, _vertC;
 		private int _counter;
 
-		public override void OnInitialized(ElevationLayerProperties elOptions)
+		public override void Initialize(ElevationLayerProperties elOptions)
 		{
-			base.OnInitialized(elOptions);
+			base.Initialize(elOptions);
 
 			_meshData = new Dictionary<UnwrappedTileId, Mesh>();
 			_currentTileMeshData = new MeshData();
@@ -37,7 +37,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			_newTriangleList = new List<int>();
 		}
 
-		public override void OnRegistered(UnityTile tile)
+		public override void RegisterTile(UnityTile tile)
 		{
 			if (_elevationOptions.unityLayerOptions.addToLayer && tile.gameObject.layer != _elevationOptions.unityLayerOptions.layerId)
 			{
@@ -64,15 +64,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			GenerateTerrainMesh(tile);
 		}
 
-		public override void OnUnregistered(UnityTile tile)
+		public override void UnregisterTile(UnityTile tile)
 		{
 			_meshData.Remove(tile.UnwrappedTileId);
 		}
 
-		//public override void OnErrorOccurred(TileErrorEventArgs e)
-		//{
-		//	base.OnErrorOccurred(e);
-		//}
+		public override void DataErrorOccurred(UnityTile t, TileErrorEventArgs e)
+		{
+			
+		}
 
 		#region mesh gen
 		private void CreateBaseMesh(UnityTile tile)

@@ -10,12 +10,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 	{
 		Mesh _cachedQuad;
 
-		public override void OnInitialized(ElevationLayerProperties elOptions)
+		public override void Initialize(ElevationLayerProperties elOptions)
 		{
 			_elevationOptions = elOptions;
 		}
 
-		public override void OnRegistered(UnityTile tile)
+		public override void RegisterTile(UnityTile tile)
 		{
 			if (_elevationOptions.unityLayerOptions.addToLayer && tile.gameObject.layer != _elevationOptions.unityLayerOptions.layerId)
 			{

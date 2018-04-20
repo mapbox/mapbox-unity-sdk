@@ -12,12 +12,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 	{
 		public float Radius { get { return _elevationOptions.modificationOptions.earthRadius; } }
 
-		public override void OnInitialized(ElevationLayerProperties elOptions)
+		public override void Initialize(ElevationLayerProperties elOptions)
 		{
 			_elevationOptions = elOptions;
 		}
 
-		public override void OnRegistered(UnityTile tile)
+		public override void RegisterTile(UnityTile tile)
 		{
 			if (_elevationOptions.unityLayerOptions.addToLayer && tile.gameObject.layer != _elevationOptions.unityLayerOptions.layerId)
 			{
@@ -105,7 +105,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			tile.transform.localPosition = Mapbox.Unity.Constants.Math.Vector3Zero;
 		}
 
-		public override void OnUnregistered(UnityTile tile)
+		public override void UnregisterTile(UnityTile tile)
 		{
 
 		}

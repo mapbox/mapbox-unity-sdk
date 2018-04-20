@@ -6,6 +6,7 @@ using Mapbox.Unity.Map;
 using Mapbox.Map;
 using Mapbox.Unity.MeshGeneration.Enums;
 using Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies;
+using System;
 
 namespace Mapbox.Unity.MeshGeneration.Factories
 {
@@ -14,6 +15,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		public TerrainStrategy Strategy;
 		[SerializeField]
 		protected ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
+		protected TerrainDataFetcher DataFetcher;
 
 		public override void SetOptions(LayerProperties options)
 		{
@@ -22,7 +24,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		internal override void OnInitialized()
 		{
-			Strategy.OnInitialized(_elevationOptions);
+			Strategy.Initialize(_elevationOptions);
+			DataFetcher = ScriptableObject.CreateInstance<TerrainDataFetcher>();
+			DataFetcher.DataRecieved += (s, t) => { OnTerrainRecieved(t, s); };
+			DataFetcher.FetchingError += (e, t) => { OnDataError(t,e); };
 		}
 
 		internal override void OnRegistered(UnityTile tile)
@@ -31,49 +36,33 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			if (Strategy is IElevationBasedTerrainStrategy)
 			{
 				tile.HeightDataState = TilePropertyState.Loading;
-				var pngRasterTile = new RawPngRasterTile();
-
-				tile.AddTile(pngRasterTile);
-
-
-				pngRasterTile.Initialize(_fileSource, tile.CanonicalTileId, _elevationOptions.sourceOptions.Id, () =>
-				{
-					if (tile == null)
-					{
-						Progress--;
-						return;
-					}
-
-					if (pngRasterTile.HasError)
-					{
-						OnErrorOccurred(new TileErrorEventArgs(tile.CanonicalTileId, pngRasterTile.GetType(), tile, pngRasterTile.Exceptions));
-						tile.HeightDataState = TilePropertyState.Error;
-
-						// Handle missing elevation from server (404)!
-						// TODO: optimize this search!
-						if (pngRasterTile.ExceptionsAsString.Contains("404"))
-						{
-							Strategy.OnFetchingError(pngRasterTile.Exceptions);
-						}
-						Progress--;
-						return;
-					}
-
-					tile.SetHeightData(pngRasterTile.Data, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight);
-					Strategy.OnRegistered(tile);
-
-				});
+				DataFetcher.FetchTerrain(tile.CanonicalTileId, _elevationOptions.sourceOptions.Id, tile);
 			}
 			else
 			{
-				Strategy.OnRegistered(tile);
+				Strategy.RegisterTile(tile);
+				Progress--;
 			}
+
+		}
+
+		private void OnTerrainRecieved(UnityTile tile, RawPngRasterTile pngRasterTile)
+		{
 			Progress--;
+			tile.SetHeightData(pngRasterTile.Data, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight);
+			Strategy.RegisterTile(tile);
+
+		}
+
+		private void OnDataError(UnityTile tile, TileErrorEventArgs e)
+		{
+			Strategy.DataErrorOccurred(tile, e);
 		}
 
 		internal override void OnUnregistered(UnityTile tile)
 		{
-			Strategy.OnUnregistered(tile);
+			Progress--;
+			Strategy.UnregisterTile(tile);
 		}
 	}
 }

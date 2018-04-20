@@ -3,6 +3,7 @@ using Mapbox.Unity.MeshGeneration.Data;
 using System;
 using Mapbox.Unity.Map;
 using System.Collections.ObjectModel;
+using Mapbox.Map;
 
 namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 {
@@ -11,22 +12,22 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 		[SerializeField]
 		protected ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
 
-		public virtual void OnInitialized(ElevationLayerProperties elOptions)
+		public virtual void Initialize(ElevationLayerProperties elOptions)
 		{
 			_elevationOptions = elOptions;
 		}
 
-		public virtual void OnRegistered(UnityTile tile)
+		public virtual void RegisterTile(UnityTile tile)
 		{
 
 		}
 
-		public virtual void OnUnregistered(UnityTile tile)
+		public virtual void UnregisterTile(UnityTile tile)
 		{
 
 		}
 
-		internal void OnFetchingError(ReadOnlyCollection<Exception> exceptions)
+		public virtual void DataErrorOccurred(UnityTile tile, TileErrorEventArgs e)
 		{
 
 		}

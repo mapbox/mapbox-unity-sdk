@@ -22,7 +22,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 		private int _counter;
 
 
-		public override void OnInitialized(ElevationLayerProperties elOptions)
+		public override void Initialize(ElevationLayerProperties elOptions)
 		{
 			_elevationOptions = elOptions;
 			_meshData = new Dictionary<UnwrappedTileId, Mesh>();
@@ -35,12 +35,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			_newTriangleList = new List<int>();
 		}
 
-		public override void OnUnregistered(UnityTile tile)
+		public override void UnregisterTile(UnityTile tile)
 		{
 			_meshData.Remove(tile.UnwrappedTileId);
 		}
 
-		public override void OnRegistered(UnityTile tile)
+		public override void RegisterTile(UnityTile tile)
 		{
 			if (_elevationOptions.unityLayerOptions.addToLayer && tile.gameObject.layer != _elevationOptions.unityLayerOptions.layerId)
 			{
