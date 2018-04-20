@@ -18,7 +18,12 @@ namespace Mapbox.Unity.Location
 		public AbstractMap mapManager;
 
 		[SerializeField]
-		AbstractLocationProvider _deviceLocationProvider;
+		[Tooltip("Provider using Unity's builtin 'Input.Location' service")]
+		AbstractLocationProvider _deviceLocationProviderUnity;
+
+		[SerializeField]
+		[Tooltip("Custom native Android location provider. If this is not set above provider is used")]
+		DeviceLocationProviderAndroidNative _deviceLocationProviderAndroid;
 
 		[SerializeField]
 		AbstractLocationProvider _editorLocationProvider;
@@ -107,7 +112,7 @@ namespace Mapbox.Unity.Location
 		{
 			get
 			{
-				return _deviceLocationProvider;
+				return _deviceLocationProviderUnity;
 			}
 		}
 
@@ -150,8 +155,16 @@ namespace Mapbox.Unity.Location
 		[Conditional("NOT_UNITY_EDITOR")]
 		void InjectDeviceLocationProvider()
 		{
-			UnityEngine.Debug.Log("LocationProviderFactory: " + "Injected DEVICE Location Provider");
-			DefaultLocationProvider = _deviceLocationProvider;
+			if (Application.platform == RuntimePlatform.Android && null != _deviceLocationProviderAndroid)
+			{
+				UnityEngine.Debug.Log("LocationProviderFactory: " + "Injected native Android DEVICE Location Provider");
+				DefaultLocationProvider = _deviceLocationProviderAndroid;
+			}
+			else
+			{
+				UnityEngine.Debug.Log("LocationProviderFactory: " + "Injected DEVICE Location Provider");
+				DefaultLocationProvider = _deviceLocationProviderUnity;
+			}
 		}
 	}
 }

@@ -55,6 +55,21 @@
 		public bool IsLocationUpdated;
 
 		/// <summary>
+		/// Has the location been aquired via a GPS fix. 'Null' if not supported by the location provider-
+		/// </summary>
+		public bool? HasGpsFix;
+
+		/// <summary>
+		/// How many satellites were in view when the location was acquired. 'Null' if not supported by the location provider-
+		/// </summary>
+		public int? SatellitesInView;
+
+		/// <summary>
+		/// How many satellites were used for the location. 'Null' if not supported by the location provider-
+		/// </summary>
+		public int? SatellitesUsed;
+
+		/// <summary>
 		/// Has the heading changed since last update?
 		/// </summary>
 		public bool IsHeadingUpdated;
