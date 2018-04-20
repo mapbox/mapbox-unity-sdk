@@ -90,7 +90,7 @@
 						string truncatedCoordinates = feature.Center.x.ToString("F2", CultureInfo.InvariantCulture) + ", " +
 							feature.Center.y.ToString("F2", CultureInfo.InvariantCulture);
 
-
+						//split feature name and add elements until the maxButtonContentLenght is exceeded
 						string[] featureNameSplit = feature.PlaceName.Split(',');
 						string buttonContent = "";
 						int maxButtonContentLength = 30;
@@ -118,9 +118,10 @@
 						if (GUILayout.Button(buttonContent))
 						{
 							_coordinateProperty.stringValue = coordinates;
-
 							_coordinateProperty.serializedObject.ApplyModifiedProperties();
 							EditorUtility.SetDirty(_coordinateProperty.serializedObject.targetObject);
+
+							//TODO: assign the address string to an ajacent property.
 
 							Close();
 						}

@@ -24,7 +24,7 @@ namespace Mapbox.Unity.Map
 		//Dictionary containing the layer names for each location prefab find by type
 		public readonly Dictionary<LocationPrefabFindBy, string> layerNameFromFindByTypeDictionary = new Dictionary<LocationPrefabFindBy, string>
 		{
-			{LocationPrefabFindBy.AddressOrLatLon, "poi_label"},
+			{LocationPrefabFindBy.AddressOrLatLon, ""},
 			{LocationPrefabFindBy.MapboxCategory, "poi_label"},
 			{LocationPrefabFindBy.POIName, "poi_label"},
 		};
@@ -32,7 +32,7 @@ namespace Mapbox.Unity.Map
 		//Dictionary containing the property names in the layer for each location prefab find by type
 		public readonly Dictionary<LocationPrefabFindBy, string> categoryPropertyFromFindByTypeDictionary = new Dictionary<LocationPrefabFindBy, string>
 		{
-			{LocationPrefabFindBy.AddressOrLatLon, "none"},
+			{LocationPrefabFindBy.AddressOrLatLon, ""},
 			{LocationPrefabFindBy.MapboxCategory, "maki"},
 			{LocationPrefabFindBy.POIName, "name"},
 		};
@@ -40,7 +40,7 @@ namespace Mapbox.Unity.Map
 		//Dictionary containing the density names in the layer for each location prefab find by type
 		public readonly Dictionary<LocationPrefabFindBy, string> densityPropertyFromFindByTypeDictionary = new Dictionary<LocationPrefabFindBy, string>
 		{
-			{LocationPrefabFindBy.AddressOrLatLon, "none"},
+			{LocationPrefabFindBy.AddressOrLatLon, ""},
 			{LocationPrefabFindBy.MapboxCategory, "localrank"},
 			{LocationPrefabFindBy.POIName, "localrank"},
 		};

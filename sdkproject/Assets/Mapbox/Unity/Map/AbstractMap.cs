@@ -560,7 +560,7 @@ namespace Mapbox.Unity.Map
 			OnInitialized();
 		}
 
-		internal Vector3 GeoToWorldPositionXZ(Vector2d latitudeLongitude)
+		private Vector3 GeoToWorldPositionXZ(Vector2d latitudeLongitude)
 		{
 			// For quadtree implementation of the map, the map scale needs to be compensated for.
 			var scaleFactor = Mathf.Pow(2, (InitialZoom - AbsoluteZoom));
