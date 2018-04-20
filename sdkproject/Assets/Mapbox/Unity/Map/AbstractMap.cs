@@ -290,7 +290,17 @@ namespace Mapbox.Unity.Map
 		{
 			_worldRelativeScale = scale;
 		}
+
+		/// <summary>
+		/// Event delegate, gets called after map is initialized
+		/// <seealso cref="OnUpdated"/>
+		/// </summary>
 		public event Action OnInitialized = delegate { };
+		/// <summary>
+		/// Event delegate, gets called after map is updated.
+		/// <c>UpdateMap</c> will trigger this event.
+		/// <seealso cref="OnInitialized"/>
+		/// </summary>
 		public event Action OnUpdated = delegate { };
 
 		void Awake()
