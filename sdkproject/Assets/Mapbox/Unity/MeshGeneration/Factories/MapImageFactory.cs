@@ -56,21 +56,36 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		internal override void OnInitialized()
 		{
 			DataFetcher = ScriptableObject.CreateInstance<ImageDataFetcher>();
-			DataFetcher.DataRecieved += (s, t) => { OnImageRecieved(t, s); };
-			DataFetcher.FetchingError += (e, t) => { OnDataError(t, e); };
+			DataFetcher.DataRecieved += OnImageRecieved;
+			DataFetcher.FetchingError += OnDataError;
+		}
+
+		//Does this even work? 
+		private void OnDestroy()
+		{
+			DataFetcher.DataRecieved -= OnImageRecieved;
+			DataFetcher.FetchingError -= OnDataError;
 		}
 
 		private void OnImageRecieved(UnityTile tile, RasterTile rasterTile)
 		{
-			Progress--;
-			tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
-			tile.RasterDataState = TilePropertyState.Loaded;
+			if (tile != null)
+			{
+				Progress--;
+				tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
+				tile.RasterDataState = TilePropertyState.Loaded;
+			}
 		}
 
 		//merge this with OnErrorOccurred?
-		private void OnDataError(UnityTile t, TileErrorEventArgs e)
+		private void OnDataError(UnityTile tile, TileErrorEventArgs e)
 		{
-			OnErrorOccurred(e);
+			if (tile != null)
+			{
+				Progress--;
+				tile.RasterDataState = TilePropertyState.Error;
+				OnErrorOccurred(e);
+			}
 		}
 
 		internal override void OnRegistered(UnityTile tile)
@@ -82,7 +97,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				return;
 			}
 
-			Progress++;			
+			tile.RasterDataState = TilePropertyState.Loading; ;
+			Progress++;
 			DataFetcher.FetchImage(tile.CanonicalTileId, MapId, tile, _properties.rasterOptions.useRetina);
 		}
 
@@ -92,7 +108,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// <param name="e"><see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance/</param>
 		protected override void OnErrorOccurred(TileErrorEventArgs e)
 		{
-			base.OnErrorOccurred(e);
 		}
 
 		internal override void OnUnregistered(UnityTile tile)
