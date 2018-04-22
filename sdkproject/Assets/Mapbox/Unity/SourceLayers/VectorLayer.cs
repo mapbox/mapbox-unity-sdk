@@ -9,10 +9,9 @@
 	[Serializable]
 	public class VectorLayer : IVectorDataLayer
 	{
-		public VectorLayer()
-		{
-			_locationPrefabsLayerProperties = new LocationPrefabsLayerProperties();	
-		}
+		[SerializeField]
+		LocationPrefabsLayerProperties _locationPrefabsLayerProperties = new LocationPrefabsLayerProperties();	
+
 
 		[SerializeField]
 		VectorLayerProperties _layerProperty = new VectorLayerProperties();
@@ -166,8 +165,6 @@
 		}
 		private VectorTileFactory _vectorTileFactory;
 
-		[SerializeField]
-		LocationPrefabsLayerProperties _locationPrefabsLayerProperties;
 		public LocationPrefabsLayerProperties LocationPrefabsLayerProperties
 		{
 			get
