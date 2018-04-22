@@ -194,20 +194,18 @@
 				string streets_v7 = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id;
 				//var layerSourceId = vectorDataProperty.FindPropertyRelative("Id");
 				string layerString = layerProperty.FindPropertyRelative("sourceOptions.layerSource.Id").stringValue;
-				if (sourceTypeValue !=  VectorSourceType.None)
+
+				if(sourceTypeValue != VectorSourceType.None && layerString.Contains(streets_v7))
 				{
-					if(layerString.Contains(streets_v7))
-					{
-						GUI.enabled = false;
-						EditorGUILayout.PropertyField(layerSourceProperty, _mapIdGui);
-						GUI.enabled = true;
-						ShowSection(vectorDataProperty, "_locationPrefabsLayerProperties");
-						GUILayout.Space(EditorGUIUtility.singleLineHeight);
-					}
-					else
-					{
-						EditorGUILayout.HelpBox("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the data source in the Vector section.",MessageType.Error);
-					}
+					GUI.enabled = false;
+					EditorGUILayout.PropertyField(layerSourceProperty, _mapIdGui);
+					GUI.enabled = true;
+					ShowSection(vectorDataProperty, "_locationPrefabsLayerProperties");
+					//GUILayout.Space(EditorGUIUtility.singleLineHeight);
+				}
+				else
+				{
+					EditorGUILayout.HelpBox("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the data source in the Vector section.",MessageType.Error);
 				}
 			}
 
