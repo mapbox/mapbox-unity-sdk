@@ -17,12 +17,16 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		protected ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
 		protected TerrainDataFetcher DataFetcher;
 
-		public override void SetOptions(LayerProperties options)
+		#region UnityMethods
+		private void OnDestroy()
 		{
-			_elevationOptions = (ElevationLayerProperties)options;
+			DataFetcher.DataRecieved -= OnTerrainRecieved;
+			DataFetcher.FetchingError -= OnDataError;
 		}
-
-		internal override void OnInitialized()
+		#endregion
+		
+		#region AbstractFactoryOverrides
+		protected override void OnInitialized()
 		{
 			Strategy.Initialize(_elevationOptions);
 			DataFetcher = ScriptableObject.CreateInstance<TerrainDataFetcher>();
@@ -30,13 +34,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			DataFetcher.FetchingError += OnDataError;
 		}
 
-		private void OnDestroy()
+		public override void SetOptions(LayerProperties options)
 		{
-			DataFetcher.DataRecieved -= OnTerrainRecieved;
-			DataFetcher.FetchingError -= OnDataError;
+			_elevationOptions = (ElevationLayerProperties)options;
 		}
 
-		internal override void OnRegistered(UnityTile tile)
+		protected override void OnRegistered(UnityTile tile)
 		{
 			Progress++;
 			if (Strategy is IElevationBasedTerrainStrategy)
@@ -52,6 +55,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		}
 
+		protected override void OnUnregistered(UnityTile tile)
+		{
+			Progress--;
+			Strategy.UnregisterTile(tile);
+		}
+		#endregion
+
+		#region DataFetcherEvents
 		private void OnTerrainRecieved(UnityTile tile, RawPngRasterTile pngRasterTile)
 		{
 			if (tile != null)
@@ -72,11 +83,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				Strategy.DataErrorOccurred(tile, e);
 			}
 		}
+		#endregion
 
-		internal override void OnUnregistered(UnityTile tile)
-		{
-			Progress--;
-			Strategy.UnregisterTile(tile);
-		}
 	}
 }

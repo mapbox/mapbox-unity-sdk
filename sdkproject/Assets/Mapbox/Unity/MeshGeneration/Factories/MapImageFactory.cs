@@ -24,7 +24,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField]
 		ImageryLayerProperties _properties;
 		protected ImageDataFetcher DataFetcher;
-
 		public string MapId
 		{
 			get
@@ -37,36 +36,16 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				_properties.sourceOptions.Id = value;
 			}
 		}
-
-		public override void SetOptions(LayerProperties options)
-		{
-			_properties = (ImageryLayerProperties)options;
-		}
-
-		// TODO: come back to this
-		//public override void Update()
-		//{
-		//    base.Update();
-		//    foreach (var tile in _tiles.Values)
-		//    {
-		//        Run(tile);
-		//    }
-		//}
-
-		internal override void OnInitialized()
-		{
-			DataFetcher = ScriptableObject.CreateInstance<ImageDataFetcher>();
-			DataFetcher.DataRecieved += OnImageRecieved;
-			DataFetcher.FetchingError += OnDataError;
-		}
-
-		//Does this even work? 
+				
+		#region UnityMethods
 		private void OnDestroy()
 		{
 			DataFetcher.DataRecieved -= OnImageRecieved;
 			DataFetcher.FetchingError -= OnDataError;
-		}
+		} 
+		#endregion
 
+		#region DataFetcherEvents
 		private void OnImageRecieved(UnityTile tile, RasterTile rasterTile)
 		{
 			if (tile != null)
@@ -87,8 +66,22 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				OnErrorOccurred(e);
 			}
 		}
+		#endregion
 
-		internal override void OnRegistered(UnityTile tile)
+		#region AbstractFactoryOverrides
+		protected override void OnInitialized()
+		{
+			DataFetcher = ScriptableObject.CreateInstance<ImageDataFetcher>();
+			DataFetcher.DataRecieved += OnImageRecieved;
+			DataFetcher.FetchingError += OnDataError;
+		}
+
+		public override void SetOptions(LayerProperties options)
+		{
+			_properties = (ImageryLayerProperties)options;
+		}
+
+		protected override void OnRegistered(UnityTile tile)
 		{
 			if (_properties.sourceType == ImagerySourceType.None)
 			{
@@ -97,7 +90,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				return;
 			}
 
-			tile.RasterDataState = TilePropertyState.Loading; ;
+			tile.RasterDataState = TilePropertyState.Loading;
 			Progress++;
 			DataFetcher.FetchImage(tile.CanonicalTileId, MapId, tile, _properties.rasterOptions.useRetina);
 		}
@@ -110,9 +103,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 		}
 
-		internal override void OnUnregistered(UnityTile tile)
+		protected override void OnUnregistered(UnityTile tile)
 		{
 
 		}
+
+
+		#endregion
 	}
 }
