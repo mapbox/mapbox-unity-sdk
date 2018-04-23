@@ -198,7 +198,7 @@
 				if(sourceTypeValue != VectorSourceType.None && layerString.Contains(streets_v7))
 				{
 					GUI.enabled = false;
-					EditorGUILayout.PropertyField(layerSourceProperty, _mapIdGui);
+					EditorGUILayout.TextField(_mapIdGui, streets_v7);
 					GUI.enabled = true;
 					ShowSection(vectorDataProperty, "_locationPrefabsLayerProperties");
 					//GUILayout.Space(EditorGUIUtility.singleLineHeight);
