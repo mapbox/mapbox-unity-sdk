@@ -107,27 +107,27 @@ namespace Mapbox.Unity.Map
 		public SpawnPrefabOptions spawnPrefabOptions;
 
 		/// <summary>
-		/// The FindbyType enum to specify the type of prefanb item in the list
+		/// Find points-of-interest to spawn prefabs using this enum
 		/// </summary>
 		public LocationPrefabFindBy findByType = LocationPrefabFindBy.MapboxCategory;//default to Mapbox Category
 
 		/// <summary>
-		/// The category filter for the location marker
+		/// Spawn at any location in the categories selected
 		/// </summary>
 		public LocationPrefabCategories categories;
 
 		/// <summary>
-		/// All the POIs containing this name string will be shown
+		/// Spawn at any location containing this name string
 		/// </summary>
-		public string nameString = "POI Name";
+		public string nameString = "Name";
 
 		/// <summary>
-		/// The density of pois in an area
+		/// The number of prefabs to spawn per-tile. Try a lower number if the map is cluttered.
 		/// </summary>
 		public Popularity popularity;
 
 		/// <summary>
-		/// The coordinates to place prefabs when selecting address/latlon
+		/// Spawn at specific coordinates
 		/// </summary>
 		[Geocode]
 		public string[] coordinates;

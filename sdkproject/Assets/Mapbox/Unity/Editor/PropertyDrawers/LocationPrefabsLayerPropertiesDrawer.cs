@@ -44,7 +44,7 @@ namespace Mapbox.Unity.Map
 			GUILayout.Space(EditorGUIUtility.singleLineHeight);
 			GUILayout.BeginHorizontal();
 
-			if (GUILayout.Button(new GUIContent("Add Item"), (GUIStyle)"minibuttonleft"))
+			if (GUILayout.Button(new GUIContent("Add Layer"), (GUIStyle)"minibuttonleft"))
 			{
 				selectedLayers = layerTreeView.GetSelection();
 
@@ -93,6 +93,7 @@ namespace Mapbox.Unity.Map
 			}
 			else
 			{
+				GUILayout.Space(15);
 				GUILayout.Label("Select a location item to see its properties");
 			}
 			EditorGUI.EndProperty();

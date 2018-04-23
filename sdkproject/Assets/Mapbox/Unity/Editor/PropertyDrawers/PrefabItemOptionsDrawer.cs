@@ -15,32 +15,32 @@ namespace Mapbox.Editor
 		private GUIContent prefabLocationsTitle = new GUIContent
 		{
 			text = "Prefab Locations",
-			tooltip = "The properties for creating POI filters"
+			tooltip = "Where on the map to spawn the selected prefab"
 		};
 
 
 		private GUIContent findByDropDown = new GUIContent
 		{
 			text = "Find by",
-			tooltip = "The type of filter you would like to use for looking up POIs"
+			tooltip = "Find points-of-interest by category, name, or address"
 		};
 
 		private GUIContent categoriesDropDown = new GUIContent
 		{
 			text = "Category",
-			tooltip = "Would you like to filter them by categories for the POI?"
+			tooltip = "Spawn at locations in the categories selected"
 		};
 
 		private GUIContent  densitySlider = new GUIContent
 		{
 			text = "Density",
-			tooltip = "This slider defines the density of POIs in a region"
+			tooltip = "The number of prefabs to spawn per-tile; try a lower number if the map is cluttered"
 		};
 
 		private GUIContent nameField = new GUIContent
 		{
 			text = "Name",
-			tooltip = "All the POIs containing this string will be shown on the map"
+			tooltip = "Spawn at locations containing this name string"
 		};
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -56,7 +56,7 @@ namespace Mapbox.Editor
 			//Prefab Game Object
 			position.y += _lineHeight;
 			var spawnPrefabOptions = property.FindPropertyRelative("spawnPrefabOptions");
-			EditorGUI.PropertyField(new Rect(position.x, position.y,position.width,2*_lineHeight),spawnPrefabOptions);
+			EditorGUI.PropertyField(new Rect(position.x, position.y + 2,position.width,2*_lineHeight),spawnPrefabOptions);
 			GUILayout.Space(1);
 
 			//Prefab Locations title

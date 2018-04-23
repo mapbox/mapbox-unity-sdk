@@ -14,7 +14,7 @@ namespace Mapbox.Unity.Map
 		private GUIContent prefabContent = new GUIContent
 		{
 			text = "Prefab",
-			tooltip = "The prefab that will be spawned at the locations chosen below"
+			tooltip = "The prefab to be spawned"
 		};
 
 		private GUIContent scalePrefabContent = new GUIContent
