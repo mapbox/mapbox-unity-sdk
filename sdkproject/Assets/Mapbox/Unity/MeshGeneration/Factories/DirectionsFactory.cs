@@ -40,11 +40,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 			_directions = MapboxAccess.Instance.Directions;
 			_map.OnInitialized += Query;
+			_map.OnUpdated += Query;
 		}
 
 		void OnDestroy()
 		{
 			_map.OnInitialized -= Query;
+			_map.OnUpdated -= Query;
 		}
 
 		void Query()
