@@ -654,7 +654,7 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		/// <param name="prefab"> A Game Object Prefab.</param>
 		/// <param name="LatLon">A Vector2d(Latitude Longitude) object</param>
-		public void PlacePrefabAtGeoLocation(GameObject prefab, Vector2d LatLon, Action<List<GameObject>> callback = null, bool scaleDownWithWorld = true, string locationItemName = "New Location")
+		public void SpawnPrefabAtGeoLocation(GameObject prefab, Vector2d LatLon, Action<List<GameObject>> callback = null, bool scaleDownWithWorld = true, string locationItemName = "New Location")
 		{
 			var coordinateArray = new string[] { LatLon.x + ", " + LatLon.y };
 
@@ -672,7 +672,9 @@ namespace Mapbox.Unity.Map
 			};
 
 			if (callback != null)
+			{
 				item.OnAllPrefabsInstantiated += callback;
+			}
 
 			if(!_vectorData.LayerProperty.vectorSubLayers.Contains(item))
 			{
@@ -686,7 +688,7 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		/// <param name="prefab"> A Game Object Prefab.</param>
 		/// <param name="LatLon">A Vector2d(Latitude Longitude) object</param>
-		public void PlacePrefabAtGeoLocation(GameObject prefab, Vector2d[] LatLon, Action<List<GameObject>> callback = null, bool scaleDownWithWorld = true, string locationItemName = "New Location")
+		public void SpawnPrefabAtGeoLocation(GameObject prefab, Vector2d[] LatLon, Action<List<GameObject>> callback = null, bool scaleDownWithWorld = true, string locationItemName = "New Location")
 		{
 			var coordinateArray = new string[LatLon.Length];
 			for (int i = 0; i < LatLon.Length; i++)
@@ -727,7 +729,7 @@ namespace Mapbox.Unity.Map
 		/// <param name="density">Density (Integer value between 1 and 30)</param>
 		/// <param name="locationItemName">Name of this location prefab item for future reference</param>
 		/// <param name="scaleDownWithWorld">Should the prefab scale up/down along with the map game object?</param>
-		public void PlacePrefabForCategories(GameObject prefab, LocationPrefabCategories categories = LocationPrefabCategories.AnyCategory, int density = 30, Action<List<GameObject>> callback = null, bool scaleDownWithWorld = true, string locationItemName = "New Location")
+		public void SpawnPrefabByCategory(GameObject prefab, LocationPrefabCategories categories = LocationPrefabCategories.AnyCategory, int density = 30, Action<List<GameObject>> callback = null, bool scaleDownWithWorld = true, string locationItemName = "New Location")
 		{
 			PrefabItemOptions item = new PrefabItemOptions()
 			{
@@ -768,7 +770,7 @@ namespace Mapbox.Unity.Map
 		/// <param name="locationItemName">Name of this location prefab item for future reference</param>
 		/// <param name="scaleDownWithWorld">Should the prefab scale up/down along with the map game object?</param>
 		/// </summary>
-		public void PlacePrefabIfPOIContainsName(GameObject prefab, string nameString, int density = 30, Action<List<GameObject>> callback = null, bool scaleDownWithWorld = true, string locationItemName = "New Location")
+		public void SpawnPrefabByName(GameObject prefab, string nameString, int density = 30, Action<List<GameObject>> callback = null, bool scaleDownWithWorld = true, string locationItemName = "New Location")
 		{
 			PrefabItemOptions item = new PrefabItemOptions()
 			{
