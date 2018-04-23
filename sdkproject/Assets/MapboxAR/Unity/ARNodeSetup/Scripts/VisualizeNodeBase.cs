@@ -33,7 +33,7 @@
 			_lineRend.startWidth = _lineWidth;
 			_lineRend.endWidth = _lineWidth;
 			_lineRend.material = _nodeMaterial;
-
+			_lineRend.useWorldSpace = false;
 			_nodeBase.NodeAdded += PlotRoute;
 
 		}

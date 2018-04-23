@@ -7,6 +7,7 @@
 	using System;
 	using Mapbox.MapMatching;
 	using Mapbox.Utils;
+	using System.Threading.Tasks;
 
 	public class CentralizedARLocator : MonoBehaviour
 	{
@@ -38,23 +39,23 @@
 		Node[] _nodes;
 		Location _highestLocation;
 
-		IEnumerator _checkNodes;
-		WaitForSeconds _waitFor;
-
 		public static Action<Location> OnNewHighestAccuracyGPS;
 
 		void Start()
 		{
 			LocationProviderFactory.Instance.DefaultLocationProvider.OnLocationUpdated += SaveHighestAccuracy;
 			_mapMathching.ReturnMapMatchCoords += GetMapMatchingCoords;
-			_waitFor = new WaitForSeconds(10);
-			_checkNodes = FindBestNodes();
-			Invoke("hack", 10f);
+			Invoke("hack", 5f);
 		}
 
 		void hack()
 		{
-			StartCoroutine(_checkNodes);
+			for (int i = 0; i < _nodeSyncs.Length; i++)
+			{
+				_nodeSyncs[i].InitializeNodeBase();
+			}
+
+			FindBestNodes();
 		}
 
 		void SaveHighestAccuracy(Location location)
@@ -74,22 +75,25 @@
 			}
 		}
 
-		IEnumerator FindBestNodes()
+		async void FindBestNodes()
 		{
 
 			while (true)
 			{
 				foreach (var nodeSync in _nodeSyncs)
 				{
-					var average = CheckAverageAccuracy(nodeSync, _amountOfNodesToCheck);
-					if (average <= _desiredAccuracy)
+					if (nodeSync.ReturnNodes().Length >= _amountOfNodesToCheck)
 					{
-						// TODO: Do map matching based on Nodes.
-						_mapMathching.MapMatchQuery(nodeSync.ReturnNodes());
+						var average = CheckAverageAccuracy(nodeSync, _amountOfNodesToCheck);
+
+						if (average <= _desiredAccuracy)
+						{
+							_mapMathching.MapMatchQuery(nodeSync.ReturnNodes());
+						}
 					}
 				}
 
-				yield return _waitFor;
+				await Task.Delay(TimeSpan.FromSeconds(10));
 			}
 		}
 
@@ -97,12 +101,6 @@
 		{
 			var nodes = syncBase.ReturnNodes();
 			int accuracy = 0;
-
-			if (howManyNodes > nodes.Length)
-			{
-				Debug.Log("Not enough nodes!");
-				return 100;
-			}
 
 			for (int i = 1; i < howManyNodes; i++)
 			{

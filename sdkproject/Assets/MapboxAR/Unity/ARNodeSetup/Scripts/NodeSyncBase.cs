@@ -19,6 +19,10 @@
 		/// <returns>The latest node.</returns>
 		public abstract Node ReturnLatestNode();
 		/// <summary>
+		/// Initializes the node base.
+		/// </summary>
+		public abstract void InitializeNodeBase();
+		/// <summary>
 		/// An event that is called when a node is added.
 		/// </summary>
 		public Action NodeAdded;

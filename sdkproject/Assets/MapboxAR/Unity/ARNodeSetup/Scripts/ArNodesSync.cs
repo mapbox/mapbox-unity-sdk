@@ -6,6 +6,7 @@
 	using UnityEngine;
 	using Mapbox.Unity.Map;
 	using Mapbox.Unity.Location;
+	using System.Threading.Tasks;
 
 	/// <summary>
 	///  Generates and filters ArNodes for ARLocationManager.
@@ -27,26 +28,13 @@
 		WaitForSeconds _waitFor;
 		int _latestBestGPSAccuracy;
 
-		void Start()
+		public override void InitializeNodeBase()
 		{
-			//TODO : This needs to have InitializdedARMode notifier.
-			//That is notified on ARPlanePlacement....
-			//_map.Initialize();
-			//OOOOR actually this should start running from CentralizedArLocator...
-			// NodeSyncBase call that calls for Run!
-
 			_waitFor = new WaitForSeconds(_secondsBetweenDropCheck);
 			_savedNodes = new List<Node>();
 			CentralizedARLocator.OnNewHighestAccuracyGPS += SavedGPSAccuracy;
-
-			//Then you wont need this fucking crazy shenanigans...
-			Action handler = null;
-			handler = () =>
-			{
-				StartCoroutine(SaveArNodes(_targetTransform));
-				_map.OnInitialized -= handler;
-			};
-			_map.OnInitialized += handler;
+			Debug.Log("Initialized ARNodes");
+			SaveArNodes(_targetTransform);
 		}
 
 		void SavedGPSAccuracy(Location location)
@@ -54,12 +42,12 @@
 			_latestBestGPSAccuracy = location.Accuracy;
 		}
 
-		IEnumerator SaveArNodes(Transform dropTransform)
+		async void SaveArNodes(Transform dropTransform)
 		{
 			while (true)
 			{
 				ConvertToNodes(dropTransform);
-				yield return _waitFor;
+				await Task.Delay(TimeSpan.FromSeconds(1));
 			}
 		}
 
@@ -70,7 +58,7 @@
 			{
 				var previousNodePos = _map.GeoToWorldPosition(_savedNodes[_savedNodes.Count - 1].LatLon, false);
 				var currentMagnitude = nodeDrop.position - previousNodePos;
-
+				Debug.Log("ARNode Magnitude: " + currentMagnitude);
 				if (currentMagnitude.magnitude >= _minMagnitudeBetween)
 				{
 					var node = new Node();

@@ -22,6 +22,12 @@
 		IEnumerator _mapMatching, _waitForRequest;
 		WaitForSeconds _waitFor;
 
+
+		public override void InitializeNodeBase()
+		{
+			throw new NotImplementedException();
+		}
+
 		public void MapMatchQuery(Node[] nodes)
 		{
 
