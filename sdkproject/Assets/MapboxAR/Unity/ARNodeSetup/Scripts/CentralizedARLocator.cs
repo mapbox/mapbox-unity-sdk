@@ -8,12 +8,15 @@
 	using Mapbox.MapMatching;
 	using Mapbox.Utils;
 	using System.Threading.Tasks;
+	using UnityARInterface;
 
 	public class CentralizedARLocator : MonoBehaviour
 	{
 
 		// TODO : Snap should happening here for things to happen...
 		// Lol. Snap Snap Snap... after yeach new better GPS val...
+		[SerializeField]
+		ARInterface _arInterface;
 
 		[SerializeField]
 		ARMapMatching _mapMathching;
@@ -41,6 +44,8 @@
 
 		public static Action<Location> OnNewHighestAccuracyGPS;
 
+		ARInterface.CustomTrackingState _trackingState;
+
 		void Start()
 		{
 			LocationProviderFactory.Instance.DefaultLocationProvider.OnLocationUpdated += SaveHighestAccuracy;
@@ -56,6 +61,18 @@
 			}
 
 			FindBestNodes();
+		}
+
+		void CheckTracking()
+		{
+			var tracking = new ARInterface.CustomTrackingState();
+			if (_arInterface.GetTrackingState(ref tracking))
+			{
+				if (tracking == ARInterface.CustomTrackingState.Good)
+				{
+					// Blah blah..
+				}
+			}
 		}
 
 		void SaveHighestAccuracy(Location location)
