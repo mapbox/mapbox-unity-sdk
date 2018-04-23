@@ -33,6 +33,8 @@
 		private WaitForSeconds _wait1sec;
 		private WaitForSeconds _wait5sec;
 		private WaitForSeconds _wait60sec;
+		/// <summary>polls location provider only at the requested update intervall to reduce load</summary>
+		private WaitForSeconds _waitUpdateTime;
 		private bool _disposed;
 		private static object _lock = new object();
 		private Coroutine _pollLocation;
@@ -99,6 +101,15 @@
 			_wait1sec = new WaitForSeconds(1);
 			_wait5sec = new WaitForSeconds(5);
 			_wait60sec = new WaitForSeconds(60);
+			// throttle if entered update intervall is unreasonably low
+			if (_updateTimeInMilliSeconds < 500)
+			{
+				_waitUpdateTime = new WaitForSeconds(500);
+			}
+			else
+			{
+				_waitUpdateTime = new WaitForSeconds(_updateTimeInMilliSeconds / 1000);
+			}
 
 			_currentLocation.IsLocationServiceEnabled = false;
 			_currentLocation.IsLocationServiceInitializing = true;
@@ -168,6 +179,7 @@
 				// couldn't get player activity, wait and retry
 				if (null == _activityContext)
 				{
+					SendLocation(_currentLocation);
 					yield return _wait60sec;
 					getActivityContext();
 					continue;
@@ -175,6 +187,7 @@
 				// couldn't get gps plugin instance, wait and retry
 				if (null == _gpsInstance)
 				{
+					SendLocation(_currentLocation);
 					yield return _wait60sec;
 					getGpsInstance();
 					continue;
@@ -187,6 +200,7 @@
 				// check from time to time
 				if (!locationServiceAvailable)
 				{
+					SendLocation(_currentLocation);
 					_gpsInstance.Call("stopLocationListeners");
 					yield return _wait5sec;
 					_gpsInstance.Call("startLocationListeners", _updateDistanceInMeters, _updateTimeInMilliSeconds);
@@ -198,45 +212,21 @@
 				// if we got till here it means location services are running
 				_currentLocation.IsLocationServiceInitializing = false;
 
-
-				bool networkEnabled = _gpsInstance.Get<bool>("isNetworkEnabled");
-				bool gpsEnabled = _gpsInstance.Get<bool>("isGpsEnabled");
-				bool hasFix = _gpsInstance.Get<bool>("hasGpsFix");
-				int time2firstFix = _gpsInstance.Get<int>("timeToFirstGpsFix");
-				int satsInView = _gpsInstance.Get<int>("satellitesInView");
-				int satsUsed = _gpsInstance.Get<int>("satellitesUsedInFix");
-
-
 				try
 				{
-
 					AndroidJavaObject locNetwork = _gpsInstance.Get<AndroidJavaObject>("lastKnownLocationNetwork");
 					AndroidJavaObject locGps = _gpsInstance.Get<AndroidJavaObject>("lastKnownLocationGps");
 
-					if (null != locGps)
-					{
-						float acc = locGps.Call<float>("getAccuracy");
-						// TODO: getBearingAccuracyDegrees
-						float hdg = locGps.Call<float>("getBearing");
-					}
+					// easy cases: neither or either gps location or network location available
+					if (null == locGps & null == locNetwork) { populateCurrentLocation(null); }
+					if (null != locGps && null == locNetwork) { populateCurrentLocation(locGps); }
+					if (null == locGps && null != locNetwork) { populateCurrentLocation(locNetwork); }
 
-					if (null != locNetwork)
-					{
-						float accNetwork = locNetwork.Call<float>("getAccuracy");
-						float hdg = locNetwork.Call<float>("getBearing");
-					}
+					// gps- and network location available: figure out which one to use
+					if (null != locGps && null != locNetwork) { populateWithBetterLocation(locGps, locNetwork); }
 
-					// TODO evaluate which location to send
-					// just use GPS during backporting
-					if (null != locGps)
-					{
-						double lat = locGps.Call<double>("getLatitude");
-						double lng = locGps.Call<double>("getLongitude");
-						_currentLocation.LatitudeLongitude = new Utils.Vector2d(lat, lng);
-						_currentLocation.Accuracy= (int)locGps.Call<float>("getAccuracy");
-						SendLocation(_currentLocation);
-					}
 
+					SendLocation(_currentLocation);
 				}
 				catch (Exception ex)
 				{
@@ -244,8 +234,82 @@
 				}
 
 
-				yield return _wait1sec;
+				yield return _waitUpdateTime;
 			}
+		}
+
+
+		private void populateCurrentLocation(AndroidJavaObject location)
+		{
+			if (null == location)
+			{
+				_currentLocation.IsHeadingUpdated = false;
+				_currentLocation.IsHeadingUpdated = false;
+				return;
+			}
+
+			double lat = location.Call<double>("getLatitude");
+			double lng = location.Call<double>("getLongitude");
+			Utils.Vector2d newLatLng = new Utils.Vector2d(lat, lng);
+			_currentLocation.IsLocationUpdated = !newLatLng.Equals(_currentLocation.LatitudeLongitude);
+			_currentLocation.LatitudeLongitude = newLatLng;
+			_currentLocation.Accuracy = location.Call<float>("getAccuracy");
+			// divide by 1000. Android uses milliseconds
+			_currentLocation.Timestamp = location.Call<long>("getTime") / 1000;
+			_currentLocation.Provider = location.Call<string>("getProvider");
+			float newHeading = location.Call<float>("getBearing");
+			_currentLocation.IsHeadingUpdated = newHeading != _currentLocation.Heading;
+			_currentLocation.Heading = newHeading;
+			_currentLocation.HeadingAccuracy = location.Call<float>("getBearingAccuracyDegrees");
+			_currentLocation.SpeedMetersPerSecond = location.Call<float>("getSpeed");
+
+			bool networkEnabled = _gpsInstance.Get<bool>("isNetworkEnabled");
+			bool gpsEnabled = _gpsInstance.Get<bool>("isGpsEnabled");
+			if (!gpsEnabled)
+			{
+				_currentLocation.HasGpsFix = null;
+				_currentLocation.SatellitesInView = null;
+				_currentLocation.SatellitesUsed = null;
+			}
+			else
+			{
+				_currentLocation.HasGpsFix = _gpsInstance.Get<bool>("hasGpsFix");
+				//int time2firstFix = _gpsInstance.Get<int>("timeToFirstGpsFix");
+				_currentLocation.SatellitesInView = _gpsInstance.Get<int>("satellitesInView");
+				_currentLocation.SatellitesUsed = _gpsInstance.Get<int>("satellitesUsedInFix");
+			}
+
+		}
+
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="locGps"></param>
+		/// <param name="locNetwork"></param>
+		private void populateWithBetterLocation(AndroidJavaObject locGps, AndroidJavaObject locNetwork)
+		{
+
+			// check which location is fresher
+			long timestampGps = locGps.Call<long>("getTime");
+			long timestampNet = locNetwork.Call<long>("getTime");
+			if (timestampGps > timestampNet)
+			{
+				populateCurrentLocation(locGps);
+				return;
+			}
+
+			// check which location has better accuracy
+			float accuracyGps = locGps.Call<float>("getAccuracy");
+			float accuracyNet = locNetwork.Call<float>("getAccuracy");
+			if (accuracyGps < accuracyNet)
+			{
+				populateCurrentLocation(locGps);
+				return;
+			}
+
+			// default to network
+			populateCurrentLocation(locNetwork);
 		}
 
 

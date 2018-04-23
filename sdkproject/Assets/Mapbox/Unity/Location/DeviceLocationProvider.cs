@@ -52,6 +52,7 @@ namespace Mapbox.Unity.Location
 		void Awake()
 		{
 			_wait1sec = new WaitForSeconds(1f);
+			_currentLocation.Provider = "unity";
 
 			if (_pollRoutine == null)
 			{
