@@ -9,10 +9,9 @@
 	[Serializable]
 	public class VectorLayer : IVectorDataLayer
 	{
-		public VectorLayer()
-		{
-			_locationPrefabsLayerProperties = new LocationPrefabsLayerProperties();	
-		}
+		[SerializeField]
+		LocationPrefabsLayerProperties _locationPrefabsLayerProperties = new LocationPrefabsLayerProperties();	
+
 
 		[SerializeField]
 		VectorLayerProperties _layerProperty = new VectorLayerProperties();
@@ -124,21 +123,24 @@
 		public void Initialize()
 		{
 			_vectorTileFactory = ScriptableObject.CreateInstance<VectorTileFactory>();
-			foreach(var item in _locationPrefabsLayerProperties.locationPrefabList)
+			if (_layerProperty.sourceType != VectorSourceType.None || _layerProperty.sourceOptions.Id.Contains(MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id))
 			{
-				//Add PrefabItemOptions items as a VectorSubLayerProperties
-				if(!_layerProperty.vectorSubLayers.Contains(item))
+				foreach (var item in _locationPrefabsLayerProperties.locationPrefabList)
 				{
 					//Add PrefabItemOptions items as a VectorSubLayerProperties
-					if (_layerProperty.sourceType == VectorSourceType.Custom || _layerProperty.sourceType == VectorSourceType.None)
+					if (!_layerProperty.vectorSubLayers.Contains(item))
 					{
-						if (_layerProperty.sourceType == VectorSourceType.None)
-							_layerProperty.sourceOptions.Id = "";
-						//This is the style id we need for instantiating POI location prefabs
-						Style streetsVectorSource = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets);
-						AddLayerSource(streetsVectorSource.Id);
+						//Add PrefabItemOptions items as a VectorSubLayerProperties
+						//if (_layerProperty.sourceType == VectorSourceType.Custom || _layerProperty.sourceType == VectorSourceType.None)
+						//{
+						//	if (_layerProperty.sourceType == VectorSourceType.None)
+						//		_layerProperty.sourceOptions.Id = "";
+						//	//This is the style id we need for instantiating POI location prefabs
+						//	Style streetsVectorSource = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets);
+						//	AddLayerSource(streetsVectorSource.Id);
+						//}
+						AddVectorLayer(item);
 					}
-					AddVectorLayer(item);
 				}
 			}
 			_vectorTileFactory.SetOptions(_layerProperty);
@@ -166,8 +168,6 @@
 		}
 		private VectorTileFactory _vectorTileFactory;
 
-		[SerializeField]
-		LocationPrefabsLayerProperties _locationPrefabsLayerProperties;
 		public LocationPrefabsLayerProperties LocationPrefabsLayerProperties
 		{
 			get
