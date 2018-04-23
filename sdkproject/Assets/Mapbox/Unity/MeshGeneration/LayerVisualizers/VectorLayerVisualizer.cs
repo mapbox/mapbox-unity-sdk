@@ -325,7 +325,7 @@
 				return;
 
 			//this will be improved in next version and will probably be replaced by filters
-			var styleSelectorKey = FindSelectorKey(feature);
+			var styleSelectorKey = _layerProperties.coreOptions.sublayerName;
 
 			var meshData = new MeshData();
 			meshData.TileRect = tile.Rect;
