@@ -1,7 +1,9 @@
-﻿## CHANGELOG
+## CHANGELOG
+ ### v.1.4.2
+*??/??/2018*
 
-### v.?.?.?
-*??/??/????*
+##### New Features
+- Add `OnUpdated` event to `AbstractMap`. Enables subscribers to get a notification when the map location and/or zoom gets updated.
 
 ##### Improvements
 - `UnityARInterface` updated to [commit 67351b6](https://github.com/Unity-Technologies/experimental-ARInterface/commit/67351b66ff9af28380e7dd5f5b2f4ba1bf802ca8) from March 1st 2018
