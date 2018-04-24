@@ -762,8 +762,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a38712e93231418a84665190b8473d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _desiredAccuracyInMeters: 5
-  _updateDistanceInMeters: 5
+  _desiredAccuracyInMeters: 100
+  _updateDistanceInMeters: 1
 --- !u!114 &1908994633
 MonoBehaviour:
   m_ObjectHideFlags: 0
