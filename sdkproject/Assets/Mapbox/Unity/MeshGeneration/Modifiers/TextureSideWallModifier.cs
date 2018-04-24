@@ -139,7 +139,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					//0-33% gets 1 window, 33-66 gets 2, 66-100 gets all three
 					//we're not wrapping/repeating texture as it won't work with atlases
 					columnScaleRatio = Math.Min(1, d / _scaledPreferredWallLength);
-					rightOfEdgeUv = _currentTextureRect.xMin + _currentTextureRect.size.x * Math.Min(1, ((float)(Math.Floor(columnScaleRatio * _currentFacade.ColumnCount) + 1) / _currentFacade.ColumnCount));
+					rightOfEdgeUv = _currentTextureRect.xMin + _currentTextureRect.size.x * columnScaleRatio; // Math.Min(1, ((float)(Math.Floor(columnScaleRatio * _currentFacade.ColumnCount) + 1) / _currentFacade.ColumnCount));
 					bottomOfTopUv = _currentTextureRect.yMax - (_currentTextureRect.size.y * _currentFacade.TopSectionRatio); //not doing that scaling thing for y axis and floors yet
 					topOfBottomUv = _currentTextureRect.yMin + (_currentTextureRect.size.y * _currentFacade.BottomSectionRatio); // * (Mathf.Max(1, (float)Math.Floor(tby * textureSection.TopSectionFloorCount)) / textureSection.TopSectionFloorCount);
 
@@ -366,35 +366,64 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				sc = md.Vertices[md.Edges[i + 1]];
 
 				dist = Vector3.Distance(fs, sc);
-				step = Mathf.Min(_maxEdgeSectionCount, dist / _scaledPreferredWallLength);
+				var singleColumn = _scaledPreferredWallLength / _currentFacade.ColumnCount;
 
+				var leftOver = dist % singleColumn;
+				var currentWall = dist;
 				start = fs;
-				edgeList.Add(start);
 				wallDirection = (sc - fs).normalized;
-				if (_centerSegments && step > 1)
+
+				if (_centerSegments)
 				{
-					dif = dist - ((int)step * _scaledPreferredWallLength);
-					//prevent new point being to close to existing corner
-					if (dif > 2 * tile.TileScale)
-					{
-						//first step, original point or another close point if sections are centered
-						start = fs + (wallDirection * (dif / 2));
-						//to compansate step-1 below, so if there's more than 2m to corner, go one more step
-					}
 					edgeList.Add(start);
+					start = start + wallDirection * (leftOver / 2);
 					edgeList.Add(start);
+					leftOver = leftOver / 2;
 				}
-				if (step > 1)
+								
+				while(currentWall > singleColumn)
 				{
-					for (int s = 1; s < step; s++)
-					{
-						var da = start + wallDirection * s * _scaledPreferredWallLength;
-						edgeList.Add(da);
-						edgeList.Add(da);
-					}
+					edgeList.Add(start);
+					var singleColumnCount = (float)Math.Min(_currentFacade.ColumnCount, Math.Floor(currentWall / singleColumn));
+					var stepRatio = singleColumnCount / _currentFacade.ColumnCount;
+					start = start + wallDirection * (stepRatio * _scaledPreferredWallLength);
+					edgeList.Add(start);
+					currentWall -= (stepRatio * _scaledPreferredWallLength);
 				}
 
-				edgeList.Add(sc);
+				if(leftOver > 0)
+				{
+					edgeList.Add(start);
+					edgeList.Add(sc);
+				}
+
+				//step = Mathf.Min(_maxEdgeSectionCount, dist / _scaledPreferredWallLength);
+
+				//edgeList.Add(start);
+				//if (_centerSegments && step > 1)
+				//{
+				//	dif = dist - ((int)step * _scaledPreferredWallLength);
+				//	//prevent new point being to close to existing corner
+				//	if (dif > 2 * tile.TileScale)
+				//	{
+				//		//first step, original point or another close point if sections are centered
+				//		start = fs + (wallDirection * (dif / 2));
+				//		//to compansate step-1 below, so if there's more than 2m to corner, go one more step
+				//	}
+				//	edgeList.Add(start);
+				//	edgeList.Add(start);
+				//}
+				//if (step > 1)
+				//{
+				//	for (int s = 1; s < step; s++)
+				//	{
+				//		var da = start + wallDirection * s * _scaledPreferredWallLength;
+				//		edgeList.Add(da);
+				//		edgeList.Add(da);
+				//	}
+				//}
+
+				//edgeList.Add(sc);
 			}
 		}
 
