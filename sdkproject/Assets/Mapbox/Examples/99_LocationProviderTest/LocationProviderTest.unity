@@ -557,7 +557,7 @@ MonoBehaviour:
   _options:
     locationOptions:
       latitudeLongitude: 48.85825,2.29450
-      zoom: 15.57
+      zoom: 16
     extentOptions:
       extentType: 1
       cameraBoundsOptions:
@@ -576,7 +576,7 @@ MonoBehaviour:
         disposeBuffer: 0
     placementOptions:
       placementType: 1
-      snapMapToZero: 1
+      snapMapToZero: 0
     scalingOptions:
       scalingType: 1
       unityTileSize: 100
@@ -667,7 +667,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _map: {fileID: 1411663281}
-  _positionFollowFactor: 0
+  _positionFollowFactor: 0.1
   _useTransformLocationProvider: 0
 --- !u!114 &1411663284
 MonoBehaviour:
@@ -742,14 +742,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _accuracy: 5
   _autoFireEvent: 1
-  _updateInterval: 1500
+  _updateInterval: 1
   _sendEvent: 0
   _latitudeLongitude:
-  - 48.859489, 2.320582
-  - 44.83778, -0.57944
-  - 47.915735, 2.30547
-  - 48.57333, 7.75222
-  - 48.62778, 2.66556
+  - 48.859489, 2.32000
+  - 48.859489, 2.32005
+  - 48.859489, 2.32010
+  - 48.859489, 2.32015
+  - 48.859489, 2.32020
   _heading: 112
 --- !u!114 &1908994632
 MonoBehaviour:
@@ -778,7 +778,7 @@ MonoBehaviour:
   mapManager: {fileID: 1411663281}
   _deviceLocationProviderUnity: {fileID: 1908994632}
   _deviceLocationProviderAndroid: {fileID: 1908994635}
-  _editorLocationProvider: {fileID: 1908994632}
+  _editorLocationProvider: {fileID: 1908994631}
   _transformLocationProvider: {fileID: 1908994630}
   _dontDestroyOnLoad: 0
 --- !u!4 &1908994634
