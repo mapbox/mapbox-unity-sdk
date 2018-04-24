@@ -46,13 +46,20 @@ namespace Mapbox.Examples.Scripts
 			sb.AppendLine(string.Format("UTC time; device:{0} location:{1}", DateTime.UtcNow.ToString("yyyyMMdd HHmmss"), UnixTimestampUtils.From(location.Timestamp).ToString("yyyyMMdd HHmmss")));
 			sb.AppendLine(string.Format(_invariantCulture, "position: {0:0.00000000} / {1:0.00000000}", location.LatitudeLongitude.x, location.LatitudeLongitude.y));
 			sb.AppendLine(string.Format(_invariantCulture, "accuracy: {0:0.0}m", location.Accuracy));
-			sb.AppendLine(string.Format(_invariantCulture, "heading: {0:0.0}°", location.Heading));
+			sb.AppendLine(string.Format(_invariantCulture, "heading: {0:0.0}Â°", location.Heading));
 			sb.AppendLine(string.Format(_invariantCulture, "speed: {0:0.0}km/h", location.SpeedKmPerHour));
-			sb.AppendLine(string.Format("HasGpsFix: {0}", location.HasGpsFix));
-			sb.AppendLine(string.Format("SatellitesUsed: {0} SatellitesInView:{1}", location.SatellitesUsed, location.SatellitesInView));
+			sb.AppendLine(string.Format("HasGpsFix: {0}", nullableAsStr<bool>(location.HasGpsFix)));
+			sb.AppendLine(string.Format("SatellitesUsed: {0} SatellitesInView:{1}", nullableAsStr<int>(location.SatellitesUsed), nullableAsStr<int>(location.SatellitesInView)));
 
 			_logText.text = sb.ToString();
 		}
+
+		private string nullableAsStr<T>(T? val) where T : struct
+		{
+			if (null == val) { return "not supported by provider"; }
+			return val.Value.ToString();
+		}
+
 
 
 		// Update is called once per frame

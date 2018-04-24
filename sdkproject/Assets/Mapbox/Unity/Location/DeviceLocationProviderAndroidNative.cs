@@ -200,6 +200,12 @@
 				// check from time to time
 				if (!locationServiceAvailable)
 				{
+					_currentLocation.IsLocationServiceInitializing = true;
+					_currentLocation.Accuracy = 0;
+					_currentLocation.HasGpsFix = false;
+					_currentLocation.SatellitesInView = 0;
+					_currentLocation.SatellitesUsed = 0;
+
 					SendLocation(_currentLocation);
 					_gpsInstance.Call("stopLocationListeners");
 					yield return _wait5sec;
@@ -263,8 +269,8 @@
 			_currentLocation.HeadingAccuracy = location.Call<float>("getBearingAccuracyDegrees");
 			_currentLocation.SpeedMetersPerSecond = location.Call<float>("getSpeed");
 
-			bool networkEnabled = _gpsInstance.Get<bool>("isNetworkEnabled");
-			bool gpsEnabled = _gpsInstance.Get<bool>("isGpsEnabled");
+			bool networkEnabled = _gpsInstance.Call<bool>("getIsNetworkEnabled");
+			bool gpsEnabled = _gpsInstance.Call<bool>("getIsGpsEnabled");
 			if (!gpsEnabled)
 			{
 				_currentLocation.HasGpsFix = null;
