@@ -50,12 +50,18 @@
 			//Instantiate(GameObject.CreatePrimitive(PrimitiveType.Sphere), nodePos, Quaternion.identity, _map.gameObject.transform);
 
 			var nodes = _nodeBase.ReturnNodes();
-			_lineRend.positionCount = nodes.Length;
+			var length = nodes.Length;
+			_lineRend.positionCount = length;
 
-			for (int i = 0; i < _nodeBase.ReturnNodes().Length; i++)
+			if (length - 1 > 0)
 			{
-				_lineRend.SetPosition(i, _map.GeoToWorldPosition(nodes[i].LatLon));
+				_lineRend.SetPosition(length - 1, _map.GeoToWorldPosition(nodes[length - 1].LatLon));
 			}
+
+			//for (int i = 0; i < _nodeBase.ReturnNodes().Length; i++)
+			//{
+			//	_lineRend.SetPosition(i, _map.GeoToWorldPosition(nodes[i].LatLon));
+			//}
 		}
 
 		private void OnDisable()
