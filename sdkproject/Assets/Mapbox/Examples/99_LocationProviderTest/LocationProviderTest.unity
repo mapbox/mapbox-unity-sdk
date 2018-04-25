@@ -427,7 +427,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _map: {fileID: 1411663281}
-  _positionFollowFactor: 0.9
+  _positionFollowFactor: 2
   _useTransformLocationProvider: 0
 --- !u!4 &561771269
 Transform:
@@ -718,7 +718,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 061d2afb48ace4fd19611279b6cf732f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rotationFollowFactor: 0.5
+  _rotationFollowFactor: 2
   _rotateZ: 0
   _useTransformLocationProvider: 0
 --- !u!1 &1411663280
@@ -1062,7 +1062,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _updateDistanceInMeters: 0.5
-  _updateTimeInMilliSeconds: 1000
+  _updateTimeInMilliSeconds: 500
 --- !u!4 &2054056460
 Transform:
   m_ObjectHideFlags: 0
