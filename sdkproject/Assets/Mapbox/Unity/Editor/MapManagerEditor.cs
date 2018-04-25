@@ -345,23 +345,16 @@
 
 		}
 
-		private PropertyDataType GetPropertyDataType(string propertyDescription)
-		{
-			if (propertyDescription.ToLower().Contains("number"))
-				return PropertyDataType.Number;
-			
-			return PropertyDataType.String;
-		}
-
 		private void ProcessTileJSONData(TileJSONResponse tjr)
 		{
 			TileJSONResponse response = tjr;
 			EditorTileJSONData tileJSONData = EditorTileJSONData.Instance;
+			tileJSONData.ClearData();
 
 			List<string> layerPropertiesList = new List<string>();
 			List<string> sourceLayersList = new List<string>();
 
-			if (response.VectorLayers == null && response.VectorLayers.Length == 0)
+			if (response==null || response.VectorLayers == null || response.VectorLayers.Length == 0)
 			{
 				return;
 			}
@@ -369,7 +362,6 @@
 			var propertyName = "";
 			var propertyDescription = "";
 			var layerSource = "";
-			PropertyDataType propertyDataType = PropertyDataType.Number;
 
 			foreach (var layer in response.VectorLayers)
 			{
@@ -377,34 +369,31 @@
 				layerPropertiesList = new List<string>();
 				layerSource = layer.Source;
 
+				if (layer.Fields.Count == 0)
+					continue;
+				
 				foreach (var property in layer.Fields)
 				{
 					propertyName = property.Key;
 					propertyDescription = property.Value;
-					propertyDataType = GetPropertyDataType(propertyDescription);
 					layerPropertiesList.Add(propertyName);
 
-					//adding data type for the property to the dictionary
-					if (tileJSONData.PropertyDataTypeDictionary.ContainsKey(propertyName))
-						tileJSONData.PropertyDataTypeDictionary[propertyName] = propertyDataType;
-					else
-						tileJSONData.PropertyDataTypeDictionary.Add(propertyName, propertyDataType);
-
 					//adding property descriptions
-					if (tileJSONData.PropertyDescriptionDictionary.ContainsKey(propertyName))
-						tileJSONData.PropertyDescriptionDictionary[propertyName] = propertyDescription;
+					if (tileJSONData.LayerPropertyDescriptionDictionary.ContainsKey(layerName))
+					{
+						if (tileJSONData.LayerPropertyDescriptionDictionary[layerName].ContainsKey(propertyName))
+						{
+							tileJSONData.LayerPropertyDescriptionDictionary[layerName][propertyName] = propertyDescription;
+						}
+						else
+						{
+							tileJSONData.LayerPropertyDescriptionDictionary[layerName].Add(propertyName, propertyDescription);
+						}
+					}
 					else
-						tileJSONData.PropertyDescriptionDictionary.Add(propertyName, propertyDescription);
-				}
-
-				//loading layerproperty dictionary
-				if (tileJSONData.LayerPropertyDictionary.ContainsKey(layerName))
-				{
-					tileJSONData.LayerPropertyDictionary[layerName].AddRange(layerPropertiesList);
-				}
-				else
-				{
-					tileJSONData.LayerPropertyDictionary.Add(layerName, layerPropertiesList);
+					{
+						tileJSONData.LayerPropertyDescriptionDictionary.Add(layerName, new Dictionary<string, string>() { { propertyName, propertyDescription } });
+					}
 				}
 
 				//loading layer sources
@@ -420,7 +409,35 @@
 				//loading layers to a data source
 				if (tileJSONData.SourceLayersDictionary.ContainsKey(layerSource))
 				{
-					tileJSONData.SourceLayersDictionary[layerSource].Add(layerName);
+					string commonLayersKey = tileJSONData.commonLayersKey;
+					List<string> sourceList = new List<string>();
+					tileJSONData.LayerSourcesDictionary.TryGetValue(layerName, out sourceList);
+
+					if (sourceList.Count > 1 && sourceList.Contains(layerSource)) // the current layerName has more than one source
+					{
+						if (tileJSONData.SourceLayersDictionary.ContainsKey(commonLayersKey))
+						{
+							tileJSONData.SourceLayersDictionary[commonLayersKey].Add(layerName);
+						}
+						else
+						{
+							tileJSONData.SourceLayersDictionary.Add(commonLayersKey, new List<string>() { layerName });
+						}
+
+						//remove the layer from other different sources
+						foreach (var source in sourceList)
+						{
+							tileJSONData.SourceLayersDictionary[source].Remove(layerName);
+
+							//if the source contains zero layers remove th source from the list
+							if (tileJSONData.SourceLayersDictionary[source].Count == 0)
+								tileJSONData.SourceLayersDictionary.Remove(source);
+						}
+					}
+					else
+					{
+						tileJSONData.SourceLayersDictionary[layerSource].Add(layerName);
+					}
 				}
 				else
 				{
@@ -429,7 +446,7 @@
 			}
 			
 			tileJSONData.tileJSONLoaded = true;
-			//Debug.Log(tileJSONResponse);
+			Debug.Log(tileJSONData);
 		}
 	}
 }

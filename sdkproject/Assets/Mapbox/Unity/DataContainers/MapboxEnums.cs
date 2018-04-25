@@ -176,13 +176,4 @@
 		[Description("Sphere collider added to the GameObject.")]
 		SphereCollider,
 	}
-
-	/// <summary>
-	/// Data type for the property name derived from the Mapbox tilset layer
-	/// </summary>
-	public enum PropertyDataType
-	{
-		String,
-		Number
-	}
 }

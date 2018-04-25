@@ -14,17 +14,17 @@ public class EditorTileJSONData
 			return _instance;
 		}
 	}
+	public readonly string commonLayersKey = "Common layers across all sources";
 
-	public bool tileJSONLoaded = false;
 	/// <summary>
-	/// List of data sources (tileset ids) linked to a layer name
+	/// This boolean is to check if tile JSON data has loaded after the data source has changed
 	/// </summary>
-	public Dictionary<string, List<string>> LayerPropertyDictionary = new Dictionary<string, List<string>>();
+	public bool tileJSONLoaded = false;
 
 	/// <summary>
 	/// The description of the property in a layer
 	/// </summary>
-	public Dictionary<string, string> PropertyDescriptionDictionary = new Dictionary<string, string>();
+	public Dictionary<string, Dictionary<string,string>> LayerPropertyDescriptionDictionary = new Dictionary<string, Dictionary<string, string>>();
 
 	/// <summary>
 	/// List of data sources (tileset ids) linked to a layer name
@@ -32,12 +32,15 @@ public class EditorTileJSONData
 	public Dictionary<string, List<string>> LayerSourcesDictionary = new Dictionary<string, List<string>>();
 
 	/// <summary>
-	/// The source layers in a dictionary
+	/// Dictionary containting the list of layers in a source
 	/// </summary>
 	public Dictionary<string, List<string>> SourceLayersDictionary = new Dictionary<string, List<string>>();
 
-	/// <summary>
-	/// The data type of the property name in the layer
-	/// </summary>
-	public Dictionary<string, PropertyDataType> PropertyDataTypeDictionary = new Dictionary<string, PropertyDataType>();
+	public void ClearData()
+	{
+		tileJSONLoaded = false;
+		LayerPropertyDescriptionDictionary = new Dictionary<string, Dictionary<string, string>>();
+		LayerSourcesDictionary = new Dictionary<string, List<string>>();
+		SourceLayersDictionary = new Dictionary<string, List<string>>();
+	}
 }
