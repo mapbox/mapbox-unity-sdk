@@ -74,14 +74,21 @@ namespace Mapbox.Examples
 		{
 			if (location.IsHeadingUpdated)
 			{
+				var currentEuler = transform.localRotation.eulerAngles;
 				var euler = Mapbox.Unity.Constants.Math.Vector3Zero;
 				if (_rotateZ)
 				{
 					euler.z = -location.Heading;
+
+					euler.x = currentEuler.x;
+					euler.y = currentEuler.y;
 				}
 				else
 				{
 					euler.y = location.Heading;
+
+					euler.x = currentEuler.x;
+					euler.z = currentEuler.z;
 				}
 
 				_targetRotation = Quaternion.Euler(euler);

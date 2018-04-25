@@ -260,12 +260,23 @@
 			_currentLocation.IsLocationUpdated = !newLatLng.Equals(_currentLocation.LatitudeLongitude);
 			_currentLocation.LatitudeLongitude = newLatLng;
 			_currentLocation.Accuracy = location.Call<float>("getAccuracy");
-			// divide by 1000. Android uses milliseconds
+			// divide by 1000. Android returns milliseconds, we work with seconds
 			_currentLocation.Timestamp = location.Call<long>("getTime") / 1000;
 			_currentLocation.Provider = location.Call<string>("getProvider");
-			float newHeading = location.Call<float>("getBearing");
-			_currentLocation.IsHeadingUpdated = newHeading != _currentLocation.Heading;
-			_currentLocation.Heading = newHeading;
+			bool hasBearing = location.Call<bool>("hasBearing");
+			// only evalute bearing when location object actually has a bearing
+			// Android populates bearing (which is not equal to device orientation)
+			// only when the device is moving.
+			// Otherwise it is set to '0.0'
+			// https://developer.android.com/reference/android/location/Location.html#getBearing()
+			// We don't want that when we rotate a map according to the direction
+			// thes user is moving, thus don't update 'heading' with '0.0' 
+			if (hasBearing)
+			{
+				float newHeading = location.Call<float>("getBearing");
+				_currentLocation.IsHeadingUpdated = newHeading != _currentLocation.Heading;
+				_currentLocation.Heading = newHeading;
+			}
 			_currentLocation.HeadingAccuracy = location.Call<float>("getBearingAccuracyDegrees");
 			_currentLocation.SpeedMetersPerSecond = location.Call<float>("getSpeed");
 
@@ -289,7 +300,7 @@
 
 
 		/// <summary>
-		/// 
+		/// If GPS and network location are available use the newer/better one
 		/// </summary>
 		/// <param name="locGps"></param>
 		/// <param name="locNetwork"></param>
