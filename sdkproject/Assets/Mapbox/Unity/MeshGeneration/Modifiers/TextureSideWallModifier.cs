@@ -198,10 +198,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				}
 				else
 				{
-					md.UV[0].Add(new Vector2(rightOfEdgeUv, topOfMidUv));
-					md.UV[0].Add(new Vector2(rightOfEdgeUv, topOfMidUv));
-					md.UV[0].Add(new Vector2(rightOfEdgeUv, bottomOfMidUv));
-					md.UV[0].Add(new Vector2(rightOfEdgeUv, bottomOfMidUv));
+					md.UV[0].Add(new Vector2(_currentTextureRect.xMin, topOfMidUv));
+					md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.01f, topOfMidUv));
+					md.UV[0].Add(new Vector2(_currentTextureRect.xMin, topOfMidUv - midUvHeight * stepRatio));
+					md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.01f, topOfMidUv - midUvHeight * stepRatio));
 
 				}
 				md.Normals.Add(wallNormal);
@@ -239,10 +239,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			md.Vertices.Add(new Vector3(v2.x, currentY2, v2.z));
 
 
-			md.UV[0].Add(new Vector2(_currentTextureRect.xMin, topOfMidUv));
-			md.UV[0].Add(new Vector2(rightOfEdgeUv, topOfMidUv));
-			md.UV[0].Add(new Vector2(_currentTextureRect.xMin, topOfMidUv));
-			md.UV[0].Add(new Vector2(rightOfEdgeUv, topOfMidUv));
+			md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentTextureRect.yMax));
+			md.UV[0].Add(new Vector2(rightOfEdgeUv, _currentTextureRect.yMax));
+			md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentTextureRect.yMax - 0.015f));
+			md.UV[0].Add(new Vector2(rightOfEdgeUv, _currentTextureRect.yMax - 0.015f));
 
 			md.Normals.Add(wallNormal);
 			md.Normals.Add(wallNormal);
@@ -283,10 +283,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 			else
 			{
-				md.UV[0].Add(new Vector2(rightOfEdgeUv, _currentTextureRect.yMax));
-				md.UV[0].Add(new Vector2(rightOfEdgeUv, _currentTextureRect.yMax));
-				md.UV[0].Add(new Vector2(rightOfEdgeUv, bottomOfTopUv));
-				md.UV[0].Add(new Vector2(rightOfEdgeUv, bottomOfTopUv));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentTextureRect.yMax));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.01f, _currentTextureRect.yMax));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, bottomOfTopUv));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.01f, bottomOfTopUv));
 			}
 
 			md.Normals.Add(wallNormal);
@@ -336,10 +336,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 			else
 			{
-				md.UV[0].Add(new Vector2(rightOfEdgeUv, topOfBottomUv));
-				md.UV[0].Add(new Vector2(rightOfEdgeUv, topOfBottomUv));
-				md.UV[0].Add(new Vector2(rightOfEdgeUv, _currentTextureRect.yMin));
-				md.UV[0].Add(new Vector2(rightOfEdgeUv, _currentTextureRect.yMin));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, topOfBottomUv));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.01f, topOfBottomUv));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentTextureRect.yMin));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.01f, _currentTextureRect.yMin));
 			}
 
 			wallTriangles.Add(ind);
