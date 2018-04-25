@@ -249,7 +249,7 @@
 		{
 			if (null == location)
 			{
-				_currentLocation.IsHeadingUpdated = false;
+				_currentLocation.IsLocationUpdated = false;
 				_currentLocation.IsHeadingUpdated = false;
 				return;
 			}
@@ -257,12 +257,22 @@
 			double lat = location.Call<double>("getLatitude");
 			double lng = location.Call<double>("getLongitude");
 			Utils.Vector2d newLatLng = new Utils.Vector2d(lat, lng);
-			_currentLocation.IsLocationUpdated = !newLatLng.Equals(_currentLocation.LatitudeLongitude);
+			bool coordinatesUpdated = !newLatLng.Equals(_currentLocation.LatitudeLongitude);
 			_currentLocation.LatitudeLongitude = newLatLng;
-			_currentLocation.Accuracy = location.Call<float>("getAccuracy");
+
+			float newAccuracy = location.Call<float>("getAccuracy");
+			bool accuracyUpdated = newAccuracy != _currentLocation.Accuracy;
+			_currentLocation.Accuracy = newAccuracy;
+
 			// divide by 1000. Android returns milliseconds, we work with seconds
-			_currentLocation.Timestamp = location.Call<long>("getTime") / 1000;
-			_currentLocation.Provider = location.Call<string>("getProvider");
+			long newTimestamp = location.Call<long>("getTime") / 1000;
+			bool timestampUpdated = newTimestamp != _currentLocation.Timestamp;
+			_currentLocation.Timestamp = newTimestamp;
+
+			string newProvider = location.Call<string>("getProvider");
+			bool providerUpdated = newProvider != _currentLocation.Provider;
+			_currentLocation.Provider = newProvider;
+
 			bool hasBearing = location.Call<bool>("hasBearing");
 			// only evalute bearing when location object actually has a bearing
 			// Android populates bearing (which is not equal to device orientation)
@@ -271,14 +281,29 @@
 			// https://developer.android.com/reference/android/location/Location.html#getBearing()
 			// We don't want that when we rotate a map according to the direction
 			// thes user is moving, thus don't update 'heading' with '0.0' 
-			if (hasBearing)
+			if (!hasBearing)
+			{
+				_currentLocation.IsHeadingUpdated = false;
+			}
+			else
 			{
 				float newHeading = location.Call<float>("getBearing");
 				_currentLocation.IsHeadingUpdated = newHeading != _currentLocation.Heading;
 				_currentLocation.Heading = newHeading;
 			}
 			_currentLocation.HeadingAccuracy = location.Call<float>("getBearingAccuracyDegrees");
-			_currentLocation.SpeedMetersPerSecond = location.Call<float>("getSpeed");
+
+			float? newSpeed = location.Call<float>("getSpeed");
+			bool speedUpdated = newSpeed != _currentLocation.SpeedMetersPerSecond;
+			_currentLocation.SpeedMetersPerSecond = newSpeed;
+
+			Debug.LogFormat("coords:{0} acc:{1} time:{2} speed:{3}", coordinatesUpdated, accuracyUpdated, timestampUpdated, speedUpdated);
+			_currentLocation.IsLocationUpdated =
+				providerUpdated
+				|| coordinatesUpdated
+				|| accuracyUpdated
+				|| timestampUpdated
+				|| speedUpdated;
 
 			bool networkEnabled = _gpsInstance.Call<bool>("getIsNetworkEnabled");
 			bool gpsEnabled = _gpsInstance.Call<bool>("getIsGpsEnabled");
