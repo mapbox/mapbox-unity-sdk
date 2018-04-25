@@ -80,8 +80,7 @@ namespace Mapbox.Examples
 
 		void Update()
 		{
-			//transform.localPosition = Vector3.Lerp(transform.localPosition, _targetPosition, Time.deltaTime * _positionFollowFactor);
-			transform.localPosition = _targetPosition;
+			transform.localPosition = Vector3.Lerp(transform.localPosition, _targetPosition, Time.deltaTime * _positionFollowFactor);
 		}
 	}
 }
