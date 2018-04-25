@@ -74,8 +74,10 @@ namespace Mapbox.Examples
 		{
 			if (location.IsHeadingUpdated)
 			{
-				var currentEuler = transform.localRotation.eulerAngles;
+				var localRotation = transform.localRotation;
+				var currentEuler = localRotation.eulerAngles;
 				var euler = Mapbox.Unity.Constants.Math.Vector3Zero;
+
 				if (_rotateZ)
 				{
 					euler.z = -location.Heading;
