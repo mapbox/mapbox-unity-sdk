@@ -3,11 +3,31 @@
 	using UnityEngine;
 	using UnityEditor;
 	using Mapbox.Unity.Map;
+	using Mapbox.Platform.TilesetTileJSON;
+	using System.Collections.Generic;
 
 	[CustomEditor(typeof(AbstractMap))]
 	[CanEditMultipleObjects]
 	public class MapManagerEditor : Editor
 	{
+		private Rect buttonRect;
+		/// <summary>
+		/// Gets or sets the layerID
+		/// </summary>
+		/// <value><c>true</c> then show general section; otherwise hide, <c>false</c>.</value>
+		private string TilesetId
+		{
+			get
+			{
+				return EditorPrefs.GetString("MapManagerEditor_tilesetId");
+			}
+			set
+			{
+				EditorPrefs.SetString("MapManagerEditor_tilesetId", value);
+			}
+		}
+
+
 		/// <summary>
 		/// Gets or sets a value indicating whether to show general section <see cref="T:Mapbox.Editor.MapManagerEditor"/>.
 		/// </summary>
@@ -161,7 +181,26 @@
 			ShowVector = EditorGUILayout.Foldout(ShowVector, "VECTOR");
 			if (ShowVector)
 			{
-				ShowSection(serializedObject.FindProperty("_vectorData"), "_layerProperty");
+				var vectorDataProperty = serializedObject.FindProperty("_vectorData");
+
+
+				var layerProperty = vectorDataProperty.FindPropertyRelative("_layerProperty");
+				var layerSourceProperty = layerProperty.FindPropertyRelative("sourceOptions");
+				var sourceType = layerProperty.FindPropertyRelative("sourceType");
+				VectorSourceType sourceTypeValue = (VectorSourceType)sourceType.enumValueIndex;
+				string layerString = layerProperty.FindPropertyRelative("sourceOptions.layerSource.Id").stringValue;
+
+				if (sourceTypeValue != VectorSourceType.None && !string.IsNullOrEmpty(layerString))
+				{
+					if (string.IsNullOrEmpty(TilesetId) || layerString != TilesetId)
+					{
+						EditorTileJSONData tileJSONData = EditorTileJSONData.Instance;
+						tileJSONData.tileJSONLoaded = false;
+						TilesetId = layerString;
+						Unity.MapboxAccess.Instance.TileJSON.Get(layerString,ProcessTileJSONData);
+					}
+				}
+				ShowSection(vectorDataProperty, "_layerProperty");
 			}
 			GUILayout.EndVertical();
 
@@ -304,6 +343,93 @@
 
 			vectorSourceType.enumValueIndex = (int)VectorSourceType.MapboxStreets;
 
+		}
+
+		private PropertyDataType GetPropertyDataType(string propertyDescription)
+		{
+			if (propertyDescription.ToLower().Contains("number"))
+				return PropertyDataType.Number;
+			
+			return PropertyDataType.String;
+		}
+
+		private void ProcessTileJSONData(TileJSONResponse tjr)
+		{
+			TileJSONResponse response = tjr;
+			EditorTileJSONData tileJSONData = EditorTileJSONData.Instance;
+
+			List<string> layerPropertiesList = new List<string>();
+			List<string> sourceLayersList = new List<string>();
+
+			if (response.VectorLayers == null && response.VectorLayers.Length == 0)
+			{
+				return;
+			}
+
+			var propertyName = "";
+			var propertyDescription = "";
+			var layerSource = "";
+			PropertyDataType propertyDataType = PropertyDataType.Number;
+
+			foreach (var layer in response.VectorLayers)
+			{
+				var layerName = layer.Id;
+				layerPropertiesList = new List<string>();
+				layerSource = layer.Source;
+
+				foreach (var property in layer.Fields)
+				{
+					propertyName = property.Key;
+					propertyDescription = property.Value;
+					propertyDataType = GetPropertyDataType(propertyDescription);
+					layerPropertiesList.Add(propertyName);
+
+					//adding data type for the property to the dictionary
+					if (tileJSONData.PropertyDataTypeDictionary.ContainsKey(propertyName))
+						tileJSONData.PropertyDataTypeDictionary[propertyName] = propertyDataType;
+					else
+						tileJSONData.PropertyDataTypeDictionary.Add(propertyName, propertyDataType);
+
+					//adding property descriptions
+					if (tileJSONData.PropertyDescriptionDictionary.ContainsKey(propertyName))
+						tileJSONData.PropertyDescriptionDictionary[propertyName] = propertyDescription;
+					else
+						tileJSONData.PropertyDescriptionDictionary.Add(propertyName, propertyDescription);
+				}
+
+				//loading layerproperty dictionary
+				if (tileJSONData.LayerPropertyDictionary.ContainsKey(layerName))
+				{
+					tileJSONData.LayerPropertyDictionary[layerName].AddRange(layerPropertiesList);
+				}
+				else
+				{
+					tileJSONData.LayerPropertyDictionary.Add(layerName, layerPropertiesList);
+				}
+
+				//loading layer sources
+				if (tileJSONData.LayerSourcesDictionary.ContainsKey(layerName))
+				{
+					tileJSONData.LayerSourcesDictionary[layerName].Add(layerSource);
+				}
+				else
+				{
+					tileJSONData.LayerSourcesDictionary.Add(layerName, new List<string>() { layerSource });
+				}
+
+				//loading layers to a data source
+				if (tileJSONData.SourceLayersDictionary.ContainsKey(layerSource))
+				{
+					tileJSONData.SourceLayersDictionary[layerSource].Add(layerName);
+				}
+				else
+				{
+					tileJSONData.SourceLayersDictionary.Add(layerSource, new List<string>() { layerName });
+				}
+			}
+			
+			tileJSONData.tileJSONLoaded = true;
+			//Debug.Log(tileJSONResponse);
 		}
 	}
 }
