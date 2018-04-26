@@ -259,9 +259,7 @@
 
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
 
-				//EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
-
-				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("styleOptions"));
+				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("mapFeatureStyleOptions"));
 
 			}
 			//EditorGUI.indentLevel--;

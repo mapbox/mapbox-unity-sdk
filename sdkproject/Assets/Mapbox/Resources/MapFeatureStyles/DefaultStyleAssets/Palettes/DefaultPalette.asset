@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 324a61621a4444024b4a9423715bd22b, type: 3}
+  m_Name: DefaultPalette
+  m_EditorClassIdentifier: 
+  m_numColors: 3
+  m_keyColor: {r: 1, g: 1, b: 1, a: 1}
+  m_colors: []
+  m_hueRange: 0
+  m_saturationRange: 0
+  m_valueRange: 0
+  m_setBaseColor_Override: 0
+  m_setDetailColor1_Override: 0
+  m_setDetailColor2_Override: 0
+  m_baseColor_Override: {r: 1, g: 1, b: 1, a: 1}
+  m_detailColor1_Override: {r: 1, g: 1, b: 1, a: 1}
+  m_detailColor2_Override: {r: 1, g: 1, b: 1, a: 1}

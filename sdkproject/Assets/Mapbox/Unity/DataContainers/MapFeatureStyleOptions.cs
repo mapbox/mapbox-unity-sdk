@@ -6,6 +6,9 @@
 	using Mapbox.Unity.MeshGeneration.Data;
 	using UnityEngine;
 
+	/// <summary>
+	/// MapFeatureStyleOptions wraps public reference variables relavent to map feature styling. 
+	/// </summary>
 	[Serializable]
 	public class MapFeatureStyleOptions : ModifierProperties
 	{
@@ -14,14 +17,13 @@
 		{
 			get
 			{
-				//this should be style modifier?
 				return typeof(StyleModifier);
 			}
 		}
 
-		public StyleTypes m_style;
+		public StyleTypes style;
 
-		public ScriptableStyle m_scriptableStyle;
+		public ScriptableStyle scriptableStyle;
 
 		public MapFeatureStyleOptions()
 		{

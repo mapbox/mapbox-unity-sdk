@@ -187,22 +187,15 @@
 		Parkland, 
 	};
 
-
 	public enum StyleTypes 
 	{ 
 		[Description("Simple style.")]
 		Simple,
-		[Description("Go style.")]
-		Go,
 		[Description("Realistic style.")]
 		Realistic,
 		[Description("Fantasy style.")]
 		Fantasy,
-		[Description("Scifi style.")]
-		Scifi,
 		[Description("Custom style.")]
 		Custom,
 	}
-
-
 }

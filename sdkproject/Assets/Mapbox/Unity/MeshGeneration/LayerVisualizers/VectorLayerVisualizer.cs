@@ -89,8 +89,7 @@
 					}
 
 					var lineStyleMod = CreateInstance<StyleModifier>();
-
-					lineStyleMod.SetProperties(_layerProperties.styleOptions);
+					lineStyleMod.SetProperties(MapboxDefaultStyles.GetGeometryMaterialOptions(_layerProperties.mapFeatureStyleOptions));
 					defaultGOModifierStack.Add(lineStyleMod);
 
 					break;
@@ -100,18 +99,21 @@
 						defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
 					}
 					defaultMeshModifierStack.Add(CreateInstance<PolygonMeshModifier>());
-					UVModifierOptions uvModOptions = new UVModifierOptions
-					{
-						texturingType = _layerProperties.materialOptions.texturingType,
-						atlasInfo = _layerProperties.materialOptions.atlasInfo
-					};
+
+					GeometryMaterialOptions geometryMaterialOptions = MapboxDefaultStyles.GetGeometryMaterialOptions(_layerProperties.mapFeatureStyleOptions);
+		
+					UVModifierOptions uvModOptions = new UVModifierOptions();
+					uvModOptions.texturingType = geometryMaterialOptions.texturingType;
+					uvModOptions.atlasInfo = geometryMaterialOptions.atlasInfo;
+
 					var uvMod = CreateInstance<UvModifier>();
 					uvMod.SetProperties(uvModOptions);
 					defaultMeshModifierStack.Add(uvMod);
 
 					if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
 					{
-						if (_layerProperties.materialOptions.texturingType == UvMapType.Atlas || _layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette)
+						//replace materialOptions with styleOptions
+						if (geometryMaterialOptions.texturingType == UvMapType.Atlas || geometryMaterialOptions.texturingType == UvMapType.AtlasWithColorPalette)
 						{
 							var atlasMod = CreateInstance<TextureSideWallModifier>();
 							GeometryExtrusionWithAtlasOptions atlasOptions = new GeometryExtrusionWithAtlasOptions(_layerProperties.extrusionOptions, uvModOptions);
@@ -136,13 +138,13 @@
 
 					var styleMod = CreateInstance<StyleModifier>();
 
-					styleMod.SetProperties(_layerProperties.styleOptions);
+					styleMod.SetProperties(geometryMaterialOptions);
 					defaultGOModifierStack.Add(styleMod);
 
-					if (_layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette)
+					if (geometryMaterialOptions.texturingType == UvMapType.AtlasWithColorPalette)
 					{
 						var colorPaletteMod = CreateInstance<MapboxStylesColorModifier>();
-						colorPaletteMod.m_scriptablePalette = _layerProperties.materialOptions.colorPalette;
+						colorPaletteMod.m_scriptablePalette = geometryMaterialOptions.colorPalette;
 
 						defaultGOModifierStack.Add(colorPaletteMod);
 					}

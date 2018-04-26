@@ -34,11 +34,11 @@
 				}
 
 				var roofMat = matList.GetArrayElementAtIndex(0);
-				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), roofMat, new GUIContent { text = "Roof Material", tooltip = "Unity material to use for extruded roof/top mesh. " });
+				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), roofMat, new GUIContent { text = "Top Material", tooltip = "Unity material to use for extruded top/roof mesh. " });
 				position.y += EditorGUI.GetPropertyHeight(roofMat);
 
 				var wallMat = matList.GetArrayElementAtIndex(1);
-				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), wallMat, new GUIContent { text = "Wall Material", tooltip = "Unity material to use for extruded wall/side mesh. " });
+				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), wallMat, new GUIContent { text = "Side Material", tooltip = "Unity material to use for extruded side/wall mesh. " });
 				position.y += EditorGUI.GetPropertyHeight(wallMat);
 
 				if ((UvMapType)texturingType.enumValueIndex == UvMapType.Atlas)
@@ -62,13 +62,9 @@
 					var colorPalette = property.FindPropertyRelative("colorPalette");
 					EditorGUI.ObjectField(new Rect(position.x, position.y, position.width, lineHeight), colorPalette, new GUIContent { text = "Color Palette", tooltip = "Atlas information scriptable object, this defines how the texture roof and wall texture atlases will be used.  " });
 					position.y += lineHeight;
-					//var taco = property.FindPropertyRelative("taco");
-					//EditorGUI.ObjectField(new Rect(position.x, position.y, position.width, lineHeight), colorPalette, new GUIContent { text = "Taco", tooltip = "Atlas information scriptable object, this defines how the texture roof and wall texture atlases will be used.  " });
-
 				}
 
 			}
-			//EditorGUI.indentLevel--;
 			EditorGUI.EndProperty();
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)

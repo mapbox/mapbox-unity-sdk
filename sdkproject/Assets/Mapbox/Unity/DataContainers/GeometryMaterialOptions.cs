@@ -19,7 +19,6 @@
 		public MaterialList[] materials = new MaterialList[2];
 		public AtlasInfo atlasInfo;
 		public ScriptablePalette colorPalette;
-		//public bool taco;
 
 		public GeometryMaterialOptions()
 		{
