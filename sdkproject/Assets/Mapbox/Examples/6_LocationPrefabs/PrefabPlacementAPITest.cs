@@ -8,7 +8,7 @@ using Mapbox.Utils;
 public class PrefabPlacementAPITest : MonoBehaviour {
 
 	public AbstractMap map;
-	public GameObject prefab;
+	public GameObject myCustomPrefab;
 
 	// Use this for initialization
 	void Start () 
@@ -17,7 +17,7 @@ public class PrefabPlacementAPITest : MonoBehaviour {
 		map.MapVisualizer.OnMapVisualizerStateChanged += HandleMapStateChange;
 
 		//add layers before initialize
-		map.SpawnPrefabAtGeoLocation(prefab, new Vector2d(37.784179, -122.401583), HandlePrefabsPlaced);
+		map.SpawnPrefabAtGeoLocation(myCustomPrefab, new Vector2d(37.784179, -122.401583), HandlePrefabsPlaced);
 		map.Initialize( new Vector2d(37.784179, -122.401583), 16);
 	}
 	
