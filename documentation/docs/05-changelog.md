@@ -1,4 +1,9 @@
 ﻿## CHANGELOG
+ ### v.1.4.2
+*??/??/2018*
+
+##### New Features
+- Add `OnUpdated` event to `AbstractMap`. Enables subscribers to get a notification when the map location and/or zoom gets updated.
 ### v.1.4.1
 *04/17/2018*
 
