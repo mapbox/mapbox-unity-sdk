@@ -227,7 +227,7 @@
 					if(builder.Active)
 					{
 						Progress++;
-						//MEGA HACK just pass the first available layer - we should create a static null layer for this
+						//just pass the first available layer - we should create a static null layer for this
 						builder.Create(_cachedData[tile].Data.GetLayer(_cachedData[tile].Data.LayerNames()[0]), tile, DecreaseProgressCounter);
 					}
 				}
