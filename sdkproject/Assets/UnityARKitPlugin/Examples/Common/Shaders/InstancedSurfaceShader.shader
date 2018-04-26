@@ -1,16 +1,13 @@
 ﻿// Upgrade NOTE: upgraded instancing buffer 'Props' to new syntax.
 
-Shader "Custom/InstancedSurfaceShader" 
-{
-	Properties 
-	{
+Shader "Custom/InstancedSurfaceShader" {
+	Properties {
 		_Color ("Color", Color) = (1,1,1,1)
 		_MainTex ("Albedo (RGB)", 2D) = "white" {}
 		_Glossiness ("Smoothness", Range(0,1)) = 0.5
 		_Metallic ("Metallic", Range(0,1)) = 0.0
 	}
-	SubShader 
-	{
+	SubShader {
 		Tags { "RenderType"="Opaque" }
 		LOD 200
 		
@@ -23,8 +20,7 @@ Shader "Custom/InstancedSurfaceShader"
 
 		sampler2D _MainTex;
 
-		struct Input 
-		{
+		struct Input {
 			float2 uv_MainTex;
 		};
 
@@ -36,9 +32,9 @@ Shader "Custom/InstancedSurfaceShader"
 		// See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
 		// #pragma instancing_options assumeuniformscaling
 		UNITY_INSTANCING_BUFFER_START(Props)
-		// put more per-instance properties here
-		UNITY_DEFINE_INSTANCED_PROP (fixed4, _InstanceColor)
-		#define _InstanceColor_arr Props
+			// put more per-instance properties here
+			UNITY_DEFINE_INSTANCED_PROP (fixed4, _InstanceColor)
+#define _InstanceColor_arr Props
 		UNITY_INSTANCING_BUFFER_END(Props)
 
 		void surf (Input IN, inout SurfaceOutputStandard o) {

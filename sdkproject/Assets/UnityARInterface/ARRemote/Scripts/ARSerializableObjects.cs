@@ -190,6 +190,16 @@ namespace UnityARInterface
     }
 
     [Serializable]
+    public class SerializableBackgroundRendering
+    {
+        public bool backgroundRendering;
+        public SerializableBackgroundRendering(bool backgroundRendering)
+        {
+            this.backgroundRendering = backgroundRendering;
+        }
+    }
+
+    [Serializable]
     public class SerializableARSettings
     {
         public bool enablePointCloud;
