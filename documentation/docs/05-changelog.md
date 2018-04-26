@@ -1,8 +1,9 @@
-﻿## CHANGELOG
+## CHANGELOG
  ### v.1.4.2
 *??/??/2018*
 
 ##### New Features
+- Add `Location Prefabs` section to `AbstractMap`. Enables users to spawn prefabs at points-of-interest on the map directly from the `AbstractMap` UI.
 - Add `OnUpdated` event to `AbstractMap`. Enables subscribers to get a notification when the map location and/or zoom gets updated.
 ### v.1.4.1
 *04/17/2018*
