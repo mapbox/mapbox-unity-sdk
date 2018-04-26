@@ -33,7 +33,7 @@ MonoBehaviour:
       width: 0.25
       height: 0.25
     MidFloorCount: 1
-    ColumnCount: 1
+    ColumnCount: 3
     TopSectionRatio: 0.3
     BottomSectionRatio: 0.4
     PreferredEdgeSectionLength: 40
@@ -85,7 +85,7 @@ MonoBehaviour:
   - TextureRect:
       serializedVersion: 2
       x: 0.25
-      y: 0.25
+      y: 0
       width: 0.25
       height: 0.25
     MidFloorCount: 1
@@ -154,12 +154,12 @@ MonoBehaviour:
     TopFloorHeight: 16
   - TextureRect:
       serializedVersion: 2
-      x: 0
+      x: 0.5
       y: 0.5
       width: 0.25
       height: 0.5
     MidFloorCount: 4
-    ColumnCount: 1
+    ColumnCount: 3
     TopSectionRatio: 0.2
     BottomSectionRatio: 0.2
     PreferredEdgeSectionLength: 40
