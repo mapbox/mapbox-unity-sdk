@@ -193,12 +193,8 @@
 					subLayerFilterOptions.FindPropertyRelative("filters").ClearArray();
 					subLayerFilterOptions.FindPropertyRelative("combinerType").enumValueIndex = (int)LayerFilterCombinerOperationType.Any;
 
-					var subLayerMaterialOptions = subLayer.FindPropertyRelative("materialOptions");
-					subLayerMaterialOptions.FindPropertyRelative("materials").ClearArray();
-					subLayerMaterialOptions.FindPropertyRelative("materials").arraySize = 2;
-					subLayerMaterialOptions.FindPropertyRelative("atlasInfo").objectReferenceValue = null;
-					subLayerMaterialOptions.FindPropertyRelative("colorPalette").objectReferenceValue = null;
-					subLayerMaterialOptions.FindPropertyRelative("texturingType").enumValueIndex = (int)UvMapType.Tiled;
+					var subLayerMapFeatureStyleOptions = subLayer.FindPropertyRelative("mapFeatureStyleOptions");
+					subLayerMapFeatureStyleOptions.FindPropertyRelative("style").enumValueIndex = (int)StyleTypes.Realistic;
 
 					subLayer.FindPropertyRelative("buildingsWithUniqueIds").boolValue = false;
 					subLayer.FindPropertyRelative("moveFeaturePositionTo").enumValueIndex = (int)PositionTargetType.TileCenter;
