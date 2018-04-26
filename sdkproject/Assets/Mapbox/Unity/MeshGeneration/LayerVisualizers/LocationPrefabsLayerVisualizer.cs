@@ -14,9 +14,10 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 	{
 		private int maxDensity = 30; //This value is same as the density's max range value in PrefabItemOptions
 
-		public void SetProperties(PrefabItemOptions item)
+		public void SetProperties(PrefabItemOptions item, LayerPerformanceOptions performanceOptions)
 		{
 			SubLayerProperties = item;
+			_performanceOptions = performanceOptions;
 
 			if (!item.isActive)
 				return;
@@ -231,6 +232,10 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			   == LocationPrefabFindBy.AddressOrLatLon)
 			{
 				BuildFeatureFromLatLon(layer, tile);
+				if (callback != null)
+				{
+					callback();
+				}
 			}
 			else
 			{

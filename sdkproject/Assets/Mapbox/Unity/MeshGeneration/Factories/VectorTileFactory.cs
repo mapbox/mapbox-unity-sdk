@@ -68,7 +68,7 @@
 				if (typeof(PrefabItemOptions).IsAssignableFrom(sublayer.GetType())) //to check that the instance is of type PrefabItemOptions
 				{
 					visualizer = CreateInstance<LocationPrefabsLayerVisualizer>();
-					((LocationPrefabsLayerVisualizer)visualizer).SetProperties((PrefabItemOptions)sublayer);
+					((LocationPrefabsLayerVisualizer)visualizer).SetProperties((PrefabItemOptions)sublayer, _properties.performanceOptions);
 				}
 				else
 				{
