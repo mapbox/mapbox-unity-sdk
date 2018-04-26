@@ -38,7 +38,7 @@
 			}
 		}
 
-		LayerPerformanceOptions _performanceOptions;
+		protected LayerPerformanceOptions _performanceOptions;
 		protected Dictionary<UnityTile, List<int>> _activeCoroutines;
 		int _entityInCurrentCoroutine = 0;
 
