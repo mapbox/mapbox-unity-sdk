@@ -149,9 +149,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					currentY1 = v1.y;
 					currentY2 = v2.y;
 					
+					FirstFloor(md, height);
 					TopFloor(md);
 					MidFloors(md);
-					FirstFloor(md, height);
 				}
 
 				if (_separateSubmesh)
@@ -189,12 +189,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				//bottom two vertices
 				md.Vertices.Add(new Vector3(v1.x, currentY1, v1.z));
 				md.Vertices.Add(new Vector3(v2.x, currentY2, v2.z));
-
-				if((scaledFloorHeight * stepRatio) > midHeight)
-				{
-					Debug.Log("here");
-				}
-
+				
 				if (d >= (_scaledPreferredWallLength / _currentFacade.ColumnCount) * 0.9f)
 				{
 					md.UV[0].Add(new Vector2(_currentTextureRect.xMin, topOfMidUv));
@@ -204,9 +199,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				}
 				else
 				{
-					md.UV[0].Add(new Vector2(_currentTextureRect.xMin, topOfMidUv));
+					md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.001f, topOfMidUv));
 					md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.01f, topOfMidUv));
-					md.UV[0].Add(new Vector2(_currentTextureRect.xMin, topOfMidUv - midUvHeight * stepRatio));
+					md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.001f, topOfMidUv - midUvHeight * stepRatio));
 					md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.01f, topOfMidUv - midUvHeight * stepRatio));
 
 				}
@@ -231,8 +226,14 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				ind += 4;
 				leftOver -= (scaledFloorHeight * stepRatio);
 			}
+		}
 
-			
+		private void TopFloor(MeshData md)
+		{
+			var leftOver = midHeight > 0 ? midHeight : topHeight;
+			var singleFloorHeight = _scaledFloorHeight / _currentFacade.MidFloorCount;
+			leftOver = leftOver % singleFloorHeight;
+
 			//leftover
 			md.Vertices.Add(new Vector3(v1.x, currentY1, v1.z));
 			md.Vertices.Add(new Vector3(v2.x, currentY2, v2.z));
@@ -268,16 +269,14 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			wallTriangles.Add(ind + 2);
 
 			ind += 4;
-		}
 
-		private void TopFloor(MeshData md)
-		{
+			//top floor start
 			currentY1 -= topHeight;
 			currentY2 -= topHeight;
-			md.Vertices.Add(new Vector3(v1.x, v1.y, v1.z));
-			md.Vertices.Add(new Vector3(v2.x, v2.y, v2.z));
-			md.Vertices.Add(new Vector3(v1.x, v1.y - topHeight, v1.z));
-			md.Vertices.Add(new Vector3(v2.x, v2.y - topHeight, v2.z));
+			md.Vertices.Add(new Vector3(v1.x, v1.y - leftOver, v1.z));
+			md.Vertices.Add(new Vector3(v2.x, v2.y - leftOver, v2.z));
+			md.Vertices.Add(new Vector3(v1.x, v1.y - leftOver - topHeight, v1.z));
+			md.Vertices.Add(new Vector3(v2.x, v2.y - leftOver - topHeight, v2.z));
 
 			if (d >= (_scaledPreferredWallLength / _currentFacade.ColumnCount) * 0.9f)
 			{
@@ -288,10 +287,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 			else
 			{
-				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentTextureRect.yMax));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.001f, _currentTextureRect.yMax));
 				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.01f, _currentTextureRect.yMax));
 				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, bottomOfTopUv));
-				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.01f, bottomOfTopUv));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.001f + 0.01f, bottomOfTopUv));
 			}
 
 			md.Normals.Add(wallNormal);
@@ -341,9 +340,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 			else
 			{
-				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, topOfBottomUv));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.001f, topOfBottomUv));
 				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.01f, topOfBottomUv));
-				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentTextureRect.yMin));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.001f, _currentTextureRect.yMin));
 				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.01f, _currentTextureRect.yMin));
 			}
 
@@ -378,7 +377,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				start = fs;
 				wallDirection = (sc - fs).normalized;
 
-				if (_centerSegments)
+				if (_centerSegments && currentWall > singleColumn)
 				{
 					edgeList.Add(start);
 					start = start + wallDirection * (leftOver / 2);
