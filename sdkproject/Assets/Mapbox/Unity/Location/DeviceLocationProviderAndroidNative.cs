@@ -41,6 +41,7 @@
 		private CultureInfo _invariantCulture = CultureInfo.InvariantCulture;
 		private AndroidJavaObject _activityContext = null;
 		private AndroidJavaObject _gpsInstance;
+		private AndroidJavaObject _sensorInstance;
 
 
 		~DeviceLocationProviderAndroidNative() { Dispose(false); }
@@ -75,6 +76,12 @@
 						_gpsInstance.Call("stopLocationListeners");
 						_gpsInstance.Dispose();
 						_gpsInstance = null;
+					}
+					if (null != _sensorInstance)
+					{
+						_sensorInstance.Call("stopSensorListeners");
+						_sensorInstance.Dispose();
+						_sensorInstance = null;
 					}
 				}
 			}
@@ -118,6 +125,7 @@
 			{
 				getActivityContext();
 				getGpsInstance(true);
+				getSensorInstance();
 
 				if (_pollLocation == null)
 				{
@@ -151,7 +159,6 @@
 				if (null == androidGps)
 				{
 					Debug.LogError("Could not get class 'AndroidGps'");
-					_activityContext.Call("runOnUiThread", new AndroidJavaRunnable(() => { _gpsInstance.Call("showMessage", "Could not get class 'AndroidGps'"); }));
 					return;
 				}
 
@@ -159,13 +166,38 @@
 				if (null == _gpsInstance)
 				{
 					Debug.LogError("Could not get 'AndroidGps' instance");
-					_activityContext.Call("runOnUiThread", new AndroidJavaRunnable(() => { _gpsInstance.Call("showMessage", "Could not get 'AndroidGps' instance"); }));
 					return;
 				}
 
 				_activityContext.Call("runOnUiThread", new AndroidJavaRunnable(() => { _gpsInstance.Call("showMessage", "starting location listeners"); }));
 
 				_gpsInstance.Call("startLocationListeners", _updateDistanceInMeters, _updateTimeInMilliSeconds);
+			}
+		}
+
+
+		private void getSensorInstance()
+		{
+			if (null == _activityContext) { return; }
+
+			using (AndroidJavaClass androidSensors = new AndroidJavaClass("com.mapbox.android.unity.AndroidSensors"))
+			{
+				if (null == androidSensors)
+				{
+					Debug.LogError("Could not get class 'AndroidSensors'");
+					return;
+				}
+
+				_sensorInstance = androidSensors.CallStatic<AndroidJavaObject>("instance", _activityContext);
+				if (null == _sensorInstance)
+				{
+					Debug.LogError("Could not get 'AndroidSensors' instance");
+					return;
+				}
+
+				//_activityContext.Call("runOnUiThread", new AndroidJavaRunnable(() => { _sensorInstance.Call("showMessage", "starting sensor listeners"); }));
+
+				_sensorInstance.Call("startSensorListeners");
 			}
 		}
 
@@ -191,6 +223,12 @@
 					yield return _wait60sec;
 					getGpsInstance();
 					continue;
+				}
+
+				// update device orientation
+				if (null != _sensorInstance)
+				{
+					_currentLocation.Orientation = _sensorInstance.Call<float>("getOrientation");
 				}
 
 				bool locationServiceAvailable = _gpsInstance.Call<bool>("getIsLocationServiceAvailable");
@@ -291,13 +329,13 @@
 				_currentLocation.IsHeadingUpdated = newHeading != _currentLocation.Heading;
 				_currentLocation.Heading = newHeading;
 			}
-			_currentLocation.HeadingAccuracy = location.Call<float>("getBearingAccuracyDegrees");
 
 			float? newSpeed = location.Call<float>("getSpeed");
 			bool speedUpdated = newSpeed != _currentLocation.SpeedMetersPerSecond;
 			_currentLocation.SpeedMetersPerSecond = newSpeed;
 
-			Debug.LogFormat("coords:{0} acc:{1} time:{2} speed:{3}", coordinatesUpdated, accuracyUpdated, timestampUpdated, speedUpdated);
+			// flag location as updated if any of below conditions evaluates to true
+			// Debug.LogFormat("coords:{0} acc:{1} time:{2} speed:{3}", coordinatesUpdated, accuracyUpdated, timestampUpdated, speedUpdated);
 			_currentLocation.IsLocationUpdated =
 				providerUpdated
 				|| coordinatesUpdated

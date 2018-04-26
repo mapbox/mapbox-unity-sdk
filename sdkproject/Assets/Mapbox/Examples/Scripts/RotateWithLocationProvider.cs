@@ -6,6 +6,14 @@ namespace Mapbox.Examples
 	public class RotateWithLocationProvider : MonoBehaviour
 	{
 		/// <summary>
+		/// Location property used for rotation: false=Heading (default), true=Orientation  
+		/// </summary>
+		[SerializeField]
+		[Tooltip("Per default 'Heading' (direction the device is moving) is used for rotation. Check to use 'Orientation' (where the device is facing)")]
+		bool _useOrientation;
+
+
+		/// <summary>
 		/// The rate at which the transform's rotation tries catch up to the provided heading.  
 		/// </summary>
 		[SerializeField]
@@ -72,30 +80,49 @@ namespace Mapbox.Examples
 
 		void LocationProvider_OnLocationUpdated(Location location)
 		{
-			if (location.IsHeadingUpdated)
+
+			float rotationAngle = _useOrientation ? location.Orientation: location.Heading;
+
+			// 'Orientation' changes all the time, pass through immediately
+			if (_useOrientation)
 			{
-				var localRotation = transform.localRotation;
-				var currentEuler = localRotation.eulerAngles;
-				var euler = Mapbox.Unity.Constants.Math.Vector3Zero;
-
-				if (_rotateZ)
+				_targetRotation = Quaternion.Euler(getNewEulerAngles(rotationAngle));
+			}
+			else
+			{
+				// if rotating by 'Heading' only do it if heading has a new value
+				if (location.IsHeadingUpdated)
 				{
-					euler.z = -location.Heading;
-
-					euler.x = currentEuler.x;
-					euler.y = currentEuler.y;
+					_targetRotation = Quaternion.Euler(getNewEulerAngles(rotationAngle));
 				}
-				else
-				{
-					euler.y = location.Heading;
-
-					euler.x = currentEuler.x;
-					euler.z = currentEuler.z;
-				}
-
-				_targetRotation = Quaternion.Euler(euler);
 			}
 		}
+
+
+		private Vector3 getNewEulerAngles(float newAngle)
+		{
+			var localRotation = transform.localRotation;
+			var currentEuler = localRotation.eulerAngles;
+			var euler = Mapbox.Unity.Constants.Math.Vector3Zero;
+
+			if (_rotateZ)
+			{
+				euler.z = -newAngle;
+
+				euler.x = currentEuler.x;
+				euler.y = currentEuler.y;
+			}
+			else
+			{
+				euler.y = newAngle;
+
+				euler.x = currentEuler.x;
+				euler.z = currentEuler.z;
+			}
+
+			return euler;
+		}
+
 
 		void Update()
 		{

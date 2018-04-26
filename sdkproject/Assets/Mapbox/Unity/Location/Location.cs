@@ -15,19 +15,20 @@
 		public Vector2d LatitudeLongitude;
 
 		/// <summary>
-		/// Heading represents a facing angle, generally between 0-359. Also need location services enabled via Input.location.Start()
+		/// <para>Heading represents a angle of direction during movement, generally between 0-359.</para>
+		///<para>Initially 0 this property gets populated after the device has moved far enough to determine a direction</para>
+		///<para>If the device stops moving last heading is kept till a new one can be caluculated. Check <see cref="Mapbox.Unity.Location.IsHeadingUpdated"/></para>
+		///<para>Also needs location services enabled via Input.location.Start()</para>
+		///<para>related <see cref="Mapbox.Unity.Location.Orientation"/></para>
 		/// </summary>
 		public float Heading;
 
 		/// <summary>
-		/// The heading in degrees relative to the magnetic North Pole.
+		///<para>Orientation (where the device is looking).</para>
+		///<para>Uses device compass</para>
+		///<para>related <see cref="Mapbox.Unity.Location.Heading"/></para>
 		/// </summary>
-		public float HeadingMagnetic;
-
-		/// <summary>
-		/// Accuracy of heading reading in degrees.
-		/// </summary>
-		public float HeadingAccuracy;
+		public float Orientation;
 
 		/// <summary>
 		/// Timestamp (in seconds since 1970) when location was last updated.

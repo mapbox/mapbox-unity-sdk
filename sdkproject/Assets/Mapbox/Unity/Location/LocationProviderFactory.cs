@@ -167,7 +167,7 @@ namespace Mapbox.Unity.Location
 				// API version 24 => Android 7 (Nougat): we are using GnssStatus 'https://developer.android.com/reference/android/location/GnssStatus.html'
 				// in the native plugin.
 				// GnssStatus is not available with versions lower than 24
-				&& AndroidApiVersion >= 24
+				&& AndroidApiVersion >= 240
 			)
 			{
 				Debug.Log("LocationProviderFactory: " + "Injected native Android DEVICE Location Provider");

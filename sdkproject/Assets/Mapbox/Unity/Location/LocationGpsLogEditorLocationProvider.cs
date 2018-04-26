@@ -8,8 +8,14 @@
 	using UnityEngine;
 
 	/// <summary>
-	/// The EditorLocationProvider is responsible for providing mock location data via log file obtained via Google's GnssLogger
-	/// for testing purposes in the Unity editor.
+	/// <para>
+	/// The EditorLocationProvider is responsible for providing mock location data via log file obtained
+	/// via a customized 'Google GnssLogger' for testing purposes in the Unity editor.
+	/// </para>
+	/// <para>GnssLogger was changed to include 'Bearing' in the log here:</para>
+	/// <para>
+	/// https://github.com/google/gps-measurement-tools/blob/2f6ba51e7ddfa3a34d0f75933f833af20417042a/GNSSLogger/app/src/main/java/com/google/android/apps/location/gps/gnsslogger/FileLogger.java#L246-L256
+	/// </para>
 	/// </summary>
 	public class LocationGpsLogEditorLocationProvider : AbstractEditorLocationProvider
 	{
@@ -42,6 +48,7 @@
 			public double Timestamp;
 			public float Accuracy;
 			public float? Speed;
+			public float? Heading;
 		}
 
 		private GpsFix NextLocationData
@@ -66,6 +73,7 @@
 				double timestamp;
 				float speed;
 				float accuracy;
+				float bearing;
 
 				GpsFix gpsFix = new GpsFix();
 
@@ -81,27 +89,45 @@
 					gpsFix.LatLng = new Vector2d(lat, lng);
 				}
 
-				gpsFix.Timestamp = double.TryParse(tokens[7], NumberStyles.Any, _invariantCulture, out timestamp) ? timestamp / 1000 : 0;
 				gpsFix.Speed = float.TryParse(tokens[5], NumberStyles.Any, _invariantCulture, out speed) ? speed : (float?)null;
 				gpsFix.Accuracy = float.TryParse(tokens[6], NumberStyles.Any, _invariantCulture, out accuracy) ? accuracy : 0;
+
+				// backwards compability with unmodified GnssLogger file that don't contain a 'Bearing'
+				// timestamp is the last value
+				int idxTimestamp = tokens.Length - 1;
+				gpsFix.Timestamp = double.TryParse(tokens[idxTimestamp], NumberStyles.Any, _invariantCulture, out timestamp) ? timestamp / 1000 : 0;
+
+				// bearing included
+				if (tokens.Length == 9)
+				{
+					gpsFix.Heading = float.TryParse(tokens[7], NumberStyles.Any, _invariantCulture, out bearing) ? bearing : (float?)null;
+				}
 
 				return gpsFix;
 			}
 		}
 
 
-		//private static readonly System.Random _random = new System.Random();
 		protected override void SetLocation()
 		{
 			GpsFix gpsFix = NextLocationData;
 
 			_currentLocation.IsLocationServiceEnabled = true;
-			//_currentLocation.Heading = 0;
-			_currentLocation.Heading = (float)(Math.Atan2(gpsFix.LatLng.y - _currentLocation.LatitudeLongitude.y, gpsFix.LatLng.x - _currentLocation.LatitudeLongitude.x) * 180 / Math.PI);
+			if (gpsFix.Heading.HasValue)
+			{
+				_currentLocation.Heading = gpsFix.Heading.Value;
+			}
+			else
+			{
+				_currentLocation.Heading = (float)(Math.Atan2(gpsFix.LatLng.y - _currentLocation.LatitudeLongitude.y, gpsFix.LatLng.x - _currentLocation.LatitudeLongitude.x) * 180 / Math.PI);
+			}
+			// simluate device rotating all the time
+			_currentLocation.Orientation += 15;
+			if (_currentLocation.Orientation > 359) { _currentLocation.Orientation = 0; }
+
 			_currentLocation.LatitudeLongitude = gpsFix.LatLng;
 			_currentLocation.Timestamp = gpsFix.Timestamp;
 			_currentLocation.Accuracy = gpsFix.Accuracy;
-			//_currentLocation.Accuracy = _random.Next(1, 100);
 			_currentLocation.SpeedMetersPerSecond = gpsFix.Speed;
 			_currentLocation.IsLocationUpdated = true;
 			_currentLocation.IsHeadingUpdated = true;

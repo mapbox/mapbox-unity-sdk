@@ -156,8 +156,6 @@ namespace Mapbox.Unity.Location
 				{
 					var heading = Input.compass.trueHeading;
 					_currentLocation.Heading = heading;
-					_currentLocation.HeadingMagnetic = Input.compass.magneticHeading;
-					_currentLocation.HeadingAccuracy = Input.compass.headingAccuracy;
 					_lastHeadingTimestamp = timestamp;
 
 					_currentLocation.IsHeadingUpdated = true;
