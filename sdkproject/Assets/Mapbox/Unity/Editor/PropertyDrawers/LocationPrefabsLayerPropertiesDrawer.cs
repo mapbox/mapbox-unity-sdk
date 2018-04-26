@@ -19,11 +19,11 @@ namespace Mapbox.Unity.Map
 		{
 			get
 			{
-				return EditorPrefs.GetInt("VectorLayerProperties_selectionIndex");
+				return EditorPrefs.GetInt("LocationPrefabsLayerProperties_selectionIndex");
 			}
 			set
 			{
-				EditorPrefs.SetInt("VectorLayerProperties_selectionIndex", value);
+				EditorPrefs.SetInt("LocationPrefabsLayerProperties_selectionIndex", value);
 			}
 		}
 
@@ -40,15 +40,38 @@ namespace Mapbox.Unity.Map
 			layerTreeView.OnGUI(layersRect);
 
 			selectedLayers = layerTreeView.GetSelection();
+			//if there are selected elements, set the selection index at the first element.
+			//if not, use the Selection index to persist the selection at the right index.
+			if (selectedLayers.Count > 0)
+			{
+				//ensure that selectedLayers[0] isn't out of bounds
+				if (selectedLayers[0] > prefabItemArray.arraySize - 1)
+				{
+					selectedLayers[0] = prefabItemArray.arraySize - 1;
+				}
+
+				SelectionIndex = selectedLayers[0];
+
+			}
+			else
+			{
+				selectedLayers = new int[1] { SelectionIndex };
+				if (SelectionIndex > 0 && (SelectionIndex <= prefabItemArray.arraySize - 1))
+				{
+					layerTreeView.SetSelection(selectedLayers);
+				}
+			}
+
 
 			GUILayout.Space(EditorGUIUtility.singleLineHeight);
 			GUILayout.BeginHorizontal();
 
 			if (GUILayout.Button(new GUIContent("Add Layer"), (GUIStyle)"minibuttonleft"))
 			{
-				selectedLayers = layerTreeView.GetSelection();
 
 				GUILayout.Space(EditorGUIUtility.singleLineHeight);
+
+				selectedLayers = layerTreeView.GetSelection();
 
 				prefabItemArray.arraySize++;
 				//subLayerArray.InsertArrayElementAtIndex(subLayerArray.arraySize);
@@ -69,6 +92,8 @@ namespace Mapbox.Unity.Map
 
 				selectedLayers = new int[1] { prefabItemArray.arraySize - 1 };
 				layerTreeView.SetSelection(selectedLayers);
+
+
 			}
 			if (GUILayout.Button(new GUIContent("Remove Selected"), (GUIStyle)"minibuttonright"))
 			{
@@ -82,20 +107,37 @@ namespace Mapbox.Unity.Map
 
 			GUILayout.EndHorizontal();
 
-			if (selectedLayers.Count == 1 && prefabItemArray.arraySize!=0)//(SelectionIndex > 0 && (SelectionIndex <= subLayerArray.arraySize - 1))
+			if (selectedLayers.Count == 1 && prefabItemArray.arraySize != 0)
 			{
+				//ensure that selectedLayers[0] isn't out of bounds
+				if (selectedLayers[0] > prefabItemArray.arraySize - 1)
+				{
+					selectedLayers[0] = prefabItemArray.arraySize - 1;
+				}
 				SelectionIndex = selectedLayers[0];
 
 				var layerProperty = prefabItemArray.GetArrayElementAtIndex(SelectionIndex);
 
 				layerProperty.isExpanded = true;
-				DrawLayerLocationPrefabProperties(layerProperty);
+				var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
+				bool isLayerActive = subLayerCoreOptions.FindPropertyRelative("isActive").boolValue;
+				if (!isLayerActive)
+				{
+					GUI.enabled = false;
+				}
+
+				DrawLayerLocationPrefabProperties( layerProperty);
+				if (!isLayerActive)
+				{
+					GUI.enabled = true;
+				}
 			}
 			else
 			{
 				GUILayout.Space(15);
-				GUILayout.Label("Select a location item to see its properties");
+				GUILayout.Label("Select a visualizer to see properties");
 			}
+
 			EditorGUI.EndProperty();
 		}
 

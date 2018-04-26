@@ -156,16 +156,17 @@
 				//if not, use the Selection index to persist the selection at the right index.
 				if (selectedLayers.Count > 0)
 				{
+					//ensure that selectedLayers[0] isn't out of bounds
+					if (selectedLayers[0] > subLayerArray.arraySize - 1)
+					{
+						selectedLayers[0] = subLayerArray.arraySize - 1;
+					}
+
 					SelectionIndex = selectedLayers[0];
+
 				}
 				else
 				{
-					//make sure the selection index still exists, if it doesn't, move to the last element
-					if(SelectionIndex > subLayerArray.arraySize - 1)
-					{
-						SelectionIndex = subLayerArray.arraySize - 1;
-					}
-
 					selectedLayers = new int[1] {SelectionIndex};
 					if (SelectionIndex > 0 && (SelectionIndex <= subLayerArray.arraySize - 1))
 					{
@@ -244,6 +245,12 @@
 
 				if (selectedLayers.Count == 1 && subLayerArray.arraySize!=0)
 				{
+					//ensure that selectedLayers[0] isn't out of bounds
+					if (selectedLayers[0] > subLayerArray.arraySize - 1)
+					{
+						selectedLayers[0] = subLayerArray.arraySize - 1;
+					}
+
 					SelectionIndex = selectedLayers[0];
 
 					var layerProperty = subLayerArray.GetArrayElementAtIndex(SelectionIndex);
