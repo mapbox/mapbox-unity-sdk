@@ -126,18 +126,18 @@ MonoBehaviour:
     TopFloorHeight: 9
   - TextureRect:
       serializedVersion: 2
-      x: 0.5
+      x: 0
       y: 0
       width: 0.25
       height: 0.25
     MidFloorCount: 1
-    ColumnCount: 1
+    ColumnCount: 3
     TopSectionRatio: 0.3
     BottomSectionRatio: 0.4
-    PreferredEdgeSectionLength: 30
-    FloorHeight: 8.999999
-    FirstFloorHeight: 12
-    TopFloorHeight: 9
+    PreferredEdgeSectionLength: 40
+    FloorHeight: 11.999999
+    FirstFloorHeight: 16
+    TopFloorHeight: 12
   - TextureRect:
       serializedVersion: 2
       x: 0

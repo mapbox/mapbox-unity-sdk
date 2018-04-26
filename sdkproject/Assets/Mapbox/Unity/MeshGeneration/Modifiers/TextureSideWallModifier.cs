@@ -38,25 +38,25 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private float firstHeight;
 		private float topHeight;
 		private float midHeight;
-		private int midFloorCount;
 		private float scaledFloorHeight;
 		private int ind;
 		private Vector3 wallNormal;
 		private List<int> wallTriangles;
 		private float columnScaleRatio;
-		private float floorScaleRatio;
 		private float rightOfEdgeUv;
 		private float bottomOfTopUv;
 		private float topOfBottomUv;
 		private float currentY1;
 		private float currentY2;
-		private float bottomOfMidUv;
 		private float topOfMidUv;
+		private float _wallSizeEpsilon = 0.99f;
+		private float _narrowWallWidthDelta = 0.01f;
+		private float _shortRowHeightDelta = 0.015f;
 
 		GeometryExtrusionWithAtlasOptions _options;
 		private int _counter = 0;
-		float height = 0.0f;
-		float _scale = 1f;
+		private float height = 0.0f;
+		private float _scale = 1f;
 
 		public override void SetProperties(ModifierProperties properties)
 		{
@@ -107,24 +107,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				firstHeight = Mathf.Min(height, _scaledFirstFloorHeight);
 				topHeight = (height - firstHeight) < _scaledTopFloorHeight ? 0 : _scaledTopFloorHeight;
 				midHeight = Mathf.Max(0, height - (firstHeight + topHeight));
-
-				//we're merging small mid sections to top and small top sections to first floor to avoid really short/compressed floors
-				//I think we need this but I'm not sure about implementation. I feel like mid height should be shared by top&bottom for example.
-				//if (midHeight < _scaledFloorHeight / (_currentFacade.MidFloorCount * 2))
-				//{
-				//	topHeight += midHeight;
-				//	_scaledTopFloorHeight += midHeight;
-				//	midHeight = 0;
-				//}
-				//if (topHeight < _scaledTopFloorHeight * 0.66f) //0.66 here is just a random number for acceptable stretching
-				//{
-				//	firstHeight += topHeight;
-				//	topHeight = 0;
-				//}
-
+				
 				//scaledFloorHeight = midHeight / floorCount;
 				wallTriangles = new List<int>();
-
+				
 				//this first loop is for columns
 				for (int i = 0; i < edgeList.Count - 1; i += 2)
 				{
@@ -149,6 +135,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					currentY1 = v1.y;
 					currentY2 = v2.y;
 					
+					if(feature.Data.Id == 1487108801)
+					{
+						Debug.Log("here");
+					}
+
 					FirstFloor(md, height);
 					TopFloor(md);
 					MidFloors(md);
@@ -175,7 +166,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			var midUvHeight = _currentTextureRect.height * (1 - _currentFacade.TopSectionRatio - _currentFacade.BottomSectionRatio);
 			scaledFloorHeight = _scaledPreferredWallLength * (1 - _currentFacade.TopSectionRatio - _currentFacade.BottomSectionRatio) * (_currentTextureRect.height / _currentTextureRect.width);
 
-			while (leftOver > singleFloorHeight)
+			while (leftOver >= singleFloorHeight - 0.01f)
 			{
 				var singleFloorCount = (float)Math.Min(_currentFacade.MidFloorCount, Math.Floor(leftOver / singleFloorHeight));
 				var stepRatio = singleFloorCount / _currentFacade.MidFloorCount;
@@ -190,7 +181,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				md.Vertices.Add(new Vector3(v1.x, currentY1, v1.z));
 				md.Vertices.Add(new Vector3(v2.x, currentY2, v2.z));
 				
-				if (d >= (_scaledPreferredWallLength / _currentFacade.ColumnCount) * 0.9f)
+				if (d >= (_scaledPreferredWallLength / _currentFacade.ColumnCount) * _wallSizeEpsilon)
 				{
 					md.UV[0].Add(new Vector2(_currentTextureRect.xMin, topOfMidUv));
 					md.UV[0].Add(new Vector2(rightOfEdgeUv, topOfMidUv));
@@ -199,12 +190,12 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				}
 				else
 				{
-					md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.001f, topOfMidUv));
-					md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.01f, topOfMidUv));
-					md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.001f, topOfMidUv - midUvHeight * stepRatio));
-					md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.01f, topOfMidUv - midUvHeight * stepRatio));
-
+					md.UV[0].Add(new Vector2(_currentTextureRect.xMin, topOfMidUv));
+					md.UV[0].Add(new Vector2(_currentTextureRect.xMin + _narrowWallWidthDelta, topOfMidUv));
+					md.UV[0].Add(new Vector2(_currentTextureRect.xMin, topOfMidUv - midUvHeight * stepRatio));
+					md.UV[0].Add(new Vector2(_currentTextureRect.xMin + _narrowWallWidthDelta, topOfMidUv - midUvHeight * stepRatio));
 				}
+
 				md.Normals.Add(wallNormal);
 				md.Normals.Add(wallNormal);
 				md.Normals.Add(wallNormal);
@@ -224,7 +215,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				wallTriangles.Add(ind + 2);
 
 				ind += 4;
-				leftOver -= (scaledFloorHeight * stepRatio);
+				leftOver -= Math.Max(0.1f, (scaledFloorHeight * stepRatio));
 			}
 		}
 
@@ -244,11 +235,20 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			md.Vertices.Add(new Vector3(v1.x, currentY1, v1.z));
 			md.Vertices.Add(new Vector3(v2.x, currentY2, v2.z));
 
-
-			md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentTextureRect.yMax));
-			md.UV[0].Add(new Vector2(rightOfEdgeUv, _currentTextureRect.yMax));
-			md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentTextureRect.yMax - 0.015f));
-			md.UV[0].Add(new Vector2(rightOfEdgeUv, _currentTextureRect.yMax - 0.015f));
+			if (d >= (_scaledPreferredWallLength / _currentFacade.ColumnCount) * _wallSizeEpsilon)
+			{
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentTextureRect.yMax));
+				md.UV[0].Add(new Vector2(rightOfEdgeUv, _currentTextureRect.yMax));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentTextureRect.yMax - _shortRowHeightDelta));
+				md.UV[0].Add(new Vector2(rightOfEdgeUv, _currentTextureRect.yMax - _shortRowHeightDelta));
+			}
+			else
+			{
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentTextureRect.yMax));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + _narrowWallWidthDelta, _currentTextureRect.yMax));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentTextureRect.yMax - _shortRowHeightDelta));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + _narrowWallWidthDelta, _currentTextureRect.yMax - _shortRowHeightDelta));
+			}			
 
 			md.Normals.Add(wallNormal);
 			md.Normals.Add(wallNormal);
@@ -278,7 +278,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			md.Vertices.Add(new Vector3(v1.x, v1.y - leftOver - topHeight, v1.z));
 			md.Vertices.Add(new Vector3(v2.x, v2.y - leftOver - topHeight, v2.z));
 
-			if (d >= (_scaledPreferredWallLength / _currentFacade.ColumnCount) * 0.9f)
+			if (d >= (_scaledPreferredWallLength / _currentFacade.ColumnCount) * _wallSizeEpsilon)
 			{
 				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentTextureRect.yMax));
 				md.UV[0].Add(new Vector2(rightOfEdgeUv, _currentTextureRect.yMax));
@@ -287,10 +287,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 			else
 			{
-				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.001f, _currentTextureRect.yMax));
-				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.01f, _currentTextureRect.yMax));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentTextureRect.yMax));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + _narrowWallWidthDelta, _currentTextureRect.yMax));
 				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, bottomOfTopUv));
-				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.001f + 0.01f, bottomOfTopUv));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + _narrowWallWidthDelta, bottomOfTopUv));
 			}
 
 			md.Normals.Add(wallNormal);
@@ -331,7 +331,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			md.Tangents.Add(wallDirection);
 			md.Tangents.Add(wallDirection);
 
-			if (d >= (_scaledPreferredWallLength / _currentFacade.ColumnCount) * 0.9f)
+			if (d >= (_scaledPreferredWallLength / _currentFacade.ColumnCount) * _wallSizeEpsilon)
 			{
 				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, topOfBottomUv));
 				md.UV[0].Add(new Vector2(rightOfEdgeUv, topOfBottomUv));
@@ -340,10 +340,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 			else
 			{
-				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.001f, topOfBottomUv));
-				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.01f, topOfBottomUv));
-				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.001f, _currentTextureRect.yMin));
-				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + 0.01f, _currentTextureRect.yMin));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, topOfBottomUv));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + _narrowWallWidthDelta, topOfBottomUv));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentTextureRect.yMin));
+				md.UV[0].Add(new Vector2(_currentTextureRect.xMin + _narrowWallWidthDelta, _currentTextureRect.yMin));
 			}
 
 			wallTriangles.Add(ind);
