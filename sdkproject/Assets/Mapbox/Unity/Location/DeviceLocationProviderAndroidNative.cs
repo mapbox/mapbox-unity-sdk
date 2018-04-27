@@ -109,14 +109,7 @@
 			_wait5sec = new WaitForSeconds(5);
 			_wait60sec = new WaitForSeconds(60);
 			// throttle if entered update intervall is unreasonably low
-			if (_updateTimeInMilliSeconds < 500)
-			{
-				_waitUpdateTime = new WaitForSeconds(500);
-			}
-			else
-			{
-				_waitUpdateTime = new WaitForSeconds(_updateTimeInMilliSeconds / 1000);
-			}
+			_waitUpdateTime = _updateTimeInMilliSeconds < 500 ? new WaitForSeconds(500) : new WaitForSeconds(_updateTimeInMilliSeconds / 1000);
 
 			_currentLocation.IsLocationServiceEnabled = false;
 			_currentLocation.IsLocationServiceInitializing = true;
@@ -228,7 +221,7 @@
 				// update device orientation
 				if (null != _sensorInstance)
 				{
-					_currentLocation.Orientation = _sensorInstance.Call<float>("getOrientation");
+					_currentLocation.DeviceOrientation = _sensorInstance.Call<float>("getOrientation");
 				}
 
 				bool locationServiceAvailable = _gpsInstance.Call<bool>("getIsLocationServiceAvailable");
@@ -288,7 +281,7 @@
 			if (null == location)
 			{
 				_currentLocation.IsLocationUpdated = false;
-				_currentLocation.IsHeadingUpdated = false;
+				_currentLocation.IsUserHeadingUpdated = false;
 				return;
 			}
 
@@ -321,13 +314,13 @@
 			// thes user is moving, thus don't update 'heading' with '0.0' 
 			if (!hasBearing)
 			{
-				_currentLocation.IsHeadingUpdated = false;
+				_currentLocation.IsUserHeadingUpdated = false;
 			}
 			else
 			{
 				float newHeading = location.Call<float>("getBearing");
-				_currentLocation.IsHeadingUpdated = newHeading != _currentLocation.Heading;
-				_currentLocation.Heading = newHeading;
+				_currentLocation.IsUserHeadingUpdated = newHeading != _currentLocation.UserHeading;
+				_currentLocation.UserHeading = newHeading;
 			}
 
 			float? newSpeed = location.Call<float>("getSpeed");

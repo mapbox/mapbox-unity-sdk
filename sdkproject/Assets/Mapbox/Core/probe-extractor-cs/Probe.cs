@@ -27,7 +27,7 @@ namespace Mapbox.ProbeExtractorCs
 				Timestamp = (long)location.Timestamp,
 				Latitude = location.LatitudeLongitude.x,
 				Longitude = location.LatitudeLongitude.y,
-				Bearing = location.Heading,
+				Bearing = location.UserHeading,
 				HDop = location.Accuracy
 			};
 		}

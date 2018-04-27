@@ -500,7 +500,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _desiredAccuracyInMeters: 100
-  _updateDistanceInMeters: 1
+  _updateDistanceInMeters: 0
 --- !u!4 &849657522
 Transform:
   m_ObjectHideFlags: 0
@@ -639,7 +639,7 @@ MonoBehaviour:
   _autoFireEvent: 1
   _updateInterval: 1
   _sendEvent: 0
-  _gpsLogFile: {fileID: 4900000, guid: fd2155fa3aba0614b8aee6712eed31be, type: 3}
+  _gpsLogFile: {fileID: 4900000, guid: 7a07747909ea237468470c6398307001, type: 3}
 --- !u!4 &1363590664
 Transform:
   m_ObjectHideFlags: 0
@@ -746,9 +746,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 061d2afb48ace4fd19611279b6cf732f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _useOrientation: 0
+  _useDeviceOrientation: 0
   _rotationFollowFactor: 2
   _rotateZ: 0
+  _useNegativeAngle: 0
   _useTransformLocationProvider: 0
 --- !u!1 &1390435044
 GameObject:
@@ -762,9 +763,8 @@ GameObject:
   - component: {fileID: 1390435049}
   - component: {fileID: 1390435048}
   - component: {fileID: 1390435047}
-  - component: {fileID: 1390435046}
   m_Layer: 0
-  m_Name: Heading
+  m_Name: UserHeading
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -783,21 +783,6 @@ Transform:
   m_Father: {fileID: 561771269}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
---- !u!114 &1390435046
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1390435044}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 061d2afb48ace4fd19611279b6cf732f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _useOrientation: 0
-  _rotationFollowFactor: 2
-  _rotateZ: 0
-  _useTransformLocationProvider: 0
 --- !u!114 &1390435047
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -900,17 +885,17 @@ MonoBehaviour:
       latitudeLongitude: 48.85825,2.29450
       zoom: 16
     extentOptions:
-      extentType: 0
+      extentType: 1
       cameraBoundsOptions:
         camera: {fileID: 1383156767}
         visibleBuffer: 0
         disposeBuffer: 0
         updateInterval: 0
       rangeAroundCenterOptions:
-        west: 3
-        north: 3
-        east: 3
-        south: 3
+        west: 1
+        north: 1
+        east: 1
+        south: 1
       rangeAroundTransformOptions:
         targetTransform: {fileID: 0}
         visibleBuffer: 0
@@ -1031,9 +1016,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 061d2afb48ace4fd19611279b6cf732f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _useOrientation: 0
+  _useDeviceOrientation: 0
   _rotationFollowFactor: 2
   _rotateZ: 0
+  _useNegativeAngle: 1
   _useTransformLocationProvider: 0
 --- !u!1 &1830401241
 GameObject:
@@ -1275,7 +1261,7 @@ GameObject:
   - component: {fileID: 1972204565}
   - component: {fileID: 1972204566}
   m_Layer: 0
-  m_Name: Orientation
+  m_Name: DeviceOrientation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1366,14 +1352,15 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1972204560}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 061d2afb48ace4fd19611279b6cf732f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _useOrientation: 1
+  _useDeviceOrientation: 1
   _rotationFollowFactor: 2
   _rotateZ: 0
+  _useNegativeAngle: 0
   _useTransformLocationProvider: 0
 --- !u!1 &2032640978
 GameObject:
@@ -1464,7 +1451,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3d557417079b1446999d2d86ff71dfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _updateDistanceInMeters: 0.5
+  _updateDistanceInMeters: 0
   _updateTimeInMilliSeconds: 500
 --- !u!4 &2054056460
 Transform:

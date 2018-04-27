@@ -9,8 +9,8 @@ namespace Mapbox.Examples
 		/// Location property used for rotation: false=Heading (default), true=Orientation  
 		/// </summary>
 		[SerializeField]
-		[Tooltip("Per default 'Heading' (direction the device is moving) is used for rotation. Check to use 'Orientation' (where the device is facing)")]
-		bool _useOrientation;
+		[Tooltip("Per default 'UserHeading' (direction the device is moving) is used for rotation. Check to use 'DeviceOrientation' (where the device is facing)")]
+		bool _useDeviceOrientation;
 
 
 		/// <summary>
@@ -24,6 +24,14 @@ namespace Mapbox.Examples
 		/// </summary>
 		[SerializeField]
 		bool _rotateZ;
+
+		/// <summary>
+		/// <para>Set this to true if you'd like to adjust the sign of the rotation angle.</para>
+		/// <para>eg angle passed in 63.5, angle that should be used for rotation: -63.5.</para>
+		/// <para>This might be needed when rotating the map and not objects on the map.</para>
+		/// </summary>
+		[SerializeField]
+		bool _useNegativeAngle;
 
 		/// <summary>
 		/// Use a mock <see cref="T:Mapbox.Unity.Location.TransformLocationProvider"/>,
@@ -81,17 +89,19 @@ namespace Mapbox.Examples
 		void LocationProvider_OnLocationUpdated(Location location)
 		{
 
-			float rotationAngle = _useOrientation ? location.Orientation: location.Heading;
+			float rotationAngle = _useDeviceOrientation ? location.DeviceOrientation : location.UserHeading;
+
+			if (_useNegativeAngle) { rotationAngle *= -1f; }
 
 			// 'Orientation' changes all the time, pass through immediately
-			if (_useOrientation)
+			if (_useDeviceOrientation)
 			{
 				_targetRotation = Quaternion.Euler(getNewEulerAngles(rotationAngle));
 			}
 			else
 			{
 				// if rotating by 'Heading' only do it if heading has a new value
-				if (location.IsHeadingUpdated)
+				if (location.IsUserHeadingUpdated)
 				{
 					_targetRotation = Quaternion.Euler(getNewEulerAngles(rotationAngle));
 				}

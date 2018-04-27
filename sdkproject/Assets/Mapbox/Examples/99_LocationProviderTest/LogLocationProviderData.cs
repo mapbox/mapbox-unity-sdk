@@ -40,14 +40,14 @@ namespace Mapbox.Examples.Scripts
 			sb.AppendLine(string.Format("IsLocationServiceEnabled: {0}", location.IsLocationServiceEnabled));
 			sb.AppendLine(string.Format("IsLocationServiceInitializing: {0}", location.IsLocationServiceInitializing));
 			sb.AppendLine(string.Format("IsLocationUpdated: {0}", location.IsLocationUpdated));
-			sb.AppendLine(string.Format("IsHeadingUpdated: {0}", location.IsHeadingUpdated));
+			sb.AppendLine(string.Format("IsHeadingUpdated: {0}", location.IsUserHeadingUpdated));
 			string locationProviderClass = LocationProviderFactory.Instance.DefaultLocationProvider.GetType().Name;
 			sb.AppendLine(string.Format("location provider: {0} ({1})", location.Provider, locationProviderClass));
 			sb.AppendLine(string.Format("UTC time:{0}  - device:  {1}{0}  - location:{2}", Environment.NewLine, DateTime.UtcNow.ToString("yyyyMMdd HHmmss"), UnixTimestampUtils.From(location.Timestamp).ToString("yyyyMMdd HHmmss")));
 			sb.AppendLine(string.Format(_invariantCulture, "position: {0:0.00000000} / {1:0.00000000}", location.LatitudeLongitude.x, location.LatitudeLongitude.y));
 			sb.AppendLine(string.Format(_invariantCulture, "accuracy: {0:0.0}m", location.Accuracy));
-			sb.AppendLine(string.Format(_invariantCulture, "heading: {0:0.0}°", location.Heading));
-			sb.AppendLine(string.Format(_invariantCulture, "orientation: {0:0.0}°", location.Orientation));
+			sb.AppendLine(string.Format(_invariantCulture, "user heading: {0:0.0}°", location.UserHeading));
+			sb.AppendLine(string.Format(_invariantCulture, "device orientation: {0:0.0}°", location.DeviceOrientation));
 			sb.AppendLine(nullableAsStr<float>(location.SpeedKmPerHour, "speed: {0:0.0}km/h"));
 			sb.AppendLine(nullableAsStr<bool>(location.HasGpsFix, "HasGpsFix: {0}"));
 			sb.AppendLine(nullableAsStr<int>(location.SatellitesUsed, "SatellitesUsed:{0} ") + nullableAsStr<int>(location.SatellitesInView, "SatellitesInView:{0}"));

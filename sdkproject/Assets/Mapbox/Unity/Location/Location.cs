@@ -19,16 +19,16 @@
 		///<para>Initially 0 this property gets populated after the device has moved far enough to determine a direction</para>
 		///<para>If the device stops moving last heading is kept till a new one can be caluculated. Check <see cref="Mapbox.Unity.Location.IsHeadingUpdated"/></para>
 		///<para>Also needs location services enabled via Input.location.Start()</para>
-		///<para>related <see cref="Mapbox.Unity.Location.Orientation"/></para>
+		///<para>related <see cref="Mapbox.Unity.Location.DeviceOrientation"/></para>
 		/// </summary>
-		public float Heading;
+		public float UserHeading;
 
 		/// <summary>
 		///<para>Orientation (where the device is looking).</para>
 		///<para>Uses device compass</para>
-		///<para>related <see cref="Mapbox.Unity.Location.Heading"/></para>
+		///<para>related <see cref="Mapbox.Unity.Location.UserHeading"/></para>
 		/// </summary>
-		public float Orientation;
+		public float DeviceOrientation;
 
 		/// <summary>
 		/// Timestamp (in seconds since 1970) when location was last updated.
@@ -94,6 +94,6 @@
 		/// <summary>
 		/// Has the heading changed since last update?
 		/// </summary>
-		public bool IsHeadingUpdated;
+		public bool IsUserHeadingUpdated;
 	}
 }
