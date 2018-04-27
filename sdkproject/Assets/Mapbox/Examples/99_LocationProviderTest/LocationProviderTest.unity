@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.4465785, g: 0.49641252, b: 0.574817, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -303,6 +303,47 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 424127797}
+--- !u!1 &536971210
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 536971212}
+  - component: {fileID: 536971211}
+  m_Layer: 0
+  m_Name: LogLocationProviderData
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &536971211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 536971210}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1e59fc6e7b8a20469944d48968f397f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _logText: {fileID: 424127799}
+--- !u!4 &536971212
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 536971210}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -19.623516, y: 0, z: -1.3808823}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &541353170
 GameObject:
   m_ObjectHideFlags: 0
@@ -407,7 +448,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 561771269}
-  - component: {fileID: 561771268}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -415,20 +455,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &561771268
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 561771267}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4bb39d89f6f3742418be7c93b4259637, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _map: {fileID: 1411663281}
-  _positionFollowFactor: 2
-  _useTransformLocationProvider: 0
 --- !u!4 &561771269
 Transform:
   m_ObjectHideFlags: 0
@@ -715,7 +741,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1383156764}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 061d2afb48ace4fd19611279b6cf732f, type: 3}
   m_Name: 
@@ -848,8 +874,8 @@ GameObject:
   - component: {fileID: 1411663282}
   - component: {fileID: 1411663281}
   - component: {fileID: 1411663284}
-  - component: {fileID: 1411663285}
   - component: {fileID: 1411663283}
+  - component: {fileID: 1411663286}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -994,7 +1020,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _map: {fileID: 1411663281}
---- !u!114 &1411663285
+--- !u!114 &1411663286
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -1002,10 +1028,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1411663280}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1e59fc6e7b8a20469944d48968f397f, type: 3}
+  m_Script: {fileID: 11500000, guid: 061d2afb48ace4fd19611279b6cf732f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _logText: {fileID: 424127799}
+  _useOrientation: 0
+  _rotationFollowFactor: 2
+  _rotateZ: 0
+  _useTransformLocationProvider: 0
 --- !u!1 &1830401241
 GameObject:
   m_ObjectHideFlags: 0
@@ -1337,7 +1366,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1972204560}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 061d2afb48ace4fd19611279b6cf732f, type: 3}
   m_Name: 
