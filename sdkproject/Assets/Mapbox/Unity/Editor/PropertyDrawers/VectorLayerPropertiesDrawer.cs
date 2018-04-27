@@ -420,7 +420,7 @@
 				{
 					TilesetId = sourceString;
 					tileJSONData = ScriptableObject.CreateInstance<TileJsonData>();
-					tileJSONData.ClearData();
+					//tileJSONData.ClearData();
 					Unity.MapboxAccess.Instance.TileJSON.Get(sourceString, tileJSONData.ProcessTileJSONData);
 				}
 			}

@@ -7,8 +7,8 @@
 
 	public class TileJsonData : ScriptableObject
 	{
-		public readonly string commonLayersKey = "(common across all sources)";
-		public readonly string optionalPropertiesString = "(may not appear)";
+		public readonly string commonLayersKey = "(layer found in more than one source)";
+		public readonly string optionalPropertiesString = "(may not appear across all locations)";
 		/// <summary>
 		/// This boolean is to check if tile JSON data has loaded after the data source has changed
 		/// </summary>
@@ -164,8 +164,7 @@
 							PropertyDisplayNames[layerName].Add(propertyName);
 
 							//logic to add the list of masked properties from all sources that are not #1
-							if (layerName == "building")
-								if (LayerSourcesDictionary[layerName].Count > 1)
+							if (LayerSourcesDictionary[layerName].Count > 1 && !string.IsNullOrEmpty(tjr.Source))
 								{
 									var firstSource = tjr.Source.Split(new string[] { "," }, System.StringSplitOptions.None)[0].Trim();
 									if (layerSource != firstSource)
