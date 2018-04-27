@@ -72,6 +72,16 @@
 			if (_elapsedTime > _updateInterval && offset.sqrMagnitude > _sqDistance)
 			{
 				_elapsedTime = 0f;
+#if UNITY_EDITOR
+				//Debug.LogFormat("Adding Node for {0} : {1}", gameObject.name, _target.localPosition);
+#else
+				Unity.Utilities.Console.Instance.Log(
+					string.Format(
+						"Adding Node: {0}"
+						, _target.localPosition)
+					, "orange"
+				);
+#endif
 				AddNode(_target.localPosition);
 			}
 		}

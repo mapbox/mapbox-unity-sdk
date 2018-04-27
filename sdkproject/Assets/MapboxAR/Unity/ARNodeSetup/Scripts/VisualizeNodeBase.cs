@@ -18,6 +18,9 @@
 		float _lineWidth;
 
 		[SerializeField]
+		float _lineHeight;
+
+		[SerializeField]
 		Material _nodeMaterial;
 
 		LineRenderer _lineRend;
@@ -49,19 +52,25 @@
 			//var nodePos = _map.GeoToWorldPosition(_nodeBase.ReturnLatestNode().LatLon);
 			//Instantiate(GameObject.CreatePrimitive(PrimitiveType.Sphere), nodePos, Quaternion.identity, _map.gameObject.transform);
 
+			Debug.Log("Plot Route");
 			var nodes = _nodeBase.ReturnNodes();
 			var length = nodes.Length;
 			_lineRend.positionCount = length;
 
-			if (length - 1 > 0)
-			{
-				_lineRend.SetPosition(length - 1, _map.GeoToWorldPosition(nodes[length - 1].LatLon));
-			}
-
-			//for (int i = 0; i < _nodeBase.ReturnNodes().Length; i++)
+			//if (length - 1 > 0)
 			//{
-			//	_lineRend.SetPosition(i, _map.GeoToWorldPosition(nodes[i].LatLon));
+			//	_lineRend.SetPosition(length - 1, _map.GeoToWorldPosition(nodes[length - 1].LatLon));
 			//}
+
+			for (int i = 0; i < _nodeBase.ReturnNodes().Length; i++)
+			{
+				var position = _map.GeoToWorldPosition(nodes[i].LatLon, false);
+				if (_lineHeight > 0)
+				{
+					position.y = _lineHeight;
+				}
+				_lineRend.SetPosition(i, position);
+			}
 		}
 
 		private void OnDisable()

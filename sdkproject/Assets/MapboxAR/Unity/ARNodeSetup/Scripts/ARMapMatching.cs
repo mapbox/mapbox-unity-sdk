@@ -8,6 +8,7 @@
 	using Mapbox.Utils;
 	using Mapbox.Platform;
 	using Mapbox.Unity.Map;
+	using System.Linq;
 
 	public class ARMapMatching : NodeSyncBase
 	{
@@ -18,27 +19,17 @@
 		AbstractMap _map;
 
 		public Action<Node[]> ReturnMapMatchCoords;
-		Node[] _savedNodes;
+		private List<Node> _savedNodes;
 		IEnumerator _mapMatching, _waitForRequest;
 		WaitForSeconds _waitFor;
 
-
-		public override void InitializeNodeBase()
-		{
-			throw new NotImplementedException();
-		}
+		private List<Node> _nodesForMapMatchingQuery = new List<Node>();
 
 		public void MapMatchQuery(Node[] nodes)
 		{
+			_nodesForMapMatchingQuery.Clear();
+			_nodesForMapMatchingQuery.AddRange(nodes);
 
-			Vector2d[] coordinates = new Vector2d[nodes.Length];
-
-			for (int i = 0; i < nodes.Length; i++)
-			{
-				coordinates[i] = nodes[i].LatLon;
-			}
-
-			SimpleQuery(coordinates);
 		}
 
 		void SimpleQuery(Vector2d[] coords)
@@ -61,17 +52,20 @@
 		{
 			var coordinates = response.Matchings[0].Geometry;
 			var quality = response.Matchings[0].Confidence;
-			var nodes = new Node[coordinates.Count];
+			var nodes = new List<Node>();
 
 			if (ReturnMapMatchCoords != null)
 			{
 				for (int i = 0; i < coordinates.Count; i++)
 				{
-					nodes[i].Confidence = quality;
-					nodes[i].LatLon = coordinates[i];
+					nodes.Add(new Node
+					{
+						Confidence = quality,
+						LatLon = coordinates[i]
+					});
 				}
 
-				ReturnMapMatchCoords(nodes);
+				ReturnMapMatchCoords(nodes.ToArray());
 				_savedNodes = nodes;
 
 				if (NodeAdded != null)
@@ -88,12 +82,25 @@
 
 		public override Node[] ReturnNodes()
 		{
-			return _savedNodes;
+			return _savedNodes.ToArray();
 		}
 
 		public override Node ReturnLatestNode()
 		{
-			return _savedNodes[_savedNodes.Length - 1];
+			return _savedNodes[_savedNodes.Count - 1];
+		}
+
+		public override void InitializeNodeBase()
+		{
+			_savedNodes = new List<Node>();
+			_nodesForMapMatchingQuery = new List<Node>();
+		}
+
+		public override void SaveNode()
+		{
+			var coordinates = _nodesForMapMatchingQuery.Select(t => t.LatLon);
+			SimpleQuery(coordinates.ToArray());
+
 		}
 	}
 }

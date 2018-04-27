@@ -31,8 +31,6 @@ namespace Mapbox.Unity.Location
 		//[SerializeField]
 		AbstractMap _map;
 
-		bool _mapInitialized;
-
 #if UNITY_EDITOR
 		protected void Start()
 		{
@@ -43,6 +41,10 @@ namespace Mapbox.Unity.Location
 			{
 				_targetTransform = transform;
 			}
+			else
+			{
+				Debug.Log(_targetTransform.gameObject.name);
+			}
 
 			base.Awake();
 		}
@@ -50,9 +52,10 @@ namespace Mapbox.Unity.Location
 
 		void Map_OnInitialized()
 		{
+			Debug.Log("Map Initialized");
 			LocationProviderFactory.Instance.mapManager.OnInitialized -= Map_OnInitialized;
 			//_map.OnInitialized -= Map_OnInitialized;
-			_mapInitialized = true;
+			LocationProviderFactory.Instance.IsMapInitialized = true;
 			_map = LocationProviderFactory.Instance.mapManager;
 		}
 
@@ -60,7 +63,7 @@ namespace Mapbox.Unity.Location
 		{
 			get
 			{
-				if (_mapInitialized)
+				if (LocationProviderFactory.Instance.IsMapInitialized)
 				{
 					var startingLatLong = Conversions.StringToLatLon(_latitudeLongitude);
 					var position = Conversions.GeoToWorldPosition(
@@ -69,7 +72,10 @@ namespace Mapbox.Unity.Location
 						_map.WorldRelativeScale
 					).ToVector3xz();
 					position += _targetTransform.position;
-					return position.GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
+					Debug.Log("Position : " + position);
+					var latLong = _map.WorldToGeoPosition(position);
+					Debug.Log("Lat Long " + latLong.x + " , " + latLong.y);
+					return _map.WorldToGeoPosition(position);// position.GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
 				}
 
 				return Conversions.StringToLatLon(_latitudeLongitude);

@@ -5,6 +5,7 @@
 	using System.Collections.Generic;
 	using UnityEngine;
 	using Mapbox.Utils;
+	using Mapbox.Unity.Location;
 
 	public abstract class NodeSyncBase : MonoBehaviour
 	{
@@ -22,6 +23,10 @@
 		/// Initializes the node base.
 		/// </summary>
 		public abstract void InitializeNodeBase();
+		/// <summary>
+		/// Saves the node.
+		/// </summary>
+		public abstract void SaveNode();
 		/// <summary>
 		/// An event that is called when a node is added.
 		/// </summary>

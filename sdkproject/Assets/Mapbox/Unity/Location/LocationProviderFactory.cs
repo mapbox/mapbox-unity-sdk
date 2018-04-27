@@ -29,6 +29,18 @@ namespace Mapbox.Unity.Location
 		[SerializeField]
 		bool _dontDestroyOnLoad;
 
+		protected bool _mapInitialized = false;
+		public bool IsMapInitialized
+		{
+			get
+			{
+				return _mapInitialized;
+			}
+			set
+			{
+				_mapInitialized = value;
+			}
+		}
 
 		/// <summary>
 		/// The singleton instance of this factory.

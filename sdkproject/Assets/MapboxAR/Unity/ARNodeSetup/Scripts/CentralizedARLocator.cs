@@ -7,7 +7,7 @@
 	using System;
 	using Mapbox.MapMatching;
 	using Mapbox.Utils;
-	using System.Threading.Tasks;
+	//using System.Threading.Tasks;
 	using UnityARInterface;
 
 	public class CentralizedARLocator : MonoBehaviour
@@ -34,12 +34,11 @@
 		int _desiredAccuracy;
 
 		[SerializeField]
-		NodeSyncBase[] _nodeSyncs;
+		NodeSyncBase[] _syncNodes;
 
 		[SerializeField]
 		Transform _player;
 
-		Node[] _nodes;
 		Location _highestLocation;
 
 		public static Action<Location> OnNewHighestAccuracyGPS;
@@ -48,19 +47,36 @@
 
 		void Start()
 		{
-			LocationProviderFactory.Instance.DefaultLocationProvider.OnLocationUpdated += SaveHighestAccuracy;
-			_mapMathching.ReturnMapMatchCoords += GetMapMatchingCoords;
-			Invoke("hack", 5f);
+			// Initialize all sync-nodes.Make them ready to recieve node data. 
+			InitializeSyncNodes();
+			//We want Syncronize to be called when location is updated. This could extend to any other polling methods in the future.
+			LocationProviderFactory.Instance.DefaultLocationProvider.OnLocationUpdated += SyncronizeNodesToFindAlignment;
+			//Debugging purpose???
+			//_mapMathching.ReturnMapMatchCoords += GetMapMatchingCoords;
 		}
 
-		void hack()
+		protected void SyncronizeNodesToFindAlignment(Location location)
 		{
-			for (int i = 0; i < _nodeSyncs.Length; i++)
+			// Our location provider just got a new update.
+			// We now ask all our nodes to update and save the most recent node. 
+			// Sync Nodes should also update a "Quality/Accuracy" metric.
+			// Quality/Accuracy metric will be used to determine whether the node will be considered for the alignment computation or not. 
+			Debug.Log("SyncronizeNodesToFindAlignment");
+
+			foreach (var node in _syncNodes)
 			{
-				_nodeSyncs[i].InitializeNodeBase();
+				node.SaveNode();
 			}
 
-			FindBestNodes();
+			// Compute Alignment 
+		}
+
+		void InitializeSyncNodes()
+		{
+			for (int i = 0; i < _syncNodes.Length; i++)
+			{
+				_syncNodes[i].InitializeNodeBase();
+			}
 		}
 
 		void CheckTracking()
@@ -92,27 +108,27 @@
 			}
 		}
 
-		async void FindBestNodes()
-		{
+		//async void FindBestNodes()
+		//{
 
-			while (true)
-			{
-				foreach (var nodeSync in _nodeSyncs)
-				{
-					if (nodeSync.ReturnNodes().Length >= _amountOfNodesToCheck)
-					{
-						var average = CheckAverageAccuracy(nodeSync, _amountOfNodesToCheck);
+		//	while (true)
+		//	{
+		//		foreach (var nodeSync in _nodeSyncs)
+		//		{
+		//			if (nodeSync.ReturnNodes().Length >= _amountOfNodesToCheck)
+		//			{
+		//				var average = CheckAverageAccuracy(nodeSync, _amountOfNodesToCheck);
 
-						if (average <= _desiredAccuracy)
-						{
-							_mapMathching.MapMatchQuery(nodeSync.ReturnNodes());
-						}
-					}
-				}
+		//				if (average <= _desiredAccuracy)
+		//				{
+		//					_mapMathching.MapMatchQuery(nodeSync.ReturnNodes());
+		//				}
+		//			}
+		//		}
 
-				await Task.Delay(TimeSpan.FromSeconds(10));
-			}
-		}
+		//		await Task.Delay(TimeSpan.FromSeconds(10));
+		//	}
+		//}
 
 		int CheckAverageAccuracy(NodeSyncBase syncBase, int howManyNodes)
 		{
@@ -140,7 +156,7 @@
 		{
 			if (Input.GetKeyDown(KeyCode.Space))
 			{
-				_mapMathching.MapMatchQuery(_nodeSyncs[0].ReturnNodes());
+				_mapMathching.MapMatchQuery(_syncNodes[0].ReturnNodes());
 			}
 		}
 
