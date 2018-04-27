@@ -3,10 +3,12 @@
 	using UnityEditor;
 	using UnityEngine;
 	using Mapbox.Unity.Map;
+	using System.Collections.Generic;
 
 	[CustomPropertyDrawer(typeof(CoreVectorLayerProperties))]
 	public class CoreVectorLayerPropertiesDrawer : PropertyDrawer
 	{
+		private int index = 0;
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -25,7 +27,19 @@
 			EditorGUI.indentLevel++;
 
 			position.y += lineHeight;
-			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("layerName"));
+			//EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("layerName"));
+			TileJsonData tileJSONData = property.FindPropertyRelative("_tileJsonData").objectReferenceValue as TileJsonData;
+			if (tileJSONData.LayerDisplayNames.Count > 0)
+			{
+				var layerDisplayNames = tileJSONData.LayerDisplayNames;
+				var layerNamesArray = layerDisplayNames.ToArray();
+				typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Layer Name", tooltip = "The layer name from the Mapbox tileset that would be used for visualizing a feature" });
+				EditorGUI.indentLevel--;
+				index = EditorGUI.Popup(typePosition, index, layerNamesArray);
+				var parsedString = layerNamesArray[index].Split(new string[] { tileJSONData.commonLayersKey }, System.StringSplitOptions.None)[0].Trim();
+				property.FindPropertyRelative("layerName").stringValue = parsedString;
+				EditorGUI.indentLevel++;
+			}
 
 			position.y += lineHeight;
 			EditorGUI.PropertyField(position, property.FindPropertyRelative("snapToTerrain"));

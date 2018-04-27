@@ -8,6 +8,8 @@
 	[Serializable]
 	public class CoreVectorLayerProperties
 	{
+		[SerializeField]
+		private TileJsonData _tileJsonData;
 		[Tooltip("Is visualizer active.")]
 		public bool isActive = true;
 		[Tooltip("Name of the visualizer. ")]

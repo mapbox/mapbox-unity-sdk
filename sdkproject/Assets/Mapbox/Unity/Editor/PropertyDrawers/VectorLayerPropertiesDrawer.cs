@@ -14,9 +14,27 @@
 	[CustomPropertyDrawer(typeof(VectorLayerProperties))]
 	public class VectorLayerPropertiesDrawer : PropertyDrawer
 	{
+		private TileJsonData _tileJsonData;
 		static float _lineHeight = EditorGUIUtility.singleLineHeight;
 		GUIContent[] _sourceTypeContent;
 		bool _isGUIContentSet = false;
+		private TileJsonData tileJSONData;
+
+		/// <summary>
+		/// Gets or sets the layerID
+		/// </summary>
+		/// <value><c>true</c> then show general section; otherwise hide, <c>false</c>.</value>
+		private string TilesetId
+		{
+			get
+			{
+				return EditorPrefs.GetString("MapManagerEditor_tilesetId");
+			}
+			set
+			{
+				EditorPrefs.SetString("MapManagerEditor_tilesetId", value);
+			}
+		}
 
 		bool ShowPosition
 		{
@@ -116,12 +134,14 @@
 					layerSourceId.stringValue = sourcePropertyValue.Id;
 					GUI.enabled = false;
 					EditorGUILayout.PropertyField(sourceOptionsProperty, _mapIdGui);
+					LoadEditorTileJSON(sourceTypeValue, layerSourceId.stringValue);
 					GUI.enabled = true;
 					isActiveProperty.boolValue = true;
 					break;
 				case VectorSourceType.Custom:
 					layerSourceId.stringValue = CustomSourceMapId;
 					EditorGUILayout.PropertyField(sourceOptionsProperty, _mapIdGui);
+					LoadEditorTileJSON(sourceTypeValue, layerSourceId.stringValue);
 					CustomSourceMapId = layerSourceId.stringValue;
 					isActiveProperty.boolValue = true;
 					break;
@@ -249,15 +269,22 @@
 			GUILayout.BeginVertical();
 
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
+			subLayerCoreOptions.FindPropertyRelative("_tileJsonData").objectReferenceValue = tileJSONData;
+
 			VectorPrimitiveType primitiveTypeProp = (VectorPrimitiveType)subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex;
 
 			EditorGUILayout.PropertyField(subLayerCoreOptions);
+
+			var extrusionOptions = layerProperty.FindPropertyRelative("extrusionOptions");
+			extrusionOptions.FindPropertyRelative("_tileJsonData").objectReferenceValue = tileJSONData ;
+			//loading up the selectedLayerName for extrusion options to pull up the right propertyName
+			extrusionOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
 
 			if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
 			{
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("colliderOptions"));
 
-				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
+				EditorGUILayout.PropertyField(extrusionOptions);
 
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
 			}
@@ -383,6 +410,24 @@
 			}
 			//
 			EditorGUILayout.EndVertical();
+		}
+
+		private void LoadEditorTileJSON(VectorSourceType sourceTypeValue, string sourceString)
+		{
+			if (sourceTypeValue != VectorSourceType.None && !string.IsNullOrEmpty(sourceString))
+			{
+				if (string.IsNullOrEmpty(TilesetId) || sourceString != TilesetId)
+				{
+					TilesetId = sourceString;
+					tileJSONData = ScriptableObject.CreateInstance<TileJsonData>();
+					tileJSONData.ClearData();
+					Unity.MapboxAccess.Instance.TileJSON.Get(sourceString, tileJSONData.ProcessTileJSONData);
+				}
+			}
+			else
+			{
+				tileJSONData.ClearData();
+			}
 		}
 	}
 }

@@ -8,6 +8,7 @@
 	[CustomPropertyDrawer(typeof(GeometryExtrusionOptions))]
 	public class GeometryExtrusionOptionsDrawer : PropertyDrawer
 	{
+		private int index = 0;
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		GUIContent[] sourceTypeContent;
 		bool isGUIContentSet = false;
@@ -55,25 +56,29 @@
 					position.y += lineHeight;
 					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), extrusionGeometryType, extrusionGeometryGUI);
 					position.y += lineHeight;
-					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
+					//EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
+					DrawPropertyDropDown(property, position);
 					break;
 				case Unity.Map.ExtrusionType.MinHeight:
 					position.y += lineHeight;
 					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), extrusionGeometryType, extrusionGeometryGUI);
 					position.y += lineHeight;
-					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
+					//EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
+					DrawPropertyDropDown(property, position);
 					break;
 				case Unity.Map.ExtrusionType.MaxHeight:
 					position.y += lineHeight;
 					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), extrusionGeometryType, extrusionGeometryGUI);
 					position.y += lineHeight;
-					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
+					//EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
+					DrawPropertyDropDown(property, position);
 					break;
 				case Unity.Map.ExtrusionType.RangeHeight:
 					position.y += lineHeight;
 					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), extrusionGeometryType, extrusionGeometryGUI);
 					position.y += lineHeight;
-					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
+					//EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
+					DrawPropertyDropDown(property, position);
 					position.y += lineHeight;
 					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), minHeightProperty);
 					position.y += lineHeight;
@@ -99,6 +104,26 @@
 
 			EditorGUI.EndProperty();
 		}
+
+		private void DrawPropertyDropDown(SerializedProperty property, Rect position)
+		{
+			var selectedLayerName = property.FindPropertyRelative("_selectedLayerName").stringValue;
+
+			if (string.IsNullOrEmpty(selectedLayerName))
+				return;
+
+			TileJsonData tileJsonData = property.FindPropertyRelative("_tileJsonData").objectReferenceValue as TileJsonData;
+			var propertyDisplayNames = tileJsonData.PropertyDisplayNames[selectedLayerName];
+			var propertyNamesArray = propertyDisplayNames.ToArray();
+			Rect typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Property Name", tooltip = "The name of the property in the selected Mapbox layer that will be used for extrusion" });
+			EditorGUI.indentLevel -= 2;
+			index = EditorGUI.Popup(typePosition, index, propertyNamesArray);
+			var parsedString = propertyNamesArray[index].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+			property.FindPropertyRelative("propertyName").stringValue = parsedString;
+			EditorGUI.indentLevel += 2;
+		
+		}
+
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
 			var extrusionTypeProperty = property.FindPropertyRelative("extrusionType");

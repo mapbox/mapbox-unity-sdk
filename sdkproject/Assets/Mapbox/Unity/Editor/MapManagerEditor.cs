@@ -10,24 +10,6 @@
 	[CanEditMultipleObjects]
 	public class MapManagerEditor : Editor
 	{
-		private Rect buttonRect;
-		/// <summary>
-		/// Gets or sets the layerID
-		/// </summary>
-		/// <value><c>true</c> then show general section; otherwise hide, <c>false</c>.</value>
-		private string TilesetId
-		{
-			get
-			{
-				return EditorPrefs.GetString("MapManagerEditor_tilesetId");
-			}
-			set
-			{
-				EditorPrefs.SetString("MapManagerEditor_tilesetId", value);
-			}
-		}
-
-
 		/// <summary>
 		/// Gets or sets a value indicating whether to show general section <see cref="T:Mapbox.Editor.MapManagerEditor"/>.
 		/// </summary>
@@ -181,26 +163,7 @@
 			ShowVector = EditorGUILayout.Foldout(ShowVector, "VECTOR");
 			if (ShowVector)
 			{
-				var vectorDataProperty = serializedObject.FindProperty("_vectorData");
-
-
-				var layerProperty = vectorDataProperty.FindPropertyRelative("_layerProperty");
-				var layerSourceProperty = layerProperty.FindPropertyRelative("sourceOptions");
-				var sourceType = layerProperty.FindPropertyRelative("sourceType");
-				VectorSourceType sourceTypeValue = (VectorSourceType)sourceType.enumValueIndex;
-				string layerString = layerProperty.FindPropertyRelative("sourceOptions.layerSource.Id").stringValue;
-
-				if (sourceTypeValue != VectorSourceType.None && !string.IsNullOrEmpty(layerString))
-				{
-					if (string.IsNullOrEmpty(TilesetId) || layerString != TilesetId)
-					{
-						EditorTileJSONData tileJSONData = EditorTileJSONData.Instance;
-						tileJSONData.tileJSONLoaded = false;
-						TilesetId = layerString;
-						Unity.MapboxAccess.Instance.TileJSON.Get(layerString,ProcessTileJSONData);
-					}
-				}
-				ShowSection(vectorDataProperty, "_layerProperty");
+				ShowSection(serializedObject.FindProperty("_vectorData"), "_layerProperty");
 			}
 			GUILayout.EndVertical();
 
@@ -343,110 +306,6 @@
 
 			vectorSourceType.enumValueIndex = (int)VectorSourceType.MapboxStreets;
 
-		}
-
-		private void ProcessTileJSONData(TileJSONResponse tjr)
-		{
-			TileJSONResponse response = tjr;
-			EditorTileJSONData tileJSONData = EditorTileJSONData.Instance;
-			tileJSONData.ClearData();
-
-			List<string> layerPropertiesList = new List<string>();
-			List<string> sourceLayersList = new List<string>();
-
-			if (response==null || response.VectorLayers == null || response.VectorLayers.Length == 0)
-			{
-				return;
-			}
-
-			var propertyName = "";
-			var propertyDescription = "";
-			var layerSource = "";
-
-			foreach (var layer in response.VectorLayers)
-			{
-				var layerName = layer.Id;
-				layerPropertiesList = new List<string>();
-				layerSource = layer.Source;
-
-				if (layer.Fields.Count == 0)
-					continue;
-				
-				foreach (var property in layer.Fields)
-				{
-					propertyName = property.Key;
-					propertyDescription = property.Value;
-					layerPropertiesList.Add(propertyName);
-
-					//adding property descriptions
-					if (tileJSONData.LayerPropertyDescriptionDictionary.ContainsKey(layerName))
-					{
-						if (tileJSONData.LayerPropertyDescriptionDictionary[layerName].ContainsKey(propertyName))
-						{
-							tileJSONData.LayerPropertyDescriptionDictionary[layerName][propertyName] = propertyDescription;
-						}
-						else
-						{
-							tileJSONData.LayerPropertyDescriptionDictionary[layerName].Add(propertyName, propertyDescription);
-						}
-					}
-					else
-					{
-						tileJSONData.LayerPropertyDescriptionDictionary.Add(layerName, new Dictionary<string, string>() { { propertyName, propertyDescription } });
-					}
-				}
-
-				//loading layer sources
-				if (tileJSONData.LayerSourcesDictionary.ContainsKey(layerName))
-				{
-					tileJSONData.LayerSourcesDictionary[layerName].Add(layerSource);
-				}
-				else
-				{
-					tileJSONData.LayerSourcesDictionary.Add(layerName, new List<string>() { layerSource });
-				}
-
-				//loading layers to a data source
-				if (tileJSONData.SourceLayersDictionary.ContainsKey(layerSource))
-				{
-					string commonLayersKey = tileJSONData.commonLayersKey;
-					List<string> sourceList = new List<string>();
-					tileJSONData.LayerSourcesDictionary.TryGetValue(layerName, out sourceList);
-
-					if (sourceList.Count > 1 && sourceList.Contains(layerSource)) // the current layerName has more than one source
-					{
-						if (tileJSONData.SourceLayersDictionary.ContainsKey(commonLayersKey))
-						{
-							tileJSONData.SourceLayersDictionary[commonLayersKey].Add(layerName);
-						}
-						else
-						{
-							tileJSONData.SourceLayersDictionary.Add(commonLayersKey, new List<string>() { layerName });
-						}
-
-						//remove the layer from other different sources
-						foreach (var source in sourceList)
-						{
-							tileJSONData.SourceLayersDictionary[source].Remove(layerName);
-
-							//if the source contains zero layers remove th source from the list
-							if (tileJSONData.SourceLayersDictionary[source].Count == 0)
-								tileJSONData.SourceLayersDictionary.Remove(source);
-						}
-					}
-					else
-					{
-						tileJSONData.SourceLayersDictionary[layerSource].Add(layerName);
-					}
-				}
-				else
-				{
-					tileJSONData.SourceLayersDictionary.Add(layerSource, new List<string>() { layerName });
-				}
-			}
-			
-			tileJSONData.tileJSONLoaded = true;
-			Debug.Log(tileJSONData);
 		}
 	}
 }
