@@ -20,14 +20,14 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private bool _separateSubmesh = true;
 
 		#endregion
-		private List<Vector3> edgeList;
 		float currentWallLength = 0;
-		float step = 0;
-		float difference = 0;
 		Vector3 start = Constants.Math.Vector3Zero;
 		Vector3 wallDirection = Constants.Math.Vector3Zero;
-		Vector3 firstVertex;
-		Vector3 secondVertex;
+
+		Vector3 wallSegmentFirstVertex;
+		Vector3 wallSegmentSecondVertex;
+		Vector3 wallSegmentDirection;
+		float wallSegmentLength;
 		
 		//public AtlasInfo AtlasInfo;
 		private AtlasEntity _currentFacade;
@@ -68,7 +68,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		public override void Initialize()
 		{
 			base.Initialize();
-			edgeList = new List<Vector3>();
 			foreach (var atlasEntity in _options.atlasInfo.Textures)
 			{
 				atlasEntity.CalculateParameters();
@@ -109,25 +108,65 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			if (_options.extrusionGeometryType != ExtrusionGeometryType.RoofOnly)
 			{
-				edgeList.Clear();
-				
-				//cuts long edges into smaller ones using PreferredEdgeSectionLength
-				CalculateEdgeList(md, tile, _currentFacade.PreferredEdgeSectionLength);
-
 				//limiting section heights, first floor gets priority, then we draw top floor, then mid if we still have space
 				finalFirstHeight = Mathf.Min(height, _scaledFirstFloorHeight);
 				finalTopHeight = (height - finalFirstHeight) < _scaledTopFloorHeight ? 0 : _scaledTopFloorHeight;
 				finalMidHeight = Mathf.Max(0, height - (finalFirstHeight + finalTopHeight));
 				//scaledFloorHeight = midHeight / floorCount;
 				wallTriangles = new List<int>();
-				
-				//this first loop is for columns
-				for (int i = 0; i < edgeList.Count - 1; i += 2)
+
+				//cuts long edges into smaller ones using PreferredEdgeSectionLength
+				currentWallLength = 0;
+				start = Constants.Math.Vector3Zero;
+				wallSegmentDirection = Constants.Math.Vector3Zero;
+				for (int i = 0; i < md.Edges.Count; i += 2)
 				{
-					firstVertex = edgeList[i];
-					secondVertex = edgeList[i + 1];
-					CreateWall(md);
+					var v1 = md.Vertices[md.Edges[i]];
+					var v2 = md.Vertices[md.Edges[i + 1]];
+
+					currentWallLength = Vector3.Distance(v1, v2);
+					_leftOverColumnLength = currentWallLength % _singleColumnLength;
+					start = v1;
+					wallSegmentDirection = (v2 - v1).normalized;
+
+					//half of leftover column (if _centerSegments ofc) at the begining
+					if (_centerSegments && currentWallLength > _singleColumnLength)
+					{
+						//save left,right vertices and wall length
+						wallSegmentFirstVertex = start;
+						wallSegmentLength = (_leftOverColumnLength / 2);
+						start += wallSegmentDirection * wallSegmentLength;
+						wallSegmentSecondVertex = start;
+
+						_leftOverColumnLength = _leftOverColumnLength / 2;
+						CreateWall(md);
+					}
+
+					while (currentWallLength > _singleColumnLength)
+					{
+						wallSegmentFirstVertex = start;
+						//columns fitting wall / max column we have in texture
+						var stepRatio = (float)Math.Min(_currentFacade.ColumnCount, Math.Floor(currentWallLength / _singleColumnLength)) / _currentFacade.ColumnCount;
+						wallSegmentLength = stepRatio * _scaledPreferredWallLength;
+						start += wallSegmentDirection * wallSegmentLength;
+						wallSegmentSecondVertex = start;
+
+						currentWallLength -= (stepRatio * _scaledPreferredWallLength);
+						CreateWall(md);
+					}
+
+					//left over column at the end
+					if (_leftOverColumnLength > 0)
+					{
+						wallSegmentFirstVertex = start;
+						wallSegmentSecondVertex = v2;
+						wallSegmentLength = _leftOverColumnLength;
+						CreateWall(md);
+					}
 				}
+
+				//this first loop is for columns
+
 
 				if (_separateSubmesh)
 				{
@@ -145,14 +184,12 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		{
 			//need to keep track of this for triangulation indices
 			triIndex = md.Vertices.Count;
-			wallDirection = (secondVertex - firstVertex);
-			difference = wallDirection.magnitude;
 
 			//this part minimizes stretching for narrow columns
 			//if texture has 3 columns, 33% (of preferred edge length) wide walls will get 1 window.
 			//0-33% gets 1 window, 33-66 gets 2, 66-100 gets all three
 			//we're not wrapping/repeating texture as it won't work with atlases
-			columnScaleRatio = Math.Min(1, difference / _scaledPreferredWallLength);
+			columnScaleRatio = Math.Min(1, wallSegmentLength / _scaledPreferredWallLength);
 			rightOfEdgeUv = _currentTextureRect.xMin + _currentTextureRect.size.x * columnScaleRatio; // Math.Min(1, ((float)(Math.Floor(columnScaleRatio * _currentFacade.ColumnCount) + 1) / _currentFacade.ColumnCount));
 
 			//leftover row means the area left after first/top/mid floors placed without any stretching
@@ -160,10 +197,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			leftOver = leftOver % _singleFloorHeight;
 			_minWallLength = (_scaledPreferredWallLength / _currentFacade.ColumnCount) * _wallSizeEpsilon;
 			//common for all top/mid/bottom segments
-			wallNormal = new Vector3(-(firstVertex.z - secondVertex.z), 0, (firstVertex.x - secondVertex.x)).normalized;
+			wallNormal = new Vector3(-(wallSegmentFirstVertex.z - wallSegmentSecondVertex.z), 0, (wallSegmentFirstVertex.x - wallSegmentSecondVertex.x)).normalized;
 			//height of the left/right edges
-			currentY1 = firstVertex.y;
-			currentY2 = secondVertex.y;
+			currentY1 = wallSegmentFirstVertex.y;
+			currentY2 = wallSegmentSecondVertex.y;
 
 			//moving leftover row to top
 			LeftOverRow(md, leftOver);
@@ -178,16 +215,16 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			//leftover. we're moving small leftover row to top of the building
 			if (leftOver > 0)
 			{
-				md.Vertices.Add(new Vector3(firstVertex.x, currentY1, firstVertex.z));
-				md.Vertices.Add(new Vector3(secondVertex.x, currentY2, secondVertex.z));
+				md.Vertices.Add(new Vector3(wallSegmentFirstVertex.x, currentY1, wallSegmentFirstVertex.z));
+				md.Vertices.Add(new Vector3(wallSegmentSecondVertex.x, currentY2, wallSegmentSecondVertex.z));
 				//move offsets bottom
 				currentY1 -= leftOver;
 				currentY2 -= leftOver;
 				//bottom two vertices
-				md.Vertices.Add(new Vector3(firstVertex.x, currentY1, firstVertex.z));
-				md.Vertices.Add(new Vector3(secondVertex.x, currentY2, secondVertex.z));
+				md.Vertices.Add(new Vector3(wallSegmentFirstVertex.x, currentY1, wallSegmentFirstVertex.z));
+				md.Vertices.Add(new Vector3(wallSegmentSecondVertex.x, currentY2, wallSegmentSecondVertex.z));
 
-				if (difference >= _minWallLength)
+				if (wallSegmentLength >= _minWallLength)
 				{
 					md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentTextureRect.yMax));
 					md.UV[0].Add(new Vector2(rightOfEdgeUv, _currentTextureRect.yMax));
@@ -234,17 +271,17 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				_midUvInCurrentStep = ((float)Math.Min(_currentFacade.MidFloorCount, Math.Round(_currentMidHeight / _singleFloorHeight))) / _currentFacade.MidFloorCount;
 
 				//top two vertices
-				md.Vertices.Add(new Vector3(firstVertex.x, currentY1, firstVertex.z));
-				md.Vertices.Add(new Vector3(secondVertex.x, currentY2, secondVertex.z));
+				md.Vertices.Add(new Vector3(wallSegmentFirstVertex.x, currentY1, wallSegmentFirstVertex.z));
+				md.Vertices.Add(new Vector3(wallSegmentSecondVertex.x, currentY2, wallSegmentSecondVertex.z));
 				//move offsets bottom
 				currentY1 -= (_scaledFloorHeight * _midUvInCurrentStep);
 				currentY2 -= (_scaledFloorHeight * _midUvInCurrentStep);
 				//bottom two vertices
-				md.Vertices.Add(new Vector3(firstVertex.x, currentY1, firstVertex.z));
-				md.Vertices.Add(new Vector3(secondVertex.x, currentY2, secondVertex.z));
+				md.Vertices.Add(new Vector3(wallSegmentFirstVertex.x, currentY1, wallSegmentFirstVertex.z));
+				md.Vertices.Add(new Vector3(wallSegmentSecondVertex.x, currentY2, wallSegmentSecondVertex.z));
 				
 				//we uv narrow walls different so they won't have condensed windows
-				if (difference >= _minWallLength)
+				if (wallSegmentLength >= _minWallLength)
 				{
 					md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentFacade.topOfMidUv));
 					md.UV[0].Add(new Vector2(rightOfEdgeUv, _currentFacade.topOfMidUv));
@@ -287,12 +324,12 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			//top floor start
 			currentY1 -= finalTopHeight;
 			currentY2 -= finalTopHeight;
-			md.Vertices.Add(new Vector3(firstVertex.x, firstVertex.y - leftOver, firstVertex.z));
-			md.Vertices.Add(new Vector3(secondVertex.x, secondVertex.y - leftOver, secondVertex.z));
-			md.Vertices.Add(new Vector3(firstVertex.x, firstVertex.y - leftOver - finalTopHeight, firstVertex.z));
-			md.Vertices.Add(new Vector3(secondVertex.x, secondVertex.y - leftOver - finalTopHeight, secondVertex.z));
+			md.Vertices.Add(new Vector3(wallSegmentFirstVertex.x, wallSegmentFirstVertex.y - leftOver, wallSegmentFirstVertex.z));
+			md.Vertices.Add(new Vector3(wallSegmentSecondVertex.x, wallSegmentSecondVertex.y - leftOver, wallSegmentSecondVertex.z));
+			md.Vertices.Add(new Vector3(wallSegmentFirstVertex.x, wallSegmentFirstVertex.y - leftOver - finalTopHeight, wallSegmentFirstVertex.z));
+			md.Vertices.Add(new Vector3(wallSegmentSecondVertex.x, wallSegmentSecondVertex.y - leftOver - finalTopHeight, wallSegmentSecondVertex.z));
 
-			if (difference >= _minWallLength)
+			if (wallSegmentLength >= _minWallLength)
 			{
 				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentTextureRect.yMax));
 				md.UV[0].Add(new Vector2(rightOfEdgeUv, _currentTextureRect.yMax));
@@ -331,10 +368,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		private void FirstFloor(MeshData md, float hf)
 		{
-			md.Vertices.Add(new Vector3(firstVertex.x, firstVertex.y - hf + finalFirstHeight, firstVertex.z));
-			md.Vertices.Add(new Vector3(secondVertex.x, secondVertex.y - hf + finalFirstHeight, secondVertex.z));
-			md.Vertices.Add(new Vector3(firstVertex.x, firstVertex.y - hf, firstVertex.z));
-			md.Vertices.Add(new Vector3(secondVertex.x, secondVertex.y - hf, secondVertex.z));
+			md.Vertices.Add(new Vector3(wallSegmentFirstVertex.x, wallSegmentFirstVertex.y - hf + finalFirstHeight, wallSegmentFirstVertex.z));
+			md.Vertices.Add(new Vector3(wallSegmentSecondVertex.x, wallSegmentSecondVertex.y - hf + finalFirstHeight, wallSegmentSecondVertex.z));
+			md.Vertices.Add(new Vector3(wallSegmentFirstVertex.x, wallSegmentFirstVertex.y - hf, wallSegmentFirstVertex.z));
+			md.Vertices.Add(new Vector3(wallSegmentSecondVertex.x, wallSegmentSecondVertex.y - hf, wallSegmentSecondVertex.z));
 
 			md.Normals.Add(wallNormal);
 			md.Normals.Add(wallNormal);
@@ -345,7 +382,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			md.Tangents.Add(wallDirection);
 			md.Tangents.Add(wallDirection);
 
-			if (difference >= _minWallLength)
+			if (wallSegmentLength >= _minWallLength)
 			{
 				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, _currentFacade.topOfBottomUv));
 				md.UV[0].Add(new Vector2(rightOfEdgeUv, _currentFacade.topOfBottomUv));
@@ -373,43 +410,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		private void CalculateEdgeList(MeshData md, UnityTile tile, float preferredEdgeSectionLength)
 		{
-			currentWallLength = 0;
-			start = Constants.Math.Vector3Zero;
-			wallDirection = Constants.Math.Vector3Zero;
-			for (int i = 0; i < md.Edges.Count; i += 2)
-			{
-				firstVertex = md.Vertices[md.Edges[i]];
-				secondVertex = md.Vertices[md.Edges[i + 1]];
-
-				currentWallLength = Vector3.Distance(firstVertex, secondVertex);
-				_leftOverColumnLength = currentWallLength % _singleColumnLength;
-				start = firstVertex;
-				wallDirection = (secondVertex - firstVertex).normalized;
-
-				if (_centerSegments && currentWallLength > _singleColumnLength)
-				{
-					edgeList.Add(start);
-					start = start + wallDirection * (_leftOverColumnLength / 2);
-					edgeList.Add(start);
-					_leftOverColumnLength = _leftOverColumnLength / 2;
-				}
-								
-				while(currentWallLength > _singleColumnLength)
-				{
-					edgeList.Add(start);
-					//columns fitting wall / max column we have in texture
-					var stepRatio = (float)Math.Min(_currentFacade.ColumnCount, Math.Floor(currentWallLength / _singleColumnLength)) / _currentFacade.ColumnCount;
-					start = start + wallDirection * (stepRatio * _scaledPreferredWallLength);
-					edgeList.Add(start);
-					currentWallLength -= (stepRatio * _scaledPreferredWallLength);
-				}
-
-				if(_leftOverColumnLength > 0)
-				{
-					edgeList.Add(start);
-					edgeList.Add(secondVertex);
-				}
-			}
+			
 		}
 
 		private void GenerateRoofMesh(MeshData md, float minHeight, float maxHeight)
