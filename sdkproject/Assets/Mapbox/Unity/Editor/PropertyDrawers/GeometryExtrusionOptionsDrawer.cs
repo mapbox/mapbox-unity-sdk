@@ -60,7 +60,7 @@
 					position.y += lineHeight;
 					//EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
 					DrawPropertyDropDown(property, position);
-					position.y += 3*lineHeight;
+					position.y += 2.5f *lineHeight;
 					break;
 				case Unity.Map.ExtrusionType.MinHeight:
 					position.y += lineHeight;
@@ -68,6 +68,7 @@
 					position.y += lineHeight;
 					//EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
 					DrawPropertyDropDown(property, position);
+					position.y += 2.5f * lineHeight;
 					break;
 				case Unity.Map.ExtrusionType.MaxHeight:
 					position.y += lineHeight;
@@ -75,6 +76,7 @@
 					position.y += lineHeight;
 					//EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
 					DrawPropertyDropDown(property, position);
+					position.y += 2.5f * lineHeight;
 					break;
 				case Unity.Map.ExtrusionType.RangeHeight:
 					position.y += lineHeight;
@@ -82,6 +84,7 @@
 					position.y += lineHeight;
 					//EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
 					DrawPropertyDropDown(property, position);
+					position.y += 2.5f * lineHeight;
 					position.y += lineHeight;
 					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), minHeightProperty);
 					position.y += lineHeight;
@@ -127,18 +130,16 @@
 			Rect typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Property Name", tooltip = "The name of the property in the selected Mapbox layer that will be used for extrusion" });
 			EditorGUI.indentLevel -= 2;
 			index = EditorGUI.Popup(typePosition, index, propertyNamesArray);
-			var descriptionString = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][propertyNamesArray[index]];
 			position.y += lineHeight;
 			var parsedString = propertyNamesArray[index].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
 			property.FindPropertyRelative("propertyName").stringValue = parsedString;
 			EditorGUI.indentLevel += 2;
+
+			var descriptionString = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][propertyNamesArray[index]];
 			typePosition.y += lineHeight;
-			typePosition.height = 2 * lineHeight;
+			typePosition.height = (float)(2.5f * lineHeight);
+			EditorGUI.PrefixLabel(new Rect(position.x, typePosition.y + lineHeight/2, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Property Description", tooltip = "Factual information about the selected property" });
 			EditorGUI.HelpBox(typePosition,descriptionString, MessageType.Info);
-
-
-
-		
 		}
 
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -157,10 +158,10 @@
 					case Unity.Map.ExtrusionType.PropertyHeight:
 					case Unity.Map.ExtrusionType.MinHeight:
 					case Unity.Map.ExtrusionType.MaxHeight:
-						rows += 5;
+						rows += 6;
 						break;
 					case Unity.Map.ExtrusionType.RangeHeight:
-						rows += 7;
+						rows += 8;
 						break;
 					case Unity.Map.ExtrusionType.AbsoluteHeight:
 						rows += 3;

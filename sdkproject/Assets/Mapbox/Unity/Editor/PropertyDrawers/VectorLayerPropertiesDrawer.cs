@@ -304,7 +304,11 @@
 				{
 					layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue = false;
 				}
-				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("filterOptions"), new GUIContent("Filters"));
+				var filterOptions = layerProperty.FindPropertyRelative("filterOptions");
+				filterOptions.FindPropertyRelative("_tileJsonData").objectReferenceValue = tileJSONData;
+				filterOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
+
+				EditorGUILayout.PropertyField(filterOptions, new GUIContent("Filters"));
 				//EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("modifierOptions"), new GUIContent("Modifiers"));
 				DrawModifiers(layerProperty, new GUIContent { text = "Modifier Options", tooltip = "Additional Feature modifiers to apply to the visualizer. " });
 			}

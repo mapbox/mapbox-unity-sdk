@@ -4,10 +4,14 @@
 	using UnityEngine;
 	using Mapbox.Unity.Map;
 	using Mapbox.Unity.MeshGeneration.Filters;
+	using System.Linq;
 
 	[CustomPropertyDrawer(typeof(VectorFilterOptions))]
 	public class VectorFilterOptionsDrawer : PropertyDrawer
 	{
+		private int index = 0;
+		private string[] propertyNamesArray;
+		private string[] descriptionArray;
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		bool showFilters = true;
 
@@ -29,7 +33,7 @@
 
 				for (int i = 0; i < propertyFilters.arraySize; i++)
 				{
-					DrawLayerFilter(propertyFilters, i);
+					DrawLayerFilter(property, propertyFilters, i);
 				}
 				if (propertyFilters.arraySize > 0)
 				{
@@ -54,7 +58,7 @@
 			return lineHeight;
 		}
 
-		void DrawLayerFilter(SerializedProperty propertyFilters, int index)
+		void DrawLayerFilter(SerializedProperty originalProperty, SerializedProperty propertyFilters, int index)
 		{
 			var property = propertyFilters.GetArrayElementAtIndex(index);
 			var filterOperatorProp = property.FindPropertyRelative("filterOperator");
@@ -91,7 +95,8 @@
 
 
 			EditorGUILayout.BeginHorizontal();
-			property.FindPropertyRelative("Key").stringValue = EditorGUILayout.TextField(property.FindPropertyRelative("Key").stringValue, GUILayout.MaxWidth(150));
+			//property.FindPropertyRelative("Key").stringValue = EditorGUILayout.TextField(property.FindPropertyRelative("Key").stringValue, GUILayout.MaxWidth(150));
+			DrawPropertyDropDown(originalProperty, property);
 			filterOperatorProp.enumValueIndex = EditorGUILayout.Popup(filterOperatorProp.enumValueIndex, filterOperatorProp.enumDisplayNames, GUILayout.MaxWidth(150));
 
 			switch ((LayerFilterOperationType)filterOperatorProp.enumValueIndex)
@@ -120,7 +125,37 @@
 			EditorGUILayout.EndVertical();
 
 		}
+
+		private void DrawPropertyDropDown(SerializedProperty originalProperty, SerializedProperty filterProperty)
+		{
+			var selectedLayerName = originalProperty.FindPropertyRelative("_selectedLayerName").stringValue;
+
+			if (string.IsNullOrEmpty(selectedLayerName))
+				return;
+
+			TileJsonData tileJsonData = originalProperty.FindPropertyRelative("_tileJsonData").objectReferenceValue as TileJsonData;
+			if (!tileJsonData.PropertyDisplayNames.ContainsKey(selectedLayerName))
+				return;
+			var propertyDisplayNames = tileJsonData.PropertyDisplayNames[selectedLayerName];
+
+			if (propertyNamesArray != null && !Enumerable.SequenceEqual(propertyNamesArray, propertyDisplayNames.ToArray()))
+				index = 0;
+
+			propertyNamesArray = propertyDisplayNames.ToArray();
+			descriptionArray = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName].Values.ToArray<string>();
+			GUIContent[] properties = new GUIContent[propertyNamesArray.Length];
+			for (int i = 0; i< propertyNamesArray.Length; i++)
+			{
+				properties[i] = new GUIContent(propertyNamesArray[i], descriptionArray[i]);
+			}
+
+			index = EditorGUILayout.Popup(index, properties);
+			var parsedString = propertyNamesArray[index].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+			filterProperty.FindPropertyRelative("Key").stringValue = parsedString;
+			//EditorGUILayout.HelpBox(descriptionString, MessageType.Info);
+		}
 	}
+
 
 	//[CustomPropertyDrawer(typeof(TypeVisualizerTuple))]
 	//public class TypeVisualizerBaseDrawer : PropertyDrawer
