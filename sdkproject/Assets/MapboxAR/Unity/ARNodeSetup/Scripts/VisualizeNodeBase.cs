@@ -52,7 +52,6 @@
 			//var nodePos = _map.GeoToWorldPosition(_nodeBase.ReturnLatestNode().LatLon);
 			//Instantiate(GameObject.CreatePrimitive(PrimitiveType.Sphere), nodePos, Quaternion.identity, _map.gameObject.transform);
 
-			Debug.Log("Plot Route");
 			var nodes = _nodeBase.ReturnNodes();
 			var length = nodes.Length;
 			_lineRend.positionCount = length;

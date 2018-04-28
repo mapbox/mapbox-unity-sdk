@@ -18,6 +18,14 @@
 		[SerializeField]
 		AbstractMap _map;
 
+		[SerializeField]
+		NodeSyncBase _inputNodes;
+
+		[SerializeField]
+		float _updateInterval = 10f;
+
+		float _elapsedTime;
+
 		public Action<Node[]> ReturnMapMatchCoords;
 		private List<Node> _savedNodes;
 		IEnumerator _mapMatching, _waitForRequest;
@@ -25,11 +33,9 @@
 
 		private List<Node> _nodesForMapMatchingQuery = new List<Node>();
 
-		public void MapMatchQuery(Node[] nodes)
+		protected void Update()
 		{
-			_nodesForMapMatchingQuery.Clear();
-			_nodesForMapMatchingQuery.AddRange(nodes);
-
+			_elapsedTime += Time.deltaTime;
 		}
 
 		void SimpleQuery(Vector2d[] coords)
@@ -50,12 +56,25 @@
 
 		void SendResponseCoords(MapMatchingResponse response)
 		{
-			var coordinates = response.Matchings[0].Geometry;
-			var quality = response.Matchings[0].Confidence;
-			var nodes = new List<Node>();
-
-			if (ReturnMapMatchCoords != null)
+			if (response == null)
 			{
+				Debug.Log("Empty Response");
+				return;
+			}
+			if (response.HasMatchingError)
+			{
+				Debug.Log("MapMatching error : " + response.Message);
+				return;
+			}
+			Debug.Log("Before if");
+			if (response.Matchings != null && response.Matchings.Length > 0)
+			{
+				Debug.Log("Here");
+				var coordinates = response.Matchings[0].Geometry;
+				var quality = response.Matchings[0].Confidence;
+				var nodes = new List<Node>();
+
+
 				for (int i = 0; i < coordinates.Count; i++)
 				{
 					nodes.Add(new Node
@@ -64,19 +83,18 @@
 						LatLon = coordinates[i]
 					});
 				}
-
-				ReturnMapMatchCoords(nodes.ToArray());
 				_savedNodes = nodes;
+				if (ReturnMapMatchCoords != null)
+				{
+					ReturnMapMatchCoords(nodes.ToArray());
+				}
 
+				Debug.Log("MapMatching Node added");
 				if (NodeAdded != null)
 				{
+					Debug.Log("MapMatching Node added");
 					NodeAdded();
 				}
-			}
-
-			if (NodeAdded != null)
-			{
-				NodeAdded();
 			}
 		}
 
@@ -98,9 +116,13 @@
 
 		public override void SaveNode()
 		{
-			var coordinates = _nodesForMapMatchingQuery.Select(t => t.LatLon);
-			SimpleQuery(coordinates.ToArray());
-
+			_nodesForMapMatchingQuery = _inputNodes.ReturnNodes().ToList();
+			if (_nodesForMapMatchingQuery.Count > 2 && _elapsedTime > _updateInterval)
+			{
+				_elapsedTime = 0;
+				var coordinates = _nodesForMapMatchingQuery.Select(t => t.LatLon);
+				SimpleQuery(coordinates.ToArray());
+			}
 		}
 	}
 }

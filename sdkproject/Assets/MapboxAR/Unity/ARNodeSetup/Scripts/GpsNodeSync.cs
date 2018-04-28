@@ -56,14 +56,14 @@
 
 		private bool IsNodeGoodToUse(Location location)
 		{
-			Debug.Log("GPS nodes runs");
+			//Debug.Log("GPS nodes runs");
 
 			// Check Node accuracy & distance.
 			var latestNode = _map.GeoToWorldPosition(location.LatitudeLongitude);
 			var previousNode = _map.GeoToWorldPosition(_savedNodes[_savedNodes.Count - 1].LatLon);
 			var forMagnitude = latestNode - previousNode;
-			Debug.Log("Location on GPS node : " + location.LatitudeLongitude);
-			Debug.Log("Magnitude is: " + forMagnitude.magnitude);
+			//Debug.Log("Location on GPS node : " + location.LatitudeLongitude);
+			//Debug.Log("Magnitude is: " + forMagnitude.magnitude);
 
 			if (location.Accuracy <= _desiredAccuracy && _minMagnitude <= forMagnitude.magnitude)
 			{
@@ -79,7 +79,7 @@
 
 		public override void SaveNode()
 		{
-			Debug.Log("GPS SaveNode");
+			//Debug.Log("GPS SaveNode");
 			var location = LocationProviderFactory.Instance.DefaultLocationProvider.CurrentLocation;
 			bool isFirstNode = (_savedNodes.Count == 0);
 			bool isGoodFilteredNode = false;
