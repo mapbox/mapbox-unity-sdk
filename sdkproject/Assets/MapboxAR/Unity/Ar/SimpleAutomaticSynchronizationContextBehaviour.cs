@@ -132,9 +132,9 @@ namespace Mapbox.Unity.Ar
 
 		void LocationProvider_OnLocationUpdated(Location location)
 		{
-			if (location.IsLocationUpdated || location.IsHeadingUpdated)
+			if (location.IsLocationUpdated || location.IsUserHeadingUpdated)
 			{
-				// With this line, we can control accuracy of Gps updates. 
+				// With this line, we can control accuracy of Gps updates.
 				// Be aware that we only get location information if it previously met
 				// the conditions of DeviceLocationProvider:
 				// * desired accuarracy in meters
@@ -163,17 +163,17 @@ namespace Mapbox.Unity.Ar
 					//location.Accuracy = (int)_kalman.Accuracy;
 
 					var latitudeLongitude = location.LatitudeLongitude;
-					//Unity.Utilities.Console.Instance.Log(
-					//	string.Format(
-					//		"Location[{0:yyyyMMdd-HHmmss}]: {1},{2}\tAccuracy: {3}\tHeading: {4}"
-					//		, UnixTimestampUtils.From(location.Timestamp)
-					//		, latitudeLongitude.x
-					//		, latitudeLongitude.y
-					//		, location.Accuracy
-					//		, location.Heading
-					//	)
-					//	, "lightblue"
-					//);
+					Unity.Utilities.Console.Instance.Log(
+						string.Format(
+							"Location[{0:yyyyMMdd-HHmmss}]: {1},{2}\tAccuracy: {3}\tHeading: {4}"
+							, UnixTimestampUtils.From(location.Timestamp)
+							, latitudeLongitude.x
+							, latitudeLongitude.y
+							, location.Accuracy
+							, location.UserHeading
+						)
+						, "lightblue"
+					);
 
 					var position = _map.GeoToWorldPosition(latitudeLongitude);// Conversions.GeoToWorldPosition(latitudeLongitude, _map.CenterMercator, _map.WorldRelativeScale).ToVector3xz();
 					_synchronizationContext.AddSynchronizationNodes(location, position, _arPositionReference.localPosition);

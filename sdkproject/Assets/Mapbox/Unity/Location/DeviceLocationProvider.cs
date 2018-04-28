@@ -3,6 +3,8 @@ namespace Mapbox.Unity.Location
 	using System.Collections;
 	using UnityEngine;
 	using Mapbox.Utils;
+	using Mapbox.CheapRulerCs;
+	using System;
 
 	/// <summary>
 	/// The DeviceLocationProvider is responsible for providing real world location and heading data,
@@ -28,13 +30,23 @@ namespace Mapbox.Unity.Location
 		[Tooltip("The minimum distance (measured in meters) a device must move laterally before Input.location property is updated. Higher values like 500 imply less overhead.")]
 		float _updateDistanceInMeters = 5f;
 
-		Coroutine _pollRoutine;
 
-		double _lastLocationTimestamp;
+		[SerializeField]
+		[Tooltip("The minimum time interval between location updates, in milliseconds.")]
+		long _updateTimeInMilliSeconds = 1000;
 
-		double _lastHeadingTimestamp;
 
-		WaitForSeconds _wait1sec;
+		private Coroutine _pollRoutine;
+		private double _lastLocationTimestamp;
+		private double _lastHeadingTimestamp;
+		private WaitForSeconds _wait1sec;
+		private WaitForSeconds _waitUpdateTime;
+		/// <summary>list of positions to keep for calculations</summary>
+		private CircularBuffer<Vector2d> _lastPositions;
+		/// <summary>number of last positons to keep</summary>
+		private int _maxLastPositions = 3;
+		/// <summary>minimum needed distance between oldest and newest position before UserHeading is calculated</summary>
+		private double _minDistanceOldestNewestPosition = 1;
 
 
 		// Android 6+ permissions have to be granted during runtime
@@ -51,7 +63,10 @@ namespace Mapbox.Unity.Location
 
 		void Awake()
 		{
+			_currentLocation.Provider = "unity";
 			_wait1sec = new WaitForSeconds(1f);
+			_waitUpdateTime = _updateTimeInMilliSeconds < 500 ? new WaitForSeconds(500) : new WaitForSeconds(_updateTimeInMilliSeconds / 1000);
+			_lastPositions = new CircularBuffer<Vector2d>(_maxLastPositions);
 
 			if (_pollRoutine == null)
 			{
@@ -134,66 +149,74 @@ namespace Mapbox.Unity.Location
 			yield return _wait1sec;
 #endif
 
-
-			float gpsInitializedTime = Time.realtimeSinceStartup;
-			// initially pass through all locations that come available
-			float gpsWarmupTime = 120f; //seconds
 			System.Globalization.CultureInfo invariantCulture = System.Globalization.CultureInfo.InvariantCulture;
 
 			while (true)
 			{
-				_currentLocation.IsLocationServiceEnabled = true;
 
-				_currentLocation.IsHeadingUpdated = false;
+				_currentLocation.IsLocationServiceEnabled = Input.location.status == LocationServiceStatus.Running;
+
+				_currentLocation.IsUserHeadingUpdated = false;
 				_currentLocation.IsLocationUpdated = false;
 
-				var timestamp = Input.compass.timestamp;
-				if (
-					Input.compass.enabled && timestamp > _lastHeadingTimestamp
-					|| Time.realtimeSinceStartup < gpsInitializedTime + gpsWarmupTime
-				)
+				if (!_currentLocation.IsLocationServiceEnabled)
 				{
-					var heading = Input.compass.trueHeading;
-					_currentLocation.Heading = heading;
-					_currentLocation.HeadingMagnetic = Input.compass.magneticHeading;
-					_currentLocation.HeadingAccuracy = Input.compass.headingAccuracy;
-					_lastHeadingTimestamp = timestamp;
-
-					_currentLocation.IsHeadingUpdated = true;
+					yield return _waitUpdateTime;
+					continue;
 				}
+
+				// device orientation, user heading get calculated below
+				_currentLocation.DeviceOrientation = Input.compass.trueHeading;
+
 
 				var lastData = Input.location.lastData;
-				timestamp = lastData.timestamp;
+				var timestamp = lastData.timestamp;
 				//Debug.LogFormat("{0:yyyyMMdd-HHmmss} acc:{1:0.00} {2} / {3}", UnixTimestampUtils.From(timestamp), lastData.horizontalAccuracy, lastData.latitude, lastData.longitude);
 
-				if (
-					(Input.location.status == LocationServiceStatus.Running && timestamp > _lastLocationTimestamp)
-					|| Time.realtimeSinceStartup < gpsInitializedTime + gpsWarmupTime
-				)
+
+				//_currentLocation.LatitudeLongitude = new Vector2d(lastData.latitude, lastData.longitude);
+				// HACK to get back to double precision, does this even work?
+				// https://forum.unity.com/threads/precision-of-location-longitude-is-worse-when-longitude-is-beyond-100-degrees.133192/#post-1835164
+				double latitude = double.Parse(lastData.latitude.ToString("R", invariantCulture), invariantCulture);
+				double longitude = double.Parse(lastData.longitude.ToString("R", invariantCulture), invariantCulture);
+				_currentLocation.LatitudeLongitude = new Vector2d(latitude, longitude);
+
+				_currentLocation.Accuracy = (int)System.Math.Floor(lastData.horizontalAccuracy);
+				_currentLocation.IsLocationUpdated = timestamp > _lastLocationTimestamp;
+				_currentLocation.Timestamp = timestamp;
+				_lastLocationTimestamp = timestamp;
+
+				if (_currentLocation.IsLocationUpdated)
 				{
-					//_currentLocation.LatitudeLongitude = new Vector2d(lastData.latitude, lastData.longitude);
-					// HACK to get back to double precision, does this even work?
-					// https://forum.unity.com/threads/precision-of-location-longitude-is-worse-when-longitude-is-beyond-100-degrees.133192/#post-1835164
-					double latitude = double.Parse(lastData.latitude.ToString("R", invariantCulture), invariantCulture);
-					double longitude = double.Parse(lastData.longitude.ToString("R", invariantCulture), invariantCulture);
-					_currentLocation.LatitudeLongitude = new Vector2d(latitude, longitude);
-
-					_currentLocation.Accuracy = (int)System.Math.Floor(lastData.horizontalAccuracy);
-					_currentLocation.Timestamp = timestamp;
-					_lastLocationTimestamp = timestamp;
-
-					_currentLocation.IsLocationUpdated = true;
+					_lastPositions.Add(_currentLocation.LatitudeLongitude);
 				}
 
-				if (_currentLocation.IsHeadingUpdated || _currentLocation.IsLocationUpdated)
+				// calculate user heading. only if we have enough positions available
+				if (_lastPositions.Count < _maxLastPositions)
 				{
-					if (_currentLocation.LatitudeLongitude != Vector2d.zero)
+					_currentLocation.UserHeading = 0;
+				}
+				else
+				{
+					Vector2d newestPos = _lastPositions[0];
+					Vector2d oldestPos = _lastPositions[_maxLastPositions - 1];
+					CheapRuler cheapRuler = new CheapRuler(newestPos.x, CheapRulerUnits.Meters);
+					// distance between last and first position in our buffer
+					double distance = cheapRuler.Distance(
+						new double[] { newestPos.y, newestPos.x },
+						new double[] { oldestPos.y, oldestPos.x }
+					);
+					// positions are minimum required distance apart, calculate heading
+					if (distance >= _minDistanceOldestNewestPosition)
 					{
-						SendLocation(_currentLocation);
+						_currentLocation.UserHeading = (float)(Math.Atan2(newestPos.y - oldestPos.y, newestPos.x - oldestPos.x) * 180 / Math.PI);
+						_currentLocation.IsUserHeadingUpdated = true;
 					}
 				}
 
-				yield return null;
+				SendLocation(_currentLocation);
+
+				yield return _waitUpdateTime;
 			}
 		}
 	}
