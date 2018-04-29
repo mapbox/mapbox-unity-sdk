@@ -28,7 +28,6 @@
 		WaitForSeconds _waitFor;
 		float _latestBestGPSAccuracy;
 
-
 		public override void InitializeNodeBase()
 		{
 

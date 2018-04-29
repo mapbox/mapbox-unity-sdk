@@ -109,6 +109,7 @@ namespace UnityARInterface
 
 		public override bool GetTrackingState(ref CustomTrackingState trackingState)
 		{
+			// Always assumes tracking is on point in editor. Of course. Lol.
 			trackingState = CustomTrackingState.Good;
 			return true;
 		}

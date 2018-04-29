@@ -38,27 +38,26 @@
 			_lineRend.material = _nodeMaterial;
 			_lineRend.useWorldSpace = false;
 		}
+
 		private void PlotRoute()
 		{
-			if (_nodeBase.Is)
-				var nodes = _nodeBase.ReturnNodes();
-			var length = nodes.Length;
-			_lineRend.positionCount = length;
-
-			for (int i = 0; i < _nodeBase.ReturnNodes().Length; i++)
+			if (_nodeBase.IsNodeBaseInitialized)
 			{
-				var position = _map.GeoToWorldPosition(nodes[i].LatLon, false);
-				if (_lineHeight > 0)
-				{
-					position.y = _lineHeight;
-				}
-				_lineRend.SetPosition(i, position);
-			}
-		}
+				var nodes = _nodeBase.ReturnNodes();
+				var length = nodes.Length;
+				_lineRend.positionCount = length;
 
-		private void OnDisable()
-		{
-			_nodeBase.NodeAdded -= PlotRoute;
+				for (int i = 0; i < _nodeBase.ReturnNodes().Length; i++)
+				{
+					var position = _map.GeoToWorldPosition(nodes[i].LatLon, false);
+					if (_lineHeight > 0)
+					{
+						position.y = _lineHeight;
+					}
+
+					_lineRend.SetPosition(i, position);
+				}
+			}
 		}
 	}
 }

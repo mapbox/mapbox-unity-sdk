@@ -66,7 +66,7 @@
 		{
 			_map = LocationProviderFactory.Instance.mapManager;
 			Debug.Log("First Alignment");
-			var deviceHeading = LocationProviderFactory.Instance.DefaultLocationProvider.CurrentLocation.Heading;
+			var deviceHeading = LocationProviderFactory.Instance.DefaultLocationProvider.CurrentLocation.DeviceOrientation;
 			var position = LocationProviderFactory.Instance.mapManager.transform.position;
 			LocationProviderFactory.Instance.mapManager.transform.SetPositionAndRotation(position, Quaternion.Euler(0, deviceHeading, 0));
 			//We want Syncronize to be called when location is updated. This could extend to any other polling methods in the future.
@@ -262,10 +262,10 @@
 		//	}
 		//}
 
-		int CheckAverageAccuracy(NodeSyncBase syncBase, int howManyNodes)
+		float CheckAverageAccuracy(NodeSyncBase syncBase, int howManyNodes)
 		{
 			var nodes = syncBase.ReturnNodes();
-			int accuracy = 0;
+			float accuracy = 0;
 
 			for (int i = 1; i < howManyNodes; i++)
 			{
