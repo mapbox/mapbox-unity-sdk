@@ -70,7 +70,7 @@
 			_map.OnInitialized -= Map_OnInitialized;
 
 			// We don't want location updates until we have a map, otherwise our conversion will fail.
-			LocationProviderFactory.Instance.mapManager.OnInitialized += FirstAlignment;
+			FirstAlignment();
 		}
 
 		protected void FirstAlignment()
