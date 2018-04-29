@@ -18,19 +18,17 @@
 		Transform _targetTransform;
 
 		[SerializeField]
-		AbstractMap _map;
-
-		[SerializeField]
 		float _secondsBetweenDropCheck, _minMagnitudeBetween;
 
 		float _latestBestGPSAccuracy;
-
 		List<Node> _savedNodes;
+		AbstractMap _map;
 
 		public override void InitializeNodeBase()
 		{
 			_savedNodes = new List<Node>();
 			CentralizedARLocator.OnNewHighestAccuracyGPS += SavedGPSAccuracy;
+			_map = LocationProviderFactory.Instance.mapManager;
 			IsNodeBaseInitialized = true;
 			Debug.Log("Initialized ARNodes");
 		}
