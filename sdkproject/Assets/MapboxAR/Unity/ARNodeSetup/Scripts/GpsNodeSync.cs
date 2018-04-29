@@ -42,14 +42,11 @@
 		//{
 		//	InitializeNodeBase();
 		//}
+
 		public override void InitializeNodeBase()
 		{
 			_savedNodes = new List<Node>();
-
-			// Hack - adding a new node.
-
-			//SaveNodes(LocationProviderFactory.Instance.DefaultLocationProvider.CurrentLocation);
-			//LocationProviderFactory.Instance.DefaultLocationProvider.OnLocationUpdated += SaveNode;
+			IsNodeBaseInitialized = true;
 			Debug.Log("Initialized GPS nodes");
 
 		}

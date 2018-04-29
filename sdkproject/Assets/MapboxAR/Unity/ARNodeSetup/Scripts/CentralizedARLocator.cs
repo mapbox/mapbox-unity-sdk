@@ -55,20 +55,30 @@
 		void Awake()
 		{
 			_alignmentStrategy.Register(this);
-			// Initialize all sync-nodes.Make them ready to recieve node data. 
+			_map = LocationProviderFactory.Instance.mapManager;
+
+			// Initialize all sync-nodes.Make them ready to recieve node data.
+			// Map needs to be generated before init. Otherwise bunch of errors.
+
 			InitializeSyncNodes();
-			//Debugging purpose???
-			//_mapMathching.ReturnMapMatchCoords += GetMapMatchingCoords;
+
+			_map.OnInitialized += Map_OnInitialized;
+		}
+
+		void Map_OnInitialized()
+		{
+			_map.OnInitialized -= Map_OnInitialized;
+
+			// We don't want location updates until we have a map, otherwise our conversion will fail.
 			LocationProviderFactory.Instance.mapManager.OnInitialized += FirstAlignment;
 		}
 
 		protected void FirstAlignment()
 		{
-			_map = LocationProviderFactory.Instance.mapManager;
 			Debug.Log("First Alignment");
 			var deviceHeading = LocationProviderFactory.Instance.DefaultLocationProvider.CurrentLocation.DeviceOrientation;
-			var position = LocationProviderFactory.Instance.mapManager.transform.position;
-			LocationProviderFactory.Instance.mapManager.transform.SetPositionAndRotation(position, Quaternion.Euler(0, deviceHeading, 0));
+			var position = _map.transform.position;
+			_map.transform.SetPositionAndRotation(position, Quaternion.Euler(0, deviceHeading, 0));
 			//We want Syncronize to be called when location is updated. This could extend to any other polling methods in the future.
 			LocationProviderFactory.Instance.DefaultLocationProvider.OnLocationUpdated += SyncronizeNodesToFindAlignment;
 
@@ -80,6 +90,11 @@
 
 		void ComputeAlignment()
 		{
+			// TODO
+			// I Like this. Computing aligment here. Though we should throw away computing heading only from nodes..
+			// I think as with AR & GPS nodes to MapMatching. We should have the heading from nodes as a input for the final heading.
+			// Heading from Nodes, Gyro and Compass. And then calculate. -> Ultra Heading :P
+
 			Debug.Log("Compute Alignment - Start");
 			Node currentGpsNode = new Node();
 			Node previousGpsNode = new Node();
