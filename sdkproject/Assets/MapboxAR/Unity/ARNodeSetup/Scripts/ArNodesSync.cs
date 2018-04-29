@@ -26,13 +26,11 @@
 		IEnumerator _saveARnodes;
 		List<Node> _savedNodes;
 		WaitForSeconds _waitFor;
-		int _latestBestGPSAccuracy;
+		float _latestBestGPSAccuracy;
 
 
 		public override void InitializeNodeBase()
 		{
-			_waitFor = new WaitForSeconds(_secondsBetweenDropCheck);
-			_savedNodes = new List<Node>();
 
 			CentralizedARLocator.OnNewHighestAccuracyGPS += SavedGPSAccuracy;
 			Debug.Log("Initialized ARNodes");
@@ -77,11 +75,6 @@
 				node.LatLon = _map.WorldToGeoPosition(_targetTransform.position);
 				node.Accuracy = _latestBestGPSAccuracy;
 				_savedNodes.Add(node);
-
-				if (NodeAdded != null)
-				{
-					NodeAdded();
-				}
 			}
 
 		}

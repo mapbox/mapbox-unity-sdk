@@ -23,7 +23,7 @@
 
 		[Tooltip("Applies only if FilterNode is true")]
 		[SerializeField]
-		int _desiredAccuracy = 5;
+		float _desiredAccuracy = 5;
 
 		[SerializeField]
 		float _minMagnitude;
@@ -101,11 +101,6 @@
 				latestNode.LatLon = location.LatitudeLongitude;
 				latestNode.Accuracy = location.Accuracy;
 				_savedNodes.Add(latestNode);
-
-				if (NodeAdded != null)
-				{
-					NodeAdded();
-				}
 			}
 		}
 

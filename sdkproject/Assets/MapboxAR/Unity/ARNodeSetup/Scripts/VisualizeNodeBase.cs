@@ -37,29 +37,13 @@
 			_lineRend.endWidth = _lineWidth;
 			_lineRend.material = _nodeMaterial;
 			_lineRend.useWorldSpace = false;
-			_nodeBase.NodeAdded += PlotRoute;
-
 		}
-
-		// TODO; Maybe add here something that is like. better. like... hmmm..
-		// If you check new nodes every second... That way you don't have to have that nodeAdded callback event thingy...
-		// Less depedence... Might be better. Way better. I dunno might laggg...
-
 		private void PlotRoute()
 		{
-			// TODO: pooling here for new Spheres... This won't work for MapMatching Nodes.
-
-			//var nodePos = _map.GeoToWorldPosition(_nodeBase.ReturnLatestNode().LatLon);
-			//Instantiate(GameObject.CreatePrimitive(PrimitiveType.Sphere), nodePos, Quaternion.identity, _map.gameObject.transform);
-
-			var nodes = _nodeBase.ReturnNodes();
+			if (_nodeBase.Is)
+				var nodes = _nodeBase.ReturnNodes();
 			var length = nodes.Length;
 			_lineRend.positionCount = length;
-
-			//if (length - 1 > 0)
-			//{
-			//	_lineRend.SetPosition(length - 1, _map.GeoToWorldPosition(nodes[length - 1].LatLon));
-			//}
 
 			for (int i = 0; i < _nodeBase.ReturnNodes().Length; i++)
 			{
