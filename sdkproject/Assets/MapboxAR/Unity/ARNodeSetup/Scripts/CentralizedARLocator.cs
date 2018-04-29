@@ -77,8 +77,10 @@
 		{
 			Debug.Log("First Alignment");
 			var deviceHeading = LocationProviderFactory.Instance.DefaultLocationProvider.CurrentLocation.DeviceOrientation;
+
 			var position = _map.transform.position;
 			_map.transform.SetPositionAndRotation(position, Quaternion.Euler(0, deviceHeading, 0));
+
 			//We want Syncronize to be called when location is updated. This could extend to any other polling methods in the future.
 			LocationProviderFactory.Instance.DefaultLocationProvider.OnLocationUpdated += SyncronizeNodesToFindAlignment;
 

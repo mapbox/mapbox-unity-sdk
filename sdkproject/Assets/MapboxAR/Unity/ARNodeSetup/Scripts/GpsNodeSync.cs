@@ -16,9 +16,6 @@
 	public class GpsNodeSync : NodeSyncBase
 	{
 		[SerializeField]
-		AbstractMap _map;
-
-		[SerializeField]
 		bool _filterNodes;
 
 		[Tooltip("Applies only if FilterNode is true")]
@@ -29,6 +26,7 @@
 		float _minMagnitude;
 
 		List<Node> _savedNodes;
+		AbstractMap _map;
 
 
 		//TODO : So basically the GPS can be 15 off and then 4 off.. And it might send the location 
@@ -46,6 +44,7 @@
 		public override void InitializeNodeBase()
 		{
 			_savedNodes = new List<Node>();
+			_map = LocationProviderFactory.Instance.mapManager;
 			IsNodeBaseInitialized = true;
 			Debug.Log("Initialized GPS nodes");
 
