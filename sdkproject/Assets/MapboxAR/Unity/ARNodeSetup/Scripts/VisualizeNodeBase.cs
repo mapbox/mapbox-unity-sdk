@@ -5,6 +5,7 @@
 	using UnityEngine;
 	using Mapbox.Unity.Ar;
 	using Mapbox.Unity.Map;
+	using Mapbox.Unity.Location;
 
 	public class VisualizeNodeBase : MonoBehaviour
 	{
@@ -37,9 +38,10 @@
 			_lineRend.endWidth = _lineWidth;
 			_lineRend.material = _nodeMaterial;
 			_lineRend.useWorldSpace = false;
+			LocationProviderFactory.Instance.DefaultLocationProvider.OnLocationUpdated += PlotRoute;
 		}
 
-		private void PlotRoute()
+		private void PlotRoute(Location location)
 		{
 			if (_nodeBase.IsNodeBaseInitialized)
 			{
