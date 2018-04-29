@@ -215,7 +215,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsNodeBaseInitialized: 0
   _targetTransform: {fileID: 1228666639}
-  _map: {fileID: 987782122}
   _secondsBetweenDropCheck: 1
   _minMagnitudeBetween: 5
 --- !u!4 &600682631
@@ -282,7 +281,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsNodeBaseInitialized: 0
-  _map: {fileID: 987782122}
   _filterNodes: 1
   _desiredAccuracy: 15
   _minMagnitude: 5
@@ -373,12 +371,6 @@ Transform:
   m_Father: {fileID: 869056592}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &987782122 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114324711836664524, guid: 35e76f6e52f5c4252a0b703cc2019a37,
-    type: 2}
-  m_PrefabInternal: {fileID: 1002213147}
-  m_Script: {fileID: 11500000, guid: cd961b1c9541a4cee99686069ecce852, type: 3}
 --- !u!1001 &1002213147
 Prefab:
   m_ObjectHideFlags: 0
@@ -436,7 +428,7 @@ Prefab:
     - target: {fileID: 224409009942014400, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -60
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224913775248040422, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
@@ -456,7 +448,7 @@ Prefab:
     - target: {fileID: 224913775248040422, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -160
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114324711836664524, guid: 35e76f6e52f5c4252a0b703cc2019a37,
         type: 2}
