@@ -26,7 +26,6 @@
 
 		LineRenderer _lineRend;
 
-		[SerializeField]
 		AbstractMap _map;
 
 		private void Start()
@@ -38,6 +37,7 @@
 			_lineRend.endWidth = _lineWidth;
 			_lineRend.material = _nodeMaterial;
 			_lineRend.useWorldSpace = false;
+			_map = LocationProviderFactory.Instance.mapManager;
 			LocationProviderFactory.Instance.DefaultLocationProvider.OnLocationUpdated += PlotRoute;
 		}
 
