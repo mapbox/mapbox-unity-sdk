@@ -102,6 +102,7 @@
 		{
 			_savedNodes = new List<Node>();
 			_nodesForMapMatchingQuery = new List<Node>();
+			IsNodeBaseInitialized = true;
 		}
 
 		public override void SaveNode()
