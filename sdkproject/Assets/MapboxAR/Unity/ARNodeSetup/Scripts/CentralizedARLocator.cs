@@ -17,6 +17,8 @@
 		// TODO : Snap should happening here for things to happen...
 		// Lol. Snap Snap Snap... after yeach new better GPS val...
 		[SerializeField]
+		AbstractMap _map;
+
 		ARInterface _arInterface;
 
 		[SerializeField]
@@ -44,11 +46,11 @@
 		AbstractAlignmentStrategy _alignmentStrategy;
 
 		Location _highestLocation;
-		AbstractMap _map;
+
 
 		public static Action<Location> OnNewHighestAccuracyGPS;
 
-		ARInterface.CustomTrackingState _trackingState;
+		//ARInterface.CustomTrackingState _trackingState;
 
 		public event Action<Alignment> OnAlignmentAvailable;
 
@@ -59,16 +61,16 @@
 			InitializeSyncNodes();
 			//Debugging purpose???
 			//_mapMathching.ReturnMapMatchCoords += GetMapMatchingCoords;
-			LocationProviderFactory.Instance.mapManager.OnInitialized += FirstAlignment;
+			_map.OnInitialized += FirstAlignment;
 		}
 
 		protected void FirstAlignment()
 		{
 			_map = LocationProviderFactory.Instance.mapManager;
 			Debug.Log("First Alignment");
-			var deviceHeading = LocationProviderFactory.Instance.DefaultLocationProvider.CurrentLocation.Heading;
+			var deviceHeading = LocationProviderFactory.Instance.DefaultLocationProvider.CurrentLocation.DeviceOrientation;
 			var position = LocationProviderFactory.Instance.mapManager.transform.position;
-			LocationProviderFactory.Instance.mapManager.transform.SetPositionAndRotation(position, Quaternion.Euler(0, deviceHeading, 0));
+			_map.transform.SetPositionAndRotation(position, Quaternion.Euler(0, deviceHeading, 0));
 			//We want Syncronize to be called when location is updated. This could extend to any other polling methods in the future.
 			LocationProviderFactory.Instance.DefaultLocationProvider.OnLocationUpdated += SyncronizeNodesToFindAlignment;
 
@@ -211,17 +213,17 @@
 			}
 		}
 
-		void CheckTracking()
-		{
-			var tracking = new ARInterface.CustomTrackingState();
-			if (_arInterface.GetTrackingState(ref tracking))
-			{
-				if (tracking == ARInterface.CustomTrackingState.Good)
-				{
-					// Blah blah..
-				}
-			}
-		}
+		//void CheckTracking()
+		//{
+		//	var tracking = new ARInterface.CustomTrackingState();
+		//	if (_arInterface.GetTrackingState(ref tracking))
+		//	{
+		//		if (tracking == ARInterface.CustomTrackingState.Good)
+		//		{
+		//			// Blah blah..
+		//		}
+		//	}
+		//}
 
 		void SaveHighestAccuracy(Location location)
 		{
@@ -262,10 +264,10 @@
 		//	}
 		//}
 
-		int CheckAverageAccuracy(NodeSyncBase syncBase, int howManyNodes)
+		float CheckAverageAccuracy(NodeSyncBase syncBase, int howManyNodes)
 		{
 			var nodes = syncBase.ReturnNodes();
-			int accuracy = 0;
+			float accuracy = 0;
 
 			for (int i = 1; i < howManyNodes; i++)
 			{

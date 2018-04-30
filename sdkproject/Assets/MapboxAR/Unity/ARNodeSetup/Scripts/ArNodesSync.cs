@@ -26,7 +26,7 @@
 		IEnumerator _saveARnodes;
 		List<Node> _savedNodes;
 		WaitForSeconds _waitFor;
-		int _latestBestGPSAccuracy;
+		float _latestBestGPSAccuracy;
 
 
 		public override void InitializeNodeBase()

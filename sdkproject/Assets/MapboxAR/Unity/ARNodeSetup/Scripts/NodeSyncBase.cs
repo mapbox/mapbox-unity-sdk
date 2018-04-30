@@ -42,7 +42,7 @@
 		/// <summary>
 		/// Accuracy of the Node. ARNodes accuracy is determined by the latest and most accurate GPS point.
 		/// </summary>
-		public int Accuracy;
+		public float Accuracy;
 		/// <summary>
 		/// Represents the Confidence of a Map Matching node. Not valid on ARNode or GPSNode.
 		/// </summary>
