@@ -747,7 +747,7 @@ namespace Mapbox.Unity.Map
 		/// <param name="scaleDownWithWorld">Should the prefab scale up/down along with the map game object?</param>
 		public void SpawnPrefabByCategory(GameObject prefab, LocationPrefabCategories categories = LocationPrefabCategories.AnyCategory, int density = 30, Action<List<GameObject>> callback = null, bool scaleDownWithWorld = true, string locationItemName = "New Location")
 		{
-			if (_vectorData.LayerProperty.sourceType != VectorSourceType.None || _vectorData.LayerProperty.sourceOptions.Id.Contains(MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id))
+			if (_vectorData.LayerProperty.sourceType == VectorSourceType.None || !_vectorData.LayerProperty.sourceOptions.Id.Contains(MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id))
 			{
 				Debug.LogError("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the list of vector data sources");
 				return;

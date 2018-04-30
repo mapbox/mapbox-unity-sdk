@@ -7,11 +7,25 @@
 	using Mapbox.Unity.Map;
 	using Mapbox.Utils;
 
-	public class LocationPrefabScriptExample : MonoBehaviour
+	public class LocationPrefabsScriptExample : MonoBehaviour
 	{
 
 		public AbstractMap map;
-		public GameObject myCustomPrefab;
+
+		//prefab to spawn
+		public GameObject beforeInitialize;
+		//cache of spanwed gameobjects
+		private List<GameObject> _beforeInitializeInstances;
+
+		public GameObject afterInitialize;
+		private List<GameObject> _afterInitializeInstances;
+
+		public GameObject afterLoaded;
+		private List<GameObject> _afterLoadedInstances;
+
+
+
+
 
 		// Use this for initialization
 		void Start()
@@ -20,15 +34,15 @@
 			map.MapVisualizer.OnMapVisualizerStateChanged += HandleMapStateChange;
 
 			//add layers before initialize
-			map.SpawnPrefabAtGeoLocation(myCustomPrefab, new Vector2d(37.784179, -122.401583), HandlePrefabsPlaced);
+			map.SpawnPrefabByCategory(beforeInitialize, LocationPrefabCategories.ArtsAndEntertainment, 10, HandleBeforeInitializePrefabs, true, "BeforeInitLayer");
 			map.Initialize(new Vector2d(37.784179, -122.401583), 16);
 		}
 
 		// Update is called once per frame
 		void HandleMapInitialized()
 		{
-			//add layers on initialize
-
+			map.SpawnPrefabByCategory(afterInitialize, LocationPrefabCategories.Shops, 10, HandleAfterInitializePrefabs, true, "AfterInitLayer");
+			map.UpdateMap(map.CenterLatitudeLongitude, map.InitialZoom);
 		}
 
 		void HandleMapStateChange(ModuleState state)
@@ -36,14 +50,27 @@
 			if (!(state == ModuleState.Finished))
 			{
 				//add layers on loaded
+				map.SpawnPrefabByCategory(afterLoaded, LocationPrefabCategories.Food, 10, HandleAfterLoadedPrefabs, true, "AfterLoadedLayer");
+				map.UpdateMap(map.CenterLatitudeLongitude, map.InitialZoom);
 				return;
 			}
 		}
 
 		//handle callbacks
-		void HandlePrefabsPlaced(List<GameObject> instances)
+		void HandleBeforeInitializePrefabs(List<GameObject> instances)
 		{
 			Debug.Log(instances.Count);
+			//_beforeInitializeInstances.AddRange(instances);
+		}
+
+		void HandleAfterInitializePrefabs(List<GameObject> instances)
+		{
+			//_afterInitializeInstances.AddRange(instances);
+		}
+
+		void HandleAfterLoadedPrefabs(List<GameObject> instances)
+		{
+			//_afterLoadedInstances.AddRange(instances);
 		}
 	}
 }

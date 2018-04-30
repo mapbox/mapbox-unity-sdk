@@ -227,7 +227,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		public override void Create(VectorTileLayer layer, UnityTile tile, Action callback)
 		{
 			//for layers using specific locations, ignore VectorTileLayer and
-			//pass coordinates to the modifierstack.
+			//pass coordinates to the modifierstack using BuildFeatureFromLatLon.
 			if( (SubLayerProperties as PrefabItemOptions).findByType 
 			   == LocationPrefabFindBy.AddressOrLatLon)
 			{
@@ -245,6 +245,12 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		}
 
+
+		/// <summary>
+		/// Creates a vector feature from lat lon and builds that feature using the modifier stack.
+		/// </summary>
+		/// <param name="layer">Layer.</param>
+		/// <param name="tile">Tile.</param>
 		private void BuildFeatureFromLatLon(VectorTileLayer layer, UnityTile tile)
 		{
 			var coordinates = (SubLayerProperties as PrefabItemOptions).coordinates;
@@ -295,7 +301,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 					//HACK: silence errors when modifiers access feature.Data
 					//this data has no relation to the features being drawn
-					feature.Data = layer.GetFeature(0);
+					//feature.Data = layer.GetFeature(0);
 
 					//pass the feature to the mod stack
 					base.Build(feature, tile, tile.gameObject);
