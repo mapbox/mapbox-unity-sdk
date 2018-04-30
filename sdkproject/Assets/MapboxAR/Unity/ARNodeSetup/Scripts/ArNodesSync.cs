@@ -18,23 +18,21 @@
 		Transform _targetTransform;
 
 		[SerializeField]
-		AbstractMap _map;
+		float _minMagnitudeBetween;
 
-		[SerializeField]
-		float _secondsBetweenDropCheck, _minMagnitudeBetween;
-
-		IEnumerator _saveARnodes;
+		float _latestBestGPSAccuracy;
 		List<Node> _savedNodes;
 		WaitForSeconds _waitFor;
 		float _latestBestGPSAccuracy;
 
+		AbstractMap _map;
 
 		public override void InitializeNodeBase()
 		{
-			_waitFor = new WaitForSeconds(_secondsBetweenDropCheck);
 			_savedNodes = new List<Node>();
-
 			CentralizedARLocator.OnNewHighestAccuracyGPS += SavedGPSAccuracy;
+			_map = LocationProviderFactory.Instance.mapManager;
+			IsNodeBaseInitialized = true;
 			Debug.Log("Initialized ARNodes");
 		}
 
@@ -42,15 +40,6 @@
 		{
 			_latestBestGPSAccuracy = location.Accuracy;
 		}
-
-		//async void SaveArNodes(Transform dropTransform)
-		//{
-		//	while (true)
-		//	{
-		//		ConvertToNodes(dropTransform);
-		//		await Task.Delay(TimeSpan.FromSeconds(1));
-		//	}
-		//}
 
 		public override void SaveNode()
 		{
@@ -60,7 +49,7 @@
 			{
 				var previousNodePos = _map.GeoToWorldPosition(_savedNodes[_savedNodes.Count - 1].LatLon, false);
 				var currentMagnitude = _targetTransform.position - previousNodePos;
-				//Debug.Log("ARNode Magnitude: " + currentMagnitude);
+
 				if (currentMagnitude.magnitude >= _minMagnitudeBetween)
 				{
 					saveNode = true;
@@ -77,49 +66,9 @@
 				node.LatLon = _map.WorldToGeoPosition(_targetTransform.position);
 				node.Accuracy = _latestBestGPSAccuracy;
 				_savedNodes.Add(node);
-
-				if (NodeAdded != null)
-				{
-					NodeAdded();
-				}
 			}
 
 		}
-		//void ConvertToNodes(Transform nodeDrop)
-		//{
-		//	 Despise if else jungles...
-		//	if (_savedNodes.Count >= 1)
-		//	{
-		//		var previousNodePos = _map.GeoToWorldPosition(_savedNodes[_savedNodes.Count - 1].LatLon, false);
-		//		var currentMagnitude = nodeDrop.position - previousNodePos;
-		//		Debug.Log("ARNode Magnitude: " + currentMagnitude);
-		//		if (currentMagnitude.magnitude >= _minMagnitudeBetween)
-		//		{
-		//			var node = new Node();
-		//			node.LatLon = _map.WorldToGeoPosition(nodeDrop.position);
-		//			node.Accuracy = _latestBestGPSAccuracy;
-		//			_savedNodes.Add(node);
-
-		//			if (NodeAdded != null)
-		//			{
-		//				NodeAdded();
-		//			}
-		//		}
-		//	}
-		//	else
-		//	{
-		//		var node = new Node();
-		//		node.LatLon = _map.WorldToGeoPosition(nodeDrop.position);
-		//		node.Accuracy = _latestBestGPSAccuracy;
-		//		_savedNodes.Add(node);
-
-		//		if (NodeAdded != null)
-		//		{
-		//			NodeAdded();
-		//		}
-		//	}
-
-		//}
 
 		public override Node[] ReturnNodes()
 		{
@@ -132,4 +81,3 @@
 		}
 	}
 }
-

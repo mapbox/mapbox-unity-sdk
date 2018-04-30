@@ -28,9 +28,9 @@
 		/// </summary>
 		public abstract void SaveNode();
 		/// <summary>
-		/// An event that is called when a node is added.
+		/// Returns true if Node Base is Intialized for filtering.
 		/// </summary>
-		public Action NodeAdded;
+		public bool IsNodeBaseInitialized;
 	}
 
 	public struct Node

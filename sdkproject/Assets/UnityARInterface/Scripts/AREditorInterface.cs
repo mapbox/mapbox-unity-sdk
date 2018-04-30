@@ -107,79 +107,86 @@ namespace UnityARInterface
 			return Matrix4x4.identity;
 		}
 
-        public override void UpdateCamera(Camera camera)
-        {
-            float speed = camera.transform.parent.localScale.x / 10f;
-            float turnSpeed = 10f;
-            var forward = m_CameraPose.rotation * Vector3.forward;
-            var right = m_CameraPose.rotation * Vector3.right;
-            var up = m_CameraPose.rotation * Vector3.up;
+		public override bool GetTrackingState(ref CustomTrackingState trackingState)
+		{
+			// Always assumes tracking is on point in editor. Of course. Lol.
+			trackingState = CustomTrackingState.Good;
+			return true;
+		}
 
-            if (Input.GetKey(KeyCode.W))
-                m_CameraPose.position += forward * Time.deltaTime * speed;
+		public override void UpdateCamera(Camera camera)
+		{
+			float speed = camera.transform.parent.localScale.x / 10f;
+			float turnSpeed = 10f;
+			var forward = m_CameraPose.rotation * Vector3.forward;
+			var right = m_CameraPose.rotation * Vector3.right;
+			var up = m_CameraPose.rotation * Vector3.up;
 
-            if (Input.GetKey(KeyCode.S))
-                m_CameraPose.position -= forward * Time.deltaTime * speed;
+			if (Input.GetKey(KeyCode.W))
+				m_CameraPose.position += forward * Time.deltaTime * speed;
 
-            if (Input.GetKey(KeyCode.A))
-                m_CameraPose.position -= right * Time.deltaTime * speed;
+			if (Input.GetKey(KeyCode.S))
+				m_CameraPose.position -= forward * Time.deltaTime * speed;
 
-            if (Input.GetKey(KeyCode.D))
-                m_CameraPose.position += right * Time.deltaTime * speed;
+			if (Input.GetKey(KeyCode.A))
+				m_CameraPose.position -= right * Time.deltaTime * speed;
 
-            if (Input.GetKey(KeyCode.Q))
-                m_CameraPose.position += up * Time.deltaTime * speed;
+			if (Input.GetKey(KeyCode.D))
+				m_CameraPose.position += right * Time.deltaTime * speed;
 
-            if (Input.GetKey(KeyCode.Z))
-                m_CameraPose.position -= up * Time.deltaTime * speed;
+			if (Input.GetKey(KeyCode.Q))
+				m_CameraPose.position += up * Time.deltaTime * speed;
 
-            if (Input.GetMouseButton(1))
-            {
-                if (!m_WasMouseDownLastFrame)
-                    m_LastMousePosition = Input.mousePosition;
+			if (Input.GetKey(KeyCode.Z))
+				m_CameraPose.position -= up * Time.deltaTime * speed;
 
-                var deltaPosition = Input.mousePosition - m_LastMousePosition;
-                m_EulerAngles.y += Time.deltaTime * turnSpeed * deltaPosition.x;
-                m_EulerAngles.x -= Time.deltaTime * turnSpeed * deltaPosition.y;
-                m_CameraPose.rotation = Quaternion.Euler(m_EulerAngles);
-                m_LastMousePosition = Input.mousePosition;
-                m_WasMouseDownLastFrame = true;
-            }
-            else
-            {
-                m_WasMouseDownLastFrame = false;
-            }
-        }
+			if (Input.GetMouseButton(1))
+			{
+				if (!m_WasMouseDownLastFrame)
+					m_LastMousePosition = Input.mousePosition;
 
-        public override void Update()
-        {
-            switch (m_State)
-            {
-                case State.Initialized:
-                    m_State = State.WaitingToAddPlane1;
-                    m_LastTime = Time.time;
-                    break;
+				var deltaPosition = Input.mousePosition - m_LastMousePosition;
+				m_EulerAngles.y += Time.deltaTime * turnSpeed * deltaPosition.x;
+				m_EulerAngles.x -= Time.deltaTime * turnSpeed * deltaPosition.y;
+				m_CameraPose.rotation = Quaternion.Euler(m_EulerAngles);
+				m_LastMousePosition = Input.mousePosition;
+				m_WasMouseDownLastFrame = true;
+			}
+			else
+			{
+				m_WasMouseDownLastFrame = false;
+			}
+		}
 
-                case State.WaitingToAddPlane1:
+		public override void Update()
+		{
+			switch (m_State)
+			{
+				case State.Initialized:
+					m_State = State.WaitingToAddPlane1;
+					m_LastTime = Time.time;
+					break;
 
-                    if (Time.time - m_LastTime > 1f)
-                    {
-                        OnPlaneAdded(m_FakePlanes[0]);
-                        m_LastTime = Time.time;
-                        m_State = State.WaitingToAddPlane2;
-                    }
-                    break;
+				case State.WaitingToAddPlane1:
 
-                case State.WaitingToAddPlane2:
+					if (Time.time - m_LastTime > 1f)
+					{
+						OnPlaneAdded(m_FakePlanes[0]);
+						m_LastTime = Time.time;
+						m_State = State.WaitingToAddPlane2;
+					}
+					break;
 
-                    if (Time.time - m_LastTime > 1f)
-                    {
-                        OnPlaneAdded(m_FakePlanes[1]);
-                        m_LastTime = Time.time;
-                        m_State = State.Finished;
-                    }
-                    break;
-            }
-        }
-    }
+				case State.WaitingToAddPlane2:
+
+					if (Time.time - m_LastTime > 1f)
+					{
+						OnPlaneAdded(m_FakePlanes[1]);
+						m_LastTime = Time.time;
+						m_State = State.Finished;
+					}
+					break;
+			}
+		}
+	}
 }

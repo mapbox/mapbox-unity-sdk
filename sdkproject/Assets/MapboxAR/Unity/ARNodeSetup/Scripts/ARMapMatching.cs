@@ -16,9 +16,6 @@
 		MapMatching.Profile _profile;
 
 		[SerializeField]
-		AbstractMap _map;
-
-		[SerializeField]
 		NodeSyncBase _inputNodes;
 
 		[SerializeField]
@@ -28,8 +25,6 @@
 
 		public Action<Node[]> ReturnMapMatchCoords;
 		private List<Node> _savedNodes;
-		IEnumerator _mapMatching, _waitForRequest;
-		WaitForSeconds _waitFor;
 
 		private List<Node> _nodesForMapMatchingQuery = new List<Node>();
 
@@ -66,6 +61,7 @@
 				Debug.Log("MapMatching error : " + response.Message);
 				return;
 			}
+
 			Debug.Log("Before if");
 			if (response.Matchings != null && response.Matchings.Length > 0)
 			{
@@ -84,16 +80,10 @@
 					});
 				}
 				_savedNodes = nodes;
+
 				if (ReturnMapMatchCoords != null)
 				{
 					ReturnMapMatchCoords(nodes.ToArray());
-				}
-
-				Debug.Log("MapMatching Node added");
-				if (NodeAdded != null)
-				{
-					Debug.Log("MapMatching Node added");
-					NodeAdded();
 				}
 			}
 		}
@@ -112,6 +102,7 @@
 		{
 			_savedNodes = new List<Node>();
 			_nodesForMapMatchingQuery = new List<Node>();
+			IsNodeBaseInitialized = true;
 		}
 
 		public override void SaveNode()

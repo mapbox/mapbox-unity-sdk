@@ -57,20 +57,32 @@
 		void Awake()
 		{
 			_alignmentStrategy.Register(this);
-			// Initialize all sync-nodes.Make them ready to recieve node data. 
+			_map = LocationProviderFactory.Instance.mapManager;
+
+			// Initialize all sync-nodes.Make them ready to recieve node data.
+			// Map needs to be generated before init. Otherwise bunch of errors.
+
 			InitializeSyncNodes();
-			//Debugging purpose???
-			//_mapMathching.ReturnMapMatchCoords += GetMapMatchingCoords;
-			_map.OnInitialized += FirstAlignment;
+
+			_map.OnInitialized += Map_OnInitialized;
+		}
+
+		void Map_OnInitialized()
+		{
+			_map.OnInitialized -= Map_OnInitialized;
+
+			// We don't want location updates until we have a map, otherwise our conversion will fail.
+			FirstAlignment();
 		}
 
 		protected void FirstAlignment()
 		{
-			_map = LocationProviderFactory.Instance.mapManager;
 			Debug.Log("First Alignment");
 			var deviceHeading = LocationProviderFactory.Instance.DefaultLocationProvider.CurrentLocation.DeviceOrientation;
-			var position = LocationProviderFactory.Instance.mapManager.transform.position;
+
+			var position = _map.transform.position;
 			_map.transform.SetPositionAndRotation(position, Quaternion.Euler(0, deviceHeading, 0));
+
 			//We want Syncronize to be called when location is updated. This could extend to any other polling methods in the future.
 			LocationProviderFactory.Instance.DefaultLocationProvider.OnLocationUpdated += SyncronizeNodesToFindAlignment;
 
@@ -82,6 +94,11 @@
 
 		void ComputeAlignment()
 		{
+			// TODO
+			// I Like this. Computing aligment here. Though we should throw away computing heading only from nodes..
+			// I think as with AR & GPS nodes to MapMatching. We should have the heading from nodes as a input for the final heading.
+			// Heading from Nodes, Gyro and Compass. And then calculate. -> Ultra Heading :P
+
 			Debug.Log("Compute Alignment - Start");
 			Node currentGpsNode = new Node();
 			Node previousGpsNode = new Node();
@@ -89,7 +106,7 @@
 			Node previousARNode = new Node();
 			foreach (var syncNode in _syncNodes)
 			{
-				// HACk to get data from GPS Nodes. 
+				// HACk to get data from GPS Nodes.
 				if (syncNode.GetType() == typeof(GpsNodeSync))
 				{
 					var gpsNodes = syncNode.ReturnNodes();
@@ -192,16 +209,16 @@
 		protected void SyncronizeNodesToFindAlignment(Location location)
 		{
 			// Our location provider just got a new update.
-			// We now ask all our nodes to update and save the most recent node. 
+			// We now ask all our nodes to update and save the most recent node.
 			// Sync Nodes should also update a "Quality/Accuracy" metric.
-			// Quality/Accuracy metric will be used to determine whether the node will be considered for the alignment computation or not. 
+			// Quality/Accuracy metric will be used to determine whether the node will be considered for the alignment computation or not.
 			Debug.Log("SyncronizeNodesToFindAlignment");
 
 			foreach (var node in _syncNodes)
 			{
 				node.SaveNode();
 			}
-			// Compute Alignment 
+			// Compute Alignment
 			ComputeAlignment();
 		}
 
@@ -299,7 +316,7 @@
 
 		}
 
-		// TODO: Check trackingQuality in AR 
+		// TODO: Check trackingQuality in AR
 		// and snap to GPS nodes if tracking goes bad..
 	}
 }
