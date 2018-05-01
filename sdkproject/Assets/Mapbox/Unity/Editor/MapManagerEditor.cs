@@ -192,7 +192,6 @@
 				var sourceType = layerProperty.FindPropertyRelative("_sourceType");
 				VectorSourceType sourceTypeValue = (VectorSourceType)sourceType.enumValueIndex;
 				string streets_v7 = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id;
-				//var layerSourceId = vectorDataProperty.FindPropertyRelative("Id");
 				string layerString = layerProperty.FindPropertyRelative("sourceOptions.layerSource.Id").stringValue;
 
 				if(sourceTypeValue != VectorSourceType.None && layerString.Contains(streets_v7))
@@ -201,7 +200,6 @@
 					EditorGUILayout.TextField(_mapIdGui, streets_v7);
 					GUI.enabled = true;
 					ShowSection(vectorDataProperty, "_locationPrefabsLayerProperties");
-					//GUILayout.Space(EditorGUIUtility.singleLineHeight);
 				}
 				else
 				{
