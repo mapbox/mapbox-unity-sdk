@@ -45,10 +45,7 @@
 		protected ModifierStackBase _defaultStack;
 		private HashSet<ulong> _activeIds;
 		private Dictionary<UnityTile, List<ulong>> _idPool; //necessary to keep _activeIds list up to date when unloading tiles
-
 		private string _key;
-
-
 
 		public override string Key
 		{
@@ -81,7 +78,6 @@
 			switch (properties.coreOptions.geometryType)
 			{
 				case VectorPrimitiveType.Point:
-					break;
 				case VectorPrimitiveType.Custom:
 					// Let the user add anything that they want
 					if (_layerProperties.coreOptions.snapToTerrain == true)
