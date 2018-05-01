@@ -4,6 +4,7 @@
 	using UnityEngine;
 	using Mapbox.Unity.Map;
 	using System.Collections.Generic;
+	using System.Linq;
 
 	[CustomPropertyDrawer(typeof(CoreVectorLayerProperties))]
 	public class CoreVectorLayerPropertiesDrawer : PropertyDrawer
@@ -20,6 +21,7 @@
 			}
 		}
 
+		private string[] layerNamesArray;
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		static TileJsonData tileJSONData = new TileJsonData();
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -44,14 +46,17 @@
 			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
 			tileJSONData = mapObject.VectorData.LayerProperty.tileJsonData;
 
-			if (tileJSONData == null || tileJSONData.LayerDisplayNames.Count <= 0)
+			if (tileJSONData == null || tileJSONData.LayerDisplayNames.Count == 0)
 			{
 				tileJSONData.ProcessTileJSONData(mapObject.tileJSONResponse);
 			}
 			else
 			{
 				var layerDisplayNames = tileJSONData.LayerDisplayNames;
-				var layerNamesArray = layerDisplayNames.ToArray();
+				if (layerNamesArray == null || !Enumerable.SequenceEqual(layerNamesArray, layerDisplayNames.ToArray()))
+					index = 0;
+				
+				layerNamesArray = layerDisplayNames.ToArray();
 				typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Layer Name", tooltip = "The layer name from the Mapbox tileset that would be used for visualizing a feature" });
 				EditorGUI.indentLevel--;
 				index = EditorGUI.Popup(typePosition, index, layerNamesArray);

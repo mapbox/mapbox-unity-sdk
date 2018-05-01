@@ -146,7 +146,7 @@
 			
 			var propertyDisplayNames = tileJsonData.PropertyDisplayNames[selectedLayerName];
 
-			if (propertyNamesArray != null && !Enumerable.SequenceEqual(propertyNamesArray, propertyDisplayNames.ToArray()))
+			if (propertyNamesArray == null || !Enumerable.SequenceEqual(propertyNamesArray, propertyDisplayNames.ToArray()))
 			   index = 0;
 			
 			propertyNamesArray = propertyDisplayNames.ToArray();
