@@ -675,7 +675,7 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0.14181519
+      value: 0.14468281
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -795,7 +795,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -116.52501
+      value: -116.91571
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -805,12 +805,12 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 213.05002
+      value: 213.83142
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 233.05002
+      value: 233.83142
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -989,7 +989,7 @@ MonoBehaviour:
         coordinates: []
         density: 10
       - coreOptions:
-          isActive: 0
+          isActive: 1
           sublayerName: Food
           geometryType: 0
           layerName: 
@@ -1028,7 +1028,7 @@ MonoBehaviour:
         coordinates: []
         density: 15
       - coreOptions:
-          isActive: 0
+          isActive: 1
           sublayerName: Nightlife
           geometryType: 0
           layerName: 
@@ -1067,7 +1067,7 @@ MonoBehaviour:
         coordinates: []
         density: 10
       - coreOptions:
-          isActive: 0
+          isActive: 1
           sublayerName: Outdoors and Recreation
           geometryType: 0
           layerName: 
@@ -1106,7 +1106,7 @@ MonoBehaviour:
         coordinates: []
         density: 20
       - coreOptions:
-          isActive: 0
+          isActive: 1
           sublayerName: Services
           geometryType: 0
           layerName: 
@@ -1145,7 +1145,7 @@ MonoBehaviour:
         coordinates: []
         density: 5
       - coreOptions:
-          isActive: 0
+          isActive: 1
           sublayerName: Shops
           geometryType: 0
           layerName: 
@@ -1184,7 +1184,7 @@ MonoBehaviour:
         coordinates: []
         density: 10
       - coreOptions:
-          isActive: 0
+          isActive: 1
           sublayerName: Transportation
           geometryType: 0
           layerName: 
