@@ -187,21 +187,6 @@
 		AddressOrLatLon,
 	}
 
-	//unused enum for now
-	public enum Popularity
-	{
-		[Description("localrank = 1")]
-		MostPopularLocationsOnly,
-		[Description("localrank = 2")]
-		VeryPopular,
-		[Description("localrank = 3")]
-		Popular,
-		[Description("localrank = 4")]
-		SomewhatPopular, 
-		[Description("localrank = 5")]
-		AllLocations
-	}
-
 	public enum LocationPrefabCategories
 	{
 		None = 0,

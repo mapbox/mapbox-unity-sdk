@@ -122,11 +122,6 @@ namespace Mapbox.Unity.Map
 		public string nameString = "Name";
 
 		/// <summary>
-		/// The number of prefabs to spawn per-tile. Try a lower number if the map is cluttered.
-		/// </summary>
-		public Popularity popularity;
-
-		/// <summary>
 		/// Spawn at specific coordinates
 		/// </summary>
 		[Geocode]
