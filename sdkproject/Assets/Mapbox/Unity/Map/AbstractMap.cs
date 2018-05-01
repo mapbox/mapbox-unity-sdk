@@ -791,8 +791,8 @@ namespace Mapbox.Unity.Map
 		/// <param name="item"> the options of the prefab layer.</param>
 		private void CreatePrefabLayer( PrefabItemOptions item )
 		{
-			if (_vectorData.LayerProperty.sourceType != VectorSourceType.None 
-			|| _vectorData.LayerProperty.sourceOptions.Id.Contains(MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id))
+			if (_vectorData.LayerProperty.sourceType == VectorSourceType.None 
+			|| !_vectorData.LayerProperty.sourceOptions.Id.Contains(MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id))
 			{
 				Debug.LogError("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the list of vector data sources");
 				return;
