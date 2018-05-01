@@ -666,45 +666,30 @@ namespace Mapbox.Unity.Map
 		#region Location Prefabs Methods
 
 		/// <summary>
-		/// Places a game object prefabs at the specified LatLon on the Map.
+		/// Places a prefab at the specified LatLon on the Map.
 		/// </summary>
 		/// <param name="prefab"> A Game Object Prefab.</param>
 		/// <param name="LatLon">A Vector2d(Latitude Longitude) object</param>
-		public void SpawnPrefabAtGeoLocation(GameObject prefab, Vector2d LatLon, Action<List<GameObject>> callback = null, bool scaleDownWithWorld = true, string locationItemName = "New Location")
+		public void SpawnPrefabAtGeoLocation(GameObject prefab, 
+		                                     Vector2d LatLon, 
+		                                     Action<List<GameObject>> callback = null, 
+		                                     bool scaleDownWithWorld = true, 
+		                                     string locationItemName = "New Location")
 		{
-			var coordinateArray = new string[] { LatLon.x + ", " + LatLon.y };
-
-			PrefabItemOptions item = new PrefabItemOptions()
-			{
-				findByType = LocationPrefabFindBy.AddressOrLatLon,
-				prefabItemName = locationItemName,
-				spawnPrefabOptions = new SpawnPrefabOptions()
-				{
-					prefab = prefab,
-					scaleDownWithWorld = scaleDownWithWorld
-				},
-
-				coordinates = coordinateArray
-			};
-
-			if (callback != null)
-			{
-				item.OnAllPrefabsInstantiated += callback;
-			}
-
-			if(!_vectorData.LayerProperty.vectorSubLayers.Contains(item))
-			{
-				_vectorData.LocationPrefabsLayerProperties.locationPrefabList.Add(item);
-				_vectorData.AddVectorLayer(item);
-			}
+			var latLonArray = new Vector2d[] { LatLon };
+			SpawnPrefabAtGeoLocation(prefab, latLonArray, callback, scaleDownWithWorld, locationItemName);
 		}
 
 		/// <summary>
-		/// Places a game object prefabs all locations specified by the LatLon array.
+		/// Places a prefab at all locations specified by the LatLon array.
 		/// </summary>
 		/// <param name="prefab"> A Game Object Prefab.</param>
 		/// <param name="LatLon">A Vector2d(Latitude Longitude) object</param>
-		public void SpawnPrefabAtGeoLocation(GameObject prefab, Vector2d[] LatLon, Action<List<GameObject>> callback = null, bool scaleDownWithWorld = true, string locationItemName = "New Location")
+		public void SpawnPrefabAtGeoLocation(GameObject prefab, 
+		                                     Vector2d[] LatLon, 
+		                                     Action<List<GameObject>> callback = null, 
+		                                     bool scaleDownWithWorld = true, 
+		                                     string locationItemName = "New Location")
 		{
 			var coordinateArray = new string[LatLon.Length];
 			for (int i = 0; i < LatLon.Length; i++)
@@ -726,32 +711,28 @@ namespace Mapbox.Unity.Map
 			};
 
 			if (callback != null)
-				item.OnAllPrefabsInstantiated += callback;
-
-			if (!_vectorData.LayerProperty.vectorSubLayers.Contains(item))
 			{
-				_vectorData.LocationPrefabsLayerProperties.locationPrefabList.Add(item);
-				_vectorData.AddVectorLayer(item);
+				item.OnAllPrefabsInstantiated += callback;
 			}
+
+			CreatePrefabLayer(item);
 		}
 
 		/// <summary>
 		/// Places the prefab for supplied categories.
-		/// For more than one category separate them by pipe. for eg: LocationPrefabCategories.Food | LocationPrefabCategories.Nightlife
-		/// Density value controls the number of POIs on the map. It's a value between 1 and 30, where 30 is max density
 		/// </summary>
 		/// <param name="prefab">GameObject Prefab</param>
-		/// <param name="categories"><see cref="LocationPrefabCategories"/> For more than one category separate them by pipe (eg: LocationPrefabCategories.Food | LocationPrefabCategories.Nightlife)</param>
-		/// <param name="density">Density (Integer value between 1 and 30)</param>
+		/// <param name="categories"><see cref="LocationPrefabCategories"/> For more than one category separate them by pipe 
+		/// (eg: LocationPrefabCategories.Food | LocationPrefabCategories.Nightlife)</param>
+		/// <param name="density">Density controls the number of POIs on the map.(Integer value between 1 and 30)</param>
 		/// <param name="locationItemName">Name of this location prefab item for future reference</param>
 		/// <param name="scaleDownWithWorld">Should the prefab scale up/down along with the map game object?</param>
-		public void SpawnPrefabByCategory(GameObject prefab, LocationPrefabCategories categories = LocationPrefabCategories.AnyCategory, int density = 30, Action<List<GameObject>> callback = null, bool scaleDownWithWorld = true, string locationItemName = "New Location")
+		public void SpawnPrefabByCategory(GameObject prefab, 
+		                                  LocationPrefabCategories categories = LocationPrefabCategories.AnyCategory, 
+		                                  int density = 30, Action<List<GameObject>> callback = null, 
+		                                  bool scaleDownWithWorld = true, 
+		                                  string locationItemName = "New Location")
 		{
-			if (_vectorData.LayerProperty.sourceType == VectorSourceType.None || !_vectorData.LayerProperty.sourceOptions.Id.Contains(MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id))
-			{
-				Debug.LogError("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the list of vector data sources");
-				return;
-			}
 			PrefabItemOptions item = new PrefabItemOptions()
 			{
 				findByType = LocationPrefabFindBy.MapboxCategory,
@@ -764,23 +745,13 @@ namespace Mapbox.Unity.Map
 					scaleDownWithWorld = scaleDownWithWorld
 				}
 			};
-			if(_vectorData==null)
-			{
-				_vectorData = new VectorLayer();
-			}
-			if (_vectorData.LocationPrefabsLayerProperties.locationPrefabList == null)
-			{
-				_vectorData.LocationPrefabsLayerProperties.locationPrefabList = new List<PrefabItemOptions>();
-			}
 
 			if (callback != null)
-				item.OnAllPrefabsInstantiated += callback;
-			
-			if (!_vectorData.LayerProperty.vectorSubLayers.Contains(item))
 			{
-				_vectorData.LocationPrefabsLayerProperties.locationPrefabList.Add(item);
-				_vectorData.AddVectorLayer(item);
+				item.OnAllPrefabsInstantiated += callback;
 			}
+
+			CreatePrefabLayer(item);
 		}
 
 		/// <summary>
@@ -791,13 +762,13 @@ namespace Mapbox.Unity.Map
 		/// <param name="locationItemName">Name of this location prefab item for future reference</param>
 		/// <param name="scaleDownWithWorld">Should the prefab scale up/down along with the map game object?</param>
 		/// </summary>
-		public void SpawnPrefabByName(GameObject prefab, string nameString, int density = 30, Action<List<GameObject>> callback = null, bool scaleDownWithWorld = true, string locationItemName = "New Location")
+		public void SpawnPrefabByName(GameObject prefab, 
+		                              string nameString, 
+		                              int density = 30, 
+		                              Action<List<GameObject>> callback = null, 
+		                              bool scaleDownWithWorld = true, 
+		                              string locationItemName = "New Location")
 		{
-			if (_vectorData.LayerProperty.sourceType != VectorSourceType.None || _vectorData.LayerProperty.sourceOptions.Id.Contains(MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id))
-			{
-				Debug.LogError("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the list of vector data sources");
-				return;
-			}
 			PrefabItemOptions item = new PrefabItemOptions()
 			{
 				findByType = LocationPrefabFindBy.POIName,
@@ -810,23 +781,42 @@ namespace Mapbox.Unity.Map
 					scaleDownWithWorld = scaleDownWithWorld
 				}
 			};
+
+			CreatePrefabLayer(item);
+		}
+
+		/// <summary>
+		/// Creates the prefab layer.
+		/// </summary>
+		/// <param name="item"> the options of the prefab layer.</param>
+		private void CreatePrefabLayer( PrefabItemOptions item )
+		{
+			if (_vectorData.LayerProperty.sourceType != VectorSourceType.None 
+			|| _vectorData.LayerProperty.sourceOptions.Id.Contains(MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id))
+			{
+				Debug.LogError("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the list of vector data sources");
+				return;
+			}
+
+			//ensure that there is a vector layer
 			if (_vectorData == null)
 			{
 				_vectorData = new VectorLayer();
 			}
+
+			//ensure that there is a list of prefabitems
 			if (_vectorData.LocationPrefabsLayerProperties.locationPrefabList == null)
 			{
 				_vectorData.LocationPrefabsLayerProperties.locationPrefabList = new List<PrefabItemOptions>();
 			}
 
-			if (callback != null)
-				item.OnAllPrefabsInstantiated += callback;
-			
+			//add the prefab item if it doesn't already exist
 			if (!_vectorData.LayerProperty.vectorSubLayers.Contains(item))
 			{
 				_vectorData.LocationPrefabsLayerProperties.locationPrefabList.Add(item);
 				_vectorData.AddVectorLayer(item);
 			}
+
 		}
 
   		#endregion
