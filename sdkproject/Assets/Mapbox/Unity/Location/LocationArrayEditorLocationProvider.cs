@@ -42,7 +42,8 @@
 
 		protected override void SetLocation()
 		{
-			_currentLocation.UserHeading = _heading;
+			//_currentLocation.UserHeading = _heading;
+			_currentLocation.DeviceOrientation = _heading;
 			_currentLocation.LatitudeLongitude = LatitudeLongitude;
 			_currentLocation.Accuracy = _accuracy;
 			_currentLocation.Timestamp = UnixTimestampUtils.To(DateTime.UtcNow);

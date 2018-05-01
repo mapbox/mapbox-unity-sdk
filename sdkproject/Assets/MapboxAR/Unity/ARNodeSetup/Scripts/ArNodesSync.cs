@@ -23,7 +23,6 @@
 		float _latestBestGPSAccuracy;
 		List<Node> _savedNodes;
 		WaitForSeconds _waitFor;
-		float _latestBestGPSAccuracy;
 
 		AbstractMap _map;
 

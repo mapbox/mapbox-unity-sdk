@@ -34,10 +34,9 @@
 			yield return new WaitForSeconds(.1f);
 			while (true)
 			{
-				SetLocation();
 				if (_autoFireEvent)
 				{
-					SendLocation(_currentLocation);
+					SendLocationEvent();
 				}
 				yield return _wait;
 			}
@@ -57,7 +56,7 @@
 			if (_sendEvent)
 			{
 				_sendEvent = false;
-				SendLocation(_currentLocation);
+				SendLocationEvent();
 			}
 		}
 

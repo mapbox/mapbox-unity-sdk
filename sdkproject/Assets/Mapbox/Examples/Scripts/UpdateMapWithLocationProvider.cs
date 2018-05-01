@@ -9,9 +9,37 @@
 		[SerializeField]
 		AbstractMap _map;
 
+		[SerializeField]
+		Transform _targetTransform;
 		ILocationProvider _locationProvider;
 		Vector3 _targetPosition;
 		bool _isMapInitialized = false;
+
+		/// <summary>
+		/// The time taken to move from the start to finish positions
+		/// </summary>
+		public float timeTakenDuringLerp = 1f;
+
+		//Whether we are currently interpolating or not
+		private bool _isLerping;
+
+		//The start and finish positions for the interpolation
+		private Vector3 _startPosition;
+		private Vector3 _endPosition;
+
+		private Utils.Vector2d _startLatLong;
+		private Utils.Vector2d _endLatlong;
+
+		[SerializeField]
+		Transform _startLocation;
+
+		[SerializeField]
+		Transform _endLocation;
+
+
+		//The Time.time value when we started the interpolation
+		private float _timeStartedLerping;
+
 		private void Awake()
 		{
 			// Prevent double initialization of the map. 
@@ -40,18 +68,76 @@
 		{
 			if (_isMapInitialized && location.IsLocationUpdated)
 			{
-				_targetPosition = _map.GeoToWorldPosition(location.LatitudeLongitude, false);
+				if (_targetTransform != null && !_targetTransform.gameObject.activeInHierarchy)
+				{
+					_targetTransform.gameObject.SetActive(true);
+				}
+				StartLerping(location);
 			}
 		}
 
-		private void LateUpdate()
+		//private void LateUpdate()
+		//{
+		//	if (_isMapInitialized)
+		//	{
+		//		var currentPosition = _map.GeoToWorldPosition(_map.CenterLatitudeLongitude, false);
+		//		var position = Vector3.Lerp(currentPosition, _targetPosition, Time.deltaTime);
+		//		var latLong = _map.WorldToGeoPosition(position);
+		//		_map.UpdateMap(latLong, _map.Zoom);
+		//	}
+		//}
+
+		/// <summary>
+		/// Called to begin the linear interpolation
+		/// </summary>
+		void StartLerping(Unity.Location.Location location)
 		{
-			if (_isMapInitialized)
+			_isLerping = true;
+			_timeStartedLerping = Time.time;
+			//Debug.Log(Time.deltaTime);
+			//timeTakenDuringLerp = Time.deltaTime;
+
+			//We set the start position to the current position
+			_startLatLong = _map.CenterLatitudeLongitude;
+			_endLatlong = location.LatitudeLongitude;
+			_startPosition = _map.GeoToWorldPosition(_startLatLong, false);
+			_endPosition = _map.GeoToWorldPosition(_endLatlong, false);
+
+			_startLocation.transform.localPosition = _startPosition;
+			_endLocation.transform.localPosition = _endPosition;
+		}
+
+		//We do the actual interpolation in FixedUpdate(), since we're dealing with a rigidbody
+		void LateUpdate()
+		{
+			if (_isMapInitialized && _isLerping)
 			{
-				var currentPosition = _map.GeoToWorldPosition(_map.CenterLatitudeLongitude, false);
-				var position = Vector3.Lerp(currentPosition, _targetPosition, Time.deltaTime);
+				//We want percentage = 0.0 when Time.time = _timeStartedLerping
+				//and percentage = 1.0 when Time.time = _timeStartedLerping + timeTakenDuringLerp
+				//In other words, we want to know what percentage of "timeTakenDuringLerp" the value
+				//"Time.time - _timeStartedLerping" is.
+				float timeSinceStarted = Time.time - _timeStartedLerping;
+				float percentageComplete = timeSinceStarted / timeTakenDuringLerp;
+
+				//Perform the actual lerping.  Notice that the first two parameters will always be the same
+				//throughout a single lerp-processs (ie. they won't change until we hit the space-bar again
+				//to start another lerp)
+				//_startPosition = _map.GeoToWorldPosition(_map.CenterLatitudeLongitude, false);
+				_startPosition = _map.GeoToWorldPosition(_startLatLong, false);
+				_endPosition = _map.GeoToWorldPosition(_endLatlong, false);
+				var position = Vector3.Lerp(_startPosition, _endPosition, percentageComplete);
+				_startLocation.transform.localPosition = position;
+				_endLocation.transform.localPosition = _endPosition;
 				var latLong = _map.WorldToGeoPosition(position);
 				_map.UpdateMap(latLong, _map.Zoom);
+
+				//When we've completed the lerp, we set _isLerping to false
+				if (percentageComplete >= 1.0f)
+				{
+					Debug.Log("Lerp Complete");
+					_isLerping = false;
+
+				}
 			}
 		}
 	}

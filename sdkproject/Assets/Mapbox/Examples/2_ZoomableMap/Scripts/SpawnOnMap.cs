@@ -25,9 +25,15 @@
 
 		List<GameObject> _spawnedObjects;
 
-		void Start()
+		bool _isMapInitialized = false;
+		private void Awake()
 		{
 			_locations = new Vector2d[_locationStrings.Length];
+			_map.OnInitialized += OnMapInitialized;
+		}
+
+		void OnMapInitialized()
+		{
 			_spawnedObjects = new List<GameObject>();
 			for (int i = 0; i < _locationStrings.Length; i++)
 			{
@@ -38,18 +44,23 @@
 				instance.transform.localScale = new Vector3(_spawnScale, _spawnScale, _spawnScale);
 				_spawnedObjects.Add(instance);
 			}
+			_isMapInitialized = true;
 		}
 
 		private void Update()
 		{
-			int count = _spawnedObjects.Count;
-			for (int i = 0; i < count; i++)
+			if (_isMapInitialized)
 			{
-				var spawnedObject = _spawnedObjects[i];
-				var location = _locations[i];
-				spawnedObject.transform.localPosition = _map.GeoToWorldPosition(location, true);
-				spawnedObject.transform.localScale = new Vector3(_spawnScale, _spawnScale, _spawnScale);
+				int count = _spawnedObjects.Count;
+				for (int i = 0; i < count; i++)
+				{
+					var spawnedObject = _spawnedObjects[i];
+					var location = _locations[i];
+					spawnedObject.transform.localPosition = _map.GeoToWorldPosition(location, true);
+					spawnedObject.transform.localScale = new Vector3(_spawnScale, _spawnScale, _spawnScale);
+				}
 			}
+
 		}
 	}
 }

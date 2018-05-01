@@ -11,6 +11,9 @@
 
 		bool _isInitialized;
 
+		[SerializeField]
+		bool _addError = false;
+
 		ILocationProvider _locationProvider;
 		ILocationProvider LocationProvider
 		{
@@ -29,15 +32,19 @@
 
 		void Start()
 		{
-			LocationProviderFactory.Instance.mapManager.OnInitialized += () => _isInitialized = true;
+			LocationProviderFactory.Instance.mapManager.OnInitialized += () =>
+			{
+				_isInitialized = true;
+				LocationProviderFactory.Instance.DeviceLocationProvider.OnLocationUpdated += LocationProvider_OnLocationUpdated;
+			};
 		}
-
-		void LateUpdate()
+		void LocationProvider_OnLocationUpdated(Location location)
 		{
-			if (_isInitialized)
+			if (_isInitialized && location.IsLocationUpdated)
 			{
 				var map = LocationProviderFactory.Instance.mapManager;
-				transform.localPosition = map.GeoToWorldPosition(LocationProvider.CurrentLocation.LatitudeLongitude);
+
+				_targetPosition = map.GeoToWorldPosition(location.LatitudeLongitude) + ((_addError) ? Random.insideUnitSphere : Vector3.zero);
 			}
 		}
 	}
