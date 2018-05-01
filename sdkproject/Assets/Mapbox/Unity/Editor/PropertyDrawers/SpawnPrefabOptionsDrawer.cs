@@ -20,7 +20,7 @@ namespace Mapbox.Unity.Map
 		private GUIContent scalePrefabContent = new GUIContent
 		{
 			text = "Scale down with world",
-			tooltip = "Turning on this option causes the prefab to scale down when you scale the map object"
+			tooltip = "The prefab will scale with the map object"
 		};
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)

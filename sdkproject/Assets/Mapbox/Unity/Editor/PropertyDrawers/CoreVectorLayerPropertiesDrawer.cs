@@ -15,8 +15,6 @@
 			position.height = lineHeight;
 
 			// Draw label.
-			//EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("isActive"));
-			//position.y += lineHeight;
 			var primitiveType = property.FindPropertyRelative("geometryType");
 
 			var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Primitive Type", tooltip = "Primitive geometry type of the visualizer, allowed primitives - point, line, polygon." });
@@ -42,6 +40,12 @@
 			EditorGUI.EndProperty();
 		}
 
+		/// <summary>
+		/// Gets the number of UI rows necessary to draw the property correctly, given it's primitive type.
+		/// </summary>
+		/// <returns>The property height.</returns>
+		/// <param name="property">Property.</param>
+		/// <param name="label">Label.</param>
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
 			var sourceTypeProperty = property.FindPropertyRelative("geometryType");

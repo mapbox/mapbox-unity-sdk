@@ -11,7 +11,7 @@ namespace Mapbox.Editor
 	{
 
 		static float _lineHeight = EditorGUIUtility.singleLineHeight;
-		private int shiftLeftPixels = -22;
+		private int shiftLeftPixels = -16;
 		private GUIContent prefabLocationsTitle = new GUIContent
 		{
 			text = "Prefab Locations",
@@ -115,7 +115,6 @@ namespace Mapbox.Editor
 				//get the element to draw
 				var coordinate = coordinateProperties.GetArrayElementAtIndex(i);
 
-				//TODO: update coordinate property drawer from specific-locations-modifiers branch
 				//use the tagged property drawer for the coordinate layout
 				EditorGUILayout.PropertyField(coordinate);
 
@@ -139,7 +138,6 @@ namespace Mapbox.Editor
 			}
 			EditorGUILayout.EndHorizontal();
 			EditorGUILayout.EndVertical();
-
 		}
 
 
@@ -168,7 +166,6 @@ namespace Mapbox.Editor
 			}
 
 			EditorGUILayout.PropertyField(densityProp, densitySlider);
-			var integ = densityProp.intValue;
 			GUI.enabled = true;
 			densityProp.serializedObject.ApplyModifiedProperties();
 		}

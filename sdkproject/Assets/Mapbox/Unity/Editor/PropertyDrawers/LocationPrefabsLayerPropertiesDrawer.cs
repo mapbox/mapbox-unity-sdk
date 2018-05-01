@@ -74,7 +74,6 @@ namespace Mapbox.Unity.Map
 				selectedLayers = layerTreeView.GetSelection();
 
 				prefabItemArray.arraySize++;
-				//subLayerArray.InsertArrayElementAtIndex(subLayerArray.arraySize);
 
 				var prefabItem = prefabItemArray.GetArrayElementAtIndex(prefabItemArray.arraySize - 1);
 				var prefabItemName = prefabItem.FindPropertyRelative("coreOptions.sublayerName");

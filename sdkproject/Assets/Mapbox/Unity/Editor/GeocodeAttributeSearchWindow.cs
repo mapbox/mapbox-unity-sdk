@@ -121,8 +121,6 @@
 							_coordinateProperty.serializedObject.ApplyModifiedProperties();
 							EditorUtility.SetDirty(_coordinateProperty.serializedObject.targetObject);
 
-							//TODO: assign the address string to an ajacent property.
-
 							Close();
 						}
 					}

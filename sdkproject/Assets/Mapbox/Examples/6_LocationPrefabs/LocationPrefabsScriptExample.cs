@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Examples
+﻿                                                                                             namespace Mapbox.Examples
 {
 	using System.Collections;
 	using System.Collections.Generic;
@@ -14,7 +14,7 @@
 
 		//prefab to spawn
 		public GameObject beforeInitialize;
-		//cache of spanwed gameobjects
+		//cache of spawned gameobjects
 		private List<GameObject> _beforeInitializeInstances;
 
 		public GameObject afterInitialize;
@@ -22,8 +22,6 @@
 
 		public GameObject afterLoaded;
 		private List<GameObject> _afterLoadedInstances;
-
-
 
 
 
