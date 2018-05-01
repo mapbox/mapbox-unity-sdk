@@ -104,8 +104,6 @@ namespace Mapbox.Editor
 
 		private void ShowAddressOrLatLonUI(SerializedProperty property)
 		{
-
-
 			EditorGUILayout.BeginVertical();
 			var coordinateProperties = property.FindPropertyRelative("coordinates");
 

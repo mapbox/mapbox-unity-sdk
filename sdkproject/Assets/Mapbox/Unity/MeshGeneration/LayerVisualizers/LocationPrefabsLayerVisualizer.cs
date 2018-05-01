@@ -17,10 +17,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		public void SetProperties(PrefabItemOptions item, LayerPerformanceOptions performanceOptions)
 		{
 			SubLayerProperties = item;
+			Active = item.isActive;
 			_performanceOptions = performanceOptions;
 
-			if (!item.isActive)
-				return;
 			
 			//Check to make sure that when Categories selection is none, the location prefab is disabled
 			if (item.findByType == LocationPrefabFindBy.MapboxCategory && item.categories == LocationPrefabCategories.None)
@@ -196,13 +195,13 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		/// Gets the list of categories selected through the dropdown
 		/// </summary>
 		/// <returns>The selected categories list.</returns>
-		/// <param name="cat">Cat.</param>
-		private List<LocationPrefabCategories> GetSelectedCategoriesList(LocationPrefabCategories cat)
+		/// <param name="selectedCategories">Cat.</param>
+		private List<LocationPrefabCategories> GetSelectedCategoriesList(LocationPrefabCategories selectedCategories)
 		{
 			List<LocationPrefabCategories> containingCategories = new List<LocationPrefabCategories>();
 
 			var eligibleValues = Enum.GetValues(typeof(LocationPrefabCategories));
-			if (cat == LocationPrefabCategories.None || cat == LocationPrefabCategories.AnyCategory)
+			if (selectedCategories == LocationPrefabCategories.None || selectedCategories == LocationPrefabCategories.AnyCategory)
 			{
 				return containingCategories;
 			}
@@ -215,7 +214,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				if (category == LocationPrefabCategories.AnyCategory || category==LocationPrefabCategories.None)
 					continue;
 				
-				if((category & cat) != 0) //to check if category is contained in cat
+				if((category & selectedCategories) != 0) //to check if category is contained in cat
 				{
 					containingCategories.Add(category);
 				}
@@ -299,9 +298,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					//add coordinate feature to feature points
 					feature.Points.Add(latLonPoint);
 
-					//HACK: silence errors when modifiers access feature.Data
+					//pass valid feature.Data to modifiers
 					//this data has no relation to the features being drawn
-					//feature.Data = layer.GetFeature(0);
+					feature.Data = layer.GetFeature(0);
 
 					//pass the feature to the mod stack
 					base.Build(feature, tile, tile.gameObject);
