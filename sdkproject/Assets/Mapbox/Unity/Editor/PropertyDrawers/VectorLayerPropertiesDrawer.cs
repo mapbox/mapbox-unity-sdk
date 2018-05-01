@@ -10,16 +10,16 @@
 	using Mapbox.Unity.MeshGeneration.Modifiers;
 	using Mapbox.VectorTile.ExtensionMethods;
 	using Mapbox.Unity.MeshGeneration.Filters;
+	using Mapbox.Platform.TilesetTileJSON;
 
 	[CustomPropertyDrawer(typeof(VectorLayerProperties))]
 	public class VectorLayerPropertiesDrawer : PropertyDrawer
 	{
-		private TileJsonData _tileJsonData;
 		static float _lineHeight = EditorGUIUtility.singleLineHeight;
 		GUIContent[] _sourceTypeContent;
 		bool _isGUIContentSet = false;
 		private TileJsonData tileJSONData;
-
+		private static TileJSONResponse tileJSONResponse;
 		/// <summary>
 		/// Gets or sets the layerID
 		/// </summary>
@@ -97,6 +97,16 @@
 		{
 			EditorGUI.BeginProperty(position, label, property);
 			position.height = _lineHeight;
+
+			var serializedMapObject = property.serializedObject;
+			//serializedMapObject.Update();
+			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
+			//mapObject.h
+			//tileJSONData = mapObject.VectorData.LayerProperty.tileJsonData;
+			//Debug.Log("TileJSON before : " + tileJSONData.LayerDisplayNames.Count);
+			tileJSONData = mapObject.VectorData.LayerProperty.tileJsonData;
+			mapObject.tileJSONResponse = tileJSONResponse;
+			//Debug.Log("TileJSON after : " + tileJSONData.LayerDisplayNames.Count);
 
 			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
 			var sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
@@ -260,6 +270,8 @@
 				}
 			}
 			EditorGUI.EndProperty();
+
+			//serializedMapObject.ApplyModifiedProperties();
 		}
 
 		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty)
@@ -269,14 +281,12 @@
 			GUILayout.BeginVertical();
 
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
-			subLayerCoreOptions.FindPropertyRelative("_tileJsonData").objectReferenceValue = tileJSONData;
 
 			VectorPrimitiveType primitiveTypeProp = (VectorPrimitiveType)subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex;
 
 			EditorGUILayout.PropertyField(subLayerCoreOptions);
 
 			var extrusionOptions = layerProperty.FindPropertyRelative("extrusionOptions");
-			extrusionOptions.FindPropertyRelative("_tileJsonData").objectReferenceValue = tileJSONData ;
 			//loading up the selectedLayerName for extrusion options to pull up the right propertyName
 			extrusionOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
 
@@ -305,7 +315,6 @@
 					layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue = false;
 				}
 				var filterOptions = layerProperty.FindPropertyRelative("filterOptions");
-				filterOptions.FindPropertyRelative("_tileJsonData").objectReferenceValue = tileJSONData;
 				filterOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
 
 				EditorGUILayout.PropertyField(filterOptions, new GUIContent("Filters"));
@@ -420,13 +429,20 @@
 		{
 			if (sourceTypeValue != VectorSourceType.None && !string.IsNullOrEmpty(sourceString))
 			{
-				if (string.IsNullOrEmpty(TilesetId) || sourceString != TilesetId)
+				if (tileJSONResponse==null || string.IsNullOrEmpty(TilesetId) || sourceString != TilesetId)
 				{
 					TilesetId = sourceString;
-					tileJSONData = ScriptableObject.CreateInstance<TileJsonData>();
 					//tileJSONData.ClearData();
-					Unity.MapboxAccess.Instance.TileJSON.Get(sourceString, tileJSONData.ProcessTileJSONData);
+					Unity.MapboxAccess.Instance.TileJSON.Get(sourceString,(response) => {
+						tileJSONResponse = response;
+						tileJSONData.ProcessTileJSONData(response);
+					});
 				}
+				else if(tileJSONData.LayerPropertyDescriptionDictionary.Count==0)
+				{
+					tileJSONData.ProcessTileJSONData(tileJSONResponse);
+				}
+
 			}
 			else
 			{

@@ -8,9 +8,20 @@
 	[CustomPropertyDrawer(typeof(CoreVectorLayerProperties))]
 	public class CoreVectorLayerPropertiesDrawer : PropertyDrawer
 	{
-		private int index = 0;
-		static float lineHeight = EditorGUIUtility.singleLineHeight;
+		int index
+		{
+			get
+			{
+				return EditorPrefs.GetInt("CoreOptions_propertySelectionIndex");
+			}
+			set
+			{
+				EditorPrefs.SetInt("CoreOptions_propertySelectionIndex", value);
+			}
+		}
 
+		static float lineHeight = EditorGUIUtility.singleLineHeight;
+		static TileJsonData tileJSONData = new TileJsonData();
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
@@ -28,8 +39,16 @@
 
 			position.y += lineHeight;
 			//EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("layerName"));
-			TileJsonData tileJSONData = property.FindPropertyRelative("_tileJsonData").objectReferenceValue as TileJsonData;
-			if (tileJSONData.LayerDisplayNames.Count > 0)
+			var serializedMapObject = property.serializedObject;
+			//serializedMapObject.Update();
+			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
+			tileJSONData = mapObject.VectorData.LayerProperty.tileJsonData;
+
+			if (tileJSONData == null || tileJSONData.LayerDisplayNames.Count <= 0)
+			{
+				tileJSONData.ProcessTileJSONData(mapObject.tileJSONResponse);
+			}
+			else
 			{
 				var layerDisplayNames = tileJSONData.LayerDisplayNames;
 				var layerNamesArray = layerDisplayNames.ToArray();
@@ -54,6 +73,7 @@
 			}
 
 			EditorGUI.EndProperty();
+			//serializedMapObject.ApplyModifiedProperties();
 		}
 
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)

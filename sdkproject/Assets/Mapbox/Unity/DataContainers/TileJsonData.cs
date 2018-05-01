@@ -5,7 +5,8 @@
 	using Mapbox.Platform.TilesetTileJSON;
 	using UnityEngine;
 
-	public class TileJsonData : ScriptableObject
+	[Serializable]
+	public class TileJsonData
 	{
 		public readonly string commonLayersKey = "(layer found in more than one source)";
 		public readonly string optionalPropertiesString = "(may not appear across all locations)";
@@ -51,12 +52,10 @@
 
 		public void ProcessTileJSONData(TileJSONResponse tjr)
 		{
-			TileJSONResponse response = tjr;
-
 			List<string> layerPropertiesList = new List<string>();
 			List<string> sourceLayersList = new List<string>();
 
-			if (response == null || response.VectorLayers == null || response.VectorLayers.Length == 0)
+			if (tjr == null || tjr.VectorLayers == null || tjr.VectorLayers.Length == 0)
 			{
 				return;
 			}
@@ -67,7 +66,7 @@
 			var propertyDescription = "";
 			var layerSource = "";
 
-			foreach (var layer in response.VectorLayers)
+			foreach (var layer in tjr.VectorLayers)
 			{
 				//load layer names
 				var layerName = layer.Id;

@@ -133,7 +133,9 @@
 			if (string.IsNullOrEmpty(selectedLayerName))
 				return;
 
-			TileJsonData tileJsonData = originalProperty.FindPropertyRelative("_tileJsonData").objectReferenceValue as TileJsonData;
+			AbstractMap mapObject = (AbstractMap)originalProperty.serializedObject.targetObject;
+			TileJsonData tileJsonData = mapObject.VectorData.LayerProperty.tileJsonData;
+
 			if (!tileJsonData.PropertyDisplayNames.ContainsKey(selectedLayerName))
 				return;
 			var propertyDisplayNames = tileJsonData.PropertyDisplayNames[selectedLayerName];
@@ -152,7 +154,6 @@
 			index = EditorGUILayout.Popup(index, properties);
 			var parsedString = propertyNamesArray[index].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
 			filterProperty.FindPropertyRelative("Key").stringValue = parsedString;
-			//EditorGUILayout.HelpBox(descriptionString, MessageType.Info);
 		}
 	}
 

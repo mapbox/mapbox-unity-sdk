@@ -9,6 +9,7 @@ namespace Mapbox.Unity.Map
 	using Mapbox.Map;
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Unity.MeshGeneration.Data;
+	using Mapbox.Platform.TilesetTileJSON;
 
 	public interface IUnifiedMap
 	{
@@ -661,6 +662,11 @@ namespace Mapbox.Unity.Map
 			Options.loadingTexture = loadingTexture;
 			_mapVisualizer.SetLoadingTexture(loadingTexture);
 		}
+
+		/// <summary>
+		/// Raw tileJSON response received from the requested source tileset id(s)
+		/// </summary>
+		public TileJSONResponse tileJSONResponse;
 	}
 }
 

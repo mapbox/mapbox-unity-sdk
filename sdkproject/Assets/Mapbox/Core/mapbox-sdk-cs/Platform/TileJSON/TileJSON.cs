@@ -37,6 +37,7 @@ namespace Mapbox.Platform.TilesetTileJSON
 				{
 					string json = Encoding.UTF8.GetString(response.Data);
 					TileJSONResponse tileJSONResponse = JsonConvert.DeserializeObject<TileJSONResponse>(json);
+					tileJSONResponse.Source = tilesetName;
 					callback(tileJSONResponse);
 				}
 				, _timeout

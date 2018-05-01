@@ -17,8 +17,6 @@
 		}
 
 		[SerializeField]
-		private TileJsonData _tileJsonData;
-		[SerializeField]
 		private string _selectedLayerName = "";
 		public ExtrusionType extrusionType = ExtrusionType.None;
 		public ExtrusionGeometryType extrusionGeometryType = ExtrusionGeometryType.RoofAndSide;
