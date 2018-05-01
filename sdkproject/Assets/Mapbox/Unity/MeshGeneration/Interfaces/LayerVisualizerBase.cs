@@ -1,6 +1,7 @@
 namespace Mapbox.Unity.MeshGeneration.Interfaces
 {
 	using Mapbox.VectorTile;
+	using Mapbox.Unity.Map;
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using System;
@@ -14,9 +15,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
         public abstract string Key { get; set; }
         public abstract void Create(VectorTileLayer layer, UnityTile tile, Action callback = null);
 
-		public virtual void Initialize()
-		{
+		protected IMapReadable _map;
 
+		public virtual void Initialize( IMapReadable map)
+		{
+			_map = map;
 		}
 
 		public void UnregisterTile(UnityTile tile)

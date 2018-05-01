@@ -21,8 +21,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_options = (ColliderOptions)properties;
 		}
 
-		public override void Initialize()
+		public override void Initialize(IMapReadable map)
 		{
+			base.Initialize(map);
+
 			//no need to reset strategy objects on map reinit as we're caching feature game objects as well
 			//creating a new one iff we don't already have one. if you want to reset/recreate you have to clear stuff inside current/old one first.
 			if (_colliderStrategy == null)

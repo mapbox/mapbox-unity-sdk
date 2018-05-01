@@ -5,6 +5,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using Mapbox.Unity.MeshGeneration.Components;
 	using Mapbox.Unity.MeshGeneration.Interfaces;
 	using System.Collections.Generic;
+	using Mapbox.Unity.Map;
 
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Prefab Modifier")]
 	public class PrefabModifier : GameObjectModifier
@@ -17,8 +18,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		private Dictionary<GameObject, GameObject> _objects;
 
-		public override void Initialize()
+		public override void Initialize( IMapReadable map )
 		{
+			base.Initialize(map);
+
 			if (_objects == null)
 			{
 				_objects = new Dictionary<GameObject, GameObject>();

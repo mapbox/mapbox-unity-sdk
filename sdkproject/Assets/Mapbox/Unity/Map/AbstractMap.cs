@@ -68,6 +68,20 @@ namespace Mapbox.Unity.Map
 	/// </summary>
 	public class AbstractMap : MonoBehaviour, IMap
 	{
+
+		/// <summary>
+		/// A random number generator that will be used to set a map-specific random instance
+		/// </summary>
+		private int _mapSeed = 0;
+
+		public int MapSeed
+		{
+			get
+			{
+				return _mapSeed;
+			}
+		}
+
 		/// <summary>
 		/// Setting to trigger map initialization in Unity's Start method.
 		/// if set to false, Initialize method should be called explicitly to initialize the map.
@@ -441,6 +455,8 @@ namespace Mapbox.Unity.Map
 		/// <param name="options">Options.</param>
 		protected virtual void InitializeMap(MapOptions options)
 		{
+			UnityEngine.Random.InitState(0);
+
 			Options = options;
 			_worldHeightFixed = false;
 			_fileSource = MapboxAccess.Instance;
@@ -466,6 +482,7 @@ namespace Mapbox.Unity.Map
 		/// <param name="zoom">Zoom.</param>
 		public virtual void Initialize(Vector2d latLon, int zoom)
 		{
+
 			_initializeOnStart = false;
 			if (_options == null)
 			{

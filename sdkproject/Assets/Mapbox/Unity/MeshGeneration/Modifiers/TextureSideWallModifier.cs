@@ -62,9 +62,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_options = (GeometryExtrusionWithAtlasOptions)properties;
 		}
 
-		public override void Initialize()
+		public override void Initialize( IMapReadable map )
 		{
-			base.Initialize();
+			base.Initialize(map);
 			edgeList = new List<Vector3>();
 		}
 

@@ -6,6 +6,7 @@ using Mapbox.Map;
 using Mapbox.Unity.MeshGeneration.Modifiers;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Components;
+using Mapbox.Unity.Map;
 
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
@@ -96,9 +97,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
-		public override void Initialize()
+		public override void Initialize( IMapReadable map )
 		{
-			base.Initialize();
+			base.Initialize( map );
 			//init is also used for reloading map/ location change, so reseting everything here
 			_cacheVertexCount.Clear();
 			_cached.Clear();
@@ -108,13 +109,13 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_counter = MeshModifiers.Count;
 			for (int i = 0; i < _counter; i++)
 			{
-				MeshModifiers[i].Initialize();
+				MeshModifiers[i].Initialize(map);
 			}
 
 			_counter = GoModifiers.Count;
 			for (int i = 0; i < _counter; i++)
 			{
-				GoModifiers[i].Initialize();
+				GoModifiers[i].Initialize(map);
 			}
 		}
 

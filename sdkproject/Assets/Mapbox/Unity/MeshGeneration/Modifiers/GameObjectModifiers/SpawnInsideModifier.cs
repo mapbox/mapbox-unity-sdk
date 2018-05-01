@@ -10,6 +10,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using UnityEngine;
 	using System.Collections.Generic;
 	using System;
+	using Mapbox.Unity.Map;
 
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Spawn Inside Modifier")]
 	public class SpawnInsideModifier : GameObjectModifier
@@ -40,8 +41,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private Dictionary<GameObject, List<GameObject>> _objects;
 		private Queue<GameObject> _pool;
 
-		public override void Initialize()
+		public override void Initialize( IMapReadable map )
 		{
+			base.Initialize(map);
+
 			if (_objects == null || _pool == null)
 			{
 				_objects = new Dictionary<GameObject, List<GameObject>>();

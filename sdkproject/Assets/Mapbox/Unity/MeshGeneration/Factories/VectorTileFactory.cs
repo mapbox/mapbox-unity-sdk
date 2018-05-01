@@ -66,7 +66,7 @@
 				var visualizer = CreateInstance<VectorLayerVisualizer>();
 				visualizer.SetProperties(sublayer, _properties.performanceOptions);
 
-				visualizer.Initialize();
+				visualizer.Initialize(_map);
 				if (visualizer == null)
 				{
 					continue;

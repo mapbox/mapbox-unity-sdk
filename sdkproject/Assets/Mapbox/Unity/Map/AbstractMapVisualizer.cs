@@ -101,7 +101,7 @@ namespace Mapbox.Unity.Map
 				}
 				else
 				{
-					factory.Initialize(fileSource);
+					factory.Initialize(_map, fileSource);
 					UnregisterEvents(factory);
 					RegisterEvents(factory);
 				}

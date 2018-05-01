@@ -5,7 +5,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers;
-	
+	using Mapbox.Unity.Map;
+
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Loft Modifier")]
 	public class LoftModifier : MeshModifier
 	{
@@ -19,9 +20,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private float _sliceTotalMagnitude;
 		private Vector2[] _sliceUvs;
 
-		public override void Initialize()
+		public override void Initialize(IMapReadable map)
 		{
-			base.Initialize();
+			base.Initialize(map);
 			_slice = new List<Vector3>();
 			foreach (Transform tr in Slice.transform)
 			{

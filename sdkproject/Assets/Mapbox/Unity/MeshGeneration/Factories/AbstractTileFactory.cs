@@ -32,6 +32,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	public abstract class AbstractTileFactory : ScriptableObject
 	{
 		protected IFileSource _fileSource;
+		protected IMapReadable _map;
 
 		public ModuleState State { get; private set; }
 
@@ -88,9 +89,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		public virtual void Initialize(IFileSource fileSource)
+		public virtual void Initialize(IMapReadable map, IFileSource fileSource)
 		{
 			_progress = 0;
+			_map = map;
 			_fileSource = fileSource;
 			State = ModuleState.Initialized;
 			OnInitialized();

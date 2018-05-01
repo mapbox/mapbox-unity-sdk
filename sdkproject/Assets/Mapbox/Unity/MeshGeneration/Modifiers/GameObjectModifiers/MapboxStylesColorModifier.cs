@@ -3,6 +3,7 @@
 	using Mapbox.Unity.MeshGeneration.Data;
 	using UnityEngine.Assertions;
 	using UnityEngine;
+	using Mapbox.Unity.Map;
 
 	public class MapboxStylesColorModifier : GameObjectModifier
 	{
@@ -17,8 +18,10 @@
 		private int _detailOneColorId;
 		private int _detailTWoColorId;
 
-		public override void Initialize()
+		public override void Initialize( IMapReadable map )
 		{
+			base.Initialize(map);
+
 			if (m_scriptablePalette == null)
 			{
 				return;
@@ -31,6 +34,7 @@
 
 		private Color GetRandomColorFromPalette()
 		{
+
 			Color color = Color.white;
 			if (m_scriptablePalette.m_colors.Length > 0)
 			{

@@ -5,6 +5,7 @@
 	using UnityEngine;
 	using System.Collections.Generic;
 	using System;
+	using Mapbox.Unity.Map;
 
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Add Monobehaviours Modifier")]
 	public class AddMonoBehavioursModifier : GameObjectModifier
@@ -14,8 +15,10 @@
 		private HashSet<string> _scripts;
 		private string _tempId;
 
-		public override void Initialize()
+		public override void Initialize( IMapReadable map )
 		{
+			base.Initialize(map);
+
 			if (_scripts == null)
 			{
 				_scripts = new HashSet<string>();

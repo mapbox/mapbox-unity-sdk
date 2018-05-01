@@ -8,6 +8,9 @@
 
 	public interface IMapReadable
 	{
+		//get the random number generator for the map
+		int MapSeed { get; }
+
 		Vector2d CenterMercator { get; }
 		float WorldRelativeScale { get; }
 		Vector2d CenterLatitudeLongitude { get; }

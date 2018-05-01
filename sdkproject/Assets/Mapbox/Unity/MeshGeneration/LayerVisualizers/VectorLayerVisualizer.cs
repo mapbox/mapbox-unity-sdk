@@ -158,9 +158,9 @@
 		}
 
 
-		public override void Initialize()
+		public override void Initialize( IMapReadable map )
 		{
-			base.Initialize();
+			base.Initialize(map);
 			_entityInCurrentCoroutine = 0;
 			_activeCoroutines = new Dictionary<UnityTile, List<int>>();
 			_activeIds = new HashSet<ulong>();
@@ -168,7 +168,7 @@
 
 			if (_defaultStack != null)
 			{
-				_defaultStack.Initialize();
+				_defaultStack.Initialize( map );
 			}
 		}
 

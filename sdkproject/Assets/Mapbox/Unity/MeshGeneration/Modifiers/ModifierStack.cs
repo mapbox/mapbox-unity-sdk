@@ -5,6 +5,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.MeshGeneration.Components;
 	using System;
+	using Mapbox.Unity.Map;
 
 	public enum PositionTargetType
 	{
@@ -97,20 +98,20 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
-		public override void Initialize()
+		public override void Initialize( IMapReadable map )
 		{
-			base.Initialize();
+			base.Initialize( map );
 
 			_counter = MeshModifiers.Count;
 			for (int i = 0; i < _counter; i++)
 			{
-				MeshModifiers[i].Initialize();
+				MeshModifiers[i].Initialize( map );
 			}
 
 			_counter = GoModifiers.Count;
 			for (int i = 0; i < _counter; i++)
 			{
-				GoModifiers[i].Initialize();
+				GoModifiers[i].Initialize( map );
 			}
 		}
 

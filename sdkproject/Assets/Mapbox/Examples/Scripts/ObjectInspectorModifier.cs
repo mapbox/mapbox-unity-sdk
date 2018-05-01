@@ -6,6 +6,7 @@ namespace Mapbox.Examples
 	using UnityEngine.UI;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
 	using System.Collections.Generic;
+	using Mapbox.Unity.Map;
 
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Object Inspector Modifier")]
 	public class ObjectInspectorModifier : GameObjectModifier
@@ -14,8 +15,10 @@ namespace Mapbox.Examples
 		private FeatureUiMarker _marker;
 		private FeatureSelectionDetector _tempDetector;
 
-		public override void Initialize()
+		public override void Initialize( IMapReadable map )
 		{
+			base.Initialize(map);
+
 			if (_detectors == null)
 			{
 				_detectors = new Dictionary<GameObject, FeatureSelectionDetector>();
