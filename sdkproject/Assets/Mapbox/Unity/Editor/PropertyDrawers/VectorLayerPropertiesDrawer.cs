@@ -24,15 +24,18 @@
 		/// Gets or sets the layerID
 		/// </summary>
 		/// <value><c>true</c> then show general section; otherwise hide, <c>false</c>.</value>
+
+
+		string objectId = "";
 		private string TilesetId
 		{
 			get
 			{
-				return EditorPrefs.GetString("MapManagerEditor_tilesetId");
+				return EditorPrefs.GetString(objectId+"MapManagerEditor_tilesetId");
 			}
 			set
 			{
-				EditorPrefs.SetString("MapManagerEditor_tilesetId", value);
+				EditorPrefs.SetString(objectId +"MapManagerEditor_tilesetId", value);
 			}
 		}
 
@@ -40,11 +43,11 @@
 		{
 			get
 			{
-				return EditorPrefs.GetBool("VectorLayerProperties_showPosition");
+				return EditorPrefs.GetBool(objectId +"VectorLayerProperties_showPosition");
 			}
 			set
 			{
-				EditorPrefs.SetBool("VectorLayerProperties_showPosition", value);
+				EditorPrefs.SetBool(objectId +"VectorLayerProperties_showPosition", value);
 			}
 		}
 
@@ -52,11 +55,11 @@
 		{
 			get
 			{
-				return EditorPrefs.GetBool("VectorLayerProperties_showOthers");
+				return EditorPrefs.GetBool(objectId +"VectorLayerProperties_showOthers");
 			}
 			set
 			{
-				EditorPrefs.SetBool("VectorLayerProperties_showOthers", value);
+				EditorPrefs.SetBool(objectId +"VectorLayerProperties_showOthers", value);
 			}
 		}
 
@@ -64,11 +67,11 @@
 		{
 			get
 			{
-				return EditorPrefs.GetInt("VectorLayerProperties_selectionIndex");
+				return EditorPrefs.GetInt(objectId +"VectorLayerProperties_selectionIndex");
 			}
 			set
 			{
-				EditorPrefs.SetInt("VectorLayerProperties_selectionIndex", value);
+				EditorPrefs.SetInt(objectId +"VectorLayerProperties_selectionIndex", value);
 			}
 		}
 
@@ -76,11 +79,11 @@
 		{
 			get
 			{
-				return EditorPrefs.GetString("VectorLayerProperties_customSourceMapId");
+				return EditorPrefs.GetString(objectId +"VectorLayerProperties_customSourceMapId");
 			}
 			set
 			{
-				EditorPrefs.SetString("VectorLayerProperties_customSourceMapId", value);
+				EditorPrefs.SetString(objectId +"VectorLayerProperties_customSourceMapId", value);
 			}
 		}
 
@@ -95,6 +98,7 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 			EditorGUI.BeginProperty(position, label, property);
 			position.height = _lineHeight;
 
@@ -107,7 +111,6 @@
 			tileJSONData = mapObject.VectorData.LayerProperty.tileJsonData;
 			mapObject.tileJSONResponse = tileJSONResponse;
 			//Debug.Log("TileJSON after : " + tileJSONData.LayerDisplayNames.Count);
-
 			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
 			var sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
 

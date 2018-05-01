@@ -8,6 +8,7 @@
 	[CustomPropertyDrawer(typeof(ElevationLayerProperties))]
 	public class ElevationLayerPropertiesDrawer : PropertyDrawer
 	{
+		string objectId = "";
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		GUIContent[] sourceTypeContent;
 		bool isGUIContentSet = false;
@@ -16,11 +17,11 @@
 		{
 			get
 			{
-				return EditorPrefs.GetBool("ElevationLayerProperties_showPosition");
+				return EditorPrefs.GetBool(objectId + "ElevationLayerProperties_showPosition");
 			}
 			set
 			{
-				EditorPrefs.SetBool("ElevationLayerProperties_showPosition", value);
+				EditorPrefs.SetBool(objectId + "ElevationLayerProperties_showPosition", value);
 			}
 		}
 
@@ -34,16 +35,18 @@
 		{
 			get
 			{
-				return EditorPrefs.GetString("ElevationLayerProperties_customSourceMapId");
+				return EditorPrefs.GetString(objectId + "ElevationLayerProperties_customSourceMapId");
 			}
 			set
 			{
-				EditorPrefs.SetString("ElevationLayerProperties_customSourceMapId", value);
+				EditorPrefs.SetString(objectId + "ElevationLayerProperties_customSourceMapId", value);
 			}
 		}
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
+
 			EditorGUI.BeginProperty(position, label, property);
 			position.height = lineHeight;
 

@@ -13,19 +13,21 @@
 		{
 			get
 			{
-				return EditorPrefs.GetInt("CoreOptions_propertySelectionIndex");
+				return EditorPrefs.GetInt(objectId + "CoreOptions_propertySelectionIndex");
 			}
 			set
 			{
-				EditorPrefs.SetInt("CoreOptions_propertySelectionIndex", value);
+				EditorPrefs.SetInt(objectId + "CoreOptions_propertySelectionIndex", value);
 			}
 		}
 
+		string objectId = "";
 		private string[] layerNamesArray;
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		static TileJsonData tileJSONData = new TileJsonData();
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 			EditorGUI.BeginProperty(position, label, property);
 			position.height = lineHeight;
 

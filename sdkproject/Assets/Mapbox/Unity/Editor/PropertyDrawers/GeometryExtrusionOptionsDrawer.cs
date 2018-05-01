@@ -14,14 +14,15 @@
 		{
 			get
 			{
-				return EditorPrefs.GetInt("GeometryOptions_propertySelectionIndex");
+				return EditorPrefs.GetInt(objectId + "GeometryOptions_propertySelectionIndex");
 			}
 			set
 			{
-				EditorPrefs.SetInt("GeometryOptions_propertySelectionIndex", value);
+				EditorPrefs.SetInt(objectId + "GeometryOptions_propertySelectionIndex", value);
 			}
 		}
 
+		string objectId = "";
 		private string[] propertyNamesArray;
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		GUIContent[] sourceTypeContent;
@@ -30,6 +31,7 @@
 		static TileJSONResponse tileJsonResponse;
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 			EditorGUI.BeginProperty(position, label, property);
 			var extrusionTypeProperty = property.FindPropertyRelative("extrusionType");
 

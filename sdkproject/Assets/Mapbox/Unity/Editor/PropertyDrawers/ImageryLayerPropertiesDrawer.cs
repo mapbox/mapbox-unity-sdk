@@ -8,6 +8,7 @@
 	[CustomPropertyDrawer(typeof(ImageryLayerProperties))]
 	public class ImageryLayerPropertiesDrawer : PropertyDrawer
 	{
+		string objectId = "";
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 
 		GUIContent[] sourceTypeContent;
@@ -23,16 +24,17 @@
 		{
 			get
 			{
-				return EditorPrefs.GetString("ImageryLayerProperties_customSourceMapId");
+				return EditorPrefs.GetString(objectId + "ImageryLayerProperties_customSourceMapId");
 			}
 			set
 			{
-				EditorPrefs.SetString("ImageryLayerProperties_customSourceMapId", value);
+				EditorPrefs.SetString(objectId + "ImageryLayerProperties_customSourceMapId", value);
 			}
 		}
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 			EditorGUI.BeginProperty(position, label, property);
 			position.height = lineHeight;
 
