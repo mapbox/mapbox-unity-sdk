@@ -675,7 +675,7 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0.19720304
+      value: 0.14181519
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -795,7 +795,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -124.5645
+      value: -116.52501
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -805,12 +805,12 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 229.129
+      value: 213.05002
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 249.129
+      value: 233.05002
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -842,7 +842,7 @@ Prefab:
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000015258789
+      value: 0.000030517578
       objectReference: {fileID: 0}
     - target: {fileID: 1611603657303738, guid: 98be219873e6d4dffb5949746f515a33, type: 2}
       propertyPath: m_IsActive
@@ -860,7 +860,6 @@ GameObject:
   m_Component:
   - component: {fileID: 967308907}
   - component: {fileID: 967308906}
-  - component: {fileID: 967308908}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -951,7 +950,7 @@ MonoBehaviour:
     _locationPrefabsLayerProperties:
       locationPrefabList:
       - coreOptions:
-          isActive: 0
+          isActive: 1
           sublayerName: Arts and Enterinment
           geometryType: 0
           layerName: 
@@ -987,7 +986,6 @@ MonoBehaviour:
         findByType: 0
         categories: 1
         nameString: POI Name
-        popularity: 4
         coordinates: []
         density: 10
       - coreOptions:
@@ -1027,7 +1025,6 @@ MonoBehaviour:
         findByType: 0
         categories: 2
         nameString: POI Name
-        popularity: 4
         coordinates: []
         density: 15
       - coreOptions:
@@ -1067,7 +1064,6 @@ MonoBehaviour:
         findByType: 0
         categories: 4
         nameString: POI Name
-        popularity: 4
         coordinates: []
         density: 10
       - coreOptions:
@@ -1107,7 +1103,6 @@ MonoBehaviour:
         findByType: 0
         categories: 8
         nameString: POI Name
-        popularity: 4
         coordinates: []
         density: 20
       - coreOptions:
@@ -1147,7 +1142,6 @@ MonoBehaviour:
         findByType: 0
         categories: 16
         nameString: POI Name
-        popularity: 4
         coordinates: []
         density: 5
       - coreOptions:
@@ -1187,7 +1181,6 @@ MonoBehaviour:
         findByType: 0
         categories: 32
         nameString: POI Name
-        popularity: 4
         coordinates: []
         density: 10
       - coreOptions:
@@ -1227,7 +1220,6 @@ MonoBehaviour:
         findByType: 0
         categories: 64
         nameString: POI Name
-        popularity: 4
         coordinates: []
         density: 10
       - coreOptions:
@@ -1267,7 +1259,6 @@ MonoBehaviour:
         findByType: 0
         categories: -1
         nameString: POI Name
-        popularity: 4
         coordinates: []
         density: 15
     _layerProperty:
@@ -1338,24 +1329,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &967308908
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 967308905}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d4a34f0945b164364b9959e0be1a2494, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  map: {fileID: 967308906}
-  beforeInitialize: {fileID: 1707885508695930, guid: 29d1abf5ba6514d81a7974353f130ca8,
-    type: 2}
-  afterInitialize: {fileID: 1707885508695930, guid: 49bc5d782d9184533a37abea20ed30e4,
-    type: 2}
-  afterLoaded: {fileID: 1707885508695930, guid: fafbd32423ea04e379d8321b4d370fea,
-    type: 2}
 --- !u!1 &987810028
 GameObject:
   m_ObjectHideFlags: 0
