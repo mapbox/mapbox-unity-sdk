@@ -2,14 +2,11 @@
 namespace Mapbox.Unity.UnitTest
 {
 
-	using System.Collections;
 	using System.Collections.Generic;
 	using System.Linq;
-	using UnityEngine;
-
-
 	using NUnit.Framework;
 	using Mapbox.Utils;
+
 
 	[TestFixture]
 	internal class CircularBufferTest
@@ -28,7 +25,7 @@ namespace Mapbox.Unity.UnitTest
 			cb.Add(20);
 			cb.Add(30);
 			Assert.AreEqual(3, cb.Count, "added three values. count == 3");
-			// newest values is at [0], oldest at cb[cb.Count-1]
+			// newest value is at [0], oldest at cb[cb.Count-1]
 			Assert.AreEqual(30, cb[0], "circularbuffer[0] == 30");
 			Assert.AreEqual(10, cb[cb.Count - 1], "circularbuffer[cb.Count-1] == 10");
 
@@ -45,7 +42,7 @@ namespace Mapbox.Unity.UnitTest
 			cb.Add(80);
 
 
-			// test getting values via differnt methods
+			// test getting values via different methods
 
 			int[] expected = new int[] { 80, 70, 60, 50, 40 };
 
@@ -56,7 +53,7 @@ namespace Mapbox.Unity.UnitTest
 			}
 
 			// test values via Enumerator
-			int[] actual = new int[5];
+			int[] actual = new int[cb.Count];
 			int idx = 0;
 			IEnumerator<int> enumerator = cb.GetEnumerator();
 			while (enumerator.MoveNext())
