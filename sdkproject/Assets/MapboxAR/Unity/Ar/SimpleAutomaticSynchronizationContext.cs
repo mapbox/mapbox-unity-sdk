@@ -60,6 +60,7 @@
 		/// This is an event to support future implementations where alignment is calculate over time.
 		/// </summary>
 		public event Action<Alignment> OnAlignmentAvailable;
+		public event Action OnAlignmentComplete;
 
 		/// <summary>
 		/// Add GPS and AR nodes to the context.

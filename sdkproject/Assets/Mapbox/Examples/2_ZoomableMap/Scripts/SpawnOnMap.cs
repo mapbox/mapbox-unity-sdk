@@ -6,11 +6,15 @@
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Unity.Utilities;
 	using System.Collections.Generic;
+	using Mapbox.Unity.Ar;
 
 	public class SpawnOnMap : MonoBehaviour
 	{
 		[SerializeField]
 		AbstractMap _map;
+
+		[SerializeField]
+		CentralizedARLocator _nodeManager;
 
 		[SerializeField]
 		[Geocode]
@@ -29,11 +33,13 @@
 		private void Awake()
 		{
 			_locations = new Vector2d[_locationStrings.Length];
-			_map.OnInitialized += OnMapInitialized;
+			_nodeManager.OnAlignmentComplete += OnMapInitialized;
+			//_map.OnInitialized += OnMapInitialized;
 		}
 
 		void OnMapInitialized()
 		{
+			_nodeManager.OnAlignmentComplete -= OnMapInitialized;
 			_spawnedObjects = new List<GameObject>();
 			for (int i = 0; i < _locationStrings.Length; i++)
 			{
@@ -42,6 +48,7 @@
 				var instance = Instantiate(_markerPrefab);
 				instance.transform.localPosition = _map.GeoToWorldPosition(_locations[i], true);
 				instance.transform.localScale = new Vector3(_spawnScale, _spawnScale, _spawnScale);
+				//instance.transform.SetParent(_map.transform);
 				_spawnedObjects.Add(instance);
 			}
 			_isMapInitialized = true;

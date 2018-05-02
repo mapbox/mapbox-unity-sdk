@@ -26,12 +26,10 @@
 		float _minMagnitude;
 
 		List<Node> _savedNodes;
-		AbstractMap _map;
 
 		public override void InitializeNodeBase()
 		{
 			_savedNodes = new List<Node>();
-			_map = LocationProviderFactory.Instance.mapManager;
 			IsNodeBaseInitialized = true;
 			Debug.Log("Initialized GPS nodes");
 
@@ -39,6 +37,7 @@
 
 		private bool IsNodeGoodToUse(Location location)
 		{
+			var _map = LocationProviderFactory.Instance.mapManager;
 			// Check Node accuracy & distance.
 			var latestNode = _map.GeoToWorldPosition(location.LatitudeLongitude);
 			var previousNode = _map.GeoToWorldPosition(_savedNodes[_savedNodes.Count - 1].LatLon);

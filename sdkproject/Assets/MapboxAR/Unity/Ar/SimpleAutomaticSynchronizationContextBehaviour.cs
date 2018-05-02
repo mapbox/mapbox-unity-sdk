@@ -46,6 +46,7 @@ namespace Mapbox.Unity.Ar
 		ILocationProvider _locationProvider;
 
 		public event Action<Alignment> OnAlignmentAvailable = delegate { };
+		public event Action OnAlignmentComplete;
 
 		public ILocationProvider LocationProvider
 		{

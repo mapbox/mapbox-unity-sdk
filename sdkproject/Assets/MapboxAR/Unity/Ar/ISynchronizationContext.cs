@@ -6,6 +6,7 @@
 	public interface ISynchronizationContext
 	{
 		event Action<Alignment> OnAlignmentAvailable;
+		event Action OnAlignmentComplete;
 	}
 
 	public struct Alignment

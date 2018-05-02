@@ -72,22 +72,24 @@
 		//ARInterface.CustomTrackingState _trackingState;
 
 		public event Action<Alignment> OnAlignmentAvailable;
+		public event Action OnAlignmentComplete;
 
-		void Awake()
+		void Start()
 		{
 			_alignmentStrategy.Register(this);
-			_map = LocationProviderFactory.Instance.mapManager;
+
 
 			// Initialize all sync-nodes.Make them ready to recieve node data.
 			// Map needs to be generated before init. Otherwise bunch of errors.
 
 			InitializeSyncNodes();
 
-			_map.OnInitialized += Map_OnInitialized;
+			LocationProviderFactory.Instance.mapManager.OnInitialized += Map_OnInitialized;
 		}
 
 		void Map_OnInitialized()
 		{
+			_map = LocationProviderFactory.Instance.mapManager;
 			_map.OnInitialized -= Map_OnInitialized;
 
 			// We don't want location updates until we have a map, otherwise our conversion will fail.
@@ -102,6 +104,7 @@
 			_initialLocalizationStrategy.OnLocalizationComplete += OnFirstLocalizationComplete;
 			_initialLocalizationStrategy.ComputeLocalization(this);
 		}
+
 		/// <summary>
 		/// Delegate that gets triggered when first localization computation is complete
 		/// </summary>
@@ -109,6 +112,7 @@
 		void OnFirstLocalizationComplete(Alignment alignment)
 		{
 			_initialLocalizationStrategy.OnLocalizationComplete -= OnFirstLocalizationComplete;
+			_alignmentStrategy.OnAlignmentApplicationComplete += OnAlignmentApplicationComplete;
 			// Localization is complete. Now call AlignmentStrategy to align the map
 			OnAlignmentAvailable(alignment);
 
@@ -133,9 +137,18 @@
 		/// <param name="alignment">Alignment.</param>
 		void OnGeneralLocalizationComplete(Alignment alignment)
 		{
-			_initialLocalizationStrategy.OnLocalizationComplete -= OnGeneralLocalizationComplete;
+			_generalLocalizationStrategy.OnLocalizationComplete -= OnGeneralLocalizationComplete;
+			_alignmentStrategy.OnAlignmentApplicationComplete += OnAlignmentApplicationComplete;
 			// Localization is complete. Now call AlignmentStrategy to align the map
 			OnAlignmentAvailable(alignment);
+		}
+
+		void OnAlignmentApplicationComplete()
+		{
+			if (OnAlignmentComplete != null)
+			{
+				OnAlignmentComplete();
+			}
 		}
 
 		/// <summary>

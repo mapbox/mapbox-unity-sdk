@@ -25,6 +25,7 @@
 		float _lastHeading = 0;
 
 		public event Action<Alignment> OnAlignmentAvailable = delegate { };
+		public event Action OnAlignmentComplete;
 
 		void Start()
 		{

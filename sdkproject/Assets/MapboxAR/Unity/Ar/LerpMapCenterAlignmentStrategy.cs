@@ -1,10 +1,11 @@
+﻿
 namespace Mapbox.Unity.Ar
 {
 	using UnityEngine;
 	using Mapbox.Unity.Map;
 	using Mapbox.Utils;
 
-	public class LerpAlignmentStrategy : AbstractAlignmentStrategy
+	public class LerpMapCenterAlignmentStrategy : AbstractAlignmentStrategy
 	{
 		[SerializeField]
 		private AbstractMap _map;
@@ -55,10 +56,10 @@ namespace Mapbox.Unity.Ar
 			//We set the start position to the current position
 			_startLatLong = _map.CenterLatitudeLongitude;
 			_endLatlong = _map.WorldToGeoPosition(alignment.Position);
-			_startPosition = _transform.position;
+			_startPosition = _map.Root.position;
 			_endPosition = alignment.Position;
 
-			_startRotation = _transform.rotation;
+			_startRotation = _map.Root.rotation;
 			_endRotation = Quaternion.Euler(0, alignment.Rotation, 0);
 		}
 
@@ -77,10 +78,15 @@ namespace Mapbox.Unity.Ar
 				//Perform the actual lerping.  Notice that the first two parameters will always be the same
 				//throughout a single lerp-processs (ie. they won't change until we hit the space-bar again
 				//to start another lerp)
+				//_startPosition = _map.GeoToWorldPosition(_map.CenterLatitudeLongitude, false);
+				_startPosition = _map.GeoToWorldPosition(_startLatLong, false);
+				_endPosition = _map.GeoToWorldPosition(_endLatlong, false);
 				var position = Vector3.Lerp(_startPosition, _endPosition, percentageComplete);
+				var latLong = _map.WorldToGeoPosition(position);
 				var rotation = Quaternion.Lerp(_startRotation, _endRotation, percentageComplete);
+				_map.UpdateMap(latLong, _map.Zoom);
 
-				_transform.SetPositionAndRotation(position, rotation);
+				_map.Root.SetPositionAndRotation(_map.Root.position, rotation);
 
 				//When we've completed the lerp, we set _isLerping to false
 				if (percentageComplete >= 1.0f)

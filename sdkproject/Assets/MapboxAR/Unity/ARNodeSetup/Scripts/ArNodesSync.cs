@@ -30,7 +30,6 @@
 		{
 			_savedNodes = new List<Node>();
 			CentralizedARLocator.OnNewHighestAccuracyGPS += SavedGPSAccuracy;
-			_map = LocationProviderFactory.Instance.mapManager;
 			IsNodeBaseInitialized = true;
 			Debug.Log("Initialized ARNodes");
 		}
@@ -43,6 +42,7 @@
 		public override void SaveNode()
 		{
 			bool saveNode = false;
+			_map = LocationProviderFactory.Instance.mapManager;
 
 			if (_savedNodes.Count > 1)
 			{

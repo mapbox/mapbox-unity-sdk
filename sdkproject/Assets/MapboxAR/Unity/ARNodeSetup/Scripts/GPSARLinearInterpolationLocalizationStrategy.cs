@@ -101,7 +101,7 @@
 				"AR Vector:{0} GPS Vector:{1} HEADING:{2} HDOP:{3} Relative GPS Vector:{4} BIAS:{5} DISTANCE:{6} OFFSET:{7} BIASED DELTA:{8} OFFSET:{8}"
 				, _currentArVector
 				, _currentAbsoluteGpsVector
-				, rotation
+				, _rotation
 				, accuracy
 				, relativeGpsVector
 				, _bias
