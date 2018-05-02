@@ -1,11 +1,8 @@
 ﻿namespace Mapbox.Unity.Ar
 {
-	using System;
-	using System.Collections;
-	using System.Collections.Generic;
 	using UnityEngine;
 	using Mapbox.Utils;
-	using Mapbox.Unity.Location;
+	using Mapbox.Unity.Map;
 
 	public abstract class NodeSyncBase : MonoBehaviour
 	{
@@ -22,7 +19,7 @@
 		/// <summary>
 		/// Initializes the node base.
 		/// </summary>
-		public abstract void InitializeNodeBase();
+		public abstract void InitializeNodeBase(AbstractMap map);
 		/// <summary>
 		/// Saves the node.
 		/// </summary>

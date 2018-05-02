@@ -98,7 +98,7 @@
 			return _savedNodes[_savedNodes.Count - 1];
 		}
 
-		public override void InitializeNodeBase()
+		public override void InitializeNodeBase(AbstractMap map)
 		{
 			_savedNodes = new List<Node>();
 			_nodesForMapMatchingQuery = new List<Node>();

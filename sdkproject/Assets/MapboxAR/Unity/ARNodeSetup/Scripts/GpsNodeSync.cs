@@ -1,14 +1,9 @@
 ﻿namespace Mapbox.Unity.Ar
 {
-	using System.Collections;
 	using System.Collections.Generic;
 	using UnityEngine;
-	using Mapbox.Map;
-	using Mapbox.Utils;
 	using Mapbox.Unity.Location;
-	using System;
 	using Mapbox.Unity.Map;
-	//using System.Threading.Tasks;
 
 	///<summary>
 	///  Generates GPSNodes for ARLocationManager.
@@ -27,9 +22,10 @@
 
 		List<Node> _savedNodes;
 
-		public override void InitializeNodeBase()
+		public override void InitializeNodeBase(AbstractMap map)
 		{
 			_savedNodes = new List<Node>();
+			_map = map;
 			IsNodeBaseInitialized = true;
 			Debug.Log("Initialized GPS nodes");
 
@@ -37,7 +33,6 @@
 
 		private bool IsNodeGoodToUse(Location location)
 		{
-			var _map = LocationProviderFactory.Instance.mapManager;
 			// Check Node accuracy & distance.
 			var latestNode = _map.GeoToWorldPosition(location.LatitudeLongitude);
 			var previousNode = _map.GeoToWorldPosition(_savedNodes[_savedNodes.Count - 1].LatLon);
@@ -50,7 +45,7 @@
 			}
 			else
 			{
-				//Bad node, discard. 
+				//Bad node, discard.
 				return false;
 			}
 		}
@@ -92,4 +87,3 @@
 		}
 	}
 }
-

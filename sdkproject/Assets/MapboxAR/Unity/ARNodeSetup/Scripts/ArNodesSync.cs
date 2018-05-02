@@ -1,12 +1,11 @@
 ﻿namespace Mapbox.Unity.Ar
 {
-	using System;
-	using System.Collections;
 	using System.Collections.Generic;
 	using UnityEngine;
 	using Mapbox.Unity.Map;
 	using Mapbox.Unity.Location;
-	//using System.Threading.Tasks;
+	using Mapbox.Utils;
+	using System.Linq;
 
 	/// <summary>
 	///  Generates and filters ArNodes for ARLocationManager.
@@ -22,16 +21,18 @@
 
 		float _latestBestGPSAccuracy;
 		List<Node> _savedNodes;
-		WaitForSeconds _waitFor;
-
 		AbstractMap _map;
+		CircularBuffer<Node> _nodeBuffer;
 
-		public override void InitializeNodeBase()
+		public override void InitializeNodeBase(AbstractMap map)
 		{
 			_savedNodes = new List<Node>();
 			CentralizedARLocator.OnNewHighestAccuracyGPS += SavedGPSAccuracy;
+			_map = map;
 			IsNodeBaseInitialized = true;
 			Debug.Log("Initialized ARNodes");
+			_nodeBuffer = new CircularBuffer<Node>(10);
+			_nodeBuffer.GetEnumerable().ToArray();
 		}
 
 		void SavedGPSAccuracy(Location location)
@@ -42,9 +43,7 @@
 		public override void SaveNode()
 		{
 			bool saveNode = false;
-			_map = LocationProviderFactory.Instance.mapManager;
-
-			if (_savedNodes.Count > 1)
+			if (_nodeBuffer.Count > 1)
 			{
 				var previousNodePos = _map.GeoToWorldPosition(_savedNodes[_savedNodes.Count - 1].LatLon, false);
 				var currentMagnitude = _targetTransform.position - previousNodePos;
