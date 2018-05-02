@@ -5,6 +5,7 @@ namespace Mapbox.Unity.Location
 	using Mapbox.Utils;
 	using Mapbox.CheapRulerCs;
 	using System;
+	using System.Linq;
 
 	/// <summary>
 	/// The DeviceLocationProvider is responsible for providing real world location and heading data,
@@ -44,9 +45,16 @@ namespace Mapbox.Unity.Location
 		/// <summary>list of positions to keep for calculations</summary>
 		private CircularBuffer<Vector2d> _lastPositions;
 		/// <summary>number of last positons to keep</summary>
-		private int _maxLastPositions = 3;
+		private int _maxLastPositions = 5;
 		/// <summary>minimum needed distance between oldest and newest position before UserHeading is calculated</summary>
-		private double _minDistanceOldestNewestPosition = 1;
+		private double _minDistanceOldestNewestPosition = 1.5;
+		/// <summary>weights for calculating 'UserHeading'. hardcoded for now. TODO: auto-calc based on time, distance, ...</summary>
+		private float[] _headingWeights = new float[]{
+			0,
+			-0.5f,
+			-1.0f,
+			-1.5f
+		};
 
 
 		// Android 6+ permissions have to be granted during runtime
@@ -66,7 +74,14 @@ namespace Mapbox.Unity.Location
 			_currentLocation.Provider = "unity";
 			_wait1sec = new WaitForSeconds(1f);
 			_waitUpdateTime = _updateTimeInMilliSeconds < 500 ? new WaitForSeconds(500) : new WaitForSeconds(_updateTimeInMilliSeconds / 1000);
+
 			_lastPositions = new CircularBuffer<Vector2d>(_maxLastPositions);
+			// safe measure till we have auto calculated weights
+			// "_maxLastPositions - 1" because we calculate user heading on the fly: nr of angles = nr of positions - 1
+			if (_headingWeights.Length != _maxLastPositions - 1)
+			{
+				throw new Exception("number of last positions NOT equal number of heading weights");
+			}
 
 			if (_pollRoutine == null)
 			{
@@ -206,10 +221,36 @@ namespace Mapbox.Unity.Location
 						new double[] { newestPos.y, newestPos.x },
 						new double[] { oldestPos.y, oldestPos.x }
 					);
-					// positions are minimum required distance apart, calculate heading
+					// positions are minimum required distance apart (user is moving), calculate user heading
 					if (distance >= _minDistanceOldestNewestPosition)
 					{
-						_currentLocation.UserHeading = (float)(Math.Atan2(newestPos.y - oldestPos.y, newestPos.x - oldestPos.x) * 180 / Math.PI);
+						// calculate final heading from last positions but give newest headings more weight:
+						// '_lastPositions' contains newest at [0]
+						// formula:
+						// (heading[0] * e^weight[0] + heading[1] * e^weight[1] + .... ) / weight sum
+						float[] lastHeadings = new float[_maxLastPositions - 1];
+						float[] actualWeights = new float[_maxLastPositions - 1];
+						float finalHeading = 0f;
+
+						for (int i = 1; i < _maxLastPositions; i++)
+						{
+							lastHeadings[i - 1] = (float)(Math.Atan2(_lastPositions[i].y - _lastPositions[i - 1].y, _lastPositions[i].x - _lastPositions[i - 1].x) * 180 / Math.PI);
+							// quick fix to take care of 355° and 5° being apart 10° and not 350°
+							if (lastHeadings[i - 1] > 180) { lastHeadings[i - 1] -= 360f; }
+						}
+
+						for (int i = 0; i < lastHeadings.Length; i++)
+						{
+							actualWeights[i] = (float)Math.Exp(_headingWeights[i]);
+							finalHeading += lastHeadings[i] * actualWeights[i];
+						}
+
+						float weightSum = actualWeights.Sum();
+						finalHeading /= weightSum;
+						// stay within [0..359] no negative angles
+						if (finalHeading < 0) { finalHeading += 360; }
+
+						_currentLocation.UserHeading = finalHeading;
 						_currentLocation.IsUserHeadingUpdated = true;
 					}
 				}
