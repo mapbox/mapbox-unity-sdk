@@ -93,7 +93,7 @@
 
 				GpsFix gpsFix = new GpsFix();
 
-				if (tokens[0].Equals("Fix")) { gpsFix.HasGpxFix = true; }
+				gpsFix.HasGpxFix = tokens[0].Equals("Fix") ? true : (bool?)null;
 				gpsFix.provider = tokens[1];
 
 				if (
@@ -155,6 +155,8 @@
 				if (_currentLocation.DeviceOrientation > 359) { _currentLocation.DeviceOrientation = 0; }
 			}
 
+			_currentLocation.Provider = gpsFix.provider;
+			_currentLocation.HasGpsFix = gpsFix.HasGpxFix;
 			_currentLocation.LatitudeLongitude = gpsFix.LatLng;
 			_currentLocation.Timestamp = gpsFix.Timestamp;
 			_currentLocation.Accuracy = gpsFix.Accuracy;

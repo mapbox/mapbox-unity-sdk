@@ -1,16 +1,14 @@
-# 
+#
 # Header Description:
-# 
+#
 # Version: v2.0.0.1 Platform: 8.1.0 Manufacturer: Google Model: Pixel 2
-# 
+#
 # Raw,ElapsedRealtimeMillis,TimeNanos,LeapSecond,TimeUncertaintyNanos,FullBiasNanos,BiasNanos,BiasUncertaintyNanos,DriftNanosPerSecond,DriftUncertaintyNanosPerSecond,HardwareClockDiscontinuityCount,Svid,TimeOffsetNanos,State,ReceivedSvTimeNanos,ReceivedSvTimeUncertaintyNanos,Cn0DbHz,PseudorangeRateMetersPerSecond,PseudorangeRateUncertaintyMetersPerSecond,AccumulatedDeltaRangeState,AccumulatedDeltaRangeMeters,AccumulatedDeltaRangeUncertaintyMeters,CarrierFrequencyHz,CarrierCycles,CarrierPhase,CarrierPhaseUncertainty,MultipathIndicator,SnrInDb,ConstellationType,AgcDb,CarrierFrequencyHz
-# 
+#
 # Fix,Provider,Latitude,Longitude,Altitude,Speed,Accuracy,Bearing,Orientation,(UTC)TimeInMs
-# 
+#
 # Nav,Svid,Type,Status,MessageId,Sub-messageId,Data(Bytes)
-# 
-Fix,gps,48.401141,15.580712,246.581421,0.000000,4.288000,0.000000,49.303406,1524812231000
-Fix,gps,48.401140,15.580710,246.312622,0.000000,4.288000,0.000000,48.701416,1524812232000
+#
 Fix,gps,48.401137,15.580709,245.929199,0.000000,4.288000,0.000000,36.201172,1524812233000
 Fix,gps,48.401139,15.580707,245.270020,0.000000,4.288000,0.000000,35.610931,1524812234000
 Fix,gps,48.401145,15.580716,243.787476,0.940000,4.288000,68.699997,46.157867,1524812235000
@@ -67,4 +65,3 @@ Fix,gps,48.401454,15.581524,240.710327,1.310000,3.216000,70.000000,61.725555,152
 Fix,gps,48.401458,15.581539,241.147034,0.910000,3.216000,70.199997,97.414124,1524812286000
 Fix,gps,48.401461,15.581553,240.948975,1.070000,3.216000,70.199997,48.457611,1524812287000
 Fix,gps,48.401463,15.581569,240.471313,1.100000,3.216000,70.199997,58.961212,1524812288000
-Fix,gps,48.401465,15.581585,240.935242,1.180000,4.288000,70.300003,43.385864,1524812289000

@@ -9,13 +9,14 @@
 
 ##### New Features
 - Add `OnUpdated` event to `AbstractMap`. Enables subscribers to get a notification when the map location and/or zoom gets updated.
-- New example scene showing `UserHeading` and `DeviceOrientation`
 - `DeviceLocationProviderAndroidNative`: a native location provider for Android that directly accesses location and orientation provided by the operating system not using Unity's `Input.location` which has some shortcomings, eg coordinates truncated to `float` precision.
   **Only available on Android 7.0 (Nougat, API Level 24) and up!**
 - `EditorGpsLogLocationProvider`: an Editor location provider to replay real world GPS traces logged with [GNSSLogger](https://github.com/google/gps-measurement-tools/tree/master/GNSSLogger)
+- New example scene showing `UserHeading` and `DeviceOrientation`
 
 ##### Improvements
 - `UnityARInterface` updated to [commit 67351b6](https://github.com/Unity-Technologies/experimental-ARInterface/commit/67351b66ff9af28380e7dd5f5b2f4ba1bf802ca8) from March 1st 2018
+- Additional properties on `RotateWithLocationProvider` to account for new `Location` properties `UserHeading` and `DeviceOrientation`.
 
 ### v.1.4.1
 *04/17/2018*

@@ -501,6 +501,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _desiredAccuracyInMeters: 100
   _updateDistanceInMeters: 0
+  _updateTimeInMilliSeconds: 1000
 --- !u!4 &849657522
 Transform:
   m_ObjectHideFlags: 0
@@ -747,6 +748,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _useDeviceOrientation: 0
+  _subtractUserHeading: 0
   _rotationFollowFactor: 2
   _rotateZ: 0
   _useNegativeAngle: 0
@@ -1017,6 +1019,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _useDeviceOrientation: 0
+  _subtractUserHeading: 0
   _rotationFollowFactor: 2
   _rotateZ: 0
   _useNegativeAngle: 1
@@ -1358,6 +1361,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _useDeviceOrientation: 1
+  _subtractUserHeading: 1
   _rotationFollowFactor: 2
   _rotateZ: 0
   _useNegativeAngle: 0
