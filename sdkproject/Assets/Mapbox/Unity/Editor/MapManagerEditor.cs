@@ -84,7 +84,7 @@
 				EditorPrefs.SetBool("MapManagerEditor_showVector", value);
 			}
 		}
-	
+
 
 		bool ShowPosition
 		{
@@ -113,52 +113,6 @@
 			ShowGeneral = EditorGUILayout.Foldout(ShowGeneral, new GUIContent { text = "GENERAL", tooltip = "Options related to map data" });
 			if (ShowGeneral)
 			{
-				//EditorGUILayout.Space();
-				//EditorGUILayout.LabelField("Presets");
-				//selected = property.FindPropertyRelative("mapPreset").enumValueIndex;
-				//var options = property.FindPropertyRelative("mapPreset").enumDisplayNames;
-
-				//GUIContent[] content = new GUIContent[options.Length];
-				//for (int i = 0; i < options.Length; i++)
-				//{
-				//	content[i] = new GUIContent();
-				//	content[i].text = options[i];
-				//	content[i].tooltip = EnumExtensions.Description((MapPresetType)i);
-				//}
-				//selected = property.FindPropertyRelative("mapPreset").enumValueIndex;
-				//selected = GUILayout.SelectionGrid(selected, content, options.Length);
-
-
-				//if (selected != previousSelection)
-				//{
-				//	previousSelection = selected;
-				//	property.FindPropertyRelative("mapPreset").enumValueIndex = selected;
-
-				//	switch ((MapPresetType)selected)
-				//	{
-				//		case MapPresetType.LocationBasedMap:
-				//			PresetLocationBased(property);
-
-				//			//TODO : Get opinions on this UX. 
-				//			//var locationProvider = _map.gameObject.GetComponent<LocationProviderFactory>();
-				//			//Debug.Log("target -> " + ((locationProvider == null) ? "null" : "notnull"));
-				//			//if (locationProvider == null)
-				//			//(_map.gameObject).AddComponent<LocationProviderFactory>();
-				//			break;
-				//		case MapPresetType.WorldSimulator:
-				//			PresetWorldSimulator(property);
-				//			break;
-				//		case MapPresetType.ARTableTop:
-				//			break;
-				//		case MapPresetType.ARWorldScale:
-				//			PresetARWorldScale(property);
-				//			break;
-				//		default:
-				//			break;
-				//	}
-
-				//}
-
 				EditorGUILayout.Space();
 				DrawMapOptions(serializedObject);
 			}
@@ -221,7 +175,7 @@
 
 		void ShowSection(SerializedProperty property, string propertyName)
 		{
-    		EditorGUILayout.Space();
+			EditorGUILayout.Space();
 			EditorGUILayout.PropertyField(property.FindPropertyRelative(propertyName));
 		}
 
@@ -264,8 +218,8 @@
 
 		void PresetLocationBased(SerializedProperty unifiedMap)
 		{
-			//Set 
-			//placement = atLocationCenter, 
+			//Set
+			//placement = atLocationCenter,
 			//scaling = custom
 			//turn off vector layers.
 			var mapOptionsProp = unifiedMap.FindPropertyRelative("mapOptions");
@@ -289,8 +243,8 @@
 
 		void PresetWorldSimulator(SerializedProperty unifiedMap)
 		{
-			//Set 
-			//placement = atLocationCenter, 
+			//Set
+			//placement = atLocationCenter,
 			//scaling = custom
 			//turn on vector layers.
 			var mapOptionsProp = unifiedMap.FindPropertyRelative("mapOptions");
@@ -313,8 +267,8 @@
 
 		void PresetARTableTop(SerializedProperty unifiedMap)
 		{
-			//Set 
-			//placement = atLocationCenter, 
+			//Set
+			//placement = atLocationCenter,
 			//scaling = custom
 			//turn on vector layers.
 			var mapOptionsProp = unifiedMap.FindPropertyRelative("mapOptions");
@@ -336,8 +290,8 @@
 
 		void PresetARWorldScale(SerializedProperty unifiedMap)
 		{
-			//Set 
-			//placement = atLocationCenter, 
+			//Set
+			//placement = atLocationCenter,
 			//scaling = custom
 			//turn on vector layers.
 			var mapOptionsProp = unifiedMap.FindPropertyRelative("mapOptions");
