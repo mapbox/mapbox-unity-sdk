@@ -640,7 +640,7 @@ MonoBehaviour:
   _autoFireEvent: 1
   _updateInterval: 1
   _sendEvent: 0
-  _gpsLogFile: {fileID: 4900000, guid: 7a07747909ea237468470c6398307001, type: 3}
+  _gpsLogFile: {fileID: 4900000, guid: b9abe7d031734c34e83d93fc4b21fa58, type: 3}
 --- !u!4 &1363590664
 Transform:
   m_ObjectHideFlags: 0
