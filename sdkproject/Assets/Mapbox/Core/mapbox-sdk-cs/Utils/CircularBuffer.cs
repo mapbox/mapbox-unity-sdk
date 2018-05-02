@@ -81,13 +81,11 @@ namespace Mapbox.Utils
 		public IEnumerator<T> GetEnumerator()
 		{
 			if (Count == 0 || _buffer.Length == 0)
+			{
 				yield break;
+			}
 
-			// ATTENTION, access indexer this[] in reverse order
-			// this[0] returns newest value
-
-			//for (var i = 0; i < Count; ++i) { yield return this[i]; }
-			for (var i = Count - 1; i >= 0; i--) { yield return this[i]; }
+			for (var i = 0; i < Count; ++i) { yield return this[i]; }
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
@@ -95,9 +93,16 @@ namespace Mapbox.Utils
 			return GetEnumerator();
 		}
 
+
+		public IEnumerable<T> GetEnumerable()
+		{
+			IEnumerator<T> enumerator = GetEnumerator();
+			while (enumerator.MoveNext())
+			{
+				yield return enumerator.Current;
+			}
+		}
+
+
 	}
-
-
-
-
 }
