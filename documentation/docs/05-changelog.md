@@ -3,6 +3,10 @@
 *??/??/2018*
 
 ##### New Features
+- Add `Location Prefabs` section to `AbstractMap`. Enables users to spawn prefabs at points-of-interest on the map directly from the `AbstractMap` UI.
+- Add options to spawn prefabs on points-of-interest using `Mapbox Category`, `Name`, or a list of `Address or LatLon`.
+- Add methods on `AbstractMap` to spawn prefabs. Enables users to add layers via script.
+- Add the `LocationPrefabs.unity` example scene. Demonstrates the basics of using the `Location Prefabs` feature.
 - Add `OnUpdated` event to `AbstractMap`. Enables subscribers to get a notification when the map location and/or zoom gets updated.
 
 ##### Improvements

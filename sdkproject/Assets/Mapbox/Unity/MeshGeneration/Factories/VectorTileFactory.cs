@@ -63,8 +63,18 @@
 
 			foreach (var sublayer in _properties.vectorSubLayers)
 			{
-				var visualizer = CreateInstance<VectorLayerVisualizer>();
-				visualizer.SetProperties(sublayer, _properties.performanceOptions);
+				//if its of type prefabitemoptions then separate the visualizer type
+				LayerVisualizerBase visualizer;
+				if (typeof(PrefabItemOptions).IsAssignableFrom(sublayer.GetType())) //to check that the instance is of type PrefabItemOptions
+				{
+					visualizer = CreateInstance<LocationPrefabsLayerVisualizer>();
+					((LocationPrefabsLayerVisualizer)visualizer).SetProperties((PrefabItemOptions)sublayer, _properties.performanceOptions);
+				}
+				else
+				{
+					visualizer = CreateInstance<VectorLayerVisualizer>();
+					((VectorLayerVisualizer)visualizer).SetProperties(sublayer, _properties.performanceOptions);
+				}
 
 				visualizer.Initialize();
 				if (visualizer == null)
@@ -204,6 +214,21 @@
 							Progress++;
 							builder.Create(_cachedData[tile].Data.GetLayer(layerName), tile, DecreaseProgressCounter);
 						}
+					}
+				}
+			}
+
+			//emptylayer for visualizers that don't depend on outside data sources
+			string emptyLayer = "";
+			if (_layerBuilder.ContainsKey(emptyLayer))
+			{
+				foreach (var builder in _layerBuilder[emptyLayer])
+				{
+					if(builder.Active)
+					{
+						Progress++;
+						//just pass the first available layer - we should create a static null layer for this
+						builder.Create(_cachedData[tile].Data.GetLayer(_cachedData[tile].Data.LayerNames()[0]), tile, DecreaseProgressCounter);
 					}
 				}
 			}
