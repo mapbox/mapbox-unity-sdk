@@ -22,15 +22,13 @@
 
 		float _latestBestGPSAccuracy;
 		List<Node> _savedNodes;
-		WaitForSeconds _waitFor;
-
 		AbstractMap _map;
 
-		public override void InitializeNodeBase()
+		public override void InitializeNodeBase(AbstractMap map)
 		{
 			_savedNodes = new List<Node>();
 			CentralizedARLocator.OnNewHighestAccuracyGPS += SavedGPSAccuracy;
-			_map = LocationProviderFactory.Instance.mapManager;
+			_map = map;
 			IsNodeBaseInitialized = true;
 			Debug.Log("Initialized ARNodes");
 		}

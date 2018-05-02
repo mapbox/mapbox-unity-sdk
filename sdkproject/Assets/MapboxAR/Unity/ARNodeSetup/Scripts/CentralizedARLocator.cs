@@ -7,7 +7,6 @@
 	using System;
 	using Mapbox.MapMatching;
 	using Mapbox.Utils;
-	//using System.Threading.Tasks;
 	using UnityARInterface;
 	using Mapbox.Unity.Map;
 
@@ -89,7 +88,6 @@
 		void Map_OnInitialized()
 		{
 			_map.OnInitialized -= Map_OnInitialized;
-
 			// We don't want location updates until we have a map, otherwise our conversion will fail.
 			ComputeFirstLocalization();
 		}
@@ -165,7 +163,7 @@
 		{
 			for (int i = 0; i < _syncNodes.Length; i++)
 			{
-				_syncNodes[i].InitializeNodeBase();
+				_syncNodes[i].InitializeNodeBase(_map);
 			}
 		}
 
@@ -179,8 +177,6 @@
 				node.SaveNode();
 			}
 		}
-
-
 
 		//void CheckTracking()
 		//{

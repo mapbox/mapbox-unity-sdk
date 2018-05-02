@@ -1,14 +1,9 @@
 ﻿namespace Mapbox.Unity.Ar
 {
-	using System.Collections;
 	using System.Collections.Generic;
 	using UnityEngine;
-	using Mapbox.Map;
-	using Mapbox.Utils;
 	using Mapbox.Unity.Location;
-	using System;
 	using Mapbox.Unity.Map;
-	//using System.Threading.Tasks;
 
 	///<summary>
 	///  Generates GPSNodes for ARLocationManager.
@@ -28,10 +23,10 @@
 		List<Node> _savedNodes;
 		AbstractMap _map;
 
-		public override void InitializeNodeBase()
+		public override void InitializeNodeBase(AbstractMap map)
 		{
 			_savedNodes = new List<Node>();
-			_map = LocationProviderFactory.Instance.mapManager;
+			_map = map;
 			IsNodeBaseInitialized = true;
 			Debug.Log("Initialized GPS nodes");
 
