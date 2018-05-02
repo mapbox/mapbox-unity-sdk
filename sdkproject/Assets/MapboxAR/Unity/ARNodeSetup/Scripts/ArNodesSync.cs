@@ -20,13 +20,12 @@
 		float _minMagnitudeBetween;
 
 		float _latestBestGPSAccuracy;
-		List<Node> _savedNodes;
 		AbstractMap _map;
 		CircularBuffer<Node> _nodeBuffer;
 
 		public override void InitializeNodeBase(AbstractMap map)
 		{
-			_savedNodes = new List<Node>();
+			_nodeBuffer = new CircularBuffer<Node>(20);
 			CentralizedARLocator.OnNewHighestAccuracyGPS += SavedGPSAccuracy;
 			_map = map;
 			IsNodeBaseInitialized = true;
@@ -46,7 +45,7 @@
 
 			if (_nodeBuffer.Count > 1)
 			{
-				var previousNodePos = _map.GeoToWorldPosition(_savedNodes[_savedNodes.Count - 1].LatLon, false);
+				var previousNodePos = _map.GeoToWorldPosition(_nodeBuffer[0].LatLon, false);
 				var currentMagnitude = _targetTransform.position - previousNodePos;
 
 				if (currentMagnitude.magnitude >= _minMagnitudeBetween)
@@ -61,22 +60,24 @@
 			if (saveNode == true)
 			{
 				Debug.Log("Saving AR Node");
-				var node = new Node();
-				node.LatLon = _map.WorldToGeoPosition(_targetTransform.position);
-				node.Accuracy = _latestBestGPSAccuracy;
-				_savedNodes.Add(node);
+				var node = new Node
+				{
+					LatLon = _map.WorldToGeoPosition(_targetTransform.position),
+					Accuracy = _latestBestGPSAccuracy
+				};
+				_nodeBuffer.Add(node);
 			}
 
 		}
 
 		public override Node[] ReturnNodes()
 		{
-			return _savedNodes.ToArray();
+			return _nodeBuffer.GetEnumerable().ToArray();
 		}
 
 		public override Node ReturnLatestNode()
 		{
-			return _savedNodes[_savedNodes.Count - 1];
+			return _nodeBuffer[0];
 		}
 	}
 }

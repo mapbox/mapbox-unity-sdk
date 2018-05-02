@@ -4,6 +4,8 @@
 	using UnityEngine;
 	using Mapbox.Unity.Location;
 	using Mapbox.Unity.Map;
+	using Mapbox.Utils;
+	using System.Linq;
 
 	///<summary>
 	///  Generates GPSNodes for ARLocationManager.
@@ -20,23 +22,22 @@
 		[SerializeField]
 		float _minMagnitude;
 
-		List<Node> _savedNodes;
 		AbstractMap _map;
+		CircularBuffer<Node> _nodeBuffer;
 
 		public override void InitializeNodeBase(AbstractMap map)
 		{
-			_savedNodes = new List<Node>();
+			_nodeBuffer = new CircularBuffer<Node>(20);
 			_map = map;
 			IsNodeBaseInitialized = true;
 			Debug.Log("Initialized GPS nodes");
-
 		}
 
 		private bool IsNodeGoodToUse(Location location)
 		{
 			// Check Node accuracy & distance.
 			var latestNode = _map.GeoToWorldPosition(location.LatitudeLongitude);
-			var previousNode = _map.GeoToWorldPosition(_savedNodes[_savedNodes.Count - 1].LatLon);
+			var previousNode = _map.GeoToWorldPosition(_nodeBuffer[0].LatLon);
 			var forMagnitude = latestNode - previousNode;
 
 			if (location.Accuracy <= _desiredAccuracy && _minMagnitude <= forMagnitude.magnitude)
@@ -54,9 +55,10 @@
 		public override void SaveNode()
 		{
 			var location = LocationProviderFactory.Instance.DefaultLocationProvider.CurrentLocation;
-			bool isFirstNode = (_savedNodes.Count == 0);
+			bool isFirstNode = (_nodeBuffer.Count == 0);
 			bool isGoodFilteredNode = false;
 			bool saveNode = true;
+
 			if (isFirstNode)
 			{
 				saveNode = true;
@@ -70,21 +72,24 @@
 			if (saveNode)
 			{
 				Debug.Log("Saving GPS Node");
-				var latestNode = new Node();
-				latestNode.LatLon = location.LatitudeLongitude;
-				latestNode.Accuracy = location.Accuracy;
-				_savedNodes.Add(latestNode);
+				var latestNode = new Node
+				{
+					LatLon = location.LatitudeLongitude,
+					Accuracy = location.Accuracy
+				};
+
+				_nodeBuffer.Add(latestNode);
 			}
 		}
 
 		public override Node ReturnLatestNode()
 		{
-			return _savedNodes[_savedNodes.Count - 1]; ;
+			return _nodeBuffer[0];
 		}
 
 		public override Node[] ReturnNodes()
 		{
-			return _savedNodes.ToArray();
+			return _nodeBuffer.GetEnumerable().ToArray();
 		}
 	}
 }

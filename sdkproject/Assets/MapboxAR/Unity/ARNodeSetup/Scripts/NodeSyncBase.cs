@@ -7,7 +7,7 @@
 	public abstract class NodeSyncBase : MonoBehaviour
 	{
 		/// <summary>
-		/// Returns the nodes that the sync base has collected.
+		/// Returns the nodes that the sync base has collected. Note that latest node is at index 0.
 		/// </summary>
 		/// <returns>The nodes.</returns>
 		public abstract Node[] ReturnNodes();
