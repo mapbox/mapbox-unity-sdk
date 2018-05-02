@@ -20,6 +20,21 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public float FloorHeight;
 		public float FirstFloorHeight;
 		public float TopFloorHeight;
+
+		public float bottomOfTopUv;
+		public float topOfMidUv;
+		public float topOfBottomUv;
+		public float midUvHeight;
+		public float WallToFloorRatio;
+
+		public void CalculateParameters()
+		{
+			bottomOfTopUv = TextureRect.yMax - (TextureRect.size.y * TopSectionRatio); //not doing that scaling thing for y axis and floors yet
+			topOfMidUv = TextureRect.yMax - (TextureRect.height * TopSectionRatio);
+			topOfBottomUv = TextureRect.yMin + (TextureRect.size.y * BottomSectionRatio); // * (Mathf.Max(1, (float)Math.Floor(tby * textureSection.TopSectionFloorCount)) / textureSection.TopSectionFloorCount);
+			midUvHeight = TextureRect.height * (1 - TopSectionRatio - BottomSectionRatio);
+			WallToFloorRatio = (1 - TopSectionRatio - BottomSectionRatio) * (TextureRect.height / TextureRect.width);
+		}
 	}
 
 	public enum AtlasEntityType
