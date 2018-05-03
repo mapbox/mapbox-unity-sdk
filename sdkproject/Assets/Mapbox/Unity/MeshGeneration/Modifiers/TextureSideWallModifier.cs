@@ -48,7 +48,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private float rightOfEdgeUv;
 		private float bottomOfTopUv;
 		private float topOfBottomUv;
-		private float currentY;
+		private float currentY1;
+		private float currentY2;
 		private float bottomOfMidUv;
 		private float topOfMidUv;
 
@@ -143,7 +144,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					topOfBottomUv = _currentTextureRect.yMin + (_currentTextureRect.size.y * _currentFacade.BottomSectionRatio); // * (Mathf.Max(1, (float)Math.Floor(tby * textureSection.TopSectionFloorCount)) / textureSection.TopSectionFloorCount);
 
 					wallNormal = new Vector3(-(v1.z - v2.z), 0, (v1.x - v2.x)).normalized;
-					currentY = v1.y;
+					currentY1 = v1.y;
+					currentY2 = v2.y;
 
 					floorScaleRatio = Math.Min(1, midHeight / _scaledFloorHeight);
 					var midSecHeight = (_currentTextureRect.height * (1 - _currentFacade.TopSectionRatio - _currentFacade.BottomSectionRatio));
@@ -172,12 +174,13 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		{
 			for (int f = 0; f < floorCount; f++)
 			{
-				currentY -= scaledFloorHeight;
+				currentY1 -= scaledFloorHeight;
+				currentY2 -= scaledFloorHeight;
 
-				md.Vertices.Add(new Vector3(v1.x, currentY + scaledFloorHeight, v1.z));
-				md.Vertices.Add(new Vector3(v2.x, currentY + scaledFloorHeight, v2.z));
-				md.Vertices.Add(new Vector3(v1.x, currentY, v1.z));
-				md.Vertices.Add(new Vector3(v2.x, currentY, v2.z));
+				md.Vertices.Add(new Vector3(v1.x, currentY1 + scaledFloorHeight, v1.z));
+				md.Vertices.Add(new Vector3(v2.x, currentY2 + scaledFloorHeight, v2.z));
+				md.Vertices.Add(new Vector3(v1.x, currentY1, v1.z));
+				md.Vertices.Add(new Vector3(v2.x, currentY2, v2.z));
 
 				md.UV[0].Add(new Vector2(_currentTextureRect.xMin, topOfMidUv));
 				md.UV[0].Add(new Vector2(rightOfEdgeUv, topOfMidUv));
@@ -208,7 +211,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		private void TopFloor(MeshData md)
 		{
-			currentY -= topHeight;
+			currentY1 -= topHeight;
+			currentY2 -= topHeight;
 			md.Vertices.Add(new Vector3(v1.x, v1.y, v1.z));
 			md.Vertices.Add(new Vector3(v2.x, v2.y, v2.z));
 			md.Vertices.Add(new Vector3(v1.x, v1.y - topHeight, v1.z));
