@@ -6,6 +6,7 @@
 	using Mapbox.VectorTile.ExtensionMethods;
 	using System.Linq;
 	using Mapbox.Platform.TilesetTileJSON;
+	using System.Collections.Generic;
 
 	[CustomPropertyDrawer(typeof(GeometryExtrusionOptions))]
 	public class GeometryExtrusionOptionsDrawer : PropertyDrawer
@@ -22,8 +23,9 @@
 			}
 		}
 
+		bool _isInitialized = false;
 		string objectId = "";
-		private string[] propertyNamesArray;
+		private static List<string> propertyNamesList = new List<string>();
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		GUIContent[] sourceTypeContent;
 		bool isGUIContentSet = false;
@@ -148,24 +150,43 @@
 			
 			var propertyDisplayNames = tileJsonData.PropertyDisplayNames[selectedLayerName];
 
-			if (propertyNamesArray == null || !Enumerable.SequenceEqual(propertyNamesArray, propertyDisplayNames.ToArray()))
-			   index = 0;
-			
-			propertyNamesArray = propertyDisplayNames.ToArray();
+			if (_isInitialized == true)
+			{
+				if (!Enumerable.SequenceEqual(propertyNamesList, propertyDisplayNames))
+				{
+					index = 0;
+					propertyNamesList = propertyDisplayNames;
+				}
+				else
+				{
+					DrawPropertyName(property, position, propertyDisplayNames, selectedLayerName);
+				}
+			}
+			else
+			{
+				_isInitialized = true;
+				DrawPropertyName(property, position, propertyDisplayNames, selectedLayerName);
+			}
+
+			//serializedMapObject.ApplyModifiedProperties();
+		}
+
+		private void DrawPropertyName(SerializedProperty property, Rect position, List<string>propertyDisplayNames, string selectedLayerName)
+		{
+			propertyNamesList = propertyDisplayNames;
 			Rect typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Property Name", tooltip = "The name of the property in the selected Mapbox layer that will be used for extrusion" });
 			EditorGUI.indentLevel -= 2;
-			index = EditorGUI.Popup(typePosition, index, propertyNamesArray);
+			index = EditorGUI.Popup(typePosition, index, propertyNamesList.ToArray());
 			position.y += lineHeight;
-			var parsedString = propertyNamesArray[index].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+			var parsedString = propertyNamesList.ToArray()[index].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
 			property.FindPropertyRelative("propertyName").stringValue = parsedString;
 			EditorGUI.indentLevel += 2;
 
 			var descriptionString = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedString];
 			typePosition.y += lineHeight;
 			typePosition.height = (float)(2.5f * lineHeight);
-			EditorGUI.PrefixLabel(new Rect(position.x, typePosition.y + lineHeight/2, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Property Description", tooltip = "Factual information about the selected property" });
-			EditorGUI.HelpBox(typePosition,descriptionString, MessageType.Info);
-			//serializedMapObject.ApplyModifiedProperties();
+			EditorGUI.PrefixLabel(new Rect(position.x, typePosition.y + lineHeight / 2, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Property Description", tooltip = "Factual information about the selected property" });
+			EditorGUI.HelpBox(typePosition, descriptionString, MessageType.Info);
 		}
 
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)

@@ -18,6 +18,7 @@
 		static float _lineHeight = EditorGUIUtility.singleLineHeight;
 		GUIContent[] _sourceTypeContent;
 		bool _isGUIContentSet = false;
+		bool _isInitialized = false;
 		private TileJsonData tileJSONData;
 		private static TileJSONResponse tileJSONResponse;
 		/// <summary>
@@ -147,15 +148,28 @@
 					layerSourceId.stringValue = sourcePropertyValue.Id;
 					GUI.enabled = false;
 					EditorGUILayout.PropertyField(sourceOptionsProperty, _mapIdGui);
-					LoadEditorTileJSON(sourceTypeValue, layerSourceId.stringValue);
+					if (_isInitialized)
+					{
+						LoadEditorTileJSON(sourceTypeValue, layerSourceId.stringValue);
+					}
+					else
+					{
+						_isInitialized = true;
+					}
 					GUI.enabled = true;
 					isActiveProperty.boolValue = true;
 					break;
 				case VectorSourceType.Custom:
 					layerSourceId.stringValue = CustomSourceMapId;
 					EditorGUILayout.PropertyField(sourceOptionsProperty, _mapIdGui);
-					LoadEditorTileJSON(sourceTypeValue, layerSourceId.stringValue);
-					CustomSourceMapId = layerSourceId.stringValue;
+					if (_isInitialized)
+					{
+						LoadEditorTileJSON(sourceTypeValue, layerSourceId.stringValue);
+					}
+					else
+					{
+						_isInitialized = true;
+					}					CustomSourceMapId = layerSourceId.stringValue;
 					isActiveProperty.boolValue = true;
 					break;
 				case VectorSourceType.None:

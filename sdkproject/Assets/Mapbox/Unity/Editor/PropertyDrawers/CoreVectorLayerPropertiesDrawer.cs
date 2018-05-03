@@ -5,6 +5,7 @@
 	using Mapbox.Unity.Map;
 	using System.Collections.Generic;
 	using System.Linq;
+	using System;
 
 	[CustomPropertyDrawer(typeof(CoreVectorLayerProperties))]
 	public class CoreVectorLayerPropertiesDrawer : PropertyDrawer
@@ -21,8 +22,9 @@
 			}
 		}
 
+		static List<string> layerNameList = new List<string>();
+		bool _isInitialized = false;
 		string objectId = "";
-		private string[] layerNamesArray;
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		static TileJsonData tileJSONData = new TileJsonData();
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -48,24 +50,17 @@
 			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
 			tileJSONData = mapObject.VectorData.LayerProperty.tileJsonData;
 
-			if (tileJSONData == null || tileJSONData.LayerDisplayNames.Count == 0)
+			var layerDisplayNames = tileJSONData.LayerDisplayNames;
+			if (_isInitialized == true)
 			{
-				tileJSONData.ProcessTileJSONData(mapObject.tileJSONResponse);
+				DrawLayerName(property, position, layerDisplayNames);
 			}
 			else
 			{
-				var layerDisplayNames = tileJSONData.LayerDisplayNames;
-				if (layerNamesArray == null || !Enumerable.SequenceEqual(layerNamesArray, layerDisplayNames.ToArray()))
-					index = 0;
-				
-				layerNamesArray = layerDisplayNames.ToArray();
-				typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Layer Name", tooltip = "The layer name from the Mapbox tileset that would be used for visualizing a feature" });
-				EditorGUI.indentLevel--;
-				index = EditorGUI.Popup(typePosition, index, layerNamesArray);
-				var parsedString = layerNamesArray[index].Split(new string[] { tileJSONData.commonLayersKey }, System.StringSplitOptions.None)[0].Trim();
-				property.FindPropertyRelative("layerName").stringValue = parsedString;
-				EditorGUI.indentLevel++;
+				_isInitialized = true;
+				//DrawLayerName(property, position, layerDisplayNames);
 			}
+
 
 			position.y += lineHeight;
 			EditorGUI.PropertyField(position, property.FindPropertyRelative("snapToTerrain"));
@@ -81,6 +76,34 @@
 
 			EditorGUI.EndProperty();
 			//serializedMapObject.ApplyModifiedProperties();
+		}
+		private static int count = 0;
+		private void DrawLayerName(SerializedProperty property,Rect position,List<string> layerDisplayNames)
+		{
+			if (layerDisplayNames.Count == 0)
+				return;
+
+			if(layerDisplayNames.Count!=count)
+			{
+				count = layerDisplayNames.Count;
+			}
+			if (!layerDisplayNames.SequenceEqual(layerNameList))
+			{
+				index = 0;
+				layerNameList = layerDisplayNames;
+			}
+
+			if(layerNameList.Count<index)
+			{
+				index = 0;
+				return;
+			}
+			var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Layer Name", tooltip = "The layer name from the Mapbox tileset that would be used for visualizing a feature" });
+			EditorGUI.indentLevel--;
+			index = EditorGUI.Popup(typePosition, index, layerNameList.ToArray());
+			var parsedString = layerNameList[index].Split(new string[] { tileJSONData.commonLayersKey }, System.StringSplitOptions.None)[0].Trim();
+			property.FindPropertyRelative("layerName").stringValue = parsedString;
+			EditorGUI.indentLevel++;
 		}
 
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
