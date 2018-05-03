@@ -28,6 +28,7 @@
 		bool showFilters = true;
 		static bool _isInitialized = false;
 		static string cachedLayerName = "";
+		static bool dataUnavailable = false;
 
 		GUIContent operatorGui = new GUIContent { text = "Operator", tooltip = "Filter operator to apply. " };
 		GUIContent numValueGui = new GUIContent { text = "Num Value", tooltip = "Numeric value to match using the operator.  " };
@@ -161,15 +162,16 @@
 		private void DrawPropertyDropDown(SerializedProperty originalProperty, SerializedProperty filterProperty)
 		{
 			var selectedLayerName = originalProperty.FindPropertyRelative("_selectedLayerName").stringValue;
-
-			if (string.IsNullOrEmpty(selectedLayerName))
-				return;
-
 			AbstractMap mapObject = (AbstractMap)originalProperty.serializedObject.targetObject;
 			TileJsonData tileJsonData = mapObject.VectorData.LayerProperty.tileJsonData;
 
-			if (!tileJsonData.PropertyDisplayNames.ContainsKey(selectedLayerName))
+			if (string.IsNullOrEmpty(selectedLayerName) || !tileJsonData.PropertyDisplayNames.ContainsKey(selectedLayerName))
+			{
+				DrawWarningMessage();
 				return;
+			}
+
+			dataUnavailable = false;
 			var propertyDisplayNames = tileJsonData.PropertyDisplayNames[selectedLayerName];
 
 			descriptionArray = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName].Values.ToArray<string>();
@@ -182,6 +184,13 @@
 			propertyIndex = EditorGUILayout.Popup(propertyIndex, properties);
 			var parsedString = propertyDisplayNames[propertyIndex].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
 			filterProperty.FindPropertyRelative("Key").stringValue = parsedString;
+		}
+
+		private void DrawWarningMessage()
+		{
+			dataUnavailable = true;
+			EditorGUILayout.HelpBox("Check MapId / Internet.", MessageType.None);
+			return;
 		}
 	}
 

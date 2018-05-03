@@ -104,14 +104,8 @@
 			position.height = _lineHeight;
 
 			var serializedMapObject = property.serializedObject;
-			//serializedMapObject.Update();
 			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
-			//mapObject.h
-			//tileJSONData = mapObject.VectorData.LayerProperty.tileJsonData;
-			//Debug.Log("TileJSON before : " + tileJSONData.LayerDisplayNames.Count);
 			tileJSONData = mapObject.VectorData.LayerProperty.tileJsonData;
-			mapObject.tileJSONResponse = tileJSONResponse;
-			//Debug.Log("TileJSON after : " + tileJSONData.LayerDisplayNames.Count);
 			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
 			var sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
 
@@ -156,6 +150,10 @@
 					{
 						_isInitialized = true;
 					}
+					if(tileJSONData.PropertyDisplayNames.Count==0)
+					{
+						EditorGUILayout.HelpBox("Invalid Map Id / There might be a problem with the internet connection.", MessageType.Error);
+					}
 					GUI.enabled = true;
 					isActiveProperty.boolValue = true;
 					break;
@@ -169,7 +167,12 @@
 					else
 					{
 						_isInitialized = true;
-					}					CustomSourceMapId = layerSourceId.stringValue;
+					}
+					if (tileJSONData.PropertyDisplayNames.Count == 0)
+					{
+						EditorGUILayout.HelpBox("Invalid Map Id / There might be a problem with the internet connection.", MessageType.Error);
+					}
+					CustomSourceMapId = layerSourceId.stringValue;
 					isActiveProperty.boolValue = true;
 					break;
 				case VectorSourceType.None:
@@ -287,8 +290,6 @@
 				}
 			}
 			EditorGUI.EndProperty();
-
-			//serializedMapObject.ApplyModifiedProperties();
 		}
 
 		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty, SerializedProperty property)
@@ -454,6 +455,11 @@
 					//tileJSONData.ClearData();
 					Unity.MapboxAccess.Instance.TileJSON.Get(sourceString,(response) => {
 						tileJSONResponse = response;
+						if(response == null || response.VectorLayers == null) //indicates bad tileresponse
+						{
+							tileJSONData.ClearData();
+							return;
+						}
 						tileJSONData.ProcessTileJSONData(response);
 					});
 				}

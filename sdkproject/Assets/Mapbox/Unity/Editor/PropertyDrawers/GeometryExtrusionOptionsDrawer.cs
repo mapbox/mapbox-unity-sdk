@@ -31,6 +31,7 @@
 		bool isGUIContentSet = false;
 		static TileJsonData tileJsonData = new TileJsonData();
 		static TileJSONResponse tileJsonResponse;
+		static bool dataUnavailable = false;
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
@@ -77,7 +78,10 @@
 					position.y += lineHeight;
 					//EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
 					DrawPropertyDropDown(property, position);
-					position.y += 2.5f *lineHeight;
+					if (!dataUnavailable)
+					{
+						position.y += 2.5f * lineHeight;
+					}
 					break;
 				case Unity.Map.ExtrusionType.MinHeight:
 					position.y += lineHeight;
@@ -85,15 +89,20 @@
 					position.y += lineHeight;
 					//EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
 					DrawPropertyDropDown(property, position);
-					position.y += 2.5f * lineHeight;
-					break;
+					if (!dataUnavailable)
+					{
+						position.y += 2.5f * lineHeight;
+					}					break;
 				case Unity.Map.ExtrusionType.MaxHeight:
 					position.y += lineHeight;
 					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), extrusionGeometryType, extrusionGeometryGUI);
 					position.y += lineHeight;
 					//EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
 					DrawPropertyDropDown(property, position);
-					position.y += 2.5f * lineHeight;
+					if (!dataUnavailable)
+					{
+						position.y += 2.5f * lineHeight;
+					}
 					break;
 				case Unity.Map.ExtrusionType.RangeHeight:
 					position.y += lineHeight;
@@ -101,7 +110,10 @@
 					position.y += lineHeight;
 					//EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
 					DrawPropertyDropDown(property, position);
-					position.y += 2.5f * lineHeight;
+					if (!dataUnavailable)
+					{
+						position.y += 2.5f * lineHeight;
+					}
 					position.y += lineHeight;
 					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), minHeightProperty);
 					position.y += lineHeight;
@@ -121,7 +133,7 @@
 				default:
 					break;
 			}
-			position.y += lineHeight;
+				position.y += lineHeight;
 			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("extrusionScaleFactor"), new GUIContent { text = "Scale Factor" });
 			EditorGUI.indentLevel--;
 
@@ -133,21 +145,19 @@
 		{
 			var selectedLayerName = property.FindPropertyRelative("_selectedLayerName").stringValue;
 
-			if (string.IsNullOrEmpty(selectedLayerName))
-				return;
-
 			var serializedMapObject = property.serializedObject;
 			//serializedMapObject.Update();
 			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
 			tileJsonData = mapObject.VectorData.LayerProperty.tileJsonData;
 
 
-			if (tileJsonData == null || !tileJsonData.PropertyDisplayNames.ContainsKey(selectedLayerName))
+			if (string.IsNullOrEmpty(selectedLayerName) || tileJsonData == null || !tileJsonData.PropertyDisplayNames.ContainsKey(selectedLayerName))
 			{
+				DrawWarningMessage(position);
 				return;
 			}
 
-			
+			dataUnavailable = false;
 			var propertyDisplayNames = tileJsonData.PropertyDisplayNames[selectedLayerName];
 
 			if (_isInitialized == true)
@@ -189,6 +199,16 @@
 			EditorGUI.HelpBox(typePosition, descriptionString, MessageType.Info);
 		}
 
+		private void DrawWarningMessage(Rect position)
+		{
+			dataUnavailable = true;
+			Rect typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Property Name", tooltip = "The name of the property in the selected Mapbox layer that will be used for extrusion" });
+			EditorGUI.indentLevel-=2;
+			EditorGUI.HelpBox(typePosition, "No properties found : Invalid MapId / No Internet.", MessageType.None);
+			EditorGUI.indentLevel+=2;
+			return;
+		}
+
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
 			var extrusionTypeProperty = property.FindPropertyRelative("extrusionType");
@@ -205,13 +225,19 @@
 					case Unity.Map.ExtrusionType.PropertyHeight:
 					case Unity.Map.ExtrusionType.MinHeight:
 					case Unity.Map.ExtrusionType.MaxHeight:
-						rows += 6;
+						if (dataUnavailable)
+							rows += 3;
+						else
+							rows += 6;
 						break;
 					case Unity.Map.ExtrusionType.RangeHeight:
-						rows += 8;
+						if (dataUnavailable)
+							rows += 5;
+						else
+							rows += 8;
 						break;
 					case Unity.Map.ExtrusionType.AbsoluteHeight:
-						rows += 3;
+							rows += 3;
 						break;
 					default:
 						rows += 2;

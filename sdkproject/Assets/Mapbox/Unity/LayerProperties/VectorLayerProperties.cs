@@ -12,7 +12,6 @@
 		/// <summary>
 		/// Raw tileJSON response received from the requested source tileset id(s)
 		/// </summary>
-		public TileJSONResponse tileJSONResponse;
 		public TileJsonData tileJsonData = new TileJsonData();
 		public VectorSourceType sourceType = VectorSourceType.MapboxStreets;
 		public LayerSourceOptions sourceOptions = new LayerSourceOptions()

@@ -26,7 +26,7 @@
 		string objectId = "";
 		static string currentSource = "";
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
-		static TileJsonData tileJSONData = new TileJsonData();
+		static TileJsonData tileJsonData = new TileJsonData();
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
@@ -48,9 +48,9 @@
 			var serializedMapObject = property.serializedObject;
 			//serializedMapObject.Update();
 			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
-			tileJSONData = mapObject.VectorData.LayerProperty.tileJsonData;
+			tileJsonData = mapObject.VectorData.LayerProperty.tileJsonData;
 
-			var layerDisplayNames = tileJSONData.LayerDisplayNames;
+			var layerDisplayNames = tileJsonData.LayerDisplayNames;
 
 			var newSource = property.FindPropertyRelative("sourceId").stringValue;
 
@@ -88,14 +88,19 @@
 		private static int count = 0;
 		private void DrawLayerName(SerializedProperty property,Rect position,List<string> layerDisplayNames)
 		{
-			if (layerDisplayNames.Count == 0)
-				return;
-
-			//EditorTileJsonProps.layerNamesList = layerDisplayNames;
 			var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Layer Name", tooltip = "The layer name from the Mapbox tileset that would be used for visualizing a feature" });
+
+			if (layerDisplayNames.Count == 0)
+			{
+				EditorGUI.indentLevel--;
+				EditorGUI.HelpBox(typePosition, "No layers found : Invalid MapId / No Internet.", MessageType.None);
+				EditorGUI.indentLevel++;
+				return;
+			}
+
 			EditorGUI.indentLevel--;
 			index = EditorGUI.Popup(typePosition, index, layerDisplayNames.ToArray());
-			var parsedString = layerDisplayNames.ToArray()[index].Split(new string[] { tileJSONData.commonLayersKey }, System.StringSplitOptions.None)[0].Trim();
+			var parsedString = layerDisplayNames.ToArray()[index].Split(new string[] { tileJsonData.commonLayersKey }, System.StringSplitOptions.None)[0].Trim();
 			property.FindPropertyRelative("layerName").stringValue = parsedString;
 			EditorGUI.indentLevel++;
 		}

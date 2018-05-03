@@ -662,11 +662,6 @@ namespace Mapbox.Unity.Map
 			Options.loadingTexture = loadingTexture;
 			_mapVisualizer.SetLoadingTexture(loadingTexture);
 		}
-
-		/// <summary>
-		/// Raw tileJSON response received from the requested source tileset id(s)
-		/// </summary>
-		public TileJSONResponse tileJSONResponse;
 	}
 }
 
