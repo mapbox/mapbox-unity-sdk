@@ -4,6 +4,7 @@
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Unity.Utilities;
+	using Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies;
 
 	// Layer Concrete Implementation. 
 	[Serializable]
@@ -123,30 +124,32 @@
 
 		public void Initialize()
 		{
+			_elevationFactory = ScriptableObject.CreateInstance<TerrainFactoryBase>();
 			switch (_layerProperty.elevationLayerType)
 			{
 				case ElevationLayerType.FlatTerrain:
-					_elevationFactory = ScriptableObject.CreateInstance<FlatTerrainFactory>();
+					_elevationFactory.Strategy = new FlatTerrainStrategy();
 					break;
 				case ElevationLayerType.LowPolygonTerrain:
-					_elevationFactory = ScriptableObject.CreateInstance<LowPolyTerrainFactory>();
+					_elevationFactory.Strategy = new LowPolyTerrainStrategy();
 					break;
 				case ElevationLayerType.TerrainWithElevation:
 					if (_layerProperty.sideWallOptions.isActive)
 					{
-						_elevationFactory = ScriptableObject.CreateInstance<TerrainWithSideWallsFactory>();
+						_elevationFactory.Strategy = new ElevatedTerrainWithSidesStrategy();
 					}
 					else
 					{
-						_elevationFactory = ScriptableObject.CreateInstance<TerrainFactory>();
+						_elevationFactory.Strategy = new ElevatedTerrainStrategy();
 					}
 					break;
 				case ElevationLayerType.GlobeTerrain:
-					_elevationFactory = ScriptableObject.CreateInstance<FlatSphereTerrainFactory>();
+					_elevationFactory.Strategy = new FlatSphereTerrainStrategy();
 					break;
 				default:
 					break;
 			}
+
 			_elevationFactory.SetOptions(_layerProperty);
 		}
 
@@ -169,7 +172,7 @@
 				return _elevationFactory;
 			}
 		}
-		private AbstractTileFactory _elevationFactory;
+		private TerrainFactoryBase _elevationFactory;
 
 	}
 }

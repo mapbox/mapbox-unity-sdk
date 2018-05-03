@@ -11,6 +11,13 @@
 
 ##### Improvements
 - `UnityARInterface` updated to [commit 67351b6](https://github.com/Unity-Technologies/experimental-ARInterface/commit/67351b66ff9af28380e7dd5f5b2f4ba1bf802ca8) from March 1st 2018
+- Changes to terrain factory (#623)
+  - Create a new base class
+  - Introduce all different terrains as strategies
+  - Change sidewalls as a property on elevated terrain strategy
+- Data Fetching Changes (#622)
+  - Move data calls from factories to DataFetcher classes
+  - Factories register to events in DataFetchers
 
 ### v.1.4.1
 *04/17/2018*
