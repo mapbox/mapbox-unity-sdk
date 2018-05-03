@@ -22,9 +22,9 @@
 			}
 		}
 
-		static List<string> layerNameList = new List<string>();
-		bool _isInitialized = false;
+		static bool _isInitialized = false;
 		string objectId = "";
+		static string currentSource = "";
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		static TileJsonData tileJSONData = new TileJsonData();
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -51,16 +51,24 @@
 			tileJSONData = mapObject.VectorData.LayerProperty.tileJsonData;
 
 			var layerDisplayNames = tileJSONData.LayerDisplayNames;
-			if (_isInitialized == true)
+
+			var newSource = property.FindPropertyRelative("sourceId").stringValue;
+
+			if(_isInitialized)
 			{
+				if (currentSource != newSource)
+				{
+					index = 0;
+				}
+				currentSource = newSource;
+
 				DrawLayerName(property, position, layerDisplayNames);
 			}
 			else
 			{
 				_isInitialized = true;
-				//DrawLayerName(property, position, layerDisplayNames);
+				currentSource = newSource;
 			}
-
 
 			position.y += lineHeight;
 			EditorGUI.PropertyField(position, property.FindPropertyRelative("snapToTerrain"));
@@ -83,25 +91,11 @@
 			if (layerDisplayNames.Count == 0)
 				return;
 
-			if(layerDisplayNames.Count!=count)
-			{
-				count = layerDisplayNames.Count;
-			}
-			if (!layerDisplayNames.SequenceEqual(layerNameList))
-			{
-				index = 0;
-				layerNameList = layerDisplayNames;
-			}
-
-			if(layerNameList.Count<index)
-			{
-				index = 0;
-				return;
-			}
+			//EditorTileJsonProps.layerNamesList = layerDisplayNames;
 			var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Layer Name", tooltip = "The layer name from the Mapbox tileset that would be used for visualizing a feature" });
 			EditorGUI.indentLevel--;
-			index = EditorGUI.Popup(typePosition, index, layerNameList.ToArray());
-			var parsedString = layerNameList[index].Split(new string[] { tileJSONData.commonLayersKey }, System.StringSplitOptions.None)[0].Trim();
+			index = EditorGUI.Popup(typePosition, index, layerDisplayNames.ToArray());
+			var parsedString = layerDisplayNames.ToArray()[index].Split(new string[] { tileJSONData.commonLayersKey }, System.StringSplitOptions.None)[0].Trim();
 			property.FindPropertyRelative("layerName").stringValue = parsedString;
 			EditorGUI.indentLevel++;
 		}

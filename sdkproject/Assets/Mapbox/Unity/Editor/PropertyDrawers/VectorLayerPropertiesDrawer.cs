@@ -229,7 +229,7 @@
 					subLayerCoreOptions.FindPropertyRelative("snapToTerrain").boolValue = true;
 					subLayerCoreOptions.FindPropertyRelative("groupFeatures").boolValue = false;
 					subLayerCoreOptions.FindPropertyRelative("lineWidth").floatValue = 1.0f;
-
+						
 					var subLayerExtrusionOptions = subLayer.FindPropertyRelative("extrusionOptions");
 					subLayerExtrusionOptions.FindPropertyRelative("extrusionType").enumValueIndex = (int)ExtrusionType.None;
 					subLayerExtrusionOptions.FindPropertyRelative("extrusionGeometryType").enumValueIndex = (int)ExtrusionGeometryType.RoofAndSide;
@@ -279,7 +279,7 @@
 					var layerProperty = subLayerArray.GetArrayElementAtIndex(SelectionIndex);
 
 					layerProperty.isExpanded = true;
-					DrawLayerVisualizerProperties(sourceTypeValue,layerProperty);
+					DrawLayerVisualizerProperties(sourceTypeValue,layerProperty, property);
 				}
 				else
 				{
@@ -291,7 +291,7 @@
 			//serializedMapObject.ApplyModifiedProperties();
 		}
 
-		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty)
+		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty, SerializedProperty property)
 		{
 			EditorGUI.indentLevel++;
 			GUILayout.Label("Vector Layer Visualizer Properties");
@@ -302,6 +302,8 @@
 			VectorPrimitiveType primitiveTypeProp = (VectorPrimitiveType)subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex;
 
 			EditorGUILayout.PropertyField(subLayerCoreOptions);
+
+			subLayerCoreOptions.FindPropertyRelative("sourceId").stringValue = property.FindPropertyRelative("sourceOptions.layerSource.Id").stringValue;
 
 			var extrusionOptions = layerProperty.FindPropertyRelative("extrusionOptions");
 			//loading up the selectedLayerName for extrusion options to pull up the right propertyName
