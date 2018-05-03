@@ -106,10 +106,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			OnUnregistered(tile);
 		}
 
-		internal abstract void OnInitialized();
+		protected abstract void OnInitialized();
 
-		internal abstract void OnRegistered(UnityTile tile);
+		protected abstract void OnRegistered(UnityTile tile);
 
-		internal abstract void OnUnregistered(UnityTile tile);
+		protected abstract void OnUnregistered(UnityTile tile);
 	}
 }

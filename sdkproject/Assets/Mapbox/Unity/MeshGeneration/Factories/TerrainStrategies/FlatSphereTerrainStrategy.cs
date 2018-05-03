@@ -1,36 +1,23 @@
-﻿namespace Mapbox.Unity.MeshGeneration.Factories
+﻿using System.Collections.Generic;
+using UnityEngine;
+using Mapbox.Unity.MeshGeneration.Data;
+using Mapbox.Unity.Map;
+using Mapbox.Utils;
+using Mapbox.Unity.Utilities;
+
+namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 {
-	using UnityEngine;
-	using Mapbox.Unity.MeshGeneration.Data;
-	using Mapbox.Unity.Utilities;
-	using System.Collections.Generic;
-	using Mapbox.Utils;
-	using Mapbox.Unity.Map;
 
-	[CreateAssetMenu(menuName = "Mapbox/Factories/Terrain Factory - Flat Sphere")]
-	public class FlatSphereTerrainFactory : AbstractTileFactory
+	public class FlatSphereTerrainStrategy : TerrainStrategy
 	{
+		public float Radius { get { return _elevationOptions.modificationOptions.earthRadius; } }
 
-		public float Radius
+		public override void Initialize(ElevationLayerProperties elOptions)
 		{
-			get
-			{
-				return _elevationOptions.modificationOptions.earthRadius;
-			}
-		}
-		[SerializeField]
-		ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
-		public override void SetOptions(LayerProperties options)
-		{
-			_elevationOptions = (ElevationLayerProperties)options;
+			_elevationOptions = elOptions;
 		}
 
-		internal override void OnInitialized()
-		{
-
-		}
-
-		internal override void OnRegistered(UnityTile tile)
+		public override void RegisterTile(UnityTile tile)
 		{
 			if (_elevationOptions.unityLayerOptions.addToLayer && tile.gameObject.layer != _elevationOptions.unityLayerOptions.layerId)
 			{
@@ -48,10 +35,7 @@
 				tile.gameObject.AddComponent<MeshFilter>();
 			}
 
-			// HACK: This is here in to make the system trigger a finished state.
-			Progress++;
 			GenerateTerrainMesh(tile);
-			Progress--;
 
 			if (_elevationOptions.requiredOptions.addCollider && tile.Collider == null)
 			{
@@ -121,9 +105,10 @@
 			tile.transform.localPosition = Mapbox.Unity.Constants.Math.Vector3Zero;
 		}
 
-		internal override void OnUnregistered(UnityTile tile)
+		public override void UnregisterTile(UnityTile tile)
 		{
 
 		}
 	}
+
 }
