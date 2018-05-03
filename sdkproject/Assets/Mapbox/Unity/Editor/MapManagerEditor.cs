@@ -1,102 +1,170 @@
 ﻿namespace Mapbox.Editor
 {
-	using System.Collections;
-	using System.Collections.Generic;
 	using UnityEngine;
 	using UnityEditor;
 	using Mapbox.Unity.Map;
-	using Mapbox.VectorTile.ExtensionMethods;
-	using Mapbox.Unity.Location;
 
 	[CustomEditor(typeof(AbstractMap))]
 	[CanEditMultipleObjects]
 	public class MapManagerEditor : Editor
 	{
-		static bool showGeneral = true;
-		static bool showImage = false;
-		static bool showTerrain = false;
-		static bool showVector = false;
+		/// <summary>
+		/// Gets or sets a value indicating whether to show general section <see cref="T:Mapbox.Editor.MapManagerEditor"/>.
+		/// </summary>
+		/// <value><c>true</c> then show general section; otherwise hide, <c>false</c>.</value>
+		bool ShowGeneral
+		{
+			get
+			{
+				return EditorPrefs.GetBool("MapManagerEditor_showGeneral");
+			}
+			set
+			{
+				EditorPrefs.SetBool("MapManagerEditor_showGeneral", value);
+			}
+		}
+		/// <summary>
+		/// Gets or sets a value to show or hide Image section<see cref="T:Mapbox.Editor.MapManagerEditor"/>.
+		/// </summary>
+		/// <value><c>true</c> if show image; otherwise, <c>false</c>.</value>
+		bool ShowImage
+		{
+			get
+			{
+				return EditorPrefs.GetBool("MapManagerEditor_showImage");
+			}
+			set
+			{
+				EditorPrefs.SetBool("MapManagerEditor_showImage", value);
+			}
+		}
+		/// <summary>
+		/// Gets or sets a value to show or hide Terrain section <see cref="T:Mapbox.Editor.MapManagerEditor"/>
+		/// </summary>
+		/// <value><c>true</c> if show terrain; otherwise, <c>false</c>.</value>
+		bool ShowTerrain
+		{
+			get
+			{
+				return EditorPrefs.GetBool("MapManagerEditor_showTerrain");
+			}
+			set
+			{
+				EditorPrefs.SetBool("MapManagerEditor_showTerrain", value);
+			}
+		}
+		/// <summary>
+		/// Gets or sets a value to show or hide Vector section <see cref="T:Mapbox.Editor.MapManagerEditor"/>.
+		/// </summary>
+		/// <value><c>true</c> if show vector; otherwise, <c>false</c>.</value>
+		bool ShowLocationPrefabs
+		{
+			get
+			{
+				return EditorPrefs.GetBool("MapManagerEditor_showLocationPrefabs");
+			}
+			set
+			{
+				EditorPrefs.SetBool("MapManagerEditor_showLocationPrefabs", value);
+			}
+		}
 
-		bool showPosition = false;
+		/// <summary>
+		/// Gets or sets a value to show or hide Vector section <see cref="T:Mapbox.Editor.MapManagerEditor"/>.
+		/// </summary>
+		/// <value><c>true</c> if show vector; otherwise, <c>false</c>.</value>
+		bool ShowVector
+		{
+			get
+			{
+				return EditorPrefs.GetBool("MapManagerEditor_showVector");
+			}
+			set
+			{
+				EditorPrefs.SetBool("MapManagerEditor_showVector", value);
+			}
+		}
+
+
+		bool ShowPosition
+		{
+			get
+			{
+				return EditorPrefs.GetBool("MapManagerEditor_showPosition");
+			}
+			set
+			{
+				EditorPrefs.SetBool("MapManagerEditor_showPosition", value);
+			}
+		}
+
+		private GUIContent _mapIdGui = new GUIContent
+		{
+			text = "Required Map Id",
+			tooltip = "For location prefabs to spawn the \"streets-v7\" tileset needs to be a part of the Vector data source"
+		};
+
 		public override void OnInspectorGUI()
 		{
 			serializedObject.Update();
 			GUILayout.BeginVertical();
 			EditorGUILayout.Space();
 
-			showGeneral = EditorGUILayout.Foldout(showGeneral, new GUIContent { text = "GENERAL", tooltip = "Options related to map data" });
-			if (showGeneral)
+			ShowGeneral = EditorGUILayout.Foldout(ShowGeneral, new GUIContent { text = "GENERAL", tooltip = "Options related to map data" });
+			if (ShowGeneral)
 			{
-				//EditorGUILayout.Space();
-				//EditorGUILayout.LabelField("Presets");
-				//selected = property.FindPropertyRelative("mapPreset").enumValueIndex;
-				//var options = property.FindPropertyRelative("mapPreset").enumDisplayNames;
-
-				//GUIContent[] content = new GUIContent[options.Length];
-				//for (int i = 0; i < options.Length; i++)
-				//{
-				//	content[i] = new GUIContent();
-				//	content[i].text = options[i];
-				//	content[i].tooltip = EnumExtensions.Description((MapPresetType)i);
-				//}
-				//selected = property.FindPropertyRelative("mapPreset").enumValueIndex;
-				//selected = GUILayout.SelectionGrid(selected, content, options.Length);
-
-
-				//if (selected != previousSelection)
-				//{
-				//	previousSelection = selected;
-				//	property.FindPropertyRelative("mapPreset").enumValueIndex = selected;
-
-				//	switch ((MapPresetType)selected)
-				//	{
-				//		case MapPresetType.LocationBasedMap:
-				//			PresetLocationBased(property);
-
-				//			//TODO : Get opinions on this UX. 
-				//			//var locationProvider = _map.gameObject.GetComponent<LocationProviderFactory>();
-				//			//Debug.Log("target -> " + ((locationProvider == null) ? "null" : "notnull"));
-				//			//if (locationProvider == null)
-				//			//(_map.gameObject).AddComponent<LocationProviderFactory>();
-				//			break;
-				//		case MapPresetType.WorldSimulator:
-				//			PresetWorldSimulator(property);
-				//			break;
-				//		case MapPresetType.ARTableTop:
-				//			break;
-				//		case MapPresetType.ARWorldScale:
-				//			PresetARWorldScale(property);
-				//			break;
-				//		default:
-				//			break;
-				//	}
-
-				//}
-
 				EditorGUILayout.Space();
 				DrawMapOptions(serializedObject);
 			}
 
 			ShowSepartor();
 
-			showImage = EditorGUILayout.Foldout(showImage, "IMAGE");
-			if (showImage)
+			ShowImage = EditorGUILayout.Foldout(ShowImage, "IMAGE");
+			if (ShowImage)
 			{
 				ShowSection(serializedObject.FindProperty("_imagery"), "_layerProperty");
 			}
 
 			ShowSepartor();
 
-			showTerrain = EditorGUILayout.Foldout(showTerrain, "TERRAIN");
-			if (showTerrain)
+			ShowTerrain = EditorGUILayout.Foldout(ShowTerrain, "TERRAIN");
+			if (ShowTerrain)
 			{
 				ShowSection(serializedObject.FindProperty("_terrain"), "_layerProperty");
 			}
 
 			ShowSepartor();
 
-			showVector = EditorGUILayout.Foldout(showVector, "VECTOR");
-			if (showVector)
+			ShowLocationPrefabs = EditorGUILayout.Foldout(ShowLocationPrefabs, "LOCATION PREFABS");
+			if (ShowLocationPrefabs)
+			{
+				var vectorDataProperty = serializedObject.FindProperty("_vectorData");
+
+
+				var layerProperty = vectorDataProperty.FindPropertyRelative("_layerProperty");
+				var layerSourceProperty = layerProperty.FindPropertyRelative("sourceOptions");
+				var sourceType = layerProperty.FindPropertyRelative("_sourceType");
+				VectorSourceType sourceTypeValue = (VectorSourceType)sourceType.enumValueIndex;
+				string streets_v7 = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id;
+				string layerString = layerProperty.FindPropertyRelative("sourceOptions.layerSource.Id").stringValue;
+
+				if(sourceTypeValue != VectorSourceType.None && layerString.Contains(streets_v7))
+				{
+					GUI.enabled = false;
+					EditorGUILayout.TextField(_mapIdGui, streets_v7);
+					GUI.enabled = true;
+					ShowSection(vectorDataProperty, "_locationPrefabsLayerProperties");
+				}
+				else
+				{
+					EditorGUILayout.HelpBox("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the data source in the Vector section.",MessageType.Error);
+				}
+			}
+
+			ShowSepartor();
+
+			ShowVector = EditorGUILayout.Foldout(ShowVector, "VECTOR");
+			if (ShowVector)
 			{
 				ShowSection(serializedObject.FindProperty("_vectorData"), "_layerProperty");
 			}
@@ -109,8 +177,8 @@
 		{
 			EditorGUILayout.Space();
 			EditorGUILayout.PropertyField(property.FindPropertyRelative(propertyName));
-
 		}
+
 		void ShowSepartor()
 		{
 			EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
@@ -139,8 +207,8 @@
 
 			EditorGUILayout.PropertyField(serializedObject.FindProperty("_initializeOnStart"));
 
-			showPosition = EditorGUILayout.Foldout(showPosition, "Others");
-			if (showPosition)
+			ShowPosition = EditorGUILayout.Foldout(ShowPosition, "Others");
+			if (ShowPosition)
 			{
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("placementOptions"));
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("scalingOptions"));
@@ -150,8 +218,8 @@
 
 		void PresetLocationBased(SerializedProperty unifiedMap)
 		{
-			//Set 
-			//placement = atLocationCenter, 
+			//Set
+			//placement = atLocationCenter,
 			//scaling = custom
 			//turn off vector layers.
 			var mapOptionsProp = unifiedMap.FindPropertyRelative("mapOptions");
@@ -175,8 +243,8 @@
 
 		void PresetWorldSimulator(SerializedProperty unifiedMap)
 		{
-			//Set 
-			//placement = atLocationCenter, 
+			//Set
+			//placement = atLocationCenter,
 			//scaling = custom
 			//turn on vector layers.
 			var mapOptionsProp = unifiedMap.FindPropertyRelative("mapOptions");
@@ -199,8 +267,8 @@
 
 		void PresetARTableTop(SerializedProperty unifiedMap)
 		{
-			//Set 
-			//placement = atLocationCenter, 
+			//Set
+			//placement = atLocationCenter,
 			//scaling = custom
 			//turn on vector layers.
 			var mapOptionsProp = unifiedMap.FindPropertyRelative("mapOptions");
@@ -222,8 +290,8 @@
 
 		void PresetARWorldScale(SerializedProperty unifiedMap)
 		{
-			//Set 
-			//placement = atLocationCenter, 
+			//Set
+			//placement = atLocationCenter,
 			//scaling = custom
 			//turn on vector layers.
 			var mapOptionsProp = unifiedMap.FindPropertyRelative("mapOptions");

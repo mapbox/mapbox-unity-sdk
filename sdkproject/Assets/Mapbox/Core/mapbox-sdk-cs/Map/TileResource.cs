@@ -9,7 +9,7 @@ namespace Mapbox.Map
 	using System;
 	using Mapbox.Unity.Telemetry;
 
-	internal sealed class TileResource : IResource
+	public sealed class TileResource : IResource
 	{
 		readonly string _query;
 
@@ -65,7 +65,8 @@ namespace Mapbox.Map
 				uriBuilder.Query = TelemetryFactory.EventQuery;
 			}
 
-			return uriBuilder.ToString();
+			//return uriBuilder.ToString();
+			return uriBuilder.Uri.ToString();
 		}
 	}
 }

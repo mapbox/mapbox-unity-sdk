@@ -26,7 +26,8 @@ namespace Mapbox.Unity.Map
 	{
 		public void SetUpScaling(AbstractMap map)
 		{
-			map.SetWorldRelativeScale(Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x));
+			var scaleFactor = Mathf.Pow(2, (map.AbsoluteZoom - map.InitialZoom));
+			map.SetWorldRelativeScale(scaleFactor * Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x));
 		}
 	}
 
@@ -62,13 +63,28 @@ namespace Mapbox.Unity.Map
 	}
 	/// <summary>
 	/// Abstract map.
-	/// This is the main monobehavior which controls the map. It controls the visualization of map data. 
-	/// Abstract map encapsulates the image, terrain and vector sources and provides a centralized interface to control the visualization of the map. 
+	/// This is the main monobehavior which controls the map. It controls the visualization of map data.
+	/// Abstract map encapsulates the image, terrain and vector sources and provides a centralized interface to control the visualization of the map.
 	/// </summary>
 	public class AbstractMap : MonoBehaviour, IMap
 	{
+		/// <summary>
+		/// Setting to trigger map initialization in Unity's Start method.
+		/// if set to false, Initialize method should be called explicitly to initialize the map.
+		/// </summary>
 		[SerializeField]
 		private bool _initializeOnStart = true;
+		public bool InitializeOnStart
+		{
+			get
+			{
+				return _initializeOnStart;
+			}
+			set
+			{
+				_initializeOnStart = value;
+			}
+		}
 		/// <summary>
 		/// The map options.
 		/// Options to control the behaviour of the map like location,extent, scale and placement.
@@ -87,7 +103,7 @@ namespace Mapbox.Unity.Map
 			}
 		}
 		/// <summary>
-		/// Options to control the imagery component of the map. 
+		/// Options to control the imagery component of the map.
 		/// </summary>
 		[SerializeField]
 		ImageryLayer _imagery = new ImageryLayer();
@@ -112,10 +128,11 @@ namespace Mapbox.Unity.Map
 				return _terrain;
 			}
 		}
+
 		/// <summary>
 		/// The vector data.
-		/// Options to control the vector data component of the map. 
-		/// Adds a vector source and visualizers to define the rendering behaviour of vector data layers. 
+		/// Options to control the vector data component of the map.
+		/// Adds a vector source and visualizers to define the rendering behaviour of vector data layers.
 		/// </summary>
 		[SerializeField]
 		VectorLayer _vectorData = new VectorLayer();
@@ -188,8 +205,8 @@ namespace Mapbox.Unity.Map
 
 		protected int _initialZoom;
 		/// <summary>
-		/// Gets the initial zoom at which the map was initialized. 
-		/// This parameter is useful in calculating the scale of the tiles and the map. 
+		/// Gets the initial zoom at which the map was initialized.
+		/// This parameter is useful in calculating the scale of the tiles and the map.
 		/// </summary>
 		/// <value>The initial zoom.</value>
 		public int InitialZoom
@@ -233,8 +250,8 @@ namespace Mapbox.Unity.Map
 			}
 		}
 		/// <summary>
-		/// Gets the current zoom value of the map. 
-		/// Use <c>AbsoluteZoom</c> to get the zoom level of the tileset. 
+		/// Gets the current zoom value of the map.
+		/// Use <c>AbsoluteZoom</c> to get the zoom level of the tileset.
 		/// <seealso cref="AbsoluteZoom"/>
 		/// </summary>
 		/// <value>The zoom.</value>
@@ -274,7 +291,18 @@ namespace Mapbox.Unity.Map
 		{
 			_worldRelativeScale = scale;
 		}
+
+		/// <summary>
+		/// Event delegate, gets called after map is initialized
+		/// <seealso cref="OnUpdated"/>
+		/// </summary>
 		public event Action OnInitialized = delegate { };
+		/// <summary>
+		/// Event delegate, gets called after map is updated.
+		/// <c>UpdateMap</c> will trigger this event.
+		/// <seealso cref="OnInitialized"/>
+		/// </summary>
+		public event Action OnUpdated = delegate { };
 
 		void Awake()
 		{
@@ -300,8 +328,8 @@ namespace Mapbox.Unity.Map
 		}
 		/// <summary>
 		/// Sets up map.
-		/// This method uses the mapOptions and layer properties to setup the map to be rendered. 
-		/// Override <c>SetUpMap</c> to write custom behavior to map setup. 
+		/// This method uses the mapOptions and layer properties to setup the map to be rendered.
+		/// Override <c>SetUpMap</c> to write custom behavior to map setup.
 		/// </summary>
 		protected virtual void SetUpMap()
 		{
@@ -332,7 +360,7 @@ namespace Mapbox.Unity.Map
 			if (_options.extentOptions.extentType != MapExtentType.Custom)
 			{
 				ITileProviderOptions tileProviderOptions = _options.extentOptions.GetTileProviderOptions();
-				// Setup tileprovider based on type. 
+				// Setup tileprovider based on type.
 				switch (_options.extentOptions.extentType)
 				{
 					case MapExtentType.CameraBounds:
@@ -431,7 +459,7 @@ namespace Mapbox.Unity.Map
 		}
 		/// <summary>
 		/// Initialize the map using the specified latLon and zoom.
-		/// Map will automatically get initialized in the <c>Start</c> method. 
+		/// Map will automatically get initialized in the <c>Start</c> method.
 		/// Use this method to explicitly initialize the map and disable intialize on <c>Start</c>
 		/// </summary>
 		/// <returns>The initialize.</returns>
@@ -451,9 +479,9 @@ namespace Mapbox.Unity.Map
 		}
 		/// <summary>
 		/// Updates the map.
-		/// Use this method to update the location of the map. 
-		/// Update method should be used when panning, zooming or changing location of the map. 
-		/// This method avoid startup delays that might occur on re-initializing the map. 
+		/// Use this method to update the location of the map.
+		/// Update method should be used when panning, zooming or changing location of the map.
+		/// This method avoid startup delays that might occur on re-initializing the map.
 		/// </summary>
 		/// <param name="latLon">LatitudeLongitude.</param>
 		/// <param name="zoom">Zoom level.</param>
@@ -473,7 +501,7 @@ namespace Mapbox.Unity.Map
 			xDelta = xDelta > 0 ? Mathd.Min(xDelta, Mapbox.Utils.Constants.LatitudeMax) : Mathd.Max(xDelta, -Mapbox.Utils.Constants.LatitudeMax);
 			zDelta = zDelta > 0 ? Mathd.Min(zDelta, Mapbox.Utils.Constants.LongitudeMax) : Mathd.Max(zDelta, -Mapbox.Utils.Constants.LongitudeMax);
 
-			//Set Center in Latitude Longitude and Mercator. 
+			//Set Center in Latitude Longitude and Mercator.
 			SetCenterLatitudeLongitude(new Vector2d(xDelta, zDelta));
 			Options.scalingOptions.scalingStrategy.SetUpScaling(this);
 
@@ -486,10 +514,15 @@ namespace Mapbox.Unity.Map
 				_mapScaleFactor.y = 1;
 				Root.localScale = _mapScaleFactor;
 			}
+
+			if (OnUpdated != null)
+			{
+				OnUpdated();
+			}
 		}
 		/// <summary>
 		/// Resets the map.
-		/// Use this method to reset the map to and reset all parameters. 
+		/// Use this method to reset the map to and reset all parameters.
 		/// </summary>
 		public void ResetMap()
 		{
@@ -543,9 +576,9 @@ namespace Mapbox.Unity.Map
 			OnInitialized();
 		}
 
-		internal Vector3 GeoToWorldPositionXZ(Vector2d latitudeLongitude)
+		private Vector3 GeoToWorldPositionXZ(Vector2d latitudeLongitude)
 		{
-			// For quadtree implementation of the map, the map scale needs to be compensated for. 
+			// For quadtree implementation of the map, the map scale needs to be compensated for.
 			var scaleFactor = Mathf.Pow(2, (InitialZoom - AbsoluteZoom));
 			var worldPos = Conversions.GeoToWorldPosition(latitudeLongitude, CenterMercator, WorldRelativeScale * scaleFactor).ToVector3xz();
 			return Root.TransformPoint(worldPos);
@@ -570,7 +603,7 @@ namespace Mapbox.Unity.Map
 
 		}
 		/// <summary>
-		/// Converts a latitude longitude into map space position. 
+		/// Converts a latitude longitude into map space position.
 		/// </summary>
 		/// <returns>Position in map space.</returns>
 		/// <param name="latitudeLongitude">Latitude longitude.</param>
@@ -589,13 +622,13 @@ namespace Mapbox.Unity.Map
 			return worldPos;
 		}
 		/// <summary>
-		/// Converts a position in map space into a laitude longitude. 
+		/// Converts a position in map space into a laitude longitude.
 		/// </summary>
 		/// <returns>Position in Latitude longitude.</returns>
 		/// <param name="realworldPoint">Realworld point.</param>
 		public virtual Vector2d WorldToGeoPosition(Vector3 realworldPoint)
 		{
-			// For quadtree implementation of the map, the map scale needs to be compensated for. 
+			// For quadtree implementation of the map, the map scale needs to be compensated for.
 			var scaleFactor = Mathf.Pow(2, (InitialZoom - AbsoluteZoom));
 
 			return (Root.InverseTransformPoint(realworldPoint)).GetGeoPosition(CenterMercator, WorldRelativeScale * scaleFactor);
@@ -629,6 +662,163 @@ namespace Mapbox.Unity.Map
 			Options.loadingTexture = loadingTexture;
 			_mapVisualizer.SetLoadingTexture(loadingTexture);
 		}
+
+		#region Location Prefabs Methods
+
+		/// <summary>
+		/// Places a prefab at the specified LatLon on the Map.
+		/// </summary>
+		/// <param name="prefab"> A Game Object Prefab.</param>
+		/// <param name="LatLon">A Vector2d(Latitude Longitude) object</param>
+		public void SpawnPrefabAtGeoLocation(GameObject prefab, 
+		                                     Vector2d LatLon, 
+		                                     Action<List<GameObject>> callback = null, 
+		                                     bool scaleDownWithWorld = true, 
+		                                     string locationItemName = "New Location")
+		{
+			var latLonArray = new Vector2d[] { LatLon };
+			SpawnPrefabAtGeoLocation(prefab, latLonArray, callback, scaleDownWithWorld, locationItemName);
+		}
+
+		/// <summary>
+		/// Places a prefab at all locations specified by the LatLon array.
+		/// </summary>
+		/// <param name="prefab"> A Game Object Prefab.</param>
+		/// <param name="LatLon">A Vector2d(Latitude Longitude) object</param>
+		public void SpawnPrefabAtGeoLocation(GameObject prefab, 
+		                                     Vector2d[] LatLon, 
+		                                     Action<List<GameObject>> callback = null, 
+		                                     bool scaleDownWithWorld = true, 
+		                                     string locationItemName = "New Location")
+		{
+			var coordinateArray = new string[LatLon.Length];
+			for (int i = 0; i < LatLon.Length; i++)
+			{
+				coordinateArray[i] = LatLon[i].x + ", " + LatLon[i].y;
+			}
+
+			PrefabItemOptions item = new PrefabItemOptions()
+			{
+				findByType = LocationPrefabFindBy.AddressOrLatLon,
+				prefabItemName = locationItemName,
+				spawnPrefabOptions = new SpawnPrefabOptions()
+				{
+					prefab = prefab,
+					scaleDownWithWorld = scaleDownWithWorld
+				},
+
+				coordinates = coordinateArray
+			};
+
+			if (callback != null)
+			{
+				item.OnAllPrefabsInstantiated += callback;
+			}
+
+			CreatePrefabLayer(item);
+		}
+
+		/// <summary>
+		/// Places the prefab for supplied categories.
+		/// </summary>
+		/// <param name="prefab">GameObject Prefab</param>
+		/// <param name="categories"><see cref="LocationPrefabCategories"/> For more than one category separate them by pipe 
+		/// (eg: LocationPrefabCategories.Food | LocationPrefabCategories.Nightlife)</param>
+		/// <param name="density">Density controls the number of POIs on the map.(Integer value between 1 and 30)</param>
+		/// <param name="locationItemName">Name of this location prefab item for future reference</param>
+		/// <param name="scaleDownWithWorld">Should the prefab scale up/down along with the map game object?</param>
+		public void SpawnPrefabByCategory(GameObject prefab, 
+		                                  LocationPrefabCategories categories = LocationPrefabCategories.AnyCategory, 
+		                                  int density = 30, Action<List<GameObject>> callback = null, 
+		                                  bool scaleDownWithWorld = true, 
+		                                  string locationItemName = "New Location")
+		{
+			PrefabItemOptions item = new PrefabItemOptions()
+			{
+				findByType = LocationPrefabFindBy.MapboxCategory,
+				categories = categories,
+				density = density,
+				prefabItemName = locationItemName,
+				spawnPrefabOptions = new SpawnPrefabOptions()
+				{
+					prefab = prefab,
+					scaleDownWithWorld = scaleDownWithWorld
+				}
+			};
+
+			if (callback != null)
+			{
+				item.OnAllPrefabsInstantiated += callback;
+			}
+
+			CreatePrefabLayer(item);
+		}
+
+		/// <summary>
+		/// Places the prefab at POI locations if its name contains the supplied string
+		/// <param name="prefab">GameObject Prefab</param>
+		/// <param name="nameString">This is the string that will be checked against the POI name to see if is contained in it, and ony those POIs will be spawned</param>
+		/// <param name="density">Density (Integer value between 1 and 30)</param>
+		/// <param name="locationItemName">Name of this location prefab item for future reference</param>
+		/// <param name="scaleDownWithWorld">Should the prefab scale up/down along with the map game object?</param>
+		/// </summary>
+		public void SpawnPrefabByName(GameObject prefab, 
+		                              string nameString, 
+		                              int density = 30, 
+		                              Action<List<GameObject>> callback = null, 
+		                              bool scaleDownWithWorld = true, 
+		                              string locationItemName = "New Location")
+		{
+			PrefabItemOptions item = new PrefabItemOptions()
+			{
+				findByType = LocationPrefabFindBy.POIName,
+				nameString = nameString, 
+				density = density,
+				prefabItemName = locationItemName,
+				spawnPrefabOptions = new SpawnPrefabOptions()
+				{
+					prefab = prefab,
+					scaleDownWithWorld = scaleDownWithWorld
+				}
+			};
+
+			CreatePrefabLayer(item);
+		}
+
+		/// <summary>
+		/// Creates the prefab layer.
+		/// </summary>
+		/// <param name="item"> the options of the prefab layer.</param>
+		private void CreatePrefabLayer( PrefabItemOptions item )
+		{
+			if (_vectorData.LayerProperty.sourceType == VectorSourceType.None 
+			|| !_vectorData.LayerProperty.sourceOptions.Id.Contains(MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id))
+			{
+				Debug.LogError("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the list of vector data sources");
+				return;
+			}
+
+			//ensure that there is a vector layer
+			if (_vectorData == null)
+			{
+				_vectorData = new VectorLayer();
+			}
+
+			//ensure that there is a list of prefabitems
+			if (_vectorData.LocationPrefabsLayerProperties.locationPrefabList == null)
+			{
+				_vectorData.LocationPrefabsLayerProperties.locationPrefabList = new List<PrefabItemOptions>();
+			}
+
+			//add the prefab item if it doesn't already exist
+			if (!_vectorData.LayerProperty.vectorSubLayers.Contains(item))
+			{
+				_vectorData.LocationPrefabsLayerProperties.locationPrefabList.Add(item);
+				_vectorData.AddVectorLayer(item);
+			}
+
+		}
+
+  		#endregion
 	}
 }
-

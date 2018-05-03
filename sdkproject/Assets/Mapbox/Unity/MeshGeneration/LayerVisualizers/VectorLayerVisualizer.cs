@@ -14,14 +14,37 @@
 	public class VectorLayerVisualizer : LayerVisualizerBase
 	{
 		VectorSubLayerProperties _layerProperties;
-		LayerPerformanceOptions _performanceOptions;
-		private Dictionary<UnityTile, List<int>> _activeCoroutines;
+		public VectorSubLayerProperties SubLayerProperties
+		{
+			get
+			{
+				return _layerProperties;
+			}
+			set
+			{
+				_layerProperties = value;
+			}
+		}
+
+		public ModifierStackBase DefaultModifierStack
+		{
+			get
+			{
+				return _defaultStack;
+			}
+			set
+			{
+				_defaultStack = value;
+			}
+		}
+
+		protected LayerPerformanceOptions _performanceOptions;
+		protected Dictionary<UnityTile, List<int>> _activeCoroutines;
 		int _entityInCurrentCoroutine = 0;
 
-		ModifierStackBase _defaultStack;
+		protected ModifierStackBase _defaultStack;
 		private HashSet<ulong> _activeIds;
 		private Dictionary<UnityTile, List<ulong>> _idPool; //necessary to keep _activeIds list up to date when unloading tiles
-
 		private string _key;
 
 		public override string Key
@@ -29,11 +52,11 @@
 			get { return _layerProperties.coreOptions.layerName; }
 			set { _layerProperties.coreOptions.layerName = value; }
 		}
+
 		public void SetProperties(VectorSubLayerProperties properties, LayerPerformanceOptions performanceOptions)
 		{
 			List<MeshModifier> defaultMeshModifierStack = new List<MeshModifier>();
-			List<GameObjectModifier> defaultGOModifierStack = new List<GameObjectModifier>();
-
+		 	List<GameObjectModifier> defaultGOModifierStack = new List<GameObjectModifier>();
 			_layerProperties = properties;
 			_performanceOptions = performanceOptions;
 
@@ -46,6 +69,7 @@
 			else
 			{
 				_defaultStack = ScriptableObject.CreateInstance<ModifierStack>();
+				((ModifierStack)_defaultStack).moveFeaturePositionTo = _layerProperties.moveFeaturePositionTo;
 			}
 
 			_defaultStack.MeshModifiers = new List<MeshModifier>();
@@ -55,7 +79,7 @@
 			{
 				case VectorPrimitiveType.Point:
 				case VectorPrimitiveType.Custom:
-					// Let the user add anything that they want 
+					// Let the user add anything that they want
 					if (_layerProperties.coreOptions.snapToTerrain == true)
 					{
 						defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
@@ -78,6 +102,15 @@
 					{
 						defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
 					}
+
+					//collider modifier options
+					if (_layerProperties.colliderOptions.colliderType != ColliderType.None)
+					{
+						var lineColliderMod = CreateInstance<ColliderModifier>();
+						lineColliderMod.SetProperties(_layerProperties.colliderOptions);
+						defaultGOModifierStack.Add(lineColliderMod);
+					}
+
 					var lineMatMod = CreateInstance<MaterialModifier>();
 					lineMatMod.SetProperties(_layerProperties.materialOptions);
 					defaultGOModifierStack.Add(lineMatMod);
@@ -114,6 +147,14 @@
 						}
 					}
 
+					//collider modifier options
+					if (_layerProperties.colliderOptions.colliderType != ColliderType.None)
+					{
+						var polyColliderMod = CreateInstance<ColliderModifier>();
+						polyColliderMod.SetProperties(_layerProperties.colliderOptions);
+						defaultGOModifierStack.Add(polyColliderMod);
+					}
+
 					var matMod = CreateInstance<MaterialModifier>();
 					matMod.SetProperties(_layerProperties.materialOptions);
 					defaultGOModifierStack.Add(matMod);
@@ -121,7 +162,7 @@
 					if (_layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette)
 					{
 						var colorPaletteMod = CreateInstance<MapboxStylesColorModifier>();
-						colorPaletteMod.m_scriptablePalette = _layerProperties.materialOptions.colorPallete;
+						colorPaletteMod.m_scriptablePalette = _layerProperties.materialOptions.colorPalette;
 
 						defaultGOModifierStack.Add(colorPaletteMod);
 					}
@@ -133,12 +174,10 @@
 			_defaultStack.MeshModifiers.AddRange(defaultMeshModifierStack);
 			_defaultStack.GoModifiers.AddRange(defaultGOModifierStack);
 
-			//Add any additional modifiers that were added. 
+			//Add any additional modifiers that were added.
 			_defaultStack.MeshModifiers.AddRange(_layerProperties.MeshModifiers);
 			_defaultStack.GoModifiers.AddRange(_layerProperties.GoModifiers);
-
 		}
-
 
 		public override void Initialize()
 		{
@@ -163,7 +202,7 @@
 
 		private IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, Action callback = null)
 		{
-			//HACK to prevent request finishing on same frame which breaks modules started/finished events 
+			//HACK to prevent request finishing on same frame which breaks modules started/finished events
 			yield return null;
 
 			if (tile == null)
@@ -173,10 +212,10 @@
 
 			//testing each feature with filters
 			var fc = layer.FeatureCount();
-			//Get all filters in the array. 
+			//Get all filters in the array.
 			var filters = _layerProperties.filterOptions.filters.Select(m => m.GetFilterComparer()).ToArray();
 
-			// Pass them to the combiner 
+			// Pass them to the combiner
 			Filters.ILayerFeatureFilterComparer combiner = new Filters.LayerFilterComparer();
 			switch (_layerProperties.filterOptions.combinerType)
 			{
@@ -196,10 +235,13 @@
 			for (int i = 0; i < fc; i++)
 			{
 
-				var feature = new VectorFeatureUnity(layer.GetFeature(i), tile, layer.Extent, _layerProperties.buildingsWithUniqueIds);
+				var buildingsWithUniqueIds =
+					(_layerProperties.honorBuildingIdSetting) && _layerProperties.buildingsWithUniqueIds;
+
+				var feature = new VectorFeatureUnity(layer.GetFeature(i), tile, layer.Extent, buildingsWithUniqueIds);
 
 				//skip existing features, only works on tilesets with unique ids
-				if (_layerProperties.buildingsWithUniqueIds && _activeIds.Contains(feature.Data.Id))
+				if (buildingsWithUniqueIds && _activeIds.Contains(feature.Data.Id))
 				{
 					continue;
 				}
@@ -218,7 +260,7 @@
 
 				if (filters.Length == 0)
 				{
-					// no filters, just build the features. 
+					// no filters, just build the features.
 					if (tile != null && tile.gameObject != null && tile.VectorDataState != Enums.TilePropertyState.Cancelled)
 						Build(feature, tile, tile.gameObject);
 
@@ -226,7 +268,7 @@
 				}
 				else
 				{
-					// build features only if the filter returns true. 
+					// build features only if the filter returns true.
 					if (combiner.Try(feature))
 					{
 						if (tile != null && tile.gameObject != null && tile.VectorDataState != Enums.TilePropertyState.Cancelled)
@@ -236,7 +278,7 @@
 					}
 				}
 
-				if (_performanceOptions.isEnabled && _entityInCurrentCoroutine >= _performanceOptions.entityPerCoroutine)
+				if (_performanceOptions!=null && _performanceOptions.isEnabled && _entityInCurrentCoroutine >= _performanceOptions.entityPerCoroutine)
 				{
 					_entityInCurrentCoroutine = 0;
 					yield return null;
@@ -270,7 +312,7 @@
 			return true;
 		}
 
-		private void Build(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
+		protected void Build(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
 		{
 			if (feature.Properties.ContainsKey("extrude") && !Convert.ToBoolean(feature.Properties["extrude"]))
 				return;
@@ -279,7 +321,7 @@
 				return;
 
 			//this will be improved in next version and will probably be replaced by filters
-			var styleSelectorKey = FindSelectorKey(feature);
+			var styleSelectorKey = _layerProperties.coreOptions.sublayerName;
 
 			var meshData = new MeshData();
 			meshData.TileRect = tile.Rect;
@@ -310,8 +352,8 @@
 			//		return feature.Properties["class"].ToString().ToLowerInvariant();
 			//	}
 			//}
-			//else 
-			//TODO: Come back to this. 
+			//else
+			//TODO: Come back to this.
 			//var size = _layerProperties.coreOptions.propertyValuePairs.Count;
 			//for (int i = 0; i < size; i++)
 			//{

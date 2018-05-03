@@ -5,14 +5,22 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using Mapbox.Unity.MeshGeneration.Components;
 	using System.Collections.Generic;
 	using System;
+	using Mapbox.Unity.Map;
 
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Collider Modifier")]
 	public class ColliderModifier : GameObjectModifier
 	{
-		[SerializeField]
-		private ColliderType _colliderType;
+		//[SerializeField]
+		//private ColliderType _colliderType;
 		private IColliderStrategy _colliderStrategy;
 
+		[SerializeField]
+		ColliderOptions _options;
+
+		public override void SetProperties(ModifierProperties properties)
+		{
+			_options = (ColliderOptions)properties;
+		}
 
 		public override void Initialize()
 		{
@@ -20,7 +28,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			//creating a new one iff we don't already have one. if you want to reset/recreate you have to clear stuff inside current/old one first.
 			if (_colliderStrategy == null)
 			{
-				switch (_colliderType)
+				switch (_options.colliderType)
 				{
 					case ColliderType.None:
 						_colliderStrategy = null;
@@ -48,14 +56,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				_colliderStrategy.AddColliderTo(ve);
 			}
 
-		}
-
-		public enum ColliderType
-		{
-			None,
-			BoxCollider,
-			MeshCollider,
-			SphereCollider
 		}
 
 		public class BoxColliderStrategy : IColliderStrategy
