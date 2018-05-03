@@ -30,8 +30,6 @@
 			_map = map;
 			IsNodeBaseInitialized = true;
 			Debug.Log("Initialized ARNodes");
-			_nodeBuffer = new CircularBuffer<Node>(10);
-			_nodeBuffer.GetEnumerable().ToArray();
 		}
 
 		void SavedGPSAccuracy(Location location)
@@ -64,6 +62,7 @@
 					LatLon = _map.WorldToGeoPosition(_targetTransform.position),
 					Accuracy = _latestBestGPSAccuracy
 				};
+
 				_nodeBuffer.Add(node);
 			}
 
