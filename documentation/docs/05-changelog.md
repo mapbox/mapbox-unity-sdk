@@ -8,6 +8,10 @@
   - `DeviceOrientation`: value obtained from the device compass. Where the device is looking to.
 
 ##### New Features
+- Add `Location Prefabs` section to `AbstractMap`. Enables users to spawn prefabs at points-of-interest on the map directly from the `AbstractMap` UI.
+- Add options to spawn prefabs on points-of-interest using `Mapbox Category`, `Name`, or a list of `Address or LatLon`.
+- Add methods on `AbstractMap` to spawn prefabs. Enables users to add layers via script.
+- Add the `LocationPrefabs.unity` example scene. Demonstrates the basics of using the `Location Prefabs` feature.
 - Add `OnUpdated` event to `AbstractMap`. Enables subscribers to get a notification when the map location and/or zoom gets updated.
 - `DeviceLocationProviderAndroidNative`: a native location provider for Android that directly accesses location and orientation provided by the operating system not using Unity's `Input.location` which has some shortcomings, eg coordinates truncated to `float` precision.
   **Only available on Android 7.0 (Nougat, API Level 24) and up!**

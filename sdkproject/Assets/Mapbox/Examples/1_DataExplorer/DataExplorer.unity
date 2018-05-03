@@ -418,7 +418,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 3
           materials:
           - Materials:
@@ -428,6 +427,7 @@ MonoBehaviour:
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 11400000, guid: e1b79d6caac0144adada0c548ef06705,
             type: 2}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 1
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -458,7 +458,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 2
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -467,6 +466,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: 1843a50abea6fa448a61d143054f2166, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -496,7 +496,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -505,6 +504,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -535,7 +535,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -544,6 +543,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -570,7 +570,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -579,6 +578,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -606,7 +606,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -615,6 +614,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: 55643c4fd976d7e429bda0a90c976b14, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -640,7 +640,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -649,6 +648,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: ab4ee1288a054a84b85ba5cf5a0abf34, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -674,7 +674,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -683,6 +682,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: c0be5c38e1944584b89f81505e3c4446, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -708,7 +708,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -717,6 +716,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: a4c397925829de8438fa9bb51535fd17, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -742,7 +742,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 2
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -751,6 +750,7 @@ MonoBehaviour:
             - {fileID: 0}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 2
         MeshModifiers: []
@@ -776,7 +776,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -785,6 +784,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 1
         MeshModifiers: []
@@ -810,7 +810,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -819,6 +818,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -845,7 +845,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -854,6 +853,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -880,7 +880,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -889,6 +888,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -915,7 +915,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -924,6 +923,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -950,7 +950,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -959,6 +958,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -985,7 +985,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -994,6 +993,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1020,7 +1020,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -1029,6 +1028,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1055,7 +1055,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -1064,6 +1063,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1090,7 +1090,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -1099,6 +1098,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1125,7 +1125,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -1134,6 +1133,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1160,7 +1160,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -1169,6 +1168,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1195,7 +1195,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -1204,6 +1203,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1230,7 +1230,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -1239,6 +1238,7 @@ MonoBehaviour:
             - {fileID: 0}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1264,7 +1264,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -1273,6 +1272,7 @@ MonoBehaviour:
             - {fileID: 0}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1298,7 +1298,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -1307,6 +1306,7 @@ MonoBehaviour:
             - {fileID: 0}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1337,7 +1337,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -1346,6 +1345,7 @@ MonoBehaviour:
             - {fileID: 0}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1376,7 +1376,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -1385,6 +1384,7 @@ MonoBehaviour:
             - {fileID: 0}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1415,7 +1415,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -1424,6 +1423,7 @@ MonoBehaviour:
             - {fileID: 0}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1454,7 +1454,6 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -1463,10 +1462,13 @@ MonoBehaviour:
             - {fileID: 0}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
+    _locationPrefabsLayerProperties:
+      locationPrefabList: []
   _tileProvider: {fileID: 0}
 --- !u!1 &165147574
 GameObject:
@@ -2696,7 +2698,7 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0.000000059604645
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -2726,7 +2728,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -98.25222
+      value: -92.88317
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -2736,12 +2738,12 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 176.50444
+      value: 165.76634
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 185.76634
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -2792,7 +2794,7 @@ Prefab:
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -0.000015258789
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114731470950229392, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}

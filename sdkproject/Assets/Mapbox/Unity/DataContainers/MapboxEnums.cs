@@ -176,4 +176,27 @@
 		[Description("Sphere collider added to the GameObject.")]
 		SphereCollider,
 	}
+
+	public enum LocationPrefabFindBy
+	{
+		[Description("Display points of interest based on a choice of categories")]
+		MapboxCategory,
+		[Description("Display points of interest based on name")]
+		POIName,
+		[Description("Display points of interest at specific address or geographical co-ordinates on the map")]
+		AddressOrLatLon,
+	}
+
+	public enum LocationPrefabCategories
+	{
+		None = 0,
+		AnyCategory = ~0,
+		ArtsAndEntertainment = 1 << 0,
+		Food = 1 << 1,
+		Nightlife = 1 << 2,
+		OutdoorsAndRecreation = 1 << 3,
+		Services = 1 << 4,
+		Shops = 1 << 5,
+		Transportation = 1 << 6
+	}
 }
