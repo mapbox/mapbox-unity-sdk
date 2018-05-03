@@ -7,7 +7,6 @@
 	using System;
 	using Mapbox.MapMatching;
 	using Mapbox.Utils;
-	using UnityARInterface;
 	using Mapbox.Unity.Map;
 
 	public class CentralizedARLocator : MonoBehaviour, ISynchronizationContext
@@ -23,8 +22,6 @@
 				return _map;
 			}
 		}
-
-		ARInterface _arInterface;
 
 		[SerializeField]
 		ARMapMatching _mapMathching;
@@ -65,11 +62,7 @@
 
 		Location _highestLocation;
 
-
 		public static Action<Location> OnNewHighestAccuracyGPS;
-
-		//ARInterface.CustomTrackingState _trackingState;
-
 		public event Action<Alignment> OnAlignmentAvailable;
 		public event Action OnAlignmentComplete;
 
@@ -83,12 +76,11 @@
 
 			InitializeSyncNodes();
 
-			LocationProviderFactory.Instance.mapManager.OnInitialized += Map_OnInitialized;
+			_map.OnInitialized += Map_OnInitialized;
 		}
 
 		void Map_OnInitialized()
 		{
-			_map = LocationProviderFactory.Instance.mapManager;
 			_map.OnInitialized -= Map_OnInitialized;
 			// We don't want location updates until we have a map, otherwise our conversion will fail.
 			ComputeFirstLocalization();
@@ -190,18 +182,6 @@
 				node.SaveNode();
 			}
 		}
-
-		//void CheckTracking()
-		//{
-		//	var tracking = new ARInterface.CustomTrackingState();
-		//	if (_arInterface.GetTrackingState(ref tracking))
-		//	{
-		//		if (tracking == ARInterface.CustomTrackingState.Good)
-		//		{
-		//			// Blah blah..
-		//		}
-		//	}
-		//}
 
 		void SaveHighestAccuracy(Location location)
 		{
