@@ -56,6 +56,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/MapboxAR/Unity/ARNodeSetup/NewAutomaticSyncScene.unity
     guid: 286981d0402274b159a31625923aa4e9
-  - enabled: 1
+  - enabled: 0
     path: Assets/MapboxAR/Examples/Scenes/NodeScene.unity
     guid: 0adefcc2278624e1eaeebd54683031c8
+  - enabled: 0
+    path: Assets/MapboxAR/Examples/Scenes/CleanAR.unity
+    guid: 39b8c88c5cfaa42d7980ea9ebd083a0b
+  - enabled: 1
+    path: Assets/MapboxAR/Examples/Scenes/TestingAR.unity
+    guid: 45ed70fa1a3574e738c0fcd567d8e8b7

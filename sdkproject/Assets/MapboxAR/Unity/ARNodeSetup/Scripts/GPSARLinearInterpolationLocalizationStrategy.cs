@@ -40,7 +40,7 @@
 						return;
 					}
 					currentGpsNode = syncNode.ReturnLatestNode();
-					previousGpsNode = gpsNodes[gpsNodes.Length - 2];
+					previousGpsNode = gpsNodes[1];
 				}
 				if (syncNode.GetType() == typeof(ArNodesSync))
 				{
@@ -51,7 +51,7 @@
 						return;
 					}
 					currentARNode = syncNode.ReturnLatestNode();
-					previousARNode = arNodes[arNodes.Length - 2];
+					previousARNode = arNodes[1];
 				}
 			}
 

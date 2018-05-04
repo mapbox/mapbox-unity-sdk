@@ -14,7 +14,7 @@
 		ARInterface.CustomTrackingState _trackingState;
 		ARInterface _arInterface;
 		bool _isTrackingGood;
-		float _planePosOnY;
+		float _planePosOnY = -.5f;
 
 		public override event Action<Alignment> OnLocalizationComplete;
 
@@ -24,35 +24,36 @@
 			_trackingState = new ARInterface.CustomTrackingState();
 			ARInterface.planeAdded += GetPlaneCoords;
 			ARInterface.planeRemoved += GetPlaneCoords;
-
-			// TODO : Get always the current gps position.. and then return the mapmatching coords and after that..
-			/// Choose which one to choose on relocalisation...
-			/// Also create a custom new larp aligment strategy...
-			/// 
 		}
 
 		public override void ComputeLocalization(CentralizedARLocator centralizedARLocator)
 		{
 			var currentLocation = LocationProviderFactory.Instance.DefaultLocationProvider.CurrentLocation;
 			var aligment = new Alignment();
+
 			// Checking if tracking is good, do nothing on location. Other than check if the newly calculated heading is better.
-			if (CheckTracking())
+			if (!CheckTracking())
 			{
-				if (currentLocation.IsLocationUpdated)
+				if (currentLocation.IsUserHeadingUpdated)
 				{
 					var mapPos = centralizedARLocator.CurrentMap.transform.position;
 					var newPos = new Vector3(mapPos.x, _planePosOnY, mapPos.z);
 					aligment.Position = newPos;
 					aligment.Rotation = currentLocation.UserHeading;
 					OnLocalizationComplete(aligment);
+					Debug.Log("this runs");
 				}
 				return;
 			}
 
+			// If tracking is bad then use GPS to align map.
+			// TODO : Add mapmatching to the equation.
+
 			var geoPos = centralizedARLocator.CurrentMap.GeoToWorldPosition(currentLocation.LatitudeLongitude);
 			var geoAndPlanePos = new Vector3(geoPos.x, _planePosOnY, geoPos.z);
 			aligment.Position = geoAndPlanePos;
-			aligment.Rotation = currentLocation.IsLocationUpdated ? currentLocation.UserHeading : currentLocation.DeviceOrientation;
+			//aligment.Rotation = currentLocation.IsUserHeadingUpdated ? currentLocation.UserHeading : currentLocation.DeviceOrientation;
+			aligment.Rotation = currentLocation.DeviceOrientation;
 			OnLocalizationComplete(aligment);
 		}
 
@@ -65,6 +66,8 @@
 		{
 			if (_arInterface.GetTrackingState(ref _trackingState))
 			{
+				Debug.Log((_trackingState));
+
 				if (_trackingState == ARInterface.CustomTrackingState.Good)
 				{
 					return true;
