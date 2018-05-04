@@ -56,20 +56,32 @@
 			DataFetcher.DataRecieved += OnVectorDataRecieved;
 			DataFetcher.FetchingError += OnDataError;
 
-			foreach (var sublayer in _properties.vectorSubLayers)
+			foreach (var item in _properties.locationPrefabList)
 			{
-				//if its of type prefabitemoptions then separate the visualizer type
-				LayerVisualizerBase visualizer;
-				if (typeof(PrefabItemOptions).IsAssignableFrom(sublayer.GetType())) //to check that the instance is of type PrefabItemOptions
+				LayerVisualizerBase visualizer = CreateInstance<LocationPrefabsLayerVisualizer>();
+				((LocationPrefabsLayerVisualizer)visualizer).SetProperties((PrefabItemOptions)item, _properties.performanceOptions);
+
+				visualizer.Initialize();
+				if (visualizer == null)
 				{
-					visualizer = CreateInstance<LocationPrefabsLayerVisualizer>();
-					((LocationPrefabsLayerVisualizer)visualizer).SetProperties((PrefabItemOptions)sublayer, _properties.performanceOptions);
+					continue;
+				}
+
+				if (_layerBuilder.ContainsKey(visualizer.Key))
+				{
+					_layerBuilder[visualizer.Key].Add(visualizer);
 				}
 				else
 				{
-					visualizer = CreateInstance<VectorLayerVisualizer>();
-					((VectorLayerVisualizer)visualizer).SetProperties(sublayer, _properties.performanceOptions);
+					_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase>() { visualizer });
 				}
+			}
+
+			foreach (var sublayer in _properties.vectorSubLayers)
+			{
+				//if its of type prefabitemoptions then separate the visualizer type
+				LayerVisualizerBase visualizer = CreateInstance<VectorLayerVisualizer>();
+				((VectorLayerVisualizer)visualizer).SetProperties(sublayer, _properties.performanceOptions);
 
 				visualizer.Initialize();
 				if (visualizer == null)

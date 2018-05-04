@@ -156,7 +156,7 @@
 			if (ShowMapLayers)
 			{
 				EditorGUI.indentLevel++;
-				ShowLocationPrefabs = EditorGUILayout.Foldout(ShowLocationPrefabs, "LOCATION PREFABS");
+				ShowLocationPrefabs = EditorGUILayout.Foldout(ShowLocationPrefabs, "POINTS OF INTEREST");
 				if (ShowLocationPrefabs)
 				{
 					var vectorDataProperty = serializedObject.FindProperty("_vectorData");
@@ -181,7 +181,7 @@
 						EditorGUILayout.HelpBox("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the data source in the FEATURES section.", MessageType.Error);
 					}
 				}
-
+				ShowSepartor();
 				ShowFeatures = EditorGUILayout.Foldout(ShowFeatures, "FEATURES");
 				if (ShowFeatures)
 				{
