@@ -53,6 +53,23 @@
 				EditorPrefs.SetBool("MapManagerEditor_showTerrain", value);
 			}
 		}
+
+		/// <summary>
+		/// Gets or sets a value show or hide Map Layers section <see cref="T:Mapbox.Editor.MapManagerEditor"/> show features.
+		/// </summary>
+		/// <value><c>true</c> if show features; otherwise, <c>false</c>.</value>
+		bool ShowMapLayers
+		{
+			get
+			{
+				return EditorPrefs.GetBool("MapManagerEditor_showMapLayers");
+			}
+			set
+			{
+				EditorPrefs.SetBool("MapManagerEditor_showMapLayers", value);
+			}
+		}
+
 		/// <summary>
 		/// Gets or sets a value to show or hide Vector section <see cref="T:Mapbox.Editor.MapManagerEditor"/>.
 		/// </summary>
@@ -73,7 +90,7 @@
 		/// Gets or sets a value to show or hide Vector section <see cref="T:Mapbox.Editor.MapManagerEditor"/>.
 		/// </summary>
 		/// <value><c>true</c> if show vector; otherwise, <c>false</c>.</value>
-		bool ShowVector
+		bool ShowFeatures
 		{
 			get
 			{
@@ -135,38 +152,42 @@
 
 			ShowSepartor();
 
-			ShowLocationPrefabs = EditorGUILayout.Foldout(ShowLocationPrefabs, "LOCATION PREFABS");
-			if (ShowLocationPrefabs)
+			ShowMapLayers = EditorGUILayout.Foldout(ShowMapLayers, "MAP LAYERS");
+			if (ShowMapLayers)
 			{
-				var vectorDataProperty = serializedObject.FindProperty("_vectorData");
-
-
-				var layerProperty = vectorDataProperty.FindPropertyRelative("_layerProperty");
-				var layerSourceProperty = layerProperty.FindPropertyRelative("sourceOptions");
-				var sourceType = layerProperty.FindPropertyRelative("_sourceType");
-				VectorSourceType sourceTypeValue = (VectorSourceType)sourceType.enumValueIndex;
-				string streets_v7 = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id;
-				string layerString = layerProperty.FindPropertyRelative("sourceOptions.layerSource.Id").stringValue;
-
-				if(sourceTypeValue != VectorSourceType.None && layerString.Contains(streets_v7))
+				EditorGUI.indentLevel++;
+				ShowLocationPrefabs = EditorGUILayout.Foldout(ShowLocationPrefabs, "LOCATION PREFABS");
+				if (ShowLocationPrefabs)
 				{
-					GUI.enabled = false;
-					EditorGUILayout.TextField(_mapIdGui, streets_v7);
-					GUI.enabled = true;
-					ShowSection(vectorDataProperty, "_locationPrefabsLayerProperties");
+					var vectorDataProperty = serializedObject.FindProperty("_vectorData");
+
+
+					var layerProperty = vectorDataProperty.FindPropertyRelative("_layerProperty");
+					var layerSourceProperty = layerProperty.FindPropertyRelative("sourceOptions");
+					var sourceType = layerProperty.FindPropertyRelative("_sourceType");
+					VectorSourceType sourceTypeValue = (VectorSourceType)sourceType.enumValueIndex;
+					string streets_v7 = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id;
+					string layerString = layerProperty.FindPropertyRelative("sourceOptions.layerSource.Id").stringValue;
+
+					if (sourceTypeValue != VectorSourceType.None && layerString.Contains(streets_v7))
+					{
+						GUI.enabled = false;
+						EditorGUILayout.TextField(_mapIdGui, streets_v7);
+						GUI.enabled = true;
+						ShowSection(vectorDataProperty, "_locationPrefabsLayerProperties");
+					}
+					else
+					{
+						EditorGUILayout.HelpBox("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the data source in the FEATURES section.", MessageType.Error);
+					}
 				}
-				else
+
+				ShowFeatures = EditorGUILayout.Foldout(ShowFeatures, "FEATURES");
+				if (ShowFeatures)
 				{
-					EditorGUILayout.HelpBox("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the data source in the Vector section.",MessageType.Error);
+					ShowSection(serializedObject.FindProperty("_vectorData"), "_layerProperty");
 				}
-			}
-
-			ShowSepartor();
-
-			ShowVector = EditorGUILayout.Foldout(ShowVector, "VECTOR");
-			if (ShowVector)
-			{
-				ShowSection(serializedObject.FindProperty("_vectorData"), "_layerProperty");
+				EditorGUI.indentLevel--;
 			}
 			GUILayout.EndVertical();
 
