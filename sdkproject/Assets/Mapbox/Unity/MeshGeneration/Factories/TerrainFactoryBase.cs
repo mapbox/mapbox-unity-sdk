@@ -20,11 +20,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		#region UnityMethods
 		private void OnDestroy()
 		{
-			DataFetcher.DataRecieved -= OnTerrainRecieved;
-			DataFetcher.FetchingError -= OnDataError;
+			if (DataFetcher != null)
+			{
+				DataFetcher.DataRecieved -= OnTerrainRecieved;
+				DataFetcher.FetchingError -= OnDataError;
+			}
 		}
 		#endregion
-		
+
 		#region AbstractFactoryOverrides
 		protected override void OnInitialized()
 		{
