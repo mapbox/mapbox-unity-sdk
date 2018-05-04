@@ -5,17 +5,22 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using Mapbox.Unity.MeshGeneration.Components;
 	using Mapbox.Unity.MeshGeneration.Interfaces;
 	using System.Collections.Generic;
+	using Mapbox.Unity.Map;
+	using System;
 
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Prefab Modifier")]
 	public class PrefabModifier : GameObjectModifier
 	{
-		[SerializeField]
-		private GameObject _prefab;
+		//[SerializeField]
+		//private GameObject _prefab;
 
-		[SerializeField]
-		private bool _scaleDownWithWorld = false;
+		//[SerializeField]
+		//private bool _scaleDownWithWorld = false;
 
 		private Dictionary<GameObject, GameObject> _objects;
+		[SerializeField]
+		private SpawnPrefabOptions _options;
+		private List<GameObject> _prefabList = new List<GameObject>();
 
 		public override void Initialize()
 		{
@@ -23,6 +28,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				_objects = new Dictionary<GameObject, GameObject>();
 			}
+		}
+
+		public override void SetProperties(ModifierProperties properties)
+		{
+			_options = (SpawnPrefabOptions)properties;
 		}
 
 		public override void Run(VectorEntity ve, UnityTile tile)
@@ -47,7 +57,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				go.transform.localPosition = met;
 				go.transform.localScale = Constants.Math.Vector3One;
 
-				if (!_scaleDownWithWorld)
+				if (!_options.scaleDownWithWorld)
 				{
 					go.transform.localScale = Vector3.one / tile.TileScale;
 				}
@@ -55,7 +65,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 			else
 			{
-				go = Instantiate(_prefab);
+				go = Instantiate(_options.prefab);
+				_prefabList.Add(go);
 				_objects.Add(ve.GameObject, go);
 			}
 
@@ -70,11 +81,20 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				settable.Set(ve.Feature.Properties);
 			}
 
-			if (!_scaleDownWithWorld)
+			if (!_options.scaleDownWithWorld)
 			{
 				go.transform.localScale = Vector3.one / tile.TileScale;
 			}
 
+			if (_options.AllPrefabsInstatiated != null)
+			{
+				_options.AllPrefabsInstatiated(_prefabList);
+			}
+		}
+
+		public List<GameObject> returnInstanceList()
+		{
+			return _prefabList;
 		}
 	}
 }

@@ -10,6 +10,12 @@
 		AbstractMap _map;
 
 		ILocationProvider _locationProvider;
+    
+		private void Awake()
+		{
+			// Prevent double initialization of the map. 
+			_map.InitializeOnStart = false;
+		}
 
 		protected virtual IEnumerator Start()
 		{

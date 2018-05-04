@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Name: PoiDemo3dPoiModifier
   m_EditorClassIdentifier: 
   Active: 1
-  _prefab: {fileID: 1000010288152912, guid: 44828d4325e8b544ca6ffec352cfe165, type: 2}
-  _scaleDownWithWorld: 1
+  _options:
+    prefab: {fileID: 1000010288152912, guid: 44828d4325e8b544ca6ffec352cfe165, type: 2}
+    scaleDownWithWorld: 1

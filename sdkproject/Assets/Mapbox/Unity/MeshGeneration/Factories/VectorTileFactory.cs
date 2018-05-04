@@ -7,6 +7,7 @@
 	using Mapbox.Unity.MeshGeneration.Interfaces;
 	using Mapbox.Map;
 	using Mapbox.Unity.Map;
+	using System;
 
 	/// <summary>
 	///	Vector Tile Factory
@@ -25,16 +26,9 @@
 	//[CreateAssetMenu(menuName = "Mapbox/Factories/Vector Tile Factory")]
 	public class VectorTileFactory : AbstractTileFactory
 	{
-		//[SerializeField]
-		//private string _mapId = "mapbox.mapbox-streets-v7";
-
-		//[NodeEditorElementAttribute("Layer Visalizers")]
-		//public List<LayerVisualizerBase> Visualizers;
-
 		private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;
 		private Dictionary<UnityTile, VectorTile> _cachedData = new Dictionary<UnityTile, VectorTile>();
-
-		VectorLayerProperties _properties;
+		private VectorLayerProperties _properties;
 		public string MapId
 		{
 			get
@@ -47,24 +41,35 @@
 				_properties.sourceOptions.Id = value;
 			}
 		}
+		protected VectorDataFetcher DataFetcher;
 
-
-		public override void SetOptions(LayerProperties options)
-		{
-			_properties = (VectorLayerProperties)options;
-		}
+		#region AbstractFactoryOverrides
 		/// <summary>
 		/// Set up sublayers using VectorLayerVisualizers.
 		/// </summary>
-		internal override void OnInitialized()
+		protected override void OnInitialized()
 		{
 			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
 			_cachedData.Clear();
 
+			DataFetcher = ScriptableObject.CreateInstance<VectorDataFetcher>();
+			DataFetcher.DataRecieved += OnVectorDataRecieved;
+			DataFetcher.FetchingError += OnDataError;
+
 			foreach (var sublayer in _properties.vectorSubLayers)
 			{
-				var visualizer = CreateInstance<VectorLayerVisualizer>();
-				visualizer.SetProperties(sublayer, _properties.performanceOptions);
+				//if its of type prefabitemoptions then separate the visualizer type
+				LayerVisualizerBase visualizer;
+				if (typeof(PrefabItemOptions).IsAssignableFrom(sublayer.GetType())) //to check that the instance is of type PrefabItemOptions
+				{
+					visualizer = CreateInstance<LocationPrefabsLayerVisualizer>();
+					((LocationPrefabsLayerVisualizer)visualizer).SetProperties((PrefabItemOptions)sublayer, _properties.performanceOptions);
+				}
+				else
+				{
+					visualizer = CreateInstance<VectorLayerVisualizer>();
+					((VectorLayerVisualizer)visualizer).SetProperties(sublayer, _properties.performanceOptions);
+				}
 
 				visualizer.Initialize();
 				if (visualizer == null)
@@ -83,11 +88,13 @@
 			}
 		}
 
-		internal override void OnRegistered(UnityTile tile)
+		public override void SetOptions(LayerProperties options)
 		{
-			var vectorTile = (_properties.useOptimizedStyle) ? new VectorTile(_properties.optimizedStyle.Id, _properties.optimizedStyle.Modified) : new VectorTile();
-			tile.AddTile(vectorTile);
+			_properties = (VectorLayerProperties)options;
+		}
 
+		protected override void OnRegistered(UnityTile tile)
+		{
 			if (string.IsNullOrEmpty(MapId) || _properties.sourceOptions.isActive == false || _properties.vectorSubLayers.Count == 0)
 			{
 				// Do nothing; 
@@ -96,45 +103,9 @@
 			}
 			else
 			{
-				vectorTile.Initialize(_fileSource, tile.CanonicalTileId, MapId, () =>
-				{
-					if (tile == null)
-					{
-						Progress++;
-						Progress--;
-						return;
-					}
-
-					if (vectorTile.HasError)
-					{
-						OnErrorOccurred(new TileErrorEventArgs(tile.CanonicalTileId, vectorTile.GetType(), tile, vectorTile.Exceptions));
-						tile.VectorDataState = TilePropertyState.Error;
-						Progress++;
-						Progress--;
-						return;
-					}
-
-					if (_cachedData.ContainsKey(tile))
-					{
-						_cachedData[tile] = vectorTile;
-					}
-					else
-					{
-						_cachedData.Add(tile, vectorTile);
-					}
-
-					// FIXME: we can make the request BEFORE getting a response from these!
-					if (tile.HeightDataState == TilePropertyState.Loading ||
-							tile.RasterDataState == TilePropertyState.Loading)
-					{
-						tile.OnHeightDataChanged += DataChangedHandler;
-						tile.OnRasterDataChanged += DataChangedHandler;
-					}
-					else
-					{
-						CreateMeshes(tile);
-					}
-				});
+				tile.VectorDataState = TilePropertyState.Loading;
+				Progress++;
+				DataFetcher.FetchVector(tile.CanonicalTileId, MapId, tile, _properties.useOptimizedStyle, _properties.optimizedStyle);
 			}
 		}
 
@@ -147,7 +118,7 @@
 			base.OnErrorOccurred(e);
 		}
 
-		internal override void OnUnregistered(UnityTile tile)
+		protected override void OnUnregistered(UnityTile tile)
 		{
 			// We are no longer interested in this tile's notifications.
 			tile.OnHeightDataChanged -= DataChangedHandler;
@@ -170,7 +141,51 @@
 				}
 			}
 		}
+		#endregion
 
+
+		#region DataFetcherEvents
+		private void OnVectorDataRecieved(UnityTile tile, VectorTile vectorTile)
+		{
+			Progress--;
+			if (_cachedData.ContainsKey(tile))
+			{
+				_cachedData[tile] = vectorTile;
+			}
+			else
+			{
+				_cachedData.Add(tile, vectorTile);
+			}
+
+			// FIXME: we can make the request BEFORE getting a response from these!
+			if (tile.HeightDataState == TilePropertyState.Loading ||
+					tile.RasterDataState == TilePropertyState.Loading)
+			{
+				tile.OnHeightDataChanged += DataChangedHandler;
+				tile.OnRasterDataChanged += DataChangedHandler;
+			}
+			else
+			{
+				CreateMeshes(tile);
+			}
+		}
+
+		private void OnDataError(UnityTile tile, TileErrorEventArgs e)
+		{
+			if (tile != null)
+			{
+				Progress--;
+				tile.VectorDataState = TilePropertyState.Error;
+			}
+		}
+
+		#endregion
+
+
+		/// <summary>
+		/// Vector Factory runs after Raster&Height data recieved and processed
+		/// </summary>
+		/// <param name="t"></param>
 		private void DataChangedHandler(UnityTile t)
 		{
 			if (t.RasterDataState != TilePropertyState.Loading &&
@@ -204,6 +219,21 @@
 							Progress++;
 							builder.Create(_cachedData[tile].Data.GetLayer(layerName), tile, DecreaseProgressCounter);
 						}
+					}
+				}
+			}
+
+			//emptylayer for visualizers that don't depend on outside data sources
+			string emptyLayer = "";
+			if (_layerBuilder.ContainsKey(emptyLayer))
+			{
+				foreach (var builder in _layerBuilder[emptyLayer])
+				{
+					if(builder.Active)
+					{
+						Progress++;
+						//just pass the first available layer - we should create a static null layer for this
+						builder.Create(_cachedData[tile].Data.GetLayer(_cachedData[tile].Data.LayerNames()[0]), tile, DecreaseProgressCounter);
 					}
 				}
 			}

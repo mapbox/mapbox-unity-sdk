@@ -2,13 +2,15 @@
 {
 	using UnityEngine;
 	using UnityEditor;
+	using System;
 	using System.Collections.Generic;
 	using Mapbox.Geocoding;
 	using Mapbox.Unity;
+	using System.Globalization;
 
 	public class GeocodeAttributeSearchWindow : EditorWindow
 	{
-		SerializedProperty _property;
+		SerializedProperty _coordinateProperty;
 
 		string _searchInput = "";
 
@@ -41,7 +43,7 @@
 		{
 			GeocodeAttributeSearchWindow window = EditorWindow.GetWindow<GeocodeAttributeSearchWindow>(true, "Search for location");
 
-			window._property = property;
+			window._coordinateProperty = property;
 
 			Event e = Event.current;
 			Vector2 mousePos = GUIUtility.GUIToScreenPoint(e.mousePosition);
@@ -81,15 +83,43 @@
 					for (int i = 0; i < _features.Count; i++)
 					{
 						Feature feature = _features[i];
-						string coordinates = feature.Center.x + ", " + feature.Center.y;
-						string buttonContent = feature.Address + " (" + coordinates + ")";
+						string coordinates = feature.Center.x.ToString(CultureInfo.InvariantCulture) + ", " +
+						                            feature.Center.y.ToString(CultureInfo.InvariantCulture);
+
+						//abreviated coords for display in the UI
+						string truncatedCoordinates = feature.Center.x.ToString("F2", CultureInfo.InvariantCulture) + ", " +
+							feature.Center.y.ToString("F2", CultureInfo.InvariantCulture);
+
+						//split feature name and add elements until the maxButtonContentLenght is exceeded
+						string[] featureNameSplit = feature.PlaceName.Split(',');
+						string buttonContent = "";
+						int maxButtonContentLength = 30;
+						for (int j = 0; j < featureNameSplit.Length; j++)
+						{
+							if(buttonContent.Length + featureNameSplit[j].Length < maxButtonContentLength)
+							{
+								if(String.IsNullOrEmpty(buttonContent))
+								{
+									buttonContent = featureNameSplit[j];
+								}
+								else
+								{
+									buttonContent = buttonContent + "," + featureNameSplit[j];
+								}
+							}
+						}
+
+						if (buttonContent.Length < maxButtonContentLength + 15)
+						{
+							buttonContent = buttonContent + "," + " (" + truncatedCoordinates + ")";
+						}
+
 
 						if (GUILayout.Button(buttonContent))
 						{
-							_property.stringValue = coordinates;
-
-							_property.serializedObject.ApplyModifiedProperties();
-							EditorUtility.SetDirty(_property.serializedObject.targetObject);
+							_coordinateProperty.stringValue = coordinates;
+							_coordinateProperty.serializedObject.ApplyModifiedProperties();
+							EditorUtility.SetDirty(_coordinateProperty.serializedObject.targetObject);
 
 							Close();
 						}

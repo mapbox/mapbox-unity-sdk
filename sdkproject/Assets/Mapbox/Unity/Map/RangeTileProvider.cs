@@ -7,15 +7,8 @@ namespace Mapbox.Unity.Map
 
 	public class RangeTileProvider : AbstractTileProvider
 	{
-		//[SerializeField]
-		//private int _west = 2;
-		//[SerializeField]
-		//private int _north = 2;
-		//[SerializeField]
-		//private int _east = 2;
-		//[SerializeField]
-		//private int _south = 2;
 		RangeTileProviderOptions _rangeTileProviderOptions;
+		private bool _initialized = false;
 
 		public override void OnInitialized()
 		{
@@ -28,15 +21,16 @@ namespace Mapbox.Unity.Map
 				_rangeTileProviderOptions = new RangeTileProviderOptions();
 			}
 
-
-			//foreach (var tile in tilesToRequest)
-			//{
-			//	AddTile(tile);
-			//}
+			_initialized = true;
 		}
 
 		protected virtual void Update()
 		{
+			if (!_initialized)
+			{
+				return;
+			}
+
 			if (Options == null)
 			{
 				return;

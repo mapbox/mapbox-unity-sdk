@@ -10,6 +10,10 @@
 	public class VectorLayer : IVectorDataLayer
 	{
 		[SerializeField]
+		LocationPrefabsLayerProperties _locationPrefabsLayerProperties = new LocationPrefabsLayerProperties();	
+
+
+		[SerializeField]
 		VectorLayerProperties _layerProperty = new VectorLayerProperties();
 
 		[NodeEditorElement(" Vector Layer ")]
@@ -20,6 +24,7 @@
 				return _layerProperty;
 			}
 		}
+
 		public MapLayerType LayerType
 		{
 			get
@@ -71,6 +76,27 @@
 			}
 		}
 
+		public void AddLayerSource(string vectorSource)
+		{
+			if (!string.IsNullOrEmpty(vectorSource))
+			{
+				if (!_layerProperty.sourceOptions.Id.Contains(vectorSource))
+				{
+					if (string.IsNullOrEmpty(_layerProperty.sourceOptions.Id))
+					{
+						SetLayerSource(vectorSource);
+						return;
+					}
+					var newLayerSource = _layerProperty.sourceOptions.Id + "," + vectorSource;
+					SetLayerSource(newLayerSource);
+				}
+			}
+			else
+			{
+				Debug.LogError("Empty source. Nothing was added to the list of data sources");
+			}
+		}
+
 		public void AddVectorLayer(VectorSubLayerProperties subLayerProperties)
 		{
 			if (_layerProperty.vectorSubLayers == null)
@@ -97,6 +123,26 @@
 		public void Initialize()
 		{
 			_vectorTileFactory = ScriptableObject.CreateInstance<VectorTileFactory>();
+			if (_layerProperty.sourceType != VectorSourceType.None || _layerProperty.sourceOptions.Id.Contains(MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id))
+			{
+				foreach (var item in _locationPrefabsLayerProperties.locationPrefabList)
+				{
+					//Add PrefabItemOptions items as a VectorSubLayerProperties
+					if (!_layerProperty.vectorSubLayers.Contains(item))
+					{
+						//Add PrefabItemOptions items as a VectorSubLayerProperties
+						//if (_layerProperty.sourceType == VectorSourceType.Custom || _layerProperty.sourceType == VectorSourceType.None)
+						//{
+						//	if (_layerProperty.sourceType == VectorSourceType.None)
+						//		_layerProperty.sourceOptions.Id = "";
+						//	//This is the style id we need for instantiating POI location prefabs
+						//	Style streetsVectorSource = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets);
+						//	AddLayerSource(streetsVectorSource.Id);
+						//}
+						AddVectorLayer(item);
+					}
+				}
+			}
 			_vectorTileFactory.SetOptions(_layerProperty);
 		}
 
@@ -121,5 +167,13 @@
 			}
 		}
 		private VectorTileFactory _vectorTileFactory;
+
+		public LocationPrefabsLayerProperties LocationPrefabsLayerProperties
+		{
+			get
+			{
+				return _locationPrefabsLayerProperties;
+			}
+		}
 	}
 }

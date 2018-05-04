@@ -20,6 +20,7 @@ namespace UnityARInterface
             public static Guid startService { get { return new Guid("0b3e1cb1-d233-43ba-afd0-6c2890159b4b"); } }
             public static Guid stopService { get { return new Guid("8b8504e1-d673-4fb6-95b7-88a3a23d2ebc"); } }
             public static Guid enableVideo { get { return new Guid("f2d57d81-1b8e-4d54-8ce8-8bc42b97b5d2"); } }
+            public static Guid backgroundRendering { get { return new Guid("b95af19e-39db-4bd2-acca-e353fd822689"); } }
         }
     }
 }

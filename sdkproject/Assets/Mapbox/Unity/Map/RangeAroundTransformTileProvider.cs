@@ -3,20 +3,12 @@
 	using System.Linq;
 	using UnityEngine;
 	using Mapbox.Map;
+	using System.Collections.Generic;
 	using Mapbox.Utils;
 	using Mapbox.Unity.Utilities;
 
 	public class RangeAroundTransformTileProvider : AbstractTileProvider
 	{
-		//[SerializeField]
-		//private Transform _targetTransform;
-
-		//[SerializeField]
-		//private int _visibleBuffer;
-
-		//[SerializeField]
-		//private int _disposeBuffer;
-
 		RangeAroundTransformTileProviderOptions _rangeTileProviderOptions;
 
 		private bool _initialized = false;
@@ -44,7 +36,10 @@
 		{
 			if (!_initialized) return;
 
-			_currentTile = TileCover.CoordinateToTileId(_rangeTileProviderOptions.targetTransform.localPosition.GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale), _map.AbsoluteZoom);
+			var activeTiles = _activeTiles.Keys.ToList();
+
+			List<UnwrappedTileId> tilesToRequest = new List<UnwrappedTileId>();
+			_currentTile = TileCover.CoordinateToTileId(_map.WorldToGeoPosition(_rangeTileProviderOptions.targetTransform.localPosition), _map.AbsoluteZoom);
 
 			if (!_currentTile.Equals(_cachedTile))
 			{
@@ -52,11 +47,24 @@
 				{
 					for (int y = _currentTile.Y - _rangeTileProviderOptions.visibleBuffer; y <= (_currentTile.Y + _rangeTileProviderOptions.visibleBuffer); y++)
 					{
-						AddTile(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
+						tilesToRequest.Add(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
 					}
 				}
 				_cachedTile = _currentTile;
 				Cleanup(_currentTile);
+
+				var finalTilesNeeded = tilesToRequest.Except(activeTiles);
+
+				foreach (var tile in activeTiles)
+				{
+					// Reposition tiles in case we panned.
+					RepositionTile(tile);
+				}
+
+				foreach (var tile in finalTilesNeeded)
+				{
+					AddTile(tile);
+				}
 			}
 		}
 

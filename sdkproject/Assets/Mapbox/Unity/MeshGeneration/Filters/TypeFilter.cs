@@ -263,7 +263,7 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 			}
 
 			var propertyValue = Convert.ToDouble(property);
-			if (propertyValue - Min < Mapbox.Utils.Constants.EpsilonFloatingPoint)
+			if (Math.Abs(propertyValue - Min) < Mapbox.Utils.Constants.EpsilonFloatingPoint)
 			{
 				return true;
 			}
@@ -278,7 +278,14 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 
 		protected override bool PropertyComparer(object property)
 		{
-			return ValueSet.Contains(property.ToString().ToLower());
+			foreach(var value in ValueSet)
+			{
+				if (property.ToString().ToLower().Contains(value.ToString()))
+				{
+					return true;
+				}
+			}
+			return false;	
 		}
 	}
 
