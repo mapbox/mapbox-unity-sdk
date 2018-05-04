@@ -92,17 +92,12 @@
 		}
 
 
-		private void OnDestroy() { shutdown(); }
+		protected virtual void OnDestroy() { shutdown(); }
 
 
-		private void OnDisable() { shutdown(); }
+		protected virtual void OnDisable() { shutdown(); }
 
-
-
-
-
-
-		void Awake()
+		protected virtual void Awake()
 		{
 
 			_wait1sec = new WaitForSeconds(1);
@@ -387,7 +382,7 @@
 
 
 
-		private void Update()
+		protected virtual void Update()
 		{
 
 			/*
