@@ -253,7 +253,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		void OnDestroy()
+		protected virtual void OnDestroy()
 		{
 			Cancel();
 			if (_heightTexture != null)

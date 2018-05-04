@@ -18,7 +18,7 @@
 		public float TotalTime = 0;
 		private float _firstRun;
 
-		private void Awake()
+		protected virtual void Awake()
 		{
 			TotalTime = 0;
 			_currentTest = 1;
