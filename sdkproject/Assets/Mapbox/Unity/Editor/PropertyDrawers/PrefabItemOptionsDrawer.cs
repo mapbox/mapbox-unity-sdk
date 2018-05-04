@@ -63,6 +63,7 @@ namespace Mapbox.Editor
 			GUILayout.Label(prefabLocationsTitle);
 
 			//FindBy drop down
+			EditorGUI.indentLevel--;
 			EditorGUILayout.BeginHorizontal();
 			EditorGUILayout.PrefixLabel(findByDropDown);
 			var findByProp = property.FindPropertyRelative("findByType");

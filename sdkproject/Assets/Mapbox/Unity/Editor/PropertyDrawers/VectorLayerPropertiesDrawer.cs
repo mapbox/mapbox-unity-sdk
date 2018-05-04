@@ -144,11 +144,9 @@
 				var layersRect = GUILayoutUtility.GetRect(0, 500, Mathf.Max(subLayerArray.arraySize + 1, 1) * _lineHeight,
 					(subLayerArray.arraySize + 1) * _lineHeight);
 
-
 				layerTreeView.Layers = subLayerArray;
 				layerTreeView.Reload();
 				layerTreeView.OnGUI(layersRect);
-
 
 				selectedLayers = layerTreeView.GetSelection();
 
