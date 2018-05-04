@@ -36,13 +36,16 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				_properties.sourceOptions.Id = value;
 			}
 		}
-				
+
 		#region UnityMethods
 		private void OnDestroy()
 		{
-			DataFetcher.DataRecieved -= OnImageRecieved;
-			DataFetcher.FetchingError -= OnDataError;
-		} 
+			if (DataFetcher != null)
+			{
+				DataFetcher.DataRecieved -= OnImageRecieved;
+				DataFetcher.FetchingError -= OnDataError;
+			}
+		}
 		#endregion
 
 		#region DataFetcherEvents
