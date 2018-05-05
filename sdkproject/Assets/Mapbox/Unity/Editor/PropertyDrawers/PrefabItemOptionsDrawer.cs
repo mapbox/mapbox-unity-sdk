@@ -85,6 +85,7 @@ namespace Mapbox.Editor
 				default:
 					break;
 			}
+			EditorGUI.indentLevel++;
 
 			EditorGUI.EndProperty();
 		}

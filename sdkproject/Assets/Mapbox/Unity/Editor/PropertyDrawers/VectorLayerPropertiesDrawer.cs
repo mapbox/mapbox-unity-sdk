@@ -15,8 +15,6 @@
 	public class VectorLayerPropertiesDrawer : PropertyDrawer
 	{
 		static float _lineHeight = EditorGUIUtility.singleLineHeight;
-		GUIContent[] _sourceTypeContent;
-		bool _isGUIContentSet = false;
 
 		bool ShowPosition
 		{
@@ -36,18 +34,6 @@
 			set { EditorPrefs.SetInt("VectorLayerProperties_selectionIndex", value); }
 		}
 
-		string CustomSourceMapId
-		{
-			get { return EditorPrefs.GetString("VectorLayerProperties_customSourceMapId"); }
-			set { EditorPrefs.SetString("VectorLayerProperties_customSourceMapId", value); }
-		}
-
-		private GUIContent _mapIdGui = new GUIContent
-		{
-			text = "Map Id",
-			tooltip = "Map Id corresponding to the tileset."
-		};
-
 		VectorSubLayerTreeView layerTreeView = new VectorSubLayerTreeView(new TreeViewState());
 		IList<int> selectedLayers = new List<int>();
 
@@ -56,84 +42,12 @@
 			EditorGUI.BeginProperty(position, label, property);
 			position.height = _lineHeight;
 
+			GUILayout.Space(-_lineHeight);
 			var sourceTypeProperty = property.FindPropertyRelative("_sourceType");
 			var sourceTypeValue = (VectorSourceType) sourceTypeProperty.enumValueIndex;
 
-			var displayNames = sourceTypeProperty.enumDisplayNames;
-			int count = sourceTypeProperty.enumDisplayNames.Length;
-			if (!_isGUIContentSet)
-			{
-				_sourceTypeContent = new GUIContent[count];
-				for (int extIdx = 0; extIdx < count; extIdx++)
-				{
-					_sourceTypeContent[extIdx] = new GUIContent
-					{
-						text = displayNames[extIdx],
-						tooltip = ((VectorSourceType) extIdx).Description(),
-					};
-				}
-
-				_isGUIContentSet = true;
-			}
-
-			var typePosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent
-			{
-				text = "Data Source",
-				tooltip = "Source tileset for Vector Data"
-			});
-
-			sourceTypeProperty.enumValueIndex =
-				EditorGUI.Popup(typePosition, sourceTypeProperty.enumValueIndex, _sourceTypeContent);
-			sourceTypeValue = (VectorSourceType) sourceTypeProperty.enumValueIndex;
-
-			position.y += _lineHeight;
-			var sourceOptionsProperty = property.FindPropertyRelative("sourceOptions");
-			var layerSourceProperty = sourceOptionsProperty.FindPropertyRelative("layerSource");
-			var layerSourceId = layerSourceProperty.FindPropertyRelative("Id");
-			var isActiveProperty = sourceOptionsProperty.FindPropertyRelative("isActive");
-			switch (sourceTypeValue)
-			{
-				case VectorSourceType.MapboxStreets:
-				case VectorSourceType.MapboxStreetsWithBuildingIds:
-					var sourcePropertyValue = MapboxDefaultVector.GetParameters(sourceTypeValue);
-					layerSourceId.stringValue = sourcePropertyValue.Id;
-					GUI.enabled = false;
-					EditorGUILayout.PropertyField(sourceOptionsProperty, _mapIdGui);
-					GUI.enabled = true;
-					isActiveProperty.boolValue = true;
-					break;
-				case VectorSourceType.Custom:
-					layerSourceId.stringValue = CustomSourceMapId;
-					EditorGUILayout.PropertyField(sourceOptionsProperty, _mapIdGui);
-					CustomSourceMapId = layerSourceId.stringValue;
-					isActiveProperty.boolValue = true;
-					break;
-				case VectorSourceType.None:
-					isActiveProperty.boolValue = false;
-					break;
-				default:
-					isActiveProperty.boolValue = false;
-					break;
-			}
-
 			if (sourceTypeValue != VectorSourceType.None)
 			{
-				position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sourceOptions"));
-
-				var isStyleOptimized = property.FindPropertyRelative("useOptimizedStyle");
-				EditorGUILayout.PropertyField(isStyleOptimized);
-				position.y += _lineHeight;
-
-				if (isStyleOptimized.boolValue)
-				{
-					EditorGUILayout.PropertyField(property.FindPropertyRelative("optimizedStyle"), new GUIContent("Style Options"));
-				}
-
-				position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("optimizedStyle"));
-				EditorGUILayout.PropertyField(property.FindPropertyRelative("performanceOptions"),
-					new GUIContent("Perfomance Options"));
-				position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("performanceOptions"));
-
 				EditorGUILayout.LabelField(new GUIContent
 				{
 					text = "Vector Layer Visualizers",
@@ -278,6 +192,7 @@
 
 		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty)
 		{
+			EditorGUI.indentLevel--;
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
 			EditorGUI.indentLevel++;
 			GUILayout.Label(subLayerCoreOptions.FindPropertyRelative("sublayerName").stringValue + " Properties");
@@ -330,6 +245,7 @@
 			EditorGUI.indentLevel--;
 			GUILayout.EndVertical();
 			EditorGUI.indentLevel--;
+			EditorGUI.indentLevel++;
 		}
 
 		void DrawModifiers(SerializedProperty property, GUIContent label)
