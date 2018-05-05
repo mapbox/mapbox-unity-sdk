@@ -259,7 +259,7 @@
 					}
 					else
 					{
-						EditorGUILayout.HelpBox("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the data source in the FEATURES section.", MessageType.Error);
+						EditorGUILayout.HelpBox("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the data source.", MessageType.Error);
 					}
 				}
 				ShowSepartor();
