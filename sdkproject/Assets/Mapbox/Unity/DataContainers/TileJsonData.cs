@@ -52,6 +52,7 @@
 
 		public void ProcessTileJSONData(TileJSONResponse tjr)
 		{
+			tileJSONLoaded = true;
 			List<string> layerPropertiesList = new List<string>();
 			List<string> sourceLayersList = new List<string>();
 
@@ -184,8 +185,6 @@
 					}
 				}
 			}
-
-			tileJSONLoaded = true;
 		}
 	}
 }

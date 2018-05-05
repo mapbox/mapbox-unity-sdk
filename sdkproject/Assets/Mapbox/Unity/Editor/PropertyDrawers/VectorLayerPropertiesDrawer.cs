@@ -150,7 +150,7 @@
 					{
 						_isInitialized = true;
 					}
-					if(tileJSONData.PropertyDisplayNames.Count==0)
+					if(tileJSONData.PropertyDisplayNames.Count==0 && tileJSONData.tileJSONLoaded)
 					{
 						EditorGUILayout.HelpBox("Invalid Map Id / There might be a problem with the internet connection.", MessageType.Error);
 					}
@@ -168,7 +168,7 @@
 					{
 						_isInitialized = true;
 					}
-					if (tileJSONData.PropertyDisplayNames.Count == 0)
+					if (tileJSONData.PropertyDisplayNames.Count == 0 && tileJSONData.tileJSONLoaded)
 					{
 						EditorGUILayout.HelpBox("Invalid Map Id / There might be a problem with the internet connection.", MessageType.Error);
 					}
