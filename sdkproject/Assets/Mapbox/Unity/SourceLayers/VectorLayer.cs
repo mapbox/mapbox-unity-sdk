@@ -158,17 +158,6 @@
 		public void Initialize()
 		{
 			_vectorTileFactory = ScriptableObject.CreateInstance<VectorTileFactory>();
-			//if (_layerProperty.sourceType != VectorSourceType.None || _layerProperty.sourceOptions.Id.Contains(MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id))
-			//{
-			//	foreach (var item in _locationPrefabsLayerProperties.locationPrefabList)
-			//	{
-			//		//Add PrefabItemOptions items as a VectorSubLayerProperties
-			//		if (!_layerProperty.vectorSubLayers.Contains(item))
-			//		{
-			//			AddVectorLayer(item);
-			//		}
-			//	}
-			//}
 			_layerProperty.locationPrefabList = LocationPrefabsLayerProperties.locationPrefabList;
 			_vectorTileFactory.SetOptions(_layerProperty);
 		}

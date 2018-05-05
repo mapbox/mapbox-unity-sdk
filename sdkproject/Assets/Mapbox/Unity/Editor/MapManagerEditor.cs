@@ -56,7 +56,7 @@
 		}
 
 		/// <summary>
-		/// Gets or sets a value show or hide Map Layers section <see cref="T:Mapbox.Editor.MapManagerEditor"/> show features.
+		/// Gets or sets a value to show or hide Map Layers section <see cref="T:Mapbox.Editor.MapManagerEditor"/> show features.
 		/// </summary>
 		/// <value><c>true</c> if show features; otherwise, <c>false</c>.</value>
 		bool ShowMapLayers
