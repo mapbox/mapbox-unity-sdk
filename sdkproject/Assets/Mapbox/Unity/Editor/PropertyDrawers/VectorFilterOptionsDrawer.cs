@@ -61,7 +61,6 @@
 				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibutton"))
 				{
 					propertyFilters.arraySize++;
-					//propertyFilters.GetArrayElementAtIndex(propertyFilters.arraySize - 1) = null;
 				}
 				EditorGUILayout.EndHorizontal();
 				EditorGUI.indentLevel--;
@@ -111,7 +110,6 @@
 
 
 			EditorGUILayout.BeginHorizontal();
-			//property.FindPropertyRelative("Key").stringValue = EditorGUILayout.TextField(property.FindPropertyRelative("Key").stringValue, GUILayout.MaxWidth(150));
 			var selectedLayerName = originalProperty.FindPropertyRelative("_selectedLayerName").stringValue;
 
 			if (_isInitialized == true)

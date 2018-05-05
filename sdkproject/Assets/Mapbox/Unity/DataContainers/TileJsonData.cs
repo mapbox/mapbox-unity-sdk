@@ -8,17 +8,17 @@
 	[Serializable]
 	public class TileJsonData
 	{
-		public readonly string commonLayersKey = "(layer found in more than one source)";
+		public readonly string commonLayersKey = "(layer found in more than one data source)";
 		public readonly string optionalPropertiesString = "(may not appear across all locations)";
 		/// <summary>
 		/// This boolean is to check if tile JSON data has loaded after the data source has changed
 		/// </summary>
 		public bool tileJSONLoaded = false;
+
 		/// <summary>
 		/// Layer Display Names seen in the editor
 		/// </summary>
 		public List<string> LayerDisplayNames = new List<string>();
-
 
 		/// <summary>
 		/// Property Display Names seen in the editor
@@ -97,31 +97,17 @@
 						if (SourceLayersDictionary.ContainsKey(commonLayersKey))
 						{
 							SourceLayersDictionary[commonLayersKey].Add(layerName);
-							if (LayerDisplayNames.Contains(layerName))
-							{
-								LayerDisplayNames.Remove(layerName);
-							}
-							LayerDisplayNames.Add(layerName + " " + commonLayersKey);
 						}
 						else
 						{
 							SourceLayersDictionary.Add(commonLayersKey, new List<string>() { layerName });
-							if (LayerDisplayNames.Contains(layerName))
-							{
-								LayerDisplayNames.Remove(layerName);
-							}
-							LayerDisplayNames.Add(layerName + " " + commonLayersKey);
 						}
 
-						//remove the layer from other different sources
-						//foreach (var source in sourceList)
-						//{
-						//	SourceLayersDictionary[source].Remove(layerName);
-
-						//	//if the source contains zero layers remove th source from the list
-						//	if (SourceLayersDictionary[source].Count == 0)
-						//		SourceLayersDictionary.Remove(source);
-						//}
+						if (LayerDisplayNames.Contains(layerName))
+						{
+							LayerDisplayNames.Remove(layerName);
+						}
+						LayerDisplayNames.Add(layerName + " " + commonLayersKey);
 					}
 					else
 					{

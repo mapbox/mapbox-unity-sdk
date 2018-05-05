@@ -76,7 +76,6 @@
 					position.y += lineHeight;
 					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), extrusionGeometryType, extrusionGeometryGUI);
 					position.y += lineHeight;
-					//EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
 					DrawPropertyDropDown(property, position);
 					if (!dataUnavailable)
 					{
@@ -87,17 +86,16 @@
 					position.y += lineHeight;
 					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), extrusionGeometryType, extrusionGeometryGUI);
 					position.y += lineHeight;
-					//EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
 					DrawPropertyDropDown(property, position);
 					if (!dataUnavailable)
 					{
 						position.y += 2.5f * lineHeight;
-					}					break;
+					}					
+					break;
 				case Unity.Map.ExtrusionType.MaxHeight:
 					position.y += lineHeight;
 					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), extrusionGeometryType, extrusionGeometryGUI);
 					position.y += lineHeight;
-					//EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
 					DrawPropertyDropDown(property, position);
 					if (!dataUnavailable)
 					{
@@ -108,7 +106,6 @@
 					position.y += lineHeight;
 					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), extrusionGeometryType, extrusionGeometryGUI);
 					position.y += lineHeight;
-					//EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("propertyName"));
 					DrawPropertyDropDown(property, position);
 					if (!dataUnavailable)
 					{
@@ -120,7 +117,6 @@
 					EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), maxHeightProperty);
 					if (minHeightProperty.floatValue > maxHeightProperty.floatValue)
 					{
-						//position.y += lineHeight;
 						EditorGUILayout.HelpBox("Maximum Height less than Minimum Height!", MessageType.Error);
 					}
 					break;
@@ -133,7 +129,8 @@
 				default:
 					break;
 			}
-				position.y += lineHeight;
+
+			position.y += lineHeight;
 			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("extrusionScaleFactor"), new GUIContent { text = "Scale Factor" });
 			EditorGUI.indentLevel--;
 
@@ -146,7 +143,6 @@
 			var selectedLayerName = property.FindPropertyRelative("_selectedLayerName").stringValue;
 
 			var serializedMapObject = property.serializedObject;
-			//serializedMapObject.Update();
 			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
 			tileJsonData = mapObject.VectorData.LayerProperty.tileJsonData;
 
@@ -177,8 +173,6 @@
 				_isInitialized = true;
 				DrawPropertyName(property, position, propertyDisplayNames, selectedLayerName);
 			}
-
-			//serializedMapObject.ApplyModifiedProperties();
 		}
 
 		private void DrawPropertyName(SerializedProperty property, Rect position, List<string>propertyDisplayNames, string selectedLayerName)

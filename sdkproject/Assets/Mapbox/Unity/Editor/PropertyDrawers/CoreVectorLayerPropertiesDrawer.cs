@@ -44,9 +44,7 @@
 			EditorGUI.indentLevel++;
 
 			position.y += lineHeight;
-			//EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("layerName"));
 			var serializedMapObject = property.serializedObject;
-			//serializedMapObject.Update();
 			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
 			tileJsonData = mapObject.VectorData.LayerProperty.tileJsonData;
 
@@ -83,7 +81,6 @@
 			}
 
 			EditorGUI.EndProperty();
-			//serializedMapObject.ApplyModifiedProperties();
 		}
 		private static int count = 0;
 		private void DrawLayerName(SerializedProperty property,Rect position,List<string> layerDisplayNames)

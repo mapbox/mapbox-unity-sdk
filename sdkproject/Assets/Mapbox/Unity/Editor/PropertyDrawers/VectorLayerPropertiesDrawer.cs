@@ -26,7 +26,6 @@
 		/// </summary>
 		/// <value><c>true</c> then show general section; otherwise hide, <c>false</c>.</value>
 
-
 		string objectId = "";
 		private string TilesetId
 		{

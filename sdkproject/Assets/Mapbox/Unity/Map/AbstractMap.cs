@@ -9,7 +9,6 @@ namespace Mapbox.Unity.Map
 	using Mapbox.Map;
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Unity.MeshGeneration.Data;
-	using Mapbox.Platform.TilesetTileJSON;
 
 	public interface IUnifiedMap
 	{
