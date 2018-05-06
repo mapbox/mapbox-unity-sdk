@@ -63,14 +63,12 @@
 
 		protected override void RowGUI(RowGUIArgs args)
 		{
-			//EditorGUI.indentLevel--;
 			Rect toggleRect = args.rowRect;
 			toggleRect.width = kToggleWidth;
 			var item = Layers.GetArrayElementAtIndex(args.item.id);
 			item.FindPropertyRelative("coreOptions.isActive").boolValue = EditorGUI.Toggle(toggleRect, item.FindPropertyRelative("coreOptions.isActive").boolValue);
 			args.item.displayName = item.FindPropertyRelative("coreOptions.sublayerName").stringValue;
 			base.RowGUI(args);
-			//EditorGUI.indentLevel++;
 		}
 	}
 }

@@ -52,8 +52,6 @@ namespace Mapbox.Editor
 			GUILayout.Space(-_lineHeight);
 			var prefabItemCoreOptions = property.FindPropertyRelative("coreOptions");
 			GUILayout.Label(prefabItemCoreOptions.FindPropertyRelative("sublayerName").stringValue + " Properties");
-			//GUILayout.Space(2.5f * EditorGUIUtility.singleLineHeight);
-
 
 			//Prefab Game Object
 			GUILayout.Space(-_lineHeight);
@@ -81,12 +79,14 @@ namespace Mapbox.Editor
 					findByPropContent[extIdx] = new GUIContent
 					{
 						text = displayNames[extIdx],
-						tooltip = ((ImagerySourceType)extIdx).Description(),
+						tooltip = ((LocationPrefabFindBy)extIdx).Description(),
 					};
 				}
 				isGUIContentSet = true;
 			}
+
 			EditorGUI.indentLevel++;
+
 			findByProp.enumValueIndex = EditorGUILayout.Popup(findByDropDown, findByProp.enumValueIndex, findByPropContent);
 
 			EditorGUILayout.EndHorizontal();
@@ -127,13 +127,13 @@ namespace Mapbox.Editor
 				//get the element to draw
 				var coordinate = coordinateProperties.GetArrayElementAtIndex(i);
 
-				//label for each location. 
+				//label for each location.
 				var coordinateLabel = String.Format("Location {0}", i);
 
-				// draw coordinate string. 
+				// draw coordinate string.
 				coordinate.stringValue = EditorGUILayout.TextField(coordinateLabel, coordinate.stringValue);
 
-				// draw search button. 
+				// draw search button.
 				if (GUILayout.Button(new GUIContent(searchButtonContent), (GUIStyle)"minibuttonleft", GUILayout.MaxWidth(100)))
 				{
 					GeocodeAttributeSearchWindow.Open(coordinate);

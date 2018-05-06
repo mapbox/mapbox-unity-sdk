@@ -103,7 +103,6 @@
 			}
 		}
 
-
 		bool ShowPosition
 		{
 			get
@@ -174,7 +173,6 @@
 			if (ShowMapLayers)
 			{
 				DrawMapLayerOptions();
-				//EditorGUI.indentLevel--;
 			}
 			GUILayout.EndVertical();
 
@@ -228,6 +226,7 @@
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("loadingTexture"));
 			}
 		}
+
 		void DrawMapLayerOptions()
 		{
 			//EditorGUI.indentLevel++;
@@ -321,6 +320,7 @@
 					EditorGUILayout.HelpBox("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the data source in the FEATURES section.", MessageType.Error);
 				}
 			}
+
 			ShowSepartor();
 			ShowFeatures = EditorGUILayout.Foldout(ShowFeatures, "FEATURES");
 			if (ShowFeatures)
@@ -328,6 +328,7 @@
 				ShowSection(serializedObject.FindProperty("_vectorData"), "_layerProperty");
 			}
 		}
+
 		void PresetLocationBased(SerializedProperty unifiedMap)
 		{
 			//Set

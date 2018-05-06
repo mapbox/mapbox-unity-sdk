@@ -58,8 +58,6 @@
 				var layersRect = GUILayoutUtility.GetRect(0, 500, Mathf.Max(subLayerArray.arraySize + 1, 1) * _lineHeight,
 					(subLayerArray.arraySize + 1) * _lineHeight);
 
-				//Debug.Log("Indent" + EditorGUIUtility.standardVerticalSpacing);
-				//layersRect.x += (EditorGUIUtility.singleLineHeight * (EditorGUI.indentLevel + 1));
 				layerTreeView.Layers = subLayerArray;
 				layerTreeView.Reload();
 				layerTreeView.OnGUI(layersRect);
