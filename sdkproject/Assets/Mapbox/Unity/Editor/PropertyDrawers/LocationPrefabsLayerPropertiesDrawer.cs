@@ -29,11 +29,10 @@ namespace Mapbox.Unity.Map
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			EditorGUI.BeginProperty(position, label, property);
-			position.height = _lineHeight;
 			GUILayout.Space(-_lineHeight);
 			var prefabItemArray = property.FindPropertyRelative("locationPrefabList");
 			var layersRect = GUILayoutUtility.GetRect(0, 500, Mathf.Max(prefabItemArray.arraySize + 1, 1) * _lineHeight, (prefabItemArray.arraySize + 1) * _lineHeight);
+
 			layerTreeView.Layers = prefabItemArray;
 			layerTreeView.Reload();
 			layerTreeView.OnGUI(layersRect);
@@ -124,7 +123,7 @@ namespace Mapbox.Unity.Map
 					GUI.enabled = false;
 				}
 
-				DrawLayerLocationPrefabProperties( layerProperty);
+				DrawLayerLocationPrefabProperties(layerProperty);
 				if (!isLayerActive)
 				{
 					GUI.enabled = true;
@@ -135,16 +134,12 @@ namespace Mapbox.Unity.Map
 				GUILayout.Space(15);
 				GUILayout.Label("Select a visualizer to see properties");
 			}
-
-			EditorGUI.EndProperty();
 		}
 
 
 		void DrawLayerLocationPrefabProperties(SerializedProperty layerProperty)
 		{
-			EditorGUI.indentLevel++;
 			EditorGUILayout.PropertyField(layerProperty);
-			EditorGUI.indentLevel--;
 		}
-	} 
+	}
 }
