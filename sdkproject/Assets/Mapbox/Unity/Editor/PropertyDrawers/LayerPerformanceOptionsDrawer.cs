@@ -8,7 +8,7 @@
 	public class LayerPerformanceOptionsDrawer : PropertyDrawer
 	{
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
-
+		static int checkBoxOffset = 15;
 		SerializedProperty isActiveProperty;
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -18,6 +18,7 @@
 			EditorGUI.BeginProperty(position, label, property);
 			position.height = lineHeight;
 			var typePosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent("Enable Coroutines"));
+			typePosition.x -= checkBoxOffset;
 			isActiveProperty.boolValue = EditorGUI.Toggle(typePosition, isActiveProperty.boolValue);
 
 			if (isActiveProperty.boolValue == true)

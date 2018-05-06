@@ -804,19 +804,7 @@ namespace Mapbox.Unity.Map
 				_vectorData = new VectorLayer();
 			}
 
-			//ensure that there is a list of prefabitems
-			if (_vectorData.LocationPrefabsLayerProperties.locationPrefabList == null)
-			{
-				_vectorData.LocationPrefabsLayerProperties.locationPrefabList = new List<PrefabItemOptions>();
-			}
-
-			//add the prefab item if it doesn't already exist
-			if (!_vectorData.LayerProperty.vectorSubLayers.Contains(item))
-			{
-				_vectorData.LocationPrefabsLayerProperties.locationPrefabList.Add(item);
-				_vectorData.AddVectorLayer(item);
-			}
-
+			_vectorData.AddLocationPrefabItem(item);
 		}
 
   		#endregion

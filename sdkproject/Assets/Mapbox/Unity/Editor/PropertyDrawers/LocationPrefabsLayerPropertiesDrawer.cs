@@ -32,7 +32,6 @@ namespace Mapbox.Unity.Map
 			EditorGUI.BeginProperty(position, label, property);
 			position.height = _lineHeight;
 			GUILayout.Space(-_lineHeight);
-
 			var prefabItemArray = property.FindPropertyRelative("locationPrefabList");
 			var layersRect = GUILayoutUtility.GetRect(0, 500, Mathf.Max(prefabItemArray.arraySize + 1, 1) * _lineHeight, (prefabItemArray.arraySize + 1) * _lineHeight);
 			layerTreeView.Layers = prefabItemArray;

@@ -106,6 +106,32 @@
 			_layerProperty.vectorSubLayers.Add(subLayerProperties);
 		}
 
+		public void AddLocationPrefabItem(PrefabItemOptions prefabItem)
+		{
+			//ensure that there is a list of prefabitems
+			if (LocationPrefabsLayerProperties.locationPrefabList == null)
+			{
+				LocationPrefabsLayerProperties.locationPrefabList = new List<PrefabItemOptions>();
+			}
+
+			if(_layerProperty.locationPrefabList == null)
+			{
+				_layerProperty.locationPrefabList = new List<PrefabItemOptions>();
+			}
+
+			//add the prefab item if it doesn't already exist
+			if (!LocationPrefabsLayerProperties.locationPrefabList.Contains(prefabItem))
+			{
+				LocationPrefabsLayerProperties.locationPrefabList.Add(prefabItem);
+			}
+
+			//add the prefab item if it doesn't already exist
+			if (!_layerProperty.locationPrefabList.Contains(prefabItem))
+			{
+				_layerProperty.locationPrefabList.Add(prefabItem);
+			}
+		}
+
 		public void RemoveVectorLayer(int index)
 		{
 			if (_layerProperty.vectorSubLayers != null)
@@ -113,6 +139,15 @@
 				_layerProperty.vectorSubLayers.RemoveAt(index);
 			}
 		}
+
+		public void RemovePrefabItem(int index)
+		{
+			if (LocationPrefabsLayerProperties.locationPrefabList != null)
+			{
+				LocationPrefabsLayerProperties.locationPrefabList.RemoveAt(index);
+			}
+		}
+
 
 		public void Initialize(LayerProperties properties)
 		{
@@ -123,26 +158,7 @@
 		public void Initialize()
 		{
 			_vectorTileFactory = ScriptableObject.CreateInstance<VectorTileFactory>();
-			if (_layerProperty.sourceType != VectorSourceType.None || _layerProperty.sourceOptions.Id.Contains(MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id))
-			{
-				foreach (var item in _locationPrefabsLayerProperties.locationPrefabList)
-				{
-					//Add PrefabItemOptions items as a VectorSubLayerProperties
-					if (!_layerProperty.vectorSubLayers.Contains(item))
-					{
-						//Add PrefabItemOptions items as a VectorSubLayerProperties
-						//if (_layerProperty.sourceType == VectorSourceType.Custom || _layerProperty.sourceType == VectorSourceType.None)
-						//{
-						//	if (_layerProperty.sourceType == VectorSourceType.None)
-						//		_layerProperty.sourceOptions.Id = "";
-						//	//This is the style id we need for instantiating POI location prefabs
-						//	Style streetsVectorSource = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets);
-						//	AddLayerSource(streetsVectorSource.Id);
-						//}
-						AddVectorLayer(item);
-					}
-				}
-			}
+			_layerProperty.locationPrefabList = LocationPrefabsLayerProperties.locationPrefabList;
 			_vectorTileFactory.SetOptions(_layerProperty);
 		}
 

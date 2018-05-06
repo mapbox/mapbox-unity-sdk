@@ -48,5 +48,6 @@
 		public LayerPerformanceOptions performanceOptions;
 		[NodeEditorElementAttribute("Vector Sublayers")]
 		public List<VectorSubLayerProperties> vectorSubLayers = new List<VectorSubLayerProperties>();
+		public List<PrefabItemOptions> locationPrefabList = new List<PrefabItemOptions>();
 	}
 }
