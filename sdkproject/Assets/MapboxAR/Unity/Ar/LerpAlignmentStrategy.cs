@@ -85,8 +85,9 @@ namespace Mapbox.Unity.Ar
 				//var position = Vector3.Lerp(_startPosition, _endPosition, percentageComplete);
 				var rotation = Quaternion.Lerp(_startRotation, _endRotation, percentageComplete);
 
+				var inversed = Quaternion.Inverse(rotation);
 				// Rotate ARoot, but place map on ARPlane.
-				_transform.rotation = rotation;
+				_transform.rotation = inversed;
 
 				//_map.transform.position = position;
 				//_transform.SetPositionAndRotation(position, rotation);

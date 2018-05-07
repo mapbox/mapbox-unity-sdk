@@ -11,10 +11,15 @@
 	public class ARLocalizationStrategy : ComputeARLocalizationStrategy
 	{
 
+		[SerializeField]
+		ARMapMatching _mapMatching;
+
 		ARInterface.CustomTrackingState _trackingState;
 		ARInterface _arInterface;
 		bool _isTrackingGood, _setUserHeading;
 		float _planePosOnY = -.5f;
+		Node _mapMatchNode;
+
 
 		public override event Action<Alignment> OnLocalizationComplete;
 
@@ -24,6 +29,7 @@
 			_trackingState = new ARInterface.CustomTrackingState();
 			ARInterface.planeAdded += GetPlaneCoords;
 			ARInterface.planeRemoved += GetPlaneCoords;
+			_mapMatching.ReturnMapMatchCoords += MapMatchGetCoords;
 		}
 
 		public override void ComputeLocalization(CentralizedARLocator centralizedARLocator)
@@ -31,6 +37,10 @@
 			var currentLocation = LocationProviderFactory.Instance.DefaultLocationProvider.CurrentLocation;
 			var aligment = new Alignment();
 
+			// TODO: Get the mapmatching coords and then check the latest node to replace the user, if GPS or so is bad...
+			/// IN the meantime flow with the offset of things.
+			/// 
+			/// 
 			// Checking if tracking is good, do nothing on location. Other than check if the newly calculated heading is better.
 			Debug.Log("Tracking state: " + CheckTracking());
 
@@ -61,14 +71,26 @@
 				return;
 			}
 
-			// If tracking is bad then use GPS to align map.
+			// If tracking is bad then use GPS to align map. If tracking was previously bad... 
+			// Check map matching quality. And maybe use that to snap to the user.
+
 			// TODO : Add mapmatching to the equation.
+
+
 			var geoPos = centralizedARLocator.CurrentMap.GeoToWorldPosition(currentLocation.LatitudeLongitude);
 			var geoAndPlanePos = new Vector3(geoPos.x, _planePosOnY, geoPos.z);
 			aligment.Position = geoAndPlanePos;
 			//aligment.Rotation = currentLocation.IsUserHeadingUpdated ? currentLocation.UserHeading : currentLocation.DeviceOrientation;
 			aligment.Rotation = currentLocation.DeviceOrientation;
-			OnLocalizationComplete(aligment);
+
+			//OnLocalizationComplete(aligment);
+		}
+
+		void MapMatchGetCoords(Node[] nodes)
+		{
+			_mapMatchNode = nodes[nodes.Length - 1];
+			// ARMapMatching is not like the other node bases. Order is reversed.
+			// Do smth with the coords.
 		}
 
 		void GetPlaneCoords(BoundedPlane plane)
