@@ -10,6 +10,7 @@
 	public class VectorSubLayerTreeView : TreeView
 	{
 		public SerializedProperty Layers;
+		private float kToggleWidth = 18f;
 
 		public VectorSubLayerTreeView(TreeViewState state)
 			: base(state)
@@ -32,8 +33,7 @@
 				for (int i = 0; i < Layers.arraySize; i++)
 				{
 					var name = Layers.GetArrayElementAtIndex(i).FindPropertyRelative("coreOptions.sublayerName").stringValue;
-					//Debug.Log(name);
-					items.Add(new TreeViewItem { id = index, depth = 0, displayName = name });
+					items.Add(new TreeViewItem { id = index, depth = 1, displayName = name });
 					index++;
 				}
 			}
@@ -52,20 +52,23 @@
 
 		protected override void RenameEnded(RenameEndedArgs args)
 		{
-			if (Layers != null)
+			if (Layers == null)
 			{
-				//var layer = Layers[args.itemID]; //
-				//layer = args.newName;
-				var layer = Layers.GetArrayElementAtIndex(args.itemID);
-				if (string.IsNullOrEmpty(args.newName.Trim()))
-				{
-					layer.FindPropertyRelative("coreOptions.sublayerName").stringValue = args.originalName;
-				}
-				else
-				{
-					layer.FindPropertyRelative("coreOptions.sublayerName").stringValue = args.newName;
-				}
+				return;
 			}
+
+			var layer = Layers.GetArrayElementAtIndex(args.itemID);
+			layer.FindPropertyRelative("coreOptions.sublayerName").stringValue = string.IsNullOrEmpty(args.newName.Trim()) ? args.originalName : args.newName;
+		}
+
+		protected override void RowGUI(RowGUIArgs args)
+		{
+			Rect toggleRect = args.rowRect;
+			toggleRect.width = kToggleWidth;
+			var item = Layers.GetArrayElementAtIndex(args.item.id);
+			item.FindPropertyRelative("coreOptions.isActive").boolValue = EditorGUI.Toggle(toggleRect, item.FindPropertyRelative("coreOptions.isActive").boolValue);
+			args.item.displayName = item.FindPropertyRelative("coreOptions.sublayerName").stringValue;
+			base.RowGUI(args);
 		}
 	}
 }

@@ -132,7 +132,7 @@ namespace Mapbox.Unity.Ar
 
 		void LocationProvider_OnLocationUpdated(Location location)
 		{
-			if (location.IsLocationUpdated || location.IsHeadingUpdated)
+			if (location.IsLocationUpdated || location.IsUserHeadingUpdated)
 			{
 				// With this line, we can control accuracy of Gps updates. 
 				// Be aware that we only get location information if it previously met
@@ -170,7 +170,7 @@ namespace Mapbox.Unity.Ar
 							, latitudeLongitude.x
 							, latitudeLongitude.y
 							, location.Accuracy
-							, location.Heading
+							, location.UserHeading
 						)
 						, "lightblue"
 					);

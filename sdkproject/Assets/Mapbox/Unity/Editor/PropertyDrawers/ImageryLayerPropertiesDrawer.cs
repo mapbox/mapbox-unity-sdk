@@ -35,9 +35,6 @@
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
-			EditorGUI.BeginProperty(position, label, property);
-			position.height = lineHeight;
-
 			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
 			var sourceTypeValue = (ImagerySourceType)sourceTypeProperty.enumValueIndex;
 
@@ -51,19 +48,18 @@
 					sourceTypeContent[extIdx] = new GUIContent
 					{
 						text = displayNames[extIdx],
-						tooltip = ((ImagerySourceType)extIdx).Description(),
+						tooltip = EnumExtensions.Description((ImagerySourceType)extIdx),
 					};
 				}
 				isGUIContentSet = true;
 			}
+
 			// Draw label.
+			var sourceTypeLabel = new GUIContent { text = "Data Source", tooltip = "Source tileset for Imagery." };
 
-			var typePosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Data Source", tooltip = "Source tileset for Imagery." });
-
-			sourceTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, sourceTypeProperty.enumValueIndex, sourceTypeContent);
+			sourceTypeProperty.enumValueIndex = EditorGUILayout.Popup(sourceTypeLabel, sourceTypeProperty.enumValueIndex, sourceTypeContent);
 			sourceTypeValue = (ImagerySourceType)sourceTypeProperty.enumValueIndex;
 
-			position.y += lineHeight;
 			var sourceOptionsProperty = property.FindPropertyRelative("sourceOptions");
 			var layerSourceProperty = sourceOptionsProperty.FindPropertyRelative("layerSource");
 			var layerSourceId = layerSourceProperty.FindPropertyRelative("Id");
@@ -79,12 +75,12 @@
 					var sourcePropertyValue = MapboxDefaultImagery.GetParameters(sourceTypeValue);
 					layerSourceId.stringValue = sourcePropertyValue.Id;
 					GUI.enabled = false;
-					EditorGUI.PropertyField(position, sourceOptionsProperty,_mapIdGui);
+					EditorGUILayout.PropertyField(sourceOptionsProperty, _mapIdGui);
 					GUI.enabled = true;
 					break;
 				case ImagerySourceType.Custom:
 					layerSourceId.stringValue = CustomSourceMapId;
-					EditorGUI.PropertyField(position, sourceOptionsProperty, new GUIContent{text = "Map Id / Style URL", tooltip = _mapIdGui.tooltip} );
+					EditorGUILayout.PropertyField(sourceOptionsProperty, new GUIContent { text = "Map Id / Style URL", tooltip = _mapIdGui.tooltip });
 					CustomSourceMapId = layerSourceId.stringValue;
 					break;
 				case ImagerySourceType.None:
@@ -94,29 +90,7 @@
 			}
 			if (sourceTypeValue != ImagerySourceType.None)
 			{
-				position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sourceOptions"));
-				EditorGUI.PropertyField(position, property.FindPropertyRelative("rasterOptions"));
-			}
-
-			EditorGUI.EndProperty();
-
-		}
-		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-		{
-			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
-			var sourceTypeValue = (ImagerySourceType)sourceTypeProperty.enumValueIndex;
-
-			if (sourceTypeValue == ImagerySourceType.None)
-			{
-				return lineHeight;
-			}
-			else
-			{
-				float height = 0.0f;
-				height += (1.0f * lineHeight);
-				height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("rasterOptions"));
-				height += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("sourceOptions"));
-				return height;
+				EditorGUILayout.PropertyField(property.FindPropertyRelative("rasterOptions"));
 			}
 		}
 	}

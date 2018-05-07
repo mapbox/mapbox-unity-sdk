@@ -10,6 +10,10 @@
 	public class VectorLayer : IVectorDataLayer
 	{
 		[SerializeField]
+		LocationPrefabsLayerProperties _locationPrefabsLayerProperties = new LocationPrefabsLayerProperties();	
+
+
+		[SerializeField]
 		VectorLayerProperties _layerProperty = new VectorLayerProperties();
 
 		[NodeEditorElement(" Vector Layer ")]
@@ -20,6 +24,7 @@
 				return _layerProperty;
 			}
 		}
+
 		public MapLayerType LayerType
 		{
 			get
@@ -71,6 +76,27 @@
 			}
 		}
 
+		public void AddLayerSource(string vectorSource)
+		{
+			if (!string.IsNullOrEmpty(vectorSource))
+			{
+				if (!_layerProperty.sourceOptions.Id.Contains(vectorSource))
+				{
+					if (string.IsNullOrEmpty(_layerProperty.sourceOptions.Id))
+					{
+						SetLayerSource(vectorSource);
+						return;
+					}
+					var newLayerSource = _layerProperty.sourceOptions.Id + "," + vectorSource;
+					SetLayerSource(newLayerSource);
+				}
+			}
+			else
+			{
+				Debug.LogError("Empty source. Nothing was added to the list of data sources");
+			}
+		}
+
 		public void AddVectorLayer(VectorSubLayerProperties subLayerProperties)
 		{
 			if (_layerProperty.vectorSubLayers == null)
@@ -78,6 +104,32 @@
 				_layerProperty.vectorSubLayers = new List<VectorSubLayerProperties>();
 			}
 			_layerProperty.vectorSubLayers.Add(subLayerProperties);
+		}
+
+		public void AddLocationPrefabItem(PrefabItemOptions prefabItem)
+		{
+			//ensure that there is a list of prefabitems
+			if (LocationPrefabsLayerProperties.locationPrefabList == null)
+			{
+				LocationPrefabsLayerProperties.locationPrefabList = new List<PrefabItemOptions>();
+			}
+
+			if(_layerProperty.locationPrefabList == null)
+			{
+				_layerProperty.locationPrefabList = new List<PrefabItemOptions>();
+			}
+
+			//add the prefab item if it doesn't already exist
+			if (!LocationPrefabsLayerProperties.locationPrefabList.Contains(prefabItem))
+			{
+				LocationPrefabsLayerProperties.locationPrefabList.Add(prefabItem);
+			}
+
+			//add the prefab item if it doesn't already exist
+			if (!_layerProperty.locationPrefabList.Contains(prefabItem))
+			{
+				_layerProperty.locationPrefabList.Add(prefabItem);
+			}
 		}
 
 		public void RemoveVectorLayer(int index)
@@ -88,6 +140,15 @@
 			}
 		}
 
+		public void RemovePrefabItem(int index)
+		{
+			if (LocationPrefabsLayerProperties.locationPrefabList != null)
+			{
+				LocationPrefabsLayerProperties.locationPrefabList.RemoveAt(index);
+			}
+		}
+
+
 		public void Initialize(LayerProperties properties)
 		{
 			_layerProperty = (VectorLayerProperties)properties;
@@ -97,6 +158,7 @@
 		public void Initialize()
 		{
 			_vectorTileFactory = ScriptableObject.CreateInstance<VectorTileFactory>();
+			_layerProperty.locationPrefabList = LocationPrefabsLayerProperties.locationPrefabList;
 			_vectorTileFactory.SetOptions(_layerProperty);
 		}
 
@@ -121,5 +183,13 @@
 			}
 		}
 		private VectorTileFactory _vectorTileFactory;
+
+		public LocationPrefabsLayerProperties LocationPrefabsLayerProperties
+		{
+			get
+			{
+				return _locationPrefabsLayerProperties;
+			}
+		}
 	}
 }

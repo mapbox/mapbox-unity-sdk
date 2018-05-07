@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Name: ExplorerPointPrefabModifier
   m_EditorClassIdentifier: 
   Active: 1
-  _prefab: {fileID: 1918270036827452, guid: cef2154b086ac7244b859a4cb18fe659, type: 2}
-  _scaleDownWithWorld: 1
+  _options:
+    prefab: {fileID: 1706413382388718, guid: 0940fff5996150e4cb6c1f69c781a29a, type: 2}
+    scaleDownWithWorld: 1
