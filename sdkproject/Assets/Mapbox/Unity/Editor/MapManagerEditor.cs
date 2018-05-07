@@ -3,12 +3,16 @@
 	using UnityEngine;
 	using UnityEditor;
 	using Mapbox.Unity.Map;
+	using Mapbox.Platform.TilesetTileJSON;
+	using System.Collections.Generic;
 	using Mapbox.VectorTile.ExtensionMethods;
 
 	[CustomEditor(typeof(AbstractMap))]
 	[CanEditMultipleObjects]
 	public class MapManagerEditor : Editor
 	{
+
+		private string objectId = "";
 		/// <summary>
 		/// Gets or sets a value indicating whether to show general section <see cref="T:Mapbox.Editor.MapManagerEditor"/>.
 		/// </summary>
@@ -17,11 +21,11 @@
 		{
 			get
 			{
-				return EditorPrefs.GetBool("MapManagerEditor_showGeneral");
+				return EditorPrefs.GetBool(objectId + "MapManagerEditor_showGeneral");
 			}
 			set
 			{
-				EditorPrefs.SetBool("MapManagerEditor_showGeneral", value);
+				EditorPrefs.SetBool(objectId + "MapManagerEditor_showGeneral", value);
 			}
 		}
 		/// <summary>
@@ -32,11 +36,11 @@
 		{
 			get
 			{
-				return EditorPrefs.GetBool("MapManagerEditor_showImage");
+				return EditorPrefs.GetBool(objectId + "MapManagerEditor_showImage");
 			}
 			set
 			{
-				EditorPrefs.SetBool("MapManagerEditor_showImage", value);
+				EditorPrefs.SetBool(objectId + "MapManagerEditor_showImage", value);
 			}
 		}
 		/// <summary>
@@ -47,11 +51,11 @@
 		{
 			get
 			{
-				return EditorPrefs.GetBool("MapManagerEditor_showTerrain");
+				return EditorPrefs.GetBool(objectId + "MapManagerEditor_showTerrain");
 			}
 			set
 			{
-				EditorPrefs.SetBool("MapManagerEditor_showTerrain", value);
+				EditorPrefs.SetBool(objectId + "MapManagerEditor_showTerrain", value);
 			}
 		}
 
@@ -95,11 +99,11 @@
 		{
 			get
 			{
-				return EditorPrefs.GetBool("MapManagerEditor_showVector");
+				return EditorPrefs.GetBool(objectId + "MapManagerEditor_showVector");
 			}
 			set
 			{
-				EditorPrefs.SetBool("MapManagerEditor_showVector", value);
+				EditorPrefs.SetBool(objectId + "MapManagerEditor_showVector", value);
 			}
 		}
 
@@ -107,11 +111,11 @@
 		{
 			get
 			{
-				return EditorPrefs.GetBool("MapManagerEditor_showPosition");
+				return EditorPrefs.GetBool(objectId + "MapManagerEditor_showPosition");
 			}
 			set
 			{
-				EditorPrefs.SetBool("MapManagerEditor_showPosition", value);
+				EditorPrefs.SetBool(objectId + "MapManagerEditor_showPosition", value);
 			}
 		}
 
@@ -139,6 +143,7 @@
 
 		public override void OnInspectorGUI()
 		{
+			objectId = serializedObject.targetObject.GetInstanceID().ToString();
 			serializedObject.Update();
 			EditorGUILayout.BeginVertical();
 			EditorGUILayout.Space();

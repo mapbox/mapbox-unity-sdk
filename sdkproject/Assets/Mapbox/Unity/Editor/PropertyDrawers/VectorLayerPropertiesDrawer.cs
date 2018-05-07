@@ -10,41 +10,177 @@
 	using Mapbox.Unity.MeshGeneration.Modifiers;
 	using Mapbox.VectorTile.ExtensionMethods;
 	using Mapbox.Unity.MeshGeneration.Filters;
+	using Mapbox.Platform.TilesetTileJSON;
 
 	[CustomPropertyDrawer(typeof(VectorLayerProperties))]
 	public class VectorLayerPropertiesDrawer : PropertyDrawer
 	{
 		static float _lineHeight = EditorGUIUtility.singleLineHeight;
+		GUIContent[] _sourceTypeContent;
+		bool _isGUIContentSet = false;
+		bool _isInitialized = false;
+		private TileJsonData tileJSONData;
+		private static TileJSONResponse tileJSONResponse;
+		/// <summary>
+		/// Gets or sets the layerID
+		/// </summary>
+		/// <value><c>true</c> then show general section; otherwise hide, <c>false</c>.</value>
+
+		string objectId = "";
+		private string TilesetId
+		{
+			get
+			{
+				return EditorPrefs.GetString(objectId + "MapManagerEditor_tilesetId");
+			}
+			set
+			{
+				EditorPrefs.SetString(objectId + "MapManagerEditor_tilesetId", value);
+			}
+		}
 
 		bool ShowPosition
 		{
-			get { return EditorPrefs.GetBool("VectorLayerProperties_showPosition"); }
-			set { EditorPrefs.SetBool("VectorLayerProperties_showPosition", value); }
+			get
+			{
+				return EditorPrefs.GetBool(objectId + "VectorLayerProperties_showPosition");
+			}
+			set
+			{
+				EditorPrefs.SetBool(objectId + "VectorLayerProperties_showPosition", value);
+			}
 		}
 
 		bool ShowOthers
 		{
-			get { return EditorPrefs.GetBool("VectorLayerProperties_showOthers"); }
-			set { EditorPrefs.SetBool("VectorLayerProperties_showOthers", value); }
+			get
+			{
+				return EditorPrefs.GetBool(objectId + "VectorLayerProperties_showOthers");
+			}
+			set
+			{
+				EditorPrefs.SetBool(objectId + "VectorLayerProperties_showOthers", value);
+			}
 		}
 
 		int SelectionIndex
 		{
-			get { return EditorPrefs.GetInt("VectorLayerProperties_selectionIndex"); }
-			set { EditorPrefs.SetInt("VectorLayerProperties_selectionIndex", value); }
+			get
+			{
+				return EditorPrefs.GetInt(objectId + "VectorLayerProperties_selectionIndex");
+			}
+			set
+			{
+				EditorPrefs.SetInt(objectId + "VectorLayerProperties_selectionIndex", value);
+			}
+		}
+
+		string CustomSourceMapId
+		{
+			get
+			{
+				return EditorPrefs.GetString(objectId + "VectorLayerProperties_customSourceMapId");
+			}
+			set
+			{
+				EditorPrefs.SetString(objectId + "VectorLayerProperties_customSourceMapId", value);
+			}
 		}
 
 		VectorSubLayerTreeView layerTreeView = new VectorSubLayerTreeView(new TreeViewState());
 		IList<int> selectedLayers = new List<int>();
 
+		private GUIContent _mapIdGui = new GUIContent
+		{
+			text = "Map Id",
+			tooltip = "Map Id corresponding to the tileset."
+		};
+
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
+			var serializedMapObject = property.serializedObject;
+			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
+			tileJSONData = mapObject.VectorData.LayerProperty.tileJsonData;
+			var sourceTypeProperty = property.FindPropertyRelative("_sourceType");
+			var sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
+
+			var displayNames = sourceTypeProperty.enumDisplayNames;
+			int count = sourceTypeProperty.enumDisplayNames.Length;
+			if (!_isGUIContentSet)
+			{
+				_sourceTypeContent = new GUIContent[count];
+				for (int extIdx = 0; extIdx < count; extIdx++)
+				{
+					_sourceTypeContent[extIdx] = new GUIContent
+					{
+						text = displayNames[extIdx],
+						tooltip = ((VectorSourceType)extIdx).Description(),
+					};
+				}
+				_isGUIContentSet = true;
+			}
+			//var sourceTypeLabel = (new GUIContent { text = "Data Source", tooltip = "Source tileset for Vector Data" });
+
+			//sourceTypeProperty.enumValueIndex = EditorGUILayout.Popup(sourceTypeLabel, sourceTypeProperty.enumValueIndex, _sourceTypeContent);
+			sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
+
+			var sourceOptionsProperty = property.FindPropertyRelative("sourceOptions");
+			var layerSourceProperty = sourceOptionsProperty.FindPropertyRelative("layerSource");
+			var layerSourceId = layerSourceProperty.FindPropertyRelative("Id");
+			var isActiveProperty = sourceOptionsProperty.FindPropertyRelative("isActive");
+			switch (sourceTypeValue)
+			{
+				case VectorSourceType.MapboxStreets:
+				case VectorSourceType.MapboxStreetsWithBuildingIds:
+					var sourcePropertyValue = MapboxDefaultVector.GetParameters(sourceTypeValue);
+					layerSourceId.stringValue = sourcePropertyValue.Id;
+					GUI.enabled = false;
+					//EditorGUILayout.PropertyField(sourceOptionsProperty, _mapIdGui);
+					if (_isInitialized)
+					{
+						LoadEditorTileJSON(sourceTypeValue, layerSourceId.stringValue);
+					}
+					else
+					{
+						_isInitialized = true;
+					}
+					if (tileJSONData.PropertyDisplayNames.Count == 0 && tileJSONData.tileJSONLoaded)
+					{
+						EditorGUILayout.HelpBox("Invalid Map Id / There might be a problem with the internet connection.", MessageType.Error);
+					}
+					GUI.enabled = true;
+					isActiveProperty.boolValue = true;
+					break;
+				case VectorSourceType.Custom:
+					layerSourceId.stringValue = CustomSourceMapId;
+					//EditorGUILayout.PropertyField(sourceOptionsProperty, _mapIdGui);
+					if (_isInitialized)
+					{
+						LoadEditorTileJSON(sourceTypeValue, layerSourceId.stringValue);
+					}
+					else
+					{
+						_isInitialized = true;
+					}
+					if (tileJSONData.PropertyDisplayNames.Count == 0 && tileJSONData.tileJSONLoaded)
+					{
+						EditorGUILayout.HelpBox("Invalid Map Id / There might be a problem with the internet connection.", MessageType.Error);
+					}
+					CustomSourceMapId = layerSourceId.stringValue;
+					isActiveProperty.boolValue = true;
+					break;
+				case VectorSourceType.None:
+					isActiveProperty.boolValue = false;
+					break;
+				default:
+					isActiveProperty.boolValue = false;
+					break;
+			}
 			//EditorGUI.BeginProperty(position, label, property);
 			//position.height = _lineHeight;
 
 			GUILayout.Space(-_lineHeight);
-			var sourceTypeProperty = property.FindPropertyRelative("_sourceType");
-			var sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
 
 			if (sourceTypeValue != VectorSourceType.None)
 			{
@@ -175,7 +311,7 @@
 						GUI.enabled = false;
 					}
 
-					DrawLayerVisualizerProperties(sourceTypeValue, layerProperty);
+					DrawLayerVisualizerProperties(sourceTypeValue, layerProperty, property);
 					if (!isLayerActive)
 					{
 						GUI.enabled = true;
@@ -190,7 +326,7 @@
 			//EditorGUI.EndProperty();
 		}
 
-		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty)
+		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty, SerializedProperty property)
 		{
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
 			GUILayout.Label(subLayerCoreOptions.FindPropertyRelative("sublayerName").stringValue + " Properties");
@@ -202,13 +338,19 @@
 			GUILayout.Space(-_lineHeight);
 			EditorGUILayout.PropertyField(subLayerCoreOptions);
 
+			subLayerCoreOptions.FindPropertyRelative("sourceId").stringValue = property.FindPropertyRelative("sourceOptions.layerSource.Id").stringValue;
+
+			var extrusionOptions = layerProperty.FindPropertyRelative("extrusionOptions");
+			//loading up the selectedLayerName for extrusion options to pull up the right propertyName
+			extrusionOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
+
 			if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
 			{
 				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("colliderOptions"));
 				GUILayout.Space(-_lineHeight);
-				EditorGUI.indentLevel--;
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
+				EditorGUI.indentLevel--;
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
 				EditorGUI.indentLevel++;
 			}
@@ -234,13 +376,12 @@
 				{
 					layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue = false;
 				}
+				var filterOptions = layerProperty.FindPropertyRelative("filterOptions");
+				filterOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
 
-				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("filterOptions"), new GUIContent("Filters"));
-				DrawModifiers(layerProperty, new GUIContent
-				{
-					text = "Modifier Options",
-					tooltip = "Additional Feature modifiers to apply to the visualizer. "
-				});
+				EditorGUILayout.PropertyField(filterOptions, new GUIContent("Filters"));
+				//EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("modifierOptions"), new GUIContent("Modifiers"));
+				DrawModifiers(layerProperty, new GUIContent { text = "Modifier Options", tooltip = "Additional Feature modifiers to apply to the visualizer. " });
 			}
 
 			EditorGUI.indentLevel--;
@@ -370,6 +511,37 @@
 				EditorGUI.indentLevel--;
 			}
 			EditorGUILayout.EndVertical();
+		}
+
+		private void LoadEditorTileJSON(VectorSourceType sourceTypeValue, string sourceString)
+		{
+			if (sourceTypeValue != VectorSourceType.None && !string.IsNullOrEmpty(sourceString))
+			{
+				if (tileJSONResponse == null || string.IsNullOrEmpty(TilesetId) || sourceString != TilesetId)
+				{
+					TilesetId = sourceString;
+					//tileJSONData.ClearData();
+					Unity.MapboxAccess.Instance.TileJSON.Get(sourceString, (response) =>
+					{
+						tileJSONResponse = response;
+						if (response == null || response.VectorLayers == null) //indicates bad tileresponse
+						{
+							tileJSONData.ClearData();
+							return;
+						}
+						tileJSONData.ProcessTileJSONData(response);
+					});
+				}
+				else if (tileJSONData.LayerPropertyDescriptionDictionary.Count == 0)
+				{
+					tileJSONData.ProcessTileJSONData(tileJSONResponse);
+				}
+
+			}
+			else
+			{
+				tileJSONData.ClearData();
+			}
 		}
 	}
 }

@@ -4,16 +4,40 @@
 	using UnityEngine;
 	using Mapbox.Unity.Map;
 	using Mapbox.VectorTile.ExtensionMethods;
+	using System.Linq;
+	using Mapbox.Platform.TilesetTileJSON;
+	using System.Collections.Generic;
 
 	[CustomPropertyDrawer(typeof(GeometryExtrusionOptions))]
 	public class GeometryExtrusionOptionsDrawer : PropertyDrawer
 	{
+		int index
+		{
+			get
+			{
+				return EditorPrefs.GetInt(objectId + "GeometryOptions_propertySelectionIndex");
+			}
+			set
+			{
+				EditorPrefs.SetInt(objectId + "GeometryOptions_propertySelectionIndex", value);
+			}
+		}
+
+		bool _isInitialized = false;
+		string objectId = "";
+		private static List<string> propertyNamesList = new List<string>();
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		GUIContent[] extrusionTypeContent;
 		bool isGUIContentSet = false;
-
+		GUIContent[] _propertyNameContent;
+		bool _isLayerNameGUIContentSet = false;
+		static TileJsonData tileJsonData = new TileJsonData();
+		static TileJSONResponse tileJsonResponse;
+		static bool dataUnavailable = false;
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
+
 			var extrusionTypeProperty = property.FindPropertyRelative("extrusionType");
 			var displayNames = extrusionTypeProperty.enumDisplayNames;
 			int count = extrusionTypeProperty.enumDisplayNames.Length;
@@ -54,19 +78,35 @@
 					break;
 				case Unity.Map.ExtrusionType.PropertyHeight:
 					EditorGUILayout.PropertyField(extrusionGeometryType, extrusionGeometryGUI);
-					EditorGUILayout.PropertyField(property.FindPropertyRelative("propertyName"));
+					DrawPropertyDropDown(property, position);
+					if (!dataUnavailable)
+					{
+						position.y += 2.5f * lineHeight;
+					}
 					break;
 				case Unity.Map.ExtrusionType.MinHeight:
 					EditorGUILayout.PropertyField(extrusionGeometryType, extrusionGeometryGUI);
-					EditorGUILayout.PropertyField(property.FindPropertyRelative("propertyName"));
+					DrawPropertyDropDown(property, position);
+					if (!dataUnavailable)
+					{
+						//position.y += 2.5f * lineHeight;
+					}
 					break;
 				case Unity.Map.ExtrusionType.MaxHeight:
 					EditorGUILayout.PropertyField(extrusionGeometryType, extrusionGeometryGUI);
-					EditorGUILayout.PropertyField(property.FindPropertyRelative("propertyName"));
+					DrawPropertyDropDown(property, position);
+					if (!dataUnavailable)
+					{
+						//position.y += 2.5f * lineHeight;
+					}
 					break;
 				case Unity.Map.ExtrusionType.RangeHeight:
 					EditorGUILayout.PropertyField(extrusionGeometryType, extrusionGeometryGUI);
-					EditorGUILayout.PropertyField(property.FindPropertyRelative("propertyName"));
+					DrawPropertyDropDown(property, position);
+					if (!dataUnavailable)
+					{
+						//position.y += 2.5f * lineHeight;
+					}
 					EditorGUILayout.PropertyField(minHeightProperty);
 					EditorGUILayout.PropertyField(maxHeightProperty);
 					if (minHeightProperty.floatValue > maxHeightProperty.floatValue)
@@ -81,8 +121,83 @@
 				default:
 					break;
 			}
+
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("extrusionScaleFactor"), new GUIContent { text = "Scale Factor" });
 			EditorGUI.indentLevel--;
+		}
+
+		private void DrawPropertyDropDown(SerializedProperty property, Rect position)
+		{
+			var selectedLayerName = property.FindPropertyRelative("_selectedLayerName").stringValue;
+
+			var serializedMapObject = property.serializedObject;
+			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
+			tileJsonData = mapObject.VectorData.LayerProperty.tileJsonData;
+
+
+			if (string.IsNullOrEmpty(selectedLayerName) || tileJsonData == null || !tileJsonData.PropertyDisplayNames.ContainsKey(selectedLayerName))
+			{
+				DrawWarningMessage(position);
+				return;
+			}
+
+			dataUnavailable = false;
+			var propertyDisplayNames = tileJsonData.PropertyDisplayNames[selectedLayerName];
+
+			if (_isInitialized == true)
+			{
+				if (!Enumerable.SequenceEqual(propertyNamesList, propertyDisplayNames))
+				{
+					index = 0;
+					propertyNamesList = propertyDisplayNames;
+				}
+				else
+				{
+					DrawPropertyName(property, position, propertyDisplayNames, selectedLayerName);
+				}
+			}
+			else
+			{
+				_isInitialized = true;
+				DrawPropertyName(property, position, propertyDisplayNames, selectedLayerName);
+			}
+		}
+
+		private void DrawPropertyName(SerializedProperty property, Rect position, List<string> propertyDisplayNames, string selectedLayerName)
+		{
+			propertyNamesList = propertyDisplayNames;
+			if (!_isLayerNameGUIContentSet)
+			{
+				_propertyNameContent = new GUIContent[propertyNamesList.Count];
+				for (int extIdx = 0; extIdx < propertyNamesList.Count; extIdx++)
+				{
+					_propertyNameContent[extIdx] = new GUIContent
+					{
+						text = propertyNamesList[extIdx],
+					};
+				}
+				_isLayerNameGUIContentSet = true;
+			}
+			var propertyNameLabel = new GUIContent { text = "Property Name", tooltip = "The name of the property in the selected Mapbox layer that will be used for extrusion" };
+			index = EditorGUILayout.Popup(propertyNameLabel, index, _propertyNameContent);
+			//position.y += lineHeight;
+			var parsedString = propertyNamesList.ToArray()[index].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+			property.FindPropertyRelative("propertyName").stringValue = parsedString;
+
+			var descriptionString = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedString];
+
+			EditorGUILayout.PrefixLabel(new GUIContent { text = "Property Description", tooltip = "Factual information about the selected property" });
+			EditorGUILayout.HelpBox(descriptionString, MessageType.Info);
+		}
+
+		private void DrawWarningMessage(Rect position)
+		{
+			dataUnavailable = true;
+			EditorGUILayout.PrefixLabel(new GUIContent { text = "Property Name", tooltip = "The name of the property in the selected Mapbox layer that will be used for extrusion" });
+			EditorGUI.indentLevel -= 2;
+			EditorGUILayout.HelpBox("No properties found : Invalid MapId / No Internet.", MessageType.None);
+			EditorGUI.indentLevel += 2;
+			return;
 		}
 	}
 }
