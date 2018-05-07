@@ -103,7 +103,6 @@
 			}
 		}
 
-
 		bool ShowPosition
 		{
 			get
@@ -136,25 +135,26 @@
 
 		bool _isGUIContentSet = false;
 		GUIContent[] _sourceTypeContent;
+		static float _lineHeight = EditorGUIUtility.singleLineHeight;
 
 		public override void OnInspectorGUI()
 		{
 			serializedObject.Update();
-			GUILayout.BeginVertical();
+			EditorGUILayout.BeginVertical();
 			EditorGUILayout.Space();
 
 			ShowGeneral = EditorGUILayout.Foldout(ShowGeneral, new GUIContent { text = "GENERAL", tooltip = "Options related to map data" });
+
 			if (ShowGeneral)
 			{
-				EditorGUILayout.Space();
 				DrawMapOptions(serializedObject);
 			}
-
 			ShowSepartor();
 
 			ShowImage = EditorGUILayout.Foldout(ShowImage, "IMAGE");
 			if (ShowImage)
 			{
+				GUILayout.Space(-1.5f * _lineHeight);
 				ShowSection(serializedObject.FindProperty("_imagery"), "_layerProperty");
 			}
 
@@ -163,6 +163,7 @@
 			ShowTerrain = EditorGUILayout.Foldout(ShowTerrain, "TERRAIN");
 			if (ShowTerrain)
 			{
+				GUILayout.Space(-1.5f * _lineHeight);
 				ShowSection(serializedObject.FindProperty("_terrain"), "_layerProperty");
 			}
 
@@ -171,104 +172,7 @@
 			ShowMapLayers = EditorGUILayout.Foldout(ShowMapLayers, "MAP LAYERS");
 			if (ShowMapLayers)
 			{
-				EditorGUI.indentLevel++;
-				var vectorDataProperty = serializedObject.FindProperty("_vectorData");
-				var layerProperty = vectorDataProperty.FindPropertyRelative("_layerProperty");
-				var layerSourceProperty = layerProperty.FindPropertyRelative("sourceOptions");
-				var sourceTypeProperty = layerProperty.FindPropertyRelative("_sourceType");
-				VectorSourceType sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
-				string streets_v7 = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id;
-				var layerSourceId = layerProperty.FindPropertyRelative("sourceOptions.layerSource.Id");
-				string layerString = layerSourceId.stringValue;
-				var isActiveProperty = layerSourceProperty.FindPropertyRelative("isActive");
-
-				var displayNames = sourceTypeProperty.enumDisplayNames;
-				int count = sourceTypeProperty.enumDisplayNames.Length;
-				if (!_isGUIContentSet)
-				{
-					_sourceTypeContent = new GUIContent[count];
-					for (int extIdx = 0; extIdx < count; extIdx++)
-					{
-						_sourceTypeContent[extIdx] = new GUIContent
-						{
-							text = displayNames[extIdx],
-							tooltip = ((VectorSourceType)extIdx).Description(),
-						};
-					}
-
-					_isGUIContentSet = true;
-				}
-
-				sourceTypeProperty.enumValueIndex = EditorGUILayout.Popup(new GUIContent
-					{
-						text = "Data Source",
-						tooltip = "Source tileset for Vector Data"
-					},sourceTypeProperty.enumValueIndex, _sourceTypeContent);
-
-				sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
-
-				switch (sourceTypeValue)
-				{
-					case VectorSourceType.MapboxStreets:
-					case VectorSourceType.MapboxStreetsWithBuildingIds:
-						var sourcePropertyValue = MapboxDefaultVector.GetParameters(sourceTypeValue);
-						layerSourceId.stringValue = sourcePropertyValue.Id;
-						GUI.enabled = false;
-						EditorGUILayout.PropertyField(layerSourceProperty, mapIdGui);
-						GUI.enabled = true;
-						isActiveProperty.boolValue = true;
-						break;
-					case VectorSourceType.Custom:
-						layerSourceId.stringValue = CustomSourceMapId;
-						EditorGUILayout.PropertyField(layerSourceProperty, mapIdGui);
-						CustomSourceMapId = layerSourceId.stringValue;
-						isActiveProperty.boolValue = true;
-						break;
-					case VectorSourceType.None:
-						isActiveProperty.boolValue = false;
-						break;
-					default:
-						isActiveProperty.boolValue = false;
-						break;
-				}
-
-				if (sourceTypeValue != VectorSourceType.None)
-				{
-					var isStyleOptimized = layerProperty.FindPropertyRelative("useOptimizedStyle");
-					EditorGUILayout.PropertyField(isStyleOptimized);
-
-					if (isStyleOptimized.boolValue)
-					{
-						EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("optimizedStyle"), new GUIContent("Style Options"));
-					}
-
-					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("performanceOptions"), new GUIContent("Perfomance Options"));
-				}
-				EditorGUILayout.Space();
-				ShowSepartor();
-
-				ShowLocationPrefabs = EditorGUILayout.Foldout(ShowLocationPrefabs, "POINTS OF INTEREST");
-				if (ShowLocationPrefabs)
-				{
-					if (sourceTypeValue != VectorSourceType.None && layerString.Contains(streets_v7))
-					{
-						GUI.enabled = false;
-						EditorGUILayout.TextField(_requiredMapIdGui, streets_v7);
-						GUI.enabled = true;
-						ShowSection(vectorDataProperty, "_locationPrefabsLayerProperties");
-					}
-					else
-					{
-						EditorGUILayout.HelpBox("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the data source.", MessageType.Error);
-					}
-				}
-				ShowSepartor();
-				ShowFeatures = EditorGUILayout.Foldout(ShowFeatures, "FEATURES");
-				if (ShowFeatures)
-				{
-					ShowSection(serializedObject.FindProperty("_vectorData"), "_layerProperty");
-				}
-				EditorGUI.indentLevel--;
+				DrawMapLayerOptions();
 			}
 			GUILayout.EndVertical();
 
@@ -291,19 +195,22 @@
 		{
 			var property = mapObject.FindProperty("_options");
 
-			EditorGUILayout.LabelField("Location ");
+			EditorGUILayout.LabelField("Location ", GUILayout.Height(_lineHeight));
+
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("locationOptions"));
 			var extentOptions = property.FindPropertyRelative("extentOptions");
 			var extentOptionsType = extentOptions.FindPropertyRelative("extentType");
 			if ((MapExtentType)extentOptionsType.enumValueIndex == MapExtentType.Custom)
 			{
-
 				var test = mapObject.FindProperty("_tileProvider");
 				EditorGUILayout.PropertyField(extentOptionsType);
+				EditorGUI.indentLevel++;
 				EditorGUILayout.PropertyField(test);
+				EditorGUI.indentLevel--;
 			}
 			else
 			{
+				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("extentOptions"));
 			}
 
@@ -312,9 +219,113 @@
 			ShowPosition = EditorGUILayout.Foldout(ShowPosition, "Others");
 			if (ShowPosition)
 			{
+				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("placementOptions"));
+				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("scalingOptions"));
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("loadingTexture"));
+			}
+		}
+
+		void DrawMapLayerOptions()
+		{
+			//EditorGUI.indentLevel++;
+			var vectorDataProperty = serializedObject.FindProperty("_vectorData");
+			var layerProperty = vectorDataProperty.FindPropertyRelative("_layerProperty");
+			var layerSourceProperty = layerProperty.FindPropertyRelative("sourceOptions");
+			var sourceTypeProperty = layerProperty.FindPropertyRelative("_sourceType");
+			VectorSourceType sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
+			string streets_v7 = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id;
+			var layerSourceId = layerProperty.FindPropertyRelative("sourceOptions.layerSource.Id");
+			string layerString = layerSourceId.stringValue;
+			var isActiveProperty = layerSourceProperty.FindPropertyRelative("isActive");
+
+			var displayNames = sourceTypeProperty.enumDisplayNames;
+			int count = sourceTypeProperty.enumDisplayNames.Length;
+			if (!_isGUIContentSet)
+			{
+				_sourceTypeContent = new GUIContent[count];
+				for (int extIdx = 0; extIdx < count; extIdx++)
+				{
+					_sourceTypeContent[extIdx] = new GUIContent
+					{
+						text = displayNames[extIdx],
+						tooltip = ((VectorSourceType)extIdx).Description(),
+					};
+				}
+
+				_isGUIContentSet = true;
+			}
+
+			sourceTypeProperty.enumValueIndex = EditorGUILayout.Popup(new GUIContent
+			{
+				text = "Data Source",
+				tooltip = "Source tileset for Vector Data"
+			}, sourceTypeProperty.enumValueIndex, _sourceTypeContent);
+
+			sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
+
+			switch (sourceTypeValue)
+			{
+				case VectorSourceType.MapboxStreets:
+				case VectorSourceType.MapboxStreetsWithBuildingIds:
+					var sourcePropertyValue = MapboxDefaultVector.GetParameters(sourceTypeValue);
+					layerSourceId.stringValue = sourcePropertyValue.Id;
+					GUI.enabled = false;
+					EditorGUILayout.PropertyField(layerSourceProperty, mapIdGui);
+					GUI.enabled = true;
+					isActiveProperty.boolValue = true;
+					break;
+				case VectorSourceType.Custom:
+					layerSourceId.stringValue = CustomSourceMapId;
+					EditorGUILayout.PropertyField(layerSourceProperty, mapIdGui);
+					CustomSourceMapId = layerSourceId.stringValue;
+					isActiveProperty.boolValue = true;
+					break;
+				case VectorSourceType.None:
+					isActiveProperty.boolValue = false;
+					break;
+				default:
+					isActiveProperty.boolValue = false;
+					break;
+			}
+
+			if (sourceTypeValue != VectorSourceType.None)
+			{
+				var isStyleOptimized = layerProperty.FindPropertyRelative("useOptimizedStyle");
+				EditorGUILayout.PropertyField(isStyleOptimized);
+
+				if (isStyleOptimized.boolValue)
+				{
+					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("optimizedStyle"), new GUIContent("Style Options"));
+				}
+				GUILayout.Space(-_lineHeight);
+				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("performanceOptions"), new GUIContent("Perfomance Options"));
+			}
+			EditorGUILayout.Space();
+			ShowSepartor();
+
+			ShowLocationPrefabs = EditorGUILayout.Foldout(ShowLocationPrefabs, "POINTS OF INTEREST");
+			if (ShowLocationPrefabs)
+			{
+				if (sourceTypeValue != VectorSourceType.None && layerString.Contains(streets_v7))
+				{
+					GUI.enabled = false;
+					EditorGUILayout.TextField(_requiredMapIdGui, streets_v7);
+					GUI.enabled = true;
+					ShowSection(vectorDataProperty, "_locationPrefabsLayerProperties");
+				}
+				else
+				{
+					EditorGUILayout.HelpBox("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the data source in the FEATURES section.", MessageType.Error);
+				}
+			}
+
+			ShowSepartor();
+			ShowFeatures = EditorGUILayout.Foldout(ShowFeatures, "FEATURES");
+			if (ShowFeatures)
+			{
+				ShowSection(serializedObject.FindProperty("_vectorData"), "_layerProperty");
 			}
 		}
 

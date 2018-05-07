@@ -39,12 +39,12 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			EditorGUI.BeginProperty(position, label, property);
-			position.height = _lineHeight;
+			//EditorGUI.BeginProperty(position, label, property);
+			//position.height = _lineHeight;
 
 			GUILayout.Space(-_lineHeight);
 			var sourceTypeProperty = property.FindPropertyRelative("_sourceType");
-			var sourceTypeValue = (VectorSourceType) sourceTypeProperty.enumValueIndex;
+			var sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
 
 			if (sourceTypeValue != VectorSourceType.None)
 			{
@@ -79,7 +79,7 @@
 				}
 				else
 				{
-					selectedLayers = new int[1] {SelectionIndex};
+					selectedLayers = new int[1] { SelectionIndex };
 					if (SelectionIndex > 0 && (SelectionIndex <= subLayerArray.arraySize - 1))
 					{
 						layerTreeView.SetSelection(selectedLayers);
@@ -90,7 +90,7 @@
 
 				GUILayout.BeginHorizontal();
 
-				if (GUILayout.Button(new GUIContent("Add Visualizer"), (GUIStyle) "minibuttonleft"))
+				if (GUILayout.Button(new GUIContent("Add Visualizer"), (GUIStyle)"minibuttonleft"))
 				{
 					subLayerArray.arraySize++;
 					//subLayerArray.InsertArrayElementAtIndex(subLayerArray.arraySize);
@@ -104,43 +104,43 @@
 					var subLayerCoreOptions = subLayer.FindPropertyRelative("coreOptions");
 					subLayerCoreOptions.FindPropertyRelative("isActive").boolValue = true;
 					subLayerCoreOptions.FindPropertyRelative("layerName").stringValue = "building";
-					subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex = (int) VectorPrimitiveType.Polygon;
+					subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex = (int)VectorPrimitiveType.Polygon;
 					subLayerCoreOptions.FindPropertyRelative("snapToTerrain").boolValue = true;
 					subLayerCoreOptions.FindPropertyRelative("groupFeatures").boolValue = false;
 					subLayerCoreOptions.FindPropertyRelative("lineWidth").floatValue = 1.0f;
 
 					var subLayerExtrusionOptions = subLayer.FindPropertyRelative("extrusionOptions");
-					subLayerExtrusionOptions.FindPropertyRelative("extrusionType").enumValueIndex = (int) ExtrusionType.None;
+					subLayerExtrusionOptions.FindPropertyRelative("extrusionType").enumValueIndex = (int)ExtrusionType.None;
 					subLayerExtrusionOptions.FindPropertyRelative("extrusionGeometryType").enumValueIndex =
-						(int) ExtrusionGeometryType.RoofAndSide;
+						(int)ExtrusionGeometryType.RoofAndSide;
 					subLayerExtrusionOptions.FindPropertyRelative("propertyName").stringValue = "height";
 					subLayerExtrusionOptions.FindPropertyRelative("extrusionScaleFactor").floatValue = 1f;
 
 					var subLayerFilterOptions = subLayer.FindPropertyRelative("filterOptions");
 					subLayerFilterOptions.FindPropertyRelative("filters").ClearArray();
 					subLayerFilterOptions.FindPropertyRelative("combinerType").enumValueIndex =
-						(int) LayerFilterCombinerOperationType.Any;
+						(int)LayerFilterCombinerOperationType.Any;
 
 					var subLayerMaterialOptions = subLayer.FindPropertyRelative("materialOptions");
 					subLayerMaterialOptions.FindPropertyRelative("materials").ClearArray();
 					subLayerMaterialOptions.FindPropertyRelative("materials").arraySize = 2;
 					subLayerMaterialOptions.FindPropertyRelative("atlasInfo").objectReferenceValue = null;
 					subLayerMaterialOptions.FindPropertyRelative("colorPalette").objectReferenceValue = null;
-					subLayerMaterialOptions.FindPropertyRelative("texturingType").enumValueIndex = (int) UvMapType.Tiled;
+					subLayerMaterialOptions.FindPropertyRelative("texturingType").enumValueIndex = (int)UvMapType.Tiled;
 
 					subLayer.FindPropertyRelative("buildingsWithUniqueIds").boolValue = false;
-					subLayer.FindPropertyRelative("moveFeaturePositionTo").enumValueIndex = (int) PositionTargetType.TileCenter;
+					subLayer.FindPropertyRelative("moveFeaturePositionTo").enumValueIndex = (int)PositionTargetType.TileCenter;
 					subLayer.FindPropertyRelative("MeshModifiers").ClearArray();
 					subLayer.FindPropertyRelative("GoModifiers").ClearArray();
 
 					var subLayerColliderOptions = subLayer.FindPropertyRelative("colliderOptions");
-					subLayerColliderOptions.FindPropertyRelative("colliderType").enumValueIndex = (int) ColliderType.None;
+					subLayerColliderOptions.FindPropertyRelative("colliderType").enumValueIndex = (int)ColliderType.None;
 
-					selectedLayers = new int[1] {subLayerArray.arraySize - 1};
+					selectedLayers = new int[1] { subLayerArray.arraySize - 1 };
 					layerTreeView.SetSelection(selectedLayers);
 				}
 
-				if (GUILayout.Button(new GUIContent("Remove Selected"), (GUIStyle) "minibuttonright"))
+				if (GUILayout.Button(new GUIContent("Remove Selected"), (GUIStyle)"minibuttonright"))
 				{
 					foreach (var index in selectedLayers.OrderByDescending(i => i))
 					{
@@ -155,7 +155,7 @@
 
 				GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
-				if (selectedLayers.Count == 1 && subLayerArray.arraySize!=0)
+				if (selectedLayers.Count == 1 && subLayerArray.arraySize != 0)
 				{
 					//ensure that selectedLayers[0] isn't out of bounds
 					if (selectedLayers[0] > subLayerArray.arraySize - 1)
@@ -187,32 +187,33 @@
 				}
 			}
 
-			EditorGUI.EndProperty();
+			//EditorGUI.EndProperty();
 		}
 
 		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty)
 		{
-			EditorGUI.indentLevel--;
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
-			EditorGUI.indentLevel++;
 			GUILayout.Label(subLayerCoreOptions.FindPropertyRelative("sublayerName").stringValue + " Properties");
 			GUILayout.BeginVertical();
-
+			EditorGUI.indentLevel++;
 			VectorPrimitiveType primitiveTypeProp =
-				(VectorPrimitiveType) subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex;
+				(VectorPrimitiveType)subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex;
 
+			GUILayout.Space(-_lineHeight);
 			EditorGUILayout.PropertyField(subLayerCoreOptions);
 
 			if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
 			{
+				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("colliderOptions"));
-
+				GUILayout.Space(-_lineHeight);
+				EditorGUI.indentLevel--;
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
-
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
+				EditorGUI.indentLevel++;
 			}
 
-			//EditorGUI.indentLevel--;
+			EditorGUI.indentLevel--;
 			ShowOthers = EditorGUILayout.Foldout(ShowOthers, "Advanced");
 			EditorGUI.indentLevel++;
 			if (ShowOthers)
@@ -289,12 +290,12 @@
 						EditorGUILayout.ObjectField(meshfac.GetArrayElementAtIndex(i).objectReferenceValue, typeof(MeshModifier), false)
 							as ScriptableObject;
 					EditorGUILayout.EndVertical();
-					if (GUILayout.Button(new GUIContent("+"), (GUIStyle) "minibuttonleft", GUILayout.Width(30)))
+					if (GUILayout.Button(new GUIContent("+"), (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
 					{
 						ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac, ind);
 					}
 
-					if (GUILayout.Button(new GUIContent("-"), (GUIStyle) "minibuttonright", GUILayout.Width(30)))
+					if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
 					{
 						meshfac.DeleteArrayElementAtIndex(ind);
 					}
@@ -306,13 +307,13 @@
 				EditorGUI.indentLevel++;
 				EditorGUILayout.BeginHorizontal();
 				GUILayout.Space(EditorGUI.indentLevel * 12);
-				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle) "minibuttonleft"))
+				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
 				{
 					meshfac.arraySize++;
 					meshfac.GetArrayElementAtIndex(meshfac.arraySize - 1).objectReferenceValue = null;
 				}
 
-				if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle) "minibuttonright"))
+				if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
 				{
 					ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac);
 				}
@@ -337,12 +338,12 @@
 							false) as ScriptableObject;
 					EditorGUILayout.EndVertical();
 
-					if (GUILayout.Button(new GUIContent("+"), (GUIStyle) "minibuttonleft", GUILayout.Width(30)))
+					if (GUILayout.Button(new GUIContent("+"), (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
 					{
 						ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac, ind);
 					}
 
-					if (GUILayout.Button(new GUIContent("-"), (GUIStyle) "minibuttonright", GUILayout.Width(30)))
+					if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
 					{
 						gofac.DeleteArrayElementAtIndex(ind);
 					}
@@ -354,13 +355,13 @@
 				EditorGUI.indentLevel++;
 				EditorGUILayout.BeginHorizontal();
 				GUILayout.Space(EditorGUI.indentLevel * 12);
-				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle) "minibuttonleft"))
+				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
 				{
 					gofac.arraySize++;
 					gofac.GetArrayElementAtIndex(gofac.arraySize - 1).objectReferenceValue = null;
 				}
 
-				if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle) "minibuttonright"))
+				if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
 				{
 					ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac);
 				}

@@ -33,7 +33,7 @@
 				for (int i = 0; i < Layers.arraySize; i++)
 				{
 					var name = Layers.GetArrayElementAtIndex(i).FindPropertyRelative("coreOptions.sublayerName").stringValue;
-					items.Add(new TreeViewItem { id = index, depth = 0, displayName = name });
+					items.Add(new TreeViewItem { id = index, depth = 1, displayName = name });
 					index++;
 				}
 			}
@@ -61,16 +61,14 @@
 			layer.FindPropertyRelative("coreOptions.sublayerName").stringValue = string.IsNullOrEmpty(args.newName.Trim()) ? args.originalName : args.newName;
 		}
 
-		protected override void RowGUI (RowGUIArgs args)
+		protected override void RowGUI(RowGUIArgs args)
 		{
-			EditorGUI.indentLevel--;
 			Rect toggleRect = args.rowRect;
 			toggleRect.width = kToggleWidth;
 			var item = Layers.GetArrayElementAtIndex(args.item.id);
 			item.FindPropertyRelative("coreOptions.isActive").boolValue = EditorGUI.Toggle(toggleRect, item.FindPropertyRelative("coreOptions.isActive").boolValue);
 			args.item.displayName = item.FindPropertyRelative("coreOptions.sublayerName").stringValue;
 			base.RowGUI(args);
-			EditorGUI.indentLevel++;
 		}
 	}
 }
