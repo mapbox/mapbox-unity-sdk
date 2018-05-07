@@ -6,6 +6,7 @@ namespace Mapbox.Examples.Scripts
 	using System.Collections;
 	using System.Collections.Generic;
 	using System.Globalization;
+	using System.IO;
 	using System.Text;
 	using UnityEngine;
 	using UnityEngine.UI;
@@ -16,20 +17,31 @@ namespace Mapbox.Examples.Scripts
 		[SerializeField]
 		private Text _logText;
 
+		[SerializeField]
+		private Toggle _logToggle;
+
 
 		private CultureInfo _invariantCulture = CultureInfo.InvariantCulture;
+		private bool _logToFile = false;
+		private TextWriter _textWriter = null;
 
 
 		// Use this for initialization
 		void Start()
 		{
 			LocationProviderFactory.Instance.DefaultLocationProvider.OnLocationUpdated += LocationProvider_OnLocationUpdated;
+
+			if (null != _logToggle)
+			{
+				_logToggle.onValueChanged.AddListener((isOn) => { _logToFile = isOn; });
+			}
 		}
 
 
 		void OnDestroy()
 		{
 			LocationProviderFactory.Instance.DefaultLocationProvider.OnLocationUpdated -= LocationProvider_OnLocationUpdated;
+			closeLogFile();
 		}
 
 
@@ -53,6 +65,40 @@ namespace Mapbox.Examples.Scripts
 			sb.AppendLine(nullableAsStr<int>(location.SatellitesUsed, "SatellitesUsed:{0} ") + nullableAsStr<int>(location.SatellitesInView, "SatellitesInView:{0}"));
 
 			_logText.text = sb.ToString();
+
+			// start logging to file
+			if (_logToFile && null == _textWriter)
+			{
+				string fileName = "MBX-location-log-" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".txt";
+				string path = Application.dataPath + "/" + fileName;
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_WSA
+				// use `GetFullPath` on that to sanitize the path: replaces `/` returned by `Application.persistentDataPath` with `\`
+				path = Path.GetFullPath(path);
+#endif
+
+				Debug.Log("starting new log file: " + path);
+
+				_textWriter = new StreamWriter(path);
+				// TODO: write header
+				_textWriter.WriteLine("--- THIS WILL BE THE HEADER ---");
+				_logToggle.GetComponentInChildren<Text>().text = "stop logging";
+			}
+
+			// stop logging to file
+			if (!_logToFile && null != _textWriter)
+			{
+				Debug.Log("stop logging to file");
+				_logToggle.GetComponentInChildren<Text>().text = "start logging";
+				closeLogFile();
+			}
+
+			// write to log file
+			if (_logToFile && null != _textWriter)
+			{
+				string line = "writing log file entry: " + DateTime.UtcNow.ToString("yyyyMMdd HHmmss") + " " + UnixTimestampUtils.From(location.Timestamp).ToString("yyyyMMdd HHmmss");
+				Debug.Log(line);
+				_textWriter.WriteLine(line);
+			}
 		}
 
 
@@ -65,11 +111,16 @@ namespace Mapbox.Examples.Scripts
 		}
 
 
-		// Update is called once per frame
-		void Update()
+		private void closeLogFile()
 		{
-
+			if (null == _textWriter) { return; }
+			Debug.Log("closing stream writer");
+			_textWriter.Flush();
+			_textWriter.Close();
+			_textWriter = null;
 		}
+
+		void Update() { }
 
 
 
