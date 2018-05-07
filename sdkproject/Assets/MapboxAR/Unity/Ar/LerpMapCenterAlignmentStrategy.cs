@@ -58,7 +58,6 @@ namespace Mapbox.Unity.Ar
 			_endLatlong = _map.WorldToGeoPosition(alignment.Position);
 			_startPosition = _map.Root.position;
 			_endPosition = alignment.Position;
-
 			_startRotation = _map.Root.rotation;
 			_endRotation = Quaternion.Euler(0, alignment.Rotation, 0);
 		}
