@@ -35,7 +35,9 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			EditorGUI.BeginProperty(position, null, property);
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
+
 
 			// Draw label.
 			var primitiveType = property.FindPropertyRelative("geometryType");
@@ -80,14 +82,14 @@
 					index = 0;
 				}
 				currentSource = newSource;
-
-				DrawLayerName(property, position, layerDisplayNames);
 			}
 			else
 			{
 				_isInitialized = true;
 				currentSource = newSource;
 			}
+
+			DrawLayerName(property, position, layerDisplayNames);
 
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("snapToTerrain"));
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("groupFeatures"));
@@ -96,6 +98,7 @@
 			{
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("lineWidth"));
 			}
+			EditorGUI.EndProperty();
 		}
 		private static int count = 0;
 		private void DrawLayerName(SerializedProperty property, Rect position, List<string> layerDisplayNames)

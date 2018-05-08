@@ -10,10 +10,6 @@
 	public class VectorLayer : IVectorDataLayer
 	{
 		[SerializeField]
-		LocationPrefabsLayerProperties _locationPrefabsLayerProperties = new LocationPrefabsLayerProperties();	
-
-
-		[SerializeField]
 		VectorLayerProperties _layerProperty = new VectorLayerProperties();
 
 		[NodeEditorElement(" Vector Layer ")]
@@ -109,26 +105,15 @@
 		public void AddLocationPrefabItem(PrefabItemOptions prefabItem)
 		{
 			//ensure that there is a list of prefabitems
-			if (LocationPrefabsLayerProperties.locationPrefabList == null)
+			if (PointsOfInterestSublayerList == null)
 			{
-				LocationPrefabsLayerProperties.locationPrefabList = new List<PrefabItemOptions>();
-			}
-
-			if(_layerProperty.locationPrefabList == null)
-			{
-				_layerProperty.locationPrefabList = new List<PrefabItemOptions>();
+				PointsOfInterestSublayerList = new List<PrefabItemOptions>();
 			}
 
 			//add the prefab item if it doesn't already exist
-			if (!LocationPrefabsLayerProperties.locationPrefabList.Contains(prefabItem))
+			if (!PointsOfInterestSublayerList.Contains(prefabItem))
 			{
-				LocationPrefabsLayerProperties.locationPrefabList.Add(prefabItem);
-			}
-
-			//add the prefab item if it doesn't already exist
-			if (!_layerProperty.locationPrefabList.Contains(prefabItem))
-			{
-				_layerProperty.locationPrefabList.Add(prefabItem);
+				PointsOfInterestSublayerList.Add(prefabItem);
 			}
 		}
 
@@ -142,9 +127,9 @@
 
 		public void RemovePrefabItem(int index)
 		{
-			if (LocationPrefabsLayerProperties.locationPrefabList != null)
+			if (PointsOfInterestSublayerList != null)
 			{
-				LocationPrefabsLayerProperties.locationPrefabList.RemoveAt(index);
+				PointsOfInterestSublayerList.RemoveAt(index);
 			}
 		}
 
@@ -158,7 +143,6 @@
 		public void Initialize()
 		{
 			_vectorTileFactory = ScriptableObject.CreateInstance<VectorTileFactory>();
-			_layerProperty.locationPrefabList = LocationPrefabsLayerProperties.locationPrefabList;
 			_vectorTileFactory.SetOptions(_layerProperty);
 		}
 
@@ -184,11 +168,15 @@
 		}
 		private VectorTileFactory _vectorTileFactory;
 
-		public LocationPrefabsLayerProperties LocationPrefabsLayerProperties
+		public List<PrefabItemOptions> PointsOfInterestSublayerList
 		{
 			get
 			{
-				return _locationPrefabsLayerProperties;
+				return _layerProperty.locationPrefabList;
+			}
+			set
+			{
+				_layerProperty.locationPrefabList = value;
 			}
 		}
 	}
