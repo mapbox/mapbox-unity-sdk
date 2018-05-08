@@ -304,14 +304,14 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		public event Action OnUpdated = delegate { };
 
-		void Awake()
+		protected virtual void Awake()
 		{
 			// Setup a visualizer to get a "Starter" map.
 			_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
 		}
 
 		// Use this for initialization
-		void Start()
+		protected virtual void Start()
 		{
 			StartCoroutine("SetupAccess");
 			if (_initializeOnStart)

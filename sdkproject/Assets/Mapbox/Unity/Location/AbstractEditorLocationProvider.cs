@@ -52,7 +52,7 @@
 		}
 
 
-		void OnValidate()
+		protected virtual void OnValidate()
 		{
 			if (_sendEvent)
 			{

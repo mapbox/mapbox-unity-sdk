@@ -9,7 +9,7 @@
 		[SerializeField]
 		bool _booleanValue;
 
-		void Awake()
+		protected virtual void Awake()
 		{
 			GetComponent<Button>().onClick.AddListener(SetPlayerPref);
 		}
