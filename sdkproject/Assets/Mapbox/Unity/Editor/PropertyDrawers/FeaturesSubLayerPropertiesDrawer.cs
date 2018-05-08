@@ -508,16 +508,25 @@
 				{
 					TilesetId = sourceString;
 					//tileJSONData.ClearData();
-					Unity.MapboxAccess.Instance.TileJSON.Get(sourceString, (response) =>
+					try
 					{
-						tileJSONResponse = response;
-						if (response == null || response.VectorLayers == null) //indicates bad tileresponse
+						Unity.MapboxAccess.Instance.TileJSON.Get(sourceString, (response) =>
 						{
-							tileJSONData.ClearData();
-							return;
-						}
-						tileJSONData.ProcessTileJSONData(response);
-					});
+							tileJSONResponse = response;
+							if (response == null || response.VectorLayers == null) //indicates bad tileresponse
+							{
+								tileJSONData.ClearData();
+								return;
+							}
+							tileJSONData.ProcessTileJSONData(response);
+						});
+					}
+					catch (System.Exception e)
+					{
+
+					}
+
+
 				}
 				else if (tileJSONData.LayerPropertyDescriptionDictionary.Count == 0)
 				{

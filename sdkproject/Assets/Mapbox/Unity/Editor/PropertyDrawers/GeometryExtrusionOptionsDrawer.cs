@@ -182,10 +182,11 @@
 		private void DrawWarningMessage(Rect position)
 		{
 			dataUnavailable = true;
-			EditorGUILayout.PrefixLabel(new GUIContent { text = "Property Name", tooltip = "The name of the property in the selected Mapbox layer that will be used for extrusion" });
-			EditorGUI.indentLevel -= 2;
+			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.LabelField(new GUIContent { text = "Property Name", tooltip = "The name of the property in the selected Mapbox layer that will be used for extrusion" });
+			GUILayout.Space(-0.55f * EditorGUIUtility.labelWidth);
 			EditorGUILayout.HelpBox("No properties found : Invalid MapId / No Internet.", MessageType.None);
-			EditorGUI.indentLevel += 2;
+			EditorGUILayout.EndHorizontal();
 			return;
 		}
 	}

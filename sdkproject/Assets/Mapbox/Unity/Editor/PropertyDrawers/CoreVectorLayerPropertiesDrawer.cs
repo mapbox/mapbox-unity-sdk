@@ -111,9 +111,11 @@
 
 			if (layerDisplayNames.Count == 0)
 			{
-				EditorGUI.indentLevel--;
+				EditorGUILayout.BeginHorizontal();
+				EditorGUILayout.LabelField(layerNameLabel);
+				GUILayout.Space(-0.55f * EditorGUIUtility.labelWidth);
 				EditorGUILayout.HelpBox("No layers found : Invalid MapId / No Internet.", MessageType.None);
-				EditorGUI.indentLevel++;
+				EditorGUILayout.EndHorizontal();
 				return;
 			}
 
