@@ -523,10 +523,8 @@
 					}
 					catch (System.Exception e)
 					{
-
+						tileJSONData.ClearData();
 					}
-
-
 				}
 				else if (tileJSONData.LayerPropertyDescriptionDictionary.Count == 0)
 				{
