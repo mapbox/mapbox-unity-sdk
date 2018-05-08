@@ -39,10 +39,8 @@
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
-			EditorGUI.BeginProperty(position, label, property);
-			position.height = lineHeight;
 
-			showFilters = EditorGUI.Foldout(position, showFilters, new GUIContent { text = "Filters", tooltip = "Filter features in a vector layer based on criterion specified.  " });
+			showFilters = EditorGUILayout.Foldout(showFilters, new GUIContent { text = "Filters", tooltip = "Filter features in a vector layer based on criterion specified.  " });
 			if (showFilters)
 			{
 				var propertyFilters = property.FindPropertyRelative("filters");
@@ -65,8 +63,6 @@
 				EditorGUILayout.EndHorizontal();
 				EditorGUI.indentLevel--;
 			}
-
-			EditorGUI.EndProperty();
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
@@ -174,7 +170,7 @@
 
 			descriptionArray = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName].Values.ToArray<string>();
 			GUIContent[] properties = new GUIContent[propertyDisplayNames.Count];
-			for (int i = 0; i< propertyDisplayNames.Count; i++)
+			for (int i = 0; i < propertyDisplayNames.Count; i++)
 			{
 				properties[i] = new GUIContent(propertyDisplayNames[i], descriptionArray[i]);
 			}

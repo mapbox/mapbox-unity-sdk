@@ -79,34 +79,18 @@
 				case Unity.Map.ExtrusionType.PropertyHeight:
 					EditorGUILayout.PropertyField(extrusionGeometryType, extrusionGeometryGUI);
 					DrawPropertyDropDown(property, position);
-					if (!dataUnavailable)
-					{
-						position.y += 2.5f * lineHeight;
-					}
 					break;
 				case Unity.Map.ExtrusionType.MinHeight:
 					EditorGUILayout.PropertyField(extrusionGeometryType, extrusionGeometryGUI);
 					DrawPropertyDropDown(property, position);
-					if (!dataUnavailable)
-					{
-						//position.y += 2.5f * lineHeight;
-					}
 					break;
 				case Unity.Map.ExtrusionType.MaxHeight:
 					EditorGUILayout.PropertyField(extrusionGeometryType, extrusionGeometryGUI);
 					DrawPropertyDropDown(property, position);
-					if (!dataUnavailable)
-					{
-						//position.y += 2.5f * lineHeight;
-					}
 					break;
 				case Unity.Map.ExtrusionType.RangeHeight:
 					EditorGUILayout.PropertyField(extrusionGeometryType, extrusionGeometryGUI);
 					DrawPropertyDropDown(property, position);
-					if (!dataUnavailable)
-					{
-						//position.y += 2.5f * lineHeight;
-					}
 					EditorGUILayout.PropertyField(minHeightProperty);
 					EditorGUILayout.PropertyField(maxHeightProperty);
 					if (minHeightProperty.floatValue > maxHeightProperty.floatValue)
@@ -166,25 +150,30 @@
 		private void DrawPropertyName(SerializedProperty property, Rect position, List<string> propertyDisplayNames, string selectedLayerName)
 		{
 			propertyNamesList = propertyDisplayNames;
+
 			if (!_isLayerNameGUIContentSet)
 			{
 				_propertyNameContent = new GUIContent[propertyNamesList.Count];
 				for (int extIdx = 0; extIdx < propertyNamesList.Count; extIdx++)
 				{
+					var parsedPropertyString = propertyNamesList[extIdx].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
 					_propertyNameContent[extIdx] = new GUIContent
 					{
 						text = propertyNamesList[extIdx],
+						tooltip = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedPropertyString]
 					};
 				}
 				_isLayerNameGUIContentSet = true;
 			}
+
 			var propertyNameLabel = new GUIContent { text = "Property Name", tooltip = "The name of the property in the selected Mapbox layer that will be used for extrusion" };
 			index = EditorGUILayout.Popup(propertyNameLabel, index, _propertyNameContent);
-			//position.y += lineHeight;
-			var parsedString = propertyNamesList.ToArray()[index].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+			var parsedString = propertyNamesList[index].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+			var descriptionString = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedString];
+
 			property.FindPropertyRelative("propertyName").stringValue = parsedString;
 
-			var descriptionString = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedString];
+
 
 			EditorGUILayout.PrefixLabel(new GUIContent { text = "Property Description", tooltip = "Factual information about the selected property" });
 			EditorGUILayout.HelpBox(descriptionString, MessageType.Info);
