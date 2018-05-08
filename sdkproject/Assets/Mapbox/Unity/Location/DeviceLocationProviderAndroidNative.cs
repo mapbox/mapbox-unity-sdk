@@ -109,7 +109,7 @@
 			_wait5sec = new WaitForSeconds(5);
 			_wait60sec = new WaitForSeconds(60);
 			// throttle if entered update intervall is unreasonably low
-			_waitUpdateTime = _updateTimeInMilliSeconds < 500 ? new WaitForSeconds(500) : new WaitForSeconds(_updateTimeInMilliSeconds / 1000);
+			_waitUpdateTime = _updateTimeInMilliSeconds < 500 ? new WaitForSeconds(0.5f) : new WaitForSeconds((float)_updateTimeInMilliSeconds / 1000f);
 
 			_currentLocation.IsLocationServiceEnabled = false;
 			_currentLocation.IsLocationServiceInitializing = true;
