@@ -318,6 +318,7 @@
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
 			GUILayout.Space(-_lineHeight);
 			GUILayout.Label(subLayerCoreOptions.FindPropertyRelative("sublayerName").stringValue + " Properties");
+			// V1
 			EditorGUILayout.BeginVertical();
 			EditorGUI.indentLevel++;
 			VectorPrimitiveType primitiveTypeProp =
@@ -334,7 +335,6 @@
 
 			if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
 			{
-				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("colliderOptions"));
 				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
@@ -368,11 +368,9 @@
 				filterOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
 
 				EditorGUILayout.PropertyField(filterOptions, new GUIContent("Filters"));
-				//EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("modifierOptions"), new GUIContent("Modifiers"));
 				DrawModifiers(layerProperty, new GUIContent { text = "Modifier Options", tooltip = "Additional Feature modifiers to apply to the visualizer. " });
 			}
 			EditorGUILayout.EndVertical();
-			EditorGUI.indentLevel--;
 			EditorGUI.indentLevel--;
 		}
 
@@ -412,11 +410,14 @@
 				{
 					var ind = i;
 					EditorGUILayout.BeginHorizontal();
+
 					EditorGUILayout.BeginVertical();
 					meshfac.GetArrayElementAtIndex(ind).objectReferenceValue =
 						EditorGUILayout.ObjectField(meshfac.GetArrayElementAtIndex(i).objectReferenceValue, typeof(MeshModifier), false)
 							as ScriptableObject;
+
 					EditorGUILayout.EndVertical();
+
 					if (GUILayout.Button(new GUIContent("+"), (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
 					{
 						ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac, ind);

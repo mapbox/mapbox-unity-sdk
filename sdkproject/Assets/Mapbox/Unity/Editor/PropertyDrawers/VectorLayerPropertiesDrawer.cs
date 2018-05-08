@@ -58,6 +58,7 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			EditorGUI.BeginProperty(position, null, property);
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 			var layerSourceProperty = property.FindPropertyRelative("sourceOptions");
 			var sourceTypeProperty = property.FindPropertyRelative("_sourceType");
@@ -73,9 +74,9 @@
 			{
 				if (sourceTypeValue != VectorSourceType.None && layerString.Contains(streets_v7))
 				{
-					//GUI.enabled = false;
-					//EditorGUILayout.TextField(_requiredMapIdGui, streets_v7);
-					//GUI.enabled = true;
+					GUI.enabled = false;
+					EditorGUILayout.TextField(_requiredMapIdGui, streets_v7);
+					GUI.enabled = true;
 					_poiSublayerDrawer.DrawUI(property);
 				}
 				else
@@ -93,7 +94,7 @@
 				_vectorSublayerDrawer.DrawUI(property);
 			}
 
-
+			EditorGUI.EndProperty();
 		}
 	}
 }

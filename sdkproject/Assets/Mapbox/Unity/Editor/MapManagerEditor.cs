@@ -141,7 +141,7 @@
 			{
 				DrawMapLayerOptions();
 			}
-			GUILayout.EndVertical();
+			EditorGUILayout.EndVertical();
 
 			serializedObject.ApplyModifiedProperties();
 		}

@@ -241,7 +241,7 @@
 			{
 				foreach (var builder in _layerBuilder[emptyLayer])
 				{
-					if(builder.Active)
+					if (builder.Active)
 					{
 						Progress++;
 						//just pass the first available layer - we should create a static null layer for this

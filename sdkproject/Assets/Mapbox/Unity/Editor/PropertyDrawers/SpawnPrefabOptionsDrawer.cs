@@ -25,13 +25,17 @@ namespace Mapbox.Unity.Map
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			EditorGUILayout.PropertyField(property.FindPropertyRelative("prefab"), prefabContent);
-			EditorGUILayout.PropertyField(property.FindPropertyRelative("scaleDownWithWorld"), scalePrefabContent);
+			EditorGUI.BeginProperty(position, label, property);
+			position.height = 2.5f * lineHeight;
+			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("prefab"), prefabContent);
+			position.y += lineHeight;
+			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("scaleDownWithWorld"), scalePrefabContent);
+			EditorGUI.EndProperty();
 		}
 
-		//public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-		//{
-		//	return 0;
-		//}
+		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+		{
+			return 2.0f * lineHeight;
+		}
 	}
 }

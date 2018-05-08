@@ -181,7 +181,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_tempVectorEntity.Feature = feature;
 
 #if UNITY_EDITOR
-			if(feature.Data != null)
+			if (feature.Data != null)
 			{
 				_tempVectorEntity.GameObject.name = type + " - " + feature.Data.Id;
 			}

@@ -14,7 +14,7 @@
 		private void OnEnable()
 		{
 			script = MonoScript.FromScriptableObject((ModifierStack)target);
-			_positionType = serializedObject.FindProperty("_moveFeaturePositionTo");
+			_positionType = serializedObject.FindProperty("moveFeaturePositionTo");
 		}
 
 		public override void OnInspectorGUI()

@@ -54,7 +54,6 @@ namespace Mapbox.Editor
 			GUILayout.Label(prefabItemCoreOptions.FindPropertyRelative("sublayerName").stringValue + " Properties");
 
 			//Prefab Game Object
-			GUILayout.Space(-_lineHeight);
 			EditorGUI.indentLevel++;
 			var spawnPrefabOptions = property.FindPropertyRelative("spawnPrefabOptions");
 			EditorGUILayout.PropertyField(spawnPrefabOptions);
