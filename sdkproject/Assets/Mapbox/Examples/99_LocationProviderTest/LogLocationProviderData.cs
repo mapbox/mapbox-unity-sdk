@@ -24,9 +24,10 @@ namespace Mapbox.Examples.Scripts
 		private CultureInfo _invariantCulture = CultureInfo.InvariantCulture;
 		private bool _logToFile = false;
 		private TextWriter _textWriter = null;
+		/// <summary>column delimiter when logging to file </summary>
+		private string _delimiter = ";";
 
 
-		// Use this for initialization
 		void Start()
 		{
 			LocationProviderFactory.Instance.DefaultLocationProvider.OnLocationUpdated += LocationProvider_OnLocationUpdated;
@@ -47,6 +48,8 @@ namespace Mapbox.Examples.Scripts
 
 		void LocationProvider_OnLocationUpdated(Location location)
 		{
+
+			/////////////// GUI logging //////////////////////
 			StringBuilder sb = new StringBuilder();
 
 			sb.AppendLine(string.Format("IsLocationServiceEnabled: {0}", location.IsLocationServiceEnabled));
@@ -66,25 +69,38 @@ namespace Mapbox.Examples.Scripts
 
 			_logText.text = sb.ToString();
 
+
+			/////////////// file logging //////////////////////
+
 			// start logging to file
 			if (_logToFile && null == _textWriter)
 			{
 				string fileName = "MBX-location-log-" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".txt";
-				//string path = Application.dataPath + "/" + fileName;
-				//string path = "Assets/Resources/" + fileName;
-				string path = Application.persistentDataPath + "/" + fileName; //persistentDataPath depends on Bundle Identifier
+				string persistentPath = Application.persistentDataPath;
+				string fullFilePathAndName = Path.Combine(persistentPath, fileName);
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_WSA
 				// use `GetFullPath` on that to sanitize the path: replaces `/` returned by `Application.persistentDataPath` with `\`
-				path = Path.GetFullPath(path);
+				fullFilePathAndName = Path.GetFullPath(fullFilePathAndName);
 #endif
+//#if UNITY_ANDROID
+//				if (RuntimePlatform.Android == Application.platform)
+//				{
+//					// persistentDataPath evaluates to storage/Android/data/<bundle-identifier>/files
+//					// but files writting there cannot be accessed from Windows file explorer
+//					// save into dedicated subdirectory below `files`
+//					string logFolder = Path.Combine(persistentPath, "location-logs");
+//					if (!Directory.Exists(logFolder)) { Directory.CreateDirectory(logFolder); }
+//					fullFilePathAndName = Path.Combine(logFolder, fileName);
+//				}
+//#endif
 
-				Debug.Log("starting new log file: " + path);
+				Debug.Log("starting new log file: " + fullFilePathAndName);
 
-				_textWriter = new StreamWriter(path, false, new UTF8Encoding(false));
-				// TODO: write header
-				_textWriter.WriteLine("--- THIS WILL BE THE HEADER ---");
+				_textWriter = new StreamWriter(fullFilePathAndName, false, new UTF8Encoding(false));
+				_textWriter.WriteLine("location service enabled{0}location service initializing{0}location updated{0}heading updated{0}location provider{0}location provider class{0}UTC device{0}UTC location{0}lat{0}lng{0}accuracy[m]{0}user heading[°]{0}device orientation[°]{0}speed{0}has gps fix{0}satellites used{0}satellites in view", _delimiter);
 				_logToggle.GetComponentInChildren<Text>().text = "stop logging";
 			}
+
 
 			// stop logging to file
 			if (!_logToFile && null != _textWriter)
@@ -94,12 +110,34 @@ namespace Mapbox.Examples.Scripts
 				closeLogFile();
 			}
 
-			// write to log file
+
+			// write line to log file
 			if (_logToFile && null != _textWriter)
 			{
-				string line = "writing log file entry: " + DateTime.UtcNow.ToString("yyyyMMdd HHmmss") + " " + UnixTimestampUtils.From(location.Timestamp).ToString("yyyyMMdd HHmmss");
-				Debug.Log(line);
-				_textWriter.WriteLine(line);
+				string[] lineTokens = new string[]
+				{
+					location.IsLocationServiceEnabled.ToString(),
+					location.IsLocationServiceInitializing.ToString(),
+					location.IsLocationUpdated.ToString(),
+					location.IsUserHeadingUpdated.ToString(),
+					location.Provider,
+					LocationProviderFactory.Instance.DefaultLocationProvider.GetType().Name,
+					DateTime.UtcNow.ToString("yyyyMMdd-HHmmss.fff"),
+					UnixTimestampUtils.From(location.Timestamp).ToString("yyyyMMdd-HHmmss.fff"),
+					string.Format(_invariantCulture, "{0:0.00000000}", location.LatitudeLongitude.x),
+					string.Format(_invariantCulture, "{0:0.00000000}", location.LatitudeLongitude.y),
+					string.Format(_invariantCulture, "{0:0.0}", location.Accuracy),
+					string.Format(_invariantCulture, "{0:0.0}", location.UserHeading),
+					string.Format(_invariantCulture, "{0:0.0}", location.DeviceOrientation),
+					nullableAsStr<float>(location.SpeedKmPerHour, "{0:0.0}"),
+					nullableAsStr<bool>(location.HasGpsFix, "{0}"),
+					nullableAsStr<int>(location.SatellitesUsed, "{0} "),
+					nullableAsStr<int>(location.SatellitesInView, "{0}")
+				};
+
+				string logMsg = string.Join(_delimiter, lineTokens);
+				Debug.Log(logMsg);
+				_textWriter.WriteLine(logMsg);
 			}
 		}
 
@@ -122,6 +160,7 @@ namespace Mapbox.Examples.Scripts
 			_textWriter.Dispose();
 			_textWriter = null;
 		}
+
 
 		void Update() { }
 
