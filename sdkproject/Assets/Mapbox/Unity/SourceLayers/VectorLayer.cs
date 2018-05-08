@@ -110,21 +110,10 @@
 				PointsOfInterestSublayerList = new List<PrefabItemOptions>();
 			}
 
-			if (_layerProperty.locationPrefabList == null)
-			{
-				_layerProperty.locationPrefabList = new List<PrefabItemOptions>();
-			}
-
 			//add the prefab item if it doesn't already exist
 			if (!PointsOfInterestSublayerList.Contains(prefabItem))
 			{
 				PointsOfInterestSublayerList.Add(prefabItem);
-			}
-
-			//add the prefab item if it doesn't already exist
-			if (!_layerProperty.locationPrefabList.Contains(prefabItem))
-			{
-				_layerProperty.locationPrefabList.Add(prefabItem);
 			}
 		}
 
@@ -154,7 +143,6 @@
 		public void Initialize()
 		{
 			_vectorTileFactory = ScriptableObject.CreateInstance<VectorTileFactory>();
-			_layerProperty.locationPrefabList = PointsOfInterestSublayerList;
 			_vectorTileFactory.SetOptions(_layerProperty);
 		}
 
