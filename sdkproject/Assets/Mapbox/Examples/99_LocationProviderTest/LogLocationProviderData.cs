@@ -70,7 +70,9 @@ namespace Mapbox.Examples.Scripts
 			if (_logToFile && null == _textWriter)
 			{
 				string fileName = "MBX-location-log-" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".txt";
-				string path = Application.dataPath + "/" + fileName;
+				//string path = Application.dataPath + "/" + fileName;
+				//string path = "Assets/Resources/" + fileName;
+				string path = Application.persistentDataPath + "/" + fileName; //persistentDataPath depends on Bundle Identifier
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_WSA
 				// use `GetFullPath` on that to sanitize the path: replaces `/` returned by `Application.persistentDataPath` with `\`
 				path = Path.GetFullPath(path);
@@ -78,7 +80,7 @@ namespace Mapbox.Examples.Scripts
 
 				Debug.Log("starting new log file: " + path);
 
-				_textWriter = new StreamWriter(path);
+				_textWriter = new StreamWriter(path, false, new UTF8Encoding(false));
 				// TODO: write header
 				_textWriter.WriteLine("--- THIS WILL BE THE HEADER ---");
 				_logToggle.GetComponentInChildren<Text>().text = "stop logging";
@@ -117,6 +119,7 @@ namespace Mapbox.Examples.Scripts
 			Debug.Log("closing stream writer");
 			_textWriter.Flush();
 			_textWriter.Close();
+			_textWriter.Dispose();
 			_textWriter = null;
 		}
 
