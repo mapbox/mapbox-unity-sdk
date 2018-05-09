@@ -135,7 +135,7 @@
 					GUI.enabled = false;
 					if (_isInitialized)
 					{
-						LoadEditorTileJSON(sourceTypeValue, layerSourceId.stringValue);
+						LoadEditorTileJSON(property, sourceTypeValue, layerSourceId.stringValue);
 					}
 					else
 					{
@@ -152,7 +152,7 @@
 					layerSourceId.stringValue = CustomSourceMapId;
 					if (_isInitialized)
 					{
-						LoadEditorTileJSON(sourceTypeValue, layerSourceId.stringValue);
+						LoadEditorTileJSON(property, sourceTypeValue, layerSourceId.stringValue);
 					}
 					else
 					{
@@ -317,7 +317,7 @@
 		{
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
 			GUILayout.Space(-_lineHeight);
-			GUILayout.Label(subLayerCoreOptions.FindPropertyRelative("sublayerName").stringValue + " Properties");
+			EditorGUILayout.PrefixLabel(subLayerCoreOptions.FindPropertyRelative("sublayerName").stringValue + " Properties");
 			// V1
 			EditorGUILayout.BeginVertical();
 			EditorGUI.indentLevel++;
@@ -338,9 +338,7 @@
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("colliderOptions"));
 				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
-				EditorGUI.indentLevel--;
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
-				EditorGUI.indentLevel++;
 			}
 
 			EditorGUI.indentLevel--;
@@ -367,6 +365,7 @@
 				var filterOptions = layerProperty.FindPropertyRelative("filterOptions");
 				filterOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
 
+				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(filterOptions, new GUIContent("Filters"));
 				DrawModifiers(layerProperty, new GUIContent { text = "Modifier Options", tooltip = "Additional Feature modifiers to apply to the visualizer. " });
 			}
@@ -500,7 +499,7 @@
 			EditorGUILayout.EndVertical();
 		}
 
-		private void LoadEditorTileJSON(VectorSourceType sourceTypeValue, string sourceString)
+		private void LoadEditorTileJSON(SerializedProperty property, VectorSourceType sourceTypeValue, string sourceString)
 		{
 			if (sourceTypeValue != VectorSourceType.None && !string.IsNullOrEmpty(sourceString))
 			{
@@ -508,16 +507,25 @@
 				{
 					TilesetId = sourceString;
 					//tileJSONData.ClearData();
-					Unity.MapboxAccess.Instance.TileJSON.Get(sourceString, (response) =>
+					try
 					{
-						tileJSONResponse = response;
-						if (response == null || response.VectorLayers == null) //indicates bad tileresponse
+						Unity.MapboxAccess.Instance.TileJSON.Get(sourceString, (response) =>
 						{
-							tileJSONData.ClearData();
-							return;
-						}
-						tileJSONData.ProcessTileJSONData(response);
-					});
+							//if the code has reached this point it means that there is a valid access token
+							tileJSONResponse = response;
+							if (response == null || response.VectorLayers == null) //indicates bad tileresponse
+							{
+								tileJSONData.ClearData();
+								return;
+							}
+							tileJSONData.ProcessTileJSONData(response);
+						});
+					}
+					catch (System.Exception e)
+					{
+						//no valid access token causes MapboxAccess to throw an error and hence setting this property
+						tileJSONData.ClearData();
+					}
 				}
 				else if (tileJSONData.LayerPropertyDescriptionDictionary.Count == 0)
 				{
