@@ -134,7 +134,6 @@
 
 				dataUnavailable = false;
 				var propertyDisplayNames = tileJsonData.PropertyDisplayNames[selectedLayerName];
-				propertyNamesList = propertyDisplayNames;
 				if (_isInitialized == true)
 				{
 					if (!Enumerable.SequenceEqual(propertyNamesList, propertyDisplayNames))
