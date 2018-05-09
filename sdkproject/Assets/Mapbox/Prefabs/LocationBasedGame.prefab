@@ -420,8 +420,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 061d2afb48ace4fd19611279b6cf732f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _useDeviceOrientation: 0
+  _subtractUserHeading: 0
   _rotationFollowFactor: 2
   _rotateZ: 0
+  _useNegativeAngle: 0
   _useTransformLocationProvider: 0
 --- !u!114 &114276132085450664
 MonoBehaviour:
@@ -504,7 +507,31 @@ MonoBehaviour:
         wallMaterial: {fileID: 0}
   _vectorData:
     _layerProperty:
-      sourceType: 0
+      tileJsonData:
+        tileJSONLoaded: 0
+        LayerDisplayNames:
+        - landuse
+        - waterway
+        - aeroway
+        - barrier_line
+        - building (layer found in more than one data source)
+        - landuse_overlay
+        - road
+        - admin
+        - country_label
+        - marine_label
+        - state_label
+        - place_label
+        - water_label
+        - airport_label
+        - rail_station_label
+        - mountain_peak_label
+        - poi_label
+        - motorway_junction
+        - road_label
+        - waterway_label
+        - housenum_label
+      _sourceType: 0
       sourceOptions:
         isActive: 1
         layerSource:
@@ -522,6 +549,7 @@ MonoBehaviour:
         isEnabled: 1
         entityPerCoroutine: 20
       vectorSubLayers: []
+      locationPrefabList: []
   _tileProvider: {fileID: 0}
 --- !u!114 &114375948512099040
 MonoBehaviour:
@@ -535,7 +563,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mapManager: {fileID: 114276132085450664}
-  _deviceLocationProvider: {fileID: 114664232128227002}
+  _deviceLocationProviderUnity: {fileID: 0}
+  _deviceLocationProviderAndroid: {fileID: 0}
   _editorLocationProvider: {fileID: 114586318175614768}
   _transformLocationProvider: {fileID: 114549904832999176}
   _dontDestroyOnLoad: 0
@@ -615,7 +644,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _desiredAccuracyInMeters: 5
-  _updateDistanceInMeters: 5
+  _updateDistanceInMeters: 1
+  _updateTimeInMilliSeconds: 1000
 --- !u!114 &114946137324152330
 MonoBehaviour:
   m_ObjectHideFlags: 1
