@@ -209,6 +209,44 @@ namespace Mapbox.Unity.Utilities
 			return new UnwrappedTileId(zoom, x, y);
 		}
 
+
+		/// <summary>
+		/// Get coordinates for a given latitude/longitude in tile-space. Useful when comparing feature geometry to lat/lon coordinates.
+		/// </summary>
+		/// <returns>The longitude to tile position.</returns>
+		/// <param name="coordinate">Coordinate.</param>
+		/// <param name="tileZoom">The zoom level of the tile.</param>
+		/// <param name="tileScale">Tile scale. Optional, but recommended. Defaults to a scale of 1.</param>
+		/// <param name="layerExtent">Layer extent. Optional, but recommended. Defaults to 4096, the standard for Mapbox Tiles</param>
+		public static Vector3 LatitudeLongitudeToTilePosition(Vector2d coordinate, int tileZoom, float tileScale = 1f, ulong layerExtent = 4096)
+		{
+			//get the tileId 
+			var coordinateTileId = Conversions.LatitudeLongitudeToTileId(
+				coordinate.x, coordinate.y, tileZoom);
+
+			//Create a feature point based on the coordinate
+			var _meters = LatLonToMeters(coordinate);
+			var _rect = Conversions.TileBounds(coordinateTileId);
+			var _scale = tileScale;
+			var _extent = layerExtent;
+
+			//vectortile space point (0 - layerExtent)
+			var vectorTilePoint = new Vector3((float)((_meters - _rect.Min).x / _rect.Size.x) * _extent,
+									0,
+									(float)((_meters - _rect.Max).y / _rect.Size.y) * _extent
+								   );
+
+			//UnityTile space
+			var unityTilePoint = new Vector3((float)(vectorTilePoint.x / _extent * _rect.Size.x - (_rect.Size.x / 2)) * _scale,
+										0,
+										(float)((vectorTilePoint.z) / _extent * _rect.Size.y - (_rect.Size.y / 2)) * _scale
+									   );
+
+			//add coordinate feature to feature points
+			return unityTilePoint;
+			
+		}
+
 		/// <summary>
 		/// Gets the WGS84 longitude of the northwest corner from a tile's X position and zoom level.
 		/// See: http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames.
@@ -284,7 +322,6 @@ namespace Mapbox.Unity.Utilities
 			centerY = (1 - (centerY / tileCnt * 2)) * Constants.WebMercMax;
 			return new Vector2d(centerX, centerY);
 		}
-
 
 		/// <summary>
 		/// Gets the meters per pixels at given latitude and zoom level for a 256x256 tile.
