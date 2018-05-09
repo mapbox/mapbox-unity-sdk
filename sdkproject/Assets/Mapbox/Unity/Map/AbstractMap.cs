@@ -300,6 +300,11 @@ namespace Mapbox.Unity.Map
 				try
 				{
 					var accessTokenCheck = Unity.MapboxAccess.Instance;
+					if (Unity.MapboxAccess.Instance.Configuration == null || string.IsNullOrEmpty(Unity.MapboxAccess.Instance.Configuration.AccessToken))
+					{
+						return false;
+					}
+
 					isAccessTokenValid = true;
 				}
 				catch (System.Exception e)
