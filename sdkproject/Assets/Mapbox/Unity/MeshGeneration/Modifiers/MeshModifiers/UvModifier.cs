@@ -85,7 +85,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				}
 
 				var width = maxx - minx;
-				var height = maxy - minx;
+				var height = maxy - miny;
 
 				for (int i = 0; i < _mdVertexCount; i++)
 				{
