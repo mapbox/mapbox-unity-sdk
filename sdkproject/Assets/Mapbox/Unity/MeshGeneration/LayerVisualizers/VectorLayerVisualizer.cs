@@ -68,7 +68,6 @@
 					lineMeshMod.Width = _layerProperties.coreOptions.lineWidth;
 					defaultMeshModifierStack.Add(lineMeshMod);
 
-					//defaultMeshModifierStack.Add(CreateInstance<UvModifier>());
 					if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
 					{
 						var heightMod = CreateInstance<HeightModifier>();
@@ -88,8 +87,8 @@
 						defaultGOModifierStack.Add(lineColliderMod);
 					}
 
-					var lineStyleMod = CreateInstance<StyleModifier>();
-					lineStyleMod.SetProperties(MapboxDefaultStyles.GetGeometryMaterialOptions(_layerProperties.mapFeatureStyleOptions));
+					var lineStyleMod = CreateInstance<MaterialModifier>();
+					lineStyleMod.SetProperties(MapboxDefaultStyles.GetGeometryMaterialOptions(_layerProperties.geometryMaterialOptions));
 					defaultGOModifierStack.Add(lineStyleMod);
 
 					break;
@@ -100,11 +99,12 @@
 					}
 					defaultMeshModifierStack.Add(CreateInstance<PolygonMeshModifier>());
 
-					GeometryMaterialOptions geometryMaterialOptions = MapboxDefaultStyles.GetGeometryMaterialOptions(_layerProperties.mapFeatureStyleOptions);
-		
+					GeometryMaterialOptions geometryMaterialOptions = MapboxDefaultStyles.GetGeometryMaterialOptions(_layerProperties.geometryMaterialOptions);
+
 					UVModifierOptions uvModOptions = new UVModifierOptions();
 					uvModOptions.texturingType = geometryMaterialOptions.texturingType;
 					uvModOptions.atlasInfo = geometryMaterialOptions.atlasInfo;
+					uvModOptions.style = geometryMaterialOptions.style;
 
 					var uvMod = CreateInstance<UvModifier>();
 					uvMod.SetProperties(uvModOptions);
@@ -136,7 +136,7 @@
 						defaultGOModifierStack.Add(polyColliderMod);
 					}
 
-					var styleMod = CreateInstance<StyleModifier>();
+					var styleMod = CreateInstance<MaterialModifier>();
 
 					styleMod.SetProperties(geometryMaterialOptions);
 					defaultGOModifierStack.Add(styleMod);

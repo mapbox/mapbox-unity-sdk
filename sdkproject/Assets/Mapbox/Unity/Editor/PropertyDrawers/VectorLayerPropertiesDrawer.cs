@@ -167,7 +167,6 @@
 				if (GUILayout.Button(new GUIContent("Add Visualizer"), (GUIStyle)"minibuttonleft"))
 				{
 					subLayerArray.arraySize++;
-					//subLayerArray.InsertArrayElementAtIndex(subLayerArray.arraySize);
 
 					var subLayer = subLayerArray.GetArrayElementAtIndex(subLayerArray.arraySize - 1);
 					var subLayerName = subLayer.FindPropertyRelative("coreOptions.sublayerName");
@@ -193,8 +192,23 @@
 					subLayerFilterOptions.FindPropertyRelative("filters").ClearArray();
 					subLayerFilterOptions.FindPropertyRelative("combinerType").enumValueIndex = (int)LayerFilterCombinerOperationType.Any;
 
-					var subLayerMapFeatureStyleOptions = subLayer.FindPropertyRelative("mapFeatureStyleOptions");
-					subLayerMapFeatureStyleOptions.FindPropertyRelative("style").enumValueIndex = (int)StyleTypes.Realistic;
+					var subLayerGeometryMaterialOptions = subLayer.FindPropertyRelative("geometryMaterialOptions");
+					subLayerGeometryMaterialOptions.FindPropertyRelative("style").enumValueIndex = (int)StyleTypes.Realistic;
+
+					GeometryMaterialOptions geometryMaterialOptionsReference = MapboxDefaultStyles.GetDefaultAssets();
+
+					var mats = subLayerGeometryMaterialOptions.FindPropertyRelative("materials");
+
+					var topMat = mats.GetArrayElementAtIndex(0).FindPropertyRelative("Materials").GetArrayElementAtIndex(0);
+					var sideMat = mats.GetArrayElementAtIndex(1).FindPropertyRelative("Materials").GetArrayElementAtIndex(0);
+;					
+					var atlas = subLayerGeometryMaterialOptions.FindPropertyRelative("atlasInfo");
+					var palette = subLayerGeometryMaterialOptions.FindPropertyRelative("colorPalette");
+
+					topMat.objectReferenceValue = geometryMaterialOptionsReference.materials[0].Materials[0];
+					sideMat.objectReferenceValue = geometryMaterialOptionsReference.materials[1].Materials[0];
+					atlas.objectReferenceValue = geometryMaterialOptionsReference.atlasInfo;
+					palette.objectReferenceValue = geometryMaterialOptionsReference.colorPalette;
 
 					subLayer.FindPropertyRelative("buildingsWithUniqueIds").boolValue = false;
 					subLayer.FindPropertyRelative("moveFeaturePositionTo").enumValueIndex = (int)PositionTargetType.TileCenter;
@@ -255,7 +269,7 @@
 
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
 
-				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("mapFeatureStyleOptions"));
+				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("geometryMaterialOptions"));
 
 			}
 			//EditorGUI.indentLevel--;

@@ -75,8 +75,8 @@
 	{
 		[Description("Use image texture using tiled UV.")]
 		Tiled,
-		[Description("Use image texture from the Imagery source as texture for roofs. ")]
-		Satellite,
+		//[Description("Use image texture from the Imagery source as texture for roofs. ")]
+		//Satellite,
 		[Description("Use an image texture atlas to define textures for roof & sides of buildings.")]
 		Atlas,
 		[Description("Use an image texture atlas and a color pallete to define textures for roof & sides of buildings.")]
@@ -191,10 +191,16 @@
 	{ 
 		[Description("Simple style.")]
 		Simple,
+		[Description("Light style.")]
+		Light,
+		[Description("Dark style.")]
+		Dark,
 		[Description("Realistic style.")]
 		Realistic,
 		[Description("Fantasy style.")]
 		Fantasy,
+		[Description("Satellite style.")]
+		Satellite,
 		[Description("Custom style.")]
 		Custom,
 	}

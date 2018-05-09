@@ -14,26 +14,12 @@ MonoBehaviour:
   Textures:
   - TextureRect:
       serializedVersion: 2
-      x: 0.5
+      x: 0
       y: 0
       width: 0.25
       height: 0.25
     MidFloorCount: 1
-    ColumnCount: 1
-    TopSectionRatio: 0.3
-    BottomSectionRatio: 0.4
-    PreferredEdgeSectionLength: 20
-    FloorHeight: 10
-    FirstFloorHeight: 12
-    TopFloorHeight: 12
-  - TextureRect:
-      serializedVersion: 2
-      x: 0.75
-      y: 0
-      width: 0.25
-      height: 0.25
-    MidFloorCount: 1
-    ColumnCount: 6
+    ColumnCount: 3
     TopSectionRatio: 0.3
     BottomSectionRatio: 0.4
     PreferredEdgeSectionLength: 40
@@ -48,6 +34,34 @@ MonoBehaviour:
       height: 0.25
     MidFloorCount: 1
     ColumnCount: 4
+    TopSectionRatio: 0.3
+    BottomSectionRatio: 0.4
+    PreferredEdgeSectionLength: 40
+    FloorHeight: 10
+    FirstFloorHeight: 12
+    TopFloorHeight: 12
+  - TextureRect:
+      serializedVersion: 2
+      x: 0.5
+      y: 0
+      width: 0.25
+      height: 0.25
+    MidFloorCount: 1
+    ColumnCount: 5
+    TopSectionRatio: 0.3
+    BottomSectionRatio: 0.4
+    PreferredEdgeSectionLength: 40
+    FloorHeight: 10
+    FirstFloorHeight: 12
+    TopFloorHeight: 12
+  - TextureRect:
+      serializedVersion: 2
+      x: 0.75
+      y: 0
+      width: 0.25
+      height: 0.25
+    MidFloorCount: 1
+    ColumnCount: 6
     TopSectionRatio: 0.3
     BottomSectionRatio: 0.4
     PreferredEdgeSectionLength: 40
@@ -82,35 +96,35 @@ MonoBehaviour:
     FloorHeight: 10
     FirstFloorHeight: 12
     TopFloorHeight: 12
-  Roofs:
-  - TextureRect:
-      serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0.5
-      height: 0.5
-    MidFloorCount: 0
-    ColumnCount: 0
-    TopSectionRatio: 0
-    BottomSectionRatio: 0
-    PreferredEdgeSectionLength: 0
-    FloorHeight: 0
-    FirstFloorHeight: 0
-    TopFloorHeight: 0
   - TextureRect:
       serializedVersion: 2
       x: 0.5
-      y: 0
-      width: 0.5
-      height: 0.5
-    MidFloorCount: 0
-    ColumnCount: 0
-    TopSectionRatio: 0
-    BottomSectionRatio: 0
-    PreferredEdgeSectionLength: 0
-    FloorHeight: 0
-    FirstFloorHeight: 0
-    TopFloorHeight: 0
+      y: 0.25
+      width: 0.25
+      height: 0.25
+    MidFloorCount: 1
+    ColumnCount: 1
+    TopSectionRatio: 0.3
+    BottomSectionRatio: 0.4
+    PreferredEdgeSectionLength: 40
+    FloorHeight: 10
+    FirstFloorHeight: 12
+    TopFloorHeight: 12
+  - TextureRect:
+      serializedVersion: 2
+      x: 0.75
+      y: 0.25
+      width: 0.25
+      height: 0.25
+    MidFloorCount: 1
+    ColumnCount: 11
+    TopSectionRatio: 0.3
+    BottomSectionRatio: 0.4
+    PreferredEdgeSectionLength: 40
+    FloorHeight: 10
+    FirstFloorHeight: 12
+    TopFloorHeight: 12
+  Roofs:
   - TextureRect:
       serializedVersion: 2
       x: 0
