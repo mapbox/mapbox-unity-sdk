@@ -183,7 +183,9 @@
 		private void DrawWarningMessage()
 		{
 			dataUnavailable = true;
-			EditorGUILayout.HelpBox("Check MapId / Internet.", MessageType.None);
+			GUIStyle labelStyle = new GUIStyle(EditorStyles.popup);
+			labelStyle.fontStyle = FontStyle.Bold;
+			EditorGUILayout.LabelField(new GUIContent(), new GUIContent("Check MapId / Internet."), labelStyle, new GUILayoutOption[]{ GUILayout.MaxWidth(160) });//(GUIStyle)"minipopUp");
 			return;
 		}
 	}
