@@ -12,13 +12,6 @@
 			{
 				throw new System.Exception("Too many tiles! Use a lower zoom level!");
 			}
-		}
-		private void Update()
-		{
-			if (_map.AbsoluteZoom > 5)
-			{
-				throw new System.Exception("Too many tiles! Use a lower zoom level!");
-			}
 
 			var tileCover = TileCover.Get(Vector2dBounds.World(), _map.AbsoluteZoom);
 			foreach (var tile in tileCover)

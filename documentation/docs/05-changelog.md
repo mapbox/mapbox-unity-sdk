@@ -1,6 +1,7 @@
 ﻿## CHANGELOG
  ### v.1.4.2
 *??/??/2018*
+- Layer names and property names are preloaded from the data source into a dropdown.
 
 ##### BREAKING CHANGES
 - Property `Heading` on `Location` object has been split into `UserHeading` and `DeviceOrientation`.

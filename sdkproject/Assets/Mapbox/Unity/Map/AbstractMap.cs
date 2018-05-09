@@ -292,6 +292,29 @@ namespace Mapbox.Unity.Map
 			_worldRelativeScale = scale;
 		}
 
+		public bool IsAccessTokenValid
+		{
+			get
+			{
+				bool isAccessTokenValid = false;
+				try
+				{
+					var accessTokenCheck = Unity.MapboxAccess.Instance;
+					if (Unity.MapboxAccess.Instance.Configuration == null || string.IsNullOrEmpty(Unity.MapboxAccess.Instance.Configuration.AccessToken))
+					{
+						return false;
+					}
+
+					isAccessTokenValid = true;
+				}
+				catch (System.Exception e)
+				{
+					isAccessTokenValid = false;
+				}
+				return isAccessTokenValid;
+			}
+		}
+
 		/// <summary>
 		/// Event delegate, gets called after map is initialized
 		/// <seealso cref="OnUpdated"/>
@@ -304,14 +327,14 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		public event Action OnUpdated = delegate { };
 
-		void Awake()
+		protected virtual void Awake()
 		{
 			// Setup a visualizer to get a "Starter" map.
 			_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
 		}
 
 		// Use this for initialization
-		void Start()
+		protected virtual void Start()
 		{
 			StartCoroutine("SetupAccess");
 			if (_initializeOnStart)

@@ -16,7 +16,7 @@ namespace Mapbox.Unity.MeshGeneration.Components
 
 		Mesh _mesh;
 
-		void Start()
+		protected virtual void Start()
 		{
 			var mf = GetComponent<MeshFilter>();
 			if (mf)
@@ -31,7 +31,7 @@ namespace Mapbox.Unity.MeshGeneration.Components
 			}
 		}
 
-		void OnDrawGizmosSelected()
+		protected virtual void OnDrawGizmosSelected()
 		{
 			if (_mesh)
 			{

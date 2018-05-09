@@ -11,13 +11,8 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			EditorGUI.BeginProperty(position, label, property);
-
-			position.height = lineHeight;
-
-			EditorGUI.PropertyField(position, property.FindPropertyRelative("Id"), label);
-
-			EditorGUI.EndProperty();
+			GUILayout.Space(-lineHeight);
+			EditorGUILayout.PropertyField(property.FindPropertyRelative("Id"), label);
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{

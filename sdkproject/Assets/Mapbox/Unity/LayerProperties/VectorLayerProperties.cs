@@ -2,12 +2,17 @@
 {
 	using System;
 	using System.Collections.Generic;
+	using Mapbox.Platform.TilesetTileJSON;
 	using Mapbox.Unity.Utilities;
 	using UnityEngine;
 
 	[Serializable]
 	public class VectorLayerProperties : LayerProperties
 	{
+		/// <summary>
+		/// Raw tileJSON response received from the requested source tileset id(s)
+		/// </summary>
+		public TileJsonData tileJsonData = new TileJsonData();
 		[SerializeField]
 		protected VectorSourceType _sourceType = VectorSourceType.MapboxStreets;
 		public VectorSourceType sourceType
@@ -46,8 +51,9 @@
 		[StyleSearch]
 		public Style optimizedStyle;
 		public LayerPerformanceOptions performanceOptions;
-		[NodeEditorElementAttribute("Vector Sublayers")]
+		[NodeEditorElementAttribute("Feature Sublayers")]
 		public List<VectorSubLayerProperties> vectorSubLayers = new List<VectorSubLayerProperties>();
+		[NodeEditorElementAttribute("POI Sublayers")]
 		public List<PrefabItemOptions> locationPrefabList = new List<PrefabItemOptions>();
 	}
 }
