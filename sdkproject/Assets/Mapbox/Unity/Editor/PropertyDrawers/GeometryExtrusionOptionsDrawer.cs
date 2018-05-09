@@ -118,54 +118,54 @@
 			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
 			tileJsonData = mapObject.VectorData.LayerProperty.tileJsonData;
 
+			DrawPropertyName(property, position, selectedLayerName);
+		}
+
+		private void DrawPropertyName(SerializedProperty property, Rect position, string selectedLayerName)
+		{
+			var descriptionString = "No description available";
 
 			if (string.IsNullOrEmpty(selectedLayerName) || tileJsonData == null || !tileJsonData.PropertyDisplayNames.ContainsKey(selectedLayerName))
 			{
 				DrawWarningMessage(position);
-				return;
-			}
-
-			dataUnavailable = false;
-			var propertyDisplayNames = tileJsonData.PropertyDisplayNames[selectedLayerName];
-
-			if (_isInitialized == true)
-			{
-				if (!Enumerable.SequenceEqual(propertyNamesList, propertyDisplayNames))
-				{
-					index = 0;
-					propertyNamesList = propertyDisplayNames;
-				}
-				DrawPropertyName(property, position, propertyDisplayNames, selectedLayerName);
 			}
 			else
 			{
-				_isInitialized = true;
-				DrawPropertyName(property, position, propertyDisplayNames, selectedLayerName);
-			}
-		}
 
-		private void DrawPropertyName(SerializedProperty property, Rect position, List<string> propertyDisplayNames, string selectedLayerName)
-		{
-			propertyNamesList = propertyDisplayNames;
-
-			_propertyNameContent = new GUIContent[propertyNamesList.Count];
-			for (int extIdx = 0; extIdx < propertyNamesList.Count; extIdx++)
-			{
-				var parsedPropertyString = propertyNamesList[extIdx].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
-				_propertyNameContent[extIdx] = new GUIContent
+				dataUnavailable = false;
+				var propertyDisplayNames = tileJsonData.PropertyDisplayNames[selectedLayerName];
+				propertyNamesList = propertyDisplayNames;
+				if (_isInitialized == true)
 				{
-					text = propertyNamesList[extIdx],
-					tooltip = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedPropertyString]
-				};
-			}
+					if (!Enumerable.SequenceEqual(propertyNamesList, propertyDisplayNames))
+					{
+						index = 0;
+						propertyNamesList = propertyDisplayNames;
+					}
+				}
+				else
+				{
+					_isInitialized = true;
+				}
+				_propertyNameContent = new GUIContent[propertyNamesList.Count];
+				for (int extIdx = 0; extIdx < propertyNamesList.Count; extIdx++)
+				{
+					var parsedPropertyString = propertyNamesList[extIdx].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+					_propertyNameContent[extIdx] = new GUIContent
+					{
+						text = propertyNamesList[extIdx],
+						tooltip = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedPropertyString]
+					};
+				}
 
-			var propertyNameLabel = new GUIContent { text = "Property Name", tooltip = "The name of the property in the selected Mapbox layer that will be used for extrusion" };
-			index = EditorGUILayout.Popup(propertyNameLabel, index, _propertyNameContent);
-			var parsedString = propertyNamesList[index].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
-			var descriptionString = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedString];
+				var propertyNameLabel = new GUIContent { text = "Property Name", tooltip = "The name of the property in the selected Mapbox layer that will be used for extrusion" };
+				index = EditorGUILayout.Popup(propertyNameLabel, index, _propertyNameContent);
+				var parsedString = propertyNamesList[index].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+				descriptionString = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedString];
+				property.FindPropertyRelative("propertyName").stringValue = parsedString;
+			}
 
 			descriptionString = string.IsNullOrEmpty(descriptionString) ? "No description available" : descriptionString;
-			property.FindPropertyRelative("propertyName").stringValue = parsedString;
 
 			var propertyDescriptionPrefixLabel = new GUIContent { text = "Property Description", tooltip = "Factual information about the selected property" };
 			EditorGUILayout.LabelField(propertyDescriptionPrefixLabel, new GUIContent(descriptionString), (GUIStyle)"wordWrappedLabel");
