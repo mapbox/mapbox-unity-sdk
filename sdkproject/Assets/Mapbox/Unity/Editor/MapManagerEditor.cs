@@ -161,6 +161,11 @@
 		void DrawMapOptions(SerializedObject mapObject)
 		{
 			var property = mapObject.FindProperty("_options");
+			if(!((AbstractMap)serializedObject.targetObject).IsAccessTokenValid)
+			{
+				EditorGUILayout.HelpBox("Invalid Access Token. Please add a valid access token using the Mapbox  > Setup Menu", MessageType.Error);
+			}
+
 
 			EditorGUILayout.LabelField("Location ", GUILayout.Height(_lineHeight));
 

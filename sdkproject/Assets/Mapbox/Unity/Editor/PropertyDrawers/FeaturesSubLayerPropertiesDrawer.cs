@@ -135,7 +135,7 @@
 					GUI.enabled = false;
 					if (_isInitialized)
 					{
-						LoadEditorTileJSON(sourceTypeValue, layerSourceId.stringValue);
+						LoadEditorTileJSON(property, sourceTypeValue, layerSourceId.stringValue);
 					}
 					else
 					{
@@ -152,7 +152,7 @@
 					layerSourceId.stringValue = CustomSourceMapId;
 					if (_isInitialized)
 					{
-						LoadEditorTileJSON(sourceTypeValue, layerSourceId.stringValue);
+						LoadEditorTileJSON(property,sourceTypeValue, layerSourceId.stringValue);
 					}
 					else
 					{
@@ -500,7 +500,7 @@
 			EditorGUILayout.EndVertical();
 		}
 
-		private void LoadEditorTileJSON(VectorSourceType sourceTypeValue, string sourceString)
+		private void LoadEditorTileJSON(SerializedProperty property, VectorSourceType sourceTypeValue, string sourceString)
 		{
 			if (sourceTypeValue != VectorSourceType.None && !string.IsNullOrEmpty(sourceString))
 			{
@@ -512,6 +512,7 @@
 					{
 						Unity.MapboxAccess.Instance.TileJSON.Get(sourceString, (response) =>
 						{
+							//if the code has reached this point it means that there is a valid access token
 							tileJSONResponse = response;
 							if (response == null || response.VectorLayers == null) //indicates bad tileresponse
 							{
@@ -523,6 +524,7 @@
 					}
 					catch (System.Exception e)
 					{
+						//no valid access token causes MapboxAccess to throw an error and hence setting this property
 						tileJSONData.ClearData();
 					}
 				}

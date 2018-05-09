@@ -292,6 +292,24 @@ namespace Mapbox.Unity.Map
 			_worldRelativeScale = scale;
 		}
 
+		public bool IsAccessTokenValid
+		{
+			get
+			{
+				bool isAccessTokenValid = false;
+				try
+				{
+					var accessTokenCheck = Unity.MapboxAccess.Instance;
+					isAccessTokenValid = true;
+				}
+				catch (System.Exception e)
+				{
+					isAccessTokenValid = false;
+				}
+				return isAccessTokenValid;
+			}
+		}
+
 		/// <summary>
 		/// Event delegate, gets called after map is initialized
 		/// <seealso cref="OnUpdated"/>
