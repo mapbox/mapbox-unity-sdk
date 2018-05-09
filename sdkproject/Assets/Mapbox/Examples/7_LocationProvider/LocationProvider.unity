@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.4465785, g: 0.49641252, b: 0.574817, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -951,7 +951,31 @@ MonoBehaviour:
         wallMaterial: {fileID: 0}
   _vectorData:
     _layerProperty:
-      sourceType: 1
+      tileJsonData:
+        tileJSONLoaded: 0
+        LayerDisplayNames:
+        - landuse
+        - waterway
+        - aeroway
+        - barrier_line
+        - building
+        - landuse_overlay
+        - road
+        - admin
+        - country_label
+        - marine_label
+        - state_label
+        - place_label
+        - water_label
+        - airport_label
+        - rail_station_label
+        - mountain_peak_label
+        - poi_label
+        - motorway_junction
+        - road_label
+        - waterway_label
+        - housenum_label
+      _sourceType: 1
       sourceOptions:
         isActive: 1
         layerSource:
@@ -969,6 +993,7 @@ MonoBehaviour:
         isEnabled: 1
         entityPerCoroutine: 20
       vectorSubLayers: []
+      locationPrefabList: []
   _tileProvider: {fileID: 0}
 --- !u!4 &1411663282
 Transform:
@@ -1001,7 +1026,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1411663280}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 96f0fa82f89d64bb9a6524c72d538179, type: 3}
   m_Name: 
