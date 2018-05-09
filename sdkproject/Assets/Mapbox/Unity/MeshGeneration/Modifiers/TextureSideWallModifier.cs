@@ -377,7 +377,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
-		private void QueryHeight(VectorFeatureUnity feature, MeshData md, UnityTile tile, out float maxHeight, out float minHeight)
+		protected virtual void QueryHeight(VectorFeatureUnity feature, MeshData md, UnityTile tile, out float maxHeight, out float minHeight)
 		{
 			minHeight = 0.0f;
 			maxHeight = 0.0f;
@@ -391,11 +391,20 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				case ExtrusionType.MaxHeight:
 					if (feature.Properties.ContainsKey(_options.propertyName))
 					{
-						maxHeight = Convert.ToSingle(feature.Properties[_options.propertyName]);
+						try
+						{
+							maxHeight = Convert.ToSingle(feature.Properties[_options.propertyName]);
+						}
+						catch (Exception ex)
+						{
+							Debug.LogError("Property: '" + _options.propertyName + "' must contain a numerical value for extrusion.");
+							return;
+						}
+
 						if (feature.Properties.ContainsKey("min_height"))
 						{
 							minHeight = Convert.ToSingle(feature.Properties["min_height"]);
-							//hf -= minHeight;
+							//maxHeight -= minHeight;
 						}
 					}
 					break;
@@ -409,13 +418,23 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 							_options.minimumHeight = _options.maximumHeight;
 							_options.maximumHeight = temp;
 						}
-						var featureHeight = Convert.ToSingle(feature.Properties[_options.propertyName]);
+
+						float featureHeight;
+						try
+						{
+							featureHeight = Convert.ToSingle(feature.Properties[_options.propertyName]);
+						}
+						catch (Exception ex)
+						{
+							Debug.LogError("Property: '" + _options.propertyName + "' must contain a numerical value for extrusion.");
+							return;
+						}
+
 						maxHeight = Math.Min(Math.Max(_options.minimumHeight, featureHeight), _options.maximumHeight);
 						if (feature.Properties.ContainsKey("min_height"))
 						{
 							var featureMinHeight = Convert.ToSingle(feature.Properties["min_height"]);
 							minHeight = Math.Min(featureMinHeight, _options.maximumHeight);
-							//maxHeight -= minHeight;
 						}
 					}
 					break;
