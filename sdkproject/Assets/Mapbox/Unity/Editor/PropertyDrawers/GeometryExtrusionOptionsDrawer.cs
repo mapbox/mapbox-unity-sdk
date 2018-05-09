@@ -131,7 +131,6 @@
 			}
 			else
 			{
-
 				dataUnavailable = false;
 				var propertyDisplayNames = tileJsonData.PropertyDisplayNames[selectedLayerName];
 				if (_isInitialized == true)
@@ -139,13 +138,13 @@
 					if (!Enumerable.SequenceEqual(propertyNamesList, propertyDisplayNames))
 					{
 						index = 0;
-						propertyNamesList = propertyDisplayNames;
 					}
 				}
 				else
 				{
 					_isInitialized = true;
 				}
+				propertyNamesList = propertyDisplayNames;
 				_propertyNameContent = new GUIContent[propertyNamesList.Count];
 				for (int extIdx = 0; extIdx < propertyNamesList.Count; extIdx++)
 				{
