@@ -490,9 +490,8 @@
 		{
 			if (sourceTypeValue != VectorSourceType.None && !string.IsNullOrEmpty(sourceString))
 			{
-				if (tileJSONResponse == null || string.IsNullOrEmpty(TilesetId) || sourceString != TilesetId)
+				if (tileJSONResponse == null || string.IsNullOrEmpty(sourceString) || sourceString != TilesetId)
 				{
-					TilesetId = sourceString;
 					//tileJSONData.ClearData();
 					try
 					{
@@ -518,12 +517,13 @@
 				{
 					tileJSONData.ProcessTileJSONData(tileJSONResponse);
 				}
-
 			}
 			else
 			{
 				tileJSONData.ClearData();
 			}
+			Debug.Log(TilesetId);
+			TilesetId = sourceString;
 		}
 	}
 }
