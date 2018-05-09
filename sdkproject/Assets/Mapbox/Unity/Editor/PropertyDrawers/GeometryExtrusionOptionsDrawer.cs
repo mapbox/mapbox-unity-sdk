@@ -135,10 +135,7 @@
 					index = 0;
 					propertyNamesList = propertyDisplayNames;
 				}
-				else
-				{
-					DrawPropertyName(property, position, propertyDisplayNames, selectedLayerName);
-				}
+				DrawPropertyName(property, position, propertyDisplayNames, selectedLayerName);
 			}
 			else
 			{
@@ -151,19 +148,15 @@
 		{
 			propertyNamesList = propertyDisplayNames;
 
-			if (!_isLayerNameGUIContentSet)
+			_propertyNameContent = new GUIContent[propertyNamesList.Count];
+			for (int extIdx = 0; extIdx < propertyNamesList.Count; extIdx++)
 			{
-				_propertyNameContent = new GUIContent[propertyNamesList.Count];
-				for (int extIdx = 0; extIdx < propertyNamesList.Count; extIdx++)
+				var parsedPropertyString = propertyNamesList[extIdx].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+				_propertyNameContent[extIdx] = new GUIContent
 				{
-					var parsedPropertyString = propertyNamesList[extIdx].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
-					_propertyNameContent[extIdx] = new GUIContent
-					{
-						text = propertyNamesList[extIdx],
-						tooltip = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedPropertyString]
-					};
-				}
-				_isLayerNameGUIContentSet = true;
+					text = propertyNamesList[extIdx],
+					tooltip = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedPropertyString]
+				};
 			}
 
 			var propertyNameLabel = new GUIContent { text = "Property Name", tooltip = "The name of the property in the selected Mapbox layer that will be used for extrusion" };
