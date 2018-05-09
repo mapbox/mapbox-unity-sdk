@@ -81,27 +81,22 @@
 					Texture texture = _styleIconBundles[(StyleTypes)styleType.enumValueIndex].texture;
 					GUI.DrawTexture(new Rect(52, position.y + 10, 60, 60), texture, ScaleMode.StretchToFill, true, 10.0F);
 				}
-
 				if (Constants.GUI.StyleLabels.labels.ContainsKey((StyleTypes)styleType.enumValueIndex))
 				{
 					string descriptionLabel = Constants.GUI.StyleLabels.labels[(StyleTypes)styleType.enumValueIndex];
 					GUI.Label(new Rect(200, position.y + 10, 300, 60), descriptionLabel, Constants.GUI.Styles.EDITOR_TEXTURE_STYLE_DESCRIPTION_STYLE);
 				}
+
 				GUILayout.EndHorizontal();
 			}
 			else
 			{
 				var texturingType = property.FindPropertyRelative("texturingType");
+
 				var texturingTypeGUI = new GUIContent { text = "Texturing Type", tooltip = EnumExtensions.Description((UvMapType)texturingType.enumValueIndex) };
 
 				EditorGUI.indentLevel++;
 				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), texturingType, texturingTypeGUI);
-
-				EditorGUI.indentLevel--;
-				EditorGUI.indentLevel--;
-
-				EditorGUI.indentLevel++;
-				EditorGUI.indentLevel++;
 
 				var matList = property.FindPropertyRelative("materials");
 				if (matList.arraySize == 0)

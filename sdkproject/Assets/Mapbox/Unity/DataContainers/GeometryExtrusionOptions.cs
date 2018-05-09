@@ -15,6 +15,9 @@
 				return typeof(HeightModifier);
 			}
 		}
+
+		[SerializeField]
+		private string _selectedLayerName = "";
 		public ExtrusionType extrusionType = ExtrusionType.None;
 		public ExtrusionGeometryType extrusionGeometryType = ExtrusionGeometryType.RoofAndSide;
 		[Tooltip("Property name in feature layer to use for extrusion.")]

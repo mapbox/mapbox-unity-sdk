@@ -24,7 +24,7 @@ namespace Mapbox.Unity.Map
 			_initialized = true;
 		}
 
-		private void Update()
+		protected virtual void Update()
 		{
 			if (!_initialized)
 			{

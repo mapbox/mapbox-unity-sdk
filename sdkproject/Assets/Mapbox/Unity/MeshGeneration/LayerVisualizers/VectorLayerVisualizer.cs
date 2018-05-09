@@ -14,14 +14,37 @@
 	public class VectorLayerVisualizer : LayerVisualizerBase
 	{
 		VectorSubLayerProperties _layerProperties;
-		LayerPerformanceOptions _performanceOptions;
-		private Dictionary<UnityTile, List<int>> _activeCoroutines;
+		public VectorSubLayerProperties SubLayerProperties
+		{
+			get
+			{
+				return _layerProperties;
+			}
+			set
+			{
+				_layerProperties = value;
+			}
+		}
+
+		public ModifierStackBase DefaultModifierStack
+		{
+			get
+			{
+				return _defaultStack;
+			}
+			set
+			{
+				_defaultStack = value;
+			}
+		}
+
+		protected LayerPerformanceOptions _performanceOptions;
+		protected Dictionary<UnityTile, List<int>> _activeCoroutines;
 		int _entityInCurrentCoroutine = 0;
 
-		ModifierStackBase _defaultStack;
+		protected ModifierStackBase _defaultStack;
 		private HashSet<ulong> _activeIds;
 		private Dictionary<UnityTile, List<ulong>> _idPool; //necessary to keep _activeIds list up to date when unloading tiles
-
 		private string _key;
 
 		public override string Key
@@ -29,11 +52,11 @@
 			get { return _layerProperties.coreOptions.layerName; }
 			set { _layerProperties.coreOptions.layerName = value; }
 		}
+
 		public void SetProperties(VectorSubLayerProperties properties, LayerPerformanceOptions performanceOptions)
 		{
 			List<MeshModifier> defaultMeshModifierStack = new List<MeshModifier>();
-			List<GameObjectModifier> defaultGOModifierStack = new List<GameObjectModifier>();
-
+		 	List<GameObjectModifier> defaultGOModifierStack = new List<GameObjectModifier>();
 			_layerProperties = properties;
 			_performanceOptions = performanceOptions;
 
@@ -159,9 +182,7 @@
 			//Add any additional modifiers that were added.
 			_defaultStack.MeshModifiers.AddRange(_layerProperties.MeshModifiers);
 			_defaultStack.GoModifiers.AddRange(_layerProperties.GoModifiers);
-
 		}
-
 
 		public override void Initialize()
 		{
@@ -262,7 +283,7 @@
 					}
 				}
 
-				if (_performanceOptions.isEnabled && _entityInCurrentCoroutine >= _performanceOptions.entityPerCoroutine)
+				if (_performanceOptions!=null && _performanceOptions.isEnabled && _entityInCurrentCoroutine >= _performanceOptions.entityPerCoroutine)
 				{
 					_entityInCurrentCoroutine = 0;
 					yield return null;
@@ -296,7 +317,7 @@
 			return true;
 		}
 
-		private void Build(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
+		protected void Build(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
 		{
 			if (feature.Properties.ContainsKey("extrude") && !Convert.ToBoolean(feature.Properties["extrude"]))
 				return;
@@ -305,7 +326,7 @@
 				return;
 
 			//this will be improved in next version and will probably be replaced by filters
-			var styleSelectorKey = FindSelectorKey(feature);
+			var styleSelectorKey = _layerProperties.coreOptions.sublayerName;
 
 			var meshData = new MeshData();
 			meshData.TileRect = tile.Rect;

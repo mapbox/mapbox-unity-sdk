@@ -14,6 +14,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		//private ColliderType _colliderType;
 		private IColliderStrategy _colliderStrategy;
 
+		[SerializeField]
 		ColliderOptions _options;
 
 		public override void SetProperties(ModifierProperties properties)

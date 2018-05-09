@@ -1,13 +1,34 @@
-## CHANGELOG
+﻿## CHANGELOG
  ### v.1.4.2
 *??/??/2018*
+- Layer names and property names are preloaded from the data source into a dropdown.
+
+##### BREAKING CHANGES
+- Property `Heading` on `Location` object has been split into `UserHeading` and `DeviceOrientation`.
+  - `UserHeading`: the direction the user is moving. This is calculated from the latest position. If the user stops moving the last heading value is kept.
+  - `DeviceOrientation`: value obtained from the device compass. Where the device is looking to.
 
 ##### New Features
+- Add `Location Prefabs` section to `AbstractMap`. Enables users to spawn prefabs at points-of-interest on the map directly from the `AbstractMap` UI.
+- Add options to spawn prefabs on points-of-interest using `Mapbox Category`, `Name`, or a list of `Address or LatLon`.
+- Add methods on `AbstractMap` to spawn prefabs. Enables users to add layers via script.
+- Add the `LocationPrefabs.unity` example scene. Demonstrates the basics of using the `Location Prefabs` feature.
 - Add `OnUpdated` event to `AbstractMap`. Enables subscribers to get a notification when the map location and/or zoom gets updated.
-- Add new UI for vector layer style selection and creation. Enables users to easily select from several Mapbox sample styles and/or create/assign thier own styles.
- 
+- `DeviceLocationProviderAndroidNative`: a native location provider for Android that directly accesses location and orientation provided by the operating system not using Unity's `Input.location` which has some shortcomings, eg coordinates truncated to `float` precision.
+  **Only available on Android 7.0 (Nougat, API Level 24) and up!**
+- `EditorGpsLogLocationProvider`: an Editor location provider to replay real world GPS traces logged with [GNSSLogger](https://github.com/google/gps-measurement-tools/tree/master/GNSSLogger)
+- New example scene showing `UserHeading` and `DeviceOrientation`
+
 ##### Improvements
 - `UnityARInterface` updated to [commit 67351b6](https://github.com/Unity-Technologies/experimental-ARInterface/commit/67351b66ff9af28380e7dd5f5b2f4ba1bf802ca8) from March 1st 2018
+- Additional properties on `RotateWithLocationProvider` to account for new `Location` properties `UserHeading` and `DeviceOrientation`.
+- Changes to terrain factory (#623)
+  - Create a new base class
+  - Introduce all different terrains as strategies
+  - Change sidewalls as a property on elevated terrain strategy
+- Data Fetching Changes (#622)
+  - Move data calls from factories to DataFetcher classes
+  - Factories register to events in DataFetchers
 
 ### v.1.4.1
 *04/17/2018*

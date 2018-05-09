@@ -20,6 +20,7 @@
 				return _layerProperty;
 			}
 		}
+
 		public MapLayerType LayerType
 		{
 			get
@@ -71,6 +72,27 @@
 			}
 		}
 
+		public void AddLayerSource(string vectorSource)
+		{
+			if (!string.IsNullOrEmpty(vectorSource))
+			{
+				if (!_layerProperty.sourceOptions.Id.Contains(vectorSource))
+				{
+					if (string.IsNullOrEmpty(_layerProperty.sourceOptions.Id))
+					{
+						SetLayerSource(vectorSource);
+						return;
+					}
+					var newLayerSource = _layerProperty.sourceOptions.Id + "," + vectorSource;
+					SetLayerSource(newLayerSource);
+				}
+			}
+			else
+			{
+				Debug.LogError("Empty source. Nothing was added to the list of data sources");
+			}
+		}
+
 		public void AddVectorLayer(VectorSubLayerProperties subLayerProperties)
 		{
 			if (_layerProperty.vectorSubLayers == null)
@@ -80,6 +102,21 @@
 			_layerProperty.vectorSubLayers.Add(subLayerProperties);
 		}
 
+		public void AddLocationPrefabItem(PrefabItemOptions prefabItem)
+		{
+			//ensure that there is a list of prefabitems
+			if (PointsOfInterestSublayerList == null)
+			{
+				PointsOfInterestSublayerList = new List<PrefabItemOptions>();
+			}
+
+			//add the prefab item if it doesn't already exist
+			if (!PointsOfInterestSublayerList.Contains(prefabItem))
+			{
+				PointsOfInterestSublayerList.Add(prefabItem);
+			}
+		}
+
 		public void RemoveVectorLayer(int index)
 		{
 			if (_layerProperty.vectorSubLayers != null)
@@ -87,6 +124,15 @@
 				_layerProperty.vectorSubLayers.RemoveAt(index);
 			}
 		}
+
+		public void RemovePrefabItem(int index)
+		{
+			if (PointsOfInterestSublayerList != null)
+			{
+				PointsOfInterestSublayerList.RemoveAt(index);
+			}
+		}
+
 
 		public void Initialize(LayerProperties properties)
 		{
@@ -121,5 +167,17 @@
 			}
 		}
 		private VectorTileFactory _vectorTileFactory;
+
+		public List<PrefabItemOptions> PointsOfInterestSublayerList
+		{
+			get
+			{
+				return _layerProperty.locationPrefabList;
+			}
+			set
+			{
+				_layerProperty.locationPrefabList = value;
+			}
+		}
 	}
 }

@@ -52,7 +52,7 @@
 			{
 				var alignment = new Alignment();
 				var originalPosition = _map.Root.position;
-				alignment.Rotation = -location.Heading + _map.Root.localEulerAngles.y;
+				alignment.Rotation = -location.UserHeading + _map.Root.localEulerAngles.y;
 
 				// Rotate our offset by the last heading.
 				var rotation = Quaternion.Euler(0, -_lastHeading, 0);
