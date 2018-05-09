@@ -91,8 +91,11 @@
 
 			DrawLayerName(property, position, layerDisplayNames);
 
-			EditorGUILayout.PropertyField(property.FindPropertyRelative("snapToTerrain"));
-			EditorGUILayout.PropertyField(property.FindPropertyRelative("groupFeatures"));
+			var snapToTerrainProperty = property.FindPropertyRelative("snapToTerrain");
+			var groupFeaturesProperty = property.FindPropertyRelative("groupFeatures");
+
+			snapToTerrainProperty.boolValue = EditorGUILayout.Toggle(snapToTerrainProperty.displayName, snapToTerrainProperty.boolValue);
+			groupFeaturesProperty.boolValue = EditorGUILayout.Toggle(groupFeaturesProperty.displayName, groupFeaturesProperty.boolValue);
 
 			if ((VectorPrimitiveType)primitiveType.enumValueIndex == VectorPrimitiveType.Line)
 			{
@@ -111,11 +114,7 @@
 
 			if (layerDisplayNames.Count == 0)
 			{
-				EditorGUILayout.BeginHorizontal();
-				EditorGUILayout.LabelField(layerNameLabel);
-				GUILayout.Space(-0.55f * EditorGUIUtility.labelWidth);
-				EditorGUILayout.HelpBox("No layers found : Invalid MapId / No Internet.", MessageType.None);
-				EditorGUILayout.EndHorizontal();
+				EditorGUILayout.LabelField(layerNameLabel, new GUIContent("No layers found: Invalid MapId / No Internet."), (GUIStyle)"minipopUp");
 				return;
 			}
 

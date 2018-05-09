@@ -171,22 +171,21 @@
 			var parsedString = propertyNamesList[index].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
 			var descriptionString = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedString];
 
+			descriptionString = string.IsNullOrEmpty(descriptionString) ? "No description available" : descriptionString;
 			property.FindPropertyRelative("propertyName").stringValue = parsedString;
 
-
-
-			EditorGUILayout.PrefixLabel(new GUIContent { text = "Property Description", tooltip = "Factual information about the selected property" });
-			EditorGUILayout.HelpBox(descriptionString, MessageType.Info);
+			var propertyDescriptionPrefixLabel = new GUIContent { text = "Property Description", tooltip = "Factual information about the selected property" };
+			EditorGUILayout.LabelField(propertyDescriptionPrefixLabel, new GUIContent(descriptionString), (GUIStyle)"wordWrappedLabel");
 		}
 
 		private void DrawWarningMessage(Rect position)
 		{
 			dataUnavailable = true;
-			EditorGUILayout.BeginHorizontal();
-			EditorGUILayout.LabelField(new GUIContent { text = "Property Name", tooltip = "The name of the property in the selected Mapbox layer that will be used for extrusion" });
-			GUILayout.Space(-0.55f * EditorGUIUtility.labelWidth);
-			EditorGUILayout.HelpBox("No properties found : Invalid MapId / No Internet.", MessageType.None);
-			EditorGUILayout.EndHorizontal();
+			GUIStyle labelStyle = new GUIStyle(EditorStyles.popup);
+			//labelStyle.normal.textColor = Color.red;
+			labelStyle.fontStyle = FontStyle.Bold;
+			var layerNameLabel = new GUIContent { text = "Property Name", tooltip = "The name of the property in the selected Mapbox layer that will be used for extrusion" };
+			EditorGUILayout.LabelField(layerNameLabel, new GUIContent("No layers found: Invalid MapId / No Internet."), labelStyle);//(GUIStyle)"minipopUp");
 			return;
 		}
 	}

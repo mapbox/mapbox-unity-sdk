@@ -152,7 +152,7 @@
 					layerSourceId.stringValue = CustomSourceMapId;
 					if (_isInitialized)
 					{
-						LoadEditorTileJSON(property,sourceTypeValue, layerSourceId.stringValue);
+						LoadEditorTileJSON(property, sourceTypeValue, layerSourceId.stringValue);
 					}
 					else
 					{
@@ -317,7 +317,7 @@
 		{
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
 			GUILayout.Space(-_lineHeight);
-			GUILayout.Label(subLayerCoreOptions.FindPropertyRelative("sublayerName").stringValue + " Properties");
+			EditorGUILayout.PrefixLabel(subLayerCoreOptions.FindPropertyRelative("sublayerName").stringValue + " Properties");
 			// V1
 			EditorGUILayout.BeginVertical();
 			EditorGUI.indentLevel++;
@@ -338,9 +338,7 @@
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("colliderOptions"));
 				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
-				EditorGUI.indentLevel--;
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
-				EditorGUI.indentLevel++;
 			}
 
 			EditorGUI.indentLevel--;
@@ -367,6 +365,7 @@
 				var filterOptions = layerProperty.FindPropertyRelative("filterOptions");
 				filterOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
 
+				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(filterOptions, new GUIContent("Filters"));
 				DrawModifiers(layerProperty, new GUIContent { text = "Modifier Options", tooltip = "Additional Feature modifiers to apply to the visualizer. " });
 			}

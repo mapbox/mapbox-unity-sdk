@@ -116,7 +116,6 @@
 				}
 
 				cachedLayerName = selectedLayerName;
-				DrawPropertyDropDown(originalProperty, property);
 			}
 			else
 			{
@@ -124,6 +123,7 @@
 				cachedLayerName = selectedLayerName;
 			}
 
+			DrawPropertyDropDown(originalProperty, property);
 			filterOperatorProp.enumValueIndex = EditorGUILayout.Popup(filterOperatorProp.enumValueIndex, filterOperatorProp.enumDisplayNames, GUILayout.MaxWidth(150));
 
 			switch ((LayerFilterOperationType)filterOperatorProp.enumValueIndex)
@@ -175,7 +175,7 @@
 				properties[i] = new GUIContent(propertyDisplayNames[i], descriptionArray[i]);
 			}
 
-			propertyIndex = EditorGUILayout.Popup(propertyIndex, properties);
+			propertyIndex = EditorGUILayout.Popup(propertyIndex, properties, GUILayout.MaxWidth(150));
 			var parsedString = propertyDisplayNames[propertyIndex].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
 			filterProperty.FindPropertyRelative("Key").stringValue = parsedString;
 		}
