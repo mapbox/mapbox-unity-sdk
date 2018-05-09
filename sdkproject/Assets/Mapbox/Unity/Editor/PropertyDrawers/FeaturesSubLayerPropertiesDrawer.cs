@@ -522,7 +522,6 @@
 			{
 				tileJSONData.ClearData();
 			}
-			Debug.Log(TilesetId);
 			TilesetId = sourceString;
 		}
 	}
