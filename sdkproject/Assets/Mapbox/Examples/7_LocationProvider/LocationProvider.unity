@@ -1175,9 +1175,10 @@ MonoBehaviour:
         wallHeight: 10
         wallMaterial: {fileID: 0}
   _vectorData:
-    _locationPrefabsLayerProperties:
-      locationPrefabList: []
     _layerProperty:
+      tileJsonData:
+        tileJSONLoaded: 0
+        LayerDisplayNames: []
       _sourceType: 1
       sourceOptions:
         isActive: 1
@@ -1525,7 +1526,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mapManager: {fileID: 1411663281}
   _deviceLocationProviderUnity: {fileID: 849657521}
-  _deviceLocationProviderAndroid: {fileID: 2054056459}
+  _deviceLocationProviderAndroid: {fileID: 0}
   _editorLocationProvider: {fileID: 1363590663}
   _transformLocationProvider: {fileID: 1830401242}
   _dontDestroyOnLoad: 0
