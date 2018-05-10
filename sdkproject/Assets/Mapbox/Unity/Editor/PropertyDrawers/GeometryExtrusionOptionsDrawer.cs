@@ -11,20 +11,10 @@
 	[CustomPropertyDrawer(typeof(GeometryExtrusionOptions))]
 	public class GeometryExtrusionOptionsDrawer : PropertyDrawer
 	{
-		int index
-		{
-			get
-			{
-				return EditorPrefs.GetInt(objectId + "GeometryOptions_propertySelectionIndex");
-			}
-			set
-			{
-				EditorPrefs.SetInt(objectId + "GeometryOptions_propertySelectionIndex", value);
-			}
-		}
+		//indices for tileJSON lookup
+		int _propertyIndex = 0;
 
 		bool _isInitialized = false;
-		string objectId = "";
 		private static List<string> propertyNamesList = new List<string>();
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		GUIContent[] extrusionTypeContent;
@@ -36,7 +26,6 @@
 		static bool dataUnavailable = false;
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 
 			var extrusionTypeProperty = property.FindPropertyRelative("extrusionType");
 			var displayNames = extrusionTypeProperty.enumDisplayNames;
@@ -133,18 +122,23 @@
 			{
 				dataUnavailable = false;
 				var propertyDisplayNames = tileJsonData.PropertyDisplayNames[selectedLayerName];
-				if (_isInitialized == true)
+				propertyNamesList = propertyDisplayNames;
+
+				var propertyString = property.FindPropertyRelative("propertyName").stringValue;
+				if (propertyNamesList.Contains(propertyString))
 				{
-					if (!Enumerable.SequenceEqual(propertyNamesList, propertyDisplayNames))
-					{
-						index = 0;
-					}
+					//if the layer contains the current layerstring, set it's index to match
+					_propertyIndex = propertyDisplayNames.FindIndex(s => s.Equals(propertyString));
+
 				}
 				else
 				{
-					_isInitialized = true;
+					//if the selected layer isn't in the source, add a placeholder entry
+					_propertyIndex = 0;
+					propertyNamesList.Insert(0, propertyString);
 				}
-				propertyNamesList = propertyDisplayNames;
+
+				//create GUIcontent array
 				_propertyNameContent = new GUIContent[propertyNamesList.Count];
 				for (int extIdx = 0; extIdx < propertyNamesList.Count; extIdx++)
 				{
@@ -152,13 +146,17 @@
 					_propertyNameContent[extIdx] = new GUIContent
 					{
 						text = propertyNamesList[extIdx],
+						//this lookup doesn't work for placeholder properties
 						tooltip = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedPropertyString]
 					};
 				}
 
+				//display popup
 				var propertyNameLabel = new GUIContent { text = "Property Name", tooltip = "The name of the property in the selected Mapbox layer that will be used for extrusion" };
-				index = EditorGUILayout.Popup(propertyNameLabel, index, _propertyNameContent);
-				var parsedString = propertyNamesList[index].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+				_propertyIndex = EditorGUILayout.Popup(propertyNameLabel, _propertyIndex, _propertyNameContent);
+				var parsedString = propertyNamesList[_propertyIndex].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+
+				//this lookup doesn't work for placeholder properties
 				descriptionString = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedString];
 				property.FindPropertyRelative("propertyName").stringValue = parsedString;
 			}

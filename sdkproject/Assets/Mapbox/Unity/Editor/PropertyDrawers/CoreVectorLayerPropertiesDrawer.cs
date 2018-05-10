@@ -11,32 +11,20 @@
 	[CustomPropertyDrawer(typeof(CoreVectorLayerProperties))]
 	public class CoreVectorLayerPropertiesDrawer : PropertyDrawer
 	{
-		int index
-		{
-			get
-			{
-				return EditorPrefs.GetInt(objectId + "CoreOptions_propertySelectionIndex");
-			}
-			set
-			{
-				EditorPrefs.SetInt(objectId + "CoreOptions_propertySelectionIndex", value);
-			}
-		}
-
+		int _layerIndex = 0;
 		static float _lineHeight = EditorGUIUtility.singleLineHeight;
 		bool _isGUIContentSet = false;
 		bool _isLayerNameGUIContentSet = false;
 		GUIContent[] _primitiveTypeContent;
 		GUIContent[] _layerTypeContent;
 		static bool _isInitialized = false;
-		string objectId = "";
 		static string currentSource = "";
 		static TileJsonData tileJsonData = new TileJsonData();
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, null, property);
-			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
+
 
 
 			// Draw label.
@@ -71,24 +59,22 @@
 			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
 			tileJsonData = mapObject.VectorData.LayerProperty.tileJsonData;
 
+			//var newSource = property.FindPropertyRelative("sourceId").stringValue;
+			//if (_isInitialized)
+			//{
+			//	if (currentSource != newSource)
+			//	{
+			//		//lookup index value for name string
+			//	}
+			//	currentSource = newSource;
+			//}
+			//else
+			//{
+			//	_isInitialized = true;
+			//	currentSource = newSource;
+			//}
+
 			var layerDisplayNames = tileJsonData.LayerDisplayNames;
-
-			var newSource = property.FindPropertyRelative("sourceId").stringValue;
-
-			if (_isInitialized)
-			{
-				if (currentSource != newSource)
-				{
-					index = 0;
-				}
-				currentSource = newSource;
-			}
-			else
-			{
-				_isInitialized = true;
-				currentSource = newSource;
-			}
-
 			DrawLayerName(property, position, layerDisplayNames);
 
 			var snapToTerrainProperty = property.FindPropertyRelative("snapToTerrain");
@@ -106,19 +92,36 @@
 		private static int count = 0;
 		private void DrawLayerName(SerializedProperty property, Rect position, List<string> layerDisplayNames)
 		{
+
 			var layerNameLabel = new GUIContent
 			{
 				text = "Layer Name",
 				tooltip = "The layer name from the Mapbox tileset that would be used for visualizing a feature"
 			};
 
+			//disable the selection if there is no layer
 			if (layerDisplayNames.Count == 0)
 			{
 				EditorGUILayout.LabelField(layerNameLabel, new GUIContent("No layers found: Invalid MapId / No Internet."), (GUIStyle)"minipopUp");
 				return;
 			}
 
+			//check the string value at the current _layerIndex to verify that the stored index matches the property string.
+			var layerString = property.FindPropertyRelative("layerName").stringValue;
+			if (layerDisplayNames.Contains(layerString))
+			{
+				//if the layer contains the current layerstring, set it's index to match
+				_layerIndex = layerDisplayNames.FindIndex(s => s.Equals(layerString));
 
+			}
+			else
+			{
+				//if the selected layer isn't in the source, add a placeholder entry
+				_layerIndex = 0;
+				layerDisplayNames.Insert(0, layerString);
+			}
+
+			//create the display name guicontent array with an additional entry for the currently selected item
 			_layerTypeContent = new GUIContent[layerDisplayNames.Count];
 			for (int extIdx = 0; extIdx < layerDisplayNames.Count; extIdx++)
 			{
@@ -128,8 +131,9 @@
 				};
 			}
 
-			index = EditorGUILayout.Popup(layerNameLabel, index, _layerTypeContent);
-			var parsedString = layerDisplayNames.ToArray()[index].Split(new string[] { tileJsonData.commonLayersKey }, System.StringSplitOptions.None)[0].Trim();
+			//draw the layer selection popup
+			_layerIndex = EditorGUILayout.Popup(layerNameLabel, _layerIndex, _layerTypeContent);
+			var parsedString = layerDisplayNames.ToArray()[_layerIndex].Split(new string[] { tileJsonData.commonLayersKey }, System.StringSplitOptions.None)[0].Trim();
 			property.FindPropertyRelative("layerName").stringValue = parsedString;
 		}
 	}

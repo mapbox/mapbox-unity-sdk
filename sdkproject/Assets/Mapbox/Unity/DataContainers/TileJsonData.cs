@@ -107,7 +107,8 @@
 						{
 							LayerDisplayNames.Remove(layerName);
 						}
-						LayerDisplayNames.Add(layerName + " " + commonLayersKey);
+						LayerDisplayNames.Add(layerName);
+//						LayerDisplayNames.Add(layerName + " " + commonLayersKey);
 					}
 					else
 					{
@@ -160,7 +161,8 @@
 											PropertyDisplayNames[layerName].Remove(propertyName);
 										}
 
-										PropertyDisplayNames[layerName].Add(propertyName + " " + optionalPropertiesString);
+										PropertyDisplayNames[layerName].Add(propertyName);
+										//PropertyDisplayNames[layerName].Add(propertyName + " " + optionalPropertiesString);
 									}
 								}
 						}
@@ -170,7 +172,11 @@
 						PropertyDisplayNames.Add(layerName, new List<string> { propertyName });
 					}
 				}
+
+				PropertyDisplayNames[layerName].Sort();
 			}
+
+			LayerDisplayNames.Sort();
 		}
 	}
 }
