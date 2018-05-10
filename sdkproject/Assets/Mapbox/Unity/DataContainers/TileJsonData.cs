@@ -73,8 +73,8 @@
 				var layerName = layer.Id;
 				layerPropertiesList = new List<string>();
 				layerSource = layer.Source;
-				if (layer.Fields.Count == 0)
-					continue;
+				//if (layer.Fields.Count == 0)
+					//continue;
 
 				//loading layer sources
 				if (LayerSourcesDictionary.ContainsKey(layerName))
@@ -173,10 +173,17 @@
 					}
 				}
 
-				PropertyDisplayNames[layerName].Sort();
+				if (PropertyDisplayNames.ContainsKey(layerName) && PropertyDisplayNames[layerName].Count > 1)
+				{
+					PropertyDisplayNames[layerName].Sort();
+				}
 			}
 
-			LayerDisplayNames.Sort();
+
+			if (LayerDisplayNames.Count > 1)
+			{
+				LayerDisplayNames.Sort();
+			}
 		}
 	}
 }
