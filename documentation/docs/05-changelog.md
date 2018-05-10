@@ -1,4 +1,4 @@
-﻿## CHANGELOG
+## CHANGELOG
  ### v.1.4.2
 *??/??/2018*
 - Layer names and property names are preloaded from the data source into a dropdown.
@@ -29,6 +29,10 @@
 - Data Fetching Changes (#622)
   - Move data calls from factories to DataFetcher classes
   - Factories register to events in DataFetchers
+-  `Layer Name` , `Extrusion Property Name` and `Filter Key` are now selectable dropdowns indicating the layers and properties available in the current `Data Source`. Layers and properties no longer require manual string entry.
+
+#### Known Issues
+- `Filters` with empty key or value parameters will exclude all features in a layer.
 
 ### v.1.4.1
 *04/17/2018*
