@@ -117,7 +117,11 @@
 				//if the selected layer isn't in the source, add a placeholder entry
 				_layerIndex = 0;
 				layerDisplayNames.Insert(0, layerString);
-				tileJsonData.LayerPropertyDescriptionDictionary.Add(layerString, new Dictionary<string, string>());
+				if (!tileJsonData.LayerPropertyDescriptionDictionary.ContainsKey(layerString))
+				{
+					tileJsonData.LayerPropertyDescriptionDictionary.Add(layerString, new Dictionary<string, string>());
+				}
+
 			}
 
 			//create the display name guicontent array with an additional entry for the currently selected item
