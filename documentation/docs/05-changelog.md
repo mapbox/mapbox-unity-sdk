@@ -33,6 +33,7 @@
 
 #### Known Issues
 - `Filters` with empty key or value parameters will exclude all features in a layer.
+-  SDK will throw `[Physics.PhysX] cleaning the mesh failed` error if a MapFeature is used with the following options: {Primitive Type: `Line`, LayerName: `Road`, Collider Type: `Mesh Collider`}
 
 ### v.1.4.1
 *04/17/2018*
