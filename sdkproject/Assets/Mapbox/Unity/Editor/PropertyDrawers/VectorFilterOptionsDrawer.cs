@@ -144,6 +144,22 @@
 			dataUnavailable = false;
 			var propertyDisplayNames = tileJsonData.PropertyDisplayNames[selectedLayerName];
 
+			var propertyString = filterProperty.FindPropertyRelative("Key").stringValue;
+			if (propertyDisplayNames.Contains(propertyString))
+			{
+				//if the layer contains the current layerstring, set it's index to match
+				_propertyIndex = propertyDisplayNames.FindIndex(s => s.Equals(propertyString));
+
+			}
+			else
+			{
+				//if the selected layer isn't in the source, add a placeholder entry
+				_propertyIndex = 0;
+				propertyDisplayNames.Insert(0, propertyString);
+				tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName].Add(propertyString, filterProperty.FindPropertyRelative("KeyDescription").stringValue);
+			}
+
+
 			descriptionArray = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName].Values.ToArray<string>();
 			GUIContent[] properties = new GUIContent[propertyDisplayNames.Count];
 			for (int i = 0; i < propertyDisplayNames.Count; i++)
@@ -153,7 +169,10 @@
 
 			_propertyIndex = EditorGUILayout.Popup(_propertyIndex, properties, GUILayout.MaxWidth(150));
 			var parsedString = propertyDisplayNames[_propertyIndex].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+
+			var descriptionString = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedString];
 			filterProperty.FindPropertyRelative("Key").stringValue = parsedString;
+			filterProperty.FindPropertyRelative("KeyDescription").stringValue = descriptionString;
 		}
 
 		private void DrawWarningMessage()
