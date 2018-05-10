@@ -15,7 +15,10 @@
 		int _propertyIndex = 0;
 
 		bool _isInitialized = false;
-		private static List<string> propertyNamesList = new List<string>();
+
+		private bool _isSelectionValid = true;
+		private static List<string> _propertyNamesList = new List<string>();
+
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		GUIContent[] extrusionTypeContent;
 		bool isGUIContentSet = false;
@@ -111,6 +114,7 @@
 
 		private void DrawPropertyName(SerializedProperty property, Rect position, string selectedLayerName)
 		{
+			var parsedString = "No property selected";
 			var descriptionString = "No description available";
 
 			if (string.IsNullOrEmpty(selectedLayerName) || tileJsonData == null || !tileJsonData.PropertyDisplayNames.ContainsKey(selectedLayerName))
@@ -121,45 +125,77 @@
 			{
 				dataUnavailable = false;
 				var propertyDisplayNames = tileJsonData.PropertyDisplayNames[selectedLayerName];
-				propertyNamesList = propertyDisplayNames;
+				_propertyNamesList = new List<string>(propertyDisplayNames);
 
+				//check if the selection is valid
 				var propertyString = property.FindPropertyRelative("propertyName").stringValue;
-				if (propertyNamesList.Contains(propertyString))
+				if (_propertyNamesList.Contains(propertyString))
 				{
 					//if the layer contains the current layerstring, set it's index to match
 					_propertyIndex = propertyDisplayNames.FindIndex(s => s.Equals(propertyString));
+
+
+					//create guicontent for a valid layer
+					_propertyNameContent = new GUIContent[_propertyNamesList.Count];
+					for (int extIdx = 0; extIdx < _propertyNamesList.Count; extIdx++)
+					{
+						var parsedPropertyString = _propertyNamesList[extIdx].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+						_propertyNameContent[extIdx] = new GUIContent
+						{
+							text = _propertyNamesList[extIdx],
+							tooltip = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedPropertyString]
+						};
+					}
+
+					//display popup
+					var propertyNameLabel = new GUIContent { text = "Property Name", tooltip = "The name of the property in the selected Mapbox layer that will be used for extrusion" };
+					_propertyIndex = EditorGUILayout.Popup(propertyNameLabel, _propertyIndex, _propertyNameContent);
+
+					//set new string values based on selection
+					parsedString = _propertyNamesList[_propertyIndex].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+					descriptionString = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedString];
+
 
 				}
 				else
 				{
 					//if the selected layer isn't in the source, add a placeholder entry
 					_propertyIndex = 0;
-					propertyNamesList.Insert(0, propertyString);
-					tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName].Add(propertyString, property.FindPropertyRelative("propertyDescription").stringValue);
-				}
+					_propertyNamesList.Insert(0, propertyString);
 
-				//create GUIcontent array
-				_propertyNameContent = new GUIContent[propertyNamesList.Count];
-				for (int extIdx = 0; extIdx < propertyNamesList.Count; extIdx++)
-				{
-					var parsedPropertyString = propertyNamesList[extIdx].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
-					_propertyNameContent[extIdx] = new GUIContent
+					//create guicontent for an invalid layer
+					_propertyNameContent = new GUIContent[_propertyNamesList.Count];
+
+					//first property gets a unique tooltip
+					_propertyNameContent[0] = new GUIContent
 					{
-						text = propertyNamesList[extIdx],
-						//this lookup doesn't work for placeholder properties
-						tooltip = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedPropertyString]
+						text = _propertyNamesList[0],
+						tooltip = "Unavialable in Selected Layer"
 					};
+
+					for (int extIdx = 1; extIdx < _propertyNamesList.Count; extIdx++)
+					{
+						var parsedPropertyString = _propertyNamesList[extIdx].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+						_propertyNameContent[extIdx] = new GUIContent
+						{
+							text = _propertyNamesList[extIdx],
+							tooltip = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedPropertyString]
+						};
+					}
+
+					//display popup
+					var propertyNameLabel = new GUIContent { text = "Property Name", tooltip = "The name of the property in the selected Mapbox layer that will be used for extrusion" };
+					_propertyIndex = EditorGUILayout.Popup(propertyNameLabel, _propertyIndex, _propertyNameContent);
+
+					//set new string values based on the offset
+					parsedString = _propertyNamesList[_propertyIndex].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+					descriptionString = "Unavailable in Selected Layer.";
+
 				}
 
-				//display popup
-				var propertyNameLabel = new GUIContent { text = "Property Name", tooltip = "The name of the property in the selected Mapbox layer that will be used for extrusion" };
-				_propertyIndex = EditorGUILayout.Popup(propertyNameLabel, _propertyIndex, _propertyNameContent);
-				var parsedString = propertyNamesList[_propertyIndex].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
-
-				//this lookup doesn't work for placeholder properties
-				descriptionString = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedString];
 				property.FindPropertyRelative("propertyName").stringValue = parsedString;
 				property.FindPropertyRelative("propertyDescription").stringValue = descriptionString;
+
 			}
 
 			descriptionString = string.IsNullOrEmpty(descriptionString) ? "No description available" : descriptionString;
@@ -175,7 +211,7 @@
 			//labelStyle.normal.textColor = Color.red;
 			labelStyle.fontStyle = FontStyle.Bold;
 			var layerNameLabel = new GUIContent { text = "Property Name", tooltip = "The name of the property in the selected Mapbox layer that will be used for extrusion" };
-			EditorGUILayout.LabelField(layerNameLabel, new GUIContent("No layers found: Invalid MapId / No Internet."), labelStyle);//(GUIStyle)"minipopUp");
+			EditorGUILayout.LabelField(layerNameLabel, new GUIContent("No properties found in layer"), labelStyle);//(GUIStyle)"minipopUp");
 			return;
 		}
 	}

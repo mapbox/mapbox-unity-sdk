@@ -12,6 +12,8 @@
 	{
 		//indices for tileJSON lookup
 		int _propertyIndex = 0;
+		List<string> _propertyNamesList = new List<string>();
+		GUIContent[] _propertyNameContent;
 
 		private static string objectId = "";
 		private string[] descriptionArray;
@@ -142,35 +144,75 @@
 			}
 
 			dataUnavailable = false;
+			var parsedString = "no property selected";
+			var descriptionString = "no description available";
 			var propertyDisplayNames = tileJsonData.PropertyDisplayNames[selectedLayerName];
+			_propertyNamesList = new List<string>(propertyDisplayNames);
 
 			var propertyString = filterProperty.FindPropertyRelative("Key").stringValue;
-			if (propertyDisplayNames.Contains(propertyString))
+			//check if the selection is valid
+			if (_propertyNamesList.Contains(propertyString))
 			{
 				//if the layer contains the current layerstring, set it's index to match
 				_propertyIndex = propertyDisplayNames.FindIndex(s => s.Equals(propertyString));
+
+
+				//create guicontent for a valid layer
+				_propertyNameContent = new GUIContent[_propertyNamesList.Count];
+				for (int extIdx = 0; extIdx < _propertyNamesList.Count; extIdx++)
+				{
+					var parsedPropertyString = _propertyNamesList[extIdx].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+					_propertyNameContent[extIdx] = new GUIContent
+					{
+						text = _propertyNamesList[extIdx],
+						//tooltip = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedPropertyString]
+					};
+				}
+
+				//display popup
+				_propertyIndex = EditorGUILayout.Popup(_propertyIndex, _propertyNameContent, GUILayout.MaxWidth(150));
+
+				//set new string values based on selection
+				parsedString = _propertyNamesList[_propertyIndex].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+				//descriptionString = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedString];
+
 
 			}
 			else
 			{
 				//if the selected layer isn't in the source, add a placeholder entry
 				_propertyIndex = 0;
-				propertyDisplayNames.Insert(0, propertyString);
-				tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName].Add(propertyString, filterProperty.FindPropertyRelative("KeyDescription").stringValue);
+				_propertyNamesList.Insert(0, propertyString);
+
+				//create guicontent for an invalid layer
+				_propertyNameContent = new GUIContent[_propertyNamesList.Count];
+
+				//first property gets a unique tooltip
+				_propertyNameContent[0] = new GUIContent
+				{
+					text = _propertyNamesList[0],
+					tooltip = "Unavialable in Selected Layer"
+				};
+
+				for (int extIdx = 1; extIdx < _propertyNamesList.Count; extIdx++)
+				{
+					var parsedPropertyString = _propertyNamesList[extIdx].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+					_propertyNameContent[extIdx] = new GUIContent
+					{
+						text = _propertyNamesList[extIdx],
+						tooltip = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedPropertyString]
+					};
+				}
+
+				//display popup
+				_propertyIndex = EditorGUILayout.Popup( _propertyIndex, _propertyNameContent, GUILayout.MaxWidth(150));
+
+				//set new string values based on the offset
+				parsedString = _propertyNamesList[_propertyIndex].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+				descriptionString = "Unavailable in Selected Layer.";
+
 			}
 
-
-			descriptionArray = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName].Values.ToArray<string>();
-			GUIContent[] properties = new GUIContent[propertyDisplayNames.Count];
-			for (int i = 0; i < propertyDisplayNames.Count; i++)
-			{
-				properties[i] = new GUIContent(propertyDisplayNames[i], descriptionArray[i]);
-			}
-
-			_propertyIndex = EditorGUILayout.Popup(_propertyIndex, properties, GUILayout.MaxWidth(150));
-			var parsedString = propertyDisplayNames[_propertyIndex].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
-
-			var descriptionString = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedString];
 			filterProperty.FindPropertyRelative("Key").stringValue = parsedString;
 			filterProperty.FindPropertyRelative("KeyDescription").stringValue = descriptionString;
 		}
@@ -180,7 +222,7 @@
 			dataUnavailable = true;
 			GUIStyle labelStyle = new GUIStyle(EditorStyles.popup);
 			labelStyle.fontStyle = FontStyle.Bold;
-			EditorGUILayout.LabelField(new GUIContent(), new GUIContent("Check MapId / Internet."), labelStyle, new GUILayoutOption[] { GUILayout.MaxWidth(155) });//(GUIStyle)"minipopUp");
+			EditorGUILayout.LabelField(new GUIContent(), new GUIContent("Check Layer Name"), labelStyle, new GUILayoutOption[] { GUILayout.MaxWidth(155) });//(GUIStyle)"minipopUp");
 			return;
 		}
 	}
