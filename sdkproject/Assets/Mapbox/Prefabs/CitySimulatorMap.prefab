@@ -121,7 +121,31 @@ MonoBehaviour:
         wallMaterial: {fileID: 0}
   _vectorData:
     _layerProperty:
-      sourceType: 0
+      tileJsonData:
+        tileJSONLoaded: 0
+        LayerDisplayNames:
+        - landuse
+        - waterway
+        - aeroway
+        - barrier_line
+        - building (layer found in more than one data source)
+        - landuse_overlay
+        - road
+        - admin
+        - country_label
+        - marine_label
+        - state_label
+        - place_label
+        - water_label
+        - airport_label
+        - rail_station_label
+        - mountain_peak_label
+        - poi_label
+        - motorway_junction
+        - road_label
+        - waterway_label
+        - housenum_label
+      _sourceType: 0
       sourceOptions:
         isActive: 1
         layerSource:
@@ -140,6 +164,7 @@ MonoBehaviour:
         entityPerCoroutine: 20
       vectorSubLayers:
       - coreOptions:
+          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7
           isActive: 1
           sublayerName: ExtrudedBuildings
           geometryType: 2
@@ -148,16 +173,20 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: building
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: building
           extrusionType: 1
           extrusionGeometryType: 0
           propertyName: height
           minimumHeight: 0
           maximumHeight: 0
+          extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 3
           materials:
           - Materials:
@@ -165,13 +194,15 @@ MonoBehaviour:
           - Materials:
             - {fileID: 2100000, guid: 55cc6edead802446b9106b2998406844, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
-          colorPallete: {fileID: 11400000, guid: ef118b5e263da4b1fa4327ca1d3e0c7b,
+          colorPalette: {fileID: 11400000, guid: ef118b5e263da4b1fa4327ca1d3e0c7b,
             type: 2}
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 1
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
       - coreOptions:
+          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7
           isActive: 1
           sublayerName: Roads
           geometryType: 1
@@ -180,16 +211,20 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 3
         filterOptions:
+          _selectedLayerName: road
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: road
           extrusionType: 5
           extrusionGeometryType: 0
-          propertyName: height
+          propertyName: class
           minimumHeight: 0
           maximumHeight: 2
+          extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
         materialOptions:
-          projectMapImagery: 0
           texturingType: 0
           materials:
           - Materials:
@@ -197,9 +232,11 @@ MonoBehaviour:
           - Materials:
             - {fileID: 2100000, guid: 8e8afdee0a225a84282f04f2fb89b8b6, type: 2}
           atlasInfo: {fileID: 0}
-          colorPallete: {fileID: 0}
+          colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
+      locationPrefabList: []
   _tileProvider: {fileID: 0}

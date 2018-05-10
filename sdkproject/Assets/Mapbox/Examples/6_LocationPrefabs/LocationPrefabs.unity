@@ -675,7 +675,7 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0.14468281
+      value: 0.20733595
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -795,7 +795,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -116.91571
+      value: -126.156845
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -805,12 +805,12 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 213.83142
+      value: 232.31369
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 233.83142
+      value: 252.31369
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -947,20 +947,103 @@ MonoBehaviour:
         wallHeight: 10
         wallMaterial: {fileID: 0}
   _vectorData:
-    _locationPrefabsLayerProperties:
+    _layerProperty:
+      tileJsonData:
+        tileJSONLoaded: 0
+        LayerDisplayNames:
+        - landuse
+        - waterway
+        - aeroway
+        - barrier_line
+        - building (layer found in more than one data source)
+        - landuse_overlay
+        - road
+        - admin
+        - country_label
+        - marine_label
+        - state_label
+        - place_label
+        - water_label
+        - airport_label
+        - rail_station_label
+        - mountain_peak_label
+        - poi_label
+        - motorway_junction
+        - road_label
+        - waterway_label
+        - housenum_label
+      _sourceType: 0
+      sourceOptions:
+        isActive: 1
+        layerSource:
+          Name: Mapbox Terrain
+          Id: mapbox.3d-buildings,mapbox.mapbox-streets-v7
+          Modified: 
+          UserName: 
+      useOptimizedStyle: 0
+      optimizedStyle:
+        Name: 
+        Id: 
+        Modified: 
+        UserName: 
+      performanceOptions:
+        isEnabled: 1
+        entityPerCoroutine: 20
+      vectorSubLayers:
+      - coreOptions:
+          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7
+          isActive: 1
+          sublayerName: Building
+          geometryType: 2
+          layerName: building
+          snapToTerrain: 1
+          groupFeatures: 0
+          lineWidth: 1
+        filterOptions:
+          _selectedLayerName: building
+          filters: []
+          combinerType: 0
+        extrusionOptions:
+          _selectedLayerName: building
+          extrusionType: 1
+          extrusionGeometryType: 0
+          propertyName: height
+          minimumHeight: 0
+          maximumHeight: 0
+          extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
+        materialOptions:
+          texturingType: 3
+          materials:
+          - Materials:
+            - {fileID: 2100000, guid: d4d7464e3429a44e090f55a4ac17f110, type: 2}
+          - Materials:
+            - {fileID: 2100000, guid: 55cc6edead802446b9106b2998406844, type: 2}
+          atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
+          colorPalette: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
+            type: 2}
+        honorBuildingIdSetting: 1
+        buildingsWithUniqueIds: 1
+        moveFeaturePositionTo: 0
+        MeshModifiers: []
+        GoModifiers: []
       locationPrefabList:
       - coreOptions:
+          sourceId: 
           isActive: 1
-          sublayerName: Arts and Enterinment
+          sublayerName: Arts and Entertainment
           geometryType: 0
           layerName: 
           snapToTerrain: 1
           groupFeatures: 0
           lineWidth: 0
         filterOptions:
+          _selectedLayerName: 
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: 
           extrusionType: 0
           extrusionGeometryType: 0
           propertyName: 
@@ -985,10 +1068,11 @@ MonoBehaviour:
           scaleDownWithWorld: 1
         findByType: 0
         categories: 1
-        nameString: POI Name
+        nameString: 
         coordinates: []
-        density: 10
+        density: 15
       - coreOptions:
+          sourceId: 
           isActive: 1
           sublayerName: Food
           geometryType: 0
@@ -997,9 +1081,11 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 0
         filterOptions:
+          _selectedLayerName: 
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: 
           extrusionType: 0
           extrusionGeometryType: 0
           propertyName: 
@@ -1024,10 +1110,11 @@ MonoBehaviour:
           scaleDownWithWorld: 1
         findByType: 0
         categories: 2
-        nameString: POI Name
+        nameString: 
         coordinates: []
         density: 15
       - coreOptions:
+          sourceId: 
           isActive: 1
           sublayerName: Nightlife
           geometryType: 0
@@ -1036,9 +1123,11 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 0
         filterOptions:
+          _selectedLayerName: 
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: 
           extrusionType: 0
           extrusionGeometryType: 0
           propertyName: 
@@ -1063,10 +1152,11 @@ MonoBehaviour:
           scaleDownWithWorld: 1
         findByType: 0
         categories: 4
-        nameString: POI Name
+        nameString: 
         coordinates: []
-        density: 10
+        density: 15
       - coreOptions:
+          sourceId: 
           isActive: 1
           sublayerName: Outdoors and Recreation
           geometryType: 0
@@ -1075,9 +1165,11 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 0
         filterOptions:
+          _selectedLayerName: 
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: 
           extrusionType: 0
           extrusionGeometryType: 0
           propertyName: 
@@ -1102,10 +1194,11 @@ MonoBehaviour:
           scaleDownWithWorld: 1
         findByType: 0
         categories: 8
-        nameString: POI Name
+        nameString: 
         coordinates: []
-        density: 20
+        density: 15
       - coreOptions:
+          sourceId: 
           isActive: 1
           sublayerName: Services
           geometryType: 0
@@ -1114,9 +1207,11 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 0
         filterOptions:
+          _selectedLayerName: 
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: 
           extrusionType: 0
           extrusionGeometryType: 0
           propertyName: 
@@ -1141,10 +1236,11 @@ MonoBehaviour:
           scaleDownWithWorld: 1
         findByType: 0
         categories: 16
-        nameString: POI Name
+        nameString: 
         coordinates: []
-        density: 5
+        density: 10
       - coreOptions:
+          sourceId: 
           isActive: 1
           sublayerName: Shops
           geometryType: 0
@@ -1153,9 +1249,11 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 0
         filterOptions:
+          _selectedLayerName: 
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: 
           extrusionType: 0
           extrusionGeometryType: 0
           propertyName: 
@@ -1180,10 +1278,11 @@ MonoBehaviour:
           scaleDownWithWorld: 1
         findByType: 0
         categories: 32
-        nameString: POI Name
+        nameString: 
         coordinates: []
-        density: 10
+        density: 15
       - coreOptions:
+          sourceId: 
           isActive: 1
           sublayerName: Transportation
           geometryType: 0
@@ -1192,9 +1291,11 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 0
         filterOptions:
+          _selectedLayerName: 
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: 
           extrusionType: 0
           extrusionGeometryType: 0
           propertyName: 
@@ -1219,21 +1320,24 @@ MonoBehaviour:
           scaleDownWithWorld: 1
         findByType: 0
         categories: 64
-        nameString: POI Name
+        nameString: 
         coordinates: []
-        density: 10
+        density: 15
       - coreOptions:
+          sourceId: 
           isActive: 0
-          sublayerName: All Points of Interest (POIs)
+          sublayerName: All POIs
           geometryType: 0
           layerName: 
           snapToTerrain: 1
           groupFeatures: 0
           lineWidth: 0
         filterOptions:
+          _selectedLayerName: 
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: 
           extrusionType: 0
           extrusionGeometryType: 0
           propertyName: 
@@ -1258,63 +1362,9 @@ MonoBehaviour:
           scaleDownWithWorld: 1
         findByType: 0
         categories: -1
-        nameString: POI Name
+        nameString: 
         coordinates: []
-        density: 15
-    _layerProperty:
-      _sourceType: 0
-      sourceOptions:
-        isActive: 1
-        layerSource:
-          Name: Mapbox Terrain
-          Id: mapbox.3d-buildings,mapbox.mapbox-streets-v7
-          Modified: 
-          UserName: 
-      useOptimizedStyle: 0
-      optimizedStyle:
-        Name: 
-        Id: 
-        Modified: 
-        UserName: 
-      performanceOptions:
-        isEnabled: 1
-        entityPerCoroutine: 20
-      vectorSubLayers:
-      - coreOptions:
-          isActive: 1
-          sublayerName: Building
-          geometryType: 2
-          layerName: building
-          snapToTerrain: 1
-          groupFeatures: 0
-          lineWidth: 1
-        filterOptions:
-          filters: []
-          combinerType: 0
-        extrusionOptions:
-          extrusionType: 1
-          extrusionGeometryType: 0
-          propertyName: height
-          minimumHeight: 0
-          maximumHeight: 0
-          extrusionScaleFactor: 1
-        colliderOptions:
-          colliderType: 0
-        materialOptions:
-          texturingType: 3
-          materials:
-          - Materials:
-            - {fileID: 2100000, guid: d4d7464e3429a44e090f55a4ac17f110, type: 2}
-          - Materials:
-            - {fileID: 2100000, guid: 55cc6edead802446b9106b2998406844, type: 2}
-          atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
-          colorPalette: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
-            type: 2}
-        honorBuildingIdSetting: 1
-        buildingsWithUniqueIds: 1
-        moveFeaturePositionTo: 0
-        MeshModifiers: []
-        GoModifiers: []
+        density: 30
   _tileProvider: {fileID: 0}
 --- !u!4 &967308907
 Transform:
