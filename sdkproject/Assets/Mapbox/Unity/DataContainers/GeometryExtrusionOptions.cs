@@ -22,6 +22,7 @@
 		public ExtrusionGeometryType extrusionGeometryType = ExtrusionGeometryType.RoofAndSide;
 		[Tooltip("Property name in feature layer to use for extrusion.")]
 		public string propertyName = "height";
+		public string propertyDescription = "";
 		public float minimumHeight = 0f;
 		public float maximumHeight = 0f;
 		[Tooltip("Scale factor to multiply the extrusion value of the feature.")]
@@ -43,6 +44,7 @@
 		public ExtrusionType extrusionType = ExtrusionType.None;
 		public ExtrusionGeometryType extrusionGeometryType = ExtrusionGeometryType.RoofAndSide;
 		public string propertyName = "height";
+		public string propertyDescription = "";
 		public float minimumHeight = 0f;
 		public float maximumHeight = 0f;
 		public float extrusionScaleFactor = 1f;

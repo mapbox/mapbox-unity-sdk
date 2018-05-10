@@ -10,17 +10,8 @@
 	[CustomPropertyDrawer(typeof(VectorFilterOptions))]
 	public class VectorFilterOptionsDrawer : PropertyDrawer
 	{
-		int propertyIndex
-		{
-			get
-			{
-				return EditorPrefs.GetInt(objectId + "FilterOptions_propertySelectionIndex");
-			}
-			set
-			{
-				EditorPrefs.SetInt(objectId + "FilterOptions_propertySelectionIndex", value);
-			}
-		}
+		//indices for tileJSON lookup
+		int _propertyIndex = 0;
 
 		private static string objectId = "";
 		private string[] descriptionArray;
@@ -108,21 +99,6 @@
 			EditorGUILayout.BeginHorizontal();
 			var selectedLayerName = originalProperty.FindPropertyRelative("_selectedLayerName").stringValue;
 
-			if (_isInitialized == true)
-			{
-				if (cachedLayerName != selectedLayerName)
-				{
-					propertyIndex = 0;
-				}
-
-				cachedLayerName = selectedLayerName;
-			}
-			else
-			{
-				_isInitialized = true;
-				cachedLayerName = selectedLayerName;
-			}
-
 			DrawPropertyDropDown(originalProperty, property);
 			filterOperatorProp.enumValueIndex = EditorGUILayout.Popup(filterOperatorProp.enumValueIndex, filterOperatorProp.enumDisplayNames, GUILayout.MaxWidth(150));
 
@@ -175,8 +151,8 @@
 				properties[i] = new GUIContent(propertyDisplayNames[i], descriptionArray[i]);
 			}
 
-			propertyIndex = EditorGUILayout.Popup(propertyIndex, properties, GUILayout.MaxWidth(150));
-			var parsedString = propertyDisplayNames[propertyIndex].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+			_propertyIndex = EditorGUILayout.Popup(_propertyIndex, properties, GUILayout.MaxWidth(150));
+			var parsedString = propertyDisplayNames[_propertyIndex].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
 			filterProperty.FindPropertyRelative("Key").stringValue = parsedString;
 		}
 
@@ -185,7 +161,7 @@
 			dataUnavailable = true;
 			GUIStyle labelStyle = new GUIStyle(EditorStyles.popup);
 			labelStyle.fontStyle = FontStyle.Bold;
-			EditorGUILayout.LabelField(new GUIContent(), new GUIContent("Check MapId / Internet."), labelStyle, new GUILayoutOption[]{ GUILayout.MaxWidth(155) });//(GUIStyle)"minipopUp");
+			EditorGUILayout.LabelField(new GUIContent(), new GUIContent("Check MapId / Internet."), labelStyle, new GUILayoutOption[] { GUILayout.MaxWidth(155) });//(GUIStyle)"minipopUp");
 			return;
 		}
 	}

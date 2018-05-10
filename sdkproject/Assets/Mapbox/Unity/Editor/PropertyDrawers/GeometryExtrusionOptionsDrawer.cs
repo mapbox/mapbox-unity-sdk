@@ -26,7 +26,6 @@
 		static bool dataUnavailable = false;
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-
 			var extrusionTypeProperty = property.FindPropertyRelative("extrusionType");
 			var displayNames = extrusionTypeProperty.enumDisplayNames;
 			int count = extrusionTypeProperty.enumDisplayNames.Length;
@@ -136,6 +135,7 @@
 					//if the selected layer isn't in the source, add a placeholder entry
 					_propertyIndex = 0;
 					propertyNamesList.Insert(0, propertyString);
+					tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName].Add(propertyString, property.FindPropertyRelative("propertyDescription").stringValue);
 				}
 
 				//create GUIcontent array
@@ -159,6 +159,7 @@
 				//this lookup doesn't work for placeholder properties
 				descriptionString = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedString];
 				property.FindPropertyRelative("propertyName").stringValue = parsedString;
+				property.FindPropertyRelative("propertyDescription").stringValue = descriptionString;
 			}
 
 			descriptionString = string.IsNullOrEmpty(descriptionString) ? "No description available" : descriptionString;
