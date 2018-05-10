@@ -404,12 +404,12 @@ MonoBehaviour:
         - water_label
         - waterway
         - waterway_label
-      _sourceType: 1
+      _sourceType: 0
       sourceOptions:
         isActive: 1
         layerSource:
           Name: Mapbox Streets
-          Id: mapbox.mapbox-streets-v7
+          Id: mapbox.3d-buildings,mapbox.mapbox-streets-v7
           Modified: 
           UserName: 
       useOptimizedStyle: 0
@@ -1893,7 +1893,7 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -69.15138
+      value: -67.20215
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -1903,12 +1903,12 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 118.30277
+      value: 114.404305
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 138.30276
+      value: 134.4043
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
