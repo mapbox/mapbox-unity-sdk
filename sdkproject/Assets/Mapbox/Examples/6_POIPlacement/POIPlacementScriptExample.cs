@@ -7,7 +7,7 @@
 	using Mapbox.Unity.Map;
 	using Mapbox.Utils;
 
-	public class LocationPrefabsScriptExample : MonoBehaviour
+	public class POIPlacementScriptExample : MonoBehaviour
 	{
 		public AbstractMap map;
 
@@ -27,7 +27,7 @@
 		//handle callbacks
 		void HandlePrefabSpawned(List<GameObject> instances)
 		{
-			if(instances.Count > 0)
+			if (instances.Count > 0)
 			{
 				Debug.Log(instances[0].name);
 			}
