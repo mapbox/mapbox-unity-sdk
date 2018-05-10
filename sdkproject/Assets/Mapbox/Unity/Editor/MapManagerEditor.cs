@@ -93,12 +93,6 @@
 			tooltip = "Map Id corresponding to the tileset."
 		};
 
-		string CustomSourceMapId
-		{
-			get { return EditorPrefs.GetString("VectorLayerProperties_customSourceMapId"); }
-			set { EditorPrefs.SetString("VectorLayerProperties_customSourceMapId", value); }
-		}
-
 		bool _isGUIContentSet = false;
 		GUIContent[] _sourceTypeContent;
 		static float _lineHeight = EditorGUIUtility.singleLineHeight;
@@ -161,7 +155,7 @@
 		void DrawMapOptions(SerializedObject mapObject)
 		{
 			var property = mapObject.FindProperty("_options");
-			if(!((AbstractMap)serializedObject.targetObject).IsAccessTokenValid)
+			if (!((AbstractMap)serializedObject.targetObject).IsAccessTokenValid)
 			{
 				EditorGUILayout.HelpBox("Invalid Access Token. Please add a valid access token using the Mapbox  > Setup Menu", MessageType.Error);
 			}
@@ -248,9 +242,7 @@
 					isActiveProperty.boolValue = true;
 					break;
 				case VectorSourceType.Custom:
-					layerSourceId.stringValue = CustomSourceMapId;
 					EditorGUILayout.PropertyField(layerSourceProperty, mapIdGui);
-					CustomSourceMapId = layerSourceId.stringValue;
 					isActiveProperty.boolValue = true;
 					break;
 				case VectorSourceType.None:
