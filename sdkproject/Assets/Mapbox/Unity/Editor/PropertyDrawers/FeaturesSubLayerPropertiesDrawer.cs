@@ -73,18 +73,6 @@
 			}
 		}
 
-		string CustomSourceMapId
-		{
-			get
-			{
-				return EditorPrefs.GetString(objectId + "VectorSubLayerProperties_customSourceMapId");
-			}
-			set
-			{
-				EditorPrefs.SetString(objectId + "VectorSubLayerProperties_customSourceMapId", value);
-			}
-		}
-
 		FeatureSubLayerTreeView layerTreeView = new FeatureSubLayerTreeView(new TreeViewState());
 		IList<int> selectedLayers = new List<int>();
 
@@ -149,9 +137,9 @@
 					isActiveProperty.boolValue = true;
 					break;
 				case VectorSourceType.Custom:
-					layerSourceId.stringValue = CustomSourceMapId;
 					if (_isInitialized)
 					{
+						string test = layerSourceId.stringValue;
 						LoadEditorTileJSON(property, sourceTypeValue, layerSourceId.stringValue);
 					}
 					else
@@ -162,7 +150,6 @@
 					{
 						EditorGUILayout.HelpBox("Invalid Map Id / There might be a problem with the internet connection.", MessageType.Error);
 					}
-					CustomSourceMapId = layerSourceId.stringValue;
 					isActiveProperty.boolValue = true;
 					break;
 				case VectorSourceType.None:
@@ -503,9 +490,8 @@
 		{
 			if (sourceTypeValue != VectorSourceType.None && !string.IsNullOrEmpty(sourceString))
 			{
-				if (tileJSONResponse == null || string.IsNullOrEmpty(TilesetId) || sourceString != TilesetId)
+				if (tileJSONResponse == null || string.IsNullOrEmpty(sourceString) || sourceString != TilesetId)
 				{
-					TilesetId = sourceString;
 					//tileJSONData.ClearData();
 					try
 					{
@@ -531,12 +517,12 @@
 				{
 					tileJSONData.ProcessTileJSONData(tileJSONResponse);
 				}
-
 			}
 			else
 			{
 				tileJSONData.ClearData();
 			}
+			TilesetId = sourceString;
 		}
 	}
 }

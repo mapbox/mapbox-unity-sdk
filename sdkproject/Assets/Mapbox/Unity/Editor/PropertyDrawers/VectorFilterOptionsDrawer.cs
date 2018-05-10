@@ -185,34 +185,8 @@
 			dataUnavailable = true;
 			GUIStyle labelStyle = new GUIStyle(EditorStyles.popup);
 			labelStyle.fontStyle = FontStyle.Bold;
-			EditorGUILayout.LabelField(new GUIContent(), new GUIContent("Check MapId / Internet."), labelStyle, new GUILayoutOption[]{ GUILayout.MaxWidth(160) });//(GUIStyle)"minipopUp");
+			EditorGUILayout.LabelField(new GUIContent(), new GUIContent("Check MapId / Internet."), labelStyle, new GUILayoutOption[]{ GUILayout.MaxWidth(155) });//(GUIStyle)"minipopUp");
 			return;
 		}
 	}
-
-
-	//[CustomPropertyDrawer(typeof(TypeVisualizerTuple))]
-	//public class TypeVisualizerBaseDrawer : PropertyDrawer
-	//{
-	//	static float lineHeight = EditorGUIUtility.singleLineHeight;
-	//	bool showPosition = true;
-	//	public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-	//	{
-	//		EditorGUI.BeginProperty(position, label, property);
-
-	//		position.height = lineHeight;
-
-	//		EditorGUI.PropertyField(position, property.FindPropertyRelative("Stack"));
-
-	//		EditorGUI.EndProperty();
-	//	}
-	//	public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-	//	{
-	//		// Reserve space for the total visible properties.
-	//		int rows = 2;
-	//		//Debug.Log("Height - " + rows * lineHeight);
-	//		return (float)rows * lineHeight;
-	//	}
-	//}
-
 }

@@ -118,17 +118,14 @@
 				return;
 			}
 
-			if (!_isLayerNameGUIContentSet)
+
+			_layerTypeContent = new GUIContent[layerDisplayNames.Count];
+			for (int extIdx = 0; extIdx < layerDisplayNames.Count; extIdx++)
 			{
-				_layerTypeContent = new GUIContent[layerDisplayNames.Count];
-				for (int extIdx = 0; extIdx < layerDisplayNames.Count; extIdx++)
+				_layerTypeContent[extIdx] = new GUIContent
 				{
-					_layerTypeContent[extIdx] = new GUIContent
-					{
-						text = layerDisplayNames[extIdx],
-					};
-				}
-				_isLayerNameGUIContentSet = true;
+					text = layerDisplayNames[extIdx],
+				};
 			}
 
 			index = EditorGUILayout.Popup(layerNameLabel, index, _layerTypeContent);
