@@ -222,7 +222,7 @@
 			dataUnavailable = true;
 			GUIStyle labelStyle = new GUIStyle(EditorStyles.popup);
 			labelStyle.fontStyle = FontStyle.Bold;
-			EditorGUILayout.LabelField(new GUIContent(), new GUIContent("Check Layer Name"), labelStyle, new GUILayoutOption[] { GUILayout.MaxWidth(155) });//(GUIStyle)"minipopUp");
+			EditorGUILayout.LabelField(new GUIContent(), new GUIContent("No properties"), labelStyle, new GUILayoutOption[] { GUILayout.MaxWidth(155) });//(GUIStyle)"minipopUp");
 			return;
 		}
 	}
