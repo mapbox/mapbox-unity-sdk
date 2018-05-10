@@ -13,16 +13,12 @@
 	{
 		//indices for tileJSON lookup
 		int _propertyIndex = 0;
-
-		bool _isInitialized = false;
-
-		private bool _isSelectionValid = true;
 		private static List<string> _propertyNamesList = new List<string>();
+		GUIContent[] _propertyNameContent;
 
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		GUIContent[] extrusionTypeContent;
 		bool isGUIContentSet = false;
-		GUIContent[] _propertyNameContent;
 		bool _isLayerNameGUIContentSet = false;
 		static TileJsonData tileJsonData = new TileJsonData();
 		static TileJSONResponse tileJsonResponse;
