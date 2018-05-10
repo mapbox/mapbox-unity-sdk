@@ -17,7 +17,6 @@
 		bool _isLayerNameGUIContentSet = false;
 		GUIContent[] _primitiveTypeContent;
 		GUIContent[] _layerTypeContent;
-		static bool _isInitialized = false;
 		static string currentSource = "";
 		static TileJsonData tileJsonData = new TileJsonData();
 
@@ -56,21 +55,6 @@
 			var serializedMapObject = property.serializedObject;
 			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
 			tileJsonData = mapObject.VectorData.LayerProperty.tileJsonData;
-
-			//var newSource = property.FindPropertyRelative("sourceId").stringValue;
-			//if (_isInitialized)
-			//{
-			//	if (currentSource != newSource)
-			//	{
-			//		//lookup index value for name string
-			//	}
-			//	currentSource = newSource;
-			//}
-			//else
-			//{
-			//	_isInitialized = true;
-			//	currentSource = newSource;
-			//}
 
 			var layerDisplayNames = tileJsonData.LayerDisplayNames;
 			DrawLayerName(property, position, layerDisplayNames);
