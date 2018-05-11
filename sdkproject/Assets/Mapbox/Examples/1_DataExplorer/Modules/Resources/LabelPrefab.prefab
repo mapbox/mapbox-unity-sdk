@@ -151,7 +151,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9b2b4cc337b3479a9f4365ea51ff65c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pixelSize: 3
+  pixelSize: 1
   outlineColor: {r: 0, g: 0, b: 0, a: 1}
   resolutionDependant: 0
   doubleResolution: 1024
