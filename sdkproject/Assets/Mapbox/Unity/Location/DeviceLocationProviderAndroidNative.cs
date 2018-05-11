@@ -426,7 +426,7 @@
 				double lat = loc.Call<double>("getLatitude");
 				double lng = loc.Call<double>("getLongitude");
 
-				return string.Format(_invariantCulture, "{0:0.00000000} / {1:0.00000000}", lat, lng);
+				return string.Format(CultureInfo.InvariantCulture, "{0:0.00000000} / {1:0.00000000}", lat, lng);
 			}
 			catch (Exception ex)
 			{
