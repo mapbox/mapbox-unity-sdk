@@ -68,6 +68,10 @@
 			string layerString = layerSourceId.stringValue;
 
 			//Draw POI Section
+			if(sourceTypeValue == VectorSourceType.None)
+			{
+				return;
+			}
 
 			ShowLocationPrefabs = EditorGUILayout.Foldout(ShowLocationPrefabs, "POINTS OF INTEREST");
 			if (ShowLocationPrefabs)
