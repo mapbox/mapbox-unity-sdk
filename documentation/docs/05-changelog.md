@@ -31,6 +31,9 @@
   - Factories register to events in DataFetchers
 -  `Layer Name` , `Extrusion Property Name` and `Filter Key` are now selectable dropdowns indicating the layers and properties available in the current `Data Source`. Layers and properties no longer require manual string entry.
 
+#### Bug Fixes
+- Added checks to prevent NRE in `GeocodeAttributeSearchWindow` when searching with an invalid token or no connection.
+
 #### Known Issues
 - `Filters` with empty key or value parameters will exclude all features in a layer.
 
@@ -59,7 +62,6 @@
 - Added a check to prevent NRE on tile update because map was not initialized.
 - Added method to disable `InitializeOnStart` in the `Initialize With Location Provider` script.
 - Fix loop counter in `SpawnInsidePrefabModifier` which was causing an infinite loop.
-- Added checks to prevent NRE in `GeocodeAttributeSearchWindow` when searching with an invalid token or no connection.
 
 ### v.1.4.0
 *03/20/2018*
