@@ -1162,7 +1162,6 @@ MonoBehaviour:
         entityPerCoroutine: 20
       vectorSubLayers:
       - coreOptions:
-          sourceId: mapbox.mapbox-streets-v7
           isActive: 1
           sublayerName: buildings
           geometryType: 2
@@ -1411,7 +1410,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b55f37f9a6f7e44f7bb35e6bc3863847, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapManager: {fileID: 0}
+  mapManager: {fileID: 114081268807403756}
   _deviceLocationProviderUnity: {fileID: 114321575131809240}
   _deviceLocationProviderAndroid: {fileID: 114250988310879394}
   _editorLocationProvider: {fileID: 114426609730744774}
