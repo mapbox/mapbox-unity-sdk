@@ -63,7 +63,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				{
 					goRectTransform.anchoredPosition3D = met;
 				}
-				//go.transform.localScale = Constants.Math.Vector3One;
+
 
 				if (!_options.scaleDownWithWorld)
 				{
@@ -89,7 +89,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				goRectTransform.anchoredPosition3D = met;
 			}
-			//go.transform.localPosition = met;
+
 			go.transform.SetParent(ve.GameObject.transform, false);
 			go.transform.localScale = Constants.Math.Vector3One;
 

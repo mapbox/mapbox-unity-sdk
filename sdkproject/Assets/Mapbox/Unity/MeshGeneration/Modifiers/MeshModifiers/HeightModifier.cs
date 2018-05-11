@@ -234,14 +234,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						{
 							maxHeight = Convert.ToSingle(feature.Properties[_options.propertyName]);
 						}
-						catch (Exception ex)
+						catch (Exception)
 						{
 							Debug.LogError("Property: '" + _options.propertyName + "' must contain a numerical value for extrusion.");
 							return;
 						}
-
-
-
 
 						if (feature.Properties.ContainsKey("min_height"))
 						{
@@ -266,7 +263,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						{
 							featureHeight = Convert.ToSingle(feature.Properties[_options.propertyName]);
 						}
-						catch (Exception ex)
+						catch (Exception)
 						{
 							Debug.LogError("Property: '" + _options.propertyName + "' must contain a numerical value for extrusion.");
 							return;

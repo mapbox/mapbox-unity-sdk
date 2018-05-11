@@ -8,7 +8,6 @@
 	[CustomPropertyDrawer(typeof(MapPlacementOptions))]
 	public class MapPlacementOptionsDrawer : PropertyDrawer
 	{
-		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		GUIContent[] placementTypeContent;
 		bool isGUIContentSet = false;
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
