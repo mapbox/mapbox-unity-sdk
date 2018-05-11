@@ -59,6 +59,7 @@
 - Added a check to prevent NRE on tile update because map was not initialized.
 - Added method to disable `InitializeOnStart` in the `Initialize With Location Provider` script.
 - Fix loop counter in `SpawnInsidePrefabModifier` which was causing an infinite loop.
+- Added checks to prevent NRE in `GeocodeAttributeSearchWindow` when searching with an invalid token or no connection.
 
 ### v.1.4.0
 *03/20/2018*
