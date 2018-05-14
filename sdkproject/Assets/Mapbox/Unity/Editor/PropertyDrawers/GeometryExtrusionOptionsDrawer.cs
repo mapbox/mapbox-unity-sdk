@@ -16,13 +16,10 @@
 		private static List<string> _propertyNamesList = new List<string>();
 		GUIContent[] _propertyNameContent;
 
-		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		GUIContent[] extrusionTypeContent;
 		bool isGUIContentSet = false;
-		bool _isLayerNameGUIContentSet = false;
 		static TileJsonData tileJsonData = new TileJsonData();
 		static TileJSONResponse tileJsonResponse;
-		static bool dataUnavailable = false;
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			var extrusionTypeProperty = property.FindPropertyRelative("extrusionType");
@@ -119,7 +116,6 @@
 			}
 			else
 			{
-				dataUnavailable = false;
 				var propertyDisplayNames = tileJsonData.PropertyDisplayNames[selectedLayerName];
 				_propertyNamesList = new List<string>(propertyDisplayNames);
 
@@ -150,7 +146,6 @@
 					//set new string values based on selection
 					parsedString = _propertyNamesList[_propertyIndex].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
 					descriptionString = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedString];
-
 
 				}
 				else
@@ -202,7 +197,6 @@
 
 		private void DrawWarningMessage(Rect position)
 		{
-			dataUnavailable = true;
 			GUIStyle labelStyle = new GUIStyle(EditorStyles.popup);
 			//labelStyle.normal.textColor = Color.red;
 			labelStyle.fontStyle = FontStyle.Bold;

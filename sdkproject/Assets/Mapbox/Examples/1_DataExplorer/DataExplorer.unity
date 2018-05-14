@@ -427,7 +427,6 @@ MonoBehaviour:
         entityPerCoroutine: 20
       vectorSubLayers:
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 1
           sublayerName: Buildings
           geometryType: 2
@@ -466,7 +465,6 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 1
           sublayerName: Parks
           geometryType: 2
@@ -513,7 +511,6 @@ MonoBehaviour:
         - {fileID: 11400000, guid: d5cfd67d46b2f4892ae231737f3a95f8, type: 2}
         - {fileID: 11400000, guid: 4aeb0629486794f25bf199af8a4f4830, type: 2}
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 1
           sublayerName: Roads
           geometryType: 1
@@ -551,7 +548,6 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 1
           sublayerName: PoiLabels
           geometryType: 0
@@ -597,7 +593,6 @@ MonoBehaviour:
         GoModifiers:
         - {fileID: 11400000, guid: 90f8fc7667430374d9ddd1907cf522dd, type: 2}
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 1
           sublayerName: Pois
           geometryType: 0
@@ -637,7 +632,6 @@ MonoBehaviour:
         - {fileID: 11400000, guid: 873cf898fb44149798c637959fd811ba, type: 2}
         - {fileID: 11400000, guid: 69c9fbc203d6e934ea944041d43ea709, type: 2}
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 1
           sublayerName: Water
           geometryType: 2
@@ -675,7 +669,6 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 0
           sublayerName: Waterway
           geometryType: 1
@@ -713,7 +706,6 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 0
           sublayerName: Aeroway
           geometryType: 1
@@ -751,7 +743,6 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 0
           sublayerName: BarrierLine
           geometryType: 1
@@ -789,7 +780,6 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 0
           sublayerName: LanduseOverlay
           geometryType: 2
@@ -827,7 +817,6 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 0
           sublayerName: Admin
           geometryType: 1
@@ -865,7 +854,6 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 0
           sublayerName: CountryLabel
           geometryType: 0
@@ -904,7 +892,6 @@ MonoBehaviour:
         GoModifiers:
         - {fileID: 11400000, guid: 856c73f1fff593349bebf4e5b37f6e50, type: 2}
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 0
           sublayerName: MarineLabel
           geometryType: 0
@@ -943,7 +930,6 @@ MonoBehaviour:
         GoModifiers:
         - {fileID: 11400000, guid: 856c73f1fff593349bebf4e5b37f6e50, type: 2}
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 0
           sublayerName: StateLabel
           geometryType: 0
@@ -982,7 +968,6 @@ MonoBehaviour:
         GoModifiers:
         - {fileID: 11400000, guid: 856c73f1fff593349bebf4e5b37f6e50, type: 2}
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 0
           sublayerName: WaterLabel
           geometryType: 0
@@ -1021,7 +1006,6 @@ MonoBehaviour:
         GoModifiers:
         - {fileID: 11400000, guid: 856c73f1fff593349bebf4e5b37f6e50, type: 2}
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 0
           sublayerName: PlaceLabel
           geometryType: 0
@@ -1060,7 +1044,6 @@ MonoBehaviour:
         GoModifiers:
         - {fileID: 11400000, guid: 856c73f1fff593349bebf4e5b37f6e50, type: 2}
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 0
           sublayerName: RoadLabel
           geometryType: 0
@@ -1099,7 +1082,6 @@ MonoBehaviour:
         GoModifiers:
         - {fileID: 11400000, guid: 856c73f1fff593349bebf4e5b37f6e50, type: 2}
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 0
           sublayerName: WaterwayLabel
           geometryType: 0
@@ -1138,7 +1120,6 @@ MonoBehaviour:
         GoModifiers:
         - {fileID: 11400000, guid: 856c73f1fff593349bebf4e5b37f6e50, type: 2}
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 0
           sublayerName: AirportLabel
           geometryType: 0
@@ -1177,7 +1158,6 @@ MonoBehaviour:
         GoModifiers:
         - {fileID: 11400000, guid: 856c73f1fff593349bebf4e5b37f6e50, type: 2}
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 0
           sublayerName: RailStationLabel
           geometryType: 0
@@ -1216,7 +1196,6 @@ MonoBehaviour:
         GoModifiers:
         - {fileID: 11400000, guid: 856c73f1fff593349bebf4e5b37f6e50, type: 2}
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 0
           sublayerName: MountainPeakLabel
           geometryType: 0
@@ -1255,7 +1234,6 @@ MonoBehaviour:
         GoModifiers:
         - {fileID: 11400000, guid: 856c73f1fff593349bebf4e5b37f6e50, type: 2}
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 0
           sublayerName: HouseNumberLabel
           geometryType: 0
@@ -1294,7 +1272,6 @@ MonoBehaviour:
         GoModifiers:
         - {fileID: 11400000, guid: 856c73f1fff593349bebf4e5b37f6e50, type: 2}
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 0
           sublayerName: MotorwayJunction
           geometryType: 0
@@ -1333,7 +1310,6 @@ MonoBehaviour:
         GoModifiers:
         - {fileID: 11400000, guid: ceca5248b4c18354d8089a76da2f7f45, type: 2}
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 0
           sublayerName: Landcover
           geometryType: 2
@@ -1371,8 +1347,7 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
-          isActive: 1
+          isActive: 0
           sublayerName: Hillshade
           geometryType: 2
           layerName: hillshade
@@ -1409,7 +1384,6 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 0
           sublayerName: Contour
           geometryType: 1
@@ -1447,8 +1421,7 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
-          isActive: 0
+          isActive: 1
           sublayerName: LowTrafficCongestion
           geometryType: 1
           layerName: traffic
@@ -1492,8 +1465,7 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
-          isActive: 0
+          isActive: 1
           sublayerName: ModerateTrafficCongestion
           geometryType: 1
           layerName: traffic
@@ -1537,7 +1509,6 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           isActive: 1
           sublayerName: HeavyTrafficCongestion
           geometryType: 1
@@ -1582,8 +1553,7 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
-          isActive: 0
+          isActive: 1
           sublayerName: SevereTrafficCongestion
           geometryType: 1
           layerName: traffic
@@ -2861,47 +2831,47 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.x
-      value: 116.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -95.440895
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.x
-      value: 213
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 170.88179
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 190.88179
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}

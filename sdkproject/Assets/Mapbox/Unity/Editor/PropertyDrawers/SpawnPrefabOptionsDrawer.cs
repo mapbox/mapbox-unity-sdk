@@ -27,7 +27,7 @@ namespace Mapbox.Unity.Map
 		{
 			EditorGUI.BeginProperty(position, label, property);
 			position.height = 2.5f * lineHeight;
-			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("prefab"), prefabContent);
+			property.FindPropertyRelative("prefab").objectReferenceValue = EditorGUI.ObjectField(new Rect(position.x, position.y, position.width, lineHeight), prefabContent, property.FindPropertyRelative("prefab").objectReferenceValue, typeof(UnityEngine.GameObject), false);
 			position.y += lineHeight;
 			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("scaleDownWithWorld"), scalePrefabContent);
 			EditorGUI.EndProperty();

@@ -200,7 +200,6 @@
 			var layerSourceProperty = layerProperty.FindPropertyRelative("sourceOptions");
 			var sourceTypeProperty = layerProperty.FindPropertyRelative("_sourceType");
 			VectorSourceType sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
-			string streets_v7 = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id;
 			var layerSourceId = layerProperty.FindPropertyRelative("sourceOptions.layerSource.Id");
 			string layerString = layerSourceId.stringValue;
 			var isActiveProperty = layerSourceProperty.FindPropertyRelative("isActive");
