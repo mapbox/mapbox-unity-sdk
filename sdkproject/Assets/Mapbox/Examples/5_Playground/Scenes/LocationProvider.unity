@@ -935,7 +935,7 @@ MonoBehaviour:
           UserName: 
       elevationLayerType: 0
       requiredOptions:
-        baseMaterial: {fileID: 0}
+        baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
         addCollider: 0
         exaggerationFactor: 1
       modificationOptions:
