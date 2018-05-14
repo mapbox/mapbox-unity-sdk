@@ -30,6 +30,7 @@ namespace Mapbox.Examples.Scripts
 
 		void Start()
 		{
+			Screen.sleepTimeout = SleepTimeout.NeverSleep;
 			LocationProviderFactory.Instance.DefaultLocationProvider.OnLocationUpdated += LocationProvider_OnLocationUpdated;
 
 			if (null != _logToggle)
