@@ -15,7 +15,6 @@
 		List<string> _propertyNamesList = new List<string>();
 		GUIContent[] _propertyNameContent;
 
-		private static string objectId = "";
 		private string[] descriptionArray;
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		bool showFilters = true;
@@ -31,8 +30,6 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
-
 			showFilters = EditorGUILayout.Foldout(showFilters, new GUIContent { text = "Filters", tooltip = "Filter features in a vector layer based on criterion specified.  " });
 			if (showFilters)
 			{
@@ -143,7 +140,6 @@
 				return;
 			}
 
-			dataUnavailable = false;
 			var parsedString = "no property selected";
 			var descriptionString = "no description available";
 			var propertyDisplayNames = tileJsonData.PropertyDisplayNames[selectedLayerName];
@@ -156,7 +152,6 @@
 				//if the layer contains the current layerstring, set it's index to match
 				_propertyIndex = propertyDisplayNames.FindIndex(s => s.Equals(propertyString));
 
-
 				//create guicontent for a valid layer
 				_propertyNameContent = new GUIContent[_propertyNamesList.Count];
 				for (int extIdx = 0; extIdx < _propertyNamesList.Count; extIdx++)
@@ -165,7 +160,7 @@
 					_propertyNameContent[extIdx] = new GUIContent
 					{
 						text = _propertyNamesList[extIdx],
-						//tooltip = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedPropertyString]
+						tooltip = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedPropertyString]
 					};
 				}
 
@@ -174,8 +169,7 @@
 
 				//set new string values based on selection
 				parsedString = _propertyNamesList[_propertyIndex].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
-				//descriptionString = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedString];
-
+				descriptionString = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedString];
 
 			}
 			else
@@ -205,7 +199,7 @@
 				}
 
 				//display popup
-				_propertyIndex = EditorGUILayout.Popup( _propertyIndex, _propertyNameContent, GUILayout.MaxWidth(150));
+				_propertyIndex = EditorGUILayout.Popup(_propertyIndex, _propertyNameContent, GUILayout.MaxWidth(150));
 
 				//set new string values based on the offset
 				parsedString = _propertyNamesList[_propertyIndex].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
@@ -219,7 +213,6 @@
 
 		private void DrawWarningMessage()
 		{
-			dataUnavailable = true;
 			GUIStyle labelStyle = new GUIStyle(EditorStyles.popup);
 			labelStyle.fontStyle = FontStyle.Bold;
 			EditorGUILayout.LabelField(new GUIContent(), new GUIContent("No properties"), labelStyle, new GUILayoutOption[] { GUILayout.MaxWidth(155) });//(GUIStyle)"minipopUp");

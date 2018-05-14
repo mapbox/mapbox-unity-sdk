@@ -39,7 +39,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		{
 			int selpos = ve.Feature.Points[0].Count / 2;
 			var met = ve.Feature.Points[0][selpos];
-
+			RectTransform goRectTransform;
 			IFeaturePropertySettable settable = null;
 			GameObject go;
 
@@ -54,12 +54,20 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				}
 				// set gameObject transform
 				go.name = ve.Feature.Data.Id.ToString();
-				go.transform.localPosition = met;
-				go.transform.localScale = Constants.Math.Vector3One;
+				goRectTransform = go.GetComponent<RectTransform>();
+				if (goRectTransform == null)
+				{
+					go.transform.localPosition = met;
+				}
+				else
+				{
+					goRectTransform.anchoredPosition3D = met;
+				}
+
 
 				if (!_options.scaleDownWithWorld)
 				{
-					go.transform.localScale = Vector3.one / tile.TileScale;
+					go.transform.localScale = (go.transform.localScale * (1.0f / tile.TileScale));
 				}
 				return;
 			}
@@ -71,7 +79,17 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 
 			go.name = ve.Feature.Data.Id.ToString();
-			go.transform.position = met;
+
+			goRectTransform = go.GetComponent<RectTransform>();
+			if (goRectTransform == null)
+			{
+				go.transform.localPosition = met;
+			}
+			else
+			{
+				goRectTransform.anchoredPosition3D = met;
+			}
+
 			go.transform.SetParent(ve.GameObject.transform, false);
 			go.transform.localScale = Constants.Math.Vector3One;
 
@@ -83,7 +101,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			if (!_options.scaleDownWithWorld)
 			{
-				go.transform.localScale = Vector3.one / tile.TileScale;
+				go.transform.localScale = (go.transform.localScale * (1.0f / tile.TileScale));
 			}
 
 			if (_options.AllPrefabsInstatiated != null)

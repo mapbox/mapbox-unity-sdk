@@ -54,7 +54,8 @@
 		{
 			tileJSONLoaded = true;
 			List<string> layerPropertiesList = new List<string>();
-			List<string> sourceLayersList = new List<string>();
+			// Un-comment if required. Throws a warning right now.
+			//List<string> sourceLayersList = new List<string>();
 
 			if (tjr == null || tjr.VectorLayers == null || tjr.VectorLayers.Length == 0)
 			{
@@ -74,7 +75,7 @@
 				layerPropertiesList = new List<string>();
 				layerSource = layer.Source;
 				//if (layer.Fields.Count == 0)
-					//continue;
+				//continue;
 
 				//loading layer sources
 				if (LayerSourcesDictionary.ContainsKey(layerName))
@@ -108,7 +109,7 @@
 							LayerDisplayNames.Remove(layerName);
 						}
 						LayerDisplayNames.Add(layerName);
-//						LayerDisplayNames.Add(layerName + " " + commonLayersKey);
+						//						LayerDisplayNames.Add(layerName + " " + commonLayersKey);
 					}
 					else
 					{
@@ -152,19 +153,19 @@
 
 							//logic to add the list of masked properties from all sources that are not #1
 							if (LayerSourcesDictionary[layerName].Count > 1 && !string.IsNullOrEmpty(tjr.Source))
+							{
+								var firstSource = tjr.Source.Split(new string[] { "," }, System.StringSplitOptions.None)[0].Trim();
+								if (layerSource != firstSource)
 								{
-									var firstSource = tjr.Source.Split(new string[] { "," }, System.StringSplitOptions.None)[0].Trim();
-									if (layerSource != firstSource)
+									if (PropertyDisplayNames[layerName].Contains(propertyName))
 									{
-										if (PropertyDisplayNames[layerName].Contains(propertyName))
-										{
-											PropertyDisplayNames[layerName].Remove(propertyName);
-										}
-
-										PropertyDisplayNames[layerName].Add(propertyName);
-										//PropertyDisplayNames[layerName].Add(propertyName + " " + optionalPropertiesString);
+										PropertyDisplayNames[layerName].Remove(propertyName);
 									}
+
+									PropertyDisplayNames[layerName].Add(propertyName);
+									//PropertyDisplayNames[layerName].Add(propertyName + " " + optionalPropertiesString);
 								}
+							}
 						}
 					}
 					else

@@ -95,6 +95,11 @@ namespace Mapbox.Unity.Map
 			}
 			if (GUILayout.Button(new GUIContent("Remove Selected"), (GUIStyle)"minibuttonright"))
 			{
+				if (prefabItemArray.arraySize == 0)
+				{
+					return;
+				}
+
 				foreach (var index in selectedLayers.OrderByDescending(i => i))
 				{
 					prefabItemArray.DeleteArrayElementAtIndex(index);

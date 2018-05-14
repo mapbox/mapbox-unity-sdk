@@ -68,6 +68,10 @@
 			string layerString = layerSourceId.stringValue;
 
 			//Draw POI Section
+			if(sourceTypeValue == VectorSourceType.None)
+			{
+				return;
+			}
 
 			ShowLocationPrefabs = EditorGUILayout.Foldout(ShowLocationPrefabs, "POINTS OF INTEREST");
 			if (ShowLocationPrefabs)
@@ -81,13 +85,13 @@
 				}
 				else
 				{
-					EditorGUILayout.HelpBox("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the data source.", MessageType.Error);
+					EditorGUILayout.HelpBox("In order to place points of interest please add \"mapbox.mapbox-streets-v7\" to the data source.", MessageType.Error);
 				}
 			}
 
 			ShowSepartor();
 
-			//Draw Feature section. 
+			//Draw Feature section.
 			ShowFeatures = EditorGUILayout.Foldout(ShowFeatures, "FEATURES");
 			if (ShowFeatures)
 			{
