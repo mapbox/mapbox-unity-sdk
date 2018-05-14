@@ -54,7 +54,7 @@
 		{
 			tileJSONLoaded = true;
 			List<string> layerPropertiesList = new List<string>();
-			// Un-comment if required. Throws a warning right now.
+			// Un-comment if required. Throws a warning right now. 
 			//List<string> sourceLayersList = new List<string>();
 
 			if (tjr == null || tjr.VectorLayers == null || tjr.VectorLayers.Length == 0)
