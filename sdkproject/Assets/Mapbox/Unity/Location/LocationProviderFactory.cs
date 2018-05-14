@@ -4,9 +4,9 @@
 
 namespace Mapbox.Unity.Location
 {
-	using System.Diagnostics;
 	using UnityEngine;
 	using Mapbox.Unity.Map;
+	using System.Text.RegularExpressions;
 
 	/// <summary>
 	/// Singleton factory to allow easy access to various LocationProviders.
@@ -18,7 +18,12 @@ namespace Mapbox.Unity.Location
 		public AbstractMap mapManager;
 
 		[SerializeField]
-		AbstractLocationProvider _deviceLocationProvider;
+		[Tooltip("Provider using Unity's builtin 'Input.Location' service")]
+		AbstractLocationProvider _deviceLocationProviderUnity;
+
+		[SerializeField]
+		[Tooltip("Custom native Android location provider. If this is not set above provider is used")]
+		DeviceLocationProviderAndroidNative _deviceLocationProviderAndroid;
 
 		[SerializeField]
 		AbstractLocationProvider _editorLocationProvider;
@@ -107,14 +112,14 @@ namespace Mapbox.Unity.Location
 		{
 			get
 			{
-				return _deviceLocationProvider;
+				return _deviceLocationProviderUnity;
 			}
 		}
 
 		/// <summary>
 		/// Create singleton instance and inject the DefaultLocationProvider upon initialization of this component. 
 		/// </summary>
-		private void Awake()
+		protected virtual void Awake()
 		{
 			if (Instance != null)
 			{
@@ -136,10 +141,10 @@ namespace Mapbox.Unity.Location
 		/// Injects the editor location provider.
 		/// Depending on the platform, this method and calls to it will be stripped during compile.
 		/// </summary>
-		[Conditional("UNITY_EDITOR")]
+		[System.Diagnostics.Conditional("UNITY_EDITOR")]
 		void InjectEditorLocationProvider()
 		{
-			UnityEngine.Debug.Log("LocationProviderFactory: " + "Injected EDITOR Location Provider");
+			Debug.Log("LocationProviderFactory: " + "Injected EDITOR Location Provider");
 			DefaultLocationProvider = _editorLocationProvider;
 		}
 
@@ -147,11 +152,32 @@ namespace Mapbox.Unity.Location
 		/// Injects the device location provider.
 		/// Depending on the platform, this method and calls to it will be stripped during compile.
 		/// </summary>
-		[Conditional("NOT_UNITY_EDITOR")]
+		[System.Diagnostics.Conditional("NOT_UNITY_EDITOR")]
 		void InjectDeviceLocationProvider()
 		{
-			UnityEngine.Debug.Log("LocationProviderFactory: " + "Injected DEVICE Location Provider");
-			DefaultLocationProvider = _deviceLocationProvider;
+			int AndroidApiVersion = 0;
+			var regex = new Regex(@"(?<=API-)-?\d+");
+			Match match = regex.Match(SystemInfo.operatingSystem); // eg 'Android OS 8.1.0 / API-27 (OPM2.171019.029/4657601)'
+			if (match.Success) { int.TryParse(match.Groups[0].Value, out AndroidApiVersion); }
+			Debug.LogFormat("{0} => API version: {1}", SystemInfo.operatingSystem, AndroidApiVersion);
+
+
+			if (Application.platform == RuntimePlatform.Android
+				&& null != _deviceLocationProviderAndroid
+				// API version 24 => Android 7 (Nougat): we are using GnssStatus 'https://developer.android.com/reference/android/location/GnssStatus.html'
+				// in the native plugin.
+				// GnssStatus is not available with versions lower than 24
+				&& AndroidApiVersion >= 24
+			)
+			{
+				Debug.Log("LocationProviderFactory: " + "Injected native Android DEVICE Location Provider");
+				DefaultLocationProvider = _deviceLocationProviderAndroid;
+			}
+			else
+			{
+				Debug.Log("LocationProviderFactory: " + "Injected DEVICE Location Provider");
+				DefaultLocationProvider = _deviceLocationProviderUnity;
+			}
 		}
 	}
 }

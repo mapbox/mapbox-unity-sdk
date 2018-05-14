@@ -21,11 +21,11 @@
 				position.y += lineHeight;
 				var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Texturing Type", tooltip = "Use image texture from the Imagery source as texture for roofs. " });
 				var texturingType = property.FindPropertyRelative("texturingType");
-				EditorGUI.indentLevel--;
-				EditorGUI.indentLevel--;
+				EditorGUI.indentLevel -= 2;
+
 				texturingType.enumValueIndex = EditorGUI.Popup(typePosition, texturingType.enumValueIndex, texturingType.enumDisplayNames);
-				EditorGUI.indentLevel++;
-				EditorGUI.indentLevel++;
+
+				EditorGUI.indentLevel += 2;
 
 				var matList = property.FindPropertyRelative("materials");
 				if (matList.arraySize == 0)

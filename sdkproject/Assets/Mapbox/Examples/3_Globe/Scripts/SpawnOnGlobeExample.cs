@@ -3,11 +3,13 @@
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Unity.Utilities;
+	using Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies;
+	using Mapbox.Unity.Map;
 
 	public class SpawnOnGlobeExample : MonoBehaviour
 	{
 		[SerializeField]
-		FlatSphereTerrainFactory _globeFactory;
+		AbstractMap _map;
 
 		[SerializeField]
 		[Geocode]
@@ -25,7 +27,8 @@
 			{
 				var instance = Instantiate(_markerPrefab);
 				var location = Conversions.StringToLatLon(locationString);
-				instance.transform.position = Conversions.GeoToWorldGlobePosition(location, _globeFactory.Radius);
+				var earthRadius = (_map.Terrain.LayerProperty as ElevationLayerProperties).modificationOptions.earthRadius;
+				instance.transform.position = Conversions.GeoToWorldGlobePosition(location, earthRadius);
 				instance.transform.localScale = Vector3.one * _spawnScale;
 				instance.transform.SetParent(transform);
 			}
