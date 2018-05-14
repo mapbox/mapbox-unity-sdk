@@ -85,7 +85,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			minHeight = minHeight * _options.extrusionScaleFactor * _scale;
 			height = (maxHeight - minHeight);
 
-			//Set roof height
+			//Set roof height 
 			GenerateRoofMesh(md, minHeight, maxHeight);
 
 			GenerateWallMesh(md);

@@ -745,7 +745,7 @@ namespace Mapbox.Unity.Map
 		/// Places the prefab for supplied categories.
 		/// </summary>
 		/// <param name="prefab">GameObject Prefab</param>
-		/// <param name="categories"><see cref="LocationPrefabCategories"/> For more than one category separate them by pipe
+		/// <param name="categories"><see cref="LocationPrefabCategories"/> For more than one category separate them by pipe 
 		/// (eg: LocationPrefabCategories.Food | LocationPrefabCategories.Nightlife)</param>
 		/// <param name="density">Density controls the number of POIs on the map.(Integer value between 1 and 30)</param>
 		/// <param name="locationItemName">Name of this location prefab item for future reference</param>

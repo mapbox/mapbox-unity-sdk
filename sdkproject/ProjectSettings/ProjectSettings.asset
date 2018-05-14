@@ -80,7 +80,7 @@ PlayerSettings:
   forceSingleInstance: 0
   resizableWindow: 0
   useMacAppStoreValidation: 0
-  macAppStoreCategory:
+  macAppStoreCategory: 
   gpuSkinning: 0
   graphicsJobs: 0
   xboxPIXTextureCapture: 0
@@ -364,7 +364,7 @@ PlayerSettings:
   wiiUTVStartupScreen: {fileID: 0}
   wiiUGamePadStartupScreen: {fileID: 0}
   wiiUDrcBufferDisabled: 0
-  wiiUProfilerLibPath:
+  wiiUProfilerLibPath: 
   playModeTestRunnerEnabled: 1
   actionOnDotNetUnhandledException: 1
   enableInternalProfiler: 0
