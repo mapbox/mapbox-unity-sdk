@@ -73,27 +73,8 @@
 			}
 		}
 
-		string CustomSourceMapId
-		{
-			get
-			{
-				return EditorPrefs.GetString(objectId + "VectorSubLayerProperties_customSourceMapId");
-			}
-			set
-			{
-				EditorPrefs.SetString(objectId + "VectorSubLayerProperties_customSourceMapId", value);
-			}
-		}
-
 		FeatureSubLayerTreeView layerTreeView = new FeatureSubLayerTreeView(new TreeViewState());
 		IList<int> selectedLayers = new List<int>();
-
-		private GUIContent _mapIdGui = new GUIContent
-		{
-			text = "Map Id",
-			tooltip = "Map Id corresponding to the tileset."
-		};
-
 		public void DrawUI(SerializedProperty property)
 		{
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
@@ -149,9 +130,9 @@
 					isActiveProperty.boolValue = true;
 					break;
 				case VectorSourceType.Custom:
-					layerSourceId.stringValue = CustomSourceMapId;
 					if (_isInitialized)
 					{
+						string test = layerSourceId.stringValue;
 						LoadEditorTileJSON(property, sourceTypeValue, layerSourceId.stringValue);
 					}
 					else
@@ -162,7 +143,6 @@
 					{
 						EditorGUILayout.HelpBox("Invalid Map Id / There might be a problem with the internet connection.", MessageType.Error);
 					}
-					CustomSourceMapId = layerSourceId.stringValue;
 					isActiveProperty.boolValue = true;
 					break;
 				case VectorSourceType.None:
@@ -326,8 +306,6 @@
 
 			GUILayout.Space(-_lineHeight);
 			EditorGUILayout.PropertyField(subLayerCoreOptions);
-
-			subLayerCoreOptions.FindPropertyRelative("sourceId").stringValue = property.FindPropertyRelative("sourceOptions.layerSource.Id").stringValue;
 
 			var extrusionOptions = layerProperty.FindPropertyRelative("extrusionOptions");
 			//loading up the selectedLayerName for extrusion options to pull up the right propertyName
@@ -503,9 +481,8 @@
 		{
 			if (sourceTypeValue != VectorSourceType.None && !string.IsNullOrEmpty(sourceString))
 			{
-				if (tileJSONResponse == null || string.IsNullOrEmpty(TilesetId) || sourceString != TilesetId)
+				if (tileJSONResponse == null || string.IsNullOrEmpty(sourceString) || sourceString != TilesetId)
 				{
-					TilesetId = sourceString;
 					//tileJSONData.ClearData();
 					try
 					{
@@ -521,7 +498,7 @@
 							tileJSONData.ProcessTileJSONData(response);
 						});
 					}
-					catch (System.Exception e)
+					catch (System.Exception)
 					{
 						//no valid access token causes MapboxAccess to throw an error and hence setting this property
 						tileJSONData.ClearData();
@@ -531,12 +508,12 @@
 				{
 					tileJSONData.ProcessTileJSONData(tileJSONResponse);
 				}
-
 			}
 			else
 			{
 				tileJSONData.ClearData();
 			}
+			TilesetId = sourceString;
 		}
 	}
 }

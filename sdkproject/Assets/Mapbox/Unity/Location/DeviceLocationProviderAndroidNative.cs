@@ -38,7 +38,7 @@
 		private bool _disposed;
 		private static object _lock = new object();
 		private Coroutine _pollLocation;
-		private CultureInfo _invariantCulture = CultureInfo.InvariantCulture;
+		//private CultureInfo _invariantCulture = CultureInfo.InvariantCulture;
 		private AndroidJavaObject _activityContext = null;
 		private AndroidJavaObject _gpsInstance;
 		private AndroidJavaObject _sensorInstance;
@@ -264,8 +264,6 @@
 				{
 					Debug.LogErrorFormat("GPS plugin error: " + ex.ToString());
 				}
-
-
 				yield return _waitUpdateTime;
 			}
 		}
@@ -331,7 +329,8 @@
 				|| timestampUpdated
 				|| speedUpdated;
 
-			bool networkEnabled = _gpsInstance.Call<bool>("getIsNetworkEnabled");
+			// Un-comment if required. Throws a warning right now. 
+			//bool networkEnabled = _gpsInstance.Call<bool>("getIsNetworkEnabled");
 			bool gpsEnabled = _gpsInstance.Call<bool>("getIsGpsEnabled");
 			if (!gpsEnabled)
 			{
@@ -427,7 +426,7 @@
 				double lat = loc.Call<double>("getLatitude");
 				double lng = loc.Call<double>("getLongitude");
 
-				return string.Format(_invariantCulture, "{0:0.00000000} / {1:0.00000000}", lat, lng);
+				return string.Format(CultureInfo.InvariantCulture, "{0:0.00000000} / {1:0.00000000}", lat, lng);
 			}
 			catch (Exception ex)
 			{
