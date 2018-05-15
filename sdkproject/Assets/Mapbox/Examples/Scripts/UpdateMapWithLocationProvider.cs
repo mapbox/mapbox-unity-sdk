@@ -33,7 +33,7 @@
 
 		private void Awake()
 		{
-			// Prevent double initialization of the map.
+			// Prevent double initialization of the map. 
 			_map.InitializeOnStart = false;
 		}
 

@@ -91,7 +91,7 @@
 
 			ShowSepartor();
 
-			//Draw Feature section.
+			//Draw Feature section. 
 			ShowFeatures = EditorGUILayout.Foldout(ShowFeatures, "FEATURES");
 			if (ShowFeatures)
 			{
