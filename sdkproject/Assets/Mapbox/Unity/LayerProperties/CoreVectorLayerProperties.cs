@@ -9,7 +9,7 @@
 	public class CoreVectorLayerProperties
 	{
 		[SerializeField]
-		private string sourceId = "";
+		private string sourceId;
 		[Tooltip("Is visualizer active.")]
 		public bool isActive = true;
 		[Tooltip("Name of the visualizer. ")]
