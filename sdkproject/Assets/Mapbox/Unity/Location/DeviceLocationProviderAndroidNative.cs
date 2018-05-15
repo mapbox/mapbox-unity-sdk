@@ -26,7 +26,7 @@
 		/// https://developer.android.com/reference/android/location/LocationManager.html#requestLocationUpdates(java.lang.String,%20long,%20float,%20android.location.LocationListener)
 		/// </summary>
 		[SerializeField]
-		[Tooltip("The minimum time interval between location updates, in milliseconds.")]
+		[Tooltip("The minimum time interval between location updates, in milliseconds. It's reasonable to not go below 500ms.")]
 		long _updateTimeInMilliSeconds = 1000;
 
 

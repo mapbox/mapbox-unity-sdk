@@ -642,9 +642,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a38712e93231418a84665190b8473d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _desiredAccuracyInMeters: 100
+  _desiredAccuracyInMeters: 200
   _updateDistanceInMeters: 0
-  _updateTimeInMilliSeconds: 1000
+  _updateTimeInMilliSeconds: 500
 --- !u!4 &849657522
 Transform:
   m_ObjectHideFlags: 0
@@ -1224,6 +1224,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _map: {fileID: 1411663281}
+  timeTakenDuringLerp: 1
 --- !u!114 &1411663284
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1748,7 +1749,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2054056458}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3d557417079b1446999d2d86ff71dfb, type: 3}
   m_Name: 

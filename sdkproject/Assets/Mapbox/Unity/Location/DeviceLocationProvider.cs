@@ -21,7 +21,7 @@ namespace Mapbox.Unity.Location
 		/// </summary>
 		[SerializeField]
 		[Tooltip("Using higher value like 500 usually does not require to turn GPS chip on and thus saves battery power. Values like 5-10 could be used for getting best accuracy.")]
-		float _desiredAccuracyInMeters = 5f;
+		float _desiredAccuracyInMeters = 200f;
 
 		/// <summary>
 		/// The minimum distance (measured in meters) a device must move laterally before Input.location property is updated. 
@@ -29,12 +29,12 @@ namespace Mapbox.Unity.Location
 		/// </summary>
 		[SerializeField]
 		[Tooltip("The minimum distance (measured in meters) a device must move laterally before Input.location property is updated. Higher values like 500 imply less overhead.")]
-		float _updateDistanceInMeters = 5f;
+		float _updateDistanceInMeters = 0f;
 
 
 		[SerializeField]
-		[Tooltip("The minimum time interval between location updates, in milliseconds.")]
-		long _updateTimeInMilliSeconds = 1000;
+		[Tooltip("The minimum time interval between location updates, in milliseconds. It's reasonable to not go below 500ms.")]
+		long _updateTimeInMilliSeconds = 500;
 
 
 		private Coroutine _pollRoutine;
@@ -73,7 +73,7 @@ namespace Mapbox.Unity.Location
 		{
 			_currentLocation.Provider = "unity";
 			_wait1sec = new WaitForSeconds(1f);
-			_waitUpdateTime = _updateTimeInMilliSeconds < 500 ? new WaitForSeconds(500) : new WaitForSeconds(_updateTimeInMilliSeconds / 1000);
+			_waitUpdateTime = _updateTimeInMilliSeconds < 500 ? new WaitForSeconds(0.5f) : new WaitForSeconds(_updateTimeInMilliSeconds / 1000);
 
 			_lastPositions = new CircularBuffer<Vector2d>(_maxLastPositions);
 			// safe measure till we have auto calculated weights
