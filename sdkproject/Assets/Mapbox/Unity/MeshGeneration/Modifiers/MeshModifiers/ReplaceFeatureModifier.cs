@@ -14,6 +14,7 @@
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Replace Feature Modifier")]
 	public class ReplaceFeatureModifier : MeshModifier
 	{
+		[SerializeField]
 		private List<Vector2d> LatLon;
 
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
