@@ -26,6 +26,7 @@
 		private TextAsset _locationLogFile;
 
 
+		private LocationLogReader _logReader;
 		private IEnumerator<Location> _locationEnumerator;
 
 
@@ -33,15 +34,31 @@
 		protected override void Awake()
 		{
 			base.Awake();
-			LocationLogReader logReader = new LocationLogReader(_locationLogFile.bytes);
-			_locationEnumerator = logReader.GetLocations();
+			_logReader = new LocationLogReader(_locationLogFile.bytes);
+			_locationEnumerator = _logReader.GetLocations();
 		}
-
 #endif
+
+
+		private void OnDestroy()
+		{
+			if (null != _locationEnumerator)
+			{
+				_locationEnumerator.Dispose();
+				_locationEnumerator = null;
+			}
+			if (null != _logReader)
+			{
+				_logReader.Dispose();
+				_logReader = null;
+			}
+		}
 
 
 		protected override void SetLocation()
 		{
+			if (null == _locationEnumerator) { return; }
+
 			// no need to check if 'MoveNext()' returns false as LocationLogReader loops through log file
 			_locationEnumerator.MoveNext();
 			_currentLocation = _locationEnumerator.Current;

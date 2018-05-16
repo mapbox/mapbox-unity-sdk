@@ -196,7 +196,7 @@ namespace Mapbox.Unity.Location
 				double longitude = double.Parse(lastData.longitude.ToString("R", invariantCulture), invariantCulture);
 				_currentLocation.LatitudeLongitude = new Vector2d(latitude, longitude);
 
-				_currentLocation.Accuracy = (int)System.Math.Floor(lastData.horizontalAccuracy);
+				_currentLocation.Accuracy = (float)Math.Floor(lastData.horizontalAccuracy);
 				_currentLocation.IsLocationUpdated = timestamp > _lastLocationTimestamp;
 				_currentLocation.Timestamp = timestamp;
 				_lastLocationTimestamp = timestamp;

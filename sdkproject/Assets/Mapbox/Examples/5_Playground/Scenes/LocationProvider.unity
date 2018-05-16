@@ -863,9 +863,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _accuracy: 5
   _autoFireEvent: 1
-  _updateInterval: 1
+  _updateInterval: 0.5
   _sendEvent: 0
-  _locationLogFile: {fileID: 4900000, guid: 68bec6c8608b92347af5171a71daa41e, type: 3}
+  _locationLogFile: {fileID: 4900000, guid: 94c88328e99910e49bc7d6cce15b3d43, type: 3}
 --- !u!4 &1363590664
 Transform:
   m_ObjectHideFlags: 0
@@ -1527,7 +1527,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mapManager: {fileID: 1411663281}
   _deviceLocationProviderUnity: {fileID: 849657521}
-  _deviceLocationProviderAndroid: {fileID: 0}
+  _deviceLocationProviderAndroid: {fileID: 2054056459}
   _editorLocationProvider: {fileID: 1363590663}
   _transformLocationProvider: {fileID: 1830401242}
   _dontDestroyOnLoad: 0
@@ -1742,7 +1742,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &2054056459
 MonoBehaviour:
   m_ObjectHideFlags: 0

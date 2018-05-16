@@ -4,6 +4,7 @@ namespace Mapbox.Unity.Location
 	using System.Collections;
 	using System.Collections.Generic;
 	using System.ComponentModel;
+	using System.Globalization;
 	using System.Linq;
 	using Mapbox.VectorTile.ExtensionMethods;
 
@@ -12,6 +13,7 @@ namespace Mapbox.Unity.Location
 	{
 
 		public readonly string Delimiter = ";";
+		protected readonly CultureInfo _invariantCulture = CultureInfo.InvariantCulture;
 
 
 		public enum LogfileColumns
