@@ -844,7 +844,7 @@ GameObject:
   - component: {fileID: 1363590664}
   - component: {fileID: 1363590663}
   m_Layer: 0
-  m_Name: EditorGpsLogLocationProvider
+  m_Name: EditorLocationProviderLocationLog
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -865,7 +865,7 @@ MonoBehaviour:
   _autoFireEvent: 1
   _updateInterval: 1
   _sendEvent: 0
-  _gpsLogFile: {fileID: 4900000, guid: b9abe7d031734c34e83d93fc4b21fa58, type: 3}
+  _locationLogFile: {fileID: 4900000, guid: 68bec6c8608b92347af5171a71daa41e, type: 3}
 --- !u!4 &1363590664
 Transform:
   m_ObjectHideFlags: 0
@@ -1596,7 +1596,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 0de83c8715792fe43aceecafcdbd8b24, type: 2}
+  - {fileID: 2100000, guid: 107ca5e7bb5e26f46b0ce09f5fc2e817, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

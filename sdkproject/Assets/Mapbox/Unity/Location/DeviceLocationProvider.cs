@@ -255,6 +255,7 @@ namespace Mapbox.Unity.Location
 					}
 				}
 
+				_currentLocation.TimestampDevice = UnixTimestampUtils.To(DateTime.UtcNow);
 				SendLocation(_currentLocation);
 
 				yield return _waitUpdateTime;

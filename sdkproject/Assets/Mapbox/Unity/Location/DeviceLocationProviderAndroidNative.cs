@@ -6,7 +6,7 @@
 	using System;
 	using System.IO;
 	using System.Text;
-
+	using Mapbox.Utils;
 
 	public class DeviceLocationProviderAndroidNative : AbstractLocationProvider, IDisposable
 	{
@@ -258,6 +258,7 @@
 					if (null != locGps && null != locNetwork) { populateWithBetterLocation(locGps, locNetwork); }
 
 
+					_currentLocation.TimestampDevice = UnixTimestampUtils.To(DateTime.UtcNow);
 					SendLocation(_currentLocation);
 				}
 				catch (Exception ex)
