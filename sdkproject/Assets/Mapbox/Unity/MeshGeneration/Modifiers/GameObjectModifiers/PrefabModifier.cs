@@ -11,12 +11,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Prefab Modifier")]
 	public class PrefabModifier : GameObjectModifier
 	{
-		//[SerializeField]
-		//private GameObject _prefab;
-
-		//[SerializeField]
-		//private bool _scaleDownWithWorld = false;
-
 		private Dictionary<GameObject, GameObject> _objects;
 		[SerializeField]
 		private SpawnPrefabOptions _options;
@@ -39,7 +33,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		{
 			int selpos = ve.Feature.Points[0].Count / 2;
 			var met = ve.Feature.Points[0][selpos];
-
+			RectTransform goRectTransform;
 			IFeaturePropertySettable settable = null;
 			GameObject go;
 
@@ -54,12 +48,20 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				}
 				// set gameObject transform
 				go.name = ve.Feature.Data.Id.ToString();
-				go.transform.localPosition = met;
-				go.transform.localScale = Constants.Math.Vector3One;
-
-				if (!_options.scaleDownWithWorld)
+				goRectTransform = go.GetComponent<RectTransform>();
+				if (goRectTransform == null)
 				{
-					go.transform.localScale = Vector3.one / tile.TileScale;
+					go.transform.localPosition = met;
+				}
+				else
+				{
+					goRectTransform.anchoredPosition3D = met;
+				}
+				//go.transform.localScale = Constants.Math.Vector3One;
+
+				if (_options.scaleDownWithWorld)
+				{
+					go.transform.localScale = (go.transform.localScale * (tile.TileScale));
 				}
 				return;
 			}
@@ -71,9 +73,18 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 
 			go.name = ve.Feature.Data.Id.ToString();
-			go.transform.position = met;
+
+			goRectTransform = go.GetComponent<RectTransform>();
+			if (goRectTransform == null)
+			{
+				go.transform.localPosition = met;
+			}
+			else
+			{
+				goRectTransform.anchoredPosition3D = met;
+			}
 			go.transform.SetParent(ve.GameObject.transform, false);
-			go.transform.localScale = Constants.Math.Vector3One;
+			//go.transform.localScale = Constants.Math.Vector3One;
 
 			settable = go.GetComponent<IFeaturePropertySettable>();
 			if (settable != null)
@@ -81,9 +92,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				settable.Set(ve.Feature.Properties);
 			}
 
-			if (!_options.scaleDownWithWorld)
+			if (_options.scaleDownWithWorld)
 			{
-				go.transform.localScale = Vector3.one / tile.TileScale;
+				go.transform.localScale = (go.transform.localScale * (tile.TileScale));
 			}
 
 			if (_options.AllPrefabsInstatiated != null)

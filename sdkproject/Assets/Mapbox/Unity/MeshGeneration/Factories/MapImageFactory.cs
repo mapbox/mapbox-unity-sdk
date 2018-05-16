@@ -38,7 +38,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		}
 
 		#region UnityMethods
-		private void OnDestroy()
+		protected virtual void OnDestroy()
 		{
 			if (DataFetcher != null)
 			{
@@ -60,7 +60,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		}
 
 		//merge this with OnErrorOccurred?
-		private void OnDataError(UnityTile tile, TileErrorEventArgs e)
+		protected virtual void OnDataError(UnityTile tile, TileErrorEventArgs e)
 		{
 			if (tile != null)
 			{

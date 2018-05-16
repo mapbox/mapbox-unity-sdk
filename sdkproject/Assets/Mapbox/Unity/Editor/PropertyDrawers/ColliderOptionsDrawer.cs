@@ -15,6 +15,7 @@
 		GUIContent[] colliderTypeContent;
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			EditorGUI.BeginProperty(position, null, property);
 			var colliderTypeLabel = new GUIContent
 			{
 				text = "Collider Type",
@@ -39,7 +40,12 @@
 				isGUIContentSet = true;
 			}
 
-			colliderTypeProperty.enumValueIndex = EditorGUILayout.Popup(colliderTypeLabel, colliderTypeProperty.enumValueIndex, colliderTypeContent);
+			colliderTypeProperty.enumValueIndex = EditorGUI.Popup(position, colliderTypeLabel, colliderTypeProperty.enumValueIndex, colliderTypeContent);
+			EditorGUI.EndProperty();
+		}
+		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+		{
+			return lineHeight;
 		}
 	}
 }

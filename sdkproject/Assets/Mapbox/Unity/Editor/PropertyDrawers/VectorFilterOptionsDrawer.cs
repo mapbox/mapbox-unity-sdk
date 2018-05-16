@@ -10,19 +10,11 @@
 	[CustomPropertyDrawer(typeof(VectorFilterOptions))]
 	public class VectorFilterOptionsDrawer : PropertyDrawer
 	{
-		int propertyIndex
-		{
-			get
-			{
-				return EditorPrefs.GetInt(objectId + "FilterOptions_propertySelectionIndex");
-			}
-			set
-			{
-				EditorPrefs.SetInt(objectId + "FilterOptions_propertySelectionIndex", value);
-			}
-		}
+		//indices for tileJSON lookup
+		int _propertyIndex = 0;
+		List<string> _propertyNamesList = new List<string>();
+		GUIContent[] _propertyNameContent;
 
-		private static string objectId = "";
 		private string[] descriptionArray;
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		bool showFilters = true;
@@ -38,11 +30,7 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
-			EditorGUI.BeginProperty(position, label, property);
-			position.height = lineHeight;
-
-			showFilters = EditorGUI.Foldout(position, showFilters, new GUIContent { text = "Filters", tooltip = "Filter features in a vector layer based on criterion specified.  " });
+			showFilters = EditorGUILayout.Foldout(showFilters, new GUIContent { text = "Filters", tooltip = "Filter features in a vector layer based on criterion specified.  " });
 			if (showFilters)
 			{
 				var propertyFilters = property.FindPropertyRelative("filters");
@@ -65,8 +53,6 @@
 				EditorGUILayout.EndHorizontal();
 				EditorGUI.indentLevel--;
 			}
-
-			EditorGUI.EndProperty();
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
@@ -112,22 +98,7 @@
 			EditorGUILayout.BeginHorizontal();
 			var selectedLayerName = originalProperty.FindPropertyRelative("_selectedLayerName").stringValue;
 
-			if (_isInitialized == true)
-			{
-				if (cachedLayerName != selectedLayerName)
-				{
-					propertyIndex = 0;
-				}
-
-				cachedLayerName = selectedLayerName;
-				DrawPropertyDropDown(originalProperty, property);
-			}
-			else
-			{
-				_isInitialized = true;
-				cachedLayerName = selectedLayerName;
-			}
-
+			DrawPropertyDropDown(originalProperty, property);
 			filterOperatorProp.enumValueIndex = EditorGUILayout.Popup(filterOperatorProp.enumValueIndex, filterOperatorProp.enumDisplayNames, GUILayout.MaxWidth(150));
 
 			switch ((LayerFilterOperationType)filterOperatorProp.enumValueIndex)
@@ -169,52 +140,83 @@
 				return;
 			}
 
-			dataUnavailable = false;
+			var parsedString = "no property selected";
+			var descriptionString = "no description available";
 			var propertyDisplayNames = tileJsonData.PropertyDisplayNames[selectedLayerName];
+			_propertyNamesList = new List<string>(propertyDisplayNames);
 
-			descriptionArray = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName].Values.ToArray<string>();
-			GUIContent[] properties = new GUIContent[propertyDisplayNames.Count];
-			for (int i = 0; i< propertyDisplayNames.Count; i++)
+			var propertyString = filterProperty.FindPropertyRelative("Key").stringValue;
+			//check if the selection is valid
+			if (_propertyNamesList.Contains(propertyString))
 			{
-				properties[i] = new GUIContent(propertyDisplayNames[i], descriptionArray[i]);
+				//if the layer contains the current layerstring, set it's index to match
+				_propertyIndex = propertyDisplayNames.FindIndex(s => s.Equals(propertyString));
+
+				//create guicontent for a valid layer
+				_propertyNameContent = new GUIContent[_propertyNamesList.Count];
+				for (int extIdx = 0; extIdx < _propertyNamesList.Count; extIdx++)
+				{
+					var parsedPropertyString = _propertyNamesList[extIdx].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+					_propertyNameContent[extIdx] = new GUIContent
+					{
+						text = _propertyNamesList[extIdx],
+						tooltip = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedPropertyString]
+					};
+				}
+
+				//display popup
+				_propertyIndex = EditorGUILayout.Popup(_propertyIndex, _propertyNameContent, GUILayout.MaxWidth(150));
+
+				//set new string values based on selection
+				parsedString = _propertyNamesList[_propertyIndex].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+				descriptionString = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedString];
+
+			}
+			else
+			{
+				//if the selected layer isn't in the source, add a placeholder entry
+				_propertyIndex = 0;
+				_propertyNamesList.Insert(0, propertyString);
+
+				//create guicontent for an invalid layer
+				_propertyNameContent = new GUIContent[_propertyNamesList.Count];
+
+				//first property gets a unique tooltip
+				_propertyNameContent[0] = new GUIContent
+				{
+					text = _propertyNamesList[0],
+					tooltip = "Unavialable in Selected Layer"
+				};
+
+				for (int extIdx = 1; extIdx < _propertyNamesList.Count; extIdx++)
+				{
+					var parsedPropertyString = _propertyNamesList[extIdx].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+					_propertyNameContent[extIdx] = new GUIContent
+					{
+						text = _propertyNamesList[extIdx],
+						tooltip = tileJsonData.LayerPropertyDescriptionDictionary[selectedLayerName][parsedPropertyString]
+					};
+				}
+
+				//display popup
+				_propertyIndex = EditorGUILayout.Popup(_propertyIndex, _propertyNameContent, GUILayout.MaxWidth(150));
+
+				//set new string values based on the offset
+				parsedString = _propertyNamesList[_propertyIndex].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
+				descriptionString = "Unavailable in Selected Layer.";
+
 			}
 
-			propertyIndex = EditorGUILayout.Popup(propertyIndex, properties);
-			var parsedString = propertyDisplayNames[propertyIndex].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
 			filterProperty.FindPropertyRelative("Key").stringValue = parsedString;
+			filterProperty.FindPropertyRelative("KeyDescription").stringValue = descriptionString;
 		}
 
 		private void DrawWarningMessage()
 		{
-			dataUnavailable = true;
-			EditorGUILayout.HelpBox("Check MapId / Internet.", MessageType.None);
+			GUIStyle labelStyle = new GUIStyle(EditorStyles.popup);
+			labelStyle.fontStyle = FontStyle.Bold;
+			EditorGUILayout.LabelField(new GUIContent(), new GUIContent("No properties"), labelStyle, new GUILayoutOption[] { GUILayout.MaxWidth(155) });//(GUIStyle)"minipopUp");
 			return;
 		}
 	}
-
-
-	//[CustomPropertyDrawer(typeof(TypeVisualizerTuple))]
-	//public class TypeVisualizerBaseDrawer : PropertyDrawer
-	//{
-	//	static float lineHeight = EditorGUIUtility.singleLineHeight;
-	//	bool showPosition = true;
-	//	public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-	//	{
-	//		EditorGUI.BeginProperty(position, label, property);
-
-	//		position.height = lineHeight;
-
-	//		EditorGUI.PropertyField(position, property.FindPropertyRelative("Stack"));
-
-	//		EditorGUI.EndProperty();
-	//	}
-	//	public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-	//	{
-	//		// Reserve space for the total visible properties.
-	//		int rows = 2;
-	//		//Debug.Log("Height - " + rows * lineHeight);
-	//		return (float)rows * lineHeight;
-	//	}
-	//}
-
 }

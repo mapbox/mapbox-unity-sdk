@@ -403,7 +403,7 @@ GameObject:
   - component: {fileID: 621795786}
   m_Layer: 0
   m_Name: LabelCamera
-  m_TagString: MainCamera
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -675,17 +675,17 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0.14468281
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224315790701160254, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -780,52 +780,52 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.x
-      value: 116.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -116.91571
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.x
-      value: 213
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 213.83142
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 233.83142
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.x
-      value: -17
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114603753021256032, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -834,10 +834,10 @@ Prefab:
         prefabs to a variety of locations. For example, you can choose to add prefabs
         at all the cafes and restaurants in a city, at specific addresses, or at locations
         with \"Starbucks\" in the name.\n\nTo get started, look at Map's Inspector
-        panel and open LOCATION PREFABS in the Abstract Map component. We've already
-        created a few prefab layers for you. Toggle them on and off to see how they
-        change the map. \n\nTo create your own, click \"Add Item\" and add the desired
-        prefab and rules. "
+        panel and open POINTS OF INTEREST in the MAP LAYERS section of the Abstract
+        Map component. We've already created a few prefab layers for you. Toggle them
+        on and off to see how they change the map. \n\nTo create your own, click \"Add
+        Layer\" and add the desired prefab and rules. "
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -947,321 +947,32 @@ MonoBehaviour:
         wallHeight: 10
         wallMaterial: {fileID: 0}
   _vectorData:
-    _locationPrefabsLayerProperties:
-      locationPrefabList:
-      - coreOptions:
-          isActive: 1
-          sublayerName: Arts and Enterinment
-          geometryType: 0
-          layerName: 
-          snapToTerrain: 1
-          groupFeatures: 0
-          lineWidth: 0
-        filterOptions:
-          filters: []
-          combinerType: 0
-        extrusionOptions:
-          extrusionType: 0
-          extrusionGeometryType: 0
-          propertyName: 
-          minimumHeight: 0
-          maximumHeight: 0
-          extrusionScaleFactor: 0
-        colliderOptions:
-          colliderType: 0
-        materialOptions:
-          texturingType: 0
-          materials: []
-          atlasInfo: {fileID: 0}
-          colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 0
-        buildingsWithUniqueIds: 0
-        moveFeaturePositionTo: 0
-        MeshModifiers: []
-        GoModifiers: []
-        spawnPrefabOptions:
-          prefab: {fileID: 1707885508695930, guid: 29d1abf5ba6514d81a7974353f130ca8,
-            type: 2}
-          scaleDownWithWorld: 1
-        findByType: 0
-        categories: 1
-        nameString: POI Name
-        coordinates: []
-        density: 10
-      - coreOptions:
-          isActive: 1
-          sublayerName: Food
-          geometryType: 0
-          layerName: 
-          snapToTerrain: 1
-          groupFeatures: 0
-          lineWidth: 0
-        filterOptions:
-          filters: []
-          combinerType: 0
-        extrusionOptions:
-          extrusionType: 0
-          extrusionGeometryType: 0
-          propertyName: 
-          minimumHeight: 0
-          maximumHeight: 0
-          extrusionScaleFactor: 0
-        colliderOptions:
-          colliderType: 0
-        materialOptions:
-          texturingType: 0
-          materials: []
-          atlasInfo: {fileID: 0}
-          colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 0
-        buildingsWithUniqueIds: 0
-        moveFeaturePositionTo: 0
-        MeshModifiers: []
-        GoModifiers: []
-        spawnPrefabOptions:
-          prefab: {fileID: 1707885508695930, guid: fafbd32423ea04e379d8321b4d370fea,
-            type: 2}
-          scaleDownWithWorld: 1
-        findByType: 0
-        categories: 2
-        nameString: POI Name
-        coordinates: []
-        density: 15
-      - coreOptions:
-          isActive: 1
-          sublayerName: Nightlife
-          geometryType: 0
-          layerName: 
-          snapToTerrain: 1
-          groupFeatures: 0
-          lineWidth: 0
-        filterOptions:
-          filters: []
-          combinerType: 0
-        extrusionOptions:
-          extrusionType: 0
-          extrusionGeometryType: 0
-          propertyName: 
-          minimumHeight: 0
-          maximumHeight: 0
-          extrusionScaleFactor: 0
-        colliderOptions:
-          colliderType: 0
-        materialOptions:
-          texturingType: 0
-          materials: []
-          atlasInfo: {fileID: 0}
-          colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 0
-        buildingsWithUniqueIds: 0
-        moveFeaturePositionTo: 0
-        MeshModifiers: []
-        GoModifiers: []
-        spawnPrefabOptions:
-          prefab: {fileID: 1707885508695930, guid: 61bcd2d324dd34bb9b722d856749c28c,
-            type: 2}
-          scaleDownWithWorld: 1
-        findByType: 0
-        categories: 4
-        nameString: POI Name
-        coordinates: []
-        density: 10
-      - coreOptions:
-          isActive: 1
-          sublayerName: Outdoors and Recreation
-          geometryType: 0
-          layerName: 
-          snapToTerrain: 1
-          groupFeatures: 0
-          lineWidth: 0
-        filterOptions:
-          filters: []
-          combinerType: 0
-        extrusionOptions:
-          extrusionType: 0
-          extrusionGeometryType: 0
-          propertyName: 
-          minimumHeight: 0
-          maximumHeight: 0
-          extrusionScaleFactor: 0
-        colliderOptions:
-          colliderType: 0
-        materialOptions:
-          texturingType: 0
-          materials: []
-          atlasInfo: {fileID: 0}
-          colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 0
-        buildingsWithUniqueIds: 0
-        moveFeaturePositionTo: 0
-        MeshModifiers: []
-        GoModifiers: []
-        spawnPrefabOptions:
-          prefab: {fileID: 1707885508695930, guid: b0e54a880e97f4c5ead7dcc1c0918e05,
-            type: 2}
-          scaleDownWithWorld: 1
-        findByType: 0
-        categories: 8
-        nameString: POI Name
-        coordinates: []
-        density: 20
-      - coreOptions:
-          isActive: 1
-          sublayerName: Services
-          geometryType: 0
-          layerName: 
-          snapToTerrain: 1
-          groupFeatures: 0
-          lineWidth: 0
-        filterOptions:
-          filters: []
-          combinerType: 0
-        extrusionOptions:
-          extrusionType: 0
-          extrusionGeometryType: 0
-          propertyName: 
-          minimumHeight: 0
-          maximumHeight: 0
-          extrusionScaleFactor: 0
-        colliderOptions:
-          colliderType: 0
-        materialOptions:
-          texturingType: 0
-          materials: []
-          atlasInfo: {fileID: 0}
-          colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 0
-        buildingsWithUniqueIds: 0
-        moveFeaturePositionTo: 0
-        MeshModifiers: []
-        GoModifiers: []
-        spawnPrefabOptions:
-          prefab: {fileID: 1707885508695930, guid: 60a41cfc23d514878814f0d425912eff,
-            type: 2}
-          scaleDownWithWorld: 1
-        findByType: 0
-        categories: 16
-        nameString: POI Name
-        coordinates: []
-        density: 5
-      - coreOptions:
-          isActive: 1
-          sublayerName: Shops
-          geometryType: 0
-          layerName: 
-          snapToTerrain: 1
-          groupFeatures: 0
-          lineWidth: 0
-        filterOptions:
-          filters: []
-          combinerType: 0
-        extrusionOptions:
-          extrusionType: 0
-          extrusionGeometryType: 0
-          propertyName: 
-          minimumHeight: 0
-          maximumHeight: 0
-          extrusionScaleFactor: 0
-        colliderOptions:
-          colliderType: 0
-        materialOptions:
-          texturingType: 0
-          materials: []
-          atlasInfo: {fileID: 0}
-          colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 0
-        buildingsWithUniqueIds: 0
-        moveFeaturePositionTo: 0
-        MeshModifiers: []
-        GoModifiers: []
-        spawnPrefabOptions:
-          prefab: {fileID: 1707885508695930, guid: 49bc5d782d9184533a37abea20ed30e4,
-            type: 2}
-          scaleDownWithWorld: 1
-        findByType: 0
-        categories: 32
-        nameString: POI Name
-        coordinates: []
-        density: 10
-      - coreOptions:
-          isActive: 1
-          sublayerName: Transportation
-          geometryType: 0
-          layerName: 
-          snapToTerrain: 1
-          groupFeatures: 0
-          lineWidth: 0
-        filterOptions:
-          filters: []
-          combinerType: 0
-        extrusionOptions:
-          extrusionType: 0
-          extrusionGeometryType: 0
-          propertyName: 
-          minimumHeight: 0
-          maximumHeight: 0
-          extrusionScaleFactor: 0
-        colliderOptions:
-          colliderType: 0
-        materialOptions:
-          texturingType: 0
-          materials: []
-          atlasInfo: {fileID: 0}
-          colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 0
-        buildingsWithUniqueIds: 0
-        moveFeaturePositionTo: 0
-        MeshModifiers: []
-        GoModifiers: []
-        spawnPrefabOptions:
-          prefab: {fileID: 1707885508695930, guid: 22150daba6e8b47b69fd30f00b9c56cd,
-            type: 2}
-          scaleDownWithWorld: 1
-        findByType: 0
-        categories: 64
-        nameString: POI Name
-        coordinates: []
-        density: 10
-      - coreOptions:
-          isActive: 0
-          sublayerName: All Points of Interest (POIs)
-          geometryType: 0
-          layerName: 
-          snapToTerrain: 1
-          groupFeatures: 0
-          lineWidth: 0
-        filterOptions:
-          filters: []
-          combinerType: 0
-        extrusionOptions:
-          extrusionType: 0
-          extrusionGeometryType: 0
-          propertyName: 
-          minimumHeight: 0
-          maximumHeight: 0
-          extrusionScaleFactor: 0
-        colliderOptions:
-          colliderType: 0
-        materialOptions:
-          texturingType: 0
-          materials: []
-          atlasInfo: {fileID: 0}
-          colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 0
-        buildingsWithUniqueIds: 0
-        moveFeaturePositionTo: 0
-        MeshModifiers: []
-        GoModifiers: []
-        spawnPrefabOptions:
-          prefab: {fileID: 1707885508695930, guid: d748e6a0b26334f4d933c1438339484d,
-            type: 2}
-          scaleDownWithWorld: 1
-        findByType: 0
-        categories: -1
-        nameString: POI Name
-        coordinates: []
-        density: 15
     _layerProperty:
+      tileJsonData:
+        tileJSONLoaded: 0
+        LayerDisplayNames:
+        - admin
+        - aeroway
+        - airport_label
+        - barrier_line
+        - building
+        - country_label
+        - housenum_label
+        - landuse
+        - landuse_overlay
+        - marine_label
+        - motorway_junction
+        - mountain_peak_label
+        - place_label
+        - poi_label
+        - rail_station_label
+        - road
+        - road_label
+        - state_label
+        - water
+        - water_label
+        - waterway
+        - waterway_label
       _sourceType: 0
       sourceOptions:
         isActive: 1
@@ -1289,12 +1000,15 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: building
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: building
           extrusionType: 1
           extrusionGeometryType: 0
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 0
           extrusionScaleFactor: 1
@@ -1315,6 +1029,343 @@ MonoBehaviour:
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
+      locationPrefabList:
+      - coreOptions:
+          isActive: 1
+          sublayerName: Arts and Entertainment
+          geometryType: 0
+          layerName: 
+          snapToTerrain: 1
+          groupFeatures: 0
+          lineWidth: 0
+        filterOptions:
+          _selectedLayerName: 
+          filters: []
+          combinerType: 0
+        extrusionOptions:
+          _selectedLayerName: 
+          extrusionType: 0
+          extrusionGeometryType: 0
+          propertyName: 
+          propertyDescription: 
+          minimumHeight: 0
+          maximumHeight: 0
+          extrusionScaleFactor: 0
+        colliderOptions:
+          colliderType: 0
+        materialOptions:
+          texturingType: 0
+          materials: []
+          atlasInfo: {fileID: 0}
+          colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 0
+        buildingsWithUniqueIds: 0
+        moveFeaturePositionTo: 0
+        MeshModifiers: []
+        GoModifiers: []
+        spawnPrefabOptions:
+          prefab: {fileID: 1707885508695930, guid: 29d1abf5ba6514d81a7974353f130ca8,
+            type: 2}
+          scaleDownWithWorld: 1
+        findByType: 0
+        categories: 1
+        nameString: 
+        coordinates: []
+        density: 15
+      - coreOptions:
+          isActive: 1
+          sublayerName: Food
+          geometryType: 0
+          layerName: 
+          snapToTerrain: 1
+          groupFeatures: 0
+          lineWidth: 0
+        filterOptions:
+          _selectedLayerName: 
+          filters: []
+          combinerType: 0
+        extrusionOptions:
+          _selectedLayerName: 
+          extrusionType: 0
+          extrusionGeometryType: 0
+          propertyName: 
+          propertyDescription: 
+          minimumHeight: 0
+          maximumHeight: 0
+          extrusionScaleFactor: 0
+        colliderOptions:
+          colliderType: 0
+        materialOptions:
+          texturingType: 0
+          materials: []
+          atlasInfo: {fileID: 0}
+          colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 0
+        buildingsWithUniqueIds: 0
+        moveFeaturePositionTo: 0
+        MeshModifiers: []
+        GoModifiers: []
+        spawnPrefabOptions:
+          prefab: {fileID: 1707885508695930, guid: fafbd32423ea04e379d8321b4d370fea,
+            type: 2}
+          scaleDownWithWorld: 1
+        findByType: 0
+        categories: 2
+        nameString: 
+        coordinates: []
+        density: 15
+      - coreOptions:
+          isActive: 1
+          sublayerName: Nightlife
+          geometryType: 0
+          layerName: 
+          snapToTerrain: 1
+          groupFeatures: 0
+          lineWidth: 0
+        filterOptions:
+          _selectedLayerName: 
+          filters: []
+          combinerType: 0
+        extrusionOptions:
+          _selectedLayerName: 
+          extrusionType: 0
+          extrusionGeometryType: 0
+          propertyName: 
+          propertyDescription: 
+          minimumHeight: 0
+          maximumHeight: 0
+          extrusionScaleFactor: 0
+        colliderOptions:
+          colliderType: 0
+        materialOptions:
+          texturingType: 0
+          materials: []
+          atlasInfo: {fileID: 0}
+          colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 0
+        buildingsWithUniqueIds: 0
+        moveFeaturePositionTo: 0
+        MeshModifiers: []
+        GoModifiers: []
+        spawnPrefabOptions:
+          prefab: {fileID: 1707885508695930, guid: 61bcd2d324dd34bb9b722d856749c28c,
+            type: 2}
+          scaleDownWithWorld: 1
+        findByType: 0
+        categories: 4
+        nameString: 
+        coordinates: []
+        density: 15
+      - coreOptions:
+          isActive: 1
+          sublayerName: Outdoors and Recreation
+          geometryType: 0
+          layerName: 
+          snapToTerrain: 1
+          groupFeatures: 0
+          lineWidth: 0
+        filterOptions:
+          _selectedLayerName: 
+          filters: []
+          combinerType: 0
+        extrusionOptions:
+          _selectedLayerName: 
+          extrusionType: 0
+          extrusionGeometryType: 0
+          propertyName: 
+          propertyDescription: 
+          minimumHeight: 0
+          maximumHeight: 0
+          extrusionScaleFactor: 0
+        colliderOptions:
+          colliderType: 0
+        materialOptions:
+          texturingType: 0
+          materials: []
+          atlasInfo: {fileID: 0}
+          colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 0
+        buildingsWithUniqueIds: 0
+        moveFeaturePositionTo: 0
+        MeshModifiers: []
+        GoModifiers: []
+        spawnPrefabOptions:
+          prefab: {fileID: 1707885508695930, guid: b0e54a880e97f4c5ead7dcc1c0918e05,
+            type: 2}
+          scaleDownWithWorld: 1
+        findByType: 0
+        categories: 8
+        nameString: 
+        coordinates: []
+        density: 15
+      - coreOptions:
+          isActive: 1
+          sublayerName: Services
+          geometryType: 0
+          layerName: 
+          snapToTerrain: 1
+          groupFeatures: 0
+          lineWidth: 0
+        filterOptions:
+          _selectedLayerName: 
+          filters: []
+          combinerType: 0
+        extrusionOptions:
+          _selectedLayerName: 
+          extrusionType: 0
+          extrusionGeometryType: 0
+          propertyName: 
+          propertyDescription: 
+          minimumHeight: 0
+          maximumHeight: 0
+          extrusionScaleFactor: 0
+        colliderOptions:
+          colliderType: 0
+        materialOptions:
+          texturingType: 0
+          materials: []
+          atlasInfo: {fileID: 0}
+          colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 0
+        buildingsWithUniqueIds: 0
+        moveFeaturePositionTo: 0
+        MeshModifiers: []
+        GoModifiers: []
+        spawnPrefabOptions:
+          prefab: {fileID: 1707885508695930, guid: 60a41cfc23d514878814f0d425912eff,
+            type: 2}
+          scaleDownWithWorld: 1
+        findByType: 0
+        categories: 16
+        nameString: 
+        coordinates: []
+        density: 10
+      - coreOptions:
+          isActive: 1
+          sublayerName: Shops
+          geometryType: 0
+          layerName: 
+          snapToTerrain: 1
+          groupFeatures: 0
+          lineWidth: 0
+        filterOptions:
+          _selectedLayerName: 
+          filters: []
+          combinerType: 0
+        extrusionOptions:
+          _selectedLayerName: 
+          extrusionType: 0
+          extrusionGeometryType: 0
+          propertyName: 
+          propertyDescription: 
+          minimumHeight: 0
+          maximumHeight: 0
+          extrusionScaleFactor: 0
+        colliderOptions:
+          colliderType: 0
+        materialOptions:
+          texturingType: 0
+          materials: []
+          atlasInfo: {fileID: 0}
+          colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 0
+        buildingsWithUniqueIds: 0
+        moveFeaturePositionTo: 0
+        MeshModifiers: []
+        GoModifiers: []
+        spawnPrefabOptions:
+          prefab: {fileID: 1707885508695930, guid: 49bc5d782d9184533a37abea20ed30e4,
+            type: 2}
+          scaleDownWithWorld: 1
+        findByType: 0
+        categories: 32
+        nameString: 
+        coordinates: []
+        density: 15
+      - coreOptions:
+          isActive: 1
+          sublayerName: Transportation
+          geometryType: 0
+          layerName: 
+          snapToTerrain: 1
+          groupFeatures: 0
+          lineWidth: 0
+        filterOptions:
+          _selectedLayerName: 
+          filters: []
+          combinerType: 0
+        extrusionOptions:
+          _selectedLayerName: 
+          extrusionType: 0
+          extrusionGeometryType: 0
+          propertyName: 
+          propertyDescription: 
+          minimumHeight: 0
+          maximumHeight: 0
+          extrusionScaleFactor: 0
+        colliderOptions:
+          colliderType: 0
+        materialOptions:
+          texturingType: 0
+          materials: []
+          atlasInfo: {fileID: 0}
+          colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 0
+        buildingsWithUniqueIds: 0
+        moveFeaturePositionTo: 0
+        MeshModifiers: []
+        GoModifiers: []
+        spawnPrefabOptions:
+          prefab: {fileID: 1707885508695930, guid: 22150daba6e8b47b69fd30f00b9c56cd,
+            type: 2}
+          scaleDownWithWorld: 1
+        findByType: 0
+        categories: 64
+        nameString: 
+        coordinates: []
+        density: 15
+      - coreOptions:
+          isActive: 0
+          sublayerName: All POIs
+          geometryType: 0
+          layerName: 
+          snapToTerrain: 1
+          groupFeatures: 0
+          lineWidth: 0
+        filterOptions:
+          _selectedLayerName: 
+          filters: []
+          combinerType: 0
+        extrusionOptions:
+          _selectedLayerName: 
+          extrusionType: 0
+          extrusionGeometryType: 0
+          propertyName: 
+          propertyDescription: 
+          minimumHeight: 0
+          maximumHeight: 0
+          extrusionScaleFactor: 0
+        colliderOptions:
+          colliderType: 0
+        materialOptions:
+          texturingType: 0
+          materials: []
+          atlasInfo: {fileID: 0}
+          colorPalette: {fileID: 0}
+        honorBuildingIdSetting: 0
+        buildingsWithUniqueIds: 0
+        moveFeaturePositionTo: 0
+        MeshModifiers: []
+        GoModifiers: []
+        spawnPrefabOptions:
+          prefab: {fileID: 1707885508695930, guid: d748e6a0b26334f4d933c1438339484d,
+            type: 2}
+          scaleDownWithWorld: 1
+        findByType: 0
+        categories: -1
+        nameString: 
+        coordinates: []
+        density: 30
   _tileProvider: {fileID: 0}
 --- !u!4 &967308907
 Transform:
@@ -1958,7 +2009,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _panSpeed: 10
   _zoomSpeed: 50
-  _referenceCamera: {fileID: 0}
+  _referenceCamera: {fileID: 1681481105}
 --- !u!81 &1681481102
 AudioListener:
   m_ObjectHideFlags: 0

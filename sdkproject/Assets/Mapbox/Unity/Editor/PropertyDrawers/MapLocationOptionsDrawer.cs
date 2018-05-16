@@ -12,7 +12,7 @@
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.indentLevel++;
-			GUILayout.Space(-2f * _lineHeight);
+			GUILayout.Space(-1f * _lineHeight);
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("latitudeLongitude"));
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("zoom"), GUILayout.Height(_lineHeight));
 			EditorGUI.indentLevel--;

@@ -67,43 +67,11 @@
 		{
 			get
 			{
-				return EditorPrefs.GetBool("MapManagerEditor_showMapLayers");
+				return EditorPrefs.GetBool(objectId + "MapManagerEditor_showMapLayers");
 			}
 			set
 			{
-				EditorPrefs.SetBool("MapManagerEditor_showMapLayers", value);
-			}
-		}
-
-		/// <summary>
-		/// Gets or sets a value to show or hide Vector section <see cref="T:Mapbox.Editor.MapManagerEditor"/>.
-		/// </summary>
-		/// <value><c>true</c> if show vector; otherwise, <c>false</c>.</value>
-		bool ShowLocationPrefabs
-		{
-			get
-			{
-				return EditorPrefs.GetBool("MapManagerEditor_showLocationPrefabs");
-			}
-			set
-			{
-				EditorPrefs.SetBool("MapManagerEditor_showLocationPrefabs", value);
-			}
-		}
-
-		/// <summary>
-		/// Gets or sets a value to show or hide Vector section <see cref="T:Mapbox.Editor.MapManagerEditor"/>.
-		/// </summary>
-		/// <value><c>true</c> if show vector; otherwise, <c>false</c>.</value>
-		bool ShowFeatures
-		{
-			get
-			{
-				return EditorPrefs.GetBool(objectId + "MapManagerEditor_showVector");
-			}
-			set
-			{
-				EditorPrefs.SetBool(objectId + "MapManagerEditor_showVector", value);
+				EditorPrefs.SetBool(objectId + "MapManagerEditor_showMapLayers", value);
 			}
 		}
 
@@ -119,23 +87,11 @@
 			}
 		}
 
-		private GUIContent _requiredMapIdGui = new GUIContent
-		{
-			text = "Required Map Id",
-			tooltip = "For location prefabs to spawn the \"streets-v7\" tileset needs to be a part of the Vector data source"
-		};
-
 		private GUIContent mapIdGui = new GUIContent
 		{
 			text = "Map Id",
 			tooltip = "Map Id corresponding to the tileset."
 		};
-
-		string CustomSourceMapId
-		{
-			get { return EditorPrefs.GetString("VectorLayerProperties_customSourceMapId"); }
-			set { EditorPrefs.SetString("VectorLayerProperties_customSourceMapId", value); }
-		}
 
 		bool _isGUIContentSet = false;
 		GUIContent[] _sourceTypeContent;
@@ -179,7 +135,7 @@
 			{
 				DrawMapLayerOptions();
 			}
-			GUILayout.EndVertical();
+			EditorGUILayout.EndVertical();
 
 			serializedObject.ApplyModifiedProperties();
 		}
@@ -199,6 +155,11 @@
 		void DrawMapOptions(SerializedObject mapObject)
 		{
 			var property = mapObject.FindProperty("_options");
+			if (!((AbstractMap)serializedObject.targetObject).IsAccessTokenValid)
+			{
+				EditorGUILayout.HelpBox("Invalid Access Token. Please add a valid access token using the Mapbox  > Setup Menu", MessageType.Error);
+			}
+
 
 			EditorGUILayout.LabelField("Location ", GUILayout.Height(_lineHeight));
 
@@ -234,13 +195,11 @@
 
 		void DrawMapLayerOptions()
 		{
-			//EditorGUI.indentLevel++;
 			var vectorDataProperty = serializedObject.FindProperty("_vectorData");
 			var layerProperty = vectorDataProperty.FindPropertyRelative("_layerProperty");
 			var layerSourceProperty = layerProperty.FindPropertyRelative("sourceOptions");
 			var sourceTypeProperty = layerProperty.FindPropertyRelative("_sourceType");
 			VectorSourceType sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
-			string streets_v7 = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id;
 			var layerSourceId = layerProperty.FindPropertyRelative("sourceOptions.layerSource.Id");
 			string layerString = layerSourceId.stringValue;
 			var isActiveProperty = layerSourceProperty.FindPropertyRelative("isActive");
@@ -282,9 +241,7 @@
 					isActiveProperty.boolValue = true;
 					break;
 				case VectorSourceType.Custom:
-					layerSourceId.stringValue = CustomSourceMapId;
 					EditorGUILayout.PropertyField(layerSourceProperty, mapIdGui);
-					CustomSourceMapId = layerSourceId.stringValue;
 					isActiveProperty.boolValue = true;
 					break;
 				case VectorSourceType.None:
@@ -310,123 +267,8 @@
 			EditorGUILayout.Space();
 			ShowSepartor();
 
-			ShowLocationPrefabs = EditorGUILayout.Foldout(ShowLocationPrefabs, "POINTS OF INTEREST");
-			if (ShowLocationPrefabs)
-			{
-				if (sourceTypeValue != VectorSourceType.None && layerString.Contains(streets_v7))
-				{
-					GUI.enabled = false;
-					EditorGUILayout.TextField(_requiredMapIdGui, streets_v7);
-					GUI.enabled = true;
-					ShowSection(vectorDataProperty, "_locationPrefabsLayerProperties");
-				}
-				else
-				{
-					EditorGUILayout.HelpBox("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the data source in the FEATURES section.", MessageType.Error);
-				}
-			}
-
-			ShowSepartor();
-			ShowFeatures = EditorGUILayout.Foldout(ShowFeatures, "FEATURES");
-			if (ShowFeatures)
-			{
-				ShowSection(serializedObject.FindProperty("_vectorData"), "_layerProperty");
-			}
-		}
-
-		void PresetLocationBased(SerializedProperty unifiedMap)
-		{
-			//Set
-			//placement = atLocationCenter,
-			//scaling = custom
-			//turn off vector layers.
-			var mapOptionsProp = unifiedMap.FindPropertyRelative("mapOptions");
-			var vectorLayerProps = unifiedMap.FindPropertyRelative("vectorLayerProperties");
-			var placementType = mapOptionsProp.FindPropertyRelative("placementOptions.placementType");
-			var scalingType = mapOptionsProp.FindPropertyRelative("scalingOptions.scalingType");
-			var unitType = mapOptionsProp.FindPropertyRelative("scalingOptions.unitType");
-			var extentType = mapOptionsProp.FindPropertyRelative("extentOptions.extentType");
-			var vectorSourceType = vectorLayerProps.FindPropertyRelative("sourceType");
-
-			placementType.enumValueIndex = (int)MapPlacementType.AtLocationCenter;
-
-			scalingType.enumValueIndex = (int)MapScalingType.Custom;
-			unitType.enumValueIndex = (int)MapUnitType.meters;
-
-			extentType.enumValueIndex = (int)MapExtentType.CameraBounds;
-
-			vectorSourceType.enumValueIndex = (int)VectorSourceType.None;
-
-		}
-
-		void PresetWorldSimulator(SerializedProperty unifiedMap)
-		{
-			//Set
-			//placement = atLocationCenter,
-			//scaling = custom
-			//turn on vector layers.
-			var mapOptionsProp = unifiedMap.FindPropertyRelative("mapOptions");
-			var vectorLayerProps = unifiedMap.FindPropertyRelative("vectorLayerProperties");
-			var placementType = mapOptionsProp.FindPropertyRelative("placementOptions.placementType");
-			var scalingType = mapOptionsProp.FindPropertyRelative("scalingOptions.scalingType");
-			var unitType = mapOptionsProp.FindPropertyRelative("scalingOptions.unitType");
-			var extentType = mapOptionsProp.FindPropertyRelative("extentOptions.extentType");
-			var vectorSourceType = vectorLayerProps.FindPropertyRelative("sourceType");
-
-			placementType.enumValueIndex = (int)MapPlacementType.AtLocationCenter;
-
-			scalingType.enumValueIndex = (int)MapScalingType.Custom;
-			unitType.enumValueIndex = (int)MapUnitType.meters;
-
-			extentType.enumValueIndex = (int)MapExtentType.CameraBounds;
-
-			vectorSourceType.enumValueIndex = (int)VectorSourceType.MapboxStreets;
-		}
-
-		void PresetARTableTop(SerializedProperty unifiedMap)
-		{
-			//Set
-			//placement = atLocationCenter,
-			//scaling = custom
-			//turn on vector layers.
-			var mapOptionsProp = unifiedMap.FindPropertyRelative("mapOptions");
-			var vectorLayerProps = unifiedMap.FindPropertyRelative("vectorLayerProperties");
-			var placementType = mapOptionsProp.FindPropertyRelative("placementOptions.placementType");
-			var scalingType = mapOptionsProp.FindPropertyRelative("scalingOptions.scalingType");
-			var extentType = mapOptionsProp.FindPropertyRelative("extentOptions.extentType");
-			var vectorSourceType = vectorLayerProps.FindPropertyRelative("sourceType");
-
-			placementType.enumValueIndex = (int)MapPlacementType.AtLocationCenter;
-
-			scalingType.enumValueIndex = (int)MapScalingType.WorldScale;
-
-			extentType.enumValueIndex = (int)MapExtentType.CameraBounds;
-
-			vectorSourceType.enumValueIndex = (int)VectorSourceType.MapboxStreets;
-
-		}
-
-		void PresetARWorldScale(SerializedProperty unifiedMap)
-		{
-			//Set
-			//placement = atLocationCenter,
-			//scaling = custom
-			//turn on vector layers.
-			var mapOptionsProp = unifiedMap.FindPropertyRelative("mapOptions");
-			var vectorLayerProps = unifiedMap.FindPropertyRelative("vectorLayerProperties");
-			var placementType = mapOptionsProp.FindPropertyRelative("placementOptions.placementType");
-			var scalingType = mapOptionsProp.FindPropertyRelative("scalingOptions.scalingType");
-			var extentType = mapOptionsProp.FindPropertyRelative("extentOptions.extentType");
-			var vectorSourceType = vectorLayerProps.FindPropertyRelative("sourceType");
-
-			placementType.enumValueIndex = (int)MapPlacementType.AtLocationCenter;
-
-			scalingType.enumValueIndex = (int)MapScalingType.WorldScale;
-
-			extentType.enumValueIndex = (int)MapExtentType.CameraBounds;
-
-			vectorSourceType.enumValueIndex = (int)VectorSourceType.MapboxStreets;
-
+			GUILayout.Space(-2.0f * _lineHeight);
+			ShowSection(serializedObject.FindProperty("_vectorData"), "_layerProperty");
 		}
 	}
 }

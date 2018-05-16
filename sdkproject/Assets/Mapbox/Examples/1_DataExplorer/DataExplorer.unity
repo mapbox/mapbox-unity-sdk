@@ -379,12 +379,41 @@ MonoBehaviour:
         wallMaterial: {fileID: 0}
   _vectorData:
     _layerProperty:
-      sourceType: 0
+      tileJsonData:
+        tileJSONLoaded: 0
+        LayerDisplayNames:
+        - admin
+        - aeroway
+        - airport_label
+        - barrier_line
+        - building
+        - contour
+        - country_label
+        - hillshade
+        - housenum_label
+        - landcover
+        - landuse
+        - landuse_overlay
+        - marine_label
+        - motorway_junction
+        - mountain_peak_label
+        - place_label
+        - poi_label
+        - rail_station_label
+        - road
+        - road_label
+        - state_label
+        - traffic
+        - water
+        - water_label
+        - waterway
+        - waterway_label
+      _sourceType: 2
       sourceOptions:
         isActive: 1
         layerSource:
           Name: Mapbox Streets
-          Id: mapbox.3d-buildings,mapbox.mapbox-streets-v7
+          Id: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           Modified: 
           UserName: 
       useOptimizedStyle: 0
@@ -406,12 +435,15 @@ MonoBehaviour:
           groupFeatures: 1
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: building
           filters: []
           combinerType: 2
         extrusionOptions:
+          _selectedLayerName: building
           extrusionType: 1
           extrusionGeometryType: 0
           propertyName: height
+          propertyDescription: Number. Height of building or part of building.
           minimumHeight: 0
           maximumHeight: 0
           extrusionScaleFactor: 1
@@ -441,17 +473,21 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: landuse
           filters:
           - Key: type
+            KeyDescription: OSM tag, more specific than class
             PropertyValue: park
             Min: 0
             Max: 0
             filterOperator: 0
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: landuse
           extrusionType: 0
           extrusionGeometryType: 0
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 0
           extrusionScaleFactor: 1
@@ -473,7 +509,6 @@ MonoBehaviour:
         GoModifiers:
         - {fileID: 11400000, guid: 3505ec4e61e3f4c4d88fc3c5548e7144, type: 2}
         - {fileID: 11400000, guid: d5cfd67d46b2f4892ae231737f3a95f8, type: 2}
-        - {fileID: 11400000, guid: 14ec972a1cec2dc429f5eca7d22b572f, type: 2}
         - {fileID: 11400000, guid: 4aeb0629486794f25bf199af8a4f4830, type: 2}
       - coreOptions:
           isActive: 1
@@ -484,12 +519,15 @@ MonoBehaviour:
           groupFeatures: 1
           lineWidth: 3
         filterOptions:
+          _selectedLayerName: road
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: road
           extrusionType: 5
           extrusionGeometryType: 0
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 0.5
           extrusionScaleFactor: 1
@@ -504,7 +542,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -518,17 +556,22 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: poi_label
           filters:
           - Key: localrank
+            KeyDescription: Number. Priority relative to nearby POIs. Useful for limiting
+              label density.
             PropertyValue: 
             Min: 1
             Max: 0
             filterOperator: 1
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: poi_label
           extrusionType: 5
           extrusionGeometryType: 0
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 0.5
           extrusionScaleFactor: 1
@@ -543,7 +586,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -558,12 +601,15 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: poi_label
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: poi_label
           extrusionType: 5
           extrusionGeometryType: 0
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 0.5
           extrusionScaleFactor: 1
@@ -578,7 +624,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -594,12 +640,15 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: water
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: water
           extrusionType: 5
           extrusionGeometryType: 0
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 0.4
           extrusionScaleFactor: 1
@@ -628,12 +677,15 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 3
         filterOptions:
+          _selectedLayerName: waterway
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: waterway
           extrusionType: 5
           extrusionGeometryType: 1
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 0.5
           extrusionScaleFactor: 1
@@ -648,7 +700,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: ab4ee1288a054a84b85ba5cf5a0abf34, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -662,12 +714,15 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: aeroway
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: aeroway
           extrusionType: 5
           extrusionGeometryType: 1
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 0.5
           extrusionScaleFactor: 1
@@ -682,7 +737,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: c0be5c38e1944584b89f81505e3c4446, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -696,12 +751,15 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: barrier_line
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: barrier_line
           extrusionType: 5
           extrusionGeometryType: 0
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 1
           extrusionScaleFactor: 1
@@ -716,7 +774,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: a4c397925829de8438fa9bb51535fd17, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -730,12 +788,15 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: landuse_overlay
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: landuse_overlay
           extrusionType: 5
           extrusionGeometryType: 1
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 1
           extrusionScaleFactor: 1
@@ -764,12 +825,15 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 3
         filterOptions:
+          _selectedLayerName: admin
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: admin
           extrusionType: 5
           extrusionGeometryType: 0
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
@@ -784,7 +848,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 1
         MeshModifiers: []
@@ -798,12 +862,15 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: country_label
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: country_label
           extrusionType: 5
           extrusionGeometryType: 0
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
@@ -818,7 +885,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -833,12 +900,15 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: marine_label
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: marine_label
           extrusionType: 5
           extrusionGeometryType: 0
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
@@ -853,7 +923,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -868,12 +938,15 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: state_label
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: state_label
           extrusionType: 5
           extrusionGeometryType: 0
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
@@ -888,7 +961,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -903,12 +976,15 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: water_label
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: water_label
           extrusionType: 5
           extrusionGeometryType: 0
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
@@ -923,7 +999,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -938,12 +1014,15 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: place_label
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: place_label
           extrusionType: 5
           extrusionGeometryType: 0
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
@@ -958,7 +1037,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -973,12 +1052,15 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: road_label
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: road_label
           extrusionType: 5
           extrusionGeometryType: 0
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
@@ -993,7 +1075,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1008,12 +1090,15 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: waterway_label
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: waterway_label
           extrusionType: 5
           extrusionGeometryType: 0
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
@@ -1028,7 +1113,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1043,12 +1128,15 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: airport_label
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: airport_label
           extrusionType: 5
           extrusionGeometryType: 0
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
@@ -1063,7 +1151,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1078,12 +1166,15 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: rail_station_label
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: rail_station_label
           extrusionType: 5
           extrusionGeometryType: 0
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
@@ -1098,7 +1189,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1113,12 +1204,15 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: mountain_peak_label
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: mountain_peak_label
           extrusionType: 5
           extrusionGeometryType: 0
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
@@ -1133,7 +1227,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1148,12 +1242,15 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: housenum_label
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: housenum_label
           extrusionType: 5
           extrusionGeometryType: 0
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
@@ -1168,7 +1265,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1183,12 +1280,15 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: motorway_junction
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: motorway_junction
           extrusionType: 5
           extrusionGeometryType: 0
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
@@ -1203,7 +1303,7 @@ MonoBehaviour:
             - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1218,12 +1318,15 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: building
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: building
           extrusionType: 5
           extrusionGeometryType: 1
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 0.2
           extrusionScaleFactor: 1
@@ -1244,20 +1347,23 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
       - coreOptions:
-          isActive: 1
-          sublayerName: HIllshade
+          isActive: 0
+          sublayerName: Hillshade
           geometryType: 2
           layerName: hillshade
           snapToTerrain: 1
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
+          _selectedLayerName: hillshade
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: hillshade
           extrusionType: 5
           extrusionGeometryType: 1
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 3
           extrusionScaleFactor: 1
@@ -1286,12 +1392,15 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 3
         filterOptions:
+          _selectedLayerName: contour
           filters: []
           combinerType: 0
         extrusionOptions:
+          _selectedLayerName: contour
           extrusionType: 5
           extrusionGeometryType: 1
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 0.5
           extrusionScaleFactor: 1
@@ -1306,13 +1415,13 @@ MonoBehaviour:
             - {fileID: 0}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
       - coreOptions:
-          isActive: 0
+          isActive: 1
           sublayerName: LowTrafficCongestion
           geometryType: 1
           layerName: traffic
@@ -1320,17 +1429,22 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 3
         filterOptions:
+          _selectedLayerName: traffic
           filters:
           - Key: congestion
+            KeyDescription: 'Congestion severity. One of: ''low'', ''moderate'', ''heavy'',
+              ''severe'''
             PropertyValue: low
             Min: 0
             Max: 0
             filterOperator: 0
           combinerType: 1
         extrusionOptions:
+          _selectedLayerName: traffic
           extrusionType: 5
           extrusionGeometryType: 1
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 1
           extrusionScaleFactor: 1
@@ -1345,13 +1459,13 @@ MonoBehaviour:
             - {fileID: 0}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
       - coreOptions:
-          isActive: 0
+          isActive: 1
           sublayerName: ModerateTrafficCongestion
           geometryType: 1
           layerName: traffic
@@ -1359,17 +1473,22 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 3
         filterOptions:
+          _selectedLayerName: traffic
           filters:
           - Key: congestion
+            KeyDescription: 'Congestion severity. One of: ''low'', ''moderate'', ''heavy'',
+              ''severe'''
             PropertyValue: moderate
             Min: 0
             Max: 0
             filterOperator: 0
           combinerType: 1
         extrusionOptions:
+          _selectedLayerName: traffic
           extrusionType: 5
           extrusionGeometryType: 1
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 1
           extrusionScaleFactor: 1
@@ -1384,7 +1503,7 @@ MonoBehaviour:
             - {fileID: 0}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
@@ -1398,17 +1517,22 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 3
         filterOptions:
+          _selectedLayerName: traffic
           filters:
           - Key: congestion
+            KeyDescription: 'Congestion severity. One of: ''low'', ''moderate'', ''heavy'',
+              ''severe'''
             PropertyValue: heavy
             Min: 0
             Max: 0
             filterOperator: 0
           combinerType: 1
         extrusionOptions:
+          _selectedLayerName: traffic
           extrusionType: 5
           extrusionGeometryType: 1
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 1
           extrusionScaleFactor: 1
@@ -1423,13 +1547,13 @@ MonoBehaviour:
             - {fileID: 0}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
       - coreOptions:
-          isActive: 0
+          isActive: 1
           sublayerName: SevereTrafficCongestion
           geometryType: 1
           layerName: traffic
@@ -1437,17 +1561,22 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 3
         filterOptions:
+          _selectedLayerName: traffic
           filters:
           - Key: congestion
+            KeyDescription: 'Congestion severity. One of: ''low'', ''moderate'', ''heavy'',
+              ''severe'''
             PropertyValue: severe
             Min: 0
             Max: 0
             filterOperator: 0
           combinerType: 1
         extrusionOptions:
+          _selectedLayerName: traffic
           extrusionType: 5
           extrusionGeometryType: 1
           propertyName: height
+          propertyDescription: 
           minimumHeight: 0
           maximumHeight: 1
           extrusionScaleFactor: 1
@@ -1462,12 +1591,11 @@ MonoBehaviour:
             - {fileID: 0}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
           colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
-    _locationPrefabsLayerProperties:
       locationPrefabList: []
   _tileProvider: {fileID: 0}
 --- !u!1 &165147574
@@ -2703,62 +2831,62 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.x
-      value: 116.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -92.88317
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.x
-      value: 213
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 165.76634
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 185.76634
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.x
-      value: -17
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114603753021256032, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -3026,12 +3154,12 @@ Prefab:
     - target: {fileID: 224000013044306136, guid: 3adcee2515f8c49f4a7afb3bacf2c56e,
         type: 2}
       propertyPath: m_LocalPosition.x
-      value: 371
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224000013044306136, guid: 3adcee2515f8c49f4a7afb3bacf2c56e,
         type: 2}
       propertyPath: m_LocalPosition.y
-      value: 197.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224000013044306136, guid: 3adcee2515f8c49f4a7afb3bacf2c56e,
         type: 2}

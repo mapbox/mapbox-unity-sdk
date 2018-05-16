@@ -9,7 +9,7 @@
 	public class CoreVectorLayerProperties
 	{
 		[SerializeField]
-		private string sourceId = "";
+		private string sourceId;
 		[Tooltip("Is visualizer active.")]
 		public bool isActive = true;
 		[Tooltip("Name of the visualizer. ")]
@@ -30,7 +30,7 @@
 	public class VectorFilterOptions
 	{
 		[SerializeField]
-		private string _selectedLayerName = "";
+		private string _selectedLayerName;
 		public List<LayerFilter> filters = new List<LayerFilter>();
 		[Tooltip("Operator to combine filters. ")]
 		public LayerFilterCombinerOperationType combinerType = LayerFilterCombinerOperationType.All;

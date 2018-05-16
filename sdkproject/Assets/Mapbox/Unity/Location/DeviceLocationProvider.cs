@@ -69,7 +69,7 @@ namespace Mapbox.Unity.Location
 #endif
 
 
-		void Awake()
+		protected virtual void Awake()
 		{
 			_currentLocation.Provider = "unity";
 			_wait1sec = new WaitForSeconds(1f);
