@@ -225,18 +225,23 @@
 					subLayerFilterOptions.FindPropertyRelative("filters").ClearArray();
 					subLayerFilterOptions.FindPropertyRelative("combinerType").enumValueIndex =
 						(int)LayerFilterCombinerOperationType.Any;
-
+					
 					var subLayerGeometryMaterialOptions = subLayer.FindPropertyRelative("geometryMaterialOptions");
 					subLayerGeometryMaterialOptions.FindPropertyRelative("style").enumValueIndex = (int)StyleTypes.Realistic;
 
 					GeometryMaterialOptions geometryMaterialOptionsReference = MapboxDefaultStyles.GetDefaultAssets();
 
 					var mats = subLayerGeometryMaterialOptions.FindPropertyRelative("materials");
-
 					mats.arraySize = 2;
 
-					var topMat = mats.GetArrayElementAtIndex(0).FindPropertyRelative("Materials").GetArrayElementAtIndex(0);
-					var sideMat = mats.GetArrayElementAtIndex(1).FindPropertyRelative("Materials").GetArrayElementAtIndex(0);
+					var topMatArray = mats.GetArrayElementAtIndex(0).FindPropertyRelative("Materials");
+					var sideMatArray = mats.GetArrayElementAtIndex(1).FindPropertyRelative("Materials");
+
+					topMatArray.arraySize = 1;
+					sideMatArray.arraySize = 1;
+
+					var topMat = topMatArray.GetArrayElementAtIndex(0);
+					var sideMat = sideMatArray.GetArrayElementAtIndex(0);
 
 					var atlas = subLayerGeometryMaterialOptions.FindPropertyRelative("atlasInfo");
 					var palette = subLayerGeometryMaterialOptions.FindPropertyRelative("colorPalette");

@@ -64,7 +64,6 @@
 			var styleType = property.FindPropertyRelative("style");
 
 			EditorGUI.indentLevel--;
-			EditorGUI.indentLevel--;
 			styleType.enumValueIndex = EditorGUI.Popup(styleTypePosition, styleType.enumValueIndex, styleType.enumDisplayNames);
 			EditorGUI.indentLevel++;
 			EditorGUI.indentLevel++;
@@ -89,8 +88,9 @@
 			}
 			else
 			{
-				var texturingType = property.FindPropertyRelative("texturingType");
 
+				var texturingType = property.FindPropertyRelative("texturingType");
+				EditorGUI.indentLevel--;
 				var texturingTypeGUI = new GUIContent { text = "Texturing Type", tooltip = EnumExtensions.Description((UvMapType)texturingType.enumValueIndex) };
 
 				EditorGUI.indentLevel++;
