@@ -142,14 +142,6 @@ namespace Mapbox.Unity.Map
 				spawnPrefabOptions.AllPrefabsInstatiated = value;
 			}
 		}
-
-		public override Type ModifierType
-		{
-			get
-			{
-				return typeof(PrefabItemOptions);
-			}
-		}
 		#endregion
 	}
 }

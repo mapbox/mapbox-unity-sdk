@@ -14,17 +14,9 @@
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Replace Feature Modifier")]
 	public class ReplaceFeatureModifier : MeshModifier
 	{
-		//private List<Vector2d> LatLon;
-
-		[SerializeField]
-		private PrefabItemOptions _options;
+		private List<Vector2d> LatLon;
 
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
-
-		public override void SetProperties(ModifierProperties properties)
-		{
-			_options = (PrefabItemOptions)properties;
-		}
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, float scale)
 		{

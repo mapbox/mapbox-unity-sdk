@@ -6,7 +6,7 @@
 	using Mapbox.Unity.Utilities;
 
 	[Serializable]
-	public class VectorSubLayerProperties : ModifierProperties
+	public class VectorSubLayerProperties : LayerProperties
 	{
 		public CoreVectorLayerProperties coreOptions = new CoreVectorLayerProperties();
 		public VectorFilterOptions filterOptions = new VectorFilterOptions();
@@ -30,13 +30,5 @@
 		public List<MeshModifier> MeshModifiers;
 		[NodeEditorElement("Game Object Modifiers")]
 		public List<GameObjectModifier> GoModifiers;
-
-		public override Type ModifierType
-		{
-			get
-			{
-				return typeof(VectorSubLayerProperties);
-			}
-		}
 	}
 }
