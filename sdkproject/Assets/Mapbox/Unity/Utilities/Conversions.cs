@@ -216,35 +216,22 @@ namespace Mapbox.Unity.Utilities
 		/// <returns>The longitude to tile position.</returns>
 		/// <param name="coordinate">Coordinate.</param>
 		/// <param name="tileZoom">The zoom level of the tile.</param>
-		/// <param name="tileScale">Tile scale. Optional, but recommended. Defaults to a scale of 1.</param>
 		/// <param name="layerExtent">Layer extent. Optional, but recommended. Defaults to 4096, the standard for Mapbox Tiles</param>
-		public static Vector3 LatitudeLongitudeToTilePosition(Vector2d coordinate, int tileZoom, float tileScale = 1f, ulong layerExtent = 4096)
+		public static Vector3 LatitudeLongitudeToVectorTilePosition(Vector2d coordinate, int tileZoom, ulong layerExtent = 4096)
 		{
-			//get the tileId 
 			var coordinateTileId = Conversions.LatitudeLongitudeToTileId(
 				coordinate.x, coordinate.y, tileZoom);
-
-			//Create a feature point based on the coordinate
 			var _meters = LatLonToMeters(coordinate);
 			var _rect = Conversions.TileBounds(coordinateTileId);
-			var _scale = tileScale;
-			var _extent = layerExtent;
 
 			//vectortile space point (0 - layerExtent)
-			var vectorTilePoint = new Vector3((float)((_meters - _rect.Min).x / _rect.Size.x) * _extent,
+			var vectorTilePoint = new Vector3((float)((_meters - _rect.Min).x / _rect.Size.x) * layerExtent,
 									0,
-									(float)((_meters - _rect.Max).y / _rect.Size.y) * _extent
+			                                  (float)((_meters - _rect.Max).y / _rect.Size.y) * layerExtent
 								   );
 
-			//UnityTile space
-			var unityTilePoint = new Vector3((float)(vectorTilePoint.x / _extent * _rect.Size.x - (_rect.Size.x / 2)) * _scale,
-										0,
-										(float)((vectorTilePoint.z) / _extent * _rect.Size.y - (_rect.Size.y / 2)) * _scale
-									   );
-
 			//add coordinate feature to feature points
-			return unityTilePoint;
-			
+			return vectorTilePoint;
 		}
 
 		/// <summary>
@@ -255,33 +242,23 @@ namespace Mapbox.Unity.Utilities
 		/// <param name="tileZoom">The zoom level of the tile.</param>
 		/// <param name="tileScale">Tile scale. Optional, but recommended. Defaults to a scale of 1.</param>
 		/// <param name="layerExtent">Layer extent. Optional, but recommended. Defaults to 4096, the standard for Mapbox Tiles</param>
-		public static Vector3 LatitudeLongitudeToTilePosition(Vector2d coordinate, int tileZoom, float tileScale = 1f, ulong layerExtent = 4096)
+		public static Vector3 LatitudeLongitudeToUnityTilePosition(Vector2d coordinate, int tileZoom, float tileScale, ulong layerExtent = 4096)
 		{
-			//get the tileId 
 			var coordinateTileId = Conversions.LatitudeLongitudeToTileId(
 				coordinate.x, coordinate.y, tileZoom);
-
-			//Create a feature point based on the coordinate
-			var _meters = LatLonToMeters(coordinate);
 			var _rect = Conversions.TileBounds(coordinateTileId);
-			var _scale = tileScale;
-			var _extent = layerExtent;
 
 			//vectortile space point (0 - layerExtent)
-			var vectorTilePoint = new Vector3((float)((_meters - _rect.Min).x / _rect.Size.x) * _extent,
-									0,
-									(float)((_meters - _rect.Max).y / _rect.Size.y) * _extent
-								   );
+			var vectorTilePoint = LatitudeLongitudeToVectorTilePosition(coordinate, tileZoom, layerExtent);
 
 			//UnityTile space
-			var unityTilePoint = new Vector3((float)(vectorTilePoint.x / _extent * _rect.Size.x - (_rect.Size.x / 2)) * _scale,
+			var unityTilePoint = new Vector3((float)(vectorTilePoint.x / layerExtent * _rect.Size.x - (_rect.Size.x / 2)) * tileScale,
 										0,
-										(float)((vectorTilePoint.z) / _extent * _rect.Size.y - (_rect.Size.y / 2)) * _scale
+			                                 (float)((vectorTilePoint.z) / layerExtent * _rect.Size.y - (_rect.Size.y / 2)) * tileScale
 									   );
 
 			//add coordinate feature to feature points
 			return unityTilePoint;
-			
 		}
 
 		/// <summary>

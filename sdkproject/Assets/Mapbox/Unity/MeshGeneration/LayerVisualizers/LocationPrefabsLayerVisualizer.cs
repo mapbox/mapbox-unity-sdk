@@ -278,7 +278,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					var latLonPoint = new List<Vector3>();
 
 					//add point to submesh, and submesh to feature
-					latLonPoint.Add(Conversions.LatitudeLongitudeToTilePosition(coordinate, tile.InitialZoom, tile.TileScale,layer.Extent));
+					latLonPoint.Add(Conversions.LatitudeLongitudeToUnityTilePosition(coordinate, tile.InitialZoom, tile.TileScale,layer.Extent));
 					feature.Points.Add(latLonPoint);
 
 					//pass valid feature.Data to modifiers
