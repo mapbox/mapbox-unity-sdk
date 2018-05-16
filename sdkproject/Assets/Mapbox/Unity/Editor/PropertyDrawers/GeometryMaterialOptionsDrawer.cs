@@ -58,8 +58,6 @@
 		{
 			LoadDefaultStyleIcons();
 			EditorGUI.BeginProperty(position, label, property);
-			EditorGUI.LabelField(new Rect(position.x, position.y, position.width, lineHeight), new GUIContent { text = "Material Options", tooltip = "Unity materials to be used for features. " });
-			EditorGUI.indentLevel++;
 
 			position.y += lineHeight;
 			var styleTypePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Texturing Style", tooltip = "Texturing style for feature; choose from sample style or create your own by choosing Custom. " });
