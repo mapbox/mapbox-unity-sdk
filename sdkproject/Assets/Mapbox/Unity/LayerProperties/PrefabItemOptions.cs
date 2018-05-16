@@ -143,6 +143,13 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
+		public override Type ModifierType
+		{
+			get
+			{
+				return typeof(PrefabItemOptions);
+			}
+		}
 		#endregion
 	}
 }
