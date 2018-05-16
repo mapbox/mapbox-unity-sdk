@@ -474,10 +474,14 @@
 					gofac.arraySize++;
 					gofac.GetArrayElementAtIndex(gofac.arraySize - 1).objectReferenceValue = null;
 				}
+				//EditorWindow.Repaint();
+				Rect buttonRect = GUILayoutUtility.GetLastRect();
 
 				if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
 				{
-					ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac);
+					PopupWindow.Show(buttonRect, new PopupExample(typeof(GameObjectModifier), gofac));
+					if (Event.current.type == EventType.Repaint) buttonRect = GUILayoutUtility.GetLastRect();
+					//ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac);
 				}
 
 				EditorGUILayout.EndHorizontal();
