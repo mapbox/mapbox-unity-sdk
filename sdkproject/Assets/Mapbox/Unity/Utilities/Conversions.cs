@@ -230,7 +230,6 @@ namespace Mapbox.Unity.Utilities
 			                                  (float)((_meters - _rect.Max).y / _rect.Size.y) * layerExtent
 								   );
 
-			//add coordinate feature to feature points
 			return vectorTilePoint;
 		}
 
@@ -257,7 +256,6 @@ namespace Mapbox.Unity.Utilities
 			                                 (float)((vectorTilePoint.z) / layerExtent * _rect.Size.y - (_rect.Size.y / 2)) * tileScale
 									   );
 
-			//add coordinate feature to feature points
 			return unityTilePoint;
 		}
 
