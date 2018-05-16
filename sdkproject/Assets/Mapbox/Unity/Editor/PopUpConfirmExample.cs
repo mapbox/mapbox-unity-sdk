@@ -19,7 +19,7 @@ public class PopUpConfirmExample : PopupWindowContent
 	{
 		GUILayout.Label("New thing:", EditorStyles.boldLabel);
 
-		MyNewModifierName = EditorGUILayout.TextField("Thing Name: ", MyNewModifierName);
+		MyNewModifierName = EditorGUILayout.TextField("Name: ", MyNewModifierName);
 
 		EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 		if (GUILayout.Button("Create"))
