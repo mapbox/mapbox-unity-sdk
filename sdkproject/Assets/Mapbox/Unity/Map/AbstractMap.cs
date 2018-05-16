@@ -307,7 +307,7 @@ namespace Mapbox.Unity.Map
 
 					isAccessTokenValid = true;
 				}
-				catch (System.Exception e)
+				catch (System.Exception)
 				{
 					isAccessTokenValid = false;
 				}
@@ -693,11 +693,11 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		/// <param name="prefab"> A Game Object Prefab.</param>
 		/// <param name="LatLon">A Vector2d(Latitude Longitude) object</param>
-		public void SpawnPrefabAtGeoLocation(GameObject prefab, 
-		                                     Vector2d LatLon, 
-		                                     Action<List<GameObject>> callback = null, 
-		                                     bool scaleDownWithWorld = true, 
-		                                     string locationItemName = "New Location")
+		public void SpawnPrefabAtGeoLocation(GameObject prefab,
+											 Vector2d LatLon,
+											 Action<List<GameObject>> callback = null,
+											 bool scaleDownWithWorld = true,
+											 string locationItemName = "New Location")
 		{
 			var latLonArray = new Vector2d[] { LatLon };
 			SpawnPrefabAtGeoLocation(prefab, latLonArray, callback, scaleDownWithWorld, locationItemName);
@@ -708,11 +708,11 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		/// <param name="prefab"> A Game Object Prefab.</param>
 		/// <param name="LatLon">A Vector2d(Latitude Longitude) object</param>
-		public void SpawnPrefabAtGeoLocation(GameObject prefab, 
-		                                     Vector2d[] LatLon, 
-		                                     Action<List<GameObject>> callback = null, 
-		                                     bool scaleDownWithWorld = true, 
-		                                     string locationItemName = "New Location")
+		public void SpawnPrefabAtGeoLocation(GameObject prefab,
+											 Vector2d[] LatLon,
+											 Action<List<GameObject>> callback = null,
+											 bool scaleDownWithWorld = true,
+											 string locationItemName = "New Location")
 		{
 			var coordinateArray = new string[LatLon.Length];
 			for (int i = 0; i < LatLon.Length; i++)
@@ -750,11 +750,11 @@ namespace Mapbox.Unity.Map
 		/// <param name="density">Density controls the number of POIs on the map.(Integer value between 1 and 30)</param>
 		/// <param name="locationItemName">Name of this location prefab item for future reference</param>
 		/// <param name="scaleDownWithWorld">Should the prefab scale up/down along with the map game object?</param>
-		public void SpawnPrefabByCategory(GameObject prefab, 
-		                                  LocationPrefabCategories categories = LocationPrefabCategories.AnyCategory, 
-		                                  int density = 30, Action<List<GameObject>> callback = null, 
-		                                  bool scaleDownWithWorld = true, 
-		                                  string locationItemName = "New Location")
+		public void SpawnPrefabByCategory(GameObject prefab,
+										  LocationPrefabCategories categories = LocationPrefabCategories.AnyCategory,
+										  int density = 30, Action<List<GameObject>> callback = null,
+										  bool scaleDownWithWorld = true,
+										  string locationItemName = "New Location")
 		{
 			PrefabItemOptions item = new PrefabItemOptions()
 			{
@@ -785,17 +785,17 @@ namespace Mapbox.Unity.Map
 		/// <param name="locationItemName">Name of this location prefab item for future reference</param>
 		/// <param name="scaleDownWithWorld">Should the prefab scale up/down along with the map game object?</param>
 		/// </summary>
-		public void SpawnPrefabByName(GameObject prefab, 
-		                              string nameString, 
-		                              int density = 30, 
-		                              Action<List<GameObject>> callback = null, 
-		                              bool scaleDownWithWorld = true, 
-		                              string locationItemName = "New Location")
+		public void SpawnPrefabByName(GameObject prefab,
+									  string nameString,
+									  int density = 30,
+									  Action<List<GameObject>> callback = null,
+									  bool scaleDownWithWorld = true,
+									  string locationItemName = "New Location")
 		{
 			PrefabItemOptions item = new PrefabItemOptions()
 			{
 				findByType = LocationPrefabFindBy.POIName,
-				nameString = nameString, 
+				nameString = nameString,
 				density = density,
 				prefabItemName = locationItemName,
 				spawnPrefabOptions = new SpawnPrefabOptions()
@@ -812,9 +812,9 @@ namespace Mapbox.Unity.Map
 		/// Creates the prefab layer.
 		/// </summary>
 		/// <param name="item"> the options of the prefab layer.</param>
-		private void CreatePrefabLayer( PrefabItemOptions item )
+		private void CreatePrefabLayer(PrefabItemOptions item)
 		{
-			if (_vectorData.LayerProperty.sourceType == VectorSourceType.None 
+			if (_vectorData.LayerProperty.sourceType == VectorSourceType.None
 			|| !_vectorData.LayerProperty.sourceOptions.Id.Contains(MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id))
 			{
 				Debug.LogError("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the list of vector data sources");
@@ -830,6 +830,6 @@ namespace Mapbox.Unity.Map
 			_vectorData.AddLocationPrefabItem(item);
 		}
 
-  		#endregion
+		#endregion
 	}
 }
