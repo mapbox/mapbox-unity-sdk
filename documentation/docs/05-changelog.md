@@ -1,6 +1,15 @@
-﻿## CHANGELOG
-### v.1.4.1
+## CHANGELOG
+ ### v.1.4.2
 *??/??/2018*
+
+##### New Features
+- Add `OnUpdated` event to `AbstractMap`. Enables subscribers to get a notification when the map location and/or zoom gets updated.
+
+##### Improvements
+- `UnityARInterface` updated to [commit 67351b6](https://github.com/Unity-Technologies/experimental-ARInterface/commit/67351b66ff9af28380e7dd5f5b2f4ba1bf802ca8) from March 1st 2018
+
+### v.1.4.1
+*04/17/2018*
 
 ##### New Features
 - Add two new modules, KdTreeCollection and AddToCollection Gameobject modifier.
@@ -23,6 +32,7 @@
 - Fix issue with Satellite TextureType.
 - Added a check to prevent NRE on tile update because map was not initialized.
 - Added method to disable `InitializeOnStart` in the `Initialize With Location Provider` script.
+- Fix loop counter in `SpawnInsidePrefabModifier` which was causing an infinite loop.
 
 ### v.1.4.0
 *03/20/2018*

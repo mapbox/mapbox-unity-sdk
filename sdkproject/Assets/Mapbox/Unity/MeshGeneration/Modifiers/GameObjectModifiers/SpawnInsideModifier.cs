@@ -90,8 +90,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						transform.localScale = scale;
 					}
 
-					_spawnedCount++;
 				}
+				_spawnedCount++;
 			}
 		}
 
