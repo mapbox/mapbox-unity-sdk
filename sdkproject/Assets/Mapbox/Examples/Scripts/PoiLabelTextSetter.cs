@@ -1,4 +1,4 @@
-namespace Mapbox.Examples
+ namespace Mapbox.Examples
 {
 	using Mapbox.Unity.MeshGeneration.Interfaces;
 	using System.Collections.Generic;
@@ -30,9 +30,19 @@ namespace Mapbox.Examples
 				_textMesh.text = props["type"].ToString();
 			}
 
+			SetBackgroundWidth();
+		}
+
+		public void Start()
+		{
+			SetBackgroundWidth();
+		}
+
+		public void SetBackgroundWidth()
+		{
 			float textWidth = _textMesh.GetComponent<Renderer>().bounds.size.x;
 			RectTransform backgroundRect = _background.GetComponent<RectTransform>();
-			backgroundRect.sizeDelta = new Vector2 (textWidth + 4f, 3f);
+			backgroundRect.sizeDelta = new Vector2(textWidth + 4f, 3f);
 		}
 	}
 }
