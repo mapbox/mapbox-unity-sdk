@@ -9,7 +9,7 @@ public class PopupExample : PopupWindowContent
 
 	bool _dropdown = false;
 
-	Type _type;
+	public Type _type;
 
 	private Action<UnityEngine.Object> _act;
 
@@ -117,6 +117,8 @@ public class PopupExample : PopupWindowContent
 			Debug.Log("custom >");
 		}
 		*/
+		EditorGUILayout.LabelField("Compiling:", EditorApplication.isCompiling ? "Yes" : "No");
+
 
 		//EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 		editorWindow.Repaint();
@@ -156,8 +158,20 @@ public class PopupExample : PopupWindowContent
 		Debug.Log("Popup closed: " + this);
 	}
 
-	public void Close(string n)
+	public void SetNewClass(string n)
 	{
+		//selected.AddComponent(Type.GetType(name));
+		Type type = Type.GetType(n);
+
+		var myNewScriptabeObject = ScriptableObject.CreateInstance(n) as ScriptableObject;
+
+		myNewScriptabeObject.name = n;
+
+		AssetDatabase.CreateAsset(myNewScriptabeObject, "Assets/" + n);
+
+		AssetDatabase.SaveAssets();
+		AssetDatabase.Refresh();
+		Confirm(myNewScriptabeObject);
 		editorWindow.Close();
 	}
 
