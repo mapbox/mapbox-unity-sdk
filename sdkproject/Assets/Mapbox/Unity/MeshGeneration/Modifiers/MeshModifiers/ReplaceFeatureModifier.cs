@@ -12,21 +12,22 @@
 	/// ReplaceBuildingFeatureModifier takes in POIs and checks if the feature layer has those points and deletes them
 	/// </summary>
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Replace Feature Modifier")]
-	public class ReplaceFeatureModifier : MeshModifier
+	public class ReplaceFeatureModifier : PrefabModifier, IReplacementCriteria
 	{
 		[SerializeField]
 		private List<Vector2d> LatLon;
 
-		public override ModifierType Type { get { return ModifierType.Preprocess; } }
-
-		public override void Run(VectorFeatureUnity feature, MeshData md, float scale)
+		public bool ShouldReplaceFeature( VectorFeatureUnity feature )
 		{
-			Run(feature, md);
+			return true;
 		}
 
-		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
+		public override void Run(VectorEntity ve, UnityTile tile)
 		{
-			
+			if(ShouldReplaceFeature(ve.Feature))
+			{
+				base.Run(ve, tile);
+			}
 		}
 	}
 }
