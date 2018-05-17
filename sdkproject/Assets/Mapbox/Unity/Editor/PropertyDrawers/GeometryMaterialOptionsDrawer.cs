@@ -91,7 +91,8 @@
 
 				var texturingType = property.FindPropertyRelative("texturingType");
 				EditorGUI.indentLevel--;
-				var texturingTypeGUI = new GUIContent { text = "Texturing Type", tooltip = EnumExtensions.Description((UvMapType)texturingType.enumValueIndex) };
+				int valIndex = texturingType.enumValueIndex == 0 ? 0 : texturingType.enumValueIndex + 1;
+				var texturingTypeGUI = new GUIContent { text = "Texturing Type", tooltip = EnumExtensions.Description((UvMapType)valIndex) };
 
 				EditorGUI.indentLevel++;
 				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), texturingType, texturingTypeGUI);
@@ -101,7 +102,6 @@
 				{
 					matList.arraySize = 2;
 				}
-
 				var roofMat = matList.GetArrayElementAtIndex(0);
 				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), roofMat, new GUIContent { text = "Top Material", tooltip = "Unity material to use for extruded top/roof mesh. " });
 				position.y += EditorGUI.GetPropertyHeight(roofMat);
@@ -110,13 +110,13 @@
 				EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), wallMat, new GUIContent { text = "Side Material", tooltip = "Unity material to use for extruded side/wall mesh. " });
 				position.y += EditorGUI.GetPropertyHeight(wallMat);
 
-				if ((UvMapType)texturingType.enumValueIndex == UvMapType.Atlas)
+				if ((UvMapType)texturingType.enumValueIndex + 1 == UvMapType.Atlas)
 				{
 					position.y += lineHeight;
 					var atlasInfo = property.FindPropertyRelative("atlasInfo");
 					EditorGUI.ObjectField(new Rect(position.x, position.y, position.width, lineHeight), atlasInfo, new GUIContent { text = "Altas Info", tooltip = "Atlas information scriptable object, this defines how the texture roof and wall texture atlases will be used.  " });
 				}
-				if ((UvMapType)texturingType.enumValueIndex == UvMapType.AtlasWithColorPalette)
+				if ((UvMapType)texturingType.enumValueIndex + 1 == UvMapType.AtlasWithColorPalette)
 				{
 					position.y += lineHeight;
 					var atlasInfo = property.FindPropertyRelative("atlasInfo");
@@ -149,11 +149,11 @@
 					height += EditorGUI.GetPropertyHeight(matInList);
 				}
 				var texturingType = property.FindPropertyRelative("texturingType");
-				if ((UvMapType)texturingType.enumValueIndex == UvMapType.Atlas)
+				if ((UvMapType)texturingType.enumValueIndex + 1 == UvMapType.Atlas)
 				{
 					height += lineHeight;
 				}
-				else if ((UvMapType)texturingType.enumValueIndex == UvMapType.AtlasWithColorPalette)
+				else if ((UvMapType)texturingType.enumValueIndex + 1 == UvMapType.AtlasWithColorPalette)
 				{
 					height += (3.0f * lineHeight);
 				}
