@@ -33,6 +33,17 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
+			if(Criteria!=null && Criteria.Count > 0)
+			{
+				foreach(var criterion in Criteria)
+				{
+					if(criterion.ShouldReplaceFeature(feature))
+					{
+						return;
+					}
+				}
+			}
+
 			_secondCounter = feature.Points.Count;
 			var subset = new List<List<Vector3>>(_secondCounter);
 			Data flatData = null;

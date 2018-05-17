@@ -105,6 +105,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			for (int i = 0; i < _counter; i++)
 			{
 				MeshModifiers[i].Initialize();
+				if(MeshModifiers[i].GetType().IsSubclassOf(typeof(MeshGenerationBase)))
+				{
+					InitializeWithReplacementCriteria((MeshGenerationBase)MeshModifiers[i]);
+				}
 			}
 
 			_counter = GoModifiers.Count;
@@ -114,6 +118,19 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
+		public void InitializeWithReplacementCriteria(MeshGenerationBase meshModifier)
+		{
+			List<IReplacementCriteria> replacementCriteria = new List<IReplacementCriteria>(); 
+			foreach (var goModifier in GoModifiers)
+			{
+				if (goModifier.GetType().IsSubclassOf(typeof(IReplacementCriteria)))
+				{
+					replacementCriteria.Add((IReplacementCriteria)goModifier);
+				}
+			}
+
+			meshModifier.Initialize(replacementCriteria);
+		}
 
 		public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
 		{
