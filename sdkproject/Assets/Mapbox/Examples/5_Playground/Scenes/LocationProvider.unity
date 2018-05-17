@@ -473,7 +473,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _logText: {fileID: 424127799}
-  _logToggle: {fileID: 1086928930}
+  _logToggle: {fileID: 0}
 --- !u!4 &536971212
 Transform:
   m_ObjectHideFlags: 0
@@ -1528,7 +1528,7 @@ MonoBehaviour:
   mapManager: {fileID: 1411663281}
   _deviceLocationProviderUnity: {fileID: 849657521}
   _deviceLocationProviderAndroid: {fileID: 0}
-  _editorLocationProvider: {fileID: 849657521}
+  _editorLocationProvider: {fileID: 1363590663}
   _transformLocationProvider: {fileID: 1830401242}
   _dontDestroyOnLoad: 0
 --- !u!4 &1908994634
