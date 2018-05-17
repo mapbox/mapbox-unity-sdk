@@ -13,48 +13,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Active: 1
   _options:
-    coreOptions:
-      sourceId: 
-      isActive: 1
-      sublayerName: untitled
-      geometryType: 2
-      layerName: layerName
-      snapToTerrain: 1
-      groupFeatures: 0
-      lineWidth: 1
-    filterOptions:
-      _selectedLayerName: 
-      filters: []
-      combinerType: 1
-    extrusionOptions:
-      _selectedLayerName: 
-      extrusionType: 0
-      extrusionGeometryType: 0
-      propertyName: height
-      minimumHeight: 0
-      maximumHeight: 0
-      extrusionScaleFactor: 1
-    colliderOptions:
-      colliderType: 0
-    materialOptions:
-      texturingType: 0
-      materials:
-      - Materials:
-        - {fileID: 0}
-      - Materials:
-        - {fileID: 0}
-      atlasInfo: {fileID: 0}
-      colorPalette: {fileID: 0}
-    honorBuildingIdSetting: 1
-    buildingsWithUniqueIds: 0
-    moveFeaturePositionTo: 0
-    MeshModifiers: []
-    GoModifiers: []
-    spawnPrefabOptions:
-      prefab: {fileID: 0}
-      scaleDownWithWorld: 1
-    findByType: 0
-    categories: 0
-    nameString: Name
-    coordinates: []
-    density: 15
+    prefab: {fileID: 1653056824005286, guid: 36fa8e4d748d14a079b9f98250ccf58d, type: 2}
+    scaleDownWithWorld: 1
+  LatLon:
+  - x: 37.784179
+    y: -122.401583

@@ -105,10 +105,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			for (int i = 0; i < _counter; i++)
 			{
 				MeshModifiers[i].Initialize();
-				if(MeshModifiers[i].GetType().IsSubclassOf(typeof(MeshGenerationBase)))
-				{
-					InitializeWithReplacementCriteria((MeshGenerationBase)MeshModifiers[i]);
-				}
 			}
 
 			_counter = GoModifiers.Count;
@@ -116,20 +112,30 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				GoModifiers[i].Initialize();
 			}
-		}
 
-		public void InitializeWithReplacementCriteria(MeshGenerationBase meshModifier)
-		{
-			List<IReplacementCriteria> replacementCriteria = new List<IReplacementCriteria>(); 
-			foreach (var goModifier in GoModifiers)
+			//find any replacement criteria and assign them
+			foreach ( var goModifier in GoModifiers)
 			{
-				if (goModifier.GetType().IsSubclassOf(typeof(IReplacementCriteria)))
+				if(goModifier is IReplacementCriteria)
 				{
-					replacementCriteria.Add((IReplacementCriteria)goModifier);
+					SetReplacementCriteria((IReplacementCriteria)goModifier);
 				}
 			}
+		}
 
-			meshModifier.Initialize(replacementCriteria);
+		/// <summary>
+		/// Add the replacement criteria to any mesh modifiers implementing IReplaceable
+		/// </summary>
+		/// <param name="criteria">Criteria.</param>
+		protected void SetReplacementCriteria( IReplacementCriteria criteria)
+		{
+			foreach ( var meshMod in MeshModifiers)
+			{
+				if( meshMod is IReplaceable )
+				{
+					((IReplaceable)meshMod).Criteria.Add(criteria);
+				}
+			}
 		}
 
 		public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")

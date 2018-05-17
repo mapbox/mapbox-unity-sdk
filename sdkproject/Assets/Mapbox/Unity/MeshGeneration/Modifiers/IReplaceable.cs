@@ -2,8 +2,9 @@
 
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
-	public interface IReplacable
+	public interface IReplaceable
 	{
 		List<IReplacementCriteria> Criteria { get; set; }
+
 	}
 }
