@@ -57,11 +57,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				{
 					goRectTransform.anchoredPosition3D = met;
 				}
-				//go.transform.localScale = Constants.Math.Vector3One;
+				go.transform.localScale = _options.prefab.transform.localScale;
 
 				if (_options.scaleDownWithWorld)
 				{
-					go.transform.localScale = (go.transform.localScale * (tile.TileScale));
+					go.transform.localScale  *= (tile.TileScale);
 				}
 				return;
 			}
@@ -84,17 +84,17 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				goRectTransform.anchoredPosition3D = met;
 			}
 			go.transform.SetParent(ve.GameObject.transform, false);
-			//go.transform.localScale = Constants.Math.Vector3One;
 
 			settable = go.GetComponent<IFeaturePropertySettable>();
 			if (settable != null)
 			{
 				settable.Set(ve.Feature.Properties);
 			}
+			go.transform.localScale = _options.prefab.transform.localScale;
 
 			if (_options.scaleDownWithWorld)
 			{
-				go.transform.localScale = (go.transform.localScale * (tile.TileScale));
+				go.transform.localScale *= (tile.TileScale);
 			}
 
 			if (_options.AllPrefabsInstatiated != null)

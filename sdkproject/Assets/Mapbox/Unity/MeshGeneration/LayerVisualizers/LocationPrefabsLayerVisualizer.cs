@@ -75,6 +75,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 						var prefabModifier = ScriptableObject.CreateInstance<PrefabModifier>();
 						prefabModifier.SetProperties(itemProperties.spawnPrefabOptions);
 						_defaultStack = ScriptableObject.CreateInstance<ModifierStack>();
+						(_defaultStack as ModifierStack).moveFeaturePositionTo = item.moveFeaturePositionTo;
+
 						if (_defaultStack.GoModifiers == null)
 						{
 							_defaultStack.GoModifiers = new List<GameObjectModifier>();
@@ -85,7 +87,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 						{
 							_defaultStack.MeshModifiers.Add(ScriptableObject.CreateInstance<SnapTerrainModifier>());
 						}
-
 					}
 					break;
 				default:
