@@ -35,28 +35,28 @@
 			switch (outputUnits)
 			{
 				case CheapRulerUnits.Kilometers:
-					factor = 1;
+					factor = 1.0d;
 					break;
 				case CheapRulerUnits.Miles:
-					factor = 1000 / 1609.344;
+					factor = 1000.0d / 1609.344;
 					break;
 				case CheapRulerUnits.NauticalMiles:
-					factor = 1000 / 1852;
+					factor = 1000.0d / 1852.0d;
 					break;
 				case CheapRulerUnits.Meters:
-					factor = 1000;
+					factor = 1000.0d;
 					break;
 				case CheapRulerUnits.Yards:
-					factor = 1000 / 0.9144;
+					factor = 1000.0d / 0.9144;
 					break;
 				case CheapRulerUnits.Feet:
-					factor = 1000 / 0.3048;
+					factor = 1000.0d / 0.3048;
 					break;
 				case CheapRulerUnits.Inches:
-					factor = 1000 / 0.0254;
+					factor = 1000.0d / 0.0254;
 					break;
 				default:
-					factor = 1;
+					factor = 1.0d;
 					break;
 			}
 
