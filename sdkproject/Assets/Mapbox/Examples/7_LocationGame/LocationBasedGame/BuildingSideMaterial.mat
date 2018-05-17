@@ -75,14 +75,15 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _Range: 24.33
+    - _Range: 55.2
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
+    - _Tile: 2.8
     - _UVSec: 0
     - _ZWrite: 1
     - __dirty: 0
     m_Colors:
-    - _CharacterPosition: {r: 0, g: 0, b: 0, a: 0}
+    - _CharacterPosition: {r: 11.47, g: 0, b: 64.03, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0.5131844, b: 0.64705884, a: 1}
