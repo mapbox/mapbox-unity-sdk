@@ -9,7 +9,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 420705c61d1b6435c8aa7b1cbd0ce80a, type: 3}
-  m_Name: LocationProviderSpawnTreeModifier
+  m_Name: LocationGameSpawnTreeModifier
   m_EditorClassIdentifier: 
   Active: 1
   _spawnRateInSquareMeters: 20
