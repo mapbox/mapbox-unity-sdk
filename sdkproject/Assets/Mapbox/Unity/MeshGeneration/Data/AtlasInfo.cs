@@ -20,12 +20,12 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public float FloorHeight;
 		public float FirstFloorHeight;
 		public float TopFloorHeight;
-
-		public float bottomOfTopUv;
-		public float topOfMidUv;
-		public float topOfBottomUv;
-		public float midUvHeight;
-		public float WallToFloorRatio;
+		
+		[HideInInspector] public float bottomOfTopUv;
+		[HideInInspector] public float topOfMidUv;
+		[HideInInspector] public float topOfBottomUv;
+		[HideInInspector] public float midUvHeight;
+		[HideInInspector] public float WallToFloorRatio;
 
 		public void CalculateParameters()
 		{
