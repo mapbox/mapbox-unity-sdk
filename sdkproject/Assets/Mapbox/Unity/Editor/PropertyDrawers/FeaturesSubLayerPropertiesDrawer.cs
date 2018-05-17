@@ -225,8 +225,8 @@
 					subLayerFilterOptions.FindPropertyRelative("filters").ClearArray();
 					subLayerFilterOptions.FindPropertyRelative("combinerType").enumValueIndex =
 						(int)LayerFilterCombinerOperationType.Any;
-					
-					var subLayerGeometryMaterialOptions = subLayer.FindPropertyRelative("geometryMaterialOptions");
+
+					var subLayerGeometryMaterialOptions = subLayer.FindPropertyRelative("materialOptions");
 					subLayerGeometryMaterialOptions.FindPropertyRelative("style").enumValueIndex = (int)StyleTypes.Realistic;
 
 					GeometryMaterialOptions geometryMaterialOptionsReference = MapboxDefaultStyles.GetDefaultAssets();
@@ -237,8 +237,14 @@
 					var topMatArray = mats.GetArrayElementAtIndex(0).FindPropertyRelative("Materials");
 					var sideMatArray = mats.GetArrayElementAtIndex(1).FindPropertyRelative("Materials");
 
-					topMatArray.arraySize = 1;
-					sideMatArray.arraySize = 1;
+					if (topMatArray.arraySize == 0)
+					{
+						topMatArray.arraySize = 1;
+					}
+					if (sideMatArray.arraySize == 0)
+					{
+						sideMatArray.arraySize = 1;
+					}
 
 					var topMat = topMatArray.GetArrayElementAtIndex(0);
 					var sideMat = sideMatArray.GetArrayElementAtIndex(0);
@@ -334,7 +340,7 @@
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("colliderOptions"));
 				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
-				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("geometryMaterialOptions"));
+				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
 			}
 
 			EditorGUI.indentLevel--;

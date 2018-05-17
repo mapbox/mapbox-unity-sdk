@@ -111,7 +111,7 @@
 					}
 
 					var lineStyleMod = CreateInstance<MaterialModifier>();
-					lineStyleMod.SetProperties(MapboxDefaultStyles.GetGeometryMaterialOptions(_layerProperties.geometryMaterialOptions));
+					lineStyleMod.SetProperties(MapboxDefaultStyles.GetGeometryMaterialOptions(_layerProperties.materialOptions));
 					defaultGOModifierStack.Add(lineStyleMod);
 
 					break;
@@ -122,7 +122,7 @@
 					}
 					defaultMeshModifierStack.Add(CreateInstance<PolygonMeshModifier>());
 
-					GeometryMaterialOptions geometryMaterialOptions = MapboxDefaultStyles.GetGeometryMaterialOptions(_layerProperties.geometryMaterialOptions);
+					GeometryMaterialOptions geometryMaterialOptions = MapboxDefaultStyles.GetGeometryMaterialOptions(_layerProperties.materialOptions);
 
 					UVModifierOptions uvModOptions = new UVModifierOptions();
 					uvModOptions.texturingType = geometryMaterialOptions.texturingType;
