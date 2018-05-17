@@ -144,7 +144,7 @@ namespace Mapbox.Unity.Location
 		[System.Diagnostics.Conditional("UNITY_EDITOR")]
 		void InjectEditorLocationProvider()
 		{
-			Debug.Log("LocationProviderFactory: " + "Injected EDITOR Location Provider");
+			Debug.LogFormat("LocationProviderFactory: Injected EDITOR Location Provider - {0}", _editorLocationProvider.GetType());
 			DefaultLocationProvider = _editorLocationProvider;
 		}
 
@@ -170,12 +170,12 @@ namespace Mapbox.Unity.Location
 				&& AndroidApiVersion >= 24
 			)
 			{
-				Debug.Log("LocationProviderFactory: " + "Injected native Android DEVICE Location Provider");
+				Debug.LogFormat("LocationProviderFactory: Injected native Android DEVICE Location Provider - {0}", _deviceLocationProviderAndroid.GetType());
 				DefaultLocationProvider = _deviceLocationProviderAndroid;
 			}
 			else
 			{
-				Debug.Log("LocationProviderFactory: " + "Injected DEVICE Location Provider");
+				Debug.LogFormat("LocationProviderFactory: Injected DEVICE Location Provider - {0}", _deviceLocationProviderUnity.GetType());
 				DefaultLocationProvider = _deviceLocationProviderUnity;
 			}
 		}
