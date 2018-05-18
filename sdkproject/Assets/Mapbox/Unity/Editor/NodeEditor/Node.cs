@@ -85,6 +85,8 @@ namespace Mapbox.Editor.NodeEditor
 			var inlabel = "";
 			if (ScriptableObject is VectorSubLayerProperties)
 				inlabel = (ScriptableObject as VectorSubLayerProperties).coreOptions.sublayerName;
+			if (ScriptableObject is PrefabItemOptions)
+				inlabel = (ScriptableObject as PrefabItemOptions).coreOptions.sublayerName;
 			inPoint = new ConnectionPoint(this, inlabel, "", 20, ConnectionPointType.In, NodeBasedEditor.inPointStyle);
 		}
 
@@ -115,6 +117,18 @@ namespace Mapbox.Editor.NodeEditor
 			if (so != null)
 			{
 				inPoint.inLabel = so.coreOptions.sublayerName;
+				inPoint.Draw();
+			}
+			else
+			{
+				if (!_isRoot)
+					inPoint.Draw();
+			}
+
+			var prefabItemObj = ScriptableObject as PrefabItemOptions;
+			if (prefabItemObj != null)
+			{
+				inPoint.inLabel = prefabItemObj.coreOptions.sublayerName;
 				inPoint.Draw();
 			}
 			else
@@ -295,6 +309,21 @@ namespace Mapbox.Editor.NodeEditor
 							if (val is List<VectorSubLayerProperties>)
 							{
 								foreach (VectorSubLayerProperties listitem in val as IEnumerable)
+								{
+									//var prop = new SerializedObject(listitem);
+									var cc = new ConnectionPoint(this, "", listitem.coreOptions.sublayerName, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle, listitem);
+
+									ConnectionPoints.Add(cc);
+									_propCount++;
+									var newNode = new Node(listitem);
+									Children.Add(newNode);
+									newNode.Connections.Add(new Connection(newNode.inPoint, cc));
+									newNode.Dive(listitem, showModifiers, depth + 1);
+								}
+							}
+							else if (val is List<PrefabItemOptions>)
+							{
+								foreach (PrefabItemOptions listitem in val as IEnumerable)
 								{
 									//var prop = new SerializedObject(listitem);
 									var cc = new ConnectionPoint(this, "", listitem.coreOptions.sublayerName, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle, listitem);

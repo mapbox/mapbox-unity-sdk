@@ -230,7 +230,16 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				case ExtrusionType.MaxHeight:
 					if (feature.Properties.ContainsKey(_options.propertyName))
 					{
-						maxHeight = Convert.ToSingle(feature.Properties[_options.propertyName]);
+						try
+						{
+							maxHeight = Convert.ToSingle(feature.Properties[_options.propertyName]);
+						}
+						catch (Exception)
+						{
+							Debug.LogError("Property: '" + _options.propertyName + "' must contain a numerical value for extrusion.");
+							return;
+						}
+
 						if (feature.Properties.ContainsKey("min_height"))
 						{
 							minHeight = Convert.ToSingle(feature.Properties["min_height"]);
@@ -248,7 +257,18 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 							_options.minimumHeight = _options.maximumHeight;
 							_options.maximumHeight = temp;
 						}
-						var featureHeight = Convert.ToSingle(feature.Properties[_options.propertyName]);
+
+						float featureHeight;
+						try
+						{
+							featureHeight = Convert.ToSingle(feature.Properties[_options.propertyName]);
+						}
+						catch (Exception)
+						{
+							Debug.LogError("Property: '" + _options.propertyName + "' must contain a numerical value for extrusion.");
+							return;
+						}
+
 						maxHeight = Math.Min(Math.Max(_options.minimumHeight, featureHeight), _options.maximumHeight);
 						if (feature.Properties.ContainsKey("min_height"))
 						{

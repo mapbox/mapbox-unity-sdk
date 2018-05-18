@@ -21,7 +21,7 @@
 		public TileErrorEvent OnTileError;
 
 
-		void OnEnable()
+		protected virtual void OnEnable()
 		{
 			if (_mapInstance == null)
 			{
@@ -83,7 +83,7 @@
 		}
 
 
-		void OnDisable()
+		protected virtual void OnDisable()
 		{
 			_mapInstance.MapVisualizer.OnTileError -= _OnTileErrorHandler;
 		}

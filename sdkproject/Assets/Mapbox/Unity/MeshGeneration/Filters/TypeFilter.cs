@@ -278,7 +278,14 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 
 		protected override bool PropertyComparer(object property)
 		{
-			return ValueSet.Contains(property.ToString().ToLower());
+			foreach (var value in ValueSet)
+			{
+				if (property.ToString().ToLower().Contains(value.ToString()))
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 
@@ -287,6 +294,9 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 	{
 		[Tooltip("Name of the property to use as key. This property is case sensitive.")]
 		public string Key;
+		[SerializeField]
+		[Tooltip("Description of the property defined as key.")]
+		private string KeyDescription;
 		[Tooltip("Value to match using the operator. ")]
 		public string PropertyValue = string.Empty;
 		[Tooltip("Value to match using the operator. ")]
