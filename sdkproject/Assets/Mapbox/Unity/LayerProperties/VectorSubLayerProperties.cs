@@ -23,7 +23,7 @@
 			colliderType = ColliderType.None,
 		};
 
-		public GeometryMaterialOptions geometryMaterialOptions = new GeometryMaterialOptions();
+		public GeometryMaterialOptions materialOptions = new GeometryMaterialOptions();
 
 		//HACK : workaround to avoid users accidentaly leaving the buildingsWithUniqueIds settign on and have missing buildings. 
 		public bool honorBuildingIdSetting = true;

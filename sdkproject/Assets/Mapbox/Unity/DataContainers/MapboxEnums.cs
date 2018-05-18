@@ -74,13 +74,11 @@
 	public enum UvMapType
 	{
 		[Description("Use image texture using tiled UV.")]
-		Tiled,
-		//[Description("Use image texture from the Imagery source as texture for roofs. ")]
-		//Satellite,
+		Tiled = 0,
 		[Description("Use an image texture atlas to define textures for roof & sides of buildings.")]
-		Atlas,
+		Atlas = 2,
 		[Description("Use an image texture atlas and a color pallete to define textures for roof & sides of buildings.")]
-		AtlasWithColorPalette,
+		AtlasWithColorPalette = 3,
 	}
 
 	public enum ImagerySourceType
@@ -177,18 +175,20 @@
 		SphereCollider,
 	}
 
-	public enum MapFeatureType 
-	{ 
+	public enum MapFeatureType
+	{
 		[Description("Building Layer.")]
 		Building,
 		[Description("Road Layer.")]
 		Road,
 		[Description("Parkland Layer.")]
-		Parkland, 
+		Parkland,
 	};
 
 	public enum StyleTypes
 	{
+		[Description("Custom style.")]
+		Custom,
 		[Description("Simple style.")]
 		Simple,
 		[Description("Light style.")]
@@ -201,8 +201,7 @@
 		Fantasy,
 		[Description("Satellite style.")]
 		Satellite,
-		[Description("Custom style.")]
-		Custom,
+
 	}
 
 	public enum LocationPrefabFindBy
