@@ -6,6 +6,8 @@
 	using System;
 	using Mapbox.Unity.Map;
 	using Mapbox.Utils;
+	using Mapbox.Unity.Utilities;
+	using Mapbox.VectorTile.Geometry;
 
 
 	/// <summary>
@@ -19,7 +21,15 @@
 
 		public bool ShouldReplaceFeature( VectorFeatureUnity feature )
 		{
-			return true;
+			foreach( var point in LatLon )
+			{
+				if (feature.ContainsLatLon(point))
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		public override void Run(VectorEntity ve, UnityTile tile)
@@ -29,5 +39,7 @@
 				base.Run(ve, tile);
 			}
 		}
+
+
 	}
 }

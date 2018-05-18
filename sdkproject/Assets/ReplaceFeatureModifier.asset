@@ -14,7 +14,7 @@ MonoBehaviour:
   Active: 1
   _options:
     prefab: {fileID: 1653056824005286, guid: 36fa8e4d748d14a079b9f98250ccf58d, type: 2}
-    scaleDownWithWorld: 1
+    scaleDownWithWorld: 0
   LatLon:
-  - x: 37.784179
-    y: -122.401583
+  - x: 37.786286
+    y: -122.401364
