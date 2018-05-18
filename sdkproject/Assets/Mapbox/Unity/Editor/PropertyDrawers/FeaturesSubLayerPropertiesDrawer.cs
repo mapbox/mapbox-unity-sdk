@@ -384,21 +384,6 @@
 
 				EditorGUILayout.Space();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 				EditorGUILayout.LabelField(new GUIContent
 				{
 					text = "Mesh Modifiers",
@@ -419,11 +404,6 @@
 
 					EditorGUILayout.EndVertical();
 
-					//if (GUILayout.Button(new GUIContent("+"), (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
-					//{
-					//	ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac, ind);
-					//}
-
 					if (GUILayout.Button(new GUIContent("x"), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
 					{
 						meshfac.DeleteArrayElementAtIndex(ind);
@@ -440,48 +420,18 @@
 				Rect buttonRect = GUILayoutUtility.GetLastRect();
 				if (GUILayout.Button(new GUIContent("Add New"), (GUIStyle)"minibuttonleft"))
 				{
-					PopupWindow.Show(buttonRect, new PopupExample(typeof(MeshModifier), meshfac));
-					if (Event.current.type == EventType.Repaint) buttonRect = GUILayoutUtility.GetLastRect();
-
-
-					//meshfac.arraySize++;
-					//meshfac.GetArrayElementAtIndex(meshfac.arraySize - 1).objectReferenceValue = null;
+					PopupWindow.Show(buttonRect, new PopupSelectionMenu(typeof(MeshModifier), meshfac));
+					//if (Event.current.type == EventType.Repaint) buttonRect = GUILayoutUtility.GetLastRect();
 				}
 
-				if (GUILayout.Button(new GUIContent("Add existing"), (GUIStyle)"minibuttonright"))
+				if (GUILayout.Button(new GUIContent("Add Existing"), (GUIStyle)"minibuttonright"))
 				{
 					ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac);
 				}
 
-				//Rect buttonRect = GUILayoutUtility.GetLastRect();
-				//if (GUILayout.Button(new GUIContent("Add Modifier")))
-				//if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
-				//{
-					//PopupWindow.Show(buttonRect, new PopupExample(typeof(MeshModifier), meshfac));
-					//if (Event.current.type == EventType.Repaint) buttonRect = GUILayoutUtility.GetLastRect();
-					//ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac);
-				//}
-
 				EditorGUILayout.EndHorizontal();
 				EditorGUI.indentLevel--;
 				EditorGUILayout.Space();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 				EditorGUILayout.LabelField(new GUIContent
 				{
@@ -500,11 +450,6 @@
 							false) as ScriptableObject;
 					EditorGUILayout.EndVertical();
 
-					//if (GUILayout.Button(new GUIContent("+"), (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
-					//{
-					//	ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac, ind);
-					//}
-
 					if (GUILayout.Button(new GUIContent("x"), GUILayout.Width(30)))
 					{
 						gofac.DeleteArrayElementAtIndex(ind);
@@ -518,16 +463,14 @@
 				EditorGUI.indentLevel++;
 				EditorGUILayout.BeginHorizontal();
 				GUILayout.Space(EditorGUI.indentLevel * 12);
+				buttonRect = GUILayoutUtility.GetLastRect();
 				if (GUILayout.Button(new GUIContent("Add New"), (GUIStyle)"minibuttonleft"))
 				{
-					PopupWindow.Show(buttonRect, new PopupExample(typeof(GameObjectModifier), gofac));
-					if (Event.current.type == EventType.Repaint) buttonRect = GUILayoutUtility.GetLastRect();
-					//gofac.arraySize++;
-					//gofac.GetArrayElementAtIndex(gofac.arraySize - 1).objectReferenceValue = null;
+					PopupWindow.Show(buttonRect, new PopupSelectionMenu(typeof(GameObjectModifier), gofac));
+					//if (Event.current.type == EventType.Repaint) buttonRect = GUILayoutUtility.GetLastRect();
 				}
 				//EditorWindow.Repaint();
-				buttonRect = GUILayoutUtility.GetLastRect();
-				//if (GUILayout.Button(new GUIContent("Add Modifier")))
+				//buttonRect = GUILayoutUtility.GetLastRect();
 				if (GUILayout.Button(new GUIContent("Add Existing"), (GUIStyle)"minibuttonright"))
 				{
 					
