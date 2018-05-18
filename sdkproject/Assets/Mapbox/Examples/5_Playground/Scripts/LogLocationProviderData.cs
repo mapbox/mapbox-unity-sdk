@@ -39,6 +39,10 @@ namespace Mapbox.Examples.Scripts
 			{
 				Debug.LogError("no logtoggle attached, cannot log");
 			}
+			if (null == _logText)
+			{
+				Debug.LogError("no text to log to");
+			}
 		}
 
 
@@ -68,9 +72,13 @@ namespace Mapbox.Examples.Scripts
 			sb.AppendLine(string.Format(_invariantCulture, "device orientation: {0:0.0}°", location.DeviceOrientation));
 			sb.AppendLine(nullableAsStr<float>(location.SpeedKmPerHour, "speed: {0:0.0}km/h"));
 			sb.AppendLine(nullableAsStr<bool>(location.HasGpsFix, "HasGpsFix: {0}"));
-			sb.AppendLine(nullableAsStr<int>(location.SatellitesUsed, "SatellitesUsed:{0} ") + nullableAsStr<int>(location.SatellitesInView, "SatellitesInView:{0}"));
+			sb.AppendLine(nullableAsStr<int>(location.SatellitesUsed, "SatellitesUsed:{0} "));
+			sb.AppendLine(nullableAsStr<int>(location.SatellitesInView, "SatellitesInView:{0}"));
 
-			_logText.text = sb.ToString();
+			if (null != _logText)
+			{
+				_logText.text = sb.ToString();
+			}
 
 
 			/////////////// file logging //////////////////////
