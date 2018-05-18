@@ -17,14 +17,15 @@
 	public class ReplaceFeatureModifier : PrefabModifier, IReplacementCriteria
 	{
 		[SerializeField]
-		private List<Vector2d> LatLon;
-		private List<Vector2d> _latLonToSpawn;
+		[Geocode]
+		private List<string> LatLon;
+		private List<string> _latLonToSpawn;
 
 		public override void Initialize()
 		{
 			base.Initialize();
 			//duplicate the list of lat/lons to track which coordinates have already been spawned
-			_latLonToSpawn = new List<Vector2d>(LatLon);
+			_latLonToSpawn = new List<string>(LatLon);
 		}
 
 		/// <summary>
@@ -36,7 +37,8 @@
 		{
 			foreach( var point in LatLon )
 			{
-				if (feature.ContainsLatLon(point))
+				var coord = Conversions.StringToLatLon(point);
+				if (feature.ContainsLatLon(coord))
 				{
 					return true;
 				}
@@ -63,7 +65,8 @@
 		{
 			foreach (var point in _latLonToSpawn)
 			{
-				if (feature.ContainsLatLon(point))
+				var coord = Conversions.StringToLatLon(point);
+				if (feature.ContainsLatLon(coord))
 				{
 					_latLonToSpawn.Remove(point);
 					return true;
