@@ -31,8 +31,14 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void Run(VectorEntity ve, UnityTile tile)
 		{
-			int selpos = ve.Feature.Points[0].Count / 2;
-			var met = ve.Feature.Points[0][selpos];
+			//int selpos = ve.Feature.Points[0].Count / 2;
+			var met = new Vector3();
+			foreach( var point in ve.Feature.Points[0])
+			{
+				met += point;
+			}
+			met = met / ve.Feature.Points[0].Count;
+
 			RectTransform goRectTransform;
 			IFeaturePropertySettable settable = null;
 			GameObject go;

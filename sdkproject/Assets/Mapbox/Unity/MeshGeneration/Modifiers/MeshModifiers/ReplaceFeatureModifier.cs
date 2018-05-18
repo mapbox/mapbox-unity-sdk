@@ -18,7 +18,20 @@
 	{
 		[SerializeField]
 		private List<Vector2d> LatLon;
+		private List<Vector2d> _latLonToSpawn;
 
+		public override void Initialize()
+		{
+			base.Initialize();
+			//duplicate the list of lat/lons to track which coordinates have already been spawned
+			_latLonToSpawn = new List<Vector2d>(LatLon);
+		}
+
+		/// <summary>
+		/// Check the feature against the list of lat/lons in the modifier
+		/// </summary>
+		/// <returns><c>true</c>, if the feature overlaps with a lat/lon in the modifier <c>false</c> otherwise.</returns>
+		/// <param name="feature">Feature.</param>
 		public bool ShouldReplaceFeature( VectorFeatureUnity feature )
 		{
 			foreach( var point in LatLon )
@@ -34,10 +47,30 @@
 
 		public override void Run(VectorEntity ve, UnityTile tile)
 		{
-			if(ShouldReplaceFeature(ve.Feature))
+			//replace the feature only once per lat/lon
+			if(ShouldSpawnFeature(ve.Feature))
 			{
 				base.Run(ve, tile);
 			}
+		}
+
+		/// <summary>
+		/// Checks if the feature should be used to spawn a prefab, once per lat/lon
+		/// </summary>
+		/// <returns><c>true</c>, if the feature should be spawned <c>false</c> otherwise.</returns>
+		/// <param name="feature">Feature.</param>
+		private bool ShouldSpawnFeature(VectorFeatureUnity feature)
+		{
+			foreach (var point in _latLonToSpawn)
+			{
+				if (feature.ContainsLatLon(point))
+				{
+					_latLonToSpawn.Remove(point);
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 
