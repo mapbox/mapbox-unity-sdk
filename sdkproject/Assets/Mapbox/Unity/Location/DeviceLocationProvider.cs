@@ -273,6 +273,7 @@ namespace Mapbox.Unity.Location
 
 						float weightSum = actualWeights.Sum();
 						finalHeading /= weightSum;
+						finalHeading -= 180; //fix heading to have 0° for north, 90° for east, 180° for south and 270° for west
 						// stay within [0..359] no negative angles
 						if (finalHeading < 0) { finalHeading += 360; }
 

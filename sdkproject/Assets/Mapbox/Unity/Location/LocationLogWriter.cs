@@ -32,6 +32,7 @@ namespace Mapbox.Unity.Location
 
 		private bool _disposed;
 		private TextWriter _textWriter;
+		private long _lineCount = 0;
 
 
 		#region idisposable
@@ -56,6 +57,7 @@ namespace Mapbox.Unity.Location
 			{
 				if (disposeManagedResources)
 				{
+					Debug.LogFormat("{0} locations logged", _lineCount);
 					if (null != _textWriter)
 					{
 						_textWriter.Flush();
@@ -95,6 +97,7 @@ namespace Mapbox.Unity.Location
 					nullableAsStr<int>(location.SatellitesInView, "{0}")
 			};
 
+			_lineCount++;
 			string logMsg = string.Join(Delimiter, lineTokens);
 			Debug.Log(logMsg);
 			_textWriter.WriteLine(logMsg);

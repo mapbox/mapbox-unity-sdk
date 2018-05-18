@@ -35,6 +35,10 @@ namespace Mapbox.Examples.Scripts
 			{
 				_logToggle.onValueChanged.AddListener((isOn) => { _logToFile = isOn; });
 			}
+			else
+			{
+				Debug.LogError("no logtoggle attached, cannot log");
+			}
 		}
 
 
@@ -74,6 +78,7 @@ namespace Mapbox.Examples.Scripts
 			// start logging to file
 			if (_logToFile && null == _logWriter)
 			{
+				Debug.Log("--- about to start logging to file ---");
 				_logWriter = new LocationLogWriter();
 				_logToggle.GetComponentInChildren<Text>().text = "stop logging";
 			}
@@ -82,7 +87,7 @@ namespace Mapbox.Examples.Scripts
 			// stop logging to file
 			if (!_logToFile && null != _logWriter)
 			{
-				Debug.Log("stop logging to file");
+				Debug.Log("--- about to stop logging to file ---");
 				_logToggle.GetComponentInChildren<Text>().text = "start logging";
 				closeLogWriter();
 			}

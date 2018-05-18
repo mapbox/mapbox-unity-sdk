@@ -473,7 +473,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _logText: {fileID: 424127799}
-  _logToggle: {fileID: 0}
+  _logToggle: {fileID: 1086928930}
 --- !u!4 &536971212
 Transform:
   m_ObjectHideFlags: 0
