@@ -11,6 +11,7 @@ namespace Mapbox.Unity.Utilities
 	using Mapbox.Utils;
 	using UnityEngine;
 	using System.Globalization;
+	using Mapbox.Unity.MeshGeneration.Data;
 
 	/// <summary>
 	/// A set of Geo and Terrain Conversion utils.
@@ -217,7 +218,7 @@ namespace Mapbox.Unity.Utilities
 		/// <param name="coordinate">Coordinate.</param>
 		/// <param name="tileZoom">The zoom level of the tile.</param>
 		/// <param name="layerExtent">Layer extent. Optional, but recommended. Defaults to 4096, the standard for Mapbox Tiles</param>
-		public static Vector3 LatitudeLongitudeToVectorTilePosition(Vector2d coordinate, int tileZoom, ulong layerExtent = 4096)
+		public static Vector2 LatitudeLongitudeToVectorTilePosition(Vector2d coordinate, int tileZoom, ulong layerExtent = 4096)
 		{
 			var coordinateTileId = Conversions.LatitudeLongitudeToTileId(
 				coordinate.x, coordinate.y, tileZoom);
@@ -225,12 +226,15 @@ namespace Mapbox.Unity.Utilities
 			var _rect = Conversions.TileBounds(coordinateTileId);
 
 			//vectortile space point (0 - layerExtent)
-			var vectorTilePoint = new Vector3((float)((_meters - _rect.Min).x / _rect.Size.x) * layerExtent,
-									0,
-			                                  (float)((_meters - _rect.Max).y / _rect.Size.y) * layerExtent
-								   );
+			var vectorTilePoint = new Vector2((float)((_meters - _rect.Min).x / _rect.Size.x) * layerExtent,
+			                                  (float)(layerExtent - ((_meters - _rect.Max).y / _rect.Size.y) * layerExtent));
 
 			return vectorTilePoint;
+		}
+
+		public static Vector2 LatitudeLongitudeToUnityTilePosition(Vector2d coordinate, UnityTile tile, ulong layerExtent = 4096)
+		{
+			return LatitudeLongitudeToUnityTilePosition(coordinate, tile.InitialZoom, tile.TileScale, layerExtent);
 		}
 
 		/// <summary>
@@ -241,7 +245,7 @@ namespace Mapbox.Unity.Utilities
 		/// <param name="tileZoom">The zoom level of the tile.</param>
 		/// <param name="tileScale">Tile scale. Optional, but recommended. Defaults to a scale of 1.</param>
 		/// <param name="layerExtent">Layer extent. Optional, but recommended. Defaults to 4096, the standard for Mapbox Tiles</param>
-		public static Vector3 LatitudeLongitudeToUnityTilePosition(Vector2d coordinate, int tileZoom, float tileScale, ulong layerExtent = 4096)
+		public static Vector2 LatitudeLongitudeToUnityTilePosition(Vector2d coordinate, int tileZoom, float tileScale, ulong layerExtent = 4096)
 		{
 			var coordinateTileId = Conversions.LatitudeLongitudeToTileId(
 				coordinate.x, coordinate.y, tileZoom);
@@ -251,10 +255,8 @@ namespace Mapbox.Unity.Utilities
 			var vectorTilePoint = LatitudeLongitudeToVectorTilePosition(coordinate, tileZoom, layerExtent);
 
 			//UnityTile space
-			var unityTilePoint = new Vector3((float)(vectorTilePoint.x / layerExtent * _rect.Size.x - (_rect.Size.x / 2)) * tileScale,
-										0,
-			                                 (float)((vectorTilePoint.z) / layerExtent * _rect.Size.y - (_rect.Size.y / 2)) * tileScale
-									   );
+			var unityTilePoint = new Vector2((float)(vectorTilePoint.x / layerExtent * _rect.Size.x - (_rect.Size.x / 2)) * tileScale,
+			                                 (float)((layerExtent - vectorTilePoint.y) / layerExtent * _rect.Size.y - (_rect.Size.y / 2)) * tileScale);
 
 			return unityTilePoint;
 		}
