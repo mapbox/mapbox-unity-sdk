@@ -99,6 +99,10 @@
 
 		protected virtual void Awake()
 		{
+			// safe measures to not run when disabled or not selected as location provider
+			if (!enabled) { return; }
+			if (!transform.gameObject.activeInHierarchy) { return; }
+
 
 			_wait1sec = new WaitForSeconds(1);
 			_wait5sec = new WaitForSeconds(5);

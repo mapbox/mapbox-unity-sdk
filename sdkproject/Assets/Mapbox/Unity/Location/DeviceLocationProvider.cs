@@ -173,10 +173,12 @@ namespace Mapbox.Unity.Location
 				var timestamp = lastData.timestamp;
 
 				///////////////////////////////
-				// oh boy, Unity what are you doing
-				// on some devices: 
+				// oh boy, Unity what are you doing???
+				// on some devices it seems that
+				// Input.location.status != LocationServiceStatus.Running
+				// nevertheless new location is available
 				//////////////////////////////
-				Debug.LogFormat("Input.location.status: {0}", Input.location.status);
+				//Debug.LogFormat("Input.location.status: {0}", Input.location.status);
 				_currentLocation.IsLocationServiceEnabled =
 					Input.location.status == LocationServiceStatus.Running
 					|| timestamp > _lastLocationTimestamp;
