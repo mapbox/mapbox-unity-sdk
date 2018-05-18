@@ -8,8 +8,8 @@ Material:
   m_PrefabInternal: {fileID: 0}
   m_Name: GameHeavyTrafficMat
   m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
-  m_ShaderKeywords: _ALPHABLEND_ON _EMISSION
-  m_LightmapFlags: 1
+  m_ShaderKeywords: _ALPHABLEND_ON _NORMALMAP _PARALLAXMAP
+  m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: 3000
@@ -20,7 +20,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BumpMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: c1eca697f699f2244ac7c55b7f5ea199, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -36,17 +36,17 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
-        m_Texture: {fileID: 2800000, guid: 08ac86f8a8ee3e4408ccd95957fca9b9, type: 3}
-        m_Scale: {x: 1, y: 0.38}
-        m_Offset: {x: 0, y: 0}
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 0.3}
+        m_Offset: {x: 0, y: 4.513877}
     - _Illum:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 809f63cdf714b3240bad881e32711bb8, type: 3}
-        m_Scale: {x: 1, y: 0.38}
-        m_Offset: {x: 0, y: 1649.3804}
+        m_Texture: {fileID: 2800000, guid: e085a9121904c9b489f2cab3ee5c17c0, type: 3}
+        m_Scale: {x: 1, y: 0.3}
+        m_Offset: {x: 0, y: 38.166946}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -56,11 +56,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 12e7d749f709dcd4791267fa7bbebc85, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _BumpScale: 1
+    - _BumpScale: 3.7
     - _Cutoff: 0
     - _DetailNormalMapScale: 1
     - _DstBlend: 10
@@ -68,15 +68,15 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0
     - _GlossyReflections: 1
-    - _Metallic: 0.288
+    - _Metallic: 0.12
     - _Mode: 2
     - _OcclusionStrength: 1
-    - _Parallax: 0.02
+    - _Parallax: 0.08
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 5
     - _UVSec: 0
     - _ZWrite: 0
     m_Colors:
-    - _Color: {r: 1, g: 0.5586207, b: 0, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

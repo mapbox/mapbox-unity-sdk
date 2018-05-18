@@ -84,6 +84,6 @@ Material:
     - _ZWrite: 1
     - __dirty: 0
     m_Colors:
-    - _CharacterPosition: {r: 11.47, g: 0, b: 64.03, a: 0}
+    - _CharacterPosition: {r: -1.1557493, g: 0, b: -8.39369, a: 0}
     - _Color: {r: 0.014705896, g: 0.014705896, b: 0.014705896, a: 1}
     - _EmissionColor: {r: 0.022058845, g: 0.022058845, b: 0.022058845, a: 1}
