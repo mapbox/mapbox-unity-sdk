@@ -1,4 +1,12 @@
 ## CHANGELOG
+ ### v.1.4.3
+*??/??/2018*
+##### New Features
+##### Improvements
+##### Bug Fixes
+- Fix issue with UvModifier where it calculates roof uv positions wrong
+
+
  ### v.1.4.2
 *05/14/2018*
 
@@ -26,13 +34,13 @@
   - Factories register to events in DataFetchers
 -  `Layer Name` , `Extrusion Property Name` and `Filter Key` are now selectable dropdowns indicating the layers and properties available in the current `Data Source`. Layers and properties no longer require manual string entry.
 
-#### Bug Fixes
+##### Bug Fixes
 - Added checks to prevent NRE in `GeocodeAttributeSearchWindow` when searching with an invalid token or no connection.
 - Fix issue where side wall mesh generation did not work with elevated terrain.
 - Fix issue with scaling prefabs for POI's. Enables correct scaling of objects with map.
 - Fix issue with data fetcher where it didn't handle failed connections properly and caused IndexOutOfRangeException 
 
-#### Known Issues
+##### Known Issues
 - `Filters` with empty key or value parameters will exclude all features in a layer.
 -  SDK will throw `[Physics.PhysX] cleaning the mesh failed` error if a MapFeature is used with the following options: {Primitive Type: `Line`, LayerName: `Road`, Collider Type: `Mesh Collider`}
 
