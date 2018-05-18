@@ -38,8 +38,12 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
+			if (md.Vertices.Count == 0 || feature == null || feature.Points.Count < 1)
+				return;
+			
 			_uv.Clear();
 			_mdVertexCount = md.Vertices.Count;
+			
 			_size = md.TileRect.Size;
 
 			if (_options.texturingType != UvMapType.Atlas && _options.texturingType != UvMapType.AtlasWithColorPalette)
@@ -64,6 +68,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				_currentFacade = _options.atlasInfo.Roofs[UnityEngine.Random.Range(0, _options.atlasInfo.Roofs.Count)];
 
 				float minx = float.MaxValue, miny = float.MaxValue, maxx = float.MinValue, maxy = float.MinValue;
+
 				_textureUvCoordinates = new Vector2[_mdVertexCount];
 				_textureDirection = Quaternion.FromToRotation((md.Vertices[_mdVertexCount - 2] - md.Vertices[0]), Mapbox.Unity.Constants.Math.Vector3Right);
 				_textureUvCoordinates[0] = new Vector2(0, 0);
