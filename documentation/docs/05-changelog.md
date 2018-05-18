@@ -1,10 +1,11 @@
-## CHANGELOG
+﻿## CHANGELOG
  ### v.1.4.3
 *??/??/2018*
 ##### New Features
 ##### Improvements
 ##### Bug Fixes
-- Fix issue with UvModifier where it calculates roof uv positions wrong
+- Fix issue with UvModifier which caused wrong roof uv positions calculations.
+- Fix issue with data fetcher to handle failed connections properly, which caused IndexOutOfRangeException during tile loading/unloading.
 
 
  ### v.1.4.2
@@ -38,7 +39,6 @@
 - Added checks to prevent NRE in `GeocodeAttributeSearchWindow` when searching with an invalid token or no connection.
 - Fix issue where side wall mesh generation did not work with elevated terrain.
 - Fix issue with scaling prefabs for POI's. Enables correct scaling of objects with map.
-- Fix issue with data fetcher where it didn't handle failed connections properly and caused IndexOutOfRangeException 
 
 ##### Known Issues
 - `Filters` with empty key or value parameters will exclude all features in a layer.
