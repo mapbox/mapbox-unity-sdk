@@ -340,10 +340,11 @@
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("colliderOptions"));
 				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
+				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
 			}
 
-			EditorGUI.indentLevel--;
+			//EditorGUI.indentLevel--;
 			ShowOthers = EditorGUILayout.Foldout(ShowOthers, "Advanced");
 			EditorGUI.indentLevel++;
 			if (ShowOthers)

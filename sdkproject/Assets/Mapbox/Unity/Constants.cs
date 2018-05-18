@@ -67,6 +67,7 @@ namespace Mapbox.Unity
 			{
 				public static readonly GUIStyle EDITOR_NOTE_STYLE = new GUIStyle { wordWrap = true, normal = { textColor = Colors.EDITOR_NOTE_COLOR } };
 				public static readonly GUIStyle EDITOR_TEXTURE_STYLE_DESCRIPTION_STYLE = new GUIStyle { wordWrap = true, normal = { textColor = Colors.EDITOR_TEXT_COLOR } };
+				public static readonly GUIStyle EDITOR_TEXTURE_THUMBNAIL_STYLE = new GUIStyle { imagePosition = ImagePosition.ImageOnly, wordWrap = true };
 			}
 
 			public static class StyleLabels
