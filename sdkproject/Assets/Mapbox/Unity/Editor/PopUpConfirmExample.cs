@@ -26,23 +26,16 @@ public class PopUpConfirmExample : PopupWindowContent
 		EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 		if (GUILayout.Button("Create"))
 		{
+			/*
 			Debug.Log("Create");
 			CreateClass.Create(MyNewModifierName, popup._type);
-			/*
+
 			if (popup != null)
 			{
 				popup.SetNewClass(MyNewModifierName);
 			}
 			editorWindow.Close();
 			*/
-		}
-		if (GUILayout.Button("Assign"))
-		{
-			if (popup != null)
-			{
-				popup.SetNewClass(MyNewModifierName);
-			}
-			editorWindow.Close();
 		}
 	}
 

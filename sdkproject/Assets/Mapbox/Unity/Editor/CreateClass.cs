@@ -36,8 +36,6 @@ public static class CreateClass
 				outfile.WriteLine("}");
 			}//File written
 		}
-
 		AssetDatabase.Refresh();
-		//selected.AddComponent(Type.GetType(name));
 	}
 }

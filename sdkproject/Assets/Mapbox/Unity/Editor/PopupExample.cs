@@ -7,24 +7,20 @@ using System.Linq;
 public class PopupExample : PopupWindowContent
 {
 
-	bool _dropdown = false;
-
-	public Type _type;
+	private Type _type;
 
 	private Action<UnityEngine.Object> _act;
 
-	List<ScriptableObject> _assets;
+	private List<ScriptableObject> _assets;
 
-	SerializedProperty _finalize;
+	private SerializedProperty _finalize;
 
-	int _index = -1;
+	private int _index = -1;
 
-	Vector2 scrollPos;
+	private Vector2 scrollPos;
 
 	public override Vector2 GetWindowSize()
 	{
-		//int count = _assets.Count;
-		//float h = count * 50;
 		return new Vector2(250, 250);
 	}
 
@@ -43,17 +39,6 @@ public class PopupExample : PopupWindowContent
 				_assets.Add(asset);
 			}
 			_assets = _assets.OrderBy(x => x.GetType().Name).ThenBy(x => x.name).ToList();
-		}
-
-		if (_dropdown)
-		{
-			GenericMenu menu = new GenericMenu();
-			for (int i = 0; i < _assets.Count; i++)
-			{
-				menu.AddItem(new GUIContent(_assets[i].name), false, Confirm, _assets[i]);
-			}
-			menu.ShowAsContext();
-			return;
 		}
 
 		else
@@ -75,52 +60,18 @@ public class PopupExample : PopupWindowContent
 				{
 					Debug.Log(asset.name);
 					Confirm(asset);
-					/*
-					if (_act != null)
-					{
-						Debug.Log("ACT!!");
-						_act(asset);
-					}
-					else
-					{
-						if (_index == -1)
-						{
-							_finalize.arraySize++;
-							_finalize.GetArrayElementAtIndex(_finalize.arraySize - 1).objectReferenceValue = asset;
-							_finalize.serializedObject.ApplyModifiedProperties();
-						}
-						else
-						{
-							_finalize.GetArrayElementAtIndex(_index).objectReferenceValue = asset;
-							_finalize.serializedObject.ApplyModifiedProperties();
-						}
-					}
-					*/
 				}
 			}
 			EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 			if (GUILayout.Button("custom >"))
 			{
-				Rect newRect = GUILayoutUtility.GetLastRect();//new Rect(position.x + 50, 200, 200, 200);
+				Rect newRect = GUILayoutUtility.GetLastRect();
 				newRect.x += GetWindowSize().x;
 				PopupWindow.Show(newRect, new PopUpConfirmExample(this));
 				Debug.Log("custom >");
 			}
 			EditorGUILayout.EndScrollView();
 		}
-		/*
-		if (GUILayout.Button("custom >"))
-		{
-			Rect newRect = GUILayoutUtility.GetLastRect();//new Rect(position.x + 50, 200, 200, 200);
-			newRect.x += GetWindowSize().x;
-			PopupWindow.Show(newRect, new PopUpConfirmExample(this));
-			Debug.Log("custom >");
-		}
-		*/
-		EditorGUILayout.LabelField("Compiling:", EditorApplication.isCompiling ? "Yes" : "No");
-
-
-		//EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 		editorWindow.Repaint();
 	}
 
@@ -158,16 +109,30 @@ public class PopupExample : PopupWindowContent
 		Debug.Log("Popup closed: " + this);
 	}
 
+
 	public void SetNewClass(string n)
 	{
-		//selected.AddComponent(Type.GetType(name));
-		Type type = Type.GetType(n);
+		//Type type = Type.GetType(n);
 
-		var myNewScriptabeObject = ScriptableObject.CreateInstance(n) as ScriptableObject;
+		//var myNewScriptabeObject;
+		//switch(_type.ToString())
+		//{
+		//	case("Mapbox.Unity.MeshGeneration.Modifiers.MeshModifier"):
+		//		break;
+		//	case("Mapbox.Unity.MeshGeneration.Modifiers.GameObjectModifier"):
+		//		break;
+		//}
+		var myNewScriptabeObject = ScriptableObject.CreateInstance<Mapbox.Unity.MeshGeneration.Modifiers.GameObjectModifier>() as Mapbox.Unity.MeshGeneration.Modifiers.GameObjectModifier;
+		//object foo = GetFoo();
+		//Type t = typeof(_type.GetType());
+		//string bar = (string)Convert.ChangeType(foo, t);
+
+		//var myNewScriptabeObject = ScriptableObject.CreateInstance<_type.GetType()>() as _type;
+
 
 		myNewScriptabeObject.name = n;
 
-		AssetDatabase.CreateAsset(myNewScriptabeObject, "Assets/" + n);
+		AssetDatabase.CreateAsset(myNewScriptabeObject, "Assets/" + n + ".asset");
 
 		AssetDatabase.SaveAssets();
 		AssetDatabase.Refresh();
@@ -178,6 +143,7 @@ public class PopupExample : PopupWindowContent
 	public PopupExample(Type type, SerializedProperty p, int index = -1, Action<UnityEngine.Object> act = null)
 	{
 		_type = type;
+		Debug.Log(_type.ToString());
 		_finalize = p;
 		_act = act;
 		if (index > -1)
