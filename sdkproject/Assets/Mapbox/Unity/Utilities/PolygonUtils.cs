@@ -1,25 +1,46 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
+using Mapbox.VectorTile.Geometry;
+using Mapbox.VectorTile.Geometry.InteralClipperLib;
 
-public class PolygonUtils
+namespace Mapbox.Utils
 {
-	/// <summary>
-	/// Method to check if a point is contained inside a polygon, ignores vertical axis (y axis),
-	/// </summary>
-	/// <returns><c>true</c>, if point lies inside the constructed polygon, <c>false</c> otherwise.</returns>
-	/// <param name="polyPoints">Polygon points.</param>
-	/// <param name="p">The point that is to be tested.</param>
-	static bool ContainsPoint(Vector3[] polyPoints, Vector3 p) 
-	{ 
-		int j = polyPoints.Length - 1;
-		bool inside = false;
-		for (int i = 0; i < polyPoints.Length; j = i++)
+
+	using Polygon = List<InternalClipper.IntPoint>;
+	using Polygons = List<List<InternalClipper.IntPoint>>;
+
+
+	public static class PolygonUtils
+	{
+		/// <summary>
+		/// Method to check if a point is contained inside a polygon, ignores vertical axis (y axis),
+		/// </summary>
+		/// <returns><c>true</c>, if point lies inside the constructed polygon, <c>false</c> otherwise.</returns>
+		/// <param name="polyPoints">Polygon points.</param>
+		/// <param name="p">The point that is to be tested.</param>
+		public static bool PointInPolygon(Point2d<float> coord, List<List<Point2d<float>>> poly)
 		{
-			if (((polyPoints[i].y <= p.y && p.y < polyPoints[j].y) || (polyPoints[j].y <= p.y && p.y < polyPoints[i].y)) && (p.x < (polyPoints[j].x - polyPoints[i].x) * (p.y - polyPoints[i].y) / (polyPoints[j].y - polyPoints[i].y) + polyPoints[i].x))
+			var point = new InternalClipper.IntPoint(coord.X, coord.Y);
+			var polygon = new Polygon();
+
+
+			foreach (var vert in poly[0])
 			{
-				inside = !inside;
+				polygon.Add(new InternalClipper.IntPoint(vert.X, vert.Y));
 			}
+
+			////first check bounds for a fast result
+			//var polygons = new Polygons();
+			//	polygons.Add(polygon);
+			//var bounds = InternalClipper.Clipper.GetBounds(polygons);
+
+
+
+			//then check the actual polygon
+			int result = InternalClipper.Clipper.PointInPolygon(point, polygon);
+			return (result == 1) ? true : false;
 		}
-		return inside; 
 	}
+
 }
+

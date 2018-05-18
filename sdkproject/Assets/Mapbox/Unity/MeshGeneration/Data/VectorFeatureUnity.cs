@@ -74,7 +74,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 			//then check polygon
 			var point = Conversions.LatitudeLongitudeToVectorTilePosition(coord, Tile.InitialZoom);
-			var output = UtilGeom.PointInPolygon(new Point2d<float>(point.x, point.y), _geom);
+			var output = PolygonUtils.PointInPolygon(new Point2d<float>(point.x, point.y), _geom);
 
 			return output;
 		}
