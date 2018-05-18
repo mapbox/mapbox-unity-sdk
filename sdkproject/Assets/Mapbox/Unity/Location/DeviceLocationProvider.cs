@@ -21,7 +21,7 @@ namespace Mapbox.Unity.Location
 		/// </summary>
 		[SerializeField]
 		[Tooltip("Using higher value like 500 usually does not require to turn GPS chip on and thus saves battery power. Values like 5-10 could be used for getting best accuracy.")]
-		float _desiredAccuracyInMeters = 200f;
+		float _desiredAccuracyInMeters = 1.0f;
 
 		/// <summary>
 		/// The minimum distance (measured in meters) a device must move laterally before Input.location property is updated. 
@@ -29,7 +29,7 @@ namespace Mapbox.Unity.Location
 		/// </summary>
 		[SerializeField]
 		[Tooltip("The minimum distance (measured in meters) a device must move laterally before Input.location property is updated. Higher values like 500 imply less overhead.")]
-		float _updateDistanceInMeters = 0f;
+		float _updateDistanceInMeters = 0.0f;
 
 
 		[SerializeField]
@@ -73,7 +73,7 @@ namespace Mapbox.Unity.Location
 		{
 			_currentLocation.Provider = "unity";
 			_wait1sec = new WaitForSeconds(1f);
-			_waitUpdateTime = _updateTimeInMilliSeconds < 500 ? new WaitForSeconds(0.5f) : new WaitForSeconds(_updateTimeInMilliSeconds / 1000);
+			_waitUpdateTime = _updateTimeInMilliSeconds < 500 ? new WaitForSeconds(0.5f) : new WaitForSeconds((float)_updateTimeInMilliSeconds / 1000.0f);
 
 			_lastPositions = new CircularBuffer<Vector2d>(_maxLastPositions);
 			// safe measure till we have auto calculated weights
@@ -169,7 +169,17 @@ namespace Mapbox.Unity.Location
 			while (true)
 			{
 
-				_currentLocation.IsLocationServiceEnabled = Input.location.status == LocationServiceStatus.Running;
+				var lastData = Input.location.lastData;
+				var timestamp = lastData.timestamp;
+
+				///////////////////////////////
+				// oh boy, Unity what are you doing
+				// on some devices: 
+				//////////////////////////////
+				Debug.LogFormat("Input.location.status: {0}", Input.location.status);
+				_currentLocation.IsLocationServiceEnabled =
+					Input.location.status == LocationServiceStatus.Running
+					|| timestamp > _lastLocationTimestamp;
 
 				_currentLocation.IsUserHeadingUpdated = false;
 				_currentLocation.IsLocationUpdated = false;
@@ -182,11 +192,6 @@ namespace Mapbox.Unity.Location
 
 				// device orientation, user heading get calculated below
 				_currentLocation.DeviceOrientation = Input.compass.trueHeading;
-
-
-				var lastData = Input.location.lastData;
-				var timestamp = lastData.timestamp;
-				//Debug.LogFormat("{0:yyyyMMdd-HHmmss} acc:{1:0.00} {2} / {3}", UnixTimestampUtils.From(timestamp), lastData.horizontalAccuracy, lastData.latitude, lastData.longitude);
 
 
 				//_currentLocation.LatitudeLongitude = new Vector2d(lastData.latitude, lastData.longitude);
@@ -203,10 +208,29 @@ namespace Mapbox.Unity.Location
 
 				if (_currentLocation.IsLocationUpdated)
 				{
-					_lastPositions.Add(_currentLocation.LatitudeLongitude);
+					if (_lastPositions.Count > 0)
+					{
+						// only add position if user has moved +1m
+						CheapRuler cheapRuler = new CheapRuler(_currentLocation.LatitudeLongitude.x, CheapRulerUnits.Meters);
+						Vector2d p = _currentLocation.LatitudeLongitude;
+						double distance = cheapRuler.Distance(
+							new double[] { p.y, p.x },
+							new double[] { _lastPositions[0].y, _lastPositions[0].x }
+						);
+						if (distance > 1.0)
+						{
+							_lastPositions.Add(_currentLocation.LatitudeLongitude);
+						}
+					}
+					else
+					{
+						_lastPositions.Add(_currentLocation.LatitudeLongitude);
+					}
 				}
 
-				// calculate user heading. only if we have enough positions available
+				// if we have enough positions calculate user heading ourselves.
+				// Unity does not provide bearing based on locations, just
+				// device orientation based on Compass.Heading
 				if (_lastPositions.Count < _maxLastPositions)
 				{
 					_currentLocation.UserHeading = 0;
