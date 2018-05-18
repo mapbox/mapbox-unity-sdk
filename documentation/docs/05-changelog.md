@@ -30,6 +30,7 @@
 - Added checks to prevent NRE in `GeocodeAttributeSearchWindow` when searching with an invalid token or no connection.
 - Fix issue where side wall mesh generation did not work with elevated terrain.
 - Fix issue with scaling prefabs for POI's. Enables correct scaling of objects with map.
+- Fix issue with UvModifier where it calculates roof uv positions wrong
 
 #### Known Issues
 - `Filters` with empty key or value parameters will exclude all features in a layer.
