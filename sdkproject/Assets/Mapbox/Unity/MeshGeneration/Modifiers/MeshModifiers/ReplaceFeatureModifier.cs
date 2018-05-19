@@ -61,8 +61,8 @@
 				if (feature.ContainsLatLon(coord))
 				{
 
-					//TODO: null check on feature.Data.Id
-					if(String.IsNullOrEmpty(_featureId))
+
+					if(feature.Data.Id != null && !string.IsNullOrEmpty(feature.Data.Id.ToString()) && String.IsNullOrEmpty(_featureId))
 					{
 						_featureId = feature.Data.Id.ToString();
 						_featureId = _featureId.Substring(0, _featureId.Length - 3);
