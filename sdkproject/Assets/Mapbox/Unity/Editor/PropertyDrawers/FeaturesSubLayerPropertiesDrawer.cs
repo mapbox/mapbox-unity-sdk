@@ -421,7 +421,7 @@
 				if (GUILayout.Button(new GUIContent("Add New"), (GUIStyle)"minibuttonleft"))
 				{
 					PopupWindow.Show(buttonRect, new PopupSelectionMenu(typeof(MeshModifier), meshfac));
-					//if (Event.current.type == EventType.Repaint) buttonRect = GUILayoutUtility.GetLastRect();
+					if (Event.current.type == EventType.Repaint) buttonRect = GUILayoutUtility.GetLastRect();
 				}
 
 				if (GUILayout.Button(new GUIContent("Add Existing"), (GUIStyle)"minibuttonright"))
@@ -463,11 +463,11 @@
 				EditorGUI.indentLevel++;
 				EditorGUILayout.BeginHorizontal();
 				GUILayout.Space(EditorGUI.indentLevel * 12);
-				buttonRect = GUILayoutUtility.GetLastRect();
+				//buttonRect = GUILayoutUtility.GetLastRect();
 				if (GUILayout.Button(new GUIContent("Add New"), (GUIStyle)"minibuttonleft"))
 				{
 					PopupWindow.Show(buttonRect, new PopupSelectionMenu(typeof(GameObjectModifier), gofac));
-					//if (Event.current.type == EventType.Repaint) buttonRect = GUILayoutUtility.GetLastRect();
+					if (Event.current.type == EventType.Repaint) buttonRect = GUILayoutUtility.GetLastRect();
 				}
 				//EditorWindow.Repaint();
 				//buttonRect = GUILayoutUtility.GetLastRect();

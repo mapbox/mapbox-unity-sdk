@@ -3,6 +3,8 @@ using UnityEditor;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using System.Reflection;
+using Mapbox.Unity.MeshGeneration.Modifiers;
 
 public class PopupSelectionMenu : PopupWindowContent
 {
@@ -11,7 +13,7 @@ public class PopupSelectionMenu : PopupWindowContent
 
 	private Action<UnityEngine.Object> _act;
 
-	private List<ScriptableObject> _assets;
+	private List<Type> _modTypes;
 
 	private SerializedProperty _finalize;
 
@@ -24,21 +26,22 @@ public class PopupSelectionMenu : PopupWindowContent
 		return new Vector2(250, 250);
 	}
 
-	Rect buttonRect;
-
 	public override void OnGUI(Rect rect)
 	{
-		if (_assets == null || _assets.Count == 0)
+		if (_modTypes == null || _modTypes.Count == 0)
 		{
 			var list = AssetDatabase.FindAssets("t:" + _type.Name);
-			_assets = new List<ScriptableObject>();
+			_modTypes = new List<Type>();
+
 			foreach (var item in list)
 			{
 				var ne = AssetDatabase.GUIDToAssetPath(item);
 				var asset = AssetDatabase.LoadAssetAtPath(ne, _type) as ScriptableObject;
-				_assets.Add(asset);
+				if(!_modTypes.Contains(asset.GetType()))
+				{
+					_modTypes.Add(asset.GetType());
+				}
 			}
-			_assets = _assets.OrderBy(x => x.GetType().Name).ThenBy(x => x.name).ToList();
 		}
 
 		else
@@ -48,31 +51,53 @@ public class PopupSelectionMenu : PopupWindowContent
 			st.padding = new RectOffset(0, 0, 15, 15);
 			scrollPos = EditorGUILayout.BeginScrollView(scrollPos, st);
 
-			for (int i = 0; i < _assets.Count; i++)
+			for (int i = 0; i < _modTypes.Count; i++)
 			{
-				var asset = _assets[i];
+				Type asset = _modTypes[i];
 				if (asset == null) //yea turns out this can happen
 					continue;
 				var style = GUI.skin.button;
 				style.alignment = TextAnchor.MiddleLeft;
-
-				if (GUILayout.Button(asset.name, style))
+				string shortTypeName = GetShortTypeName(asset.ToString());
+                if (GUILayout.Button(shortTypeName, style))
 				{
-					Debug.Log(asset.name);
-					Confirm(asset);
+					CreateNewModiferInstance(asset, shortTypeName);
+					editorWindow.Close();
 				}
 			}
 			EditorGUILayout.EndScrollView();
 		}
-		editorWindow.Repaint();
+		//editorWindow.Repaint();
 	}
 
-	public void Confirm(object obj)
+	private string GetShortTypeName(string input)
+	{
+		int pos = input.LastIndexOf(".") + 1;
+		return input.Substring(pos, input.Length - pos);
+	}
+
+	private void CreateNewModiferInstance(Type type, string name)
+	{
+		var modifierInstance = ScriptableObject.CreateInstance(type);
+
+		string pathCandidate = string.Format("Assets/New{0}.asset", name);
+		string uniquePath = AssetDatabase.GenerateUniqueAssetPath(pathCandidate);
+
+		modifierInstance.name = name;
+
+		AssetDatabase.CreateAsset(modifierInstance, uniquePath);
+
+		AssetDatabase.SaveAssets();
+		AssetDatabase.Refresh();
+
+		AddNewInstanceToArray(modifierInstance);
+	}
+
+	public void AddNewInstanceToArray(object obj)
 	{
 		ScriptableObject asset = obj as ScriptableObject;
 		if (_act != null)
 		{
-			Debug.Log("ACT!!");
 			_act(asset);
 		}
 		else
