@@ -29,13 +29,6 @@ namespace Mapbox.Utils
 				polygon.Add(new InternalClipper.IntPoint(vert.X, vert.Y));
 			}
 
-			////first check bounds for a fast result
-			//var polygons = new Polygons();
-			//	polygons.Add(polygon);
-			//var bounds = InternalClipper.Clipper.GetBounds(polygons);
-
-
-
 			//then check the actual polygon
 			int result = InternalClipper.Clipper.PointInPolygon(point, polygon);
 			return (result == 1) ? true : false;

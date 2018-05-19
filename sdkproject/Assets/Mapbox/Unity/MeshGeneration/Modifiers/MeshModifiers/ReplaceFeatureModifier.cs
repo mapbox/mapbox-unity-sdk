@@ -21,11 +21,14 @@
 		private List<string> LatLon;
 		private List<string> _latLonToSpawn;
 
+		private string _featureId;
+
 		public override void Initialize()
 		{
 			base.Initialize();
 			//duplicate the list of lat/lons to track which coordinates have already been spawned
 			_latLonToSpawn = new List<string>(LatLon);
+			_featureId = String.Empty;
 		}
 
 		/// <summary>
@@ -40,8 +43,22 @@
 				var coord = Conversions.StringToLatLon(point);
 				if (feature.ContainsLatLon(coord))
 				{
+
+					//TODO: null check on feature.Data.Id
+					if(String.IsNullOrEmpty(_featureId))
+					{
+						_featureId = feature.Data.Id.ToString();
+						_featureId = _featureId.Substring(0, _featureId.Length - 3);
+					}
+					Debug.Log(_featureId);
 					return true;
 				}
+			}
+
+			if(feature.Data.Id.ToString().StartsWith(_featureId, StringComparison.CurrentCulture) &&
+			  !String.IsNullOrEmpty(_featureId))
+			{
+				return true;
 			}
 
 			return false;
