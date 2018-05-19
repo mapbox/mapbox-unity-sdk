@@ -116,7 +116,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			//find any replacement criteria and assign them
 			foreach ( var goModifier in GoModifiers)
 			{
-				if(goModifier is IReplacementCriteria)
+				if(goModifier is IReplacementCriteria && 
+				  goModifier.Active)
 				{
 					SetReplacementCriteria((IReplacementCriteria)goModifier);
 				}
