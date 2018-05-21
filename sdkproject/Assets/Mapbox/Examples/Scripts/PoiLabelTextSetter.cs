@@ -41,8 +41,9 @@
 		public void SetBackgroundWidth()
 		{
 			float textWidth = _textMesh.GetComponent<Renderer>().bounds.size.x;
+			float textHeight = _textMesh.GetComponent<Renderer>().bounds.size.y;
 			RectTransform backgroundRect = _background.GetComponent<RectTransform>();
-			backgroundRect.sizeDelta = new Vector2(textWidth + 4f, 3f);
+			backgroundRect.sizeDelta = new Vector2(textWidth + 8f, textHeight + 1f);
 		}
 	}
 }
