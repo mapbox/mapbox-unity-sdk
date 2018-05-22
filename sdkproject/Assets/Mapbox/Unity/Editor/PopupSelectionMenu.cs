@@ -2,7 +2,9 @@
 using UnityEditor;
 using System.Collections.Generic;
 using System;
+using System.IO;
 using System.Reflection;
+using Mapbox.Unity;
 
 namespace Mapbox.Editor
 {
@@ -79,17 +81,31 @@ namespace Mapbox.Editor
 		{
 			var modifierInstance = ScriptableObject.CreateInstance(type);
 
-			string pathCandidate = string.Format("Assets/New{0}.asset", name);
-			string uniquePath = AssetDatabase.GenerateUniqueAssetPath(pathCandidate);
+			string pathCandidate = Constants.Path.MAPBOX_USER_MODIFIERS;
+
+			foreach (UnityEngine.Object obj in Selection.GetFiltered(typeof(UnityEngine.Object), SelectionMode.Assets))
+			{
+				pathCandidate = AssetDatabase.GetAssetPath(obj);
+				if (!string.IsNullOrEmpty(pathCandidate) && File.Exists(pathCandidate))
+				{
+					pathCandidate = Path.GetDirectoryName(pathCandidate);
+					break;
+				}
+			}
+
+			string combinedPath = string.Format("{0}{1}.asset", Path.Combine(pathCandidate, "New"), name);
+			string uniqueAssetPath = AssetDatabase.GenerateUniqueAssetPath(combinedPath);
 
 			modifierInstance.name = name;
 
-			AssetDatabase.CreateAsset(modifierInstance, uniquePath);
+			AssetDatabase.CreateAsset(modifierInstance, uniqueAssetPath);
 
 			AssetDatabase.SaveAssets();
 			AssetDatabase.Refresh();
 
 			AddNewInstanceToArray(modifierInstance);
+
+			Debug.Log(string.Format("Created new {0} modifer at {1}", name, uniqueAssetPath));
 		}
 
 		public void AddNewInstanceToArray(object obj)
