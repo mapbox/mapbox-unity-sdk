@@ -155,9 +155,14 @@
 
 		void HandleGeocoderResponse(ForwardGeocodeResponse res)
 		{
+			//null if no internet connection
 			if (res != null)
 			{
-				_features = res.Features;
+				//null if invalid token
+				if (res.Features != null)
+				{
+					_features = res.Features;
+				}
 			}
 			_isSearching = false;
 			this.Repaint();

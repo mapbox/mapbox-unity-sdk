@@ -403,7 +403,7 @@ GameObject:
   - component: {fileID: 621795786}
   m_Layer: 0
   m_Name: LabelCamera
-  m_TagString: MainCamera
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -675,17 +675,17 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0.1685723
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224315790701160254, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -780,52 +780,52 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.x
-      value: 116.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -120.27503
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.x
-      value: 213
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 220.55006
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 240.55006
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.x
-      value: -17
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114603753021256032, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -834,10 +834,10 @@ Prefab:
         prefabs to a variety of locations. For example, you can choose to add prefabs
         at all the cafes and restaurants in a city, at specific addresses, or at locations
         with \"Starbucks\" in the name.\n\nTo get started, look at Map's Inspector
-        panel and open LOCATION PREFABS in the Abstract Map component. We've already
-        created a few prefab layers for you. Toggle them on and off to see how they
-        change the map. \n\nTo create your own, click \"Add Item\" and add the desired
-        prefab and rules. "
+        panel and open POINTS OF INTEREST in the MAP LAYERS section of the Abstract
+        Map component. We've already created a few prefab layers for you. Toggle them
+        on and off to see how they change the map. \n\nTo create your own, click \"Add
+        Layer\" and add the desired prefab and rules. "
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -992,7 +992,6 @@ MonoBehaviour:
         entityPerCoroutine: 20
       vectorSubLayers:
       - coreOptions:
-          sourceId: mapbox.3d-buildings,mapbox.mapbox-streets-v7
           isActive: 1
           sublayerName: Building
           geometryType: 2
@@ -1032,7 +1031,6 @@ MonoBehaviour:
         GoModifiers: []
       locationPrefabList:
       - coreOptions:
-          sourceId: 
           isActive: 1
           sublayerName: Arts and Entertainment
           geometryType: 0
@@ -1075,7 +1073,6 @@ MonoBehaviour:
         coordinates: []
         density: 15
       - coreOptions:
-          sourceId: 
           isActive: 1
           sublayerName: Food
           geometryType: 0
@@ -1118,7 +1115,6 @@ MonoBehaviour:
         coordinates: []
         density: 15
       - coreOptions:
-          sourceId: 
           isActive: 1
           sublayerName: Nightlife
           geometryType: 0
@@ -1161,7 +1157,6 @@ MonoBehaviour:
         coordinates: []
         density: 15
       - coreOptions:
-          sourceId: 
           isActive: 1
           sublayerName: Outdoors and Recreation
           geometryType: 0
@@ -1204,7 +1199,6 @@ MonoBehaviour:
         coordinates: []
         density: 15
       - coreOptions:
-          sourceId: 
           isActive: 1
           sublayerName: Services
           geometryType: 0
@@ -1247,7 +1241,6 @@ MonoBehaviour:
         coordinates: []
         density: 10
       - coreOptions:
-          sourceId: 
           isActive: 1
           sublayerName: Shops
           geometryType: 0
@@ -1290,7 +1283,6 @@ MonoBehaviour:
         coordinates: []
         density: 15
       - coreOptions:
-          sourceId: 
           isActive: 1
           sublayerName: Transportation
           geometryType: 0
@@ -1333,7 +1325,6 @@ MonoBehaviour:
         coordinates: []
         density: 15
       - coreOptions:
-          sourceId: 
           isActive: 0
           sublayerName: All POIs
           geometryType: 0
@@ -2018,7 +2009,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _panSpeed: 10
   _zoomSpeed: 50
-  _referenceCamera: {fileID: 0}
+  _referenceCamera: {fileID: 1681481105}
 --- !u!81 &1681481102
 AudioListener:
   m_ObjectHideFlags: 0

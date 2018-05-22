@@ -1,14 +1,18 @@
-## CHANGELOG
- ### v.1.4.2
+﻿## CHANGELOG
+ ### v.1.4.3
 *??/??/2018*
-- Layer names and property names are preloaded from the data source into a dropdown.
+##### New Features
+##### Improvements
+##### Bug Fixes
+- Fix issue with UvModifier which caused wrong roof uv positions calculations.
+- Fix issue with data fetcher to handle failed connections properly, which caused IndexOutOfRangeException during tile loading/unloading.
 
-##### BREAKING CHANGES
-- Property `Heading` on `Location` object has been split into `UserHeading` and `DeviceOrientation`.
-  - `UserHeading`: the direction the user is moving. This is calculated from the latest position. If the user stops moving the last heading value is kept.
-  - `DeviceOrientation`: value obtained from the device compass. Where the device is looking to.
+
+ ### v.1.4.2
+*05/14/2018*
 
 ##### New Features
+- Layer names and property names are preloaded from the data source into a dropdown.
 - Add `Location Prefabs` section to `AbstractMap`. Enables users to spawn prefabs at points-of-interest on the map directly from the `AbstractMap` UI.
 - Add options to spawn prefabs on points-of-interest using `Mapbox Category`, `Name`, or a list of `Address or LatLon`.
 - Add methods on `AbstractMap` to spawn prefabs. Enables users to add layers via script.
@@ -31,8 +35,19 @@
   - Factories register to events in DataFetchers
 -  `Layer Name` , `Extrusion Property Name` and `Filter Key` are now selectable dropdowns indicating the layers and properties available in the current `Data Source`. Layers and properties no longer require manual string entry.
 
-#### Known Issues
+##### Bug Fixes
+- Added checks to prevent NRE in `GeocodeAttributeSearchWindow` when searching with an invalid token or no connection.
+- Fix issue where side wall mesh generation did not work with elevated terrain.
+- Fix issue with scaling prefabs for POI's. Enables correct scaling of objects with map.
+
+##### Known Issues
 - `Filters` with empty key or value parameters will exclude all features in a layer.
+-  SDK will throw `[Physics.PhysX] cleaning the mesh failed` error if a MapFeature is used with the following options: {Primitive Type: `Line`, LayerName: `Road`, Collider Type: `Mesh Collider`}
+
+##### BREAKING CHANGES
+- Property `Heading` on `Location` object has been split into `UserHeading` and `DeviceOrientation`.
+  - `UserHeading`: the direction the user is moving. This is calculated from the latest position. If the user stops moving the last heading value is kept.
+  - `DeviceOrientation`: value obtained from the device compass. Where the device is looking to.
 
 ### v.1.4.1
 *04/17/2018*

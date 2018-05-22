@@ -12,12 +12,9 @@
 	public class CoreVectorLayerPropertiesDrawer : PropertyDrawer
 	{
 		int _layerIndex = 0;
-		static float _lineHeight = EditorGUIUtility.singleLineHeight;
 		bool _isGUIContentSet = false;
-		bool _isLayerNameGUIContentSet = false;
 		GUIContent[] _primitiveTypeContent;
 		GUIContent[] _layerTypeContent;
-		static string currentSource = "";
 		static TileJsonData tileJsonData = new TileJsonData();
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -71,7 +68,7 @@
 			}
 			EditorGUI.EndProperty();
 		}
-		private static int count = 0;
+		//private static int count = 0;
 		private void DrawLayerName(SerializedProperty property, Rect position, List<string> layerDisplayNames)
 		{
 

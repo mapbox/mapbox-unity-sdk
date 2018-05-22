@@ -9,7 +9,6 @@
 	public class ImageryLayerPropertiesDrawer : PropertyDrawer
 	{
 		string objectId = "";
-		static float lineHeight = EditorGUIUtility.singleLineHeight;
 
 		GUIContent[] sourceTypeContent;
 		bool isGUIContentSet = false;
