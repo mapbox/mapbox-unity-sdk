@@ -69,19 +69,6 @@ namespace Mapbox.Unity
 				public static readonly GUIStyle EDITOR_TEXTURE_STYLE_DESCRIPTION_STYLE = new GUIStyle { wordWrap = true, normal = { textColor = Colors.EDITOR_TEXT_COLOR } };
 				public static readonly GUIStyle EDITOR_TEXTURE_THUMBNAIL_STYLE = new GUIStyle { imagePosition = ImagePosition.ImageOnly, wordWrap = true };
 			}
-
-			public static class StyleLabels
-			{
-				public static Dictionary<StyleTypes, string> labels = new Dictionary<StyleTypes, string>()
-				{
-					{StyleTypes.Simple, "Simple style combines stylized vector designs with scriptable palettes to create a simple, procedurally colored rendering style."},
-					{StyleTypes.Realistic, "Realistic style combines modern, urban designs with physically-based-rendering materials to help create a contemporary, realistic rendering style."},
-					{StyleTypes.Fantasy, "Fantasy style combines old world medieval designs with physically-based-rendering materials to help create a fantasy rendering style."},
-					{StyleTypes.Light, "Light, greyscale shading for your map."},
-					{StyleTypes.Dark, "Dark, greyscale shading for your map."},
-					{StyleTypes.Satellite, "Satellite style uses high-resolution satellite imagery as a texture set. The comprehensive set of road, label, and POI information brings clarity and context to the crisp detail in our high-resolution satellite imagery."},
-				};
-			}
 		}
 	}
 }

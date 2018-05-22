@@ -189,17 +189,17 @@
 	{
 		[Description("Custom style.")]
 		Custom,
-		[Description("Simple style.")]
+		[Description("Simple style combines stylized vector designs with scriptable palettes to create a simple, procedurally colored rendering style.")]
 		Simple,
-		[Description("Light style.")]
+		[Description("Light style uses colored materials to create light, greyscale shading for your map.")]
 		Light,
-		[Description("Dark style.")]
+		[Description("Dark style uses colored materials to create dark, greyscale shading for your map.")]
 		Dark,
-		[Description("Realistic style.")]
+		[Description("Realistic style combines modern, urban designs with physically based rendering materials to help create a contemporary, realistic rendering style.")]
 		Realistic,
-		[Description("Fantasy style.")]
+		[Description("Fantasy style combines old world medieval designs with physically based rendering materials to help create a fantasy rendering style.")]
 		Fantasy,
-		[Description("Satellite style.")]
+		[Description("Satellite style uses high-resolution satellite imagery as a texture set. The comprehensive set of road, label, and POI information brings clarity and context to the crisp detail in our high-resolution satellite imagery.")]
 		Satellite,
 
 	}

@@ -77,19 +77,13 @@
 			if ((StyleTypes)styleType.enumValueIndex != StyleTypes.Custom)
 			{
 				GUILayout.BeginHorizontal();
-				var guiStyle = new GUIStyle();
-				guiStyle.imagePosition = ImagePosition.ImageOnly;
-				guiStyle.wordWrap = true;
-				guiStyle.normal.textColor = new Color(0.7f, 0.7f, 0.7f);
 
 				Texture2D thumbnailTexture = (Texture2D)_styleIconBundles[(StyleTypes)styleType.enumValueIndex].texture;
 
-				if (Constants.GUI.StyleLabels.labels.ContainsKey((StyleTypes)styleType.enumValueIndex))
-				{
-					string descriptionLabel = Constants.GUI.StyleLabels.labels[(StyleTypes)styleType.enumValueIndex];
-					EditorGUILayout.LabelField(new GUIContent(" ", thumbnailTexture), Constants.GUI.Styles.EDITOR_TEXTURE_THUMBNAIL_STYLE, GUILayout.Height(60), GUILayout.Width(EditorGUIUtility.labelWidth - 60));
-					EditorGUILayout.TextArea(descriptionLabel, (GUIStyle)"wordWrappedLabel");
-				}
+				string descriptionLabel = EnumExtensions.Description((StyleTypes)styleType.enumValueIndex);
+				EditorGUILayout.LabelField(new GUIContent(" ", thumbnailTexture), Constants.GUI.Styles.EDITOR_TEXTURE_THUMBNAIL_STYLE, GUILayout.Height(60), GUILayout.Width(EditorGUIUtility.labelWidth - 60));
+				EditorGUILayout.TextArea(descriptionLabel, (GUIStyle)"wordWrappedLabel");
+
 				GUILayout.EndHorizontal();
 			}
 			else
