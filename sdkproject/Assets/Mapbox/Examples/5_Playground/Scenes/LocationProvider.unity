@@ -675,6 +675,8 @@ MonoBehaviour:
   _desiredAccuracyInMeters: 1
   _updateDistanceInMeters: 0.5
   _updateTimeInMilliSeconds: 500
+  _mockUnityInputLocation: 1
+  _locationLogFile: {fileID: 4900000, guid: b88daf565166aeb4bad8b889e9bcc1a6, type: 3}
 --- !u!4 &849657522
 Transform:
   m_ObjectHideFlags: 0
@@ -895,7 +897,7 @@ MonoBehaviour:
   _autoFireEvent: 1
   _updateInterval: 0.5
   _sendEvent: 0
-  _locationLogFile: {fileID: 4900000, guid: b88daf565166aeb4bad8b889e9bcc1a6, type: 3}
+  _locationLogFile: {fileID: 4900000, guid: 1273cde990e694a4ab408f6a2b288edb, type: 3}
 --- !u!4 &1363590664
 Transform:
   m_ObjectHideFlags: 0
@@ -1558,7 +1560,7 @@ MonoBehaviour:
   mapManager: {fileID: 1411663281}
   _deviceLocationProviderUnity: {fileID: 849657521}
   _deviceLocationProviderAndroid: {fileID: 2054056459}
-  _editorLocationProvider: {fileID: 1363590663}
+  _editorLocationProvider: {fileID: 849657521}
   _transformLocationProvider: {fileID: 1830401242}
   _dontDestroyOnLoad: 0
 --- !u!4 &1908994634

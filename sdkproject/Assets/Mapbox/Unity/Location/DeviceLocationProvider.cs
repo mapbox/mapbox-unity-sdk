@@ -23,6 +23,7 @@ namespace Mapbox.Unity.Location
 		[Tooltip("Using higher value like 500 usually does not require to turn GPS chip on and thus saves battery power. Values like 5-10 could be used for getting best accuracy.")]
 		float _desiredAccuracyInMeters = 1.0f;
 
+
 		/// <summary>
 		/// The minimum distance (measured in meters) a device must move laterally before Input.location property is updated. 
 		/// Higher values like 500 imply less overhead.
@@ -37,6 +38,17 @@ namespace Mapbox.Unity.Location
 		long _updateTimeInMilliSeconds = 500;
 
 
+		[Header("For Editor debugging only:")]
+		[SerializeField]
+		[Tooltip("FOR DEBUGGING IN EDITOR!!! Mock Unity's 'Input.Location' to route location log files through this class (eg fresh calculation of 'UserHeading') instead of just replaying them. To use set 'Editor Location Provider' in 'Location Factory' to 'Device Location Provider' and select a location log file below.")]
+		bool _mockUnityInputLocation = false;
+
+		[SerializeField]
+		[Tooltip("FOR DEBUGGING IN EDITOR!!! Also see above. Location log file to mock Unity's 'Input.Location'.")]
+		private TextAsset _locationLogFile = null;
+
+
+		private IMapboxLocationService _locationService;
 		private Coroutine _pollRoutine;
 		private double _lastLocationTimestamp;
 		private double _lastHeadingTimestamp;
@@ -71,6 +83,24 @@ namespace Mapbox.Unity.Location
 
 		protected virtual void Awake()
 		{
+#if UNITY_EDITOR
+			if (_mockUnityInputLocation)
+			{
+				if (null == _locationLogFile || null == _locationLogFile.bytes)
+				{
+					throw new ArgumentNullException("Location Log File");
+				}
+
+				_locationService = new MapboxLocationServiceMock(_locationLogFile.bytes);
+			}
+			else
+			{
+#endif
+				_locationService = new MapboxLocationServiceUnityWrapper();
+#if UNITY_EDITOR
+			}
+#endif
+
 			_currentLocation.Provider = "unity";
 			_wait1sec = new WaitForSeconds(1f);
 			_waitUpdateTime = _updateTimeInMilliSeconds < 500 ? new WaitForSeconds(0.5f) : new WaitForSeconds((float)_updateTimeInMilliSeconds / 1000.0f);
@@ -101,14 +131,15 @@ namespace Mapbox.Unity.Location
 #if UNITY_EDITOR
 			while (!UnityEditor.EditorApplication.isRemoteConnected)
 			{
-				yield return null;
+				Debug.LogWarning("Remote device not connected via 'Unity Remote'. Waiting ...");
+				yield return _wait1sec;
 			}
 #endif
 
 
 			//request runtime fine location permission on Android if not yet allowed
 #if UNITY_ANDROID
-			if (!Input.location.isEnabledByUser)
+			if (!_locationService.isEnabledByUser)
 			{
 				UniAndroidPermission.RequestPermission(AndroidPermission.ACCESS_FINE_LOCATION);
 				//wait for user to allow or deny
@@ -117,7 +148,7 @@ namespace Mapbox.Unity.Location
 #endif
 
 
-			if (!Input.location.isEnabledByUser)
+			if (!_locationService.isEnabledByUser)
 			{
 				Debug.LogError("DeviceLocationProvider: Location is not enabled by user!");
 				_currentLocation.IsLocationServiceEnabled = false;
@@ -127,11 +158,11 @@ namespace Mapbox.Unity.Location
 
 
 			_currentLocation.IsLocationServiceInitializing = true;
-			Input.location.Start(_desiredAccuracyInMeters, _updateDistanceInMeters);
+			_locationService.Start(_desiredAccuracyInMeters, _updateDistanceInMeters);
 			Input.compass.enabled = true;
 
 			int maxWait = 20;
-			while (Input.location.status == LocationServiceStatus.Initializing && maxWait > 0)
+			while (_locationService.status == LocationServiceStatus.Initializing && maxWait > 0)
 			{
 				yield return _wait1sec;
 				maxWait--;
@@ -146,7 +177,7 @@ namespace Mapbox.Unity.Location
 				yield break;
 			}
 
-			if (Input.location.status == LocationServiceStatus.Failed)
+			if (_locationService.status == LocationServiceStatus.Failed)
 			{
 				Debug.LogError("DeviceLocationProvider: " + "Failed to initialize location services!");
 				_currentLocation.IsLocationServiceInitializing = false;
@@ -169,7 +200,7 @@ namespace Mapbox.Unity.Location
 			while (true)
 			{
 
-				var lastData = Input.location.lastData;
+				var lastData = _locationService.lastData;
 				var timestamp = lastData.timestamp;
 
 				///////////////////////////////
@@ -180,7 +211,7 @@ namespace Mapbox.Unity.Location
 				//////////////////////////////
 				//Debug.LogFormat("Input.location.status: {0}", Input.location.status);
 				_currentLocation.IsLocationServiceEnabled =
-					Input.location.status == LocationServiceStatus.Running
+					_locationService.status == LocationServiceStatus.Running
 					|| timestamp > _lastLocationTimestamp;
 
 				_currentLocation.IsUserHeadingUpdated = false;
@@ -201,10 +232,11 @@ namespace Mapbox.Unity.Location
 				// https://forum.unity.com/threads/precision-of-location-longitude-is-worse-when-longitude-is-beyond-100-degrees.133192/#post-1835164
 				double latitude = double.Parse(lastData.latitude.ToString("R", invariantCulture), invariantCulture);
 				double longitude = double.Parse(lastData.longitude.ToString("R", invariantCulture), invariantCulture);
+				Vector2d previousLocation = new Vector2d(_currentLocation.LatitudeLongitude.x, _currentLocation.LatitudeLongitude.y);
 				_currentLocation.LatitudeLongitude = new Vector2d(latitude, longitude);
 
 				_currentLocation.Accuracy = (float)Math.Floor(lastData.horizontalAccuracy);
-				_currentLocation.IsLocationUpdated = timestamp > _lastLocationTimestamp;
+				_currentLocation.IsLocationUpdated = timestamp > _lastLocationTimestamp || !_currentLocation.LatitudeLongitude.Equals(previousLocation);
 				_currentLocation.Timestamp = timestamp;
 				_lastLocationTimestamp = timestamp;
 
@@ -274,7 +306,7 @@ namespace Mapbox.Unity.Location
 						float weightSum = actualWeights.Sum();
 						finalHeading /= weightSum;
 						finalHeading -= 180; //fix heading to have 0° for north, 90° for east, 180° for south and 270° for west
-						// stay within [0..359] no negative angles
+											 // stay within [0..359] no negative angles
 						if (finalHeading < 0) { finalHeading += 360; }
 
 						_currentLocation.UserHeading = finalHeading;
