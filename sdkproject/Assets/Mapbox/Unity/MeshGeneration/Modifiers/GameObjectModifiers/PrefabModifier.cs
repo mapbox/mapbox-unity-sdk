@@ -39,7 +39,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 			centroidVector = centroidVector / ve.Feature.Points[0].Count;
 
-			RectTransform goRectTransform;
 			IFeaturePropertySettable settable = null;
 			GameObject go;
 
@@ -50,33 +49,30 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				if (settable != null)
 				{
 					go = (settable as MonoBehaviour).gameObject;
-					settable.Set(ve.Feature.Properties);
 				}
-				// set gameObject transform
-				go.name = ve.Feature.Data.Id.ToString();
-				goRectTransform = go.GetComponent<RectTransform>();
-				if (goRectTransform == null)
-				{
-					go.transform.localPosition = centroidVector;
-				}
-				else
-				{
-					goRectTransform.anchoredPosition3D = centroidVector;
-				}
-				//go.transform.localScale = Constants.Math.Vector3One;
-
-				if (_options.scaleDownWithWorld)
-				{
-					go.transform.localScale = (go.transform.localScale * (tile.TileScale));
-				}
+				PositionScaleRectTransform(ve, tile, go);
 				return;
 			}
-			else
+
+			go = Instantiate(_options.prefab);
+			_prefabList.Add(go);
+			_objects.Add(ve.GameObject, go);
+
+			go.transform.SetParent(ve.GameObject.transform, false);
+
+			PositionScaleRectTransform(ve, tile, go);
+
+			if (_options.AllPrefabsInstatiated != null)
 			{
-				go = Instantiate(_options.prefab);
-				_prefabList.Add(go);
-				_objects.Add(ve.GameObject, go);
+				_options.AllPrefabsInstatiated(_prefabList);
 			}
+		}
+
+		public void PositionScaleRectTransform(VectorEntity ve, UnityTile tile, GameObject go)
+		{
+			RectTransform goRectTransform;
+			IFeaturePropertySettable settable = null;
+			var centroidVector = new Vector3();
 
 			go.name = ve.Feature.Data.Id.ToString();
 
@@ -89,7 +85,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				goRectTransform.anchoredPosition3D = centroidVector;
 			}
-			go.transform.SetParent(ve.GameObject.transform, false);
 			//go.transform.localScale = Constants.Math.Vector3One;
 
 			settable = go.GetComponent<IFeaturePropertySettable>();
@@ -101,11 +96,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			if (_options.scaleDownWithWorld)
 			{
 				go.transform.localScale = (go.transform.localScale * (tile.TileScale));
-			}
-
-			if (_options.AllPrefabsInstatiated != null)
-			{
-				_options.AllPrefabsInstatiated(_prefabList);
 			}
 		}
 
