@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class TrafficUvAnimator : MonoBehaviour
 {
-	public Material[] Materials;
+	public Material[] XAxisMaterials;
+	public Material[] YAxisMaterials;
 	public float Speed;
-	private Vector2 _offset;
+	private Vector2 _xOffset;
+	private Vector2 _yOffset;
 
 	void Start()
 	{
@@ -15,10 +17,17 @@ public class TrafficUvAnimator : MonoBehaviour
 
 	void Update()
 	{
-		_offset.Set(0, _offset.y + Time.deltaTime * Speed);
-		foreach (var item in Materials)
+		_xOffset.Set(_xOffset.x + Time.deltaTime * Speed, 0.2f);
+		_yOffset.Set(0, _yOffset.y + Time.deltaTime * Speed);
+
+		foreach (var item in XAxisMaterials)
 		{
-			item.SetTextureOffset("_MainTex", _offset);
+			item.SetTextureOffset("_MainTex", _xOffset);
+		}
+
+		foreach (var item in YAxisMaterials)
+		{
+			item.SetTextureOffset("_MainTex", _yOffset);
 		}
 	}
 }

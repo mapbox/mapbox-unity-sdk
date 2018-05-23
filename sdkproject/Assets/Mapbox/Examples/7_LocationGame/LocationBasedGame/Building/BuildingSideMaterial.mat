@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: cb_diff_01
-  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
+  m_Name: BuildingSideMaterial
+  m_Shader: {fileID: 4800000, guid: b1ff8392b8844df42be7268d6a58fd62, type: 3}
   m_ShaderKeywords: _EMISSION
   m_LightmapFlags: 1
   m_EnableInstancingVariants: 0
@@ -18,8 +18,8 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _Albedo:
-        m_Texture: {fileID: 2800000, guid: b9879ea948b70a14b9b15ce6f4f798d8, type: 3}
+    - _BotTexture0:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -38,20 +38,20 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _Emission:
-        m_Texture: {fileID: 2800000, guid: b9879ea948b70a14b9b15ce6f4f798d8, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _EmissionMap:
-        m_Texture: {fileID: 2800000, guid: 7d75b711a408ef2478ba757bc66994af, type: 3}
-        m_Scale: {x: 1, y: 1}
+        m_Texture: {fileID: 2800000, guid: 1cd3051fbf6150c46bbb8d117deb860b, type: 3}
+        m_Scale: {x: 1, y: 2.76}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 7d75b711a408ef2478ba757bc66994af, type: 3}
-        m_Scale: {x: 1, y: 1}
+        m_Texture: {fileID: 2800000, guid: 1cd3051fbf6150c46bbb8d117deb860b, type: 3}
+        m_Scale: {x: 1, y: 2.76}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MidTexture0:
+        m_Texture: {fileID: 2800000, guid: 1cd3051fbf6150c46bbb8d117deb860b, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -62,55 +62,40 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _SpecGlossMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
+    - _Texture:
+        m_Texture: {fileID: 2800000, guid: 1cd3051fbf6150c46bbb8d117deb860b, type: 3}
+        m_Scale: {x: 1, y: -1.4}
         m_Offset: {x: 0, y: 0}
-    - _node_3072:
-        m_Texture: {fileID: 2800000, guid: b9879ea948b70a14b9b15ce6f4f798d8, type: 3}
+    - _texcoord:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _BumpScale: 1
-    - _Cutoff: 0.855
+    - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _FresnelPower: 5.18
-    - _FresnelSlope: 2.86
-    - _FresnelStrength: 2
-    - _GhostSmoothness: 1
-    - _GhostThickness: 1
+    - _EmissionPower: 2.06
+    - _FadeEnd: 3.06
+    - _FadeMax: 8.14
     - _GlossMapScale: 1
-    - _Glossiness: 0.638
+    - _Glossiness: 0
     - _GlossyReflections: 1
     - _Metallic: 1
     - _Mode: 0
     - _OcclusionStrength: 1
-    - _Outline: 0.0622
-    - _OutlineSize: 0.02
-    - _OutlineThickness: 0.02
     - _Parallax: 0.02
+    - _Range: 53.87
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _Thickness: 55
+    - _Tile: 2.8
     - _UVSec: 0
-    - _XraySmoothness: 0.177
-    - _XrayThickness: 0.371
+    - _WallOffset: -0.15
     - _ZWrite: 1
-    - _node_4288: 0
-    - _node_98: 0
+    - __dirty: 0
     m_Colors:
-    - _AlbedoColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DiffuseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _EmissionColor: {r: 0, g: 0.34106228, b: 0.626, a: 0}
-    - _FresnelColor: {r: 0.19999993, g: 1, b: 0, a: 1}
-    - _FresnelColor_copy: {r: 1, g: 0, b: 0, a: 1}
-    - _GhostColor: {r: 1, g: 1, b: 1, a: 1}
-    - _OutlineColor: {r: 1, g: 0.5586207, b: 0, a: 1}
-    - _SilhouetteColor: {r: 1, g: 0.77931035, b: 0.5, a: 1}
-    - _SpecColor: {r: 0, g: 0, b: 0, a: 1}
-    - _XrayColor: {r: 1, g: 0.35172415, b: 0, a: 1}
-    - _node_3055: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-    - _node_657: {r: 1, g: 0, b: 0, a: 1}
+    - _BaseColor: {r: 0, g: 0, b: 0, a: 0}
+    - _CharacterPosition: {r: -0.7420407, g: 0, b: -2.1579773, a: 0}
+    - _Color: {r: 1, g: 0.5586207, b: 0, a: 1}
+    - _EmissionColor: {r: 1, g: 0.2275863, b: 0, a: 1}
