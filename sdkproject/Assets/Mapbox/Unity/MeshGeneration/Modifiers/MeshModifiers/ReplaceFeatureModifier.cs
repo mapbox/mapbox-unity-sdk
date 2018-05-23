@@ -176,6 +176,11 @@
 		/// <param name="feature">Feature.</param>
 		private bool ShouldSpawnFeature(VectorFeatureUnity feature)
 		{
+			if (feature == null)
+			{
+				return false;
+			}
+
 			foreach (var point in _latLonToSpawn)
 			{
 				var coord = Conversions.StringToLatLon(point);
