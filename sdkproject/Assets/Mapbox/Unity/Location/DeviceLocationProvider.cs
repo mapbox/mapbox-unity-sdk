@@ -21,7 +21,7 @@ namespace Mapbox.Unity.Location
 		/// </summary>
 		[SerializeField]
 		[Tooltip("Using higher value like 500 usually does not require to turn GPS chip on and thus saves battery power. Values like 5-10 could be used for getting best accuracy.")]
-		float _desiredAccuracyInMeters = 1.0f;
+		public float _desiredAccuracyInMeters = 1.0f;
 
 
 		/// <summary>
@@ -30,22 +30,29 @@ namespace Mapbox.Unity.Location
 		/// </summary>
 		[SerializeField]
 		[Tooltip("The minimum distance (measured in meters) a device must move laterally before Input.location property is updated. Higher values like 500 imply less overhead.")]
-		float _updateDistanceInMeters = 0.0f;
+		public float _updateDistanceInMeters = 0.0f;
 
 
 		[SerializeField]
 		[Tooltip("The minimum time interval between location updates, in milliseconds. It's reasonable to not go below 500ms.")]
-		long _updateTimeInMilliSeconds = 500;
+		public long _updateTimeInMilliSeconds = 500;
 
 
-		[Header("For Editor debugging only:")]
-		[SerializeField]
-		[Tooltip("FOR DEBUGGING IN EDITOR!!! Mock Unity's 'Input.Location' to route location log files through this class (eg fresh calculation of 'UserHeading') instead of just replaying them. To use set 'Editor Location Provider' in 'Location Factory' to 'Device Location Provider' and select a location log file below.")]
-		bool _mockUnityInputLocation = false;
+		[Serializable]
+		public struct DebuggingInEditor
+		{
+			[Header("set 'EditorLocationProvider' to 'DeviceLocationProvider' and connect device with UnityRemote.")]
+			[SerializeField]
+			[Tooltip("Mock Unity's 'Input.Location' to route location log files through this class (eg fresh calculation of 'UserHeading') instead of just replaying them. To use set 'Editor Location Provider' in 'Location Factory' to 'Device Location Provider' and select a location log file below.")]
+			public bool _mockUnityInputLocation;
 
-		[SerializeField]
-		[Tooltip("FOR DEBUGGING IN EDITOR!!! Also see above. Location log file to mock Unity's 'Input.Location'.")]
-		private TextAsset _locationLogFile = null;
+			[SerializeField]
+			[Tooltip("Also see above. Location log file to mock Unity's 'Input.Location'.")]
+			public TextAsset _locationLogFile;
+		}
+
+		[Space(20)]
+		public DebuggingInEditor _editorDebuggingOnly;
 
 
 		private IMapboxLocationService _locationService;
@@ -84,14 +91,14 @@ namespace Mapbox.Unity.Location
 		protected virtual void Awake()
 		{
 #if UNITY_EDITOR
-			if (_mockUnityInputLocation)
+			if (_editorDebuggingOnly._mockUnityInputLocation)
 			{
-				if (null == _locationLogFile || null == _locationLogFile.bytes)
+				if (null == _editorDebuggingOnly._locationLogFile || null == _editorDebuggingOnly._locationLogFile.bytes)
 				{
 					throw new ArgumentNullException("Location Log File");
 				}
 
-				_locationService = new MapboxLocationServiceMock(_locationLogFile.bytes);
+				_locationService = new MapboxLocationServiceMock(_editorDebuggingOnly._locationLogFile.bytes);
 			}
 			else
 			{
@@ -294,6 +301,7 @@ namespace Mapbox.Unity.Location
 						{
 							lastHeadings[i - 1] = (float)(Math.Atan2(_lastPositions[i].y - _lastPositions[i - 1].y, _lastPositions[i].x - _lastPositions[i - 1].x) * 180 / Math.PI);
 							// quick fix to take care of 355° and 5° being apart 10° and not 350°
+							lastHeadings[i - 1] = Math.Abs(lastHeadings[i - 1]);
 							if (lastHeadings[i - 1] > 180) { lastHeadings[i - 1] -= 360f; }
 						}
 

@@ -675,8 +675,9 @@ MonoBehaviour:
   _desiredAccuracyInMeters: 1
   _updateDistanceInMeters: 0.5
   _updateTimeInMilliSeconds: 500
-  _mockUnityInputLocation: 1
-  _locationLogFile: {fileID: 4900000, guid: b88daf565166aeb4bad8b889e9bcc1a6, type: 3}
+  _editorDebuggingOnly:
+    _mockUnityInputLocation: 1
+    _locationLogFile: {fileID: 4900000, guid: b88daf565166aeb4bad8b889e9bcc1a6, type: 3}
 --- !u!4 &849657522
 Transform:
   m_ObjectHideFlags: 0
