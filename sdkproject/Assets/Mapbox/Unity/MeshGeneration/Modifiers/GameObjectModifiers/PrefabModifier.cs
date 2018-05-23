@@ -32,12 +32,12 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		public override void Run(VectorEntity ve, UnityTile tile)
 		{
 			//int selpos = ve.Feature.Points[0].Count / 2;
-			var met = new Vector3();
+			var centroidVector = new Vector3();
 			foreach( var point in ve.Feature.Points[0])
 			{
-				met += point;
+				centroidVector += point;
 			}
-			met = met / ve.Feature.Points[0].Count;
+			centroidVector = centroidVector / ve.Feature.Points[0].Count;
 
 			RectTransform goRectTransform;
 			IFeaturePropertySettable settable = null;
@@ -57,11 +57,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				goRectTransform = go.GetComponent<RectTransform>();
 				if (goRectTransform == null)
 				{
-					go.transform.localPosition = met;
+					go.transform.localPosition = centroidVector;
 				}
 				else
 				{
-					goRectTransform.anchoredPosition3D = met;
+					goRectTransform.anchoredPosition3D = centroidVector;
 				}
 				//go.transform.localScale = Constants.Math.Vector3One;
 
@@ -83,11 +83,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			goRectTransform = go.GetComponent<RectTransform>();
 			if (goRectTransform == null)
 			{
-				go.transform.localPosition = met;
+				go.transform.localPosition = centroidVector;
 			}
 			else
 			{
-				goRectTransform.anchoredPosition3D = met;
+				goRectTransform.anchoredPosition3D = centroidVector;
 			}
 			go.transform.SetParent(ve.GameObject.transform, false);
 			//go.transform.localScale = Constants.Math.Vector3One;

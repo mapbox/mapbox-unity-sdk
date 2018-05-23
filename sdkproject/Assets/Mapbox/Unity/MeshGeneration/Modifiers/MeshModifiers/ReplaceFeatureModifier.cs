@@ -60,14 +60,13 @@
 				var coord = Conversions.StringToLatLon(point);
 				if (feature.ContainsLatLon(coord))
 				{
+					
 
-
-					if(feature.Data.Id != null && !string.IsNullOrEmpty(feature.Data.Id.ToString()) && String.IsNullOrEmpty(_featureId))
+					if(feature.Data.Id != 0 && String.IsNullOrEmpty(_featureId))
 					{
 						_featureId = feature.Data.Id.ToString();
 						_featureId = _featureId.Substring(0, _featureId.Length - 3);
 					}
-					Debug.Log(_featureId);
 					return true;
 				}
 			}
