@@ -31,34 +31,20 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void Run(VectorEntity ve, UnityTile tile)
 		{
-			//int selpos = ve.Feature.Points[0].Count / 2;
-			var centroidVector = new Vector3();
-			foreach( var point in ve.Feature.Points[0])
-			{
-				centroidVector += point;
-			}
-			centroidVector = centroidVector / ve.Feature.Points[0].Count;
-
 			IFeaturePropertySettable settable = null;
 			GameObject go;
 
 			if (_objects.ContainsKey(ve.GameObject))
 			{
 				go = _objects[ve.GameObject];
-				settable = go.GetComponent<IFeaturePropertySettable>();
-				if (settable != null)
-				{
-					go = (settable as MonoBehaviour).gameObject;
-				}
-				PositionScaleRectTransform(ve, tile, go);
-				return;
 			}
-
-			go = Instantiate(_options.prefab);
-			_prefabList.Add(go);
-			_objects.Add(ve.GameObject, go);
-
-			go.transform.SetParent(ve.GameObject.transform, false);
+			else
+			{
+				go = Instantiate(_options.prefab);
+				_prefabList.Add(go);
+				_objects.Add(ve.GameObject, go);
+				go.transform.SetParent(ve.GameObject.transform, false);
+			}
 
 			PositionScaleRectTransform(ve, tile, go);
 
@@ -73,6 +59,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			RectTransform goRectTransform;
 			IFeaturePropertySettable settable = null;
 			var centroidVector = new Vector3();
+			foreach (var point in ve.Feature.Points[0])
+			{
+				centroidVector += point;
+			}
+			centroidVector = centroidVector / ve.Feature.Points[0].Count;
 
 			go.name = ve.Feature.Data.Id.ToString();
 
