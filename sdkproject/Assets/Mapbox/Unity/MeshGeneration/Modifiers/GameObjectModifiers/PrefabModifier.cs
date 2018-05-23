@@ -31,8 +31,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void Run(VectorEntity ve, UnityTile tile)
 		{
-			IFeaturePropertySettable settable = null;
-			GameObject go;
+			GameObject go = new GameObject();
 
 			if (_objects.ContainsKey(ve.GameObject))
 			{
@@ -88,11 +87,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				go.transform.localScale = (go.transform.localScale * (tile.TileScale));
 			}
-		}
-
-		public List<GameObject> returnInstanceList()
-		{
-			return _prefabList;
 		}
 	}
 }
