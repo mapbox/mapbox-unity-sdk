@@ -59,15 +59,16 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				for (int i = 0; i < _mdVertexCount; i++)
 				{
 					_vert = md.Vertices[i];
-					if (_options.texturingType == UvMapType.Tiled)
-					{
-						_uv.Add(new Vector2(_vert.x, _vert.z));
-					}
-					else if (_options.texturingType == UvMapType.Satellite)
+
+					if (_options.style == StyleTypes.Satellite)
 					{
 						var fromBottomLeft = new Vector2((float)(((_vert.x + md.PositionInTile.x) / tile.TileScale + _size.x / 2) / _size.x),
 							(float)(((_vert.z + md.PositionInTile.z) / tile.TileScale + _size.x / 2) / _size.x));
 						_uv.Add(fromBottomLeft);
+					}
+					else if (_options.texturingType == UvMapType.Tiled)
+					{
+						_uv.Add(new Vector2(_vert.x, _vert.z));
 					}
 				}
 			}

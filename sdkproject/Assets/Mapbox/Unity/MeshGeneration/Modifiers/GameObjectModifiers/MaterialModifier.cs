@@ -26,7 +26,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			var min = Math.Min(_options.materials.Length, ve.MeshFilter.mesh.subMeshCount);
 			var mats = new Material[min];
 
-			if (_options.texturingType != UvMapType.Satellite)
+			if (_options.style != StyleTypes.Satellite)
 			{
 				for (int i = 0; i < min; i++)
 				{

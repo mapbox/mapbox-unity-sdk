@@ -4,6 +4,7 @@
 	using System.Collections.Generic;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
 	using Mapbox.Unity.Utilities;
+	using UnityEngine;
 
 	[Serializable]
 	public class VectorSubLayerProperties : LayerProperties
@@ -21,10 +22,13 @@
 		{
 			colliderType = ColliderType.None,
 		};
+
 		public GeometryMaterialOptions materialOptions = new GeometryMaterialOptions();
+
 		//HACK : workaround to avoid users accidentaly leaving the buildingsWithUniqueIds settign on and have missing buildings. 
 		public bool honorBuildingIdSetting = true;
 		public bool buildingsWithUniqueIds = false;
+
 		public PositionTargetType moveFeaturePositionTo;
 		[NodeEditorElement("Mesh Modifiers")]
 		public List<MeshModifier> MeshModifiers;
