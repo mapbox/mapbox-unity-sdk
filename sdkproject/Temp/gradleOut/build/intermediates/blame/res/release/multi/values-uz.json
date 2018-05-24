@@ -1,0 +1,102 @@
+[
+    {
+        "outputFile": "D:\\Unity2018\\WorldScaleARUX\\Temp\\gradleOut\\build\\intermediates\\incremental\\mergeReleaseResources\\merged.dir\\values-uz\\values-uz.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 55,
+                    "endColumn": 56,
+                    "endOffset": 107
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\e26656ec822d82bcdc884a6779a371e4053bc7d1\\output\\res\\values-uz\\values.xml",
+                    "position": {
+                        "startLine": 4,
+                        "startColumn": 0,
+                        "startOffset": 199,
+                        "endColumn": 52,
+                        "endOffset": 251
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 3,
+                    "startColumn": 4,
+                    "startOffset": 112,
+                    "endColumn": 57,
+                    "endOffset": 165
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\e26656ec822d82bcdc884a6779a371e4053bc7d1\\output\\res\\values-uz\\values.xml",
+                    "position": {
+                        "startLine": 5,
+                        "startColumn": 0,
+                        "startOffset": 252,
+                        "endColumn": 53,
+                        "endOffset": 305
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 4,
+                    "startColumn": 4,
+                    "startOffset": 170,
+                    "endColumn": 118,
+                    "endOffset": 284
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\e26656ec822d82bcdc884a6779a371e4053bc7d1\\output\\res\\values-uz\\values.xml",
+                    "position": {
+                        "startLine": 6,
+                        "startColumn": 0,
+                        "startOffset": 306,
+                        "endColumn": 114,
+                        "endOffset": 420
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 5,
+                    "startColumn": 4,
+                    "startOffset": 289,
+                    "endColumn": 126,
+                    "endOffset": 411
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\e26656ec822d82bcdc884a6779a371e4053bc7d1\\output\\res\\values-uz\\values.xml",
+                    "position": {
+                        "startLine": 7,
+                        "startColumn": 0,
+                        "startOffset": 421,
+                        "endColumn": 122,
+                        "endOffset": 543
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 6,
+                    "startColumn": 4,
+                    "startOffset": 416,
+                    "endColumn": 69,
+                    "endOffset": 481
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\e26656ec822d82bcdc884a6779a371e4053bc7d1\\output\\res\\values-uz\\values.xml",
+                    "position": {
+                        "startLine": 8,
+                        "startColumn": 0,
+                        "startOffset": 544,
+                        "endColumn": 65,
+                        "endOffset": 609
+                    }
+                }
+            }
+        ]
+    }
+]

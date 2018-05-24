@@ -1,0 +1,501 @@
+[
+    {
+        "outputFile": "D:\\Unity2018\\WorldScaleARUX\\Temp\\gradleOut\\build\\intermediates\\incremental\\mergeReleaseResources\\merged.dir\\values-hr\\values-hr.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 55,
+                    "endColumn": 52,
+                    "endOffset": 103
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\e26656ec822d82bcdc884a6779a371e4053bc7d1\\output\\res\\values-hr\\values.xml",
+                    "position": {
+                        "startLine": 4,
+                        "startColumn": 0,
+                        "startOffset": 199,
+                        "endColumn": 48,
+                        "endOffset": 247
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 3,
+                    "startColumn": 4,
+                    "startOffset": 108,
+                    "endColumn": 53,
+                    "endOffset": 157
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\e26656ec822d82bcdc884a6779a371e4053bc7d1\\output\\res\\values-hr\\values.xml",
+                    "position": {
+                        "startLine": 5,
+                        "startColumn": 0,
+                        "startOffset": 248,
+                        "endColumn": 49,
+                        "endOffset": 297
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 4,
+                    "startColumn": 4,
+                    "startOffset": 162,
+                    "endColumn": 100,
+                    "endOffset": 258
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\e26656ec822d82bcdc884a6779a371e4053bc7d1\\output\\res\\values-hr\\values.xml",
+                    "position": {
+                        "startLine": 6,
+                        "startColumn": 0,
+                        "startOffset": 298,
+                        "endColumn": 96,
+                        "endOffset": 394
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 5,
+                    "startColumn": 4,
+                    "startOffset": 263,
+                    "endColumn": 102,
+                    "endOffset": 361
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\e26656ec822d82bcdc884a6779a371e4053bc7d1\\output\\res\\values-hr\\values.xml",
+                    "position": {
+                        "startLine": 7,
+                        "startColumn": 0,
+                        "startOffset": 395,
+                        "endColumn": 98,
+                        "endOffset": 493
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 6,
+                    "startColumn": 4,
+                    "startOffset": 366,
+                    "endColumn": 69,
+                    "endOffset": 431
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\e26656ec822d82bcdc884a6779a371e4053bc7d1\\output\\res\\values-hr\\values.xml",
+                    "position": {
+                        "startLine": 8,
+                        "startColumn": 0,
+                        "startOffset": 494,
+                        "endColumn": 65,
+                        "endOffset": 559
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 7,
+                    "startColumn": 4,
+                    "startOffset": 436,
+                    "endColumn": 104,
+                    "endOffset": 536
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-hr\\values-hr.xml",
+                    "position": {
+                        "startLine": 2,
+                        "startColumn": 4,
+                        "startOffset": 55,
+                        "endColumn": 104,
+                        "endOffset": 155
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 8,
+                    "startColumn": 4,
+                    "startOffset": 541,
+                    "endColumn": 107,
+                    "endOffset": 644
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-hr\\values-hr.xml",
+                    "position": {
+                        "startLine": 3,
+                        "startColumn": 4,
+                        "startOffset": 160,
+                        "endColumn": 107,
+                        "endOffset": 263
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 9,
+                    "startColumn": 4,
+                    "startOffset": 649,
+                    "endColumn": 122,
+                    "endOffset": 767
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-hr\\values-hr.xml",
+                    "position": {
+                        "startLine": 4,
+                        "startColumn": 4,
+                        "startOffset": 268,
+                        "endColumn": 122,
+                        "endOffset": 386
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 10,
+                    "startColumn": 4,
+                    "startOffset": 772,
+                    "endColumn": 96,
+                    "endOffset": 864
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-hr\\values-hr.xml",
+                    "position": {
+                        "startLine": 5,
+                        "startColumn": 4,
+                        "startOffset": 391,
+                        "endColumn": 96,
+                        "endOffset": 483
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 11,
+                    "startColumn": 4,
+                    "startOffset": 869,
+                    "endColumn": 109,
+                    "endOffset": 974
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-hr\\values-hr.xml",
+                    "position": {
+                        "startLine": 6,
+                        "startColumn": 4,
+                        "startOffset": 488,
+                        "endColumn": 109,
+                        "endOffset": 593
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 12,
+                    "startColumn": 4,
+                    "startOffset": 979,
+                    "endColumn": 85,
+                    "endOffset": 1060
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-hr\\values-hr.xml",
+                    "position": {
+                        "startLine": 7,
+                        "startColumn": 4,
+                        "startOffset": 598,
+                        "endColumn": 85,
+                        "endOffset": 679
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 13,
+                    "startColumn": 4,
+                    "startOffset": 1065,
+                    "endColumn": 103,
+                    "endOffset": 1164
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-hr\\values-hr.xml",
+                    "position": {
+                        "startLine": 8,
+                        "startColumn": 4,
+                        "startOffset": 684,
+                        "endColumn": 103,
+                        "endOffset": 783
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 14,
+                    "startColumn": 4,
+                    "startOffset": 1169,
+                    "endColumn": 118,
+                    "endOffset": 1283
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-hr\\values-hr.xml",
+                    "position": {
+                        "startLine": 9,
+                        "startColumn": 4,
+                        "startOffset": 788,
+                        "endColumn": 118,
+                        "endOffset": 902
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 15,
+                    "startColumn": 4,
+                    "startOffset": 1288,
+                    "endColumn": 83,
+                    "endOffset": 1367
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-hr\\values-hr.xml",
+                    "position": {
+                        "startLine": 10,
+                        "startColumn": 4,
+                        "startOffset": 907,
+                        "endColumn": 83,
+                        "endOffset": 986
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 16,
+                    "startColumn": 4,
+                    "startOffset": 1372,
+                    "endColumn": 82,
+                    "endOffset": 1450
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-hr\\values-hr.xml",
+                    "position": {
+                        "startLine": 11,
+                        "startColumn": 4,
+                        "startOffset": 991,
+                        "endColumn": 82,
+                        "endOffset": 1069
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 17,
+                    "startColumn": 4,
+                    "startOffset": 1455,
+                    "endColumn": 85,
+                    "endOffset": 1536
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-hr\\values-hr.xml",
+                    "position": {
+                        "startLine": 12,
+                        "startColumn": 4,
+                        "startOffset": 1074,
+                        "endColumn": 85,
+                        "endOffset": 1155
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 18,
+                    "startColumn": 4,
+                    "startOffset": 1541,
+                    "endColumn": 103,
+                    "endOffset": 1640
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-hr\\values-hr.xml",
+                    "position": {
+                        "startLine": 13,
+                        "startColumn": 4,
+                        "startOffset": 1160,
+                        "endColumn": 103,
+                        "endOffset": 1259
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 19,
+                    "startColumn": 4,
+                    "startOffset": 1645,
+                    "endColumn": 112,
+                    "endOffset": 1753
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-hr\\values-hr.xml",
+                    "position": {
+                        "startLine": 14,
+                        "startColumn": 4,
+                        "startOffset": 1264,
+                        "endColumn": 112,
+                        "endOffset": 1372
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 20,
+                    "startColumn": 4,
+                    "startOffset": 1758,
+                    "endColumn": 105,
+                    "endOffset": 1859
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-hr\\values-hr.xml",
+                    "position": {
+                        "startLine": 15,
+                        "startColumn": 4,
+                        "startOffset": 1377,
+                        "endColumn": 105,
+                        "endOffset": 1478
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 21,
+                    "startColumn": 4,
+                    "startOffset": 1864,
+                    "endColumn": 104,
+                    "endOffset": 1964
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-hr\\values-hr.xml",
+                    "position": {
+                        "startLine": 16,
+                        "startColumn": 4,
+                        "startOffset": 1483,
+                        "endColumn": 104,
+                        "endOffset": 1583
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 22,
+                    "startColumn": 4,
+                    "startOffset": 1969,
+                    "endColumn": 112,
+                    "endOffset": 2077
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-hr\\values-hr.xml",
+                    "position": {
+                        "startLine": 17,
+                        "startColumn": 4,
+                        "startOffset": 1588,
+                        "endColumn": 112,
+                        "endOffset": 1696
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 23,
+                    "startColumn": 4,
+                    "startOffset": 2082,
+                    "endColumn": 106,
+                    "endOffset": 2184
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-hr\\values-hr.xml",
+                    "position": {
+                        "startLine": 18,
+                        "startColumn": 4,
+                        "startOffset": 1701,
+                        "endColumn": 106,
+                        "endOffset": 1803
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 24,
+                    "startColumn": 4,
+                    "startOffset": 2189,
+                    "endColumn": 122,
+                    "endOffset": 2307
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-hr\\values-hr.xml",
+                    "position": {
+                        "startLine": 19,
+                        "startColumn": 4,
+                        "startOffset": 1808,
+                        "endColumn": 122,
+                        "endOffset": 1926
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 25,
+                    "startColumn": 4,
+                    "startOffset": 2312,
+                    "endColumn": 96,
+                    "endOffset": 2404
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-hr\\values-hr.xml",
+                    "position": {
+                        "startLine": 20,
+                        "startColumn": 4,
+                        "startOffset": 1931,
+                        "endColumn": 96,
+                        "endOffset": 2023
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 26,
+                    "startColumn": 4,
+                    "startOffset": 2409,
+                    "endColumn": 88,
+                    "endOffset": 2493
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-hr\\values-hr.xml",
+                    "position": {
+                        "startLine": 21,
+                        "startColumn": 4,
+                        "startOffset": 2028,
+                        "endColumn": 88,
+                        "endOffset": 2112
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 27,
+                    "startColumn": 4,
+                    "startOffset": 2498,
+                    "endColumn": 100,
+                    "endOffset": 2594
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-hr\\values-hr.xml",
+                    "position": {
+                        "startLine": 22,
+                        "startColumn": 4,
+                        "startOffset": 2117,
+                        "endColumn": 100,
+                        "endOffset": 2213
+                    }
+                }
+            }
+        ]
+    }
+]

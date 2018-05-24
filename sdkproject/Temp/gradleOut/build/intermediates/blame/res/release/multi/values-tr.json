@@ -1,0 +1,501 @@
+[
+    {
+        "outputFile": "D:\\Unity2018\\WorldScaleARUX\\Temp\\gradleOut\\build\\intermediates\\incremental\\mergeReleaseResources\\merged.dir\\values-tr\\values-tr.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 55,
+                    "endColumn": 49,
+                    "endOffset": 100
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\e26656ec822d82bcdc884a6779a371e4053bc7d1\\output\\res\\values-tr\\values.xml",
+                    "position": {
+                        "startLine": 4,
+                        "startColumn": 0,
+                        "startOffset": 199,
+                        "endColumn": 45,
+                        "endOffset": 244
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 3,
+                    "startColumn": 4,
+                    "startOffset": 105,
+                    "endColumn": 51,
+                    "endOffset": 152
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\e26656ec822d82bcdc884a6779a371e4053bc7d1\\output\\res\\values-tr\\values.xml",
+                    "position": {
+                        "startLine": 5,
+                        "startColumn": 0,
+                        "startOffset": 245,
+                        "endColumn": 47,
+                        "endOffset": 292
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 4,
+                    "startColumn": 4,
+                    "startOffset": 157,
+                    "endColumn": 109,
+                    "endOffset": 262
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\e26656ec822d82bcdc884a6779a371e4053bc7d1\\output\\res\\values-tr\\values.xml",
+                    "position": {
+                        "startLine": 6,
+                        "startColumn": 0,
+                        "startOffset": 293,
+                        "endColumn": 105,
+                        "endOffset": 398
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 5,
+                    "startColumn": 4,
+                    "startOffset": 267,
+                    "endColumn": 118,
+                    "endOffset": 381
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\e26656ec822d82bcdc884a6779a371e4053bc7d1\\output\\res\\values-tr\\values.xml",
+                    "position": {
+                        "startLine": 7,
+                        "startColumn": 0,
+                        "startOffset": 399,
+                        "endColumn": 114,
+                        "endOffset": 513
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 6,
+                    "startColumn": 4,
+                    "startOffset": 386,
+                    "endColumn": 66,
+                    "endOffset": 448
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\e26656ec822d82bcdc884a6779a371e4053bc7d1\\output\\res\\values-tr\\values.xml",
+                    "position": {
+                        "startLine": 8,
+                        "startColumn": 0,
+                        "startOffset": 514,
+                        "endColumn": 62,
+                        "endOffset": 576
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 7,
+                    "startColumn": 4,
+                    "startOffset": 453,
+                    "endColumn": 104,
+                    "endOffset": 553
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-tr\\values-tr.xml",
+                    "position": {
+                        "startLine": 2,
+                        "startColumn": 4,
+                        "startOffset": 55,
+                        "endColumn": 104,
+                        "endOffset": 155
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 8,
+                    "startColumn": 4,
+                    "startOffset": 558,
+                    "endColumn": 107,
+                    "endOffset": 661
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-tr\\values-tr.xml",
+                    "position": {
+                        "startLine": 3,
+                        "startColumn": 4,
+                        "startOffset": 160,
+                        "endColumn": 107,
+                        "endOffset": 263
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 9,
+                    "startColumn": 4,
+                    "startOffset": 666,
+                    "endColumn": 122,
+                    "endOffset": 784
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-tr\\values-tr.xml",
+                    "position": {
+                        "startLine": 4,
+                        "startColumn": 4,
+                        "startOffset": 268,
+                        "endColumn": 122,
+                        "endOffset": 386
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 10,
+                    "startColumn": 4,
+                    "startOffset": 789,
+                    "endColumn": 98,
+                    "endOffset": 883
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-tr\\values-tr.xml",
+                    "position": {
+                        "startLine": 5,
+                        "startColumn": 4,
+                        "startOffset": 391,
+                        "endColumn": 98,
+                        "endOffset": 485
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 11,
+                    "startColumn": 4,
+                    "startOffset": 888,
+                    "endColumn": 111,
+                    "endOffset": 995
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-tr\\values-tr.xml",
+                    "position": {
+                        "startLine": 6,
+                        "startColumn": 4,
+                        "startOffset": 490,
+                        "endColumn": 111,
+                        "endOffset": 597
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 12,
+                    "startColumn": 4,
+                    "startOffset": 1000,
+                    "endColumn": 84,
+                    "endOffset": 1080
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-tr\\values-tr.xml",
+                    "position": {
+                        "startLine": 7,
+                        "startColumn": 4,
+                        "startOffset": 602,
+                        "endColumn": 84,
+                        "endOffset": 682
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 13,
+                    "startColumn": 4,
+                    "startOffset": 1085,
+                    "endColumn": 105,
+                    "endOffset": 1186
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-tr\\values-tr.xml",
+                    "position": {
+                        "startLine": 8,
+                        "startColumn": 4,
+                        "startOffset": 687,
+                        "endColumn": 105,
+                        "endOffset": 788
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 14,
+                    "startColumn": 4,
+                    "startOffset": 1191,
+                    "endColumn": 119,
+                    "endOffset": 1306
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-tr\\values-tr.xml",
+                    "position": {
+                        "startLine": 9,
+                        "startColumn": 4,
+                        "startOffset": 793,
+                        "endColumn": 119,
+                        "endOffset": 908
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 15,
+                    "startColumn": 4,
+                    "startOffset": 1311,
+                    "endColumn": 78,
+                    "endOffset": 1385
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-tr\\values-tr.xml",
+                    "position": {
+                        "startLine": 10,
+                        "startColumn": 4,
+                        "startOffset": 913,
+                        "endColumn": 78,
+                        "endOffset": 987
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 16,
+                    "startColumn": 4,
+                    "startOffset": 1390,
+                    "endColumn": 75,
+                    "endOffset": 1461
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-tr\\values-tr.xml",
+                    "position": {
+                        "startLine": 11,
+                        "startColumn": 4,
+                        "startOffset": 992,
+                        "endColumn": 75,
+                        "endOffset": 1063
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 17,
+                    "startColumn": 4,
+                    "startOffset": 1466,
+                    "endColumn": 78,
+                    "endOffset": 1540
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-tr\\values-tr.xml",
+                    "position": {
+                        "startLine": 12,
+                        "startColumn": 4,
+                        "startOffset": 1068,
+                        "endColumn": 78,
+                        "endOffset": 1142
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 18,
+                    "startColumn": 4,
+                    "startOffset": 1545,
+                    "endColumn": 106,
+                    "endOffset": 1647
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-tr\\values-tr.xml",
+                    "position": {
+                        "startLine": 13,
+                        "startColumn": 4,
+                        "startOffset": 1147,
+                        "endColumn": 106,
+                        "endOffset": 1249
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 19,
+                    "startColumn": 4,
+                    "startOffset": 1652,
+                    "endColumn": 104,
+                    "endOffset": 1752
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-tr\\values-tr.xml",
+                    "position": {
+                        "startLine": 14,
+                        "startColumn": 4,
+                        "startOffset": 1254,
+                        "endColumn": 104,
+                        "endOffset": 1354
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 20,
+                    "startColumn": 4,
+                    "startOffset": 1757,
+                    "endColumn": 95,
+                    "endOffset": 1848
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-tr\\values-tr.xml",
+                    "position": {
+                        "startLine": 15,
+                        "startColumn": 4,
+                        "startOffset": 1359,
+                        "endColumn": 95,
+                        "endOffset": 1450
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 21,
+                    "startColumn": 4,
+                    "startOffset": 1853,
+                    "endColumn": 106,
+                    "endOffset": 1955
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-tr\\values-tr.xml",
+                    "position": {
+                        "startLine": 16,
+                        "startColumn": 4,
+                        "startOffset": 1455,
+                        "endColumn": 106,
+                        "endOffset": 1557
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 22,
+                    "startColumn": 4,
+                    "startOffset": 1960,
+                    "endColumn": 101,
+                    "endOffset": 2057
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-tr\\values-tr.xml",
+                    "position": {
+                        "startLine": 17,
+                        "startColumn": 4,
+                        "startOffset": 1562,
+                        "endColumn": 101,
+                        "endOffset": 1659
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 23,
+                    "startColumn": 4,
+                    "startOffset": 2062,
+                    "endColumn": 107,
+                    "endOffset": 2165
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-tr\\values-tr.xml",
+                    "position": {
+                        "startLine": 18,
+                        "startColumn": 4,
+                        "startOffset": 1664,
+                        "endColumn": 107,
+                        "endOffset": 1767
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 24,
+                    "startColumn": 4,
+                    "startOffset": 2170,
+                    "endColumn": 118,
+                    "endOffset": 2284
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-tr\\values-tr.xml",
+                    "position": {
+                        "startLine": 19,
+                        "startColumn": 4,
+                        "startOffset": 1772,
+                        "endColumn": 118,
+                        "endOffset": 1886
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 25,
+                    "startColumn": 4,
+                    "startOffset": 2289,
+                    "endColumn": 97,
+                    "endOffset": 2382
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-tr\\values-tr.xml",
+                    "position": {
+                        "startLine": 20,
+                        "startColumn": 4,
+                        "startOffset": 1891,
+                        "endColumn": 97,
+                        "endOffset": 1984
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 26,
+                    "startColumn": 4,
+                    "startOffset": 2387,
+                    "endColumn": 78,
+                    "endOffset": 2461
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-tr\\values-tr.xml",
+                    "position": {
+                        "startLine": 21,
+                        "startColumn": 4,
+                        "startOffset": 1989,
+                        "endColumn": 78,
+                        "endOffset": 2063
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 27,
+                    "startColumn": 4,
+                    "startOffset": 2466,
+                    "endColumn": 100,
+                    "endOffset": 2562
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-tr\\values-tr.xml",
+                    "position": {
+                        "startLine": 22,
+                        "startColumn": 4,
+                        "startOffset": 2068,
+                        "endColumn": 100,
+                        "endOffset": 2164
+                    }
+                }
+            }
+        ]
+    }
+]

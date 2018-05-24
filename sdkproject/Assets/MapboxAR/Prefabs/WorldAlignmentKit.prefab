@@ -2278,6 +2278,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5e4bbf13fb4b4b8185ca3a5fa3d140e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  GPS_Button: {fileID: 0}
+  firstTarget:
+    InstructionText: 
+    canvasEvent:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  secondTarget:
+    InstructionText: 
+    canvasEvent:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  takingGps:
+    InstructionText: 
+    canvasEvent:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  endofCalibration:
+    InstructionText: 
+    canvasEvent:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
   _arPositionReference: {fileID: 4066601245629192}
   _map: {fileID: 114673356928061534}
   _useAutomaticSynchronizationBias: 0

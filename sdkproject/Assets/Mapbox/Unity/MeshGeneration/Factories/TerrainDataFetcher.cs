@@ -22,7 +22,7 @@ public class TerrainDataFetcher : DataFetcher
 	public Action<UnityTile, TileErrorEventArgs> FetchingError = (t, s) => { };
 
 	//tile here should be totally optional and used only not to have keep a dictionary in terrain factory base
-	public void FetchTerrain(CanonicalTileId canonicalTileId, string mapid, UnityTile tile = null)
+	public void FetchTerrain(CanonicalTileId canonicalTileId, string mapid, UnityTile tile = null) 
 	{
 		var pngRasterTile = new RawPngRasterTile();
 		pngRasterTile.Initialize(_fileSource, canonicalTileId, mapid, () =>
@@ -31,10 +31,8 @@ public class TerrainDataFetcher : DataFetcher
 			{
 				FetchingError(tile, new TileErrorEventArgs(canonicalTileId, pngRasterTile.GetType(), null, pngRasterTile.Exceptions));
 			}
-			else
-			{
-				DataRecieved(tile, pngRasterTile);
-			}
+
+			DataRecieved(tile, pngRasterTile);
 		});
 	}
 }

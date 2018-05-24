@@ -1,0 +1,501 @@
+[
+    {
+        "outputFile": "D:\\Unity2018\\WorldScaleARUX\\Temp\\gradleOut\\build\\intermediates\\incremental\\mergeReleaseResources\\merged.dir\\values-sv\\values-sv.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 55,
+                    "endColumn": 50,
+                    "endOffset": 101
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\e26656ec822d82bcdc884a6779a371e4053bc7d1\\output\\res\\values-sv\\values.xml",
+                    "position": {
+                        "startLine": 4,
+                        "startColumn": 0,
+                        "startOffset": 199,
+                        "endColumn": 46,
+                        "endOffset": 245
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 3,
+                    "startColumn": 4,
+                    "startOffset": 106,
+                    "endColumn": 54,
+                    "endOffset": 156
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\e26656ec822d82bcdc884a6779a371e4053bc7d1\\output\\res\\values-sv\\values.xml",
+                    "position": {
+                        "startLine": 5,
+                        "startColumn": 0,
+                        "startOffset": 246,
+                        "endColumn": 50,
+                        "endOffset": 296
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 4,
+                    "startColumn": 4,
+                    "startOffset": 161,
+                    "endColumn": 105,
+                    "endOffset": 262
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\e26656ec822d82bcdc884a6779a371e4053bc7d1\\output\\res\\values-sv\\values.xml",
+                    "position": {
+                        "startLine": 6,
+                        "startColumn": 0,
+                        "startOffset": 297,
+                        "endColumn": 101,
+                        "endOffset": 398
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 5,
+                    "startColumn": 4,
+                    "startOffset": 267,
+                    "endColumn": 114,
+                    "endOffset": 377
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\e26656ec822d82bcdc884a6779a371e4053bc7d1\\output\\res\\values-sv\\values.xml",
+                    "position": {
+                        "startLine": 7,
+                        "startColumn": 0,
+                        "startOffset": 399,
+                        "endColumn": 110,
+                        "endOffset": 509
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 6,
+                    "startColumn": 4,
+                    "startOffset": 382,
+                    "endColumn": 68,
+                    "endOffset": 446
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\e26656ec822d82bcdc884a6779a371e4053bc7d1\\output\\res\\values-sv\\values.xml",
+                    "position": {
+                        "startLine": 8,
+                        "startColumn": 0,
+                        "startOffset": 510,
+                        "endColumn": 64,
+                        "endOffset": 574
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 7,
+                    "startColumn": 4,
+                    "startOffset": 451,
+                    "endColumn": 105,
+                    "endOffset": 552
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-sv\\values-sv.xml",
+                    "position": {
+                        "startLine": 2,
+                        "startColumn": 4,
+                        "startOffset": 55,
+                        "endColumn": 105,
+                        "endOffset": 156
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 8,
+                    "startColumn": 4,
+                    "startOffset": 557,
+                    "endColumn": 107,
+                    "endOffset": 660
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-sv\\values-sv.xml",
+                    "position": {
+                        "startLine": 3,
+                        "startColumn": 4,
+                        "startOffset": 161,
+                        "endColumn": 107,
+                        "endOffset": 264
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 9,
+                    "startColumn": 4,
+                    "startOffset": 665,
+                    "endColumn": 122,
+                    "endOffset": 783
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-sv\\values-sv.xml",
+                    "position": {
+                        "startLine": 4,
+                        "startColumn": 4,
+                        "startOffset": 269,
+                        "endColumn": 122,
+                        "endOffset": 387
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 10,
+                    "startColumn": 4,
+                    "startOffset": 788,
+                    "endColumn": 102,
+                    "endOffset": 886
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-sv\\values-sv.xml",
+                    "position": {
+                        "startLine": 5,
+                        "startColumn": 4,
+                        "startOffset": 392,
+                        "endColumn": 102,
+                        "endOffset": 490
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 11,
+                    "startColumn": 4,
+                    "startOffset": 891,
+                    "endColumn": 110,
+                    "endOffset": 997
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-sv\\values-sv.xml",
+                    "position": {
+                        "startLine": 6,
+                        "startColumn": 4,
+                        "startOffset": 495,
+                        "endColumn": 110,
+                        "endOffset": 601
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 12,
+                    "startColumn": 4,
+                    "startOffset": 1002,
+                    "endColumn": 84,
+                    "endOffset": 1082
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-sv\\values-sv.xml",
+                    "position": {
+                        "startLine": 7,
+                        "startColumn": 4,
+                        "startOffset": 606,
+                        "endColumn": 84,
+                        "endOffset": 686
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 13,
+                    "startColumn": 4,
+                    "startOffset": 1087,
+                    "endColumn": 101,
+                    "endOffset": 1184
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-sv\\values-sv.xml",
+                    "position": {
+                        "startLine": 8,
+                        "startColumn": 4,
+                        "startOffset": 691,
+                        "endColumn": 101,
+                        "endOffset": 788
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 14,
+                    "startColumn": 4,
+                    "startOffset": 1189,
+                    "endColumn": 112,
+                    "endOffset": 1297
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-sv\\values-sv.xml",
+                    "position": {
+                        "startLine": 9,
+                        "startColumn": 4,
+                        "startOffset": 793,
+                        "endColumn": 112,
+                        "endOffset": 901
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 15,
+                    "startColumn": 4,
+                    "startOffset": 1302,
+                    "endColumn": 75,
+                    "endOffset": 1373
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-sv\\values-sv.xml",
+                    "position": {
+                        "startLine": 10,
+                        "startColumn": 4,
+                        "startOffset": 906,
+                        "endColumn": 75,
+                        "endOffset": 977
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 16,
+                    "startColumn": 4,
+                    "startOffset": 1378,
+                    "endColumn": 75,
+                    "endOffset": 1449
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-sv\\values-sv.xml",
+                    "position": {
+                        "startLine": 11,
+                        "startColumn": 4,
+                        "startOffset": 982,
+                        "endColumn": 75,
+                        "endOffset": 1053
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 17,
+                    "startColumn": 4,
+                    "startOffset": 1454,
+                    "endColumn": 79,
+                    "endOffset": 1529
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-sv\\values-sv.xml",
+                    "position": {
+                        "startLine": 12,
+                        "startColumn": 4,
+                        "startOffset": 1058,
+                        "endColumn": 79,
+                        "endOffset": 1133
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 18,
+                    "startColumn": 4,
+                    "startOffset": 1534,
+                    "endColumn": 105,
+                    "endOffset": 1635
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-sv\\values-sv.xml",
+                    "position": {
+                        "startLine": 13,
+                        "startColumn": 4,
+                        "startOffset": 1138,
+                        "endColumn": 105,
+                        "endOffset": 1239
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 19,
+                    "startColumn": 4,
+                    "startOffset": 1640,
+                    "endColumn": 99,
+                    "endOffset": 1735
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-sv\\values-sv.xml",
+                    "position": {
+                        "startLine": 14,
+                        "startColumn": 4,
+                        "startOffset": 1244,
+                        "endColumn": 99,
+                        "endOffset": 1339
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 20,
+                    "startColumn": 4,
+                    "startOffset": 1740,
+                    "endColumn": 95,
+                    "endOffset": 1831
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-sv\\values-sv.xml",
+                    "position": {
+                        "startLine": 15,
+                        "startColumn": 4,
+                        "startOffset": 1344,
+                        "endColumn": 95,
+                        "endOffset": 1435
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 21,
+                    "startColumn": 4,
+                    "startOffset": 1836,
+                    "endColumn": 104,
+                    "endOffset": 1936
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-sv\\values-sv.xml",
+                    "position": {
+                        "startLine": 16,
+                        "startColumn": 4,
+                        "startOffset": 1440,
+                        "endColumn": 104,
+                        "endOffset": 1540
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 22,
+                    "startColumn": 4,
+                    "startOffset": 1941,
+                    "endColumn": 101,
+                    "endOffset": 2038
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-sv\\values-sv.xml",
+                    "position": {
+                        "startLine": 17,
+                        "startColumn": 4,
+                        "startOffset": 1545,
+                        "endColumn": 101,
+                        "endOffset": 1642
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 23,
+                    "startColumn": 4,
+                    "startOffset": 2043,
+                    "endColumn": 101,
+                    "endOffset": 2140
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-sv\\values-sv.xml",
+                    "position": {
+                        "startLine": 18,
+                        "startColumn": 4,
+                        "startOffset": 1647,
+                        "endColumn": 101,
+                        "endOffset": 1744
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 24,
+                    "startColumn": 4,
+                    "startOffset": 2145,
+                    "endColumn": 116,
+                    "endOffset": 2257
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-sv\\values-sv.xml",
+                    "position": {
+                        "startLine": 19,
+                        "startColumn": 4,
+                        "startOffset": 1749,
+                        "endColumn": 116,
+                        "endOffset": 1861
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 25,
+                    "startColumn": 4,
+                    "startOffset": 2262,
+                    "endColumn": 101,
+                    "endOffset": 2359
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-sv\\values-sv.xml",
+                    "position": {
+                        "startLine": 20,
+                        "startColumn": 4,
+                        "startOffset": 1866,
+                        "endColumn": 101,
+                        "endOffset": 1963
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 26,
+                    "startColumn": 4,
+                    "startOffset": 2364,
+                    "endColumn": 78,
+                    "endOffset": 2438
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-sv\\values-sv.xml",
+                    "position": {
+                        "startLine": 21,
+                        "startColumn": 4,
+                        "startOffset": 1968,
+                        "endColumn": 78,
+                        "endOffset": 2042
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 27,
+                    "startColumn": 4,
+                    "startOffset": 2443,
+                    "endColumn": 100,
+                    "endOffset": 2539
+                },
+                "from": {
+                    "file": "C:\\Users\\ASUS\\.android\\build-cache\\6f07de201908e6880387361e1e89454d36f63089\\output\\res\\values-sv\\values-sv.xml",
+                    "position": {
+                        "startLine": 22,
+                        "startColumn": 4,
+                        "startOffset": 2047,
+                        "endColumn": 100,
+                        "endOffset": 2143
+                    }
+                }
+            }
+        ]
+    }
+]

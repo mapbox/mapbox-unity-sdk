@@ -22,36 +22,33 @@ namespace GoogleARCoreInternal
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Runtime.InteropServices;
     using GoogleARCore;
     using UnityEngine;
 
-    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented",
-    Justification = "Internal")]
-    public class NativeSession
+    internal class NativeSession
     {
-        private IntPtr m_SessionHandle = IntPtr.Zero;
-
-        private IntPtr m_FrameHandle = IntPtr.Zero;
-
-        private IntPtr m_PointCloudHandle = IntPtr.Zero;
-
         private float m_LastReleasedPointcloudTimestamp = 0.0f;
 
         private TrackableManager m_TrackableManager = null;
 
+        private Dictionary<IntPtr, int> m_AcquiredHandleCounts = new Dictionary<IntPtr, int>(
+            new IntPtrEqualityComparer());
+
         public NativeSession(IntPtr sessionHandle, IntPtr frameHandle)
         {
-            m_SessionHandle = sessionHandle;
-            m_FrameHandle = frameHandle;
+            SessionHandle = sessionHandle;
+            FrameHandle = frameHandle;
             m_TrackableManager = new TrackableManager(this);
 
             AnchorApi = new AnchorApi(this);
+            AugmentedImageApi = new AugmentedImageApi(this);
+            AugmentedImageDatabaseApi = new AugmentedImageDatabaseApi(this);
             CameraApi = new CameraApi(this);
             CameraMetadataApi = new CameraMetadataApi(this);
             FrameApi = new FrameApi(this);
             HitTestApi = new HitTestApi(this);
+            ImageApi = new ImageApi(this);
             LightEstimateApi = new LightEstimateApi(this);
             PlaneApi = new PlaneApi(this);
             PointApi = new PointApi(this);
@@ -63,36 +60,18 @@ namespace GoogleARCoreInternal
             TrackableListApi = new TrackableListApi(this);
         }
 
-        public IntPtr SessionHandle
-        {
-            get
-            {
-                return m_SessionHandle;
-            }
-        }
+        public IntPtr SessionHandle { get; private set; }
 
-        public IntPtr FrameHandle
-        {
-            get
-            {
-                return m_FrameHandle;
-            }
-        }
+        public IntPtr FrameHandle { get; private set; }
 
-        public IntPtr PointCloudHandle
-        {
-            get
-            {
-                return m_PointCloudHandle;
-            }
-        }
+        public IntPtr PointCloudHandle { get; private set; }
 
         public bool IsPointCloudNew
         {
             get
             {
                 // TODO (b/73256094): Remove when fixed.
-                if (LifecycleManager.Instance.SessionStatus != SessionStatus.Tracking)
+                if (LifecycleManager.Instance.IsTracking)
                 {
                     var previousLastTimestamp = m_LastReleasedPointcloudTimestamp;
                     m_LastReleasedPointcloudTimestamp = 0.0f;
@@ -105,6 +84,10 @@ namespace GoogleARCoreInternal
 
         public AnchorApi AnchorApi { get; private set; }
 
+        public AugmentedImageApi AugmentedImageApi { get; private set; }
+
+        public AugmentedImageDatabaseApi AugmentedImageDatabaseApi { get; private set; }
+
         public CameraApi CameraApi { get; private set; }
 
         public CameraMetadataApi CameraMetadataApi { get; private set; }
@@ -112,6 +95,8 @@ namespace GoogleARCoreInternal
         public FrameApi FrameApi { get; private set; }
 
         public HitTestApi HitTestApi { get; private set; }
+
+        public ImageApi ImageApi { get; private set; }
 
         public LightEstimateApi LightEstimateApi { get; private set; }
 
@@ -131,6 +116,42 @@ namespace GoogleARCoreInternal
 
         public TrackableListApi TrackableListApi { get; private set; }
 
+        public void MarkHandleAcquired(IntPtr handle)
+        {
+            if (handle == IntPtr.Zero)
+            {
+                Debug.LogError("MarkHandleAcquired::Attempted to mark a null handle acquired.");
+                return;
+            }
+
+            int acquireCount;
+            m_AcquiredHandleCounts.TryGetValue(handle, out acquireCount);
+            m_AcquiredHandleCounts[handle] = ++acquireCount;
+        }
+
+        public void MarkHandleReleased(IntPtr handle)
+        {
+            int acquireCount;
+            if (m_AcquiredHandleCounts.TryGetValue(handle, out acquireCount))
+            {
+                if (--acquireCount > 0)
+                {
+                    m_AcquiredHandleCounts[handle] = acquireCount;
+                }
+                else
+                {
+                    m_AcquiredHandleCounts.Remove(handle);
+                }
+            }
+        }
+
+        public bool IsHandleAcquired(IntPtr handle)
+        {
+            int acquireCount;
+            m_AcquiredHandleCounts.TryGetValue(handle, out acquireCount);
+            return acquireCount > 0;
+        }
+
         public Trackable TrackableFactory(IntPtr nativeHandle)
         {
             return m_TrackableManager.TrackableFactory(nativeHandle);
@@ -141,20 +162,27 @@ namespace GoogleARCoreInternal
             m_TrackableManager.GetTrackables<T>(trackables, filter);
         }
 
-        public void OnUpdate()
+        public void OnUpdate(IntPtr frameHandle)
         {
-            // After first frame, release previous frame's point cloud.
-            if (m_PointCloudHandle != IntPtr.Zero)
-            {
-                m_LastReleasedPointcloudTimestamp = PointCloudApi.GetTimestamp(m_PointCloudHandle);
-                PointCloudApi.Release(m_PointCloudHandle);
-                m_PointCloudHandle = IntPtr.Zero;
-            }
+            FrameHandle = frameHandle;
 
-            // TODO (b/73256094): Remove when fixed.
-            if (LifecycleManager.Instance.SessionStatus == SessionStatus.Tracking)
+            if (ApiConstants.isBehaveAsIfOnAndroid)
             {
-                m_PointCloudHandle = FrameApi.AcquirePointCloud();
+                // After first frame, release previous frame's point cloud.
+                if (PointCloudHandle != IntPtr.Zero)
+                {
+                    m_LastReleasedPointcloudTimestamp = PointCloudApi.GetTimestamp(PointCloudHandle);
+                    PointCloudApi.Release(PointCloudHandle);
+                    PointCloudHandle = IntPtr.Zero;
+                }
+
+                // TODO (b/73256094): Remove when fixed.
+                if (LifecycleManager.Instance.IsTracking)
+                {
+                    IntPtr pointCloudHandle;
+                    FrameApi.TryAcquirePointCloudHandle(out pointCloudHandle);
+                    PointCloudHandle = pointCloudHandle;
+                }
             }
         }
     }
