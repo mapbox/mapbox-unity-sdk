@@ -992,6 +992,7 @@ MonoBehaviour:
         entityPerCoroutine: 20
       vectorSubLayers:
       - coreOptions:
+          sourceId: 
           isActive: 1
           sublayerName: Building
           geometryType: 2
@@ -1008,13 +1009,14 @@ MonoBehaviour:
           extrusionType: 1
           extrusionGeometryType: 0
           propertyName: height
-          propertyDescription: 
+          propertyDescription: Number. Height of building or part of building.
           minimumHeight: 0
           maximumHeight: 0
           extrusionScaleFactor: 1
         colliderOptions:
           colliderType: 0
         materialOptions:
+          style: 1
           texturingType: 3
           materials:
           - Materials:
@@ -1031,6 +1033,7 @@ MonoBehaviour:
         GoModifiers: []
       locationPrefabList:
       - coreOptions:
+          sourceId: 
           isActive: 1
           sublayerName: Arts and Entertainment
           geometryType: 0
@@ -1054,6 +1057,7 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
+          style: 0
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
@@ -1073,6 +1077,7 @@ MonoBehaviour:
         coordinates: []
         density: 15
       - coreOptions:
+          sourceId: 
           isActive: 1
           sublayerName: Food
           geometryType: 0
@@ -1096,6 +1101,7 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
+          style: 0
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
@@ -1115,6 +1121,7 @@ MonoBehaviour:
         coordinates: []
         density: 15
       - coreOptions:
+          sourceId: 
           isActive: 1
           sublayerName: Nightlife
           geometryType: 0
@@ -1138,6 +1145,7 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
+          style: 0
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
@@ -1157,6 +1165,7 @@ MonoBehaviour:
         coordinates: []
         density: 15
       - coreOptions:
+          sourceId: 
           isActive: 1
           sublayerName: Outdoors and Recreation
           geometryType: 0
@@ -1180,6 +1189,7 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
+          style: 0
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
@@ -1199,6 +1209,7 @@ MonoBehaviour:
         coordinates: []
         density: 15
       - coreOptions:
+          sourceId: 
           isActive: 1
           sublayerName: Services
           geometryType: 0
@@ -1222,6 +1233,7 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
+          style: 0
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
@@ -1241,6 +1253,7 @@ MonoBehaviour:
         coordinates: []
         density: 10
       - coreOptions:
+          sourceId: 
           isActive: 1
           sublayerName: Shops
           geometryType: 0
@@ -1264,6 +1277,7 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
+          style: 0
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
@@ -1283,6 +1297,7 @@ MonoBehaviour:
         coordinates: []
         density: 15
       - coreOptions:
+          sourceId: 
           isActive: 1
           sublayerName: Transportation
           geometryType: 0
@@ -1306,6 +1321,7 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
+          style: 0
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
@@ -1325,6 +1341,7 @@ MonoBehaviour:
         coordinates: []
         density: 15
       - coreOptions:
+          sourceId: 
           isActive: 0
           sublayerName: All POIs
           geometryType: 0
@@ -1348,6 +1365,7 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
+          style: 0
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}

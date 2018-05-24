@@ -132,7 +132,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 
 			scaleFactor = Mathf.Pow(2, (map.InitialZoom - zoom));
-			gameObject.transform.localScale = new Vector3(scaleFactor, 1, scaleFactor);
+			gameObject.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
 			gameObject.SetActive(true);
 		}
 
