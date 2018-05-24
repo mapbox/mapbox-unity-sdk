@@ -28,7 +28,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		Vector3 wallSegmentSecondVertex;
 		Vector3 wallSegmentDirection;
 		float wallSegmentLength;
-		
+
 		//public AtlasInfo AtlasInfo;
 		private AtlasEntity _currentFacade;
 		private Rect _currentTextureRect;
@@ -123,6 +123,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				{
 					var v1 = md.Vertices[md.Edges[i]];
 					var v2 = md.Vertices[md.Edges[i + 1]];
+
+					wallDirection = v2 - v1;
 
 					currentWallLength = Vector3.Distance(v1, v2);
 					_leftOverColumnLength = currentWallLength % _singleColumnLength;
@@ -279,7 +281,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				//bottom two vertices
 				md.Vertices.Add(new Vector3(wallSegmentFirstVertex.x, currentY1, wallSegmentFirstVertex.z));
 				md.Vertices.Add(new Vector3(wallSegmentSecondVertex.x, currentY2, wallSegmentSecondVertex.z));
-				
+
 				//we uv narrow walls different so they won't have condensed windows
 				if (wallSegmentLength >= _minWallLength)
 				{
@@ -410,7 +412,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		private void CalculateEdgeList(MeshData md, UnityTile tile, float preferredEdgeSectionLength)
 		{
-			
+
 		}
 
 		private void GenerateRoofMesh(MeshData md, float minHeight, float maxHeight)
