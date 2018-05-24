@@ -20,8 +20,8 @@ namespace Mapbox.Unity
 			public static readonly string MAPBOX_RESOURCES_RELATIVE = System.IO.Path.Combine("Mapbox", "MapboxConfiguration");
 			public static readonly string MAPBOX_RESOURCES_ABSOLUTE = System.IO.Path.Combine(System.IO.Path.Combine(Application.dataPath, "Resources"), "Mapbox");
 
-			public static readonly string MAP_FEATURE_STYLES_DEFAULT_STYLE_ASSETS = System.IO.Path.Combine("MapFeatureStyles", "DefaultStyleAssets");
-			public static readonly string MAP_FEATURE_STYLES_SAMPLES = System.IO.Path.Combine(System.IO.Path.Combine("MapFeatureStyles", "Styles"), "MapboxSampleStyles");
+			public static readonly string MAP_FEATURE_STYLES_DEFAULT_STYLE_ASSETS = System.IO.Path.Combine("MapboxStyles", "DefaultStyleAssets");
+			public static readonly string MAP_FEATURE_STYLES_SAMPLES = System.IO.Path.Combine(System.IO.Path.Combine("MapboxStyles", "Styles"), "MapboxSampleStyles");
 
 			public const string MAPBOX_STYLES_ASSETS_FOLDER = "Assets";
 			public const string MAPBOX_STYLES_ATLAS_FOLDER = "Atlas";
