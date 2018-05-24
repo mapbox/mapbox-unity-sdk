@@ -20,12 +20,17 @@ MonoBehaviour:
       height: 0.5
     MidFloorCount: 4
     ColumnCount: 2
-    TopSectionRatio: 0.3
-    BottomSectionRatio: 0.4
-    PreferredEdgeSectionLength: 20
-    FloorHeight: 10
-    FirstFloorHeight: 12
-    TopFloorHeight: 12
+    TopSectionRatio: 0.2
+    BottomSectionRatio: 0.2
+    PreferredEdgeSectionLength: 40
+    FloorHeight: 48
+    FirstFloorHeight: 16
+    TopFloorHeight: 16
+    bottomOfTopUv: 0.9
+    topOfMidUv: 0.9
+    topOfBottomUv: 0.6
+    midUvHeight: 0.3
+    WallToFloorRatio: 1.2
   - TextureRect:
       serializedVersion: 2
       x: 0.5
@@ -33,13 +38,18 @@ MonoBehaviour:
       width: 0.25
       height: 0.25
     MidFloorCount: 1
-    ColumnCount: 1
+    ColumnCount: 3
     TopSectionRatio: 0.3
     BottomSectionRatio: 0.4
     PreferredEdgeSectionLength: 40
-    FloorHeight: 10
-    FirstFloorHeight: 12
+    FloorHeight: 11.999999
+    FirstFloorHeight: 16
     TopFloorHeight: 12
+    bottomOfTopUv: 0.425
+    topOfMidUv: 0.425
+    topOfBottomUv: 0.35
+    midUvHeight: 0.074999996
+    WallToFloorRatio: 0.29999998
   - TextureRect:
       serializedVersion: 2
       x: 0
@@ -51,9 +61,14 @@ MonoBehaviour:
     TopSectionRatio: 0.3
     BottomSectionRatio: 0.4
     PreferredEdgeSectionLength: 40
-    FloorHeight: 10
-    FirstFloorHeight: 12
+    FloorHeight: 11.999999
+    FirstFloorHeight: 16
     TopFloorHeight: 12
+    bottomOfTopUv: 0.425
+    topOfMidUv: 0.425
+    topOfBottomUv: 0.35
+    midUvHeight: 0.074999996
+    WallToFloorRatio: 0.29999998
   - TextureRect:
       serializedVersion: 2
       x: 0.75
@@ -65,9 +80,14 @@ MonoBehaviour:
     TopSectionRatio: 0.3
     BottomSectionRatio: 0.4
     PreferredEdgeSectionLength: 40
-    FloorHeight: 10
-    FirstFloorHeight: 12
+    FloorHeight: 11.999999
+    FirstFloorHeight: 16
     TopFloorHeight: 12
+    bottomOfTopUv: 0.425
+    topOfMidUv: 0.425
+    topOfBottomUv: 0.35
+    midUvHeight: 0.074999996
+    WallToFloorRatio: 0.29999998
   - TextureRect:
       serializedVersion: 2
       x: 0.25
@@ -79,13 +99,18 @@ MonoBehaviour:
     TopSectionRatio: 0.3
     BottomSectionRatio: 0.4
     PreferredEdgeSectionLength: 40
-    FloorHeight: 10
-    FirstFloorHeight: 12
+    FloorHeight: 11.999999
+    FirstFloorHeight: 16
     TopFloorHeight: 12
+    bottomOfTopUv: 0.425
+    topOfMidUv: 0.425
+    topOfBottomUv: 0.35
+    midUvHeight: 0.074999996
+    WallToFloorRatio: 0.29999998
   - TextureRect:
       serializedVersion: 2
       x: 0.25
-      y: 0.25
+      y: 0
       width: 0.25
       height: 0.25
     MidFloorCount: 1
@@ -93,9 +118,14 @@ MonoBehaviour:
     TopSectionRatio: 0.3
     BottomSectionRatio: 0.4
     PreferredEdgeSectionLength: 40
-    FloorHeight: 10
-    FirstFloorHeight: 12
+    FloorHeight: 11.999999
+    FirstFloorHeight: 16
     TopFloorHeight: 12
+    bottomOfTopUv: 0.175
+    topOfMidUv: 0.175
+    topOfBottomUv: 0.1
+    midUvHeight: 0.074999996
+    WallToFloorRatio: 0.29999998
   - TextureRect:
       serializedVersion: 2
       x: 0.75
@@ -107,9 +137,14 @@ MonoBehaviour:
     TopSectionRatio: 0.3
     BottomSectionRatio: 0.4
     PreferredEdgeSectionLength: 40
-    FloorHeight: 10
-    FirstFloorHeight: 12
+    FloorHeight: 11.999999
+    FirstFloorHeight: 16
     TopFloorHeight: 12
+    bottomOfTopUv: 0.175
+    topOfMidUv: 0.175
+    topOfBottomUv: 0.1
+    midUvHeight: 0.074999996
+    WallToFloorRatio: 0.29999998
   - TextureRect:
       serializedVersion: 2
       x: 0
@@ -121,23 +156,33 @@ MonoBehaviour:
     TopSectionRatio: 0.3
     BottomSectionRatio: 0.4
     PreferredEdgeSectionLength: 30
-    FloorHeight: 10
+    FloorHeight: 8.999999
     FirstFloorHeight: 12
-    TopFloorHeight: 12
+    TopFloorHeight: 9
+    bottomOfTopUv: 0.175
+    topOfMidUv: 0.175
+    topOfBottomUv: 0.1
+    midUvHeight: 0.074999996
+    WallToFloorRatio: 0.29999998
   - TextureRect:
       serializedVersion: 2
-      x: 0.5
+      x: 0
       y: 0
       width: 0.25
       height: 0.25
     MidFloorCount: 1
-    ColumnCount: 1
+    ColumnCount: 3
     TopSectionRatio: 0.3
     BottomSectionRatio: 0.4
-    PreferredEdgeSectionLength: 30
-    FloorHeight: 10
-    FirstFloorHeight: 12
+    PreferredEdgeSectionLength: 40
+    FloorHeight: 11.999999
+    FirstFloorHeight: 16
     TopFloorHeight: 12
+    bottomOfTopUv: 0.175
+    topOfMidUv: 0.175
+    topOfBottomUv: 0.1
+    midUvHeight: 0.074999996
+    WallToFloorRatio: 0.29999998
   - TextureRect:
       serializedVersion: 2
       x: 0
@@ -145,27 +190,37 @@ MonoBehaviour:
       width: 0.25
       height: 0.5
     MidFloorCount: 4
-    ColumnCount: 1
+    ColumnCount: 3
     TopSectionRatio: 0.2
     BottomSectionRatio: 0.2
     PreferredEdgeSectionLength: 40
-    FloorHeight: 50
-    FirstFloorHeight: 12
-    TopFloorHeight: 12
+    FloorHeight: 48
+    FirstFloorHeight: 16
+    TopFloorHeight: 16
+    bottomOfTopUv: 0.9
+    topOfMidUv: 0.9
+    topOfBottomUv: 0.6
+    midUvHeight: 0.3
+    WallToFloorRatio: 1.2
   - TextureRect:
       serializedVersion: 2
-      x: 0
+      x: 0.5
       y: 0.5
       width: 0.25
       height: 0.5
     MidFloorCount: 4
-    ColumnCount: 1
+    ColumnCount: 3
     TopSectionRatio: 0.2
     BottomSectionRatio: 0.2
     PreferredEdgeSectionLength: 40
-    FloorHeight: 50
-    FirstFloorHeight: 12
-    TopFloorHeight: 12
+    FloorHeight: 48
+    FirstFloorHeight: 16
+    TopFloorHeight: 16
+    bottomOfTopUv: 0.9
+    topOfMidUv: 0.9
+    topOfBottomUv: 0.6
+    midUvHeight: 0.3
+    WallToFloorRatio: 1.2
   - TextureRect:
       serializedVersion: 2
       x: 0.75
@@ -177,9 +232,14 @@ MonoBehaviour:
     TopSectionRatio: 0.2
     BottomSectionRatio: 0.2
     PreferredEdgeSectionLength: 40
-    FloorHeight: 50
-    FirstFloorHeight: 12
-    TopFloorHeight: 12
+    FloorHeight: 48
+    FirstFloorHeight: 16
+    TopFloorHeight: 16
+    bottomOfTopUv: 0.9
+    topOfMidUv: 0.9
+    topOfBottomUv: 0.6
+    midUvHeight: 0.3
+    WallToFloorRatio: 1.2
   Roofs:
   - TextureRect:
       serializedVersion: 2
@@ -195,6 +255,11 @@ MonoBehaviour:
     FloorHeight: 0
     FirstFloorHeight: 0
     TopFloorHeight: 0
+    bottomOfTopUv: 0
+    topOfMidUv: 0
+    topOfBottomUv: 0
+    midUvHeight: 0
+    WallToFloorRatio: 0
   - TextureRect:
       serializedVersion: 2
       x: 0.5
@@ -209,6 +274,11 @@ MonoBehaviour:
     FloorHeight: 0
     FirstFloorHeight: 0
     TopFloorHeight: 0
+    bottomOfTopUv: 0
+    topOfMidUv: 0
+    topOfBottomUv: 0
+    midUvHeight: 0
+    WallToFloorRatio: 0
   - TextureRect:
       serializedVersion: 2
       x: 0
@@ -223,6 +293,11 @@ MonoBehaviour:
     FloorHeight: 0
     FirstFloorHeight: 0
     TopFloorHeight: 0
+    bottomOfTopUv: 0
+    topOfMidUv: 0
+    topOfBottomUv: 0
+    midUvHeight: 0
+    WallToFloorRatio: 0
   - TextureRect:
       serializedVersion: 2
       x: 0.5
@@ -237,3 +312,9 @@ MonoBehaviour:
     FloorHeight: 0
     FirstFloorHeight: 0
     TopFloorHeight: 0
+    bottomOfTopUv: 0
+    topOfMidUv: 0
+    topOfBottomUv: 0
+    midUvHeight: 0
+    WallToFloorRatio: 0
+  AtlasEntityType: 0

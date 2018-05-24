@@ -35,6 +35,7 @@
   - Move data calls from factories to DataFetcher classes
   - Factories register to events in DataFetchers
 -  `Layer Name` , `Extrusion Property Name` and `Filter Key` are now selectable dropdowns indicating the layers and properties available in the current `Data Source`. Layers and properties no longer require manual string entry.
+- Changes to atlas UV mapping for side walls of extruded polygons
 
 ##### Bug Fixes
 - Added checks to prevent NRE in `GeocodeAttributeSearchWindow` when searching with an invalid token or no connection.
