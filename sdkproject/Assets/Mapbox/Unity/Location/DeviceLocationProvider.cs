@@ -1,11 +1,15 @@
 namespace Mapbox.Unity.Location
 {
+
+
 	using System.Collections;
 	using UnityEngine;
 	using Mapbox.Utils;
 	using Mapbox.CheapRulerCs;
 	using System;
 	using System.Linq;
+
+
 
 	/// <summary>
 	/// The DeviceLocationProvider is responsible for providing real world location and heading data,
@@ -15,6 +19,8 @@ namespace Mapbox.Unity.Location
 	/// </summary>
 	public class DeviceLocationProvider : AbstractLocationProvider
 	{
+
+
 		/// <summary>
 		/// Using higher value like 500 usually does not require to turn GPS chip on and thus saves battery power. 
 		/// Values like 5-10 could be used for getting best accuracy.
@@ -58,7 +64,6 @@ namespace Mapbox.Unity.Location
 		private IMapboxLocationService _locationService;
 		private Coroutine _pollRoutine;
 		private double _lastLocationTimestamp;
-		private double _lastHeadingTimestamp;
 		private WaitForSeconds _wait1sec;
 		private WaitForSeconds _waitUpdateTime;
 		/// <summary>list of positions to keep for calculations</summary>
@@ -243,6 +248,8 @@ namespace Mapbox.Unity.Location
 				_currentLocation.LatitudeLongitude = new Vector2d(latitude, longitude);
 
 				_currentLocation.Accuracy = (float)Math.Floor(lastData.horizontalAccuracy);
+				// sometimes Unity's timestamp doesn't seem to get updated, or even jump back in time
+				// do an additional check if location has changed
 				_currentLocation.IsLocationUpdated = timestamp > _lastLocationTimestamp || !_currentLocation.LatitudeLongitude.Equals(previousLocation);
 				_currentLocation.Timestamp = timestamp;
 				_lastLocationTimestamp = timestamp;
@@ -270,11 +277,14 @@ namespace Mapbox.Unity.Location
 				}
 
 				// if we have enough positions calculate user heading ourselves.
-				// Unity does not provide bearing based on locations, just
-				// device orientation based on Compass.Heading
+				// Unity does not provide bearing based on GPS locations, just
+				// device orientation based on Compass.Heading.
+				// nevertheless, use compass for intial UserHeading till we have
+				// enough values to calculate ourselves.
 				if (_lastPositions.Count < _maxLastPositions)
 				{
-					_currentLocation.UserHeading = 0;
+					_currentLocation.UserHeading = _currentLocation.DeviceOrientation;
+					_currentLocation.IsUserHeadingUpdated = true;
 				}
 				else
 				{
@@ -289,33 +299,37 @@ namespace Mapbox.Unity.Location
 					// positions are minimum required distance apart (user is moving), calculate user heading
 					if (distance >= _minDistanceOldestNewestPosition)
 					{
-						// calculate final heading from last positions but give newest headings more weight:
-						// '_lastPositions' contains newest at [0]
-						// formula:
-						// (heading[0] * e^weight[0] + heading[1] * e^weight[1] + .... ) / weight sum
 						float[] lastHeadings = new float[_maxLastPositions - 1];
-						float[] actualWeights = new float[_maxLastPositions - 1];
 						float finalHeading = 0f;
 
 						for (int i = 1; i < _maxLastPositions; i++)
 						{
-							lastHeadings[i - 1] = (float)(Math.Atan2(_lastPositions[i].y - _lastPositions[i - 1].y, _lastPositions[i].x - _lastPositions[i - 1].x) * 180 / Math.PI);
-							// quick fix to take care of 355° and 5° being apart 10° and not 350°
-							lastHeadings[i - 1] = Math.Abs(lastHeadings[i - 1]);
-							if (lastHeadings[i - 1] > 180) { lastHeadings[i - 1] -= 360f; }
+							// atan2 increases angle CCW, flip sign of latDiff to get CW
+							double latDiff = -(_lastPositions[i].x - _lastPositions[i - 1].x);
+							double lngDiff = _lastPositions[i].y - _lastPositions[i - 1].y;
+							// +90.0 to make top (north) 0°
+							double heading = (Math.Atan2(latDiff, lngDiff) * 180.0 / Math.PI) + 90.0f;
+							if (heading < 0) { heading += 360; }
+							if (heading >= 360) { heading -= 360; }
+							lastHeadings[i - 1] = (float)heading;
 						}
 
-						for (int i = 0; i < lastHeadings.Length; i++)
-						{
-							actualWeights[i] = (float)Math.Exp(_headingWeights[i]);
-							finalHeading += lastHeadings[i] * actualWeights[i];
-						}
+						////////////// TODO /////////
+						// reintroduce a weighing formula!
+						// for now we are just averaging angles
 
-						float weightSum = actualWeights.Sum();
-						finalHeading /= weightSum;
-						finalHeading -= 180; //fix heading to have 0° for north, 90° for east, 180° for south and 270° for west
-											 // stay within [0..359] no negative angles
+						// calc mean heading taking into account that eg 355° and 5° should result in 0° and not 180°
+						// ref https://rosettacode.org/wiki/Averages/Mean_angle and https://rosettacode.org/wiki/Averages/Mean_angle#C.23
+						double x = lastHeadings.Sum(a => Math.Cos(a * Math.PI / 180.0)) / lastHeadings.Length;
+						// atan2 increases angle CCW, flip sign of y to get CW
+						double y = (lastHeadings.Sum(a => Math.Sin(a * Math.PI / 180.0)) / lastHeadings.Length);
+						finalHeading = (float)(Math.Atan2(y, x) * 180.0 / Math.PI);
+						//stay positive ;-)
 						if (finalHeading < 0) { finalHeading += 360; }
+
+
+						//fix heading to have 0° for north, 90° for east, 180° for south and 270° for west
+						finalHeading = finalHeading >= 180 ? finalHeading - 180.0f : finalHeading + 180.0f;
 
 						_currentLocation.UserHeading = finalHeading;
 						_currentLocation.IsUserHeadingUpdated = true;

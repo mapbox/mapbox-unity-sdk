@@ -677,7 +677,7 @@ MonoBehaviour:
   _updateTimeInMilliSeconds: 500
   _editorDebuggingOnly:
     _mockUnityInputLocation: 1
-    _locationLogFile: {fileID: 4900000, guid: b88daf565166aeb4bad8b889e9bcc1a6, type: 3}
+    _locationLogFile: {fileID: 4900000, guid: 7f5a63385e66eab42a5ac17538bc0199, type: 3}
 --- !u!4 &849657522
 Transform:
   m_ObjectHideFlags: 0
@@ -1285,7 +1285,7 @@ MonoBehaviour:
   _subtractUserHeading: 0
   _rotationFollowFactor: 2
   _rotateZ: 0
-  _useNegativeAngle: 1
+  _useNegativeAngle: 0
   _useTransformLocationProvider: 0
 --- !u!1 &1587024384
 GameObject:
