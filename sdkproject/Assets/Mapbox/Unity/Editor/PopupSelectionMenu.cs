@@ -21,7 +21,7 @@ namespace Mapbox.Editor
 
 		private int _index = -1;
 
-		private Vector2 scrollPos;
+		private Vector2 _scrollPos;
 
 		public override Vector2 GetWindowSize()
 		{
@@ -52,7 +52,7 @@ namespace Mapbox.Editor
 			GUILayout.Label(String.Format("{0}s", _type.Name), EditorStyles.boldLabel);
 			var st = new GUIStyle();
 			st.padding = new RectOffset(0, 0, 15, 15);
-			scrollPos = EditorGUILayout.BeginScrollView(scrollPos, st);
+			_scrollPos = EditorGUILayout.BeginScrollView(_scrollPos, st);
 
 			for (int i = 0; i < _modTypes.Count; i++)
 			{
