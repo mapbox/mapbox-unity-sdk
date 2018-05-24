@@ -23,7 +23,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	{
 		[SerializeField]
 		ImageryLayerProperties _properties;
-
+		protected ImageDataFetcher DataFetcher;
 		public string MapId
 		{
 			get
@@ -37,27 +37,54 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
+		#region UnityMethods
+		protected virtual void OnDestroy()
+		{
+			if (DataFetcher != null)
+			{
+				DataFetcher.DataRecieved -= OnImageRecieved;
+				DataFetcher.FetchingError -= OnDataError;
+			}
+		}
+		#endregion
+
+		#region DataFetcherEvents
+		private void OnImageRecieved(UnityTile tile, RasterTile rasterTile)
+		{
+			if (tile != null)
+			{
+				Progress--;
+				tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
+				tile.RasterDataState = TilePropertyState.Loaded;
+			}
+		}
+
+		//merge this with OnErrorOccurred?
+		protected virtual void OnDataError(UnityTile tile, TileErrorEventArgs e)
+		{
+			if (tile != null)
+			{
+				Progress--;
+				tile.RasterDataState = TilePropertyState.Error;
+				OnErrorOccurred(e);
+			}
+		}
+		#endregion
+
+		#region AbstractFactoryOverrides
+		protected override void OnInitialized()
+		{
+			DataFetcher = ScriptableObject.CreateInstance<ImageDataFetcher>();
+			DataFetcher.DataRecieved += OnImageRecieved;
+			DataFetcher.FetchingError += OnDataError;
+		}
+
 		public override void SetOptions(LayerProperties options)
 		{
 			_properties = (ImageryLayerProperties)options;
 		}
 
-		// TODO: come back to this
-		//public override void Update()
-		//{
-		//    base.Update();
-		//    foreach (var tile in _tiles.Values)
-		//    {
-		//        Run(tile);
-		//    }
-		//}
-
-		internal override void OnInitialized()
-		{
-
-		}
-
-		internal override void OnRegistered(UnityTile tile)
+		protected override void OnRegistered(UnityTile tile)
 		{
 			if (_properties.sourceType == ImagerySourceType.None)
 			{
@@ -66,40 +93,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				return;
 			}
 
-			RasterTile rasterTile;
-			if (MapId.StartsWith("mapbox://", StringComparison.Ordinal))
-			{
-				rasterTile = _properties.rasterOptions.useRetina ? new RetinaRasterTile() : new RasterTile();
-			}
-			else
-			{
-				rasterTile = _properties.rasterOptions.useRetina ? new ClassicRetinaRasterTile() : new ClassicRasterTile();
-			}
-
 			tile.RasterDataState = TilePropertyState.Loading;
-
-			tile.AddTile(rasterTile);
 			Progress++;
-			rasterTile.Initialize(_fileSource, tile.CanonicalTileId, MapId, () =>
-			{
-				if (tile == null)
-				{
-					Progress--;
-					return;
-				}
-
-				if (rasterTile.HasError)
-				{
-					OnErrorOccurred(new TileErrorEventArgs(tile.CanonicalTileId, rasterTile.GetType(), tile, rasterTile.Exceptions));
-					tile.RasterDataState = TilePropertyState.Error;
-					Progress--;
-					return;
-				}
-
-				tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
-				tile.RasterDataState = TilePropertyState.Loaded;
-				Progress--;
-			});
+			DataFetcher.FetchImage(tile.CanonicalTileId, MapId, tile, _properties.rasterOptions.useRetina);
 		}
 
 		/// <summary>
@@ -108,12 +104,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// <param name="e"><see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance/</param>
 		protected override void OnErrorOccurred(TileErrorEventArgs e)
 		{
-			base.OnErrorOccurred(e);
 		}
 
-		internal override void OnUnregistered(UnityTile tile)
+		protected override void OnUnregistered(UnityTile tile)
 		{
 
 		}
+
+
+		#endregion
 	}
 }

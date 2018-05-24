@@ -34,7 +34,7 @@ namespace Mapbox.Unity.Location
 		bool _mapInitialized;
 
 #if UNITY_EDITOR
-		protected void Start()
+		protected virtual void Start()
 		{
 			LocationProviderFactory.Instance.mapManager.OnInitialized += Map_OnInitialized;
 			//_map.OnInitialized += Map_OnInitialized;
@@ -78,12 +78,12 @@ namespace Mapbox.Unity.Location
 
 		protected override void SetLocation()
 		{
-			_currentLocation.Heading = _targetTransform.eulerAngles.y;
+			_currentLocation.UserHeading = _targetTransform.eulerAngles.y;
 			_currentLocation.LatitudeLongitude = LatitudeLongitude;
 			_currentLocation.Accuracy = _accuracy;
 			_currentLocation.Timestamp = UnixTimestampUtils.To(DateTime.UtcNow);
 			_currentLocation.IsLocationUpdated = true;
-			_currentLocation.IsHeadingUpdated = true;
+			_currentLocation.IsUserHeadingUpdated = true;
 			_currentLocation.IsLocationServiceEnabled = true;
 		}
 	}

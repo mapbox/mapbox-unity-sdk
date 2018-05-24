@@ -51,6 +51,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd961b1c9541a4cee99686069ecce852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _initializeOnStart: 1
   _options:
     locationOptions:
       latitudeLongitude: 37.784179, -122.401583
@@ -80,7 +81,7 @@ MonoBehaviour:
     loadingTexture: {fileID: 2800000, guid: e2896a92727704803a9c422b043eae89, type: 3}
   _imagery:
     _layerProperty:
-      sourceType: 0
+      sourceType: 7
       sourceOptions:
         isActive: 1
         layerSource:
@@ -120,7 +121,10 @@ MonoBehaviour:
         wallMaterial: {fileID: 0}
   _vectorData:
     _layerProperty:
-      sourceType: 3
+      tileJsonData:
+        tileJSONLoaded: 0
+        LayerDisplayNames: []
+      _sourceType: 3
       sourceOptions:
         isActive: 0
         layerSource:
@@ -138,4 +142,5 @@ MonoBehaviour:
         isEnabled: 1
         entityPerCoroutine: 20
       vectorSubLayers: []
+      locationPrefabList: []
   _tileProvider: {fileID: 0}

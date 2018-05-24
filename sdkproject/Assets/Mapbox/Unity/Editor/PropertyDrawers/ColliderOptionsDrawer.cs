@@ -11,25 +11,38 @@
 	public class ColliderOptionsDrawer : PropertyDrawer
 	{
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
+		bool isGUIContentSet = false;
+		GUIContent[] colliderTypeContent;
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			EditorGUI.BeginProperty(position, label, property);
-			var typePosition = EditorGUI.PrefixLabel(new Rect(position.x, position.y, position.width, lineHeight), GUIUtility.GetControlID(FocusType.Passive), new GUIContent { text = "Collider Type", tooltip = "The type of collider added to game objects in this layer." });
+			EditorGUI.BeginProperty(position, null, property);
+			var colliderTypeLabel = new GUIContent
+			{
+				text = "Collider Type",
+				tooltip = "The type of collider added to game objects in this layer."
+			};
 			var colliderTypeProperty = property.FindPropertyRelative("colliderType");
 
-			List<GUIContent> enumContent = new List<GUIContent>();
-			foreach(var enumValue in colliderTypeProperty.enumDisplayNames)
+			var displayNames = colliderTypeProperty.enumDisplayNames;
+			int count = colliderTypeProperty.enumDisplayNames.Length;
+
+			if (!isGUIContentSet)
 			{
-				var guiContent =  new GUIContent { text = enumValue, tooltip =  ((Unity.Map.ColliderType)colliderTypeProperty.enumValueIndex).Description()} ;
-				enumContent.Add(guiContent);
+				colliderTypeContent = new GUIContent[count];
+				for (int extIdx = 0; extIdx < count; extIdx++)
+				{
+					colliderTypeContent[extIdx] = new GUIContent
+					{
+						text = displayNames[extIdx],
+						tooltip = EnumExtensions.Description((ColliderType)extIdx),
+					};
+				}
+				isGUIContentSet = true;
 			}
 
-			EditorGUI.indentLevel--;
-			colliderTypeProperty.enumValueIndex = EditorGUI.Popup(typePosition, colliderTypeProperty.enumValueIndex, enumContent.ToArray());
-			EditorGUI.indentLevel++;
+			colliderTypeProperty.enumValueIndex = EditorGUI.Popup(position, colliderTypeLabel, colliderTypeProperty.enumValueIndex, colliderTypeContent);
 			EditorGUI.EndProperty();
 		}
-
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
 			return lineHeight;

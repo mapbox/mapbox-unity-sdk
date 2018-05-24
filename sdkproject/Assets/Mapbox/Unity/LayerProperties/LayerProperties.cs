@@ -1,4 +1,6 @@
-﻿namespace Mapbox.Unity.Map
+﻿using UnityEngine;
+
+namespace Mapbox.Unity.Map
 {
 	public abstract class LayerProperties
 	{
