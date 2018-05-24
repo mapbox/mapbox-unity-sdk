@@ -31,58 +31,52 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void Run(VectorEntity ve, UnityTile tile)
 		{
-			int selpos = ve.Feature.Points[0].Count / 2;
-			var met = ve.Feature.Points[0][selpos];
-			RectTransform goRectTransform;
-			IFeaturePropertySettable settable = null;
-			GameObject go;
+			GameObject go = new GameObject();
 
 			if (_objects.ContainsKey(ve.GameObject))
 			{
 				go = _objects[ve.GameObject];
-				settable = go.GetComponent<IFeaturePropertySettable>();
-				if (settable != null)
-				{
-					go = (settable as MonoBehaviour).gameObject;
-					settable.Set(ve.Feature.Properties);
-				}
-				// set gameObject transform
-				go.name = ve.Feature.Data.Id.ToString();
-				goRectTransform = go.GetComponent<RectTransform>();
-				if (goRectTransform == null)
-				{
-					go.transform.localPosition = met;
-				}
-				else
-				{
-					goRectTransform.anchoredPosition3D = met;
-				}
-
-				if (_options.scaleDownWithWorld)
-				{
-					go.transform.localScale  = _options.prefab.transform.localScale * (tile.TileScale);
-				}
-				return;
 			}
 			else
 			{
 				go = Instantiate(_options.prefab);
 				_prefabList.Add(go);
 				_objects.Add(ve.GameObject, go);
+				go.transform.SetParent(ve.GameObject.transform, false);
 			}
+
+			PositionScaleRectTransform(ve, tile, go);
+
+			if (_options.AllPrefabsInstatiated != null)
+			{
+				_options.AllPrefabsInstatiated(_prefabList);
+			}
+		}
+
+		public void PositionScaleRectTransform(VectorEntity ve, UnityTile tile, GameObject go)
+		{
+			RectTransform goRectTransform;
+			IFeaturePropertySettable settable = null;
+			var centroidVector = new Vector3();
+			foreach (var point in ve.Feature.Points[0])
+			{
+				centroidVector += point;
+			}
+			centroidVector = centroidVector / ve.Feature.Points[0].Count;
 
 			go.name = ve.Feature.Data.Id.ToString();
 
 			goRectTransform = go.GetComponent<RectTransform>();
 			if (goRectTransform == null)
 			{
-				go.transform.localPosition = met;
+				go.transform.localPosition = centroidVector;
 			}
 			else
 			{
-				goRectTransform.anchoredPosition3D = met;
+				goRectTransform.anchoredPosition3D = centroidVector;
 			}
-			go.transform.SetParent(ve.GameObject.transform, false);
+			
+			//go.transform.localScale = Constants.Math.Vector3One;
 
 			settable = go.GetComponent<IFeaturePropertySettable>();
 			if (settable != null)
@@ -94,16 +88,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				go.transform.localScale = _options.prefab.transform.localScale * (tile.TileScale);
 			}
-
-			if (_options.AllPrefabsInstatiated != null)
-			{
-				_options.AllPrefabsInstatiated(_prefabList);
-			}
-		}
-
-		public List<GameObject> returnInstanceList()
-		{
-			return _prefabList;
 		}
 	}
 }
