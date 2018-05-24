@@ -81,7 +81,7 @@ namespace Mapbox.Editor
 		{
 			var modifierInstance = ScriptableObject.CreateInstance(type);
 
-			string pathCandidate = Constants.Path.MAPBOX_USER_MODIFIERS;
+			string pathCandidate = Directory.Exists(Constants.Path.MAPBOX_USER_MODIFIERS) ? Constants.Path.MAPBOX_USER_MODIFIERS : "Assets";
 
 			foreach (UnityEngine.Object obj in Selection.GetFiltered(typeof(UnityEngine.Object), SelectionMode.Assets))
 			{
