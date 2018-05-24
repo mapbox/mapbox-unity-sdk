@@ -442,17 +442,18 @@ MonoBehaviour:
             filterOperator: 0
           combinerType: 0
         extrusionOptions:
-          _selectedLayerName: 
+          _selectedLayerName: building
           extrusionType: 1
           extrusionGeometryType: 0
           propertyName: height
-          propertyDescription: 
+          propertyDescription: Number. Height of building or part of building.
           minimumHeight: 0
           maximumHeight: 0
           extrusionScaleFactor: 1
         colliderOptions:
           colliderType: 1
         materialOptions:
+          style: 4
           texturingType: 3
           materials:
           - Materials:
@@ -489,17 +490,18 @@ MonoBehaviour:
             filterOperator: 0
           combinerType: 0
         extrusionOptions:
-          _selectedLayerName: 
+          _selectedLayerName: building
           extrusionType: 1
           extrusionGeometryType: 0
           propertyName: height
-          propertyDescription: 
+          propertyDescription: Number. Height of building or part of building.
           minimumHeight: 0
           maximumHeight: 0
           extrusionScaleFactor: 1
         colliderOptions:
           colliderType: 1
         materialOptions:
+          style: 4
           texturingType: 3
           materials:
           - Materials:
@@ -542,17 +544,18 @@ MonoBehaviour:
             filterOperator: 0
           combinerType: 2
         extrusionOptions:
-          _selectedLayerName: 
+          _selectedLayerName: building
           extrusionType: 1
           extrusionGeometryType: 0
           propertyName: height
-          propertyDescription: 
+          propertyDescription: Number. Height of building or part of building.
           minimumHeight: 0
           maximumHeight: 0
           extrusionScaleFactor: 1
         colliderOptions:
           colliderType: 1
         materialOptions:
+          style: 4
           texturingType: 3
           materials:
           - Materials:
@@ -590,7 +593,7 @@ MonoBehaviour:
             filterOperator: 0
           combinerType: 0
         extrusionOptions:
-          _selectedLayerName: 
+          _selectedLayerName: landuse
           extrusionType: 0
           extrusionGeometryType: 0
           propertyName: height
@@ -601,6 +604,7 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 2
         materialOptions:
+          style: 0
           texturingType: 0
           materials:
           - Materials:
@@ -1868,62 +1872,62 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.x
-      value: 116.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -67.20215
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.x
-      value: 213
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 114.404305
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 134.4043
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.x
-      value: -17
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114603753021256032, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -2191,12 +2195,12 @@ Prefab:
     - target: {fileID: 224000013044306136, guid: 3adcee2515f8c49f4a7afb3bacf2c56e,
         type: 2}
       propertyPath: m_LocalPosition.x
-      value: 371
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224000013044306136, guid: 3adcee2515f8c49f4a7afb3bacf2c56e,
         type: 2}
       propertyPath: m_LocalPosition.y
-      value: 197.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224000013044306136, guid: 3adcee2515f8c49f4a7afb3bacf2c56e,
         type: 2}
