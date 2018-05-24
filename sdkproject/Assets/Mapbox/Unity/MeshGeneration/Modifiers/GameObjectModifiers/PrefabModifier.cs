@@ -75,6 +75,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				goRectTransform.anchoredPosition3D = centroidVector;
 			}
+			
 			//go.transform.localScale = Constants.Math.Vector3One;
 
 			settable = go.GetComponent<IFeaturePropertySettable>();
@@ -85,7 +86,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			if (_options.scaleDownWithWorld)
 			{
-				go.transform.localScale = (go.transform.localScale * (tile.TileScale));
+				go.transform.localScale = _options.prefab.transform.localScale * (tile.TileScale);
 			}
 		}
 	}
