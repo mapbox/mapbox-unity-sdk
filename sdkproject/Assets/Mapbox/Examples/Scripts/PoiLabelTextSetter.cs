@@ -7,43 +7,40 @@
 
 	public class PoiLabelTextSetter : MonoBehaviour, IFeaturePropertySettable
 	{
+		//[SerializeField]
+		//TextMesh _textMesh;
 		[SerializeField]
-		TextMesh _textMesh;
-
+		Text _text;
 		[SerializeField]
 		Image _background;
 
 		public void Set(Dictionary<string, object> props)
 		{
-			_textMesh.text = "";
+			//_textMesh.text = "";
+			_text.text = "";
 
 			if (props.ContainsKey("name"))
 			{
-				_textMesh.text = props["name"].ToString();
+				//_textMesh.text = props["name"].ToString();
+				_text.text = props["name"].ToString();
 			}
 			else if (props.ContainsKey("house_num"))
 			{
-				_textMesh.text = props["house_num"].ToString();
+				//_textMesh.text = props["house_num"].ToString();
+				_text.text = props["name"].ToString();
 			}
 			else if (props.ContainsKey("type"))
 			{
-				_textMesh.text = props["type"].ToString();
+				//_textMesh.text = props["type"].ToString();
+				_text.text = props["name"].ToString();
 			}
-
-			SetBackgroundWidth();
+			RefreshBackground();
 		}
 
-		public void Start()
+		public void RefreshBackground()
 		{
-			SetBackgroundWidth();
-		}
-
-		public void SetBackgroundWidth()
-		{
-			float textWidth = _textMesh.GetComponent<Renderer>().bounds.size.x;
-			float textHeight = _textMesh.GetComponent<Renderer>().bounds.size.y;
 			RectTransform backgroundRect = _background.GetComponent<RectTransform>();
-			backgroundRect.sizeDelta = new Vector2(textWidth + 8f, textHeight + 1f);
+			LayoutRebuilder.ForceRebuildLayoutImmediate(backgroundRect);
 		}
 	}
 }
