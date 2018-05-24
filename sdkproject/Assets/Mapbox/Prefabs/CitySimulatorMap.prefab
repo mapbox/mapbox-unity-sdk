@@ -174,7 +174,7 @@ MonoBehaviour:
           groupFeatures: 0
           lineWidth: 1
         filterOptions:
-          _selectedLayerName: 
+          _selectedLayerName: building
           filters: []
           combinerType: 0
         extrusionOptions:
@@ -189,6 +189,7 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
+          style: 4
           texturingType: 3
           materials:
           - Materials:
@@ -228,6 +229,7 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
+          style: 0
           texturingType: 0
           materials:
           - Materials:

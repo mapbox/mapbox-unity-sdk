@@ -81,7 +81,18 @@ namespace Mapbox.Editor
 		{
 			var modifierInstance = ScriptableObject.CreateInstance(type);
 
-			string pathCandidate = Directory.Exists(Constants.Path.MAPBOX_USER_MODIFIERS) ? Constants.Path.MAPBOX_USER_MODIFIERS : "Assets";
+			string pathCandidate = Constants.Path.MAPBOX_USER_MODIFIERS;
+			if(!Directory.Exists(pathCandidate))
+			{
+
+				string userFolder = Constants.Path.MAPBOX_USER;
+				if(!Directory.Exists(userFolder))
+				{
+					string parentPath = System.IO.Path.Combine("Assets", "Mapbox");
+					AssetDatabase.CreateFolder(parentPath, "User");
+				}
+				AssetDatabase.CreateFolder(userFolder, "Modifiers");
+			}
 
 			foreach (UnityEngine.Object obj in Selection.GetFiltered(typeof(UnityEngine.Object), SelectionMode.Assets))
 			{
