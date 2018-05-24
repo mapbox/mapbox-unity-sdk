@@ -8,6 +8,9 @@ using Mapbox.Unity;
 
 namespace Mapbox.Editor
 {
+	/// <summary>
+	/// Pop up menu for selecting, creating and assigning modifier instances to AbstractMap.
+	/// </summary>
 	public class PopupSelectionMenu : PopupWindowContent
 	{
 
@@ -71,12 +74,22 @@ namespace Mapbox.Editor
 			EditorGUILayout.EndScrollView();
 		}
 
+		/// <summary>
+		/// Gets the short name of the type.
+		/// </summary>
+		/// <returns>The short type name.</returns>
+		/// <param name="input">Input.</param>
 		private string GetShortTypeName(string input)
 		{
 			int pos = input.LastIndexOf(".", StringComparison.CurrentCulture) + 1;
 			return input.Substring(pos, input.Length - pos);
 		}
 
+		/// <summary>
+		/// Creates the new modifer instance.
+		/// </summary>
+		/// <param name="type">Type.</param>
+		/// <param name="name">Name.</param>
 		private void CreateNewModiferInstance(Type type, string name)
 		{
 			var modifierInstance = ScriptableObject.CreateInstance(type);
@@ -119,6 +132,10 @@ namespace Mapbox.Editor
 			Debug.Log(string.Format("Created new {0} modifer at {1}", name, uniqueAssetPath));
 		}
 
+		/// <summary>
+		/// Adds the new instance to array.
+		/// </summary>
+		/// <param name="obj">Object.</param>
 		public void AddNewInstanceToArray(object obj)
 		{
 			ScriptableObject asset = obj as ScriptableObject;
@@ -142,6 +159,13 @@ namespace Mapbox.Editor
 			}
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="T:Mapbox.Editor.PopupSelectionMenu"/> class.
+		/// </summary>
+		/// <param name="t">T.</param>
+		/// <param name="p">P.</param>
+		/// <param name="index">Index.</param>
+		/// <param name="act">Act.</param>
 		public PopupSelectionMenu(Type t, SerializedProperty p, int index = -1, Action<UnityEngine.Object> act = null)
 		{
 			_type = t;
