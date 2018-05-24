@@ -3,11 +3,11 @@
 *??/??/2018*
 ##### New Features
 - Added a **Feature Replacement Modifer** that allows replacement of a vector feature at a given Latitude,Longitude with a supplied prefab. Enables replacing a procedurally generated building at a given Latitude,Longitude with a custom 3D model.
+- Texturing Style dropdown now allows users to select from prepackaged texture styles or custom, which allows for user-defined texturing.
 ##### Improvements
 ##### Bug Fixes
 - Fix issue with UvModifier which caused wrong roof uv positions calculations.
 - Fix issue with data fetcher to handle failed connections properly, which caused IndexOutOfRangeException during tile loading/unloading.
-
 
  ### v.1.4.2
 *05/14/2018*
@@ -23,7 +23,6 @@
   **Only available on Android 7.0 (Nougat, API Level 24) and up!**
 - `EditorGpsLogLocationProvider`: an Editor location provider to replay real world GPS traces logged with [GNSSLogger](https://github.com/google/gps-measurement-tools/tree/master/GNSSLogger)
 - New example scene showing `UserHeading` and `DeviceOrientation`
-- Texturing Style dropdown now allows users to select from prepackaged texture styles or custom, which allows for user-defined texturing.
 
 ##### Improvements
 - `UnityARInterface` updated to [commit 67351b6](https://github.com/Unity-Technologies/experimental-ARInterface/commit/67351b66ff9af28380e7dd5f5b2f4ba1bf802ca8) from March 1st 2018
