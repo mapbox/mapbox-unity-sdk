@@ -19,11 +19,10 @@ public class VectorDataFetcher : DataFetcher
 			{
 				FetchingError(tile, new TileErrorEventArgs(tile.CanonicalTileId, vectorTile.GetType(), tile, vectorTile.Exceptions));
 				tile.VectorDataState = TilePropertyState.Error;
+				return;
 			}
-			else
-			{
-				DataRecieved(tile, vectorTile);
-			}
+
+			DataRecieved(tile, vectorTile);
 		});
 	}
 }

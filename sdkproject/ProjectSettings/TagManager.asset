@@ -3,8 +3,7 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags:
-  - POIPrefab
+  tags: []
   layers:
   - Default
   - TransparentFX
@@ -14,15 +13,15 @@ TagManager:
   - UI
   - 
   - 
-  - Tile
-  - Park
-  - Label
-  - AR
+  - PostProcessing
   - Map
-  - Both
   - Path
+  - Both
   - ARGameObject
-  - POIPrefab
+  - 
+  - 
+  - 
+  - 
   - 
   - 
   - 

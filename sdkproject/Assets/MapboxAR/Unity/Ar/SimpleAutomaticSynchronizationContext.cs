@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Unity.Ar
+namespace Mapbox.Unity.Ar
 {
 	using System.Collections.Generic;
 	using UnityEngine;
@@ -67,103 +67,91 @@
 		/// </summary>
 		/// <param name="gpsNode">Gps node.</param>
 		/// <param name="arNode">Ar node.</param>
-		public void AddSynchronizationNodes(Location location, Vector3 locationPosition, Vector3 arNode)
+		public void AddSynchronizationNodes(Location location, Vector3 locationPosition, Vector3 arNode,float compassFirstValue)
 		{
-			_gpsNodes.Add(location);
-			_gpsPositions.Add(locationPosition);
-			_arNodes.Add(arNode);
+            _gpsNodes.Add(location);
+            _gpsPositions.Add(locationPosition);
+            _arNodes.Add(arNode);
 
-			_count = _arNodes.Count;
-			if (_count > 1)
-			{
-				_currentArVector = arNode - _previousArNode;
-				_currentAbsoluteGpsVector = locationPosition - _previousLocationPosition;
+            _count = _arNodes.Count;
+            if (_count > 1)
+            {
+                _currentArVector = arNode - _previousArNode;
+                _currentAbsoluteGpsVector = locationPosition - _previousLocationPosition;
 
-				// TODO: try to use ArTrustRange instead!
-				// This would mean no alignment is calculated until the threshold is met.
-				// Perhaps more drift, but also more stable?
-				if (_currentArVector.magnitude < MinimumDeltaDistance || _currentAbsoluteGpsVector.magnitude < MinimumDeltaDistance)
-				{
-					Unity.Utilities.Console.Instance.Log("Minimum movement not yet met (arDelta: " + _currentArVector.magnitude + ", gpsDelta: " + _currentAbsoluteGpsVector.magnitude + ")", "red");
-					return;
-				}
+                // TODO: try to use ArTrustRange instead!
+                // This would mean no alignment is calculated until the threshold is met.
+                // Perhaps more drift, but also more stable?
+                if (_currentArVector.magnitude < MinimumDeltaDistance || _currentAbsoluteGpsVector.magnitude < MinimumDeltaDistance)
+                {
+                    Unity.Utilities.Console.Instance.Log("Minimum movement not yet met (arDelta: " + _currentArVector.magnitude + ", gpsDelta: " + _currentAbsoluteGpsVector.magnitude + ")", "red");
+                    return;
+                }
+                _rotation = -compassFirstValue;
 
-				ComputeAlignment();
+                ComputeAlignment();
 
-				//Compute next alignment relative to current location.
-				_previousArNode = arNode;
-				_previousLocationPosition = locationPosition;
-			}
-			else
-			{
-				//Initialize previous AR / GPS vectors
-				_previousArNode = arNode;
-				_previousLocationPosition = locationPosition;
-			}
-		}
+                //Compute next alignment relative to current location.
+                _previousArNode = arNode;
+                _previousLocationPosition = locationPosition;
+            }
+            else
+            {
+                //Initialize previous AR / GPS vectors
+                _previousArNode = arNode;
+                _previousLocationPosition = locationPosition;
+            }
+        }
 
-		void ComputeAlignment()
-		{
-			var rotation = Vector3.SignedAngle(_currentAbsoluteGpsVector, _currentArVector, Vector3.up);
-			var headingQuaternion = Quaternion.Euler(0, rotation, 0);
-			var relativeGpsVector = headingQuaternion * _currentAbsoluteGpsVector;
+        void ComputeAlignment()
+        {
+            //var rotation = Vector3.SignedAngle(_currentAbsoluteGpsVector, _currentArVector, Vector3.up);
+            var rotation = _rotation;
 
-			_rotation = rotation;
+            var headingQuaternion = Quaternion.Euler(0, rotation, 0);
+            var relativeGpsVector = headingQuaternion * _currentAbsoluteGpsVector;
 
-			var accuracy = _gpsNodes[_count - 1].Accuracy;
-			var delta = _currentArVector - relativeGpsVector;
-			var deltaDistance = delta.magnitude;
+            //_rotation = rotation;
+           
 
-			var bias = SynchronizationBias;
-			if (UseAutomaticSynchronizationBias && _count > 2)
-			{
-				// FIXME: This works fine, but a better approach would be to reset only after we favor GPS.
-				// In other words, don't reset every time we add a node.
-				// Generally speaking, this will slowly shift the bias up before resetting bias to 0.
-				bias = Mathf.Clamp01((.5f * (deltaDistance + ArTrustRange - accuracy)) / deltaDistance);
-			}
+            var accuracy = _gpsNodes[_count - 1].Accuracy;
+            var delta = _currentArVector - relativeGpsVector;
+            var deltaDistance = delta.magnitude;
 
-			// Our new "origin" will be the difference offset between our last nodes (mapped into the same coordinate space).
-			var originOffset = _previousArNode - headingQuaternion * _previousLocationPosition;
+            var bias = SynchronizationBias;
+            if (UseAutomaticSynchronizationBias && _count > 2)
+            {
+                // FIXME: This works fine, but a better approach would be to reset only after we favor GPS.
+                // In other words, don't reset every time we add a node.
+                // Generally speaking, this will slowly shift the bias up before resetting bias to 0.
+                bias = Mathf.Clamp01((.5f * (deltaDistance + ArTrustRange - accuracy)) / deltaDistance);
+            }
 
-			// Add the weighted delta.
-			_position = (delta * bias) + originOffset;
+            // Our new "origin" will be the difference offset between our last nodes (mapped into the same coordinate space).
+            var originOffset = _previousArNode - headingQuaternion * _previousLocationPosition;
 
-			//_rotation = _gpsNodes[_count - 1].Heading;
-			//_position = _gpsPositions[_count - 1];
-
+            // Add the weighted delta.
+            _position = (delta * bias) + originOffset;
 
 #if UNITY_EDITOR
-			Debug.LogFormat(
-				"AR Vector:{0} GPS Vector:{1} HEADING:{2} HDOP:{3} Relative GPS Vector:{4} BIAS:{5} DISTANCE:{6} OFFSET:{7} BIASED DELTA:{8} OFFSET:{8}"
-				, _currentArVector
-				, _currentAbsoluteGpsVector
-				, rotation
-				, accuracy
-				, relativeGpsVector
-				, bias
-				, deltaDistance
-				, originOffset
-				, delta
-				, _position
-			);
+            Debug.Log("AR Vector: " + _currentArVector);
+            Debug.Log("GPS Vector: " + _currentAbsoluteGpsVector);
+            Debug.Log("HEADING:" + rotation);
+            Debug.Log("Relative GPS Vector: " + relativeGpsVector);
+            Debug.Log("BIAS: " + bias);
+            Debug.Log("DISTANCE: " + deltaDistance);
+            Debug.Log("OFFSET: " + originOffset);
+            Debug.Log("BIASED DELTA: " + delta);
+            Debug.Log("OFFSET: " + _position);
 #endif
-			Unity.Utilities.Console.Instance.Log(
-				string.Format(
-					"Offset: {0},\tHeading: {1},\tDisance: {2},\tBias: {3}"
-					, _position
-					, _rotation
-					, deltaDistance
-					, bias
-				)
-				, "orange"
-			);
+            Unity.Utilities.Console.Instance.Log(string.Format("Offset: {0},\tHeading: {1},\tDisance: {2},\tBias: {3}",
+                                                               _position, _rotation, deltaDistance, bias), "orange");
 
-			var alignment = new Alignment();
-			alignment.Rotation = _rotation;
-			alignment.Position = _position;
+            var alignment = new Alignment();
+            alignment.Rotation = _rotation;
+            alignment.Position = _position;
 
-			OnAlignmentAvailable(alignment);
-		}
-	}
+            OnAlignmentAvailable(alignment);
+        }
+    }
 }

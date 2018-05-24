@@ -23,7 +23,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private Vector3 _vert;
 		private List<Vector2> _uv = new List<Vector2>();
 
-		#region Atlas Fields
 		//texture uv fields
 		//public AtlasInfo AtlasInfo;
 		private AtlasEntity _currentFacade;
@@ -32,12 +31,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private Vector3 _vertexRelativePos;
 		private Vector3 _firstVert;
 
-		private float minx;
-		private float miny;
-		private float maxx;
-		private float maxy;
-		#endregion
-
 		public override void SetProperties(ModifierProperties properties)
 		{
 			_options = (UVModifierOptions)properties;
@@ -45,11 +38,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
-			if (md.Vertices.Count == 0 || feature == null || feature.Points.Count < 1)
-			{
-				return;
-			}
-			
 			_uv.Clear();
 			_mdVertexCount = md.Vertices.Count;
 			_size = md.TileRect.Size;
@@ -75,13 +63,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				_currentFacade = _options.atlasInfo.Roofs[UnityEngine.Random.Range(0, _options.atlasInfo.Roofs.Count)];
 
-				minx = float.MaxValue;
-				miny = float.MaxValue;
-				maxx = float.MinValue;
-				maxy = float.MinValue;
-
+				float minx = float.MaxValue, miny = float.MaxValue, maxx = float.MinValue, maxy = float.MinValue;
 				_textureUvCoordinates = new Vector2[_mdVertexCount];
-				_textureDirection = Quaternion.FromToRotation((md.Vertices[0] - md.Vertices[1]), Mapbox.Unity.Constants.Math.Vector3Right);
+				_textureDirection = Quaternion.FromToRotation((md.Vertices[_mdVertexCount - 2] - md.Vertices[0]), Mapbox.Unity.Constants.Math.Vector3Right);
 				_textureUvCoordinates[0] = new Vector2(0, 0);
 				_firstVert = md.Vertices[0];
 				for (int i = 1; i < _mdVertexCount; i++)
@@ -101,10 +85,14 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				}
 
 				var width = maxx - minx;
-				var height = maxy - miny;
+				var height = maxy - minx;
 
 				for (int i = 0; i < _mdVertexCount; i++)
 				{
+					//var nx = _textureUvCoordinates[i].x - minx; //first point isn't always the min
+					//var ny = _textureUvCoordinates[i].y - miny;
+					//var xx = (nx / (maxx - minx)) * _currentFacade.TextureRect.width + _currentFacade.TextureRect.x;
+					//var yy = (ny / (maxy - miny)) * _currentFacade.TextureRect.height + _currentFacade.TextureRect.y;
 					_uv.Add(new Vector2(
 						(((_textureUvCoordinates[i].x - minx) / width) * _currentFacade.TextureRect.width) + _currentFacade.TextureRect.x,
 						(((_textureUvCoordinates[i].y - miny) / height) * _currentFacade.TextureRect.height) + _currentFacade.TextureRect.y));

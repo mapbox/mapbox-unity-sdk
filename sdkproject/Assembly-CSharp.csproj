@@ -1,0 +1,875 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <LangVersion>4</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.20506</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <RootNamespace>
+    </RootNamespace>
+    <ProjectGuid>{6A1761F8-EC62-6A3C-073D-44E507A75121}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <AssemblyName>Assembly-CSharp</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <BaseDirectory>.</BaseDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Temp\bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_5_OR_NEWER;UNITY_5_6_OR_NEWER;UNITY_2017_1_OR_NEWER;UNITY_2017_2_OR_NEWER;UNITY_2017_3_OR_NEWER;UNITY_2018_1_OR_NEWER;UNITY_2018_1_0;UNITY_2018_1;UNITY_2018;PLATFORM_ARCH_64;UNITY_64;UNITY_ANALYTICS;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_DUCK_TYPING;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_SPRITERENDERER_FLIPPING;ENABLE_SPRITES;ENABLE_GRID;ENABLE_TILEMAP;ENABLE_TERRAIN;ENABLE_RAKNET;ENABLE_DIRECTOR;ENABLE_UNET;ENABLE_LZMA;ENABLE_UNITYEVENTS;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES_COLLAB;ENABLE_CLOUD_SERVICES_COLLAB_SOFTLOCKS;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_HUB;ENABLE_CLOUD_PROJECT_ID;ENABLE_CLOUD_SERVICES_USE_WEBREQUEST;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_HUB;ENABLE_EDITOR_HUB_LICENSE;ENABLE_WEBSOCKET_CLIENT;ENABLE_DIRECTOR_AUDIO;ENABLE_DIRECTOR_TEXTURE;ENABLE_TIMELINE;ENABLE_EDITOR_METRICS;ENABLE_EDITOR_METRICS_CACHING;ENABLE_MANAGED_JOBS;ENABLE_MANAGED_TRANSFORM_JOBS;INCLUDE_DYNAMIC_GI;INCLUDE_GI;ENABLE_MONO_BDWGC;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;INCLUDE_PUBNUB;ENABLE_PLAYMODE_TESTS_RUNNER;ENABLE_VIDEO;ENABLE_PACKMAN;ENABLE_CUSTOM_RENDER_TEXTURE;ENABLE_LOCALIZATION;PLATFORM_STANDALONE_WIN;PLATFORM_STANDALONE;UNITY_STANDALONE_WIN;UNITY_STANDALONE;ENABLE_SUBSTANCE;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_UNITYWEBREQUEST;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_OUT_OF_PROCESS_CRASH_HANDLER;ENABLE_EVENT_QUEUE;ENABLE_CLUSTERINPUT;ENABLE_VR;ENABLE_AR;ENABLE_WEBSOCKET_HOST;ENABLE_MONO;NET_2_0_SUBSET;ENABLE_PROFILER;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;ENABLE_UNITY_COLLECTIONS_CHECKS;UNITY_TEAM_LICENSE;ENABLE_VSTU;UNITY_POST_PROCESSING_STACK_V2</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>0169</NoWarn>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Temp\bin\Release\</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>0169</NoWarn>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NoConfig>true</NoConfig>
+    <NoStdLib>true</NoStdLib>
+    <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <UnityProjectGenerator>Unity/VSTU</UnityProjectGenerator>
+    <UnityProjectType>Game:1</UnityProjectType>
+    <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
+    <UnityVersion>2018.1.0f2</UnityVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="UnityEngine">
+      <HintPath>D:\Unityson\Editor\Data\Managed/UnityEngine/UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor">
+      <HintPath>D:\Unityson\Editor\Data\Managed/UnityEditor.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Assets\GoogleARCore\Examples\AugmentedImage\Scripts\AugmentedImageExampleController.cs" />
+    <Compile Include="Assets\GoogleARCore\Examples\AugmentedImage\Scripts\AugmentedImageVisualizer.cs" />
+    <Compile Include="Assets\GoogleARCore\Examples\CloudAnchor\Scripts\AnchorIdFromRoomRequestMessage.cs" />
+    <Compile Include="Assets\GoogleARCore\Examples\CloudAnchor\Scripts\AnchorIdFromRoomResponseMessage.cs" />
+    <Compile Include="Assets\GoogleARCore\Examples\CloudAnchor\Scripts\ARKitHelper.cs" />
+    <Compile Include="Assets\GoogleARCore\Examples\CloudAnchor\Scripts\CloudAnchorController.cs" />
+    <Compile Include="Assets\GoogleARCore\Examples\CloudAnchor\Scripts\CloudAnchorUIController.cs" />
+    <Compile Include="Assets\GoogleARCore\Examples\CloudAnchor\Scripts\RoomSharingClient.cs" />
+    <Compile Include="Assets\GoogleARCore\Examples\CloudAnchor\Scripts\RoomSharingMsgType.cs" />
+    <Compile Include="Assets\GoogleARCore\Examples\CloudAnchor\Scripts\RoomSharingServer.cs" />
+    <Compile Include="Assets\GoogleARCore\Examples\Common\Scripts\DetectedPlaneGenerator.cs" />
+    <Compile Include="Assets\GoogleARCore\Examples\Common\Scripts\DetectedPlaneVisualizer.cs" />
+    <Compile Include="Assets\GoogleARCore\Examples\Common\Scripts\PointcloudVisualizer.cs" />
+    <Compile Include="Assets\GoogleARCore\Examples\ComputerVision\Scripts\ComputerVisionController.cs" />
+    <Compile Include="Assets\GoogleARCore\Examples\ComputerVision\Scripts\EdgeDetector.cs" />
+    <Compile Include="Assets\GoogleARCore\Examples\ComputerVision\Scripts\TextureReader.cs" />
+    <Compile Include="Assets\GoogleARCore\Examples\ComputerVision\Scripts\TextureReaderApi.cs" />
+    <Compile Include="Assets\GoogleARCore\Examples\HelloAR\Scripts\HelloARController.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\InstantPreview\Scripts\InstantPreviewInput.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\InstantPreview\Scripts\InstantPreviewManager.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\InstantPreview\Scripts\InstantPreviewTrackedPoseDriver.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Anchor.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\AndroidPermissionsManager.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\AndroidPermissionsRequestResult.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\AnchorApi.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiApkInstallationStatus.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiApkInstallStatusExtensions.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiArStatus.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiArStatusExtensions.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiAvailability.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiAvailabilityExtensions.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiCameraMetadata.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiCloudAnchorMode.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiCloudAnchorState.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiCloudAnchorStateExtensions.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiConstants.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiDisplayUvCoords.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiDisplayUvCoordsExtensions.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiFeaturePointOrientationMode.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiFeaturePointOrientationModeExtensions.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiLightEstimateState.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiLightEstimateStateExtensions.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiLightEstimationMode.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiPlaneFindingMode.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiPoseData.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiPrestoConfig.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiPrestoStatus.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiPrestoStatusExtensions.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiTrackableType.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiTrackingState.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiTrackingStateExtensions.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiTrackingStateXPExtensions.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ApiUpdateMode.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\AugmentedImageApi.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\AugmentedImageDatabaseApi.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\CameraApi.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\CameraMetadataApi.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\FrameApi.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\HitTestApi.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\ImageApi.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\LightEstimateApi.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\NativeSession.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\PlaneApi.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\PointApi.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\PointCloudApi.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\PoseApi.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\SessionApi.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\SessionConfigApi.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\TrackableApi.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Api\TrackableListApi.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\ApkAvailabilityStatus.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\ApkInstallationStatus.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\ARCoreBackgroundRenderer.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\ARCoreSession.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\ARCoreSessionConfig.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Async\WaitForTaskCompletionYieldInstruction.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\AsyncTask.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\AugmentedImage.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\AugmentedImageDatabase.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\AugmentedImageDatabaseEntry.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\CameraImageBytes.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\CameraMetadataTag.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\CameraMetadataValue.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\CloudAnchorResult.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\CloudServiceResponse.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Deprecated\TrackedPlane.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Deprecated\TrackedPoint.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Deprecated\TrackedPointOrientationMode.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\DetectedPlane.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\DetectedPlaneFindingMode.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\DisplayUvCoords.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\EnvironmentalLight.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\ExperimentSupport\ExperimentBase.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\ExperimentSupport\ExperimentManager.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\FeaturePoint.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\FeaturePointOrientationMode.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Frame.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\LightEstimate.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\LightEstimateState.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Managers\ARCoreAndroidLifecycleManager.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Managers\ARCoreIOSLifecycleManager.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Managers\ARPrestoCallbackManager.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Managers\CloudServiceManager.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Managers\ILifecycleManager.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Managers\LifecycleManager.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Managers\TrackableManager.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\PointCloudPoint.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Session.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\SessionStatus.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\SessionStatusExtensions.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Trackable.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\TrackableHit.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\TrackableHitFlags.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\TrackableQueryFilter.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\TrackingState.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Utility\ARCoreProjectSettings.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Utility\ARDebug.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Utility\ConversionHelper.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Utility\DllImportNoop.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Utility\IntPtrEqualityComparer.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Utility\MarshalingHelper.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\Utility\ShellHelper.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\XPAnchor.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\XPSession.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\XPSessionStatus.cs" />
+    <Compile Include="Assets\GoogleARCore\SDK\Scripts\XPTrackingState.cs" />
+    <Compile Include="Assets\Mapbox\Core\cheap-ruler-cs\CheapRuler.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Directions\DirectionResource.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Directions\Directions.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Directions\Overview.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Directions\Response\Annotation.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Directions\Response\DirectionsResponse.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Directions\Response\Intersection.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Directions\Response\Leg.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Directions\Response\Maneuver.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Directions\Response\Route.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Directions\Response\Step.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Directions\Response\Waypoint.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Directions\RoutingProfile.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Geocoding\ForwardGeocodeResource.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Geocoding\Geocoder.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Geocoding\GeocodeResource.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Geocoding\Response\Feature.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Geocoding\Response\GeocodeResponse.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Geocoding\Response\Geometry.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Geocoding\ReverseGeocodeResource.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Map\CanonicalTileId.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Map\ClassicRasterTile.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Map\ClassicRetinaRasterTile.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Map\Map.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Map\MapUtils.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Map\RasterTile.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Map\RawPngRasterTile.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Map\RetinaRasterTile.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Map\Tile.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Map\TileCover.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Map\TileErrorEventArgs.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Map\TileResource.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Map\UnwrappedTileId.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Map\VectorTile.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\MapMatching\MapMatcher.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\MapMatching\MapMatchingParameters.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\MapMatching\MapMatchingResource.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\MapMatching\MapMatchingResponse.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\MapMatching\MatchObject.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\MapMatching\Tracepoint.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Platform\Cache\CacheItem.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Platform\Cache\CachingWebFileSource.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Platform\Cache\ICache.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Platform\Cache\MbTilesCache.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Platform\Cache\MemoryCache.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Platform\FileSource.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Platform\HTTPRequestNonThreaded.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Platform\HTTPRequestThreaded.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Platform\IAsyncRequest.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Platform\IAsyncRequestFactory.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Platform\IFileSource.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Platform\IResource.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Platform\MbTiles\MbTiles.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Platform\MbTiles\MetaData.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Platform\MbTiles\MetaDataRequired.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Platform\MbTiles\Tiles.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Platform\Resource.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Platform\Response.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Platform\SQLite\SQLite.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Platform\TileJSON\TileJSON.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Platform\TileJSON\TileJSONObjectVectorLayer.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Platform\TileJSON\TileJSONReponse.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Tokens\MapboxToken.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Tokens\MapboxTokenApi.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Utils\BearingFilter.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Utils\CircularBuffer.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Utils\Compression.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Utils\Constants.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Utils\GeoCoordinate.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Utils\GeoCoordinateBounds.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Utils\IObservable.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Utils\IObserver.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Utils\JsonConverters\BboxToGeoCoordinateBoundsConverter.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Utils\JsonConverters\JsonConverters.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Utils\JsonConverters\LonLatToGeoCoordinateConverter.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Utils\JsonConverters\PolylineToGeoCoordinateListConverter.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Utils\PolylineUtils.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Utils\UnixTimestampUtils.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Utils\Vector2d\Mathd.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Utils\Vector2d\RectD.cs" />
+    <Compile Include="Assets\Mapbox\Core\mapbox-sdk-cs\Utils\Vector2d\Vector2d.cs" />
+    <Compile Include="Assets\Mapbox\Core\Plugins\Android\UniAndroidPermission\UniAndroidPermission.cs" />
+    <Compile Include="Assets\Mapbox\Core\Plugins\Mapbox\vector-tile-cs\ExtensionMethods\Enums.cs" />
+    <Compile Include="Assets\Mapbox\Core\Plugins\Mapbox\vector-tile-cs\ExtensionMethods\VectorTile.cs" />
+    <Compile Include="Assets\Mapbox\Core\Plugins\Mapbox\vector-tile-cs\ExtensionMethods\VectorTileFeature.cs" />
+    <Compile Include="Assets\Mapbox\Core\Plugins\Mapbox\vector-tile-cs\Geometry\clipper.cs" />
+    <Compile Include="Assets\Mapbox\Core\Plugins\Mapbox\vector-tile-cs\Geometry\DecodeGeometry.cs" />
+    <Compile Include="Assets\Mapbox\Core\Plugins\Mapbox\vector-tile-cs\Geometry\Geometry.cs" />
+    <Compile Include="Assets\Mapbox\Core\Plugins\Mapbox\vector-tile-cs\Geometry\Util.cs" />
+    <Compile Include="Assets\Mapbox\Core\Plugins\Mapbox\vector-tile-cs\PbfReader\Constants.cs" />
+    <Compile Include="Assets\Mapbox\Core\Plugins\Mapbox\vector-tile-cs\PbfReader\PbfReader.cs" />
+    <Compile Include="Assets\Mapbox\Core\Plugins\Mapbox\vector-tile-cs\VectorTileReader\VectorTile.cs" />
+    <Compile Include="Assets\Mapbox\Core\Plugins\Mapbox\vector-tile-cs\VectorTileReader\VectorTileFeature.cs" />
+    <Compile Include="Assets\Mapbox\Core\Plugins\Mapbox\vector-tile-cs\VectorTileReader\VectorTileLayer.cs" />
+    <Compile Include="Assets\Mapbox\Core\Plugins\Mapbox\vector-tile-cs\VectorTileReader\VectorTileReader.cs" />
+    <Compile Include="Assets\Mapbox\Core\probe-extractor-cs\Probe.cs" />
+    <Compile Include="Assets\Mapbox\Core\probe-extractor-cs\ProbeExtractor.cs" />
+    <Compile Include="Assets\Mapbox\Examples\1_DataExplorer\HighlightBuildings.cs" />
+    <Compile Include="Assets\Mapbox\Examples\1_DataExplorer\Scripts\TextMeshOutline.cs" />
+    <Compile Include="Assets\Mapbox\Examples\2_ZoomableMap\Scripts\SetCameraHeight.cs" />
+    <Compile Include="Assets\Mapbox\Examples\2_ZoomableMap\Scripts\SpawnOnMap.cs" />
+    <Compile Include="Assets\Mapbox\Examples\3_Globe\Scripts\DragRotate.cs" />
+    <Compile Include="Assets\Mapbox\Examples\3_Globe\Scripts\SpawnOnGlobeExample.cs" />
+    <Compile Include="Assets\Mapbox\Examples\4_VoxelMap\Scripts\TextureScaler.cs" />
+    <Compile Include="Assets\Mapbox\Examples\4_VoxelMap\Scripts\VoxelData.cs" />
+    <Compile Include="Assets\Mapbox\Examples\4_VoxelMap\Scripts\VoxelFetcher.cs" />
+    <Compile Include="Assets\Mapbox\Examples\4_VoxelMap\Scripts\VoxelTile.cs" />
+    <Compile Include="Assets\Mapbox\Examples\5_Playground\Scripts\DirectionsExample.cs" />
+    <Compile Include="Assets\Mapbox\Examples\5_Playground\Scripts\ForwardGeocoderExample.cs" />
+    <Compile Include="Assets\Mapbox\Examples\5_Playground\Scripts\LogLocationProviderData.cs" />
+    <Compile Include="Assets\Mapbox\Examples\5_Playground\Scripts\RasterTileExample.cs" />
+    <Compile Include="Assets\Mapbox\Examples\5_Playground\Scripts\ReverseGeocoderExample.cs" />
+    <Compile Include="Assets\Mapbox\Examples\5_Playground\Scripts\VectorTileExample.cs" />
+    <Compile Include="Assets\Mapbox\Examples\6_POIPlacement\POIPlacementScriptExample.cs" />
+    <Compile Include="Assets\Mapbox\Examples\Scripts\CameraBillboard.cs" />
+    <Compile Include="Assets\Mapbox\Examples\Scripts\CameraMovement.cs" />
+    <Compile Include="Assets\Mapbox\Examples\Scripts\ChangeShadowDistance.cs" />
+    <Compile Include="Assets\Mapbox\Examples\Scripts\FeatureSelectionDetector.cs" />
+    <Compile Include="Assets\Mapbox\Examples\Scripts\FeatureUiMarker.cs" />
+    <Compile Include="Assets\Mapbox\Examples\Scripts\ForwardGeocodeUserInput.cs" />
+    <Compile Include="Assets\Mapbox\Examples\Scripts\HighlightFeature.cs" />
+    <Compile Include="Assets\Mapbox\Examples\Scripts\ImmediatePositionWithLocationProvider.cs" />
+    <Compile Include="Assets\Mapbox\Examples\Scripts\LabelTextSetter.cs" />
+    <Compile Include="Assets\Mapbox\Examples\Scripts\LoadingPanelController.cs" />
+    <Compile Include="Assets\Mapbox\Examples\Scripts\LocationStatus.cs" />
+    <Compile Include="Assets\Mapbox\Examples\Scripts\MakiHelper.cs" />
+    <Compile Include="Assets\Mapbox\Examples\Scripts\ObjectInspectorModifier.cs" />
+    <Compile Include="Assets\Mapbox\Examples\Scripts\PoiLabelTextSetter.cs" />
+    <Compile Include="Assets\Mapbox\Examples\Scripts\PoiMarkerHelper.cs" />
+    <Compile Include="Assets\Mapbox\Examples\Scripts\PositionWithLocationProvider.cs" />
+    <Compile Include="Assets\Mapbox\Examples\Scripts\QuadTreeCameraMovement.cs" />
+    <Compile Include="Assets\Mapbox\Examples\Scripts\ReloadMap.cs" />
+    <Compile Include="Assets\Mapbox\Examples\Scripts\ReverseGeocodeUserInput.cs" />
+    <Compile Include="Assets\Mapbox\Examples\Scripts\RotateWithLocationProvider.cs" />
+    <Compile Include="Assets\Mapbox\Examples\Scripts\ScriptablePalette.cs" />
+    <Compile Include="Assets\Mapbox\Examples\Scripts\UpdateMapWithLocationProvider.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Constants.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\CameraBoundsTileProviderOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\ColliderOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\ElevationModificationOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\ElevationRequiredOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\GeometryExtrusionOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\GeometryMaterialOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\ImageryRasterOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\LayerModifierOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\LayerPerformanceOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\LayerSourceOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\LocationPrefabCategoryOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\MapboxEnums.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\MapExtentOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\MapLocationOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\MapOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\MapPlacementOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\MapScalingOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\RangeAroundTransformTileProviderOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\RangeTileProviderOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\SpawnPrefabOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\TerrainSideWallOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\TileJsonData.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\TileProviderOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\UnifiedMapOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\DataContainers\UnityLayerOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\LayerProperties\CoreVectorLayerProperties.cs" />
+    <Compile Include="Assets\Mapbox\Unity\LayerProperties\ElevationLayerProperties.cs" />
+    <Compile Include="Assets\Mapbox\Unity\LayerProperties\ImageryLayerProperties.cs" />
+    <Compile Include="Assets\Mapbox\Unity\LayerProperties\LayerProperties.cs" />
+    <Compile Include="Assets\Mapbox\Unity\LayerProperties\PrefabItemOptions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\LayerProperties\VectorLayerProperties.cs" />
+    <Compile Include="Assets\Mapbox\Unity\LayerProperties\VectorSubLayerProperties.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Location\AbstractEditorLocationProvider.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Location\AbstractLocationProvider.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Location\DeviceLocationProvider.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Location\DeviceLocationProviderAndroidNative.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Location\EditorLocationProvider.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Location\ILocationProvider.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Location\KalmanFilter.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Location\Location.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Location\LocationArrayEditorLocationProvider.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Location\LocationGpsLogEditorLocationProvider.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Location\LocationProviderFactory.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Location\TransformLocationProvider.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Map\AbstractMap.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Map\AbstractMapVisualizer.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Map\AbstractTileProvider.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Map\CameraBoundsTileProvider.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Map\GlobeTileProvider.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Map\IMap.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Map\InitializeMapWithLocationProvider.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Map\ITileProvider.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Map\MapVisualizer.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Map\QuadTreeMapVisualizer.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Map\QuadTreeTileProvider.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Map\RangeAroundTransformTileProvider.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Map\RangeTileProvider.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Map\TileErrorHandler.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MapboxAccess.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Components\FeatureBehaviour.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Components\TextureSelector.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Components\VertexDebugger.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Components\VertexDebuggerGizmo.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Data\AtlasInfo.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Data\FeatureCollectionBase.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Data\KdTree\DistanceFunctions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Data\KdTree\IntervalHeap.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Data\KdTree\KDNode.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Data\KdTree\KDTree.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Data\KdTree\MinHeap.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Data\KdTree\NearestNeighbour.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Data\KdTreeCollection.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Data\MeshData.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Data\UnityTile.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Data\VectorFeatureUnity.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Enums\TilePropertyState.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Factories\AbstractTileFactory.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Factories\DirectionsFactory.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Factories\ImageDataFetcher.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Factories\MapImageFactory.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Factories\TerrainDataFetcher.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Factories\TerrainFactoryBase.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Factories\TerrainStrategies\ElevatedTerrainStrategy.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Factories\TerrainStrategies\ElevatedTerrainWithSidesStrategy.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Factories\TerrainStrategies\ElevationBasedTerrainStrategy.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Factories\TerrainStrategies\FlatSphereTerrainStrategy.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Factories\TerrainStrategies\FlatTerrainStrategy.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Factories\TerrainStrategies\LowPolyTerrainStrategy.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Factories\TerrainStrategies\TerrainStrategy.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Factories\VectorDataFetcher.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Factories\VectorTileFactory.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Filters\FilterBase.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Filters\HeightFilter.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Filters\TypeFilter.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Interfaces\IFeaturePropertySettable.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Interfaces\LayerVisualizerBase.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\LayerVisualizers\LocationPrefabsLayerVisualizer.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\LayerVisualizers\VectorLayerVisualizer.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\GameObjectModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\GameObjectModifiers\AddMonoBehavioursModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\GameObjectModifiers\AddMonoBehavioursModifierType.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\GameObjectModifiers\AddToCollectionModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\GameObjectModifiers\ColliderModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\GameObjectModifiers\DisableMeshRendererModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\GameObjectModifiers\FeatureBehaviourModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\GameObjectModifiers\LayerModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\GameObjectModifiers\MapboxStylesColorModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\GameObjectModifiers\MaterialModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\GameObjectModifiers\PrefabModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\GameObjectModifiers\SpawnInsideModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\GameObjectModifiers\TagModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\GameObjectModifiers\TextureModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\GameObjectModifiers\TextureMonoBehaviourModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\MergedModifierStack.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\MeshModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\MeshModifiers\ChamferHeightModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\MeshModifiers\Earcut.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\MeshModifiers\HeightModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\MeshModifiers\LineMeshModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\MeshModifiers\LoftModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\MeshModifiers\PolygonMeshModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\MeshModifiers\SmoothLineModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\MeshModifiers\SnapTerrainModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\MeshModifiers\SnapTerrainRaycastModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\MeshModifiers\UvModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\ModifierBase.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\ModifierStack.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\ModifierStackBase.cs" />
+    <Compile Include="Assets\Mapbox\Unity\MeshGeneration\Modifiers\TextureSideWallModifier.cs" />
+    <Compile Include="Assets\Mapbox\Unity\SourceLayers\ILayer.cs" />
+    <Compile Include="Assets\Mapbox\Unity\SourceLayers\ImageryLayer.cs" />
+    <Compile Include="Assets\Mapbox\Unity\SourceLayers\MapboxDefaultElevation.cs" />
+    <Compile Include="Assets\Mapbox\Unity\SourceLayers\MapboxDefaultImagery.cs" />
+    <Compile Include="Assets\Mapbox\Unity\SourceLayers\MapboxDefaultVector.cs" />
+    <Compile Include="Assets\Mapbox\Unity\SourceLayers\TerrainLayer.cs" />
+    <Compile Include="Assets\Mapbox\Unity\SourceLayers\VectorLayer.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Telemetry\ITelemetryLibrary.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Telemetry\TelemetryAndroid.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Telemetry\TelemetryDummy.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Telemetry\TelemetryEditor.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Telemetry\TelemetryFactory.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Telemetry\TelemetryFallback.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Telemetry\TelemetryIos.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Telemetry\TelemetryWebgl.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Utilities\AndroidSettings.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Utilities\Console.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Utilities\Conversions.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Utilities\DebugTools\SceneData.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Utilities\DebugTools\ScenesList.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Utilities\DontDestroyOnLoad.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Utilities\GeocodeAttribute.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Utilities\HTTPRequest.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Utilities\MapVisualizerPerformance.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Utilities\NodeEditorElementAttribute.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Utilities\ObjectPool.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Utilities\OpenUrlOnButtonClick.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Utilities\Runnable.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Utilities\Singleton.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Utilities\SingletonScriptableObject.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Utilities\StyleSearchAttribute.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Utilities\TelemetryConfigurationButton.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Utilities\VectorEntity.cs" />
+    <Compile Include="Assets\Mapbox\Unity\Utilities\VectorExtensions.cs" />
+    <Compile Include="Assets\MapboxAR\Examples\ARPrerequisiteInfo.cs" />
+    <Compile Include="Assets\MapboxAR\Examples\ARTabletop\Scripts\ARPlaneHandler.cs" />
+    <Compile Include="Assets\MapboxAR\Examples\ARTabletop\Scripts\ARTableTileProvider.cs" />
+    <Compile Include="Assets\MapboxAR\Examples\ARTabletop\Scripts\ARTableTopCameraMovement.cs" />
+    <Compile Include="Assets\MapboxAR\Examples\ARTabletop\Scripts\PlaceMapOnARPlane.cs" />
+    <Compile Include="Assets\MapboxAR\Examples\ARTabletop\Scripts\UpdateShaderCoordinatesByARPlane.cs" />
+    <Compile Include="Assets\MapboxAR\Scripts\Camera\ManualTouchCamera.cs" />
+    <Compile Include="Assets\MapboxAR\Scripts\Camera\TouchCamera.cs" />
+    <Compile Include="Assets\MapboxAR\Scripts\ManualSync\FollowTargetTransform.cs" />
+    <Compile Include="Assets\MapboxAR\Scripts\ManualSync\RelocateMapByGPS.cs" />
+    <Compile Include="Assets\MapboxAR\Scripts\ManualSync\RotateOnYTargetTransform.cs" />
+    <Compile Include="Assets\MapboxAR\Scripts\ManualSync\UpdateMapPosByARPlaneY.cs" />
+    <Compile Include="Assets\MapboxAR\Scripts\PlayerSizeFromLocationAccuracy.cs" />
+    <Compile Include="Assets\MapboxAR\Unity\Ar\AbstractAlignmentStrategy.cs" />
+    <Compile Include="Assets\MapboxAR\Unity\Ar\AverageHeadingAlignmentStrategy.cs" />
+    <Compile Include="Assets\MapboxAR\Unity\Ar\ISynchronizationContext.cs" />
+    <Compile Include="Assets\MapboxAR\Unity\Ar\LerpAlignmentStrategy.cs" />
+    <Compile Include="Assets\MapboxAR\Unity\Ar\ManualSynchronizationContextBehaviour.cs" />
+    <Compile Include="Assets\MapboxAR\Unity\Ar\SimpleAutomaticSynchronizationContext.cs" />
+    <Compile Include="Assets\MapboxAR\Unity\Ar\SimpleAutomaticSynchronizationContextBehaviour.cs" />
+    <Compile Include="Assets\MapboxAR\Unity\Ar\SnapAlignmentStrategy.cs" />
+    <Compile Include="Assets\MapboxAR\Unity\Ar\Utilities\PlotRoute.cs" />
+    <Compile Include="Assets\Resources\Area730\TextureBlocks\Scripts\Bezier.cs" />
+    <Compile Include="Assets\Resources\Area730\TextureBlocks\Scripts\BezierCurve.cs" />
+    <Compile Include="Assets\Resources\Area730\TextureBlocks\Scripts\BezierSpline.cs" />
+    <Compile Include="Assets\Resources\Area730\TextureBlocks\Scripts\TextureBlock.cs" />
+    <Compile Include="Assets\Resources\Area730\TextureBlocks\Scripts\TextureScroller.cs" />
+    <Compile Include="Assets\Scripts\InstructionUXCanvas.cs" />
+    <Compile Include="Assets\Scripts\ManualCalibrationCanvas.cs" />
+    <Compile Include="Assets\Scripts\MovingRoadsScript.cs" />
+    <Compile Include="Assets\Simple UI\Samples\IconPreview.cs" />
+    <Compile Include="Assets\UnityARInterface\ARRemote\Scripts\ARRemoteDevice.cs" />
+    <Compile Include="Assets\UnityARInterface\ARRemote\Scripts\ARRemoteEditor.cs" />
+    <Compile Include="Assets\UnityARInterface\ARRemote\Scripts\ARRemoteEditorInterface.cs" />
+    <Compile Include="Assets\UnityARInterface\ARRemote\Scripts\ARSerializableObjects.cs" />
+    <Compile Include="Assets\UnityARInterface\Examples\ARFocusSquare\ARFocusSquare.cs" />
+    <Compile Include="Assets\UnityARInterface\Examples\Scripts\DemoGUI.cs" />
+    <Compile Include="Assets\UnityARInterface\Examples\Scripts\MatchingScalePicker.cs" />
+    <Compile Include="Assets\UnityARInterface\Examples\Scripts\ObjectShooter.cs" />
+    <Compile Include="Assets\UnityARInterface\Examples\Scripts\OptionsGUI.cs" />
+    <Compile Include="Assets\UnityARInterface\Examples\Scripts\PlaceOnPlane.cs" />
+    <Compile Include="Assets\UnityARInterface\Examples\Scripts\RemoveRigidbody.cs" />
+    <Compile Include="Assets\UnityARInterface\Scripts\ARAnchor.cs" />
+    <Compile Include="Assets\UnityARInterface\Scripts\ARBase.cs" />
+    <Compile Include="Assets\UnityARInterface\Scripts\ARController.cs" />
+    <Compile Include="Assets\UnityARInterface\Scripts\ARCoreInterface.cs" />
+    <Compile Include="Assets\UnityARInterface\Scripts\AREditorInterface.cs" />
+    <Compile Include="Assets\UnityARInterface\Scripts\ARInterface.cs" />
+    <Compile Include="Assets\UnityARInterface\Scripts\ARKitInterface.cs" />
+    <Compile Include="Assets\UnityARInterface\Scripts\ARLightEstimate.cs" />
+    <Compile Include="Assets\UnityARInterface\Scripts\ARMessageIds.cs" />
+    <Compile Include="Assets\UnityARInterface\Scripts\ARPlaneVisualizer.cs" />
+    <Compile Include="Assets\UnityARInterface\Scripts\ARPointCloudVisualizer.cs" />
+    <Compile Include="Assets\UnityARInterface\Scripts\BoundedPlane.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\ARKitRemote\ARKitRemoteConnection.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\ARKitRemote\ConnectionMessageIds.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\ARKitRemote\ConnectToEditor.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\ARKitRemote\EditorHitTest.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\ARKitRemote\ObjectSerializationExtension.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\ARKitRemote\SerializableObjects.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\ARKitRemote\UnityRemoteVideo.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Examples\AddRemoveAnchorExample\UnityARUserAnchorExample.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Examples\FocusSquare\FocusSquare.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\Helpers\AR3DOFCameraManager.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\Helpers\ARPlaneAnchorGameObject.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\Helpers\DontDestroyOnLoad.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\Helpers\PointCloudParticleExample.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\Helpers\UnityARAmbient.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\Helpers\UnityARAnchorManager.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\Helpers\UnityARCameraManager.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\Helpers\UnityARCameraNearFar.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\Helpers\UnityARGeneratePlane.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\Helpers\UnityARHitTestExample.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\Helpers\UnityARKitControl.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\Helpers\UnityARKitLightManager.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\Helpers\UnityARMatrixOps.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\Helpers\UnityARUserAnchorComponent.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\Helpers\UnityARUtility.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\Helpers\UnityARVideo.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\Helpers\UnityPointCloudExample.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\ARAnchor.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\ARCamera.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\ARErrorCode.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\ARFaceAnchor.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\ARFrame.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\ARHitTestResult.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\ARHitTestResultType.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\ARLightEstimate.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\ARPlaneAnchor.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\ARPlaneAnchorAlignment.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\ARPoint.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\ARRect.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\ARSize.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\ARTextureHandles.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\ARTrackingQuality.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\ARTrackingState.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\ARTrackingStateReason.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\ARUserAnchor.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\NativeInterface\UnityARSessionNativeInterface.cs" />
+    <Compile Include="Assets\UnityARKitPlugin\UnityARKitPluginSettings.cs" />
+    <None Include="Assets\GoogleARCore\Examples\Common\Materials\Shaders\PlaneGrid.shader" />
+    <None Include="Assets\UnityARInterface\Examples\Common\Shaders\MobileOcclusion.shader" />
+    <None Include="Assets\Mapbox\Unity\Location\ExampleGpsTraces\driving_in_circles.txt" />
+    <None Include="Assets\UnityARInterface\Examples\Common\Shaders\InstancedSurfaceShader.shader" />
+    <None Include="Assets\GoogleARCore\Examples\Common\Materials\Shaders\MobileDiffuseWithLightEstimation.shader" />
+    <None Include="Assets\Mapbox\Core\Plugins\link.xml" />
+    <None Include="Assets\GoogleARCore\SDK\Materials\ARBackground.shader" />
+    <None Include="Assets\Mapbox\Shaders\RasterWithTransparencyShader.shader" />
+    <None Include="Assets\Mapbox\Shaders\MapboxStylesPerRenderer.shader" />
+    <None Include="Assets\Mapbox\Fonts\OpenSansLic.txt" />
+    <None Include="Assets\MapboxAR\link.xml" />
+    <None Include="Assets\Mapbox\Unity\Location\ExampleGpsTraces\walking_device_looking_in_different_direction_1.txt" />
+    <None Include="Assets\MapboxAR\Examples\ARTabletop\Shaders\ClipBox\Clip_Box.shader" />
+    <None Include="Assets\Mapbox\README.txt" />
+    <None Include="Assets\UnityARKitPlugin\Examples\Common\Shaders\MobileOcclusion.shader" />
+    <None Include="Assets\Simple UI\Fonts\OFL.txt" />
+    <None Include="Assets\Mapbox\Core\Plugins\Android\UniAndroidPermission\AndroidManifest-uniRP.xml" />
+    <None Include="Assets\MapboxAR\Examples\ARTabletop\Shaders\ClipBox\LICENSE.txt" />
+    <None Include="Assets\Mapbox\Shaders\MapboxStyles.shader" />
+    <None Include="Assets\Resources\Area730\TextureBlocks\Shaders\SelfIlluminatedAlpha.shader" />
+    <None Include="Assets\GoogleARCore\Examples\Common\Materials\Shaders\PointCloud.shader" />
+    <None Include="Assets\UnityARKitPlugin\ARKitRemote\ARKITREMOTE.txt" />
+    <None Include="Assets\Mapbox\Unity\Location\ExampleGpsTraces\walking_device_looking_in_different_direction_2.txt" />
+    <None Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\Shaders\YUVShaderLinear.shader" />
+    <None Include="Assets\GoogleARCore\Examples\ComputerVision\Materials\EdgeDetectionBackground.shader" />
+    <None Include="Assets\UnityARKitPlugin\Examples\Common\Shaders\MobileARShadow.shader" />
+    <None Include="Assets\MapboxAR\Examples\ARTabletop\Shaders\Clip_MapboxStyles.shader" />
+    <None Include="Assets\UnityARKitPlugin\Examples\Common\Shaders\InstancedSurfaceShader.shader" />
+    <None Include="Assets\Resources\Mapbox\MapboxConfiguration.txt" />
+    <None Include="Assets\MapboxAR\Examples\ARTabletop\Shaders\Clip_MapBoxStylesPerRenderer.shader" />
+    <None Include="Assets\UnityARKitPlugin\Plugins\iOS\UnityARKit\Shaders\YUVShader.shader" />
+    <None Include="Assets\GoogleARCore\Examples\Common\Materials\Shaders\MobileSpecularWithLightEstimation.shader" />
+    <None Include="Assets\UnityARInterface\Examples\Common\Shaders\MobileARShadow.shader" />
+    <None Include="Assets\Mapbox\link.xml" />
+    <Reference Include="UnityEditor.StandardEvents">
+      <HintPath>D:/Unity2018/WorldScaleARUX/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.PackageManagerUI.Editor">
+      <HintPath>D:/Unity2018/WorldScaleARUX/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AIModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ARModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.ARModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AccessibilityModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.AccessibilityModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.AssetBundleModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.AudioModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.BaselibModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.BaselibModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ClothModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.ClothModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CloudWebServicesModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.CloudWebServicesModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ClusterInputModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.ClusterInputModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ClusterRendererModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.ClusterRendererModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CrashReportingModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.CrashReportingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.DirectorModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.DirectorModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.FacebookModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.FacebookModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.GameCenterModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.GameCenterModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.GridModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.GridModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.HotReloadModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.HotReloadModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.ImageConversionModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.InputModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.JSONSerializeModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.JSONSerializeModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.ParticleSystemModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ParticlesLegacyModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.ParticlesLegacyModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PerformanceReportingModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.PerformanceReportingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Physics2DModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.Physics2DModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ScreenCaptureModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.ScreenCaptureModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SharedInternalsModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.SharedInternalsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SpatialTrackingModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.SpatialTrackingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SpriteMaskModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.SpriteMaskModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SpriteShapeModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.SpriteShapeModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.StyleSheetsModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.StyleSheetsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SubstanceModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.SubstanceModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TLSModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.TLSModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TerrainModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.TerrainModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TerrainPhysicsModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.TerrainPhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.TextRenderingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TilemapModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.TilemapModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TimelineModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.TimelineModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.UIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIElementsModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.UIElementsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UNETModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.UNETModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UmbraModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.UmbraModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityAnalyticsModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.UnityAnalyticsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityConnectModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.UnityConnectModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.UnityWebRequestModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestAssetBundleModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.UnityWebRequestAssetBundleModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestAudioModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestTextureModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestWWWModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.VRModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.VRModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.VehiclesModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.VehiclesModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.VideoModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.VideoModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.WebModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.WebModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.WindModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.WindModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.XRModule">
+      <HintPath>D:/Unityson/Editor/Data/Managed/UnityEngine/UnityEngine.XRModule.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Locator">
+      <HintPath>D:/Unityson/Editor/Data/Managed/Unity.Locator.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>D:/Unityson/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Networking">
+      <HintPath>D:/Unityson/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Timeline">
+      <HintPath>D:/Unityson/Editor/Data/UnityExtensions/Unity/Timeline/RuntimeEditor/UnityEngine.Timeline.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIAutomation">
+      <HintPath>D:/Unityson/Editor/Data/UnityExtensions/Unity/UIAutomation/UnityEngine.UIAutomation.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.GoogleAudioSpatializer">
+      <HintPath>D:/Unityson/Editor/Data/UnityExtensions/Unity/UnityGoogleAudioSpatializer/RuntimeEditor/UnityEngine.GoogleAudioSpatializer.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.HoloLens">
+      <HintPath>D:/Unityson/Editor/Data/UnityExtensions/Unity/UnityHoloLens/RuntimeEditor/UnityEngine.HoloLens.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SpatialTracking">
+      <HintPath>D:/Unityson/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
+    </Reference>
+    <Reference Include="Mapbox.IO.Compression">
+      <HintPath>D:/Unity2018/WorldScaleARUX/Assets/Mapbox/Core/Plugins/ThirdParty/Mapbox.IO.Compression/net35/Mapbox.IO.Compression.dll</HintPath>
+    </Reference>
+    <Reference Include="Mapbox.Json">
+      <HintPath>D:/Unity2018/WorldScaleARUX/Assets/Mapbox/Core/Plugins/ThirdParty/Mapbox.Json/Net35/Mapbox.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Analytics">
+      <HintPath>C:/Users/ASUS/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.analytics@2.0.16/UnityEngine.Analytics.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Purchasing">
+      <HintPath>C:/Users/ASUS/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.purchasing@2.0.1/UnityEngine.Purchasing.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.StandardEvents">
+      <HintPath>C:/Users/ASUS/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.13/UnityEngine.StandardEvents.dll</HintPath>
+    </Reference>
+    <Reference Include="mscorlib">
+      <HintPath>D:/Unityson/Editor/Data/MonoBleedingEdge/lib/mono/unity/mscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="System">
+      <HintPath>D:/Unityson/Editor/Data/MonoBleedingEdge/lib/mono/unity/System.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core">
+      <HintPath>D:/Unityson/Editor/Data/MonoBleedingEdge/lib/mono/unity/System.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization">
+      <HintPath>D:/Unityson/Editor/Data/MonoBleedingEdge/lib/mono/unity/System.Runtime.Serialization.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml">
+      <HintPath>D:/Unityson/Editor/Data/MonoBleedingEdge/lib/mono/unity/System.Xml.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <HintPath>D:/Unityson/Editor/Data/MonoBleedingEdge/lib/mono/unity/System.Xml.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityScript">
+      <HintPath>D:/Unityson/Editor/Data/MonoBleedingEdge/lib/mono/unity/UnityScript.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityScript.Lang">
+      <HintPath>D:/Unityson/Editor/Data/MonoBleedingEdge/lib/mono/unity/UnityScript.Lang.dll</HintPath>
+    </Reference>
+    <Reference Include="Boo.Lang">
+      <HintPath>D:/Unityson/Editor/Data/MonoBleedingEdge/lib/mono/unity/Boo.Lang.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="GenerateTargetFrameworkMonikerAttribute" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

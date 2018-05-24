@@ -534,7 +534,7 @@ namespace Mapbox.Unity.Map
 			if (Math.Abs(differenceInZoom) > Constants.EpsilonFloatingPoint)
 			{
 				_mapScaleFactor = Vector3.one * Mathf.Pow(2, differenceInZoom);
-				//_mapScaleFactor.y = 1;
+				_mapScaleFactor.y = 1;
 				Root.localScale = _mapScaleFactor;
 			}
 

@@ -1,0 +1,463 @@
+/*
+ * Copyright 2017 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+def helpText = """
+This Gradle script performs the following:
+- Adds Android maven repositories to search locations for artifacts.
+- Adds user specified maven repositories to search locations for artifacts.
+- Copies specified set of maven artifacts to the specified output directory.
+- Displays the set of files copied into the output directory.
+- Displays any packages that were not found.
+
+./gradlew -b """ + project.buildscript.sourceFile + """ \\
+  \"-PMAVEN_REPOS=[semicolon separated list of repo URIs]\" \\
+  \"-PPACKAGES_TO_COPY=[semicolon separated list of maven artifacts]\" \\
+  -PTARGET_DIR=[target directory]
+
+ANDROID_HOME (optional env var, system property or project property):
+  Optional environment variable, system property or project project that
+  specifies the install location of the Android SDK.
+MAVEN_REPOS (optional project property):
+  Optional property which adds to the list of Maven repositories to search.
+  This is a semicolon separated list of URIs e.g
+  \"-PMAVEN_REPOS=http://some.repos.com;file:///some/other/path\"
+  Since this property semicolon separated it needs to be quoted correctly
+  when specified via some command line shells.
+PACKAGES_TO_COPY (required project property):
+  Semicolon separated list of Maven artifact specifications.  This will
+  result in the script attempting to download the set of artifacts to
+  TARGET_DIR.  Specified artifacts that are not copied to the target directory
+  are logged to the standard output stream.
+  e.g
+  \"-PPACKAGES_TO_COPY=com.android.support:support-compat:26.0.1;\
+com.android.support:support-core-utils:26.0.1\"
+  Since this property semicolon separated it needs to be quoted correctly
+  when specified via some command line shells.
+TARGET_DIR (required project property):
+  Directory to copy artifacts to.
+  e.g -PTARGET_DIR=some/directory/to/copy/to
+"""
+
+buildscript {
+  repositories {
+    jcenter()
+    mavenLocal()
+    mavenCentral()
+  }
+}
+
+configurations {
+  // Configuration used to search the initial set of packages before applying
+  // a fallback search strategy.
+  userPackages
+  // Set of packages with version locked dependencies.
+  nonVersionLockedPackages
+  // Configuration used to aggregate the set of packages we'll copy.
+  copyPackagesConfig
+}
+
+// Convert a package specifier to a versionless artifact filename.
+// Incomplete package specifiers result in this method returning null.
+def getVersionlessArtifactByPackage(packageSpecifier) {
+  def groupArtifact = packageSpecifier.split(":")
+  if (groupArtifact.size() >= 2) {
+    return [groupArtifact[0], groupArtifact[1]].join(".")
+  }
+  return null
+}
+
+// From a set of package specifiers generate a dictionary of versionless
+// artifact filenames (e.g com.example:my-package:1.2.3 would become
+// `ret[com.example:my-package:1.2.3] = "com.example.my-package"`).
+// Incomplete package specifications e.g "com.example" are ignored.
+//
+// Returns a set of versionless artifacts by package specifier.
+def getVersionlessArtifactsByPackage(packages) {
+  def versionlessArtifactByPackage = [:]
+  packages.each {
+    def versionlessArtifact = getVersionlessArtifactByPackage(it)
+    if (versionlessArtifact) {
+      versionlessArtifactByPackage[it] = versionlessArtifact
+    }
+  }
+  return versionlessArtifactByPackage
+}
+
+// From a set of package specifiers dictionary of package names indexed
+// by group:artifact strings (e.g, com.example:my-package:1.2.3@aar would
+// become ret[com.example:my-package] = "com.example:my-package:1.2.3@aar")
+// Package specifiers without at least a group and artifact are ignored.
+def getGroupArtifacts(packages) {
+  def groupArtifacts = [:]
+  packages.each {
+    def components = it.split(":")
+    if (components.size() >= 2) {
+      groupArtifacts[[components[0], components[1]].join(":")] = it
+    }
+  }
+  return groupArtifacts;
+}
+
+// Convert ResolvedModuleVersion to a package specifier string.
+// overrideVersion can be used to replace the version string.
+def resolvedModuleVersionToPackage(resolvedModuleVersion,
+                                   overrideVersion=null) {
+  def components = []
+  resolvedModuleVersion.id.with {
+    module.with {
+      components.add(group)
+      components.add(name)
+    }
+    if (overrideVersion) {
+      components.add(overrideVersion)
+    } else {
+      components.add(version)
+    }
+  }
+  return components.join(":")
+}
+
+// Convert a ResolvedArtifact object to a package specifier string.
+def resolvedArtifactToPackage(resolvedArtifact) {
+  def packageSpecifier = resolvedModuleVersionToPackage(
+    resolvedArtifact.moduleVersion)
+  resolvedArtifact.with { if (type) packageSpecifier += "@" + type }
+  return packageSpecifier
+}
+
+// Given a set of ResolvedArtifact objects, generate a set of versionless
+// artifact filenames.
+//
+// Returns a set of versioned artifact filenames.
+def getVersionlessArtifactFilenames(artifacts) {
+  Set versionlessFilenames = []
+  artifacts.each {
+    versionlessFilenames.add(getVersionlessArtifactByPackage(
+                               resolvedArtifactToPackage(it)))
+  }
+  return versionlessFilenames
+}
+
+// Sort a list of version strings.
+// The returned list contains a list of oldest to most recent version.
+def sortVersionStrings(versions) {
+  // The following sorts by comparing the indices of the versions.
+  // If all common indices match, the longer of the two is more recent.
+  return versions.sort(false) {
+    a, b -> [a, b]*.tokenize('.')*.collect { it.tokenize('-')[0] as int }.with {
+      u, v -> [u, v].transpose().findResult {
+        x, y -> x <=> y ?: null } ?: u.size() <=> v.size()
+    }
+  }
+}
+
+// Configure project properties.
+project.ext {
+  // Get the install location of the Android SDK.
+  def sdkRoot = null
+  for (prop in [System.getProperty("ANDROID_HOME"),
+                project.hasProperty("ANDROID_HOME") ?
+                  getProperty("ANDROID_HOME") : null,
+                System.getenv("ANDROID_HOME")]) {
+    if (prop) {
+      sdkRoot = prop
+      break
+    }
+  }
+  if (sdkRoot) {
+    logger.info("ANDROID_HOME: " + sdkRoot)
+  }
+  androidSdkRoot = sdkRoot
+
+  def mavenUris = []
+  // Retrieve a list of command line specified maven repo URIs.
+  if (project.hasProperty("MAVEN_REPOS")) {
+    project.getProperty("MAVEN_REPOS").tokenize(";").each {
+      mavenUris.push(new URI(it))
+    }
+  }
+
+  // Construct a list of local Maven URIs in the Android SDK.
+  if (androidSdkRoot) {
+    ["extras/android/m2repository", "extras/google/m2repository"].each {
+      def path = new File(androidSdkRoot, it)
+      if (path.exists()) mavenUris.push(path.toURI())
+    }
+  }
+  // Add Google maven repositories.
+  mavenUris.push(new URI("https://maven.google.com"))
+
+  // List of URIs to add to the set of maven sources.
+  mavenRepoUris = mavenUris
+
+  // Add the repositories here so that we can resolve during configuration
+  // below.
+  project.repositories {
+    for (uri in mavenRepoUris) {
+      maven {
+        url uri
+      }
+    }
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+  }
+
+  project.repositories.each {
+    logger.info(sprintf("MAVEN_REPOS: name=%s url=%s", it.name, it.url));
+  }
+
+  // Set of packages to copy to the target directory.
+  if (!project.hasProperty("PACKAGES_TO_COPY")) {
+    print helpText
+    logger.error("Project property PACKAGES_TO_COPY must be specified.")
+    System.exit(1)
+  }
+  Set packages = project.getProperty("PACKAGES_TO_COPY").tokenize(";")
+  // Add user specified packages to the userPackages configuration.
+  // This allows us to resolve during the configuration phase.
+  packages.each {
+    project.dependencies.userPackages it
+    logger.info("PACKAGES_TO_COPY: " + it)
+  }
+
+  // Location to copy referenced packages.
+  if (!project.hasProperty("TARGET_DIR")) {
+    print helpText
+    logger.error("Project property TARGET_DIR must be specified.")
+    System.exit(1)
+  }
+  targetDir = project.getProperty("TARGET_DIR")
+  logger.info("TARGET_DIR: " + (new File(targetDir).absolutePath).toString())
+
+  // JarResolverLib will implicitly search for .srcaar artifacts in a maven
+  // package in addition to aar and jar artifacts.  Since Gradle doesn't know
+  // what a srcaar is and it's likely each POM doesn't reference the srcaar
+  // either, we resolve dependencies during the configuration phase to
+  // determine which packages are missing, add the srcaar artifact specifier
+  // to search for srcarr files then search again in an attempt to resolve
+  // the missing packages.
+  def versionlessArtifactByPackage = getVersionlessArtifactsByPackage(packages)
+  Set packagesToCopyByUserPackages = []
+
+  def resolvedVersionlessArtifacts = getVersionlessArtifactFilenames(
+    project.configurations.userPackages.resolvedConfiguration.
+        lenientConfiguration.getArtifacts(Specs.satisfyAll()))
+  versionlessArtifactByPackage.each {
+    def pkg = it.key
+    // If the package wasn't found and the artifact type isn't specified, try
+    // searching for a srcaar artifact instead.
+    if (!resolvedVersionlessArtifacts.contains(it.value) &&
+        !pkg.contains("@")) {
+      pkg += "@srcaar"
+    }
+    packagesToCopyByUserPackages.add(pkg)
+  }
+
+  packagesToCopyByUserPackages.each {
+    project.dependencies.nonVersionLockedPackages it
+  }
+
+  // Resolve the current set of packages including any srcaar packages injected
+  // in packagesToCopyByUserPackages.
+  def resolvedArtifacts = project.configurations.nonVersionLockedPackages.
+    resolvedConfiguration.lenientConfiguration.getArtifacts(Specs.satisfyAll())
+
+  // Set of packages to copy, exposed to the copyPackages task.
+  packagesToCopy = [].toSet()
+  // Set of packages with modified versions due to conflicting dependencies.
+  packagesModified = []
+  // Packages that should be version locked.
+  // TODO(smiles): Make the version locking regular expressions configurable.
+  def versionLockedModuleIds = [
+    // * com.google.android.gms.* packages are released a single set that
+    //   typically are not compatible between revisions.  e.g If a user depends
+    //   upon play-services-games:9.8.0 they'll also require
+    //   play-services-base:9.8.0 etc.
+    // * com.google.firebase.* packages are versioned in the same way as
+    //   com.google.android.gms.* with dependencies upon the gms (Play Services)
+    //   components. and need to be pinned to the same com.google.android.gms.*
+    //   packages.
+    //   com.google.firebase.* packages that end with -unity$ are shipped
+    //   separately so they are *not* locked to Google Play services and
+    //   Firebase packages.  This is handled below by excludeModuleIds.
+    ~/^com\.google\.(android\.gms|firebase):.*/,
+    // com.android.support packages all need to be included at the same
+    // revision.
+    ~/^com\.android\.support:.*/,
+  ]
+  // Regular expression used to exclude packages from version locking.
+  def excludeModuleIds = ~/^com\.google\.firebase:[^:]+-unity:.*/
+  // Version lock packages.
+  versionLockedModuleIds.each {
+    def artifacts = []
+    def versionLockedModuleId = it;
+    // Scan the packages for ones that need to be version locked, add all
+    // others to the set of packages to copy.
+    resolvedArtifacts.each {
+      def moduleVersionIdString = resolvedModuleVersionToPackage(
+        it.moduleVersion)
+      def versionLockThisModule = (
+        moduleVersionIdString ==~ versionLockedModuleId)
+      // Ignore packages that match any regular expression in
+      // versionLockedModuleIds except the one being evaluated
+      // versionLockedModuleId.
+      def versionLockedModule = false
+      versionLockedModuleIds.each {
+        versionLockedModule |= (versionLockedModuleId != it &&
+                                moduleVersionIdString ==~ it)
+      }
+      if (versionLockedModule || moduleVersionIdString ==~ excludeModuleIds ||
+          !versionLockThisModule) {
+        if (!versionLockedModule) {
+          packagesToCopy.add(resolvedArtifactToPackage(it))
+        }
+        return
+      }
+      logger.info(sprintf("Version locked %s in group %s",
+                          moduleVersionIdString, versionLockedModuleId))
+      artifacts.add(it)
+    }
+    if (artifacts.size > 0) {
+      // Pin each version locked package to the most recent version of
+      // each package in the set.
+      def availableVersions = artifacts.collect { it.moduleVersion.id.version }
+      def maxVersion = sortVersionStrings(availableVersions)[-1]
+      logger.info(sprintf("Max version %s found in %s for group %s",
+                          maxVersion, availableVersions.toString(),
+                          versionLockedModuleId))
+      artifacts.each {
+        def moduleVersionString = resolvedModuleVersionToPackage(
+          it.moduleVersion)
+        def newModuleVersionString = resolvedModuleVersionToPackage(
+          it.moduleVersion, maxVersion)
+        // Report modified packages due to conflicting dependencies here.
+        if (moduleVersionString != newModuleVersionString) {
+          packagesModified.add([moduleVersionString,
+                                newModuleVersionString])
+        }
+        packagesToCopy.add(newModuleVersionString)
+      }
+    }
+  }
+
+  // Scan for user specified artifacts that were not resolved and add them to
+  // the list of packages to copy so they can be reported as missing.
+  foundArtifacts = getGroupArtifacts(packagesToCopy)
+  getGroupArtifacts(versionlessArtifactByPackage.keySet()).each {
+    if (!foundArtifacts.keySet().contains(it.key)) {
+      packagesToCopy.add(it.value)
+    }
+  }
+
+  packagesToCopy.each {
+    // Add final set of packages to copy to the copyPackagesConfig
+    // configuration.
+    project.dependencies.copyPackagesConfig it
+  }
+
+  // List of tasks that copy artifacts.
+  copyTasks = []
+  // List of copied file and the associated artifact tuples.
+  copiedFileArtifacts = []
+  // Resolve the final set of artifacts to copy.
+  def artifactsToCopy = project.configurations.copyPackagesConfig.
+    resolvedConfiguration.lenientConfiguration.getArtifacts(Specs.satisfyAll())
+  // Generate tasks to copy each artifact to a unique filename in the target
+  // directory.
+  artifactsToCopy.each {
+    def artifact = it
+    def packageType = artifact.type
+    def packageSpecifier = resolvedArtifactToPackage(artifact)
+    def artifactTargetFilename =
+      sprintf("%s-%s.%s",
+              getVersionlessArtifactByPackage(packageSpecifier),
+              artifact.moduleVersion.id.version,
+              packageType == "srcaar" ? "aar" : packageType)
+    artifactTargetFile = new File(targetDir,
+                                  artifactTargetFilename)
+    if (artifactTargetFile.exists()) {
+      // If the target file already exists simply report it as copied.
+      copiedFileArtifacts.add([artifactTargetFile, artifact])
+    } else {
+      // If the target file does not exist generate a task to copy it.
+      def copyTask = tasks.create(
+        name: "copy_" + artifactTargetFilename,
+          type: Copy,
+          description: sprintf("Copy %s (%s) to %s", packageSpecifier,
+                               artifact.file, artifactTargetFilename))
+      copyTask.with {
+        from artifact.file
+        into targetDir
+        rename(
+          // Rename the file to the target filename and log the copied file &
+          // artifact so that they can be summarized when all copy artifact
+          // tasks are complete.
+          {
+            String filename ->
+              copiedFileArtifacts.add([new File(artifactTargetFilename),
+                                       artifact])
+              return artifactTargetFilename
+          }
+        )
+        doFirst { logger.info(description) }
+      }
+      copyTasks.add(copyTask)
+    }
+  }
+}
+
+// Task which depends upon all copy package tasks and summarizes the set of
+// copied files when it's complete, displaying:
+// * The set of files copied into the target directory.
+// * The dependency expression for each artifact that was not found.
+// * Any packages that were modified from the dependency expression specified
+//   by the user.
+task copyPackages(dependsOn: project.ext.copyTasks) {
+  doLast {
+    def copiedFileArtifacts = project.ext.copiedFileArtifacts
+    def copiedArtifacts = []
+    if (copiedFileArtifacts) {
+      println "Copied artifacts:"
+      copiedFileArtifacts.collect { it[0].name }.toSorted().each { println it }
+      println ""
+      copiedFileArtifacts.each { copiedArtifacts.add(it[1]) }
+    }
+    def resolvedVersionlessArtifacts = getVersionlessArtifactFilenames(
+      copiedArtifacts)
+    def versionlessArtifactByPackage = getVersionlessArtifactsByPackage(
+      project.ext.packagesToCopy)
+    def missingPackages = []
+    versionlessArtifactByPackage.each {
+      if (!resolvedVersionlessArtifacts.contains(it.value)) {
+        missingPackages.push(it.key)
+      }
+    }
+    if (missingPackages) {
+      println "Missing artifacts:"
+      missingPackages.toSorted().each { println it }
+      println ""
+    }
+    def packagesModified = project.ext.packagesModified
+    if (packagesModified) {
+      println "Modified artifacts:"
+      packagesModified.toSorted().each { println it[0] + " --> " + it[1] }
+      println ""
+    }
+  }
+}
+
+project.defaultTasks = ["copyPackages"]

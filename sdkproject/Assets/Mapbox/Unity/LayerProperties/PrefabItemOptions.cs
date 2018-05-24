@@ -142,6 +142,7 @@ namespace Mapbox.Unity.Map
 				spawnPrefabOptions.AllPrefabsInstatiated = value;
 			}
 		}
+
 		#endregion
 	}
 }

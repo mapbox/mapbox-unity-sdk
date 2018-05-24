@@ -75,8 +75,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 						var prefabModifier = ScriptableObject.CreateInstance<PrefabModifier>();
 						prefabModifier.SetProperties(itemProperties.spawnPrefabOptions);
 						_defaultStack = ScriptableObject.CreateInstance<ModifierStack>();
-						(_defaultStack as ModifierStack).moveFeaturePositionTo = item.moveFeaturePositionTo;
-
 						if (_defaultStack.GoModifiers == null)
 						{
 							_defaultStack.GoModifiers = new List<GameObjectModifier>();
@@ -87,6 +85,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 						{
 							_defaultStack.MeshModifiers.Add(ScriptableObject.CreateInstance<SnapTerrainModifier>());
 						}
+
 					}
 					break;
 				default:
@@ -275,11 +274,28 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					feature.Properties = new Dictionary<string, object>();
 					feature.Points = new List<List<Vector3>>();
 
-					//create submesh for feature
+					//create a point in tilespace from coordinates
 					var latLonPoint = new List<Vector3>();
 
-					//add point to submesh, and submesh to feature
-					latLonPoint.Add(Conversions.LatitudeLongitudeToUnityTilePosition(coordinate, tile.InitialZoom, tile.TileScale,layer.Extent).ToVector3xz());
+					//Create a feature point based on the coordinate
+					var _meters = Conversions.LatLonToMeters(coordinate);
+					var _rect = tile.Rect;
+					var _scale = tile.TileScale;
+					var _extent = layer.Extent;
+
+					//vectortile space point (0 - layerExtent)
+					var point = new Vector3((float)((_meters - _rect.Min).x / _rect.Size.x) * _extent, 
+					                        0, 
+					                        (float)((_meters - _rect.Max).y / _rect.Size.y) * _extent
+					                       );
+
+					//UnityTile space
+					latLonPoint.Add(new Vector3((float)(point.x / _extent * _rect.Size.x - (_rect.Size.x / 2)) * tile.TileScale, 
+					                            0, 
+					                            (float)((point.z) / _extent * _rect.Size.y - (_rect.Size.y / 2)) * tile.TileScale
+					                           ));
+
+					//add coordinate feature to feature points
 					feature.Points.Add(latLonPoint);
 
 					//pass valid feature.Data to modifiers

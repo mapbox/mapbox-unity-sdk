@@ -4,15 +4,12 @@ namespace Mapbox.Unity.MeshGeneration.Data
 	using System.Collections.Generic;
 	using Mapbox.VectorTile.Geometry;
 	using UnityEngine;
-	using Mapbox.Utils;
-	using Mapbox.Unity.Utilities;
 
 	public class VectorFeatureUnity
 	{
 		public VectorTileFeature Data;
 		public Dictionary<string, object> Properties;
 		public List<List<Vector3>> Points = new List<List<Vector3>>();
-		public UnityTile Tile;
 
 		private double _rectSizex;
 		private double _rectSizey;
@@ -31,7 +28,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			Data = feature;
 			Properties = Data.GetProperties();
 			Points.Clear();
-			Tile = tile;
 
 			//this is a temp hack until we figure out how streets ids works
 			if (buildingsWithUniqueIds == true) //ids from building dataset is big ulongs 
@@ -59,25 +55,5 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				Points.Add(_newPoints);
 			}
 		}
-
-		public bool ContainsLatLon(Vector2d coord)
-		{
-			////first check tile
-			var coordinateTileId = Conversions.LatitudeLongitudeToTileId(
-				coord.x, coord.y, Tile.InitialZoom);
-			if (!coordinateTileId.Canonical.Equals(Tile.CanonicalTileId))
-			{
-				return false;
-			}
-
-			//TODO: add AABB check to improve performance
-
-			//then check polygon
-			var point = Conversions.LatitudeLongitudeToVectorTilePosition(coord, Tile.InitialZoom);
-			var output = PolygonUtils.PointInPolygon(new Point2d<float>(point.x, point.y), _geom);
-
-			return output;
-		}
- 
 	}
 }

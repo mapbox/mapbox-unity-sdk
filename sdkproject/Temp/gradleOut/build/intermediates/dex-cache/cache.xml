@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="false"
+        jar="D:\Unity2018\WorldScaleARUX\Temp\gradleOut\libs\okio-1.13.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="a9283170b7305c8d92d25aff02a6ab7e45d06cbe">
+        <dex dex="D:\Unity2018\WorldScaleARUX\Temp\gradleOut\build\intermediates\pre-dexed\release\okio-1.13.0_2d075c776dcdc9e70afefdd02acdc2639c8db214.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\ASUS\.android\build-cache\055109657d1328d8b15f7c24a8a4b0deb93b6904\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="0837fa2b478de89f0955fe1df02c3282c221e25f">
+        <dex dex="D:\Unity2018\WorldScaleARUX\Temp\gradleOut\build\intermediates\pre-dexed\release\classes_3acf841c6aa6d4fd0fa906029a877a928fb5d891.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\ASUS\.android\build-cache\27f60c79232729402b847ed8eb081b89a3f45067\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="0e6290f14469a9d37f220c96626eea8271c5da4c">
+        <dex dex="D:\Unity2018\WorldScaleARUX\Temp\gradleOut\build\intermediates\pre-dexed\release\classes_58918e098c7ac78d398cd64d0038f80defd145b4.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\ASUS\.android\build-cache\ddfb89a9fa16c6866c2068aafff1ca6f44ceeb96\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="ca3c7aa31e2726a400a6e552b93cb9f63c9a1e6d">
+        <dex dex="D:\Unity2018\WorldScaleARUX\Temp\gradleOut\build\intermediates\pre-dexed\release\classes_d3cf059acfc44efce8b6a3d8d265b46f217be932.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\ASUS\.android\build-cache\ea175b32bed2d5c0de6cd36cae1cab8537dc9542\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="be35cfb98dbf80214072c4eb41da843fb0d4400d">
+        <dex dex="D:\Unity2018\WorldScaleARUX\Temp\gradleOut\build\intermediates\pre-dexed\release\classes_0e8adb3908389ecf5143d049c7c739564a68ca22.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\ASUS\.android\build-cache\e26656ec822d82bcdc884a6779a371e4053bc7d1\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="730efff9c50fccabcc6d6779ec09d69913a7bb98">
+        <dex dex="D:\Unity2018\WorldScaleARUX\Temp\gradleOut\build\intermediates\pre-dexed\release\classes_f428483354a430697967dc92e9c3ed55bd5f5ee1.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\ASUS\.android\build-cache\631359fa03ba8d816b09cf15f76676da3af1f2c1\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="f02263e35e52668dd17b73bf961437e3d562b35f">
+        <dex dex="D:\Unity2018\WorldScaleARUX\Temp\gradleOut\build\intermediates\pre-dexed\release\classes_aca1cb11a6a7385905cf9496180b2ac99fa313db.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\ASUS\.android\build-cache\08b8d6e8482a303b9ccb382de82f205e4b315cce\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="0a0ef86b7fa568a52bf6214a0326ca1f1d618da7">
+        <dex dex="D:\Unity2018\WorldScaleARUX\Temp\gradleOut\build\intermediates\pre-dexed\release\classes_61b9eae789b1fcd0f6b9f2da921655b553df65cd.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Unity2018\WorldScaleARUX\Temp\gradleOut\libs\UniAndroidPermission_v1_2.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="b4f92b611a3833fe23ee88d106499dac1cf725a6">
+        <dex dex="D:\Unity2018\WorldScaleARUX\Temp\gradleOut\build\intermediates\pre-dexed\release\UniAndroidPermission_v1_2_542003f49ef96c9b300b5722d3646385c11f486b.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Unity2018\WorldScaleARUX\Temp\gradleOut\libs\unity-classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="1fe606101cdb82d4a24700b3b5a5dfe9581db921">
+        <dex dex="D:\Unity2018\WorldScaleARUX\Temp\gradleOut\build\intermediates\pre-dexed\release\unity-classes_78cdacb68cdf2ac9f0fddbf840f6c9c21b598e83.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Unity2018\WorldScaleARUX\Temp\gradleOut\libs\okhttp-3.8.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="5a11f020cce2d11eb71ba916700600e18c4547e7">
+        <dex dex="D:\Unity2018\WorldScaleARUX\Temp\gradleOut\build\intermediates\pre-dexed\release\okhttp-3.8.0_a8b60bf60e81be1b3d115e13376757e4aa06ae4d.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\ASUS\.android\build-cache\6f07de201908e6880387361e1e89454d36f63089\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="1630658fbc2d222b988603c27b4a4249586fbfe7">
+        <dex dex="D:\Unity2018\WorldScaleARUX\Temp\gradleOut\build\intermediates\pre-dexed\release\classes_95f73089f80081c15ef8c7720cb5bd2e69b3941e.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\ASUS\.android\build-cache\4caa7ac00c0b7989569c46fba3d75a64bb3e4756\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="e79aa3d9a16f8c9f16377c0608de70a8f31e5d80">
+        <dex dex="D:\Unity2018\WorldScaleARUX\Temp\gradleOut\build\intermediates\pre-dexed\release\classes_a81992b9782c36bc4ee2044c1ff4e17c58573323.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\ASUS\.android\build-cache\cc811900a373978f6229e1486af0ac77171bc18d\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="6fb6ac3e8d3b9013819920d9ea11f3803c4c0033">
+        <dex dex="D:\Unity2018\WorldScaleARUX\Temp\gradleOut\build\intermediates\pre-dexed\release\classes_68037b18678a6bfe30531f4ac8ca84333c4f0b84.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\ASUS\.android\build-cache\c05816e312badcd0fca7cc3facede9faba72d612\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="aee64634871d88a419d59eb743c1258a60f19700">
+        <dex dex="D:\Unity2018\WorldScaleARUX\Temp\gradleOut\build\intermediates\pre-dexed\release\classes_f72c0017d0f95b1ce2a2401d55e8712e98ecb462.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\ASUS\.android\build-cache\9a7ae072029e6dc77fe1b16261d3d4aaed2e91e2\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="3b08b853fe85764387602ff10decaf2b449f4ea2">
+        <dex dex="D:\Unity2018\WorldScaleARUX\Temp\gradleOut\build\intermediates\pre-dexed\release\classes_c1a8c430098a63294a3ae714c9ffd62c79ec5852.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\ASUS\.android\build-cache\4d22657262ce79358928bd6cfd15f5a3ac7ecc1e\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
+        <dex dex="D:\Unity2018\WorldScaleARUX\Temp\gradleOut\build\intermediates\pre-dexed\release\classes_c4b58ea0e44fd4c1767632d6f92e779a8c884b36.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\ASUS\.android\build-cache\9a7ae072029e6dc77fe1b16261d3d4aaed2e91e2\output\jars\libs\tango_java_lib.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="dac29b41332a170a55310a99e3e2f3058e3ac419">
+        <dex dex="D:\Unity2018\WorldScaleARUX\Temp\gradleOut\build\intermediates\pre-dexed\release\tango_java_lib_779d88105a38adedfb259bebeaa0bc70d12e8ea1.jar" />
+    </item>
+
+</items>

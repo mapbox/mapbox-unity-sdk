@@ -29,11 +29,10 @@ public class ImageDataFetcher : DataFetcher
 			if (rasterTile.HasError)
 			{
 				FetchingError(tile, new TileErrorEventArgs(tile.CanonicalTileId, rasterTile.GetType(), tile, rasterTile.Exceptions));
+				return;
 			}
-			else
-			{
-				DataRecieved(tile, rasterTile);
-			}
+
+			DataRecieved(tile, rasterTile);
 		});
 	}
 }
