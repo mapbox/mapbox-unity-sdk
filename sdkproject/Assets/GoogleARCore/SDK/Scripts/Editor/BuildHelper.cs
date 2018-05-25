@@ -30,9 +30,13 @@ namespace GoogleARCoreInternal
 
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented",
      Justification = "Internal")]
-    public class BuildHelper : IPreprocessBuild
-    {
-        [SuppressMessage("UnityRules.UnityStyleRules", "US1000:FieldsMustBeUpperCamelCase",
+#if UNITY_2018_1_OR_NEWER
+	public class BuildHelper : IPreprocessBuildWithReport
+#else
+	public class BuildHelper : IPreprocessBuild
+#endif
+	{
+		[SuppressMessage("UnityRules.UnityStyleRules", "US1000:FieldsMustBeUpperCamelCase",
          Justification = "Overriden property.")]
         public int callbackOrder
         {
@@ -48,7 +52,7 @@ namespace GoogleARCoreInternal
 #else
         public void OnPreprocessBuild(BuildTarget target, string path)
         {
-#endif 
+#endif
             var isARCoreRequired = ARCoreProjectSettings.Instance.IsARCoreRequired;
 
             Debug.LogFormat("Building application with {0} ARCore support.",

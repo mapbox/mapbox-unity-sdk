@@ -226,12 +226,36 @@
 					subLayerFilterOptions.FindPropertyRelative("combinerType").enumValueIndex =
 						(int)LayerFilterCombinerOperationType.Any;
 
-					var subLayerMaterialOptions = subLayer.FindPropertyRelative("materialOptions");
-					subLayerMaterialOptions.FindPropertyRelative("materials").ClearArray();
-					subLayerMaterialOptions.FindPropertyRelative("materials").arraySize = 2;
-					subLayerMaterialOptions.FindPropertyRelative("atlasInfo").objectReferenceValue = null;
-					subLayerMaterialOptions.FindPropertyRelative("colorPalette").objectReferenceValue = null;
-					subLayerMaterialOptions.FindPropertyRelative("texturingType").enumValueIndex = (int)UvMapType.Tiled;
+					var subLayerGeometryMaterialOptions = subLayer.FindPropertyRelative("materialOptions");
+					subLayerGeometryMaterialOptions.FindPropertyRelative("style").enumValueIndex = (int)StyleTypes.Realistic;
+
+					GeometryMaterialOptions geometryMaterialOptionsReference = MapboxDefaultStyles.GetDefaultAssets();
+
+					var mats = subLayerGeometryMaterialOptions.FindPropertyRelative("materials");
+					mats.arraySize = 2;
+
+					var topMatArray = mats.GetArrayElementAtIndex(0).FindPropertyRelative("Materials");
+					var sideMatArray = mats.GetArrayElementAtIndex(1).FindPropertyRelative("Materials");
+
+					if (topMatArray.arraySize == 0)
+					{
+						topMatArray.arraySize = 1;
+					}
+					if (sideMatArray.arraySize == 0)
+					{
+						sideMatArray.arraySize = 1;
+					}
+
+					var topMat = topMatArray.GetArrayElementAtIndex(0);
+					var sideMat = sideMatArray.GetArrayElementAtIndex(0);
+
+					var atlas = subLayerGeometryMaterialOptions.FindPropertyRelative("atlasInfo");
+					var palette = subLayerGeometryMaterialOptions.FindPropertyRelative("colorPalette");
+
+					topMat.objectReferenceValue = geometryMaterialOptionsReference.materials[0].Materials[0];
+					sideMat.objectReferenceValue = geometryMaterialOptionsReference.materials[1].Materials[0];
+					atlas.objectReferenceValue = geometryMaterialOptionsReference.atlasInfo;
+					palette.objectReferenceValue = geometryMaterialOptionsReference.colorPalette;
 
 					subLayer.FindPropertyRelative("buildingsWithUniqueIds").boolValue = false;
 					subLayer.FindPropertyRelative("moveFeaturePositionTo").enumValueIndex = (int)PositionTargetType.TileCenter;
@@ -316,10 +340,11 @@
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("colliderOptions"));
 				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
+				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
 			}
 
-			EditorGUI.indentLevel--;
+			//EditorGUI.indentLevel--;
 			ShowOthers = EditorGUILayout.Foldout(ShowOthers, "Advanced");
 			EditorGUI.indentLevel++;
 			if (ShowOthers)
@@ -395,13 +420,9 @@
 
 					EditorGUILayout.EndVertical();
 
-					if (GUILayout.Button(new GUIContent("+"), (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
+					if (GUILayout.Button(new GUIContent("x"), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
 					{
-						ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac, ind);
-					}
-
-					if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
-					{
+						meshfac.DeleteArrayElementAtIndex(ind);
 						meshfac.DeleteArrayElementAtIndex(ind);
 					}
 
@@ -412,13 +433,14 @@
 				EditorGUI.indentLevel++;
 				EditorGUILayout.BeginHorizontal();
 				GUILayout.Space(EditorGUI.indentLevel * 12);
-				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
+				Rect buttonRect = GUILayoutUtility.GetLastRect();
+				if (GUILayout.Button(new GUIContent("Add New"), (GUIStyle)"minibuttonleft"))
 				{
-					meshfac.arraySize++;
-					meshfac.GetArrayElementAtIndex(meshfac.arraySize - 1).objectReferenceValue = null;
+					PopupWindow.Show(buttonRect, new PopupSelectionMenu(typeof(MeshModifier), meshfac));
+					if (Event.current.type == EventType.Repaint) buttonRect = GUILayoutUtility.GetLastRect();
 				}
 
-				if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
+				if (GUILayout.Button(new GUIContent("Add Existing"), (GUIStyle)"minibuttonright"))
 				{
 					ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac);
 				}
@@ -426,6 +448,7 @@
 				EditorGUILayout.EndHorizontal();
 				EditorGUI.indentLevel--;
 				EditorGUILayout.Space();
+
 				EditorGUILayout.LabelField(new GUIContent
 				{
 					text = "Game Object Modifiers",
@@ -443,13 +466,9 @@
 							false) as ScriptableObject;
 					EditorGUILayout.EndVertical();
 
-					if (GUILayout.Button(new GUIContent("+"), (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
+					if (GUILayout.Button(new GUIContent("x"), GUILayout.Width(30)))
 					{
-						ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac, ind);
-					}
-
-					if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
-					{
+						gofac.DeleteArrayElementAtIndex(ind);
 						gofac.DeleteArrayElementAtIndex(ind);
 					}
 
@@ -460,14 +479,17 @@
 				EditorGUI.indentLevel++;
 				EditorGUILayout.BeginHorizontal();
 				GUILayout.Space(EditorGUI.indentLevel * 12);
-				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
+				//buttonRect = GUILayoutUtility.GetLastRect();
+				if (GUILayout.Button(new GUIContent("Add New"), (GUIStyle)"minibuttonleft"))
 				{
-					gofac.arraySize++;
-					gofac.GetArrayElementAtIndex(gofac.arraySize - 1).objectReferenceValue = null;
+					PopupWindow.Show(buttonRect, new PopupSelectionMenu(typeof(GameObjectModifier), gofac));
+					if (Event.current.type == EventType.Repaint) buttonRect = GUILayoutUtility.GetLastRect();
 				}
-
-				if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
+				//EditorWindow.Repaint();
+				//buttonRect = GUILayoutUtility.GetLastRect();
+				if (GUILayout.Button(new GUIContent("Add Existing"), (GUIStyle)"minibuttonright"))
 				{
+					
 					ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac);
 				}
 
