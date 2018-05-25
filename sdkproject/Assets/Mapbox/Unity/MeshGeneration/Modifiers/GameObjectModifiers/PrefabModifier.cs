@@ -31,7 +31,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void Run(VectorEntity ve, UnityTile tile)
 		{
-			GameObject go = new GameObject();
+			GameObject go = null;
 
 			if (_objects.ContainsKey(ve.GameObject))
 			{
@@ -70,10 +70,18 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			if (goRectTransform == null)
 			{
 				go.transform.localPosition = centroidVector;
+				if (_options.scaleDownWithWorld)
+				{
+					go.transform.localScale = _options.prefab.transform.localScale * (tile.TileScale);
+				}
 			}
 			else
 			{
 				goRectTransform.anchoredPosition3D = centroidVector;
+				if (_options.scaleDownWithWorld)
+				{
+					goRectTransform.localScale = _options.prefab.transform.localScale * (tile.TileScale);
+				}
 			}
 			
 			//go.transform.localScale = Constants.Math.Vector3One;
@@ -82,11 +90,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			if (settable != null)
 			{
 				settable.Set(ve.Feature.Properties);
-			}
-
-			if (_options.scaleDownWithWorld)
-			{
-				go.transform.localScale = _options.prefab.transform.localScale * (tile.TileScale);
 			}
 		}
 	}

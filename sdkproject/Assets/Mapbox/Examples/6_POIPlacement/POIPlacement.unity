@@ -1068,7 +1068,7 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
         spawnPrefabOptions:
-          prefab: {fileID: 1707885508695930, guid: 29d1abf5ba6514d81a7974353f130ca8,
+          prefab: {fileID: 1895949781674336, guid: 29d1abf5ba6514d81a7974353f130ca8,
             type: 2}
           scaleDownWithWorld: 1
         findByType: 0
@@ -1156,7 +1156,7 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
         spawnPrefabOptions:
-          prefab: {fileID: 1707885508695930, guid: 61bcd2d324dd34bb9b722d856749c28c,
+          prefab: {fileID: 1424114192387644, guid: 61bcd2d324dd34bb9b722d856749c28c,
             type: 2}
           scaleDownWithWorld: 1
         findByType: 0
@@ -1200,7 +1200,7 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
         spawnPrefabOptions:
-          prefab: {fileID: 1707885508695930, guid: b0e54a880e97f4c5ead7dcc1c0918e05,
+          prefab: {fileID: 1004221095257992, guid: b0e54a880e97f4c5ead7dcc1c0918e05,
             type: 2}
           scaleDownWithWorld: 1
         findByType: 0
@@ -1244,7 +1244,7 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
         spawnPrefabOptions:
-          prefab: {fileID: 1707885508695930, guid: 60a41cfc23d514878814f0d425912eff,
+          prefab: {fileID: 1550249727436304, guid: 60a41cfc23d514878814f0d425912eff,
             type: 2}
           scaleDownWithWorld: 1
         findByType: 0
@@ -1288,7 +1288,7 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
         spawnPrefabOptions:
-          prefab: {fileID: 1707885508695930, guid: 49bc5d782d9184533a37abea20ed30e4,
+          prefab: {fileID: 1665298560487606, guid: 49bc5d782d9184533a37abea20ed30e4,
             type: 2}
           scaleDownWithWorld: 1
         findByType: 0
@@ -1332,7 +1332,7 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
         spawnPrefabOptions:
-          prefab: {fileID: 1707885508695930, guid: 22150daba6e8b47b69fd30f00b9c56cd,
+          prefab: {fileID: 1295758952425276, guid: 22150daba6e8b47b69fd30f00b9c56cd,
             type: 2}
           scaleDownWithWorld: 1
         findByType: 0
@@ -1376,7 +1376,7 @@ MonoBehaviour:
         MeshModifiers: []
         GoModifiers: []
         spawnPrefabOptions:
-          prefab: {fileID: 1707885508695930, guid: d748e6a0b26334f4d933c1438339484d,
+          prefab: {fileID: 1396740541782364, guid: d748e6a0b26334f4d933c1438339484d,
             type: 2}
           scaleDownWithWorld: 1
         findByType: 0
@@ -1561,8 +1561,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.25, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: -12}
+  m_AnchoredPosition: {x: 0, y: -11}
+  m_SizeDelta: {x: 0, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1077699859
 GameObject:
@@ -2434,6 +2434,6 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 127.5, y: -45.5}
-  m_SizeDelta: {x: 231, y: 23}
+  m_AnchoredPosition: {x: 127.5, y: -23}
+  m_SizeDelta: {x: 231, y: 8}
   m_Pivot: {x: 0.5, y: 0.5}
