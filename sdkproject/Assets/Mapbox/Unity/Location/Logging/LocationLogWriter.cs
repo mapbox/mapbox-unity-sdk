@@ -1,14 +1,17 @@
 namespace Mapbox.Unity.Location
 {
+
+
 	using Mapbox.Utils;
 	using System;
-	using System.Collections;
-	using System.Collections.Generic;
 	using System.IO;
 	using System.Text;
 	using UnityEngine;
 
 
+	/// <summary>
+	/// Writes location data into Application.persistentDataPath
+	/// </summary>
 	public class LocationLogWriter : LocationLogAbstractBase, IDisposable
 	{
 

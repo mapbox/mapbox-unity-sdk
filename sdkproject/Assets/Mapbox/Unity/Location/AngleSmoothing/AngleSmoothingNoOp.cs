@@ -2,13 +2,9 @@
 {
 
 
-	using System;
-	using System.Collections;
-	using System.Collections.Generic;
-	using System.Linq;
-	using UnityEngine;
-
-
+	/// <summary>
+	/// Doesn't do any calculations. Just passes latest value through.
+	/// </summary>
 	public class AngleSmoothingNoOp : AngleSmoothingAbstractBase
 	{
 

@@ -1,13 +1,18 @@
 ﻿namespace Mapbox.Unity.Location
 {
+
+
 	using Mapbox.Utils;
 	using System;
-	using System.Collections;
 	using System.Collections.Generic;
 	using System.Globalization;
 	using System.IO;
 	using UnityEngine;
 
+
+	/// <summary>
+	/// Parses location data and returns Location objects.
+	/// </summary>
 	public class LocationLogReader : LocationLogAbstractBase, IDisposable
 	{
 
@@ -60,7 +65,10 @@
 		#endregion
 
 
-
+		/// <summary>
+		/// Returns 'Location' objects from the data passed in. Loops through the data.
+		/// </summary>
+		/// <returns>'Location' objects and loops through the data.</returns>
 		public IEnumerator<Location> GetLocations()
 		{
 

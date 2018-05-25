@@ -1,17 +1,19 @@
 namespace Mapbox.Unity.Location
 {
 
-	using System.Collections;
-	using System.Collections.Generic;
-	using UnityEngine;
 
+	/// <summary>
+	/// Wrapper to mock our 'Location' objects as Unity's 'LocationInfo'
+	/// </summary>
 	public struct MapboxLocationInfoMock : IMapboxLocationInfo
 	{
+
 
 		public MapboxLocationInfoMock(Location location)
 		{
 			_location = location;
 		}
+
 
 		private Location _location;
 

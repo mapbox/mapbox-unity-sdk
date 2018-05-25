@@ -1,16 +1,19 @@
 namespace Mapbox.Unity.Location
 {
+
+
 	using System;
-	using System.Collections;
-	using System.Collections.Generic;
 	using System.ComponentModel;
 	using System.Globalization;
-	using System.Linq;
 	using Mapbox.VectorTile.ExtensionMethods;
 
 
+	/// <summary>
+	/// Base class for reading/writing location logs
+	/// </summary>
 	public abstract class LocationLogAbstractBase
 	{
+
 
 		public readonly string Delimiter = ";";
 		protected readonly CultureInfo _invariantCulture = CultureInfo.InvariantCulture;

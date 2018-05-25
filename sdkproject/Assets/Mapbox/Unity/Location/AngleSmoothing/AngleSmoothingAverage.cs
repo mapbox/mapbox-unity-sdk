@@ -3,12 +3,12 @@ namespace Mapbox.Unity.Location
 
 
 	using System;
-	using System.Collections;
-	using System.Collections.Generic;
 	using System.Linq;
-	using UnityEngine;
 
 
+	/// <summary>
+	/// Simple averaging latest 'n' values.
+	/// </summary>
 	public class AngleSmoothingAverage : AngleSmoothingAbstractBase
 	{
 

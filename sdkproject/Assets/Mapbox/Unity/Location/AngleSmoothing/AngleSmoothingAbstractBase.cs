@@ -1,12 +1,17 @@
 namespace Mapbox.Unity.Location
 {
+
+
 	using Mapbox.Utils;
-	using System.Collections;
-	using System.Collections.Generic;
 	using UnityEngine;
 
+
+	/// <summary>
+	/// Base class for implementing different smoothing strategies
+	/// </summary>
 	public abstract class AngleSmoothingAbstractBase : MonoBehaviour, IAngleSmoothing
 	{
+
 
 		[SerializeField]
 		[Tooltip("Number of measurements used for smoothing. Keep that number as low as feasible as collection of measurements depends on update time of location provider (minimum 500ms). eg 6 smoothes over the last 3 seconds.")]
@@ -20,7 +25,11 @@ namespace Mapbox.Unity.Location
 		}
 
 
+		/// <summary>
+		/// Internal storage for latest 'n' values.
+		/// </summary>
 		protected CircularBuffer<double> _angles;
+
 
 		/// <summary>
 		/// Add angle to list of angles used for calculation.

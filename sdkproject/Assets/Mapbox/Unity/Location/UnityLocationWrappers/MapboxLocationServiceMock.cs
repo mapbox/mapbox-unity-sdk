@@ -1,17 +1,19 @@
 
 namespace Mapbox.Unity.Location
-
 {
+
+
 	using System;
-	using System.Collections;
 	using System.Collections.Generic;
-	using System.Linq;
-	using System.Reflection;
-	using System.Runtime.CompilerServices;
 	using UnityEngine;
 
+
+	/// <summary>
+	/// Class to mock Unity's location service Input.location
+	/// </summary>
 	public class MapboxLocationServiceMock : IMapboxLocationService, IDisposable
 	{
+
 
 		public MapboxLocationServiceMock(byte[] locationLogFileContents)
 		{
@@ -71,9 +73,12 @@ namespace Mapbox.Unity.Location
 
 		#endregion
 
+
 		public bool isEnabledByUser { get { return true; } }
 
+
 		public LocationServiceStatus status { get { return _isRunning ? LocationServiceStatus.Running : LocationServiceStatus.Stopped; } }
+
 
 		public IMapboxLocationInfo lastData
 		{
@@ -88,14 +93,19 @@ namespace Mapbox.Unity.Location
 			}
 		}
 
+
 		public void Start(float desiredAccuracyInMeters, float updateDistanceInMeters)
 		{
 			_isRunning = true;
 		}
 
+
 		public void Stop()
 		{
 			_isRunning = false;
 		}
+
+
+
 	}
 }

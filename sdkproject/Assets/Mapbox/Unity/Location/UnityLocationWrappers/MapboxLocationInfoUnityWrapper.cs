@@ -1,10 +1,13 @@
 namespace Mapbox.Unity.Location
 {
 
-	using System.Collections;
-	using System.Collections.Generic;
+
 	using UnityEngine;
 
+
+	/// <summary>
+	/// Wrapper to use Unity's LocationInfo as MapboxLocationInfo
+	/// </summary>
 	public struct MapboxLocationInfoUnityWrapper : IMapboxLocationInfo
 	{
 

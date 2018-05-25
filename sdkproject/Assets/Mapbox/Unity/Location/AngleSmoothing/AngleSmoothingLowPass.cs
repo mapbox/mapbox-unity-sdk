@@ -6,6 +6,9 @@ namespace Mapbox.Unity.Location
 	using UnityEngine;
 
 
+	/// <summary>
+	/// Smoothing via low pass filter
+	/// </summary>
 	public class AngleSmoothingLowPass : AngleSmoothingAbstractBase
 	{
 
