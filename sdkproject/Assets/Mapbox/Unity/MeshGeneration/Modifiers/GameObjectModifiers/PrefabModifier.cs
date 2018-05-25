@@ -31,7 +31,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void Run(VectorEntity ve, UnityTile tile)
 		{
-			GameObject go = new GameObject();
+			GameObject go = null;
 
 			if (_objects.ContainsKey(ve.GameObject))
 			{
