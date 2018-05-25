@@ -11,7 +11,7 @@ API: https://www.mapbox.com/mapbox-unity-sdk/api/
 
 
 
-Current version: 1.4.2, as of May 14th, 2018
+Current version: 1.4.3, as of May 29th, 2018
 
 Changelog: https://www.mapbox.com/mapbox-unity-sdk/docs/05-changelog.html
 

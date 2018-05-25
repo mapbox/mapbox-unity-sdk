@@ -1,6 +1,6 @@
 ﻿## CHANGELOG
  ### v.1.4.3
-*??/??/2018*
+*05/29/2018*
 ##### New Features
 - Added a **Feature Replacement Modifer** that allows replacement of a vector feature at a given Latitude,Longitude with a supplied prefab. Enables replacing a procedurally generated building at a given Latitude,Longitude with a custom 3D model.
 - Texturing Style dropdown now allows users to select from prepackaged texture styles or custom, which allows for user-defined texturing.
