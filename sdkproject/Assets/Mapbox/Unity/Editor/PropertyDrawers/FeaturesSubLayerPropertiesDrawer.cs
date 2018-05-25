@@ -420,13 +420,9 @@
 
 					EditorGUILayout.EndVertical();
 
-					if (GUILayout.Button(new GUIContent("+"), (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
+					if (GUILayout.Button(new GUIContent("x"), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
 					{
-						ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac, ind);
-					}
-
-					if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
-					{
+						meshfac.DeleteArrayElementAtIndex(ind);
 						meshfac.DeleteArrayElementAtIndex(ind);
 					}
 
@@ -437,13 +433,14 @@
 				EditorGUI.indentLevel++;
 				EditorGUILayout.BeginHorizontal();
 				GUILayout.Space(EditorGUI.indentLevel * 12);
-				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
+				Rect buttonRect = GUILayoutUtility.GetLastRect();
+				if (GUILayout.Button(new GUIContent("Add New"), (GUIStyle)"minibuttonleft"))
 				{
-					meshfac.arraySize++;
-					meshfac.GetArrayElementAtIndex(meshfac.arraySize - 1).objectReferenceValue = null;
+					PopupWindow.Show(buttonRect, new PopupSelectionMenu(typeof(MeshModifier), meshfac));
+					if (Event.current.type == EventType.Repaint) buttonRect = GUILayoutUtility.GetLastRect();
 				}
 
-				if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
+				if (GUILayout.Button(new GUIContent("Add Existing"), (GUIStyle)"minibuttonright"))
 				{
 					ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac);
 				}
@@ -451,6 +448,7 @@
 				EditorGUILayout.EndHorizontal();
 				EditorGUI.indentLevel--;
 				EditorGUILayout.Space();
+
 				EditorGUILayout.LabelField(new GUIContent
 				{
 					text = "Game Object Modifiers",
@@ -468,13 +466,9 @@
 							false) as ScriptableObject;
 					EditorGUILayout.EndVertical();
 
-					if (GUILayout.Button(new GUIContent("+"), (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
+					if (GUILayout.Button(new GUIContent("x"), GUILayout.Width(30)))
 					{
-						ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac, ind);
-					}
-
-					if (GUILayout.Button(new GUIContent("-"), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
-					{
+						gofac.DeleteArrayElementAtIndex(ind);
 						gofac.DeleteArrayElementAtIndex(ind);
 					}
 
@@ -485,14 +479,17 @@
 				EditorGUI.indentLevel++;
 				EditorGUILayout.BeginHorizontal();
 				GUILayout.Space(EditorGUI.indentLevel * 12);
-				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibuttonleft"))
+				//buttonRect = GUILayoutUtility.GetLastRect();
+				if (GUILayout.Button(new GUIContent("Add New"), (GUIStyle)"minibuttonleft"))
 				{
-					gofac.arraySize++;
-					gofac.GetArrayElementAtIndex(gofac.arraySize - 1).objectReferenceValue = null;
+					PopupWindow.Show(buttonRect, new PopupSelectionMenu(typeof(GameObjectModifier), gofac));
+					if (Event.current.type == EventType.Repaint) buttonRect = GUILayoutUtility.GetLastRect();
 				}
-
-				if (GUILayout.Button(new GUIContent("Find Asset"), (GUIStyle)"minibuttonright"))
+				//EditorWindow.Repaint();
+				//buttonRect = GUILayoutUtility.GetLastRect();
+				if (GUILayout.Button(new GUIContent("Add Existing"), (GUIStyle)"minibuttonright"))
 				{
+					
 					ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac);
 				}
 
