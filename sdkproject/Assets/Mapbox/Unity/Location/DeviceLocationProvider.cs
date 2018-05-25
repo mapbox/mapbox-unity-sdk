@@ -120,8 +120,8 @@ namespace Mapbox.Unity.Location
 			_wait1sec = new WaitForSeconds(1f);
 			_waitUpdateTime = _updateTimeInMilliSeconds < 500 ? new WaitForSeconds(0.5f) : new WaitForSeconds((float)_updateTimeInMilliSeconds / 1000.0f);
 
-			if (null == _userHeadingSmoothing) { _userHeadingSmoothing = new AngleSmoothingNoOp(); }
-			if (null == _deviceOrientationSmoothing) { _deviceOrientationSmoothing = new AngleSmoothingNoOp(); }
+			if (null == _userHeadingSmoothing) { _userHeadingSmoothing = transform.gameObject.AddComponent<AngleSmoothingNoOp>(); }
+			if (null == _deviceOrientationSmoothing) { _deviceOrientationSmoothing = transform.gameObject.AddComponent<AngleSmoothingNoOp>(); }
 
 			_lastPositions = new CircularBuffer<Vector2d>(_maxLastPositions);
 
@@ -143,6 +143,15 @@ namespace Mapbox.Unity.Location
 #if UNITY_EDITOR
 			while (!UnityEditor.EditorApplication.isRemoteConnected)
 			{
+				// exit if we are not the selected location provider
+				if (null != LocationProviderFactory.Instance && null != LocationProviderFactory.Instance.DefaultLocationProvider)
+				{
+					if (!this.Equals(LocationProviderFactory.Instance.DefaultLocationProvider))
+					{
+						yield break;
+					}
+				}
+
 				Debug.LogWarning("Remote device not connected via 'Unity Remote'. Waiting ..." + Environment.NewLine + "If Unity seems to be stuck here make sure 'Unity Remote' is running and restart Unity with your device already connected.");
 				yield return _wait1sec;
 			}
