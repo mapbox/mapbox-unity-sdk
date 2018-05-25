@@ -104,7 +104,25 @@ namespace Mapbox.Examples
 			// 'Orientation' changes all the time, pass through immediately
 			if (_useDeviceOrientation)
 			{
-				if (_subtractUserHeading) { rotationAngle -= location.UserHeading; }
+				if (_subtractUserHeading)
+				{
+					float origAngle = rotationAngle;
+					if (rotationAngle > location.UserHeading)
+					{
+						rotationAngle = 360 - (rotationAngle - location.UserHeading);
+					}
+					else
+					{
+						rotationAngle = location.UserHeading - rotationAngle + 360;
+					}
+
+					float before360 = rotationAngle;
+					//rotationAngle -= location.UserHeading;
+					if (rotationAngle < 0) { rotationAngle += 360; }
+					if (rotationAngle >= 360) { rotationAngle -= 360; }
+
+					Debug.LogFormat("hdg{0} finalRot:{1} initalRot:{2} before360:{3}", location.UserHeading, rotationAngle, origAngle, before360);
+				}
 				_targetRotation = Quaternion.Euler(getNewEulerAngles(rotationAngle));
 			}
 			else
@@ -133,7 +151,7 @@ namespace Mapbox.Examples
 			}
 			else
 			{
-				euler.y = newAngle;
+				euler.y = -newAngle;
 
 				euler.x = currentEuler.x;
 				euler.z = currentEuler.z;

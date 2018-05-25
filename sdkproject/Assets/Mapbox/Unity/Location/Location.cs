@@ -1,10 +1,12 @@
 ﻿namespace Mapbox.Unity.Location
 {
 	using Mapbox.Utils;
+    using System.Diagnostics;
 
-	/// <summary>
-	/// Location contains heading, latitude, longitude, accuracy and a timestamp.
-	/// </summary>
+    /// <summary>
+    /// Location contains heading, latitude, longitude, accuracy and a timestamp.
+    /// </summary>
+    [DebuggerDisplay("{LatitudeLongitude,nq} {Accuracy}m hdg:{UserHeading} orientation:{DeviceOrientation}")]
 	public struct Location
 	{
 		/// <summary>
@@ -31,9 +33,14 @@
 		public float DeviceOrientation;
 
 		/// <summary>
-		/// Timestamp (in seconds since 1970) when location was last updated.
+		/// UTC Timestamp (in seconds since 1970) when location was last updated.
 		/// </summary>
 		public double Timestamp;
+
+		/// <summary>
+		/// UTC Timestamp (in seconds since 1970) of the device when OnLocationUpdated was fired.
+		/// </summary>
+		public double TimestampDevice;
 
 		/// <summary>
 		/// Horizontal Accuracy of the location.
@@ -87,9 +94,15 @@
 			}
 		}
 		/// <summary>
-		/// Name of the location provider. 'Null' if not supported by the active location provider.
+		/// Name of the location provider. GPS or network or 'Null' if not supported by the active location provider.
 		/// </summary>
 		public string Provider;
+
+
+		/// <summary>
+		/// Name of the location provider script class in Unity
+		/// </summary>
+		public string ProviderClass;
 
 		/// <summary>
 		/// Has the heading changed since last update?

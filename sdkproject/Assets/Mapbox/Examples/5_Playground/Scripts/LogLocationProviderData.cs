@@ -6,6 +6,7 @@ namespace Mapbox.Examples.Scripts
 	using System.Collections;
 	using System.Collections.Generic;
 	using System.Globalization;
+	using System.IO;
 	using System.Text;
 	using UnityEngine;
 	using UnityEngine.UI;
@@ -16,25 +17,46 @@ namespace Mapbox.Examples.Scripts
 		[SerializeField]
 		private Text _logText;
 
+		[SerializeField]
+		private Toggle _logToggle;
+
 
 		private CultureInfo _invariantCulture = CultureInfo.InvariantCulture;
+		private bool _logToFile = false;
+		private LocationLogWriter _logWriter = null;
 
 
-		// Use this for initialization
 		void Start()
 		{
+			Screen.sleepTimeout = SleepTimeout.NeverSleep;
 			LocationProviderFactory.Instance.DefaultLocationProvider.OnLocationUpdated += LocationProvider_OnLocationUpdated;
+
+			if (null != _logToggle)
+			{
+				_logToggle.onValueChanged.AddListener((isOn) => { _logToFile = isOn; });
+			}
+			else
+			{
+				Debug.LogError("no logtoggle attached, cannot log");
+			}
+			if (null == _logText)
+			{
+				Debug.LogError("no text to log to");
+			}
 		}
 
 
 		void OnDestroy()
 		{
+			closeLogWriter();
 			LocationProviderFactory.Instance.DefaultLocationProvider.OnLocationUpdated -= LocationProvider_OnLocationUpdated;
 		}
 
 
 		void LocationProvider_OnLocationUpdated(Location location)
 		{
+
+			/////////////// GUI logging //////////////////////
 			StringBuilder sb = new StringBuilder();
 
 			sb.AppendLine(string.Format("IsLocationServiceEnabled: {0}", location.IsLocationServiceEnabled));
@@ -50,9 +72,40 @@ namespace Mapbox.Examples.Scripts
 			sb.AppendLine(string.Format(_invariantCulture, "device orientation: {0:0.0}°", location.DeviceOrientation));
 			sb.AppendLine(nullableAsStr<float>(location.SpeedKmPerHour, "speed: {0:0.0}km/h"));
 			sb.AppendLine(nullableAsStr<bool>(location.HasGpsFix, "HasGpsFix: {0}"));
-			sb.AppendLine(nullableAsStr<int>(location.SatellitesUsed, "SatellitesUsed:{0} ") + nullableAsStr<int>(location.SatellitesInView, "SatellitesInView:{0}"));
+			sb.AppendLine(nullableAsStr<int>(location.SatellitesUsed, "SatellitesUsed:{0} "));
+			sb.AppendLine(nullableAsStr<int>(location.SatellitesInView, "SatellitesInView:{0}"));
 
-			_logText.text = sb.ToString();
+			if (null != _logText)
+			{
+				_logText.text = sb.ToString();
+			}
+
+
+			/////////////// file logging //////////////////////
+
+			// start logging to file
+			if (_logToFile && null == _logWriter)
+			{
+				Debug.Log("--- about to start logging to file ---");
+				_logWriter = new LocationLogWriter();
+				_logToggle.GetComponentInChildren<Text>().text = "stop logging";
+			}
+
+
+			// stop logging to file
+			if (!_logToFile && null != _logWriter)
+			{
+				Debug.Log("--- about to stop logging to file ---");
+				_logToggle.GetComponentInChildren<Text>().text = "start logging";
+				closeLogWriter();
+			}
+
+
+			// write line to log file
+			if (_logToFile && null != _logWriter)
+			{
+				_logWriter.Write(location);
+			}
 		}
 
 
@@ -65,11 +118,16 @@ namespace Mapbox.Examples.Scripts
 		}
 
 
-		// Update is called once per frame
-		void Update()
+		private void closeLogWriter()
 		{
-
+			if (null == _logWriter) { return; }
+			Debug.Log("closing stream writer");
+			_logWriter.Dispose();
+			_logWriter = null;
 		}
+
+
+		void Update() { }
 
 
 
