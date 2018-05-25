@@ -6,6 +6,7 @@
 - Texturing Style dropdown now allows users to select from prepackaged texture styles or custom, which allows for user-defined texturing.
 - Mesh and GameObject modifiers can now be created and added to AbstractMap via `Add New` buttons.
 ##### Improvements
+- Improvements to UV mapping for side walls of extruded polygons when using atlas textures. Enables better handling of leftover areas when creating columns.
 ##### Bug Fixes
 - Fix issue with UvModifier which caused wrong roof uv positions calculations.
 - Fix issue with data fetcher to handle failed connections properly, which caused IndexOutOfRangeException during tile loading/unloading.

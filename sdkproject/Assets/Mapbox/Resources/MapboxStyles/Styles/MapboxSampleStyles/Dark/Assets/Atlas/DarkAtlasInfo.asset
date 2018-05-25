@@ -14,172 +14,18 @@ MonoBehaviour:
   Textures:
   - TextureRect:
       serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0.25
-      height: 0.25
-    MidFloorCount: 1
-    ColumnCount: 3
-    TopSectionRatio: 0.3
-    BottomSectionRatio: 0.4
-    PreferredEdgeSectionLength: 40
-    FloorHeight: 10
-    FirstFloorHeight: 12
-    TopFloorHeight: 12
-  - TextureRect:
-      serializedVersion: 2
-      x: 0.25
-      y: 0
-      width: 0.25
-      height: 0.25
-    MidFloorCount: 1
-    ColumnCount: 4
-    TopSectionRatio: 0.3
-    BottomSectionRatio: 0.4
-    PreferredEdgeSectionLength: 40
-    FloorHeight: 10
-    FirstFloorHeight: 12
-    TopFloorHeight: 12
-  - TextureRect:
-      serializedVersion: 2
       x: 0.5
       y: 0
-      width: 0.25
-      height: 0.25
-    MidFloorCount: 1
-    ColumnCount: 5
-    TopSectionRatio: 0.3
-    BottomSectionRatio: 0.4
-    PreferredEdgeSectionLength: 40
-    FloorHeight: 10
-    FirstFloorHeight: 12
-    TopFloorHeight: 12
-  - TextureRect:
-      serializedVersion: 2
-      x: 0.75
-      y: 0
-      width: 0.25
-      height: 0.25
-    MidFloorCount: 1
-    ColumnCount: 6
-    TopSectionRatio: 0.3
-    BottomSectionRatio: 0.4
-    PreferredEdgeSectionLength: 40
-    FloorHeight: 10
-    FirstFloorHeight: 12
-    TopFloorHeight: 12
-  - TextureRect:
-      serializedVersion: 2
-      x: 0
-      y: 0.25
-      width: 0.25
-      height: 0.25
-    MidFloorCount: 1
-    ColumnCount: 4
-    TopSectionRatio: 0.3
-    BottomSectionRatio: 0.4
-    PreferredEdgeSectionLength: 40
-    FloorHeight: 10
-    FirstFloorHeight: 12
-    TopFloorHeight: 12
-  - TextureRect:
-      serializedVersion: 2
-      x: 0.25
-      y: 0.25
-      width: 0.25
-      height: 0.25
-    MidFloorCount: 1
-    ColumnCount: 2
-    TopSectionRatio: 0.3
-    BottomSectionRatio: 0.4
-    PreferredEdgeSectionLength: 40
-    FloorHeight: 10
-    FirstFloorHeight: 12
-    TopFloorHeight: 12
-  - TextureRect:
-      serializedVersion: 2
-      x: 0.5
-      y: 0.25
       width: 0.25
       height: 0.25
     MidFloorCount: 1
     ColumnCount: 1
-    TopSectionRatio: 0.3
-    BottomSectionRatio: 0.4
-    PreferredEdgeSectionLength: 40
-    FloorHeight: 10
-    FirstFloorHeight: 12
-    TopFloorHeight: 12
-  - TextureRect:
-      serializedVersion: 2
-      x: 0.75
-      y: 0.25
-      width: 0.25
-      height: 0.25
-    MidFloorCount: 1
-    ColumnCount: 11
-    TopSectionRatio: 0.3
-    BottomSectionRatio: 0.4
-    PreferredEdgeSectionLength: 40
-    FloorHeight: 10
-    FirstFloorHeight: 12
-    TopFloorHeight: 12
-  - TextureRect:
-      serializedVersion: 2
-      x: 0
-      y: 0.5
-      width: 0.5
-      height: 0.5
-    MidFloorCount: 4
-    ColumnCount: 1
     TopSectionRatio: 0.2
     BottomSectionRatio: 0.2
-    PreferredEdgeSectionLength: 40
-    FloorHeight: 50
-    FirstFloorHeight: 12
-    TopFloorHeight: 12
-  - TextureRect:
-      serializedVersion: 2
-      x: 0.25
-      y: 0.5
-      width: 0.25
-      height: 0.5
-    MidFloorCount: 4
-    ColumnCount: 2
-    TopSectionRatio: 0.2
-    BottomSectionRatio: 0.2
-    PreferredEdgeSectionLength: 40
-    FloorHeight: 50
-    FirstFloorHeight: 12
-    TopFloorHeight: 12
-  - TextureRect:
-      serializedVersion: 2
-      x: 0.5
-      y: 0.5
-      width: 0.25
-      height: 0.5
-    MidFloorCount: 4
-    ColumnCount: 3
-    TopSectionRatio: 0.2
-    BottomSectionRatio: 0.2
-    PreferredEdgeSectionLength: 40
-    FloorHeight: 50
-    FirstFloorHeight: 12
-    TopFloorHeight: 12
-  - TextureRect:
-      serializedVersion: 2
-      x: 0.75
-      y: 0.5
-      width: 0.25
-      height: 0.5
-    MidFloorCount: 4
-    ColumnCount: 4
-    TopSectionRatio: 0.2
-    BottomSectionRatio: 0.2
-    PreferredEdgeSectionLength: 40
-    FloorHeight: 50
-    FirstFloorHeight: 12
-    TopFloorHeight: 12
+    PreferredEdgeSectionLength: 30
+    FloorHeight: 18
+    FirstFloorHeight: 6
+    TopFloorHeight: 6
   Roofs:
   - TextureRect:
       serializedVersion: 2
@@ -237,3 +83,4 @@ MonoBehaviour:
     FloorHeight: 0
     FirstFloorHeight: 0
     TopFloorHeight: 0
+  AtlasEntityType: 0
