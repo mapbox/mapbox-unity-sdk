@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd8aacc1880ff504d9531b4d61c86458, type: 3}
   m_Name: ExplorerCountryLabelPrefabModifier
   m_EditorClassIdentifier: 
-  Active: 1
+  Active: 0
   _options:
     prefab: {fileID: 1706413382388718, guid: 0940fff5996150e4cb6c1f69c781a29a, type: 2}
     scaleDownWithWorld: 1
