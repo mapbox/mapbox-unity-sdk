@@ -10,6 +10,7 @@ namespace Mapbox.Unity.Location
 
 		[SerializeField]
 		[Tooltip("Number of measurements used for smoothing. Keep that number as low as feasible as collection of measurements depends on update time of location provider (minimum 500ms). eg 6 smoothes over the last 3 seconds.")]
+		[Range(5, 20)]
 		public int _measurements = 5;
 
 

@@ -57,7 +57,7 @@ namespace Mapbox.Unity.Location
 		[Serializable]
 		public struct DebuggingInEditor
 		{
-			[Header("set 'EditorLocationProvider' to 'DeviceLocationProvider' and connect device with UnityRemote.")]
+			[Header("Set 'EditorLocationProvider' to 'DeviceLocationProvider' and connect device with UnityRemote.")]
 			[SerializeField]
 			[Tooltip("Mock Unity's 'Input.Location' to route location log files through this class (eg fresh calculation of 'UserHeading') instead of just replaying them. To use set 'Editor Location Provider' in 'Location Factory' to 'Device Location Provider' and select a location log file below.")]
 			public bool _mockUnityInputLocation;

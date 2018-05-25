@@ -767,8 +767,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bc20e719eeb82d448d4698d29d526c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _measurements: 5
-  _smoothingFactor: 0.4000000059604645
+  _measurements: 2
+  _smoothingFactor: 0.009999999776482582
 --- !u!1 &849657520
 GameObject:
   m_ObjectHideFlags: 0
@@ -803,7 +803,7 @@ MonoBehaviour:
   _deviceOrientationSmoothing: {fileID: 1410188430}
   _editorDebuggingOnly:
     _mockUnityInputLocation: 1
-    _locationLogFile: {fileID: 4900000, guid: b88daf565166aeb4bad8b889e9bcc1a6, type: 3}
+    _locationLogFile: {fileID: 4900000, guid: 5e6bb7224cef35c4788a4817b1c9778d, type: 3}
 --- !u!4 &849657522
 Transform:
   m_ObjectHideFlags: 0
@@ -1112,7 +1112,7 @@ MonoBehaviour:
   _autoFireEvent: 1
   _updateInterval: 0.5
   _sendEvent: 0
-  _locationLogFile: {fileID: 4900000, guid: 1e464aa782260a14284ea489d62bc787, type: 3}
+  _locationLogFile: {fileID: 4900000, guid: 5e6bb7224cef35c4788a4817b1c9778d, type: 3}
 --- !u!4 &1363590664
 Transform:
   m_ObjectHideFlags: 0
