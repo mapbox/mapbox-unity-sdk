@@ -48,8 +48,8 @@ namespace Mapbox.Examples.Scripts
 
 		void OnDestroy()
 		{
-			LocationProviderFactory.Instance.DefaultLocationProvider.OnLocationUpdated -= LocationProvider_OnLocationUpdated;
 			closeLogWriter();
+			LocationProviderFactory.Instance.DefaultLocationProvider.OnLocationUpdated -= LocationProvider_OnLocationUpdated;
 		}
 
 

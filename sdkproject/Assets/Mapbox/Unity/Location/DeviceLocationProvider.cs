@@ -44,6 +44,16 @@ namespace Mapbox.Unity.Location
 		public long _updateTimeInMilliSeconds = 500;
 
 
+		[SerializeField]
+		[Tooltip("Smoothing strategy to be applied to the UserHeading.")]
+		public AngleSmoothingAbstractBase _userHeadingSmoothing;
+
+
+		[SerializeField]
+		[Tooltip("Smoothing strategy to applied to the DeviceOrientation.")]
+		public AngleSmoothingAbstractBase _deviceOrientationSmoothing;
+
+
 		[Serializable]
 		public struct DebuggingInEditor
 		{
@@ -72,13 +82,6 @@ namespace Mapbox.Unity.Location
 		private int _maxLastPositions = 5;
 		/// <summary>minimum needed distance between oldest and newest position before UserHeading is calculated</summary>
 		private double _minDistanceOldestNewestPosition = 1.5;
-		/// <summary>weights for calculating 'UserHeading'. hardcoded for now. TODO: auto-calc based on time, distance, ...</summary>
-		private float[] _headingWeights = new float[]{
-			0,
-			-0.5f,
-			-1.0f,
-			-1.5f
-		};
 
 
 		// Android 6+ permissions have to be granted during runtime
@@ -117,13 +120,10 @@ namespace Mapbox.Unity.Location
 			_wait1sec = new WaitForSeconds(1f);
 			_waitUpdateTime = _updateTimeInMilliSeconds < 500 ? new WaitForSeconds(0.5f) : new WaitForSeconds((float)_updateTimeInMilliSeconds / 1000.0f);
 
+			if (null == _userHeadingSmoothing) { _userHeadingSmoothing = new AngleSmoothingNoOp(); }
+			if (null == _deviceOrientationSmoothing) { _deviceOrientationSmoothing = new AngleSmoothingNoOp(); }
+
 			_lastPositions = new CircularBuffer<Vector2d>(_maxLastPositions);
-			// safe measure till we have auto calculated weights
-			// "_maxLastPositions - 1" because we calculate user heading on the fly: nr of angles = nr of positions - 1
-			if (_headingWeights.Length != _maxLastPositions - 1)
-			{
-				throw new Exception("number of last positions NOT equal number of heading weights");
-			}
 
 			if (_pollRoutine == null)
 			{
@@ -143,7 +143,7 @@ namespace Mapbox.Unity.Location
 #if UNITY_EDITOR
 			while (!UnityEditor.EditorApplication.isRemoteConnected)
 			{
-				Debug.LogWarning("Remote device not connected via 'Unity Remote'. Waiting ...");
+				Debug.LogWarning("Remote device not connected via 'Unity Remote'. Waiting ..." + Environment.NewLine + "If Unity seems to be stuck here make sure 'Unity Remote' is running and restart Unity with your device already connected.");
 				yield return _wait1sec;
 			}
 #endif
@@ -236,7 +236,8 @@ namespace Mapbox.Unity.Location
 				}
 
 				// device orientation, user heading get calculated below
-				_currentLocation.DeviceOrientation = Input.compass.trueHeading;
+				_deviceOrientationSmoothing.Add(Input.compass.trueHeading);
+				_currentLocation.DeviceOrientation = (float)_deviceOrientationSmoothing.Calculate();
 
 
 				//_currentLocation.LatitudeLongitude = new Vector2d(lastData.latitude, lastData.longitude);
@@ -258,7 +259,7 @@ namespace Mapbox.Unity.Location
 				{
 					if (_lastPositions.Count > 0)
 					{
-						// only add position if user has moved +1m
+						// only add position if user has moved +1m since we added the previous position to the list
 						CheapRuler cheapRuler = new CheapRuler(_currentLocation.LatitudeLongitude.x, CheapRulerUnits.Meters);
 						Vector2d p = _currentLocation.LatitudeLongitude;
 						double distance = cheapRuler.Distance(
@@ -300,7 +301,6 @@ namespace Mapbox.Unity.Location
 					if (distance >= _minDistanceOldestNewestPosition)
 					{
 						float[] lastHeadings = new float[_maxLastPositions - 1];
-						float finalHeading = 0f;
 
 						for (int i = 1; i < _maxLastPositions; i++)
 						{
@@ -309,27 +309,18 @@ namespace Mapbox.Unity.Location
 							double lngDiff = _lastPositions[i].y - _lastPositions[i - 1].y;
 							// +90.0 to make top (north) 0°
 							double heading = (Math.Atan2(latDiff, lngDiff) * 180.0 / Math.PI) + 90.0f;
+							// stay within [0..360]° range
 							if (heading < 0) { heading += 360; }
 							if (heading >= 360) { heading -= 360; }
 							lastHeadings[i - 1] = (float)heading;
 						}
 
-						////////////// TODO /////////
-						// reintroduce a weighing formula!
-						// for now we are just averaging angles
-
-						// calc mean heading taking into account that eg 355° and 5° should result in 0° and not 180°
-						// ref https://rosettacode.org/wiki/Averages/Mean_angle and https://rosettacode.org/wiki/Averages/Mean_angle#C.23
-						double x = lastHeadings.Sum(a => Math.Cos(a * Math.PI / 180.0)) / lastHeadings.Length;
-						// atan2 increases angle CCW, flip sign of y to get CW
-						double y = (lastHeadings.Sum(a => Math.Sin(a * Math.PI / 180.0)) / lastHeadings.Length);
-						finalHeading = (float)(Math.Atan2(y, x) * 180.0 / Math.PI);
-						//stay positive ;-)
-						if (finalHeading < 0) { finalHeading += 360; }
-
+						_userHeadingSmoothing.Add(lastHeadings[0]);
+						float finalHeading = (float)_userHeadingSmoothing.Calculate();
 
 						//fix heading to have 0° for north, 90° for east, 180° for south and 270° for west
-						finalHeading = finalHeading >= 180 ? finalHeading - 180.0f : finalHeading + 180.0f;
+						finalHeading = finalHeading >= 180.0f ? finalHeading - 180.0f : finalHeading + 180.0f;
+
 
 						_currentLocation.UserHeading = finalHeading;
 						_currentLocation.IsUserHeadingUpdated = true;
