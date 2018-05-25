@@ -11,4 +11,7 @@
   href: windowsstore-uwp-hololens.md
 
 - name: HoloLens Development
-  href: hololens-development.md 
+  href: hololens-development.md
+
+- name: Access GPS logs
+  href: access-gps-logs.md
