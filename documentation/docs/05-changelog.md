@@ -3,11 +3,12 @@
 *??/??/2018*
 ##### New Features
 - Added a **Feature Replacement Modifer** that allows replacement of a vector feature at a given Latitude,Longitude with a supplied prefab. Enables replacing a procedurally generated building at a given Latitude,Longitude with a custom 3D model.
+- Texturing Style dropdown now allows users to select from prepackaged texture styles or custom, which allows for user-defined texturing.
 ##### Improvements
+- Improvements to UV mapping for side walls of extruded polygons when using atlas textures. Enables better handling of leftover areas when creating columns.
 ##### Bug Fixes
 - Fix issue with UvModifier which caused wrong roof uv positions calculations.
 - Fix issue with data fetcher to handle failed connections properly, which caused IndexOutOfRangeException during tile loading/unloading.
-
 
  ### v.1.4.2
 *05/14/2018*

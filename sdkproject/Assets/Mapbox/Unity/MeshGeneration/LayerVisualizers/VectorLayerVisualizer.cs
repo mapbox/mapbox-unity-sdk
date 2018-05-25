@@ -91,7 +91,6 @@
 					lineMeshMod.Width = _layerProperties.coreOptions.lineWidth;
 					defaultMeshModifierStack.Add(lineMeshMod);
 
-					//defaultMeshModifierStack.Add(CreateInstance<UvModifier>());
 					if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
 					{
 						var heightMod = CreateInstance<HeightModifier>();
@@ -111,9 +110,10 @@
 						defaultGOModifierStack.Add(lineColliderMod);
 					}
 
-					var lineMatMod = CreateInstance<MaterialModifier>();
-					lineMatMod.SetProperties(_layerProperties.materialOptions);
-					defaultGOModifierStack.Add(lineMatMod);
+					var lineStyleMod = CreateInstance<MaterialModifier>();
+					lineStyleMod.SetProperties(MapboxDefaultStyles.GetGeometryMaterialOptions(_layerProperties.materialOptions));
+					defaultGOModifierStack.Add(lineStyleMod);
+
 					break;
 				case VectorPrimitiveType.Polygon:
 					if (_layerProperties.coreOptions.snapToTerrain == true)
@@ -121,18 +121,22 @@
 						defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
 					}
 					defaultMeshModifierStack.Add(CreateInstance<PolygonMeshModifier>());
-					UVModifierOptions uvModOptions = new UVModifierOptions
-					{
-						texturingType = _layerProperties.materialOptions.texturingType,
-						atlasInfo = _layerProperties.materialOptions.atlasInfo
-					};
+
+					GeometryMaterialOptions geometryMaterialOptions = MapboxDefaultStyles.GetGeometryMaterialOptions(_layerProperties.materialOptions);
+
+					UVModifierOptions uvModOptions = new UVModifierOptions();
+					uvModOptions.texturingType = geometryMaterialOptions.texturingType;
+					uvModOptions.atlasInfo = geometryMaterialOptions.atlasInfo;
+					uvModOptions.style = geometryMaterialOptions.style;
+
 					var uvMod = CreateInstance<UvModifier>();
 					uvMod.SetProperties(uvModOptions);
 					defaultMeshModifierStack.Add(uvMod);
 
 					if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
 					{
-						if (_layerProperties.materialOptions.texturingType == UvMapType.Atlas || _layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette)
+						//replace materialOptions with styleOptions
+						if (geometryMaterialOptions.texturingType == UvMapType.Atlas || geometryMaterialOptions.texturingType == UvMapType.AtlasWithColorPalette)
 						{
 							var atlasMod = CreateInstance<TextureSideWallModifier>();
 							GeometryExtrusionWithAtlasOptions atlasOptions = new GeometryExtrusionWithAtlasOptions(_layerProperties.extrusionOptions, uvModOptions);
@@ -155,14 +159,15 @@
 						defaultGOModifierStack.Add(polyColliderMod);
 					}
 
-					var matMod = CreateInstance<MaterialModifier>();
-					matMod.SetProperties(_layerProperties.materialOptions);
-					defaultGOModifierStack.Add(matMod);
+					var styleMod = CreateInstance<MaterialModifier>();
 
-					if (_layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette)
+					styleMod.SetProperties(geometryMaterialOptions);
+					defaultGOModifierStack.Add(styleMod);
+
+					if (geometryMaterialOptions.texturingType == UvMapType.AtlasWithColorPalette)
 					{
 						var colorPaletteMod = CreateInstance<MapboxStylesColorModifier>();
-						colorPaletteMod.m_scriptablePalette = _layerProperties.materialOptions.colorPalette;
+						colorPaletteMod.m_scriptablePalette = geometryMaterialOptions.colorPalette;
 
 						defaultGOModifierStack.Add(colorPaletteMod);
 					}

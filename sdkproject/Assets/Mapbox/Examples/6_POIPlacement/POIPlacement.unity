@@ -1009,13 +1009,14 @@ MonoBehaviour:
           extrusionType: 1
           extrusionGeometryType: 0
           propertyName: height
-          propertyDescription: 
+          propertyDescription: Number. Height of building or part of building.
           minimumHeight: 0
           maximumHeight: 0
           extrusionScaleFactor: 1
         colliderOptions:
           colliderType: 0
         materialOptions:
+          style: 1
           texturingType: 3
           materials:
           - Materials:
@@ -1056,6 +1057,7 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
+          style: 0
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
@@ -1099,6 +1101,7 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
+          style: 0
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
@@ -1142,6 +1145,7 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
+          style: 0
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
@@ -1185,6 +1189,7 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
+          style: 0
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
@@ -1228,6 +1233,7 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
+          style: 0
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
@@ -1271,6 +1277,7 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
+          style: 0
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
@@ -1314,6 +1321,7 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
+          style: 0
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
@@ -1357,6 +1365,7 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
+          style: 0
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
