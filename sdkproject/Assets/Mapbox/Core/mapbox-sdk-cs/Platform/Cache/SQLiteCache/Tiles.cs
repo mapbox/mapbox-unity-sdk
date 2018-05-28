@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using SQLite4Unity3d;
 
-namespace Mapbox.Platform.MbTiles
+namespace Mapbox.Platform.Cache
 {
 
 	/// <summary>
@@ -12,6 +12,8 @@ namespace Mapbox.Platform.MbTiles
 	/// </summary>
 	public class tiles
 	{
+
+		public int tile_set { get; set; }
 
 		//hrmpf: multiple PKs not supported by sqlite.net
 		//https://github.com/praeclarum/sqlite-net/issues/282

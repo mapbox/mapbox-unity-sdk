@@ -110,34 +110,13 @@ namespace Mapbox.Unity
 		}
 
 
-		/// <summary>
-		/// Deprecated. Use 'ClearSceneCache' or 'ClearAllCacheFiles' instead.
-		/// </summary>
-		[Obsolete("Deprecated. Use 'ClearSceneCache' or 'ClearAllCacheFiles' instead.")]
-		public void ClearCache()
-		{
-			ClearSceneCache();
-		}
-
-
-		/// <summary>
-		/// Clear all existing tile caches. Deletes MBTiles database files.
-		/// </summary>
-		public void ClearSceneCache()
-		{
-			CachingWebFileSource cwfs = _fileSource as CachingWebFileSource;
-			if (null != cwfs)
-			{
-				cwfs.Clear();
-			}
-		}
-
-
 		public void ClearAllCacheFiles()
 		{
-			// call ClearSceneCache to close any connections that might be open
-			ClearSceneCache();
+			// explicity call Clear() to close any connections that might be referenced by the current scene
+			CachingWebFileSource cwfs = _fileSource as CachingWebFileSource;
+			if (null != cwfs) { cwfs.Clear(); }
 
+			// remove all left over files (eg orphaned .journal) from the cache directory
 			string cacheDirectory = Path.Combine(Application.persistentDataPath, "cache");
 			if (!Directory.Exists(cacheDirectory)) { return; }
 
@@ -152,6 +131,7 @@ namespace Mapbox.Unity
 					Debug.LogErrorFormat("Could not delete [{0}]: {1}", file, deleteEx);
 				}
 			}
+			Debug.Log("done clearing file cache");
 		}
 
 		/// <summary>
@@ -183,7 +163,7 @@ namespace Mapbox.Unity
 			_fileSource = new CachingWebFileSource(_configuration.AccessToken, _configuration.AutoRefreshCache)
 				.AddCache(new MemoryCache(_configuration.MemoryCacheSize))
 #if !UNITY_WEBGL
-				.AddCache(new MbTilesCache(_configuration.MbTilesCacheSize))
+				.AddCache(new SQLiteCache(_configuration.MbTilesCacheSize))
 #endif
 				;
 		}

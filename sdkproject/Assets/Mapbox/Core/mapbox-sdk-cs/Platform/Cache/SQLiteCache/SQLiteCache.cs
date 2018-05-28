@@ -1,8 +1,7 @@
-﻿namespace Mapbox.Platform.MbTiles
+﻿namespace Mapbox.Platform.Cache
 {
 
 	using Mapbox.Map;
-	using Mapbox.Platform.Cache;
 	using Mapbox.Utils;
 	using SQLite4Unity3d;
 	using System;
@@ -11,44 +10,59 @@
 	using System.Linq;
 	using UnityEngine;
 
-	public class MbTilesDb : IDisposable
+	public class SQLiteCache : ICache, IDisposable
 	{
+
+
+		public uint MaxCacheSize { get { return _maxTileCount; } }
+
 
 
 #if MAPBOX_DEBUG_CACHE
 		private string _className;
 #endif
-		private string _tileset;
 		private bool _disposed;
 		private string _dbPath;
 		private SQLiteConnection _sqlite;
-		private uint? _maxTileCount;
+		private readonly uint _maxTileCount;
 		/// <summary>check cache size only every '_pruneCacheDelta' calls to 'Add()' to avoid being too chatty with the database</summary>
 		private const int _pruneCacheDelta = 20;
 		/// <summary>counter to keep track of calls to `Add()`</summary>
 		private int _pruneCacheCounter = 0;
 
 
-		public MbTilesDb(string tileset, uint? maxTileCount = null)
+		public SQLiteCache(uint? maxTileCount = null)
 		{
 #if MAPBOX_DEBUG_CACHE
 			_className = this.GetType().Name;
 #endif
-			_tileset = tileset;
-			openOrCreateDb(_tileset);
-			_maxTileCount = maxTileCount;
+			openOrCreateDb();
+			_maxTileCount = maxTileCount ?? 3000;
 
 			//hrmpf: multiple PKs not supported by sqlite.net
 			//https://github.com/praeclarum/sqlite-net/issues/282
-			//TODO: do it via plain SQL
+			//do it via plain SQL
 
-			List<SQLite4Unity3d.SQLiteConnection.ColumnInfo> colInfo = _sqlite.GetTableInfo(typeof(tiles).Name);
-			if (0 == colInfo.Count)
+			List<SQLiteConnection.ColumnInfo> colInfoTileset = _sqlite.GetTableInfo(typeof(tilesets).Name);
+			if (0 == colInfoTileset.Count)
+			{
+				string cmdCreateTableTilesets = @"CREATE TABLE tilesets(
+id    INTEGER PRIMARY KEY ASC AUTOINCREMENT NOT NULL UNIQUE,
+name  STRING  NOT NULL
+);";
+				_sqlite.Execute(cmdCreateTableTilesets);
+				string cmdCreateIdxNames = @"CREATE UNIQUE INDEX idx_names ON tilesets (name ASC);";
+				_sqlite.Execute(cmdCreateIdxNames);
+			}
+
+			List<SQLite4Unity3d.SQLiteConnection.ColumnInfo> colInfoTiles = _sqlite.GetTableInfo(typeof(tiles).Name);
+			if (0 == colInfoTiles.Count)
 			{
 				//sqlite does not support multiple PK columns, create table manually
 				//_sqlite.CreateTable<tiles>();
 
-				string cmdCreateTTbliles = @"CREATE TABLE tiles(
+				string cmdCreateTableTiles = @"CREATE TABLE tiles(
+tile_set     INTEGER REFERENCES tilesets (id) ON DELETE CASCADE ON UPDATE CASCADE,
 zoom_level   INTEGER NOT NULL,
 tile_column  BIGINT  NOT NULL,
 tile_row     BIGINT  NOT NULL,
@@ -57,28 +71,23 @@ timestamp    INTEGER NOT NULL,
 etag         TEXT,
 lastmodified INTEGER,
 	PRIMARY KEY(
+		tile_set ASC,
 		zoom_level ASC,
 		tile_column ASC,
 		tile_row ASC
 	)
 );";
-				_sqlite.Execute(cmdCreateTTbliles);
+				_sqlite.Execute(cmdCreateTableTiles);
 
+				string cmdIdxTileset = "CREATE INDEX idx_tileset ON tiles (tile_set ASC);";
+				_sqlite.Execute(cmdIdxTileset);
 				string cmdIdxTimestamp = "CREATE INDEX idx_timestamp ON tiles (timestamp ASC);";
 				_sqlite.Execute(cmdIdxTimestamp);
 			}
 
-			// auto migrate old caches
-			if (
-				0 != colInfo.Count
-				&& null == colInfo.FirstOrDefault(ci => ci.Name.Equals("etag"))
-			)
-			{
-				string sql = "ALTER TABLE tiles ADD COLUMN etag text;";
-				_sqlite.Execute(sql);
-				sql = "ALTER TABLE tiles ADD COLUMN lastmodified INTEGER;";
-				_sqlite.Execute(sql);
-			}
+
+
+
 
 			//some pragmas to speed things up a bit :-)
 			string[] cmds = new string[]
@@ -109,10 +118,10 @@ lastmodified INTEGER,
 		}
 
 
-#region idisposable
+		#region idisposable
 
 
-		~MbTilesDb()
+		~SQLiteCache()
 		{
 			Dispose(false);
 		}
@@ -132,6 +141,7 @@ lastmodified INTEGER,
 					if (null != _sqlite)
 					{
 						_sqlite.Execute("VACUUM;"); // compact db to keep file size small
+						_sqlite.Close();
 						_sqlite.Dispose();
 						_sqlite = null;
 					}
@@ -141,64 +151,57 @@ lastmodified INTEGER,
 		}
 
 
-#endregion
+		#endregion
 
 
-		private void openOrCreateDb(string dbName)
+		private void openOrCreateDb()
 		{
 			_dbPath = Path.Combine(Application.persistentDataPath, "cache");
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_WSA
-			// 1. workaround the 260 character MAX_PATH path and file name limit by prepeding `\\?\`
-			//    see https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx#maxpath
-			// 2. use `GetFullPath` on that to sanitize the path: replaces `/` returned by `Application.persistentDataPath` with `\`
-			_dbPath = Path.GetFullPath(@"\\?\" + _dbPath);
+			_dbPath = Path.GetFullPath(_dbPath);
 #endif
 			if (!Directory.Exists(_dbPath)) { Directory.CreateDirectory(_dbPath); }
-			_dbPath = Path.Combine(_dbPath, dbName);
+			_dbPath = Path.Combine(_dbPath, "cache.db");
 			_sqlite = new SQLiteConnection(_dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
-			//Debug.LogFormat("MBTiles path ----> {0}", _dbPath);
+			//Debug.LogFormat("SQLiteCache path ----> {0}", _dbPath);
 		}
 
 
 
 
-		public System.Collections.ObjectModel.ReadOnlyCollection<KeyValuePair<string, string>> MetaData()
-		{
-			TableQuery<metadata> tq = _sqlite.Table<metadata>();
-			if (null == tq) { return null; }
-			return tq.Select(r => new KeyValuePair<string, string>(r.name, r.value)).ToList().AsReadOnly();
-		}
-
-
-		public void CreateMetaData(MetaDataRequired md)
-		{
-			List<SQLite4Unity3d.SQLiteConnection.ColumnInfo> colInfo = _sqlite.GetTableInfo(typeof(metadata).Name);
-			if (0 != colInfo.Count) { return; }
-
-			//UnityEngine.Debug.LogFormat("creating table '{0}'", typeof(metadata).Name);
-			_sqlite.CreateTable<metadata>();
-			_sqlite.InsertAll(new[]
-			{
-				new metadata{ name="name", value=md.TilesetName},
-				new metadata{name="type", value=md.Type},
-				new metadata{name="version", value=md.Version.ToString()},
-				new metadata{name="description", value=md.Description},
-				new metadata{name="format", value=md.Format}
-			});
-		}
-
-
-		public void AddTile(CanonicalTileId tileId, CacheItem item, bool update = false)
+		public void Add(string tilesetName, CanonicalTileId tileId, CacheItem item, bool forceInsert = false)
 		{
 
 #if MAPBOX_DEBUG_CACHE
 			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
-			UnityEngine.Debug.LogFormat("{0} {1} {2} update:{3}", methodName, _tileset, tileId, update);
+			UnityEngine.Debug.LogFormat("{0} {1} {2} forceInsert:{3}", methodName, tileset, tileId, forceInsert);
 #endif
 			try
 			{
+				if (
+					TileExists(tilesetName, tileId)
+					&& !forceInsert
+				)
+				{
+					return;
+				}
+
+				int? tilesetId = getTilesetId(tilesetName);
+				if (!tilesetId.HasValue)
+				{
+					tilesetId = insertTileset(tilesetName);
+				}
+
+				if (tilesetId < 0)
+				{
+					Debug.LogErrorFormat("could not get tilesetID for [{0}] tile: {1}", tilesetName, tileId);
+					return;
+				}
+
+				_sqlite.BeginTransaction(true);
 				_sqlite.InsertOrReplace(new tiles
 				{
+					tile_set = tilesetId.Value,
 					zoom_level = tileId.Z,
 					tile_column = tileId.X,
 					tile_row = tileId.Y,
@@ -209,11 +212,15 @@ lastmodified INTEGER,
 			}
 			catch (Exception ex)
 			{
-				Debug.LogErrorFormat("Error inserting {0} {1} {2} ", _tileset, tileId, ex);
+				Debug.LogErrorFormat("Error inserting {0} {1} {2} ", tilesetName, tileId, ex);
+			}
+			finally
+			{
+				_sqlite.Commit();
 			}
 
 			// update counter only when new tile gets inserted
-			if (!update)
+			if (!forceInsert)
 			{
 				_pruneCacheCounter++;
 			}
@@ -227,13 +234,12 @@ lastmodified INTEGER,
 
 		private void prune()
 		{
-			if (!_maxTileCount.HasValue) { return; }
 
 			long tileCnt = _sqlite.ExecuteScalar<long>("SELECT COUNT(zoom_level) FROM tiles");
 
-			if (tileCnt < _maxTileCount.Value) { return; }
+			if (tileCnt < _maxTileCount) { return; }
 
-			long toDelete = tileCnt - _maxTileCount.Value;
+			long toDelete = tileCnt - _maxTileCount;
 
 #if MAPBOX_DEBUG_CACHE
 			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
@@ -259,7 +265,7 @@ lastmodified INTEGER,
 		/// </summary>
 		/// <param name="tileId">Canonical tile id to identify the tile</param>
 		/// <returns>tile data as byte[], if tile is not cached returns null</returns>
-		public CacheItem GetTile(CanonicalTileId tileId)
+		public CacheItem Get(string tilesetName, CanonicalTileId tileId)
 		{
 #if MAPBOX_DEBUG_CACHE
 			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
@@ -269,14 +275,25 @@ lastmodified INTEGER,
 
 			try
 			{
+				int? tilesetId = getTilesetId(tilesetName);
+				if (!tilesetId.HasValue)
+				{
+					return null;
+				}
+
 				tile = _sqlite
 					.Table<tiles>()
-					.Where(t => t.zoom_level == tileId.Z && t.tile_column == tileId.X && t.tile_row == tileId.Y)
+					.Where(t =>
+						t.tile_set == tilesetId.Value
+						&& t.zoom_level == tileId.Z
+						&& t.tile_column == tileId.X
+						&& t.tile_row == tileId.Y
+						)
 					.FirstOrDefault();
 			}
 			catch (Exception ex)
 			{
-				Debug.LogErrorFormat("error getting tile {1} {2} from cache{0}{3}", Environment.NewLine, _tileset, tileId, ex);
+				Debug.LogErrorFormat("error getting tile {1} {2} from cache{0}{3}", Environment.NewLine, tilesetName, tileId, ex);
 				return null;
 			}
 			if (null == tile)
@@ -302,19 +319,72 @@ lastmodified INTEGER,
 		/// </summary>
 		/// <param name="tileId">Canonical tile id</param>
 		/// <returns>True if tile exists</returns>
-		public bool TileExists(CanonicalTileId tileId)
+		public bool TileExists(string tilesetName, CanonicalTileId tileId)
 		{
+			int? tilesetId = getTilesetId(tilesetName);
+			if (!tilesetId.HasValue)
+			{
+				return false;
+			}
+
 			return null != _sqlite
 				.Table<tiles>()
-				.Where(t => t.zoom_level == tileId.Z && t.tile_column == tileId.X && t.tile_row == tileId.Y)
+				.Where(t =>
+					t.tile_set == tilesetId.Value
+					&& t.zoom_level == tileId.Z
+					&& t.tile_column == tileId.X
+					&& t.tile_row == tileId.Y
+					)
 				.FirstOrDefault();
+		}
+
+
+		private int insertTileset(string tilesetName)
+		{
+			try
+			{
+				_sqlite.BeginTransaction(true);
+				return _sqlite.Insert(new tilesets { name = tilesetName });
+			}
+			catch (Exception ex)
+			{
+				Debug.LogErrorFormat("could not insert tileset [{0}]: {1}", tilesetName, ex);
+				return -1;
+			}
+			finally
+			{
+				_sqlite.Commit();
+			}
+		}
+
+
+		private int? getTilesetId(string tilesetName)
+		{
+			tilesets tileset = _sqlite
+				.Table<tilesets>()
+				.Where(ts => ts.name.Equals(tilesetName))
+				.FirstOrDefault();
+			return null == tileset ? (int?)null : tileset.id;
+		}
+
+
+		/// <summary>
+		/// Clear cache for one tile set
+		/// </summary>
+		/// <param name="tilesetName"></param>
+		public void Clear(string tilesetName)
+		{
+			int? tilesetId = getTilesetId(tilesetName);
+			if (!tilesetId.HasValue) { return; }
+			//just delete on table 'tilesets', we've setup cascading which should take care of tabls 'tiles'
+			_sqlite.Delete<tilesets>(tilesetId.Value);
 		}
 
 
 		/// <summary>
 		/// Delete the database file
 		/// </summary>
-		public void Delete()
+		public void Clear()
 		{
 			//already disposed
 			if (null == _sqlite) { return; }
@@ -323,7 +393,7 @@ lastmodified INTEGER,
 			_sqlite.Dispose();
 			_sqlite = null;
 
-			UnityEngine.Debug.LogFormat("deleting {0}", _dbPath);
+			Debug.LogFormat("deleting {0}", _dbPath);
 
 			// try several times in case SQLite needs a bit more time to dispose
 			for (int i = 0; i < 5; i++)
