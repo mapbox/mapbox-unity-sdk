@@ -12,7 +12,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		#region ModifierOptions
 		private float _scaledFirstFloorHeight = 0;
 		private float _scaledTopFloorHeight = 0;
-		private int _maxEdgeSectionCount = 40;
+		//private int _maxEdgeSectionCount = 40;
 		private float _scaledPreferredWallLength;
 		[SerializeField]
 		private bool _centerSegments = true;

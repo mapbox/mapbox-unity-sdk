@@ -18,9 +18,6 @@
 		private string[] descriptionArray;
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		bool showFilters = true;
-		static bool _isInitialized = false;
-		static string cachedLayerName = "";
-		static bool dataUnavailable = false;
 
 		GUIContent operatorGui = new GUIContent { text = "Operator", tooltip = "Filter operator to apply. " };
 		GUIContent numValueGui = new GUIContent { text = "Num Value", tooltip = "Numeric value to match using the operator.  " };
