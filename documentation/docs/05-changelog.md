@@ -5,7 +5,7 @@
 - Added a **Feature Replacement Modifer** that allows replacement of a vector feature at a given Latitude,Longitude with a supplied prefab. Enables replacing a procedurally generated building at a given Latitude,Longitude with a custom 3D model.
 - Texturing Style dropdown now allows users to select from prepackaged texture styles or custom, which allows for user-defined texturing.
 - Mesh and GameObject modifiers can now be created and added to AbstractMap via `Add New` buttons.
-- Example scene `LocationProvder` can be used to log GPS traces. See documentation on how to copy logs from devices.
+- Example scene `LocationProvider` can be used to log GPS traces. See documentation on how to copy logs from devices.
 - GPS traces can be played back in the Editor with `EditorLocationProviderLocationLog`.
 - `UserHeading` and `DeviceOrientation` values can be smoothed via different smoothing algorithms.
 ##### Improvements
