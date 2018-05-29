@@ -14,6 +14,7 @@
 ##### Bug Fixes
 - Fix issue with UvModifier which caused wrong roof uv positions calculations.
 - Fix issue with data fetcher to handle failed connections properly, which caused IndexOutOfRangeException during tile loading/unloading.
+- Fix issue with TileRangeProvicer where it used unoptimized functions causing too much memory allocation and time
 
  ### v.1.4.2
 *05/14/2018*
