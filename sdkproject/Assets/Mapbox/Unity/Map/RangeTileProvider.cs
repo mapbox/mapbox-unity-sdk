@@ -3,12 +3,15 @@ namespace Mapbox.Unity.Map
 	using UnityEngine;
 	using Mapbox.Map;
 	using System.Collections.Generic;
-	using System.Linq;
 
 	public class RangeTileProvider : AbstractTileProvider
 	{
 		RangeTileProviderOptions _rangeTileProviderOptions;
 		private bool _initialized = false;
+		List<UnwrappedTileId> toRemove;
+		HashSet<UnwrappedTileId> tilesToRequest;
+
+		private int _activeTileCount;
 
 		public override void OnInitialized()
 		{
@@ -22,7 +25,10 @@ namespace Mapbox.Unity.Map
 			}
 
 			_initialized = true;
+			toRemove = new List<UnwrappedTileId>((_rangeTileProviderOptions.east + _rangeTileProviderOptions.west) * (_rangeTileProviderOptions.north + _rangeTileProviderOptions.south));
+			tilesToRequest = new HashSet<UnwrappedTileId>();
 		}
+
 
 		protected virtual void Update()
 		{
@@ -35,9 +41,8 @@ namespace Mapbox.Unity.Map
 			{
 				return;
 			}
-			var activeTiles = _activeTiles.Keys.ToList();
 
-			List<UnwrappedTileId> tilesToRequest = new List<UnwrappedTileId>();
+			tilesToRequest.Clear();
 			var centerTile = TileCover.CoordinateToTileId(_map.CenterLatitudeLongitude, _map.AbsoluteZoom);
 			tilesToRequest.Add(new UnwrappedTileId(_map.AbsoluteZoom, centerTile.X, centerTile.Y));
 
@@ -49,19 +54,31 @@ namespace Mapbox.Unity.Map
 				}
 			}
 
-			List<UnwrappedTileId> toRemove = activeTiles.Except(tilesToRequest).ToList();
-			foreach (var t2r in toRemove) { RemoveTile(t2r); }
-			var finalTilesNeeded = tilesToRequest.Except(activeTiles);
+			foreach (var item in _activeTiles)
+			{
+				if(!tilesToRequest.Contains(item.Key))
+				{
+					toRemove.Add(item.Key);
+				}
+			}
 
-			foreach (var tile in activeTiles)
+			foreach (var t2r in toRemove)
+			{
+				RemoveTile(t2r);
+			}
+
+			foreach (var tile in _activeTiles.Keys)
 			{
 				// Reposition tiles in case we panned.
 				RepositionTile(tile);
 			}
 
-			foreach (var tile in finalTilesNeeded)
+			foreach (var tile in tilesToRequest)
 			{
-				AddTile(tile);
+				if (!_activeTiles.ContainsKey(tile))
+				{
+					AddTile(tile);
+				}
 			}
 		}
 	}

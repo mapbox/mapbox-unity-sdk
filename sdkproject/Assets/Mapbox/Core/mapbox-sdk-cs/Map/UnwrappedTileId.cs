@@ -4,13 +4,15 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+
 namespace Mapbox.Map
 {
 	/// <summary>
 	///     Unwrapped tile identifier in a slippy map. Similar to <see cref="CanonicalTileId"/>,
 	///     but might go around the globe.
 	/// </summary>
-	public struct UnwrappedTileId
+	public struct UnwrappedTileId : IEquatable<UnwrappedTileId>
 	{
 		/// <summary> The zoom level. </summary>
 		public readonly int Z;
@@ -57,6 +59,11 @@ namespace Mapbox.Map
 		public override string ToString()
 		{
 			return this.Z + "/" + this.X + "/" + this.Y;
+		}
+
+		public bool Equals(UnwrappedTileId other)
+		{
+			return this.X == other.X && this.Y == other.Y && this.Z == other.Z;
 		}
 
 		public UnwrappedTileId North
