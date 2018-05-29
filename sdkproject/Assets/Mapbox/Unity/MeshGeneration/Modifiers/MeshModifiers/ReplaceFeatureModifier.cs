@@ -28,14 +28,18 @@
 		[Geocode]
 		private List<string> _prefabLocations;
 
-		private string _featureId;
+		private List<string> _featureId;
 
 		public override void Initialize()
 		{
 			base.Initialize();
 			//duplicate the list of lat/lons to track which coordinates have already been spawned
 			_latLonToSpawn = new List<string>(_prefabLocations);
-			_featureId = String.Empty;
+			_featureId = new List<string>();
+			for (int i = 0; i < _prefabLocations.Count; i++)
+			{
+				_featureId.Add(String.Empty);
+			}
 			if (_objects == null)
 			{
 				_objects = new Dictionary<GameObject, GameObject>();
@@ -53,37 +57,43 @@
 		/// </summary>
 		/// <returns><c>true</c>, if the feature overlaps with a lat/lon in the modifier <c>false</c> otherwise.</returns>
 		/// <param name="feature">Feature.</param>
-		public bool ShouldReplaceFeature( VectorFeatureUnity feature )
+		public bool ShouldReplaceFeature(VectorFeatureUnity feature)
 		{
-			foreach( var point in _prefabLocations )
+			int index = -1;
+			foreach (var point in _prefabLocations)
 			{
-				var coord = Conversions.StringToLatLon(point);
-				if (feature.ContainsLatLon(coord))
+				try
 				{
-					
-
-					if(feature.Data.Id != 0 && String.IsNullOrEmpty(_featureId))
+					index++;
+					var coord = Conversions.StringToLatLon(point);
+					if (feature.ContainsLatLon(coord))
 					{
-						_featureId = feature.Data.Id.ToString();
-						_featureId = _featureId.Substring(0, _featureId.Length - 3);
+						if (feature.Data.Id != 0 && String.IsNullOrEmpty(_featureId[index]))
+						{
+							_featureId[index] = feature.Data.Id.ToString();
+							_featureId[index] = _featureId[index].Substring(0, _featureId[index].Length - 3);
+						}
+						return true;
 					}
-					return true;
+
+					if (!String.IsNullOrEmpty(_featureId[index]) && feature.Data.Id.ToString().StartsWith(_featureId[index], StringComparison.CurrentCulture))
+					{
+						return true;
+					}
 				}
-			}
+				catch (Exception e)
+				{
+					Debug.LogException(e);
+				}
 
-			if(feature.Data.Id.ToString().StartsWith(_featureId, StringComparison.CurrentCulture) &&
-			  !String.IsNullOrEmpty(_featureId))
-			{
-				return true;
 			}
-
 			return false;
 		}
 
 		public override void Run(VectorEntity ve, UnityTile tile)
 		{
 			//replace the feature only once per lat/lon
-			if(ShouldSpawnFeature(ve.Feature))
+			if (ShouldSpawnFeature(ve.Feature))
 			{
 				SpawnPrefab(ve, tile);
 			}
