@@ -14,6 +14,8 @@
 ##### Bug Fixes
 - Fix issue with UvModifier which caused wrong roof uv positions calculations.
 - Fix issue with data fetcher to handle failed connections properly, which caused IndexOutOfRangeException during tile loading/unloading.
+##### Known Issues
+- ARInterface related errors and crashes on Unity 2018.1.1f1 related to bug in Unity  https://issuetracker.unity3d.com/issues/vuforia-gameobject-transforms-are-not-being-disabled-when-the-player-is-stopped
 
  ### v.1.4.2
 *05/14/2018*
