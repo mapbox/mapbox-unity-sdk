@@ -12,6 +12,7 @@ namespace Mapbox.Unity.Map
 		HashSet<UnwrappedTileId> tilesToRequest;
 
 		private int _activeTileCount;
+		private UnwrappedTileId centerTile;
 
 		public override void OnInitialized()
 		{
@@ -43,7 +44,7 @@ namespace Mapbox.Unity.Map
 			}
 
 			tilesToRequest.Clear();
-			var centerTile = TileCover.CoordinateToTileId(_map.CenterLatitudeLongitude, _map.AbsoluteZoom);
+			centerTile = TileCover.CoordinateToTileId(_map.CenterLatitudeLongitude, _map.AbsoluteZoom);
 			tilesToRequest.Add(new UnwrappedTileId(_map.AbsoluteZoom, centerTile.X, centerTile.Y));
 
 			for (int x = (int)(centerTile.X - _rangeTileProviderOptions.west); x <= (centerTile.X + _rangeTileProviderOptions.east); x++)
