@@ -56,7 +56,7 @@
 		public void SetProperties(VectorSubLayerProperties properties, LayerPerformanceOptions performanceOptions)
 		{
 			List<MeshModifier> defaultMeshModifierStack = new List<MeshModifier>();
-		 	List<GameObjectModifier> defaultGOModifierStack = new List<GameObjectModifier>();
+			List<GameObjectModifier> defaultGOModifierStack = new List<GameObjectModifier>();
 			_layerProperties = properties;
 			_performanceOptions = performanceOptions;
 
@@ -182,6 +182,22 @@
 			//Add any additional modifiers that were added.
 			_defaultStack.MeshModifiers.AddRange(_layerProperties.MeshModifiers);
 			_defaultStack.GoModifiers.AddRange(_layerProperties.GoModifiers);
+
+		}
+
+		/// <summary>
+		/// Add the replacement criteria to any mesh modifiers implementing IReplaceable
+		/// </summary>
+		/// <param name="criteria">Criteria.</param>
+		protected void SetReplacementCriteria(IReplacementCriteria criteria)
+		{
+			foreach (var meshMod in _defaultStack.MeshModifiers)
+			{
+				if (meshMod is IReplaceable)
+				{
+					((IReplaceable)meshMod).Criteria.Add(criteria);
+				}
+			}
 		}
 
 		public override void Initialize()
@@ -205,7 +221,7 @@
 			_activeCoroutines[tile].Add(Runnable.Run(ProcessLayer(layer, tile, callback)));
 		}
 
-		private IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, Action callback = null)
+		protected IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, Action callback = null)
 		{
 			//HACK to prevent request finishing on same frame which breaks modules started/finished events
 			yield return null;
@@ -237,6 +253,8 @@
 					break;
 			}
 
+			#region PreProcess
+
 			for (int i = 0; i < fc; i++)
 			{
 
@@ -267,6 +285,71 @@
 				{
 					// no filters, just build the features.
 					if (tile != null && tile.gameObject != null && tile.VectorDataState != Enums.TilePropertyState.Cancelled)
+						PreProcessFeatures(feature, tile, tile.gameObject);
+					_entityInCurrentCoroutine++;
+				}
+				else
+				{
+					// build features only if the filter returns true.
+					if (combiner.Try(feature))
+					{
+						if (tile != null && tile.gameObject != null && tile.VectorDataState != Enums.TilePropertyState.Cancelled)
+							PreProcessFeatures(feature, tile, tile.gameObject);
+
+						_entityInCurrentCoroutine++;
+					}
+				}
+
+				if (_performanceOptions != null && _performanceOptions.isEnabled && _entityInCurrentCoroutine >= _performanceOptions.entityPerCoroutine)
+				{
+					_entityInCurrentCoroutine = 0;
+					yield return null;
+				}
+			}
+			#endregion
+
+			#region Process
+
+			////find any replacement criteria and assign them
+			foreach (var goModifier in _defaultStack.GoModifiers)
+			{
+				if (goModifier is IReplacementCriteria &&
+				  goModifier.Active)
+				{
+					SetReplacementCriteria((IReplacementCriteria)goModifier);
+				}
+			}
+
+			for (int i = 0; i < fc; i++)
+			{
+
+				var buildingsWithUniqueIds =
+					(_layerProperties.honorBuildingIdSetting) && _layerProperties.buildingsWithUniqueIds;
+
+				var feature = new VectorFeatureUnity(layer.GetFeature(i), tile, layer.Extent, buildingsWithUniqueIds);
+
+				////skip existing features, only works on tilesets with unique ids
+				//if (buildingsWithUniqueIds && _activeIds.Contains(feature.Data.Id))
+				//{
+				//	continue;
+				//}
+				//else
+				//{
+				//	_activeIds.Add(feature.Data.Id);
+				//	if (!_idPool.ContainsKey(tile))
+				//	{
+				//		_idPool.Add(tile, new List<ulong>());
+				//	}
+				//	else
+				//	{
+				//		_idPool[tile].Add(feature.Data.Id);
+				//	}
+				//}
+
+				if (filters.Length == 0)
+				{
+					// no filters, just build the features.
+					if (tile != null && tile.gameObject != null && tile.VectorDataState != Enums.TilePropertyState.Cancelled)
 						Build(feature, tile, tile.gameObject);
 
 					_entityInCurrentCoroutine++;
@@ -283,23 +366,82 @@
 					}
 				}
 
-				if (_performanceOptions!=null && _performanceOptions.isEnabled && _entityInCurrentCoroutine >= _performanceOptions.entityPerCoroutine)
+				if (_performanceOptions != null && _performanceOptions.isEnabled && _entityInCurrentCoroutine >= _performanceOptions.entityPerCoroutine)
 				{
 					_entityInCurrentCoroutine = 0;
 					yield return null;
 				}
 			}
+			#endregion
 
+			#region PostProcess
 			var mergedStack = _defaultStack as MergedModifierStack;
 			if (mergedStack != null && tile != null)
 			{
 				mergedStack.End(tile, tile.gameObject, layer.Name);
 			}
+			#endregion
 
 			if (callback != null)
 				callback();
 		}
 
+		//private IEnumerable ProcessFeature(FeatureProcessingStage stage, VectorTileLayer layer, UnityTile tile, Filters.ILayerFeatureFilterComparer filters,Filters.ILayerFeatureFilterComparer combiner)
+		//{
+		//	//testing each feature with filters
+		//	var fc = layer.FeatureCount();
+
+		//	for (int i = 0; i < fc; i++)
+		//	{
+		//		var buildingsWithUniqueIds =
+		//			(_layerProperties.honorBuildingIdSetting) && _layerProperties.buildingsWithUniqueIds;
+
+		//		var feature = new VectorFeatureUnity(layer.GetFeature(i), tile, layer.Extent, buildingsWithUniqueIds);
+
+		//		//skip existing features, only works on tilesets with unique ids
+		//		if (buildingsWithUniqueIds && _activeIds.Contains(feature.Data.Id))
+		//		{
+		//			continue;
+		//		}
+		//		else
+		//		{
+		//			_activeIds.Add(feature.Data.Id);
+		//			if (!_idPool.ContainsKey(tile))
+		//			{
+		//				_idPool.Add(tile, new List<ulong>());
+		//			}
+		//			else
+		//			{
+		//				_idPool[tile].Add(feature.Data.Id);
+		//			}
+		//		}
+
+		//		if (filters.Length == 0)
+		//		{
+		//			// no filters, just build the features.
+		//			if (tile != null && tile.gameObject != null && tile.VectorDataState != Enums.TilePropertyState.Cancelled)
+		//				PreProcessFeatures(feature, tile, tile.gameObject);
+		//			_entityInCurrentCoroutine++;
+		//		}
+		//		else
+		//		{
+		//			// build features only if the filter returns true.
+		//			if (combiner.Try(feature))
+		//			{
+		//				if (tile != null && tile.gameObject != null && tile.VectorDataState != Enums.TilePropertyState.Cancelled)
+		//					PreProcessFeatures(feature, tile, tile.gameObject);
+
+		//				_entityInCurrentCoroutine++;
+		//			}
+		//		}
+
+		//		if (_performanceOptions != null && _performanceOptions.isEnabled && _entityInCurrentCoroutine >= _performanceOptions.entityPerCoroutine)
+		//		{
+		//			_entityInCurrentCoroutine = 0;
+		//			yield return null;
+		//		}
+		//	}
+		//}
 		/// <summary>
 		/// Preprocess features, finds the relevant modifier stack and passes the feature to that stack
 		/// </summary>
@@ -317,6 +459,18 @@
 			return true;
 		}
 
+		protected void PreProcessFeatures(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
+		{
+			////find any replacement criteria and assign them
+			foreach (var goModifier in _defaultStack.GoModifiers)
+			{
+				if (goModifier is IReplacementCriteria &&
+				  goModifier.Active)
+				{
+					goModifier.FeaturePreProcess(feature);
+				}
+			}
+		}
 		protected void Build(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
 		{
 			if (feature.Properties.ContainsKey("extrude") && !Convert.ToBoolean(feature.Properties["extrude"]))

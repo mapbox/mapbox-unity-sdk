@@ -27,18 +27,23 @@
 		[SerializeField]
 		[Geocode]
 		private List<string> _prefabLocations;
-
-		private List<string> _featureId;
+		/// <summary>
+		/// List of featureIds to test against. 
+		/// We need a list of featureIds per location. 
+		/// A list is required since buildings on tile boundary will have multiple id's for the same feature.
+		/// </summary>
+		private List<List<string>> _featureId;
+		private string _tempFeatureId;
 
 		public override void Initialize()
 		{
 			base.Initialize();
 			//duplicate the list of lat/lons to track which coordinates have already been spawned
 			_latLonToSpawn = new List<string>(_prefabLocations);
-			_featureId = new List<string>();
+			_featureId = new List<List<string>>();
 			for (int i = 0; i < _prefabLocations.Count; i++)
 			{
-				_featureId.Add(String.Empty);
+				_featureId.Add(new List<string>());
 			}
 			if (_objects == null)
 			{
@@ -50,6 +55,35 @@
 		public override void SetProperties(ModifierProperties properties)
 		{
 			_options = (SpawnPrefabOptions)properties;
+		}
+
+		public override void FeaturePreProcess(VectorFeatureUnity feature)
+		{
+			int index = -1;
+			foreach (var point in _prefabLocations)
+			{
+				try
+				{
+					index++;
+					var coord = Conversions.StringToLatLon(point);
+					if (feature.ContainsLatLon(coord))
+					{
+						if (feature.Data.Id != 0)
+						{
+							if (_featureId[index] == null)
+							{
+								_featureId[index] = new List<string>();
+							}
+							_tempFeatureId = feature.Data.Id.ToString();
+							_featureId[index].Add(_tempFeatureId.Substring(0, _tempFeatureId.Length - 3));
+						}
+					}
+				}
+				catch (Exception e)
+				{
+					Debug.LogException(e);
+				}
+			}
 		}
 
 		/// <summary>
@@ -65,20 +99,15 @@
 				try
 				{
 					index++;
-					var coord = Conversions.StringToLatLon(point);
-					if (feature.ContainsLatLon(coord))
+					if (_featureId[index] != null)
 					{
-						if (feature.Data.Id != 0 && String.IsNullOrEmpty(_featureId[index]))
+						foreach (var featureId in _featureId[index])
 						{
-							_featureId[index] = feature.Data.Id.ToString();
-							_featureId[index] = _featureId[index].Substring(0, _featureId[index].Length - 3);
+							if (feature.Data.Id.ToString().StartsWith(featureId, StringComparison.CurrentCulture))
+							{
+								return true;
+							}
 						}
-						return true;
-					}
-
-					if (!String.IsNullOrEmpty(_featureId[index]) && feature.Data.Id.ToString().StartsWith(_featureId[index], StringComparison.CurrentCulture))
-					{
-						return true;
 					}
 				}
 				catch (Exception e)
