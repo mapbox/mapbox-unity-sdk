@@ -66,17 +66,11 @@
 				{
 					index++;
 					var coord = Conversions.StringToLatLon(point);
-					if (feature.ContainsLatLon(coord))
+					if (feature.ContainsLatLon(coord) && (feature.Data.Id != 0))
 					{
-						if (feature.Data.Id != 0)
-						{
-							if (_featureId[index] == null)
-							{
-								_featureId[index] = new List<string>();
-							}
-							_tempFeatureId = feature.Data.Id.ToString();
-							_featureId[index].Add(_tempFeatureId.Substring(0, _tempFeatureId.Length - 3));
-						}
+						_featureId[index] = (_featureId[index] == null) ? new List<string>() : _featureId[index];
+						_tempFeatureId = feature.Data.Id.ToString();
+						_featureId[index].Add(_tempFeatureId.Substring(0, _tempFeatureId.Length - 3));
 					}
 				}
 				catch (Exception e)
