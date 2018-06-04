@@ -27,6 +27,9 @@
 		[SerializeField]
 		[Geocode]
 		private List<string> _prefabLocations;
+
+		[SerializeField]
+		private List<string> _explicitlyBlockedFeatureIds;
 		/// <summary>
 		/// List of featureIds to test against. 
 		/// We need a list of featureIds per location. 
@@ -88,6 +91,7 @@
 		public bool ShouldReplaceFeature(VectorFeatureUnity feature)
 		{
 			int index = -1;
+
 			foreach (var point in _prefabLocations)
 			{
 				try
@@ -97,6 +101,15 @@
 					{
 						foreach (var featureId in _featureId[index])
 						{
+							//preventing spawning of explicitly blocked features
+							foreach (var blockedId in _explicitlyBlockedFeatureIds)
+							{
+								if (feature.Data.Id.ToString() == blockedId)
+								{
+									return true;
+								}
+							}
+
 							if (feature.Data.Id.ToString().StartsWith(featureId, StringComparison.CurrentCulture))
 							{
 								return true;
