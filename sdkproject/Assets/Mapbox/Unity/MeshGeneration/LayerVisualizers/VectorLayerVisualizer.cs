@@ -322,7 +322,6 @@
 				yield break;
 			}
 
-			Debug.Log("Tile Id -> " + tile.name + "Layer Name -> " + layer.Name + " features -> " + layer.FeatureCount());
 			if (!_vectorFeaturesPerTile.ContainsKey(tile))
 			{
 				_vectorFeaturesPerTile.Add(tile, new VectorLayerVisualizerProperties
@@ -356,8 +355,7 @@
 			////find any replacement criteria and assign them
 			foreach (var goModifier in _defaultStack.GoModifiers)
 			{
-				if (goModifier is IReplacementCriteria &&
-				  goModifier.Active)
+				if (goModifier is IReplacementCriteria && goModifier.Active)
 				{
 					SetReplacementCriteria((IReplacementCriteria)goModifier);
 				}
@@ -365,10 +363,10 @@
 
 			#region PreProcess & Process. 
 
-			var fc = _vectorFeaturesPerTile[tile].vectorTileLayer.FeatureCount();
+			var featureCount = _vectorFeaturesPerTile[tile].vectorTileLayer.FeatureCount();
 			do
 			{
-				for (int i = 0; i < fc; i++)
+				for (int i = 0; i < featureCount; i++)
 				{
 					ProcessFeature(i, tile);
 
@@ -403,26 +401,21 @@
 		{
 			var feature = GetFeatureinTileAtIndex(index, tile);
 
-			//feature not skipped. Add to pool only if features are in preprocess stage. 
-			if (_vectorFeaturesPerTile[tile].featureProcessingStage == FeatureProcessingStage.PreProcess)
-			{
-				//skip existing features, only works on tilesets with unique ids
-				if (ShouldSkipProcessingFeatureWithId(feature.Data.Id, tile))
-				{
-					Debug.Log("Skipped");
-					return false;
-				}
-				AddFeatureToTileObjectPool(feature, tile);
-			}
-
 			if (IsFeatureEligibleAfterFiltering(feature, tile))
 			{
 				if (tile != null && tile.gameObject != null && tile.VectorDataState != Enums.TilePropertyState.Cancelled)
 				{
-					Debug.Log(_vectorFeaturesPerTile[tile].featureProcessingStage);
 					switch (_vectorFeaturesPerTile[tile].featureProcessingStage)
 					{
 						case FeatureProcessingStage.PreProcess:
+							//skip existing features, only works on tilesets with unique ids
+							if (ShouldSkipProcessingFeatureWithId(feature.Data.Id, tile))
+							{
+								return false;
+							}
+							//feature not skipped. Add to pool only if features are in preprocess stage. 
+							AddFeatureToTileObjectPool(feature, tile);
+							//pre process features.
 							PreProcessFeatures(feature, tile, tile.gameObject);
 							break;
 						case FeatureProcessingStage.Process:
