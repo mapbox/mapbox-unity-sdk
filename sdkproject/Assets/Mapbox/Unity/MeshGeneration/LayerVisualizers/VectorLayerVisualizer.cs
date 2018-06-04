@@ -454,8 +454,7 @@
 			////find any replacement criteria and assign them
 			foreach (var goModifier in _defaultStack.GoModifiers)
 			{
-				if (goModifier is IReplacementCriteria &&
-				  goModifier.Active)
+				if (goModifier is IReplacementCriteria && goModifier.Active)
 				{
 					goModifier.FeaturePreProcess(feature);
 				}
