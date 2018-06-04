@@ -29,14 +29,15 @@
 		private const int _pruneCacheDelta = 20;
 		/// <summary>counter to keep track of calls to `Add()`</summary>
 		private int _pruneCacheCounter = 0;
+		private object _lock = new object();
 
 
-		public SQLiteCache(uint? maxTileCount = null)
+		public SQLiteCache(uint? maxTileCount = null, string dbName = "cache.db")
 		{
 #if MAPBOX_DEBUG_CACHE
 			_className = this.GetType().Name;
 #endif
-			openOrCreateDb();
+			openOrCreateDb(dbName);
 			_maxTileCount = maxTileCount ?? 3000;
 
 			//hrmpf: multiple PKs not supported by sqlite.net
@@ -154,18 +155,25 @@ lastmodified INTEGER,
 		#endregion
 
 
-		private void openOrCreateDb()
+		private void openOrCreateDb(string dbName)
 		{
-			_dbPath = Path.Combine(Application.persistentDataPath, "cache");
-#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_WSA
-			_dbPath = Path.GetFullPath(_dbPath);
-#endif
-			if (!Directory.Exists(_dbPath)) { Directory.CreateDirectory(_dbPath); }
-			_dbPath = Path.Combine(_dbPath, "cache.db");
+			_dbPath = GetFullDbPath(dbName);
 			_sqlite = new SQLiteConnection(_dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
 			//Debug.LogFormat("SQLiteCache path ----> {0}", _dbPath);
 		}
 
+
+		public static string GetFullDbPath(string dbName)
+		{
+			string dbPath = Path.Combine(Application.persistentDataPath, "cache");
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_WSA
+			dbPath = Path.GetFullPath(dbPath);
+#endif
+			if (!Directory.Exists(dbPath)) { Directory.CreateDirectory(dbPath); }
+			dbPath = Path.Combine(dbPath, dbName);
+
+			return dbPath;
+		}
 
 
 
@@ -186,10 +194,14 @@ lastmodified INTEGER,
 					return;
 				}
 
-				int? tilesetId = getTilesetId(tilesetName);
-				if (!tilesetId.HasValue)
+				int? tilesetId = null;
+				lock (_lock)
 				{
-					tilesetId = insertTileset(tilesetName);
+					tilesetId = getTilesetId(tilesetName);
+					if (!tilesetId.HasValue)
+					{
+						tilesetId = insertTileset(tilesetName);
+					}
 				}
 
 				if (tilesetId < 0)
@@ -198,7 +210,7 @@ lastmodified INTEGER,
 					return;
 				}
 
-				_sqlite.BeginTransaction(true);
+				_sqlite.BeginTransaction();
 				_sqlite.InsertOrReplace(new tiles
 				{
 					tile_set = tilesetId.Value,
