@@ -58,8 +58,6 @@
 		private Dictionary<UnityTile, List<ulong>> _idPool; //necessary to keep _activeIds list up to date when unloading tiles
 		private string _key;
 
-		private Dictionary<UnityTile, VectorLayerVisualizerProperties> _vectorFeaturesPerTile = new Dictionary<UnityTile, VectorLayerVisualizerProperties>();
-
 		public override string Key
 		{
 			get { return _layerProperties.coreOptions.layerName; }
@@ -237,16 +235,16 @@
 		/// </summary>
 		/// <returns><c>true</c>, if feature eligible after filtering was applied, <c>false</c> otherwise.</returns>
 		/// <param name="feature">Feature.</param>
-		private bool IsFeatureEligibleAfterFiltering(VectorFeatureUnity feature, UnityTile tile)
+		private bool IsFeatureEligibleAfterFiltering(VectorFeatureUnity feature, UnityTile tile, VectorLayerVisualizerProperties layerProperties)
 		{
-			if (_vectorFeaturesPerTile[tile].layerFeatureFilters.Count() == 0)
+			if (layerProperties.layerFeatureFilters.Count() == 0)
 			{
 				return true;
 			}
 			else
 			{
 				// build features only if the filter returns true.
-				if (_vectorFeaturesPerTile[tile].layerFeatureFilterCombiner.Try(feature))
+				if (layerProperties.layerFeatureFilterCombiner.Try(feature))
 				{
 					return true;
 				}
@@ -260,12 +258,12 @@
 		/// <returns>The feature in tile at the index requested.</returns>
 		/// <param name="tile">Unity Tile containing the feature.</param>
 		/// <param name="index">Index of the vector feature being requested.</param>
-		private VectorFeatureUnity GetFeatureinTileAtIndex(int index, UnityTile tile)
+		private VectorFeatureUnity GetFeatureinTileAtIndex(int index, UnityTile tile, VectorLayerVisualizerProperties layerProperties)
 		{
-			return new VectorFeatureUnity(_vectorFeaturesPerTile[tile].vectorTileLayer.GetFeature(index),
+			return new VectorFeatureUnity(layerProperties.vectorTileLayer.GetFeature(index),
 													 tile,
-													 _vectorFeaturesPerTile[tile].vectorTileLayer.Extent,
-													 _vectorFeaturesPerTile[tile].buildingsWithUniqueIds);
+										  layerProperties.vectorTileLayer.Extent,
+										  layerProperties.buildingsWithUniqueIds);
 		}
 
 		/// <summary>
@@ -273,9 +271,9 @@
 		/// </summary>
 		/// <returns><c>true</c>, if feature is already in activeId pool or if the layer has buildingsWithUniqueId flag set to <see langword="true"/>, <c>false</c> otherwise.</returns>
 		/// <param name="featureId">Feature identifier.</param>
-		private bool ShouldSkipProcessingFeatureWithId(ulong featureId, UnityTile tile)
+		private bool ShouldSkipProcessingFeatureWithId(ulong featureId, UnityTile tile, VectorLayerVisualizerProperties layerProperties)
 		{
-			return (_vectorFeaturesPerTile[tile].buildingsWithUniqueIds && _activeIds.Contains(featureId));
+			return (layerProperties.buildingsWithUniqueIds && _activeIds.Contains(featureId));
 		}
 
 		/// <summary>
@@ -322,35 +320,31 @@
 				yield break;
 			}
 
-			if (!_vectorFeaturesPerTile.ContainsKey(tile))
-			{
-				_vectorFeaturesPerTile.Add(tile, new VectorLayerVisualizerProperties
-				{
-					vectorTileLayer = layer,
-				});
-			}
+			VectorLayerVisualizerProperties tempLayerProperties = new VectorLayerVisualizerProperties();
+			tempLayerProperties.vectorTileLayer = layer;
+			tempLayerProperties.featureProcessingStage = FeatureProcessingStage.PreProcess;
 
 			//Get all filters in the array.
-			_vectorFeaturesPerTile[tile].layerFeatureFilters = _layerProperties.filterOptions.filters.Select(m => m.GetFilterComparer()).ToArray();
+			tempLayerProperties.layerFeatureFilters = _layerProperties.filterOptions.filters.Select(m => m.GetFilterComparer()).ToArray();
 
 			// Pass them to the combiner
-			_vectorFeaturesPerTile[tile].layerFeatureFilterCombiner = new Filters.LayerFilterComparer();
+			tempLayerProperties.layerFeatureFilterCombiner = new Filters.LayerFilterComparer();
 			switch (_layerProperties.filterOptions.combinerType)
 			{
 				case Filters.LayerFilterCombinerOperationType.Any:
-					_vectorFeaturesPerTile[tile].layerFeatureFilterCombiner = Filters.LayerFilterComparer.AnyOf(_vectorFeaturesPerTile[tile].layerFeatureFilters);
+					tempLayerProperties.layerFeatureFilterCombiner = Filters.LayerFilterComparer.AnyOf(tempLayerProperties.layerFeatureFilters);
 					break;
 				case Filters.LayerFilterCombinerOperationType.All:
-					_vectorFeaturesPerTile[tile].layerFeatureFilterCombiner = Filters.LayerFilterComparer.AllOf(_vectorFeaturesPerTile[tile].layerFeatureFilters);
+					tempLayerProperties.layerFeatureFilterCombiner = Filters.LayerFilterComparer.AllOf(tempLayerProperties.layerFeatureFilters);
 					break;
 				case Filters.LayerFilterCombinerOperationType.None:
-					_vectorFeaturesPerTile[tile].layerFeatureFilterCombiner = Filters.LayerFilterComparer.NoneOf(_vectorFeaturesPerTile[tile].layerFeatureFilters);
+					tempLayerProperties.layerFeatureFilterCombiner = Filters.LayerFilterComparer.NoneOf(tempLayerProperties.layerFeatureFilters);
 					break;
 				default:
 					break;
 			}
 
-			_vectorFeaturesPerTile[tile].buildingsWithUniqueIds = (_layerProperties.honorBuildingIdSetting) && _layerProperties.buildingsWithUniqueIds;
+			tempLayerProperties.buildingsWithUniqueIds = (_layerProperties.honorBuildingIdSetting) && _layerProperties.buildingsWithUniqueIds;
 
 			////find any replacement criteria and assign them
 			foreach (var goModifier in _defaultStack.GoModifiers)
@@ -363,12 +357,13 @@
 
 			#region PreProcess & Process. 
 
-			var featureCount = _vectorFeaturesPerTile[tile].vectorTileLayer.FeatureCount();
+			var featureCount = tempLayerProperties.vectorTileLayer.FeatureCount();
 			do
 			{
 				for (int i = 0; i < featureCount; i++)
 				{
-					ProcessFeature(i, tile);
+
+					ProcessFeature(i, tile, tempLayerProperties);
 
 					if (IsCoroutineBucketFull)
 					{
@@ -378,9 +373,9 @@
 					}
 				}
 				// move processing to next stage. 
-				_vectorFeaturesPerTile[tile].featureProcessingStage++;
-			} while (_vectorFeaturesPerTile[tile].featureProcessingStage == FeatureProcessingStage.PreProcess
-			|| _vectorFeaturesPerTile[tile].featureProcessingStage == FeatureProcessingStage.Process);
+				tempLayerProperties.featureProcessingStage++;
+			} while (tempLayerProperties.featureProcessingStage == FeatureProcessingStage.PreProcess
+			|| tempLayerProperties.featureProcessingStage == FeatureProcessingStage.Process);
 
 			#endregion
 
@@ -393,34 +388,33 @@
 			}
 			#endregion
 
-			_vectorFeaturesPerTile.Remove(tile);
-
 			if (callback != null)
 				callback();
 		}
 
-		private bool ProcessFeature(int index, UnityTile tile)
+		private bool ProcessFeature(int index, UnityTile tile, VectorLayerVisualizerProperties layerProperties)
 		{
-			var feature = GetFeatureinTileAtIndex(index, tile);
+			var feature = GetFeatureinTileAtIndex(index, tile, layerProperties);
 
-			if (IsFeatureEligibleAfterFiltering(feature, tile))
+			if (IsFeatureEligibleAfterFiltering(feature, tile, layerProperties))
 			{
 				if (tile != null && tile.gameObject != null && tile.VectorDataState != Enums.TilePropertyState.Cancelled)
 				{
-					switch (_vectorFeaturesPerTile[tile].featureProcessingStage)
+					switch (layerProperties.featureProcessingStage)
 					{
 						case FeatureProcessingStage.PreProcess:
-							//skip existing features, only works on tilesets with unique ids
-							if (ShouldSkipProcessingFeatureWithId(feature.Data.Id, tile))
-							{
-								return false;
-							}
-							//feature not skipped. Add to pool only if features are in preprocess stage. 
-							AddFeatureToTileObjectPool(feature, tile);
 							//pre process features.
 							PreProcessFeatures(feature, tile, tile.gameObject);
 							break;
 						case FeatureProcessingStage.Process:
+							//skip existing features, only works on tilesets with unique ids
+							if (ShouldSkipProcessingFeatureWithId(feature.Data.Id, tile, layerProperties))
+							{
+								Debug.Log("Here");
+								return false;
+							}
+							//feature not skipped. Add to pool only if features are in preprocess stage. 
+							AddFeatureToTileObjectPool(feature, tile);
 							Build(feature, tile, tile.gameObject);
 							break;
 						case FeatureProcessingStage.PostProcess:
@@ -491,11 +485,11 @@
 
 		protected void PostProcessFeatures(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
 		{
-			var mergedStack = _defaultStack as MergedModifierStack;
-			if (mergedStack != null && tile != null)
-			{
-				mergedStack.End(tile, tile.gameObject, _vectorFeaturesPerTile[tile].vectorTileLayer.Name);
-			}
+			//var mergedStack = _defaultStack as MergedModifierStack;
+			//if (mergedStack != null && tile != null)
+			//{
+			//	mergedStack.End(tile, tile.gameObject, _vectorFeaturesPerTile[tile].vectorTileLayer.Name);
+			//}
 		}
 		private string FindSelectorKey(VectorFeatureUnity feature)
 		{
