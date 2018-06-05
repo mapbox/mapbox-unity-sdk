@@ -7,7 +7,6 @@
 	[CustomPropertyDrawer(typeof(MaterialList))]
 	public class MaterialListDrawer : PropertyDrawer
 	{
-		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
