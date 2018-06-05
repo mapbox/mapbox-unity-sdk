@@ -393,6 +393,8 @@
 			}
 			#endregion
 
+			_vectorFeaturesPerTile.Remove(tile);
+
 			if (callback != null)
 				callback();
 		}
