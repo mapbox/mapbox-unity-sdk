@@ -7,7 +7,6 @@ namespace Mapbox.Platform.Cache
 {
 
 	/// <summary>
-	/// https://github.com/mapbox/mbtiles-spec/blob/master/1.1/spec.md#tiles
 	/// Don't change the class name: sqlite-net uses it for table creation
 	/// </summary>
 	public class tilesets

@@ -163,7 +163,7 @@ namespace Mapbox.Unity
 			_fileSource = new CachingWebFileSource(_configuration.AccessToken, _configuration.AutoRefreshCache)
 				.AddCache(new MemoryCache(_configuration.MemoryCacheSize))
 #if !UNITY_WEBGL
-				.AddCache(new SQLiteCache(_configuration.MbTilesCacheSize))
+				.AddCache(new SQLiteCache(_configuration.FileCacheSize))
 #endif
 				;
 		}
@@ -324,7 +324,7 @@ namespace Mapbox.Unity
 	{
 		public string AccessToken;
 		public uint MemoryCacheSize = 500;
-		public uint MbTilesCacheSize = 2000;
+		public uint FileCacheSize = 2500;
 		public int DefaultTimeout = 30;
 		public bool AutoRefreshCache = false;
 	}

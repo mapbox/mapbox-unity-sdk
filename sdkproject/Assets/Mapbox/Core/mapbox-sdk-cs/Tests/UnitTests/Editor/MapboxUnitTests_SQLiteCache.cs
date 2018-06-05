@@ -12,30 +12,33 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 	using System.Globalization;
 	using System.IO;
 	using System.Linq;
-	using ued=UnityEngine.Debug;
+	using ued = UnityEngine.Debug;
 	using UnityEngine.TestTools;
 
 
 	[TestFixture]
 	internal class SQLiteCacheTest
 	{
-		
+
 
 		private const string _dbName = "UNITTEST.db";
 		// tileset names
-		private const string TS_NOOVERWRITE = "NoOverwrite";
-		private const string TS_FORCEVERWRITE = "ForceOverwrite";
+		private const string TS_NO_OVERWRITE = "NoOverwrite";
+		private const string TS_FORCE_OVERWRITE = "ForceOverwrite";
 		private const string TS_CONCURRENT1 = "concurrent1";
 		private const string TS_CONCURRENT2 = "concurrent2";
 		private const string TS_CONCURRENT3 = "concurrent3";
 		private const string TS_CONCURRENT4 = "concurrent4";
+		private const string TS_PRUNE = "concurrent4";
 		private SQLiteCache _cache;
 		private string _className;
 		private HashSet<CanonicalTileId> _tileIds;
+		// be careful when setting the 'maxTileCount' parameter. when setting too low unwanted pruning might happen.
+		private uint _maxCacheTileCount = 6000;
 
 
 		[OneTimeSetUp]
-		public void Setup()
+		public void Init()
 		{
 			_className = this.GetType().Name;
 
@@ -51,7 +54,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			string dbFullPath = SQLiteCache.GetFullDbPath(_dbName);
 			if (File.Exists(dbFullPath)) { File.Delete(dbFullPath); }
 
-			_cache = new SQLiteCache(3000, _dbName);
+			_cache = new SQLiteCache(_maxCacheTileCount, _dbName);
 		}
 
 
@@ -60,7 +63,6 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		{
 			if (null != _cache)
 			{
-				// TODO: remove comment to cleanup properly after test run
 				//_cache.Clear();
 				_cache.Dispose();
 				_cache = null;
@@ -72,8 +74,10 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		public void InsertSameTileNoOverwrite()
 		{
 			string methodName = _className + "." + new StackFrame().GetMethod().Name;
-			List<long> elapsed = simpleInsert(TS_NOOVERWRITE, false);
+			List<long> elapsed = simpleInsert(TS_NO_OVERWRITE, false);
 			logTime(methodName, elapsed);
+			cacheItemAsserts(TS_NO_OVERWRITE, new CanonicalTileId(0, 0, 0));
+			Assert.AreEqual(1, _cache.TileCount(TS_NO_OVERWRITE), "tileset {0}: unexpected number of tiles", TS_NO_OVERWRITE);
 		}
 
 
@@ -81,8 +85,10 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		public void InsertSameTileForceOverwrite()
 		{
 			string methodName = _className + "." + new StackFrame().GetMethod().Name;
-			List<long> elapsed = simpleInsert(TS_FORCEVERWRITE, true);
+			List<long> elapsed = simpleInsert(TS_FORCE_OVERWRITE, true);
 			logTime(methodName, elapsed);
+			cacheItemAsserts(TS_FORCE_OVERWRITE, new CanonicalTileId(0, 0, 0));
+			Assert.AreEqual(1, _cache.TileCount(TS_FORCE_OVERWRITE), "tileset {0}: unexpected number of tiles", TS_FORCE_OVERWRITE);
 		}
 
 
@@ -90,7 +96,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		public IEnumerator ConcurrentTilesetInsert()
 		{
 
-			ued.LogFormat("{0} tiles", _tileIds.Count);
+			ued.LogFormat("about to insert {0} tiles for each tileset", _tileIds.Count);
 
 			int rIdCr1 = Runnable.Run(InsertCoroutine(TS_CONCURRENT1, false, _tileIds));
 			int rIdCr2 = Runnable.Run(InsertCoroutine(TS_CONCURRENT2, false, _tileIds));
@@ -111,17 +117,54 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			ued.Log("verifying concurrently inserted tiles ...");
 
 			string[] tilesetNames = new string[] { TS_CONCURRENT1, TS_CONCURRENT2, TS_CONCURRENT3, TS_CONCURRENT4 };
-			foreach (CanonicalTileId tileId in _tileIds)
+
+			foreach (string tilesetName in tilesetNames)
 			{
-				foreach (string tilesetName in tilesetNames)
+				Assert.AreEqual(_tileIds.Count, _cache.TileCount(tilesetName), "tileset '{0}' does not contain expected number of tiles", tilesetName);
+			}
+
+			foreach (string tilesetName in tilesetNames)
+			{
+				foreach (CanonicalTileId tileId in _tileIds)
 				{
-					CacheItem ci = _cache.Get(tilesetName, tileId);
-					Assert.NotNull(ci, "tileset '{0}': {1} not found in cache", tilesetName, tileId);
-					Assert.NotNull(ci.Data, "tileset '{0}': {1} tile data is null", tilesetName, tileId);
-					Assert.NotZero(ci.Data.Length, "tileset '{0}': {1} data length is 0", tilesetName, tileId);
+					cacheItemAsserts(tilesetName, tileId);
 				}
 			}
+
+			ued.Log("all tiles in cache!");
 		}
+
+
+		[Test, Order(5)]
+		public void Prune()
+		{
+			string methodName = _className + "." + new StackFrame().GetMethod().Name;
+			HashSet<CanonicalTileId> tileIds = new HashSet<CanonicalTileId>();
+
+			int tiles2Insert = (int)_maxCacheTileCount + (int)_cache.PruneCacheDelta + 1;
+			ued.Log(string.Format("about to insert {0} tiles", tiles2Insert));
+			for (int x = 0; x < tiles2Insert; x++)
+			{
+				tileIds.Add(new CanonicalTileId(x, 131205, 18));
+			}
+
+			List<long> elapsed = simpleInsert(TS_PRUNE, false, tileIds);
+			logTime(methodName, elapsed);
+			Assert.AreEqual(_maxCacheTileCount, _cache.TileCount(TS_PRUNE), _cache.PruneCacheDelta, "tileset [{0}]: pruning did not work as expected", TS_PRUNE);
+		}
+
+
+		#region helper methods
+
+
+		private void cacheItemAsserts(string tilesetName, CanonicalTileId tileId)
+		{
+			CacheItem ci = _cache.Get(tilesetName, tileId);
+			Assert.NotNull(ci, "tileset '{0}': {1} not found in cache", tilesetName, tileId);
+			Assert.NotNull(ci.Data, "tileset '{0}': {1} tile data is null", tilesetName, tileId);
+			Assert.NotZero(ci.Data.Length, "tileset '{0}': {1} data length is 0", tilesetName, tileId);
+		}
+
 
 		private IEnumerator InsertCoroutine(string tileSetName, bool forceInsert, HashSet<CanonicalTileId> tileIds = null)
 		{
@@ -143,8 +186,6 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		}
 
 
-
-
 		private List<long> simpleInsert(string tileSetName, bool forceInsert, HashSet<CanonicalTileId> tileIds = null, int itemCount = 1000)
 		{
 			if (null != tileIds) { itemCount = tileIds.Count; }
@@ -160,7 +201,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				{
 					AddedToCacheTicksUtc = now.Ticks,
 					// simulate 100KB data
-					Data = Enumerable.Repeat((byte)0x20, 100 * 1024).ToArray(),
+					Data = Enumerable.Repeat((byte)0x58, 100 * 1024).ToArray(),
 					ETag = "etag",
 					LastModified = now
 				};
@@ -199,6 +240,10 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				, stdDev
 			));
 		}
+
+
+		#endregion
+
 
 	}
 }

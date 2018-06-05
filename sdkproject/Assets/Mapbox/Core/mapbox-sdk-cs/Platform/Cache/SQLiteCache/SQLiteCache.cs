@@ -14,8 +14,16 @@
 	{
 
 
+		/// <summary>
+		/// maximum number tiles that get cached
+		/// </summary>
 		public uint MaxCacheSize { get { return _maxTileCount; } }
 
+
+		/// <summary>
+		/// Check cache size every n inserts
+		/// </summary>
+		public uint PruneCacheDelta { get { return _pruneCacheDelta; } }
 
 
 #if MAPBOX_DEBUG_CACHE
@@ -186,6 +194,7 @@ lastmodified INTEGER,
 #endif
 			try
 			{
+				// tile exists and we don't want to overwrite -> exit early
 				if (
 					TileExists(tilesetName, tileId)
 					&& !forceInsert
@@ -210,8 +219,8 @@ lastmodified INTEGER,
 					return;
 				}
 
-				_sqlite.BeginTransaction();
-				_sqlite.InsertOrReplace(new tiles
+				//_sqlite.BeginTransaction();
+				int rowsAffected = _sqlite.InsertOrReplace(new tiles
 				{
 					tile_set = tilesetId.Value,
 					zoom_level = tileId.Z,
@@ -221,6 +230,10 @@ lastmodified INTEGER,
 					timestamp = (int)UnixTimestampUtils.To(DateTime.Now),
 					etag = item.ETag
 				});
+				if (1 != rowsAffected)
+				{
+					throw new Exception(string.Format("tile [{0} / {1}] was not inserted, rows affected:{2}", tilesetName, tileId, rowsAffected));
+				}
 			}
 			catch (Exception ex)
 			{
@@ -228,7 +241,7 @@ lastmodified INTEGER,
 			}
 			finally
 			{
-				_sqlite.Commit();
+				//_sqlite.Commit();
 			}
 
 			// update counter only when new tile gets inserted
@@ -356,7 +369,14 @@ lastmodified INTEGER,
 			try
 			{
 				_sqlite.BeginTransaction(true);
-				return _sqlite.Insert(new tilesets { name = tilesetName });
+				//return _sqlite.Insert(new tilesets { name = tilesetName });
+				tilesets newTileset = new tilesets { name = tilesetName };
+				int rowsAffected = _sqlite.Insert(newTileset);
+				if (1 != rowsAffected)
+				{
+					throw new Exception(string.Format("tileset [{0}] was not inserted, rows affected:{1}", tilesetName, rowsAffected));
+				}
+				return newTileset.id;
 			}
 			catch (Exception ex)
 			{
@@ -377,6 +397,23 @@ lastmodified INTEGER,
 				.Where(ts => ts.name.Equals(tilesetName))
 				.FirstOrDefault();
 			return null == tileset ? (int?)null : tileset.id;
+		}
+
+
+		/// <summary>
+		/// FOR INTERNAL DEBUGGING ONLY - DON'T RELY ON IN PRODUCTION
+		/// </summary>
+		/// <param name="tilesetName"></param>
+		/// <returns></returns>
+		public long TileCount(string tilesetName)
+		{
+			int? tilesetId = getTilesetId(tilesetName);
+			if (!tilesetId.HasValue) { return 0; }
+
+			return _sqlite
+				.Table<tiles>()
+				.Where(t => t.tile_set == tilesetId.Value)
+				.LongCount();
 		}
 
 
