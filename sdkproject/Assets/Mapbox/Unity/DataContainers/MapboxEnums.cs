@@ -226,4 +226,11 @@
 		Shops = 1 << 5,
 		Transportation = 1 << 6
 	}
+
+	public enum FeatureProcessingStage
+	{
+		PreProcess,
+		Process,
+		PostProcess
+	}
 }
