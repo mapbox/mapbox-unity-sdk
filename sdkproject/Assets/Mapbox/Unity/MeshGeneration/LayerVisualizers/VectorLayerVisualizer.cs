@@ -410,7 +410,6 @@
 							//skip existing features, only works on tilesets with unique ids
 							if (ShouldSkipProcessingFeatureWithId(feature.Data.Id, tile, layerProperties))
 							{
-								Debug.Log("Here");
 								return false;
 							}
 							//feature not skipped. Add to pool only if features are in preprocess stage. 

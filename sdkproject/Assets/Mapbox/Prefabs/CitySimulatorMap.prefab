@@ -218,7 +218,7 @@ MonoBehaviour:
           filters: []
           combinerType: 0
         extrusionOptions:
-          _selectedLayerName: 
+          _selectedLayerName: road
           extrusionType: 5
           extrusionGeometryType: 0
           propertyName: height
@@ -235,7 +235,7 @@ MonoBehaviour:
           - Materials:
             - {fileID: 2100000, guid: 8e8afdee0a225a84282f04f2fb89b8b6, type: 2}
           - Materials:
-            - {fileID: 2100000, guid: 8e8afdee0a225a84282f04f2fb89b8b6, type: 2}
+            - {fileID: 2100000, guid: b00db1eb69ea64eb4adb30b2c0fb01cb, type: 2}
           atlasInfo: {fileID: 0}
           colorPalette: {fileID: 0}
         honorBuildingIdSetting: 1
