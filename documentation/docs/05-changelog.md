@@ -1,4 +1,15 @@
 ﻿## CHANGELOG
+ ### v.1.4.4
+*??/??/????*
+##### New Features
+-
+##### Improvements
+-
+##### Bug Fixes
+- Fix issue with ambient file caching on Windows with .NET4.6 runtime and long file names. https://github.com/mapbox/mapbox-unity-sdk/issues/815
+##### Known Issues
+-
+
  ### v.1.4.3
 *05/29/2018*
 ##### New Features
