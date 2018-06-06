@@ -100,6 +100,14 @@
 		}
 
 
+		public void ReInit() {
+			foreach (var cache in _caches)
+			{
+				cache.ReInit();
+			}
+		}
+
+
 		public IAsyncRequest Request(
 			string uri
 			, Action<Response> callback
