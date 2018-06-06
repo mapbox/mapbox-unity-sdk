@@ -12,8 +12,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 	{
 		public bool Active = true;
 		public abstract string Key { get; set; }
-		public event Action FeaturePreProcessEvent;
-		public event Action FeaturePostProcessEvent;
+		//public event Action FeaturePreProcessEvent;
+		//public event Action FeaturePostProcessEvent;
 		public abstract void Create(VectorTileLayer layer, UnityTile tile, Action callback = null);
 
 		public virtual void Initialize()
