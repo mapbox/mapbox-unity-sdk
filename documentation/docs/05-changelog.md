@@ -6,7 +6,7 @@
 ##### Improvements
 -
 ##### Bug Fixes
-- Fix issue with ambient file caching on Windows with .NET4.6 runtime and long file names. https://github.com/mapbox/mapbox-unity-sdk/issues/815
+- Fix issue with ambient file caching on Windows with .NET4.6 runtime and long file names. https://github.com/mapbox/mapbox-unity-sdk/pull/825 https://github.com/mapbox/mapbox-unity-sdk/issues/815
 ##### Known Issues
 -
 
