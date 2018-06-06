@@ -30,6 +30,8 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		private const string TS_CONCURRENT3 = "concurrent3";
 		private const string TS_CONCURRENT4 = "concurrent4";
 		private const string TS_PRUNE = "concurrent4";
+		private const string TS_REINIT = "reinit";
+		private string[] _allTilesetNames;
 		private SQLiteCache _cache;
 		private string _className;
 		private HashSet<CanonicalTileId> _tileIds;
@@ -43,6 +45,17 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			_className = this.GetType().Name;
 
 			Runnable.EnableRunnableInEditor();
+
+			_allTilesetNames = new string[] {
+				TS_NO_OVERWRITE
+				, TS_FORCE_OVERWRITE
+				, TS_CONCURRENT1
+				, TS_CONCURRENT2
+				, TS_CONCURRENT3
+				, TS_CONCURRENT4
+				, TS_PRUNE
+				, TS_REINIT
+			};
 
 			Vector2d southWest = new Vector2d(48.2174, 16.3662);
 			Vector2d northEast = new Vector2d(48.2310, 16.3877);
@@ -154,7 +167,54 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		}
 
 
+		[Test, Order(6)]
+		public void Clear()
+		{
+			// We still should have tiles in the cache
+			long tileCnt = getAllTilesCount();
+
+			// beware 'Assert.Greater' has parameters flipped compared to 'Assert.AreEqual'
+			Assert.GreaterOrEqual(tileCnt, _cache.MaxCacheSize, "number of tiles lower than expected");
+
+			_cache.Clear();
+			// have to Reinit after Clear()
+			_cache.ReInit();
+
+			tileCnt = getAllTilesCount();
+
+			Assert.AreEqual(0, tileCnt, "'Clear()' did not work as expected");
+		}
+
+
+		[Test, Order(7)]
+		public void ReInit()
+		{
+			// after previous 'Clear' there shouldn't be any tiles in cache
+			long tileCnt = getAllTilesCount();
+			Assert.AreEqual(0, tileCnt, "'Clear()' did not work as expected");
+			// insert one tile
+			simpleInsert(TS_REINIT, false, itemCount: 1);
+			tileCnt = getAllTilesCount();
+			Assert.AreEqual(1, tileCnt, "one tile was not inserted");
+
+			_cache.ReInit();
+
+			Assert.AreEqual(1, tileCnt, "tile was lost during 'ReInit()'");
+		}
+
+
 		#region helper methods
+
+
+		private long getAllTilesCount()
+		{
+			long tileCnt = 0;
+			foreach (string tilesetName in _allTilesetNames)
+			{
+				tileCnt += _cache.TileCount(tilesetName);
+			}
+			return tileCnt;
+		}
 
 
 		private void cacheItemAsserts(string tilesetName, CanonicalTileId tileId)
