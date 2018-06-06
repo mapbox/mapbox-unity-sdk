@@ -1,15 +1,4 @@
 ﻿## CHANGELOG
- ### v.1.4.4
-*??/??/????*
-##### New Features
--
-##### Improvements
--
-##### Bug Fixes
-- Fix issue with ambient file caching on Windows with .NET4.6 runtime and long file names. https://github.com/mapbox/mapbox-unity-sdk/pull/825 https://github.com/mapbox/mapbox-unity-sdk/issues/815
-##### Known Issues
--
-
  ### v.1.4.3
 *05/29/2018*
 ##### New Features
@@ -25,6 +14,7 @@
 ##### Bug Fixes
 - Fix issue with UvModifier which caused wrong roof uv positions calculations.
 - Fix issue with data fetcher to handle failed connections properly, which caused IndexOutOfRangeException during tile loading/unloading.
+- Fix issue with ambient file caching on Windows with .NET4.6 runtime and long file names. https://github.com/mapbox/mapbox-unity-sdk/pull/825 https://github.com/mapbox/mapbox-unity-sdk/issues/815
 ##### Known Issues
 - ARInterface related errors and crashes on Unity 2018.1.1f1 related to bug in Unity  https://issuetracker.unity3d.com/issues/vuforia-gameobject-transforms-are-not-being-disabled-when-the-player-is-stopped
 
