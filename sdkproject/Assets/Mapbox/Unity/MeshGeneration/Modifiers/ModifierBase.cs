@@ -2,6 +2,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
 	using UnityEngine;
 	using System;
+	using Mapbox.Unity.MeshGeneration.Data;
 
 	[Serializable]
 	public abstract class ModifierProperties
@@ -21,6 +22,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		}
 		public virtual void Initialize()
+		{
+
+		}
+
+		public virtual void FeaturePreProcess(VectorFeatureUnity feature)
 		{
 
 		}

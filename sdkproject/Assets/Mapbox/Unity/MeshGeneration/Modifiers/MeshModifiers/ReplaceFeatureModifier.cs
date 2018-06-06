@@ -28,14 +28,26 @@
 		[Geocode]
 		private List<string> _prefabLocations;
 
-		private string _featureId;
+		[SerializeField]
+		private List<string> _explicitlyBlockedFeatureIds;
+		/// <summary>
+		/// List of featureIds to test against. 
+		/// We need a list of featureIds per location. 
+		/// A list is required since buildings on tile boundary will have multiple id's for the same feature.
+		/// </summary>
+		private List<List<string>> _featureId;
+		private string _tempFeatureId;
 
 		public override void Initialize()
 		{
 			base.Initialize();
 			//duplicate the list of lat/lons to track which coordinates have already been spawned
 			_latLonToSpawn = new List<string>(_prefabLocations);
-			_featureId = String.Empty;
+			_featureId = new List<List<string>>();
+			for (int i = 0; i < _prefabLocations.Count; i++)
+			{
+				_featureId.Add(new List<string>());
+			}
 			if (_objects == null)
 			{
 				_objects = new Dictionary<GameObject, GameObject>();
@@ -48,42 +60,76 @@
 			_options = (SpawnPrefabOptions)properties;
 		}
 
+		public override void FeaturePreProcess(VectorFeatureUnity feature)
+		{
+			int index = -1;
+			foreach (var point in _prefabLocations)
+			{
+				try
+				{
+					index++;
+					var coord = Conversions.StringToLatLon(point);
+					if (feature.ContainsLatLon(coord) && (feature.Data.Id != 0))
+					{
+						_featureId[index] = (_featureId[index] == null) ? new List<string>() : _featureId[index];
+						_tempFeatureId = feature.Data.Id.ToString();
+						_featureId[index].Add(_tempFeatureId.Substring(0, _tempFeatureId.Length - 3));
+					}
+				}
+				catch (Exception e)
+				{
+					Debug.LogException(e);
+				}
+			}
+		}
+
 		/// <summary>
 		/// Check the feature against the list of lat/lons in the modifier
 		/// </summary>
 		/// <returns><c>true</c>, if the feature overlaps with a lat/lon in the modifier <c>false</c> otherwise.</returns>
 		/// <param name="feature">Feature.</param>
-		public bool ShouldReplaceFeature( VectorFeatureUnity feature )
+		public bool ShouldReplaceFeature(VectorFeatureUnity feature)
 		{
-			foreach( var point in _prefabLocations )
+			int index = -1;
+
+			foreach (var point in _prefabLocations)
 			{
-				var coord = Conversions.StringToLatLon(point);
-				if (feature.ContainsLatLon(coord))
+				try
 				{
-					
-
-					if(feature.Data.Id != 0 && String.IsNullOrEmpty(_featureId))
+					index++;
+					if (_featureId[index] != null)
 					{
-						_featureId = feature.Data.Id.ToString();
-						_featureId = _featureId.Substring(0, _featureId.Length - 3);
+						foreach (var featureId in _featureId[index])
+						{
+							//preventing spawning of explicitly blocked features
+							foreach (var blockedId in _explicitlyBlockedFeatureIds)
+							{
+								if (feature.Data.Id.ToString() == blockedId)
+								{
+									return true;
+								}
+							}
+
+							if (feature.Data.Id.ToString().StartsWith(featureId, StringComparison.CurrentCulture))
+							{
+								return true;
+							}
+						}
 					}
-					return true;
 				}
-			}
+				catch (Exception e)
+				{
+					Debug.LogException(e);
+				}
 
-			if(feature.Data.Id.ToString().StartsWith(_featureId, StringComparison.CurrentCulture) &&
-			  !String.IsNullOrEmpty(_featureId))
-			{
-				return true;
 			}
-
 			return false;
 		}
 
 		public override void Run(VectorEntity ve, UnityTile tile)
 		{
 			//replace the feature only once per lat/lon
-			if(ShouldSpawnFeature(ve.Feature))
+			if (ShouldSpawnFeature(ve.Feature))
 			{
 				SpawnPrefab(ve, tile);
 			}
