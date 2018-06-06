@@ -169,6 +169,7 @@ lastmodified INTEGER,
 			}
 		}
 
+
 		private void openOrCreateDb(string dbName)
 		{
 			_dbPath = GetFullDbPath(dbName);
@@ -177,6 +178,11 @@ lastmodified INTEGER,
 		}
 
 
+		/// <summary>
+		/// <para>Reinitialize cache.</para>
+		/// <para>This is needed after 'Clear()' to recreate the cache database.</para>
+		/// <para>And has been implemented on purpose to not hold on to any references to the cache directory after 'Clear()'</para>
+		/// </summary>
 		public void ReInit()
 		{
 			if (null != _sqlite)
@@ -449,7 +455,8 @@ lastmodified INTEGER,
 
 
 		/// <summary>
-		/// Delete the database file
+		/// <para>Delete the database file.</para>
+		/// <para>Call 'ReInit()' if you intend to continue using the cache after 'Clear()!</para>
 		/// </summary>
 		public void Clear()
 		{
