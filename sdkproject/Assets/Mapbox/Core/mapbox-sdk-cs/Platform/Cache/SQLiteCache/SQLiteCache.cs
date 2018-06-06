@@ -30,6 +30,7 @@
 		private string _className;
 #endif
 		private bool _disposed;
+		private string _dbName;
 		private string _dbPath;
 		private SQLiteConnection _sqlite;
 		private readonly uint _maxTileCount;
@@ -42,88 +43,9 @@
 
 		public SQLiteCache(uint? maxTileCount = null, string dbName = "cache.db")
 		{
-#if MAPBOX_DEBUG_CACHE
-			_className = this.GetType().Name;
-#endif
-			openOrCreateDb(dbName);
 			_maxTileCount = maxTileCount ?? 3000;
-
-			//hrmpf: multiple PKs not supported by sqlite.net
-			//https://github.com/praeclarum/sqlite-net/issues/282
-			//do it via plain SQL
-
-			List<SQLiteConnection.ColumnInfo> colInfoTileset = _sqlite.GetTableInfo(typeof(tilesets).Name);
-			if (0 == colInfoTileset.Count)
-			{
-				string cmdCreateTableTilesets = @"CREATE TABLE tilesets(
-id    INTEGER PRIMARY KEY ASC AUTOINCREMENT NOT NULL UNIQUE,
-name  STRING  NOT NULL
-);";
-				_sqlite.Execute(cmdCreateTableTilesets);
-				string cmdCreateIdxNames = @"CREATE UNIQUE INDEX idx_names ON tilesets (name ASC);";
-				_sqlite.Execute(cmdCreateIdxNames);
-			}
-
-			List<SQLite4Unity3d.SQLiteConnection.ColumnInfo> colInfoTiles = _sqlite.GetTableInfo(typeof(tiles).Name);
-			if (0 == colInfoTiles.Count)
-			{
-				//sqlite does not support multiple PK columns, create table manually
-				//_sqlite.CreateTable<tiles>();
-
-				string cmdCreateTableTiles = @"CREATE TABLE tiles(
-tile_set     INTEGER REFERENCES tilesets (id) ON DELETE CASCADE ON UPDATE CASCADE,
-zoom_level   INTEGER NOT NULL,
-tile_column  BIGINT  NOT NULL,
-tile_row     BIGINT  NOT NULL,
-tile_data    BLOB    NOT NULL,
-timestamp    INTEGER NOT NULL,
-etag         TEXT,
-lastmodified INTEGER,
-	PRIMARY KEY(
-		tile_set ASC,
-		zoom_level ASC,
-		tile_column ASC,
-		tile_row ASC
-	)
-);";
-				_sqlite.Execute(cmdCreateTableTiles);
-
-				string cmdIdxTileset = "CREATE INDEX idx_tileset ON tiles (tile_set ASC);";
-				_sqlite.Execute(cmdIdxTileset);
-				string cmdIdxTimestamp = "CREATE INDEX idx_timestamp ON tiles (timestamp ASC);";
-				_sqlite.Execute(cmdIdxTimestamp);
-			}
-
-
-
-
-
-			//some pragmas to speed things up a bit :-)
-			string[] cmds = new string[]
-			{
-				"PRAGMA synchronous=OFF",
-				"PRAGMA count_changes=OFF",
-				"PRAGMA journal_mode=MEMORY",
-				"PRAGMA temp_store=MEMORY"
-			};
-			foreach (var cmd in cmds)
-			{
-				try
-				{
-					_sqlite.Execute(cmd);
-				}
-				catch (SQLiteException ex)
-				{
-					// workaround for sqlite.net's exeception:
-					// https://stackoverflow.com/a/23839503
-					if (ex.Result != SQLite3.Result.Row)
-					{
-						UnityEngine.Debug.LogErrorFormat("{0}: {1}", cmd, ex);
-						// TODO: when mapbox-sdk-cs gets backported to its own repo -> throw
-						//throw; // to throw or not to throw???
-					}
-				}
-			}
+			_dbName = dbName;
+			init();
 		}
 
 
@@ -163,11 +85,107 @@ lastmodified INTEGER,
 		#endregion
 
 
+		private void init()
+		{
+
+#if MAPBOX_DEBUG_CACHE
+			_className = this.GetType().Name;
+#endif
+			openOrCreateDb(_dbName);
+
+			//hrmpf: multiple PKs not supported by sqlite.net
+			//https://github.com/praeclarum/sqlite-net/issues/282
+			//do it via plain SQL
+
+			List<SQLiteConnection.ColumnInfo> colInfoTileset = _sqlite.GetTableInfo(typeof(tilesets).Name);
+			if (0 == colInfoTileset.Count)
+			{
+				string cmdCreateTableTilesets = @"CREATE TABLE tilesets(
+id    INTEGER PRIMARY KEY ASC AUTOINCREMENT NOT NULL UNIQUE,
+name  STRING  NOT NULL
+);";
+				_sqlite.Execute(cmdCreateTableTilesets);
+				string cmdCreateIdxNames = @"CREATE UNIQUE INDEX idx_names ON tilesets (name ASC);";
+				_sqlite.Execute(cmdCreateIdxNames);
+			}
+
+			List<SQLiteConnection.ColumnInfo> colInfoTiles = _sqlite.GetTableInfo(typeof(tiles).Name);
+			if (0 == colInfoTiles.Count)
+			{
+				//sqlite does not support multiple PK columns, create table manually
+				//_sqlite.CreateTable<tiles>();
+
+				string cmdCreateTableTiles = @"CREATE TABLE tiles(
+tile_set     INTEGER REFERENCES tilesets (id) ON DELETE CASCADE ON UPDATE CASCADE,
+zoom_level   INTEGER NOT NULL,
+tile_column  BIGINT  NOT NULL,
+tile_row     BIGINT  NOT NULL,
+tile_data    BLOB    NOT NULL,
+timestamp    INTEGER NOT NULL,
+etag         TEXT,
+lastmodified INTEGER,
+	PRIMARY KEY(
+		tile_set ASC,
+		zoom_level ASC,
+		tile_column ASC,
+		tile_row ASC
+	)
+);";
+				_sqlite.Execute(cmdCreateTableTiles);
+
+				string cmdIdxTileset = "CREATE INDEX idx_tileset ON tiles (tile_set ASC);";
+				_sqlite.Execute(cmdIdxTileset);
+				string cmdIdxTimestamp = "CREATE INDEX idx_timestamp ON tiles (timestamp ASC);";
+				_sqlite.Execute(cmdIdxTimestamp);
+			}
+
+
+			// some pragmas to speed things up a bit :-)
+			// inserting 1,000 tiles takes 1-2 sec as opposed to ~20 sec
+			string[] cmds = new string[]
+			{
+				"PRAGMA synchronous=OFF",
+				"PRAGMA count_changes=OFF",
+				"PRAGMA journal_mode=MEMORY",
+				"PRAGMA temp_store=MEMORY"
+			};
+			foreach (var cmd in cmds)
+			{
+				try
+				{
+					_sqlite.Execute(cmd);
+				}
+				catch (SQLiteException ex)
+				{
+					// workaround for sqlite.net's exeception:
+					// https://stackoverflow.com/a/23839503
+					if (ex.Result != SQLite3.Result.Row)
+					{
+						UnityEngine.Debug.LogErrorFormat("{0}: {1}", cmd, ex);
+						// TODO: when mapbox-sdk-cs gets backported to its own repo -> throw
+						//throw; // to throw or not to throw???
+					}
+				}
+			}
+		}
+
 		private void openOrCreateDb(string dbName)
 		{
 			_dbPath = GetFullDbPath(dbName);
 			_sqlite = new SQLiteConnection(_dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
 			//Debug.LogFormat("SQLiteCache path ----> {0}", _dbPath);
+		}
+
+
+		public void ReInit()
+		{
+			if (null != _sqlite)
+			{
+				_sqlite.Dispose();
+				_sqlite = null;
+			}
+
+			init();
 		}
 
 

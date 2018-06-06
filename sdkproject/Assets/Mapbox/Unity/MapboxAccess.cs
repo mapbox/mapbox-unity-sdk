@@ -131,7 +131,11 @@ namespace Mapbox.Unity
 					Debug.LogErrorFormat("Could not delete [{0}]: {1}", file, deleteEx);
 				}
 			}
-			Debug.Log("done clearing file cache");
+
+			//reinit caches after clear
+			if (null != cwfs) { cwfs.ReInit(); }
+
+			Debug.Log("done clearing caches");
 		}
 
 		/// <summary>
