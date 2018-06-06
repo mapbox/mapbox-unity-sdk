@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using SQLite4Unity3d;
 
-namespace Mapbox.Platform.MbTiles
+namespace Mapbox.Platform.Cache
 {
 
 	/// <summary>
-	/// https://github.com/mapbox/mbtiles-spec/blob/master/1.1/spec.md#tiles
 	/// Don't change the class name: sqlite-net uses it for table creation
 	/// </summary>
 	public class tiles
 	{
+
+		public int tile_set { get; set; }
 
 		//hrmpf: multiple PKs not supported by sqlite.net
 		//https://github.com/praeclarum/sqlite-net/issues/282

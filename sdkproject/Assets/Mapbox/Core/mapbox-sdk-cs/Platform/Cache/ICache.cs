@@ -14,6 +14,7 @@ namespace Mapbox.Platform.Cache
 		/// </summary>
 		uint MaxCacheSize { get; }
 
+
 		/// <summary>
 		/// Add tile data to the cache
 		/// </summary>
@@ -42,5 +43,11 @@ namespace Mapbox.Platform.Cache
 		/// </summary>
 		/// <param name="mapId"></param>
 		void Clear(string mapId);
+
+
+		/// <summary>
+		/// Reinitialize cache. Might be needed after 'Clear', eg for SQLiteCache
+		/// </summary>
+		void ReInit();
 	}
 }
