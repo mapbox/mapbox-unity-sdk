@@ -6,7 +6,7 @@
 	using System;
 	using System.IO;
 	using System.Text;
-
+	using Mapbox.Utils;
 
 	public class DeviceLocationProviderAndroidNative : AbstractLocationProvider, IDisposable
 	{
@@ -18,7 +18,7 @@
 		/// </summary>
 		[SerializeField]
 		[Tooltip("The minimum distance (measured in meters) a device must move laterally before location is updated. Higher values like 500 imply less overhead.")]
-		float _updateDistanceInMeters = 0.5f;
+		float _updateDistanceInMeters = 0.0f;
 
 
 		/// <summary>
@@ -26,7 +26,7 @@
 		/// https://developer.android.com/reference/android/location/LocationManager.html#requestLocationUpdates(java.lang.String,%20long,%20float,%20android.location.LocationListener)
 		/// </summary>
 		[SerializeField]
-		[Tooltip("The minimum time interval between location updates, in milliseconds.")]
+		[Tooltip("The minimum time interval between location updates, in milliseconds. It's reasonable to not go below 500ms.")]
 		long _updateTimeInMilliSeconds = 1000;
 
 
@@ -99,12 +99,16 @@
 
 		protected virtual void Awake()
 		{
+			// safe measures to not run when disabled or not selected as location provider
+			if (!enabled) { return; }
+			if (!transform.gameObject.activeInHierarchy) { return; }
+
 
 			_wait1sec = new WaitForSeconds(1);
 			_wait5sec = new WaitForSeconds(5);
 			_wait60sec = new WaitForSeconds(60);
 			// throttle if entered update intervall is unreasonably low
-			_waitUpdateTime = _updateTimeInMilliSeconds < 500 ? new WaitForSeconds(500) : new WaitForSeconds(_updateTimeInMilliSeconds / 1000);
+			_waitUpdateTime = _updateTimeInMilliSeconds < 500 ? new WaitForSeconds(0.5f) : new WaitForSeconds((float)_updateTimeInMilliSeconds / 1000.0f);
 
 			_currentLocation.IsLocationServiceEnabled = false;
 			_currentLocation.IsLocationServiceInitializing = true;
@@ -258,6 +262,7 @@
 					if (null != locGps && null != locNetwork) { populateWithBetterLocation(locGps, locNetwork); }
 
 
+					_currentLocation.TimestampDevice = UnixTimestampUtils.To(DateTime.UtcNow);
 					SendLocation(_currentLocation);
 				}
 				catch (Exception ex)

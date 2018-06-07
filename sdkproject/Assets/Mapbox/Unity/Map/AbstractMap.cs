@@ -9,6 +9,7 @@ namespace Mapbox.Unity.Map
 	using Mapbox.Map;
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Unity.MeshGeneration.Data;
+	using System.Globalization;
 
 	public interface IUnifiedMap
 	{
@@ -495,7 +496,7 @@ namespace Mapbox.Unity.Map
 			{
 				_options = new MapOptions();
 			}
-			_options.locationOptions.latitudeLongitude = String.Format("{0},{1}", latLon.x, latLon.y);
+			_options.locationOptions.latitudeLongitude = String.Format(CultureInfo.InvariantCulture, "{0},{1}", latLon.x, latLon.y);
 			_options.locationOptions.zoom = zoom;
 
 			SetUpMap();
@@ -534,7 +535,7 @@ namespace Mapbox.Unity.Map
 			if (Math.Abs(differenceInZoom) > Constants.EpsilonFloatingPoint)
 			{
 				_mapScaleFactor = Vector3.one * Mathf.Pow(2, differenceInZoom);
-				_mapScaleFactor.y = 1;
+				//_mapScaleFactor.y = 1;
 				Root.localScale = _mapScaleFactor;
 			}
 

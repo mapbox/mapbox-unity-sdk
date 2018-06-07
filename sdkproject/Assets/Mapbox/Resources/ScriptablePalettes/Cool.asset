@@ -22,3 +22,9 @@ MonoBehaviour:
   m_hueRange: 0.21
   m_saturationRange: 0.203
   m_valueRange: 0.292
+  m_setBaseColor_Override: 0
+  m_setDetailColor1_Override: 0
+  m_setDetailColor2_Override: 0
+  m_baseColor_Override: {r: 1, g: 1, b: 1, a: 1}
+  m_detailColor1_Override: {r: 1, g: 1, b: 1, a: 1}
+  m_detailColor2_Override: {r: 1, g: 1, b: 1, a: 1}

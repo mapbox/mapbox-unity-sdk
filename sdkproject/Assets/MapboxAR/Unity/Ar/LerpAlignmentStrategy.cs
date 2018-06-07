@@ -9,20 +9,27 @@ namespace Mapbox.Unity.Ar
 
 		Vector3 _targetPosition;
 		Quaternion _targetRotation = Quaternion.identity;
+		bool _isAlignmentAvailable = false;
 
 		public override void OnAlignmentAvailable(Alignment alignment)
 		{
 			_targetPosition = alignment.Position;
 			_targetRotation = Quaternion.Euler(0, alignment.Rotation, 0);
+			_isAlignmentAvailable = true;
 		}
 
 		// FIXME: this should be in a coroutine, which is activated in Align.
 		void Update()
 		{
-			var t = _followFactor * Time.deltaTime;
-			_transform.SetPositionAndRotation(
-				Vector3.Lerp(_transform.localPosition, _targetPosition, t),
-				Quaternion.Lerp(_transform.localRotation, _targetRotation, t));
+			if (_isAlignmentAvailable)
+			{
+				var t = _followFactor * Time.deltaTime;
+				_transform.SetPositionAndRotation(
+					Vector3.Lerp(_transform.localPosition, _targetPosition, t),
+					Quaternion.Lerp(_transform.localRotation, _targetRotation, t));
+				_isAlignmentAvailable = false;
+			}
+
 		}
 	}
 }

@@ -175,7 +175,8 @@ namespace Mapbox.Unity.Ar
 						, "lightblue"
 					);
 
-					var position = Conversions.GeoToWorldPosition(latitudeLongitude, _map.CenterMercator, _map.WorldRelativeScale).ToVector3xz();
+					var position = _map.GeoToWorldPosition(latitudeLongitude, false);
+					position.y = _map.Root.position.y;
 					_synchronizationContext.AddSynchronizationNodes(location, position, _arPositionReference.localPosition);
 				}
 			}
