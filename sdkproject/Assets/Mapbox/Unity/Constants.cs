@@ -4,7 +4,7 @@ namespace Mapbox.Unity
 
 	public static class Constants
 	{
-		public const string SDK_VERSION = "1.4.2";
+		public const string SDK_VERSION = "1.4.3";
 
 		public static class Path
 		{
@@ -39,7 +39,7 @@ namespace Mapbox.Unity
 			public static readonly Vector3 Vector3Down = new Vector3(0, -1, 0);
 			public static readonly Vector3 Vector3One = new Vector3(1, 1, 1);
 			public static readonly Vector3 Vector3Forward = new Vector3(0, 0, 1);
-				
+
 			public static Vector3 Vector3Right = new Vector3(1, 0, 0);
 		}
 

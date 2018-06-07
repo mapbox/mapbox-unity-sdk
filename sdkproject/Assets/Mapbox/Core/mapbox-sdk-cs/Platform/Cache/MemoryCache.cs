@@ -37,6 +37,12 @@ namespace Mapbox.Platform.Cache
 		}
 
 
+		public void ReInit()
+		{
+			_cachedResponses = new Dictionary<string, CacheItem>();
+		}
+
+
 		public void Add(string mapdId, CanonicalTileId tileId, CacheItem item, bool forceInsert)
 		{
 			string key = mapdId + "||" + tileId;

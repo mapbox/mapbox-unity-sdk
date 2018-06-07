@@ -112,31 +112,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				GoModifiers[i].Initialize();
 			}
-
-			//find any replacement criteria and assign them
-			foreach ( var goModifier in GoModifiers)
-			{
-				if(goModifier is IReplacementCriteria && 
-				  goModifier.Active)
-				{
-					SetReplacementCriteria((IReplacementCriteria)goModifier);
-				}
-			}
-		}
-
-		/// <summary>
-		/// Add the replacement criteria to any mesh modifiers implementing IReplaceable
-		/// </summary>
-		/// <param name="criteria">Criteria.</param>
-		protected void SetReplacementCriteria( IReplacementCriteria criteria)
-		{
-			foreach ( var meshMod in MeshModifiers)
-			{
-				if( meshMod is IReplaceable )
-				{
-					((IReplaceable)meshMod).Criteria.Add(criteria);
-				}
-			}
 		}
 
 		public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")

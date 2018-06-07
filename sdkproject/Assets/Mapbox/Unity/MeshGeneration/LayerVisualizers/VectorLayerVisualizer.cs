@@ -10,6 +10,17 @@
 	using UnityEngine;
 	using Mapbox.Unity.Map;
 	using Mapbox.Unity.Utilities;
+	using Mapbox.Unity.MeshGeneration.Filters;
+
+	public class VectorLayerVisualizerProperties
+	{
+		public FeatureProcessingStage featureProcessingStage;
+		public bool buildingsWithUniqueIds = false;
+		public VectorTileLayer vectorTileLayer;
+		public ILayerFeatureFilterComparer[] layerFeatureFilters;
+		public ILayerFeatureFilterComparer layerFeatureFilterCombiner;
+	}
+
 
 	public class VectorLayerVisualizer : LayerVisualizerBase
 	{
@@ -56,7 +67,7 @@
 		public void SetProperties(VectorSubLayerProperties properties, LayerPerformanceOptions performanceOptions)
 		{
 			List<MeshModifier> defaultMeshModifierStack = new List<MeshModifier>();
-		 	List<GameObjectModifier> defaultGOModifierStack = new List<GameObjectModifier>();
+			List<GameObjectModifier> defaultGOModifierStack = new List<GameObjectModifier>();
 			_layerProperties = properties;
 			_performanceOptions = performanceOptions;
 
@@ -182,8 +193,102 @@
 			//Add any additional modifiers that were added.
 			_defaultStack.MeshModifiers.AddRange(_layerProperties.MeshModifiers);
 			_defaultStack.GoModifiers.AddRange(_layerProperties.GoModifiers);
+
 		}
 
+		/// <summary>
+		/// Add the replacement criteria to any mesh modifiers implementing IReplaceable
+		/// </summary>
+		/// <param name="criteria">Criteria.</param>
+		protected void SetReplacementCriteria(IReplacementCriteria criteria)
+		{
+			foreach (var meshMod in _defaultStack.MeshModifiers)
+			{
+				if (meshMod is IReplaceable)
+				{
+					((IReplaceable)meshMod).Criteria.Add(criteria);
+				}
+			}
+		}
+
+		#region Private Helper Methods
+		/// <summary>
+		/// Convenience function to add feature to Tile object pool. 
+		/// </summary>
+		/// <param name="feature">Feature to be added to the pool.</param>
+		/// <param name="tile">Tile currently being processed.</param>
+		private void AddFeatureToTileObjectPool(VectorFeatureUnity feature, UnityTile tile)
+		{
+			_activeIds.Add(feature.Data.Id);
+			if (!_idPool.ContainsKey(tile))
+			{
+				_idPool.Add(tile, new List<ulong>());
+			}
+			else
+			{
+				_idPool[tile].Add(feature.Data.Id);
+			}
+		}
+
+		/// <summary>
+		/// Apply filters to the layer and check if the current feature is eleigible for rendering. 
+		/// </summary>
+		/// <returns><c>true</c>, if feature eligible after filtering was applied, <c>false</c> otherwise.</returns>
+		/// <param name="feature">Feature.</param>
+		private bool IsFeatureEligibleAfterFiltering(VectorFeatureUnity feature, UnityTile tile, VectorLayerVisualizerProperties layerProperties)
+		{
+			if (layerProperties.layerFeatureFilters.Count() == 0)
+			{
+				return true;
+			}
+			else
+			{
+				// build features only if the filter returns true.
+				if (layerProperties.layerFeatureFilterCombiner.Try(feature))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// Function to fetch feature in vector tile at the index specified. 
+		/// </summary>
+		/// <returns>The feature in tile at the index requested.</returns>
+		/// <param name="tile">Unity Tile containing the feature.</param>
+		/// <param name="index">Index of the vector feature being requested.</param>
+		private VectorFeatureUnity GetFeatureinTileAtIndex(int index, UnityTile tile, VectorLayerVisualizerProperties layerProperties)
+		{
+			return new VectorFeatureUnity(layerProperties.vectorTileLayer.GetFeature(index),
+													 tile,
+										  layerProperties.vectorTileLayer.Extent,
+										  layerProperties.buildingsWithUniqueIds);
+		}
+
+		/// <summary>
+		/// Function to check if the feature is already in the active Id pool, features already in active Id pool should be skipped from processing.
+		/// </summary>
+		/// <returns><c>true</c>, if feature is already in activeId pool or if the layer has buildingsWithUniqueId flag set to <see langword="true"/>, <c>false</c> otherwise.</returns>
+		/// <param name="featureId">Feature identifier.</param>
+		private bool ShouldSkipProcessingFeatureWithId(ulong featureId, UnityTile tile, VectorLayerVisualizerProperties layerProperties)
+		{
+			return (layerProperties.buildingsWithUniqueIds && _activeIds.Contains(featureId));
+		}
+
+		/// <summary>
+		/// Gets a value indicating whether this entity per coroutine bucket is full.
+		/// </summary>
+		/// <value><c>true</c> if coroutine bucket is full; otherwise, <c>false</c>.</value>
+		private bool IsCoroutineBucketFull
+		{
+			get
+			{
+				return (_performanceOptions != null && _performanceOptions.isEnabled && _entityInCurrentCoroutine >= _performanceOptions.entityPerCoroutine);
+			}
+		}
+
+		#endregion
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -205,7 +310,7 @@
 			_activeCoroutines[tile].Add(Runnable.Run(ProcessLayer(layer, tile, callback)));
 		}
 
-		private IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, Action callback = null)
+		protected IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, Action callback = null)
 		{
 			//HACK to prevent request finishing on same frame which breaks modules started/finished events
 			yield return null;
@@ -215,89 +320,111 @@
 				yield break;
 			}
 
-			//testing each feature with filters
-			var fc = layer.FeatureCount();
+			VectorLayerVisualizerProperties tempLayerProperties = new VectorLayerVisualizerProperties();
+			tempLayerProperties.vectorTileLayer = layer;
+			tempLayerProperties.featureProcessingStage = FeatureProcessingStage.PreProcess;
+
 			//Get all filters in the array.
-			var filters = _layerProperties.filterOptions.filters.Select(m => m.GetFilterComparer()).ToArray();
+			tempLayerProperties.layerFeatureFilters = _layerProperties.filterOptions.filters.Select(m => m.GetFilterComparer()).ToArray();
 
 			// Pass them to the combiner
-			Filters.ILayerFeatureFilterComparer combiner = new Filters.LayerFilterComparer();
+			tempLayerProperties.layerFeatureFilterCombiner = new Filters.LayerFilterComparer();
 			switch (_layerProperties.filterOptions.combinerType)
 			{
 				case Filters.LayerFilterCombinerOperationType.Any:
-					combiner = Filters.LayerFilterComparer.AnyOf(filters);
+					tempLayerProperties.layerFeatureFilterCombiner = Filters.LayerFilterComparer.AnyOf(tempLayerProperties.layerFeatureFilters);
 					break;
 				case Filters.LayerFilterCombinerOperationType.All:
-					combiner = Filters.LayerFilterComparer.AllOf(filters);
+					tempLayerProperties.layerFeatureFilterCombiner = Filters.LayerFilterComparer.AllOf(tempLayerProperties.layerFeatureFilters);
 					break;
 				case Filters.LayerFilterCombinerOperationType.None:
-					combiner = Filters.LayerFilterComparer.NoneOf(filters);
+					tempLayerProperties.layerFeatureFilterCombiner = Filters.LayerFilterComparer.NoneOf(tempLayerProperties.layerFeatureFilters);
 					break;
 				default:
 					break;
 			}
 
-			for (int i = 0; i < fc; i++)
+			tempLayerProperties.buildingsWithUniqueIds = (_layerProperties.honorBuildingIdSetting) && _layerProperties.buildingsWithUniqueIds;
+
+			////find any replacement criteria and assign them
+			foreach (var goModifier in _defaultStack.GoModifiers)
 			{
-
-				var buildingsWithUniqueIds =
-					(_layerProperties.honorBuildingIdSetting) && _layerProperties.buildingsWithUniqueIds;
-
-				var feature = new VectorFeatureUnity(layer.GetFeature(i), tile, layer.Extent, buildingsWithUniqueIds);
-
-				//skip existing features, only works on tilesets with unique ids
-				if (buildingsWithUniqueIds && _activeIds.Contains(feature.Data.Id))
+				if (goModifier is IReplacementCriteria && goModifier.Active)
 				{
-					continue;
-				}
-				else
-				{
-					_activeIds.Add(feature.Data.Id);
-					if (!_idPool.ContainsKey(tile))
-					{
-						_idPool.Add(tile, new List<ulong>());
-					}
-					else
-					{
-						_idPool[tile].Add(feature.Data.Id);
-					}
-				}
-
-				if (filters.Length == 0)
-				{
-					// no filters, just build the features.
-					if (tile != null && tile.gameObject != null && tile.VectorDataState != Enums.TilePropertyState.Cancelled)
-						Build(feature, tile, tile.gameObject);
-
-					_entityInCurrentCoroutine++;
-				}
-				else
-				{
-					// build features only if the filter returns true.
-					if (combiner.Try(feature))
-					{
-						if (tile != null && tile.gameObject != null && tile.VectorDataState != Enums.TilePropertyState.Cancelled)
-							Build(feature, tile, tile.gameObject);
-
-						_entityInCurrentCoroutine++;
-					}
-				}
-
-				if (_performanceOptions!=null && _performanceOptions.isEnabled && _entityInCurrentCoroutine >= _performanceOptions.entityPerCoroutine)
-				{
-					_entityInCurrentCoroutine = 0;
-					yield return null;
+					SetReplacementCriteria((IReplacementCriteria)goModifier);
 				}
 			}
 
+			#region PreProcess & Process. 
+
+			var featureCount = tempLayerProperties.vectorTileLayer.FeatureCount();
+			do
+			{
+				for (int i = 0; i < featureCount; i++)
+				{
+
+					ProcessFeature(i, tile, tempLayerProperties);
+
+					if (IsCoroutineBucketFull)
+					{
+						//Reset bucket..
+						_entityInCurrentCoroutine = 0;
+						yield return null;
+					}
+				}
+				// move processing to next stage. 
+				tempLayerProperties.featureProcessingStage++;
+			} while (tempLayerProperties.featureProcessingStage == FeatureProcessingStage.PreProcess
+			|| tempLayerProperties.featureProcessingStage == FeatureProcessingStage.Process);
+
+			#endregion
+
+			#region PostProcess
+			// TODO : Clean this up to follow the same pattern. 
 			var mergedStack = _defaultStack as MergedModifierStack;
 			if (mergedStack != null && tile != null)
 			{
 				mergedStack.End(tile, tile.gameObject, layer.Name);
 			}
+			#endregion
 
 			if (callback != null)
 				callback();
+		}
+
+		private bool ProcessFeature(int index, UnityTile tile, VectorLayerVisualizerProperties layerProperties)
+		{
+			var feature = GetFeatureinTileAtIndex(index, tile, layerProperties);
+
+			if (IsFeatureEligibleAfterFiltering(feature, tile, layerProperties))
+			{
+				if (tile != null && tile.gameObject != null && tile.VectorDataState != Enums.TilePropertyState.Cancelled)
+				{
+					switch (layerProperties.featureProcessingStage)
+					{
+						case FeatureProcessingStage.PreProcess:
+							//pre process features.
+							PreProcessFeatures(feature, tile, tile.gameObject);
+							break;
+						case FeatureProcessingStage.Process:
+							//skip existing features, only works on tilesets with unique ids
+							if (ShouldSkipProcessingFeatureWithId(feature.Data.Id, tile, layerProperties))
+							{
+								return false;
+							}
+							//feature not skipped. Add to pool only if features are in preprocess stage. 
+							AddFeatureToTileObjectPool(feature, tile);
+							Build(feature, tile, tile.gameObject);
+							break;
+						case FeatureProcessingStage.PostProcess:
+							break;
+						default:
+							break;
+					}
+					_entityInCurrentCoroutine++;
+				}
+			}
+			return true;
 		}
 
 		/// <summary>
@@ -315,6 +442,18 @@
 				return false;
 
 			return true;
+		}
+
+		protected void PreProcessFeatures(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
+		{
+			////find any replacement criteria and assign them
+			foreach (var goModifier in _defaultStack.GoModifiers)
+			{
+				if (goModifier is IReplacementCriteria && goModifier.Active)
+				{
+					goModifier.FeaturePreProcess(feature);
+				}
+			}
 		}
 
 		protected void Build(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
@@ -343,6 +482,14 @@
 			}
 		}
 
+		protected void PostProcessFeatures(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
+		{
+			//var mergedStack = _defaultStack as MergedModifierStack;
+			//if (mergedStack != null && tile != null)
+			//{
+			//	mergedStack.End(tile, tile.gameObject, _vectorFeaturesPerTile[tile].vectorTileLayer.Name);
+			//}
+		}
 		private string FindSelectorKey(VectorFeatureUnity feature)
 		{
 			// TODO: FIX THIS!!

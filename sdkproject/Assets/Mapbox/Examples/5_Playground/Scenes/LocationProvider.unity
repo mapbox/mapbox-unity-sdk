@@ -1105,12 +1105,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1363590662}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b7aa6be6e90405940b281e996bcb2f20, type: 3}
+  m_Script: {fileID: 11500000, guid: beed7ad1e12d3434a943d5fb6807cb6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _accuracy: 5
+  _accuracy: 0
   _autoFireEvent: 1
-  _updateInterval: 0.5
+  _updateInterval: 500
   _sendEvent: 0
   _locationLogFile: {fileID: 4900000, guid: 5e6bb7224cef35c4788a4817b1c9778d, type: 3}
 --- !u!4 &1363590664
@@ -1449,7 +1449,7 @@ MonoBehaviour:
           UserName: 
       elevationLayerType: 0
       requiredOptions:
-        baseMaterial: {fileID: 0}
+        baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
         addCollider: 0
         exaggerationFactor: 1
       modificationOptions:

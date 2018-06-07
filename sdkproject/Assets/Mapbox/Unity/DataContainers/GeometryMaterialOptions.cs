@@ -3,8 +3,6 @@
 	using System;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
 	using Mapbox.Unity.MeshGeneration.Data;
-	using UnityEngine;
-	using UnityEditor;
 
 	[Serializable]
 	public class GeometryMaterialOptions : ModifierProperties
