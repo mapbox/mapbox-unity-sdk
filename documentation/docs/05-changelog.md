@@ -1,4 +1,4 @@
-﻿## CHANGELOG
+## CHANGELOG
  ### v.1.4.3
 *05/29/2018*
 ##### New Features
