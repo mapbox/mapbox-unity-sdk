@@ -15,7 +15,7 @@ namespace Mapbox.Utils
 		/// <returns><c>true</c>, if point lies inside the constructed polygon, <c>false</c> otherwise.</returns>
 		/// <param name="polygon">Polygon points.</param>
 		/// <param name="p">The point that is to be tested.</param>
-		public static bool IsInPolygon(Point2d<float> p, List<List<Point2d<float>>> polygon)
+		public static bool PointInPolygon(Point2d<float> p, List<List<Point2d<float>>> polygon)
 		{
 			List<Point2d<float>> poly = polygon[0];
 
