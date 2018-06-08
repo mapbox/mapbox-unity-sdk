@@ -626,16 +626,16 @@ PlayerSettings:
   additionalIl2CppArgs: 
   scriptingRuntimeVersion: 1
   apiCompatibilityLevelPerPlatform:
-    Metro: 6
+    Metro: 3
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
   metroPackageName: sdkproject
   metroPackageVersion: 1.0.0.0
-  metroCertificatePath: 
+  metroCertificatePath: C:\mb\mbx-2018\sdkproject\Assets\WSATestCertificate.pfx
   metroCertificatePassword: 
-  metroCertificateSubject: 
-  metroCertificateIssuer: 
-  metroCertificateNotAfter: 0000000000000000
+  metroCertificateSubject: Mapbox
+  metroCertificateIssuer: Mapbox
+  metroCertificateNotAfter: 80e6f735301ed501
   metroApplicationDescription: sdkproject
   wsaImages: {}
   metroTileShortName: 
