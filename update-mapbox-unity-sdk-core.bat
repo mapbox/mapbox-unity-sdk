@@ -1,10 +1,6 @@
 @ECHO OFF
 SETLOCAL
 
-ECHO fetching submodules
-git submodule update --init --recursive
-IF %ERRORLEVEL% NEQ 0 ECHO could not update submodules && EXIT /B 1
-
 SET SDK_PATH=sdkproject\Assets\Mapbox\Core
 
 ECHO deleting existing plugins
@@ -30,7 +26,7 @@ ECHO \VectorTiles.Tests\>>x.txt
 ECHO \VerifyNetFrameworkVersion\>>x.txt
 
 ECHO ---- copying vector-tile-cs
-xcopy /S /R /E /Y dependencies\vector-tile-cs\src\* %SDK_PATH%\Plugins\Mapbox\vector-tile-cs\ /EXCLUDE:x.txt
+xcopy /S /R /E /Y dependencies\vector-tile-cs\* %SDK_PATH%\Plugins\Mapbox\vector-tile-cs\ /EXCLUDE:x.txt
 IF %ERRORLEVEL% NEQ 0 ECHO error during copying vector-tile-cs && EXIT /B 1
 
 ECHO ---- copying Mapbox.IO.Compression
