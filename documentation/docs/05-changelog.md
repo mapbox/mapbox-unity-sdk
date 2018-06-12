@@ -1,4 +1,23 @@
 ## CHANGELOG
+ ### v.1.4.3
+*05/29/2018*
+##### New Features
+- Added a **Feature Replacement Modifer** that allows replacement of a vector feature at a given Latitude,Longitude with a supplied prefab. Enables replacing a procedurally generated building at a given Latitude,Longitude with a custom 3D model.
+- Texturing Style dropdown now allows users to select from prepackaged texture styles or custom, which allows for user-defined texturing.
+- Mesh and GameObject modifiers can now be created and added to AbstractMap via `Add New` buttons.
+- Example scene `LocationProvider` can be used to log GPS traces. See documentation on how to copy logs from devices.
+- GPS traces can be played back in the Editor with `EditorLocationProviderLocationLog`.
+- `UserHeading` and `DeviceOrientation` values can be smoothed via different smoothing algorithms.
+##### Improvements
+- Improvements to UV mapping for side walls of extruded polygons when using atlas textures. Enables better handling of leftover areas when creating columns.
+- DeviceLocationProvider should work on devices. Tested with iPhone 7/8/X, Google Pixel 2, Samsung S8, Samsung Galaxy Note 8, OnePlus 3
+##### Bug Fixes
+- Fix issue with UvModifier which caused wrong roof uv positions calculations.
+- Fix issue with data fetcher to handle failed connections properly, which caused IndexOutOfRangeException during tile loading/unloading.
+- Fix issue with ambient file caching on Windows with .NET4.6 runtime and long file names. https://github.com/mapbox/mapbox-unity-sdk/pull/825 https://github.com/mapbox/mapbox-unity-sdk/issues/815
+##### Known Issues
+- ARInterface related errors and crashes on Unity 2018.1.1f1 related to bug in Unity  https://issuetracker.unity3d.com/issues/vuforia-gameobject-transforms-are-not-being-disabled-when-the-player-is-stopped
+
  ### v.1.4.2
 *05/14/2018*
 
@@ -26,11 +45,12 @@
   - Factories register to events in DataFetchers
 -  `Layer Name` , `Extrusion Property Name` and `Filter Key` are now selectable dropdowns indicating the layers and properties available in the current `Data Source`. Layers and properties no longer require manual string entry.
 
-#### Bug Fixes
+##### Bug Fixes
 - Added checks to prevent NRE in `GeocodeAttributeSearchWindow` when searching with an invalid token or no connection.
 - Fix issue where side wall mesh generation did not work with elevated terrain.
+- Fix issue with scaling prefabs for POI's. Enables correct scaling of objects with map.
 
-#### Known Issues
+##### Known Issues
 - `Filters` with empty key or value parameters will exclude all features in a layer.
 -  SDK will throw `[Physics.PhysX] cleaning the mesh failed` error if a MapFeature is used with the following options: {Primitive Type: `Line`, LayerName: `Road`, Collider Type: `Mesh Collider`}
 

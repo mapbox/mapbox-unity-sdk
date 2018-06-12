@@ -1,10 +1,12 @@
 ﻿namespace Mapbox.Unity.Location
 {
 	using Mapbox.Utils;
+    using System.Diagnostics;
 
-	/// <summary>
-	/// Location contains heading, latitude, longitude, accuracy and a timestamp.
-	/// </summary>
+    /// <summary>
+    /// Location contains heading, latitude, longitude, accuracy and a timestamp.
+    /// </summary>
+    [DebuggerDisplay("{LatitudeLongitude,nq} {Accuracy}m hdg:{UserHeading} orientation:{DeviceOrientation}")]
 	public struct Location
 	{
 		/// <summary>

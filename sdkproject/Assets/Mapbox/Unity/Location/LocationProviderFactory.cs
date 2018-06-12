@@ -161,9 +161,12 @@ namespace Mapbox.Unity.Location
 			if (match.Success) { int.TryParse(match.Groups[0].Value, out AndroidApiVersion); }
 			Debug.LogFormat("{0} => API version: {1}", SystemInfo.operatingSystem, AndroidApiVersion);
 
-
+			// only inject native provider if platform requirement is met
+			// and script itself as well as parent game object are active
 			if (Application.platform == RuntimePlatform.Android
 				&& null != _deviceLocationProviderAndroid
+				&& _deviceLocationProviderAndroid.enabled
+				&& _deviceLocationProviderAndroid.transform.gameObject.activeInHierarchy
 				// API version 24 => Android 7 (Nougat): we are using GnssStatus 'https://developer.android.com/reference/android/location/GnssStatus.html'
 				// in the native plugin.
 				// GnssStatus is not available with versions lower than 24

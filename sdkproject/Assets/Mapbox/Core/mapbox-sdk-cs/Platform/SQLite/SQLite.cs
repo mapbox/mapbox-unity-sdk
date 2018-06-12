@@ -885,7 +885,7 @@ namespace SQLite4Unity3d
 		/// Begins a new transaction. Call <see cref="Commit"/> to end the transaction.
 		/// </summary>
 		/// <example cref="System.InvalidOperationException">Throws if a transaction has already begun.</example>
-		public void BeginTransaction()
+		public void BeginTransaction(bool exclusive = false)
 		{
 			// The BEGIN command only works if the transaction stack is empty, 
 			//    or in other words if there are no pending transactions. 
@@ -897,7 +897,14 @@ namespace SQLite4Unity3d
 			{
 				try
 				{
-					Execute("begin transaction");
+					if (exclusive)
+					{
+						Execute("BEGIN EXCLUSIVE TRANSACTION;");
+					}
+					else
+					{
+						Execute("begin transaction");
+					}
 				}
 				catch (Exception ex)
 				{
@@ -1310,7 +1317,7 @@ namespace SQLite4Unity3d
 			var map = GetMapping(objType);
 
 #if NETFX_CORE
-            if (map.PK != null && map.PK.IsAutoGuid)
+            if (map.PK != null && map.PK.IsAutoInc)
             {
                 // no GetProperty so search our way up the inheritance chain till we find it
                 PropertyInfo prop;
@@ -1331,7 +1338,7 @@ namespace SQLite4Unity3d
                 }
             }
 #else
-			if (map.PK != null && map.PK.IsAutoGuid)
+			if (map.PK != null && map.PK.IsAutoInc)
 			{
 				var prop = objType.GetProperty(map.PK.PropertyName);
 				if (prop != null)
@@ -1933,7 +1940,7 @@ namespace SQLite4Unity3d
 
 				var isAuto = Orm.IsAutoInc(prop) || (IsPK && ((createFlags & CreateFlags.AutoIncPK) == CreateFlags.AutoIncPK));
 				IsAutoGuid = isAuto && ColumnType == typeof(Guid);
-				IsAutoInc = isAuto && !IsAutoGuid;
+				IsAutoInc = isAuto && !IsAutoGuid || isAuto;
 
 				Indices = Orm.GetIndices(prop);
 				if (!Indices.Any()

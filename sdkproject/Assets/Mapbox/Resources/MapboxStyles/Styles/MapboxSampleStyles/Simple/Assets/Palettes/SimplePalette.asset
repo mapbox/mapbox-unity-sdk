@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 324a61621a4444024b4a9423715bd22b, type: 3}
+  m_Name: SimplePalette
+  m_EditorClassIdentifier: 
+  m_numColors: 9
+  m_keyColor: {r: 0.8161765, g: 0.69962716, b: 0.5521194, a: 1}
+  m_colors:
+  - {r: 0.6328619, g: 0.49346206, b: 0.44425955, a: 1}
+  - {r: 0.6985294, g: 0.6954592, b: 0.64716697, a: 1}
+  - {r: 0.93227565, g: 0.9338235, b: 0.9269572, a: 1}
+  - {r: 0.8897059, g: 0.70093226, b: 0.50373054, a: 1}
+  - {r: 0.5068123, g: 0.56482077, b: 0.63235295, a: 1}
+  - {r: 0.58965516, g: 0.50580156, b: 0.48993406, a: 1}
+  - {r: 0.866, g: 0.628776, b: 0.527394, a: 1}
+  - {r: 0.9191176, g: 0.8699924, b: 0.7096129, a: 1}
+  - {r: 0.593929, g: 0.53991795, b: 0.46728235, a: 1}
+  m_hueRange: 0.118
+  m_saturationRange: 0.144
+  m_valueRange: 0.569
+  m_setBaseColor_Override: 0
+  m_setDetailColor1_Override: 0
+  m_setDetailColor2_Override: 1
+  m_baseColor_Override: {r: 1, g: 1, b: 1, a: 1}
+  m_detailColor1_Override: {r: 1, g: 1, b: 1, a: 1}
+  m_detailColor2_Override: {r: 0.934, g: 0.9042066, b: 0.8996618, a: 1}

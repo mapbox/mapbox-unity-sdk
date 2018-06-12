@@ -114,7 +114,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
-
 		public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
 		{
 			_counter = feature.Points.Count;

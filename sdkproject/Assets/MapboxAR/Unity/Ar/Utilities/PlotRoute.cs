@@ -30,7 +30,7 @@
 		int _currentIndex = 0;
 		float _sqDistance;
 		Vector3 _lastPosition;
-		bool _isStable;
+		bool _isStable = false;
 
 		void Awake()
 		{

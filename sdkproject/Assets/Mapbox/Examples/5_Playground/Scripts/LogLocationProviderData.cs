@@ -35,13 +35,21 @@ namespace Mapbox.Examples.Scripts
 			{
 				_logToggle.onValueChanged.AddListener((isOn) => { _logToFile = isOn; });
 			}
+			else
+			{
+				Debug.LogError("no logtoggle attached, cannot log");
+			}
+			if (null == _logText)
+			{
+				Debug.LogError("no text to log to");
+			}
 		}
 
 
 		void OnDestroy()
 		{
-			LocationProviderFactory.Instance.DefaultLocationProvider.OnLocationUpdated -= LocationProvider_OnLocationUpdated;
 			closeLogWriter();
+			LocationProviderFactory.Instance.DefaultLocationProvider.OnLocationUpdated -= LocationProvider_OnLocationUpdated;
 		}
 
 
@@ -64,9 +72,13 @@ namespace Mapbox.Examples.Scripts
 			sb.AppendLine(string.Format(_invariantCulture, "device orientation: {0:0.0}°", location.DeviceOrientation));
 			sb.AppendLine(nullableAsStr<float>(location.SpeedKmPerHour, "speed: {0:0.0}km/h"));
 			sb.AppendLine(nullableAsStr<bool>(location.HasGpsFix, "HasGpsFix: {0}"));
-			sb.AppendLine(nullableAsStr<int>(location.SatellitesUsed, "SatellitesUsed:{0} ") + nullableAsStr<int>(location.SatellitesInView, "SatellitesInView:{0}"));
+			sb.AppendLine(nullableAsStr<int>(location.SatellitesUsed, "SatellitesUsed:{0} "));
+			sb.AppendLine(nullableAsStr<int>(location.SatellitesInView, "SatellitesInView:{0}"));
 
-			_logText.text = sb.ToString();
+			if (null != _logText)
+			{
+				_logText.text = sb.ToString();
+			}
 
 
 			/////////////// file logging //////////////////////
@@ -74,6 +86,7 @@ namespace Mapbox.Examples.Scripts
 			// start logging to file
 			if (_logToFile && null == _logWriter)
 			{
+				Debug.Log("--- about to start logging to file ---");
 				_logWriter = new LocationLogWriter();
 				_logToggle.GetComponentInChildren<Text>().text = "stop logging";
 			}
@@ -82,7 +95,7 @@ namespace Mapbox.Examples.Scripts
 			// stop logging to file
 			if (!_logToFile && null != _logWriter)
 			{
-				Debug.Log("stop logging to file");
+				Debug.Log("--- about to stop logging to file ---");
 				_logToggle.GetComponentInChildren<Text>().text = "start logging";
 				closeLogWriter();
 			}

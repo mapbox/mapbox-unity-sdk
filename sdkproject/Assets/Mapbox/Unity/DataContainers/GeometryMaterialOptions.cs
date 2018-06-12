@@ -3,7 +3,6 @@
 	using System;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
 	using Mapbox.Unity.MeshGeneration.Data;
-	using UnityEngine;
 
 	[Serializable]
 	public class GeometryMaterialOptions : ModifierProperties
@@ -15,6 +14,9 @@
 				return typeof(MaterialModifier);
 			}
 		}
+
+		public StyleTypes style;
+
 		public UvMapType texturingType = UvMapType.Tiled;
 		public MaterialList[] materials = new MaterialList[2];
 		public AtlasInfo atlasInfo;
@@ -38,7 +40,9 @@
 				return typeof(UvModifier);
 			}
 		}
+		public StyleTypes style;
 		public UvMapType texturingType = UvMapType.Tiled;
 		public AtlasInfo atlasInfo;
 	}
+
 }
