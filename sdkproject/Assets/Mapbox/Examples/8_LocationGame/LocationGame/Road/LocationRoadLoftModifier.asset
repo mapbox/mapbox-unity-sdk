@@ -9,7 +9,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 634e53b543236f246833fc88fea03aa0, type: 3}
-  m_Name: LoftModifier
+  m_Name: LocationRoadLoftModifier
   m_EditorClassIdentifier: 
   Active: 1
   Slice: {fileID: 1161984165156050, guid: a89fda20d92b63e46ab2900a8e978041, type: 2}

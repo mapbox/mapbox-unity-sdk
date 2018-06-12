@@ -69,6 +69,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			var wallTri = new List<int>();
 			var wallUv = new List<Vector2>();
 			meshData.Vertices.Add(new Vector3(meshData.Vertices[originalVertexCount - 1].x, meshData.Vertices[originalVertexCount - 1].y - hf, meshData.Vertices[originalVertexCount - 1].z));
+			meshData.Tangents.Add(meshData.Tangents[originalVertexCount - 1]);
 			wallUv.Add(new Vector2(0, -hf));
 			meshData.Normals.Add(meshData.Normals[originalVertexCount - 1]);
 
@@ -86,6 +87,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				meshData.Normals.Add(meshData.Normals[meshData.Edges[i + 1]]);
 				meshData.Normals.Add(meshData.Normals[meshData.Edges[i]]);
 				meshData.Normals.Add(meshData.Normals[meshData.Edges[i + 1]]);
+
+				meshData.Tangents.Add(v2 - v1.normalized);
+				meshData.Tangents.Add(v2 - v1.normalized);
+				meshData.Tangents.Add(v2 - v1.normalized);
+				meshData.Tangents.Add(v2 - v1.normalized);
 
 				d = (v2 - v1).magnitude;
 
@@ -152,6 +158,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			List<Vector2> newUV = new List<Vector2>();
 			md.Normals.Clear();
 			md.Edges.Clear();
+			md.Tangents.Clear();
 
 			for (int t = 0; t < md.Triangles[0].Count; t++)
 			{
@@ -180,6 +187,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						md.Normals.Add(md.Normals[cst]);
 						md.Normals.Add(md.Normals[cst + 1]);
 						md.Normals.Add(md.Normals[cst + 2]);
+
+						md.Tangents.Add(md.Tangents[cst]);
+						md.Tangents.Add(md.Tangents[cst + 1]);
+						md.Tangents.Add(md.Tangents[cst + 2]);
+
 						continue;
 					}
 
@@ -234,12 +246,17 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					}
 
 					newVertices.Add(new Vector3(poi.x, poi.y + _offset + md.Vertices[current].y, poi.z));
-
 					newVertices.Add(md.Vertices[current] + v1);
 					newVertices.Add(md.Vertices[current] - v2);
+
 					md.Normals.Add(Constants.Math.Vector3Up);
 					md.Normals.Add(-n1);
 					md.Normals.Add(-n2);
+
+					md.Tangents.Add(v1 - v2);
+					md.Tangents.Add(v1 - v2);
+					md.Tangents.Add(v1 - v2);
+
 					newUV.Add(md.UV[0][current]);
 					newUV.Add(md.UV[0][current]);
 					newUV.Add(md.UV[0][current]);
