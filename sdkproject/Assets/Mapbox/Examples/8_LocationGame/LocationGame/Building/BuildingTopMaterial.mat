@@ -63,7 +63,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Texture:
-        m_Texture: {fileID: 2800000, guid: 1cd3051fbf6150c46bbb8d117deb860b, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _texcoord:
@@ -76,7 +76,7 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _EmissionPower: 0
-    - _FadeEnd: 32.66
+    - _FadeEnd: 55
     - _FadeMax: 0
     - _GlossMapScale: 1
     - _Glossiness: 0.5
@@ -89,13 +89,13 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _Tile: 2.8
+    - _Tile: 0
     - _UVSec: 0
     - _WallOffset: 0
     - _ZWrite: 1
     - __dirty: 0
     m_Colors:
     - _BaseColor: {r: 0.125, g: 0.113970585, b: 0.113970585, a: 0}
-    - _CharacterPosition: {r: -0.07871786, g: 0, b: -0.05342651, a: 0}
-    - _Color: {r: 0.17647058, g: 0.10362086, b: 0.0064878846, a: 0}
+    - _CharacterPosition: {r: -0.7075575, g: 0, b: -0.48022854, a: 0}
+    - _Color: {r: 0, g: 0.037068963, b: 0.125, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

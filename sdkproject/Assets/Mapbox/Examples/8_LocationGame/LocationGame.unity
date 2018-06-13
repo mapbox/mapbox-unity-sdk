@@ -385,7 +385,7 @@ MonoBehaviour:
       vectorSubLayers:
       - coreOptions:
           sourceId: 
-          isActive: 0
+          isActive: 1
           sublayerName: Buildings
           geometryType: 2
           layerName: building
@@ -442,7 +442,7 @@ MonoBehaviour:
           propertyName: height
           propertyDescription: Number. Height of building or part of building.
           minimumHeight: 3
-          maximumHeight: 0.2
+          maximumHeight: 0.5
           extrusionScaleFactor: 1
         colliderOptions:
           colliderType: 2
@@ -463,190 +463,6 @@ MonoBehaviour:
         GoModifiers:
         - {fileID: 11400000, guid: 3505ec4e61e3f4c4d88fc3c5548e7144, type: 2}
         - {fileID: 11400000, guid: e425dc440a40d9a4080794105e9f66ef, type: 2}
-      - coreOptions:
-          sourceId: 
-          isActive: 0
-          sublayerName: TrafficLow
-          geometryType: 1
-          layerName: traffic
-          snapToTerrain: 1
-          groupFeatures: 0
-          lineWidth: 8
-        filterOptions:
-          _selectedLayerName: traffic
-          filters:
-          - Key: congestion
-            KeyDescription: 'Congestion severity. One of: ''low'', ''moderate'', ''heavy'',
-              ''severe'''
-            PropertyValue: low
-            Min: 0
-            Max: 0
-            filterOperator: 0
-          combinerType: 0
-        extrusionOptions:
-          _selectedLayerName: traffic
-          extrusionType: 5
-          extrusionGeometryType: 1
-          propertyName: height
-          propertyDescription: Number. Height of building or part of building.
-          minimumHeight: 3
-          maximumHeight: 0.2
-          extrusionScaleFactor: 1
-        colliderOptions:
-          colliderType: 0
-        materialOptions:
-          style: 0
-          texturingType: 0
-          materials:
-          - Materials:
-            - {fileID: 0}
-          - Materials:
-            - {fileID: 0}
-          atlasInfo: {fileID: 0}
-          colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 0
-        buildingsWithUniqueIds: 0
-        moveFeaturePositionTo: 0
-        MeshModifiers: []
-        GoModifiers: []
-      - coreOptions:
-          sourceId: 
-          isActive: 0
-          sublayerName: TrafficMid
-          geometryType: 1
-          layerName: traffic
-          snapToTerrain: 1
-          groupFeatures: 0
-          lineWidth: 8
-        filterOptions:
-          _selectedLayerName: traffic
-          filters:
-          - Key: congestion
-            KeyDescription: 'Congestion severity. One of: ''low'', ''moderate'', ''heavy'',
-              ''severe'''
-            PropertyValue: moderate
-            Min: 0
-            Max: 0
-            filterOperator: 0
-          combinerType: 0
-        extrusionOptions:
-          _selectedLayerName: traffic
-          extrusionType: 5
-          extrusionGeometryType: 1
-          propertyName: height
-          propertyDescription: Number. Height of building or part of building.
-          minimumHeight: 3
-          maximumHeight: 0.2
-          extrusionScaleFactor: 1
-        colliderOptions:
-          colliderType: 0
-        materialOptions:
-          style: 0
-          texturingType: 0
-          materials:
-          - Materials:
-            - {fileID: 0}
-          - Materials:
-            - {fileID: 0}
-          atlasInfo: {fileID: 0}
-          colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 0
-        buildingsWithUniqueIds: 0
-        moveFeaturePositionTo: 0
-        MeshModifiers: []
-        GoModifiers: []
-      - coreOptions:
-          sourceId: 
-          isActive: 0
-          sublayerName: TrafficHeavy
-          geometryType: 1
-          layerName: traffic
-          snapToTerrain: 1
-          groupFeatures: 0
-          lineWidth: 8
-        filterOptions:
-          _selectedLayerName: traffic
-          filters:
-          - Key: congestion
-            KeyDescription: 'Congestion severity. One of: ''low'', ''moderate'', ''heavy'',
-              ''severe'''
-            PropertyValue: heavy
-            Min: 0
-            Max: 0
-            filterOperator: 0
-          combinerType: 0
-        extrusionOptions:
-          _selectedLayerName: traffic
-          extrusionType: 5
-          extrusionGeometryType: 1
-          propertyName: height
-          propertyDescription: Number. Height of building or part of building.
-          minimumHeight: 3
-          maximumHeight: 0.2
-          extrusionScaleFactor: 1
-        colliderOptions:
-          colliderType: 0
-        materialOptions:
-          style: 0
-          texturingType: 0
-          materials:
-          - Materials:
-            - {fileID: 2100000, guid: 5ac0ac96d738c0845b30185d2838f299, type: 2}
-          - Materials:
-            - {fileID: 0}
-          atlasInfo: {fileID: 0}
-          colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 0
-        buildingsWithUniqueIds: 0
-        moveFeaturePositionTo: 0
-        MeshModifiers: []
-        GoModifiers: []
-      - coreOptions:
-          sourceId: 
-          isActive: 0
-          sublayerName: TrafficSevere
-          geometryType: 1
-          layerName: traffic
-          snapToTerrain: 1
-          groupFeatures: 0
-          lineWidth: 8
-        filterOptions:
-          _selectedLayerName: traffic
-          filters:
-          - Key: congestion
-            KeyDescription: 'Congestion severity. One of: ''low'', ''moderate'', ''heavy'',
-              ''severe'''
-            PropertyValue: severe
-            Min: 0
-            Max: 0
-            filterOperator: 0
-          combinerType: 0
-        extrusionOptions:
-          _selectedLayerName: traffic
-          extrusionType: 5
-          extrusionGeometryType: 1
-          propertyName: height
-          propertyDescription: Number. Height of building or part of building.
-          minimumHeight: 3
-          maximumHeight: 0.2
-          extrusionScaleFactor: 1
-        colliderOptions:
-          colliderType: 0
-        materialOptions:
-          style: 0
-          texturingType: 0
-          materials:
-          - Materials:
-            - {fileID: 0}
-          - Materials:
-            - {fileID: 0}
-          atlasInfo: {fileID: 0}
-          colorPalette: {fileID: 0}
-        honorBuildingIdSetting: 0
-        buildingsWithUniqueIds: 0
-        moveFeaturePositionTo: 0
-        MeshModifiers: []
-        GoModifiers: []
       - coreOptions:
           sourceId: 
           isActive: 1
@@ -735,7 +551,7 @@ MonoBehaviour:
         - {fileID: 11400000, guid: 5ad7c36a7a62f8b4cbcbcea8139a12a5, type: 2}
       - coreOptions:
           sourceId: 
-          isActive: 1
+          isActive: 0
           sublayerName: b2
           geometryType: 3
           layerName: building
@@ -849,6 +665,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff26db721962cdf4a8edcdfa9a767d2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  profile: {fileID: 0}
 --- !u!81 &234181017
 AudioListener:
   m_ObjectHideFlags: 0
