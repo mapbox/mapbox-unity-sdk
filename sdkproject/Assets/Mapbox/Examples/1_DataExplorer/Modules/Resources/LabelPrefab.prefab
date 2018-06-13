@@ -116,12 +116,12 @@ TextMesh:
   m_GameObject: {fileID: 1961071164979864}
   m_Text: 
   m_OffsetZ: 0
-  m_CharacterSize: 1
+  m_CharacterSize: 2
   m_LineSpacing: 1
   m_Anchor: 4
   m_Alignment: 1
   m_TabSize: 4
-  m_FontSize: 300
+  m_FontSize: 200
   m_FontStyle: 0
   m_RichText: 1
   m_Font: {fileID: 12800000, guid: 218956a5c2a6e42d6a60afccf80b002b, type: 3}
@@ -151,8 +151,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9b2b4cc337b3479a9f4365ea51ff65c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pixelSize: 1
-  outlineColor: {r: 0, g: 0, b: 0, a: 1}
+  pixelSize: 3
+  outlineColor: {r: 0.16911763, g: 0.16911763, b: 0.16911763, a: 0.497}
   resolutionDependant: 0
   doubleResolution: 1024
 --- !u!114 &114543158922302552
