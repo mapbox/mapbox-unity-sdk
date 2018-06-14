@@ -19,7 +19,8 @@
 	{
 		private List<string> _latLonToSpawn;
 
-		private Dictionary<GameObject, GameObject> _objects;
+		private Dictionary<ulong, GameObject> _objects;
+		private GameObject _poolGameObject;
 		[SerializeField]
 		private SpawnPrefabOptions _options;
 		private List<GameObject> _prefabList = new List<GameObject>();
@@ -50,7 +51,8 @@
 			}
 			if (_objects == null)
 			{
-				_objects = new Dictionary<GameObject, GameObject>();
+				_objects = new Dictionary<ulong, GameObject>();
+				_poolGameObject = new GameObject("_inactive_prefabs_pool");
 			}
 			_latLonToSpawn = new List<string>(_prefabLocations);
 		}
@@ -137,17 +139,22 @@
 
 		private void SpawnPrefab(VectorEntity ve, UnityTile tile)
 		{
-			GameObject go = new GameObject();
+			Debug.Log(ve.Feature.Data.Id.ToString());
 
-			if (_objects.ContainsKey(ve.GameObject))
+			GameObject go;
+
+			var featureId = ve.Feature.Data.Id;
+			if (_objects.ContainsKey(featureId))
 			{
-				go = _objects[ve.GameObject];
+				go = _objects[featureId];
+				go.SetActive(true);
+				go.transform.SetParent(ve.GameObject.transform, false);
 			}
 			else
 			{
 				go = Instantiate(_options.prefab);
 				_prefabList.Add(go);
-				_objects.Add(ve.GameObject, go);
+				_objects.Add(featureId, go);
 				go.transform.SetParent(ve.GameObject.transform, false);
 			}
 
@@ -161,6 +168,7 @@
 
 		public void PositionScaleRectTransform(VectorEntity ve, UnityTile tile, GameObject go)
 		{
+			go.transform.localScale = _options.prefab.transform.localScale;
 			RectTransform goRectTransform;
 			IFeaturePropertySettable settable = null;
 			var centroidVector = new Vector3();
@@ -207,6 +215,11 @@
 				return false;
 			}
 
+			if (_objects.ContainsKey(feature.Data.Id))
+			{
+				return true;
+			}
+
 			foreach (var point in _latLonToSpawn)
 			{
 				var coord = Conversions.StringToLatLon(point);
@@ -218,6 +231,22 @@
 			}
 
 			return false;
+		}
+		public override void OnPoolItem(VectorEntity vectorEntity)
+		{
+			Debug.Log("destroying");
+
+			base.OnPoolItem(vectorEntity);
+			var featureId = vectorEntity.Feature.Data.Id;
+
+			if (!_objects.ContainsKey(featureId))
+			{
+				return;
+			}
+
+			var go = _objects[featureId];
+			go.SetActive(false);
+			go.transform.SetParent(_poolGameObject.transform, false);
 		}
 	}
 }
