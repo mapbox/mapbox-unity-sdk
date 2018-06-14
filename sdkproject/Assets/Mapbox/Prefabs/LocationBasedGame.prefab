@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 114140835023345716}
   - component: {fileID: 114668955501623132}
   m_Layer: 0
-  m_Name: Player
+  m_Name: PlayerTarget
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -713,12 +713,12 @@ MonoBehaviour:
     loadingTexture: {fileID: 2800000, guid: e2896a92727704803a9c422b043eae89, type: 3}
   _imagery:
     _layerProperty:
-      sourceType: 0
+      sourceType: 2
       sourceOptions:
         isActive: 1
         layerSource:
           Name: Streets
-          Id: mapbox://styles/mapbox/streets-v10
+          Id: mapbox://styles/mapbox/dark-v9
           Modified: 
           UserName: 
       rasterOptions:
@@ -761,8 +761,11 @@ MonoBehaviour:
         - airport_label
         - barrier_line
         - building
+        - contour
         - country_label
+        - hillshade
         - housenum_label
+        - landcover
         - landuse
         - landuse_overlay
         - marine_label
@@ -774,16 +777,17 @@ MonoBehaviour:
         - road
         - road_label
         - state_label
+        - traffic
         - water
         - water_label
         - waterway
         - waterway_label
-      _sourceType: 1
+      _sourceType: 3
       sourceOptions:
-        isActive: 1
+        isActive: 0
         layerSource:
           Name: Mapbox Terrain
-          Id: mapbox.mapbox-streets-v7
+          Id: mapbox.3d-buildings,mapbox.mapbox-streets-v7,mapbox.mapbox-traffic-v1,mapbox.mapbox-terrain-v2
           Modified: 
           UserName: 
       useOptimizedStyle: 0
@@ -817,7 +821,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1514120829208204}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: beed7ad1e12d3434a943d5fb6807cb6d, type: 3}
+  m_Script: {fileID: 11500000, guid: c34c76d6349bc9844998f48d16f0d3bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _accuracy: 1
