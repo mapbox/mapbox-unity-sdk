@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/MapboxAR-HoloLens/Scenes/HoloLens-01.unity
-    guid: d8d3f90a10390b743b4d6abeb15d4bae
+    path: Assets/MapboxAR-HoloLens/Scenes/HoloLens-02.unity
+    guid: a70b961afdf004c47a9e9969796aaf0c
   m_configObjects: {}
