@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 634e53b543236f246833fc88fea03aa0, type: 3}
+  m_Name: BuildingLoft
+  m_EditorClassIdentifier: 
+  Active: 1
+  Slice: {fileID: 1365784337168304, guid: 227fb7e837f3d3f499f9ba6c019aebd6, type: 2}
+  _closeEdges: 1
