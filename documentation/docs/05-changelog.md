@@ -1,4 +1,10 @@
 ## CHANGELOG
+
+ ### v.1.4.x
+ 
+##### Bug Fixes
+- Fix issue where POI Locations only appear when layers exist in the `Map Features` section.
+
  ### v.1.4.3
 *05/29/2018*
 ##### New Features

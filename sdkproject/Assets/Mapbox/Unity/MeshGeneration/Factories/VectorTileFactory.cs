@@ -107,7 +107,7 @@
 
 		protected override void OnRegistered(UnityTile tile)
 		{
-			if (string.IsNullOrEmpty(MapId) || _properties.sourceOptions.isActive == false || _properties.vectorSubLayers.Count == 0)
+			if (string.IsNullOrEmpty(MapId) || _properties.sourceOptions.isActive == false || (_properties.vectorSubLayers.Count + _properties.locationPrefabList.Count) == 0)
 			{
 				// Do nothing; 
 				Progress++;
