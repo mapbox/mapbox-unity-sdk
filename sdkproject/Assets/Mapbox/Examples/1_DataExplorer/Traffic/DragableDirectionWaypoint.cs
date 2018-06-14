@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class DragableDirectionWaypoint : MonoBehaviour
 {
+	public Transform MoveTarget;
 	private Vector3 screenPoint;
 	private Vector3 offset;
 	private Plane _yPlane;
@@ -19,7 +20,7 @@ public class DragableDirectionWaypoint : MonoBehaviour
 		float enter = 0.0f;
 		if (_yPlane.Raycast(ray, out enter))
 		{
-			transform.position = ray.GetPoint(enter);
+			MoveTarget.position = ray.GetPoint(enter);
 		}
 	}
 }

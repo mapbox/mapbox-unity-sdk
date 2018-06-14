@@ -9,8 +9,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 634e53b543236f246833fc88fea03aa0, type: 3}
-  m_Name: BuildingLoft
+  m_Name: DirectionLoft
   m_EditorClassIdentifier: 
   Active: 1
-  Slice: {fileID: 1365784337168304, guid: 227fb7e837f3d3f499f9ba6c019aebd6, type: 2}
-  _closeEdges: 1
+  Slice: {fileID: 1580225070089920, guid: 10bc3919f3bb2d5498f03226ee189f43, type: 2}
+  _closeEdges: 0

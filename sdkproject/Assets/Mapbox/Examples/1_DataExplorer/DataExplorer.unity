@@ -1474,7 +1474,7 @@ MonoBehaviour:
         GoModifiers: []
       - coreOptions:
           sourceId: 
-          isActive: 1
+          isActive: 0
           sublayerName: LowTrafficCongestion
           geometryType: 1
           layerName: traffic
@@ -1520,7 +1520,7 @@ MonoBehaviour:
         GoModifiers: []
       - coreOptions:
           sourceId: 
-          isActive: 1
+          isActive: 0
           sublayerName: ModerateTrafficCongestion
           geometryType: 1
           layerName: traffic
@@ -1566,7 +1566,7 @@ MonoBehaviour:
         GoModifiers: []
       - coreOptions:
           sourceId: 
-          isActive: 1
+          isActive: 0
           sublayerName: HeavyTrafficCongestion
           geometryType: 1
           layerName: traffic
@@ -1612,7 +1612,7 @@ MonoBehaviour:
         GoModifiers: []
       - coreOptions:
           sourceId: 
-          isActive: 1
+          isActive: 0
           sublayerName: SevereTrafficCongestion
           geometryType: 1
           layerName: traffic

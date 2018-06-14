@@ -42,8 +42,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				_map = FindObjectOfType<AbstractMap>();
 			}
 			_directions = MapboxAccess.Instance.Directions;
-			//_map.OnInitialized += Query;
-			//_map.OnUpdated += Query;
+			_map.OnInitialized += Query;
+			_map.OnUpdated += Query;
 		}
 
 		public void Start()
@@ -54,6 +54,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				_cachedWaypoints.Add(item.position);
 			}
 			_recalculateNext = false;
+
+			foreach (var modifier in MeshModifiers)
+			{
+				modifier.Initialize();
+			}
 
 			StartCoroutine(QueryTimer());
 		}
@@ -94,6 +99,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				if (_recalculateNext)
 				{
 					Query();
+					_recalculateNext = false;
 				}
 			}
 		}
