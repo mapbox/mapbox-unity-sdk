@@ -4,4 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/MapboxAR-HoloLens/Scenes/HoloLens-01.unity
+    guid: d8d3f90a10390b743b4d6abeb15d4bae
+  m_configObjects: {}
