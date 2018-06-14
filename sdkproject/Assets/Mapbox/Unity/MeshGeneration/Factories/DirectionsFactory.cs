@@ -18,16 +18,18 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		[SerializeField]
 		MeshModifier[] MeshModifiers;
+		[SerializeField]
+		Material _material;
 
 		[SerializeField]
 		Transform[] _waypoints;
 		private List<Vector3> _cachedWaypoints;
 
 		[SerializeField]
-		Material _material;
+		[Range(1,10)]
+		private float UpdateFrequency = 2;
 
-		[SerializeField]
-		float _directionsLineWidth;
+		
 
 		private Directions _directions;
 		private int _counter;
@@ -86,7 +88,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			while (true)
 			{
-				yield return new WaitForSeconds(2);
+				yield return new WaitForSeconds(UpdateFrequency);
 				for (int i = 0; i < _waypoints.Length; i++)
 				{
 					if (_waypoints[i].position != _cachedWaypoints[i])
@@ -123,11 +125,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			foreach (MeshModifier mod in MeshModifiers.Where(x => x.Active))
 			{
-				var lineMod = mod as LineMeshModifier;
-				if (lineMod != null)
-				{
-					lineMod.Width = _directionsLineWidth / _map.WorldRelativeScale;
-				}
 				mod.Run(feat, meshData, _map.WorldRelativeScale);
 			}
 

@@ -1738,11 +1738,11 @@ MonoBehaviour:
   _map: {fileID: 110210642}
   MeshModifiers:
   - {fileID: 11400000, guid: 72a54fd58e79618408c60d91df61d553, type: 2}
+  _material: {fileID: 2100000, guid: 49b5d148287c83443bd632e6d5b5bd6f, type: 2}
   _waypoints:
   - {fileID: 1684020941}
   - {fileID: 1560654209}
-  _material: {fileID: 2100000, guid: 49b5d148287c83443bd632e6d5b5bd6f, type: 2}
-  _directionsLineWidth: 0
+  UpdateFrequency: 1
 --- !u!4 &580700370
 Transform:
   m_ObjectHideFlags: 0
