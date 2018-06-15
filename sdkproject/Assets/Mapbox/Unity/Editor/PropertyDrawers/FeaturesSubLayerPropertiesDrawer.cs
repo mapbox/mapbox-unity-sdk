@@ -349,7 +349,7 @@
 			EditorGUI.indentLevel++;
 			if (ShowOthers)
 			{
-				if (primitiveTypeProp == VectorPrimitiveType.Polygon && sourceType != VectorSourceType.MapboxStreets)
+				if ((primitiveTypeProp == VectorPrimitiveType.Polygon || primitiveTypeProp == VectorPrimitiveType.Custom) && sourceType != VectorSourceType.MapboxStreets)
 				{
 					EditorGUI.indentLevel--;
 					layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue = true;
