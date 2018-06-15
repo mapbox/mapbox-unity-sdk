@@ -168,8 +168,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				}
 
 				//this first loop is for columns
-
-
 				if (_separateSubmesh)
 				{
 					md.Triangles.Add(wallTriangles);
@@ -459,7 +457,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					case ExtrusionType.AbsoluteHeight:
 						for (int i = 0; i < _counter; i++)
 						{
-							md.Vertices[i] = new Vector3(md.Vertices[i].x, maxHeight, md.Vertices[i].z);
+							md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + maxHeight, md.Vertices[i].z);
 						}
 						break;
 					default:
