@@ -77,6 +77,22 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1161883305855374
+GameObject:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4855030733565386}
+  - component: {fileID: 114503416500697234}
+  m_Layer: 0
+  m_Name: EditorLocationProvider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1317352403415316
 GameObject:
   m_ObjectHideFlags: 0
@@ -386,7 +402,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1914554019858210}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -18.677399, y: 12.257265, z: 21.646572}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4857128744900630}
@@ -394,6 +410,7 @@ Transform:
   - {fileID: 4109422646323390}
   - {fileID: 4730853386710314}
   - {fileID: 4684202510553644}
+  - {fileID: 4855030733565386}
   m_Father: {fileID: 4886150424162858}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -474,6 +491,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4857128744900630}
   m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4855030733565386
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1161883305855374}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4556514920020454}
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4857128744900630
 Transform:
@@ -713,12 +743,12 @@ MonoBehaviour:
     loadingTexture: {fileID: 2800000, guid: e2896a92727704803a9c422b043eae89, type: 3}
   _imagery:
     _layerProperty:
-      sourceType: 2
+      sourceType: 0
       sourceOptions:
         isActive: 1
         layerSource:
           Name: Streets
-          Id: mapbox://styles/mapbox/dark-v9
+          Id: mapbox://styles/mapbox/streets-v10
           Modified: 
           UserName: 
       rasterOptions:
@@ -825,10 +855,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _accuracy: 1
-  _autoFireEvent: 1
+  _autoFireEvent: 0
   _updateInterval: 0.1
   _sendEvent: 0
-  _locationLogFile: {fileID: 4900000, guid: 5e6bb7224cef35c4788a4817b1c9778d, type: 3}
+  _locationLogFile: {fileID: 4900000, guid: 20a0b399820a344d18ef679c7f4ceb3a, type: 3}
 --- !u!114 &114330636339840990
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -881,9 +911,26 @@ MonoBehaviour:
   mapManager: {fileID: 114105500206378512}
   _deviceLocationProviderUnity: {fileID: 114811608996724456}
   _deviceLocationProviderAndroid: {fileID: 114352101756843672}
-  _editorLocationProvider: {fileID: 114275890671072080}
+  _editorLocationProvider: {fileID: 114503416500697234}
   _transformLocationProvider: {fileID: 114011132729224596}
   _dontDestroyOnLoad: 0
+--- !u!114 &114503416500697234
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1161883305855374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60712efc3153a4819b0c79437175846d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _accuracy: 2
+  _autoFireEvent: 1
+  _updateInterval: 0.1
+  _sendEvent: 0
+  _latitudeLongitude: 37.784179, -122.401583
+  _targetTransform: {fileID: 0}
 --- !u!114 &114658503893516242
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -896,7 +943,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _accuracy: 5
-  _autoFireEvent: 1
+  _autoFireEvent: 0
   _updateInterval: 1
   _sendEvent: 0
   _latitudeLongitude:
