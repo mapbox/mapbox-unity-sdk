@@ -10,7 +10,6 @@
 	using Mapbox.VectorTile.Geometry;
 	using Mapbox.Unity.MeshGeneration.Interfaces;
 
-
 	/// <summary>
 	/// ReplaceBuildingFeatureModifier takes in POIs and checks if the feature layer has those points and deletes them
 	/// </summary>
@@ -31,6 +30,9 @@
 
 		[SerializeField]
 		private List<string> _explicitlyBlockedFeatureIds;
+		//maximum distance to trigger feature replacement ( in tile space )
+		private const float _maxDistanceToBlockFeature_tilespace = 1000f;
+
 		/// <summary>
 		/// List of featureIds to test against. 
 		/// We need a list of featureIds per location. 
@@ -110,6 +112,13 @@
 								{
 									return true;
 								}
+							}
+
+							var from = Conversions.LatitudeLongitudeToVectorTilePosition(Conversions.StringToLatLon(point), feature.Tile.InitialZoom);
+							var to = feature.Data.Geometry<float>()[0][0];
+							if( Vector2.SqrMagnitude( new Vector2(from.x, from.y) - new Vector2(to.X, to.Y)) > Math.Pow(_maxDistanceToBlockFeature_tilespace, 2f))
+							{
+								return false;
 							}
 
 							if (feature.Data.Id.ToString().StartsWith(featureId, StringComparison.CurrentCulture))
