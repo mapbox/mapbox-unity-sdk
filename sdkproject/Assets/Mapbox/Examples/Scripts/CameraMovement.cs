@@ -91,8 +91,11 @@ namespace Mapbox.Examples
 				{
 					return;
 				}
-				var zoomFactor = Input.GetAxis("Mouse ScrollWheel") * _zoomSpeed;
-				ZoomMapUsingTouchOrMouse(zoomFactor);
+
+				var x = Input.GetAxis("Horizontal");
+				var z = Input.GetAxis("Vertical");
+				var y = Input.GetAxis("Mouse ScrollWheel") * _zoomSpeed;
+				transform.localPosition += transform.forward * y + (_originalRotation * new Vector3(x * _panSpeed, 0, z * _panSpeed));
 			}
 
 
