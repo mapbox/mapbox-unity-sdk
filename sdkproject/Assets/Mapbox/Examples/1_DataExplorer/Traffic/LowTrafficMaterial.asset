@@ -9,7 +9,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 76c93f3debdba4e48adb1b99cad0a0d2, type: 3}
-  m_Name: ExplorerWhiteMaterialModifier
+  m_Name: LowTrafficMaterial
   m_EditorClassIdentifier: 
   Active: 1
   _options:
@@ -17,8 +17,8 @@ MonoBehaviour:
     texturingType: 0
     materials:
     - Materials:
-      - {fileID: 2100000, guid: 508236771313ff54788fa797ece5c0e8, type: 2}
+      - {fileID: 2100000, guid: 345209cc13279414db9639b2843ac3c1, type: 2}
     - Materials:
-      - {fileID: 2100000, guid: 508236771313ff54788fa797ece5c0e8, type: 2}
+      - {fileID: 0}
     atlasInfo: {fileID: 0}
     colorPalette: {fileID: 0}

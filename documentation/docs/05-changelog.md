@@ -1,9 +1,10 @@
 ## CHANGELOG
-
- ### v.1.4.x
- 
-##### Bug Fixes
-- Fix issue where POI Locations only appear when layers exist in the `Map Features` section.
+### v.1.4.3
+*06/18/2018*
+##### Improvements
+- Added a separate Traffic and Directions demo scene 
+- Changed loft modifier to stretch texture horizontally
+- Changed Directions Factory to check waypoints on timer and recalculate path if there's a chance
 
  ### v.1.4.3
 *05/29/2018*
