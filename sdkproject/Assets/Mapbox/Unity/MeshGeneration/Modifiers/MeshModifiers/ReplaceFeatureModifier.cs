@@ -148,8 +148,6 @@
 
 		private void SpawnPrefab(VectorEntity ve, UnityTile tile)
 		{
-			Debug.Log(ve.Feature.Data.Id.ToString());
-
 			GameObject go;
 
 			var featureId = ve.Feature.Data.Id;
@@ -243,8 +241,6 @@
 		}
 		public override void OnPoolItem(VectorEntity vectorEntity)
 		{
-			Debug.Log("destroying");
-
 			base.OnPoolItem(vectorEntity);
 			var featureId = vectorEntity.Feature.Data.Id;
 
@@ -254,6 +250,11 @@
 			}
 
 			var go = _objects[featureId];
+			if(go == null || _poolGameObject == null)
+			{
+				return;
+			}
+
 			go.SetActive(false);
 			go.transform.SetParent(_poolGameObject.transform, false);
 		}
