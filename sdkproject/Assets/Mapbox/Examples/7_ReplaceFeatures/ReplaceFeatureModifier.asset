@@ -17,3 +17,4 @@ MonoBehaviour:
     scaleDownWithWorld: 1
   _prefabLocations:
   - 37.8024, -122.405833
+  _explicitlyBlockedFeatureIds: []

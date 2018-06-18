@@ -6,6 +6,8 @@
 	{
 		[Multiline(10)]
 		public string Triangles;
+		[Multiline(10)]
+		public string Tangents;
 
 		protected virtual void Start()
 		{
@@ -14,12 +16,15 @@
 			{
 				var mesh = mf.mesh;
 				var verts = mesh.vertices;
+				var tang = mesh.tangents;
 				for (int i = 0; i < verts.Length; i++)
 				{
 					var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 					go.name = i.ToString();
 					go.transform.SetParent(transform, false);
 					go.transform.localPosition = verts[i];
+
+					Debug.DrawLine(transform.position + verts[i], transform.position + verts[i] + new Vector3(tang[i].x, tang[i].y, tang[i].z) * .5f, Color.red, 10000);
 				}
 				var tris = mesh.triangles;
 				Triangles = "";
@@ -27,7 +32,15 @@
 				{
 					Triangles += tris[i] + "," + tris[i + 1] + "," + tris[i + 2] + "\r\n";
 				}
+
+				//var tang = mesh.tangents;
+				//Tangents = "";
+				//for (int i = 0; i < tang.Length; i += 1)
+				//{
+				//	Tangents += tang[i].x + "," + tang[i].y + "," + tang[i].z + "," + tang[i].w + "\r\n";
+				//}
 			}
 		}
+		
 	}
 }
