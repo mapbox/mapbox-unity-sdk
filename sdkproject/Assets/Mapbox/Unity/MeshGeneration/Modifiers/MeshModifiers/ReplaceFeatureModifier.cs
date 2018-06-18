@@ -10,7 +10,6 @@
 	using Mapbox.VectorTile.Geometry;
 	using Mapbox.Unity.MeshGeneration.Interfaces;
 
-
 	/// <summary>
 	/// ReplaceBuildingFeatureModifier takes in POIs and checks if the feature layer has those points and deletes them
 	/// </summary>
@@ -19,7 +18,8 @@
 	{
 		private List<string> _latLonToSpawn;
 
-		private Dictionary<GameObject, GameObject> _objects;
+		private Dictionary<ulong, GameObject> _objects;
+		private GameObject _poolGameObject;
 		[SerializeField]
 		private SpawnPrefabOptions _options;
 		private List<GameObject> _prefabList = new List<GameObject>();
@@ -30,6 +30,9 @@
 
 		[SerializeField]
 		private List<string> _explicitlyBlockedFeatureIds;
+		//maximum distance to trigger feature replacement ( in tile space )
+		private const float _maxDistanceToBlockFeature_tilespace = 1000f;
+
 		/// <summary>
 		/// List of featureIds to test against. 
 		/// We need a list of featureIds per location. 
@@ -50,7 +53,8 @@
 			}
 			if (_objects == null)
 			{
-				_objects = new Dictionary<GameObject, GameObject>();
+				_objects = new Dictionary<ulong, GameObject>();
+				_poolGameObject = new GameObject("_inactive_prefabs_pool");
 			}
 			_latLonToSpawn = new List<string>(_prefabLocations);
 		}
@@ -110,6 +114,13 @@
 								}
 							}
 
+							var from = Conversions.LatitudeLongitudeToVectorTilePosition(Conversions.StringToLatLon(point), feature.Tile.InitialZoom);
+							var to = feature.Data.Geometry<float>()[0][0];
+							if( Vector2.SqrMagnitude( new Vector2(from.x, from.y) - new Vector2(to.X, to.Y)) > Math.Pow(_maxDistanceToBlockFeature_tilespace, 2f))
+							{
+								return false;
+							}
+
 							if (feature.Data.Id.ToString().StartsWith(featureId, StringComparison.CurrentCulture))
 							{
 								return true;
@@ -137,17 +148,20 @@
 
 		private void SpawnPrefab(VectorEntity ve, UnityTile tile)
 		{
-			GameObject go = new GameObject();
+			GameObject go;
 
-			if (_objects.ContainsKey(ve.GameObject))
+			var featureId = ve.Feature.Data.Id;
+			if (_objects.ContainsKey(featureId))
 			{
-				go = _objects[ve.GameObject];
+				go = _objects[featureId];
+				go.SetActive(true);
+				go.transform.SetParent(ve.GameObject.transform, false);
 			}
 			else
 			{
 				go = Instantiate(_options.prefab);
 				_prefabList.Add(go);
-				_objects.Add(ve.GameObject, go);
+				_objects.Add(featureId, go);
 				go.transform.SetParent(ve.GameObject.transform, false);
 			}
 
@@ -161,6 +175,7 @@
 
 		public void PositionScaleRectTransform(VectorEntity ve, UnityTile tile, GameObject go)
 		{
+			go.transform.localScale = _options.prefab.transform.localScale;
 			RectTransform goRectTransform;
 			IFeaturePropertySettable settable = null;
 			var centroidVector = new Vector3();
@@ -207,6 +222,11 @@
 				return false;
 			}
 
+			if (_objects.ContainsKey(feature.Data.Id))
+			{
+				return true;
+			}
+
 			foreach (var point in _latLonToSpawn)
 			{
 				var coord = Conversions.StringToLatLon(point);
@@ -218,6 +238,25 @@
 			}
 
 			return false;
+		}
+		public override void OnPoolItem(VectorEntity vectorEntity)
+		{
+			base.OnPoolItem(vectorEntity);
+			var featureId = vectorEntity.Feature.Data.Id;
+
+			if (!_objects.ContainsKey(featureId))
+			{
+				return;
+			}
+
+			var go = _objects[featureId];
+			if(go == null || _poolGameObject == null)
+			{
+				return;
+			}
+
+			go.SetActive(false);
+			go.transform.SetParent(_poolGameObject.transform, false);
 		}
 	}
 }
