@@ -27,8 +27,8 @@ EditorBuildSettings:
     path: Assets/Mapbox/Examples/2_ZoomableMap/ZoomableMap.unity
     guid: 2c7147d54825142878b256c67aae5704
   - enabled: 1
-    path: Assets/Mapbox/Examples/3_Globe/Globe.unity
-    guid: 614e3e19125ae46c7af990b7e3debd36
+    path: Assets/Mapbox/Examples/3_AstroWalk-LocationGame/AstroWalkLocationGame.unity
+    guid: 23b3522d4f6fa450eb781397db4b26ed
   - enabled: 1
     path: Assets/Mapbox/Examples/4_VoxelMap/VoxelMap.unity
     guid: daabe3028a2c14661b829fff509af827
@@ -57,8 +57,8 @@ EditorBuildSettings:
     path: Assets/Mapbox/Examples/7_ReplaceFeatures/ReplaceFeatures.unity
     guid: 54d1b7ee40bee49559dd74210c7d5a57
   - enabled: 1
-    path: Assets/Mapbox/Examples/8_AstroWalk-LocationGame/AstroWalkLocationGame.unity
-    guid: 23b3522d4f6fa450eb781397db4b26ed
+    path: Assets/Mapbox/Examples/8_Globe/Globe.unity
+    guid: 614e3e19125ae46c7af990b7e3debd36
   - enabled: 1
     path: Assets/MapboxAR/Examples/Scenes/TabletopAR.unity
     guid: a455922b0e2954431922c9fb6c5377e4
