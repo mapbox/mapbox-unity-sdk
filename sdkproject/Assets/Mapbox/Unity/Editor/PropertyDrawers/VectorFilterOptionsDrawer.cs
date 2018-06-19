@@ -17,7 +17,7 @@
 
 		private string[] descriptionArray;
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
-		bool showFilters = true;
+		bool showFilters = false;
 
 		GUIContent operatorGui = new GUIContent { text = "Operator", tooltip = "Filter operator to apply. " };
 		GUIContent numValueGui = new GUIContent { text = "Num Value", tooltip = "Numeric value to match using the operator.  " };

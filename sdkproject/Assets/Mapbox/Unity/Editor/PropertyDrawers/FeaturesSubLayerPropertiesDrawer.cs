@@ -19,6 +19,10 @@
 		bool _isInitialized = false;
 		private TileJsonData tileJSONData;
 		private static TileJSONResponse tileJSONResponse;
+		static TileJsonData tileJsonData = new TileJsonData();
+		int _layerIndex = 0;
+		GUIContent[] _layerTypeContent;
+
 		/// <summary>
 		/// Gets or sets the layerID
 		/// </summary>
@@ -322,18 +326,33 @@
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
 			GUILayout.Space(-_lineHeight);
 			EditorGUILayout.PrefixLabel(subLayerCoreOptions.FindPropertyRelative("sublayerName").stringValue + " Properties");
+			EditorGUI.indentLevel++;
+			VectorPrimitiveType primitiveTypeProp =
+	(VectorPrimitiveType)subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex;
+
+			var serializedMapObject = property.serializedObject;
+			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
+			tileJsonData = mapObject.VectorData.LayerProperty.tileJsonData;
+
+			var layerDisplayNames = tileJsonData.LayerDisplayNames;
+			DrawLayerName(subLayerCoreOptions, layerDisplayNames);
+
+			//***********************FILTERS SECTION BEGINS***********************************//
+			var filterOptions = layerProperty.FindPropertyRelative("filterOptions");
+			filterOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
+			//***********************FILTERS SECTION ENDS***********************************//
+
+			GUILayout.Space(-_lineHeight);
+			EditorGUILayout.PropertyField(filterOptions, new GUIContent("Filters"));
+
 			// V1
 			EditorGUILayout.BeginVertical();
 			EditorGUI.indentLevel++;
-			VectorPrimitiveType primitiveTypeProp =
-				(VectorPrimitiveType)subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex;
 
 			GUILayout.Space(-_lineHeight);
 			EditorGUILayout.PropertyField(subLayerCoreOptions);
 
-			var extrusionOptions = layerProperty.FindPropertyRelative("extrusionOptions");
-			//loading up the selectedLayerName for extrusion options to pull up the right propertyName
-			extrusionOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
+
 
 			if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
 			{
@@ -345,7 +364,7 @@
 			}
 
 			//EditorGUI.indentLevel--;
-			ShowOthers = EditorGUILayout.Foldout(ShowOthers, "Advanced");
+			ShowOthers = EditorGUILayout.Foldout(ShowOthers, "Gameplay");
 			EditorGUI.indentLevel++;
 			if (ShowOthers)
 			{
@@ -365,14 +384,10 @@
 				{
 					layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue = false;
 				}
-				var filterOptions = layerProperty.FindPropertyRelative("filterOptions");
-				filterOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
-
-				GUILayout.Space(-_lineHeight);
-				EditorGUILayout.PropertyField(filterOptions, new GUIContent("Filters"));
 				DrawModifiers(layerProperty, new GUIContent { text = "Modifier Options", tooltip = "Additional Feature modifiers to apply to the visualizer. " });
 			}
 			EditorGUILayout.EndVertical();
+			EditorGUI.indentLevel--;
 			EditorGUI.indentLevel--;
 		}
 
@@ -536,6 +551,57 @@
 				tileJSONData.ClearData();
 			}
 			TilesetId = sourceString;
+		}
+		public void DrawLayerName(SerializedProperty property, List<string> layerDisplayNames)
+		{
+
+			var layerNameLabel = new GUIContent
+			{
+				text = "Layer Name",
+				tooltip = "The layer name from the Mapbox tileset that would be used for visualizing a feature"
+			};
+
+			//disable the selection if there is no layer
+			if (layerDisplayNames.Count == 0)
+			{
+				EditorGUILayout.LabelField(layerNameLabel, new GUIContent("No layers found: Invalid MapId / No Internet."), (GUIStyle)"minipopUp");
+				return;
+			}
+
+			//check the string value at the current _layerIndex to verify that the stored index matches the property string.
+			var layerString = property.FindPropertyRelative("layerName").stringValue;
+			if (layerDisplayNames.Contains(layerString))
+			{
+				//if the layer contains the current layerstring, set it's index to match
+				_layerIndex = layerDisplayNames.FindIndex(s => s.Equals(layerString));
+
+			}
+			else
+			{
+				//if the selected layer isn't in the source, add a placeholder entry
+				_layerIndex = 0;
+				layerDisplayNames.Insert(0, layerString);
+				if (!tileJsonData.LayerPropertyDescriptionDictionary.ContainsKey(layerString))
+				{
+					tileJsonData.LayerPropertyDescriptionDictionary.Add(layerString, new Dictionary<string, string>());
+				}
+
+			}
+
+			//create the display name guicontent array with an additional entry for the currently selected item
+			_layerTypeContent = new GUIContent[layerDisplayNames.Count];
+			for (int extIdx = 0; extIdx < layerDisplayNames.Count; extIdx++)
+			{
+				_layerTypeContent[extIdx] = new GUIContent
+				{
+					text = layerDisplayNames[extIdx],
+				};
+			}
+
+			//draw the layer selection popup
+			_layerIndex = EditorGUILayout.Popup(layerNameLabel, _layerIndex, _layerTypeContent);
+			var parsedString = layerDisplayNames.ToArray()[_layerIndex].Split(new string[] { tileJsonData.commonLayersKey }, System.StringSplitOptions.None)[0].Trim();
+			property.FindPropertyRelative("layerName").stringValue = parsedString;
 		}
 	}
 }
