@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.4500653, g: 0.5001166, b: 0.57548314, a: 1}
+  m_IndirectSpecularColor: {r: 0.45006508, g: 0.5001157, b: 0.57548237, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -594,7 +594,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff26db721962cdf4a8edcdfa9a767d2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  profile: {fileID: 0}
 --- !u!81 &234181017
 AudioListener:
   m_ObjectHideFlags: 0
@@ -704,6 +703,7 @@ GameObject:
   - component: {fileID: 1538829360}
   - component: {fileID: 397025670}
   - component: {fileID: 397025669}
+  - component: {fileID: 397025671}
   m_Layer: 0
   m_Name: Target
   m_TagString: Untagged
@@ -741,6 +741,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7760043eea2cd452ba7117f2c97e0038, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &397025671
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 397025668}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5798356d101127847ac0719a2d1ab574, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Materials: []
+  Target: {fileID: 1176362812}
+  CharacterAnimator: {fileID: 1176362811}
+  Speed: 5
 --- !u!1 &444856203
 GameObject:
   m_ObjectHideFlags: 0
@@ -1005,6 +1020,16 @@ MonoBehaviour:
   _editorDebuggingOnly:
     _mockUnityInputLocation: 0
     _locationLogFile: {fileID: 0}
+--- !u!95 &1176362811 stripped
+Animator:
+  m_PrefabParentObject: {fileID: 95022966287224496, guid: b4281c0219e45624e855839527bdc6f1,
+    type: 2}
+  m_PrefabInternal: {fileID: 1502952404}
+--- !u!4 &1176362812 stripped
+Transform:
+  m_PrefabParentObject: {fileID: 4601729990306218, guid: b4281c0219e45624e855839527bdc6f1,
+    type: 2}
+  m_PrefabInternal: {fileID: 1502952404}
 --- !u!1 &1188978833
 GameObject:
   m_ObjectHideFlags: 0
