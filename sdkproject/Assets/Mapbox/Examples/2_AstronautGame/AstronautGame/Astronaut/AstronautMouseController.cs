@@ -177,11 +177,15 @@ namespace Mapbox.Examples
         [Header("CameraSettings")]
         [SerializeField]
         Camera cam;
-        [SerializeField]
-        Vector3 offset;
+		Vector3 previousPos = Vector3.zero;
+		Vector3 deltaPos = Vector3.zero;
+
         void CamControl()
         {
-            //cam.transform.localPosition = transform.localPosition + offset;
+			deltaPos = transform.position - previousPos;
+			deltaPos.y = 0;
+			cam.transform.position = Vector3.Lerp(cam.transform.position, cam.transform.position + deltaPos, Time.time);
+			previousPos = transform.position;
         }
         #endregion
 
