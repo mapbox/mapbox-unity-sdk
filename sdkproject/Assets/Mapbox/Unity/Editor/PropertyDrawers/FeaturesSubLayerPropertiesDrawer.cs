@@ -77,6 +77,8 @@
 			}
 		}
 
+		private GUIStyle visualizerNameAndType = new GUIStyle();
+
 		FeatureSubLayerTreeView layerTreeView = new FeatureSubLayerTreeView(new TreeViewState());
 		IList<int> selectedLayers = new List<int>();
 		public void DrawUI(SerializedProperty property)
@@ -161,7 +163,7 @@
 			{
 				EditorGUILayout.LabelField(new GUIContent
 				{
-					text = "Vector Layer Visualizers",
+					text = "Map Features",
 					tooltip = "Visualizers for vector features contained in a layer. "
 				});
 
@@ -200,7 +202,7 @@
 
 				EditorGUILayout.BeginHorizontal();
 
-				if (GUILayout.Button(new GUIContent("Add Visualizer"), (GUIStyle)"minibuttonleft"))
+				if (GUILayout.Button(new GUIContent("Add Feature"), (GUIStyle)"minibuttonleft"))
 				{
 					subLayerArray.arraySize++;
 
@@ -325,20 +327,28 @@
 		{
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
 			GUILayout.Space(-_lineHeight);
-			EditorGUILayout.PrefixLabel(subLayerCoreOptions.FindPropertyRelative("sublayerName").stringValue + " Properties");
-			EditorGUI.indentLevel++;
-			VectorPrimitiveType primitiveTypeProp =
-	(VectorPrimitiveType)subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex;
+			visualizerNameAndType.normal.textColor = Color.yellow;
+			visualizerNameAndType.fontStyle = FontStyle.Bold;
+			EditorGUILayout.LabelField("Feature Name : "+ subLayerCoreOptions.FindPropertyRelative("sublayerName").stringValue, visualizerNameAndType);
+			EditorGUILayout.LabelField("Type : " + "Building", visualizerNameAndType);
+			EditorGUILayout.LabelField("Sub-type : " + "Highway", visualizerNameAndType);
+
+			//***********************LAYER NAME BEGINS***********************************//
+			VectorPrimitiveType primitiveTypeProp = (VectorPrimitiveType)subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex;
 
 			var serializedMapObject = property.serializedObject;
 			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
 			tileJsonData = mapObject.VectorData.LayerProperty.tileJsonData;
 
 			var layerDisplayNames = tileJsonData.LayerDisplayNames;
+
 			DrawLayerName(subLayerCoreOptions, layerDisplayNames);
+			//***********************LAYER NAME ENDS***********************************//
+
 
 			//***********************FILTERS SECTION BEGINS***********************************//
-			var filterOptions = layerProperty.FindPropertyRelative("filterOptions");
+			EditorGUI.indentLevel++;
+ 			var filterOptions = layerProperty.FindPropertyRelative("filterOptions");
 			filterOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
 			//***********************FILTERS SECTION ENDS***********************************//
 
@@ -552,6 +562,7 @@
 			}
 			TilesetId = sourceString;
 		}
+
 		public void DrawLayerName(SerializedProperty property, List<string> layerDisplayNames)
 		{
 
