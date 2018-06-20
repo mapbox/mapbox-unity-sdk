@@ -40,7 +40,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			};
 
 				
-			item.coreOptions.groupFeatures = item.groupFeatures;
+			item.coreOptions.combineMeshes = item.groupFeatures;
 			item.moveFeaturePositionTo = item._movePrefabFeaturePositionTo;
 
 

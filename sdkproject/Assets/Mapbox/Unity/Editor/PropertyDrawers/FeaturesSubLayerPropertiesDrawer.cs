@@ -22,6 +22,7 @@
 		static TileJsonData tileJsonData = new TileJsonData();
 		int _layerIndex = 0;
 		GUIContent[] _layerTypeContent;
+		bool showModeling = false;
 
 		/// <summary>
 		/// Gets or sets the layerID
@@ -327,13 +328,13 @@
 		{
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
 			GUILayout.Space(-_lineHeight);
-			visualizerNameAndType.normal.textColor = Color.yellow;
+			visualizerNameAndType.normal.textColor = Color.white;
 			visualizerNameAndType.fontStyle = FontStyle.Bold;
 			EditorGUILayout.LabelField("Feature Name : "+ subLayerCoreOptions.FindPropertyRelative("sublayerName").stringValue, visualizerNameAndType);
 			EditorGUILayout.LabelField("Type : " + "Building", visualizerNameAndType);
 			EditorGUILayout.LabelField("Sub-type : " + "Highway", visualizerNameAndType);
 
-			//***********************LAYER NAME BEGINS***********************************//
+			//*********************** LAYER NAME BEGINS ***********************************//
 			VectorPrimitiveType primitiveTypeProp = (VectorPrimitiveType)subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex;
 
 			var serializedMapObject = property.serializedObject;
@@ -343,32 +344,48 @@
 			var layerDisplayNames = tileJsonData.LayerDisplayNames;
 
 			DrawLayerName(subLayerCoreOptions, layerDisplayNames);
-			//***********************LAYER NAME ENDS***********************************//
+			//*********************** LAYER NAME ENDS ***********************************//
 
 
-			//***********************FILTERS SECTION BEGINS***********************************//
+
+			//*********************** FILTERS SECTION BEGINS ***********************************//
 			EditorGUI.indentLevel++;
  			var filterOptions = layerProperty.FindPropertyRelative("filterOptions");
 			filterOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
-			//***********************FILTERS SECTION ENDS***********************************//
-
 			GUILayout.Space(-_lineHeight);
 			EditorGUILayout.PropertyField(filterOptions, new GUIContent("Filters"));
+			//*********************** FILTERS SECTION ENDS ***********************************//
 
+
+
+			//*********************** MODELING SECTION BEGINS ***********************************//
 			// V1
+			showModeling = EditorGUILayout.Foldout(showModeling, new GUIContent { text = "Modeling", tooltip = "This section provides you with options to fine tune your meshes" });
 			EditorGUILayout.BeginVertical();
 			EditorGUI.indentLevel++;
 
 			GUILayout.Space(-_lineHeight);
 			EditorGUILayout.PropertyField(subLayerCoreOptions);
 
+			if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
+			{
+				GUILayout.Space(-_lineHeight);
+				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
+			}
+			EditorGUI.indentLevel++;
+
+			var snapToTerrainProperty = subLayerCoreOptions.FindPropertyRelative("snapToTerrain");
+			var groupFeaturesProperty = subLayerCoreOptions.FindPropertyRelative("combineMeshes");
+
+			snapToTerrainProperty.boolValue = EditorGUILayout.Toggle(snapToTerrainProperty.displayName, snapToTerrainProperty.boolValue);
+			groupFeaturesProperty.boolValue = EditorGUILayout.Toggle(groupFeaturesProperty.displayName, groupFeaturesProperty.boolValue);
+			//*********************** MODELING SECTION BEGINS ***********************************//
 
 
 			if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
 			{
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("colliderOptions"));
-				GUILayout.Space(-_lineHeight);
-				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
+
 				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
 			}

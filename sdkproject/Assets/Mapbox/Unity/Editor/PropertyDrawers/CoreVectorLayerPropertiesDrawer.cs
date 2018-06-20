@@ -54,12 +54,6 @@
 			var layerDisplayNames = tileJsonData.LayerDisplayNames;
 			//DrawLayerName(property, layerDisplayNames);
 
-			var snapToTerrainProperty = property.FindPropertyRelative("snapToTerrain");
-			var groupFeaturesProperty = property.FindPropertyRelative("groupFeatures");
-
-			snapToTerrainProperty.boolValue = EditorGUILayout.Toggle(snapToTerrainProperty.displayName, snapToTerrainProperty.boolValue);
-			groupFeaturesProperty.boolValue = EditorGUILayout.Toggle(groupFeaturesProperty.displayName, groupFeaturesProperty.boolValue);
-
 			if ((VectorPrimitiveType)primitiveType.enumValueIndex == VectorPrimitiveType.Line)
 			{
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("lineWidth"));

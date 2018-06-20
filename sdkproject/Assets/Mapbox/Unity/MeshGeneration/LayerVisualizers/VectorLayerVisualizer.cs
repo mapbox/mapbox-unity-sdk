@@ -73,7 +73,7 @@
 
 			Active = _layerProperties.coreOptions.isActive;
 
-			if (properties.coreOptions.groupFeatures)
+			if (properties.coreOptions.combineMeshes)
 			{
 				_defaultStack = ScriptableObject.CreateInstance<MergedModifierStack>();
 			}
