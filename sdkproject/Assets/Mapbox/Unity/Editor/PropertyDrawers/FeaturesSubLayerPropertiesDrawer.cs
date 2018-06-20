@@ -23,7 +23,7 @@
 		int _layerIndex = 0;
 		GUIContent[] _layerTypeContent;
 		bool showModeling = false;
-
+		bool showTexturing = false;
 		/// <summary>
 		/// Gets or sets the layerID
 		/// </summary>
@@ -360,41 +360,58 @@
 
 			//*********************** MODELING SECTION BEGINS ***********************************//
 			// V1
-			showModeling = EditorGUILayout.Foldout(showModeling, new GUIContent { text = "Modeling", tooltip = "This section provides you with options to fine tune your meshes" });
 			EditorGUILayout.BeginVertical();
-			EditorGUI.indentLevel++;
-
-			GUILayout.Space(-_lineHeight);
-			EditorGUILayout.PropertyField(subLayerCoreOptions);
-
-			if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
+			showModeling = EditorGUILayout.Foldout(showModeling, new GUIContent { text = "Modeling", tooltip = "This section provides you with options to fine tune your meshes" });
+			if (showModeling)
 			{
-				GUILayout.Space(-_lineHeight);
-				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
-			}
-			EditorGUI.indentLevel++;
-
-			var snapToTerrainProperty = subLayerCoreOptions.FindPropertyRelative("snapToTerrain");
-			var groupFeaturesProperty = subLayerCoreOptions.FindPropertyRelative("combineMeshes");
-
-			snapToTerrainProperty.boolValue = EditorGUILayout.Toggle(snapToTerrainProperty.displayName, snapToTerrainProperty.boolValue);
-			groupFeaturesProperty.boolValue = EditorGUILayout.Toggle(groupFeaturesProperty.displayName, groupFeaturesProperty.boolValue);
-			//*********************** MODELING SECTION BEGINS ***********************************//
-
-
-			if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
-			{
-				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("colliderOptions"));
+				EditorGUI.indentLevel++;
 
 				GUILayout.Space(-_lineHeight);
-				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
+				EditorGUILayout.PropertyField(subLayerCoreOptions);
+
+				if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
+				{
+					GUILayout.Space(-_lineHeight);
+					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
+				}
+
+				var snapToTerrainProperty = subLayerCoreOptions.FindPropertyRelative("snapToTerrain");
+				var groupFeaturesProperty = subLayerCoreOptions.FindPropertyRelative("combineMeshes");
+
+				snapToTerrainProperty.boolValue = EditorGUILayout.Toggle(snapToTerrainProperty.displayName, snapToTerrainProperty.boolValue);
+				groupFeaturesProperty.boolValue = EditorGUILayout.Toggle(groupFeaturesProperty.displayName, groupFeaturesProperty.boolValue);
+				EditorGUI.indentLevel--;
 			}
+			//*********************** MODELING SECTION ENDS ***********************************//
+
+
+
+
+			//*********************** TEXTURING SECTION BEGINS ***********************************//
+			showTexturing = EditorGUILayout.Foldout(showTexturing, new GUIContent { text = "Texturing", tooltip = "Material options to texture the generated building geometry" });
+			if (showTexturing)
+			{
+				if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
+				{
+					GUILayout.Space(-_lineHeight);
+					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
+				}
+			}
+			//*********************** TEXTURING SECTION ENDS ***********************************//
+
+
+
 
 			//EditorGUI.indentLevel--;
 			ShowOthers = EditorGUILayout.Foldout(ShowOthers, "Gameplay");
 			EditorGUI.indentLevel++;
 			if (ShowOthers)
 			{
+				if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
+				{
+					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("colliderOptions"));
+				}
+
 				if ((primitiveTypeProp == VectorPrimitiveType.Polygon || primitiveTypeProp == VectorPrimitiveType.Custom) && sourceType != VectorSourceType.MapboxStreets)
 				{
 					EditorGUI.indentLevel--;
