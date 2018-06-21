@@ -25,6 +25,8 @@
 
 		public GeometryMaterialOptions materialOptions = new GeometryMaterialOptions();
 
+		public LayerPerformanceOptions performanceOptions;
+
 		//HACK : workaround to avoid users accidentaly leaving the buildingsWithUniqueIds settign on and have missing buildings. 
 		public bool honorBuildingIdSetting = true;
 		public bool buildingsWithUniqueIds = false;

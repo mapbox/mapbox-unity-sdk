@@ -60,7 +60,7 @@
 			EditorGUI.BeginProperty(position, label, property);
 
 			//position.y += lineHeight;
-			var styleTypeLabel = new GUIContent { text = "Texturing Style", tooltip = "Texturing style for feature; choose from sample style or create your own by choosing Custom. " };
+			var styleTypeLabel = new GUIContent { text = "Style Type", tooltip = "Texturing style for feature; choose from sample style or create your own by choosing Custom. " };
 			var styleType = property.FindPropertyRelative("style");
 
 			GUIContent[] styleTypeGuiContent = new GUIContent[styleType.enumDisplayNames.Length];

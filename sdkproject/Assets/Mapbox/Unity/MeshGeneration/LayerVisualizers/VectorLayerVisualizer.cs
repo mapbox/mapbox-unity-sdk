@@ -64,12 +64,12 @@
 			set { _layerProperties.coreOptions.layerName = value; }
 		}
 
-		public void SetProperties(VectorSubLayerProperties properties, LayerPerformanceOptions performanceOptions)
+		public void SetProperties(VectorSubLayerProperties properties)
 		{
 			List<MeshModifier> defaultMeshModifierStack = new List<MeshModifier>();
 			List<GameObjectModifier> defaultGOModifierStack = new List<GameObjectModifier>();
 			_layerProperties = properties;
-			_performanceOptions = performanceOptions;
+			_performanceOptions = properties.performanceOptions;
 
 			Active = _layerProperties.coreOptions.isActive;
 
