@@ -11,21 +11,6 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 	{
 
 
-		private string _className;
-
-
-		[OneTimeSetUp]
-		public void Init()
-		{
-			_className = this.GetType().Name;
-
-		}
-
-
-		[OneTimeTearDown]
-		public void Cleanup() { }
-
-
 		[Test]
 		public void NoOp()
 		{
