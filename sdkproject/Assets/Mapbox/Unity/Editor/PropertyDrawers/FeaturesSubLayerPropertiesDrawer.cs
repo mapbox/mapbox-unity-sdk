@@ -54,18 +54,6 @@
 			}
 		}
 
-		bool showGameplay
-		{
-			get
-			{
-				return EditorPrefs.GetBool(objectId + "VectorSubLayerProperties_showOthers");
-			}
-			set
-			{
-				EditorPrefs.SetBool(objectId + "VectorSubLayerProperties_showOthers", value);
-			}
-		}
-
 		int SelectionIndex
 		{
 			get
@@ -79,6 +67,8 @@
 		}
 
 		private GUIStyle visualizerNameAndType = new GUIStyle();
+		ModelingSectionDrawer _modelingSectionDrawer = new ModelingSectionDrawer();
+		GameplaySectionDrawer _gameplaySectionDrawer = new GameplaySectionDrawer();
 
 		FeatureSubLayerTreeView layerTreeView = new FeatureSubLayerTreeView(new TreeViewState());
 		IList<int> selectedLayers = new List<int>();
@@ -218,7 +208,7 @@
 					subLayerCoreOptions.FindPropertyRelative("layerName").stringValue = "building";
 					subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex = (int)VectorPrimitiveType.Polygon;
 					subLayerCoreOptions.FindPropertyRelative("snapToTerrain").boolValue = true;
-					subLayerCoreOptions.FindPropertyRelative("groupFeatures").boolValue = false;
+					subLayerCoreOptions.FindPropertyRelative("combineMeshes").boolValue = false;
 					subLayerCoreOptions.FindPropertyRelative("lineWidth").floatValue = 1.0f;
 
 					var subLayerExtrusionOptions = subLayer.FindPropertyRelative("extrusionOptions");
@@ -347,9 +337,9 @@
 			//*********************** LAYER NAME ENDS ***********************************//
 
 
+			EditorGUI.indentLevel++;
 
 			//*********************** FILTERS SECTION BEGINS ***********************************//
-			EditorGUI.indentLevel++;
  			var filterOptions = layerProperty.FindPropertyRelative("filterOptions");
 			filterOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
 			GUILayout.Space(-_lineHeight);
@@ -359,228 +349,27 @@
 
 
 			//*********************** MODELING SECTION BEGINS ***********************************//
-			// V1
 			EditorGUILayout.BeginVertical();
-			showModeling = EditorGUILayout.Foldout(showModeling, new GUIContent { text = "Modeling", tooltip = "This section provides you with options to fine tune your meshes" });
-			if (showModeling)
-			{
-				EditorGUI.indentLevel++;
-
-				GUILayout.Space(-_lineHeight);
-				EditorGUILayout.PropertyField(subLayerCoreOptions);
-
-				if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
-				{
-					GUILayout.Space(-_lineHeight);
-					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
-				}
-
-				var snapToTerrainProperty = subLayerCoreOptions.FindPropertyRelative("snapToTerrain");
-				var groupFeaturesProperty = subLayerCoreOptions.FindPropertyRelative("combineMeshes");
-
-				snapToTerrainProperty.boolValue = EditorGUILayout.Toggle(snapToTerrainProperty.displayName, snapToTerrainProperty.boolValue);
-				groupFeaturesProperty.boolValue = EditorGUILayout.Toggle(groupFeaturesProperty.displayName, groupFeaturesProperty.boolValue);
-
-				if ((primitiveTypeProp == VectorPrimitiveType.Polygon || primitiveTypeProp == VectorPrimitiveType.Custom) && sourceType != VectorSourceType.MapboxStreets)
-				{
-					layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue = true;
-					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("buildingsWithUniqueIds"), new GUIContent
-					{
-						text = "Buildings With Unique Ids",
-						tooltip =
-							"Turn on this setting only when rendering 3D buildings from the Mapbox Streets with Building Ids tileset. Using this setting with any other polygon layers or source will result in visual artifacts. "
-					});
-				}
-
-				if (sourceType != VectorSourceType.None)
-				{
-					GUILayout.Space(-_lineHeight);
-					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("performanceOptions"), new GUIContent("Perfomance Options"));
-				}
-
-				EditorGUILayout.BeginHorizontal();
-				if (groupFeaturesProperty.boolValue == false)
-				{
-					var featurePositionProperty = layerProperty.FindPropertyRelative("moveFeaturePositionTo");
-					GUIContent dropDownLabel = new GUIContent
-					{
-						text = "Feature Position",
-						tooltip = "Position to place feature in the tile. "
-					};
-
-					GUIContent[] dropDownItems = new GUIContent[featurePositionProperty.enumDisplayNames.Length];
-
-					for (int i = 0; i < featurePositionProperty.enumDisplayNames.Length; i++)
-					{
-						dropDownItems[i] = new GUIContent
-						{
-							text = featurePositionProperty.enumDisplayNames[i]
-						};
-					}
-
-					featurePositionProperty.enumValueIndex = EditorGUILayout.Popup(dropDownLabel, featurePositionProperty.enumValueIndex, dropDownItems);
-				}
-				EditorGUILayout.EndHorizontal();
-
-				DrawMeshModifiers(layerProperty);
-				EditorGUI.indentLevel--;
-			}
+			_modelingSectionDrawer.DrawUI(subLayerCoreOptions, layerProperty, primitiveTypeProp, sourceType);
 			//*********************** MODELING SECTION ENDS ***********************************//
 
 
 
 
 			//*********************** TEXTURING SECTION BEGINS ***********************************//
-			showTexturing = EditorGUILayout.Foldout(showTexturing, new GUIContent { text = "Texturing", tooltip = "Material options to texture the generated building geometry" });
-			if (showTexturing)
+			if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
 			{
-				if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
-				{
-					GUILayout.Space(-_lineHeight);
-					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
-				}
+				GUILayout.Space(-_lineHeight);
+				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
 			}
 			//*********************** TEXTURING SECTION ENDS ***********************************//
 
 
 			//*********************** GAMEPLAY SECTION BEGINS ***********************************//
-			showGameplay = EditorGUILayout.Foldout(showGameplay, "Gameplay");
-			EditorGUI.indentLevel++;
-			if (showGameplay)
-			{
-				if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
-				{
-					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("colliderOptions"));
-				}
-
-				else
-				{
-					layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue = false;
-				}
-				DrawGoModifiers(layerProperty);
-			}
-			EditorGUILayout.EndVertical();
-			EditorGUI.indentLevel--;
-			EditorGUI.indentLevel--;
+			_gameplaySectionDrawer.DrawUI(layerProperty,primitiveTypeProp);
 			//*********************** GAMEPLAY SECTION ENDS ***********************************//
-		}
 
-		void DrawMeshModifiers(SerializedProperty property)
-		{
-			var groupFeaturesProperty = property.FindPropertyRelative("coreOptions").FindPropertyRelative("combineMeshes");
-			EditorGUILayout.BeginVertical();
-			EditorGUILayout.LabelField(new GUIContent
-			{
-				text = "Mesh Modifiers",
-				tooltip = "Modifiers that manipulate the features mesh. "
-			});
-
-			var meshfac = property.FindPropertyRelative("MeshModifiers");
-
-			for (int i = 0; i < meshfac.arraySize; i++)
-			{
-				var ind = i;
-				EditorGUILayout.BeginHorizontal();
-
-				EditorGUILayout.BeginVertical();
-				meshfac.GetArrayElementAtIndex(ind).objectReferenceValue =
-					EditorGUILayout.ObjectField(meshfac.GetArrayElementAtIndex(i).objectReferenceValue, typeof(MeshModifier), false)
-						as ScriptableObject;
-
-				EditorGUILayout.EndVertical();
-
-				if (GUILayout.Button(new GUIContent("x"), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
-				{
-					if (meshfac.arraySize > 0)
-					{
-						meshfac.DeleteArrayElementAtIndex(ind);
-					}
-					if (meshfac.arraySize > 0)
-					{
-						meshfac.DeleteArrayElementAtIndex(ind);
-					}
-				}
-
-				EditorGUILayout.EndHorizontal();
-			}
-
-			EditorGUI.indentLevel++;
-			EditorGUILayout.BeginHorizontal();
-			GUILayout.Space(EditorGUI.indentLevel * 12);
-			Rect buttonRect = GUILayoutUtility.GetLastRect();
-			if (GUILayout.Button(new GUIContent("Add New"), (GUIStyle)"minibuttonleft"))
-			{
-				PopupWindow.Show(buttonRect, new PopupSelectionMenu(typeof(MeshModifier), meshfac));
-				if (Event.current.type == EventType.Repaint) buttonRect = GUILayoutUtility.GetLastRect();
-			}
-
-			if (GUILayout.Button(new GUIContent("Add Existing"), (GUIStyle)"minibuttonright"))
-			{
-				ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac);
-			}
-
-			EditorGUILayout.EndHorizontal();
-			EditorGUILayout.EndVertical();
 			EditorGUI.indentLevel--;
-		}
-
-		private void DrawGoModifiers(SerializedProperty property)
-		{
-			EditorGUILayout.BeginVertical();
-
-			EditorGUILayout.LabelField(new GUIContent
-			{
-				text = "Game Object Modifiers",
-				tooltip = "Modifiers that manipulate the GameObject after mesh generation."
-			});
-			var gofac = property.FindPropertyRelative("GoModifiers");
-			for (int i = 0; i < gofac.arraySize; i++)
-			{
-				var ind = i;
-				EditorGUILayout.BeginHorizontal();
-				EditorGUILayout.BeginVertical();
-				GUILayout.Space(5);
-				gofac.GetArrayElementAtIndex(ind).objectReferenceValue =
-					EditorGUILayout.ObjectField(gofac.GetArrayElementAtIndex(i).objectReferenceValue, typeof(GameObjectModifier),
-						false) as ScriptableObject;
-				EditorGUILayout.EndVertical();
-
-				if (GUILayout.Button(new GUIContent("x"), GUILayout.Width(30)))
-				{
-					if (gofac.arraySize > 0)
-					{
-						gofac.DeleteArrayElementAtIndex(ind);
-					}
-					if (gofac.arraySize > 0)
-					{
-						gofac.DeleteArrayElementAtIndex(ind);
-					}
-				}
-
-				EditorGUILayout.EndHorizontal();
-			}
-
-			EditorGUI.indentLevel++;
-			EditorGUILayout.BeginHorizontal();
-			GUILayout.Space(EditorGUI.indentLevel * 12);
-			Rect buttonRect = GUILayoutUtility.GetLastRect();
-
-			if (GUILayout.Button(new GUIContent("Add New"), (GUIStyle)"minibuttonleft"))
-			{
-				PopupWindow.Show(buttonRect, new PopupSelectionMenu(typeof(GameObjectModifier), gofac));
-				if (Event.current.type == EventType.Repaint) buttonRect = GUILayoutUtility.GetLastRect();
-			}
-			//EditorWindow.Repaint();
-			//buttonRect = GUILayoutUtility.GetLastRect();
-			if (GUILayout.Button(new GUIContent("Add Existing"), (GUIStyle)"minibuttonright"))
-			{
-
-				ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac);
-			}
-
-			EditorGUILayout.EndHorizontal();
-			EditorGUI.indentLevel--;
-			EditorGUILayout.EndVertical();
 		}
 
 		private void LoadEditorTileJSON(SerializedProperty property, VectorSourceType sourceTypeValue, string sourceString)
