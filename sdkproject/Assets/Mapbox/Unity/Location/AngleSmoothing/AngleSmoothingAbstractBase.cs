@@ -48,10 +48,10 @@ namespace Mapbox.Unity.Location
 		/// Add angle to list of angles used for calculation.
 		/// </summary>
 		/// <param name="angle"></param>
-		public void Add(double angle) {
-			// safe measures to stay within [0..360]
-			if (angle < 0) { angle += 360; }
-			if (angle >= 360) { angle -= 360; }
+		public void Add(double angle)
+		{
+			// safe measures to stay within [0..<360]
+			angle = angle < 0 ? angle + 360 : angle >= 360 ? angle - 360 : angle;
 			_angles.Add(angle);
 		}
 
@@ -61,6 +61,16 @@ namespace Mapbox.Unity.Location
 		/// </summary>
 		/// <returns>Smoothed angle</returns>
 		public abstract double Calculate();
+
+
+		[System.Diagnostics.Conditional("UNITY_EDITOR")]
+		protected void debugLogAngle(double raw, double smoothed)
+		{
+			double debugAngle = Math.Atan2(Math.Sin(smoothed * DEG2RAD), Math.Cos(smoothed * DEG2RAD)) * RAD2DEG;
+			debugAngle = debugAngle < 0 ? debugAngle + 360 : debugAngle >= 360 ? debugAngle - 360 : debugAngle;
+			Debug.Log(string.Format("{0:0.000} => {1:0.000}", raw, smoothed));
+		}
+
 
 
 	}
