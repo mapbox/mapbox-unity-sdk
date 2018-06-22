@@ -263,23 +263,26 @@
 		{
 			object[] parameters = (object[])parms;
 
-			var subLayerArray = (SerializedProperty)parameters[0];
+			var subLayerArray = (SerializedProperty)parameters[1];
 			subLayerArray.arraySize++;
 
+			PresetFeatureType featureType = ((PresetFeatureType)Enum.Parse(typeof(PresetFeatureType), parameters[0].ToString()));
+			var properties = PresetSubLayerPropertiesFetcher.GetSubLayerProperties(featureType);
 			var subLayer = subLayerArray.GetArrayElementAtIndex(subLayerArray.arraySize - 1);
 			var subLayerName = subLayer.FindPropertyRelative("coreOptions.sublayerName");
 
-			subLayerName.stringValue = "Untitled";
-			subLayer.FindPropertyRelative("presetFeatureType").enumValueIndex = (int)((PresetFeatureType)Enum.Parse(typeof(PresetFeatureType), parameters[1].ToString()));
-
+			subLayerName.stringValue = properties.coreOptions.sublayerName;
+			subLayer.FindPropertyRelative("presetFeatureType").enumValueIndex = (int)featureType;
+			//TODO: SET PROPERTIES indiviually.. can't cast from object to serialedobject--------------------------
+			return;
 			// Set defaults here because SerializedProperty copies the previous element.
-			var subLayerCoreOptions = subLayer.FindPropertyRelative("coreOptions");
-			subLayerCoreOptions.FindPropertyRelative("isActive").boolValue = true;
-			subLayerCoreOptions.FindPropertyRelative("layerName").stringValue = "building";
-			subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex = (int)VectorPrimitiveType.Polygon;
-			subLayerCoreOptions.FindPropertyRelative("snapToTerrain").boolValue = true;
-			subLayerCoreOptions.FindPropertyRelative("combineMeshes").boolValue = false;
-			subLayerCoreOptions.FindPropertyRelative("lineWidth").floatValue = 1.0f;
+			//var subLayerCoreOptions = subLayer.FindPropertyRelative("coreOptions");
+			//subLayerCoreOptions.FindPropertyRelative("isActive").boolValue = true;
+			//subLayerCoreOptions.FindPropertyRelative("layerName").stringValue = "building";
+			//subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex = (int)VectorPrimitiveType.Polygon;
+			//subLayerCoreOptions.FindPropertyRelative("snapToTerrain").boolValue = true;
+			//subLayerCoreOptions.FindPropertyRelative("combineMeshes").boolValue = false;
+			//subLayerCoreOptions.FindPropertyRelative("lineWidth").floatValue = 1.0f;
 
 			var subLayerExtrusionOptions = subLayer.FindPropertyRelative("extrusionOptions");
 			subLayerExtrusionOptions.FindPropertyRelative("extrusionType").enumValueIndex = (int)ExtrusionType.None;
