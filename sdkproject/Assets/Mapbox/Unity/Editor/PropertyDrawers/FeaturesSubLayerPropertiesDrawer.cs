@@ -10,6 +10,7 @@
 	using Mapbox.VectorTile.ExtensionMethods;
 	using Mapbox.Unity.MeshGeneration.Filters;
 	using Mapbox.Platform.TilesetTileJSON;
+	using System;
 
 	public class FeaturesSubLayerPropertiesDrawer
 	{
@@ -24,6 +25,7 @@
 		GUIContent[] _layerTypeContent;
 		bool showModeling = false;
 		bool showTexturing = false;
+
 		/// <summary>
 		/// Gets or sets the layerID
 		/// </summary>
@@ -192,78 +194,89 @@
 				GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
 				EditorGUILayout.BeginHorizontal();
-
-				if (GUILayout.Button(new GUIContent("Add Feature"), (GUIStyle)"minibuttonleft"))
+				var presetTypes = property.FindPropertyRelative("presetFeatureTypes");
+				var names = Enum.GetNames(typeof(PresetFeatureType));
+				GenericMenu menu = new GenericMenu();
+				foreach(var name in names)
 				{
-					subLayerArray.arraySize++;
+					menu.AddItem(new GUIContent() { text = name }, false, HandleMenuFunction,(name));
+				}
+				GUILayout.Space(0); // do not remove this line; it is needed for the next line to work
+				Rect rect = GUILayoutUtility.GetLastRect();
+				rect.y += 2*_lineHeight/3;
 
-					var subLayer = subLayerArray.GetArrayElementAtIndex(subLayerArray.arraySize - 1);
-					var subLayerName = subLayer.FindPropertyRelative("coreOptions.sublayerName");
+				if (EditorGUILayout.DropdownButton(new GUIContent { text = "Add Feature" }, FocusType.Passive, (GUIStyle)"minibuttonleft"))
+				{
+					menu.DropDown(rect);
+					//subLayerArray.arraySize++;
 
-					subLayerName.stringValue = "Untitled";
+					//var subLayer = subLayerArray.GetArrayElementAtIndex(subLayerArray.arraySize - 1);
+					//var subLayerName = subLayer.FindPropertyRelative("coreOptions.sublayerName");
 
-					// Set defaults here because SerializedProperty copies the previous element.
-					var subLayerCoreOptions = subLayer.FindPropertyRelative("coreOptions");
-					subLayerCoreOptions.FindPropertyRelative("isActive").boolValue = true;
-					subLayerCoreOptions.FindPropertyRelative("layerName").stringValue = "building";
-					subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex = (int)VectorPrimitiveType.Polygon;
-					subLayerCoreOptions.FindPropertyRelative("snapToTerrain").boolValue = true;
-					subLayerCoreOptions.FindPropertyRelative("combineMeshes").boolValue = false;
-					subLayerCoreOptions.FindPropertyRelative("lineWidth").floatValue = 1.0f;
+					//subLayerName.stringValue = "Untitled";
 
-					var subLayerExtrusionOptions = subLayer.FindPropertyRelative("extrusionOptions");
-					subLayerExtrusionOptions.FindPropertyRelative("extrusionType").enumValueIndex = (int)ExtrusionType.None;
-					subLayerExtrusionOptions.FindPropertyRelative("extrusionGeometryType").enumValueIndex =
-						(int)ExtrusionGeometryType.RoofAndSide;
-					subLayerExtrusionOptions.FindPropertyRelative("propertyName").stringValue = "height";
-					subLayerExtrusionOptions.FindPropertyRelative("extrusionScaleFactor").floatValue = 1f;
+					//// Set defaults here because SerializedProperty copies the previous element.
+					//var subLayerCoreOptions = subLayer.FindPropertyRelative("coreOptions");
+					//subLayerCoreOptions.FindPropertyRelative("isActive").boolValue = true;
+					//subLayerCoreOptions.FindPropertyRelative("layerName").stringValue = "building";
+					//subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex = (int)VectorPrimitiveType.Polygon;
+					//subLayerCoreOptions.FindPropertyRelative("snapToTerrain").boolValue = true;
+					//subLayerCoreOptions.FindPropertyRelative("combineMeshes").boolValue = false;
+					//subLayerCoreOptions.FindPropertyRelative("lineWidth").floatValue = 1.0f;
 
-					var subLayerFilterOptions = subLayer.FindPropertyRelative("filterOptions");
-					subLayerFilterOptions.FindPropertyRelative("filters").ClearArray();
-					subLayerFilterOptions.FindPropertyRelative("combinerType").enumValueIndex =
-						(int)LayerFilterCombinerOperationType.Any;
+					//var subLayerExtrusionOptions = subLayer.FindPropertyRelative("extrusionOptions");
+					//subLayerExtrusionOptions.FindPropertyRelative("extrusionType").enumValueIndex = (int)ExtrusionType.None;
+					//subLayerExtrusionOptions.FindPropertyRelative("extrusionGeometryType").enumValueIndex =
+					//	(int)ExtrusionGeometryType.RoofAndSide;
+					//subLayerExtrusionOptions.FindPropertyRelative("propertyName").stringValue = "height";
+					//subLayerExtrusionOptions.FindPropertyRelative("extrusionScaleFactor").floatValue = 1f;
 
-					var subLayerGeometryMaterialOptions = subLayer.FindPropertyRelative("materialOptions");
-					subLayerGeometryMaterialOptions.FindPropertyRelative("style").enumValueIndex = (int)StyleTypes.Realistic;
+					//var subLayerFilterOptions = subLayer.FindPropertyRelative("filterOptions");
+					//subLayerFilterOptions.FindPropertyRelative("filters").ClearArray();
+					//subLayerFilterOptions.FindPropertyRelative("combinerType").enumValueIndex =
+					//	(int)LayerFilterCombinerOperationType.Any;
 
-					GeometryMaterialOptions geometryMaterialOptionsReference = MapboxDefaultStyles.GetDefaultAssets();
+					//var subLayerGeometryMaterialOptions = subLayer.FindPropertyRelative("materialOptions");
+					//subLayerGeometryMaterialOptions.FindPropertyRelative("style").enumValueIndex = (int)StyleTypes.Realistic;
 
-					var mats = subLayerGeometryMaterialOptions.FindPropertyRelative("materials");
-					mats.arraySize = 2;
+					//GeometryMaterialOptions geometryMaterialOptionsReference = MapboxDefaultStyles.GetDefaultAssets();
 
-					var topMatArray = mats.GetArrayElementAtIndex(0).FindPropertyRelative("Materials");
-					var sideMatArray = mats.GetArrayElementAtIndex(1).FindPropertyRelative("Materials");
+					//var mats = subLayerGeometryMaterialOptions.FindPropertyRelative("materials");
+					//mats.arraySize = 2;
 
-					if (topMatArray.arraySize == 0)
-					{
-						topMatArray.arraySize = 1;
-					}
-					if (sideMatArray.arraySize == 0)
-					{
-						sideMatArray.arraySize = 1;
-					}
+					//var topMatArray = mats.GetArrayElementAtIndex(0).FindPropertyRelative("Materials");
+					//var sideMatArray = mats.GetArrayElementAtIndex(1).FindPropertyRelative("Materials");
 
-					var topMat = topMatArray.GetArrayElementAtIndex(0);
-					var sideMat = sideMatArray.GetArrayElementAtIndex(0);
+					//if (topMatArray.arraySize == 0)
+					//{
+					//	topMatArray.arraySize = 1;
+					//}
+					//if (sideMatArray.arraySize == 0)
+					//{
+					//	sideMatArray.arraySize = 1;
+					//}
 
-					var atlas = subLayerGeometryMaterialOptions.FindPropertyRelative("atlasInfo");
-					var palette = subLayerGeometryMaterialOptions.FindPropertyRelative("colorPalette");
+					//var topMat = topMatArray.GetArrayElementAtIndex(0);
+					//var sideMat = sideMatArray.GetArrayElementAtIndex(0);
 
-					topMat.objectReferenceValue = geometryMaterialOptionsReference.materials[0].Materials[0];
-					sideMat.objectReferenceValue = geometryMaterialOptionsReference.materials[1].Materials[0];
-					atlas.objectReferenceValue = geometryMaterialOptionsReference.atlasInfo;
-					palette.objectReferenceValue = geometryMaterialOptionsReference.colorPalette;
+					//var atlas = subLayerGeometryMaterialOptions.FindPropertyRelative("atlasInfo");
+					//var palette = subLayerGeometryMaterialOptions.FindPropertyRelative("colorPalette");
 
-					subLayer.FindPropertyRelative("buildingsWithUniqueIds").boolValue = false;
-					subLayer.FindPropertyRelative("moveFeaturePositionTo").enumValueIndex = (int)PositionTargetType.TileCenter;
-					subLayer.FindPropertyRelative("MeshModifiers").ClearArray();
-					subLayer.FindPropertyRelative("GoModifiers").ClearArray();
+					//topMat.objectReferenceValue = geometryMaterialOptionsReference.materials[0].Materials[0];
+					//sideMat.objectReferenceValue = geometryMaterialOptionsReference.materials[1].Materials[0];
+					//atlas.objectReferenceValue = geometryMaterialOptionsReference.atlasInfo;
+					//palette.objectReferenceValue = geometryMaterialOptionsReference.colorPalette;
 
-					var subLayerColliderOptions = subLayer.FindPropertyRelative("colliderOptions");
-					subLayerColliderOptions.FindPropertyRelative("colliderType").enumValueIndex = (int)ColliderType.None;
+					//subLayer.FindPropertyRelative("buildingsWithUniqueIds").boolValue = false;
+					//subLayer.FindPropertyRelative("moveFeaturePositionTo").enumValueIndex = (int)PositionTargetType.TileCenter;
+					//subLayer.FindPropertyRelative("MeshModifiers").ClearArray();
+					//subLayer.FindPropertyRelative("GoModifiers").ClearArray();
 
-					selectedLayers = new int[1] { subLayerArray.arraySize - 1 + layerTreeView.uniqueId };
-					layerTreeView.SetSelection(selectedLayers);
+					//var subLayerColliderOptions = subLayer.FindPropertyRelative("colliderOptions");
+					//subLayerColliderOptions.FindPropertyRelative("colliderType").enumValueIndex = (int)ColliderType.None;
+
+					//selectedLayers = new int[1] { subLayerArray.arraySize - 1 + layerTreeView.uniqueId };
+					//layerTreeView.SetSelection(selectedLayers);
 				}
 
 				if (GUILayout.Button(new GUIContent("Remove Selected"), (GUIStyle)"minibuttonright"))
@@ -313,6 +326,12 @@
 				}
 			}
 		}
+
+		void HandleMenuFunction(object option)
+		{
+			Debug.Log(option);
+		}
+
 
 		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty, SerializedProperty property)
 		{

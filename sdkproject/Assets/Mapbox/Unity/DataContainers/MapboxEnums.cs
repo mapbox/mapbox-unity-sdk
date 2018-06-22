@@ -233,4 +233,12 @@
 		Process,
 		PostProcess
 	}
+
+	public enum PresetFeatureType
+	{
+		Buildings,
+		Roads,
+		Landuse,
+		Custom
+	}
 }
