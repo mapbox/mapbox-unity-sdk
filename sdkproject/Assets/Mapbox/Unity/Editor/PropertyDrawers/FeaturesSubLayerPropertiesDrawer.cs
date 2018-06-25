@@ -25,7 +25,6 @@
 		GUIContent[] _layerTypeContent;
 		bool showModeling = false;
 		bool showTexturing = false;
-
 		/// <summary>
 		/// Gets or sets the layerID
 		/// </summary>
@@ -199,7 +198,7 @@
 				GenericMenu menu = new GenericMenu();
 				foreach(var name in names)
 				{
-					object parms = new object []{ name, subLayerArray };
+					object parms = new object []{ name, property };
 					menu.AddItem(new GUIContent() { text = name }, false, HandleMenuFunction, parms);
 				}
 				GUILayout.Space(0); // do not remove this line; it is needed for the next line to work
@@ -225,8 +224,9 @@
 				EditorGUILayout.EndHorizontal();
 
 				GUILayout.Space(EditorGUIUtility.singleLineHeight);
+				Debug.Log(subLayerArray.arraySize);
 
-				if (selectedLayers.Count == 1 && subLayerArray.arraySize != 0)
+				if (selectedLayers.Count == 1 && subLayerArray.arraySize != 0 && selectedLayers[0] - layerTreeView.uniqueId >= 0)
 				{
 					//ensure that selectedLayers[0] isn't out of bounds
 					if (selectedLayers[0] - layerTreeView.uniqueId > subLayerArray.arraySize - 1)
@@ -236,6 +236,7 @@
 
 					SelectionIndex = selectedLayers[0];
 
+					Debug.Log(SelectionIndex - layerTreeView.uniqueId);
 					var layerProperty = subLayerArray.GetArrayElementAtIndex(SelectionIndex - layerTreeView.uniqueId);
 
 					layerProperty.isExpanded = true;
@@ -262,42 +263,42 @@
 		void HandleMenuFunction(object parms)
 		{
 			object[] parameters = (object[])parms;
-
-			var subLayerArray = (SerializedProperty)parameters[1];
+			PresetFeatureType featureType = ((PresetFeatureType)Enum.Parse(typeof(PresetFeatureType), parameters[0].ToString()));
+			var property = (SerializedProperty)parameters[1];
+			var subLayerArray = property.FindPropertyRelative("vectorSubLayers");
 			subLayerArray.arraySize++;
 
-			PresetFeatureType featureType = ((PresetFeatureType)Enum.Parse(typeof(PresetFeatureType), parameters[0].ToString()));
 			var properties = PresetSubLayerPropertiesFetcher.GetSubLayerProperties(featureType);
 			var subLayer = subLayerArray.GetArrayElementAtIndex(subLayerArray.arraySize - 1);
-			var subLayerName = subLayer.FindPropertyRelative("coreOptions.sublayerName");
 
-			subLayerName.stringValue = properties.coreOptions.sublayerName;
+			subLayer.FindPropertyRelative("coreOptions.sublayerName").stringValue = properties.coreOptions.sublayerName;
 			subLayer.FindPropertyRelative("presetFeatureType").enumValueIndex = (int)featureType;
-			//TODO: SET PROPERTIES indiviually.. can't cast from object to serialedobject--------------------------
-			return;
 			// Set defaults here because SerializedProperty copies the previous element.
-			//var subLayerCoreOptions = subLayer.FindPropertyRelative("coreOptions");
-			//subLayerCoreOptions.FindPropertyRelative("isActive").boolValue = true;
-			//subLayerCoreOptions.FindPropertyRelative("layerName").stringValue = "building";
-			//subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex = (int)VectorPrimitiveType.Polygon;
-			//subLayerCoreOptions.FindPropertyRelative("snapToTerrain").boolValue = true;
-			//subLayerCoreOptions.FindPropertyRelative("combineMeshes").boolValue = false;
-			//subLayerCoreOptions.FindPropertyRelative("lineWidth").floatValue = 1.0f;
+			var subLayerCoreOptions = subLayer.FindPropertyRelative("coreOptions");
+			CoreVectorLayerProperties coreOptions = properties.coreOptions;
+			subLayerCoreOptions.FindPropertyRelative("isActive").boolValue = coreOptions.isActive;
+			subLayerCoreOptions.FindPropertyRelative("layerName").stringValue = coreOptions.layerName;
+			subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex = (int)coreOptions.geometryType;
+			subLayerCoreOptions.FindPropertyRelative("snapToTerrain").boolValue = coreOptions.snapToTerrain;
+			subLayerCoreOptions.FindPropertyRelative("combineMeshes").boolValue = coreOptions.combineMeshes;
+			subLayerCoreOptions.FindPropertyRelative("lineWidth").floatValue = coreOptions.lineWidth;
 
 			var subLayerExtrusionOptions = subLayer.FindPropertyRelative("extrusionOptions");
-			subLayerExtrusionOptions.FindPropertyRelative("extrusionType").enumValueIndex = (int)ExtrusionType.None;
-			subLayerExtrusionOptions.FindPropertyRelative("extrusionGeometryType").enumValueIndex =
-				(int)ExtrusionGeometryType.RoofAndSide;
-			subLayerExtrusionOptions.FindPropertyRelative("propertyName").stringValue = "height";
-			subLayerExtrusionOptions.FindPropertyRelative("extrusionScaleFactor").floatValue = 1f;
+			var extrusionOptions = properties.extrusionOptions;
+			subLayerExtrusionOptions.FindPropertyRelative("extrusionType").enumValueIndex = (int)extrusionOptions.extrusionType;
+			subLayerExtrusionOptions.FindPropertyRelative("extrusionGeometryType").enumValueIndex = (int)extrusionOptions.extrusionGeometryType;
+			subLayerExtrusionOptions.FindPropertyRelative("propertyName").stringValue = extrusionOptions.propertyName;
+			subLayerExtrusionOptions.FindPropertyRelative("extrusionScaleFactor").floatValue = extrusionOptions.extrusionScaleFactor;
 
 			var subLayerFilterOptions = subLayer.FindPropertyRelative("filterOptions");
+			var filterOptions = properties.filterOptions;
 			subLayerFilterOptions.FindPropertyRelative("filters").ClearArray();
-			subLayerFilterOptions.FindPropertyRelative("combinerType").enumValueIndex =
-				(int)LayerFilterCombinerOperationType.Any;
+			subLayerFilterOptions.FindPropertyRelative("combinerType").enumValueIndex = (int)filterOptions.combinerType;
+			//Add any future filter related assignments here
 
 			var subLayerGeometryMaterialOptions = subLayer.FindPropertyRelative("materialOptions");
-			subLayerGeometryMaterialOptions.FindPropertyRelative("style").enumValueIndex = (int)StyleTypes.Realistic;
+			var materialOptions = properties.materialOptions;
+			subLayerGeometryMaterialOptions.FindPropertyRelative("style").enumValueIndex = (int)materialOptions.style;
 
 			GeometryMaterialOptions geometryMaterialOptionsReference = MapboxDefaultStyles.GetDefaultAssets();
 
@@ -327,16 +328,17 @@
 			atlas.objectReferenceValue = geometryMaterialOptionsReference.atlasInfo;
 			palette.objectReferenceValue = geometryMaterialOptionsReference.colorPalette;
 
-			subLayer.FindPropertyRelative("buildingsWithUniqueIds").boolValue = false;
-			subLayer.FindPropertyRelative("moveFeaturePositionTo").enumValueIndex = (int)PositionTargetType.TileCenter;
+			subLayer.FindPropertyRelative("buildingsWithUniqueIds").boolValue = properties.buildingsWithUniqueIds;
+			subLayer.FindPropertyRelative("moveFeaturePositionTo").enumValueIndex = (int)properties.moveFeaturePositionTo;
 			subLayer.FindPropertyRelative("MeshModifiers").ClearArray();
 			subLayer.FindPropertyRelative("GoModifiers").ClearArray();
 
 			var subLayerColliderOptions = subLayer.FindPropertyRelative("colliderOptions");
-			subLayerColliderOptions.FindPropertyRelative("colliderType").enumValueIndex = (int)ColliderType.None;
+			subLayerColliderOptions.FindPropertyRelative("colliderType").enumValueIndex = (int)properties.colliderOptions.colliderType;
 
 			selectedLayers = new int[1] { subLayerArray.arraySize - 1 + layerTreeView.uniqueId };
 			layerTreeView.SetSelection(selectedLayers);
+			EditorUtility.SetDirty(subLayerArray.serializedObject.targetObject);
 		}
 
 
