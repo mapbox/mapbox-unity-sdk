@@ -8,7 +8,11 @@
 
 	public class PresetSubLayerPropertiesFetcher
 	{
-
+		/// <summary>
+		/// Gets the default sub layer properties for the chosen preset type.
+		/// </summary>
+		/// <returns>The sub layer properties.</returns>
+		/// <param name="type">Type.</param>
 		public static VectorSubLayerProperties GetSubLayerProperties(PresetFeatureType type)
 		{
 			//CoreOptions properties
@@ -110,6 +114,25 @@
 			};
 
 			return _properties;
+		}
+
+		/// <summary>
+		/// Gets the default preset type from supplied layerName.
+		/// </summary>
+		/// <param name="layerName">Layer name.</param>
+		public static PresetFeatureType GetPresetTypeFromLayerName(string layerName)
+		{
+			switch(layerName)
+			{
+				case "building":
+					return PresetFeatureType.Buildings;
+				case "road":
+					return PresetFeatureType.Roads;
+				case "landuse":
+					return PresetFeatureType.Landuse;
+				default:
+					return PresetFeatureType.Custom;
+			}
 		}
 	}
 }

@@ -25,6 +25,7 @@
 		GUIContent[] _layerTypeContent;
 		bool showModeling = false;
 		bool showTexturing = false;
+		private static VectorSubLayerProperties subLayerProperties;
 		/// <summary>
 		/// Gets or sets the layerID
 		/// </summary>
@@ -198,8 +199,7 @@
 				GenericMenu menu = new GenericMenu();
 				foreach(var name in names)
 				{
-					object parms = new object []{ name, property };
-					menu.AddItem(new GUIContent() { text = name }, false, HandleMenuFunction, parms);
+					menu.AddItem(new GUIContent() { text = name }, false, FetchPresetProperties, name);
 				}
 				GUILayout.Space(0); // do not remove this line; it is needed for the next line to work
 				Rect rect = GUILayoutUtility.GetLastRect();
@@ -208,6 +208,18 @@
 				if (EditorGUILayout.DropdownButton(new GUIContent { text = "Add Feature" }, FocusType.Passive, (GUIStyle)"minibuttonleft"))
 				{
 					menu.DropDown(rect);
+				}
+
+				//Assign subLayerProperties after fetching it from the presets class
+				if(subLayerProperties!=null)
+				{
+					subLayerArray.arraySize++;
+					var subLayer = subLayerArray.GetArrayElementAtIndex(subLayerArray.arraySize - 1);
+
+					SetSubLayerProps(subLayer);
+					selectedLayers = new int[1] { subLayerArray.arraySize - 1 + layerTreeView.uniqueId };
+					layerTreeView.SetSelection(selectedLayers);
+					subLayerProperties = null; // setting this to null so that the if block is not called again
 				}
 
 				if (GUILayout.Button(new GUIContent("Remove Selected"), (GUIStyle)"minibuttonright"))
@@ -224,7 +236,6 @@
 				EditorGUILayout.EndHorizontal();
 
 				GUILayout.Space(EditorGUIUtility.singleLineHeight);
-				Debug.Log(subLayerArray.arraySize);
 
 				if (selectedLayers.Count == 1 && subLayerArray.arraySize != 0 && selectedLayers[0] - layerTreeView.uniqueId >= 0)
 				{
@@ -236,7 +247,6 @@
 
 					SelectionIndex = selectedLayers[0];
 
-					Debug.Log(SelectionIndex - layerTreeView.uniqueId);
 					var layerProperty = subLayerArray.GetArrayElementAtIndex(SelectionIndex - layerTreeView.uniqueId);
 
 					layerProperty.isExpanded = true;
@@ -260,22 +270,28 @@
 			}
 		}
 
-		void HandleMenuFunction(object parms)
+
+		/// <summary>
+		/// Fetches the preset properties using the supplied <see cref="PresetFeatureType">PresetFeatureType</see>
+		/// </summary>
+		/// <param name="name">Name.</param>
+		void FetchPresetProperties(object name)
 		{
-			object[] parameters = (object[])parms;
-			PresetFeatureType featureType = ((PresetFeatureType)Enum.Parse(typeof(PresetFeatureType), parameters[0].ToString()));
-			var property = (SerializedProperty)parameters[1];
-			var subLayerArray = property.FindPropertyRelative("vectorSubLayers");
-			subLayerArray.arraySize++;
+			PresetFeatureType featureType = ((PresetFeatureType)Enum.Parse(typeof(PresetFeatureType), name.ToString()));
+			subLayerProperties = PresetSubLayerPropertiesFetcher.GetSubLayerProperties(featureType);
+		}
 
-			var properties = PresetSubLayerPropertiesFetcher.GetSubLayerProperties(featureType);
-			var subLayer = subLayerArray.GetArrayElementAtIndex(subLayerArray.arraySize - 1);
-
-			subLayer.FindPropertyRelative("coreOptions.sublayerName").stringValue = properties.coreOptions.sublayerName;
-			subLayer.FindPropertyRelative("presetFeatureType").enumValueIndex = (int)featureType;
+		/// <summary>
+		/// Sets the sub layer properties for the newly added layer
+		/// </summary>
+		/// <param name="subLayer">Sub layer.</param>
+		void SetSubLayerProps(SerializedProperty subLayer)
+		{
+			subLayer.FindPropertyRelative("coreOptions.sublayerName").stringValue = subLayerProperties.coreOptions.sublayerName;
+			subLayer.FindPropertyRelative("presetFeatureType").enumValueIndex = (int)subLayerProperties.presetFeatureType;
 			// Set defaults here because SerializedProperty copies the previous element.
 			var subLayerCoreOptions = subLayer.FindPropertyRelative("coreOptions");
-			CoreVectorLayerProperties coreOptions = properties.coreOptions;
+			CoreVectorLayerProperties coreOptions = subLayerProperties.coreOptions;
 			subLayerCoreOptions.FindPropertyRelative("isActive").boolValue = coreOptions.isActive;
 			subLayerCoreOptions.FindPropertyRelative("layerName").stringValue = coreOptions.layerName;
 			subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex = (int)coreOptions.geometryType;
@@ -284,20 +300,20 @@
 			subLayerCoreOptions.FindPropertyRelative("lineWidth").floatValue = coreOptions.lineWidth;
 
 			var subLayerExtrusionOptions = subLayer.FindPropertyRelative("extrusionOptions");
-			var extrusionOptions = properties.extrusionOptions;
+			var extrusionOptions = subLayerProperties.extrusionOptions;
 			subLayerExtrusionOptions.FindPropertyRelative("extrusionType").enumValueIndex = (int)extrusionOptions.extrusionType;
 			subLayerExtrusionOptions.FindPropertyRelative("extrusionGeometryType").enumValueIndex = (int)extrusionOptions.extrusionGeometryType;
 			subLayerExtrusionOptions.FindPropertyRelative("propertyName").stringValue = extrusionOptions.propertyName;
 			subLayerExtrusionOptions.FindPropertyRelative("extrusionScaleFactor").floatValue = extrusionOptions.extrusionScaleFactor;
 
 			var subLayerFilterOptions = subLayer.FindPropertyRelative("filterOptions");
-			var filterOptions = properties.filterOptions;
+			var filterOptions = subLayerProperties.filterOptions;
 			subLayerFilterOptions.FindPropertyRelative("filters").ClearArray();
 			subLayerFilterOptions.FindPropertyRelative("combinerType").enumValueIndex = (int)filterOptions.combinerType;
 			//Add any future filter related assignments here
 
 			var subLayerGeometryMaterialOptions = subLayer.FindPropertyRelative("materialOptions");
-			var materialOptions = properties.materialOptions;
+			var materialOptions = subLayerProperties.materialOptions;
 			subLayerGeometryMaterialOptions.FindPropertyRelative("style").enumValueIndex = (int)materialOptions.style;
 
 			GeometryMaterialOptions geometryMaterialOptionsReference = MapboxDefaultStyles.GetDefaultAssets();
@@ -328,29 +344,28 @@
 			atlas.objectReferenceValue = geometryMaterialOptionsReference.atlasInfo;
 			palette.objectReferenceValue = geometryMaterialOptionsReference.colorPalette;
 
-			subLayer.FindPropertyRelative("buildingsWithUniqueIds").boolValue = properties.buildingsWithUniqueIds;
-			subLayer.FindPropertyRelative("moveFeaturePositionTo").enumValueIndex = (int)properties.moveFeaturePositionTo;
+			subLayer.FindPropertyRelative("buildingsWithUniqueIds").boolValue = subLayerProperties.buildingsWithUniqueIds;
+			subLayer.FindPropertyRelative("moveFeaturePositionTo").enumValueIndex = (int)subLayerProperties.moveFeaturePositionTo;
 			subLayer.FindPropertyRelative("MeshModifiers").ClearArray();
 			subLayer.FindPropertyRelative("GoModifiers").ClearArray();
 
 			var subLayerColliderOptions = subLayer.FindPropertyRelative("colliderOptions");
-			subLayerColliderOptions.FindPropertyRelative("colliderType").enumValueIndex = (int)properties.colliderOptions.colliderType;
-
-			selectedLayers = new int[1] { subLayerArray.arraySize - 1 + layerTreeView.uniqueId };
-			layerTreeView.SetSelection(selectedLayers);
-			EditorUtility.SetDirty(subLayerArray.serializedObject.targetObject);
+			subLayerColliderOptions.FindPropertyRelative("colliderType").enumValueIndex = (int)subLayerProperties.colliderOptions.colliderType;
 		}
 
 
 		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty, SerializedProperty property)
 		{
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
+			var subLayerName = subLayerCoreOptions.FindPropertyRelative("sublayerName").stringValue;
+			var visualizerLayer = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
+			var subLayerType = PresetSubLayerPropertiesFetcher.GetPresetTypeFromLayerName(visualizerLayer).ToString();
 			GUILayout.Space(-_lineHeight);
 			visualizerNameAndType.normal.textColor = Color.white;
 			visualizerNameAndType.fontStyle = FontStyle.Bold;
-			EditorGUILayout.LabelField("Feature Name : "+ subLayerCoreOptions.FindPropertyRelative("sublayerName").stringValue, visualizerNameAndType);
-			EditorGUILayout.LabelField("Type : " + "Building", visualizerNameAndType);
-			EditorGUILayout.LabelField("Sub-type : " + "Highway", visualizerNameAndType);
+			EditorGUILayout.LabelField("Feature Name : "+ subLayerName, visualizerNameAndType);
+			EditorGUILayout.LabelField("Type : " + subLayerType, visualizerNameAndType);
+			//EditorGUILayout.LabelField("Sub-type : " + "Highway", visualizerNameAndType);
 
 			//*********************** LAYER NAME BEGINS ***********************************//
 			VectorPrimitiveType primitiveTypeProp = (VectorPrimitiveType)subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex;

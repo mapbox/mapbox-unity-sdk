@@ -36,6 +36,6 @@
 		public List<MeshModifier> MeshModifiers;
 		[NodeEditorElement("Game Object Modifiers")]
 		public List<GameObjectModifier> GoModifiers;
-		public PresetFeatureType presetFeatureType;
+		public PresetFeatureType presetFeatureType = PresetFeatureType.Custom;
 	}
 }
