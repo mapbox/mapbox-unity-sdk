@@ -2955,9 +2955,9 @@ Prefab:
         vector tile includes high levels of detail about a particular location or
         building that you can leverage for procedurally generating experiences or
         styling. The data layers include building data, points of interest (POIs),
-        roads, and real-time traffic data. You can filter these data layers on and
-        off as needed in the Map Editor (access through the Mapbox menu). Also, note
-        the POIs are shown both as labels and as prefabs."
+        roads, and real-time traffic data. You can toggle these data layers on and
+        off as needed under MAP LAYERS -> FEATURES section of the Map prefab. Also,
+        note the POIs are shown both as labels and as prefabs."
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}

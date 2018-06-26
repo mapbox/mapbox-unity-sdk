@@ -831,18 +831,19 @@ Prefab:
         type: 2}
       propertyPath: m_Text
       value: "<b>POI Placement</b>\n\nThis example showcases how to procedurally add
-        prefabs to a variety of locations. For example, you can choose to add prefabs
-        at all the cafes and restaurants in a city, at specific addresses, or at locations
-        with \"Starbucks\" in the name.\n\nTo get started, look at Map's Inspector
-        panel and open POINTS OF INTEREST in the MAP LAYERS section of the Abstract
-        Map component. We've already created a few prefab layers for you. Toggle them
-        on and off to see how they change the map. \n\nTo create your own, click \"Add
-        Layer\" and add the desired prefab and rules. "
+        prefabs to a variety of locations using POI data. For example, you can choose
+        to add prefabs at all the places labeled food in a city, at specific addresses
+        or coordinates, or at locations with a specific name. \n\n To get started,
+        look at the \"Map\" Game Object's Inspector Panel, unfold the MAP LAYERS section,
+        then unfold the POINTS OF INTEREST section. We've already created a few prefab
+        layers for you. Toggle them on and off to see how they change the map.\n\n
+        To create your own, simply click \"Add Layer\" and add the desired prefab
+        and rules."
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000030517578
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1611603657303738, guid: 98be219873e6d4dffb5949746f515a33, type: 2}
       propertyPath: m_IsActive
