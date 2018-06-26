@@ -1931,7 +1931,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 345209cc13279414db9639b2843ac3c1, type: 2}
   - {fileID: 2100000, guid: 5df7ad3e02d78284cbc17810cb387d54, type: 2}
   - {fileID: 2100000, guid: 46e6f9799c66fb648be2fb26a721be4c, type: 2}
-  Speed: 0.2
+  Speed: -0.2
 --- !u!4 &1279735269
 Transform:
   m_ObjectHideFlags: 0
@@ -2112,10 +2112,9 @@ Prefab:
       propertyPath: m_Text
       value: '<b>Traffic and Directions</b>
 
-
         Mapbox provides traffic information through a vector data layer. In this example
         you can see an additional traffic map id added to Abstract Map under Map Layers
-        segment. It''s then visualized by a simple 3D geometry. The Directions API
+        segment. It's then visualized by a simple 3D geometry. The Directions API
         returns the shortest route between two points. You can drag & drop the two
         markers to update the route in this example. The Directions API call can also
         be changed for walking profiles. '
