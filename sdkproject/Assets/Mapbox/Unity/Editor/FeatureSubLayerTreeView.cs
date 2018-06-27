@@ -97,15 +97,12 @@
 				//cellItem.FindPropertyRelative("coreOptions.sublayerName").stringValue  = item.data.Name;
 				//args.item.displayName = item.data.Name;
 				EditorGUILayout.TextField(item.data.Type);
-				Debug.Log("name");
 			}
 			if (column == MyColumns.Type)
 			{
 				//var typeString = ((PresetFeatureType)cellItem.FindPropertyRelative("presetFeatureType").intValue).ToString();
 				//item.data.Type = typeString;
 				EditorGUILayout.LabelField(item.data.Type);
-				Debug.Log("type");
-
 			}
 			base.RowGUI(args);
 		}
