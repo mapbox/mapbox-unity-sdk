@@ -26,10 +26,13 @@
 		bool showModeling = false;
 		bool showTexturing = false;
 		private static VectorSubLayerProperties subLayerProperties;
-		/// <summary>
-		/// Gets or sets the layerID
-		/// </summary>
-		/// <value><c>true</c> then show general section; otherwise hide, <c>false</c>.</value>
+		private TreeModel<MyTreeElement> treeModel;
+
+		[SerializeField]
+		TreeViewState m_TreeViewState;
+
+		[SerializeField]
+		MultiColumnHeaderState m_MultiColumnHeaderState;
 
 		string objectId = "";
 		private string TilesetId
@@ -72,7 +75,7 @@
 		ModelingSectionDrawer _modelingSectionDrawer = new ModelingSectionDrawer();
 		GameplaySectionDrawer _gameplaySectionDrawer = new GameplaySectionDrawer();
 
-		FeatureSubLayerTreeView layerTreeView = new FeatureSubLayerTreeView(new TreeViewState());
+		FeatureSubLayerTreeView layerTreeView;
 		IList<int> selectedLayers = new List<int>();
 		public void DrawUI(SerializedProperty property)
 		{
@@ -164,7 +167,36 @@
 
 				var layersRect = EditorGUILayout.GetControlRect(GUILayout.MinHeight(Mathf.Max(subLayerArray.arraySize + 1, 1) * _lineHeight),
 																GUILayout.MaxHeight((subLayerArray.arraySize + 1) * _lineHeight));
-				layerTreeView.Layers = subLayerArray;
+
+				bool firstInit = m_MultiColumnHeaderState == null;
+				var headerState = FeatureSubLayerTreeView.CreateDefaultMultiColumnHeaderState();
+				if (MultiColumnHeaderState.CanOverwriteSerializedFields(m_MultiColumnHeaderState, headerState))
+				{
+					MultiColumnHeaderState.OverwriteSerializedFields(m_MultiColumnHeaderState, headerState);
+				}
+				m_MultiColumnHeaderState = headerState;
+
+				var multiColumnHeader = new MyMultiColumnHeader(headerState);
+
+				if (firstInit)
+				{
+					multiColumnHeader.ResizeToFit();
+				}
+
+				treeModel = new TreeModel<MyTreeElement>(GetData(subLayerArray));
+				if (m_TreeViewState == null)
+				{
+					m_TreeViewState = new TreeViewState();
+				}
+
+				if (layerTreeView == null)
+				{
+					layerTreeView = new FeatureSubLayerTreeView(m_TreeViewState, multiColumnHeader, treeModel);
+				}
+
+				layerTreeView.multiColumnHeader = multiColumnHeader;
+
+				//layerTreeView.Layers = subLayerArray;
 				layerTreeView.Reload();
 				layerTreeView.OnGUI(layersRect);
 
@@ -175,16 +207,16 @@
 				if (selectedLayers.Count > 0)
 				{
 					//ensure that selectedLayers[0] isn't out of bounds
-					if (selectedLayers[0] - layerTreeView.uniqueId > subLayerArray.arraySize - 1)
+					if (selectedLayers[0] - FeatureSubLayerTreeView.uniqueId > subLayerArray.arraySize - 1)
 					{
-						selectedLayers[0] = subLayerArray.arraySize - 1 + layerTreeView.uniqueId;
+						selectedLayers[0] = subLayerArray.arraySize - 1 + FeatureSubLayerTreeView.uniqueId;
 					}
 
 					SelectionIndex = selectedLayers[0];
 				}
 				else
 				{
-					if (SelectionIndex > 0 && (SelectionIndex - layerTreeView.uniqueId <= subLayerArray.arraySize - 1))
+					if (SelectionIndex > 0 && (SelectionIndex - FeatureSubLayerTreeView.uniqueId <= subLayerArray.arraySize - 1))
 					{
 						selectedLayers = new int[1] { SelectionIndex };
 						layerTreeView.SetSelection(selectedLayers);
@@ -217,7 +249,7 @@
 					var subLayer = subLayerArray.GetArrayElementAtIndex(subLayerArray.arraySize - 1);
 
 					SetSubLayerProps(subLayer);
-					selectedLayers = new int[1] { subLayerArray.arraySize - 1 + layerTreeView.uniqueId };
+					selectedLayers = new int[1] { subLayerArray.arraySize - 1 + FeatureSubLayerTreeView.uniqueId };
 					layerTreeView.SetSelection(selectedLayers);
 					subLayerProperties = null; // setting this to null so that the if block is not called again
 				}
@@ -226,7 +258,7 @@
 				{
 					foreach (var index in selectedLayers.OrderByDescending(i => i))
 					{
-						subLayerArray.DeleteArrayElementAtIndex(index - layerTreeView.uniqueId);
+						subLayerArray.DeleteArrayElementAtIndex(index - FeatureSubLayerTreeView.uniqueId);
 					}
 
 					selectedLayers = new int[0];
@@ -237,17 +269,17 @@
 
 				GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
-				if (selectedLayers.Count == 1 && subLayerArray.arraySize != 0 && selectedLayers[0] - layerTreeView.uniqueId >= 0)
+				if (selectedLayers.Count == 1 && subLayerArray.arraySize != 0 && selectedLayers[0] - FeatureSubLayerTreeView.uniqueId >= 0)
 				{
 					//ensure that selectedLayers[0] isn't out of bounds
-					if (selectedLayers[0] - layerTreeView.uniqueId > subLayerArray.arraySize - 1)
+					if (selectedLayers[0] - FeatureSubLayerTreeView.uniqueId > subLayerArray.arraySize - 1)
 					{
-						selectedLayers[0] = subLayerArray.arraySize - 1 + layerTreeView.uniqueId;
+						selectedLayers[0] = subLayerArray.arraySize - 1 + FeatureSubLayerTreeView.uniqueId;
 					}
 
 					SelectionIndex = selectedLayers[0];
 
-					var layerProperty = subLayerArray.GetArrayElementAtIndex(SelectionIndex - layerTreeView.uniqueId);
+					var layerProperty = subLayerArray.GetArrayElementAtIndex(SelectionIndex - FeatureSubLayerTreeView.uniqueId);
 
 					layerProperty.isExpanded = true;
 					var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
@@ -270,6 +302,27 @@
 			}
 		}
 
+		IList<MyTreeElement> GetData(SerializedProperty subLayerArray)
+		{
+			List<MyTreeElement> elements = new List<MyTreeElement>();
+			string name = string.Empty;
+			string type = string.Empty;
+			int id = 0;
+			var root = new MyTreeElement("Root", -1, 0);
+			elements.Add(root);
+			for (int i = 0; i < subLayerArray.arraySize; i++)
+			{
+				var subLayer = subLayerArray.GetArrayElementAtIndex(i);
+				name = subLayer.FindPropertyRelative("coreOptions.sublayerName").stringValue;
+				id = i + FeatureSubLayerTreeView.uniqueId;
+				type = ((PresetFeatureType)subLayer.FindPropertyRelative("presetFeatureType").enumValueIndex).ToString();
+				MyTreeElement element = new MyTreeElement(name, 0, id);
+				element.Name = name;
+				element.Type = type;
+				elements.Add(element);
+			}
+			return elements;
+		}
 
 		/// <summary>
 		/// Fetches the preset properties using the supplied <see cref="PresetFeatureType">PresetFeatureType</see>
