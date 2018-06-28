@@ -6,9 +6,7 @@ namespace Mapbox.Experimental.Platform
 	using Mapbox.Unity;
 	using System;
 	using System.Collections.Generic;
-	using System.Net;
 	using System.Net.Http;
-	using System.Text;
 	using System.Threading;
 	using System.Threading.Tasks;
 
@@ -73,11 +71,22 @@ namespace Mapbox.Experimental.Platform
 		{
 
 			_verb = verb;
+
+			string accessTokenQuery = $"&access_token={MapboxAccess.Instance.Configuration.AccessToken}";
+			UriBuilder uriBuilder = new UriBuilder(Url);
+			if (!string.IsNullOrWhiteSpace(uriBuilder.Query) && uriBuilder.Query.Length > 1)
+			{
+				uriBuilder.Query = $"{uriBuilder.Query.Substring(1)}&{accessTokenQuery}";
+			}
+			else
+			{
+				uriBuilder.Query = accessTokenQuery;
+			}
 			HttpRequestMessage request = new HttpRequestMessage
 			{
 				Method = verb,
 				Content = content,
-				RequestUri = new Uri(Url + $"&access_token={MapboxAccess.Instance.Configuration.AccessToken}")
+				RequestUri = uriBuilder.Uri
 			};
 
 			if (null != headers)
