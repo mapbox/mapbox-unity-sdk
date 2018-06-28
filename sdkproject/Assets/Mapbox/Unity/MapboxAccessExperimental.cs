@@ -1,4 +1,4 @@
-#if !MAPBOX_EXPERIMENTAL
+#if MAPBOX_EXPERIMENTAL
 namespace Mapbox.Unity
 {
 	using UnityEngine;
@@ -13,6 +13,8 @@ namespace Mapbox.Unity
 	using Mapbox.MapMatching;
 	using Mapbox.Tokens;
 	using Mapbox.Platform.TilesetTileJSON;
+	using Mapbox.Experimental.Platform;
+	using System.Threading.Tasks;
 
 	/// <summary>
 	/// Object for retrieving an API token and making http requests.
@@ -44,6 +46,7 @@ namespace Mapbox.Unity
 		}
 
 
+		public MapboxHttpClientFactory HttpClientFactory = new MapboxHttpClientFactory();
 		public static bool Configured;
 		public static string ConfigurationJSON;
 		private MapboxConfiguration _configuration;
@@ -62,6 +65,9 @@ namespace Mapbox.Unity
 
 		MapboxAccess()
 		{
+#if MAPBOX_EXPERIMENTAL && !NET_STANDARD_2_0
+			throw new NotSupportedException("Api Compatibility Level has to be set to: '.NET Standard 2.0'");
+#endif
 			LoadAccessToken();
 			if (null == _configuration || string.IsNullOrEmpty(_configuration.AccessToken))
 			{
@@ -147,7 +153,7 @@ namespace Mapbox.Unity
 
 			if (string.IsNullOrEmpty(ConfigurationJSON))
 			{
-				TextAsset configurationTextAsset = Resources.Load<TextAsset>(Constants.Path.MAPBOX_RESOURCES_RELATIVE);
+				TextAsset configurationTextAsset = Resources.Load<TextAsset>(Mapbox.Unity.Constants.Path.MAPBOX_RESOURCES_RELATIVE);
 				if (null == configurationTextAsset)
 				{
 					throw new InvalidTokenException(_tokenNotSetErrorMessage);
@@ -201,18 +207,18 @@ namespace Mapbox.Unity
 
 		public void SetLocationCollectionState(bool enable)
 		{
-			PlayerPrefs.SetInt(Constants.Path.SHOULD_COLLECT_LOCATION_KEY, (enable ? 1 : 0));
+			PlayerPrefs.SetInt(Mapbox.Unity.Constants.Path.SHOULD_COLLECT_LOCATION_KEY, (enable ? 1 : 0));
 			PlayerPrefs.Save();
 			_telemetryLibrary.SetLocationCollectionState(enable);
 		}
 
 		bool GetTelemetryCollectionState()
 		{
-			if (!PlayerPrefs.HasKey(Constants.Path.SHOULD_COLLECT_LOCATION_KEY))
+			if (!PlayerPrefs.HasKey(Mapbox.Unity.Constants.Path.SHOULD_COLLECT_LOCATION_KEY))
 			{
-				PlayerPrefs.SetInt(Constants.Path.SHOULD_COLLECT_LOCATION_KEY, 1);
+				PlayerPrefs.SetInt(Mapbox.Unity.Constants.Path.SHOULD_COLLECT_LOCATION_KEY, 1);
 			}
-			return PlayerPrefs.GetInt(Constants.Path.SHOULD_COLLECT_LOCATION_KEY) != 0;
+			return PlayerPrefs.GetInt(Mapbox.Unity.Constants.Path.SHOULD_COLLECT_LOCATION_KEY) != 0;
 		}
 
 		/// <summary>
@@ -232,6 +238,11 @@ namespace Mapbox.Unity
 			return _fileSource.Request(url, callback, _configuration.DefaultTimeout, tileId, mapId);
 		}
 
+
+		public IMapboxHttpRequest RequestNew(string url)
+		{
+			return new MapboxHttpRequest(url);
+		}
 
 		Geocoder _geocoder;
 		/// <summary>
