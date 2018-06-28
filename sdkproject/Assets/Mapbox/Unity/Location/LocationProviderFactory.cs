@@ -4,9 +4,9 @@
 
 namespace Mapbox.Unity.Location
 {
-	using UnityEngine;
 	using Mapbox.Unity.Map;
 	using System.Text.RegularExpressions;
+	using UnityEngine;
 
 	/// <summary>
 	/// Singleton factory to allow easy access to various LocationProviders.
@@ -19,20 +19,20 @@ namespace Mapbox.Unity.Location
 
 		[SerializeField]
 		[Tooltip("Provider using Unity's builtin 'Input.Location' service")]
-		AbstractLocationProvider _deviceLocationProviderUnity;
+		private AbstractLocationProvider _deviceLocationProviderUnity;
 
 		[SerializeField]
 		[Tooltip("Custom native Android location provider. If this is not set above provider is used")]
-		DeviceLocationProviderAndroidNative _deviceLocationProviderAndroid;
+		private DeviceLocationProviderAndroidNative _deviceLocationProviderAndroid;
 
 		[SerializeField]
-		AbstractLocationProvider _editorLocationProvider;
+		private AbstractLocationProvider _editorLocationProvider;
 
 		[SerializeField]
-		AbstractLocationProvider _transformLocationProvider;
+		private AbstractLocationProvider _transformLocationProvider;
 
 		[SerializeField]
-		bool _dontDestroyOnLoad;
+		private bool _dontDestroyOnLoad;
 
 
 		/// <summary>
@@ -52,7 +52,7 @@ namespace Mapbox.Unity.Location
 			}
 		}
 
-		ILocationProvider _defaultLocationProvider;
+		private ILocationProvider _defaultLocationProvider;
 
 		/// <summary>
 		/// The default location provider. 
@@ -142,8 +142,12 @@ namespace Mapbox.Unity.Location
 		/// Depending on the platform, this method and calls to it will be stripped during compile.
 		/// </summary>
 		[System.Diagnostics.Conditional("UNITY_EDITOR")]
-		void InjectEditorLocationProvider()
+		private void InjectEditorLocationProvider()
 		{
+			if (null == _editorLocationProvider)
+			{
+				throw new System.Exception("Editor Location Provider not set");
+			}
 			Debug.LogFormat("LocationProviderFactory: Injected EDITOR Location Provider - {0}", _editorLocationProvider.GetType());
 			DefaultLocationProvider = _editorLocationProvider;
 		}
@@ -153,7 +157,7 @@ namespace Mapbox.Unity.Location
 		/// Depending on the platform, this method and calls to it will be stripped during compile.
 		/// </summary>
 		[System.Diagnostics.Conditional("NOT_UNITY_EDITOR")]
-		void InjectDeviceLocationProvider()
+		private void InjectDeviceLocationProvider()
 		{
 			int AndroidApiVersion = 0;
 			var regex = new Regex(@"(?<=API-)-?\d+");
