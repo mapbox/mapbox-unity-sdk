@@ -246,13 +246,18 @@
 					menu.DropDown(rect);
 				}
 
-				//Assign subLayerProperties after fetching it from the presets class
+				//Assign subLayerProperties after fetching it from the presets class. This happens everytime an element is added
 				if(subLayerProperties!=null)
 				{
 					subLayerArray.arraySize++;
 					var subLayer = subLayerArray.GetArrayElementAtIndex(subLayerArray.arraySize - 1);
-
 					SetSubLayerProps(subLayer);
+
+					//Refreshing the tree
+					layerTreeView.Layers = subLayerArray;
+					layerTreeView.AddElementToTree(subLayer);
+					layerTreeView.Reload();
+
 					selectedLayers = new int[1] { subLayerArray.arraySize - 1 + FeatureSubLayerTreeView.uniqueId };
 					layerTreeView.SetSelection(selectedLayers);
 					subLayerProperties = null; // setting this to null so that the if block is not called again

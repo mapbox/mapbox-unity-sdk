@@ -93,6 +93,24 @@
 			treeModel.RemoveElements(new List<int>() { id });
 		}
 
+		public void AddElementToTree(SerializedProperty subLayer)
+		{
+			var name = subLayer.FindPropertyRelative("coreOptions.sublayerName").stringValue;
+			var id = Layers.arraySize - 1 + uniqueId;
+
+			if(treeModel.Find(Layers.arraySize - 1 + uniqueId)!=null)
+			{
+				Debug.Log(" found one. exiting");
+				return;
+			}
+
+			var type = ((PresetFeatureType)subLayer.FindPropertyRelative("presetFeatureType").enumValueIndex).ToString();
+			FeatureTreeElement element = new FeatureTreeElement(name, 0, id);
+			element.Name = name;
+			element.Type = type;
+			treeModel.AddElement(element, treeModel.root, treeModel.numberOfDataElements-1);
+		}
+
 		protected override void RowGUI(RowGUIArgs args)		
 		{
 			var rowItem = (TreeViewItem <FeatureTreeElement>)args.item;
