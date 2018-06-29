@@ -26,7 +26,7 @@
 		bool showModeling = false;
 		bool showTexturing = false;
 		private static VectorSubLayerProperties subLayerProperties;
-		private TreeModel<MyTreeElement> treeModel;
+		private TreeModel<FeatureTreeElement> treeModel;
 
 		[SerializeField]
 		TreeViewState m_TreeViewState;
@@ -179,14 +179,14 @@
 					}
 					m_MultiColumnHeaderState = headerState;
 
-					var multiColumnHeader = new MyMultiColumnHeader(headerState);
+					var multiColumnHeader = new FeatureSectionMultiColumnHeader(headerState);
 
 					if (firstInit)
 					{
 						multiColumnHeader.ResizeToFit();
 					}
 
-					treeModel = new TreeModel<MyTreeElement>(GetData(subLayerArray));
+					treeModel = new TreeModel<FeatureTreeElement>(GetData(subLayerArray));
 					if (m_TreeViewState == null)
 					{
 						m_TreeViewState = new TreeViewState();
@@ -311,13 +311,13 @@
 			}
 		}
 
-		IList<MyTreeElement> GetData(SerializedProperty subLayerArray)
+		IList<FeatureTreeElement> GetData(SerializedProperty subLayerArray)
 		{
-			List<MyTreeElement> elements = new List<MyTreeElement>();
+			List<FeatureTreeElement> elements = new List<FeatureTreeElement>();
 			string name = string.Empty;
 			string type = string.Empty;
 			int id = 0;
-			var root = new MyTreeElement("Root", -1, 0);
+			var root = new FeatureTreeElement("Root", -1, 0);
 			elements.Add(root);
 			for (int i = 0; i < subLayerArray.arraySize; i++)
 			{
@@ -325,7 +325,7 @@
 				name = subLayer.FindPropertyRelative("coreOptions.sublayerName").stringValue;
 				id = i + FeatureSubLayerTreeView.uniqueId;
 				type = ((PresetFeatureType)subLayer.FindPropertyRelative("presetFeatureType").enumValueIndex).ToString();
-				MyTreeElement element = new MyTreeElement(name, 0, id);
+				FeatureTreeElement element = new FeatureTreeElement(name, 0, id);
 				element.Name = name;
 				element.Type = type;
 				elements.Add(element);

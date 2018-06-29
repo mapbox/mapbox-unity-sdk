@@ -6,7 +6,7 @@
 	using UnityEditor;
 	using Mapbox.Unity.Map;
 
-	internal class FeatureSubLayerTreeView : TreeViewWithTreeModel<MyTreeElement>
+	internal class FeatureSubLayerTreeView : TreeViewWithTreeModel<FeatureTreeElement>
 	{
 		public SerializedProperty Layers;
 		private float kToggleWidth = 18f;
@@ -19,7 +19,7 @@
 			normal = new GUIStyleState(){textColor = Color.white} 
 		};
 
-		public FeatureSubLayerTreeView(TreeViewState state, MultiColumnHeader multicolumnHeader, TreeModel<MyTreeElement> model) : base(state, multicolumnHeader, model)
+		public FeatureSubLayerTreeView(TreeViewState state, MultiColumnHeader multicolumnHeader, TreeModel<FeatureTreeElement> model) : base(state, multicolumnHeader, model)
 		{
 			// Custom setup
 			rowHeight = kRowHeights;
@@ -94,14 +94,14 @@
 
 		protected override void RowGUI(RowGUIArgs args)		
 		{
-			var rowItem = (TreeViewItem <MyTreeElement>)args.item;
+			var rowItem = (TreeViewItem <FeatureTreeElement>)args.item;
 			for (int i = 0; i < args.GetNumVisibleColumns(); ++i)
 			{
 				CellGUI(args.GetCellRect(i), rowItem, (MyColumns)args.GetColumn(i), ref args);
 			}
 		}
 
-		void CellGUI(Rect cellRect, TreeViewItem<MyTreeElement> item, MyColumns column, ref RowGUIArgs args)
+		void CellGUI(Rect cellRect, TreeViewItem<FeatureTreeElement> item, MyColumns column, ref RowGUIArgs args)
 		{
 			// Center cell rect vertically (makes it easier to place controls, icons etc in the cells)
 			if (Layers == null || Layers.arraySize == 0)

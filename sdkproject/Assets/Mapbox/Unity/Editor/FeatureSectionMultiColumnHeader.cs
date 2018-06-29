@@ -4,7 +4,7 @@ namespace Mapbox.Editor
 	using UnityEditor;
 	using UnityEditor.IMGUI.Controls;
 	using UnityEngine;
-	internal class MyMultiColumnHeader : MultiColumnHeader
+	internal class FeatureSectionMultiColumnHeader : MultiColumnHeader
 	{
 		Mode m_Mode;
 
@@ -15,7 +15,7 @@ namespace Mapbox.Editor
 			MinimumHeaderWithoutSorting
 		}
 
-		public MyMultiColumnHeader(MultiColumnHeaderState state)
+		public FeatureSectionMultiColumnHeader(MultiColumnHeaderState state)
 			: base(state)
 		{
 			mode = Mode.DefaultHeader;
