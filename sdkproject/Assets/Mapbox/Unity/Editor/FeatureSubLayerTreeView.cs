@@ -12,6 +12,12 @@
 		private float kToggleWidth = 18f;
 		public static int uniqueId = 3000;
 		const float kRowHeights = 20f;
+		const float nameOffset = 15f;
+		private GUIStyle columnStyle = new GUIStyle() 
+		{
+			alignment = TextAnchor.MiddleLeft, 
+			normal = new GUIStyleState(){textColor = Color.white} 
+		};
 
 		public FeatureSubLayerTreeView(TreeViewState state, MultiColumnHeader multicolumnHeader, TreeModel<MyTreeElement> model) : base(state, multicolumnHeader, model)
 		{
@@ -21,7 +27,6 @@
 			showBorder = true;
 			customFoldoutYOffset = (kRowHeights - EditorGUIUtility.singleLineHeight) * 0.5f; // center foldout in the row since we also center content. See RowGUI
 			extraSpaceBeforeIconAndLabel = kToggleWidth;
-
 			Reload();
 		}
 
@@ -52,18 +57,39 @@
 
 		protected override bool CanRename(TreeViewItem item)
 		{
-			return true;
+			// Only allow rename if we can show the rename overlay with a certain width (label might be clipped by other columns)
+			Rect renameRect = GetRenameRect(treeViewRect, 0, item);
+			return renameRect.width > 30;
 		}
 
 		protected override void RenameEnded(RenameEndedArgs args)
 		{
-			if (Layers == null)
+			if (Layers == null || Layers.arraySize == 0)
 			{
 				return;
 			}
 
-			var layer = Layers.GetArrayElementAtIndex(args.itemID - uniqueId);
-			layer.FindPropertyRelative("coreOptions.sublayerName").stringValue = string.IsNullOrEmpty(args.newName.Trim()) ? args.originalName : args.newName;
+			if (args.acceptedRename)
+			{
+				var element = treeModel.Find(args.itemID);
+				element.name = string.IsNullOrEmpty(args.newName.Trim()) ? args.originalName : args.newName;
+				var layer = Layers.GetArrayElementAtIndex(args.itemID - uniqueId);
+				layer.FindPropertyRelative("coreOptions.sublayerName").stringValue = element.name;
+				Reload();
+			}
+		}
+
+		protected override Rect GetRenameRect(Rect rowRect, int row, TreeViewItem item)
+		{
+			Rect cellRect = GetCellRectForTreeFoldouts(rowRect);
+			cellRect.xMin = nameOffset;
+			CenterRectUsingSingleLineHeight(ref cellRect);
+			return base.GetRenameRect(cellRect, row, item);
+		}
+
+		public void RemoveItemFromTree(int id)
+		{
+			treeModel.RemoveElements(new List<int>() { id });
 		}
 
 		protected override void RowGUI(RowGUIArgs args)		
@@ -75,36 +101,47 @@
 			}
 		}
 
-
 		void CellGUI(Rect cellRect, TreeViewItem<MyTreeElement> item, MyColumns column, ref RowGUIArgs args)
 		{
 			// Center cell rect vertically (makes it easier to place controls, icons etc in the cells)
+			if (Layers == null || Layers.arraySize == 0)
+			{
+				return;
+			}
+
+			if (Layers.arraySize <= args.item.id - uniqueId)
+			{
+				return;
+			}
+
+			var layer = Layers.GetArrayElementAtIndex(args.item.id - uniqueId);
 			CenterRectUsingSingleLineHeight(ref cellRect);
-			// Do toggle
-			Rect toggleRect = cellRect;
-			toggleRect.x += GetContentIndent(item);
-			toggleRect.width = kToggleWidth;
-
-			args.rowRect = cellRect;
-
-			cellRect.xMin += 5f; // When showing controls make some extra spacing
-								 //var cellItem = Layers.GetArrayElementAtIndex(args.item.id - uniqueId);
-
 			if (column == MyColumns.Name)
 			{
-				item.data.isActive = EditorGUI.Toggle(toggleRect, item.data.isActive);
-				//cellItem.FindPropertyRelative("coreOptions.isActive").boolValue = item.data.isActive;
-				//cellItem.FindPropertyRelative("coreOptions.sublayerName").stringValue  = item.data.Name;
-				//args.item.displayName = item.data.Name;
-				EditorGUILayout.TextField(item.data.Type);
+				layer.FindPropertyRelative("coreOptions.isActive").boolValue = item.data.isActive;
+				Rect toggleRect = cellRect;
+				toggleRect.x += GetContentIndent(item);
+				toggleRect.width = kToggleWidth;
+
+				if (toggleRect.xMax < cellRect.xMax)
+				{
+					item.data.isActive = EditorGUI.Toggle(toggleRect, item.data.isActive); // hide when outside cell rect
+				}
+
+				cellRect.xMin += nameOffset; // Adding some gap between the checkbox and the name
+				args.rowRect = cellRect;
+
+				layer.FindPropertyRelative("coreOptions.sublayerName").stringValue = item.data.Name;
+				//This draws the name property
+				base.RowGUI(args);
 			}
 			if (column == MyColumns.Type)
 			{
 				//var typeString = ((PresetFeatureType)cellItem.FindPropertyRelative("presetFeatureType").intValue).ToString();
 				//item.data.Type = typeString;
-				EditorGUILayout.LabelField(item.data.Type);
+				cellRect.xMin += 15f; // Adding some gap between the checkbox and the name
+				EditorGUI.LabelField(cellRect, item.data.Type, columnStyle);
 			}
-			base.RowGUI(args);
 		}
 
 		// All columns
@@ -124,13 +161,7 @@
 					headerContent = new GUIContent("Name"),
 					contextMenuText = "Name",
 					headerTextAlignment = TextAlignment.Center,
-					//sortedAscending = true,
-					//sortingArrowAlignment = TextAlignment.Right,
-					//width = 30,
-					//minWidth = 30,
-					//maxWidth = 60,
-					autoResize = false,
-					allowToggleVisibility = true,
+					autoResize = true,
 					canSort = false
 				},
 
@@ -140,13 +171,7 @@
 					headerContent = new GUIContent("Type"),
 					contextMenuText = "Type",
 					headerTextAlignment = TextAlignment.Center,
-					//sortedAscending = true,
-					//sortingArrowAlignment = TextAlignment.Right,
-					//width = 30,
-					//minWidth = 30,
-					//maxWidth = 60,
-					autoResize = false,
-					allowToggleVisibility = true,
+					autoResize = true,
 					canSort = false
 				}
 			};

@@ -33,7 +33,8 @@
 
 		[SerializeField]
 		MultiColumnHeaderState m_MultiColumnHeaderState;
-
+			
+		bool m_Initialized = false;
 		string objectId = "";
 		private string TilesetId
 		{
@@ -168,36 +169,39 @@
 				var layersRect = EditorGUILayout.GetControlRect(GUILayout.MinHeight(Mathf.Max(subLayerArray.arraySize + 1, 1) * _lineHeight),
 																GUILayout.MaxHeight((subLayerArray.arraySize + 1) * _lineHeight));
 
-				bool firstInit = m_MultiColumnHeaderState == null;
-				var headerState = FeatureSubLayerTreeView.CreateDefaultMultiColumnHeaderState();
-				if (MultiColumnHeaderState.CanOverwriteSerializedFields(m_MultiColumnHeaderState, headerState))
+				if (!m_Initialized)
 				{
-					MultiColumnHeaderState.OverwriteSerializedFields(m_MultiColumnHeaderState, headerState);
+					bool firstInit = m_MultiColumnHeaderState == null;
+					var headerState = FeatureSubLayerTreeView.CreateDefaultMultiColumnHeaderState();
+					if (MultiColumnHeaderState.CanOverwriteSerializedFields(m_MultiColumnHeaderState, headerState))
+					{
+						MultiColumnHeaderState.OverwriteSerializedFields(m_MultiColumnHeaderState, headerState);
+					}
+					m_MultiColumnHeaderState = headerState;
+
+					var multiColumnHeader = new MyMultiColumnHeader(headerState);
+
+					if (firstInit)
+					{
+						multiColumnHeader.ResizeToFit();
+					}
+
+					treeModel = new TreeModel<MyTreeElement>(GetData(subLayerArray));
+					if (m_TreeViewState == null)
+					{
+						m_TreeViewState = new TreeViewState();
+					}
+
+					if (layerTreeView == null)
+					{
+						layerTreeView = new FeatureSubLayerTreeView(m_TreeViewState, multiColumnHeader, treeModel);
+					}
+
+					layerTreeView.multiColumnHeader = multiColumnHeader;
+					layerTreeView.Reload();
+					m_Initialized = true;
 				}
-				m_MultiColumnHeaderState = headerState;
-
-				var multiColumnHeader = new MyMultiColumnHeader(headerState);
-
-				if (firstInit)
-				{
-					multiColumnHeader.ResizeToFit();
-				}
-
-				treeModel = new TreeModel<MyTreeElement>(GetData(subLayerArray));
-				if (m_TreeViewState == null)
-				{
-					m_TreeViewState = new TreeViewState();
-				}
-
-				if (layerTreeView == null)
-				{
-					layerTreeView = new FeatureSubLayerTreeView(m_TreeViewState, multiColumnHeader, treeModel);
-				}
-
-				layerTreeView.multiColumnHeader = multiColumnHeader;
-
-				//layerTreeView.Layers = subLayerArray;
-				layerTreeView.Reload();
+				layerTreeView.Layers = subLayerArray;
 				layerTreeView.OnGUI(layersRect);
 
 				selectedLayers = layerTreeView.GetSelection();
@@ -259,6 +263,11 @@
 					foreach (var index in selectedLayers.OrderByDescending(i => i))
 					{
 						subLayerArray.DeleteArrayElementAtIndex(index - FeatureSubLayerTreeView.uniqueId);
+						if (layerTreeView != null)
+						{
+							layerTreeView.RemoveItemFromTree(index);
+							layerTreeView.Reload();
+						}
 					}
 
 					selectedLayers = new int[0];
