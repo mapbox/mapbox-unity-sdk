@@ -13,6 +13,7 @@ namespace Mapbox.Unity
 	using Mapbox.Unity.Telemetry;
 	using System;
 	using System.IO;
+	using System.Threading.Tasks;
 	using UnityEngine;
 
 	/// <summary>
@@ -250,9 +251,9 @@ namespace Mapbox.Unity
 		}
 
 
-		public IMapboxHttpRequest RequestNew(string url)
+		public async Task<IMapboxHttpRequest> RequestNew(string url)
 		{
-			return _webDataFetcher.GetRequest(url);
+			return await _webDataFetcher.GetRequest(url);
 		}
 
 		Geocoder _geocoder;

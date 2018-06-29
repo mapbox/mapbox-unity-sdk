@@ -6,22 +6,39 @@
 
 	public class MapboxHttpResponseReceivedEventArgs : EventArgs
 	{
-
-
-		public MapboxHttpResponseReceivedEventArgs(
+		public MapboxHttpResponseReceivedEventArgs
+		(
 			object id
 			, MapboxHttpResponse response
-			)
+		)
 		{
+			Id = id;
+			Response = response;
 			Completed = null != response.Data;
 			Succeeded = Completed && response.StatusCode.HasValue && response.StatusCode.Value == (int)HttpStatusCode.OK;
 		}
 
 
-		public object Id { get; set; }
+		public object Id { get; private set; }
 
-		public bool Completed { get; set; }
 
-		public bool Succeeded { get; set; }
+		public MapboxHttpResponse Response { get; private set; }
+
+		public bool Completed { get; private set; }
+
+		public bool Succeeded { get; private set; }
 	}
+
+
+
+	public class MapboxWebDataFetcherResponseReceivedEventArgs : EventArgs
+	{
+
+		public MapboxWebDataFetcherResponseReceivedEventArgs()
+		{
+
+		}
+
+	}
+
 }

@@ -13,6 +13,10 @@ namespace Mapbox.Experimental.Platform.Http
 		IMapboxHttpClient Client { get; set; }
 		string Url { get; set; }
 		HttpMethod Verb { get; }
+		Task<MapboxHttpResponse> Head(object id);
+		Task<MapboxHttpResponse> Get(object id);
+		Task<MapboxHttpResponse> Post(object id, HttpContent content = null);
+		Task<MapboxHttpResponse> Put(object id, HttpContent content = null);
 		Task<MapboxHttpResponse> SendAsync(
 			object id
 			, HttpMethod verb
@@ -73,6 +77,39 @@ namespace Mapbox.Experimental.Platform.Http
 			_cancellationTokenSource.Cancel();
 		}
 
+
+		///////////////////////////////////
+		///////////////////////////////////
+		///////////////////////////////////
+		///// TODO!!!! revisit!!! all those overloads are necessaray because it is not posssible
+		///// to use System.Net references in the tests, in this case HttpMethod
+		///////////////////////////////////
+		///////////////////////////////////
+		///////////////////////////////////
+		///////////////////////////////////
+
+		public async Task<MapboxHttpResponse> Head(object id)
+		{
+			return await SendAsync(id, HttpMethod.Head);
+		}
+
+		public async Task<MapboxHttpResponse> Get(object id)
+		{
+			return await SendAsync(id, HttpMethod.Get);
+		}
+
+		public async Task<MapboxHttpResponse> Post(object id, HttpContent content = null)
+		{
+			return await SendAsync(id, HttpMethod.Post, content);
+		}
+
+
+		public async Task<MapboxHttpResponse> Put(object id, HttpContent content = null)
+		{
+			return await SendAsync(id, HttpMethod.Put, content);
+		}
+
+
 		public async Task<MapboxHttpResponse> SendAsync(
 			object id
 			, HttpMethod verb
@@ -95,7 +132,7 @@ namespace Mapbox.Experimental.Platform.Http
 			{
 				uriBuilder.Query = accessTokenQuery;
 			}
-			HttpRequestMessage request = new HttpRequestMessage
+			HttpRequestMessage httpRequestMessage = new HttpRequestMessage
 			{
 				Method = verb,
 				Content = content,
@@ -106,7 +143,7 @@ namespace Mapbox.Experimental.Platform.Http
 			{
 				foreach (var hdr in headers)
 				{
-					request.Headers.Add(hdr.Key, hdr.Value);
+					httpRequestMessage.Headers.Add(hdr.Key, hdr.Value);
 				}
 			}
 
@@ -116,34 +153,39 @@ namespace Mapbox.Experimental.Platform.Http
 			var cts = CancellationTokenSource.CreateLinkedTokenSource(userToken);
 			cts.CancelAfter(_timeOutSeconds * 1000);
 			var token = cts.Token;
-			MapboxHttpResponse response = null;
+			MapboxHttpResponse mapboxResponse = null;
+			HttpResponseMessage httpResponseMessage = null;
 			try
 			{
-				using (HttpResponseMessage resp = await Client.HttpClient.SendAsync(request, completionOption, token).ConfigureAwait(false))
-				{
-					response = await MapboxHttpResponse.FromWebResponse(this, resp, null);
-					return response;
-				}
+				httpResponseMessage = await Client.HttpClient.SendAsync(httpRequestMessage, completionOption, token).ConfigureAwait(false);
+				mapboxResponse = await MapboxHttpResponse.FromWebResponse(this, httpResponseMessage, null);
+				return mapboxResponse;
 			}
 			catch (Exception ex)
 			{
-				UnityEngine.Debug.LogError(ex);
+				UnityEngine.Debug.LogError($"caught exception: {ex}");
 				if (ex is OperationCanceledException && !token.IsCancellationRequested)
 				{
-					response = await MapboxHttpResponse.FromWebResponse(this, null, new TimeoutException());
+					mapboxResponse = await MapboxHttpResponse.FromWebResponse(this, httpResponseMessage, new TimeoutException());
 				}
 				else
 				{
-					response = await MapboxHttpResponse.FromWebResponse(this, null, ex);
+					mapboxResponse = await MapboxHttpResponse.FromWebResponse(this, httpResponseMessage, ex);
 				}
-				return response;
+				return mapboxResponse;
 			}
 			finally
 			{
-				request.Dispose();
-				request = null;
+				if (null != httpResponseMessage)
+				{
+					httpResponseMessage.Dispose();
+					httpResponseMessage = null;
+				}
 
-				MapboxHttpResponseReceivedEventArgs args = new MapboxHttpResponseReceivedEventArgs(id, response);
+				httpRequestMessage.Dispose();
+				httpRequestMessage = null;
+
+				MapboxHttpResponseReceivedEventArgs args = new MapboxHttpResponseReceivedEventArgs(id, mapboxResponse);
 				ResponseReveived?.Invoke(this, args);
 			}
 		}
