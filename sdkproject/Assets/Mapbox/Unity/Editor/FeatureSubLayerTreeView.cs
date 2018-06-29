@@ -73,6 +73,7 @@
 			{
 				var element = treeModel.Find(args.itemID);
 				element.name = string.IsNullOrEmpty(args.newName.Trim()) ? args.originalName : args.newName;
+				element.Name = string.IsNullOrEmpty(args.newName.Trim()) ? args.originalName : args.newName;
 				var layer = Layers.GetArrayElementAtIndex(args.itemID - uniqueId);
 				layer.FindPropertyRelative("coreOptions.sublayerName").stringValue = element.name;
 				Reload();
