@@ -1,20 +1,19 @@
 #if MAPBOX_EXPERIMENTAL
 namespace Mapbox.Unity
 {
-	using UnityEngine;
-	using System;
-	using System.IO;
-	using Mapbox.Geocoding;
 	using Mapbox.Directions;
-	using Mapbox.Platform;
-	using Mapbox.Platform.Cache;
-	using Mapbox.Unity.Telemetry;
+	using Mapbox.Experimental.Platform.Http;
+	using Mapbox.Geocoding;
 	using Mapbox.Map;
 	using Mapbox.MapMatching;
-	using Mapbox.Tokens;
+	using Mapbox.Platform;
+	using Mapbox.Platform.Cache;
 	using Mapbox.Platform.TilesetTileJSON;
-	using Mapbox.Experimental.Platform;
-	using System.Threading.Tasks;
+	using Mapbox.Tokens;
+	using Mapbox.Unity.Telemetry;
+	using System;
+	using System.IO;
+	using UnityEngine;
 
 	/// <summary>
 	/// Object for retrieving an API token and making http requests.
@@ -24,6 +23,7 @@ namespace Mapbox.Unity
 	{
 		ITelemetryLibrary _telemetryLibrary;
 		CachingWebFileSource _fileSource;
+		MapboxWebDataFetcher _webDataFetcher;
 
 		public delegate void TokenValidationEvent(MapboxTokenStatus response);
 		public event TokenValidationEvent OnTokenValidation;
@@ -46,7 +46,6 @@ namespace Mapbox.Unity
 		}
 
 
-		public MapboxHttpClientFactory HttpClientFactory = new MapboxHttpClientFactory();
 		public static bool Configured;
 		public static string ConfigurationJSON;
 		private MapboxConfiguration _configuration;
@@ -110,6 +109,7 @@ namespace Mapbox.Unity
 				_configuration = configuration;
 
 				ConfigureFileSource();
+				ConfigureWebDataFetcher();
 				ConfigureTelemetry();
 
 				Configured = true;
@@ -180,6 +180,17 @@ namespace Mapbox.Unity
 		}
 
 
+		void ConfigureWebDataFetcher()
+		{
+			_webDataFetcher = new MapboxWebDataFetcher(_configuration.DefaultTimeout, _configuration.AccessToken, _configuration.AutoRefreshCache)
+				.AddCache(new MemoryCache(_configuration.MemoryCacheSize))
+#if !UNITY_WEBGL
+				.AddCache(new SQLiteCache(_configuration.FileCacheSize))
+#endif
+				;
+		}
+
+
 		void ConfigureTelemetry()
 		{
 			// TODO: enable after token validation has been made async
@@ -241,7 +252,7 @@ namespace Mapbox.Unity
 
 		public IMapboxHttpRequest RequestNew(string url)
 		{
-			return new MapboxHttpRequest(url);
+			return _webDataFetcher.GetRequest(url);
 		}
 
 		Geocoder _geocoder;

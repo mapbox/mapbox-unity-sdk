@@ -1,9 +1,7 @@
 ﻿
 
-namespace Mapbox.Experimental.Platform
+namespace Mapbox.Experimental.Platform.Http
 {
-
-	using Mapbox.Unity;
 	using System;
 	using System.Collections.Generic;
 	using System.Net.Http;
@@ -20,7 +18,7 @@ namespace Mapbox.Experimental.Platform
 			, HttpMethod verb
 			, HttpContent content = null
 			, Dictionary<string, string> headers = null
-			, CancellationToken? cancellationToken = null
+			//, CancellationToken? cancellationToken = null
 			, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead
 		);
 	}
@@ -28,13 +26,20 @@ namespace Mapbox.Experimental.Platform
 	public class MapboxHttpRequest : IMapboxHttpRequest
 	{
 
+		public event EventHandler<MapboxHttpResponseReceivedEventArgs> ResponseReveived;
+
 
 		private static IMapboxHttpClient _client = null;
-		private HttpMethod _verb;
+		private CancellationTokenSource _cancellationTokenSource;
+		private string _accessToken;
+		private int _timeOutSeconds;
 
-		public MapboxHttpRequest(string url)
+		public MapboxHttpRequest(string url, int timeoutSeconds, string accessToken)
 		{
 			Url = url;
+			_timeOutSeconds = timeoutSeconds;
+			_accessToken = accessToken;
+			_cancellationTokenSource = new CancellationTokenSource();
 		}
 
 
@@ -49,7 +54,7 @@ namespace Mapbox.Experimental.Platform
 			get
 			{
 				return (null != _client) ? Client :
-			   (!string.IsNullOrWhiteSpace(Url)) ? MapboxAccess.Instance.HttpClientFactory.Get(Url) :
+			   (!string.IsNullOrWhiteSpace(Url)) ? MapboxHttp.HttpClientFactory.Get(Url) :
 			   null;
 			}
 			set { _client = value; }
@@ -59,20 +64,28 @@ namespace Mapbox.Experimental.Platform
 		public string Url { get; set; }
 
 
-		public HttpMethod Verb { get { return _verb; } }
+		public HttpMethod Verb { get; private set; }
+
+
+		public void Cancel()
+		{
+			if (null == _cancellationTokenSource) { return; }
+			_cancellationTokenSource.Cancel();
+		}
+
 		public async Task<MapboxHttpResponse> SendAsync(
 			object id
 			, HttpMethod verb
 			, HttpContent content = null
 			, Dictionary<string, string> headers = null
-			, CancellationToken? cancellationToken = null
+			/*, CancellationToken? cancellationToken = null*/
 			, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead
 			)
 		{
 
-			_verb = verb;
+			Verb = verb;
 
-			string accessTokenQuery = $"&access_token={MapboxAccess.Instance.Configuration.AccessToken}";
+			string accessTokenQuery = $"&access_token={_accessToken}";
 			UriBuilder uriBuilder = new UriBuilder(Url);
 			if (!string.IsNullOrWhiteSpace(uriBuilder.Query) && uriBuilder.Query.Length > 1)
 			{
@@ -98,17 +111,18 @@ namespace Mapbox.Experimental.Platform
 			}
 
 
-			var userToken = cancellationToken ?? CancellationToken.None;
+			var userToken = _cancellationTokenSource.Token; // cancellationToken ?? CancellationToken.None;
 
 			var cts = CancellationTokenSource.CreateLinkedTokenSource(userToken);
-			cts.CancelAfter(MapboxAccess.Instance.Configuration.DefaultTimeout * 1000);
+			cts.CancelAfter(_timeOutSeconds * 1000);
 			var token = cts.Token;
-
+			MapboxHttpResponse response = null;
 			try
 			{
 				using (HttpResponseMessage resp = await Client.HttpClient.SendAsync(request, completionOption, token).ConfigureAwait(false))
 				{
-					return await MapboxHttpResponse.FromWebResponse(this, resp, null);
+					response = await MapboxHttpResponse.FromWebResponse(this, resp, null);
+					return response;
 				}
 			}
 			catch (Exception ex)
@@ -116,11 +130,22 @@ namespace Mapbox.Experimental.Platform
 				UnityEngine.Debug.LogError(ex);
 				if (ex is OperationCanceledException && !token.IsCancellationRequested)
 				{
-					return await MapboxHttpResponse.FromWebResponse(this, null, new TimeoutException());
+					response = await MapboxHttpResponse.FromWebResponse(this, null, new TimeoutException());
 				}
-				return await MapboxHttpResponse.FromWebResponse(this, null, ex);
+				else
+				{
+					response = await MapboxHttpResponse.FromWebResponse(this, null, ex);
+				}
+				return response;
 			}
+			finally
+			{
+				request.Dispose();
+				request = null;
 
+				MapboxHttpResponseReceivedEventArgs args = new MapboxHttpResponseReceivedEventArgs(id, response);
+				ResponseReveived?.Invoke(this, args);
+			}
 		}
 
 

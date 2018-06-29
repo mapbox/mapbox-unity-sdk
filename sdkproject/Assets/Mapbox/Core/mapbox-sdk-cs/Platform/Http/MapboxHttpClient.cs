@@ -1,6 +1,6 @@
 ﻿
 
-namespace Mapbox.Experimental.Platform
+namespace Mapbox.Experimental.Platform.Http
 {
 
 	using System;
@@ -13,7 +13,7 @@ namespace Mapbox.Experimental.Platform
 	{
 		HttpClient HttpClient { get; }
 		string BaseUrl { get; set; }
-		IMapboxHttpRequest Request(string url);
+		MapboxHttpRequest Request(string url, int timeoutSeconds, string accessToken);
 
 		bool IsDisposed { get; }
 	}
@@ -70,9 +70,9 @@ namespace Mapbox.Experimental.Platform
 
 		public HttpClient HttpClient => _client.Value;
 
-		public IMapboxHttpRequest Request(string url)
+		public MapboxHttpRequest Request(string url, int timeoutSeconds, string accessToken)
 		{
-			return new MapboxHttpRequest(url);
+			return new MapboxHttpRequest(url, timeoutSeconds, accessToken);
 		}
 
 

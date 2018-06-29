@@ -1,6 +1,6 @@
 ﻿
 
-namespace Mapbox.Experimental.Platform
+namespace Mapbox.Experimental.Platform.Http
 {
 
 	using System;
