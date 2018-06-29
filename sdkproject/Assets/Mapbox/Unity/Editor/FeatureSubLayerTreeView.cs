@@ -137,15 +137,16 @@
 			CenterRectUsingSingleLineHeight(ref cellRect);
 			if (column == MyColumns.Name)
 			{
-				layer.FindPropertyRelative("coreOptions.isActive").boolValue = item.data.isActive;
 				Rect toggleRect = cellRect;
 				toggleRect.x += GetContentIndent(item);
 				toggleRect.width = kToggleWidth;
 
+				item.data.isActive = layer.FindPropertyRelative("coreOptions.isActive").boolValue;
 				if (toggleRect.xMax < cellRect.xMax)
 				{
 					item.data.isActive = EditorGUI.Toggle(toggleRect, item.data.isActive); // hide when outside cell rect
 				}
+				layer.FindPropertyRelative("coreOptions.isActive").boolValue = item.data.isActive;
 
 				cellRect.xMin += nameOffset; // Adding some gap between the checkbox and the name
 				args.rowRect = cellRect;
@@ -156,9 +157,10 @@
 			}
 			if (column == MyColumns.Type)
 			{
-				//var typeString = ((PresetFeatureType)cellItem.FindPropertyRelative("presetFeatureType").intValue).ToString();
-				//item.data.Type = typeString;
 				cellRect.xMin += 15f; // Adding some gap between the checkbox and the name
+
+				var typeString = ((PresetFeatureType)layer.FindPropertyRelative("presetFeatureType").intValue).ToString();
+				item.data.Type = typeString;
 				EditorGUI.LabelField(cellRect, item.data.Type, columnStyle);
 			}
 		}
