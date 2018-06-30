@@ -426,14 +426,13 @@
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
 			var subLayerName = subLayerCoreOptions.FindPropertyRelative("sublayerName").stringValue;
 			var visualizerLayer = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
-			var subLayerType = PresetSubLayerPropertiesFetcher.GetPresetTypeFromLayerName(visualizerLayer).ToString();
+			var subLayerType = PresetSubLayerPropertiesFetcher.GetPresetTypeFromLayerName(visualizerLayer);
 			GUILayout.Space(-_lineHeight);
 			visualizerNameAndType.normal.textColor = Color.white;
 			visualizerNameAndType.fontStyle = FontStyle.Bold;
-			EditorGUILayout.LabelField("Feature Name : "+ subLayerName, visualizerNameAndType);
-			EditorGUILayout.LabelField("Type : " + subLayerType, visualizerNameAndType);
+			layerProperty.FindPropertyRelative("presetFeatureType").intValue = (int)subLayerType;
 			//EditorGUILayout.LabelField("Sub-type : " + "Highway", visualizerNameAndType);
-
+			GUILayout.Space(_lineHeight);
 			//*********************** LAYER NAME BEGINS ***********************************//
 			VectorPrimitiveType primitiveTypeProp = (VectorPrimitiveType)subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex;
 
