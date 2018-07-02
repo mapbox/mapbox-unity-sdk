@@ -72,7 +72,6 @@
 			}
 		}
 
-		private GUIStyle visualizerNameAndType = new GUIStyle();
 		ModelingSectionDrawer _modelingSectionDrawer = new ModelingSectionDrawer();
 		GameplaySectionDrawer _gameplaySectionDrawer = new GameplaySectionDrawer();
 
@@ -166,8 +165,8 @@
 
 				var subLayerArray = property.FindPropertyRelative("vectorSubLayers");
 
-				var layersRect = EditorGUILayout.GetControlRect(GUILayout.MinHeight(Mathf.Max(subLayerArray.arraySize + 1, 1) * _lineHeight),
-																GUILayout.MaxHeight((subLayerArray.arraySize + 1) * _lineHeight));
+				var layersRect = EditorGUILayout.GetControlRect(GUILayout.MinHeight(Mathf.Max(subLayerArray.arraySize + 1, 1) * _lineHeight + MultiColumnHeader.DefaultGUI.defaultHeight),
+				                                                GUILayout.MaxHeight((subLayerArray.arraySize + 1) * _lineHeight + MultiColumnHeader.DefaultGUI.defaultHeight));
 
 				if (!m_Initialized)
 				{
@@ -428,8 +427,6 @@
 			var visualizerLayer = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
 			var subLayerType = PresetSubLayerPropertiesFetcher.GetPresetTypeFromLayerName(visualizerLayer);
 			GUILayout.Space(-_lineHeight);
-			visualizerNameAndType.normal.textColor = Color.white;
-			visualizerNameAndType.fontStyle = FontStyle.Bold;
 			layerProperty.FindPropertyRelative("presetFeatureType").intValue = (int)subLayerType;
 			//EditorGUILayout.LabelField("Sub-type : " + "Highway", visualizerNameAndType);
 			GUILayout.Space(_lineHeight);

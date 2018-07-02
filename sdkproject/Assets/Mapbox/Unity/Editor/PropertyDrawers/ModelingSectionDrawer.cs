@@ -39,7 +39,9 @@
 				if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
 				{
 					GUILayout.Space(-_lineHeight);
-					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("extrusionOptions"));
+					var extrusionOptions = layerProperty.FindPropertyRelative("extrusionOptions");
+					extrusionOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
+					EditorGUILayout.PropertyField(extrusionOptions);
 				}
 
 				var snapToTerrainProperty = subLayerCoreOptions.FindPropertyRelative("snapToTerrain");
