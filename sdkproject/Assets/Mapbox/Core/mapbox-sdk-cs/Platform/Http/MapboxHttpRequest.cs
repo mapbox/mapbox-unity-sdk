@@ -13,10 +13,10 @@ namespace Mapbox.Experimental.Platform.Http
 		IMapboxHttpClient Client { get; set; }
 		string Url { get; set; }
 		HttpMethod Verb { get; }
-		Task<MapboxHttpResponse> Head(object id);
-		Task<MapboxHttpResponse> Get(object id);
-		Task<MapboxHttpResponse> Post(object id, HttpContent content = null);
-		Task<MapboxHttpResponse> Put(object id, HttpContent content = null);
+		Task<MapboxHttpResponse> Head(object id, Dictionary<string, string> headers = null);
+		Task<MapboxHttpResponse> Get(object id, Dictionary<string, string> headers = null);
+		Task<MapboxHttpResponse> Post(object id, HttpContent content = null, Dictionary<string, string> headers = null);
+		Task<MapboxHttpResponse> Put(object id, HttpContent content = null, Dictionary<string, string> headers = null);
 		Task<MapboxHttpResponse> SendAsync(
 			object id
 			, HttpMethod verb
@@ -88,25 +88,25 @@ namespace Mapbox.Experimental.Platform.Http
 		///////////////////////////////////
 		///////////////////////////////////
 
-		public async Task<MapboxHttpResponse> Head(object id)
+		public async Task<MapboxHttpResponse> Head(object id, Dictionary<string, string> headers = null)
 		{
-			return await SendAsync(id, HttpMethod.Head);
+			return await SendAsync(id, HttpMethod.Head, headers: headers);
 		}
 
-		public async Task<MapboxHttpResponse> Get(object id)
+		public async Task<MapboxHttpResponse> Get(object id, Dictionary<string, string> headers = null)
 		{
-			return await SendAsync(id, HttpMethod.Get);
+			return await SendAsync(id, HttpMethod.Get, headers: headers);
 		}
 
-		public async Task<MapboxHttpResponse> Post(object id, HttpContent content = null)
+		public async Task<MapboxHttpResponse> Post(object id, HttpContent content = null, Dictionary<string, string> headers = null)
 		{
-			return await SendAsync(id, HttpMethod.Post, content);
+			return await SendAsync(id, HttpMethod.Post, content, headers);
 		}
 
 
-		public async Task<MapboxHttpResponse> Put(object id, HttpContent content = null)
+		public async Task<MapboxHttpResponse> Put(object id, HttpContent content = null, Dictionary<string, string> headers = null)
 		{
-			return await SendAsync(id, HttpMethod.Put, content);
+			return await SendAsync(id, HttpMethod.Put, content, headers);
 		}
 
 
@@ -157,13 +157,15 @@ namespace Mapbox.Experimental.Platform.Http
 			HttpResponseMessage httpResponseMessage = null;
 			try
 			{
+				DateTime started = DateTime.UtcNow;
 				httpResponseMessage = await Client.HttpClient.SendAsync(httpRequestMessage, completionOption, token).ConfigureAwait(false);
 				mapboxResponse = await MapboxHttpResponse.FromWebResponse(this, httpResponseMessage, null);
+				mapboxResponse.StartedUtc = started;
 				return mapboxResponse;
 			}
 			catch (Exception ex)
 			{
-				UnityEngine.Debug.LogError($"caught exception: {ex}");
+				UnityEngine.Debug.LogWarning($"caught exception: {ex}");
 				if (ex is OperationCanceledException && !token.IsCancellationRequested)
 				{
 					mapboxResponse = await MapboxHttpResponse.FromWebResponse(this, httpResponseMessage, new TimeoutException());
@@ -176,6 +178,7 @@ namespace Mapbox.Experimental.Platform.Http
 			}
 			finally
 			{
+				if (null != mapboxResponse) { mapboxResponse.EndedUtc = DateTime.UtcNow; }
 				if (null != httpResponseMessage)
 				{
 					httpResponseMessage.Dispose();

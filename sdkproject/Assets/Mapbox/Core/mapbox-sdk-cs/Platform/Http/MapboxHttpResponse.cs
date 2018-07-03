@@ -11,12 +11,10 @@ namespace Mapbox.Experimental.Platform.Http
 	using System;
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
-	using System.IO;
 	using System.Linq;
 	using System.Net;
 	using System.Net.Http;
 	using System.Threading.Tasks;
-	using Utils;
 
 
 
@@ -38,6 +36,10 @@ namespace Mapbox.Experimental.Platform.Http
 			get { return StatusCode.HasValue ? 429 == StatusCode.Value : false; }
 		}
 
+
+		public DateTime? StartedUtc { get; set; }
+		public DateTime? EndedUtc { get; set; }
+		public TimeSpan? Duration => EndedUtc - StartedUtc;
 
 		/// <summary>Flag to indicate if the request was successful</summary>
 		public bool HasError
@@ -119,6 +121,7 @@ namespace Mapbox.Experimental.Platform.Http
 
 			MapboxHttpResponse response = new MapboxHttpResponse();
 			response.Request = request;
+			response.RequestUrl = request.Url;
 
 			if (null != apiEx)
 			{
