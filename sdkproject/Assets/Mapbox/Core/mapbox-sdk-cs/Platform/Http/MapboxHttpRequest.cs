@@ -12,6 +12,7 @@ namespace Mapbox.Experimental.Platform.Http
 	{
 		IMapboxHttpClient Client { get; set; }
 		string Url { get; set; }
+		MapboxHttpResponse Response { get; }
 		HttpMethod Verb { get; }
 		Task<MapboxHttpResponse> Head(object id, Dictionary<string, string> headers = null);
 		Task<MapboxHttpResponse> Get(object id, Dictionary<string, string> headers = null);
@@ -68,6 +69,8 @@ namespace Mapbox.Experimental.Platform.Http
 		public string Url { get; set; }
 
 
+		public MapboxHttpResponse Response { get; private set; }
+
 		public HttpMethod Verb { get; private set; }
 
 
@@ -82,7 +85,7 @@ namespace Mapbox.Experimental.Platform.Http
 		///////////////////////////////////
 		///////////////////////////////////
 		///// TODO!!!! revisit!!! all those overloads are necessaray because it is not posssible
-		///// to use System.Net references in the tests, in this case HttpMethod
+		///// to use System.Net references in the Unity tests, in this case HttpMethod
 		///////////////////////////////////
 		///////////////////////////////////
 		///////////////////////////////////
@@ -153,32 +156,32 @@ namespace Mapbox.Experimental.Platform.Http
 			var cts = CancellationTokenSource.CreateLinkedTokenSource(userToken);
 			cts.CancelAfter(_timeOutSeconds * 1000);
 			var token = cts.Token;
-			MapboxHttpResponse mapboxResponse = null;
+			MapboxHttpResponse mapboxHttpResponse = null;
 			HttpResponseMessage httpResponseMessage = null;
 			try
 			{
 				DateTime started = DateTime.UtcNow;
 				httpResponseMessage = await Client.HttpClient.SendAsync(httpRequestMessage, completionOption, token).ConfigureAwait(false);
-				mapboxResponse = await MapboxHttpResponse.FromWebResponse(this, httpResponseMessage, null);
-				mapboxResponse.StartedUtc = started;
-				return mapboxResponse;
+				mapboxHttpResponse = await MapboxHttpResponse.FromWebResponse(this, httpResponseMessage, null);
+				mapboxHttpResponse.StartedUtc = started;
+				return mapboxHttpResponse;
 			}
 			catch (Exception ex)
 			{
 				UnityEngine.Debug.LogWarning($"caught exception: {ex}");
 				if (ex is OperationCanceledException && !token.IsCancellationRequested)
 				{
-					mapboxResponse = await MapboxHttpResponse.FromWebResponse(this, httpResponseMessage, new TimeoutException());
+					mapboxHttpResponse = await MapboxHttpResponse.FromWebResponse(this, httpResponseMessage, new TimeoutException());
 				}
 				else
 				{
-					mapboxResponse = await MapboxHttpResponse.FromWebResponse(this, httpResponseMessage, ex);
+					mapboxHttpResponse = await MapboxHttpResponse.FromWebResponse(this, httpResponseMessage, ex);
 				}
-				return mapboxResponse;
+				return mapboxHttpResponse;
 			}
 			finally
 			{
-				if (null != mapboxResponse) { mapboxResponse.EndedUtc = DateTime.UtcNow; }
+				if (null != mapboxHttpResponse) { mapboxHttpResponse.EndedUtc = DateTime.UtcNow; }
 				if (null != httpResponseMessage)
 				{
 					httpResponseMessage.Dispose();
@@ -188,7 +191,8 @@ namespace Mapbox.Experimental.Platform.Http
 				httpRequestMessage.Dispose();
 				httpRequestMessage = null;
 
-				MapboxHttpResponseReceivedEventArgs args = new MapboxHttpResponseReceivedEventArgs(id, mapboxResponse);
+				Response = mapboxHttpResponse;
+				MapboxHttpResponseReceivedEventArgs args = new MapboxHttpResponseReceivedEventArgs(id, mapboxHttpResponse);
 				ResponseReveived?.Invoke(this, args);
 			}
 		}

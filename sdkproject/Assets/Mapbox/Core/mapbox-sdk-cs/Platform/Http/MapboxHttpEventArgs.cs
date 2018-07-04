@@ -34,11 +34,20 @@
 	public class MapboxWebDataFetcherResponseReceivedEventArgs : EventArgs
 	{
 
-		public MapboxWebDataFetcherResponseReceivedEventArgs()
+		public MapboxWebDataFetcherResponseReceivedEventArgs(
+			MapboxHttpResponseReceivedEventArgs responseReceivedEventArgs
+			, int requestsInQueue
+			, int requestsExecuting
+		)
 		{
-
+			ResponseEventArgs = responseReceivedEventArgs;
+			RequestsInQueue = requestsInQueue;
 		}
 
+
+		public MapboxHttpResponseReceivedEventArgs ResponseEventArgs { get; private set; }
+		public int RequestsInQueue { get; private set; }
+		public int RequestsExecuting { get; private set; }
 	}
 
 }

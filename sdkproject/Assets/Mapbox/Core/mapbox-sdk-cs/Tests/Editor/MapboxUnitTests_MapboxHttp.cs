@@ -65,11 +65,11 @@ namespace Mapbox.Experimental.Tests.MapboxSdkCs.Platform.Http
 
 
 
-		private void fetcher_ResponseReveived(object sender, MapboxHttpResponseReceivedEventArgs e)
+		private void fetcher_ResponseReveived(object sender, MapboxWebDataFetcherResponseReceivedEventArgs e)
 		{
 			_responseEventsCount++;
 			MapboxHttpRequest request = sender as MapboxHttpRequest;
-			Debug.Log($"response event received for request {request.Url}");
+			Debug.Log($"response event received for request {request.Url}, requests in queue/executing:{e.RequestsInQueue}/{e.RequestsExecuting}");
 		}
 
 
@@ -104,7 +104,12 @@ namespace Mapbox.Experimental.Tests.MapboxSdkCs.Platform.Http
 				try
 				{
 					MapboxHttpRequest request = await _fetcher.GetRequest("https://a.tiles.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/10/545/361.vector.pbf");
-					MapboxHttpResponse response = await request.Get("pbf");
+					//MapboxHttpResponse response = await request.Get("pbf");
+					MapboxHttpResponse response = null;
+					while (null == (response = request.Response))
+					{
+						await Task.Delay(100);
+					}
 					commonResponseTests(response);
 
 					// hmmm: no content-type???????
@@ -165,6 +170,7 @@ namespace Mapbox.Experimental.Tests.MapboxSdkCs.Platform.Http
 					Task<MapboxHttpResponse>[] downloads = new Task<MapboxHttpResponse>[tileIds.Count];
 					int idCnt = 0;
 
+					// try to force no caching. not all participating parties might adhere: OS, ISP, ...
 					Dictionary<string, string> headers = new Dictionary<string, string>() { { "Cache-Control", "max-age=0, no-cache, no-store" } };
 					foreach (var tileId in tileIds)
 					{
@@ -198,6 +204,11 @@ namespace Mapbox.Experimental.Tests.MapboxSdkCs.Platform.Http
 					Debug.Log(Invariant($"first request started:{start:HH:mm:ss.fff} last request ended:{end:HH:mm:ss.fff}"));
 					Debug.Log(Invariant($"duration first request started to last request ended[ms]:{duration:0.000}"));
 					Debug.Log(Invariant($"duration∑ of requests[ms]:{sumDurations:0.000}"));
+					// assumption: if requests are parallel the duration between start of first request
+					// and end of last request should be less than the sum of durations of all requests executing.
+					// however, this test might fail if it is run several times in short succession
+					// and tiles get most likely cached somewhere in the middle (OS, proxy, ISP, ...)
+					// despite the 'Cache-Control' header we set above.
 					Assert.Less(duration, sumDurations, "requests did not run in parallel");
 				}
 				finally { running = false; }
