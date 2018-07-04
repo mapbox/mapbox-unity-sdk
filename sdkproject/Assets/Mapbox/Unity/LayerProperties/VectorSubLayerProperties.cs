@@ -37,5 +37,6 @@
 		[NodeEditorElement("Game Object Modifiers")]
 		public List<GameObjectModifier> GoModifiers;
 		public PresetFeatureType presetFeatureType = PresetFeatureType.Custom;
+		public List<string> subTypes;
 	}
 }

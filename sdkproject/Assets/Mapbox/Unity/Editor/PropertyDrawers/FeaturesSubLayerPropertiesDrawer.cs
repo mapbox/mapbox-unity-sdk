@@ -27,7 +27,12 @@
 		bool showTexturing = false;
 		private static VectorSubLayerProperties subLayerProperties;
 		private TreeModel<FeatureTreeElement> treeModel;
+		private static string _roadsLayer = "road";
+		private static string _landuseLayer = "landuse";
+		private static string _roadsLayerProperty = "type";
+		private static string _landuseLayerProperty = "class";
 
+		private static string[] names;
 		[SerializeField]
 		TreeViewState m_TreeViewState;
 
@@ -75,6 +80,8 @@
 		ModelingSectionDrawer _modelingSectionDrawer = new ModelingSectionDrawer();
 		GameplaySectionDrawer _gameplaySectionDrawer = new GameplaySectionDrawer();
 
+		private static TileStats _streetsV7TileStats;
+		private static string[] subTypeValues;
 		FeatureSubLayerTreeView layerTreeView;
 		IList<int> selectedLayers = new List<int>();
 		public void DrawUI(SerializedProperty property)
@@ -444,6 +451,19 @@
 
 
 			EditorGUI.indentLevel++;
+			//*********************** TYPE DROPDOWN BEGINS ***********************************//
+			if (_streetsV7TileStats == null || subTypeValues == null)
+			{
+				subTypeValues = GetSubTypeValues(layerProperty, visualizerLayer, sourceType);
+			}
+				//layerProperty.FindPropertyRelative("subTypes").arraySize++;
+				//layerProperty.FindPropertyRelative("subTypes").GetArrayElementAtIndex(i).stringValue = layer.attributes[i].values[i];
+
+			if (subTypeValues != null)
+			{
+				EditorGUILayout.MaskField(0, subTypeValues);
+			}
+			//*********************** TYPE DROPDOWN ENDS ***********************************//
 
 			//*********************** FILTERS SECTION BEGINS ***********************************//
  			var filterOptions = layerProperty.FindPropertyRelative("filterOptions");
@@ -567,6 +587,47 @@
 			_layerIndex = EditorGUILayout.Popup(layerNameLabel, _layerIndex, _layerTypeContent);
 			var parsedString = layerDisplayNames.ToArray()[_layerIndex].Split(new string[] { tileJsonData.commonLayersKey }, System.StringSplitOptions.None)[0].Trim();
 			property.FindPropertyRelative("layerName").stringValue = parsedString;
+		}
+
+		private string[] GetSubTypeValues(SerializedProperty layerProperty, string visualizerLayer, VectorSourceType sourceType)
+		{
+			string[] typesArray = null;
+			if (visualizerLayer == _roadsLayer || visualizerLayer == _landuseLayer)
+			{
+				_streetsV7TileStats = TileStatsFetcher.Instance.GetTileStats(sourceType);
+				if (_streetsV7TileStats != null && _streetsV7TileStats.layers != null && _streetsV7TileStats.layers.Length != 0)
+				{
+					foreach (var layer in _streetsV7TileStats.layers)
+					{
+						if (layer.layer != visualizerLayer)
+						{
+							continue;
+						}
+
+						string presetPropertyName = "";
+						if (layer.layer == _roadsLayer)
+						{
+							presetPropertyName = _roadsLayerProperty;
+						}
+						else if (layer.layer == _landuseLayer)
+						{
+							presetPropertyName = _landuseLayerProperty;
+						}
+
+						if (layer.attributes != null && layer.attributes.Length > 0)
+						{
+							foreach(var attributeItem in layer.attributes)
+							{
+								if (attributeItem.attribute == presetPropertyName)
+								{
+									typesArray = attributeItem.values;
+								}
+							}
+						}
+					}
+				}
+			}
+			return typesArray;
 		}
 	}
 }
