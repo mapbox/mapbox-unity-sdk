@@ -27,10 +27,6 @@
 		bool showTexturing = false;
 		private static VectorSubLayerProperties subLayerProperties;
 		private TreeModel<FeatureTreeElement> treeModel;
-		private static string _roadsLayer = "road";
-		private static string _landuseLayer = "landuse";
-		private static string _roadsLayerProperty = "type";
-		private static string _landuseLayerProperty = "class";
 
 		private static string[] names;
 		[SerializeField]
@@ -433,6 +429,9 @@
 			var subLayerName = subLayerCoreOptions.FindPropertyRelative("sublayerName").stringValue;
 			var visualizerLayer = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
 			var subLayerType = PresetSubLayerPropertiesFetcher.GetPresetTypeFromLayerName(visualizerLayer);
+			var maskValue = layerProperty.FindPropertyRelative("_maskValue");
+			var selectedTypes = layerProperty.FindPropertyRelative("selectedTypes");
+
 			GUILayout.Space(-_lineHeight);
 			layerProperty.FindPropertyRelative("presetFeatureType").intValue = (int)subLayerType;
 			//EditorGUILayout.LabelField("Sub-type : " + "Highway", visualizerNameAndType);
@@ -449,21 +448,33 @@
 			DrawLayerName(subLayerCoreOptions, layerDisplayNames);
 			//*********************** LAYER NAME ENDS ***********************************//
 
-
-			EditorGUI.indentLevel++;
 			//*********************** TYPE DROPDOWN BEGINS ***********************************//
 			if (_streetsV7TileStats == null || subTypeValues == null)
 			{
 				subTypeValues = GetSubTypeValues(layerProperty, visualizerLayer, sourceType);
 			}
-				//layerProperty.FindPropertyRelative("subTypes").arraySize++;
-				//layerProperty.FindPropertyRelative("subTypes").GetArrayElementAtIndex(i).stringValue = layer.attributes[i].values[i];
 
 			if (subTypeValues != null)
 			{
-				EditorGUILayout.MaskField(0, subTypeValues);
+				maskValue.intValue = EditorGUILayout.MaskField("Type",maskValue.intValue, subTypeValues);
+				string selectedOptions = string.Empty;
+				for (int i = 0; i < subTypeValues.Length; i++)
+				{
+					if ((maskValue.intValue & (1 << i)) == (1 << i))
+					{
+						if (string.IsNullOrEmpty(selectedOptions))
+						{
+							selectedOptions = subTypeValues[i];
+							continue;
+						}
+						selectedOptions += "," + subTypeValues[i];
+					}
+				}
+				selectedTypes.stringValue = selectedOptions;
 			}
 			//*********************** TYPE DROPDOWN ENDS ***********************************//
+
+			EditorGUI.indentLevel++;
 
 			//*********************** FILTERS SECTION BEGINS ***********************************//
  			var filterOptions = layerProperty.FindPropertyRelative("filterOptions");
@@ -592,7 +603,10 @@
 		private string[] GetSubTypeValues(SerializedProperty layerProperty, string visualizerLayer, VectorSourceType sourceType)
 		{
 			string[] typesArray = null;
-			if (visualizerLayer == _roadsLayer || visualizerLayer == _landuseLayer)
+			string roadLayer = layerProperty.FindPropertyRelative("roadLayer").stringValue;
+			string landuseLayer = layerProperty.FindPropertyRelative("landuseLayer").stringValue;
+
+			if (visualizerLayer == roadLayer || visualizerLayer == landuseLayer)
 			{
 				_streetsV7TileStats = TileStatsFetcher.Instance.GetTileStats(sourceType);
 				if (_streetsV7TileStats != null && _streetsV7TileStats.layers != null && _streetsV7TileStats.layers.Length != 0)
@@ -605,13 +619,13 @@
 						}
 
 						string presetPropertyName = "";
-						if (layer.layer == _roadsLayer)
+						if (layer.layer == roadLayer)
 						{
-							presetPropertyName = _roadsLayerProperty;
+							presetPropertyName = layerProperty.FindPropertyRelative("roadLayer_TypeProperty").stringValue;
 						}
-						else if (layer.layer == _landuseLayer)
+						else if (layer.layer == landuseLayer)
 						{
-							presetPropertyName = _landuseLayerProperty;
+							presetPropertyName = layerProperty.FindPropertyRelative("landuseLayer_TypeProperty").stringValue;
 						}
 
 						if (layer.attributes != null && layer.attributes.Length > 0)

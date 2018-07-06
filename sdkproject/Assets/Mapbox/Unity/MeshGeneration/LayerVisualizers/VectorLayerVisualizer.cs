@@ -194,6 +194,19 @@
 			_defaultStack.MeshModifiers.AddRange(_layerProperties.MeshModifiers);
 			_defaultStack.GoModifiers.AddRange(_layerProperties.GoModifiers);
 
+			//Adding filters from the types dropdown
+			LayerFilter filter = new LayerFilter(LayerFilterOperationType.Contains);
+			if (properties.coreOptions.layerName == properties.roadLayer)
+			{
+				filter.Key = properties.roadLayer_TypeProperty;
+				filter.PropertyValue = properties.selectedTypes;
+			}
+			else if (properties.coreOptions.layerName == "landuse")
+			{
+				filter.Key = properties.landuseLayer_TypeProperty;
+				filter.PropertyValue = properties.selectedTypes;
+			}
+			properties.filterOptions.filters.Add(filter);
 		}
 
 		/// <summary>
