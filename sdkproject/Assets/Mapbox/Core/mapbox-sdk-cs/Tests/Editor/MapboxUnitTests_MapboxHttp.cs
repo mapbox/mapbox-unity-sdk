@@ -21,8 +21,10 @@ namespace Mapbox.Experimental.Tests.MapboxSdkCs.Platform.Http
 	{
 
 		private MapboxWebDataFetcher _fetcher;
+		private static readonly object _lock = new object();
 		private long _responseEventsCount = 0;
 		private string _className;
+		private string _singlePbfUrl = "https://a.tiles.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/10/545/361.vector.pbf";
 
 		[OneTimeSetUp]
 		public void Init()
@@ -67,7 +69,8 @@ namespace Mapbox.Experimental.Tests.MapboxSdkCs.Platform.Http
 
 		private void fetcher_ResponseReveived(object sender, MapboxWebDataFetcherResponseReceivedEventArgs e)
 		{
-			_responseEventsCount++;
+			// take care of responses arriving in quick succession
+			lock (_lock) { _responseEventsCount++; }
 			MapboxHttpRequest request = sender as MapboxHttpRequest;
 			Debug.Log($"response event received for request {request.Url}, requests in queue/executing:{e.RequestsInQueue}/{e.RequestsExecuting}");
 		}
@@ -82,8 +85,8 @@ namespace Mapbox.Experimental.Tests.MapboxSdkCs.Platform.Http
 			{
 				try
 				{
-					MapboxHttpRequest request = await _fetcher.GetRequest("http://www.mapbox.com");
-					MapboxHttpResponse response = await request.Get("myId");
+					MapboxHttpRequest request = await _fetcher.GetRequestAsync(MapboxWebDataRequestType.Tile, "myId", MapboxHttpMethod.Get, "http://www.mapbox.com");
+					MapboxHttpResponse response = await request.GetResponseAsync();
 					commonResponseTests(response);
 				}
 				finally { running = false; }
@@ -92,6 +95,7 @@ namespace Mapbox.Experimental.Tests.MapboxSdkCs.Platform.Http
 
 			while (running) { yield return null; }
 		}
+
 
 
 		[UnityTest]
@@ -103,8 +107,7 @@ namespace Mapbox.Experimental.Tests.MapboxSdkCs.Platform.Http
 			{
 				try
 				{
-					MapboxHttpRequest request = await _fetcher.GetRequest("https://a.tiles.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/10/545/361.vector.pbf");
-					//MapboxHttpResponse response = await request.Get("pbf");
+					MapboxHttpRequest request = await _fetcher.GetRequestAsync(MapboxWebDataRequestType.Tile, "pbf", MapboxHttpMethod.Get, _singlePbfUrl);
 					MapboxHttpResponse response = null;
 					while (null == (response = request.Response))
 					{
@@ -127,6 +130,33 @@ namespace Mapbox.Experimental.Tests.MapboxSdkCs.Platform.Http
 
 
 		[UnityTest]
+		public IEnumerator PbfRequestWithEvent()
+		{
+			bool running = true;
+			string requestId = "my-unique-pbf-request-id";
+
+			EventHandler<MapboxWebDataFetcherResponseReceivedEventArgs> handler = (sender, evtArgs) =>
+			{
+				MapboxHttpResponse response = evtArgs.ResponseEventArgs.Response;
+				Assert.AreEqual(requestId, evtArgs.ResponseEventArgs.Id);
+				commonResponseTests(response);
+				running = false;
+			};
+			_fetcher.ResponseReveived += handler;
+
+			Action asyncWorkaround = async () =>
+			{
+				MapboxHttpRequest request = await _fetcher.GetRequestAsync(MapboxWebDataRequestType.Tile, requestId, MapboxHttpMethod.Get, _singlePbfUrl);
+			};
+			asyncWorkaround();
+
+			while (running) { yield return null; }
+
+			_fetcher.ResponseReveived -= handler;
+		}
+
+
+		[UnityTest]
 		public IEnumerator Cancel()
 		{
 			bool running = true;
@@ -135,14 +165,13 @@ namespace Mapbox.Experimental.Tests.MapboxSdkCs.Platform.Http
 			{
 				try
 				{
-					MapboxHttpRequest request = await _fetcher.GetRequest("https://a.tiles.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/10/545/361.vector.pbf");
-					Task<MapboxHttpResponse> response = request.Get("pbf");
+					MapboxHttpRequest request = await _fetcher.GetRequestAsync(MapboxWebDataRequestType.Tile, "pbf", MapboxHttpMethod.Get, "https://a.tiles.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/10/545/361.vector.pbf");
+					Task<MapboxHttpResponse> response = request.GetResponseAsync();
 					request.Cancel();
 					await response;
 
-					MapboxHttpResponse resp = response.Result;
-					Assert.IsTrue(resp.HasError);
-					Assert.IsTrue(resp.Exceptions.Any(e => e is TaskCanceledException), "response doesn't contain 'TaskCanceledException'");
+					Assert.IsTrue(response.Result.HasError);
+					Assert.IsTrue(response.Result.Exceptions.Any(e => e is TaskCanceledException), "response doesn't contain 'TaskCanceledException'");
 				}
 				finally { running = false; }
 			};
@@ -175,14 +204,14 @@ namespace Mapbox.Experimental.Tests.MapboxSdkCs.Platform.Http
 					foreach (var tileId in tileIds)
 					{
 						string url = TileResource.MakeRaster(tileId, null).GetUrl();
-						Debug.Log($"url:{url}");
-						MapboxHttpRequest request = await _fetcher.GetRequest(url);
-						downloads[idCnt] = request.Get(tileId, headers);
+#if MAPBOX_DEBUG_HTTP
+						Debug.Log($"creating request for url:{url}");
+#endif
+						MapboxHttpRequest request = await _fetcher.GetRequestAsync(MapboxWebDataRequestType.Tile, tileId, MapboxHttpMethod.Get, url, headers: headers);
+						downloads[idCnt] = request.GetResponseAsync();
 						idCnt++;
-						await Task.Delay(10);
 					}
 
-					//Task.WaitAll(downloads);
 					MapboxHttpResponse[] responses = await Task.WhenAll(downloads);
 
 					Assert.AreEqual(tileIds.Count, responses.Length);
@@ -220,13 +249,80 @@ namespace Mapbox.Experimental.Tests.MapboxSdkCs.Platform.Http
 
 
 
+		[UnityTest]
+		public IEnumerator CancelAll()
+		{
+			bool running = true;
+
+			Action asyncWorkaround = async () =>
+			{
+				try
+				{
+					_responseEventsCount = 0;
+
+					Vector2d sw = new Vector2d(48.21659, 16.39010);
+					Vector2d ne = new Vector2d(48.21970, 16.39376);
+					Vector2dBounds bounds = new Vector2dBounds(sw, ne);
+					HashSet<CanonicalTileId> tileIds = TileCover.Get(bounds, 18);
+					Task<MapboxHttpResponse>[] downloads = new Task<MapboxHttpResponse>[tileIds.Count];
+					int idCnt = 0;
+
+					// try to force no caching. not all participating parties might adhere: OS, ISP, ...
+					Dictionary<string, string> headers = new Dictionary<string, string>() { { "Cache-Control", "max-age=0, no-cache, no-store" } };
+					foreach (var tileId in tileIds)
+					{
+						string url = TileResource.MakeRaster(tileId, null).GetUrl();
+#if MAPBOX_DEBUG_HTTP
+						Debug.Log($"creating request for url:{url}");
+#endif
+						MapboxHttpRequest request = await _fetcher.GetRequestAsync(MapboxWebDataRequestType.Tile, tileId, MapboxHttpMethod.Get, url, headers: headers);
+						downloads[idCnt] = request.GetResponseAsync();
+						request.Cancel();
+						idCnt++;
+					}
+
+					MapboxHttpResponse[] responses = await Task.WhenAll(downloads);
+
+					Assert.AreEqual(tileIds.Count, responses.Length);
+					Assert.AreEqual(tileIds.Count, _responseEventsCount);
+
+					int failedCnt = 0;
+					int succeededCnt = 0;
+					foreach (var response in responses)
+					{
+#if MAPBOX_DEBUG_HTTP
+						Debug.Log($"{response.RequestUrl}: hasError->{response.HasError} statusCode:{response.StatusCode}");
+#endif
+						if (response.HasError)
+						{
+							failedCnt++;
+						}
+						else
+						{
+							succeededCnt++;
+						}
+					}
+
+					// check if at least more requests failed than succeeded: Mapbox API is faassst ;-)
+					Assert.GreaterOrEqual(failedCnt, succeededCnt, "unexpected result: more requests succeeded than failed");
+				}
+				finally { running = false; }
+			};
+			asyncWorkaround();
+
+			while (running) { yield return null; }
+		}
+
+
+
 		private void commonResponseTests(MapboxHttpResponse response)
 		{
 			//Debug.Log($"status:{response.StatusCode} data.length:{(response.Data == null ? "NULL" : response.Data.Length.ToString())}");
-			Assert.AreEqual(200, response.StatusCode.Value, "request status code indicates failure");
+			Assert.IsTrue(response.StatusCode.HasValue, "reponse StatusCode does not have a value set");
+			Assert.AreEqual(200, response.StatusCode.Value, "response StatusCode indicates failure");
 			Assert.NotNull(response.Data, "no data received");
 			Assert.AreNotEqual(0, response.Data.Length, "empty data received");
-			Assert.AreEqual(string.Empty, response.ExceptionsAsString, "response has exceptions");
+			Assert.IsNull(response.Exceptions, "response has unexpected exceptions");
 		}
 
 

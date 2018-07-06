@@ -47,6 +47,7 @@ namespace Mapbox.Experimental.Platform.Http
 			get { return _exceptions == null ? false : _exceptions.Count > 0; }
 		}
 
+
 		/// <summary>Flag to indicate if the request was fullfilled from a local cache</summary>
 		public bool LoadedFromCache;
 
@@ -128,7 +129,7 @@ namespace Mapbox.Experimental.Platform.Http
 				response.AddException(apiEx);
 			}
 
-			// timeout: API response is null
+			// eg timeout: API response is null
 			if (null == apiResponse)
 			{
 				response.AddException(new Exception("No Reponse."));

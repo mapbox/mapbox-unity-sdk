@@ -2,25 +2,41 @@
 
 namespace Mapbox.Experimental.Platform.Http
 {
+
+
 	using System;
 	using System.Collections.Generic;
 	using System.Net.Http;
 	using System.Threading;
 	using System.Threading.Tasks;
 
+
+	/// <summary>
+	/// <para>ATTENTION: this is a workaround for Unity tests not being able to access System.Net.Http.HttpMethod.</para>
+	/// <para>Hopefully this can be removed some time in the future when Unit has consistent NetStandard2.0 support everywhere.</para>
+	public enum MapboxHttpMethod
+	{
+		Get,
+		Post,
+		Put,
+		Head
+	}
 	public interface IMapboxHttpRequest
 	{
 		IMapboxHttpClient Client { get; set; }
-		string Url { get; set; }
+		string Url { get; }
 		MapboxHttpResponse Response { get; }
-		HttpMethod Verb { get; }
-		Task<MapboxHttpResponse> Head(object id, Dictionary<string, string> headers = null);
-		Task<MapboxHttpResponse> Get(object id, Dictionary<string, string> headers = null);
-		Task<MapboxHttpResponse> Post(object id, HttpContent content = null, Dictionary<string, string> headers = null);
-		Task<MapboxHttpResponse> Put(object id, HttpContent content = null, Dictionary<string, string> headers = null);
+		MapboxHttpMethod Verb { get; }
+
+		/// <summary>
+		/// Type of request: Tile, Geocoding, TileJson, ...
+		/// </summary>
+		MapboxWebDataRequestType WebDataRequestType { get; }
+
 		Task<MapboxHttpResponse> SendAsync(
-			object id
-			, HttpMethod verb
+			MapboxWebDataRequestType webDataRequestType
+			, object id
+			, MapboxHttpMethod verb
 			, HttpContent content = null
 			, Dictionary<string, string> headers = null
 			//, CancellationToken? cancellationToken = null
@@ -66,12 +82,14 @@ namespace Mapbox.Experimental.Platform.Http
 		}
 
 
-		public string Url { get; set; }
+		public string Url { get; private set; }
+
+		public MapboxWebDataRequestType WebDataRequestType { get; private set; }
 
 
 		public MapboxHttpResponse Response { get; private set; }
 
-		public HttpMethod Verb { get; private set; }
+		public MapboxHttpMethod Verb { get; private set; }
 
 
 		public void Cancel()
@@ -81,41 +99,10 @@ namespace Mapbox.Experimental.Platform.Http
 		}
 
 
-		///////////////////////////////////
-		///////////////////////////////////
-		///////////////////////////////////
-		///// TODO!!!! revisit!!! all those overloads are necessaray because it is not posssible
-		///// to use System.Net references in the Unity tests, in this case HttpMethod
-		///////////////////////////////////
-		///////////////////////////////////
-		///////////////////////////////////
-		///////////////////////////////////
-
-		public async Task<MapboxHttpResponse> Head(object id, Dictionary<string, string> headers = null)
-		{
-			return await SendAsync(id, HttpMethod.Head, headers: headers);
-		}
-
-		public async Task<MapboxHttpResponse> Get(object id, Dictionary<string, string> headers = null)
-		{
-			return await SendAsync(id, HttpMethod.Get, headers: headers);
-		}
-
-		public async Task<MapboxHttpResponse> Post(object id, HttpContent content = null, Dictionary<string, string> headers = null)
-		{
-			return await SendAsync(id, HttpMethod.Post, content, headers);
-		}
-
-
-		public async Task<MapboxHttpResponse> Put(object id, HttpContent content = null, Dictionary<string, string> headers = null)
-		{
-			return await SendAsync(id, HttpMethod.Put, content, headers);
-		}
-
-
 		public async Task<MapboxHttpResponse> SendAsync(
-			object id
-			, HttpMethod verb
+			MapboxWebDataRequestType webDataRequestType
+			, object id
+			, MapboxHttpMethod mbxVerb
 			, HttpContent content = null
 			, Dictionary<string, string> headers = null
 			/*, CancellationToken? cancellationToken = null*/
@@ -123,7 +110,31 @@ namespace Mapbox.Experimental.Platform.Http
 			)
 		{
 
-			Verb = verb;
+			Response = null;
+			Verb = mbxVerb;
+			WebDataRequestType = webDataRequestType;
+
+			HttpMethod httpVerb;
+			//TODO: remove once System.Net.Http.HttpMethod is accessible in Unity tests
+			switch (mbxVerb)
+			{
+				case MapboxHttpMethod.Get:
+					httpVerb = HttpMethod.Get;
+					break;
+				case MapboxHttpMethod.Post:
+					httpVerb = HttpMethod.Post;
+					break;
+				case MapboxHttpMethod.Put:
+					httpVerb = HttpMethod.Put;
+					break;
+				case MapboxHttpMethod.Head:
+					httpVerb = HttpMethod.Head;
+					break;
+				default:
+					httpVerb = HttpMethod.Get;
+					break;
+			}
+
 
 			string accessTokenQuery = $"&access_token={_accessToken}";
 			UriBuilder uriBuilder = new UriBuilder(Url);
@@ -137,7 +148,7 @@ namespace Mapbox.Experimental.Platform.Http
 			}
 			HttpRequestMessage httpRequestMessage = new HttpRequestMessage
 			{
-				Method = verb,
+				Method = httpVerb,
 				Content = content,
 				RequestUri = uriBuilder.Uri
 			};
@@ -198,7 +209,11 @@ namespace Mapbox.Experimental.Platform.Http
 		}
 
 
-
+		public async Task<MapboxHttpResponse> GetResponseAsync()
+		{
+			while (null == Response) { await Task.Delay(1); }
+			return Response;
+		}
 
 
 

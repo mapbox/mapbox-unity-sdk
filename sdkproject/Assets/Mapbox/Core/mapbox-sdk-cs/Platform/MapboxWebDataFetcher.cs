@@ -2,6 +2,7 @@
 namespace Mapbox.Experimental.Platform.Http
 {
 
+
 	using Mapbox.Platform.Cache;
 	using System;
 	using System.Collections.Concurrent;
@@ -9,6 +10,20 @@ namespace Mapbox.Experimental.Platform.Http
 	using System.Net.Http;
 	using System.Threading;
 	using System.Threading.Tasks;
+	using static System.FormattableString;
+
+
+	public enum MapboxWebDataRequestType
+	{
+		Tile,
+		Geocode,
+		Direction,
+		MapMatching,
+		TileJson,
+		Token,
+		Telemetry
+	}
+
 
 	public class MapboxWebDataFetcher : IDisposable
 	{
@@ -26,15 +41,16 @@ namespace Mapbox.Experimental.Platform.Http
 
 
 
-#if MAPBOX_DEBUG_CACHE
+#if MAPBOX_DEBUG_HTTP
 		private string _className;
 #endif
 
 		private bool _disposed;
+		private static readonly object _lock = new object();
 		private List<ICache> _caches = new List<ICache>();
 		private ConcurrentDictionary<string, MapboxHttpRequest> _requests = new ConcurrentDictionary<string, MapboxHttpRequest>(Environment.ProcessorCount * 2, 49);
 		private int _requestsExecuting = 0;
-		private int _requestDelay = 0;
+		private int _requestDelay = 1;
 		private MapboxHttpClient _httpclient = new MapboxHttpClient();
 		private int _timeoutSeconds;
 		private string _accessToken;
@@ -43,7 +59,7 @@ namespace Mapbox.Experimental.Platform.Http
 
 		public MapboxWebDataFetcher(int timeoutSeconds, string accessToken, bool autoRefreshCache)
 		{
-#if MAPBOX_DEBUG_CACHE
+#if MAPBOX_DEBUG_HTTP
 			_className = this.GetType().Name;
 #endif
 			_timeoutSeconds = timeoutSeconds;
@@ -148,14 +164,32 @@ namespace Mapbox.Experimental.Platform.Http
 					//request.Dispose();
 					request = null;
 				}
+				else
+				{
+					UnityEngine.Debug.LogError($"CancelAllRequests: Unexpected error: could not remove request for [{key}] from internal queue");
+				}
+
 			}
 		}
 
 
 #pragma warning disable 4014
 #pragma warning disable 1998
-		public async Task<MapboxHttpRequest> GetRequest(string url)
+		public async Task<MapboxHttpRequest> GetRequestAsync(
+			MapboxWebDataRequestType webDataRequestType
+			, object id
+			, MapboxHttpMethod verb
+			, string url
+			/*
+			 * System.Net.Http not available from Unity unit tests
+			 * TODO: maybe pass content as byte array????
+			, HttpContent content = null
+			*/
+			, Dictionary<string, string> headers = null
+		)
 		{
+
+			HttpContent content = null;
 
 			UnityEngine.Debug.LogWarning("TODO EXPERIMENTAL: async and throttle");
 
@@ -170,7 +204,7 @@ namespace Mapbox.Experimental.Platform.Http
 			Task.Run(async () =>
 			{
 				await Task.Delay(_requestDelay);
-				await request.SendAsync(null, HttpMethod.Get);
+				await request.SendAsync(webDataRequestType, id, verb, content, headers);
 			});
 
 
@@ -192,8 +226,15 @@ namespace Mapbox.Experimental.Platform.Http
 				{
 					double limitIntervalSeconds = r.XRateLimitInterval.Value;
 					double remainingNrOfRequests = r.XRateLimitLimit.Value;
-					double secondsPerRequest = remainingNrOfRequests / limitIntervalSeconds;
-					_requestDelay = (int)Math.Ceiling(secondsPerRequest * 1000.0d);
+					double requestsPerSecond = remainingNrOfRequests / limitIntervalSeconds;
+					double milliSecondsPerRequest = 1000.0d / requestsPerSecond;
+					lock (_lock)
+					{
+						_requestDelay = (int)Math.Ceiling(milliSecondsPerRequest);
+#if MAPBOX_DEBUG_HTTP
+						UnityEngine.Debug.LogWarning(Invariant($"new request delay set: {_requestDelay} (remaining requests:{remainingNrOfRequests} time interval:{limitIntervalSeconds}s)"));
+#endif
+					}
 				}
 			}
 
@@ -209,8 +250,41 @@ namespace Mapbox.Experimental.Platform.Http
 				, _requests.Count
 				, _requestsExecuting
 			);
-			UnityEngine.Debug.Log($"webresponse id:{e.Id}, completed:{e.Completed} successed:{e.Succeeded}");
+#if MAPBOX_DEBUG_HTTP
+			string methodName = new System.Diagnostics.StackFrame().GetMethod().Name;
+			UnityEngine.Debug.Log($"{_className}.{methodName} webresponse id:{e.Id}, completed:{e.Completed} successed:{e.Succeeded}");
+#endif
 			ResponseReveivedPrivate?.Invoke(sender, ea);
+
+			cache(e.Response);
+		}
+
+
+
+		private void cache(MapboxHttpResponse response)
+		{
+			UnityEngine.Debug.Log("TODO!!!! settings: implement caching strategy based on WebDataRequestType");
+
+			if (null == response) { return; }
+
+			bool doCache = false;
+			switch (response.Request.WebDataRequestType)
+			{
+				case MapboxWebDataRequestType.Tile:
+					doCache = true;
+					break;
+				default:
+					doCache = false;
+					break;
+			}
+
+			if (doCache)
+			{
+				foreach (ICache cache in _caches)
+				{
+					// TODO caching
+				}
+			}
 		}
 
 

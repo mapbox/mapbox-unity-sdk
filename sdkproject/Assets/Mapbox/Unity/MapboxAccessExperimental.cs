@@ -251,9 +251,9 @@ namespace Mapbox.Unity
 		}
 
 
-		public async Task<IMapboxHttpRequest> RequestNew(string url)
+		public async Task<IMapboxHttpRequest> RequestNew(MapboxWebDataRequestType requestType, object id, MapboxHttpMethod verb, string url)
 		{
-			return await _webDataFetcher.GetRequest(url);
+			return await _webDataFetcher.GetRequestAsync(requestType, id, verb, url);
 		}
 
 		Geocoder _geocoder;
