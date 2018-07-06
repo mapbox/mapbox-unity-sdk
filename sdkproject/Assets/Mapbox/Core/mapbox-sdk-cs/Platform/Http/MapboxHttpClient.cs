@@ -52,6 +52,7 @@ namespace Mapbox.Experimental.Platform.Http
 
 				//UseProxy = true,
 				//Proxy = new WebProxy("192.168.1.125", 8888)
+				Proxy = WebRequest.DefaultWebProxy
 			}
 			)
 			{
