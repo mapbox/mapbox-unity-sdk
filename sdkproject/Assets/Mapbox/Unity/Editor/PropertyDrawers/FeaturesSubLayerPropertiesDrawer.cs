@@ -426,6 +426,11 @@
 		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty, SerializedProperty property)
 		{
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
+			var layerName = layerProperty.FindPropertyRelative("coreOptions.layerName");
+			var roadLayerName = layerProperty.FindPropertyRelative("roadLayer");
+			var landuseLayerName = layerProperty.FindPropertyRelative("landuseLayer");
+
+
 			var subLayerName = subLayerCoreOptions.FindPropertyRelative("sublayerName").stringValue;
 			var visualizerLayer = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
 			var subLayerType = PresetSubLayerPropertiesFetcher.GetPresetTypeFromLayerName(visualizerLayer);
@@ -454,7 +459,7 @@
 				subTypeValues = GetSubTypeValues(layerProperty, visualizerLayer, sourceType);
 			}
 
-			if (subTypeValues != null)
+			if ((layerName.stringValue == roadLayerName.stringValue || layerName.stringValue == landuseLayerName.stringValue) && subTypeValues!=null)
 			{
 				maskValue.intValue = EditorGUILayout.MaskField("Type",maskValue.intValue, subTypeValues);
 				string selectedOptions = string.Empty;
