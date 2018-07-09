@@ -18,5 +18,9 @@ MonoBehaviour:
     prefabPath: 
   - active: 1
     prefab: {fileID: 1930251145991046, guid: 902eec150b0db493aaaad43f3e7b9336, type: 2}
-    latLon: 37.8025, -122.405833
+    latLon: 37.80250, -122.405833
+    prefabPath: 
+  - active: 1
+    prefab: {fileID: 1701369004274330, guid: eedc86a83362b4091b145ae9e3e59f6d, type: 2}
+    latLon: 37.78990, -122.3969
     prefabPath: 

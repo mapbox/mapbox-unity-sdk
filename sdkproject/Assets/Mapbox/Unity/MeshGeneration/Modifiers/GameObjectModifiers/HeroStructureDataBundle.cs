@@ -16,5 +16,5 @@ public class HeroStructureDataBundle
 	public GameObject prefab;
 	[Geocode]
 	public string latLon;
-	public string prefabPath;
+	public float radius;
 }
