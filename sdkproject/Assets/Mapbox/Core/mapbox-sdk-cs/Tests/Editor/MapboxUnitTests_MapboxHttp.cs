@@ -46,7 +46,8 @@ namespace Mapbox.Experimental.Tests.MapboxSdkCs.Platform.Http
 
 			Debug.LogWarning(sb.ToString());
 
-			// this fetcher doesn't cache
+			// we initialize our own MapboxWebDataFetcher here in
+			// order to bypass default caching enabled in MapboxAccess
 			_fetcher = new MapboxWebDataFetcher(
 				Mapbox.Unity.MapboxAccess.Instance.Configuration.DefaultTimeout
 				, Mapbox.Unity.MapboxAccess.Instance.Configuration.AccessToken
@@ -70,9 +71,12 @@ namespace Mapbox.Experimental.Tests.MapboxSdkCs.Platform.Http
 		private void fetcher_ResponseReveived(object sender, MapboxWebDataFetcherResponseReceivedEventArgs e)
 		{
 			// take care of responses arriving in quick succession
-			lock (_lock) { _responseEventsCount++; }
-			MapboxHttpRequest request = sender as MapboxHttpRequest;
-			Debug.Log($"response event received for request {request.Url}, requests in queue/executing:{e.RequestsInQueue}/{e.RequestsExecuting}");
+			lock (_lock)
+			{
+				_responseEventsCount++;
+				MapboxHttpRequest request = sender as MapboxHttpRequest;
+				Debug.Log($"response event received for request {request.Url}, requests in queue/executing:{e.RequestsInQueue}/{e.RequestsExecuting} _responseEventsCount:{_responseEventsCount}");
+			}
 		}
 
 
@@ -85,9 +89,9 @@ namespace Mapbox.Experimental.Tests.MapboxSdkCs.Platform.Http
 			{
 				try
 				{
-					MapboxHttpRequest request = await _fetcher.GetRequestAsync(MapboxWebDataRequestType.Tile, "myId", MapboxHttpMethod.Get, "http://www.mapbox.com");
+					MapboxHttpRequest request = await _fetcher.GetRequestAsync(MapboxWebDataRequestType.Generic, "myId", MapboxHttpMethod.Get, "http://www.mapbox.com");
 					MapboxHttpResponse response = await request.GetResponseAsync();
-					commonResponseTests(response);
+					commonResponseTests(response, MapboxWebDataRequestType.Generic);
 				}
 				finally { running = false; }
 			};
@@ -95,6 +99,64 @@ namespace Mapbox.Experimental.Tests.MapboxSdkCs.Platform.Http
 
 			while (running) { yield return null; }
 		}
+
+
+		[UnityTest]
+		public IEnumerator Forbidden()
+		{
+			bool running = true;
+
+			Action asyncWorkaround = async () =>
+			{
+				try
+				{
+					MapboxHttpRequest request = await _fetcher.GetRequestAsync(
+						MapboxWebDataRequestType.Generic
+						, "some-id"
+						, MapboxHttpMethod.Get
+						, "https://mapbox.com/forbidden"
+					);
+					MapboxHttpResponse response = await request.GetResponseAsync();
+
+					Assert.IsTrue(response.HasError);
+					Assert.AreEqual(403, response.StatusCode);
+				}
+				finally { running = false; }
+			};
+			asyncWorkaround();
+
+			while (running) { yield return null; }
+		}
+
+
+		[UnityTest]
+		public IEnumerator DnsError()
+		{
+			bool running = true;
+
+			Action asyncWorkaround = async () =>
+			{
+				try
+				{
+					MapboxHttpRequest request = await _fetcher.GetRequestAsync(
+						MapboxWebDataRequestType.Generic
+						, "some-id"
+						, MapboxHttpMethod.Get
+						, "https://dnserror.shouldnotwork"
+					);
+					MapboxHttpResponse response = await request.GetResponseAsync();
+
+					Assert.IsTrue(response.HasError);
+					Assert.IsNull(response.StatusCode);
+					Assert.Greater(response.Exceptions.Count, 0);
+				}
+				finally { running = false; }
+			};
+			asyncWorkaround();
+
+			while (running) { yield return null; }
+		}
+
 
 
 
@@ -113,7 +175,7 @@ namespace Mapbox.Experimental.Tests.MapboxSdkCs.Platform.Http
 					{
 						await Task.Delay(100);
 					}
-					commonResponseTests(response);
+					commonResponseTests(response, MapboxWebDataRequestType.Tile);
 
 					// hmmm: no content-type???????
 					foreach (var hdr in response.Headers)
@@ -139,14 +201,14 @@ namespace Mapbox.Experimental.Tests.MapboxSdkCs.Platform.Http
 			{
 				MapboxHttpResponse response = evtArgs.ResponseEventArgs.Response;
 				Assert.AreEqual(requestId, evtArgs.ResponseEventArgs.Id);
-				commonResponseTests(response);
+				commonResponseTests(response, MapboxWebDataRequestType.Tile);
 				running = false;
 			};
 			_fetcher.ResponseReveived += handler;
 
 			Action asyncWorkaround = async () =>
 			{
-				MapboxHttpRequest request = await _fetcher.GetRequestAsync(MapboxWebDataRequestType.Tile, requestId, MapboxHttpMethod.Get, _singlePbfUrl);
+				await _fetcher.GetRequestAsync(MapboxWebDataRequestType.Tile, requestId, MapboxHttpMethod.Get, _singlePbfUrl);
 			};
 			asyncWorkaround();
 
@@ -214,6 +276,9 @@ namespace Mapbox.Experimental.Tests.MapboxSdkCs.Platform.Http
 
 					MapboxHttpResponse[] responses = await Task.WhenAll(downloads);
 
+					// if we don't wait a bit '_responseEventsCount' won't be as expected,
+					// because events need a few milliseconds to bubble up
+					await Task.Delay(500);
 					Assert.AreEqual(tileIds.Count, responses.Length);
 					Assert.AreEqual(tileIds.Count, _responseEventsCount);
 
@@ -222,7 +287,7 @@ namespace Mapbox.Experimental.Tests.MapboxSdkCs.Platform.Http
 					DateTime end = DateTime.MinValue;
 					foreach (var response in responses)
 					{
-						commonResponseTests(response);
+						commonResponseTests(response, MapboxWebDataRequestType.Tile);
 						Debug.Log($"{response.RequestUrl}: {response.StartedUtc:HH:mm:ss.fff} -> {response.EndedUtc:HH:mm:ss.fff}: {response.Duration}");
 						start = response.StartedUtc.Value < start ? response.StartedUtc.Value : start;
 						end = response.EndedUtc.Value > end ? response.EndedUtc.Value : end;
@@ -315,11 +380,12 @@ namespace Mapbox.Experimental.Tests.MapboxSdkCs.Platform.Http
 
 
 
-		private void commonResponseTests(MapboxHttpResponse response)
+		private void commonResponseTests(MapboxHttpResponse response, MapboxWebDataRequestType webDataRequestType)
 		{
 			//Debug.Log($"status:{response.StatusCode} data.length:{(response.Data == null ? "NULL" : response.Data.Length.ToString())}");
 			Assert.IsTrue(response.StatusCode.HasValue, "reponse StatusCode does not have a value set");
 			Assert.AreEqual(200, response.StatusCode.Value, "response StatusCode indicates failure");
+			Assert.AreEqual(webDataRequestType, response.WebDataRequestType, "WebDataRequestType not set properly");
 			Assert.NotNull(response.Data, "no data received");
 			Assert.AreNotEqual(0, response.Data.Length, "empty data received");
 			Assert.IsNull(response.Exceptions, "response has unexpected exceptions");

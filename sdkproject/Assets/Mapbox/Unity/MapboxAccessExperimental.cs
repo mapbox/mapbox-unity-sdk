@@ -251,7 +251,7 @@ namespace Mapbox.Unity
 		}
 
 
-		public async Task<IMapboxHttpRequest> RequestNew(MapboxWebDataRequestType requestType, object id, MapboxHttpMethod verb, string url)
+		public async Task<MapboxHttpRequest> Request(MapboxWebDataRequestType requestType, object id, MapboxHttpMethod verb, string url)
 		{
 			return await _webDataFetcher.GetRequestAsync(requestType, id, verb, url);
 		}
@@ -266,7 +266,11 @@ namespace Mapbox.Unity
 			{
 				if (_geocoder == null)
 				{
+#if MAPBOX_EXPERIMENTAL
+					_geocoder = new Geocoder(this);
+#else
 					_geocoder = new Geocoder(new FileSource(_configuration.AccessToken));
+#endif
 				}
 				return _geocoder;
 			}
@@ -283,7 +287,11 @@ namespace Mapbox.Unity
 			{
 				if (_directions == null)
 				{
+#if MAPBOX_EXPERIMENTAL
+					_directions = new Directions(this);
+#else
 					_directions = new Directions(new FileSource(_configuration.AccessToken));
+#endif
 				}
 				return _directions;
 			}

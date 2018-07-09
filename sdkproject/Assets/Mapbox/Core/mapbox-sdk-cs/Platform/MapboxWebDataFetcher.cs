@@ -15,6 +15,7 @@ namespace Mapbox.Experimental.Platform.Http
 
 	public enum MapboxWebDataRequestType
 	{
+		Generic,
 		Tile,
 		Geocode,
 		Direction,
@@ -50,7 +51,7 @@ namespace Mapbox.Experimental.Platform.Http
 		private List<ICache> _caches = new List<ICache>();
 		private ConcurrentDictionary<string, MapboxHttpRequest> _requests = new ConcurrentDictionary<string, MapboxHttpRequest>(Environment.ProcessorCount * 2, 49);
 		private int _requestsExecuting = 0;
-		private int _requestDelay = 1;
+		private ConcurrentDictionary<MapboxWebDataRequestType, int> _requestDelays = new ConcurrentDictionary<MapboxWebDataRequestType, int>();
 		private MapboxHttpClient _httpclient = new MapboxHttpClient();
 		private int _timeoutSeconds;
 		private string _accessToken;
@@ -203,7 +204,7 @@ namespace Mapbox.Experimental.Platform.Http
 			//[System.Diagnostics.CodeAnalysis.SuppressMessage(
 			Task.Run(async () =>
 			{
-				await Task.Delay(_requestDelay);
+				await Task.Delay(_requestDelays.GetOrAdd(webDataRequestType, 30));
 				await request.SendAsync(webDataRequestType, id, verb, content, headers);
 			});
 
@@ -216,7 +217,9 @@ namespace Mapbox.Experimental.Platform.Http
 		private void Request_ResponseReveived(object sender, MapboxHttpResponseReceivedEventArgs e)
 		{
 			//////////////////////
-			/////////////TODO: evalute rate limit headers and adjust Delay!!!
+			/////////////TODO:
+			///////////// evalute rate limit headers and adjust Delay!!!
+			///////////// according to request type: different API calls have different rate limits!!!
 			/////////////////////
 
 			if (null != e.Response)
@@ -230,9 +233,10 @@ namespace Mapbox.Experimental.Platform.Http
 					double milliSecondsPerRequest = 1000.0d / requestsPerSecond;
 					lock (_lock)
 					{
-						_requestDelay = (int)Math.Ceiling(milliSecondsPerRequest);
+						int delay = (int)Math.Ceiling(milliSecondsPerRequest);
+						_requestDelays.AddOrUpdate(e.Response.WebDataRequestType, delay, (key, oldValue) => delay);
 #if MAPBOX_DEBUG_HTTP
-						UnityEngine.Debug.LogWarning(Invariant($"new request delay set: {_requestDelay} (remaining requests:{remainingNrOfRequests} time interval:{limitIntervalSeconds}s)"));
+						UnityEngine.Debug.LogWarning(Invariant($"new request delay set[{e.Response.WebDataRequestType}]: {delay} (remaining requests:{remainingNrOfRequests} time interval:{limitIntervalSeconds}s)"));
 #endif
 					}
 				}

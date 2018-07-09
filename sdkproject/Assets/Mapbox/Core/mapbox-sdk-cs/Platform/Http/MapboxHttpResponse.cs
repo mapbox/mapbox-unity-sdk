@@ -75,6 +75,9 @@ namespace Mapbox.Experimental.Platform.Http
 		public DateTime? XRateLimitReset;
 
 
+		public MapboxWebDataRequestType WebDataRequestType;
+
+
 		private List<Exception> _exceptions;
 		/// <summary> Exceptions that might have occured during the request. </summary>
 		public ReadOnlyCollection<Exception> Exceptions
@@ -123,6 +126,7 @@ namespace Mapbox.Experimental.Platform.Http
 			MapboxHttpResponse response = new MapboxHttpResponse();
 			response.Request = request;
 			response.RequestUrl = request.Url;
+			response.WebDataRequestType = request.WebDataRequestType;
 
 			if (null != apiEx)
 			{

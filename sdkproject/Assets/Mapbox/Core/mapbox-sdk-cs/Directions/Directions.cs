@@ -6,20 +6,40 @@
 
 namespace Mapbox.Directions
 {
-    using System;
-    using System.Text;
-    using Mapbox.Json;
-    using Mapbox.Platform;
-    using Mapbox.Utils.JsonConverters;
+	using System;
+	using System.Text;
+	using Mapbox.Json;
+	using Mapbox.Platform;
+	using Mapbox.Utils.JsonConverters;
+#if MAPBOX_EXPERIMENTAL
+	using Mapbox.Unity;
+	using System.Threading.Tasks;
+	using Mapbox.Experimental.Platform.Http;
+#endif
 
-    /// <summary>
-    ///     Wrapper around the <see href="https://www.mapbox.com/api-documentation/#directions">
-    ///     Mapbox Directions API</see>. The Mapbox Directions API will show you how to get where
-    ///     you're going.
-    /// </summary>
-    public sealed class Directions
+	/// <summary>
+	///     Wrapper around the <see href="https://www.mapbox.com/api-documentation/#directions">
+	///     Mapbox Directions API</see>. The Mapbox Directions API will show you how to get where
+	///     you're going.
+	/// </summary>
+	public sealed class Directions
 	{
+
+
+#if MAPBOX_EXPERIMENTAL
+		private readonly MapboxAccess _mapboxAccess;
+#endif
 		private readonly IFileSource fileSource;
+
+
+
+#if MAPBOX_EXPERIMENTAL
+		public Directions(MapboxAccess mapboxAccess)
+		{
+			_mapboxAccess = mapboxAccess;
+		}
+#endif
+
 
 		/// <summary> Initializes a new instance of the <see cref="Directions" /> class. </summary>
 		/// <param name="fileSource"> Network access abstraction. </param>
@@ -27,6 +47,25 @@ namespace Mapbox.Directions
 		{
 			this.fileSource = fileSource;
 		}
+
+
+#if MAPBOX_EXPERIMENTAL
+		public async Task<DirectionsResponse> Query(DirectionResource directionResource)
+		{
+			MapboxHttpRequest request = await _mapboxAccess.Request(
+				MapboxWebDataRequestType.Direction
+				, null
+				, MapboxHttpMethod.Get
+				, directionResource.GetUrl()
+			);
+			MapboxHttpResponse response = await request.GetResponseAsync();
+			if (response.HasError && null == response.Data) { return new DirectionsResponse(); }
+
+			string jsonTxt = Encoding.UTF8.GetString(response.Data);
+			return Deserialize(jsonTxt);
+		}
+#endif
+
 
 		/// <summary> Performs asynchronously a directions lookup. </summary>
 		/// <param name="direction"> Direction resource. </param>
