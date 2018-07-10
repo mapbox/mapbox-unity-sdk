@@ -5,135 +5,133 @@
 //-----------------------------------------------------------------------
 
 // TODO: figure out how run tests outside of Unity with .NET framework, something like '#if !UNITY'
-#if UNITY_5_6_OR_NEWER
+#if MAPBOX_EXPERIMENTAL
+
 
 namespace Mapbox.MapboxSdkCs.UnitTest
 {
 
 
 	using Mapbox.Platform;
-	using NUnit.Framework;
-	using UnityEngine.TestTools;
-	using System.Collections;
 	using Mapbox.Platform.TilesetTileJSON;
+	using Mapbox.Unity;
+	using NUnit.Framework;
+	using System;
+	using System.Collections;
+	using UnityEngine.TestTools;
 
 
 	[TestFixture]
 	internal class TileJSONTest
 	{
 
+		private TileJSON _tileJson;
+
+		[OneTimeSetUp]
+		public void Setup()
+		{
+			_tileJson = MapboxAccess.Instance.TileJSON;
+		}
 
 
 		[UnityTest]
 		public IEnumerator MapboxStreets()
 		{
-			string id = "mapbox.mapbox-streets-v7";
-			int minZoom = 0;
-			int maxZoom = 16;
+			bool running = true;
+			Action asyncWorkaround = async () =>
+			{
+				string id = "mapbox.mapbox-streets-v7";
+				int minZoom = 0;
+				int maxZoom = 16;
 
-			TileJSONResponse response = null;
+				TileJSONResponse response = await _tileJson.Get(id);
 
-			Unity.MapboxAccess.Instance.TileJSON.Get(
-				id
-				, (TileJSONResponse tjr) =>
-				{
-					response = tjr;
-				}
-			);
+				testsCommonToVectorAndRasterTilesets(response, id, minZoom, maxZoom);
+				testsForVectorTilesets(response);
 
+				running = false;
+			};
+			asyncWorkaround();
 
-			IEnumerator enumerator = ((FileSource)Unity.MapboxAccess.Instance.TileJSON.FileSource).WaitForAllRequests();
-			while (enumerator.MoveNext()) { yield return null; }
-
-			testsCommonToVectorAndRasterTilesets(response, id, minZoom, maxZoom);
-			testsForVectorTilesets(response);
+			while (running) { yield return null; }
 		}
 
 
 		[UnityTest]
 		public IEnumerator ConcatenatedVectorTilesets()
 		{
-			string id = "mapbox.mapbox-traffic-v1,mapbox.mapbox-streets-v7";
-			int minZoom = 0;
-			int maxZoom = 16;
+			bool running = true;
+			Action asyncWorkaround = async () =>
+			{
+				string id = "mapbox.mapbox-traffic-v1,mapbox.mapbox-streets-v7";
+				int minZoom = 0;
+				int maxZoom = 16;
 
-			TileJSONResponse response = null;
+				TileJSONResponse response = await _tileJson.Get(id);
 
-			Unity.MapboxAccess.Instance.TileJSON.Get(
-				id
-				, (TileJSONResponse tjr) =>
-				{
-					response = tjr;
-				}
-			);
+				testsCommonToVectorAndRasterTilesets(
+					response
+					, id
+					, minZoom
+					, maxZoom
+					, boundsSouth: -90
+					, boundsNorth: 90
+				);
+				testsForVectorTilesets(response);
 
+				running = false;
+			};
+			asyncWorkaround();
 
-			IEnumerator enumerator = ((FileSource)Unity.MapboxAccess.Instance.TileJSON.FileSource).WaitForAllRequests();
-			while (enumerator.MoveNext()) { yield return null; }
-
-			testsCommonToVectorAndRasterTilesets(
-				response
-				, id
-				, minZoom
-				, maxZoom
-				, boundsSouth: -90
-				, boundsNorth: 90
-			);
-			testsForVectorTilesets(response);
+			while (running) { yield return null; }
 		}
+
 
 
 		[UnityTest]
 		public IEnumerator MapboxSatellite()
 		{
-			string id = "mapbox.satellite";
-			int minZoom = 0;
-			int maxZoom = 22;
+			bool running = true;
+			Action asyncWorkaround = async () =>
+			{
+				string id = "mapbox.satellite";
+				int minZoom = 0;
+				int maxZoom = 22;
 
-			TileJSONResponse response = null;
+				TileJSONResponse response = await _tileJson.Get(id);
 
-			Unity.MapboxAccess.Instance.TileJSON.Get(
-				id
-				, (TileJSONResponse tjr) =>
-				{
-					response = tjr;
-				}
-			);
+				testsCommonToVectorAndRasterTilesets(response, id, minZoom, maxZoom, boundsSouth: -85, boundsNorth: 85);
 
+				running = false;
+			};
+			asyncWorkaround();
 
-			IEnumerator enumerator = ((FileSource)Unity.MapboxAccess.Instance.TileJSON.FileSource).WaitForAllRequests();
-			while (enumerator.MoveNext()) { yield return null; }
-
-			testsCommonToVectorAndRasterTilesets(response, id, minZoom, maxZoom, boundsSouth: -85, boundsNorth: 85);
+			while (running) { yield return null; }
 		}
 
 
 		[UnityTest]
 		public IEnumerator MapboxEmerald()
 		{
-			string id = "mapbox.emerald";
-			int minZoom = 0;
-			int maxZoom = 22;
+			bool running = true;
+			Action asyncWorkaround = async () =>
+			{
+				string id = "mapbox.emerald";
+				int minZoom = 0;
+				int maxZoom = 22;
 
-			TileJSONResponse response = null;
+				TileJSONResponse response = await _tileJson.Get(id);
 
-			Unity.MapboxAccess.Instance.TileJSON.Get(
-				id
-				, (TileJSONResponse tjr) =>
-				{
-					response = tjr;
-				}
-			);
+				testsCommonToVectorAndRasterTilesets(response, id, minZoom, maxZoom);
 
+				Assert.IsNotEmpty(response.Source, "'Source' not set properly");
 
-			IEnumerator enumerator = ((FileSource)Unity.MapboxAccess.Instance.TileJSON.FileSource).WaitForAllRequests();
-			while (enumerator.MoveNext()) { yield return null; }
+				running = false;
+			};
+			asyncWorkaround();
 
-			testsCommonToVectorAndRasterTilesets(response, id, minZoom, maxZoom);
-
-			Assert.IsNotEmpty(response.Source, "'Source' not set properly");
+			while (running) { yield return null; }
 		}
-
 
 
 		private void testsForVectorTilesets(TileJSONResponse response)
