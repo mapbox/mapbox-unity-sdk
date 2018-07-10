@@ -19,18 +19,6 @@
 			tooltip = "Map Id corresponding to the tileset."
 		};
 
-		string CustomSourceMapId
-		{
-			get
-			{
-				return EditorPrefs.GetString(objectId + "ImageryLayerProperties_customSourceMapId");
-			}
-			set
-			{
-				EditorPrefs.SetString(objectId + "ImageryLayerProperties_customSourceMapId", value);
-			}
-		}
-
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
@@ -78,9 +66,7 @@
 					GUI.enabled = true;
 					break;
 				case ImagerySourceType.Custom:
-					layerSourceId.stringValue = CustomSourceMapId;
 					EditorGUILayout.PropertyField(sourceOptionsProperty, new GUIContent { text = "Map Id / Style URL", tooltip = _mapIdGui.tooltip });
-					CustomSourceMapId = layerSourceId.stringValue;
 					break;
 				case ImagerySourceType.None:
 					break;

@@ -57,15 +57,11 @@ namespace Mapbox.Examples
 		void ZoomMapUsingTouchOrMouse(float zoomFactor)
 		{
 			var y = zoomFactor * _zoomSpeed;
-			transform.localPosition += transform.forward * y;
+			transform.localPosition += (transform.forward * y);
 		}
 
 		void HandleMouseAndKeyBoard()
 		{
-			var x = 0f;
-			var y = 0f;
-			var z = 0f;
-
 			if (Input.GetMouseButton(0) && !EventSystem.current.IsPointerOverGameObject())
 			{
 				var mousePosition = Input.mousePosition;
@@ -96,12 +92,13 @@ namespace Mapbox.Examples
 					return;
 				}
 
-				// TODO: disable keyboard-specific input.
-				x = Input.GetAxis("Horizontal");
-				z = Input.GetAxis("Vertical");
-				y = -Input.GetAxis("Mouse ScrollWheel") * _zoomSpeed;
+				var x = Input.GetAxis("Horizontal");
+				var z = Input.GetAxis("Vertical");
+				var y = Input.GetAxis("Mouse ScrollWheel") * _zoomSpeed;
 				transform.localPosition += transform.forward * y + (_originalRotation * new Vector3(x * _panSpeed, 0, z * _panSpeed));
 			}
+
+
 		}
 
 		void Awake()

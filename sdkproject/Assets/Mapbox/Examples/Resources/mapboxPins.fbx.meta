@@ -1,0 +1,199 @@
+fileFormatVersion: 2
+guid: 69df092de970eec4a8de42c500691f9f
+timeCreated: 1529009187
+licenseType: Pro
+ModelImporter:
+  serializedVersion: 22
+  fileIDToRecycleName:
+    100000: boundingCircle
+    100002: boundingCircle 1
+    100004: boundingCircle1
+    100006: boundingCircle2
+    100008: combinedPoint
+    100010: floatingPoint
+    100012: hollowPoint
+    100014: //RootNode
+    100016: pinOnly
+    100018: pinOnly1_pinpoint
+    100020: pinOnlyHollow
+    100022: pinpoint
+    100024: pinpoint 1
+    100026: pinpoint 2
+    100028: pinpoint 3
+    100030: pinpoint 4
+    100032: pinpoint 5
+    100034: pinpoint1
+    100036: rotatedPin
+    100038: rotatedPin1
+    100040: rotatedPinHollow
+    100042: star
+    100044: star 1
+    100046: star 2
+    100048: star 3
+    100050: star 4
+    100052: star 5
+    100054: star1
+    100056: transform1
+    100058: transform2
+    100060: transform3
+    100062: transform4
+    100064: transform5
+    100066: transform6
+    400000: boundingCircle
+    400002: boundingCircle 1
+    400004: boundingCircle1
+    400006: boundingCircle2
+    400008: combinedPoint
+    400010: floatingPoint
+    400012: hollowPoint
+    400014: //RootNode
+    400016: pinOnly
+    400018: pinOnly1_pinpoint
+    400020: pinOnlyHollow
+    400022: pinpoint
+    400024: pinpoint 1
+    400026: pinpoint 2
+    400028: pinpoint 3
+    400030: pinpoint 4
+    400032: pinpoint 5
+    400034: pinpoint1
+    400036: rotatedPin
+    400038: rotatedPin1
+    400040: rotatedPinHollow
+    400042: star
+    400044: star 1
+    400046: star 2
+    400048: star 3
+    400050: star 4
+    400052: star 5
+    400054: star1
+    400056: transform1
+    400058: transform2
+    400060: transform3
+    400062: transform4
+    400064: transform5
+    400066: transform6
+    2100000: phong1
+    2300000: boundingCircle
+    2300002: boundingCircle 1
+    2300004: boundingCircle2
+    2300006: pinOnly1_pinpoint
+    2300008: pinpoint
+    2300010: pinpoint 1
+    2300012: pinpoint 2
+    2300014: pinpoint 4
+    2300016: rotatedPinHollow
+    2300018: star
+    2300020: star 1
+    2300022: star 2
+    2300024: star 4
+    2300026: star1
+    3300000: boundingCircle
+    3300002: boundingCircle 1
+    3300004: boundingCircle2
+    3300006: pinOnly1_pinpoint
+    3300008: pinpoint
+    3300010: pinpoint 1
+    3300012: pinpoint 2
+    3300014: pinpoint 4
+    3300016: rotatedPinHollow
+    3300018: star
+    3300020: star 1
+    3300022: star 2
+    3300024: star 4
+    3300026: star1
+    4300000: star
+    4300002: pinpoint
+    4300004: boundingCircle
+    4300006: boundingCircle2
+    4300008: star1
+    4300010: star
+    4300012: pinpoint
+    4300014: boundingCircle
+    4300016: star
+    4300018: pinpoint
+    4300020: pinOnly1_pinpoint
+    4300022: star
+    4300024: pinpoint
+    4300026: rotatedPinHollow
+    9500000: //RootNode
+  externalObjects: {}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

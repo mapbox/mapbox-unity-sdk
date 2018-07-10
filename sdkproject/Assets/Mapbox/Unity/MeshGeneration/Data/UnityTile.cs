@@ -191,6 +191,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 			HeightDataState = TilePropertyState.Loaded;
 			OnHeightDataChanged(this);
+
+			if (_rasterData != null)
+			{
+				_meshRenderer.material.mainTexture = _rasterData;
+			}
 		}
 
 		public float QueryHeightData(float x, float y)
