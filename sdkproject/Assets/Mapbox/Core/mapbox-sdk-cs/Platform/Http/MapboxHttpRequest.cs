@@ -138,14 +138,25 @@ namespace Mapbox.Experimental.Platform.Http
 
 			string accessTokenQuery = $"&access_token={_accessToken}";
 			UriBuilder uriBuilder = new UriBuilder(Url);
-			if (!string.IsNullOrWhiteSpace(uriBuilder.Query) && uriBuilder.Query.Length > 1)
+
+			// EXEMPT(!!) token queries from adding the access_token defined in the settings
+			// otherwise 2 tokens would be added:
+			//   * the one from the settings
+			//   * and the one that get's queried
+			// if we add creating, deleting, updating, ... of tokens later another solution
+			// has to be implemented
+			if (MapboxWebDataRequestType.Token != webDataRequestType)
 			{
-				uriBuilder.Query = $"{uriBuilder.Query.Substring(1)}&{accessTokenQuery}";
+				if (!string.IsNullOrWhiteSpace(uriBuilder.Query) && uriBuilder.Query.Length > 1)
+				{
+					uriBuilder.Query = $"{uriBuilder.Query.Substring(1)}&{accessTokenQuery}";
+				}
+				else
+				{
+					uriBuilder.Query = accessTokenQuery;
+				}
 			}
-			else
-			{
-				uriBuilder.Query = accessTokenQuery;
-			}
+
 			HttpRequestMessage httpRequestMessage = new HttpRequestMessage
 			{
 				Method = httpVerb,

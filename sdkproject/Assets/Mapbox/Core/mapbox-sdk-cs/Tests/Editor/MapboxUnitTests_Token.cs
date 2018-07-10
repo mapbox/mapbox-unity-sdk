@@ -4,6 +4,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+#if MAPBOX_EXPERIMENTAL
 namespace Mapbox.MapboxSdkCs.UnitTest
 {
 
@@ -11,6 +12,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 	using Mapbox.Tokens;
 	using Mapbox.Unity;
 	using NUnit.Framework;
+	using System;
 	using System.Collections;
 	using UnityEngine.TestTools;
 
@@ -23,10 +25,10 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		private MapboxTokenApi _tokenApi;
 		private string _configAccessToken;
 
-		[SetUp]
+		[OneTimeSetUp]
 		public void SetUp()
 		{
-			_tokenApi = new MapboxTokenApi();
+			_tokenApi = MapboxAccess.Instance.TokenValidator;
 			_configAccessToken = MapboxAccess.Instance.Configuration.AccessToken;
 		}
 
@@ -34,69 +36,60 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		[UnityTest]
 		public IEnumerator RetrieveConfigToken()
 		{
+			bool running = true;
+			Action asyncWorkaround = async () =>
+			{
+				MapboxToken token = await _tokenApi.Retrieve(_configAccessToken);
 
-			MapboxToken token = null;
+				Assert.IsNull(token.ErrorMessage);
+				Assert.IsFalse(token.HasError);
+				Assert.AreEqual(MapboxTokenStatus.TokenValid, token.Status, "Config token is not valid");
+				running = false;
+			};
+			asyncWorkaround();
 
-			_tokenApi.Retrieve(
-				_configAccessToken,
-				(MapboxToken tok) =>
-				{
-					token = tok;
-				}
-			);
-
-			while (null == token) { yield return null; }
-
-			Assert.IsNull(token.ErrorMessage);
-			Assert.IsFalse(token.HasError);
-			Assert.AreEqual(MapboxTokenStatus.TokenValid, token.Status, "Config token is not valid");
+			while (running) { yield return null; }
 		}
 
 
 		[UnityTest]
 		public IEnumerator TokenMalformed()
 		{
+			bool running = true;
+			Action asyncWorkaround = async () =>
+			{
+				MapboxToken token = await _tokenApi.Retrieve("yada.yada");
 
-			MapboxToken token = null;
+				Assert.IsNull(token.ErrorMessage);
+				Assert.IsFalse(token.HasError);
+				Assert.AreEqual(MapboxTokenStatus.TokenMalformed, token.Status, "token is malformed");
+				running = false;
+			};
+			asyncWorkaround();
 
-			_tokenApi.Retrieve(
-				"yada.yada"
-				, (MapboxToken tok) =>
-				{
-					token = tok;
-				}
-			);
-
-			while (null == token) { yield return null; }
-
-			Assert.IsNull(token.ErrorMessage);
-			Assert.IsFalse(token.HasError);
-			Assert.AreEqual(MapboxTokenStatus.TokenMalformed, token.Status, "token is malformed");
+			while (running) { yield return null; }
 		}
 
 
 		[UnityTest]
 		public IEnumerator TokenInvalid()
 		{
+			bool running = true;
+			Action asyncWorkaround = async () =>
+			{
+				MapboxToken token = await _tokenApi.Retrieve("pk.12345678901234567890123456789012345.0123456789012345678901");
 
-			MapboxToken token = null;
+				Assert.IsNull(token.ErrorMessage);
+				Assert.IsFalse(token.HasError);
+				Assert.AreEqual(MapboxTokenStatus.TokenInvalid, token.Status, "token is invalid");
+				running = false;
+			};
+			asyncWorkaround();
 
-			_tokenApi.Retrieve(
-				"pk.12345678901234567890123456789012345.0123456789012345678901"
-				, (MapboxToken tok) =>
-				{
-					token = tok;
-				}
-			);
-
-			while (null == token) { yield return null; }
-
-			Assert.IsNull(token.ErrorMessage);
-			Assert.IsFalse(token.HasError);
-			Assert.AreEqual(MapboxTokenStatus.TokenInvalid, token.Status, "token is invalid");
-
+			while (running) { yield return null; }
 		}
 
 
 	}
 }
+#endif

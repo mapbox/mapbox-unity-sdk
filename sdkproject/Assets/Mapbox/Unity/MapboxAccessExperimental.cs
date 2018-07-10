@@ -328,7 +328,11 @@ namespace Mapbox.Unity
 			{
 				if (_tokenValidator == null)
 				{
+#if MAPBOX_EXPERIMENTAL
+					_tokenValidator = new MapboxTokenApi(this);
+#else
 					_tokenValidator = new MapboxTokenApi();
+#endif
 				}
 				return _tokenValidator;
 			}
@@ -345,7 +349,11 @@ namespace Mapbox.Unity
 			{
 				if (_tileJson == null)
 				{
+#if MAPBOX_EXPERIMENTAL
+					_tileJson = new TileJSON(this);
+#else
 					_tileJson = new TileJSON(new FileSource(_configuration.AccessToken), _configuration.DefaultTimeout);
+#endif
 				}
 				return _tileJson;
 			}

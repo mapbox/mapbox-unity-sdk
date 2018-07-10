@@ -2,12 +2,15 @@
 
 namespace Mapbox.Tokens
 {
-
-
 	using Mapbox.Platform;
 	using System;
 	using System.ComponentModel;
-	using Mapbox.VectorTile.Geometry;
+#if MAPBOX_EXPERIMENTAL
+	using System.Threading.Tasks;
+	using Mapbox.Experimental.Platform.Http;
+	using Mapbox.Unity;
+#endif
+
 
 	public enum MapboxTokenStatus
 	{
@@ -37,8 +40,9 @@ namespace Mapbox.Tokens
 	public class MapboxTokenApi
 	{
 
-		public MapboxTokenApi() { }
-
+#if MAPBOX_EXPERIMENTAL
+		private MapboxAccess _mapboxAccess;
+#endif
 
 		// use internal FileSource without(!) passing access token from config into constructor
 		// otherwise access token would be appended to url twice
@@ -47,6 +51,46 @@ namespace Mapbox.Tokens
 		// we will need another FileSource with the token from the config
 		private FileSource _fs = new FileSource();
 
+
+#if MAPBOX_EXPERIMENTAL
+		public MapboxTokenApi(MapboxAccess mapboxAccess)
+		{
+			_mapboxAccess = mapboxAccess;
+		}
+#endif
+
+		public MapboxTokenApi() { }
+
+
+
+#if MAPBOX_EXPERIMENTAL
+		public async Task<MapboxToken> Retrieve(string accessToken)
+		{
+			// we can use the request provided by `MapboxAccess.Request()' as
+			// the underlying 'MapboxHttpRequest' takes care of **not** appending
+			// the token from the settings for 'MapboxWebDataRequestType.Token' requests
+			// nevertheless: for creating, updating, ... tokens another implementation
+			// will be necessary
+			string url = $"{Utils.Constants.BaseAPI}tokens/v2?access_token={accessToken}";
+			MapboxHttpRequest request = await _mapboxAccess.Request(
+				MapboxWebDataRequestType.Token
+				, null
+				, MapboxHttpMethod.Get
+				, url
+			);
+			MapboxHttpResponse response = await request.GetResponseAsync();
+			if (response.HasError)
+			{
+				return new MapboxToken
+				{
+					HasError = true,
+					ErrorMessage = response.ExceptionsAsString
+				};
+			}
+
+			return MapboxToken.FromResponseData(response.Data);
+		}
+#endif
 
 		public void Retrieve(string accessToken, Action<MapboxToken> callback)
 		{
@@ -68,6 +112,8 @@ namespace Mapbox.Tokens
 				}
 			);
 		}
+
+
 
 	}
 }
