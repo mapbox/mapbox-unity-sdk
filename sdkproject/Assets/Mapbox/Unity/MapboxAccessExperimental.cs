@@ -307,7 +307,11 @@ namespace Mapbox.Unity
 			{
 				if (_mapMatcher == null)
 				{
+#if MAPBOX_EXPERIMENTAL
+					_mapMatcher = new MapMatcher(this);
+#else
 					_mapMatcher = new MapMatcher(new FileSource(_configuration.AccessToken), _configuration.DefaultTimeout);
+#endif
 				}
 				return _mapMatcher;
 			}

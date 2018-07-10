@@ -6,11 +6,19 @@
 
 namespace Mapbox.MapMatching
 {
+
+
 	using System;
 	using System.Text;
 	using Mapbox.Json;
 	using Mapbox.Platform;
 	using Mapbox.Utils.JsonConverters;
+#if MAPBOX_EXPERIMENTAL
+	using Mapbox.Unity;
+	using System.Threading.Tasks;
+	using Mapbox.Experimental.Platform.Http;
+#endif
+
 
 	/// <summary>
 	///     Wrapper around the <see href="https://www.mapbox.com/api-documentation/#map-matching">
@@ -18,8 +26,19 @@ namespace Mapbox.MapMatching
 	/// </summary>
 	public class MapMatcher
 	{
+#if MAPBOX_EXPERIMENTAL
+		private MapboxAccess _mapboxAccess;
+#endif
 		private readonly IFileSource _fileSource;
 		private int _timeout;
+
+
+#if MAPBOX_EXPERIMENTAL
+		public MapMatcher(MapboxAccess mapboxAccess)
+		{
+			_mapboxAccess = mapboxAccess;
+		}
+#endif
 
 		/// <summary> Initializes a new instance of the <see cref="MapMatcher" /> class. </summary>
 		/// <param name="fileSource"> Network access abstraction. </param>
@@ -28,6 +47,33 @@ namespace Mapbox.MapMatching
 			_fileSource = fileSource;
 			_timeout = timeout;
 		}
+
+
+#if MAPBOX_EXPERIMENTAL
+		public async Task<MapMatchingResponse> Match(MapMatchingResource resource)
+		{
+			MapboxHttpRequest request = await _mapboxAccess.Request(
+				MapboxWebDataRequestType.MapMatching
+				, null
+				, MapboxHttpMethod.Get
+				, resource.GetUrl()
+			);
+			MapboxHttpResponse response = await request.GetResponseAsync();
+
+			MapMatchingResponse mapMatchingResponse =
+				null == response.Data
+				? new MapMatchingResponse()
+				: Deserialize<MapMatchingResponse>(Encoding.UTF8.GetString(response.Data))
+			;
+
+			if (response.HasError)
+			{
+				mapMatchingResponse.SetRequestExceptions(response.Exceptions);
+			}
+
+			return mapMatchingResponse;
+		}
+#endif
 
 		/// <summary> Performs asynchronously a geocoding lookup. </summary>
 		/// <param name="geocode"> Geocode resource. </param>

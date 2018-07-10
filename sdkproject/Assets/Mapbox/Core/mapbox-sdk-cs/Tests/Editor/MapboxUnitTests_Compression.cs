@@ -101,14 +101,9 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		}
 
 
-#if UNITY_5_6_OR_NEWER
 		[UnityTest]
 		public IEnumerator Decompress()
 		{
-#else
-		[Test]
-		public void Decompress() {
-#endif
 			var buffer = new byte[] { };
 
 			// Vector tiles are compressed.
@@ -118,26 +113,18 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 				{
 					if (res.HasError)
 					{
-#if UNITY_5_6_OR_NEWER
 						Debug.LogError(res.ExceptionsAsString);
-#else
-						System.Diagnostics.Debug.WriteLine(res.ExceptionsAsString);
-#endif
 					}
 					buffer = res.Data;
 				},
 				_timeout
 			);
 
-#if UNITY_5_6_OR_NEWER
 			IEnumerator enumerator = _fs.WaitForAllRequests();
 			while (enumerator.MoveNext()) { yield return null; }
-#else
-			_fs.WaitForAllRequests();
-#endif
 
-            // tiles are automatically decompressed during HttpRequest on full .Net framework
-            // not on .NET Core / UWP / Unity
+			// tiles are automatically decompressed during HttpRequest on full .Net framework
+			// not on .NET Core / UWP / Unity
 #if UNITY_EDITOR_OSX && UNITY_IOS
             Assert.AreEqual(buffer.Length, Compression.Decompress(buffer).Length); // EditMode on OSX
 #elif UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID) // PlayMode tests in Editor
