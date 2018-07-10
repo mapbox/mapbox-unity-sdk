@@ -1,13 +1,15 @@
 ## CHANGELOG
 
 ### v.1.4.4
-*06/20/2018*
+*07/10/2018*
 ##### Improvements
 - Added 2 examples to the setup dialog 
 - AstronautGame - enhanced version of the Location Based game with custom styling and Astronaut asset
 - TrafficAndDirections - example built around using Mapbox's traffic data layer and directions API
-- Fixes the issue with Replacement Modifier to prevent duplicate prefab spawning and blocking wrong features. 
-
+- Fix an issue with factories where a racing condition causing tiles without imagery
+- Fixes the issue with Replacement Modifier to prevent duplicate prefab spawning and blocking wrong features.
+- Fixes the issue with custom styles that go missing after building to a device.
+- Fix an issue with factories where a racing condition causing tiles without imagery
 
 ### v.1.4.3
 *06/18/2018*

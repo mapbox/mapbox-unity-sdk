@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.4465785, g: 0.49641252, b: 0.574817, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -675,17 +675,17 @@ Prefab:
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 0.22727782
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907993215804030, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224315790701160254, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -780,37 +780,37 @@ Prefab:
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.x
-      value: 116.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -129.41263
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.x
-      value: 213
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224835413515161394, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 238.82524
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 258.82526
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -831,18 +831,19 @@ Prefab:
         type: 2}
       propertyPath: m_Text
       value: "<b>POI Placement</b>\n\nThis example showcases how to procedurally add
-        prefabs to a variety of locations. For example, you can choose to add prefabs
-        at all the cafes and restaurants in a city, at specific addresses, or at locations
-        with \"Starbucks\" in the name.\n\nTo get started, look at Map's Inspector
-        panel and open POINTS OF INTEREST in the MAP LAYERS section of the Abstract
-        Map component. We've already created a few prefab layers for you. Toggle them
-        on and off to see how they change the map. \n\nTo create your own, click \"Add
-        Layer\" and add the desired prefab and rules. "
+        prefabs to a variety of locations using POI data. For example, you can choose
+        to add prefabs at all the places labeled food in a city, at specific addresses
+        or coordinates, or at locations with a specific name. \n\n To get started,
+        look at the \"Map\" Game Object's Inspector Panel, unfold the MAP LAYERS section,
+        then unfold the POINTS OF INTEREST section. We've already created a few prefab
+        layers for you. Toggle them on and off to see how they change the map.\n\n
+        To create your own, simply click \"Add Layer\" and add the desired prefab
+        and rules."
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000030517578
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1611603657303738, guid: 98be219873e6d4dffb5949746f515a33, type: 2}
       propertyPath: m_IsActive
@@ -884,7 +885,7 @@ MonoBehaviour:
       latitudeLongitude: 37.784179, -122.401583
       zoom: 16
     extentOptions:
-      extentType: 1
+      extentType: 0
       cameraBoundsOptions:
         camera: {fileID: 0}
         visibleBuffer: 0
@@ -901,7 +902,7 @@ MonoBehaviour:
         disposeBuffer: 0
     placementOptions:
       placementType: 1
-      snapMapToZero: 0
+      snapMapToZero: 1
     scalingOptions:
       scalingType: 1
       unityTileSize: 100
@@ -937,7 +938,7 @@ MonoBehaviour:
         exaggerationFactor: 1
       modificationOptions:
         sampleCount: 10
-        useRelativeHeight: 1
+        useRelativeHeight: 0
         earthRadius: 1000
       unityLayerOptions:
         addToLayer: 0
@@ -2025,7 +2026,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9527fd56bc6a0c549a1e550219f9b16e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _panSpeed: 10
+  _panSpeed: 2
   _zoomSpeed: 50
   _referenceCamera: {fileID: 1681481105}
 --- !u!81 &1681481102
