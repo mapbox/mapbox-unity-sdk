@@ -35,7 +35,7 @@ public class HeroStructureCollection : ScriptableObject {
 			MeshRenderer meshRenderer = structure.prefab.GetComponent<MeshRenderer>();
 			Vector3 size = meshRenderer.bounds.size;
 			float radius = Mathf.Max(size.x, size.z);
-
+			//Debug.Log(meshRenderer.gameObject.name + " " + size.y);
 			structure.radius = (double)System.Math.Pow(radius, 2f);
 		}
 	}
@@ -52,7 +52,7 @@ public class HeroStructureCollection : ScriptableObject {
 			{
 				heroStructureDataBundle.Spawned = false;
 				list.Add(heroStructureDataBundle);
-				//Debug.Log(heroStructureDataBundle.prefab.name + " is in range...");
+				Debug.Log(heroStructureDataBundle.prefab.name + " is in range...");
 				//Debug.Log(heroStructureDataBundle.Spawned);
 			}
 		}

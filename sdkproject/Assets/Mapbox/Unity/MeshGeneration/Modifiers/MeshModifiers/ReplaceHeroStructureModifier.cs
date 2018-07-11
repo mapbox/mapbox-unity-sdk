@@ -83,8 +83,13 @@
 		/*
 		public override void FeaturePreProcess(VectorFeatureUnity feature)
 		{
+			
+			//feature.Tile.transform.position = center of tile...
+			//world to geo position...
+			//get lat lon that is tile specific...
+
 			int index = -1;
-			Debug.Log("PREPROCESS");
+			//Debug.Log("PREPROCESS");
 			foreach (var point in _prefabLocations)
 			{
 				try
@@ -149,23 +154,14 @@
 
 		public override void Run(VectorEntity ve, UnityTile tile)
 		{
-			//replace the feature only once per lat/lon
-			int shouldSpawn = ShouldSpawnFeature(ve.Feature);
-			if (shouldSpawn != -1)
-			{
-				HeroStructureDataBundle heroStructureDataBundle = heroStructuresToSpawn[shouldSpawn];
-				GameObject gameObject = heroStructureDataBundle.prefab;
-				SpawnPrefab(ve, tile, gameObject);
-
-				//heroStructuresToSpawn.Remove(heroStructureDataBundle);
-			}
+			ShouldSpawnFeature(ve, tile);
 		}
 
-		private int ShouldSpawnFeature(VectorFeatureUnity feature)
+		private void ShouldSpawnFeature(VectorEntity ve, UnityTile tile)
 		{
-			if (feature == null)
+			if (ve.Feature == null)
 			{
-				return -1;
+				return;
 			}
 
 			for (int i = 0; i < heroStructuresToSpawn.Count; i++)
@@ -176,41 +172,23 @@
 					continue;
 				}
 				var coord = Conversions.StringToLatLon(heroStructureDataBundle.latLon);
-				if (feature.ContainsLatLon(coord))
+				if (ve.Feature.ContainsLatLon(coord))
 				{
-					//heroStructures.Remove(heroStructureDataBundle);
-					//_latLonToSpawn.Remove(point);
-					heroStructureDataBundle.Spawned = true;
-					return i;
+					SpawnHeroStructure(ve, tile, heroStructureDataBundle);
 				}
 			}
-			return -1;
 		}
 
-		private void SpawnPrefab(VectorEntity ve, UnityTile tile, GameObject goPrefab)
+		private void SpawnHeroStructure(VectorEntity ve, UnityTile tile, HeroStructureDataBundle heroStructureDataBundle)
 		{
-			//GameObject go;
-
-			var featureId = ve.Feature.Data.Id;
-			/*
-			if (_objects.ContainsKey(featureId))
-			{
-				go = _objects[featureId];
-				go.SetActive(true);
-				go.transform.SetParent(ve.GameObject.transform, false);
-			}
-			else
-			{
-				go = Instantiate(_options.prefab);
-				_prefabList.Add(go);
-				_objects.Add(featureId, go);
-				go.transform.SetParent(ve.GameObject.transform, false);
-			}
-			*/
+			
+			GameObject goPrefab = heroStructureDataBundle.prefab;
 			GameObject go = Instantiate(goPrefab) as GameObject;
 			go.name = goPrefab.name;
 			go.transform.SetParent(ve.GameObject.transform, false);
 			PositionScaleRectTransform(ve, tile, go);
+
+			heroStructureDataBundle.Spawned = true;
 
 			//if (_options.AllPrefabsInstatiated != null)
 			//{
