@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Name: NewReplaceHeroStructureModifier
   m_EditorClassIdentifier: 
   Active: 1
+  heroStructureCollection: {fileID: 11400000, guid: 7314870ec38bb4d1a839b359059bf87f,
+    type: 2}
   _options:
     prefab: {fileID: 0}
     scaleDownWithWorld: 1

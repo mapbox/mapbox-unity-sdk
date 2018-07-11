@@ -22,6 +22,7 @@ public class HeroStructureCollection : ScriptableObject {
 			HeroStructureDataBundle structure = heroStructures[i];
 			string latLonString = structure.latLon;
 			Vector2d latLon = Conversions.StringToLatLon(latLonString);
+			structure.latLon_vector2d = latLon;
 			kdTree.AddPoint(new double[] { latLon.x, latLon.y }, structure);
 		}
 	}
@@ -33,8 +34,9 @@ public class HeroStructureCollection : ScriptableObject {
 			HeroStructureDataBundle structure = heroStructures[i];
 			MeshRenderer meshRenderer = structure.prefab.GetComponent<MeshRenderer>();
 			Vector3 size = meshRenderer.bounds.size;
+			float radius = Mathf.Max(size.x, size.z);
 
-			structure.radius = Mathf.Max(size.x, size.z);
+			structure.radius = (double)System.Math.Pow(radius, 2f);
 		}
 	}
 
@@ -45,11 +47,13 @@ public class HeroStructureCollection : ScriptableObject {
 		List<HeroStructureDataBundle> list = new List<HeroStructureDataBundle>();
 		do
 		{
-			HeroStructureDataBundle ve = pIter.Current;
-			if(ve != null)
+			HeroStructureDataBundle heroStructureDataBundle = pIter.Current;
+			if(heroStructureDataBundle != null)
 			{
-				list.Add(ve);
-				Debug.Log(ve.prefab.name + " is in range...");
+				heroStructureDataBundle.Spawned = false;
+				list.Add(heroStructureDataBundle);
+				//Debug.Log(heroStructureDataBundle.prefab.name + " is in range...");
+				//Debug.Log(heroStructureDataBundle.Spawned);
 			}
 		}
 		while (pIter.MoveNext());

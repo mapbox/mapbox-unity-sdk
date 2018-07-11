@@ -43,7 +43,8 @@
 		private List<List<string>> _featureId;
 		private string _tempFeatureId;
 
-		private List<HeroStructureDataBundle> heroStructuresInRange;
+		private List<HeroStructureDataBundle> heroStructuresToSpawn;
+
 
 		public override void Initialize()
 		{
@@ -52,7 +53,7 @@
 			AbstractMap abstractMap = FindObjectOfType<AbstractMap>();
 			MapOptions mapOptions = abstractMap.Options;
 			heroStructureCollection = Resources.Load("GlobalHeroStructureCollection") as HeroStructureCollection;
-			heroStructuresInRange = heroStructureCollection.GetListOfHeroStructuresInRange(mapOptions);
+			heroStructuresToSpawn = heroStructureCollection.GetListOfHeroStructuresInRange(mapOptions);
 
 			//duplicate the list of lat/lons to track which coordinates have already been spawned
 			_latLonToSpawn = new List<string>(_prefabLocations);
@@ -79,11 +80,11 @@
 			_prefabLocations = new List<string>();
 			_prefabLocations.Add(latLon);
 		}
-
+		/*
 		public override void FeaturePreProcess(VectorFeatureUnity feature)
 		{
 			int index = -1;
-
+			Debug.Log("PREPROCESS");
 			foreach (var point in _prefabLocations)
 			{
 				try
@@ -103,7 +104,7 @@
 				}
 			}
 		}
-
+		*/
 		//heroStructures
 
 		/// <summary>
@@ -114,35 +115,33 @@
 		public bool ShouldReplaceFeature(VectorFeatureUnity feature)
 		{
 
-			for (int i = 0; i < heroStructuresInRange.Count; i++)
+			for (int i = 0; i < heroStructuresToSpawn.Count; i++)
 			{
-				string point = heroStructuresInRange[i].latLon;
-
-				Vector2d ll = Conversions.StringToLatLon(point);
-				var tileId = Conversions.LatitudeLongitudeToTileId(ll.x, ll.y, feature.Tile.InitialZoom);
+				HeroStructureDataBundle heroStructureDataBundle = heroStructuresToSpawn[i];
+				/*
+				if(heroStructureDataBundle.Spawned)
+				{
+					continue;
+				}
+				*/
+				var tileId = Conversions.LatitudeLongitudeToTileId(heroStructureDataBundle.latLon_vector2d.x, heroStructureDataBundle.latLon_vector2d.y, feature.Tile.InitialZoom);
 
 				if(!tileId.Canonical.Equals(feature.Tile.CanonicalTileId))
 				{
 					continue;
 				}
 
-				float rad = heroStructuresInRange[i].radius;
-
-				var from = Conversions.LatitudeLongitudeToUnityTilePosition(Conversions.StringToLatLon(point), feature.Tile);
+				var from = Conversions.LatitudeLongitudeToUnityTilePosition(heroStructureDataBundle.latLon_vector2d, feature.Tile);
 
 				//TODO - is this the best 3d point to query from? Any way to get the center?
 				var to = feature.Points[0][0];
-				//TODO - refactor this to use Vector2.SqrMag; it will be faster...
-				//if (Vector2.SqrMagnitude(new Vector2(from.x, from.y) - new Vector2(to.X, to.Y)) < Math.Pow(_maxDistanceToBlockFeature_tilespace, 2f))
-				//float dist = Vector2.SqrMagnitude(new Vector2(from.x, from.y) - new Vector2(to.x, to.z));
-				float dist = Vector2.Distance(new Vector2((float)from.x, (float)from.y),new Vector2(to.x, to.z));
-				//double compare = rad;//Math.Pow(rad, 2f);
 
-				if (dist < (double)rad)
+				float sqrMag = Vector2.SqrMagnitude(new Vector2(from.x, from.y) - new Vector2(to.x, to.z));
+
+				if (sqrMag < heroStructureDataBundle.radius)
 				{
 					return true;
 				}
-
 			}
 			return false;
 		}
@@ -154,9 +153,38 @@
 			int shouldSpawn = ShouldSpawnFeature(ve.Feature);
 			if (shouldSpawn != -1)
 			{
-				GameObject gameObject = heroStructuresInRange[shouldSpawn].prefab;
+				HeroStructureDataBundle heroStructureDataBundle = heroStructuresToSpawn[shouldSpawn];
+				GameObject gameObject = heroStructureDataBundle.prefab;
 				SpawnPrefab(ve, tile, gameObject);
+
+				//heroStructuresToSpawn.Remove(heroStructureDataBundle);
 			}
+		}
+
+		private int ShouldSpawnFeature(VectorFeatureUnity feature)
+		{
+			if (feature == null)
+			{
+				return -1;
+			}
+
+			for (int i = 0; i < heroStructuresToSpawn.Count; i++)
+			{
+				HeroStructureDataBundle heroStructureDataBundle = heroStructuresToSpawn[i];
+				if(heroStructureDataBundle.Spawned)
+				{
+					continue;
+				}
+				var coord = Conversions.StringToLatLon(heroStructureDataBundle.latLon);
+				if (feature.ContainsLatLon(coord))
+				{
+					//heroStructures.Remove(heroStructureDataBundle);
+					//_latLonToSpawn.Remove(point);
+					heroStructureDataBundle.Spawned = true;
+					return i;
+				}
+			}
+			return -1;
 		}
 
 		private void SpawnPrefab(VectorEntity ve, UnityTile tile, GameObject goPrefab)
@@ -179,7 +207,6 @@
 				go.transform.SetParent(ve.GameObject.transform, false);
 			}
 			*/
-			Debug.Log("SPAWNING!!! " +  goPrefab.name);
 			GameObject go = Instantiate(goPrefab) as GameObject;
 			go.name = goPrefab.name;
 			go.transform.SetParent(ve.GameObject.transform, false);
@@ -229,59 +256,6 @@
 			//}
 		}
 
-		/// <summary>
-		/// Checks if the feature should be used to spawn a prefab, once per lat/lon
-		/// </summary>
-		/// <returns><c>true</c>, if the feature should be spawned <c>false</c> otherwise.</returns>
-		/// <param name="feature">Feature.</param>
-
-		/*
-		private bool ShouldSpawnFeature(VectorFeatureUnity feature)
-		{
-			if (feature == null)
-			{
-				return false;
-			}
-
-			if (_objects.ContainsKey(feature.Data.Id))
-			{
-				return true;
-			}
-
-			foreach (var point in _latLonToSpawn)
-			{
-				var coord = Conversions.StringToLatLon(point);
-				if (feature.ContainsLatLon(coord))
-				{
-					_latLonToSpawn.Remove(point);
-					return true;
-				}
-			}
-
-			return false;
-		}
-		*/
-		private int ShouldSpawnFeature(VectorFeatureUnity feature)
-		{
-			if (feature == null)
-			{
-				return -1;
-			}
-
-			for (int i = 0; i < heroStructuresInRange.Count; i++)
-			{
-				HeroStructureDataBundle heroStructureDataBundle = heroStructuresInRange[i];
-				var coord = Conversions.StringToLatLon(heroStructureDataBundle.latLon);
-				if (feature.ContainsLatLon(coord))
-				{
-					//heroStructures.Remove(heroStructureDataBundle);
-					//_latLonToSpawn.Remove(point);
-					return i;
-				}
-			}
-
-			return -1;
-		}
 
 		public override void OnPoolItem(VectorEntity vectorEntity)
 		{

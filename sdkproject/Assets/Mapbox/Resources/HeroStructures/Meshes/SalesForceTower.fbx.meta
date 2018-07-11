@@ -1,7 +1,5 @@
 fileFormatVersion: 2
-guid: 8d3c72129c1784ef2842386df0cd00ee
-timeCreated: 1530562943
-licenseType: Pro
+guid: 44f74893ebb18c44da514d62e67795bd
 ModelImporter:
   serializedVersion: 22
   fileIDToRecycleName:
@@ -11,7 +9,6 @@ ModelImporter:
     2300000: //RootNode
     3300000: //RootNode
     4300000: SalesForceTower
-    9500000: //RootNode
   externalObjects: {}
   materials:
     importMaterials: 1
@@ -42,7 +39,7 @@ ModelImporter:
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: 600
+    globalScale: 20
     meshCompression: 0
     addColliders: 0
     importVisibility: 1
@@ -86,7 +83,7 @@ ModelImporter:
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 2
+  animationType: 0
   humanoidOversampling: 1
   additionalBone: 0
   userData: 

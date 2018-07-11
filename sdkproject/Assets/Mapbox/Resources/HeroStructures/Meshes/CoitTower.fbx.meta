@@ -1,7 +1,5 @@
 fileFormatVersion: 2
-guid: b751c14c05db24d65bb70909f1e0a50f
-timeCreated: 1530553938
-licenseType: Pro
+guid: 6ccff0083b3ae714f9211a29435b28d0
 ModelImporter:
   serializedVersion: 22
   fileIDToRecycleName:
@@ -10,8 +8,7 @@ ModelImporter:
     2100000: lambert1
     2300000: //RootNode
     3300000: //RootNode
-    4300000: polySurface22
-    9500000: //RootNode
+    4300000: CoitTower
   externalObjects: {}
   materials:
     importMaterials: 1
@@ -42,7 +39,7 @@ ModelImporter:
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: 10
+    globalScale: 20
     meshCompression: 0
     addColliders: 0
     importVisibility: 1
@@ -86,7 +83,7 @@ ModelImporter:
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 2
+  animationType: 0
   humanoidOversampling: 1
   additionalBone: 0
   userData: 

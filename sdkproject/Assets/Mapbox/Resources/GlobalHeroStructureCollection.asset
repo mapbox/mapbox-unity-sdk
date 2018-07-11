@@ -15,12 +15,12 @@ MonoBehaviour:
   - active: 1
     prefab: {fileID: 1673554629469664, guid: 97310ce40def14528bd8155d12ba03d9, type: 2}
     latLon: 37.795135, -122.402748
-    prefabPath: 
+    radius: 228.97141981987807
   - active: 1
     prefab: {fileID: 1930251145991046, guid: 902eec150b0db493aaaad43f3e7b9336, type: 2}
-    latLon: 37.80250, -122.405833
-    prefabPath: 
+    latLon: 37.8024, -122.405833
+    radius: 491.0869804939466
   - active: 1
     prefab: {fileID: 1701369004274330, guid: eedc86a83362b4091b145ae9e3e59f6d, type: 2}
     latLon: 37.78990, -122.3969
-    prefabPath: 
+    radius: 208.6454252691774
