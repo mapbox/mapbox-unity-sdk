@@ -144,7 +144,7 @@ namespace Mapbox.Experimental.Platform.Http
 				if (null != apiResponse.Headers)
 				{
 					response.Headers = new Dictionary<string, string>();
-					foreach (var hdr in apiResponse.Headers)
+					foreach (KeyValuePair<string, IEnumerable<string>> hdr in apiResponse.Headers)
 					{
 						string key = hdr.Key;
 						string val = hdr.Value.FirstOrDefault();
@@ -175,7 +175,11 @@ namespace Mapbox.Experimental.Platform.Http
 					}
 				}
 
-				if (apiResponse.StatusCode != HttpStatusCode.OK)
+				if (
+					apiResponse.StatusCode != HttpStatusCode.OK
+					&& MapboxWebDataRequestType.Telemetry != request.WebDataRequestType
+					&& 204 != (int)apiResponse.StatusCode
+				)
 				{
 					response.AddException(new Exception(string.Format("{0}: {1}", apiResponse.StatusCode, apiResponse.ReasonPhrase)));
 				}

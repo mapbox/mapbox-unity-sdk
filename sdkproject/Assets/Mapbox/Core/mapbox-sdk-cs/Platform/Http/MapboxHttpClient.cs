@@ -38,7 +38,7 @@ namespace Mapbox.Experimental.Platform.Http
 			ServicePointManager.ServerCertificateValidationCallback += (o, certificate, chain, errors) => true;
 
 			//ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3;
-			var cookies = new CookieContainer();
+			CookieContainer cookies = new CookieContainer();
 
 			_client = new Lazy<HttpClient>(() =>
 			new HttpClient(new HttpClientHandler
@@ -56,11 +56,18 @@ namespace Mapbox.Experimental.Platform.Http
 			}
 			)
 			{
+				// we set timeout per request using a CancellationToken
 				Timeout = Timeout.InfiniteTimeSpan
 			});
 
 			//_client.DefaultRequestHeaders.Add("Accept", "text/html, application/json");
 			//_client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36");
+
+			// DOES NOT WORK "/0" is the problem
+			//_client.Value.DefaultRequestHeaders.Add("User-Agent", "unity.Mapbox.MBX SDK/1.4.3/0 MapboxEventsUnityEditor/1.4.3");
+			// works! replaced with " 0"
+			//_client.Value.DefaultRequestHeaders.Add("User-Agent", "unity.Mapbox.MBX SDK/1.4.3 0 MapboxEventsUnityEditor/1.4.3");
+
 			//_client.DefaultRequestHeaders.Add("Accept", "text/html, application/json");
 			//_client.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate");
 

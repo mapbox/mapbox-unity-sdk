@@ -61,7 +61,7 @@ namespace Mapbox.Experimental.Platform.Http
 		public MapboxWebDataFetcher(int timeoutSeconds, string accessToken, bool autoRefreshCache)
 		{
 #if MAPBOX_DEBUG_HTTP
-			_className = this.GetType().Name;
+			_className = GetType().Name;
 #endif
 			_timeoutSeconds = timeoutSeconds;
 			_accessToken = accessToken;
@@ -89,7 +89,7 @@ namespace Mapbox.Experimental.Platform.Http
 			{
 				if (disposeManagedResources)
 				{
-					foreach (var handler in _handlers)
+					foreach (EventHandler<MapboxWebDataFetcherResponseReceivedEventArgs> handler in _handlers)
 					{
 						ResponseReveivedPrivate -= handler;
 					}
@@ -137,7 +137,7 @@ namespace Mapbox.Experimental.Platform.Http
 		/// </summary>
 		public void Clear()
 		{
-			foreach (var cache in _caches)
+			foreach (ICache cache in _caches)
 			{
 				cache.Clear();
 			}
@@ -146,7 +146,7 @@ namespace Mapbox.Experimental.Platform.Http
 
 		public void ReInit()
 		{
-			foreach (var cache in _caches)
+			foreach (ICache cache in _caches)
 			{
 				cache.ReInit();
 			}
@@ -156,7 +156,7 @@ namespace Mapbox.Experimental.Platform.Http
 		public void CancelAllRequests()
 		{
 			MapboxHttpRequest request;
-			foreach (var key in _requests.Keys)
+			foreach (string key in _requests.Keys)
 			{
 				if (_requests.TryRemove(key, out request))
 				{
@@ -176,6 +176,16 @@ namespace Mapbox.Experimental.Platform.Http
 
 #pragma warning disable 4014
 #pragma warning disable 1998
+		/// <summary>
+		/// /
+		/// </summary>
+		/// <param name="webDataRequestType"></param>
+		/// <param name="id"></param>
+		/// <param name="verb"></param>
+		/// <param name="url"></param>
+		/// <param name="contentAsString">Some parts of Unity cannot access System.Net.Http: limit to StringContent for now</param>
+		/// <param name="headers"></param>
+		/// <returns></returns>
 		public async Task<MapboxHttpRequest> GetRequestAsync(
 			MapboxWebDataRequestType webDataRequestType
 			, object id
@@ -183,14 +193,19 @@ namespace Mapbox.Experimental.Platform.Http
 			, string url
 			/*
 			 * System.Net.Http not available from Unity unit tests
-			 * TODO: maybe pass content as byte array????
+			 * HACK: just use string for now
 			, HttpContent content = null
 			*/
+			, string contentAsString = null
 			, Dictionary<string, string> headers = null
 		)
 		{
 
 			HttpContent content = null;
+			if (!string.IsNullOrWhiteSpace(contentAsString))
+			{
+				content = new StringContent(contentAsString, System.Text.Encoding.UTF8, "application/json");
+			}
 
 			UnityEngine.Debug.LogWarning("TODO EXPERIMENTAL: async and throttle");
 
@@ -199,11 +214,16 @@ namespace Mapbox.Experimental.Platform.Http
 			_requests.AddOrUpdate(url, request, (key, oldValue) => request);
 			request.ResponseReveived += Request_ResponseReveived;
 
-			// **DON'T(!!!)** use await here, we want to initiate the actual request
+			// **DON'T(!!!)** use await for 'Task.Run()', we want to initiate the actual request
 			// but continue execution of this method to return the MapboxHttpRequest object
 			//[System.Diagnostics.CodeAnalysis.SuppressMessage(
 			Task.Run(async () =>
 			{
+				////////
+				//TODO: create dedicated queues (with separte delays) for each requestType!!!
+				///////
+				// set a default delay of 30ms: will be autoadjusted according to
+				// response header X-Rate headers as soon as we get the first response
 				await Task.Delay(_requestDelays.GetOrAdd(webDataRequestType, 30));
 				await request.SendAsync(webDataRequestType, id, verb, content, headers);
 			});
@@ -257,6 +277,11 @@ namespace Mapbox.Experimental.Platform.Http
 #if MAPBOX_DEBUG_HTTP
 			string methodName = new System.Diagnostics.StackFrame().GetMethod().Name;
 			UnityEngine.Debug.Log($"{_className}.{methodName} webresponse id:{e.Id}, completed:{e.Completed} successed:{e.Succeeded}");
+			if (!e.Completed || e.Succeeded)
+			{
+				MapboxHttpResponse failed = e.Response;
+				UnityEngine.Debug.LogError($"{failed.RequestUrl} statusCode:{failed.StatusCode} errors:{failed.ExceptionsAsString}");
+			}
 #endif
 			ResponseReveivedPrivate?.Invoke(sender, ea);
 

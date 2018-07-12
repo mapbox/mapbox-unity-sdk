@@ -12,6 +12,7 @@ namespace Mapbox.Unity
 	using Mapbox.Tokens;
 	using Mapbox.Unity.Telemetry;
 	using System;
+	using System.Collections.Generic;
 	using System.IO;
 	using System.Threading.Tasks;
 	using UnityEngine;
@@ -251,9 +252,16 @@ namespace Mapbox.Unity
 		}
 
 
-		public async Task<MapboxHttpRequest> Request(MapboxWebDataRequestType requestType, object id, MapboxHttpMethod verb, string url)
+		public async Task<MapboxHttpRequest> Request(
+			MapboxWebDataRequestType requestType
+			, object id
+			, MapboxHttpMethod verb
+			, string url
+			, string contentAsString = null // because of Unity's shortcommings of accessing System.Net.Http just StringContent for now
+			, Dictionary<string, string> headers = null
+		)
 		{
-			return await _webDataFetcher.GetRequestAsync(requestType, id, verb, url);
+			return await _webDataFetcher.GetRequestAsync(requestType, id, verb, url, contentAsString, headers);
 		}
 
 		Geocoder _geocoder;

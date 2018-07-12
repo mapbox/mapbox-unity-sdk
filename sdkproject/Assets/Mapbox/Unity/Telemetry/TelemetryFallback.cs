@@ -1,18 +1,17 @@
 namespace Mapbox.Unity.Telemetry
 {
-	using System.Collections.Generic;
-	using System.Collections;
 	using Mapbox.Json;
-	using System;
 	using Mapbox.Unity.Utilities;
-	using UnityEngine;
+	using System;
+	using System.Collections;
+	using System.Collections.Generic;
 	using System.Text;
+	using UnityEngine;
 
 	public class TelemetryFallback : ITelemetryLibrary
 	{
-		string _url;
-
-		static ITelemetryLibrary _instance = new TelemetryFallback();
+		private string _url;
+		private static ITelemetryLibrary _instance = new TelemetryFallback();
 		public static ITelemetryLibrary Instance
 		{
 			get
@@ -28,7 +27,7 @@ namespace Mapbox.Unity.Telemetry
 
 		public void SendTurnstile()
 		{
-			var ticks = DateTime.Now.Ticks;
+			long ticks = DateTime.Now.Ticks;
 			if (ShouldPostTurnstile(ticks))
 			{
 				Runnable.Run(PostWWW(_url, GetPostBody()));
@@ -36,7 +35,7 @@ namespace Mapbox.Unity.Telemetry
 			}
 		}
 
-		string GetPostBody()
+		private string GetPostBody()
 		{
 			List<Dictionary<string, object>> eventList = new List<Dictionary<string, object>>();
 			Dictionary<string, object> jsonDict = new Dictionary<string, object>();
@@ -49,36 +48,36 @@ namespace Mapbox.Unity.Telemetry
 			jsonDict.Add("enabled.telemetry", false);
 			eventList.Add(jsonDict);
 
-			var jsonString = JsonConvert.SerializeObject(eventList);
+			string jsonString = JsonConvert.SerializeObject(eventList);
 			return jsonString;
 		}
 
-		bool ShouldPostTurnstile(long ticks)
+		private bool ShouldPostTurnstile(long ticks)
 		{
-			var date = new DateTime(ticks);
-			var longAgo = DateTime.Now.AddDays(-100).Ticks.ToString();
-			var lastDateString = PlayerPrefs.GetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_FALLBACK_KEY, longAgo);
+			DateTime date = new DateTime(ticks);
+			string longAgo = DateTime.Now.AddDays(-100).Ticks.ToString();
+			string lastDateString = PlayerPrefs.GetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_FALLBACK_KEY, longAgo);
 			long lastTicks = 0;
 			long.TryParse(lastDateString, out lastTicks);
-			var lastDate = new DateTime(lastTicks);
-			var timeSpan = date - lastDate;
+			DateTime lastDate = new DateTime(lastTicks);
+			TimeSpan timeSpan = date - lastDate;
 			return timeSpan.Days >= 1;
 		}
 
-		IEnumerator PostWWW(string url, string bodyJsonString)
+		private IEnumerator PostWWW(string url, string bodyJsonString)
 		{
 			byte[] bodyRaw = Encoding.UTF8.GetBytes(bodyJsonString);
-			var headers = new Dictionary<string, string>();
+			Dictionary<string, string> headers = new Dictionary<string, string>();
 			headers.Add("Content-Type", "application/json");
 			headers.Add("user-agent", GetUserAgent());
 
-			var www = new WWW(url, bodyRaw, headers);
+			WWW www = new WWW(url, bodyRaw, headers);
 			yield return www;
 		}
 
-		static string GetUserAgent()
+		private static string GetUserAgent()
 		{
-			var userAgent = string.Format("{0}/{1}/{2} MapboxEventsUnity{3}/{4}",
+			string userAgent = string.Format("{0}/{1} {2} MapboxEventsUnity{3}/{4}",
 										  Application.identifier,
 										  Application.version,
 										  "0",

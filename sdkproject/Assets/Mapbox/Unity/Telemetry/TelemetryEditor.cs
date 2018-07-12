@@ -1,20 +1,22 @@
 ﻿#if UNITY_EDITOR
 namespace Mapbox.Unity.Telemetry
 {
-	using System.Collections.Generic;
-	using System.Collections;
 	using Mapbox.Json;
-	using System;
 	using Mapbox.Unity.Utilities;
-	using UnityEngine;
+	using System;
+	using System.Collections;
+	using System.Collections.Generic;
 	using System.Text;
 	using UnityEditor;
+	using UnityEngine;
+#if MAPBOX_EXPERIMENTAL
+	using Mapbox.Experimental.Platform.Http;
+#endif
 
 	public class TelemetryEditor : ITelemetryLibrary
 	{
-		string _url;
-
-		static ITelemetryLibrary _instance = new TelemetryEditor();
+		private string _url;
+		private static ITelemetryLibrary _instance = new TelemetryEditor();
 		public static ITelemetryLibrary Instance
 		{
 			get
@@ -25,7 +27,12 @@ namespace Mapbox.Unity.Telemetry
 
 		public void Initialize(string accessToken)
 		{
+#if MAPBOX_EXPERIMENTAL
+			// don't need to add accessToken, gets added automatically in MapboxHttpRequest
+			_url = $"{Mapbox.Utils.Constants.EventsAPI}events/v2";
+#else
 			_url = string.Format("{0}events/v2?access_token={1}", Mapbox.Utils.Constants.EventsAPI, accessToken);
+#endif
 		}
 
 		public void SendTurnstile()
@@ -33,14 +40,14 @@ namespace Mapbox.Unity.Telemetry
 			// This is only needed for maps at design-time.
 			//Runnable.EnableRunnableInEditor();
 
-			var ticks = DateTime.Now.Ticks;
+			long ticks = DateTime.Now.Ticks;
 			if (ShouldPostTurnstile(ticks))
 			{
 				Runnable.Run(PostWWW(_url, GetPostBody()));
 			}
 		}
 
-		string GetPostBody()
+		private string GetPostBody()
 		{
 			List<Dictionary<string, object>> eventList = new List<Dictionary<string, object>>();
 			Dictionary<string, object> jsonDict = new Dictionary<string, object>();
@@ -53,22 +60,69 @@ namespace Mapbox.Unity.Telemetry
 			jsonDict.Add("enabled.telemetry", false);
 			eventList.Add(jsonDict);
 
-			var jsonString = JsonConvert.SerializeObject(eventList);
+			string jsonString = JsonConvert.SerializeObject(eventList);
 			return jsonString;
 		}
 
-		bool ShouldPostTurnstile(long ticks)
+		private bool _isPostingTurnstile = false;
+		private bool ShouldPostTurnstile(long ticks)
 		{
-			var date = new DateTime(ticks);
-			var longAgo = DateTime.Now.AddDays(-100).Ticks.ToString();
-			var lastDateString = PlayerPrefs.GetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR_KEY, longAgo);
+			if (_isPostingTurnstile) { return false; }
+			//FOR DEBUGGING
+			//return true;
+
+			DateTime date = new DateTime(ticks);
+			string longAgo = DateTime.Now.AddDays(-100).Ticks.ToString();
+			string lastDateString = PlayerPrefs.GetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR_KEY, longAgo);
 			long lastTicks = 0;
 			long.TryParse(lastDateString, out lastTicks);
-			var lastDate = new DateTime(lastTicks);
-			var timeSpan = date - lastDate;
+			DateTime lastDate = new DateTime(lastTicks);
+			TimeSpan timeSpan = date - lastDate;
 			return timeSpan.Days >= 1;
 		}
 
+#if MAPBOX_EXPERIMENTAL
+		private IEnumerator PostWWW(string url, string bodyJsonString)
+		{
+			_isPostingTurnstile = true;
+
+			Action asyncWorkaround = async () =>
+			{
+
+				Dictionary<string, string> headers = new Dictionary<string, string>();
+				//headers.Add("Content-Type", "application/json");
+				headers.Add("User-Agent", GetUserAgent());
+
+				// TODO: verify, Mapbox access might not yet be fully initialised when
+				// we get here: verify is there could be a circular race condition
+				// currrent workaround via '_isPostingTurnstile'
+				MapboxHttpRequest request = await MapboxAccess.Instance.Request(
+					MapboxWebDataRequestType.Telemetry
+					, null
+					, MapboxHttpMethod.Post
+					, _url
+					, bodyJsonString
+					, headers
+				);
+				MapboxHttpResponse response = await request.GetResponseAsync();
+
+				if (response.HasError)
+				{
+					PlayerPrefs.SetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR_KEY, "0");
+				}
+				else
+				{
+					// FOR DEBUGGING
+					//PlayerPrefs.SetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR_KEY, "0");
+					PlayerPrefs.SetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR_KEY, DateTime.Now.Ticks.ToString());
+				}
+				_isPostingTurnstile = false;
+			};
+			asyncWorkaround();
+
+			while (_isPostingTurnstile) { yield return null; }
+		}
+#else
 		IEnumerator PostWWW(string url, string bodyJsonString)
 		{
 			byte[] bodyRaw = Encoding.UTF8.GetBytes(bodyJsonString);
@@ -90,11 +144,12 @@ namespace Mapbox.Unity.Telemetry
 				PlayerPrefs.SetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR_KEY, DateTime.Now.Ticks.ToString());
 			}
 		}
+#endif
 
-		static string GetUserAgent()
+		private static string GetUserAgent()
 		{
-			var userAgent = string.Format(
-				"{0}/{1}/{2} MapboxEventsUnityEditor/{3}",
+			string userAgent = string.Format(
+				"{0}/{1} {2} MapboxEventsUnityEditor/{3}",
 				PlayerSettings.applicationIdentifier,
 				PlayerSettings.bundleVersion,
 #if UNITY_IOS

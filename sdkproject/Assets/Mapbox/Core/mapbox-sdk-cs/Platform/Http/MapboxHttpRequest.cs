@@ -7,6 +7,7 @@ namespace Mapbox.Experimental.Platform.Http
 	using System;
 	using System.Collections.Generic;
 	using System.Net.Http;
+	using System.Net.Http.Headers;
 	using System.Threading;
 	using System.Threading.Tasks;
 
@@ -166,18 +167,49 @@ namespace Mapbox.Experimental.Platform.Http
 
 			if (null != headers)
 			{
-				foreach (var hdr in headers)
+				foreach (KeyValuePair<string, string> hdr in headers)
 				{
-					httpRequestMessage.Headers.Add(hdr.Key, hdr.Value);
+					try
+					{
+						//httpRequestMessage.Headers.Add(hdr.Key, hdr.Value);
+						if (hdr.Key.ToLower() == "user-agent")
+						{
+							string uaStringEscaped = Uri.EscapeDataString(hdr.Value);
+							httpRequestMessage.Headers.UserAgent.Clear();
+							//UnityEngine.Debug.Log($"{hdr.Key}:{hdr.Value}");
+							//httpRequestMessage.Headers.UserAgent.ParseAdd(hdr.Value);
+							if (!httpRequestMessage.Headers.UserAgent.TryParseAdd(hdr.Value)) { UnityEngine.Debug.LogWarning($"could not add raw useragent"); }
+							//if (!httpRequestMessage.Headers.UserAgent.TryParseAdd(uaStringEscaped)) { UnityEngine.Debug.LogWarning($"could not add escaped useragent"); }
+
+							//ProductInfoHeaderValue uaHdrVal = new ProductInfoHeaderValue(uaStringEscaped);
+							//ProductInfoHeaderValue uaHdrVal = new ProductInfoHeaderValue(hdr.Value);
+							//httpRequestMessage.Headers.UserAgent.Add(uaHdrVal);
+
+							//httpRequestMessage.Headers.UserAgent.Clear();
+							//httpRequestMessage.Headers.UserAgent.ParseAdd(uaStringEscaped);
+						}
+						else
+						{
+							if (httpRequestMessage.Headers.Contains(hdr.Key))
+							{
+								httpRequestMessage.Headers.Remove(hdr.Key);
+							}
+							httpRequestMessage.Headers.Add(hdr.Key, hdr.Value);
+						}
+					}
+					catch (Exception ex)
+					{
+						UnityEngine.Debug.LogError($"Unexpected error settings headers: {ex}");
+					}
 				}
 			}
 
 
-			var userToken = _cancellationTokenSource.Token; // cancellationToken ?? CancellationToken.None;
+			CancellationToken userToken = _cancellationTokenSource.Token; // cancellationToken ?? CancellationToken.None;
 
-			var cts = CancellationTokenSource.CreateLinkedTokenSource(userToken);
+			CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(userToken);
 			cts.CancelAfter(_timeOutSeconds * 1000);
-			var token = cts.Token;
+			CancellationToken token = cts.Token;
 			MapboxHttpResponse mapboxHttpResponse = null;
 			HttpResponseMessage httpResponseMessage = null;
 			try
