@@ -7,34 +7,12 @@
 	using Mapbox.Unity.Map;
 	using Mapbox.Utils;
 	using Mapbox.Unity.Utilities;
-	//using Mapbox.VectorTile.Geometry;
-	//using Mapbox.Unity.MeshGeneration.Interfaces;
 
 	public class ReplaceHeroStructureModifier : GameObjectModifier, IReplacementCriteria
 	{
-
-		private class HeroStructureDataCollection
-		{
-			private const int _MAX_BUNDLE_SIZE = 100;
-
-			public HeroStructureData[] heroStructureData = new HeroStructureData[_MAX_BUNDLE_SIZE];
-			public int count;
-
-			public void Add(HeroStructureData data)
-			{
-				if (count == _MAX_BUNDLE_SIZE)
-				{
-					Debug.LogError("Max bundle size reached!");
-					return;
-				}
-				heroStructureData[count] = data;
-				count++;
-			}
-		}
-
 		public List<HeroStructureData> heroStructures = new List<HeroStructureData>();
 
-		private Dictionary<string, HeroStructureDataCollection> _heroStructureTileIdDictionary;
+		private Dictionary<string, List<HeroStructureData>> _heroStructureTileIdDictionary;
 
 		private int _numHeroStructures;
 		private int _numSpawned;
@@ -45,9 +23,7 @@
 
 			AbstractMap map = FindObjectOfType<AbstractMap>();
 
-			int zoom = map.AbsoluteZoom;
-
-			_heroStructureTileIdDictionary = new Dictionary<string, HeroStructureDataCollection>();
+			_heroStructureTileIdDictionary = new Dictionary<string, List<HeroStructureData>>();
 
 			for (int i = 0; i < heroStructures.Count; i++)
 			{
@@ -56,10 +32,10 @@
 
 				heroStructureData.Spawned = false;
 
-				string tileId = Conversions.LatitudeLongitudeToTileId(heroStructureLatLon.x, heroStructureLatLon.y, zoom).ToString();
+				string tileId = Conversions.LatitudeLongitudeToTileId(heroStructureLatLon.x, heroStructureLatLon.y, map.AbsoluteZoom).ToString();
 				if (!_heroStructureTileIdDictionary.ContainsKey(tileId))
 				{
-					_heroStructureTileIdDictionary.Add(tileId, new HeroStructureDataCollection());
+					_heroStructureTileIdDictionary.Add(tileId, new List<HeroStructureData>());
 				}
 				_heroStructureTileIdDictionary[tileId].Add(heroStructureData);
 				_numHeroStructures++;
@@ -109,13 +85,12 @@
 		public HeroStructureData CheckHeroStructures(VectorFeatureUnity feature, Func<VectorFeatureUnity, HeroStructureData, bool> func )
 		{
 			string tileId = feature.Tile.UnwrappedTileId.ToString();
-			HeroStructureDataCollection heroStructureDataCollection;
-			if (_heroStructureTileIdDictionary.TryGetValue(tileId, out heroStructureDataCollection))
+			List<HeroStructureData> heroStructureDataList;
+			if (_heroStructureTileIdDictionary.TryGetValue(tileId, out heroStructureDataList))
 			{
-				int count = heroStructureDataCollection.count;
-				for (int i = 0; i < count; i++)
+				for (int i = 0; i < heroStructureDataList.Count; i++)
 				{
-					HeroStructureData heroStructureData = heroStructureDataCollection.heroStructureData[i];
+					HeroStructureData heroStructureData = heroStructureDataList[i];
 					if(func(feature, heroStructureData))
 					{
 						return heroStructureData;
