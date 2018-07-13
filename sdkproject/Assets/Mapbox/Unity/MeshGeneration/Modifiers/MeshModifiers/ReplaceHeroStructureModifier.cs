@@ -1,9 +1,11 @@
 ﻿namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
+	using System.Collections;
 	using System.Collections.Generic;
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using System;
+	using Mapbox.Map;
 	using Mapbox.Unity.Map;
 	using Mapbox.Utils;
 	using Mapbox.Unity.Utilities;
@@ -14,6 +16,26 @@
 	/// ReplaceBuildingFeatureModifier takes in POIs and checks if the feature layer has those points and deletes them
 	/// </summary>
 	//[CreateAssetMenu(menuName = "Mapbox/Modifiers/Replace Feature Modifier")]
+
+	public class HeroStructureDataBundleCollection
+	{
+		private const int MAX_BUNDLE_SIZE = 100;
+
+		public HeroStructureDataBundle[] heroStructureDataBundleArray = new HeroStructureDataBundle[MAX_BUNDLE_SIZE];
+		public int count;
+
+		public void Add(HeroStructureDataBundle heroStructureDataBundle)
+		{
+			if(count >= MAX_BUNDLE_SIZE)
+			{
+				Debug.Log("Max bundle size reached!");
+				return;
+			}
+			heroStructureDataBundleArray[count] = heroStructureDataBundle;
+			count++;
+		}
+	}
+
 	public class ReplaceHeroStructureModifier : GameObjectModifier, IReplacementCriteria
 	{
 		public HeroStructureCollection heroStructureCollection;
@@ -43,17 +65,23 @@
 		private List<List<string>> _featureId;
 		private string _tempFeatureId;
 
-		private List<HeroStructureDataBundle> heroStructuresToSpawn;
+		private List<HeroStructureDataBundle> _heroStructuresToSpawn;
 
+
+		private List<HeroStructureDataBundle> _heroStructureBuffer;
+
+
+		private Dictionary<string, HeroStructureDataBundleCollection> _heroStructureTileIdDictionary;
+
+		private string _lastTileId;
 
 		public override void Initialize()
 		{
 			base.Initialize();
 
 			AbstractMap abstractMap = FindObjectOfType<AbstractMap>();
-			MapOptions mapOptions = abstractMap.Options;
-			heroStructureCollection = Resources.Load("GlobalHeroStructureCollection") as HeroStructureCollection;
-			heroStructuresToSpawn = heroStructureCollection.GetListOfHeroStructuresInRange(mapOptions);
+
+			CreateTileIdHeroBundleDictionary(abstractMap.AbsoluteZoom);
 
 			//duplicate the list of lat/lons to track which coordinates have already been spawned
 			_latLonToSpawn = new List<string>(_prefabLocations);
@@ -70,6 +98,28 @@
 			_latLonToSpawn = new List<string>(_prefabLocations);
 		}
 
+		private void CreateTileIdHeroBundleDictionary(int zoom)
+		{
+			_heroStructureTileIdDictionary = new Dictionary<string, HeroStructureDataBundleCollection>();
+
+			heroStructureCollection = Resources.Load("GlobalHeroStructureCollection") as HeroStructureCollection;
+			for (int i = 0; i < heroStructureCollection.heroStructures.Count; i++)
+			{
+				HeroStructureDataBundle heroStructureDataBundle = heroStructureCollection.heroStructures[i];
+				Vector2d heroStructureLatLon = heroStructureDataBundle.latLon_vector2d;
+
+				heroStructureDataBundle.Spawned = false;
+
+				string tileId = Conversions.LatitudeLongitudeToTileId(heroStructureLatLon.x, heroStructureLatLon.y, zoom).ToString();
+				if (!_heroStructureTileIdDictionary.ContainsKey(tileId))
+				{
+					_heroStructureTileIdDictionary.Add(tileId, new HeroStructureDataBundleCollection());
+				}
+				_heroStructureTileIdDictionary[tileId].Add(heroStructureDataBundle);
+			}
+		}
+
+
 		public override void SetProperties(ModifierProperties properties)
 		{
 			_options = (SpawnPrefabOptions)properties;
@@ -80,36 +130,7 @@
 			_prefabLocations = new List<string>();
 			_prefabLocations.Add(latLon);
 		}
-		/*
-		public override void FeaturePreProcess(VectorFeatureUnity feature)
-		{
-			
-			//feature.Tile.transform.position = center of tile...
-			//world to geo position...
-			//get lat lon that is tile specific...
 
-			int index = -1;
-			//Debug.Log("PREPROCESS");
-			foreach (var point in _prefabLocations)
-			{
-				try
-				{
-					index++;
-					var coord = Conversions.StringToLatLon(point);
-					if (feature.ContainsLatLon(coord) && (feature.Data.Id != 0))
-					{
-						_featureId[index] = (_featureId[index] == null) ? new List<string>() : _featureId[index];
-						_tempFeatureId = feature.Data.Id.ToString();
-						_featureId[index].Add(_tempFeatureId.Substring(0, _tempFeatureId.Length - 3));
-					}
-				}
-				catch (Exception e)
-				{
-					Debug.LogException(e);
-				}
-			}
-		}
-		*/
 		//heroStructures
 
 		/// <summary>
@@ -117,40 +138,48 @@
 		/// </summary>
 		/// <returns><c>true</c>, if the feature overlaps with a lat/lon in the modifier <c>false</c> otherwise.</returns>
 		/// <param name="feature">Feature.</param>
+		/// 
+		/// 
+
+		private HeroStructureDataBundleCollection GetHeroStructureDataBundle(VectorFeatureUnity feature)//, Fuct function)
+		{
+			string tileId = feature.Tile.UnwrappedTileId.ToString();
+			HeroStructureDataBundleCollection heroStructureDataBundleCollection;
+			if (_heroStructureTileIdDictionary.TryGetValue(tileId, out heroStructureDataBundleCollection))
+			{
+				//put 
+
+
+				return heroStructureDataBundleCollection;
+			}
+			return null;
+		}
+
 		public bool ShouldReplaceFeature(VectorFeatureUnity feature)
 		{
-
-			for (int i = 0; i < heroStructuresToSpawn.Count; i++)
+			HeroStructureDataBundleCollection heroStructureDataBundleCollection = GetHeroStructureDataBundle(feature);
+			if (heroStructureDataBundleCollection != null)
 			{
-				HeroStructureDataBundle heroStructureDataBundle = heroStructuresToSpawn[i];
-				/*
-				if(heroStructureDataBundle.Spawned)
+				HeroStructureDataBundle[] heroStructureDataBundleArray = heroStructureDataBundleCollection.heroStructureDataBundleArray;
+				int count = heroStructureDataBundleCollection.count;
+				for (int i = 0; i < count; i++)
 				{
-					continue;
-				}
-				*/
-				var tileId = Conversions.LatitudeLongitudeToTileId(heroStructureDataBundle.latLon_vector2d.x, heroStructureDataBundle.latLon_vector2d.y, feature.Tile.InitialZoom);
+					HeroStructureDataBundle heroStructureDataBundle = heroStructureDataBundleArray[i];
 
-				if(!tileId.Canonical.Equals(feature.Tile.CanonicalTileId))
-				{
-					continue;
-				}
+					var from = Conversions.LatitudeLongitudeToUnityTilePosition(heroStructureDataBundle.latLon_vector2d, feature.Tile);
 
-				var from = Conversions.LatitudeLongitudeToUnityTilePosition(heroStructureDataBundle.latLon_vector2d, feature.Tile);
+					var to = feature.Points[0][0];
 
-				//TODO - is this the best 3d point to query from? Any way to get the center?
-				var to = feature.Points[0][0];
+					float sqrMag = Vector2.SqrMagnitude(new Vector2(from.x, from.y) - new Vector2(to.x, to.z));
 
-				float sqrMag = Vector2.SqrMagnitude(new Vector2(from.x, from.y) - new Vector2(to.x, to.z));
-
-				if (sqrMag < heroStructureDataBundle.radius)
-				{
-					return true;
+					if (sqrMag < heroStructureDataBundle.radius)
+					{
+						return true;
+					}
 				}
 			}
 			return false;
 		}
-
 
 		public override void Run(VectorEntity ve, UnityTile tile)
 		{
@@ -164,20 +193,34 @@
 				return;
 			}
 
-			for (int i = 0; i < heroStructuresToSpawn.Count; i++)
+			HeroStructureDataBundleCollection heroStructureDataBundleCollection = GetHeroStructureDataBundle(ve.Feature);
+			if (heroStructureDataBundleCollection == null)
 			{
-				HeroStructureDataBundle heroStructureDataBundle = heroStructuresToSpawn[i];
-				if(heroStructureDataBundle.Spawned)
+				return;
+			}
+			HeroStructureDataBundle[] heroStructureDataBundleArray = heroStructureDataBundleCollection.heroStructureDataBundleArray;
+			int count = heroStructureDataBundleCollection.count;
+			for (int i = 0; i < count; i++)
+			{
+				HeroStructureDataBundle heroStructureDataBundle = heroStructureDataBundleArray[i];
+				if (heroStructureDataBundle.Spawned)
 				{
 					continue;
 				}
-				var coord = Conversions.StringToLatLon(heroStructureDataBundle.latLon);
-				if (ve.Feature.ContainsLatLon(coord))
+				if (ve.Feature.ContainsLatLon(heroStructureDataBundle.latLon_vector2d))
 				{
 					SpawnHeroStructure(ve, tile, heroStructureDataBundle);
 				}
 			}
 		}
+
+		public T GenericMethod<T>(T param)
+		{
+			return param;
+		}
+
+
+		//private bool SpawnCheck
 
 		private void SpawnHeroStructure(VectorEntity ve, UnityTile tile, HeroStructureDataBundle heroStructureDataBundle)
 		{

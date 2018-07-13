@@ -12,26 +12,14 @@ using Mapbox.Unity.Map;
 public class HeroStructureCollection : ScriptableObject {
 
 	public List<HeroStructureDataBundle> heroStructures = new List<HeroStructureDataBundle>();
-	public KDTree<HeroStructureDataBundle> kdTree;
-
-	private void BuildKDTree()
-	{
-		kdTree = new KDTree.KDTree<HeroStructureDataBundle>(2);
-		for (int i = 0; i < heroStructures.Count; i++)
-		{
-			HeroStructureDataBundle structure = heroStructures[i];
-			string latLonString = structure.latLon;
-			Vector2d latLon = Conversions.StringToLatLon(latLonString);
-			structure.latLon_vector2d = latLon;
-			kdTree.AddPoint(new double[] { latLon.x, latLon.y }, structure);
-		}
-	}
 
 	private void CacheStructureRadius()
 	{
 		for (int i = 0; i < heroStructures.Count; i++)
 		{
 			HeroStructureDataBundle structure = heroStructures[i];
+			Vector2d latLon = Conversions.StringToLatLon(structure.latLon);
+			structure.latLon_vector2d = latLon;
 			MeshRenderer meshRenderer = structure.prefab.GetComponent<MeshRenderer>();
 			Vector3 size = meshRenderer.bounds.size;
 			float radius = Mathf.Max(size.x, size.z);
@@ -40,29 +28,8 @@ public class HeroStructureCollection : ScriptableObject {
 		}
 	}
 
-	public List<HeroStructureDataBundle> GetListOfHeroStructuresInRange(MapOptions mapOptions)
-	{
-		Vector2d latLon = Conversions.StringToLatLon(mapOptions.locationOptions.latitudeLongitude);
-		NearestNeighbour<HeroStructureDataBundle> pIter = kdTree.NearestNeighbors(new double[] { latLon.x, latLon.y}, 10, 10);
-		List<HeroStructureDataBundle> list = new List<HeroStructureDataBundle>();
-		do
-		{
-			HeroStructureDataBundle heroStructureDataBundle = pIter.Current;
-			if(heroStructureDataBundle != null)
-			{
-				heroStructureDataBundle.Spawned = false;
-				list.Add(heroStructureDataBundle);
-				Debug.Log(heroStructureDataBundle.prefab.name + " is in range...");
-				//Debug.Log(heroStructureDataBundle.Spawned);
-			}
-		}
-		while (pIter.MoveNext());
-		return list;
-	}
-
 	private void OnValidate()
 	{
 		CacheStructureRadius();
-		BuildKDTree();
 	}
 }
