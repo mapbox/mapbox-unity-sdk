@@ -3,7 +3,7 @@
 ### v.1.4.4
 *07/10/2018*
 ##### Improvements
-- Added 2 examples to the setup dialog 
+- Added 2 examples to the setup dialog  
 - AstronautGame - enhanced version of the Location Based game with custom styling and Astronaut asset
 - TrafficAndDirections - example built around using Mapbox's traffic data layer and directions API
 - Fix an issue with factories where a racing condition causing tiles without imagery
