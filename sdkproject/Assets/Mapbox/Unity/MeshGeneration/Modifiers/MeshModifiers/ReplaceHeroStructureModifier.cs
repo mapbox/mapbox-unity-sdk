@@ -60,21 +60,28 @@
 			}
 		}
 
+		private Vector3 GetCentroidVector(VectorFeatureUnity feature)
+		{
+			Vector3 centroidVector = new Vector3();
+			for (int i = 0; i < feature.Points[0].Count; i++)
+			{
+				centroidVector += feature.Points[0][i];
+			}
+			return centroidVector / feature.Points[0].Count;
+		}
+
 		private void SpawnHeroStructure(VectorEntity ve, HeroStructureData heroStructureData)
 		{
 			GameObject prefab = heroStructureData.prefab;
 			GameObject go = Instantiate(prefab) as GameObject;
 
+			Debug.Log("Spawning " + prefab.name);
+
 			go.name = ve.Feature.Data.Id.ToString();
 
 			go.transform.SetParent(ve.GameObject.transform, false);
 
-			var centroidVector = new Vector3();
-			foreach (var point in ve.Feature.Points[0])
-			{
-				centroidVector += point;
-			}
-			centroidVector = centroidVector / ve.Feature.Points[0].Count;
+			Vector3 centroidVector = GetCentroidVector(ve.Feature);
 
 			go.transform.localPosition = centroidVector;
 
@@ -115,8 +122,8 @@
 		private bool Replace(VectorFeatureUnity feature, HeroStructureData heroStructureData)
 		{
 			var from = Conversions.LatitudeLongitudeToUnityTilePosition(heroStructureData.LatLonVector2d, feature.Tile);
+			//var to = GetCentroidVector(feature);//).Points[0][0];
 			var to = feature.Points[0][0];
-
 			float sqrMag = Vector2.SqrMagnitude(new Vector2(from.x, from.y) - new Vector2(to.x, to.z));
 
 			return (sqrMag < heroStructureData.Radius);
