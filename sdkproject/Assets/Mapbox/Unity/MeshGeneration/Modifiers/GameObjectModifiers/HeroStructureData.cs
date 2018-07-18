@@ -12,26 +12,25 @@ using Mapbox.Unity.MeshGeneration.Interfaces;
 [System.Serializable]
 public class HeroStructureData
 {
-	public bool active = true;
+	public bool active;
+
 	public GameObject prefab;
 	[Geocode]
 	public string latLon;
-	[SerializeField]
-	private Vector2d latLon_vector2d;
-	[SerializeField]
+
+	private Vector2d _latLonVector2d;
 	private double _radius;
+	private bool _hasSpawned = false;
 
-	private bool _spawned = false;
-
-	public bool Spawned
+	public bool HasSpawned
 	{
 		get
 		{
-			return _spawned;
+			return _hasSpawned;
 		}
 		set
 		{
-			_spawned = value;
+			_hasSpawned = value;
 		}
 	}
 
@@ -39,7 +38,7 @@ public class HeroStructureData
 	{
 		get
 		{
-			return latLon_vector2d;
+			return _latLonVector2d;
 		}
 	}
 
@@ -55,8 +54,13 @@ public class HeroStructureData
 	{
 		if (!string.IsNullOrEmpty(latLon))
 		{
-			latLon_vector2d = Conversions.StringToLatLon(latLon);
+			_latLonVector2d = Conversions.StringToLatLon(latLon);
 		}
+	}
+
+	public void CacheFootprint()
+	{
+		
 	}
 
 	public void SetRadius()
