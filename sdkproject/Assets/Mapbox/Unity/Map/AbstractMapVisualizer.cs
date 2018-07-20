@@ -108,6 +108,14 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
+		public virtual void MapUpdate()
+		{
+			foreach (var factory in Factories)
+			{
+				factory.MapUpdate();
+			}
+		}
+
 		private void RegisterEvents(AbstractTileFactory factory)
 		{
 			factory.OnFactoryStateChanged += UpdateState;
@@ -244,5 +252,6 @@ namespace Mapbox.Unity.Map
 		}
 
 		protected abstract void PlaceTile(UnwrappedTileId tileId, UnityTile tile, IMapReadable map);
+
 	}
 }

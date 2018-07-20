@@ -303,14 +303,14 @@
 			}
 		}
 
-		public override void Create(VectorTileLayer layer, UnityTile tile, Action callback)
+		public override void Create(VectorTileLayer layer, UnityTile tile, Action<UnityTile> callback)
 		{
 			if (!_activeCoroutines.ContainsKey(tile))
 				_activeCoroutines.Add(tile, new List<int>());
 			_activeCoroutines[tile].Add(Runnable.Run(ProcessLayer(layer, tile, callback)));
 		}
 
-		protected IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, Action callback = null)
+		protected IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, Action<UnityTile> callback = null)
 		{
 			//HACK to prevent request finishing on same frame which breaks modules started/finished events
 			yield return null;
@@ -389,7 +389,7 @@
 			#endregion
 
 			if (callback != null)
-				callback();
+				callback(tile);
 		}
 
 		private bool ProcessFeature(int index, UnityTile tile, VectorLayerVisualizerProperties layerProperties)
@@ -530,7 +530,7 @@
 		public override void OnUnregisterTile(UnityTile tile)
 		{
 			base.OnUnregisterTile(tile);
-			tile.VectorDataState = Enums.TilePropertyState.Cancelled;
+			//tile.VectorDataState = Enums.TilePropertyState.Cancelled;
 			if (_activeCoroutines.ContainsKey(tile))
 			{
 				foreach (var cor in _activeCoroutines[tile])

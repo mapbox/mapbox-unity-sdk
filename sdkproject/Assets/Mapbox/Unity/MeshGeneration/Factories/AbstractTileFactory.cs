@@ -6,6 +6,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	using UnityEngine;
 	using Mapbox.Unity.Map;
 	using Mapbox.Map;
+	using System.Collections.Generic;
 
 	/// <summary>
 	/// Factories
@@ -44,28 +45,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		private int _progress;
-		protected int Progress
-		{
-			get
-			{
-				return _progress;
-			}
-			set
-			{
-				if (_progress == 0 && value > 0)
-				{
-					State = ModuleState.Working;
-					OnFactoryStateChanged(this);
-				}
-				if (_progress > 0 && value == 0)
-				{
-					State = ModuleState.Finished;
-					OnFactoryStateChanged(this);
-				}
-				_progress = value;
-			}
-		}
+		protected Queue<UnityTile> _tilesToFetch;
+		protected HashSet<UnityTile> _tilesWaitingResponse;
+		protected HashSet<UnityTile> _tilesWaitingProcessing;
 
 		public event Action<AbstractTileFactory> OnFactoryStateChanged = delegate { };
 		/// <summary>
@@ -90,10 +72,35 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		public virtual void Initialize(IFileSource fileSource)
 		{
-			_progress = 0;
 			_fileSource = fileSource;
 			State = ModuleState.Initialized;
+			_tilesToFetch = new Queue<UnityTile>();
+			_tilesWaitingResponse = new HashSet<UnityTile>();
+			_tilesWaitingProcessing = new HashSet<UnityTile>();
 			OnInitialized();
+		}
+
+		public virtual void MapUpdate()
+		{
+			if (State == ModuleState.Initialized || State == ModuleState.Working)
+			{
+				if (_tilesToFetch.Count == 0 && _tilesWaitingResponse.Count == 0 && _tilesWaitingProcessing.Count == 0)
+				{
+					State = ModuleState.Finished;
+					OnFactoryStateChanged(this);
+				}
+			}
+			else if (State == ModuleState.Finished)
+			{
+				if (_tilesToFetch.Count > 0 || _tilesWaitingResponse.Count > 0 || _tilesWaitingProcessing.Count > 0)
+				{
+					State = ModuleState.Working;
+					OnFactoryStateChanged(this);
+				}
+			}
+
+
+			OnMapUpdate();
 		}
 
 		public virtual void Register(UnityTile tile)
@@ -105,6 +112,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			OnUnregistered(tile);
 		}
+
+		protected abstract void OnMapUpdate();
 
 		protected abstract void OnInitialized();
 

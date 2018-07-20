@@ -344,6 +344,11 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
+		protected virtual void Update()
+		{
+			MapVisualizer.MapUpdate();
+		}
+
 		protected IEnumerator SetupAccess()
 		{
 			_fileSource = MapboxAccess.Instance;
