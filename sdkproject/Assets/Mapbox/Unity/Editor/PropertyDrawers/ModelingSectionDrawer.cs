@@ -94,6 +94,7 @@
 				DrawMeshModifiers(layerProperty);
 				EditorGUI.indentLevel--;
 			}
+			EditorGUILayout.EndVertical();
 		}
 
 

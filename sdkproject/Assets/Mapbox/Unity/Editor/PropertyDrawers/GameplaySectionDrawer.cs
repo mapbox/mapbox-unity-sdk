@@ -37,7 +37,6 @@
 					layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue = false;
 				}
 				DrawGoModifiers(layerProperty);
-				EditorGUILayout.EndVertical();
 			}
 		}
 

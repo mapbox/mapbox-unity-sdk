@@ -491,7 +491,6 @@
 
 
 			//*********************** MODELING SECTION BEGINS ***********************************//
-			EditorGUILayout.BeginVertical();
 			_modelingSectionDrawer.DrawUI(subLayerCoreOptions, layerProperty, primitiveTypeProp, sourceType);
 			//*********************** MODELING SECTION ENDS ***********************************//
 
