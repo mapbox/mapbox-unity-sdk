@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 33571745042536274}
   - component: {fileID: 23524301740635018}
   m_Layer: 0
-  m_Name: TransamericaPyramidPrefab
+  m_Name: TransamericaPyramid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

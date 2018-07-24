@@ -1,9 +1,14 @@
 ﻿namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
+	using UnityEngine;
 	using System.Collections.Generic;
 	using Mapbox.Unity.MeshGeneration.Data;
 
-	public class ReplaceHeroStructureModifier : GameObjectModifier, IReplacementCriteria
+	/// <summary>
+	/// ReplaceFeatureCollectionModifier aggregates multiple ReplaceFeatureModifier objects into one modifier.
+	/// </summary>
+	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Replace Feature Collection Modifier")]
+	public class ReplaceFeatureCollectionModifier : GameObjectModifier, IReplacementCriteria
 	{
 		public List<ReplaceFeatureModifier> _replaceFeatureModifiers = new List<ReplaceFeatureModifier>();
 
@@ -17,6 +22,18 @@
 					continue;
 				}
 				modifier.Initialize();
+			}
+		}
+
+		public override void FeaturePreProcess(VectorFeatureUnity feature)
+		{
+			foreach (ReplaceFeatureModifier modifier in _replaceFeatureModifiers)
+			{
+				if (modifier == null)
+				{
+					continue;
+				}
+				modifier.FeaturePreProcess(feature);
 			}
 		}
 
