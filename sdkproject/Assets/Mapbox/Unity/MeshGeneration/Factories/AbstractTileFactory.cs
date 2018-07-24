@@ -54,22 +54,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		/// The  <c>OnTileError</c> event triggers when there's <c>Tile</c> error.
 		/// Returns a <see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance as a parameter, for the tile on which error occurred.
 		/// </summary>
-		public event EventHandler<TileErrorEventArgs> OnTileError;
 
 		public virtual void SetOptions(LayerProperties options)
 		{
 			_options = options;
 		}
-
-		protected virtual void OnErrorOccurred(TileErrorEventArgs e)
-		{
-			EventHandler<TileErrorEventArgs> handler = OnTileError;
-			if (handler != null)
-			{
-				handler(this, e);
-			}
-		}
-
+		
 		public virtual void Initialize(IFileSource fileSource)
 		{
 			_fileSource = fileSource;
@@ -120,5 +110,26 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		protected abstract void OnRegistered(UnityTile tile);
 
 		protected abstract void OnUnregistered(UnityTile tile);
+
+		#region Events
+		public event EventHandler<TileErrorEventArgs> OnTileError;
+		public event EventHandler<TileProcessFinishedEventArgs> OnTileFinished;
+		protected virtual void OnErrorOccurred(TileErrorEventArgs e)
+		{
+			EventHandler<TileErrorEventArgs> handler = OnTileError;
+			if (handler != null)
+			{
+				handler(this, e);
+			}
+		}
+		protected virtual void TileFinished(TileProcessFinishedEventArgs e)
+		{
+			var handler = OnTileFinished;
+			if (handler != null)
+			{
+				handler(this, e);
+			}
+		}
+		#endregion
 	}
 }

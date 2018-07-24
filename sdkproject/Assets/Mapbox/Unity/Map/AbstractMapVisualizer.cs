@@ -52,6 +52,7 @@ namespace Mapbox.Unity.Map
 
 		public IMapReadable Map { get { return _map; } }
 		public Dictionary<UnwrappedTileId, UnityTile> ActiveTiles { get { return _activeTiles; } }
+		public Dictionary<UnwrappedTileId, int> _tileProgress;
 
 		public event Action<ModuleState> OnMapVisualizerStateChanged = delegate { };
 
@@ -59,12 +60,6 @@ namespace Mapbox.Unity.Map
 		{
 			_loadingTexture = loadingTexture;
 		}
-
-		/// <summary>
-		/// The  <c>OnTileError</c> event triggers when there's a <c>Tile</c> error.
-		/// Returns a <see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance as a parameter, for the tile on which error occurred.
-		/// </summary>
-		public event EventHandler<TileErrorEventArgs> OnTileError;
 
 		/// <summary>
 		/// Gets the unity tile from unwrapped tile identifier.
@@ -83,6 +78,7 @@ namespace Mapbox.Unity.Map
 		public virtual void Initialize(IMapReadable map, IFileSource fileSource)
 		{
 			_map = map;
+			_tileProgress = new Dictionary<UnwrappedTileId, int>();
 
 			// Allow for map re-use by recycling any active tiles.
 			var activeTiles = _activeTiles.Keys.ToList();
@@ -119,13 +115,16 @@ namespace Mapbox.Unity.Map
 		private void RegisterEvents(AbstractTileFactory factory)
 		{
 			factory.OnFactoryStateChanged += UpdateState;
+			//directly relaying to map visualizer event for now, nothing doing special
 			factory.OnTileError += Factory_OnTileError;
+			factory.OnTileFinished += Factory_OnTileFinished;
 		}
 
 		private void UnregisterEvents(AbstractTileFactory factory)
 		{
 			factory.OnFactoryStateChanged -= UpdateState;
 			factory.OnTileError -= Factory_OnTileError;
+			factory.OnTileFinished -= Factory_OnTileFinished;
 		}
 
 		public virtual void Destroy()
@@ -154,6 +153,41 @@ namespace Mapbox.Unity.Map
 			_inactiveTiles.Clear();
 		}
 
+		#region Factory event callbacks
+		//factory event callback, not relaying this up for now
+		private void Factory_OnTileFinished(object sender, TileProcessFinishedEventArgs e)
+		{
+			ChangeTileProgress(e.Tile.UnwrappedTileId, -1);
+		}
+
+		private void ChangeTileProgress(UnwrappedTileId tileId, int change)
+		{
+			if(!_tileProgress.ContainsKey(tileId) && change > 0)
+			{
+				_tileProgress.Add(tileId, 0);
+			}
+						
+
+			if (_tileProgress.ContainsKey(tileId))
+			{
+				if (_tileProgress.Count == 1 && _tileProgress[tileId] == 0 && change > 0)
+				{
+					Debug.Log("Map is loading");
+				}
+
+				_tileProgress[tileId] += change;
+
+				if (_tileProgress[tileId] == 0)
+				{
+					_tileProgress.Remove(tileId);
+					if (_tileProgress.Count == 0)
+					{
+						Debug.Log("Map Finished");
+					}
+				}
+			}
+		}
+
 		void UpdateState(AbstractTileFactory factory)
 		{
 			if (State != ModuleState.Working && factory.State == ModuleState.Working)
@@ -177,6 +211,7 @@ namespace Mapbox.Unity.Map
 				}
 			}
 		}
+		#endregion
 
 		/// <summary>
 		/// Registers requested tiles to the factories
@@ -204,9 +239,9 @@ namespace Mapbox.Unity.Map
 #if UNITY_EDITOR
 			unityTile.gameObject.name = unityTile.CanonicalTileId.ToString();
 #endif
-
 			foreach (var factory in Factories)
 			{
+				ChangeTileProgress(unityTile.UnwrappedTileId, 1);
 				factory.Register(unityTile);
 			}
 
@@ -219,14 +254,17 @@ namespace Mapbox.Unity.Map
 		{
 			var unityTile = ActiveTiles[tileId];
 
-			unityTile.Recycle();
-			ActiveTiles.Remove(tileId);
-			_inactiveTiles.Enqueue(unityTile);
-
 			foreach (var factory in Factories)
 			{
 				factory.Unregister(unityTile);
 			}
+
+			unityTile.Recycle();
+			ActiveTiles.Remove(tileId);
+			_inactiveTiles.Enqueue(unityTile);
+
+			
+			ChangeTileProgress(tileId, -1);
 		}
 
 		/// <summary>
@@ -242,16 +280,23 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
+		protected abstract void PlaceTile(UnwrappedTileId tileId, UnityTile tile, IMapReadable map);
+
+		#region Events
+		/// <summary>
+		/// The  <c>OnTileError</c> event triggers when there's a <c>Tile</c> error.
+		/// Returns a <see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance as a parameter, for the tile on which error occurred.
+		/// </summary>
+		public event EventHandler<TileErrorEventArgs> OnTileError;
 		private void Factory_OnTileError(object sender, TileErrorEventArgs e)
 		{
+			ChangeTileProgress(new UnwrappedTileId(e.TileId.Z, e.TileId.X, e.TileId.Y), -1);
 			EventHandler<TileErrorEventArgs> handler = OnTileError;
 			if (handler != null)
 			{
 				handler(this, e);
 			}
 		}
-
-		protected abstract void PlaceTile(UnwrappedTileId tileId, UnityTile tile, IMapReadable map);
-
+		#endregion
 	}
 }

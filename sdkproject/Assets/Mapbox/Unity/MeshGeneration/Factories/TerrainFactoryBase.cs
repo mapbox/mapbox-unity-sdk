@@ -67,6 +67,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					{
 						Strategy.RegisterTile(tile);
 						tile.HeightDataState = TilePropertyState.Loaded;
+						TileFinished(new TileProcessFinishedEventArgs(this, tile));
 					}
 				}
 			}
@@ -90,6 +91,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				_tilesWaitingResponse.Remove(tile);
 				tile.SetHeightData(pngRasterTile.Data, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.requiredOptions.addCollider);
 				Strategy.RegisterTile(tile);
+				tile.gameObject.name += Time.frameCount;
+				TileFinished(new TileProcessFinishedEventArgs(this, tile));
 			}
 		}
 

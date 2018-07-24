@@ -56,6 +56,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				_tilesWaitingResponse.Remove(tile);
 				tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
+				TileFinished(new TileProcessFinishedEventArgs(this, tile));
 			}
 		}
 
@@ -87,6 +88,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			if (_properties.sourceType == ImagerySourceType.None)
 			{
+				TileFinished(new TileProcessFinishedEventArgs(this, tile));
 				return;
 			}
 

@@ -113,9 +113,10 @@
 		{
 			if (string.IsNullOrEmpty(MapId) || _properties.sourceOptions.isActive == false || (_properties.vectorSubLayers.Count + _properties.locationPrefabList.Count) == 0)
 			{
+				TileFinished(new TileProcessFinishedEventArgs(this, tile));
 				return;
 			}
-
+			tile.HeightDataState = TilePropertyState.Loading;
 			_tilesToFetch.Enqueue(tile);
 		}
 
@@ -166,7 +167,6 @@
 		}
 		#endregion
 
-
 		#region DataFetcherEvents
 		private void OnVectorDataRecieved(UnityTile tile, VectorTile vectorTile)
 		{
@@ -202,6 +202,7 @@
 				DecreaseProgressCounter(tile);
 				_tilesWaitingResponse.Remove(tile);
 				tile.SetVectorData(null);
+				TileFinished(new TileProcessFinishedEventArgs(this, tile));
 				Debug.Log(tile + " - " + vectorTile.ExceptionsAsString);
 			}
 			OnErrorOccurred(e);
@@ -275,6 +276,7 @@
 
 				if (_layerProgress[tile] == 0)
 				{
+					TileFinished(new TileProcessFinishedEventArgs(this, tile));
 					_layerProgress.Remove(tile);
 					_tilesWaitingProcessing.Remove(tile);
 					tile.VectorDataState = TilePropertyState.Loaded;

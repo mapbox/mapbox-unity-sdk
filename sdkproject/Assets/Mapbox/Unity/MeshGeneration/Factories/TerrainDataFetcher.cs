@@ -31,11 +31,13 @@ public class TerrainDataFetcher : DataFetcher
 		{
 			if (pngRasterTile.HasError)
 			{
+				tile.HeightDataState = TilePropertyState.Loaded;
 				FetchingError(tile, pngRasterTile, new TileErrorEventArgs(canonicalTileId, pngRasterTile.GetType(), null, pngRasterTile.Exceptions));
 			}
 			else
 			{
 				DataRecieved(tile, pngRasterTile);
+				tile.HeightDataState = TilePropertyState.Loaded;
 			}
 		});
 	}

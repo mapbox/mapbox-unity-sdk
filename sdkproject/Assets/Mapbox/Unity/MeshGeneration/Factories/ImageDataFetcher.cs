@@ -29,12 +29,15 @@ public class ImageDataFetcher : DataFetcher
 		{
 			if (rasterTile.HasError)
 			{
+				tile.RasterDataState = TilePropertyState.Loaded;
 				FetchingError(tile, rasterTile, new TileErrorEventArgs(tile.CanonicalTileId, rasterTile.GetType(), tile, rasterTile.Exceptions));
 			}
 			else
 			{
 				DataRecieved(tile, rasterTile);
+				tile.RasterDataState = TilePropertyState.Loaded;
 			}
+			
 		});
 	}
 }
