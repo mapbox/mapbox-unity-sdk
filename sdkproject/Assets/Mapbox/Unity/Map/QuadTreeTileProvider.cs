@@ -16,6 +16,10 @@
 
 		CameraBoundsTileProviderOptions _cbtpOptions;
 
+		private List<UnwrappedTileId> toRemove;
+		private HashSet<UnwrappedTileId> tilesToRequest;
+		private Vector2dBounds _viewPortWebMercBounds;
+
 		public override void OnInitialized()
 		{
 			_cbtpOptions = (CameraBoundsTileProviderOptions)_options;
@@ -25,20 +29,12 @@
 			}
 			_groundPlane = new Plane(Vector3.up, 0);
 			_shouldUpdate = true;
+			toRemove = new List<UnwrappedTileId>();
+			tilesToRequest = new HashSet<UnwrappedTileId>();
 		}
 
 		protected virtual void Update()
 		{
-			//Camera Debugging
-			//Vector3[] frustumCorners = new Vector3[4];
-			//_cbtpOptions.camera.CalculateFrustumCorners(new Rect(0, 0, 1, 1), _cbtpOptions.camera.transform.position.y, Camera.MonoOrStereoscopicEye.Mono, frustumCorners);
-
-			//for (int i = 0; i < 4; i++)
-			//{
-			//	var worldSpaceCorner = _cbtpOptions.camera.transform.TransformVector(frustumCorners[i]);
-			//	Debug.DrawRay(_cbtpOptions.camera.transform.position, worldSpaceCorner, Color.blue);
-			//}
-
 			if (!_shouldUpdate)
 			{
 				return;
@@ -51,24 +47,33 @@
 				_elapsedTime = 0f;
 
 				//update viewport in case it was changed by switching zoom level
-				Vector2dBounds _viewPortWebMercBounds = getcurrentViewPortWebMerc();
-
-				var tilesToRequest = TileCover.GetWithWebMerc(_viewPortWebMercBounds, _map.AbsoluteZoom);
-
-				var activeTiles = _activeTiles.Keys.ToList();
-				List<UnwrappedTileId> toRemove = activeTiles.Except(tilesToRequest).ToList();
-				foreach (var t2r in toRemove) { RemoveTile(t2r); }
-				var finalTilesNeeded = tilesToRequest.Except(activeTiles);
-
-				foreach (var tile in activeTiles)
+				_viewPortWebMercBounds = getcurrentViewPortWebMerc();
+				tilesToRequest = TileCover.GetWithWebMerc(_viewPortWebMercBounds, _map.AbsoluteZoom);
+				foreach (var item in _activeTiles)
 				{
-					// Reposition tiles in case we panned.
-					RepositionTile(tile);
+					if (!tilesToRequest.Contains(item.Key))
+					{
+						toRemove.Add(item.Key);
+					}
 				}
 
-				foreach (var tile in finalTilesNeeded)
+				foreach (var t2r in toRemove)
 				{
-					AddTile(tile);
+					RemoveTile(t2r);
+				}
+				
+				foreach (var tile in _activeTiles)
+				{
+					// Reposition tiles in case we panned.
+					RepositionTile(tile.Key);
+				}
+
+				foreach (var tile in tilesToRequest)
+				{
+					if (!_activeTiles.ContainsKey(tile))
+					{
+						AddTile(tile);
+					}
 				}
 			}
 		}
