@@ -53,6 +53,7 @@
 				return;
 			}
 
+			_toRemove.Clear();
 			_elapsedTime += Time.deltaTime;
 
 			if (_elapsedTime >= _cbtpOptions.updateInterval)
