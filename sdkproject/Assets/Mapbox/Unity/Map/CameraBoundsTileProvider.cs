@@ -9,32 +9,22 @@ namespace Mapbox.Unity.Map
 
 	public class CameraBoundsTileProvider : AbstractTileProvider
 	{
-		//[SerializeField]
-		//Camera _camera;
+		private Plane _groundPlane;
+		private Ray _ray;
+		private float _hitDistance;
+		private Vector3 _viewportTarget;
+		private float _elapsedTime;
+		private bool _shouldUpdate;
 
-		//// TODO: change to Vector4 to optimize for different aspect ratios.
-		//[SerializeField]
-		//int _visibleBuffer;
+		private Vector2d _currentLatitudeLongitude;
+		private UnwrappedTileId _cachedTile;
+		private UnwrappedTileId _currentTile;
+		private List<UnwrappedTileId> toRemove;
 
-		//[SerializeField]
-		//int _disposeBuffer;
+		private CameraBoundsTileProviderOptions _cbtpOptions;
 
-		//[SerializeField]
-		//float _updateInterval;
-
-		Plane _groundPlane;
-		Ray _ray;
-		float _hitDistance;
-		Vector3 _viewportTarget;
-		float _elapsedTime;
-		bool _shouldUpdate;
-
-		Vector2d _currentLatitudeLongitude;
-		UnwrappedTileId _cachedTile;
-		UnwrappedTileId _currentTile;
-		List<UnwrappedTileId> toRemove;
-
-		CameraBoundsTileProviderOptions _cbtpOptions;
+		private UnwrappedTileId key;
+		private bool _shouldDispose;
 
 		public override void OnInitialized()
 		{
@@ -83,16 +73,16 @@ namespace Mapbox.Unity.Map
 		void Cleanup(UnwrappedTileId currentTile)
 		{
 			toRemove.Clear();
-			var _activeTilesKeys = _activeTiles.Keys.ToList();
-			foreach (var tile in _activeTilesKeys)
+			foreach (var tile in _activeTiles)
 			{
-				bool dispose = false;
-				dispose = tile.X > currentTile.X + _cbtpOptions.disposeBuffer || tile.X < _currentTile.X - _cbtpOptions.disposeBuffer;
-				dispose = dispose || tile.Y > _currentTile.Y + _cbtpOptions.disposeBuffer || tile.Y < _currentTile.Y - _cbtpOptions.disposeBuffer;
+				key = tile.Key;
+				_shouldDispose = false;
+				_shouldDispose = key.X > currentTile.X + _cbtpOptions.disposeBuffer || key.X < _currentTile.X - _cbtpOptions.disposeBuffer;
+				_shouldDispose = _shouldDispose || key.Y > _currentTile.Y + _cbtpOptions.disposeBuffer || key.Y < _currentTile.Y - _cbtpOptions.disposeBuffer;
 
-				if (dispose)
+				if (_shouldDispose)
 				{
-					toRemove.Add(tile);
+					toRemove.Add(key);
 				}
 			}
 

@@ -7,12 +7,11 @@ namespace Mapbox.Unity.Map
 	public class RangeTileProvider : AbstractTileProvider
 	{
 		[SerializeField]
-		RangeTileProviderOptions _rangeTileProviderOptions;
+		private RangeTileProviderOptions _rangeTileProviderOptions;
 		private bool _initialized = false;
-		List<UnwrappedTileId> toRemove;
-		HashSet<UnwrappedTileId> tilesToRequest;
 
-		private int _activeTileCount;
+		private List<UnwrappedTileId> _toRemove;
+		private HashSet<UnwrappedTileId> _tilesToRequest;
 
 		public override void OnInitialized()
 		{
@@ -26,44 +25,39 @@ namespace Mapbox.Unity.Map
 			}
 
 			_initialized = true;
-			toRemove = new List<UnwrappedTileId>((_rangeTileProviderOptions.east + _rangeTileProviderOptions.west) * (_rangeTileProviderOptions.north + _rangeTileProviderOptions.south));
-			tilesToRequest = new HashSet<UnwrappedTileId>();
+			_toRemove = new List<UnwrappedTileId>((_rangeTileProviderOptions.east + _rangeTileProviderOptions.west) * (_rangeTileProviderOptions.north + _rangeTileProviderOptions.south));
+			_tilesToRequest = new HashSet<UnwrappedTileId>();
 		}
 
 		protected virtual void Update()
 		{
-			if (!_initialized)
+			if (!_initialized || Options == null)
 			{
 				return;
 			}
 
-			if (Options == null)
-			{
-				return;
-			}
-
-			tilesToRequest.Clear();
-			toRemove.Clear();
+			_tilesToRequest.Clear();
+			_toRemove.Clear();
 			var centerTile = TileCover.CoordinateToTileId(_map.CenterLatitudeLongitude, _map.AbsoluteZoom);
-			tilesToRequest.Add(new UnwrappedTileId(_map.AbsoluteZoom, centerTile.X, centerTile.Y));
+			_tilesToRequest.Add(new UnwrappedTileId(_map.AbsoluteZoom, centerTile.X, centerTile.Y));
 
-			for (int x = (int)(centerTile.X - _rangeTileProviderOptions.west); x <= (centerTile.X + _rangeTileProviderOptions.east); x++)
+			for (int x = (centerTile.X - _rangeTileProviderOptions.west); x <= (centerTile.X + _rangeTileProviderOptions.east); x++)
 			{
-				for (int y = (int)(centerTile.Y - _rangeTileProviderOptions.north); y <= (centerTile.Y + _rangeTileProviderOptions.south); y++)
+				for (int y = (centerTile.Y - _rangeTileProviderOptions.north); y <= (centerTile.Y + _rangeTileProviderOptions.south); y++)
 				{
-					tilesToRequest.Add(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
+					_tilesToRequest.Add(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
 				}
 			}
 
 			foreach (var item in _activeTiles)
 			{
-				if (!tilesToRequest.Contains(item.Key))
+				if (!_tilesToRequest.Contains(item.Key))
 				{
-					toRemove.Add(item.Key);
+					_toRemove.Add(item.Key);
 				}
 			}
 
-			foreach (var t2r in toRemove)
+			foreach (var t2r in _toRemove)
 			{
 				RemoveTile(t2r);
 			}
@@ -74,7 +68,7 @@ namespace Mapbox.Unity.Map
 				RepositionTile(tile.Key);
 			}
 
-			foreach (var tile in tilesToRequest)
+			foreach (var tile in _tilesToRequest)
 			{
 				if (!_activeTiles.ContainsKey(tile))
 				{
