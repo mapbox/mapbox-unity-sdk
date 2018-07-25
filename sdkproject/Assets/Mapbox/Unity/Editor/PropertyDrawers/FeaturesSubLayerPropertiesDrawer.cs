@@ -557,7 +557,7 @@
 
 			var layerNameLabel = new GUIContent
 			{
-				text = "Layer Name",
+				text = "Data Layer",
 				tooltip = "The layer name from the Mapbox tileset that would be used for visualizing a feature"
 			};
 
