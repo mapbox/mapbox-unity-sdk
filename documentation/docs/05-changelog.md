@@ -1,7 +1,11 @@
 ## CHANGELOG
 
+### v.1.4.5
+- Added a **ReplaceFeatureCollectionModifier** class that allows multiple ReplaceFeatureModifiers to be run from one modifier.
+- Added six hero structures/modifiers - Transamerica Pyramid, Coit Tower, Salesforce Tower, Empire State Building, Chrysler Building and One World Trade Center.
+
 ### v.1.4.4
-*06/20/2018*
+*07/10/2018*
 ##### Improvements
 - Added 2 examples to the setup dialog 
 - AstronautGame - enhanced version of the Location Based game with custom styling and Astronaut asset
