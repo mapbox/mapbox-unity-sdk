@@ -3,7 +3,7 @@
 If you want to contribute:
 
 1. Ensure that existing [pull requests](https://github.com/mapbox/mapbox-unity-sdk/pulls) and [issues](https://github.com/mapbox/mapbox-unity-sdk/issues) don’t already cover your contribution or question.
-2. Please see [known issues](https://www.mapbox.com/mapbox-unity-sdk/docs/02-known-issues.html) for contrubition ideas.
+2. Please see [known issues](https://www.mapbox.com/mapbox-unity-sdk/docs/02-known-issues.html) for contribution ideas.
 3. Pull requests are gladly accepted. We require code reviews before merging PRs. When your tests pass, tag a project contributor (for example, @isiyu, @BergWerkGIS, @brnky, or @david-rhodes) and request a review.
 4. Please adhere to our [coding style](CODING-STYLE.md).
 
@@ -46,7 +46,7 @@ Windows
 update-mapbox-unity-sdk-core.bat
 ```
 
-This process copies releavant files from `mapbox-sdk-unity/dependencies` to `mapbox-sdk-unity/sdkproject/Assets/Mapbox/Core/`.
+This process copies relevant files from `mapbox-sdk-unity/dependencies` to `mapbox-sdk-unity/sdkproject/Assets/Mapbox/Core/`.
 
 # Contributing from your own project
 
