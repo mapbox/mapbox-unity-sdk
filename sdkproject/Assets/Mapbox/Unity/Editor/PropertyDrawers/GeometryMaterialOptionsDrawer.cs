@@ -85,6 +85,23 @@
 				EditorGUILayout.TextArea(descriptionLabel, (GUIStyle)"wordWrappedLabel");
 
 				GUILayout.EndHorizontal();
+
+				if ((StyleTypes)styleType.enumValueIndex == StyleTypes.Simple)
+				{
+					var samplePaletteType = property.FindPropertyRelative("samplePalettes");
+					var samplePaletteTypeLabel = new GUIContent { text = "Palette Type", tooltip = "Palette type for procedural colorization; choose from sample palettes or create your own by choosing Custom. " };
+
+					GUIContent[] samplePaletteTypeGuiContent = new GUIContent[samplePaletteType.enumDisplayNames.Length];
+					for (int i = 0; i < samplePaletteType.enumDisplayNames.Length; i++)
+					{
+						samplePaletteTypeGuiContent[i] = new GUIContent
+						{
+							text = samplePaletteType.enumDisplayNames[i]
+						};
+					}
+
+					samplePaletteType.enumValueIndex = EditorGUILayout.Popup(samplePaletteTypeLabel, samplePaletteType.enumValueIndex, samplePaletteTypeGuiContent);
+				}
 			}
 			else
 			{

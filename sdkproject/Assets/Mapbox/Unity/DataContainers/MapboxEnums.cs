@@ -201,7 +201,15 @@
 		Fantasy,
 		[Description("Satellite style uses high-resolution satellite imagery as a texture set. The comprehensive set of road, label, and POI information brings clarity and context to the crisp detail in our high-resolution satellite imagery.")]
 		Satellite,
+	}
 
+	public enum SamplePalettes
+	{
+		City,
+		Urban,
+		Warm,
+		Cool,
+		Rainbow
 	}
 
 	public enum LocationPrefabFindBy

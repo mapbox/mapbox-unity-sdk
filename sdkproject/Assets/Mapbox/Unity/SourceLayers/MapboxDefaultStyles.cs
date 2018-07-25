@@ -16,12 +16,12 @@ namespace Mapbox.Unity.Map
 		public string atlasPath;
 		public string palettePath;
 
-		public StyleAssetPathBundle(string styleName, string path)
+		public StyleAssetPathBundle(string styleName, string path, string samplePaletteName = "")
 		{
 			string topMaterialName = string.Format("{0}{1}", styleName, Constants.StyleAssetNames.TOP_MATERIAL_SUFFIX);
 			string sideMaterialName = string.Format("{0}{1}", styleName, Constants.StyleAssetNames.SIDE_MATERIAL_SUFFIX);
 			string atlasInfoName = string.Format("{0}{1}", styleName, Constants.StyleAssetNames.ALTAS_SUFFIX);
-			string paletteName = string.Format("{0}{1}", styleName, Constants.StyleAssetNames.PALETTE_SUFFIX);
+			string paletteName = (styleName == "Simple") ? samplePaletteName : string.Format("{0}{1}", styleName, Constants.StyleAssetNames.PALETTE_SUFFIX);
 
 			string materialFolderPath = Path.Combine(path, Constants.Path.MAPBOX_STYLES_MATERIAL_FOLDER);
 			string atlasFolderPath = Path.Combine(path, Constants.Path.MAPBOX_STYLES_ATLAS_FOLDER);
@@ -54,9 +54,11 @@ namespace Mapbox.Unity.Map
 			{
 				string styleName = geometryMaterialOptionsRef.style.ToString();
 
+				string samplePaletteName = geometryMaterialOptionsRef.samplePalettes.ToString();
+
 				string path = Path.Combine(Constants.Path.MAP_FEATURE_STYLES_SAMPLES, Path.Combine(styleName, Constants.Path.MAPBOX_STYLES_ASSETS_FOLDER));
 
-				StyleAssetPathBundle styleAssetPathBundle = new StyleAssetPathBundle(styleName, path);
+				StyleAssetPathBundle styleAssetPathBundle = new StyleAssetPathBundle(styleName, path, samplePaletteName);
 
 				geometryMaterialOptions = AssignAssets(new GeometryMaterialOptions(), styleAssetPathBundle);
 
