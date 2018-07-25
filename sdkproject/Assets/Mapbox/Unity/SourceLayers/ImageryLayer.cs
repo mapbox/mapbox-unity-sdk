@@ -18,6 +18,11 @@
 			{
 				return _layerProperty;
 			}
+			set
+			{
+				Debug.Log("Image Layer");
+				_layerProperty = value;
+			}
 		}
 		public MapLayerType LayerType
 		{
@@ -55,6 +60,13 @@
 		public ImageryLayer(ImageryLayerProperties properties)
 		{
 			_layerProperty = properties;
+			_layerProperty.PropertyChanged += PropertyChangedHandler;
+		
+		}
+
+		public void PropertyChangedHandler(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+		{
+			Initialize();
 		}
 
 		public void SetLayerSource(ImagerySourceType imageSource)
@@ -97,6 +109,7 @@
 
 		public void Initialize()
 		{
+			Debug.Log("ImageryLayer Initialize");
 			if (_layerProperty.sourceType != ImagerySourceType.Custom && _layerProperty.sourceType != ImagerySourceType.None)
 			{
 				_layerProperty.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(_layerProperty.sourceType);
