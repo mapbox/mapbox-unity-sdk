@@ -27,6 +27,12 @@ public class TerrainDataFetcher : DataFetcher
 		var pngRasterTile = new RawPngRasterTile();
 		pngRasterTile.Initialize(_fileSource, canonicalTileId, mapid, () =>
 		{
+			if (tile.CanonicalTileId != pngRasterTile.Id)
+			{
+				//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
+				return;
+			}
+
 			if (pngRasterTile.HasError)
 			{
 				FetchingError(tile, new TileErrorEventArgs(canonicalTileId, pngRasterTile.GetType(), null, pngRasterTile.Exceptions));
