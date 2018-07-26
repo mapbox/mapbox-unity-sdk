@@ -9,12 +9,14 @@
 
 	public class RangeAroundTransformTileProvider : AbstractTileProvider
 	{
-		RangeAroundTransformTileProviderOptions _rangeTileProviderOptions;
+		private RangeAroundTransformTileProviderOptions _rangeTileProviderOptions;
 
 		private bool _initialized = false;
 		private UnwrappedTileId _currentTile;
 		private UnwrappedTileId _cachedTile;
-		private int _counter;
+
+		private List<UnwrappedTileId> _toRemove;
+		private HashSet<UnwrappedTileId> _tilesToRequest;
 
 		public override void OnInitialized()
 		{
@@ -30,15 +32,16 @@
 				_initialized = true;
 			}
 			_cachedTile = new UnwrappedTileId();
+			_toRemove = new List<UnwrappedTileId>(((_rangeTileProviderOptions.visibleBuffer*2) + 1) * ((_rangeTileProviderOptions.visibleBuffer * 2) + 1));
+			_tilesToRequest = new HashSet<UnwrappedTileId>();
 		}
 
 		protected virtual void Update()
 		{
 			if (!_initialized) return;
 
-			var activeTiles = _activeTiles.Keys.ToList();
-
-			List<UnwrappedTileId> tilesToRequest = new List<UnwrappedTileId>();
+			_tilesToRequest.Clear();
+			_toRemove.Clear();
 			_currentTile = TileCover.CoordinateToTileId(_map.WorldToGeoPosition(_rangeTileProviderOptions.targetTransform.localPosition), _map.AbsoluteZoom);
 
 			if (!_currentTile.Equals(_cachedTile))
@@ -47,39 +50,36 @@
 				{
 					for (int y = _currentTile.Y - _rangeTileProviderOptions.visibleBuffer; y <= (_currentTile.Y + _rangeTileProviderOptions.visibleBuffer); y++)
 					{
-						tilesToRequest.Add(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
+						_tilesToRequest.Add(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
 					}
 				}
 				_cachedTile = _currentTile;
-				Cleanup(_currentTile);
 
-				var finalTilesNeeded = tilesToRequest.Except(activeTiles);
+				foreach (var item in _activeTiles)
+				{
+					if (!_tilesToRequest.Contains(item.Key))
+					{
+						_toRemove.Add(item.Key);
+					}
+				}
 
-				foreach (var tile in activeTiles)
+				foreach (var t2r in _toRemove)
+				{
+					RemoveTile(t2r);
+				}
+
+				foreach (var tile in _activeTiles)
 				{
 					// Reposition tiles in case we panned.
-					RepositionTile(tile);
+					RepositionTile(tile.Key);
 				}
 
-				foreach (var tile in finalTilesNeeded)
+				foreach (var tile in _tilesToRequest)
 				{
-					AddTile(tile);
-				}
-			}
-		}
-
-		private void Cleanup(UnwrappedTileId currentTile)
-		{
-			var _activeTilesKeys = _activeTiles.Keys.ToList();
-			foreach (var tile in _activeTilesKeys)
-			{
-				bool dispose = false;
-				dispose = tile.X > currentTile.X + _rangeTileProviderOptions.disposeBuffer || tile.X < _currentTile.X - _rangeTileProviderOptions.disposeBuffer;
-				dispose = dispose || tile.Y > _currentTile.Y + _rangeTileProviderOptions.disposeBuffer || tile.Y < _currentTile.Y - _rangeTileProviderOptions.disposeBuffer;
-
-				if (dispose)
-				{
-					RemoveTile(tile);
+					if (!_activeTiles.ContainsKey(tile))
+					{
+						AddTile(tile);
+					}
 				}
 			}
 		}
