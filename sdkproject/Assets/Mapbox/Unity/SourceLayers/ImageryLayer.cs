@@ -5,6 +5,7 @@
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Unity.Utilities;
 
+
 	[Serializable]
 	public class ImageryLayer : IImageryLayer
 	{
@@ -60,13 +61,6 @@
 		public ImageryLayer(ImageryLayerProperties properties)
 		{
 			_layerProperty = properties;
-			_layerProperty.PropertyChanged += PropertyChangedHandler;
-		
-		}
-
-		public void PropertyChangedHandler(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-		{
-			Initialize();
 		}
 
 		public void SetLayerSource(ImagerySourceType imageSource)
@@ -109,13 +103,13 @@
 
 		public void Initialize()
 		{
-			Debug.Log("ImageryLayer Initialize");
 			if (_layerProperty.sourceType != ImagerySourceType.Custom && _layerProperty.sourceType != ImagerySourceType.None)
 			{
 				_layerProperty.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(_layerProperty.sourceType);
 			}
 			_imageFactory = ScriptableObject.CreateInstance<MapImageFactory>();
 			_imageFactory.SetOptions(_layerProperty);
+			_layerProperty.PropertyChanged += _imageFactory.OnMapUpdated;
 		}
 
 		public void Remove()
