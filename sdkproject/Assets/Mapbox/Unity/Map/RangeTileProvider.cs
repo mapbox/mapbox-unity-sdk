@@ -6,7 +6,6 @@ namespace Mapbox.Unity.Map
 
 	public class RangeTileProvider : AbstractTileProvider
 	{
-		[SerializeField]
 		private RangeTileProviderOptions _rangeTileProviderOptions;
 		private bool _initialized = false;
 
