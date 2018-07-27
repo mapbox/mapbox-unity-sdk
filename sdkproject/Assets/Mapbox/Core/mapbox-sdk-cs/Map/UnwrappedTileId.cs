@@ -1,8 +1,4 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="UnwrappedTileId.cs" company="Mapbox">
-//     Copyright (c) 2016 Mapbox. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
+﻿using System;
 
 namespace Mapbox.Map
 {
@@ -10,7 +6,7 @@ namespace Mapbox.Map
 	///     Unwrapped tile identifier in a slippy map. Similar to <see cref="CanonicalTileId"/>,
 	///     but might go around the globe.
 	/// </summary>
-	public struct UnwrappedTileId
+	public struct UnwrappedTileId : IEquatable<UnwrappedTileId>
 	{
 		/// <summary> The zoom level. </summary>
 		public readonly int Z;
@@ -57,6 +53,26 @@ namespace Mapbox.Map
 		public override string ToString()
 		{
 			return this.Z + "/" + this.X + "/" + this.Y;
+		}
+
+		public bool Equals(UnwrappedTileId other)
+		{
+			return this.X == other.X && this.Y == other.Y && this.Z == other.Z;
+		}
+
+		public override int GetHashCode()
+		{
+			return X ^ Y ^ Z;
+		}
+
+		public static bool operator ==(UnwrappedTileId a, UnwrappedTileId b)
+		{
+			return a.X == b.X && a.Y == b.Y && a.Z == b.Z;
+		}
+
+		public static bool operator !=(UnwrappedTileId a, UnwrappedTileId b)
+		{
+			return !(a == b);
 		}
 
 		public UnwrappedTileId North
