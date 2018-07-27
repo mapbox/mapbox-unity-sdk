@@ -59,6 +59,7 @@
 			foreach (var item in _properties.locationPrefabList)
 			{
 				LayerVisualizerBase visualizer = CreateInstance<LocationPrefabsLayerVisualizer>();
+				item.performanceOptions = _properties.performanceOptions;
 				((LocationPrefabsLayerVisualizer)visualizer).SetProperties((PrefabItemOptions)item);
 
 				visualizer.Initialize();
@@ -81,6 +82,7 @@
 			{
 				//if its of type prefabitemoptions then separate the visualizer type
 				LayerVisualizerBase visualizer = CreateInstance<VectorLayerVisualizer>();
+				sublayer.performanceOptions = _properties.performanceOptions;
 				((VectorLayerVisualizer)visualizer).SetProperties(sublayer);
 
 				visualizer.Initialize();

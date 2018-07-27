@@ -50,6 +50,7 @@
 		public bool useOptimizedStyle = false;
 		[StyleSearch]
 		public Style optimizedStyle;
+		public LayerPerformanceOptions performanceOptions;
 		[NodeEditorElementAttribute("Feature Sublayers")]
 		public List<VectorSubLayerProperties> vectorSubLayers = new List<VectorSubLayerProperties>();
 		[NodeEditorElementAttribute("POI Sublayers")]

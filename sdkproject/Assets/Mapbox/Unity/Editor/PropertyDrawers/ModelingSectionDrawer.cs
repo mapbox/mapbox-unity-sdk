@@ -31,8 +31,6 @@
 			showModeling = EditorGUILayout.Foldout(showModeling, new GUIContent { text = "Modeling", tooltip = "This section provides you with options to fine tune your meshes" });
 			if (showModeling)
 			{
-				EditorGUI.indentLevel++;
-
 				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(subLayerCoreOptions);
 
@@ -61,12 +59,6 @@
 					});
 				}
 
-				if (sourceType != VectorSourceType.None)
-				{
-					GUILayout.Space(-_lineHeight);
-					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("performanceOptions"), new GUIContent("Perfomance Options"));
-				}
-
 				EditorGUILayout.BeginHorizontal();
 				if (combineMeshesProperty.boolValue == false)
 				{
@@ -92,7 +84,6 @@
 				EditorGUILayout.EndHorizontal();
 
 				DrawMeshModifiers(layerProperty);
-				EditorGUI.indentLevel--;
 			}
 			EditorGUILayout.EndVertical();
 		}
