@@ -7,32 +7,37 @@ public class ImageDataFetcher : DataFetcher
 	public Action<UnityTile, TileErrorEventArgs> FetchingError = (t, s) => { };
 
 	//tile here should be totally optional and used only not to have keep a dictionary in terrain factory base
-	public void FetchImage(CanonicalTileId canonicalTileId, string mapid, UnityTile tile = null, bool useRetina = false)
+	public override void FetchData(DataFetcherParameters parameters)
 	{
-		RasterTile rasterTile;
-		if (mapid.StartsWith("mapbox://", StringComparison.Ordinal))
+		var imageDataParameters = parameters as ImageDataFetcherParameters;
+		if(imageDataParameters == null)
 		{
-			rasterTile = useRetina ? new RetinaRasterTile() : new RasterTile();
+			return;
+		}
+		RasterTile rasterTile;
+		if (imageDataParameters.mapid.StartsWith("mapbox://", StringComparison.Ordinal))
+		{
+			rasterTile = imageDataParameters.useRetina ? new RetinaRasterTile() : new RasterTile();
 		}
 		else
 		{
-			rasterTile = useRetina ? new ClassicRetinaRasterTile() : new ClassicRasterTile();
+			rasterTile = imageDataParameters.useRetina ? new ClassicRetinaRasterTile() : new ClassicRasterTile();
 		}
 
-		if (tile != null)
+		if (imageDataParameters.tile != null)
 		{
-			tile.AddTile(rasterTile);
+			imageDataParameters.tile.AddTile(rasterTile);
 		}
 
-		rasterTile.Initialize(_fileSource, tile.CanonicalTileId, mapid, () =>
+		rasterTile.Initialize(_fileSource, imageDataParameters.tile.CanonicalTileId, imageDataParameters.mapid, () =>
 		{
 			if (rasterTile.HasError)
 			{
-				FetchingError(tile, new TileErrorEventArgs(tile.CanonicalTileId, rasterTile.GetType(), tile, rasterTile.Exceptions));
+				FetchingError(imageDataParameters.tile, new TileErrorEventArgs(imageDataParameters.tile.CanonicalTileId, rasterTile.GetType(), imageDataParameters.tile, rasterTile.Exceptions));
 			}
 			else
 			{
-				DataRecieved(tile, rasterTile);
+				DataRecieved(imageDataParameters.tile, rasterTile);
 			}
 		});
 	}

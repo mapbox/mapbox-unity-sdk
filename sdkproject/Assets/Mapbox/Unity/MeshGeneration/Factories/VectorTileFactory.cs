@@ -117,7 +117,15 @@
 			{
 				tile.VectorDataState = TilePropertyState.Loading;
 				Progress++;
-				DataFetcher.FetchVector(tile.CanonicalTileId, MapId, tile, _properties.useOptimizedStyle, _properties.optimizedStyle);
+				VectorDataFetcherParameters parameters = new VectorDataFetcherParameters()
+				{
+					canonicalTileId = tile.CanonicalTileId,
+					mapid = MapId,
+					tile = tile,
+					useOptimizedStyle = _properties.useOptimizedStyle,
+					style = _properties.optimizedStyle
+				};
+				DataFetcher.FetchData(parameters);
 			}
 		}
 

@@ -48,7 +48,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			if (Strategy is IElevationBasedTerrainStrategy)
 			{
 				tile.HeightDataState = TilePropertyState.Loading;
-				DataFetcher.FetchTerrain(tile.CanonicalTileId, _elevationOptions.sourceOptions.Id, tile);
+				TerrainDataFetcherParameters parameters = new TerrainDataFetcherParameters()
+				{
+					canonicalTileId = tile.CanonicalTileId,
+					mapid = _elevationOptions.sourceOptions.Id,
+					tile = tile
+				};
+				DataFetcher.FetchData(parameters);
 			}
 			else
 			{

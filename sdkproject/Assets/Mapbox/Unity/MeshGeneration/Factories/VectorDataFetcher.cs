@@ -9,20 +9,25 @@ public class VectorDataFetcher : DataFetcher
 	public Action<UnityTile, TileErrorEventArgs> FetchingError = (t, s) => { };
 
 	//tile here should be totally optional and used only not to have keep a dictionary in terrain factory base
-	public void FetchVector(CanonicalTileId canonicalTileId, string mapid, UnityTile tile = null, bool useOptimizedStyle = false, Style style = null)
+	public override void FetchData(DataFetcherParameters parameters)
 	{
-		var vectorTile = (useOptimizedStyle) ? new VectorTile(style.Id, style.Modified) : new VectorTile();
-		tile.AddTile(vectorTile);
-		vectorTile.Initialize(_fileSource, tile.CanonicalTileId, mapid, () =>
+		var vectorDaraParameters = parameters as VectorDataFetcherParameters;
+		if(vectorDaraParameters == null)
+		{
+			return;
+		}
+		var vectorTile = (vectorDaraParameters.useOptimizedStyle) ? new VectorTile(vectorDaraParameters.style.Id, vectorDaraParameters.style.Modified) : new VectorTile();
+		vectorDaraParameters.tile.AddTile(vectorTile);
+		vectorTile.Initialize(_fileSource, vectorDaraParameters.tile.CanonicalTileId, vectorDaraParameters.mapid, () =>
 		{
 			if (vectorTile.HasError)
 			{
-				FetchingError(tile, new TileErrorEventArgs(tile.CanonicalTileId, vectorTile.GetType(), tile, vectorTile.Exceptions));
-				tile.VectorDataState = TilePropertyState.Error;
+				FetchingError(vectorDaraParameters.tile, new TileErrorEventArgs(vectorDaraParameters.tile.CanonicalTileId, vectorTile.GetType(), vectorDaraParameters.tile, vectorTile.Exceptions));
+				vectorDaraParameters.tile.VectorDataState = TilePropertyState.Error;
 			}
 			else
 			{
-				DataRecieved(tile, vectorTile);
+				DataRecieved(vectorDaraParameters.tile, vectorTile);
 			}
 		});
 	}

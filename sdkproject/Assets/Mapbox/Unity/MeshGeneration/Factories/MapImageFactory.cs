@@ -99,7 +99,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			tile.RasterDataState = TilePropertyState.Loading;
 			Progress++;
-			DataFetcher.FetchImage(tile.CanonicalTileId, MapId, tile, _properties.rasterOptions.useRetina);
+			ImageDataFetcherParameters parameters = new ImageDataFetcherParameters()
+			{
+				canonicalTileId = tile.CanonicalTileId,
+				tile = tile,
+				mapid = MapId,
+				useRetina = _properties.rasterOptions.useRetina
+
+			};
+			DataFetcher.FetchData(parameters);
 			UnwrappedTileId key = tile.UnwrappedTileId;
 			_tileDictionary.Add(key, tile);
 		}
@@ -130,7 +138,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				UnwrappedTileId unwrappedTileId = tileBundle.Key;
 				UnityTile tile = tileBundle.Value;
-				DataFetcher.FetchImage(tile.CanonicalTileId, MapId, tile, _properties.rasterOptions.useRetina);
+				ImageDataFetcherParameters parameters = new ImageDataFetcherParameters()
+				{
+					canonicalTileId = tile.CanonicalTileId,
+					mapid = MapId,
+					tile = tile,
+					useRetina = _properties.rasterOptions.useRetina
+				};
+				DataFetcher.FetchData(parameters);
 			}
 		}
 
