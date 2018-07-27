@@ -109,7 +109,7 @@
 			}
 			_imageFactory = ScriptableObject.CreateInstance<MapImageFactory>();
 			_imageFactory.SetOptions(_layerProperty);
-			_layerProperty.PropertyChanged += _imageFactory.OnMapUpdated;
+			_layerProperty.PropertyChanged += _imageFactory.UpdateMapId;
 		}
 
 		public void Remove()

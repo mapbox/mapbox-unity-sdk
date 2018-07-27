@@ -55,6 +55,10 @@ namespace Mapbox.Unity.Map
 
 		public event Action<ModuleState> OnMapVisualizerStateChanged = delegate { };
 
+		public event Action OnImageLayerRedrawn = delegate { };
+		public event Action OnTerrainLayerRedrawn = delegate { };
+		public event Action OnVectorLayerRedrawn = delegate { };
+
 		public void SetLoadingTexture(Texture2D loadingTexture)
 		{
 			_loadingTexture = loadingTexture;
@@ -241,6 +245,64 @@ namespace Mapbox.Unity.Map
 			{
 				handler(this, e);
 			}
+		}
+
+		private AbstractTileFactory GetFactoryOfType<T>()
+		{
+			foreach (var factory in Factories)
+			{
+				if(factory.GetType() == typeof(T))
+				{
+					return factory;
+				}
+			}
+			return null;
+		}
+
+		public void RedrawImageLayer()
+		{
+			MapImageFactory factory = GetFactoryOfType<MapImageFactory>() as MapImageFactory;
+			if(factory == null)
+			{
+				return;
+			}
+			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
+			{
+				UnwrappedTileId unwrappedTileId = tileBundle.Key;
+				UnityTile tile = tileBundle.Value;
+				ImageDataFetcherParameters parameters = new ImageDataFetcherParameters()
+				{
+					canonicalTileId = tile.CanonicalTileId,
+					mapid = factory.MapId,
+					tile = tile,
+					useRetina = factory.Properties.rasterOptions.useRetina
+				};
+				factory.GetFetcher().FetchData(parameters);
+			}
+			if(OnImageLayerRedrawn != null)
+			{
+				OnImageLayerRedrawn();
+			}
+		}
+
+		public void RedrawTerrainLayer()
+		{
+			TerrainFactoryBase factory = GetFactoryOfType<TerrainFactoryBase>() as TerrainFactoryBase;
+			if (factory == null)
+			{
+				return;
+			}
+			Debug.Log(factory.GetType().ToString());
+		}
+
+		public void RedrawVectorLayer()
+		{
+			VectorTileFactory factory = GetFactoryOfType<VectorTileFactory>() as VectorTileFactory;
+			if (factory == null)
+			{
+				return;
+			}
+			Debug.Log(factory.GetType().ToString());
 		}
 
 		protected abstract void PlaceTile(UnwrappedTileId tileId, UnityTile tile, IMapReadable map);

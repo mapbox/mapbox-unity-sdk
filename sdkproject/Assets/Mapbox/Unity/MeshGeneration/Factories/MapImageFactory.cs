@@ -26,7 +26,20 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		ImageryLayerProperties _properties;
 		protected ImageDataFetcher DataFetcher;
 
-		private Dictionary<UnwrappedTileId, UnityTile> _tileDictionary = new Dictionary<UnwrappedTileId, UnityTile>();
+		public event Action OnMapIdUpdated = delegate { };
+
+		public ImageDataFetcher GetFetcher()
+		{
+			return DataFetcher;
+		}
+
+		public ImageryLayerProperties Properties
+		{
+			get
+			{
+				return _properties;	
+			}
+		}
 
 		public string MapId
 		{
@@ -108,8 +121,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			};
 			DataFetcher.FetchData(parameters);
-			UnwrappedTileId key = tile.UnwrappedTileId;
-			_tileDictionary.Add(key, tile);
 		}
 
 		/// <summary>
@@ -122,30 +133,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		protected override void OnUnregistered(UnityTile tile)
 		{
-			UnwrappedTileId key = tile.UnwrappedTileId;
-			_tileDictionary.Remove(key);
+
 		}
 
-		private void UpdateMapId()
+		public void UpdateMapId(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
 			_properties.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(_properties.sourceType);
-		}
-
-		public void OnMapUpdated(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-		{
-			UpdateMapId();
-			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _tileDictionary)
+			if (OnMapIdUpdated != null)
 			{
-				UnwrappedTileId unwrappedTileId = tileBundle.Key;
-				UnityTile tile = tileBundle.Value;
-				ImageDataFetcherParameters parameters = new ImageDataFetcherParameters()
-				{
-					canonicalTileId = tile.CanonicalTileId,
-					mapid = MapId,
-					tile = tile,
-					useRetina = _properties.rasterOptions.useRetina
-				};
-				DataFetcher.FetchData(parameters);
+				OnMapIdUpdated();
 			}
 		}
 

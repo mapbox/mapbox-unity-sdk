@@ -43,6 +43,19 @@
 		}
 		protected VectorDataFetcher DataFetcher;
 
+		public VectorDataFetcher GetFetcher()
+		{
+			return DataFetcher;
+		}
+
+		public VectorLayerProperties Properties
+		{
+			get
+			{
+				return _properties;
+			}
+		}
+
 		#region AbstractFactoryOverrides
 		/// <summary>
 		/// Set up sublayers using VectorLayerVisualizers.

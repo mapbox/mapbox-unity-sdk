@@ -328,6 +328,8 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		public event Action OnUpdated = delegate { };
 
+		public event Action OnImageLayerRedrawn = delegate { };
+
 		protected virtual void Awake()
 		{
 			// Setup a visualizer to get a "Starter" map.
@@ -438,6 +440,8 @@ namespace Mapbox.Unity.Map
 			if (_imagery.IsLayerActive)
 			{
 				_mapVisualizer.Factories.Add(_imagery.Factory);
+				_imagery.Factory.OnMapIdUpdated += _mapVisualizer.RedrawImageLayer;
+				_mapVisualizer.OnImageLayerRedrawn += OnImageLayerRedrawn;
 			}
 			if (_vectorData.IsLayerActive)
 			{

@@ -17,6 +17,19 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		protected ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
 		protected TerrainDataFetcher DataFetcher;
 
+		public TerrainDataFetcher GetFetcher()
+		{
+			return DataFetcher;
+		}
+
+		public ElevationLayerProperties Properties
+		{
+			get
+			{
+				return _elevationOptions;
+			}
+		}
+
 		#region UnityMethods
 		private void OnDestroy()
 		{
