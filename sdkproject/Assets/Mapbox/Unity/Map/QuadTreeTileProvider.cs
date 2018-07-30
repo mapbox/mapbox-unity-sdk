@@ -22,7 +22,7 @@
 		#region Tile decision and raycasting fields
 		private HashSet<UnwrappedTileId> _tiles;
 		private HashSet<CanonicalTileId> _canonicalTiles;
-		
+
 		private Ray _ray00;
 		private Ray _ray01;
 		private Ray _ray10;
@@ -44,9 +44,11 @@
 			_shouldUpdate = true;
 			_toRemove = new List<UnwrappedTileId>();
 			_tilesToRequest = new HashSet<UnwrappedTileId>();
+			_map.OnInitialized += UpdateTileExtent;
+			_map.OnUpdated += UpdateTileExtent;
 		}
 
-		protected virtual void Update()
+		protected override void UpdateTileExtent()
 		{
 			if (!_shouldUpdate)
 			{
@@ -75,7 +77,7 @@
 				{
 					RemoveTile(t2r);
 				}
-				
+
 				foreach (var tile in _activeTiles)
 				{
 					// Reposition tiles in case we panned.
@@ -132,7 +134,7 @@
 		public UnwrappedTileId WebMercatorToTileId(Vector2d webMerc, int zoom)
 		{
 			var tileCount = Math.Pow(2, zoom);
-			
+
 			var dblX = webMerc.x / Constants.WebMercMax;
 			var dblY = webMerc.y / Constants.WebMercMax;
 

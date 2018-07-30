@@ -26,9 +26,11 @@ namespace Mapbox.Unity.Map
 			_initialized = true;
 			_toRemove = new List<UnwrappedTileId>((_rangeTileProviderOptions.east + _rangeTileProviderOptions.west) * (_rangeTileProviderOptions.north + _rangeTileProviderOptions.south));
 			_tilesToRequest = new HashSet<UnwrappedTileId>();
+			_map.OnInitialized += UpdateTileExtent;
+			_map.OnUpdated += UpdateTileExtent;
 		}
 
-		protected virtual void Update()
+		protected override void UpdateTileExtent()
 		{
 			if (!_initialized || Options == null)
 			{

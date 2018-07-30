@@ -32,11 +32,13 @@
 				_initialized = true;
 			}
 			_cachedTile = new UnwrappedTileId();
-			_toRemove = new List<UnwrappedTileId>(((_rangeTileProviderOptions.visibleBuffer*2) + 1) * ((_rangeTileProviderOptions.visibleBuffer * 2) + 1));
+			_toRemove = new List<UnwrappedTileId>(((_rangeTileProviderOptions.visibleBuffer * 2) + 1) * ((_rangeTileProviderOptions.visibleBuffer * 2) + 1));
 			_tilesToRequest = new HashSet<UnwrappedTileId>();
+			_map.OnInitialized += UpdateTileExtent;
+			_map.OnUpdated += UpdateTileExtent;
 		}
 
-		protected virtual void Update()
+		protected override void UpdateTileExtent()
 		{
 			if (!_initialized) return;
 

@@ -66,6 +66,7 @@
 		}
 
 		public abstract void OnInitialized();
+		protected abstract void UpdateTileExtent();
 
 		public virtual void SetOptions(ITileProviderOptions options)
 		{

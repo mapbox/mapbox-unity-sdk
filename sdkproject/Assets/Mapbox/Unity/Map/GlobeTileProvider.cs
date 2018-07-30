@@ -19,5 +19,10 @@
 				AddTile(new UnwrappedTileId(tile.Z, tile.X, tile.Y));
 			}
 		}
+
+		protected override void UpdateTileExtent()
+		{
+
+		}
 	}
 }
