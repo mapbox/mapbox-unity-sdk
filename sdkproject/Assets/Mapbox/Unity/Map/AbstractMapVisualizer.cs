@@ -259,6 +259,91 @@ namespace Mapbox.Unity.Map
 			return null;
 		}
 
+		/*
+
+		private class GenericFactoryContainer<T> where T : AbstractTileFactory
+		{
+			public T factory;
+		}
+
+		private class GenericFetcherContainer<T> where T : DataFetcher
+		{
+			public T fetcher;
+		}
+
+		private class GenericFactoryFetcherBundle
+		{
+			public GenericFactoryContainer factory;
+			public GenericFetcherContainer fetcher;
+		}
+	
+
+		private ImageDataFetcherParameters GetImageDataFetcherParameters(UnityTile tile, AbstractTileFactory abstractTileFactory)
+		{
+			MapImageFactory factory = abstractTileFactory as MapImageFactory;
+			if(factory == null)
+			{
+				return null;
+			}
+			return new ImageDataFetcherParameters()
+			{
+				canonicalTileId = tile.CanonicalTileId,
+				mapid = factory.MapId,
+				tile = tile,
+				useRetina = factory.Properties.rasterOptions.useRetina
+			};
+		}
+
+		private IDictionary<Type, Func<DataFetcherParameters, UnityTile, AbstractTileFactory>> typeMap = new IDictionary<Type, Func<DataFetcherParameters, UnityTile, AbstractTileFactory>>
+		{
+			{ MapImageFactory, GetImageDataFetcherParameters }
+		}
+
+		private T GetFetcherParameters<T>() where T: DataFetcherParameters
+		{
+			switch (typeof(T).Name)
+			{
+				case typeof(ImageDataFetcherParameters).Name:
+					return new ImageDataFetcherParameters()
+					{
+						canonicalTileId = tile.CanonicalTileId,
+						mapid = factory.MapId,
+						tile = tile,
+						useRetina = factory.Properties.rasterOptions.useRetina
+					};
+					break;
+				case typeOf(TerrainDataFetcherParameters).Name:
+					break;
+				case VectorDataFetcherParameters:
+					break;
+				case default:
+					return null;
+			}
+		}
+
+		private void RedrawLayer<T, U>() where T : AbstractTileFactory where U : DataFetcherParameters
+		{
+			T factory = GetFactoryOfType<T>() as T;
+			if (factory == null)
+			{
+				return;
+			}
+			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
+			{
+				UnwrappedTileId unwrappedTileId = tileBundle.Key;
+				UnityTile tile = tileBundle.Value;
+
+				ImageDataFetcherParameters parameters = new ImageDataFetcherParameters()
+				{
+					canonicalTileId = tile.CanonicalTileId,
+					mapid = factory.MapId,
+					tile = tile,
+					useRetina = factory.Properties.rasterOptions.useRetina
+				};
+				factory.GetFetcher().FetchData(parameters);
+			}
+		}
+*/
 		public void RedrawImageLayer()
 		{
 			MapImageFactory factory = GetFactoryOfType<MapImageFactory>() as MapImageFactory;
@@ -292,7 +377,23 @@ namespace Mapbox.Unity.Map
 			{
 				return;
 			}
-			Debug.Log(factory.GetType().ToString());
+			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
+			{
+				UnwrappedTileId unwrappedTileId = tileBundle.Key;
+				UnityTile tile = tileBundle.Value;
+				TerrainDataFetcherParameters parameters = new TerrainDataFetcherParameters()
+				{
+					canonicalTileId = tile.CanonicalTileId,
+					mapid = factory.Properties.sourceOptions.Id,
+					tile = tile,
+					//useRetina = factory.Properties.rasterOptions.useRetina
+				};
+				factory.GetFetcher().FetchData(parameters);
+			}
+			if (OnTerrainLayerRedrawn != null)
+			{
+				OnTerrainLayerRedrawn();
+			}
 		}
 
 		public void RedrawVectorLayer()

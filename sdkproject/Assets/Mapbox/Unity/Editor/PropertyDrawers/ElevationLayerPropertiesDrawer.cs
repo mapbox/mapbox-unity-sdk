@@ -45,6 +45,10 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+
+			var map = (AbstractMap)property.serializedObject.targetObject;
+			var terrainProp = map.Terrain.LayerProperty;
+
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 
 			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
@@ -96,7 +100,15 @@
 				GUI.enabled = false;
 			}
 			var elevationLayerType = property.FindPropertyRelative("elevationLayerType");
+
+			//terrainProp.ElevationLayerType = (ElevationLayerType)EditorGUILayout.Popup(sourceTypeLabel, elevationLayerType.enumValueIndex, sourceTypeContent);
+
+			//terrainProp.ElevationLayerType = EditorGUILayout.PropertyField(elevationLayerType, new GUIContent { text = elevationLayerType.displayName, tooltip = ((ElevationLayerType)elevationLayerType.enumValueIndex).Description() });
+
 			EditorGUILayout.PropertyField(elevationLayerType, new GUIContent { text = elevationLayerType.displayName, tooltip = ((ElevationLayerType)elevationLayerType.enumValueIndex).Description() });
+
+			//terrainProp.ElevationLayerType = elevationLayerType.objectReferenceValue as ElevationLayerType;
+
 			position.y += lineHeight;
 			if (sourceTypeValue == ElevationSourceType.None)
 			{
