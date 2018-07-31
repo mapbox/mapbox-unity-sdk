@@ -501,6 +501,22 @@ namespace Mapbox.Unity.Map
 
 			SetUpMap();
 		}
+
+		public virtual void UpdateMap()
+		{
+			UpdateMap(_centerLatitudeLongitude, Zoom);
+		}
+
+		public virtual void UpdateMap(Vector2d latLon)
+		{
+			UpdateMap(latLon, Zoom);
+		}
+
+		public virtual void UpdateMap(float zoom)
+		{
+			UpdateMap(_centerLatitudeLongitude, zoom);
+		}
+
 		/// <summary>
 		/// Updates the map.
 		/// Use this method to update the location of the map.
