@@ -101,13 +101,9 @@
 			}
 			var elevationLayerType = property.FindPropertyRelative("elevationLayerType");
 
-			//terrainProp.ElevationLayerType = (ElevationLayerType)EditorGUILayout.Popup(sourceTypeLabel, elevationLayerType.enumValueIndex, sourceTypeContent);
-
-			//terrainProp.ElevationLayerType = EditorGUILayout.PropertyField(elevationLayerType, new GUIContent { text = elevationLayerType.displayName, tooltip = ((ElevationLayerType)elevationLayerType.enumValueIndex).Description() });
-
 			EditorGUILayout.PropertyField(elevationLayerType, new GUIContent { text = elevationLayerType.displayName, tooltip = ((ElevationLayerType)elevationLayerType.enumValueIndex).Description() });
 
-			//terrainProp.ElevationLayerType = elevationLayerType.objectReferenceValue as ElevationLayerType;
+			terrainProp.ElevationLayerType = (ElevationLayerType)elevationLayerType.enumValueIndex;
 
 			position.y += lineHeight;
 			if (sourceTypeValue == ElevationSourceType.None)

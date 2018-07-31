@@ -372,6 +372,7 @@ namespace Mapbox.Unity.Map
 
 		public void RedrawTerrainLayer()
 		{
+			Debug.Log("RedrawTerrainLayer");
 			TerrainFactoryBase factory = GetFactoryOfType<TerrainFactoryBase>() as TerrainFactoryBase;
 			if (factory == null)
 			{

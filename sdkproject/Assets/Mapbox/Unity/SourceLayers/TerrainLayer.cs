@@ -151,6 +151,7 @@
 			}
 
 			_elevationFactory.SetOptions(_layerProperty);
+			_layerProperty.PropertyChanged += _elevationFactory.UpdateMapId;
 		}
 
 		public void Remove()
@@ -165,7 +166,8 @@
 		{
 			Initialize(properties);
 		}
-		public AbstractTileFactory Factory
+
+		public TerrainFactoryBase Factory
 		{
 			get
 			{

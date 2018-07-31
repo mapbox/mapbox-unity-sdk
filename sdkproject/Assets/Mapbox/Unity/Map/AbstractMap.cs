@@ -329,6 +329,7 @@ namespace Mapbox.Unity.Map
 		public event Action OnUpdated = delegate { };
 
 		public event Action OnImageLayerRedrawn = delegate { };
+		public event Action OnTerrainLayerRedrawn = delegate { };
 
 		protected virtual void Awake()
 		{
@@ -436,6 +437,8 @@ namespace Mapbox.Unity.Map
 			if (_terrain.IsLayerActive)
 			{
 				_mapVisualizer.Factories.Add(_terrain.Factory);
+				_terrain.Factory.OnMapIdUpdated += _mapVisualizer.RedrawTerrainLayer;
+				_mapVisualizer.OnTerrainLayerRedrawn += OnTerrainLayerRedrawn;
 			}
 			if (_imagery.IsLayerActive)
 			{

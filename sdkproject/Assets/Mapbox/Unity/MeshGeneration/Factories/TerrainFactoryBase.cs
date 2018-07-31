@@ -17,6 +17,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		protected ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
 		protected TerrainDataFetcher DataFetcher;
 
+		public event Action OnMapIdUpdated = delegate { };
+
 		public TerrainDataFetcher GetFetcher()
 		{
 			return DataFetcher;
@@ -103,6 +105,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				tile.HeightDataState = TilePropertyState.Error;
 				//strategy might want to act on this , i.e. flattening tile mesh on data fetching failed?
 				Strategy.DataErrorOccurred(tile, e);
+			}
+		}
+
+		public void UpdateMapId(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+		{
+			Debug.Log("UpdateMapId");
+			if (OnMapIdUpdated != null)
+			{
+				OnMapIdUpdated();
 			}
 		}
 		#endregion
