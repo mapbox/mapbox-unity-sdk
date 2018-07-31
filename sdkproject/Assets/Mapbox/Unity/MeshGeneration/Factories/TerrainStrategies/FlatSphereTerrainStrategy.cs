@@ -29,6 +29,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				tile.MeshRenderer.material = _elevationOptions.requiredOptions.baseMaterial;
 			}
 
+			if ((int)tile.ElevationType != (int)ElevationLayerType.GlobeTerrain)
+			{
+				tile.MeshFilter.mesh.Clear();
+				tile.ElevationType = TileTerrainType.Globe;
+			}
 			GenerateTerrainMesh(tile);
 		}
 

@@ -5,9 +5,8 @@
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Unity.Utilities;
 
-
 	[Serializable]
-	public class ImageryLayer : IImageryLayer
+	public class ImageryLayer : AbstractLayer, IImageryLayer
 	{
 		[SerializeField]
 		ImageryLayerProperties _layerProperty = new ImageryLayerProperties();
@@ -109,7 +108,12 @@
 			}
 			_imageFactory = ScriptableObject.CreateInstance<MapImageFactory>();
 			_imageFactory.SetOptions(_layerProperty);
-			_layerProperty.PropertyChanged += _imageFactory.UpdateMapId;
+
+			//updating image layer on settings change
+			_layerProperty.PropertyChanged += (s, e) =>
+			{
+				NotifyUpdateLayer(_imageFactory);
+			};
 		}
 
 		public void Remove()
@@ -124,6 +128,8 @@
 		{
 			Initialize(properties);
 		}
+
+		private MapImageFactory _imageFactory;
 		public MapImageFactory Factory
 		{
 			get
@@ -131,6 +137,6 @@
 				return _imageFactory;
 			}
 		}
-		private MapImageFactory _imageFactory;
+
 	}
 }

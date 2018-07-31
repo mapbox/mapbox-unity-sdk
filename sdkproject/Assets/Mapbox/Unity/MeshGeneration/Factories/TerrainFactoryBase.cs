@@ -52,6 +52,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			DataFetcher.FetchingError += OnDataError;
 		}
 
+		public void Reinitialize()
+		{
+			Strategy.Initialize(_elevationOptions);
+		}
+
 		public override void SetOptions(LayerProperties options)
 		{
 			_elevationOptions = (ElevationLayerProperties)options;

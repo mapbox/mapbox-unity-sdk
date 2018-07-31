@@ -437,13 +437,11 @@ namespace Mapbox.Unity.Map
 			if (_terrain.IsLayerActive)
 			{
 				_mapVisualizer.Factories.Add(_terrain.Factory);
-				_terrain.Factory.OnMapIdUpdated += _mapVisualizer.RedrawTerrainLayer;
 				_mapVisualizer.OnTerrainLayerRedrawn += OnTerrainLayerRedrawn;
 			}
 			if (_imagery.IsLayerActive)
 			{
 				_mapVisualizer.Factories.Add(_imagery.Factory);
-				_imagery.Factory.OnMapIdUpdated += _mapVisualizer.RedrawImageLayer;
 				_mapVisualizer.OnImageLayerRedrawn += OnImageLayerRedrawn;
 			}
 			if (_vectorData.IsLayerActive)
@@ -483,6 +481,16 @@ namespace Mapbox.Unity.Map
 
 			options.placementOptions.placementStrategy.SetUpPlacement(this);
 
+			_imagery.UpdateLayer += (factory) =>
+			{
+				_mapVisualizer.RedrawLayer(factory);
+			};
+
+			_terrain.UpdateLayer += (factory) =>
+			{
+				_mapVisualizer.RedrawLayer(factory);
+			};
+
 			_mapVisualizer.Initialize(this, _fileSource);
 			_tileProvider.Initialize(this);
 
@@ -505,6 +513,8 @@ namespace Mapbox.Unity.Map
 			}
 			_options.locationOptions.latitudeLongitude = String.Format(CultureInfo.InvariantCulture, "{0},{1}", latLon.x, latLon.y);
 			_options.locationOptions.zoom = zoom;
+
+			
 
 			SetUpMap();
 		}

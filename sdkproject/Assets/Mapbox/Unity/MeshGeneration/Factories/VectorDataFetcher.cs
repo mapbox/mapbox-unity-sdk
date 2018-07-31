@@ -20,7 +20,7 @@ public class VectorDataFetcher : DataFetcher
 		vectorDaraParameters.tile.AddTile(vectorTile);
 		vectorTile.Initialize(_fileSource, vectorDaraParameters.tile.CanonicalTileId, vectorDaraParameters.mapid, () =>
 		{
-			if (tile.CanonicalTileId != vectorTile.Id)
+			if (vectorDaraParameters.tile.CanonicalTileId != vectorTile.Id)
 			{
 				//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
 				return;

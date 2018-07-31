@@ -9,8 +9,20 @@ namespace Mapbox.Unity.MeshGeneration.Data
 	using Mapbox.Unity.Map;
 	using System.Collections.Generic;
 
+	public enum TileTerrainType
+	{
+		//starting from -1 to match ElevationLayerType
+		None = -1,
+		Flat = 0,
+		Elevated = 1,
+		LowPoly = 2,
+		Globe = 3
+	}
+
 	public class UnityTile : MonoBehaviour
 	{
+		public TileTerrainType ElevationType;
+
 		[SerializeField]
 		Texture2D _rasterData;
 
@@ -52,6 +64,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					if (_meshFilter == null)
 					{
 						_meshFilter = gameObject.AddComponent<MeshFilter>();
+						ElevationType = TileTerrainType.None;
 					}
 				}
 				return _meshFilter;

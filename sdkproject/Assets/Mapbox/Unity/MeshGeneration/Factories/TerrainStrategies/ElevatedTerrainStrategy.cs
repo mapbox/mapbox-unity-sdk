@@ -22,7 +22,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 		private Vector3 _newDir;
 		private int _vertA, _vertB, _vertC;
 		private int _counter;
-
+		
 		public override void Initialize(ElevationLayerProperties elOptions)
 		{
 			base.Initialize(elOptions);
@@ -49,9 +49,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				tile.MeshRenderer.material = _elevationOptions.requiredOptions.baseMaterial;
 			}
 
-			if (tile.MeshFilter.mesh.vertexCount == 0)
+			//_newVertexList.Count is the vertex count this strategy is expected to use
+			//by checking for current vertex count and expected vertex count,
+			//we're trying to understand if we can use existing mesh (created by same strategy)
+			//or do we haev to create a new one.
+			if ((int)tile.ElevationType != (int)ElevationLayerType.TerrainWithElevation)
 			{
+				tile.MeshFilter.mesh.Clear();
 				CreateBaseMesh(tile);
+				tile.ElevationType = TileTerrainType.Elevated;
 			}
 
 			GenerateTerrainMesh(tile);

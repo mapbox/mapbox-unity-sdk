@@ -33,7 +33,7 @@ public class ImageDataFetcher : DataFetcher
 
 		rasterTile.Initialize(_fileSource, imageDataParameters.tile.CanonicalTileId, imageDataParameters.mapid, () =>
 		{
-			if (tile.CanonicalTileId != rasterTile.Id)
+			if (imageDataParameters.tile.CanonicalTileId != rasterTile.Id)
 			{
 				//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
 				return;

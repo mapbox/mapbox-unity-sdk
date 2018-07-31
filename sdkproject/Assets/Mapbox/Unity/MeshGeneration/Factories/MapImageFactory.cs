@@ -26,8 +26,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		ImageryLayerProperties _properties;
 		protected ImageDataFetcher DataFetcher;
 
-		public event Action OnMapIdUpdated = delegate { };
-
 		public ImageDataFetcher GetFetcher()
 		{
 			return DataFetcher;
@@ -112,6 +110,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			tile.RasterDataState = TilePropertyState.Loading;
 			Progress++;
+			_properties.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(_properties.sourceType);
 			ImageDataFetcherParameters parameters = new ImageDataFetcherParameters()
 			{
 				canonicalTileId = tile.CanonicalTileId,
@@ -135,16 +134,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 
 		}
-
-		public void UpdateMapId(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-		{
-			_properties.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(_properties.sourceType);
-			if (OnMapIdUpdated != null)
-			{
-				OnMapIdUpdated();
-			}
-		}
-
 		#endregion
 	}
 }

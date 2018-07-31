@@ -38,8 +38,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				}
 			}
 
-			// HACK: This is here in to make the system trigger a finished state.
-			tile.MeshFilter.sharedMesh = GetQuad(tile, _elevationOptions.sideWallOptions.isActive);
+			if ((int)tile.ElevationType != (int)ElevationLayerType.FlatTerrain)
+			{
+				tile.MeshFilter.mesh.Clear();
+				// HACK: This is here in to make the system trigger a finished state.
+				tile.MeshFilter.sharedMesh = GetQuad(tile, _elevationOptions.sideWallOptions.isActive);
+				tile.ElevationType = TileTerrainType.Flat;
+			}
 		}
 
 		private Mesh GetQuad(UnityTile tile, bool buildSide)

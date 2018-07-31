@@ -8,7 +8,7 @@
 
 	// Layer Concrete Implementation. 
 	[Serializable]
-	public class TerrainLayer : ITerrainLayer
+	public class TerrainLayer : AbstractLayer, ITerrainLayer
 	{
 		[SerializeField]
 		[NodeEditorElement("Terrain Layer")]
@@ -125,6 +125,19 @@
 		public void Initialize()
 		{
 			_elevationFactory = ScriptableObject.CreateInstance<TerrainFactoryBase>();
+			SetStrategy();
+
+			_elevationFactory.SetOptions(_layerProperty);
+			_layerProperty.PropertyChanged += (s, e) =>
+			{
+				SetStrategy();
+				_elevationFactory.Reinitialize();
+				NotifyUpdateLayer(_elevationFactory);
+			};
+		}
+
+		public void SetStrategy()
+		{
 			switch (_layerProperty.elevationLayerType)
 			{
 				case ElevationLayerType.FlatTerrain:
@@ -149,9 +162,6 @@
 				default:
 					break;
 			}
-
-			_elevationFactory.SetOptions(_layerProperty);
-			_layerProperty.PropertyChanged += _elevationFactory.UpdateMapId;
 		}
 
 		public void Remove()
@@ -166,8 +176,7 @@
 		{
 			Initialize(properties);
 		}
-
-		public TerrainFactoryBase Factory
+		public AbstractTileFactory Factory
 		{
 			get
 			{
