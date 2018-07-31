@@ -24,23 +24,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				tile.gameObject.layer = _elevationOptions.unityLayerOptions.layerId;
 			}
 
-			if (tile.MeshRenderer == null)
+			if (tile.RasterDataState != Enums.TilePropertyState.Loaded)
 			{
-				var renderer = tile.gameObject.AddComponent<MeshRenderer>();
-				renderer.material = _elevationOptions.requiredOptions.baseMaterial;
-			}
-
-			if (tile.MeshFilter == null)
-			{
-				tile.gameObject.AddComponent<MeshFilter>();
+				tile.MeshRenderer.material = _elevationOptions.requiredOptions.baseMaterial;
 			}
 
 			GenerateTerrainMesh(tile);
-
-			if (_elevationOptions.requiredOptions.addCollider && tile.Collider == null)
-			{
-				tile.gameObject.AddComponent<MeshCollider>();
-			}
 		}
 
 		void GenerateTerrainMesh(UnityTile tile)
