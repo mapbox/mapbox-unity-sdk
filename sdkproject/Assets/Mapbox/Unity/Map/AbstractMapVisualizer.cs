@@ -253,6 +253,7 @@ namespace Mapbox.Unity.Map
 			{
 				factory.Register(tileBundle.Value);
 			}
+
 			if (OnImageLayerRedrawn != null)
 			{
 				OnImageLayerRedrawn();

@@ -132,7 +132,7 @@
 			{
 				SetStrategy();
 				_elevationFactory.Reinitialize();
-				NotifyUpdateLayer(_elevationFactory);
+				NotifyUpdateLayer(_elevationFactory, true);
 			};
 		}
 

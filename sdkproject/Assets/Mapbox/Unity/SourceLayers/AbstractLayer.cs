@@ -4,12 +4,12 @@
 
 	public class AbstractLayer
 	{
-		public void NotifyUpdateLayer(AbstractTileFactory factory)
+		public void NotifyUpdateLayer(AbstractTileFactory factory, bool effectsVectorLayer = false)
 		{
-			UpdateLayer(factory);
+			UpdateLayer(factory, effectsVectorLayer);
 		}
 
 		public event UpdateLayerHandler UpdateLayer;
-		public delegate void UpdateLayerHandler(AbstractTileFactory factory);
+		public delegate void UpdateLayerHandler(AbstractTileFactory factory, bool effectsVectorLayer);
 	}
 }

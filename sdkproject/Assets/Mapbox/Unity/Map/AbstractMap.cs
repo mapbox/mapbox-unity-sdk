@@ -481,14 +481,22 @@ namespace Mapbox.Unity.Map
 
 			options.placementOptions.placementStrategy.SetUpPlacement(this);
 
-			_imagery.UpdateLayer += (factory) =>
+			_imagery.UpdateLayer += (factory, updateVector) =>
 			{
 				_mapVisualizer.RedrawLayer(factory);
+				if(updateVector)
+				{
+					_mapVisualizer.RedrawLayer(VectorData.Factory);
+				}
 			};
 
-			_terrain.UpdateLayer += (factory) =>
+			_terrain.UpdateLayer += (factory, updateVector) =>
 			{
 				_mapVisualizer.RedrawLayer(factory);
+				if (updateVector)
+				{
+					_mapVisualizer.RedrawLayer(VectorData.Factory);
+				}
 			};
 
 			_mapVisualizer.Initialize(this, _fileSource);
