@@ -6,7 +6,10 @@
 	{
 		public void NotifyUpdateLayer(AbstractTileFactory factory, bool effectsVectorLayer = false)
 		{
-			UpdateLayer(factory, effectsVectorLayer);
+			if(UpdateLayer != null)
+			{
+				UpdateLayer(factory, effectsVectorLayer);
+			}
 		}
 
 		public event UpdateLayerHandler UpdateLayer;
