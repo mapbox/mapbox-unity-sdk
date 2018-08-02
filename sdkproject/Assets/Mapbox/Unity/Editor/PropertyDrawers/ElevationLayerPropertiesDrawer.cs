@@ -45,9 +45,7 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-
-			var map = (AbstractMap)property.serializedObject.targetObject;
-			var terrainProp = map.Terrain.LayerProperty;
+			
 
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 
@@ -101,9 +99,7 @@
 			}
 			var elevationLayerType = property.FindPropertyRelative("elevationLayerType");
 
-			EditorGUILayout.PropertyField(elevationLayerType, new GUIContent { text = elevationLayerType.displayName, tooltip = ((ElevationLayerType)elevationLayerType.enumValueIndex).Description() });
-
-			terrainProp.ElevationLayerType = (ElevationLayerType)elevationLayerType.enumValueIndex;
+			EditorGUILayout.PropertyField(property.FindPropertyRelative("elevationLayerType"), new GUIContent { text = elevationLayerType.displayName, tooltip = ((ElevationLayerType)elevationLayerType.enumValueIndex).Description() });
 
 			position.y += lineHeight;
 			if (sourceTypeValue == ElevationSourceType.None)
@@ -112,7 +108,7 @@
 			}
 
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("requiredOptions"), true);
-			//position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("requiredOptions"));
+
 			ShowPosition = EditorGUILayout.Foldout(ShowPosition, "Others");
 			if (ShowPosition)
 			{
@@ -121,6 +117,11 @@
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("unityLayerOptions"), true);
 			}
 
+			if (GUI.changed)
+			{
+				var map = (AbstractMap)property.serializedObject.targetObject;
+				map.Terrain.LayerProperty.UpdateProperty();
+			}
 		}
 	}
 }

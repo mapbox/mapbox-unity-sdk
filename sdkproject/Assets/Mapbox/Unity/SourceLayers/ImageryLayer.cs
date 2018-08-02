@@ -110,7 +110,7 @@
 			_imageFactory.SetOptions(_layerProperty);
 
 			//updating image layer on settings change
-			_layerProperty.PropertyChanged += (s, e) =>
+			_layerProperty.OnPropertyUpdated += () =>
 			{
 				NotifyUpdateLayer(_imageFactory);
 			};

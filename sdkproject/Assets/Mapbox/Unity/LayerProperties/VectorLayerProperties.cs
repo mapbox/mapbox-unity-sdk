@@ -9,6 +9,16 @@
 	[Serializable]
 	public class VectorLayerProperties : LayerProperties
 	{
+		public event Action OnPropertyUpdated = delegate { };
+
+		public void UpdateProperty()
+		{
+			if (OnPropertyUpdated != null)
+			{
+				OnPropertyUpdated();
+			}
+		}
+
 		/// <summary>
 		/// Raw tileJSON response received from the requested source tileset id(s)
 		/// </summary>

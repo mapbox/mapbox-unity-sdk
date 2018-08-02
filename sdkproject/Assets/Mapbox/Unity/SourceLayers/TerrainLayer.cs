@@ -128,7 +128,7 @@
 			SetStrategy();
 
 			_elevationFactory.SetOptions(_layerProperty);
-			_layerProperty.PropertyChanged += (s, e) =>
+			_layerProperty.OnPropertyUpdated += () =>
 			{
 				SetStrategy();
 				_elevationFactory.Reinitialize();

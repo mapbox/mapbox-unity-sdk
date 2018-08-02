@@ -5,19 +5,19 @@
 	using Mapbox.Unity.MeshGeneration.Factories;
 
 	[Serializable]
-	public class ElevationLayerProperties : LayerProperties, INotifyPropertyChanged
+	public class ElevationLayerProperties : LayerProperties
 	{
-		public ElevationSourceType sourceType = ElevationSourceType.MapboxTerrain;
+		public event Action OnPropertyUpdated = delegate { };
 
-		public event PropertyChangedEventHandler PropertyChanged;
-
-		private void NotifyPropertyChanged(String propertyName = "")
+		public void UpdateProperty()
 		{
-			if (PropertyChanged != null)
+			if (OnPropertyUpdated != null)
 			{
-				PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+				OnPropertyUpdated();
 			}
 		}
+
+		public ElevationSourceType sourceType = ElevationSourceType.MapboxTerrain;
 
 		public LayerSourceOptions sourceOptions = new LayerSourceOptions()
 		{
@@ -32,22 +32,5 @@
 		public ElevationModificationOptions modificationOptions = new ElevationModificationOptions();
 		public UnityLayerOptions unityLayerOptions = new UnityLayerOptions();
 		public TerrainSideWallOptions sideWallOptions = new TerrainSideWallOptions();
-
-		public ElevationLayerType ElevationLayerType
-		{
-			get
-			{
-				return elevationLayerType;
-			}
-			set
-			{
-
-				if (value != this.elevationLayerType)
-				{
-					this.elevationLayerType = value;
-					NotifyPropertyChanged("ElevationLayerType");
-				}
-			}
-		}
 	}
 }

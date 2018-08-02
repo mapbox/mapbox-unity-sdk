@@ -21,9 +21,6 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			var map = (AbstractMap)property.serializedObject.targetObject;
-			var imglyrProp = map.ImageLayer.LayerProperty;
-
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
 			var sourceTypeValue = (ImagerySourceType)sourceTypeProperty.enumValueIndex;
@@ -47,9 +44,7 @@
 			// Draw label.
 			var sourceTypeLabel = new GUIContent { text = "Data Source", tooltip = "Source tileset for Imagery." };
 
-			//sourceTypeProperty.enumValueIndex = EditorGUILayout.Popup(sourceTypeLabel, sourceTypeProperty.enumValueIndex, sourceTypeContent);
-
-			imglyrProp.SourceType = (ImagerySourceType)EditorGUILayout.Popup(sourceTypeLabel, sourceTypeProperty.enumValueIndex, sourceTypeContent);
+			sourceTypeProperty.enumValueIndex = EditorGUILayout.Popup(sourceTypeLabel, sourceTypeProperty.enumValueIndex, sourceTypeContent);
 
 			sourceTypeValue = (ImagerySourceType)sourceTypeProperty.enumValueIndex;
 
@@ -79,9 +74,15 @@
 				default:
 					break;
 			}
+
 			if (sourceTypeValue != ImagerySourceType.None)
 			{
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("rasterOptions"));
+			}
+			if (GUI.changed)
+			{
+				var map = (AbstractMap)property.serializedObject.targetObject;
+				map.ImageLayer.LayerProperty.UpdateProperty();
 			}
 		}
 	}

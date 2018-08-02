@@ -99,6 +99,12 @@
 			}
 
 			EditorGUI.EndProperty();
+
+			if (GUI.changed)
+			{
+				var map = (AbstractMap)property.serializedObject.targetObject;
+				map.VectorData.LayerProperty.UpdateProperty();
+			}
 		}
 	}
 }

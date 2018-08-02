@@ -7,37 +7,20 @@
 	using System.Runtime.CompilerServices;
 
 	[System.Serializable]
-	public class ImageryLayerProperties : LayerProperties, INotifyPropertyChanged
+	public class ImageryLayerProperties : LayerProperties
 	{
+		public event Action OnPropertyUpdated = delegate { };
+
+		public void UpdateProperty()
+		{
+			if (OnPropertyUpdated != null)
+			{
+				OnPropertyUpdated();
+			}
+		}
+
 		//[TestAttribute]
 		public ImagerySourceType sourceType = ImagerySourceType.MapboxStreets;
-
-		public event PropertyChangedEventHandler PropertyChanged;
-
-		private void NotifyPropertyChanged(String propertyName = "")
-		{
-			if (PropertyChanged != null)
-			{
-				PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-
-		public ImagerySourceType SourceType
-		{
-			get
-			{
-				return sourceType;
-			}
-			set
-			{
-				
-				if (value != this.sourceType)
-				{
-					this.sourceType = value;
-					NotifyPropertyChanged("SourceType");
-				}
-			}
-		}
 
 		//[StyleSearch]
 		// TODO : Do we really need a separate DS for default styles ??
