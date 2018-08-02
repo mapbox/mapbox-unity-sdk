@@ -7,7 +7,7 @@
 	using Mapbox.Unity.Utilities;
 
 	[Serializable]
-	public class VectorLayer : IVectorDataLayer
+	public class VectorLayer : AbstractLayer, IVectorDataLayer
 	{
 		[SerializeField]
 		VectorLayerProperties _layerProperty = new VectorLayerProperties();
@@ -144,6 +144,12 @@
 		{
 			_vectorTileFactory = ScriptableObject.CreateInstance<VectorTileFactory>();
 			_vectorTileFactory.SetOptions(_layerProperty);
+
+			_layerProperty.OnPropertyUpdated += () =>
+			{
+				//notifying map to reload existing tiles
+				NotifyUpdateLayer(_vectorTileFactory);
+			};
 		}
 
 		public void Remove()

@@ -130,8 +130,10 @@
 			_elevationFactory.SetOptions(_layerProperty);
 			_layerProperty.OnPropertyUpdated += () =>
 			{
+				//pushing new settings to factory directly
 				SetStrategy();
 				_elevationFactory.Reinitialize();
+				//notifying map to reload existing tiles
 				NotifyUpdateLayer(_elevationFactory, true);
 			};
 		}
