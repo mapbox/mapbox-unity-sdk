@@ -15,8 +15,8 @@
 		private bool _shouldUpdate;
 		private CameraBoundsTileProviderOptions _cbtpOptions;
 
-		private List<UnwrappedTileId> _toRemove;
-		private HashSet<UnwrappedTileId> _tilesToRequest;
+		//private List<UnwrappedTileId> _toRemove;
+		//private HashSet<UnwrappedTileId> _tilesToRequest;
 		private Vector2dBounds _viewPortWebMercBounds;
 
 		#region Tile decision and raycasting fields
@@ -28,6 +28,7 @@
 		private Ray _ray10;
 		private Ray _ray11;
 		private Vector3[] _hitPnt = new Vector3[4];
+		private bool _isFirstLoad;
 		#endregion
 
 		public override void OnInitialized()
@@ -40,57 +41,30 @@
 			{
 				_cbtpOptions.camera = Camera.main;
 			}
+			_cbtpOptions.camera.transform.hasChanged = false;
 			_groundPlane = new Plane(Vector3.up, 0);
 			_shouldUpdate = true;
-			_toRemove = new List<UnwrappedTileId>();
-			_tilesToRequest = new HashSet<UnwrappedTileId>();
-			_map.OnInitialized += UpdateTileExtent;
-			_map.OnUpdated += UpdateTileExtent;
+			_currentExtent.activeTiles = new HashSet<UnwrappedTileId>();
 		}
 
-		protected override void UpdateTileExtent()
+		public override void UpdateTileExtent()
 		{
 			if (!_shouldUpdate)
 			{
 				return;
 			}
 
-			_toRemove.Clear();
-			_elapsedTime += Time.deltaTime;
+			//_elapsedTime += Time.deltaTime;
 
-			if (_elapsedTime >= _cbtpOptions.updateInterval)
+			//if (_elapsedTime >= _cbtpOptions.updateInterval)
 			{
 				_elapsedTime = 0f;
 
 				//update viewport in case it was changed by switching zoom level
 				_viewPortWebMercBounds = getcurrentViewPortWebMerc();
-				_tilesToRequest = GetWithWebMerc(_viewPortWebMercBounds, _map.AbsoluteZoom);
-				foreach (var item in _activeTiles)
-				{
-					if (!_tilesToRequest.Contains(item.Key))
-					{
-						_toRemove.Add(item.Key);
-					}
-				}
+				_currentExtent.activeTiles = GetWithWebMerc(_viewPortWebMercBounds, _map.AbsoluteZoom);
 
-				foreach (var t2r in _toRemove)
-				{
-					RemoveTile(t2r);
-				}
-
-				foreach (var tile in _activeTiles)
-				{
-					// Reposition tiles in case we panned.
-					RepositionTile(tile.Key);
-				}
-
-				foreach (var tile in _tilesToRequest)
-				{
-					if (!_activeTiles.ContainsKey(tile))
-					{
-						AddTile(tile);
-					}
-				}
+				OnExtentChanged();
 			}
 		}
 
@@ -208,6 +182,16 @@
 			float distance;
 			if (!_groundPlane.Raycast(ray, out distance)) { return Vector3.zero; }
 			return ray.GetPoint(distance);
+		}
+
+		public virtual void Update()
+		{
+			if (_cbtpOptions != null && _cbtpOptions.camera != null && _cbtpOptions.camera.transform.hasChanged)
+			{
+				UpdateTileExtent();
+				_cbtpOptions.camera.transform.hasChanged = false;
+				Debug.Log("Camera Changed");
+			}
 		}
 	}
 }

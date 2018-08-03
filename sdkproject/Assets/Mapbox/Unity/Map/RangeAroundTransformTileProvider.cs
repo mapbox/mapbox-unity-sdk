@@ -15,8 +15,8 @@
 		private UnwrappedTileId _currentTile;
 		private UnwrappedTileId _cachedTile;
 
-		private List<UnwrappedTileId> _toRemove;
-		private HashSet<UnwrappedTileId> _tilesToRequest;
+		//private List<UnwrappedTileId> _toRemove;
+		//private HashSet<UnwrappedTileId> _tilesToRequest;
 
 		public override void OnInitialized()
 		{
@@ -32,18 +32,18 @@
 				_initialized = true;
 			}
 			_cachedTile = new UnwrappedTileId();
-			_toRemove = new List<UnwrappedTileId>(((_rangeTileProviderOptions.visibleBuffer * 2) + 1) * ((_rangeTileProviderOptions.visibleBuffer * 2) + 1));
-			_tilesToRequest = new HashSet<UnwrappedTileId>();
+			//_toRemove = new List<UnwrappedTileId>(((_rangeTileProviderOptions.visibleBuffer * 2) + 1) * ((_rangeTileProviderOptions.visibleBuffer * 2) + 1));
+			_currentExtent.activeTiles = new HashSet<UnwrappedTileId>();
 			_map.OnInitialized += UpdateTileExtent;
 			_map.OnUpdated += UpdateTileExtent;
 		}
 
-		protected override void UpdateTileExtent()
+		public override void UpdateTileExtent()
 		{
 			if (!_initialized) return;
 
-			_tilesToRequest.Clear();
-			_toRemove.Clear();
+			_currentExtent.activeTiles.Clear();
+			//_toRemove.Clear();
 			_currentTile = TileCover.CoordinateToTileId(_map.WorldToGeoPosition(_rangeTileProviderOptions.targetTransform.localPosition), _map.AbsoluteZoom);
 
 			if (!_currentTile.Equals(_cachedTile))
@@ -52,37 +52,21 @@
 				{
 					for (int y = _currentTile.Y - _rangeTileProviderOptions.visibleBuffer; y <= (_currentTile.Y + _rangeTileProviderOptions.visibleBuffer); y++)
 					{
-						_tilesToRequest.Add(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
+						_currentExtent.activeTiles.Add(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
 					}
 				}
 				_cachedTile = _currentTile;
+				OnExtentChanged();
+			}
+		}
 
-				foreach (var item in _activeTiles)
-				{
-					if (!_tilesToRequest.Contains(item.Key))
-					{
-						_toRemove.Add(item.Key);
-					}
-				}
+		public virtual void Update()
+		{
+			if (_rangeTileProviderOptions != null && _rangeTileProviderOptions.targetTransform != null && _rangeTileProviderOptions.targetTransform.hasChanged)
+			{
+				UpdateTileExtent();
+				_rangeTileProviderOptions.targetTransform.hasChanged = false;
 
-				foreach (var t2r in _toRemove)
-				{
-					RemoveTile(t2r);
-				}
-
-				foreach (var tile in _activeTiles)
-				{
-					// Reposition tiles in case we panned.
-					RepositionTile(tile.Key);
-				}
-
-				foreach (var tile in _tilesToRequest)
-				{
-					if (!_activeTiles.ContainsKey(tile))
-					{
-						AddTile(tile);
-					}
-				}
 			}
 		}
 	}
