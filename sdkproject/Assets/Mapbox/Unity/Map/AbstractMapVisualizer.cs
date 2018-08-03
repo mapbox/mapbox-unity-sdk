@@ -55,10 +55,6 @@ namespace Mapbox.Unity.Map
 
 		public event Action<ModuleState> OnMapVisualizerStateChanged = delegate { };
 
-		public event Action OnImageLayerRedrawn = delegate { };
-		public event Action OnTerrainLayerRedrawn = delegate { };
-		public event Action OnVectorLayerRedrawn = delegate { };
-
 		public void SetLoadingTexture(Texture2D loadingTexture)
 		{
 			_loadingTexture = loadingTexture;
@@ -249,14 +245,23 @@ namespace Mapbox.Unity.Map
 		
 		public void RedrawLayer(AbstractTileFactory factory)
 		{
-			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
+			if (!(factory is VectorTileFactory))
 			{
-				factory.Register(tileBundle.Value);
+				foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
+				{
+					factory.Register(tileBundle.Value);
+				}
 			}
-
-			if (OnImageLayerRedrawn != null)
+			else
 			{
-				OnImageLayerRedrawn();
+				foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
+				{
+					factory.Unregister(tileBundle.Value);
+				}
+				foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
+				{
+					factory.Register(tileBundle.Value);
+				}
 			}
 		}
 
