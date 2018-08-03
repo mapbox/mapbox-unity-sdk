@@ -328,8 +328,7 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		public event Action OnUpdated = delegate { };
 
-		public event Action OnImageLayerRedrawn = delegate { };
-		public event Action OnTerrainLayerRedrawn = delegate { };
+		public event Action OnMapRedrawn = delegate { };
 
 		protected virtual void Awake()
 		{
@@ -437,12 +436,10 @@ namespace Mapbox.Unity.Map
 			if (_terrain.IsLayerActive)
 			{
 				_mapVisualizer.Factories.Add(_terrain.Factory);
-				_mapVisualizer.OnTerrainLayerRedrawn += OnTerrainLayerRedrawn;
 			}
 			if (_imagery.IsLayerActive)
 			{
 				_mapVisualizer.Factories.Add(_imagery.Factory);
-				_mapVisualizer.OnImageLayerRedrawn += OnImageLayerRedrawn;
 			}
 			if (_vectorData.IsLayerActive)
 			{
@@ -486,8 +483,10 @@ namespace Mapbox.Unity.Map
 				_mapVisualizer.RedrawLayer(factory);
 				if(updateVector)
 				{
+					//VectorData.Initialize();
 					_mapVisualizer.RedrawLayer(VectorData.Factory);
 				}
+				OnMapRedrawn();
 			};
 
 			_terrain.UpdateLayer += (factory, updateVector) =>
@@ -495,8 +494,11 @@ namespace Mapbox.Unity.Map
 				_mapVisualizer.RedrawLayer(factory);
 				if (updateVector)
 				{
+					VectorData.Factory.SetOptions(VectorData.LayerProperty);
+					VectorData.Factory.SetChildProperties();
 					_mapVisualizer.RedrawLayer(VectorData.Factory);
 				}
+				OnMapRedrawn();
 			};
 
 			_mapVisualizer.Initialize(this, _fileSource);
