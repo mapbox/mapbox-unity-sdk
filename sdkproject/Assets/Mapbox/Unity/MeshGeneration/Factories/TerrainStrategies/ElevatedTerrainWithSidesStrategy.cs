@@ -45,27 +45,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				tile.gameObject.layer = _elevationOptions.unityLayerOptions.layerId;
 			}
 
-			if (tile.MeshRenderer == null)
-			{
-				var renderer = tile.gameObject.AddComponent<MeshRenderer>();
-				renderer.materials = new Material[2]
-				{
-					_elevationOptions.requiredOptions.baseMaterial,
-					_elevationOptions.sideWallOptions.wallMaterial
-				};
-			}
-
-			if (tile.MeshFilter == null)
-			{
-				tile.gameObject.AddComponent<MeshFilter>();
-				CreateBaseMesh(tile);
-			}
-
-			if (_elevationOptions.requiredOptions.addCollider && tile.Collider == null)
-			{
-				tile.gameObject.AddComponent<MeshCollider>();
-			}
-
+			CreateBaseMesh(tile);
 			GenerateTerrainMesh(tile);
 		}
 

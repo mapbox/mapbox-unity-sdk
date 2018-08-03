@@ -224,7 +224,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			return containingCategories;
 		}
 
-		public override void Create(VectorTileLayer layer, UnityTile tile, Action callback)
+		public override void Create(VectorTileLayer layer, UnityTile tile, Action<UnityTile> callback)
 		{
 			//for layers using specific locations, ignore VectorTileLayer and
 			//pass coordinates to the modifierstack using BuildFeatureFromLatLon.
@@ -234,15 +234,13 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				BuildFeatureFromLatLon(layer, tile);
 				if (callback != null)
 				{
-					callback();
+					callback(tile);
 				}
 			}
 			else
 			{
 				base.Create(layer, tile, callback);
-
 			}
-
 		}
 
 

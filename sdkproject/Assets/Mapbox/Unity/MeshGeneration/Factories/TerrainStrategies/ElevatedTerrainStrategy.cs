@@ -219,6 +219,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			var meshVertCount = mesh.Vertices.Count;
 			_stitchTarget = null;
 			_meshData.TryGetValue(tileId.North, out _stitchTarget);
+
 			if (_stitchTarget != null)
 			{
 				_stitchTarget.GetVertices(_stitchTargetMeshData.Vertices);
