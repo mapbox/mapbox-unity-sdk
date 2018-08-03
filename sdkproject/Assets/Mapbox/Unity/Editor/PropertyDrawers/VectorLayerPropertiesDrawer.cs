@@ -56,6 +56,12 @@
 			EditorGUILayout.Space();
 		}
 
+		private void UpdateProperty(SerializedProperty property)
+		{
+			var map = (AbstractMap)property.serializedObject.targetObject;
+			map.VectorData.LayerProperty.UpdateProperty();
+		}
+
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, null, property);
@@ -102,8 +108,7 @@
 
 			if (GUI.changed)
 			{
-				var map = (AbstractMap)property.serializedObject.targetObject;
-				map.VectorData.LayerProperty.UpdateProperty();
+				UpdateProperty(property);
 			}
 		}
 	}

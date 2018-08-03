@@ -43,6 +43,12 @@
 			}
 		}
 
+		private void UpdateProperty(SerializedProperty property)
+		{
+			var map = (AbstractMap)property.serializedObject.targetObject;
+			map.Terrain.LayerProperty.UpdateProperty();
+		}
+
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			
@@ -68,10 +74,13 @@
 				isGUIContentSet = true;
 			}
 			var sourceTypeLabel = new GUIContent { text = "Data Source", tooltip = "Source tileset for Terrain." };
-
+			EditorGUI.BeginChangeCheck();
 			sourceTypeProperty.enumValueIndex = EditorGUILayout.Popup(sourceTypeLabel, sourceTypeProperty.enumValueIndex, sourceTypeContent);
 			sourceTypeValue = (ElevationSourceType)sourceTypeProperty.enumValueIndex;
-
+			if (EditorGUI.EndChangeCheck())
+			{
+				UpdateProperty(property);
+			}
 			var sourceOptionsProperty = property.FindPropertyRelative("sourceOptions");
 			var layerSourceProperty = sourceOptionsProperty.FindPropertyRelative("layerSource");
 			var layerSourceId = layerSourceProperty.FindPropertyRelative("Id");
@@ -97,30 +106,41 @@
 			{
 				GUI.enabled = false;
 			}
+			EditorGUI.BeginChangeCheck();
 			var elevationLayerType = property.FindPropertyRelative("elevationLayerType");
 
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("elevationLayerType"), new GUIContent { text = elevationLayerType.displayName, tooltip = ((ElevationLayerType)elevationLayerType.enumValueIndex).Description() });
 
+
 			position.y += lineHeight;
+
+
+			EditorGUILayout.PropertyField(property.FindPropertyRelative("requiredOptions"), true);
+
+
+
 			if (sourceTypeValue == ElevationSourceType.None)
 			{
 				GUI.enabled = true;
 			}
 
-			EditorGUILayout.PropertyField(property.FindPropertyRelative("requiredOptions"), true);
+			if (EditorGUI.EndChangeCheck())
+			{
+				UpdateProperty(property);
+			}
 
 			ShowPosition = EditorGUILayout.Foldout(ShowPosition, "Others");
 			if (ShowPosition)
 			{
+				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("modificationOptions"), true);
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("sideWallOptions"), true);
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("unityLayerOptions"), true);
-			}
+				if (EditorGUI.EndChangeCheck())
+				{
+					UpdateProperty(property);
+				}
 
-			if (GUI.changed)
-			{
-				var map = (AbstractMap)property.serializedObject.targetObject;
-				map.Terrain.LayerProperty.UpdateProperty();
 			}
 		}
 	}

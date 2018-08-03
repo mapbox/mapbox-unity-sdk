@@ -41,6 +41,11 @@
 				position.y += lineHeight;
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("unityTileSize"));
 			}
+
+			if (GUI.changed)
+			{
+				Debug.Log("MapScalingOptionsDrawer");
+			}
 		}
 	}
 }
