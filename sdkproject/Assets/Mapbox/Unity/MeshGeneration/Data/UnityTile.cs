@@ -24,6 +24,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		List<Tile> _tiles = new List<Tile>();
 
+		public bool IsRecycled = false;
+
 		MeshRenderer _meshRenderer;
 		public MeshRenderer MeshRenderer
 		{
@@ -113,9 +115,68 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public int InitialZoom { get; internal set; }
 		public float TileScale { get; internal set; }
 
-		public TilePropertyState RasterDataState;
-		public TilePropertyState HeightDataState;
-		public TilePropertyState VectorDataState;
+		[SerializeField]
+		private TilePropertyState _rasterDataState;
+		public TilePropertyState RasterDataState
+		{
+			get
+			{
+				return _rasterDataState;
+			}
+			internal set
+			{
+				if (_rasterDataState != value)
+				{
+					_rasterDataState = value;
+					if (_rasterDataState != TilePropertyState.None)
+					{
+						OnRasterDataChanged(this);
+					}
+				}
+			}
+		}
+		[SerializeField]
+		private TilePropertyState _heightDataState;
+		public TilePropertyState HeightDataState
+		{
+			get
+			{
+				return _heightDataState;
+			}
+			internal set
+			{
+				if (_heightDataState != value)
+				{
+					_heightDataState = value;
+					if (_heightDataState != TilePropertyState.None)
+					{
+						OnHeightDataChanged(this);
+					}
+				}
+			}
+		}
+		[SerializeField]
+		private TilePropertyState _vectorDataState;
+		public TilePropertyState VectorDataState
+		{
+			get
+			{
+				return _vectorDataState;
+			}
+			internal set
+			{
+				if (_vectorDataState != value)
+				{
+					_vectorDataState = value;
+					if (_vectorDataState != TilePropertyState.None)
+					{
+						OnVectorDataChanged(this);
+					}
+				}
+			}
+		}
+
+		public TilePropertyState TileState = TilePropertyState.None;
 
 		public event Action<UnityTile> OnHeightDataChanged = delegate { };
 		public event Action<UnityTile> OnRasterDataChanged = delegate { };
@@ -142,6 +203,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			scaleFactor = Mathf.Pow(2, (map.InitialZoom - zoom));
 			gameObject.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
 			gameObject.SetActive(true);
+
+			IsRecycled = false;
+			MeshRenderer.enabled = true;
 		}
 
 		internal void Recycle()
@@ -149,14 +213,19 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			if (_loadingTexture && MeshRenderer != null)
 			{
 				MeshRenderer.material.mainTexture = _loadingTexture;
+				if (_rasterData != null)
+					_rasterData.LoadImage(null);
+				MeshRenderer.enabled = false;
 			}
 
 			gameObject.SetActive(false);
+			IsRecycled = true;
 
 			// Reset internal state.
 			RasterDataState = TilePropertyState.None;
 			HeightDataState = TilePropertyState.None;
 			VectorDataState = TilePropertyState.None;
+			TileState = TilePropertyState.None;
 
 			OnHeightDataChanged = delegate { };
 			OnRasterDataChanged = delegate { };
@@ -197,17 +266,19 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				}
 			}
 
-			if(addCollider && gameObject.GetComponent<MeshCollider>() == null)
+			if (addCollider && gameObject.GetComponent<MeshCollider>() == null)
 			{
 				gameObject.AddComponent<MeshCollider>();
 			}
 
 			HeightDataState = TilePropertyState.Loaded;
-			OnHeightDataChanged(this);
+			//OnHeightDataChanged(this);
 
 			if (_rasterData != null)
 			{
+				//Debug.Log("Setting Raster Data");
 				_meshRenderer.material.mainTexture = _rasterData;
+				//gameObject.SetActive(true);
 			}
 		}
 
@@ -230,6 +301,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void SetRasterData(byte[] data, bool useMipMap, bool useCompression)
 		{
+
 			//if (MeshRenderer == null || MeshRenderer.material == null)
 			//{
 			//	return;
@@ -250,7 +322,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 			MeshRenderer.material.mainTexture = _rasterData;
 			RasterDataState = TilePropertyState.Loaded;
-			OnRasterDataChanged(this);
+			//OnRasterDataChanged(this);
 		}
 
 		public Texture2D GetRasterData()
