@@ -495,7 +495,7 @@ namespace Mapbox.Unity.Map
 				if (updateVector)
 				{
 					VectorData.Factory.SetOptions(VectorData.LayerProperty);
-					VectorData.Factory.SetChildProperties();
+					//VectorData.Factory.SetChildProperties();
 					_mapVisualizer.RedrawLayer(VectorData.Factory);
 				}
 				OnMapRedrawn();

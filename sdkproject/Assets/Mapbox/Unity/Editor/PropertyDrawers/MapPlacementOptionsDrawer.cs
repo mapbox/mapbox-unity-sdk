@@ -33,10 +33,6 @@
 
 			placementType.enumValueIndex = EditorGUILayout.Popup(new GUIContent { text = label.text, tooltip = "Placement of Map root.", }, placementType.enumValueIndex, placementTypeContent);
 			EditorGUILayout.PropertyField(snapMapToTerrain, new GUIContent { text = snapMapToTerrain.displayName, tooltip = "If checked, map's root will be snapped to zero. " });
-			if (GUI.changed)
-			{
-				Debug.Log("MapPlacementOptionsDrawer");
-			}
 		}
 	}
 }

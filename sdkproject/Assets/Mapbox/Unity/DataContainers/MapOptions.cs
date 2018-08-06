@@ -9,8 +9,6 @@
 
 		public void UpdateProperty()
 		{
-			Debug.Log("MapOptions");
-			return;
 			if (OnPropertyUpdated != null)
 			{
 				OnPropertyUpdated();
