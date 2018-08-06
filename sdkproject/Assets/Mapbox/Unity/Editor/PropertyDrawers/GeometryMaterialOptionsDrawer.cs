@@ -40,6 +40,7 @@
 			{StyleTypes.Fantasy, new StyleIconBundle(StyleTypes.Fantasy.ToString())},
 			{StyleTypes.Light, new StyleIconBundle(StyleTypes.Light.ToString())},
 			{StyleTypes.Dark, new StyleIconBundle(StyleTypes.Dark.ToString())},
+			{StyleTypes.Color, new StyleIconBundle(StyleTypes.Color.ToString())},
 			{StyleTypes.Satellite, new StyleIconBundle(StyleTypes.Satellite.ToString())},
 		};
 
@@ -86,21 +87,34 @@
 
 				GUILayout.EndHorizontal();
 
-				if ((StyleTypes)styleType.enumValueIndex == StyleTypes.Simple)
+				switch ((StyleTypes)styleType.enumValueIndex)
 				{
-					var samplePaletteType = property.FindPropertyRelative("samplePalettes");
-					var samplePaletteTypeLabel = new GUIContent { text = "Palette Type", tooltip = "Palette type for procedural colorization; choose from sample palettes or create your own by choosing Custom. " };
+					case StyleTypes.Simple:
+						var samplePaletteType = property.FindPropertyRelative("samplePalettes");
+						var samplePaletteTypeLabel = new GUIContent { text = "Palette Type", tooltip = "Palette type for procedural colorization; choose from sample palettes or create your own by choosing Custom. " };
 
-					GUIContent[] samplePaletteTypeGuiContent = new GUIContent[samplePaletteType.enumDisplayNames.Length];
-					for (int i = 0; i < samplePaletteType.enumDisplayNames.Length; i++)
-					{
-						samplePaletteTypeGuiContent[i] = new GUIContent
+						GUIContent[] samplePaletteTypeGuiContent = new GUIContent[samplePaletteType.enumDisplayNames.Length];
+						for (int i = 0; i < samplePaletteType.enumDisplayNames.Length; i++)
 						{
-							text = samplePaletteType.enumDisplayNames[i]
-						};
-					}
+							samplePaletteTypeGuiContent[i] = new GUIContent
+							{
+								text = samplePaletteType.enumDisplayNames[i]
+							};
+						}
+						samplePaletteType.enumValueIndex = EditorGUILayout.Popup(samplePaletteTypeLabel, samplePaletteType.enumValueIndex, samplePaletteTypeGuiContent);
+						break;
+					case StyleTypes.Light:
+						property.FindPropertyRelative("lightStyleOpacity").floatValue = EditorGUILayout.Slider("Opacity", property.FindPropertyRelative("lightStyleOpacity").floatValue, 0.0f, 1.0f);
+						break;
+					case StyleTypes.Dark:
+						property.FindPropertyRelative("darkStyleOpacity").floatValue = EditorGUILayout.Slider("Opacity", property.FindPropertyRelative("darkStyleOpacity").floatValue, 0.0f, 1.0f);
+						break;
+					case StyleTypes.Color:
+						property.FindPropertyRelative("colorStyleColor").colorValue = EditorGUILayout.ColorField("Color", property.FindPropertyRelative("colorStyleColor").colorValue);
+						break;
+					default:
+						break;
 
-					samplePaletteType.enumValueIndex = EditorGUILayout.Popup(samplePaletteTypeLabel, samplePaletteType.enumValueIndex, samplePaletteTypeGuiContent);
 				}
 			}
 			else

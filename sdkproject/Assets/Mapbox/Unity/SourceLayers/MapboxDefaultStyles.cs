@@ -64,6 +64,40 @@ namespace Mapbox.Unity.Map
 
 				geometryMaterialOptions.style = geometryMaterialOptionsRef.style;
 
+				geometryMaterialOptions.lightStyleOpacity = geometryMaterialOptionsRef.lightStyleOpacity;
+				geometryMaterialOptions.darkStyleOpacity = geometryMaterialOptionsRef.darkStyleOpacity;
+
+				geometryMaterialOptions.colorStyleColor = geometryMaterialOptionsRef.colorStyleColor;
+
+				switch (geometryMaterialOptions.style)
+				{
+					case StyleTypes.Light:
+						Color lightColor = geometryMaterialOptions.materials[0].Materials[0].color;
+						lightColor.a = geometryMaterialOptions.lightStyleOpacity;
+						geometryMaterialOptions.materials[0].Materials[0].color = lightColor;
+
+						lightColor = geometryMaterialOptions.materials[1].Materials[0].color;
+						lightColor.a = geometryMaterialOptions.lightStyleOpacity;
+						geometryMaterialOptions.materials[1].Materials[0].color = lightColor;
+						break;
+					case StyleTypes.Dark:
+						Color darkColor = geometryMaterialOptions.materials[0].Materials[0].color;
+						darkColor.a = geometryMaterialOptions.darkStyleOpacity;
+						geometryMaterialOptions.materials[0].Materials[0].color = darkColor;
+
+						darkColor = geometryMaterialOptions.materials[1].Materials[0].color;
+						darkColor.a = geometryMaterialOptions.darkStyleOpacity;
+						geometryMaterialOptions.materials[1].Materials[0].color = darkColor;
+						break;
+					case StyleTypes.Color:
+						Color color = geometryMaterialOptions.colorStyleColor;
+						geometryMaterialOptions.materials[0].Materials[0].color = color;
+						geometryMaterialOptions.materials[1].Materials[0].color = color;
+						break;
+					default:
+						break;
+				}
+
 				if(geometryMaterialOptions.style == StyleTypes.Satellite)
 				{
 					geometryMaterialOptions.texturingType = UvMapType.Tiled;
