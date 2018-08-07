@@ -10,6 +10,8 @@
 	using Mapbox.VectorTile.Geometry;
 	using Mapbox.Unity.MeshGeneration.Interfaces;
 
+
+
 	/// <summary>
 	/// ReplaceBuildingFeatureModifier takes in POIs and checks if the feature layer has those points and deletes them
 	/// </summary>
@@ -41,6 +43,30 @@
 		/// </summary>
 		private List<List<string>> _featureId;
 		private string _tempFeatureId;
+
+		public SpawnPrefabOptions SpawnPrefabOptions
+		{
+			set
+			{
+				_options = value;
+			}
+		}
+
+		public List<string> PrefabLocations
+		{
+			set
+			{
+				_prefabLocations = value;
+			}
+		}
+
+		public List<string> BlockedIds
+		{
+			set
+			{
+				_explicitlyBlockedFeatureIds = value;
+			}
+		}
 
 		public override void Initialize()
 		{
