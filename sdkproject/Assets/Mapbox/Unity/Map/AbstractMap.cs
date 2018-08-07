@@ -483,7 +483,7 @@ namespace Mapbox.Unity.Map
 				_mapVisualizer.RedrawLayer(factory);
 				if(updateVector)
 				{
-					//VectorData.Initialize();
+					VectorData.UpdateFactorySettings();
 					_mapVisualizer.RedrawLayer(VectorData.Factory);
 				}
 				OnMapRedrawn();
@@ -494,7 +494,8 @@ namespace Mapbox.Unity.Map
 				_mapVisualizer.RedrawLayer(factory);
 				if (updateVector)
 				{
-					VectorData.Factory.SetOptions(VectorData.LayerProperty);
+					VectorData.UpdateFactorySettings();
+					//.Factory.SetOptions(VectorData.LayerProperty);
 					//VectorData.Factory.SetChildProperties();
 					_mapVisualizer.RedrawLayer(VectorData.Factory);
 				}

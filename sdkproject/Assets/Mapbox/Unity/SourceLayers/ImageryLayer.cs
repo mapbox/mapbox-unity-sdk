@@ -112,6 +112,7 @@
 			//updating image layer on settings change
 			_layerProperty.OnPropertyUpdated += () =>
 			{
+				Factory.SetOptions(_layerProperty);
 				NotifyUpdateLayer(_imageFactory);
 			};
 		}

@@ -38,7 +38,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			if (DataFetcher != null)
 			{
 				DataFetcher.DataRecieved -= OnTerrainRecieved;
-				DataFetcher.FetchingError -= OnDataError;
+				DataFetcher.FetchingError -= OnErrorOccurred;
 			}
 		}
 		#endregion
@@ -49,17 +49,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			Strategy.Initialize(_elevationOptions);
 			DataFetcher = ScriptableObject.CreateInstance<TerrainDataFetcher>();
 			DataFetcher.DataRecieved += OnTerrainRecieved;
-			DataFetcher.FetchingError += OnDataError;
-		}
-
-		public void Reinitialize()
-		{
-			Strategy.Initialize(_elevationOptions);
+			DataFetcher.FetchingError += OnErrorOccurred;
 		}
 
 		public override void SetOptions(LayerProperties options)
 		{
 			_elevationOptions = (ElevationLayerProperties)options;
+			Strategy.Initialize(_elevationOptions);
 		}
 
 		protected override void OnRegistered(UnityTile tile)
@@ -78,10 +74,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 			else
 			{
+				//reseting height data
+				tile.SetHeightData(null);
 				Strategy.RegisterTile(tile);
 				Progress--;
 			}
-
 		}
 
 		protected override void OnUnregistered(UnityTile tile)
@@ -102,23 +99,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		private void OnDataError(UnityTile tile, TileErrorEventArgs e)
+		protected override void OnErrorOccurred(UnityTile tile, TileErrorEventArgs e)
 		{
+			base.OnErrorOccurred(tile, e);
 			if (tile != null)
 			{
 				Progress--;
 				tile.HeightDataState = TilePropertyState.Error;
 				//strategy might want to act on this , i.e. flattening tile mesh on data fetching failed?
 				Strategy.DataErrorOccurred(tile, e);
-			}
-		}
-
-		public void UpdateMapId(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-		{
-			Debug.Log("UpdateMapId");
-			if (OnMapIdUpdated != null)
-			{
-				OnMapIdUpdated();
 			}
 		}
 		#endregion

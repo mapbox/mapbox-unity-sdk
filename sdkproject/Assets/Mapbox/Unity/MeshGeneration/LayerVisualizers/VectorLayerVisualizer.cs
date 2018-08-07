@@ -65,74 +65,103 @@
 			set { _layerProperties.coreOptions.layerName = value; }
 		}
 
+		public T AddOrCreateMeshModifier<T>() where T : MeshModifier
+		{
+			MeshModifier mod = _defaultStack.MeshModifiers.FirstOrDefault(x => x.GetType() == typeof(T));
+			if(mod == null)
+			{
+				mod = (MeshModifier)CreateInstance(typeof(T));
+				_defaultStack.MeshModifiers.Add(mod);
+			}
+			return (T)mod;
+		}
+
+		public T AddOrCreateGameObjectModifier<T>() where T : GameObjectModifier
+		{
+			GameObjectModifier mod = _defaultStack.GoModifiers.FirstOrDefault(x => x.GetType() == typeof(T));
+			if (mod == null)
+			{
+				mod = (GameObjectModifier)CreateInstance(typeof(T));
+				_defaultStack.GoModifiers.Add(mod);
+			}
+			return (T)mod;
+		}
+
 		public void SetProperties(VectorSubLayerProperties properties, LayerPerformanceOptions performanceOptions)
 		{
 			List<MeshModifier> defaultMeshModifierStack = new List<MeshModifier>();
 			List<GameObjectModifier> defaultGOModifierStack = new List<GameObjectModifier>();
-			_layerProperties = properties;
-			_performanceOptions = performanceOptions;
+			if(_layerProperties == null && properties != null)
+				_layerProperties = properties;
+			if(_performanceOptions == null && performanceOptions != null)
+				_performanceOptions = performanceOptions;
 
 			Active = _layerProperties.coreOptions.isActive;
 
-			if (properties.coreOptions.groupFeatures)
+			if (_layerProperties.coreOptions.groupFeatures)
 			{
-				_defaultStack = ScriptableObject.CreateInstance<MergedModifierStack>();
+				if(_defaultStack == null || !(_defaultStack is MergedModifierStack))
+				{
+					_defaultStack = ScriptableObject.CreateInstance<MergedModifierStack>();
+				}
 			}
 			else
 			{
-				_defaultStack = ScriptableObject.CreateInstance<ModifierStack>();
+				if (_defaultStack == null || !(_defaultStack is ModifierStack))
+				{
+					_defaultStack = ScriptableObject.CreateInstance<ModifierStack>();
+				}
 				((ModifierStack)_defaultStack).moveFeaturePositionTo = _layerProperties.moveFeaturePositionTo;
 			}
 
 			_defaultStack.MeshModifiers = new List<MeshModifier>();
 			_defaultStack.GoModifiers = new List<GameObjectModifier>();
 
-			switch (properties.coreOptions.geometryType)
+			switch (_layerProperties.coreOptions.geometryType)
 			{
 				case VectorPrimitiveType.Point:
 				case VectorPrimitiveType.Custom:
 					// Let the user add anything that they want
 					if (_layerProperties.coreOptions.snapToTerrain == true)
 					{
-						defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
+						//defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
+						AddOrCreateMeshModifier<SnapTerrainModifier>();
 					}
 					break;
 				case VectorPrimitiveType.Line:
 
-					var lineMeshMod = CreateInstance<LineMeshModifier>();
+					var lineMeshMod = AddOrCreateMeshModifier<LineMeshModifier>();//CreateInstance<LineMeshModifier>();
 					lineMeshMod.Width = _layerProperties.coreOptions.lineWidth;
-					defaultMeshModifierStack.Add(lineMeshMod);
+					//defaultMeshModifierStack.Add(lineMeshMod);
 
 					if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
 					{
-						var heightMod = CreateInstance<HeightModifier>();
+						var heightMod = AddOrCreateMeshModifier<HeightModifier>();
 						heightMod.SetProperties(_layerProperties.extrusionOptions);
-						defaultMeshModifierStack.Add(heightMod);
+						//defaultMeshModifierStack.Add(heightMod);
 					}
 					if (_layerProperties.coreOptions.snapToTerrain == true)
 					{
-						defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
+						AddOrCreateMeshModifier<SnapTerrainModifier>();
 					}
 
 					//collider modifier options
 					if (_layerProperties.colliderOptions.colliderType != ColliderType.None)
 					{
-						var lineColliderMod = CreateInstance<ColliderModifier>();
+						var lineColliderMod = AddOrCreateGameObjectModifier<ColliderModifier>();
 						lineColliderMod.SetProperties(_layerProperties.colliderOptions);
-						defaultGOModifierStack.Add(lineColliderMod);
 					}
 
-					var lineStyleMod = CreateInstance<MaterialModifier>();
+					var lineStyleMod = AddOrCreateGameObjectModifier<MaterialModifier>();
 					lineStyleMod.SetProperties(MapboxDefaultStyles.GetGeometryMaterialOptions(_layerProperties.materialOptions));
-					defaultGOModifierStack.Add(lineStyleMod);
 
 					break;
 				case VectorPrimitiveType.Polygon:
 					if (_layerProperties.coreOptions.snapToTerrain == true)
 					{
-						defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
+						AddOrCreateMeshModifier<SnapTerrainModifier>();
 					}
-					defaultMeshModifierStack.Add(CreateInstance<PolygonMeshModifier>());
+					AddOrCreateMeshModifier<PolygonMeshModifier>();
 
 					GeometryMaterialOptions geometryMaterialOptions = MapboxDefaultStyles.GetGeometryMaterialOptions(_layerProperties.materialOptions);
 
@@ -141,55 +170,47 @@
 					uvModOptions.atlasInfo = geometryMaterialOptions.atlasInfo;
 					uvModOptions.style = geometryMaterialOptions.style;
 
-					var uvMod = CreateInstance<UvModifier>();
+					var uvMod = AddOrCreateMeshModifier<UvModifier>();
 					uvMod.SetProperties(uvModOptions);
-					defaultMeshModifierStack.Add(uvMod);
 
 					if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
 					{
 						//replace materialOptions with styleOptions
 						if (geometryMaterialOptions.texturingType == UvMapType.Atlas || geometryMaterialOptions.texturingType == UvMapType.AtlasWithColorPalette)
 						{
-							var atlasMod = CreateInstance<TextureSideWallModifier>();
+							var atlasMod = AddOrCreateMeshModifier<TextureSideWallModifier>();
 							GeometryExtrusionWithAtlasOptions atlasOptions = new GeometryExtrusionWithAtlasOptions(_layerProperties.extrusionOptions, uvModOptions);
 							atlasMod.SetProperties(atlasOptions);
-							defaultMeshModifierStack.Add(atlasMod);
 						}
 						else
 						{
-							var heightMod = CreateInstance<HeightModifier>();
+							var heightMod = AddOrCreateMeshModifier<HeightModifier>();
 							heightMod.SetProperties(_layerProperties.extrusionOptions);
-							defaultMeshModifierStack.Add(heightMod);
 						}
 					}
 
 					//collider modifier options
 					if (_layerProperties.colliderOptions.colliderType != ColliderType.None)
 					{
-						var polyColliderMod = CreateInstance<ColliderModifier>();
+						var polyColliderMod = AddOrCreateGameObjectModifier<ColliderModifier>();
 						polyColliderMod.SetProperties(_layerProperties.colliderOptions);
-						defaultGOModifierStack.Add(polyColliderMod);
 					}
 
-					var styleMod = CreateInstance<MaterialModifier>();
-
+					var styleMod = AddOrCreateGameObjectModifier<MaterialModifier>();
 					styleMod.SetProperties(geometryMaterialOptions);
-					defaultGOModifierStack.Add(styleMod);
 
 					if (geometryMaterialOptions.texturingType == UvMapType.AtlasWithColorPalette)
 					{
-						var colorPaletteMod = CreateInstance<MapboxStylesColorModifier>();
+						var colorPaletteMod = AddOrCreateGameObjectModifier<MapboxStylesColorModifier>();
 						colorPaletteMod.m_scriptablePalette = geometryMaterialOptions.colorPalette;
-
-						defaultGOModifierStack.Add(colorPaletteMod);
 					}
 					break;
 				default:
 					break;
 			}
 
-			_defaultStack.MeshModifiers.AddRange(defaultMeshModifierStack);
-			_defaultStack.GoModifiers.AddRange(defaultGOModifierStack);
+			//_defaultStack.MeshModifiers.AddRange(defaultMeshModifierStack);
+			//_defaultStack.GoModifiers.AddRange(defaultGOModifierStack);
 
 			//Add any additional modifiers that were added.
 			_defaultStack.MeshModifiers.AddRange(_layerProperties.MeshModifiers);
@@ -357,7 +378,7 @@
 			}
 
 			#region PreProcess & Process. 
-
+			
 			var featureCount = tempLayerProperties.vectorTileLayer.FeatureCount();
 			do
 			{

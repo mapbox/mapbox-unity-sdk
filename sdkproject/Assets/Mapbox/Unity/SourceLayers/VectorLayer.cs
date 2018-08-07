@@ -147,9 +147,15 @@
 
 			_layerProperty.OnPropertyUpdated += () =>
 			{
+
 				//notifying map to reload existing tiles
 				NotifyUpdateLayer(_vectorTileFactory);
 			};
+		}
+
+		public void UpdateFactorySettings()
+		{
+			_vectorTileFactory.SetOptions(_layerProperty);
 		}
 
 		public void Remove()

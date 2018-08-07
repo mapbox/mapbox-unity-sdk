@@ -116,6 +116,18 @@
 		public override void SetOptions(LayerProperties options)
 		{
 			_properties = (VectorLayerProperties)options;
+
+			if (_layerBuilder != null)
+			{
+				foreach (var layer in _layerBuilder)
+				{
+					foreach (var item in layer.Value)
+					{
+						(item as VectorLayerVisualizer).SetProperties(null, null);
+						item.Initialize();
+					}
+				}
+			}
 		}
 
 		protected override void OnRegistered(UnityTile tile)
@@ -146,9 +158,9 @@
 		/// Method to be called when a tile error has occurred.
 		/// </summary>
 		/// <param name="e"><see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance/</param>
-		protected override void OnErrorOccurred(TileErrorEventArgs e)
+		protected override void OnErrorOccurred(UnityTile tile, TileErrorEventArgs e)
 		{
-			base.OnErrorOccurred(e);
+			base.OnErrorOccurred(tile, e);
 		}
 
 		protected override void OnUnregistered(UnityTile tile)

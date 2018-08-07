@@ -130,9 +130,11 @@
 			_elevationFactory.SetOptions(_layerProperty);
 			_layerProperty.OnPropertyUpdated += () =>
 			{
-				//pushing new settings to factory directly
+				//terrain factory uses strategy objects and they are controlled by layer
+				//so we have to refresh that first
 				SetStrategy();
-				_elevationFactory.Reinitialize();
+				//pushing new settings to factory directly
+				Factory.SetOptions(_layerProperty);
 				//notifying map to reload existing tiles
 				NotifyUpdateLayer(_elevationFactory, true);
 			};
