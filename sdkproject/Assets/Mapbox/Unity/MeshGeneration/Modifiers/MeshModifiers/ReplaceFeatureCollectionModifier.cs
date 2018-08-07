@@ -21,20 +21,21 @@
 
 	}
 
+	/*
 	[System.Serializable]
 	public class FeatureBundleList
 	{
 		public List<FeatureBundle> features = new List<FeatureBundle>();
 	}
-
+	*/
 	/// <summary>
 	/// ReplaceFeatureCollectionModifier aggregates multiple ReplaceFeatureModifier objects into one modifier.
 	/// </summary>
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Replace Feature Collection Modifier")]
 	public class ReplaceFeatureCollectionModifier : GameObjectModifier, IReplacementCriteria
 	{
-		public FeatureBundleList featureBundleList;
-		//public List<FeatureBundle> features = new List<FeatureBundle>();
+		//public FeatureBundleList featureBundleList;
+		public List<FeatureBundle> features = new List<FeatureBundle>();
 
 		private List<ReplaceFeatureModifier> _replaceFeatureModifiers;
 
@@ -42,7 +43,7 @@
 		{
 			base.Initialize();
 			_replaceFeatureModifiers = new List<ReplaceFeatureModifier>();
-			foreach (FeatureBundle feature in featureBundleList.features)
+			foreach (FeatureBundle feature in features)
 			{
 				ReplaceFeatureModifier replaceFeatureModifier = ScriptableObject.CreateInstance<ReplaceFeatureModifier>();
 
