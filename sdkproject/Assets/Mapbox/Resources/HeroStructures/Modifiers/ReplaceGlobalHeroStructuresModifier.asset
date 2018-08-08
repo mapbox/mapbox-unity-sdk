@@ -12,7 +12,38 @@ MonoBehaviour:
   m_Name: ReplaceGlobalHeroStructuresModifier
   m_EditorClassIdentifier: 
   Active: 1
-  _replaceFeatureModifiers:
-  - {fileID: 11400000, guid: e8f257af9ed9047a4849f35b088e9018, type: 2}
-  - {fileID: 11400000, guid: a2e1bcfb2a40347779a8185312368521, type: 2}
-  - {fileID: 11400000, guid: fdd98fcce392b43349632ff3f9b3153c, type: 2}
+  features:
+  - Name: TransamericaPyramid
+    active: 1
+    spawnPrefabOptions:
+      prefab: {fileID: 1286618319241328, guid: 6310371eff51a7344b94c2d1bd6659ee, type: 2}
+      scaleDownWithWorld: 1
+    _prefabLocations:
+    - 37.795135, -122.402748
+    _explicitlyBlockedFeatureIds:
+    - 1366159871
+    - 4513368931
+    - 4513368951
+    - 4513368981
+  - Name: CoitTower
+    active: 1
+    spawnPrefabOptions:
+      prefab: {fileID: 1012822833162048, guid: 2cb306508c053344ea5fbc519cdcff79, type: 2}
+      scaleDownWithWorld: 1
+    _prefabLocations:
+    - 37.8024, -122.405833
+    _explicitlyBlockedFeatureIds:
+    - 4513315301
+    - 4513315311
+    - 4513315321
+    - 4513315341
+    - 4513315331
+    - 4513315351
+  - Name: SalesForceTower
+    active: 0
+    spawnPrefabOptions:
+      prefab: {fileID: 1286725550759852, guid: 8c4fae6310db68849ad95d5e92cd30fe, type: 2}
+      scaleDownWithWorld: 1
+    _prefabLocations:
+    - 37.7899, -122.3969
+    _explicitlyBlockedFeatureIds: []

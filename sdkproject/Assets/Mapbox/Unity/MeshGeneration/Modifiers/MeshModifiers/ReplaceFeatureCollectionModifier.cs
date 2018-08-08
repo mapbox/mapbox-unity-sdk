@@ -10,6 +10,9 @@
 	[System.Serializable]
 	public class FeatureBundle
 	{
+		//Name parameter shows up in inspector display instead of Element 0 , 1, etc...
+		[HideInInspector]
+		public string Name;
 		public bool active;
 
 		public SpawnPrefabOptions spawnPrefabOptions;
@@ -18,26 +21,26 @@
 		public List<string> _prefabLocations;
 
 		public List<string> _explicitlyBlockedFeatureIds;
-
 	}
 
-	/*
-	[System.Serializable]
-	public class FeatureBundleList
-	{
-		public List<FeatureBundle> features = new List<FeatureBundle>();
-	}
-	*/
 	/// <summary>
 	/// ReplaceFeatureCollectionModifier aggregates multiple ReplaceFeatureModifier objects into one modifier.
 	/// </summary>
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Replace Feature Collection Modifier")]
 	public class ReplaceFeatureCollectionModifier : GameObjectModifier, IReplacementCriteria
 	{
-		//public FeatureBundleList featureBundleList;
 		public List<FeatureBundle> features = new List<FeatureBundle>();
 
 		private List<ReplaceFeatureModifier> _replaceFeatureModifiers;
+
+		//Set the Name parameter to be either the prefab name or Feature; helps make the UI look slightly better...
+		private void OnValidate()
+		{
+			foreach(FeatureBundle feature in features)
+			{
+				feature.Name = (feature.spawnPrefabOptions.prefab != null) ? feature.spawnPrefabOptions.prefab.name : "Feature";
+			}
+		}
 
 		public override void Initialize()
 		{
