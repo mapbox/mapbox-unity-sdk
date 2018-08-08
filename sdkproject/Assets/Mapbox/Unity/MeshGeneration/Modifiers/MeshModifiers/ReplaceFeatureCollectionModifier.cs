@@ -16,9 +16,9 @@
 		public bool scaleDownWithWorld = true;
 
 		[Geocode]
-		public List<string> _prefabLocations;
+		public List<string> _prefabLocations = new List<string>();
 
-		public List<string> _explicitlyBlockedFeatureIds;
+		public List<string> _explicitlyBlockedFeatureIds = new List<string>();
 
 	}
 
@@ -35,7 +35,7 @@
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Replace Feature Collection Modifier")]
 	public class ReplaceFeatureCollectionModifier : GameObjectModifier, IReplacementCriteria
 	{
-		public FeatureBundleList featureBundleList;
+		//public FeatureBundleList featureBundleList;
 
 		public List<FeatureBundle> features = new List<FeatureBundle>();
 
