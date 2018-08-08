@@ -16,6 +16,7 @@
 		public bool active;
 
 		public SpawnPrefabOptions spawnPrefabOptions;
+		public bool alwaysSpawnPrefab;
 
 		[Geocode]
 		public List<string> _prefabLocations;
@@ -52,6 +53,7 @@
 
 				replaceFeatureModifier.Active = feature.active;
 				replaceFeatureModifier.SpawnPrefabOptions = feature.spawnPrefabOptions;
+				replaceFeatureModifier.alwaysSpawnPrefab = feature.alwaysSpawnPrefab;
 				replaceFeatureModifier.PrefabLocations = new List<string>(feature._prefabLocations);
 				replaceFeatureModifier.BlockedIds = new List<string>(feature._explicitlyBlockedFeatureIds);
 				replaceFeatureModifier.Initialize();

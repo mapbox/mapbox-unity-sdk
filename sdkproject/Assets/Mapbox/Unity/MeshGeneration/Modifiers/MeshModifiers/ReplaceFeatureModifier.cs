@@ -25,6 +25,7 @@
 		private GameObject _poolGameObject;
 		[SerializeField]
 		private SpawnPrefabOptions _options;
+		public bool alwaysSpawnPrefab;
 		private List<GameObject> _prefabList = new List<GameObject>();
 
 		[SerializeField]
@@ -83,7 +84,7 @@
 				_objects = new Dictionary<ulong, GameObject>();
 				_poolGameObject = new GameObject("_inactive_prefabs_pool");
 			}
-			_latLonToSpawn = new List<string>(_prefabLocations);
+			//_latLonToSpawn = new List<string>(_prefabLocations);
 		}
 
 		public override void SetProperties(ModifierProperties properties)
@@ -104,6 +105,7 @@
 					{
 						_featureId[index] = (_featureId[index] == null) ? new List<string>() : _featureId[index];
 						_tempFeatureId = feature.Data.Id.ToString();
+						//need to check if len is greater than 3 before stripping string
 						_featureId[index].Add(_tempFeatureId.Substring(0, _tempFeatureId.Length - 3));
 					}
 				}
@@ -263,8 +265,10 @@
 					return true;
 				}
 			}
-
-			return false;
+			return alwaysSpawnPrefab;
+			//if some bool is true, return the bool value
+			//bool is 'always spawn regardless of replace features'
+			//return false;
 		}
 		public override void OnPoolItem(VectorEntity vectorEntity)
 		{
