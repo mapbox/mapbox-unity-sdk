@@ -12,7 +12,8 @@
 	{
 		public bool active;
 
-		public SpawnPrefabOptions spawnPrefabOptions;
+		public GameObject prefab;
+		public bool scaleDownWithWorld = true;
 
 		[Geocode]
 		public List<string> _prefabLocations;
@@ -21,20 +22,21 @@
 
 	}
 
-	/*
+
 	[System.Serializable]
 	public class FeatureBundleList
 	{
 		public List<FeatureBundle> features = new List<FeatureBundle>();
 	}
-	*/
+
 	/// <summary>
 	/// ReplaceFeatureCollectionModifier aggregates multiple ReplaceFeatureModifier objects into one modifier.
 	/// </summary>
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Replace Feature Collection Modifier")]
 	public class ReplaceFeatureCollectionModifier : GameObjectModifier, IReplacementCriteria
 	{
-		//public FeatureBundleList featureBundleList;
+		public FeatureBundleList featureBundleList;
+
 		public List<FeatureBundle> features = new List<FeatureBundle>();
 
 		private List<ReplaceFeatureModifier> _replaceFeatureModifiers;
@@ -48,7 +50,11 @@
 				ReplaceFeatureModifier replaceFeatureModifier = ScriptableObject.CreateInstance<ReplaceFeatureModifier>();
 
 				replaceFeatureModifier.Active = feature.active;
-				replaceFeatureModifier.SpawnPrefabOptions = feature.spawnPrefabOptions;
+				replaceFeatureModifier.SpawnPrefabOptions = new SpawnPrefabOptions()
+				{
+					prefab = feature.prefab,
+					scaleDownWithWorld = feature.scaleDownWithWorld
+				};
 				replaceFeatureModifier.PrefabLocations = new List<string>(feature._prefabLocations);
 				replaceFeatureModifier.BlockedIds = new List<string>(feature._explicitlyBlockedFeatureIds);
 				replaceFeatureModifier.Initialize();
