@@ -195,21 +195,26 @@
 			_defaultStack.GoModifiers.AddRange(_layerProperties.GoModifiers);
 
 			//Adding filters from the types dropdown
-			if((properties.coreOptions.layerName == properties.roadLayer || properties.coreOptions.layerName == properties.landuseLayer) && !string.IsNullOrEmpty(properties.selectedTypes))
-			{
-				LayerFilter filter = new LayerFilter(LayerFilterOperationType.Contains);
-				if (properties.coreOptions.layerName == properties.roadLayer)
-				{
-					filter.Key = properties.roadLayer_TypeProperty;
-					filter.PropertyValue = properties.selectedTypes;
-				}
-				else if (properties.coreOptions.layerName == "landuse")
-				{
-					filter.Key = properties.landuseLayer_TypeProperty;
-					filter.PropertyValue = properties.selectedTypes;
-				}
-				properties.filterOptions.filters.Add(filter);
-			}
+
+			//if ((MapboxSpecialLayerParameters.LayerNameTypeProperty.ContainsKey(properties.coreOptions.layerName)) && !string.IsNullOrEmpty(properties.selectedTypes))
+			//{
+			//	LayerFilter filter = new LayerFilter(LayerFilterOperationType.Contains);
+
+			//	filter.Key = MapboxSpecialLayerParameters.LayerNameTypeProperty[properties.coreOptions.layerName];
+			//	filter.PropertyValue = properties.selectedTypes;
+
+			//	//if (properties.coreOptions.layerName == properties.roadLayer)
+			//	//{
+			//	//	filter.Key = properties.roadLayer_TypeProperty;
+			//	//	filter.PropertyValue = properties.selectedTypes;
+			//	//}
+			//	//else if (properties.coreOptions.layerName == "landuse")
+			//	//{
+			//	//	filter.Key = properties.landuseLayer_TypeProperty;
+			//	//	filter.PropertyValue = properties.selectedTypes;
+			//	//}
+			//	properties.filterOptions.filters.Add(filter);
+			//}
 		}
 
 		/// <summary>

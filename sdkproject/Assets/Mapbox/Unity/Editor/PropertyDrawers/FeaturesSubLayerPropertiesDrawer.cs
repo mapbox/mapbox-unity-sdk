@@ -74,7 +74,7 @@
 		}
 
 		ModelingSectionDrawer _modelingSectionDrawer = new ModelingSectionDrawer();
-		GameplaySectionDrawer _gameplaySectionDrawer = new GameplaySectionDrawer();
+		BehaviorModifiersSectionDrawer _behaviorModifierSectionDrawer = new BehaviorModifiersSectionDrawer();
 
 		private static TileStats _streetsV7TileStats;
 		private static string[] subTypeValues;
@@ -169,7 +169,7 @@
 				var subLayerArray = property.FindPropertyRelative("vectorSubLayers");
 
 				var layersRect = EditorGUILayout.GetControlRect(GUILayout.MinHeight(Mathf.Max(subLayerArray.arraySize + 1, 1) * _lineHeight + MultiColumnHeader.DefaultGUI.defaultHeight),
-				                                                GUILayout.MaxHeight((subLayerArray.arraySize + 1) * _lineHeight + MultiColumnHeader.DefaultGUI.defaultHeight));
+																GUILayout.MaxHeight((subLayerArray.arraySize + 1) * _lineHeight + MultiColumnHeader.DefaultGUI.defaultHeight));
 
 				if (!m_Initialized)
 				{
@@ -198,12 +198,11 @@
 					{
 						layerTreeView = new FeatureSubLayerTreeView(m_TreeViewState, multiColumnHeader, treeModel);
 					}
-
 					layerTreeView.multiColumnHeader = multiColumnHeader;
-					layerTreeView.Reload();
 					m_Initialized = true;
 				}
 				layerTreeView.Layers = subLayerArray;
+				layerTreeView.Reload();
 				layerTreeView.OnGUI(layersRect);
 
 				selectedLayers = layerTreeView.GetSelection();
@@ -235,13 +234,13 @@
 				var presetTypes = property.FindPropertyRelative("presetFeatureTypes");
 				var names = Enum.GetNames(typeof(PresetFeatureType));
 				GenericMenu menu = new GenericMenu();
-				foreach(var name in names)
+				foreach (var name in names)
 				{
 					menu.AddItem(new GUIContent() { text = name }, false, FetchPresetProperties, name);
 				}
 				GUILayout.Space(0); // do not remove this line; it is needed for the next line to work
 				Rect rect = GUILayoutUtility.GetLastRect();
-				rect.y += 2*_lineHeight/3;
+				rect.y += 2 * _lineHeight / 3;
 
 				if (EditorGUILayout.DropdownButton(new GUIContent { text = "Add Feature" }, FocusType.Passive, (GUIStyle)"minibuttonleft"))
 				{
@@ -249,7 +248,7 @@
 				}
 
 				//Assign subLayerProperties after fetching it from the presets class. This happens everytime an element is added
-				if(subLayerProperties!=null)
+				if (subLayerProperties != null)
 				{
 					subLayerArray.arraySize++;
 					var subLayer = subLayerArray.GetArrayElementAtIndex(subLayerArray.arraySize - 1);
@@ -269,11 +268,11 @@
 				{
 					foreach (var index in selectedLayers.OrderByDescending(i => i))
 					{
-						subLayerArray.DeleteArrayElementAtIndex(index - FeatureSubLayerTreeView.uniqueId);
 						if (layerTreeView != null)
 						{
 							layerTreeView.RemoveItemFromTree(index);
-							layerTreeView.Reload();
+							subLayerArray.DeleteArrayElementAtIndex(index - FeatureSubLayerTreeView.uniqueId);
+							layerTreeView.treeModel.SetData(GetData(subLayerArray));
 						}
 					}
 
@@ -304,8 +303,15 @@
 					{
 						GUI.enabled = false;
 					}
-
-					DrawLayerVisualizerProperties(sourceTypeValue, layerProperty, property);
+					//var primitiveType = (VectorPrimitiveType)subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex;
+					//if ((primitiveType == VectorPrimitiveType.Point) && (sourceTypeValue == VectorSourceType.MapboxStreets || sourceTypeValue == VectorSourceType.MapboxStreetsWithBuildingIds))
+					//{
+					//	prefabUI.OnGUI(layerProperty);
+					//}
+					//else
+					{
+						DrawLayerVisualizerProperties(sourceTypeValue, layerProperty, property);
+					}
 					if (!isLayerActive)
 					{
 						GUI.enabled = true;
@@ -334,6 +340,7 @@
 				type = ((PresetFeatureType)subLayer.FindPropertyRelative("presetFeatureType").enumValueIndex).ToString();
 				FeatureTreeElement element = new FeatureTreeElement(name, 0, id);
 				element.Name = name;
+				element.name = name;
 				element.Type = type;
 				elements.Add(element);
 			}
@@ -454,35 +461,35 @@
 			//*********************** LAYER NAME ENDS ***********************************//
 
 			//*********************** TYPE DROPDOWN BEGINS ***********************************//
-			if (_streetsV7TileStats == null || subTypeValues == null)
-			{
-				subTypeValues = GetSubTypeValues(layerProperty, visualizerLayer, sourceType);
-			}
+			//if (_streetsV7TileStats == null || subTypeValues == null)
+			//{
+			//	subTypeValues = GetSubTypeValues(layerProperty, visualizerLayer, sourceType);
+			//}
 
-			if ((layerName.stringValue == roadLayerName.stringValue || layerName.stringValue == landuseLayerName.stringValue) && subTypeValues!=null)
-			{
-				maskValue.intValue = EditorGUILayout.MaskField("Type",maskValue.intValue, subTypeValues);
-				string selectedOptions = string.Empty;
-				for (int i = 0; i < subTypeValues.Length; i++)
-				{
-					if ((maskValue.intValue & (1 << i)) == (1 << i))
-					{
-						if (string.IsNullOrEmpty(selectedOptions))
-						{
-							selectedOptions = subTypeValues[i];
-							continue;
-						}
-						selectedOptions += "," + subTypeValues[i];
-					}
-				}
-				selectedTypes.stringValue = selectedOptions;
-			}
+			//if ((layerName.stringValue == roadLayerName.stringValue || layerName.stringValue == landuseLayerName.stringValue) && subTypeValues!=null)
+			//{
+			//	maskValue.intValue = EditorGUILayout.MaskField("Type",maskValue.intValue, subTypeValues);
+			//	string selectedOptions = string.Empty;
+			//	for (int i = 0; i < subTypeValues.Length; i++)
+			//	{
+			//		if ((maskValue.intValue & (1 << i)) == (1 << i))
+			//		{
+			//			if (string.IsNullOrEmpty(selectedOptions))
+			//			{
+			//				selectedOptions = subTypeValues[i];
+			//				continue;
+			//			}
+			//			selectedOptions += "," + subTypeValues[i];
+			//		}
+			//	}
+			//	selectedTypes.stringValue = selectedOptions;
+			//}
 			//*********************** TYPE DROPDOWN ENDS ***********************************//
 
 			EditorGUI.indentLevel++;
 
 			//*********************** FILTERS SECTION BEGINS ***********************************//
- 			var filterOptions = layerProperty.FindPropertyRelative("filterOptions");
+			var filterOptions = layerProperty.FindPropertyRelative("filterOptions");
 			filterOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
 			GUILayout.Space(-_lineHeight);
 			EditorGUILayout.PropertyField(filterOptions, new GUIContent("Filters"));
@@ -491,7 +498,7 @@
 
 
 			//*********************** MODELING SECTION BEGINS ***********************************//
-			_modelingSectionDrawer.DrawUI(subLayerCoreOptions, layerProperty, primitiveTypeProp, sourceType);
+			_modelingSectionDrawer.DrawUI(subLayerCoreOptions, layerProperty, primitiveTypeProp);
 			//*********************** MODELING SECTION ENDS ***********************************//
 
 
@@ -507,7 +514,7 @@
 
 
 			//*********************** GAMEPLAY SECTION BEGINS ***********************************//
-			_gameplaySectionDrawer.DrawUI(layerProperty,primitiveTypeProp);
+			_behaviorModifierSectionDrawer.DrawUI(layerProperty, primitiveTypeProp, sourceType);
 			//*********************** GAMEPLAY SECTION ENDS ***********************************//
 
 			EditorGUI.indentLevel--;
@@ -634,7 +641,7 @@
 
 						if (layer.attributes != null && layer.attributes.Length > 0)
 						{
-							foreach(var attributeItem in layer.attributes)
+							foreach (var attributeItem in layer.attributes)
 							{
 								if (attributeItem.attribute == presetPropertyName)
 								{
