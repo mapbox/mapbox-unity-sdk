@@ -11,5 +11,6 @@
 		public MapScalingOptions scalingOptions = new MapScalingOptions();
 		[Tooltip("Texture used while tiles are loading.")]
 		public Texture2D loadingTexture = null;
+		public Material tileMaterial = null;
 	}
 }

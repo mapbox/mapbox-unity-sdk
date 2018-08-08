@@ -430,6 +430,11 @@ namespace Mapbox.Unity.Map
 				_mapVisualizer.SetLoadingTexture(Options.loadingTexture);
 			}
 
+			if (Options.tileMaterial != null)
+			{
+				_mapVisualizer.SetTileMaterial(Options.tileMaterial);
+			}
+
 			_mapVisualizer.Factories = new List<AbstractTileFactory>();
 			if (_terrain.IsLayerActive)
 			{
