@@ -11,12 +11,14 @@
 		public SerializedProperty Layers;
 		private float kToggleWidth = 18f;
 		public static int uniqueId = 3000;
+		public int maxElementsAdded = 0;
 		const float kRowHeights = 15f;
 		const float nameOffset = 15f;
-		private GUIStyle columnStyle = new GUIStyle() 
+		MultiColumnHeaderState m_MultiColumnHeaderState;
+		private GUIStyle columnStyle = new GUIStyle()
 		{
-			alignment = TextAnchor.MiddleCenter, 
-			normal = new GUIStyleState(){textColor = Color.white} 
+			alignment = TextAnchor.MiddleCenter,
+			normal = new GUIStyleState() { textColor = Color.white }
 		};
 
 		public FeatureSubLayerTreeView(TreeViewState state, MultiColumnHeader multicolumnHeader, TreeModel<FeatureTreeElement> model) : base(state, multicolumnHeader, model)
@@ -28,30 +30,6 @@
 			customFoldoutYOffset = (kRowHeights - EditorGUIUtility.singleLineHeight) * 0.5f; // center foldout in the row since we also center content. See RowGUI
 			extraSpaceBeforeIconAndLabel = kToggleWidth;
 			Reload();
-		}
-
-		protected override TreeViewItem BuildRoot()
-		{
-			// The root item is required to have a depth of -1, and the rest of the items increment from that.
-			var root = new TreeViewItem { id = -1, depth = -1, displayName = "Root" };
-
-			var items = new List<TreeViewItem>();
-			var index = 0;
-
-			if (Layers != null)
-			{
-				for (int i = 0; i < Layers.arraySize; i++)
-				{
-					var name = Layers.GetArrayElementAtIndex(i).FindPropertyRelative("coreOptions.sublayerName").stringValue;
-					items.Add(new TreeViewItem { id = index + uniqueId, depth = 1, displayName = name });
-					index++;
-				}
-			}
-
-			// Utility method that initializes the TreeViewItem.children and .parent for all items.
-			SetupParentsAndChildrenFromDepths(root, items);
-			// Return root of the tree
-			return root;
 		}
 
 		protected override bool CanRename(TreeViewItem item)
@@ -97,7 +75,7 @@
 			var name = subLayer.FindPropertyRelative("coreOptions.sublayerName").stringValue;
 			var id = Layers.arraySize - 1 + uniqueId;
 
-			if(treeModel.Find(Layers.arraySize - 1 + uniqueId)!=null)
+			if (treeModel.Find(id) != null)
 			{
 				Debug.Log(" found one. exiting");
 				return;
@@ -107,12 +85,12 @@
 			FeatureTreeElement element = new FeatureTreeElement(name, 0, id);
 			element.Name = name;
 			element.Type = type;
-			treeModel.AddElement(element, treeModel.root, treeModel.numberOfDataElements-1);
+			treeModel.AddElement(element, treeModel.root, treeModel.numberOfDataElements - 1);
 		}
 
-		protected override void RowGUI(RowGUIArgs args)		
+		protected override void RowGUI(RowGUIArgs args)
 		{
-			var rowItem = (TreeViewItem <FeatureTreeElement>)args.item;
+			var rowItem = (TreeViewItem<FeatureTreeElement>)args.item;
 			for (int i = 0; i < args.GetNumVisibleColumns(); ++i)
 			{
 				CellGUI(args.GetCellRect(i), rowItem, (FeatureSubLayerColumns)args.GetColumn(i), ref args);

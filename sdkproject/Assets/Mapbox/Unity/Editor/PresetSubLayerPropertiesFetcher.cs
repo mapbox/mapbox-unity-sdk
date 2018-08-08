@@ -44,7 +44,7 @@
 			List<GameObjectModifier> gameObjectModifiers = new List<GameObjectModifier>();
 			ColliderType colliderType = ColliderType.None;
 
-			switch(type)
+			switch (type)
 			{
 				case PresetFeatureType.Buildings:
 					layerName = "building";
@@ -58,7 +58,11 @@
 					layerName = "road";
 					geometryType = VectorPrimitiveType.Line;
 					lineWidth = 1.0f;
-					style = StyleTypes.Simple;
+					style = StyleTypes.Custom;
+					break;
+				case PresetFeatureType.PointsOfInterest:
+					layerName = "poi_label";
+					geometryType = VectorPrimitiveType.Point;
 					break;
 				case PresetFeatureType.Landuse:
 					layerName = "landuse";
@@ -94,7 +98,7 @@
 			};
 
 			_properties.filterOptions = new VectorFilterOptions
-			{ 
+			{
 				combinerType = combinerType,
 				filters = filters
 			};
@@ -122,7 +126,7 @@
 		/// <param name="layerName">Layer name.</param>
 		public static PresetFeatureType GetPresetTypeFromLayerName(string layerName)
 		{
-			switch(layerName)
+			switch (layerName)
 			{
 				case "building":
 					return PresetFeatureType.Buildings;
@@ -130,6 +134,8 @@
 					return PresetFeatureType.Roads;
 				case "landuse":
 					return PresetFeatureType.Landuse;
+				case "poi_label":
+					return PresetFeatureType.PointsOfInterest;
 				default:
 					return PresetFeatureType.Custom;
 			}

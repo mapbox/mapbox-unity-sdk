@@ -38,14 +38,15 @@
 		public List<GameObjectModifier> GoModifiers;
 		public PresetFeatureType presetFeatureType = PresetFeatureType.Custom;
 
-		public string roadLayer = "road";
-		public string landuseLayer = "landuse";
-		public string roadLayer_TypeProperty = "class";
-		public string landuseLayer_TypeProperty = "class";
+		//public string roadLayer = "road";
+		//public string landuseLayer = "landuse";
+		//public string roadLayer_TypeProperty = "class";
+		//public string landuseLayer_TypeProperty = "class";
 
 		[SerializeField]
 		private int _maskValue;
 
 		public string selectedTypes;
 	}
+
 }

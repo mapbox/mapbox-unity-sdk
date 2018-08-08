@@ -238,6 +238,7 @@
 	{
 		Buildings,
 		Roads,
+		PointsOfInterest,
 		Landuse,
 		Custom
 	}

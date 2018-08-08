@@ -8,7 +8,7 @@
 
 	public class TileStatsFetcher
 	{
-		private static TileStatsFetcher  _instance;
+		private static TileStatsFetcher _instance;
 		private string _filePath = "Assets/Mapbox/Unity/DataContainers/streets-v7-stats.json";
 		public static TileStatsFetcher Instance
 		{
@@ -32,6 +32,7 @@
 			switch (sourceType)
 			{
 				case VectorSourceType.MapboxStreets:
+				case VectorSourceType.MapboxStreetsWithBuildingIds:
 					StreamReader reader = new StreamReader(_filePath);
 					stats = JsonConvert.DeserializeObject<TileStats>(reader.ReadToEnd());
 					reader.Close();
