@@ -13,7 +13,7 @@ namespace Mapbox.Map
 	/// Data type to store  <see href="https://en.wikipedia.org/wiki/Web_Mercator"> Web Mercator</see> tile scheme.
 	/// <see href="http://www.maptiler.org/google-maps-coordinates-tile-bounds-projection/"> See tile IDs in action. </see>
 	/// </summary>
-	public struct CanonicalTileId
+	public struct CanonicalTileId : IEquatable<CanonicalTileId>
 	{
 		/// <summary> The zoom level. </summary>
 		public readonly int Z;
@@ -78,5 +78,40 @@ namespace Mapbox.Map
 		{
 			return this.Z + "/" + this.X + "/" + this.Y;
 		}
+
+		#region Equality 
+		public bool Equals(CanonicalTileId other)
+		{
+			return this.X == other.X && this.Y == other.Y && this.Z == other.Z;
+		}
+		
+		public override int GetHashCode()
+		{
+			return X ^ Y ^ Z;
+		}
+
+		public static bool operator ==(CanonicalTileId a, CanonicalTileId b)
+		{
+			return a.X == b.X && a.Y == b.Y && a.Z == b.Z;
+		}
+
+		public static bool operator !=(CanonicalTileId a, CanonicalTileId b)
+		{
+			return !(a == b);
+		}
+
+		public override bool Equals(object obj)
+		{
+			if (obj is CanonicalTileId)
+			{
+				return this.Equals((CanonicalTileId)obj);
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		#endregion
 	}
 }

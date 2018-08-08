@@ -1,6 +1,8 @@
 ﻿using Mapbox.Map;
 using Mapbox.Unity.MeshGeneration.Data;
 using System;
+using System.Collections.Generic;
+
 public class ImageDataFetcher : DataFetcher
 {
 	public Action<UnityTile, RasterTile> DataRecieved = (t, s) => { };
@@ -26,6 +28,12 @@ public class ImageDataFetcher : DataFetcher
 
 		rasterTile.Initialize(_fileSource, tile.CanonicalTileId, mapid, () =>
 		{
+			if (tile.CanonicalTileId != rasterTile.Id)
+			{
+				//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
+				return;
+			}
+
 			if (rasterTile.HasError)
 			{
 				FetchingError(tile, new TileErrorEventArgs(tile.CanonicalTileId, rasterTile.GetType(), tile, rasterTile.Exceptions));

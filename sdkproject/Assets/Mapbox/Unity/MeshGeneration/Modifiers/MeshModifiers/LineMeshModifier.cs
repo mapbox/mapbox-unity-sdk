@@ -77,8 +77,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						newNorms[roadSegmentCount * 2 - 1] = Constants.Math.Vector3Up;
 						uvList[0] = new Vector2(0, 0);
 						uvList[roadSegmentCount * 2 - 1] = new Vector2(1, 0);
-						newTangents[0] = p3 - p2;
+						newTangents[0] = new Vector4(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z, 1).normalized;
+						newTangents[roadSegmentCount * 2 - 1] = newTangents[0];
 					}
+
 					var dist = Vector3.Distance(p1, p2);
 					lastUv += dist;
 					norm = GetNormal(p1, p2, p3) * _scaledWidth;
@@ -90,7 +92,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					uvList[i] = new Vector2(0, lastUv);
 					uvList[2 * roadSegmentCount - 1 - i] = new Vector2(1, lastUv);
 
-					newTangents[i] = p2 - p1;
+					newTangents[i] = new Vector4(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z, 1).normalized;
+					newTangents[2 * roadSegmentCount - 1 - i] = newTangents[i];
 				}
 
 				md.Vertices.AddRange(newVerticeList);

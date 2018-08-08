@@ -32,6 +32,10 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				if (_meshRenderer == null)
 				{
 					_meshRenderer = GetComponent<MeshRenderer>();
+					if (_meshRenderer == null)
+					{
+						_meshRenderer = gameObject.AddComponent<MeshRenderer>();
+					}
 				}
 				return _meshRenderer;
 			}
@@ -45,6 +49,10 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				if (_meshFilter == null)
 				{
 					_meshFilter = GetComponent<MeshFilter>();
+					if (_meshFilter == null)
+					{
+						_meshFilter = gameObject.AddComponent<MeshFilter>();
+					}
 				}
 				return _meshFilter;
 			}
@@ -158,7 +166,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			_tiles.Clear();
 		}
 
-		internal void SetHeightData(byte[] data, float heightMultiplier = 1f, bool useRelative = false)
+		internal void SetHeightData(byte[] data, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = true)
 		{
 			// HACK: compute height values for terrain. We could probably do this without a texture2d.
 			if (_heightTexture == null)
@@ -189,8 +197,18 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				}
 			}
 
+			if(addCollider && gameObject.GetComponent<MeshCollider>() == null)
+			{
+				gameObject.AddComponent<MeshCollider>();
+			}
+
 			HeightDataState = TilePropertyState.Loaded;
 			OnHeightDataChanged(this);
+
+			if (_rasterData != null)
+			{
+				_meshRenderer.material.mainTexture = _rasterData;
+			}
 		}
 
 		public float QueryHeightData(float x, float y)
@@ -212,10 +230,10 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void SetRasterData(byte[] data, bool useMipMap, bool useCompression)
 		{
-			if (MeshRenderer == null || MeshRenderer.material == null)
-			{
-				return;
-			}
+			//if (MeshRenderer == null || MeshRenderer.material == null)
+			//{
+			//	return;
+			//}
 			// Don't leak the texture, just reuse it.
 			if (_rasterData == null)
 			{

@@ -6,6 +6,66 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/MapboxAR-HoloLens/Scenes/HoloLens-02.unity
-    guid: a70b961afdf004c47a9e9969796aaf0c
+    path: Assets/MapboxDevTools/Main.unity
+    guid: 7d19bea03415b4df195d9fe422b3b5cf
+  - enabled: 1
+    path: Assets/Mapbox/Examples/0_PrefabScenes/CitySimulator.unity
+    guid: e9aaa5d7902ec4a07bb4b1f2923cafc8
+  - enabled: 1
+    path: Assets/Mapbox/Examples/0_PrefabScenes/Location-basedGame.unity
+    guid: 42f6aa7ce7a604f16ade319663f46ceb
+  - enabled: 1
+    path: Assets/Mapbox/Examples/1_DataExplorer/DataExplorer.unity
+    guid: 028ca2c46390a4409bcf0fae61aef3b3
+  - enabled: 1
+    path: Assets/Mapbox/Examples/1_DataExplorer/InteractiveStyledVectorMap.unity
+    guid: 52800afdfcee54908a3d4a475f2662bd
+  - enabled: 1
+    path: Assets/Mapbox/Examples/1_DataExplorer/TrafficAndDirections.unity
+    guid: 4e6c827a7836ae446b19d2f18a3a1351
+  - enabled: 1
+    path: Assets/Mapbox/Examples/2_AstronautGame/AstronautGame.unity
+    guid: 23b3522d4f6fa450eb781397db4b26ed
+  - enabled: 1
+    path: Assets/Mapbox/Examples/3_POIPlacement/POIPlacement.unity
+    guid: c600a8b272a5846a1b71bdc2d0796637
+  - enabled: 1
+    path: Assets/Mapbox/Examples/4_ReplaceFeatures/ReplaceFeatures.unity
+    guid: 54d1b7ee40bee49559dd74210c7d5a57
+  - enabled: 1
+    path: Assets/Mapbox/Examples/5_Playground/Scenes/Directions.unity
+    guid: b650aa71f57a846dc83ef01c3c1755ad
+  - enabled: 1
+    path: Assets/Mapbox/Examples/5_Playground/Scenes/ForwardGeocoder.unity
+    guid: 9683d5465276540cd9a4c9e89d931293
+  - enabled: 1
+    path: Assets/Mapbox/Examples/5_Playground/Scenes/LocationProvider.unity
+    guid: 12e74a80942ad194fb4ddd66ed099b5b
+  - enabled: 1
+    path: Assets/Mapbox/Examples/5_Playground/Scenes/RasterTile.unity
+    guid: 893d0b4deb5544335b798dafd12ff9a7
+  - enabled: 1
+    path: Assets/Mapbox/Examples/5_Playground/Scenes/ReverseGeocoder.unity
+    guid: 9a904a5fcec05469db76712a52999b39
+  - enabled: 1
+    path: Assets/Mapbox/Examples/5_Playground/Scenes/VectorTile.unity
+    guid: 416b524fd28da493a9b8e35443dbd25b
+  - enabled: 1
+    path: Assets/Mapbox/Examples/6_ZoomableMap/ZoomableMap.unity
+    guid: 2c7147d54825142878b256c67aae5704
+  - enabled: 1
+    path: Assets/Mapbox/Examples/7_Globe/Globe.unity
+    guid: 614e3e19125ae46c7af990b7e3debd36
+  - enabled: 1
+    path: Assets/Mapbox/Examples/8_VoxelMap/VoxelMap.unity
+    guid: daabe3028a2c14661b829fff509af827
+  - enabled: 1
+    path: Assets/MapboxAR/Examples/Scenes/TabletopAR.unity
+    guid: a455922b0e2954431922c9fb6c5377e4
+  - enabled: 1
+    path: Assets/MapboxAR/Examples/Scenes/WorldScaleAR-ManualAlignment.unity
+    guid: d9ff170f22f0545c3970a889a592f312
+  - enabled: 1
+    path: Assets/MapboxAR/Examples/Scenes/WorldScaleAR.unity
+    guid: c60dfd6bb74264e44b3dbf93e9d129c4
   m_configObjects: {}

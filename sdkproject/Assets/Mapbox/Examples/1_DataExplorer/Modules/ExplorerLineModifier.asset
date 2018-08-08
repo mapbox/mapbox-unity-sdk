@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Name: ExplorerLineModifier
   m_EditorClassIdentifier: 
   Active: 1
-  Width: 3
+  Width: 0

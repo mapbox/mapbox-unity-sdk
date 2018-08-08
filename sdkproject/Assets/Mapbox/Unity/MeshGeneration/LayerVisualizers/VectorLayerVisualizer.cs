@@ -11,6 +11,7 @@
 	using Mapbox.Unity.Map;
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Unity.MeshGeneration.Filters;
+	using Mapbox.Map;
 
 	public class VectorLayerVisualizerProperties
 	{
@@ -307,10 +308,10 @@
 		{
 			if (!_activeCoroutines.ContainsKey(tile))
 				_activeCoroutines.Add(tile, new List<int>());
-			_activeCoroutines[tile].Add(Runnable.Run(ProcessLayer(layer, tile, callback)));
+			_activeCoroutines[tile].Add(Runnable.Run(ProcessLayer(layer, tile, tile.UnwrappedTileId, callback)));
 		}
 
-		protected IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, Action callback = null)
+		protected IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, UnwrappedTileId tileId, Action callback = null)
 		{
 			//HACK to prevent request finishing on same frame which breaks modules started/finished events
 			yield return null;
@@ -362,6 +363,11 @@
 			{
 				for (int i = 0; i < featureCount; i++)
 				{
+					//checking if tile is recycled and changed
+					if(tile.UnwrappedTileId != tileId)
+					{
+						yield break;
+					}
 
 					ProcessFeature(i, tile, tempLayerProperties);
 

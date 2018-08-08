@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Name: PrefabList
   m_EditorClassIdentifier: 
   SceneList:
-  - {fileID: 114700025974298426}
+  - {fileID: 114897919769560758}
   - {fileID: 114727026839306020}
   - {fileID: 114308819730444958}
   - {fileID: 114247311498626294}
@@ -72,9 +72,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
   m_Name: LocationBasedGame
   m_EditorClassIdentifier: 
-  Name: Location Based Game
-  ScenePath: Assets/Mapbox/Examples/0_PrefabScenes/LocationBasedGame.unity
-  Image: {fileID: 2800000, guid: 5b405ed49599a452bb91b1492ee0a328, type: 3}
+  Name: Location-based Game
+  ScenePath: Assets/Mapbox/Examples/0_PrefabScenes/Location-basedGame.unity
+  Image: {fileID: 2800000, guid: b9da555a2df00402d86244517dae835a, type: 3}
   Text: {fileID: 0}
 --- !u!114 &114727026839306020
 MonoBehaviour:
@@ -90,4 +90,19 @@ MonoBehaviour:
   Name: City Simulator
   ScenePath: Assets/Mapbox/Examples/0_PrefabScenes/CitySimulator.unity
   Image: {fileID: 2800000, guid: 53e90d032a2624ab1801469b8ce804e4, type: 3}
+  Text: {fileID: 0}
+--- !u!114 &114897919769560758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5d9ef4c9a5f1410ea3cf247b3917654, type: 3}
+  m_Name: Location-basedGame
+  m_EditorClassIdentifier: 
+  Name: Location-based Game
+  ScenePath: Assets/Mapbox/Examples/0_PrefabScenes/Location-basedGame.unity
+  Image: {fileID: 2800000, guid: b9da555a2df00402d86244517dae835a, type: 3}
   Text: {fileID: 0}

@@ -118,11 +118,12 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						md.Vertices.Add(vl[ind + _sliceCount]);
 						md.Vertices.Add(vl[ind + _sliceCount + 1]);
 
-						h = (vl[ind + 1] - vl[ind]).magnitude;
+						//h = (vl[ind + 1] - vl[ind]).magnitude;
+						h = (float)j / _sliceCount;
 
-						md.UV[0].Add(new Vector2(uvDist, 0));
+						md.UV[0].Add(new Vector2(uvDist, ((float)j - 1) / _sliceCount));
 						md.UV[0].Add(new Vector2(uvDist, h));
-						md.UV[0].Add(new Vector2(uvDist + edMag, 0));
+						md.UV[0].Add(new Vector2(uvDist + edMag, ((float)j - 1) / _sliceCount));
 						md.UV[0].Add(new Vector2(uvDist + edMag, h));
 
 						md.Tangents.Add(new Vector4(ed.normalized.x, ed.normalized.y, ed.normalized.z, 1));
