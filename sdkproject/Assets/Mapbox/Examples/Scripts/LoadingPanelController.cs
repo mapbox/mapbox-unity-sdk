@@ -42,7 +42,7 @@ namespace Mapbox.Examples
 
 					// Uncommment me if you want the loading screen to show again
 					// when loading new tiles.
-					_content.SetActive(true);
+					//_content.SetActive(true);
 				}
 			};
 		}

@@ -13,7 +13,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 	public class UnityTile : MonoBehaviour
 	{
 		[SerializeField]
-		public Texture2D RasterData { get; private set; }
+		private Texture2D _rasterData;
 		public VectorTile VectorData { get; private set; }
 		private Texture2D _heightTexture;
 		private float[] _heightData;
@@ -96,10 +96,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				if (_rasterDataState != value)
 				{
 					_rasterDataState = value;
-					if (_rasterDataState != TilePropertyState.None)
-					{
-						OnRasterDataChanged(this);
-					}
+					OnRasterDataChanged(this);
 				}
 			}
 		}
@@ -116,10 +113,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				if (_heightDataState != value)
 				{
 					_heightDataState = value;
-					if (_heightDataState != TilePropertyState.None)
-					{
-						OnHeightDataChanged(this);
-					}
+					OnHeightDataChanged(this);
 				}
 			}
 		}
@@ -136,10 +130,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				if (_vectorDataState != value)
 				{
 					_vectorDataState = value;
-					if (_vectorDataState != TilePropertyState.None)
-					{
-						OnVectorDataChanged(this);
-					}
+					OnVectorDataChanged(this);
 				}
 			}
 		}
@@ -174,6 +165,14 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 			IsRecycled = false;
 			MeshRenderer.enabled = true;
+
+
+			// Setup Loading as initial state. 
+			// When tile registers with factories, it will set the appropriate state.
+			// None, if Factory source is None, Loading otherwise. 
+			RasterDataState = TilePropertyState.Loading;
+			HeightDataState = TilePropertyState.Loading;
+			VectorDataState = TilePropertyState.Loading;
 		}
 
 		internal void Recycle()
@@ -181,8 +180,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			if (_loadingTexture && MeshRenderer != null)
 			{
 				MeshRenderer.material.mainTexture = _loadingTexture;
-				if (_rasterData != null)
-					_rasterData.LoadImage(null);
 				MeshRenderer.enabled = false;
 			}
 
@@ -250,11 +247,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 
 			HeightDataState = TilePropertyState.Loaded;
-			OnHeightDataChanged(this);
+			//OnHeightDataChanged(this);
 
-			if (RasterData != null)
+			if (_rasterData != null)
 			{
-				_meshRenderer.material.mainTexture = RasterData;
+				_meshRenderer.material.mainTexture = _rasterData;
 			}
 		}
 
@@ -266,20 +263,20 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			//	return;
 			//}
 			// Don't leak the texture, just reuse it.
-			if (RasterData == null)
+			if (_rasterData == null)
 			{
-				RasterData = new Texture2D(0, 0, TextureFormat.RGB24, useMipMap);
-				RasterData.wrapMode = TextureWrapMode.Clamp;
+				_rasterData = new Texture2D(0, 0, TextureFormat.RGB24, useMipMap);
+				_rasterData.wrapMode = TextureWrapMode.Clamp;
 			}
 
-			RasterData.LoadImage(data);
+			_rasterData.LoadImage(data);
 			if (useCompression)
 			{
 				// High quality = true seems to decrease image quality?
-				RasterData.Compress(false);
+				_rasterData.Compress(false);
 			}
 
-			MeshRenderer.material.mainTexture = RasterData;
+			MeshRenderer.material.mainTexture = _rasterData;
 			RasterDataState = TilePropertyState.Loaded;
 			//OnRasterDataChanged(this);
 		}
@@ -310,7 +307,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public Texture2D GetRasterData()
 		{
-			return RasterData;
+			return _rasterData;
 		}
 
 		internal void AddTile(Tile tile)
@@ -333,9 +330,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			{
 				Destroy(_heightTexture);
 			}
-			if (RasterData != null)
+			if (_rasterData != null)
 			{
-				Destroy(RasterData);
+				Destroy(_rasterData);
 			}
 		}
 	}

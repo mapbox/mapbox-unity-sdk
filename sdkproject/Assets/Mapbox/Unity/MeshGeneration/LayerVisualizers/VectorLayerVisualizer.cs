@@ -304,14 +304,14 @@
 			}
 		}
 
-		public override void Create(VectorTileLayer layer, UnityTile tile, Action<UnityTile> callback)
+		public override void Create(VectorTileLayer layer, UnityTile tile, Action<UnityTile, LayerVisualizerBase> callback)
 		{
 			if (!_activeCoroutines.ContainsKey(tile))
 				_activeCoroutines.Add(tile, new List<int>());
 			_activeCoroutines[tile].Add(Runnable.Run(ProcessLayer(layer, tile, tile.UnwrappedTileId, callback)));
 		}
 
-		protected IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, Action<UnityTile> callback = null)
+		protected IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, UnwrappedTileId tileId, Action<UnityTile, LayerVisualizerBase> callback = null)
 		{
 			//HACK to prevent request finishing on same frame which breaks modules started/finished events
 			yield return null;
@@ -395,7 +395,7 @@
 			#endregion
 
 			if (callback != null)
-				callback(tile);
+				callback(tile, this);
 		}
 
 		private bool ProcessFeature(int index, UnityTile tile, VectorLayerVisualizerProperties layerProperties)

@@ -43,7 +43,7 @@
 		protected VectorDataFetcher DataFetcher;
 
 		private int _maximumConcurrentRequestCount = 10;
-		private Dictionary<UnityTile, int> _layerProgress;
+		private Dictionary<UnityTile, HashSet<LayerVisualizerBase>> _layerProgress;
 
 		#region AbstractFactoryOverrides
 		/// <summary>
@@ -51,7 +51,7 @@
 		/// </summary>
 		protected override void OnInitialized()
 		{
-			_layerProgress = new Dictionary<UnityTile, int>();
+			_layerProgress = new Dictionary<UnityTile, HashSet<LayerVisualizerBase>>();
 			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
 
 			DataFetcher = ScriptableObject.CreateInstance<VectorDataFetcher>();
@@ -107,30 +107,16 @@
 			_properties = (VectorLayerProperties)options;
 		}
 
-		//tiles are registered in first frame. Tile is added to a list and factory is flagged in tile (add factory call)
-		//starting from next frame, tiles start to get processed so factory knows all workload and tile knows which factories he's waiting for
 		protected override void OnRegistered(UnityTile tile)
 		{
 			if (string.IsNullOrEmpty(MapId) || _properties.sourceOptions.isActive == false || (_properties.vectorSubLayers.Count + _properties.locationPrefabList.Count) == 0)
 			{
-				TileFinished(new TileProcessFinishedEventArgs(this, tile));
+				tile.VectorDataState = TilePropertyState.None;
 				return;
 			}
-			tile.HeightDataState = TilePropertyState.Loading;
-			_tilesToFetch.Enqueue(tile);
-		}
-
-		protected override void OnMapUpdate()
-		{
-			if (_tilesToFetch.Count > 0 && _tilesWaitingResponse.Count < _maximumConcurrentRequestCount)
-			{
-				for (int i = 0; i < Math.Min(_tilesToFetch.Count, 5); i++)
-				{
-					var tile = _tilesToFetch.Dequeue();
-					_tilesWaitingResponse.Add(tile);
-					DataFetcher.FetchVector(tile.CanonicalTileId, MapId, tile, _properties.useOptimizedStyle, _properties.optimizedStyle);
-				}
-			}
+			tile.VectorDataState = TilePropertyState.Loading;
+			_tilesWaitingResponse.Add(tile);
+			DataFetcher.FetchVector(tile.CanonicalTileId, MapId, tile, _properties.useOptimizedStyle, _properties.optimizedStyle);
 		}
 
 		/// <summary>
@@ -199,11 +185,9 @@
 		{
 			if (tile != null)
 			{
-				DecreaseProgressCounter(tile);
 				_tilesWaitingResponse.Remove(tile);
 				tile.SetVectorData(null);
-				TileFinished(new TileProcessFinishedEventArgs(this, tile));
-				Debug.Log(tile + " - " + vectorTile.ExceptionsAsString);
+				tile.VectorDataState = TilePropertyState.Error;
 			}
 			OnErrorOccurred(e);
 		}
@@ -225,11 +209,11 @@
 						{
 							if (_layerProgress.ContainsKey(tile))
 							{
-								_layerProgress[tile]++;
+								_layerProgress[tile].Add(builder);
 							}
 							else
 							{
-								_layerProgress.Add(tile, 1);
+								_layerProgress.Add(tile, new HashSet<LayerVisualizerBase> { builder });
 								if (!_tilesWaitingProcessing.Contains(tile))
 								{
 									_tilesWaitingProcessing.Add(tile);
@@ -251,11 +235,11 @@
 					{
 						if (_layerProgress.ContainsKey(tile))
 						{
-							_layerProgress[tile]++;
+							_layerProgress[tile].Add(builder);
 						}
 						else
 						{
-							_layerProgress.Add(tile, 1);
+							_layerProgress.Add(tile, new HashSet<LayerVisualizerBase> { builder });
 							if (!_tilesWaitingProcessing.Contains(tile))
 							{
 								_tilesWaitingProcessing.Add(tile);
@@ -266,17 +250,24 @@
 					}
 				}
 			}
+
+			if (!_layerProgress.ContainsKey(tile))
+			{
+				tile.VectorDataState = TilePropertyState.Loaded;
+			}
 		}
 
-		private void DecreaseProgressCounter(UnityTile tile)
+		private void DecreaseProgressCounter(UnityTile tile, LayerVisualizerBase builder)
 		{
 			if (_layerProgress.ContainsKey(tile))
 			{
-				_layerProgress[tile]--;
-
-				if (_layerProgress[tile] == 0)
+				if (_layerProgress[tile].Contains(builder))
 				{
-					TileFinished(new TileProcessFinishedEventArgs(this, tile));
+					_layerProgress[tile].Remove(builder);
+
+				}
+				if (_layerProgress[tile].Count == 0)
+				{
 					_layerProgress.Remove(tile);
 					_tilesWaitingProcessing.Remove(tile);
 					tile.VectorDataState = TilePropertyState.Loaded;

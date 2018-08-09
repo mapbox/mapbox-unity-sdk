@@ -105,27 +105,15 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public virtual void MapUpdate()
-		{
-			foreach (var factory in Factories)
-			{
-				factory.MapUpdate();
-			}
-		}
-
 		private void RegisterEvents(AbstractTileFactory factory)
 		{
-			factory.OnFactoryStateChanged += UpdateState;
 			//directly relaying to map visualizer event for now, nothing doing special
 			factory.OnTileError += Factory_OnTileError;
-			factory.OnTileFinished += Factory_OnTileFinished;
 		}
 
 		private void UnregisterEvents(AbstractTileFactory factory)
 		{
-			factory.OnFactoryStateChanged -= UpdateState;
 			factory.OnTileError -= Factory_OnTileError;
-			factory.OnTileFinished -= Factory_OnTileFinished;
 		}
 
 		public virtual void Destroy()
@@ -156,62 +144,6 @@ namespace Mapbox.Unity.Map
 
 		#region Factory event callbacks
 		//factory event callback, not relaying this up for now
-		private void Factory_OnTileFinished(object sender, TileProcessFinishedEventArgs e)
-		{
-			ChangeTileProgress(e.Tile.UnwrappedTileId, -1);
-		}
-
-		private void ChangeTileProgress(UnwrappedTileId tileId, int change)
-		{
-			if (!_tileProgress.ContainsKey(tileId) && change > 0)
-			{
-				_tileProgress.Add(tileId, 0);
-			}
-
-
-			if (_tileProgress.ContainsKey(tileId))
-			{
-				if (_tileProgress.Count == 1 && _tileProgress[tileId] == 0 && change > 0)
-				{
-					Debug.Log("Map is loading");
-				}
-
-				_tileProgress[tileId] += change;
-
-				if (_tileProgress[tileId] == 0)
-				{
-					_tileProgress.Remove(tileId);
-					if (_tileProgress.Count == 0)
-					{
-						Debug.Log("Map Finished");
-					}
-				}
-			}
-		}
-
-		void UpdateState(AbstractTileFactory factory)
-		{
-			//if (State != ModuleState.Working && factory.State == ModuleState.Working)
-			//{
-			//	State = ModuleState.Working;
-			//}
-			//else if (State != ModuleState.Finished && factory.State == ModuleState.Finished)
-			//{
-			//	var allFinished = true;
-			//	_counter = Factories.Count;
-			//	for (int i = 0; i < _counter; i++)
-			//	{
-			//		if (Factories[i] != null)
-			//		{
-			//			allFinished &= Factories[i].State == ModuleState.Finished;
-			//		}
-			//	}
-			//	if (allFinished)
-			//	{
-			//		State = ModuleState.Finished;
-			//	}
-			//}
-		}
 
 		public virtual void TileStateChanged(UnityTile tile)
 		{
@@ -232,7 +164,6 @@ namespace Mapbox.Unity.Map
 			if (rasterDone && terrainDone && vectorDone)
 			{
 				tile.TileState = MeshGeneration.Enums.TilePropertyState.Loaded;
-				Debug.Log(tile.UnwrappedTileId.ToString() + " --> " + tile.TileState.ToString());
 
 				if (_map.CurrentExtent.Count == _activeTiles.Count)
 				{
@@ -240,21 +171,17 @@ namespace Mapbox.Unity.Map
 					foreach (var currentTile in _map.CurrentExtent)
 					{
 						bool status = (_activeTiles.ContainsKey(currentTile) && _activeTiles[currentTile].TileState == TilePropertyState.Loaded);
-						//if (!status)
-						//Debug.Log(currentTile.ToString() + " --> " + status);
 						allDone = allDone && (_activeTiles.ContainsKey(currentTile) && _activeTiles[currentTile].TileState == TilePropertyState.Loaded);
 					}
 
 					if (allDone)
 					{
 						State = ModuleState.Finished;
-						//Debug.Log("Extent Loaded");
 					}
 				}
 				else
 				{
 					State = ModuleState.Working;
-					//Debug.Log("Extent Count --> " + _map.CurrentExtent.Count + " != " + _activeTiles.Count);
 				}
 			}
 		}
@@ -295,7 +222,6 @@ namespace Mapbox.Unity.Map
 
 			foreach (var factory in Factories)
 			{
-				ChangeTileProgress(unityTile.UnwrappedTileId, 1);
 				factory.Register(unityTile);
 			}
 
@@ -314,9 +240,6 @@ namespace Mapbox.Unity.Map
 			unityTile.Recycle();
 			ActiveTiles.Remove(tileId);
 			_inactiveTiles.Enqueue(unityTile);
-
-
-			ChangeTileProgress(tileId, -1);
 		}
 
 		/// <summary>
@@ -342,7 +265,6 @@ namespace Mapbox.Unity.Map
 		public event EventHandler<TileErrorEventArgs> OnTileError;
 		private void Factory_OnTileError(object sender, TileErrorEventArgs e)
 		{
-			ChangeTileProgress(new UnwrappedTileId(e.TileId.Z, e.TileId.X, e.TileId.Y), -1);
 			EventHandler<TileErrorEventArgs> handler = OnTileError;
 			if (handler != null)
 			{

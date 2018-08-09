@@ -34,8 +34,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	{
 		protected IFileSource _fileSource;
 
-		public ModuleState State { get; private set; }
-
 		protected LayerProperties _options;
 		public LayerProperties Options
 		{
@@ -45,33 +43,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		private int _progress;
-		protected int Progress
-		{
-			get
-			{
-				return _progress;
-			}
-			set
-			{
-				if (_progress == 0 && value > 0)
-				{
-					State = ModuleState.Working;
-					//OnFactoryStateChanged(this);
-				}
-				if (_progress > 0 && value == 0)
-				{
-					State = ModuleState.Finished;
-					//OnFactoryStateChanged(this);
-				}
-				_progress = value;
-			}
-		}
-		protected Queue<UnityTile> _tilesToFetch;
 		protected HashSet<UnityTile> _tilesWaitingResponse;
 		protected HashSet<UnityTile> _tilesWaitingProcessing;
 
-		public event Action<AbstractTileFactory> OnFactoryStateChanged = delegate { };
 		/// <summary>
 		/// The  <c>OnTileError</c> event triggers when there's <c>Tile</c> error.
 		/// Returns a <see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance as a parameter, for the tile on which error occurred.
@@ -85,34 +59,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		public virtual void Initialize(IFileSource fileSource)
 		{
 			_fileSource = fileSource;
-			State = ModuleState.Initialized;
-			_tilesToFetch = new Queue<UnityTile>();
 			_tilesWaitingResponse = new HashSet<UnityTile>();
 			_tilesWaitingProcessing = new HashSet<UnityTile>();
 			OnInitialized();
-		}
-
-		public virtual void MapUpdate()
-		{
-			if (State == ModuleState.Initialized || State == ModuleState.Working)
-			{
-				if (_tilesToFetch.Count == 0 && _tilesWaitingResponse.Count == 0 && _tilesWaitingProcessing.Count == 0)
-				{
-					State = ModuleState.Finished;
-					OnFactoryStateChanged(this);
-				}
-			}
-			else if (State == ModuleState.Finished)
-			{
-				if (_tilesToFetch.Count > 0 || _tilesWaitingResponse.Count > 0 || _tilesWaitingProcessing.Count > 0)
-				{
-					State = ModuleState.Working;
-					OnFactoryStateChanged(this);
-				}
-			}
-
-
-			OnMapUpdate();
 		}
 
 		public virtual void Register(UnityTile tile)
@@ -125,8 +74,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			OnUnregistered(tile);
 		}
 
-		protected abstract void OnMapUpdate();
-
 		protected abstract void OnInitialized();
 
 		protected abstract void OnRegistered(UnityTile tile);
@@ -135,18 +82,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		#region Events
 		public event EventHandler<TileErrorEventArgs> OnTileError;
-		public event EventHandler<TileProcessFinishedEventArgs> OnTileFinished;
 		protected virtual void OnErrorOccurred(TileErrorEventArgs e)
 		{
 			EventHandler<TileErrorEventArgs> handler = OnTileError;
-			if (handler != null)
-			{
-				handler(this, e);
-			}
-		}
-		protected virtual void TileFinished(TileProcessFinishedEventArgs e)
-		{
-			var handler = OnTileFinished;
 			if (handler != null)
 			{
 				handler(this, e);
