@@ -238,8 +238,8 @@
 	{
 		Buildings,
 		Roads,
-		PointsOfInterest,
 		Landuse,
+		Points,
 		Custom
 	}
 }

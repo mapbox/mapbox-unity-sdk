@@ -60,7 +60,7 @@
 					lineWidth = 1.0f;
 					style = StyleTypes.Custom;
 					break;
-				case PresetFeatureType.PointsOfInterest:
+				case PresetFeatureType.Points:
 					layerName = "poi_label";
 					geometryType = VectorPrimitiveType.Point;
 					break;
@@ -135,7 +135,7 @@
 				case "landuse":
 					return PresetFeatureType.Landuse;
 				case "poi_label":
-					return PresetFeatureType.PointsOfInterest;
+					return PresetFeatureType.Points;
 				default:
 					return PresetFeatureType.Custom;
 			}
