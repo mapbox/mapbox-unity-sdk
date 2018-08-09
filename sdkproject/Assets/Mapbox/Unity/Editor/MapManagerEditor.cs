@@ -190,6 +190,7 @@
 				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("scalingOptions"));
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("loadingTexture"));
+				EditorGUILayout.PropertyField(property.FindPropertyRelative("tileMaterial"));
 			}
 		}
 
@@ -264,6 +265,7 @@
 				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("performanceOptions"), new GUIContent("Perfomance Options"));
 			}
+
 			EditorGUILayout.Space();
 			ShowSepartor();
 
