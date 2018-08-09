@@ -15,6 +15,12 @@ public class VectorDataFetcher : DataFetcher
 		tile.AddTile(vectorTile);
 		vectorTile.Initialize(_fileSource, tile.CanonicalTileId, mapid, () =>
 		{
+			if (tile.CanonicalTileId != vectorTile.Id)
+			{
+				//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
+				return;
+			}
+
 			if (vectorTile.HasError)
 			{
 				FetchingError(tile, new TileErrorEventArgs(tile.CanonicalTileId, vectorTile.GetType(), tile, vectorTile.Exceptions));

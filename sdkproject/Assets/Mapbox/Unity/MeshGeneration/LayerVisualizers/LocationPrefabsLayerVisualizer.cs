@@ -14,11 +14,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 	{
 		private int maxDensity = 30; //This value is same as the density's max range value in PrefabItemOptions
 
-		public void SetProperties(PrefabItemOptions item, LayerPerformanceOptions performanceOptions)
+		public void SetProperties(PrefabItemOptions item)
 		{
 			SubLayerProperties = item;
 			Active = item.isActive;
-			_performanceOptions = performanceOptions;
+			_performanceOptions = item.performanceOptions;
 
 			
 			//Check to make sure that when Categories selection is none, the location prefab is disabled
@@ -40,7 +40,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			};
 
 				
-			item.coreOptions.groupFeatures = item.groupFeatures;
+			item.coreOptions.combineMeshes = item.combineMeshes;
 			item.moveFeaturePositionTo = item._movePrefabFeaturePositionTo;
 
 

@@ -11,6 +11,7 @@
 	using Mapbox.Unity.Map;
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Unity.MeshGeneration.Filters;
+	using Mapbox.Map;
 
 	public class VectorLayerVisualizerProperties
 	{
@@ -64,16 +65,16 @@
 			set { _layerProperties.coreOptions.layerName = value; }
 		}
 
-		public void SetProperties(VectorSubLayerProperties properties, LayerPerformanceOptions performanceOptions)
+		public void SetProperties(VectorSubLayerProperties properties)
 		{
 			List<MeshModifier> defaultMeshModifierStack = new List<MeshModifier>();
 			List<GameObjectModifier> defaultGOModifierStack = new List<GameObjectModifier>();
 			_layerProperties = properties;
-			_performanceOptions = performanceOptions;
+			_performanceOptions = properties.performanceOptions;
 
 			Active = _layerProperties.coreOptions.isActive;
 
-			if (properties.coreOptions.groupFeatures)
+			if (properties.coreOptions.combineMeshes)
 			{
 				_defaultStack = ScriptableObject.CreateInstance<MergedModifierStack>();
 			}
@@ -194,6 +195,27 @@
 			_defaultStack.MeshModifiers.AddRange(_layerProperties.MeshModifiers);
 			_defaultStack.GoModifiers.AddRange(_layerProperties.GoModifiers);
 
+			//Adding filters from the types dropdown
+
+			//if ((MapboxSpecialLayerParameters.LayerNameTypeProperty.ContainsKey(properties.coreOptions.layerName)) && !string.IsNullOrEmpty(properties.selectedTypes))
+			//{
+			//	LayerFilter filter = new LayerFilter(LayerFilterOperationType.Contains);
+
+			//	filter.Key = MapboxSpecialLayerParameters.LayerNameTypeProperty[properties.coreOptions.layerName];
+			//	filter.PropertyValue = properties.selectedTypes;
+
+			//	//if (properties.coreOptions.layerName == properties.roadLayer)
+			//	//{
+			//	//	filter.Key = properties.roadLayer_TypeProperty;
+			//	//	filter.PropertyValue = properties.selectedTypes;
+			//	//}
+			//	//else if (properties.coreOptions.layerName == "landuse")
+			//	//{
+			//	//	filter.Key = properties.landuseLayer_TypeProperty;
+			//	//	filter.PropertyValue = properties.selectedTypes;
+			//	//}
+			//	properties.filterOptions.filters.Add(filter);
+			//}
 		}
 
 		/// <summary>
@@ -307,10 +329,10 @@
 		{
 			if (!_activeCoroutines.ContainsKey(tile))
 				_activeCoroutines.Add(tile, new List<int>());
-			_activeCoroutines[tile].Add(Runnable.Run(ProcessLayer(layer, tile, callback)));
+			_activeCoroutines[tile].Add(Runnable.Run(ProcessLayer(layer, tile, tile.UnwrappedTileId, callback)));
 		}
 
-		protected IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, Action callback = null)
+		protected IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, UnwrappedTileId tileId, Action callback = null)
 		{
 			//HACK to prevent request finishing on same frame which breaks modules started/finished events
 			yield return null;
@@ -362,6 +384,11 @@
 			{
 				for (int i = 0; i < featureCount; i++)
 				{
+					//checking if tile is recycled and changed
+					if(tile.UnwrappedTileId != tileId)
+					{
+						yield break;
+					}
 
 					ProcessFeature(i, tile, tempLayerProperties);
 

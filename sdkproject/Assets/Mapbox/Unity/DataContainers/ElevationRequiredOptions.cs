@@ -5,8 +5,6 @@
 	[Serializable]
 	public class ElevationRequiredOptions
 	{
-		[Tooltip("Unity material used for rendering terrain tiles.")]
-		public Material baseMaterial;
 		[Tooltip("Add Unity Physics collider to terrain tiles, used for detecting collisions etc.")]
 		public bool addCollider = false;
 		[Range(0, 100)]
