@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 891973e6c0cc14d778d0090973a4ac11
-timeCreated: 1533836370
+guid: ba75241273f0c46219edec5d43b408f6
+timeCreated: 1533836371
 licenseType: Pro
 ModelImporter:
   serializedVersion: 22
@@ -10,7 +10,7 @@ ModelImporter:
     2100000: lambert1
     2300000: //RootNode
     3300000: //RootNode
-    4300000: OneWorldTradeCenter
+    4300000: pCube3
     9500000: //RootNode
   externalObjects: {}
   materials:
@@ -42,7 +42,7 @@ ModelImporter:
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: 0.01
+    globalScale: 1
     meshCompression: 0
     addColliders: 0
     importVisibility: 1

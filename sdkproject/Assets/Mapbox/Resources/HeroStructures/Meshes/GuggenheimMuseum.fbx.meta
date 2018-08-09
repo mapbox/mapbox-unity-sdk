@@ -1,18 +1,17 @@
 fileFormatVersion: 2
-guid: a1f20f386bef22b4b8e4d0f1dded9ebd
+guid: e5682d2ad51bd46f3b8c4d8ba90a0378
+timeCreated: 1533836371
+licenseType: Pro
 ModelImporter:
   serializedVersion: 22
   fileIDToRecycleName:
     100000: //RootNode
-    100002: ChryslerBuilding
     400000: //RootNode
-    400002: ChryslerBuilding
     2100000: lambert1
     2300000: //RootNode
-    2300002: ChryslerBuilding
     3300000: //RootNode
-    3300002: ChryslerBuilding
-    4300000: ChryslerBuilding
+    4300000: pSphere4
+    9500000: //RootNode
   externalObjects: {}
   materials:
     importMaterials: 1
@@ -43,7 +42,7 @@ ModelImporter:
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: 20
+    globalScale: 0.01
     meshCompression: 0
     addColliders: 0
     importVisibility: 1
@@ -87,7 +86,7 @@ ModelImporter:
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 0
+  animationType: 2
   humanoidOversampling: 1
   additionalBone: 0
   userData: 

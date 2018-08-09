@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 891973e6c0cc14d778d0090973a4ac11
+guid: 76087a3bd0f174964bbe71a0a9c5386d
 timeCreated: 1533836370
 licenseType: Pro
 ModelImporter:
@@ -7,10 +7,11 @@ ModelImporter:
   fileIDToRecycleName:
     100000: //RootNode
     400000: //RootNode
-    2100000: lambert1
+    2100000: Base
+    2100002: Statue
     2300000: //RootNode
     3300000: //RootNode
-    4300000: OneWorldTradeCenter
+    4300000: polySurface5
     9500000: //RootNode
   externalObjects: {}
   materials:

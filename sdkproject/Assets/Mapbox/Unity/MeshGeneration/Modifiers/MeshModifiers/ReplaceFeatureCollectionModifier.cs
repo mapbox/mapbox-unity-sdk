@@ -10,6 +10,10 @@
 	[System.Serializable]
 	public class FeatureBundle
 	{
+		//public name param will be displayed in inspector list ui instead of element x...
+		[HideInInspector]
+		public string Name;
+
 		public bool active;
 
 		public GameObject prefab;
@@ -22,24 +26,25 @@
 
 	}
 
-
-	[System.Serializable]
-	public class FeatureBundleList
-	{
-		public List<FeatureBundle> features = new List<FeatureBundle>();
-	}
-
 	/// <summary>
 	/// ReplaceFeatureCollectionModifier aggregates multiple ReplaceFeatureModifier objects into one modifier.
 	/// </summary>
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Replace Feature Collection Modifier")]
 	public class ReplaceFeatureCollectionModifier : GameObjectModifier, IReplacementCriteria
 	{
-		//public FeatureBundleList featureBundleList;
 
 		public List<FeatureBundle> features = new List<FeatureBundle>();
 
 		private List<ReplaceFeatureModifier> _replaceFeatureModifiers;
+
+		//update all names to make inspector look better...
+		private void OnValidate()
+		{
+			for (int i = 0; i < features.Count; i++)
+			{
+				features[i].Name = (features[i].prefab == null) ? "Feature" : features[i].prefab.name;
+			}
+		}
 
 		public override void Initialize()
 		{

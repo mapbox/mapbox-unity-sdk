@@ -1,16 +1,18 @@
 fileFormatVersion: 2
-guid: 891973e6c0cc14d778d0090973a4ac11
+guid: 9ef00dc880db74fa2a52720b0b7b3c13
 timeCreated: 1533836370
 licenseType: Pro
 ModelImporter:
   serializedVersion: 22
   fileIDToRecycleName:
-    100000: //RootNode
-    400000: //RootNode
+    100000: ChryslerBuilding
+    100002: //RootNode
+    400000: ChryslerBuilding
+    400002: //RootNode
     2100000: lambert1
-    2300000: //RootNode
-    3300000: //RootNode
-    4300000: OneWorldTradeCenter
+    2300000: ChryslerBuilding
+    3300000: ChryslerBuilding
+    4300000: ChryslerBuilding
     9500000: //RootNode
   externalObjects: {}
   materials:

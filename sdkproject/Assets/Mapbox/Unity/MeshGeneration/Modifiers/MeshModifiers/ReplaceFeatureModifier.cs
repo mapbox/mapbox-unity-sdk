@@ -104,7 +104,8 @@
 					{
 						_featureId[index] = (_featureId[index] == null) ? new List<string>() : _featureId[index];
 						_tempFeatureId = feature.Data.Id.ToString();
-						_featureId[index].Add(_tempFeatureId.Substring(0, _tempFeatureId.Length - 3));
+						string idCandidate = (_tempFeatureId.Length <= 3) ? _tempFeatureId : _tempFeatureId.Substring(0, _tempFeatureId.Length - 3);
+						_featureId[index].Add(idCandidate);
 					}
 				}
 				catch (Exception e)
