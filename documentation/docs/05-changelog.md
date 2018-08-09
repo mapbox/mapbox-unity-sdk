@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+### v.1.4.5
+- Added a **ReplaceFeatureCollectionModifier** class that allows multiple ReplaceFeatureModifiers to be run from one modifier.
+- Added six hero structures/modifiers - Transamerica Pyramid, Coit Tower, Salesforce Tower, Empire State Building, Chrysler Building and One World Trade Center.
+
 ### v.1.4.4
 *07/10/2018*
 ##### New Features
