@@ -2,6 +2,8 @@
 
 ### v.1.4.4
 *07/10/2018*
+##### New Features
+- Selecting `Simple` Texturing Style in a `Vector Layer Visualizer` exposes a drop down menu which allows users to select a color palette for that layer.
 ##### Improvements
 - Added 2 examples to the setup dialog 
 - AstronautGame - enhanced version of the Location Based game with custom styling and Astronaut asset
@@ -10,6 +12,7 @@
 - Fixes the issue with Replacement Modifier to prevent duplicate prefab spawning and blocking wrong features.
 - Fixes the issue with custom styles that go missing after building to a device.
 - Fix an issue with factories where a racing condition causing tiles without imagery
+
 
 ### v.1.4.3
 *06/18/2018*
