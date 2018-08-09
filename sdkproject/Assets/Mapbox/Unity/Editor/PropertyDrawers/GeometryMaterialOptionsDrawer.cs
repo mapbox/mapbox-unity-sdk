@@ -21,9 +21,9 @@
 			}
 		}
 
-		public StyleIconBundle(string styleName)
+		public StyleIconBundle(string styleName, string paletteName = "")
 		{
-			path = Path.Combine(Constants.Path.MAP_FEATURE_STYLES_SAMPLES, Path.Combine(styleName, string.Format("{0}Icon", styleName)));
+			path = Path.Combine(Constants.Path.MAP_FEATURE_STYLES_SAMPLES, Path.Combine(styleName, string.Format("{0}Icon", (styleName + paletteName))));
 		}
 	}
 
@@ -43,8 +43,6 @@
 				EditorPrefs.SetBool(objectId + "VectorSubLayerProperties_showTexturing", value);
 			}
 		}
-		static float colorCellSize = 16.0f;
-		static float colorCellSpacing = 20.0f;
 
 		private Dictionary<StyleTypes, StyleIconBundle> _styleIconBundles = new Dictionary<StyleTypes, StyleIconBundle>()
 		{
@@ -57,14 +55,28 @@
 			{StyleTypes.Satellite, new StyleIconBundle(StyleTypes.Satellite.ToString())},
 		};
 
+		private Dictionary<SamplePalettes, StyleIconBundle> _paletteIconBundles = new Dictionary<SamplePalettes, StyleIconBundle>()
+		{
+			{SamplePalettes.City, new StyleIconBundle(StyleTypes.Simple.ToString(), SamplePalettes.City.ToString())},
+			{SamplePalettes.Cool, new StyleIconBundle(StyleTypes.Simple.ToString(), SamplePalettes.Cool.ToString())},
+			{SamplePalettes.Rainbow, new StyleIconBundle(StyleTypes.Simple.ToString(), SamplePalettes.Rainbow.ToString())},
+			{SamplePalettes.Urban, new StyleIconBundle(StyleTypes.Simple.ToString(), SamplePalettes.Urban.ToString())},
+			{SamplePalettes.Warm, new StyleIconBundle(StyleTypes.Simple.ToString(), SamplePalettes.Warm.ToString())},
+		};
+
 		/// <summary>
 		/// Loads the default style icons.
 		/// </summary>
+
 		private void LoadDefaultStyleIcons()
 		{
 			foreach (var key in _styleIconBundles.Keys)
 			{
 				_styleIconBundles[key].Load();
+			}
+			foreach (var key in _paletteIconBundles.Keys)
+			{
+				_paletteIconBundles[key].Load();
 			}
 		}
 
@@ -78,7 +90,6 @@
 				LoadDefaultStyleIcons();
 				EditorGUI.BeginProperty(position, label, property);
 
-				//position.y += lineHeight;
 				var styleTypeLabel = new GUIContent { text = "Style Type", tooltip = "Texturing style for feature; choose from sample style or create your own by choosing Custom. " };
 				var styleType = property.FindPropertyRelative("style");
 
@@ -97,9 +108,18 @@
 				{
 					GUILayout.BeginHorizontal();
 
-					Texture2D thumbnailTexture = (Texture2D)_styleIconBundles[(StyleTypes)styleType.enumValueIndex].texture;
+					var style = (StyleTypes)styleType.enumValueIndex;
 
-					string descriptionLabel = EnumExtensions.Description((StyleTypes)styleType.enumValueIndex);
+					Texture2D thumbnailTexture = (Texture2D)_styleIconBundles[style].texture;
+
+					if ((StyleTypes)styleType.enumValueIndex == StyleTypes.Simple)
+					{
+						var samplePaletteType = property.FindPropertyRelative("samplePalettes");
+						var palette = (SamplePalettes)samplePaletteType.enumValueIndex;
+						thumbnailTexture = (Texture2D)_paletteIconBundles[palette].texture;
+					}
+
+					string descriptionLabel = EnumExtensions.Description(style);
 					EditorGUILayout.LabelField(new GUIContent(" ", thumbnailTexture), Constants.GUI.Styles.EDITOR_TEXTURE_THUMBNAIL_STYLE, GUILayout.Height(60), GUILayout.Width(EditorGUIUtility.labelWidth - 60));
 					EditorGUILayout.TextArea(descriptionLabel, (GUIStyle)"wordWrappedLabel");
 
@@ -121,28 +141,6 @@
 							}
 
 							samplePaletteType.enumValueIndex = EditorGUILayout.Popup(samplePaletteTypeLabel, samplePaletteType.enumValueIndex, samplePaletteTypeGuiContent);
-							//load the palette
-							SamplePalettes paletteValue = (SamplePalettes)samplePaletteType.enumValueIndex;
-							string paletteName = paletteValue.ToString();
-							string path = Path.Combine(Constants.Path.MAP_FEATURE_STYLES_SAMPLES, Path.Combine("Simple", Constants.Path.MAPBOX_STYLES_ASSETS_FOLDER));
-
-							string paletteFolderPath = Path.Combine(path, Constants.Path.MAPBOX_STYLES_PALETTES_FOLDER);
-
-							string palettePath = Path.Combine(paletteFolderPath, paletteName);
-
-							ScriptablePalette palette = Resources.Load(palettePath) as ScriptablePalette;
-							Color[] colors = palette.m_colors;
-
-							for (int i = 0; i < colors.Length; i++)
-							{
-								Color color = colors[i];
-								float x = position.x + 22;//	0 + (i * colorCellSpacing);
-								float y = position.y + 80;
-								EditorGUI.DrawRect(new Rect(x, y, colorCellSize, colorCellSize), color);
-							}
-							//draw a box for each one
-
-							//EditorGUI.DrawRect(new Rect(50, 350, m_Value, 70), Color.green);
 							break;
 						case StyleTypes.Light:
 							property.FindPropertyRelative("lightStyleOpacity").floatValue = EditorGUILayout.Slider("Opacity", property.FindPropertyRelative("lightStyleOpacity").floatValue, 0.0f, 1.0f);
@@ -155,7 +153,6 @@
 							break;
 						default:
 							break;
-
 					}
 				}
 				else
