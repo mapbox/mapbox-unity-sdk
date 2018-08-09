@@ -79,12 +79,12 @@ namespace Mapbox.Map
 			return this.Z + "/" + this.X + "/" + this.Y;
 		}
 
-		#region Equality
+		#region Equality 
 		public bool Equals(CanonicalTileId other)
 		{
 			return this.X == other.X && this.Y == other.Y && this.Z == other.Z;
 		}
-
+		
 		public override int GetHashCode()
 		{
 			return X ^ Y ^ Z;
@@ -98,8 +98,20 @@ namespace Mapbox.Map
 		public static bool operator !=(CanonicalTileId a, CanonicalTileId b)
 		{
 			return !(a == b);
-		} 
-		#endregion
+		}
 
+		public override bool Equals(object obj)
+		{
+			if (obj is CanonicalTileId)
+			{
+				return this.Equals((CanonicalTileId)obj);
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		#endregion
 	}
 }
