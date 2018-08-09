@@ -2982,8 +2982,8 @@ Prefab:
         type: 2}
       propertyPath: m_Text
       value: "<b>Data Explorer</b>\n\nExplore Mapbox\u2019s location data. Each map
-        vector tile includes high levels of detail about a particular location or
-        building that you can leverage for procedurally generating experiences or
+        vector tile contains detailed info about locations and buildings. You can
+        leverage this data to procedurally generate experiences or for data-driven
         styling. The data layers include building data, points of interest (POIs),
         roads, and real-time traffic data. You can toggle these data layers on and
         off as needed under MAP LAYERS -> FEATURES section of the Map prefab. Also,
