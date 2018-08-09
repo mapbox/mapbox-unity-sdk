@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.4465785, g: 0.49641252, b: 0.574817, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -400,7 +400,10 @@ Prefab:
 
         City Simulator is a great starting point for applications that require 3D
         cities & terrain. This starting point comes ready with 3D building & road
-        layers. You can start here and customize this scene to match your 3D map needs.'
+        layers. You can start here and customize this scene to match your 3D map needs.
+
+
+        <link="Documentation">https://www.mapbox.com/unity-sdk/maps/examples/data-explorer/#custom-data</link>'
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.45006472, g: 0.50011563, b: 0.575482, a: 1}
+  m_IndirectSpecularColor: {r: 0.45006484, g: 0.50011563, b: 0.5754822, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -847,7 +847,7 @@ Prefab:
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -0.000015258789
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114731470950229392, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -881,11 +881,10 @@ Prefab:
 
 
         This is an enhanced version of the "Location-based Game Starting Point." It
-        features custom styling, procedural vehicle movement based on real traffic
-        data, and dynamic lighting. Click on the road in the editor to navigate the
-        astronaut character there using our directions API response. On device, this
-        example uses device GPS location information to move/rotate the character
-        alongside the device position.'
+        features custom styling, procedural vehicle movement based on real road data,
+        and dynamic lighting. Click on the road in the editor to navigate the astronaut
+        character to a point via the Directions API. On a device, this example uses
+        GPS location information to move and rotate the character.'
       objectReference: {fileID: 0}
     - target: {fileID: 1912118435774886, guid: 98be219873e6d4dffb5949746f515a33, type: 2}
       propertyPath: m_IsActive

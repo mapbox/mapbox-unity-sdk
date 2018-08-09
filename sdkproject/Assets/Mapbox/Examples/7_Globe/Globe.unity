@@ -280,14 +280,19 @@ Prefab:
       propertyPath: m_Text
       value: "<b>A Real Globe</b>\n\nThis example demonstrates a procedurally generated
         globe model leveraging Mapbox\u2019s global coverage map data. The custom
-        markers showcase how to drop pins according to exact world coordinates. It
-        uses a special terrain factor that spherically projects our square tiles onto
-        the globe. \n\nClick and drag to rotate the globe around!"
+        markers showcase how to drop pins at exact world coordinates. It uses a special
+        terrain factory that spherically projects our square tiles onto the globe.
+        \n\nClick and drag to rotate the globe around!"
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114731470950229392, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 2}
+      propertyPath: m_Size
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 98be219873e6d4dffb5949746f515a33, type: 2}
