@@ -21,7 +21,7 @@
 		[Tooltip("Snap features to the terrain elevation, use this option to draw features above terrain. ")]
 		public bool snapToTerrain = true;
 		[Tooltip("Groups features into one Unity GameObject.")]
-		public bool groupFeatures = false;
+		public bool combineMeshes = false;
 		[Tooltip("Width of the line feature.")]
 		public float lineWidth = 1.0f;
 	}

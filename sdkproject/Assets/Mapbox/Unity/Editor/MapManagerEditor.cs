@@ -264,6 +264,7 @@
 				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("performanceOptions"), new GUIContent("Perfomance Options"));
 			}
+
 			EditorGUILayout.Space();
 			ShowSepartor();
 

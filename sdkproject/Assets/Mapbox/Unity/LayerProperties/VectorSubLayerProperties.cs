@@ -25,6 +25,8 @@
 
 		public GeometryMaterialOptions materialOptions = new GeometryMaterialOptions();
 
+		public LayerPerformanceOptions performanceOptions;
+
 		//HACK : workaround to avoid users accidentaly leaving the buildingsWithUniqueIds settign on and have missing buildings. 
 		public bool honorBuildingIdSetting = true;
 		public bool buildingsWithUniqueIds = false;
@@ -34,5 +36,17 @@
 		public List<MeshModifier> MeshModifiers;
 		[NodeEditorElement("Game Object Modifiers")]
 		public List<GameObjectModifier> GoModifiers;
+		public PresetFeatureType presetFeatureType = PresetFeatureType.Custom;
+
+		//public string roadLayer = "road";
+		//public string landuseLayer = "landuse";
+		//public string roadLayer_TypeProperty = "class";
+		//public string landuseLayer_TypeProperty = "class";
+
+		[SerializeField]
+		private int _maskValue;
+
+		public string selectedTypes;
 	}
+
 }
