@@ -32,6 +32,8 @@
 	public class GeometryMaterialOptionsDrawer : PropertyDrawer
 	{
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
+		static float colorCellSize = 16.0f;
+		static float colorCellSpacing = 20.0f;
 
 		private Dictionary<StyleTypes, StyleIconBundle> _styleIconBundles = new Dictionary<StyleTypes, StyleIconBundle>()
 		{
@@ -40,6 +42,7 @@
 			{StyleTypes.Fantasy, new StyleIconBundle(StyleTypes.Fantasy.ToString())},
 			{StyleTypes.Light, new StyleIconBundle(StyleTypes.Light.ToString())},
 			{StyleTypes.Dark, new StyleIconBundle(StyleTypes.Dark.ToString())},
+			{StyleTypes.Color, new StyleIconBundle(StyleTypes.Color.ToString())},
 			{StyleTypes.Satellite, new StyleIconBundle(StyleTypes.Satellite.ToString())},
 		};
 
@@ -85,6 +88,59 @@
 				EditorGUILayout.TextArea(descriptionLabel, (GUIStyle)"wordWrappedLabel");
 
 				GUILayout.EndHorizontal();
+
+				switch ((StyleTypes)styleType.enumValueIndex)
+				{
+					case StyleTypes.Simple:
+						var samplePaletteType = property.FindPropertyRelative("samplePalettes");
+						var samplePaletteTypeLabel = new GUIContent { text = "Palette Type", tooltip = "Palette type for procedural colorization; choose from sample palettes or create your own by choosing Custom. " };
+
+						GUIContent[] samplePaletteTypeGuiContent = new GUIContent[samplePaletteType.enumDisplayNames.Length];
+						for (int i = 0; i < samplePaletteType.enumDisplayNames.Length; i++)
+						{
+							samplePaletteTypeGuiContent[i] = new GUIContent
+							{
+								text = samplePaletteType.enumDisplayNames[i]
+							};
+						}
+
+						samplePaletteType.enumValueIndex = EditorGUILayout.Popup(samplePaletteTypeLabel, samplePaletteType.enumValueIndex, samplePaletteTypeGuiContent);
+						//load the palette
+						SamplePalettes paletteValue = (SamplePalettes)samplePaletteType.enumValueIndex;
+						string paletteName = paletteValue.ToString();
+						string path = Path.Combine(Constants.Path.MAP_FEATURE_STYLES_SAMPLES, Path.Combine("Simple", Constants.Path.MAPBOX_STYLES_ASSETS_FOLDER));
+
+						string paletteFolderPath = Path.Combine(path, Constants.Path.MAPBOX_STYLES_PALETTES_FOLDER);
+
+						string palettePath = Path.Combine(paletteFolderPath, paletteName);
+
+						ScriptablePalette palette = Resources.Load(palettePath) as ScriptablePalette;
+						Color[] colors = palette.m_colors;
+
+						for (int i = 0; i < colors.Length; i++)
+						{
+							Color color = colors[i];
+							float x = position.x + 22;//	0 + (i * colorCellSpacing);
+							float y = position.y + 80;
+							EditorGUI.DrawRect(new Rect(x, y, colorCellSize, colorCellSize), color);
+						}
+						//draw a box for each one
+
+						//EditorGUI.DrawRect(new Rect(50, 350, m_Value, 70), Color.green);
+						break;
+					case StyleTypes.Light:
+						property.FindPropertyRelative("lightStyleOpacity").floatValue = EditorGUILayout.Slider("Opacity", property.FindPropertyRelative("lightStyleOpacity").floatValue, 0.0f, 1.0f);
+						break;
+					case StyleTypes.Dark:
+						property.FindPropertyRelative("darkStyleOpacity").floatValue = EditorGUILayout.Slider("Opacity", property.FindPropertyRelative("darkStyleOpacity").floatValue, 0.0f, 1.0f);
+						break;
+					case StyleTypes.Color:
+						property.FindPropertyRelative("colorStyleColor").colorValue = EditorGUILayout.ColorField("Color", property.FindPropertyRelative("colorStyleColor").colorValue);
+						break;
+					default:
+						break;
+
+				}
 			}
 			else
 			{
