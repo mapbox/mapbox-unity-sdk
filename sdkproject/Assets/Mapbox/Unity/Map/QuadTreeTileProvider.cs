@@ -139,24 +139,31 @@
 			float maxZ = float.MinValue;
 			for (int i = 0; i < 4; i++)
 			{
-				if (minX > _hitPnt[i].x)
+				if (_hitPnt[i] == Vector3.zero)
 				{
-					minX = _hitPnt[i].x;
+					continue;
 				}
-
-				if (minZ > _hitPnt[i].z)
+				else
 				{
-					minZ = _hitPnt[i].z;
-				}
+					if (minX > _hitPnt[i].x)
+					{
+						minX = _hitPnt[i].x;
+					}
 
-				if (maxX < _hitPnt[i].x)
-				{
-					maxX = _hitPnt[i].x;
-				}
+					if (minZ > _hitPnt[i].z)
+					{
+						minZ = _hitPnt[i].z;
+					}
 
-				if (maxZ < _hitPnt[i].z)
-				{
-					maxZ = _hitPnt[i].z;
+					if (maxX < _hitPnt[i].x)
+					{
+						maxX = _hitPnt[i].x;
+					}
+
+					if (maxZ < _hitPnt[i].z)
+					{
+						maxZ = _hitPnt[i].z;
+					}
 				}
 			}
 
@@ -190,7 +197,6 @@
 			{
 				UpdateTileExtent();
 				_cbtpOptions.camera.transform.hasChanged = false;
-				Debug.Log("Camera Changed");
 			}
 		}
 	}

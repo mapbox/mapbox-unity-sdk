@@ -65,16 +65,16 @@
 			set { _layerProperties.coreOptions.layerName = value; }
 		}
 
-		public void SetProperties(VectorSubLayerProperties properties, LayerPerformanceOptions performanceOptions)
+		public void SetProperties(VectorSubLayerProperties properties)
 		{
 			List<MeshModifier> defaultMeshModifierStack = new List<MeshModifier>();
 			List<GameObjectModifier> defaultGOModifierStack = new List<GameObjectModifier>();
 			_layerProperties = properties;
-			_performanceOptions = performanceOptions;
+			_performanceOptions = properties.performanceOptions;
 
 			Active = _layerProperties.coreOptions.isActive;
 
-			if (properties.coreOptions.groupFeatures)
+			if (properties.coreOptions.combineMeshes)
 			{
 				_defaultStack = ScriptableObject.CreateInstance<MergedModifierStack>();
 			}
@@ -195,6 +195,27 @@
 			_defaultStack.MeshModifiers.AddRange(_layerProperties.MeshModifiers);
 			_defaultStack.GoModifiers.AddRange(_layerProperties.GoModifiers);
 
+			//Adding filters from the types dropdown
+
+			//if ((MapboxSpecialLayerParameters.LayerNameTypeProperty.ContainsKey(properties.coreOptions.layerName)) && !string.IsNullOrEmpty(properties.selectedTypes))
+			//{
+			//	LayerFilter filter = new LayerFilter(LayerFilterOperationType.Contains);
+
+			//	filter.Key = MapboxSpecialLayerParameters.LayerNameTypeProperty[properties.coreOptions.layerName];
+			//	filter.PropertyValue = properties.selectedTypes;
+
+			//	//if (properties.coreOptions.layerName == properties.roadLayer)
+			//	//{
+			//	//	filter.Key = properties.roadLayer_TypeProperty;
+			//	//	filter.PropertyValue = properties.selectedTypes;
+			//	//}
+			//	//else if (properties.coreOptions.layerName == "landuse")
+			//	//{
+			//	//	filter.Key = properties.landuseLayer_TypeProperty;
+			//	//	filter.PropertyValue = properties.selectedTypes;
+			//	//}
+			//	properties.filterOptions.filters.Add(filter);
+			//}
 		}
 
 		/// <summary>

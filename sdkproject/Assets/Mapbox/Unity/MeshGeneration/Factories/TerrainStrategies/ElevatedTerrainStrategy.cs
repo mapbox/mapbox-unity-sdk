@@ -44,11 +44,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				tile.gameObject.layer = _elevationOptions.unityLayerOptions.layerId;
 			}
 
-			if (tile.RasterDataState != Enums.TilePropertyState.Loaded)
-			{
-				tile.MeshRenderer.material = _elevationOptions.requiredOptions.baseMaterial;
-			}
-
 			if (tile.MeshFilter.mesh.vertexCount == 0)
 			{
 				CreateBaseMesh(tile);

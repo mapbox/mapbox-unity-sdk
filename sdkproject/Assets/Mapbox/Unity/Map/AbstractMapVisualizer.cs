@@ -28,6 +28,8 @@ namespace Mapbox.Unity.Map
 
 		[SerializeField]
 		Texture2D _loadingTexture;
+		[SerializeField]
+		Material TileMaterial;
 
 		protected IMapReadable _map;
 		protected Dictionary<UnwrappedTileId, UnityTile> _activeTiles = new Dictionary<UnwrappedTileId, UnityTile>();
@@ -60,6 +62,11 @@ namespace Mapbox.Unity.Map
 		public void SetLoadingTexture(Texture2D loadingTexture)
 		{
 			_loadingTexture = loadingTexture;
+		}
+
+		public void SetTileMaterial(Material tileMaterial)
+		{
+			TileMaterial = tileMaterial;
 		}
 
 		/// <summary>
@@ -203,6 +210,7 @@ namespace Mapbox.Unity.Map
 			if (unityTile == null)
 			{
 				unityTile = new GameObject().AddComponent<UnityTile>();
+				unityTile.MeshRenderer.material = TileMaterial;
 				unityTile.transform.SetParent(_map.Root, false);
 			}
 
