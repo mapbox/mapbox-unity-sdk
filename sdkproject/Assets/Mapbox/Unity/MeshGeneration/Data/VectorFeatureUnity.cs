@@ -59,6 +59,31 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				Points.Add(_newPoints);
 			}
 		}
+		
+		public VectorFeatureUnity(VectorTileFeature feature, List<List<Point2d<float>>> geom, UnityTile tile, float layerExtent, bool buildingsWithUniqueIds = false)
+		{
+			Data = feature;
+			Properties = Data.GetProperties();
+			Points.Clear();
+			Tile = tile;
+			_geom = geom;
+
+			_rectSizex = tile.Rect.Size.x;
+			_rectSizey = tile.Rect.Size.y;
+
+			_geomCount = _geom.Count;
+			for (int i = 0; i < _geomCount; i++)
+			{
+				_pointCount = _geom[i].Count;
+				_newPoints = new List<Vector3>(_pointCount);
+				for (int j = 0; j < _pointCount; j++)
+				{
+					var point = _geom[i][j];
+					_newPoints.Add(new Vector3((float)(point.X / layerExtent * _rectSizex - (_rectSizex / 2)) * tile.TileScale, 0, (float)((layerExtent - point.Y) / layerExtent * _rectSizey - (_rectSizey / 2)) * tile.TileScale));
+				}
+				Points.Add(_newPoints);
+			}
+		}
 
 		public bool ContainsLatLon(Vector2d coord)
 		{
