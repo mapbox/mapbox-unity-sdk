@@ -178,6 +178,8 @@ namespace Mapbox.Unity.Map
 		{
 			var _activeTiles = _mapVisualizer.ActiveTiles;
 			_currentExtent = new HashSet<UnwrappedTileId>(currentExtent.activeTiles);
+			// Change Map Visualizer state
+			_mapVisualizer.State = ModuleState.Working;
 			List<UnwrappedTileId> _toRemove = new List<UnwrappedTileId>();
 			foreach (var item in _activeTiles)
 			{

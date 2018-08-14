@@ -184,10 +184,10 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			IsRecycled = true;
 
 			// Reset internal state.
-			RasterDataState = TilePropertyState.None;
-			HeightDataState = TilePropertyState.None;
-			VectorDataState = TilePropertyState.None;
-			TileState = TilePropertyState.None;
+			RasterDataState = TilePropertyState.Unregistered;
+			HeightDataState = TilePropertyState.Unregistered;
+			VectorDataState = TilePropertyState.Unregistered;
+			TileState = TilePropertyState.Unregistered;
 
 			OnHeightDataChanged = delegate { };
 			OnRasterDataChanged = delegate { };

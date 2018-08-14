@@ -187,6 +187,10 @@ namespace Mapbox.Unity.Map
 					{
 						State = ModuleState.Finished;
 					}
+					else
+					{
+						State = ModuleState.Working;
+					}
 				}
 				else
 				{
