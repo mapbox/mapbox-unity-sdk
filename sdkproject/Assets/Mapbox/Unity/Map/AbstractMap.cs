@@ -158,16 +158,59 @@ namespace Mapbox.Unity.Map
 			{
 				if (_tileProvider != null)
 				{
-					_tileProvider.OnTileAdded -= TileProvider_OnTileAdded;
-					_tileProvider.OnTileRemoved -= TileProvider_OnTileRemoved;
-					_tileProvider.OnTileRepositioned -= TileProvider_OnTileRepositioned;
+					_tileProvider.ExtentChanged -= OnMapExtentChanged;
 				}
 				_tileProvider = value;
-				_tileProvider.OnTileAdded += TileProvider_OnTileAdded;
-				_tileProvider.OnTileRemoved += TileProvider_OnTileRemoved;
-				_tileProvider.OnTileRepositioned += TileProvider_OnTileRepositioned;
-
+				_tileProvider.ExtentChanged += OnMapExtentChanged;
 			}
+		}
+		[SerializeField]
+		protected HashSet<UnwrappedTileId> _currentExtent;
+		public HashSet<UnwrappedTileId> CurrentExtent
+		{
+			get
+			{
+				return _currentExtent;
+			}
+		}
+
+		private void TriggerTileRedrawForExtent(ExtentArgs currentExtent)
+		{
+			var _activeTiles = _mapVisualizer.ActiveTiles;
+			var _tilesToRequest = currentExtent.activeTiles;
+			List<UnwrappedTileId> _toRemove = new List<UnwrappedTileId>();
+			foreach (var item in _activeTiles)
+			{
+				if (!_tilesToRequest.Contains(item.Key))
+				{
+					_toRemove.Add(item.Key);
+				}
+			}
+
+			foreach (var t2r in _toRemove)
+			{
+				TileProvider_OnTileRemoved(t2r);
+			}
+
+			foreach (var tile in _activeTiles)
+			{
+				// Reposition tiles in case we panned.
+				TileProvider_OnTileRepositioned(tile.Key);
+			}
+
+			foreach (var tile in _tilesToRequest)
+			{
+				if (!_activeTiles.ContainsKey(tile))
+				{
+					TileProvider_OnTileAdded(tile);
+				}
+			}
+		}
+
+		private void OnMapExtentChanged(object sender, ExtentArgs currentExtent)
+		{
+			_currentExtent = currentExtent.activeTiles;
+			TriggerTileRedrawForExtent(currentExtent);
 		}
 
 		protected AbstractMapVisualizer _mapVisualizer;
@@ -458,9 +501,7 @@ namespace Mapbox.Unity.Map
 		{
 			if (_tileProvider != null)
 			{
-				_tileProvider.OnTileAdded -= TileProvider_OnTileAdded;
-				_tileProvider.OnTileRemoved -= TileProvider_OnTileRemoved;
-				_tileProvider.OnTileRepositioned -= TileProvider_OnTileRepositioned;
+				_tileProvider.ExtentChanged -= OnMapExtentChanged;
 			}
 
 			_mapVisualizer.Destroy();
@@ -485,6 +526,8 @@ namespace Mapbox.Unity.Map
 			_tileProvider.Initialize(this);
 
 			SendInitialized();
+
+			_tileProvider.UpdateTileExtent();
 		}
 		/// <summary>
 		/// Initialize the map using the specified latLon and zoom.
@@ -506,6 +549,22 @@ namespace Mapbox.Unity.Map
 
 			SetUpMap();
 		}
+
+		public virtual void UpdateMap()
+		{
+			UpdateMap(_centerLatitudeLongitude, Zoom);
+		}
+
+		public virtual void UpdateMap(Vector2d latLon)
+		{
+			UpdateMap(latLon, Zoom);
+		}
+
+		public virtual void UpdateMap(float zoom)
+		{
+			UpdateMap(_centerLatitudeLongitude, zoom);
+		}
+
 		/// <summary>
 		/// Updates the map.
 		/// Use this method to update the location of the map.
@@ -543,6 +602,7 @@ namespace Mapbox.Unity.Map
 				//_mapScaleFactor.y = 1;
 				Root.localScale = _mapScaleFactor;
 			}
+			_tileProvider.UpdateTileExtent();
 
 			if (OnUpdated != null)
 			{

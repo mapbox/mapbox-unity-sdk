@@ -15,19 +15,20 @@
 		private bool _shouldUpdate;
 		private CameraBoundsTileProviderOptions _cbtpOptions;
 
-		private List<UnwrappedTileId> _toRemove;
-		private HashSet<UnwrappedTileId> _tilesToRequest;
+		//private List<UnwrappedTileId> _toRemove;
+		//private HashSet<UnwrappedTileId> _tilesToRequest;
 		private Vector2dBounds _viewPortWebMercBounds;
 
 		#region Tile decision and raycasting fields
 		private HashSet<UnwrappedTileId> _tiles;
 		private HashSet<CanonicalTileId> _canonicalTiles;
-		
+
 		private Ray _ray00;
 		private Ray _ray01;
 		private Ray _ray10;
 		private Ray _ray11;
 		private Vector3[] _hitPnt = new Vector3[4];
+		private bool _isFirstLoad;
 		#endregion
 
 		public override void OnInitialized()
@@ -40,55 +41,30 @@
 			{
 				_cbtpOptions.camera = Camera.main;
 			}
+			_cbtpOptions.camera.transform.hasChanged = false;
 			_groundPlane = new Plane(Vector3.up, 0);
 			_shouldUpdate = true;
-			_toRemove = new List<UnwrappedTileId>();
-			_tilesToRequest = new HashSet<UnwrappedTileId>();
+			_currentExtent.activeTiles = new HashSet<UnwrappedTileId>();
 		}
 
-		protected virtual void Update()
+		public override void UpdateTileExtent()
 		{
 			if (!_shouldUpdate)
 			{
 				return;
 			}
 
-			_toRemove.Clear();
-			_elapsedTime += Time.deltaTime;
+			//_elapsedTime += Time.deltaTime;
 
-			if (_elapsedTime >= _cbtpOptions.updateInterval)
+			//if (_elapsedTime >= _cbtpOptions.updateInterval)
 			{
 				_elapsedTime = 0f;
 
 				//update viewport in case it was changed by switching zoom level
 				_viewPortWebMercBounds = getcurrentViewPortWebMerc();
-				_tilesToRequest = GetWithWebMerc(_viewPortWebMercBounds, _map.AbsoluteZoom);
-				foreach (var item in _activeTiles)
-				{
-					if (!_tilesToRequest.Contains(item.Key))
-					{
-						_toRemove.Add(item.Key);
-					}
-				}
+				_currentExtent.activeTiles = GetWithWebMerc(_viewPortWebMercBounds, _map.AbsoluteZoom);
 
-				foreach (var t2r in _toRemove)
-				{
-					RemoveTile(t2r);
-				}
-				
-				foreach (var tile in _activeTiles)
-				{
-					// Reposition tiles in case we panned.
-					RepositionTile(tile.Key);
-				}
-
-				foreach (var tile in _tilesToRequest)
-				{
-					if (!_activeTiles.ContainsKey(tile))
-					{
-						AddTile(tile);
-					}
-				}
+				OnExtentChanged();
 			}
 		}
 
@@ -132,7 +108,7 @@
 		public UnwrappedTileId WebMercatorToTileId(Vector2d webMerc, int zoom)
 		{
 			var tileCount = Math.Pow(2, zoom);
-			
+
 			var dblX = webMerc.x / Constants.WebMercMax;
 			var dblY = webMerc.y / Constants.WebMercMax;
 
@@ -163,24 +139,31 @@
 			float maxZ = float.MinValue;
 			for (int i = 0; i < 4; i++)
 			{
-				if (minX > _hitPnt[i].x)
+				if (_hitPnt[i] == Vector3.zero)
 				{
-					minX = _hitPnt[i].x;
+					continue;
 				}
-
-				if (minZ > _hitPnt[i].z)
+				else
 				{
-					minZ = _hitPnt[i].z;
-				}
+					if (minX > _hitPnt[i].x)
+					{
+						minX = _hitPnt[i].x;
+					}
 
-				if (maxX < _hitPnt[i].x)
-				{
-					maxX = _hitPnt[i].x;
-				}
+					if (minZ > _hitPnt[i].z)
+					{
+						minZ = _hitPnt[i].z;
+					}
 
-				if (maxZ < _hitPnt[i].z)
-				{
-					maxZ = _hitPnt[i].z;
+					if (maxX < _hitPnt[i].x)
+					{
+						maxX = _hitPnt[i].x;
+					}
+
+					if (maxZ < _hitPnt[i].z)
+					{
+						maxZ = _hitPnt[i].z;
+					}
 				}
 			}
 
@@ -206,6 +189,15 @@
 			float distance;
 			if (!_groundPlane.Raycast(ray, out distance)) { return Vector3.zero; }
 			return ray.GetPoint(distance);
+		}
+
+		public virtual void Update()
+		{
+			if (_cbtpOptions != null && _cbtpOptions.camera != null && _cbtpOptions.camera.transform.hasChanged)
+			{
+				UpdateTileExtent();
+				_cbtpOptions.camera.transform.hasChanged = false;
+			}
 		}
 	}
 }
