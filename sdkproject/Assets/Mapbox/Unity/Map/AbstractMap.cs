@@ -478,21 +478,12 @@ namespace Mapbox.Unity.Map
 			}
 
 			_mapVisualizer.Factories = new List<AbstractTileFactory>();
-			if (_terrain.IsLayerActive)
-			{
-				_mapVisualizer.Factories.Add(_terrain.Factory);
-			}
-			if (_imagery.IsLayerActive)
-			{
-				_mapVisualizer.Factories.Add(_imagery.Factory);
-			}
-			if (_vectorData.IsLayerActive)
-			{
-				_mapVisualizer.Factories.Add(_vectorData.Factory);
-			}
+
+			_mapVisualizer.Factories.Add(_terrain.Factory);
+			_mapVisualizer.Factories.Add(_imagery.Factory);
+			_mapVisualizer.Factories.Add(_vectorData.Factory);
 
 			InitializeMap(_options);
-
 		}
 
 		// TODO: implement IDisposable, instead?

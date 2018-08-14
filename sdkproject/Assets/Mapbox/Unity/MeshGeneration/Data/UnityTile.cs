@@ -167,12 +167,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			MeshRenderer.enabled = true;
 
 
-			// Setup Loading as initial state. 
+			// Setup Loading as initial state - Unregistered 
 			// When tile registers with factories, it will set the appropriate state.
 			// None, if Factory source is None, Loading otherwise. 
-			RasterDataState = TilePropertyState.Loading;
-			HeightDataState = TilePropertyState.Loading;
-			VectorDataState = TilePropertyState.Loading;
 		}
 
 		internal void Recycle()

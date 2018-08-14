@@ -172,9 +172,11 @@ namespace Mapbox.Unity.Map
 			{
 				tile.TileState = MeshGeneration.Enums.TilePropertyState.Loaded;
 
+				// Check if all tiles in extent are active tiles
 				if (_map.CurrentExtent.Count == _activeTiles.Count)
 				{
 					bool allDone = true;
+					// Check if all tiles are loaded. 
 					foreach (var currentTile in _map.CurrentExtent)
 					{
 						bool status = (_activeTiles.ContainsKey(currentTile) && _activeTiles[currentTile].TileState == TilePropertyState.Loaded);
