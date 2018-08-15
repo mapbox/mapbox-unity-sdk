@@ -36,8 +36,9 @@ MonoBehaviour:
     prefab: {fileID: 1410376122861786, guid: 8c4fae6310db68849ad95d5e92cd30fe, type: 2}
     scaleDownWithWorld: 1
     _prefabLocations:
-    - 37.7899, -122.3969
-    _explicitlyBlockedFeatureIds: []
+    - 37.7898526,-122.3972425
+    _explicitlyBlockedFeatureIds:
+    - 4319721861
   - Name: EmpireStateBuilding
     active: 1
     prefab: {fileID: 1158024974015050, guid: f845fd35405547d4ca0a433a01c502c4, type: 2}
@@ -45,7 +46,17 @@ MonoBehaviour:
     _prefabLocations:
     - 40.748333333333, -73.985277777778
     _explicitlyBlockedFeatureIds:
+    - 20989694
     - 2659326181
+    - 1374251251
+    - 1374251271
+    - 1374251281
+    - 1374251291
+    - 1374251421
+    - 1374251331
+    - 1374251441
+    - 346338541
+    - 1374251311
   - Name: ChryslerBuilding
     active: 1
     prefab: {fileID: 1858286666362292, guid: aedce91c327268742b81a28f40485857, type: 2}
@@ -59,7 +70,14 @@ MonoBehaviour:
     scaleDownWithWorld: 1
     _prefabLocations:
     - 40.713, -74.0135
-    _explicitlyBlockedFeatureIds: []
+    _explicitlyBlockedFeatureIds:
+    - 2410292511
+    - 2410292491
+    - 2410292501
+    - 2410292521
+    - 1472299781
+    - 2410292531
+    - 2410292481
   - Name: StatueofLiberty
     active: 1
     prefab: {fileID: 1512981436160018, guid: 810c08d90875e4d2cab1a96f8a2edba4, type: 2}
