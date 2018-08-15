@@ -177,11 +177,13 @@ namespace Mapbox.Unity.Map
 		private void TriggerTileRedrawForExtent(ExtentArgs currentExtent)
 		{
 			var _activeTiles = _mapVisualizer.ActiveTiles;
-			var _tilesToRequest = currentExtent.activeTiles;
+			_currentExtent = new HashSet<UnwrappedTileId>(currentExtent.activeTiles);
+			// Change Map Visualizer state
+			_mapVisualizer.State = ModuleState.Working;
 			List<UnwrappedTileId> _toRemove = new List<UnwrappedTileId>();
 			foreach (var item in _activeTiles)
 			{
-				if (!_tilesToRequest.Contains(item.Key))
+				if (!_currentExtent.Contains(item.Key))
 				{
 					_toRemove.Add(item.Key);
 				}
@@ -198,7 +200,7 @@ namespace Mapbox.Unity.Map
 				TileProvider_OnTileRepositioned(tile.Key);
 			}
 
-			foreach (var tile in _tilesToRequest)
+			foreach (var tile in _currentExtent)
 			{
 				if (!_activeTiles.ContainsKey(tile))
 				{
@@ -209,7 +211,6 @@ namespace Mapbox.Unity.Map
 
 		private void OnMapExtentChanged(object sender, ExtentArgs currentExtent)
 		{
-			_currentExtent = currentExtent.activeTiles;
 			TriggerTileRedrawForExtent(currentExtent);
 		}
 
@@ -479,21 +480,12 @@ namespace Mapbox.Unity.Map
 			}
 
 			_mapVisualizer.Factories = new List<AbstractTileFactory>();
-			if (_terrain.IsLayerActive)
-			{
-				_mapVisualizer.Factories.Add(_terrain.Factory);
-			}
-			if (_imagery.IsLayerActive)
-			{
-				_mapVisualizer.Factories.Add(_imagery.Factory);
-			}
-			if (_vectorData.IsLayerActive)
-			{
-				_mapVisualizer.Factories.Add(_vectorData.Factory);
-			}
+
+			_mapVisualizer.Factories.Add(_terrain.Factory);
+			_mapVisualizer.Factories.Add(_imagery.Factory);
+			_mapVisualizer.Factories.Add(_vectorData.Factory);
 
 			InitializeMap(_options);
-
 		}
 
 		// TODO: implement IDisposable, instead?

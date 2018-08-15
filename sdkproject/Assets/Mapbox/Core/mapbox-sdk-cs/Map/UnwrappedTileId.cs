@@ -65,6 +65,11 @@ namespace Mapbox.Map
 			return X ^ Y ^ Z;
 		}
 
+		public override bool Equals(object obj)
+		{
+			return this.X == ((UnwrappedTileId)obj).X && this.Y == ((UnwrappedTileId)obj).Y && this.Z == ((UnwrappedTileId)obj).Z;
+		}
+
 		public static bool operator ==(UnwrappedTileId a, UnwrappedTileId b)
 		{
 			return a.X == b.X && a.Y == b.Y && a.Z == b.Z;

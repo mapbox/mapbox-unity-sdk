@@ -11,7 +11,6 @@
 	public class QuadTreeTileProvider : AbstractTileProvider
 	{
 		private Plane _groundPlane;
-		private float _elapsedTime;
 		private bool _shouldUpdate;
 		private CameraBoundsTileProviderOptions _cbtpOptions;
 
@@ -54,18 +53,11 @@
 				return;
 			}
 
-			//_elapsedTime += Time.deltaTime;
+			//update viewport in case it was changed by switching zoom level
+			_viewPortWebMercBounds = getcurrentViewPortWebMerc();
+			_currentExtent.activeTiles = GetWithWebMerc(_viewPortWebMercBounds, _map.AbsoluteZoom);
 
-			//if (_elapsedTime >= _cbtpOptions.updateInterval)
-			{
-				_elapsedTime = 0f;
-
-				//update viewport in case it was changed by switching zoom level
-				_viewPortWebMercBounds = getcurrentViewPortWebMerc();
-				_currentExtent.activeTiles = GetWithWebMerc(_viewPortWebMercBounds, _map.AbsoluteZoom);
-
-				OnExtentChanged();
-			}
+			OnExtentChanged();
 		}
 
 		public HashSet<UnwrappedTileId> GetWithWebMerc(Vector2dBounds bounds, int zoom)

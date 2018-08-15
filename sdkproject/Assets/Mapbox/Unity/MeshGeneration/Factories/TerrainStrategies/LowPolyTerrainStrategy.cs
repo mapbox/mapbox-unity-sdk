@@ -150,7 +150,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 						tile.QueryHeightData(x / cap, 1 - (y + 1) / cap),
 						_currentTileMeshData.Vertices[(int)(y * cap + x) * 6 + 2].z);
 
-					//-- 
+					//--
 
 					_currentTileMeshData.Vertices[(int)(y * cap + x) * 6 + 3] = new Vector3(
 						_currentTileMeshData.Vertices[(int)(y * cap + x) * 6 + 3].x,

@@ -139,7 +139,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				_newUvList.Add(new Vector2(_newUvList[x * _sampleCount].y, 1));
 				_newUvList.Add(new Vector2(_newUvList[x * _sampleCount].y, 0));
 
-				//--- 
+				//---
 
 				_newVertexList.Add(_newVertexList[x * _sampleCount]);
 				_newVertexList.Add(new Vector3(
@@ -151,7 +151,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				_newUvList.Add(new Vector2(_newUvList[x * _sampleCount].y, 1));
 				_newUvList.Add(new Vector2(_newUvList[x * _sampleCount].y, 0));
 
-				//--- 
+				//---
 
 				_newVertexList.Add(_newVertexList[(x + 1) * _sampleCount - 1]);
 				_newVertexList.Add(new Vector3(
@@ -163,7 +163,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				_newUvList.Add(new Vector2(_newUvList[x * _sampleCount].y, 1));
 				_newUvList.Add(new Vector2(_newUvList[x * _sampleCount].y, 0));
 
-				//--- 
+				//---
 
 				_newVertexList.Add(_newVertexList[lastRow + x]);
 				_newVertexList.Add(new Vector3(

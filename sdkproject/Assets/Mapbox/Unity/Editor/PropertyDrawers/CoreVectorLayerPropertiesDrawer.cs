@@ -13,7 +13,6 @@
 	{
 		bool _isGUIContentSet = false;
 		GUIContent[] _primitiveTypeContent;
-		static TileJsonData tileJsonData = new TileJsonData();
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
@@ -49,10 +48,6 @@
 
 			var serializedMapObject = property.serializedObject;
 			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
-			tileJsonData = mapObject.VectorData.LayerProperty.tileJsonData;
-
-			var layerDisplayNames = tileJsonData.LayerDisplayNames;
-			//DrawLayerName(property, layerDisplayNames);
 
 			if ((VectorPrimitiveType)primitiveType.enumValueIndex == VectorPrimitiveType.Line)
 			{

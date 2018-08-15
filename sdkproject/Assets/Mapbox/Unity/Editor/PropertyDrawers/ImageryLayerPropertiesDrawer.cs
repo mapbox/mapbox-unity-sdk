@@ -8,8 +8,6 @@
 	[CustomPropertyDrawer(typeof(ImageryLayerProperties))]
 	public class ImageryLayerPropertiesDrawer : PropertyDrawer
 	{
-		string objectId = "";
-
 		GUIContent[] sourceTypeContent;
 		bool isGUIContentSet = false;
 
@@ -21,7 +19,6 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
 			var sourceTypeValue = (ImagerySourceType)sourceTypeProperty.enumValueIndex;
 

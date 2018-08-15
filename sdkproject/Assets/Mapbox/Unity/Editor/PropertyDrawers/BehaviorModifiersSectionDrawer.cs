@@ -79,7 +79,6 @@
 
 		private void DrawMeshModifiers(SerializedProperty property)
 		{
-			var combineMeshesProperty = property.FindPropertyRelative("coreOptions").FindPropertyRelative("combineMeshes");
 			EditorGUILayout.BeginVertical();
 			EditorGUILayout.LabelField(new GUIContent
 			{

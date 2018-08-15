@@ -5,7 +5,8 @@
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
 
-	public class TileErrorEventArgs:EventArgs {
+	public class TileErrorEventArgs : EventArgs
+	{
 
 		/// <summary>
 		/// The tile identifier.
@@ -50,7 +51,7 @@
 		{
 			this.TileId = TileId;
 			List<Exception> _exceptions = new List<Exception>();
-			foreach(var exception in Exceptions)
+			foreach (var exception in Exceptions)
 			{
 				_exceptions.Add(exception);
 			}
