@@ -179,7 +179,6 @@ namespace Mapbox.Unity.Map
 					// Check if all tiles are loaded. 
 					foreach (var currentTile in _map.CurrentExtent)
 					{
-						bool status = (_activeTiles.ContainsKey(currentTile) && _activeTiles[currentTile].TileState == TilePropertyState.Loaded);
 						allDone = allDone && (_activeTiles.ContainsKey(currentTile) && _activeTiles[currentTile].TileState == TilePropertyState.Loaded);
 					}
 

@@ -42,7 +42,6 @@
 		}
 		protected VectorDataFetcher DataFetcher;
 
-		private int _maximumConcurrentRequestCount = 10;
 		private Dictionary<UnityTile, HashSet<LayerVisualizerBase>> _layerProgress;
 
 		#region AbstractFactoryOverrides

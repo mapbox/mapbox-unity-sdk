@@ -23,8 +23,6 @@
 		static TileJsonData tileJsonData = new TileJsonData();
 		int _layerIndex = 0;
 		GUIContent[] _layerTypeContent;
-		bool showModeling = false;
-		bool showTexturing = false;
 		private static VectorSubLayerProperties subLayerProperties;
 		private TreeModel<FeatureTreeElement> treeModel;
 
@@ -34,7 +32,7 @@
 
 		[SerializeField]
 		MultiColumnHeaderState m_MultiColumnHeaderState;
-			
+
 		bool m_Initialized = false;
 		string objectId = "";
 		private string TilesetId
@@ -231,10 +229,9 @@
 				GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
 				EditorGUILayout.BeginHorizontal();
-				var presetTypes = property.FindPropertyRelative("presetFeatureTypes");
-				var names = Enum.GetNames(typeof(PresetFeatureType));
+				//var presetTypes = property.FindPropertyRelative("presetFeatureTypes");
 				GenericMenu menu = new GenericMenu();
-				foreach (var name in names)
+				foreach (var name in Enum.GetNames(typeof(PresetFeatureType)))
 				{
 					menu.AddItem(new GUIContent() { text = name }, false, FetchPresetProperties, name);
 				}
@@ -303,15 +300,9 @@
 					{
 						GUI.enabled = false;
 					}
-					//var primitiveType = (VectorPrimitiveType)subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex;
-					//if ((primitiveType == VectorPrimitiveType.Point) && (sourceTypeValue == VectorSourceType.MapboxStreets || sourceTypeValue == VectorSourceType.MapboxStreetsWithBuildingIds))
-					//{
-					//	prefabUI.OnGUI(layerProperty);
-					//}
-					//else
-					{
-						DrawLayerVisualizerProperties(sourceTypeValue, layerProperty, property);
-					}
+
+					DrawLayerVisualizerProperties(sourceTypeValue, layerProperty, property);
+
 					if (!isLayerActive)
 					{
 						GUI.enabled = true;
@@ -433,16 +424,16 @@
 		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty, SerializedProperty property)
 		{
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
-			var layerName = layerProperty.FindPropertyRelative("coreOptions.layerName");
-			var roadLayerName = layerProperty.FindPropertyRelative("roadLayer");
-			var landuseLayerName = layerProperty.FindPropertyRelative("landuseLayer");
+			//var layerName = layerProperty.FindPropertyRelative("coreOptions.layerName");
+			//var roadLayerName = layerProperty.FindPropertyRelative("roadLayer");
+			//var landuseLayerName = layerProperty.FindPropertyRelative("landuseLayer");
 
 
 			var subLayerName = subLayerCoreOptions.FindPropertyRelative("sublayerName").stringValue;
 			var visualizerLayer = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
 			var subLayerType = PresetSubLayerPropertiesFetcher.GetPresetTypeFromLayerName(visualizerLayer);
-			var maskValue = layerProperty.FindPropertyRelative("_maskValue");
-			var selectedTypes = layerProperty.FindPropertyRelative("selectedTypes");
+			//var maskValue = layerProperty.FindPropertyRelative("_maskValue");
+			//var selectedTypes = layerProperty.FindPropertyRelative("selectedTypes");
 
 			GUILayout.Space(-_lineHeight);
 			layerProperty.FindPropertyRelative("presetFeatureType").intValue = (int)subLayerType;
