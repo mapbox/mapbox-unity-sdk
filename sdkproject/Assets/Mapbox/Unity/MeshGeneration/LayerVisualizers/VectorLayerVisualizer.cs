@@ -237,7 +237,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		#region Private Helper Methods
 		/// <summary>
-		/// Convenience function to add feature to Tile object pool. 
+		/// Convenience function to add feature to Tile object pool.
 		/// </summary>
 		/// <param name="feature">Feature to be added to the pool.</param>
 		/// <param name="tile">Tile currently being processed.</param>
@@ -255,7 +255,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		}
 
 		/// <summary>
-		/// Apply filters to the layer and check if the current feature is eleigible for rendering. 
+		/// Apply filters to the layer and check if the current feature is eleigible for rendering.
 		/// </summary>
 		/// <returns><c>true</c>, if feature eligible after filtering was applied, <c>false</c> otherwise.</returns>
 		/// <param name="feature">Feature.</param>
@@ -277,7 +277,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		}
 
 		/// <summary>
-		/// Function to fetch feature in vector tile at the index specified. 
+		/// Function to fetch feature in vector tile at the index specified.
 		/// </summary>
 		/// <returns>The feature in tile at the index requested.</returns>
 		/// <param name="tile">Unity Tile containing the feature.</param>
@@ -327,14 +327,14 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 		}
 
-		public override void Create(VectorTileLayer layer, UnityTile tile, Action callback)
+		public override void Create(VectorTileLayer layer, UnityTile tile, Action<UnityTile, LayerVisualizerBase> callback)
 		{
 			if (!_activeCoroutines.ContainsKey(tile))
 				_activeCoroutines.Add(tile, new List<int>());
 			_activeCoroutines[tile].Add(Runnable.Run(ProcessLayer(layer, tile, tile.UnwrappedTileId, callback)));
 		}
 
-		protected IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, UnwrappedTileId tileId, Action callback = null)
+		protected IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, UnwrappedTileId tileId, Action<UnityTile, LayerVisualizerBase> callback = null)
 		{
 			//HACK to prevent request finishing on same frame which breaks modules started/finished events
 			yield return null;
@@ -379,7 +379,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				}
 			}
 
-			#region PreProcess & Process. 
+			#region PreProcess & Process.
 
 			var featureCount = tempLayerProperties.vectorTileLayer.FeatureCount();
 			do
@@ -387,7 +387,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				for (int i = 0; i < featureCount; i++)
 				{
 					//checking if tile is recycled and changed
-					if(tile.UnwrappedTileId != tileId)
+					if (tile.UnwrappedTileId != tileId)
 					{
 						yield break;
 					}
@@ -401,7 +401,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 						yield return null;
 					}
 				}
-				// move processing to next stage. 
+				// move processing to next stage.
 				tempLayerProperties.featureProcessingStage++;
 			} while (tempLayerProperties.featureProcessingStage == FeatureProcessingStage.PreProcess
 			|| tempLayerProperties.featureProcessingStage == FeatureProcessingStage.Process);
@@ -409,7 +409,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			#endregion
 
 			#region PostProcess
-			// TODO : Clean this up to follow the same pattern. 
+			// TODO : Clean this up to follow the same pattern.
 			var mergedStack = _defaultStack as MergedModifierStack;
 			if (mergedStack != null && tile != null)
 			{
@@ -418,7 +418,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			#endregion
 
 			if (callback != null)
-				callback();
+				callback(tile, this);
 		}
 
 		private bool ProcessFeature(int index, UnityTile tile, VectorLayerVisualizerProperties layerProperties, float layerExtent)
@@ -462,7 +462,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 							{
 								return false;
 							}
-							//feature not skipped. Add to pool only if features are in preprocess stage. 
+							//feature not skipped. Add to pool only if features are in preprocess stage.
 							AddFeatureToTileObjectPool(feature, tile);
 							Build(feature, tile, tile.gameObject);
 							break;
@@ -580,7 +580,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		public override void OnUnregisterTile(UnityTile tile)
 		{
 			base.OnUnregisterTile(tile);
-			tile.VectorDataState = Enums.TilePropertyState.Cancelled;
+			//tile.VectorDataState = Enums.TilePropertyState.Cancelled;
 			if (_activeCoroutines.ContainsKey(tile))
 			{
 				foreach (var cor in _activeCoroutines[tile])

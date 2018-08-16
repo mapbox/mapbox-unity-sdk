@@ -5,10 +5,7 @@
 
 	public interface ITileProvider
 	{
-		event Action<UnwrappedTileId> OnTileAdded;
-		event Action<UnwrappedTileId> OnTileRemoved;
-		event Action<UnwrappedTileId> OnTileRepositioned;
-
+		event EventHandler<ExtentArgs> ExtentChanged;
 		ITileProviderOptions Options { get; }
 
 		// TODO: add cancel event?

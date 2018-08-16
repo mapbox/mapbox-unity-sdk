@@ -195,14 +195,14 @@
 		Light,
 		[Description("Dark style uses colored materials to create dark, greyscale shading for your map.")]
 		Dark,
-		[Description("Color style uses user-defined color and opacity to create colorful, flat shading for your map.")]
-		Color,
 		[Description("Realistic style combines modern, urban designs with physically based rendering materials to help create a contemporary, realistic rendering style.")]
 		Realistic,
 		[Description("Fantasy style combines old world medieval designs with physically based rendering materials to help create a fantasy rendering style.")]
 		Fantasy,
 		[Description("Satellite style uses high-resolution satellite imagery as a texture set. The comprehensive set of road, label, and POI information brings clarity and context to the crisp detail in our high-resolution satellite imagery.")]
 		Satellite,
+		[Description("Color style uses user-defined color and opacity to create colorful, flat shading for your map.")]
+		Color,
 	}
 
 	public enum SamplePalettes

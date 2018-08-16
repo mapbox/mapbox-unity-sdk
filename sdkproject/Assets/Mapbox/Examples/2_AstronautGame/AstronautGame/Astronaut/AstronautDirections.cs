@@ -43,7 +43,6 @@ namespace Mapbox.Examples
 				return;
 			}
 
-			var meshData = new MeshData();
 			var dat = new List<Vector3>();
 			foreach (var point in response.Routes[0].Geometry)
 			{

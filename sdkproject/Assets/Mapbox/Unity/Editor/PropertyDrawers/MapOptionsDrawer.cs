@@ -61,7 +61,7 @@
 	}
 
 	[CustomPropertyDrawer(typeof(AbstractTileProvider))]
-	public class AbstractTileProvider : PropertyDrawer
+	public class AbstractTileProviderDrawer : PropertyDrawer
 	{
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
