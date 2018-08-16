@@ -76,6 +76,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		#region Tile Positon/Scale Properties
 		public RectD Rect { get; private set; }
 		public int InitialZoom { get; private set; }
+		public int CurrentZoom { get; private set; }
 		public float TileScale { get; private set; }
 		public UnwrappedTileId UnwrappedTileId { get; private set; }
 		public CanonicalTileId CanonicalTileId { get; private set; }
@@ -158,7 +159,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				_isInitialized = true;
 				InitialZoom = zoom;
 			}
-
+			CurrentZoom = zoom;
 			scaleFactor = Mathf.Pow(2, (map.InitialZoom - zoom));
 			gameObject.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
 			gameObject.SetActive(true);
@@ -167,9 +168,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			MeshRenderer.enabled = true;
 
 
-			// Setup Loading as initial state - Unregistered 
+			// Setup Loading as initial state - Unregistered
 			// When tile registers with factories, it will set the appropriate state.
-			// None, if Factory source is None, Loading otherwise. 
+			// None, if Factory source is None, Loading otherwise.
 		}
 
 		internal void Recycle()

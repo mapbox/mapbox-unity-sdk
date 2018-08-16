@@ -1,4 +1,6 @@
-﻿namespace Mapbox.Unity.MeshGeneration.Interfaces
+﻿using Mapbox.VectorTile.Geometry;
+
+namespace Mapbox.Unity.MeshGeneration.Interfaces
 {
 	using System;
 	using System.Collections;
@@ -390,7 +392,7 @@
 						yield break;
 					}
 
-					ProcessFeature(i, tile, tempLayerProperties);
+					ProcessFeature(i, tile, tempLayerProperties, layer.Extent);
 
 					if (IsCoroutineBucketFull)
 					{
@@ -419,9 +421,30 @@
 				callback(tile, this);
 		}
 
-		private bool ProcessFeature(int index, UnityTile tile, VectorLayerVisualizerProperties layerProperties)
+		private bool ProcessFeature(int index, UnityTile tile, VectorLayerVisualizerProperties layerProperties, float layerExtent)
 		{
-			var feature = GetFeatureinTileAtIndex(index, tile, layerProperties);
+			var fe = layerProperties.vectorTileLayer.GetFeature(index);
+			List<List<Point2d<float>>> geom;
+			if (layerProperties.buildingsWithUniqueIds == true) //ids from building dataset is big ulongs 
+			{
+				geom = fe.Geometry<float>(); //and we're not clipping by passing no parameters
+
+				if (geom[0][0].X < 0 || geom[0][0].X > layerExtent || geom[0][0].Y < 0 || geom[0][0].Y > layerExtent)
+				{
+					return false;
+				}
+			}
+			else //streets ids, will require clipping
+			{
+				geom = fe.Geometry<float>(0); //passing zero means clip at tile edge
+			}
+
+			var feature = new VectorFeatureUnity(layerProperties.vectorTileLayer.GetFeature(index),
+				geom,
+				tile,
+				layerProperties.vectorTileLayer.Extent,
+				layerProperties.buildingsWithUniqueIds);
+
 
 			if (IsFeatureEligibleAfterFiltering(feature, tile, layerProperties))
 			{
