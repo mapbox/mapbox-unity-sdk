@@ -4,7 +4,7 @@
 08/20/2018
 ##### New Features
 - Added a **ReplaceFeatureCollectionModifier** class that allows multiple ReplaceFeatureModifiers to be run from one modifier.
-- Added eight hero structures - Transamerica Pyramid, Coit Tower, Salesforce Tower, Empire State Building, Chrysler Building, One World Trade Center, Statue of Liberty.
+- Added seven hero structures - Transamerica Pyramid, Coit Tower, Salesforce Tower, Empire State Building, Chrysler Building, One World Trade Center, Statue of Liberty.
 ##### Improvements
 - Added color option to texturing style
 - Added color palettes drop down to Simple texturing option. Allows users to choose between different color palettes.
