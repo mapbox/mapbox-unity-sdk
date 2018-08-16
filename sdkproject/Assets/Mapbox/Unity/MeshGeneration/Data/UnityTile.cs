@@ -111,6 +111,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		}
 
 		public int InitialZoom { get; internal set; }
+		public int CurrentZoom { get; internal set; }
 		public float TileScale { get; internal set; }
 
 		public TilePropertyState RasterDataState;
@@ -138,7 +139,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				_isInitialized = true;
 				InitialZoom = zoom;
 			}
-
+			CurrentZoom = zoom;
 			scaleFactor = Mathf.Pow(2, (map.InitialZoom - zoom));
 			gameObject.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
 			gameObject.SetActive(true);
@@ -197,7 +198,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				}
 			}
 
-			if(addCollider && gameObject.GetComponent<MeshCollider>() == null)
+			if (addCollider && gameObject.GetComponent<MeshCollider>() == null)
 			{
 				gameObject.AddComponent<MeshCollider>();
 			}

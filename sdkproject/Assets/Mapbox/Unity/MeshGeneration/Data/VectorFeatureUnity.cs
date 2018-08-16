@@ -59,7 +59,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				Points.Add(_newPoints);
 			}
 		}
-		
+
 		public VectorFeatureUnity(VectorTileFeature feature, List<List<Point2d<float>>> geom, UnityTile tile, float layerExtent, bool buildingsWithUniqueIds = false)
 		{
 			Data = feature;
@@ -89,18 +89,36 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		{
 			////first check tile
 			var coordinateTileId = Conversions.LatitudeLongitudeToTileId(
-				coord.x, coord.y, Tile.InitialZoom);
-			if (!coordinateTileId.Canonical.Equals(Tile.CanonicalTileId))
+				coord.x, coord.y, Tile.CurrentZoom);
+
+			if (Points.Count > 0)
 			{
-				return false;
+				var from = Conversions.LatLonToMeters(coord.x, coord.y);
+
+				var to = new Vector2d((Points[0][0].x / Tile.TileScale) + Tile.Rect.Center.x, (Points[0][0].z / Tile.TileScale) + Tile.Rect.Center.y);
+				var dist = Vector2d.Distance(from, to);
+				if (Mathd.Abs(dist) < 50)
+				{
+					return true;
+				}
 			}
 
-			//then check polygon
-			var point = Conversions.LatitudeLongitudeToVectorTilePosition(coord, Tile.InitialZoom);
-			var output = PolygonUtils.PointInPolygon(new Point2d<float>(point.x, point.y), _geom);
 
-			return output;
+			//Debug.Log("Distance -> " + dist);
+			{
+				if ((!coordinateTileId.Canonical.Equals(Tile.CanonicalTileId)))
+				{
+					return false;
+				}
+
+				//then check polygon
+				var point = Conversions.LatitudeLongitudeToVectorTilePosition(coord, Tile.CurrentZoom);
+				var output = PolygonUtils.PointInPolygon(new Point2d<float>(point.x, point.y), _geom);
+
+				return output;
+			}
+
 		}
- 
+
 	}
 }
