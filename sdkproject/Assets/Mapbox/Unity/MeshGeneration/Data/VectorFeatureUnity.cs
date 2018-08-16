@@ -91,17 +91,20 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			var coordinateTileId = Conversions.LatitudeLongitudeToTileId(
 				coord.x, coord.y, Tile.CurrentZoom);
 
-
-			var from = Conversions.LatLonToMeters(coord.x, coord.y);
-			var to = new Vector2d((Points[0][0].x / Tile.TileScale) + Tile.Rect.Center.x, (Points[0][0].z / Tile.TileScale) + Tile.Rect.Center.y);
-			var dist = Vector2d.Distance(from, to);
-			//Debug.Log("Distance -> " + dist);
-
-			if (Mathd.Abs(dist) < 50)
+			if (Points.Count > 0)
 			{
-				return true;
+				var from = Conversions.LatLonToMeters(coord.x, coord.y);
+
+				var to = new Vector2d((Points[0][0].x / Tile.TileScale) + Tile.Rect.Center.x, (Points[0][0].z / Tile.TileScale) + Tile.Rect.Center.y);
+				var dist = Vector2d.Distance(from, to);
+				if (Mathd.Abs(dist) < 50)
+				{
+					return true;
+				}
 			}
-			else
+
+
+			//Debug.Log("Distance -> " + dist);
 			{
 				if ((!coordinateTileId.Canonical.Equals(Tile.CanonicalTileId)))
 				{
