@@ -115,5 +115,13 @@
 				modifier.Run(ve, tile);
 			}
 		}
+
+		public override void OnPoolItem(VectorEntity vectorEntity)
+		{
+			foreach (ReplaceFeatureModifier modifier in _replaceFeatureModifiers)
+			{
+				modifier.OnPoolItem(vectorEntity);
+			}
+		}
 	}
 }

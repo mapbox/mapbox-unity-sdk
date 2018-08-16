@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 public class MeshGenerationBase : MeshModifier, IReplaceable
 {
-	public List<IReplacementCriteria> Criteria{get; set;}
+	public HashSet<IReplacementCriteria> Criteria { get; set; }
 	public override void Initialize()
 	{
 		base.Initialize();
-		Criteria = new List<IReplacementCriteria>();
+		Criteria = new HashSet<IReplacementCriteria>();
 	}
 }
