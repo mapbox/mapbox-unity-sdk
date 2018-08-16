@@ -85,10 +85,3 @@ MonoBehaviour:
     _prefabLocations:
     - 40.6892, -74.0445
     _explicitlyBlockedFeatureIds: []
-  - Name: GuggenheimMuseum
-    active: 1
-    prefab: {fileID: 1769344787186994, guid: d7b312f965ac0465dbc06b4b61aabb99, type: 2}
-    scaleDownWithWorld: 1
-    _prefabLocations:
-    - 40.783056, -73.958889
-    _explicitlyBlockedFeatureIds: []
