@@ -64,6 +64,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			if (tile != null)
 			{
+				tile.RasterDataState = TilePropertyState.Error;
 				_tilesWaitingResponse.Remove(tile);
 				OnErrorOccurred(e);
 			}
