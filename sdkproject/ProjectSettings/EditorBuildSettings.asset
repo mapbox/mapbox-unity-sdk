@@ -12,6 +12,9 @@ EditorBuildSettings:
     path: Assets/Mapbox/Examples/0_PrefabScenes/CitySimulator.unity
     guid: e9aaa5d7902ec4a07bb4b1f2923cafc8
   - enabled: 1
+    path: Assets/Mapbox/Examples/0_PrefabScenes/IconicBuildings.unity
+    guid: 2047e93df64ce478c91225d834c82f3d
+  - enabled: 1
     path: Assets/Mapbox/Examples/0_PrefabScenes/Location-basedGame.unity
     guid: 42f6aa7ce7a604f16ade319663f46ceb
   - enabled: 1
@@ -68,4 +71,3 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/MapboxAR/Examples/Scenes/WorldScaleAR.unity
     guid: c60dfd6bb74264e44b3dbf93e9d129c4
-  m_configObjects: {}
