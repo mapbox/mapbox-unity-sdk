@@ -110,11 +110,13 @@
 			_imageFactory.SetOptions(_layerProperty);
 
 			//updating image layer on settings change
-			_layerProperty.OnPropertyUpdated += () =>
-			{
-				Factory.SetOptions(_layerProperty);
-				NotifyUpdateLayer(_imageFactory);
-			};
+			_layerProperty.OnPropertyUpdated += Refresh;
+		}
+
+		public void Refresh()
+		{
+			Factory.SetOptions(_layerProperty);
+			NotifyUpdateLayer(_imageFactory);
 		}
 
 		public void Remove()
