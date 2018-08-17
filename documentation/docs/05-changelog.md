@@ -10,6 +10,8 @@
 - Added color palettes drop down to Simple texturing option. Allows users to choose between different color palettes.
 - Improvements to Tile states and map states. Map extent finished state is robust and deterministic.
 - Removed dependency of Tile Providers on Update methods.
+##### Bug Fixes
+- Fix issue with building side wall modifier where it miscalculated the floor heights causing overlaping polygons/floors
 
 ### v.1.4.4
 *07/10/2018*
