@@ -675,7 +675,7 @@ Prefab:
         This demonstrates the use of the ReplaceFeatureCollection modifier, which
         allows key locations to be replaced with unique prefabs, such as a iconic
         skyscrapers or historic landmarks. Click to buttons above to see various features
-        from around the world reokaced with custom 3d models.'
+        from around the world replaced with custom 3d models.'
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
