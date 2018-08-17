@@ -17,13 +17,14 @@ namespace Mapbox.Examples
 
 	public class HeroBuildingSelectionUserInput : MonoBehaviour
 	{
-
+		
 		[Geocode]
 		public string location;
 
-		public Vector3 _cameraPosition;
-
-		public Vector3 _cameraRotation;
+		[SerializeField]
+		private Vector3 _cameraPosition;
+		[SerializeField]
+		private Vector3 _cameraRotation;
 
 		Vector2d _coordinate;
 
@@ -95,5 +96,6 @@ namespace Mapbox.Examples
 			_cameraPosition = _camera.transform.position;
 			_cameraRotation = _camera.transform.localEulerAngles;
 		}
+
 	}
 }
