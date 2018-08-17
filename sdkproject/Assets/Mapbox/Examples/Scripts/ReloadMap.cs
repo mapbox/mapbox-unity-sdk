@@ -38,9 +38,9 @@
 			{
 				_forwardGeocoder.OnGeocoderResponse += ForwardGeocoder_OnGeocoderResponse;
 			}
-			else
+			_heroBuildingSelectionUserInput = GetComponentsInChildren<HeroBuildingSelectionUserInput>();
+			if(_heroBuildingSelectionUserInput != null)
 			{
-				_heroBuildingSelectionUserInput = GetComponentsInChildren<HeroBuildingSelectionUserInput>();
 				for (int i = 0; i < _heroBuildingSelectionUserInput.Length; i++)
 				{
 					_heroBuildingSelectionUserInput[i].OnGeocoderResponse += ForwardGeocoder_OnGeocoderResponse;
