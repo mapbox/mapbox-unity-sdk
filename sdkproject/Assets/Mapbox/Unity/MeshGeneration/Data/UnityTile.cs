@@ -200,41 +200,44 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void SetHeightData(byte[] data, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false)
 		{
-			// HACK: compute height values for terrain. We could probably do this without a texture2d.
-			if (_heightTexture == null)
+			if (HeightDataState != TilePropertyState.Unregistered)
 			{
-				_heightTexture = new Texture2D(0, 0);
-			}
-
-			_heightTexture.LoadImage(data);
-			byte[] rgbData = _heightTexture.GetRawTextureData();
-
-			// Get rid of this temporary texture. We don't need to bloat memory.
-			_heightTexture.LoadImage(null);
-
-			if (_heightData == null)
-			{
-				_heightData = new float[256 * 256];
-			}
-
-			var relativeScale = useRelative ? _relativeScale : 1f;
-			for (int xx = 0; xx < 256; ++xx)
-			{
-				for (int yy = 0; yy < 256; ++yy)
+				// HACK: compute height values for terrain. We could probably do this without a texture2d.
+				if (_heightTexture == null)
 				{
-					float r = rgbData[(xx * 256 + yy) * 4 + 1];
-					float g = rgbData[(xx * 256 + yy) * 4 + 2];
-					float b = rgbData[(xx * 256 + yy) * 4 + 3];
-					_heightData[xx * 256 + yy] = relativeScale * heightMultiplier * Conversions.GetAbsoluteHeightFromColor(r, g, b);
+					_heightTexture = new Texture2D(0, 0);
 				}
-			}
 
-			if (addCollider && gameObject.GetComponent<MeshCollider>() == null)
-			{
-				gameObject.AddComponent<MeshCollider>();
-			}
+				_heightTexture.LoadImage(data);
+				byte[] rgbData = _heightTexture.GetRawTextureData();
 
-			HeightDataState = TilePropertyState.Loaded;
+				// Get rid of this temporary texture. We don't need to bloat memory.
+				_heightTexture.LoadImage(null);
+
+				if (_heightData == null)
+				{
+					_heightData = new float[256 * 256];
+				}
+
+				var relativeScale = useRelative ? _relativeScale : 1f;
+				for (int xx = 0; xx < 256; ++xx)
+				{
+					for (int yy = 0; yy < 256; ++yy)
+					{
+						float r = rgbData[(xx * 256 + yy) * 4 + 1];
+						float g = rgbData[(xx * 256 + yy) * 4 + 2];
+						float b = rgbData[(xx * 256 + yy) * 4 + 3];
+						_heightData[xx * 256 + yy] = relativeScale * heightMultiplier * Conversions.GetAbsoluteHeightFromColor(r, g, b);
+					}
+				}
+
+				if (addCollider && gameObject.GetComponent<MeshCollider>() == null)
+				{
+					gameObject.AddComponent<MeshCollider>();
+				}
+
+				HeightDataState = TilePropertyState.Loaded;
+			}
 
 			//if (_rasterData != null)
 			//{
@@ -245,26 +248,32 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public void SetRasterData(byte[] data, bool useMipMap, bool useCompression)
 		{
 			// Don't leak the texture, just reuse it.
-			if (_rasterData == null)
+			if (RasterDataState != TilePropertyState.Unregistered)
 			{
-				_rasterData = new Texture2D(0, 0, TextureFormat.RGB24, useMipMap);
-				_rasterData.wrapMode = TextureWrapMode.Clamp;
-			}
+				if (_rasterData == null)
+				{
+					_rasterData = new Texture2D(0, 0, TextureFormat.RGB24, useMipMap);
+					_rasterData.wrapMode = TextureWrapMode.Clamp;
+				}
 
-			_rasterData.LoadImage(data);
-			if (useCompression)
-			{
-				// High quality = true seems to decrease image quality?
-				_rasterData.Compress(false);
-			}
+				_rasterData.LoadImage(data);
+				if (useCompression)
+				{
+					// High quality = true seems to decrease image quality?
+					_rasterData.Compress(false);
+				}
 
-			MeshRenderer.material.mainTexture = _rasterData;
-			RasterDataState = TilePropertyState.Loaded;
+				MeshRenderer.material.mainTexture = _rasterData;
+				RasterDataState = TilePropertyState.Loaded;
+			}
 		}
 
 		public void SetVectorData(VectorTile vectorTile)
 		{
-			VectorData = vectorTile;
+			if (VectorDataState != TilePropertyState.Unregistered)
+			{
+				VectorData = vectorTile;
+			}
 		}
 
 		public float QueryHeightData(float x, float y)
