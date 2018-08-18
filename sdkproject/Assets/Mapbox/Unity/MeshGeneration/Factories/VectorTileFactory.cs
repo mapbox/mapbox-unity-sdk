@@ -152,6 +152,12 @@
 				}
 			}
 		}
+
+		protected override void OnPostProcess(UnityTile tile)
+		{
+
+		}
+
 		#endregion
 
 		#region DataFetcherEvents

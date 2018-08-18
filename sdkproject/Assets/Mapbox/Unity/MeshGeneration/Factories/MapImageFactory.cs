@@ -111,6 +111,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				_tilesWaitingResponse.Remove(tile);
 			}
 		}
+
+		protected override void OnPostProcess(UnityTile tile)
+		{
+
+		}
 		#endregion
 	}
 }

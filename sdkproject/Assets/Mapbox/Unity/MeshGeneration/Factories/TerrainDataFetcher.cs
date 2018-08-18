@@ -26,7 +26,7 @@ public class TerrainDataFetcher : DataFetcher
 	public void FetchTerrain(CanonicalTileId canonicalTileId, string mapid, UnityTile tile = null)
 	{
 		var pngRasterTile = new RawPngRasterTile();
-		
+
 		pngRasterTile.Initialize(_fileSource, canonicalTileId, mapid, () =>
 		{
 			if (tile.CanonicalTileId != pngRasterTile.Id)
@@ -37,13 +37,13 @@ public class TerrainDataFetcher : DataFetcher
 
 			if (pngRasterTile.HasError)
 			{
-				tile.HeightDataState = TilePropertyState.Loaded;
+				//tile.HeightDataState = TilePropertyState.Error;
 				FetchingError(tile, pngRasterTile, new TileErrorEventArgs(canonicalTileId, pngRasterTile.GetType(), null, pngRasterTile.Exceptions));
 			}
 			else
 			{
 				DataRecieved(tile, pngRasterTile);
-				tile.HeightDataState = TilePropertyState.Loaded;
+				//tile.HeightDataState = TilePropertyState.Loaded;
 			}
 		});
 	}

@@ -62,6 +62,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 
 		}
 
+		public override void PostProcessTile(UnityTile tile)
+		{
+			//if (_meshData.ContainsKey(tile.UnwrappedTileId))
+			//{
+			//	FixStitches(tile.UnwrappedTileId, _meshData[tile.UnwrappedTileId]);
+			//	tile.MeshFilter.mesh.RecalculateBounds();
+			//}
+		}
 		#region mesh gen
 		private void CreateBaseMesh(UnityTile tile)
 		{
