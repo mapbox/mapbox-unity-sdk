@@ -165,7 +165,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			gameObject.SetActive(true);
 
 			IsRecycled = false;
-			MeshRenderer.enabled = true;
+			//MeshRenderer.enabled = true;
 
 
 			// Setup Loading as initial state - Unregistered
@@ -178,7 +178,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			if (_loadingTexture && MeshRenderer != null)
 			{
 				MeshRenderer.material.mainTexture = _loadingTexture;
-				MeshRenderer.enabled = false;
+				//MeshRenderer.enabled = false;
 			}
 
 			gameObject.SetActive(false);
@@ -236,17 +236,10 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 			HeightDataState = TilePropertyState.Loaded;
 
-			if (_rasterData != null)
-			{
-				_meshRenderer.material.mainTexture = _rasterData;
-			}
-
-			HeightDataState = TilePropertyState.Loaded;
-
-			if (_rasterData != null)
-			{
-				_meshRenderer.material.mainTexture = _rasterData;
-			}
+			//if (_rasterData != null)
+			//{
+			//	_meshRenderer.material.mainTexture = _rasterData;
+			//}
 		}
 
 		public void SetRasterData(byte[] data, bool useMipMap, bool useCompression)
