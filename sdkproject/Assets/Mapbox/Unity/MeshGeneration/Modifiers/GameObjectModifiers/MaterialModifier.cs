@@ -16,9 +16,13 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		[SerializeField]
 		GeometryMaterialOptions _options;
 
+		private const string _BASE_COLOR_NAME = "_BaseColor";
+		private int _baseColorId;
+
 		public override void SetProperties(ModifierProperties properties)
 		{
 			_options = (GeometryMaterialOptions)properties;
+			_baseColorId = Shader.PropertyToID(_BASE_COLOR_NAME);
 		}
 
 		public override void Run(VectorEntity ve, UnityTile tile)
@@ -45,6 +49,16 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 
 			ve.MeshRenderer.materials = mats;
+
+			if (_options.style == StyleTypes.Color)
+			{
+				MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+				ve.MeshRenderer.GetPropertyBlock(propBlock);
+
+				propBlock.SetColor(_baseColorId, _options.colorStyleColor);
+
+				ve.MeshRenderer.SetPropertyBlock(propBlock);
+			}
 		}
 	}
 
