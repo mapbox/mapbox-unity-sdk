@@ -24,7 +24,6 @@ public class VectorDataFetcher : DataFetcher
 			if (vectorTile.HasError)
 			{
 				FetchingError(tile, vectorTile, new TileErrorEventArgs(tile.CanonicalTileId, vectorTile.GetType(), tile, vectorTile.Exceptions));
-				tile.VectorDataState = TilePropertyState.Error;
 			}
 			else
 			{

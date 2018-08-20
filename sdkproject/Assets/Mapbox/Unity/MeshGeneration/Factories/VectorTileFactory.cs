@@ -185,12 +185,13 @@
 			}
 		}
 
-		private void DataChangedHandler(UnityTile t)
+		private void DataChangedHandler(UnityTile tile)
 		{
-			if (t.RasterDataState != TilePropertyState.Loading &&
-				t.HeightDataState != TilePropertyState.Loading)
+			if (tile.VectorDataState != TilePropertyState.Unregistered &&
+				tile.RasterDataState != TilePropertyState.Loading &&
+				tile.HeightDataState != TilePropertyState.Loading)
 			{
-				CreateMeshes(t);
+				CreateMeshes(tile);
 			}
 		}
 

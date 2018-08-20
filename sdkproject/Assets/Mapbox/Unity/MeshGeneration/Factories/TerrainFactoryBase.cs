@@ -84,11 +84,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					Strategy.RegisterTile(tile);
 					tile.gameObject.name += Time.frameCount;
 				}
-				else
-				{
-					Debug.Log("Unregistered Not loading!!!!");
-				}
-				//TileFinished(new TileProcessFinishedEventArgs(this, tile));
 			}
 		}
 

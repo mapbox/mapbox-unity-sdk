@@ -135,8 +135,21 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				}
 			}
 		}
-
-		public TilePropertyState TileState = TilePropertyState.None;
+		private TilePropertyState _tileState = TilePropertyState.None;
+		public TilePropertyState TileState
+		{
+			get
+			{
+				return _tileState;
+			}
+			set
+			{
+				if (_tileState != value)
+				{
+					_tileState = value;
+				}
+			}
+		}
 
 		public event Action<UnityTile> OnHeightDataChanged = delegate { };
 		public event Action<UnityTile> OnRasterDataChanged = delegate { };
@@ -238,11 +251,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 				HeightDataState = TilePropertyState.Loaded;
 			}
-
-			//if (_rasterData != null)
-			//{
-			//	_meshRenderer.material.mainTexture = _rasterData;
-			//}
 		}
 
 		public void SetRasterData(byte[] data, bool useMipMap, bool useCompression)
