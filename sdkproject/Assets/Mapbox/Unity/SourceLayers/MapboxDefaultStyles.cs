@@ -122,8 +122,8 @@ namespace Mapbox.Unity.Map
 			AtlasInfo atlas = Resources.Load(styleAssetPathBundle.atlasPath, typeof(AtlasInfo)) as AtlasInfo;
 			ScriptablePalette palette = Resources.Load(styleAssetPathBundle.palettePath, typeof(ScriptablePalette)) as ScriptablePalette;
 
-			geometryMaterialOptions.materials[0].Materials[0] = topMaterial;
-			geometryMaterialOptions.materials[1].Materials[0] = sideMaterial;
+			geometryMaterialOptions.materials[0].Materials[0] = new Material(topMaterial);
+			geometryMaterialOptions.materials[1].Materials[0] = new Material(sideMaterial);
 			geometryMaterialOptions.atlasInfo = atlas;
 			geometryMaterialOptions.colorPalette = palette;
 
