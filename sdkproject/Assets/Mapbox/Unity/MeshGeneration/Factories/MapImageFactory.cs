@@ -54,8 +54,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			if (tile != null)
 			{
-				_tilesWaitingResponse.Remove(tile);
-				tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
+				if (tile.RasterDataState != TilePropertyState.Unregistered)
+				{
+					_tilesWaitingResponse.Remove(tile);
+					tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
+				}
 			}
 		}
 
@@ -64,9 +67,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			if (tile != null)
 			{
-				tile.RasterDataState = TilePropertyState.Error;
-				_tilesWaitingResponse.Remove(tile);
-				OnErrorOccurred(e);
+				if (tile.RasterDataState != TilePropertyState.Unregistered)
+				{
+					tile.RasterDataState = TilePropertyState.Error;
+					_tilesWaitingResponse.Remove(tile);
+					OnErrorOccurred(e);
+				}
+
 			}
 		}
 		#endregion
@@ -110,6 +117,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				_tilesWaitingResponse.Remove(tile);
 			}
+		}
+
+		protected override void OnPostProcess(UnityTile tile)
+		{
+
 		}
 		#endregion
 	}

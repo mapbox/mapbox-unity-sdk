@@ -55,32 +55,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				Strategy.RegisterTile(tile);
 				tile.HeightDataState = TilePropertyState.Loaded;
 			}
-
 		}
-
-		//protected override void OnMapUpdate()
-		//{
-		//	if (_tilesToFetch.Count > 0 && _tilesWaitingResponse.Count < 10)
-		//	{
-		//		for (int i = 0; i < Math.Min(_tilesToFetch.Count, 5); i++)
-		//		{
-		//			var tile = _tilesToFetch.Dequeue();
-
-		//			if (Strategy is IElevationBasedTerrainStrategy)
-		//			{
-		//				_tilesWaitingResponse.Add(tile);
-		//				DataFetcher.FetchTerrain(tile.CanonicalTileId, _elevationOptions.sourceOptions.Id, tile);
-		//				//we're not calling tile.RemoveFactory here as we're not done with the tile yet
-		//			}
-		//			else
-		//			{
-		//				Strategy.RegisterTile(tile);
-		//				tile.HeightDataState = TilePropertyState.Loaded;
-		//				//TileFinished(new TileProcessFinishedEventArgs(this, tile));
-		//			}
-		//		}
-		//	}
-		//}
 
 		protected override void OnUnregistered(UnityTile tile)
 		{
@@ -90,6 +65,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 			Strategy.UnregisterTile(tile);
 		}
+
+		protected override void OnPostProcess(UnityTile tile)
+		{
+			Strategy.PostProcessTile(tile);
+		}
 		#endregion
 
 		#region DataFetcherEvents
@@ -98,10 +78,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			if (tile != null)
 			{
 				_tilesWaitingResponse.Remove(tile);
-				tile.SetHeightData(pngRasterTile.Data, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.requiredOptions.addCollider);
-				Strategy.RegisterTile(tile);
-				tile.gameObject.name += Time.frameCount;
-				//TileFinished(new TileProcessFinishedEventArgs(this, tile));
+				if (tile.HeightDataState != TilePropertyState.Unregistered)
+				{
+					tile.SetHeightData(pngRasterTile.Data, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.requiredOptions.addCollider);
+					Strategy.RegisterTile(tile);
+					tile.gameObject.name += Time.frameCount;
+				}
 			}
 		}
 
@@ -110,8 +92,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			if (tile != null)
 			{
 				_tilesWaitingResponse.Remove(tile);
-				Strategy.DataErrorOccurred(tile, e);
-				tile.HeightDataState = TilePropertyState.Error;
+				if (tile.HeightDataState != TilePropertyState.Unregistered)
+				{
+					Strategy.DataErrorOccurred(tile, e);
+					tile.HeightDataState = TilePropertyState.Error;
+				}
 			}
 		}
 		#endregion

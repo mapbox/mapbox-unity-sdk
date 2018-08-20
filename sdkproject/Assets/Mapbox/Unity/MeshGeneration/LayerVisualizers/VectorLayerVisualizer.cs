@@ -387,7 +387,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				for (int i = 0; i < featureCount; i++)
 				{
 					//checking if tile is recycled and changed
-					if (tile.UnwrappedTileId != tileId)
+					if (tile.UnwrappedTileId != tileId || tile.TileState == Enums.TilePropertyState.Unregistered)
 					{
 						yield break;
 					}
