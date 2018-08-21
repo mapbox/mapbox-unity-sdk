@@ -588,12 +588,9 @@ namespace Mapbox.Unity.Map
 			Options.placementOptions.placementStrategy.SetUpPlacement(this);
 
 			//Scale the map accordingly.
-			if (Math.Abs(differenceInZoom) > Constants.EpsilonFloatingPoint)
-			{
-				_mapScaleFactor = Vector3.one * Mathf.Pow(2, differenceInZoom);
-				//_mapScaleFactor.y = 1;
-				Root.localScale = _mapScaleFactor;
-			}
+
+			_mapScaleFactor = Vector3.one * Mathf.Pow(2, differenceInZoom);
+			Root.localScale = _mapScaleFactor;
 			_tileProvider.UpdateTileExtent();
 
 			if (OnUpdated != null)
