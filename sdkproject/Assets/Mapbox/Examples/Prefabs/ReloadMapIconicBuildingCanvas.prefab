@@ -511,7 +511,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   location: Salesforce Tower
-  _cameraPosition: {x: 13.8, y: 48.9, z: -50}
+  _cameraPosition: {x: 11, y: 48.9, z: -56.57}
   _cameraRotation: {x: 20.799995, y: 0, z: 0}
 --- !u!114 &114104293458475558
 MonoBehaviour:
@@ -525,7 +525,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   location: Statue of Liberty
-  _cameraPosition: {x: 5.63, y: 3.9038727, z: -18.143627}
+  _cameraPosition: {x: 5, y: 2.4, z: -20}
   _cameraRotation: {x: 346.8, y: 357.56, z: 0.07500533}
 --- !u!114 &114111282196320942
 MonoBehaviour:
@@ -601,7 +601,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   location: Coit Tower
-  _cameraPosition: {x: 1.88, y: 26.83, z: -31.2}
+  _cameraPosition: {x: -1.4, y: 26.83, z: -32.5}
   _cameraRotation: {x: 23.391632, y: 16.149326, z: 359.48593}
 --- !u!114 &114141921765535322
 MonoBehaviour:
@@ -642,7 +642,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   location: Transamerica Pyramid
-  _cameraPosition: {x: 6.03, y: 35.120415, z: -52.590508}
+  _cameraPosition: {x: 0.67, y: 35.120415, z: -54.84}
   _cameraRotation: {x: 13.614003, y: 11.5199995, z: 1.5299962}
 --- !u!114 &114191474831456942
 MonoBehaviour:
@@ -683,7 +683,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   location: Empire State Building
-  _cameraPosition: {x: 1.1, y: 36.98, z: -70.53833}
+  _cameraPosition: {x: -8.6, y: 36.98, z: -77.36}
   _cameraRotation: {x: 359.6, y: 9.948002, z: 0.009999273}
 --- !u!114 &114251792932351436
 MonoBehaviour:
@@ -1155,7 +1155,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   location: Chrysler Building
-  _cameraPosition: {x: 35.2, y: 40.2, z: -35.6}
+  _cameraPosition: {x: 35.6, y: 40.2, z: -41.5}
   _cameraRotation: {x: 14.129676, y: 330.4426, z: 0.075521134}
 --- !u!114 &114986056470046540
 MonoBehaviour:
@@ -1169,7 +1169,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   location: One World Trade Center
-  _cameraPosition: {x: -39.2, y: 16, z: -82.8}
+  _cameraPosition: {x: -43.47, y: 16, z: -82.8}
   _cameraRotation: {x: 346.971, y: 39.799988, z: 0.077998556}
 --- !u!114 &114991531217100008
 MonoBehaviour:

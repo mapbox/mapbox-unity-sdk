@@ -152,33 +152,46 @@
 				}
 			}
 		}
+
+		protected override void OnPostProcess(UnityTile tile)
+		{
+
+		}
+
 		#endregion
 
 		#region DataFetcherEvents
 		private void OnVectorDataRecieved(UnityTile tile, VectorTile vectorTile)
 		{
-			_tilesWaitingResponse.Remove(tile);
-			tile.SetVectorData(vectorTile);
+			if (tile != null)
+			{
+				_tilesWaitingResponse.Remove(tile);
+				if (tile.VectorDataState != TilePropertyState.Unregistered)
+				{
+					tile.SetVectorData(vectorTile);
 
-			// FIXME: we can make the request BEFORE getting a response from these!
-			if (tile.HeightDataState == TilePropertyState.Loading ||
-					tile.RasterDataState == TilePropertyState.Loading)
-			{
-				tile.OnHeightDataChanged += DataChangedHandler;
-				tile.OnRasterDataChanged += DataChangedHandler;
-			}
-			else
-			{
-				CreateMeshes(tile);
+					// FIXME: we can make the request BEFORE getting a response from these!
+					if (tile.HeightDataState == TilePropertyState.Loading ||
+							tile.RasterDataState == TilePropertyState.Loading)
+					{
+						tile.OnHeightDataChanged += DataChangedHandler;
+						tile.OnRasterDataChanged += DataChangedHandler;
+					}
+					else
+					{
+						CreateMeshes(tile);
+					}
+				}
 			}
 		}
 
-		private void DataChangedHandler(UnityTile t)
+		private void DataChangedHandler(UnityTile tile)
 		{
-			if (t.RasterDataState != TilePropertyState.Loading &&
-				t.HeightDataState != TilePropertyState.Loading)
+			if (tile.VectorDataState != TilePropertyState.Unregistered &&
+				tile.RasterDataState != TilePropertyState.Loading &&
+				tile.HeightDataState != TilePropertyState.Loading)
 			{
-				CreateMeshes(t);
+				CreateMeshes(tile);
 			}
 		}
 
@@ -187,10 +200,14 @@
 			if (tile != null)
 			{
 				_tilesWaitingResponse.Remove(tile);
-				tile.SetVectorData(null);
-				tile.VectorDataState = TilePropertyState.Error;
+				if (tile.VectorDataState != TilePropertyState.Unregistered)
+				{
+					tile.SetVectorData(null);
+					tile.VectorDataState = TilePropertyState.Error;
+					OnErrorOccurred(e);
+				}
 			}
-			OnErrorOccurred(e);
+
 		}
 		#endregion
 

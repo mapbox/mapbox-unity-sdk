@@ -62,7 +62,8 @@ namespace Mapbox.Map
 
 		public override int GetHashCode()
 		{
-			return X ^ Y ^ Z;
+			return (X << 6) ^ (Y << 16) ^ (Z << 8);
+			//return X ^ Y ^ Z;
 		}
 
 		public override bool Equals(object obj)

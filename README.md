@@ -1,5 +1,5 @@
 # Mapbox-unity-sdk
-### For Unity 2017.1+  
+### For Unity 2017.1.2+
 
 **AR support requires Unity 2017.3+, Android 7+ (Nougat), iOS 11.3**
 
