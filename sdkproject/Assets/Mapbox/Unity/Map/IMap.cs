@@ -1,6 +1,8 @@
 ﻿namespace Mapbox.Unity.Map
 {
 	using System;
+	using System.Collections.Generic;
+	using Mapbox.Map;
 	using Mapbox.Utils;
 	using UnityEngine;
 
@@ -27,7 +29,9 @@
 		int AbsoluteZoom { get; }
 		Transform Root { get; }
 		float UnityTileSize { get; }
+		HashSet<UnwrappedTileId> CurrentExtent { get; }
 		event Action OnInitialized;
+		event Action OnUpdated;
 		Vector2d WorldToGeoPosition(Vector3 realworldPoint);
 		Vector3 GeoToWorldPosition(Vector2d latitudeLongitude, bool queryHeight = true);
 	}

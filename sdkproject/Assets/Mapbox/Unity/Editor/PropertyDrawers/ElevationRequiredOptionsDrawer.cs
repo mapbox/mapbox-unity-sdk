@@ -13,7 +13,7 @@
 		{
 			EditorGUI.BeginProperty(position, label, property);
 
-			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("baseMaterial"));
+			//EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("baseMaterial"));
 			position.y += lineHeight;
 			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("exaggerationFactor"));
 			position.y += lineHeight;

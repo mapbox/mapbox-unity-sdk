@@ -7,6 +7,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Unity.Map;
+	using System.Collections.Generic;
 
 	public enum MapImageType
 	{
@@ -53,20 +54,26 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			if (tile != null)
 			{
-				Progress--;
-				tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
-				tile.RasterDataState = TilePropertyState.Loaded;
+				if (tile.RasterDataState != TilePropertyState.Unregistered)
+				{
+					_tilesWaitingResponse.Remove(tile);
+					tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
+				}
 			}
 		}
 
 		//merge this with OnErrorOccurred?
-		protected virtual void OnDataError(UnityTile tile, TileErrorEventArgs e)
+		protected virtual void OnDataError(UnityTile tile, RasterTile rasterTile, TileErrorEventArgs e)
 		{
 			if (tile != null)
 			{
-				Progress--;
-				tile.RasterDataState = TilePropertyState.Error;
-				OnErrorOccurred(e);
+				if (tile.RasterDataState != TilePropertyState.Unregistered)
+				{
+					tile.RasterDataState = TilePropertyState.Error;
+					_tilesWaitingResponse.Remove(tile);
+					OnErrorOccurred(e);
+				}
+
 			}
 		}
 		#endregion
@@ -88,13 +95,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			if (_properties.sourceType == ImagerySourceType.None)
 			{
-				Progress++;
-				Progress--;
+				tile.RasterDataState = TilePropertyState.None;
 				return;
 			}
 
 			tile.RasterDataState = TilePropertyState.Loading;
-			Progress++;
 			DataFetcher.FetchImage(tile.CanonicalTileId, MapId, tile, _properties.rasterOptions.useRetina);
 		}
 
@@ -108,10 +113,16 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		protected override void OnUnregistered(UnityTile tile)
 		{
-
+			if (_tilesWaitingResponse.Contains(tile))
+			{
+				_tilesWaitingResponse.Remove(tile);
+			}
 		}
 
+		protected override void OnPostProcess(UnityTile tile)
+		{
 
+		}
 		#endregion
 	}
 }

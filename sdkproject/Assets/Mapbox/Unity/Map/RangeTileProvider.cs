@@ -3,12 +3,15 @@ namespace Mapbox.Unity.Map
 	using UnityEngine;
 	using Mapbox.Map;
 	using System.Collections.Generic;
-	using System.Linq;
+	using System;
 
 	public class RangeTileProvider : AbstractTileProvider
 	{
-		RangeTileProviderOptions _rangeTileProviderOptions;
+		private RangeTileProviderOptions _rangeTileProviderOptions;
 		private bool _initialized = false;
+
+		//private List<UnwrappedTileId> _toRemove;
+		//private HashSet<UnwrappedTileId> _tilesToRequest;
 
 		public override void OnInitialized()
 		{
@@ -22,47 +25,58 @@ namespace Mapbox.Unity.Map
 			}
 
 			_initialized = true;
+			//_toRemove = new List<UnwrappedTileId>((_rangeTileProviderOptions.east + _rangeTileProviderOptions.west) * (_rangeTileProviderOptions.north + _rangeTileProviderOptions.south));
+			_currentExtent.activeTiles = new HashSet<UnwrappedTileId>();
 		}
 
-		protected virtual void Update()
+		public override void UpdateTileExtent()
 		{
-			if (!_initialized)
+			if (!_initialized || Options == null)
 			{
 				return;
 			}
 
-			if (Options == null)
-			{
-				return;
-			}
-			var activeTiles = _activeTiles.Keys.ToList();
-
-			List<UnwrappedTileId> tilesToRequest = new List<UnwrappedTileId>();
+			_currentExtent.activeTiles.Clear();
+			//_toRemove.Clear();
 			var centerTile = TileCover.CoordinateToTileId(_map.CenterLatitudeLongitude, _map.AbsoluteZoom);
-			tilesToRequest.Add(new UnwrappedTileId(_map.AbsoluteZoom, centerTile.X, centerTile.Y));
+			_currentExtent.activeTiles.Add(new UnwrappedTileId(_map.AbsoluteZoom, centerTile.X, centerTile.Y));
 
-			for (int x = (int)(centerTile.X - _rangeTileProviderOptions.west); x <= (centerTile.X + _rangeTileProviderOptions.east); x++)
+			for (int x = (centerTile.X - _rangeTileProviderOptions.west); x <= (centerTile.X + _rangeTileProviderOptions.east); x++)
 			{
-				for (int y = (int)(centerTile.Y - _rangeTileProviderOptions.north); y <= (centerTile.Y + _rangeTileProviderOptions.south); y++)
+				for (int y = (centerTile.Y - _rangeTileProviderOptions.north); y <= (centerTile.Y + _rangeTileProviderOptions.south); y++)
 				{
-					tilesToRequest.Add(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
+					_currentExtent.activeTiles.Add(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
 				}
 			}
 
-			List<UnwrappedTileId> toRemove = activeTiles.Except(tilesToRequest).ToList();
-			foreach (var t2r in toRemove) { RemoveTile(t2r); }
-			var finalTilesNeeded = tilesToRequest.Except(activeTiles);
+			OnExtentChanged();
+			//foreach (var item in _activeTiles)
+			//{
+			//	if (!_tilesToRequest.Contains(item.Key))
+			//	{
+			//		_toRemove.Add(item.Key);
+			//	}
+			//}
 
-			foreach (var tile in activeTiles)
-			{
-				// Reposition tiles in case we panned.
-				RepositionTile(tile);
-			}
+			//foreach (var t2r in _toRemove)
+			//{
+			//	RemoveTile(t2r);
+			//}
 
-			foreach (var tile in finalTilesNeeded)
-			{
-				AddTile(tile);
-			}
+			//foreach (var tile in _activeTiles)
+			//{
+			//	// Reposition tiles in case we panned.
+			//	RepositionTile(tile.Key);
+			//}
+
+			//foreach (var tile in _tilesToRequest)
+			//{
+			//	if (!_activeTiles.ContainsKey(tile))
+			//	{
+			//		AddTile(tile);
+			//	}
+			//}
 		}
+
 	}
 }

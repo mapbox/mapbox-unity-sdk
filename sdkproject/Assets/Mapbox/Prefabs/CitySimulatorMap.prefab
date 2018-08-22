@@ -62,7 +62,6 @@ MonoBehaviour:
         camera: {fileID: 0}
         visibleBuffer: 0
         disposeBuffer: 0
-        updateInterval: 0
       rangeAroundCenterOptions:
         west: 1
         north: 1
@@ -79,6 +78,7 @@ MonoBehaviour:
       scalingType: 1
       unityTileSize: 100
     loadingTexture: {fileID: 2800000, guid: e2896a92727704803a9c422b043eae89, type: 3}
+    tileMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
   _imagery:
     _layerProperty:
       sourceType: 0
@@ -105,7 +105,6 @@ MonoBehaviour:
           UserName: 
       elevationLayerType: 1
       requiredOptions:
-        baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
         addCollider: 0
         exaggerationFactor: 1
       modificationOptions:
@@ -171,7 +170,7 @@ MonoBehaviour:
           geometryType: 2
           layerName: building
           snapToTerrain: 1
-          groupFeatures: 0
+          combineMeshes: 0
           lineWidth: 1
         filterOptions:
           _selectedLayerName: building
@@ -197,13 +196,23 @@ MonoBehaviour:
           - Materials:
             - {fileID: 2100000, guid: 55cc6edead802446b9106b2998406844, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
+          lightStyleOpacity: 1
+          darkStyleOpacity: 1
+          colorStyleColor: {r: 1, g: 1, b: 1, a: 1}
+          samplePalettes: 0
           colorPalette: {fileID: 11400000, guid: ef118b5e263da4b1fa4327ca1d3e0c7b,
             type: 2}
+        performanceOptions:
+          isEnabled: 1
+          entityPerCoroutine: 20
         honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 1
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
+        presetFeatureType: 4
+        _maskValue: 0
+        selectedTypes: 
       - coreOptions:
           sourceId: 
           isActive: 1
@@ -211,7 +220,7 @@ MonoBehaviour:
           geometryType: 1
           layerName: road
           snapToTerrain: 1
-          groupFeatures: 0
+          combineMeshes: 0
           lineWidth: 3
         filterOptions:
           _selectedLayerName: 
@@ -237,11 +246,21 @@ MonoBehaviour:
           - Materials:
             - {fileID: 2100000, guid: b00db1eb69ea64eb4adb30b2c0fb01cb, type: 2}
           atlasInfo: {fileID: 0}
+          lightStyleOpacity: 1
+          darkStyleOpacity: 1
+          colorStyleColor: {r: 1, g: 1, b: 1, a: 1}
+          samplePalettes: 0
           colorPalette: {fileID: 0}
+        performanceOptions:
+          isEnabled: 1
+          entityPerCoroutine: 20
         honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
+        presetFeatureType: 4
+        _maskValue: 0
+        selectedTypes: 
       locationPrefabList: []
   _tileProvider: {fileID: 0}

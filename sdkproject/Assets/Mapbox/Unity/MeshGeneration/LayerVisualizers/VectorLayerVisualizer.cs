@@ -1,4 +1,6 @@
-﻿namespace Mapbox.Unity.MeshGeneration.Interfaces
+﻿using Mapbox.VectorTile.Geometry;
+
+namespace Mapbox.Unity.MeshGeneration.Interfaces
 {
 	using System;
 	using System.Collections;
@@ -11,6 +13,7 @@
 	using Mapbox.Unity.Map;
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Unity.MeshGeneration.Filters;
+	using Mapbox.Map;
 
 	public class VectorLayerVisualizerProperties
 	{
@@ -64,16 +67,16 @@
 			set { _layerProperties.coreOptions.layerName = value; }
 		}
 
-		public void SetProperties(VectorSubLayerProperties properties, LayerPerformanceOptions performanceOptions)
+		public void SetProperties(VectorSubLayerProperties properties)
 		{
 			List<MeshModifier> defaultMeshModifierStack = new List<MeshModifier>();
 			List<GameObjectModifier> defaultGOModifierStack = new List<GameObjectModifier>();
 			_layerProperties = properties;
-			_performanceOptions = performanceOptions;
+			_performanceOptions = properties.performanceOptions;
 
 			Active = _layerProperties.coreOptions.isActive;
 
-			if (properties.coreOptions.groupFeatures)
+			if (properties.coreOptions.combineMeshes)
 			{
 				_defaultStack = ScriptableObject.CreateInstance<MergedModifierStack>();
 			}
@@ -194,6 +197,27 @@
 			_defaultStack.MeshModifiers.AddRange(_layerProperties.MeshModifiers);
 			_defaultStack.GoModifiers.AddRange(_layerProperties.GoModifiers);
 
+			//Adding filters from the types dropdown
+
+			//if ((MapboxSpecialLayerParameters.LayerNameTypeProperty.ContainsKey(properties.coreOptions.layerName)) && !string.IsNullOrEmpty(properties.selectedTypes))
+			//{
+			//	LayerFilter filter = new LayerFilter(LayerFilterOperationType.Contains);
+
+			//	filter.Key = MapboxSpecialLayerParameters.LayerNameTypeProperty[properties.coreOptions.layerName];
+			//	filter.PropertyValue = properties.selectedTypes;
+
+			//	//if (properties.coreOptions.layerName == properties.roadLayer)
+			//	//{
+			//	//	filter.Key = properties.roadLayer_TypeProperty;
+			//	//	filter.PropertyValue = properties.selectedTypes;
+			//	//}
+			//	//else if (properties.coreOptions.layerName == "landuse")
+			//	//{
+			//	//	filter.Key = properties.landuseLayer_TypeProperty;
+			//	//	filter.PropertyValue = properties.selectedTypes;
+			//	//}
+			//	properties.filterOptions.filters.Add(filter);
+			//}
 		}
 
 		/// <summary>
@@ -213,7 +237,7 @@
 
 		#region Private Helper Methods
 		/// <summary>
-		/// Convenience function to add feature to Tile object pool. 
+		/// Convenience function to add feature to Tile object pool.
 		/// </summary>
 		/// <param name="feature">Feature to be added to the pool.</param>
 		/// <param name="tile">Tile currently being processed.</param>
@@ -231,7 +255,7 @@
 		}
 
 		/// <summary>
-		/// Apply filters to the layer and check if the current feature is eleigible for rendering. 
+		/// Apply filters to the layer and check if the current feature is eleigible for rendering.
 		/// </summary>
 		/// <returns><c>true</c>, if feature eligible after filtering was applied, <c>false</c> otherwise.</returns>
 		/// <param name="feature">Feature.</param>
@@ -253,7 +277,7 @@
 		}
 
 		/// <summary>
-		/// Function to fetch feature in vector tile at the index specified. 
+		/// Function to fetch feature in vector tile at the index specified.
 		/// </summary>
 		/// <returns>The feature in tile at the index requested.</returns>
 		/// <param name="tile">Unity Tile containing the feature.</param>
@@ -303,14 +327,14 @@
 			}
 		}
 
-		public override void Create(VectorTileLayer layer, UnityTile tile, Action callback)
+		public override void Create(VectorTileLayer layer, UnityTile tile, Action<UnityTile, LayerVisualizerBase> callback)
 		{
 			if (!_activeCoroutines.ContainsKey(tile))
 				_activeCoroutines.Add(tile, new List<int>());
-			_activeCoroutines[tile].Add(Runnable.Run(ProcessLayer(layer, tile, callback)));
+			_activeCoroutines[tile].Add(Runnable.Run(ProcessLayer(layer, tile, tile.UnwrappedTileId, callback)));
 		}
 
-		protected IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, Action callback = null)
+		protected IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, UnwrappedTileId tileId, Action<UnityTile, LayerVisualizerBase> callback = null)
 		{
 			//HACK to prevent request finishing on same frame which breaks modules started/finished events
 			yield return null;
@@ -355,15 +379,20 @@
 				}
 			}
 
-			#region PreProcess & Process. 
+			#region PreProcess & Process.
 
 			var featureCount = tempLayerProperties.vectorTileLayer.FeatureCount();
 			do
 			{
 				for (int i = 0; i < featureCount; i++)
 				{
+					//checking if tile is recycled and changed
+					if (tile.UnwrappedTileId != tileId || tile.TileState == Enums.TilePropertyState.Unregistered)
+					{
+						yield break;
+					}
 
-					ProcessFeature(i, tile, tempLayerProperties);
+					ProcessFeature(i, tile, tempLayerProperties, layer.Extent);
 
 					if (IsCoroutineBucketFull)
 					{
@@ -372,7 +401,7 @@
 						yield return null;
 					}
 				}
-				// move processing to next stage. 
+				// move processing to next stage.
 				tempLayerProperties.featureProcessingStage++;
 			} while (tempLayerProperties.featureProcessingStage == FeatureProcessingStage.PreProcess
 			|| tempLayerProperties.featureProcessingStage == FeatureProcessingStage.Process);
@@ -380,7 +409,7 @@
 			#endregion
 
 			#region PostProcess
-			// TODO : Clean this up to follow the same pattern. 
+			// TODO : Clean this up to follow the same pattern.
 			var mergedStack = _defaultStack as MergedModifierStack;
 			if (mergedStack != null && tile != null)
 			{
@@ -389,12 +418,33 @@
 			#endregion
 
 			if (callback != null)
-				callback();
+				callback(tile, this);
 		}
 
-		private bool ProcessFeature(int index, UnityTile tile, VectorLayerVisualizerProperties layerProperties)
+		private bool ProcessFeature(int index, UnityTile tile, VectorLayerVisualizerProperties layerProperties, float layerExtent)
 		{
-			var feature = GetFeatureinTileAtIndex(index, tile, layerProperties);
+			var fe = layerProperties.vectorTileLayer.GetFeature(index);
+			List<List<Point2d<float>>> geom;
+			if (layerProperties.buildingsWithUniqueIds == true) //ids from building dataset is big ulongs 
+			{
+				geom = fe.Geometry<float>(); //and we're not clipping by passing no parameters
+
+				if (geom[0][0].X < 0 || geom[0][0].X > layerExtent || geom[0][0].Y < 0 || geom[0][0].Y > layerExtent)
+				{
+					return false;
+				}
+			}
+			else //streets ids, will require clipping
+			{
+				geom = fe.Geometry<float>(0); //passing zero means clip at tile edge
+			}
+
+			var feature = new VectorFeatureUnity(layerProperties.vectorTileLayer.GetFeature(index),
+				geom,
+				tile,
+				layerProperties.vectorTileLayer.Extent,
+				layerProperties.buildingsWithUniqueIds);
+
 
 			if (IsFeatureEligibleAfterFiltering(feature, tile, layerProperties))
 			{
@@ -412,7 +462,7 @@
 							{
 								return false;
 							}
-							//feature not skipped. Add to pool only if features are in preprocess stage. 
+							//feature not skipped. Add to pool only if features are in preprocess stage.
 							AddFeatureToTileObjectPool(feature, tile);
 							Build(feature, tile, tile.gameObject);
 							break;
@@ -530,7 +580,7 @@
 		public override void OnUnregisterTile(UnityTile tile)
 		{
 			base.OnUnregisterTile(tile);
-			tile.VectorDataState = Enums.TilePropertyState.Cancelled;
+			//tile.VectorDataState = Enums.TilePropertyState.Cancelled;
 			if (_activeCoroutines.ContainsKey(tile))
 			{
 				foreach (var cor in _activeCoroutines[tile])

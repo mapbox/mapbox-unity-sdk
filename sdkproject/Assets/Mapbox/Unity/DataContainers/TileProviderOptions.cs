@@ -29,14 +29,13 @@
 				disposeBuffer = disposeRange,
 			};
 		}
-		public static ITileProviderOptions CameraBoundsProviderOptions(Camera camera, int visibleRange, int disposeRange, float updateTime)
+		public static ITileProviderOptions CameraBoundsProviderOptions(Camera camera, int visibleRange, int disposeRange)
 		{
 			return new CameraBoundsTileProviderOptions
 			{
 				camera = camera,
 				visibleBuffer = visibleRange,
 				disposeBuffer = disposeRange,
-				updateInterval = updateTime
 			};
 		}
 	}

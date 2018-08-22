@@ -19,6 +19,8 @@
 		[SerializeField]
 		Slider _zoomSlider;
 
+		private HeroBuildingSelectionUserInput[] _heroBuildingSelectionUserInput;
+
 		Coroutine _reloadRoutine;
 
 		WaitForSeconds _wait;
@@ -28,22 +30,45 @@
 			_camera = Camera.main;
 			_cameraStartPos = _camera.transform.position;
 			_map = FindObjectOfType<AbstractMap>();
-			_forwardGeocoder.OnGeocoderResponse += ForwardGeocoder_OnGeocoderResponse;
-			_zoomSlider.onValueChanged.AddListener(Reload);
+			if (_zoomSlider != null)
+			{
+				_zoomSlider.onValueChanged.AddListener(Reload);
+			}
+			if(_forwardGeocoder != null)
+			{
+				_forwardGeocoder.OnGeocoderResponse += ForwardGeocoder_OnGeocoderResponse;
+			}
+			_heroBuildingSelectionUserInput = GetComponentsInChildren<HeroBuildingSelectionUserInput>();
+			if(_heroBuildingSelectionUserInput != null)
+			{
+				for (int i = 0; i < _heroBuildingSelectionUserInput.Length; i++)
+				{
+					_heroBuildingSelectionUserInput[i].OnGeocoderResponse += ForwardGeocoder_OnGeocoderResponse;
+				}
+			}
 			_wait = new WaitForSeconds(.3f);
 		}
 
 		void ForwardGeocoder_OnGeocoderResponse(ForwardGeocodeResponse response)
 		{
-			if(response == null)
+			if (null != response.Features && response.Features.Count > 0)
+			{
+				int zoom = _map.AbsoluteZoom;
+				_map.UpdateMap(response.Features[0].Center, zoom);
+			}
+		}
+
+		void ForwardGeocoder_OnGeocoderResponse(ForwardGeocodeResponse response, bool resetCamera)
+		{
+			if (response == null)
 			{
 				return;
 			}
-			_camera.transform.position = _cameraStartPos;
-			if (null != response.Features && response.Features.Count > 0)
+			if (resetCamera)
 			{
-				_map.UpdateMap(response.Features[0].Center, (int)_zoomSlider.value);
+				_camera.transform.position = _cameraStartPos;
 			}
+			ForwardGeocoder_OnGeocoderResponse(response);
 		}
 
 		void Reload(float value)

@@ -17,7 +17,18 @@
 
 		private string[] descriptionArray;
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
-		bool showFilters = true;
+		private string objectId = "";
+		bool showFilters
+		{
+			get
+			{
+				return EditorPrefs.GetBool(objectId + "VectorSubLayerProperties_showFilters");
+			}
+			set
+			{
+				EditorPrefs.SetBool(objectId + "VectorSubLayerProperties_showFilters", value);
+			}
+		}
 
 		GUIContent operatorGui = new GUIContent { text = "Operator", tooltip = "Filter operator to apply. " };
 		GUIContent numValueGui = new GUIContent { text = "Num Value", tooltip = "Numeric value to match using the operator.  " };
@@ -27,6 +38,8 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
+
 			showFilters = EditorGUILayout.Foldout(showFilters, new GUIContent { text = "Filters", tooltip = "Filter features in a vector layer based on criterion specified.  " });
 			if (showFilters)
 			{

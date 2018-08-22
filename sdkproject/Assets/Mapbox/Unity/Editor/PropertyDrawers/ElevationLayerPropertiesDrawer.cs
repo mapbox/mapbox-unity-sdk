@@ -91,18 +91,20 @@
 					break;
 			}
 
+			var elevationLayerType = property.FindPropertyRelative("elevationLayerType");
+
 			if (sourceTypeValue == ElevationSourceType.None)
 			{
 				GUI.enabled = false;
+				elevationLayerType.enumValueIndex = (int)ElevationLayerType.FlatTerrain;
 			}
-			var elevationLayerType = property.FindPropertyRelative("elevationLayerType");
 			EditorGUILayout.PropertyField(elevationLayerType, new GUIContent { text = elevationLayerType.displayName, tooltip = ((ElevationLayerType)elevationLayerType.enumValueIndex).Description() });
-			position.y += lineHeight;
+
 			if (sourceTypeValue == ElevationSourceType.None)
 			{
 				GUI.enabled = true;
 			}
-
+			GUILayout.Space(-lineHeight);
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("requiredOptions"), true);
 			//position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("requiredOptions"));
 			ShowPosition = EditorGUILayout.Foldout(ShowPosition, "Others");

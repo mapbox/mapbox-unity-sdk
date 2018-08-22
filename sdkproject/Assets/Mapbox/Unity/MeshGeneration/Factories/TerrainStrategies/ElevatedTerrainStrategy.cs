@@ -44,21 +44,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				tile.gameObject.layer = _elevationOptions.unityLayerOptions.layerId;
 			}
 
-			if (tile.MeshRenderer == null)
+			if (tile.MeshFilter.mesh.vertexCount == 0)
 			{
-				var renderer = tile.gameObject.AddComponent<MeshRenderer>();
-				renderer.material = _elevationOptions.requiredOptions.baseMaterial;
-			}
-
-			if (tile.MeshFilter == null)
-			{
-				tile.gameObject.AddComponent<MeshFilter>();
 				CreateBaseMesh(tile);
-			}
-
-			if (_elevationOptions.requiredOptions.addCollider && tile.Collider == null)
-			{
-				tile.gameObject.AddComponent<MeshCollider>();
 			}
 
 			GenerateTerrainMesh(tile);
@@ -71,9 +59,17 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 
 		public override void DataErrorOccurred(UnityTile t, TileErrorEventArgs e)
 		{
-			
+
 		}
 
+		public override void PostProcessTile(UnityTile tile)
+		{
+			//if (_meshData.ContainsKey(tile.UnwrappedTileId))
+			//{
+			//	FixStitches(tile.UnwrappedTileId, _meshData[tile.UnwrappedTileId]);
+			//	tile.MeshFilter.mesh.RecalculateBounds();
+			//}
+		}
 		#region mesh gen
 		private void CreateBaseMesh(UnityTile tile)
 		{
@@ -226,6 +222,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			var meshVertCount = mesh.Vertices.Count;
 			_stitchTarget = null;
 			_meshData.TryGetValue(tileId.North, out _stitchTarget);
+
 			if (_stitchTarget != null)
 			{
 				_stitchTarget.GetVertices(_stitchTargetMeshData.Vertices);

@@ -280,7 +280,9 @@ Prefab:
       propertyPath: m_Text
       value: "<b>Worldwide Dynamic Zoom & Panning Support</b>\n\nThis example is a
         starting point for creating a traditional web-based zoomable map. Go anywhere
-        in the world and check out Mapbox\u2019s high-quality satellite imagery. "
+        in the world and check out Mapbox\u2019s high-quality satellite imagery. It
+        also uses the SpawnOnMap script to instantiate custom markers on the map at
+        specified locations."
       objectReference: {fileID: 0}
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -435,7 +437,6 @@ MonoBehaviour:
         camera: {fileID: 1787361574}
         visibleBuffer: 0
         disposeBuffer: 0
-        updateInterval: 0
       rangeAroundCenterOptions:
         west: 1
         north: 1
@@ -447,11 +448,12 @@ MonoBehaviour:
         disposeBuffer: 0
     placementOptions:
       placementType: 1
-      snapMapToZero: 1
+      snapMapToZero: 0
     scalingOptions:
       scalingType: 1
       unityTileSize: 100
     loadingTexture: {fileID: 2800000, guid: e2896a92727704803a9c422b043eae89, type: 3}
+    tileMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
   _imagery:
     _layerProperty:
       sourceType: 4
@@ -478,7 +480,6 @@ MonoBehaviour:
           UserName: 
       elevationLayerType: 1
       requiredOptions:
-        baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
         addCollider: 0
         exaggerationFactor: 1
       modificationOptions:
@@ -769,6 +770,11 @@ Prefab:
         type: 2}
       propertyPath: m_SizeDelta.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114023684558016336, guid: 00f5bf1ff996842fc82384f8f686fda6,
+        type: 2}
+      propertyPath: m_Value
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 00f5bf1ff996842fc82384f8f686fda6, type: 2}

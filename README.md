@@ -1,5 +1,5 @@
 # Mapbox-unity-sdk
-### For Unity 2017.1+  
+### For Unity 2017.1.2+
 
 **AR support requires Unity 2017.3+, Android 7+ (Nougat), iOS 11.3**
 
@@ -18,7 +18,7 @@ Tools for using Mapbox APIs with C# / Unity. If you'd like to contribute to the 
 This repo contains:
 - Unity specific tools and libraries for processing Mapbox data
   - Example projects using Mapbox Maps SDK for Unity
-  - DocFX project for generateing API documentation
+  - DocFX project for generating API documentation
   - Written manuals and guides
 
 # Getting started

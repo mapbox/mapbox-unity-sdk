@@ -22,36 +22,21 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				tile.gameObject.layer = _elevationOptions.unityLayerOptions.layerId;
 			}
 
-			if (tile.MeshRenderer == null)
+			if (tile.RasterDataState != Enums.TilePropertyState.Loaded)
 			{
-				var renderer = tile.gameObject.AddComponent<MeshRenderer>();
-
 				if (_elevationOptions.sideWallOptions.isActive)
 				{
-					renderer.materials = new Material[2]
+					var firstMat = tile.MeshRenderer.materials[0];
+					tile.MeshRenderer.materials = new Material[2]
 					{
-						_elevationOptions.requiredOptions.baseMaterial,
+						firstMat,
 						_elevationOptions.sideWallOptions.wallMaterial
 					};
 				}
-				else
-				{
-					renderer.material = _elevationOptions.requiredOptions.baseMaterial;
-				}
-			}
-
-			if (tile.MeshFilter == null)
-			{
-				tile.gameObject.AddComponent<MeshFilter>();
 			}
 
 			// HACK: This is here in to make the system trigger a finished state.
 			tile.MeshFilter.sharedMesh = GetQuad(tile, _elevationOptions.sideWallOptions.isActive);
-
-			if (_elevationOptions.requiredOptions.addCollider && tile.Collider == null)
-			{
-				tile.gameObject.AddComponent<BoxCollider>();
-			}
 		}
 
 		private Mesh GetQuad(UnityTile tile, bool buildSide)
