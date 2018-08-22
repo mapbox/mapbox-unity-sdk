@@ -54,7 +54,7 @@
 			var maxHeightProperty = property.FindPropertyRelative("maximumHeight");
 
 			var extrusionGeometryType = property.FindPropertyRelative("extrusionGeometryType");
-			var extrusionGeometryGUI = new GUIContent { text = "Extrusion Geometry Type", tooltip = EnumExtensions.Description((Unity.Map.ExtrusionGeometryType)extrusionGeometryType.enumValueIndex) };
+			var extrusionGeometryGUI = new GUIContent { text = "Geometry Type", tooltip = EnumExtensions.Description((Unity.Map.ExtrusionGeometryType)extrusionGeometryType.enumValueIndex) };
 			EditorGUI.indentLevel++;
 			switch (sourceTypeValue)
 			{

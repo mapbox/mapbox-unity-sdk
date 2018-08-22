@@ -890,7 +890,6 @@ MonoBehaviour:
         camera: {fileID: 0}
         visibleBuffer: 0
         disposeBuffer: 0
-        updateInterval: 0
       rangeAroundCenterOptions:
         west: 1
         north: 1
@@ -907,6 +906,7 @@ MonoBehaviour:
       scalingType: 1
       unityTileSize: 100
     loadingTexture: {fileID: 2800000, guid: e2896a92727704803a9c422b043eae89, type: 3}
+    tileMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
   _imagery:
     _layerProperty:
       sourceType: 1
@@ -933,7 +933,6 @@ MonoBehaviour:
           UserName: 
       elevationLayerType: 1
       requiredOptions:
-        baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
         addCollider: 0
         exaggerationFactor: 1
       modificationOptions:
@@ -999,7 +998,7 @@ MonoBehaviour:
           geometryType: 2
           layerName: building
           snapToTerrain: 1
-          groupFeatures: 0
+          combineMeshes: 0
           lineWidth: 1
         filterOptions:
           _selectedLayerName: building
@@ -1021,17 +1020,27 @@ MonoBehaviour:
           texturingType: 3
           materials:
           - Materials:
-            - {fileID: 2100000, guid: d4d7464e3429a44e090f55a4ac17f110, type: 2}
+            - {fileID: 2100000, guid: a1aa333e18c0640d7b428eecff9c4af7, type: 2}
           - Materials:
-            - {fileID: 2100000, guid: 55cc6edead802446b9106b2998406844, type: 2}
+            - {fileID: 2100000, guid: c0653693b48614a139a124871d499679, type: 2}
           atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21, type: 2}
-          colorPalette: {fileID: 11400000, guid: b01b6d453d33e40119c0f9472d50c45f,
+          lightStyleOpacity: 1
+          darkStyleOpacity: 1
+          colorStyleColor: {r: 1, g: 1, b: 1, a: 1}
+          samplePalettes: 0
+          colorPalette: {fileID: 11400000, guid: 57bdfa37edf7a4f7f999d19443497554,
             type: 2}
+        performanceOptions:
+          isEnabled: 1
+          entityPerCoroutine: 20
         honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 1
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
+        presetFeatureType: 4
+        _maskValue: 0
+        selectedTypes: 
       locationPrefabList:
       - coreOptions:
           sourceId: 
@@ -1040,7 +1049,7 @@ MonoBehaviour:
           geometryType: 0
           layerName: 
           snapToTerrain: 1
-          groupFeatures: 0
+          combineMeshes: 0
           lineWidth: 0
         filterOptions:
           _selectedLayerName: 
@@ -1062,12 +1071,22 @@ MonoBehaviour:
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
+          lightStyleOpacity: 1
+          darkStyleOpacity: 1
+          colorStyleColor: {r: 1, g: 1, b: 1, a: 1}
+          samplePalettes: 0
           colorPalette: {fileID: 0}
+        performanceOptions:
+          isEnabled: 1
+          entityPerCoroutine: 20
         honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
+        presetFeatureType: 4
+        _maskValue: 0
+        selectedTypes: 
         spawnPrefabOptions:
           prefab: {fileID: 1895949781674336, guid: 29d1abf5ba6514d81a7974353f130ca8,
             type: 2}
@@ -1084,7 +1103,7 @@ MonoBehaviour:
           geometryType: 0
           layerName: 
           snapToTerrain: 1
-          groupFeatures: 0
+          combineMeshes: 0
           lineWidth: 0
         filterOptions:
           _selectedLayerName: 
@@ -1106,12 +1125,22 @@ MonoBehaviour:
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
+          lightStyleOpacity: 1
+          darkStyleOpacity: 1
+          colorStyleColor: {r: 1, g: 1, b: 1, a: 1}
+          samplePalettes: 0
           colorPalette: {fileID: 0}
+        performanceOptions:
+          isEnabled: 1
+          entityPerCoroutine: 20
         honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
+        presetFeatureType: 4
+        _maskValue: 0
+        selectedTypes: 
         spawnPrefabOptions:
           prefab: {fileID: 1707885508695930, guid: fafbd32423ea04e379d8321b4d370fea,
             type: 2}
@@ -1128,7 +1157,7 @@ MonoBehaviour:
           geometryType: 0
           layerName: 
           snapToTerrain: 1
-          groupFeatures: 0
+          combineMeshes: 0
           lineWidth: 0
         filterOptions:
           _selectedLayerName: 
@@ -1150,12 +1179,22 @@ MonoBehaviour:
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
+          lightStyleOpacity: 1
+          darkStyleOpacity: 1
+          colorStyleColor: {r: 1, g: 1, b: 1, a: 1}
+          samplePalettes: 0
           colorPalette: {fileID: 0}
+        performanceOptions:
+          isEnabled: 1
+          entityPerCoroutine: 20
         honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
+        presetFeatureType: 4
+        _maskValue: 0
+        selectedTypes: 
         spawnPrefabOptions:
           prefab: {fileID: 1424114192387644, guid: 61bcd2d324dd34bb9b722d856749c28c,
             type: 2}
@@ -1172,7 +1211,7 @@ MonoBehaviour:
           geometryType: 0
           layerName: 
           snapToTerrain: 1
-          groupFeatures: 0
+          combineMeshes: 0
           lineWidth: 0
         filterOptions:
           _selectedLayerName: 
@@ -1194,12 +1233,22 @@ MonoBehaviour:
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
+          lightStyleOpacity: 1
+          darkStyleOpacity: 1
+          colorStyleColor: {r: 1, g: 1, b: 1, a: 1}
+          samplePalettes: 0
           colorPalette: {fileID: 0}
+        performanceOptions:
+          isEnabled: 1
+          entityPerCoroutine: 20
         honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
+        presetFeatureType: 4
+        _maskValue: 0
+        selectedTypes: 
         spawnPrefabOptions:
           prefab: {fileID: 1004221095257992, guid: b0e54a880e97f4c5ead7dcc1c0918e05,
             type: 2}
@@ -1216,7 +1265,7 @@ MonoBehaviour:
           geometryType: 0
           layerName: 
           snapToTerrain: 1
-          groupFeatures: 0
+          combineMeshes: 0
           lineWidth: 0
         filterOptions:
           _selectedLayerName: 
@@ -1238,12 +1287,22 @@ MonoBehaviour:
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
+          lightStyleOpacity: 1
+          darkStyleOpacity: 1
+          colorStyleColor: {r: 1, g: 1, b: 1, a: 1}
+          samplePalettes: 0
           colorPalette: {fileID: 0}
+        performanceOptions:
+          isEnabled: 1
+          entityPerCoroutine: 20
         honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
+        presetFeatureType: 4
+        _maskValue: 0
+        selectedTypes: 
         spawnPrefabOptions:
           prefab: {fileID: 1550249727436304, guid: 60a41cfc23d514878814f0d425912eff,
             type: 2}
@@ -1260,7 +1319,7 @@ MonoBehaviour:
           geometryType: 0
           layerName: 
           snapToTerrain: 1
-          groupFeatures: 0
+          combineMeshes: 0
           lineWidth: 0
         filterOptions:
           _selectedLayerName: 
@@ -1282,12 +1341,22 @@ MonoBehaviour:
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
+          lightStyleOpacity: 1
+          darkStyleOpacity: 1
+          colorStyleColor: {r: 1, g: 1, b: 1, a: 1}
+          samplePalettes: 0
           colorPalette: {fileID: 0}
+        performanceOptions:
+          isEnabled: 1
+          entityPerCoroutine: 20
         honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
+        presetFeatureType: 4
+        _maskValue: 0
+        selectedTypes: 
         spawnPrefabOptions:
           prefab: {fileID: 1665298560487606, guid: 49bc5d782d9184533a37abea20ed30e4,
             type: 2}
@@ -1304,7 +1373,7 @@ MonoBehaviour:
           geometryType: 0
           layerName: 
           snapToTerrain: 1
-          groupFeatures: 0
+          combineMeshes: 0
           lineWidth: 0
         filterOptions:
           _selectedLayerName: 
@@ -1326,12 +1395,22 @@ MonoBehaviour:
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
+          lightStyleOpacity: 1
+          darkStyleOpacity: 1
+          colorStyleColor: {r: 1, g: 1, b: 1, a: 1}
+          samplePalettes: 0
           colorPalette: {fileID: 0}
+        performanceOptions:
+          isEnabled: 1
+          entityPerCoroutine: 20
         honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
+        presetFeatureType: 4
+        _maskValue: 0
+        selectedTypes: 
         spawnPrefabOptions:
           prefab: {fileID: 1295758952425276, guid: 22150daba6e8b47b69fd30f00b9c56cd,
             type: 2}
@@ -1348,7 +1427,7 @@ MonoBehaviour:
           geometryType: 0
           layerName: 
           snapToTerrain: 1
-          groupFeatures: 0
+          combineMeshes: 0
           lineWidth: 0
         filterOptions:
           _selectedLayerName: 
@@ -1370,12 +1449,22 @@ MonoBehaviour:
           texturingType: 0
           materials: []
           atlasInfo: {fileID: 0}
+          lightStyleOpacity: 1
+          darkStyleOpacity: 1
+          colorStyleColor: {r: 1, g: 1, b: 1, a: 1}
+          samplePalettes: 0
           colorPalette: {fileID: 0}
+        performanceOptions:
+          isEnabled: 1
+          entityPerCoroutine: 20
         honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
+        presetFeatureType: 4
+        _maskValue: 0
+        selectedTypes: 
         spawnPrefabOptions:
           prefab: {fileID: 1396740541782364, guid: d748e6a0b26334f4d933c1438339484d,
             type: 2}
@@ -2026,6 +2115,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9527fd56bc6a0c549a1e550219f9b16e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _map: {fileID: 967308906}
   _panSpeed: 2
   _zoomSpeed: 50
   _referenceCamera: {fileID: 1681481105}

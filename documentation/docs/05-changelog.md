@@ -1,25 +1,34 @@
 ## CHANGELOG
 
+### v.1.4.5
+08/20/2018
+##### New Features
+- Added a **ReplaceFeatureCollectionModifier** class that allows multiple ReplaceFeatureModifiers to be run from one modifier.
+- Added seven hero structures - Transamerica Pyramid, Coit Tower, Salesforce Tower, Empire State Building, Chrysler Building, One World Trade Center, Statue of Liberty.
+##### Improvements
+- Added color option to texturing style
+- Added color palettes drop down to Simple texturing option. Allows users to choose between different color palettes.
+- Improvements to Tile states and map states. Map extent finished state is robust and deterministic.
+- Removed dependency of Tile Providers on Update methods.
+
 ### v.1.4.4
 *07/10/2018*
+##### New Features
+- Selecting `Simple` Texturing Style in a `Vector Layer Visualizer` exposes a drop down menu which allows users to select a color palette for that layer.
 ##### Improvements
-- Added 2 examples to the setup dialog 
+- Added 2 examples to the setup dialog
 - AstronautGame - enhanced version of the Location Based game with custom styling and Astronaut asset
 - TrafficAndDirections - example built around using Mapbox's traffic data layer and directions API
 - Fix an issue with factories where a racing condition causing tiles without imagery
 - Fixes the issue with Replacement Modifier to prevent duplicate prefab spawning and blocking wrong features.
 - Fixes the issue with custom styles that go missing after building to a device.
 - Fix an issue with factories where a racing condition causing tiles without imagery
-
-### v.1.4.3
-*06/18/2018*
-##### Improvements
-- Added a separate Traffic and Directions demo scene 
+- Added a separate Traffic and Directions demo scene
 - Changed loft modifier to stretch texture horizontally
 - Changed Directions Factory to check waypoints on timer and recalculate path if there's a chance
 
- ### v.1.4.3
-*05/29/2018*
+### v.1.4.3
+*06/18/2018*
 ##### New Features
 - Added a **Feature Replacement Modifer** that allows replacement of a vector feature at a given Latitude,Longitude with a supplied prefab. Enables replacing a procedurally generated building at a given Latitude,Longitude with a custom 3D model.
 - Texturing Style dropdown now allows users to select from prepackaged texture styles or custom, which allows for user-defined texturing.

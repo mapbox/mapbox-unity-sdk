@@ -45,19 +45,21 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				tile.gameObject.layer = _elevationOptions.unityLayerOptions.layerId;
 			}
 
-			if (tile.MeshRenderer == null)
+			if (tile.RasterDataState != Enums.TilePropertyState.Loaded)
 			{
-				var renderer = tile.gameObject.AddComponent<MeshRenderer>();
-				renderer.materials = new Material[2]
+				if (_elevationOptions.sideWallOptions.isActive)
 				{
-					_elevationOptions.requiredOptions.baseMaterial,
-					_elevationOptions.sideWallOptions.wallMaterial
-				};
+					var firstMat = tile.MeshRenderer.materials[0];
+					tile.MeshRenderer.materials = new Material[2]
+					{
+						firstMat,
+						_elevationOptions.sideWallOptions.wallMaterial
+					};
+				}
 			}
 
-			if (tile.MeshFilter == null)
+			if (tile.MeshFilter.mesh.vertexCount == 0)
 			{
-				tile.gameObject.AddComponent<MeshFilter>();
 				CreateBaseMesh(tile);
 			}
 
@@ -137,7 +139,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				_newUvList.Add(new Vector2(_newUvList[x * _sampleCount].y, 1));
 				_newUvList.Add(new Vector2(_newUvList[x * _sampleCount].y, 0));
 
-				//--- 
+				//---
 
 				_newVertexList.Add(_newVertexList[x * _sampleCount]);
 				_newVertexList.Add(new Vector3(
@@ -149,7 +151,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				_newUvList.Add(new Vector2(_newUvList[x * _sampleCount].y, 1));
 				_newUvList.Add(new Vector2(_newUvList[x * _sampleCount].y, 0));
 
-				//--- 
+				//---
 
 				_newVertexList.Add(_newVertexList[(x + 1) * _sampleCount - 1]);
 				_newVertexList.Add(new Vector3(
@@ -161,7 +163,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				_newUvList.Add(new Vector2(_newUvList[x * _sampleCount].y, 1));
 				_newUvList.Add(new Vector2(_newUvList[x * _sampleCount].y, 0));
 
-				//--- 
+				//---
 
 				_newVertexList.Add(_newVertexList[lastRow + x]);
 				_newVertexList.Add(new Vector3(

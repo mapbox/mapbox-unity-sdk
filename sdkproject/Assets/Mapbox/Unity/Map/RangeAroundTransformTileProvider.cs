@@ -9,12 +9,14 @@
 
 	public class RangeAroundTransformTileProvider : AbstractTileProvider
 	{
-		RangeAroundTransformTileProviderOptions _rangeTileProviderOptions;
+		private RangeAroundTransformTileProviderOptions _rangeTileProviderOptions;
 
 		private bool _initialized = false;
 		private UnwrappedTileId _currentTile;
 		private UnwrappedTileId _cachedTile;
-		private int _counter;
+
+		//private List<UnwrappedTileId> _toRemove;
+		//private HashSet<UnwrappedTileId> _tilesToRequest;
 
 		public override void OnInitialized()
 		{
@@ -30,15 +32,18 @@
 				_initialized = true;
 			}
 			_cachedTile = new UnwrappedTileId();
+			//_toRemove = new List<UnwrappedTileId>(((_rangeTileProviderOptions.visibleBuffer * 2) + 1) * ((_rangeTileProviderOptions.visibleBuffer * 2) + 1));
+			_currentExtent.activeTiles = new HashSet<UnwrappedTileId>();
+			_map.OnInitialized += UpdateTileExtent;
+			_map.OnUpdated += UpdateTileExtent;
 		}
 
-		protected virtual void Update()
+		public override void UpdateTileExtent()
 		{
 			if (!_initialized) return;
 
-			var activeTiles = _activeTiles.Keys.ToList();
-
-			List<UnwrappedTileId> tilesToRequest = new List<UnwrappedTileId>();
+			_currentExtent.activeTiles.Clear();
+			//_toRemove.Clear();
 			_currentTile = TileCover.CoordinateToTileId(_map.WorldToGeoPosition(_rangeTileProviderOptions.targetTransform.localPosition), _map.AbsoluteZoom);
 
 			if (!_currentTile.Equals(_cachedTile))
@@ -47,40 +52,21 @@
 				{
 					for (int y = _currentTile.Y - _rangeTileProviderOptions.visibleBuffer; y <= (_currentTile.Y + _rangeTileProviderOptions.visibleBuffer); y++)
 					{
-						tilesToRequest.Add(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
+						_currentExtent.activeTiles.Add(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
 					}
 				}
 				_cachedTile = _currentTile;
-				Cleanup(_currentTile);
-
-				var finalTilesNeeded = tilesToRequest.Except(activeTiles);
-
-				foreach (var tile in activeTiles)
-				{
-					// Reposition tiles in case we panned.
-					RepositionTile(tile);
-				}
-
-				foreach (var tile in finalTilesNeeded)
-				{
-					AddTile(tile);
-				}
+				OnExtentChanged();
 			}
 		}
 
-		private void Cleanup(UnwrappedTileId currentTile)
+		public virtual void Update()
 		{
-			var _activeTilesKeys = _activeTiles.Keys.ToList();
-			foreach (var tile in _activeTilesKeys)
+			if (_rangeTileProviderOptions != null && _rangeTileProviderOptions.targetTransform != null && _rangeTileProviderOptions.targetTransform.hasChanged)
 			{
-				bool dispose = false;
-				dispose = tile.X > currentTile.X + _rangeTileProviderOptions.disposeBuffer || tile.X < _currentTile.X - _rangeTileProviderOptions.disposeBuffer;
-				dispose = dispose || tile.Y > _currentTile.Y + _rangeTileProviderOptions.disposeBuffer || tile.Y < _currentTile.Y - _rangeTileProviderOptions.disposeBuffer;
+				UpdateTileExtent();
+				_rangeTileProviderOptions.targetTransform.hasChanged = false;
 
-				if (dispose)
-				{
-					RemoveTile(tile);
-				}
 			}
 		}
 	}
