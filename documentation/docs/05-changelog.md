@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+### v.1.4.6
+##### Bug Fixes
+- fix QueryHeight method to take tile local position/rotation/scale into account
+
 ### v.1.4.5
 08/20/2018
 ##### New Features
