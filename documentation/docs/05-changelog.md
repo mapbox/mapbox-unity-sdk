@@ -1,6 +1,10 @@
 ## CHANGELOG
 
 ### v.1.4.5
+##### Bug Fixes
+- Fix a bug where a map editor script not working on Unity3d 2018.2
+
+### v.1.4.5
 08/20/2018
 ##### New Features
 - Added a **ReplaceFeatureCollectionModifier** class that allows multiple ReplaceFeatureModifiers to be run from one modifier.
