@@ -45,6 +45,7 @@
 
 		private void UpdateProperty(SerializedProperty property)
 		{
+			property.serializedObject.ApplyModifiedProperties();
 			var map = (AbstractMap)property.serializedObject.targetObject;
 			map.Terrain.LayerProperty.UpdateProperty();
 		}
