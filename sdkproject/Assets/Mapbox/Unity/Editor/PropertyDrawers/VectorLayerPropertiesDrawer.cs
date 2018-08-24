@@ -102,15 +102,15 @@
 			ShowFeatures = EditorGUILayout.Foldout(ShowFeatures, "FEATURES");
 			if (ShowFeatures)
 			{
+				EditorGUI.BeginChangeCheck();
 				_vectorSublayerDrawer.DrawUI(property);
+				if (EditorGUI.EndChangeCheck())
+				{
+					UpdateProperty(property);
+				}
 			}
 
 			EditorGUI.EndProperty();
-
-			if (GUI.changed)
-			{
-				UpdateProperty(property);
-			}
 		}
 	}
 }
