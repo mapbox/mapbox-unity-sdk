@@ -502,6 +502,19 @@ namespace Mapbox.Unity.Map
 				OnMapRedrawn();
 			};
 
+			_vectorData.UpdateLayer += (factory, updateVector) =>
+			{
+				_mapVisualizer.RedrawLayer(factory);
+				if (updateVector)
+				{
+					VectorData.UpdateFactorySettings();
+					//.Factory.SetOptions(VectorData.LayerProperty);
+					//VectorData.Factory.SetChildProperties();
+					_mapVisualizer.RedrawLayer(VectorData.Factory);
+				}
+				OnMapRedrawn();
+			};
+
 			_mapVisualizer.Initialize(this, _fileSource);
 			_tileProvider.Initialize(this);
 

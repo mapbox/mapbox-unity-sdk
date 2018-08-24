@@ -149,7 +149,7 @@
 			{
 
 				//notifying map to reload existing tiles
-				NotifyUpdateLayer(_vectorTileFactory);
+				NotifyUpdateLayer(_vectorTileFactory, true);
 			};
 		}
 
