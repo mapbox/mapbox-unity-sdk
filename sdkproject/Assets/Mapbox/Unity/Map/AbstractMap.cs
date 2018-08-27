@@ -491,27 +491,15 @@ namespace Mapbox.Unity.Map
 
 			_terrain.UpdateLayer += (factory, updateVector) =>
 			{
-				_mapVisualizer.RedrawLayer(factory);
-				if (updateVector)
-				{
-					VectorData.UpdateFactorySettings();
-					//.Factory.SetOptions(VectorData.LayerProperty);
-					//VectorData.Factory.SetChildProperties();
-					_mapVisualizer.RedrawLayer(VectorData.Factory);
-				}
+				VectorData.UpdateFactorySettings();
+				_mapVisualizer.RedrawLayer(VectorData.Factory);
 				OnMapRedrawn();
 			};
 
 			_vectorData.UpdateLayer += (factory, updateVector) =>
 			{
-				_mapVisualizer.RedrawLayer(factory);
-				if (updateVector)
-				{
 					VectorData.UpdateFactorySettings();
-					//.Factory.SetOptions(VectorData.LayerProperty);
-					//VectorData.Factory.SetChildProperties();
 					_mapVisualizer.RedrawLayer(VectorData.Factory);
-				}
 				OnMapRedrawn();
 			};
 
