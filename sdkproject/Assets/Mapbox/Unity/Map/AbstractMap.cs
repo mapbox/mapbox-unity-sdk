@@ -491,8 +491,14 @@ namespace Mapbox.Unity.Map
 
 			_terrain.UpdateLayer += (factory, updateVector) =>
 			{
-				VectorData.UpdateFactorySettings();
-				_mapVisualizer.RedrawLayer(VectorData.Factory);
+				_mapVisualizer.RedrawLayer(factory);
+				if (updateVector)
+				{
+					VectorData.UpdateFactorySettings();
+					//.Factory.SetOptions(VectorData.LayerProperty);
+					//VectorData.Factory.SetChildProperties();
+					_mapVisualizer.RedrawLayer(VectorData.Factory);
+				}
 				OnMapRedrawn();
 			};
 
