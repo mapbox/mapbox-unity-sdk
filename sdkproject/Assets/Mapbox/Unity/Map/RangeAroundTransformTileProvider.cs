@@ -62,7 +62,7 @@
 
 		public virtual void Update()
 		{
-			if (_rangeTileProviderOptions != null && _rangeTileProviderOptions.targetTransform != null && _rangeTileProviderOptions.targetTransform.hasChanged)
+			if (_rangeTileProviderOptions != null && _rangeTileProviderOptions.targetTransform != null && (_rangeTileProviderOptions.targetTransform.hasChanged || _map.Root.transform.hasChanged))
 			{
 				UpdateTileExtent();
 				_rangeTileProviderOptions.targetTransform.hasChanged = false;

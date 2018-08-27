@@ -1,0 +1,25 @@
+# Example Scene: Planes
+
+Description:
+This example scene demonstrates and prescribes preferred methods for detecting
+surfaces and displaying planes.
+
+The scene detects surfaces and displays the planes in your environment as you
+look around. Planes can be vertical, horizontal, or diagonals, and the scene
+textures surfaces differently according to both untagged and semantically tagged
+planes (floors, walls, ceiling).
+
+The UI text depicts the current number of planes and the maximum number of
+possible planes.
+
+## Bumper
+Toggles the texturing mode for planes.
+
+## Home Button
+Switch plane query extents between bounded and boundless.
+
+## Swipe Right/Left
+Modify texturing parameters based on the semantic tag of the planes
+the cursor is positioned over.
+
+

@@ -1,0 +1,46 @@
+# Example Scene: MCA
+
+This example demonstrates and prescribes preferred methods for receiving input
+from a Mobile Companion Application (MCA).
+
+When a MCA is connected, this example shows its status. A mobile phone model
+shows the state of the buttons and touch input. This model follows your mobile device
+with 3 DoF rotational data after calibration is completed -- positional data is not
+available for MCA.
+
+When an MCA is disconnected, the example updates the status UI. If a controller is
+connected, the status UI also is updated accordingly. If a Control is connected,
+this one gets ignored.
+
+## Calibration
+- Align your mobile device with the model on the scene
+- Press the MCA Home Button
+- Pressing when on calibration mode will apply calibration and model will
+  start to follow MCA rotational data.
+- Pressing when calibrated will enter calibration mode.
+
+## Bumper - Bottom left button with 2 circles
+When you press the Bumper:
+- A ring around the bumper button on the mobile phone model lights up.
+
+## Home Button - Bottom middle button with the house icon
+When you release the Home Button:
+- A ring around the home button on the mobile phone model lights up for a short duration.
+- Calibration steps will get applied.
+
+## Trigger - Bottom right button with the 4 arrows
+When you press the Trigger button:
+- A ring around the trigger button on the mobile phone model lights up.
+- Note: the trigger value can only be 0 or 1 for the MCA.
+
+## Touchpad - Grid at the center of the app
+When you touch the Touchpad:
+- The touchpad on the mobile phone model shows the touch location, similar to what you see on the
+  actual MCA. A maximum of two touches can be detected.
+
+## Keyboard - Tap the keyboard icon on the upper right corner
+When you type on the Keyboard:
+- Printable characters appear on the keyboard input (left side). Note: you have to tap
+  **Submit** on the MCA.
+- The delete key (backspace) removes the last printable character entered. This key does
+  not require to tap Submit.

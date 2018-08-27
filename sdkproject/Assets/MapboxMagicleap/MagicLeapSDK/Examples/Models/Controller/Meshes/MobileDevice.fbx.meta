@@ -1,0 +1,146 @@
+fileFormatVersion: 2
+guid: 92d6f68d435a7db44b6a5e8cab75fa17
+ModelImporter:
+  serializedVersion: 22
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: App_Button_Geo
+    100004: Buttons_Grp
+    100006: Camera_Button_Geo
+    100008: Dot_Grid_Geo
+    100010: Home_Button_Geo
+    100012: Keyboard_Button_Geo
+    100014: Move_Button_Geo
+    100016: Settings_Button_Geo
+    400000: //RootNode
+    400002: App_Button_Geo
+    400004: Buttons_Grp
+    400006: Camera_Button_Geo
+    400008: Dot_Grid_Geo
+    400010: Home_Button_Geo
+    400012: Keyboard_Button_Geo
+    400014: Move_Button_Geo
+    400016: Settings_Button_Geo
+    2100000: MobileDevice_Mat
+    2100002: Button_MAT
+    2100004: Dot_Grid_Mat
+    2300000: //RootNode
+    2300002: App_Button_Geo
+    2300004: Camera_Button_Geo
+    2300006: Dot_Grid_Geo
+    2300008: Home_Button_Geo
+    2300010: Keyboard_Button_Geo
+    2300012: Move_Button_Geo
+    2300014: Settings_Button_Geo
+    3300000: //RootNode
+    3300002: App_Button_Geo
+    3300004: Camera_Button_Geo
+    3300006: Dot_Grid_Geo
+    3300008: Home_Button_Geo
+    3300010: Keyboard_Button_Geo
+    3300012: Move_Button_Geo
+    3300014: Settings_Button_Geo
+    4300000: MobileDevice_Geo
+    4300002: Camera_Button_Geo
+    4300004: Keyboard_Button_Geo
+    4300006: Settings_Button_Geo
+    4300008: Move_Button_Geo
+    4300010: Home_Button_Geo
+    4300012: App_Button_Geo
+    4300014: Dot_Grid_Geo
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Button_MAT
+    second: {fileID: 2100000, guid: 1f4e9723203231b419dfd26522ef4d83, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Dot_Grid_Mat
+    second: {fileID: 2100000, guid: 13eafd56208ff3b43a7b9df3fb279794, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MobileDevice_Mat
+    second: {fileID: 2100000, guid: 39518081c3690494380a8dece4faef00, type: 2}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

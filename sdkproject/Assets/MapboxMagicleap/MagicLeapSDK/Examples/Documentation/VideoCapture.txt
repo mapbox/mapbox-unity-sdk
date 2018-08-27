@@ -1,0 +1,9 @@
+# Example Scene: Video Capture
+
+This example demonstrates the functionality of using the camera
+for video recording.
+
+## Bumper
+- First Press: Start video recording.
+- Second Press: Stop video recording and show preview.
+- Repeat

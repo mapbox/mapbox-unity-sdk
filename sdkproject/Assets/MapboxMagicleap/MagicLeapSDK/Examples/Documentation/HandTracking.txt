@@ -1,0 +1,21 @@
+# Example Scene: Hand Tracking
+This example demonstrates and prescribes preferred methods for using hand tracking.
+
+The UI depicts all the recognized hand key poses. As you perform these key poses
+the example highlights the ones that are detected and prints both the name of the
+key pose and the confidence percentage. In addition to this as you examine your
+hands, you will see various key points.
+
+Available Key Points
+
+- Thumb Tip
+- Thumb MCP
+- Index Tip
+- Index PIP
+- Index MCP
+- Middle MCP
+- Hand Center
+- Wrist Center
+
+The confidence percentage specifies how confident we are that the key pose you
+are performing is the key pose that is detected.

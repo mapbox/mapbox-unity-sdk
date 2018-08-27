@@ -1,0 +1,20 @@
+# Example Scene: Image Tracking
+
+This example demonstrates and prescribes preferred methods for using image
+recognition and tracking on two-dimensional, planar images.
+
+We recommend ambient lighting levels of at least a standard living room.
+
+Print the DeepSea and DeepSpace images, each at a scale that fits a letter or
+A4-sized sheet of paper.
+
+For the optimal conditions for recognizing a printed image, place the images
+about 1 meter away from you, at an angle no more than about 40 degrees. When
+an image is recognized, the example displays a box on top of the recognized
+image, and then prints "Target Found" in the UI text.
+
+After an image is recognized, tracking can be maintained at longer distances
+(about 1.5 meters) and higher angles of incidence up to around 70 degrees.
+
+## Bumper
+Cycle through the different visualizers: box, axis, demo, all.

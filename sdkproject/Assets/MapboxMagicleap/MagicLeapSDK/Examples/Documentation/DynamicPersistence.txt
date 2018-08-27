@@ -1,0 +1,12 @@
+# Example Scene: DynamicPersistence
+
+This example shows how you can dynamically create objects and persist them by attaching them to the
+closest Persistence Coordinate Frame (PCF) in the world. Pressing the bumper creates objects at random
+locations and orientations around you.
+
+Althought this example lets you create as many objects as you like, the cost of saving an association between
+a virtual object and neighboring PCF is not small. It's recommended that you do this for a few (anchor )objects
+in your scene and put most of the other objects under it. For more info refer to the StaticPersistence example.
+
+##Add Objects
+- Press Bumper to add new objects.

@@ -1,0 +1,129 @@
+fileFormatVersion: 2
+guid: 96b7ac3345f3fd04aa9adb5777372e61
+ModelImporter:
+  serializedVersion: 22
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: SpherePrimitive_InnerGlass
+    100004: SpherePrimitive_Metal
+    100006: SpherePrimitive_OutterGlass
+    100008: SpherePrimitive_Plastic
+    400000: //RootNode
+    400002: SpherePrimitive_InnerGlass
+    400004: SpherePrimitive_Metal
+    400006: SpherePrimitive_OutterGlass
+    400008: SpherePrimitive_Plastic
+    2300000: SpherePrimitive_InnerGlass
+    2300002: SpherePrimitive_Metal
+    2300004: SpherePrimitive_OutterGlass
+    2300006: SpherePrimitive_Plastic
+    3300000: SpherePrimitive_InnerGlass
+    3300002: SpherePrimitive_Metal
+    3300004: SpherePrimitive_OutterGlass
+    3300006: SpherePrimitive_Plastic
+    4300000: SpherePrimitive_OutterGlass
+    4300002: SpherePrimitive_Metal
+    4300004: SpherePrimitive_InnerGlass
+    4300006: SpherePrimitive_Plastic
+    9500000: //RootNode
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SpherePrimitive_Glass
+    second: {fileID: 2100000, guid: c48e77c57945ce3439b77eb6bc02c3c3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SpherePrimitive_InnerGlass1
+    second: {fileID: 2100000, guid: 3a0a4e151745c8b4ca50484f2cf3ecd8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SpherePrimitive_Metal1
+    second: {fileID: 2100000, guid: 17c6c5d0d3fd34749978df59424c2c28, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SpherePrimitive_Plastic1
+    second: {fileID: 2100000, guid: 4facf0a9108690c4abeac7c85849c488, type: 2}
+  materials:
+    importMaterials: 0
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 0
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 0
+    importBlendShapes: 1
+    importCameras: 0
+    importLights: 0
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 4
+    normalCalculationMode: 0
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

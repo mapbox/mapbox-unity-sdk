@@ -1,0 +1,11 @@
+# Example Scene: Raycast
+
+This example scene demonstrates and prescribes preferred methods for raycasting
+by displaying cursors where the rays hit. There are three raycast modes:
+controller, head, and eyes.
+
+We display cursors at the ray collision points by subscribing to the raycast
+event callback.
+
+## Bumper
+Press the Bumper to cycle through the raycast modes: controller, head, eyes, and all.

@@ -1,0 +1,44 @@
+# Example Scene: Media Player
+
+This example demonstrates and prescribes preferred methods for using the
+Media Player API and showcases the use of digital rights management (DRM) technology.
+This example needs a controller to work with the User Interface and Internet access
+in order to validate DRM.
+
+The controller acts as a virtual pointer. A ray coming out of the controller model
+indicates where the controller is pointing at. If the controller is pointing at an
+interactable interface, the ray cursor is a yellow circle. Pull the trigger
+to activate the interface and change the cursor color green.
+
+Note:
+- If you use a DRM protected video, you must supply the corresponding
+  license server for it.
+- If you use a DRM-free video, the license server must be left blank
+- For online media, enter the URL of the video
+- For local media, the video should be placed inside a StreamingAssets folder
+  and the URL should be relative to StreamingAssets
+See MediaPlayerExample.cs for more information.
+
+## Timeline Slider
+Pull the trigger while pointing on the Timeline control:
+- The playhead jumps to that location. The content might need to buffer for a short
+  time before playback can continue.
+- You can scrub through the timeline by dragging the playhead.
+
+## Rewind 10 Seconds
+Pull the trigger while pointing at the Rewind control:
+- The playhead moves backward by 10 seconds.
+
+## Play/Pause
+Pull the trigger while pointing to the Play/Pause control:
+- If the video is paused, this resumes playback.
+- If the video is stopped, this resets the playhead back to the beginning and starts playing.
+- If the video is playing, this pauses the video playback.
+
+## Forward 10 Seconds
+Pull the trigger while pointing to the Forward control:
+- The playhead moves forward by 10 seconds.
+
+## Volume Slider
+Pull the trigger while pointing to the Volume control:
+- Modifies the volume.

@@ -1,0 +1,25 @@
+fileFormatVersion: 2
+guid: 2b303258409019f428ed17a87cda4ac9
+timeCreated: 1517943548
+licenseType: Pro
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Lomino UI App
+  fontNames:
+  - Lomino UI App
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 170c02e10c121294486c57133d65b5cc, type: 3}
+  - {fileID: 12800000, guid: 1e71f539decd80f4bb2541c46a153223, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,3 @@
+MSA 1.0.0-22
+Core Library - v1.0.0
+Unity Plugin - v22

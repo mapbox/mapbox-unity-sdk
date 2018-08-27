@@ -1,0 +1,44 @@
+<!--
+Certain features require a privilege to be requested in the manifest. For the scenes that use these features,
+a custom manifest is needed with the required privileges. This file lists all the ones that the examples use.
+It can be modified by adding/trimming privileges as needed for the specific example or scene.
+The custom manifest should live in the Assets/Plugins/Lumin project folder with the filename manifest.xml.
+-->
+
+<!--
+Along with being in the manifest, certain privileges need to be requested at runtime as well:
+
+PwFoundObjRead is a sensitive privilege and must be requested before the API that needs it is started.
+
+CameraCapture and AudioCaptureMic are reality privileges and must be requested before the API that needs it
+is started and every time the app regains focus, such as returning from a pause.
+
+The examples that use these privileges demonstrate how this is done.
+-->
+
+<!--
+Unity will automatically fill in areas marked as Placeholder from the Player Settings.
+-->
+<manifest xmlns:ml="magicleap" ml:package="Placeholder" ml:version_code="1" ml:version_name="">
+  <application ml:sdk_version="1.0" ml:visible_name="Placeholder">
+    <!--Examples using AudioCaptureMic: VideoCapture-->
+    <uses-privilege ml:name="AudioCaptureMic" />
+    <!--Examples using CameraCapture: ImageCapture, ImageTracking, VideoCapture-->
+    <uses-privilege ml:name="CameraCapture" />
+    <!--Examples using GesturesSubscribe: HandTracking-->
+    <uses-privilege ml:name="GesturesSubscribe" />
+    <!--Examples using GesturesConfig: HandTracking-->
+    <uses-privilege ml:name="GesturesConfig" />
+    <!--Examples using Internet: MediaPlayer-->
+    <uses-privilege ml:name="Internet" />
+    <!--Examples using PwFoundObjRead: StaticPersistence, DynamicPersistence-->
+    <uses-privilege ml:name="PwFoundObjRead" />
+    <!--Examples using WorldReconstruction: Meshing, Planes, Raycast-->
+    <uses-privilege ml:name="WorldReconstruction" />
+    <!--Examples using ControllerPose : Controller, StaticPersistence, DynamicPersistence, ImageCapture, VideoCapture, MediaPlayer, Raycast -->
+    <uses-privilege ml:name="ControllerPose" />
+    <component ml:binary_name="bin/Player.elf" ml:name=".fullscreen" ml:type="Fullscreen" ml:visible_name="Placeholder">
+      <icon ml:model_folder="Icon/Model" ml:portal_folder="Icon/Portal" />
+    </component>
+  </application>
+</manifest>

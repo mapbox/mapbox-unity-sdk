@@ -1,0 +1,38 @@
+# Example Scene: Controller
+
+This example demonstrates and prescribes preferred methods for receiving input
+from the Control controller and sending haptic feedback to it.
+
+When a controller is connected, a controller model will appear and stats about
+it will show up on the UI. This controller model will follow your physical controller
+with 6dof (rotational and positional data). A second model with the same characteristics
+will appear when a second controller is connected.
+
+When a controller is disconnected, the model mapped to the disconnected controller will
+disappear and the UI mapped to this controller will display the status as disconnected.
+
+## Bumper
+When you press the Bumper:
+- The bumper in the controller model will change colors.
+- A haptic ForceDown body vibration effect occurs onButtonDown.
+- A haptic ForceUp body vibration effect occurs onButtonUp.
+- If CFUID (Coordinate Frame Unique ID) based tracking is enabled (which is on by default
+in the examples on device), it would toggle whether to use it or or not. When CFUID tracking is disabled
+it has no effect.
+
+## Home Button
+When you release the Home Button:
+- The home button in the controller model will light up for a small duration.
+
+## Trigger
+When you squeeze the Trigger:
+- The trigger in the controller model moves to match the physical controller and
+  the color will change based on the trigger value.
+- A haptic Buzz body vibration effect occurs on the controller. The intensity is based on
+  Trigger pressure.
+
+## Touchpad
+When you touch the Touchpad:
+- The touchpad in the controller model will change colors based on the pressure value.
+- A small visualizer will appear at the position touched on the touchpad.
+- The touchpad gesture is shown on the UI.

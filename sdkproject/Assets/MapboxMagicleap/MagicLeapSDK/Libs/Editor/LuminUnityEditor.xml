@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>obj\Release\LuminUnityEditor</name>
+    </assembly>
+    <members>
+        <member name="T:UnityEngine.XR.MagicLeap.MLPlayerSettings">
+            <summary>
+            This class can be used to enforce that some player settings
+            meet requirements.
+            </summary>
+        </member>
+    </members>
+</doc>

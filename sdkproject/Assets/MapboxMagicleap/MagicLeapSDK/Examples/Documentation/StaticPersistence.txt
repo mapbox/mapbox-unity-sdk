@@ -1,0 +1,13 @@
+# Example Scene: StaticPersistence
+
+This examples shows usage of MLPersistentPoint MonoBehaviour which is a utility class that you can attach
+to the GameObject and put your virtual objects underneath. This is how you can maintain persistence of
+objects for objects created statically ()i.e. they are not dynamically added to the scene hierarchy).
+
+MLPersistentPoint MonoBehaviour provides a high degree of resilience because the component associates
+your object with more than one Persistent coordinate frames (PCFs) thereby improveing the chances of
+restoration on boot.
+
+The two balls you see in the scene should persist in the same location between device boots. Please
+note that the object that is really persisting is the parent of the two balls. The balls restore by 
+maintaining their relative locations with respect to their parent in the scene.
