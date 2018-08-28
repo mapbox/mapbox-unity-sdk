@@ -62,7 +62,13 @@ namespace Mapbox.Map
 
 		public override int GetHashCode()
 		{
-			return X ^ Y ^ Z;
+			return (X << 6) ^ (Y << 16) ^ (Z << 8);
+			//return X ^ Y ^ Z;
+		}
+
+		public override bool Equals(object obj)
+		{
+			return this.X == ((UnwrappedTileId)obj).X && this.Y == ((UnwrappedTileId)obj).Y && this.Z == ((UnwrappedTileId)obj).Z;
 		}
 
 		public static bool operator ==(UnwrappedTileId a, UnwrappedTileId b)

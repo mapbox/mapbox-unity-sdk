@@ -54,7 +54,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			if (DataFetcher != null)
 			{
 				DataFetcher.DataRecieved -= OnImageRecieved;
-				DataFetcher.FetchingError -= OnErrorOccurred;
+				DataFetcher.FetchingError -= OnDataError;
 			}
 		}
 		#endregion
@@ -64,9 +64,26 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			if (tile != null)
 			{
-				Progress--;
-				tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
-				tile.RasterDataState = TilePropertyState.Loaded;
+				if (tile.RasterDataState != TilePropertyState.Unregistered)
+				{
+					_tilesWaitingResponse.Remove(tile);
+					tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
+				}
+			}
+		}
+
+		//merge this with OnErrorOccurred?
+		protected virtual void OnDataError(UnityTile tile, RasterTile rasterTile, TileErrorEventArgs e)
+		{
+			if (tile != null)
+			{
+				if (tile.RasterDataState != TilePropertyState.Unregistered)
+				{
+					tile.RasterDataState = TilePropertyState.Error;
+					_tilesWaitingResponse.Remove(tile);
+					OnErrorOccurred(e);
+				}
+
 			}
 		}
 		#endregion
@@ -76,7 +93,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			DataFetcher = ScriptableObject.CreateInstance<ImageDataFetcher>();
 			DataFetcher.DataRecieved += OnImageRecieved;
-			DataFetcher.FetchingError += OnErrorOccurred;
+			DataFetcher.FetchingError += OnDataError;
 		}
 
 		public override void SetOptions(LayerProperties options)
@@ -88,17 +105,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			if (_properties.sourceType == ImagerySourceType.None)
 			{
-				Progress++;
-				//reset imagery
 				tile.SetRasterData(null);
-				Progress--;
+				tile.RasterDataState = TilePropertyState.None;
 				return;
 			}
 			else
 			{
 				tile.RasterDataState = TilePropertyState.Loading;
-				Progress++;
 				_properties.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(_properties.sourceType);
+
 				ImageDataFetcherParameters parameters = new ImageDataFetcherParameters()
 				{
 					canonicalTileId = tile.CanonicalTileId,
@@ -120,12 +135,19 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			base.OnErrorOccurred(tile, e);
 			if (tile != null)
 			{
-				Progress--;
 				tile.RasterDataState = TilePropertyState.Error;
 			}
 		}
 
 		protected override void OnUnregistered(UnityTile tile)
+		{
+			if (_tilesWaitingResponse.Contains(tile))
+			{
+				_tilesWaitingResponse.Remove(tile);
+			}
+		}
+
+		protected override void OnPostProcess(UnityTile tile)
 		{
 
 		}

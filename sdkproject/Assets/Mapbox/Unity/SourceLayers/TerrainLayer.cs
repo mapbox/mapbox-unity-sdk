@@ -97,11 +97,6 @@
 			}
 		}
 
-		public void SetTerrainMaterial(Material baseMaterial)
-		{
-			_layerProperty.requiredOptions.baseMaterial = baseMaterial;
-		}
-
 		public void ShowSideWalls(float wallHeight, Material wallMaterial)
 		{
 			_layerProperty.sideWallOptions.isActive = true;

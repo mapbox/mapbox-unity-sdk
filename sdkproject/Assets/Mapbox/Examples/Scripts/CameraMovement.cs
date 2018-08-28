@@ -2,9 +2,13 @@ namespace Mapbox.Examples
 {
 	using UnityEngine;
 	using UnityEngine.EventSystems;
+	using Mapbox.Unity.Map;
 
 	public class CameraMovement : MonoBehaviour
 	{
+		[SerializeField]
+		AbstractMap _map;
+
 		[SerializeField]
 		float _panSpeed = 20f;
 
@@ -96,6 +100,7 @@ namespace Mapbox.Examples
 				var z = Input.GetAxis("Vertical");
 				var y = Input.GetAxis("Mouse ScrollWheel") * _zoomSpeed;
 				transform.localPosition += transform.forward * y + (_originalRotation * new Vector3(x * _panSpeed, 0, z * _panSpeed));
+				_map.UpdateMap();
 			}
 
 

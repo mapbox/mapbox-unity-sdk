@@ -1,12 +1,13 @@
 ﻿using Mapbox.Map;
 using Mapbox.Unity.MeshGeneration.Data;
+using Mapbox.Unity.MeshGeneration.Enums;
 using System;
 using System.Collections.Generic;
 
 public class ImageDataFetcher : DataFetcher
 {
 	public Action<UnityTile, RasterTile> DataRecieved = (t, s) => { };
-	public Action<UnityTile, TileErrorEventArgs> FetchingError = (t, s) => { };
+	public Action<UnityTile, RasterTile, TileErrorEventArgs> FetchingError = (t, r, s) => { };
 
 	//tile here should be totally optional and used only not to have keep a dictionary in terrain factory base
 	public override void FetchData(DataFetcherParameters parameters)
@@ -41,12 +42,13 @@ public class ImageDataFetcher : DataFetcher
 
 			if (rasterTile.HasError)
 			{
-				FetchingError(imageDataParameters.tile, new TileErrorEventArgs(imageDataParameters.tile.CanonicalTileId, rasterTile.GetType(), imageDataParameters.tile, rasterTile.Exceptions));
+				FetchingError(imageDataParameters.tile, rasterTile, new TileErrorEventArgs(imageDataParameters.tile.CanonicalTileId, rasterTile.GetType(), imageDataParameters.tile, rasterTile.Exceptions));
 			}
 			else
 			{
 				DataRecieved(imageDataParameters.tile, rasterTile);
 			}
+
 		});
 	}
 }

@@ -26,15 +26,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			{
 				if (_elevationOptions.sideWallOptions.isActive)
 				{
+					var firstMat = tile.MeshRenderer.materials[0];
 					tile.MeshRenderer.materials = new Material[2]
 					{
-						_elevationOptions.requiredOptions.baseMaterial,
+						firstMat,
 						_elevationOptions.sideWallOptions.wallMaterial
 					};
-				}
-				else
-				{
-					tile.MeshRenderer.material = _elevationOptions.requiredOptions.baseMaterial;
 				}
 			}
 

@@ -32,8 +32,6 @@ public class ScriptablePalette : ScriptableObject
 
         Color.RGBToHSV(m_keyColor, out hue, out sat, out val);
 
-        Debug.Log(hue);
-
         float hueMin = hue - m_hueRange;
         float hueMax = hue + m_hueRange;
 

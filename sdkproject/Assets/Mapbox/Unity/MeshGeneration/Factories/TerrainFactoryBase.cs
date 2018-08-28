@@ -7,6 +7,7 @@ using Mapbox.Map;
 using Mapbox.Unity.MeshGeneration.Enums;
 using Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies;
 using System;
+using System.Collections.Generic;
 
 namespace Mapbox.Unity.MeshGeneration.Factories
 {
@@ -38,7 +39,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			if (DataFetcher != null)
 			{
 				DataFetcher.DataRecieved -= OnTerrainRecieved;
-				DataFetcher.FetchingError -= OnErrorOccurred;
+				DataFetcher.FetchingError -= OnDataError;
 			}
 		}
 		#endregion
@@ -49,7 +50,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			Strategy.Initialize(_elevationOptions);
 			DataFetcher = ScriptableObject.CreateInstance<TerrainDataFetcher>();
 			DataFetcher.DataRecieved += OnTerrainRecieved;
-			DataFetcher.FetchingError += OnErrorOccurred;
+			DataFetcher.FetchingError += OnDataError;
 		}
 
 		public override void SetOptions(LayerProperties options)
@@ -60,7 +61,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		protected override void OnRegistered(UnityTile tile)
 		{
-			Progress++;
 			if (Strategy is IElevationBasedTerrainStrategy)
 			{
 				tile.HeightDataState = TilePropertyState.Loading;
@@ -77,14 +77,22 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				//reseting height data
 				tile.SetHeightData(null);
 				Strategy.RegisterTile(tile);
-				Progress--;
+				tile.HeightDataState = TilePropertyState.Loaded;
 			}
 		}
 
 		protected override void OnUnregistered(UnityTile tile)
 		{
-			Progress--;
+			if (_tilesWaitingResponse.Contains(tile))
+			{
+				_tilesWaitingResponse.Remove(tile);
+			}
 			Strategy.UnregisterTile(tile);
+		}
+
+		protected override void OnPostProcess(UnityTile tile)
+		{
+			Strategy.PostProcessTile(tile);
 		}
 		#endregion
 
@@ -93,21 +101,27 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			if (tile != null)
 			{
-				Progress--;
-				tile.SetHeightData(pngRasterTile.Data, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.requiredOptions.addCollider);
-				Strategy.RegisterTile(tile);
+				_tilesWaitingResponse.Remove(tile);
+				if (tile.HeightDataState != TilePropertyState.Unregistered)
+				{
+					tile.SetHeightData(pngRasterTile.Data, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.requiredOptions.addCollider);
+					Strategy.RegisterTile(tile);
+					tile.gameObject.name += Time.frameCount;
+				}
 			}
 		}
 
-		protected override void OnErrorOccurred(UnityTile tile, TileErrorEventArgs e)
+		private void OnDataError(UnityTile tile, RawPngRasterTile rawTile, TileErrorEventArgs e)
 		{
 			base.OnErrorOccurred(tile, e);
 			if (tile != null)
 			{
-				Progress--;
-				tile.HeightDataState = TilePropertyState.Error;
-				//strategy might want to act on this , i.e. flattening tile mesh on data fetching failed?
-				Strategy.DataErrorOccurred(tile, e);
+				_tilesWaitingResponse.Remove(tile);
+				if (tile.HeightDataState != TilePropertyState.Unregistered)
+				{
+					Strategy.DataErrorOccurred(tile, e);
+					tile.HeightDataState = TilePropertyState.Error;
+				}
 			}
 		}
 		#endregion

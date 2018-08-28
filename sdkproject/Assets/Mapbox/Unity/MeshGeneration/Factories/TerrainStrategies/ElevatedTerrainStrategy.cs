@@ -44,11 +44,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				tile.gameObject.layer = _elevationOptions.unityLayerOptions.layerId;
 			}
 
-			if (tile.RasterDataState != Enums.TilePropertyState.Loaded)
-			{
-				tile.MeshRenderer.material = _elevationOptions.requiredOptions.baseMaterial;
-			}
-
 			//_newVertexList.Count is the vertex count this strategy is expected to use
 			//by checking for current vertex count and expected vertex count,
 			//we're trying to understand if we can use existing mesh (created by same strategy)
@@ -73,6 +68,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 
 		}
 
+		public override void PostProcessTile(UnityTile tile)
+		{
+			//if (_meshData.ContainsKey(tile.UnwrappedTileId))
+			//{
+			//	FixStitches(tile.UnwrappedTileId, _meshData[tile.UnwrappedTileId]);
+			//	tile.MeshFilter.mesh.RecalculateBounds();
+			//}
+		}
 		#region mesh gen
 		private void CreateBaseMesh(UnityTile tile)
 		{
@@ -225,6 +228,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			var meshVertCount = mesh.Vertices.Count;
 			_stitchTarget = null;
 			_meshData.TryGetValue(tileId.North, out _stitchTarget);
+
 			if (_stitchTarget != null)
 			{
 				_stitchTarget.GetVertices(_stitchTargetMeshData.Vertices);

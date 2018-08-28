@@ -8,6 +8,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 	using System;
 	using Mapbox.Unity.Map;
 	using System.Collections.Generic;
+	using Mapbox.Unity.MeshGeneration.Factories;
 
 	public enum TileTerrainType
 	{
@@ -24,18 +25,18 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public TileTerrainType ElevationType;
 
 		[SerializeField]
-		Texture2D _rasterData;
+		private Texture2D _rasterData;
+		public VectorTile VectorData { get; private set; }
+		private Texture2D _heightTexture;
+		private float[] _heightData;
 
-		float[] _heightData;
+		private Texture2D _loadingTexture;
+		//keeping track of tile objects to be able to cancel them safely if tile is destroyed before data fetching finishes
+		private List<Tile> _tiles = new List<Tile>();
 
-		float _relativeScale;
+		public bool IsRecycled = false;
 
-		Texture2D _heightTexture;
-
-		Texture2D _loadingTexture;
-
-		List<Tile> _tiles = new List<Tile>();
-
+		#region CachedUnityComponents
 		MeshRenderer _meshRenderer;
 		public MeshRenderer MeshRenderer
 		{
@@ -83,52 +84,85 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				return _collider;
 			}
 		}
+		#endregion
 
-		// TODO: should this be a string???
-		string _vectorData;
-		public string VectorData
+		#region Tile Positon/Scale Properties
+		public RectD Rect { get; private set; }
+		public int InitialZoom { get; private set; }
+		public int CurrentZoom { get; private set; }
+		public float TileScale { get; private set; }
+		public UnwrappedTileId UnwrappedTileId { get; private set; }
+		public CanonicalTileId CanonicalTileId { get; private set; }
+
+		private float _relativeScale;
+		#endregion
+
+		[SerializeField]
+		private TilePropertyState _rasterDataState;
+		public TilePropertyState RasterDataState
 		{
-			get { return _vectorData; }
+			get
+			{
+				return _rasterDataState;
+			}
+			internal set
+			{
+				if (_rasterDataState != value)
+				{
+					_rasterDataState = value;
+					OnRasterDataChanged(this);
+				}
+			}
+		}
+		[SerializeField]
+		private TilePropertyState _heightDataState;
+		public TilePropertyState HeightDataState
+		{
+			get
+			{
+				return _heightDataState;
+			}
+			internal set
+			{
+				if (_heightDataState != value)
+				{
+					_heightDataState = value;
+					OnHeightDataChanged(this);
+				}
+			}
+		}
+		[SerializeField]
+		private TilePropertyState _vectorDataState;
+		public TilePropertyState VectorDataState
+		{
+			get
+			{
+				return _vectorDataState;
+			}
+			internal set
+			{
+				if (_vectorDataState != value)
+				{
+					_vectorDataState = value;
+					OnVectorDataChanged(this);
+				}
+			}
+		}
+		private TilePropertyState _tileState = TilePropertyState.None;
+		public TilePropertyState TileState
+		{
+			get
+			{
+				return _tileState;
+			}
 			set
 			{
-				_vectorData = value;
-				OnVectorDataChanged(this);
+				if (_tileState != value)
+				{
+					_tileState = value;
+				}
 			}
 		}
-		RectD _rect;
-		public RectD Rect
-		{
-			get
-			{
-				return _rect;
-			}
-		}
-
-		UnwrappedTileId _unwrappedTileId;
-		public UnwrappedTileId UnwrappedTileId
-		{
-			get
-			{
-				return _unwrappedTileId;
-
-			}
-		}
-
-		CanonicalTileId _canonicalTileId;
-		public CanonicalTileId CanonicalTileId
-		{
-			get
-			{
-				return _canonicalTileId;
-			}
-		}
-
-		public int InitialZoom { get; internal set; }
-		public float TileScale { get; internal set; }
-
-		public TilePropertyState RasterDataState;
-		public TilePropertyState HeightDataState;
-		public TilePropertyState VectorDataState;
 
 		public event Action<UnityTile> OnHeightDataChanged = delegate { };
 		public event Action<UnityTile> OnRasterDataChanged = delegate { };
@@ -141,9 +175,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			ElevationType = TileTerrainType.None;
 			TileScale = scale;
 			_relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
-			_rect = Conversions.TileBounds(tileId);
-			_unwrappedTileId = tileId;
-			_canonicalTileId = tileId.Canonical;
+			Rect = Conversions.TileBounds(tileId);
+			UnwrappedTileId = tileId;
+			CanonicalTileId = tileId.Canonical;
 			_loadingTexture = loadingTexture;
 
 			float scaleFactor = 1.0f;
@@ -152,10 +186,18 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				_isInitialized = true;
 				InitialZoom = zoom;
 			}
-
+			CurrentZoom = zoom;
 			scaleFactor = Mathf.Pow(2, (map.InitialZoom - zoom));
 			gameObject.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
 			gameObject.SetActive(true);
+
+			IsRecycled = false;
+			//MeshRenderer.enabled = true;
+
+
+			// Setup Loading as initial state - Unregistered
+			// When tile registers with factories, it will set the appropriate state.
+			// None, if Factory source is None, Loading otherwise.
 		}
 
 		internal void Recycle()
@@ -163,14 +205,17 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			if (_loadingTexture && MeshRenderer != null)
 			{
 				MeshRenderer.material.mainTexture = _loadingTexture;
+				//MeshRenderer.enabled = false;
 			}
 
 			gameObject.SetActive(false);
+			IsRecycled = true;
 
 			// Reset internal state.
-			RasterDataState = TilePropertyState.None;
-			HeightDataState = TilePropertyState.None;
-			VectorDataState = TilePropertyState.None;
+			RasterDataState = TilePropertyState.Unregistered;
+			HeightDataState = TilePropertyState.Unregistered;
+			VectorDataState = TilePropertyState.Unregistered;
+			TileState = TilePropertyState.Unregistered;
 
 			OnHeightDataChanged = delegate { };
 			OnRasterDataChanged = delegate { };
@@ -180,55 +225,90 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			_tiles.Clear();
 		}
 
-		internal void SetHeightData(byte[] data, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = true)
+		public void SetHeightData(byte[] data, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false)
 		{
-			//reset height data
-			if(data == null)
+			if (HeightDataState != TilePropertyState.Unregistered)
 			{
-				_heightData = new float[256 * 256];
-				return;
-			}
-
-			// HACK: compute height values for terrain. We could probably do this without a texture2d.
-			if (_heightTexture == null)
-			{
-				_heightTexture = new Texture2D(0, 0);
-			}
-
-			_heightTexture.LoadImage(data);
-			byte[] rgbData = _heightTexture.GetRawTextureData();
-
-			// Get rid of this temporary texture. We don't need to bloat memory.
-			_heightTexture.LoadImage(null);
-
-			if (_heightData == null)
-			{
-				_heightData = new float[256 * 256];
-			}
-
-			var relativeScale = useRelative ? _relativeScale : 1f;
-			for (int xx = 0; xx < 256; ++xx)
-			{
-				for (int yy = 0; yy < 256; ++yy)
+				//reset height data
+				if(data == null)
 				{
-					float r = rgbData[(xx * 256 + yy) * 4 + 1];
-					float g = rgbData[(xx * 256 + yy) * 4 + 2];
-					float b = rgbData[(xx * 256 + yy) * 4 + 3];
-					_heightData[xx * 256 + yy] = relativeScale * heightMultiplier * Conversions.GetAbsoluteHeightFromColor(r, g, b);
+					_heightData = new float[256 * 256];
+					return;
 				}
+				
+				// HACK: compute height values for terrain. We could probably do this without a texture2d.
+				if (_heightTexture == null)
+				{
+					_heightTexture = new Texture2D(0, 0);
+				}
+
+				_heightTexture.LoadImage(data);
+				byte[] rgbData = _heightTexture.GetRawTextureData();
+
+				// Get rid of this temporary texture. We don't need to bloat memory.
+				_heightTexture.LoadImage(null);
+
+				if (_heightData == null)
+				{
+					_heightData = new float[256 * 256];
+				}
+
+				var relativeScale = useRelative ? _relativeScale : 1f;
+				for (int xx = 0; xx < 256; ++xx)
+				{
+					for (int yy = 0; yy < 256; ++yy)
+					{
+						float r = rgbData[(xx * 256 + yy) * 4 + 1];
+						float g = rgbData[(xx * 256 + yy) * 4 + 2];
+						float b = rgbData[(xx * 256 + yy) * 4 + 3];
+						_heightData[xx * 256 + yy] = relativeScale * heightMultiplier * Conversions.GetAbsoluteHeightFromColor(r, g, b);
+					}
+				}
+
+				if (addCollider && gameObject.GetComponent<MeshCollider>() == null)
+				{
+					gameObject.AddComponent<MeshCollider>();
+				}
+
+				HeightDataState = TilePropertyState.Loaded;
 			}
+		}
 
-			if(addCollider && gameObject.GetComponent<MeshCollider>() == null)
+		public void SetRasterData(byte[] data, bool useMipMap = true, bool useCompression = false)
+		{
+			// Don't leak the texture, just reuse it.
+			if (RasterDataState != TilePropertyState.Unregistered)
 			{
-				gameObject.AddComponent<MeshCollider>();
+				//reset image on null data
+				if (data == null)
+				{
+					MeshRenderer.material.mainTexture = null;
+					return;
+				}
+				
+				if (_rasterData == null)
+				{
+					_rasterData = new Texture2D(0, 0, TextureFormat.RGB24, useMipMap);
+					_rasterData.wrapMode = TextureWrapMode.Clamp;
+				}
+
+				_rasterData.LoadImage(data);
+				if (useCompression)
+				{
+					// High quality = true seems to decrease image quality?
+					_rasterData.Compress(false);
+				}
+
+				MeshRenderer.material.mainTexture = _rasterData;
+				RasterDataState = TilePropertyState.Loaded;
 			}
+		}
 
-			HeightDataState = TilePropertyState.Loaded;
-			OnHeightDataChanged(this);
-
-			if (_rasterData != null)
+		public void SetVectorData(VectorTile vectorTile)
+		{
+			if (VectorDataState != TilePropertyState.Unregistered)
 			{
-				_meshRenderer.material.mainTexture = _rasterData;
+				VectorData = vectorTile;
 			}
 		}
 
@@ -247,39 +327,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public void SetLoadingTexture(Texture2D texture)
 		{
 			MeshRenderer.material.mainTexture = texture;
-		}
-
-		public void SetRasterData(byte[] data, bool useMipMap = true, bool useCompression = true)
-		{
-			if (MeshRenderer == null || MeshRenderer.material == null)
-			{
-				return;
-			}
-
-			//reset image on null data
-			if (data == null)
-			{
-				MeshRenderer.material.mainTexture = null;
-				return;
-			}
-
-			// Don't leak the texture, just reuse it.
-			if (_rasterData == null)
-			{
-				_rasterData = new Texture2D(0, 0, TextureFormat.RGB24, useMipMap);
-				_rasterData.wrapMode = TextureWrapMode.Clamp;
-			}
-
-			_rasterData.LoadImage(data);
-			if (useCompression)
-			{
-				// High quality = true seems to decrease image quality?
-				_rasterData.Compress(false);
-			}
-
-			MeshRenderer.material.mainTexture = _rasterData;
-			RasterDataState = TilePropertyState.Loaded;
-			OnRasterDataChanged(this);
 		}
 
 		public Texture2D GetRasterData()

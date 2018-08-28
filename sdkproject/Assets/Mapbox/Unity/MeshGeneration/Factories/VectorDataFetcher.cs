@@ -6,7 +6,7 @@ using System;
 public class VectorDataFetcher : DataFetcher
 {
 	public Action<UnityTile, VectorTile> DataRecieved = (t, s) => { };
-	public Action<UnityTile, TileErrorEventArgs> FetchingError = (t, s) => { };
+	public Action<UnityTile, VectorTile, TileErrorEventArgs> FetchingError = (t, r, s) => { };
 
 	//tile here should be totally optional and used only not to have keep a dictionary in terrain factory base
 	public override void FetchData(DataFetcherParameters parameters)
@@ -25,11 +25,9 @@ public class VectorDataFetcher : DataFetcher
 				//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
 				return;
 			}
-
 			if (vectorTile.HasError)
 			{
-				FetchingError(vectorDaraParameters.tile, new TileErrorEventArgs(vectorDaraParameters.tile.CanonicalTileId, vectorTile.GetType(), vectorDaraParameters.tile, vectorTile.Exceptions));
-				vectorDaraParameters.tile.VectorDataState = TilePropertyState.Error;
+				FetchingError(vectorDaraParameters.tile, vectorTile, new TileErrorEventArgs(vectorDaraParameters.tile.CanonicalTileId, vectorTile.GetType(), vectorDaraParameters.tile, vectorTile.Exceptions));
 			}
 			else
 			{

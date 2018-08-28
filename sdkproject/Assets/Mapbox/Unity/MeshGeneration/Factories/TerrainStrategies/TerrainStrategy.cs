@@ -22,6 +22,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 
 		}
 
+		public virtual void PostProcessTile(UnityTile tile)
+		{
+
+		}
+
 		public virtual void UnregisterTile(UnityTile tile)
 		{
 

@@ -103,12 +103,14 @@
 					break;
 			}
 
+			var elevationLayerType = property.FindPropertyRelative("elevationLayerType");
+
 			if (sourceTypeValue == ElevationSourceType.None)
 			{
 				GUI.enabled = false;
+				elevationLayerType.enumValueIndex = (int)ElevationLayerType.FlatTerrain;
 			}
 			EditorGUI.BeginChangeCheck();
-			var elevationLayerType = property.FindPropertyRelative("elevationLayerType");
 
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("elevationLayerType"), new GUIContent { text = elevationLayerType.displayName, tooltip = ((ElevationLayerType)elevationLayerType.enumValueIndex).Description() });
 
@@ -119,6 +121,7 @@
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("requiredOptions"), true);
 
 
+			EditorGUILayout.PropertyField(elevationLayerType, new GUIContent { text = elevationLayerType.displayName, tooltip = ((ElevationLayerType)elevationLayerType.enumValueIndex).Description() });
 
 			if (sourceTypeValue == ElevationSourceType.None)
 			{
@@ -130,6 +133,9 @@
 				UpdateProperty(property);
 			}
 
+			GUILayout.Space(-lineHeight);
+			//?? ----->>>> EditorGUILayout.PropertyField(property.FindPropertyRelative("requiredOptions"), true);
+			//position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("requiredOptions"));
 			ShowPosition = EditorGUILayout.Foldout(ShowPosition, "Others");
 			if (ShowPosition)
 			{
