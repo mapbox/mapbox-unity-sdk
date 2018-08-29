@@ -286,26 +286,21 @@ namespace Mapbox.Unity.Map
 			}
 		}
 		
-		public void RedrawLayer(AbstractTileFactory factory)
+		public void UnregisterTilesFrom(AbstractTileFactory factory)
 		{
-			if (!(factory is VectorTileFactory))
+			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
 			{
-				foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
-				{
-					factory.Register(tileBundle.Value);
-				}
+				factory.Unregister(tileBundle.Value);
 			}
-			else
+		}
+		
+		public void ReregisterTilesTo(AbstractTileFactory factory)
+		{
+			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
 			{
-				foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
-				{
-					factory.Unregister(tileBundle.Value);
-				}
-				foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
-				{
-					factory.Register(tileBundle.Value);
-				}
+				factory.Register(tileBundle.Value);
 			}
+			
 		}
 		#endregion
 	}

@@ -518,32 +518,33 @@ namespace Mapbox.Unity.Map
 
 			_imagery.UpdateLayer += (factory, updateVector) =>
 			{
-				_mapVisualizer.RedrawLayer(factory);
+				_mapVisualizer.ReregisterTilesTo(factory);
 				if(updateVector)
 				{
+					_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
 					VectorData.UpdateFactorySettings();
-					_mapVisualizer.RedrawLayer(VectorData.Factory);
+					_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
 				}
 				OnMapRedrawn();
 			};
 
 			_terrain.UpdateLayer += (factory, updateVector) =>
 			{
-				_mapVisualizer.RedrawLayer(factory);
+				_mapVisualizer.ReregisterTilesTo(factory);
 				if (updateVector)
 				{
+					_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
 					VectorData.UpdateFactorySettings();
-					//.Factory.SetOptions(VectorData.LayerProperty);
-					//VectorData.Factory.SetChildProperties();
-					_mapVisualizer.RedrawLayer(VectorData.Factory);
+					_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
 				}
 				OnMapRedrawn();
 			};
 
 			_vectorData.UpdateLayer += (factory, updateVector) =>
 			{
-					VectorData.UpdateFactorySettings();
-					_mapVisualizer.RedrawLayer(VectorData.Factory);
+				_mapVisualizer.UnregisterTilesFrom(factory);
+				VectorData.UpdateFactorySettings();
+				_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
 				OnMapRedrawn();
 			};
 

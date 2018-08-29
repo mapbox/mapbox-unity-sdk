@@ -91,8 +91,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		public void SetProperties(VectorSubLayerProperties properties)
 		{
-			List<MeshModifier> defaultMeshModifierStack = new List<MeshModifier>();
-			List<GameObjectModifier> defaultGOModifierStack = new List<GameObjectModifier>();
 			if(_layerProperties == null && properties != null)
 			{
 				_layerProperties = properties;
@@ -412,7 +410,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				for (int i = 0; i < featureCount; i++)
 				{
 					//checking if tile is recycled and changed
-					if (tile.UnwrappedTileId != tileId || tile.TileState == Enums.TilePropertyState.Unregistered)
+					if (tile.UnwrappedTileId != tileId || !_activeCoroutines.ContainsKey(tile) || tile.TileState == Enums.TilePropertyState.Unregistered)
 					{
 						yield break;
 					}
@@ -613,7 +611,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					Runnable.Stop(cor);
 				}
 			}
-
+			_activeCoroutines.Remove(tile);
+			
 			if (_defaultStack != null)
 			{
 				_defaultStack.UnregisterTile(tile);

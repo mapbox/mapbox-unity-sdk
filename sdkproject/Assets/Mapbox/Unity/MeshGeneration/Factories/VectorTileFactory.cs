@@ -91,12 +91,16 @@
 				}
 			}
 
+			CreateLayerVisualizers();
+		}
+
+		private void CreateLayerVisualizers()
+		{
 			foreach (var sublayer in _properties.vectorSubLayers)
 			{
 				//if its of type prefabitemoptions then separate the visualizer type
 				LayerVisualizerBase visualizer = CreateInstance<VectorLayerVisualizer>();
-				sublayer.performanceOptions = _properties.performanceOptions;
-				((VectorLayerVisualizer)visualizer).SetProperties(sublayer);
+				((VectorLayerVisualizer) visualizer).SetProperties(sublayer);
 
 				visualizer.Initialize();
 				if (visualizer == null)
@@ -110,17 +114,19 @@
 				}
 				else
 				{
-					_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase>() { visualizer });
+					_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase>() {visualizer});
 				}
 			}
 		}
-
+		
 		public override void SetOptions(LayerProperties options)
 		{
 			_properties = (VectorLayerProperties)options;
 
 			if (_layerBuilder != null)
 			{
+				_layerBuilder.Clear();
+				CreateLayerVisualizers();
 				foreach (var layer in _layerBuilder)
 				{
 					foreach (var item in layer.Value)
