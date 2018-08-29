@@ -252,4 +252,12 @@
 		Points,
 		Custom
 	}
+
+	public enum VectorUpdateType
+	{
+		None,
+		Complete,
+		Collider,
+		Material
+	}
 }
