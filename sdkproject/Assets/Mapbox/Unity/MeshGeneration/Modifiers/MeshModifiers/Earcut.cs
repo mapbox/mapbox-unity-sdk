@@ -485,8 +485,6 @@ namespace Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers
 			// segment's endpoint with lesser x will be potential connection point
 			do
 			{
-				if (p == null || p.next == null)
-					Debug.Log("here");
 				if (hy <= p.y && hy >= p.next.y && p.next.y != p.y)
 				{
 					var x = p.x + (hy - p.y) * (p.next.x - p.x) / (p.next.y - p.y);
