@@ -1,6 +1,7 @@
 ﻿namespace Mapbox.Editor
 {
 	using UnityEngine;
+	using System;
 	using System.Collections;
 	using UnityEditor;
 	using Mapbox.Unity.Map;
@@ -23,7 +24,7 @@
 		}
 		static float _lineHeight = EditorGUIUtility.singleLineHeight;
 
-		public void DrawUI(SerializedProperty subLayerCoreOptions, SerializedProperty layerProperty, VectorPrimitiveType primitiveTypeProp)
+		public void DrawUI(SerializedProperty subLayerCoreOptions, SerializedProperty layerProperty, VectorPrimitiveType primitiveTypeProp, Action<SerializedProperty> action = null)
 		{
 			objectId = layerProperty.serializedObject.targetObject.GetInstanceID().ToString();
 
@@ -39,18 +40,39 @@
 					GUILayout.Space(-_lineHeight);
 					var extrusionOptions = layerProperty.FindPropertyRelative("extrusionOptions");
 					extrusionOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
+					EditorGUI.BeginChangeCheck();
 					EditorGUILayout.PropertyField(extrusionOptions);
+					if (EditorGUI.EndChangeCheck() && action != null)
+					{
+						action(extrusionOptions);
+					}
 				}
 
+				EditorGUI.BeginChangeCheck();
 				var snapToTerrainProperty = subLayerCoreOptions.FindPropertyRelative("snapToTerrain");
-				var combineMeshesProperty = subLayerCoreOptions.FindPropertyRelative("combineMeshes");
-
 				snapToTerrainProperty.boolValue = EditorGUILayout.Toggle(snapToTerrainProperty.displayName, snapToTerrainProperty.boolValue);
+
+				if (EditorGUI.EndChangeCheck() && action != null)
+				{
+					action(snapToTerrainProperty);
+				}
+
+				EditorGUI.BeginChangeCheck();
+				var combineMeshesProperty = subLayerCoreOptions.FindPropertyRelative("combineMeshes");
 				combineMeshesProperty.boolValue = EditorGUILayout.Toggle(combineMeshesProperty.displayName, combineMeshesProperty.boolValue);
+				if (EditorGUI.EndChangeCheck() && action != null)
+				{
+					action(combineMeshesProperty);
+				}
 
 				if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
 				{
+					EditorGUI.BeginChangeCheck();
 					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("colliderOptions"));
+					if (EditorGUI.EndChangeCheck() && action != null)
+					{
+						action(layerProperty.FindPropertyRelative("colliderOptions"));
+					}
 				}
 			}
 			EditorGUILayout.EndVertical();

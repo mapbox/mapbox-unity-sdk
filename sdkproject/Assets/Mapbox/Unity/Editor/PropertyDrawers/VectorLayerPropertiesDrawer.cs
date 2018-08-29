@@ -58,6 +58,7 @@
 
 		private void UpdateProperty(SerializedProperty property)
 		{
+			Debug.Log(property.name);
 			property.serializedObject.ApplyModifiedProperties();
 			var map = (AbstractMap)property.serializedObject.targetObject;
 			map.VectorData.LayerProperty.UpdateProperty();
@@ -102,12 +103,7 @@
 			ShowFeatures = EditorGUILayout.Foldout(ShowFeatures, "FEATURES");
 			if (ShowFeatures)
 			{
-				EditorGUI.BeginChangeCheck();
-				_vectorSublayerDrawer.DrawUI(property);
-				if (EditorGUI.EndChangeCheck())
-				{
-					UpdateProperty(property);
-				}
+				_vectorSublayerDrawer.DrawUI(property, UpdateProperty);
 			}
 
 			EditorGUI.EndProperty();

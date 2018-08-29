@@ -78,7 +78,7 @@
 		private static string[] subTypeValues;
 		FeatureSubLayerTreeView layerTreeView;
 		IList<int> selectedLayers = new List<int>();
-		public void DrawUI(SerializedProperty property)
+		public void DrawUI(SerializedProperty property, Action<SerializedProperty> action = null)
 		{
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 			var serializedMapObject = property.serializedObject;
@@ -301,7 +301,7 @@
 						GUI.enabled = false;
 					}
 
-					DrawLayerVisualizerProperties(sourceTypeValue, layerProperty, property);
+					DrawLayerVisualizerProperties(sourceTypeValue, layerProperty, property, action);
 
 					if (!isLayerActive)
 					{
@@ -420,8 +420,12 @@
 			subLayerColliderOptions.FindPropertyRelative("colliderType").enumValueIndex = (int)subLayerProperties.colliderOptions.colliderType;
 		}
 
+		private void UpdateMe()
+		{
+			Debug.Log("Update!");
+		}
 
-		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty, SerializedProperty property)
+		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty, SerializedProperty property, Action<SerializedProperty> action = null)
 		{
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
 			//var layerName = layerProperty.FindPropertyRelative("coreOptions.layerName");
@@ -489,10 +493,8 @@
 
 
 			//*********************** MODELING SECTION BEGINS ***********************************//
-			_modelingSectionDrawer.DrawUI(subLayerCoreOptions, layerProperty, primitiveTypeProp);
+			_modelingSectionDrawer.DrawUI(subLayerCoreOptions, layerProperty, primitiveTypeProp, action);
 			//*********************** MODELING SECTION ENDS ***********************************//
-
-
 
 
 			//*********************** TEXTURING SECTION BEGINS ***********************************//
