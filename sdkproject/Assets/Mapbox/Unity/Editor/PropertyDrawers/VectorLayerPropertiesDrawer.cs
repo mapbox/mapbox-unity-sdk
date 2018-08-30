@@ -5,6 +5,18 @@
 	using UnityEditor;
 	using Mapbox.Unity.Map;
 
+	public class VectorUpdate
+	{
+		public SerializedProperty property;
+		public VectorUpdateType updateType;
+
+		public VectorUpdate(SerializedProperty serializedProperty, VectorUpdateType vectorUpdateType = VectorUpdateType.Complete)
+		{
+			property = serializedProperty;
+			updateType = vectorUpdateType;
+		}
+	}
+
 	[CustomPropertyDrawer(typeof(VectorLayerProperties))]
 	public class VectorLayerPropertiesDrawer : PropertyDrawer
 	{
@@ -55,13 +67,16 @@
 			EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 			EditorGUILayout.Space();
 		}
-
-		private void UpdateProperty(SerializedProperty property)
+		//VectorUpdate
+		private void UpdateProperty(VectorUpdate vectorUpdate)
+//		private void UpdateProperty(SerializedProperty property, VectorUpdateType vectorUpdateType = VectorUpdateType.Absolute)
 		{
-			Debug.Log(property.name);
-			property.serializedObject.ApplyModifiedProperties();
-			var map = (AbstractMap)property.serializedObject.targetObject;
-			map.VectorData.LayerProperty.UpdateProperty();
+			//action could take two params, one for property, one for layer...(can pass one for vector sub layers?)
+			//how can we find which layer?
+			//index #?
+			vectorUpdate.property.serializedObject.ApplyModifiedProperties();
+			var map = (AbstractMap)vectorUpdate.property.serializedObject.targetObject;
+			map.VectorData.LayerProperty.UpdateProperty(vectorUpdate.updateType);
 		}
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)

@@ -78,7 +78,7 @@
 		private static string[] subTypeValues;
 		FeatureSubLayerTreeView layerTreeView;
 		IList<int> selectedLayers = new List<int>();
-		public void DrawUI(SerializedProperty property, Action<SerializedProperty> action = null)
+		public void DrawUI(SerializedProperty property, Action<VectorUpdate> action = null)
 		{
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 			var serializedMapObject = property.serializedObject;
@@ -425,7 +425,7 @@
 			Debug.Log("Update!");
 		}
 
-		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty, SerializedProperty property, Action<SerializedProperty> action = null)
+		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty, SerializedProperty property, Action<VectorUpdate> action = null)
 		{
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
 			//var layerName = layerProperty.FindPropertyRelative("coreOptions.layerName");
@@ -501,7 +501,12 @@
 			if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
 			{
 				GUILayout.Space(-_lineHeight);
+				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
+				if(EditorGUI.EndChangeCheck())
+				{
+					action(new VectorUpdate(layerProperty.FindPropertyRelative("materialOptions"), VectorUpdateType.Material));
+				}
 			}
 			//*********************** TEXTURING SECTION ENDS ***********************************//
 

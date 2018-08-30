@@ -24,7 +24,7 @@
 		}
 		static float _lineHeight = EditorGUIUtility.singleLineHeight;
 
-		public void DrawUI(SerializedProperty subLayerCoreOptions, SerializedProperty layerProperty, VectorPrimitiveType primitiveTypeProp, Action<SerializedProperty> action = null)
+		public void DrawUI(SerializedProperty subLayerCoreOptions, SerializedProperty layerProperty, VectorPrimitiveType primitiveTypeProp, Action<VectorUpdate> action = null)
 		{
 			objectId = layerProperty.serializedObject.targetObject.GetInstanceID().ToString();
 
@@ -44,7 +44,7 @@
 					EditorGUILayout.PropertyField(extrusionOptions);
 					if (EditorGUI.EndChangeCheck() && action != null)
 					{
-						action(extrusionOptions);
+						action(new VectorUpdate(extrusionOptions));
 					}
 				}
 
@@ -54,7 +54,7 @@
 
 				if (EditorGUI.EndChangeCheck() && action != null)
 				{
-					action(snapToTerrainProperty);
+					action(new VectorUpdate(snapToTerrainProperty));
 				}
 
 				EditorGUI.BeginChangeCheck();
@@ -62,7 +62,7 @@
 				combineMeshesProperty.boolValue = EditorGUILayout.Toggle(combineMeshesProperty.displayName, combineMeshesProperty.boolValue);
 				if (EditorGUI.EndChangeCheck() && action != null)
 				{
-					action(combineMeshesProperty);
+					action(new VectorUpdate(combineMeshesProperty));
 				}
 
 				if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
@@ -71,7 +71,7 @@
 					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("colliderOptions"));
 					if (EditorGUI.EndChangeCheck() && action != null)
 					{
-						action(layerProperty.FindPropertyRelative("colliderOptions"));
+						action(new VectorUpdate (layerProperty.FindPropertyRelative("colliderOptions"), VectorUpdateType.Collider));
 					}
 				}
 			}

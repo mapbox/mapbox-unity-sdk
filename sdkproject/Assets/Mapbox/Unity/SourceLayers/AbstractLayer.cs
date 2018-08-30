@@ -4,15 +4,15 @@
 
 	public class AbstractLayer
 	{
-		public void NotifyUpdateLayer(AbstractTileFactory factory, bool effectsVectorLayer = false)
+		public void NotifyUpdateLayer(AbstractTileFactory factory, VectorUpdateType updateType = VectorUpdateType.None)
 		{
 			if(UpdateLayer != null)
 			{
-				UpdateLayer(factory, effectsVectorLayer);
+				UpdateLayer(factory, updateType);
 			}
 		}
 
 		public event UpdateLayerHandler UpdateLayer;
-		public delegate void UpdateLayerHandler(AbstractTileFactory factory, bool effectsVectorLayer);
+		public delegate void UpdateLayerHandler(AbstractTileFactory factory, VectorUpdateType updateType);
 	}
 }

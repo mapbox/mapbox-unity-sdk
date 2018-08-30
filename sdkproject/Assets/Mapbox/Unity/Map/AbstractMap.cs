@@ -519,32 +519,20 @@ namespace Mapbox.Unity.Map
 			_imagery.UpdateLayer += (factory, updateVector) =>
 			{
 				_mapVisualizer.ReregisterTilesTo(factory);
-				if(updateVector)
-				{
-					_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
-					VectorData.UpdateFactorySettings();
-					_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
-				}
+				CheckVectorUpdateType(updateVector);
 				OnMapRedrawn();
 			};
 
 			_terrain.UpdateLayer += (factory, updateVector) =>
 			{
 				_mapVisualizer.ReregisterTilesTo(factory);
-				if (updateVector)
-				{
-					_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
-					VectorData.UpdateFactorySettings();
-					_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
-				}
+				CheckVectorUpdateType(updateVector);
 				OnMapRedrawn();
 			};
 
 			_vectorData.UpdateLayer += (factory, updateVector) =>
 			{
-				_mapVisualizer.UnregisterTilesFrom(factory);
-				VectorData.UpdateFactorySettings();
-				_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
+				CheckVectorUpdateType(updateVector);
 				OnMapRedrawn();
 			};
 
@@ -555,6 +543,32 @@ namespace Mapbox.Unity.Map
 
 			_tileProvider.UpdateTileExtent();
 		}
+
+		private void CheckVectorUpdateType(VectorUpdateType updateType)
+		{
+			switch (updateType)
+			{
+				case VectorUpdateType.None:
+					break;
+				case VectorUpdateType.Complete:
+					_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
+					VectorData.UpdateFactorySettings();
+					_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
+					break;
+				case VectorUpdateType.Collider:
+					Debug.Log("Update colliders...");
+					//update/rerun collider modifiers...
+					break;
+				case VectorUpdateType.Material:
+					Debug.Log("Update material...");
+					//update/rerun material modifiers...
+					break;
+				default:
+					break;
+					
+			}
+		}
+
 		/// <summary>
 		/// Initialize the map using the specified latLon and zoom.
 		/// Map will automatically get initialized in the <c>Start</c> method.

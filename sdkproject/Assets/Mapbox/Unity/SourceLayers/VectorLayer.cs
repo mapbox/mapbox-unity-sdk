@@ -149,8 +149,20 @@
 			{
 
 				//notifying map to reload existing tiles
-				NotifyUpdateLayer(_vectorTileFactory, true);
+				NotifyUpdateLayer(_vectorTileFactory, VectorUpdateType.Complete);
 			};
+			_layerProperty.OnPropertyUpdatedCollider += () =>
+			{
+				//notifying map to add/change/remove colliders
+				NotifyUpdateLayer(_vectorTileFactory, VectorUpdateType.Collider);
+			};
+			_layerProperty.OnPropertyUpdatedMaterial += () =>
+			{
+				//notifying map to add/change/remove colliders
+				NotifyUpdateLayer(_vectorTileFactory, VectorUpdateType.Material);
+				//NotifyUpdateLayer(_vectorTileFactory, true);
+			};
+
 		}
 
 		public void UpdateFactorySettings()
