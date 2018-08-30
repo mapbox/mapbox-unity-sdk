@@ -84,6 +84,9 @@
 		{
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 
+			var map = (AbstractMap)property.serializedObject.targetObject;
+			var materialOptions = map.VectorData.LayerProperty.vectorSubLayers[0].materialOptions;
+
 			showTexturing = EditorGUILayout.Foldout(showTexturing, new GUIContent { text = "Texturing", tooltip = "Material options to texture the generated building geometry" });
 			if (showTexturing)
 			{
@@ -92,6 +95,8 @@
 
 				var styleTypeLabel = new GUIContent { text = "Style Type", tooltip = "Texturing style for feature; choose from sample style or create your own by choosing Custom. " };
 				var styleType = property.FindPropertyRelative("style");
+
+				materialOptions.Style = (StyleTypes)styleType.enumValueIndex;
 
 				GUIContent[] styleTypeGuiContent = new GUIContent[styleType.enumDisplayNames.Length];
 				for (int i = 0; i < styleType.enumDisplayNames.Length; i++)
@@ -102,7 +107,8 @@
 					};
 				}
 
-				styleType.enumValueIndex = EditorGUILayout.Popup(styleTypeLabel, styleType.enumValueIndex, styleTypeGuiContent);
+				materialOptions.Style = (StyleTypes)EditorGUILayout.Popup(styleTypeLabel, styleType.enumValueIndex, styleTypeGuiContent);
+
 				EditorGUI.indentLevel++;
 				if ((StyleTypes)styleType.enumValueIndex != StyleTypes.Custom)
 				{

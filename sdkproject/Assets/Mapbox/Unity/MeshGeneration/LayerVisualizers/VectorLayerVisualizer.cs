@@ -89,6 +89,16 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			return (T)mod;
 		}
 
+		private void UpdateMaterials(object sender, System.EventArgs e)
+		{
+			Debug.Log("UpdateMaterials " + sender.ToString());
+		}
+
+		private void UpdateColliders(object sender, System.EventArgs e)
+		{
+			Debug.Log("UpdateColliders " + sender.ToString());
+		}
+
 		public void SetProperties(VectorSubLayerProperties properties)
 		{
 			if(_layerProperties == null && properties != null)
@@ -99,7 +109,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					_performanceOptions = properties.performanceOptions;
 				}
 			}
-		
+
+			_layerProperties.materialOptions.PropertyHasChanged += UpdateMaterials;
+
+			_layerProperties.colliderOptions.PropertyHasChanged += UpdateColliders;
+
 			Active = _layerProperties.coreOptions.isActive;
 
 			if (_layerProperties.coreOptions.combineMeshes)

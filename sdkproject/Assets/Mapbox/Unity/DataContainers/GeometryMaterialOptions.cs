@@ -17,6 +17,8 @@
 			}
 		}
 
+		public int layerId;
+
 		public StyleTypes style;
 
 		public UvMapType texturingType = UvMapType.Tiled;
@@ -37,6 +39,18 @@
 			materials = new MaterialList[2];
 			materials[0] = new MaterialList();
 			materials[1] = new MaterialList();
+		}
+
+		public StyleTypes Style
+		{
+			set
+			{
+				if(value != style)
+				{
+					style = value;
+					HasChanged = true;
+				}
+			}
 		}
 	}
 

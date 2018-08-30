@@ -4,8 +4,36 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using System;
 	using Mapbox.Unity.MeshGeneration.Data;
 
+
+	public abstract class MapboxDataProperty
+	{
+		public event System.EventHandler PropertyHasChanged;
+		protected virtual void OnPropertyHasChanged(System.EventArgs e)
+		{
+			System.EventHandler handler = PropertyHasChanged;
+			if (handler != null)
+			{
+				handler(this, e);
+			}
+		}
+		bool _hasChanged;
+
+		public bool HasChanged
+		{
+			set
+			{
+				if (value == true)
+				{
+					OnPropertyHasChanged(null /*Pass args here */);
+					// reset HasChanged 
+					_hasChanged = false;
+				}
+			}
+		}
+	}
+
 	[Serializable]
-	public abstract class ModifierProperties
+	public abstract class ModifierProperties : MapboxDataProperty
 	{
 		public abstract Type ModifierType
 		{

@@ -546,6 +546,7 @@ namespace Mapbox.Unity.Map
 
 		private void CheckVectorUpdateType(VectorUpdateType updateType)
 		{
+			/*
 			switch (updateType)
 			{
 				case VectorUpdateType.None:
@@ -560,13 +561,14 @@ namespace Mapbox.Unity.Map
 					//update/rerun collider modifiers...
 					break;
 				case VectorUpdateType.Material:
-					Debug.Log("Update material...");
+					Debug.Log("Update materials...");
 					//update/rerun material modifiers...
 					break;
 				default:
 					break;
 					
 			}
+			*/
 		}
 
 		/// <summary>

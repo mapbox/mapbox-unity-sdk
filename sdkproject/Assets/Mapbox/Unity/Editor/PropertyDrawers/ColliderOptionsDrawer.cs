@@ -15,6 +15,9 @@
 		GUIContent[] colliderTypeContent;
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			var map = (AbstractMap)property.serializedObject.targetObject;
+			var colliderOptions = map.VectorData.LayerProperty.vectorSubLayers[0].colliderOptions;
+
 			EditorGUI.BeginProperty(position, null, property);
 			var colliderTypeLabel = new GUIContent
 			{
@@ -40,7 +43,10 @@
 				isGUIContentSet = true;
 			}
 
-			colliderTypeProperty.enumValueIndex = EditorGUI.Popup(position, colliderTypeLabel, colliderTypeProperty.enumValueIndex, colliderTypeContent);
+			colliderOptions.ColliderType = (ColliderType)EditorGUILayout.Popup(colliderTypeLabel, colliderTypeProperty.enumValueIndex, colliderTypeContent);
+
+
+			//colliderTypeProperty.enumValueIndex = EditorGUI.Popup(position, colliderTypeLabel, colliderTypeProperty.enumValueIndex, colliderTypeContent);
 			EditorGUI.EndProperty();
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
