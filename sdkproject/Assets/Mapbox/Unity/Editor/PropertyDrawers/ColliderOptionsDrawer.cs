@@ -44,9 +44,16 @@
 			}
 
 			colliderOptions.ColliderType = (ColliderType)EditorGUILayout.Popup(colliderTypeLabel, colliderTypeProperty.enumValueIndex, colliderTypeContent);
-
-
-			//colliderTypeProperty.enumValueIndex = EditorGUI.Popup(position, colliderTypeLabel, colliderTypeProperty.enumValueIndex, colliderTypeContent);
+			//this will trigger changes if the user selects the enum dropdown in the UI and chooses the SAME option...
+			//is there a better way to compare pre/post values other than change check?
+			/*
+			EditorGUI.BeginChangeCheck();
+			colliderTypeProperty.enumValueIndex = EditorGUI.Popup(position, colliderTypeLabel, colliderTypeProperty.enumValueIndex, colliderTypeContent);
+			if(EditorGUI.EndChangeCheck())
+			{
+				colliderOptions.HasChanged = true;
+			}
+			*/
 			EditorGUI.EndProperty();
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)

@@ -59,6 +59,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		protected ModifierStackBase _defaultStack;
 		private HashSet<ulong> _activeIds;
 		private Dictionary<UnityTile, List<ulong>> _idPool; //necessary to keep _activeIds list up to date when unloading tiles
+		private Dictionary<Type, Action> _updateMethods;
 		private string _key;
 
 		public override string Key
@@ -89,18 +90,39 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			return (T)mod;
 		}
 
-		private void UpdateMaterials(object sender, System.EventArgs e)
+		private void UpdateMaterials()
 		{
-			Debug.Log("UpdateMaterials " + sender.ToString());
+			Debug.Log("UpdateMaterials");
+			// do something with materials...
 		}
 
-		private void UpdateColliders(object sender, System.EventArgs e)
+		private void UpdateColliders()
 		{
-			Debug.Log("UpdateColliders " + sender.ToString());
+			Debug.Log("UpdateColliders");
+			//do something with colliders...
+		}
+
+		private void UpdateExtrusion()
+		{
+			Debug.Log("UpdateExtrusion");
+			//do something with extrusion...
+		}
+
+		private void UpdateVector(object sender, System.EventArgs e)
+		{
+			Debug.Log("UpdateVector " + sender.ToString());
+			_updateMethods[sender.GetType()]();
 		}
 
 		public void SetProperties(VectorSubLayerProperties properties)
 		{
+			_updateMethods = new Dictionary<Type, Action>()
+			{
+				{ typeof(GeometryMaterialOptions), UpdateMaterials },
+				{ typeof(ColliderOptions), UpdateColliders },
+				{ typeof(GeometryExtrusionOptions), UpdateExtrusion }
+			};
+
 			if(_layerProperties == null && properties != null)
 			{
 				_layerProperties = properties;
@@ -110,9 +132,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				}
 			}
 
-			_layerProperties.materialOptions.PropertyHasChanged += UpdateMaterials;
+			_layerProperties.extrusionOptions.PropertyHasChanged += UpdateVector;
 
-			_layerProperties.colliderOptions.PropertyHasChanged += UpdateColliders;
+			_layerProperties.materialOptions.PropertyHasChanged += UpdateVector;
+
+			_layerProperties.colliderOptions.PropertyHasChanged += UpdateVector;
 
 			Active = _layerProperties.coreOptions.isActive;
 
