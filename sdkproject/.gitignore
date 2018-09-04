@@ -32,3 +32,8 @@ sysinfo.txt
 /Assets/StreamingAssets/MapboxAccess.*
 /Assets/Resources/Mapbox/*
 /Assets/Resources/Mapbox.meta
+
+# MagicLeap
+/Assets/MagicLeapSDK/*
+/Assets/MagicLeapSDK.meta
+
