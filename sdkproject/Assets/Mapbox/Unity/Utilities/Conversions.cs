@@ -227,14 +227,14 @@ namespace Mapbox.Unity.Utilities
 
 			//vectortile space point (0 - layerExtent)
 			var vectorTilePoint = new Vector2((float)((_meters - _rect.Min).x / _rect.Size.x) * layerExtent,
-			                                  (float)(layerExtent - ((_meters - _rect.Max).y / _rect.Size.y) * layerExtent));
+											  (float)(layerExtent - ((_meters - _rect.Max).y / _rect.Size.y) * layerExtent));
 
 			return vectorTilePoint;
 		}
 
 		public static Vector2 LatitudeLongitudeToUnityTilePosition(Vector2d coordinate, UnityTile tile, ulong layerExtent = 4096)
 		{
-			return LatitudeLongitudeToUnityTilePosition(coordinate, tile.InitialZoom, tile.TileScale, layerExtent);
+			return LatitudeLongitudeToUnityTilePosition(coordinate, tile.CurrentZoom, tile.TileScale, layerExtent);
 		}
 
 		/// <summary>

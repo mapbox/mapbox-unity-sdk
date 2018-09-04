@@ -1,3 +1,4 @@
+
 namespace Mapbox.Examples
 {
 	using UnityEngine;
@@ -41,7 +42,7 @@ namespace Mapbox.Examples
 
 					// Uncommment me if you want the loading screen to show again
 					// when loading new tiles.
-					//Content.SetActive(true);
+					//_content.SetActive(true);
 				}
 			};
 		}

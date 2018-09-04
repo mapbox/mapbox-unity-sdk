@@ -1,4 +1,4 @@
-Thank you for downloading the Mapbox Unity SDK (for Unity 2017.1+)!
+Thank you for downloading the Mapbox Unity SDK (for Unity 2017.1.2+)!
 
 
 Getting started: https://www.mapbox.com/unity-sdk/overview/#getting-started
@@ -11,7 +11,7 @@ API: https://www.mapbox.com/mapbox-unity-sdk/api/
 
 
 
-Current version: 1.4.3, as of May 29th, 2018
+Current version: 1.4.5, as of August 20th, 2018
 
 Changelog: https://www.mapbox.com/mapbox-unity-sdk/docs/05-changelog.html
 

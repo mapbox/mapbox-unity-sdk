@@ -16,12 +16,12 @@ namespace Mapbox.Unity.Map
 		public string atlasPath;
 		public string palettePath;
 
-		public StyleAssetPathBundle(string styleName, string path)
+		public StyleAssetPathBundle(string styleName, string path, string samplePaletteName = "")
 		{
 			string topMaterialName = string.Format("{0}{1}", styleName, Constants.StyleAssetNames.TOP_MATERIAL_SUFFIX);
 			string sideMaterialName = string.Format("{0}{1}", styleName, Constants.StyleAssetNames.SIDE_MATERIAL_SUFFIX);
 			string atlasInfoName = string.Format("{0}{1}", styleName, Constants.StyleAssetNames.ALTAS_SUFFIX);
-			string paletteName = string.Format("{0}{1}", styleName, Constants.StyleAssetNames.PALETTE_SUFFIX);
+			string paletteName = (styleName == "Simple") ? samplePaletteName : string.Format("{0}{1}", styleName, Constants.StyleAssetNames.PALETTE_SUFFIX);
 
 			string materialFolderPath = Path.Combine(path, Constants.Path.MAPBOX_STYLES_MATERIAL_FOLDER);
 			string atlasFolderPath = Path.Combine(path, Constants.Path.MAPBOX_STYLES_ATLAS_FOLDER);
@@ -54,13 +54,49 @@ namespace Mapbox.Unity.Map
 			{
 				string styleName = geometryMaterialOptionsRef.style.ToString();
 
+				string samplePaletteName = geometryMaterialOptionsRef.samplePalettes.ToString();
+
 				string path = Path.Combine(Constants.Path.MAP_FEATURE_STYLES_SAMPLES, Path.Combine(styleName, Constants.Path.MAPBOX_STYLES_ASSETS_FOLDER));
 
-				StyleAssetPathBundle styleAssetPathBundle = new StyleAssetPathBundle(styleName, path);
+				StyleAssetPathBundle styleAssetPathBundle = new StyleAssetPathBundle(styleName, path, samplePaletteName);
 
 				geometryMaterialOptions = AssignAssets(new GeometryMaterialOptions(), styleAssetPathBundle);
 
 				geometryMaterialOptions.style = geometryMaterialOptionsRef.style;
+
+				geometryMaterialOptions.lightStyleOpacity = geometryMaterialOptionsRef.lightStyleOpacity;
+				geometryMaterialOptions.darkStyleOpacity = geometryMaterialOptionsRef.darkStyleOpacity;
+
+				geometryMaterialOptions.colorStyleColor = geometryMaterialOptionsRef.colorStyleColor;
+
+				switch (geometryMaterialOptions.style)
+				{
+					case StyleTypes.Light:
+						Color lightColor = geometryMaterialOptions.materials[0].Materials[0].color;
+						lightColor.a = geometryMaterialOptions.lightStyleOpacity;
+						geometryMaterialOptions.materials[0].Materials[0].color = lightColor;
+
+						lightColor = geometryMaterialOptions.materials[1].Materials[0].color;
+						lightColor.a = geometryMaterialOptions.lightStyleOpacity;
+						geometryMaterialOptions.materials[1].Materials[0].color = lightColor;
+						break;
+					case StyleTypes.Dark:
+						Color darkColor = geometryMaterialOptions.materials[0].Materials[0].color;
+						darkColor.a = geometryMaterialOptions.darkStyleOpacity;
+						geometryMaterialOptions.materials[0].Materials[0].color = darkColor;
+
+						darkColor = geometryMaterialOptions.materials[1].Materials[0].color;
+						darkColor.a = geometryMaterialOptions.darkStyleOpacity;
+						geometryMaterialOptions.materials[1].Materials[0].color = darkColor;
+						break;
+					case StyleTypes.Color:
+						Color color = geometryMaterialOptions.colorStyleColor;
+						geometryMaterialOptions.materials[0].Materials[0].color = color;
+						geometryMaterialOptions.materials[1].Materials[0].color = color;
+						break;
+					default:
+						break;
+				}
 
 				if(geometryMaterialOptions.style == StyleTypes.Satellite)
 				{
@@ -86,8 +122,8 @@ namespace Mapbox.Unity.Map
 			AtlasInfo atlas = Resources.Load(styleAssetPathBundle.atlasPath, typeof(AtlasInfo)) as AtlasInfo;
 			ScriptablePalette palette = Resources.Load(styleAssetPathBundle.palettePath, typeof(ScriptablePalette)) as ScriptablePalette;
 
-			geometryMaterialOptions.materials[0].Materials[0] = topMaterial;
-			geometryMaterialOptions.materials[1].Materials[0] = sideMaterial;
+			geometryMaterialOptions.materials[0].Materials[0] = new Material(topMaterial);
+			geometryMaterialOptions.materials[1].Materials[0] = new Material(sideMaterial);
 			geometryMaterialOptions.atlasInfo = atlas;
 			geometryMaterialOptions.colorPalette = palette;
 

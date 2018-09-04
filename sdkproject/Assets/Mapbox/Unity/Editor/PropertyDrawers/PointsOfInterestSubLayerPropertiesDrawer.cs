@@ -90,9 +90,8 @@ namespace Mapbox.Unity.Map
 
 				selectedLayers = new int[1] { prefabItemArray.arraySize - 1 };
 				layerTreeView.SetSelection(selectedLayers);
-
-
 			}
+
 			if (GUILayout.Button(new GUIContent("Remove Selected"), (GUIStyle)"minibuttonright"))
 			{
 				if (prefabItemArray.arraySize == 0)

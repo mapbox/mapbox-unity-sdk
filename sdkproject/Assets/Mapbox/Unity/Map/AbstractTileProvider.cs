@@ -6,15 +6,18 @@
 	using Mapbox.Map;
 	using System.Linq;
 
+	public class ExtentArgs : EventArgs
+	{
+		//TODO: Override GetHashCode for UnwrappedTileId
+		public HashSet<UnwrappedTileId> activeTiles;
+	}
+
 	public abstract class AbstractTileProvider : MonoBehaviour, ITileProvider
 	{
-		public event Action<UnwrappedTileId> OnTileAdded = delegate { };
-		public event Action<UnwrappedTileId> OnTileRemoved = delegate { };
-		public event Action<UnwrappedTileId> OnTileRepositioned = delegate { };
+		public event EventHandler<ExtentArgs> ExtentChanged;
 
 		protected IMap _map;
-
-		protected Dictionary<UnwrappedTileId, byte> _activeTiles = new Dictionary<UnwrappedTileId, byte>();
+		protected ExtentArgs _currentExtent = new ExtentArgs();
 
 		protected ITileProviderOptions _options;
 		public ITileProviderOptions Options
@@ -27,45 +30,17 @@
 
 		public virtual void Initialize(IMap map)
 		{
-			_activeTiles.Clear();
 			_map = map;
 			OnInitialized();
 		}
 
-		protected virtual void AddTile(UnwrappedTileId tile)
+		public virtual void OnExtentChanged()
 		{
-			if (_activeTiles.ContainsKey(tile))
-			{
-				return;
-			}
-
-			_activeTiles.Add(tile, 0);
-			OnTileAdded(tile);
-		}
-
-		protected virtual void RemoveTile(UnwrappedTileId tile)
-		{
-			if (!_activeTiles.ContainsKey(tile))
-			{
-				return;
-			}
-
-			_activeTiles.Remove(tile);
-			OnTileRemoved(tile);
-		}
-
-		protected virtual void RepositionTile(UnwrappedTileId tile)
-		{
-			if (!_activeTiles.ContainsKey(tile))
-			{
-				//TODO : Only active tiles should be repositioned ?
-				return;
-			}
-
-			OnTileRepositioned(tile);
+			ExtentChanged(this, _currentExtent);
 		}
 
 		public abstract void OnInitialized();
+		public abstract void UpdateTileExtent();
 
 		public virtual void SetOptions(ITileProviderOptions options)
 		{

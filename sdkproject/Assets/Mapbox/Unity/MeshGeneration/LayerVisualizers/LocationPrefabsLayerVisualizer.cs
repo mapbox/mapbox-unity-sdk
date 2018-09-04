@@ -15,11 +15,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 	{
 		private int maxDensity = 30; //This value is same as the density's max range value in PrefabItemOptions
 
-		public void SetProperties(PrefabItemOptions item, LayerPerformanceOptions performanceOptions)
+		public void SetProperties(PrefabItemOptions item)
 		{
 			SubLayerProperties = item;
 			Active = item.isActive;
-			_performanceOptions = performanceOptions;
+			_performanceOptions = item.performanceOptions;
 
 
 			//Check to make sure that when Categories selection is none, the location prefab is disabled
@@ -40,10 +40,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				extrusionType = item.extrusionType
 			};
 
-
-			item.coreOptions.groupFeatures = item.groupFeatures;
+			item.coreOptions.combineMeshes = item.combineMeshes;
 			item.moveFeaturePositionTo = item._movePrefabFeaturePositionTo;
-
 
 			string layerName = "";
 			if (item.layerNameFromFindByTypeDictionary.TryGetValue(item.findByType, out layerName))
@@ -241,7 +239,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			return containingCategories;
 		}
 
-		public override void Create(VectorTileLayer layer, UnityTile tile, Action callback)
+		public override void Create(VectorTileLayer layer, UnityTile tile, Action<UnityTile, LayerVisualizerBase> callback)
 		{
 			//for layers using specific locations, ignore VectorTileLayer and
 			//pass coordinates to the modifierstack using BuildFeatureFromLatLon.
@@ -251,15 +249,13 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				BuildFeatureFromLatLon(layer, tile);
 				if (callback != null)
 				{
-					callback();
+					callback(tile, this);
 				}
 			}
 			else
 			{
 				base.Create(layer, tile, callback);
-
 			}
-
 		}
 
 
@@ -270,6 +266,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		/// <param name="tile">Tile.</param>
 		private void BuildFeatureFromLatLon(VectorTileLayer layer, UnityTile tile)
 		{
+			if (tile.TileState != Enums.TilePropertyState.Unregistered)
+			{
 			string[] coordinates = (SubLayerProperties as PrefabItemOptions).coordinates;
 
 			for (int i = 0; i < coordinates.Length; i++)
@@ -286,6 +284,10 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 				if (coordinateTileId.Canonical.Equals(tile.CanonicalTileId))
 				{
+					if (String.IsNullOrEmpty(coordinates[i]))
+					{
+						return;
+					}
 
 					//create new vector feature
 					VectorFeatureUnity feature = new VectorFeatureUnity();
@@ -294,22 +296,19 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 					//create submesh for feature
 					List<Vector3> latLonPoint = new List<Vector3>();
+						//add point to submesh, and submesh to feature
+						latLonPoint.Add(Conversions.LatitudeLongitudeToUnityTilePosition(coordinate, tile.CurrentZoom, tile.TileScale, layer.Extent).ToVector3xz());
+						feature.Points.Add(latLonPoint);
 
-					//add point to submesh, and submesh to feature
-					latLonPoint.Add(Conversions.LatitudeLongitudeToUnityTilePosition(coordinate, tile.InitialZoom, tile.TileScale, layer.Extent).ToVector3xz());
-					feature.Points.Add(latLonPoint);
+						//pass valid feature.Data to modifiers
+						//this data has no relation to the features being drawn
+						feature.Data = layer.GetFeature(0);
 
-					//pass valid feature.Data to modifiers
-					//this data has no relation to the features being drawn
-					feature.Data = layer.GetFeature(0);
-
-					//pass the feature to the mod stack
-					base.Build(feature, tile, tile.gameObject);
-
+						//pass the feature to the mod stack
+						base.Build(feature, tile, tile.gameObject);
+					}
 				}
-
 			}
 		}
-
 	}
 }

@@ -47,11 +47,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				tile.gameObject.layer = _elevationOptions.unityLayerOptions.layerId;
 			}
 
-			if (tile.RasterDataState != Enums.TilePropertyState.Loaded)
-			{
-				tile.MeshRenderer.material = _elevationOptions.requiredOptions.baseMaterial;
-			}
-
 			if (tile.MeshFilter.mesh.vertexCount == 0)
 			{
 				CreateBaseMesh(tile);
@@ -155,7 +150,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 						tile.QueryHeightData(x / cap, 1 - (y + 1) / cap),
 						_currentTileMeshData.Vertices[(int)(y * cap + x) * 6 + 2].z);
 
-					//-- 
+					//--
 
 					_currentTileMeshData.Vertices[(int)(y * cap + x) * 6 + 3] = new Vector3(
 						_currentTileMeshData.Vertices[(int)(y * cap + x) * 6 + 3].x,
