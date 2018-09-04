@@ -166,7 +166,7 @@ namespace Mapbox.Unity
 		{
 			_fileSource = new CachingWebFileSource(_configuration.AccessToken, _configuration.AutoRefreshCache)
 				.AddCache(new MemoryCache(_configuration.MemoryCacheSize))
-#if !UNITY_WEBGL
+#if !UNITY_WEBGL && !PLATFORM_LUMIN
 				.AddCache(new SQLiteCache(_configuration.FileCacheSize))
 #endif
 				;
