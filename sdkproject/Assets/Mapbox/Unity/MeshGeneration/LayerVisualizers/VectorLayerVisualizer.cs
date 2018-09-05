@@ -59,7 +59,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		protected ModifierStackBase _defaultStack;
 		private HashSet<ulong> _activeIds;
 		private Dictionary<UnityTile, List<ulong>> _idPool; //necessary to keep _activeIds list up to date when unloading tiles
-		private Dictionary<Type, Action> _updateMethods;
 		private string _key;
 
 		public override string Key
@@ -111,18 +110,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		private void UpdateVector(object sender, System.EventArgs e)
 		{
 			Debug.Log("UpdateVector " + sender.ToString());
-			_updateMethods[sender.GetType()]();
+			//do something...
 		}
 
 		public void SetProperties(VectorSubLayerProperties properties)
 		{
-			_updateMethods = new Dictionary<Type, Action>()
-			{
-				{ typeof(GeometryMaterialOptions), UpdateMaterials },
-				{ typeof(ColliderOptions), UpdateColliders },
-				{ typeof(GeometryExtrusionOptions), UpdateExtrusion }
-			};
-
 			if(_layerProperties == null && properties != null)
 			{
 				_layerProperties = properties;
@@ -131,6 +123,10 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					_performanceOptions = properties.performanceOptions;
 				}
 			}
+
+			_layerProperties.PropertyHasChanged += UpdateVector;
+
+			_layerProperties.coreOptions.PropertyHasChanged += UpdateVector;
 
 			_layerProperties.extrusionOptions.PropertyHasChanged += UpdateVector;
 
