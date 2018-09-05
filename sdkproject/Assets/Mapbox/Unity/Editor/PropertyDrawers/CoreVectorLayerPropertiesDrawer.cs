@@ -48,7 +48,7 @@
 
 			primitiveType.enumValueIndex = EditorGUILayout.Popup(primitiveTypeLabel, primitiveType.enumValueIndex, _primitiveTypeContent);
 			bool primitiveTypeHasChanged = primitiveType.serializedObject.ApplyModifiedProperties();
-			if (primitiveTypeHasChanged)
+			if(primitiveTypeHasChanged && coreOptions != null)
 			{
 				coreOptions.HasChanged = true;
 			}
@@ -57,7 +57,7 @@
 			{
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("lineWidth"));
 				bool lineWidthHasChanged = property.FindPropertyRelative("lineWidth").serializedObject.ApplyModifiedProperties();
-				if (lineWidthHasChanged)
+				if (lineWidthHasChanged && coreOptions != null)
 				{
 					coreOptions.HasChanged = true;
 				}

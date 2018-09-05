@@ -45,7 +45,7 @@
 			colliderTypeProperty.enumValueIndex = EditorGUILayout.Popup(colliderTypeLabel, colliderTypeProperty.enumValueIndex, colliderTypeContent);
 			bool colliderHasChanged = colliderTypeProperty.serializedObject.ApplyModifiedProperties();
 
-			if (colliderHasChanged)
+			if (colliderHasChanged && colliderOptions != null)
 			{
 				colliderOptions.HasChanged = true;
 			}

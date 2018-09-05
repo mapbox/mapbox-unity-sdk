@@ -56,7 +56,7 @@
 
 			extrusionTypeProperty.enumValueIndex = EditorGUILayout.Popup(extrusionTypeLabel, extrusionTypeProperty.enumValueIndex, extrusionTypeContent);
 			bool extrusionTypeHasChanged = extrusionTypeProperty.serializedObject.ApplyModifiedProperties();
-			if (extrusionTypeHasChanged)
+			if (extrusionTypeHasChanged && extrusionOptions != null)
 			{
 				extrusionOptions.HasChanged = true;
 			}
@@ -104,14 +104,14 @@
 			}
 
 			bool extrusionGeometryTypeHasChanged = extrusionGeometryType.serializedObject.ApplyModifiedProperties();
-			if (extrusionGeometryTypeHasChanged)
+			if (extrusionGeometryTypeHasChanged && extrusionOptions != null)
 			{
 				extrusionOptions.HasChanged = true;
 			}
 
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("extrusionScaleFactor"), new GUIContent { text = "Scale Factor" });
 			bool scaleFactorHasChanged = property.FindPropertyRelative("extrusionScaleFactor").serializedObject.ApplyModifiedProperties();
-			if (scaleFactorHasChanged)
+			if (scaleFactorHasChanged && extrusionOptions != null)
 			{
 				extrusionOptions.HasChanged = true;
 			}

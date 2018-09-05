@@ -49,7 +49,7 @@
 				var snapToTerrainProperty = subLayerCoreOptions.FindPropertyRelative("snapToTerrain");
 				snapToTerrainProperty.boolValue = EditorGUILayout.Toggle(snapToTerrainProperty.displayName, snapToTerrainProperty.boolValue);
 				bool snapToterrainHasChanged = snapToTerrainProperty.serializedObject.ApplyModifiedProperties();
-				if (snapToterrainHasChanged)
+				if (snapToterrainHasChanged && vectorSubLayerProperties!= null)
 				{
 					vectorSubLayerProperties.HasChanged = true;
 				}
@@ -57,7 +57,7 @@
 				var combineMeshesProperty = subLayerCoreOptions.FindPropertyRelative("combineMeshes");
 				combineMeshesProperty.boolValue = EditorGUILayout.Toggle(combineMeshesProperty.displayName, combineMeshesProperty.boolValue);
 				bool combineMeshesHasChanged = combineMeshesProperty.serializedObject.ApplyModifiedProperties();
-				if (combineMeshesHasChanged)
+				if (combineMeshesHasChanged && vectorSubLayerProperties != null)
 				{
 					vectorSubLayerProperties.HasChanged = true;
 				}
