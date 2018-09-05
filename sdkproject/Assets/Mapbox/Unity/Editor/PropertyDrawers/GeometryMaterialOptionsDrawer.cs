@@ -8,6 +8,7 @@
 	using Mapbox.VectorTile.ExtensionMethods;
 	using System.IO;
 	using System.Collections.Generic;
+	using com.spacepuppyeditor;
 
 	public class StyleIconBundle
 	{
@@ -84,8 +85,7 @@
 		{
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 
-			var map = (AbstractMap)property.serializedObject.targetObject;
-			var materialOptions = map.VectorData.LayerProperty.vectorSubLayers[0].materialOptions;
+			GeometryMaterialOptions materialOptions = (GeometryMaterialOptions)EditorHelper.GetTargetObjectOfProperty(property);
 
 			showTexturing = EditorGUILayout.Foldout(showTexturing, new GUIContent { text = "Texturing", tooltip = "Material options to texture the generated building geometry" });
 			if (showTexturing)
@@ -96,8 +96,6 @@
 				var styleTypeLabel = new GUIContent { text = "Style Type", tooltip = "Texturing style for feature; choose from sample style or create your own by choosing Custom. " };
 				var styleType = property.FindPropertyRelative("style");
 
-				materialOptions.Style = (StyleTypes)styleType.enumValueIndex;
-
 				GUIContent[] styleTypeGuiContent = new GUIContent[styleType.enumDisplayNames.Length];
 				for (int i = 0; i < styleType.enumDisplayNames.Length; i++)
 				{
@@ -107,7 +105,12 @@
 					};
 				}
 
-				materialOptions.Style = (StyleTypes)EditorGUILayout.Popup(styleTypeLabel, styleType.enumValueIndex, styleTypeGuiContent);
+				styleType.enumValueIndex = EditorGUILayout.Popup(styleTypeLabel, styleType.enumValueIndex, styleTypeGuiContent);
+				bool styleTypeHasChanged = styleType.serializedObject.ApplyModifiedProperties();
+				if (styleTypeHasChanged)
+				{
+					materialOptions.HasChanged = true;
+				}
 
 				EditorGUI.indentLevel++;
 				if ((StyleTypes)styleType.enumValueIndex != StyleTypes.Custom)
@@ -147,15 +150,35 @@
 							}
 
 							samplePaletteType.enumValueIndex = EditorGUILayout.Popup(samplePaletteTypeLabel, samplePaletteType.enumValueIndex, samplePaletteTypeGuiContent);
+							bool paletteHasChanged = samplePaletteType.serializedObject.ApplyModifiedProperties();
+							if (paletteHasChanged)
+							{
+								materialOptions.HasChanged = true;
+							}
 							break;
 						case StyleTypes.Light:
 							property.FindPropertyRelative("lightStyleOpacity").floatValue = EditorGUILayout.Slider("Opacity", property.FindPropertyRelative("lightStyleOpacity").floatValue, 0.0f, 1.0f);
+							bool lightOpacityHasChanged = property.FindPropertyRelative("lightStyleOpacity").serializedObject.ApplyModifiedProperties();
+							if(lightOpacityHasChanged)
+							{
+								materialOptions.HasChanged = true;
+							}
 							break;
 						case StyleTypes.Dark:
 							property.FindPropertyRelative("darkStyleOpacity").floatValue = EditorGUILayout.Slider("Opacity", property.FindPropertyRelative("darkStyleOpacity").floatValue, 0.0f, 1.0f);
+							bool darkOpacityHasChanged = property.FindPropertyRelative("darkStyleOpacity").serializedObject.ApplyModifiedProperties();
+							if (darkOpacityHasChanged)
+							{
+								materialOptions.HasChanged = true;
+							}
 							break;
 						case StyleTypes.Color:
 							property.FindPropertyRelative("colorStyleColor").colorValue = EditorGUILayout.ColorField("Color", property.FindPropertyRelative("colorStyleColor").colorValue);
+							bool colorHasChanged = property.FindPropertyRelative("colorStyleColor").serializedObject.ApplyModifiedProperties();
+							if(colorHasChanged)
+							{
+								materialOptions.HasChanged = true;
+							}
 							break;
 						default:
 							break;
@@ -168,7 +191,14 @@
 					int valIndex = texturingType.enumValueIndex == 0 ? 0 : texturingType.enumValueIndex + 1;
 					var texturingTypeGUI = new GUIContent { text = "Texturing Type", tooltip = EnumExtensions.Description((UvMapType)valIndex) };
 
+
+					int cachedTexturingType = texturingType.enumValueIndex;
 					EditorGUILayout.PropertyField(texturingType, texturingTypeGUI);
+					bool texturingTypeHasChanged = texturingType.serializedObject.ApplyModifiedProperties();
+					if (texturingTypeHasChanged)	
+					{
+						materialOptions.HasChanged = true;
+					}
 
 					var matList = property.FindPropertyRelative("materials");
 					if (matList.arraySize == 0)
@@ -176,24 +206,51 @@
 						matList.arraySize = 2;
 					}
 					GUILayout.Space(-lineHeight);
-					var roofMat = matList.GetArrayElementAtIndex(0);
-					EditorGUILayout.PropertyField(roofMat, new GUIContent { text = "Top Material", tooltip = "Unity material to use for extruded top/roof mesh. " });
+
+					EditorGUILayout.PropertyField(matList.GetArrayElementAtIndex(0), new GUIContent { text = "Top Material", tooltip = "Unity material to use for extruded top/roof mesh. " });
+					bool topMatHasChanged = matList.GetArrayElementAtIndex(0).serializedObject.ApplyModifiedProperties();
+					if(topMatHasChanged)
+					{
+						materialOptions.HasChanged = true;
+					}
 
 					GUILayout.Space(-lineHeight);
-					var wallMat = matList.GetArrayElementAtIndex(1);
-					EditorGUILayout.PropertyField(wallMat, new GUIContent { text = "Side Material", tooltip = "Unity material to use for extruded side/wall mesh. " });
+
+					EditorGUILayout.PropertyField(matList.GetArrayElementAtIndex(1), new GUIContent { text = "Side Material", tooltip = "Unity material to use for extruded side/wall mesh. " });
+					bool sideMatHasChanged = matList.GetArrayElementAtIndex(1).serializedObject.ApplyModifiedProperties();
+					if (sideMatHasChanged)
+					{
+						materialOptions.HasChanged = true;
+					}
 
 					if ((UvMapType)texturingType.enumValueIndex + 1 == UvMapType.Atlas)
 					{
 						var atlasInfo = property.FindPropertyRelative("atlasInfo");
 						EditorGUILayout.ObjectField(atlasInfo, new GUIContent { text = "Altas Info", tooltip = "Atlas information scriptable object, this defines how the texture roof and wall texture atlases will be used.  " });
+
+						bool atlasInfoHasChanged = atlasInfo.serializedObject.ApplyModifiedProperties();
+						if (atlasInfoHasChanged)
+						{
+							materialOptions.HasChanged = true;
+						}
 					}
 					if ((UvMapType)texturingType.enumValueIndex + 1 == UvMapType.AtlasWithColorPalette)
 					{
 						var atlasInfo = property.FindPropertyRelative("atlasInfo");
 						EditorGUILayout.ObjectField(atlasInfo, new GUIContent { text = "Altas Info", tooltip = "Atlas information scriptable object, this defines how the texture roof and wall texture atlases will be used.  " });
+						bool atlasInfoHasChanged = atlasInfo.serializedObject.ApplyModifiedProperties();
+						if (atlasInfoHasChanged)
+						{
+							materialOptions.HasChanged = true;
+						}
+
 						var colorPalette = property.FindPropertyRelative("colorPalette");
 						EditorGUILayout.ObjectField(colorPalette, new GUIContent { text = "Color Palette", tooltip = "Color palette scriptable object, allows texture features to be procedurally colored at runtime. Requires materials that use the MapboxPerRenderer shader. " });
+						bool colorPaletteHasChanged = colorPalette.serializedObject.ApplyModifiedProperties();
+						if (colorPaletteHasChanged)
+						{
+							materialOptions.HasChanged = true;
+						}
 
 						EditorGUILayout.LabelField(new GUIContent { text = "Note: Atlas With Color Palette requires materials that use the MapboxPerRenderer shader." }, Constants.GUI.Styles.EDITOR_NOTE_STYLE);
 					}

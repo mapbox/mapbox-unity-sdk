@@ -19,17 +19,5 @@
 		}
 
 		public ColliderType colliderType = ColliderType.None;
-
-		public ColliderType ColliderType
-		{
-			set
-			{
-				if (value != colliderType)
-				{
-					colliderType = value;
-					HasChanged = true;
-				}
-			}
-		}
 	}
 }

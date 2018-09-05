@@ -6,6 +6,7 @@
 	using UnityEngine;
 	using Mapbox.Unity.Map;
 	using Mapbox.VectorTile.ExtensionMethods;
+	using com.spacepuppyeditor;
 
 	[CustomPropertyDrawer(typeof(ColliderOptions))]
 	public class ColliderOptionsDrawer : PropertyDrawer
@@ -15,9 +16,7 @@
 		GUIContent[] colliderTypeContent;
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			var map = (AbstractMap)property.serializedObject.targetObject;
-			var colliderOptions = map.VectorData.LayerProperty.vectorSubLayers[0].colliderOptions;
-
+			ColliderOptions colliderOptions = (ColliderOptions)EditorHelper.GetTargetObjectOfProperty(property);
 			EditorGUI.BeginProperty(position, null, property);
 			var colliderTypeLabel = new GUIContent
 			{
@@ -43,17 +42,14 @@
 				isGUIContentSet = true;
 			}
 
-			colliderOptions.ColliderType = (ColliderType)EditorGUILayout.Popup(colliderTypeLabel, colliderTypeProperty.enumValueIndex, colliderTypeContent);
-			//this will trigger changes if the user selects the enum dropdown in the UI and chooses the SAME option...
-			//is there a better way to compare pre/post values other than change check?
-			/*
-			EditorGUI.BeginChangeCheck();
-			colliderTypeProperty.enumValueIndex = EditorGUI.Popup(position, colliderTypeLabel, colliderTypeProperty.enumValueIndex, colliderTypeContent);
-			if(EditorGUI.EndChangeCheck())
+			colliderTypeProperty.enumValueIndex = EditorGUILayout.Popup(colliderTypeLabel, colliderTypeProperty.enumValueIndex, colliderTypeContent);
+			bool colliderHasChanged = colliderTypeProperty.serializedObject.ApplyModifiedProperties();
+
+			if (colliderHasChanged)
 			{
 				colliderOptions.HasChanged = true;
 			}
-			*/
+
 			EditorGUI.EndProperty();
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)

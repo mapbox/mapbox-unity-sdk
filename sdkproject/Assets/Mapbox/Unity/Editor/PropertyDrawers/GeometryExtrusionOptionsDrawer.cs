@@ -7,6 +7,7 @@
 	using System.Linq;
 	using Mapbox.Platform.TilesetTileJSON;
 	using System.Collections.Generic;
+	using com.spacepuppyeditor;
 
 	[CustomPropertyDrawer(typeof(GeometryExtrusionOptions))]
 	public class GeometryExtrusionOptionsDrawer : PropertyDrawer
@@ -20,8 +21,15 @@
 		bool isGUIContentSet = false;
 		static TileJsonData tileJsonData = new TileJsonData();
 		static TileJSONResponse tileJsonResponse;
+
+
+		//private void ChangeCheck()
+
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+
+			GeometryExtrusionOptions extrusionOptions = (GeometryExtrusionOptions)EditorHelper.GetTargetObjectOfProperty(property);
+
 			var extrusionTypeProperty = property.FindPropertyRelative("extrusionType");
 			var displayNames = extrusionTypeProperty.enumDisplayNames;
 			int count = extrusionTypeProperty.enumDisplayNames.Length;
@@ -47,6 +55,11 @@
 			};
 
 			extrusionTypeProperty.enumValueIndex = EditorGUILayout.Popup(extrusionTypeLabel, extrusionTypeProperty.enumValueIndex, extrusionTypeContent);
+			bool extrusionTypeHasChanged = extrusionTypeProperty.serializedObject.ApplyModifiedProperties();
+			if (extrusionTypeHasChanged)
+			{
+				extrusionOptions.HasChanged = true;
+			}
 
 			var sourceTypeValue = (Unity.Map.ExtrusionType)extrusionTypeProperty.enumValueIndex;
 
@@ -90,7 +103,18 @@
 					break;
 			}
 
+			bool extrusionGeometryTypeHasChanged = extrusionGeometryType.serializedObject.ApplyModifiedProperties();
+			if (extrusionGeometryTypeHasChanged)
+			{
+				extrusionOptions.HasChanged = true;
+			}
+
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("extrusionScaleFactor"), new GUIContent { text = "Scale Factor" });
+			bool scaleFactorHasChanged = property.FindPropertyRelative("extrusionScaleFactor").serializedObject.ApplyModifiedProperties();
+			if (scaleFactorHasChanged)
+			{
+				extrusionOptions.HasChanged = true;
+			}
 			EditorGUI.indentLevel--;
 		}
 

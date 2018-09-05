@@ -40,18 +40,6 @@
 			materials[0] = new MaterialList();
 			materials[1] = new MaterialList();
 		}
-
-		public StyleTypes Style
-		{
-			set
-			{
-				if(value != style)
-				{
-					style = value;
-					HasChanged = true;
-				}
-			}
-		}
 	}
 
 	[Serializable]
