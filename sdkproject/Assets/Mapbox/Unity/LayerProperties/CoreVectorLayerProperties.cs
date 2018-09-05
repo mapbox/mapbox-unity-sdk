@@ -3,10 +3,11 @@
 	using System;
 	using System.Collections.Generic;
 	using Mapbox.Unity.MeshGeneration.Filters;
+	using Mapbox.Unity.MeshGeneration.Modifiers;
 	using UnityEngine;
 
 	[Serializable]
-	public class CoreVectorLayerProperties
+	public class CoreVectorLayerProperties : MapboxDataProperty
 	{
 		[SerializeField]
 		private string sourceId;
