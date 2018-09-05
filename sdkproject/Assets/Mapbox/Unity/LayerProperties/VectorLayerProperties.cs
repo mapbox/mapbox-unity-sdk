@@ -12,37 +12,8 @@
 
 		public event Action OnPropertyUpdated = delegate { };
 
-		public event Action OnPropertyUpdatedComplete = delegate { };
-		public event Action OnPropertyUpdatedCollider = delegate { };
-		public event Action OnPropertyUpdatedMaterial = delegate { };
-
-		public void UpdateProperty(VectorUpdateType updateType)
+		public void UpdateProperty()
 		{
-			//probably a better way to do this...we are doing conditional checks here, can we just call OnPropertyUpdated and pass updateType to it?
-			switch (updateType)
-			{
-				case VectorUpdateType.Complete:
-					if (OnPropertyUpdatedComplete != null)
-					{
-						OnPropertyUpdatedComplete();
-					}
-					break;
-				case VectorUpdateType.Collider:
-					if (OnPropertyUpdatedCollider != null)
-					{
-						OnPropertyUpdatedCollider();
-					}
-					break;
-				case VectorUpdateType.Material:
-					if (OnPropertyUpdatedMaterial != null)
-					{
-						OnPropertyUpdatedMaterial();
-					}
-					break;
-				default:
-					break;
-			}
-
 			if (OnPropertyUpdated != null)
 			{
 				OnPropertyUpdated();

@@ -78,7 +78,7 @@
 		private static string[] subTypeValues;
 		FeatureSubLayerTreeView layerTreeView;
 		IList<int> selectedLayers = new List<int>();
-		public void DrawUI(SerializedProperty property, Action<VectorUpdate> action = null)
+		public void DrawUI(SerializedProperty property)
 		{
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 			var serializedMapObject = property.serializedObject;
@@ -301,7 +301,7 @@
 						GUI.enabled = false;
 					}
 
-					DrawLayerVisualizerProperties(sourceTypeValue, layerProperty, property, action);
+					DrawLayerVisualizerProperties(sourceTypeValue, layerProperty, property);
 
 					if (!isLayerActive)
 					{
@@ -425,7 +425,7 @@
 			Debug.Log("Update!");
 		}
 
-		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty, SerializedProperty property, Action<VectorUpdate> action = null)
+		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty, SerializedProperty property)
 		{
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
 			//var layerName = layerProperty.FindPropertyRelative("coreOptions.layerName");
@@ -493,7 +493,7 @@
 
 
 			//*********************** MODELING SECTION BEGINS ***********************************//
-			_modelingSectionDrawer.DrawUI(subLayerCoreOptions, layerProperty, primitiveTypeProp, action);
+			_modelingSectionDrawer.DrawUI(subLayerCoreOptions, layerProperty, primitiveTypeProp);
 			//*********************** MODELING SECTION ENDS ***********************************//
 
 
@@ -501,12 +501,7 @@
 			if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
 			{
 				GUILayout.Space(-_lineHeight);
-				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
-				if(EditorGUI.EndChangeCheck())
-				{
-					action(new VectorUpdate(layerProperty.FindPropertyRelative("materialOptions"), VectorUpdateType.Material));
-				}
 			}
 			//*********************** TEXTURING SECTION ENDS ***********************************//
 
