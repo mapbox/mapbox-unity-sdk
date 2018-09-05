@@ -7,6 +7,7 @@
 	using Mapbox.Unity.Map;
 	using Mapbox.Editor;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
+	using com.spacepuppyeditor;
 
 	public class ModelingSectionDrawer
 	{
@@ -24,8 +25,10 @@
 		}
 		static float _lineHeight = EditorGUIUtility.singleLineHeight;
 
-		public void DrawUI(SerializedProperty subLayerCoreOptions, SerializedProperty layerProperty, VectorPrimitiveType primitiveTypeProp, Action<VectorUpdate> action = null)
+		public void DrawUI(SerializedProperty subLayerCoreOptions, SerializedProperty layerProperty, VectorPrimitiveType primitiveTypeProp)
 		{
+			VectorSubLayerProperties vectorSubLayerProperties = (VectorSubLayerProperties)EditorHelper.GetTargetObjectOfProperty(layerProperty);
+
 			objectId = layerProperty.serializedObject.targetObject.GetInstanceID().ToString();
 
 			EditorGUILayout.BeginVertical();
@@ -40,39 +43,28 @@
 					GUILayout.Space(-_lineHeight);
 					var extrusionOptions = layerProperty.FindPropertyRelative("extrusionOptions");
 					extrusionOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
-					EditorGUI.BeginChangeCheck();
 					EditorGUILayout.PropertyField(extrusionOptions);
-					if (EditorGUI.EndChangeCheck() && action != null)
-					{
-						action(new VectorUpdate(extrusionOptions));
-					}
 				}
 
-				EditorGUI.BeginChangeCheck();
 				var snapToTerrainProperty = subLayerCoreOptions.FindPropertyRelative("snapToTerrain");
 				snapToTerrainProperty.boolValue = EditorGUILayout.Toggle(snapToTerrainProperty.displayName, snapToTerrainProperty.boolValue);
-
-				if (EditorGUI.EndChangeCheck() && action != null)
+				bool snapToterrainHasChanged = snapToTerrainProperty.serializedObject.ApplyModifiedProperties();
+				if (snapToterrainHasChanged)
 				{
-					action(new VectorUpdate(snapToTerrainProperty));
+					vectorSubLayerProperties.HasChanged = true;
 				}
 
-				EditorGUI.BeginChangeCheck();
 				var combineMeshesProperty = subLayerCoreOptions.FindPropertyRelative("combineMeshes");
 				combineMeshesProperty.boolValue = EditorGUILayout.Toggle(combineMeshesProperty.displayName, combineMeshesProperty.boolValue);
-				if (EditorGUI.EndChangeCheck() && action != null)
+				bool combineMeshesHasChanged = combineMeshesProperty.serializedObject.ApplyModifiedProperties();
+				if (combineMeshesHasChanged)
 				{
-					action(new VectorUpdate(combineMeshesProperty));
+					vectorSubLayerProperties.HasChanged = true;
 				}
 
 				if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
 				{
-					EditorGUI.BeginChangeCheck();
 					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("colliderOptions"));
-					if (EditorGUI.EndChangeCheck() && action != null)
-					{
-						action(new VectorUpdate (layerProperty.FindPropertyRelative("colliderOptions"), VectorUpdateType.Collider));
-					}
 				}
 			}
 			EditorGUILayout.EndVertical();
