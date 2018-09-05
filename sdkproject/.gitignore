@@ -34,6 +34,7 @@ sysinfo.txt
 /Assets/Resources/Mapbox.meta
 
 # MagicLeap
-/Assets/MagicLeapSDK/*
-/Assets/MagicLeapSDK.meta
+/Assets/MagicLeap/*
+/Assets/MagicLeap.meta
+/.out/*
 

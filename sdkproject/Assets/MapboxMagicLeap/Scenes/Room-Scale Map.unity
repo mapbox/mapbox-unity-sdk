@@ -355,7 +355,7 @@ GameObject:
   m_Component:
   - component: {fileID: 234904009}
   m_Layer: 0
-  m_Name: MagicLeap Occlusion Mesh
+  m_Name: Occlusion Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -593,7 +593,7 @@ LineRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 391962295}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 0
@@ -956,7 +956,7 @@ LineRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 707980062}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 0
@@ -1183,6 +1183,7 @@ GameObject:
   m_Component:
   - component: {fileID: 950194439}
   - component: {fileID: 950194440}
+  - component: {fileID: 950194441}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -1220,10 +1221,10 @@ MonoBehaviour:
   _initializeOnStart: 1
   _options:
     locationOptions:
-      latitudeLongitude: 36.0553, -112.122
-      zoom: 15
+      latitudeLongitude: 36.093153, -112.117023
+      zoom: 16
     extentOptions:
-      extentType: 2
+      extentType: 3
       cameraBoundsOptions:
         camera: {fileID: 0}
         visibleBuffer: 0
@@ -1308,7 +1309,20 @@ MonoBehaviour:
         entityPerCoroutine: 20
       vectorSubLayers: []
       locationPrefabList: []
-  _tileProvider: {fileID: 0}
+  _tileProvider: {fileID: 950194441}
+--- !u!114 &950194441
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 950194438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 451561217008441418d3436d9a834633, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetTransform: {fileID: 2121387210}
+  visibleBuffer: 3
 --- !u!1 &981759306
 GameObject:
   m_ObjectHideFlags: 0
@@ -1559,7 +1573,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Pan Map (TrackPad)
+  m_Text: Pan Map ( TrackPad )
 --- !u!222 &1005429314
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1822,7 +1836,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1432224079}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -2.45, z: 0}
+  m_LocalPosition: {x: 0, y: -2.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2121387210}
@@ -1871,7 +1885,7 @@ LineRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1471003289}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 0
@@ -2463,7 +2477,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Move Map Root (Trigger)
+  m_Text: Move Map Root ( Trigger )
 --- !u!222 &1705941316
 CanvasRenderer:
   m_ObjectHideFlags: 0
