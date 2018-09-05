@@ -1,4 +1,7 @@
 ## CHANGELOG
+### v.1.4.6
+##### Improvements
+- Reworked line meshes generator 
 
 ### v.1.4.5
 08/20/2018
