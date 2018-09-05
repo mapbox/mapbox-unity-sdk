@@ -519,20 +519,32 @@ namespace Mapbox.Unity.Map
 			_imagery.UpdateLayer += (factory, updateVector) =>
 			{
 				_mapVisualizer.ReregisterTilesTo(factory);
-				CheckVectorUpdateType(updateVector);
+				if(updateVector)
+				{
+					_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
+					VectorData.UpdateFactorySettings();
+					_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
+				}
 				OnMapRedrawn();
 			};
 
 			_terrain.UpdateLayer += (factory, updateVector) =>
 			{
 				_mapVisualizer.ReregisterTilesTo(factory);
-				CheckVectorUpdateType(updateVector);
+				if (updateVector)
+				{
+					_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
+					VectorData.UpdateFactorySettings();
+					_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
+				}
 				OnMapRedrawn();
 			};
 
 			_vectorData.UpdateLayer += (factory, updateVector) =>
 			{
-				CheckVectorUpdateType(updateVector);
+				_mapVisualizer.UnregisterTilesFrom(factory);
+				VectorData.UpdateFactorySettings();
+				_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
 				OnMapRedrawn();
 			};
 
@@ -542,33 +554,6 @@ namespace Mapbox.Unity.Map
 			SendInitialized();
 
 			_tileProvider.UpdateTileExtent();
-		}
-
-		private void CheckVectorUpdateType(VectorUpdateType updateType)
-		{
-			/*
-			switch (updateType)
-			{
-				case VectorUpdateType.None:
-					break;
-				case VectorUpdateType.Complete:
-					_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
-					VectorData.UpdateFactorySettings();
-					_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
-					break;
-				case VectorUpdateType.Collider:
-					Debug.Log("Update colliders...");
-					//update/rerun collider modifiers...
-					break;
-				case VectorUpdateType.Material:
-					Debug.Log("Update materials...");
-					//update/rerun material modifiers...
-					break;
-				default:
-					break;
-					
-			}
-			*/
 		}
 
 		/// <summary>

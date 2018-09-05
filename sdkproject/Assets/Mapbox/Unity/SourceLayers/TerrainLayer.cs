@@ -131,7 +131,7 @@
 				//pushing new settings to factory directly
 				Factory.SetOptions(_layerProperty);
 				//notifying map to reload existing tiles
-				NotifyUpdateLayer(_elevationFactory, VectorUpdateType.Complete);
+				NotifyUpdateLayer(_elevationFactory, true);
 			};
 		}
 
