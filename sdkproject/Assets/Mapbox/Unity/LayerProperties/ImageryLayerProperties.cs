@@ -3,8 +3,6 @@
 	using UnityEngine;
 	using System;
 	using System.Collections.Generic;
-	using System.ComponentModel;
-	using System.Runtime.CompilerServices;
 
 	[System.Serializable]
 	public class ImageryLayerProperties : LayerProperties
@@ -38,19 +36,6 @@
 
 		};
 
-		/*
-		public LayerSourceOptions sourceOptions()
-		{
-			LayerSourceOptions layerSourceOptions = new LayerSourceOptions()
-			{
-				isActive = true,
-				//layerSource = MapboxDefaultImagery.GetParameters(ImagerySourceType.MapboxStreets)
-				layerSource = MapboxDefaultImagery.GetParameters(sourceType)
-
-			};
-			return layerSourceOptions;
-		}
-		*/
 		public ImageryRasterOptions rasterOptions = new ImageryRasterOptions();
 	}
 }

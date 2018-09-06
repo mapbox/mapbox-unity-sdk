@@ -22,9 +22,6 @@
 		static TileJsonData tileJsonData = new TileJsonData();
 		static TileJSONResponse tileJsonResponse;
 
-
-		//private void ChangeCheck()
-
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 

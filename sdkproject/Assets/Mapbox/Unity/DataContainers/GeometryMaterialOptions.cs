@@ -17,8 +17,6 @@
 			}
 		}
 
-		public int layerId;
-
 		public StyleTypes style;
 
 		public UvMapType texturingType = UvMapType.Tiled;

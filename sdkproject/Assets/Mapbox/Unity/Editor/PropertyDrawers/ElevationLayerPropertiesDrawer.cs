@@ -112,8 +112,6 @@
 			}
 			EditorGUI.BeginChangeCheck();
 
-			//position.y += lineHeight;
-
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("elevationLayerType"), new GUIContent { text = elevationLayerType.displayName, tooltip = ((ElevationLayerType)elevationLayerType.enumValueIndex).Description() });
 
 			if (sourceTypeValue == ElevationSourceType.None)
