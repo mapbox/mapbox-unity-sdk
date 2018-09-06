@@ -1,6 +1,6 @@
 # README-MagicLeap
 
-These are MagicLeap compatible examples built using the Mapbox Unity SDK. For faster setup, download the [MagicMaps unitypackage](www.mapbox.com/ar) (recommended).
+These are MagicLeap compatible examples built using the Mapbox Unity SDK. For faster setup, download the [MagicMaps unitypackage](https://s3.amazonaws.com/mapbox-unity-sdk/beta/mapbox-magicmaps-unity-sdk_v0.1.0-beta.unitypackage) (recommended).
 
 ## Magic Leap setup
 Follow Magic Leap's [setup instructions for Unity](https://creator.magicleap.com/learn/guides/sdk-unity-installing-and-configuring)
@@ -12,7 +12,7 @@ Follow Magic Leap's [setup instructions for Unity](https://creator.magicleap.com
      - In this repository, `.gitignore` is already setup for `sdkproject/Assets/MagicLeap`
 
 ## When Copying/Cloning this Repo
-This section isn’t necessary for those importing the [MagicMaps unitypackage](www.mapbox.com/ar) (recommended).
+This section isn’t necessary for those importing the [MagicMaps unitypackage](https://s3.amazonaws.com/mapbox-unity-sdk/beta/mapbox-magicmaps-unity-sdk_v0.1.0-beta.unitypackage) (recommended).
 1. Delete these folders:
    - `MapboxAR`
    - `UnityARInterface`
