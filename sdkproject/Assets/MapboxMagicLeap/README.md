@@ -6,7 +6,10 @@ These are MagicLeap compatible examples built using the Mapbox Unity SDK. For fa
 Follow Magic Leap's [setup instructions for Unity](https://creator.magicleap.com/learn/guides/sdk-unity-installing-and-configuring)
   1. Install the [Magic Leap Package Manager](https://creator.magicleap.com/downloads/lumin-sdk/overview).
   1. Install the [Unity developer preview](https://unity3d.com/partners/magicleap). `2018.1.6f1 MLTP7` at the time of writing. 
-  1. Add Magicleap’s Unity SDK v0.16.0 to the project. In this repository, `.gitignore` is already setup for `sdkproject/Assets/MagicLeap`
+  1. Manually import Magicleap’s Unity SDK v0.16.0 to the project. 
+     - By default, the Package Manager saves the unitypackage to `~/MagicLeap/tools/unity/v0.16.0/`. You can also press the `Open folder` button in the package manager.
+     - Once complete, you should see an `Assets/MagicLeap` folder. If you don't, namespace errors may occur.
+     - In this repository, `.gitignore` is already setup for `sdkproject/Assets/MagicLeap`
 
 ## When Copying/Cloning this Repo
 This section isn’t necessary for those importing the [MagicMaps unitypackage](www.mapbox.com/ar) (recommended).
