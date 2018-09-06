@@ -28,12 +28,7 @@
 		public LayerSourceOptions sourceOptions = new LayerSourceOptions()
 		{
 			isActive = true,
-			
-			//if(SourceType == ImagerySourceType.MapboxDark)
-			//{}
 			layerSource = MapboxDefaultImagery.GetParameters(ImagerySourceType.MapboxStreets)
-			//layerSource = MapboxDefaultImagery.GetParameters(sourceType);
-
 		};
 
 		public ImageryRasterOptions rasterOptions = new ImageryRasterOptions();
