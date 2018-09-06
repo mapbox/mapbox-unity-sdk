@@ -6,7 +6,7 @@
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Reflection;
-
+	using Mapbox.Unity.Map;
 	/// <summary>
 	/// EditorHelper class provides methods for working with serialzed properties.
 	/// Methods in this class are based on the spacepuppy-unity-framework, available at the url below.
@@ -14,6 +14,16 @@
 	/// </summary>
 	public static class EditorHelper
 	{
+
+		public static void CheckForModifiedProperty<T>(SerializedProperty property, T targetObject)
+		{
+			MapboxDataProperty targetObjectAsDataProperty = targetObject as MapboxDataProperty;
+			if (property.serializedObject.ApplyModifiedProperties() && targetObjectAsDataProperty != null)
+			{
+				targetObjectAsDataProperty.HasChanged = true;
+			}
+		}
+
 		public static IEnumerable<SerializedProperty> GetChildren(this SerializedProperty property)
 		{
 			property = property.Copy();

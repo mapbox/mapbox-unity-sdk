@@ -43,12 +43,7 @@
 			}
 
 			colliderTypeProperty.enumValueIndex = EditorGUILayout.Popup(colliderTypeLabel, colliderTypeProperty.enumValueIndex, colliderTypeContent);
-			bool colliderHasChanged = colliderTypeProperty.serializedObject.ApplyModifiedProperties();
-
-			if (colliderHasChanged && colliderOptions != null)
-			{
-				colliderOptions.HasChanged = true;
-			}
+			EditorHelper.CheckForModifiedProperty(colliderTypeProperty, colliderOptions);
 
 			EditorGUI.EndProperty();
 		}

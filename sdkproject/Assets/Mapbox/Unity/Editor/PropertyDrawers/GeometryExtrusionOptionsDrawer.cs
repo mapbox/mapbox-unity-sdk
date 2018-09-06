@@ -52,11 +52,7 @@
 			};
 
 			extrusionTypeProperty.enumValueIndex = EditorGUILayout.Popup(extrusionTypeLabel, extrusionTypeProperty.enumValueIndex, extrusionTypeContent);
-			bool extrusionTypeHasChanged = extrusionTypeProperty.serializedObject.ApplyModifiedProperties();
-			if (extrusionTypeHasChanged && extrusionOptions != null)
-			{
-				extrusionOptions.HasChanged = true;
-			}
+			EditorHelper.CheckForModifiedProperty(extrusionTypeProperty, extrusionOptions);
 
 			var sourceTypeValue = (Unity.Map.ExtrusionType)extrusionTypeProperty.enumValueIndex;
 
@@ -100,18 +96,11 @@
 					break;
 			}
 
-			bool extrusionGeometryTypeHasChanged = extrusionGeometryType.serializedObject.ApplyModifiedProperties();
-			if (extrusionGeometryTypeHasChanged && extrusionOptions != null)
-			{
-				extrusionOptions.HasChanged = true;
-			}
+			EditorHelper.CheckForModifiedProperty(extrusionGeometryType, extrusionOptions);
 
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("extrusionScaleFactor"), new GUIContent { text = "Scale Factor" });
-			bool scaleFactorHasChanged = property.FindPropertyRelative("extrusionScaleFactor").serializedObject.ApplyModifiedProperties();
-			if (scaleFactorHasChanged && extrusionOptions != null)
-			{
-				extrusionOptions.HasChanged = true;
-			}
+			EditorHelper.CheckForModifiedProperty(property.FindPropertyRelative("extrusionScaleFactor"), extrusionOptions);
+
 			EditorGUI.indentLevel--;
 		}
 

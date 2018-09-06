@@ -47,20 +47,12 @@
 			}
 
 			primitiveType.enumValueIndex = EditorGUILayout.Popup(primitiveTypeLabel, primitiveType.enumValueIndex, _primitiveTypeContent);
-			bool primitiveTypeHasChanged = primitiveType.serializedObject.ApplyModifiedProperties();
-			if(primitiveTypeHasChanged && coreOptions != null)
-			{
-				coreOptions.HasChanged = true;
-			}
+			EditorHelper.CheckForModifiedProperty(primitiveType, coreOptions);
 
 			if ((VectorPrimitiveType)primitiveType.enumValueIndex == VectorPrimitiveType.Line)
 			{
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("lineWidth"));
-				bool lineWidthHasChanged = property.FindPropertyRelative("lineWidth").serializedObject.ApplyModifiedProperties();
-				if (lineWidthHasChanged && coreOptions != null)
-				{
-					coreOptions.HasChanged = true;
-				}
+				EditorHelper.CheckForModifiedProperty(property.FindPropertyRelative("lineWidth"), coreOptions);
 			}
 			EditorGUI.EndProperty();
 		}
