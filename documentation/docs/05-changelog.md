@@ -1,4 +1,7 @@
 ## CHANGELOG
+### v.1.4.5
+##### Bug Fixes
+- Fix an issue where streets tileset wasn't creating buildings on tile edges
 
 ### v.1.4.5
 08/20/2018
