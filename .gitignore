@@ -1,6 +1,13 @@
 # Autosave files
 *~
 
+# HoloToolkit
+sdkproject/Assets/HoloToolkit-Examples.meta
+sdkproject/Assets/HoloToolkit-Examples/
+sdkproject/Assets/HoloToolkit.meta
+sdkproject/Assets/HoloToolkit/
+sdkproject/UWP/
+
 MapboxSDKforUnityCore*/
 
 sdkproject/Assets/WSATestCertificate.pfx

@@ -27,13 +27,15 @@ namespace Mapbox.Unity.Location
 #endif
 			Debug.Log("starting new log file: " + fullFilePathAndName);
 
-			_textWriter = new StreamWriter(fullFilePathAndName, false, new UTF8Encoding(false));
+			_fileStream = new FileStream(fullFilePathAndName, FileMode.Create, FileAccess.Write);
+			_textWriter = new StreamWriter(_fileStream, new UTF8Encoding(false));
 			_textWriter.WriteLine("#" + string.Join(Delimiter, HeaderNames));
 
 		}
 
 
 		private bool _disposed;
+		private FileStream _fileStream;
 		private TextWriter _textWriter;
 		private long _lineCount = 0;
 
@@ -64,9 +66,15 @@ namespace Mapbox.Unity.Location
 					if (null != _textWriter)
 					{
 						_textWriter.Flush();
+						_fileStream.Flush();
+#if !NETFX_CORE
 						_textWriter.Close();
+#endif
 						_textWriter.Dispose();
+						_fileStream.Dispose();
+
 						_textWriter = null;
+						_fileStream = null;
 					}
 				}
 				_disposed = true;
