@@ -35,8 +35,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		#region Line Parameters
 
 		[NonSerialized] private float _miterLimit = 2f;
-		[NonSerialized] private JoinType _joinType = JoinType.Miter;
-		[NonSerialized] private JoinType _capType = JoinType.Butt;
+		[NonSerialized] private JoinType _joinType = JoinType.Round;
+		[NonSerialized] private JoinType _capType = JoinType.Round;
+		[NonSerialized] private JoinType _beginCap = JoinType.Round;
+		[NonSerialized] private JoinType _endCap = JoinType.Round;
 		[NonSerialized] private float _roundLimit = 1.05f;
 		[SerializeField] public float Width = 3.0f;
 		private float _scaledWidth;
@@ -59,8 +61,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private float _cornerOffsetB;
 		private bool _startOfLine = true;
 
-		[NonSerialized] private JoinType _beginCap = JoinType.Butt;
-		[NonSerialized] private JoinType _endCap = JoinType.Butt;
+		
 		private Vector3 _prevVertex;
 		private Vector3 _currentVertex;
 		private Vector3 _nextVertex;
@@ -112,6 +113,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			foreach (var roadSegment in feature.Points)
 			{
+				if (roadSegment.Count < 2)
+					continue;
+				
 				ResetFields();
 
 				var roadSegmentCount = roadSegment.Count;
@@ -226,7 +230,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					}
 					else if (currentJoin == JoinType.Bevel || currentJoin == JoinType.Fakeround)
 					{
-						var lineTurnsLeft = (_prevNormal.x * _nextNormal.y - _prevNormal.y * _nextNormal.x) > 0;
+						var lineTurnsLeft = (_prevNormal.x * _nextNormal.z - _prevNormal.z * _nextNormal.x) > 0;
 						var offset = (float) -Math.Sqrt(miterLength * miterLength - 1);
 						if (lineTurnsLeft)
 						{
@@ -257,19 +261,19 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 							var n = Mathf.Floor((0.5f - (cosHalfAngle - 0.5f)) * 8);
 							Vector3 approxFractionalJoinNormal;
 
-							for (var m = 0; m < n; m++)
-							{
-								approxFractionalJoinNormal = _nextNormal * ((m + 1) / (n + 1)) + (_prevNormal).normalized;
-								AddPieSliceVertex(_currentVertex, _distance, approxFractionalJoinNormal, lineTurnsLeft, md.Vertices.Count);
-							}
+//							for (var m = 0; m < n; m++)
+//							{
+//								approxFractionalJoinNormal = _nextNormal * ((m + 1) / (n + 1)) + (_prevNormal).normalized;
+//								AddPieSliceVertex(_currentVertex, _distance, approxFractionalJoinNormal, lineTurnsLeft, md);
+//							}
 
-							AddPieSliceVertex(_currentVertex, _distance, joinNormal, lineTurnsLeft, md.Vertices.Count);
+							AddPieSliceVertex(_currentVertex, _distance, joinNormal, lineTurnsLeft, md);
 
-							for (var k = n - 1; k >= 0; k--)
-							{
-								approxFractionalJoinNormal = _prevNormal * ((k + 1) / (n + 1)) + (_nextNormal).normalized;
-								AddPieSliceVertex(_currentVertex, _distance, approxFractionalJoinNormal, lineTurnsLeft, md.Vertices.Count);
-							}
+//							for (var k = n - 1; k >= 0; k--)
+//							{
+//								approxFractionalJoinNormal = _prevNormal * ((k + 1) / (n + 1)) + (_nextNormal).normalized;
+//								AddPieSliceVertex(_currentVertex, _distance, approxFractionalJoinNormal, lineTurnsLeft, md);
+//							}
 						}
 
 						if (_nextVertex != Constants.Math.Vector3Null)
@@ -308,31 +312,29 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 							AddCurrentVertex(_currentVertex, _distance, _nextNormal, md, -1, -1);
 						}
 					}
-//					else if (currentJoin == JoinType.Round)
-//					{
-//						if (!_startOfLine)
-//						{
-//							// Close previous segment with butt
-//							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md.Vertices.Count, 0, 0);
-//
-//							// Add round cap or linejoin at end of segment
-//							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md.Vertices.Count, 1, 1);
-//
-//							// The segment is done. Unset vertices to disconnect segments.
-//							_index1 = -1;
-//							_index2 = -1;
-//						}
-//
-//
-//						// Start next segment with a butt
-//						if (_nextVertex != Constants.Math.Vector3Null)
-//						{
-//							// Add round cap before first segment
-//							AddCurrentVertex(_currentVertex, _distance, _nextNormal, md.Vertices.Count, -1, -1);
-//
-//							AddCurrentVertex(_currentVertex, _distance, _nextNormal, md.Vertices.Count, 0, 0);
-//						}
-//					}
+					else if (currentJoin == JoinType.Round)
+					{
+						if (_startOfLine)
+						{
+							AddCurrentVertex(_currentVertex, _distance, _prevNormal * 0.33f, md, -2f, -2f);
+							AddCurrentVertex(_currentVertex, _distance, _prevNormal * 0.66f, md, -.7f, -.7f);
+							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md, 0, 0);
+						}
+						else if (_nextVertex == Constants.Math.Vector3Null)
+						{
+							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md, 0, 0);
+							AddCurrentVertex(_currentVertex, _distance, _prevNormal * 0.66f, md, .7f, .7f);
+							AddCurrentVertex(_currentVertex, _distance, _prevNormal * 0.33f, md, 2f, 2f);
+							_index1 = -1;
+							_index2 = -1;
+						}
+						else
+						{
+							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md, 0, 0);
+							_index1 = -1;
+							_index2 = -1;
+						}
+					}
 
 					if (isSharpCorner && i < roadSegmentCount - 1)
 					{
@@ -393,10 +395,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_distance = 0f;
 		}
 
-		private void AddPieSliceVertex(Vector3 vertex, float dist, Vector3 normal, bool lineTurnsLeft, int triIndexStart)
+		private void AddPieSliceVertex(Vector3 vertexPosition, float dist, Vector3 normal, bool lineTurnsLeft, MeshData md)
 		{
+			var triIndexStart = md.Vertices.Count;
 			var extrude = normal * (lineTurnsLeft ? -1 : 1);
-			_vertexList.Add(vertex + extrude * _scaledWidth);
+			_vertexList.Add(vertexPosition + extrude * _scaledWidth);
 			_normalList.Add(Constants.Math.Vector3Up);
 			_uvList.Add(new Vector2(1, dist));
 			_tangentList.Add(normal.Perpendicular() * -1);
@@ -407,16 +410,19 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				_triangleList.Add(_index1);
 				_triangleList.Add(_index3);
 				_triangleList.Add(_index2);
+				md.Edges.Add(triIndexStart + _vertexList.Count - 2);
+				md.Edges.Add(triIndexStart + _vertexList.Count - 3);
 			}
 
-			if (lineTurnsLeft)
-			{
-				_index2 = _index3;
-			}
-			else
-			{
-				_index1 = _index3;
-			}
+//			if (lineTurnsLeft)
+//			{
+//				_index2 = _index3;
+//			}
+//			else
+//			{
+//				_index1 = _index3;
+//			}
+			
 		}
 
 
