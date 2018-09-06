@@ -69,6 +69,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			OnRegistered(tile);
 		}
 
+		public virtual void PostProcess(UnityTile tile)
+		{
+			OnPostProcess(tile);
+		}
 		public virtual void Unregister(UnityTile tile)
 		{
 			OnUnregistered(tile);
@@ -77,7 +81,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		protected abstract void OnInitialized();
 
 		protected abstract void OnRegistered(UnityTile tile);
-
+		protected abstract void OnPostProcess(UnityTile tile);
 		protected abstract void OnUnregistered(UnityTile tile);
 
 		#region Events

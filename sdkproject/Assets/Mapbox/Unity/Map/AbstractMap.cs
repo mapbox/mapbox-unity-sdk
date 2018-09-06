@@ -568,10 +568,12 @@ namespace Mapbox.Unity.Map
 		public virtual void UpdateMap(Vector2d latLon, float zoom)
 		{
 			float differenceInZoom = 0.0f;
+			bool isAtInitialZoom = false;
 			if (Math.Abs(Zoom - zoom) > Constants.EpsilonFloatingPoint)
 			{
 				SetZoom(zoom);
 				differenceInZoom = Zoom - InitialZoom;
+				isAtInitialZoom = (differenceInZoom - 0.0 < Constants.EpsilonFloatingPoint);
 			}
 			//Update center latitude longitude
 			var centerLatitudeLongitude = latLon;
@@ -588,12 +590,12 @@ namespace Mapbox.Unity.Map
 			Options.placementOptions.placementStrategy.SetUpPlacement(this);
 
 			//Scale the map accordingly.
-			if (Math.Abs(differenceInZoom) > Constants.EpsilonFloatingPoint)
+			if (Math.Abs(differenceInZoom) > Constants.EpsilonFloatingPoint || isAtInitialZoom)
 			{
 				_mapScaleFactor = Vector3.one * Mathf.Pow(2, differenceInZoom);
-				//_mapScaleFactor.y = 1;
 				Root.localScale = _mapScaleFactor;
 			}
+
 			_tileProvider.UpdateTileExtent();
 
 			if (OnUpdated != null)

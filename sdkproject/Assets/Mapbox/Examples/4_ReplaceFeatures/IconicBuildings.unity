@@ -139,7 +139,7 @@ Light:
   serializedVersion: 8
   m_Type: 1
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
-  m_Intensity: 0.7
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_CookieSize: 10
@@ -753,6 +753,66 @@ Prefab:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114035459605040000, guid: aaa51caf037dd4424bab8d45ef3be316,
+        type: 2}
+      propertyPath: m_FontData.m_Alignment
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 114183711506714234, guid: aaa51caf037dd4424bab8d45ef3be316,
+        type: 2}
+      propertyPath: _cameraPosition.z
+      value: -54.84
+      objectReference: {fileID: 0}
+    - target: {fileID: 114129582089887352, guid: aaa51caf037dd4424bab8d45ef3be316,
+        type: 2}
+      propertyPath: _cameraPosition.z
+      value: -32.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114129582089887352, guid: aaa51caf037dd4424bab8d45ef3be316,
+        type: 2}
+      propertyPath: _cameraPosition.x
+      value: -1.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 114080423598663096, guid: aaa51caf037dd4424bab8d45ef3be316,
+        type: 2}
+      propertyPath: _cameraPosition.x
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 114080423598663096, guid: aaa51caf037dd4424bab8d45ef3be316,
+        type: 2}
+      propertyPath: _cameraPosition.z
+      value: -56.57
+      objectReference: {fileID: 0}
+    - target: {fileID: 114219888318426142, guid: aaa51caf037dd4424bab8d45ef3be316,
+        type: 2}
+      propertyPath: _cameraPosition.z
+      value: -77.36
+      objectReference: {fileID: 0}
+    - target: {fileID: 114963665310814296, guid: aaa51caf037dd4424bab8d45ef3be316,
+        type: 2}
+      propertyPath: _cameraPosition.x
+      value: 35.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 114963665310814296, guid: aaa51caf037dd4424bab8d45ef3be316,
+        type: 2}
+      propertyPath: _cameraPosition.z
+      value: -41.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114104293458475558, guid: aaa51caf037dd4424bab8d45ef3be316,
+        type: 2}
+      propertyPath: _cameraPosition.x
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114104293458475558, guid: aaa51caf037dd4424bab8d45ef3be316,
+        type: 2}
+      propertyPath: _cameraPosition.y
+      value: 2.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 114104293458475558, guid: aaa51caf037dd4424bab8d45ef3be316,
+        type: 2}
+      propertyPath: _cameraPosition.z
+      value: -20
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: aaa51caf037dd4424bab8d45ef3be316, type: 2}
   m_IsPrefabParent: 0
@@ -873,7 +933,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2001912278}
   m_LocalRotation: {x: 0.11924687, y: 0.098070905, z: 0.0012959492, w: 0.98800844}
-  m_LocalPosition: {x: 6.03, y: 35.12041, z: -52.59051}
+  m_LocalPosition: {x: 0.67, y: 35.12041, z: -54.84}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

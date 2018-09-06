@@ -1,4 +1,7 @@
 ## CHANGELOG
+### v.1.4.6
+##### Improvements
+- Terrain mesh is generated as flat on height data errors
 
 ### v.1.4.5
 08/20/2018

@@ -1,3 +1,0 @@
-[submodule "dependencies/vector-tile-cs"]
-	path = dependencies/vector-tile-cs
-	url = https://github.com/mapbox/vector-tile-cs
