@@ -6,7 +6,7 @@
 	using UnityEngine;
 	using Mapbox.Unity.Map;
 	using Mapbox.VectorTile.ExtensionMethods;
-	using com.spacepuppyeditor;
+	using Mapbox.Editor;
 
 	[CustomPropertyDrawer(typeof(ColliderOptions))]
 	public class ColliderOptionsDrawer : PropertyDrawer

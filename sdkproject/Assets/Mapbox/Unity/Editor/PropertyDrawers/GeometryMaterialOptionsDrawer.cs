@@ -3,12 +3,12 @@
 	using UnityEditor;
 	using UnityEngine;
 	using Mapbox.Unity;
+	using Mapbox.Editor;
 	using Mapbox.Unity.Map;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.VectorTile.ExtensionMethods;
 	using System.IO;
 	using System.Collections.Generic;
-	using com.spacepuppyeditor;
 
 	public class StyleIconBundle
 	{

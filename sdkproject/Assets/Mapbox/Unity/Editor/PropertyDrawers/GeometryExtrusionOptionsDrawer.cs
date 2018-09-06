@@ -7,7 +7,7 @@
 	using System.Linq;
 	using Mapbox.Platform.TilesetTileJSON;
 	using System.Collections.Generic;
-	using com.spacepuppyeditor;
+	using Mapbox.Editor;
 
 	[CustomPropertyDrawer(typeof(GeometryExtrusionOptions))]
 	public class GeometryExtrusionOptionsDrawer : PropertyDrawer

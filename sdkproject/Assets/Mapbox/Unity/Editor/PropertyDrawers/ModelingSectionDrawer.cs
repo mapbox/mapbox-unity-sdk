@@ -7,7 +7,6 @@
 	using Mapbox.Unity.Map;
 	using Mapbox.Editor;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
-	using com.spacepuppyeditor;
 
 	public class ModelingSectionDrawer
 	{

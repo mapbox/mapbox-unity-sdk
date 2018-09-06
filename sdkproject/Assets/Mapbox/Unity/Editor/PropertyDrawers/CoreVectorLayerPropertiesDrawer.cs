@@ -7,7 +7,7 @@
 	using System.Linq;
 	using System;
 	using Mapbox.VectorTile.ExtensionMethods;
-	using com.spacepuppyeditor;
+	using Mapbox.Editor;
 
 	[CustomPropertyDrawer(typeof(CoreVectorLayerProperties))]
 	public class CoreVectorLayerPropertiesDrawer : PropertyDrawer

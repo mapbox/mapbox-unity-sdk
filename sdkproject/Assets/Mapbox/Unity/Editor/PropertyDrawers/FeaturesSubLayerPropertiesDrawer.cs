@@ -10,7 +10,7 @@
 	using Mapbox.VectorTile.ExtensionMethods;
 	using Mapbox.Unity.MeshGeneration.Filters;
 	using Mapbox.Platform.TilesetTileJSON;
-	using com.spacepuppyeditor;
+	using Mapbox.Editor;
 	using System;
 
 	public class FeaturesSubLayerPropertiesDrawer
