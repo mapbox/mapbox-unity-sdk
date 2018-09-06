@@ -233,7 +233,23 @@
 			switch (sourceTypeValue)
 			{
 				case VectorSourceType.MapboxStreets:
+				{
+					var subLayerArray = layerProperty.FindPropertyRelative("vectorSubLayers");
+					for (int i = 0; i < subLayerArray.arraySize; i++)
+					{
+						var idsSetting = subLayerArray.GetArrayElementAtIndex(i).FindPropertyRelative("buildingsWithUniqueIds");
+						idsSetting.boolValue = false;
+					}
+					break;
+				}
 				case VectorSourceType.MapboxStreetsWithBuildingIds:
+				{
+					var subLayerArray = layerProperty.FindPropertyRelative("vectorSubLayers");
+					for (int i = 0; i < subLayerArray.arraySize; i++)
+					{
+						var idsSetting = subLayerArray.GetArrayElementAtIndex(i).FindPropertyRelative("buildingsWithUniqueIds");
+						idsSetting.boolValue = true;
+					}
 					var sourcePropertyValue = MapboxDefaultVector.GetParameters(sourceTypeValue);
 					layerSourceId.stringValue = sourcePropertyValue.Id;
 					GUI.enabled = false;
@@ -241,6 +257,7 @@
 					GUI.enabled = true;
 					isActiveProperty.boolValue = true;
 					break;
+				}
 				case VectorSourceType.Custom:
 					EditorGUILayout.PropertyField(layerSourceProperty, mapIdGui);
 					isActiveProperty.boolValue = true;
