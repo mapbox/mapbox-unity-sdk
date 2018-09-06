@@ -2,6 +2,8 @@
 ### v.1.4.6
 ##### Improvements
 - Terrain mesh is generated as flat on height data errors
+##### Bug Fixes
+- Fix issue with building side wall modifier where it miscalculated the floor heights causing overlaping polygons/floors
 
 ### v.1.4.5
 08/20/2018
