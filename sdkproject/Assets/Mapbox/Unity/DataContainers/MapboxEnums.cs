@@ -135,6 +135,17 @@
 		[Description("Render terrain with no elevation for a globe.")]
 		GlobeTerrain
 	}
+
+	public enum TileTerrainType
+	{
+		//starting from -1 to match ElevationLayerType
+		None = -1,
+		Flat = 0,
+		Elevated = 1,
+		LowPoly = 2,
+		Globe = 3
+	}
+
 	public enum ExtrusionType
 	{
 		[Description("No extrusion.")]

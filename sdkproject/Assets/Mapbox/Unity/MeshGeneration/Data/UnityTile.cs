@@ -10,16 +10,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 	using System.Collections.Generic;
 	using Mapbox.Unity.MeshGeneration.Factories;
 
-	public enum TileTerrainType
-	{
-		//starting from -1 to match ElevationLayerType
-		None = -1,
-		Flat = 0,
-		Elevated = 1,
-		LowPoly = 2,
-		Globe = 3
-	}
-
 	public class UnityTile : MonoBehaviour
 	{
 		public TileTerrainType ElevationType;
