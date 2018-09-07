@@ -100,7 +100,16 @@
 			{
 				//if its of type prefabitemoptions then separate the visualizer type
 				LayerVisualizerBase visualizer = CreateInstance<VectorLayerVisualizer>();
-				((VectorLayerVisualizer) visualizer).SetProperties(sublayer);
+
+				// Set honorBuildingSettings - need to set here in addition to the UI. 
+				// Not setting it here can lead to wrong filtering. 
+
+				bool isPrimitiveTypeValidForBuidingIds = (sublayer.coreOptions.geometryType == VectorPrimitiveType.Polygon || sublayer.coreOptions.geometryType == VectorPrimitiveType.Custom);
+				bool isSourceValidForBuildingIds = (_properties.sourceType != VectorSourceType.MapboxStreets);
+
+				sublayer.honorBuildingIdSetting = isPrimitiveTypeValidForBuidingIds && isSourceValidForBuildingIds;
+				// Setup visualizer. 
+				((VectorLayerVisualizer)visualizer).SetProperties(sublayer);
 
 				visualizer.Initialize();
 				if (visualizer == null)
@@ -114,11 +123,11 @@
 				}
 				else
 				{
-					_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase>() {visualizer});
+					_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase>() { visualizer });
 				}
 			}
 		}
-		
+
 		public override void SetOptions(LayerProperties options)
 		{
 			_properties = (VectorLayerProperties)options;
