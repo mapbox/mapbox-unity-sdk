@@ -22,7 +22,6 @@ public class ImageDataFetcherParameters : DataFetcherParameters
 
 public class TerrainDataFetcherParameters : DataFetcherParameters
 {
-	public bool useRetina = true;
 }
 
 public class VectorDataFetcherParameters : DataFetcherParameters
