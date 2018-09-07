@@ -693,17 +693,33 @@ namespace Mapbox.Unity.Map
 		/// <param name="queryHeight">If set to <c>true</c> will return the terrain height(in Unity units) at that point.</param>
 		public virtual Vector3 GeoToWorldPosition(Vector2d latitudeLongitude, bool queryHeight = true)
 		{
-			var worldPos = GeoToWorldPositionXZ(latitudeLongitude);
+			Vector3 worldPos = GeoToWorldPositionXZ(latitudeLongitude);
 
 			if (queryHeight)
 			{
 				//Query Height.
 				float tileScale = 1f;
-				worldPos.y = QueryElevationAtInternal(latitudeLongitude, out tileScale);
+				float height = QueryElevationAtInternal(latitudeLongitude, out tileScale);
+
+				// Apply height inside the unity tile space
+				UnityTile tile;
+				if (MapVisualizer.ActiveTiles.TryGetValue(Conversions.LatitudeLongitudeToTileId(latitudeLongitude.x, latitudeLongitude.y, (int)Zoom), out tile))
+				{
+					if (tile != null)
+					{
+						// Calculate height in the local space of the tile gameObject.
+						// Height is aligned with the y axis in local space.
+						// This also helps us avoid scale values when setting the height. 
+						var localPos = tile.gameObject.transform.InverseTransformPoint(worldPos);
+						localPos.y = height;
+						worldPos = tile.gameObject.transform.TransformPoint(localPos);
+					}
+				}
 			}
 
 			return worldPos;
 		}
+		
 		/// <summary>
 		/// Converts a position in map space into a laitude longitude.
 		/// </summary>
