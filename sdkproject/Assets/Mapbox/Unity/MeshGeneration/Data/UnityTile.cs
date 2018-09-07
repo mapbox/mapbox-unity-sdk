@@ -12,6 +12,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 	public class UnityTile : MonoBehaviour
 	{
+		public TileTerrainType ElevationType;
+
 		[SerializeField]
 		private Texture2D _rasterData;
 		public VectorTile VectorData { get; private set; }
@@ -53,6 +55,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					if (_meshFilter == null)
 					{
 						_meshFilter = gameObject.AddComponent<MeshFilter>();
+						ElevationType = TileTerrainType.None;
 					}
 				}
 				return _meshFilter;
@@ -159,6 +162,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, float scale, int zoom, Texture2D loadingTexture = null)
 		{
+			ElevationType = TileTerrainType.None;
 			TileScale = scale;
 			_relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
 			Rect = Conversions.TileBounds(tileId);
@@ -215,6 +219,13 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		{
 			if (HeightDataState != TilePropertyState.Unregistered)
 			{
+				//reset height data
+				if(data == null)
+				{
+					_heightData = new float[256 * 256];
+					return;
+				}
+				
 				// HACK: compute height values for terrain. We could probably do this without a texture2d.
 				if (_heightTexture == null)
 				{
@@ -253,11 +264,18 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		public void SetRasterData(byte[] data, bool useMipMap, bool useCompression)
+		public void SetRasterData(byte[] data, bool useMipMap = true, bool useCompression = false)
 		{
 			// Don't leak the texture, just reuse it.
 			if (RasterDataState != TilePropertyState.Unregistered)
 			{
+				//reset image on null data
+				if (data == null)
+				{
+					MeshRenderer.material.mainTexture = null;
+					return;
+				}
+				
 				if (_rasterData == null)
 				{
 					_rasterData = new Texture2D(0, 0, TextureFormat.RGB24, useMipMap);

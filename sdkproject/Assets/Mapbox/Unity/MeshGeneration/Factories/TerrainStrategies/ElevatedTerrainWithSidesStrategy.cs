@@ -37,7 +37,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			_newTriangleList = new List<int>();
 		}
 
-
 		public override void RegisterTile(UnityTile tile)
 		{
 			if (_elevationOptions.unityLayerOptions.addToLayer && tile.gameObject.layer != _elevationOptions.unityLayerOptions.layerId)

@@ -25,6 +25,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField]
 		ImageryLayerProperties _properties;
 		protected ImageDataFetcher DataFetcher;
+
+		public ImageryLayerProperties Properties
+		{
+			get
+			{
+				return _properties;
+			}
+		}
+
 		public string MapId
 		{
 			get
@@ -41,6 +50,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		#region UnityMethods
 		protected virtual void OnDestroy()
 		{
+			//unregister events
 			if (DataFetcher != null)
 			{
 				DataFetcher.DataRecieved -= OnImageRecieved;
@@ -95,20 +105,38 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			if (_properties.sourceType == ImagerySourceType.None)
 			{
+				tile.SetRasterData(null);
 				tile.RasterDataState = TilePropertyState.None;
 				return;
 			}
+			else
+			{
+				tile.RasterDataState = TilePropertyState.Loading;
+				_properties.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(_properties.sourceType);
 
-			tile.RasterDataState = TilePropertyState.Loading;
-			DataFetcher.FetchImage(tile.CanonicalTileId, MapId, tile, _properties.rasterOptions.useRetina);
+				ImageDataFetcherParameters parameters = new ImageDataFetcherParameters()
+				{
+					canonicalTileId = tile.CanonicalTileId,
+					tile = tile,
+					mapid = MapId,
+					useRetina = _properties.rasterOptions.useRetina
+
+				};
+				DataFetcher.FetchData(parameters);
+			}
 		}
 
 		/// <summary>
 		/// Method to be called when a tile error has occurred.
 		/// </summary>
 		/// <param name="e"><see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance/</param>
-		protected override void OnErrorOccurred(TileErrorEventArgs e)
+		protected override void OnErrorOccurred(UnityTile tile, TileErrorEventArgs e)
 		{
+			base.OnErrorOccurred(tile, e);
+			if (tile != null)
+			{
+				tile.RasterDataState = TilePropertyState.Error;
+			}
 		}
 
 		protected override void OnUnregistered(UnityTile tile)

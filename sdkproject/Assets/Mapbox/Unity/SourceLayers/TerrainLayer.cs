@@ -8,7 +8,7 @@
 
 	// Layer Concrete Implementation. 
 	[Serializable]
-	public class TerrainLayer : ITerrainLayer
+	public class TerrainLayer : AbstractLayer, ITerrainLayer
 	{
 		[SerializeField]
 		[NodeEditorElement("Terrain Layer")]
@@ -120,6 +120,23 @@
 		public void Initialize()
 		{
 			_elevationFactory = ScriptableObject.CreateInstance<TerrainFactoryBase>();
+			SetStrategy();
+
+			_elevationFactory.SetOptions(_layerProperty);
+			_layerProperty.OnPropertyUpdated += () =>
+			{
+				//terrain factory uses strategy objects and they are controlled by layer
+				//so we have to refresh that first
+				SetStrategy();
+				//pushing new settings to factory directly
+				Factory.SetOptions(_layerProperty);
+				//notifying map to reload existing tiles
+				NotifyUpdateLayer(_elevationFactory, true);
+			};
+		}
+
+		public void SetStrategy()
+		{
 			switch (_layerProperty.elevationLayerType)
 			{
 				case ElevationLayerType.FlatTerrain:
@@ -144,8 +161,6 @@
 				default:
 					break;
 			}
-
-			_elevationFactory.SetOptions(_layerProperty);
 		}
 
 		public void Remove()

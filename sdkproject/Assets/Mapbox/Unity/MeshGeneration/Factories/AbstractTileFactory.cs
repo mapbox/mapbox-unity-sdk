@@ -56,6 +56,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_options = options;
 		}
 
+		protected virtual void OnErrorOccurred(UnityTile tile, TileErrorEventArgs e)
+		{
+			EventHandler<TileErrorEventArgs> handler = OnTileError;
+			if (handler != null)
+			{
+				handler(this, e);
+			}
+		}
+
 		public virtual void Initialize(IFileSource fileSource)
 		{
 			_fileSource = fileSource;

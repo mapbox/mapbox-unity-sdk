@@ -6,6 +6,7 @@
 	using UnityEngine;
 	using Mapbox.Unity.Map;
 	using Mapbox.VectorTile.ExtensionMethods;
+	using Mapbox.Editor;
 
 	[CustomPropertyDrawer(typeof(ColliderOptions))]
 	public class ColliderOptionsDrawer : PropertyDrawer
@@ -15,6 +16,7 @@
 		GUIContent[] colliderTypeContent;
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			ColliderOptions colliderOptions = (ColliderOptions)EditorHelper.GetTargetObjectOfProperty(property);
 			EditorGUI.BeginProperty(position, null, property);
 			var colliderTypeLabel = new GUIContent
 			{
@@ -40,7 +42,9 @@
 				isGUIContentSet = true;
 			}
 
-			colliderTypeProperty.enumValueIndex = EditorGUI.Popup(position, colliderTypeLabel, colliderTypeProperty.enumValueIndex, colliderTypeContent);
+			colliderTypeProperty.enumValueIndex = EditorGUILayout.Popup(colliderTypeLabel, colliderTypeProperty.enumValueIndex, colliderTypeContent);
+			EditorHelper.CheckForModifiedProperty(colliderTypeProperty, colliderOptions);
+
 			EditorGUI.EndProperty();
 		}
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)

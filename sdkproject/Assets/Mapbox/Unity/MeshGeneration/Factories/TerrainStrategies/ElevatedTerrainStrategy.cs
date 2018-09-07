@@ -22,7 +22,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 		private Vector3 _newDir;
 		private int _vertA, _vertB, _vertC;
 		private int _counter;
-
+		
 		public override void Initialize(ElevationLayerProperties elOptions)
 		{
 			base.Initialize(elOptions);
@@ -44,9 +44,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				tile.gameObject.layer = _elevationOptions.unityLayerOptions.layerId;
 			}
 
-			if (tile.MeshFilter.mesh.vertexCount == 0)
+			if ((int)tile.ElevationType != (int)ElevationLayerType.TerrainWithElevation)
 			{
+				tile.MeshFilter.mesh.Clear();
 				CreateBaseMesh(tile);
+				tile.ElevationType = TileTerrainType.Elevated;
 			}
 
 			GenerateTerrainMesh(tile);

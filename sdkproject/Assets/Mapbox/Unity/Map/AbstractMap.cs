@@ -372,6 +372,8 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		public event Action OnUpdated = delegate { };
 
+		public event Action OnMapRedrawn = delegate { };
+
 		protected virtual void Awake()
 		{
 			// Setup a visualizer to get a "Starter" map.
@@ -514,6 +516,38 @@ namespace Mapbox.Unity.Map
 
 			options.placementOptions.placementStrategy.SetUpPlacement(this);
 
+			_imagery.UpdateLayer += (factory, updateVector) =>
+			{
+				_mapVisualizer.ReregisterTilesTo(factory);
+				if(updateVector)
+				{
+					_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
+					VectorData.UpdateFactorySettings();
+					_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
+				}
+				OnMapRedrawn();
+			};
+
+			_terrain.UpdateLayer += (factory, updateVector) =>
+			{
+				_mapVisualizer.ReregisterTilesTo(factory);
+				if (updateVector)
+				{
+					_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
+					VectorData.UpdateFactorySettings();
+					_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
+				}
+				OnMapRedrawn();
+			};
+
+			_vectorData.UpdateLayer += (factory, updateVector) =>
+			{
+				_mapVisualizer.UnregisterTilesFrom(factory);
+				VectorData.UpdateFactorySettings();
+				_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
+				OnMapRedrawn();
+			};
+
 			_mapVisualizer.Initialize(this, _fileSource);
 			_tileProvider.Initialize(this);
 
@@ -521,6 +555,7 @@ namespace Mapbox.Unity.Map
 
 			_tileProvider.UpdateTileExtent();
 		}
+
 		/// <summary>
 		/// Initialize the map using the specified latLon and zoom.
 		/// Map will automatically get initialized in the <c>Start</c> method.
@@ -538,6 +573,8 @@ namespace Mapbox.Unity.Map
 			}
 			_options.locationOptions.latitudeLongitude = String.Format(CultureInfo.InvariantCulture, "{0},{1}", latLon.x, latLon.y);
 			_options.locationOptions.zoom = zoom;
+
+			
 
 			SetUpMap();
 		}

@@ -3,9 +3,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using UnityEngine;
 	using System;
 	using Mapbox.Unity.MeshGeneration.Data;
+	using Mapbox.Unity.Map;
 
 	[Serializable]
-	public abstract class ModifierProperties
+	public abstract class ModifierProperties : MapboxDataProperty
 	{
 		public abstract Type ModifierType
 		{

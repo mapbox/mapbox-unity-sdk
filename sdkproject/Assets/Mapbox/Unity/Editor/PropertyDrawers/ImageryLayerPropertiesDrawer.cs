@@ -17,6 +17,13 @@
 			tooltip = "Map Id corresponding to the tileset."
 		};
 
+		private void UpdateProperty(SerializedProperty property)
+		{
+			property.serializedObject.ApplyModifiedProperties();
+			var map = (AbstractMap)property.serializedObject.targetObject;
+			map.ImageLayer.LayerProperty.UpdateProperty();
+		}
+
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
@@ -41,9 +48,14 @@
 			// Draw label.
 			var sourceTypeLabel = new GUIContent { text = "Data Source", tooltip = "Source tileset for Imagery." };
 
+			EditorGUI.BeginChangeCheck();
 			sourceTypeProperty.enumValueIndex = EditorGUILayout.Popup(sourceTypeLabel, sourceTypeProperty.enumValueIndex, sourceTypeContent);
-			sourceTypeValue = (ImagerySourceType)sourceTypeProperty.enumValueIndex;
 
+			sourceTypeValue = (ImagerySourceType)sourceTypeProperty.enumValueIndex;
+			if(EditorGUI.EndChangeCheck())
+			{
+				UpdateProperty(property);
+			}
 			var sourceOptionsProperty = property.FindPropertyRelative("sourceOptions");
 			var layerSourceProperty = sourceOptionsProperty.FindPropertyRelative("layerSource");
 			var layerSourceId = layerSourceProperty.FindPropertyRelative("Id");
@@ -70,9 +82,15 @@
 				default:
 					break;
 			}
+
 			if (sourceTypeValue != ImagerySourceType.None)
 			{
+				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("rasterOptions"));
+				if (EditorGUI.EndChangeCheck())
+				{
+					UpdateProperty(property);
+				}
 			}
 		}
 	}

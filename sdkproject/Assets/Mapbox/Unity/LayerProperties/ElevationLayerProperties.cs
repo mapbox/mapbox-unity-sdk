@@ -1,11 +1,24 @@
 ﻿namespace Mapbox.Unity.Map
 {
 	using System;
+	using System.ComponentModel;
 	using Mapbox.Unity.MeshGeneration.Factories;
+
 	[Serializable]
 	public class ElevationLayerProperties : LayerProperties
 	{
+		public event Action OnPropertyUpdated = delegate { };
+
+		public void UpdateProperty()
+		{
+			if (OnPropertyUpdated != null)
+			{
+				OnPropertyUpdated();
+			}
+		}
+
 		public ElevationSourceType sourceType = ElevationSourceType.MapboxTerrain;
+
 		public LayerSourceOptions sourceOptions = new LayerSourceOptions()
 		{
 			layerSource = new Style()

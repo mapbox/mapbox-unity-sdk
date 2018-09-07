@@ -6,7 +6,7 @@
 	using Mapbox.Unity.Utilities;
 
 	[Serializable]
-	public class ImageryLayer : IImageryLayer
+	public class ImageryLayer : AbstractLayer, IImageryLayer
 	{
 		[SerializeField]
 		ImageryLayerProperties _layerProperty = new ImageryLayerProperties();
@@ -17,6 +17,11 @@
 			get
 			{
 				return _layerProperty;
+			}
+			set
+			{
+				Debug.Log("Image Layer");
+				_layerProperty = value;
 			}
 		}
 		public MapLayerType LayerType
@@ -103,6 +108,15 @@
 			}
 			_imageFactory = ScriptableObject.CreateInstance<MapImageFactory>();
 			_imageFactory.SetOptions(_layerProperty);
+
+			//updating image layer on settings change
+			_layerProperty.OnPropertyUpdated += Refresh;
+		}
+
+		public void Refresh()
+		{
+			Factory.SetOptions(_layerProperty);
+			NotifyUpdateLayer(_imageFactory);
 		}
 
 		public void Remove()
@@ -117,6 +131,8 @@
 		{
 			Initialize(properties);
 		}
+
+		private MapImageFactory _imageFactory;
 		public MapImageFactory Factory
 		{
 			get
@@ -124,6 +140,6 @@
 				return _imageFactory;
 			}
 		}
-		private MapImageFactory _imageFactory;
+
 	}
 }
