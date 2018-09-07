@@ -106,7 +106,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				{
 					tile.SetHeightData(pngRasterTile.Data, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.requiredOptions.addCollider);
 					Strategy.RegisterTile(tile);
-					tile.gameObject.name += Time.frameCount;
 				}
 			}
 		}

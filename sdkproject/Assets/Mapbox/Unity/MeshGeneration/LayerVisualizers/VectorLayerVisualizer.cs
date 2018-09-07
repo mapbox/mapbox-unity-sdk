@@ -247,9 +247,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					break;
 			}
 
-			//_defaultStack.MeshModifiers.AddRange(defaultMeshModifierStack);
-			//_defaultStack.GoModifiers.AddRange(defaultGOModifierStack);
-
 			//Add any additional modifiers that were added.
 			_defaultStack.MeshModifiers.AddRange(_layerProperties.MeshModifiers);
 			_defaultStack.GoModifiers.AddRange(_layerProperties.GoModifiers);

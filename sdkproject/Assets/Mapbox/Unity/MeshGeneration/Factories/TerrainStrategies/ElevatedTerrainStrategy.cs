@@ -44,10 +44,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				tile.gameObject.layer = _elevationOptions.unityLayerOptions.layerId;
 			}
 
-			//_newVertexList.Count is the vertex count this strategy is expected to use
-			//by checking for current vertex count and expected vertex count,
-			//we're trying to understand if we can use existing mesh (created by same strategy)
-			//or do we haev to create a new one.
 			if ((int)tile.ElevationType != (int)ElevationLayerType.TerrainWithElevation)
 			{
 				tile.MeshFilter.mesh.Clear();
