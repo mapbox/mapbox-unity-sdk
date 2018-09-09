@@ -28,16 +28,13 @@
 			if (showGameplay)
 			{
 
+				bool isPrimitiveTypeValidForBuidingIds = (primitiveTypeProp == VectorPrimitiveType.Polygon || primitiveTypeProp == VectorPrimitiveType.Custom);
+				bool isSourceValidForBuildingIds = sourceType != VectorSourceType.MapboxStreets;
 
-				if (!(primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom))
+				layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue = isPrimitiveTypeValidForBuidingIds && isSourceValidForBuildingIds;
+
+				if (layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue == true)
 				{
-					layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue = false;
-				}
-
-
-				if ((primitiveTypeProp == VectorPrimitiveType.Polygon || primitiveTypeProp == VectorPrimitiveType.Custom) && sourceType != VectorSourceType.MapboxStreets)
-				{
-					layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue = true;
 					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("buildingsWithUniqueIds"), new GUIContent
 					{
 						text = "Buildings With Unique Ids",

@@ -1,13 +1,13 @@
 ## CHANGELOG
+
 ### v.1.4.6
+??/??/2018
 ##### Improvements
 - Terrain mesh is generated as flat on height data errors
 ##### Bug Fixes
 - Fix issue with building side wall modifier where it miscalculated the floor heights causing overlaping polygons/floors
-
-### v.1.4.6
-##### Bug Fixes
-- fix QueryHeight method to take tile local position/rotation/scale into account
+- Fix an issue where streets tileset wasn't creating buildings on tile edges
+- Fix QueryHeight method to take tile local position/rotation/scale into account
 
 ### v.1.4.5
 08/20/2018
