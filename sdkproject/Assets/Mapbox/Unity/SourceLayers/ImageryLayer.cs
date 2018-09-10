@@ -115,12 +115,10 @@
 			}
 			_imageFactory = ScriptableObject.CreateInstance<MapImageFactory>();
 			_imageFactory.SetOptions(_layerProperty);
-
-			//updating image layer on settings change
-			_layerProperty.PropertyHasChanged += UpdateImageryLayer;
+			_layerProperty.PropertyHasChanged += RedrawLayer;
 		}
 
-		public void UpdateImageryLayer(object sender, System.EventArgs e)
+		public void RedrawLayer(object sender, System.EventArgs e)
 		{
 			Factory.SetOptions(_layerProperty);
 			NotifyUpdateLayer(_imageFactory);

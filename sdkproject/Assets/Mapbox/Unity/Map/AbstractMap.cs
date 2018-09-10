@@ -516,9 +516,9 @@ namespace Mapbox.Unity.Map
 
 			options.placementOptions.placementStrategy.SetUpPlacement(this);
 
-			_imagery.UpdateLayer += (object sender, System.EventArgs e)=>
+			_imagery.UpdateLayer += (object sender, System.EventArgs eventArgs) =>
 			{
-				LayerUpdateArgs layerUpdateArgs = e as LayerUpdateArgs;
+				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
 				if (layerUpdateArgs != null)
 				{
 					_mapVisualizer.ReregisterTilesTo(layerUpdateArgs.factory);
@@ -532,9 +532,9 @@ namespace Mapbox.Unity.Map
 				}
 			};
 
-			_terrain.UpdateLayer += (object sender, System.EventArgs e) =>
+			_terrain.UpdateLayer += (object sender, System.EventArgs eventArgs) =>
 			{
-				LayerUpdateArgs layerUpdateArgs = e as LayerUpdateArgs;
+				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
 				if (layerUpdateArgs != null)
 				{
 					_mapVisualizer.ReregisterTilesTo(layerUpdateArgs.factory);
@@ -548,10 +548,10 @@ namespace Mapbox.Unity.Map
 				}
 			};
 
-			_vectorData.UpdateLayer += (object sender, System.EventArgs e) =>
+			_vectorData.UpdateLayer += (object sender, System.EventArgs eventArgs) =>
 			{
-				LayerUpdateArgs layerUpdateArgs = e as LayerUpdateArgs;
-				if(layerUpdateArgs != null)
+				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
+				if (layerUpdateArgs != null)
 				{
 					_mapVisualizer.UnregisterTilesFrom(layerUpdateArgs.factory);
 					VectorData.UpdateFactorySettings();
@@ -586,7 +586,7 @@ namespace Mapbox.Unity.Map
 			_options.locationOptions.latitudeLongitude = String.Format(CultureInfo.InvariantCulture, "{0},{1}", latLon.x, latLon.y);
 			_options.locationOptions.zoom = zoom;
 
-			
+
 
 			SetUpMap();
 		}
@@ -768,7 +768,7 @@ namespace Mapbox.Unity.Map
 
 			return worldPos;
 		}
-		
+
 		/// <summary>
 		/// Converts a position in map space into a laitude longitude.
 		/// </summary>
