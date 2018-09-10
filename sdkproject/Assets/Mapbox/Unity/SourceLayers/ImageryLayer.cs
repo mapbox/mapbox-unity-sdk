@@ -72,7 +72,7 @@
 				_layerProperty.sourceType = imageSource;
 				_layerProperty.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(imageSource);
 
-				_layerProperty.UpdateProperty();
+				_layerProperty.HasChanged = true;
 			}
 			else
 			{
@@ -92,13 +92,13 @@
 				_layerProperty.sourceType = ImagerySourceType.None;
 				Debug.LogWarning("Empty source - turning off imagery. ");
 			}
-			_layerProperty.UpdateProperty();
+			_layerProperty.HasChanged = true;
 		}
 
 		public void SetRasterOptions(ImageryRasterOptions rasterOptions)
 		{
 			_layerProperty.rasterOptions = rasterOptions;
-			_layerProperty.UpdateProperty();
+			_layerProperty.HasChanged = true;
 		}
 
 		public void Initialize(LayerProperties properties)
