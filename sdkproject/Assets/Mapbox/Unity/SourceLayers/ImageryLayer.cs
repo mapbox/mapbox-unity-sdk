@@ -20,7 +20,6 @@
 			}
 			set
 			{
-				Debug.Log("Image Layer");
 				_layerProperty = value;
 			}
 		}
@@ -110,10 +109,10 @@
 			_imageFactory.SetOptions(_layerProperty);
 
 			//updating image layer on settings change
-			_layerProperty.OnPropertyUpdated += Refresh;
+			_layerProperty.PropertyHasChanged += UpdateImageryLayer;
 		}
 
-		public void Refresh()
+		public void UpdateImageryLayer(object sender, System.EventArgs e)
 		{
 			Factory.SetOptions(_layerProperty);
 			NotifyUpdateLayer(_imageFactory);
