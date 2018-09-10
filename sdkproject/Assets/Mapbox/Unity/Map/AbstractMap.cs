@@ -516,9 +516,9 @@ namespace Mapbox.Unity.Map
 
 			options.placementOptions.placementStrategy.SetUpPlacement(this);
 
-			_imagery.UpdateLayer += (object sender, System.EventArgs e)=>
+			_imagery.UpdateLayer += (object sender, System.EventArgs eventArgs)=>
 			{
-				LayerUpdateArgs layerUpdateArgs = e as LayerUpdateArgs;
+				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
 				if (layerUpdateArgs != null)
 				{
 					_mapVisualizer.ReregisterTilesTo(layerUpdateArgs.factory);
@@ -532,9 +532,9 @@ namespace Mapbox.Unity.Map
 				}
 			};
 
-			_terrain.UpdateLayer += (object sender, System.EventArgs e) =>
+			_terrain.UpdateLayer += (object sender, System.EventArgs eventArgs) =>
 			{
-				LayerUpdateArgs layerUpdateArgs = e as LayerUpdateArgs;
+				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
 				if (layerUpdateArgs != null)
 				{
 					_mapVisualizer.ReregisterTilesTo(layerUpdateArgs.factory);
@@ -548,9 +548,9 @@ namespace Mapbox.Unity.Map
 				}
 			};
 
-			_vectorData.UpdateLayer += (object sender, System.EventArgs e) =>
+			_vectorData.UpdateLayer += (object sender, System.EventArgs eventArgs) =>
 			{
-				LayerUpdateArgs layerUpdateArgs = e as LayerUpdateArgs;
+				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
 				if(layerUpdateArgs != null)
 				{
 					_mapVisualizer.UnregisterTilesFrom(layerUpdateArgs.factory);
