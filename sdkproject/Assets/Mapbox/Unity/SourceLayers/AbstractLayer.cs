@@ -2,17 +2,27 @@
 {
 	using Mapbox.Unity.MeshGeneration.Factories;
 
+	public class LayerUpdateArgs : System.EventArgs
+	{
+		public AbstractTileFactory factory;
+		public bool effectsVectorLayer;
+	}
+
 	public class AbstractLayer
 	{
-		public void NotifyUpdateLayer(AbstractTileFactory factory, bool effectsVectorLayer = false)
+		public event System.EventHandler UpdateLayer;
+		protected virtual void NotifyUpdateLayer(AbstractTileFactory factory, bool effectsVectorLayer = false)
 		{
-			if(UpdateLayer != null)
+			System.EventHandler handler = UpdateLayer;
+			if (handler != null)
 			{
-				UpdateLayer(factory, effectsVectorLayer);
+				LayerUpdateArgs layerUpdateArgs = new LayerUpdateArgs()
+				{
+					factory = factory,
+					effectsVectorLayer = effectsVectorLayer
+				};
+				handler(this, layerUpdateArgs);
 			}
 		}
-
-		public event UpdateLayerHandler UpdateLayer;
-		public delegate void UpdateLayerHandler(AbstractTileFactory factory, bool effectsVectorLayer);
 	}
 }

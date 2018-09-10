@@ -516,36 +516,48 @@ namespace Mapbox.Unity.Map
 
 			options.placementOptions.placementStrategy.SetUpPlacement(this);
 
-			_imagery.UpdateLayer += (factory, updateVector) =>
+			_imagery.UpdateLayer += (object sender, System.EventArgs eventArgs)=>
 			{
-				_mapVisualizer.ReregisterTilesTo(factory);
-				if(updateVector)
+				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
+				if (layerUpdateArgs != null)
 				{
-					_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
-					VectorData.UpdateFactorySettings();
-					_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
+					_mapVisualizer.ReregisterTilesTo(layerUpdateArgs.factory);
+					if (layerUpdateArgs.effectsVectorLayer)
+					{
+						_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
+						VectorData.UpdateFactorySettings();
+						_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
+					}
+					OnMapRedrawn();
 				}
-				OnMapRedrawn();
 			};
 
-			_terrain.UpdateLayer += (factory, updateVector) =>
+			_terrain.UpdateLayer += (object sender, System.EventArgs eventArgs) =>
 			{
-				_mapVisualizer.ReregisterTilesTo(factory);
-				if (updateVector)
+				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
+				if (layerUpdateArgs != null)
 				{
-					_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
-					VectorData.UpdateFactorySettings();
-					_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
+					_mapVisualizer.ReregisterTilesTo(layerUpdateArgs.factory);
+					if (layerUpdateArgs.effectsVectorLayer)
+					{
+						_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
+						VectorData.UpdateFactorySettings();
+						_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
+					}
+					OnMapRedrawn();
 				}
-				OnMapRedrawn();
 			};
 
-			_vectorData.UpdateLayer += (factory, updateVector) =>
+			_vectorData.UpdateLayer += (object sender, System.EventArgs eventArgs) =>
 			{
-				_mapVisualizer.UnregisterTilesFrom(factory);
-				VectorData.UpdateFactorySettings();
-				_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
-				OnMapRedrawn();
+				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
+				if(layerUpdateArgs != null)
+				{
+					_mapVisualizer.UnregisterTilesFrom(layerUpdateArgs.factory);
+					VectorData.UpdateFactorySettings();
+					_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
+					OnMapRedrawn();
+				}
 			};
 
 			_mapVisualizer.Initialize(this, _fileSource);
