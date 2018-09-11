@@ -125,21 +125,24 @@
 		public void Initialize()
 		{
 			_elevationFactory = ScriptableObject.CreateInstance<TerrainFactoryBase>();
-			SetStrategy();
-
-			_elevationFactory.SetOptions(_layerProperty);
+			SetFactoryOptions();
 			_layerProperty.PropertyHasChanged += RedrawLayer;
 		}
 
 		public void RedrawLayer(object sender, System.EventArgs e)
+		{
+			SetFactoryOptions();
+			//notifying map to reload existing tiles
+			NotifyUpdateLayer(_elevationFactory, true);
+		}
+
+		private void SetFactoryOptions()
 		{
 			//terrain factory uses strategy objects and they are controlled by layer
 			//so we have to refresh that first
 			SetStrategy();
 			//pushing new settings to factory directly
 			Factory.SetOptions(_layerProperty);
-			//notifying map to reload existing tiles
-			NotifyUpdateLayer(_elevationFactory, true);
 		}
 
 		private void SetStrategy()
