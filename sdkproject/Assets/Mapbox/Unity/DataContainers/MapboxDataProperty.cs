@@ -11,8 +11,7 @@
 				handler(this, e);
 			}
 		}
-		bool _hasChanged;
-
+		bool _hasChanged = false;
 		public bool HasChanged
 		{
 			set

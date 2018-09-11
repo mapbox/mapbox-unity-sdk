@@ -112,15 +112,16 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			else
 			{
 				tile.RasterDataState = TilePropertyState.Loading;
-				_properties.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(_properties.sourceType);
-
+				if (_properties.sourceType != ImagerySourceType.Custom)
+				{
+					_properties.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(_properties.sourceType);
+				}
 				ImageDataFetcherParameters parameters = new ImageDataFetcherParameters()
 				{
 					canonicalTileId = tile.CanonicalTileId,
 					tile = tile,
 					mapid = MapId,
 					useRetina = _properties.rasterOptions.useRetina
-
 				};
 				DataFetcher.FetchData(parameters);
 			}
