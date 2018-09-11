@@ -14,6 +14,14 @@
 	/// </summary>
 	public static class EditorHelper
 	{
+		public static void CheckForModifiedProperty<T>(SerializedProperty property, T targetObject)
+		{
+			MapboxDataProperty targetObjectAsDataProperty = targetObject as MapboxDataProperty;
+			if (property.serializedObject.ApplyModifiedProperties() && targetObjectAsDataProperty != null)
+			{
+				targetObjectAsDataProperty.HasChanged = true;
+			}
+		}
 
 		public static void CheckForModifiedProperty(SerializedProperty property)
 		{
