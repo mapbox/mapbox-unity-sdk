@@ -50,7 +50,7 @@
 				if (value != _layerProperty.sourceOptions.Id)
 				{
 					_layerProperty.sourceOptions.Id = value;
-					_layerProperty.UpdateProperty();
+					_layerProperty.HasChanged = true;
 				}
 			}
 		}

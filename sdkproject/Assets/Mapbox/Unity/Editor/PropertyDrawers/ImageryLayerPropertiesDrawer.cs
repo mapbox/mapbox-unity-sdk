@@ -19,10 +19,10 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			property.serializedObject.Update();
+
 			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
 			var sourceTypeValue = (ImagerySourceType)sourceTypeProperty.enumValueIndex;
-
-			ImageryLayerProperties imageryLayerProperties = (ImageryLayerProperties)EditorHelper.GetTargetObjectOfProperty(property);
 
 			var displayNames = sourceTypeProperty.enumDisplayNames;
 			int count = sourceTypeProperty.enumDisplayNames.Length;
@@ -43,15 +43,19 @@
 			// Draw label.
 			var sourceTypeLabel = new GUIContent { text = "Data Source", tooltip = "Source tileset for Imagery." };
 
+			EditorGUI.BeginChangeCheck();
 			sourceTypeProperty.enumValueIndex = EditorGUILayout.Popup(sourceTypeLabel, sourceTypeProperty.enumValueIndex, sourceTypeContent);
-
+			if(EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(property);
+			}
 			sourceTypeValue = (ImagerySourceType)sourceTypeProperty.enumValueIndex;
-
-			EditorHelper.CheckForModifiedProperty(sourceTypeProperty, imageryLayerProperties);
 
 			var sourceOptionsProperty = property.FindPropertyRelative("sourceOptions");
 			var layerSourceProperty = sourceOptionsProperty.FindPropertyRelative("layerSource");
 			var layerSourceId = layerSourceProperty.FindPropertyRelative("Id");
+
+			EditorGUI.BeginChangeCheck();
 
 			switch (sourceTypeValue)
 			{
@@ -76,16 +80,19 @@
 					break;
 			}
 
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(property);
+			}
+
 			if (sourceTypeValue != ImagerySourceType.None)
 			{
 				EditorGUI.BeginChangeCheck();
-				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("rasterOptions"));
-				if(EditorGUI.EndChangeCheck())
+				if (EditorGUI.EndChangeCheck())
 				{
-					imageryLayerProperties.HasChanged = true;
+					EditorHelper.CheckForModifiedProperty(property);
 				}
-				//EditorHelper.CheckForModifiedProperty(property.FindPropertyRelative("rasterOptions"), imageryLayerProperties);
 			}
 		}
 	}

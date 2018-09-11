@@ -18,8 +18,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		protected ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
 		protected TerrainDataFetcher DataFetcher;
 
-		public event Action OnMapIdUpdated = delegate { };
-
 		public TerrainDataFetcher GetFetcher()
 		{
 			return DataFetcher;
