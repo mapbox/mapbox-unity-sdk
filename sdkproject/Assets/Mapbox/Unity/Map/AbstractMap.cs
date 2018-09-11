@@ -521,7 +521,7 @@ namespace Mapbox.Unity.Map
 				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
 				if (layerUpdateArgs != null)
 				{
-					Debug.Log("_imagery.UpdateLayer");
+					Debug.Log("<color=red>_imagery.UpdateLayer</color>");
 					_mapVisualizer.ReregisterTilesTo(layerUpdateArgs.factory);
 					if (layerUpdateArgs.effectsVectorLayer)
 					{
@@ -538,7 +538,7 @@ namespace Mapbox.Unity.Map
 				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
 				if (layerUpdateArgs != null)
 				{
-					Debug.Log("_terrain.UpdateLayer");
+					Debug.Log("<color=green>_terrain.UpdateLayer</color>");
 					_mapVisualizer.ReregisterTilesTo(layerUpdateArgs.factory);
 					if (layerUpdateArgs.effectsVectorLayer)
 					{

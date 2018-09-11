@@ -46,7 +46,6 @@
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			property.serializedObject.Update();
-			ElevationLayerProperties elevationLayerProperties = (ElevationLayerProperties)EditorHelper.GetTargetObjectOfProperty(property);
 
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 
@@ -70,7 +69,7 @@
 			var sourceTypeLabel = new GUIContent { text = "Data Source", tooltip = "Source tileset for Terrain." };
 
 			sourceTypeProperty.enumValueIndex = EditorGUILayout.Popup(sourceTypeLabel, sourceTypeProperty.enumValueIndex, sourceTypeContent);
-			EditorHelper.CheckForModifiedProperty(sourceTypeProperty, elevationLayerProperties);
+			EditorHelper.CheckForModifiedProperty(property);
 
 			var sourceTypeValue = (ElevationSourceType)sourceTypeProperty.enumValueIndex;
 
@@ -104,7 +103,7 @@
 			}
 
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("elevationLayerType"), new GUIContent { text = elevationLayerType.displayName, tooltip = ((ElevationLayerType)elevationLayerType.enumValueIndex).Description() });
-			EditorHelper.CheckForModifiedProperty(elevationLayerType, elevationLayerProperties);
+			EditorHelper.CheckForModifiedProperty(property);
 
 			if (sourceTypeValue == ElevationSourceType.None)
 			{
@@ -114,20 +113,20 @@
 			GUILayout.Space(-lineHeight);
 
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("requiredOptions"), true);
-			EditorHelper.CheckForModifiedProperty(property.FindPropertyRelative("requiredOptions"), elevationLayerProperties);
+			EditorHelper.CheckForModifiedProperty(property);
 
 			ShowPosition = EditorGUILayout.Foldout(ShowPosition, "Others");
 			property.serializedObject.ApplyModifiedProperties();
 			if (ShowPosition)
 			{
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("modificationOptions"), true);
-				EditorHelper.CheckForModifiedProperty(property.FindPropertyRelative("modificationOptions"), elevationLayerProperties);
+				EditorHelper.CheckForModifiedProperty(property);
 
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("sideWallOptions"), true);
-				EditorHelper.CheckForModifiedProperty(property.FindPropertyRelative("sideWallOptions"), elevationLayerProperties);
+				EditorHelper.CheckForModifiedProperty(property);
 
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("unityLayerOptions"), true);
-				EditorHelper.CheckForModifiedProperty(property.FindPropertyRelative("unityLayerOptions"), elevationLayerProperties);
+				EditorHelper.CheckForModifiedProperty(property);
 			}
 			property.serializedObject.ApplyModifiedProperties();
 		}

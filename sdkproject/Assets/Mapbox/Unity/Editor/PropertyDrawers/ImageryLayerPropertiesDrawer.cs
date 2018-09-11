@@ -23,8 +23,6 @@
 			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
 			var sourceTypeValue = (ImagerySourceType)sourceTypeProperty.enumValueIndex;
 
-			ImageryLayerProperties imageryLayerProperties = (ImageryLayerProperties)EditorHelper.GetTargetObjectOfProperty(property);
-
 			var displayNames = sourceTypeProperty.enumDisplayNames;
 			int count = sourceTypeProperty.enumDisplayNames.Length;
 			if (!isGUIContentSet)
@@ -48,7 +46,7 @@
 
 			sourceTypeValue = (ImagerySourceType)sourceTypeProperty.enumValueIndex;
 
-			EditorHelper.CheckForModifiedProperty(sourceTypeProperty, imageryLayerProperties);
+			EditorHelper.CheckForModifiedProperty(property);
 
 			var sourceOptionsProperty = property.FindPropertyRelative("sourceOptions");
 			var layerSourceProperty = sourceOptionsProperty.FindPropertyRelative("layerSource");
@@ -80,7 +78,7 @@
 			if (sourceTypeValue != ImagerySourceType.None)
 			{
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("rasterOptions"));
-				EditorHelper.CheckForModifiedProperty(property.FindPropertyRelative("rasterOptions"), imageryLayerProperties);
+				EditorHelper.CheckForModifiedProperty(property);
 			}
 			property.serializedObject.ApplyModifiedProperties();
 		}
