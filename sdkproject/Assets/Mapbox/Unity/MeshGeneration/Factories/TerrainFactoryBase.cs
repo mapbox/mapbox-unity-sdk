@@ -61,6 +61,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		protected override void OnRegistered(UnityTile tile)
 		{
+			if (Properties.sourceType == ElevationSourceType.None)
+			{
+				tile.SetHeightData(null);
+				return;
+			}
+			
 			if (Strategy is IElevationBasedTerrainStrategy)
 			{
 				tile.HeightDataState = TilePropertyState.Loading;
