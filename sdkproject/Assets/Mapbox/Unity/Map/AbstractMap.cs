@@ -516,7 +516,7 @@ namespace Mapbox.Unity.Map
 
 			options.placementOptions.placementStrategy.SetUpPlacement(this);
 
-			_imagery.UpdateLayer += (object sender, System.EventArgs eventArgs)=>
+			_imagery.UpdateLayer += (object sender, System.EventArgs eventArgs) =>
 			{
 				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
 				if (layerUpdateArgs != null)
@@ -551,7 +551,7 @@ namespace Mapbox.Unity.Map
 			_vectorData.UpdateLayer += (object sender, System.EventArgs eventArgs) =>
 			{
 				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
-				if(layerUpdateArgs != null)
+				if (layerUpdateArgs != null)
 				{
 					_mapVisualizer.UnregisterTilesFrom(layerUpdateArgs.factory);
 					VectorData.UpdateFactorySettings();
@@ -586,7 +586,7 @@ namespace Mapbox.Unity.Map
 			_options.locationOptions.latitudeLongitude = String.Format(CultureInfo.InvariantCulture, "{0},{1}", latLon.x, latLon.y);
 			_options.locationOptions.zoom = zoom;
 
-			
+
 
 			SetUpMap();
 		}
@@ -768,7 +768,7 @@ namespace Mapbox.Unity.Map
 
 			return worldPos;
 		}
-		
+
 		/// <summary>
 		/// Converts a position in map space into a laitude longitude.
 		/// </summary>

@@ -85,6 +85,7 @@
 				{
 					imageryLayerProperties.HasChanged = true;
 				}
+				//EditorHelper.CheckForModifiedProperty(property.FindPropertyRelative("rasterOptions"), imageryLayerProperties);
 			}
 		}
 	}
