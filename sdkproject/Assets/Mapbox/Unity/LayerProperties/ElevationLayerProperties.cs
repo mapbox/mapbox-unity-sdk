@@ -19,9 +19,6 @@
 		};
 		public ElevationLayerType elevationLayerType = ElevationLayerType.FlatTerrain;
 		public ElevationRequiredOptions requiredOptions = new ElevationRequiredOptions();
-		//{
-
-		//}
 		public ElevationModificationOptions modificationOptions = new ElevationModificationOptions();
 		public UnityLayerOptions unityLayerOptions = new UnityLayerOptions();
 		public TerrainSideWallOptions sideWallOptions = new TerrainSideWallOptions();
