@@ -94,8 +94,6 @@
 					EditorHelper.CheckForModifiedProperty(property);
 				}
 			}
-
-			EditorHelper.CheckForModifiedProperty(property);
 		}
 	}
 }

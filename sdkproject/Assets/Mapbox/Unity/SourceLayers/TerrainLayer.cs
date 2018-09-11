@@ -60,7 +60,7 @@
 			{
 				_layerProperty.sourceType = terrainSource;
 				_layerProperty.sourceOptions.layerSource = MapboxDefaultElevation.GetParameters(terrainSource);
-				_layerProperty.UpdateProperty();
+				_layerProperty.HasChanged = true;
 			}
 			else
 			{
@@ -81,7 +81,7 @@
 				_layerProperty.elevationLayerType = ElevationLayerType.FlatTerrain;
 				Debug.LogWarning("Empty source - turning off terrain. ");
 			}
-			_layerProperty.UpdateProperty();
+			_layerProperty.HasChanged = true;
 		}
 
 		public void SetTerrainOptions(ElevationLayerType type, ElevationRequiredOptions requiredOptions = null, ElevationModificationOptions modificationOptions = null)
@@ -97,7 +97,7 @@
 			{
 				_layerProperty.modificationOptions = modificationOptions;
 			}
-			_layerProperty.UpdateProperty();
+			_layerProperty.HasChanged = true;
 		}
 
 		public void ShowSideWalls(float wallHeight, Material wallMaterial)
@@ -105,14 +105,14 @@
 			_layerProperty.sideWallOptions.isActive = true;
 			_layerProperty.sideWallOptions.wallHeight = wallHeight;
 			_layerProperty.sideWallOptions.wallMaterial = wallMaterial;
-			_layerProperty.UpdateProperty();
+			_layerProperty.HasChanged = true;
 		}
 
 		public void AddToUnityLayer(int layerId)
 		{
 			_layerProperty.unityLayerOptions.addToLayer = true;
 			_layerProperty.unityLayerOptions.layerId = layerId;
-			_layerProperty.UpdateProperty();
+			_layerProperty.HasChanged = true;
 		}
 
 		public void Initialize(LayerProperties properties)
