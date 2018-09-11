@@ -19,6 +19,8 @@
 			VectorPrimitiveType geometryType = VectorPrimitiveType.Polygon;
 			string layerName = "building";
 			string sublayerName = "Untitled";
+
+			//Line Geometry Options
 			float lineWidth = 1.0f;
 
 			//Geometry Extrusion Options
@@ -85,8 +87,12 @@
 				geometryType = geometryType,
 				snapToTerrain = true,
 				combineMeshes = false,
-				lineWidth = lineWidth,
 				sublayerName = sublayerName
+			};
+
+			_properties.lineGeometryOptions = new LineGeometryOptions
+			{
+				Width = lineWidth
 			};
 
 			_properties.extrusionOptions = new GeometryExtrusionOptions

@@ -101,8 +101,14 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					break;
 				case VectorPrimitiveType.Line:
 
+					if (_layerProperties.coreOptions.snapToTerrain == true)
+					{
+						defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
+					}
+					
 					var lineMeshMod = CreateInstance<LineMeshModifier>();
-					lineMeshMod.Width = _layerProperties.coreOptions.lineWidth;
+					//lineMeshMod.Width = _layerProperties.coreOptions.lineWidth;
+					lineMeshMod.SetProperties(_layerProperties.lineGeometryOptions);
 					defaultMeshModifierStack.Add(lineMeshMod);
 
 					if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
@@ -110,10 +116,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 						var heightMod = CreateInstance<HeightModifier>();
 						heightMod.SetProperties(_layerProperties.extrusionOptions);
 						defaultMeshModifierStack.Add(heightMod);
-					}
-					if (_layerProperties.coreOptions.snapToTerrain == true)
-					{
-						defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
 					}
 
 					//collider modifier options

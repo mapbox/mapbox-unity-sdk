@@ -48,11 +48,6 @@
 
 			var serializedMapObject = property.serializedObject;
 			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
-
-			if ((VectorPrimitiveType)primitiveType.enumValueIndex == VectorPrimitiveType.Line)
-			{
-				EditorGUILayout.PropertyField(property.FindPropertyRelative("lineWidth"));
-			}
 			EditorGUI.EndProperty();
 		}
 		//private static int count = 0;

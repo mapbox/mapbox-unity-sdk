@@ -252,4 +252,16 @@
 		Points,
 		Custom
 	}
+	
+	public enum JoinType
+	{
+		Miter,
+		Round,
+		Bevel,
+		Fakeround,
+		Flipbevel,
+		Butt,
+		Square
+	}
+
 }

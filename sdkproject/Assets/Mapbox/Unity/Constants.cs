@@ -39,7 +39,7 @@ namespace Mapbox.Unity
 			public static readonly Vector3 Vector3Down = new Vector3(0, -1, 0);
 			public static readonly Vector3 Vector3One = new Vector3(1, 1, 1);
 			public static readonly Vector3 Vector3Forward = new Vector3(0, 0, 1);
-			public static readonly Vector3 Vector3Null = new Vector3(9999.99f, 9999.99f, 9999.99f);
+			public static readonly Vector3 Vector3Unused = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 
 			public static Vector3 Vector3Right = new Vector3(1, 0, 0);
 		}
