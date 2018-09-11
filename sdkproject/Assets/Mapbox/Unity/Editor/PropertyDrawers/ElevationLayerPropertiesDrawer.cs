@@ -45,6 +45,7 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			property.serializedObject.Update();
 			ElevationLayerProperties elevationLayerProperties = (ElevationLayerProperties)EditorHelper.GetTargetObjectOfProperty(property);
 
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
@@ -68,14 +69,8 @@
 			}
 			var sourceTypeLabel = new GUIContent { text = "Data Source", tooltip = "Source tileset for Terrain." };
 
-			// sourceTypeCacheValue = sourceTypeProperty.enumValueIndex;
 			sourceTypeProperty.enumValueIndex = EditorGUILayout.Popup(sourceTypeLabel, sourceTypeProperty.enumValueIndex, sourceTypeContent);
 			EditorHelper.CheckForModifiedProperty(sourceTypeProperty, elevationLayerProperties);
-
-			//if(sourceTypeProperty.enumValueIndex != sourceTypeCacheValue && elevationLayerProperties != null)
-			//{
-			//	elevationLayerProperties.HasChanged = true;
-			//}
 
 			var sourceTypeValue = (ElevationSourceType)sourceTypeProperty.enumValueIndex;
 
@@ -108,13 +103,8 @@
 				elevationLayerType.enumValueIndex = (int)ElevationLayerType.FlatTerrain;
 			}
 
-			//int cachedElevationLayerType = elevationLayerType.enumValueIndex;
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("elevationLayerType"), new GUIContent { text = elevationLayerType.displayName, tooltip = ((ElevationLayerType)elevationLayerType.enumValueIndex).Description() });
 			EditorHelper.CheckForModifiedProperty(elevationLayerType, elevationLayerProperties);
-			//if (elevationLayerType.enumValueIndex != cachedElevationLayerType && elevationLayerProperties != null)
-			//{
-			//	elevationLayerProperties.HasChanged = true;
-			//}
 
 			if (sourceTypeValue == ElevationSourceType.None)
 			{
@@ -123,25 +113,23 @@
 
 			GUILayout.Space(-lineHeight);
 
-			EditorGUI.BeginChangeCheck();
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("requiredOptions"), true);
-			if (EditorGUI.EndChangeCheck() && elevationLayerProperties != null)
-			{
-				elevationLayerProperties.HasChanged = true;
-			}
+			EditorHelper.CheckForModifiedProperty(property.FindPropertyRelative("requiredOptions"), elevationLayerProperties);
 
 			ShowPosition = EditorGUILayout.Foldout(ShowPosition, "Others");
+			property.serializedObject.ApplyModifiedProperties();
 			if (ShowPosition)
 			{
-				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("modificationOptions"), true);
+				EditorHelper.CheckForModifiedProperty(property.FindPropertyRelative("modificationOptions"), elevationLayerProperties);
+
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("sideWallOptions"), true);
+				EditorHelper.CheckForModifiedProperty(property.FindPropertyRelative("sideWallOptions"), elevationLayerProperties);
+
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("unityLayerOptions"), true);
-				if (EditorGUI.EndChangeCheck() && elevationLayerProperties != null)
-				{
-					elevationLayerProperties.HasChanged = true;
-				}
+				EditorHelper.CheckForModifiedProperty(property.FindPropertyRelative("unityLayerOptions"), elevationLayerProperties);
 			}
+			property.serializedObject.ApplyModifiedProperties();
 		}
 	}
 }

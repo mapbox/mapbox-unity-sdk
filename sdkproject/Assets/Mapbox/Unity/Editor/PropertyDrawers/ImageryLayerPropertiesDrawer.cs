@@ -19,6 +19,7 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			property.serializedObject.Update();
 			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
 			var sourceTypeValue = (ImagerySourceType)sourceTypeProperty.enumValueIndex;
 
@@ -75,15 +76,11 @@
 				default:
 					break;
 			}
-
+			property.serializedObject.ApplyModifiedProperties();
 			if (sourceTypeValue != ImagerySourceType.None)
 			{
-				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("rasterOptions"));
-				if(EditorGUI.EndChangeCheck() && imageryLayerProperties != null)
-				{
-					imageryLayerProperties.HasChanged = true;
-				}
+				EditorHelper.CheckForModifiedProperty(property.FindPropertyRelative("rasterOptions"), imageryLayerProperties);
 			}
 			property.serializedObject.ApplyModifiedProperties();
 		}
