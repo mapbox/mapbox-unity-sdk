@@ -7,16 +7,6 @@
 	[Serializable]
 	public class ElevationLayerProperties : LayerProperties
 	{
-		public event Action OnPropertyUpdated = delegate { };
-
-		public void UpdateProperty()
-		{
-			if (OnPropertyUpdated != null)
-			{
-				OnPropertyUpdated();
-			}
-		}
-
 		public ElevationSourceType sourceType = ElevationSourceType.MapboxTerrain;
 
 		public LayerSourceOptions sourceOptions = new LayerSourceOptions()
@@ -29,6 +19,9 @@
 		};
 		public ElevationLayerType elevationLayerType = ElevationLayerType.FlatTerrain;
 		public ElevationRequiredOptions requiredOptions = new ElevationRequiredOptions();
+		//{
+
+		//}
 		public ElevationModificationOptions modificationOptions = new ElevationModificationOptions();
 		public UnityLayerOptions unityLayerOptions = new UnityLayerOptions();
 		public TerrainSideWallOptions sideWallOptions = new TerrainSideWallOptions();

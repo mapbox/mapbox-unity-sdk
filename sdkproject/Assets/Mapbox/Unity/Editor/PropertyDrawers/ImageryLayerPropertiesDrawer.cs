@@ -79,13 +79,13 @@
 			if (sourceTypeValue != ImagerySourceType.None)
 			{
 				EditorGUI.BeginChangeCheck();
-				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("rasterOptions"));
-				if(EditorGUI.EndChangeCheck())
+				if(EditorGUI.EndChangeCheck() && imageryLayerProperties != null)
 				{
 					imageryLayerProperties.HasChanged = true;
 				}
 			}
+			property.serializedObject.ApplyModifiedProperties();
 		}
 	}
 }

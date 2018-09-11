@@ -123,16 +123,18 @@
 			SetStrategy();
 
 			_elevationFactory.SetOptions(_layerProperty);
-			_layerProperty.OnPropertyUpdated += () =>
-			{
-				//terrain factory uses strategy objects and they are controlled by layer
-				//so we have to refresh that first
-				SetStrategy();
-				//pushing new settings to factory directly
-				Factory.SetOptions(_layerProperty);
-				//notifying map to reload existing tiles
-				NotifyUpdateLayer(_elevationFactory, true);
-			};
+			_layerProperty.PropertyHasChanged += RedrawLayer;
+		}
+
+		public void RedrawLayer(object sender, System.EventArgs e)
+		{
+			//terrain factory uses strategy objects and they are controlled by layer
+			//so we have to refresh that first
+			SetStrategy();
+			//pushing new settings to factory directly
+			Factory.SetOptions(_layerProperty);
+			//notifying map to reload existing tiles
+			NotifyUpdateLayer(_elevationFactory, true);
 		}
 
 		public void SetStrategy()
