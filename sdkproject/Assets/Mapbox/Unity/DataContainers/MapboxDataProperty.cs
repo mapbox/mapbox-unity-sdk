@@ -11,7 +11,6 @@
 				handler(this, e);
 			}
 		}
-		bool _hasChanged = false;
 		public bool HasChanged
 		{
 			set
@@ -19,8 +18,6 @@
 				if (value == true)
 				{
 					OnPropertyHasChanged(null /*Pass args here */);
-					// reset HasChanged 
-					_hasChanged = false;
 				}
 			}
 		}
