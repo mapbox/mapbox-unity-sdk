@@ -1,26 +1,15 @@
 using System;
 using Mapbox.Unity.Utilities;
 using System.Collections.Generic;
+using Mapbox.Unity.Map;
 using UnityEngine;
 using Mapbox.Unity.MeshGeneration.Data;
 
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
-	public enum JoinType
-	{
-		Miter,
-		Round,
-		Bevel,
-		Fakeround,
-		Flipbevel,
-		Butt,
-		Square
-	}
-
 	/// <summary>
 	/// Line Mesh Modifier creates line polygons from a list of vertices. It offsets the original vertices to both sides using Width parameter and triangulates them manually.
 	/// It also creates tiled UV mapping using the line length.
-	/// MergeStartEnd parameter connects both edges of the line segment and creates a closed loop which is useful for some cases like pavements around a building block.
 	/// </summary>
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Line Mesh Modifier")]
 	public class LineMeshModifier : MeshModifier
@@ -34,13 +23,14 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		#region Line Parameters
 
-		[NonSerialized] private float _miterLimit = 2f;
-		[NonSerialized] private JoinType _joinType = JoinType.Round;
-		[NonSerialized] private JoinType _capType = JoinType.Round;
-		[NonSerialized] private JoinType _beginCap = JoinType.Round;
-		[NonSerialized] private JoinType _endCap = JoinType.Round;
-		[NonSerialized] private float _roundLimit = 1.05f;
-		[SerializeField] public float Width = 3.0f;
+		private LineGeometryOptions _options;
+		private float _miterLimit = 2f;
+		private JoinType _joinType = JoinType.Round;
+		private JoinType _capType = JoinType.Round;
+		private JoinType _beginCap = JoinType.Round;
+		private JoinType _endCap = JoinType.Round;
+		private float _roundLimit = 1.05f;
+		 
 		private float _scaledWidth;
 
 		#endregion
@@ -80,7 +70,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void Initialize()
 		{
-			_scaledWidth = Width;
+			_scaledWidth = _options.Width;
 			_vertexList = new List<Vector3>();
 			_normalList = new List<Vector3>();
 			_triangleList = new List<int>();
@@ -88,15 +78,20 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_tangentList = new List<Vector4>();
 		}
 
+		public override void SetProperties(ModifierProperties properties)
+		{
+			_options = (LineGeometryOptions)properties;
+		}
+		
 		public override void Run(VectorFeatureUnity feature, MeshData md, float scale)
 		{
-			_scaledWidth = Width * scale;
+			_scaledWidth = _options.Width * scale;
 			ExtureLine(feature, md);
 		}
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
-			_scaledWidth = tile != null ? Width * tile.TileScale : Width;
+			_scaledWidth = tile != null ? _options.Width * tile.TileScale : _options.Width;
 			ExtureLine(feature, md);
 		}
 
@@ -121,25 +116,25 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				var roadSegmentCount = roadSegment.Count;
 				for (int i = 0; i < roadSegmentCount; i++)
 				{
-					_nextVertex = i != (roadSegmentCount - 1) ? roadSegment[i + 1] : Constants.Math.Vector3Null;
+					_nextVertex = i != (roadSegmentCount - 1) ? roadSegment[i + 1] : Constants.Math.Vector3Unused;
 
-					if (_nextNormal != Constants.Math.Vector3Null)
+					if (_nextNormal != Constants.Math.Vector3Unused)
 					{
 						_prevNormal = _nextNormal;
 					}
 
-					if (_currentVertex != Constants.Math.Vector3Null)
+					if (_currentVertex != Constants.Math.Vector3Unused)
 					{
 						_prevVertex = _currentVertex;
 					}
 
 					_currentVertex = roadSegment[i];
 
-					_nextNormal = (_nextVertex != Constants.Math.Vector3Null)
+					_nextNormal = (_nextVertex != Constants.Math.Vector3Unused)
 						? (_nextVertex - _currentVertex).normalized.Perpendicular()
 						: _prevNormal;
 
-					if (_prevNormal == Constants.Math.Vector3Null)
+					if (_prevNormal == Constants.Math.Vector3Unused)
 					{
 						_prevNormal = _nextNormal;
 					}
@@ -158,7 +153,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 					var cosHalfAngle = joinNormal.x * _nextNormal.x + joinNormal.z * _nextNormal.z;
 					var miterLength = cosHalfAngle != 0 ? 1 / cosHalfAngle : float.PositiveInfinity;
-					var isSharpCorner = cosHalfAngle < _cosHalfSharpCorner && _prevVertex != Constants.Math.Vector3Null && _nextVertex != Constants.Math.Vector3Null;
+					var isSharpCorner = cosHalfAngle < _cosHalfSharpCorner && _prevVertex != Constants.Math.Vector3Unused && _nextVertex != Constants.Math.Vector3Unused;
 
 					if (isSharpCorner && i > 0)
 					{
@@ -173,8 +168,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						}
 					}
 
-					var middleVertex = _prevVertex != Constants.Math.Vector3Null && _nextVertex != Constants.Math.Vector3Null;
-					var currentJoin = middleVertex ? _joinType : _nextVertex != Constants.Math.Vector3Null ? _beginCap : _endCap;
+					var middleVertex = _prevVertex != Constants.Math.Vector3Unused && _nextVertex != Constants.Math.Vector3Unused;
+					var currentJoin = middleVertex ? _joinType : _nextVertex != Constants.Math.Vector3Unused ? _beginCap : _endCap;
 
 					if (middleVertex && currentJoin == JoinType.Round)
 					{
@@ -276,7 +271,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 //							}
 						}
 
-						if (_nextVertex != Constants.Math.Vector3Null)
+						if (_nextVertex != Constants.Math.Vector3Unused)
 						{
 							AddCurrentVertex(_currentVertex, _distance, _nextNormal, md, -_cornerOffsetA, -_cornerOffsetB);
 						}
@@ -290,7 +285,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						}
 
 						// Start next segment with a butt
-						if (_nextVertex != Constants.Math.Vector3Null)
+						if (_nextVertex != Constants.Math.Vector3Unused)
 						{
 							AddCurrentVertex(_currentVertex, _distance, _nextNormal, md, 0, 0);
 						}
@@ -307,7 +302,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						}
 
 						// Start next segment
-						if (_nextVertex != Constants.Math.Vector3Null)
+						if (_nextVertex != Constants.Math.Vector3Unused)
 						{
 							AddCurrentVertex(_currentVertex, _distance, _nextNormal, md, -1, -1);
 						}
@@ -320,7 +315,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 							AddCurrentVertex(_currentVertex, _distance, _prevNormal * 0.66f, md, -.7f, -.7f);
 							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md, 0, 0);
 						}
-						else if (_nextVertex == Constants.Math.Vector3Null)
+						else if (_nextVertex == Constants.Math.Vector3Unused)
 						{
 							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md, 0, 0);
 							AddCurrentVertex(_currentVertex, _distance, _prevNormal * 0.66f, md, .7f, .7f);
@@ -386,12 +381,12 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			_beginCap = _capType;
 			_endCap = _capType;
-			_prevVertex = Constants.Math.Vector3Null;
-			_currentVertex = Constants.Math.Vector3Null;
-			_nextVertex = Constants.Math.Vector3Null;
+			_prevVertex = Constants.Math.Vector3Unused;
+			_currentVertex = Constants.Math.Vector3Unused;
+			_nextVertex = Constants.Math.Vector3Unused;
 
-			_prevNormal = Constants.Math.Vector3Null;
-			_nextNormal = Constants.Math.Vector3Null;
+			_prevNormal = Constants.Math.Vector3Unused;
+			_nextNormal = Constants.Math.Vector3Unused;
 			_distance = 0f;
 		}
 
@@ -435,7 +430,13 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				extrude -= (normal.Perpendicular() * endLeft);
 			}
 
-			_vertexList.Add(vertexPosition + extrude * _scaledWidth);
+			var vert = vertexPosition + extrude * _scaledWidth;
+			if (vert.x < -10000 || vert.z < -10000)
+			{
+				Debug.Log("here");
+			}
+			
+			_vertexList.Add(vert);
 			_normalList.Add(Constants.Math.Vector3Up);
 			_uvList.Add(new Vector2(1, dist));
 			_tangentList.Add(normal.Perpendicular() * -1);
