@@ -25,11 +25,7 @@
 
 		public static void CheckForModifiedProperty(SerializedProperty property)
 		{
-			MapboxDataProperty targetObjectAsDataProperty = GetTargetObjectOfProperty(property) as MapboxDataProperty;
-			if (property.serializedObject.ApplyModifiedProperties() && targetObjectAsDataProperty != null)
-			{
-				targetObjectAsDataProperty.HasChanged = true;
-			}
+			CheckForModifiedProperty(property, GetTargetObjectOfProperty(property));
 		}
 
 		public static IEnumerable<SerializedProperty> GetChildren(this SerializedProperty property)
