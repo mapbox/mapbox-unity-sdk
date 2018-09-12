@@ -5,11 +5,13 @@
 	using System.Collections.Generic;
 	using System;
 	using System.Linq;
+	using Mapbox.Unity.Map;
 
 	public class ScriptableCreatorWindow : EditorWindow
 	{
 		Type _type;
 		SerializedProperty _finalize;
+		SerializedProperty _container;
 		const float width = 620f;
 		const float height = 600f;
 		List<ScriptableObject> _assets;
@@ -37,11 +39,12 @@
 			Close();
 		}
 
-		public static void Open(Type type, SerializedProperty p, int index = -1, Action<UnityEngine.Object> act = null)
+		public static void Open(Type type, SerializedProperty p, int index = -1, Action<UnityEngine.Object> act = null, SerializedProperty containerProperty = null)
 		{
 			var window = GetWindow<ScriptableCreatorWindow>(true, "Select a module");
 			window._type = type;
 			window._finalize = p;
+			window._container = containerProperty;
 			window.position = new Rect(500, 200, width, height);
 			window._act = act;
 			if (index > -1)
@@ -108,6 +111,12 @@
 						}
 					}
 
+					MapboxDataProperty mapboxDataProperty = (MapboxDataProperty)EditorHelper.GetTargetObjectOfProperty(_container);
+					if (mapboxDataProperty != null)
+					{
+						mapboxDataProperty.HasChanged = true;
+					}
+
 					this.Close();
 				}
 
@@ -127,16 +136,6 @@
 				EditorGUILayout.Space();
 			}
 			EditorGUILayout.EndScrollView();
-
-			//if (GUILayout.Button(new GUIContent("Create New Factory")))
-			//{
-			//	//var fac = CreateInstance<Unity.MeshGeneration.Factories.TerrainFactory>();
-			//	var fac = CreateAsset<Unity.MeshGeneration.Factories.TerrainFactory>();
-			//	_finalize.arraySize++;
-			//	_finalize.GetArrayElementAtIndex(_finalize.arraySize - 1).objectReferenceValue = fac;
-			//	_finalize.serializedObject.ApplyModifiedProperties();
-			//	this.Close();
-			//}
 		}
 
 		public static T CreateAsset<T>() where T : ScriptableObject
