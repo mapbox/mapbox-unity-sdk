@@ -24,9 +24,6 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-
-			GeometryExtrusionOptions extrusionOptions = (GeometryExtrusionOptions)EditorHelper.GetTargetObjectOfProperty(property);
-
 			var extrusionTypeProperty = property.FindPropertyRelative("extrusionType");
 			var displayNames = extrusionTypeProperty.enumDisplayNames;
 			int count = extrusionTypeProperty.enumDisplayNames.Length;
@@ -51,8 +48,12 @@
 				tooltip = "Type of geometry extrusion"
 			};
 
+			EditorGUI.BeginChangeCheck();
 			extrusionTypeProperty.enumValueIndex = EditorGUILayout.Popup(extrusionTypeLabel, extrusionTypeProperty.enumValueIndex, extrusionTypeContent);
-			EditorHelper.CheckForModifiedProperty(extrusionTypeProperty, extrusionOptions);
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(property);
+			}
 
 			var sourceTypeValue = (Unity.Map.ExtrusionType)extrusionTypeProperty.enumValueIndex;
 
@@ -62,6 +63,9 @@
 			var extrusionGeometryType = property.FindPropertyRelative("extrusionGeometryType");
 			var extrusionGeometryGUI = new GUIContent { text = "Geometry Type", tooltip = EnumExtensions.Description((Unity.Map.ExtrusionGeometryType)extrusionGeometryType.enumValueIndex) };
 			EditorGUI.indentLevel++;
+
+			EditorGUI.BeginChangeCheck();
+
 			switch (sourceTypeValue)
 			{
 				case Unity.Map.ExtrusionType.None:
@@ -96,10 +100,17 @@
 					break;
 			}
 
-			EditorHelper.CheckForModifiedProperty(extrusionGeometryType, extrusionOptions);
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(property);
+			}
 
+			EditorGUI.BeginChangeCheck();
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("extrusionScaleFactor"), new GUIContent { text = "Scale Factor" });
-			EditorHelper.CheckForModifiedProperty(property.FindPropertyRelative("extrusionScaleFactor"), extrusionOptions);
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(property);
+			}
 
 			EditorGUI.indentLevel--;
 		}
@@ -151,7 +162,13 @@
 
 					//display popup
 					var propertyNameLabel = new GUIContent { text = "Property Name", tooltip = "The name of the property in the selected Mapbox layer that will be used for extrusion" };
+
+					EditorGUI.BeginChangeCheck();
 					_propertyIndex = EditorGUILayout.Popup(propertyNameLabel, _propertyIndex, _propertyNameContent);
+					if (EditorGUI.EndChangeCheck())
+					{
+						EditorHelper.CheckForModifiedProperty(property);
+					}
 
 					//set new string values based on selection
 					parsedString = _propertyNamesList[_propertyIndex].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
@@ -186,7 +203,13 @@
 
 					//display popup
 					var propertyNameLabel = new GUIContent { text = "Property Name", tooltip = "The name of the property in the selected Mapbox layer that will be used for extrusion" };
+
+					EditorGUI.BeginChangeCheck();
 					_propertyIndex = EditorGUILayout.Popup(propertyNameLabel, _propertyIndex, _propertyNameContent);
+					if (EditorGUI.EndChangeCheck())
+					{
+						EditorHelper.CheckForModifiedProperty(property);
+					}
 
 					//set new string values based on the offset
 					parsedString = _propertyNamesList[_propertyIndex].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();

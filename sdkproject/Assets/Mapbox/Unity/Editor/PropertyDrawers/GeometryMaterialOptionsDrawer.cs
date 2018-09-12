@@ -105,8 +105,12 @@
 					};
 				}
 
+				EditorGUI.BeginChangeCheck();
 				styleType.enumValueIndex = EditorGUILayout.Popup(styleTypeLabel, styleType.enumValueIndex, styleTypeGuiContent);
-				EditorHelper.CheckForModifiedProperty(styleType, materialOptions);
+				if (EditorGUI.EndChangeCheck())
+				{
+					EditorHelper.CheckForModifiedProperty(property);
+				}
 
 				EditorGUI.indentLevel++;
 				if ((StyleTypes)styleType.enumValueIndex != StyleTypes.Custom)
@@ -130,6 +134,8 @@
 
 					GUILayout.EndHorizontal();
 
+					EditorGUI.BeginChangeCheck();
+
 					switch ((StyleTypes)styleType.enumValueIndex)
 					{
 						case StyleTypes.Simple:
@@ -145,22 +151,22 @@
 								};
 							}
 							samplePaletteType.enumValueIndex = EditorGUILayout.Popup(samplePaletteTypeLabel, samplePaletteType.enumValueIndex, samplePaletteTypeGuiContent);
-							EditorHelper.CheckForModifiedProperty(samplePaletteType, materialOptions);
 							break;
 						case StyleTypes.Light:
 							property.FindPropertyRelative("lightStyleOpacity").floatValue = EditorGUILayout.Slider("Opacity", property.FindPropertyRelative("lightStyleOpacity").floatValue, 0.0f, 1.0f);
-							EditorHelper.CheckForModifiedProperty(property.FindPropertyRelative("lightStyleOpacity"), materialOptions);
 							break;
 						case StyleTypes.Dark:
 							property.FindPropertyRelative("darkStyleOpacity").floatValue = EditorGUILayout.Slider("Opacity", property.FindPropertyRelative("darkStyleOpacity").floatValue, 0.0f, 1.0f);
-							EditorHelper.CheckForModifiedProperty(property.FindPropertyRelative("darkStyleOpacity"), materialOptions);
 							break;
 						case StyleTypes.Color:
 							property.FindPropertyRelative("colorStyleColor").colorValue = EditorGUILayout.ColorField("Color", property.FindPropertyRelative("colorStyleColor").colorValue);
-							EditorHelper.CheckForModifiedProperty(property.FindPropertyRelative("colorStyleColor"), materialOptions);
 							break;
 						default:
 							break;
+					}
+					if (EditorGUI.EndChangeCheck())
+					{
+						EditorHelper.CheckForModifiedProperty(property);
 					}
 				}
 				else
@@ -170,8 +176,12 @@
 					int valIndex = texturingType.enumValueIndex == 0 ? 0 : texturingType.enumValueIndex + 1;
 					var texturingTypeGUI = new GUIContent { text = "Texturing Type", tooltip = EnumExtensions.Description((UvMapType)valIndex) };
 
+					EditorGUI.BeginChangeCheck();
 					EditorGUILayout.PropertyField(texturingType, texturingTypeGUI);
-					EditorHelper.CheckForModifiedProperty(texturingType, materialOptions);
+					if (EditorGUI.EndChangeCheck())
+					{
+						EditorHelper.CheckForModifiedProperty(property);
+					}
 
 					var matList = property.FindPropertyRelative("materials");
 					if (matList.arraySize == 0)
