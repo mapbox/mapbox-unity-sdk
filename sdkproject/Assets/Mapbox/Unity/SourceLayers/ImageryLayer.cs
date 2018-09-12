@@ -115,7 +115,7 @@
 		public void RedrawLayer(object sender, System.EventArgs e)
 		{
 			Factory.SetOptions(_layerProperty);
-			NotifyUpdateLayer(_imageFactory);
+			NotifyUpdateLayer(_imageFactory, null);
 		}
 
 		public void Remove()

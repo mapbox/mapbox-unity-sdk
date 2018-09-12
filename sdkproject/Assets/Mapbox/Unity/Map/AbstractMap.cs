@@ -521,7 +521,7 @@ namespace Mapbox.Unity.Map
 				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
 				if (layerUpdateArgs != null)
 				{
-					_mapVisualizer.ReregisterTilesTo(layerUpdateArgs.factory);
+					_mapVisualizer.UpdateTileForProperty(layerUpdateArgs.factory, layerUpdateArgs);
 					if (layerUpdateArgs.effectsVectorLayer)
 					{
 						_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
@@ -537,7 +537,7 @@ namespace Mapbox.Unity.Map
 				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
 				if (layerUpdateArgs != null)
 				{
-					_mapVisualizer.ReregisterTilesTo(layerUpdateArgs.factory);
+					_mapVisualizer.UpdateTileForProperty(layerUpdateArgs.factory, layerUpdateArgs);
 					if (layerUpdateArgs.effectsVectorLayer)
 					{
 						_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);

@@ -120,7 +120,10 @@
 			}
 
 			GUILayout.Space(-lineHeight);
+			EditorGUILayout.PropertyField(property.FindPropertyRelative("colliderOptions"), true);
+			GUILayout.Space(2 * -lineHeight);
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("requiredOptions"), true);
+			GUILayout.Space(-lineHeight);
 			if (EditorGUI.EndChangeCheck())
 			{
 				UpdateProperty(property);

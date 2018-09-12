@@ -293,14 +293,23 @@ namespace Mapbox.Unity.Map
 				factory.Unregister(tileBundle.Value);
 			}
 		}
-		
-		public void ReregisterTilesTo(AbstractTileFactory factory)
+
+		public void ReregisterTilesTo(VectorTileFactory factory)
 		{
 			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
 			{
 				factory.Register(tileBundle.Value);
 			}
-			
+		}
+
+		public void UpdateTileForProperty(AbstractTileFactory factory, LayerUpdateArgs updateArgs)
+		{
+
+
+			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
+			{
+				factory.UpdateTileProperty(tileBundle.Value, updateArgs);
+			}
 		}
 		#endregion
 	}
