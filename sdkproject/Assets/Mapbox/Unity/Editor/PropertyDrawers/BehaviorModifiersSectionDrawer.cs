@@ -137,11 +137,6 @@
 				ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac, -1, null, property);
 			}
 
-			if (EditorGUI.EndChangeCheck())
-			{
-				EditorHelper.CheckForModifiedProperty(property);
-			}
-
 			EditorGUILayout.EndHorizontal();
 			EditorGUILayout.EndVertical();
 			EditorGUI.indentLevel--;
