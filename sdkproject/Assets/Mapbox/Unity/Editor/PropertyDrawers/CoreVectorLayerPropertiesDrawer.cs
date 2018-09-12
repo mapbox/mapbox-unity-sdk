@@ -17,7 +17,7 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			CoreVectorLayerProperties coreOptions = (CoreVectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property);
+			property.serializedObject.Update();
 
 			EditorGUI.BeginProperty(position, null, property);
 

@@ -16,6 +16,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		//public event Action FeaturePostProcessEvent;
 		public abstract void Create(VectorTileLayer layer, UnityTile tile, Action<UnityTile, LayerVisualizerBase> callback = null);
 
+		public event System.EventHandler LayerVisualizerHasChanged;
+
 		public virtual void Initialize()
 		{
 
@@ -29,6 +31,15 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		public virtual void OnUnregisterTile(UnityTile tile)
 		{
 
+		}
+
+		protected virtual void OnUpdateLayerVisualizer(System.EventArgs e)
+		{
+			System.EventHandler handler = LayerVisualizerHasChanged;
+			if (handler != null)
+			{
+				handler(this, e);
+			}
 		}
 	}
 }

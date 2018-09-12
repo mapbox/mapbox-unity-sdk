@@ -46,6 +46,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		protected HashSet<UnityTile> _tilesWaitingResponse;
 		protected HashSet<UnityTile> _tilesWaitingProcessing;
 
+		public event System.EventHandler TileFactoryHasChanged;
+
 		/// <summary>
 		/// The  <c>OnTileError</c> event triggers when there's <c>Tile</c> error.
 		/// Returns a <see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance as a parameter, for the tile on which error occurred.
@@ -85,6 +87,18 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		public virtual void Unregister(UnityTile tile)
 		{
 			OnUnregistered(tile);
+		}
+
+		protected void UpdateTileFactory(object sender, System.EventArgs e)
+		{
+			//Debug.Log("TileFactoryHasChanged " + sender.ToString());
+			System.EventHandler handler = TileFactoryHasChanged;
+			if (handler != null)
+			{
+				handler(this, e);
+			}
+
+			//do something...
 		}
 
 		protected abstract void OnInitialized();

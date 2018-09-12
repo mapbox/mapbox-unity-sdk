@@ -52,6 +52,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 		}
 
+		public event System.EventHandler VectorHasChanged;
+
 		protected LayerPerformanceOptions _performanceOptions;
 		protected Dictionary<UnityTile, List<int>> _activeCoroutines;
 		int _entityInCurrentCoroutine = 0;
@@ -109,7 +111,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		private void UpdateVector(object sender, System.EventArgs e)
 		{
-			Debug.Log("UpdateVector " + sender.ToString());
+			//Debug.Log("UpdateVector " + sender.ToString());
+			OnUpdateLayerVisualizer(e);
 			//do something...
 		}
 
@@ -634,6 +637,17 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		public override void OnUnregisterTile(UnityTile tile)
 		{
 			base.OnUnregisterTile(tile);
+
+			_layerProperties.PropertyHasChanged -= UpdateVector;
+
+			_layerProperties.coreOptions.PropertyHasChanged -= UpdateVector;
+
+			_layerProperties.extrusionOptions.PropertyHasChanged -= UpdateVector;
+
+			_layerProperties.materialOptions.PropertyHasChanged -= UpdateVector;
+
+			_layerProperties.colliderOptions.PropertyHasChanged -= UpdateVector;
+
 			//tile.VectorDataState = Enums.TilePropertyState.Cancelled;
 			if (_activeCoroutines.ContainsKey(tile))
 			{

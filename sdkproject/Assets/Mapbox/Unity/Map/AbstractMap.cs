@@ -555,7 +555,7 @@ namespace Mapbox.Unity.Map
 				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
 				if (layerUpdateArgs != null)
 				{
-					Debug.Log("_vectorData.UpdateLayer");
+					Debug.Log("<color=blue>Vector</color>");
 					_mapVisualizer.UnregisterTilesFrom(layerUpdateArgs.factory);
 					VectorData.UpdateFactorySettings();
 					_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
