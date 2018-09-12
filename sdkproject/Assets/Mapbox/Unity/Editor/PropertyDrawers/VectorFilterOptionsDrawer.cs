@@ -59,6 +59,8 @@
 				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibutton"))
 				{
 					propertyFilters.arraySize++;
+					EditorHelper.CheckForModifiedProperty(property);
+					property.serializedObject.Update();
 				}
 				EditorGUILayout.EndHorizontal();
 				EditorGUI.indentLevel--;
@@ -109,8 +111,15 @@
 			var selectedLayerName = originalProperty.FindPropertyRelative("_selectedLayerName").stringValue;
 
 			DrawPropertyDropDown(originalProperty, property);
-			filterOperatorProp.enumValueIndex = EditorGUILayout.Popup(filterOperatorProp.enumValueIndex, filterOperatorProp.enumDisplayNames, GUILayout.MaxWidth(150));
 
+			EditorGUI.BeginChangeCheck();
+			filterOperatorProp.enumValueIndex = EditorGUILayout.Popup(filterOperatorProp.enumValueIndex, filterOperatorProp.enumDisplayNames, GUILayout.MaxWidth(150));
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(originalProperty);
+			}
+
+			//EditorGUI.BeginChangeCheck();
 			switch ((LayerFilterOperationType)filterOperatorProp.enumValueIndex)
 			{
 				case LayerFilterOperationType.IsEqual:
@@ -128,9 +137,16 @@
 				default:
 					break;
 			}
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(originalProperty);
+			}
+
 			if (GUILayout.Button(new GUIContent(" X "), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
 			{
 				propertyFilters.DeleteArrayElementAtIndex(index);
+				EditorHelper.CheckForModifiedProperty(originalProperty);
+				originalProperty.serializedObject.Update();
 			}
 			EditorGUILayout.EndHorizontal();
 
@@ -140,6 +156,7 @@
 
 		private void DrawPropertyDropDown(SerializedProperty originalProperty, SerializedProperty filterProperty)
 		{
+			originalProperty.serializedObject.Update();
 			var selectedLayerName = originalProperty.FindPropertyRelative("_selectedLayerName").stringValue;
 			AbstractMap mapObject = (AbstractMap)originalProperty.serializedObject.targetObject;
 			TileJsonData tileJsonData = mapObject.VectorData.LayerProperty.tileJsonData;
@@ -216,8 +233,12 @@
 				descriptionString = "Unavailable in Selected Layer.";
 
 			}
-
+			EditorGUI.BeginChangeCheck();
 			filterProperty.FindPropertyRelative("Key").stringValue = parsedString;
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(originalProperty);
+			}
 			filterProperty.FindPropertyRelative("KeyDescription").stringValue = descriptionString;
 		}
 

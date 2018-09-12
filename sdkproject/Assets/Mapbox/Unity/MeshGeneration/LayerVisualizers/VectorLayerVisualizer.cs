@@ -131,6 +131,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			_layerProperties.coreOptions.PropertyHasChanged += UpdateVector;
 
+			_layerProperties.filterOptions.PropertyHasChanged += UpdateVector;
+
 			_layerProperties.extrusionOptions.PropertyHasChanged += UpdateVector;
 
 			_layerProperties.materialOptions.PropertyHasChanged += UpdateVector;
@@ -641,6 +643,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			_layerProperties.PropertyHasChanged -= UpdateVector;
 
 			_layerProperties.coreOptions.PropertyHasChanged -= UpdateVector;
+
+			_layerProperties.filterOptions.PropertyHasChanged += UpdateVector;
 
 			_layerProperties.extrusionOptions.PropertyHasChanged -= UpdateVector;
 
