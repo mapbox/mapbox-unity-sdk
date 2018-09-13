@@ -556,12 +556,10 @@ namespace Mapbox.Unity.Map
 				if (layerUpdateArgs != null)
 				{
 					Debug.Log("<color=blue>Vector</color>");
-					/*
 					_mapVisualizer.UnregisterTilesFrom(layerUpdateArgs.factory);
 					VectorData.UpdateFactorySettings();
 					_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
 					OnMapRedrawn();
-					*/
 				}
 			};
 

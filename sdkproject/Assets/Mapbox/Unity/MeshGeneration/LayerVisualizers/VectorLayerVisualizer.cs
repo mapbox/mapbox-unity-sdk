@@ -127,6 +127,10 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				}
 			}
 
+			//watch this in the console when doing runtime changes...
+			//this message is currenly displaying multiple times per layer on redraws...
+			Debug.Log("SetProperties");
+
 			_layerProperties.PropertyHasChanged += UpdateVector;
 
 			_layerProperties.coreOptions.PropertyHasChanged += UpdateVector;
@@ -640,11 +644,13 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		{
 			base.OnUnregisterTile(tile);
 
+
+			//These unregister calls seem to do nothing..
 			_layerProperties.PropertyHasChanged -= UpdateVector;
 
 			_layerProperties.coreOptions.PropertyHasChanged -= UpdateVector;
 
-			_layerProperties.filterOptions.PropertyHasChanged += UpdateVector;
+			_layerProperties.filterOptions.PropertyHasChanged -= UpdateVector;
 
 			_layerProperties.extrusionOptions.PropertyHasChanged -= UpdateVector;
 
