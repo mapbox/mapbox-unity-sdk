@@ -83,7 +83,7 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			property.serializedObject.Update();
+			//property.serializedObject.Update();
 
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 
@@ -192,7 +192,7 @@
 
 					EditorGUI.BeginChangeCheck();
 					EditorGUILayout.PropertyField(matList.GetArrayElementAtIndex(0), new GUIContent { text = "Top Material", tooltip = "Unity material to use for extruded top/roof mesh. " });
-					if(EditorGUI.EndChangeCheck())
+					if (EditorGUI.EndChangeCheck())
 					{
 						EditorHelper.CheckForModifiedProperty(property);
 					}

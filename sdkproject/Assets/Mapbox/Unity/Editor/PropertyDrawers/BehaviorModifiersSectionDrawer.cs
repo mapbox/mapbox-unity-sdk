@@ -24,7 +24,7 @@
 
 		public void DrawUI(SerializedProperty layerProperty, VectorPrimitiveType primitiveTypeProp, VectorSourceType sourceType)
 		{
-			layerProperty.serializedObject.Update();
+			//layerProperty.serializedObject.Update();
 
 			showGameplay = EditorGUILayout.Foldout(showGameplay, "Behavior Modifiers");
 			if (showGameplay)
@@ -78,7 +78,7 @@
 
 		private void DrawMeshModifiers(SerializedProperty property)
 		{
-			property.serializedObject.Update();
+			//property.serializedObject.Update();
 
 			EditorGUILayout.BeginVertical();
 			EditorGUILayout.LabelField(new GUIContent
@@ -144,7 +144,7 @@
 
 		private void DrawGoModifiers(SerializedProperty property)
 		{
-			property.serializedObject.Update();
+			//property.serializedObject.Update();
 
 			EditorGUILayout.BeginVertical();
 
@@ -178,7 +178,7 @@
 					{
 						gofac.DeleteArrayElementAtIndex(ind);
 					}
-					if(elementWasDeleted)
+					if (elementWasDeleted)
 					{
 						EditorHelper.CheckForModifiedProperty(property);
 					}

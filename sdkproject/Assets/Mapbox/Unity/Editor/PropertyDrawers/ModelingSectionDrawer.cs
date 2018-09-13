@@ -26,7 +26,7 @@
 
 		public void DrawUI(SerializedProperty subLayerCoreOptions, SerializedProperty layerProperty, VectorPrimitiveType primitiveTypeProp)
 		{
-			subLayerCoreOptions.serializedObject.Update();
+			//subLayerCoreOptions.serializedObject.Update();
 
 			objectId = layerProperty.serializedObject.targetObject.GetInstanceID().ToString();
 
