@@ -12,8 +12,12 @@
 		private float kToggleWidth = 18f;
 		public static int uniqueId = 3000;
 		public int maxElementsAdded = 0;
+
+		public bool hasChanged = false;
+
 		const float kRowHeights = 15f;
 		const float nameOffset = 15f;
+
 		MultiColumnHeaderState m_MultiColumnHeaderState;
 		private GUIStyle columnStyle = new GUIStyle()
 		{
@@ -121,7 +125,12 @@
 				item.data.isActive = layer.FindPropertyRelative("coreOptions.isActive").boolValue;
 				if (toggleRect.xMax < cellRect.xMax)
 				{
+					EditorGUI.BeginChangeCheck();
 					item.data.isActive = EditorGUI.Toggle(toggleRect, item.data.isActive); // hide when outside cell rect
+					if(EditorGUI.EndChangeCheck())
+					{
+						hasChanged = true;
+					}
 				}
 				layer.FindPropertyRelative("coreOptions.isActive").boolValue = item.data.isActive;
 
