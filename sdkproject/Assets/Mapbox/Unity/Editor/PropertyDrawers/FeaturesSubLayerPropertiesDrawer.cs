@@ -205,6 +205,12 @@
 				layerTreeView.Reload();
 				layerTreeView.OnGUI(layersRect);
 
+				if(layerTreeView.hasChanged)
+				{
+					EditorHelper.CheckForModifiedProperty(property);
+					layerTreeView.hasChanged = false;
+				}
+
 				selectedLayers = layerTreeView.GetSelection();
 
 				//if there are selected elements, set the selection index at the first element.
