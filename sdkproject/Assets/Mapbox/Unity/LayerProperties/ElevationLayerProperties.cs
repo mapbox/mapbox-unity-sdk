@@ -29,7 +29,7 @@
 		};
 		public ElevationLayerType elevationLayerType = ElevationLayerType.FlatTerrain;
 		public ElevationRequiredOptions requiredOptions = new ElevationRequiredOptions();
-		public TerrainColliderOptions colliderOptions= new TerrainColliderOptions();
+		public TerrainColliderOptions colliderOptions = new TerrainColliderOptions();
 		public ElevationModificationOptions modificationOptions = new ElevationModificationOptions();
 		public UnityLayerOptions unityLayerOptions = new UnityLayerOptions();
 		public TerrainSideWallOptions sideWallOptions = new TerrainSideWallOptions();
@@ -37,7 +37,7 @@
 		//public void SetCollider(ColliderType type)
 		public void SetCollider(bool enabled)
 		{
-			colliderOptions.addCollider = true;
+			colliderOptions.addCollider = enabled;
 			colliderOptions.HasChanged = true;
 		}
 	}
