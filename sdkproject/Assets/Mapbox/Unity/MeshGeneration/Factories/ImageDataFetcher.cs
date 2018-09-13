@@ -10,26 +10,31 @@ public class ImageDataFetcher : DataFetcher
 	public Action<UnityTile, RasterTile, TileErrorEventArgs> FetchingError = (t, r, s) => { };
 
 	//tile here should be totally optional and used only not to have keep a dictionary in terrain factory base
-	public void FetchImage(CanonicalTileId canonicalTileId, string mapid, UnityTile tile = null, bool useRetina = false)
+	public override void FetchData(DataFetcherParameters parameters)
 	{
-		RasterTile rasterTile;
-		if (mapid.StartsWith("mapbox://", StringComparison.Ordinal))
+		var imageDataParameters = parameters as ImageDataFetcherParameters;
+		if(imageDataParameters == null)
 		{
-			rasterTile = useRetina ? new RetinaRasterTile() : new RasterTile();
+			return;
+		}
+		RasterTile rasterTile;
+		if (imageDataParameters.mapid.StartsWith("mapbox://", StringComparison.Ordinal))
+		{
+			rasterTile = imageDataParameters.useRetina ? new RetinaRasterTile() : new RasterTile();
 		}
 		else
 		{
-			rasterTile = useRetina ? new ClassicRetinaRasterTile() : new ClassicRasterTile();
+			rasterTile = imageDataParameters.useRetina ? new ClassicRetinaRasterTile() : new ClassicRasterTile();
 		}
 
-		if (tile != null)
+		if (imageDataParameters.tile != null)
 		{
-			tile.AddTile(rasterTile);
+			imageDataParameters.tile.AddTile(rasterTile);
 		}
 
-		rasterTile.Initialize(_fileSource, tile.CanonicalTileId, mapid, () =>
+		rasterTile.Initialize(_fileSource, imageDataParameters.tile.CanonicalTileId, imageDataParameters.mapid, () =>
 		{
-			if (tile.CanonicalTileId != rasterTile.Id)
+			if (imageDataParameters.tile.CanonicalTileId != rasterTile.Id)
 			{
 				//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
 				return;
@@ -37,11 +42,11 @@ public class ImageDataFetcher : DataFetcher
 
 			if (rasterTile.HasError)
 			{
-				FetchingError(tile, rasterTile, new TileErrorEventArgs(tile.CanonicalTileId, rasterTile.GetType(), tile, rasterTile.Exceptions));
+				FetchingError(imageDataParameters.tile, rasterTile, new TileErrorEventArgs(imageDataParameters.tile.CanonicalTileId, rasterTile.GetType(), imageDataParameters.tile, rasterTile.Exceptions));
 			}
 			else
 			{
-				DataRecieved(tile, rasterTile);
+				DataRecieved(imageDataParameters.tile, rasterTile);
 			}
 
 		});

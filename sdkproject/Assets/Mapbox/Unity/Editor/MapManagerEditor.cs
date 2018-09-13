@@ -97,6 +97,12 @@
 		GUIContent[] _sourceTypeContent;
 		static float _lineHeight = EditorGUIUtility.singleLineHeight;
 
+		private void UpdateProperty(SerializedProperty property)
+		{
+			var map = (AbstractMap)property.serializedObject.targetObject;
+			map.Options.UpdateProperty();
+		}
+
 		public override void OnInspectorGUI()
 		{
 			objectId = serializedObject.targetObject.GetInstanceID().ToString();
@@ -160,6 +166,7 @@
 				EditorGUILayout.HelpBox("Invalid Access Token. Please add a valid access token using the Mapbox  > Setup Menu", MessageType.Error);
 			}
 
+			EditorGUI.BeginChangeCheck();
 
 			EditorGUILayout.LabelField("Location ", GUILayout.Height(_lineHeight));
 
@@ -182,15 +189,25 @@
 
 			EditorGUILayout.PropertyField(serializedObject.FindProperty("_initializeOnStart"));
 
+			if(EditorGUI.EndChangeCheck())
+			{
+				UpdateProperty(property);
+			}
+
 			ShowPosition = EditorGUILayout.Foldout(ShowPosition, "Others");
 			if (ShowPosition)
 			{
+				EditorGUI.BeginChangeCheck();
 				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("placementOptions"));
 				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("scalingOptions"));
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("loadingTexture"));
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("tileMaterial"));
+				if (EditorGUI.EndChangeCheck())
+				{
+					UpdateProperty(property);
+				}
 			}
 		}
 

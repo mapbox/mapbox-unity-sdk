@@ -279,7 +279,11 @@ namespace Mapbox.Editor.NodeEditor
 			foreach (FieldInfo fi in obj.GetType().GetFields().Where(prop => prop.IsDefined(typeof(NodeEditorElementAttribute), false)))
 			{
 				//field SO
+#if ENABLE_WINMD_SUPPORT
+				if (typeof(ILayer).GetTypeInfo().IsAssignableFrom(fi.FieldType.GetTypeInfo()))
+#else
 				if (typeof(ILayer).IsAssignableFrom(fi.FieldType))
+#endif
 				{
 					var val = fi.GetValue(obj) as ILayer;
 					if (val != null)

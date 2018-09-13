@@ -372,6 +372,8 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		public event Action OnUpdated = delegate { };
 
+		public event Action OnMapRedrawn = delegate { };
+
 		protected virtual void Awake()
 		{
 			// Setup a visualizer to get a "Starter" map.
@@ -514,6 +516,53 @@ namespace Mapbox.Unity.Map
 
 			options.placementOptions.placementStrategy.SetUpPlacement(this);
 
+			_imagery.UpdateLayer += (object sender, System.EventArgs eventArgs) =>
+			{
+				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
+				if (layerUpdateArgs != null)
+				{
+					Debug.Log("<color=red>Image</color>");
+					_mapVisualizer.ReregisterTilesTo(layerUpdateArgs.factory);
+					if (layerUpdateArgs.effectsVectorLayer)
+					{
+						_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
+						VectorData.UpdateFactorySettings();
+						_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
+					}
+					OnMapRedrawn();
+				}
+			};
+
+			_terrain.UpdateLayer += (object sender, System.EventArgs eventArgs) =>
+			{
+				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
+				if (layerUpdateArgs != null)
+				{
+					Debug.Log("<color=green>Terrain</color>");
+					_mapVisualizer.ReregisterTilesTo(layerUpdateArgs.factory);
+					if (layerUpdateArgs.effectsVectorLayer)
+					{
+						_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
+						VectorData.UpdateFactorySettings();
+						_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
+					}
+					OnMapRedrawn();
+				}
+			};
+
+			_vectorData.UpdateLayer += (object sender, System.EventArgs eventArgs) =>
+			{
+				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
+				if (layerUpdateArgs != null)
+				{
+					Debug.Log("_vectorData.UpdateLayer");
+					_mapVisualizer.UnregisterTilesFrom(layerUpdateArgs.factory);
+					VectorData.UpdateFactorySettings();
+					_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
+					OnMapRedrawn();
+				}
+			};
+
 			_mapVisualizer.Initialize(this, _fileSource);
 			_tileProvider.Initialize(this);
 
@@ -521,6 +570,7 @@ namespace Mapbox.Unity.Map
 
 			_tileProvider.UpdateTileExtent();
 		}
+
 		/// <summary>
 		/// Initialize the map using the specified latLon and zoom.
 		/// Map will automatically get initialized in the <c>Start</c> method.
@@ -538,6 +588,8 @@ namespace Mapbox.Unity.Map
 			}
 			_options.locationOptions.latitudeLongitude = String.Format(CultureInfo.InvariantCulture, "{0},{1}", latLon.x, latLon.y);
 			_options.locationOptions.zoom = zoom;
+
+
 
 			SetUpMap();
 		}
@@ -693,17 +745,33 @@ namespace Mapbox.Unity.Map
 		/// <param name="queryHeight">If set to <c>true</c> will return the terrain height(in Unity units) at that point.</param>
 		public virtual Vector3 GeoToWorldPosition(Vector2d latitudeLongitude, bool queryHeight = true)
 		{
-			var worldPos = GeoToWorldPositionXZ(latitudeLongitude);
+			Vector3 worldPos = GeoToWorldPositionXZ(latitudeLongitude);
 
 			if (queryHeight)
 			{
 				//Query Height.
 				float tileScale = 1f;
-				worldPos.y = QueryElevationAtInternal(latitudeLongitude, out tileScale);
+				float height = QueryElevationAtInternal(latitudeLongitude, out tileScale);
+
+				// Apply height inside the unity tile space
+				UnityTile tile;
+				if (MapVisualizer.ActiveTiles.TryGetValue(Conversions.LatitudeLongitudeToTileId(latitudeLongitude.x, latitudeLongitude.y, (int)Zoom), out tile))
+				{
+					if (tile != null)
+					{
+						// Calculate height in the local space of the tile gameObject.
+						// Height is aligned with the y axis in local space.
+						// This also helps us avoid scale values when setting the height. 
+						var localPos = tile.gameObject.transform.InverseTransformPoint(worldPos);
+						localPos.y = height;
+						worldPos = tile.gameObject.transform.TransformPoint(localPos);
+					}
+				}
 			}
 
 			return worldPos;
 		}
+
 		/// <summary>
 		/// Converts a position in map space into a laitude longitude.
 		/// </summary>

@@ -46,10 +46,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			{
 				tile.gameObject.layer = _elevationOptions.unityLayerOptions.layerId;
 			}
-
-			if (tile.MeshFilter.mesh.vertexCount == 0)
+			if ((int)tile.ElevationType != (int)ElevationLayerType.LowPolygonTerrain)
 			{
+				tile.MeshFilter.mesh.Clear();
 				CreateBaseMesh(tile);
+				tile.ElevationType = TileTerrainType.LowPoly;
 			}
 
 			GenerateTerrainMesh(tile);

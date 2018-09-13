@@ -9,6 +9,13 @@
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		bool showPosition = false;
 
+		private void UpdateProperty(SerializedProperty property)
+		{
+			Debug.Log("UpdateProperty");
+			var map = (AbstractMap)property.serializedObject.targetObject;
+			map.Options.UpdateProperty();
+		}
+
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
@@ -16,7 +23,15 @@
 			position.height = lineHeight;
 			EditorGUI.LabelField(position, "Location ");
 			position.y += lineHeight;
-			EditorGUI.PropertyField(position, property.FindPropertyRelative("locationOptions"));
+
+			EditorGUI.BeginChangeCheck();
+
+			//EditorGUI.PropertyField(position, property.FindPropertyRelative("locationOptions"));
+			EditorGUILayout.PropertyField(property.FindPropertyRelative("locationOptions"));
+			if (EditorGUI.EndChangeCheck())
+			{
+				UpdateProperty(property);
+			}
 			position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("locationOptions"));
 			var extentOptions = property.FindPropertyRelative("extentOptions");
 			var extentOptionsType = extentOptions.FindPropertyRelative("extentType");
@@ -33,18 +48,30 @@
 				position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("extentOptions"));
 			}
 
-
 			showPosition = EditorGUI.Foldout(position, showPosition, "Others");
 			if (showPosition)
 			{
+				EditorGUI.BeginChangeCheck();
+
 				position.y += lineHeight;
-				EditorGUI.PropertyField(position, property.FindPropertyRelative("placementOptions"));
+				EditorGUILayout.PropertyField(property.FindPropertyRelative("placementOptions"));
+
 				position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("placementOptions"));
 				EditorGUI.PropertyField(position, property.FindPropertyRelative("scalingOptions"));
-			}
 
+				if (EditorGUI.EndChangeCheck())
+				{
+					UpdateProperty(property);
+				}
+			}
+			if (GUI.changed)
+			{
+				Debug.Log("CHANGE");
+			}
 			EditorGUI.EndProperty();
+
 		}
+
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
 			// Reserve space for the total visible properties.

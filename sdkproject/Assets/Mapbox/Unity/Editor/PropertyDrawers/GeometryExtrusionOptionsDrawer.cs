@@ -7,6 +7,7 @@
 	using System.Linq;
 	using Mapbox.Platform.TilesetTileJSON;
 	using System.Collections.Generic;
+	using Mapbox.Editor;
 
 	[CustomPropertyDrawer(typeof(GeometryExtrusionOptions))]
 	public class GeometryExtrusionOptionsDrawer : PropertyDrawer
@@ -20,8 +21,12 @@
 		bool isGUIContentSet = false;
 		static TileJsonData tileJsonData = new TileJsonData();
 		static TileJSONResponse tileJsonResponse;
+
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+
+			GeometryExtrusionOptions extrusionOptions = (GeometryExtrusionOptions)EditorHelper.GetTargetObjectOfProperty(property);
+
 			var extrusionTypeProperty = property.FindPropertyRelative("extrusionType");
 			var displayNames = extrusionTypeProperty.enumDisplayNames;
 			int count = extrusionTypeProperty.enumDisplayNames.Length;
@@ -47,6 +52,7 @@
 			};
 
 			extrusionTypeProperty.enumValueIndex = EditorGUILayout.Popup(extrusionTypeLabel, extrusionTypeProperty.enumValueIndex, extrusionTypeContent);
+			EditorHelper.CheckForModifiedProperty(extrusionTypeProperty, extrusionOptions);
 
 			var sourceTypeValue = (Unity.Map.ExtrusionType)extrusionTypeProperty.enumValueIndex;
 
@@ -90,7 +96,11 @@
 					break;
 			}
 
+			EditorHelper.CheckForModifiedProperty(extrusionGeometryType, extrusionOptions);
+
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("extrusionScaleFactor"), new GUIContent { text = "Scale Factor" });
+			EditorHelper.CheckForModifiedProperty(property.FindPropertyRelative("extrusionScaleFactor"), extrusionOptions);
+
 			EditorGUI.indentLevel--;
 		}
 

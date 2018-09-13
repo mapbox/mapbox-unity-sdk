@@ -52,7 +52,9 @@
 				{
 					if (null != _textReader)
 					{
+#if !NETFX_CORE
 						_textReader.Close();
+#endif
 						_textReader.Dispose();
 						_textReader = null;
 					}

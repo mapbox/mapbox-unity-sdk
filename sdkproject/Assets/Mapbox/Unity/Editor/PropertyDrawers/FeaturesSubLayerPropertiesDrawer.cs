@@ -10,6 +10,7 @@
 	using Mapbox.VectorTile.ExtensionMethods;
 	using Mapbox.Unity.MeshGeneration.Filters;
 	using Mapbox.Platform.TilesetTileJSON;
+	using Mapbox.Editor;
 	using System;
 
 	public class FeaturesSubLayerPropertiesDrawer
@@ -80,6 +81,8 @@
 		IList<int> selectedLayers = new List<int>();
 		public void DrawUI(SerializedProperty property)
 		{
+			VectorLayerProperties vectorLayerProperties = (VectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property);
+
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 			var serializedMapObject = property.serializedObject;
 			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
@@ -259,10 +262,16 @@
 					selectedLayers = new int[1] { subLayerArray.arraySize - 1 + FeatureSubLayerTreeView.uniqueId };
 					layerTreeView.SetSelection(selectedLayers);
 					subLayerProperties = null; // setting this to null so that the if block is not called again
+
+					if(vectorLayerProperties != null)
+					{
+						vectorLayerProperties.HasChanged = true;
+					}
 				}
 
 				if (GUILayout.Button(new GUIContent("Remove Selected"), (GUIStyle)"minibuttonright"))
 				{
+					bool layerWasRemoved = false;
 					foreach (var index in selectedLayers.OrderByDescending(i => i))
 					{
 						if (layerTreeView != null)
@@ -270,11 +279,17 @@
 							layerTreeView.RemoveItemFromTree(index);
 							subLayerArray.DeleteArrayElementAtIndex(index - FeatureSubLayerTreeView.uniqueId);
 							layerTreeView.treeModel.SetData(GetData(subLayerArray));
+							layerWasRemoved = true;
 						}
 					}
 
 					selectedLayers = new int[0];
 					layerTreeView.SetSelection(selectedLayers);
+
+					if(layerWasRemoved && vectorLayerProperties != null)
+					{
+						vectorLayerProperties.HasChanged = true;
+					}
 				}
 
 				EditorGUILayout.EndHorizontal();
@@ -420,6 +435,10 @@
 			subLayerColliderOptions.FindPropertyRelative("colliderType").enumValueIndex = (int)subLayerProperties.colliderOptions.colliderType;
 		}
 
+		private void UpdateMe()
+		{
+			Debug.Log("Update!");
+		}
 
 		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty, SerializedProperty property)
 		{
@@ -491,8 +510,6 @@
 			//*********************** MODELING SECTION BEGINS ***********************************//
 			_modelingSectionDrawer.DrawUI(subLayerCoreOptions, layerProperty, primitiveTypeProp);
 			//*********************** MODELING SECTION ENDS ***********************************//
-
-
 
 
 			//*********************** TEXTURING SECTION BEGINS ***********************************//
