@@ -30,7 +30,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private JoinType _beginCap = JoinType.Round;
 		private JoinType _endCap = JoinType.Round;
 		private float _roundLimit = 1.05f;
-		 
+
 		private float _scaledWidth;
 
 		#endregion
@@ -51,7 +51,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private float _cornerOffsetB;
 		private bool _startOfLine = true;
 
-		
+
 		private Vector3 _prevVertex;
 		private Vector3 _currentVertex;
 		private Vector3 _nextVertex;
@@ -80,9 +80,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void SetProperties(ModifierProperties properties)
 		{
-			_options = (LineGeometryOptions)properties;
+			_options = (LineGeometryOptions) properties;
 		}
-		
+
 		public override void Run(VectorFeatureUnity feature, MeshData md, float scale)
 		{
 			_scaledWidth = _options.Width * scale;
@@ -110,7 +110,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				if (roadSegment.Count < 2)
 					continue;
-				
+
 				ResetFields();
 
 				var roadSegmentCount = roadSegment.Count;
@@ -215,7 +215,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						}
 						else
 						{
-							var direction = (_prevNormal.x * _nextNormal.y - _prevNormal.y * _nextNormal.x) > 0 ? -1 : 1;
+							var direction = (_prevNormal.x * _nextNormal.z - _prevNormal.z * _nextNormal.x) > 0 ? -1 : 1;
 							var bevelLength = miterLength * (_prevNormal + _nextNormal).magnitude / (_prevNormal - _nextNormal).magnitude;
 							joinNormal = joinNormal.Perpendicular() * (bevelLength * direction);
 						}
@@ -255,21 +255,27 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 							// This math is just a good enough approximation. It isn't "correct".
 							var n = Mathf.Floor((0.5f - (cosHalfAngle - 0.5f)) * 8);
 							Vector3 approxFractionalJoinNormal;
-
-//							for (var m = 0; m < n; m++)
-//							{
-//								approxFractionalJoinNormal = _nextNormal * ((m + 1) / (n + 1)) + (_prevNormal).normalized;
-//								AddPieSliceVertex(_currentVertex, _distance, approxFractionalJoinNormal, lineTurnsLeft, md);
-//							}
+							for (var m = 0f; m < n; m++)
+							{
+								var aaa = (m + 1f) / (n + 1f);
+								approxFractionalJoinNormal = (_nextNormal * ((m + 1f) / (n + 1f)) + (_prevNormal)).normalized;
+								AddPieSliceVertex(_currentVertex, _distance, approxFractionalJoinNormal, lineTurnsLeft, md);
+							}
 
 							AddPieSliceVertex(_currentVertex, _distance, joinNormal, lineTurnsLeft, md);
 
-//							for (var k = n - 1; k >= 0; k--)
-//							{
-//								approxFractionalJoinNormal = _prevNormal * ((k + 1) / (n + 1)) + (_nextNormal).normalized;
-//								AddPieSliceVertex(_currentVertex, _distance, approxFractionalJoinNormal, lineTurnsLeft, md);
-//							}
+							//change it to go -1, not sure if it's a good idea but it adds the last vertex in the corner,
+							//as duplicate of next road segment start
+							for (var k = n - 1; k >= -1; k--)
+							{
+								approxFractionalJoinNormal = (_prevNormal * ((k + 1) / (n + 1)) + (_nextNormal)).normalized;
+								AddPieSliceVertex(_currentVertex, _distance, approxFractionalJoinNormal, lineTurnsLeft, md);
+							}
 						}
+
+						//ending corner
+						_index1 = -1;
+						_index2 = -1;
 
 						if (_nextVertex != Constants.Math.Vector3Unused)
 						{
@@ -326,8 +332,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						else
 						{
 							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md, 0, 0);
-							_index1 = -1;
-							_index2 = -1;
+							AddCurrentVertex(_currentVertex, _distance, _nextNormal, md, 0, 0);
+							//adding extra vertices instead of switching indexing as it looks better on sharp corners
+							//var t = _index1;
+							//_index1 = _index2;
+							//_index2 = t;
 						}
 					}
 
@@ -347,10 +356,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				}
 
 				md.Edges.Add(md.Vertices.Count);
-				md.Edges.Add(md.Vertices.Count  + 1);
+				md.Edges.Add(md.Vertices.Count + 1);
 				md.Edges.Add(md.Vertices.Count + _vertexList.Count - 1);
 				md.Edges.Add(md.Vertices.Count + _vertexList.Count - 2);
-				
+
 				md.Vertices.AddRange(_vertexList);
 				md.Normals.AddRange(_normalList);
 				if (md.Triangles.Count == 0)
@@ -405,19 +414,26 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				_triangleList.Add(_index1);
 				_triangleList.Add(_index3);
 				_triangleList.Add(_index2);
-				md.Edges.Add(triIndexStart + _vertexList.Count - 2);
-				md.Edges.Add(triIndexStart + _vertexList.Count - 3);
+				if (!lineTurnsLeft)
+				{
+					md.Edges.Add(_index3);
+					md.Edges.Add(_index1);
+				}
+				else
+				{
+					md.Edges.Add(_index2);
+					md.Edges.Add(_index3);
+				}
 			}
 
-//			if (lineTurnsLeft)
-//			{
-//				_index2 = _index3;
-//			}
-//			else
-//			{
-//				_index1 = _index3;
-//			}
-			
+			if (lineTurnsLeft)
+			{
+				_index2 = _index3;
+			}
+			else
+			{
+				_index1 = _index3;
+			}
 		}
 
 
@@ -431,11 +447,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 
 			var vert = vertexPosition + extrude * _scaledWidth;
-			if (vert.x < -10000 || vert.z < -10000)
-			{
-				Debug.Log("here");
-			}
-			
 			_vertexList.Add(vert);
 			_normalList.Add(Constants.Math.Vector3Up);
 			_uvList.Add(new Vector2(1, dist));
