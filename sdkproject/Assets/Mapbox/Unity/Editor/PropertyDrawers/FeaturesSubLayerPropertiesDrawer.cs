@@ -81,7 +81,6 @@
 		IList<int> selectedLayers = new List<int>();
 		public void DrawUI(SerializedProperty property)
 		{
-			VectorLayerProperties vectorLayerProperties = (VectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property);
 
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 			var serializedMapObject = property.serializedObject;
@@ -263,10 +262,8 @@
 					layerTreeView.SetSelection(selectedLayers);
 					subLayerProperties = null; // setting this to null so that the if block is not called again
 
-					if(vectorLayerProperties != null)
-					{
-						vectorLayerProperties.HasChanged = true;
-					}
+					EditorHelper.CheckForModifiedProperty(property);
+
 				}
 
 				if (GUILayout.Button(new GUIContent("Remove Selected"), (GUIStyle)"minibuttonright"))
@@ -286,9 +283,9 @@
 					selectedLayers = new int[0];
 					layerTreeView.SetSelection(selectedLayers);
 
-					if(layerWasRemoved && vectorLayerProperties != null)
+					if(layerWasRemoved)
 					{
-						vectorLayerProperties.HasChanged = true;
+						EditorHelper.CheckForModifiedProperty(property);
 					}
 				}
 
