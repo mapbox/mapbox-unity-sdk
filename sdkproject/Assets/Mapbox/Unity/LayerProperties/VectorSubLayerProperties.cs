@@ -47,6 +47,21 @@
 		private int _maskValue;
 
 		public string selectedTypes;
+
+		public bool SubLayerNameMatchesExact(string layerName)
+		{
+			return coreOptions.sublayerName == layerName;
+		}
+		public bool SubLayerNameContains(string layerName)
+		{
+			return coreOptions.sublayerName.Contains(layerName);
+		}
+
+		public void SetActive(bool active)
+		{
+			coreOptions.isActive = active;
+			coreOptions.HasChanged = true;
+		}
 	}
 
 }

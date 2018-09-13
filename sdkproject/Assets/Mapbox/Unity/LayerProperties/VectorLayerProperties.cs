@@ -66,5 +66,21 @@
 		public List<VectorSubLayerProperties> vectorSubLayers = new List<VectorSubLayerProperties>();
 		[NodeEditorElementAttribute("POI Sublayers")]
 		public List<PrefabItemOptions> locationPrefabList = new List<PrefabItemOptions>();
+
+
+		public VectorSubLayerProperties FindFeatureLayerWithName(string featureLayerName)
+		{
+			int foundLayerIndex = -1;
+			// Optimize for performance. 
+			for (int i = 0; i < vectorSubLayers.Count; i++)
+			{
+				if (vectorSubLayers[i].SubLayerNameMatchesExact(featureLayerName))
+				{
+					foundLayerIndex = i;
+					break;
+				}
+			}
+			return (foundLayerIndex != -1) ? vectorSubLayers[foundLayerIndex] : null;
+		}
 	}
 }
