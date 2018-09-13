@@ -1,6 +1,7 @@
 ﻿namespace Mapbox.Editor
 {
 	using UnityEngine;
+	using System;
 	using System.Collections;
 	using UnityEditor;
 	using Mapbox.Unity.Map;
@@ -25,6 +26,8 @@
 
 		public void DrawUI(SerializedProperty subLayerCoreOptions, SerializedProperty layerProperty, VectorPrimitiveType primitiveTypeProp)
 		{
+			VectorSubLayerProperties vectorSubLayerProperties = (VectorSubLayerProperties)EditorHelper.GetTargetObjectOfProperty(layerProperty);
+
 			objectId = layerProperty.serializedObject.targetObject.GetInstanceID().ToString();
 
 			EditorGUILayout.BeginVertical();
@@ -50,10 +53,12 @@
 				}
 
 				var snapToTerrainProperty = subLayerCoreOptions.FindPropertyRelative("snapToTerrain");
-				var combineMeshesProperty = subLayerCoreOptions.FindPropertyRelative("combineMeshes");
-
 				snapToTerrainProperty.boolValue = EditorGUILayout.Toggle(snapToTerrainProperty.displayName, snapToTerrainProperty.boolValue);
+				EditorHelper.CheckForModifiedProperty(snapToTerrainProperty, vectorSubLayerProperties);
+
+				var combineMeshesProperty = subLayerCoreOptions.FindPropertyRelative("combineMeshes");
 				combineMeshesProperty.boolValue = EditorGUILayout.Toggle(combineMeshesProperty.displayName, combineMeshesProperty.boolValue);
+				EditorHelper.CheckForModifiedProperty(combineMeshesProperty, vectorSubLayerProperties);
 
 				if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
 				{

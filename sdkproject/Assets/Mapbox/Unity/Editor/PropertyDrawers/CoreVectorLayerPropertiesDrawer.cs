@@ -7,6 +7,7 @@
 	using System.Linq;
 	using System;
 	using Mapbox.VectorTile.ExtensionMethods;
+	using Mapbox.Editor;
 
 	[CustomPropertyDrawer(typeof(CoreVectorLayerProperties))]
 	public class CoreVectorLayerPropertiesDrawer : PropertyDrawer
@@ -16,9 +17,10 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			CoreVectorLayerProperties coreOptions = (CoreVectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property);
+
 			EditorGUI.BeginProperty(position, null, property);
 
-			// Draw label.
 			var primitiveType = property.FindPropertyRelative("geometryType");
 
 			var primitiveTypeLabel = new GUIContent
@@ -45,12 +47,9 @@
 			}
 
 			primitiveType.enumValueIndex = EditorGUILayout.Popup(primitiveTypeLabel, primitiveType.enumValueIndex, _primitiveTypeContent);
+			EditorHelper.CheckForModifiedProperty(primitiveType, coreOptions);
 
-			var serializedMapObject = property.serializedObject;
-			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
 			EditorGUI.EndProperty();
 		}
-		//private static int count = 0;
-
 	}
 }

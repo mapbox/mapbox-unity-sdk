@@ -6,7 +6,7 @@
 	using Mapbox.Unity.Utilities;
 
 	[Serializable]
-	public class ImageryLayer : IImageryLayer
+	public class ImageryLayer : AbstractLayer, IImageryLayer
 	{
 		[SerializeField]
 		ImageryLayerProperties _layerProperty = new ImageryLayerProperties();
@@ -17,6 +17,10 @@
 			get
 			{
 				return _layerProperty;
+			}
+			set
+			{
+				_layerProperty = value;
 			}
 		}
 		public MapLayerType LayerType
@@ -41,9 +45,13 @@
 			{
 				return _layerProperty.sourceOptions.Id;
 			}
-			set
+			internal set
 			{
-				_layerProperty.sourceOptions.Id = value;
+				if (value != _layerProperty.sourceOptions.Id)
+				{
+					_layerProperty.sourceOptions.Id = value;
+					_layerProperty.HasChanged = true;
+				}
 			}
 		}
 
@@ -63,6 +71,8 @@
 			{
 				_layerProperty.sourceType = imageSource;
 				_layerProperty.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(imageSource);
+
+				_layerProperty.HasChanged = true;
 			}
 			else
 			{
@@ -82,11 +92,13 @@
 				_layerProperty.sourceType = ImagerySourceType.None;
 				Debug.LogWarning("Empty source - turning off imagery. ");
 			}
+			_layerProperty.HasChanged = true;
 		}
 
 		public void SetRasterOptions(ImageryRasterOptions rasterOptions)
 		{
 			_layerProperty.rasterOptions = rasterOptions;
+			_layerProperty.HasChanged = true;
 		}
 
 		public void Initialize(LayerProperties properties)
@@ -103,6 +115,13 @@
 			}
 			_imageFactory = ScriptableObject.CreateInstance<MapImageFactory>();
 			_imageFactory.SetOptions(_layerProperty);
+			_layerProperty.PropertyHasChanged += RedrawLayer;
+		}
+
+		public void RedrawLayer(object sender, System.EventArgs e)
+		{
+			Factory.SetOptions(_layerProperty);
+			NotifyUpdateLayer(_imageFactory);
 		}
 
 		public void Remove()
@@ -117,6 +136,8 @@
 		{
 			Initialize(properties);
 		}
+
+		private MapImageFactory _imageFactory;
 		public MapImageFactory Factory
 		{
 			get
@@ -124,6 +145,6 @@
 				return _imageFactory;
 			}
 		}
-		private MapImageFactory _imageFactory;
+
 	}
 }

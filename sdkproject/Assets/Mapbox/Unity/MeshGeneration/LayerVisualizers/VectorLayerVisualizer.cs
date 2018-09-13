@@ -107,7 +107,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					}
 					
 					var lineMeshMod = CreateInstance<LineMeshModifier>();
-					//lineMeshMod.Width = _layerProperties.coreOptions.lineWidth;
 					lineMeshMod.SetProperties(_layerProperties.lineGeometryOptions);
 					defaultMeshModifierStack.Add(lineMeshMod);
 

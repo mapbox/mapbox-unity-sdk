@@ -3,6 +3,17 @@
 ##### Improvements
 - Reworked line meshes generator 
 
+### v.1.4.6
+??/??/2018
+##### Improvements
+- Terrain mesh is generated as flat on height data errors
+##### Bug Fixes
+- Fix issue with building side wall modifier where it miscalculated the floor heights causing overlaping polygons/floors
+- Fix an issue where streets tileset wasn't creating buildings on tile edges
+- Fix QueryHeight method to take tile local position/rotation/scale into account
+- Fix an isse with terrain factory where it didn't respect "none" terrain option.
+- Fix a bug where a map editor script not working on Unity3d 2018.2
+
 ### v.1.4.5
 08/20/2018
 ##### New Features

@@ -42,6 +42,18 @@
 		}
 		protected VectorDataFetcher DataFetcher;
 
+		public VectorDataFetcher GetFetcher()
+		{
+			return DataFetcher;
+		}
+
+		public VectorLayerProperties Properties
+		{
+			get
+			{
+				return _properties;
+			}
+		}
 		private Dictionary<UnityTile, HashSet<LayerVisualizerBase>> _layerProgress;
 
 		#region AbstractFactoryOverrides
@@ -79,11 +91,24 @@
 				}
 			}
 
+			CreateLayerVisualizers();
+		}
+
+		private void CreateLayerVisualizers()
+		{
 			foreach (var sublayer in _properties.vectorSubLayers)
 			{
 				//if its of type prefabitemoptions then separate the visualizer type
 				LayerVisualizerBase visualizer = CreateInstance<VectorLayerVisualizer>();
-				sublayer.performanceOptions = _properties.performanceOptions;
+
+				// Set honorBuildingSettings - need to set here in addition to the UI. 
+				// Not setting it here can lead to wrong filtering. 
+
+				bool isPrimitiveTypeValidForBuidingIds = (sublayer.coreOptions.geometryType == VectorPrimitiveType.Polygon || sublayer.coreOptions.geometryType == VectorPrimitiveType.Custom);
+				bool isSourceValidForBuildingIds = (_properties.sourceType != VectorSourceType.MapboxStreets);
+
+				sublayer.honorBuildingIdSetting = isPrimitiveTypeValidForBuidingIds && isSourceValidForBuildingIds;
+				// Setup visualizer. 
 				((VectorLayerVisualizer)visualizer).SetProperties(sublayer);
 
 				visualizer.Initialize();
@@ -106,6 +131,20 @@
 		public override void SetOptions(LayerProperties options)
 		{
 			_properties = (VectorLayerProperties)options;
+
+			if (_layerBuilder != null)
+			{
+				_layerBuilder.Clear();
+				CreateLayerVisualizers();
+				foreach (var layer in _layerBuilder)
+				{
+					foreach (var item in layer.Value)
+					{
+						(item as VectorLayerVisualizer).SetProperties(null);
+						item.Initialize();
+					}
+				}
+			}
 		}
 
 		protected override void OnRegistered(UnityTile tile)
@@ -117,17 +156,24 @@
 			}
 			tile.VectorDataState = TilePropertyState.Loading;
 			_tilesWaitingResponse.Add(tile);
-			DataFetcher.FetchVector(tile.CanonicalTileId, MapId, tile, _properties.useOptimizedStyle, _properties.optimizedStyle);
+			VectorDataFetcherParameters parameters = new VectorDataFetcherParameters()
+			{
+				canonicalTileId = tile.CanonicalTileId,
+				mapid = MapId,
+				tile = tile,
+				useOptimizedStyle = _properties.useOptimizedStyle,
+				style = _properties.optimizedStyle
+			};
+			DataFetcher.FetchData(parameters);
 		}
 
 		/// <summary>
 		/// Method to be called when a tile error has occurred.
 		/// </summary>
 		/// <param name="e"><see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance/</param>
-		protected override void OnErrorOccurred(TileErrorEventArgs e)
+		protected override void OnErrorOccurred(UnityTile tile, TileErrorEventArgs e)
 		{
-			//relaying OnDataError from datafetcher using this event
-			base.OnErrorOccurred(e);
+			base.OnErrorOccurred(tile, e);
 		}
 
 		protected override void OnUnregistered(UnityTile tile)
