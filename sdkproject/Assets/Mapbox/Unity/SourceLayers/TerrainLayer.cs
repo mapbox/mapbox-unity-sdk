@@ -128,17 +128,16 @@
 			{
 				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
 			};
-
-//			_layerProperty.OnPropertyUpdated += () =>
-//			{
-//				//terrain factory uses strategy objects and they are controlled by layer
-//				//so we have to refresh that first
-//				SetStrategy();
-//				//pushing new settings to factory directly
-//				Factory.SetOptions(_layerProperty);
-//				//notifying map to reload existing tiles
-//				NotifyUpdateLayer(_elevationFactory, true);
-//			};
+			_layerProperty.PropertyHasChanged += (property, e) =>
+			{
+				//terrain factory uses strategy objects and they are controlled by layer
+				//so we have to refresh that first
+				SetStrategy();
+				//pushing new settings to factory directly
+				Factory.SetOptions(_layerProperty);
+				//notifying map to reload existing tiles
+				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
+			};
 		}
 
 		public void SetStrategy()
