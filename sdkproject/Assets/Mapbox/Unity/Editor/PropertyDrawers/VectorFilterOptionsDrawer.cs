@@ -159,7 +159,6 @@
 
 		private void DrawPropertyDropDown(SerializedProperty originalProperty, SerializedProperty filterProperty)
 		{
-			//originalProperty.serializedObject.Update();
 			var selectedLayerName = originalProperty.FindPropertyRelative("_selectedLayerName").stringValue;
 			AbstractMap mapObject = (AbstractMap)originalProperty.serializedObject.targetObject;
 			TileJsonData tileJsonData = mapObject.VectorData.LayerProperty.tileJsonData;
