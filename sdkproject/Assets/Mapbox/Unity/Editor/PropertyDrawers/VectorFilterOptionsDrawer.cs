@@ -56,11 +56,15 @@
 				EditorGUI.indentLevel++;
 				EditorGUILayout.BeginHorizontal();
 				GUILayout.Space(EditorGUI.indentLevel * 12);
+
+				EditorGUI.BeginChangeCheck();
 				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibutton"))
 				{
 					propertyFilters.arraySize++;
+				}
+				if (EditorGUI.EndChangeCheck())
+				{
 					EditorHelper.CheckForModifiedProperty(property);
-					property.serializedObject.Update();
 				}
 				EditorGUILayout.EndHorizontal();
 				EditorGUI.indentLevel--;
@@ -119,7 +123,6 @@
 				EditorHelper.CheckForModifiedProperty(originalProperty);
 			}
 
-			//EditorGUI.BeginChangeCheck();
 			switch ((LayerFilterOperationType)filterOperatorProp.enumValueIndex)
 			{
 				case LayerFilterOperationType.IsEqual:
@@ -137,16 +140,16 @@
 				default:
 					break;
 			}
-			if (EditorGUI.EndChangeCheck())
-			{
-				EditorHelper.CheckForModifiedProperty(originalProperty);
-			}
 
+			EditorGUI.BeginChangeCheck();
 			if (GUILayout.Button(new GUIContent(" X "), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
 			{
 				propertyFilters.DeleteArrayElementAtIndex(index);
+			}
+
+			if (EditorGUI.EndChangeCheck())
+			{
 				EditorHelper.CheckForModifiedProperty(originalProperty);
-				originalProperty.serializedObject.Update();
 			}
 			EditorGUILayout.EndHorizontal();
 
@@ -156,7 +159,6 @@
 
 		private void DrawPropertyDropDown(SerializedProperty originalProperty, SerializedProperty filterProperty)
 		{
-			originalProperty.serializedObject.Update();
 			var selectedLayerName = originalProperty.FindPropertyRelative("_selectedLayerName").stringValue;
 			AbstractMap mapObject = (AbstractMap)originalProperty.serializedObject.targetObject;
 			TileJsonData tileJsonData = mapObject.VectorData.LayerProperty.tileJsonData;
