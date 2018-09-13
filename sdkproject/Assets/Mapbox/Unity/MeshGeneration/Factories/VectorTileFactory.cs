@@ -135,7 +135,7 @@
 		public override void SetOptions(LayerProperties options)
 		{
 			_properties = (VectorLayerProperties)options;
-
+			_properties.PropertyHasChanged += UpdateTileFactory;
 			if (_layerBuilder != null)
 			{
 				_layerBuilder.Clear();
