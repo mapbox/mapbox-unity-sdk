@@ -9,6 +9,7 @@
 - Fix an issue where streets tileset wasn't creating buildings on tile edges
 - Fix QueryHeight method to take tile local position/rotation/scale into account
 - Fix an isse with terrain factory where it didn't respect "none" terrain option.
+- Fix a bug where a map editor script not working on Unity3d 2018.2
 
 ### v.1.4.5
 08/20/2018
