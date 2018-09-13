@@ -36,12 +36,17 @@
 
 				if (layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue == true)
 				{
+					EditorGUI.BeginChangeCheck();
 					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("buildingsWithUniqueIds"), new GUIContent
 					{
 						text = "Buildings With Unique Ids",
 						tooltip =
 							"Turn on this setting only when rendering 3D buildings from the Mapbox Streets with Building Ids tileset. Using this setting with any other polygon layers or source will result in visual artifacts. "
 					});
+					if (EditorGUI.EndChangeCheck())
+					{
+						EditorHelper.CheckForModifiedProperty(layerProperty);
+					}
 				}
 
 				var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
@@ -66,8 +71,12 @@
 							text = featurePositionProperty.enumDisplayNames[i]
 						};
 					}
-
+					EditorGUI.BeginChangeCheck();
 					featurePositionProperty.enumValueIndex = EditorGUILayout.Popup(dropDownLabel, featurePositionProperty.enumValueIndex, dropDownItems);
+					if(EditorGUI.EndChangeCheck())
+					{
+						EditorHelper.CheckForModifiedProperty(layerProperty);
+					}
 				}
 				EditorGUILayout.EndHorizontal();
 				DrawMeshModifiers(layerProperty);
