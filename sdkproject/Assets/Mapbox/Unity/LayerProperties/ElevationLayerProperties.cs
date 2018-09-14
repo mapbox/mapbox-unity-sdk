@@ -2,6 +2,7 @@
 {
 	using System;
 	using System.ComponentModel;
+	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.MeshGeneration.Factories;
 
 	[Serializable]
@@ -29,6 +30,10 @@
 		{
 			colliderOptions.addCollider = enabled;
 			colliderOptions.HasChanged = true;
+		}
+		public override bool NeedsForceUpdate()
+		{
+			return true;
 		}
 	}
 }

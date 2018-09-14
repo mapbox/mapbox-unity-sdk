@@ -1,4 +1,6 @@
-﻿namespace Mapbox.Unity.Map
+﻿using Mapbox.Unity.MeshGeneration.Data;
+
+namespace Mapbox.Unity.Map
 {
 	public abstract class MapboxDataProperty
 	{
@@ -20,6 +22,14 @@
 					OnPropertyHasChanged(null /*Pass args here */);
 				}
 			}
+		}
+		public virtual bool NeedsForceUpdate()
+		{
+			return false;
+		}
+		public virtual void UpdateProperty(UnityTile tile)
+		{
+
 		}
 	}
 }
