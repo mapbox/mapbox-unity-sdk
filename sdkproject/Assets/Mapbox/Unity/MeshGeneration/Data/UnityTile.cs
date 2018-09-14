@@ -223,6 +223,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				if(data == null)
 				{
 					_heightData = new float[256 * 256];
+					HeightDataState = TilePropertyState.None;
 					return;
 				}
 				

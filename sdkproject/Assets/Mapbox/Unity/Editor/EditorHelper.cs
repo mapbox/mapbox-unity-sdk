@@ -14,7 +14,6 @@
 	/// </summary>
 	public static class EditorHelper
 	{
-
 		public static void CheckForModifiedProperty<T>(SerializedProperty property, T targetObject)
 		{
 			MapboxDataProperty targetObjectAsDataProperty = targetObject as MapboxDataProperty;
@@ -22,6 +21,11 @@
 			{
 				targetObjectAsDataProperty.HasChanged = true;
 			}
+		}
+
+		public static void CheckForModifiedProperty(SerializedProperty property)
+		{
+			CheckForModifiedProperty(property, GetTargetObjectOfProperty(property));
 		}
 
 		public static IEnumerable<SerializedProperty> GetChildren(this SerializedProperty property)

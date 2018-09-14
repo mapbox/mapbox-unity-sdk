@@ -7,23 +7,7 @@
 	[System.Serializable]
 	public class ImageryLayerProperties : LayerProperties
 	{
-		public event Action OnPropertyUpdated = delegate { };
-
-		public void UpdateProperty()
-		{
-			if (OnPropertyUpdated != null)
-			{
-				OnPropertyUpdated();
-			}
-		}
-
-		//[TestAttribute]
 		public ImagerySourceType sourceType = ImagerySourceType.MapboxStreets;
-
-		//[StyleSearch]
-		// TODO : Do we really need a separate DS for default styles ??
-		// Style struct should be enough to hold all tile-service info?
-		//public Style CustomStyle = new Style();
 
 		public LayerSourceOptions sourceOptions = new LayerSourceOptions()
 		{

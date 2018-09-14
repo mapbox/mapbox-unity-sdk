@@ -516,11 +516,12 @@ namespace Mapbox.Unity.Map
 
 			options.placementOptions.placementStrategy.SetUpPlacement(this);
 
-			_imagery.UpdateLayer += (object sender, System.EventArgs eventArgs)=>
+			_imagery.UpdateLayer += (object sender, System.EventArgs eventArgs) =>
 			{
 				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
 				if (layerUpdateArgs != null)
 				{
+					Debug.Log("<color=red>Image</color>");
 					_mapVisualizer.UpdateTileForProperty(layerUpdateArgs.factory, layerUpdateArgs);
 					if (layerUpdateArgs.effectsVectorLayer)
 					{
@@ -537,6 +538,7 @@ namespace Mapbox.Unity.Map
 				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
 				if (layerUpdateArgs != null)
 				{
+					Debug.Log("<color=green>Terrain</color>");
 					_mapVisualizer.UpdateTileForProperty(layerUpdateArgs.factory, layerUpdateArgs);
 					if (layerUpdateArgs.effectsVectorLayer)
 					{
@@ -551,8 +553,9 @@ namespace Mapbox.Unity.Map
 			_vectorData.UpdateLayer += (object sender, System.EventArgs eventArgs) =>
 			{
 				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
-				if(layerUpdateArgs != null)
+				if (layerUpdateArgs != null)
 				{
+					Debug.Log("_vectorData.UpdateLayer");
 					_mapVisualizer.UnregisterTilesFrom(layerUpdateArgs.factory);
 					VectorData.UpdateFactorySettings();
 					_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
@@ -586,7 +589,7 @@ namespace Mapbox.Unity.Map
 			_options.locationOptions.latitudeLongitude = String.Format(CultureInfo.InvariantCulture, "{0},{1}", latLon.x, latLon.y);
 			_options.locationOptions.zoom = zoom;
 
-			
+
 
 			SetUpMap();
 		}
@@ -758,7 +761,7 @@ namespace Mapbox.Unity.Map
 					{
 						// Calculate height in the local space of the tile gameObject.
 						// Height is aligned with the y axis in local space.
-						// This also helps us avoid scale values when setting the height. 
+						// This also helps us avoid scale values when setting the height.
 						var localPos = tile.gameObject.transform.InverseTransformPoint(worldPos);
 						localPos.y = height;
 						worldPos = tile.gameObject.transform.TransformPoint(localPos);
@@ -768,7 +771,7 @@ namespace Mapbox.Unity.Map
 
 			return worldPos;
 		}
-		
+
 		/// <summary>
 		/// Converts a position in map space into a laitude longitude.
 		/// </summary>
@@ -870,7 +873,7 @@ namespace Mapbox.Unity.Map
 		/// Places the prefab for supplied categories.
 		/// </summary>
 		/// <param name="prefab">GameObject Prefab</param>
-		/// <param name="categories"><see cref="LocationPrefabCategories"/> For more than one category separate them by pipe 
+		/// <param name="categories"><see cref="LocationPrefabCategories"/> For more than one category separate them by pipe
 		/// (eg: LocationPrefabCategories.Food | LocationPrefabCategories.Nightlife)</param>
 		/// <param name="density">Density controls the number of POIs on the map.(Integer value between 1 and 30)</param>
 		/// <param name="locationItemName">Name of this location prefab item for future reference</param>

@@ -6,7 +6,7 @@
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies;
 
-	// Layer Concrete Implementation. 
+	// Layer Concrete Implementation.
 	[Serializable]
 	public class TerrainLayer : AbstractLayer, ITerrainLayer
 	{
@@ -60,6 +60,7 @@
 			{
 				_layerProperty.sourceType = terrainSource;
 				_layerProperty.sourceOptions.layerSource = MapboxDefaultElevation.GetParameters(terrainSource);
+				_layerProperty.HasChanged = true;
 			}
 			else
 			{
@@ -80,6 +81,7 @@
 				_layerProperty.elevationLayerType = ElevationLayerType.FlatTerrain;
 				Debug.LogWarning("Empty source - turning off terrain. ");
 			}
+			_layerProperty.HasChanged = true;
 		}
 
 		public void SetTerrainOptions(ElevationLayerType type, ElevationRequiredOptions requiredOptions = null, ElevationModificationOptions modificationOptions = null)
@@ -95,6 +97,7 @@
 			{
 				_layerProperty.modificationOptions = modificationOptions;
 			}
+			_layerProperty.HasChanged = true;
 		}
 
 		public void ShowSideWalls(float wallHeight, Material wallMaterial)
@@ -102,12 +105,14 @@
 			_layerProperty.sideWallOptions.isActive = true;
 			_layerProperty.sideWallOptions.wallHeight = wallHeight;
 			_layerProperty.sideWallOptions.wallMaterial = wallMaterial;
+			_layerProperty.HasChanged = true;
 		}
 
 		public void AddToUnityLayer(int layerId)
 		{
 			_layerProperty.unityLayerOptions.addToLayer = true;
 			_layerProperty.unityLayerOptions.layerId = layerId;
+			_layerProperty.HasChanged = true;
 		}
 
 		public void Initialize(LayerProperties properties)
@@ -120,9 +125,7 @@
 		public void Initialize()
 		{
 			_elevationFactory = ScriptableObject.CreateInstance<TerrainFactoryBase>();
-			SetStrategy();
-
-			_elevationFactory.SetOptions(_layerProperty);
+			SetFactoryOptions();
 
 			_layerProperty.colliderOptions.PropertyHasChanged += (property, e) =>
 			{
@@ -132,15 +135,30 @@
 			{
 				//terrain factory uses strategy objects and they are controlled by layer
 				//so we have to refresh that first
-				SetStrategy();
 				//pushing new settings to factory directly
-				Factory.SetOptions(_layerProperty);
+				Debug.Log("here");
+				SetFactoryOptions();
 				//notifying map to reload existing tiles
 				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
 			};
 		}
+		// public void RedrawLayer(object sender, System.EventArgs e)
+		// {
+		// 	SetFactoryOptions();
+		// 	//notifying map to reload existing tiles
+		// 	NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
+		// }
 
-		public void SetStrategy()
+		private void SetFactoryOptions()
+		{
+			//terrain factory uses strategy objects and they are controlled by layer
+			//so we have to refresh that first
+			SetStrategy();
+			//pushing new settings to factory directly
+			Factory.SetOptions(_layerProperty);
+		}
+
+		private void SetStrategy()
 		{
 			switch (_layerProperty.elevationLayerType)
 			{
