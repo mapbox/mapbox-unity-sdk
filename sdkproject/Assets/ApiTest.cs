@@ -21,6 +21,22 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("DisableColliders")]
 	public void DisableColliders()
 	{
-		_abstractMap.Terrain.LayerProperty.SetCollider(true);
+		_abstractMap.Terrain.LayerProperty.SetCollider(false);
 	}
+
+
+	[ContextMenu("DisableLayer")]
+	public void DisableLayer()
+	{
+		var layer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("ExtrudedBuildings");
+		if (layer != null)
+		{
+			layer.SetActive(false);
+		}
+		else
+		{
+			Debug.Log("Layer not found");
+		}
+	}
+
 }

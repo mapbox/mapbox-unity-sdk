@@ -87,7 +87,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			OnUnregistered(tile);
 		}
 
-		public virtual void UpdateTileProperty(UnityTile tileBundleValue, LayerUpdateArgs updateArgs)
+		public virtual void UpdateTileProperty(UnityTile tile, LayerUpdateArgs updateArgs)
 		{
 
 		}

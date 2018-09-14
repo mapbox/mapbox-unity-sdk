@@ -64,7 +64,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				tile.SetHeightData(null);
 				return;
 			}
-			
+
 			if (Strategy is IElevationBasedTerrainStrategy)
 			{
 				tile.HeightDataState = TilePropertyState.Loading;
@@ -101,21 +101,28 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		public override void UpdateTileProperty(UnityTile tile, LayerUpdateArgs updateArgs)
 		{
-			if (updateArgs.property is TerrainColliderOptions)
+			updateArgs.property.UpdateProperty(tile);
+
+			if (updateArgs.property.NeedsForceUpdate())
 			{
-				var existingCollider = tile.Collider;
-				if (Properties.colliderOptions.addCollider)
-				{
-					if (existingCollider == null)
-					{
-						tile.gameObject.AddComponent<MeshCollider>();
-					}
-				}
-				else
-				{
-					Destroy(tile.Collider);
-				}
+				Register(tile);
 			}
+
+			//if (updateArgs.property is TerrainColliderOptions)
+			//{
+			//	var existingCollider = tileBundleValue.Collider;
+			//	if (Properties.colliderOptions.addCollider)
+			//	{
+			//		if (existingCollider == null)
+			//		{
+			//			tileBundleValue.gameObject.AddComponent<MeshCollider>();
+			//		}
+			//	}
+			//	else
+			//	{
+			//		Destroy(tileBundleValue.Collider);
+			//	}
+			//}
 		}
 
 		#endregion

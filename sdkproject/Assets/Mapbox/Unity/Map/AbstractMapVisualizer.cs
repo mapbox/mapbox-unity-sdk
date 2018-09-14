@@ -285,7 +285,7 @@ namespace Mapbox.Unity.Map
 				handler(this, e);
 			}
 		}
-		
+
 		public void UnregisterTilesFrom(AbstractTileFactory factory)
 		{
 			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
@@ -304,8 +304,6 @@ namespace Mapbox.Unity.Map
 
 		public void UpdateTileForProperty(AbstractTileFactory factory, LayerUpdateArgs updateArgs)
 		{
-
-
 			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
 			{
 				factory.UpdateTileProperty(tileBundle.Value, updateArgs);
