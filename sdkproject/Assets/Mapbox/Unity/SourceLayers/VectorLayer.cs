@@ -140,6 +140,12 @@
 			Initialize();
 		}
 
+
+		private void RedrawVectorLayer(object sender, System.EventArgs e)
+		{
+			NotifyUpdateLayer(_vectorTileFactory, true);
+		}
+
 		public void Initialize()
 		{
 			_vectorTileFactory = ScriptableObject.CreateInstance<VectorTileFactory>();
@@ -151,6 +157,7 @@
 				//notifying map to reload existing tiles
 				NotifyUpdateLayer(_vectorTileFactory, null, true);
 			};
+			_vectorTileFactory.TileFactoryHasChanged += RedrawVectorLayer;
 		}
 
 		public void UpdateFactorySettings()

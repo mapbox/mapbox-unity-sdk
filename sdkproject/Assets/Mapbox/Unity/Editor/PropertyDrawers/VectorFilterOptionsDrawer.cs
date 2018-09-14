@@ -56,9 +56,15 @@
 				EditorGUI.indentLevel++;
 				EditorGUILayout.BeginHorizontal();
 				GUILayout.Space(EditorGUI.indentLevel * 12);
+
+				EditorGUI.BeginChangeCheck();
 				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibutton"))
 				{
 					propertyFilters.arraySize++;
+				}
+				if (EditorGUI.EndChangeCheck())
+				{
+					EditorHelper.CheckForModifiedProperty(property);
 				}
 				EditorGUILayout.EndHorizontal();
 				EditorGUI.indentLevel--;
@@ -109,7 +115,13 @@
 			var selectedLayerName = originalProperty.FindPropertyRelative("_selectedLayerName").stringValue;
 
 			DrawPropertyDropDown(originalProperty, property);
+
+			EditorGUI.BeginChangeCheck();
 			filterOperatorProp.enumValueIndex = EditorGUILayout.Popup(filterOperatorProp.enumValueIndex, filterOperatorProp.enumDisplayNames, GUILayout.MaxWidth(150));
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(originalProperty);
+			}
 
 			switch ((LayerFilterOperationType)filterOperatorProp.enumValueIndex)
 			{
@@ -128,9 +140,16 @@
 				default:
 					break;
 			}
+
+			EditorGUI.BeginChangeCheck();
 			if (GUILayout.Button(new GUIContent(" X "), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
 			{
 				propertyFilters.DeleteArrayElementAtIndex(index);
+			}
+
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(originalProperty);
 			}
 			EditorGUILayout.EndHorizontal();
 
@@ -216,8 +235,12 @@
 				descriptionString = "Unavailable in Selected Layer.";
 
 			}
-
+			EditorGUI.BeginChangeCheck();
 			filterProperty.FindPropertyRelative("Key").stringValue = parsedString;
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(originalProperty);
+			}
 			filterProperty.FindPropertyRelative("KeyDescription").stringValue = descriptionString;
 		}
 

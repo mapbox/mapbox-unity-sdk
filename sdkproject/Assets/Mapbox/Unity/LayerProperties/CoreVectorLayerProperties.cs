@@ -28,7 +28,7 @@
 	}
 
 	[Serializable]
-	public class VectorFilterOptions
+	public class VectorFilterOptions : MapboxDataProperty
 	{
 		[SerializeField]
 		private string _selectedLayerName;

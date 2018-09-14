@@ -81,7 +81,6 @@
 		IList<int> selectedLayers = new List<int>();
 		public void DrawUI(SerializedProperty property)
 		{
-			VectorLayerProperties vectorLayerProperties = (VectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property);
 
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 			var serializedMapObject = property.serializedObject;
@@ -206,6 +205,12 @@
 				layerTreeView.Reload();
 				layerTreeView.OnGUI(layersRect);
 
+				if(layerTreeView.hasChanged)
+				{
+					EditorHelper.CheckForModifiedProperty(property);
+					layerTreeView.hasChanged = false;
+				}
+
 				selectedLayers = layerTreeView.GetSelection();
 
 				//if there are selected elements, set the selection index at the first element.
@@ -263,10 +268,8 @@
 					layerTreeView.SetSelection(selectedLayers);
 					subLayerProperties = null; // setting this to null so that the if block is not called again
 
-					if(vectorLayerProperties != null)
-					{
-						vectorLayerProperties.HasChanged = true;
-					}
+					EditorHelper.CheckForModifiedProperty(property);
+
 				}
 
 				if (GUILayout.Button(new GUIContent("Remove Selected"), (GUIStyle)"minibuttonright"))
@@ -286,9 +289,9 @@
 					selectedLayers = new int[0];
 					layerTreeView.SetSelection(selectedLayers);
 
-					if(layerWasRemoved && vectorLayerProperties != null)
+					if(layerWasRemoved)
 					{
-						vectorLayerProperties.HasChanged = true;
+						EditorHelper.CheckForModifiedProperty(property);
 					}
 				}
 
@@ -614,7 +617,16 @@
 			}
 
 			//draw the layer selection popup
+			EditorGUI.BeginChangeCheck();
 			_layerIndex = EditorGUILayout.Popup(layerNameLabel, _layerIndex, _layerTypeContent);
+			if(EditorGUI.EndChangeCheck())
+			{
+				MapboxDataProperty mapboxDataProperty = (MapboxDataProperty)EditorHelper.GetTargetObjectOfProperty(property);
+				if(mapboxDataProperty != null)
+				{
+					mapboxDataProperty.HasChanged = true;
+				}
+			}
 			var parsedString = layerDisplayNames.ToArray()[_layerIndex].Split(new string[] { tileJsonData.commonLayersKey }, System.StringSplitOptions.None)[0].Trim();
 			property.FindPropertyRelative("layerName").stringValue = parsedString;
 		}

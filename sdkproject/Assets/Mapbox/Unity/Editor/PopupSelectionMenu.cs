@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using Mapbox.Unity;
+using Mapbox.Unity.Map;
 
 namespace Mapbox.Editor
 {
@@ -21,6 +22,8 @@ namespace Mapbox.Editor
 		private List<Type> _modTypes;
 
 		private SerializedProperty _finalize;
+
+		private SerializedProperty _container;
 
 		private int _index = -1;
 
@@ -157,6 +160,11 @@ namespace Mapbox.Editor
 					_finalize.serializedObject.ApplyModifiedProperties();
 				}
 			}
+			MapboxDataProperty mapboxDataProperty = (MapboxDataProperty)EditorHelper.GetTargetObjectOfProperty(_container);
+			if(mapboxDataProperty != null)
+			{
+				mapboxDataProperty.HasChanged = true;
+			}
 		}
 
 		/// <summary>
@@ -166,10 +174,11 @@ namespace Mapbox.Editor
 		/// <param name="p">P.</param>
 		/// <param name="index">Index.</param>
 		/// <param name="act">Act.</param>
-		public PopupSelectionMenu(Type t, SerializedProperty p, int index = -1, Action<UnityEngine.Object> act = null)
+		public PopupSelectionMenu(Type t, SerializedProperty p, SerializedProperty containerProperty, int index = -1, Action<UnityEngine.Object> act = null)
 		{
 			_type = t;
 			_finalize = p;
+			_container = containerProperty;
 			_act = act;
 			if (index > -1)
 			{

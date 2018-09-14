@@ -93,6 +93,8 @@
 
 			CreateLayerVisualizers();
 		}
+	
+
 
 		private void CreateLayerVisualizers()
 		{
@@ -100,6 +102,8 @@
 			{
 				//if its of type prefabitemoptions then separate the visualizer type
 				LayerVisualizerBase visualizer = CreateInstance<VectorLayerVisualizer>();
+
+				visualizer.LayerVisualizerHasChanged += UpdateTileFactory;
 
 				// Set honorBuildingSettings - need to set here in addition to the UI. 
 				// Not setting it here can lead to wrong filtering. 
@@ -131,7 +135,7 @@
 		public override void SetOptions(LayerProperties options)
 		{
 			_properties = (VectorLayerProperties)options;
-
+			_properties.PropertyHasChanged += UpdateTileFactory;
 			if (_layerBuilder != null)
 			{
 				_layerBuilder.Clear();

@@ -16,7 +16,6 @@
 		GUIContent[] colliderTypeContent;
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			ColliderOptions colliderOptions = (ColliderOptions)EditorHelper.GetTargetObjectOfProperty(property);
 			EditorGUI.BeginProperty(position, null, property);
 			var colliderTypeLabel = new GUIContent
 			{
@@ -42,8 +41,12 @@
 				isGUIContentSet = true;
 			}
 
+			EditorGUI.BeginChangeCheck();
 			colliderTypeProperty.enumValueIndex = EditorGUILayout.Popup(colliderTypeLabel, colliderTypeProperty.enumValueIndex, colliderTypeContent);
-			EditorHelper.CheckForModifiedProperty(colliderTypeProperty, colliderOptions);
+			if(EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(property);
+			}
 
 			EditorGUI.EndProperty();
 		}
