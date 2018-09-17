@@ -553,14 +553,16 @@ namespace Mapbox.Unity.Map
 			_vectorData.UpdateLayer += (object sender, System.EventArgs eventArgs) =>
 			{
 				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
-				if (layerUpdateArgs != null)
-				{
-					Debug.Log("<color=blue>Vector</color>");
-					_mapVisualizer.UnregisterTilesFrom(layerUpdateArgs.factory);
-					VectorData.UpdateFactorySettings();
-					_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
-					OnMapRedrawn();
-				}
+				_mapVisualizer.UpdateTileForProperty(layerUpdateArgs.factory, layerUpdateArgs);
+				//if (layerUpdateArgs != null)
+				//{
+				//	Debug.Log("<color=blue>Vector</color>");
+				//	_mapVisualizer.UnregisterTilesFrom(layerUpdateArgs.factory);
+				//	VectorData.UpdateFactorySettings();
+				//	_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
+				//	//OnMapRedrawn();
+				//}
+				OnMapRedrawn();
 			};
 
 			_mapVisualizer.Initialize(this, _fileSource);

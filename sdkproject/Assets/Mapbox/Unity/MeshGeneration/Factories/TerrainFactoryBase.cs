@@ -99,31 +99,31 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			Strategy.PostProcessTile(tile);
 		}
 
-		public override void UpdateTileProperty(UnityTile tile, LayerUpdateArgs updateArgs)
-		{
-			updateArgs.property.UpdateProperty(tile);
+		//public override void UpdateTileProperty(UnityTile tile, LayerUpdateArgs updateArgs)
+		//{
+		//	updateArgs.property.UpdateProperty(tile);
 
-			if (updateArgs.property.NeedsForceUpdate())
-			{
-				Register(tile);
-			}
+		//	if (updateArgs.property.NeedsForceUpdate())
+		//	{
+		//		Register(tile);
+		//	}
 
-			//if (updateArgs.property is TerrainColliderOptions)
-			//{
-			//	var existingCollider = tileBundleValue.Collider;
-			//	if (Properties.colliderOptions.addCollider)
-			//	{
-			//		if (existingCollider == null)
-			//		{
-			//			tileBundleValue.gameObject.AddComponent<MeshCollider>();
-			//		}
-			//	}
-			//	else
-			//	{
-			//		Destroy(tileBundleValue.Collider);
-			//	}
-			//}
-		}
+		//	//if (updateArgs.property is TerrainColliderOptions)
+		//	//{
+		//	//	var existingCollider = tileBundleValue.Collider;
+		//	//	if (Properties.colliderOptions.addCollider)
+		//	//	{
+		//	//		if (existingCollider == null)
+		//	//		{
+		//	//			tileBundleValue.gameObject.AddComponent<MeshCollider>();
+		//	//		}
+		//	//	}
+		//	//	else
+		//	//	{
+		//	//		Destroy(tileBundleValue.Collider);
+		//	//	}
+		//	//}
+		//}
 
 		#endregion
 
