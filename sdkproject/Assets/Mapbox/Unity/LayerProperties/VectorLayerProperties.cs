@@ -58,6 +58,11 @@
 		public List<PrefabItemOptions> locationPrefabList = new List<PrefabItemOptions>();
 
 
+		public override bool NeedsForceUpdate()
+		{
+			return true;
+		}
+
 		public VectorSubLayerProperties FindFeatureLayerWithName(string featureLayerName)
 		{
 			int foundLayerIndex = -1;
