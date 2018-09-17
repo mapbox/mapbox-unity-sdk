@@ -15,10 +15,18 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 	{
 		private int maxDensity = 30; //This value is same as the density's max range value in PrefabItemOptions
 
+		public override bool Active
+		{
+			get
+			{
+				return SubLayerProperties.coreOptions.isActive;
+			}
+		}
+
 		public void SetProperties(PrefabItemOptions item)
 		{
 			SubLayerProperties = item;
-			Active = item.isActive;
+			//Active = item.isActive;
 			_performanceOptions = item.performanceOptions;
 
 

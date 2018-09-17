@@ -10,7 +10,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 	/// </summary>
 	public abstract class LayerVisualizerBase : ScriptableObject
 	{
-		public bool Active = true;
+		public abstract bool Active { get; }
 		public abstract string Key { get; set; }
 		//public event Action FeaturePreProcessEvent;
 		//public event Action FeaturePostProcessEvent;

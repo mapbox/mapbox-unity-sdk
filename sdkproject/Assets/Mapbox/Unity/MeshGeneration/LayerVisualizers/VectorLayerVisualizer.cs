@@ -143,11 +143,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			_layerProperties.colliderOptions.PropertyHasChanged += UpdateVector;
 
-			Active = _layerProperties.coreOptions.isActive;
+			//Active = _layerProperties.coreOptions.isActive;
 
 			if (_layerProperties.coreOptions.combineMeshes)
 			{
-				if(_defaultStack == null || !(_defaultStack is MergedModifierStack))
+				if (_defaultStack == null || !(_defaultStack is MergedModifierStack))
 				{
 					_defaultStack = ScriptableObject.CreateInstance<MergedModifierStack>();
 				}
@@ -157,8 +157,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				if (_defaultStack == null || !(_defaultStack is ModifierStack))
 				{
 					_defaultStack = ScriptableObject.CreateInstance<ModifierStack>();
+					((ModifierStack)_defaultStack).moveFeaturePositionTo = _layerProperties.moveFeaturePositionTo;
 				}
-				((ModifierStack)_defaultStack).moveFeaturePositionTo = _layerProperties.moveFeaturePositionTo;
 			}
 
 			_defaultStack.MeshModifiers = new List<MeshModifier>();
@@ -372,6 +372,14 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			get
 			{
 				return (_performanceOptions != null && _performanceOptions.isEnabled && _entityInCurrentCoroutine >= _performanceOptions.entityPerCoroutine);
+			}
+		}
+
+		public override bool Active
+		{
+			get
+			{
+				return _layerProperties.coreOptions.isActive;
 			}
 		}
 
