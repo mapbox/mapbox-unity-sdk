@@ -563,6 +563,13 @@ namespace Mapbox.Unity.Map
 				}
 			};
 
+			_options.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
+			{
+				Debug.Log("<color=yellow>General</color>");
+
+				//take care of redraw map business...
+			};
+				
 			_mapVisualizer.Initialize(this, _fileSource);
 			_tileProvider.Initialize(this);
 

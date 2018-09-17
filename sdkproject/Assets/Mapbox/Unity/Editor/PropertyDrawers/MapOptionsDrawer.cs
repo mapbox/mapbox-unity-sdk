@@ -9,13 +9,6 @@
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 		bool showPosition = false;
 
-		private void UpdateProperty(SerializedProperty property)
-		{
-			Debug.Log("UpdateProperty");
-			var map = (AbstractMap)property.serializedObject.targetObject;
-			map.Options.UpdateProperty();
-		}
-
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			EditorGUI.BeginProperty(position, label, property);
@@ -30,7 +23,7 @@
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("locationOptions"));
 			if (EditorGUI.EndChangeCheck())
 			{
-				UpdateProperty(property);
+				EditorHelper.CheckForModifiedProperty(property);
 			}
 			position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("locationOptions"));
 			var extentOptions = property.FindPropertyRelative("extentOptions");
@@ -44,7 +37,12 @@
 			}
 			else
 			{
+				EditorGUI.BeginChangeCheck();
 				EditorGUI.PropertyField(position, property.FindPropertyRelative("extentOptions"));
+				if (EditorGUI.EndChangeCheck())
+				{
+					EditorHelper.CheckForModifiedProperty(property);
+				}
 				position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("extentOptions"));
 			}
 
@@ -61,12 +59,8 @@
 
 				if (EditorGUI.EndChangeCheck())
 				{
-					UpdateProperty(property);
+					EditorHelper.CheckForModifiedProperty(property);
 				}
-			}
-			if (GUI.changed)
-			{
-				Debug.Log("CHANGE");
 			}
 			EditorGUI.EndProperty();
 
