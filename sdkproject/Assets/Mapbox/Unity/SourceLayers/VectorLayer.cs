@@ -143,21 +143,17 @@
 
 		private void RedrawVectorLayer(object sender, System.EventArgs e)
 		{
-			NotifyUpdateLayer(_vectorTileFactory, true);
+			//UpdateFactorySettings();
+			NotifyUpdateLayer(_vectorTileFactory, sender as MapboxDataProperty, true);
 		}
 
 		public void Initialize()
 		{
 			_vectorTileFactory = ScriptableObject.CreateInstance<VectorTileFactory>();
-			_vectorTileFactory.SetOptions(_layerProperty);
+			UpdateFactorySettings();
 
-			_layerProperty.OnPropertyUpdated += () =>
-			{
-
-				//notifying map to reload existing tiles
-				NotifyUpdateLayer(_vectorTileFactory, null, true);
-			};
-			_vectorTileFactory.TileFactoryHasChanged += RedrawVectorLayer;
+			_layerProperty.PropertyHasChanged += RedrawVectorLayer;
+			//_vectorTileFactory.TileFactoryHasChanged += RedrawVectorLayer;
 		}
 
 		public void UpdateFactorySettings()

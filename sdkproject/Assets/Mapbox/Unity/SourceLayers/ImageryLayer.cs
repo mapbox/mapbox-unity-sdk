@@ -121,7 +121,7 @@
 		public void RedrawLayer(object sender, System.EventArgs e)
 		{
 			Factory.SetOptions(_layerProperty);
-			NotifyUpdateLayer(_imageFactory, null);
+			NotifyUpdateLayer(_imageFactory, sender as MapboxDataProperty, false);
 		}
 
 		public void Remove()
