@@ -100,7 +100,7 @@
 		private void UpdateProperty(SerializedProperty property)
 		{
 			var map = (AbstractMap)property.serializedObject.targetObject;
-			map.Options.UpdateProperty();
+			map.Options.HasChanged = true;
 		}
 
 		public override void OnInspectorGUI()
