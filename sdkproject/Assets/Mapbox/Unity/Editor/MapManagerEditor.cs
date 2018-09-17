@@ -239,6 +239,7 @@
 				_isGUIContentSet = true;
 			}
 
+			EditorGUI.BeginChangeCheck();
 			sourceTypeProperty.enumValueIndex = EditorGUILayout.Popup(new GUIContent
 			{
 				text = "Data Source",
@@ -268,6 +269,11 @@
 				default:
 					isActiveProperty.boolValue = false;
 					break;
+			}
+
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(layerProperty);
 			}
 
 			if (sourceTypeValue != VectorSourceType.None)
