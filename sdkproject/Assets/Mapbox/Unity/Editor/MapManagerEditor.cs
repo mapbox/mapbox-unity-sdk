@@ -166,11 +166,12 @@
 				EditorGUILayout.HelpBox("Invalid Access Token. Please add a valid access token using the Mapbox  > Setup Menu", MessageType.Error);
 			}
 
-			EditorGUI.BeginChangeCheck();
-
 			EditorGUILayout.LabelField("Location ", GUILayout.Height(_lineHeight));
 
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("locationOptions"));
+
+			EditorGUI.BeginChangeCheck();
+
 			var extentOptions = property.FindPropertyRelative("extentOptions");
 			var extentOptionsType = extentOptions.FindPropertyRelative("extentType");
 			if ((MapExtentType)extentOptionsType.enumValueIndex == MapExtentType.Custom)
