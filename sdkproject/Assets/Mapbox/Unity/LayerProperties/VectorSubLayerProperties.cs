@@ -62,6 +62,12 @@
 			coreOptions.isActive = active;
 			coreOptions.HasChanged = true;
 		}
+
+		public void SetTexturingType(StyleTypes style)
+		{
+			materialOptions.style = style;
+			materialOptions.HasChanged = true;
+		}
 	}
 
 }
