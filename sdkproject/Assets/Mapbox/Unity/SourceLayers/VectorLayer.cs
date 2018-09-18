@@ -140,7 +140,6 @@
 			Initialize();
 		}
 
-
 		private void RedrawVectorLayer(object sender, System.EventArgs e)
 		{
 			//UpdateFactorySettings();
@@ -153,7 +152,11 @@
 			UpdateFactorySettings();
 
 			_layerProperty.PropertyHasChanged += RedrawVectorLayer;
-			//_vectorTileFactory.TileFactoryHasChanged += RedrawVectorLayer;
+			_vectorTileFactory.TileFactoryHasChanged += (sender, args) =>
+			{
+				Debug.Log("VectorLayer Delegate");
+				NotifyUpdateLayer(args as LayerUpdateArgs);
+			};
 		}
 
 		public void UpdateFactorySettings()

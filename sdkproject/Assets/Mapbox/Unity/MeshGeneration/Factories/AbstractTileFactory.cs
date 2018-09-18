@@ -115,15 +115,16 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		//public event EventHandler TileFactoryHasChanged;
-		//protected void UpdateTileFactory(object sender, System.EventArgs e)
-		//{
-		//	System.EventHandler handler = TileFactoryHasChanged;
-		//	if (handler != null)
-		//	{
-		//		handler(this, e);
-		//	}
-		//}
+		public event EventHandler TileFactoryHasChanged;
+		protected virtual void UpdateTileFactory(object sender, System.EventArgs args)
+		{
+			Debug.Log("TileFactoryHasChanged Delegate ");
+			System.EventHandler handler = TileFactoryHasChanged;
+			if (handler != null)
+			{
+				handler(this, args);
+			}
+		}
 		#endregion
 	}
 }

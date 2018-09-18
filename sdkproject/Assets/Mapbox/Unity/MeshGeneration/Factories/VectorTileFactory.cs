@@ -102,7 +102,7 @@
 				LayerVisualizerBase visualizer = CreateInstance<VectorLayerVisualizer>();
 
 				//TODO : FIX THIS !!
-				//visualizer.LayerVisualizerHasChanged += UpdateTileFactory;
+				visualizer.LayerVisualizerHasChanged += UpdateTileFactory;
 
 				// Set honorBuildingSettings - need to set here in addition to the UI. 
 				// Not setting it here can lead to wrong filtering. 
@@ -137,15 +137,16 @@
 			if (_layerBuilder != null)
 			{
 				_layerBuilder.Clear();
-				CreateLayerVisualizers();
-				foreach (var layer in _layerBuilder)
-				{
-					foreach (var item in layer.Value)
-					{
-						(item as VectorLayerVisualizer).SetProperties(null);
-						item.Initialize();
-					}
-				}
+				// TODO : IS THIS CODE REALLY REQUIRED?
+				//CreateLayerVisualizers();
+				//foreach (var layer in _layerBuilder)
+				//{
+				//	foreach (var item in layer.Value)
+				//	{
+				//		(item as VectorLayerVisualizer).SetProperties(null);
+				//		item.Initialize();
+				//	}
+				//}
 			}
 		}
 
@@ -168,6 +169,15 @@
 			};
 			DataFetcher.FetchData(parameters);
 		}
+
+		protected override void UpdateTileFactory(object sender, EventArgs args)
+		{
+			Debug.Log("TileFactoryHasChanged Override ");
+			VectorLayerUpdateArgs layerUpdateArgs = args as VectorLayerUpdateArgs;
+			layerUpdateArgs.factory = this;
+			base.UpdateTileFactory(sender, layerUpdateArgs);
+		}
+
 
 		public override void UpdateTileProperty(UnityTile tile, LayerUpdateArgs updateArgs)
 		{
@@ -205,6 +215,32 @@
 				foreach (var layer in _layerBuilder.Values)
 				{
 					foreach (var visualizer in layer)
+					{
+						visualizer.UnregisterTile(tile);
+					}
+				}
+			}
+		}
+		public void RedrawSubLayer(UnityTile tile, LayerVisualizerBase visualizer)
+		{
+			CreateFeatureWithBuilder(tile, visualizer.SubLayerProperties.coreOptions.layerName, visualizer);
+		}
+		public void UnregisterLayer(UnityTile tile, LayerVisualizerBase visualizer)
+		{
+			if (_layerProgress.ContainsKey(tile))
+			{
+				_layerProgress.Remove(tile);
+			}
+			if (_tilesWaitingProcessing.Contains(tile))
+			{
+				_tilesWaitingProcessing.Remove(tile);
+			}
+
+			if (visualizer != null)
+			{
+				//foreach (var layer in _layerBuilder.Values)
+				{
+					//foreach (var visualizer in layer)
 					{
 						visualizer.UnregisterTile(tile);
 					}
@@ -282,22 +318,7 @@
 				{
 					foreach (var builder in _layerBuilder[layerName])
 					{
-						if (builder.Active)
-						{
-							if (_layerProgress.ContainsKey(tile))
-							{
-								_layerProgress[tile].Add(builder);
-							}
-							else
-							{
-								_layerProgress.Add(tile, new HashSet<LayerVisualizerBase> { builder });
-								if (!_tilesWaitingProcessing.Contains(tile))
-								{
-									_tilesWaitingProcessing.Add(tile);
-								}
-							}
-							builder.Create(tile.VectorData.Data.GetLayer(layerName), tile, DecreaseProgressCounter);
-						}
+						CreateFeatureWithBuilder(tile, layerName, builder);
 					}
 				}
 			}
@@ -308,29 +329,58 @@
 			{
 				foreach (var builder in _layerBuilder[emptyLayer])
 				{
-					if (builder.Active)
-					{
-						if (_layerProgress.ContainsKey(tile))
-						{
-							_layerProgress[tile].Add(builder);
-						}
-						else
-						{
-							_layerProgress.Add(tile, new HashSet<LayerVisualizerBase> { builder });
-							if (!_tilesWaitingProcessing.Contains(tile))
-							{
-								_tilesWaitingProcessing.Add(tile);
-							}
-						}
-						//just pass the first available layer - we should create a static null layer for this
-						builder.Create(tile.VectorData.Data.GetLayer(tile.VectorData.Data.LayerNames()[0]), tile, DecreaseProgressCounter);
-					}
+					CreateFeatureWithBuilder(tile, emptyLayer, builder);
+					//if (builder.Active)
+					//{
+					//	if (_layerProgress.ContainsKey(tile))
+					//	{
+					//		_layerProgress[tile].Add(builder);
+					//	}
+					//	else
+					//	{
+					//		_layerProgress.Add(tile, new HashSet<LayerVisualizerBase> { builder });
+					//		if (!_tilesWaitingProcessing.Contains(tile))
+					//		{
+					//			_tilesWaitingProcessing.Add(tile);
+					//		}
+					//	}
+					//	//just pass the first available layer - we should create a static null layer for this
+					//	builder.Create(tile.VectorData.Data.GetLayer(tile.VectorData.Data.LayerNames()[0]), tile, DecreaseProgressCounter);
+					//}
 				}
 			}
 
 			if (!_layerProgress.ContainsKey(tile))
 			{
 				tile.VectorDataState = TilePropertyState.Loaded;
+			}
+		}
+
+		private void CreateFeatureWithBuilder(UnityTile tile, string layerName, LayerVisualizerBase builder)
+		{
+			if (builder.Active)
+			{
+				if (_layerProgress.ContainsKey(tile))
+				{
+					_layerProgress[tile].Add(builder);
+				}
+				else
+				{
+					_layerProgress.Add(tile, new HashSet<LayerVisualizerBase> { builder });
+					if (!_tilesWaitingProcessing.Contains(tile))
+					{
+						_tilesWaitingProcessing.Add(tile);
+					}
+				}
+				if (layerName != "")
+				{
+					builder.Create(tile.VectorData.Data.GetLayer(layerName), tile, DecreaseProgressCounter);
+				}
+				else
+				{
+					//just pass the first available layer - we should create a static null layer for this
+					builder.Create(tile.VectorData.Data.GetLayer(tile.VectorData.Data.LayerNames()[0]), tile, DecreaseProgressCounter);
+				}
 			}
 		}
 
