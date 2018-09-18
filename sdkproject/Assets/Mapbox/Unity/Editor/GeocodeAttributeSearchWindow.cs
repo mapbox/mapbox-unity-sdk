@@ -7,10 +7,12 @@
 	using Mapbox.Geocoding;
 	using Mapbox.Unity;
 	using System.Globalization;
+	using Mapbox.Unity.Map;
 
 	public class GeocodeAttributeSearchWindow : EditorWindow
 	{
 		SerializedProperty _coordinateProperty;
+		AbstractMap _abstractMap;
 
 		string _searchInput = "";
 
@@ -39,11 +41,12 @@
 
 		bool hasSetFocus = false;
 
-		public static void Open(SerializedProperty property)
+		public static void Open(SerializedProperty property, AbstractMap abstractMap = null)
 		{
 			GeocodeAttributeSearchWindow window = EditorWindow.GetWindow<GeocodeAttributeSearchWindow>(true, "Search for location");
 
 			window._coordinateProperty = property;
+			window._abstractMap = abstractMap;
 
 			Event e = Event.current;
 			Vector2 mousePos = GUIUtility.GUIToScreenPoint(e.mousePosition);
@@ -121,6 +124,10 @@
 							_coordinateProperty.serializedObject.ApplyModifiedProperties();
 							EditorUtility.SetDirty(_coordinateProperty.serializedObject.targetObject);
 
+							if (_abstractMap != null)
+							{
+								_abstractMap.Options.HasChanged = true;
+							}
 							Close();
 						}
 					}

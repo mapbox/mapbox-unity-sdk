@@ -3,6 +3,7 @@ namespace Mapbox.Editor
 	using UnityEngine;
 	using UnityEditor;
 	using Mapbox.Unity.Utilities;
+	using Mapbox.Unity.Map;
 
 	/// <summary>
 	/// Custom property drawer for geocodes <para/>
@@ -16,6 +17,8 @@ namespace Mapbox.Editor
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			AbstractMap abstractMap = (AbstractMap)property.serializedObject.targetObject;
+
 			float buttonWidth = EditorGUIUtility.singleLineHeight * 4;
 
 			Rect fieldRect = new Rect(position.x, position.y, position.width - buttonWidth, EditorGUIUtility.singleLineHeight);
@@ -25,7 +28,7 @@ namespace Mapbox.Editor
 
 			if (GUI.Button(buttonRect, searchButtonContent))
 			{
-				GeocodeAttributeSearchWindow.Open(property);
+				GeocodeAttributeSearchWindow.Open(property, abstractMap);
 			}
 		}
 	}
