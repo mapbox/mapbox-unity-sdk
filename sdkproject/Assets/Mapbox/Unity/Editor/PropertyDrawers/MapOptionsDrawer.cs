@@ -16,15 +16,8 @@
 			position.height = lineHeight;
 			EditorGUI.LabelField(position, "Location ");
 			position.y += lineHeight;
-
-			EditorGUI.BeginChangeCheck();
-
 			//EditorGUI.PropertyField(position, property.FindPropertyRelative("locationOptions"));
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("locationOptions"));
-			if (EditorGUI.EndChangeCheck())
-			{
-				EditorHelper.CheckForModifiedProperty(property);
-			}
 			position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("locationOptions"));
 			var extentOptions = property.FindPropertyRelative("extentOptions");
 			var extentOptionsType = extentOptions.FindPropertyRelative("extentType");
@@ -37,30 +30,20 @@
 			}
 			else
 			{
-				EditorGUI.BeginChangeCheck();
 				EditorGUI.PropertyField(position, property.FindPropertyRelative("extentOptions"));
-				if (EditorGUI.EndChangeCheck())
-				{
-					EditorHelper.CheckForModifiedProperty(property);
-				}
+
 				position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("extentOptions"));
 			}
 
 			showPosition = EditorGUI.Foldout(position, showPosition, "Others");
 			if (showPosition)
 			{
-				EditorGUI.BeginChangeCheck();
-
 				position.y += lineHeight;
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("placementOptions"));
 
 				position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("placementOptions"));
 				EditorGUI.PropertyField(position, property.FindPropertyRelative("scalingOptions"));
 
-				if (EditorGUI.EndChangeCheck())
-				{
-					EditorHelper.CheckForModifiedProperty(property);
-				}
 			}
 			EditorGUI.EndProperty();
 
