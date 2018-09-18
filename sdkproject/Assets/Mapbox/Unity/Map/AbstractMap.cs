@@ -521,7 +521,7 @@ namespace Mapbox.Unity.Map
 				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
 				if (layerUpdateArgs != null)
 				{
-					Debug.Log("<color=red>Image</color>");
+					Debug.Log("<color=red>Image </color>" + gameObject.name);
 					_mapVisualizer.ReregisterTilesTo(layerUpdateArgs.factory);
 					if (layerUpdateArgs.effectsVectorLayer)
 					{
@@ -538,7 +538,7 @@ namespace Mapbox.Unity.Map
 				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
 				if (layerUpdateArgs != null)
 				{
-					Debug.Log("<color=green>Terrain</color>");
+					Debug.Log("<color=green>Terrain </color>" + gameObject.name);
 					_mapVisualizer.ReregisterTilesTo(layerUpdateArgs.factory);
 					if (layerUpdateArgs.effectsVectorLayer)
 					{
@@ -555,7 +555,7 @@ namespace Mapbox.Unity.Map
 				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
 				if (layerUpdateArgs != null)
 				{
-					Debug.Log("<color=blue>Vector</color>");
+					Debug.Log("<color=blue>Vector </color>" + gameObject.name);
 					_mapVisualizer.UnregisterTilesFrom(layerUpdateArgs.factory);
 					VectorData.UpdateFactorySettings();
 					_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
@@ -565,7 +565,14 @@ namespace Mapbox.Unity.Map
 
 			_options.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
 			{
-				Debug.Log("<color=yellow>General</color>");
+				Debug.Log("<color=yellow>General </color>" + gameObject.name);
+
+				//take care of redraw map business...
+			};
+
+			_options.locationOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
+			{
+				Debug.Log("<color=yellow>General! </color>" + gameObject.name);
 
 				//take care of redraw map business...
 			};
