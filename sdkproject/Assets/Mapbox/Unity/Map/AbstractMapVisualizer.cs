@@ -11,6 +11,7 @@ namespace Mapbox.Unity.Map
 	using UnityEngine.Serialization;
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Unity.MeshGeneration.Enums;
+	using Mapbox.Unity.MeshGeneration.Interfaces;
 
 	/// <summary>
 	/// Map Visualizer
@@ -291,6 +292,16 @@ namespace Mapbox.Unity.Map
 			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
 			{
 				factory.Unregister(tileBundle.Value);
+			}
+		}
+
+		public void UnregisterTilesFromLayer(VectorTileFactory factory, LayerVisualizerBase layerVisualizer)
+		{
+			layerVisualizer.SetProperties(layerVisualizer.SubLayerProperties);
+			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
+			{
+				factory.UnregisterLayer(tileBundle.Value, layerVisualizer);
+				factory.RedrawSubLayer(tileBundle.Value, layerVisualizer);
 			}
 		}
 

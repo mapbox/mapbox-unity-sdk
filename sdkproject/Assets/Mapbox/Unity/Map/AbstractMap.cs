@@ -552,11 +552,26 @@ namespace Mapbox.Unity.Map
 
 			_vectorData.UpdateLayer += (object sender, System.EventArgs eventArgs) =>
 			{
-				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
-				_mapVisualizer.UpdateTileForProperty(layerUpdateArgs.factory, layerUpdateArgs);
+				VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
+
+				if (layerUpdateArgs.visualizer != null)
+				{
+					Debug.Log("UnregisterTiles");
+					//we got a visualizer. Update only the visualizer. 
+					// No need to unload the entire factory to apply changes.
+					_mapVisualizer.UnregisterTilesFromLayer((VectorTileFactory)layerUpdateArgs.factory, layerUpdateArgs.visualizer);
+				}
+				else
+				{
+					//We are updating a core property of vector section. 
+					//All vector features need to get unloaded and re-created. 
+					_mapVisualizer.UpdateTileForProperty(layerUpdateArgs.factory, layerUpdateArgs);
+				}
+
+
 				//if (layerUpdateArgs != null)
 				//{
-				//	Debug.Log("<color=blue>Vector</color>");
+				Debug.Log("<color=blue>Vector</color>");
 				//	_mapVisualizer.UnregisterTilesFrom(layerUpdateArgs.factory);
 				//	VectorData.UpdateFactorySettings();
 				//	_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
