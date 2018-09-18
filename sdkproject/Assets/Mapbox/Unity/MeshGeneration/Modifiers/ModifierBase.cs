@@ -4,6 +4,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using System;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.Map;
+	using Mapbox.Unity.MeshGeneration.Interfaces;
 
 	[Serializable]
 	public abstract class ModifierProperties : MapboxDataProperty
@@ -11,6 +12,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		public abstract Type ModifierType
 		{
 			get;
+		}
+		public virtual void UpdateProperty(LayerVisualizerBase layerVisualizer)
+		{
+
 		}
 	}
 
@@ -30,6 +35,23 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		public virtual void FeaturePreProcess(VectorFeatureUnity feature)
 		{
 
+		}
+
+		public virtual void UpdateModifier(object sender, System.EventArgs layerArgs)
+		{
+			SetProperties((ModifierProperties)sender);
+			NotifyUpdateLayer(new VectorLayerUpdateArgs { property = sender as MapboxDataProperty });
+		}
+
+		public event System.EventHandler ModifierHasChanged;
+		protected virtual void NotifyUpdateLayer(VectorLayerUpdateArgs layerUpdateArgs)
+		{
+			Debug.Log("ModifierHasChanged Delegate");
+			System.EventHandler handler = ModifierHasChanged;
+			if (handler != null)
+			{
+				handler(this, layerUpdateArgs);
+			}
 		}
 	}
 }

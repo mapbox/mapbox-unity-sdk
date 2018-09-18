@@ -28,7 +28,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 	public class VectorLayerVisualizer : LayerVisualizerBase
 	{
 		VectorSubLayerProperties _layerProperties;
-		public VectorSubLayerProperties SubLayerProperties
+		public override VectorSubLayerProperties SubLayerProperties
 		{
 			get
 			{
@@ -52,7 +52,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 		}
 
-		public event System.EventHandler VectorHasChanged;
+		//public event System.EventHandler VectorHasChanged;
 
 		protected LayerPerformanceOptions _performanceOptions;
 		protected Dictionary<UnityTile, List<int>> _activeCoroutines;
@@ -69,10 +69,22 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			set { _layerProperties.coreOptions.layerName = value; }
 		}
 
+		public T FindMeshModifier<T>() where T : MeshModifier
+		{
+			MeshModifier mod = _defaultStack.MeshModifiers.FirstOrDefault(x => x.GetType() == typeof(T));
+			return (T)mod;
+		}
+
+		public T FindGameObjectModifier<T>() where T : GameObjectModifier
+		{
+			GameObjectModifier mod = _defaultStack.GoModifiers.FirstOrDefault(x => x.GetType() == typeof(T));
+			return (T)mod;
+		}
+
 		public T AddOrCreateMeshModifier<T>() where T : MeshModifier
 		{
 			MeshModifier mod = _defaultStack.MeshModifiers.FirstOrDefault(x => x.GetType() == typeof(T));
-			if(mod == null)
+			if (mod == null)
 			{
 				mod = (MeshModifier)CreateInstance(typeof(T));
 				_defaultStack.MeshModifiers.Add(mod);
@@ -91,10 +103,26 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			return (T)mod;
 		}
 
-		private void UpdateMaterials()
+		private void UpdateMaterials(object sender, System.EventArgs e)
 		{
 			Debug.Log("UpdateMaterials");
 			// do something with materials...
+			VectorLayerUpdateArgs layerUpdateArgs = e as VectorLayerUpdateArgs;
+
+			layerUpdateArgs.visualizer = this;
+			layerUpdateArgs.effectsVectorLayer = true;
+			//{
+			//	effectsVectorLayer = true,
+			//	property = sender as MapboxDataProperty,
+			//	visualizer = this
+			//};
+			var styleMod = FindGameObjectModifier<MaterialModifier>();
+			if (styleMod != null)
+			{
+				_layerProperties.materialOptions.PropertyHasChanged -= styleMod.UpdateModifier;
+				styleMod.ModifierHasChanged -= UpdateMaterials;
+			}
+			OnUpdateLayerVisualizer(layerUpdateArgs);
 		}
 
 		private void UpdateColliders()
@@ -111,17 +139,25 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		private void UpdateVector(object sender, System.EventArgs e)
 		{
-			//Debug.Log("UpdateVector " + sender.ToString());
-			OnUpdateLayerVisualizer(e);
+			Debug.Log("UpdateVector " + sender.ToString());
+
+			VectorLayerUpdateArgs layerUpdateArgs = new VectorLayerUpdateArgs
+			{
+				effectsVectorLayer = true,
+				property = sender as MapboxDataProperty,
+				visualizer = this
+			};
+
+			OnUpdateLayerVisualizer(layerUpdateArgs);
 			//do something...
 		}
 
-		public void SetProperties(VectorSubLayerProperties properties)
+		public override void SetProperties(VectorSubLayerProperties properties)
 		{
-			if(_layerProperties == null && properties != null)
+			if (_layerProperties == null && properties != null)
 			{
 				_layerProperties = properties;
-				if(_performanceOptions == null && properties.performanceOptions != null)
+				if (_performanceOptions == null && properties.performanceOptions != null)
 				{
 					_performanceOptions = properties.performanceOptions;
 				}
@@ -131,17 +167,17 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			//this message is currenly displaying multiple times per layer on redraws...
 			Debug.Log("SetProperties");
 
-			_layerProperties.PropertyHasChanged += UpdateVector;
+			//_layerProperties.PropertyHasChanged += UpdateVector;
 
-			_layerProperties.coreOptions.PropertyHasChanged += UpdateVector;
+			//_layerProperties.coreOptions.PropertyHasChanged += UpdateVector;
 
-			_layerProperties.filterOptions.PropertyHasChanged += UpdateVector;
+			//_layerProperties.filterOptions.PropertyHasChanged += UpdateVector;
 
-			_layerProperties.extrusionOptions.PropertyHasChanged += UpdateVector;
+			//_layerProperties.extrusionOptions.PropertyHasChanged += UpdateVector;
 
-			_layerProperties.materialOptions.PropertyHasChanged += UpdateVector;
+			////_layerProperties.materialOptions.PropertyHasChanged += UpdateVector;
 
-			_layerProperties.colliderOptions.PropertyHasChanged += UpdateVector;
+			//_layerProperties.colliderOptions.PropertyHasChanged += UpdateVector;
 
 			//Active = _layerProperties.coreOptions.isActive;
 
@@ -160,9 +196,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					((ModifierStack)_defaultStack).moveFeaturePositionTo = _layerProperties.moveFeaturePositionTo;
 				}
 			}
-
-			_defaultStack.MeshModifiers = new List<MeshModifier>();
-			_defaultStack.GoModifiers = new List<GameObjectModifier>();
+			//if(_defaultStack.MeshModifiers )
+			//_defaultStack.MeshModifiers = new List<MeshModifier>();
+			//_defaultStack.GoModifiers = new List<GameObjectModifier>();
 
 			switch (_layerProperties.coreOptions.geometryType)
 			{
@@ -245,6 +281,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 					var styleMod = AddOrCreateGameObjectModifier<MaterialModifier>();
 					styleMod.SetProperties(geometryMaterialOptions);
+					_layerProperties.materialOptions.PropertyHasChanged += styleMod.UpdateModifier;
+					styleMod.ModifierHasChanged += UpdateMaterials;
 
 					if (geometryMaterialOptions.texturingType == UvMapType.AtlasWithColorPalette)
 					{
@@ -654,17 +692,17 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 
 			//These unregister calls seem to do nothing..
-			_layerProperties.PropertyHasChanged -= UpdateVector;
+			//_layerProperties.PropertyHasChanged -= UpdateVector;
 
-			_layerProperties.coreOptions.PropertyHasChanged -= UpdateVector;
+			//_layerProperties.coreOptions.PropertyHasChanged -= UpdateVector;
 
-			_layerProperties.filterOptions.PropertyHasChanged -= UpdateVector;
+			//_layerProperties.filterOptions.PropertyHasChanged -= UpdateVector;
 
-			_layerProperties.extrusionOptions.PropertyHasChanged -= UpdateVector;
+			//_layerProperties.extrusionOptions.PropertyHasChanged -= UpdateVector;
 
-			_layerProperties.materialOptions.PropertyHasChanged -= UpdateVector;
+			//_layerProperties.materialOptions.PropertyHasChanged -= UpdateVector;
 
-			_layerProperties.colliderOptions.PropertyHasChanged -= UpdateVector;
+			//_layerProperties.colliderOptions.PropertyHasChanged -= UpdateVector;
 
 			//tile.VectorDataState = Enums.TilePropertyState.Cancelled;
 			if (_activeCoroutines.ContainsKey(tile))
@@ -675,7 +713,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				}
 			}
 			_activeCoroutines.Remove(tile);
-			
+
 			if (_defaultStack != null)
 			{
 				_defaultStack.UnregisterTile(tile);
