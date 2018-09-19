@@ -205,7 +205,7 @@
 				layerTreeView.Reload();
 				layerTreeView.OnGUI(layersRect);
 
-				if(layerTreeView.hasChanged)
+				if (layerTreeView.hasChanged)
 				{
 					EditorHelper.CheckForModifiedProperty(property);
 					layerTreeView.hasChanged = false;
@@ -268,8 +268,10 @@
 					layerTreeView.SetSelection(selectedLayers);
 					subLayerProperties = null; // setting this to null so that the if block is not called again
 
-					EditorHelper.CheckForModifiedProperty(property);
-
+					if (EditorHelper.DidModifyProperty(property))
+					{
+						((VectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property)).OnSubLayerPropertyAdded(new VectorLayerUpdateArgs { property = EditorHelper.GetTargetObjectOfProperty(subLayer) as MapboxDataProperty });
+					}
 				}
 
 				if (GUILayout.Button(new GUIContent("Remove Selected"), (GUIStyle)"minibuttonright"))
