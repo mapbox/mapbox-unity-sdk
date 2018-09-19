@@ -65,7 +65,18 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void SetProperties(ModifierProperties properties)
 		{
-			_options = (GeometryExtrusionWithAtlasOptions) properties;
+			if (properties is GeometryExtrusionWithAtlasOptions)
+			{
+				_options = (GeometryExtrusionWithAtlasOptions)properties;
+			}
+			else if (properties is GeometryExtrusionOptions)
+			{
+				_options = ((GeometryExtrusionOptions)properties).ToGeometryExtrusionWithAtlasOptions();
+			}
+			else if (properties is UVModifierOptions)
+			{
+				_options = ((UVModifierOptions)properties).ToGeometryExtrusionWithAtlasOptions();
+			}
 		}
 
 		public override void Initialize()
@@ -75,6 +86,12 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				atlasEntity.CalculateParameters();
 			}
+		}
+
+		public override void UpdateModifier(object sender, System.EventArgs layerArgs)
+		{
+			SetProperties((ModifierProperties)sender);
+			NotifyUpdateModifier(new VectorLayerUpdateArgs { property = sender as MapboxDataProperty, modifier = this });
 		}
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)

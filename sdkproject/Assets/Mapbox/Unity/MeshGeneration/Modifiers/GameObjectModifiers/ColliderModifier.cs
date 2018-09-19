@@ -20,6 +20,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		public override void SetProperties(ModifierProperties properties)
 		{
 			_options = (ColliderOptions)properties;
+			_options.PropertyHasChanged += UpdateModifier;
 		}
 
 		public override void Initialize()

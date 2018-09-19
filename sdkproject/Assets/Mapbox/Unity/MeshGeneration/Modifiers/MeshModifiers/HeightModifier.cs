@@ -59,6 +59,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		public override void SetProperties(ModifierProperties properties)
 		{
 			_options = (GeometryExtrusionOptions)properties;
+			_options.PropertyHasChanged += UpdateModifier;
 		}
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, float scale)
