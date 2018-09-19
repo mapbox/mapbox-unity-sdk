@@ -60,4 +60,14 @@ public class ApiTest : MonoBehaviour
 		}
 	}
 
+	[ContextMenu("AddLayer")]
+	public void AddLayer()
+	{
+		VectorSubLayerProperties subLayerProperties = new VectorSubLayerProperties();
+		subLayerProperties.coreOptions.geometryType = VectorPrimitiveType.Polygon;
+		subLayerProperties.coreOptions.layerName = "building";
+
+		_abstractMap.VectorData.LayerProperty.AddVectorLayer(subLayerProperties);
+	}
+
 }
