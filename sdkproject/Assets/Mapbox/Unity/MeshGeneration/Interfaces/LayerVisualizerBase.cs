@@ -24,7 +24,10 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		{
 
 		}
+		public virtual void InitializeStack()
+		{
 
+		}
 		public virtual void SetProperties(VectorSubLayerProperties properties)
 		{
 

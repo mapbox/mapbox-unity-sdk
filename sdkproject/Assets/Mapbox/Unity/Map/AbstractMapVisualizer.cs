@@ -298,6 +298,7 @@ namespace Mapbox.Unity.Map
 		public void UnregisterTilesFromLayer(VectorTileFactory factory, LayerVisualizerBase layerVisualizer)
 		{
 			layerVisualizer.SetProperties(layerVisualizer.SubLayerProperties);
+			layerVisualizer.InitializeStack();
 			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
 			{
 				factory.UnregisterLayer(tileBundle.Value, layerVisualizer);
