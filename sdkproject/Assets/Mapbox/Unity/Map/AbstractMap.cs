@@ -550,6 +550,18 @@ namespace Mapbox.Unity.Map
 				}
 			};
 
+			_vectorData.SubLayerAdded += (object sender, EventArgs eventArgs) =>
+			{
+				VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
+
+				if (layerUpdateArgs.visualizer != null)
+				{
+					_mapVisualizer.UpdateTileForProperty(layerUpdateArgs.factory, layerUpdateArgs);
+				}
+
+				Debug.Log("<color=blue>Vector</color>");
+				OnMapRedrawn();
+			};
 			_vectorData.UpdateLayer += (object sender, System.EventArgs eventArgs) =>
 			{
 				VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
@@ -565,6 +577,9 @@ namespace Mapbox.Unity.Map
 				{
 					//We are updating a core property of vector section. 
 					//All vector features need to get unloaded and re-created. 
+					//_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
+					//VectorData.UpdateFactorySettings();
+					//_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
 					_mapVisualizer.UpdateTileForProperty(layerUpdateArgs.factory, layerUpdateArgs);
 				}
 

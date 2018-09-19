@@ -9,6 +9,12 @@
 	[Serializable]
 	public class VectorLayer : AbstractLayer, IVectorDataLayer
 	{
+		#region Events
+		public EventHandler SubLayerAdded;
+		public EventHandler SubLayerRemoved;
+		#endregion
+
+
 		[SerializeField]
 		VectorLayerProperties _layerProperty = new VectorLayerProperties();
 
@@ -93,13 +99,13 @@
 			}
 		}
 
-		public void AddVectorLayer(VectorSubLayerProperties subLayerProperties)
+		private void AddVectorLayer(object sender, EventArgs args)
 		{
-			if (_layerProperty.vectorSubLayers == null)
-			{
-				_layerProperty.vectorSubLayers = new List<VectorSubLayerProperties>();
-			}
-			_layerProperty.vectorSubLayers.Add(subLayerProperties);
+			VectorLayerUpdateArgs layerUpdateArgs = args as VectorLayerUpdateArgs;
+			layerUpdateArgs.visualizer = _vectorTileFactory.AddVectorLayerVisualizer((VectorSubLayerProperties)layerUpdateArgs.property);
+			layerUpdateArgs.factory = _vectorTileFactory;
+
+			SubLayerAdded(this, layerUpdateArgs);
 		}
 
 		public void AddLocationPrefabItem(PrefabItemOptions prefabItem)
@@ -133,17 +139,10 @@
 			}
 		}
 
-
 		public void Initialize(LayerProperties properties)
 		{
 			_layerProperty = (VectorLayerProperties)properties;
 			Initialize();
-		}
-
-		private void RedrawVectorLayer(object sender, System.EventArgs e)
-		{
-			//UpdateFactorySettings();
-			NotifyUpdateLayer(_vectorTileFactory, sender as MapboxDataProperty, true);
 		}
 
 		public void Initialize()
@@ -152,6 +151,7 @@
 			UpdateFactorySettings();
 
 			_layerProperty.PropertyHasChanged += RedrawVectorLayer;
+			_layerProperty.SubLayerPropertyAdded += AddVectorLayer;
 			_vectorTileFactory.TileFactoryHasChanged += (sender, args) =>
 			{
 				Debug.Log("VectorLayer Delegate");
@@ -175,6 +175,12 @@
 		public void Update(LayerProperties properties)
 		{
 			Initialize(properties);
+		}
+
+		private void RedrawVectorLayer(object sender, System.EventArgs e)
+		{
+			UpdateFactorySettings();
+			NotifyUpdateLayer(_vectorTileFactory, sender as MapboxDataProperty, true);
 		}
 
 		public VectorTileFactory Factory

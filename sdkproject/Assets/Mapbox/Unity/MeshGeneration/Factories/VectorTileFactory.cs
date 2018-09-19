@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Unity.MeshGeneration.Factories
+namespace Mapbox.Unity.MeshGeneration.Factories
 {
 	using System.Collections.Generic;
 	using UnityEngine;
@@ -69,65 +69,81 @@
 			DataFetcher.DataRecieved += OnVectorDataRecieved;
 			DataFetcher.FetchingError += OnDataError;
 
-			foreach (var item in _properties.locationPrefabList)
-			{
-				LayerVisualizerBase visualizer = CreateInstance<LocationPrefabsLayerVisualizer>();
-				item.performanceOptions = _properties.performanceOptions;
-				((LocationPrefabsLayerVisualizer)visualizer).SetProperties((PrefabItemOptions)item);
-
-				visualizer.Initialize();
-				if (visualizer == null)
-				{
-					continue;
-				}
-
-				if (_layerBuilder.ContainsKey(visualizer.Key))
-				{
-					_layerBuilder[visualizer.Key].Add(visualizer);
-				}
-				else
-				{
-					_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase>() { visualizer });
-				}
-			}
+			CreatePOILayerVisualizers();
 
 			CreateLayerVisualizers();
+		}
+
+		private void CreatePOILayerVisualizers()
+		{
+			foreach (var item in _properties.locationPrefabList)
+			{
+				AddPOIVectorLayerVisualizer(item);
+			}
 		}
 
 		private void CreateLayerVisualizers()
 		{
 			foreach (var sublayer in _properties.vectorSubLayers)
 			{
-				//if its of type prefabitemoptions then separate the visualizer type
-				LayerVisualizerBase visualizer = CreateInstance<VectorLayerVisualizer>();
+				AddVectorLayerVisualizer(sublayer);
+			}
+		}
 
-				//TODO : FIX THIS !!
-				visualizer.LayerVisualizerHasChanged += UpdateTileFactory;
+		public virtual LayerVisualizerBase AddVectorLayerVisualizer(VectorSubLayerProperties subLayer)
+		{
+			//if its of type prefabitemoptions then separate the visualizer type
+			LayerVisualizerBase visualizer = CreateInstance<VectorLayerVisualizer>();
 
-				// Set honorBuildingSettings - need to set here in addition to the UI. 
-				// Not setting it here can lead to wrong filtering. 
+			//TODO : FIX THIS !!
+			visualizer.LayerVisualizerHasChanged += UpdateTileFactory;
 
-				bool isPrimitiveTypeValidForBuidingIds = (sublayer.coreOptions.geometryType == VectorPrimitiveType.Polygon || sublayer.coreOptions.geometryType == VectorPrimitiveType.Custom);
-				bool isSourceValidForBuildingIds = (_properties.sourceType != VectorSourceType.MapboxStreets);
+			// Set honorBuildingSettings - need to set here in addition to the UI. 
+			// Not setting it here can lead to wrong filtering. 
 
-				sublayer.honorBuildingIdSetting = isPrimitiveTypeValidForBuidingIds && isSourceValidForBuildingIds;
-				// Setup visualizer. 
-				((VectorLayerVisualizer)visualizer).SetProperties(sublayer);
+			bool isPrimitiveTypeValidForBuidingIds = (subLayer.coreOptions.geometryType == VectorPrimitiveType.Polygon) || (subLayer.coreOptions.geometryType == VectorPrimitiveType.Custom);
+			bool isSourceValidForBuildingIds = _properties.sourceType != VectorSourceType.MapboxStreets;
 
-				visualizer.Initialize();
-				if (visualizer == null)
-				{
-					continue;
-				}
+			subLayer.honorBuildingIdSetting = isPrimitiveTypeValidForBuidingIds && isSourceValidForBuildingIds;
+			// Setup visualizer. 
+			((VectorLayerVisualizer)visualizer).SetProperties(subLayer);
 
-				if (_layerBuilder.ContainsKey(visualizer.Key))
-				{
-					_layerBuilder[visualizer.Key].Add(visualizer);
-				}
-				else
-				{
-					_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase>() { visualizer });
-				}
+			visualizer.Initialize();
+			if (visualizer == null)
+			{
+				return visualizer;
+			}
+
+			if (_layerBuilder.ContainsKey(visualizer.Key))
+			{
+				_layerBuilder[visualizer.Key].Add(visualizer);
+			}
+			else
+			{
+				_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase> { visualizer });
+			}
+			return visualizer;
+		}
+
+		public virtual void AddPOIVectorLayerVisualizer(PrefabItemOptions poiSubLayer)
+		{
+			LayerVisualizerBase visualizer = CreateInstance<LocationPrefabsLayerVisualizer>();
+			poiSubLayer.performanceOptions = _properties.performanceOptions;
+			((LocationPrefabsLayerVisualizer)visualizer).SetProperties((PrefabItemOptions)poiSubLayer);
+
+			visualizer.Initialize();
+			if (visualizer == null)
+			{
+				return;
+			}
+
+			if (_layerBuilder.ContainsKey(visualizer.Key))
+			{
+				_layerBuilder[visualizer.Key].Add(visualizer);
+			}
+			else
+			{
+				_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase>() { visualizer });
 			}
 		}
 
@@ -186,8 +202,8 @@
 			if (updateArgs.property.NeedsForceUpdate())
 			{
 				Unregister(tile);
-				Register(tile);
 			}
+			Register(tile);
 		}
 
 		/// <summary>
