@@ -13,7 +13,7 @@ namespace Mapbox.Unity.Map
 				handler(this, e);
 			}
 		}
-		public bool HasChanged
+		public virtual bool HasChanged
 		{
 			set
 			{

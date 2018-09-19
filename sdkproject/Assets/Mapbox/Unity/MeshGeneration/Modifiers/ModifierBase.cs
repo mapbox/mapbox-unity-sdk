@@ -17,6 +17,16 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		{
 
 		}
+		public override bool HasChanged
+		{
+			set
+			{
+				if (value == true)
+				{
+					OnPropertyHasChanged(new VectorLayerUpdateArgs { property = this });
+				}
+			}
+		}
 	}
 
 	public class ModifierBase : ScriptableObject
@@ -39,14 +49,12 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public virtual void UpdateModifier(object sender, System.EventArgs layerArgs)
 		{
-			SetProperties((ModifierProperties)sender);
 			NotifyUpdateModifier(new VectorLayerUpdateArgs { property = sender as MapboxDataProperty, modifier = this });
 		}
 
 		public event System.EventHandler ModifierHasChanged;
 		protected virtual void NotifyUpdateModifier(VectorLayerUpdateArgs layerUpdateArgs)
 		{
-			Debug.Log("ModifierHasChanged Delegate");
 			System.EventHandler handler = ModifierHasChanged;
 			if (handler != null)
 			{
