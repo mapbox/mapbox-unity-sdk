@@ -54,14 +54,16 @@
 				{
 					EditorHelper.CheckForModifiedProperty(subLayerCoreOptions);
 				}
-
+				GUILayout.Space(-_lineHeight);
 				if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
 				{
+					var colliderOptionsProperty = layerProperty.FindPropertyRelative("colliderOptions");
 					EditorGUI.BeginChangeCheck();
-					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("colliderOptions"));
+					EditorGUILayout.PropertyField(colliderOptionsProperty);
 					if (EditorGUI.EndChangeCheck())
 					{
-						EditorHelper.CheckForModifiedProperty(subLayerCoreOptions);
+						Debug.Log("Collider UI changed");
+						EditorHelper.CheckForModifiedProperty(colliderOptionsProperty);
 					}
 				}
 			}
