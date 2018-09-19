@@ -572,8 +572,7 @@ namespace Mapbox.Unity.Map
 
 			_options.locationOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
 			{
-				Debug.Log("<color=yellow>General! </color>" + gameObject.name);
-
+				Debug.Log("<color=yellow>General - Lat/Lon (string field) or Zoom </color>" + gameObject.name);
 				//take care of redraw map business...
 			};
 				
