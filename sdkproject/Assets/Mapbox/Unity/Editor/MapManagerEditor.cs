@@ -170,7 +170,6 @@
 
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("locationOptions"));
 
-			EditorGUI.BeginChangeCheck();
 
 			var extentOptions = property.FindPropertyRelative("extentOptions");
 			var extentOptionsType = extentOptions.FindPropertyRelative("extentType");
@@ -185,12 +184,19 @@
 			else
 			{
 				GUILayout.Space(-_lineHeight);
+				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("extentOptions"));
+				if (EditorGUI.EndChangeCheck() && mapObject.ApplyModifiedProperties())
+				{
+					UpdateProperty(property);
+				}
 			}
+
+			EditorGUI.BeginChangeCheck();
 
 			EditorGUILayout.PropertyField(serializedObject.FindProperty("_initializeOnStart"));
 
-			if(EditorGUI.EndChangeCheck())
+			if(EditorGUI.EndChangeCheck() && mapObject.ApplyModifiedProperties())
 			{
 				UpdateProperty(property);
 			}
