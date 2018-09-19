@@ -16,7 +16,6 @@
 			position.height = lineHeight;
 			EditorGUI.LabelField(position, "Location ");
 			position.y += lineHeight;
-			//EditorGUI.PropertyField(position, property.FindPropertyRelative("locationOptions"));
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("locationOptions"));
 			position.y += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("locationOptions"));
 			var extentOptions = property.FindPropertyRelative("extentOptions");
