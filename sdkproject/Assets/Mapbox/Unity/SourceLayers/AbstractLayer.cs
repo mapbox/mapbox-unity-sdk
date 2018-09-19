@@ -2,6 +2,7 @@
 {
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Unity.MeshGeneration.Interfaces;
+	using Mapbox.Unity.MeshGeneration.Modifiers;
 
 	public class LayerUpdateArgs : System.EventArgs
 	{
@@ -13,6 +14,7 @@
 	public class VectorLayerUpdateArgs : LayerUpdateArgs
 	{
 		public LayerVisualizerBase visualizer;
+		public ModifierBase modifier;
 	}
 
 	public class AbstractLayer
@@ -31,12 +33,21 @@
 			System.EventHandler handler = UpdateLayer;
 			if (handler != null)
 			{
-				LayerUpdateArgs layerUpdateArgs = new LayerUpdateArgs()
-				{
-					factory = factory,
-					effectsVectorLayer = effectsVectorLayer,
-					property = prop
-				};
+				LayerUpdateArgs layerUpdateArgs =
+					(factory is VectorTileFactory) ?
+					new VectorLayerUpdateArgs
+					{
+						factory = factory,
+						effectsVectorLayer = effectsVectorLayer,
+						property = prop
+					}
+					:
+					new LayerUpdateArgs
+					{
+						factory = factory,
+						effectsVectorLayer = effectsVectorLayer,
+						property = prop
+					};
 				handler(this, layerUpdateArgs);
 			}
 		}
