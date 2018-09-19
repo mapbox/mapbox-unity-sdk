@@ -145,6 +145,13 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				{
 					_defaultStack = ScriptableObject.CreateInstance<MergedModifierStack>();
 				}
+				else
+				{
+					// HACK - to clean out the Modifiers. 
+					// Will this trigger GC that we could avoid ??
+					_defaultStack.MeshModifiers.Clear();
+					_defaultStack.GoModifiers.Clear();
+				}
 			}
 			else
 			{
@@ -152,6 +159,13 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				{
 					_defaultStack = ScriptableObject.CreateInstance<ModifierStack>();
 					((ModifierStack)_defaultStack).moveFeaturePositionTo = _layerProperties.moveFeaturePositionTo;
+				}
+				else
+				{
+					// HACK - to clean out the Modifiers. 
+					// Will this trigger GC that we could avoid ??
+					_defaultStack.MeshModifiers.Clear();
+					_defaultStack.GoModifiers.Clear();
 				}
 			}
 
