@@ -196,9 +196,19 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					((ModifierStack)_defaultStack).moveFeaturePositionTo = _layerProperties.moveFeaturePositionTo;
 				}
 			}
-			//if(_defaultStack.MeshModifiers )
-			//_defaultStack.MeshModifiers = new List<MeshModifier>();
-			//_defaultStack.GoModifiers = new List<GameObjectModifier>();
+
+			//Add any additional modifiers that were added.
+			if (_defaultStack.MeshModifiers == null)
+			{
+				_defaultStack.MeshModifiers = new List<MeshModifier>();
+			}
+			if (_defaultStack.GoModifiers == null)
+			{
+				_defaultStack.GoModifiers = new List<GameObjectModifier>();
+			}
+
+			// Setup material options. 
+			_layerProperties.materialOptions.SetDefaultMaterialOptions();
 
 			switch (_layerProperties.coreOptions.geometryType)
 			{

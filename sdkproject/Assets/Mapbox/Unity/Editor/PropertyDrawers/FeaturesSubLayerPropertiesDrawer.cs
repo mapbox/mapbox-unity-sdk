@@ -401,7 +401,7 @@
 			var materialOptions = subLayerProperties.materialOptions;
 			subLayerGeometryMaterialOptions.FindPropertyRelative("style").enumValueIndex = (int)materialOptions.style;
 
-			GeometryMaterialOptions geometryMaterialOptionsReference = MapboxDefaultStyles.GetDefaultAssets();
+			//GeometryMaterialOptions geometryMaterialOptionsReference = MapboxDefaultStyles.GetDefaultAssets();
 
 			var mats = subLayerGeometryMaterialOptions.FindPropertyRelative("materials");
 			mats.arraySize = 2;
@@ -424,10 +424,10 @@
 			var atlas = subLayerGeometryMaterialOptions.FindPropertyRelative("atlasInfo");
 			var palette = subLayerGeometryMaterialOptions.FindPropertyRelative("colorPalette");
 
-			topMat.objectReferenceValue = geometryMaterialOptionsReference.materials[0].Materials[0];
-			sideMat.objectReferenceValue = geometryMaterialOptionsReference.materials[1].Materials[0];
-			atlas.objectReferenceValue = geometryMaterialOptionsReference.atlasInfo;
-			palette.objectReferenceValue = geometryMaterialOptionsReference.colorPalette;
+			topMat.objectReferenceValue = materialOptions.materials[0].Materials[0];
+			sideMat.objectReferenceValue = materialOptions.materials[1].Materials[0];
+			atlas.objectReferenceValue = materialOptions.atlasInfo;
+			palette.objectReferenceValue = materialOptions.colorPalette;
 
 			subLayer.FindPropertyRelative("buildingsWithUniqueIds").boolValue = subLayerProperties.buildingsWithUniqueIds;
 			subLayer.FindPropertyRelative("moveFeaturePositionTo").enumValueIndex = (int)subLayerProperties.moveFeaturePositionTo;

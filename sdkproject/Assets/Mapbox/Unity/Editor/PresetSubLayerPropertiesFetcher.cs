@@ -107,7 +107,7 @@
 			{
 				style = style,
 			};
-
+			_properties.materialOptions.SetDefaultAssets();
 			_properties.buildingsWithUniqueIds = buildingsWithUniqueIds;
 			_properties.moveFeaturePositionTo = positionTargetType;
 			_properties.MeshModifiers = meshModifiers;
