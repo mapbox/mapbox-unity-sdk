@@ -179,7 +179,6 @@
 
 		private void RedrawVectorLayer(object sender, System.EventArgs e)
 		{
-			UpdateFactorySettings();
 			NotifyUpdateLayer(_vectorTileFactory, sender as MapboxDataProperty, true);
 		}
 

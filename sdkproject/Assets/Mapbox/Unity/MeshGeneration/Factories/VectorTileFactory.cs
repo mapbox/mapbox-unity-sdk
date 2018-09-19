@@ -254,13 +254,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			if (visualizer != null)
 			{
-				//foreach (var layer in _layerBuilder.Values)
-				{
-					//foreach (var visualizer in layer)
-					{
-						visualizer.UnregisterTile(tile);
-					}
-				}
+				visualizer.UnregisterTile(tile);
 			}
 		}
 
