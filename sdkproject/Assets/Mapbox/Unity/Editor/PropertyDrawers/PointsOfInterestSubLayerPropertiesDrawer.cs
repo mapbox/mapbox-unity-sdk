@@ -38,6 +38,12 @@ namespace Mapbox.Unity.Map
 			layerTreeView.Reload();
 			layerTreeView.OnGUI(layersRect);
 
+			if (layerTreeView.hasChanged)
+			{
+				EditorHelper.CheckForModifiedProperty(property);
+				layerTreeView.hasChanged = false;
+			}
+
 			selectedLayers = layerTreeView.GetSelection();
 			//if there are selected elements, set the selection index at the first element.
 			//if not, use the Selection index to persist the selection at the right index.
@@ -90,6 +96,8 @@ namespace Mapbox.Unity.Map
 
 				selectedLayers = new int[1] { prefabItemArray.arraySize - 1 };
 				layerTreeView.SetSelection(selectedLayers);
+
+				EditorHelper.CheckForModifiedProperty(property);
 			}
 
 			if (GUILayout.Button(new GUIContent("Remove Selected"), (GUIStyle)"minibuttonright"))
@@ -105,6 +113,7 @@ namespace Mapbox.Unity.Map
 				}
 				selectedLayers = new int[0];
 				layerTreeView.SetSelection(selectedLayers);
+				EditorHelper.CheckForModifiedProperty(property);
 			}
 
 			EditorGUILayout.EndHorizontal();
