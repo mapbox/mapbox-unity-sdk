@@ -10,7 +10,6 @@
 	[Serializable]
 	public class VectorLayerProperties : LayerProperties
 	{
-
 		#region Events
 		public event System.EventHandler SubLayerPropertyAdded;
 		public virtual void OnSubLayerPropertyAdded(System.EventArgs e)
@@ -83,6 +82,16 @@
 		public override bool NeedsForceUpdate()
 		{
 			return true;
+		}
+
+		public void RemoveFeatureLayerWithName(string featureLayerName)
+		{
+			var layerToRemove = FindFeatureLayerWithName(featureLayerName);
+			if (layerToRemove != null)
+			{
+				//vectorSubLayers.Remove(layerToRemove);
+				OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = layerToRemove });
+			}
 		}
 
 		public VectorSubLayerProperties FindFeatureLayerWithName(string featureLayerName)

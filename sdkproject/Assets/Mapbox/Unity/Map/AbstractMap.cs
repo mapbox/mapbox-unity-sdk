@@ -550,6 +550,18 @@ namespace Mapbox.Unity.Map
 				}
 			};
 
+			_vectorData.SubLayerRemoved += (object sender, EventArgs eventArgs) =>
+			{
+				VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
+
+				if (layerUpdateArgs.visualizer != null)
+				{
+					_mapVisualizer.RemoveTilesFromLayer((VectorTileFactory)layerUpdateArgs.factory, layerUpdateArgs.visualizer);
+				}
+
+				Debug.Log("<color=blue>Vector</color>");
+				OnMapRedrawn();
+			};
 			_vectorData.SubLayerAdded += (object sender, EventArgs eventArgs) =>
 			{
 				VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;

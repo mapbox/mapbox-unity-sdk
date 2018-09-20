@@ -147,6 +147,25 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
+		public virtual LayerVisualizerBase FindVectorLayerVisualizer(VectorSubLayerProperties subLayer)
+		{
+			if (_layerBuilder.ContainsKey(subLayer.Key))
+			{
+				var visualizer = _layerBuilder[subLayer.Key].Find((obj) => obj.SubLayerProperties == subLayer);
+				return visualizer;
+			}
+			return null;
+		}
+
+		public virtual void RemoveVectorLayerVisualizer(LayerVisualizerBase subLayer)
+		{
+			if (_layerBuilder.ContainsKey(subLayer.Key))
+			{
+				Properties.vectorSubLayers.Remove(subLayer.SubLayerProperties);
+				_layerBuilder[subLayer.Key].Remove(subLayer);
+			}
+		}
+
 		public override void SetOptions(LayerProperties options)
 		{
 			_properties = (VectorLayerProperties)options;
@@ -241,6 +260,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			CreateFeatureWithBuilder(tile, visualizer.SubLayerProperties.coreOptions.layerName, visualizer);
 		}
+
 		public void UnregisterLayer(UnityTile tile, LayerVisualizerBase visualizer)
 		{
 			if (_layerProgress.ContainsKey(tile))

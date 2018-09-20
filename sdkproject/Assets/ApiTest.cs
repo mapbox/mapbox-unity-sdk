@@ -70,4 +70,10 @@ public class ApiTest : MonoBehaviour
 		_abstractMap.VectorData.LayerProperty.AddVectorLayer(subLayerProperties);
 	}
 
+	[ContextMenu("RemoveLayer")]
+	public void RemoveLayer()
+	{
+		_abstractMap.VectorData.LayerProperty.RemoveFeatureLayerWithName("ExtrudedBuildings");
+	}
+
 }

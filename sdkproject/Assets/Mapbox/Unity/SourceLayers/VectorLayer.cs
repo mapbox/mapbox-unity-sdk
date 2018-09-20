@@ -108,6 +108,16 @@
 			SubLayerAdded(this, layerUpdateArgs);
 		}
 
+		private void RemoveVectorLayer(object sender, EventArgs args)
+		{
+			VectorLayerUpdateArgs layerUpdateArgs = args as VectorLayerUpdateArgs;
+
+			layerUpdateArgs.visualizer = _vectorTileFactory.FindVectorLayerVisualizer((VectorSubLayerProperties)layerUpdateArgs.property);
+			layerUpdateArgs.factory = _vectorTileFactory;
+			//_vectorTileFactory.RemoveVectorLayerVisualizer((VectorSubLayerProperties)layerUpdateArgs.property);
+
+			SubLayerRemoved(this, layerUpdateArgs);
+		}
 		public void AddLocationPrefabItem(PrefabItemOptions prefabItem)
 		{
 			//ensure that there is a list of prefabitems
@@ -152,6 +162,7 @@
 
 			_layerProperty.PropertyHasChanged += RedrawVectorLayer;
 			_layerProperty.SubLayerPropertyAdded += AddVectorLayer;
+			_layerProperty.SubLayerPropertyRemoved += RemoveVectorLayer;
 			_vectorTileFactory.TileFactoryHasChanged += (sender, args) =>
 			{
 				Debug.Log("VectorLayer Delegate");
