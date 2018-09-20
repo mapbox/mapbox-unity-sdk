@@ -167,6 +167,8 @@
 
 			var extentOptions = property.FindPropertyRelative("extentOptions");
 			var extentOptionsType = extentOptions.FindPropertyRelative("extentType");
+
+			EditorGUI.BeginChangeCheck();
 			if ((MapExtentType)extentOptionsType.enumValueIndex == MapExtentType.Custom)
 			{
 				var test = mapObject.FindProperty("_tileProvider");
@@ -178,12 +180,11 @@
 			else
 			{
 				GUILayout.Space(-_lineHeight);
-				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(extentOptions);
-				if (EditorGUI.EndChangeCheck())
-				{
-					EditorHelper.CheckForModifiedProperty(extentOptions);
-				}
+			}
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(extentOptions);
 			}
 
 			EditorGUI.BeginChangeCheck();
