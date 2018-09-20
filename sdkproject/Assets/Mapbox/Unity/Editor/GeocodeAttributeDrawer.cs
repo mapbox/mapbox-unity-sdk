@@ -17,8 +17,6 @@ namespace Mapbox.Editor
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			AbstractMap abstractMap = (AbstractMap)property.serializedObject.targetObject;
-
 			float buttonWidth = EditorGUIUtility.singleLineHeight * 4;
 
 			Rect fieldRect = new Rect(position.x, position.y, position.width - buttonWidth, EditorGUIUtility.singleLineHeight);
