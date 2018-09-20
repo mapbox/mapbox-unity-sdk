@@ -179,10 +179,10 @@
 			{
 				GUILayout.Space(-_lineHeight);
 				EditorGUI.BeginChangeCheck();
-				EditorGUILayout.PropertyField(property.FindPropertyRelative("extentOptions"));
+				EditorGUILayout.PropertyField(extentOptions);
 				if (EditorGUI.EndChangeCheck())
 				{
-					EditorHelper.CheckForModifiedProperty(property);
+					EditorHelper.CheckForModifiedProperty(extentOptions);
 				}
 			}
 
@@ -198,11 +198,27 @@
 			ShowPosition = EditorGUILayout.Foldout(ShowPosition, "Others");
 			if (ShowPosition)
 			{
+				GUILayout.Space(-_lineHeight);
+
 				EditorGUI.BeginChangeCheck();
+				var placementOptions = property.FindPropertyRelative("placementOptions");
+				EditorGUILayout.PropertyField(placementOptions);
+				if (EditorGUI.EndChangeCheck())
+				{
+					EditorHelper.CheckForModifiedProperty(placementOptions);
+				}
+
 				GUILayout.Space(-_lineHeight);
-				EditorGUILayout.PropertyField(property.FindPropertyRelative("placementOptions"));
-				GUILayout.Space(-_lineHeight);
-				EditorGUILayout.PropertyField(property.FindPropertyRelative("scalingOptions"));
+
+				EditorGUI.BeginChangeCheck();
+				var scalingOptions = property.FindPropertyRelative("scalingOptions");
+				EditorGUILayout.PropertyField(scalingOptions);
+				if (EditorGUI.EndChangeCheck())
+				{
+					EditorHelper.CheckForModifiedProperty(scalingOptions);
+				}
+
+				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("loadingTexture"));
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("tileMaterial"));
 				if (EditorGUI.EndChangeCheck())
