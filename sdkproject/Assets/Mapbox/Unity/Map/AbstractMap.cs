@@ -572,10 +572,28 @@ namespace Mapbox.Unity.Map
 
 			_options.locationOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
 			{
-				Debug.Log("<color=yellow>General - Lat/Lon (string field) or Zoom </color>" + gameObject.name);
+				Debug.Log("<color=yellow>General - Location Options </color>" + gameObject.name);
 				//take care of redraw map business...
 			};
-				
+
+			_options.extentOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
+			{
+				Debug.Log("<color=yellow>General - Extent Options </color>" + gameObject.name);
+				//take care of redraw map business...
+			};
+
+			_options.placementOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
+			{
+				Debug.Log("<color=yellow>General - Placement Options </color>" + gameObject.name);
+				//take care of redraw map business...
+			};
+
+			_options.scalingOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
+			{
+				Debug.Log("<color=yellow>General - Scaling Options </color>" + gameObject.name);
+				//take care of redraw map business...
+			};
+
 			_mapVisualizer.Initialize(this, _fileSource);
 			_tileProvider.Initialize(this);
 
