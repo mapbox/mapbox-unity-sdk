@@ -28,7 +28,7 @@ namespace Mapbox.Editor
 
 			if (GUI.Button(buttonRect, searchButtonContent))
 			{
-				GeocodeAttributeSearchWindow.Open(property, abstractMap);
+				GeocodeAttributeSearchWindow.Open(property, true);
 			}
 		}
 	}
