@@ -135,7 +135,7 @@
 			Rect buttonRect = GUILayoutUtility.GetLastRect();
 			if (GUILayout.Button(new GUIContent("Add New"), (GUIStyle)"minibuttonleft"))
 			{
-				PopupWindow.Show(buttonRect, new PopupSelectionMenu(typeof(MeshModifier), meshfac, property));
+				PopupWindow.Show(buttonRect, new PopupSelectionMenu(typeof(MeshModifier), meshfac));
 				if (Event.current.type == EventType.Repaint) buttonRect = GUILayoutUtility.GetLastRect();
 			}
 
@@ -200,7 +200,7 @@
 
 			if (GUILayout.Button(new GUIContent("Add New"), (GUIStyle)"minibuttonleft"))
 			{
-				PopupWindow.Show(buttonRect, new PopupSelectionMenu(typeof(GameObjectModifier), gofac, property));
+				PopupWindow.Show(buttonRect, new PopupSelectionMenu(typeof(GameObjectModifier), gofac));
 				if (Event.current.type == EventType.Repaint) buttonRect = GUILayoutUtility.GetLastRect();
 			}
 
