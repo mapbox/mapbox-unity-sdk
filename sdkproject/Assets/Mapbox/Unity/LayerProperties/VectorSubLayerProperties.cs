@@ -9,6 +9,13 @@
 	[Serializable]
 	public class VectorSubLayerProperties : LayerProperties
 	{
+		public virtual string Key
+		{
+			get
+			{
+				return coreOptions.layerName;
+			}
+		}
 		public CoreVectorLayerProperties coreOptions = new CoreVectorLayerProperties();
 		public VectorFilterOptions filterOptions = new VectorFilterOptions();
 		public GeometryExtrusionOptions extrusionOptions = new GeometryExtrusionOptions
