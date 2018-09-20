@@ -21,8 +21,6 @@ namespace Mapbox.Editor
 
 		private SerializedProperty _finalize;
 
-		private int _index = -1;
-
 		private Vector2 _scrollPos;
 
 		public override Vector2 GetWindowSize()
@@ -94,11 +92,11 @@ namespace Mapbox.Editor
 			var modifierInstance = ScriptableObject.CreateInstance(type);
 
 			string pathCandidate = Constants.Path.MAPBOX_USER_MODIFIERS;
-			if(!Directory.Exists(pathCandidate))
+			if (!Directory.Exists(pathCandidate))
 			{
 
 				string userFolder = Constants.Path.MAPBOX_USER;
-				if(!Directory.Exists(userFolder))
+				if (!Directory.Exists(userFolder))
 				{
 					string parentPath = System.IO.Path.Combine("Assets", "Mapbox");
 					AssetDatabase.CreateFolder(parentPath, "User");
@@ -139,15 +137,9 @@ namespace Mapbox.Editor
 		{
 			ScriptableObject asset = obj as ScriptableObject;
 
-			if (_index == -1)
-			{
-				_finalize.arraySize++;
-				_finalize.GetArrayElementAtIndex(_finalize.arraySize - 1).objectReferenceValue = asset;
-			}
-			else
-			{
-				_finalize.GetArrayElementAtIndex(_index).objectReferenceValue = asset;
-			}
+			_finalize.arraySize++;
+			_finalize.GetArrayElementAtIndex(_finalize.arraySize - 1).objectReferenceValue = asset;
+
 			MapboxDataProperty mapboxDataProperty = (MapboxDataProperty)EditorHelper.GetTargetObjectWithProperty(_finalize);
 			if (_finalize.serializedObject.ApplyModifiedProperties() && mapboxDataProperty != null)
 			{
