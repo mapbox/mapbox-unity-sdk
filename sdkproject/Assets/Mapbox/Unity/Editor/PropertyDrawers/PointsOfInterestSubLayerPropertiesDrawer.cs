@@ -156,13 +156,12 @@ namespace Mapbox.Unity.Map
 
 		void DrawLayerLocationPrefabProperties(SerializedProperty layerProperty, SerializedProperty property)
 		{
-			//EditorGUI.BeginChangeCheck();
-			Debug.Log(EditorHelper.GetTargetObjectOfProperty(layerProperty).GetType().ToString());
 			EditorGUILayout.PropertyField(layerProperty);
-			//if(EditorGUI.EndChangeCheck())
-			//{
-			//	EditorHelper.CheckForModifiedProperty(layerProperty);
-			//}
+			if (layerProperty.FindPropertyRelative("hasChanged").boolValue == true)
+			{
+				layerProperty.FindPropertyRelative("hasChanged").boolValue = false;
+				EditorHelper.CheckForModifiedProperty(property);
+			}
 		}
 	}
 }

@@ -13,6 +13,7 @@ namespace Mapbox.Editor
 
 		static float _lineHeight = EditorGUIUtility.singleLineHeight;
 		const string searchButtonContent = "Search";
+
 		private GUIContent prefabLocationsTitle = new GUIContent
 		{
 			text = "Prefab Locations",
@@ -56,7 +57,10 @@ namespace Mapbox.Editor
 			//Prefab Game Object
 			EditorGUI.indentLevel++;
 			var spawnPrefabOptions = property.FindPropertyRelative("spawnPrefabOptions");
+
+			EditorGUI.BeginChangeCheck();
 			EditorGUILayout.PropertyField(spawnPrefabOptions);
+
 			GUILayout.Space(1);
 			EditorGUI.indentLevel--;
 
@@ -103,6 +107,10 @@ namespace Mapbox.Editor
 					break;
 				default:
 					break;
+			}
+			if (EditorGUI.EndChangeCheck())
+			{
+				property.FindPropertyRelative("hasChanged").boolValue = true;
 			}
 			EditorGUI.indentLevel--;
 		}
@@ -173,10 +181,6 @@ namespace Mapbox.Editor
 		{
 			//Density slider
 			var densityProp = property.FindPropertyRelative("density");
-			if (Application.isPlaying)
-			{
-				GUI.enabled = false;
-			}
 
 			EditorGUILayout.PropertyField(densityProp, densitySlider);
 			GUI.enabled = true;
