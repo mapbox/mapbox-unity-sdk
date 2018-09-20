@@ -97,12 +97,6 @@
 		GUIContent[] _sourceTypeContent;
 		static float _lineHeight = EditorGUIUtility.singleLineHeight;
 
-		private void UpdateProperty(SerializedProperty property)
-		{
-			var map = (AbstractMap)property.serializedObject.targetObject;
-			map.Options.HasChanged = true;
-		}
-
 		public override void OnInspectorGUI()
 		{
 			objectId = serializedObject.targetObject.GetInstanceID().ToString();
@@ -186,9 +180,9 @@
 				GUILayout.Space(-_lineHeight);
 				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("extentOptions"));
-				if (EditorGUI.EndChangeCheck() && mapObject.ApplyModifiedProperties())
+				if (EditorGUI.EndChangeCheck())
 				{
-					UpdateProperty(property);
+					EditorHelper.CheckForModifiedProperty(property);
 				}
 			}
 
@@ -196,9 +190,9 @@
 
 			EditorGUILayout.PropertyField(serializedObject.FindProperty("_initializeOnStart"));
 
-			if(EditorGUI.EndChangeCheck() && mapObject.ApplyModifiedProperties())
+			if (EditorGUI.EndChangeCheck())
 			{
-				UpdateProperty(property);
+				EditorHelper.CheckForModifiedProperty(property);
 			}
 
 			ShowPosition = EditorGUILayout.Foldout(ShowPosition, "Others");
@@ -213,7 +207,7 @@
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("tileMaterial"));
 				if (EditorGUI.EndChangeCheck())
 				{
-					UpdateProperty(property);
+					EditorHelper.CheckForModifiedProperty(property);
 				}
 			}
 		}
