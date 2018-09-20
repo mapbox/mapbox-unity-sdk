@@ -136,8 +136,12 @@ namespace Mapbox.Unity.Map
 				{
 					GUI.enabled = false;
 				}
-
-				DrawLayerLocationPrefabProperties(layerProperty);
+				EditorGUI.BeginChangeCheck();
+				DrawLayerLocationPrefabProperties(layerProperty, property);
+				if (EditorGUI.EndChangeCheck())
+				{
+					EditorHelper.CheckForModifiedProperty(property);
+				}
 				if (!isLayerActive)
 				{
 					GUI.enabled = true;
@@ -150,9 +154,15 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		void DrawLayerLocationPrefabProperties(SerializedProperty layerProperty)
+		void DrawLayerLocationPrefabProperties(SerializedProperty layerProperty, SerializedProperty property)
 		{
+			//EditorGUI.BeginChangeCheck();
+			Debug.Log(EditorHelper.GetTargetObjectOfProperty(layerProperty).GetType().ToString());
 			EditorGUILayout.PropertyField(layerProperty);
+			//if(EditorGUI.EndChangeCheck())
+			//{
+			//	EditorHelper.CheckForModifiedProperty(layerProperty);
+			//}
 		}
 	}
 }
