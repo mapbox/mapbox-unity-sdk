@@ -12,7 +12,8 @@
 	public class GeocodeAttributeSearchWindow : EditorWindow
 	{
 		SerializedProperty _coordinateProperty;
-		AbstractMap _abstractMap;
+
+		private bool _updateAbstractMap;
 
 		string _searchInput = "";
 
@@ -41,12 +42,12 @@
 
 		bool hasSetFocus = false;
 
-		public static void Open(SerializedProperty property, AbstractMap abstractMap = null)
+		public static void Open(SerializedProperty property, bool updateAbstractMap = false)
 		{
 			GeocodeAttributeSearchWindow window = EditorWindow.GetWindow<GeocodeAttributeSearchWindow>(true, "Search for location");
 
 			window._coordinateProperty = property;
-			window._abstractMap = abstractMap;
+			window._updateAbstractMap = updateAbstractMap;
 
 			Event e = Event.current;
 			Vector2 mousePos = GUIUtility.GUIToScreenPoint(e.mousePosition);
@@ -124,9 +125,13 @@
 							_coordinateProperty.serializedObject.ApplyModifiedProperties();
 							EditorUtility.SetDirty(_coordinateProperty.serializedObject.targetObject);
 
-							if (_abstractMap != null)
+							if (_updateAbstractMap)
 							{
-								_abstractMap.Options.HasChanged = true;
+								AbstractMap map = (AbstractMap)_coordinateProperty.serializedObject.targetObject;
+								if(map != null)
+								{
+									map.Options.HasChanged = true;
+								}
 							}
 							Close();
 						}
