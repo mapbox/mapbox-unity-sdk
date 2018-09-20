@@ -130,7 +130,7 @@
 								AbstractMap map = (AbstractMap)_coordinateProperty.serializedObject.targetObject;
 								if(map != null)
 								{
-									map.Options.HasChanged = true;
+									map.Options.locationOptions.HasChanged = true;
 								}
 							}
 							Close();
