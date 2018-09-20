@@ -2,7 +2,7 @@
 {
 	using System;
 	[Serializable]
-	public class MapPlacementOptions
+	public class MapPlacementOptions : MapboxDataProperty
 	{
 		public MapPlacementType placementType = MapPlacementType.AtLocationCenter;
 		public bool snapMapToZero = false;

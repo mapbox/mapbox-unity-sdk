@@ -4,7 +4,7 @@
 	using UnityEngine;
 
 	[Serializable]
-	public class MapScalingOptions
+	public class MapScalingOptions : MapboxDataProperty
 	{
 		public MapScalingType scalingType = MapScalingType.Custom;
 		//public MapUnitType unitType = MapUnitType.meters;
