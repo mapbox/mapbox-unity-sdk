@@ -17,13 +17,9 @@ namespace Mapbox.Editor
 
 		private Type _type;
 
-		private Action<UnityEngine.Object> _act;
-
 		private List<Type> _modTypes;
 
 		private SerializedProperty _finalize;
-
-		private SerializedProperty _container;
 
 		private int _index = -1;
 
@@ -142,26 +138,18 @@ namespace Mapbox.Editor
 		public void AddNewInstanceToArray(object obj)
 		{
 			ScriptableObject asset = obj as ScriptableObject;
-			if (_act != null)
+
+			if (_index == -1)
 			{
-				_act(asset);
+				_finalize.arraySize++;
+				_finalize.GetArrayElementAtIndex(_finalize.arraySize - 1).objectReferenceValue = asset;
 			}
 			else
 			{
-				if (_index == -1)
-				{
-					_finalize.arraySize++;
-					_finalize.GetArrayElementAtIndex(_finalize.arraySize - 1).objectReferenceValue = asset;
-					_finalize.serializedObject.ApplyModifiedProperties();
-				}
-				else
-				{
-					_finalize.GetArrayElementAtIndex(_index).objectReferenceValue = asset;
-					_finalize.serializedObject.ApplyModifiedProperties();
-				}
+				_finalize.GetArrayElementAtIndex(_index).objectReferenceValue = asset;
 			}
-			MapboxDataProperty mapboxDataProperty = (MapboxDataProperty)EditorHelper.GetTargetObjectOfProperty(_container);
-			if(mapboxDataProperty != null)
+			MapboxDataProperty mapboxDataProperty = (MapboxDataProperty)EditorHelper.GetTargetObjectWithProperty(_finalize);
+			if (_finalize.serializedObject.ApplyModifiedProperties() && mapboxDataProperty != null)
 			{
 				mapboxDataProperty.HasChanged = true;
 			}
@@ -172,18 +160,10 @@ namespace Mapbox.Editor
 		/// </summary>
 		/// <param name="t">T.</param>
 		/// <param name="p">P.</param>
-		/// <param name="index">Index.</param>
-		/// <param name="act">Act.</param>
-		public PopupSelectionMenu(Type t, SerializedProperty p, SerializedProperty containerProperty, int index = -1, Action<UnityEngine.Object> act = null)
+		public PopupSelectionMenu(Type t, SerializedProperty p)
 		{
 			_type = t;
 			_finalize = p;
-			_container = containerProperty;
-			_act = act;
-			if (index > -1)
-			{
-				_index = index;
-			}
 		}
 	}
 }
