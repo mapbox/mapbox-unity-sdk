@@ -17,6 +17,7 @@
 			}
 		}
 		public CoreVectorLayerProperties coreOptions = new CoreVectorLayerProperties();
+		public LineGeometryOptions lineGeometryOptions = new LineGeometryOptions();
 		public VectorFilterOptions filterOptions = new VectorFilterOptions();
 		public GeometryExtrusionOptions extrusionOptions = new GeometryExtrusionOptions
 		{
@@ -25,6 +26,7 @@
 			extrusionGeometryType = ExtrusionGeometryType.RoofAndSide,
 
 		};
+
 		public ColliderOptions colliderOptions = new ColliderOptions
 		{
 			colliderType = ColliderType.None,

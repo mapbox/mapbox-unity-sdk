@@ -36,6 +36,13 @@
 				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(subLayerCoreOptions);
 
+				if (primitiveTypeProp == VectorPrimitiveType.Line)
+				{
+					GUILayout.Space(-_lineHeight);
+					var lineGeometryOptions = layerProperty.FindPropertyRelative("lineGeometryOptions");
+					EditorGUILayout.PropertyField(lineGeometryOptions);
+				}
+				
 				if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
 				{
 					GUILayout.Space(-_lineHeight);
