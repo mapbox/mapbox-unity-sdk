@@ -109,6 +109,21 @@
 			return (foundLayerIndex != -1) ? vectorSubLayers[foundLayerIndex] : null;
 		}
 
+		public PrefabItemOptions FindPoiLayerWithName(string poiLayerName)
+		{
+			int foundLayerIndex = -1;
+			// Optimize for performance.
+			for (int i = 0; i < locationPrefabList.Count; i++)
+			{
+				if (locationPrefabList[i].SubLayerNameMatchesExact(poiLayerName))
+				{
+					foundLayerIndex = i;
+					break;
+				}
+			}
+			return (foundLayerIndex != -1) ? locationPrefabList[foundLayerIndex] : null;
+		}
+
 		public void AddVectorLayer(VectorSubLayerProperties subLayerProperties)
 		{
 			if (vectorSubLayers == null)
