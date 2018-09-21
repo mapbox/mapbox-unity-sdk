@@ -44,6 +44,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_options.PropertyHasChanged += UpdateModifier;
 		}
 
+		public override void UnbindProperties()
+		{
+			_options.PropertyHasChanged -= UpdateModifier;
+		}
+
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
 			if (md.Vertices.Count == 0 || feature == null || feature.Points.Count < 1)

@@ -22,6 +22,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_options.PropertyHasChanged += UpdateModifier;
 		}
 
+		public override void UnbindProperties()
+		{
+			_options.PropertyHasChanged -= UpdateModifier;
+		}
+
 		public override void Run(VectorEntity ve, UnityTile tile)
 		{
 			var min = Math.Min(_options.materials.Length, ve.MeshFilter.mesh.subMeshCount);
