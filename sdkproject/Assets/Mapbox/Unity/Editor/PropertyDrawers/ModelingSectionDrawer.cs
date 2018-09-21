@@ -42,21 +42,31 @@
 					var extrusionOptions = layerProperty.FindPropertyRelative("extrusionOptions");
 					extrusionOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
 					EditorGUILayout.PropertyField(extrusionOptions);
+
+					EditorGUI.BeginChangeCheck();
+					var snapToTerrainProperty = subLayerCoreOptions.FindPropertyRelative("snapToTerrain");
+					snapToTerrainProperty.boolValue = EditorGUILayout.Toggle(snapToTerrainProperty.displayName, snapToTerrainProperty.boolValue);
+					if (EditorGUI.EndChangeCheck())
+					{
+						EditorHelper.CheckForModifiedProperty(subLayerCoreOptions);
+					}
 				}
 
-				EditorGUI.BeginChangeCheck();
-				var snapToTerrainProperty = subLayerCoreOptions.FindPropertyRelative("snapToTerrain");
-				snapToTerrainProperty.boolValue = EditorGUILayout.Toggle(snapToTerrainProperty.displayName, snapToTerrainProperty.boolValue);
-
-				var combineMeshesProperty = subLayerCoreOptions.FindPropertyRelative("combineMeshes");
-				combineMeshesProperty.boolValue = EditorGUILayout.Toggle(combineMeshesProperty.displayName, combineMeshesProperty.boolValue);
-				if (EditorGUI.EndChangeCheck())
+				if (primitiveTypeProp != VectorPrimitiveType.Point)
 				{
-					EditorHelper.CheckForModifiedProperty(subLayerCoreOptions);
+					EditorGUI.BeginChangeCheck();
+					var combineMeshesProperty = subLayerCoreOptions.FindPropertyRelative("combineMeshes");
+					combineMeshesProperty.boolValue = EditorGUILayout.Toggle(combineMeshesProperty.displayName, combineMeshesProperty.boolValue);
+					if (EditorGUI.EndChangeCheck())
+					{
+						EditorHelper.CheckForModifiedProperty(subLayerCoreOptions);
+					}
 				}
-				GUILayout.Space(-_lineHeight);
+
 				if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
 				{
+					GUILayout.Space(-_lineHeight);
+
 					var colliderOptionsProperty = layerProperty.FindPropertyRelative("colliderOptions");
 					EditorGUI.BeginChangeCheck();
 					EditorGUILayout.PropertyField(colliderOptionsProperty);
