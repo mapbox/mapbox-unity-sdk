@@ -47,11 +47,19 @@
 
 				for (int i = 0; i < propertyFilters.arraySize; i++)
 				{
-					DrawLayerFilter(property, propertyFilters, i);
+					if(DrawLayerFilter(property, propertyFilters, i))
+					{
+						EditorHelper.CheckForModifiedProperty(property);
+					}
 				}
 				if (propertyFilters.arraySize > 0)
 				{
+					EditorGUI.BeginChangeCheck();
 					EditorGUILayout.PropertyField(property.FindPropertyRelative("combinerType"));
+					if (EditorGUI.EndChangeCheck())
+					{
+						EditorHelper.CheckForModifiedProperty(property);
+					}
 				}
 				EditorGUI.indentLevel++;
 				EditorGUILayout.BeginHorizontal();
@@ -70,13 +78,15 @@
 				EditorGUI.indentLevel--;
 			}
 		}
+
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
 			return lineHeight;
 		}
 
-		void DrawLayerFilter(SerializedProperty originalProperty, SerializedProperty propertyFilters, int index)
+		private bool DrawLayerFilter(SerializedProperty originalProperty, SerializedProperty propertyFilters, int index)
 		{
+			bool hasChanged = false;
 			var property = propertyFilters.GetArrayElementAtIndex(index);
 			var filterOperatorProp = property.FindPropertyRelative("filterOperator");
 
@@ -110,19 +120,23 @@
 
 			EditorGUILayout.EndHorizontal();
 
-
 			EditorGUILayout.BeginHorizontal();
+
 			var selectedLayerName = originalProperty.FindPropertyRelative("_selectedLayerName").stringValue;
 
-			DrawPropertyDropDown(originalProperty, property);
+			if(DrawPropertyDropDown(originalProperty, property))
+			{
+				hasChanged = true;
+			}
 
 			EditorGUI.BeginChangeCheck();
 			filterOperatorProp.enumValueIndex = EditorGUILayout.Popup(filterOperatorProp.enumValueIndex, filterOperatorProp.enumDisplayNames, GUILayout.MaxWidth(150));
 			if (EditorGUI.EndChangeCheck())
 			{
-				EditorHelper.CheckForModifiedProperty(originalProperty);
+				hasChanged = true;
 			}
 
+			EditorGUI.BeginChangeCheck();
 			switch ((LayerFilterOperationType)filterOperatorProp.enumValueIndex)
 			{
 				case LayerFilterOperationType.IsEqual:
@@ -140,25 +154,32 @@
 				default:
 					break;
 			}
+			if (EditorGUI.EndChangeCheck())
+			{
+				hasChanged = true;
+			}
 
 			EditorGUI.BeginChangeCheck();
 			if (GUILayout.Button(new GUIContent(" X "), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
 			{
 				propertyFilters.DeleteArrayElementAtIndex(index);
 			}
-
 			if (EditorGUI.EndChangeCheck())
 			{
-				EditorHelper.CheckForModifiedProperty(originalProperty);
+				hasChanged = true;
 			}
+
 			EditorGUILayout.EndHorizontal();
 
 			EditorGUILayout.EndVertical();
 
+			return hasChanged;
 		}
 
-		private void DrawPropertyDropDown(SerializedProperty originalProperty, SerializedProperty filterProperty)
+		private bool DrawPropertyDropDown(SerializedProperty originalProperty, SerializedProperty filterProperty)
 		{
+			bool hasChanged = false;
+
 			var selectedLayerName = originalProperty.FindPropertyRelative("_selectedLayerName").stringValue;
 			AbstractMap mapObject = (AbstractMap)originalProperty.serializedObject.targetObject;
 			TileJsonData tileJsonData = mapObject.VectorData.LayerProperty.tileJsonData;
@@ -166,7 +187,7 @@
 			if (string.IsNullOrEmpty(selectedLayerName) || !tileJsonData.PropertyDisplayNames.ContainsKey(selectedLayerName))
 			{
 				DrawWarningMessage();
-				return;
+				return false;
 			}
 
 			var parsedString = "no property selected";
@@ -194,7 +215,12 @@
 				}
 
 				//display popup
+				EditorGUI.BeginChangeCheck();
 				_propertyIndex = EditorGUILayout.Popup(_propertyIndex, _propertyNameContent, GUILayout.MaxWidth(150));
+				if (EditorGUI.EndChangeCheck())
+				{
+					hasChanged = true;
+				}
 
 				//set new string values based on selection
 				parsedString = _propertyNamesList[_propertyIndex].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
@@ -228,7 +254,12 @@
 				}
 
 				//display popup
+				EditorGUI.BeginChangeCheck();
 				_propertyIndex = EditorGUILayout.Popup(_propertyIndex, _propertyNameContent, GUILayout.MaxWidth(150));
+				if (EditorGUI.EndChangeCheck())
+				{
+					hasChanged = true;
+				}
 
 				//set new string values based on the offset
 				parsedString = _propertyNamesList[_propertyIndex].Split(new string[] { tileJsonData.optionalPropertiesString }, System.StringSplitOptions.None)[0].Trim();
@@ -239,9 +270,11 @@
 			filterProperty.FindPropertyRelative("Key").stringValue = parsedString;
 			if (EditorGUI.EndChangeCheck())
 			{
-				EditorHelper.CheckForModifiedProperty(originalProperty);
+				hasChanged = true;
 			}
 			filterProperty.FindPropertyRelative("KeyDescription").stringValue = descriptionString;
+
+			return hasChanged;
 		}
 
 		private void DrawWarningMessage()
