@@ -618,6 +618,7 @@ namespace Mapbox.Unity.Map
 			{
 				Debug.Log("<color=yellow>General - Location Options </color>" + gameObject.name);
 				//take care of redraw map business...
+				UpdateMap();
 			};
 
 			_options.extentOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
@@ -696,12 +697,16 @@ namespace Mapbox.Unity.Map
 		{
 			float differenceInZoom = 0.0f;
 			bool isAtInitialZoom = false;
+			// Update map zoom, if it has changed. 
 			if (Math.Abs(Zoom - zoom) > Constants.EpsilonFloatingPoint)
 			{
 				SetZoom(zoom);
-				differenceInZoom = Zoom - InitialZoom;
-				isAtInitialZoom = (differenceInZoom - 0.0 < Constants.EpsilonFloatingPoint);
 			}
+
+			// Compute difference in zoom. Will be used to calculate correct scale of the map. 
+			differenceInZoom = Zoom - InitialZoom;
+			isAtInitialZoom = (differenceInZoom - 0.0 < Constants.EpsilonFloatingPoint);
+
 			//Update center latitude longitude
 			var centerLatitudeLongitude = latLon;
 			double xDelta = centerLatitudeLongitude.x;
@@ -713,7 +718,6 @@ namespace Mapbox.Unity.Map
 			//Set Center in Latitude Longitude and Mercator.
 			SetCenterLatitudeLongitude(new Vector2d(xDelta, zDelta));
 			Options.scalingOptions.scalingStrategy.SetUpScaling(this);
-
 			Options.placementOptions.placementStrategy.SetUpPlacement(this);
 
 			//Scale the map accordingly.
@@ -723,6 +727,7 @@ namespace Mapbox.Unity.Map
 				Root.localScale = _mapScaleFactor;
 			}
 
+			//Update Tile extent. 
 			_tileProvider.UpdateTileExtent();
 
 			if (OnUpdated != null)
