@@ -2,7 +2,7 @@
 {
 	using System;
 	[Serializable]
-	public class MapExtentOptions
+	public class MapExtentOptions : MapboxDataProperty
 	{
 		public MapExtentType extentType = MapExtentType.CameraBounds;
 

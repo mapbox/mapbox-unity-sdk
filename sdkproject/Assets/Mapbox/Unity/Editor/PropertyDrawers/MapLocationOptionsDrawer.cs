@@ -13,8 +13,19 @@
 		{
 			EditorGUI.indentLevel++;
 			GUILayout.Space(-1f * _lineHeight);
+			EditorGUI.BeginChangeCheck();
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("latitudeLongitude"));
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(property);
+			}
+
+			EditorGUI.BeginChangeCheck();
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("zoom"), GUILayout.Height(_lineHeight));
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(property);
+			}
 			EditorGUI.indentLevel--;
 		}
 	}

@@ -97,7 +97,7 @@
 		public VectorSubLayerProperties FindFeatureLayerWithName(string featureLayerName)
 		{
 			int foundLayerIndex = -1;
-			// Optimize for performance. 
+			// Optimize for performance.
 			for (int i = 0; i < vectorSubLayers.Count; i++)
 			{
 				if (vectorSubLayers[i].SubLayerNameMatchesExact(featureLayerName))

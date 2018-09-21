@@ -163,7 +163,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				}
 				else
 				{
-					// HACK - to clean out the Modifiers. 
+					// HACK - to clean out the Modifiers.
 					// Will this trigger GC that we could avoid ??
 					_defaultStack.MeshModifiers.Clear();
 					_defaultStack.GoModifiers.Clear();
@@ -178,7 +178,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				}
 				else
 				{
-					// HACK - to clean out the Modifiers. 
+					// HACK - to clean out the Modifiers.
 					// Will this trigger GC that we could avoid ??
 					_defaultStack.MeshModifiers.Clear();
 					_defaultStack.GoModifiers.Clear();
@@ -195,7 +195,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				_defaultStack.GoModifiers = new List<GameObjectModifier>();
 			}
 
-			// Setup material options. 
+			// Setup material options.
 			_layerProperties.materialOptions.SetDefaultMaterialOptions();
 
 			switch (_layerProperties.coreOptions.geometryType)
@@ -551,7 +551,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		{
 			var fe = layerProperties.vectorTileLayer.GetFeature(index);
 			List<List<Point2d<float>>> geom;
-			if (layerProperties.buildingsWithUniqueIds == true) //ids from building dataset is big ulongs 
+			if (layerProperties.buildingsWithUniqueIds == true) //ids from building dataset is big ulongs
 			{
 				geom = fe.Geometry<float>(); //and we're not clipping by passing no parameters
 
@@ -706,22 +706,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		public override void OnUnregisterTile(UnityTile tile)
 		{
 			base.OnUnregisterTile(tile);
-
-
-			//These unregister calls seem to do nothing..
-			//_layerProperties.PropertyHasChanged -= UpdateVector;
-
-			//_layerProperties.coreOptions.PropertyHasChanged -= UpdateVector;
-
-			//_layerProperties.filterOptions.PropertyHasChanged -= UpdateVector;
-
-			//_layerProperties.extrusionOptions.PropertyHasChanged -= UpdateVector;
-
-			//_layerProperties.materialOptions.PropertyHasChanged -= UpdateVector;
-
-			//_layerProperties.colliderOptions.PropertyHasChanged -= UpdateVector;
-
-			//tile.VectorDataState = Enums.TilePropertyState.Cancelled;
 			if (_activeCoroutines.ContainsKey(tile))
 			{
 				foreach (var cor in _activeCoroutines[tile])

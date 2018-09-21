@@ -3,18 +3,8 @@
 	using System;
 	using UnityEngine;
 	[Serializable]
-	public class MapOptions
+	public class MapOptions : MapboxDataProperty
 	{
-		public event Action OnPropertyUpdated = delegate { };
-
-		public void UpdateProperty()
-		{
-			if (OnPropertyUpdated != null)
-			{
-				OnPropertyUpdated();
-			}
-		}
-
 		public MapLocationOptions locationOptions = new MapLocationOptions();
 		public MapExtentOptions extentOptions = new MapExtentOptions(MapExtentType.RangeAroundCenter);
 		public MapPlacementOptions placementOptions = new MapPlacementOptions();

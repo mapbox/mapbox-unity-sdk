@@ -291,7 +291,7 @@
 					selectedLayers = new int[0];
 					layerTreeView.SetSelection(selectedLayers);
 
-					if(layerWasRemoved)
+					if (layerWasRemoved)
 					{
 						EditorHelper.CheckForModifiedProperty(property);
 					}
@@ -621,10 +621,10 @@
 			//draw the layer selection popup
 			EditorGUI.BeginChangeCheck();
 			_layerIndex = EditorGUILayout.Popup(layerNameLabel, _layerIndex, _layerTypeContent);
-			if(EditorGUI.EndChangeCheck())
+			if (EditorGUI.EndChangeCheck())
 			{
 				MapboxDataProperty mapboxDataProperty = (MapboxDataProperty)EditorHelper.GetTargetObjectOfProperty(property);
-				if(mapboxDataProperty != null)
+				if (mapboxDataProperty != null)
 				{
 					mapboxDataProperty.HasChanged = true;
 				}

@@ -581,14 +581,14 @@ namespace Mapbox.Unity.Map
 				if (layerUpdateArgs.visualizer != null)
 				{
 					Debug.Log("UnregisterTiles");
-					//we got a visualizer. Update only the visualizer. 
+					//we got a visualizer. Update only the visualizer.
 					// No need to unload the entire factory to apply changes.
 					_mapVisualizer.UnregisterTilesFromLayer((VectorTileFactory)layerUpdateArgs.factory, layerUpdateArgs.visualizer);
 				}
 				else
 				{
-					//We are updating a core property of vector section. 
-					//All vector features need to get unloaded and re-created. 
+					//We are updating a core property of vector section.
+					//All vector features need to get unloaded and re-created.
 					//_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
 					//VectorData.UpdateFactorySettings();
 					//_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
@@ -605,6 +605,37 @@ namespace Mapbox.Unity.Map
 				//	//OnMapRedrawn();
 				//}
 				OnMapRedrawn();
+			};
+
+			_options.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
+			{
+				Debug.Log("<color=yellow>General </color>" + gameObject.name);
+
+				//take care of redraw map business...
+			};
+
+			_options.locationOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
+			{
+				Debug.Log("<color=yellow>General - Location Options </color>" + gameObject.name);
+				//take care of redraw map business...
+			};
+
+			_options.extentOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
+			{
+				Debug.Log("<color=yellow>General - Extent Options </color>" + gameObject.name);
+				//take care of redraw map business...
+			};
+
+			_options.placementOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
+			{
+				Debug.Log("<color=yellow>General - Placement Options </color>" + gameObject.name);
+				//take care of redraw map business...
+			};
+
+			_options.scalingOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
+			{
+				Debug.Log("<color=yellow>General - Scaling Options </color>" + gameObject.name);
+				//take care of redraw map business...
 			};
 
 			_mapVisualizer.Initialize(this, _fileSource);
