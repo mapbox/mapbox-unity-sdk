@@ -61,6 +61,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_options = (GeometryExtrusionOptions)properties;
 			_options.PropertyHasChanged += UpdateModifier;
 		}
+		public override void UnbindProperties()
+		{
+			_options.PropertyHasChanged -= UpdateModifier;
+		}
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, float scale)
 		{

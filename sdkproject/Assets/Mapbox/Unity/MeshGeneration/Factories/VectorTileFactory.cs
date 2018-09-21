@@ -11,16 +11,16 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 	/// <summary>
 	///	Vector Tile Factory
-	/// Vector data is much more detailed compared to terrain and image data so we have a different structure to process 
-	/// vector data(compared to other factories). First of all, how does the vector data itself structured? Vector tile 
-	/// data contains 'vector layers' as immediate children.And then each of these vector layers contains a number of  
-	/// 'features' inside.I.e.vector data for a tile has 'building', 'road', 'landuse' etc layers. Then building layer 
+	/// Vector data is much more detailed compared to terrain and image data so we have a different structure to process
+	/// vector data(compared to other factories). First of all, how does the vector data itself structured? Vector tile
+	/// data contains 'vector layers' as immediate children.And then each of these vector layers contains a number of
+	/// 'features' inside.I.e.vector data for a tile has 'building', 'road', 'landuse' etc layers. Then building layer
 	/// has a number of polygon features, road layer has line features etc.
-	/// Similar to this, vector tile factory contains bunch of 'layer visualizers' and each one of them corresponds to 
-	/// one (or more) vector layers in data.So when data is received, factory goes through all layers inside and passes 
-	/// them to designated layer visualizers.We're using layer name as key here, to find the designated layer visualizer, 
-	/// like 'building', 'road'. (vector tile factory visual would help here). If it can't find a layer visualizer for 
-	/// that layer, it'll be skipped and not processed at all.If all you need is 1-2 layers, it's indeed a big waste to 
+	/// Similar to this, vector tile factory contains bunch of 'layer visualizers' and each one of them corresponds to
+	/// one (or more) vector layers in data.So when data is received, factory goes through all layers inside and passes
+	/// them to designated layer visualizers.We're using layer name as key here, to find the designated layer visualizer,
+	/// like 'building', 'road'. (vector tile factory visual would help here). If it can't find a layer visualizer for
+	/// that layer, it'll be skipped and not processed at all.If all you need is 1-2 layers, it's indeed a big waste to
 	/// pull whole vector data and you can use 'Style Optimized Vector Tile Factory' to pull only the layer you want to use.
 	/// </summary>
 	//[CreateAssetMenu(menuName = "Mapbox/Factories/Vector Tile Factory")]
@@ -82,6 +82,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
+
+
 		private void CreateLayerVisualizers()
 		{
 			foreach (var sublayer in _properties.vectorSubLayers)
@@ -98,14 +100,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			//TODO : FIX THIS !!
 			visualizer.LayerVisualizerHasChanged += UpdateTileFactory;
 
-			// Set honorBuildingSettings - need to set here in addition to the UI. 
-			// Not setting it here can lead to wrong filtering. 
+			// Set honorBuildingSettings - need to set here in addition to the UI.
+			// Not setting it here can lead to wrong filtering.
 
 			bool isPrimitiveTypeValidForBuidingIds = (subLayer.coreOptions.geometryType == VectorPrimitiveType.Polygon) || (subLayer.coreOptions.geometryType == VectorPrimitiveType.Custom);
 			bool isSourceValidForBuildingIds = _properties.sourceType != VectorSourceType.MapboxStreets;
 
 			subLayer.honorBuildingIdSetting = isPrimitiveTypeValidForBuidingIds && isSourceValidForBuildingIds;
-			// Setup visualizer. 
+			// Setup visualizer.
 			((VectorLayerVisualizer)visualizer).SetProperties(subLayer);
 
 			visualizer.Initialize();
@@ -131,6 +133,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			poiSubLayer.performanceOptions = _properties.performanceOptions;
 			((LocationPrefabsLayerVisualizer)visualizer).SetProperties((PrefabItemOptions)poiSubLayer);
 
+			visualizer.LayerVisualizerHasChanged += UpdateTileFactory;
+			
 			visualizer.Initialize();
 			if (visualizer == null)
 			{
@@ -144,6 +148,25 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			else
 			{
 				_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase>() { visualizer });
+			}
+		}
+
+		public virtual LayerVisualizerBase FindVectorLayerVisualizer(VectorSubLayerProperties subLayer)
+		{
+			if (_layerBuilder.ContainsKey(subLayer.Key))
+			{
+				var visualizer = _layerBuilder[subLayer.Key].Find((obj) => obj.SubLayerProperties == subLayer);
+				return visualizer;
+			}
+			return null;
+		}
+
+		public virtual void RemoveVectorLayerVisualizer(LayerVisualizerBase subLayer)
+		{
+			if (_layerBuilder.ContainsKey(subLayer.Key))
+			{
+				Properties.vectorSubLayers.Remove(subLayer.SubLayerProperties);
+				_layerBuilder[subLayer.Key].Remove(subLayer);
 			}
 		}
 
@@ -241,6 +264,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			CreateFeatureWithBuilder(tile, visualizer.SubLayerProperties.coreOptions.layerName, visualizer);
 		}
+
 		public void UnregisterLayer(UnityTile tile, LayerVisualizerBase visualizer)
 		{
 			if (_layerProgress.ContainsKey(tile))

@@ -51,16 +51,16 @@
 			{
 				EditorHelper.CheckForModifiedProperty(property);
 			}
-
-			if ((VectorPrimitiveType)primitiveType.enumValueIndex == VectorPrimitiveType.Line)
-			{
-				EditorGUI.BeginChangeCheck();
-				EditorGUILayout.PropertyField(property.FindPropertyRelative("lineWidth"));
-				if (EditorGUI.EndChangeCheck())
-				{
-					EditorHelper.CheckForModifiedProperty(property);
-				}
-			}
+//
+//			if ((VectorPrimitiveType)primitiveType.enumValueIndex == VectorPrimitiveType.Line)
+//			{
+//				EditorGUI.BeginChangeCheck();
+//				EditorGUILayout.PropertyField(property.FindPropertyRelative("lineWidth"));
+//				if (EditorGUI.EndChangeCheck())
+//				{
+//					EditorHelper.CheckForModifiedProperty(property);
+//				}
+//			}
 			EditorGUI.EndProperty();
 		}
 	}

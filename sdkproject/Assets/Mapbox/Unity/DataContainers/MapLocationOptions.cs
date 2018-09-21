@@ -4,7 +4,7 @@
 	using UnityEngine;
 	using Mapbox.Unity.Utilities;
 	[Serializable]
-	public class MapLocationOptions
+	public class MapLocationOptions : MapboxDataProperty
 	{
 		[Geocode]
 		[Tooltip("The coordinates to build a map around")]

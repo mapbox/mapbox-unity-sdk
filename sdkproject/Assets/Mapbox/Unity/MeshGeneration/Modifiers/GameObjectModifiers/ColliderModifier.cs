@@ -24,6 +24,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_options.PropertyHasChanged += UpdateModifier;
 		}
 
+		public override void UnbindProperties()
+		{
+			_options.PropertyHasChanged -= UpdateModifier;
+		}
+
 		public override void Initialize()
 		{
 			//no need to reset strategy objects on map reinit as we're caching feature game objects as well

@@ -28,6 +28,17 @@
 			CheckForModifiedProperty(property, GetTargetObjectOfProperty(property));
 		}
 
+		public static bool DidModifyProperty<T>(SerializedProperty property, T targetObject)
+		{
+			MapboxDataProperty targetObjectAsDataProperty = targetObject as MapboxDataProperty;
+			return (property.serializedObject.ApplyModifiedProperties() && targetObjectAsDataProperty != null);
+		}
+
+		public static bool DidModifyProperty(SerializedProperty property)
+		{
+			return DidModifyProperty(property, GetTargetObjectOfProperty(property));
+		}
+
 		public static IEnumerable<SerializedProperty> GetChildren(this SerializedProperty property)
 		{
 			property = property.Copy();
@@ -138,7 +149,7 @@
 					var field = tp.GetField(element, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 					if (field != null)
 					{
-					    field.SetValue(obj, value);
+						field.SetValue(obj, value);
 					}
 				}
 

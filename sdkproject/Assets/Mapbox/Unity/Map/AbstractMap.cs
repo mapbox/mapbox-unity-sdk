@@ -550,6 +550,18 @@ namespace Mapbox.Unity.Map
 				}
 			};
 
+			_vectorData.SubLayerRemoved += (object sender, EventArgs eventArgs) =>
+			{
+				VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
+
+				if (layerUpdateArgs.visualizer != null)
+				{
+					_mapVisualizer.RemoveTilesFromLayer((VectorTileFactory)layerUpdateArgs.factory, layerUpdateArgs.visualizer);
+				}
+
+				Debug.Log("<color=blue>Vector</color>");
+				OnMapRedrawn();
+			};
 			_vectorData.SubLayerAdded += (object sender, EventArgs eventArgs) =>
 			{
 				VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
@@ -569,14 +581,14 @@ namespace Mapbox.Unity.Map
 				if (layerUpdateArgs.visualizer != null)
 				{
 					Debug.Log("UnregisterTiles");
-					//we got a visualizer. Update only the visualizer. 
+					//we got a visualizer. Update only the visualizer.
 					// No need to unload the entire factory to apply changes.
 					_mapVisualizer.UnregisterTilesFromLayer((VectorTileFactory)layerUpdateArgs.factory, layerUpdateArgs.visualizer);
 				}
 				else
 				{
-					//We are updating a core property of vector section. 
-					//All vector features need to get unloaded and re-created. 
+					//We are updating a core property of vector section.
+					//All vector features need to get unloaded and re-created.
 					//_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
 					//VectorData.UpdateFactorySettings();
 					//_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
@@ -593,6 +605,38 @@ namespace Mapbox.Unity.Map
 				//	//OnMapRedrawn();
 				//}
 				OnMapRedrawn();
+			};
+
+			_options.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
+			{
+				Debug.Log("<color=yellow>General </color>" + gameObject.name);
+
+				//take care of redraw map business...
+			};
+
+			_options.locationOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
+			{
+				Debug.Log("<color=yellow>General - Location Options </color>" + gameObject.name);
+				//take care of redraw map business...
+				UpdateMap();
+			};
+
+			_options.extentOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
+			{
+				Debug.Log("<color=yellow>General - Extent Options </color>" + gameObject.name);
+				//take care of redraw map business...
+			};
+
+			_options.placementOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
+			{
+				Debug.Log("<color=yellow>General - Placement Options </color>" + gameObject.name);
+				//take care of redraw map business...
+			};
+
+			_options.scalingOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
+			{
+				Debug.Log("<color=yellow>General - Scaling Options </color>" + gameObject.name);
+				//take care of redraw map business...
 			};
 
 			_mapVisualizer.Initialize(this, _fileSource);
@@ -653,12 +697,16 @@ namespace Mapbox.Unity.Map
 		{
 			float differenceInZoom = 0.0f;
 			bool isAtInitialZoom = false;
+			// Update map zoom, if it has changed. 
 			if (Math.Abs(Zoom - zoom) > Constants.EpsilonFloatingPoint)
 			{
 				SetZoom(zoom);
-				differenceInZoom = Zoom - InitialZoom;
-				isAtInitialZoom = (differenceInZoom - 0.0 < Constants.EpsilonFloatingPoint);
 			}
+
+			// Compute difference in zoom. Will be used to calculate correct scale of the map. 
+			differenceInZoom = Zoom - InitialZoom;
+			isAtInitialZoom = (differenceInZoom - 0.0 < Constants.EpsilonFloatingPoint);
+
 			//Update center latitude longitude
 			var centerLatitudeLongitude = latLon;
 			double xDelta = centerLatitudeLongitude.x;
@@ -670,7 +718,6 @@ namespace Mapbox.Unity.Map
 			//Set Center in Latitude Longitude and Mercator.
 			SetCenterLatitudeLongitude(new Vector2d(xDelta, zDelta));
 			Options.scalingOptions.scalingStrategy.SetUpScaling(this);
-
 			Options.placementOptions.placementStrategy.SetUpPlacement(this);
 
 			//Scale the map accordingly.
@@ -680,6 +727,7 @@ namespace Mapbox.Unity.Map
 				Root.localScale = _mapScaleFactor;
 			}
 
+			//Update Tile extent. 
 			_tileProvider.UpdateTileExtent();
 
 			if (OnUpdated != null)

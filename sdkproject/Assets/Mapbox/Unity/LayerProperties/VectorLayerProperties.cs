@@ -10,7 +10,6 @@
 	[Serializable]
 	public class VectorLayerProperties : LayerProperties
 	{
-
 		#region Events
 		public event System.EventHandler SubLayerPropertyAdded;
 		public virtual void OnSubLayerPropertyAdded(System.EventArgs e)
@@ -85,10 +84,20 @@
 			return true;
 		}
 
+		public void RemoveFeatureLayerWithName(string featureLayerName)
+		{
+			var layerToRemove = FindFeatureLayerWithName(featureLayerName);
+			if (layerToRemove != null)
+			{
+				//vectorSubLayers.Remove(layerToRemove);
+				OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = layerToRemove });
+			}
+		}
+
 		public VectorSubLayerProperties FindFeatureLayerWithName(string featureLayerName)
 		{
 			int foundLayerIndex = -1;
-			// Optimize for performance. 
+			// Optimize for performance.
 			for (int i = 0; i < vectorSubLayers.Count; i++)
 			{
 				if (vectorSubLayers[i].SubLayerNameMatchesExact(featureLayerName))
@@ -98,6 +107,21 @@
 				}
 			}
 			return (foundLayerIndex != -1) ? vectorSubLayers[foundLayerIndex] : null;
+		}
+
+		public PrefabItemOptions FindPoiLayerWithName(string poiLayerName)
+		{
+			int foundLayerIndex = -1;
+			// Optimize for performance.
+			for (int i = 0; i < locationPrefabList.Count; i++)
+			{
+				if (locationPrefabList[i].SubLayerNameMatchesExact(poiLayerName))
+				{
+					foundLayerIndex = i;
+					break;
+				}
+			}
+			return (foundLayerIndex != -1) ? locationPrefabList[foundLayerIndex] : null;
 		}
 
 		public void AddVectorLayer(VectorSubLayerProperties subLayerProperties)

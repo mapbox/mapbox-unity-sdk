@@ -33,6 +33,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	{
 		[SerializeField]
 		public bool Active = true;
+
 		public virtual void SetProperties(ModifierProperties properties)
 		{
 
@@ -47,6 +48,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		}
 
+		public virtual void UnbindProperties()
+		{
+
+		}
 		public virtual void UpdateModifier(object sender, System.EventArgs layerArgs)
 		{
 			NotifyUpdateModifier(new VectorLayerUpdateArgs { property = sender as MapboxDataProperty, modifier = this });
