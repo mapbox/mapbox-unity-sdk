@@ -85,10 +85,14 @@
 				geometryType = geometryType,
 				snapToTerrain = true,
 				combineMeshes = false,
-				lineWidth = lineWidth,
 				sublayerName = sublayerName
 			};
 
+			_properties.lineGeometryOptions = new LineGeometryOptions
+			{
+				Width = lineWidth
+			};
+			
 			_properties.extrusionOptions = new GeometryExtrusionOptions
 			{
 				extrusionType = extrusionType,

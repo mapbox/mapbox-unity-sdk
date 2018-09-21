@@ -202,44 +202,52 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			{
 				case VectorPrimitiveType.Point:
 				case VectorPrimitiveType.Custom:
+				{
 					// Let the user add anything that they want
 					if (_layerProperties.coreOptions.snapToTerrain == true)
 					{
 						//defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
 						AddOrCreateMeshModifier<SnapTerrainModifier>();
 					}
-					break;
-				case VectorPrimitiveType.Line:
 
-					var lineMeshMod = AddOrCreateMeshModifier<LineMeshModifier>();//CreateInstance<LineMeshModifier>();
-					lineMeshMod.Width = _layerProperties.coreOptions.lineWidth;
+					break;
+				}
+				case VectorPrimitiveType.Line:
+				{
+					if (_layerProperties.coreOptions.snapToTerrain == true)
+					{
+						AddOrCreateMeshModifier<SnapTerrainModifier>();
+					}
+
+					var lineMeshMod = AddOrCreateMeshModifier<LineMeshModifier>();
+					lineMeshMod.SetProperties(_layerProperties.lineGeometryOptions);
+					lineMeshMod.ModifierHasChanged += UpdateVector;
 
 					if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
 					{
 						var heightMod = AddOrCreateMeshModifier<HeightModifier>();
 						heightMod.SetProperties(_layerProperties.extrusionOptions);
-					}
-					if (_layerProperties.coreOptions.snapToTerrain == true)
-					{
-						AddOrCreateMeshModifier<SnapTerrainModifier>();
+						heightMod.ModifierHasChanged += UpdateVector;
 					}
 
 					//collider modifier options
-					if (_layerProperties.colliderOptions.colliderType != ColliderType.None)
-					{
-						var lineColliderMod = AddOrCreateGameObjectModifier<ColliderModifier>();
-						lineColliderMod.SetProperties(_layerProperties.colliderOptions);
-					}
+					var lineColliderMod = AddOrCreateGameObjectModifier<ColliderModifier>();
+					lineColliderMod.SetProperties(_layerProperties.colliderOptions);
+					lineColliderMod.ModifierHasChanged += UpdateVector;
 
 					var lineStyleMod = AddOrCreateGameObjectModifier<MaterialModifier>();
 					lineStyleMod.SetProperties(_layerProperties.materialOptions);
+					lineStyleMod.ModifierHasChanged += UpdateVector;
 
 					break;
+				}
 				case VectorPrimitiveType.Polygon:
+				{
 					if (_layerProperties.coreOptions.snapToTerrain == true)
 					{
 						AddOrCreateMeshModifier<SnapTerrainModifier>();
 					}
+
 					AddOrCreateMeshModifier<PolygonMeshModifier>();
 
 					UVModifierOptions uvModOptions = new UVModifierOptions();
@@ -269,16 +277,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					}
 
 					//collider modifier options
-					if (_layerProperties.colliderOptions.colliderType != ColliderType.None)
-					{
-						var polyColliderMod = AddOrCreateGameObjectModifier<ColliderModifier>();
-						polyColliderMod.SetProperties(_layerProperties.colliderOptions);
-						polyColliderMod.ModifierHasChanged += UpdateVector;
-					}
-					else
-					{
-						_layerProperties.colliderOptions.PropertyHasChanged += UpdateVector;
-					}
+					var polyColliderMod = AddOrCreateGameObjectModifier<ColliderModifier>();
+					polyColliderMod.SetProperties(_layerProperties.colliderOptions);
+					polyColliderMod.ModifierHasChanged += UpdateVector;
 
 					var styleMod = AddOrCreateGameObjectModifier<MaterialModifier>();
 					styleMod.SetProperties(_layerProperties.materialOptions);
@@ -291,7 +292,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 						_layerProperties.materialOptions.PropertyHasChanged += UpdateVector;
 						//TODO: Add SetProperties Method to MapboxStylesColorModifier
 					}
+
 					break;
+				}
 				default:
 					break;
 			}

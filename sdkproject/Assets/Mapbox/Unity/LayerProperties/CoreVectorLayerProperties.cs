@@ -23,8 +23,7 @@
 		public bool snapToTerrain = true;
 		[Tooltip("Groups features into one Unity GameObject.")]
 		public bool combineMeshes = false;
-		[Tooltip("Width of the line feature.")]
-		public float lineWidth = 1.0f;
+		
 
 		public override bool HasChanged
 		{
