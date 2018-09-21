@@ -133,6 +133,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			poiSubLayer.performanceOptions = _properties.performanceOptions;
 			((LocationPrefabsLayerVisualizer)visualizer).SetProperties((PrefabItemOptions)poiSubLayer);
 
+			visualizer.LayerVisualizerHasChanged += UpdateTileFactory;
+			
 			visualizer.Initialize();
 			if (visualizer == null)
 			{

@@ -23,12 +23,14 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 		}
 
-		public void SetProperties(PrefabItemOptions item)
+		public override void SetProperties(VectorSubLayerProperties properties)
 		{
+			var item = properties as PrefabItemOptions;
 			SubLayerProperties = item;
 			//Active = item.isActive;
 			_performanceOptions = item.performanceOptions;
 
+			item.filterOptions.filters.Clear();
 
 			//Check to make sure that when Categories selection is none, the location prefab is disabled
 			if (item.findByType == LocationPrefabFindBy.MapboxCategory && item.categories == LocationPrefabCategories.None)
@@ -83,26 +85,65 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 #endif
 					{
 						PrefabItemOptions itemProperties = (PrefabItemOptions)item;
-						PrefabModifier prefabModifier = ScriptableObject.CreateInstance<PrefabModifier>();
-						prefabModifier.SetProperties(itemProperties.spawnPrefabOptions);
 						_defaultStack = ScriptableObject.CreateInstance<ModifierStack>();
 						(_defaultStack as ModifierStack).moveFeaturePositionTo = item.moveFeaturePositionTo;
+						if (itemProperties.snapToTerrain == true)
+						{
+							_defaultStack.MeshModifiers.Add(ScriptableObject.CreateInstance<SnapTerrainModifier>());
+						}
 
+						PrefabModifier prefabModifier = ScriptableObject.CreateInstance<PrefabModifier>();
+						prefabModifier.SetProperties(itemProperties.spawnPrefabOptions);
+						itemProperties.spawnPrefabOptions.PropertyHasChanged += UpdatePois;
 						if (_defaultStack.GoModifiers == null)
 						{
 							_defaultStack.GoModifiers = new List<GameObjectModifier>();
 						}
 						_defaultStack.GoModifiers.Add(prefabModifier);
 
-						if (itemProperties.snapToTerrain == true)
-						{
-							_defaultStack.MeshModifiers.Add(ScriptableObject.CreateInstance<SnapTerrainModifier>());
-						}
+
 					}
 					break;
 				default:
 					break;
 			}
+
+			(SubLayerProperties as PrefabItemOptions).PropertyHasChanged += UpdatePois;
+		}
+
+		private void UpdatePois(object sender, System.EventArgs eventArgs)
+		{
+			Debug.Log("UpdatePois " + sender.ToString());
+
+			VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
+
+			layerUpdateArgs.visualizer = this;
+			layerUpdateArgs.effectsVectorLayer = true;
+
+			if (layerUpdateArgs.modifier != null)
+			{
+				layerUpdateArgs.property.PropertyHasChanged -= layerUpdateArgs.modifier.UpdateModifier;
+				layerUpdateArgs.modifier.ModifierHasChanged -= UpdatePois;
+			}
+			else if (layerUpdateArgs.property != null)
+			{
+				layerUpdateArgs.property.PropertyHasChanged -= UpdatePois;
+			}
+
+			foreach (var modifier in _defaultStack.MeshModifiers)
+			{
+				modifier.UnbindProperties();
+				modifier.ModifierHasChanged -= UpdatePois;
+			}
+			foreach (var modifier in _defaultStack.GoModifiers)
+			{
+				modifier.UnbindProperties();
+				modifier.ModifierHasChanged -= UpdatePois;
+			}
+
+			(SubLayerProperties as PrefabItemOptions).PropertyHasChanged -= UpdatePois;
+
+			OnUpdateLayerVisualizer(layerUpdateArgs);
 		}
 
 		/// <summary>
