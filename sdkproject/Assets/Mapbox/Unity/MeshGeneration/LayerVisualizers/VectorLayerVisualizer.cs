@@ -114,13 +114,29 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			if (layerUpdateArgs.modifier != null)
 			{
-				_layerProperties.materialOptions.PropertyHasChanged -= layerUpdateArgs.modifier.UpdateModifier;
+				layerUpdateArgs.property.PropertyHasChanged -= layerUpdateArgs.modifier.UpdateModifier;
 				layerUpdateArgs.modifier.ModifierHasChanged -= UpdateVector;
 			}
 			else if (layerUpdateArgs.property != null)
 			{
 				layerUpdateArgs.property.PropertyHasChanged -= UpdateVector;
 			}
+
+			foreach (var modifier in _defaultStack.MeshModifiers)
+			{
+				modifier.UnbindProperties();
+				modifier.ModifierHasChanged -= UpdateVector;
+			}
+			foreach (var modifier in _defaultStack.GoModifiers)
+			{
+				modifier.UnbindProperties();
+				modifier.ModifierHasChanged -= UpdateVector;
+			}
+
+			_layerProperties.extrusionOptions.PropertyHasChanged -= UpdateVector;
+			_layerProperties.coreOptions.PropertyHasChanged -= UpdateVector;
+			_layerProperties.materialOptions.PropertyHasChanged -= UpdateVector;
+
 			OnUpdateLayerVisualizer(layerUpdateArgs);
 		}
 
@@ -242,8 +258,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 							var atlasMod = AddOrCreateMeshModifier<TextureSideWallModifier>();
 							GeometryExtrusionWithAtlasOptions atlasOptions = new GeometryExtrusionWithAtlasOptions(_layerProperties.extrusionOptions, uvModOptions);
 							atlasMod.SetProperties(atlasOptions);
-							_layerProperties.extrusionOptions.PropertyHasChanged += atlasMod.UpdateModifier;
-							atlasMod.ModifierHasChanged += UpdateVector;
+							_layerProperties.extrusionOptions.PropertyHasChanged += UpdateVector;
 						}
 						else
 						{
@@ -273,8 +288,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					{
 						var colorPaletteMod = AddOrCreateGameObjectModifier<MapboxStylesColorModifier>();
 						colorPaletteMod.m_scriptablePalette = _layerProperties.materialOptions.colorPalette;
-						_layerProperties.materialOptions.PropertyHasChanged += colorPaletteMod.UpdateModifier;
-						colorPaletteMod.ModifierHasChanged += UpdateVector;
+						_layerProperties.materialOptions.PropertyHasChanged += UpdateVector;
 						//TODO: Add SetProperties Method to MapboxStylesColorModifier
 					}
 					break;
