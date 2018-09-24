@@ -4,7 +4,7 @@
 	using UnityEngine;
 
 	[Serializable]
-	public class RangeTileProviderOptions : ITileProviderOptions
+	public class RangeTileProviderOptions : TileProviderOptions
 	{
 		[Range(0, 10)]
 		public int west = 1;

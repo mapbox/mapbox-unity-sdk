@@ -3,7 +3,7 @@
 	using System;
 	using UnityEngine;
 	[Serializable]
-	public class CameraBoundsTileProviderOptions : ITileProviderOptions
+	public class CameraBoundsTileProviderOptions : TileProviderOptions
 	{
 		public Camera camera;
 		public int visibleBuffer;

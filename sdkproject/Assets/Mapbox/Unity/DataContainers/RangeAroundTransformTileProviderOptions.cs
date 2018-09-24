@@ -3,7 +3,7 @@
 	using System;
 	using UnityEngine;
 	[Serializable]
-	public class RangeAroundTransformTileProviderOptions : ITileProviderOptions
+	public class RangeAroundTransformTileProviderOptions : TileProviderOptions
 	{
 		public Transform targetTransform;
 		public int visibleBuffer;
