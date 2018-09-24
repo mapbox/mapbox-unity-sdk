@@ -163,32 +163,27 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			string concatenatedString = "";
 			if (item.findByType == LocationPrefabFindBy.MapboxCategory)
 			{
-				if (item.categories != LocationPrefabCategories.None)
-				{
-					List<LocationPrefabCategories> categoriesList = GetSelectedCategoriesList(item.categories);
-					if (categoriesList == null || categoriesList.Count == 0)
-					{
-						return;
-					}
 
-					List<string> stringsList = new List<string>();
-					foreach (LocationPrefabCategories category in categoriesList)
+				List<LocationPrefabCategories> categoriesList = GetSelectedCategoriesList(item.categories);
+				if (categoriesList == null || categoriesList.Count == 0)
+				{
+					return;
+				}
+
+				List<string> stringsList = new List<string>();
+				foreach (LocationPrefabCategories category in categoriesList)
+				{
+					stringsList = LocationPrefabCategoryOptions.GetMakiListFromCategory(category);
+					if (string.IsNullOrEmpty(concatenatedString))
 					{
-						stringsList = LocationPrefabCategoryOptions.GetMakiListFromCategory(category);
-						if (string.IsNullOrEmpty(concatenatedString))
-						{
-							concatenatedString = string.Join(",", stringsList.ToArray());
-						}
-						else
-						{
-							concatenatedString += "," + string.Join(",", stringsList.ToArray());
-						}
+						concatenatedString = string.Join(",", stringsList.ToArray());
+					}
+					else
+					{
+						concatenatedString += "," + string.Join(",", stringsList.ToArray());
 					}
 				}
-				else
-				{
-					concatenatedString = "xyzzzzz";
-				}
+
 
 				LayerFilter filter = new LayerFilter(LayerFilterOperationType.Contains)
 				{

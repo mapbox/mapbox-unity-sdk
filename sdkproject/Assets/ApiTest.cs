@@ -92,11 +92,28 @@ public class ApiTest : MonoBehaviour
 
 		_abstractMap.VectorData.LayerProperty.AddVectorLayer(subLayerProperties);
 	}
+	
+	[ContextMenu("AddPoiLayer")]
+	public void AddPoiLayer()
+	{
+		var prefabItemOptions = new PrefabItemOptions();
+		prefabItemOptions.categories = LocationPrefabCategories;
+		prefabItemOptions.spawnPrefabOptions = new SpawnPrefabOptions();
+		prefabItemOptions.spawnPrefabOptions.prefab = PoiPrefab;
+
+		_abstractMap.VectorData.LayerProperty.AddPoiLayer(prefabItemOptions);
+	}
 
 	[ContextMenu("RemoveLayer")]
 	public void RemoveLayer()
 	{
 		_abstractMap.VectorData.LayerProperty.RemoveFeatureLayerWithName("ExtrudedBuildings");
+	}
+	
+	[ContextMenu("RemovePoiLayer")]
+	public void RemovePoiLayer()
+	{
+		_abstractMap.VectorData.LayerProperty.RemovePoiLayerWithName("loc");
 	}
 
 	[ContextMenu("IncreaseRoadHeight")]
