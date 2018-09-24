@@ -94,10 +94,15 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 						PrefabModifier prefabModifier = ScriptableObject.CreateInstance<PrefabModifier>();
 						prefabModifier.SetProperties(itemProperties.spawnPrefabOptions);
-						itemProperties.spawnPrefabOptions.PropertyHasChanged += UpdatePois;
+						prefabModifier.ModifierHasChanged += UpdatePois;
+
 						if (_defaultStack.GoModifiers == null)
 						{
 							_defaultStack.GoModifiers = new List<GameObjectModifier>();
+						}
+						else
+						{
+							_defaultStack.GoModifiers.Clear();
 						}
 						_defaultStack.GoModifiers.Add(prefabModifier);
 
@@ -155,6 +160,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			string propertyName = "";
 			item.categoryPropertyFromFindByTypeDictionary.TryGetValue(item.findByType, out propertyName);
 
+			string concatenatedString = "";
 			if (item.findByType == LocationPrefabFindBy.MapboxCategory)
 			{
 				List<LocationPrefabCategories> categoriesList = GetSelectedCategoriesList(item.categories);
@@ -164,8 +170,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				}
 
 				List<string> stringsList = new List<string>();
-				string concatenatedString = "";
-
 				foreach (LocationPrefabCategories category in categoriesList)
 				{
 					stringsList = LocationPrefabCategoryOptions.GetMakiListFromCategory(category);
@@ -292,8 +296,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		{
 			//for layers using specific locations, ignore VectorTileLayer and
 			//pass coordinates to the modifierstack using BuildFeatureFromLatLon.
-			if ((SubLayerProperties as PrefabItemOptions).findByType
-			   == LocationPrefabFindBy.AddressOrLatLon)
+			if ((SubLayerProperties as PrefabItemOptions).findByType == LocationPrefabFindBy.AddressOrLatLon)
 			{
 				BuildFeatureFromLatLon(layer, tile);
 				if (callback != null)
