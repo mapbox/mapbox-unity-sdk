@@ -97,7 +97,11 @@ namespace Mapbox.Unity.Map
 				selectedLayers = new int[1] { prefabItemArray.arraySize - 1 };
 				layerTreeView.SetSelection(selectedLayers);
 
-				EditorHelper.CheckForModifiedProperty(property);
+				if (EditorHelper.DidModifyProperty(property))
+				{
+					PrefabItemOptions prefabItemOptionToAdd= (PrefabItemOptions)EditorHelper.GetTargetObjectOfProperty(prefabItem) as PrefabItemOptions;
+					((VectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property)).OnSubLayerPropertyAdded(new VectorLayerUpdateArgs { property = prefabItemOptionToAdd });
+				}
 			}
 
 			if (GUILayout.Button(new GUIContent("Remove Selected"), (GUIStyle)"minibuttonright"))
@@ -107,13 +111,25 @@ namespace Mapbox.Unity.Map
 					return;
 				}
 
+				List<PrefabItemOptions> LayersToRemove = new List<PrefabItemOptions>();
 				foreach (var index in selectedLayers.OrderByDescending(i => i))
 				{
+					PrefabItemOptions prefabItemOptionsToRemove = (PrefabItemOptions)EditorHelper.GetTargetObjectOfProperty(prefabItemArray.GetArrayElementAtIndex(index)) as PrefabItemOptions;
+					if(prefabItemOptionsToRemove != null)
+					{
+						LayersToRemove.Add(prefabItemOptionsToRemove);
+					}
 					prefabItemArray.DeleteArrayElementAtIndex(index);
 				}
 				selectedLayers = new int[0];
 				layerTreeView.SetSelection(selectedLayers);
-				EditorHelper.CheckForModifiedProperty(property);
+				if (EditorHelper.DidModifyProperty(property))
+				{
+					for (int i = 0; i < LayersToRemove.Count; i++)
+					{
+						((VectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property)).OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = LayersToRemove[i]});
+					}
+				}
 			}
 
 			EditorGUILayout.EndHorizontal();
