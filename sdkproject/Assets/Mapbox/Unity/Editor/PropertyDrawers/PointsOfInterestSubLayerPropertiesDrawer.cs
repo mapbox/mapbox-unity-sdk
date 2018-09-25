@@ -152,11 +152,6 @@ namespace Mapbox.Unity.Map
 		void DrawLayerLocationPrefabProperties(SerializedProperty layerProperty, SerializedProperty property)
 		{
 			EditorGUILayout.PropertyField(layerProperty);
-			if (layerProperty.FindPropertyRelative("hasChanged").boolValue == true)
-			{
-				layerProperty.FindPropertyRelative("hasChanged").boolValue = false;
-				EditorHelper.CheckForModifiedProperty(property);
-			}
 		}
 	}
 }
