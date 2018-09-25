@@ -23,15 +23,40 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("EnableTerrainColliders")]
 	public void EnableTerrainColliders()
 	{
-		_abstractMap.Terrain.LayerProperty.SetCollider(true);
+		_abstractMap.Terrain.EnableCollider(true);
 	}
 
 	[ContextMenu("DisableTerrainColliders")]
 	public void DisableTerrainColliders()
 	{
-		_abstractMap.Terrain.LayerProperty.SetCollider(false);
+		_abstractMap.Terrain.EnableCollider(false);
+	}
+	
+	[ContextMenu("IncreaseTerrainExagguration")]
+	public void IncreaseTerrainExagguration()
+	{
+		_abstractMap.Terrain.SetExaggurationFactor(_abstractMap.Terrain.LayerProperty.requiredOptions.exaggerationFactor + 0.5f);
 	}
 
+	[ContextMenu("SetTerrainLayer")]
+	public void SetTerrainLayer()
+	{
+		_abstractMap.Terrain.SetLayer(LayerMask.NameToLayer("Water"));
+	}
+	
+	[ContextMenu("SetTerrainDataSource")]
+	public void SetTerrainDataSource()
+	{
+		if (_abstractMap.Terrain.LayerProperty.sourceType == ElevationSourceType.MapboxTerrain)
+		{
+			_abstractMap.Terrain.SetDataSource(ElevationSourceType.None);
+		}
+		else
+		{
+			_abstractMap.Terrain.SetDataSource(ElevationSourceType.MapboxTerrain);
+		}
+	}
+	
 	[ContextMenu("EnableVectorColliders")]
 	public void EnableVectorColliders()
 	{
