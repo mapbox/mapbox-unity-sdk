@@ -990,6 +990,17 @@ namespace Mapbox.Unity.Map
 		}
 
 		/// <summary>
+		/// Translates map root by the terrain elevation at the center geo location. 
+		/// Use this method with <c>TerrainWithElevation</c>
+		/// </summary>
+		/// <param name="active">If set to <c>true</c> active.</param>
+		public virtual void SnapMapToZero(bool active)
+		{
+			_options.placementOptions.snapMapToZero = active;
+			_options.placementOptions.HasChanged = true;
+		}
+
+		/// <summary>
 		/// Sets the map to use real world scale for map tile. 
 		/// Use world scale for AR use cases or applications that need true world scale.
 		/// </summary>
