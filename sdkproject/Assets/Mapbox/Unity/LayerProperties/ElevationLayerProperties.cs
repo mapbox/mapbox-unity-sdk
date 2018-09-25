@@ -25,12 +25,6 @@
 		public UnityLayerOptions unityLayerOptions = new UnityLayerOptions();
 		public TerrainSideWallOptions sideWallOptions = new TerrainSideWallOptions();
 
-		//public void SetCollider(ColliderType type)
-		public void SetCollider(bool enabled)
-		{
-			colliderOptions.addCollider = enabled;
-			colliderOptions.HasChanged = true;
-		}
 		public override bool NeedsForceUpdate()
 		{
 			return true;

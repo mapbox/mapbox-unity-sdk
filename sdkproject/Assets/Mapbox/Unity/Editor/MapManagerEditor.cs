@@ -168,23 +168,24 @@
 			var extentOptions = property.FindPropertyRelative("extentOptions");
 			var extentOptionsType = extentOptions.FindPropertyRelative("extentType");
 
-			EditorGUI.BeginChangeCheck();
+
 			if ((MapExtentType)extentOptionsType.enumValueIndex == MapExtentType.Custom)
 			{
-				var test = mapObject.FindProperty("_tileProvider");
+				var tileProviderProperty = mapObject.FindProperty("_tileProvider");
+				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(extentOptionsType);
+				if (EditorGUI.EndChangeCheck())
+				{
+					EditorHelper.CheckForModifiedProperty(extentOptions);
+				}
 				EditorGUI.indentLevel++;
-				EditorGUILayout.PropertyField(test);
+				EditorGUILayout.PropertyField(tileProviderProperty);
 				EditorGUI.indentLevel--;
 			}
 			else
 			{
 				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(extentOptions);
-			}
-			if (EditorGUI.EndChangeCheck())
-			{
-				EditorHelper.CheckForModifiedProperty(extentOptions);
 			}
 
 			EditorGUI.BeginChangeCheck();

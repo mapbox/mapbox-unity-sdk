@@ -202,99 +202,99 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			{
 				case VectorPrimitiveType.Point:
 				case VectorPrimitiveType.Custom:
-				{
-					// Let the user add anything that they want
-					if (_layerProperties.coreOptions.snapToTerrain == true)
 					{
-						//defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
-						AddOrCreateMeshModifier<SnapTerrainModifier>();
-					}
-
-					break;
-				}
-				case VectorPrimitiveType.Line:
-				{
-					if (_layerProperties.coreOptions.snapToTerrain == true)
-					{
-						AddOrCreateMeshModifier<SnapTerrainModifier>();
-					}
-
-					var lineMeshMod = AddOrCreateMeshModifier<LineMeshModifier>();
-					lineMeshMod.SetProperties(_layerProperties.lineGeometryOptions);
-					lineMeshMod.ModifierHasChanged += UpdateVector;
-
-					if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
-					{
-						var heightMod = AddOrCreateMeshModifier<HeightModifier>();
-						heightMod.SetProperties(_layerProperties.extrusionOptions);
-						heightMod.ModifierHasChanged += UpdateVector;
-					}
-
-					//collider modifier options
-					var lineColliderMod = AddOrCreateGameObjectModifier<ColliderModifier>();
-					lineColliderMod.SetProperties(_layerProperties.colliderOptions);
-					lineColliderMod.ModifierHasChanged += UpdateVector;
-
-					var lineStyleMod = AddOrCreateGameObjectModifier<MaterialModifier>();
-					lineStyleMod.SetProperties(_layerProperties.materialOptions);
-					lineStyleMod.ModifierHasChanged += UpdateVector;
-
-					break;
-				}
-				case VectorPrimitiveType.Polygon:
-				{
-					if (_layerProperties.coreOptions.snapToTerrain == true)
-					{
-						AddOrCreateMeshModifier<SnapTerrainModifier>();
-					}
-
-					AddOrCreateMeshModifier<PolygonMeshModifier>();
-
-					UVModifierOptions uvModOptions = new UVModifierOptions();
-					uvModOptions.texturingType = _layerProperties.materialOptions.texturingType;
-					uvModOptions.atlasInfo = _layerProperties.materialOptions.atlasInfo;
-					uvModOptions.style = _layerProperties.materialOptions.style;
-
-					var uvMod = AddOrCreateMeshModifier<UvModifier>();
-					uvMod.SetProperties(uvModOptions);
-
-					if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
-					{
-						//replace materialOptions with styleOptions
-						if (_layerProperties.materialOptions.texturingType == UvMapType.Atlas || _layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette)
+						// Let the user add anything that they want
+						if (_layerProperties.coreOptions.snapToTerrain == true)
 						{
-							var atlasMod = AddOrCreateMeshModifier<TextureSideWallModifier>();
-							GeometryExtrusionWithAtlasOptions atlasOptions = new GeometryExtrusionWithAtlasOptions(_layerProperties.extrusionOptions, uvModOptions);
-							atlasMod.SetProperties(atlasOptions);
-							_layerProperties.extrusionOptions.PropertyHasChanged += UpdateVector;
+							//defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
+							AddOrCreateMeshModifier<SnapTerrainModifier>();
 						}
-						else
+
+						break;
+					}
+				case VectorPrimitiveType.Line:
+					{
+						if (_layerProperties.coreOptions.snapToTerrain == true)
+						{
+							AddOrCreateMeshModifier<SnapTerrainModifier>();
+						}
+
+						var lineMeshMod = AddOrCreateMeshModifier<LineMeshModifier>();
+						lineMeshMod.SetProperties(_layerProperties.lineGeometryOptions);
+						lineMeshMod.ModifierHasChanged += UpdateVector;
+
+						if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
 						{
 							var heightMod = AddOrCreateMeshModifier<HeightModifier>();
 							heightMod.SetProperties(_layerProperties.extrusionOptions);
 							heightMod.ModifierHasChanged += UpdateVector;
 						}
+
+						//collider modifier options
+						var lineColliderMod = AddOrCreateGameObjectModifier<ColliderModifier>();
+						lineColliderMod.SetProperties(_layerProperties.colliderOptions);
+						lineColliderMod.ModifierHasChanged += UpdateVector;
+
+						var lineStyleMod = AddOrCreateGameObjectModifier<MaterialModifier>();
+						lineStyleMod.SetProperties(_layerProperties.materialOptions);
+						lineStyleMod.ModifierHasChanged += UpdateVector;
+
+						break;
 					}
-
-					//collider modifier options
-					var polyColliderMod = AddOrCreateGameObjectModifier<ColliderModifier>();
-					polyColliderMod.SetProperties(_layerProperties.colliderOptions);
-					polyColliderMod.ModifierHasChanged += UpdateVector;
-
-					var styleMod = AddOrCreateGameObjectModifier<MaterialModifier>();
-					styleMod.SetProperties(_layerProperties.materialOptions);
-					styleMod.ModifierHasChanged += UpdateVector;
-
-					if (_layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette)
+				case VectorPrimitiveType.Polygon:
 					{
-						var colorPaletteMod = AddOrCreateGameObjectModifier<MapboxStylesColorModifier>();
-						colorPaletteMod.m_scriptablePalette = _layerProperties.materialOptions.colorPalette;
-						_layerProperties.materialOptions.PropertyHasChanged += UpdateVector;
-						//TODO: Add SetProperties Method to MapboxStylesColorModifier
-					}
+						if (_layerProperties.coreOptions.snapToTerrain == true)
+						{
+							AddOrCreateMeshModifier<SnapTerrainModifier>();
+						}
 
-					break;
-				}
+						AddOrCreateMeshModifier<PolygonMeshModifier>();
+
+						UVModifierOptions uvModOptions = new UVModifierOptions();
+						uvModOptions.texturingType = _layerProperties.materialOptions.texturingType;
+						uvModOptions.atlasInfo = _layerProperties.materialOptions.atlasInfo;
+						uvModOptions.style = _layerProperties.materialOptions.style;
+
+						var uvMod = AddOrCreateMeshModifier<UvModifier>();
+						uvMod.SetProperties(uvModOptions);
+
+						if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
+						{
+							//replace materialOptions with styleOptions
+							if (_layerProperties.materialOptions.texturingType == UvMapType.Atlas || _layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette)
+							{
+								var atlasMod = AddOrCreateMeshModifier<TextureSideWallModifier>();
+								GeometryExtrusionWithAtlasOptions atlasOptions = new GeometryExtrusionWithAtlasOptions(_layerProperties.extrusionOptions, uvModOptions);
+								atlasMod.SetProperties(atlasOptions);
+								_layerProperties.extrusionOptions.PropertyHasChanged += UpdateVector;
+							}
+							else
+							{
+								var heightMod = AddOrCreateMeshModifier<HeightModifier>();
+								heightMod.SetProperties(_layerProperties.extrusionOptions);
+								heightMod.ModifierHasChanged += UpdateVector;
+							}
+						}
+
+						//collider modifier options
+						var polyColliderMod = AddOrCreateGameObjectModifier<ColliderModifier>();
+						polyColliderMod.SetProperties(_layerProperties.colliderOptions);
+						polyColliderMod.ModifierHasChanged += UpdateVector;
+
+						var styleMod = AddOrCreateGameObjectModifier<MaterialModifier>();
+						styleMod.SetProperties(_layerProperties.materialOptions);
+						styleMod.ModifierHasChanged += UpdateVector;
+
+						if (_layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette)
+						{
+							var colorPaletteMod = AddOrCreateGameObjectModifier<MapboxStylesColorModifier>();
+							colorPaletteMod.m_scriptablePalette = _layerProperties.materialOptions.colorPalette;
+							_layerProperties.materialOptions.PropertyHasChanged += UpdateVector;
+							//TODO: Add SetProperties Method to MapboxStylesColorModifier
+						}
+
+						break;
+					}
 				default:
 					break;
 			}
