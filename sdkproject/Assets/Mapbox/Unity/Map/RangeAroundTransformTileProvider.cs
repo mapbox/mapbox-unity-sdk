@@ -15,9 +15,6 @@
 		private UnwrappedTileId _currentTile;
 		private UnwrappedTileId _cachedTile;
 
-		//private List<UnwrappedTileId> _toRemove;
-		//private HashSet<UnwrappedTileId> _tilesToRequest;
-
 		public override void OnInitialized()
 		{
 			_rangeTileProviderOptions = (RangeAroundTransformTileProviderOptions)Options;

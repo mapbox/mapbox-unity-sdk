@@ -131,6 +131,14 @@
 			{
 				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
 			};
+			_layerProperty.requiredOptions.PropertyHasChanged += (property, e) =>
+			{
+				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
+			};
+			_layerProperty.unityLayerOptions.PropertyHasChanged += (property, e) =>
+			{
+				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
+			};
 			_layerProperty.PropertyHasChanged += (property, e) =>
 			{
 				//terrain factory uses strategy objects and they are controlled by layer
@@ -206,6 +214,56 @@
 			}
 		}
 		private TerrainFactoryBase _elevationFactory;
+
+		#region API Methods
+
+		public void SetDataSource(ElevationSourceType dataSource)
+		{
+			if (_layerProperty.sourceType != dataSource)
+			{
+				_layerProperty.sourceType = dataSource;
+				_layerProperty.HasChanged = true;
+			}
+		}
+
+		public void SetElevationType(ElevationLayerType elecationType)
+		{
+			if (LayerProperty.elevationLayerType != elecationType)
+			{
+				LayerProperty.elevationLayerType = elecationType;
+				LayerProperty.HasChanged = true;
+			}
+		}
+
+		public void EnableCollider(bool enable)
+		{
+			if (LayerProperty.colliderOptions.addCollider != enable)
+			{
+				LayerProperty.colliderOptions.addCollider = enable;
+				LayerProperty.colliderOptions.HasChanged = true;
+			}
+		}
+
+		public void SetExaggerationFactor(float factor)
+		{
+			if (LayerProperty.requiredOptions.exaggerationFactor != factor)
+			{
+				LayerProperty.requiredOptions.exaggerationFactor = factor;
+				LayerProperty.requiredOptions.HasChanged = true;
+			}
+		}
+
+		public void SetLayer(int layerId)
+		{
+			if (LayerProperty.unityLayerOptions.layerId != layerId)
+			{
+				LayerProperty.unityLayerOptions.layerId = layerId;
+				LayerProperty.unityLayerOptions.HasChanged = true;
+			}
+		}
+
+		#endregion
+
 
 	}
 }

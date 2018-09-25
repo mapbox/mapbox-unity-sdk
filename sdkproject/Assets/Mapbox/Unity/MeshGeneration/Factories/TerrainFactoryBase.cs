@@ -62,6 +62,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			if (Properties.sourceType == ElevationSourceType.None)
 			{
 				tile.SetHeightData(null);
+				tile.MeshFilter.mesh.Clear();
+				tile.ElevationType = TileTerrainType.None;
 				return;
 			}
 

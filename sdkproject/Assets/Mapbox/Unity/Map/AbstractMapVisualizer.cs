@@ -27,11 +27,6 @@ namespace Mapbox.Unity.Map
 		[FormerlySerializedAs("_factories")]
 		public List<AbstractTileFactory> Factories;
 
-		[SerializeField]
-		Texture2D _loadingTexture;
-		[SerializeField]
-		Material TileMaterial;
-
 		protected IMapReadable _map;
 		protected Dictionary<UnwrappedTileId, UnityTile> _activeTiles = new Dictionary<UnwrappedTileId, UnityTile>();
 		protected Queue<UnityTile> _inactiveTiles = new Queue<UnityTile>();
@@ -59,16 +54,6 @@ namespace Mapbox.Unity.Map
 		public Dictionary<UnwrappedTileId, int> _tileProgress;
 
 		public event Action<ModuleState> OnMapVisualizerStateChanged = delegate { };
-
-		public void SetLoadingTexture(Texture2D loadingTexture)
-		{
-			_loadingTexture = loadingTexture;
-		}
-
-		public void SetTileMaterial(Material tileMaterial)
-		{
-			TileMaterial = tileMaterial;
-		}
 
 		/// <summary>
 		/// Gets the unity tile from unwrapped tile identifier.
@@ -217,11 +202,11 @@ namespace Mapbox.Unity.Map
 			if (unityTile == null)
 			{
 				unityTile = new GameObject().AddComponent<UnityTile>();
-				unityTile.MeshRenderer.material = TileMaterial;
+				unityTile.MeshRenderer.material = _map.TileMaterial;
 				unityTile.transform.SetParent(_map.Root, false);
 			}
 
-			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale, _map.AbsoluteZoom, _loadingTexture);
+			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale, _map.AbsoluteZoom, _map.LoadingTexture);
 			PlaceTile(tileId, unityTile, _map);
 
 			// Don't spend resources naming objects, as you shouldn't find objects by name anyway!
