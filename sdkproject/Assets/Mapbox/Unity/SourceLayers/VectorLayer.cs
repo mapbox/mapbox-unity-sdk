@@ -140,7 +140,7 @@ namespace Mapbox.Unity.Map
 			//add the prefab item if it doesn't already exist
 			if (!PointsOfInterestSublayerList.Contains(prefabItem))
 			{
-				PointsOfInterestSublayerList.Add(prefabItem);
+				LayerProperty.AddPoiLayer(prefabItem);
 			}
 		}
 

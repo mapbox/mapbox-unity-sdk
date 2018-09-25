@@ -202,4 +202,10 @@ public class ApiTest : MonoBehaviour
 		pois.findByType = LocationPrefabFindBy.MapboxCategory;
 		pois.HasChanged = true;
 	}
+
+	[ContextMenu("TestPoiCategoryApi")]
+	public void TestPoiCategoryApi()
+	{
+		_abstractMap.VectorData.SpawnPrefabByCategory(PoiPrefab, LocationPrefabCategories);
+	}
 }
