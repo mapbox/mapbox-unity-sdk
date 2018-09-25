@@ -21,8 +21,6 @@ namespace Mapbox.Unity.Map
 		//No extrusion
 		public readonly ExtrusionType extrusionType = ExtrusionType.None;
 
-		public bool hasChanged = false;
-
 		//Dictionary containing the layer names for each location prefab find by type
 		public readonly Dictionary<LocationPrefabFindBy, string> layerNameFromFindByTypeDictionary = new Dictionary<LocationPrefabFindBy, string>
 		{
