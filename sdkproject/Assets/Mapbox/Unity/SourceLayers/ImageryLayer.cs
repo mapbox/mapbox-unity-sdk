@@ -138,6 +138,10 @@
 
 		#region API Methods
 
+		/// <summary>
+		/// Sets the data source for the image factory.
+		/// </summary>
+		/// <param name="imageSource"></param>
 		public void SetLayerSource(ImagerySourceType imageSource)
 		{
 			if (imageSource != ImagerySourceType.Custom && imageSource != ImagerySourceType.None)
@@ -152,6 +156,10 @@
 			}
 		}
 
+		/// <summary>
+		/// Enables high quality images for selected image factory source.
+		/// </summary>
+		/// <param name="useRetina"></param>
 		public void UseRetina(bool useRetina)
 		{
 			if (_layerProperty.rasterOptions.useRetina != useRetina)
@@ -161,6 +169,10 @@
 			}
 		}
 
+		/// <summary>
+		/// Enable Texture2D compression for image factory outputs.
+		/// </summary>
+		/// <param name="useCompression"></param>
 		public void UseCompression(bool useCompression)
 		{
 			if (_layerProperty.rasterOptions.useCompression != useCompression)
@@ -170,6 +182,10 @@
 			}
 		}
 
+		/// <summary>
+		/// Enable Texture2D MipMap option for image factory outputs.
+		/// </summary>
+		/// <param name="useMipMap"></param>
 		public void UseMipMap(bool useMipMap)
 		{
 			if (_layerProperty.rasterOptions.useMipMap != useMipMap)
