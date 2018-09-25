@@ -244,7 +244,7 @@
 			}
 		}
 
-		public void SetExaggurationFactor(float factor)
+		public void SetExaggerationFactor(float factor)
 		{
 			if (LayerProperty.requiredOptions.exaggerationFactor != factor)
 			{
