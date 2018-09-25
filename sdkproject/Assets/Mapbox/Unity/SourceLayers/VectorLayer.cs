@@ -102,7 +102,17 @@
 		private void AddVectorLayer(object sender, EventArgs args)
 		{
 			VectorLayerUpdateArgs layerUpdateArgs = args as VectorLayerUpdateArgs;
-			layerUpdateArgs.visualizer = _vectorTileFactory.AddVectorLayerVisualizer((VectorSubLayerProperties)layerUpdateArgs.property);
+			if (layerUpdateArgs.property is PrefabItemOptions)
+			{
+				layerUpdateArgs.visualizer =
+					_vectorTileFactory.AddPOIVectorLayerVisualizer((PrefabItemOptions) layerUpdateArgs.property);
+			}
+			else if (layerUpdateArgs.property is VectorSubLayerProperties)
+			{
+				layerUpdateArgs.visualizer =
+					_vectorTileFactory.AddVectorLayerVisualizer((VectorSubLayerProperties) layerUpdateArgs.property);
+			}
+
 			layerUpdateArgs.factory = _vectorTileFactory;
 
 			SubLayerAdded(this, layerUpdateArgs);
@@ -114,7 +124,6 @@
 
 			layerUpdateArgs.visualizer = _vectorTileFactory.FindVectorLayerVisualizer((VectorSubLayerProperties)layerUpdateArgs.property);
 			layerUpdateArgs.factory = _vectorTileFactory;
-			//_vectorTileFactory.RemoveVectorLayerVisualizer((VectorSubLayerProperties)layerUpdateArgs.property);
 
 			SubLayerRemoved(this, layerUpdateArgs);
 		}

@@ -127,18 +127,18 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			return visualizer;
 		}
 
-		public virtual void AddPOIVectorLayerVisualizer(PrefabItemOptions poiSubLayer)
+		public virtual LayerVisualizerBase AddPOIVectorLayerVisualizer(PrefabItemOptions poiSubLayer)
 		{
 			LayerVisualizerBase visualizer = CreateInstance<LocationPrefabsLayerVisualizer>();
 			poiSubLayer.performanceOptions = _properties.performanceOptions;
 			((LocationPrefabsLayerVisualizer)visualizer).SetProperties((PrefabItemOptions)poiSubLayer);
 
 			visualizer.LayerVisualizerHasChanged += UpdateTileFactory;
-			
+
 			visualizer.Initialize();
 			if (visualizer == null)
 			{
-				return;
+				return null;
 			}
 
 			if (_layerBuilder.ContainsKey(visualizer.Key))
@@ -149,6 +149,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase>() { visualizer });
 			}
+
+			return visualizer;
 		}
 
 		public virtual LayerVisualizerBase FindVectorLayerVisualizer(VectorSubLayerProperties subLayer)
@@ -165,7 +167,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			if (_layerBuilder.ContainsKey(subLayer.Key))
 			{
-				Properties.vectorSubLayers.Remove(subLayer.SubLayerProperties);
+				if (Properties.vectorSubLayers.Contains(subLayer.SubLayerProperties))
+				{
+					Properties.vectorSubLayers.Remove(subLayer.SubLayerProperties);
+				}
+				else if (subLayer.SubLayerProperties is PrefabItemOptions && Properties.locationPrefabList.Contains(subLayer.SubLayerProperties as PrefabItemOptions))
+				{
+					Properties.locationPrefabList.Remove(subLayer.SubLayerProperties as PrefabItemOptions);
+				}
+
 				_layerBuilder[subLayer.Key].Remove(subLayer);
 			}
 		}

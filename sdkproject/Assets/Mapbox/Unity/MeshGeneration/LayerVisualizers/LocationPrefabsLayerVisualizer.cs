@@ -33,10 +33,10 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			item.filterOptions.filters.Clear();
 
 			//Check to make sure that when Categories selection is none, the location prefab is disabled
-//			if (item.findByType == LocationPrefabFindBy.MapboxCategory && item.categories == LocationPrefabCategories.None)
-//			{
-//				return;
-//			}
+			//			if (item.findByType == LocationPrefabFindBy.MapboxCategory && item.categories == LocationPrefabCategories.None)
+			//			{
+			//				return;
+			//			}
 
 			if (item.spawnPrefabOptions.prefab == null)
 			{
@@ -168,32 +168,26 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			string concatenatedString = "";
 			if (item.findByType == LocationPrefabFindBy.MapboxCategory)
 			{
-				//if (item.categories != LocationPrefabCategories.None)
-				{
-					List<LocationPrefabCategories> categoriesList = GetSelectedCategoriesList(item.categories);
-					if (categoriesList == null || categoriesList.Count == 0)
-					{
-						return;
-					}
 
-					List<string> stringsList = new List<string>();
-					foreach (LocationPrefabCategories category in categoriesList)
+				List<LocationPrefabCategories> categoriesList = GetSelectedCategoriesList(item.categories);
+				if (categoriesList == null || categoriesList.Count == 0)
+				{
+					return;
+				}
+
+				List<string> stringsList = new List<string>();
+				foreach (LocationPrefabCategories category in categoriesList)
+				{
+					stringsList = LocationPrefabCategoryOptions.GetMakiListFromCategory(category);
+					if (string.IsNullOrEmpty(concatenatedString))
 					{
-						stringsList = LocationPrefabCategoryOptions.GetMakiListFromCategory(category);
-						if (string.IsNullOrEmpty(concatenatedString))
-						{
-							concatenatedString = string.Join(",", stringsList.ToArray());
-						}
-						else
-						{
-							concatenatedString += "," + string.Join(",", stringsList.ToArray());
-						}
+						concatenatedString = string.Join(",", stringsList.ToArray());
+					}
+					else
+					{
+						concatenatedString += "," + string.Join(",", stringsList.ToArray());
 					}
 				}
-				//else
-				//{
-				//	concatenatedString = "xyzzzzz";
-				//}
 
 				LayerFilter filter = new LayerFilter(LayerFilterOperationType.Contains)
 				{
