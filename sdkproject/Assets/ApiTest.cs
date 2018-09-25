@@ -44,11 +44,11 @@ public class ApiTest : MonoBehaviour
 	{
 		_abstractMap.Terrain.EnableCollider(false);
 	}
-	
+
 	[ContextMenu("IncreaseTerrainExagguration")]
 	public void IncreaseTerrainExagguration()
 	{
-		_abstractMap.Terrain.SetExaggurationFactor(_abstractMap.Terrain.LayerProperty.requiredOptions.exaggerationFactor + 0.5f);
+		_abstractMap.Terrain.SetExaggerationFactor(_abstractMap.Terrain.LayerProperty.requiredOptions.exaggerationFactor + 0.5f);
 	}
 
 	[ContextMenu("SetTerrainLayer")]
