@@ -94,6 +94,16 @@
 			}
 		}
 
+		public void RemovePoiLayerWithName(string poiLayerName)
+		{
+			var layerToRemove = FindPoiLayerWithName(poiLayerName);
+			if (layerToRemove != null)
+			{
+				//vectorSubLayers.Remove(layerToRemove);
+				OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = layerToRemove });
+			}
+		}
+
 		public VectorSubLayerProperties FindFeatureLayerWithName(string featureLayerName)
 		{
 			int foundLayerIndex = -1;
@@ -132,6 +142,16 @@
 			}
 			vectorSubLayers.Add(subLayerProperties);
 			OnSubLayerPropertyAdded(new VectorLayerUpdateArgs { property = vectorSubLayers.Last() });
+		}
+
+		public void AddPoiLayer(PrefabItemOptions poiLayerProperties)
+		{
+			if (locationPrefabList == null)
+			{
+				locationPrefabList = new List<PrefabItemOptions>();
+			}
+			locationPrefabList.Add(poiLayerProperties);
+			OnSubLayerPropertyAdded(new VectorLayerUpdateArgs { property = locationPrefabList.Last() });
 		}
 	}
 }
