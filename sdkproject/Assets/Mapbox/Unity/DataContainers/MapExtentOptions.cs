@@ -14,9 +14,9 @@
 			extentType = type;
 		}
 
-		public TileProviderOptions GetTileProviderOptions()
+		public ExtentOptions GetTileProviderOptions()
 		{
-			TileProviderOptions options = new TileProviderOptions();
+			ExtentOptions options = new ExtentOptions();
 			switch (extentType)
 			{
 				case MapExtentType.CameraBounds:

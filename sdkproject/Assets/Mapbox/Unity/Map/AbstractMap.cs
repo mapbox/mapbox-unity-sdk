@@ -220,6 +220,14 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
+		public Type ExtentCalculatorType
+		{
+			get
+			{
+				return _tileProvider.GetType();
+			}
+		}
+
 		/// <summary>
 		/// Gets the absolute zoom of the tiles being currently rendered.
 		/// <seealso cref="Zoom"/>
@@ -829,6 +837,7 @@ namespace Mapbox.Unity.Map
 			OnInitialized();
 		}
 
+		#region Conversion Methods
 		private Vector3 GeoToWorldPositionXZ(Vector2d latitudeLongitude)
 		{
 			// For quadtree implementation of the map, the map scale needs to be compensated for.
@@ -925,16 +934,82 @@ namespace Mapbox.Unity.Map
 			float height = QueryElevationAtInternal(latlong, out tileScale);
 			return (height / tileScale);
 		}
+		#endregion
 
-		public void SetLoadingTexture(Texture2D loadingTexture)
+		#region Map Property Related Changes Methods
+		public virtual void SetLoadingTexture(Texture2D loadingTexture)
 		{
 			Options.loadingTexture = loadingTexture;
 		}
 
-		public void SetTileMaterial(Material tileMaterial)
+		public virtual void SetTileMaterial(Material tileMaterial)
 		{
 			Options.tileMaterial = tileMaterial;
 		}
+
+		/// <summary>
+		/// Sets the extent type and parameters to control the maps extent. 
+		/// </summary>
+		/// <param name="extentType">Extent type.</param>
+		/// <param name="extentOptions">Extent options.</param>
+		public virtual void SetExtent(MapExtentType extentType, ExtentOptions extentOptions = null)
+		{
+			_options.extentOptions.extentType = extentType;
+
+			if (extentOptions != null)
+			{
+				var currentOptions = _options.extentOptions.GetTileProviderOptions();
+				if (currentOptions.GetType() == extentOptions.GetType())
+				{
+					currentOptions = extentOptions;
+				}
+			}
+			OnTileProviderChanged();
+		}
+
+		/// <summary>
+		/// Set parameters for current extent calculator strategy. 
+		/// </summary>
+		/// <param name="extentOptions">Parameters to control the map extent.</param>
+		public virtual void SetExtentOptions(ExtentOptions extentOptions)
+		{
+			_options.extentOptions.GetTileProviderOptions().SetOptions(extentOptions);
+			_options.extentOptions.defaultExtents.HasChanged = true;
+		}
+
+		/// <summary>
+		/// Sets the positions of the map's root transform. 
+		/// Use <paramref name="placementType"/> = <c> MapPlacementType.AtTileCenter</c> to place map root at the center of tile containing the latitude,longitude.
+		/// Use <paramref name="placementType"/> = <c> MapPlacementType.AtLocationCenter</c> to place map root at the latitude,longitude.
+		/// </summary>
+		/// <param name="placementType">Placement type.</param>
+		public virtual void SetPlacementType(MapPlacementType placementType)
+		{
+			_options.placementOptions.placementType = placementType;
+			_options.placementOptions.HasChanged = true;
+		}
+
+		/// <summary>
+		/// Sets the map to use real world scale for map tile. 
+		/// Use world scale for AR use cases or applications that need true world scale.
+		/// </summary>
+		public virtual void UseWorldScale()
+		{
+			_options.scalingOptions.scalingType = MapScalingType.WorldScale;
+			_options.scalingOptions.HasChanged = true;
+		}
+
+		/// <summary>
+		/// Sets the map to use custom scale for map tiles. 
+		/// </summary>
+		/// <param name="tileSizeInUnityUnits">Tile size in unity units to scale each Web Mercator tile.</param>
+		public virtual void UseCustomScale(float tileSizeInUnityUnits)
+		{
+			_options.scalingOptions.scalingType = MapScalingType.Custom;
+			_options.scalingOptions.unityTileSize = tileSizeInUnityUnits;
+			_options.scalingOptions.HasChanged = true;
+		}
+		#endregion
 
 		#region Location Prefabs Methods
 

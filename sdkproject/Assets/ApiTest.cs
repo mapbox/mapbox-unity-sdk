@@ -20,6 +20,19 @@ public class ApiTest : MonoBehaviour
 		_abstractMap = FindObjectOfType<AbstractMap>();
 	}
 
+	[ContextMenu("ChangeExtentType")]
+	public void ChangeExtentType()
+	{
+		_abstractMap.SetExtent(MapExtentType.CameraBounds);
+	}
+
+	[ContextMenu("ChangeExtentOptions")]
+	public void ChangeExtentOptions()
+	{
+		_abstractMap.SetExtentOptions(new RangeTileProviderOptions { east = 2, west = 3, north = 0, south = 1 });
+	}
+
+
 	[ContextMenu("EnableTerrainColliders")]
 	public void EnableTerrainColliders()
 	{
