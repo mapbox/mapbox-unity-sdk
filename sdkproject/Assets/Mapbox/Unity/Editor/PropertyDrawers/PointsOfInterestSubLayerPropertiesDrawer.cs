@@ -136,12 +136,7 @@ namespace Mapbox.Unity.Map
 				{
 					GUI.enabled = false;
 				}
-				EditorGUI.BeginChangeCheck();
 				DrawLayerLocationPrefabProperties(layerProperty, property);
-				if (EditorGUI.EndChangeCheck())
-				{
-					EditorHelper.CheckForModifiedProperty(property);
-				}
 				if (!isLayerActive)
 				{
 					GUI.enabled = true;
