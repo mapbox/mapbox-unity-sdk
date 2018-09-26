@@ -263,6 +263,14 @@
 			}
 		}
 
+		/// <summary>
+		/// Change terrain layer settings.
+		/// </summary>
+		/// <param name="dataSource">The data source for the terrain height map.</param>
+		/// <param name="elevationType">Mesh generation strategy for the tile/height.</param>
+		/// <param name="enableCollider">Enable/Disable collider component for the tile game object.</param>
+		/// <param name="factor">Multiplier for the height data.</param>
+		/// <param name="layerId">Unity Layer for the tile game object.</param>
 		public void SetProperties(ElevationSourceType dataSource = ElevationSourceType.MapboxTerrain,
 			ElevationLayerType elevationType = ElevationLayerType.TerrainWithElevation,
 			bool enableCollider = false,
