@@ -123,7 +123,7 @@ namespace Mapbox.Editor
 			categoryProp.intValue = (int)(LocationPrefabCategories)(EditorGUILayout.EnumFlagsField(categoriesDropDown, (LocationPrefabCategories)categoryProp.intValue));
 			if (EditorGUI.EndChangeCheck())
 			{
-				EditorHelper.CheckForModifiedProperty(property, true);
+				EditorHelper.CheckForModifiedProperty(property);
 			}
 			ShowDensitySlider(property);
 		}
@@ -148,7 +148,7 @@ namespace Mapbox.Editor
 
 				if(EditorGUI.EndChangeCheck())
 				{
-					EditorHelper.CheckForModifiedProperty(property);
+					EditorHelper.CheckForModifiedProperty(property, true);
 				}
 				// draw search button.
 				if (GUILayout.Button(new GUIContent(searchButtonContent), (GUIStyle)"minibuttonleft", GUILayout.MaxWidth(100)))
