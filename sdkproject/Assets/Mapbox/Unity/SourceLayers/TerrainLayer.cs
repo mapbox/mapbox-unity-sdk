@@ -21,6 +21,7 @@
 				return _layerProperty;
 			}
 		}
+
 		public MapLayerType LayerType
 		{
 			get
@@ -226,42 +227,74 @@
 			}
 		}
 
-		public void SetElevationType(ElevationLayerType elecationType)
+		public void SetElevationType(ElevationLayerType elevationType)
 		{
-			if (LayerProperty.elevationLayerType != elecationType)
+			if (_layerProperty.elevationLayerType != elevationType)
 			{
-				LayerProperty.elevationLayerType = elecationType;
-				LayerProperty.HasChanged = true;
+				_layerProperty.elevationLayerType = elevationType;
+				_layerProperty.HasChanged = true;
 			}
 		}
 
 		public void EnableCollider(bool enable)
 		{
-			if (LayerProperty.colliderOptions.addCollider != enable)
+			if (_layerProperty.colliderOptions.addCollider != enable)
 			{
-				LayerProperty.colliderOptions.addCollider = enable;
-				LayerProperty.colliderOptions.HasChanged = true;
+				_layerProperty.colliderOptions.addCollider = enable;
+				_layerProperty.colliderOptions.HasChanged = true;
 			}
 		}
 
 		public void SetExaggerationFactor(float factor)
 		{
-			if (LayerProperty.requiredOptions.exaggerationFactor != factor)
+			if (_layerProperty.requiredOptions.exaggerationFactor != factor)
 			{
-				LayerProperty.requiredOptions.exaggerationFactor = factor;
-				LayerProperty.requiredOptions.HasChanged = true;
+				_layerProperty.requiredOptions.exaggerationFactor = factor;
+				_layerProperty.requiredOptions.HasChanged = true;
 			}
 		}
 
 		public void SetLayer(int layerId)
 		{
-			if (LayerProperty.unityLayerOptions.layerId != layerId)
+			if (_layerProperty.unityLayerOptions.layerId != layerId)
 			{
-				LayerProperty.unityLayerOptions.layerId = layerId;
-				LayerProperty.unityLayerOptions.HasChanged = true;
+				_layerProperty.unityLayerOptions.layerId = layerId;
+				_layerProperty.unityLayerOptions.HasChanged = true;
 			}
 		}
 
+		public void SetProperties(ElevationSourceType dataSource = ElevationSourceType.MapboxTerrain,
+			ElevationLayerType elevationType = ElevationLayerType.TerrainWithElevation,
+			bool enableCollider = false,
+			float factor = 1,
+			int layerId = 0)
+		{
+			if (_layerProperty.sourceType != dataSource ||
+			    _layerProperty.elevationLayerType != elevationType)
+			{
+				_layerProperty.sourceType = dataSource;
+				_layerProperty.elevationLayerType = elevationType;
+				_layerProperty.HasChanged = true;
+			}
+
+			if (_layerProperty.colliderOptions.addCollider != enableCollider)
+			{
+				_layerProperty.colliderOptions.addCollider = enableCollider;
+				_layerProperty.colliderOptions.HasChanged = true;
+			}
+
+			if (_layerProperty.requiredOptions.exaggerationFactor != factor)
+			{
+				_layerProperty.requiredOptions.exaggerationFactor = factor;
+				_layerProperty.requiredOptions.HasChanged = true;
+			}
+
+			if (_layerProperty.unityLayerOptions.layerId != layerId)
+			{
+				_layerProperty.unityLayerOptions.layerId = layerId;
+				_layerProperty.unityLayerOptions.HasChanged = true;
+			}
+		}
 		#endregion
 
 

@@ -179,7 +179,25 @@
 			}
 		}
 
+		public void SetProperties(ImagerySourceType imageSource ,bool useRetina,bool useCompression ,bool useMipMap)
+		{
+			if (imageSource != ImagerySourceType.Custom && imageSource != ImagerySourceType.None)
+			{
+				_layerProperty.sourceType = imageSource;
+				_layerProperty.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(imageSource);
+				_layerProperty.HasChanged = true;
+			}
 
+			if (_layerProperty.rasterOptions.useRetina != useRetina ||
+			    _layerProperty.rasterOptions.useCompression != useCompression ||
+			    _layerProperty.rasterOptions.useMipMap != useMipMap)
+			{
+				_layerProperty.rasterOptions.useRetina = useRetina;
+				_layerProperty.rasterOptions.useCompression = useCompression;
+				_layerProperty.rasterOptions.useMipMap = useMipMap;
+				_layerProperty.rasterOptions.HasChanged = true;
+			}
+		}
 		#endregion
 	}
 }
