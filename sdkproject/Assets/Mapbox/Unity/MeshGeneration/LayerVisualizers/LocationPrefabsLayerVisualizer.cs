@@ -40,6 +40,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			if (item.spawnPrefabOptions.prefab == null)
 			{
+				//item.spawnPrefabOptions.prefab = GameObject.CreatePrimitive(PrimitiveType.Cube);
+				item.spawnPrefabOptions.prefab = Resources.Load<GameObject>("MapboxPin");
 				Debug.LogError("No prefab found. Please assign a prefab to spawn it on the map");
 			}
 

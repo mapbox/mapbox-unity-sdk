@@ -32,6 +32,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void Run(VectorEntity ve, UnityTile tile)
 		{
+			if (_options.prefab == null)
+			{
+				return;
+			}
+
 			GameObject go = null;
 
 			if (_objects.ContainsKey(ve.GameObject))
