@@ -202,4 +202,24 @@ public class ApiTest : MonoBehaviour
 		pois.findByType = LocationPrefabFindBy.MapboxCategory;
 		pois.HasChanged = true;
 	}
+
+	[ContextMenu("Vector - Add New Filter")]
+	public void AddNewFilter()
+	{
+		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindPoiLayerWithName("loc");
+		vectorLayer
+		//pois.findByType = LocationPrefabFindBy.MapboxCategory;
+		//pois.HasChanged = true;
+		//filterOptions
+		//filters
+	}
+
+	[ContextMenu("Vector - Remove Filter")]
+	public void RemoveFilter()
+	{
+		var pois = _abstractMap.VectorData.LayerProperty.FindPoiLayerWithName("loc");
+		pois.findByType = LocationPrefabFindBy.MapboxCategory;
+		pois.HasChanged = true;
+	}
+
 }
