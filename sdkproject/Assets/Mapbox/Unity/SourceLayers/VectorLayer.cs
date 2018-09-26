@@ -9,6 +9,12 @@
 	[Serializable]
 	public class VectorLayer : AbstractLayer, IVectorDataLayer
 	{
+		#region Events
+		public EventHandler SubLayerAdded;
+		public EventHandler SubLayerRemoved;
+		#endregion
+
+
 		[SerializeField]
 		VectorLayerProperties _layerProperty = new VectorLayerProperties();
 
@@ -93,15 +99,34 @@
 			}
 		}
 
-		public void AddVectorLayer(VectorSubLayerProperties subLayerProperties)
+		private void AddVectorLayer(object sender, EventArgs args)
 		{
-			if (_layerProperty.vectorSubLayers == null)
+			VectorLayerUpdateArgs layerUpdateArgs = args as VectorLayerUpdateArgs;
+			if (layerUpdateArgs.property is PrefabItemOptions)
 			{
-				_layerProperty.vectorSubLayers = new List<VectorSubLayerProperties>();
+				layerUpdateArgs.visualizer =
+					_vectorTileFactory.AddPOIVectorLayerVisualizer((PrefabItemOptions) layerUpdateArgs.property);
 			}
-			_layerProperty.vectorSubLayers.Add(subLayerProperties);
+			else if (layerUpdateArgs.property is VectorSubLayerProperties)
+			{
+				layerUpdateArgs.visualizer =
+					_vectorTileFactory.AddVectorLayerVisualizer((VectorSubLayerProperties) layerUpdateArgs.property);
+			}
+
+			layerUpdateArgs.factory = _vectorTileFactory;
+
+			SubLayerAdded(this, layerUpdateArgs);
 		}
 
+		private void RemoveVectorLayer(object sender, EventArgs args)
+		{
+			VectorLayerUpdateArgs layerUpdateArgs = args as VectorLayerUpdateArgs;
+
+			layerUpdateArgs.visualizer = _vectorTileFactory.FindVectorLayerVisualizer((VectorSubLayerProperties)layerUpdateArgs.property);
+			layerUpdateArgs.factory = _vectorTileFactory;
+
+			SubLayerRemoved(this, layerUpdateArgs);
+		}
 		public void AddLocationPrefabItem(PrefabItemOptions prefabItem)
 		{
 			//ensure that there is a list of prefabitems
@@ -133,25 +158,25 @@
 			}
 		}
 
-
 		public void Initialize(LayerProperties properties)
 		{
 			_layerProperty = (VectorLayerProperties)properties;
 			Initialize();
 		}
 
-
-		private void RedrawVectorLayer(object sender, System.EventArgs e)
-		{
-			NotifyUpdateLayer(_vectorTileFactory, true);
-		}
-
 		public void Initialize()
 		{
 			_vectorTileFactory = ScriptableObject.CreateInstance<VectorTileFactory>();
-			_vectorTileFactory.SetOptions(_layerProperty);
+			UpdateFactorySettings();
 
-			_vectorTileFactory.TileFactoryHasChanged += RedrawVectorLayer;
+			_layerProperty.PropertyHasChanged += RedrawVectorLayer;
+			_layerProperty.SubLayerPropertyAdded += AddVectorLayer;
+			_layerProperty.SubLayerPropertyRemoved += RemoveVectorLayer;
+			_vectorTileFactory.TileFactoryHasChanged += (sender, args) =>
+			{
+				Debug.Log("VectorLayer Delegate");
+				NotifyUpdateLayer(args as LayerUpdateArgs);
+			};
 		}
 
 		public void UpdateFactorySettings()
@@ -170,6 +195,11 @@
 		public void Update(LayerProperties properties)
 		{
 			Initialize(properties);
+		}
+
+		private void RedrawVectorLayer(object sender, System.EventArgs e)
+		{
+			NotifyUpdateLayer(_vectorTileFactory, sender as MapboxDataProperty, true);
 		}
 
 		public VectorTileFactory Factory

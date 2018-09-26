@@ -62,9 +62,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			if (Properties.sourceType == ElevationSourceType.None)
 			{
 				tile.SetHeightData(null);
+				tile.MeshFilter.mesh.Clear();
+				tile.ElevationType = TileTerrainType.None;
 				return;
 			}
-			
+
 			if (Strategy is IElevationBasedTerrainStrategy)
 			{
 				tile.HeightDataState = TilePropertyState.Loading;
@@ -98,6 +100,33 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			Strategy.PostProcessTile(tile);
 		}
+
+		//public override void UpdateTileProperty(UnityTile tile, LayerUpdateArgs updateArgs)
+		//{
+		//	updateArgs.property.UpdateProperty(tile);
+
+		//	if (updateArgs.property.NeedsForceUpdate())
+		//	{
+		//		Register(tile);
+		//	}
+
+		//	//if (updateArgs.property is TerrainColliderOptions)
+		//	//{
+		//	//	var existingCollider = tileBundleValue.Collider;
+		//	//	if (Properties.colliderOptions.addCollider)
+		//	//	{
+		//	//		if (existingCollider == null)
+		//	//		{
+		//	//			tileBundleValue.gameObject.AddComponent<MeshCollider>();
+		//	//		}
+		//	//	}
+		//	//	else
+		//	//	{
+		//	//		Destroy(tileBundleValue.Collider);
+		//	//	}
+		//	//}
+		//}
+
 		#endregion
 
 		#region DataFetcherEvents
@@ -108,7 +137,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				_tilesWaitingResponse.Remove(tile);
 				if (tile.HeightDataState != TilePropertyState.Unregistered)
 				{
-					tile.SetHeightData(pngRasterTile.Data, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.requiredOptions.addCollider);
+					tile.SetHeightData(pngRasterTile.Data, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
 					Strategy.RegisterTile(tile);
 				}
 			}

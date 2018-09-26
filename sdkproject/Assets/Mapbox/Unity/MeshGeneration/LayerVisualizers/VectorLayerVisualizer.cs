@@ -28,7 +28,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 	public class VectorLayerVisualizer : LayerVisualizerBase
 	{
 		VectorSubLayerProperties _layerProperties;
-		public VectorSubLayerProperties SubLayerProperties
+		public override VectorSubLayerProperties SubLayerProperties
 		{
 			get
 			{
@@ -52,7 +52,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 		}
 
-		public event System.EventHandler VectorHasChanged;
+		//public event System.EventHandler VectorHasChanged;
 
 		protected LayerPerformanceOptions _performanceOptions;
 		protected Dictionary<UnityTile, List<int>> _activeCoroutines;
@@ -69,10 +69,22 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			set { _layerProperties.coreOptions.layerName = value; }
 		}
 
+		public T FindMeshModifier<T>() where T : MeshModifier
+		{
+			MeshModifier mod = _defaultStack.MeshModifiers.FirstOrDefault(x => x.GetType() == typeof(T));
+			return (T)mod;
+		}
+
+		public T FindGameObjectModifier<T>() where T : GameObjectModifier
+		{
+			GameObjectModifier mod = _defaultStack.GoModifiers.FirstOrDefault(x => x.GetType() == typeof(T));
+			return (T)mod;
+		}
+
 		public T AddOrCreateMeshModifier<T>() where T : MeshModifier
 		{
 			MeshModifier mod = _defaultStack.MeshModifiers.FirstOrDefault(x => x.GetType() == typeof(T));
-			if(mod == null)
+			if (mod == null)
 			{
 				mod = (MeshModifier)CreateInstance(typeof(T));
 				_defaultStack.MeshModifiers.Add(mod);
@@ -91,37 +103,49 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			return (T)mod;
 		}
 
-		private void UpdateMaterials()
+		private void UpdateVector(object sender, System.EventArgs eventArgs)
 		{
-			Debug.Log("UpdateMaterials");
-			// do something with materials...
+			Debug.Log("UpdateVector " + sender.ToString());
+
+			VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
+
+			layerUpdateArgs.visualizer = this;
+			layerUpdateArgs.effectsVectorLayer = true;
+
+			if (layerUpdateArgs.modifier != null)
+			{
+				layerUpdateArgs.property.PropertyHasChanged -= layerUpdateArgs.modifier.UpdateModifier;
+				layerUpdateArgs.modifier.ModifierHasChanged -= UpdateVector;
+			}
+			else if (layerUpdateArgs.property != null)
+			{
+				layerUpdateArgs.property.PropertyHasChanged -= UpdateVector;
+			}
+
+			foreach (var modifier in _defaultStack.MeshModifiers)
+			{
+				modifier.UnbindProperties();
+				modifier.ModifierHasChanged -= UpdateVector;
+			}
+			foreach (var modifier in _defaultStack.GoModifiers)
+			{
+				modifier.UnbindProperties();
+				modifier.ModifierHasChanged -= UpdateVector;
+			}
+
+			_layerProperties.extrusionOptions.PropertyHasChanged -= UpdateVector;
+			_layerProperties.coreOptions.PropertyHasChanged -= UpdateVector;
+			_layerProperties.materialOptions.PropertyHasChanged -= UpdateVector;
+
+			OnUpdateLayerVisualizer(layerUpdateArgs);
 		}
 
-		private void UpdateColliders()
+		public override void SetProperties(VectorSubLayerProperties properties)
 		{
-			Debug.Log("UpdateColliders");
-			//do something with colliders...
-		}
-
-		private void UpdateExtrusion()
-		{
-			Debug.Log("UpdateExtrusion");
-			//do something with extrusion...
-		}
-
-		private void UpdateVector(object sender, System.EventArgs e)
-		{
-			//Debug.Log("UpdateVector " + sender.ToString());
-			OnUpdateLayerVisualizer(e);
-			//do something...
-		}
-
-		public void SetProperties(VectorSubLayerProperties properties)
-		{
-			if(_layerProperties == null && properties != null)
+			if (_layerProperties == null && properties != null)
 			{
 				_layerProperties = properties;
-				if(_performanceOptions == null && properties.performanceOptions != null)
+				if (_performanceOptions == null && properties.performanceOptions != null)
 				{
 					_performanceOptions = properties.performanceOptions;
 				}
@@ -131,25 +155,18 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			//this message is currenly displaying multiple times per layer on redraws...
 			Debug.Log("SetProperties");
 
-			_layerProperties.PropertyHasChanged += UpdateVector;
-
-			_layerProperties.coreOptions.PropertyHasChanged += UpdateVector;
-
-			_layerProperties.filterOptions.PropertyHasChanged += UpdateVector;
-
-			_layerProperties.extrusionOptions.PropertyHasChanged += UpdateVector;
-
-			_layerProperties.materialOptions.PropertyHasChanged += UpdateVector;
-
-			_layerProperties.colliderOptions.PropertyHasChanged += UpdateVector;
-
-			Active = _layerProperties.coreOptions.isActive;
-
 			if (_layerProperties.coreOptions.combineMeshes)
 			{
-				if(_defaultStack == null || !(_defaultStack is MergedModifierStack))
+				if (_defaultStack == null || !(_defaultStack is MergedModifierStack))
 				{
 					_defaultStack = ScriptableObject.CreateInstance<MergedModifierStack>();
+				}
+				else
+				{
+					// HACK - to clean out the Modifiers.
+					// Will this trigger GC that we could avoid ??
+					_defaultStack.MeshModifiers.Clear();
+					_defaultStack.GoModifiers.Clear();
 				}
 			}
 			else
@@ -157,109 +174,141 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				if (_defaultStack == null || !(_defaultStack is ModifierStack))
 				{
 					_defaultStack = ScriptableObject.CreateInstance<ModifierStack>();
+					((ModifierStack)_defaultStack).moveFeaturePositionTo = _layerProperties.moveFeaturePositionTo;
 				}
-				((ModifierStack)_defaultStack).moveFeaturePositionTo = _layerProperties.moveFeaturePositionTo;
+				else
+				{
+					// HACK - to clean out the Modifiers.
+					// Will this trigger GC that we could avoid ??
+					_defaultStack.MeshModifiers.Clear();
+					_defaultStack.GoModifiers.Clear();
+				}
 			}
 
-			_defaultStack.MeshModifiers = new List<MeshModifier>();
-			_defaultStack.GoModifiers = new List<GameObjectModifier>();
+			//Add any additional modifiers that were added.
+			if (_defaultStack.MeshModifiers == null)
+			{
+				_defaultStack.MeshModifiers = new List<MeshModifier>();
+			}
+			if (_defaultStack.GoModifiers == null)
+			{
+				_defaultStack.GoModifiers = new List<GameObjectModifier>();
+			}
+
+			// Setup material options.
+			_layerProperties.materialOptions.SetDefaultMaterialOptions();
 
 			switch (_layerProperties.coreOptions.geometryType)
 			{
 				case VectorPrimitiveType.Point:
 				case VectorPrimitiveType.Custom:
-					// Let the user add anything that they want
-					if (_layerProperties.coreOptions.snapToTerrain == true)
 					{
-						//defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
-						AddOrCreateMeshModifier<SnapTerrainModifier>();
-					}
-					break;
-				case VectorPrimitiveType.Line:
-
-					var lineMeshMod = AddOrCreateMeshModifier<LineMeshModifier>();//CreateInstance<LineMeshModifier>();
-					lineMeshMod.Width = _layerProperties.coreOptions.lineWidth;
-					//defaultMeshModifierStack.Add(lineMeshMod);
-
-					if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
-					{
-						var heightMod = AddOrCreateMeshModifier<HeightModifier>();
-						heightMod.SetProperties(_layerProperties.extrusionOptions);
-						//defaultMeshModifierStack.Add(heightMod);
-					}
-					if (_layerProperties.coreOptions.snapToTerrain == true)
-					{
-						AddOrCreateMeshModifier<SnapTerrainModifier>();
-					}
-
-					//collider modifier options
-					if (_layerProperties.colliderOptions.colliderType != ColliderType.None)
-					{
-						var lineColliderMod = AddOrCreateGameObjectModifier<ColliderModifier>();
-						lineColliderMod.SetProperties(_layerProperties.colliderOptions);
-					}
-
-					var lineStyleMod = AddOrCreateGameObjectModifier<MaterialModifier>();
-					lineStyleMod.SetProperties(MapboxDefaultStyles.GetGeometryMaterialOptions(_layerProperties.materialOptions));
-
-					break;
-				case VectorPrimitiveType.Polygon:
-					if (_layerProperties.coreOptions.snapToTerrain == true)
-					{
-						AddOrCreateMeshModifier<SnapTerrainModifier>();
-					}
-					AddOrCreateMeshModifier<PolygonMeshModifier>();
-
-					GeometryMaterialOptions geometryMaterialOptions = MapboxDefaultStyles.GetGeometryMaterialOptions(_layerProperties.materialOptions);
-
-					UVModifierOptions uvModOptions = new UVModifierOptions();
-					uvModOptions.texturingType = geometryMaterialOptions.texturingType;
-					uvModOptions.atlasInfo = geometryMaterialOptions.atlasInfo;
-					uvModOptions.style = geometryMaterialOptions.style;
-
-					var uvMod = AddOrCreateMeshModifier<UvModifier>();
-					uvMod.SetProperties(uvModOptions);
-
-					if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
-					{
-						//replace materialOptions with styleOptions
-						if (geometryMaterialOptions.texturingType == UvMapType.Atlas || geometryMaterialOptions.texturingType == UvMapType.AtlasWithColorPalette)
+						// Let the user add anything that they want
+						if (_layerProperties.coreOptions.snapToTerrain == true)
 						{
-							var atlasMod = AddOrCreateMeshModifier<TextureSideWallModifier>();
-							GeometryExtrusionWithAtlasOptions atlasOptions = new GeometryExtrusionWithAtlasOptions(_layerProperties.extrusionOptions, uvModOptions);
-							atlasMod.SetProperties(atlasOptions);
+							//defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
+							AddOrCreateMeshModifier<SnapTerrainModifier>();
 						}
-						else
+
+						break;
+					}
+				case VectorPrimitiveType.Line:
+					{
+						if (_layerProperties.coreOptions.snapToTerrain == true)
+						{
+							AddOrCreateMeshModifier<SnapTerrainModifier>();
+						}
+
+						var lineMeshMod = AddOrCreateMeshModifier<LineMeshModifier>();
+						lineMeshMod.SetProperties(_layerProperties.lineGeometryOptions);
+						lineMeshMod.ModifierHasChanged += UpdateVector;
+
+						if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
 						{
 							var heightMod = AddOrCreateMeshModifier<HeightModifier>();
 							heightMod.SetProperties(_layerProperties.extrusionOptions);
+							heightMod.ModifierHasChanged += UpdateVector;
 						}
-					}
 
-					//collider modifier options
-					if (_layerProperties.colliderOptions.colliderType != ColliderType.None)
+						//collider modifier options
+						var lineColliderMod = AddOrCreateGameObjectModifier<ColliderModifier>();
+						lineColliderMod.SetProperties(_layerProperties.colliderOptions);
+						lineColliderMod.ModifierHasChanged += UpdateVector;
+
+						var lineStyleMod = AddOrCreateGameObjectModifier<MaterialModifier>();
+						lineStyleMod.SetProperties(_layerProperties.materialOptions);
+						lineStyleMod.ModifierHasChanged += UpdateVector;
+
+						break;
+					}
+				case VectorPrimitiveType.Polygon:
 					{
+						if (_layerProperties.coreOptions.snapToTerrain == true)
+						{
+							AddOrCreateMeshModifier<SnapTerrainModifier>();
+						}
+
+						AddOrCreateMeshModifier<PolygonMeshModifier>();
+
+						UVModifierOptions uvModOptions = new UVModifierOptions();
+						uvModOptions.texturingType = _layerProperties.materialOptions.texturingType;
+						uvModOptions.atlasInfo = _layerProperties.materialOptions.atlasInfo;
+						uvModOptions.style = _layerProperties.materialOptions.style;
+
+						var uvMod = AddOrCreateMeshModifier<UvModifier>();
+						uvMod.SetProperties(uvModOptions);
+
+						if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
+						{
+							//replace materialOptions with styleOptions
+							if (_layerProperties.materialOptions.texturingType == UvMapType.Atlas || _layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette)
+							{
+								var atlasMod = AddOrCreateMeshModifier<TextureSideWallModifier>();
+								GeometryExtrusionWithAtlasOptions atlasOptions = new GeometryExtrusionWithAtlasOptions(_layerProperties.extrusionOptions, uvModOptions);
+								atlasMod.SetProperties(atlasOptions);
+								_layerProperties.extrusionOptions.PropertyHasChanged += UpdateVector;
+							}
+							else
+							{
+								var heightMod = AddOrCreateMeshModifier<HeightModifier>();
+								heightMod.SetProperties(_layerProperties.extrusionOptions);
+								heightMod.ModifierHasChanged += UpdateVector;
+							}
+						}
+
+						//collider modifier options
 						var polyColliderMod = AddOrCreateGameObjectModifier<ColliderModifier>();
 						polyColliderMod.SetProperties(_layerProperties.colliderOptions);
-					}
+						polyColliderMod.ModifierHasChanged += UpdateVector;
 
-					var styleMod = AddOrCreateGameObjectModifier<MaterialModifier>();
-					styleMod.SetProperties(geometryMaterialOptions);
+						var styleMod = AddOrCreateGameObjectModifier<MaterialModifier>();
+						styleMod.SetProperties(_layerProperties.materialOptions);
+						styleMod.ModifierHasChanged += UpdateVector;
 
-					if (geometryMaterialOptions.texturingType == UvMapType.AtlasWithColorPalette)
-					{
-						var colorPaletteMod = AddOrCreateGameObjectModifier<MapboxStylesColorModifier>();
-						colorPaletteMod.m_scriptablePalette = geometryMaterialOptions.colorPalette;
+						if (_layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette)
+						{
+							var colorPaletteMod = AddOrCreateGameObjectModifier<MapboxStylesColorModifier>();
+							colorPaletteMod.m_scriptablePalette = _layerProperties.materialOptions.colorPalette;
+							_layerProperties.materialOptions.PropertyHasChanged += UpdateVector;
+							//TODO: Add SetProperties Method to MapboxStylesColorModifier
+						}
+
+						break;
 					}
-					break;
 				default:
 					break;
 			}
 
-			//Add any additional modifiers that were added.
-			_defaultStack.MeshModifiers.AddRange(_layerProperties.MeshModifiers);
-			_defaultStack.GoModifiers.AddRange(_layerProperties.GoModifiers);
+			_layerProperties.coreOptions.PropertyHasChanged += UpdateVector;
 
+			if (_layerProperties.MeshModifiers != null)
+			{
+				_defaultStack.MeshModifiers.AddRange(_layerProperties.MeshModifiers);
+			}
+			if (_layerProperties.GoModifiers != null)
+			{
+				_defaultStack.GoModifiers.AddRange(_layerProperties.GoModifiers);
+			}
 			//Adding filters from the types dropdown
 
 			//if ((MapboxSpecialLayerParameters.LayerNameTypeProperty.ContainsKey(properties.coreOptions.layerName)) && !string.IsNullOrEmpty(properties.selectedTypes))
@@ -375,6 +424,14 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 		}
 
+		public override bool Active
+		{
+			get
+			{
+				return _layerProperties.coreOptions.isActive;
+			}
+		}
+
 		#endregion
 		public override void Initialize()
 		{
@@ -389,6 +446,15 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				_defaultStack.Initialize();
 			}
 		}
+
+		public override void InitializeStack()
+		{
+			if (_defaultStack != null)
+			{
+				_defaultStack.Initialize();
+			}
+		}
+
 
 		public override void Create(VectorTileLayer layer, UnityTile tile, Action<UnityTile, LayerVisualizerBase> callback)
 		{
@@ -488,7 +554,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		{
 			var fe = layerProperties.vectorTileLayer.GetFeature(index);
 			List<List<Point2d<float>>> geom;
-			if (layerProperties.buildingsWithUniqueIds == true) //ids from building dataset is big ulongs 
+			if (layerProperties.buildingsWithUniqueIds == true) //ids from building dataset is big ulongs
 			{
 				geom = fe.Geometry<float>(); //and we're not clipping by passing no parameters
 
@@ -643,22 +709,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		public override void OnUnregisterTile(UnityTile tile)
 		{
 			base.OnUnregisterTile(tile);
-
-
-			//These unregister calls seem to do nothing..
-			_layerProperties.PropertyHasChanged -= UpdateVector;
-
-			_layerProperties.coreOptions.PropertyHasChanged -= UpdateVector;
-
-			_layerProperties.filterOptions.PropertyHasChanged -= UpdateVector;
-
-			_layerProperties.extrusionOptions.PropertyHasChanged -= UpdateVector;
-
-			_layerProperties.materialOptions.PropertyHasChanged -= UpdateVector;
-
-			_layerProperties.colliderOptions.PropertyHasChanged -= UpdateVector;
-
-			//tile.VectorDataState = Enums.TilePropertyState.Cancelled;
 			if (_activeCoroutines.ContainsKey(tile))
 			{
 				foreach (var cor in _activeCoroutines[tile])
@@ -667,7 +717,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				}
 			}
 			_activeCoroutines.Remove(tile);
-			
+
 			if (_defaultStack != null)
 			{
 				_defaultStack.UnregisterTile(tile);

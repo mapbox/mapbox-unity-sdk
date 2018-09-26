@@ -6,7 +6,7 @@
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies;
 
-	// Layer Concrete Implementation. 
+	// Layer Concrete Implementation.
 	[Serializable]
 	public class TerrainLayer : AbstractLayer, ITerrainLayer
 	{
@@ -126,15 +126,36 @@
 		{
 			_elevationFactory = ScriptableObject.CreateInstance<TerrainFactoryBase>();
 			SetFactoryOptions();
-			_layerProperty.PropertyHasChanged += RedrawLayer;
-		}
 
-		public void RedrawLayer(object sender, System.EventArgs e)
-		{
-			SetFactoryOptions();
-			//notifying map to reload existing tiles
-			NotifyUpdateLayer(_elevationFactory, true);
+			_layerProperty.colliderOptions.PropertyHasChanged += (property, e) =>
+			{
+				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
+			};
+			_layerProperty.requiredOptions.PropertyHasChanged += (property, e) =>
+			{
+				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
+			};
+			_layerProperty.unityLayerOptions.PropertyHasChanged += (property, e) =>
+			{
+				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
+			};
+			_layerProperty.PropertyHasChanged += (property, e) =>
+			{
+				//terrain factory uses strategy objects and they are controlled by layer
+				//so we have to refresh that first
+				//pushing new settings to factory directly
+				Debug.Log("here");
+				SetFactoryOptions();
+				//notifying map to reload existing tiles
+				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
+			};
 		}
+		// public void RedrawLayer(object sender, System.EventArgs e)
+		// {
+		// 	SetFactoryOptions();
+		// 	//notifying map to reload existing tiles
+		// 	NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
+		// }
 
 		private void SetFactoryOptions()
 		{
@@ -193,6 +214,56 @@
 			}
 		}
 		private TerrainFactoryBase _elevationFactory;
+
+		#region API Methods
+
+		public void SetDataSource(ElevationSourceType dataSource)
+		{
+			if (_layerProperty.sourceType != dataSource)
+			{
+				_layerProperty.sourceType = dataSource;
+				_layerProperty.HasChanged = true;
+			}
+		}
+
+		public void SetElevationType(ElevationLayerType elecationType)
+		{
+			if (LayerProperty.elevationLayerType != elecationType)
+			{
+				LayerProperty.elevationLayerType = elecationType;
+				LayerProperty.HasChanged = true;
+			}
+		}
+
+		public void EnableCollider(bool enable)
+		{
+			if (LayerProperty.colliderOptions.addCollider != enable)
+			{
+				LayerProperty.colliderOptions.addCollider = enable;
+				LayerProperty.colliderOptions.HasChanged = true;
+			}
+		}
+
+		public void SetExaggerationFactor(float factor)
+		{
+			if (LayerProperty.requiredOptions.exaggerationFactor != factor)
+			{
+				LayerProperty.requiredOptions.exaggerationFactor = factor;
+				LayerProperty.requiredOptions.HasChanged = true;
+			}
+		}
+
+		public void SetLayer(int layerId)
+		{
+			if (LayerProperty.unityLayerOptions.layerId != layerId)
+			{
+				LayerProperty.unityLayerOptions.layerId = layerId;
+				LayerProperty.unityLayerOptions.HasChanged = true;
+			}
+		}
+
+		#endregion
+
 
 	}
 }

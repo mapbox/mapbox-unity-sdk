@@ -4,14 +4,16 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using System;
+	using Mapbox.Unity.Map;
 
 	/// <summary>
 	/// Layer visualizers contains sytling logic and processes features
 	/// </summary>
 	public abstract class LayerVisualizerBase : ScriptableObject
 	{
-		public bool Active = true;
+		public abstract bool Active { get; }
 		public abstract string Key { get; set; }
+		public abstract VectorSubLayerProperties SubLayerProperties { get; set; }
 		//public event Action FeaturePreProcessEvent;
 		//public event Action FeaturePostProcessEvent;
 		public abstract void Create(VectorTileLayer layer, UnityTile tile, Action<UnityTile, LayerVisualizerBase> callback = null);
@@ -22,7 +24,14 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		{
 
 		}
+		public virtual void InitializeStack()
+		{
 
+		}
+		public virtual void SetProperties(VectorSubLayerProperties properties)
+		{
+
+		}
 		public void UnregisterTile(UnityTile tile)
 		{
 			OnUnregisterTile(tile);

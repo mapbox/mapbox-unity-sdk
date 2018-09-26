@@ -125,9 +125,17 @@
 			}
 
 			GUILayout.Space(-lineHeight);
+			EditorGUI.BeginChangeCheck();
+			EditorGUILayout.PropertyField(property.FindPropertyRelative("colliderOptions"), true);
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(property.FindPropertyRelative("colliderOptions"));
+			}
+			GUILayout.Space(2 * -lineHeight);
 
 			EditorGUI.BeginChangeCheck();
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("requiredOptions"), true);
+			GUILayout.Space(-lineHeight);
 			if (EditorGUI.EndChangeCheck())
 			{
 				EditorHelper.CheckForModifiedProperty(property);
@@ -138,7 +146,7 @@
 			if (ShowPosition)
 			{
 				EditorGUI.BeginChangeCheck();
-				         
+
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("modificationOptions"), true);
 
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("sideWallOptions"), true);

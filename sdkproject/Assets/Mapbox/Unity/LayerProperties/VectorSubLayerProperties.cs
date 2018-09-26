@@ -9,7 +9,15 @@
 	[Serializable]
 	public class VectorSubLayerProperties : LayerProperties
 	{
+		public virtual string Key
+		{
+			get
+			{
+				return coreOptions.layerName;
+			}
+		}
 		public CoreVectorLayerProperties coreOptions = new CoreVectorLayerProperties();
+		public LineGeometryOptions lineGeometryOptions = new LineGeometryOptions();
 		public VectorFilterOptions filterOptions = new VectorFilterOptions();
 		public GeometryExtrusionOptions extrusionOptions = new GeometryExtrusionOptions
 		{
@@ -18,6 +26,7 @@
 			extrusionGeometryType = ExtrusionGeometryType.RoofAndSide,
 
 		};
+
 		public ColliderOptions colliderOptions = new ColliderOptions
 		{
 			colliderType = ColliderType.None,
@@ -47,6 +56,27 @@
 		private int _maskValue;
 
 		public string selectedTypes;
+
+		public bool SubLayerNameMatchesExact(string layerName)
+		{
+			return coreOptions.sublayerName == layerName;
+		}
+		public bool SubLayerNameContains(string layerName)
+		{
+			return coreOptions.sublayerName.Contains(layerName);
+		}
+
+		public void SetActive(bool active)
+		{
+			coreOptions.isActive = active;
+			coreOptions.HasChanged = true;
+		}
+
+		public void SetTexturingType(StyleTypes style)
+		{
+			materialOptions.style = style;
+			materialOptions.HasChanged = true;
+		}
 	}
 
 }

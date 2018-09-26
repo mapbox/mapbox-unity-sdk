@@ -65,20 +65,6 @@
 			_layerProperty = properties;
 		}
 
-		public void SetLayerSource(ImagerySourceType imageSource)
-		{
-			if (imageSource != ImagerySourceType.Custom && imageSource != ImagerySourceType.None)
-			{
-				_layerProperty.sourceType = imageSource;
-				_layerProperty.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(imageSource);
-
-				_layerProperty.HasChanged = true;
-			}
-			else
-			{
-				Debug.LogWarning("Invalid style - trying to set " + imageSource.ToString() + " as default style!");
-			}
-		}
 
 		public void SetLayerSource(string imageSource)
 		{
@@ -116,12 +102,16 @@
 			_imageFactory = ScriptableObject.CreateInstance<MapImageFactory>();
 			_imageFactory.SetOptions(_layerProperty);
 			_layerProperty.PropertyHasChanged += RedrawLayer;
+			_layerProperty.rasterOptions.PropertyHasChanged += (property, e) =>
+			{
+				NotifyUpdateLayer(_imageFactory, property as MapboxDataProperty, false);
+			};
 		}
 
 		public void RedrawLayer(object sender, System.EventArgs e)
 		{
 			Factory.SetOptions(_layerProperty);
-			NotifyUpdateLayer(_imageFactory);
+			NotifyUpdateLayer(_imageFactory, sender as MapboxDataProperty, false);
 		}
 
 		public void Remove()
@@ -146,5 +136,50 @@
 			}
 		}
 
+		#region API Methods
+
+		public void SetLayerSource(ImagerySourceType imageSource)
+		{
+			if (imageSource != ImagerySourceType.Custom && imageSource != ImagerySourceType.None)
+			{
+				_layerProperty.sourceType = imageSource;
+				_layerProperty.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(imageSource);
+				_layerProperty.HasChanged = true;
+			}
+			else
+			{
+				Debug.LogWarning("Invalid style - trying to set " + imageSource.ToString() + " as default style!");
+			}
+		}
+
+		public void UseRetina(bool useRetina)
+		{
+			if (_layerProperty.rasterOptions.useRetina != useRetina)
+			{
+				_layerProperty.rasterOptions.useRetina = useRetina;
+				_layerProperty.rasterOptions.HasChanged = true;
+			}
+		}
+
+		public void UseCompression(bool useCompression)
+		{
+			if (_layerProperty.rasterOptions.useCompression != useCompression)
+			{
+				_layerProperty.rasterOptions.useCompression = useCompression;
+				_layerProperty.rasterOptions.HasChanged = true;
+			}
+		}
+
+		public void UseMipMap(bool useMipMap)
+		{
+			if (_layerProperty.rasterOptions.useMipMap != useMipMap)
+			{
+				_layerProperty.rasterOptions.useMipMap = useMipMap;
+				_layerProperty.rasterOptions.HasChanged = true;
+			}
+		}
+
+
+		#endregion
 	}
 }

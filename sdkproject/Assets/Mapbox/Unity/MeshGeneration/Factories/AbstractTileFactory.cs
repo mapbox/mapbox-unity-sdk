@@ -87,7 +87,16 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			OnUnregistered(tile);
 		}
 
+		public virtual void UpdateTileProperty(UnityTile tile, LayerUpdateArgs updateArgs)
+		{
+			Debug.Log("Update Tile Property -> " + tile.UnwrappedTileId.ToString());
+			updateArgs.property.UpdateProperty(tile);
 
+			if (updateArgs.property.NeedsForceUpdate())
+			{
+				Register(tile);
+			}
+		}
 
 		protected abstract void OnInitialized();
 
@@ -107,12 +116,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		}
 
 		public event EventHandler TileFactoryHasChanged;
-		protected void UpdateTileFactory(object sender, System.EventArgs e)
+		protected virtual void UpdateTileFactory(object sender, System.EventArgs args)
 		{
+			Debug.Log("TileFactoryHasChanged Delegate ");
 			System.EventHandler handler = TileFactoryHasChanged;
 			if (handler != null)
 			{
-				handler(this, e);
+				handler(this, args);
 			}
 		}
 		#endregion

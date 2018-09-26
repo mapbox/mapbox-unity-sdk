@@ -5,11 +5,32 @@
 	using Mapbox.Platform.TilesetTileJSON;
 	using Mapbox.Unity.Utilities;
 	using UnityEngine;
+	using System.Linq;
 
 	[Serializable]
 	public class VectorLayerProperties : LayerProperties
 	{
+		#region Events
+		public event System.EventHandler SubLayerPropertyAdded;
+		public virtual void OnSubLayerPropertyAdded(System.EventArgs e)
+		{
+			System.EventHandler handler = SubLayerPropertyAdded;
+			if (handler != null)
+			{
+				handler(this, e);
+			}
+		}
 
+		public event System.EventHandler SubLayerPropertyRemoved;
+		public virtual void OnSubLayerPropertyRemoved(System.EventArgs e)
+		{
+			System.EventHandler handler = SubLayerPropertyRemoved;
+			if (handler != null)
+			{
+				handler(this, e);
+			}
+		}
+		#endregion
 		/// <summary>
 		/// Raw tileJSON response received from the requested source tileset id(s)
 		/// </summary>
@@ -56,5 +77,81 @@
 		public List<VectorSubLayerProperties> vectorSubLayers = new List<VectorSubLayerProperties>();
 		[NodeEditorElementAttribute("POI Sublayers")]
 		public List<PrefabItemOptions> locationPrefabList = new List<PrefabItemOptions>();
+
+
+		public override bool NeedsForceUpdate()
+		{
+			return true;
+		}
+
+		public void RemoveFeatureLayerWithName(string featureLayerName)
+		{
+			var layerToRemove = FindFeatureLayerWithName(featureLayerName);
+			if (layerToRemove != null)
+			{
+				//vectorSubLayers.Remove(layerToRemove);
+				OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = layerToRemove });
+			}
+		}
+
+		public void RemovePoiLayerWithName(string poiLayerName)
+		{
+			var layerToRemove = FindPoiLayerWithName(poiLayerName);
+			if (layerToRemove != null)
+			{
+				//vectorSubLayers.Remove(layerToRemove);
+				OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = layerToRemove });
+			}
+		}
+
+		public VectorSubLayerProperties FindFeatureLayerWithName(string featureLayerName)
+		{
+			int foundLayerIndex = -1;
+			// Optimize for performance.
+			for (int i = 0; i < vectorSubLayers.Count; i++)
+			{
+				if (vectorSubLayers[i].SubLayerNameMatchesExact(featureLayerName))
+				{
+					foundLayerIndex = i;
+					break;
+				}
+			}
+			return (foundLayerIndex != -1) ? vectorSubLayers[foundLayerIndex] : null;
+		}
+
+		public PrefabItemOptions FindPoiLayerWithName(string poiLayerName)
+		{
+			int foundLayerIndex = -1;
+			// Optimize for performance.
+			for (int i = 0; i < locationPrefabList.Count; i++)
+			{
+				if (locationPrefabList[i].SubLayerNameMatchesExact(poiLayerName))
+				{
+					foundLayerIndex = i;
+					break;
+				}
+			}
+			return (foundLayerIndex != -1) ? locationPrefabList[foundLayerIndex] : null;
+		}
+
+		public void AddVectorLayer(VectorSubLayerProperties subLayerProperties)
+		{
+			if (vectorSubLayers == null)
+			{
+				vectorSubLayers = new List<VectorSubLayerProperties>();
+			}
+			vectorSubLayers.Add(subLayerProperties);
+			OnSubLayerPropertyAdded(new VectorLayerUpdateArgs { property = vectorSubLayers.Last() });
+		}
+
+		public void AddPoiLayer(PrefabItemOptions poiLayerProperties)
+		{
+			if (locationPrefabList == null)
+			{
+				locationPrefabList = new List<PrefabItemOptions>();
+			}
+			locationPrefabList.Add(poiLayerProperties);
+			OnSubLayerPropertyAdded(new VectorLayerUpdateArgs { property = locationPrefabList.Last() });
+		}
 	}
 }
