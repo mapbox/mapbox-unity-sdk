@@ -21,6 +21,7 @@
 				return _layerProperty;
 			}
 		}
+
 		public MapLayerType LayerType
 		{
 			get
@@ -234,13 +235,13 @@
 		/// Sets the main strategy for terrain mesh generation.
 		/// Flat terrain doesn't pull data from servers and just uses a quad as terrain.
 		/// </summary>
-		/// <param name="elecationType">Type of the elevation strategy</param>
-		public void SetElevationType(ElevationLayerType elecationType)
+		/// <param name="elevationType">Type of the elevation strategy</param>
+		public void SetElevationType(ElevationLayerType elevationType)
 		{
-			if (LayerProperty.elevationLayerType != elecationType)
+			if (_layerProperty.elevationLayerType != elevationType)
 			{
-				LayerProperty.elevationLayerType = elecationType;
-				LayerProperty.HasChanged = true;
+				_layerProperty.elevationLayerType = elevationType;
+				_layerProperty.HasChanged = true;
 			}
 		}
 
@@ -250,10 +251,10 @@
 		/// <param name="enable">Boolean for enabling/disabling mesh collider</param>
 		public void EnableCollider(bool enable)
 		{
-			if (LayerProperty.colliderOptions.addCollider != enable)
+			if (_layerProperty.colliderOptions.addCollider != enable)
 			{
-				LayerProperty.colliderOptions.addCollider = enable;
-				LayerProperty.colliderOptions.HasChanged = true;
+				_layerProperty.colliderOptions.addCollider = enable;
+				_layerProperty.colliderOptions.HasChanged = true;
 			}
 		}
 
@@ -263,22 +264,62 @@
 		/// <param name="factor">Elevation multiplier</param>
 		public void SetExaggerationFactor(float factor)
 		{
-			if (LayerProperty.requiredOptions.exaggerationFactor != factor)
+			if (_layerProperty.requiredOptions.exaggerationFactor != factor)
 			{
-				LayerProperty.requiredOptions.exaggerationFactor = factor;
-				LayerProperty.requiredOptions.HasChanged = true;
+				_layerProperty.requiredOptions.exaggerationFactor = factor;
+				_layerProperty.requiredOptions.HasChanged = true;
 			}
 		}
 
 		public void SetLayer(int layerId)
 		{
-			if (LayerProperty.unityLayerOptions.layerId != layerId)
+			if (_layerProperty.unityLayerOptions.layerId != layerId)
 			{
-				LayerProperty.unityLayerOptions.layerId = layerId;
-				LayerProperty.unityLayerOptions.HasChanged = true;
+				_layerProperty.unityLayerOptions.layerId = layerId;
+				_layerProperty.unityLayerOptions.HasChanged = true;
 			}
 		}
 
+		/// <summary>
+		/// Change terrain layer settings.
+		/// </summary>
+		/// <param name="dataSource">The data source for the terrain height map.</param>
+		/// <param name="elevationType">Mesh generation strategy for the tile/height.</param>
+		/// <param name="enableCollider">Enable/Disable collider component for the tile game object.</param>
+		/// <param name="factor">Multiplier for the height data.</param>
+		/// <param name="layerId">Unity Layer for the tile game object.</param>
+		public void SetProperties(ElevationSourceType dataSource = ElevationSourceType.MapboxTerrain,
+			ElevationLayerType elevationType = ElevationLayerType.TerrainWithElevation,
+			bool enableCollider = false,
+			float factor = 1,
+			int layerId = 0)
+		{
+			if (_layerProperty.sourceType != dataSource ||
+			    _layerProperty.elevationLayerType != elevationType)
+			{
+				_layerProperty.sourceType = dataSource;
+				_layerProperty.elevationLayerType = elevationType;
+				_layerProperty.HasChanged = true;
+			}
+
+			if (_layerProperty.colliderOptions.addCollider != enableCollider)
+			{
+				_layerProperty.colliderOptions.addCollider = enableCollider;
+				_layerProperty.colliderOptions.HasChanged = true;
+			}
+
+			if (_layerProperty.requiredOptions.exaggerationFactor != factor)
+			{
+				_layerProperty.requiredOptions.exaggerationFactor = factor;
+				_layerProperty.requiredOptions.HasChanged = true;
+			}
+
+			if (_layerProperty.unityLayerOptions.layerId != layerId)
+			{
+				_layerProperty.unityLayerOptions.layerId = layerId;
+				_layerProperty.unityLayerOptions.HasChanged = true;
+			}
+		}
 		#endregion
 
 
