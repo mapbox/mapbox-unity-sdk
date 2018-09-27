@@ -600,8 +600,6 @@ namespace Mapbox.Unity.Map
 			};
 			_vectorData.SubLayerAdded += (object sender, EventArgs eventArgs) =>
 			{
-				VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
-
 				_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
 				VectorData.UpdateFactorySettings();
 				_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
