@@ -7,6 +7,14 @@
 	using Mapbox.Unity.MeshGeneration.Modifiers;
 	using Mapbox.Unity.MeshGeneration.Data;
 
+	public class CustomStyleBundle
+	{
+		public Material topMaterial;
+		public Material sideMaterial;
+		public AtlasInfo atlasInfo;
+		public ScriptablePalette colorPalette;
+	}
+
 	[Serializable]
 	public class GeometryMaterialOptions : ModifierProperties
 	{

@@ -84,6 +84,18 @@
 			materialOptions.HasChanged = true;
 		}
 
+		public void SetRealisticStyle()
+		{
+			materialOptions.style = StyleTypes.Realistic;
+			materialOptions.HasChanged = true;
+		}
+
+		public void SetFantasyStyle()
+		{
+			materialOptions.style = StyleTypes.Fantasy;
+			materialOptions.HasChanged = true;
+		}
+
 		public void SetSimpleStylePaletteType(SamplePalettes palette)
 		{
 			materialOptions.samplePalettes = palette;
@@ -126,6 +138,13 @@
 			materialOptions.HasChanged = true;
 		}
 
+		public void SetCustomMaterials(Material topMaterial, Material sideMaterial)
+		{
+			materialOptions.materials[0].Materials[0] = new Material(topMaterial);
+			materialOptions.materials[1].Materials[0] = new Material(sideMaterial);
+			materialOptions.HasChanged = true;
+		}
+
 		public void SetCustomUvAtlas(AtlasInfo atlas)
 		{
 			materialOptions.atlasInfo = atlas;
@@ -136,6 +155,65 @@
 		{
 			materialOptions.colorPalette = palette;
 			materialOptions.HasChanged = true;
+		}
+
+		public void SetCustomStyleAssets(CustomStyleBundle customStyleBundle)
+		{
+			materialOptions.materials[0].Materials[0] = (customStyleBundle.sideMaterial != null) ? customStyleBundle.sideMaterial : materialOptions.materials[0].Materials[0];
+			materialOptions.materials[1].Materials[0] = (customStyleBundle.topMaterial != null) ? customStyleBundle.topMaterial : materialOptions.materials[1].Materials[0];
+			materialOptions.atlasInfo = (customStyleBundle.atlasInfo != null) ? customStyleBundle.atlasInfo : materialOptions.atlasInfo;
+			materialOptions.colorPalette = (customStyleBundle.colorPalette != null) ? customStyleBundle.colorPalette : materialOptions.colorPalette;
+			materialOptions.HasChanged = true;
+		}
+
+		public StyleTypes GetStyleType()
+		{
+			return materialOptions.style;
+		}
+
+		public SamplePalettes GetSimpleStylePaletteType()
+		{
+			return materialOptions.samplePalettes;
+		}
+
+		public float GetLightStyleOpacity()
+		{
+			return materialOptions.lightStyleOpacity;
+		}
+
+		public float GetDarkStyleOpacity()
+		{
+			return materialOptions.darkStyleOpacity;
+		}
+
+		public Color GetColorStyleColor()
+		{
+			return materialOptions.colorStyleColor;
+		}
+
+		public UvMapType GetCustomTexturingType()
+		{
+			return materialOptions.texturingType;
+		}
+
+		public Material GetCustomTopMaterial()
+		{
+			return materialOptions.materials[0].Materials[0];
+		}
+
+		public Material GetCustomSideMaterial()
+		{
+			return materialOptions.materials[1].Materials[0];
+		}
+
+		public AtlasInfo GetCustomUvAtlas()
+		{
+			return materialOptions.atlasInfo;
+		}
+
+		public ScriptablePalette GetCustomColorPalette()
+		{
+			return materialOptions.colorPalette;
 		}
 	}
 }
