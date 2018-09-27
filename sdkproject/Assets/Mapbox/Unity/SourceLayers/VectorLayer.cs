@@ -472,6 +472,7 @@ namespace Mapbox.Unity.Map
 		public virtual void RemoveFeatureLayer(VectorSubLayerProperties layer)
 		{
 			_layerProperty.vectorSubLayers.Remove(layer);
+			_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs {property = layer});
 		}
 
 		// POI LAYER OPERATIONS
@@ -504,7 +505,7 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public virtual IEnumerable<PrefabItemOptions> GetFeatureLayerByQuery(Func<PrefabItemOptions, bool> query)
+		public virtual IEnumerable<PrefabItemOptions> GetPoiLayerByQuery(Func<PrefabItemOptions, bool> query)
 		{
 			foreach (var poiLayer in _layerProperty.locationPrefabList)
 			{
@@ -544,6 +545,7 @@ namespace Mapbox.Unity.Map
 		public virtual void RemovePoiLayer(PrefabItemOptions layer)
 		{
 			_layerProperty.locationPrefabList.Remove(layer);
+			_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs {property = layer});
 		}
 
 		#endregion

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Interfaces;
 using UnityEngine;
@@ -211,5 +212,51 @@ public class ApiTest : MonoBehaviour
 	public void TestPoiCategoryApi()
 	{
 		_abstractMap.VectorData.SpawnPrefabByCategory(PoiPrefab, LocationPrefabCategories);
+	}
+
+	[ContextMenu("LogAllFeatureLayerNames")]
+	public void LogAllFeatureLayerNames()
+	{
+		var str = "";
+		str += "All Feature Layers: ";
+		str += string.Join(",", _abstractMap.VectorData.GetAllFeatureLayers().Select(x => x.Key).ToArray());
+		str += "\r\n";
+		str += "Polygon Layers: ";
+		str += string.Join(",", _abstractMap.VectorData.GetAllPolygonFeatureLayers().Select(x => x.Key).ToArray());
+		str += "\r\n";
+		str += "Line Layers: ";
+		str += string.Join(",", _abstractMap.VectorData.GetAllLineFeatureLayers().Select(x => x.Key).ToArray());
+		str += "\r\n";
+		str += "Point Layers: ";
+		str += string.Join(",", _abstractMap.VectorData.GetAllPointFeatureLayers().Select(x => x.Key).ToArray());
+		str += "\r\n";
+		str += "Feature Layer at index 0: ";
+		str += _abstractMap.VectorData.GetFeatureLayerAtIndex(0).Key;
+		str += "\r\n";
+		str += "Feature Layers with \"B\" in the name ";
+		str += string.Join(",", _abstractMap.VectorData.GetFeatureLayerByQuery(x => x.coreOptions.sublayerName.Contains("B")).Select(x => x.coreOptions.sublayerName).ToArray());
+		str += "\r\n";
+		str += "All Poi Layers: ";
+		str += string.Join(",", _abstractMap.VectorData.GetAllPoiLayers().Select(x => x.Key).ToArray());
+		str += "\r\n";
+		str += "Poi Layer at index 0: ";
+		str += _abstractMap.VectorData.GetPoiLayerAtIndex(0).Key;
+		str += "\r\n";
+		str += "Poi Layers with \"L\" in the name ";
+		str += string.Join(",", _abstractMap.VectorData.GetPoiLayerByQuery(x => x.coreOptions.sublayerName.Contains("L")).Select(x => x.coreOptions.sublayerName).ToArray());
+
+		Debug.Log(str);
+	}
+
+	[ContextMenu("RemoveFirstFeatureLayer")]
+	public void RemoveFirstFeatureLayer()
+	{
+		_abstractMap.VectorData.RemoveFeatureLayer(_abstractMap.VectorData.GetFeatureLayerAtIndex(0));
+	}
+
+	[ContextMenu("RemoveFirstPoiLayer")]
+	public void RemoveFirstPoiLayer()
+	{
+		_abstractMap.VectorData.RemovePoiLayer(_abstractMap.VectorData.GetPoiLayerAtIndex(0));
 	}
 }
