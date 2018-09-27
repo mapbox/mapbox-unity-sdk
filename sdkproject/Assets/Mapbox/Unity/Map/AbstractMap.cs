@@ -602,10 +602,9 @@ namespace Mapbox.Unity.Map
 			{
 				VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
 
-				if (layerUpdateArgs.visualizer != null)
-				{
-					_mapVisualizer.UpdateTileForProperty(layerUpdateArgs.factory, layerUpdateArgs);
-				}
+				_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
+				VectorData.UpdateFactorySettings();
+				_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
 
 				Debug.Log("<color=blue>Vector</color>");
 				OnMapRedrawn();

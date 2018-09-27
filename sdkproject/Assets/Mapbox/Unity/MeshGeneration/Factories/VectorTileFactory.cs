@@ -82,8 +82,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-
-
 		private void CreateLayerVisualizers()
 		{
 			foreach (var sublayer in _properties.vectorSubLayers)
@@ -196,6 +194,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				//		item.Initialize();
 				//	}
 				//}
+
+				CreatePOILayerVisualizers();
+
+				CreateLayerVisualizers();
 			}
 		}
 
