@@ -73,7 +73,7 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("EnableVectorColliders")]
 	public void EnableVectorColliders()
 	{
-		var layer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("ExtrudedBuildings");
+		var layer = _abstractMap.VectorData.FindFeatureLayerWithName("ExtrudedBuildings");
 		layer.colliderOptions.colliderType = ColliderType.MeshCollider;
 		layer.colliderOptions.HasChanged = true;
 	}
@@ -81,7 +81,7 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("DisableVectorColliders")]
 	public void DisableVectorColliders()
 	{
-		var layer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("ExtrudedBuildings");
+		var layer = _abstractMap.VectorData.FindFeatureLayerWithName("ExtrudedBuildings");
 		layer.colliderOptions.colliderType = ColliderType.None;
 		layer.colliderOptions.HasChanged = true;
 	}
@@ -95,7 +95,7 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("DisableLayer")]
 	public void DisableLayer()
 	{
-		var layer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("ExtrudedBuildings");
+		var layer = _abstractMap.VectorData.FindFeatureLayerWithName("ExtrudedBuildings");
 		if (layer != null)
 		{
 			layer.SetActive(false);
@@ -110,7 +110,7 @@ public class ApiTest : MonoBehaviour
 	public void ChangeBuildingMaterial()
 	{
 		styleId = (styleId == 2) ? 0 : styleId + 1;
-		var layer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("ExtrudedBuildings");
+		var layer = _abstractMap.VectorData.FindFeatureLayerWithName("ExtrudedBuildings");
 		if (layer != null)
 		{
 			layer.SetTexturingType(testStyles[styleId]);
@@ -128,7 +128,7 @@ public class ApiTest : MonoBehaviour
 		subLayerProperties.coreOptions.geometryType = VectorPrimitiveType.Polygon;
 		subLayerProperties.coreOptions.layerName = "building";
 
-		_abstractMap.VectorData.LayerProperty.AddVectorLayer(subLayerProperties);
+		_abstractMap.VectorData.AddFeatureLayer(subLayerProperties);
 	}
 	
 	[ContextMenu("AddPoiLayer")]
@@ -139,25 +139,25 @@ public class ApiTest : MonoBehaviour
 		prefabItemOptions.spawnPrefabOptions = new SpawnPrefabOptions();
 		prefabItemOptions.spawnPrefabOptions.prefab = PoiPrefab;
 
-		_abstractMap.VectorData.LayerProperty.AddPoiLayer(prefabItemOptions);
+		_abstractMap.VectorData.AddPoiLayer(prefabItemOptions);
 	}
 
 	[ContextMenu("RemoveLayer")]
 	public void RemoveLayer()
 	{
-		_abstractMap.VectorData.LayerProperty.RemoveFeatureLayerWithName("ExtrudedBuildings");
+		_abstractMap.VectorData.RemoveFeatureLayerWithName("ExtrudedBuildings");
 	}
 	
 	[ContextMenu("RemovePoiLayer")]
 	public void RemovePoiLayer()
 	{
-		_abstractMap.VectorData.LayerProperty.RemovePoiLayerWithName("loc");
+		_abstractMap.VectorData.RemovePoiLayerWithName("loc");
 	}
 
 	[ContextMenu("IncreaseRoadHeight")]
 	public void IncreaseRoadHeight()
 	{
-		var roads = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("Roads");
+		var roads = _abstractMap.VectorData.FindFeatureLayerWithName("Roads");
 		roads.extrusionOptions.maximumHeight = roads.extrusionOptions.maximumHeight + 2;
 		roads.extrusionOptions.HasChanged = true;
 	}
@@ -165,7 +165,7 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("IncreaseRoadWidth")]
 	public void IncreaseRoadWidth()
 	{
-		var roads = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("Roads");
+		var roads = _abstractMap.VectorData.FindFeatureLayerWithName("Roads");
 		roads.lineGeometryOptions.Width = roads.lineGeometryOptions.Width + 2;
 		roads.lineGeometryOptions.HasChanged = true;
 	}
@@ -173,7 +173,7 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("ChangePoiCategory")]
 	public void ChangePoiCategory()
 	{
-		var pois = _abstractMap.VectorData.LayerProperty.FindPoiLayerWithName("loc");
+		var pois = _abstractMap.VectorData.FindPoiLayerWithName("loc");
 		pois.categories = LocationPrefabCategories;
 		pois.HasChanged = true;
 	}
@@ -181,7 +181,7 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("ChangePoiPrefab")]
 	public void ChangePoiPrefab()
 	{
-		var pois = _abstractMap.VectorData.LayerProperty.FindPoiLayerWithName("loc");
+		var pois = _abstractMap.VectorData.FindPoiLayerWithName("loc");
 		pois.spawnPrefabOptions.prefab = PoiPrefab;
 		pois.spawnPrefabOptions.HasChanged = true;
 	}
@@ -189,7 +189,7 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("ChangeToPoiByName")]
 	public void ChangeToPoiByName()
 	{
-		var pois = _abstractMap.VectorData.LayerProperty.FindPoiLayerWithName("loc");
+		var pois = _abstractMap.VectorData.FindPoiLayerWithName("loc");
 		pois.findByType = LocationPrefabFindBy.POIName;
 		pois.nameString = "yerba";
 		pois.HasChanged = true;
@@ -198,7 +198,7 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("ChangeToCategory")]
 	public void ChangeToCategory()
 	{
-		var pois = _abstractMap.VectorData.LayerProperty.FindPoiLayerWithName("loc");
+		var pois = _abstractMap.VectorData.FindPoiLayerWithName("loc");
 		pois.findByType = LocationPrefabFindBy.MapboxCategory;
 		pois.HasChanged = true;
 	}

@@ -1,4 +1,6 @@
-﻿namespace Mapbox.Unity.Map
+﻿using System.Linq;
+
+namespace Mapbox.Unity.Map
 {
 	using System;
 	using UnityEngine;
@@ -222,5 +224,85 @@
 				_layerProperty.locationPrefabList = value;
 			}
 		}
+
+
+		#region LayerOperations
+
+		// FEATURE LAYER OPERATIONS
+
+		public void AddFeatureLayer(VectorSubLayerProperties subLayerProperties)
+		{
+			if (_layerProperty.vectorSubLayers == null)
+			{
+				_layerProperty.vectorSubLayers = new List<VectorSubLayerProperties>();
+			}
+			_layerProperty.vectorSubLayers.Add(subLayerProperties);
+			_layerProperty.OnSubLayerPropertyAdded(new VectorLayerUpdateArgs { property = _layerProperty.vectorSubLayers.Last() });
+		}
+
+		public VectorSubLayerProperties FindFeatureLayerWithName(string featureLayerName)
+		{
+			int foundLayerIndex = -1;
+			// Optimize for performance.
+			for (int i = 0; i < _layerProperty.vectorSubLayers.Count; i++)
+			{
+				if (_layerProperty.vectorSubLayers[i].SubLayerNameMatchesExact(featureLayerName))
+				{
+					foundLayerIndex = i;
+					break;
+				}
+			}
+			return (foundLayerIndex != -1) ? _layerProperty.vectorSubLayers[foundLayerIndex] : null;
+		}
+
+		public void RemoveFeatureLayerWithName(string featureLayerName)
+		{
+			var layerToRemove = FindFeatureLayerWithName(featureLayerName);
+			if (layerToRemove != null)
+			{
+				//vectorSubLayers.Remove(layerToRemove);
+				_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = layerToRemove });
+			}
+		}
+
+		
+		// POI LAYER OPERATIONS
+
+		public void AddPoiLayer(PrefabItemOptions poiLayerProperties)
+		{
+			if (_layerProperty.locationPrefabList == null)
+			{
+				_layerProperty.locationPrefabList = new List<PrefabItemOptions>();
+			}
+			_layerProperty.locationPrefabList.Add(poiLayerProperties);
+			_layerProperty.OnSubLayerPropertyAdded(new VectorLayerUpdateArgs { property = _layerProperty.locationPrefabList.Last() });
+		}
+
+		public PrefabItemOptions FindPoiLayerWithName(string poiLayerName)
+		{
+			int foundLayerIndex = -1;
+			// Optimize for performance.
+			for (int i = 0; i < _layerProperty.locationPrefabList.Count; i++)
+			{
+				if (_layerProperty.locationPrefabList[i].SubLayerNameMatchesExact(poiLayerName))
+				{
+					foundLayerIndex = i;
+					break;
+				}
+			}
+			return (foundLayerIndex != -1) ? _layerProperty.locationPrefabList[foundLayerIndex] : null;
+		}
+
+		public void RemovePoiLayerWithName(string poiLayerName)
+		{
+			var layerToRemove = FindPoiLayerWithName(poiLayerName);
+			if (layerToRemove != null)
+			{
+				//vectorSubLayers.Remove(layerToRemove);
+				_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = layerToRemove });
+			}
+		}
+
+		#endregion
 	}
 }
