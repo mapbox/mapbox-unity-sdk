@@ -259,4 +259,16 @@ public class ApiTest : MonoBehaviour
 	{
 		_abstractMap.VectorData.RemovePoiLayer(_abstractMap.VectorData.GetPoiLayerAtIndex(0));
 	}
+
+	[ContextMenu("ToggleCoroutines")]
+	public void ToggleCoroutines()
+	{
+		_abstractMap.VectorData.EnableCoroutines(!_abstractMap.VectorData.LayerProperty.performanceOptions.isEnabled);
+	}
+
+	[ContextMenu("ToggleStyleOptimization")]
+	public void ToggleStyleOptimization()
+	{
+		_abstractMap.VectorData.EnableOptimizedStyle(!_abstractMap.VectorData.LayerProperty.useOptimizedStyle);
+	}
 }
