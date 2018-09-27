@@ -40,6 +40,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			if (item.spawnPrefabOptions.prefab == null)
 			{
+				//item.spawnPrefabOptions.prefab = GameObject.CreatePrimitive(PrimitiveType.Cube);
+				item.spawnPrefabOptions.prefab = Resources.Load<GameObject>("MapboxPin");
 				Debug.LogError("No prefab found. Please assign a prefab to spawn it on the map");
 			}
 
@@ -101,16 +103,16 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 							_defaultStack.GoModifiers.Clear();
 						}
 
-						if (item.findByType == LocationPrefabFindBy.MapboxCategory && item.categories != LocationPrefabCategories.None)
+						if ((item.findByType == LocationPrefabFindBy.MapboxCategory && item.categories == LocationPrefabCategories.None))
+						{
+							itemProperties.spawnPrefabOptions.PropertyHasChanged += UpdatePois;
+						}
+						else
 						{
 							PrefabModifier prefabModifier = ScriptableObject.CreateInstance<PrefabModifier>();
 							prefabModifier.SetProperties(itemProperties.spawnPrefabOptions);
 							prefabModifier.ModifierHasChanged += UpdatePois;
 							_defaultStack.GoModifiers.Add(prefabModifier);
-						}
-						else
-						{
-							itemProperties.spawnPrefabOptions.PropertyHasChanged += UpdatePois;
 						}
 					}
 					break;
