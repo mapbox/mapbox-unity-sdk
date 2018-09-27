@@ -14,18 +14,36 @@
 	/// </summary>
 	public static class EditorHelper
 	{
-		public static void CheckForModifiedProperty<T>(SerializedProperty property, T targetObject)
+		public static void CheckForModifiedProperty<T>(SerializedProperty property, T targetObject, bool forceHasChanged = false)
 		{
-			MapboxDataProperty targetObjectAsDataProperty = targetObject as MapboxDataProperty;
-			if (property.serializedObject.ApplyModifiedProperties() && targetObjectAsDataProperty != null)
+			MapboxDataProperty targetObjectAsDataProperty = GetMapboxDataPropertyObject(targetObject);
+			if (targetObjectAsDataProperty != null)
 			{
-				targetObjectAsDataProperty.HasChanged = true;
+				targetObjectAsDataProperty.HasChanged = forceHasChanged || property.serializedObject.ApplyModifiedProperties();
+				//REMOVE ME....
+				Debug.Log("<color=cyan>CheckForModifiedProperty is TRUE!! ---> </color>" + targetObject.GetType().ToString());
 			}
 		}
 
-		public static void CheckForModifiedProperty(SerializedProperty property)
+		public static void CheckForModifiedProperty(SerializedProperty property, bool forceHasChanged = false)
 		{
-			CheckForModifiedProperty(property, GetTargetObjectOfProperty(property));
+			CheckForModifiedProperty(property, GetTargetObjectOfProperty(property), forceHasChanged);
+		}
+
+		public static MapboxDataProperty GetMapboxDataPropertyObject<T>(T targetObject)
+		{
+			return targetObject as MapboxDataProperty;
+		}
+
+		public static bool DidModifyProperty<T>(SerializedProperty property, T targetObject)
+		{
+			MapboxDataProperty targetObjectAsDataProperty = targetObject as MapboxDataProperty;
+			return (property.serializedObject.ApplyModifiedProperties() && targetObjectAsDataProperty != null);
+		}
+
+		public static bool DidModifyProperty(SerializedProperty property)
+		{
+			return DidModifyProperty(property, GetTargetObjectOfProperty(property));
 		}
 
 		public static bool DidModifyProperty<T>(SerializedProperty property, T targetObject)

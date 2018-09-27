@@ -8,10 +8,12 @@
 	using Mapbox.Unity;
 	using System.Globalization;
 	using Mapbox.Unity.Map;
+	using Mapbox.Editor;
 
 	public class GeocodeAttributeSearchWindow : EditorWindow
 	{
 		SerializedProperty _coordinateProperty;
+		object _objectToUpdate;
 
 		private bool _updateAbstractMap;
 
@@ -42,12 +44,19 @@
 
 		bool hasSetFocus = false;
 
-		public static void Open(SerializedProperty property, bool updateAbstractMap = false)
+		public static void Open(SerializedProperty property, object objectToUpdate = null)
 		{
 			GeocodeAttributeSearchWindow window = EditorWindow.GetWindow<GeocodeAttributeSearchWindow>(true, "Search for location");
 
 			window._coordinateProperty = property;
-			window._updateAbstractMap = updateAbstractMap;
+			if (objectToUpdate != null)
+			{
+				window._objectToUpdate = objectToUpdate;
+
+				//REMOVE ME!!!
+				string propertyType = objectToUpdate.GetType().ToString();
+				Debug.Log("<color=red>" + propertyType + "</color>");
+			}
 
 			Event e = Event.current;
 			Vector2 mousePos = GUIUtility.GUIToScreenPoint(e.mousePosition);
@@ -125,13 +134,9 @@
 							_coordinateProperty.serializedObject.ApplyModifiedProperties();
 							EditorUtility.SetDirty(_coordinateProperty.serializedObject.targetObject);
 
-							if (_updateAbstractMap)
+							if(_objectToUpdate != null)
 							{
-								AbstractMap map = (AbstractMap)_coordinateProperty.serializedObject.targetObject;
-								if(map != null)
-								{
-									map.Options.locationOptions.HasChanged = true;
-								}
+								EditorHelper.CheckForModifiedProperty(_coordinateProperty, _objectToUpdate, true);
 							}
 							Close();
 						}
