@@ -19,6 +19,12 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		public override void SetProperties(ModifierProperties properties)
 		{
 			_options = (GeometryMaterialOptions)properties;
+			_options.PropertyHasChanged += UpdateModifier;
+		}
+
+		public override void UnbindProperties()
+		{
+			_options.PropertyHasChanged -= UpdateModifier;
 		}
 
 		public override void Run(VectorEntity ve, UnityTile tile)

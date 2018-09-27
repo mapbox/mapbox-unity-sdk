@@ -182,7 +182,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				_meshData.Add(tile.UnwrappedTileId, tile.MeshFilter.mesh);
 			}
 
-			if (_elevationOptions.requiredOptions.addCollider)
+			if (_elevationOptions.colliderOptions.addCollider)
 			{
 				var meshCollider = tile.Collider as MeshCollider;
 				if (meshCollider)

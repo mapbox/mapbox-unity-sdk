@@ -73,7 +73,7 @@
 					}
 					EditorGUI.BeginChangeCheck();
 					featurePositionProperty.enumValueIndex = EditorGUILayout.Popup(dropDownLabel, featurePositionProperty.enumValueIndex, dropDownItems);
-					if(EditorGUI.EndChangeCheck())
+					if (EditorGUI.EndChangeCheck())
 					{
 						EditorHelper.CheckForModifiedProperty(layerProperty);
 					}

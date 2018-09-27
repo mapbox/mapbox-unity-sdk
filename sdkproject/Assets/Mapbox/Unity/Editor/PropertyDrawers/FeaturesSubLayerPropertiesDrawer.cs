@@ -205,7 +205,7 @@
 				layerTreeView.Reload();
 				layerTreeView.OnGUI(layersRect);
 
-				if(layerTreeView.hasChanged)
+				if (layerTreeView.hasChanged)
 				{
 					EditorHelper.CheckForModifiedProperty(property);
 					layerTreeView.hasChanged = false;
@@ -268,8 +268,10 @@
 					layerTreeView.SetSelection(selectedLayers);
 					subLayerProperties = null; // setting this to null so that the if block is not called again
 
-					EditorHelper.CheckForModifiedProperty(property);
-
+					if (EditorHelper.DidModifyProperty(property))
+					{
+						((VectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property)).OnSubLayerPropertyAdded(new VectorLayerUpdateArgs { property = EditorHelper.GetTargetObjectOfProperty(subLayer) as MapboxDataProperty });
+					}
 				}
 
 				if (GUILayout.Button(new GUIContent("Remove Selected"), (GUIStyle)"minibuttonright"))
@@ -289,7 +291,7 @@
 					selectedLayers = new int[0];
 					layerTreeView.SetSelection(selectedLayers);
 
-					if(layerWasRemoved)
+					if (layerWasRemoved)
 					{
 						EditorHelper.CheckForModifiedProperty(property);
 					}
@@ -382,7 +384,10 @@
 			subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex = (int)coreOptions.geometryType;
 			subLayerCoreOptions.FindPropertyRelative("snapToTerrain").boolValue = coreOptions.snapToTerrain;
 			subLayerCoreOptions.FindPropertyRelative("combineMeshes").boolValue = coreOptions.combineMeshes;
-			subLayerCoreOptions.FindPropertyRelative("lineWidth").floatValue = coreOptions.lineWidth;
+
+			var subLayerlineGeometryOptions = subLayer.FindPropertyRelative("lineGeometryOptions");
+			var lineGeometryOptions = subLayerProperties.lineGeometryOptions;
+			subLayerlineGeometryOptions.FindPropertyRelative("Width").floatValue = lineGeometryOptions.Width;
 
 			var subLayerExtrusionOptions = subLayer.FindPropertyRelative("extrusionOptions");
 			var extrusionOptions = subLayerProperties.extrusionOptions;
@@ -401,7 +406,7 @@
 			var materialOptions = subLayerProperties.materialOptions;
 			subLayerGeometryMaterialOptions.FindPropertyRelative("style").enumValueIndex = (int)materialOptions.style;
 
-			GeometryMaterialOptions geometryMaterialOptionsReference = MapboxDefaultStyles.GetDefaultAssets();
+			//GeometryMaterialOptions geometryMaterialOptionsReference = MapboxDefaultStyles.GetDefaultAssets();
 
 			var mats = subLayerGeometryMaterialOptions.FindPropertyRelative("materials");
 			mats.arraySize = 2;
@@ -424,10 +429,10 @@
 			var atlas = subLayerGeometryMaterialOptions.FindPropertyRelative("atlasInfo");
 			var palette = subLayerGeometryMaterialOptions.FindPropertyRelative("colorPalette");
 
-			topMat.objectReferenceValue = geometryMaterialOptionsReference.materials[0].Materials[0];
-			sideMat.objectReferenceValue = geometryMaterialOptionsReference.materials[1].Materials[0];
-			atlas.objectReferenceValue = geometryMaterialOptionsReference.atlasInfo;
-			palette.objectReferenceValue = geometryMaterialOptionsReference.colorPalette;
+			topMat.objectReferenceValue = materialOptions.materials[0].Materials[0];
+			sideMat.objectReferenceValue = materialOptions.materials[1].Materials[0];
+			atlas.objectReferenceValue = materialOptions.atlasInfo;
+			palette.objectReferenceValue = materialOptions.colorPalette;
 
 			subLayer.FindPropertyRelative("buildingsWithUniqueIds").boolValue = subLayerProperties.buildingsWithUniqueIds;
 			subLayer.FindPropertyRelative("moveFeaturePositionTo").enumValueIndex = (int)subLayerProperties.moveFeaturePositionTo;
@@ -619,10 +624,10 @@
 			//draw the layer selection popup
 			EditorGUI.BeginChangeCheck();
 			_layerIndex = EditorGUILayout.Popup(layerNameLabel, _layerIndex, _layerTypeContent);
-			if(EditorGUI.EndChangeCheck())
+			if (EditorGUI.EndChangeCheck())
 			{
 				MapboxDataProperty mapboxDataProperty = (MapboxDataProperty)EditorHelper.GetTargetObjectOfProperty(property);
-				if(mapboxDataProperty != null)
+				if (mapboxDataProperty != null)
 				{
 					mapboxDataProperty.HasChanged = true;
 				}

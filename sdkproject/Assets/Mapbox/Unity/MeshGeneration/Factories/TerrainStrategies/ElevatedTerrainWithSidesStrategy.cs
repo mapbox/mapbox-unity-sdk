@@ -62,7 +62,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				CreateBaseMesh(tile);
 			}
 
-			if (_elevationOptions.requiredOptions.addCollider && tile.Collider == null)
+			if (_elevationOptions.colliderOptions.addCollider && tile.Collider == null)
 			{
 				tile.gameObject.AddComponent<MeshCollider>();
 			}
@@ -315,7 +315,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				_meshData.Add(tile.UnwrappedTileId, tile.MeshFilter.mesh);
 			}
 
-			if (_elevationOptions.requiredOptions.addCollider)
+			if (_elevationOptions.colliderOptions.addCollider)
 			{
 				var meshCollider = tile.Collider as MeshCollider;
 				if (meshCollider)

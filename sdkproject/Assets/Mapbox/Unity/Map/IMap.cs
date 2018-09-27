@@ -29,6 +29,9 @@
 		int AbsoluteZoom { get; }
 		Transform Root { get; }
 		float UnityTileSize { get; }
+		Texture2D LoadingTexture { get; }
+		Material TileMaterial { get; }
+
 		HashSet<UnwrappedTileId> CurrentExtent { get; }
 		event Action OnInitialized;
 		event Action OnUpdated;

@@ -15,21 +15,33 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 	{
 		private int maxDensity = 30; //This value is same as the density's max range value in PrefabItemOptions
 
-		public void SetProperties(PrefabItemOptions item)
+		public override bool Active
 		{
+			get
+			{
+				return SubLayerProperties.coreOptions.isActive;
+			}
+		}
+
+		public override void SetProperties(VectorSubLayerProperties properties)
+		{
+			var item = properties as PrefabItemOptions;
 			SubLayerProperties = item;
-			Active = item.isActive;
+			//Active = item.isActive;
 			_performanceOptions = item.performanceOptions;
 
+			item.filterOptions.filters.Clear();
 
 			//Check to make sure that when Categories selection is none, the location prefab is disabled
-			if (item.findByType == LocationPrefabFindBy.MapboxCategory && item.categories == LocationPrefabCategories.None)
-			{
-				return;
-			}
+			//			if (item.findByType == LocationPrefabFindBy.MapboxCategory && item.categories == LocationPrefabCategories.None)
+			//			{
+			//				return;
+			//			}
 
 			if (item.spawnPrefabOptions.prefab == null)
 			{
+				//item.spawnPrefabOptions.prefab = GameObject.CreatePrimitive(PrimitiveType.Cube);
+				item.spawnPrefabOptions.prefab = Resources.Load<GameObject>("MapboxPin");
 				Debug.LogError("No prefab found. Please assign a prefab to spawn it on the map");
 			}
 
@@ -75,26 +87,75 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 #endif
 					{
 						PrefabItemOptions itemProperties = (PrefabItemOptions)item;
-						PrefabModifier prefabModifier = ScriptableObject.CreateInstance<PrefabModifier>();
-						prefabModifier.SetProperties(itemProperties.spawnPrefabOptions);
 						_defaultStack = ScriptableObject.CreateInstance<ModifierStack>();
 						(_defaultStack as ModifierStack).moveFeaturePositionTo = item.moveFeaturePositionTo;
+						if (itemProperties.snapToTerrain == true)
+						{
+							_defaultStack.MeshModifiers.Add(ScriptableObject.CreateInstance<SnapTerrainModifier>());
+						}
 
 						if (_defaultStack.GoModifiers == null)
 						{
 							_defaultStack.GoModifiers = new List<GameObjectModifier>();
 						}
-						_defaultStack.GoModifiers.Add(prefabModifier);
-
-						if (itemProperties.snapToTerrain == true)
+						else
 						{
-							_defaultStack.MeshModifiers.Add(ScriptableObject.CreateInstance<SnapTerrainModifier>());
+							_defaultStack.GoModifiers.Clear();
+						}
+
+						if ((item.findByType == LocationPrefabFindBy.MapboxCategory && item.categories == LocationPrefabCategories.None))
+						{
+							itemProperties.spawnPrefabOptions.PropertyHasChanged += UpdatePois;
+						}
+						else
+						{
+							PrefabModifier prefabModifier = ScriptableObject.CreateInstance<PrefabModifier>();
+							prefabModifier.SetProperties(itemProperties.spawnPrefabOptions);
+							prefabModifier.ModifierHasChanged += UpdatePois;
+							_defaultStack.GoModifiers.Add(prefabModifier);
 						}
 					}
 					break;
 				default:
 					break;
 			}
+
+			(SubLayerProperties as PrefabItemOptions).PropertyHasChanged += UpdatePois;
+		}
+
+		private void UpdatePois(object sender, System.EventArgs eventArgs)
+		{
+			Debug.Log("UpdatePois " + sender.ToString());
+
+			VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
+
+			layerUpdateArgs.visualizer = this;
+			layerUpdateArgs.effectsVectorLayer = true;
+
+			if (layerUpdateArgs.modifier != null)
+			{
+				layerUpdateArgs.property.PropertyHasChanged -= layerUpdateArgs.modifier.UpdateModifier;
+				layerUpdateArgs.modifier.ModifierHasChanged -= UpdatePois;
+			}
+			else if (layerUpdateArgs.property != null)
+			{
+				layerUpdateArgs.property.PropertyHasChanged -= UpdatePois;
+			}
+
+			foreach (var modifier in _defaultStack.MeshModifiers)
+			{
+				modifier.UnbindProperties();
+				modifier.ModifierHasChanged -= UpdatePois;
+			}
+			foreach (var modifier in _defaultStack.GoModifiers)
+			{
+				modifier.UnbindProperties();
+				modifier.ModifierHasChanged -= UpdatePois;
+			}
+
+			(SubLayerProperties as PrefabItemOptions).PropertyHasChanged -= UpdatePois;
+
+			OnUpdateLayerVisualizer(layerUpdateArgs);
 		}
 
 		/// <summary>
@@ -106,8 +167,10 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			string propertyName = "";
 			item.categoryPropertyFromFindByTypeDictionary.TryGetValue(item.findByType, out propertyName);
 
+			string concatenatedString = "";
 			if (item.findByType == LocationPrefabFindBy.MapboxCategory)
 			{
+
 				List<LocationPrefabCategories> categoriesList = GetSelectedCategoriesList(item.categories);
 				if (categoriesList == null || categoriesList.Count == 0)
 				{
@@ -115,8 +178,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				}
 
 				List<string> stringsList = new List<string>();
-				string concatenatedString = "";
-
 				foreach (LocationPrefabCategories category in categoriesList)
 				{
 					stringsList = LocationPrefabCategoryOptions.GetMakiListFromCategory(category);
@@ -243,8 +304,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		{
 			//for layers using specific locations, ignore VectorTileLayer and
 			//pass coordinates to the modifierstack using BuildFeatureFromLatLon.
-			if ((SubLayerProperties as PrefabItemOptions).findByType
-			   == LocationPrefabFindBy.AddressOrLatLon)
+			if ((SubLayerProperties as PrefabItemOptions).findByType == LocationPrefabFindBy.AddressOrLatLon)
 			{
 				BuildFeatureFromLatLon(layer, tile);
 				if (callback != null)
@@ -268,34 +328,34 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		{
 			if (tile.TileState != Enums.TilePropertyState.Unregistered)
 			{
-			string[] coordinates = (SubLayerProperties as PrefabItemOptions).coordinates;
+				string[] coordinates = (SubLayerProperties as PrefabItemOptions).coordinates;
 
-			for (int i = 0; i < coordinates.Length; i++)
-			{
-				if (string.IsNullOrEmpty(coordinates[i]))
+				for (int i = 0; i < coordinates.Length; i++)
 				{
-					return;
-				}
-
-				//check if the coordinate is in the tile
-				Utils.Vector2d coordinate = Conversions.StringToLatLon(coordinates[i]);
-				Mapbox.Map.UnwrappedTileId coordinateTileId = Conversions.LatitudeLongitudeToTileId(
-					coordinate.x, coordinate.y, tile.InitialZoom);
-
-				if (coordinateTileId.Canonical.Equals(tile.CanonicalTileId))
-				{
-					if (String.IsNullOrEmpty(coordinates[i]))
+					if (string.IsNullOrEmpty(coordinates[i]))
 					{
 						return;
 					}
 
-					//create new vector feature
-					VectorFeatureUnity feature = new VectorFeatureUnity();
-					feature.Properties = new Dictionary<string, object>();
-					feature.Points = new List<List<Vector3>>();
+					//check if the coordinate is in the tile
+					Utils.Vector2d coordinate = Conversions.StringToLatLon(coordinates[i]);
+					Mapbox.Map.UnwrappedTileId coordinateTileId = Conversions.LatitudeLongitudeToTileId(
+						coordinate.x, coordinate.y, tile.InitialZoom);
 
-					//create submesh for feature
-					List<Vector3> latLonPoint = new List<Vector3>();
+					if (coordinateTileId.Canonical.Equals(tile.CanonicalTileId))
+					{
+						if (String.IsNullOrEmpty(coordinates[i]))
+						{
+							return;
+						}
+
+						//create new vector feature
+						VectorFeatureUnity feature = new VectorFeatureUnity();
+						feature.Properties = new Dictionary<string, object>();
+						feature.Points = new List<List<Vector3>>();
+
+						//create submesh for feature
+						List<Vector3> latLonPoint = new List<Vector3>();
 						//add point to submesh, and submesh to feature
 						latLonPoint.Add(Conversions.LatitudeLongitudeToUnityTilePosition(coordinate, tile.CurrentZoom, tile.TileScale, layer.Extent).ToVector3xz());
 						feature.Points.Add(latLonPoint);

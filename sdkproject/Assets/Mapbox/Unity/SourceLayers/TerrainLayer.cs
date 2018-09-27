@@ -6,7 +6,7 @@
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies;
 
-	// Layer Concrete Implementation. 
+	// Layer Concrete Implementation.
 	[Serializable]
 	public class TerrainLayer : AbstractLayer, ITerrainLayer
 	{
@@ -21,6 +21,7 @@
 				return _layerProperty;
 			}
 		}
+
 		public MapLayerType LayerType
 		{
 			get
@@ -126,15 +127,36 @@
 		{
 			_elevationFactory = ScriptableObject.CreateInstance<TerrainFactoryBase>();
 			SetFactoryOptions();
-			_layerProperty.PropertyHasChanged += RedrawLayer;
-		}
 
-		public void RedrawLayer(object sender, System.EventArgs e)
-		{
-			SetFactoryOptions();
-			//notifying map to reload existing tiles
-			NotifyUpdateLayer(_elevationFactory, true);
+			_layerProperty.colliderOptions.PropertyHasChanged += (property, e) =>
+			{
+				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
+			};
+			_layerProperty.requiredOptions.PropertyHasChanged += (property, e) =>
+			{
+				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
+			};
+			_layerProperty.unityLayerOptions.PropertyHasChanged += (property, e) =>
+			{
+				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
+			};
+			_layerProperty.PropertyHasChanged += (property, e) =>
+			{
+				//terrain factory uses strategy objects and they are controlled by layer
+				//so we have to refresh that first
+				//pushing new settings to factory directly
+				Debug.Log("here");
+				SetFactoryOptions();
+				//notifying map to reload existing tiles
+				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
+			};
 		}
+		// public void RedrawLayer(object sender, System.EventArgs e)
+		// {
+		// 	SetFactoryOptions();
+		// 	//notifying map to reload existing tiles
+		// 	NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
+		// }
 
 		private void SetFactoryOptions()
 		{
@@ -193,6 +215,113 @@
 			}
 		}
 		private TerrainFactoryBase _elevationFactory;
+
+		#region API Methods
+
+		/// <summary>
+		/// Set the data source for the terrain layer. Can be used to disable terrain layer by setting it "None".
+		/// </summary>
+		/// <param name="dataSource"></param>
+		public void SetDataSource(ElevationSourceType dataSource)
+		{
+			if (_layerProperty.sourceType != dataSource)
+			{
+				_layerProperty.sourceType = dataSource;
+				_layerProperty.HasChanged = true;
+			}
+		}
+
+		/// <summary>
+		/// Sets the main strategy for terrain mesh generation.
+		/// Flat terrain doesn't pull data from servers and just uses a quad as terrain.
+		/// </summary>
+		/// <param name="elevationType">Type of the elevation strategy</param>
+		public void SetElevationType(ElevationLayerType elevationType)
+		{
+			if (_layerProperty.elevationLayerType != elevationType)
+			{
+				_layerProperty.elevationLayerType = elevationType;
+				_layerProperty.HasChanged = true;
+			}
+		}
+
+		/// <summary>
+		/// Add/Remove terrain collider. Terrain uses mesh collider.
+		/// </summary>
+		/// <param name="enable">Boolean for enabling/disabling mesh collider</param>
+		public void EnableCollider(bool enable)
+		{
+			if (_layerProperty.colliderOptions.addCollider != enable)
+			{
+				_layerProperty.colliderOptions.addCollider = enable;
+				_layerProperty.colliderOptions.HasChanged = true;
+			}
+		}
+
+		/// <summary>
+		/// Sets the elevation multiplier for terrain. It'll regenerate terrain mesh, multiplying each point elevation by provided value.
+		/// </summary>
+		/// <param name="factor">Elevation multiplier</param>
+		public void SetExaggerationFactor(float factor)
+		{
+			if (_layerProperty.requiredOptions.exaggerationFactor != factor)
+			{
+				_layerProperty.requiredOptions.exaggerationFactor = factor;
+				_layerProperty.requiredOptions.HasChanged = true;
+			}
+		}
+
+		public void SetLayer(int layerId)
+		{
+			if (_layerProperty.unityLayerOptions.layerId != layerId)
+			{
+				_layerProperty.unityLayerOptions.layerId = layerId;
+				_layerProperty.unityLayerOptions.HasChanged = true;
+			}
+		}
+
+		/// <summary>
+		/// Change terrain layer settings.
+		/// </summary>
+		/// <param name="dataSource">The data source for the terrain height map.</param>
+		/// <param name="elevationType">Mesh generation strategy for the tile/height.</param>
+		/// <param name="enableCollider">Enable/Disable collider component for the tile game object.</param>
+		/// <param name="factor">Multiplier for the height data.</param>
+		/// <param name="layerId">Unity Layer for the tile game object.</param>
+		public void SetProperties(ElevationSourceType dataSource = ElevationSourceType.MapboxTerrain,
+			ElevationLayerType elevationType = ElevationLayerType.TerrainWithElevation,
+			bool enableCollider = false,
+			float factor = 1,
+			int layerId = 0)
+		{
+			if (_layerProperty.sourceType != dataSource ||
+			    _layerProperty.elevationLayerType != elevationType)
+			{
+				_layerProperty.sourceType = dataSource;
+				_layerProperty.elevationLayerType = elevationType;
+				_layerProperty.HasChanged = true;
+			}
+
+			if (_layerProperty.colliderOptions.addCollider != enableCollider)
+			{
+				_layerProperty.colliderOptions.addCollider = enableCollider;
+				_layerProperty.colliderOptions.HasChanged = true;
+			}
+
+			if (_layerProperty.requiredOptions.exaggerationFactor != factor)
+			{
+				_layerProperty.requiredOptions.exaggerationFactor = factor;
+				_layerProperty.requiredOptions.HasChanged = true;
+			}
+
+			if (_layerProperty.unityLayerOptions.layerId != layerId)
+			{
+				_layerProperty.unityLayerOptions.layerId = layerId;
+				_layerProperty.unityLayerOptions.HasChanged = true;
+			}
+		}
+		#endregion
+
 
 	}
 }

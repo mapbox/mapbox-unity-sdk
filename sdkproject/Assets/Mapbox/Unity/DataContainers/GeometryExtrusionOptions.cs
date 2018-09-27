@@ -27,6 +27,11 @@
 		public float maximumHeight = 0f;
 		[Tooltip("Scale factor to multiply the extrusion value of the feature.")]
 		public float extrusionScaleFactor = 1f;
+
+		public GeometryExtrusionWithAtlasOptions ToGeometryExtrusionWithAtlasOptions()
+		{
+			return new GeometryExtrusionWithAtlasOptions(this);
+		}
 	}
 
 	[Serializable]
@@ -62,6 +67,22 @@
 			maximumHeight = extrusionOptions.maximumHeight;
 			extrusionScaleFactor = extrusionOptions.extrusionScaleFactor;
 
+			texturingType = uvOptions.texturingType;
+			atlasInfo = uvOptions.atlasInfo;
+		}
+
+		public GeometryExtrusionWithAtlasOptions(GeometryExtrusionOptions extrusionOptions)
+		{
+			extrusionType = extrusionOptions.extrusionType;
+			extrusionGeometryType = extrusionOptions.extrusionGeometryType;
+			propertyName = extrusionOptions.propertyName;
+			minimumHeight = extrusionOptions.minimumHeight;
+			maximumHeight = extrusionOptions.maximumHeight;
+			extrusionScaleFactor = extrusionOptions.extrusionScaleFactor;
+		}
+
+		public GeometryExtrusionWithAtlasOptions(UVModifierOptions uvOptions)
+		{
 			texturingType = uvOptions.texturingType;
 			atlasInfo = uvOptions.atlasInfo;
 		}

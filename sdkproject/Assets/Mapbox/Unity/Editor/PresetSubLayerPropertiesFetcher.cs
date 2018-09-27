@@ -58,7 +58,7 @@
 					layerName = "road";
 					geometryType = VectorPrimitiveType.Line;
 					lineWidth = 1.0f;
-					style = StyleTypes.Custom;
+					style = StyleTypes.Dark;
 					break;
 				case PresetFeatureType.Points:
 					layerName = "poi_label";
@@ -69,6 +69,8 @@
 					geometryType = VectorPrimitiveType.Polygon;
 					break;
 				case PresetFeatureType.Custom:
+					layerName = "";
+					geometryType = VectorPrimitiveType.Custom;
 					break;
 				default:
 					break;
@@ -85,8 +87,12 @@
 				geometryType = geometryType,
 				snapToTerrain = true,
 				combineMeshes = false,
-				lineWidth = lineWidth,
 				sublayerName = sublayerName
+			};
+
+			_properties.lineGeometryOptions = new LineGeometryOptions
+			{
+				Width = lineWidth
 			};
 
 			_properties.extrusionOptions = new GeometryExtrusionOptions
@@ -107,7 +113,7 @@
 			{
 				style = style,
 			};
-
+			_properties.materialOptions.SetDefaultAssets();
 			_properties.buildingsWithUniqueIds = buildingsWithUniqueIds;
 			_properties.moveFeaturePositionTo = positionTargetType;
 			_properties.MeshModifiers = meshModifiers;

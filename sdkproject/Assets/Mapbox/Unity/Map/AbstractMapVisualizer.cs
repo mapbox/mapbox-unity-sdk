@@ -11,6 +11,7 @@ namespace Mapbox.Unity.Map
 	using UnityEngine.Serialization;
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Unity.MeshGeneration.Enums;
+	using Mapbox.Unity.MeshGeneration.Interfaces;
 
 	/// <summary>
 	/// Map Visualizer
@@ -25,11 +26,6 @@ namespace Mapbox.Unity.Map
 		[NodeEditorElementAttribute("Factories")]
 		[FormerlySerializedAs("_factories")]
 		public List<AbstractTileFactory> Factories;
-
-		[SerializeField]
-		Texture2D _loadingTexture;
-		[SerializeField]
-		Material TileMaterial;
 
 		protected IMapReadable _map;
 		protected Dictionary<UnwrappedTileId, UnityTile> _activeTiles = new Dictionary<UnwrappedTileId, UnityTile>();
@@ -58,16 +54,6 @@ namespace Mapbox.Unity.Map
 		public Dictionary<UnwrappedTileId, int> _tileProgress;
 
 		public event Action<ModuleState> OnMapVisualizerStateChanged = delegate { };
-
-		public void SetLoadingTexture(Texture2D loadingTexture)
-		{
-			_loadingTexture = loadingTexture;
-		}
-
-		public void SetTileMaterial(Material tileMaterial)
-		{
-			TileMaterial = tileMaterial;
-		}
 
 		/// <summary>
 		/// Gets the unity tile from unwrapped tile identifier.
@@ -216,11 +202,11 @@ namespace Mapbox.Unity.Map
 			if (unityTile == null)
 			{
 				unityTile = new GameObject().AddComponent<UnityTile>();
-				unityTile.MeshRenderer.material = TileMaterial;
+				unityTile.MeshRenderer.material = _map.TileMaterial;
 				unityTile.transform.SetParent(_map.Root, false);
 			}
 
-			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale, _map.AbsoluteZoom, _loadingTexture);
+			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale, _map.AbsoluteZoom, _map.LoadingTexture);
 			PlaceTile(tileId, unityTile, _map);
 
 			// Don't spend resources naming objects, as you shouldn't find objects by name anyway!
@@ -285,7 +271,7 @@ namespace Mapbox.Unity.Map
 				handler(this, e);
 			}
 		}
-		
+
 		public void UnregisterTilesFrom(AbstractTileFactory factory)
 		{
 			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
@@ -293,14 +279,44 @@ namespace Mapbox.Unity.Map
 				factory.Unregister(tileBundle.Value);
 			}
 		}
-		
-		public void ReregisterTilesTo(AbstractTileFactory factory)
+
+		public void UnregisterTilesFromLayer(VectorTileFactory factory, LayerVisualizerBase layerVisualizer)
+		{
+			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
+			{
+				factory.UnregisterLayer(tileBundle.Value, layerVisualizer);
+			}
+			layerVisualizer.SetProperties(layerVisualizer.SubLayerProperties);
+			layerVisualizer.InitializeStack();
+			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
+			{
+				factory.RedrawSubLayer(tileBundle.Value, layerVisualizer);
+			}
+		}
+
+		public void RemoveTilesFromLayer(VectorTileFactory factory, LayerVisualizerBase layerVisualizer)
+		{
+			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
+			{
+				factory.UnregisterLayer(tileBundle.Value, layerVisualizer);
+				factory.RemoveVectorLayerVisualizer(layerVisualizer);
+			}
+		}
+
+		public void ReregisterTilesTo(VectorTileFactory factory)
 		{
 			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
 			{
 				factory.Register(tileBundle.Value);
 			}
-			
+		}
+
+		public void UpdateTileForProperty(AbstractTileFactory factory, LayerUpdateArgs updateArgs)
+		{
+			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
+			{
+				factory.UpdateTileProperty(tileBundle.Value, updateArgs);
+			}
 		}
 		#endregion
 	}

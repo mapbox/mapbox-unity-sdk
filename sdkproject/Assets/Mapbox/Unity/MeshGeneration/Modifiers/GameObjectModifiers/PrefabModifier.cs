@@ -27,10 +27,16 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		public override void SetProperties(ModifierProperties properties)
 		{
 			_options = (SpawnPrefabOptions)properties;
+			_options.PropertyHasChanged += UpdateModifier;
 		}
 
 		public override void Run(VectorEntity ve, UnityTile tile)
 		{
+			if (_options.prefab == null)
+			{
+				return;
+			}
+
 			GameObject go = null;
 
 			if (_objects.ContainsKey(ve.GameObject))
@@ -83,7 +89,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					goRectTransform.localScale = _options.prefab.transform.localScale * (tile.TileScale);
 				}
 			}
-			
+
 			//go.transform.localScale = Constants.Math.Vector3One;
 
 			settable = go.GetComponent<IFeaturePropertySettable>();

@@ -4,8 +4,8 @@
 	using UnityEngine;
 	using Mapbox.Unity.Map;
 
-	[CustomPropertyDrawer(typeof(ElevationRequiredOptions))]
-	public class ElevationRequiredOptionsDrawer : PropertyDrawer
+	[CustomPropertyDrawer(typeof(TerrainColliderOptions))]
+	public class TerrainColliderOptionsDrawer : PropertyDrawer
 	{
 		static float lineHeight = EditorGUIUtility.singleLineHeight;
 
@@ -14,7 +14,7 @@
 			EditorGUI.BeginProperty(position, label, property);
 
 			position.y += lineHeight;
-			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("exaggerationFactor"));
+			EditorGUI.PropertyField(new Rect(position.x, position.y, position.width, lineHeight), property.FindPropertyRelative("addCollider"));
 
 			EditorGUI.EndProperty();
 		}

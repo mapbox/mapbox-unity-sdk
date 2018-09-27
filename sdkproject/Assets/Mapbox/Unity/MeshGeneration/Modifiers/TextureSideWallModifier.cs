@@ -65,7 +65,23 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void SetProperties(ModifierProperties properties)
 		{
-			_options = (GeometryExtrusionWithAtlasOptions) properties;
+			if (properties is GeometryExtrusionWithAtlasOptions)
+			{
+				_options = (GeometryExtrusionWithAtlasOptions)properties;
+			}
+			else if (properties is GeometryExtrusionOptions)
+			{
+				_options = ((GeometryExtrusionOptions)properties).ToGeometryExtrusionWithAtlasOptions();
+			}
+			else if (properties is UVModifierOptions)
+			{
+				_options = ((UVModifierOptions)properties).ToGeometryExtrusionWithAtlasOptions();
+			}
+		}
+
+		public override void UnbindProperties()
+		{
+			_options.PropertyHasChanged -= UpdateModifier;
 		}
 
 		public override void Initialize()
@@ -75,6 +91,12 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				atlasEntity.CalculateParameters();
 			}
+		}
+
+		public override void UpdateModifier(object sender, System.EventArgs layerArgs)
+		{
+			SetProperties((ModifierProperties)sender);
+			NotifyUpdateModifier(new VectorLayerUpdateArgs { property = sender as MapboxDataProperty, modifier = this });
 		}
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
@@ -123,7 +145,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				currentWallLength = 0;
 				start = Constants.Math.Vector3Zero;
 				wallSegmentDirection = Constants.Math.Vector3Zero;
-				
+
 				finalLeftOverRowHeight = 0f;
 				if (finalMidHeight > 0)
 				{
@@ -135,7 +157,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				{
 					finalLeftOverRowHeight = finalTopHeight;
 				}
-				
+
 				for (int i = 0; i < md.Edges.Count; i += 2)
 				{
 					var v1 = md.Vertices[md.Edges[i]];
@@ -166,7 +188,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						wallSegmentFirstVertex = start;
 						//columns fitting wall / max column we have in texture
 						var stepRatio =
-							(float) Math.Min(_currentFacade.ColumnCount,
+							(float)Math.Min(_currentFacade.ColumnCount,
 								Math.Floor(currentWallLength / _singleColumnLength)) / _currentFacade.ColumnCount;
 						wallSegmentLength = stepRatio * _scaledPreferredWallLength;
 						start += wallSegmentDirection * wallSegmentLength;
@@ -293,7 +315,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				//first part is the number of floors fitting current wall segment. You can fit max of "row count in mid". Or if wall
 				//is smaller and it can only fit i.e. 3 floors instead of 5; we use 3/5 of the mid section texture as well.
 				_midUvInCurrentStep =
-					((float) Math.Min(_currentFacade.MidFloorCount,
+					((float)Math.Min(_currentFacade.MidFloorCount,
 						Math.Round(_currentMidHeight / _singleFloorHeight))) / _currentFacade.MidFloorCount;
 
 				//top two vertices
@@ -471,25 +493,25 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 						break;
 					case ExtrusionType.MinHeight:
-					{
-						var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
-						for (int i = 0; i < _counter; i++)
 						{
-							md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.min + maxHeight, md.Vertices[i].z);
+							var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
+							for (int i = 0; i < _counter; i++)
+							{
+								md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.min + maxHeight, md.Vertices[i].z);
+							}
 						}
-					}
 						//hf += max - min;
 						break;
 					case ExtrusionType.MaxHeight:
-					{
-						var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
-						for (int i = 0; i < _counter; i++)
 						{
-							md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.max + maxHeight, md.Vertices[i].z);
-						}
+							var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
+							for (int i = 0; i < _counter; i++)
+							{
+								md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.max + maxHeight, md.Vertices[i].z);
+							}
 
-						height += minmax.max - minmax.min;
-					}
+							height += minmax.max - minmax.min;
+						}
 						break;
 					case ExtrusionType.RangeHeight:
 						for (int i = 0; i < _counter; i++)

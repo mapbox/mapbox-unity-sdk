@@ -26,7 +26,8 @@ namespace Mapbox.Editor
 
 			if (GUI.Button(buttonRect, searchButtonContent))
 			{
-				GeocodeAttributeSearchWindow.Open(property, true);
+				object objectToUpdate = EditorHelper.GetTargetObjectWithProperty(property);
+				GeocodeAttributeSearchWindow.Open(property, objectToUpdate);
 			}
 		}
 	}

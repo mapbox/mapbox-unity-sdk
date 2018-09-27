@@ -143,5 +143,16 @@ namespace Mapbox.Unity.Map
 			}
 		}
 		#endregion
+
+		public override bool HasChanged
+		{
+			set
+			{
+				if (value == true)
+				{
+					OnPropertyHasChanged(new VectorLayerUpdateArgs { property = this });
+				}
+			}
+		}
 	}
 }

@@ -38,6 +38,12 @@ namespace Mapbox.Unity.Map
 			layerTreeView.Reload();
 			layerTreeView.OnGUI(layersRect);
 
+			if (layerTreeView.hasChanged)
+			{
+				EditorHelper.CheckForModifiedProperty(property);
+				layerTreeView.hasChanged = false;
+			}
+
 			selectedLayers = layerTreeView.GetSelection();
 			//if there are selected elements, set the selection index at the first element.
 			//if not, use the Selection index to persist the selection at the right index.
@@ -90,6 +96,12 @@ namespace Mapbox.Unity.Map
 
 				selectedLayers = new int[1] { prefabItemArray.arraySize - 1 };
 				layerTreeView.SetSelection(selectedLayers);
+
+				if (EditorHelper.DidModifyProperty(property))
+				{
+					PrefabItemOptions prefabItemOptionToAdd= (PrefabItemOptions)EditorHelper.GetTargetObjectOfProperty(prefabItem) as PrefabItemOptions;
+					((VectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property)).OnSubLayerPropertyAdded(new VectorLayerUpdateArgs { property = prefabItemOptionToAdd });
+				}
 			}
 
 			if (GUILayout.Button(new GUIContent("Remove Selected"), (GUIStyle)"minibuttonright"))
@@ -99,12 +111,25 @@ namespace Mapbox.Unity.Map
 					return;
 				}
 
+				List<PrefabItemOptions> LayersToRemove = new List<PrefabItemOptions>();
 				foreach (var index in selectedLayers.OrderByDescending(i => i))
 				{
+					PrefabItemOptions prefabItemOptionsToRemove = (PrefabItemOptions)EditorHelper.GetTargetObjectOfProperty(prefabItemArray.GetArrayElementAtIndex(index)) as PrefabItemOptions;
+					if(prefabItemOptionsToRemove != null)
+					{
+						LayersToRemove.Add(prefabItemOptionsToRemove);
+					}
 					prefabItemArray.DeleteArrayElementAtIndex(index);
 				}
 				selectedLayers = new int[0];
 				layerTreeView.SetSelection(selectedLayers);
+				if (EditorHelper.DidModifyProperty(property))
+				{
+					for (int i = 0; i < LayersToRemove.Count; i++)
+					{
+						((VectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property)).OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = LayersToRemove[i]});
+					}
+				}
 			}
 
 			EditorGUILayout.EndHorizontal();
@@ -127,8 +152,7 @@ namespace Mapbox.Unity.Map
 				{
 					GUI.enabled = false;
 				}
-
-				DrawLayerLocationPrefabProperties(layerProperty);
+				DrawLayerLocationPrefabProperties(layerProperty, property);
 				if (!isLayerActive)
 				{
 					GUI.enabled = true;
@@ -141,7 +165,7 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		void DrawLayerLocationPrefabProperties(SerializedProperty layerProperty)
+		void DrawLayerLocationPrefabProperties(SerializedProperty layerProperty, SerializedProperty property)
 		{
 			EditorGUILayout.PropertyField(layerProperty);
 		}

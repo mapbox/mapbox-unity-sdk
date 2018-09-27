@@ -1,4 +1,4 @@
-﻿namespace Mapbox.Unity.MeshGeneration.Factories
+namespace Mapbox.Unity.MeshGeneration.Factories
 {
 	using System.Collections.Generic;
 	using UnityEngine;
@@ -11,16 +11,16 @@
 
 	/// <summary>
 	///	Vector Tile Factory
-	/// Vector data is much more detailed compared to terrain and image data so we have a different structure to process 
-	/// vector data(compared to other factories). First of all, how does the vector data itself structured? Vector tile 
-	/// data contains 'vector layers' as immediate children.And then each of these vector layers contains a number of  
-	/// 'features' inside.I.e.vector data for a tile has 'building', 'road', 'landuse' etc layers. Then building layer 
+	/// Vector data is much more detailed compared to terrain and image data so we have a different structure to process
+	/// vector data(compared to other factories). First of all, how does the vector data itself structured? Vector tile
+	/// data contains 'vector layers' as immediate children.And then each of these vector layers contains a number of
+	/// 'features' inside.I.e.vector data for a tile has 'building', 'road', 'landuse' etc layers. Then building layer
 	/// has a number of polygon features, road layer has line features etc.
-	/// Similar to this, vector tile factory contains bunch of 'layer visualizers' and each one of them corresponds to 
-	/// one (or more) vector layers in data.So when data is received, factory goes through all layers inside and passes 
-	/// them to designated layer visualizers.We're using layer name as key here, to find the designated layer visualizer, 
-	/// like 'building', 'road'. (vector tile factory visual would help here). If it can't find a layer visualizer for 
-	/// that layer, it'll be skipped and not processed at all.If all you need is 1-2 layers, it's indeed a big waste to 
+	/// Similar to this, vector tile factory contains bunch of 'layer visualizers' and each one of them corresponds to
+	/// one (or more) vector layers in data.So when data is received, factory goes through all layers inside and passes
+	/// them to designated layer visualizers.We're using layer name as key here, to find the designated layer visualizer,
+	/// like 'building', 'road'. (vector tile factory visual would help here). If it can't find a layer visualizer for
+	/// that layer, it'll be skipped and not processed at all.If all you need is 1-2 layers, it's indeed a big waste to
 	/// pull whole vector data and you can use 'Style Optimized Vector Tile Factory' to pull only the layer you want to use.
 	/// </summary>
 	//[CreateAssetMenu(menuName = "Mapbox/Factories/Vector Tile Factory")]
@@ -69,85 +69,135 @@
 			DataFetcher.DataRecieved += OnVectorDataRecieved;
 			DataFetcher.FetchingError += OnDataError;
 
-			foreach (var item in _properties.locationPrefabList)
-			{
-				LayerVisualizerBase visualizer = CreateInstance<LocationPrefabsLayerVisualizer>();
-				item.performanceOptions = _properties.performanceOptions;
-				((LocationPrefabsLayerVisualizer)visualizer).SetProperties((PrefabItemOptions)item);
-
-				visualizer.Initialize();
-				if (visualizer == null)
-				{
-					continue;
-				}
-
-				if (_layerBuilder.ContainsKey(visualizer.Key))
-				{
-					_layerBuilder[visualizer.Key].Add(visualizer);
-				}
-				else
-				{
-					_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase>() { visualizer });
-				}
-			}
+			CreatePOILayerVisualizers();
 
 			CreateLayerVisualizers();
 		}
-	
 
+		private void CreatePOILayerVisualizers()
+		{
+			foreach (var item in _properties.locationPrefabList)
+			{
+				AddPOIVectorLayerVisualizer(item);
+			}
+		}
 
 		private void CreateLayerVisualizers()
 		{
 			foreach (var sublayer in _properties.vectorSubLayers)
 			{
-				//if its of type prefabitemoptions then separate the visualizer type
-				LayerVisualizerBase visualizer = CreateInstance<VectorLayerVisualizer>();
+				AddVectorLayerVisualizer(sublayer);
+			}
+		}
 
-				visualizer.LayerVisualizerHasChanged += UpdateTileFactory;
+		public virtual LayerVisualizerBase AddVectorLayerVisualizer(VectorSubLayerProperties subLayer)
+		{
+			//if its of type prefabitemoptions then separate the visualizer type
+			LayerVisualizerBase visualizer = CreateInstance<VectorLayerVisualizer>();
 
-				// Set honorBuildingSettings - need to set here in addition to the UI. 
-				// Not setting it here can lead to wrong filtering. 
+			//TODO : FIX THIS !!
+			visualizer.LayerVisualizerHasChanged += UpdateTileFactory;
 
-				bool isPrimitiveTypeValidForBuidingIds = (sublayer.coreOptions.geometryType == VectorPrimitiveType.Polygon || sublayer.coreOptions.geometryType == VectorPrimitiveType.Custom);
-				bool isSourceValidForBuildingIds = (_properties.sourceType != VectorSourceType.MapboxStreets);
+			// Set honorBuildingSettings - need to set here in addition to the UI.
+			// Not setting it here can lead to wrong filtering.
 
-				sublayer.honorBuildingIdSetting = isPrimitiveTypeValidForBuidingIds && isSourceValidForBuildingIds;
-				// Setup visualizer. 
-				((VectorLayerVisualizer)visualizer).SetProperties(sublayer);
+			bool isPrimitiveTypeValidForBuidingIds = (subLayer.coreOptions.geometryType == VectorPrimitiveType.Polygon) || (subLayer.coreOptions.geometryType == VectorPrimitiveType.Custom);
+			bool isSourceValidForBuildingIds = _properties.sourceType != VectorSourceType.MapboxStreets;
 
-				visualizer.Initialize();
-				if (visualizer == null)
+			subLayer.honorBuildingIdSetting = isPrimitiveTypeValidForBuidingIds && isSourceValidForBuildingIds;
+			// Setup visualizer.
+			((VectorLayerVisualizer)visualizer).SetProperties(subLayer);
+
+			visualizer.Initialize();
+			if (visualizer == null)
+			{
+				return visualizer;
+			}
+
+			if (_layerBuilder.ContainsKey(visualizer.Key))
+			{
+				_layerBuilder[visualizer.Key].Add(visualizer);
+			}
+			else
+			{
+				_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase> { visualizer });
+			}
+			return visualizer;
+		}
+
+		public virtual LayerVisualizerBase AddPOIVectorLayerVisualizer(PrefabItemOptions poiSubLayer)
+		{
+			LayerVisualizerBase visualizer = CreateInstance<LocationPrefabsLayerVisualizer>();
+			poiSubLayer.performanceOptions = _properties.performanceOptions;
+			((LocationPrefabsLayerVisualizer)visualizer).SetProperties((PrefabItemOptions)poiSubLayer);
+
+			visualizer.LayerVisualizerHasChanged += UpdateTileFactory;
+
+			visualizer.Initialize();
+			if (visualizer == null)
+			{
+				return null;
+			}
+
+			if (_layerBuilder.ContainsKey(visualizer.Key))
+			{
+				_layerBuilder[visualizer.Key].Add(visualizer);
+			}
+			else
+			{
+				_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase>() { visualizer });
+			}
+
+			return visualizer;
+		}
+
+		public virtual LayerVisualizerBase FindVectorLayerVisualizer(VectorSubLayerProperties subLayer)
+		{
+			if (_layerBuilder.ContainsKey(subLayer.Key))
+			{
+				var visualizer = _layerBuilder[subLayer.Key].Find((obj) => obj.SubLayerProperties == subLayer);
+				return visualizer;
+			}
+			return null;
+		}
+
+		public virtual void RemoveVectorLayerVisualizer(LayerVisualizerBase subLayer)
+		{
+			if (_layerBuilder.ContainsKey(subLayer.Key))
+			{
+				if (Properties.vectorSubLayers.Contains(subLayer.SubLayerProperties))
 				{
-					continue;
+					Properties.vectorSubLayers.Remove(subLayer.SubLayerProperties);
+				}
+				else if (subLayer.SubLayerProperties is PrefabItemOptions && Properties.locationPrefabList.Contains(subLayer.SubLayerProperties as PrefabItemOptions))
+				{
+					Properties.locationPrefabList.Remove(subLayer.SubLayerProperties as PrefabItemOptions);
 				}
 
-				if (_layerBuilder.ContainsKey(visualizer.Key))
-				{
-					_layerBuilder[visualizer.Key].Add(visualizer);
-				}
-				else
-				{
-					_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase>() { visualizer });
-				}
+				_layerBuilder[subLayer.Key].Remove(subLayer);
 			}
 		}
 
 		public override void SetOptions(LayerProperties options)
 		{
 			_properties = (VectorLayerProperties)options;
-			_properties.PropertyHasChanged += UpdateTileFactory;
 			if (_layerBuilder != null)
 			{
 				_layerBuilder.Clear();
+				// TODO : IS THIS CODE REALLY REQUIRED?
+				//CreateLayerVisualizers();
+				//foreach (var layer in _layerBuilder)
+				//{
+				//	foreach (var item in layer.Value)
+				//	{
+				//		(item as VectorLayerVisualizer).SetProperties(null);
+				//		item.Initialize();
+				//	}
+				//}
+
+				CreatePOILayerVisualizers();
+
 				CreateLayerVisualizers();
-				foreach (var layer in _layerBuilder)
-				{
-					foreach (var item in layer.Value)
-					{
-						(item as VectorLayerVisualizer).SetProperties(null);
-						item.Initialize();
-					}
-				}
 			}
 		}
 
@@ -169,6 +219,26 @@
 				style = _properties.optimizedStyle
 			};
 			DataFetcher.FetchData(parameters);
+		}
+
+		protected override void UpdateTileFactory(object sender, EventArgs args)
+		{
+			Debug.Log("TileFactoryHasChanged Override ");
+			VectorLayerUpdateArgs layerUpdateArgs = args as VectorLayerUpdateArgs;
+			layerUpdateArgs.factory = this;
+			base.UpdateTileFactory(sender, layerUpdateArgs);
+		}
+
+
+		public override void UpdateTileProperty(UnityTile tile, LayerUpdateArgs updateArgs)
+		{
+			updateArgs.property.UpdateProperty(tile);
+
+			if (updateArgs.property.NeedsForceUpdate())
+			{
+				Unregister(tile);
+			}
+			Register(tile);
 		}
 
 		/// <summary>
@@ -200,6 +270,27 @@
 						visualizer.UnregisterTile(tile);
 					}
 				}
+			}
+		}
+		public void RedrawSubLayer(UnityTile tile, LayerVisualizerBase visualizer)
+		{
+			CreateFeatureWithBuilder(tile, visualizer.SubLayerProperties.coreOptions.layerName, visualizer);
+		}
+
+		public void UnregisterLayer(UnityTile tile, LayerVisualizerBase visualizer)
+		{
+			if (_layerProgress.ContainsKey(tile))
+			{
+				_layerProgress.Remove(tile);
+			}
+			if (_tilesWaitingProcessing.Contains(tile))
+			{
+				_tilesWaitingProcessing.Remove(tile);
+			}
+
+			if (visualizer != null)
+			{
+				visualizer.UnregisterTile(tile);
 			}
 		}
 
@@ -273,22 +364,7 @@
 				{
 					foreach (var builder in _layerBuilder[layerName])
 					{
-						if (builder.Active)
-						{
-							if (_layerProgress.ContainsKey(tile))
-							{
-								_layerProgress[tile].Add(builder);
-							}
-							else
-							{
-								_layerProgress.Add(tile, new HashSet<LayerVisualizerBase> { builder });
-								if (!_tilesWaitingProcessing.Contains(tile))
-								{
-									_tilesWaitingProcessing.Add(tile);
-								}
-							}
-							builder.Create(tile.VectorData.Data.GetLayer(layerName), tile, DecreaseProgressCounter);
-						}
+						CreateFeatureWithBuilder(tile, layerName, builder);
 					}
 				}
 			}
@@ -299,29 +375,58 @@
 			{
 				foreach (var builder in _layerBuilder[emptyLayer])
 				{
-					if (builder.Active)
-					{
-						if (_layerProgress.ContainsKey(tile))
-						{
-							_layerProgress[tile].Add(builder);
-						}
-						else
-						{
-							_layerProgress.Add(tile, new HashSet<LayerVisualizerBase> { builder });
-							if (!_tilesWaitingProcessing.Contains(tile))
-							{
-								_tilesWaitingProcessing.Add(tile);
-							}
-						}
-						//just pass the first available layer - we should create a static null layer for this
-						builder.Create(tile.VectorData.Data.GetLayer(tile.VectorData.Data.LayerNames()[0]), tile, DecreaseProgressCounter);
-					}
+					CreateFeatureWithBuilder(tile, emptyLayer, builder);
+					//if (builder.Active)
+					//{
+					//	if (_layerProgress.ContainsKey(tile))
+					//	{
+					//		_layerProgress[tile].Add(builder);
+					//	}
+					//	else
+					//	{
+					//		_layerProgress.Add(tile, new HashSet<LayerVisualizerBase> { builder });
+					//		if (!_tilesWaitingProcessing.Contains(tile))
+					//		{
+					//			_tilesWaitingProcessing.Add(tile);
+					//		}
+					//	}
+					//	//just pass the first available layer - we should create a static null layer for this
+					//	builder.Create(tile.VectorData.Data.GetLayer(tile.VectorData.Data.LayerNames()[0]), tile, DecreaseProgressCounter);
+					//}
 				}
 			}
 
 			if (!_layerProgress.ContainsKey(tile))
 			{
 				tile.VectorDataState = TilePropertyState.Loaded;
+			}
+		}
+
+		private void CreateFeatureWithBuilder(UnityTile tile, string layerName, LayerVisualizerBase builder)
+		{
+			if (builder.Active)
+			{
+				if (_layerProgress.ContainsKey(tile))
+				{
+					_layerProgress[tile].Add(builder);
+				}
+				else
+				{
+					_layerProgress.Add(tile, new HashSet<LayerVisualizerBase> { builder });
+					if (!_tilesWaitingProcessing.Contains(tile))
+					{
+						_tilesWaitingProcessing.Add(tile);
+					}
+				}
+				if (layerName != "")
+				{
+					builder.Create(tile.VectorData.Data.GetLayer(layerName), tile, DecreaseProgressCounter);
+				}
+				else
+				{
+					//just pass the first available layer - we should create a static null layer for this
+					builder.Create(tile.VectorData.Data.GetLayer(tile.VectorData.Data.LayerNames()[0]), tile, DecreaseProgressCounter);
+				}
 			}
 		}
 
