@@ -123,7 +123,7 @@ public class ApiTest : MonoBehaviour
 		var layer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("ExtrudedBuildings");
 		if (layer != null)
 		{
-			layer.SetTexturingType(testStyles[styleId]);
+			layer.SetStyleType(testStyles[styleId]);
 		}
 		else
 		{
@@ -303,6 +303,7 @@ public class ApiTest : MonoBehaviour
 			vectorLayer.filterOptions.filters[index].PropertyValue = contains;
 		}
 		vectorLayer.filterOptions.HasChanged = true;
+	}
 
 	[ContextMenu("TestPoiCategoryApi")]
 	public void TestPoiCategoryApi()

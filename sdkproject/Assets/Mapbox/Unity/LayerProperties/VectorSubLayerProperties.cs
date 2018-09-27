@@ -3,6 +3,7 @@
 	using System;
 	using System.Collections.Generic;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
+	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.Unity.Utilities;
 	using UnityEngine;
 
@@ -66,17 +67,75 @@
 			return coreOptions.sublayerName.Contains(layerName);
 		}
 
+		public bool SubLayerUsesStyleType(StyleTypes style)
+		{
+			return materialOptions.style == style;
+		}
+
 		public void SetActive(bool active)
 		{
 			coreOptions.isActive = active;
 			coreOptions.HasChanged = true;
 		}
 
-		public void SetTexturingType(StyleTypes style)
+		public void SetStyleType(StyleTypes style)
 		{
 			materialOptions.style = style;
 			materialOptions.HasChanged = true;
 		}
-	}
 
+		public void SetSimpleStylePaletteType(SamplePalettes palette)
+		{
+			materialOptions.samplePalettes = palette;
+			materialOptions.HasChanged = true;
+		}
+
+		public void SetLightStyleOpacity(float opacity)
+		{
+			materialOptions.lightStyleOpacity = Mathf.Clamp(opacity, 0.0f, 1.0f);
+			materialOptions.HasChanged = true;
+		}
+
+		public void SetDarkStyleOpacity(float opacity)
+		{
+			materialOptions.darkStyleOpacity = Mathf.Clamp(opacity, 0.0f, 1.0f);
+			materialOptions.HasChanged = true;
+		}
+
+		public void SetColorStyleColor(Color color)
+		{
+			materialOptions.colorStyleColor = color;
+			materialOptions.HasChanged = true;
+		}
+
+		public void SetCustomTexturingType(UvMapType uvMapType)
+		{
+			materialOptions.texturingType = uvMapType;
+			materialOptions.HasChanged = true;
+		}
+
+		public void SetCustomTopMaterial(Material material)
+		{
+			materialOptions.materials[0].Materials[0] = new Material(material);
+			materialOptions.HasChanged = true;
+		}
+
+		public void SetCustomSideMaterial(Material material)
+		{
+			materialOptions.materials[1].Materials[0] = new Material(material);
+			materialOptions.HasChanged = true;
+		}
+
+		public void SetCustomUvAtlas(AtlasInfo atlas)
+		{
+			materialOptions.atlasInfo = atlas;
+			materialOptions.HasChanged = true;
+		}
+
+		public void SetCustomColorPalette(ScriptablePalette palette)
+		{
+			materialOptions.colorPalette = palette;
+			materialOptions.HasChanged = true;
+		}
+	}
 }
