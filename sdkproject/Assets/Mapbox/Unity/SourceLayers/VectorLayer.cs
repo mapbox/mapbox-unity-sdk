@@ -311,6 +311,10 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
+		public void RemoveFeatureLayer(VectorSubLayerProperties layer)
+		{
+			_layerProperty.vectorSubLayers.Remove(layer);
+		}
 
 		// POI LAYER OPERATIONS
 
@@ -377,6 +381,11 @@ namespace Mapbox.Unity.Map
 				//vectorSubLayers.Remove(layerToRemove);
 				_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs {property = layerToRemove});
 			}
+		}
+
+		public void RemovePoiLayer(PrefabItemOptions layer)
+		{
+			_layerProperty.locationPrefabList.Remove(layer);
 		}
 
 		#endregion
