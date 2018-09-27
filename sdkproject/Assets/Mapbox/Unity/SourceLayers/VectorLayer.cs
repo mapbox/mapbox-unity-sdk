@@ -12,45 +12,34 @@ namespace Mapbox.Unity.Map
 	public class VectorLayer : AbstractLayer, IVectorDataLayer
 	{
 		#region Events
+
 		public EventHandler SubLayerAdded;
 		public EventHandler SubLayerRemoved;
+
 		#endregion
 
 
-		[SerializeField]
-		VectorLayerProperties _layerProperty = new VectorLayerProperties();
+		[SerializeField] VectorLayerProperties _layerProperty = new VectorLayerProperties();
 
 		[NodeEditorElement(" Vector Layer ")]
 		public VectorLayerProperties LayerProperty
 		{
-			get
-			{
-				return _layerProperty;
-			}
+			get { return _layerProperty; }
 		}
 
 		public MapLayerType LayerType
 		{
-			get
-			{
-				return MapLayerType.Vector;
-			}
+			get { return MapLayerType.Vector; }
 		}
 
 		public bool IsLayerActive
 		{
-			get
-			{
-				return (_layerProperty.sourceType != VectorSourceType.None);
-			}
+			get { return (_layerProperty.sourceType != VectorSourceType.None); }
 		}
 
 		public string LayerSource
 		{
-			get
-			{
-				return _layerProperty.sourceOptions.Id;
-			}
+			get { return _layerProperty.sourceOptions.Id; }
 		}
 
 		public void SetLayerSource(VectorSourceType vectorSource)
@@ -91,6 +80,7 @@ namespace Mapbox.Unity.Map
 						SetLayerSource(vectorSource);
 						return;
 					}
+
 					var newLayerSource = _layerProperty.sourceOptions.Id + "," + vectorSource;
 					SetLayerSource(newLayerSource);
 				}
@@ -124,11 +114,12 @@ namespace Mapbox.Unity.Map
 		{
 			VectorLayerUpdateArgs layerUpdateArgs = args as VectorLayerUpdateArgs;
 
-			layerUpdateArgs.visualizer = _vectorTileFactory.FindVectorLayerVisualizer((VectorSubLayerProperties)layerUpdateArgs.property);
+			layerUpdateArgs.visualizer = _vectorTileFactory.FindVectorLayerVisualizer((VectorSubLayerProperties) layerUpdateArgs.property);
 			layerUpdateArgs.factory = _vectorTileFactory;
 
 			SubLayerRemoved(this, layerUpdateArgs);
 		}
+
 		public void AddLocationPrefabItem(PrefabItemOptions prefabItem)
 		{
 			//ensure that there is a list of prefabitems
@@ -162,7 +153,7 @@ namespace Mapbox.Unity.Map
 
 		public void Initialize(LayerProperties properties)
 		{
-			_layerProperty = (VectorLayerProperties)properties;
+			_layerProperty = (VectorLayerProperties) properties;
 			Initialize();
 		}
 
@@ -206,23 +197,15 @@ namespace Mapbox.Unity.Map
 
 		public VectorTileFactory Factory
 		{
-			get
-			{
-				return _vectorTileFactory;
-			}
+			get { return _vectorTileFactory; }
 		}
+
 		private VectorTileFactory _vectorTileFactory;
 
 		public List<PrefabItemOptions> PointsOfInterestSublayerList
 		{
-			get
-			{
-				return _layerProperty.locationPrefabList;
-			}
-			set
-			{
-				_layerProperty.locationPrefabList = value;
-			}
+			get { return _layerProperty.locationPrefabList; }
+			set { _layerProperty.locationPrefabList = value; }
 		}
 
 
@@ -236,8 +219,70 @@ namespace Mapbox.Unity.Map
 			{
 				_layerProperty.vectorSubLayers = new List<VectorSubLayerProperties>();
 			}
+
 			_layerProperty.vectorSubLayers.Add(subLayerProperties);
-			_layerProperty.OnSubLayerPropertyAdded(new VectorLayerUpdateArgs { property = _layerProperty.vectorSubLayers.Last() });
+			_layerProperty.OnSubLayerPropertyAdded(new VectorLayerUpdateArgs {property = _layerProperty.vectorSubLayers.Last()});
+		}
+
+		public IEnumerable<VectorSubLayerProperties> GetAllFeatureLayers()
+		{
+			return _layerProperty.vectorSubLayers.AsEnumerable();
+		}
+
+		public IEnumerable<VectorSubLayerProperties> GetAllPolygonFeatureLayers()
+		{
+			foreach (var featureLayer in _layerProperty.vectorSubLayers)
+			{
+				if (featureLayer.coreOptions.geometryType == VectorPrimitiveType.Polygon)
+				{
+					yield return featureLayer;
+				}
+			}
+		}
+
+		public IEnumerable<VectorSubLayerProperties> GetAllLineFeatureLayers()
+		{
+			foreach (var featureLayer in _layerProperty.vectorSubLayers)
+			{
+				if (featureLayer.coreOptions.geometryType == VectorPrimitiveType.Line)
+				{
+					yield return featureLayer;
+				}
+			}
+		}
+
+		public IEnumerable<VectorSubLayerProperties> GetAllPointFeatureLayers()
+		{
+			foreach (var featureLayer in _layerProperty.vectorSubLayers)
+			{
+				if (featureLayer.coreOptions.geometryType == VectorPrimitiveType.Point)
+				{
+					yield return featureLayer;
+				}
+			}
+		}
+
+		public IEnumerable<VectorSubLayerProperties> GetFeatureLayerByQuery(Func<VectorSubLayerProperties, bool> query)
+		{
+			foreach (var featureLayer in _layerProperty.vectorSubLayers)
+			{
+				if (query(featureLayer))
+				{
+					yield return featureLayer;
+				}
+			}
+		}
+
+		public VectorSubLayerProperties GetFeatureLayerAtIndex(int i)
+		{
+			if (i < _layerProperty.vectorSubLayers.Count)
+			{
+				return _layerProperty.vectorSubLayers[i];
+			}
+			else
+			{
+				return null;
+			}
 		}
 
 		public VectorSubLayerProperties FindFeatureLayerWithName(string featureLayerName)
@@ -252,6 +297,7 @@ namespace Mapbox.Unity.Map
 					break;
 				}
 			}
+
 			return (foundLayerIndex != -1) ? _layerProperty.vectorSubLayers[foundLayerIndex] : null;
 		}
 
@@ -261,11 +307,11 @@ namespace Mapbox.Unity.Map
 			if (layerToRemove != null)
 			{
 				//vectorSubLayers.Remove(layerToRemove);
-				_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = layerToRemove });
+				_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs {property = layerToRemove});
 			}
 		}
 
-		
+
 		// POI LAYER OPERATIONS
 
 		public void AddPoiLayer(PrefabItemOptions poiLayerProperties)
@@ -274,8 +320,37 @@ namespace Mapbox.Unity.Map
 			{
 				_layerProperty.locationPrefabList = new List<PrefabItemOptions>();
 			}
+
 			_layerProperty.locationPrefabList.Add(poiLayerProperties);
-			_layerProperty.OnSubLayerPropertyAdded(new VectorLayerUpdateArgs { property = _layerProperty.locationPrefabList.Last() });
+			_layerProperty.OnSubLayerPropertyAdded(new VectorLayerUpdateArgs {property = _layerProperty.locationPrefabList.Last()});
+		}
+
+		public IEnumerable<PrefabItemOptions> GetAllPoiLayers()
+		{
+			return _layerProperty.locationPrefabList.AsEnumerable();
+		}
+
+		public PrefabItemOptions GetPoiLayerAtIndex(int i)
+		{
+			if (i < _layerProperty.vectorSubLayers.Count)
+			{
+				return _layerProperty.locationPrefabList[i];
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+		public IEnumerable<PrefabItemOptions> GetFeatureLayerByQuery(Func<PrefabItemOptions, bool> query)
+		{
+			foreach (var poiLayer in _layerProperty.locationPrefabList)
+			{
+				if (query(poiLayer))
+				{
+					yield return poiLayer;
+				}
+			}
 		}
 
 		public PrefabItemOptions FindPoiLayerWithName(string poiLayerName)
@@ -290,6 +365,7 @@ namespace Mapbox.Unity.Map
 					break;
 				}
 			}
+
 			return (foundLayerIndex != -1) ? _layerProperty.locationPrefabList[foundLayerIndex] : null;
 		}
 
@@ -299,7 +375,7 @@ namespace Mapbox.Unity.Map
 			if (layerToRemove != null)
 			{
 				//vectorSubLayers.Remove(layerToRemove);
-				_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = layerToRemove });
+				_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs {property = layerToRemove});
 			}
 		}
 
