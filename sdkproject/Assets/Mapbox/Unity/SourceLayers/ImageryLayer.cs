@@ -138,6 +138,10 @@
 
 		#region API Methods
 
+		/// <summary>
+		/// Sets the data source for the image factory.
+		/// </summary>
+		/// <param name="imageSource"></param>
 		public void SetLayerSource(ImagerySourceType imageSource)
 		{
 			if (imageSource != ImagerySourceType.Custom && imageSource != ImagerySourceType.None)
@@ -152,6 +156,10 @@
 			}
 		}
 
+		/// <summary>
+		/// Enables high quality images for selected image factory source.
+		/// </summary>
+		/// <param name="useRetina"></param>
 		public void UseRetina(bool useRetina)
 		{
 			if (_layerProperty.rasterOptions.useRetina != useRetina)
@@ -161,6 +169,10 @@
 			}
 		}
 
+		/// <summary>
+		/// Enable Texture2D compression for image factory outputs.
+		/// </summary>
+		/// <param name="useCompression"></param>
 		public void UseCompression(bool useCompression)
 		{
 			if (_layerProperty.rasterOptions.useCompression != useCompression)
@@ -170,6 +182,10 @@
 			}
 		}
 
+		/// <summary>
+		/// Enable Texture2D MipMap option for image factory outputs.
+		/// </summary>
+		/// <param name="useMipMap"></param>
 		public void UseMipMap(bool useMipMap)
 		{
 			if (_layerProperty.rasterOptions.useMipMap != useMipMap)
@@ -179,7 +195,32 @@
 			}
 		}
 
+		/// <summary>
+		/// Change image layer settings.
+		/// </summary>
+		/// <param name="imageSource">Data source for the image provider.</param>
+		/// <param name="useRetina">Enable/Disable high quality imagery.</param>
+		/// <param name="useCompression">Enable/Disable Unity3d Texture2d image compression.</param>
+		/// <param name="useMipMap">Enable/Disable Unity3d Texture2d image mipmapping.</param>
+		public void SetProperties(ImagerySourceType imageSource ,bool useRetina,bool useCompression ,bool useMipMap)
+		{
+			if (imageSource != ImagerySourceType.Custom && imageSource != ImagerySourceType.None)
+			{
+				_layerProperty.sourceType = imageSource;
+				_layerProperty.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(imageSource);
+				_layerProperty.HasChanged = true;
+			}
 
+			if (_layerProperty.rasterOptions.useRetina != useRetina ||
+			    _layerProperty.rasterOptions.useCompression != useCompression ||
+			    _layerProperty.rasterOptions.useMipMap != useMipMap)
+			{
+				_layerProperty.rasterOptions.useRetina = useRetina;
+				_layerProperty.rasterOptions.useCompression = useCompression;
+				_layerProperty.rasterOptions.useMipMap = useMipMap;
+				_layerProperty.rasterOptions.HasChanged = true;
+			}
+		}
 		#endregion
 	}
 }

@@ -303,5 +303,10 @@ public class ApiTest : MonoBehaviour
 			vectorLayer.filterOptions.filters[index].PropertyValue = contains;
 		}
 		vectorLayer.filterOptions.HasChanged = true;
+
+	[ContextMenu("TestPoiCategoryApi")]
+	public void TestPoiCategoryApi()
+	{
+		_abstractMap.VectorData.SpawnPrefabByCategory(PoiPrefab, LocationPrefabCategories);
 	}
 }
