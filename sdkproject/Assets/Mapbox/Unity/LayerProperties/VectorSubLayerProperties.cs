@@ -48,96 +48,154 @@
 		public List<GameObjectModifier> GoModifiers;
 		public PresetFeatureType presetFeatureType = PresetFeatureType.Custom;
 
-		//public string roadLayer = "road";
-		//public string landuseLayer = "landuse";
-		//public string roadLayer_TypeProperty = "class";
-		//public string landuseLayer_TypeProperty = "class";
-
 		[SerializeField]
 		private int _maskValue;
 
 		public string selectedTypes;
 
+		/// <summary>
+		/// Returns true if the layer name matches a given string.
+		/// </summary>
+		/// <returns><c>true</c>, if layer name matches exact was subed, <c>false</c> otherwise.</returns>
+		/// <param name="layerName">Layer name.</param>
 		public bool SubLayerNameMatchesExact(string layerName)
 		{
 			return coreOptions.sublayerName == layerName;
 		}
+		/// <summary>
+		/// Returns true if the layer name contains a given string.
+		/// </summary>
+		/// <returns><c>true</c>, if layer name contains was subed, <c>false</c> otherwise.</returns>
+		/// <param name="layerName">Layer name.</param>
 		public bool SubLayerNameContains(string layerName)
 		{
 			return coreOptions.sublayerName.Contains(layerName);
 		}
-
+		/// <summary>
+		/// Returns true if the layer uses a given style.
+		/// </summary>
+		/// <returns><c>true</c>, if layer uses style type was subed, <c>false</c> otherwise.</returns>
+		/// <param name="style">Style.</param>
 		public bool SubLayerUsesStyleType(StyleTypes style)
 		{
 			return materialOptions.style == style;
 		}
 
+		#region Setters
+
+		/// <summary>
+		/// Sets the active.
+		/// </summary>
+		/// <param name="active">If set to <c>true</c> active.</param>
 		public void SetActive(bool active)
 		{
 			coreOptions.isActive = active;
 			coreOptions.HasChanged = true;
 		}
 
+		/// <summary>
+		/// Sets the type of the style.
+		/// </summary>
+		/// <param name="style">Style.</param>
 		public void SetStyleType(StyleTypes style)
 		{
 			materialOptions.style = style;
 			materialOptions.HasChanged = true;
 		}
 
+		/// <summary>
+		/// Sets the layer to use the realistic style.
+		/// </summary>
 		public void SetRealisticStyle()
 		{
 			materialOptions.style = StyleTypes.Realistic;
 			materialOptions.HasChanged = true;
 		}
 
+		/// <summary>
+		/// Sets the layer to use the fantasy style.
+		/// </summary>
 		public void SetFantasyStyle()
 		{
 			materialOptions.style = StyleTypes.Fantasy;
 			materialOptions.HasChanged = true;
 		}
 
+		/// <summary>
+		/// Sets the type of the simple style palette.
+		/// </summary>
+		/// <param name="palette">Palette.</param>
 		public void SetSimpleStylePaletteType(SamplePalettes palette)
 		{
 			materialOptions.samplePalettes = palette;
 			materialOptions.HasChanged = true;
 		}
 
+		/// <summary>
+		/// Sets the light style opacity.
+		/// </summary>
+		/// <param name="opacity">Opacity.</param>
 		public void SetLightStyleOpacity(float opacity)
 		{
 			materialOptions.lightStyleOpacity = Mathf.Clamp(opacity, 0.0f, 1.0f);
 			materialOptions.HasChanged = true;
 		}
 
+		/// <summary>
+		/// Sets the dark style opacity.
+		/// </summary>
+		/// <param name="opacity">Opacity.</param>
 		public void SetDarkStyleOpacity(float opacity)
 		{
 			materialOptions.darkStyleOpacity = Mathf.Clamp(opacity, 0.0f, 1.0f);
 			materialOptions.HasChanged = true;
 		}
 
+		/// <summary>
+		/// Sets the color of the color style.
+		/// </summary>
+		/// <param name="color">Color.</param>
 		public void SetColorStyleColor(Color color)
 		{
 			materialOptions.colorStyleColor = color;
 			materialOptions.HasChanged = true;
 		}
 
+		/// <summary>
+		/// Sets the texturing (UV) type of the custom style.
+		/// </summary>
+		/// <param name="uvMapType">Uv map type.</param>
 		public void SetCustomTexturingType(UvMapType uvMapType)
 		{
 			materialOptions.texturingType = uvMapType;
 			materialOptions.HasChanged = true;
 		}
 
+		/// <summary>
+		/// Sets the custom style top material.
+		/// </summary>
+		/// <param name="material">Material.</param>
 		public void SetCustomTopMaterial(Material material)
 		{
 			materialOptions.materials[0].Materials[0] = new Material(material);
 			materialOptions.HasChanged = true;
 		}
 
+		/// <summary>
+		/// Sets the custom style side material.
+		/// </summary>
+		/// <param name="material">Material.</param>
 		public void SetCustomSideMaterial(Material material)
 		{
 			materialOptions.materials[1].Materials[0] = new Material(material);
 			materialOptions.HasChanged = true;
 		}
 
+		/// <summary>
+		/// Sets the custom style top and side materials.
+		/// </summary>
+		/// <param name="topMaterial">Top material.</param>
+		/// <param name="sideMaterial">Side material.</param>
 		public void SetCustomMaterials(Material topMaterial, Material sideMaterial)
 		{
 			materialOptions.materials[0].Materials[0] = new Material(topMaterial);
@@ -145,18 +203,30 @@
 			materialOptions.HasChanged = true;
 		}
 
+		/// <summary>
+		/// Sets the custom style uv atlas.
+		/// </summary>
+		/// <param name="atlas">Atlas.</param>
 		public void SetCustomUvAtlas(AtlasInfo atlas)
 		{
 			materialOptions.atlasInfo = atlas;
 			materialOptions.HasChanged = true;
 		}
 
+		/// <summary>
+		/// Sets the custom style color palette.
+		/// </summary>
+		/// <param name="palette">Palette.</param>
 		public void SetCustomColorPalette(ScriptablePalette palette)
 		{
 			materialOptions.colorPalette = palette;
 			materialOptions.HasChanged = true;
 		}
 
+		/// <summary>
+		/// Sets the custom style assets using a CustomStyleBundle object.
+		/// </summary>
+		/// <param name="customStyleBundle">Custom style bundle.</param>
 		public void SetCustomStyleAssets(CustomStyleBundle customStyleBundle)
 		{
 			materialOptions.materials[0].Materials[0] = (customStyleBundle.sideMaterial != null) ? customStyleBundle.sideMaterial : materialOptions.materials[0].Materials[0];
@@ -166,54 +236,100 @@
 			materialOptions.HasChanged = true;
 		}
 
+		#endregion
+
+		#region Getters
+
+		/// <summary>
+		/// Gets the type of style used in the layer.
+		/// </summary>
+		/// <returns>The style type.</returns>
 		public StyleTypes GetStyleType()
 		{
 			return materialOptions.style;
 		}
 
+		/// <summary>
+		/// Gets the type of simple style palette used in the layer.
+		/// </summary>
+		/// <returns>The simple style palette type.</returns>
 		public SamplePalettes GetSimpleStylePaletteType()
 		{
 			return materialOptions.samplePalettes;
 		}
 
+		/// <summary>
+		/// Gets the light style opacity.
+		/// </summary>
+		/// <returns>The light style opacity.</returns>
 		public float GetLightStyleOpacity()
 		{
 			return materialOptions.lightStyleOpacity;
 		}
 
+		/// <summary>
+		/// Gets the dark style opacity.
+		/// </summary>
+		/// <returns>The dark style opacity.</returns>
 		public float GetDarkStyleOpacity()
 		{
 			return materialOptions.darkStyleOpacity;
 		}
 
+		/// <summary>
+		/// Gets the color of the color style.
+		/// </summary>
+		/// <returns>The color style color.</returns>
 		public Color GetColorStyleColor()
 		{
 			return materialOptions.colorStyleColor;
 		}
 
+		/// <summary>
+		/// Gets the type of the custom style texturing.
+		/// </summary>
+		/// <returns>The custom texturing type.</returns>
 		public UvMapType GetCustomTexturingType()
 		{
 			return materialOptions.texturingType;
 		}
 
+		/// <summary>
+		/// Gets the custom top material.
+		/// </summary>
+		/// <returns>The custom top material.</returns>
 		public Material GetCustomTopMaterial()
 		{
 			return materialOptions.materials[0].Materials[0];
 		}
 
+		/// <summary>
+		/// Gets the custom side material.
+		/// </summary>
+		/// <returns>The custom side material.</returns>
 		public Material GetCustomSideMaterial()
 		{
 			return materialOptions.materials[1].Materials[0];
 		}
 
+		/// <summary>
+		/// Gets the custom uv atlas.
+		/// </summary>
+		/// <returns>The custom uv atlas.</returns>
 		public AtlasInfo GetCustomUvAtlas()
 		{
 			return materialOptions.atlasInfo;
 		}
 
+		/// <summary>
+		/// Gets the custom color palette.
+		/// </summary>
+		/// <returns>The custom color palette.</returns>
 		public ScriptablePalette GetCustomColorPalette()
 		{
 			return materialOptions.colorPalette;
 		}
+
+		#endregion
 	}
 }

@@ -46,17 +46,6 @@
 			return DidModifyProperty(property, GetTargetObjectOfProperty(property));
 		}
 
-		public static bool DidModifyProperty<T>(SerializedProperty property, T targetObject)
-		{
-			MapboxDataProperty targetObjectAsDataProperty = targetObject as MapboxDataProperty;
-			return (property.serializedObject.ApplyModifiedProperties() && targetObjectAsDataProperty != null);
-		}
-
-		public static bool DidModifyProperty(SerializedProperty property)
-		{
-			return DidModifyProperty(property, GetTargetObjectOfProperty(property));
-		}
-
 		public static IEnumerable<SerializedProperty> GetChildren(this SerializedProperty property)
 		{
 			property = property.Copy();
