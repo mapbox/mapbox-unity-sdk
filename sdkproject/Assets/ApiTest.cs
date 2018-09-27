@@ -56,7 +56,7 @@ public class ApiTest : MonoBehaviour
 	{
 		_abstractMap.Terrain.SetLayer(LayerMask.NameToLayer("Water"));
 	}
-	
+
 	[ContextMenu("SetTerrainDataSource")]
 	public void SetTerrainDataSource()
 	{
@@ -69,7 +69,7 @@ public class ApiTest : MonoBehaviour
 			_abstractMap.Terrain.SetDataSource(ElevationSourceType.MapboxTerrain);
 		}
 	}
-	
+
 	[ContextMenu("EnableVectorColliders")]
 	public void EnableVectorColliders()
 	{
@@ -130,7 +130,7 @@ public class ApiTest : MonoBehaviour
 
 		_abstractMap.VectorData.AddFeatureLayer(subLayerProperties);
 	}
-	
+
 	[ContextMenu("AddPoiLayer")]
 	public void AddPoiLayer()
 	{
@@ -147,7 +147,7 @@ public class ApiTest : MonoBehaviour
 	{
 		_abstractMap.VectorData.RemoveFeatureLayerWithName("ExtrudedBuildings");
 	}
-	
+
 	[ContextMenu("RemovePoiLayer")]
 	public void RemovePoiLayer()
 	{
@@ -175,6 +175,7 @@ public class ApiTest : MonoBehaviour
 	{
 		var pois = _abstractMap.VectorData.FindPoiLayerWithName("loc");
 		pois.categories = LocationPrefabCategories;
+		Debug.Log("ChangePoiCategory ---> " + pois.GetType().ToString()); //PrefabItemOptions
 		pois.HasChanged = true;
 	}
 
@@ -183,6 +184,7 @@ public class ApiTest : MonoBehaviour
 	{
 		var pois = _abstractMap.VectorData.FindPoiLayerWithName("loc");
 		pois.spawnPrefabOptions.prefab = PoiPrefab;
+        Debug.Log("ChangePoiPrefab ---> " + pois.spawnPrefabOptions.GetType().ToString());//SpawnPrefabOptions
 		pois.spawnPrefabOptions.HasChanged = true;
 	}
 
@@ -192,6 +194,7 @@ public class ApiTest : MonoBehaviour
 		var pois = _abstractMap.VectorData.FindPoiLayerWithName("loc");
 		pois.findByType = LocationPrefabFindBy.POIName;
 		pois.nameString = "yerba";
+		Debug.Log("ChangeToPoiByName ---> " + pois.GetType().ToString());//PrefabItemOptions
 		pois.HasChanged = true;
 	}
 
@@ -200,6 +203,13 @@ public class ApiTest : MonoBehaviour
 	{
 		var pois = _abstractMap.VectorData.FindPoiLayerWithName("loc");
 		pois.findByType = LocationPrefabFindBy.MapboxCategory;
+		Debug.Log("ChangeToCategory ---> " + pois.GetType().ToString());//PrefabItemOptions
 		pois.HasChanged = true;
+	}
+
+	[ContextMenu("TestPoiCategoryApi")]
+	public void TestPoiCategoryApi()
+	{
+		_abstractMap.VectorData.SpawnPrefabByCategory(PoiPrefab, LocationPrefabCategories);
 	}
 }

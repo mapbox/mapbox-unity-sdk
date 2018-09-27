@@ -58,7 +58,7 @@
 					layerName = "road";
 					geometryType = VectorPrimitiveType.Line;
 					lineWidth = 1.0f;
-					style = StyleTypes.Custom;
+					style = StyleTypes.Dark;
 					break;
 				case PresetFeatureType.Points:
 					layerName = "poi_label";
@@ -69,6 +69,8 @@
 					geometryType = VectorPrimitiveType.Polygon;
 					break;
 				case PresetFeatureType.Custom:
+					layerName = "";
+					geometryType = VectorPrimitiveType.Custom;
 					break;
 				default:
 					break;
@@ -92,7 +94,7 @@
 			{
 				Width = lineWidth
 			};
-			
+
 			_properties.extrusionOptions = new GeometryExtrusionOptions
 			{
 				extrusionType = extrusionType,

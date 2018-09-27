@@ -1,96 +1,104 @@
 ﻿using System.Linq;
+using Mapbox.Utils;
+using System;
+using UnityEngine;
+using System.Collections.Generic;
+using Mapbox.Unity.MeshGeneration.Factories;
+using Mapbox.Unity.Utilities;
 
 namespace Mapbox.Unity.Map
 {
-	using System;
-	using UnityEngine;
-	using System.Collections.Generic;
-	using Mapbox.Unity.MeshGeneration.Factories;
-	using Mapbox.Unity.Utilities;
-
 	[Serializable]
 	public class VectorLayer : AbstractLayer, IVectorDataLayer
 	{
-		#region Events
+		//Private Fields
+		[SerializeField]
+		private VectorLayerProperties _layerProperty = new VectorLayerProperties();
+		private VectorTileFactory _vectorTileFactory;
 
+		//Events
 		public EventHandler SubLayerAdded;
 		public EventHandler SubLayerRemoved;
 
-		#endregion
-
-
-		[SerializeField] VectorLayerProperties _layerProperty = new VectorLayerProperties();
-
+		//Properties
 		[NodeEditorElement(" Vector Layer ")]
 		public VectorLayerProperties LayerProperty
 		{
-			get { return _layerProperty; }
+			get
+			{
+				return _layerProperty;
+			}
 		}
-
 		public MapLayerType LayerType
 		{
-			get { return MapLayerType.Vector; }
+			get
+			{
+				return MapLayerType.Vector;
+			}
 		}
-
 		public bool IsLayerActive
 		{
-			get { return (_layerProperty.sourceType != VectorSourceType.None); }
+			get
+			{
+				return (_layerProperty.sourceType != VectorSourceType.None);
+			}
 		}
-
 		public string LayerSource
 		{
-			get { return _layerProperty.sourceOptions.Id; }
+			get
+			{
+				return _layerProperty.sourceOptions.Id;
+			}
 		}
-
-		public void SetLayerSource(VectorSourceType vectorSource)
+		public VectorTileFactory Factory
 		{
-			if (vectorSource != VectorSourceType.Custom && vectorSource != VectorSourceType.None)
+			get
 			{
-				_layerProperty.sourceType = vectorSource;
-				_layerProperty.sourceOptions.layerSource = MapboxDefaultVector.GetParameters(vectorSource);
-			}
-			else
-			{
-				Debug.LogWarning("Invalid style - trying to set " + vectorSource.ToString() + " as default style!");
+				return _vectorTileFactory;
 			}
 		}
 
-		public void SetLayerSource(string vectorSource)
+		//Public Methods
+		public void Initialize(LayerProperties properties)
 		{
-			if (!string.IsNullOrEmpty(vectorSource))
-			{
-				_layerProperty.sourceType = VectorSourceType.Custom;
-				_layerProperty.sourceOptions.Id = vectorSource;
-			}
-			else
-			{
-				_layerProperty.sourceType = VectorSourceType.None;
-				Debug.LogWarning("Empty source - turning off vector data. ");
-			}
+			_layerProperty = (VectorLayerProperties)properties;
+			Initialize();
 		}
 
-		public void AddLayerSource(string vectorSource)
+		public void Initialize()
 		{
-			if (!string.IsNullOrEmpty(vectorSource))
-			{
-				if (!_layerProperty.sourceOptions.Id.Contains(vectorSource))
-				{
-					if (string.IsNullOrEmpty(_layerProperty.sourceOptions.Id))
-					{
-						SetLayerSource(vectorSource);
-						return;
-					}
+			_vectorTileFactory = ScriptableObject.CreateInstance<VectorTileFactory>();
+			UpdateFactorySettings();
 
-					var newLayerSource = _layerProperty.sourceOptions.Id + "," + vectorSource;
-					SetLayerSource(newLayerSource);
-				}
-			}
-			else
+			_layerProperty.PropertyHasChanged += RedrawVectorLayer;
+			_layerProperty.SubLayerPropertyAdded += AddVectorLayer;
+			_layerProperty.SubLayerPropertyRemoved += RemoveVectorLayer;
+			_vectorTileFactory.TileFactoryHasChanged += (sender, args) =>
 			{
-				Debug.LogError("Empty source. Nothing was added to the list of data sources");
-			}
+				Debug.Log("VectorLayer Delegate");
+				NotifyUpdateLayer(args as LayerUpdateArgs);
+			};
 		}
 
+		public void Update(LayerProperties properties)
+		{
+			Initialize(properties);
+		}
+
+		public void UpdateFactorySettings()
+		{
+			_vectorTileFactory.SetOptions(_layerProperty);
+		}
+
+		public void Remove()
+		{
+			_layerProperty = new VectorLayerProperties
+			{
+				sourceType = VectorSourceType.None
+			};
+		}
+
+		//Private Methods
 		private void AddVectorLayer(object sender, EventArgs args)
 		{
 			VectorLayerUpdateArgs layerUpdateArgs = args as VectorLayerUpdateArgs;
@@ -114,80 +122,10 @@ namespace Mapbox.Unity.Map
 		{
 			VectorLayerUpdateArgs layerUpdateArgs = args as VectorLayerUpdateArgs;
 
-			layerUpdateArgs.visualizer = _vectorTileFactory.FindVectorLayerVisualizer((VectorSubLayerProperties) layerUpdateArgs.property);
+			layerUpdateArgs.visualizer = _vectorTileFactory.FindVectorLayerVisualizer((VectorSubLayerProperties)layerUpdateArgs.property);
 			layerUpdateArgs.factory = _vectorTileFactory;
 
 			SubLayerRemoved(this, layerUpdateArgs);
-		}
-
-		public void AddLocationPrefabItem(PrefabItemOptions prefabItem)
-		{
-			//ensure that there is a list of prefabitems
-			if (PointsOfInterestSublayerList == null)
-			{
-				PointsOfInterestSublayerList = new List<PrefabItemOptions>();
-			}
-
-			//add the prefab item if it doesn't already exist
-			if (!PointsOfInterestSublayerList.Contains(prefabItem))
-			{
-				PointsOfInterestSublayerList.Add(prefabItem);
-			}
-		}
-
-		public void RemoveVectorLayer(int index)
-		{
-			if (_layerProperty.vectorSubLayers != null)
-			{
-				_layerProperty.vectorSubLayers.RemoveAt(index);
-			}
-		}
-
-		public void RemovePrefabItem(int index)
-		{
-			if (PointsOfInterestSublayerList != null)
-			{
-				PointsOfInterestSublayerList.RemoveAt(index);
-			}
-		}
-
-		public void Initialize(LayerProperties properties)
-		{
-			_layerProperty = (VectorLayerProperties) properties;
-			Initialize();
-		}
-
-		public void Initialize()
-		{
-			_vectorTileFactory = ScriptableObject.CreateInstance<VectorTileFactory>();
-			UpdateFactorySettings();
-
-			_layerProperty.PropertyHasChanged += RedrawVectorLayer;
-			_layerProperty.SubLayerPropertyAdded += AddVectorLayer;
-			_layerProperty.SubLayerPropertyRemoved += RemoveVectorLayer;
-			_vectorTileFactory.TileFactoryHasChanged += (sender, args) =>
-			{
-				Debug.Log("VectorLayer Delegate");
-				NotifyUpdateLayer(args as LayerUpdateArgs);
-			};
-		}
-
-		public void UpdateFactorySettings()
-		{
-			_vectorTileFactory.SetOptions(_layerProperty);
-		}
-
-		public void Remove()
-		{
-			_layerProperty = new VectorLayerProperties
-			{
-				sourceType = VectorSourceType.None
-			};
-		}
-
-		public void Update(LayerProperties properties)
-		{
-			Initialize(properties);
 		}
 
 		private void RedrawVectorLayer(object sender, System.EventArgs e)
@@ -195,25 +133,245 @@ namespace Mapbox.Unity.Map
 			NotifyUpdateLayer(_vectorTileFactory, sender as MapboxDataProperty, true);
 		}
 
-		public VectorTileFactory Factory
+		#region Api Methods
+
+		/// <summary>
+		/// Add provided data source (mapid) to existing ones.
+		/// Mapbox vector api supports comma separated mapids and this method
+		/// adds the provided mapid at the end of the existing source.
+		/// </summary>
+		/// <param name="vectorSource">Data source (Mapid) to add to existing sources.</param>
+		public virtual void AddLayerSource(string vectorSource)
 		{
-			get { return _vectorTileFactory; }
+			if (!string.IsNullOrEmpty(vectorSource))
+			{
+				if (!_layerProperty.sourceOptions.Id.Contains(vectorSource))
+				{
+					if (string.IsNullOrEmpty(_layerProperty.sourceOptions.Id))
+					{
+						SetLayerSource(vectorSource);
+						return;
+					}
+					var newLayerSource = _layerProperty.sourceOptions.Id + "," + vectorSource;
+					SetLayerSource(newLayerSource);
+				}
+			}
+			else
+			{
+				Debug.LogError("Empty source. Nothing was added to the list of data sources");
+			}
 		}
 
-		private VectorTileFactory _vectorTileFactory;
-
-		public List<PrefabItemOptions> PointsOfInterestSublayerList
+		/// <summary>
+		/// Change existing data source (mapid) with provided source.
+		/// </summary>
+		/// <param name="vectorSource">Data source (Mapid) to use.</param>
+		public virtual void SetLayerSource(string vectorSource)
 		{
-			get { return _layerProperty.locationPrefabList; }
-			set { _layerProperty.locationPrefabList = value; }
+			if (!string.IsNullOrEmpty(vectorSource))
+			{
+				_layerProperty.sourceType = VectorSourceType.Custom;
+				_layerProperty.sourceOptions.Id = vectorSource;
+			}
+			else
+			{
+				_layerProperty.sourceType = VectorSourceType.None;
+				Debug.LogWarning("Empty source - turning off vector data. ");
+			}
 		}
 
+		/// <summary>
+		/// Change existing data source (mapid) with provided source.
+		/// </summary>
+		/// <param name="vectorSource">Data source (Mapid) to use.</param>
+		public virtual void SetLayerSource(VectorSourceType vectorSource)
+		{
+			if (vectorSource != VectorSourceType.Custom && vectorSource != VectorSourceType.None)
+			{
+				_layerProperty.sourceType = vectorSource;
+				_layerProperty.sourceOptions.layerSource = MapboxDefaultVector.GetParameters(vectorSource);
+			}
+			else
+			{
+				Debug.LogWarning("Invalid style - trying to set " + vectorSource.ToString() + " as default style!");
+			}
+		}
+
+		public virtual void EnableOptimizedStyle(bool isEnabled)
+		{
+			if (_layerProperty.useOptimizedStyle != isEnabled)
+			{
+				_layerProperty.useOptimizedStyle = isEnabled;
+				_layerProperty.HasChanged = true;
+			}
+		}
+
+		/// <summary>
+		/// Enable coroutines for vector features, processing choosen amount
+		/// of them each frame.
+		/// </summary>
+		/// <param name="isEnabled">Enable coroutine for vector layer.</param>
+		/// <param name="entityPerCoroutine">Numbers of features to process each frame.</param>
+		public virtual void EnableCoroutines(bool isEnabled, int entityPerCoroutine = 20)
+		{
+			if (_layerProperty.performanceOptions.isEnabled != isEnabled ||
+			    _layerProperty.performanceOptions.entityPerCoroutine != entityPerCoroutine)
+			{
+				_layerProperty.performanceOptions.isEnabled = isEnabled;
+				_layerProperty.performanceOptions.entityPerCoroutine = entityPerCoroutine;
+				_layerProperty.performanceOptions.HasChanged = true;
+			}
+		}
+
+		#endregion
+
+		#region Poi Api Methods
+
+		/// <summary>
+		/// Creates the prefab layer.
+		/// </summary>
+		/// <param name="item"> the options of the prefab layer.</param>
+		private void CreatePrefabLayer(PrefabItemOptions item)
+		{
+			if (LayerProperty.sourceType == VectorSourceType.None
+			    || !LayerProperty.sourceOptions.Id.Contains(MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id))
+			{
+				Debug.LogError("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the list of vector data sources");
+				return;
+			}
+
+			AddPoiLayer(item);
+		}
+
+		/// <summary>
+		/// Places a prefab at the specified LatLon on the Map.
+		/// </summary>
+		/// <param name="prefab"> A Game Object Prefab.</param>
+		/// <param name="LatLon">A Vector2d(Latitude Longitude) object</param>
+		public virtual void SpawnPrefabAtGeoLocation(GameObject prefab,
+											 Vector2d LatLon,
+											 Action<List<GameObject>> callback = null,
+											 bool scaleDownWithWorld = true,
+											 string locationItemName = "New Location")
+		{
+			var latLonArray = new Vector2d[] { LatLon };
+			SpawnPrefabAtGeoLocation(prefab, latLonArray, callback, scaleDownWithWorld, locationItemName);
+		}
+
+		/// <summary>
+		/// Places a prefab at all locations specified by the LatLon array.
+		/// </summary>
+		/// <param name="prefab"> A Game Object Prefab.</param>
+		/// <param name="LatLon">A Vector2d(Latitude Longitude) object</param>
+		public virtual void SpawnPrefabAtGeoLocation(GameObject prefab,
+											 Vector2d[] LatLon,
+											 Action<List<GameObject>> callback = null,
+											 bool scaleDownWithWorld = true,
+											 string locationItemName = "New Location")
+		{
+			var coordinateArray = new string[LatLon.Length];
+			for (int i = 0; i < LatLon.Length; i++)
+			{
+				coordinateArray[i] = LatLon[i].x + ", " + LatLon[i].y;
+			}
+
+			PrefabItemOptions item = new PrefabItemOptions()
+			{
+				findByType = LocationPrefabFindBy.AddressOrLatLon,
+				prefabItemName = locationItemName,
+				spawnPrefabOptions = new SpawnPrefabOptions()
+				{
+					prefab = prefab,
+					scaleDownWithWorld = scaleDownWithWorld
+				},
+
+				coordinates = coordinateArray
+			};
+
+			if (callback != null)
+			{
+				item.OnAllPrefabsInstantiated += callback;
+			}
+
+			CreatePrefabLayer(item);
+		}
+
+		/// <summary>
+		/// Places the prefab for supplied categories.
+		/// </summary>
+		/// <param name="prefab">GameObject Prefab</param>
+		/// <param name="categories"><see cref="LocationPrefabCategories"/> For more than one category separate them by pipe
+		/// (eg: LocationPrefabCategories.Food | LocationPrefabCategories.Nightlife)</param>
+		/// <param name="density">Density controls the number of POIs on the map.(Integer value between 1 and 30)</param>
+		/// <param name="locationItemName">Name of this location prefab item for future reference</param>
+		/// <param name="scaleDownWithWorld">Should the prefab scale up/down along with the map game object?</param>
+		public virtual void SpawnPrefabByCategory(GameObject prefab,
+										  LocationPrefabCategories categories = LocationPrefabCategories.AnyCategory,
+										  int density = 30, Action<List<GameObject>> callback = null,
+										  bool scaleDownWithWorld = true,
+										  string locationItemName = "New Location")
+		{
+			PrefabItemOptions item = new PrefabItemOptions()
+			{
+				findByType = LocationPrefabFindBy.MapboxCategory,
+				categories = categories,
+				density = density,
+				prefabItemName = locationItemName,
+				spawnPrefabOptions = new SpawnPrefabOptions()
+				{
+					prefab = prefab,
+					scaleDownWithWorld = scaleDownWithWorld
+				}
+			};
+
+			if (callback != null)
+			{
+				item.OnAllPrefabsInstantiated += callback;
+			}
+
+			CreatePrefabLayer(item);
+		}
+
+		/// <summary>
+		/// Places the prefab at POI locations if its name contains the supplied string
+		/// <param name="prefab">GameObject Prefab</param>
+		/// <param name="nameString">This is the string that will be checked against the POI name to see if is contained in it, and ony those POIs will be spawned</param>
+		/// <param name="density">Density (Integer value between 1 and 30)</param>
+		/// <param name="locationItemName">Name of this location prefab item for future reference</param>
+		/// <param name="scaleDownWithWorld">Should the prefab scale up/down along with the map game object?</param>
+		/// </summary>
+		public virtual void SpawnPrefabByName(GameObject prefab,
+									  string nameString,
+									  int density = 30,
+									  Action<List<GameObject>> callback = null,
+									  bool scaleDownWithWorld = true,
+									  string locationItemName = "New Location")
+		{
+			PrefabItemOptions item = new PrefabItemOptions()
+			{
+				findByType = LocationPrefabFindBy.POIName,
+				nameString = nameString,
+				density = density,
+				prefabItemName = locationItemName,
+				spawnPrefabOptions = new SpawnPrefabOptions()
+				{
+					prefab = prefab,
+					scaleDownWithWorld = scaleDownWithWorld
+				}
+			};
+
+			CreatePrefabLayer(item);
+		}
+
+
+
+		#endregion
 
 		#region LayerOperations
 
 		// FEATURE LAYER OPERATIONS
 
-		public void AddFeatureLayer(VectorSubLayerProperties subLayerProperties)
+		public virtual void AddFeatureLayer(VectorSubLayerProperties subLayerProperties)
 		{
 			if (_layerProperty.vectorSubLayers == null)
 			{
@@ -224,12 +382,12 @@ namespace Mapbox.Unity.Map
 			_layerProperty.OnSubLayerPropertyAdded(new VectorLayerUpdateArgs {property = _layerProperty.vectorSubLayers.Last()});
 		}
 
-		public IEnumerable<VectorSubLayerProperties> GetAllFeatureLayers()
+		public virtual IEnumerable<VectorSubLayerProperties> GetAllFeatureLayers()
 		{
 			return _layerProperty.vectorSubLayers.AsEnumerable();
 		}
 
-		public IEnumerable<VectorSubLayerProperties> GetAllPolygonFeatureLayers()
+		public virtual IEnumerable<VectorSubLayerProperties> GetAllPolygonFeatureLayers()
 		{
 			foreach (var featureLayer in _layerProperty.vectorSubLayers)
 			{
@@ -240,7 +398,7 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public IEnumerable<VectorSubLayerProperties> GetAllLineFeatureLayers()
+		public virtual IEnumerable<VectorSubLayerProperties> GetAllLineFeatureLayers()
 		{
 			foreach (var featureLayer in _layerProperty.vectorSubLayers)
 			{
@@ -251,7 +409,7 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public IEnumerable<VectorSubLayerProperties> GetAllPointFeatureLayers()
+		public virtual IEnumerable<VectorSubLayerProperties> GetAllPointFeatureLayers()
 		{
 			foreach (var featureLayer in _layerProperty.vectorSubLayers)
 			{
@@ -262,7 +420,7 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public IEnumerable<VectorSubLayerProperties> GetFeatureLayerByQuery(Func<VectorSubLayerProperties, bool> query)
+		public virtual IEnumerable<VectorSubLayerProperties> GetFeatureLayerByQuery(Func<VectorSubLayerProperties, bool> query)
 		{
 			foreach (var featureLayer in _layerProperty.vectorSubLayers)
 			{
@@ -273,7 +431,7 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public VectorSubLayerProperties GetFeatureLayerAtIndex(int i)
+		public virtual VectorSubLayerProperties GetFeatureLayerAtIndex(int i)
 		{
 			if (i < _layerProperty.vectorSubLayers.Count)
 			{
@@ -285,7 +443,7 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public VectorSubLayerProperties FindFeatureLayerWithName(string featureLayerName)
+		public virtual VectorSubLayerProperties FindFeatureLayerWithName(string featureLayerName)
 		{
 			int foundLayerIndex = -1;
 			// Optimize for performance.
@@ -301,7 +459,7 @@ namespace Mapbox.Unity.Map
 			return (foundLayerIndex != -1) ? _layerProperty.vectorSubLayers[foundLayerIndex] : null;
 		}
 
-		public void RemoveFeatureLayerWithName(string featureLayerName)
+		public virtual void RemoveFeatureLayerWithName(string featureLayerName)
 		{
 			var layerToRemove = FindFeatureLayerWithName(featureLayerName);
 			if (layerToRemove != null)
@@ -311,14 +469,14 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public void RemoveFeatureLayer(VectorSubLayerProperties layer)
+		public virtual void RemoveFeatureLayer(VectorSubLayerProperties layer)
 		{
 			_layerProperty.vectorSubLayers.Remove(layer);
 		}
 
 		// POI LAYER OPERATIONS
 
-		public void AddPoiLayer(PrefabItemOptions poiLayerProperties)
+		public virtual void AddPoiLayer(PrefabItemOptions poiLayerProperties)
 		{
 			if (_layerProperty.locationPrefabList == null)
 			{
@@ -329,12 +487,12 @@ namespace Mapbox.Unity.Map
 			_layerProperty.OnSubLayerPropertyAdded(new VectorLayerUpdateArgs {property = _layerProperty.locationPrefabList.Last()});
 		}
 
-		public IEnumerable<PrefabItemOptions> GetAllPoiLayers()
+		public virtual IEnumerable<PrefabItemOptions> GetAllPoiLayers()
 		{
 			return _layerProperty.locationPrefabList.AsEnumerable();
 		}
 
-		public PrefabItemOptions GetPoiLayerAtIndex(int i)
+		public virtual PrefabItemOptions GetPoiLayerAtIndex(int i)
 		{
 			if (i < _layerProperty.vectorSubLayers.Count)
 			{
@@ -346,7 +504,7 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public IEnumerable<PrefabItemOptions> GetFeatureLayerByQuery(Func<PrefabItemOptions, bool> query)
+		public virtual IEnumerable<PrefabItemOptions> GetFeatureLayerByQuery(Func<PrefabItemOptions, bool> query)
 		{
 			foreach (var poiLayer in _layerProperty.locationPrefabList)
 			{
@@ -357,7 +515,7 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public PrefabItemOptions FindPoiLayerWithName(string poiLayerName)
+		public virtual PrefabItemOptions FindPoiLayerWithName(string poiLayerName)
 		{
 			int foundLayerIndex = -1;
 			// Optimize for performance.
@@ -373,7 +531,7 @@ namespace Mapbox.Unity.Map
 			return (foundLayerIndex != -1) ? _layerProperty.locationPrefabList[foundLayerIndex] : null;
 		}
 
-		public void RemovePoiLayerWithName(string poiLayerName)
+		public virtual void RemovePoiLayerWithName(string poiLayerName)
 		{
 			var layerToRemove = FindPoiLayerWithName(poiLayerName);
 			if (layerToRemove != null)
@@ -383,7 +541,7 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public void RemovePoiLayer(PrefabItemOptions layer)
+		public virtual void RemovePoiLayer(PrefabItemOptions layer)
 		{
 			_layerProperty.locationPrefabList.Remove(layer);
 		}
