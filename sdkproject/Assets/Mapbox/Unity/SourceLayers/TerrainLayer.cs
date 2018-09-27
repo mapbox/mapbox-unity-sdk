@@ -218,6 +218,10 @@
 
 		#region API Methods
 
+		/// <summary>
+		/// Set the data source for the terrain layer. Can be used to disable terrain layer by setting it "None".
+		/// </summary>
+		/// <param name="dataSource"></param>
 		public void SetDataSource(ElevationSourceType dataSource)
 		{
 			if (_layerProperty.sourceType != dataSource)
@@ -227,6 +231,11 @@
 			}
 		}
 
+		/// <summary>
+		/// Sets the main strategy for terrain mesh generation.
+		/// Flat terrain doesn't pull data from servers and just uses a quad as terrain.
+		/// </summary>
+		/// <param name="elevationType">Type of the elevation strategy</param>
 		public void SetElevationType(ElevationLayerType elevationType)
 		{
 			if (_layerProperty.elevationLayerType != elevationType)
@@ -236,6 +245,10 @@
 			}
 		}
 
+		/// <summary>
+		/// Add/Remove terrain collider. Terrain uses mesh collider.
+		/// </summary>
+		/// <param name="enable">Boolean for enabling/disabling mesh collider</param>
 		public void EnableCollider(bool enable)
 		{
 			if (_layerProperty.colliderOptions.addCollider != enable)
@@ -245,6 +258,10 @@
 			}
 		}
 
+		/// <summary>
+		/// Sets the elevation multiplier for terrain. It'll regenerate terrain mesh, multiplying each point elevation by provided value.
+		/// </summary>
+		/// <param name="factor">Elevation multiplier</param>
 		public void SetExaggerationFactor(float factor)
 		{
 			if (_layerProperty.requiredOptions.exaggerationFactor != factor)
