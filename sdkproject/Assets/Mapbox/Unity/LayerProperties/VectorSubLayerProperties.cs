@@ -36,7 +36,26 @@
 				return modeling;
 			}
 		}
+		public ISubLayerFiltering Filtering
+		{
+			get
+			{
+				return filterOptions;
+			}
+		}
+		public ISubLayerBehaviorModifiers BehaviorModifiers
+		{
+			get
+			{
+				if (behaviorModifiers == null)
+				{
+					behaviorModifiers = new SubLayerBehaviorModifiers(this);
+				}
+				return behaviorModifiers;
+			}
+		}
 		protected SubLayerModeling modeling;
+		protected SubLayerBehaviorModifiers behaviorModifiers;
 		public CoreVectorLayerProperties coreOptions = new CoreVectorLayerProperties();
 		public LineGeometryOptions lineGeometryOptions = new LineGeometryOptions();
 		public VectorFilterOptions filterOptions = new VectorFilterOptions();
