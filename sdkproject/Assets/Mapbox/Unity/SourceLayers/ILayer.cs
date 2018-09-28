@@ -34,38 +34,61 @@
 
 	}
 
+
+	// TODO: Move interfaces into individual files. 
+	public interface ISubLayerCoreOptions
+	{
+	}
+	public interface ISubLayerExtrusionOptions
+	{
+	}
+
+	public interface ISubLayerLineGeometryOptions
+	{
+
+	}
+
+	public interface ISubLayerPolygonGeometryOptions
+	{
+
+	}
+
+	public interface ISubLayerFiltering
+	{
+
+	}
+
+	public interface ISubLayerModeling :
+	ISubLayerCoreOptions,
+	ISubLayerExtrusionOptions,
+	ISubLayerLineGeometryOptions,
+	ISubLayerPolygonGeometryOptions
+	{
+
+	}
+
 	public interface ISubLayerTexturing
 	{
-		void SetDefaultStyleType(StyleTypes style);
+
+	}
+
+	public interface ISubLayerBehaviorModifiers
+	{
+
 	}
 
 	public interface IVectorSubLayer
 	{
-		ISubLayerTexturing Texturing { get; }
+		ISubLayerFiltering Filtering { get; }
 		ISubLayerModeling Modeling { get; }
-	}
-	public class SubLayerTexturing : ISubLayerTexturing
-	{
-		public void SetDefaultStyleType(StyleTypes style)
-		{
-			throw new System.NotImplementedException();
-		}
+		ISubLayerTexturing Texturing { get; }
+		ISubLayerBehaviorModifiers BehaviorModifiers { get; }
+
+		// Add methods that we need at sublayer level 
 	}
 
-	public interface ISubLayerCoreOptions
-	{
-		void SetGeometryPrimitiveType(VectorPrimitiveType primitiveType);
-	}
-	public interface ISubLayerExtrusionOptions
-	{
-		void SetExtrusion(ExtrusionType extrusionType, ExtrusionGeometryType geometryType = ExtrusionGeometryType.RoofAndSide);
-	}
 
-	public interface ISubLayerModeling : ISubLayerCoreOptions, ISubLayerExtrusionOptions
-	{
-		void SetBlah();
-	}
-
+	// TODO Move classes into individual files. 
 	public class SubLayerModeling : ISubLayerModeling
 	{
 		VectorSubLayerProperties _subLayerProperties;
@@ -73,21 +96,18 @@
 		{
 			_subLayerProperties = subLayerProperties;
 		}
-		public void SetBlah()
-		{
-			throw new System.NotImplementedException();
-		}
+	}
 
-		public void SetExtrusion(ExtrusionType extrusionType, ExtrusionGeometryType geometryType = ExtrusionGeometryType.RoofAndSide)
+	public class SubLayerBehaviorModifiers : ISubLayerBehaviorModifiers
+	{
+		// TODO: Remove if not required. 
+		VectorSubLayerProperties _subLayerProperties;
+		public SubLayerBehaviorModifiers(VectorSubLayerProperties subLayerProperties)
 		{
-			_subLayerProperties.extrusionOptions.extrusionType = extrusionType;
-		}
-
-		public void SetGeometryPrimitiveType(VectorPrimitiveType primitiveType)
-		{
-			throw new System.NotImplementedException();
+			_subLayerProperties = subLayerProperties;
 		}
 	}
+
 }
 
 
