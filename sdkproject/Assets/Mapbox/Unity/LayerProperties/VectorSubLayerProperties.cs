@@ -8,7 +8,7 @@
 	using UnityEngine;
 
 	[Serializable]
-	public class VectorSubLayerProperties : LayerProperties
+	public class VectorSubLayerProperties : LayerProperties, IVectorSubLayer
 	{
 		public virtual string Key
 		{
@@ -17,6 +17,26 @@
 				return coreOptions.layerName;
 			}
 		}
+
+		public ISubLayerTexturing Texturing
+		{
+			get
+			{
+				return materialOptions;
+			}
+		}
+		public ISubLayerModeling Modeling
+		{
+			get
+			{
+				if (modeling == null)
+				{
+					modeling = new SubLayerModeling(this);
+				}
+				return modeling;
+			}
+		}
+		protected SubLayerModeling modeling;
 		public CoreVectorLayerProperties coreOptions = new CoreVectorLayerProperties();
 		public LineGeometryOptions lineGeometryOptions = new LineGeometryOptions();
 		public VectorFilterOptions filterOptions = new VectorFilterOptions();
@@ -331,5 +351,6 @@
 		}
 
 		#endregion
+
 	}
 }
