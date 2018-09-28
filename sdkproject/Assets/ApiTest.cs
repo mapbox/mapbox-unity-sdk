@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Interfaces;
 using Mapbox.Unity.MeshGeneration.Filters;
@@ -66,7 +67,7 @@ public class ApiTest : MonoBehaviour
 	{
 		_abstractMap.Terrain.SetLayer(LayerMask.NameToLayer("Water"));
 	}
-	
+
 	[ContextMenu("SetTerrainDataSource")]
 	public void SetTerrainDataSource()
 	{
@@ -79,11 +80,11 @@ public class ApiTest : MonoBehaviour
 			_abstractMap.Terrain.SetDataSource(ElevationSourceType.MapboxTerrain);
 		}
 	}
-	
+
 	[ContextMenu("EnableVectorColliders")]
 	public void EnableVectorColliders()
 	{
-		var layer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("ExtrudedBuildings");
+		var layer = _abstractMap.VectorData.FindFeatureLayerWithName("ExtrudedBuildings");
 		layer.colliderOptions.colliderType = ColliderType.MeshCollider;
 		layer.colliderOptions.HasChanged = true;
 	}
@@ -91,7 +92,7 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("DisableVectorColliders")]
 	public void DisableVectorColliders()
 	{
-		var layer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("ExtrudedBuildings");
+		var layer = _abstractMap.VectorData.FindFeatureLayerWithName("ExtrudedBuildings");
 		layer.colliderOptions.colliderType = ColliderType.None;
 		layer.colliderOptions.HasChanged = true;
 	}
@@ -105,7 +106,7 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("DisableLayer")]
 	public void DisableLayer()
 	{
-		var layer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("ExtrudedBuildings");
+		var layer = _abstractMap.VectorData.FindFeatureLayerWithName("ExtrudedBuildings");
 		if (layer != null)
 		{
 			layer.SetActive(false);
@@ -120,7 +121,7 @@ public class ApiTest : MonoBehaviour
 	public void ChangeBuildingMaterial()
 	{
 		styleId = (styleId == 2) ? 0 : styleId + 1;
-		var layer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("ExtrudedBuildings");
+		var layer = _abstractMap.VectorData.FindFeatureLayerWithName("ExtrudedBuildings");
 		if (layer != null)
 		{
 			layer.SetStyleType(testStyles[styleId]);
@@ -138,9 +139,9 @@ public class ApiTest : MonoBehaviour
 		subLayerProperties.coreOptions.geometryType = VectorPrimitiveType.Polygon;
 		subLayerProperties.coreOptions.layerName = "building";
 
-		_abstractMap.VectorData.LayerProperty.AddVectorLayer(subLayerProperties);
+		_abstractMap.VectorData.AddFeatureLayer(subLayerProperties);
 	}
-	
+
 	[ContextMenu("AddPoiLayer")]
 	public void AddPoiLayer()
 	{
@@ -149,25 +150,25 @@ public class ApiTest : MonoBehaviour
 		prefabItemOptions.spawnPrefabOptions = new SpawnPrefabOptions();
 		prefabItemOptions.spawnPrefabOptions.prefab = PoiPrefab;
 
-		_abstractMap.VectorData.LayerProperty.AddPoiLayer(prefabItemOptions);
+		_abstractMap.VectorData.AddPoiLayer(prefabItemOptions);
 	}
 
 	[ContextMenu("RemoveLayer")]
 	public void RemoveLayer()
 	{
-		_abstractMap.VectorData.LayerProperty.RemoveFeatureLayerWithName("ExtrudedBuildings");
+		_abstractMap.VectorData.RemoveFeatureLayerWithName("ExtrudedBuildings");
 	}
-	
+
 	[ContextMenu("RemovePoiLayer")]
 	public void RemovePoiLayer()
 	{
-		_abstractMap.VectorData.LayerProperty.RemovePoiLayerWithName("loc");
+		_abstractMap.VectorData.RemovePoiLayerWithName("loc");
 	}
 
 	[ContextMenu("IncreaseRoadHeight")]
 	public void IncreaseRoadHeight()
 	{
-		var roads = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("Roads");
+		var roads = _abstractMap.VectorData.FindFeatureLayerWithName("Roads");
 		roads.extrusionOptions.maximumHeight = roads.extrusionOptions.maximumHeight + 2;
 		roads.extrusionOptions.HasChanged = true;
 	}
@@ -175,7 +176,7 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("IncreaseRoadWidth")]
 	public void IncreaseRoadWidth()
 	{
-		var roads = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("Roads");
+		var roads = _abstractMap.VectorData.FindFeatureLayerWithName("Roads");
 		roads.lineGeometryOptions.Width = roads.lineGeometryOptions.Width + 2;
 		roads.lineGeometryOptions.HasChanged = true;
 	}
@@ -183,7 +184,7 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("ChangePoiCategory")]
 	public void ChangePoiCategory()
 	{
-		var pois = _abstractMap.VectorData.LayerProperty.FindPoiLayerWithName("loc");
+		var pois = _abstractMap.VectorData.FindPoiLayerWithName("loc");
 		pois.categories = LocationPrefabCategories;
 		pois.HasChanged = true;
 	}
@@ -191,7 +192,7 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("ChangePoiPrefab")]
 	public void ChangePoiPrefab()
 	{
-		var pois = _abstractMap.VectorData.LayerProperty.FindPoiLayerWithName("loc");
+		var pois = _abstractMap.VectorData.FindPoiLayerWithName("loc");
 		pois.spawnPrefabOptions.prefab = PoiPrefab;
 		pois.spawnPrefabOptions.HasChanged = true;
 	}
@@ -199,7 +200,7 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("ChangeToPoiByName")]
 	public void ChangeToPoiByName()
 	{
-		var pois = _abstractMap.VectorData.LayerProperty.FindPoiLayerWithName("loc");
+		var pois = _abstractMap.VectorData.FindPoiLayerWithName("loc");
 		pois.findByType = LocationPrefabFindBy.POIName;
 		pois.nameString = "yerba";
 		pois.HasChanged = true;
@@ -208,7 +209,7 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("ChangeToCategory")]
 	public void ChangeToCategory()
 	{
-		var pois = _abstractMap.VectorData.LayerProperty.FindPoiLayerWithName("loc");
+		var pois = _abstractMap.VectorData.FindPoiLayerWithName("loc");
 		pois.findByType = LocationPrefabFindBy.MapboxCategory;
 		pois.HasChanged = true;
 	}
@@ -216,7 +217,7 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("Vector - Add New Filter")]
 	public void AddNewFilter()
 	{
-		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
+		var vectorLayer = _abstractMap.VectorData.FindFeatureLayerWithName("loc");
 		LayerFilter layerFilter = new LayerFilter(LayerFilterOperationType.Contains);
 		vectorLayer.filterOptions.filters.Add(layerFilter);
 		vectorLayer.filterOptions.HasChanged = true;
@@ -226,8 +227,8 @@ public class ApiTest : MonoBehaviour
 	public void RemoveFilter()
 	{
 		int index = 0;
-		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
-		if(index < vectorLayer.filterOptions.filters.Count)
+		var vectorLayer = _abstractMap.VectorData.FindFeatureLayerWithName("loc");
+		if (index < vectorLayer.filterOptions.filters.Count)
 		{
 			vectorLayer.filterOptions.filters.RemoveAt(index);
 		}
@@ -237,7 +238,7 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("Vector - Set Filter Combiner Type")]
 	public void SetFilterCombinerType()
 	{
-		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
+		var vectorLayer = _abstractMap.VectorData.FindFeatureLayerWithName("loc");
 
 		vectorLayer.filterOptions.combinerType = layerFilterCombinerOperationType;
 
@@ -248,7 +249,7 @@ public class ApiTest : MonoBehaviour
 	public void SetFilterKey()
 	{
 		int index = 0;
-		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
+		var vectorLayer = _abstractMap.VectorData.FindFeatureLayerWithName("loc");
 		if (index < vectorLayer.filterOptions.filters.Count)
 		{
 			vectorLayer.filterOptions.filters[index].Key = filterKey;
@@ -260,7 +261,7 @@ public class ApiTest : MonoBehaviour
 	public void SetFilterOperator()
 	{
 		int index = 0;
-		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
+		var vectorLayer = _abstractMap.VectorData.FindFeatureLayerWithName("loc");
 		if (index < vectorLayer.filterOptions.filters.Count)
 		{
 			vectorLayer.filterOptions.filters[index].filterOperator = layerFilterOperationType;
@@ -272,7 +273,7 @@ public class ApiTest : MonoBehaviour
 	public void SetFilterCompareValue()
 	{
 		int index = 0;
-		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
+		var vectorLayer = _abstractMap.VectorData.FindFeatureLayerWithName("loc");
 		if (index < vectorLayer.filterOptions.filters.Count)
 		{
 			vectorLayer.filterOptions.filters[index].Min = min;
@@ -284,7 +285,7 @@ public class ApiTest : MonoBehaviour
 	public void SetFilterCompareMinMaxValue()
 	{
 		int index = 0;
-		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
+		var vectorLayer = _abstractMap.VectorData.FindFeatureLayerWithName("loc");
 		if (index < vectorLayer.filterOptions.filters.Count)
 		{
 			vectorLayer.filterOptions.filters[index].Min = min;
@@ -297,7 +298,7 @@ public class ApiTest : MonoBehaviour
 	public void SetFilterContainsValue()
 	{
 		int index = 0;
-		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
+		var vectorLayer = _abstractMap.VectorData.FindFeatureLayerWithName("loc");
 		if (index < vectorLayer.filterOptions.filters.Count)
 		{
 			vectorLayer.filterOptions.filters[index].PropertyValue = contains;
@@ -309,5 +310,63 @@ public class ApiTest : MonoBehaviour
 	public void TestPoiCategoryApi()
 	{
 		_abstractMap.VectorData.SpawnPrefabByCategory(PoiPrefab, LocationPrefabCategories);
+	}
+
+	[ContextMenu("LogAllFeatureLayerNames")]
+	public void LogAllFeatureLayerNames()
+	{
+		var str = "";
+		str += "All Feature Layers: ";
+		str += string.Join(",", _abstractMap.VectorData.GetAllFeatureLayers().Select(x => x.Key).ToArray());
+		str += "\r\n";
+		str += "Polygon Layers: ";
+		str += string.Join(",", _abstractMap.VectorData.GetAllPolygonFeatureLayers().Select(x => x.Key).ToArray());
+		str += "\r\n";
+		str += "Line Layers: ";
+		str += string.Join(",", _abstractMap.VectorData.GetAllLineFeatureLayers().Select(x => x.Key).ToArray());
+		str += "\r\n";
+		str += "Point Layers: ";
+		str += string.Join(",", _abstractMap.VectorData.GetAllPointFeatureLayers().Select(x => x.Key).ToArray());
+		str += "\r\n";
+		str += "Feature Layer at index 0: ";
+		str += _abstractMap.VectorData.GetFeatureLayerAtIndex(0).Key;
+		str += "\r\n";
+		str += "Feature Layers with \"B\" in the name ";
+		str += string.Join(",", _abstractMap.VectorData.GetFeatureLayerByQuery(x => x.coreOptions.sublayerName.Contains("B")).Select(x => x.coreOptions.sublayerName).ToArray());
+		str += "\r\n";
+		str += "All Poi Layers: ";
+		str += string.Join(",", _abstractMap.VectorData.GetAllPoiLayers().Select(x => x.Key).ToArray());
+		str += "\r\n";
+		str += "Poi Layer at index 0: ";
+		str += _abstractMap.VectorData.GetPoiLayerAtIndex(0).Key;
+		str += "\r\n";
+		str += "Poi Layers with \"L\" in the name ";
+		str += string.Join(",", _abstractMap.VectorData.GetPoiLayerByQuery(x => x.coreOptions.sublayerName.Contains("L")).Select(x => x.coreOptions.sublayerName).ToArray());
+
+		Debug.Log(str);
+	}
+
+	[ContextMenu("RemoveFirstFeatureLayer")]
+	public void RemoveFirstFeatureLayer()
+	{
+		_abstractMap.VectorData.RemoveFeatureLayer(_abstractMap.VectorData.GetFeatureLayerAtIndex(0));
+	}
+
+	[ContextMenu("RemoveFirstPoiLayer")]
+	public void RemoveFirstPoiLayer()
+	{
+		_abstractMap.VectorData.RemovePoiLayer(_abstractMap.VectorData.GetPoiLayerAtIndex(0));
+	}
+
+	[ContextMenu("ToggleCoroutines")]
+	public void ToggleCoroutines()
+	{
+		_abstractMap.VectorData.EnableCoroutines(!_abstractMap.VectorData.LayerProperty.performanceOptions.isEnabled);
+	}
+
+	[ContextMenu("ToggleStyleOptimization")]
+	public void ToggleStyleOptimization()
+	{
+		_abstractMap.VectorData.EnableOptimizedStyle(!_abstractMap.VectorData.LayerProperty.useOptimizedStyle);
 	}
 }

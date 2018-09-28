@@ -1,7 +1,7 @@
 ﻿//using System;
 using System.Collections;
 using System.Collections.Generic;
-using Mapbox.Unity.Map; 
+using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Interfaces;
 using Mapbox.Unity.MeshGeneration.Filters;
 using UnityEngine;
@@ -21,13 +21,13 @@ public class VectorTextureApiTest : MonoBehaviour
 	void Start()
 	{
 		_abstractMap = FindObjectOfType<AbstractMap>();
-		_layer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("test");
+		_layer = _abstractMap.VectorData.FindFeatureLayerWithName("test");
 		Assert.IsNotNull(_layer, "No layer named test found");
 
 		testMethods = new List<System.Action>
 		{
-			SetStyle, 
-			SetRealisticStyleType, 
+			SetStyle,
+			SetRealisticStyleType,
 			SetFantasyStyleType,
 			SetSimpleStylePaletteType,
 			SetLightStyleOpacity,
@@ -51,7 +51,7 @@ public class VectorTextureApiTest : MonoBehaviour
 
 	private void Update()
 	{
-		if(_testStarted)
+		if (_testStarted)
 		{
 			return;
 		}

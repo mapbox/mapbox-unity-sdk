@@ -23,7 +23,7 @@
 		public bool snapToTerrain = true;
 		[Tooltip("Groups features into one Unity GameObject.")]
 		public bool combineMeshes = false;
-		
+
 
 		public override bool HasChanged
 		{
@@ -39,7 +39,7 @@
 	}
 
 	[Serializable]
-	public class VectorFilterOptions : MapboxDataProperty
+	public class VectorFilterOptions : MapboxDataProperty, ISubLayerFiltering
 	{
 		[SerializeField]
 		private string _selectedLayerName;
