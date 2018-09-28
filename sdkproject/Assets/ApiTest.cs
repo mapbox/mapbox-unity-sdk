@@ -217,7 +217,7 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("Vector - Add New Filter")]
 	public void AddNewFilter()
 	{
-		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
+		var vectorLayer = _abstractMap.VectorData.FindFeatureLayerWithName("loc");
 		LayerFilter layerFilter = new LayerFilter(LayerFilterOperationType.Contains);
 		vectorLayer.filterOptions.filters.Add(layerFilter);
 		vectorLayer.filterOptions.HasChanged = true;
@@ -227,8 +227,8 @@ public class ApiTest : MonoBehaviour
 	public void RemoveFilter()
 	{
 		int index = 0;
-		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
-		if(index < vectorLayer.filterOptions.filters.Count)
+		var vectorLayer = _abstractMap.VectorData.FindFeatureLayerWithName("loc");
+		if (index < vectorLayer.filterOptions.filters.Count)
 		{
 			vectorLayer.filterOptions.filters.RemoveAt(index);
 		}
@@ -238,7 +238,7 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("Vector - Set Filter Combiner Type")]
 	public void SetFilterCombinerType()
 	{
-		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
+		var vectorLayer = _abstractMap.VectorData.FindFeatureLayerWithName("loc");
 
 		vectorLayer.filterOptions.combinerType = layerFilterCombinerOperationType;
 
@@ -249,7 +249,7 @@ public class ApiTest : MonoBehaviour
 	public void SetFilterKey()
 	{
 		int index = 0;
-		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
+		var vectorLayer = _abstractMap.VectorData.FindFeatureLayerWithName("loc");
 		if (index < vectorLayer.filterOptions.filters.Count)
 		{
 			vectorLayer.filterOptions.filters[index].Key = filterKey;
@@ -261,7 +261,7 @@ public class ApiTest : MonoBehaviour
 	public void SetFilterOperator()
 	{
 		int index = 0;
-		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
+		var vectorLayer = _abstractMap.VectorData.FindFeatureLayerWithName("loc");
 		if (index < vectorLayer.filterOptions.filters.Count)
 		{
 			vectorLayer.filterOptions.filters[index].filterOperator = layerFilterOperationType;
@@ -273,7 +273,7 @@ public class ApiTest : MonoBehaviour
 	public void SetFilterCompareValue()
 	{
 		int index = 0;
-		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
+		var vectorLayer = _abstractMap.VectorData.FindFeatureLayerWithName("loc");
 		if (index < vectorLayer.filterOptions.filters.Count)
 		{
 			vectorLayer.filterOptions.filters[index].Min = min;
@@ -285,7 +285,7 @@ public class ApiTest : MonoBehaviour
 	public void SetFilterCompareMinMaxValue()
 	{
 		int index = 0;
-		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
+		var vectorLayer = _abstractMap.VectorData.FindFeatureLayerWithName("loc");
 		if (index < vectorLayer.filterOptions.filters.Count)
 		{
 			vectorLayer.filterOptions.filters[index].Min = min;
@@ -298,7 +298,7 @@ public class ApiTest : MonoBehaviour
 	public void SetFilterContainsValue()
 	{
 		int index = 0;
-		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
+		var vectorLayer = _abstractMap.VectorData.FindFeatureLayerWithName("loc");
 		if (index < vectorLayer.filterOptions.filters.Count)
 		{
 			vectorLayer.filterOptions.filters[index].PropertyValue = contains;

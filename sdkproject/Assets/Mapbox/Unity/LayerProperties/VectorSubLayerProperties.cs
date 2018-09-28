@@ -76,7 +76,7 @@
 
 		public LayerPerformanceOptions performanceOptions;
 
-		//HACK : workaround to avoid users accidentaly leaving the buildingsWithUniqueIds settign on and have missing buildings. 
+		//HACK : workaround to avoid users accidentaly leaving the buildingsWithUniqueIds settign on and have missing buildings.
 		public bool honorBuildingIdSetting = true;
 		public bool buildingsWithUniqueIds = false;
 
@@ -141,7 +141,6 @@
 			materialOptions.style = style;
 			materialOptions.HasChanged = true;
 		}
-<<<<<<< HEAD
 
 		#region Feature Model Api Methods
 
@@ -198,7 +197,7 @@
 		public virtual void SetHeightRange(float minHeight, float maxHeight)
 		{
 			if (extrusionOptions.minimumHeight != minHeight ||
-			    extrusionOptions.maximumHeight != maxHeight)
+				extrusionOptions.maximumHeight != maxHeight)
 			{
 				extrusionOptions.minimumHeight = minHeight;
 				extrusionOptions.maximumHeight = maxHeight;
@@ -270,9 +269,9 @@
 		public virtual void EnableAbsoluteExtrusion(ExtrusionGeometryType extrusionGeometryType, float height, float extrusionScaleFactor = 1)
 		{
 			if (extrusionOptions.extrusionType != ExtrusionType.AbsoluteHeight ||
-			    extrusionOptions.extrusionGeometryType != extrusionGeometryType ||
-			    extrusionOptions.maximumHeight != height ||
-			    extrusionOptions.extrusionScaleFactor != extrusionScaleFactor)
+				extrusionOptions.extrusionGeometryType != extrusionGeometryType ||
+				extrusionOptions.maximumHeight != height ||
+				extrusionOptions.extrusionScaleFactor != extrusionScaleFactor)
 			{
 				extrusionOptions.extrusionType = ExtrusionType.AbsoluteHeight;
 				extrusionOptions.extrusionGeometryType = extrusionGeometryType;
@@ -292,9 +291,9 @@
 		public virtual void EnablePropertyExtrusion(ExtrusionGeometryType extrusionGeometryType, string propertyName = "height", float extrusionScaleFactor = 1)
 		{
 			if (extrusionOptions.extrusionType != ExtrusionType.PropertyHeight ||
-			    extrusionOptions.extrusionGeometryType != extrusionGeometryType ||
-			    extrusionOptions.propertyName != propertyName||
-			    extrusionOptions.extrusionScaleFactor != extrusionScaleFactor)
+				extrusionOptions.extrusionGeometryType != extrusionGeometryType ||
+				extrusionOptions.propertyName != propertyName ||
+				extrusionOptions.extrusionScaleFactor != extrusionScaleFactor)
 			{
 				extrusionOptions.extrusionType = ExtrusionType.PropertyHeight;
 				extrusionOptions.extrusionGeometryType = extrusionGeometryType;
@@ -315,9 +314,9 @@
 		public virtual void EnableMinExtrusion(ExtrusionGeometryType extrusionGeometryType, string propertyName = "height", float extrusionScaleFactor = 1)
 		{
 			if (extrusionOptions.extrusionType != ExtrusionType.MinHeight ||
-			    extrusionOptions.extrusionGeometryType != extrusionGeometryType ||
-			    extrusionOptions.propertyName != propertyName||
-			    extrusionOptions.extrusionScaleFactor != extrusionScaleFactor)
+				extrusionOptions.extrusionGeometryType != extrusionGeometryType ||
+				extrusionOptions.propertyName != propertyName ||
+				extrusionOptions.extrusionScaleFactor != extrusionScaleFactor)
 			{
 				extrusionOptions.extrusionType = ExtrusionType.MinHeight;
 				extrusionOptions.extrusionGeometryType = extrusionGeometryType;
@@ -338,9 +337,9 @@
 		public virtual void EnableMaxExtrusion(ExtrusionGeometryType extrusionGeometryType, string propertyName = "height", float extrusionScaleFactor = 1)
 		{
 			if (extrusionOptions.extrusionType != ExtrusionType.MaxHeight ||
-			    extrusionOptions.extrusionGeometryType != extrusionGeometryType ||
-			    extrusionOptions.propertyName != propertyName||
-			    extrusionOptions.extrusionScaleFactor != extrusionScaleFactor)
+				extrusionOptions.extrusionGeometryType != extrusionGeometryType ||
+				extrusionOptions.propertyName != propertyName ||
+				extrusionOptions.extrusionScaleFactor != extrusionScaleFactor)
 			{
 				extrusionOptions.extrusionType = ExtrusionType.MaxHeight;
 				extrusionOptions.extrusionGeometryType = extrusionGeometryType;
@@ -363,10 +362,10 @@
 		public virtual void EnableRangeExtrusion(ExtrusionGeometryType extrusionGeometryType, float minHeight, float maxHeight, float extrusionScaleFactor = 1)
 		{
 			if (extrusionOptions.extrusionType != ExtrusionType.RangeHeight ||
-			    extrusionOptions.extrusionGeometryType != extrusionGeometryType ||
-			    extrusionOptions.minimumHeight != minHeight||
-			    extrusionOptions.maximumHeight != maxHeight||
-			    extrusionOptions.extrusionScaleFactor != extrusionScaleFactor)
+				extrusionOptions.extrusionGeometryType != extrusionGeometryType ||
+				extrusionOptions.minimumHeight != minHeight ||
+				extrusionOptions.maximumHeight != maxHeight ||
+				extrusionOptions.extrusionScaleFactor != extrusionScaleFactor)
 			{
 				extrusionOptions.extrusionType = ExtrusionType.RangeHeight;
 				extrusionOptions.extrusionGeometryType = extrusionGeometryType;
@@ -378,9 +377,6 @@
 		}
 
 		#endregion
-	}
-=======
->>>>>>> develop
 
 		/// <summary>
 		/// Sets the layer to use the realistic style.
