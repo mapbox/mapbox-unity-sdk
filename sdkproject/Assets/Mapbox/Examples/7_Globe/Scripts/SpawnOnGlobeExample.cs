@@ -27,7 +27,7 @@
 			{
 				var instance = Instantiate(_markerPrefab);
 				var location = Conversions.StringToLatLon(locationString);
-				var earthRadius = (_map.Terrain.LayerProperty as ElevationLayerProperties).modificationOptions.earthRadius;
+				var earthRadius = ((IGlobeTerrainLayer)_map.Terrain).EarthRadius;
 				instance.transform.position = Conversions.GeoToWorldGlobePosition(location, earthRadius);
 				instance.transform.localScale = Vector3.one * _spawnScale;
 				instance.transform.SetParent(transform);

@@ -8,7 +8,7 @@ namespace Mapbox.Unity.Map
 	{
 		MapLayerType LayerType { get; }
 		bool IsLayerActive { get; }
-		string LayerSource { get; }
+		string LayerSourceId { get; }
 
 		//LayerProperties LayerProperty { get; set; }
 
@@ -18,16 +18,6 @@ namespace Mapbox.Unity.Map
 		void Initialize(LayerProperties properties);
 		void Update(LayerProperties properties);
 		void Remove();
-
-	}
-
-	public interface ITerrainLayer : ILayer
-	{
-
-	}
-
-	public interface IImageryLayer : ILayer
-	{
 
 	}
 
