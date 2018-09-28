@@ -33,4 +33,61 @@
 	{
 
 	}
+
+	public interface ISubLayerTexturing
+	{
+		void SetDefaultStyleType(StyleTypes style);
+	}
+
+	public interface IVectorSubLayer
+	{
+		ISubLayerTexturing Texturing { get; }
+		ISubLayerModeling Modeling { get; }
+	}
+	public class SubLayerTexturing : ISubLayerTexturing
+	{
+		public void SetDefaultStyleType(StyleTypes style)
+		{
+			throw new System.NotImplementedException();
+		}
+	}
+
+	public interface ISubLayerCoreOptions
+	{
+		void SetGeometryPrimitiveType(VectorPrimitiveType primitiveType);
+	}
+	public interface ISubLayerExtrusionOptions
+	{
+		void SetExtrusion(ExtrusionType extrusionType, ExtrusionGeometryType geometryType = ExtrusionGeometryType.RoofAndSide);
+	}
+
+	public interface ISubLayerModeling : ISubLayerCoreOptions, ISubLayerExtrusionOptions
+	{
+		void SetBlah();
+	}
+
+	public class SubLayerModeling : ISubLayerModeling
+	{
+		VectorSubLayerProperties _subLayerProperties;
+		public SubLayerModeling(VectorSubLayerProperties subLayerProperties)
+		{
+			_subLayerProperties = subLayerProperties;
+		}
+		public void SetBlah()
+		{
+			throw new System.NotImplementedException();
+		}
+
+		public void SetExtrusion(ExtrusionType extrusionType, ExtrusionGeometryType geometryType = ExtrusionGeometryType.RoofAndSide)
+		{
+			_subLayerProperties.extrusionOptions.extrusionType = extrusionType;
+		}
+
+		public void SetGeometryPrimitiveType(VectorPrimitiveType primitiveType)
+		{
+			throw new System.NotImplementedException();
+		}
+	}
 }
+
+
