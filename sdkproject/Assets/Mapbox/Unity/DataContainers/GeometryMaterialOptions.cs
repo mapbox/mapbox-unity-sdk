@@ -7,8 +7,17 @@
 	using Mapbox.Unity.MeshGeneration.Modifiers;
 	using Mapbox.Unity.MeshGeneration.Data;
 
+	public class CustomStyleBundle
+	{
+		public Material topMaterial;
+		public Material sideMaterial;
+		public AtlasInfo atlasInfo;
+		public ScriptablePalette colorPalette;
+	}
+
 	[Serializable]
-	public class GeometryMaterialOptions : ModifierProperties
+	public class GeometryMaterialOptions : ModifierProperties, ISubLayerTexturing
+
 	{
 		public override Type ModifierType
 		{
@@ -127,6 +136,11 @@
 			StyleAssetPathBundle styleAssetPathBundle = new StyleAssetPathBundle("Default", Constants.Path.MAP_FEATURE_STYLES_DEFAULT_STYLE_ASSETS);
 			texturingType = UvMapType.Atlas;
 			AssignAssets(styleAssetPathBundle);
+		}
+
+		public void SetDefaultStyleType(StyleTypes style)
+		{
+			throw new NotImplementedException();
 		}
 	}
 
