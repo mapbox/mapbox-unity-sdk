@@ -1,4 +1,6 @@
-﻿namespace Mapbox.Unity.Map
+﻿using Mapbox.Unity.SourceLayers;
+
+namespace Mapbox.Unity.Map
 {
 	using System;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
@@ -6,7 +8,7 @@
 	using UnityEngine;
 
 	[Serializable]
-	public class GeometryExtrusionOptions : ModifierProperties
+	public class GeometryExtrusionOptions : ModifierProperties, ISubLayerExtrusionOptions
 	{
 		public override Type ModifierType
 		{
@@ -31,6 +33,182 @@
 		public GeometryExtrusionWithAtlasOptions ToGeometryExtrusionWithAtlasOptions()
 		{
 			return new GeometryExtrusionWithAtlasOptions(this);
+		}
+
+
+		/// <summary>
+		/// Disable mesh extrusion for the features in this layer.
+		/// </summary>
+		public virtual void DisableExtrusion()
+		{
+			if (extrusionType != ExtrusionType.None)
+			{
+				extrusionType = ExtrusionType.None;
+				HasChanged = true;
+			}
+		}
+
+		/// <summary>
+		/// Sets the height value to be used for Absolute Height extrusion type.
+		/// Same field is used for the maximum height of Range Extrusion type so beware
+		/// of possible side effects.
+		/// </summary>
+		/// <param name="absoluteHeight">Fixed height value for all features in the layer.</param>
+		public virtual void SetAbsoluteHeight(float absoluteHeight)
+		{
+			if (maximumHeight != absoluteHeight)
+			{
+				maximumHeight = absoluteHeight;
+				HasChanged = true;
+			}
+		}
+
+		/// <summary>
+		/// Change the minimum and maximum height values used for Range Height option.
+		/// Maximum height is also used for Absolute Height option so beware of possible side
+		/// effects.
+		/// </summary>
+		/// <param name="minHeight">Lower bound to be used for extrusion</param>
+		/// <param name="maxHeight">Top bound to be used for extrusion</param>
+		public virtual void SetHeightRange(float minHeight, float maxHeight)
+		{
+			if (minimumHeight != minHeight ||
+				maximumHeight != maxHeight)
+			{
+				minimumHeight = minHeight;
+				maximumHeight = maxHeight;
+				HasChanged = true;
+			}
+		}
+
+		/// <summary>
+		/// Sets the extrusion multiplier which will be used only in the Y axis (height).
+		/// </summary>
+		/// <param name="multiplier">Multiplier value.</param>
+		public virtual void SetExtrusionMultiplier(float multiplier)
+		{
+			if (extrusionScaleFactor != multiplier)
+			{
+				extrusionScaleFactor = multiplier;
+				HasChanged = true;
+			}
+		}
+
+		/// <summary>
+		/// Changes extrusion type to "Absolute height" and extrudes all features by
+		/// the given fixed value.
+		/// </summary>
+		/// <param name="extrusionGeometryType">Option to create top and side polygons after extrusion.</param>
+		/// <param name="height">Extrusion value</param>
+		/// <param name="extrusionScaleFactor">Height multiplier</param>
+		public virtual void EnableAbsoluteExtrusion(ExtrusionGeometryType extrusionGeometryType, float height, float extrusionScaleFactor = 1)
+		{
+			if (extrusionType != ExtrusionType.AbsoluteHeight ||
+				extrusionGeometryType != extrusionGeometryType ||
+				maximumHeight != height ||
+				extrusionScaleFactor != extrusionScaleFactor)
+			{
+				extrusionType = ExtrusionType.AbsoluteHeight;
+				extrusionGeometryType = extrusionGeometryType;
+				maximumHeight = height;
+				extrusionScaleFactor = extrusionScaleFactor;
+				HasChanged = true;
+			}
+		}
+
+		/// <summary>
+		/// Changes extrusion type to "Property" and extrudes all features by
+		/// the choosen property's value.
+		/// </summary>
+		/// <param name="extrusionGeometryType">Option to create top and side polygons after extrusion.</param>
+		/// <param name="propertyName">Name of the property to use for extrusion</param>
+		/// <param name="extrusionScaleFactor">Height multiplier</param>
+		public virtual void EnablePropertyExtrusion(ExtrusionGeometryType extrusionGeometryType, string propertyName = "height", float extrusionScaleFactor = 1)
+		{
+			if (extrusionType != ExtrusionType.PropertyHeight ||
+				extrusionGeometryType != extrusionGeometryType ||
+				propertyName != propertyName ||
+				extrusionScaleFactor != extrusionScaleFactor)
+			{
+				extrusionType = ExtrusionType.PropertyHeight;
+				extrusionGeometryType = extrusionGeometryType;
+				propertyName = propertyName;
+				extrusionScaleFactor = extrusionScaleFactor;
+				HasChanged = true;
+			}
+		}
+
+		/// <summary>
+		/// Changes extrusion type to "Minimum Height" and extrudes all features by
+		/// the choosen property's value such that all vertices (roof) will be
+		/// flat at the lowest vertex elevation (after terrain elevation taken into account).
+		/// </summary>
+		/// <param name="extrusionGeometryType">Option to create top and side polygons after extrusion.</param>
+		/// <param name="propertyName">Name of the property to use for extrusion</param>
+		/// <param name="extrusionScaleFactor">Height multiplier</param>
+		public virtual void EnableMinExtrusion(ExtrusionGeometryType extrusionGeometryType, string propertyName = "height", float extrusionScaleFactor = 1)
+		{
+			if (extrusionType != ExtrusionType.MinHeight ||
+				extrusionGeometryType != extrusionGeometryType ||
+				propertyName != propertyName ||
+				extrusionScaleFactor != extrusionScaleFactor)
+			{
+				extrusionType = ExtrusionType.MinHeight;
+				extrusionGeometryType = extrusionGeometryType;
+				propertyName = propertyName;
+				extrusionScaleFactor = extrusionScaleFactor;
+				HasChanged = true;
+			}
+		}
+
+		/// <summary>
+		/// Changes extrusion type to "Range Height" and extrudes all features by
+		/// the choosen property's value such that all vertices (roof) will be
+		/// flat at the highest vertex elevation (after terrain elevation taken into account).
+		/// </summary>
+		/// <param name="extrusionGeometryType">Option to create top and side polygons after extrusion.</param>
+		/// <param name="propertyName">Name of the property to use for extrusion</param>
+		/// <param name="extrusionScaleFactor">Height multiplier</param>
+		public virtual void EnableMaxExtrusion(ExtrusionGeometryType extrusionGeometryType, string propertyName = "height", float extrusionScaleFactor = 1)
+		{
+			if (extrusionType != ExtrusionType.MaxHeight ||
+				extrusionGeometryType != extrusionGeometryType ||
+				propertyName != propertyName ||
+				extrusionScaleFactor != extrusionScaleFactor)
+			{
+				extrusionType = ExtrusionType.MaxHeight;
+				extrusionGeometryType = extrusionGeometryType;
+				propertyName = propertyName;
+				extrusionScaleFactor = extrusionScaleFactor;
+				HasChanged = true;
+			}
+		}
+
+		/// /// <summary>
+		/// Changes extrusion type to "Minimum Height" and extrudes all features by
+		/// the choosen property's value such that they'll be in provided range.
+		/// Lower values will be increase to Minimum Height and higher values will
+		/// be lowered to Maximum height.
+		/// </summary>
+		/// <param name="extrusionGeometryType">Option to create top and side polygons after extrusion.</param>
+		/// <param name="minHeight">Lower bound to be used for extrusion</param>
+		/// <param name="maxHeight">Top bound to be used for extrusion</param>
+		/// <param name="extrusionScaleFactor">Height multiplier</param>
+		public virtual void EnableRangeExtrusion(ExtrusionGeometryType extrusionGeometryType, float minHeight, float maxHeight, float extrusionScaleFactor = 1)
+		{
+			if (extrusionType != ExtrusionType.RangeHeight ||
+				extrusionGeometryType != extrusionGeometryType ||
+				minimumHeight != minHeight ||
+				maximumHeight != maxHeight ||
+				extrusionScaleFactor != extrusionScaleFactor)
+			{
+				extrusionType = ExtrusionType.RangeHeight;
+				extrusionGeometryType = extrusionGeometryType;
+				minimumHeight = minHeight;
+				maximumHeight = maxHeight;
+				extrusionScaleFactor = extrusionScaleFactor;
+				HasChanged = true;
+			}
 		}
 	}
 
