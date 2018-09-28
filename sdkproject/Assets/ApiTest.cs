@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Interfaces;
+using Mapbox.Unity.MeshGeneration.Filters;
 using UnityEngine;
 
 public class ApiTest : MonoBehaviour
@@ -11,7 +12,16 @@ public class ApiTest : MonoBehaviour
 	public ImagerySourceType imagerySource = ImagerySourceType.MapboxStreets;
 
 	public LocationPrefabCategories LocationPrefabCategories;
+	public LayerFilterOperationType layerFilterOperationType;
 	public GameObject PoiPrefab;
+
+
+	public LayerFilterCombinerOperationType layerFilterCombinerOperationType;
+	public string filterKey;
+
+	public float min;
+	public float max;
+	public string contains;
 
 	readonly StyleTypes[] testStyles = new StyleTypes[3] { StyleTypes.Fantasy, StyleTypes.Realistic, StyleTypes.Simple };
 	int styleId = -1;
@@ -113,7 +123,7 @@ public class ApiTest : MonoBehaviour
 		var layer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("ExtrudedBuildings");
 		if (layer != null)
 		{
-			layer.SetTexturingType(testStyles[styleId]);
+			layer.SetStyleType(testStyles[styleId]);
 		}
 		else
 		{
@@ -175,7 +185,6 @@ public class ApiTest : MonoBehaviour
 	{
 		var pois = _abstractMap.VectorData.LayerProperty.FindPoiLayerWithName("loc");
 		pois.categories = LocationPrefabCategories;
-		Debug.Log("ChangePoiCategory ---> " + pois.GetType().ToString()); //PrefabItemOptions
 		pois.HasChanged = true;
 	}
 
@@ -184,7 +193,6 @@ public class ApiTest : MonoBehaviour
 	{
 		var pois = _abstractMap.VectorData.LayerProperty.FindPoiLayerWithName("loc");
 		pois.spawnPrefabOptions.prefab = PoiPrefab;
-        Debug.Log("ChangePoiPrefab ---> " + pois.spawnPrefabOptions.GetType().ToString());//SpawnPrefabOptions
 		pois.spawnPrefabOptions.HasChanged = true;
 	}
 
@@ -194,7 +202,6 @@ public class ApiTest : MonoBehaviour
 		var pois = _abstractMap.VectorData.LayerProperty.FindPoiLayerWithName("loc");
 		pois.findByType = LocationPrefabFindBy.POIName;
 		pois.nameString = "yerba";
-		Debug.Log("ChangeToPoiByName ---> " + pois.GetType().ToString());//PrefabItemOptions
 		pois.HasChanged = true;
 	}
 
@@ -203,8 +210,99 @@ public class ApiTest : MonoBehaviour
 	{
 		var pois = _abstractMap.VectorData.LayerProperty.FindPoiLayerWithName("loc");
 		pois.findByType = LocationPrefabFindBy.MapboxCategory;
-		Debug.Log("ChangeToCategory ---> " + pois.GetType().ToString());//PrefabItemOptions
 		pois.HasChanged = true;
+	}
+
+	[ContextMenu("Vector - Add New Filter")]
+	public void AddNewFilter()
+	{
+		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
+		LayerFilter layerFilter = new LayerFilter(LayerFilterOperationType.Contains);
+		vectorLayer.filterOptions.filters.Add(layerFilter);
+		vectorLayer.filterOptions.HasChanged = true;
+	}
+
+	[ContextMenu("Vector - Remove Filter")]
+	public void RemoveFilter()
+	{
+		int index = 0;
+		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
+		if(index < vectorLayer.filterOptions.filters.Count)
+		{
+			vectorLayer.filterOptions.filters.RemoveAt(index);
+		}
+		vectorLayer.filterOptions.HasChanged = true;
+	}
+
+	[ContextMenu("Vector - Set Filter Combiner Type")]
+	public void SetFilterCombinerType()
+	{
+		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
+
+		vectorLayer.filterOptions.combinerType = layerFilterCombinerOperationType;
+
+		vectorLayer.filterOptions.HasChanged = true;
+	}
+
+	[ContextMenu("Vector - Set Filter Key")]
+	public void SetFilterKey()
+	{
+		int index = 0;
+		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
+		if (index < vectorLayer.filterOptions.filters.Count)
+		{
+			vectorLayer.filterOptions.filters[index].Key = filterKey;
+		}
+		vectorLayer.filterOptions.HasChanged = true;
+	}
+
+	[ContextMenu("Vector - Set Filter Operator")]
+	public void SetFilterOperator()
+	{
+		int index = 0;
+		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
+		if (index < vectorLayer.filterOptions.filters.Count)
+		{
+			vectorLayer.filterOptions.filters[index].filterOperator = layerFilterOperationType;
+		}
+		vectorLayer.filterOptions.HasChanged = true;
+	}
+
+	[ContextMenu("Vector - Set Filter Min Value")]
+	public void SetFilterCompareValue()
+	{
+		int index = 0;
+		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
+		if (index < vectorLayer.filterOptions.filters.Count)
+		{
+			vectorLayer.filterOptions.filters[index].Min = min;
+		}
+		vectorLayer.filterOptions.HasChanged = true;
+	}
+
+	[ContextMenu("Vector - Set Filter Compare MinMaxValue")]
+	public void SetFilterCompareMinMaxValue()
+	{
+		int index = 0;
+		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
+		if (index < vectorLayer.filterOptions.filters.Count)
+		{
+			vectorLayer.filterOptions.filters[index].Min = min;
+			vectorLayer.filterOptions.filters[index].Max = max;
+		}
+		vectorLayer.filterOptions.HasChanged = true;
+	}
+
+	[ContextMenu("Vector - Set Filter Contains Value")]
+	public void SetFilterContainsValue()
+	{
+		int index = 0;
+		var vectorLayer = _abstractMap.VectorData.LayerProperty.FindFeatureLayerWithName("loc");
+		if (index < vectorLayer.filterOptions.filters.Count)
+		{
+			vectorLayer.filterOptions.filters[index].PropertyValue = contains;
+		}
+		vectorLayer.filterOptions.HasChanged = true;
 	}
 
 	[ContextMenu("TestPoiCategoryApi")]

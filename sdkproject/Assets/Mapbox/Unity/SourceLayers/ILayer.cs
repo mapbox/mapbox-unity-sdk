@@ -33,4 +33,81 @@
 	{
 
 	}
+
+
+	// TODO: Move interfaces into individual files. 
+	public interface ISubLayerCoreOptions
+	{
+	}
+	public interface ISubLayerExtrusionOptions
+	{
+	}
+
+	public interface ISubLayerLineGeometryOptions
+	{
+
+	}
+
+	public interface ISubLayerPolygonGeometryOptions
+	{
+
+	}
+
+	public interface ISubLayerFiltering
+	{
+
+	}
+
+	public interface ISubLayerModeling :
+	ISubLayerCoreOptions,
+	ISubLayerExtrusionOptions,
+	ISubLayerLineGeometryOptions,
+	ISubLayerPolygonGeometryOptions
+	{
+
+	}
+
+	public interface ISubLayerTexturing
+	{
+
+	}
+
+	public interface ISubLayerBehaviorModifiers
+	{
+
+	}
+
+	public interface IVectorSubLayer
+	{
+		ISubLayerFiltering Filtering { get; }
+		ISubLayerModeling Modeling { get; }
+		ISubLayerTexturing Texturing { get; }
+		ISubLayerBehaviorModifiers BehaviorModifiers { get; }
+
+		// Add methods that we need at sublayer level 
+	}
+
+
+	// TODO Move classes into individual files. 
+	public class SubLayerModeling : ISubLayerModeling
+	{
+		VectorSubLayerProperties _subLayerProperties;
+		public SubLayerModeling(VectorSubLayerProperties subLayerProperties)
+		{
+			_subLayerProperties = subLayerProperties;
+		}
+	}
+
+	public class SubLayerBehaviorModifiers : ISubLayerBehaviorModifiers
+	{
+		// TODO: Remove if not required. 
+		VectorSubLayerProperties _subLayerProperties;
+		public SubLayerBehaviorModifiers(VectorSubLayerProperties subLayerProperties)
+		{
+			_subLayerProperties = subLayerProperties;
+		}
+	}
+
 }
+
+
