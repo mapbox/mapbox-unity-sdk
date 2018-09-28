@@ -109,7 +109,7 @@ namespace Mapbox.Unity.Map
 		[SerializeField]
 		ImageryLayer _imagery = new ImageryLayer();
 		[NodeEditorElement("Layers")]
-		public ImageryLayer ImageLayer
+		public IImageryLayer ImageLayer
 		{
 			get
 			{
@@ -122,7 +122,7 @@ namespace Mapbox.Unity.Map
 		[SerializeField]
 		TerrainLayer _terrain = new TerrainLayer();
 		[NodeEditorElement("Layers")]
-		public TerrainLayer Terrain
+		public ITerrainLayer Terrain
 		{
 			get
 			{

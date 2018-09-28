@@ -6,7 +6,7 @@
 	{
 		MapLayerType LayerType { get; }
 		bool IsLayerActive { get; }
-		string LayerSource { get; }
+		string LayerSourceId { get; }
 
 		//LayerProperties LayerProperty { get; set; }
 
@@ -16,16 +16,6 @@
 		void Initialize(LayerProperties properties);
 		void Update(LayerProperties properties);
 		void Remove();
-
-	}
-
-	public interface ITerrainLayer : ILayer
-	{
-
-	}
-
-	public interface IImageryLayer : ILayer
-	{
 
 	}
 
