@@ -177,7 +177,7 @@
 		/// <param name="material">Material.</param>
 		public virtual void SetCustomTopMaterial(Material material)
 		{
-			materialOptions.materials[0].Materials[0] = new Material(material);
+			materialOptions.materials[0].Materials[0] = material;
 			materialOptions.HasChanged = true;
 		}
 
@@ -187,7 +187,7 @@
 		/// <param name="material">Material.</param>
 		public virtual void SetCustomSideMaterial(Material material)
 		{
-			materialOptions.materials[1].Materials[0] = new Material(material);
+			materialOptions.materials[1].Materials[0] = material;
 			materialOptions.HasChanged = true;
 		}
 
@@ -198,8 +198,8 @@
 		/// <param name="sideMaterial">Side material.</param>
 		public virtual void SetCustomMaterials(Material topMaterial, Material sideMaterial)
 		{
-			materialOptions.materials[0].Materials[0] = new Material(topMaterial);
-			materialOptions.materials[1].Materials[0] = new Material(sideMaterial);
+			materialOptions.materials[0].Materials[0] = topMaterial;
+			materialOptions.materials[1].Materials[0] = sideMaterial;
 			materialOptions.HasChanged = true;
 		}
 
@@ -289,7 +289,7 @@
 		/// Gets the type of the custom style texturing.
 		/// </summary>
 		/// <returns>The custom texturing type.</returns>
-		public virtual UvMapType GetCustomTexturingType()
+		public virtual UvMapType GetTexturingType()
 		{
 			return materialOptions.texturingType;
 		}
@@ -298,7 +298,7 @@
 		/// Gets the custom top material.
 		/// </summary>
 		/// <returns>The custom top material.</returns>
-		public virtual Material GetCustomTopMaterial()
+		public virtual Material GetTopMaterial()
 		{
 			return materialOptions.materials[0].Materials[0];
 		}
@@ -307,7 +307,7 @@
 		/// Gets the custom side material.
 		/// </summary>
 		/// <returns>The custom side material.</returns>
-		public virtual Material GetCustomSideMaterial()
+		public virtual Material GetSideMaterial()
 		{
 			return materialOptions.materials[1].Materials[0];
 		}
@@ -316,7 +316,7 @@
 		/// Gets the custom uv atlas.
 		/// </summary>
 		/// <returns>The custom uv atlas.</returns>
-		public virtual AtlasInfo GetCustomUvAtlas()
+		public virtual AtlasInfo GetUvAtlas()
 		{
 			return materialOptions.atlasInfo;
 		}
@@ -325,7 +325,7 @@
 		/// Gets the custom color palette.
 		/// </summary>
 		/// <returns>The custom color palette.</returns>
-		public virtual ScriptablePalette GetCustomColorPalette()
+		public virtual ScriptablePalette GetColorPalette()
 		{
 			return materialOptions.colorPalette;
 		}

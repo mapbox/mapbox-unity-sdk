@@ -131,42 +131,37 @@ public class VectorTextureApiTest : MonoBehaviour
 
 	void SetCustomTexturingType()
 	{
+		_layer.SetStyleType(StyleTypes.Custom);
 		foreach (UvMapType uv in System.Enum.GetValues(typeof(UvMapType)))
 		{
 			_layer.SetCustomTexturingType(uv);
-			Debug.Log("<color=yellow>" + uv.ToString() + " - " + _layer.GetCustomTexturingType().ToString() + "</color>");
-			AddResultsToList(MethodBase.GetCurrentMethod(), _layer.GetCustomTexturingType() == uv);
+			AddResultsToList(MethodBase.GetCurrentMethod(), _layer.GetTexturingType() == uv);
 		}
 	}
 
 	void SetCustomTopMaterial()
 	{
+		_layer.SetStyleType(StyleTypes.Custom);
 		Material myNewMaterial = new Material(Shader.Find("Specular"));
-		if(myNewMaterial == null)
-		{
-			Debug.Log("efmo");
-		}
 		_layer.SetCustomTopMaterial(myNewMaterial);
-		AddResultsToList(MethodBase.GetCurrentMethod(), _layer.GetCustomTopMaterial() == myNewMaterial);
+		AddResultsToList(MethodBase.GetCurrentMethod(), _layer.GetTopMaterial().name == myNewMaterial.name);
 	}
 
 	void SetCustomSideMaterial()
 	{
+		_layer.SetStyleType(StyleTypes.Custom);
 		Material myNewMaterial = new Material(Shader.Find("Specular"));
-		if (myNewMaterial == null)
-		{
-			Debug.Log("efmo");
-		}
 		_layer.SetCustomSideMaterial(myNewMaterial);
-		AddResultsToList(MethodBase.GetCurrentMethod(), _layer.GetCustomSideMaterial() == myNewMaterial);
+		AddResultsToList(MethodBase.GetCurrentMethod(), _layer.GetSideMaterial().name == myNewMaterial.name);
 	}
 
 	void SetCustomMaterials()
 	{
+		_layer.SetStyleType(StyleTypes.Custom);
 		Material myNewMaterialTop = new Material(Shader.Find("Specular"));
 		Material myNewMaterialSide = new Material(Shader.Find("Specular"));
 		_layer.SetCustomMaterials(myNewMaterialTop, myNewMaterialSide);
-		AddResultsToList(MethodBase.GetCurrentMethod(), _layer.GetCustomTopMaterial() == myNewMaterialTop);
-		AddResultsToList(MethodBase.GetCurrentMethod(), _layer.GetCustomSideMaterial() == myNewMaterialSide);
+		AddResultsToList(MethodBase.GetCurrentMethod(), _layer.GetTopMaterial().name == myNewMaterialTop.name);
+		AddResultsToList(MethodBase.GetCurrentMethod(), _layer.GetSideMaterial().name == myNewMaterialSide.name);
 	}
 }
