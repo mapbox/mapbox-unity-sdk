@@ -715,7 +715,7 @@ namespace Mapbox.Unity.Map
 
 		public virtual void UpdateMap()
 		{
-			UpdateMap(_centerLatitudeLongitude, Zoom);
+			UpdateMap(Conversions.StringToLatLon(_options.locationOptions.latitudeLongitude), Zoom);
 		}
 
 		public virtual void UpdateMap(Vector2d latLon)
@@ -725,7 +725,7 @@ namespace Mapbox.Unity.Map
 
 		public virtual void UpdateMap(float zoom)
 		{
-			UpdateMap(_centerLatitudeLongitude, zoom);
+			UpdateMap(Conversions.StringToLatLon(_options.locationOptions.latitudeLongitude), zoom);
 		}
 
 		/// <summary>
