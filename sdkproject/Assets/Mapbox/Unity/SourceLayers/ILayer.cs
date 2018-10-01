@@ -2,6 +2,9 @@
 {
 	//public class Terrain
 	// Layer Interfaces
+	using System.Collections.Generic;
+	using Mapbox.Unity.MeshGeneration.Filters;
+
 	public interface ILayer
 	{
 		MapLayerType LayerType { get; }
@@ -55,7 +58,39 @@
 
 	public interface ISubLayerFiltering
 	{
+		void AddFilter(LayerFilterOperationType filterOperation = LayerFilterOperationType.Contains);
+		void AddFilter(LayerFilterBundle layerFilterBundle);
 
+		LayerFilter GetFilter(int index);
+		void DeleteFilter(int index);
+
+		IEnumerable<LayerFilter> GetAllFilters();
+		IEnumerable<LayerFilter> GetFiltersByQuery(System.Func<LayerFilter, bool> query);
+
+		LayerFilterCombinerOperationType GetFilterCombinerType();
+
+		void SetFilterCombinerType(LayerFilterCombinerOperationType layerFilterCombinerOperationType);
+	}
+
+	public interface ISubLayerFilteringOptions
+	{
+		bool FilterKeyContains(string key);
+		bool FilterKeyMatchesExact(string key);
+		bool FilterUsesOperationType(LayerFilterOperationType layerFilterOperationType);
+		bool FilterPropertyContains(string property);
+		bool FilterPropertyMatchesExact(string property);
+		bool FilterNumberValueEquals(float value);
+		bool FilterNumberValueIsGreaterThan(float value);
+		bool FilterNumberValueIsLessThan(float value);
+		bool FilterIsInRangeValueContains(float value);
+
+		void SetKey(string key = "");
+		void SetFilterOperationType(LayerFilterOperationType layerFilterOperationType);
+		void SetContains(string property = "");
+		void SetIsEqual(float? value = null);
+		void SetIsLessThan(float? value = null);
+		void SetIsGreaterThan(float? value = null);
+		void SetIsInRange(float? min = null, float? max = null);
 	}
 
 	public interface ISubLayerModeling :

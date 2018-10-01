@@ -5,6 +5,7 @@
 	using Mapbox.Unity.MeshGeneration.Filters;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
 	using UnityEngine;
+	using System.Linq;
 
 	[Serializable]
 	public class CoreVectorLayerProperties : MapboxDataProperty
@@ -35,7 +36,6 @@
 				}
 			}
 		}
-
 	}
 
 	[Serializable]
@@ -46,5 +46,58 @@
 		public List<LayerFilter> filters = new List<LayerFilter>();
 		[Tooltip("Operator to combine filters. ")]
 		public LayerFilterCombinerOperationType combinerType = LayerFilterCombinerOperationType.All;
+
+		public virtual void AddFilter(LayerFilterOperationType filterOperation = LayerFilterOperationType.Contains)
+		{
+			filters.Add(new LayerFilter(filterOperation));
+		}
+
+		public virtual void AddFilter(LayerFilterBundle layerFilterBundle)
+		{
+			filters.Add(new LayerFilter(layerFilterBundle));
+		}
+
+		public virtual void DeleteFilter(int index)
+		{
+			if (index < filters.Count && filters[index] != null)
+			{
+				filters.RemoveAt(index);
+			}
+		}
+
+		public virtual LayerFilter GetFilter(int index)
+		{
+			if(index < filters.Count && filters[index] != null)
+			{
+				return filters[index];
+			}
+			return null;
+		}
+
+		public virtual IEnumerable<LayerFilter> GetAllFilters()
+		{
+			return filters.AsEnumerable();
+		}
+
+		public virtual IEnumerable<LayerFilter> GetFiltersByQuery(Func<LayerFilter, bool> query)
+		{
+			foreach (var filter in filters)
+			{
+				if (query(filter))
+				{
+					yield return filter;
+				}
+			}
+		}
+
+		public virtual LayerFilterCombinerOperationType GetFilterCombinerType()
+		{
+			return combinerType;
+		}
+
+		public virtual void SetFilterCombinerType(LayerFilterCombinerOperationType layerFilterCombinerOperationType)
+		{
+			combinerType = layerFilterCombinerOperationType;
+		}
 	}
 }

@@ -5,6 +5,7 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 	using System;
 	using System.Linq;
 	using System.Collections.Generic;
+	using Mapbox.Unity.Map;
 
 	public class TypeFilter : FilterBase
 	{
@@ -289,8 +290,17 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 		}
 	}
 
+	public class LayerFilterBundle
+	{
+		public string key;
+		public LayerFilterOperationType layerFilterOperationType;
+		public string propertyValue;
+		public float min;
+		public float max;
+	}
+
 	[Serializable]
-	public class LayerFilter
+	public class LayerFilter : ISubLayerFilteringOptions
 	{
 		[Tooltip("Name of the property to use as key. This property is case sensitive.")]
 		public string Key;
@@ -308,6 +318,15 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 		public LayerFilter(LayerFilterOperationType filterOperation)
 		{
 			filterOperator = filterOperation;
+		}
+
+		public LayerFilter(LayerFilterBundle layerFilterBundle)
+		{
+			Key = layerFilterBundle.key;
+			filterOperator = layerFilterBundle.layerFilterOperationType;
+			PropertyValue = layerFilterBundle.propertyValue;
+			Min = layerFilterBundle.min;
+			Max = layerFilterBundle.max;;
 		}
 
 		public ILayerFeatureFilterComparer GetFilterComparer()
@@ -344,6 +363,111 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 					break;
 			}
 			return filterComparer;
+		}
+
+		public virtual void SetKey(string key = "")
+		{
+			Key = key;
+		}
+
+		public virtual void SetFilterOperationType(LayerFilterOperationType layerFilterOperationType)
+		{
+			switch (layerFilterOperationType)
+			{
+				case (LayerFilterOperationType.Contains):
+					SetContains();
+					break;
+				case (LayerFilterOperationType.IsEqual):
+					SetIsEqual();
+					break;
+				case (LayerFilterOperationType.IsLess):
+					SetIsLessThan();
+					break;
+				case (LayerFilterOperationType.IsGreater):
+					SetIsGreaterThan();
+					break;
+				case (LayerFilterOperationType.IsInRange):
+					SetIsInRange();
+					break;
+				default:
+					break;
+			}
+		}
+
+		public virtual void SetContains(string property = "")
+		{
+			filterOperator = LayerFilterOperationType.Contains;
+			PropertyValue = string.IsNullOrEmpty(property) ? PropertyValue : property;
+		}
+
+		public virtual void SetIsEqual(float? value = null)
+		{
+			filterOperator = LayerFilterOperationType.IsEqual;
+			Min = (value == null) ? Min : (float)value;
+		}
+
+		public virtual void SetIsLessThan(float? value = null)
+		{
+			filterOperator = LayerFilterOperationType.IsLess;
+			Min = (value == null) ? Min : (float)value;
+		}
+
+		public virtual void SetIsGreaterThan(float? value = null)
+		{
+			filterOperator = LayerFilterOperationType.IsGreater;
+			Min = (value == null) ? Min : (float)value;
+		}
+
+		public virtual void SetIsInRange(float? min = null, float? max = null)
+		{
+			filterOperator = LayerFilterOperationType.IsInRange;
+			Min = (min == null) ? Min : (float)min;
+			Max = (max == null) ? Max : (float)max;
+		}
+
+		public virtual bool FilterKeyContains(string key)
+		{
+			return Key.Contains(key);
+		}
+
+		public virtual bool FilterKeyMatchesExact(string key)
+		{
+			return Key == key;
+		}
+
+		public virtual bool FilterUsesOperationType(LayerFilterOperationType layerFilterOperationType)
+		{
+			return filterOperator == layerFilterOperationType;
+		}
+
+		public virtual bool FilterPropertyContains(string property)
+		{
+			return PropertyValue.Contains(property);
+		}
+
+		public virtual bool FilterPropertyMatchesExact(string property)
+		{
+			return PropertyValue == property;
+		}
+
+		public virtual bool FilterNumberValueEquals(float value)
+		{
+			return Mathf.Approximately(Min, value);
+		}
+
+		public virtual bool FilterNumberValueIsGreaterThan(float value)
+		{
+			return Min > value;
+		}
+
+		public virtual bool FilterNumberValueIsLessThan(float value)
+		{
+			return Min < value;
+		}
+
+		public virtual bool FilterIsInRangeValueContains(float value)
+		{
+			return Min < value && value < Max;
 		}
 	}
 }
