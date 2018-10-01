@@ -50,32 +50,10 @@ namespace Mapbox.Unity.Map
 			}
 
 			OnExtentChanged();
-			//foreach (var item in _activeTiles)
-			//{
-			//	if (!_tilesToRequest.Contains(item.Key))
-			//	{
-			//		_toRemove.Add(item.Key);
-			//	}
-			//}
-
-			//foreach (var t2r in _toRemove)
-			//{
-			//	RemoveTile(t2r);
-			//}
-
-			//foreach (var tile in _activeTiles)
-			//{
-			//	// Reposition tiles in case we panned.
-			//	RepositionTile(tile.Key);
-			//}
-
-			//foreach (var tile in _tilesToRequest)
-			//{
-			//	if (!_activeTiles.ContainsKey(tile))
-			//	{
-			//		AddTile(tile);
-			//	}
-			//}
+		}
+		public override bool Cleanup(UnwrappedTileId tile)
+		{
+			return (!_currentExtent.activeTiles.Contains(tile));
 		}
 
 	}
