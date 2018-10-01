@@ -89,13 +89,13 @@ public class VectorTextureApiTest : MonoBehaviour
 
 	void SetRealisticStyleType()
 	{
-		_layer.Texturing.SetRealisticStyle();
+		_layer.Texturing.RealisticStyle.SetAsStyle();
 		AddResultsToList(MethodBase.GetCurrentMethod(), _layer.Texturing.GetStyleType() == StyleTypes.Realistic);
 	}
 
 	void SetFantasyStyleType()
 	{
-		_layer.Texturing.SetFantasyStyle();
+		_layer.Texturing.FantasyStyle.SetAsStyle();
 		AddResultsToList(MethodBase.GetCurrentMethod(), _layer.Texturing.GetStyleType() == StyleTypes.Fantasy);
 	}
 
@@ -103,30 +103,30 @@ public class VectorTextureApiTest : MonoBehaviour
 	{
 		foreach (SamplePalettes palette in System.Enum.GetValues(typeof(SamplePalettes)))
 		{
-			_layer.Texturing.SetSimpleStylePaletteType(palette);
-			AddResultsToList(MethodBase.GetCurrentMethod(), _layer.Texturing.GetSimpleStylePaletteType() == palette);
+			_layer.Texturing.SimpleStyle.PaletteType = palette;
+			AddResultsToList(MethodBase.GetCurrentMethod(), _layer.Texturing.SimpleStyle.PaletteType == palette);
 		}
 	}
 
 	void SetLightStyleOpacity()
 	{
 		float randomVal = UnityEngine.Random.value;
-		_layer.Texturing.SetLightStyleOpacity(randomVal);
-		AddResultsToList(MethodBase.GetCurrentMethod(), Mathf.Approximately(_layer.Texturing.GetLightStyleOpacity(), randomVal));
+		_layer.Texturing.LightStyle.SetAsStyle(randomVal);
+		AddResultsToList(MethodBase.GetCurrentMethod(), Mathf.Approximately(_layer.Texturing.LightStyle.Opacity, randomVal));
 	}
 
 	void SetDarkStyleOpacity()
 	{
 		float randomVal = UnityEngine.Random.value;
-		_layer.Texturing.SetDarkStyleOpacity(randomVal);
-		AddResultsToList(MethodBase.GetCurrentMethod(), Mathf.Approximately(_layer.Texturing.GetDarkStyleOpacity(), randomVal));
+		_layer.Texturing.DarkStyle.SetAsStyle(randomVal);
+		AddResultsToList(MethodBase.GetCurrentMethod(), Mathf.Approximately(_layer.Texturing.DarkStyle.Opacity, randomVal));
 	}
 
 	void SetColorStyleColor()
 	{
 		Color randomColor = new Color(Random.value, Random.value, Random.value, Random.value);
-		_layer.Texturing.SetColorStyleColor(randomColor);
-		AddResultsToList(MethodBase.GetCurrentMethod(), _layer.Texturing.GetColorStyleColor() == randomColor);
+		_layer.Texturing.ColorStyle.SetAsStyle(randomColor);
+		AddResultsToList(MethodBase.GetCurrentMethod(), _layer.Texturing.ColorStyle.FeatureColor == randomColor);
 	}
 
 	void SetCustomTexturingType()
@@ -134,34 +134,34 @@ public class VectorTextureApiTest : MonoBehaviour
 		_layer.Texturing.SetStyleType(StyleTypes.Custom);
 		foreach (UvMapType uv in System.Enum.GetValues(typeof(UvMapType)))
 		{
-			_layer.Texturing.SetTexturingType(uv);
-			AddResultsToList(MethodBase.GetCurrentMethod(), _layer.Texturing.GetTexturingType() == uv);
+			_layer.Texturing.CustomStyle.TexturingType = (uv);
+			AddResultsToList(MethodBase.GetCurrentMethod(), _layer.Texturing.CustomStyle.TexturingType == uv);
 		}
 	}
 
 	void SetCustomTopMaterial()
 	{
-		_layer.Texturing.SetStyleType(StyleTypes.Custom);
+		_layer.Texturing.CustomStyle.Tiled.SetAsStyle();
 		Material myNewMaterial = new Material(Shader.Find("Specular"));
-		_layer.Texturing.SetTopMaterial(myNewMaterial);
-		AddResultsToList(MethodBase.GetCurrentMethod(), _layer.Texturing.GetTopMaterial().name == myNewMaterial.name);
+		_layer.Texturing.CustomStyle.Tiled.TopMaterial = (myNewMaterial);
+		AddResultsToList(MethodBase.GetCurrentMethod(), _layer.Texturing.CustomStyle.Tiled.TopMaterial.name == myNewMaterial.name);
 	}
 
 	void SetCustomSideMaterial()
 	{
-		_layer.Texturing.SetStyleType(StyleTypes.Custom);
+		_layer.Texturing.CustomStyle.Tiled.SetAsStyle();
 		Material myNewMaterial = new Material(Shader.Find("Specular"));
-		_layer.Texturing.SetSideMaterial(myNewMaterial);
-		AddResultsToList(MethodBase.GetCurrentMethod(), _layer.Texturing.GetSideMaterial().name == myNewMaterial.name);
+		_layer.Texturing.CustomStyle.Tiled.SideMaterial = (myNewMaterial);
+		AddResultsToList(MethodBase.GetCurrentMethod(), _layer.Texturing.CustomStyle.Tiled.SideMaterial.name == myNewMaterial.name);
 	}
 
 	void SetCustomMaterials()
 	{
-		_layer.Texturing.SetStyleType(StyleTypes.Custom);
+		_layer.Texturing.CustomStyle.Tiled.SetAsStyle();
 		Material myNewMaterialTop = new Material(Shader.Find("Specular"));
 		Material myNewMaterialSide = new Material(Shader.Find("Specular"));
-		_layer.Texturing.SetMaterials(myNewMaterialTop, myNewMaterialSide);
-		AddResultsToList(MethodBase.GetCurrentMethod(), _layer.Texturing.GetTopMaterial().name == myNewMaterialTop.name);
-		AddResultsToList(MethodBase.GetCurrentMethod(), _layer.Texturing.GetSideMaterial().name == myNewMaterialSide.name);
+		_layer.Texturing.CustomStyle.Tiled.SetMaterials(myNewMaterialTop, myNewMaterialSide);
+		AddResultsToList(MethodBase.GetCurrentMethod(), _layer.Texturing.CustomStyle.Tiled.TopMaterial.name == myNewMaterialTop.name);
+		AddResultsToList(MethodBase.GetCurrentMethod(), _layer.Texturing.CustomStyle.Tiled.SideMaterial.name == myNewMaterialSide.name);
 	}
 }
