@@ -1,8 +1,5 @@
 ﻿namespace Mapbox.Unity.Map
 {
-	using UnityEngine;
-	using Mapbox.Unity.MeshGeneration.Data;
-
 	//public class Terrain
 	// Layer Interfaces
 	public interface ILayer
@@ -68,44 +65,6 @@
 	ISubLayerPolygonGeometryOptions
 	{
 
-	}
-
-	public interface ISubLayerTexturing
-	{
-		void SetStyleType(StyleTypes style);
-		void SetRealisticStyle();
-		void SetFantasyStyle();
-
-		void SetSimpleStylePaletteType(SamplePalettes palette);
-
-		void SetLightStyleOpacity(float opacity);
-		void SetDarkStyleOpacity(float opacity);
-		void SetColorStyleColor(Color color);
-
-		void SetTexturingType(UvMapType uvMapType);
-		void SetTopMaterial(Material material);
-		void SetSideMaterial(Material material);
-
-		void SetMaterials(Material topMaterial, Material sideMaterial);
-		void SetUvAtlas(AtlasInfo atlas);
-		void SetColorPalette(ScriptablePalette palette);
-
-		void SetCustomStyleAssets(CustomStyleBundle customStyleBundle);
-
-		StyleTypes GetStyleType();
-		SamplePalettes GetSimpleStylePaletteType();
-
-		float GetLightStyleOpacity();
-		float GetDarkStyleOpacity();
-		Color GetColorStyleColor();
-
-		UvMapType GetTexturingType();
-
-		Material GetTopMaterial();
-		Material GetSideMaterial();
-
-		AtlasInfo GetUvAtlas();
-		ScriptablePalette GetColorPalette();
 	}
 
 	public interface ISubLayerBehaviorModifiers
