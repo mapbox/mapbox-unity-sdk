@@ -49,8 +49,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				tile.gameObject.layer = _elevationOptions.unityLayerOptions.layerId;
 			}
 
-			if (tile.RasterDataState != Enums.TilePropertyState.Loaded ||
-			    tile.MeshFilter.mesh.vertexCount != RequiredVertexCount)
+			if (tile.RasterDataState != Enums.TilePropertyState.Loaded)
 			{
 				if (_elevationOptions.sideWallOptions.isActive)
 				{
@@ -63,7 +62,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				}
 			}
 
-			if (tile.MeshFilter.mesh.vertexCount == 0)
+			if (tile.MeshFilter.mesh.vertexCount != RequiredVertexCount)
 			{
 				CreateBaseMesh(tile);
 			}
