@@ -12,6 +12,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 		[SerializeField]
 		protected ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
 
+		public virtual int RequiredVertexCount
+		{
+			get { return 0; }
+		}
+
 		public virtual void Initialize(ElevationLayerProperties elOptions)
 		{
 			_elevationOptions = elOptions;
