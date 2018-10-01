@@ -1,4 +1,6 @@
-﻿namespace Mapbox.Unity.Map
+﻿using Mapbox.Unity.SourceLayers;
+
+namespace Mapbox.Unity.Map
 {
 	//public class Terrain
 	// Layer Interfaces
@@ -34,19 +36,7 @@
 
 	}
 
-
-	// TODO: Move interfaces into individual files. 
-	public interface ISubLayerCoreOptions
-	{
-	}
-	public interface ISubLayerExtrusionOptions
-	{
-	}
-
-	public interface ISubLayerLineGeometryOptions
-	{
-
-	}
+	// TODO: Move interfaces into individual files.
 
 	public interface ISubLayerPolygonGeometryOptions
 	{
@@ -54,15 +44,6 @@
 	}
 
 	public interface ISubLayerFiltering
-	{
-
-	}
-
-	public interface ISubLayerModeling :
-	ISubLayerCoreOptions,
-	ISubLayerExtrusionOptions,
-	ISubLayerLineGeometryOptions,
-	ISubLayerPolygonGeometryOptions
 	{
 
 	}
@@ -83,15 +64,7 @@
 	}
 
 
-	// TODO Move classes into individual files. 
-	public class SubLayerModeling : ISubLayerModeling
-	{
-		VectorSubLayerProperties _subLayerProperties;
-		public SubLayerModeling(VectorSubLayerProperties subLayerProperties)
-		{
-			_subLayerProperties = subLayerProperties;
-		}
-	}
+	// TODO Move classes into individual files.
 
 	public class SubLayerBehaviorModifiers : ISubLayerBehaviorModifiers
 	{

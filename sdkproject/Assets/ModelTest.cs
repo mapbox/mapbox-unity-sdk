@@ -21,7 +21,7 @@ public class ModelTest : MonoBehaviour
 	{
 		foreach (var layer in _abstractMap.VectorData.GetAllFeatureLayers())
 		{
-			layer.DisableExtrusion();
+			layer.Modeling.ExtrusionOptions.DisableExtrusion();
 		}
 	}
 
@@ -30,7 +30,7 @@ public class ModelTest : MonoBehaviour
 	{
 		foreach (var layer in _abstractMap.VectorData.GetAllFeatureLayers())
 		{
-			layer.EnableAbsoluteExtrusion(ExtrusionGeometryType.RoofAndSide, 10, 1);
+			layer.Modeling.ExtrusionOptions.EnableAbsoluteExtrusion(ExtrusionGeometryType.RoofAndSide, 10, 1);
 		}
 	}
 
@@ -39,7 +39,7 @@ public class ModelTest : MonoBehaviour
 	{
 		foreach (var layer in _abstractMap.VectorData.GetAllFeatureLayers())
 		{
-			layer.EnablePropertyExtrusion(ExtrusionGeometryType.RoofAndSide);
+			layer.Modeling.ExtrusionOptions.EnablePropertyExtrusion(ExtrusionGeometryType.RoofAndSide);
 		}
 	}
 
@@ -48,7 +48,7 @@ public class ModelTest : MonoBehaviour
 	{
 		foreach (var layer in _abstractMap.VectorData.GetAllFeatureLayers())
 		{
-			layer.EnableMinExtrusion(ExtrusionGeometryType.RoofAndSide);
+			layer.Modeling.ExtrusionOptions.EnableMinExtrusion(ExtrusionGeometryType.RoofAndSide);
 		}
 	}
 
@@ -57,7 +57,7 @@ public class ModelTest : MonoBehaviour
 	{
 		foreach (var layer in _abstractMap.VectorData.GetAllFeatureLayers())
 		{
-			layer.EnableMaxExtrusion(ExtrusionGeometryType.RoofAndSide);
+			layer.Modeling.ExtrusionOptions.EnableMaxExtrusion(ExtrusionGeometryType.RoofAndSide);
 		}
 	}
 
@@ -66,7 +66,7 @@ public class ModelTest : MonoBehaviour
 	{
 		foreach (var layer in _abstractMap.VectorData.GetAllFeatureLayers())
 		{
-			layer.EnableRangeExtrusion(ExtrusionGeometryType.RoofAndSide, 10, 20);
+			layer.Modeling.ExtrusionOptions.EnableRangeExtrusion(ExtrusionGeometryType.RoofAndSide, 10, 20);
 		}
 	}
 
@@ -75,7 +75,7 @@ public class ModelTest : MonoBehaviour
 	{
 		foreach (var layer in _abstractMap.VectorData.GetAllFeatureLayers())
 		{
-			layer.SetAbsoluteHeight(35);
+			layer.Modeling.ExtrusionOptions.SetAbsoluteHeight(35);
 		}
 	}
 
@@ -84,7 +84,7 @@ public class ModelTest : MonoBehaviour
 	{
 		foreach (var layer in _abstractMap.VectorData.GetAllFeatureLayers())
 		{
-			layer.SetHeightRange(35, 70);
+			layer.Modeling.ExtrusionOptions.SetHeightRange(35, 70);
 		}
 	}
 
@@ -93,7 +93,7 @@ public class ModelTest : MonoBehaviour
 	{
 		foreach (var layer in _abstractMap.VectorData.GetAllFeatureLayers())
 		{
-			layer.SetExtrusionMultiplier(2);
+			layer.Modeling.ExtrusionOptions.SetExtrusionMultiplier(2);
 		}
 	}
 
@@ -102,7 +102,7 @@ public class ModelTest : MonoBehaviour
 	{
 		foreach (var layer in _abstractMap.VectorData.GetAllFeatureLayers())
 		{
-			layer.EnableSnapingTerrain(!layer.coreOptions.snapToTerrain);
+			layer.Modeling.EnableSnapingTerrain(!layer.coreOptions.snapToTerrain);
 		}
 	}
 
@@ -111,7 +111,7 @@ public class ModelTest : MonoBehaviour
 	{
 		foreach (var layer in _abstractMap.VectorData.GetAllFeatureLayers())
 		{
-			layer.EnableCombiningMeshes(true);
+			layer.Modeling.EnableCombiningMeshes(true);
 		}
 	}
 
@@ -120,7 +120,7 @@ public class ModelTest : MonoBehaviour
 	{
 		foreach (var layer in _abstractMap.VectorData.GetAllFeatureLayers())
 		{
-			layer.SetFeatureCollider((ColliderType)UnityEngine.Random.RandomRange(0,4));
+			layer.Modeling.ColliderOptions.SetFeatureCollider((ColliderType)UnityEngine.Random.RandomRange(0,4));
 		}
 	}
 
@@ -129,7 +129,16 @@ public class ModelTest : MonoBehaviour
 	{
 		foreach (var layer in _abstractMap.VectorData.GetAllFeatureLayers())
 		{
-			layer.SetPrimitiveType((VectorPrimitiveType)UnityEngine.Random.RandomRange(0,2));
+			layer.Modeling.CoreOptions.SetPrimitiveType((VectorPrimitiveType)UnityEngine.Random.RandomRange(0,2));
+		}
+	}
+
+	[ContextMenu("Set Line Width to 10")]
+	public void SetLineWidth()
+	{
+		foreach (var layer in _abstractMap.VectorData.GetAllLineFeatureLayers())
+		{
+			layer.Modeling.LineOptions.SetLineWidth(10);
 		}
 	}
 }
