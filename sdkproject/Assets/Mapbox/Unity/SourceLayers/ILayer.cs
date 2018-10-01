@@ -48,11 +48,6 @@ namespace Mapbox.Unity.Map
 
 	}
 
-	public interface ISubLayerTexturing
-	{
-
-	}
-
 	public interface ISubLayerBehaviorModifiers
 	{
 

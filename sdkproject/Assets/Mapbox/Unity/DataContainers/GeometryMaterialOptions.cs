@@ -26,6 +26,97 @@
 				return typeof(MaterialModifier);
 			}
 		}
+		private SubLayerDarkStyle _darkStyle;
+		public ISubLayerDarkStyle DarkStyle
+		{
+			get
+			{
+				if (_darkStyle == null)
+				{
+					_darkStyle = new SubLayerDarkStyle(this);
+				}
+				return _darkStyle;
+			}
+		}
+
+		private SubLayerLightStyle _lightStyle;
+		public ISubLayerLightStyle LightStyle
+		{
+			get
+			{
+				if (_lightStyle == null)
+				{
+					_lightStyle = new SubLayerLightStyle(this);
+				}
+				return _lightStyle;
+			}
+		}
+
+		private SubLayerColorStyle _colorStyle;
+		public ISubLayerColorStyle ColorStyle
+		{
+			get
+			{
+				if (_colorStyle == null)
+				{
+					_colorStyle = new SubLayerColorStyle(this);
+				}
+				return _colorStyle;
+			}
+		}
+
+		private SubLayerSimpleStyle _simpleStyle;
+		public ISubLayerSimpleStyle SimpleStyle
+		{
+			get
+			{
+				if (_simpleStyle == null)
+				{
+					_simpleStyle = new SubLayerSimpleStyle(this);
+				}
+				return _simpleStyle;
+			}
+		}
+
+		private SubLayerRealisticStyle _realisticStyle;
+		public ISubLayerRealisticStyle RealisticStyle
+		{
+			get
+			{
+				if (_realisticStyle == null)
+				{
+					_realisticStyle = new SubLayerRealisticStyle(this);
+				}
+				return _realisticStyle;
+			}
+		}
+
+		private SubLayerFantasyStyle _fantasyStyle;
+		public ISubLayerFantasyStyle FantasyStyle
+		{
+			get
+			{
+				if (_fantasyStyle == null)
+				{
+					_fantasyStyle = new SubLayerFantasyStyle(this);
+				}
+				return _fantasyStyle;
+			}
+		}
+
+
+		private SubLayerCustomStyle _customStyle;
+		public ISubLayerCustomStyle CustomStyle
+		{
+			get
+			{
+				if (_customStyle == null)
+				{
+					_customStyle = new SubLayerCustomStyle(this);
+				}
+				return _customStyle;
+			}
+		}
 
 		public StyleTypes style;
 
@@ -131,17 +222,32 @@
 
 		}
 
-		public void SetDefaultAssets()
+		public void SetDefaultAssets(UvMapType mapType = UvMapType.Atlas)
 		{
 			StyleAssetPathBundle styleAssetPathBundle = new StyleAssetPathBundle("Default", Constants.Path.MAP_FEATURE_STYLES_DEFAULT_STYLE_ASSETS);
-			texturingType = UvMapType.Atlas;
+			texturingType = mapType;
 			AssignAssets(styleAssetPathBundle);
 		}
 
-		public void SetDefaultStyleType(StyleTypes style)
+		/// <summary>
+		/// Sets the type of the style.
+		/// </summary>
+		/// <param name="styleType">Style type.</param>
+		public void SetStyleType(StyleTypes styleType)
 		{
-			throw new NotImplementedException();
+			style = styleType;
 		}
+
+
+		/// <summary>
+		/// Gets the type of style used in the layer.
+		/// </summary>
+		/// <returns>The style type.</returns>
+		public virtual StyleTypes GetStyleType()
+		{
+			return style;
+		}
+
 	}
 
 	[Serializable]
