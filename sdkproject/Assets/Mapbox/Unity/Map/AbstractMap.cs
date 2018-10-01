@@ -495,7 +495,7 @@ namespace Mapbox.Unity.Map
 			List<UnwrappedTileId> _toRemove = new List<UnwrappedTileId>();
 			foreach (var item in _activeTiles)
 			{
-				if (!_currentExtent.Contains(item.Key))
+				if (_tileProvider.Cleanup(item.Key)) //(!_currentExtent.Contains(item.Key))
 				{
 					_toRemove.Add(item.Key);
 				}
