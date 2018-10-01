@@ -1,4 +1,6 @@
-﻿namespace Mapbox.Unity.Map
+﻿using Mapbox.Unity.MeshGeneration.Modifiers;
+
+namespace Mapbox.Unity.Map
 {
 	//public class Terrain
 	// Layer Interfaces
@@ -69,8 +71,18 @@
 
 	public interface ISubLayerBehaviorModifiers
 	{
+		void AddMeshModifier(MeshModifier modifier);
+		void RemoveMeshModifier(MeshModifier modifier);
+
+		void AddGameObjectModifier(GameObjectModifier modifier);
+		void RemoveGameObjectModifier(GameObjectModifier modifier);
+	}
+
+	public interface ICustomModifierEvents
+	{
 
 	}
+
 
 	public interface IVectorSubLayer
 	{
@@ -100,6 +112,30 @@
 		public SubLayerBehaviorModifiers(VectorSubLayerProperties subLayerProperties)
 		{
 			_subLayerProperties = subLayerProperties;
+		}
+
+		public void AddGameObjectModifier(GameObjectModifier modifier)
+		{
+			_subLayerProperties.GoModifiers.Add(modifier);
+			_subLayerProperties.HasChanged = true;
+		}
+
+		public void AddMeshModifier(MeshModifier modifier)
+		{
+			_subLayerProperties.MeshModifiers.Add(modifier);
+			_subLayerProperties.HasChanged = true;
+		}
+
+		public void RemoveGameObjectModifier(GameObjectModifier modifier)
+		{
+			_subLayerProperties.GoModifiers.Remove(modifier);
+			_subLayerProperties.HasChanged = true;
+		}
+
+		public void RemoveMeshModifier(MeshModifier modifier)
+		{
+			_subLayerProperties.MeshModifiers.Remove(modifier);
+			_subLayerProperties.HasChanged = true;
 		}
 	}
 
