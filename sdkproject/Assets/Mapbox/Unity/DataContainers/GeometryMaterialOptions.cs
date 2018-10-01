@@ -26,6 +26,97 @@
 				return typeof(MaterialModifier);
 			}
 		}
+		private SubLayerDarkStyle _darkStyle;
+		public ISubLayerDarkStyle DarkStyle
+		{
+			get
+			{
+				if (_darkStyle == null)
+				{
+					_darkStyle = new SubLayerDarkStyle(this);
+				}
+				return _darkStyle;
+			}
+		}
+
+		private SubLayerLightStyle _lightStyle;
+		public ISubLayerLightStyle LightStyle
+		{
+			get
+			{
+				if (_lightStyle == null)
+				{
+					_lightStyle = new SubLayerLightStyle(this);
+				}
+				return _lightStyle;
+			}
+		}
+
+		private SubLayerColorStyle _colorStyle;
+		public ISubLayerColorStyle ColorStyle
+		{
+			get
+			{
+				if (_colorStyle == null)
+				{
+					_colorStyle = new SubLayerColorStyle(this);
+				}
+				return _colorStyle;
+			}
+		}
+
+		private SubLayerSimpleStyle _simpleStyle;
+		public ISubLayerSimpleStyle SimpleStyle
+		{
+			get
+			{
+				if (_simpleStyle == null)
+				{
+					_simpleStyle = new SubLayerSimpleStyle(this);
+				}
+				return _simpleStyle;
+			}
+		}
+
+		private SubLayerRealisticStyle _realisticStyle;
+		public ISubLayerRealisticStyle RealisticStyle
+		{
+			get
+			{
+				if (_realisticStyle == null)
+				{
+					_realisticStyle = new SubLayerRealisticStyle(this);
+				}
+				return _realisticStyle;
+			}
+		}
+
+		private SubLayerFantasyStyle _fantasyStyle;
+		public ISubLayerFantasyStyle FantasyStyle
+		{
+			get
+			{
+				if (_fantasyStyle == null)
+				{
+					_fantasyStyle = new SubLayerFantasyStyle(this);
+				}
+				return _fantasyStyle;
+			}
+		}
+
+
+		private SubLayerCustomStyle _customStyle;
+		public ISubLayerCustomStyle CustomStyle
+		{
+			get
+			{
+				if (_customStyle == null)
+				{
+					_customStyle = new SubLayerCustomStyle(this);
+				}
+				return _customStyle;
+			}
+		}
 
 		public StyleTypes style;
 
@@ -131,10 +222,10 @@
 
 		}
 
-		public void SetDefaultAssets()
+		public void SetDefaultAssets(UvMapType mapType = UvMapType.Atlas)
 		{
 			StyleAssetPathBundle styleAssetPathBundle = new StyleAssetPathBundle("Default", Constants.Path.MAP_FEATURE_STYLES_DEFAULT_STYLE_ASSETS);
-			texturingType = UvMapType.Atlas;
+			texturingType = mapType;
 			AssignAssets(styleAssetPathBundle);
 		}
 
@@ -147,138 +238,6 @@
 			style = styleType;
 		}
 
-		/// <summary>
-		/// Sets the layer to use the realistic style.
-		/// </summary>
-		public virtual void SetRealisticStyle()
-		{
-			style = StyleTypes.Realistic;
-			HasChanged = true;
-		}
-
-		/// <summary>
-		/// Sets the layer to use the fantasy style.
-		/// </summary>
-		public virtual void SetFantasyStyle()
-		{
-			style = StyleTypes.Fantasy;
-			HasChanged = true;
-		}
-
-		/// <summary>
-		/// Sets the type of the simple style palette.
-		/// </summary>
-		/// <param name="palette">Palette.</param>
-		public virtual void SetSimpleStylePaletteType(SamplePalettes palette)
-		{
-			samplePalettes = palette;
-			HasChanged = true;
-		}
-
-		/// <summary>
-		/// Sets the light style opacity.
-		/// </summary>
-		/// <param name="opacity">Opacity.</param>
-		public virtual void SetLightStyleOpacity(float opacity)
-		{
-			lightStyleOpacity = Mathf.Clamp(opacity, 0.0f, 1.0f);
-			HasChanged = true;
-		}
-
-		/// <summary>
-		/// Sets the dark style opacity.
-		/// </summary>
-		/// <param name="opacity">Opacity.</param>
-		public virtual void SetDarkStyleOpacity(float opacity)
-		{
-			darkStyleOpacity = Mathf.Clamp(opacity, 0.0f, 1.0f);
-			HasChanged = true;
-		}
-
-		/// <summary>
-		/// Sets the color of the color style.
-		/// </summary>
-		/// <param name="color">Color.</param>
-		public virtual void SetColorStyleColor(Color color)
-		{
-			colorStyleColor = color;
-			HasChanged = true;
-		}
-
-		/// <summary>
-		/// Sets the texturing (UV) type of the custom style.
-		/// </summary>
-		/// <param name="uvMapType">Uv map type.</param>
-		public virtual void SetTexturingType(UvMapType uvMapType)
-		{
-			texturingType = uvMapType;
-			HasChanged = true;
-		}
-
-		/// <summary>
-		/// Sets the custom style top material.
-		/// </summary>
-		/// <param name="material">Material.</param>
-		public virtual void SetTopMaterial(Material material)
-		{
-			materials[0].Materials[0] = material;
-			HasChanged = true;
-		}
-
-		/// <summary>
-		/// Sets the custom style side material.
-		/// </summary>
-		/// <param name="material">Material.</param>
-		public virtual void SetSideMaterial(Material material)
-		{
-			materials[1].Materials[0] = material;
-			HasChanged = true;
-		}
-
-		/// <summary>
-		/// Sets the custom style top and side materials.
-		/// </summary>
-		/// <param name="topMaterial">Top material.</param>
-		/// <param name="sideMaterial">Side material.</param>
-		public virtual void SetMaterials(Material topMaterial, Material sideMaterial)
-		{
-			materials[0].Materials[0] = topMaterial;
-			materials[1].Materials[0] = sideMaterial;
-			HasChanged = true;
-		}
-
-		/// <summary>
-		/// Sets the custom style uv atlas.
-		/// </summary>
-		/// <param name="atlas">Atlas.</param>
-		public virtual void SetUvAtlas(AtlasInfo atlas)
-		{
-			atlasInfo = atlas;
-			HasChanged = true;
-		}
-
-		/// <summary>
-		/// Sets the custom style color palette.
-		/// </summary>
-		/// <param name="palette">Palette.</param>
-		public virtual void SetColorPalette(ScriptablePalette palette)
-		{
-			colorPalette = palette;
-			HasChanged = true;
-		}
-
-		/// <summary>
-		/// Sets the custom style assets using a CustomStyleBundle object.
-		/// </summary>
-		/// <param name="customStyleBundle">Custom style bundle.</param>
-		public virtual void SetCustomStyleAssets(CustomStyleBundle customStyleBundle)
-		{
-			materials[0].Materials[0] = (customStyleBundle.sideMaterial != null) ? customStyleBundle.sideMaterial : materials[0].Materials[0];
-			materials[1].Materials[0] = (customStyleBundle.topMaterial != null) ? customStyleBundle.topMaterial : materials[1].Materials[0];
-			atlasInfo = (customStyleBundle.atlasInfo != null) ? customStyleBundle.atlasInfo : atlasInfo;
-			colorPalette = (customStyleBundle.colorPalette != null) ? customStyleBundle.colorPalette : colorPalette;
-			HasChanged = true;
-		}
 
 		/// <summary>
 		/// Gets the type of style used in the layer.
@@ -287,87 +246,6 @@
 		public virtual StyleTypes GetStyleType()
 		{
 			return style;
-		}
-
-		/// <summary>
-		/// Gets the type of simple style palette used in the layer.
-		/// </summary>
-		/// <returns>The simple style palette type.</returns>
-		public virtual SamplePalettes GetSimpleStylePaletteType()
-		{
-			return samplePalettes;
-		}
-
-		/// <summary>
-		/// Gets the light style opacity.
-		/// </summary>
-		/// <returns>The light style opacity.</returns>
-		public virtual float GetLightStyleOpacity()
-		{
-			return lightStyleOpacity;
-		}
-
-		/// <summary>
-		/// Gets the dark style opacity.
-		/// </summary>
-		/// <returns>The dark style opacity.</returns>
-		public virtual float GetDarkStyleOpacity()
-		{
-			return darkStyleOpacity;
-		}
-
-		/// <summary>
-		/// Gets the color of the color style.
-		/// </summary>
-		/// <returns>The color style color.</returns>
-		public virtual Color GetColorStyleColor()
-		{
-			return colorStyleColor;
-		}
-
-		/// <summary>
-		/// Gets the type of the custom style texturing.
-		/// </summary>
-		/// <returns>The custom texturing type.</returns>
-		public virtual UvMapType GetTexturingType()
-		{
-			return texturingType;
-		}
-
-		/// <summary>
-		/// Gets the custom top material.
-		/// </summary>
-		/// <returns>The custom top material.</returns>
-		public virtual Material GetTopMaterial()
-		{
-			return materials[0].Materials[0];
-		}
-
-		/// <summary>
-		/// Gets the custom side material.
-		/// </summary>
-		/// <returns>The custom side material.</returns>
-		public virtual Material GetSideMaterial()
-		{
-			return materials[1].Materials[0];
-		}
-
-		/// <summary>
-		/// Gets the custom uv atlas.
-		/// </summary>
-		/// <returns>The custom uv atlas.</returns>
-		public virtual AtlasInfo GetUvAtlas()
-		{
-			return atlasInfo;
-		}
-
-		/// <summary>
-		/// Gets the custom color palette.
-		/// </summary>
-		/// <returns>The custom color palette.</returns>
-		public virtual ScriptablePalette GetColorPalette()
-		{
-			return colorPalette;
 		}
 
 	}
