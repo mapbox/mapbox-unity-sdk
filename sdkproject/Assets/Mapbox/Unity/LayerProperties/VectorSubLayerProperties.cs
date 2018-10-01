@@ -170,6 +170,29 @@
 		}
 
 		/// <summary>
+		/// Switch layer to custom style using provided mesh and game object modifier
+		/// </summary>
+		/// <param name="meshModifiers">Mesh modifiers to be used in layer</param>
+		/// <param name="gameObjectModifiers">Game object modifiers to be used in layer</param>
+		public virtual void CreateCustomStyle(List<MeshModifier> meshModifiers, List<GameObjectModifier> gameObjectModifiers)
+		{
+			coreOptions.geometryType = VectorPrimitiveType.Custom;
+			coreOptions.HasChanged = true;
+			
+			MeshModifiers.Clear();
+			foreach (var meshModifier in meshModifiers)
+			{
+				MeshModifiers.Add(meshModifier);
+			}
+			foreach (var goModifier in gameObjectModifiers)
+			{
+				GoModifiers.Add(goModifier);
+			}
+
+			HasChanged = true;
+		}
+
+		/// <summary>
 		/// Disable mesh extrusion for the features in this layer.
 		/// </summary>
 		public virtual void DisableExtrusion()

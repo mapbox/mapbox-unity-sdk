@@ -1,4 +1,4 @@
-﻿using Mapbox.Unity.MeshGeneration.Modifiers;
+﻿using System.Linq;
 
 namespace Mapbox.Unity.Map
 {
@@ -69,20 +69,10 @@ namespace Mapbox.Unity.Map
 
 	}
 
-	public interface ISubLayerBehaviorModifiers
-	{
-		void AddMeshModifier(MeshModifier modifier);
-		void RemoveMeshModifier(MeshModifier modifier);
-
-		void AddGameObjectModifier(GameObjectModifier modifier);
-		void RemoveGameObjectModifier(GameObjectModifier modifier);
-	}
-
 	public interface ICustomModifierEvents
 	{
 
 	}
-
 
 	public interface IVectorSubLayer
 	{
@@ -104,41 +94,6 @@ namespace Mapbox.Unity.Map
 			_subLayerProperties = subLayerProperties;
 		}
 	}
-
-	public class SubLayerBehaviorModifiers : ISubLayerBehaviorModifiers
-	{
-		// TODO: Remove if not required. 
-		VectorSubLayerProperties _subLayerProperties;
-		public SubLayerBehaviorModifiers(VectorSubLayerProperties subLayerProperties)
-		{
-			_subLayerProperties = subLayerProperties;
-		}
-
-		public void AddGameObjectModifier(GameObjectModifier modifier)
-		{
-			_subLayerProperties.GoModifiers.Add(modifier);
-			_subLayerProperties.HasChanged = true;
-		}
-
-		public void AddMeshModifier(MeshModifier modifier)
-		{
-			_subLayerProperties.MeshModifiers.Add(modifier);
-			_subLayerProperties.HasChanged = true;
-		}
-
-		public void RemoveGameObjectModifier(GameObjectModifier modifier)
-		{
-			_subLayerProperties.GoModifiers.Remove(modifier);
-			_subLayerProperties.HasChanged = true;
-		}
-
-		public void RemoveMeshModifier(MeshModifier modifier)
-		{
-			_subLayerProperties.MeshModifiers.Remove(modifier);
-			_subLayerProperties.HasChanged = true;
-		}
-	}
-
 }
 
 
