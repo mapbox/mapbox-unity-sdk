@@ -121,15 +121,13 @@
 
 			var selectedLayerName = originalProperty.FindPropertyRelative("_selectedLayerName").stringValue;
 
-			LayerFilter layerFilter = (LayerFilter)EditorHelper.GetTargetObjectOfProperty(property);
-
-			DrawPropertyDropDown(originalProperty, property, layerFilter);
+			DrawPropertyDropDown(originalProperty, property);
 
 			EditorGUI.BeginChangeCheck();
 			filterOperatorProp.enumValueIndex = EditorGUILayout.Popup(filterOperatorProp.enumValueIndex, filterOperatorProp.enumDisplayNames, GUILayout.MaxWidth(150));
 			if (EditorGUI.EndChangeCheck())
 			{
-				layerFilter.HasChanged = true;
+				EditorHelper.CheckForModifiedProperty(property);
 			}
 
 			EditorGUI.BeginChangeCheck();
@@ -152,12 +150,12 @@
 			}
 			if (EditorGUI.EndChangeCheck())
 			{
-				layerFilter.HasChanged = true;
+				EditorHelper.CheckForModifiedProperty(property);
 			}
 
 			if (GUILayout.Button(new GUIContent(" X "), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
 			{
-				vectorFilterOptions.DeleteFilter(index);
+				vectorFilterOptions.RemoveFilter(index);
 			}
 
 			EditorGUILayout.EndHorizontal();
@@ -165,7 +163,7 @@
 			EditorGUILayout.EndVertical();
 		}
 
-		private void DrawPropertyDropDown(SerializedProperty originalProperty, SerializedProperty filterProperty, LayerFilter layerFilter)
+		private void DrawPropertyDropDown(SerializedProperty originalProperty, SerializedProperty filterProperty)
 		{
 
 			var selectedLayerName = originalProperty.FindPropertyRelative("_selectedLayerName").stringValue;
@@ -207,7 +205,7 @@
 				_propertyIndex = EditorGUILayout.Popup(_propertyIndex, _propertyNameContent, GUILayout.MaxWidth(150));
 				if (EditorGUI.EndChangeCheck())
 				{
-					layerFilter.HasChanged = true;
+					EditorHelper.CheckForModifiedProperty(filterProperty);
 				}
 
 				//set new string values based on selection
@@ -246,7 +244,7 @@
 				_propertyIndex = EditorGUILayout.Popup(_propertyIndex, _propertyNameContent, GUILayout.MaxWidth(150));
 				if (EditorGUI.EndChangeCheck())
 				{
-					layerFilter.HasChanged = true;
+					EditorHelper.CheckForModifiedProperty(filterProperty);
 				}
 
 				//set new string values based on the offset
@@ -258,7 +256,7 @@
 			filterProperty.FindPropertyRelative("Key").stringValue = parsedString;
 			if (EditorGUI.EndChangeCheck())
 			{
-				layerFilter.HasChanged = true;
+				EditorHelper.CheckForModifiedProperty(filterProperty);
 			}
 			filterProperty.FindPropertyRelative("KeyDescription").stringValue = descriptionString;
 		}

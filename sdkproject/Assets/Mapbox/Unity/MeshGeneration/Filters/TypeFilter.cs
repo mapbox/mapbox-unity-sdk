@@ -291,7 +291,7 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 	}
 
 	[Serializable]
-	public class LayerFilter : MapboxDataProperty, ISubLayerFilteringOptions
+	public class LayerFilter : MapboxDataProperty, ILayerFilter
 	{
 		[Tooltip("Name of the property to use as key. This property is case sensitive.")]
 		public string Key;
@@ -416,6 +416,78 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 		}
 
 		/// <summary>
+		/// Gets the key.
+		/// </summary>
+		/// <returns>The key.</returns>
+		public virtual string GetKey
+		{
+			get
+			{
+				return Key;
+			}
+		}
+
+		/// <summary>
+		/// Gets the type of the filter operation.
+		/// </summary>
+		/// <returns>The filter operation type.</returns>
+		public virtual LayerFilterOperationType GetFilterOperationType
+		{
+			get
+			{
+				return filterOperator;
+			}
+		}
+
+		/// <summary>
+		/// Gets the property value.
+		/// </summary>
+		/// <returns>The property value.</returns>
+		public virtual string GetPropertyValue
+		{
+			get
+			{
+				return PropertyValue;
+			}
+		}
+
+		/// <summary>
+		/// Gets the minimum value.
+		/// </summary>
+		/// <returns>The minimum value.</returns>
+		public virtual float GetNumberValue
+		{
+			get
+			{
+				return Min;
+			}
+		}
+
+		/// <summary>
+		/// Gets the minimum value.
+		/// </summary>
+		/// <returns>The minimum value.</returns>
+		public virtual float GetMinValue
+		{
+			get
+			{
+				return Min;
+			}
+		}
+
+		/// <summary>
+		/// Gets the max value.
+		/// </summary>
+		/// <returns>The max value.</returns>
+		public virtual float GetMaxValue
+		{
+			get
+			{
+				return Max;
+			}
+		}
+
+		/// <summary>
 		/// Returns true if filter key contains a given string.
 		/// </summary>
 		/// <returns><c>true</c>, if key contains was filtered, <c>false</c> otherwise.</returns>
@@ -492,7 +564,7 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 		/// <param name="value">Value.</param>
 		public virtual bool FilterNumberValueIsLessThan(float value)
 		{
-			return Min < value;
+			return Min < value;	
 		}
 
 		/// <summary>

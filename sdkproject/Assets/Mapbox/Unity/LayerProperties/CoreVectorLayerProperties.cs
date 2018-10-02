@@ -85,7 +85,7 @@
 			HasChanged = true;
 		}
 
-		public virtual LayerFilter AddStringFilterContains(string key, string property)
+		public virtual ILayerFilter AddStringFilterContains(string key, string property)
 		{
 			LayerFilter layerFilter = new LayerFilter()
 			{
@@ -98,7 +98,7 @@
 
 		}
 
-		public virtual LayerFilter AddNumericFilterEquals(string key, float value)
+		public virtual ILayerFilter AddNumericFilterEquals(string key, float value)
 		{
 			LayerFilter layerFilter = new LayerFilter()
 			{
@@ -110,7 +110,7 @@
 			return layerFilter;
 		}
 
-		public virtual LayerFilter AddNumericFilterLessThan(string key, float value)
+		public virtual ILayerFilter AddNumericFilterLessThan(string key, float value)
 		{
 			LayerFilter layerFilter = new LayerFilter()
 			{
@@ -122,7 +122,7 @@
 			return layerFilter;
 		}
 
-		public virtual LayerFilter AddNumericFilterGreaterThan(string key, float value)
+		public virtual ILayerFilter AddNumericFilterGreaterThan(string key, float value)
 		{
 			LayerFilter layerFilter = new LayerFilter()
 			{
@@ -134,7 +134,7 @@
 			return layerFilter;
 		}
 
-		public virtual LayerFilter AddNumericFilterInRange(string key, float min, float max)
+		public virtual ILayerFilter AddNumericFilterInRange(string key, float min, float max)
 		{
 			LayerFilter layerFilter = new LayerFilter()
 			{
@@ -152,7 +152,19 @@
 			AddFilterToList(new LayerFilter());
 		}
 
-		public virtual void DeleteFilter(LayerFilter layerFilter)
+		public virtual void RemoveAllFilters()
+		{
+			for (int i = 0; i < filters.Count; i++)
+			{
+				LayerFilter filter = filters[i];
+				if (filter != null)
+				{
+					RemoveFilter(filter);
+				}
+			}
+		}
+
+		public virtual void RemoveFilter(LayerFilter layerFilter)
 		{
 			layerFilter.PropertyHasChanged -= OnLayerFilterChanged;
 			if(filters.Contains(layerFilter))
@@ -162,15 +174,20 @@
 			}
 		}
 
-		public virtual void DeleteFilter(int index)
+		public virtual void RemoveFilter(ILayerFilter filter)
+		{
+			RemoveFilter((LayerFilter)filter);
+		}
+
+		public virtual void RemoveFilter(int index)
 		{
 			if (index < filters.Count && filters[index] != null)
 			{
-				DeleteFilter(filters[index]);
+				RemoveFilter(filters[index]);
 			}
 		}
 
-		public virtual LayerFilter GetFilter(int index)
+		public virtual ILayerFilter GetFilter(int index)
 		{
 			if(index < filters.Count && filters[index] != null)
 			{
@@ -179,12 +196,12 @@
 			return null;
 		}
 
-		public virtual IEnumerable<LayerFilter> GetAllFilters()
+		public virtual IEnumerable<ILayerFilter> GetAllFilters()
 		{
-			return filters.AsEnumerable();
+			return (IEnumerable<ILayerFilter>)filters.AsEnumerable();
 		}
 
-		public virtual IEnumerable<LayerFilter> GetFiltersByQuery(Func<LayerFilter, bool> query)
+		public virtual IEnumerable<ILayerFilter> GetFiltersByQuery(Func<ILayerFilter, bool> query)
 		{
 			foreach (var filter in filters)
 			{

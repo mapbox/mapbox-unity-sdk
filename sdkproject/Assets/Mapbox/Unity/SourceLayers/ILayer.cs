@@ -58,24 +58,28 @@
 
 	public interface ISubLayerFiltering
 	{
-		LayerFilter AddStringFilterContains(string key, string property);
-		LayerFilter AddNumericFilterEquals(string key, float value);
-		LayerFilter AddNumericFilterLessThan(string key, float value);
-		LayerFilter AddNumericFilterGreaterThan(string key, float value);
-		LayerFilter AddNumericFilterInRange(string key, float min, float max);
+		ILayerFilter AddStringFilterContains(string key, string property);
+		ILayerFilter AddNumericFilterEquals(string key, float value);
+		ILayerFilter AddNumericFilterLessThan(string key, float value);
+		ILayerFilter AddNumericFilterGreaterThan(string key, float value);
+		ILayerFilter AddNumericFilterInRange(string key, float min, float max);
 
-		LayerFilter GetFilter(int index);
-		void DeleteFilter(int index);
+		ILayerFilter GetFilter(int index);
 
-		IEnumerable<LayerFilter> GetAllFilters();
-		IEnumerable<LayerFilter> GetFiltersByQuery(System.Func<LayerFilter, bool> query);
+		void RemoveFilter(int index);
+		void RemoveFilter(LayerFilter filter);
+		void RemoveFilter(ILayerFilter filter);
+		void RemoveAllFilters();
+
+		IEnumerable<ILayerFilter> GetAllFilters();
+		IEnumerable<ILayerFilter> GetFiltersByQuery(System.Func<ILayerFilter, bool> query);
 
 		LayerFilterCombinerOperationType GetFilterCombinerType();
 
 		void SetFilterCombinerType(LayerFilterCombinerOperationType layerFilterCombinerOperationType);
 	}
 
-	public interface ISubLayerFilteringOptions
+	public interface ILayerFilter
 	{
 		bool FilterKeyContains(string key);
 		bool FilterKeyMatchesExact(string key);
@@ -86,6 +90,15 @@
 		bool FilterNumberValueIsGreaterThan(float value);
 		bool FilterNumberValueIsLessThan(float value);
 		bool FilterIsInRangeValueContains(float value);
+
+		string GetKey { get; }
+		LayerFilterOperationType GetFilterOperationType { get; }
+
+		string GetPropertyValue { get; }
+		float GetNumberValue { get; }
+
+		float GetMinValue { get; }
+		float GetMaxValue { get; }
 
 		void SetStringContains(string key, string property);
 		void SetNumberIsEqual(string key, float value);

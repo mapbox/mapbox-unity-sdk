@@ -42,12 +42,12 @@ public class ApiFilterTest : MonoBehaviour
 		return vectorSubLayers;
 	}
 
-	private void DebugFilterInfo(LayerFilter layerFilter)
+	private void DebugFilterInfo(ILayerFilter layerFilter)
 	{
-		Debug.Log("Key : " + layerFilter.Key);
-		Debug.Log("Operator : " + layerFilter.filterOperator.ToString());
-		Debug.Log("Property : " + layerFilter.PropertyValue);
-		Debug.Log("Min/Max : " + layerFilter.Min + ", " + layerFilter.Max);
+		Debug.Log("Key : " + layerFilter.GetKey);
+		Debug.Log("Operator : " + layerFilter.GetFilterOperationType.ToString());
+		Debug.Log("Property : " + layerFilter.GetPropertyValue);
+		Debug.Log("Min/Max : " + layerFilter.GetMinValue + ", " + layerFilter.GetMaxValue);
 	}
 
 	[ContextMenu("Check Filter ALL")]
@@ -56,7 +56,7 @@ public class ApiFilterTest : MonoBehaviour
 		VectorSubLayerProperties[] layers = GetLayers();
 		for (int i = 0; i < layers.Length; i++)
 		{
-			LayerFilter[] filters = layers[i].Filtering.GetFiltersByQuery(x => (x.FilterKeyMatchesExact(Key) && x.FilterUsesOperationType(layerFilterOperationType) && x.FilterNumberValueEquals(min))).ToArray();
+			ILayerFilter[] filters = layers[i].Filtering.GetFiltersByQuery(x => (x.FilterKeyMatchesExact(Key) && x.FilterUsesOperationType(layerFilterOperationType) && x.FilterNumberValueEquals(min))).ToArray();
 			if (filters.Length == 0)
 			{
 				continue;
@@ -64,7 +64,7 @@ public class ApiFilterTest : MonoBehaviour
 			Debug.Log(layers[i].Key);
 			for (int j = 0; j < filters.Length; j++)
 			{
-				LayerFilter layerFilter = filters[j];
+				ILayerFilter layerFilter = filters[j];
 				DebugFilterInfo(layerFilter);
 			}
 		}
@@ -76,7 +76,7 @@ public class ApiFilterTest : MonoBehaviour
 		VectorSubLayerProperties[] layers = GetLayers();
 		for (int i = 0; i < layers.Length; i++)
 		{
-			LayerFilter[] filters = layers[i].Filtering.GetFiltersByQuery(x => (x.FilterKeyMatchesExact(Key) || x.FilterUsesOperationType(layerFilterOperationType) || x.FilterNumberValueEquals(min))).ToArray();
+			ILayerFilter[] filters = layers[i].Filtering.GetFiltersByQuery(x => (x.FilterKeyMatchesExact(Key) || x.FilterUsesOperationType(layerFilterOperationType) || x.FilterNumberValueEquals(min))).ToArray();
 			if (filters.Length == 0)
 			{
 				continue;
@@ -84,7 +84,7 @@ public class ApiFilterTest : MonoBehaviour
 			Debug.Log(layers[i].Key);
 			for (int j = 0; j < filters.Length; j++)
 			{
-				LayerFilter layerFilter = filters[j];
+				ILayerFilter layerFilter = filters[j];
 				DebugFilterInfo(layerFilter);
 			}
 		}
@@ -96,7 +96,7 @@ public class ApiFilterTest : MonoBehaviour
 		VectorSubLayerProperties[] layers = GetLayers();
 		for (int i = 0; i < layers.Length; i++)
 		{
-			LayerFilter[] filters = layers[i].Filtering.GetFiltersByQuery(x => (x.FilterKeyMatchesExact(Key))).ToArray();
+			ILayerFilter[] filters = layers[i].Filtering.GetFiltersByQuery(x => (x.FilterKeyMatchesExact(Key))).ToArray();
 			if(filters.Length == 0)
 			{
 				continue;
@@ -104,7 +104,7 @@ public class ApiFilterTest : MonoBehaviour
 			Debug.Log(layers[i].Key);
 			for (int j = 0; j < filters.Length; j++)
 			{
-				LayerFilter layerFilter = filters[j];
+				ILayerFilter layerFilter = filters[j];
 				DebugFilterInfo(layerFilter);
 			}
 		}
@@ -116,7 +116,7 @@ public class ApiFilterTest : MonoBehaviour
 		VectorSubLayerProperties[] layers = GetLayers();
 		for (int i = 0; i < layers.Length; i++)
 		{
-			LayerFilter[] filters = layers[i].Filtering.GetFiltersByQuery(x => (x.FilterKeyContains(Key))).ToArray();
+			ILayerFilter[] filters = layers[i].Filtering.GetFiltersByQuery(x => (x.FilterKeyContains(Key))).ToArray();
 			if (filters.Length == 0)
 			{
 				continue;
@@ -124,7 +124,7 @@ public class ApiFilterTest : MonoBehaviour
 			Debug.Log(layers[i].Key);
 			for (int j = 0; j < filters.Length; j++)
 			{
-				LayerFilter layerFilter = filters[j];
+				ILayerFilter layerFilter = filters[j];
 				DebugFilterInfo(layerFilter);
 			}
 		}
@@ -136,7 +136,7 @@ public class ApiFilterTest : MonoBehaviour
 		VectorSubLayerProperties[] layers = GetLayers();
 		for (int i = 0; i < layers.Length; i++)
 		{
-			LayerFilter[] filters = layers[i].Filtering.GetFiltersByQuery(x => (x.FilterUsesOperationType(layerFilterOperationType))).ToArray();
+			ILayerFilter[] filters = layers[i].Filtering.GetFiltersByQuery(x => (x.FilterUsesOperationType(layerFilterOperationType))).ToArray();
 			if (filters.Length == 0)
 			{
 				continue;
@@ -144,7 +144,7 @@ public class ApiFilterTest : MonoBehaviour
 			Debug.Log(layers[i].Key);
 			for (int j = 0; j < filters.Length; j++)
 			{
-				LayerFilter layerFilter = filters[j];
+				ILayerFilter layerFilter = filters[j];
 				DebugFilterInfo(layerFilter);
 			}
 		}
@@ -156,7 +156,7 @@ public class ApiFilterTest : MonoBehaviour
 		VectorSubLayerProperties[] layers = GetLayers();
 		for (int i = 0; i < layers.Length; i++)
 		{
-			LayerFilter[] filters = layers[i].Filtering.GetFiltersByQuery(x => (x.FilterPropertyMatchesExact(property))).ToArray();
+			ILayerFilter[] filters = layers[i].Filtering.GetFiltersByQuery(x => (x.FilterPropertyMatchesExact(property))).ToArray();
 			if (filters.Length == 0)
 			{
 				continue;
@@ -164,7 +164,7 @@ public class ApiFilterTest : MonoBehaviour
 			Debug.Log(layers[i].Key);
 			for (int j = 0; j < filters.Length; j++)
 			{
-				LayerFilter layerFilter = filters[j];
+				ILayerFilter layerFilter = filters[j];
 				DebugFilterInfo(layerFilter);
 			}
 		}
@@ -176,7 +176,7 @@ public class ApiFilterTest : MonoBehaviour
 		VectorSubLayerProperties[] layers = GetLayers();
 		for (int i = 0; i < layers.Length; i++)
 		{
-			LayerFilter[] filters = layers[i].Filtering.GetFiltersByQuery(x => (x.FilterPropertyContains(property))).ToArray();
+			ILayerFilter[] filters = layers[i].Filtering.GetFiltersByQuery(x => (x.FilterPropertyContains(property))).ToArray();
 			if (filters.Length == 0)
 			{
 				continue;
@@ -184,7 +184,7 @@ public class ApiFilterTest : MonoBehaviour
 			Debug.Log(layers[i].Key);
 			for (int j = 0; j < filters.Length; j++)
 			{
-				LayerFilter layerFilter = filters[j];
+				ILayerFilter layerFilter = filters[j];
 				DebugFilterInfo(layerFilter);
 			}
 		}
@@ -196,7 +196,7 @@ public class ApiFilterTest : MonoBehaviour
 		VectorSubLayerProperties[] layers = GetLayers();
 		for (int i = 0; i < layers.Length; i++)
 		{
-			LayerFilter[] filters = layers[i].Filtering.GetFiltersByQuery(x => (x.FilterNumberValueEquals(min))).ToArray();
+			ILayerFilter[] filters = layers[i].Filtering.GetFiltersByQuery(x => (x.FilterNumberValueEquals(min))).ToArray();
 			if (filters.Length == 0)
 			{
 				continue;
@@ -204,7 +204,7 @@ public class ApiFilterTest : MonoBehaviour
 			Debug.Log(layers[i].Key);
 			for (int j = 0; j < filters.Length; j++)
 			{
-				LayerFilter layerFilter = filters[j];
+				ILayerFilter layerFilter = filters[j];
 				DebugFilterInfo(layerFilter);
 			}
 		}
@@ -216,7 +216,7 @@ public class ApiFilterTest : MonoBehaviour
 		VectorSubLayerProperties[] layers = GetLayers();
 		for (int i = 0; i < layers.Length; i++)
 		{
-			LayerFilter[] filters = layers[i].Filtering.GetFiltersByQuery(x => (x.FilterNumberValueIsLessThan(min))).ToArray();
+			ILayerFilter[] filters = layers[i].Filtering.GetFiltersByQuery(x => (x.FilterNumberValueIsLessThan(min))).ToArray();
 			if (filters.Length == 0)
 			{
 				continue;
@@ -224,7 +224,7 @@ public class ApiFilterTest : MonoBehaviour
 			Debug.Log(layers[i].Key);
 			for (int j = 0; j < filters.Length; j++)
 			{
-				LayerFilter layerFilter = filters[j];
+				ILayerFilter layerFilter = filters[j];
 				DebugFilterInfo(layerFilter);
 			}
 		}
@@ -236,7 +236,7 @@ public class ApiFilterTest : MonoBehaviour
 		VectorSubLayerProperties[] layers = GetLayers();
 		for (int i = 0; i < layers.Length; i++)
 		{
-			LayerFilter[] filters = layers[i].Filtering.GetFiltersByQuery(x => (x.FilterNumberValueIsGreaterThan(min))).ToArray();
+			ILayerFilter[] filters = layers[i].Filtering.GetFiltersByQuery(x => (x.FilterNumberValueIsGreaterThan(min))).ToArray();
 			if (filters.Length == 0)
 			{
 				continue;
@@ -244,7 +244,7 @@ public class ApiFilterTest : MonoBehaviour
 			Debug.Log(layers[i].Key);
 			for (int j = 0; j < filters.Length; j++)
 			{
-				LayerFilter layerFilter = filters[j];
+				ILayerFilter layerFilter = filters[j];
 				DebugFilterInfo(layerFilter);
 			}
 		}
@@ -256,10 +256,10 @@ public class ApiFilterTest : MonoBehaviour
 		VectorSubLayerProperties[] layers = GetLayers();
 		for (int i = 0; i < layers.Length; i++)
 		{
-			LayerFilter[] filters = layers[i].Filtering.GetAllFilters().ToArray();
+			ILayerFilter[] filters = layers[i].Filtering.GetAllFilters().ToArray();
 			if (filters.Length != 0)
 			{
-				LayerFilter layerFilter = filters[i];
+				ILayerFilter layerFilter = filters[i];
 				layerFilter.SetStringContains(Key, property);
 			}
 		}
@@ -271,10 +271,10 @@ public class ApiFilterTest : MonoBehaviour
 		VectorSubLayerProperties[] layers = GetLayers();
 		for (int i = 0; i < layers.Length; i++)
 		{
-			LayerFilter[] filters = layers[i].Filtering.GetAllFilters().ToArray();
+			ILayerFilter[] filters = layers[i].Filtering.GetAllFilters().ToArray();
 			if (filters.Length != 0)
 			{
-				LayerFilter layerFilter = filters[i]; 
+				ILayerFilter layerFilter = filters[i]; 
 				layerFilter.SetNumberIsEqual(Key, min);
 			}
 		}
@@ -286,10 +286,10 @@ public class ApiFilterTest : MonoBehaviour
 		VectorSubLayerProperties[] layers = GetLayers();
 		for (int i = 0; i < layers.Length; i++)
 		{
-			LayerFilter[] filters = layers[i].Filtering.GetAllFilters().ToArray();
+			ILayerFilter[] filters = layers[i].Filtering.GetAllFilters().ToArray();
 			if (filters.Length != 0)
 			{
-				LayerFilter layerFilter = filters[i]; 
+				ILayerFilter layerFilter = filters[i]; 
 				layerFilter.SetNumberIsLessThan(Key, min);
 			}
 		}
@@ -301,10 +301,10 @@ public class ApiFilterTest : MonoBehaviour
 		VectorSubLayerProperties[] layers = GetLayers();
 		for (int i = 0; i < layers.Length; i++)
 		{
-			LayerFilter[] filters = layers[i].Filtering.GetAllFilters().ToArray();
+			ILayerFilter[] filters = layers[i].Filtering.GetAllFilters().ToArray();
 			if (filters.Length != 0)
 			{
-				LayerFilter layerFilter = filters[i];
+				ILayerFilter layerFilter = filters[i];
 				layerFilter.SetNumberIsGreaterThan(Key, min);
 			}
 		}
@@ -316,10 +316,10 @@ public class ApiFilterTest : MonoBehaviour
 		VectorSubLayerProperties[] layers = GetLayers();
 		for (int i = 0; i < layers.Length; i++)
 		{
-			LayerFilter[] filters = layers[i].Filtering.GetAllFilters().ToArray();
+			ILayerFilter[] filters = layers[i].Filtering.GetAllFilters().ToArray();
 			if (filters.Length != 0)
 			{
-				LayerFilter layerFilter = filters[i];
+				ILayerFilter layerFilter = filters[i];
 				layerFilter.SetNumberIsInRange(Key, min, max);
 			}
 		}
