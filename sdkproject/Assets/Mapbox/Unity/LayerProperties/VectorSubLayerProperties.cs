@@ -1,4 +1,6 @@
-﻿namespace Mapbox.Unity.Map
+﻿using Mapbox.Unity.SourceLayers;
+
+namespace Mapbox.Unity.Map
 {
 	using System;
 	using System.Collections.Generic;
@@ -120,6 +122,8 @@
 			return materialOptions.style == style;
 		}
 
+		#region Setters
+
 		/// <summary>
 		/// Sets the active.
 		/// </summary>
@@ -140,239 +144,235 @@
 			materialOptions.HasChanged = true;
 		}
 
-		#region Feature Model Api Methods
 
 		/// <summary>
-		/// Change the primtive type of the feature which will be used to decide
-		/// what type of mesh operations features will require.
-		/// In example, roads are generally visualized as lines and buildings are
-		/// generally visualized as polygons.
+		/// Sets the layer to use the realistic style.
 		/// </summary>
-		/// <param name="type">Primitive type of the featues in the layer.</param>
-		public virtual void SetPrimitiveType(VectorPrimitiveType type)
+		public virtual void SetRealisticStyle()
 		{
-			if (coreOptions.geometryType != type)
-			{
-				coreOptions.geometryType = type;
-				coreOptions.HasChanged = true;
-			}
+			materialOptions.style = StyleTypes.Realistic;
+			materialOptions.HasChanged = true;
 		}
 
 		/// <summary>
-		/// Disable mesh extrusion for the features in this layer.
+		/// Sets the layer to use the fantasy style.
 		/// </summary>
-		public virtual void DisableExtrusion()
+		public virtual void SetFantasyStyle()
 		{
-			if (extrusionOptions.extrusionType != ExtrusionType.None)
-			{
-				extrusionOptions.extrusionType = ExtrusionType.None;
-				extrusionOptions.HasChanged = true;
-			}
+			materialOptions.style = StyleTypes.Fantasy;
+			materialOptions.HasChanged = true;
 		}
 
 		/// <summary>
-		/// Sets the height value to be used for Absolute Height extrusion type.
-		/// Same field is used for the maximum height of Range Extrusion type so beware
-		/// of possible side effects.
+		/// Sets the type of the simple style palette.
 		/// </summary>
-		/// <param name="absoluteHeight">Fixed height value for all features in the layer.</param>
-		public virtual void SetAbsoluteHeight(float absoluteHeight)
+		/// <param name="palette">Palette.</param>
+		public virtual void SetSimpleStylePaletteType(SamplePalettes palette)
 		{
-			if (extrusionOptions.maximumHeight != absoluteHeight)
-			{
-				extrusionOptions.maximumHeight = absoluteHeight;
-				extrusionOptions.HasChanged = true;
-			}
+			materialOptions.samplePalettes = palette;
+			materialOptions.HasChanged = true;
 		}
 
 		/// <summary>
-		/// Change the minimum and maximum height values used for Range Height option.
-		/// Maximum height is also used for Absolute Height option so beware of possible side
-		/// effects.
+		/// Sets the light style opacity.
 		/// </summary>
-		/// <param name="minHeight">Lower bound to be used for extrusion</param>
-		/// <param name="maxHeight">Top bound to be used for extrusion</param>
-		public virtual void SetHeightRange(float minHeight, float maxHeight)
+		/// <param name="opacity">Opacity.</param>
+		public virtual void SetLightStyleOpacity(float opacity)
 		{
-			if (extrusionOptions.minimumHeight != minHeight ||
-				extrusionOptions.maximumHeight != maxHeight)
-			{
-				extrusionOptions.minimumHeight = minHeight;
-				extrusionOptions.maximumHeight = maxHeight;
-				extrusionOptions.HasChanged = true;
-			}
+			materialOptions.lightStyleOpacity = Mathf.Clamp(opacity, 0.0f, 1.0f);
+			materialOptions.HasChanged = true;
 		}
 
 		/// <summary>
-		/// Sets the extrusion multiplier which will be used only in the Y axis (height).
+		/// Sets the dark style opacity.
 		/// </summary>
-		/// <param name="multiplier">Multiplier value.</param>
-		public virtual void SetExtrusionMultiplier(float multiplier)
+		/// <param name="opacity">Opacity.</param>
+		public virtual void SetDarkStyleOpacity(float opacity)
 		{
-			if (extrusionOptions.extrusionScaleFactor != multiplier)
-			{
-				extrusionOptions.extrusionScaleFactor = multiplier;
-				extrusionOptions.HasChanged = true;
-			}
+			materialOptions.darkStyleOpacity = Mathf.Clamp(opacity, 0.0f, 1.0f);
+			materialOptions.HasChanged = true;
 		}
 
 		/// <summary>
-		/// Enable terrain snapping for features which sets vertices to terrain
-		/// elevation before extrusion.
+		/// Sets the color of the color style.
 		/// </summary>
-		/// <param name="isEnabled">Enabled terrain snapping</param>
-		public virtual void EnableSnapingTerrain(bool isEnabled)
+		/// <param name="color">Color.</param>
+		public virtual void SetColorStyleColor(Color color)
 		{
-			if (coreOptions.snapToTerrain != isEnabled)
-			{
-				coreOptions.snapToTerrain = isEnabled;
-				coreOptions.HasChanged = true;
-			}
+			materialOptions.colorStyleColor = color;
+			materialOptions.HasChanged = true;
 		}
 
 		/// <summary>
-		/// Enable combining individual features meshes into one to minimize gameobject
-		/// count and draw calls.
+		/// Sets the texturing (UV) type of the custom style.
 		/// </summary>
-		/// <param name="isEnabled"></param>
-		public virtual void EnableCombiningMeshes(bool isEnabled)
+		/// <param name="uvMapType">Uv map type.</param>
+		public virtual void SetCustomTexturingType(UvMapType uvMapType)
 		{
-			if (coreOptions.combineMeshes != isEnabled)
-			{
-				coreOptions.combineMeshes = isEnabled;
-				coreOptions.HasChanged = true;
-			}
+			materialOptions.texturingType = uvMapType;
+			materialOptions.HasChanged = true;
 		}
 
 		/// <summary>
-		/// Enable/Disable feature colliders and sets the type of colliders to use.
+		/// Sets the custom style top material.
 		/// </summary>
-		/// <param name="colliderType">Type of the collider to use on features.</param>
-		public virtual void SetFeatureCollider(ColliderType colliderType)
+		/// <param name="material">Material.</param>
+		public virtual void SetCustomTopMaterial(Material material)
 		{
-			if (colliderOptions.colliderType != colliderType)
-			{
-				colliderOptions.colliderType = colliderType;
-				colliderOptions.HasChanged = true;
-			}
+			materialOptions.materials[0].Materials[0] = material;
+			materialOptions.HasChanged = true;
 		}
 
 		/// <summary>
-		/// Changes extrusion type to "Absolute height" and extrudes all features by
-		/// the given fixed value.
+		/// Sets the custom style side material.
 		/// </summary>
-		/// <param name="extrusionGeometryType">Option to create top and side polygons after extrusion.</param>
-		/// <param name="height">Extrusion value</param>
-		/// <param name="extrusionScaleFactor">Height multiplier</param>
-		public virtual void EnableAbsoluteExtrusion(ExtrusionGeometryType extrusionGeometryType, float height, float extrusionScaleFactor = 1)
+		/// <param name="material">Material.</param>
+		public virtual void SetCustomSideMaterial(Material material)
 		{
-			if (extrusionOptions.extrusionType != ExtrusionType.AbsoluteHeight ||
-				extrusionOptions.extrusionGeometryType != extrusionGeometryType ||
-				extrusionOptions.maximumHeight != height ||
-				extrusionOptions.extrusionScaleFactor != extrusionScaleFactor)
-			{
-				extrusionOptions.extrusionType = ExtrusionType.AbsoluteHeight;
-				extrusionOptions.extrusionGeometryType = extrusionGeometryType;
-				extrusionOptions.maximumHeight = height;
-				extrusionOptions.extrusionScaleFactor = extrusionScaleFactor;
-				extrusionOptions.HasChanged = true;
-			}
+			materialOptions.materials[1].Materials[0] = material;
+			materialOptions.HasChanged = true;
 		}
 
 		/// <summary>
-		/// Changes extrusion type to "Property" and extrudes all features by
-		/// the choosen property's value.
+		/// Sets the custom style top and side materials.
 		/// </summary>
-		/// <param name="extrusionGeometryType">Option to create top and side polygons after extrusion.</param>
-		/// <param name="propertyName">Name of the property to use for extrusion</param>
-		/// <param name="extrusionScaleFactor">Height multiplier</param>
-		public virtual void EnablePropertyExtrusion(ExtrusionGeometryType extrusionGeometryType, string propertyName = "height", float extrusionScaleFactor = 1)
+		/// <param name="topMaterial">Top material.</param>
+		/// <param name="sideMaterial">Side material.</param>
+		public virtual void SetCustomMaterials(Material topMaterial, Material sideMaterial)
 		{
-			if (extrusionOptions.extrusionType != ExtrusionType.PropertyHeight ||
-				extrusionOptions.extrusionGeometryType != extrusionGeometryType ||
-				extrusionOptions.propertyName != propertyName ||
-				extrusionOptions.extrusionScaleFactor != extrusionScaleFactor)
-			{
-				extrusionOptions.extrusionType = ExtrusionType.PropertyHeight;
-				extrusionOptions.extrusionGeometryType = extrusionGeometryType;
-				extrusionOptions.propertyName = propertyName;
-				extrusionOptions.extrusionScaleFactor = extrusionScaleFactor;
-				extrusionOptions.HasChanged = true;
-			}
+			materialOptions.materials[0].Materials[0] = topMaterial;
+			materialOptions.materials[1].Materials[0] = sideMaterial;
+			materialOptions.HasChanged = true;
 		}
 
 		/// <summary>
-		/// Changes extrusion type to "Minimum Height" and extrudes all features by
-		/// the choosen property's value such that all vertices (roof) will be
-		/// flat at the lowest vertex elevation (after terrain elevation taken into account).
+		/// Sets the custom style uv atlas.
 		/// </summary>
-		/// <param name="extrusionGeometryType">Option to create top and side polygons after extrusion.</param>
-		/// <param name="propertyName">Name of the property to use for extrusion</param>
-		/// <param name="extrusionScaleFactor">Height multiplier</param>
-		public virtual void EnableMinExtrusion(ExtrusionGeometryType extrusionGeometryType, string propertyName = "height", float extrusionScaleFactor = 1)
+		/// <param name="atlas">Atlas.</param>
+		public virtual void SetCustomUvAtlas(AtlasInfo atlas)
 		{
-			if (extrusionOptions.extrusionType != ExtrusionType.MinHeight ||
-				extrusionOptions.extrusionGeometryType != extrusionGeometryType ||
-				extrusionOptions.propertyName != propertyName ||
-				extrusionOptions.extrusionScaleFactor != extrusionScaleFactor)
-			{
-				extrusionOptions.extrusionType = ExtrusionType.MinHeight;
-				extrusionOptions.extrusionGeometryType = extrusionGeometryType;
-				extrusionOptions.propertyName = propertyName;
-				extrusionOptions.extrusionScaleFactor = extrusionScaleFactor;
-				extrusionOptions.HasChanged = true;
-			}
+			materialOptions.atlasInfo = atlas;
+			materialOptions.HasChanged = true;
 		}
 
 		/// <summary>
-		/// Changes extrusion type to "Range Height" and extrudes all features by
-		/// the choosen property's value such that all vertices (roof) will be
-		/// flat at the highest vertex elevation (after terrain elevation taken into account).
+		/// Sets the custom style color palette.
 		/// </summary>
-		/// <param name="extrusionGeometryType">Option to create top and side polygons after extrusion.</param>
-		/// <param name="propertyName">Name of the property to use for extrusion</param>
-		/// <param name="extrusionScaleFactor">Height multiplier</param>
-		public virtual void EnableMaxExtrusion(ExtrusionGeometryType extrusionGeometryType, string propertyName = "height", float extrusionScaleFactor = 1)
+		/// <param name="palette">Palette.</param>
+		public virtual void SetCustomColorPalette(ScriptablePalette palette)
 		{
-			if (extrusionOptions.extrusionType != ExtrusionType.MaxHeight ||
-				extrusionOptions.extrusionGeometryType != extrusionGeometryType ||
-				extrusionOptions.propertyName != propertyName ||
-				extrusionOptions.extrusionScaleFactor != extrusionScaleFactor)
-			{
-				extrusionOptions.extrusionType = ExtrusionType.MaxHeight;
-				extrusionOptions.extrusionGeometryType = extrusionGeometryType;
-				extrusionOptions.propertyName = propertyName;
-				extrusionOptions.extrusionScaleFactor = extrusionScaleFactor;
-				extrusionOptions.HasChanged = true;
-			}
+			materialOptions.colorPalette = palette;
+			materialOptions.HasChanged = true;
 		}
 
-		/// /// <summary>
-		/// Changes extrusion type to "Minimum Height" and extrudes all features by
-		/// the choosen property's value such that they'll be in provided range.
-		/// Lower values will be increase to Minimum Height and higher values will
-		/// be lowered to Maximum height.
+		/// <summary>
+		/// Sets the custom style assets using a CustomStyleBundle object.
 		/// </summary>
-		/// <param name="extrusionGeometryType">Option to create top and side polygons after extrusion.</param>
-		/// <param name="minHeight">Lower bound to be used for extrusion</param>
-		/// <param name="maxHeight">Top bound to be used for extrusion</param>
-		/// <param name="extrusionScaleFactor">Height multiplier</param>
-		public virtual void EnableRangeExtrusion(ExtrusionGeometryType extrusionGeometryType, float minHeight, float maxHeight, float extrusionScaleFactor = 1)
+		/// <param name="customStyleBundle">Custom style bundle.</param>
+		public virtual void SetCustomStyleAssets(CustomStyleBundle customStyleBundle)
 		{
-			if (extrusionOptions.extrusionType != ExtrusionType.RangeHeight ||
-				extrusionOptions.extrusionGeometryType != extrusionGeometryType ||
-				extrusionOptions.minimumHeight != minHeight ||
-				extrusionOptions.maximumHeight != maxHeight ||
-				extrusionOptions.extrusionScaleFactor != extrusionScaleFactor)
-			{
-				extrusionOptions.extrusionType = ExtrusionType.RangeHeight;
-				extrusionOptions.extrusionGeometryType = extrusionGeometryType;
-				extrusionOptions.minimumHeight = minHeight;
-				extrusionOptions.maximumHeight = maxHeight;
-				extrusionOptions.extrusionScaleFactor = extrusionScaleFactor;
-				extrusionOptions.HasChanged = true;
-			}
+			materialOptions.materials[0].Materials[0] = (customStyleBundle.sideMaterial != null) ? customStyleBundle.sideMaterial : materialOptions.materials[0].Materials[0];
+			materialOptions.materials[1].Materials[0] = (customStyleBundle.topMaterial != null) ? customStyleBundle.topMaterial : materialOptions.materials[1].Materials[0];
+			materialOptions.atlasInfo = (customStyleBundle.atlasInfo != null) ? customStyleBundle.atlasInfo : materialOptions.atlasInfo;
+			materialOptions.colorPalette = (customStyleBundle.colorPalette != null) ? customStyleBundle.colorPalette : materialOptions.colorPalette;
+			materialOptions.HasChanged = true;
 		}
+
 		#endregion
+
+		#region Getters
+
+		/// <summary>
+		/// Gets the type of style used in the layer.
+		/// </summary>
+		/// <returns>The style type.</returns>
+		public virtual StyleTypes GetStyleType()
+		{
+			return materialOptions.style;
+		}
+
+		/// <summary>
+		/// Gets the type of simple style palette used in the layer.
+		/// </summary>
+		/// <returns>The simple style palette type.</returns>
+		public virtual SamplePalettes GetSimpleStylePaletteType()
+		{
+			return materialOptions.samplePalettes;
+		}
+
+		/// <summary>
+		/// Gets the light style opacity.
+		/// </summary>
+		/// <returns>The light style opacity.</returns>
+		public virtual float GetLightStyleOpacity()
+		{
+			return materialOptions.lightStyleOpacity;
+		}
+
+		/// <summary>
+		/// Gets the dark style opacity.
+		/// </summary>
+		/// <returns>The dark style opacity.</returns>
+		public virtual float GetDarkStyleOpacity()
+		{
+			return materialOptions.darkStyleOpacity;
+		}
+
+		/// <summary>
+		/// Gets the color of the color style.
+		/// </summary>
+		/// <returns>The color style color.</returns>
+		public virtual Color GetColorStyleColor()
+		{
+			return materialOptions.colorStyleColor;
+		}
+
+		/// <summary>
+		/// Gets the type of the custom style texturing.
+		/// </summary>
+		/// <returns>The custom texturing type.</returns>
+		public virtual UvMapType GetTexturingType()
+		{
+			return materialOptions.texturingType;
+		}
+
+		/// <summary>
+		/// Gets the custom top material.
+		/// </summary>
+		/// <returns>The custom top material.</returns>
+		public virtual Material GetTopMaterial()
+		{
+			return materialOptions.materials[0].Materials[0];
+		}
+
+		/// <summary>
+		/// Gets the custom side material.
+		/// </summary>
+		/// <returns>The custom side material.</returns>
+		public virtual Material GetSideMaterial()
+		{
+			return materialOptions.materials[1].Materials[0];
+		}
+
+		/// <summary>
+		/// Gets the custom uv atlas.
+		/// </summary>
+		/// <returns>The custom uv atlas.</returns>
+		public virtual AtlasInfo GetUvAtlas()
+		{
+			return materialOptions.atlasInfo;
+		}
+
+		/// <summary>
+		/// Gets the custom color palette.
+		/// </summary>
+		/// <returns>The custom color palette.</returns>
+		public virtual ScriptablePalette GetColorPalette()
+		{
+			return materialOptions.colorPalette;
+		}
+
+		#endregion
+
 	}
 }

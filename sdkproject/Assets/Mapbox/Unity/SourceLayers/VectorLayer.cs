@@ -43,7 +43,7 @@ namespace Mapbox.Unity.Map
 				return (_layerProperty.sourceType != VectorSourceType.None);
 			}
 		}
-		public string LayerSource
+		public string LayerSourceId
 		{
 			get
 			{
@@ -105,12 +105,12 @@ namespace Mapbox.Unity.Map
 			if (layerUpdateArgs.property is PrefabItemOptions)
 			{
 				layerUpdateArgs.visualizer =
-					_vectorTileFactory.AddPOIVectorLayerVisualizer((PrefabItemOptions) layerUpdateArgs.property);
+					_vectorTileFactory.AddPOIVectorLayerVisualizer((PrefabItemOptions)layerUpdateArgs.property);
 			}
 			else if (layerUpdateArgs.property is VectorSubLayerProperties)
 			{
 				layerUpdateArgs.visualizer =
-					_vectorTileFactory.AddVectorLayerVisualizer((VectorSubLayerProperties) layerUpdateArgs.property);
+					_vectorTileFactory.AddVectorLayerVisualizer((VectorSubLayerProperties)layerUpdateArgs.property);
 			}
 
 			layerUpdateArgs.factory = _vectorTileFactory;
@@ -215,7 +215,7 @@ namespace Mapbox.Unity.Map
 		public virtual void EnableCoroutines(bool isEnabled, int entityPerCoroutine = 20)
 		{
 			if (_layerProperty.performanceOptions.isEnabled != isEnabled ||
-			    _layerProperty.performanceOptions.entityPerCoroutine != entityPerCoroutine)
+				_layerProperty.performanceOptions.entityPerCoroutine != entityPerCoroutine)
 			{
 				_layerProperty.performanceOptions.isEnabled = isEnabled;
 				_layerProperty.performanceOptions.entityPerCoroutine = entityPerCoroutine;
@@ -234,7 +234,7 @@ namespace Mapbox.Unity.Map
 		private void CreatePrefabLayer(PrefabItemOptions item)
 		{
 			if (LayerProperty.sourceType == VectorSourceType.None
-			    || !LayerProperty.sourceOptions.Id.Contains(MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id))
+				|| !LayerProperty.sourceOptions.Id.Contains(MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id))
 			{
 				Debug.LogError("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the list of vector data sources");
 				return;
@@ -379,7 +379,7 @@ namespace Mapbox.Unity.Map
 			}
 
 			_layerProperty.vectorSubLayers.Add(subLayerProperties);
-			_layerProperty.OnSubLayerPropertyAdded(new VectorLayerUpdateArgs {property = _layerProperty.vectorSubLayers.Last()});
+			_layerProperty.OnSubLayerPropertyAdded(new VectorLayerUpdateArgs { property = _layerProperty.vectorSubLayers.Last() });
 		}
 
 		public virtual IEnumerable<VectorSubLayerProperties> GetAllFeatureLayers()
@@ -465,14 +465,14 @@ namespace Mapbox.Unity.Map
 			if (layerToRemove != null)
 			{
 				//vectorSubLayers.Remove(layerToRemove);
-				_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs {property = layerToRemove});
+				_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = layerToRemove });
 			}
 		}
 
 		public virtual void RemoveFeatureLayer(VectorSubLayerProperties layer)
 		{
 			_layerProperty.vectorSubLayers.Remove(layer);
-			_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs {property = layer});
+			_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = layer });
 		}
 
 		// POI LAYER OPERATIONS
@@ -485,7 +485,7 @@ namespace Mapbox.Unity.Map
 			}
 
 			_layerProperty.locationPrefabList.Add(poiLayerProperties);
-			_layerProperty.OnSubLayerPropertyAdded(new VectorLayerUpdateArgs {property = _layerProperty.locationPrefabList.Last()});
+			_layerProperty.OnSubLayerPropertyAdded(new VectorLayerUpdateArgs { property = _layerProperty.locationPrefabList.Last() });
 		}
 
 		public virtual IEnumerable<PrefabItemOptions> GetAllPoiLayers()
@@ -538,14 +538,14 @@ namespace Mapbox.Unity.Map
 			if (layerToRemove != null)
 			{
 				//vectorSubLayers.Remove(layerToRemove);
-				_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs {property = layerToRemove});
+				_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = layerToRemove });
 			}
 		}
 
 		public virtual void RemovePoiLayer(PrefabItemOptions layer)
 		{
 			_layerProperty.locationPrefabList.Remove(layer);
-			_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs {property = layer});
+			_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = layer });
 		}
 
 		#endregion

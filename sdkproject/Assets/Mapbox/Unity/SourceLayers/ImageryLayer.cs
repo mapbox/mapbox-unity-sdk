@@ -39,7 +39,7 @@
 			}
 		}
 
-		public string LayerSource
+		public string LayerSourceId
 		{
 			get
 			{
@@ -52,6 +52,14 @@
 					_layerProperty.sourceOptions.Id = value;
 					_layerProperty.HasChanged = true;
 				}
+			}
+		}
+
+		public ImagerySourceType LayerSource
+		{
+			get
+			{
+				return _layerProperty.sourceType;
 			}
 		}
 
@@ -142,7 +150,7 @@
 		/// Sets the data source for the image factory.
 		/// </summary>
 		/// <param name="imageSource"></param>
-		public void SetLayerSource(ImagerySourceType imageSource)
+		public virtual void SetLayerSource(ImagerySourceType imageSource)
 		{
 			if (imageSource != ImagerySourceType.Custom && imageSource != ImagerySourceType.None)
 			{
@@ -160,7 +168,7 @@
 		/// Enables high quality images for selected image factory source.
 		/// </summary>
 		/// <param name="useRetina"></param>
-		public void UseRetina(bool useRetina)
+		public virtual void UseRetina(bool useRetina)
 		{
 			if (_layerProperty.rasterOptions.useRetina != useRetina)
 			{
@@ -173,7 +181,7 @@
 		/// Enable Texture2D compression for image factory outputs.
 		/// </summary>
 		/// <param name="useCompression"></param>
-		public void UseCompression(bool useCompression)
+		public virtual void UseCompression(bool useCompression)
 		{
 			if (_layerProperty.rasterOptions.useCompression != useCompression)
 			{
@@ -186,7 +194,7 @@
 		/// Enable Texture2D MipMap option for image factory outputs.
 		/// </summary>
 		/// <param name="useMipMap"></param>
-		public void UseMipMap(bool useMipMap)
+		public virtual void UseMipMap(bool useMipMap)
 		{
 			if (_layerProperty.rasterOptions.useMipMap != useMipMap)
 			{
@@ -202,7 +210,7 @@
 		/// <param name="useRetina">Enable/Disable high quality imagery.</param>
 		/// <param name="useCompression">Enable/Disable Unity3d Texture2d image compression.</param>
 		/// <param name="useMipMap">Enable/Disable Unity3d Texture2d image mipmapping.</param>
-		public void SetProperties(ImagerySourceType imageSource ,bool useRetina,bool useCompression ,bool useMipMap)
+		public virtual void SetProperties(ImagerySourceType imageSource, bool useRetina, bool useCompression, bool useMipMap)
 		{
 			if (imageSource != ImagerySourceType.Custom && imageSource != ImagerySourceType.None)
 			{
@@ -212,8 +220,8 @@
 			}
 
 			if (_layerProperty.rasterOptions.useRetina != useRetina ||
-			    _layerProperty.rasterOptions.useCompression != useCompression ||
-			    _layerProperty.rasterOptions.useMipMap != useMipMap)
+				_layerProperty.rasterOptions.useCompression != useCompression ||
+				_layerProperty.rasterOptions.useMipMap != useMipMap)
 			{
 				_layerProperty.rasterOptions.useRetina = useRetina;
 				_layerProperty.rasterOptions.useCompression = useCompression;
