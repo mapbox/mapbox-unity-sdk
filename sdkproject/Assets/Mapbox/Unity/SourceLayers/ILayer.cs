@@ -58,8 +58,11 @@
 
 	public interface ISubLayerFiltering
 	{
-		void AddFilter(LayerFilterOperationType filterOperation = LayerFilterOperationType.Contains);
-		void AddFilter(LayerFilterBundle layerFilterBundle);
+		LayerFilter AddStringFilterContains(string key, string property);
+		LayerFilter AddNumericFilterEquals(string key, float value);
+		LayerFilter AddNumericFilterLessThan(string key, float value);
+		LayerFilter AddNumericFilterGreaterThan(string key, float value);
+		LayerFilter AddNumericFilterInRange(string key, float min, float max);
 
 		LayerFilter GetFilter(int index);
 		void DeleteFilter(int index);
@@ -84,13 +87,12 @@
 		bool FilterNumberValueIsLessThan(float value);
 		bool FilterIsInRangeValueContains(float value);
 
-		void SetKey(string key = "");
-		void SetFilterOperationType(LayerFilterOperationType layerFilterOperationType);
-		void SetContains(string property = "");
-		void SetIsEqual(float? value = null);
-		void SetIsLessThan(float? value = null);
-		void SetIsGreaterThan(float? value = null);
-		void SetIsInRange(float? min = null, float? max = null);
+		void SetStringContains(string key, string property);
+		void SetNumberIsEqual(string key, float value);
+		void SetNumberIsLessThan(string key, float value);
+		void SetNumberIsGreaterThan(string key, float value);
+		void SetNumberIsInRange(string key, float min, float max);
+
 	}
 
 	public interface ISubLayerModeling :

@@ -26,7 +26,6 @@ public class ApiFilterTest : MonoBehaviour
 	void Start()
 	{
 		_abstractMap = FindObjectOfType<AbstractMap>();
-		//_layers = _abstractMap.VectorData.GetAllFeatureLayers().ToArray();
 	}
 
 	private VectorSubLayerProperties[] GetLayers()
@@ -49,36 +48,6 @@ public class ApiFilterTest : MonoBehaviour
 		Debug.Log("Operator : " + layerFilter.filterOperator.ToString());
 		Debug.Log("Property : " + layerFilter.PropertyValue);
 		Debug.Log("Min/Max : " + layerFilter.Min + ", " + layerFilter.Max);
-	}
-
-	[ContextMenu("Add Filter")]
-	public void AddFilters()
-	{
-		VectorSubLayerProperties[] layers = GetLayers();
-		for (int i = 0; i < layers.Length; i++)
-		{
-			VectorSubLayerProperties vectorSubLayerProperties = layers[i];
-			vectorSubLayerProperties.Filtering.AddFilter();
-		}
-	}
-
-	[ContextMenu("Add Filter With Everything")]
-	public void AddFiltersWithEverything()
-	{
-		VectorSubLayerProperties[] layers = GetLayers();
-		for (int i = 0; i < layers.Length; i++)
-		{
-			VectorSubLayerProperties vectorSubLayerProperties = layers[i];
-			LayerFilterBundle layerFilterBundle = new LayerFilterBundle()
-			{
-				key = Key,
-				layerFilterOperationType = layerFilterOperationType,
-				propertyValue = property,
-				min = min,
-				max = max
-			};
-			vectorSubLayerProperties.Filtering.AddFilter(layerFilterBundle);
-		}
 	}
 
 	[ContextMenu("Check Filter ALL")]
@@ -281,8 +250,8 @@ public class ApiFilterTest : MonoBehaviour
 		}
 	}
 
-	[ContextMenu("Set Filter Keys")]
-	public void SetFilterKeys()
+	[ContextMenu("Set String Contains")]
+	public void SetStringContains()
 	{
 		VectorSubLayerProperties[] layers = GetLayers();
 		for (int i = 0; i < layers.Length; i++)
@@ -291,13 +260,13 @@ public class ApiFilterTest : MonoBehaviour
 			if (filters.Length != 0)
 			{
 				LayerFilter layerFilter = filters[i];
-				layerFilter.SetKey(Key);
+				layerFilter.SetStringContains(Key, property);
 			}
 		}
 	}
 
-	[ContextMenu("Set Filter Operators")]
-	public void SetFilterOperators()
+	[ContextMenu("Set Number Is Equal")]
+	public void SetNumberIsEqual()
 	{
 		VectorSubLayerProperties[] layers = GetLayers();
 		for (int i = 0; i < layers.Length; i++)
@@ -306,13 +275,28 @@ public class ApiFilterTest : MonoBehaviour
 			if (filters.Length != 0)
 			{
 				LayerFilter layerFilter = filters[i]; 
-				layerFilter.SetFilterOperationType(layerFilterOperationType);
+				layerFilter.SetNumberIsEqual(Key, min);
 			}
 		}
 	}
 
-	[ContextMenu("Set Filter Equals")]
-	public void SetFilterEquals()
+	[ContextMenu("Set Number Is Less Than")]
+	public void SetNumberIsLessThan()
+	{
+		VectorSubLayerProperties[] layers = GetLayers();
+		for (int i = 0; i < layers.Length; i++)
+		{
+			LayerFilter[] filters = layers[i].Filtering.GetAllFilters().ToArray();
+			if (filters.Length != 0)
+			{
+				LayerFilter layerFilter = filters[i]; 
+				layerFilter.SetNumberIsLessThan(Key, min);
+			}
+		}
+	}
+
+	[ContextMenu("Set Number Is Greater Than")]
+	public void SetNumberIsGreaterThan()
 	{
 		VectorSubLayerProperties[] layers = GetLayers();
 		for (int i = 0; i < layers.Length; i++)
@@ -321,13 +305,13 @@ public class ApiFilterTest : MonoBehaviour
 			if (filters.Length != 0)
 			{
 				LayerFilter layerFilter = filters[i];
-				layerFilter.SetIsEqual(min);
+				layerFilter.SetNumberIsGreaterThan(Key, min);
 			}
 		}
 	}
 
-	[ContextMenu("Set Filter Less Than")]
-	public void SetFilterLessThan()
+	[ContextMenu("Set Number Is In Range")]
+	public void SetNumberIsInRange()
 	{
 		VectorSubLayerProperties[] layers = GetLayers();
 		for (int i = 0; i < layers.Length; i++)
@@ -336,38 +320,48 @@ public class ApiFilterTest : MonoBehaviour
 			if (filters.Length != 0)
 			{
 				LayerFilter layerFilter = filters[i];
-				layerFilter.SetIsLessThan(min);
+				layerFilter.SetNumberIsInRange(Key, min, max);
 			}
 		}
 	}
 
-	[ContextMenu("Set Filter Greater Than")]
-	public void SetFilterGreaterThan()
+	[ContextMenu("Add String Filter Contains")]
+	public void AddStringFilterContains()
 	{
 		VectorSubLayerProperties[] layers = GetLayers();
 		for (int i = 0; i < layers.Length; i++)
 		{
-			LayerFilter[] filters = layers[i].Filtering.GetAllFilters().ToArray();
-			if (filters.Length != 0)
-			{
-				LayerFilter layerFilter = filters[i];
-				layerFilter.SetIsGreaterThan(min);
-			}
+			layers[i].Filtering.AddStringFilterContains(Key, property);
 		}
 	}
 
-	[ContextMenu("Set Filter In Range")]
-	public void SetFilterInRange()
+	[ContextMenu("Add Numeric Filter Equals")]
+	public void AddNumericFilterEquals()
 	{
 		VectorSubLayerProperties[] layers = GetLayers();
 		for (int i = 0; i < layers.Length; i++)
 		{
-			LayerFilter[] filters = layers[i].Filtering.GetAllFilters().ToArray();
-			if (filters.Length != 0)
-			{
-				LayerFilter layerFilter = filters[i];
-				layerFilter.SetIsInRange(min, max);
-			}
+			layers[i].Filtering.AddNumericFilterEquals(Key, min);
+		}
+	}
+
+	[ContextMenu("Add Numeric Filter Is Less Than")]
+	public void AddNumericFilterLessThan()
+	{
+		VectorSubLayerProperties[] layers = GetLayers();
+		for (int i = 0; i < layers.Length; i++)
+		{
+			layers[i].Filtering.AddNumericFilterLessThan(Key, min);
+		}
+	}
+
+	[ContextMenu("Add Numeric Filter Is Greater Than")]
+	public void AddNumericFilterGreaterThan()
+	{
+		VectorSubLayerProperties[] layers = GetLayers();
+		for (int i = 0; i < layers.Length; i++)
+		{
+			layers[i].Filtering.AddNumericFilterGreaterThan(Key, min);
 		}
 	}
 }

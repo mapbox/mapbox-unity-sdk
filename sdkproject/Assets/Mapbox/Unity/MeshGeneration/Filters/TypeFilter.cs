@@ -290,17 +290,8 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 		}
 	}
 
-	public class LayerFilterBundle
-	{
-		public string key;
-		public LayerFilterOperationType layerFilterOperationType;
-		public string propertyValue;
-		public float min;
-		public float max;
-	}
-
 	[Serializable]
-	public class LayerFilter : ISubLayerFilteringOptions
+	public class LayerFilter : MapboxDataProperty, ISubLayerFilteringOptions
 	{
 		[Tooltip("Name of the property to use as key. This property is case sensitive.")]
 		public string Key;
@@ -315,18 +306,10 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 		[Tooltip("Filter operator to apply. ")]
 		public LayerFilterOperationType filterOperator;
 		private char[] _delimiters = new char[] { ',' };
-		public LayerFilter(LayerFilterOperationType filterOperation)
+
+		public LayerFilter(LayerFilterOperationType filterOperation = LayerFilterOperationType.Contains)
 		{
 			filterOperator = filterOperation;
-		}
-
-		public LayerFilter(LayerFilterBundle layerFilterBundle)
-		{
-			Key = layerFilterBundle.key;
-			filterOperator = layerFilterBundle.layerFilterOperationType;
-			PropertyValue = layerFilterBundle.propertyValue;
-			Min = layerFilterBundle.min;
-			Max = layerFilterBundle.max;;
 		}
 
 		public ILayerFeatureFilterComparer GetFilterComparer()
@@ -365,106 +348,158 @@ namespace Mapbox.Unity.MeshGeneration.Filters
 			return filterComparer;
 		}
 
-		public virtual void SetKey(string key = "")
-		{
-			Key = key;
-		}
-
-		public virtual void SetFilterOperationType(LayerFilterOperationType layerFilterOperationType)
-		{
-			switch (layerFilterOperationType)
-			{
-				case (LayerFilterOperationType.Contains):
-					SetContains();
-					break;
-				case (LayerFilterOperationType.IsEqual):
-					SetIsEqual();
-					break;
-				case (LayerFilterOperationType.IsLess):
-					SetIsLessThan();
-					break;
-				case (LayerFilterOperationType.IsGreater):
-					SetIsGreaterThan();
-					break;
-				case (LayerFilterOperationType.IsInRange):
-					SetIsInRange();
-					break;
-				default:
-					break;
-			}
-		}
-
-		public virtual void SetContains(string property = "")
+		/// <summary>
+		/// Sets the string contains.
+		/// </summary>
+		/// <param name="key">Key.</param>
+		/// <param name="property">Property.</param>
+		public virtual void SetStringContains(string key, string property)
 		{
 			filterOperator = LayerFilterOperationType.Contains;
-			PropertyValue = string.IsNullOrEmpty(property) ? PropertyValue : property;
+			Key = key;
+			PropertyValue = property;
+			HasChanged = true;
 		}
 
-		public virtual void SetIsEqual(float? value = null)
+		/// <summary>
+		/// Sets the number is equal.
+		/// </summary>
+		/// <param name="key">Key.</param>
+		/// <param name="value">Value.</param>
+		public virtual void SetNumberIsEqual(string key, float value)
 		{
 			filterOperator = LayerFilterOperationType.IsEqual;
-			Min = (value == null) ? Min : (float)value;
+			Key = key;
+			Min = value;
+			HasChanged = true;
 		}
 
-		public virtual void SetIsLessThan(float? value = null)
+		/// <summary>
+		/// Sets the number is less than.
+		/// </summary>
+		/// <param name="key">Key.</param>
+		/// <param name="value">Value.</param>
+		public virtual void SetNumberIsLessThan(string key, float value)
 		{
 			filterOperator = LayerFilterOperationType.IsLess;
-			Min = (value == null) ? Min : (float)value;
+			Key = key;
+			Min = value;
+			HasChanged = true;
 		}
 
-		public virtual void SetIsGreaterThan(float? value = null)
+		/// <summary>
+		/// Sets the number is greater than.
+		/// </summary>
+		/// <param name="key">Key.</param>
+		/// <param name="value">Value.</param>
+		public virtual void SetNumberIsGreaterThan(string key, float value)
 		{
 			filterOperator = LayerFilterOperationType.IsGreater;
-			Min = (value == null) ? Min : (float)value;
+			Key = key;
+			Min = value;
+			HasChanged = true;
 		}
 
-		public virtual void SetIsInRange(float? min = null, float? max = null)
+		/// <summary>
+		/// Sets the number is in range.
+		/// </summary>
+		/// <param name="key">Key.</param>
+		/// <param name="min">Minimum.</param>
+		/// <param name="max">Max.</param>
+		public virtual void SetNumberIsInRange(string key, float min, float max)
 		{
 			filterOperator = LayerFilterOperationType.IsInRange;
-			Min = (min == null) ? Min : (float)min;
-			Max = (max == null) ? Max : (float)max;
+			Key = key;
+			Min = min;
+			Max = max;
+			HasChanged = true;
 		}
 
+		/// <summary>
+		/// Returns true if filter key contains a given string.
+		/// </summary>
+		/// <returns><c>true</c>, if key contains was filtered, <c>false</c> otherwise.</returns>
+		/// <param name="key">Key.</param>
 		public virtual bool FilterKeyContains(string key)
 		{
 			return Key.Contains(key);
 		}
 
+		/// <summary>
+		/// Returns true if filter key matches a given string exactly.
+		/// </summary>
+		/// <returns><c>true</c>, if key matches exact was filtered, <c>false</c> otherwise.</returns>
+		/// <param name="key">Key.</param>
 		public virtual bool FilterKeyMatchesExact(string key)
 		{
 			return Key == key;
 		}
 
+		/// <summary>
+		/// Returns true if filter uses a given operation type.
+		/// </summary>
+		/// <returns><c>true</c>, if uses operation type was filtered, <c>false</c> otherwise.</returns>
+		/// <param name="layerFilterOperationType">Layer filter operation type.</param>
 		public virtual bool FilterUsesOperationType(LayerFilterOperationType layerFilterOperationType)
 		{
 			return filterOperator == layerFilterOperationType;
 		}
 
+		/// <summary>
+		/// Returns true if filter property contains a given string.
+		/// </summary>
+		/// <returns><c>true</c>, if property contains was filtered, <c>false</c> otherwise.</returns>
+		/// <param name="property">Property.</param>
 		public virtual bool FilterPropertyContains(string property)
 		{
 			return PropertyValue.Contains(property);
 		}
 
+		/// <summary>
+		/// Returns true if filter property matches a given string exactly.
+		/// </summary>
+		/// <returns><c>true</c>, if property matches exact was filtered, <c>false</c> otherwise.</returns>
+		/// <param name="property">Property.</param>
 		public virtual bool FilterPropertyMatchesExact(string property)
 		{
 			return PropertyValue == property;
 		}
 
+		/// <summary>
+		/// Returns true if filter number value is equal to a given number.
+		/// </summary>
+		/// <returns><c>true</c>, if number value equals was filtered, <c>false</c> otherwise.</returns>
+		/// <param name="value">Value.</param>
 		public virtual bool FilterNumberValueEquals(float value)
 		{
 			return Mathf.Approximately(Min, value);
 		}
 
+		/// <summary>
+		/// Returns true if filter number value is greater than a given number.
+		/// </summary>
+		/// <returns><c>true</c>, if number value is greater than was filtered, <c>false</c> otherwise.</returns>
+		/// <param name="value">Value.</param>
 		public virtual bool FilterNumberValueIsGreaterThan(float value)
 		{
 			return Min > value;
 		}
 
+		/// <summary>
+		/// Returns true if filter number value is less than a given number.
+		/// </summary>
+		/// <returns><c>true</c>, if number value is less than was filtered, <c>false</c> otherwise.</returns>
+		/// <param name="value">Value.</param>
 		public virtual bool FilterNumberValueIsLessThan(float value)
 		{
 			return Min < value;
 		}
 
+		/// <summary>
+		/// Returns true if filter range values contain a given number.
+		/// </summary>
+		/// <returns><c>true</c>, if is in range value contains was filtered, <c>false</c> otherwise.</returns>
+		/// <param name="value">Value.</param>
 		public virtual bool FilterIsInRangeValueContains(float value)
 		{
 			return Min < value && value < Max;

@@ -135,6 +135,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			_layerProperties.extrusionOptions.PropertyHasChanged -= UpdateVector;
 			_layerProperties.coreOptions.PropertyHasChanged -= UpdateVector;
+			_layerProperties.filterOptions.PropertyHasChanged -= UpdateVector;
+			_layerProperties.filterOptions.UnRegisterFilters();
 			_layerProperties.materialOptions.PropertyHasChanged -= UpdateVector;
 
 			OnUpdateLayerVisualizer(layerUpdateArgs);
@@ -300,7 +302,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 
 			_layerProperties.coreOptions.PropertyHasChanged += UpdateVector;
+			_layerProperties.filterOptions.PropertyHasChanged += UpdateVector;
 
+			_layerProperties.filterOptions.RegisterFilters();
 			if (_layerProperties.MeshModifiers != null)
 			{
 				_defaultStack.MeshModifiers.AddRange(_layerProperties.MeshModifiers);

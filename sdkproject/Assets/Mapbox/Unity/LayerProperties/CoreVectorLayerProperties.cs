@@ -47,21 +47,126 @@
 		[Tooltip("Operator to combine filters. ")]
 		public LayerFilterCombinerOperationType combinerType = LayerFilterCombinerOperationType.All;
 
-		public virtual void AddFilter(LayerFilterOperationType filterOperation = LayerFilterOperationType.Contains)
+		public override bool HasChanged
 		{
-			filters.Add(new LayerFilter(filterOperation));
+			set
+			{
+				if (value == true)
+				{
+					OnPropertyHasChanged(new VectorLayerUpdateArgs { property = this });
+				}
+			}
 		}
 
-		public virtual void AddFilter(LayerFilterBundle layerFilterBundle)
+		public void UnRegisterFilters()
 		{
-			filters.Add(new LayerFilter(layerFilterBundle));
+			for (int i = 0; i < filters.Count; i++)
+			{
+				filters[i].PropertyHasChanged -= OnLayerFilterChanged;
+			}
+		}
+
+		public void RegisterFilters()
+		{
+			for (int i = 0; i < filters.Count; i++)
+			{
+				filters[i].PropertyHasChanged += OnLayerFilterChanged;
+			}
+		}
+
+		private void OnLayerFilterChanged(object sender, System.EventArgs eventArgs)
+		{
+			HasChanged = true;
+		}
+
+		private void AddFilterToList(LayerFilter layerFilter)
+		{
+			filters.Add(layerFilter);
+			HasChanged = true;
+		}
+
+		public virtual LayerFilter AddStringFilterContains(string key, string property)
+		{
+			LayerFilter layerFilter = new LayerFilter()
+			{
+				Key = key,
+				filterOperator = LayerFilterOperationType.Contains,
+				PropertyValue = property
+			};
+			AddFilterToList(layerFilter);
+			return layerFilter;
+
+		}
+
+		public virtual LayerFilter AddNumericFilterEquals(string key, float value)
+		{
+			LayerFilter layerFilter = new LayerFilter()
+			{
+				Key = key,
+				filterOperator = LayerFilterOperationType.IsEqual,
+				Min = value
+			};
+			AddFilterToList(layerFilter);
+			return layerFilter;
+		}
+
+		public virtual LayerFilter AddNumericFilterLessThan(string key, float value)
+		{
+			LayerFilter layerFilter = new LayerFilter()
+			{
+				Key = key,
+				filterOperator = LayerFilterOperationType.IsLess,
+				Min = value
+			};
+			AddFilterToList(layerFilter);
+			return layerFilter;
+		}
+
+		public virtual LayerFilter AddNumericFilterGreaterThan(string key, float value)
+		{
+			LayerFilter layerFilter = new LayerFilter()
+			{
+				Key = key,
+				filterOperator = LayerFilterOperationType.IsGreater,
+				Min = value
+			};
+			AddFilterToList(layerFilter);
+			return layerFilter;
+		}
+
+		public virtual LayerFilter AddNumericFilterInRange(string key, float min, float max)
+		{
+			LayerFilter layerFilter = new LayerFilter()
+			{
+				Key = key,
+				filterOperator = LayerFilterOperationType.IsInRange,
+				Min = min,
+				Max = max
+			};
+			AddFilterToList(layerFilter);
+			return layerFilter;
+		}
+
+		public void AddFilter()
+		{
+			AddFilterToList(new LayerFilter());
+		}
+
+		public virtual void DeleteFilter(LayerFilter layerFilter)
+		{
+			layerFilter.PropertyHasChanged -= OnLayerFilterChanged;
+			if(filters.Contains(layerFilter))
+			{
+				filters.Remove(layerFilter);
+				HasChanged = true;
+			}
 		}
 
 		public virtual void DeleteFilter(int index)
 		{
 			if (index < filters.Count && filters[index] != null)
 			{
-				filters.RemoveAt(index);
+				DeleteFilter(filters[index]);
 			}
 		}
 
