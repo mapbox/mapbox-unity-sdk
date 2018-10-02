@@ -128,15 +128,15 @@
 
 			_layerProperty.colliderOptions.PropertyHasChanged += (property, e) =>
 			{
-				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
+				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, true);
 			};
 			_layerProperty.requiredOptions.PropertyHasChanged += (property, e) =>
 			{
-				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
+				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, true);
 			};
 			_layerProperty.unityLayerOptions.PropertyHasChanged += (property, e) =>
 			{
-				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
+				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, true);
 			};
 			_layerProperty.PropertyHasChanged += (property, e) =>
 			{
@@ -145,7 +145,7 @@
 				//pushing new settings to factory directly
 				SetFactoryOptions();
 				//notifying map to reload existing tiles
-				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
+				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, true);
 			};
 		}
 		// public void RedrawLayer(object sender, System.EventArgs e)
