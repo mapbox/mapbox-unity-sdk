@@ -124,7 +124,7 @@ public class ApiTest : MonoBehaviour
 		var layer = _abstractMap.VectorData.FindFeatureLayerWithName("ExtrudedBuildings");
 		if (layer != null)
 		{
-			layer.SetStyleType(testStyles[styleId]);
+			layer.Texturing.SetStyleType(testStyles[styleId]);
 		}
 		else
 		{
