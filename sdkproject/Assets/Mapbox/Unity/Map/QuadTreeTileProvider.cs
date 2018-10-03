@@ -191,5 +191,10 @@
 				_cbtpOptions.camera.transform.hasChanged = false;
 			}
 		}
+
+		public override bool Cleanup(UnwrappedTileId tile)
+		{
+			return (!_currentExtent.activeTiles.Contains(tile));
+		}
 	}
 }

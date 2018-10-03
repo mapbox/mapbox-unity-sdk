@@ -26,5 +26,9 @@
 			}
 			OnExtentChanged();
 		}
+		public override bool Cleanup(UnwrappedTileId tile)
+		{
+			return (!_currentExtent.activeTiles.Contains(tile));
+		}
 	}
 }

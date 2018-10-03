@@ -1,4 +1,5 @@
-﻿using System.Linq;
+using System.Linq;
+using Mapbox.Unity.SourceLayers;
 
 namespace Mapbox.Unity.Map
 {
@@ -8,11 +9,11 @@ namespace Mapbox.Unity.Map
 	{
 		MapLayerType LayerType { get; }
 		bool IsLayerActive { get; }
-		string LayerSource { get; }
+		string LayerSourceId { get; }
 
 		//LayerProperties LayerProperty { get; set; }
 
-		//TODO : These methods should return a status. 
+		//TODO : These methods should return a status.
 		void SetLayerSource(string source);
 		void Initialize();
 		void Initialize(LayerProperties properties);
@@ -21,34 +22,12 @@ namespace Mapbox.Unity.Map
 
 	}
 
-	public interface ITerrainLayer : ILayer
-	{
-
-	}
-
-	public interface IImageryLayer : ILayer
-	{
-
-	}
-
 	public interface IVectorDataLayer : ILayer
 	{
 
 	}
 
-
-	// TODO: Move interfaces into individual files. 
-	public interface ISubLayerCoreOptions
-	{
-	}
-	public interface ISubLayerExtrusionOptions
-	{
-	}
-
-	public interface ISubLayerLineGeometryOptions
-	{
-
-	}
+	// TODO: Move interfaces into individual files.
 
 	public interface ISubLayerPolygonGeometryOptions
 	{
@@ -60,20 +39,6 @@ namespace Mapbox.Unity.Map
 
 	}
 
-	public interface ISubLayerModeling :
-	ISubLayerCoreOptions,
-	ISubLayerExtrusionOptions,
-	ISubLayerLineGeometryOptions,
-	ISubLayerPolygonGeometryOptions
-	{
-
-	}
-
-	public interface ICustomModifierEvents
-	{
-
-	}
-
 	public interface IVectorSubLayer
 	{
 		ISubLayerFiltering Filtering { get; }
@@ -81,19 +46,6 @@ namespace Mapbox.Unity.Map
 		ISubLayerTexturing Texturing { get; }
 		ISubLayerBehaviorModifiers BehaviorModifiers { get; }
 
-		// Add methods that we need at sublayer level 
-	}
-
-
-	// TODO Move classes into individual files. 
-	public class SubLayerModeling : ISubLayerModeling
-	{
-		VectorSubLayerProperties _subLayerProperties;
-		public SubLayerModeling(VectorSubLayerProperties subLayerProperties)
-		{
-			_subLayerProperties = subLayerProperties;
-		}
+		// Add methods that we need at sublayer level
 	}
 }
-
-

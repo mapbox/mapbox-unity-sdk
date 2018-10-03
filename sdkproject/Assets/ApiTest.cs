@@ -61,25 +61,25 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("IncreaseTerrainExagguration")]
 	public void IncreaseTerrainExagguration()
 	{
-		_abstractMap.Terrain.SetExaggerationFactor(_abstractMap.Terrain.LayerProperty.requiredOptions.exaggerationFactor + 0.5f);
+		_abstractMap.Terrain.SetExaggerationFactor(_abstractMap.Terrain.ExxagerationFactor + 0.5f);
 	}
 
 	[ContextMenu("SetTerrainLayer")]
 	public void SetTerrainLayer()
 	{
-		_abstractMap.Terrain.SetLayer(LayerMask.NameToLayer("Water"));
+		_abstractMap.Terrain.AddToUnityLayer(LayerMask.NameToLayer("Water"));
 	}
 
 	[ContextMenu("SetTerrainDataSource")]
 	public void SetTerrainDataSource()
 	{
-		if (_abstractMap.Terrain.LayerProperty.sourceType == ElevationSourceType.MapboxTerrain)
+		if (_abstractMap.Terrain.LayerSource == ElevationSourceType.MapboxTerrain)
 		{
-			_abstractMap.Terrain.SetDataSource(ElevationSourceType.None);
+			_abstractMap.Terrain.SetLayerSource(ElevationSourceType.None);
 		}
 		else
 		{
-			_abstractMap.Terrain.SetDataSource(ElevationSourceType.MapboxTerrain);
+			_abstractMap.Terrain.SetLayerSource(ElevationSourceType.MapboxTerrain);
 		}
 	}
 
