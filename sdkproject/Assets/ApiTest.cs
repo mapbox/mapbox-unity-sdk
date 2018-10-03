@@ -123,7 +123,7 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("EnableLayer")]
 	public void EnableLayer()
 	{
-		var layer = _abstractMap.VectorData.FindFeatureLayerWithName("ExtrudedBuildings");
+		var layer = _abstractMap.VectorData.FindFeatureSubLayerWithName("ExtrudedBuildings");
 		if (layer != null)
 		{
 			layer.SetActive(true);
