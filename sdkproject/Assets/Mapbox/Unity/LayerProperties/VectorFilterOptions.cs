@@ -4,6 +4,7 @@
 	using System.Collections.Generic;
 	using Mapbox.Unity.MeshGeneration.Filters;
 	using UnityEngine;
+	using System.Linq;
 
 	[Serializable]
 	public class VectorFilterOptions : MapboxDataProperty, ISubLayerFiltering
