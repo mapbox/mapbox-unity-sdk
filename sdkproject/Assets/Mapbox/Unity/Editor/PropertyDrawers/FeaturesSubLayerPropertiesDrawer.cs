@@ -85,7 +85,7 @@
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 			var serializedMapObject = property.serializedObject;
 			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
-			tileJSONData = mapObject.VectorData.LayerProperty.tileJsonData;
+			tileJSONData = mapObject.VectorData.GetTileJsonData();
 
 			var sourceTypeProperty = property.FindPropertyRelative("_sourceType");
 			var sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
@@ -471,7 +471,7 @@
 
 			var serializedMapObject = property.serializedObject;
 			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
-			tileJsonData = mapObject.VectorData.LayerProperty.tileJsonData;
+			tileJsonData = mapObject.VectorData.GetTileJsonData();
 
 			var layerDisplayNames = tileJsonData.LayerDisplayNames;
 

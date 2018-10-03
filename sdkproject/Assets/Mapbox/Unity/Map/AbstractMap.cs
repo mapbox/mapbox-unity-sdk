@@ -138,7 +138,7 @@ namespace Mapbox.Unity.Map
 		[SerializeField]
 		VectorLayer _vectorData = new VectorLayer();
 		[NodeEditorElement("Layers")]
-		public VectorLayer VectorData
+		public IVectorDataLayer VectorData
 		{
 			get
 			{
@@ -628,9 +628,9 @@ namespace Mapbox.Unity.Map
 
 		private void RedrawVectorDataLayer()
 		{
-			_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
-			VectorData.UpdateFactorySettings();
-			_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
+			_mapVisualizer.UnregisterTilesFrom(_vectorData.Factory);
+			_vectorData.UpdateFactorySettings();
+			_mapVisualizer.ReregisterTilesTo(_vectorData.Factory);
 		}
 
 		private void OnVectorDataSubLayerRemoved(object sender, EventArgs eventArgs)
