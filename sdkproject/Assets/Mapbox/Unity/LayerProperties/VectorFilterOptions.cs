@@ -53,6 +53,12 @@
 			HasChanged = true;
 		}
 
+		/// <summary>
+		/// Adds a string filter that uses a contains operator.
+		/// </summary>
+		/// <returns>The filter.</returns>
+		/// <param name="key">Key.</param>
+		/// <param name="property">Property.</param>
 		public virtual ILayerFilter AddStringFilterContains(string key, string property)
 		{
 			LayerFilter layerFilter = new LayerFilter()
@@ -66,6 +72,12 @@
 
 		}
 
+		/// <summary>
+		/// Adds a number filter that uses an equals operator.
+		/// </summary>
+		/// <returns>The filter.</returns>
+		/// <param name="key">Key.</param>
+		/// <param name="value">Value.</param>
 		public virtual ILayerFilter AddNumericFilterEquals(string key, float value)
 		{
 			LayerFilter layerFilter = new LayerFilter()
@@ -78,6 +90,12 @@
 			return layerFilter;
 		}
 
+		/// <summary>
+		/// Adds a number filter that uses a less than operator.
+		/// </summary>
+		/// <returns>The filter.</returns>
+		/// <param name="key">Key.</param>
+		/// <param name="value">Value.</param>
 		public virtual ILayerFilter AddNumericFilterLessThan(string key, float value)
 		{
 			LayerFilter layerFilter = new LayerFilter()
@@ -90,6 +108,12 @@
 			return layerFilter;
 		}
 
+		/// <summary>
+		/// Adds a number filter that uses a greater than operator.
+		/// </summary>
+		/// <returns>The filter.</returns>
+		/// <param name="key">Key.</param>
+		/// <param name="value">Value.</param>
 		public virtual ILayerFilter AddNumericFilterGreaterThan(string key, float value)
 		{
 			LayerFilter layerFilter = new LayerFilter()
@@ -102,6 +126,13 @@
 			return layerFilter;
 		}
 
+		/// <summary>
+		/// Adds a number filter that uses an in range operator.
+		/// </summary>
+		/// <returns>The filter.</returns>
+		/// <param name="key">Key.</param>
+		/// <param name="min">Minimum.</param>
+		/// <param name="max">Max.</param>
 		public virtual ILayerFilter AddNumericFilterInRange(string key, float min, float max)
 		{
 			LayerFilter layerFilter = new LayerFilter()
@@ -120,6 +151,9 @@
 			AddFilterToList(new LayerFilter());
 		}
 
+		/// <summary>
+		/// Removes all filters.
+		/// </summary>
 		public virtual void RemoveAllFilters()
 		{
 			for (int i = 0; i < filters.Count; i++)
@@ -132,6 +166,10 @@
 			}
 		}
 
+		/// <summary>
+		/// Removes a filter.
+		/// </summary>
+		/// <param name="layerFilter">Layer filter.</param>
 		public virtual void RemoveFilter(LayerFilter layerFilter)
 		{
 			layerFilter.PropertyHasChanged -= OnLayerFilterChanged;
@@ -142,11 +180,19 @@
 			}
 		}
 
+		/// <summary>
+		/// Removes a filter.
+		/// </summary>
+		/// <param name="filter">Filter.</param>
 		public virtual void RemoveFilter(ILayerFilter filter)
 		{
 			RemoveFilter((LayerFilter)filter);
 		}
 
+		/// <summary>
+		/// Removes the filter using an index lookup.
+		/// </summary>
+		/// <param name="index">Index.</param>
 		public virtual void RemoveFilter(int index)
 		{
 			if (index < filters.Count && filters[index] != null)
@@ -155,6 +201,11 @@
 			}
 		}
 
+		/// <summary>
+		/// Gets a filter using an index lookup.
+		/// </summary>
+		/// <returns>The filter.</returns>
+		/// <param name="index">Index.</param>
 		public virtual ILayerFilter GetFilter(int index)
 		{
 			if (index < filters.Count && filters[index] != null)
@@ -164,11 +215,20 @@
 			return null;
 		}
 
+		/// <summary>
+		/// Gets all filters.
+		/// </summary>
+		/// <returns>All filters.</returns>
 		public virtual IEnumerable<ILayerFilter> GetAllFilters()
 		{
 			return (IEnumerable<ILayerFilter>)filters.AsEnumerable();
 		}
 
+		/// <summary>
+		/// Gets the filters by query.
+		/// </summary>
+		/// <returns>Filters by query.</returns>
+		/// <param name="query">Query.</param>
 		public virtual IEnumerable<ILayerFilter> GetFiltersByQuery(Func<ILayerFilter, bool> query)
 		{
 			foreach (var filter in filters)
@@ -180,11 +240,19 @@
 			}
 		}
 
+		/// <summary>
+		/// Gets the type of the filter combiner.
+		/// </summary>
+		/// <returns>The filter combiner type.</returns>
 		public virtual LayerFilterCombinerOperationType GetFilterCombinerType()
 		{
 			return combinerType;
 		}
 
+		/// <summary>
+		/// Sets the type of the filter combiner.
+		/// </summary>
+		/// <param name="layerFilterCombinerOperationType">Layer filter combiner operation type.</param>
 		public virtual void SetFilterCombinerType(LayerFilterCombinerOperationType layerFilterCombinerOperationType)
 		{
 			combinerType = layerFilterCombinerOperationType;
