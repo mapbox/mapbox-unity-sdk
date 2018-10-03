@@ -122,17 +122,18 @@
 				toggleRect.x += GetContentIndent(item);
 				toggleRect.width = kToggleWidth;
 
+				EditorGUI.BeginChangeCheck();
 				item.data.isActive = layer.FindPropertyRelative("coreOptions.isActive").boolValue;
 				if (toggleRect.xMax < cellRect.xMax)
 				{
-					EditorGUI.BeginChangeCheck();
 					item.data.isActive = EditorGUI.Toggle(toggleRect, item.data.isActive); // hide when outside cell rect
-					if(EditorGUI.EndChangeCheck())
-					{
-						hasChanged = true;
-					}
 				}
 				layer.FindPropertyRelative("coreOptions.isActive").boolValue = item.data.isActive;
+				if (EditorGUI.EndChangeCheck())
+				{
+					VectorSubLayerProperties vectorSubLayerProperties = (VectorSubLayerProperties)EditorHelper.GetTargetObjectOfProperty(layer);
+					EditorHelper.CheckForModifiedProperty(layer, vectorSubLayerProperties.coreOptions);
+				}
 
 				cellRect.xMin += nameOffset; // Adding some gap between the checkbox and the name
 				args.rowRect = cellRect;
