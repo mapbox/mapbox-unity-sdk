@@ -1,4 +1,5 @@
-﻿using Mapbox.Unity.SourceLayers;
+using System.Linq;
+using Mapbox.Unity.SourceLayers;
 
 namespace Mapbox.Unity.Map
 {
@@ -15,7 +16,7 @@ namespace Mapbox.Unity.Map
 
 		//LayerProperties LayerProperty { get; set; }
 
-		//TODO : These methods should return a status. 
+		//TODO : These methods should return a status.
 		void SetLayerSource(string source);
 		void Initialize();
 		void Initialize(LayerProperties properties);
@@ -88,11 +89,6 @@ namespace Mapbox.Unity.Map
 
 	}
 
-	public interface ISubLayerBehaviorModifiers
-	{
-
-	}
-
 	public interface IVectorSubLayer
 	{
 		ISubLayerFiltering Filtering { get; }
@@ -100,22 +96,6 @@ namespace Mapbox.Unity.Map
 		ISubLayerTexturing Texturing { get; }
 		ISubLayerBehaviorModifiers BehaviorModifiers { get; }
 
-		// Add methods that we need at sublayer level 
+		// Add methods that we need at sublayer level
 	}
-
-
-	// TODO Move classes into individual files.
-
-	public class SubLayerBehaviorModifiers : ISubLayerBehaviorModifiers
-	{
-		// TODO: Remove if not required. 
-		VectorSubLayerProperties _subLayerProperties;
-		public SubLayerBehaviorModifiers(VectorSubLayerProperties subLayerProperties)
-		{
-			_subLayerProperties = subLayerProperties;
-		}
-	}
-
 }
-
-

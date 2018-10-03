@@ -12,6 +12,17 @@ namespace Mapbox.Unity.Map
 	[Serializable]
 	public class VectorSubLayerProperties : LayerProperties, IVectorSubLayer
 	{
+		public override bool HasChanged
+		{
+			set
+			{
+				if (value == true)
+				{
+					OnPropertyHasChanged(new VectorLayerUpdateArgs { property = this });
+				}
+			}
+		}
+
 		public virtual string Key
 		{
 			get
@@ -134,6 +145,5 @@ namespace Mapbox.Unity.Map
 			coreOptions.HasChanged = true;
 		}
 		#endregion
-
 	}
 }

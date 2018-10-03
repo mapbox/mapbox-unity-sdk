@@ -5,6 +5,7 @@ using System.Linq;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Interfaces;
 using Mapbox.Unity.MeshGeneration.Filters;
+using Mapbox.Unity.MeshGeneration.Modifiers;
 using UnityEngine;
 
 public class ApiTest : MonoBehaviour
@@ -24,8 +25,9 @@ public class ApiTest : MonoBehaviour
 	public float max;
 	public string contains;
 
-	readonly StyleTypes[] testStyles = new StyleTypes[3] { StyleTypes.Fantasy, StyleTypes.Realistic, StyleTypes.Simple };
+	readonly StyleTypes[] testStyles = new StyleTypes[3] {StyleTypes.Fantasy, StyleTypes.Realistic, StyleTypes.Simple};
 	int styleId = -1;
+
 	void Start()
 	{
 		_abstractMap = FindObjectOfType<AbstractMap>();
@@ -40,7 +42,7 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("ChangeExtentOptions")]
 	public void ChangeExtentOptions()
 	{
-		_abstractMap.SetExtentOptions(new RangeTileProviderOptions { east = 2, west = 3, north = 0, south = 1 });
+		_abstractMap.SetExtentOptions(new RangeTileProviderOptions {east = 2, west = 3, north = 0, south = 1});
 	}
 
 
@@ -103,6 +105,7 @@ public class ApiTest : MonoBehaviour
 		imagerySource = (imagerySource == ImagerySourceType.MapboxSatelliteStreet) ? ImagerySourceType.MapboxStreets : imagerySource + 1;
 		_abstractMap.ImageLayer.SetLayerSource(imagerySource);
 	}
+
 	[ContextMenu("DisableLayer")]
 	public void DisableLayer()
 	{
@@ -232,6 +235,7 @@ public class ApiTest : MonoBehaviour
 		{
 			vectorLayer.filterOptions.filters.RemoveAt(index);
 		}
+
 		vectorLayer.filterOptions.HasChanged = true;
 	}
 
@@ -254,6 +258,7 @@ public class ApiTest : MonoBehaviour
 		{
 			vectorLayer.filterOptions.filters[index].Key = filterKey;
 		}
+
 		vectorLayer.filterOptions.HasChanged = true;
 	}
 
@@ -266,6 +271,7 @@ public class ApiTest : MonoBehaviour
 		{
 			vectorLayer.filterOptions.filters[index].filterOperator = layerFilterOperationType;
 		}
+
 		vectorLayer.filterOptions.HasChanged = true;
 	}
 
@@ -278,6 +284,7 @@ public class ApiTest : MonoBehaviour
 		{
 			vectorLayer.filterOptions.filters[index].Min = min;
 		}
+
 		vectorLayer.filterOptions.HasChanged = true;
 	}
 
@@ -291,6 +298,7 @@ public class ApiTest : MonoBehaviour
 			vectorLayer.filterOptions.filters[index].Min = min;
 			vectorLayer.filterOptions.filters[index].Max = max;
 		}
+
 		vectorLayer.filterOptions.HasChanged = true;
 	}
 
@@ -303,6 +311,7 @@ public class ApiTest : MonoBehaviour
 		{
 			vectorLayer.filterOptions.filters[index].PropertyValue = contains;
 		}
+
 		vectorLayer.filterOptions.HasChanged = true;
 	}
 
@@ -368,5 +377,72 @@ public class ApiTest : MonoBehaviour
 	public void ToggleStyleOptimization()
 	{
 		_abstractMap.VectorData.EnableOptimizedStyle(!_abstractMap.VectorData.LayerProperty.useOptimizedStyle);
+	}
+
+	[ContextMenu("Switch First Layer To Custom Style")]
+	public void SwitchFirstToCustom()
+	{
+		var layer = _abstractMap.VectorData.GetFeatureLayerAtIndex(0);
+		layer.CreateCustomStyle(
+			new List<MeshModifier>()
+			{
+				ScriptableObject.CreateInstance<PolygonMeshModifier>(),
+				ScriptableObject.CreateInstance<UvModifier>(),
+				ScriptableObject.CreateInstance<HeightModifier>()
+			},
+			new List<GameObjectModifier>()
+			{
+
+			});
+	}
+
+	[ContextMenu("Add Polygon Mesh Modifier")]
+	public void AddPolygonMeshModifier()
+	{
+		var layer = _abstractMap.VectorData.GetFeatureLayerAtIndex(0);
+		layer.BehaviorModifiers.AddMeshModifier(ScriptableObject.CreateInstance<PolygonMeshModifier>());
+	}
+
+	[ContextMenu("Add GameObject Modifier")]
+	public void AddGameObjectModifier()
+	{
+		var layer = _abstractMap.VectorData.GetFeatureLayerAtIndex(0);
+		layer.BehaviorModifiers.AddGameObjectModifier(ScriptableObject.CreateInstance<ColliderModifier>());
+	}
+
+	[ContextMenu("Debug Height Mesh Modifier Names")]
+	public void GetHeightMeshModifier()
+	{
+		var layer = _abstractMap.VectorData.GetFeatureLayerAtIndex(0);
+		foreach (var mm in layer.BehaviorModifiers.GetMeshModifier(x => x is HeightModifier || x is TextureSideWallModifier))
+		{
+			Debug.Log(mm.GetType().Name);
+		}
+	}
+
+	[ContextMenu("Debug Material Modifier Names")]
+	public void GetShortNameMeshModifier()
+	{
+		var layer = _abstractMap.VectorData.GetFeatureLayerAtIndex(0);
+		foreach (var mm in layer.BehaviorModifiers.GetMeshModifier(x => x is MaterialModifier))
+		{
+			Debug.Log(mm.GetType().Name);
+		}
+	}
+
+	[ContextMenu("Remove Material Modifier")]
+	public void RemoveMaterialModifier()
+	{
+		var layer = _abstractMap.VectorData.GetFeatureLayerAtIndex(0);
+		var mod = layer.BehaviorModifiers.GetGameObjectModifier(x => x is MaterialModifier);
+		layer.BehaviorModifiers.RemoveGameObjectModifier(mod[0]);
+	}
+
+	[ContextMenu("Remove Height Modifier")]
+	public void RemoveHeightModifier()
+	{
+		var layer = _abstractMap.VectorData.GetFeatureLayerAtIndex(0);
+		var mod = layer.BehaviorModifiers.GetMeshModifier(x => x is HeightModifier || x is TextureSideWallModifier);
+		layer.BehaviorModifiers.RemoveMeshModifier(mod[0]);
 	}
 }

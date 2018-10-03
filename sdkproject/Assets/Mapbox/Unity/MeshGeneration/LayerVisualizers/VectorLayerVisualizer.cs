@@ -144,6 +144,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			_layerProperties.filterOptions.PropertyHasChanged -= UpdateVector;
 			_layerProperties.filterOptions.UnRegisterFilters();
 			_layerProperties.materialOptions.PropertyHasChanged -= UpdateVector;
+
+			_layerProperties.PropertyHasChanged -= UpdateVector;
 		}
 
 		public override void SetProperties(VectorSubLayerProperties properties)
@@ -338,6 +340,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			//	//}
 			//	properties.filterOptions.filters.Add(filter);
 			//}
+
+			_layerProperties.PropertyHasChanged += UpdateVector;
 		}
 
 		/// <summary>
