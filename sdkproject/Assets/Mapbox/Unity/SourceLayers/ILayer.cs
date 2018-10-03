@@ -1,4 +1,6 @@
-﻿namespace Mapbox.Unity.Map
+﻿using Mapbox.Unity.SourceLayers;
+
+namespace Mapbox.Unity.Map
 {
 	//public class Terrain
 	// Layer Interfaces
@@ -9,7 +11,7 @@
 	{
 		MapLayerType LayerType { get; }
 		bool IsLayerActive { get; }
-		string LayerSource { get; }
+		string LayerSourceId { get; }
 
 		//LayerProperties LayerProperty { get; set; }
 
@@ -22,34 +24,12 @@
 
 	}
 
-	public interface ITerrainLayer : ILayer
-	{
-
-	}
-
-	public interface IImageryLayer : ILayer
-	{
-
-	}
-
 	public interface IVectorDataLayer : ILayer
 	{
 
 	}
 
-
-	// TODO: Move interfaces into individual files. 
-	public interface ISubLayerCoreOptions
-	{
-	}
-	public interface ISubLayerExtrusionOptions
-	{
-	}
-
-	public interface ISubLayerLineGeometryOptions
-	{
-
-	}
+	// TODO: Move interfaces into individual files.
 
 	public interface ISubLayerPolygonGeometryOptions
 	{
@@ -58,24 +38,28 @@
 
 	public interface ISubLayerFiltering
 	{
-		LayerFilter AddStringFilterContains(string key, string property);
-		LayerFilter AddNumericFilterEquals(string key, float value);
-		LayerFilter AddNumericFilterLessThan(string key, float value);
-		LayerFilter AddNumericFilterGreaterThan(string key, float value);
-		LayerFilter AddNumericFilterInRange(string key, float min, float max);
+		ILayerFilter AddStringFilterContains(string key, string property);
+		ILayerFilter AddNumericFilterEquals(string key, float value);
+		ILayerFilter AddNumericFilterLessThan(string key, float value);
+		ILayerFilter AddNumericFilterGreaterThan(string key, float value);
+		ILayerFilter AddNumericFilterInRange(string key, float min, float max);
 
-		LayerFilter GetFilter(int index);
-		void DeleteFilter(int index);
+		ILayerFilter GetFilter(int index);
 
-		IEnumerable<LayerFilter> GetAllFilters();
-		IEnumerable<LayerFilter> GetFiltersByQuery(System.Func<LayerFilter, bool> query);
+		void RemoveFilter(int index);
+		void RemoveFilter(LayerFilter filter);
+		void RemoveFilter(ILayerFilter filter);
+		void RemoveAllFilters();
+
+		IEnumerable<ILayerFilter> GetAllFilters();
+		IEnumerable<ILayerFilter> GetFiltersByQuery(System.Func<ILayerFilter, bool> query);
 
 		LayerFilterCombinerOperationType GetFilterCombinerType();
 
 		void SetFilterCombinerType(LayerFilterCombinerOperationType layerFilterCombinerOperationType);
 	}
 
-	public interface ISubLayerFilteringOptions
+	public interface ILayerFilter
 	{
 		bool FilterKeyContains(string key);
 		bool FilterKeyMatchesExact(string key);
@@ -87,20 +71,20 @@
 		bool FilterNumberValueIsLessThan(float value);
 		bool FilterIsInRangeValueContains(float value);
 
+		string GetKey { get; }
+		LayerFilterOperationType GetFilterOperationType { get; }
+
+		string GetPropertyValue { get; }
+		float GetNumberValue { get; }
+
+		float GetMinValue { get; }
+		float GetMaxValue { get; }
+
 		void SetStringContains(string key, string property);
 		void SetNumberIsEqual(string key, float value);
 		void SetNumberIsLessThan(string key, float value);
 		void SetNumberIsGreaterThan(string key, float value);
 		void SetNumberIsInRange(string key, float min, float max);
-
-	}
-
-	public interface ISubLayerModeling :
-	ISubLayerCoreOptions,
-	ISubLayerExtrusionOptions,
-	ISubLayerLineGeometryOptions,
-	ISubLayerPolygonGeometryOptions
-	{
 
 	}
 
@@ -120,15 +104,7 @@
 	}
 
 
-	// TODO Move classes into individual files. 
-	public class SubLayerModeling : ISubLayerModeling
-	{
-		VectorSubLayerProperties _subLayerProperties;
-		public SubLayerModeling(VectorSubLayerProperties subLayerProperties)
-		{
-			_subLayerProperties = subLayerProperties;
-		}
-	}
+	// TODO Move classes into individual files.
 
 	public class SubLayerBehaviorModifiers : ISubLayerBehaviorModifiers
 	{

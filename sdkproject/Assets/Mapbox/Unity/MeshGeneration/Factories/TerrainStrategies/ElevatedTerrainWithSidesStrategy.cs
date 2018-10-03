@@ -22,6 +22,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 		private Vector3 _newDir;
 		private int _vertA, _vertB, _vertC;
 		private int _counter;
+		public override int RequiredVertexCount
+		{
+			get { return _elevationOptions.modificationOptions.sampleCount * _elevationOptions.modificationOptions.sampleCount
+			             + (4 * _elevationOptions.modificationOptions.sampleCount); }
+		}
 
 		public override void Initialize(ElevationLayerProperties elOptions)
 		{
@@ -57,7 +62,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				}
 			}
 
-			if (tile.MeshFilter.mesh.vertexCount == 0)
+			if (tile.MeshFilter.mesh.vertexCount != RequiredVertexCount)
 			{
 				CreateBaseMesh(tile);
 			}

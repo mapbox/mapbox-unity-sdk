@@ -42,6 +42,8 @@
 		public abstract void OnInitialized();
 		public abstract void UpdateTileExtent();
 
+		public abstract bool Cleanup(UnwrappedTileId tile);
+
 		public virtual void SetOptions(ITileProviderOptions options)
 		{
 			_options = options;

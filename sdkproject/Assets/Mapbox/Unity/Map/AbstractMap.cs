@@ -109,7 +109,7 @@ namespace Mapbox.Unity.Map
 		[SerializeField]
 		ImageryLayer _imagery = new ImageryLayer();
 		[NodeEditorElement("Layers")]
-		public ImageryLayer ImageLayer
+		public IImageryLayer ImageLayer
 		{
 			get
 			{
@@ -122,7 +122,7 @@ namespace Mapbox.Unity.Map
 		[SerializeField]
 		TerrainLayer _terrain = new TerrainLayer();
 		[NodeEditorElement("Layers")]
-		public TerrainLayer Terrain
+		public ITerrainLayer Terrain
 		{
 			get
 			{
@@ -496,7 +496,7 @@ namespace Mapbox.Unity.Map
 			List<UnwrappedTileId> _toRemove = new List<UnwrappedTileId>();
 			foreach (var item in _activeTiles)
 			{
-				if (!_currentExtent.Contains(item.Key))
+				if (_tileProvider.Cleanup(item.Key)) //(!_currentExtent.Contains(item.Key))
 				{
 					_toRemove.Add(item.Key);
 				}
@@ -712,7 +712,7 @@ namespace Mapbox.Unity.Map
 
 		public virtual void UpdateMap()
 		{
-			UpdateMap(_centerLatitudeLongitude, Zoom);
+			UpdateMap(Conversions.StringToLatLon(_options.locationOptions.latitudeLongitude), Zoom);
 		}
 
 		public virtual void UpdateMap(Vector2d latLon)
@@ -722,7 +722,7 @@ namespace Mapbox.Unity.Map
 
 		public virtual void UpdateMap(float zoom)
 		{
-			UpdateMap(_centerLatitudeLongitude, zoom);
+			UpdateMap(Conversions.StringToLatLon(_options.locationOptions.latitudeLongitude), zoom);
 		}
 
 		/// <summary>
