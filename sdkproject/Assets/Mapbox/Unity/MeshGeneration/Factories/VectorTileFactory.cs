@@ -173,7 +173,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				{
 					Properties.locationPrefabList.Remove(subLayer.SubLayerProperties as PrefabItemOptions);
 				}
-
+				subLayer.LayerVisualizerHasChanged -= UpdateTileFactory;
 				_layerBuilder[subLayer.Key].Remove(subLayer);
 			}
 		}
@@ -268,6 +268,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					foreach (var visualizer in layer)
 					{
 						visualizer.UnregisterTile(tile);
+						visualizer.LayerVisualizerHasChanged -= UpdateTileFactory;
 					}
 				}
 			}
@@ -376,23 +377,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				foreach (var builder in _layerBuilder[emptyLayer])
 				{
 					CreateFeatureWithBuilder(tile, emptyLayer, builder);
-					//if (builder.Active)
-					//{
-					//	if (_layerProgress.ContainsKey(tile))
-					//	{
-					//		_layerProgress[tile].Add(builder);
-					//	}
-					//	else
-					//	{
-					//		_layerProgress.Add(tile, new HashSet<LayerVisualizerBase> { builder });
-					//		if (!_tilesWaitingProcessing.Contains(tile))
-					//		{
-					//			_tilesWaitingProcessing.Add(tile);
-					//		}
-					//	}
-					//	//just pass the first available layer - we should create a static null layer for this
-					//	builder.Create(tile.VectorData.Data.GetLayer(tile.VectorData.Data.LayerNames()[0]), tile, DecreaseProgressCounter);
-					//}
 				}
 			}
 

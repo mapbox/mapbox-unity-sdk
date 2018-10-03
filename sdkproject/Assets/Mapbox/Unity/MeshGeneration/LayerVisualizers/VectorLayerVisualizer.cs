@@ -1,4 +1,4 @@
-﻿using Mapbox.VectorTile.Geometry;
+using Mapbox.VectorTile.Geometry;
 
 namespace Mapbox.Unity.MeshGeneration.Interfaces
 {
@@ -121,7 +121,13 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			{
 				layerUpdateArgs.property.PropertyHasChanged -= UpdateVector;
 			}
+			UnbindSubLayerEvents();
 
+			OnUpdateLayerVisualizer(layerUpdateArgs);
+		}
+
+		private void UnbindSubLayerEvents()
+		{
 			foreach (var modifier in _defaultStack.MeshModifiers)
 			{
 				modifier.UnbindProperties();
@@ -135,11 +141,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			_layerProperties.extrusionOptions.PropertyHasChanged -= UpdateVector;
 			_layerProperties.coreOptions.PropertyHasChanged -= UpdateVector;
+			_layerProperties.filterOptions.PropertyHasChanged -= UpdateVector;
+			_layerProperties.filterOptions.UnRegisterFilters();
 			_layerProperties.materialOptions.PropertyHasChanged -= UpdateVector;
 
 			_layerProperties.PropertyHasChanged -= UpdateVector;
-
-			OnUpdateLayerVisualizer(layerUpdateArgs);
 		}
 
 		public override void SetProperties(VectorSubLayerProperties properties)
@@ -302,7 +308,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 
 			_layerProperties.coreOptions.PropertyHasChanged += UpdateVector;
+			_layerProperties.filterOptions.PropertyHasChanged += UpdateVector;
 
+			_layerProperties.filterOptions.RegisterFilters();
 			if (_layerProperties.MeshModifiers != null)
 			{
 				_defaultStack.MeshModifiers.AddRange(_layerProperties.MeshModifiers);
@@ -736,6 +744,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				}
 				_idPool[tile].Clear();
 			}
+			UnbindSubLayerEvents();
 		}
 	}
 }

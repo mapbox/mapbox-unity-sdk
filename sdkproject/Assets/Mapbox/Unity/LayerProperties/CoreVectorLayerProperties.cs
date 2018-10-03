@@ -1,10 +1,9 @@
 ﻿namespace Mapbox.Unity.Map
 {
 	using System;
-	using System.Collections.Generic;
-	using Mapbox.Unity.MeshGeneration.Filters;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
 	using UnityEngine;
+
 
 	[Serializable]
 	public class CoreVectorLayerProperties : MapboxDataProperty, ISubLayerCoreOptions
@@ -23,6 +22,7 @@
 		public bool snapToTerrain = true;
 		[Tooltip("Groups features into one Unity GameObject.")]
 		public bool combineMeshes = false;
+
 
 		public override bool HasChanged
 		{
@@ -50,16 +50,6 @@
 				HasChanged = true;
 			}
 		}
-	}
 
-	[Serializable]
-	public class VectorFilterOptions : MapboxDataProperty, ISubLayerFiltering
-	{
-		[SerializeField]
-		private string _selectedLayerName;
-		public List<LayerFilter> filters = new List<LayerFilter>();
-		[Tooltip("Operator to combine filters. ")]
-		public LayerFilterCombinerOperationType combinerType = LayerFilterCombinerOperationType.All;
 	}
-
 }

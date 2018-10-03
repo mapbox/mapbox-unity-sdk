@@ -39,6 +39,7 @@
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
+			VectorFilterOptions options = (VectorFilterOptions)EditorHelper.GetTargetObjectOfProperty(property);
 
 			showFilters = EditorGUILayout.Foldout(showFilters, new GUIContent { text = "Filters", tooltip = "Filter features in a vector layer based on criterion specified.  " });
 			if (showFilters)
@@ -47,10 +48,7 @@
 
 				for (int i = 0; i < propertyFilters.arraySize; i++)
 				{
-					if(DrawLayerFilter(property, propertyFilters, i))
-					{
-						EditorHelper.CheckForModifiedProperty(property);
-					}
+					DrawLayerFilter(property, propertyFilters, i, options);
 				}
 				if (propertyFilters.arraySize > 0)
 				{
@@ -68,7 +66,7 @@
 				EditorGUI.BeginChangeCheck();
 				if (GUILayout.Button(new GUIContent("Add New Empty"), (GUIStyle)"minibutton"))
 				{
-					propertyFilters.arraySize++;
+					options.AddFilter();
 				}
 				if (EditorGUI.EndChangeCheck())
 				{
@@ -84,10 +82,10 @@
 			return lineHeight;
 		}
 
-		private bool DrawLayerFilter(SerializedProperty originalProperty, SerializedProperty propertyFilters, int index)
+		private void DrawLayerFilter(SerializedProperty originalProperty, SerializedProperty propertyFilters, int index, VectorFilterOptions vectorFilterOptions)
 		{
-			bool hasChanged = false;
 			var property = propertyFilters.GetArrayElementAtIndex(index);
+
 			var filterOperatorProp = property.FindPropertyRelative("filterOperator");
 
 			EditorGUILayout.BeginVertical();
@@ -95,7 +93,6 @@
 			EditorGUILayout.BeginHorizontal();
 
 			EditorGUILayout.LabelField(new GUIContent { text = "Key", tooltip = "Name of the property to use as key. This property is case sensitive." }, GUILayout.MaxWidth(150));
-
 
 			switch ((LayerFilterOperationType)filterOperatorProp.enumValueIndex)
 			{
@@ -124,16 +121,13 @@
 
 			var selectedLayerName = originalProperty.FindPropertyRelative("_selectedLayerName").stringValue;
 
-			if(DrawPropertyDropDown(originalProperty, property))
-			{
-				hasChanged = true;
-			}
+			DrawPropertyDropDown(originalProperty, property);
 
 			EditorGUI.BeginChangeCheck();
 			filterOperatorProp.enumValueIndex = EditorGUILayout.Popup(filterOperatorProp.enumValueIndex, filterOperatorProp.enumDisplayNames, GUILayout.MaxWidth(150));
 			if (EditorGUI.EndChangeCheck())
 			{
-				hasChanged = true;
+				EditorHelper.CheckForModifiedProperty(property);
 			}
 
 			EditorGUI.BeginChangeCheck();
@@ -156,29 +150,21 @@
 			}
 			if (EditorGUI.EndChangeCheck())
 			{
-				hasChanged = true;
+				EditorHelper.CheckForModifiedProperty(property);
 			}
 
-			EditorGUI.BeginChangeCheck();
 			if (GUILayout.Button(new GUIContent(" X "), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
 			{
-				propertyFilters.DeleteArrayElementAtIndex(index);
-			}
-			if (EditorGUI.EndChangeCheck())
-			{
-				hasChanged = true;
+				vectorFilterOptions.RemoveFilter(index);
 			}
 
 			EditorGUILayout.EndHorizontal();
 
 			EditorGUILayout.EndVertical();
-
-			return hasChanged;
 		}
 
-		private bool DrawPropertyDropDown(SerializedProperty originalProperty, SerializedProperty filterProperty)
+		private void DrawPropertyDropDown(SerializedProperty originalProperty, SerializedProperty filterProperty)
 		{
-			bool hasChanged = false;
 
 			var selectedLayerName = originalProperty.FindPropertyRelative("_selectedLayerName").stringValue;
 			AbstractMap mapObject = (AbstractMap)originalProperty.serializedObject.targetObject;
@@ -187,7 +173,7 @@
 			if (string.IsNullOrEmpty(selectedLayerName) || !tileJsonData.PropertyDisplayNames.ContainsKey(selectedLayerName))
 			{
 				DrawWarningMessage();
-				return false;
+				return;
 			}
 
 			var parsedString = "no property selected";
@@ -219,7 +205,7 @@
 				_propertyIndex = EditorGUILayout.Popup(_propertyIndex, _propertyNameContent, GUILayout.MaxWidth(150));
 				if (EditorGUI.EndChangeCheck())
 				{
-					hasChanged = true;
+					EditorHelper.CheckForModifiedProperty(filterProperty);
 				}
 
 				//set new string values based on selection
@@ -258,7 +244,7 @@
 				_propertyIndex = EditorGUILayout.Popup(_propertyIndex, _propertyNameContent, GUILayout.MaxWidth(150));
 				if (EditorGUI.EndChangeCheck())
 				{
-					hasChanged = true;
+					EditorHelper.CheckForModifiedProperty(filterProperty);
 				}
 
 				//set new string values based on the offset
@@ -270,11 +256,9 @@
 			filterProperty.FindPropertyRelative("Key").stringValue = parsedString;
 			if (EditorGUI.EndChangeCheck())
 			{
-				hasChanged = true;
+				EditorHelper.CheckForModifiedProperty(filterProperty);
 			}
 			filterProperty.FindPropertyRelative("KeyDescription").stringValue = descriptionString;
-
-			return hasChanged;
 		}
 
 		private void DrawWarningMessage()
