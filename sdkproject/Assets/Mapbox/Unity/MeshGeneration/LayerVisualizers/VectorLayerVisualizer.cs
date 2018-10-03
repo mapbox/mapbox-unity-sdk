@@ -137,6 +137,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			_layerProperties.coreOptions.PropertyHasChanged -= UpdateVector;
 			_layerProperties.materialOptions.PropertyHasChanged -= UpdateVector;
 
+			_layerProperties.PropertyHasChanged -= UpdateVector;
+
 			OnUpdateLayerVisualizer(layerUpdateArgs);
 		}
 
@@ -330,6 +332,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			//	//}
 			//	properties.filterOptions.filters.Add(filter);
 			//}
+
+			_layerProperties.PropertyHasChanged += UpdateVector;
 		}
 
 		/// <summary>
