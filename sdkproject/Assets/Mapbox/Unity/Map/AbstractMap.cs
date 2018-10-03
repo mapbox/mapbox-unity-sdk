@@ -647,9 +647,7 @@ namespace Mapbox.Unity.Map
 
 		private void OnVectorDataSubLayerAdded(object sender, EventArgs eventArgs)
 		{
-			_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
-			VectorData.UpdateFactorySettings();
-			_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
+			RedrawVectorDataLayer();
 
 			Debug.Log("<color=blue>Vector</color>");
 			OnMapRedrawn();
@@ -664,13 +662,13 @@ namespace Mapbox.Unity.Map
 				Debug.Log("UnregisterTiles");
 				//we got a visualizer. Update only the visualizer.
 				// No need to unload the entire factory to apply changes.
-				_mapVisualizer.UnregisterTilesFromLayer((VectorTileFactory)layerUpdateArgs.factory, layerUpdateArgs.visualizer);
+				_mapVisualizer.UnregisterAndRedrawTilesFromLayer((VectorTileFactory)layerUpdateArgs.factory, layerUpdateArgs.visualizer);
 			}
 			else
 			{
 				//We are updating a core property of vector section.
 				//All vector features need to get unloaded and re-created.
-				_mapVisualizer.UpdateTileForProperty(layerUpdateArgs.factory, layerUpdateArgs);
+				RedrawVectorDataLayer();
 			}
 			Debug.Log("<color=blue>Vector</color>");
 			OnMapRedrawn();
