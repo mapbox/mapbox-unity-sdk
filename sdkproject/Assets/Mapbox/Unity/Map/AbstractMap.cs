@@ -420,11 +420,12 @@ namespace Mapbox.Unity.Map
 			}
 			_vectorData.Initialize();
 
-			_mapVisualizer.Factories = new List<AbstractTileFactory>();
-
-			_mapVisualizer.Factories.Add(_terrain.Factory);
-			_mapVisualizer.Factories.Add(_imagery.Factory);
-			_mapVisualizer.Factories.Add(_vectorData.Factory);
+			_mapVisualizer.Factories = new List<AbstractTileFactory>
+			{
+				_terrain.Factory,
+				_imagery.Factory,
+				_vectorData.Factory
+			};
 
 			InitializeMap(_options);
 		}
@@ -549,84 +550,16 @@ namespace Mapbox.Unity.Map
 			_initialZoom = (int)options.locationOptions.zoom;
 
 			options.scalingOptions.scalingStrategy.SetUpScaling(this);
-
 			options.placementOptions.placementStrategy.SetUpPlacement(this);
 
-			_imagery.UpdateLayer += (object sender, System.EventArgs eventArgs) =>
-			{
-				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
-				if (layerUpdateArgs != null)
-				{
-					Debug.Log("<color=red>Image</color>");
-					_mapVisualizer.UpdateTileForProperty(layerUpdateArgs.factory, layerUpdateArgs);
-					if (layerUpdateArgs.effectsVectorLayer)
-					{
-						_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
-						VectorData.UpdateFactorySettings();
-						_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
-					}
-					OnMapRedrawn();
-				}
-			};
 
-			_terrain.UpdateLayer += (object sender, System.EventArgs eventArgs) =>
-			{
-				LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
-				if (layerUpdateArgs != null)
-				{
-					Debug.Log("<color=green>Terrain</color>");
-					_mapVisualizer.UpdateTileForProperty(layerUpdateArgs.factory, layerUpdateArgs);
-					if (layerUpdateArgs.effectsVectorLayer)
-					{
-						_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
-						VectorData.UpdateFactorySettings();
-						_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
-					}
-					OnMapRedrawn();
-				}
-			};
+			//Set up events for changes. 
+			_imagery.UpdateLayer += OnImageOrTerrainUpdateLayer;
+			_terrain.UpdateLayer += OnImageOrTerrainUpdateLayer;
 
-			_vectorData.SubLayerRemoved += (object sender, EventArgs eventArgs) =>
-			{
-				VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
-
-				if (layerUpdateArgs.visualizer != null)
-				{
-					_mapVisualizer.RemoveTilesFromLayer((VectorTileFactory)layerUpdateArgs.factory, layerUpdateArgs.visualizer);
-				}
-
-				Debug.Log("<color=blue>Vector</color>");
-				OnMapRedrawn();
-			};
-			_vectorData.SubLayerAdded += (object sender, EventArgs eventArgs) =>
-			{
-				_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
-				VectorData.UpdateFactorySettings();
-				_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
-
-				Debug.Log("<color=blue>Vector</color>");
-				OnMapRedrawn();
-			};
-			_vectorData.UpdateLayer += (object sender, System.EventArgs eventArgs) =>
-			{
-				VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
-
-				if (layerUpdateArgs.visualizer != null)
-				{
-					Debug.Log("UnregisterTiles");
-					//we got a visualizer. Update only the visualizer.
-					// No need to unload the entire factory to apply changes.
-					_mapVisualizer.UnregisterTilesFromLayer((VectorTileFactory)layerUpdateArgs.factory, layerUpdateArgs.visualizer);
-				}
-				else
-				{
-					//We are updating a core property of vector section.
-					//All vector features need to get unloaded and re-created.
-					_mapVisualizer.UpdateTileForProperty(layerUpdateArgs.factory, layerUpdateArgs);
-				}
-				Debug.Log("<color=blue>Vector</color>");
-				OnMapRedrawn();
-			};
+			_vectorData.SubLayerRemoved += OnVectorDataSubLayerRemoved;
+			_vectorData.SubLayerAdded += OnVectorDataSubLayerAdded;
+			_vectorData.UpdateLayer += OnVectorDataUpdateLayer;
 
 			_options.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
 			{
@@ -677,6 +610,70 @@ namespace Mapbox.Unity.Map
 			SendInitialized();
 
 			_tileProvider.UpdateTileExtent();
+		}
+
+		private void OnImageOrTerrainUpdateLayer(object sender, System.EventArgs eventArgs)
+		{
+			LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
+			if (layerUpdateArgs != null)
+			{
+				_mapVisualizer.UpdateTileForProperty(layerUpdateArgs.factory, layerUpdateArgs);
+				if (layerUpdateArgs.effectsVectorLayer)
+				{
+					RedrawVectorDataLayer();
+				}
+				OnMapRedrawn();
+			}
+		}
+
+		private void RedrawVectorDataLayer()
+		{
+			_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
+			VectorData.UpdateFactorySettings();
+			_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
+		}
+
+		private void OnVectorDataSubLayerRemoved(object sender, EventArgs eventArgs)
+		{
+			VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
+
+			if (layerUpdateArgs.visualizer != null)
+			{
+				_mapVisualizer.RemoveTilesFromLayer((VectorTileFactory)layerUpdateArgs.factory, layerUpdateArgs.visualizer);
+			}
+			Debug.Log("<color=blue>Vector</color>");
+			OnMapRedrawn();
+		}
+
+		private void OnVectorDataSubLayerAdded(object sender, EventArgs eventArgs)
+		{
+			_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
+			VectorData.UpdateFactorySettings();
+			_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
+
+			Debug.Log("<color=blue>Vector</color>");
+			OnMapRedrawn();
+		}
+		private void OnVectorDataUpdateLayer(object sender, System.EventArgs eventArgs)
+		{
+
+			VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
+
+			if (layerUpdateArgs.visualizer != null)
+			{
+				Debug.Log("UnregisterTiles");
+				//we got a visualizer. Update only the visualizer.
+				// No need to unload the entire factory to apply changes.
+				_mapVisualizer.UnregisterTilesFromLayer((VectorTileFactory)layerUpdateArgs.factory, layerUpdateArgs.visualizer);
+			}
+			else
+			{
+				//We are updating a core property of vector section.
+				//All vector features need to get unloaded and re-created.
+				_mapVisualizer.UpdateTileForProperty(layerUpdateArgs.factory, layerUpdateArgs);
+			}
+			Debug.Log("<color=blue>Vector</color>");
+			OnMapRedrawn();
 		}
 
 		private void OnTileProviderChanged()

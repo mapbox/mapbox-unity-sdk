@@ -130,15 +130,15 @@
 
 			_layerProperty.colliderOptions.PropertyHasChanged += (property, e) =>
 			{
-				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
+				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, true);
 			};
 			_layerProperty.requiredOptions.PropertyHasChanged += (property, e) =>
 			{
-				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
+				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, true);
 			};
 			_layerProperty.unityLayerOptions.PropertyHasChanged += (property, e) =>
 			{
-				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
+				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, true);
 			};
 			_layerProperty.PropertyHasChanged += (property, e) =>
 			{
@@ -148,7 +148,7 @@
 				Debug.Log("here");
 				SetFactoryOptions();
 				//notifying map to reload existing tiles
-				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
+				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, true);
 			};
 		}
 		// public void RedrawLayer(object sender, System.EventArgs e)
@@ -295,7 +295,7 @@
 			int layerId = 0)
 		{
 			if (_layerProperty.sourceType != dataSource ||
-			    _layerProperty.elevationLayerType != elevationType)
+				_layerProperty.elevationLayerType != elevationType)
 			{
 				_layerProperty.sourceType = dataSource;
 				_layerProperty.elevationLayerType = elevationType;
