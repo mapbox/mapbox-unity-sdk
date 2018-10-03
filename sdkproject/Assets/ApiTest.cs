@@ -120,6 +120,20 @@ public class ApiTest : MonoBehaviour
 		}
 	}
 
+	[ContextMenu("EnableLayer")]
+	public void EnableLayer()
+	{
+		var layer = _abstractMap.VectorData.FindFeatureLayerWithName("ExtrudedBuildings");
+		if (layer != null)
+		{
+			layer.SetActive(true);
+		}
+		else
+		{
+			Debug.Log("Layer not found");
+		}
+	}
+
 	[ContextMenu("ChangeBuildingMaterial")]
 	public void ChangeBuildingMaterial()
 	{
