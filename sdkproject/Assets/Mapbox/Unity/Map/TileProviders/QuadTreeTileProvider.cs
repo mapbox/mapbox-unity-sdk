@@ -1,13 +1,12 @@
-﻿namespace Mapbox.Unity.Map
-{
-	using UnityEngine;
-	using Mapbox.Map;
-	using Mapbox.Unity.Utilities;
-	using Mapbox.Utils;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System;
+﻿using System;
+using System.Collections.Generic;
+using Mapbox.Map;
+using Mapbox.Unity.Utilities;
+using Mapbox.Utils;
+using UnityEngine;
 
+namespace Mapbox.Unity.Map.TileProviders
+{
 	public class QuadTreeTileProvider : AbstractTileProvider
 	{
 		private Plane _groundPlane;
@@ -68,8 +67,8 @@
 			if (bounds.IsEmpty()) { return _tiles; }
 
 			//stay within WebMerc bounds
-			Vector2d swWebMerc = new Vector2d(Math.Max(bounds.SouthWest.x, -Constants.WebMercMax), Math.Max(bounds.SouthWest.y, -Constants.WebMercMax));
-			Vector2d neWebMerc = new Vector2d(Math.Min(bounds.NorthEast.x, Constants.WebMercMax), Math.Min(bounds.NorthEast.y, Constants.WebMercMax));
+			Vector2d swWebMerc = new Vector2d(Math.Max(bounds.SouthWest.x, -Utils.Constants.WebMercMax), Math.Max(bounds.SouthWest.y, -Utils.Constants.WebMercMax));
+			Vector2d neWebMerc = new Vector2d(Math.Min(bounds.NorthEast.x, Utils.Constants.WebMercMax), Math.Min(bounds.NorthEast.y, Utils.Constants.WebMercMax));
 
 			//UnityEngine.Debug.LogFormat("swWebMerc:{0}/{1} neWebMerc:{2}/{3}", swWebMerc.x, swWebMerc.y, neWebMerc.x, neWebMerc.y);
 
@@ -101,8 +100,8 @@
 		{
 			var tileCount = Math.Pow(2, zoom);
 
-			var dblX = webMerc.x / Constants.WebMercMax;
-			var dblY = webMerc.y / Constants.WebMercMax;
+			var dblX = webMerc.x / Utils.Constants.WebMercMax;
+			var dblY = webMerc.y / Utils.Constants.WebMercMax;
 
 			int x = (int)Math.Floor((1 + dblX) / 2 * tileCount);
 			int y = (int)Math.Floor((1 - dblY) / 2 * tileCount);
@@ -123,8 +122,8 @@
 				_hitPnt[3] = getGroundPlaneHitPoint(_ray11);
 			}
 
-			// Find min max bounding box. 
-			// TODO : Find a better way of doing this. 
+			// Find min max bounding box.
+			// TODO : Find a better way of doing this.
 			float minX = float.MaxValue;
 			float minZ = float.MaxValue;
 			float maxX = float.MinValue;

@@ -1,11 +1,11 @@
-﻿namespace Mapbox.Unity.Map
-{
-	using System;
-	using System.Collections.Generic;
-	using UnityEngine;
-	using Mapbox.Map;
-	using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using Mapbox.Map;
+using Mapbox.Unity.Map.Interfaces;
+using UnityEngine;
 
+namespace Mapbox.Unity.Map.TileProviders
+{
 	public class ExtentArgs : EventArgs
 	{
 		//TODO: Override GetHashCode for UnwrappedTileId
