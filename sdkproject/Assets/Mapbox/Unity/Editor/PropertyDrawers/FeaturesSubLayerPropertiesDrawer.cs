@@ -476,7 +476,12 @@
 
 			var layerDisplayNames = tileJsonData.LayerDisplayNames;
 
+			EditorGUI.BeginChangeCheck();
 			DrawLayerName(subLayerCoreOptions, layerDisplayNames);
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(subLayerCoreOptions);
+			}
 			//*********************** LAYER NAME ENDS ***********************************//
 
 			//*********************** TYPE DROPDOWN BEGINS ***********************************//
@@ -623,16 +628,7 @@
 			}
 
 			//draw the layer selection popup
-			EditorGUI.BeginChangeCheck();
 			_layerIndex = EditorGUILayout.Popup(layerNameLabel, _layerIndex, _layerTypeContent);
-			if (EditorGUI.EndChangeCheck())
-			{
-				MapboxDataProperty mapboxDataProperty = (MapboxDataProperty)EditorHelper.GetTargetObjectOfProperty(property);
-				if (mapboxDataProperty != null)
-				{
-					mapboxDataProperty.HasChanged = true;
-				}
-			}
 			var parsedString = layerDisplayNames.ToArray()[_layerIndex].Split(new string[] { tileJsonData.commonLayersKey }, System.StringSplitOptions.None)[0].Trim();
 			property.FindPropertyRelative("layerName").stringValue = parsedString;
 		}

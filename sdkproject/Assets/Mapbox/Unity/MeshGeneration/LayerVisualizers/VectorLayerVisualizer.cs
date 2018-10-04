@@ -522,7 +522,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			#region PreProcess & Process.
 
-			var featureCount = tempLayerProperties.vectorTileLayer.FeatureCount();
+			var featureCount = (tempLayerProperties.vectorTileLayer == null) ? 0 : tempLayerProperties.vectorTileLayer.FeatureCount();
 			do
 			{
 				for (int i = 0; i < featureCount; i++)
