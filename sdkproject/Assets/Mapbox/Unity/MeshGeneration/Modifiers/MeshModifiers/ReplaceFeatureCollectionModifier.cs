@@ -11,19 +11,16 @@
 	public class FeatureBundle
 	{
 		//public name param will be displayed in inspector list ui instead of element x...
-		[HideInInspector]
-		public string Name;
+		[HideInInspector] public string Name;
 
 		public bool active;
 
 		public GameObject prefab;
 		public bool scaleDownWithWorld = true;
 
-		[Geocode]
-		public List<string> _prefabLocations = new List<string>();
+		[Geocode] public List<string> _prefabLocations = new List<string>();
 
 		public List<string> _explicitlyBlockedFeatureIds = new List<string>();
-
 	}
 
 	/// <summary>
@@ -32,7 +29,6 @@
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Replace Feature Collection Modifier")]
 	public class ReplaceFeatureCollectionModifier : GameObjectModifier, IReplacementCriteria
 	{
-
 		public List<FeatureBundle> features = new List<FeatureBundle>();
 
 		private List<ReplaceFeatureModifier> _replaceFeatureModifiers;
@@ -49,6 +45,19 @@
 		public override void Initialize()
 		{
 			base.Initialize();
+
+			if (_replaceFeatureModifiers != null && _replaceFeatureModifiers.Count > 0)
+			{
+				foreach (var replaceFeatureModifier in _replaceFeatureModifiers)
+				{
+					if (replaceFeatureModifier != null)
+					{
+						replaceFeatureModifier.ClearCaches();
+					}
+				}
+			}
+
+
 			_replaceFeatureModifiers = new List<ReplaceFeatureModifier>();
 			foreach (FeatureBundle feature in features)
 			{
@@ -76,6 +85,7 @@
 				{
 					continue;
 				}
+
 				modifier.FeaturePreProcess(feature);
 			}
 		}
@@ -88,6 +98,7 @@
 				{
 					continue;
 				}
+
 				modifier.SetProperties(properties);
 			}
 		}
@@ -100,11 +111,13 @@
 				{
 					continue;
 				}
-				if(modifier.ShouldReplaceFeature(feature))
+
+				if (modifier.ShouldReplaceFeature(feature))
 				{
 					return true;
 				}
 			}
+
 			return false;
 		}
 
@@ -121,6 +134,14 @@
 			foreach (ReplaceFeatureModifier modifier in _replaceFeatureModifiers)
 			{
 				modifier.OnPoolItem(vectorEntity);
+			}
+		}
+
+		public override void ClearCaches()
+		{
+			foreach (var subModules in _replaceFeatureModifiers)
+			{
+				subModules.ClearCaches();
 			}
 		}
 	}

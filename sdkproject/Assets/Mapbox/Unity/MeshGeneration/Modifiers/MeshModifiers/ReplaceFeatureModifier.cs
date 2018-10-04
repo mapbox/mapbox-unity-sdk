@@ -304,5 +304,14 @@
 			go.SetActive(false);
 			go.transform.SetParent(_poolGameObject.transform, false);
 		}
+
+		public override void ClearCaches()
+		{
+			foreach (var gameObject in _objects.Values)
+			{
+				Destroy(gameObject);
+			}
+			Destroy(_poolGameObject);
+		}
 	}
 }

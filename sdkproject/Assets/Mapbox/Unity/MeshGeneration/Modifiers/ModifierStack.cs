@@ -230,5 +230,28 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			return _tempVectorEntity.GameObject;
 		}
+
+		public override void ClearCaches()
+		{
+			foreach (var modifier in GoModifiers)
+			{
+				modifier.ClearCaches();
+			}
+			foreach (var vectorEntity in _pool.GetQueue())
+			{
+				Destroy(vectorEntity.GameObject);
+			}
+
+			foreach (var tileTuple in _activeObjects)
+			{
+				foreach (var vectorEntity in tileTuple.Value)
+				{
+					Destroy(vectorEntity.GameObject);
+				}
+			}
+			_pool.Clear();
+			_activeObjects.Clear();
+			_pool.Clear();
+		}
 	}
 }
