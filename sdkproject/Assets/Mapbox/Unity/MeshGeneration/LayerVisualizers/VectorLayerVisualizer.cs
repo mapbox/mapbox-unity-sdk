@@ -752,11 +752,5 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			_idPool.Clear();
 			_defaultStack.ClearCaches();
 		}
-
-		public override void ClearCaches()
-		{
-			_idPool.Clear();
-			_defaultStack.ClearCaches();
-		}
 	}
 }
