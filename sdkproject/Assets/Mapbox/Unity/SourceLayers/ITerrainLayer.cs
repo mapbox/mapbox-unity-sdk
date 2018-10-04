@@ -7,68 +7,74 @@ namespace Mapbox.Unity.Map
 
 		ElevationSourceType LayerSource { get; }
 		ElevationLayerType ElevationType { get; set; }
-		float ExaggerationFactor { get; set; }
+		float ExagerationFactor { get; set; }
 
 		/// <summary>
-		/// Sets the data source for Terrain Layer.
-		/// Defaults to MapboxTerrain.
-		/// Use <paramref name="terrainSource"/> = None, to disable the Terrain Layer.
+		/// Sets the Data Source for `TERRAIN`. By default this is set to
+		/// `Mapbox Terrain`. Currenly, only terrain-rgb is supported.
+		/// Use <paramref name="terrainSource"/> = `None`, to disable the terrain.
 		/// </summary>
-		/// <param name="terrainSource">Terrain source.</param>
+		/// <param name="terrainSource">`Data Source` for `TERRAIN`</param>
 		void SetLayerSource(ElevationSourceType terrainSource = ElevationSourceType.MapboxTerrain);
 
-		///// <summary>
-		///// Sets the main strategy for terrain mesh generation.
-		///// Flat terrain doesn't pull data from servers and just uses a quad as terrain.
-		///// </summary>
-		///// <param name="elevationType">Type of the elevation strategy</param>
-		//void SetElevationType(ElevationLayerType elevationType);
+		/// <summary>
+		/// Sets the `Elevation Layer Type` which is the main strategy for terrain
+		/// mesh generation. `Flat Terrain` doesn't pull data from servers, it
+		/// uses a quad as the terrain. </summary>
+		/// <param name="elevationType">Type of the elevation. Can be set to `Terrain with Elevation`,
+		/// `Flat Terrain`, `Globe`, or `Low Polygon Terrain`. Note: low poly doesn't
+		/// improve performance.</param>
+		void SetElevationType(ElevationLayerType elevationType);
 
 		/// <summary>
-		/// Add/Remove terrain collider. Terrain uses mesh collider.
+		/// Enables or disables the `Add Collider` settings for adding a collider
+		/// to the terrain. The collider type is a mesh collider.
 		/// </summary>
-		/// <param name="enable">Boolean for enabling/disabling mesh collider</param>
+		/// <param name="enable">Boolean for toggling `Add Collider`. </param>
 		void EnableCollider(bool enable);
 
 		/// <summary>
-		/// Sets the elevation multiplier for terrain. It'll regenerate terrain mesh, multiplying each point elevation by provided value.
+		/// Sets the `Exaggeration Factor` for the terrain. This acts as a multiplier
+		/// for elevation. Use this setting to better highlight elevation in your scene.
+		/// Each elevation point will be multiplied by the float value.
 		/// </summary>
-		/// <param name="factor">Elevation multiplier</param>
+		/// <param name="factor">Elevation multiplier for `Exaggeration Factor` settings. </param>
 		void SetExaggerationFactor(float factor);
 
 		/// <summary>
-		/// Turn on terrain side walls.
+		/// Enables the settings for `Show Sidewalls`.
 		/// </summary>
 		/// <param name="wallHeight">Wall height.</param>
 		/// <param name="wallMaterial">Wall material.</param>
 		void EnableSideWalls(float wallHeight, Material wallMaterial);
 
 		/// <summary>
-		/// Turn off terrain side walls.
+		/// Disables the settings for `Show Sidewalls`.
 		/// </summary>
 		void DisableSideWalls();
 
 
 		/// <summary>
-		/// Adds Terrain GameObject to Unity layer.
+		/// Adds the terrain mesh GameObject to a Unity layer.
 		/// </summary>
-		/// <param name="layerId">Layer identifier.</param>
+		/// <param name="layerId">Layer identifier. You may need to add the layer in
+		/// the Tags and Layers manager.</param>
 		void AddToUnityLayer(int layerId);
 
 		/// <summary>
-		/// Remove Terrain GameObject to Unity layer.
+		/// Removes the terrain GameObject from a Unity layer.
 		/// </summary>
 		/// <param name="layerId">Layer identifier.</param>
 		void RemoveFromUnityLayer(int layerId);
 
 		/// <summary>
-		/// Change terrain layer settings.
+		/// Change the `TERRAIN` layer settings.
 		/// </summary>
-		/// <param name="dataSource">The data source for the terrain height map.</param>
-		/// <param name="elevationType">Mesh generation strategy for the tile/height.</param>
-		/// <param name="enableCollider">Enable/Disable collider component for the tile game object.</param>
-		/// <param name="factor">Multiplier for the height data.</param>
-		/// <param name="layerId">Unity Layer for the tile game object.</param>
+		/// <param name="dataSource">The `Data Source` for the terrain.</param>
+		/// <param name="elevationType">`Elevation Layer Type` setting to define elevation strategy.</param>
+		/// <param name="enableCollider">Enables or disables `Use Collider` settings for a mesh collider on the terrain.</param>
+		/// <param name="factor">`Exaggertion Factor` for a multiplier of the height data.</param>
+		/// <param name="layerId">`Add to Unity Layer` settings which adds terrrain to a layer.</param>
 		void SetProperties(ElevationSourceType dataSource = ElevationSourceType.MapboxTerrain, ElevationLayerType elevationType = ElevationLayerType.TerrainWithElevation, bool enableCollider = false, float factor = 1, int layerId = 0);
 	}
 
