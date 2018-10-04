@@ -276,25 +276,25 @@
 
 				if (GUILayout.Button(new GUIContent("Remove Selected"), (GUIStyle)"minibuttonright"))
 				{
-					bool layerWasRemoved = false;
 					foreach (var index in selectedLayers.OrderByDescending(i => i))
 					{
 						if (layerTreeView != null)
 						{
+							var subLayer = subLayerArray.GetArrayElementAtIndex(index - FeatureSubLayerTreeView.uniqueId);
+
+							VectorLayerProperties vectorLayerProperties = (VectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property);
+							VectorSubLayerProperties vectorSubLayerProperties = (VectorSubLayerProperties)EditorHelper.GetTargetObjectOfProperty(subLayer);
+
+							vectorLayerProperties.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = vectorSubLayerProperties });
+
 							layerTreeView.RemoveItemFromTree(index);
 							subLayerArray.DeleteArrayElementAtIndex(index - FeatureSubLayerTreeView.uniqueId);
 							layerTreeView.treeModel.SetData(GetData(subLayerArray));
-							layerWasRemoved = true;
 						}
 					}
 
 					selectedLayers = new int[0];
 					layerTreeView.SetSelection(selectedLayers);
-
-					if (layerWasRemoved)
-					{
-						EditorHelper.CheckForModifiedProperty(property);
-					}
 				}
 
 				EditorGUILayout.EndHorizontal();
