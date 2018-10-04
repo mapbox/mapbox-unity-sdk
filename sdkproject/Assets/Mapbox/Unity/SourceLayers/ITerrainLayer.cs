@@ -7,12 +7,12 @@ namespace Mapbox.Unity.Map
 
 		ElevationSourceType LayerSource { get; }
 		ElevationLayerType ElevationType { get; set; }
-		float ExxagerationFactor { get; set; }
+		float ExaggerationFactor { get; set; }
 
 		/// <summary>
 		/// Sets the data source for Terrain Layer.
 		/// Defaults to MapboxTerrain.
-		/// Use <paramref name="terrainSource"/> = None, to disable the Terrain Layer. 
+		/// Use <paramref name="terrainSource"/> = None, to disable the Terrain Layer.
 		/// </summary>
 		/// <param name="terrainSource">Terrain source.</param>
 		void SetLayerSource(ElevationSourceType terrainSource = ElevationSourceType.MapboxTerrain);
@@ -79,5 +79,3 @@ namespace Mapbox.Unity.Map
 	}
 
 }
-
-
