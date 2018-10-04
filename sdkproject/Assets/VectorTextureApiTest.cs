@@ -21,7 +21,7 @@ public class VectorTextureApiTest : MonoBehaviour
 	void Start()
 	{
 		_abstractMap = FindObjectOfType<AbstractMap>();
-		_layer = _abstractMap.VectorData.FindFeatureLayerWithName("test");
+		_layer = _abstractMap.VectorData.FindFeatureSubLayerWithName("test");
 		Assert.IsNotNull(_layer, "No layer named test found");
 
 		testMethods = new List<System.Action>
