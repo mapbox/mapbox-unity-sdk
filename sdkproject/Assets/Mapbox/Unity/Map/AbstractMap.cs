@@ -629,6 +629,7 @@ namespace Mapbox.Unity.Map
 		private void RedrawVectorDataLayer()
 		{
 			_mapVisualizer.UnregisterTilesFrom(_vectorData.Factory);
+			_vectorData.UnbindAllEvents();
 			_vectorData.UpdateFactorySettings();
 			_mapVisualizer.ReregisterTilesTo(_vectorData.Factory);
 		}

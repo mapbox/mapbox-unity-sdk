@@ -101,6 +101,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			Strategy.PostProcessTile(tile);
 		}
 
+		public override void UnbindEvents()
+		{
+			base.UnbindEvents();
+		}
+
+		protected override void OnUnbindEvents()
+		{
+		}
 		//public override void UpdateTileProperty(UnityTile tile, LayerUpdateArgs updateArgs)
 		//{
 		//	updateArgs.property.UpdateProperty(tile);

@@ -86,6 +86,11 @@ namespace Mapbox.Unity.Map
 			Initialize(properties);
 		}
 
+		public void UnbindAllEvents()
+		{
+			_vectorTileFactory.UnbindEvents();
+		}
+
 		public void UpdateFactorySettings()
 		{
 			_vectorTileFactory.SetOptions(_layerProperty);
