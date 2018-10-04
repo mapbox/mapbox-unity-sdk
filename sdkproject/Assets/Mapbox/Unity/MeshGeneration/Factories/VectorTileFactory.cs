@@ -175,6 +175,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					Properties.locationPrefabList.Remove(subLayer.SubLayerProperties as PrefabItemOptions);
 				}
 				subLayer.LayerVisualizerHasChanged -= UpdateTileFactory;
+				subLayer.UnbindSubLayerEvents();
 				_layerBuilder[subLayer.Key].Remove(subLayer);
 			}
 		}
@@ -273,7 +274,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					foreach (var visualizer in layer)
 					{
 						visualizer.UnregisterTile(tile);
-						visualizer.LayerVisualizerHasChanged -= UpdateTileFactory;
+						//visualizer.LayerVisualizerHasChanged -= UpdateTileFactory;
 					}
 				}
 			}
@@ -305,6 +306,25 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		}
 
+		public override void UnbindEvents()
+		{
+			base.UnbindEvents();
+		}
+
+		protected override void OnUnbindEvents()
+		{
+			if (_layerBuilder != null)
+			{
+				foreach (var layer in _layerBuilder.Values)
+				{
+					foreach (var visualizer in layer)
+					{
+						visualizer.LayerVisualizerHasChanged -= UpdateTileFactory;
+						visualizer.UnbindSubLayerEvents();
+					}
+				}
+			}
+		}
 		#endregion
 
 		#region DataFetcherEvents

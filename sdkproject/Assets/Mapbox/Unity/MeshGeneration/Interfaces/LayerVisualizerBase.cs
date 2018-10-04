@@ -35,7 +35,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		public virtual void ClearCaches()
 		{
-			
+
 		}
 		public void UnregisterTile(UnityTile tile)
 		{
@@ -47,6 +47,10 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		}
 
+		public virtual void UnbindSubLayerEvents()
+		{
+
+		}
 		protected virtual void OnUpdateLayerVisualizer(System.EventArgs e)
 		{
 			System.EventHandler handler = LayerVisualizerHasChanged;

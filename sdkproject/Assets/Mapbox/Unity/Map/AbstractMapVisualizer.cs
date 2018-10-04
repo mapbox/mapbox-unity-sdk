@@ -286,6 +286,7 @@ namespace Mapbox.Unity.Map
 			{
 				factory.UnregisterLayer(tileBundle.Value, layerVisualizer);
 			}
+			layerVisualizer.UnbindSubLayerEvents();
 			layerVisualizer.SetProperties(layerVisualizer.SubLayerProperties);
 			layerVisualizer.InitializeStack();
 			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)

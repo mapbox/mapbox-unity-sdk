@@ -126,7 +126,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			OnUpdateLayerVisualizer(layerUpdateArgs);
 		}
 
-		private void UnbindSubLayerEvents()
+		public override void UnbindSubLayerEvents()
 		{
 			foreach (var modifier in _defaultStack.MeshModifiers)
 			{
@@ -744,7 +744,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				}
 				_idPool[tile].Clear();
 			}
-			UnbindSubLayerEvents();
+			//UnbindSubLayerEvents();
 		}
 
 		public override void ClearCaches()
