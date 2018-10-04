@@ -746,5 +746,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 			UnbindSubLayerEvents();
 		}
+
+		public override void ClearCaches()
+		{
+			_idPool.Clear();
+			_defaultStack.ClearCaches();
+		}
 	}
 }

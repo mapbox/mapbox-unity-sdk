@@ -163,6 +163,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		public virtual void RemoveVectorLayerVisualizer(LayerVisualizerBase subLayer)
 		{
+			subLayer.ClearCaches();
 			if (_layerBuilder.ContainsKey(subLayer.Key))
 			{
 				if (Properties.vectorSubLayers.Contains(subLayer.SubLayerProperties))
@@ -183,22 +184,26 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_properties = (VectorLayerProperties)options;
 			if (_layerBuilder != null)
 			{
-				_layerBuilder.Clear();
-				// TODO : IS THIS CODE REALLY REQUIRED?
-				//CreateLayerVisualizers();
-				//foreach (var layer in _layerBuilder)
-				//{
-				//	foreach (var item in layer.Value)
-				//	{
-				//		(item as VectorLayerVisualizer).SetProperties(null);
-				//		item.Initialize();
-				//	}
-				//}
+				RemoveAllLayerVisualiers();
 
 				CreatePOILayerVisualizers();
 
 				CreateLayerVisualizers();
 			}
+		}
+
+		private void RemoveAllLayerVisualiers()
+		{
+			//Clearing gameobjects pooled and managed by modifiers to prevent zombie gameobjects.
+			foreach (var pairs in _layerBuilder)
+			{
+				foreach (var layerVisualizerBase in pairs.Value)
+				{
+					layerVisualizerBase.ClearCaches();
+				}
+			}
+
+			_layerBuilder.Clear();
 		}
 
 		protected override void OnRegistered(UnityTile tile)
