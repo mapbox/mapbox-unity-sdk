@@ -78,6 +78,7 @@ namespace Mapbox.Unity.Map
 				Debug.Log("VectorLayer Delegate");
 				NotifyUpdateLayer(args as LayerUpdateArgs);
 			};
+
 		}
 
 		public void Update(LayerProperties properties)
@@ -135,6 +136,11 @@ namespace Mapbox.Unity.Map
 
 		#region Api Methods
 
+		public virtual TileJsonData GetTileJsonData()
+		{
+			return _layerProperty.tileJsonData;
+		}
+
 		/// <summary>
 		/// Add provided data source (mapid) to existing ones.
 		/// Mapbox vector api supports comma separated mapids and this method
@@ -168,16 +174,8 @@ namespace Mapbox.Unity.Map
 		/// <param name="vectorSource">Data source (Mapid) to use.</param>
 		public virtual void SetLayerSource(string vectorSource)
 		{
-			if (!string.IsNullOrEmpty(vectorSource))
-			{
-				_layerProperty.sourceType = VectorSourceType.Custom;
-				_layerProperty.sourceOptions.Id = vectorSource;
-			}
-			else
-			{
-				_layerProperty.sourceType = VectorSourceType.None;
-				Debug.LogWarning("Empty source - turning off vector data. ");
-			}
+			SetLayerSourceInternal(vectorSource);
+			_layerProperty.HasChanged = true;
 		}
 
 		/// <summary>
@@ -186,41 +184,59 @@ namespace Mapbox.Unity.Map
 		/// <param name="vectorSource">Data source (Mapid) to use.</param>
 		public virtual void SetLayerSource(VectorSourceType vectorSource)
 		{
-			if (vectorSource != VectorSourceType.Custom && vectorSource != VectorSourceType.None)
-			{
-				_layerProperty.sourceType = vectorSource;
-				_layerProperty.sourceOptions.layerSource = MapboxDefaultVector.GetParameters(vectorSource);
-			}
-			else
-			{
-				Debug.LogWarning("Invalid style - trying to set " + vectorSource.ToString() + " as default style!");
-			}
+			SetLayerSourceInternal(vectorSource);
+			_layerProperty.HasChanged = true;
 		}
 
-		public virtual void EnableOptimizedStyle(bool isEnabled)
+		/// <summary>
+		/// Sets the layer source as Style-optimized vector tiles
+		/// </summary>
+		/// <param name="vectorSource">Vector source.</param>
+		/// <param name="styleId">Style-Optimized style id.</param>
+		/// <param name="modifiedDate">Modified date.</param>
+		/// <param name="styleName">Style name.</param>
+		public virtual void SetLayerSourceWithOptimizedStyle(string vectorSource, string styleId, string modifiedDate, string styleName = null)
 		{
-			if (_layerProperty.useOptimizedStyle != isEnabled)
-			{
-				_layerProperty.useOptimizedStyle = isEnabled;
-				_layerProperty.HasChanged = true;
-			}
+			SetLayerSourceInternal(vectorSource);
+			SetOptimizedStyleInternal(styleId, modifiedDate, styleName);
+			_layerProperty.HasChanged = true;
 		}
+
+		/// <summary>
+		/// Sets the layer source as Style-optimized vector tiles
+		/// </summary>
+		/// <param name="vectorSource">Vector source.</param>
+		/// <param name="styleId">Style-Optimized style id.</param>
+		/// <param name="modifiedDate">Modified date.</param>
+		/// <param name="styleName">Style name.</param>
+		public virtual void SetLayerSourceWithOptimizedStyle(VectorSourceType vectorSource, string styleId, string modifiedDate, string styleName = null)
+		{
+			SetLayerSourceInternal(vectorSource);
+			SetOptimizedStyleInternal(styleId, modifiedDate, styleName);
+			_layerProperty.HasChanged = true;
+		}
+
 
 		/// <summary>
 		/// Enable coroutines for vector features, processing choosen amount
 		/// of them each frame.
 		/// </summary>
-		/// <param name="isEnabled">Enable coroutine for vector layer.</param>
 		/// <param name="entityPerCoroutine">Numbers of features to process each frame.</param>
-		public virtual void EnableCoroutines(bool isEnabled, int entityPerCoroutine = 20)
+		/// 
+		public virtual void EnableVectorFeatureProcessingWithCoroutines(int entityPerCoroutine = 20)
 		{
-			if (_layerProperty.performanceOptions.isEnabled != isEnabled ||
+			if (_layerProperty.performanceOptions.isEnabled != true ||
 				_layerProperty.performanceOptions.entityPerCoroutine != entityPerCoroutine)
 			{
-				_layerProperty.performanceOptions.isEnabled = isEnabled;
+				_layerProperty.performanceOptions.isEnabled = true;
 				_layerProperty.performanceOptions.entityPerCoroutine = entityPerCoroutine;
 				_layerProperty.performanceOptions.HasChanged = true;
 			}
+		}
+
+		public void DisableVectorFeatureProcessingWithCoroutines()
+		{
+			_layerProperty.performanceOptions.isEnabled = false;
 		}
 
 		#endregion
@@ -240,7 +256,7 @@ namespace Mapbox.Unity.Map
 				return;
 			}
 
-			AddPoiLayer(item);
+			AddPointsOfInterestSubLayer(item);
 		}
 
 		/// <summary>
@@ -371,7 +387,7 @@ namespace Mapbox.Unity.Map
 
 		// FEATURE LAYER OPERATIONS
 
-		public virtual void AddFeatureLayer(VectorSubLayerProperties subLayerProperties)
+		public virtual void AddFeatureSubLayer(VectorSubLayerProperties subLayerProperties)
 		{
 			if (_layerProperty.vectorSubLayers == null)
 			{
@@ -382,12 +398,47 @@ namespace Mapbox.Unity.Map
 			_layerProperty.OnSubLayerPropertyAdded(new VectorLayerUpdateArgs { property = _layerProperty.vectorSubLayers.Last() });
 		}
 
-		public virtual IEnumerable<VectorSubLayerProperties> GetAllFeatureLayers()
+		public virtual void AddPolygonFeatureSubLayer(string assignedSubLayerName, string dataLayerNameInService)
+		{
+
+			VectorSubLayerProperties subLayer = PresetSubLayerPropertiesFetcher.GetSubLayerProperties(PresetFeatureType.Buildings);
+			subLayer.coreOptions.layerName = dataLayerNameInService;
+			subLayer.coreOptions.sublayerName = assignedSubLayerName;
+
+			AddFeatureSubLayer(subLayer);
+		}
+		public virtual void AddLineFeatureSubLayer(string assignedSubLayerName, string dataLayerNameInService, float lineWidth = 1)
+		{
+			VectorSubLayerProperties subLayer = PresetSubLayerPropertiesFetcher.GetSubLayerProperties(PresetFeatureType.Roads);
+			subLayer.coreOptions.layerName = dataLayerNameInService;
+			subLayer.coreOptions.sublayerName = assignedSubLayerName;
+			subLayer.lineGeometryOptions.Width = lineWidth;
+
+			AddFeatureSubLayer(subLayer);
+		}
+		public virtual void AddPointFeatureSubLayer(string assignedSubLayerName, string dataLayerNameInService)
+		{
+			VectorSubLayerProperties subLayer = PresetSubLayerPropertiesFetcher.GetSubLayerProperties(PresetFeatureType.Points);
+			subLayer.coreOptions.layerName = dataLayerNameInService;
+			subLayer.coreOptions.sublayerName = assignedSubLayerName;
+
+			AddFeatureSubLayer(subLayer);
+		}
+		public virtual void AddCustomFeatureSubLayer(string assignedSubLayerName, string dataLayerNameInService)
+		{
+			VectorSubLayerProperties subLayer = PresetSubLayerPropertiesFetcher.GetSubLayerProperties(PresetFeatureType.Custom);
+			subLayer.coreOptions.layerName = dataLayerNameInService;
+			subLayer.coreOptions.sublayerName = assignedSubLayerName;
+
+			AddFeatureSubLayer(subLayer);
+		}
+
+		public virtual IEnumerable<VectorSubLayerProperties> GetAllFeatureSubLayers()
 		{
 			return _layerProperty.vectorSubLayers.AsEnumerable();
 		}
 
-		public virtual IEnumerable<VectorSubLayerProperties> GetAllPolygonFeatureLayers()
+		public virtual IEnumerable<VectorSubLayerProperties> GetAllPolygonFeatureSubLayers()
 		{
 			foreach (var featureLayer in _layerProperty.vectorSubLayers)
 			{
@@ -398,7 +449,7 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public virtual IEnumerable<VectorSubLayerProperties> GetAllLineFeatureLayers()
+		public virtual IEnumerable<VectorSubLayerProperties> GetAllLineFeatureSubLayers()
 		{
 			foreach (var featureLayer in _layerProperty.vectorSubLayers)
 			{
@@ -409,7 +460,7 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public virtual IEnumerable<VectorSubLayerProperties> GetAllPointFeatureLayers()
+		public virtual IEnumerable<VectorSubLayerProperties> GetAllPointFeatureSubLayers()
 		{
 			foreach (var featureLayer in _layerProperty.vectorSubLayers)
 			{
@@ -420,7 +471,7 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public virtual IEnumerable<VectorSubLayerProperties> GetFeatureLayerByQuery(Func<VectorSubLayerProperties, bool> query)
+		public virtual IEnumerable<VectorSubLayerProperties> GetFeatureSubLayerByQuery(Func<VectorSubLayerProperties, bool> query)
 		{
 			foreach (var featureLayer in _layerProperty.vectorSubLayers)
 			{
@@ -431,7 +482,7 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public virtual VectorSubLayerProperties GetFeatureLayerAtIndex(int i)
+		public virtual VectorSubLayerProperties GetFeatureSubLayerAtIndex(int i)
 		{
 			if (i < _layerProperty.vectorSubLayers.Count)
 			{
@@ -443,7 +494,7 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public virtual VectorSubLayerProperties FindFeatureLayerWithName(string featureLayerName)
+		public virtual VectorSubLayerProperties FindFeatureSubLayerWithName(string featureLayerName)
 		{
 			int foundLayerIndex = -1;
 			// Optimize for performance.
@@ -459,9 +510,9 @@ namespace Mapbox.Unity.Map
 			return (foundLayerIndex != -1) ? _layerProperty.vectorSubLayers[foundLayerIndex] : null;
 		}
 
-		public virtual void RemoveFeatureLayerWithName(string featureLayerName)
+		public virtual void RemoveFeatureSubLayerWithName(string featureLayerName)
 		{
-			var layerToRemove = FindFeatureLayerWithName(featureLayerName);
+			var layerToRemove = FindFeatureSubLayerWithName(featureLayerName);
 			if (layerToRemove != null)
 			{
 				//vectorSubLayers.Remove(layerToRemove);
@@ -469,7 +520,7 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public virtual void RemoveFeatureLayer(VectorSubLayerProperties layer)
+		public virtual void RemoveFeatureSubLayer(VectorSubLayerProperties layer)
 		{
 			_layerProperty.vectorSubLayers.Remove(layer);
 			_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = layer });
@@ -477,7 +528,7 @@ namespace Mapbox.Unity.Map
 
 		// POI LAYER OPERATIONS
 
-		public virtual void AddPoiLayer(PrefabItemOptions poiLayerProperties)
+		public virtual void AddPointsOfInterestSubLayer(PrefabItemOptions poiLayerProperties)
 		{
 			if (_layerProperty.locationPrefabList == null)
 			{
@@ -488,12 +539,12 @@ namespace Mapbox.Unity.Map
 			_layerProperty.OnSubLayerPropertyAdded(new VectorLayerUpdateArgs { property = _layerProperty.locationPrefabList.Last() });
 		}
 
-		public virtual IEnumerable<PrefabItemOptions> GetAllPoiLayers()
+		public virtual IEnumerable<PrefabItemOptions> GetAllPointsOfInterestSubLayers()
 		{
 			return _layerProperty.locationPrefabList.AsEnumerable();
 		}
 
-		public virtual PrefabItemOptions GetPoiLayerAtIndex(int i)
+		public virtual PrefabItemOptions GetPointsOfInterestSubLayerAtIndex(int i)
 		{
 			if (i < _layerProperty.vectorSubLayers.Count)
 			{
@@ -505,7 +556,7 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public virtual IEnumerable<PrefabItemOptions> GetPoiLayerByQuery(Func<PrefabItemOptions, bool> query)
+		public virtual IEnumerable<PrefabItemOptions> GetPointsOfInterestSubLayerByQuery(Func<PrefabItemOptions, bool> query)
 		{
 			foreach (var poiLayer in _layerProperty.locationPrefabList)
 			{
@@ -516,7 +567,7 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public virtual PrefabItemOptions FindPoiLayerWithName(string poiLayerName)
+		public virtual PrefabItemOptions FindPointsofInterestSubLayerWithName(string poiLayerName)
 		{
 			int foundLayerIndex = -1;
 			// Optimize for performance.
@@ -532,9 +583,9 @@ namespace Mapbox.Unity.Map
 			return (foundLayerIndex != -1) ? _layerProperty.locationPrefabList[foundLayerIndex] : null;
 		}
 
-		public virtual void RemovePoiLayerWithName(string poiLayerName)
+		public virtual void RemovePointsOfInterestSubLayerWithName(string poiLayerName)
 		{
-			var layerToRemove = FindPoiLayerWithName(poiLayerName);
+			var layerToRemove = FindPointsofInterestSubLayerWithName(poiLayerName);
 			if (layerToRemove != null)
 			{
 				//vectorSubLayers.Remove(layerToRemove);
@@ -542,12 +593,54 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public virtual void RemovePoiLayer(PrefabItemOptions layer)
+		public virtual void RemovePointsOfInterestSubLayer(PrefabItemOptions layer)
 		{
 			_layerProperty.locationPrefabList.Remove(layer);
 			_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = layer });
 		}
 
+		#endregion
+
+		#region Private helper methods
+		private void SetLayerSourceInternal(VectorSourceType vectorSource)
+		{
+			if (vectorSource != VectorSourceType.Custom && vectorSource != VectorSourceType.None)
+			{
+				_layerProperty.sourceType = vectorSource;
+				_layerProperty.sourceOptions.layerSource = MapboxDefaultVector.GetParameters(vectorSource);
+			}
+			else
+			{
+				Debug.LogWarning("Invalid style - trying to set " + vectorSource.ToString() + " as default style!");
+			}
+		}
+		private void SetLayerSourceInternal(string vectorSource)
+		{
+			if (!string.IsNullOrEmpty(vectorSource))
+			{
+				_layerProperty.sourceType = VectorSourceType.Custom;
+				_layerProperty.sourceOptions.Id = vectorSource;
+			}
+			else
+			{
+				_layerProperty.sourceType = VectorSourceType.None;
+				Debug.LogWarning("Empty source - turning off vector data. ");
+			}
+		}
+
+		private void SetOptimizedStyleInternal(string styleId, string modifiedDate, string styleName)
+		{
+			_layerProperty.useOptimizedStyle = true;
+
+			_layerProperty.optimizedStyle = _layerProperty.optimizedStyle ?? new Style();
+
+			_layerProperty.optimizedStyle.Id = styleId;
+			_layerProperty.optimizedStyle.Modified = modifiedDate;
+			if (!String.IsNullOrEmpty(styleName))
+			{
+				_layerProperty.optimizedStyle.Name = styleName;
+			}
+		}
 		#endregion
 	}
 }

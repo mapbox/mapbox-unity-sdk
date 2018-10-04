@@ -19,7 +19,7 @@
 	public class ReplaceFeatureModifier : GameObjectModifier, IReplacementCriteria
 	{
 
-		private List<string> _latLonToSpawn;
+		private List<Vector2d> _latLonToSpawn;
 
 		private Dictionary<ulong, GameObject> _objects;
 		private Dictionary<ulong, Vector2d> _objectPosition;
@@ -73,8 +73,9 @@
 		{
 			base.Initialize();
 			//duplicate the list of lat/lons to track which coordinates have already been spawned
-			_latLonToSpawn = new List<string>(_prefabLocations);
+
 			_featureId = new List<List<string>>();
+
 			for (int i = 0; i < _prefabLocations.Count; i++)
 			{
 				_featureId.Add(new List<string>());
@@ -85,7 +86,11 @@
 				_objectPosition = new Dictionary<ulong, Vector2d>();
 				_poolGameObject = new GameObject("_inactive_prefabs_pool");
 			}
-			_latLonToSpawn = new List<string>(_prefabLocations);
+			_latLonToSpawn = new List<Vector2d>();
+			foreach (var loc in _prefabLocations)
+			{
+				_latLonToSpawn.Add(Conversions.StringToLatLon(loc));
+			}
 		}
 
 		public override void SetProperties(ModifierProperties properties)
@@ -264,16 +269,16 @@
 			if (_objects.ContainsKey(feature.Data.Id))
 			{
 				_objectPosition.TryGetValue(feature.Data.Id, out latLong);
+				_latLonToSpawn.Remove(latLong);
 				return true;
 			}
 
 			foreach (var point in _latLonToSpawn)
 			{
-				var coord = Conversions.StringToLatLon(point);
-				if (feature.ContainsLatLon(coord))
+				if (feature.ContainsLatLon(point))
 				{
 					_latLonToSpawn.Remove(point);
-					latLong = coord;
+					latLong = point;
 					return true;
 				}
 			}
