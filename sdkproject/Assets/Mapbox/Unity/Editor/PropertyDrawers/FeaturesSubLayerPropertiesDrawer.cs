@@ -429,11 +429,16 @@
 
 			var atlas = subLayerGeometryMaterialOptions.FindPropertyRelative("atlasInfo");
 			var palette = subLayerGeometryMaterialOptions.FindPropertyRelative("colorPalette");
+			var lightStyleOpacity = subLayerGeometryMaterialOptions.FindPropertyRelative("lightStyleOpacity");
+			var darkStyleOpacity = subLayerGeometryMaterialOptions.FindPropertyRelative("darkStyleOpacity");
 
 			topMat.objectReferenceValue = materialOptions.materials[0].Materials[0];
 			sideMat.objectReferenceValue = materialOptions.materials[1].Materials[0];
 			atlas.objectReferenceValue = materialOptions.atlasInfo;
 			palette.objectReferenceValue = materialOptions.colorPalette;
+			lightStyleOpacity.floatValue = materialOptions.lightStyleOpacity;
+			darkStyleOpacity.floatValue = materialOptions.darkStyleOpacity;
+
 
 			subLayer.FindPropertyRelative("buildingsWithUniqueIds").boolValue = subLayerProperties.buildingsWithUniqueIds;
 			subLayer.FindPropertyRelative("moveFeaturePositionTo").enumValueIndex = (int)subLayerProperties.moveFeaturePositionTo;
