@@ -101,10 +101,18 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 							_defaultStack.GoModifiers = new List<GameObjectModifier>();
 						}
 
+						if (item.findByType == LocationPrefabFindBy.MapboxCategory)
+						{
+							if (_prefabModifier != null)
+							{
+								_prefabModifier.ClearCaches();
+							}
+							_defaultStack.GoModifiers.Clear();
+						}
+
 						if ((item.findByType == LocationPrefabFindBy.MapboxCategory && item.categories == LocationPrefabCategories.None))
 						{
-							_prefabModifier.ClearCaches();
-							_defaultStack.GoModifiers.Clear();
+
 							itemProperties.spawnPrefabOptions.PropertyHasChanged += UpdatePois;
 						}
 						else
@@ -175,13 +183,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				List<LocationPrefabCategories> categoriesList = GetSelectedCategoriesList(item.categories);
 				if (categoriesList == null || categoriesList.Count == 0)
 				{
-					LayerFilter filter = new LayerFilter(LayerFilterOperationType.Contains)
-					{
-						Key = "testasdadas",
-						PropertyValue = "asdqweqsd"
-					};
-					AddFilterToItem(item, filter);
-					//return;
+					return;
 				}
 				else
 				{
@@ -323,7 +325,12 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 			else
 			{
-				base.Create(layer, tile, callback);
+				var item = (SubLayerProperties as PrefabItemOptions);
+				bool isCategoryNone = (item.findByType == LocationPrefabFindBy.MapboxCategory && item.categories == LocationPrefabCategories.None);
+				if (!isCategoryNone)
+				{
+					base.Create(layer, tile, callback);
+				}
 			}
 		}
 
