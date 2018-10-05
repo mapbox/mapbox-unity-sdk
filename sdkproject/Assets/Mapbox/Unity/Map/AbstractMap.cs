@@ -824,6 +824,11 @@ namespace Mapbox.Unity.Map
 			OnInitialized();
 		}
 
+		/// <summary>
+		/// Apply Snap World to Zero setting by moving map in Y Axis such that
+		/// center of the given tile will be at y=0.
+		/// </summary>
+		/// <param name="referenceTile">Tile to use for Y axis correction.</param>
 		private void ApplySnapWorldToZero(UnityTile referenceTile)
 		{
 			if (_options.placementOptions.snapMapToZero)
