@@ -153,10 +153,10 @@
 		[Description("Mapbox Terrain provides digital elevation model with worldwide coverage. ")]
 #endif
 		MapboxTerrain,
-#if !ENABLE_WINMD_SUPPORT
-		[Description("Use custom digital elevation model tileset.")]
-#endif
-		Custom,
+//#if !ENABLE_WINMD_SUPPORT
+//		[Description("Use custom digital elevation model tileset.")]
+//#endif
+//		Custom,
 #if !ENABLE_WINMD_SUPPORT
 		[Description("Render flat terrain.")]
 #endif
