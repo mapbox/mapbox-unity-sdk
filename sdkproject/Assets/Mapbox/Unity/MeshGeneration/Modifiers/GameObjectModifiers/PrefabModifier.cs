@@ -98,5 +98,19 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				settable.Set(ve.Feature.Properties);
 			}
 		}
+
+		public override void ClearCaches()
+		{
+			base.ClearCaches();
+			foreach (var gameObject in _objects.Values)
+			{
+				Destroy(gameObject);
+			}
+
+			foreach (var gameObject in _prefabList)
+			{
+				Destroy(gameObject);
+			}
+		}
 	}
 }
