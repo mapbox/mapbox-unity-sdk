@@ -4,8 +4,6 @@ using Mapbox.Unity.SourceLayers;
 namespace Mapbox.Unity.Map
 {
 	using System;
-	//public class Terrain
-	// Layer Interfaces
 	using System.Collections.Generic;
 	using Mapbox.Unity.MeshGeneration.Filters;
 	using Mapbox.Utils;
@@ -26,9 +24,9 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		string LayerSourceId { get; }
 
-		//LayerProperties LayerProperty { get; set; }
-
-		//TODO : These methods should return a status.
+		/// <summary>
+		/// Gets the `Data Source` for the `MAP LAYERS` section.
+		/// </summary>
 		void SetLayerSource(string source);
 		void Initialize();
 		void Initialize(LayerProperties properties);
@@ -41,18 +39,19 @@ namespace Mapbox.Unity.Map
 	{
 		#region Layer Level APIs
 		TileJsonData GetTileJsonData();
+
+
 		/// <summary>
-		/// Change existing data source (mapid) with provided source.
+		/// Gets the `Data Source` for the `MAP LAYERS` section.
 		/// </summary>
-		/// <param name="vectorSource">Data source (Mapid) to use.</param>
 		void SetLayerSource(VectorSourceType vectorSource);
 
 		/// <summary>
-		/// Add provided data source (mapid) to existing ones.
-		/// Mapbox vector api supports comma separated mapids and this method
-		/// adds the provided mapid at the end of the existing source.
+		/// Adds the provided `Data Source` (`Map ID`) to existing ones. For multiple
+		/// sources, you can separate with a comma. `Map ID` string is added at the
+		/// end of the existing sources.
 		/// </summary>
-		/// <param name="vectorSource">Data source (Mapid) to add to existing sources.</param>
+		/// <param name="vectorSource">`Data Source` (`Map ID`) to add to existing sources.</param>
 		void AddLayerSource(string vectorSource);
 
 		/// <summary>
@@ -74,11 +73,10 @@ namespace Mapbox.Unity.Map
 		void SetLayerSourceWithOptimizedStyle(VectorSourceType vectorSource, string styleId, string modifiedDate, string styleName = null);
 
 		/// <summary>
-		/// Enable coroutines for vector features, processing choosen amount
+		/// Enables coroutines for vector features. Processes the specified amount
 		/// of them each frame.
 		/// </summary>
 		/// <param name="entityPerCoroutine">Numbers of features to process each frame.</param>
-		///
 		void EnableVectorFeatureProcessingWithCoroutines(int entityPerCoroutine = 20);
 
 		/// <summary>
@@ -89,7 +87,7 @@ namespace Mapbox.Unity.Map
 
 		#region LayerOperations
 
-		// FEATURE LAYER OPERATIONS
+		/// FEATURE LAYER OPERATIONS
 
 		void AddFeatureSubLayer(VectorSubLayerProperties subLayerProperties);
 
@@ -152,7 +150,7 @@ namespace Mapbox.Unity.Map
 
 		void RemoveFeatureSubLayer(VectorSubLayerProperties layer);
 
-		// POI LAYER OPERATIONS
+		/// POI LAYER OPERATIONS
 
 		void AddPointsOfInterestSubLayer(PrefabItemOptions poiLayerProperties);
 
@@ -228,7 +226,7 @@ namespace Mapbox.Unity.Map
 		#endregion
 	}
 
-	// TODO: Move interfaces into individual files.
+	/// TODO: Move interfaces into individual files.
 
 	public interface ISubLayerPolygonGeometryOptions
 	{
@@ -306,6 +304,6 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		ISubLayerBehaviorModifiers BehaviorModifiers { get; }
 
-		// Add methods that we need at sublayer level
+
 	}
 }
