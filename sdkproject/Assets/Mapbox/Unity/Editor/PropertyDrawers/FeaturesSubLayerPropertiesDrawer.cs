@@ -85,7 +85,7 @@
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 			var serializedMapObject = property.serializedObject;
 			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
-			tileJSONData = mapObject.VectorData.LayerProperty.tileJsonData;
+			tileJSONData = mapObject.VectorData.GetTileJsonData();
 
 			var sourceTypeProperty = property.FindPropertyRelative("_sourceType");
 			var sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
@@ -276,25 +276,25 @@
 
 				if (GUILayout.Button(new GUIContent("Remove Selected"), (GUIStyle)"minibuttonright"))
 				{
-					bool layerWasRemoved = false;
 					foreach (var index in selectedLayers.OrderByDescending(i => i))
 					{
 						if (layerTreeView != null)
 						{
+							var subLayer = subLayerArray.GetArrayElementAtIndex(index - FeatureSubLayerTreeView.uniqueId);
+
+							VectorLayerProperties vectorLayerProperties = (VectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property);
+							VectorSubLayerProperties vectorSubLayerProperties = (VectorSubLayerProperties)EditorHelper.GetTargetObjectOfProperty(subLayer);
+
+							vectorLayerProperties.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = vectorSubLayerProperties });
+
 							layerTreeView.RemoveItemFromTree(index);
 							subLayerArray.DeleteArrayElementAtIndex(index - FeatureSubLayerTreeView.uniqueId);
 							layerTreeView.treeModel.SetData(GetData(subLayerArray));
-							layerWasRemoved = true;
 						}
 					}
 
 					selectedLayers = new int[0];
 					layerTreeView.SetSelection(selectedLayers);
-
-					if (layerWasRemoved)
-					{
-						EditorHelper.CheckForModifiedProperty(property);
-					}
 				}
 
 				EditorGUILayout.EndHorizontal();
@@ -395,6 +395,7 @@
 			subLayerExtrusionOptions.FindPropertyRelative("extrusionGeometryType").enumValueIndex = (int)extrusionOptions.extrusionGeometryType;
 			subLayerExtrusionOptions.FindPropertyRelative("propertyName").stringValue = extrusionOptions.propertyName;
 			subLayerExtrusionOptions.FindPropertyRelative("extrusionScaleFactor").floatValue = extrusionOptions.extrusionScaleFactor;
+			subLayerExtrusionOptions.FindPropertyRelative("maximumHeight").floatValue = extrusionOptions.maximumHeight;
 
 			var subLayerFilterOptions = subLayer.FindPropertyRelative("filterOptions");
 			var filterOptions = subLayerProperties.filterOptions;
@@ -471,11 +472,16 @@
 
 			var serializedMapObject = property.serializedObject;
 			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
-			tileJsonData = mapObject.VectorData.LayerProperty.tileJsonData;
+			tileJsonData = mapObject.VectorData.GetTileJsonData();
 
 			var layerDisplayNames = tileJsonData.LayerDisplayNames;
 
+			EditorGUI.BeginChangeCheck();
 			DrawLayerName(subLayerCoreOptions, layerDisplayNames);
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(subLayerCoreOptions);
+			}
 			//*********************** LAYER NAME ENDS ***********************************//
 
 			//*********************** TYPE DROPDOWN BEGINS ***********************************//
@@ -622,16 +628,7 @@
 			}
 
 			//draw the layer selection popup
-			EditorGUI.BeginChangeCheck();
 			_layerIndex = EditorGUILayout.Popup(layerNameLabel, _layerIndex, _layerTypeContent);
-			if (EditorGUI.EndChangeCheck())
-			{
-				MapboxDataProperty mapboxDataProperty = (MapboxDataProperty)EditorHelper.GetTargetObjectOfProperty(property);
-				if (mapboxDataProperty != null)
-				{
-					mapboxDataProperty.HasChanged = true;
-				}
-			}
 			var parsedString = layerDisplayNames.ToArray()[_layerIndex].Split(new string[] { tileJsonData.commonLayersKey }, System.StringSplitOptions.None)[0].Trim();
 			property.FindPropertyRelative("layerName").stringValue = parsedString;
 		}

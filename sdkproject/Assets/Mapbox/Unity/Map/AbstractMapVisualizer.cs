@@ -280,7 +280,7 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public void UnregisterTilesFromLayer(VectorTileFactory factory, LayerVisualizerBase layerVisualizer)
+		public void UnregisterAndRedrawTilesFromLayer(VectorTileFactory factory, LayerVisualizerBase layerVisualizer)
 		{
 			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
 			{
@@ -299,8 +299,8 @@ namespace Mapbox.Unity.Map
 			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
 			{
 				factory.UnregisterLayer(tileBundle.Value, layerVisualizer);
-				factory.RemoveVectorLayerVisualizer(layerVisualizer);
 			}
+			factory.RemoveVectorLayerVisualizer(layerVisualizer);
 		}
 
 		public void ReregisterTilesTo(VectorTileFactory factory)
