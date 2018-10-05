@@ -99,7 +99,7 @@ namespace Mapbox.Unity.Map
 
 				if (EditorHelper.DidModifyProperty(property))
 				{
-					PrefabItemOptions prefabItemOptionToAdd= (PrefabItemOptions)EditorHelper.GetTargetObjectOfProperty(prefabItem) as PrefabItemOptions;
+					PrefabItemOptions prefabItemOptionToAdd = (PrefabItemOptions)EditorHelper.GetTargetObjectOfProperty(prefabItem) as PrefabItemOptions;
 					((VectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property)).OnSubLayerPropertyAdded(new VectorLayerUpdateArgs { property = prefabItemOptionToAdd });
 				}
 			}
@@ -114,22 +114,31 @@ namespace Mapbox.Unity.Map
 				List<PrefabItemOptions> LayersToRemove = new List<PrefabItemOptions>();
 				foreach (var index in selectedLayers.OrderByDescending(i => i))
 				{
-					PrefabItemOptions prefabItemOptionsToRemove = (PrefabItemOptions)EditorHelper.GetTargetObjectOfProperty(prefabItemArray.GetArrayElementAtIndex(index)) as PrefabItemOptions;
-					if(prefabItemOptionsToRemove != null)
-					{
-						LayersToRemove.Add(prefabItemOptionsToRemove);
-					}
+					var poiSubLayer = prefabItemArray.GetArrayElementAtIndex(index);
+
+					VectorLayerProperties vectorLayerProperties = (VectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property);
+					PrefabItemOptions vectorSubLayerProperties = (PrefabItemOptions)EditorHelper.GetTargetObjectOfProperty(poiSubLayer);
+
+					vectorLayerProperties.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = vectorSubLayerProperties });
+
+
+
+					//if (prefabItemOptionsToRemove != null)
+					//{
+					//	LayersToRemove.Add(prefabItemOptionsToRemove);
+					//}
 					prefabItemArray.DeleteArrayElementAtIndex(index);
+					//layerTreeView.SetData(GetData(subLayerArray));
 				}
 				selectedLayers = new int[0];
 				layerTreeView.SetSelection(selectedLayers);
-				if (EditorHelper.DidModifyProperty(property))
-				{
-					for (int i = 0; i < LayersToRemove.Count; i++)
-					{
-						((VectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property)).OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = LayersToRemove[i]});
-					}
-				}
+				//if (EditorHelper.DidModifyProperty(property))
+				//{
+				//	for (int i = 0; i < LayersToRemove.Count; i++)
+				//	{
+				//		((VectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property)).OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = LayersToRemove[i]});
+				//	}
+				//}
 			}
 
 			EditorGUILayout.EndHorizontal();
