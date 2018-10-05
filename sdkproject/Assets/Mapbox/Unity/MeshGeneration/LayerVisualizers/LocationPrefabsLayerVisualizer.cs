@@ -32,12 +32,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			item.filterOptions.filters.Clear();
 
-			//Check to make sure that when Categories selection is none, the location prefab is disabled
-			//			if (item.findByType == LocationPrefabFindBy.MapboxCategory && item.categories == LocationPrefabCategories.None)
-			//			{
-			//				return;
-			//			}
-
 			if (item.spawnPrefabOptions.prefab == null)
 			{
 				//item.spawnPrefabOptions.prefab = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -120,6 +114,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					break;
 			}
 
+			item.coreOptions.PropertyHasChanged += UpdatePois;
 			(SubLayerProperties as PrefabItemOptions).PropertyHasChanged += UpdatePois;
 		}
 
@@ -153,6 +148,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				modifier.ModifierHasChanged -= UpdatePois;
 			}
 
+			SubLayerProperties.coreOptions.PropertyHasChanged -= UpdatePois;
 			(SubLayerProperties as PrefabItemOptions).PropertyHasChanged -= UpdatePois;
 
 			OnUpdateLayerVisualizer(layerUpdateArgs);
