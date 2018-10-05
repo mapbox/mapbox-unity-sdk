@@ -17,8 +17,8 @@
 					};
 
 					break;
-				case ElevationSourceType.Custom:
-					throw new Exception("Invalid type : Custom");
+//				case ElevationSourceType.Custom:
+//					throw new Exception("Invalid type : Custom");
 				default:
 					break;
 			}

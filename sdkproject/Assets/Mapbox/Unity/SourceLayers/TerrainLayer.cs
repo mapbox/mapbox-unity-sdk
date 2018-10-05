@@ -210,12 +210,12 @@
 		/// <summary>
 		/// Sets the data source for Terrain Layer.
 		/// Defaults to MapboxTerrain.
-		/// Use <paramref name="terrainSource"/> = None, to disable the Terrain Layer. 
+		/// Use <paramref name="terrainSource"/> = None, to disable the Terrain Layer.
 		/// </summary>
 		/// <param name="terrainSource">Terrain source.</param>
 		public virtual void SetLayerSource(ElevationSourceType terrainSource = ElevationSourceType.MapboxTerrain)
 		{
-			if (terrainSource != ElevationSourceType.Custom && terrainSource != ElevationSourceType.None)
+			if (terrainSource != ElevationSourceType.None)
 			{
 				_layerProperty.sourceType = terrainSource;
 				_layerProperty.sourceOptions.layerSource = MapboxDefaultElevation.GetParameters(terrainSource);
@@ -228,22 +228,15 @@
 		}
 
 		/// <summary>
-		/// Sets the data source to a custom source for Terrain Layer. 
-		/// </summary> 
+		/// Sets the data source to a custom source for Terrain Layer.
+		/// </summary>
 		/// <param name="terrainSource">Terrain source.</param>
 		public virtual void SetLayerSource(string terrainSource)
 		{
-			if (!string.IsNullOrEmpty(terrainSource))
-			{
-				_layerProperty.sourceType = ElevationSourceType.Custom;
-				_layerProperty.sourceOptions.Id = terrainSource;
-			}
-			else
-			{
-				_layerProperty.sourceType = ElevationSourceType.None;
-				_layerProperty.elevationLayerType = ElevationLayerType.FlatTerrain;
-				Debug.LogWarning("Empty source - turning off terrain. ");
-			}
+			_layerProperty.sourceType = ElevationSourceType.None;
+			_layerProperty.elevationLayerType = ElevationLayerType.FlatTerrain;
+			Debug.LogWarning("Empty source - turning off terrain. ");
+
 			_layerProperty.HasChanged = true;
 		}
 		/// <summary>

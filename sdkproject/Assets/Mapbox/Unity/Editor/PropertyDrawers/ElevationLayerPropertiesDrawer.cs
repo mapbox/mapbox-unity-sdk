@@ -90,11 +90,11 @@
 					EditorGUILayout.PropertyField(sourceOptionsProperty, _mapIdGui);
 					GUI.enabled = true;
 					break;
-				case ElevationSourceType.Custom:
-					layerSourceId.stringValue = CustomSourceMapId;
-					EditorGUILayout.PropertyField(sourceOptionsProperty, _mapIdGui);
-					CustomSourceMapId = layerSourceId.stringValue;
-					break;
+//				case ElevationSourceType.Custom:
+//					layerSourceId.stringValue = CustomSourceMapId;
+//					EditorGUILayout.PropertyField(sourceOptionsProperty, _mapIdGui);
+//					CustomSourceMapId = layerSourceId.stringValue;
+//					break;
 				default:
 					break;
 			}
