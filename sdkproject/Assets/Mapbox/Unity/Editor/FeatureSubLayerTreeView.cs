@@ -10,7 +10,9 @@
 	{
 		public SerializedProperty Layers;
 		private float kToggleWidth = 18f;
-		public static int uniqueId = 3000;
+		public int uniqueId;
+		public static int uniqueIdPoI = 1000;
+		public static int uniqueIdFeature = 3000;
 		public int maxElementsAdded = 0;
 
 		public bool hasChanged = false;
@@ -25,7 +27,7 @@
 			normal = new GUIStyleState() { textColor = Color.white }
 		};
 
-		public FeatureSubLayerTreeView(TreeViewState state, MultiColumnHeader multicolumnHeader, TreeModel<FeatureTreeElement> model) : base(state, multicolumnHeader, model)
+		public FeatureSubLayerTreeView(TreeViewState state, MultiColumnHeader multicolumnHeader, TreeModel<FeatureTreeElement> model, int uniqueIdentifier = 3000) : base(state, multicolumnHeader, model)
 		{
 			// Custom setup
 			//rowHeight = kRowHeights;
@@ -33,6 +35,7 @@
 			showBorder = true;
 			customFoldoutYOffset = (kRowHeights - EditorGUIUtility.singleLineHeight) * 0.5f; // center foldout in the row since we also center content. See RowGUI
 			extraSpaceBeforeIconAndLabel = kToggleWidth;
+			uniqueId = uniqueIdentifier;
 			Reload();
 		}
 
