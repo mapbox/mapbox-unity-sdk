@@ -4,10 +4,18 @@ namespace Mapbox.Unity.Map
 {
 	public interface ITerrainLayer : ILayer
 	{
-
+		/// <summary>
+		/// Gets the `Data Source` for the `TERRAIN` section.
+		/// </summary>
 		ElevationSourceType LayerSource { get; }
+		/// <summary>
+		/// Gets the `Elevation Layer Type` for the `TERRAIN` section.
+		/// </summary>
 		ElevationLayerType ElevationType { get; set; }
-		float ExagerationFactor { get; set; }
+		/// <summary>
+		/// Gets the `Exaggetation Factor` for the `TERRAIN` section.
+		/// </summary>
+		float ExaggerationFactor { get; set; }
 
 		/// <summary>
 		/// Sets the Data Source for `TERRAIN`. By default this is set to

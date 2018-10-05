@@ -6,13 +6,22 @@ namespace Mapbox.Unity.Map
 	// Layer Interfaces
 	public interface ILayer
 	{
+		/// <summary>
+		/// Gets the type of feature from the `FEATURES` section.
+		/// </summary>
 		MapLayerType LayerType { get; }
+		/// <summary>
+		/// Boolean for setting the feature layer active or inactive.
+		/// </summary>
 		bool IsLayerActive { get; }
+		/// <summary>
+		/// Gets the source ID for the feature layer.
+		/// </summary>
 		string LayerSourceId { get; }
 
 		//LayerProperties LayerProperty { get; set; }
 
-		//TODO : These methods should return a status. 
+		//TODO : These methods should return a status.
 		void SetLayerSource(string source);
 		void Initialize();
 		void Initialize(LayerProperties properties);
@@ -45,12 +54,24 @@ namespace Mapbox.Unity.Map
 
 	public interface IVectorSubLayer
 	{
+		/// <summary>
+		/// Gets `Filters` data from the feature.
+		/// </summary>
 		ISubLayerFiltering Filtering { get; }
+		/// <summary>
+		/// Gets `Modeling` data from the feature.
+		/// </summary>
 		ISubLayerModeling Modeling { get; }
+		/// <summary>
+		/// Gets `Texturing` data from the feature.
+		/// </summary>
 		ISubLayerTexturing Texturing { get; }
+		/// <summary>
+		/// Gets `Behavior Modifiers` data from the feature.
+		/// </summary>
 		ISubLayerBehaviorModifiers BehaviorModifiers { get; }
 
-		// Add methods that we need at sublayer level 
+		// Add methods that we need at sublayer level
 	}
 
 
@@ -58,7 +79,7 @@ namespace Mapbox.Unity.Map
 
 	public class SubLayerBehaviorModifiers : ISubLayerBehaviorModifiers
 	{
-		// TODO: Remove if not required. 
+		// TODO: Remove if not required.
 		VectorSubLayerProperties _subLayerProperties;
 		public SubLayerBehaviorModifiers(VectorSubLayerProperties subLayerProperties)
 		{
@@ -67,5 +88,3 @@ namespace Mapbox.Unity.Map
 	}
 
 }
-
-
