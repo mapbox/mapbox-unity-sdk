@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace Mapbox.Unity.Map
 {
 	using System;
@@ -553,7 +555,7 @@ namespace Mapbox.Unity.Map
 			options.placementOptions.placementStrategy.SetUpPlacement(this);
 
 
-			//Set up events for changes. 
+			//Set up events for changes.
 			_imagery.UpdateLayer += OnImageOrTerrainUpdateLayer;
 			_terrain.UpdateLayer += OnImageOrTerrainUpdateLayer;
 
@@ -593,6 +595,7 @@ namespace Mapbox.Unity.Map
 				Debug.Log("<color=yellow>General - Placement Options </color>" + gameObject.name);
 				//take care of redraw map business...
 				SetPlacementStrategy();
+				ApplySnapWorldToZero(_mapVisualizer.ActiveTiles.First().Value);
 				UpdateMap();
 			};
 
@@ -699,6 +702,7 @@ namespace Mapbox.Unity.Map
 		public virtual void Initialize(Vector2d latLon, int zoom)
 		{
 			_initializeOnStart = false;
+			_worldHeightFixed = false;
 			if (_options == null)
 			{
 				_options = new MapOptions();
@@ -734,15 +738,17 @@ namespace Mapbox.Unity.Map
 		/// <param name="zoom">Zoom level.</param>
 		public virtual void UpdateMap(Vector2d latLon, float zoom)
 		{
+			//so map will be snapped to zero using next new tile loaded
+			_worldHeightFixed = false;
 			float differenceInZoom = 0.0f;
 			bool isAtInitialZoom = false;
-			// Update map zoom, if it has changed. 
+			// Update map zoom, if it has changed.
 			if (Math.Abs(Zoom - zoom) > Constants.EpsilonFloatingPoint)
 			{
 				SetZoom(zoom);
 			}
 
-			// Compute difference in zoom. Will be used to calculate correct scale of the map. 
+			// Compute difference in zoom. Will be used to calculate correct scale of the map.
 			differenceInZoom = Zoom - InitialZoom;
 			isAtInitialZoom = (differenceInZoom - 0.0 < Constants.EpsilonFloatingPoint);
 
@@ -766,7 +772,7 @@ namespace Mapbox.Unity.Map
 				Root.localScale = _mapScaleFactor;
 			}
 
-			//Update Tile extent. 
+			//Update Tile extent.
 			_tileProvider.UpdateTileExtent();
 
 			if (OnUpdated != null)
@@ -785,33 +791,22 @@ namespace Mapbox.Unity.Map
 
 		protected virtual void TileProvider_OnTileAdded(UnwrappedTileId tileId)
 		{
-			if (Options.placementOptions.snapMapToZero)
+			var tile = _mapVisualizer.LoadTile(tileId);
+
+			if (Options.placementOptions.snapMapToZero && !_worldHeightFixed)
 			{
 				_worldHeightFixed = true;
-				var tile = _mapVisualizer.LoadTile(tileId);
 				if (tile.HeightDataState == MeshGeneration.Enums.TilePropertyState.Loaded)
 				{
-					var h = tile.QueryHeightData(.5f, .5f);
-					Root.transform.position = new Vector3(
-					 Root.transform.position.x,
-					 -h,
-					 Root.transform.position.z);
+					ApplySnapWorldToZero(tile);
 				}
 				else
 				{
 					tile.OnHeightDataChanged += (s) =>
 					{
-						var h = s.QueryHeightData(.5f, .5f);
-						Root.transform.position = new Vector3(
-							 Root.transform.position.x,
-							 -h,
-							 Root.transform.position.z);
+						ApplySnapWorldToZero(tile);
 					};
 				}
-			}
-			else
-			{
-				_mapVisualizer.LoadTile(tileId);
 			}
 		}
 
@@ -828,6 +823,30 @@ namespace Mapbox.Unity.Map
 		protected void SendInitialized()
 		{
 			OnInitialized();
+		}
+
+		/// <summary>
+		/// Apply Snap World to Zero setting by moving map in Y Axis such that
+		/// center of the given tile will be at y=0.
+		/// </summary>
+		/// <param name="referenceTile">Tile to use for Y axis correction.</param>
+		private void ApplySnapWorldToZero(UnityTile referenceTile)
+		{
+			if (_options.placementOptions.snapMapToZero)
+			{
+				var h = referenceTile.QueryHeightData(.5f, .5f);
+				Root.transform.position = new Vector3(
+					Root.transform.position.x,
+					-h,
+					Root.transform.position.z);
+			}
+			else
+			{
+				Root.transform.position = new Vector3(
+					Root.transform.position.x,
+					0,
+					Root.transform.position.z);
+			}
 		}
 
 		#region Conversion Methods
@@ -941,7 +960,7 @@ namespace Mapbox.Unity.Map
 		}
 
 		/// <summary>
-		/// Sets the extent type and parameters to control the maps extent. 
+		/// Sets the extent type and parameters to control the maps extent.
 		/// </summary>
 		/// <param name="extentType">Extent type.</param>
 		/// <param name="extentOptions">Extent options.</param>
@@ -961,7 +980,7 @@ namespace Mapbox.Unity.Map
 		}
 
 		/// <summary>
-		/// Set parameters for current extent calculator strategy. 
+		/// Set parameters for current extent calculator strategy.
 		/// </summary>
 		/// <param name="extentOptions">Parameters to control the map extent.</param>
 		public virtual void SetExtentOptions(ExtentOptions extentOptions)
@@ -971,7 +990,7 @@ namespace Mapbox.Unity.Map
 		}
 
 		/// <summary>
-		/// Sets the positions of the map's root transform. 
+		/// Sets the positions of the map's root transform.
 		/// Use <paramref name="placementType"/> = <c> MapPlacementType.AtTileCenter</c> to place map root at the center of tile containing the latitude,longitude.
 		/// Use <paramref name="placementType"/> = <c> MapPlacementType.AtLocationCenter</c> to place map root at the latitude,longitude.
 		/// </summary>
@@ -983,7 +1002,7 @@ namespace Mapbox.Unity.Map
 		}
 
 		/// <summary>
-		/// Translates map root by the terrain elevation at the center geo location. 
+		/// Translates map root by the terrain elevation at the center geo location.
 		/// Use this method with <c>TerrainWithElevation</c>
 		/// </summary>
 		/// <param name="active">If set to <c>true</c> active.</param>
@@ -994,7 +1013,7 @@ namespace Mapbox.Unity.Map
 		}
 
 		/// <summary>
-		/// Sets the map to use real world scale for map tile. 
+		/// Sets the map to use real world scale for map tile.
 		/// Use world scale for AR use cases or applications that need true world scale.
 		/// </summary>
 		public virtual void UseWorldScale()
@@ -1004,7 +1023,7 @@ namespace Mapbox.Unity.Map
 		}
 
 		/// <summary>
-		/// Sets the map to use custom scale for map tiles. 
+		/// Sets the map to use custom scale for map tiles.
 		/// </summary>
 		/// <param name="tileSizeInUnityUnits">Tile size in unity units to scale each Web Mercator tile.</param>
 		public virtual void UseCustomScale(float tileSizeInUnityUnits)
