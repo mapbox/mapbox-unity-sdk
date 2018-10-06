@@ -218,16 +218,16 @@
 				if (selectedLayers.Count > 0)
 				{
 					//ensure that selectedLayers[0] isn't out of bounds
-					if (selectedLayers[0] - FeatureSubLayerTreeView.uniqueId > subLayerArray.arraySize - 1)
+					if (selectedLayers[0] - FeatureSubLayerTreeView.uniqueIdFeature > subLayerArray.arraySize - 1)
 					{
-						selectedLayers[0] = subLayerArray.arraySize - 1 + FeatureSubLayerTreeView.uniqueId;
+						selectedLayers[0] = subLayerArray.arraySize - 1 + FeatureSubLayerTreeView.uniqueIdFeature;
 					}
 
 					SelectionIndex = selectedLayers[0];
 				}
 				else
 				{
-					if (SelectionIndex > 0 && (SelectionIndex - FeatureSubLayerTreeView.uniqueId <= subLayerArray.arraySize - 1))
+					if (SelectionIndex > 0 && (SelectionIndex - FeatureSubLayerTreeView.uniqueIdFeature <= subLayerArray.arraySize - 1))
 					{
 						selectedLayers = new int[1] { SelectionIndex };
 						layerTreeView.SetSelection(selectedLayers);
@@ -264,7 +264,7 @@
 					layerTreeView.AddElementToTree(subLayer);
 					layerTreeView.Reload();
 
-					selectedLayers = new int[1] { subLayerArray.arraySize - 1 + FeatureSubLayerTreeView.uniqueId };
+					selectedLayers = new int[1] { subLayerArray.arraySize - 1 + FeatureSubLayerTreeView.uniqueIdFeature };
 					layerTreeView.SetSelection(selectedLayers);
 					subLayerProperties = null; // setting this to null so that the if block is not called again
 
@@ -280,7 +280,7 @@
 					{
 						if (layerTreeView != null)
 						{
-							var subLayer = subLayerArray.GetArrayElementAtIndex(index - FeatureSubLayerTreeView.uniqueId);
+							var subLayer = subLayerArray.GetArrayElementAtIndex(index - FeatureSubLayerTreeView.uniqueIdFeature);
 
 							VectorLayerProperties vectorLayerProperties = (VectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property);
 							VectorSubLayerProperties vectorSubLayerProperties = (VectorSubLayerProperties)EditorHelper.GetTargetObjectOfProperty(subLayer);
@@ -288,7 +288,7 @@
 							vectorLayerProperties.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = vectorSubLayerProperties });
 
 							layerTreeView.RemoveItemFromTree(index);
-							subLayerArray.DeleteArrayElementAtIndex(index - FeatureSubLayerTreeView.uniqueId);
+							subLayerArray.DeleteArrayElementAtIndex(index - FeatureSubLayerTreeView.uniqueIdFeature);
 							layerTreeView.treeModel.SetData(GetData(subLayerArray));
 						}
 					}
@@ -301,17 +301,17 @@
 
 				GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
-				if (selectedLayers.Count == 1 && subLayerArray.arraySize != 0 && selectedLayers[0] - FeatureSubLayerTreeView.uniqueId >= 0)
+				if (selectedLayers.Count == 1 && subLayerArray.arraySize != 0 && selectedLayers[0] - FeatureSubLayerTreeView.uniqueIdFeature >= 0)
 				{
 					//ensure that selectedLayers[0] isn't out of bounds
-					if (selectedLayers[0] - FeatureSubLayerTreeView.uniqueId > subLayerArray.arraySize - 1)
+					if (selectedLayers[0] - FeatureSubLayerTreeView.uniqueIdFeature > subLayerArray.arraySize - 1)
 					{
-						selectedLayers[0] = subLayerArray.arraySize - 1 + FeatureSubLayerTreeView.uniqueId;
+						selectedLayers[0] = subLayerArray.arraySize - 1 + FeatureSubLayerTreeView.uniqueIdFeature;
 					}
 
 					SelectionIndex = selectedLayers[0];
 
-					var layerProperty = subLayerArray.GetArrayElementAtIndex(SelectionIndex - FeatureSubLayerTreeView.uniqueId);
+					var layerProperty = subLayerArray.GetArrayElementAtIndex(SelectionIndex - FeatureSubLayerTreeView.uniqueIdFeature);
 
 					layerProperty.isExpanded = true;
 					var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
@@ -347,7 +347,7 @@
 			{
 				var subLayer = subLayerArray.GetArrayElementAtIndex(i);
 				name = subLayer.FindPropertyRelative("coreOptions.sublayerName").stringValue;
-				id = i + FeatureSubLayerTreeView.uniqueId;
+				id = i + FeatureSubLayerTreeView.uniqueIdFeature;
 				type = ((PresetFeatureType)subLayer.FindPropertyRelative("presetFeatureType").enumValueIndex).ToString();
 				FeatureTreeElement element = new FeatureTreeElement(name, 0, id);
 				element.Name = name;
@@ -429,11 +429,16 @@
 
 			var atlas = subLayerGeometryMaterialOptions.FindPropertyRelative("atlasInfo");
 			var palette = subLayerGeometryMaterialOptions.FindPropertyRelative("colorPalette");
+			var lightStyleOpacity = subLayerGeometryMaterialOptions.FindPropertyRelative("lightStyleOpacity");
+			var darkStyleOpacity = subLayerGeometryMaterialOptions.FindPropertyRelative("darkStyleOpacity");
 
 			topMat.objectReferenceValue = materialOptions.materials[0].Materials[0];
 			sideMat.objectReferenceValue = materialOptions.materials[1].Materials[0];
 			atlas.objectReferenceValue = materialOptions.atlasInfo;
 			palette.objectReferenceValue = materialOptions.colorPalette;
+			lightStyleOpacity.floatValue = materialOptions.lightStyleOpacity;
+			darkStyleOpacity.floatValue = materialOptions.darkStyleOpacity;
+
 
 			subLayer.FindPropertyRelative("buildingsWithUniqueIds").boolValue = subLayerProperties.buildingsWithUniqueIds;
 			subLayer.FindPropertyRelative("moveFeaturePositionTo").enumValueIndex = (int)subLayerProperties.moveFeaturePositionTo;
