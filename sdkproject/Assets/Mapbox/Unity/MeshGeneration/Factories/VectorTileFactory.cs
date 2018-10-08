@@ -257,11 +257,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		protected override void OnUnregistered(UnityTile tile)
 		{
-			if (_layerProgress.ContainsKey(tile))
+			if (_layerProgress != null && _layerProgress.ContainsKey(tile))
 			{
 				_layerProgress.Remove(tile);
 			}
-			if (_tilesWaitingProcessing.Contains(tile))
+			if (_tilesWaitingResponse != null && _tilesWaitingProcessing.Contains(tile))
 			{
 				_tilesWaitingProcessing.Remove(tile);
 			}
