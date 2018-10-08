@@ -61,7 +61,7 @@ public class ApiTest : MonoBehaviour
 	[ContextMenu("IncreaseTerrainExagguration")]
 	public void IncreaseTerrainExagguration()
 	{
-		_abstractMap.Terrain.SetExaggerationFactor(_abstractMap.Terrain.ExxagerationFactor + 0.5f);
+		_abstractMap.Terrain.SetExaggerationFactor(_abstractMap.Terrain.ExaggerationFactor + 0.5f);
 	}
 
 	[ContextMenu("SetTerrainLayer")]

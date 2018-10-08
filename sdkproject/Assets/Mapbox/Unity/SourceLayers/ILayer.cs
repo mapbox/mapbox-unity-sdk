@@ -4,8 +4,6 @@ using Mapbox.Unity.SourceLayers;
 namespace Mapbox.Unity.Map
 {
 	using System;
-	//public class Terrain
-	// Layer Interfaces
 	using System.Collections.Generic;
 	using Mapbox.Unity.MeshGeneration.Filters;
 	using Mapbox.Utils;
@@ -13,13 +11,22 @@ namespace Mapbox.Unity.Map
 
 	public interface ILayer
 	{
+		/// <summary>
+		/// Gets the type of feature from the `FEATURES` section.
+		/// </summary>
 		MapLayerType LayerType { get; }
+		/// <summary>
+		/// Boolean for setting the feature layer active or inactive.
+		/// </summary>
 		bool IsLayerActive { get; }
+		/// <summary>
+		/// Gets the source ID for the feature layer.
+		/// </summary>
 		string LayerSourceId { get; }
 
-		//LayerProperties LayerProperty { get; set; }
-
-		//TODO : These methods should return a status.
+		/// <summary>
+		/// Gets the `Data Source` for the `MAP LAYERS` section.
+		/// </summary>
 		void SetLayerSource(string source);
 		void Initialize();
 		void Initialize(LayerProperties properties);
@@ -32,18 +39,19 @@ namespace Mapbox.Unity.Map
 	{
 		#region Layer Level APIs
 		TileJsonData GetTileJsonData();
+
+
 		/// <summary>
-		/// Change existing data source (mapid) with provided source.
+		/// Gets the `Data Source` for the `MAP LAYERS` section.
 		/// </summary>
-		/// <param name="vectorSource">Data source (Mapid) to use.</param>
 		void SetLayerSource(VectorSourceType vectorSource);
 
 		/// <summary>
-		/// Add provided data source (mapid) to existing ones.
-		/// Mapbox vector api supports comma separated mapids and this method
-		/// adds the provided mapid at the end of the existing source.
+		/// Adds the provided `Data Source` (`Map ID`) to existing ones. For multiple
+		/// sources, you can separate with a comma. `Map ID` string is added at the
+		/// end of the existing sources.
 		/// </summary>
-		/// <param name="vectorSource">Data source (Mapid) to add to existing sources.</param>
+		/// <param name="vectorSource">`Data Source` (`Map ID`) to add to existing sources.</param>
 		void AddLayerSource(string vectorSource);
 
 		/// <summary>
@@ -65,15 +73,14 @@ namespace Mapbox.Unity.Map
 		void SetLayerSourceWithOptimizedStyle(VectorSourceType vectorSource, string styleId, string modifiedDate, string styleName = null);
 
 		/// <summary>
-		/// Enable coroutines for vector features, processing choosen amount
+		/// Enables coroutines for vector features. Processes the specified amount
 		/// of them each frame.
 		/// </summary>
 		/// <param name="entityPerCoroutine">Numbers of features to process each frame.</param>
-		/// 
 		void EnableVectorFeatureProcessingWithCoroutines(int entityPerCoroutine = 20);
 
 		/// <summary>
-		/// Disables processing of vector features on coroutines. 
+		/// Disables processing of vector features on coroutines.
 		/// </summary>
 		void DisableVectorFeatureProcessingWithCoroutines();
 		#endregion
@@ -85,7 +92,7 @@ namespace Mapbox.Unity.Map
 		void AddFeatureSubLayer(VectorSubLayerProperties subLayerProperties);
 
 		/// <summary>
-		/// Adds a sub layer to render polygon features. 
+		/// Adds a sub layer to render polygon features.
 		/// Default settings include :
 		/// Extrusion = true
 		/// ExtrusionType = PropertyHeight
@@ -118,7 +125,7 @@ namespace Mapbox.Unity.Map
 		void AddPointFeatureSubLayer(string assignedSubLayerName, string dataLayerNameInService);
 
 		/// <summary>
-		/// Adds feature sub layer for rendering using a custom pipeline. 
+		/// Adds feature sub layer for rendering using a custom pipeline.
 		/// Custom Feature Sub Layer should be used with custom modifiers to leverage the layer data or render it using a non-standard pipeline.
 		/// </summary>
 		/// <param name="assignedSubLayerName">Assigned sub layer name.</param>
@@ -280,11 +287,23 @@ namespace Mapbox.Unity.Map
 
 	public interface IVectorSubLayer
 	{
+		/// <summary>
+		/// Gets `Filters` data from the feature.
+		/// </summary>
 		ISubLayerFiltering Filtering { get; }
+		/// <summary>
+		/// Gets `Modeling` data from the feature.
+		/// </summary>
 		ISubLayerModeling Modeling { get; }
+		/// <summary>
+		/// Gets `Texturing` data from the feature.
+		/// </summary>
 		ISubLayerTexturing Texturing { get; }
+		/// <summary>
+		/// Gets `Behavior Modifiers` data from the feature.
+		/// </summary>
 		ISubLayerBehaviorModifiers BehaviorModifiers { get; }
 
-		// Add methods that we need at sublayer level
+
 	}
 }
