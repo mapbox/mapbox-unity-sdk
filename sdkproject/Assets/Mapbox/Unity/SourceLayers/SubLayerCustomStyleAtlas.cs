@@ -14,13 +14,13 @@
 		{
 			get
 			{
-				return _materialOptions.materials[0].Materials[0];
+				return _materialOptions.customStyleOptions.materials[0].Materials[0];
 			}
 			set
 			{
-				if (_materialOptions.materials[0].Materials[0] != value)
+				if (_materialOptions.customStyleOptions.materials[0].Materials[0] != value)
 				{
-					_materialOptions.materials[0].Materials[0] = value;
+					_materialOptions.customStyleOptions.materials[0].Materials[0] = value;
 					_materialOptions.HasChanged = true;
 				}
 			}
@@ -29,13 +29,13 @@
 		{
 			get
 			{
-				return _materialOptions.materials[1].Materials[0];
+				return _materialOptions.customStyleOptions.materials[1].Materials[0];
 			}
 			set
 			{
-				if (_materialOptions.materials[1].Materials[0] != value)
+				if (_materialOptions.customStyleOptions.materials[1].Materials[0] != value)
 				{
-					_materialOptions.materials[1].Materials[0] = value;
+					_materialOptions.customStyleOptions.materials[1].Materials[0] = value;
 					_materialOptions.HasChanged = true;
 				}
 			}
@@ -45,30 +45,30 @@
 		{
 			get
 			{
-				return _materialOptions.atlasInfo;
+				return _materialOptions.customStyleOptions.atlasInfo;
 			}
 
 			set
 			{
-				if (_materialOptions.atlasInfo != value)
+				if (_materialOptions.customStyleOptions.atlasInfo != value)
 				{
-					_materialOptions.atlasInfo = value;
+					_materialOptions.customStyleOptions.atlasInfo = value;
 					_materialOptions.HasChanged = true;
 				}
 			}
 		}
 		public void SetAsStyle(Material topMaterial, Material sideMaterial, AtlasInfo uvAtlas)
 		{
-			_materialOptions.texturingType = UvMapType.Atlas;
-			_materialOptions.materials[0].Materials[0] = topMaterial;
-			_materialOptions.materials[1].Materials[0] = sideMaterial;
-			_materialOptions.atlasInfo = uvAtlas;
+			_materialOptions.customStyleOptions.texturingType = UvMapType.Atlas;
+			_materialOptions.customStyleOptions.materials[0].Materials[0] = topMaterial;
+			_materialOptions.customStyleOptions.materials[1].Materials[0] = sideMaterial;
+			_materialOptions.customStyleOptions.atlasInfo = uvAtlas;
 			_materialOptions.HasChanged = true;
 		}
 
 		public void SetAsStyle()
 		{
-			_materialOptions.SetDefaultAssets();
+			_materialOptions.customStyleOptions.SetDefaultAssets();
 			_materialOptions.HasChanged = true;
 		}
 	}

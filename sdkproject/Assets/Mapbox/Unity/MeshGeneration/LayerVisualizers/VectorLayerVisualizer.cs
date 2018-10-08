@@ -269,7 +269,12 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 						if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
 						{
 							//replace materialOptions with styleOptions
-							if (_layerProperties.materialOptions.texturingType == UvMapType.Atlas || _layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette)
+							bool useTextureSideWallModifier =
+							(_layerProperties.materialOptions.style == StyleTypes.Custom) ?
+								(_layerProperties.materialOptions.customStyleOptions.texturingType == UvMapType.Atlas || _layerProperties.materialOptions.customStyleOptions.texturingType == UvMapType.AtlasWithColorPalette)
+								: (_layerProperties.materialOptions.texturingType == UvMapType.Atlas || _layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette);
+
+							if (useTextureSideWallModifier)
 							{
 								var atlasMod = AddOrCreateMeshModifier<TextureSideWallModifier>();
 								GeometryExtrusionWithAtlasOptions atlasOptions = new GeometryExtrusionWithAtlasOptions(_layerProperties.extrusionOptions, uvModOptions);
@@ -293,10 +298,13 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 						styleMod.SetProperties(_layerProperties.materialOptions);
 						styleMod.ModifierHasChanged += UpdateVector;
 
-						if (_layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette)
+
+						bool isCustomStyle = (_layerProperties.materialOptions.style == StyleTypes.Custom);
+						if ((isCustomStyle) ? (_layerProperties.materialOptions.customStyleOptions.texturingType == UvMapType.AtlasWithColorPalette)
+							: (_layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette))
 						{
 							var colorPaletteMod = AddOrCreateGameObjectModifier<MapboxStylesColorModifier>();
-							colorPaletteMod.m_scriptablePalette = _layerProperties.materialOptions.colorPalette;
+							colorPaletteMod.m_scriptablePalette = (isCustomStyle) ? _layerProperties.materialOptions.customStyleOptions.colorPalette : _layerProperties.materialOptions.colorPalette;
 							_layerProperties.materialOptions.PropertyHasChanged += UpdateVector;
 							//TODO: Add SetProperties Method to MapboxStylesColorModifier
 						}

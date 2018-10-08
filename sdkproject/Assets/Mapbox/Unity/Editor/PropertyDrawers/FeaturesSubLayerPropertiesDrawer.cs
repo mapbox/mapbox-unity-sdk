@@ -431,6 +431,7 @@
 			var palette = subLayerGeometryMaterialOptions.FindPropertyRelative("colorPalette");
 			var lightStyleOpacity = subLayerGeometryMaterialOptions.FindPropertyRelative("lightStyleOpacity");
 			var darkStyleOpacity = subLayerGeometryMaterialOptions.FindPropertyRelative("darkStyleOpacity");
+			var customStyleOptions = subLayerGeometryMaterialOptions.FindPropertyRelative("customStyleOptions");
 
 			topMat.objectReferenceValue = materialOptions.materials[0].Materials[0];
 			sideMat.objectReferenceValue = materialOptions.materials[1].Materials[0];
@@ -439,6 +440,31 @@
 			lightStyleOpacity.floatValue = materialOptions.lightStyleOpacity;
 			darkStyleOpacity.floatValue = materialOptions.darkStyleOpacity;
 
+
+			//set custom style options.
+			var customMats = customStyleOptions.FindPropertyRelative("materials");
+			mats.arraySize = 2;
+
+			var customTopMatArray = customMats.GetArrayElementAtIndex(0).FindPropertyRelative("Materials");
+			var customSideMatArray = customMats.GetArrayElementAtIndex(1).FindPropertyRelative("Materials");
+
+			if (customTopMatArray.arraySize == 0)
+			{
+				customTopMatArray.arraySize = 1;
+			}
+			if (customSideMatArray.arraySize == 0)
+			{
+				customSideMatArray.arraySize = 1;
+			}
+
+			var customTopMat = customTopMatArray.GetArrayElementAtIndex(0);
+			var customSideMat = customSideMatArray.GetArrayElementAtIndex(0);
+
+
+			customTopMat.objectReferenceValue = materialOptions.customStyleOptions.materials[0].Materials[0];
+			customSideMat.objectReferenceValue = materialOptions.customStyleOptions.materials[1].Materials[0];
+			customStyleOptions.FindPropertyRelative("atlasInfo").objectReferenceValue = materialOptions.customStyleOptions.atlasInfo;
+			customStyleOptions.FindPropertyRelative("colorPalette").objectReferenceValue = materialOptions.customStyleOptions.colorPalette;
 
 			subLayer.FindPropertyRelative("buildingsWithUniqueIds").boolValue = subLayerProperties.buildingsWithUniqueIds;
 			subLayer.FindPropertyRelative("moveFeaturePositionTo").enumValueIndex = (int)subLayerProperties.moveFeaturePositionTo;

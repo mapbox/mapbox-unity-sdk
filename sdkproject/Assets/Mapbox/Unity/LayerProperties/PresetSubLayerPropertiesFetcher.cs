@@ -57,7 +57,7 @@
 					layerName = "road";
 					geometryType = VectorPrimitiveType.Line;
 					lineWidth = 1.0f;
-					style = StyleTypes.Dark;
+					style = StyleTypes.Custom;
 					extrusionType = ExtrusionType.AbsoluteHeight;
 					extrusionGeometryType = ExtrusionGeometryType.RoofAndSide;
 					break;
@@ -69,11 +69,11 @@
 					layerName = "landuse";
 					geometryType = VectorPrimitiveType.Polygon;
 					style = StyleTypes.Color;
-
 					break;
 				case PresetFeatureType.Custom:
 					layerName = "";
 					geometryType = VectorPrimitiveType.Custom;
+					style = StyleTypes.Custom;
 					break;
 				default:
 					break;
