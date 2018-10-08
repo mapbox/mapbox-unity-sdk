@@ -455,5 +455,19 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 			}
 		}
+
+		public override void Reset()
+		{
+			foreach (var layerList in _layerBuilder.Values)
+			{
+				foreach (var layerVisualizerBase in layerList)
+				{
+					layerVisualizerBase.ClearCaches();
+				}
+			}
+			_layerProgress.Clear();
+			_tilesWaitingResponse.Clear();
+			_tilesWaitingProcessing.Clear();
+		}
 	}
 }
