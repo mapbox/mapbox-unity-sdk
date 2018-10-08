@@ -52,10 +52,6 @@
 			if (objectToUpdate != null)
 			{
 				window._objectToUpdate = objectToUpdate;
-
-				//REMOVE ME!!!
-				string propertyType = objectToUpdate.GetType().ToString();
-				Debug.Log("<color=red>" + propertyType + "</color>");
 			}
 
 			Event e = Event.current;

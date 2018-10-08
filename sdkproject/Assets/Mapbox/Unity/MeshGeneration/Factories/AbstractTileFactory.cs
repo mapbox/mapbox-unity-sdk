@@ -94,7 +94,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		public virtual void UpdateTileProperty(UnityTile tile, LayerUpdateArgs updateArgs)
 		{
-			Debug.Log("Update Tile Property -> " + tile.UnwrappedTileId.ToString());
 			updateArgs.property.UpdateProperty(tile);
 
 			if (updateArgs.property.NeedsForceUpdate())
@@ -124,7 +123,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		public event EventHandler TileFactoryHasChanged;
 		protected virtual void UpdateTileFactory(object sender, System.EventArgs args)
 		{
-			Debug.Log("TileFactoryHasChanged Delegate ");
 			System.EventHandler handler = TileFactoryHasChanged;
 			if (handler != null)
 			{

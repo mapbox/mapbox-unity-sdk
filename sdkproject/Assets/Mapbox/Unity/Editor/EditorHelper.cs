@@ -20,8 +20,6 @@
 			if (targetObjectAsDataProperty != null)
 			{
 				targetObjectAsDataProperty.HasChanged = forceHasChanged || property.serializedObject.ApplyModifiedProperties();
-				//REMOVE ME....
-				Debug.Log("<color=cyan>CheckForModifiedProperty is TRUE!! ---> </color>" + targetObject.GetType().ToString());
 			}
 		}
 
