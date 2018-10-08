@@ -229,7 +229,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		protected override void UpdateTileFactory(object sender, EventArgs args)
 		{
-			Debug.Log("TileFactoryHasChanged Override ");
 			VectorLayerUpdateArgs layerUpdateArgs = args as VectorLayerUpdateArgs;
 			layerUpdateArgs.factory = this;
 			base.UpdateTileFactory(sender, layerUpdateArgs);
