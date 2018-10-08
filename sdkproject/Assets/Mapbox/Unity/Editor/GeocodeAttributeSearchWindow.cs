@@ -52,9 +52,6 @@
 			if (objectToUpdate != null)
 			{
 				window._objectToUpdate = objectToUpdate;
-
-				//REMOVE ME!!!
-				string propertyType = objectToUpdate.GetType().ToString();
 			}
 
 			Event e = Event.current;
