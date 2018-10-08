@@ -33,6 +33,11 @@
 		{
 			_objects.Clear();
 		}
+
+		public IEnumerable<T> GetQueue()
+		{
+			return _objects;
+		}
 	}
 }
 

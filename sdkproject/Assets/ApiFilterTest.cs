@@ -11,7 +11,7 @@ public class ApiFilterTest : MonoBehaviour
 {
 	private AbstractMap _abstractMap;
 
-	private VectorSubLayerProperties[] _layers; 
+	private VectorSubLayerProperties[] _layers;
 
 	public string layerToWorkWith;
 
@@ -31,13 +31,13 @@ public class ApiFilterTest : MonoBehaviour
 	private VectorSubLayerProperties[] GetLayers()
 	{
 		VectorSubLayerProperties[] vectorSubLayers;
-		if(!string.IsNullOrEmpty(layerToWorkWith))
+		if (!string.IsNullOrEmpty(layerToWorkWith))
 		{
-			vectorSubLayers = new VectorSubLayerProperties[] { _abstractMap.VectorData.FindFeatureLayerWithName(layerToWorkWith) };
+			vectorSubLayers = new VectorSubLayerProperties[] { _abstractMap.VectorData.FindFeatureSubLayerWithName(layerToWorkWith) };
 		}
 		else
 		{
-			vectorSubLayers = _abstractMap.VectorData.GetAllFeatureLayers().ToArray();
+			vectorSubLayers = _abstractMap.VectorData.GetAllFeatureSubLayers().ToArray();
 		}
 		return vectorSubLayers;
 	}
@@ -97,7 +97,7 @@ public class ApiFilterTest : MonoBehaviour
 		for (int i = 0; i < layers.Length; i++)
 		{
 			ILayerFilter[] filters = layers[i].Filtering.GetFiltersByQuery(x => (x.FilterKeyMatchesExact(Key))).ToArray();
-			if(filters.Length == 0)
+			if (filters.Length == 0)
 			{
 				continue;
 			}
@@ -274,7 +274,7 @@ public class ApiFilterTest : MonoBehaviour
 			ILayerFilter[] filters = layers[i].Filtering.GetAllFilters().ToArray();
 			if (filters.Length != 0)
 			{
-				ILayerFilter layerFilter = filters[i]; 
+				ILayerFilter layerFilter = filters[i];
 				layerFilter.SetNumberIsEqual(Key, min);
 			}
 		}
@@ -289,7 +289,7 @@ public class ApiFilterTest : MonoBehaviour
 			ILayerFilter[] filters = layers[i].Filtering.GetAllFilters().ToArray();
 			if (filters.Length != 0)
 			{
-				ILayerFilter layerFilter = filters[i]; 
+				ILayerFilter layerFilter = filters[i];
 				layerFilter.SetNumberIsLessThan(Key, min);
 			}
 		}

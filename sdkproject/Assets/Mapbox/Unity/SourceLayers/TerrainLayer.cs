@@ -69,7 +69,7 @@
 				}
 			}
 		}
-		public float ExxagerationFactor
+		public float ExaggerationFactor
 		{
 			get
 			{

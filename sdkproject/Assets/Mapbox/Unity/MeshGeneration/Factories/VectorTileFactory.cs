@@ -163,6 +163,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		public virtual void RemoveVectorLayerVisualizer(LayerVisualizerBase subLayer)
 		{
+			subLayer.ClearCaches();
 			if (_layerBuilder.ContainsKey(subLayer.Key))
 			{
 				if (Properties.vectorSubLayers.Contains(subLayer.SubLayerProperties))
@@ -174,6 +175,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					Properties.locationPrefabList.Remove(subLayer.SubLayerProperties as PrefabItemOptions);
 				}
 				subLayer.LayerVisualizerHasChanged -= UpdateTileFactory;
+				subLayer.UnbindSubLayerEvents();
 				_layerBuilder[subLayer.Key].Remove(subLayer);
 			}
 		}
@@ -183,22 +185,26 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_properties = (VectorLayerProperties)options;
 			if (_layerBuilder != null)
 			{
-				_layerBuilder.Clear();
-				// TODO : IS THIS CODE REALLY REQUIRED?
-				//CreateLayerVisualizers();
-				//foreach (var layer in _layerBuilder)
-				//{
-				//	foreach (var item in layer.Value)
-				//	{
-				//		(item as VectorLayerVisualizer).SetProperties(null);
-				//		item.Initialize();
-				//	}
-				//}
+				RemoveAllLayerVisualiers();
 
 				CreatePOILayerVisualizers();
 
 				CreateLayerVisualizers();
 			}
+		}
+
+		private void RemoveAllLayerVisualiers()
+		{
+			//Clearing gameobjects pooled and managed by modifiers to prevent zombie gameobjects.
+			foreach (var pairs in _layerBuilder)
+			{
+				foreach (var layerVisualizerBase in pairs.Value)
+				{
+					layerVisualizerBase.ClearCaches();
+				}
+			}
+
+			_layerBuilder.Clear();
 		}
 
 		protected override void OnRegistered(UnityTile tile)
@@ -268,7 +274,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					foreach (var visualizer in layer)
 					{
 						visualizer.UnregisterTile(tile);
-						visualizer.LayerVisualizerHasChanged -= UpdateTileFactory;
+						//visualizer.LayerVisualizerHasChanged -= UpdateTileFactory;
 					}
 				}
 			}
@@ -300,6 +306,25 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		}
 
+		public override void UnbindEvents()
+		{
+			base.UnbindEvents();
+		}
+
+		protected override void OnUnbindEvents()
+		{
+			if (_layerBuilder != null)
+			{
+				foreach (var layer in _layerBuilder.Values)
+				{
+					foreach (var visualizer in layer)
+					{
+						visualizer.LayerVisualizerHasChanged -= UpdateTileFactory;
+						visualizer.UnbindSubLayerEvents();
+					}
+				}
+			}
+		}
 		#endregion
 
 		#region DataFetcherEvents

@@ -87,6 +87,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			OnUnregistered(tile);
 		}
 
+		public virtual void UnbindEvents()
+		{
+			OnUnbindEvents();
+		}
+
 		public virtual void UpdateTileProperty(UnityTile tile, LayerUpdateArgs updateArgs)
 		{
 			Debug.Log("Update Tile Property -> " + tile.UnwrappedTileId.ToString());
@@ -103,6 +108,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		protected abstract void OnRegistered(UnityTile tile);
 		protected abstract void OnPostProcess(UnityTile tile);
 		protected abstract void OnUnregistered(UnityTile tile);
+		protected abstract void OnUnbindEvents();
 
 		#region Events
 		public event EventHandler<TileErrorEventArgs> OnTileError;

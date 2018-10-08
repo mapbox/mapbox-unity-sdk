@@ -1,12 +1,10 @@
-﻿namespace Mapbox.Editor
+﻿namespace Mapbox.Unity.Map
 {
-	using UnityEngine;
 	using System.Collections.Generic;
-	using Mapbox.Unity.Map;
 	using Mapbox.Unity.MeshGeneration.Filters;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
 
-	public class PresetSubLayerPropertiesFetcher
+	public static class PresetSubLayerPropertiesFetcher
 	{
 		/// <summary>
 		/// Gets the default sub layer properties for the chosen preset type.
@@ -26,6 +24,7 @@
 			ExtrusionGeometryType extrusionGeometryType = ExtrusionGeometryType.RoofAndSide;
 			string propertyName = "height";
 			float extrusionScaleFactor = 1.0f;
+			float extrusionHeight = 1.0f;
 
 			//Filter Options
 			LayerFilterCombinerOperationType combinerType = LayerFilterCombinerOperationType.Any;
@@ -58,7 +57,9 @@
 					layerName = "road";
 					geometryType = VectorPrimitiveType.Line;
 					lineWidth = 1.0f;
-					style = StyleTypes.Dark;
+					style = StyleTypes.Custom;
+					extrusionType = ExtrusionType.AbsoluteHeight;
+					extrusionGeometryType = ExtrusionGeometryType.RoofAndSide;
 					break;
 				case PresetFeatureType.Points:
 					layerName = "poi_label";
@@ -67,10 +68,12 @@
 				case PresetFeatureType.Landuse:
 					layerName = "landuse";
 					geometryType = VectorPrimitiveType.Polygon;
+					style = StyleTypes.Color;
 					break;
 				case PresetFeatureType.Custom:
 					layerName = "";
 					geometryType = VectorPrimitiveType.Custom;
+					style = StyleTypes.Custom;
 					break;
 				default:
 					break;
@@ -100,7 +103,8 @@
 				extrusionType = extrusionType,
 				extrusionGeometryType = extrusionGeometryType,
 				propertyName = propertyName,
-				extrusionScaleFactor = extrusionScaleFactor
+				extrusionScaleFactor = extrusionScaleFactor,
+				maximumHeight = extrusionHeight
 			};
 
 			_properties.filterOptions = new VectorFilterOptions
@@ -112,8 +116,9 @@
 			_properties.materialOptions = new GeometryMaterialOptions
 			{
 				style = style,
+				colorStyleColor = UnityEngine.Color.green
 			};
-			_properties.materialOptions.SetDefaultAssets();
+			_properties.materialOptions.SetDefaultMaterialOptions();
 			_properties.buildingsWithUniqueIds = buildingsWithUniqueIds;
 			_properties.moveFeaturePositionTo = positionTargetType;
 			_properties.MeshModifiers = meshModifiers;

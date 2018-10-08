@@ -170,7 +170,8 @@
 				}
 				else
 				{
-					var texturingType = property.FindPropertyRelative("texturingType");
+					var customStyleProperty = property.FindPropertyRelative("customStyleOptions");
+					var texturingType = customStyleProperty.FindPropertyRelative("texturingType");
 
 					int valIndex = texturingType.enumValueIndex == 0 ? 0 : texturingType.enumValueIndex + 1;
 					var texturingTypeGUI = new GUIContent { text = "Texturing Type", tooltip = EnumExtensions.Description((UvMapType)valIndex) };
@@ -182,7 +183,7 @@
 						EditorHelper.CheckForModifiedProperty(property);
 					}
 
-					var matList = property.FindPropertyRelative("materials");
+					var matList = customStyleProperty.FindPropertyRelative("materials");
 					if (matList.arraySize == 0)
 					{
 						matList.arraySize = 2;
@@ -210,15 +211,15 @@
 
 					if ((UvMapType)texturingType.enumValueIndex + 1 == UvMapType.Atlas)
 					{
-						var atlasInfo = property.FindPropertyRelative("atlasInfo");
+						var atlasInfo = customStyleProperty.FindPropertyRelative("atlasInfo");
 						EditorGUILayout.ObjectField(atlasInfo, new GUIContent { text = "Altas Info", tooltip = "Atlas information scriptable object, this defines how the texture roof and wall texture atlases will be used.  " });
 					}
 					if ((UvMapType)texturingType.enumValueIndex + 1 == UvMapType.AtlasWithColorPalette)
 					{
-						var atlasInfo = property.FindPropertyRelative("atlasInfo");
+						var atlasInfo = customStyleProperty.FindPropertyRelative("atlasInfo");
 						EditorGUILayout.ObjectField(atlasInfo, new GUIContent { text = "Altas Info", tooltip = "Atlas information scriptable object, this defines how the texture roof and wall texture atlases will be used.  " });
 
-						var colorPalette = property.FindPropertyRelative("colorPalette");
+						var colorPalette = customStyleProperty.FindPropertyRelative("colorPalette");
 						EditorGUILayout.ObjectField(colorPalette, new GUIContent { text = "Color Palette", tooltip = "Color palette scriptable object, allows texture features to be procedurally colored at runtime. Requires materials that use the MapboxPerRenderer shader. " });
 
 						EditorGUILayout.LabelField(new GUIContent { text = "Note: Atlas With Color Palette requires materials that use the MapboxPerRenderer shader." }, Constants.GUI.Styles.EDITOR_NOTE_STYLE);

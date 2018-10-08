@@ -7,12 +7,43 @@
 	using Mapbox.Unity.MeshGeneration.Modifiers;
 	using Mapbox.Unity.MeshGeneration.Data;
 
+	[Serializable]
 	public class CustomStyleBundle
 	{
-		public Material topMaterial;
-		public Material sideMaterial;
+		public UvMapType texturingType = UvMapType.Tiled;
+		public MaterialList[] materials = new MaterialList[2];
 		public AtlasInfo atlasInfo;
 		public ScriptablePalette colorPalette;
+
+		public CustomStyleBundle()
+		{
+			materials = new MaterialList[2];
+			materials[0] = new MaterialList();
+			materials[1] = new MaterialList();
+
+			//SetDefaultAssets();
+		}
+
+		private void AssignAssets(StyleAssetPathBundle styleAssetPathBundle)
+		{
+			Material topMaterial = Resources.Load(styleAssetPathBundle.topMaterialPath, typeof(Material)) as Material;
+			Material sideMaterial = Resources.Load(styleAssetPathBundle.sideMaterialPath, typeof(Material)) as Material;
+
+			AtlasInfo atlas = Resources.Load(styleAssetPathBundle.atlasPath, typeof(AtlasInfo)) as AtlasInfo;
+			ScriptablePalette palette = Resources.Load(styleAssetPathBundle.palettePath, typeof(ScriptablePalette)) as ScriptablePalette;
+
+			materials[0].Materials[0] = new Material(topMaterial);
+			materials[1].Materials[0] = new Material(sideMaterial);
+			atlasInfo = atlas;
+			colorPalette = palette;
+		}
+
+		public void SetDefaultAssets(UvMapType mapType = UvMapType.Atlas)
+		{
+			StyleAssetPathBundle styleAssetPathBundle = new StyleAssetPathBundle("Default", Constants.Path.MAP_FEATURE_STYLES_DEFAULT_STYLE_ASSETS);
+			texturingType = mapType;
+			AssignAssets(styleAssetPathBundle);
+		}
 	}
 
 	[Serializable]
@@ -133,6 +164,9 @@
 
 		public ScriptablePalette colorPalette;
 
+		[SerializeField]
+		public CustomStyleBundle customStyleOptions;
+
 		public GeometryMaterialOptions()
 		{
 			materials = new MaterialList[2];
@@ -146,22 +180,29 @@
 		/// </summary>
 		public void SetDefaultMaterialOptions()
 		{
-			if (style == StyleTypes.Custom)
-			{
-				//nothing to do. Use custom settings. 
-				return;
-			}
-			else
+
 			{
 				string styleName = style.ToString();
 
-				string samplePaletteName = samplePalettes.ToString();
+				if (customStyleOptions == null)
+				{
+					customStyleOptions = new CustomStyleBundle();
+					customStyleOptions.SetDefaultAssets();
+				}
+				if (style == StyleTypes.Custom)
+				{
+					//nothing to do. Use custom settings
+				}
+				else
+				{
+					string samplePaletteName = samplePalettes.ToString();
 
-				string path = Path.Combine(Constants.Path.MAP_FEATURE_STYLES_SAMPLES, Path.Combine(styleName, Constants.Path.MAPBOX_STYLES_ASSETS_FOLDER));
+					string path = Path.Combine(Constants.Path.MAP_FEATURE_STYLES_SAMPLES, Path.Combine(styleName, Constants.Path.MAPBOX_STYLES_ASSETS_FOLDER));
 
-				StyleAssetPathBundle styleAssetPathBundle = new StyleAssetPathBundle(styleName, path, samplePaletteName);
+					StyleAssetPathBundle styleAssetPathBundle = new StyleAssetPathBundle(styleName, path, samplePaletteName);
 
-				AssignAssets(styleAssetPathBundle);
+					AssignAssets(styleAssetPathBundle);
+				}
 
 				switch (style)
 				{
@@ -196,13 +237,9 @@
 				{
 					texturingType = UvMapType.Tiled;
 				}
-				else if (style == StyleTypes.Simple)
-				{
-					texturingType = UvMapType.AtlasWithColorPalette;
-				}
 				else
 				{
-					texturingType = UvMapType.Atlas;
+					texturingType = (style != StyleTypes.Custom && style == StyleTypes.Simple) ? UvMapType.AtlasWithColorPalette : UvMapType.Atlas;
 				}
 			}
 		}
@@ -219,7 +256,6 @@
 			materials[1].Materials[0] = new Material(sideMaterial);
 			atlasInfo = atlas;
 			colorPalette = palette;
-
 		}
 
 		public void SetDefaultAssets(UvMapType mapType = UvMapType.Atlas)

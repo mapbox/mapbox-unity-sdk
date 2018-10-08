@@ -126,7 +126,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			OnUpdateLayerVisualizer(layerUpdateArgs);
 		}
 
-		private void UnbindSubLayerEvents()
+		public override void UnbindSubLayerEvents()
 		{
 			foreach (var modifier in _defaultStack.MeshModifiers)
 			{
@@ -269,7 +269,12 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 						if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
 						{
 							//replace materialOptions with styleOptions
-							if (_layerProperties.materialOptions.texturingType == UvMapType.Atlas || _layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette)
+							bool useTextureSideWallModifier =
+							(_layerProperties.materialOptions.style == StyleTypes.Custom) ?
+								(_layerProperties.materialOptions.customStyleOptions.texturingType == UvMapType.Atlas || _layerProperties.materialOptions.customStyleOptions.texturingType == UvMapType.AtlasWithColorPalette)
+								: (_layerProperties.materialOptions.texturingType == UvMapType.Atlas || _layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette);
+
+							if (useTextureSideWallModifier)
 							{
 								var atlasMod = AddOrCreateMeshModifier<TextureSideWallModifier>();
 								GeometryExtrusionWithAtlasOptions atlasOptions = new GeometryExtrusionWithAtlasOptions(_layerProperties.extrusionOptions, uvModOptions);
@@ -293,10 +298,13 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 						styleMod.SetProperties(_layerProperties.materialOptions);
 						styleMod.ModifierHasChanged += UpdateVector;
 
-						if (_layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette)
+
+						bool isCustomStyle = (_layerProperties.materialOptions.style == StyleTypes.Custom);
+						if ((isCustomStyle) ? (_layerProperties.materialOptions.customStyleOptions.texturingType == UvMapType.AtlasWithColorPalette)
+							: (_layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette))
 						{
 							var colorPaletteMod = AddOrCreateGameObjectModifier<MapboxStylesColorModifier>();
-							colorPaletteMod.m_scriptablePalette = _layerProperties.materialOptions.colorPalette;
+							colorPaletteMod.m_scriptablePalette = (isCustomStyle) ? _layerProperties.materialOptions.customStyleOptions.colorPalette : _layerProperties.materialOptions.colorPalette;
 							_layerProperties.materialOptions.PropertyHasChanged += UpdateVector;
 							//TODO: Add SetProperties Method to MapboxStylesColorModifier
 						}
@@ -522,7 +530,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			#region PreProcess & Process.
 
-			var featureCount = tempLayerProperties.vectorTileLayer.FeatureCount();
+			var featureCount = (tempLayerProperties.vectorTileLayer == null) ? 0 : tempLayerProperties.vectorTileLayer.FeatureCount();
 			do
 			{
 				for (int i = 0; i < featureCount; i++)
@@ -744,7 +752,13 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				}
 				_idPool[tile].Clear();
 			}
-			UnbindSubLayerEvents();
+			//UnbindSubLayerEvents();
+		}
+
+		public override void ClearCaches()
+		{
+			_idPool.Clear();
+			_defaultStack.ClearCaches();
 		}
 	}
 }

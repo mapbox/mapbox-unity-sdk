@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace Mapbox.Unity.MeshGeneration.Interfaces
 {
 	using Mapbox.Unity.Map;
@@ -14,6 +16,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 	public class LocationPrefabsLayerVisualizer : VectorLayerVisualizer
 	{
 		private int maxDensity = 30; //This value is same as the density's max range value in PrefabItemOptions
+		private PrefabModifier _prefabModifier;
 
 		public override bool Active
 		{
@@ -31,12 +34,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			_performanceOptions = item.performanceOptions;
 
 			item.filterOptions.filters.Clear();
-
-			//Check to make sure that when Categories selection is none, the location prefab is disabled
-			//			if (item.findByType == LocationPrefabFindBy.MapboxCategory && item.categories == LocationPrefabCategories.None)
-			//			{
-			//				return;
-			//			}
 
 			if (item.spawnPrefabOptions.prefab == null)
 			{
@@ -87,32 +84,42 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 #endif
 					{
 						PrefabItemOptions itemProperties = (PrefabItemOptions)item;
-						_defaultStack = ScriptableObject.CreateInstance<ModifierStack>();
+
+						if (_defaultStack == null)
+						{
+							_defaultStack = ScriptableObject.CreateInstance<ModifierStack>();
+						}
+
 						(_defaultStack as ModifierStack).moveFeaturePositionTo = item.moveFeaturePositionTo;
 						if (itemProperties.snapToTerrain == true)
 						{
-							_defaultStack.MeshModifiers.Add(ScriptableObject.CreateInstance<SnapTerrainModifier>());
+							AddOrCreateMeshModifier<SnapTerrainModifier>();
 						}
 
 						if (_defaultStack.GoModifiers == null)
 						{
 							_defaultStack.GoModifiers = new List<GameObjectModifier>();
 						}
-						else
+
+						if (item.findByType == LocationPrefabFindBy.MapboxCategory)
 						{
+							if (_prefabModifier != null)
+							{
+								_prefabModifier.ClearCaches();
+							}
 							_defaultStack.GoModifiers.Clear();
 						}
 
 						if ((item.findByType == LocationPrefabFindBy.MapboxCategory && item.categories == LocationPrefabCategories.None))
 						{
+
 							itemProperties.spawnPrefabOptions.PropertyHasChanged += UpdatePois;
 						}
 						else
 						{
-							PrefabModifier prefabModifier = ScriptableObject.CreateInstance<PrefabModifier>();
-							prefabModifier.SetProperties(itemProperties.spawnPrefabOptions);
-							prefabModifier.ModifierHasChanged += UpdatePois;
-							_defaultStack.GoModifiers.Add(prefabModifier);
+							_prefabModifier = AddOrCreateGameObjectModifier<PrefabModifier>();
+							_prefabModifier.SetProperties(itemProperties.spawnPrefabOptions);
+							_prefabModifier.ModifierHasChanged += UpdatePois;
 						}
 					}
 					break;
@@ -120,6 +127,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					break;
 			}
 
+			item.coreOptions.PropertyHasChanged += UpdatePois;
 			(SubLayerProperties as PrefabItemOptions).PropertyHasChanged += UpdatePois;
 		}
 
@@ -153,6 +161,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				modifier.ModifierHasChanged -= UpdatePois;
 			}
 
+			SubLayerProperties.coreOptions.PropertyHasChanged -= UpdatePois;
 			(SubLayerProperties as PrefabItemOptions).PropertyHasChanged -= UpdatePois;
 
 			OnUpdateLayerVisualizer(layerUpdateArgs);
@@ -176,27 +185,29 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				{
 					return;
 				}
-
-				List<string> stringsList = new List<string>();
-				foreach (LocationPrefabCategories category in categoriesList)
+				else
 				{
-					stringsList = LocationPrefabCategoryOptions.GetMakiListFromCategory(category);
-					if (string.IsNullOrEmpty(concatenatedString))
+					List<string> stringsList = new List<string>();
+					foreach (LocationPrefabCategories category in categoriesList)
 					{
-						concatenatedString = string.Join(",", stringsList.ToArray());
+						stringsList = LocationPrefabCategoryOptions.GetMakiListFromCategory(category);
+						if (string.IsNullOrEmpty(concatenatedString))
+						{
+							concatenatedString = string.Join(",", stringsList.ToArray());
+						}
+						else
+						{
+							concatenatedString += "," + string.Join(",", stringsList.ToArray());
+						}
 					}
-					else
+
+					LayerFilter filter = new LayerFilter(LayerFilterOperationType.Contains)
 					{
-						concatenatedString += "," + string.Join(",", stringsList.ToArray());
-					}
+						Key = propertyName,
+						PropertyValue = concatenatedString
+					};
+					AddFilterToItem(item, filter);
 				}
-
-				LayerFilter filter = new LayerFilter(LayerFilterOperationType.Contains)
-				{
-					Key = propertyName,
-					PropertyValue = concatenatedString
-				};
-				AddFilterToItem(item, filter);
 			}
 		}
 
@@ -276,7 +287,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			List<LocationPrefabCategories> containingCategories = new List<LocationPrefabCategories>();
 
 			Array eligibleValues = Enum.GetValues(typeof(LocationPrefabCategories));
-			if (selectedCategories == LocationPrefabCategories.None || selectedCategories == LocationPrefabCategories.AnyCategory)
+			if (selectedCategories == LocationPrefabCategories.None)
 			{
 				return containingCategories;
 			}
@@ -314,10 +325,14 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 			else
 			{
-				base.Create(layer, tile, callback);
+				var item = (SubLayerProperties as PrefabItemOptions);
+				bool isCategoryNone = (item.findByType == LocationPrefabFindBy.MapboxCategory && item.categories == LocationPrefabCategories.None);
+				if (!isCategoryNone)
+				{
+					base.Create(layer, tile, callback);
+				}
 			}
 		}
-
 
 		/// <summary>
 		/// Creates a vector feature from lat lon and builds that feature using the modifier stack.

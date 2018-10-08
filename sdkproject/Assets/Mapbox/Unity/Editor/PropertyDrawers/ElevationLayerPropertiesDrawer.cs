@@ -91,7 +91,7 @@
 					GUI.enabled = true;
 					break;
 				case ElevationSourceType.Custom:
-					layerSourceId.stringValue = CustomSourceMapId;
+					layerSourceId.stringValue = string.IsNullOrEmpty(CustomSourceMapId) ? MapboxDefaultElevation.GetParameters(ElevationSourceType.MapboxTerrain).Id : CustomSourceMapId;
 					EditorGUILayout.PropertyField(sourceOptionsProperty, _mapIdGui);
 					CustomSourceMapId = layerSourceId.stringValue;
 					break;

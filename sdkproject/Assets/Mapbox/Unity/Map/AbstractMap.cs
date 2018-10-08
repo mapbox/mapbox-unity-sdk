@@ -7,6 +7,7 @@ namespace Mapbox.Unity.Map
 	using System;
 	using System.Collections;
 	using System.Collections.Generic;
+	using System.Linq;
 	using Mapbox.Unity.Utilities;
 	using Utils;
 	using UnityEngine;
@@ -118,7 +119,7 @@ namespace Mapbox.Unity.Map
 		/// Adds a vector source and visualizers to define the rendering behaviour of vector data layers.
 		/// </summary>
 		[NodeEditorElement("Layers")]
-		public VectorLayer VectorData
+		public IVectorDataLayer VectorData
 		{
 			get
 			{
@@ -317,6 +318,8 @@ namespace Mapbox.Unity.Map
 		/// <param name="zoom">Zoom level.</param>
 		public virtual void UpdateMap(Vector2d latLon, float zoom)
 		{
+			//so map will be snapped to zero using next new tile loaded
+			_worldHeightFixed = false;
 			float differenceInZoom = 0.0f;
 			bool isAtInitialZoom = false;
 			// Update map zoom, if it has changed.
@@ -457,33 +460,22 @@ namespace Mapbox.Unity.Map
 
 		protected virtual void TileProvider_OnTileAdded(UnwrappedTileId tileId)
 		{
-			if (Options.placementOptions.snapMapToZero)
+			var tile = _mapVisualizer.LoadTile(tileId);
+
+			if (Options.placementOptions.snapMapToZero && !_worldHeightFixed)
 			{
 				_worldHeightFixed = true;
-				var tile = _mapVisualizer.LoadTile(tileId);
 				if (tile.HeightDataState == MeshGeneration.Enums.TilePropertyState.Loaded)
 				{
-					var h = tile.QueryHeightData(.5f, .5f);
-					Root.transform.position = new Vector3(
-						Root.transform.position.x,
-						-h,
-						Root.transform.position.z);
+					ApplySnapWorldToZero(tile);
 				}
 				else
 				{
 					tile.OnHeightDataChanged += (s) =>
 					{
-						var h = s.QueryHeightData(.5f, .5f);
-						Root.transform.position = new Vector3(
-							Root.transform.position.x,
-							-h,
-							Root.transform.position.z);
+						ApplySnapWorldToZero(tile);
 					};
 				}
-			}
-			else
-			{
-				_mapVisualizer.LoadTile(tileId);
 			}
 		}
 
@@ -502,15 +494,28 @@ namespace Mapbox.Unity.Map
 			OnInitialized();
 		}
 
-		// TODO: implement IDisposable, instead?
-		protected virtual void OnDestroy()
+		/// <summary>
+		/// Apply Snap World to Zero setting by moving map in Y Axis such that
+		/// center of the given tile will be at y=0.
+		/// </summary>
+		/// <param name="referenceTile">Tile to use for Y axis correction.</param>
+		private void ApplySnapWorldToZero(UnityTile referenceTile)
 		{
-			if (_tileProvider != null)
+			if (_options.placementOptions.snapMapToZero)
 			{
-				_tileProvider.ExtentChanged -= OnMapExtentChanged;
+				var h = referenceTile.QueryHeightData(.5f, .5f);
+				Root.transform.position = new Vector3(
+					Root.transform.position.x,
+					-h,
+					Root.transform.position.z);
 			}
-
-			_mapVisualizer.Destroy();
+			else
+			{
+				Root.transform.position = new Vector3(
+					Root.transform.position.x,
+					0,
+					Root.transform.position.z);
+			}
 		}
 
 		/// <summary>
@@ -564,6 +569,7 @@ namespace Mapbox.Unity.Map
 				//take care of redraw map business...
 				_tileProvider.UpdateTileExtent();
 			};
+
 			_options.placementOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
 			{
 				Debug.Log("<color=yellow>General - Placement Options </color>" + gameObject.name);
@@ -685,6 +691,17 @@ namespace Mapbox.Unity.Map
 			TriggerTileRedrawForExtent(currentExtent);
 		}
 
+		// TODO: implement IDisposable, instead?
+		protected virtual void OnDestroy()
+		{
+			if (_tileProvider != null)
+			{
+				_tileProvider.ExtentChanged -= OnMapExtentChanged;
+			}
+
+			_mapVisualizer.Destroy();
+		}
+
 		private void OnImageOrTerrainUpdateLayer(object sender, System.EventArgs eventArgs)
 		{
 			LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
@@ -701,9 +718,10 @@ namespace Mapbox.Unity.Map
 
 		private void RedrawVectorDataLayer()
 		{
-			_mapVisualizer.UnregisterTilesFrom(VectorData.Factory);
-			VectorData.UpdateFactorySettings();
-			_mapVisualizer.ReregisterTilesTo(VectorData.Factory);
+			_mapVisualizer.UnregisterTilesFrom(_vectorData.Factory);
+			_vectorData.UnbindAllEvents();
+			_vectorData.UpdateFactorySettings();
+			_mapVisualizer.ReregisterTilesTo(_vectorData.Factory);
 		}
 
 		private void OnVectorDataSubLayerRemoved(object sender, EventArgs eventArgs)
@@ -725,6 +743,7 @@ namespace Mapbox.Unity.Map
 			Debug.Log("<color=blue>Vector</color>");
 			OnMapRedrawn();
 		}
+
 		private void OnVectorDataUpdateLayer(object sender, System.EventArgs eventArgs)
 		{
 

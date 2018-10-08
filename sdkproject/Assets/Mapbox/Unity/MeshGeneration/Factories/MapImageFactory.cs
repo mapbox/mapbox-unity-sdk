@@ -152,6 +152,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 
 		}
+
+		public override void UnbindEvents()
+		{
+			base.UnbindEvents();
+		}
+
+		protected override void OnUnbindEvents()
+		{
+		}
 		#endregion
 	}
 }
