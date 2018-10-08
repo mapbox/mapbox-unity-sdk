@@ -87,7 +87,7 @@ namespace Mapbox.Unity.Map
 
 		#region LayerOperations
 
-		/// FEATURE LAYER OPERATIONS
+		// FEATURE LAYER OPERATIONS
 
 		void AddFeatureSubLayer(VectorSubLayerProperties subLayerProperties);
 
@@ -150,7 +150,7 @@ namespace Mapbox.Unity.Map
 
 		void RemoveFeatureSubLayer(VectorSubLayerProperties layer);
 
-		/// POI LAYER OPERATIONS
+		// POI LAYER OPERATIONS
 
 		void AddPointsOfInterestSubLayer(PrefabItemOptions poiLayerProperties);
 
@@ -226,7 +226,7 @@ namespace Mapbox.Unity.Map
 		#endregion
 	}
 
-	/// TODO: Move interfaces into individual files.
+	// TODO: Move interfaces into individual files.
 
 	public interface ISubLayerPolygonGeometryOptions
 	{

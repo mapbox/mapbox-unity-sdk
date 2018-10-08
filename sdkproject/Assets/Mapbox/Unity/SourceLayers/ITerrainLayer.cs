@@ -13,7 +13,7 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		ElevationLayerType ElevationType { get; set; }
 		/// <summary>
-		/// Gets the `Exaggetation Factor` for the `TERRAIN` section.
+		/// Gets the `Exaggeration Factor` for the `TERRAIN` section.
 		/// </summary>
 		float ExaggerationFactor { get; set; }
 
