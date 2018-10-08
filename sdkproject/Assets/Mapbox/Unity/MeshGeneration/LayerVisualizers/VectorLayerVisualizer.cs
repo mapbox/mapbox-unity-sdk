@@ -105,8 +105,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		private void UpdateVector(object sender, System.EventArgs eventArgs)
 		{
-			Debug.Log("UpdateVector " + sender.ToString());
-
 			VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
 
 			layerUpdateArgs.visualizer = this;
@@ -158,10 +156,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					_performanceOptions = properties.performanceOptions;
 				}
 			}
-
-			//watch this in the console when doing runtime changes...
-			//this message is currenly displaying multiple times per layer on redraws...
-			Debug.Log("SetProperties");
 
 			if (_layerProperties.coreOptions.combineMeshes)
 			{

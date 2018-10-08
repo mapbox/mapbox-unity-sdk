@@ -75,7 +75,6 @@ namespace Mapbox.Unity.Map
 			_layerProperty.SubLayerPropertyRemoved += RemoveVectorLayer;
 			_vectorTileFactory.TileFactoryHasChanged += (sender, args) =>
 			{
-				Debug.Log("VectorLayer Delegate");
 				NotifyUpdateLayer(args as LayerUpdateArgs);
 			};
 

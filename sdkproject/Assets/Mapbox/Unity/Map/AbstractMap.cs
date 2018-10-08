@@ -563,36 +563,25 @@ namespace Mapbox.Unity.Map
 			_vectorData.SubLayerAdded += OnVectorDataSubLayerAdded;
 			_vectorData.UpdateLayer += OnVectorDataUpdateLayer;
 
-			_options.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
-			{
-				Debug.Log("<color=yellow>General </color>" + gameObject.name);
-				//take care of redraw map business...
-
-			};
-
 			_options.locationOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
 			{
-				Debug.Log("<color=yellow>General - Location Options </color>" + gameObject.name);
 				//take care of redraw map business...
 				UpdateMap();
 			};
 
 			_options.extentOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
 			{
-				Debug.Log("<color=yellow>General - Extent Type Options </color>" + gameObject.name);
 				//take care of redraw map business...
 				OnTileProviderChanged();
 			};
 
 			_options.extentOptions.defaultExtents.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
 			{
-				Debug.Log("<color=yellow>General - Extent Options </color>" + gameObject.name);
 				//take care of redraw map business...
 				_tileProvider.UpdateTileExtent();
 			};
 			_options.placementOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
 			{
-				Debug.Log("<color=yellow>General - Placement Options </color>" + gameObject.name);
 				//take care of redraw map business...
 				SetPlacementStrategy();
 				ApplySnapWorldToZero(_mapVisualizer.ActiveTiles.First().Value);
@@ -601,7 +590,6 @@ namespace Mapbox.Unity.Map
 
 			_options.scalingOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
 			{
-				Debug.Log("<color=yellow>General - Scaling Options </color>" + gameObject.name);
 				//take care of redraw map business...
 				SetScalingStrategy();
 				UpdateMap();
@@ -645,15 +633,12 @@ namespace Mapbox.Unity.Map
 			{
 				_mapVisualizer.RemoveTilesFromLayer((VectorTileFactory)layerUpdateArgs.factory, layerUpdateArgs.visualizer);
 			}
-			Debug.Log("<color=blue>Vector</color>");
 			OnMapRedrawn();
 		}
 
 		private void OnVectorDataSubLayerAdded(object sender, EventArgs eventArgs)
 		{
 			RedrawVectorDataLayer();
-
-			Debug.Log("<color=blue>Vector</color>");
 			OnMapRedrawn();
 		}
 		private void OnVectorDataUpdateLayer(object sender, System.EventArgs eventArgs)
@@ -663,7 +648,6 @@ namespace Mapbox.Unity.Map
 
 			if (layerUpdateArgs.visualizer != null)
 			{
-				Debug.Log("UnregisterTiles");
 				//we got a visualizer. Update only the visualizer.
 				// No need to unload the entire factory to apply changes.
 				_mapVisualizer.UnregisterAndRedrawTilesFromLayer((VectorTileFactory)layerUpdateArgs.factory, layerUpdateArgs.visualizer);
@@ -674,7 +658,6 @@ namespace Mapbox.Unity.Map
 				//All vector features need to get unloaded and re-created.
 				RedrawVectorDataLayer();
 			}
-			Debug.Log("<color=blue>Vector</color>");
 			OnMapRedrawn();
 		}
 
