@@ -1,10 +1,8 @@
-namespace Mapbox.Unity.Map
-{
-	using UnityEngine;
-	using Mapbox.Map;
-	using System.Collections.Generic;
-	using System;
+using System.Collections.Generic;
+using Mapbox.Map;
 
+namespace Mapbox.Unity.Map.TileProviders
+{
 	public class RangeTileProvider : AbstractTileProvider
 	{
 		private RangeTileProviderOptions _rangeTileProviderOptions;

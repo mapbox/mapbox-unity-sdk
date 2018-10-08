@@ -1,12 +1,9 @@
-﻿namespace Mapbox.Unity.Map
-{
-	using System.Linq;
-	using UnityEngine;
-	using Mapbox.Map;
-	using System.Collections.Generic;
-	using Mapbox.Utils;
-	using Mapbox.Unity.Utilities;
+﻿using System.Collections.Generic;
+using Mapbox.Map;
+using UnityEngine;
 
+namespace Mapbox.Unity.Map.TileProviders
+{
 	public class RangeAroundTransformTileProvider : AbstractTileProvider
 	{
 		private RangeAroundTransformTileProviderOptions _rangeTileProviderOptions;

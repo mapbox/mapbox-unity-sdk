@@ -1,4 +1,6 @@
-﻿namespace Mapbox.Editor
+﻿using Mapbox.Unity.Map.TileProviders;
+
+namespace Mapbox.Editor
 {
 	using UnityEditor;
 	using UnityEngine;

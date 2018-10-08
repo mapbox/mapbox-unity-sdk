@@ -1,8 +1,9 @@
-﻿namespace Mapbox.Unity.Map
-{
-	using System;
-	using Mapbox.Map;
+﻿using System;
+using Mapbox.Map;
+using Mapbox.Unity.Map.TileProviders;
 
+namespace Mapbox.Unity.Map.Interfaces
+{
 	public interface ITileProvider
 	{
 		event EventHandler<ExtentArgs> ExtentChanged;
@@ -13,7 +14,7 @@
 		// This removal would essentially lead to a cancel request and nothing more.
 
 		void Initialize(IMap map);
-		// TODO: Maybe combine both these methods. 
+		// TODO: Maybe combine both these methods.
 		void SetOptions(ITileProviderOptions options);
 
 		// TODO: add reset/clear method?

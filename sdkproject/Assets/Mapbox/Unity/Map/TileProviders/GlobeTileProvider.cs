@@ -1,9 +1,9 @@
-﻿namespace Mapbox.Unity.Map
-{
-	using Mapbox.Utils;
-	using Mapbox.Map;
-	using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Mapbox.Map;
+using Mapbox.Utils;
 
+namespace Mapbox.Unity.Map.TileProviders
+{
 	public class GlobeTileProvider : AbstractTileProvider
 	{
 		public override void OnInitialized()
