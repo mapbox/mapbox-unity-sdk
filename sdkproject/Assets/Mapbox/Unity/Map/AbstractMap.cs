@@ -24,7 +24,7 @@ namespace Mapbox.Unity.Map
 	public class AbstractMap : MonoBehaviour, IMap
 	{
 		#region Private Fields
-		[SerializeField] private MapOptions _options;
+		[SerializeField] private MapOptions _options = new MapOptions();
 		[SerializeField] private bool _initializeOnStart = true;
 		[SerializeField] protected ImageryLayer _imagery = new ImageryLayer();
 		[SerializeField] protected TerrainLayer _terrain = new TerrainLayer();
@@ -77,8 +77,6 @@ namespace Mapbox.Unity.Map
 		/// The map options.
 		/// Options to control the behaviour of the map like location,extent, scale and placement.
 		/// </summary>
-		[SerializeField]
-		private MapOptions _options = new MapOptions();
 		public MapOptions Options
 		{
 			get
