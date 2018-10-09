@@ -70,6 +70,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			if (existingCollider != null)
 			{
 				UnityEngine.Object.Destroy(existingCollider);
+				if (_colliderStrategy != null)
+				{
+					_colliderStrategy.Reset();
+				}
 			}
 		}
 
@@ -94,6 +98,13 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					_colliders.Add(ve.GameObject, ve.GameObject.AddComponent<BoxCollider>());
 				}
 			}
+			public void Reset()
+			{
+				if (_colliders != null)
+				{
+					_colliders.Clear();
+				}
+			}
 		}
 
 		public class MeshColliderStrategy : IColliderStrategy
@@ -114,6 +125,13 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				else
 				{
 					_colliders.Add(ve.GameObject, ve.GameObject.AddComponent<MeshCollider>());
+				}
+			}
+			public void Reset()
+			{
+				if (_colliders != null)
+				{
+					_colliders.Clear();
 				}
 			}
 		}
@@ -139,11 +157,20 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					_colliders.Add(ve.GameObject, ve.GameObject.AddComponent<SphereCollider>());
 				}
 			}
+
+			public void Reset()
+			{
+				if (_colliders != null)
+				{
+					_colliders.Clear();
+				}
+			}
 		}
 
 		public interface IColliderStrategy
 		{
 			void AddColliderTo(VectorEntity ve);
+			void Reset();
 		}
 	}
 }
