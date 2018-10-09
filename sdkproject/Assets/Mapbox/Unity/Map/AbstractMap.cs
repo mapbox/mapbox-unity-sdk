@@ -24,7 +24,7 @@ namespace Mapbox.Unity.Map
 	public class AbstractMap : MonoBehaviour, IMap
 	{
 		#region Private Fields
-		[SerializeField] private MapOptions _options;
+		[SerializeField] private MapOptions _options = new MapOptions();
 		[SerializeField] private bool _initializeOnStart = true;
 		[SerializeField] protected ImageryLayer _imagery = new ImageryLayer();
 		[SerializeField] protected TerrainLayer _terrain = new TerrainLayer();
@@ -77,8 +77,6 @@ namespace Mapbox.Unity.Map
 		/// The map options.
 		/// Options to control the behaviour of the map like location,extent, scale and placement.
 		/// </summary>
-		[SerializeField]
-		private MapOptions _options = new MapOptions();
 		public MapOptions Options
 		{
 			get
@@ -367,9 +365,14 @@ namespace Mapbox.Unity.Map
 		/// Resets the map.
 		/// Use this method to reset the map to and reset all parameters.
 		/// </summary>
+		[ContextMenu("ResetMap")]
 		public void ResetMap()
 		{
-			Initialize(Conversions.StringToLatLon(_options.locationOptions.latitudeLongitude), (int)_options.locationOptions.zoom);
+			//Initialize(Conversions.StringToLatLon(_options.locationOptions.latitudeLongitude), (int)_options.locationOptions.zoom);
+
+			_mapVisualizer.UnregisterAllTiles();
+			_mapVisualizer.ClearCaches();
+			_mapVisualizer.ReregisterAllTiles();
 		}
 
 		public bool IsAccessTokenValid
