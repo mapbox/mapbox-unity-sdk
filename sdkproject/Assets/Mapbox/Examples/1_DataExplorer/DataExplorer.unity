@@ -312,7 +312,7 @@ MonoBehaviour:
   _initializeOnStart: 1
   _options:
     locationOptions:
-      latitudeLongitude: 37.7648, -122.463
+      latitudeLongitude: 40.7648, -73.9808
       zoom: 16
     extentOptions:
       extentType: 0
@@ -453,7 +453,7 @@ MonoBehaviour:
         colliderOptions:
           colliderType: 0
         materialOptions:
-          style: 1
+          style: 4
           texturingType: 3
           materials:
           - Materials:
@@ -538,9 +538,9 @@ MonoBehaviour:
             texturingType: 0
             materials:
             - Materials:
-              - {fileID: 2100000, guid: 1843a50abea6fa448a61d143054f2166, type: 2}
+              - {fileID: 2100000, guid: ff2f824fb9ab7b54b90a44e4394d18ea, type: 2}
             - Materials:
-              - {fileID: 2100000, guid: 31d8bd8fc9d4850408a1660cf3619850, type: 2}
+              - {fileID: 2100000, guid: ff2f824fb9ab7b54b90a44e4394d18ea, type: 2}
             atlasInfo: {fileID: 0}
             colorPalette: {fileID: 0}
         performanceOptions:
@@ -846,9 +846,9 @@ MonoBehaviour:
             texturingType: 0
             materials:
             - Materials:
-              - {fileID: 0}
+              - {fileID: 2100000, guid: ab4ee1288a054a84b85ba5cf5a0abf34, type: 2}
             - Materials:
-              - {fileID: 0}
+              - {fileID: 2100000, guid: ab4ee1288a054a84b85ba5cf5a0abf34, type: 2}
             atlasInfo: {fileID: 0}
             colorPalette: {fileID: 0}
         performanceOptions:
@@ -905,9 +905,9 @@ MonoBehaviour:
             texturingType: 0
             materials:
             - Materials:
-              - {fileID: 0}
+              - {fileID: 2100000, guid: c0be5c38e1944584b89f81505e3c4446, type: 2}
             - Materials:
-              - {fileID: 0}
+              - {fileID: 2100000, guid: c0be5c38e1944584b89f81505e3c4446, type: 2}
             atlasInfo: {fileID: 0}
             colorPalette: {fileID: 0}
         performanceOptions:
@@ -964,9 +964,9 @@ MonoBehaviour:
             texturingType: 0
             materials:
             - Materials:
-              - {fileID: 0}
+              - {fileID: 2100000, guid: a4c397925829de8438fa9bb51535fd17, type: 2}
             - Materials:
-              - {fileID: 0}
+              - {fileID: 2100000, guid: a4c397925829de8438fa9bb51535fd17, type: 2}
             atlasInfo: {fileID: 0}
             colorPalette: {fileID: 0}
         performanceOptions:
@@ -1023,7 +1023,7 @@ MonoBehaviour:
             texturingType: 0
             materials:
             - Materials:
-              - {fileID: 0}
+              - {fileID: 2100000, guid: 7c0707aad770f0f4ca09b79e3961539b, type: 2}
             - Materials:
               - {fileID: 0}
             atlasInfo: {fileID: 0}
@@ -1082,9 +1082,9 @@ MonoBehaviour:
             texturingType: 0
             materials:
             - Materials:
-              - {fileID: 0}
+              - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
             - Materials:
-              - {fileID: 0}
+              - {fileID: 2100000, guid: dd63290cb53906349af7ea675627a697, type: 2}
             atlasInfo: {fileID: 0}
             colorPalette: {fileID: 0}
         performanceOptions:
@@ -1861,7 +1861,7 @@ MonoBehaviour:
             texturingType: 0
             materials:
             - Materials:
-              - {fileID: 0}
+              - {fileID: 2100000, guid: ff2f824fb9ab7b54b90a44e4394d18ea, type: 2}
             - Materials:
               - {fileID: 0}
             atlasInfo: {fileID: 0}
@@ -1874,7 +1874,7 @@ MonoBehaviour:
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
-        presetFeatureType: 4
+        presetFeatureType: 0
         _maskValue: 0
         selectedTypes: 
       - coreOptions:
@@ -1920,7 +1920,7 @@ MonoBehaviour:
             texturingType: 0
             materials:
             - Materials:
-              - {fileID: 0}
+              - {fileID: 2100000, guid: 204bcfc5761ef1b46b9301bc80304e2b, type: 2}
             - Materials:
               - {fileID: 0}
             atlasInfo: {fileID: 0}
@@ -1979,7 +1979,7 @@ MonoBehaviour:
             texturingType: 0
             materials:
             - Materials:
-              - {fileID: 0}
+              - {fileID: 2100000, guid: c0be5c38e1944584b89f81505e3c4446, type: 2}
             - Materials:
               - {fileID: 0}
             atlasInfo: {fileID: 0}
@@ -2045,7 +2045,7 @@ MonoBehaviour:
             texturingType: 0
             materials:
             - Materials:
-              - {fileID: 0}
+              - {fileID: 2100000, guid: aaa94592a6eb9c8418d32b37b10f288d, type: 2}
             - Materials:
               - {fileID: 0}
             atlasInfo: {fileID: 0}
@@ -2111,7 +2111,7 @@ MonoBehaviour:
             texturingType: 0
             materials:
             - Materials:
-              - {fileID: 0}
+              - {fileID: 2100000, guid: 8d222a6659da43e45b6274794e67d47a, type: 2}
             - Materials:
               - {fileID: 0}
             atlasInfo: {fileID: 0}
@@ -2177,7 +2177,7 @@ MonoBehaviour:
             texturingType: 0
             materials:
             - Materials:
-              - {fileID: 0}
+              - {fileID: 2100000, guid: bdad3ccf6401a414188827874d8999aa, type: 2}
             - Materials:
               - {fileID: 0}
             atlasInfo: {fileID: 0}
@@ -2243,7 +2243,7 @@ MonoBehaviour:
             texturingType: 0
             materials:
             - Materials:
-              - {fileID: 0}
+              - {fileID: 2100000, guid: 0de83c8715792fe43aceecafcdbd8b24, type: 2}
             - Materials:
               - {fileID: 0}
             atlasInfo: {fileID: 0}
@@ -3586,7 +3586,7 @@ Prefab:
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 0.000015258789
       objectReference: {fileID: 0}
     - target: {fileID: 114731470950229392, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
