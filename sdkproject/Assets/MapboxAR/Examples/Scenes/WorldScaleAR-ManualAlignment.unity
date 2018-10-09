@@ -113,6 +113,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!4 &384317046 stripped
+Transform:
+  m_PrefabParentObject: {fileID: 4638309031495524, guid: 840fafd579d474d53ba0a6b55a3f7a89,
+    type: 2}
+  m_PrefabInternal: {fileID: 2112666983}
 --- !u!1001 &524865300
 Prefab:
   m_ObjectHideFlags: 0
@@ -401,6 +406,21 @@ Prefab:
       propertyPath: _vectorData._layerProperty.vectorSubLayers.Array.data[0].materialOptions.customStyleOptions.materials.Array.data[1].Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 80bd19d68c4ef4a659db43cfb6b09b91, type: 2}
+    - target: {fileID: 114081268807403756, guid: 840fafd579d474d53ba0a6b55a3f7a89,
+        type: 2}
+      propertyPath: _options.extentOptions.defaultExtents.rangeAroundTransformOptions.targetTransform
+      value: 
+      objectReference: {fileID: 384317046}
+    - target: {fileID: 114081268807403756, guid: 840fafd579d474d53ba0a6b55a3f7a89,
+        type: 2}
+      propertyPath: _options.extentOptions.defaultExtents.rangeAroundTransformOptions.visibleBuffer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114081268807403756, guid: 840fafd579d474d53ba0a6b55a3f7a89,
+        type: 2}
+      propertyPath: _options.extentOptions.defaultExtents.rangeAroundTransformOptions.disposeBuffer
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 840fafd579d474d53ba0a6b55a3f7a89, type: 2}
   m_IsPrefabParent: 0
