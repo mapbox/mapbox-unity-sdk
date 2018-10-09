@@ -77,6 +77,8 @@ namespace Mapbox.Unity.Map
 		/// The map options.
 		/// Options to control the behaviour of the map like location,extent, scale and placement.
 		/// </summary>
+		[SerializeField]
+		private MapOptions _options = new MapOptions();
 		public MapOptions Options
 		{
 			get
