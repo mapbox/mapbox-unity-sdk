@@ -365,9 +365,14 @@ namespace Mapbox.Unity.Map
 		/// Resets the map.
 		/// Use this method to reset the map to and reset all parameters.
 		/// </summary>
+		[ContextMenu("ResetMap")]
 		public void ResetMap()
 		{
-			Initialize(Conversions.StringToLatLon(_options.locationOptions.latitudeLongitude), (int)_options.locationOptions.zoom);
+			//Initialize(Conversions.StringToLatLon(_options.locationOptions.latitudeLongitude), (int)_options.locationOptions.zoom);
+
+			_mapVisualizer.UnregisterAllTiles();
+			_mapVisualizer.ClearCaches();
+			_mapVisualizer.ReregisterAllTiles();
 		}
 
 		public bool IsAccessTokenValid

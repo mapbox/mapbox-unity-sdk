@@ -102,6 +102,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
+		public virtual void Reset()
+		{
+
+		}
+
 		protected abstract void OnInitialized();
 
 		protected abstract void OnRegistered(UnityTile tile);
@@ -130,5 +135,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 		#endregion
+
 	}
 }

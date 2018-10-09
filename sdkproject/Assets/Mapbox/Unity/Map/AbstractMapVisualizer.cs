@@ -274,6 +274,28 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
+		public void ReregisterAllTiles()
+		{
+			foreach (var activeTile in _activeTiles)
+			{
+				foreach (var abstractTileFactory in Factories)
+				{
+					abstractTileFactory.Register(activeTile.Value);
+				}
+			}
+		}
+
+		public void UnregisterAllTiles()
+		{
+			foreach (var activeTile in _activeTiles)
+			{
+				foreach (var abstractTileFactory in Factories)
+				{
+					abstractTileFactory.Unregister(activeTile.Value);
+				}
+			}
+		}
+
 		public void UnregisterTilesFrom(AbstractTileFactory factory)
 		{
 			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
@@ -319,6 +341,14 @@ namespace Mapbox.Unity.Map
 			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
 			{
 				factory.UpdateTileProperty(tileBundle.Value, updateArgs);
+			}
+		}
+
+		public void ClearCaches()
+		{
+			foreach (var abstractTileFactory in Factories)
+			{
+				abstractTileFactory.Reset();
 			}
 		}
 		#endregion
