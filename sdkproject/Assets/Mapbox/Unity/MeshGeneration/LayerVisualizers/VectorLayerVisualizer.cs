@@ -259,8 +259,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 						AddOrCreateMeshModifier<PolygonMeshModifier>();
 
 						UVModifierOptions uvModOptions = new UVModifierOptions();
-						uvModOptions.texturingType = _layerProperties.materialOptions.texturingType;
-						uvModOptions.atlasInfo = _layerProperties.materialOptions.atlasInfo;
+						uvModOptions.texturingType = (_layerProperties.materialOptions.style == StyleTypes.Custom) ? _layerProperties.materialOptions.customStyleOptions.texturingType : _layerProperties.materialOptions.texturingType;
+						uvModOptions.atlasInfo = (_layerProperties.materialOptions.style == StyleTypes.Custom) ? _layerProperties.materialOptions.customStyleOptions.atlasInfo : _layerProperties.materialOptions.atlasInfo;
 						uvModOptions.style = _layerProperties.materialOptions.style;
 
 						var uvMod = AddOrCreateMeshModifier<UvModifier>();
