@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using Mapbox.Unity;
+using Mapbox.Unity.Map;
 
 namespace Mapbox.Editor
 {
@@ -16,13 +17,9 @@ namespace Mapbox.Editor
 
 		private Type _type;
 
-		private Action<UnityEngine.Object> _act;
-
 		private List<Type> _modTypes;
 
 		private SerializedProperty _finalize;
-
-		private int _index = -1;
 
 		private Vector2 _scrollPos;
 
@@ -95,11 +92,11 @@ namespace Mapbox.Editor
 			var modifierInstance = ScriptableObject.CreateInstance(type);
 
 			string pathCandidate = Constants.Path.MAPBOX_USER_MODIFIERS;
-			if(!Directory.Exists(pathCandidate))
+			if (!Directory.Exists(pathCandidate))
 			{
 
 				string userFolder = Constants.Path.MAPBOX_USER;
-				if(!Directory.Exists(userFolder))
+				if (!Directory.Exists(userFolder))
 				{
 					string parentPath = System.IO.Path.Combine("Assets", "Mapbox");
 					AssetDatabase.CreateFolder(parentPath, "User");
@@ -139,23 +136,14 @@ namespace Mapbox.Editor
 		public void AddNewInstanceToArray(object obj)
 		{
 			ScriptableObject asset = obj as ScriptableObject;
-			if (_act != null)
+
+			_finalize.arraySize++;
+			_finalize.GetArrayElementAtIndex(_finalize.arraySize - 1).objectReferenceValue = asset;
+
+			MapboxDataProperty mapboxDataProperty = (MapboxDataProperty)EditorHelper.GetTargetObjectWithProperty(_finalize);
+			if (_finalize.serializedObject.ApplyModifiedProperties() && mapboxDataProperty != null)
 			{
-				_act(asset);
-			}
-			else
-			{
-				if (_index == -1)
-				{
-					_finalize.arraySize++;
-					_finalize.GetArrayElementAtIndex(_finalize.arraySize - 1).objectReferenceValue = asset;
-					_finalize.serializedObject.ApplyModifiedProperties();
-				}
-				else
-				{
-					_finalize.GetArrayElementAtIndex(_index).objectReferenceValue = asset;
-					_finalize.serializedObject.ApplyModifiedProperties();
-				}
+				mapboxDataProperty.HasChanged = true;
 			}
 		}
 
@@ -164,17 +152,10 @@ namespace Mapbox.Editor
 		/// </summary>
 		/// <param name="t">T.</param>
 		/// <param name="p">P.</param>
-		/// <param name="index">Index.</param>
-		/// <param name="act">Act.</param>
-		public PopupSelectionMenu(Type t, SerializedProperty p, int index = -1, Action<UnityEngine.Object> act = null)
+		public PopupSelectionMenu(Type t, SerializedProperty p)
 		{
 			_type = t;
 			_finalize = p;
-			_act = act;
-			if (index > -1)
-			{
-				_index = index;
-			}
 		}
 	}
 }

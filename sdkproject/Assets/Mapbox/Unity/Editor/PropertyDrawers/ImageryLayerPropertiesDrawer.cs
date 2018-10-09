@@ -41,12 +41,19 @@
 			// Draw label.
 			var sourceTypeLabel = new GUIContent { text = "Data Source", tooltip = "Source tileset for Imagery." };
 
+			EditorGUI.BeginChangeCheck();
 			sourceTypeProperty.enumValueIndex = EditorGUILayout.Popup(sourceTypeLabel, sourceTypeProperty.enumValueIndex, sourceTypeContent);
+			if(EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(property);
+			}
 			sourceTypeValue = (ImagerySourceType)sourceTypeProperty.enumValueIndex;
 
 			var sourceOptionsProperty = property.FindPropertyRelative("sourceOptions");
 			var layerSourceProperty = sourceOptionsProperty.FindPropertyRelative("layerSource");
 			var layerSourceId = layerSourceProperty.FindPropertyRelative("Id");
+
+			EditorGUI.BeginChangeCheck();
 
 			switch (sourceTypeValue)
 			{
@@ -70,9 +77,20 @@
 				default:
 					break;
 			}
+
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(property);
+			}
+
 			if (sourceTypeValue != ImagerySourceType.None)
 			{
+				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("rasterOptions"));
+				if (EditorGUI.EndChangeCheck())
+				{
+					EditorHelper.CheckForModifiedProperty(property);
+				}
 			}
 		}
 	}

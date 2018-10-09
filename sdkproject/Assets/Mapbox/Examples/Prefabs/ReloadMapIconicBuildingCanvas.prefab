@@ -510,7 +510,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 587b1db6b06084de28d873bfbbff270c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  location: Salesforce Tower
+  location: Salesforce Tower, San Francisco
   _cameraPosition: {x: 11, y: 48.9, z: -56.57}
   _cameraRotation: {x: 20.799995, y: 0, z: 0}
 --- !u!114 &114104293458475558

@@ -202,19 +202,20 @@ MonoBehaviour:
       zoom: 16
     extentOptions:
       extentType: 0
-      cameraBoundsOptions:
-        camera: {fileID: 234181019}
-        visibleBuffer: 0
-        disposeBuffer: 0
-      rangeAroundCenterOptions:
-        west: 1
-        north: 1
-        east: 1
-        south: 1
-      rangeAroundTransformOptions:
-        targetTransform: {fileID: 0}
-        visibleBuffer: 0
-        disposeBuffer: 0
+      defaultExtents:
+        cameraBoundsOptions:
+          camera: {fileID: 0}
+          visibleBuffer: 0
+          disposeBuffer: 0
+        rangeAroundCenterOptions:
+          west: 1
+          north: 1
+          east: 1
+          south: 1
+        rangeAroundTransformOptions:
+          targetTransform: {fileID: 0}
+          visibleBuffer: 0
+          disposeBuffer: 0
     placementOptions:
       placementType: 1
       snapMapToZero: 0
@@ -249,8 +250,9 @@ MonoBehaviour:
           UserName: 
       elevationLayerType: 0
       requiredOptions:
-        addCollider: 0
         exaggerationFactor: 1
+      colliderOptions:
+        addCollider: 0
       modificationOptions:
         sampleCount: 10
         useRelativeHeight: 1
@@ -319,7 +321,8 @@ MonoBehaviour:
           layerName: building
           snapToTerrain: 1
           combineMeshes: 0
-          lineWidth: 1
+        lineGeometryOptions:
+          Width: 1
         filterOptions:
           _selectedLayerName: building
           filters: []
@@ -349,15 +352,24 @@ MonoBehaviour:
           colorStyleColor: {r: 1, g: 1, b: 1, a: 1}
           samplePalettes: 0
           colorPalette: {fileID: 0}
+          customStyleOptions:
+            texturingType: 0
+            materials:
+            - Materials:
+              - {fileID: 2100000, guid: 0f9e3de68a3085e469bd62c8b40e9487, type: 2}
+            - Materials:
+              - {fileID: 2100000, guid: 6ec7317f2ac57e2448326cdc68816797, type: 2}
+            atlasInfo: {fileID: 0}
+            colorPalette: {fileID: 0}
         performanceOptions:
           isEnabled: 1
           entityPerCoroutine: 20
         honorBuildingIdSetting: 1
-        buildingsWithUniqueIds: 0
+        buildingsWithUniqueIds: 1
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
-        presetFeatureType: 4
+        presetFeatureType: 0
         _maskValue: 0
         selectedTypes: 
       - coreOptions:
@@ -368,7 +380,8 @@ MonoBehaviour:
           layerName: landuse
           snapToTerrain: 1
           combineMeshes: 0
-          lineWidth: 1
+        lineGeometryOptions:
+          Width: 1
         filterOptions:
           _selectedLayerName: landuse
           filters: []
@@ -398,6 +411,15 @@ MonoBehaviour:
           colorStyleColor: {r: 1, g: 1, b: 1, a: 1}
           samplePalettes: 0
           colorPalette: {fileID: 0}
+          customStyleOptions:
+            texturingType: 0
+            materials:
+            - Materials:
+              - {fileID: 2100000, guid: dd22d0eb52da4594e90fbb4dd7ae0baf, type: 2}
+            - Materials:
+              - {fileID: 2100000, guid: dd22d0eb52da4594e90fbb4dd7ae0baf, type: 2}
+            atlasInfo: {fileID: 0}
+            colorPalette: {fileID: 0}
         performanceOptions:
           isEnabled: 1
           entityPerCoroutine: 20
@@ -408,7 +430,7 @@ MonoBehaviour:
         GoModifiers:
         - {fileID: 11400000, guid: 3505ec4e61e3f4c4d88fc3c5548e7144, type: 2}
         - {fileID: 11400000, guid: e425dc440a40d9a4080794105e9f66ef, type: 2}
-        presetFeatureType: 4
+        presetFeatureType: 2
         _maskValue: 0
         selectedTypes: 
       - coreOptions:
@@ -419,7 +441,8 @@ MonoBehaviour:
           layerName: road
           snapToTerrain: 0
           combineMeshes: 0
-          lineWidth: 1
+        lineGeometryOptions:
+          Width: 1
         filterOptions:
           _selectedLayerName: road
           filters:
@@ -494,17 +517,26 @@ MonoBehaviour:
           colorStyleColor: {r: 1, g: 1, b: 1, a: 1}
           samplePalettes: 0
           colorPalette: {fileID: 0}
+          customStyleOptions:
+            texturingType: 0
+            materials:
+            - Materials:
+              - {fileID: 0}
+            - Materials:
+              - {fileID: 0}
+            atlasInfo: {fileID: 0}
+            colorPalette: {fileID: 0}
         performanceOptions:
           isEnabled: 1
           entityPerCoroutine: 20
-        honorBuildingIdSetting: 0
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers:
         - {fileID: 11400000, guid: ed4da4864f7b7394399b675a217cd637, type: 2}
         GoModifiers:
         - {fileID: 11400000, guid: 5ad7c36a7a62f8b4cbcbcea8139a12a5, type: 2}
-        presetFeatureType: 4
+        presetFeatureType: 1
         _maskValue: 0
         selectedTypes: 
       - coreOptions:
@@ -515,7 +547,8 @@ MonoBehaviour:
           layerName: building
           snapToTerrain: 1
           combineMeshes: 0
-          lineWidth: 1
+        lineGeometryOptions:
+          Width: 1
         filterOptions:
           _selectedLayerName: building
           filters: []
@@ -545,10 +578,19 @@ MonoBehaviour:
           colorStyleColor: {r: 1, g: 1, b: 1, a: 1}
           samplePalettes: 0
           colorPalette: {fileID: 0}
+          customStyleOptions:
+            texturingType: 0
+            materials:
+            - Materials:
+              - {fileID: 0}
+            - Materials:
+              - {fileID: 0}
+            atlasInfo: {fileID: 0}
+            colorPalette: {fileID: 0}
         performanceOptions:
           isEnabled: 1
           entityPerCoroutine: 20
-        honorBuildingIdSetting: 0
+        honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers:
@@ -557,7 +599,7 @@ MonoBehaviour:
         - {fileID: 11400000, guid: 4dbdd9c4bb7ba4d41ac1b710cf40de49, type: 2}
         GoModifiers:
         - {fileID: 11400000, guid: cd82d41d9097fef4fb5dafaebde20bfa, type: 2}
-        presetFeatureType: 4
+        presetFeatureType: 0
         _maskValue: 0
         selectedTypes: 
       locationPrefabList: []
@@ -600,7 +642,6 @@ GameObject:
   - component: {fileID: 234181019}
   - component: {fileID: 234181018}
   - component: {fileID: 234181017}
-  - component: {fileID: 234181016}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -622,17 +663,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 35.7, y: 0, z: 0}
---- !u!114 &234181016
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 234181014}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff26db721962cdf4a8edcdfa9a767d2a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!81 &234181017
 AudioListener:
   m_ObjectHideFlags: 0

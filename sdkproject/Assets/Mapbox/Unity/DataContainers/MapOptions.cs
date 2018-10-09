@@ -3,7 +3,7 @@
 	using System;
 	using UnityEngine;
 	[Serializable]
-	public class MapOptions
+	public class MapOptions : MapboxDataProperty
 	{
 		public MapLocationOptions locationOptions = new MapLocationOptions();
 		public MapExtentOptions extentOptions = new MapExtentOptions(MapExtentType.RangeAroundCenter);

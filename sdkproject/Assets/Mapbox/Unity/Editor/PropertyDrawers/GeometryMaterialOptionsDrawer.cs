@@ -3,6 +3,7 @@
 	using UnityEditor;
 	using UnityEngine;
 	using Mapbox.Unity;
+	using Mapbox.Editor;
 	using Mapbox.Unity.Map;
 	using Mapbox.Unity.MeshGeneration.Data;
 	using Mapbox.VectorTile.ExtensionMethods;
@@ -82,6 +83,7 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 
 			showTexturing = EditorGUILayout.Foldout(showTexturing, new GUIContent { text = "Texturing", tooltip = "Material options to texture the generated building geometry" });
@@ -102,7 +104,13 @@
 					};
 				}
 
+				EditorGUI.BeginChangeCheck();
 				styleType.enumValueIndex = EditorGUILayout.Popup(styleTypeLabel, styleType.enumValueIndex, styleTypeGuiContent);
+				if (EditorGUI.EndChangeCheck())
+				{
+					EditorHelper.CheckForModifiedProperty(property);
+				}
+
 				EditorGUI.indentLevel++;
 				if ((StyleTypes)styleType.enumValueIndex != StyleTypes.Custom)
 				{
@@ -125,6 +133,8 @@
 
 					GUILayout.EndHorizontal();
 
+					EditorGUI.BeginChangeCheck();
+
 					switch ((StyleTypes)styleType.enumValueIndex)
 					{
 						case StyleTypes.Simple:
@@ -139,7 +149,6 @@
 									text = samplePaletteType.enumDisplayNames[i]
 								};
 							}
-
 							samplePaletteType.enumValueIndex = EditorGUILayout.Popup(samplePaletteTypeLabel, samplePaletteType.enumValueIndex, samplePaletteTypeGuiContent);
 							break;
 						case StyleTypes.Light:
@@ -154,43 +163,73 @@
 						default:
 							break;
 					}
+					if (EditorGUI.EndChangeCheck())
+					{
+						EditorHelper.CheckForModifiedProperty(property);
+					}
 				}
 				else
 				{
-					var texturingType = property.FindPropertyRelative("texturingType");
+					var customStyleProperty = property.FindPropertyRelative("customStyleOptions");
+					var texturingType = customStyleProperty.FindPropertyRelative("texturingType");
 
 					int valIndex = texturingType.enumValueIndex == 0 ? 0 : texturingType.enumValueIndex + 1;
 					var texturingTypeGUI = new GUIContent { text = "Texturing Type", tooltip = EnumExtensions.Description((UvMapType)valIndex) };
 
+					EditorGUI.BeginChangeCheck();
 					EditorGUILayout.PropertyField(texturingType, texturingTypeGUI);
+					if (EditorGUI.EndChangeCheck())
+					{
+						EditorHelper.CheckForModifiedProperty(property);
+					}
 
-					var matList = property.FindPropertyRelative("materials");
+					var matList = customStyleProperty.FindPropertyRelative("materials");
 					if (matList.arraySize == 0)
 					{
 						matList.arraySize = 2;
 					}
 					GUILayout.Space(-lineHeight);
-					var roofMat = matList.GetArrayElementAtIndex(0);
-					EditorGUILayout.PropertyField(roofMat, new GUIContent { text = "Top Material", tooltip = "Unity material to use for extruded top/roof mesh. " });
+
+					EditorGUI.BeginChangeCheck();
+					EditorGUILayout.PropertyField(matList.GetArrayElementAtIndex(0), new GUIContent { text = "Top Material", tooltip = "Unity material to use for extruded top/roof mesh. " });
+					if (EditorGUI.EndChangeCheck())
+					{
+						EditorHelper.CheckForModifiedProperty(property);
+					}
+
 
 					GUILayout.Space(-lineHeight);
-					var wallMat = matList.GetArrayElementAtIndex(1);
-					EditorGUILayout.PropertyField(wallMat, new GUIContent { text = "Side Material", tooltip = "Unity material to use for extruded side/wall mesh. " });
+
+					EditorGUI.BeginChangeCheck();
+					EditorGUILayout.PropertyField(matList.GetArrayElementAtIndex(1), new GUIContent { text = "Side Material", tooltip = "Unity material to use for extruded side/wall mesh. " });
+					if (EditorGUI.EndChangeCheck())
+					{
+						EditorHelper.CheckForModifiedProperty(property);
+					}
+
+					EditorGUI.BeginChangeCheck();
 
 					if ((UvMapType)texturingType.enumValueIndex + 1 == UvMapType.Atlas)
 					{
-						var atlasInfo = property.FindPropertyRelative("atlasInfo");
+						var atlasInfo = customStyleProperty.FindPropertyRelative("atlasInfo");
 						EditorGUILayout.ObjectField(atlasInfo, new GUIContent { text = "Altas Info", tooltip = "Atlas information scriptable object, this defines how the texture roof and wall texture atlases will be used.  " });
 					}
 					if ((UvMapType)texturingType.enumValueIndex + 1 == UvMapType.AtlasWithColorPalette)
 					{
-						var atlasInfo = property.FindPropertyRelative("atlasInfo");
+						var atlasInfo = customStyleProperty.FindPropertyRelative("atlasInfo");
 						EditorGUILayout.ObjectField(atlasInfo, new GUIContent { text = "Altas Info", tooltip = "Atlas information scriptable object, this defines how the texture roof and wall texture atlases will be used.  " });
-						var colorPalette = property.FindPropertyRelative("colorPalette");
+
+						var colorPalette = customStyleProperty.FindPropertyRelative("colorPalette");
 						EditorGUILayout.ObjectField(colorPalette, new GUIContent { text = "Color Palette", tooltip = "Color palette scriptable object, allows texture features to be procedurally colored at runtime. Requires materials that use the MapboxPerRenderer shader. " });
 
 						EditorGUILayout.LabelField(new GUIContent { text = "Note: Atlas With Color Palette requires materials that use the MapboxPerRenderer shader." }, Constants.GUI.Styles.EDITOR_NOTE_STYLE);
 					}
+
+					if (EditorGUI.EndChangeCheck())
+					{
+						EditorHelper.CheckForModifiedProperty(property);
+					}
+
 				}
 				EditorGUI.indentLevel--;
 				EditorGUI.EndProperty();
