@@ -1,4 +1,6 @@
-﻿namespace Mapbox.Unity.Map
+﻿using Mapbox.Unity.Map.Interfaces;
+
+namespace Mapbox.Unity.Map
 {
 	using System;
 	[Serializable]

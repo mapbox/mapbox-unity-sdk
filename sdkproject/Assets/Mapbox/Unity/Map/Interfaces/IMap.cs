@@ -1,11 +1,11 @@
-﻿namespace Mapbox.Unity.Map
-{
-	using System;
-	using System.Collections.Generic;
-	using Mapbox.Map;
-	using Mapbox.Utils;
-	using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using Mapbox.Map;
+using Mapbox.Utils;
+using UnityEngine;
 
+namespace Mapbox.Unity.Map.Interfaces
+{
 	public interface IMap : IMapReadable, IMapWritable, IUnifiedMap { }
 
 	public interface IMapReadable
@@ -24,7 +24,7 @@
 		int InitialZoom { get; }
 		/// <summary>
 		/// Gets the zoom value at which the tiles will be requested from the service.
-		/// Use this only for calls which require an integer value of zoom to be passed in. 
+		/// Use this only for calls which require an integer value of zoom to be passed in.
 		/// </summary>
 		int AbsoluteZoom { get; }
 		Transform Root { get; }

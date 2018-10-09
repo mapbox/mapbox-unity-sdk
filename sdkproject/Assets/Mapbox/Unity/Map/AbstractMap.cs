@@ -1,10 +1,13 @@
-using System.Linq;
+using Mapbox.Unity.Map.Interfaces;
+using Mapbox.Unity.Map.Strategies;
+using Mapbox.Unity.Map.TileProviders;
 
 namespace Mapbox.Unity.Map
 {
 	using System;
 	using System.Collections;
 	using System.Collections.Generic;
+	using System.Linq;
 	using Mapbox.Unity.Utilities;
 	using Utils;
 	using UnityEngine;
@@ -13,57 +16,6 @@ namespace Mapbox.Unity.Map
 	using Mapbox.Unity.MeshGeneration.Data;
 	using System.Globalization;
 
-	public interface IUnifiedMap
-	{
-		//void InitializeMap(MapOptions options);
-		void UpdateMap(Vector2d latLon, float zoom);
-		void ResetMap();
-	}
-
-	public interface IMapScalingStrategy
-	{
-		void SetUpScaling(AbstractMap map);
-	}
-
-	public class MapScalingAtWorldScaleStrategy : IMapScalingStrategy
-	{
-		public void SetUpScaling(AbstractMap map)
-		{
-			var scaleFactor = Mathf.Pow(2, (map.AbsoluteZoom - map.InitialZoom));
-			map.SetWorldRelativeScale(scaleFactor * Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x));
-		}
-	}
-
-	public class MapScalingAtUnityScaleStrategy : IMapScalingStrategy
-	{
-		public void SetUpScaling(AbstractMap map)
-		{
-			var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(map.CenterLatitudeLongitude, map.AbsoluteZoom));
-			map.SetWorldRelativeScale((float)(map.Options.scalingOptions.unityTileSize / referenceTileRect.Size.x));
-		}
-	}
-
-	public interface IMapPlacementStrategy
-	{
-		void SetUpPlacement(AbstractMap map);
-	}
-
-	public class MapPlacementAtTileCenterStrategy : IMapPlacementStrategy
-	{
-		public void SetUpPlacement(AbstractMap map)
-		{
-			var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(map.CenterLatitudeLongitude, map.AbsoluteZoom));
-			map.SetCenterMercator(referenceTileRect.Center);
-		}
-	}
-
-	public class MapPlacementAtLocationCenterStrategy : IMapPlacementStrategy
-	{
-		public void SetUpPlacement(AbstractMap map)
-		{
-			map.SetCenterMercator(Conversions.LatLonToMeters(map.CenterLatitudeLongitude));
-		}
-	}
 	/// <summary>
 	/// Abstract map.
 	/// This is the main monobehavior which controls the map. It controls the visualization of map data.
@@ -71,23 +23,56 @@ namespace Mapbox.Unity.Map
 	/// </summary>
 	public class AbstractMap : MonoBehaviour, IMap
 	{
-		/// <summary>
-		/// Setting to trigger map initialization in Unity's Start method.
-		/// if set to false, Initialize method should be called explicitly to initialize the map.
-		/// </summary>
-		[SerializeField]
-		private bool _initializeOnStart = true;
-		public bool InitializeOnStart
+		#region Private Fields
+		[SerializeField] private MapOptions _options;
+		[SerializeField] private bool _initializeOnStart = true;
+		[SerializeField] protected ImageryLayer _imagery = new ImageryLayer();
+		[SerializeField] protected TerrainLayer _terrain = new TerrainLayer();
+		[SerializeField] protected VectorLayer _vectorData = new VectorLayer();
+		[SerializeField] protected AbstractTileProvider _tileProvider;
+		[SerializeField] protected HashSet<UnwrappedTileId> _currentExtent;
+
+		protected AbstractMapVisualizer _mapVisualizer;
+		protected float _unityTileSize = 1;
+		protected bool _worldHeightFixed = false;
+		protected MapboxAccess _fileSource;
+		protected int _initialZoom;
+		protected Vector2d _centerLatitudeLongitude;
+		protected Vector2d _centerMercator;
+		protected float _worldRelativeScale;
+		protected Vector3 _mapScaleFactor;
+		#endregion
+
+		#region Properties
+		public AbstractMapVisualizer MapVisualizer
 		{
 			get
 			{
-				return _initializeOnStart;
+				return _mapVisualizer;
 			}
 			set
 			{
-				_initializeOnStart = value;
+				_mapVisualizer = value;
 			}
 		}
+
+		public AbstractTileProvider TileProvider
+		{
+			get
+			{
+				return _tileProvider;
+			}
+			set
+			{
+				if (_tileProvider != null)
+				{
+					_tileProvider.ExtentChanged -= OnMapExtentChanged;
+				}
+				_tileProvider = value;
+				_tileProvider.ExtentChanged += OnMapExtentChanged;
+			}
+		}
+
 		/// <summary>
 		/// The map options.
 		/// Options to control the behaviour of the map like location,extent, scale and placement.
@@ -105,11 +90,10 @@ namespace Mapbox.Unity.Map
 				_options = value;
 			}
 		}
+
 		/// <summary>
 		/// Options to control the imagery component of the map.
 		/// </summary>
-		[SerializeField]
-		ImageryLayer _imagery = new ImageryLayer();
 		[NodeEditorElement("Layers")]
 		public IImageryLayer ImageLayer
 		{
@@ -118,11 +102,10 @@ namespace Mapbox.Unity.Map
 				return _imagery;
 			}
 		}
+
 		/// <summary>
 		/// Options to control the terrain/ elevation component of the map.
 		/// </summary>
-		[SerializeField]
-		TerrainLayer _terrain = new TerrainLayer();
 		[NodeEditorElement("Layers")]
 		public ITerrainLayer Terrain
 		{
@@ -137,8 +120,6 @@ namespace Mapbox.Unity.Map
 		/// Options to control the vector data component of the map.
 		/// Adds a vector source and visualizers to define the rendering behaviour of vector data layers.
 		/// </summary>
-		[SerializeField]
-		VectorLayer _vectorData = new VectorLayer();
 		[NodeEditorElement("Layers")]
 		public IVectorDataLayer VectorData
 		{
@@ -148,53 +129,113 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		[SerializeField]
-		protected AbstractTileProvider _tileProvider;
-		public AbstractTileProvider TileProvider
+		public Vector2d CenterLatitudeLongitude
 		{
 			get
 			{
-				return _tileProvider;
-			}
-			set
-			{
-				if (_tileProvider != null)
-				{
-					_tileProvider.ExtentChanged -= OnMapExtentChanged;
-				}
-				_tileProvider = value;
-				_tileProvider.ExtentChanged += OnMapExtentChanged;
-			}
-		}
-		[SerializeField]
-		protected HashSet<UnwrappedTileId> _currentExtent;
-		public HashSet<UnwrappedTileId> CurrentExtent
-		{
-			get
-			{
-				return _currentExtent;
+				return _centerLatitudeLongitude;
 			}
 		}
 
-		protected AbstractMapVisualizer _mapVisualizer;
-		public AbstractMapVisualizer MapVisualizer
+		public Vector2d CenterMercator
 		{
 			get
 			{
-				return _mapVisualizer;
-			}
-			set
-			{
-				_mapVisualizer = value;
+				return _centerMercator;
 			}
 		}
 
-		protected float _unityTileSize = 1;
+		public float WorldRelativeScale
+		{
+			get
+			{
+				return _worldRelativeScale;
+			}
+		}
+
 		public float UnityTileSize
 		{
 			get
 			{
 				return _unityTileSize;
+			}
+		}
+
+		/// <summary>
+		/// Gets the absolute zoom of the tiles being currently rendered.
+		/// <seealso cref="Zoom"/>
+		/// </summary>
+		/// <value>The absolute zoom.</value>
+		public int AbsoluteZoom
+		{
+			get
+			{
+				return (int)Math.Floor(Options.locationOptions.zoom);
+			}
+		}
+
+		/// <summary>
+		/// Gets the current zoom value of the map.
+		/// Use <c>AbsoluteZoom</c> to get the zoom level of the tileset.
+		/// <seealso cref="AbsoluteZoom"/>
+		/// </summary>
+		/// <value>The zoom.</value>
+		public float Zoom
+		{
+			get
+			{
+				return Options.locationOptions.zoom;
+			}
+		}
+
+		public void SetZoom(float zoom)
+		{
+			Options.locationOptions.zoom = zoom;
+		}
+
+		/// <summary>
+		/// Gets the initial zoom at which the map was initialized.
+		/// This parameter is useful in calculating the scale of the tiles and the map.
+		/// </summary>
+		/// <value>The initial zoom.</value>
+		public int InitialZoom
+		{
+			get
+			{
+				return _initialZoom;
+			}
+		}
+
+
+		public Transform Root
+		{
+			get
+			{
+				return transform;
+			}
+		}
+
+		/// <summary>
+		/// Setting to trigger map initialization in Unity's Start method.
+		/// if set to false, Initialize method should be called explicitly to initialize the map.
+		/// </summary>
+		public bool InitializeOnStart
+		{
+			get
+			{
+				return _initializeOnStart;
+			}
+			set
+			{
+				_initializeOnStart = value;
+			}
+		}
+
+		public HashSet<UnwrappedTileId> CurrentExtent
+		{
+			get
+			{
+				return _currentExtent;
 			}
 		}
 
@@ -230,106 +271,105 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
+		#endregion
+
+		#region Public Methods
 		/// <summary>
-		/// Gets the absolute zoom of the tiles being currently rendered.
-		/// <seealso cref="Zoom"/>
+		/// Initialize the map using the specified latLon and zoom.
+		/// Map will automatically get initialized in the <c>Start</c> method.
+		/// Use this method to explicitly initialize the map and disable intialize on <c>Start</c>
 		/// </summary>
-		/// <value>The absolute zoom.</value>
-		public int AbsoluteZoom
+		/// <returns>The initialize.</returns>
+		/// <param name="latLon">Lat lon.</param>
+		/// <param name="zoom">Zoom.</param>
+		public virtual void Initialize(Vector2d latLon, int zoom)
 		{
-			get
+			_initializeOnStart = false;
+			if (_options == null)
 			{
-				return (int)Math.Floor(Options.locationOptions.zoom);
+				_options = new MapOptions();
 			}
+			_options.locationOptions.latitudeLongitude = String.Format(CultureInfo.InvariantCulture, "{0},{1}", latLon.x, latLon.y);
+			_options.locationOptions.zoom = zoom;
+
+			SetUpMap();
 		}
 
-		protected int _initialZoom;
+		public virtual void UpdateMap()
+		{
+			UpdateMap(Conversions.StringToLatLon(_options.locationOptions.latitudeLongitude), Zoom);
+		}
+
+		public virtual void UpdateMap(Vector2d latLon)
+		{
+			UpdateMap(latLon, Zoom);
+		}
+
+		public virtual void UpdateMap(float zoom)
+		{
+			UpdateMap(Conversions.StringToLatLon(_options.locationOptions.latitudeLongitude), zoom);
+		}
+
 		/// <summary>
-		/// Gets the initial zoom at which the map was initialized.
-		/// This parameter is useful in calculating the scale of the tiles and the map.
+		/// Updates the map.
+		/// Use this method to update the location of the map.
+		/// Update method should be used when panning, zooming or changing location of the map.
+		/// This method avoid startup delays that might occur on re-initializing the map.
 		/// </summary>
-		/// <value>The initial zoom.</value>
-		public int InitialZoom
+		/// <param name="latLon">LatitudeLongitude.</param>
+		/// <param name="zoom">Zoom level.</param>
+		public virtual void UpdateMap(Vector2d latLon, float zoom)
 		{
-			get
+			//so map will be snapped to zero using next new tile loaded
+			_worldHeightFixed = false;
+			float differenceInZoom = 0.0f;
+			bool isAtInitialZoom = false;
+			// Update map zoom, if it has changed.
+			if (Math.Abs(Zoom - zoom) > Constants.EpsilonFloatingPoint)
 			{
-				return _initialZoom;
+				SetZoom(zoom);
+			}
+
+			// Compute difference in zoom. Will be used to calculate correct scale of the map.
+			differenceInZoom = Zoom - InitialZoom;
+			isAtInitialZoom = (differenceInZoom - 0.0 < Constants.EpsilonFloatingPoint);
+
+			//Update center latitude longitude
+			var centerLatitudeLongitude = latLon;
+			double xDelta = centerLatitudeLongitude.x;
+			double zDelta = centerLatitudeLongitude.y;
+
+			xDelta = xDelta > 0 ? Mathd.Min(xDelta, Mapbox.Utils.Constants.LatitudeMax) : Mathd.Max(xDelta, -Mapbox.Utils.Constants.LatitudeMax);
+			zDelta = zDelta > 0 ? Mathd.Min(zDelta, Mapbox.Utils.Constants.LongitudeMax) : Mathd.Max(zDelta, -Mapbox.Utils.Constants.LongitudeMax);
+
+			//Set Center in Latitude Longitude and Mercator.
+			SetCenterLatitudeLongitude(new Vector2d(xDelta, zDelta));
+			Options.scalingOptions.scalingStrategy.SetUpScaling(this);
+			Options.placementOptions.placementStrategy.SetUpPlacement(this);
+
+			//Scale the map accordingly.
+			if (Math.Abs(differenceInZoom) > Constants.EpsilonFloatingPoint || isAtInitialZoom)
+			{
+				_mapScaleFactor = Vector3.one * Mathf.Pow(2, differenceInZoom);
+				Root.localScale = _mapScaleFactor;
+			}
+
+			//Update Tile extent.
+			_tileProvider.UpdateTileExtent();
+
+			if (OnUpdated != null)
+			{
+				OnUpdated();
 			}
 		}
 
-		protected bool _worldHeightFixed = false;
-
-		protected MapboxAccess _fileSource;
-
-		protected Vector2d _centerLatitudeLongitude;
-		public Vector2d CenterLatitudeLongitude
-		{
-			get
-			{
-				return _centerLatitudeLongitude;
-			}
-		}
-
-		protected Vector2d _centerMercator;
-		public Vector2d CenterMercator
-		{
-			get
-			{
-				return _centerMercator;
-			}
-		}
-
-		protected float _worldRelativeScale;
-		private Vector3 _mapScaleFactor;
-
-		public float WorldRelativeScale
-		{
-			get
-			{
-				return _worldRelativeScale;
-			}
-		}
 		/// <summary>
-		/// Gets the current zoom value of the map.
-		/// Use <c>AbsoluteZoom</c> to get the zoom level of the tileset.
-		/// <seealso cref="AbsoluteZoom"/>
+		/// Resets the map.
+		/// Use this method to reset the map to and reset all parameters.
 		/// </summary>
-		/// <value>The zoom.</value>
-		public float Zoom
+		public void ResetMap()
 		{
-			get
-			{
-				return Options.locationOptions.zoom;
-			}
-		}
-
-		public void SetZoom(float zoom)
-		{
-			Options.locationOptions.zoom = zoom;
-		}
-
-		public Transform Root
-		{
-			get
-			{
-				return transform;
-			}
-		}
-
-		public void SetCenterMercator(Vector2d centerMercator)
-		{
-			_centerMercator = centerMercator;
-		}
-
-		public void SetCenterLatitudeLongitude(Vector2d centerLatitudeLongitude)
-		{
-			_options.locationOptions.latitudeLongitude = string.Format("{0}, {1}", centerLatitudeLongitude.x, centerLatitudeLongitude.y);
-			_centerLatitudeLongitude = centerLatitudeLongitude;
-		}
-
-		public void SetWorldRelativeScale(float scale)
-		{
-			_worldRelativeScale = scale;
+			Initialize(Conversions.StringToLatLon(_options.locationOptions.latitudeLongitude), (int)_options.locationOptions.zoom);
 		}
 
 		public bool IsAccessTokenValid
@@ -354,21 +394,9 @@ namespace Mapbox.Unity.Map
 				return isAccessTokenValid;
 			}
 		}
+		#endregion
 
-		/// <summary>
-		/// Event delegate, gets called after map is initialized
-		/// <seealso cref="OnUpdated"/>
-		/// </summary>
-		public event Action OnInitialized = delegate { };
-		/// <summary>
-		/// Event delegate, gets called after map is updated.
-		/// <c>UpdateMap</c> will trigger this event.
-		/// <seealso cref="OnInitialized"/>
-		/// </summary>
-		public event Action OnUpdated = delegate { };
-
-		public event Action OnMapRedrawn = delegate { };
-
+		#region Private/Protected Methods
 		protected virtual void Awake()
 		{
 			// Setup a visualizer to get a "Starter" map.
@@ -430,6 +458,130 @@ namespace Mapbox.Unity.Map
 			};
 
 			InitializeMap(_options);
+		}
+
+		protected virtual void TileProvider_OnTileAdded(UnwrappedTileId tileId)
+		{
+			var tile = _mapVisualizer.LoadTile(tileId);
+
+			if (Options.placementOptions.snapMapToZero && !_worldHeightFixed)
+			{
+				_worldHeightFixed = true;
+				if (tile.HeightDataState == MeshGeneration.Enums.TilePropertyState.Loaded)
+				{
+					ApplySnapWorldToZero(tile);
+				}
+				else
+				{
+					tile.OnHeightDataChanged += (s) =>
+					{
+						ApplySnapWorldToZero(tile);
+					};
+				}
+			}
+		}
+
+		protected virtual void TileProvider_OnTileRemoved(UnwrappedTileId tileId)
+		{
+			_mapVisualizer.DisposeTile(tileId);
+		}
+
+		protected virtual void TileProvider_OnTileRepositioned(UnwrappedTileId tileId)
+		{
+			_mapVisualizer.RepositionTile(tileId);
+		}
+
+		protected void SendInitialized()
+		{
+			OnInitialized();
+		}
+
+		/// <summary>
+		/// Apply Snap World to Zero setting by moving map in Y Axis such that
+		/// center of the given tile will be at y=0.
+		/// </summary>
+		/// <param name="referenceTile">Tile to use for Y axis correction.</param>
+		private void ApplySnapWorldToZero(UnityTile referenceTile)
+		{
+			if (_options.placementOptions.snapMapToZero)
+			{
+				var h = referenceTile.QueryHeightData(.5f, .5f);
+				Root.transform.position = new Vector3(
+					Root.transform.position.x,
+					-h,
+					Root.transform.position.z);
+			}
+			else
+			{
+				Root.transform.position = new Vector3(
+					Root.transform.position.x,
+					0,
+					Root.transform.position.z);
+			}
+		}
+
+		/// <summary>
+		/// Initializes the map using the mapOptions.
+		/// </summary>
+		/// <param name="options">Options.</param>
+		protected virtual void InitializeMap(MapOptions options)
+		{
+			Options = options;
+			_worldHeightFixed = false;
+			_fileSource = MapboxAccess.Instance;
+			_centerLatitudeLongitude = Conversions.StringToLatLon(options.locationOptions.latitudeLongitude);
+			_initialZoom = (int)options.locationOptions.zoom;
+
+			options.scalingOptions.scalingStrategy.SetUpScaling(this);
+			options.placementOptions.placementStrategy.SetUpPlacement(this);
+
+
+			//Set up events for changes.
+			_imagery.UpdateLayer += OnImageOrTerrainUpdateLayer;
+			_terrain.UpdateLayer += OnImageOrTerrainUpdateLayer;
+
+			_vectorData.SubLayerRemoved += OnVectorDataSubLayerRemoved;
+			_vectorData.SubLayerAdded += OnVectorDataSubLayerAdded;
+			_vectorData.UpdateLayer += OnVectorDataUpdateLayer;
+
+			_options.locationOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
+			{
+				//take care of redraw map business...
+				UpdateMap();
+			};
+
+			_options.extentOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
+			{
+				//take care of redraw map business...
+				OnTileProviderChanged();
+			};
+
+			_options.extentOptions.defaultExtents.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
+			{
+				//take care of redraw map business...
+				_tileProvider.UpdateTileExtent();
+			};
+
+			_options.placementOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
+			{
+				//take care of redraw map business...
+				SetPlacementStrategy();
+				UpdateMap();
+			};
+
+			_options.scalingOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
+			{
+				//take care of redraw map business...
+				SetScalingStrategy();
+				UpdateMap();
+			};
+
+			_mapVisualizer.Initialize(this, _fileSource);
+			_tileProvider.Initialize(this);
+
+			SendInitialized();
+
+			_tileProvider.UpdateTileExtent();
 		}
 
 		private void SetScalingStrategy()
@@ -539,69 +691,6 @@ namespace Mapbox.Unity.Map
 
 			_mapVisualizer.Destroy();
 		}
-		/// <summary>
-		/// Initializes the map using the mapOptions.
-		/// </summary>
-		/// <param name="options">Options.</param>
-		protected virtual void InitializeMap(MapOptions options)
-		{
-			Options = options;
-			_worldHeightFixed = false;
-			_fileSource = MapboxAccess.Instance;
-			_centerLatitudeLongitude = Conversions.StringToLatLon(options.locationOptions.latitudeLongitude);
-			_initialZoom = (int)options.locationOptions.zoom;
-
-			options.scalingOptions.scalingStrategy.SetUpScaling(this);
-			options.placementOptions.placementStrategy.SetUpPlacement(this);
-
-
-			//Set up events for changes.
-			_imagery.UpdateLayer += OnImageOrTerrainUpdateLayer;
-			_terrain.UpdateLayer += OnImageOrTerrainUpdateLayer;
-
-			_vectorData.SubLayerRemoved += OnVectorDataSubLayerRemoved;
-			_vectorData.SubLayerAdded += OnVectorDataSubLayerAdded;
-			_vectorData.UpdateLayer += OnVectorDataUpdateLayer;
-
-			_options.locationOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
-			{
-				//take care of redraw map business...
-				UpdateMap();
-			};
-
-			_options.extentOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
-			{
-				//take care of redraw map business...
-				OnTileProviderChanged();
-			};
-
-			_options.extentOptions.defaultExtents.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
-			{
-				//take care of redraw map business...
-				_tileProvider.UpdateTileExtent();
-			};
-			_options.placementOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
-			{
-				//take care of redraw map business...
-				SetPlacementStrategy();
-				ApplySnapWorldToZero(_mapVisualizer.ActiveTiles.First().Value);
-				UpdateMap();
-			};
-
-			_options.scalingOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
-			{
-				//take care of redraw map business...
-				SetScalingStrategy();
-				UpdateMap();
-			};
-
-			_mapVisualizer.Initialize(this, _fileSource);
-			_tileProvider.Initialize(this);
-
-			SendInitialized();
-
-			_tileProvider.UpdateTileExtent();
-		}
 
 		private void OnImageOrTerrainUpdateLayer(object sender, System.EventArgs eventArgs)
 		{
@@ -641,6 +730,7 @@ namespace Mapbox.Unity.Map
 			RedrawVectorDataLayer();
 			OnMapRedrawn();
 		}
+
 		private void OnVectorDataUpdateLayer(object sender, System.EventArgs eventArgs)
 		{
 
@@ -674,165 +764,9 @@ namespace Mapbox.Unity.Map
 			_tileProvider.UpdateTileExtent();
 		}
 
-		/// <summary>
-		/// Initialize the map using the specified latLon and zoom.
-		/// Map will automatically get initialized in the <c>Start</c> method.
-		/// Use this method to explicitly initialize the map and disable intialize on <c>Start</c>
-		/// </summary>
-		/// <returns>The initialize.</returns>
-		/// <param name="latLon">Lat lon.</param>
-		/// <param name="zoom">Zoom.</param>
-		public virtual void Initialize(Vector2d latLon, int zoom)
-		{
-			_initializeOnStart = false;
-			_worldHeightFixed = false;
-			if (_options == null)
-			{
-				_options = new MapOptions();
-			}
-			_options.locationOptions.latitudeLongitude = String.Format(CultureInfo.InvariantCulture, "{0},{1}", latLon.x, latLon.y);
-			_options.locationOptions.zoom = zoom;
+		#endregion
 
-			SetUpMap();
-		}
-
-		public virtual void UpdateMap()
-		{
-			UpdateMap(Conversions.StringToLatLon(_options.locationOptions.latitudeLongitude), Zoom);
-		}
-
-		public virtual void UpdateMap(Vector2d latLon)
-		{
-			UpdateMap(latLon, Zoom);
-		}
-
-		public virtual void UpdateMap(float zoom)
-		{
-			UpdateMap(Conversions.StringToLatLon(_options.locationOptions.latitudeLongitude), zoom);
-		}
-
-		/// <summary>
-		/// Updates the map.
-		/// Use this method to update the location of the map.
-		/// Update method should be used when panning, zooming or changing location of the map.
-		/// This method avoid startup delays that might occur on re-initializing the map.
-		/// </summary>
-		/// <param name="latLon">LatitudeLongitude.</param>
-		/// <param name="zoom">Zoom level.</param>
-		public virtual void UpdateMap(Vector2d latLon, float zoom)
-		{
-			//so map will be snapped to zero using next new tile loaded
-			_worldHeightFixed = false;
-			float differenceInZoom = 0.0f;
-			bool isAtInitialZoom = false;
-			// Update map zoom, if it has changed.
-			if (Math.Abs(Zoom - zoom) > Constants.EpsilonFloatingPoint)
-			{
-				SetZoom(zoom);
-			}
-
-			// Compute difference in zoom. Will be used to calculate correct scale of the map.
-			differenceInZoom = Zoom - InitialZoom;
-			isAtInitialZoom = (differenceInZoom - 0.0 < Constants.EpsilonFloatingPoint);
-
-			//Update center latitude longitude
-			var centerLatitudeLongitude = latLon;
-			double xDelta = centerLatitudeLongitude.x;
-			double zDelta = centerLatitudeLongitude.y;
-
-			xDelta = xDelta > 0 ? Mathd.Min(xDelta, Mapbox.Utils.Constants.LatitudeMax) : Mathd.Max(xDelta, -Mapbox.Utils.Constants.LatitudeMax);
-			zDelta = zDelta > 0 ? Mathd.Min(zDelta, Mapbox.Utils.Constants.LongitudeMax) : Mathd.Max(zDelta, -Mapbox.Utils.Constants.LongitudeMax);
-
-			//Set Center in Latitude Longitude and Mercator.
-			SetCenterLatitudeLongitude(new Vector2d(xDelta, zDelta));
-			Options.scalingOptions.scalingStrategy.SetUpScaling(this);
-			Options.placementOptions.placementStrategy.SetUpPlacement(this);
-
-			//Scale the map accordingly.
-			if (Math.Abs(differenceInZoom) > Constants.EpsilonFloatingPoint || isAtInitialZoom)
-			{
-				_mapScaleFactor = Vector3.one * Mathf.Pow(2, differenceInZoom);
-				Root.localScale = _mapScaleFactor;
-			}
-
-			//Update Tile extent.
-			_tileProvider.UpdateTileExtent();
-
-			if (OnUpdated != null)
-			{
-				OnUpdated();
-			}
-		}
-		/// <summary>
-		/// Resets the map.
-		/// Use this method to reset the map to and reset all parameters.
-		/// </summary>
-		public void ResetMap()
-		{
-			Initialize(Conversions.StringToLatLon(_options.locationOptions.latitudeLongitude), (int)_options.locationOptions.zoom);
-		}
-
-		protected virtual void TileProvider_OnTileAdded(UnwrappedTileId tileId)
-		{
-			var tile = _mapVisualizer.LoadTile(tileId);
-
-			if (Options.placementOptions.snapMapToZero && !_worldHeightFixed)
-			{
-				_worldHeightFixed = true;
-				if (tile.HeightDataState == MeshGeneration.Enums.TilePropertyState.Loaded)
-				{
-					ApplySnapWorldToZero(tile);
-				}
-				else
-				{
-					tile.OnHeightDataChanged += (s) =>
-					{
-						ApplySnapWorldToZero(tile);
-					};
-				}
-			}
-		}
-
-		protected virtual void TileProvider_OnTileRemoved(UnwrappedTileId tileId)
-		{
-			_mapVisualizer.DisposeTile(tileId);
-		}
-
-		protected virtual void TileProvider_OnTileRepositioned(UnwrappedTileId tileId)
-		{
-			_mapVisualizer.RepositionTile(tileId);
-		}
-
-		protected void SendInitialized()
-		{
-			OnInitialized();
-		}
-
-		/// <summary>
-		/// Apply Snap World to Zero setting by moving map in Y Axis such that
-		/// center of the given tile will be at y=0.
-		/// </summary>
-		/// <param name="referenceTile">Tile to use for Y axis correction.</param>
-		private void ApplySnapWorldToZero(UnityTile referenceTile)
-		{
-			if (_options.placementOptions.snapMapToZero)
-			{
-				var h = referenceTile.QueryHeightData(.5f, .5f);
-				Root.transform.position = new Vector3(
-					Root.transform.position.x,
-					-h,
-					Root.transform.position.z);
-			}
-			else
-			{
-				Root.transform.position = new Vector3(
-					Root.transform.position.x,
-					0,
-					Root.transform.position.z);
-			}
-		}
-
-		#region Conversion Methods
+		#region Conversion and Height Query Methods
 		private Vector3 GeoToWorldPositionXZ(Vector2d latitudeLongitude)
 		{
 			// For quadtree implementation of the map, the map scale needs to be compensated for.
@@ -859,6 +793,7 @@ namespace Mapbox.Unity.Map
 			}
 
 		}
+
 		/// <summary>
 		/// Converts a latitude longitude into map space position.
 		/// </summary>
@@ -932,6 +867,22 @@ namespace Mapbox.Unity.Map
 		#endregion
 
 		#region Map Property Related Changes Methods
+		public virtual void SetCenterMercator(Vector2d centerMercator)
+		{
+			_centerMercator = centerMercator;
+		}
+
+		public virtual void SetCenterLatitudeLongitude(Vector2d centerLatitudeLongitude)
+		{
+			_options.locationOptions.latitudeLongitude = string.Format("{0}, {1}", centerLatitudeLongitude.x, centerLatitudeLongitude.y);
+			_centerLatitudeLongitude = centerLatitudeLongitude;
+		}
+
+		public virtual void SetWorldRelativeScale(float scale)
+		{
+			_worldRelativeScale = scale;
+		}
+
 		public virtual void SetLoadingTexture(Texture2D loadingTexture)
 		{
 			Options.loadingTexture = loadingTexture;
@@ -1015,6 +966,21 @@ namespace Mapbox.Unity.Map
 			_options.scalingOptions.unityTileSize = tileSizeInUnityUnits;
 			_options.scalingOptions.HasChanged = true;
 		}
+		#endregion
+
+		#region Events
+		/// <summary>
+		/// Event delegate, gets called after map is initialized
+		/// <seealso cref="OnUpdated"/>
+		/// </summary>
+		public event Action OnInitialized = delegate { };
+		/// <summary>
+		/// Event delegate, gets called after map is updated.
+		/// <c>UpdateMap</c> will trigger this event.
+		/// <seealso cref="OnInitialized"/>
+		/// </summary>
+		public event Action OnUpdated = delegate { };
+		public event Action OnMapRedrawn = delegate { };
 		#endregion
 	}
 }
