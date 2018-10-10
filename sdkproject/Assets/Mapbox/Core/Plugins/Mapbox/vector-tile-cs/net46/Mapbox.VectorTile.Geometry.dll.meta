@@ -1,5 +1,6 @@
 fileFormatVersion: 2
 guid: 902ec3a15243ce7459db8517c8de3f12
+timeCreated: 18446744011573954816
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
@@ -23,6 +24,7 @@ PluginImporter:
         Exclude Win: 0
         Exclude Win64: 0
         Exclude WindowsStoreApps: 1
+        Exclude iOS: 0
   - first:
       Android: Android
     second:
@@ -98,6 +100,11 @@ PluginImporter:
       enabled: 0
       settings:
         CPU: AnyCPU
+  - first:
+      iPhone: iOS
+    second:
+      enabled: 1
+      settings: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
