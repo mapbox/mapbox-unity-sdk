@@ -11,7 +11,7 @@ namespace Mapbox.Unity.Map.TileProviders
 		private bool _initialized = false;
 		private UnwrappedTileId _currentTile;
 		private UnwrappedTileId _cachedTile;
-
+		private bool _waitingForTargetTransform = false;
 		public override void OnInitialized()
 		{
 			_rangeTileProviderOptions = (RangeAroundTransformTileProviderOptions)Options;
@@ -19,7 +19,7 @@ namespace Mapbox.Unity.Map.TileProviders
 			if (_rangeTileProviderOptions.targetTransform == null)
 			{
 				Debug.LogError("TransformTileProvider: No location marker transform specified.");
-				Destroy(this);
+				_waitingForTargetTransform = true;
 			}
 			else
 			{
@@ -56,6 +56,14 @@ namespace Mapbox.Unity.Map.TileProviders
 
 		public virtual void Update()
 		{
+			if (_waitingForTargetTransform && !_initialized)
+			{
+				if (_rangeTileProviderOptions.targetTransform != null)
+				{
+					_initialized = true;
+				}
+			}
+
 			if (_rangeTileProviderOptions != null && _rangeTileProviderOptions.targetTransform != null && _rangeTileProviderOptions.targetTransform.hasChanged)
 			{
 				UpdateTileExtent();
