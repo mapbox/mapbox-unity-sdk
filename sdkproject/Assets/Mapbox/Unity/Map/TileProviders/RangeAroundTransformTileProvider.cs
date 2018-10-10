@@ -12,9 +12,10 @@ namespace Mapbox.Unity.Map.TileProviders
 		private UnwrappedTileId _currentTile;
 		private UnwrappedTileId _cachedTile;
 		private bool _waitingForTargetTransform = false;
+
 		public override void OnInitialized()
 		{
-			_rangeTileProviderOptions = (RangeAroundTransformTileProviderOptions)Options;
+			_rangeTileProviderOptions = (RangeAroundTransformTileProviderOptions) Options;
 
 			if (_rangeTileProviderOptions.targetTransform == null)
 			{
@@ -25,6 +26,7 @@ namespace Mapbox.Unity.Map.TileProviders
 			{
 				_initialized = true;
 			}
+
 			_cachedTile = new UnwrappedTileId();
 			//_toRemove = new List<UnwrappedTileId>(((_rangeTileProviderOptions.visibleBuffer * 2) + 1) * ((_rangeTileProviderOptions.visibleBuffer * 2) + 1));
 			_currentExtent.activeTiles = new HashSet<UnwrappedTileId>();
@@ -40,18 +42,16 @@ namespace Mapbox.Unity.Map.TileProviders
 			//_toRemove.Clear();
 			_currentTile = TileCover.CoordinateToTileId(_map.WorldToGeoPosition(_rangeTileProviderOptions.targetTransform.localPosition), _map.AbsoluteZoom);
 
-			if (!_currentTile.Equals(_cachedTile))
+			for (int x = _currentTile.X - _rangeTileProviderOptions.visibleBuffer; x <= (_currentTile.X + _rangeTileProviderOptions.visibleBuffer); x++)
 			{
-				for (int x = _currentTile.X - _rangeTileProviderOptions.visibleBuffer; x <= (_currentTile.X + _rangeTileProviderOptions.visibleBuffer); x++)
+				for (int y = _currentTile.Y - _rangeTileProviderOptions.visibleBuffer; y <= (_currentTile.Y + _rangeTileProviderOptions.visibleBuffer); y++)
 				{
-					for (int y = _currentTile.Y - _rangeTileProviderOptions.visibleBuffer; y <= (_currentTile.Y + _rangeTileProviderOptions.visibleBuffer); y++)
-					{
-						_currentExtent.activeTiles.Add(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
-					}
+					_currentExtent.activeTiles.Add(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
 				}
-				_cachedTile = _currentTile;
-				OnExtentChanged();
 			}
+
+			_cachedTile = _currentTile;
+			OnExtentChanged();
 		}
 
 		public virtual void Update()
@@ -68,7 +68,6 @@ namespace Mapbox.Unity.Map.TileProviders
 			{
 				UpdateTileExtent();
 				_rangeTileProviderOptions.targetTransform.hasChanged = false;
-
 			}
 		}
 
@@ -77,6 +76,7 @@ namespace Mapbox.Unity.Map.TileProviders
 			bool dispose = false;
 			dispose = tile.X > _currentTile.X + _rangeTileProviderOptions.disposeBuffer || tile.X < _currentTile.X - _rangeTileProviderOptions.disposeBuffer;
 			dispose = dispose || tile.Y > _currentTile.Y + _rangeTileProviderOptions.disposeBuffer || tile.Y < _currentTile.Y - _rangeTileProviderOptions.disposeBuffer;
+
 
 			return (dispose);
 		}
