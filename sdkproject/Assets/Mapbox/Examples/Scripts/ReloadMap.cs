@@ -30,6 +30,7 @@
 			_camera = Camera.main;
 			_cameraStartPos = _camera.transform.position;
 			_map = FindObjectOfType<AbstractMap>();
+			_map.OnUpdated += () => { _zoomSlider.value = _map.Zoom; };
 			if (_zoomSlider != null)
 			{
 				_zoomSlider.onValueChanged.AddListener(Reload);
