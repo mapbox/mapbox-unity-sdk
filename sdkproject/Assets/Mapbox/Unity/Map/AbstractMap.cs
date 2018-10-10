@@ -562,7 +562,7 @@ namespace Mapbox.Unity.Map
 			_options.extentOptions.defaultExtents.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
 			{
 				//take care of redraw map business...
-				OnTileProviderChanged();
+				_tileProvider.UpdateTileExtent();
 			};
 
 			_options.placementOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
