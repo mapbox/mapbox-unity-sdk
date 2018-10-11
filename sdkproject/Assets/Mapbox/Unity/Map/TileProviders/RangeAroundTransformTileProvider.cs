@@ -10,12 +10,11 @@ namespace Mapbox.Unity.Map.TileProviders
 
 		private bool _initialized = false;
 		private UnwrappedTileId _currentTile;
-		private UnwrappedTileId _cachedTile;
 		private bool _waitingForTargetTransform = false;
 
 		public override void OnInitialized()
 		{
-			_rangeTileProviderOptions = (RangeAroundTransformTileProviderOptions) Options;
+			_rangeTileProviderOptions = (RangeAroundTransformTileProviderOptions)Options;
 
 			if (_rangeTileProviderOptions.targetTransform == null)
 			{
@@ -26,8 +25,6 @@ namespace Mapbox.Unity.Map.TileProviders
 			{
 				_initialized = true;
 			}
-
-			_cachedTile = new UnwrappedTileId();
 			//_toRemove = new List<UnwrappedTileId>(((_rangeTileProviderOptions.visibleBuffer * 2) + 1) * ((_rangeTileProviderOptions.visibleBuffer * 2) + 1));
 			_currentExtent.activeTiles = new HashSet<UnwrappedTileId>();
 			_map.OnInitialized += UpdateTileExtent;
