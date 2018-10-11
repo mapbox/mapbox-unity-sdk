@@ -46,8 +46,6 @@ namespace Mapbox.Unity.Map.TileProviders
 					_currentExtent.activeTiles.Add(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
 				}
 			}
-
-			_cachedTile = _currentTile;
 			OnExtentChanged();
 		}
 
