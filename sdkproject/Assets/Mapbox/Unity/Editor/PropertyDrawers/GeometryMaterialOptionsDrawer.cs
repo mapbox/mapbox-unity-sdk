@@ -9,6 +9,7 @@
 	using Mapbox.VectorTile.ExtensionMethods;
 	using System.IO;
 	using System.Collections.Generic;
+	using Mapbox.Unity.MeshGeneration.Modifiers;
 
 	public class StyleIconBundle
 	{
@@ -78,6 +79,25 @@
 			foreach (var key in _paletteIconBundles.Keys)
 			{
 				_paletteIconBundles[key].Load();
+			}
+		}
+
+		private void SetMaterialOpacity(SerializedProperty property, bool opacity)
+		{
+			var matList = property.FindPropertyRelative("materials");
+			if (matList.arraySize == 0)
+			{
+				matList.arraySize = 2;
+			}
+			// 0 = Opaque, 3 = Transparent...
+			float renderMode = (opacity) ? 0f : 3f;
+			for (int i = 0; i < matList.arraySize; i++)
+			{
+				var material = matList.GetArrayElementAtIndex(i);
+				var mat = material.FindPropertyRelative("Materials");
+				var mmm = mat.GetArrayElementAtIndex(0);
+				Material matty = (Material)EditorHelper.GetTargetObjectOfProperty(mmm);
+				matty.SetFloat("_Mode", renderMode);
 			}
 		}
 
@@ -153,12 +173,15 @@
 							break;
 						case StyleTypes.Light:
 							property.FindPropertyRelative("lightStyleOpacity").floatValue = EditorGUILayout.Slider("Opacity", property.FindPropertyRelative("lightStyleOpacity").floatValue, 0.0f, 1.0f);
+							SetMaterialOpacity(property, Mathf.Approximately(property.FindPropertyRelative("lightStyleOpacity").floatValue, 1.0f));
 							break;
 						case StyleTypes.Dark:
 							property.FindPropertyRelative("darkStyleOpacity").floatValue = EditorGUILayout.Slider("Opacity", property.FindPropertyRelative("darkStyleOpacity").floatValue, 0.0f, 1.0f);
+							SetMaterialOpacity(property, Mathf.Approximately(property.FindPropertyRelative("darkStyleOpacity").floatValue, 1.0f));
 							break;
 						case StyleTypes.Color:
 							property.FindPropertyRelative("colorStyleColor").colorValue = EditorGUILayout.ColorField("Color", property.FindPropertyRelative("colorStyleColor").colorValue);
+							SetMaterialOpacity(property, Mathf.Approximately(property.FindPropertyRelative("colorStyleColor").colorValue.a, 1.0f));
 							break;
 						default:
 							break;
