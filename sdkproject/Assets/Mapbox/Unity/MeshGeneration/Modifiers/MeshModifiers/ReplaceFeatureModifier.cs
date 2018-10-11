@@ -311,6 +311,8 @@
 			{
 				Destroy(gameObject);
 			}
+			_objects.Clear();
+			_objectPosition.Clear();
 			Destroy(_poolGameObject);
 		}
 	}
