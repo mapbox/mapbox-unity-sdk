@@ -443,7 +443,7 @@
 
 			//set custom style options.
 			var customMats = customStyleOptions.FindPropertyRelative("materials");
-			mats.arraySize = 2;
+			customMats.arraySize = 2;
 
 			var customTopMatArray = customMats.GetArrayElementAtIndex(0).FindPropertyRelative("Materials");
 			var customSideMatArray = customMats.GetArrayElementAtIndex(1).FindPropertyRelative("Materials");
