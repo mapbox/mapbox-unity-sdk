@@ -9,7 +9,6 @@
 	using Mapbox.VectorTile.ExtensionMethods;
 	using System.IO;
 	using System.Collections.Generic;
-	using Mapbox.Unity.MeshGeneration.Modifiers;
 
 	public class StyleIconBundle
 	{
