@@ -133,8 +133,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		private void UpdatePois(object sender, System.EventArgs eventArgs)
 		{
-			Debug.Log("UpdatePois " + sender.ToString());
-
+			
 			VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
 
 			layerUpdateArgs.visualizer = this;
