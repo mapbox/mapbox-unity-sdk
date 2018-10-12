@@ -231,6 +231,10 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 							heightMod.SetProperties(_layerProperties.extrusionOptions);
 							heightMod.ModifierHasChanged += UpdateVector;
 						}
+						else
+						{
+							_layerProperties.extrusionOptions.PropertyHasChanged += UpdateVector;
+						}
 
 						//collider modifier options
 						var lineColliderMod = AddOrCreateGameObjectModifier<ColliderModifier>();
@@ -281,6 +285,10 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 								heightMod.SetProperties(_layerProperties.extrusionOptions);
 								heightMod.ModifierHasChanged += UpdateVector;
 							}
+						}
+						else
+						{
+							_layerProperties.extrusionOptions.PropertyHasChanged += UpdateVector;
 						}
 
 						//collider modifier options
