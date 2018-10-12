@@ -4,7 +4,6 @@
 	using UnityEngine.UI;
 	using Mapbox.Unity.Map;
 	using UnityEngine;
-	using UnityEngine.Assertions;
 	using System;
 	using System.Collections;
 
@@ -31,7 +30,11 @@
 			_camera = Camera.main;
 			_cameraStartPos = _camera.transform.position;
 			_map = FindObjectOfType<AbstractMap>();
-			Assert.IsNotNull(_map, "Error: No Abstract Map component found in scene.");
+			if(_map == null)
+			{
+				Debug.LogError("Error: No Abstract Map component found in scene.");
+				return;
+			}
 			if (_zoomSlider != null)
 			{
 				_map.OnUpdated += () => { _zoomSlider.value = _map.Zoom; };
