@@ -27,6 +27,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_options.PropertyHasChanged -= UpdateModifier;
 		}
 
+		private float GetRenderMode(float val)
+		{
+			return Mathf.Approximately(val, 1.0f) ? 0f : 3f;
+		}
+
 		public override void Run(VectorEntity ve, UnityTile tile)
 		{
 			var min = Math.Min(_options.materials.Length, ve.MeshFilter.mesh.subMeshCount);
@@ -51,12 +56,27 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 			else
 			{
+				float renderMode = 0.0f;
+				switch (_options.style)
+				{
+					case StyleTypes.Light:
+						renderMode = GetRenderMode(_options.lightStyleOpacity);
+						break;
+					case StyleTypes.Dark:
+						renderMode = GetRenderMode(_options.darkStyleOpacity);
+						break;
+					case StyleTypes.Color:
+						renderMode = GetRenderMode(_options.colorStyleColor.a);
+						break;
+					default:
+						break;
+				}
 				for (int i = 0; i < min; i++)
 				{
 					mats[i] = _options.materials[i].Materials[UnityEngine.Random.Range(0, _options.materials[i].Materials.Length)];
+					mats[i].SetFloat("_Mode", renderMode);
 				}
 			}
-
 			ve.MeshRenderer.materials = mats;
 		}
 	}
