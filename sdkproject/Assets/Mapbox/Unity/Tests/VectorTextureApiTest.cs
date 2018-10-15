@@ -6,6 +6,7 @@ using System.Reflection;
 
 public class VectorTextureApiTest : MonoBehaviour
 {
+#if !ENABLE_WINMD_SUPPORT
 	private AbstractMap _abstractMap;
 
 	private VectorSubLayerProperties _layer;
@@ -73,7 +74,7 @@ public class VectorTextureApiTest : MonoBehaviour
 			Debug.Log(testResults[i]);
 		}
 	}
-#if !ENABLE_WINMD_SUPPORT
+
 	void SetStyle()
 	{
 		foreach (StyleTypes style in System.Enum.GetValues(typeof(StyleTypes)))
