@@ -648,8 +648,7 @@ namespace Mapbox.Unity.Map
 		{
 			var _activeTiles = _mapVisualizer.ActiveTiles;
 			_currentExtent = new HashSet<UnwrappedTileId>(currentExtent.activeTiles);
-			// Change Map Visualizer state
-			_mapVisualizer.State = ModuleState.Working;
+
 			List<UnwrappedTileId> _toRemove = new List<UnwrappedTileId>();
 			foreach (var item in _activeTiles)
 			{
@@ -674,6 +673,8 @@ namespace Mapbox.Unity.Map
 			{
 				if (!_activeTiles.ContainsKey(tile))
 				{
+					// Change Map Visualizer state
+					_mapVisualizer.State = ModuleState.Working;
 					TileProvider_OnTileAdded(tile);
 				}
 			}

@@ -1,6 +1,6 @@
 ## CHANGELOG
 
-### v.1.4.6
+### v.2.0.0
 10/15/2018
 ##### New Features
 - *Runtime editing of map features* - Map elements like Imagery, Terrain, Feature Properties can now be updated during runtime, using AbstractMap UI in the Editor , or by using the API methods.

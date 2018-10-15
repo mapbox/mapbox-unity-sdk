@@ -1,15 +1,12 @@
-﻿//using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Mapbox.Unity.Map;
-using Mapbox.Unity.MeshGeneration.Interfaces;
-using Mapbox.Unity.MeshGeneration.Filters;
 using UnityEngine;
 using UnityEngine.Assertions;
 using System.Reflection;
 
 public class VectorTextureApiTest : MonoBehaviour
 {
+#if !ENABLE_WINMD_SUPPORT
 	private AbstractMap _abstractMap;
 
 	private VectorSubLayerProperties _layer;
@@ -164,4 +161,5 @@ public class VectorTextureApiTest : MonoBehaviour
 		AddResultsToList(MethodBase.GetCurrentMethod(), _layer.Texturing.CustomStyle.Tiled.TopMaterial.name == myNewMaterialTop.name);
 		AddResultsToList(MethodBase.GetCurrentMethod(), _layer.Texturing.CustomStyle.Tiled.SideMaterial.name == myNewMaterialSide.name);
 	}
+#endif
 }

@@ -31,6 +31,7 @@
 		private bool _shouldDrag;
 		private bool _isInitialized = false;
 		private Plane _groundPlane = new Plane(Vector3.up, 0);
+		private bool _dragStartedOnUI = false;
 
 		void Awake()
 		{
@@ -45,18 +46,34 @@
 			};
 		}
 
+		public void Update()
+		{
+			if (Input.GetMouseButtonDown(0) && EventSystem.current.IsPointerOverGameObject())
+			{
+				_dragStartedOnUI = true;
+			}
+
+			if (Input.GetMouseButtonUp(0))
+			{
+				_dragStartedOnUI = false;
+			}
+		}
+
 
 		private void LateUpdate()
 		{
 			if (!_isInitialized) { return; }
 
-			if (Input.touchSupported && Input.touchCount > 0)
+			if (!_dragStartedOnUI)
 			{
-				HandleTouch();
-			}
-			else
-			{
-				HandleMouseAndKeyBoard();
+				if (Input.touchSupported && Input.touchCount > 0)
+				{
+					HandleTouch();
+				}
+				else
+				{
+					HandleMouseAndKeyBoard();
+				}
 			}
 		}
 
@@ -82,7 +99,7 @@
 		void HandleTouch()
 		{
 			float zoomFactor = 0.0f;
-			//pinch to zoom. 
+			//pinch to zoom.
 			switch (Input.touchCount)
 			{
 				case 1:
@@ -127,8 +144,8 @@
 		{
 			if (Math.Abs(xMove) > 0.0f || Math.Abs(zMove) > 0.0f)
 			{
-				// Get the number of degrees in a tile at the current zoom level. 
-				// Divide it by the tile width in pixels ( 256 in our case) 
+				// Get the number of degrees in a tile at the current zoom level.
+				// Divide it by the tile width in pixels ( 256 in our case)
 				// to get degrees represented by each pixel.
 				// Keyboard offset is in pixels, therefore multiply the factor with the offset to move the center.
 				float factor = _panSpeed * (Conversions.GetTileScaleInDegrees((float)_mapManager.CenterLatitudeLongitude.x, _mapManager.AbsoluteZoom));
@@ -257,8 +274,8 @@
 					{
 						if (null != _mapManager)
 						{
-							// Get the number of degrees in a tile at the current zoom level. 
-							// Divide it by the tile width in pixels ( 256 in our case) 
+							// Get the number of degrees in a tile at the current zoom level.
+							// Divide it by the tile width in pixels ( 256 in our case)
 							// to get degrees represented by each pixel.
 							// Mouse offset is in pixels, therefore multiply the factor with the offset to move the center.
 							float factor = _panSpeed * Conversions.GetTileScaleInDegrees((float)_mapManager.CenterLatitudeLongitude.x, _mapManager.AbsoluteZoom) / _mapManager.UnityTileSize;
