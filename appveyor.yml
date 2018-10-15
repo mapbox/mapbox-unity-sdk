@@ -18,9 +18,6 @@ environment:
   MAPBOX_ACCESS_TOKEN:
     secure: dMZloaDRX0kslhjJRbDySkawDtY+1/42ke/v1B2LEQjSnvSp4RWTEkrxuyca3B4Y+Tw4dGg5KI9mL2WFvMQyI49UuIRoVACbIyr6s5pvn4bme5fKhbs/XxpecpzYOVSt
 
-install:
-  - update-mapbox-unity-sdk-core.bat
-
 build_script:
 #let UnityPackager finish sucessfully, even after encounting errors, eg missing '.meta' files
   - SET UNITYPACKAGER_RAISE_ERROR_ON_FAILURE=0
