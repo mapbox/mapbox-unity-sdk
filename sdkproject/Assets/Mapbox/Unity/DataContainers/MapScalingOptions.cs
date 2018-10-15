@@ -1,10 +1,12 @@
-﻿namespace Mapbox.Unity.Map
+﻿using Mapbox.Unity.Map.Interfaces;
+
+namespace Mapbox.Unity.Map
 {
 	using System;
 	using UnityEngine;
 
 	[Serializable]
-	public class MapScalingOptions
+	public class MapScalingOptions : MapboxDataProperty
 	{
 		public MapScalingType scalingType = MapScalingType.Custom;
 		//public MapUnitType unitType = MapUnitType.meters;

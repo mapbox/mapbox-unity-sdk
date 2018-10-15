@@ -5,10 +5,32 @@
 	using Mapbox.Platform.TilesetTileJSON;
 	using Mapbox.Unity.Utilities;
 	using UnityEngine;
+	using System.Linq;
 
 	[Serializable]
 	public class VectorLayerProperties : LayerProperties
 	{
+		#region Events
+		public event System.EventHandler SubLayerPropertyAdded;
+		public virtual void OnSubLayerPropertyAdded(System.EventArgs e)
+		{
+			System.EventHandler handler = SubLayerPropertyAdded;
+			if (handler != null)
+			{
+				handler(this, e);
+			}
+		}
+
+		public event System.EventHandler SubLayerPropertyRemoved;
+		public virtual void OnSubLayerPropertyRemoved(System.EventArgs e)
+		{
+			System.EventHandler handler = SubLayerPropertyRemoved;
+			if (handler != null)
+			{
+				handler(this, e);
+			}
+		}
+		#endregion
 		/// <summary>
 		/// Raw tileJSON response received from the requested source tileset id(s)
 		/// </summary>
@@ -55,5 +77,11 @@
 		public List<VectorSubLayerProperties> vectorSubLayers = new List<VectorSubLayerProperties>();
 		[NodeEditorElementAttribute("POI Sublayers")]
 		public List<PrefabItemOptions> locationPrefabList = new List<PrefabItemOptions>();
+
+
+		public override bool NeedsForceUpdate()
+		{
+			return true;
+		}
 	}
 }

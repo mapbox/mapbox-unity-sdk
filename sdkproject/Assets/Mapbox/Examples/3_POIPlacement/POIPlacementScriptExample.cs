@@ -20,7 +20,7 @@
 		void Start()
 		{
 			//add layers before initializing the map
-			map.SpawnPrefabByCategory(prefab, LocationPrefabCategories.ArtsAndEntertainment, 10, HandlePrefabSpawned, true, "SpawnFromScriptLayer");
+			map.VectorData.SpawnPrefabByCategory(prefab, LocationPrefabCategories.ArtsAndEntertainment, 10, HandlePrefabSpawned, true, "SpawnFromScriptLayer");
 			map.Initialize(new Vector2d(37.784179, -122.401583), 16);
 		}
 

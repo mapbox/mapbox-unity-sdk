@@ -1,6 +1,7 @@
 ﻿namespace Mapbox.Editor
 {
 	using UnityEngine;
+	using System;
 	using System.Collections;
 	using UnityEditor;
 	using Mapbox.Unity.Map;
@@ -25,6 +26,7 @@
 
 		public void DrawUI(SerializedProperty subLayerCoreOptions, SerializedProperty layerProperty, VectorPrimitiveType primitiveTypeProp)
 		{
+
 			objectId = layerProperty.serializedObject.targetObject.GetInstanceID().ToString();
 
 			EditorGUILayout.BeginVertical();
@@ -34,23 +36,52 @@
 				GUILayout.Space(-_lineHeight);
 				EditorGUILayout.PropertyField(subLayerCoreOptions);
 
+				if (primitiveTypeProp == VectorPrimitiveType.Line)
+				{
+					GUILayout.Space(-_lineHeight);
+					var lineGeometryOptions = layerProperty.FindPropertyRelative("lineGeometryOptions");
+					EditorGUILayout.PropertyField(lineGeometryOptions);
+				}
+				
 				if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
 				{
 					GUILayout.Space(-_lineHeight);
 					var extrusionOptions = layerProperty.FindPropertyRelative("extrusionOptions");
 					extrusionOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
 					EditorGUILayout.PropertyField(extrusionOptions);
+
+					EditorGUI.BeginChangeCheck();
+					var snapToTerrainProperty = subLayerCoreOptions.FindPropertyRelative("snapToTerrain");
+					snapToTerrainProperty.boolValue = EditorGUILayout.Toggle(snapToTerrainProperty.displayName, snapToTerrainProperty.boolValue);
+					if (EditorGUI.EndChangeCheck())
+					{
+						EditorHelper.CheckForModifiedProperty(subLayerCoreOptions);
+					}
 				}
 
-				var snapToTerrainProperty = subLayerCoreOptions.FindPropertyRelative("snapToTerrain");
-				var combineMeshesProperty = subLayerCoreOptions.FindPropertyRelative("combineMeshes");
-
-				snapToTerrainProperty.boolValue = EditorGUILayout.Toggle(snapToTerrainProperty.displayName, snapToTerrainProperty.boolValue);
-				combineMeshesProperty.boolValue = EditorGUILayout.Toggle(combineMeshesProperty.displayName, combineMeshesProperty.boolValue);
+				if (primitiveTypeProp != VectorPrimitiveType.Point)
+				{
+					EditorGUI.BeginChangeCheck();
+					var combineMeshesProperty = subLayerCoreOptions.FindPropertyRelative("combineMeshes");
+					combineMeshesProperty.boolValue = EditorGUILayout.Toggle(combineMeshesProperty.displayName, combineMeshesProperty.boolValue);
+					if (EditorGUI.EndChangeCheck())
+					{
+						EditorHelper.CheckForModifiedProperty(subLayerCoreOptions);
+					}
+				}
 
 				if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
 				{
-					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("colliderOptions"));
+					GUILayout.Space(-_lineHeight);
+
+					var colliderOptionsProperty = layerProperty.FindPropertyRelative("colliderOptions");
+					EditorGUI.BeginChangeCheck();
+					EditorGUILayout.PropertyField(colliderOptionsProperty);
+					if (EditorGUI.EndChangeCheck())
+					{
+						Debug.Log("Collider UI changed");
+						EditorHelper.CheckForModifiedProperty(colliderOptionsProperty);
+					}
 				}
 			}
 			EditorGUILayout.EndVertical();

@@ -1,38 +1,46 @@
 ﻿namespace Mapbox.Unity.Map
 {
 	using System;
+	using UnityEngine;
+
 	[Serializable]
-	public class MapExtentOptions
+	public class MapExtentOptions : MapboxDataProperty
 	{
 		public MapExtentType extentType = MapExtentType.CameraBounds;
-
-		public CameraBoundsTileProviderOptions cameraBoundsOptions = new CameraBoundsTileProviderOptions();
-		public RangeTileProviderOptions rangeAroundCenterOptions = new RangeTileProviderOptions();
-		public RangeAroundTransformTileProviderOptions rangeAroundTransformOptions = new RangeAroundTransformTileProviderOptions();
+		public DefaultMapExtents defaultExtents = new DefaultMapExtents();
 
 		public MapExtentOptions(MapExtentType type)
 		{
 			extentType = type;
 		}
 
-		public ITileProviderOptions GetTileProviderOptions()
+		public ExtentOptions GetTileProviderOptions()
 		{
-			ITileProviderOptions options = new TileProviderOptions();
+			ExtentOptions options = new ExtentOptions();
 			switch (extentType)
 			{
 				case MapExtentType.CameraBounds:
-					options = cameraBoundsOptions;// TileProviderOptions.CameraBoundsProviderOptions(camera, visibleBuffer, disposeBuffer, updateInterval);
+					options = defaultExtents.cameraBoundsOptions;
 					break;
 				case MapExtentType.RangeAroundCenter:
-					options = rangeAroundCenterOptions;// TileProviderOptions.RangeAroundCenterOptions(north, south, east, west);
+					options = defaultExtents.rangeAroundCenterOptions;
 					break;
 				case MapExtentType.RangeAroundTransform:
-					options = rangeAroundTransformOptions; //TileProviderOptions.RangeAroundTransformOptions(targetTransform, visibleBuffer, disposeBuffer);
+					options = defaultExtents.rangeAroundTransformOptions;
 					break;
 				default:
 					break;
 			}
 			return options;
 		}
+	}
+
+
+	[Serializable]
+	public class DefaultMapExtents : MapboxDataProperty
+	{
+		public CameraBoundsTileProviderOptions cameraBoundsOptions = new CameraBoundsTileProviderOptions();
+		public RangeTileProviderOptions rangeAroundCenterOptions = new RangeTileProviderOptions();
+		public RangeAroundTransformTileProviderOptions rangeAroundTransformOptions = new RangeAroundTransformTileProviderOptions();
 	}
 }

@@ -51,26 +51,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd961b1c9541a4cee99686069ecce852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _initializeOnStart: 1
   _options:
     locationOptions:
       latitudeLongitude: 37.784179, -122.401583
       zoom: 15
     extentOptions:
       extentType: 1
-      cameraBoundsOptions:
-        camera: {fileID: 0}
-        visibleBuffer: 0
-        disposeBuffer: 0
-      rangeAroundCenterOptions:
-        west: 1
-        north: 1
-        east: 1
-        south: 1
-      rangeAroundTransformOptions:
-        targetTransform: {fileID: 0}
-        visibleBuffer: 0
-        disposeBuffer: 0
+      defaultExtents:
+        cameraBoundsOptions:
+          camera: {fileID: 0}
+          visibleBuffer: 0
+          disposeBuffer: 0
+        rangeAroundCenterOptions:
+          west: 1
+          north: 1
+          east: 1
+          south: 1
+        rangeAroundTransformOptions:
+          targetTransform: {fileID: 0}
+          visibleBuffer: 0
+          disposeBuffer: 0
     placementOptions:
       placementType: 1
       snapMapToZero: 0
@@ -79,6 +79,7 @@ MonoBehaviour:
       unityTileSize: 100
     loadingTexture: {fileID: 2800000, guid: e2896a92727704803a9c422b043eae89, type: 3}
     tileMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
+  _initializeOnStart: 1
   _imagery:
     _layerProperty:
       sourceType: 0
@@ -95,7 +96,7 @@ MonoBehaviour:
         useMipMap: 1
   _terrain:
     _layerProperty:
-      sourceType: 2
+      sourceType: 0
       sourceOptions:
         isActive: 1
         layerSource:
@@ -105,8 +106,9 @@ MonoBehaviour:
           UserName: 
       elevationLayerType: 0
       requiredOptions:
-        addCollider: 0
         exaggerationFactor: 1
+      colliderOptions:
+        addCollider: 0
       modificationOptions:
         sampleCount: 10
         useRelativeHeight: 1

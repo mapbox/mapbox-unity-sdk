@@ -10,6 +10,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 	{
 		Mesh _cachedQuad;
 
+		public override int RequiredVertexCount
+		{
+			get { return 4; }
+		}
+
 		public override void Initialize(ElevationLayerProperties elOptions)
 		{
 			_elevationOptions = elOptions;
@@ -22,7 +27,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				tile.gameObject.layer = _elevationOptions.unityLayerOptions.layerId;
 			}
 
-			if (tile.RasterDataState != Enums.TilePropertyState.Loaded)
+			if (tile.RasterDataState != Enums.TilePropertyState.Loaded ||
+			    tile.MeshFilter.mesh.vertexCount != RequiredVertexCount)
 			{
 				if (_elevationOptions.sideWallOptions.isActive)
 				{
@@ -35,8 +41,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				}
 			}
 
-			// HACK: This is here in to make the system trigger a finished state.
-			tile.MeshFilter.sharedMesh = GetQuad(tile, _elevationOptions.sideWallOptions.isActive);
+			if ((int)tile.ElevationType != (int)ElevationLayerType.FlatTerrain)
+			{
+				tile.MeshFilter.mesh.Clear();
+				// HACK: This is here in to make the system trigger a finished state.
+				tile.MeshFilter.sharedMesh = GetQuad(tile, _elevationOptions.sideWallOptions.isActive);
+				tile.ElevationType = TileTerrainType.Flat;
+			}
 		}
 
 		private Mesh GetQuad(UnityTile tile, bool buildSide)

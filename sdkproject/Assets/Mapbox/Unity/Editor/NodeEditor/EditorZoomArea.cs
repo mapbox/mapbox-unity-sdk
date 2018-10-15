@@ -1,3 +1,5 @@
+//https://github.com/Seneral/Node_Editor_Framework
+
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,8 +23,15 @@ namespace Mapbox.Editor.NodeEditor
 		private static Func<Rect> topmostRectDelegate;
 
 		// Delegate accessors
-		public static Rect getTopRect { get { return (Rect)GetTopRectDelegate.Invoke(); } }
-		public static Rect getTopRectScreenSpace { get { return (Rect)topmostRectDelegate.Invoke(); } }
+		public static Rect getTopRect
+		{
+			get { return (Rect) GetTopRectDelegate.Invoke(); }
+		}
+
+		public static Rect getTopRectScreenSpace
+		{
+			get { return (Rect) topmostRectDelegate.Invoke(); }
+		}
 
 		// Rect stack for manipulating groups
 		public static List<Rect> currentRectStack { get; private set; }
@@ -42,13 +51,20 @@ namespace Mapbox.Editor.NodeEditor
 
 		public static void Init()
 		{
+			// As we can call Begin/Ends inside another, we need to save their states hierarchial in Lists (not Stack, as we need to iterate over them!):
+			currentRectStack = new List<Rect>();
+			rectStackGroups = new List<List<Rect>>();
+			GUIMatrices = new List<Matrix4x4>();
+			adjustedGUILayout = new List<bool>();
+
 			// Fetch rect acessors using Reflection
 			Assembly UnityEngine = Assembly.GetAssembly(typeof(UnityEngine.GUI));
 			Type GUIClipType = UnityEngine.GetType("UnityEngine.GUIClip", true);
 
-			PropertyInfo topmostRect = GUIClipType.GetProperty("topmostRect", BindingFlags.Static | BindingFlags.Public);
-			MethodInfo GetTopRect = GUIClipType.GetMethod("GetTopRect", BindingFlags.Static | BindingFlags.NonPublic);
-			MethodInfo ClipRect = GUIClipType.GetMethod("Clip", BindingFlags.Static | BindingFlags.Public, Type.DefaultBinder, new Type[] { typeof(Rect) }, new ParameterModifier[] { });
+			PropertyInfo topmostRect = GUIClipType.GetProperty("topmostRect", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+			MethodInfo GetTopmostRect = topmostRect != null ? (topmostRect.GetGetMethod(false) ?? topmostRect.GetGetMethod(true)) : null;
+			MethodInfo GetTopRect = GUIClipType.GetMethod("GetTopRect", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+			MethodInfo ClipRect = GUIClipType.GetMethod("Clip", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, Type.DefaultBinder, new Type[] {typeof(Rect)}, new ParameterModifier[] { });
 
 			if (GUIClipType == null || topmostRect == null || GetTopRect == null || ClipRect == null)
 			{
@@ -60,8 +76,8 @@ namespace Mapbox.Editor.NodeEditor
 			}
 
 			// Create simple acessor delegates
-			GetTopRectDelegate = (Func<Rect>)Delegate.CreateDelegate(typeof(Func<Rect>), GetTopRect);
-			topmostRectDelegate = (Func<Rect>)Delegate.CreateDelegate(typeof(Func<Rect>), topmostRect.GetGetMethod());
+			GetTopRectDelegate = (Func<Rect>) Delegate.CreateDelegate(typeof(Func<Rect>), GetTopRect);
+			topmostRectDelegate = (Func<Rect>) Delegate.CreateDelegate(typeof(Func<Rect>), GetTopmostRect);
 
 			if (GetTopRectDelegate == null || topmostRectDelegate == null)
 			{
@@ -71,12 +87,6 @@ namespace Mapbox.Editor.NodeEditor
 				initiated = true;
 				return;
 			}
-
-			// As we can call Begin/Ends inside another, we need to save their states hierarchial in Lists (not Stack, as we need to iterate over them!):
-			currentRectStack = new List<Rect>();
-			rectStackGroups = new List<List<Rect>>();
-			GUIMatrices = new List<Matrix4x4>();
-			adjustedGUILayout = new List<bool>();
 
 			// Sometimes, strange errors pop up (related to Mac?), which we try to catch and enable a compability Mode no supporting zooming in groups
 			/*try
@@ -97,7 +107,10 @@ namespace Mapbox.Editor.NodeEditor
 
 		#region Scale Area
 
-		public static Vector2 getCurrentScale { get { return new Vector2(1 / GUI.matrix.GetColumn(0).magnitude, 1 / GUI.matrix.GetColumn(1).magnitude); } }
+		public static Vector2 getCurrentScale
+		{
+			get { return new Vector2(1 / GUI.matrix.GetColumn(0).magnitude, 1 / GUI.matrix.GetColumn(1).magnitude); }
+		}
 
 		/// <summary>
 		/// Begins a scaled local area. 
@@ -108,7 +121,8 @@ namespace Mapbox.Editor.NodeEditor
 		{
 			Rect screenRect;
 			if (compabilityMode)
-			{ // In compability mode, we will assume only one top group and do everything manually, not using reflected calls (-> practically blind)
+			{
+				// In compability mode, we will assume only one top group and do everything manually, not using reflected calls (-> practically blind)
 				GUI.EndGroup();
 				screenRect = rect;
 #if UNITY_EDITOR
@@ -117,7 +131,8 @@ namespace Mapbox.Editor.NodeEditor
 #endif
 			}
 			else
-			{ // If it's supported, we take the completely generic way using reflected calls
+			{
+				// If it's supported, we take the completely generic way using reflected calls
 				GUIScaleUtility.BeginNoClip();
 				screenRect = GUIScaleUtility.GUIToScaledSpace(rect);
 			}
@@ -169,20 +184,23 @@ namespace Mapbox.Editor.NodeEditor
 				GUILayout.EndVertical();
 				GUILayout.EndHorizontal();
 			}
+
 			adjustedGUILayout.RemoveAt(adjustedGUILayout.Count - 1);
 
 			// End the scaled group
 			GUI.EndGroup();
 
 			if (compabilityMode)
-			{ // In compability mode, we don't know the previous group rect, but as we cannot use top groups there either way, we restore the screen group
+			{
+				// In compability mode, we don't know the previous group rect, but as we cannot use top groups there either way, we restore the screen group
 				if (!Application.isPlaying) // We're in an editor window
 					GUI.BeginClip(new Rect(0, 23, Screen.width, Screen.height - 23));
 				else
 					GUI.BeginClip(new Rect(0, 0, Screen.width, Screen.height));
 			}
 			else
-			{ // Else, restore the clips (groups)
+			{
+				// Else, restore the clips (groups)
 				GUIScaleUtility.RestoreClips();
 			}
 		}
@@ -205,6 +223,7 @@ namespace Mapbox.Editor.NodeEditor
 				GUI.EndClip();
 				topMostClip = getTopRect;
 			}
+
 			// Store the clips appropriately
 			rectStackGroup.Reverse();
 			rectStackGroups.Add(rectStackGroup);
@@ -226,6 +245,7 @@ namespace Mapbox.Editor.NodeEditor
 				topMostClip = getTopRect;
 				count--;
 			}
+
 			// Store the clips appropriately
 			rectStackGroup.Reverse();
 			rectStackGroups.Add(rectStackGroup);
@@ -250,6 +270,7 @@ namespace Mapbox.Editor.NodeEditor
 				GUI.BeginClip(rectStackGroup[clipCnt]);
 				currentRectStack.RemoveAt(currentRectStack.Count - 1);
 			}
+
 			rectStackGroups.RemoveAt(rectStackGroups.Count - 1);
 		}
 
@@ -338,6 +359,7 @@ namespace Mapbox.Editor.NodeEditor
 				scaledPosition -= rectStackGroup[clipCnt].position;
 			return scaledPosition;
 		}
+
 		/// <summary>
 		/// Transforms the rect from the space aquired with BeginNoClip or MoveClipsUp to it's previous space.
 		/// DOES NOT scale the rect, only offsets it!
@@ -364,6 +386,7 @@ namespace Mapbox.Editor.NodeEditor
 				guiPosition += rectStackGroup[clipCnt].position;
 			return guiPosition;
 		}
+
 		/// <summary>
 		/// Transforms the rect to the new space aquired with BeginNoClip or MoveClipsUp.
 		/// DOES NOT scale the rect, only offsets it!
