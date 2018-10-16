@@ -30,7 +30,5 @@ build_script:
   - scriptcs scripts\build.csx
 
 artifacts:
-  - path: 'mapbox-unity-sdk_*.unitypackage'
-    name: UnityPackage
   - path: documentation\docfx_project\_site
     name: site
