@@ -14,7 +14,7 @@ clone_depth: 5
 
 environment:
   GITHUB_TOKEN:
-    secure: lJJOC3O25ATwK7jNt2TeYC9LexbMpef6ZSJDS8J4OFYABWt53IDe8BPcBNuELiyJ
+    secure: vgXVXTZeGy16BWD/1TANPZ4dFW12vAjv1NPqPI3srdyUZcUbsyVNLFQ5uvTglg1J
   MAPBOX_ACCESS_TOKEN:
     secure: dMZloaDRX0kslhjJRbDySkawDtY+1/42ke/v1B2LEQjSnvSp4RWTEkrxuyca3B4Y+Tw4dGg5KI9mL2WFvMQyI49UuIRoVACbIyr6s5pvn4bme5fKhbs/XxpecpzYOVSt
 
@@ -30,7 +30,5 @@ build_script:
   - scriptcs scripts\build.csx
 
 artifacts:
-  - path: 'mapbox-unity-sdk_*.unitypackage'
-    name: UnityPackage
   - path: documentation\docfx_project\_site
     name: site
