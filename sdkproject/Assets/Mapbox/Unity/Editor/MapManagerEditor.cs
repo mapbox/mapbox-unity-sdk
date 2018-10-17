@@ -104,6 +104,12 @@
 			EditorGUILayout.BeginVertical();
 			EditorGUILayout.Space();
 
+			if (GUILayout.Button(new GUIContent("Preview"), (GUIStyle)"minibutton"))
+			{
+				Debug.Log("Preview !!");
+				((AbstractMap)serializedObject.targetObject).EditorPreview();
+			}
+
 			ShowGeneral = EditorGUILayout.Foldout(ShowGeneral, new GUIContent { text = "GENERAL", tooltip = "Options related to map data" });
 
 			if (ShowGeneral)

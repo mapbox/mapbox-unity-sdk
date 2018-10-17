@@ -21,6 +21,7 @@ namespace Mapbox.Unity.Map
 	/// This is the main monobehavior which controls the map. It controls the visualization of map data.
 	/// Abstract map encapsulates the image, terrain and vector sources and provides a centralized interface to control the visualization of the map.
 	/// </summary>
+	[ExecuteInEditMode]
 	public class AbstractMap : MonoBehaviour, IMap
 	{
 		#region Private Fields
@@ -111,6 +112,11 @@ namespace Mapbox.Unity.Map
 			{
 				return _terrain;
 			}
+		}
+
+		public void EditorPreview()
+		{
+			SetUpMap();
 		}
 
 		/// <summary>
@@ -410,7 +416,7 @@ namespace Mapbox.Unity.Map
 		protected virtual void Start()
 		{
 			StartCoroutine("SetupAccess");
-			if (_initializeOnStart)
+			if (_initializeOnStart && Application.isPlaying)
 			{
 				SetUpMap();
 			}
