@@ -1,4 +1,7 @@
 ## CHANGELOG
+### v.2.0.1
+#### Bug Fixes
+- Fixes a bug where tiled uv calculation for in height modifier was wrong and stretching instead of tiling
 
 ### v.2.0.0
 10/15/2018
