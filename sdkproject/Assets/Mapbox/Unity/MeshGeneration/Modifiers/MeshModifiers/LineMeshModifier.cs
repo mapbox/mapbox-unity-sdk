@@ -18,18 +18,14 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		private readonly float _cosHalfSharpCorner = Mathf.Cos(75f / 2f * (Mathf.PI / 180f));
 		private readonly float _sharpCornerOffset = 15f;
+		private readonly float _miterLimit = 0.2f;
+		private readonly float _roundLimit = 1.05f;
 
 		#endregion
 
 		#region Line Parameters
 
 		private LineGeometryOptions _options;
-		private float _miterLimit = 2f;
-//		private JoinType _joinType = JoinType.Round;
-//		private JoinType _capType = JoinType.Round;
-//		private JoinType _beginCap = JoinType.Round;
-//		private JoinType _endCap = JoinType.Round;
-		private float _roundLimit = 1.05f;
 
 		private float _scaledWidth;
 
@@ -272,11 +268,13 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 								approxFractionalJoinNormal = (_prevNormal * ((k + 1) / (n + 1)) + (_nextNormal)).normalized;
 								AddPieSliceVertex(_currentVertex, _distance, approxFractionalJoinNormal, lineTurnsLeft, md);
 							}
+
+							//ending corner
+							_index1 = -1;
+							_index2 = -1;
 						}
 
-						//ending corner
-						_index1 = -1;
-						_index2 = -1;
+
 
 						if (_nextVertex != Constants.Math.Vector3Unused)
 						{

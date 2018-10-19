@@ -9,6 +9,11 @@ namespace Mapbox.Unity.Map
 	[Serializable]
 	public class LineGeometryOptions : ModifierProperties, ISubLayerLineGeometryOptions
 	{
+		public readonly float CosHalfSharpCorner = Mathf.Cos(75f / 2f * (Mathf.PI / 180f));
+		public readonly float SharpCornerOffset = 15f;
+		public readonly float MiterLimit = 2f;
+		public readonly float RoundLimit = 1.05f;
+
 		public override Type ModifierType
 		{
 			get
