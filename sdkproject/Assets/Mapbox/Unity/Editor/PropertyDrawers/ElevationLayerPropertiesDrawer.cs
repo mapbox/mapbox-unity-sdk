@@ -45,8 +45,6 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			property.serializedObject.Update();
-
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 
 			var sourceTypeProperty = property.FindPropertyRelative("sourceType");
@@ -93,7 +91,7 @@
 					GUI.enabled = true;
 					break;
 				case ElevationSourceType.Custom:
-					layerSourceId.stringValue = CustomSourceMapId;
+					layerSourceId.stringValue = string.IsNullOrEmpty(CustomSourceMapId) ? MapboxDefaultElevation.GetParameters(ElevationSourceType.MapboxTerrain).Id : CustomSourceMapId;
 					EditorGUILayout.PropertyField(sourceOptionsProperty, _mapIdGui);
 					CustomSourceMapId = layerSourceId.stringValue;
 					break;
@@ -127,9 +125,17 @@
 			}
 
 			GUILayout.Space(-lineHeight);
+			EditorGUI.BeginChangeCheck();
+			EditorGUILayout.PropertyField(property.FindPropertyRelative("colliderOptions"), true);
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(property.FindPropertyRelative("colliderOptions"));
+			}
+			GUILayout.Space(2 * -lineHeight);
 
 			EditorGUI.BeginChangeCheck();
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("requiredOptions"), true);
+			GUILayout.Space(-lineHeight);
 			if (EditorGUI.EndChangeCheck())
 			{
 				EditorHelper.CheckForModifiedProperty(property);
@@ -140,7 +146,7 @@
 			if (ShowPosition)
 			{
 				EditorGUI.BeginChangeCheck();
-				         
+
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("modificationOptions"), true);
 
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("sideWallOptions"), true);

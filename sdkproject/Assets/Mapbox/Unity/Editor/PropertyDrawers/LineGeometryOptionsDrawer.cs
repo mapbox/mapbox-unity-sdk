@@ -13,11 +13,14 @@
 	{
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			EditorGUI.BeginProperty(position, null, property);
+			EditorGUI.BeginChangeCheck();
 
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("Width"));
-			
-			EditorGUI.EndProperty();
+
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(property);
+			}
 		}
 	}
 }

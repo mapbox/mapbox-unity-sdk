@@ -16,5 +16,10 @@
 		};
 
 		public ImageryRasterOptions rasterOptions = new ImageryRasterOptions();
+
+		public override bool NeedsForceUpdate()
+		{
+			return true;
+		}
 	}
 }

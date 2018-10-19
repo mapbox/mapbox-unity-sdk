@@ -326,7 +326,9 @@
 		[Description("Satellite style uses high-resolution satellite imagery as a texture set. The comprehensive set of road, label, and POI information brings clarity and context to the crisp detail in our high-resolution satellite imagery.")]
 #endif
 		Satellite,
+#if !ENABLE_WINMD_SUPPORT
 		[Description("Color style uses user-defined color and opacity to create colorful, flat shading for your map.")]
+#endif
 		Color,
 	}
 

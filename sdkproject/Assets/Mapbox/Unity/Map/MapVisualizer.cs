@@ -1,3 +1,5 @@
+using Mapbox.Unity.Map.Interfaces;
+
 namespace Mapbox.Unity.Map
 {
 	using UnityEngine;

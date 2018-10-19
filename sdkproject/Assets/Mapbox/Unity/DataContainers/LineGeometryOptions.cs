@@ -1,19 +1,36 @@
-﻿namespace Mapbox.Unity.Map
+﻿using Mapbox.Unity.SourceLayers;
+using UnityEngine;
+
+namespace Mapbox.Unity.Map
 {
-	using System;
-	using UnityEngine;
-	using System.Collections.Generic;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
-	using Mapbox.Unity.MeshGeneration.Data;
+	using System;
 
 	[Serializable]
-	public class LineGeometryOptions : ModifierProperties
+	public class LineGeometryOptions : ModifierProperties, ISubLayerLineGeometryOptions
 	{
 		public override Type ModifierType
 		{
-			get { return typeof(LineMeshModifier); }
+			get
+			{
+				return typeof(LineMeshModifier);
+			}
 		}
 
-		public float Width = 3.0f;
+		[Tooltip("Width of the line feature.")]
+		public float Width = 1.0f;
+
+		/// <summary>
+		/// Sets the width of the mesh generated for line features.
+		/// </summary>
+		/// <param name="width">Width of the mesh generated for line features.</param>
+		public void SetLineWidth(float width)
+		{
+			if (Width != width)
+			{
+				Width = width;
+				HasChanged = true;
+			}
+		}
 	}
 }

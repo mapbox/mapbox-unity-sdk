@@ -36,30 +36,39 @@
 				text = label.text,
 				tooltip = "Options to determine the geographic extent of the world for which the map tiles will be requested.",
 			};
+			EditorGUI.BeginChangeCheck();
 			kindProperty.enumValueIndex = EditorGUILayout.Popup(extentTypeLabel, kindProperty.enumValueIndex, extentTypeContent, GUILayout.Height(_lineHeight));
 
 			var kind = (MapExtentType)kindProperty.enumValueIndex;
-
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(property);
+			}
 
 			EditorGUI.indentLevel++;
 
-			//var rect = new Rect(position.x, position.y + lineHeight, position.width, lineHeight);
 			GUILayout.Space(-_lineHeight);
+			SerializedProperty defaultExtentsProp = property.FindPropertyRelative("defaultExtents");
+			EditorGUI.BeginChangeCheck();
+
 			switch (kind)
 			{
 				case MapExtentType.CameraBounds:
-					EditorGUILayout.PropertyField(property.FindPropertyRelative("cameraBoundsOptions"), new GUIContent { text = "CameraOptions-" });
+					EditorGUILayout.PropertyField(defaultExtentsProp.FindPropertyRelative("cameraBoundsOptions"), new GUIContent { text = "CameraOptions-" });
 					break;
 				case MapExtentType.RangeAroundCenter:
-					EditorGUILayout.PropertyField(property.FindPropertyRelative("rangeAroundCenterOptions"), new GUIContent { text = "RangeAroundCenter" });
+					EditorGUILayout.PropertyField(defaultExtentsProp.FindPropertyRelative("rangeAroundCenterOptions"), new GUIContent { text = "RangeAroundCenter" });
 					break;
 				case MapExtentType.RangeAroundTransform:
-					EditorGUILayout.PropertyField(property.FindPropertyRelative("rangeAroundTransformOptions"), new GUIContent { text = "RangeAroundTransform" });
+					EditorGUILayout.PropertyField(defaultExtentsProp.FindPropertyRelative("rangeAroundTransformOptions"), new GUIContent { text = "RangeAroundTransform" });
 					break;
 				default:
 					break;
 			}
-
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(defaultExtentsProp);
+			}
 			EditorGUI.indentLevel--;
 		}
 	}

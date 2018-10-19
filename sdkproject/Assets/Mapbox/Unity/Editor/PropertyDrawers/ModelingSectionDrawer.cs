@@ -26,7 +26,6 @@
 
 		public void DrawUI(SerializedProperty subLayerCoreOptions, SerializedProperty layerProperty, VectorPrimitiveType primitiveTypeProp)
 		{
-			VectorSubLayerProperties vectorSubLayerProperties = (VectorSubLayerProperties)EditorHelper.GetTargetObjectOfProperty(layerProperty);
 
 			objectId = layerProperty.serializedObject.targetObject.GetInstanceID().ToString();
 
@@ -50,19 +49,39 @@
 					var extrusionOptions = layerProperty.FindPropertyRelative("extrusionOptions");
 					extrusionOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
 					EditorGUILayout.PropertyField(extrusionOptions);
+
+					EditorGUI.BeginChangeCheck();
+					var snapToTerrainProperty = subLayerCoreOptions.FindPropertyRelative("snapToTerrain");
+					snapToTerrainProperty.boolValue = EditorGUILayout.Toggle(snapToTerrainProperty.displayName, snapToTerrainProperty.boolValue);
+					if (EditorGUI.EndChangeCheck())
+					{
+						EditorHelper.CheckForModifiedProperty(subLayerCoreOptions);
+					}
 				}
 
-				var snapToTerrainProperty = subLayerCoreOptions.FindPropertyRelative("snapToTerrain");
-				snapToTerrainProperty.boolValue = EditorGUILayout.Toggle(snapToTerrainProperty.displayName, snapToTerrainProperty.boolValue);
-				EditorHelper.CheckForModifiedProperty(snapToTerrainProperty, vectorSubLayerProperties);
-
-				var combineMeshesProperty = subLayerCoreOptions.FindPropertyRelative("combineMeshes");
-				combineMeshesProperty.boolValue = EditorGUILayout.Toggle(combineMeshesProperty.displayName, combineMeshesProperty.boolValue);
-				EditorHelper.CheckForModifiedProperty(combineMeshesProperty, vectorSubLayerProperties);
+				if (primitiveTypeProp != VectorPrimitiveType.Point)
+				{
+					EditorGUI.BeginChangeCheck();
+					var combineMeshesProperty = subLayerCoreOptions.FindPropertyRelative("combineMeshes");
+					combineMeshesProperty.boolValue = EditorGUILayout.Toggle(combineMeshesProperty.displayName, combineMeshesProperty.boolValue);
+					if (EditorGUI.EndChangeCheck())
+					{
+						EditorHelper.CheckForModifiedProperty(subLayerCoreOptions);
+					}
+				}
 
 				if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
 				{
-					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("colliderOptions"));
+					GUILayout.Space(-_lineHeight);
+
+					var colliderOptionsProperty = layerProperty.FindPropertyRelative("colliderOptions");
+					EditorGUI.BeginChangeCheck();
+					EditorGUILayout.PropertyField(colliderOptionsProperty);
+					if (EditorGUI.EndChangeCheck())
+					{
+						Debug.Log("Collider UI changed");
+						EditorHelper.CheckForModifiedProperty(colliderOptionsProperty);
+					}
 				}
 			}
 			EditorGUILayout.EndVertical();

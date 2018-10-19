@@ -97,12 +97,6 @@
 		GUIContent[] _sourceTypeContent;
 		static float _lineHeight = EditorGUIUtility.singleLineHeight;
 
-		private void UpdateProperty(SerializedProperty property)
-		{
-			var map = (AbstractMap)property.serializedObject.targetObject;
-			map.Options.UpdateProperty();
-		}
-
 		public override void OnInspectorGUI()
 		{
 			objectId = serializedObject.targetObject.GetInstanceID().ToString();
@@ -166,47 +160,72 @@
 				EditorGUILayout.HelpBox("Invalid Access Token. Please add a valid access token using the Mapbox  > Setup Menu", MessageType.Error);
 			}
 
-			EditorGUI.BeginChangeCheck();
-
 			EditorGUILayout.LabelField("Location ", GUILayout.Height(_lineHeight));
 
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("locationOptions"));
+
+
 			var extentOptions = property.FindPropertyRelative("extentOptions");
 			var extentOptionsType = extentOptions.FindPropertyRelative("extentType");
+
+
 			if ((MapExtentType)extentOptionsType.enumValueIndex == MapExtentType.Custom)
 			{
-				var test = mapObject.FindProperty("_tileProvider");
+				var tileProviderProperty = mapObject.FindProperty("_tileProvider");
+				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(extentOptionsType);
+				if (EditorGUI.EndChangeCheck())
+				{
+					EditorHelper.CheckForModifiedProperty(extentOptions);
+				}
 				EditorGUI.indentLevel++;
-				EditorGUILayout.PropertyField(test);
+				EditorGUILayout.PropertyField(tileProviderProperty);
 				EditorGUI.indentLevel--;
 			}
 			else
 			{
 				GUILayout.Space(-_lineHeight);
-				EditorGUILayout.PropertyField(property.FindPropertyRelative("extentOptions"));
+				EditorGUILayout.PropertyField(extentOptions);
 			}
+
+			EditorGUI.BeginChangeCheck();
 
 			EditorGUILayout.PropertyField(serializedObject.FindProperty("_initializeOnStart"));
 
-			if(EditorGUI.EndChangeCheck())
+			if (EditorGUI.EndChangeCheck())
 			{
-				UpdateProperty(property);
+				EditorHelper.CheckForModifiedProperty(property);
 			}
 
 			ShowPosition = EditorGUILayout.Foldout(ShowPosition, "Others");
 			if (ShowPosition)
 			{
+				GUILayout.Space(-_lineHeight);
+
 				EditorGUI.BeginChangeCheck();
+				var placementOptions = property.FindPropertyRelative("placementOptions");
+				EditorGUILayout.PropertyField(placementOptions);
+				if (EditorGUI.EndChangeCheck())
+				{
+					EditorHelper.CheckForModifiedProperty(placementOptions);
+				}
+
 				GUILayout.Space(-_lineHeight);
-				EditorGUILayout.PropertyField(property.FindPropertyRelative("placementOptions"));
-				GUILayout.Space(-_lineHeight);
-				EditorGUILayout.PropertyField(property.FindPropertyRelative("scalingOptions"));
+
+				EditorGUI.BeginChangeCheck();
+				var scalingOptions = property.FindPropertyRelative("scalingOptions");
+				EditorGUILayout.PropertyField(scalingOptions);
+				if (EditorGUI.EndChangeCheck())
+				{
+					EditorHelper.CheckForModifiedProperty(scalingOptions);
+				}
+
+				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("loadingTexture"));
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("tileMaterial"));
 				if (EditorGUI.EndChangeCheck())
 				{
-					UpdateProperty(property);
+					EditorHelper.CheckForModifiedProperty(property);
 				}
 			}
 		}
@@ -239,6 +258,7 @@
 				_isGUIContentSet = true;
 			}
 
+			EditorGUI.BeginChangeCheck();
 			sourceTypeProperty.enumValueIndex = EditorGUILayout.Popup(new GUIContent
 			{
 				text = "Data Source",
@@ -268,6 +288,11 @@
 				default:
 					isActiveProperty.boolValue = false;
 					break;
+			}
+
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(layerProperty);
 			}
 
 			if (sourceTypeValue != VectorSourceType.None)

@@ -1,14 +1,14 @@
 {
   "metadata": [
-      { //mapbox-sdk-cs source
-        "src": [
-          {
-            "src": "../../sdkproject/Assets/Mapbox/Core/mapbox-sdk-cs",
-            "files": ["**/**.cs"]
-          }
-        ],
-        "dest": "api/mapbox-sdk-cs"
-      },
+      // { //mapbox-sdk-cs source
+      //   "src": [
+      //     {
+      //       "src": "../../sdkproject/Assets/Mapbox/Core/mapbox-sdk-cs",
+      //       "files": ["**/**.cs"]
+      //     }
+      //   ],
+      //   "dest": "api/mapbox-sdk-cs"
+      // },
       { //Unity specific source
         "src": [
           {
@@ -18,15 +18,15 @@
         ],
         "dest": "api/unity"
       },
-      {  // vector-tile-cs source
-        "src": [
-          {
-            "src": "../../sdkproject/Assets/Mapbox/Core/PlugIns/Mapbox/vector-tile-cs",
-            "files": ["**/**.cs"]
-          }
-        ],
-        "dest": "api/vector-tile-cs"
-      }
+      // {  // vector-tile-cs source
+      //   "src": [
+      //     {
+      //       "src": "../../sdkproject/Assets/Mapbox/Core/PlugIns/Mapbox/vector-tile-cs",
+      //       "files": ["**/**.cs"]
+      //     }
+      //   ],
+      //   "dest": "api/vector-tile-cs"
+      // }
   ],
   "build": {
      "globalMetadata": {

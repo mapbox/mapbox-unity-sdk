@@ -39,7 +39,7 @@
 			}
 		}
 
-		public string LayerSource
+		public string LayerSourceId
 		{
 			get
 			{
@@ -55,6 +55,14 @@
 			}
 		}
 
+		public ImagerySourceType LayerSource
+		{
+			get
+			{
+				return _layerProperty.sourceType;
+			}
+		}
+
 		public ImageryLayer()
 		{
 
@@ -65,20 +73,6 @@
 			_layerProperty = properties;
 		}
 
-		public void SetLayerSource(ImagerySourceType imageSource)
-		{
-			if (imageSource != ImagerySourceType.Custom && imageSource != ImagerySourceType.None)
-			{
-				_layerProperty.sourceType = imageSource;
-				_layerProperty.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(imageSource);
-
-				_layerProperty.HasChanged = true;
-			}
-			else
-			{
-				Debug.LogWarning("Invalid style - trying to set " + imageSource.ToString() + " as default style!");
-			}
-		}
 
 		public void SetLayerSource(string imageSource)
 		{
@@ -116,12 +110,16 @@
 			_imageFactory = ScriptableObject.CreateInstance<MapImageFactory>();
 			_imageFactory.SetOptions(_layerProperty);
 			_layerProperty.PropertyHasChanged += RedrawLayer;
+			_layerProperty.rasterOptions.PropertyHasChanged += (property, e) =>
+			{
+				NotifyUpdateLayer(_imageFactory, property as MapboxDataProperty, false);
+			};
 		}
 
 		public void RedrawLayer(object sender, System.EventArgs e)
 		{
 			Factory.SetOptions(_layerProperty);
-			NotifyUpdateLayer(_imageFactory);
+			NotifyUpdateLayer(_imageFactory, sender as MapboxDataProperty, false);
 		}
 
 		public void Remove()
@@ -146,5 +144,91 @@
 			}
 		}
 
+		#region API Methods
+
+		/// <summary>
+		/// Sets the data source for the image factory.
+		/// </summary>
+		/// <param name="imageSource"></param>
+		public virtual void SetLayerSource(ImagerySourceType imageSource)
+		{
+			if (imageSource != ImagerySourceType.Custom && imageSource != ImagerySourceType.None)
+			{
+				_layerProperty.sourceType = imageSource;
+				_layerProperty.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(imageSource);
+				_layerProperty.HasChanged = true;
+			}
+			else
+			{
+				Debug.LogWarning("Invalid style - trying to set " + imageSource.ToString() + " as default style!");
+			}
+		}
+
+		/// <summary>
+		/// Enables high quality images for selected image factory source.
+		/// </summary>
+		/// <param name="useRetina"></param>
+		public virtual void UseRetina(bool useRetina)
+		{
+			if (_layerProperty.rasterOptions.useRetina != useRetina)
+			{
+				_layerProperty.rasterOptions.useRetina = useRetina;
+				_layerProperty.rasterOptions.HasChanged = true;
+			}
+		}
+
+		/// <summary>
+		/// Enable Texture2D compression for image factory outputs.
+		/// </summary>
+		/// <param name="useCompression"></param>
+		public virtual void UseCompression(bool useCompression)
+		{
+			if (_layerProperty.rasterOptions.useCompression != useCompression)
+			{
+				_layerProperty.rasterOptions.useCompression = useCompression;
+				_layerProperty.rasterOptions.HasChanged = true;
+			}
+		}
+
+		/// <summary>
+		/// Enable Texture2D MipMap option for image factory outputs.
+		/// </summary>
+		/// <param name="useMipMap"></param>
+		public virtual void UseMipMap(bool useMipMap)
+		{
+			if (_layerProperty.rasterOptions.useMipMap != useMipMap)
+			{
+				_layerProperty.rasterOptions.useMipMap = useMipMap;
+				_layerProperty.rasterOptions.HasChanged = true;
+			}
+		}
+
+		/// <summary>
+		/// Change image layer settings.
+		/// </summary>
+		/// <param name="imageSource">Data source for the image provider.</param>
+		/// <param name="useRetina">Enable/Disable high quality imagery.</param>
+		/// <param name="useCompression">Enable/Disable Unity3d Texture2d image compression.</param>
+		/// <param name="useMipMap">Enable/Disable Unity3d Texture2d image mipmapping.</param>
+		public virtual void SetProperties(ImagerySourceType imageSource, bool useRetina, bool useCompression, bool useMipMap)
+		{
+			if (imageSource != ImagerySourceType.Custom && imageSource != ImagerySourceType.None)
+			{
+				_layerProperty.sourceType = imageSource;
+				_layerProperty.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(imageSource);
+				_layerProperty.HasChanged = true;
+			}
+
+			if (_layerProperty.rasterOptions.useRetina != useRetina ||
+				_layerProperty.rasterOptions.useCompression != useCompression ||
+				_layerProperty.rasterOptions.useMipMap != useMipMap)
+			{
+				_layerProperty.rasterOptions.useRetina = useRetina;
+				_layerProperty.rasterOptions.useCompression = useCompression;
+				_layerProperty.rasterOptions.useMipMap = useMipMap;
+				_layerProperty.rasterOptions.HasChanged = true;
+			}
+		}
+		#endregion
 	}
 }

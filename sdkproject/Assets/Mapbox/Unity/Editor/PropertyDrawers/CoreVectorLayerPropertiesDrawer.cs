@@ -17,7 +17,6 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			CoreVectorLayerProperties coreOptions = (CoreVectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property);
 
 			EditorGUI.BeginProperty(position, null, property);
 
@@ -46,9 +45,22 @@
 				_isGUIContentSet = true;
 			}
 
+			EditorGUI.BeginChangeCheck();
 			primitiveType.enumValueIndex = EditorGUILayout.Popup(primitiveTypeLabel, primitiveType.enumValueIndex, _primitiveTypeContent);
-			EditorHelper.CheckForModifiedProperty(primitiveType, coreOptions);
-
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(property);
+			}
+//
+//			if ((VectorPrimitiveType)primitiveType.enumValueIndex == VectorPrimitiveType.Line)
+//			{
+//				EditorGUI.BeginChangeCheck();
+//				EditorGUILayout.PropertyField(property.FindPropertyRelative("lineWidth"));
+//				if (EditorGUI.EndChangeCheck())
+//				{
+//					EditorHelper.CheckForModifiedProperty(property);
+//				}
+//			}
 			EditorGUI.EndProperty();
 		}
 	}
