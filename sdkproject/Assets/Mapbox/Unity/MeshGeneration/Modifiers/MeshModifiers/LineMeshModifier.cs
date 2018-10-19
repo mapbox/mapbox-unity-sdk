@@ -25,10 +25,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		private LineGeometryOptions _options;
 		private float _miterLimit = 2f;
-		private JoinType _joinType = JoinType.Round;
-		private JoinType _capType = JoinType.Round;
-		private JoinType _beginCap = JoinType.Round;
-		private JoinType _endCap = JoinType.Round;
+//		private JoinType _joinType = JoinType.Round;
+//		private JoinType _capType = JoinType.Round;
+//		private JoinType _beginCap = JoinType.Round;
+//		private JoinType _endCap = JoinType.Round;
 		private float _roundLimit = 1.05f;
 
 		private float _scaledWidth;
@@ -81,6 +81,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		public override void SetProperties(ModifierProperties properties)
 		{
 			_options = (LineGeometryOptions) properties;
+			properties.PropertyHasChanged += UpdateModifier;
 		}
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, float scale)
@@ -169,7 +170,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					}
 
 					var middleVertex = _prevVertex != Constants.Math.Vector3Unused && _nextVertex != Constants.Math.Vector3Unused;
-					var currentJoin = middleVertex ? _joinType : _nextVertex != Constants.Math.Vector3Unused ? _beginCap : _endCap;
+					var currentJoin = middleVertex ? _options.JoinType : _options.CapType;
 
 					if (middleVertex && currentJoin == JoinType.Round)
 					{
@@ -388,8 +389,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_tangentList.Clear();
 			_triangleList.Clear();
 
-			_beginCap = _capType;
-			_endCap = _capType;
 			_prevVertex = Constants.Math.Vector3Unused;
 			_currentVertex = Constants.Math.Vector3Unused;
 			_nextVertex = Constants.Math.Vector3Unused;

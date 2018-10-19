@@ -385,16 +385,30 @@
 		Points,
 		Custom
 	}
-	
+
 	public enum JoinType
 	{
-		Miter,
-		Round,
-		Bevel,
-		Fakeround,
-		Flipbevel,
+		Miter = 0,
+		Round = 1,
+		Bevel = 2,
 		Butt,
-		Square
+		Square,
+		Fakeround,
+		Flipbevel
+	}
+
+	public enum LineJoinType
+	{
+		Miter = 0,
+		Round = 1,
+		Bevel = 2
+	}
+
+	public enum LineCapType
+	{
+		Butt = 3,
+		Round = 1,
+		Square = 4
 	}
 
 }

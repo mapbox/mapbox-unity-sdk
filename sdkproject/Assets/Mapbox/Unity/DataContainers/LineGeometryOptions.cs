@@ -20,6 +20,12 @@ namespace Mapbox.Unity.Map
 		[Tooltip("Width of the line feature.")]
 		public float Width = 1.0f;
 
+		[Tooltip("Join type of the line feature")]
+		public JoinType JoinType = JoinType.Round;
+
+		[Tooltip("Cap type of the line feature")]
+		public JoinType CapType = JoinType.Round;
+
 		/// <summary>
 		/// Sets the width of the mesh generated for line features.
 		/// </summary>
@@ -29,6 +35,24 @@ namespace Mapbox.Unity.Map
 			if (Width != width)
 			{
 				Width = width;
+				HasChanged = true;
+			}
+		}
+
+		public void SetJoinType(LineJoinType join)
+		{
+			if ((int)JoinType != (int)join)
+			{
+				JoinType = (JoinType)join;
+				HasChanged = true;
+			}
+		}
+
+		public void SetCapType(LineCapType cap)
+		{
+			if ((int)CapType != (int)cap)
+			{
+				CapType = (JoinType)cap;
 				HasChanged = true;
 			}
 		}

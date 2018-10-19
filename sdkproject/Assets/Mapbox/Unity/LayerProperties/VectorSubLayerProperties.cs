@@ -85,7 +85,6 @@ namespace Mapbox.Unity.Map
 			colliderType = ColliderType.None,
 		};
 
-		public LineGeometryOptions lineGeometryOptions = new LineGeometryOptions();
 		public GeometryMaterialOptions materialOptions = new GeometryMaterialOptions();
 
 		public LayerPerformanceOptions performanceOptions;

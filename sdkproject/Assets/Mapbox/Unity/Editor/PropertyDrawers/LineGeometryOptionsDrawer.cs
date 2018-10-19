@@ -16,6 +16,8 @@
 			EditorGUI.BeginChangeCheck();
 
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("Width"));
+			property.FindPropertyRelative("JoinType").enumValueIndex = (int)((LineJoinType) EditorGUILayout.EnumPopup("Join Type", (LineJoinType)property.FindPropertyRelative("JoinType").intValue));
+			property.FindPropertyRelative("CapType").enumValueIndex = (int)((LineCapType) EditorGUILayout.EnumPopup("Cap Type", (LineCapType)property.FindPropertyRelative("CapType").intValue));
 
 			if (EditorGUI.EndChangeCheck())
 			{

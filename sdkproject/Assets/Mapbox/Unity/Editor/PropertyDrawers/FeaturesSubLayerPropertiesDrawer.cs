@@ -384,10 +384,6 @@
 			subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex = (int)coreOptions.geometryType;
 			subLayerCoreOptions.FindPropertyRelative("snapToTerrain").boolValue = coreOptions.snapToTerrain;
 			subLayerCoreOptions.FindPropertyRelative("combineMeshes").boolValue = coreOptions.combineMeshes;
-			
-			var subLayerlineGeometryOptions = subLayer.FindPropertyRelative("lineGeometryOptions");
-			var lineGeometryOptions = subLayerProperties.lineGeometryOptions;
-			subLayerlineGeometryOptions.FindPropertyRelative("Width").floatValue = lineGeometryOptions.Width;
 
 			var subLayerlineGeometryOptions = subLayer.FindPropertyRelative("lineGeometryOptions");
 			var lineGeometryOptions = subLayerProperties.lineGeometryOptions;
