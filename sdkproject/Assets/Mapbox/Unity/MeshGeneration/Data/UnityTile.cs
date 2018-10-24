@@ -57,6 +57,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					if (_meshFilter == null)
 					{
 						_meshFilter = gameObject.AddComponent<MeshFilter>();
+						_meshFilter.sharedMesh = new Mesh();
 						ElevationType = TileTerrainType.None;
 					}
 				}
@@ -228,7 +229,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					HeightDataState = TilePropertyState.None;
 					return;
 				}
-				
+
 				// HACK: compute height values for terrain. We could probably do this without a texture2d.
 				if (_heightTexture == null)
 				{
@@ -278,7 +279,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					MeshRenderer.material.mainTexture = null;
 					return;
 				}
-				
+
 				if (_rasterData == null)
 				{
 					_rasterData = new Texture2D(0, 0, TextureFormat.RGB24, useMipMap);
@@ -292,7 +293,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					_rasterData.Compress(false);
 				}
 
-				MeshRenderer.material.mainTexture = _rasterData;
+				MeshRenderer.sharedMaterial.mainTexture = _rasterData;
 				RasterDataState = TilePropertyState.Loaded;
 			}
 		}

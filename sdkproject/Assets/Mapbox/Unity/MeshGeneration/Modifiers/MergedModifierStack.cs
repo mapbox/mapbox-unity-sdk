@@ -43,14 +43,14 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				_tempGameObject = new GameObject();
 				_tempMeshFilter = _tempGameObject.AddComponent<MeshFilter>();
-				_tempMeshFilter.mesh.MarkDynamic();
+				_tempMeshFilter.sharedMesh.MarkDynamic();
 				_tempVectorEntity = new VectorEntity()
 				{
 					GameObject = _tempGameObject,
 					Transform = _tempGameObject.transform,
 					MeshFilter = _tempMeshFilter,
 					MeshRenderer = _tempGameObject.AddComponent<MeshRenderer>(),
-					Mesh = _tempMeshFilter.mesh
+					Mesh = _tempMeshFilter.sharedMesh
 				};
 				return _tempVectorEntity;
 			});
@@ -61,7 +61,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void OnUnregisterTile(UnityTile tile)
 		{
-			//removing all caches 
+			//removing all caches
 			if (_activeObjects.ContainsKey(tile))
 			{
 				_counter = _activeObjects[tile].Count;

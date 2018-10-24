@@ -236,16 +236,20 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		public override void Reset()
 		{
-			foreach (var layerList in _layerBuilder.Values)
+			if (_layerBuilder != null)
 			{
-				foreach (var layerVisualizerBase in layerList)
+				foreach (var layerList in _layerBuilder.Values)
 				{
-					layerVisualizerBase.ClearCaches();
+					foreach (var layerVisualizerBase in layerList)
+					{
+						layerVisualizerBase.ClearCaches();
+					}
 				}
+
+				_layerProgress.Clear();
+				_tilesWaitingResponse.Clear();
+				_tilesWaitingProcessing.Clear();
 			}
-			_layerProgress.Clear();
-			_tilesWaitingResponse.Clear();
-			_tilesWaitingProcessing.Clear();
 		}
 
 		public override void SetOptions(LayerProperties options)

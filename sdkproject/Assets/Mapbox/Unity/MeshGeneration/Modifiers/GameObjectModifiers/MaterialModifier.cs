@@ -34,7 +34,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void Run(VectorEntity ve, UnityTile tile)
 		{
-			var min = Math.Min(_options.materials.Length, ve.MeshFilter.mesh.subMeshCount);
+			var min = Math.Min(_options.materials.Length, ve.MeshFilter.sharedMesh.subMeshCount);
 			var mats = new Material[min];
 
 			if (_options.style == StyleTypes.Custom)
