@@ -1,4 +1,8 @@
 ## CHANGELOG
+### v.2.0.1
+#### Improvements
+- Change terrain and vector mesh genertion to use sharedMesh instead of mesh.
+
 
 ### v.2.0.0
 10/15/2018
