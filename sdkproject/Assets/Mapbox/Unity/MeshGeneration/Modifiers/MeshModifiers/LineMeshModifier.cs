@@ -189,11 +189,22 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					{
 						// The maximum extrude length is 128 / 63 = 2 times the width of the line
 						// so if miterLength >= 2 we need to draw a different type of bevel here.
-						if (miterLength > 2) currentJoin = JoinType.Flipbevel;
+						if (miterLength > 2)
+						{
+							currentJoin = JoinType.Flipbevel;
+						}
 
 						// If the miterLength is really small and the line bevel wouldn't be visible,
 						// just draw a miter join to save a triangle.
-						if (miterLength < _miterLimit) currentJoin = JoinType.Miter;
+						if (miterLength < _miterLimit)
+						{
+							currentJoin = JoinType.Miter;
+						}
+					}
+
+					if (_prevVertex != Constants.Math.Vector3Unused)
+					{
+						_distance += Vector3.Distance(_currentVertex, _prevVertex);
 					}
 
 					if (currentJoin == JoinType.Miter)
