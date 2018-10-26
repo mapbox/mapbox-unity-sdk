@@ -1,4 +1,7 @@
 ## CHANGELOG
+### v.2.0.1
+##### Improvements
+- Remove Uv Modifier class and merge the functionality into polygon mesh modifier.
 
 ### v.2.0.0
 10/15/2018
