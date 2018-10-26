@@ -6,7 +6,7 @@ namespace Mapbox.Unity.Map
 {
 	public class SubLayerBehaviorModifiers : ISubLayerBehaviorModifiers
 	{
-		// TODO: Remove if not required. 
+		// TODO: Remove if not required.
 		VectorSubLayerProperties _subLayerProperties;
 		public SubLayerBehaviorModifiers(VectorSubLayerProperties subLayerProperties)
 		{
@@ -47,6 +47,10 @@ namespace Mapbox.Unity.Map
 		/// <param name="modifier">Game object modifier to add to style</param>
 		public virtual void AddGameObjectModifier(GameObjectModifier modifier)
 		{
+			if (_subLayerProperties.GoModifiers == null)
+			{
+				_subLayerProperties.GoModifiers = new List<GameObjectModifier>();
+			}
 			_subLayerProperties.GoModifiers.Add(modifier);
 			_subLayerProperties.HasChanged = true;
 		}
@@ -57,6 +61,10 @@ namespace Mapbox.Unity.Map
 		/// <param name="modifiers">List of game object modifiers to add to style</param>
 		public virtual void AddGameObjectModifier(List<GameObjectModifier> modifiers)
 		{
+			if (_subLayerProperties.GoModifiers == null)
+			{
+				_subLayerProperties.GoModifiers = new List<GameObjectModifier>();
+			}
 			_subLayerProperties.GoModifiers.AddRange(modifiers);
 			_subLayerProperties.HasChanged = true;
 		}
@@ -68,11 +76,14 @@ namespace Mapbox.Unity.Map
 		public virtual List<GameObjectModifier> GetGameObjectModifier(Func<GameObjectModifier, bool> function)
 		{
 			var finalList = new List<GameObjectModifier>();
-			foreach (var goModifier in _subLayerProperties.GoModifiers)
+			if (_subLayerProperties.GoModifiers != null)
 			{
-				if (function(goModifier))
+				foreach (var goModifier in _subLayerProperties.GoModifiers)
 				{
-					finalList.Add(goModifier);
+					if (function(goModifier))
+					{
+						finalList.Add(goModifier);
+					}
 				}
 			}
 
@@ -85,8 +96,11 @@ namespace Mapbox.Unity.Map
 		/// <param name="modifier">Game object modifier to be removed from style</param>
 		public virtual void RemoveGameObjectModifier(GameObjectModifier modifier)
 		{
-			_subLayerProperties.GoModifiers.Remove(modifier);
-			_subLayerProperties.HasChanged = true;
+			if (_subLayerProperties.GoModifiers != null)
+			{
+				_subLayerProperties.GoModifiers.Remove(modifier);
+				_subLayerProperties.HasChanged = true;
+			}
 		}
 
 		/// <summary>
@@ -95,6 +109,10 @@ namespace Mapbox.Unity.Map
 		/// <param name="modifier">Mesh modifier to add to style</param>
 		public virtual void AddMeshModifier(MeshModifier modifier)
 		{
+			if (_subLayerProperties.MeshModifiers == null)
+			{
+				_subLayerProperties.MeshModifiers = new List<MeshModifier>();
+			}
 			_subLayerProperties.MeshModifiers.Add(modifier);
 			_subLayerProperties.HasChanged = true;
 		}
@@ -105,6 +123,10 @@ namespace Mapbox.Unity.Map
 		/// <param name="modifiers">List of mesh modifiers to add to style</param>
 		public virtual void AddMeshModifier(List<MeshModifier> modifiers)
 		{
+			if (_subLayerProperties.MeshModifiers == null)
+			{
+				_subLayerProperties.MeshModifiers = new List<MeshModifier>();
+			}
 			_subLayerProperties.MeshModifiers.AddRange(modifiers);
 			_subLayerProperties.HasChanged = true;
 		}
@@ -116,11 +138,14 @@ namespace Mapbox.Unity.Map
 		public virtual List<MeshModifier> GetMeshModifier(Func<MeshModifier, bool> function)
 		{
 			var finalList = new List<MeshModifier>();
-			foreach (var meshModifier in _subLayerProperties.MeshModifiers)
+			if (_subLayerProperties.MeshModifiers != null)
 			{
-				if (function(meshModifier))
+				foreach (var meshModifier in _subLayerProperties.MeshModifiers)
 				{
-					finalList.Add(meshModifier);
+					if (function(meshModifier))
+					{
+						finalList.Add(meshModifier);
+					}
 				}
 			}
 
@@ -133,8 +158,11 @@ namespace Mapbox.Unity.Map
 		/// <param name="modifier">Mesh modifier to be removed from style</param>
 		public virtual void RemoveMeshModifier(MeshModifier modifier)
 		{
-			_subLayerProperties.MeshModifiers.Remove(modifier);
-			_subLayerProperties.HasChanged = true;
+			if (_subLayerProperties.MeshModifiers != null)
+			{
+				_subLayerProperties.MeshModifiers.Remove(modifier);
+				_subLayerProperties.HasChanged = true;
+			}
 		}
 
 	}
