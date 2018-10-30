@@ -1,4 +1,6 @@
+using System.Linq;
 using Mapbox.Unity.Map;
+using Mapbox.Unity.Utilities;
 
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
@@ -73,9 +75,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			int vertCount = 0, polygonVertexCount = 0;
 			List<int> triList = null;
 			List<Vector3> sub = null;
-
-
-
+			var uvs = new List<Vector2>();
 			for (int i = 0; i < _counter; i++)
 			{
 				sub = feature.Points[i];
@@ -127,11 +127,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						var fromBottomLeft = new Vector2(
 							(float) (((sub[j].x + md.PositionInTile.x) / tile.TileScale + _size.x / 2) / _size.x),
 							(float) (((sub[j].z + md.PositionInTile.z) / tile.TileScale + _size.x / 2) / _size.x));
-						md.UV[0].Add(fromBottomLeft);
+						uvs.Add(fromBottomLeft);
 					}
 					else if (_options.texturingType == UvMapType.Tiled)
 					{
-						md.UV[0].Add(new Vector2(sub[j].x, sub[j].z));
+						uvs.Add(new Vector2(sub[j].x, sub[j].z));
 					}
 				}
 			}
@@ -150,7 +150,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				maxy = float.MinValue;
 
 				_textureUvCoordinates = new Vector2[md.Vertices.Count];
-				_textureDirection = Quaternion.FromToRotation((md.Vertices[0] - md.Vertices[1]), Mapbox.Unity.Constants.Math.Vector3Right);
+				_textureDirection = Quaternion.FromToRotation((md.Vertices[0] - md.Vertices[1]),
+					Mapbox.Unity.Constants.Math.Vector3Right);
 				_textureUvCoordinates[0] = new Vector2(0, 0);
 				_firstVert = md.Vertices[0];
 				for (int i = 1; i < md.Vertices.Count; i++)
@@ -174,9 +175,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 				for (int i = 0; i < md.Vertices.Count; i++)
 				{
-					md.UV[0].Add(new Vector2(
-						(((_textureUvCoordinates[i].x - minx) / width) * _currentFacade.TextureRect.width) + _currentFacade.TextureRect.x,
-						(((_textureUvCoordinates[i].y - miny) / height) * _currentFacade.TextureRect.height) + _currentFacade.TextureRect.y));
+					uvs.Add(new Vector2(
+						(((_textureUvCoordinates[i].x - minx) / width) * _currentFacade.TextureRect.width) +
+						_currentFacade.TextureRect.x,
+						(((_textureUvCoordinates[i].y - miny) / height) * _currentFacade.TextureRect.height) +
+						_currentFacade.TextureRect.y));
 				}
 			}
 
@@ -194,9 +197,103 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				triList.Add(result[i] + currentIndex);
 			}
 
-			md.Triangles.Add(triList);
+			var nextTopIndex = 0;
+			var nextBottomIndex = 0;
+
+			md.Triangles.Add(new List<int>());
+			for (int i = 0; i < triList.Count; i++)
+			{
+				md.Triangles[0].Add(triList[i] * 3 + 1);
+			}
+
+			var _offset = 0.2f;
+			int index = 0;
+			md.Vertices.Clear();
+			md.Normals.Clear();
+			md.Edges.Clear();
+			//md.Triangles.Add(new List<int>());
+
+			var prevTop = 0;
+			var prevSide = 0;
+			var subStart = 0;
+
+			foreach (var set in subset)
+			{
+				subStart = md.Vertices.Count;
+				prevTop = 0;
+				prevSide = 0;
+
+				for (int i = 0; i < set.Count; i++)
+				{
+					var prev = i == 0 ? set[set.Count - 2] : set[i - 1];
+					var current = set[i];
+					var next = i == set.Count - 1 ? set[1] : set[i + 1];
+
+					var normalNext = next - current;
+					var normalPrev = prev - current;
+
+					var currentOffset = _offset;
+					if (!(normalNext.magnitude > 1 && normalPrev.magnitude > 1))
+					{
+						currentOffset = 0.01f;
+					}
+
+					var vertexPrev = (current + normalPrev.normalized * currentOffset);
+					var vertexNext = (current + normalNext.normalized * currentOffset);
+					var vertexNew = IsLeft(prev, current, next)
+						? current - (normalPrev.normalized * currentOffset) - normalNext.normalized * currentOffset
+						: vertexNext + normalPrev.normalized * currentOffset;
+
+					vertexNew = current + (vertexNew - current).normalized * _offset;
+					vertexNew = new Vector3(vertexNew.x, vertexNew.y + _offset, vertexNew.z);
+
+					md.Vertices.Add(vertexPrev);
+					md.Vertices.Add(vertexNew);
+					md.Vertices.Add(vertexNext);
+
+					md.UV[0].Add(new Vector2(0,0));
+					md.UV[0].Add(new Vector2(0,0));
+					md.UV[0].Add(new Vector2(0,0));
+
+					md.Normals.Add(normalPrev.Perpendicular().normalized * -1);
+					md.Normals.Add(Vector3.up);
+					md.Normals.Add(normalNext.Perpendicular().normalized);
+
+					//corner top triangle
+					md.Triangles[0].Add(index);
+					md.Triangles[0].Add(index + 2);
+					md.Triangles[0].Add(index + 1);
+
+					md.Edges.Add(index + 2);
+					md.Edges.Add(index);
+
+					if (prevTop != 0)
+					{
+						//side wall top chamfer
+						md.Triangles[0].Add(index);
+						md.Triangles[0].Add(index + 1);
+						md.Triangles[0].Add(prevTop);
+
+						md.Triangles[0].Add(index);
+						md.Triangles[0].Add(prevTop);
+						md.Triangles[0].Add(prevSide);
+
+						//side wall top edge
+						md.Edges.Add(index);
+						md.Edges.Add(prevSide);
+					}
+
+					prevTop = index + 1;
+					prevSide = index + 2;
+					index += 3;
+				}
+			}
 		}
 
+		public bool IsLeft(Vector3 p1, Vector3 p2, Vector3 p3)
+		{
+			return ((p2.x - p1.x) * (p3.z - p1.z) - (p2.z - p1.z) * (p3.x - p1.x)) > 0;
+		}
 
 		private bool IsClockwise(IList<Vector3> vertices)
 		{
