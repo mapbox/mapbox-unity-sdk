@@ -171,8 +171,8 @@ namespace Mapbox.Unity.Map.TileProviders
 			Vector2d hitPntNEGeoPos = new Vector2d(maxLat, maxLong);
 			Vector2dBounds tileBounds = new Vector2dBounds(Conversions.LatLonToMeters(hitPntSWGeoPos), Conversions.LatLonToMeters(hitPntNEGeoPos));			// Bounds debugging.
 #if UNITY_EDITOR
-			Debug.DrawLine(_cbtpOptions.camera.transform.position, _map.GeoToWorldPosition(hitPntLLGeoPos), Color.blue);
-			Debug.DrawLine(_cbtpOptions.camera.transform.position, _map.GeoToWorldPosition(hitPntURGeoPos), Color.red);
+			Debug.DrawLine(_cbtpOptions.camera.transform.position, _map.GeoToWorldPosition(hitPntSWGeoPos), Color.blue);
+			Debug.DrawLine(_cbtpOptions.camera.transform.position, _map.GeoToWorldPosition(hitPntNEGeoPos), Color.red);
 #endif
 			return tileBounds;
 		}
