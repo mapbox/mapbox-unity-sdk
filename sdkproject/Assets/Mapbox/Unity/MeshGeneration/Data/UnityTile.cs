@@ -313,7 +313,33 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
+		/// <summary>
+		/// Method to query elevation data in any point in the tile using [0-1] range inputs.
+		/// Input values are clamped for safety and QueryHeightDataNonclamped method should be used for
+		/// higher performance usage.
+		/// </summary>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <returns></returns>
 		public float QueryHeightData(float x, float y)
+		{
+			if (_heightData != null)
+			{
+				return _heightData[(int)(Mathf.Clamp01(y) * 255) * 256 + (int)(Mathf.Clamp01(x) * 255)] * _tileScale;
+			}
+
+			return 0;
+		}
+
+		/// <summary>
+		///  Method to query elevation data in any point in the tile using [0-1] range inputs.
+		/// Input values aren't clamped for improved performance and assuring they are in [0-1] range
+		/// is left to caller.
+		/// </summary>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <returns></returns>
+		public float QueryHeightDataNonclamped(float x, float y)
 		{
 			if (_heightData != null)
 			{
