@@ -82,7 +82,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public RectD Rect { get; private set; }
 		public int InitialZoom { get; private set; }
 		public int CurrentZoom { get; private set; }
-		public float TileScale { get; private set; }
+		public float TileScale;
 		public UnwrappedTileId UnwrappedTileId { get; private set; }
 		public CanonicalTileId CanonicalTileId { get; private set; }
 
@@ -309,9 +309,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		{
 			if (_heightData != null)
 			{
-				var intX = (int)Mathf.Clamp(x * 256, 0, 255);
-				var intY = (int)Mathf.Clamp(y * 256, 0, 255);
-				return _heightData[intY * 256 + intX] * TileScale;
+				return _heightData[(int)(y * 255) * 256 + (int)(x * 255)] * TileScale;
 			}
 
 			return 0;
