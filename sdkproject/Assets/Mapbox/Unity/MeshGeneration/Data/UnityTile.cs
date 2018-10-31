@@ -25,6 +25,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		private Texture2D _loadingTexture;
 		//keeping track of tile objects to be able to cancel them safely if tile is destroyed before data fetching finishes
 		private List<Tile> _tiles = new List<Tile>();
+		[SerializeField] private float _tileScale;
 
 		public bool IsRecycled = false;
 
@@ -82,7 +83,13 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public RectD Rect { get; private set; }
 		public int InitialZoom { get; private set; }
 		public int CurrentZoom { get; private set; }
-		public float TileScale;
+
+		public float TileScale
+		{
+			get { return _tileScale; }
+			private set { _tileScale = value; }
+		}
+
 		public UnwrappedTileId UnwrappedTileId { get; private set; }
 		public CanonicalTileId CanonicalTileId { get; private set; }
 
@@ -161,6 +168,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public event Action<UnityTile> OnVectorDataChanged = delegate { };
 
 		private bool _isInitialized = false;
+
 
 		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, float scale, int zoom, Texture2D loadingTexture = null)
 		{
@@ -309,7 +317,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		{
 			if (_heightData != null)
 			{
-				return _heightData[(int)(y * 255) * 256 + (int)(x * 255)] * TileScale;
+				return _heightData[(int)(y * 255) * 256 + (int)(x * 255)] * _tileScale;
 			}
 
 			return 0;
