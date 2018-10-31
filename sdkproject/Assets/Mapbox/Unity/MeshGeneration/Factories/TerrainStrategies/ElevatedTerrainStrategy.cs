@@ -193,7 +193,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				{
 					_verts[(int) (y * _sampleCount + x)] = new Vector3(
 						_verts[(int) (y * _sampleCount + x)].x,
-						tile.QueryHeightData(x / (_sampleCount - 1), 1 - y / (_sampleCount - 1)),
+						tile.QueryHeightDataNonclamped(x / (_sampleCount - 1), 1 - y / (_sampleCount - 1)),
 						_verts[(int) (y * _sampleCount + x)].z);
 					_normals[(int) (y * _sampleCount + x)] = Mapbox.Unity.Constants.Math.Vector3Zero;
 				}
