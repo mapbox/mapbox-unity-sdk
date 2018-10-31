@@ -1,4 +1,7 @@
 ## CHANGELOG
+### v.2.0.0
+##### Improvements
+- Improve elevated terrain performance.
 
 ### v.2.0.0
 10/15/2018
