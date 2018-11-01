@@ -51,6 +51,11 @@ namespace Mapbox.Unity.Utilities
 			return new Vector2d(v.x, v.z);
 		}
 
+		public static Vector3 Perpendicular(this Vector3 inDirection)
+		{
+			return new Vector3(-inDirection.z, 0, inDirection.x);
+		}
+
 		/// <summary>
 		/// Transform extension method to move a Unity transform to a specific latitude/longitude.
 		/// </summary>
