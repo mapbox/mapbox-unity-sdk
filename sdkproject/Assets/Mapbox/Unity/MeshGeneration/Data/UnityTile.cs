@@ -166,6 +166,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		{
 			ElevationType = TileTerrainType.None;
 			TileScale = scale;
+
 			_relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
 			Rect = Conversions.TileBounds(tileId);
 			UnwrappedTileId = tileId;
@@ -182,7 +183,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			scaleFactor = Mathf.Pow(2, (map.InitialZoom - zoom));
 			gameObject.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
 			gameObject.SetActive(true);
-
+			MeshRenderer.material.SetFloat("_TileScale", TileScale);
 			IsRecycled = false;
 			//MeshRenderer.enabled = true;
 
@@ -233,35 +234,37 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				if (_heightTexture == null)
 				{
 					_heightTexture = new Texture2D(0, 0);
+					_heightTexture.wrapMode = TextureWrapMode.Clamp;
 				}
 
 				_heightTexture.LoadImage(data);
-				byte[] rgbData = _heightTexture.GetRawTextureData();
-
-				// Get rid of this temporary texture. We don't need to bloat memory.
-				_heightTexture.LoadImage(null);
-
-				if (_heightData == null)
-				{
-					_heightData = new float[256 * 256];
-				}
-
-				var relativeScale = useRelative ? _relativeScale : 1f;
-				for (int xx = 0; xx < 256; ++xx)
-				{
-					for (int yy = 0; yy < 256; ++yy)
-					{
-						float r = rgbData[(xx * 256 + yy) * 4 + 1];
-						float g = rgbData[(xx * 256 + yy) * 4 + 2];
-						float b = rgbData[(xx * 256 + yy) * 4 + 3];
-						_heightData[xx * 256 + yy] = relativeScale * heightMultiplier * Conversions.GetAbsoluteHeightFromColor(r, g, b);
-					}
-				}
-
-				if (addCollider && gameObject.GetComponent<MeshCollider>() == null)
-				{
-					gameObject.AddComponent<MeshCollider>();
-				}
+				MeshRenderer.material.SetTexture("_HeightTexture", _heightTexture);
+//				byte[] rgbData = _heightTexture.GetRawTextureData();
+//
+//				// Get rid of this temporary texture. We don't need to bloat memory.
+//				_heightTexture.LoadImage(null);
+//
+//				if (_heightData == null)
+//				{
+//					_heightData = new float[256 * 256];
+//				}
+//
+//				var relativeScale = useRelative ? _relativeScale : 1f;
+//				for (int xx = 0; xx < 256; ++xx)
+//				{
+//					for (int yy = 0; yy < 256; ++yy)
+//					{
+//						float r = rgbData[(xx * 256 + yy) * 4 + 1];
+//						float g = rgbData[(xx * 256 + yy) * 4 + 2];
+//						float b = rgbData[(xx * 256 + yy) * 4 + 3];
+//						_heightData[xx * 256 + yy] = relativeScale * heightMultiplier * Conversions.GetAbsoluteHeightFromColor(r, g, b);
+//					}
+//				}
+//
+//				if (addCollider && gameObject.GetComponent<MeshCollider>() == null)
+//				{
+//					gameObject.AddComponent<MeshCollider>();
+//				}
 
 				HeightDataState = TilePropertyState.Loaded;
 			}
@@ -292,7 +295,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					_rasterData.Compress(false);
 				}
 
-				MeshRenderer.material.mainTexture = _rasterData;
+				//MeshRenderer.material.mainTexture = _rasterData;
+				MeshRenderer.material.SetTexture("_MainTexture", _rasterData);
 				RasterDataState = TilePropertyState.Loaded;
 			}
 		}

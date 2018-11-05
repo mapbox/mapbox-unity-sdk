@@ -56,7 +56,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				tile.ElevationType = TileTerrainType.Elevated;
 			}
 
-			GenerateTerrainMesh(tile);
+			//GenerateTerrainMesh(tile);
 		}
 
 		public override void UnregisterTile(UnityTile tile)
