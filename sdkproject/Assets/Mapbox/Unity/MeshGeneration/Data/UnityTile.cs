@@ -20,7 +20,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		private Texture2D _rasterData;
 		public VectorTile VectorData { get; private set; }
 		private Texture2D _heightTexture;
-		private float[] _heightData;
+		public float[] HeightData;
 
 		private Texture2D _loadingTexture;
 		//keeping track of tile objects to be able to cancel them safely if tile is destroyed before data fetching finishes
@@ -232,7 +232,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				//reset height data
 				if(data == null)
 				{
-					_heightData = new float[256 * 256];
+					HeightData = new float[256 * 256];
 					HeightDataState = TilePropertyState.None;
 					return;
 				}
@@ -249,9 +249,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				// Get rid of this temporary texture. We don't need to bloat memory.
 				_heightTexture.LoadImage(null);
 
-				if (_heightData == null)
+				if (HeightData == null)
 				{
-					_heightData = new float[256 * 256];
+					HeightData = new float[256 * 256];
 				}
 
 				var relativeScale = useRelative ? _relativeScale : 1f;
@@ -263,7 +263,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 						float g = rgbData[(xx * 256 + yy) * 4 + 2];
 						float b = rgbData[(xx * 256 + yy) * 4 + 3];
 						//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
-						_heightData[xx * 256 + yy] = relativeScale * heightMultiplier * (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
+						HeightData[xx * 256 + yy] = relativeScale * heightMultiplier * (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
 					}
 				}
 
@@ -324,9 +324,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		/// <returns></returns>
 		public float QueryHeightData(float x, float y)
 		{
-			if (_heightData != null)
+			if (HeightData != null)
 			{
-				return _heightData[(int)(Mathf.Clamp01(y) * 255) * 256 + (int)(Mathf.Clamp01(x) * 255)] * _tileScale;
+				return HeightData[(int)(Mathf.Clamp01(y) * 255) * 256 + (int)(Mathf.Clamp01(x) * 255)] * _tileScale;
 			}
 
 			return 0;
@@ -342,9 +342,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		/// <returns></returns>
 		public float QueryHeightDataNonclamped(float x, float y)
 		{
-			if (_heightData != null)
+			if (HeightData != null)
 			{
-				return _heightData[(int)(y * 255) * 256 + (int)(x * 255)] * _tileScale;
+				return HeightData[(int)(y * 255) * 256 + (int)(x * 255)] * _tileScale;
 			}
 
 			return 0;

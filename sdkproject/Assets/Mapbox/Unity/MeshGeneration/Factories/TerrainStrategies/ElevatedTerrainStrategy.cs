@@ -187,13 +187,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			_normals = _dataArrays[tile.UnwrappedTileId].Normals;
 
 			var _sampleCount = _elevationOptions.modificationOptions.sampleCount;
+			var hd = tile.HeightData;
+			var ts = tile.TileScale;
 			for (float y = 0; y < _sampleCount; y++)
 			{
 				for (float x = 0; x < _sampleCount; x++)
 				{
 					_verts[(int) (y * _sampleCount + x)] = new Vector3(
 						_verts[(int) (y * _sampleCount + x)].x,
-						tile.QueryHeightDataNonclamped(x / (_sampleCount - 1), 1 - y / (_sampleCount - 1)),
+						hd[((int)((1 - y / (_sampleCount - 1)) * 255) * 256) + ((int)(x / (_sampleCount - 1) * 255))] * ts,
 						_verts[(int) (y * _sampleCount + x)].z);
 					_normals[(int) (y * _sampleCount + x)] = Mapbox.Unity.Constants.Math.Vector3Zero;
 				}
