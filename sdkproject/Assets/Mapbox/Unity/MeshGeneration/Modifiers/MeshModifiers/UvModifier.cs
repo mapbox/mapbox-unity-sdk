@@ -80,7 +80,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 			else if (_options.texturingType == UvMapType.Atlas || _options.texturingType == UvMapType.AtlasWithColorPalette)
 			{
-				_currentFacade = _options.atlasInfo.Roofs[UnityEngine.Random.Range(0, _options.atlasInfo.Roofs.Count)];
+				int roofIndex = feature.Random.Range(0, _options.atlasInfo.Roofs.Count, (int)feature.Data.Id);
+
+				_currentFacade = _options.atlasInfo.Roofs[roofIndex];
 
 				minx = float.MaxValue;
 				miny = float.MaxValue;

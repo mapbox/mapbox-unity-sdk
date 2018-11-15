@@ -108,8 +108,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				_scale = tile.TileScale;
 
 			//facade texture to decorate this building
+			int facade = feature.Random.Range(0, _options.atlasInfo.Textures.Count, (int)feature.Data.Id);
+
 			_currentFacade =
-				_options.atlasInfo.Textures[UnityEngine.Random.Range(0, _options.atlasInfo.Textures.Count)];
+				_options.atlasInfo.Textures[facade];
 			//rect is a struct so we're caching this
 			_currentTextureRect = _currentFacade.TextureRect;
 

@@ -6,6 +6,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 	using UnityEngine;
 	using Mapbox.Utils;
 	using Mapbox.Unity.Utilities;
+	using Mapbox.Unity.Map;
+	using Mapbox.Map;
 
 	public class VectorFeatureUnity
 	{
@@ -21,17 +23,29 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		private List<Vector3> _newPoints = new List<Vector3>();
 		private List<List<Point2d<float>>> _geom;
 
+		private MapboxRandom mapboxRandom;
+
+		public MapboxRandom Random
+		{
+			get
+			{
+				return mapboxRandom;
+			} 
+		}
+
 		public VectorFeatureUnity()
 		{
 			Points = new List<List<Vector3>>();
 		}
 
-		public VectorFeatureUnity(VectorTileFeature feature, UnityTile tile, float layerExtent, bool buildingsWithUniqueIds = false)
+		public VectorFeatureUnity(VectorTileFeature feature, UnityTile tile, float layerExtent, MapboxRandom random, bool buildingsWithUniqueIds = false)
 		{
 			Data = feature;
 			Properties = Data.GetProperties();
 			Points.Clear();
 			Tile = tile;
+
+			mapboxRandom = random;
 
 			//this is a temp hack until we figure out how streets ids works
 			if (buildingsWithUniqueIds == true) //ids from building dataset is big ulongs 
@@ -60,13 +74,15 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		public VectorFeatureUnity(VectorTileFeature feature, List<List<Point2d<float>>> geom, UnityTile tile, float layerExtent, bool buildingsWithUniqueIds = false)
+		public VectorFeatureUnity(VectorTileFeature feature, List<List<Point2d<float>>> geom, UnityTile tile, float layerExtent, MapboxRandom random, bool buildingsWithUniqueIds = false, string _latLon = null)
 		{
 			Data = feature;
 			Properties = Data.GetProperties();
 			Points.Clear();
 			Tile = tile;
 			_geom = geom;
+
+			mapboxRandom = random;
 
 			_rectSizex = tile.Rect.Size.x;
 			_rectSizey = tile.Rect.Size.y;
@@ -90,7 +106,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			////first check tile
 			var coordinateTileId = Conversions.LatitudeLongitudeToTileId(
 				coord.x, coord.y, Tile.CurrentZoom);
-
+			
 			if (Points.Count > 0)
 			{
 				var from = Conversions.LatLonToMeters(coord.x, coord.y);

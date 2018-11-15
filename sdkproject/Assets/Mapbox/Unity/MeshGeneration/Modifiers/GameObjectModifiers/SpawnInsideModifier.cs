@@ -59,23 +59,25 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			var area = (int)(bounds.size.x * bounds.size.z);
 			int spawnCount = Mathf.Min(area / _spawnRateInSquareMeters, _maxSpawn);
+
+			ve.Feature.Random.Init((int)ve.Feature.Data.Id);
+
 			while (_spawnedCount < spawnCount)
 			{
-				var x = UnityEngine.Random.Range(-bounds.extents.x, bounds.extents.x);
-				var z = UnityEngine.Random.Range(-bounds.extents.z, bounds.extents.z);
+				var x = ve.Feature.Random.Range(-bounds.extents.x, bounds.extents.x);
+				var z = ve.Feature.Random.Range(-bounds.extents.z, bounds.extents.z);
+
 				var ray = new Ray(bounds.center + new Vector3(x, 100, z), Vector3.down * 2000);
 
 				RaycastHit hit;
-				//Debug.DrawRay(ray.origin, ray.direction * 1000, Color.yellow, 1000);
 				if (Physics.Raycast(ray, out hit, 150, _layerMask))
 				{
-					//Debug.DrawLine(ray.origin, hit.point, Color.red, 1000);
-					var index = UnityEngine.Random.Range(0, _prefabs.Length);
+					var index = ve.Feature.Random.Range(0, _prefabs.Length);
 					var transform = GetObject(index, ve.GameObject).transform;
 					transform.position = hit.point;
 					if (_randomizeRotation)
 					{
-						transform.localEulerAngles = new Vector3(0, UnityEngine.Random.Range(-180f, 180f), 0);
+						transform.localEulerAngles = new Vector3(0, ve.Feature.Random.Range(-180f, 180f), 0);
 					}
 					if (!_scaleDownWithWorld)
 					{
@@ -85,7 +87,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					if (_randomizeScale)
 					{
 						var scale = transform.localScale;
-						var y = UnityEngine.Random.Range(scale.y * .7f, scale.y * 1.3f);
+						var y = ve.Feature.Random.Range(scale.y * .7f, scale.y * 1.3f);
 						scale.y = y;
 						transform.localScale = scale;
 					}
