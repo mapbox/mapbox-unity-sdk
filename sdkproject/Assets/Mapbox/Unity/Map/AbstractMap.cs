@@ -46,6 +46,8 @@ namespace Mapbox.Unity.Map
 		#endregion
 
 		#region Properties
+		public bool IsPreviewEnabled = false;
+
 		public AbstractMapVisualizer MapVisualizer
 		{
 			get
@@ -117,19 +119,6 @@ namespace Mapbox.Unity.Map
 				return _terrain;
 			}
 		}
-
-		public bool _isPreviewEnabled = false;
-
-		// Doesn't destroy all children for some reason
-//		[UnityEditor.Callbacks.DidReloadScripts]
-//		private static void OnScriptsReloaded()
-//		{
-//			Debug.Log("OnScriptsReloaded");
-//			foreach (Transform tileObject in FindObjectOfType<AbstractMap>().transform)
-//			{
-//				DestroyImmediate(tileObject.gameObject);
-//			}
-//		}
 
 		/// <summary>
 		/// The vector data.
@@ -455,6 +444,7 @@ namespace Mapbox.Unity.Map
 
 		public void DisableEditorPreview()
 		{
+			TileProvider = null;
 			_imagery.UpdateLayer -= OnImageOrTerrainUpdateLayer;
 			_terrain.UpdateLayer -= OnImageOrTerrainUpdateLayer;
 			_vectorData.SubLayerRemoved -= OnVectorDataSubLayerRemoved;
@@ -514,7 +504,6 @@ namespace Mapbox.Unity.Map
 		protected virtual void TileProvider_OnTileAdded(UnwrappedTileId tileId)
 		{
 			var tile = _mapVisualizer.LoadTile(tileId);
-
 			if (Options.placementOptions.snapMapToZero && !_worldHeightFixed)
 			{
 				_worldHeightFixed = true;
@@ -524,10 +513,7 @@ namespace Mapbox.Unity.Map
 				}
 				else
 				{
-					tile.OnHeightDataChanged += (s) =>
-					{
-						ApplySnapWorldToZero(tile);
-					};
+					tile.OnHeightDataChanged += (s) => { ApplySnapWorldToZero(tile); };
 				}
 			}
 		}
@@ -610,7 +596,10 @@ namespace Mapbox.Unity.Map
 			_options.extentOptions.defaultExtents.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
 			{
 				//take care of redraw map business...
-				_tileProvider.UpdateTileExtent();
+				if (_tileProvider != null)
+				{
+					_tileProvider.UpdateTileExtent();
+				}
 			};
 
 			_options.placementOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>

@@ -36,7 +36,10 @@ namespace Mapbox.Unity.Map.TileProviders
 
 		public virtual void OnExtentChanged()
 		{
-			ExtentChanged(this, _currentExtent);
+			if (ExtentChanged != null)
+			{
+				ExtentChanged(this, _currentExtent);
+			}
 		}
 
 		public abstract void OnInitialized();
@@ -51,7 +54,7 @@ namespace Mapbox.Unity.Map.TileProviders
 
 		public virtual void UpdateTileProvider()
 		{
-			
+
 		}
 	}
 }

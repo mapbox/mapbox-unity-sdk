@@ -103,7 +103,7 @@
 			EditorGUILayout.BeginVertical();
 			EditorGUILayout.Space();
 
-			var prevProp = serializedObject.FindProperty("_isPreviewEnabled");
+			var prevProp = serializedObject.FindProperty("IsPreviewEnabled");
 			var prev = prevProp.boolValue;
 			prevProp.boolValue = GUILayout.Toggle(prevProp.boolValue, "Enable Preview");
 			if (prevProp.boolValue && !prev)
