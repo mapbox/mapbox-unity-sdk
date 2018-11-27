@@ -48,5 +48,10 @@ namespace Mapbox.Unity.Map.TileProviders
 		{
 			_options = options;
 		}
+
+		public virtual void UpdateTileProvider()
+		{
+			
+		}
 	}
 }

@@ -108,7 +108,7 @@
 			prevProp.boolValue = GUILayout.Toggle(prevProp.boolValue, "Enable Preview");
 			if (prevProp.boolValue && !prev)
 			{
-				((AbstractMap)serializedObject.targetObject).EditorPreview();
+				((AbstractMap)serializedObject.targetObject).EnableEditorPreview();
 			}
 			else if(prev && !prevProp.boolValue)
 			{

@@ -293,7 +293,10 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					_rasterData.Compress(false);
 				}
 
-				MeshRenderer.material.mainTexture = _rasterData;
+				Material material = new Material(MeshRenderer.sharedMaterial);
+				material.mainTexture = _rasterData;
+				MeshRenderer.sharedMaterial = material;
+				
 				RasterDataState = TilePropertyState.Loaded;
 			}
 		}

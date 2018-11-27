@@ -182,7 +182,7 @@ namespace Mapbox.Unity.Map.TileProviders
 			return ray.GetPoint(distance);
 		}
 
-		public virtual void Update()
+		public override void UpdateTileProvider()
 		{
 			if (_cbtpOptions != null && _cbtpOptions.camera != null && _cbtpOptions.camera.transform.hasChanged)
 			{

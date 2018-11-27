@@ -45,19 +45,26 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			{
 				tile.MeshFilter.sharedMesh.Clear();
 				// HACK: This is here in to make the system trigger a finished state.
-				tile.MeshFilter.sharedMesh = GetQuad(tile, _elevationOptions.sideWallOptions.isActive);
+				GetQuad(tile, _elevationOptions.sideWallOptions.isActive);
 				tile.ElevationType = TileTerrainType.Flat;
 			}
 		}
 
-		private Mesh GetQuad(UnityTile tile, bool buildSide)
+		private void GetQuad(UnityTile tile, bool buildSide)
 		{
 			if (_cachedQuad != null)
 			{
-				return _cachedQuad;
+				var mesh = tile.MeshFilter.sharedMesh;
+				mesh.vertices = _cachedQuad.vertices;
+				mesh.normals = _cachedQuad.normals;
+				mesh.tangents = _cachedQuad.tangents;
+				mesh.triangles = _cachedQuad.triangles;
+				mesh.uv = _cachedQuad.uv;
 			}
-
-			return buildSide ? BuildQuadWithSides(tile) : BuildQuad(tile);
+			else
+			{
+				tile.MeshFilter.sharedMesh = buildSide ? BuildQuadWithSides(tile) : BuildQuad(tile);
+			}
 		}
 
 		Mesh BuildQuad(UnityTile tile)

@@ -25,6 +25,7 @@ namespace Mapbox.Unity.Map
 	public class AbstractMap : MonoBehaviour, IMap
 	{
 		#region Private Fields
+
 		[SerializeField] private MapOptions _options = new MapOptions();
 		[SerializeField] private bool _initializeOnStart = true;
 		[SerializeField] protected ImageryLayer _imagery = new ImageryLayer();
@@ -118,31 +119,17 @@ namespace Mapbox.Unity.Map
 		}
 
 		public bool _isPreviewEnabled = false;
-		public void EditorPreview()
-		{
-			SetUpMap();
-		}
 
-		[UnityEditor.Callbacks.DidReloadScripts]
-		private static void OnScriptsReloaded()
-		{
-			Debug.Log("OnScriptsReloaded");
-			foreach (Transform tileObject in FindObjectOfType<AbstractMap>().transform)
-			{
-				DestroyImmediate(tileObject.gameObject);
-			}
-		}
-
-		public void DisableEditorPreview()
-		{
-			_imagery.UpdateLayer -= OnImageOrTerrainUpdateLayer;
-			_terrain.UpdateLayer -= OnImageOrTerrainUpdateLayer;
-			_vectorData.SubLayerRemoved -= OnVectorDataSubLayerRemoved;
-			_vectorData.SubLayerAdded -= OnVectorDataSubLayerAdded;
-			_vectorData.UpdateLayer -= OnVectorDataUpdateLayer;
-			_vectorData.UnbindAllEvents();
-			_mapVisualizer.ClearMap();
-		}
+		// Doesn't destroy all children for some reason
+//		[UnityEditor.Callbacks.DidReloadScripts]
+//		private static void OnScriptsReloaded()
+//		{
+//			Debug.Log("OnScriptsReloaded");
+//			foreach (Transform tileObject in FindObjectOfType<AbstractMap>().transform)
+//			{
+//				DestroyImmediate(tileObject.gameObject);
+//			}
+//		}
 
 		/// <summary>
 		/// The vector data.
@@ -324,6 +311,15 @@ namespace Mapbox.Unity.Map
 			SetUpMap();
 		}
 
+		//Unity Update
+		private void Update()
+		{
+			if (_tileProvider != null)
+			{
+				_tileProvider.UpdateTileProvider();
+			}
+		}
+
 		public virtual void UpdateMap()
 		{
 			UpdateMap(Conversions.StringToLatLon(_options.locationOptions.latitudeLongitude), Zoom);
@@ -434,10 +430,9 @@ namespace Mapbox.Unity.Map
 		protected virtual void Awake()
 		{
 			// Setup a visualizer to get a "Starter" map.
-
 			foreach (Transform tr in transform)
 			{
-				DestroyImmediate(tr.gameObject);
+				Destroy(tr.gameObject);
 			}
 
 			_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
@@ -451,6 +446,22 @@ namespace Mapbox.Unity.Map
 			{
 				SetUpMap();
 			}
+		}
+
+		public void EnableEditorPreview()
+		{
+			SetUpMap();
+		}
+
+		public void DisableEditorPreview()
+		{
+			_imagery.UpdateLayer -= OnImageOrTerrainUpdateLayer;
+			_terrain.UpdateLayer -= OnImageOrTerrainUpdateLayer;
+			_vectorData.SubLayerRemoved -= OnVectorDataSubLayerRemoved;
+			_vectorData.SubLayerAdded -= OnVectorDataSubLayerAdded;
+			_vectorData.UpdateLayer -= OnVectorDataUpdateLayer;
+			_vectorData.UnbindAllEvents();
+			_mapVisualizer.ClearMap();
 		}
 
 		protected IEnumerator SetupAccess()
