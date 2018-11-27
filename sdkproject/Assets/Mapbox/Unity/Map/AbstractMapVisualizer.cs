@@ -259,6 +259,24 @@ namespace Mapbox.Unity.Map
 
 		protected abstract void PlaceTile(UnwrappedTileId tileId, UnityTile tile, IMapReadable map);
 
+		public void ClearMap()
+		{
+			UnregisterAllTiles();
+			ClearCaches();
+
+			foreach (var tileId in _activeTiles.Keys.ToList())
+			{
+				DisposeTile(tileId);
+			}
+
+			foreach (var tile in _inactiveTiles)
+			{
+				DestroyImmediate(tile.gameObject);
+			}
+
+			_inactiveTiles.Clear();
+		}
+
 		#region Events
 		/// <summary>
 		/// The  <c>OnTileError</c> event triggers when there's a <c>Tile</c> error.
@@ -352,5 +370,7 @@ namespace Mapbox.Unity.Map
 			}
 		}
 		#endregion
+
+
 	}
 }

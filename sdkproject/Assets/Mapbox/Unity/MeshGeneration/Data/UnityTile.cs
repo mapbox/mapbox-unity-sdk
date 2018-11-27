@@ -197,7 +197,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		{
 			if (_loadingTexture && MeshRenderer != null)
 			{
-				MeshRenderer.material.mainTexture = _loadingTexture;
+				MeshRenderer.sharedMaterial.mainTexture = _loadingTexture;
 				//MeshRenderer.enabled = false;
 			}
 
@@ -293,7 +293,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					_rasterData.Compress(false);
 				}
 
-				MeshRenderer.sharedMaterial.mainTexture = _rasterData;
+				MeshRenderer.material.mainTexture = _rasterData;
 				RasterDataState = TilePropertyState.Loaded;
 			}
 		}

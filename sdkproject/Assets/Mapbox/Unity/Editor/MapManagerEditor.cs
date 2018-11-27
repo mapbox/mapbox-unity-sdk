@@ -11,7 +11,6 @@
 	[CanEditMultipleObjects]
 	public class MapManagerEditor : Editor
 	{
-
 		private string objectId = "";
 		/// <summary>
 		/// Gets or sets a value indicating whether to show general section <see cref="T:Mapbox.Editor.MapManagerEditor"/>.
@@ -104,10 +103,16 @@
 			EditorGUILayout.BeginVertical();
 			EditorGUILayout.Space();
 
-			if (GUILayout.Button(new GUIContent("Preview"), (GUIStyle)"minibutton"))
+			var prevProp = serializedObject.FindProperty("_isPreviewEnabled");
+			var prev = prevProp.boolValue;
+			prevProp.boolValue = GUILayout.Toggle(prevProp.boolValue, "Enable Preview");
+			if (prevProp.boolValue && !prev)
 			{
-				Debug.Log("Preview !!");
 				((AbstractMap)serializedObject.targetObject).EditorPreview();
+			}
+			else if(prev && !prevProp.boolValue)
+			{
+				((AbstractMap)serializedObject.targetObject).DisableEditorPreview();
 			}
 
 			ShowGeneral = EditorGUILayout.Foldout(ShowGeneral, new GUIContent { text = "GENERAL", tooltip = "Options related to map data" });

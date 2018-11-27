@@ -28,7 +28,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			}
 
 			if (tile.RasterDataState != Enums.TilePropertyState.Loaded ||
-			    tile.MeshFilter.mesh.vertexCount != RequiredVertexCount)
+			    tile.MeshFilter.sharedMesh.vertexCount != RequiredVertexCount)
 			{
 				if (_elevationOptions.sideWallOptions.isActive)
 				{
@@ -43,7 +43,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 
 			if ((int)tile.ElevationType != (int)ElevationLayerType.FlatTerrain)
 			{
-				tile.MeshFilter.mesh.Clear();
+				tile.MeshFilter.sharedMesh.Clear();
 				// HACK: This is here in to make the system trigger a finished state.
 				tile.MeshFilter.sharedMesh = GetQuad(tile, _elevationOptions.sideWallOptions.isActive);
 				tile.ElevationType = TileTerrainType.Flat;

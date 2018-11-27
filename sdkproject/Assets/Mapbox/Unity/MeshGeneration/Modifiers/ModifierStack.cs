@@ -240,7 +240,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 			foreach (var vectorEntity in _pool.GetQueue())
 			{
-				Destroy(vectorEntity.GameObject);
+				DestroyImmediate(vectorEntity.GameObject);
 			}
 
 			foreach (var tileTuple in _activeObjects)
