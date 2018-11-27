@@ -364,9 +364,12 @@ namespace Mapbox.Unity.Map
 
 		public void ClearCaches()
 		{
-			foreach (var abstractTileFactory in Factories)
+			if (Factories != null)
 			{
-				abstractTileFactory.Reset();
+				foreach (var abstractTileFactory in Factories)
+				{
+					abstractTileFactory.Reset();
+				}
 			}
 		}
 		#endregion
