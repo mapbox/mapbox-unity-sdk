@@ -18,8 +18,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		private readonly float _cosHalfSharpCorner = Mathf.Cos(75f / 2f * (Mathf.PI / 180f));
 		private readonly float _sharpCornerOffset = 15f;
-		private readonly float _miterLimit = 0.2f;
-		private readonly float _roundLimit = 1.05f;
 
 		#endregion
 
@@ -170,7 +168,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 					if (middleVertex && currentJoin == JoinType.Round)
 					{
-						if (miterLength < _roundLimit)
+						if (miterLength < _options.RoundLimit)
 						{
 							currentJoin = JoinType.Miter;
 						}
@@ -180,7 +178,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						}
 					}
 
-					if (currentJoin == JoinType.Miter && miterLength > _miterLimit)
+					if (currentJoin == JoinType.Miter && miterLength > _options.MiterLimit)
 					{
 						currentJoin = JoinType.Bevel;
 					}
@@ -196,7 +194,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 						// If the miterLength is really small and the line bevel wouldn't be visible,
 						// just draw a miter join to save a triangle.
-						if (miterLength < _miterLimit)
+						if (miterLength < _options.MiterLimit)
 						{
 							currentJoin = JoinType.Miter;
 						}
