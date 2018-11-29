@@ -33,7 +33,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 	/// <summary>
 	/// Height Modifier is responsible for the y axis placement of the feature. It pushes the original vertices upwards by "height" value and creates side walls around that new polygon down to "min_height" value.
-	/// It also checkes for "ele" (elevation) value used for contour lines in Mapbox Terrain data. 
+	/// It also checkes for "ele" (elevation) value used for contour lines in Mapbox Terrain data.
 	/// Height Modifier also creates a continuous UV mapping for side walls.
 	/// </summary>
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Height Modifier")]
@@ -90,7 +90,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			minHeight = minHeight * _options.extrusionScaleFactor * _scale;
 			height = (maxHeight - minHeight);
 
-			//Set roof height 
+			//Set roof height
 			GenerateRoofMesh(md, minHeight, maxHeight);
 
 			GenerateWallMesh(md);
@@ -126,8 +126,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					md.Vertices.Add(new Vector3(v1.x, v1.y - height, v1.z));
 					md.Vertices.Add(new Vector3(v2.x, v2.y - height, v2.z));
 
-					//d = (v2 - v1).magnitude;
-					d = Mathf.Sqrt((v2.x - v1.x) + (v2.y - v1.y) + (v2.z - v1.z));
+					d = (v2 - v1).magnitude;
 					norm = Vector3.Normalize(Vector3.Cross(v2 - v1, md.Vertices[ind + 2] - v1));
 					md.Normals.Add(norm);
 					md.Normals.Add(norm);
