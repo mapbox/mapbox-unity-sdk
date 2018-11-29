@@ -83,20 +83,20 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		public override void Run(VectorFeatureUnity feature, MeshData md, float scale)
 		{
 			_scaledWidth = _options.Width * scale;
-			ExtureLine(feature, md);
+			ExtrudeLine(feature, md);
 		}
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
 			_scaledWidth = tile != null ? _options.Width * tile.TileScale : _options.Width;
-			ExtureLine(feature, md);
+			ExtrudeLine(feature, md);
 		}
 
 		#endregion
 
 		#region Mesh Generations
 
-		private void ExtureLine(VectorFeatureUnity feature, MeshData md)
+		private void ExtrudeLine(VectorFeatureUnity feature, MeshData md)
 		{
 			if (feature.Points.Count < 1)
 			{
