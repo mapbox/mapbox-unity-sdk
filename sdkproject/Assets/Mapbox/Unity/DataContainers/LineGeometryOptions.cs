@@ -9,11 +9,6 @@ namespace Mapbox.Unity.Map
 	[Serializable]
 	public class LineGeometryOptions : ModifierProperties, ISubLayerLineGeometryOptions
 	{
-		public readonly float CosHalfSharpCorner = Mathf.Cos(75f / 2f * (Mathf.PI / 180f));
-		public readonly float SharpCornerOffset = 15f;
-		public readonly float MiterLimit = 2f;
-		public readonly float RoundLimit = 1.05f;
-
 		public override Type ModifierType
 		{
 			get
@@ -24,6 +19,12 @@ namespace Mapbox.Unity.Map
 
 		[Tooltip("Width of the line feature.")]
 		public float Width = 1.0f;
+
+		[Tooltip("Miter Limit")]
+		public float MiterLimit = 0.2f;
+
+		[Tooltip("Round Limit")]
+		public float RoundLimit = 1.05f;
 
 		[Tooltip("Join type of the line feature")]
 		public JoinType JoinType = JoinType.Round;

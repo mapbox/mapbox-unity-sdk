@@ -1,7 +1,9 @@
 ## CHANGELOG
-### v.1.4.6
+### v.2.0.1
 ##### Improvements
-- Reworked line meshes generator 
+- Improves line mesh generation, adds options for join and cap types. Users have greater control over quality and styles of line meshes.
+#### Bug Fixes
+- Fixes a bug with uv calculation which caused textures to be stretched intead of tiled.
 
 ### v.2.0.0
 10/15/2018
