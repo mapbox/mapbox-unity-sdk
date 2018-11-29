@@ -290,12 +290,29 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					_rasterData.Compress(false);
 				}
 
+				Material material;
 
-				Material material = new Material(MeshRenderer.sharedMaterial);
+				if(MeshRenderer.sharedMaterial != null)
+				{
+					material = new Material(MeshRenderer.sharedMaterial);
+
+					if (Application.isEditor && !Application.isPlaying)
+					{
+						DestroyImmediate(MeshRenderer.sharedMaterial, true);
+					}
+					else
+					{
+						Destroy(MeshRenderer.sharedMaterial);
+					}
+				}
+				else
+				{
+					material = new Material(Shader.Find("Standard"));
+				}
+
 				material.mainTexture = _rasterData;
 				MeshRenderer.sharedMaterial = material;
 
-				//MeshRenderer.material.mainTexture = _rasterData;
 				RasterDataState = TilePropertyState.Loaded;
 			}
 		}
