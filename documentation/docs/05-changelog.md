@@ -2,8 +2,10 @@
 ### v.2.0.1
 ##### Improvements
 - Improves line mesh generation, adds options for join and cap types. Users have greater control over quality and styles of line meshes.
+- Remove UV Modifier class and merge the functionality into polygon mesh modifier.
 #### Bug Fixes
 - Fixes a bug with uv calculation which caused textures to be stretched intead of tiled.
+
 
 ### v.2.0.0
 10/15/2018
