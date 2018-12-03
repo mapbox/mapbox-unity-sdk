@@ -759,6 +759,11 @@ namespace Mapbox.Unity.Map
 			TriggerTileRedrawForExtent(currentExtent);
 		}
 
+		void OnEnable()
+		{
+			IsPreviewEnabled = false;
+		}
+
 		// TODO: implement IDisposable, instead?
 		protected virtual void OnDestroy()
 		{

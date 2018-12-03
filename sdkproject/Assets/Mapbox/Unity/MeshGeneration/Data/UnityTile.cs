@@ -165,6 +165,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, float scale, int zoom, Texture2D loadingTexture = null)
 		{
+			gameObject.hideFlags = HideFlags.DontSave;
+
 			ElevationType = TileTerrainType.None;
 			TileScale = scale;
 			_relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
