@@ -79,12 +79,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 					tile.MeshFilter.mesh = mesh;
 				}
 
-				_dataArrays.Add(tile.UnwrappedTileId, new MeshDataArray()
+				if (!_dataArrays.ContainsKey(tile.UnwrappedTileId))
 				{
-					Normals = tile.MeshFilter.mesh.normals,
-					Vertices = tile.MeshFilter.mesh.vertices,
-					Triangles = tile.MeshFilter.mesh.triangles
-				});
+					_dataArrays.Add(tile.UnwrappedTileId, new MeshDataArray()
+					{
+						Normals = tile.MeshFilter.mesh.normals,
+						Vertices = tile.MeshFilter.mesh.vertices,
+						Triangles = tile.MeshFilter.mesh.triangles
+					});
+				}
 			}
 			else
 			{
