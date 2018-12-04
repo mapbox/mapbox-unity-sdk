@@ -4,6 +4,8 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using Mapbox.Unity.Telemetry;
+
 namespace Mapbox.Platform
 {
 	using Mapbox.Map;
@@ -84,18 +86,11 @@ namespace Mapbox.Platform
 		{
 			if (!string.IsNullOrEmpty(_accessToken))
 			{
-				var uriBuilder = new UriBuilder(url);
-				string accessTokenQuery = "access_token=" + _accessToken;
-				if (uriBuilder.Query != null && uriBuilder.Query.Length > 1)
+				url = url + "?" + TelemetryFactory.EventQuery;
+				if (!string.IsNullOrEmpty(_accessToken))
 				{
-					uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery;
+					url += "&access_token=" + _accessToken;
 				}
-				else
-				{
-					uriBuilder.Query = accessTokenQuery;
-				}
-
-				url = uriBuilder.ToString();
 			}
 
 			// TODO:
