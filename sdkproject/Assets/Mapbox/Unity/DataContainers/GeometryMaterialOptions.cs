@@ -175,8 +175,8 @@
 		}
 
 		/// <summary>
-		/// Sets up default values for GeometryMaterial Options. 
-		/// If style is set to Custom, user defined values will be used. 
+		/// Sets up default values for GeometryMaterial Options.
+		/// If style is set to Custom, user defined values will be used.
 		/// </summary>
 		public void SetDefaultMaterialOptions()
 		{
@@ -293,7 +293,7 @@
 		{
 			get
 			{
-				return typeof(UvModifier);
+				return typeof(PolygonMeshModifier);
 			}
 		}
 		public StyleTypes style;
