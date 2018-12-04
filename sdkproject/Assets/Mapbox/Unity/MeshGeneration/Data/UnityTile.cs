@@ -195,7 +195,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			gameObject.SetActive(true);
 
 			IsRecycled = false;
-			//MeshRenderer.enabled = true;
 
 
 			// Setup Loading as initial state - Unregistered
@@ -208,7 +207,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			if (_loadingTexture && MeshRenderer != null)
 			{
 				MeshRenderer.sharedMaterial.mainTexture = _loadingTexture;
-				//MeshRenderer.enabled = false;
 			}
 
 			gameObject.SetActive(false);
@@ -304,10 +302,29 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					_rasterData.Compress(false);
 				}
 
-				Material material = new Material(MeshRenderer.sharedMaterial);
+				Material material;
+
+				if(MeshRenderer.sharedMaterial != null)
+				{
+					material = new Material(MeshRenderer.sharedMaterial);
+
+					if (Application.isEditor && !Application.isPlaying)
+					{
+						DestroyImmediate(MeshRenderer.sharedMaterial, true);
+					}
+					else
+					{
+						Destroy(MeshRenderer.sharedMaterial);
+					}
+				}
+				else
+				{
+					material = new Material(Shader.Find("Standard"));
+				}
+
 				material.mainTexture = _rasterData;
 				MeshRenderer.sharedMaterial = material;
-				
+
 				RasterDataState = TilePropertyState.Loaded;
 			}
 		}
