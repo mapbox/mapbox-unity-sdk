@@ -156,6 +156,7 @@
 			if (GUILayout.Button(new GUIContent(" X "), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
 			{
 				vectorFilterOptions.RemoveFilter(index);
+				EditorUtility.SetDirty(property.serializedObject.targetObject);
 			}
 
 			EditorGUILayout.EndHorizontal();
