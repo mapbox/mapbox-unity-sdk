@@ -105,7 +105,7 @@
 
 			var prevProp = serializedObject.FindProperty("IsPreviewEnabled");
 			var prev = prevProp.boolValue;
-			prevProp.boolValue = GUILayout.Toggle(prevProp.boolValue, "Enable Preview");
+			prevProp.boolValue = GUILayout.Toggle(prevProp.boolValue, "Enable Preview", "Button");
 			if (prevProp.boolValue && !prev)
 			{
 				((AbstractMap)serializedObject.targetObject).EnableEditorPreview();
@@ -114,6 +114,8 @@
 			{
 				((AbstractMap)serializedObject.targetObject).DisableEditorPreview();
 			}
+
+			EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 
 			ShowGeneral = EditorGUILayout.Foldout(ShowGeneral, new GUIContent { text = "GENERAL", tooltip = "Options related to map data" });
 
