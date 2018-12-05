@@ -12,7 +12,7 @@
 	public class MapManagerEditor : Editor
 	{
 		private string objectId = "";
-		private Color previewButtonColor = new Color(0.8f, 1.0f, 0.8f);
+		private Color previewButtonColor = new Color(0.7f, 1.0f, 0.7f);
 		/// <summary>
 		/// Gets or sets a value indicating whether to show general section <see cref="T:Mapbox.Editor.MapManagerEditor"/>.
 		/// </summary>
@@ -106,9 +106,14 @@
 
 			var prevProp = serializedObject.FindProperty("IsPreviewEnabled");
 			var prev = prevProp.boolValue;
+
 			Color guiColor = GUI.color;
-			GUI.color = previewButtonColor;
-			prevProp.boolValue = GUILayout.Toggle(prevProp.boolValue, "Enable Preview", "Button");
+			GUI.color = (prev) ? previewButtonColor : guiColor;
+
+			GUIStyle style = new GUIStyle("Button");
+			style.alignment = TextAnchor.MiddleCenter;
+
+			prevProp.boolValue = GUILayout.Toggle(prevProp.boolValue, "Enable Preview", style);
 			GUI.color = guiColor;
 			if (prevProp.boolValue && !prev)
 			{
