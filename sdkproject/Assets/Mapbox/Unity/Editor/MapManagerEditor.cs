@@ -12,6 +12,7 @@
 	public class MapManagerEditor : Editor
 	{
 		private string objectId = "";
+		private Color previewButtonColor = new Color(0.7f, 1.0f, 0.7f);
 		/// <summary>
 		/// Gets or sets a value indicating whether to show general section <see cref="T:Mapbox.Editor.MapManagerEditor"/>.
 		/// </summary>
@@ -105,7 +106,15 @@
 
 			var prevProp = serializedObject.FindProperty("IsPreviewEnabled");
 			var prev = prevProp.boolValue;
-			prevProp.boolValue = GUILayout.Toggle(prevProp.boolValue, "Enable Preview");
+
+			Color guiColor = GUI.color;
+			GUI.color = (prev) ? previewButtonColor : guiColor;
+
+			GUIStyle style = new GUIStyle("Button");
+			style.alignment = TextAnchor.MiddleCenter;
+
+			prevProp.boolValue = GUILayout.Toggle(prevProp.boolValue, "Enable Preview", style);
+			GUI.color = guiColor;
 			if (prevProp.boolValue && !prev)
 			{
 				((AbstractMap)serializedObject.targetObject).EnableEditorPreview();
@@ -114,6 +123,8 @@
 			{
 				((AbstractMap)serializedObject.targetObject).DisableEditorPreview();
 			}
+
+			EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 
 			ShowGeneral = EditorGUILayout.Foldout(ShowGeneral, new GUIContent { text = "GENERAL", tooltip = "Options related to map data" });
 
