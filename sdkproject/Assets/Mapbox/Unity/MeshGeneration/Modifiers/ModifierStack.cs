@@ -58,6 +58,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				var go = new GameObject();
 				var mf = go.AddComponent<MeshFilter>();
 				mf.sharedMesh = new Mesh();
+				mf.sharedMesh.name = "feature";
 				var mr = go.AddComponent<MeshRenderer>();
 				_tempVectorEntity = new VectorEntity()
 				{
@@ -232,14 +233,25 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			return _tempVectorEntity.GameObject;
 		}
 
-		public override void ClearCaches()
+		public override void Clear()
 		{
+			foreach (var modifier in MeshModifiers)
+			{
+				DestroyImmediate(modifier);
+			}
+
 			foreach (var modifier in GoModifiers)
 			{
-				modifier.ClearCaches();
+				modifier.Clear();
+				DestroyImmediate(modifier);
 			}
 			foreach (var vectorEntity in _pool.GetQueue())
 			{
+				if (vectorEntity.Mesh != null)
+				{
+					DestroyImmediate(vectorEntity.Mesh, true);
+				}
+
 				DestroyImmediate(vectorEntity.GameObject);
 			}
 
@@ -247,6 +259,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				foreach (var vectorEntity in tileTuple.Value)
 				{
+					if (vectorEntity.Mesh != null)
+					{
+						DestroyImmediate(vectorEntity.Mesh, true);
+					}
 					Destroy(vectorEntity.GameObject);
 				}
 			}

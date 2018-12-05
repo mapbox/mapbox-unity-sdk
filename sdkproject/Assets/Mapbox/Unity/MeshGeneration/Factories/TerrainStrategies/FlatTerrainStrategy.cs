@@ -63,13 +63,20 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			}
 			else
 			{
-				tile.MeshFilter.sharedMesh = buildSide ? BuildQuadWithSides(tile) : BuildQuad(tile);
+				if (buildSide)
+				{
+					BuildQuadWithSides(tile);
+				}
+				else
+				{
+					BuildQuad(tile);
+				}
 			}
 		}
 
-		Mesh BuildQuad(UnityTile tile)
+		private void BuildQuad(UnityTile tile)
 		{
-			var unityMesh = new Mesh();
+			var unityMesh = tile.MeshFilter.sharedMesh;
 			var verts = new Vector3[4];
 			var norms = new Vector3[4];
 			verts[0] = tile.TileScale * ((tile.Rect.Min - tile.Rect.Center).ToVector3xz());
@@ -85,7 +92,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			unityMesh.normals = norms;
 
 			var trilist = new int[6] { 0, 1, 2, 0, 2, 3 };
-			unityMesh.SetTriangles(trilist, 0);
+			unityMesh.triangles = trilist;
 
 			var uvlist = new Vector2[4]
 			{
@@ -95,15 +102,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 					new Vector2(0,0)
 			};
 			unityMesh.uv = uvlist;
-			tile.MeshFilter.sharedMesh = unityMesh;
 			_cachedQuad = unityMesh;
-
-			return unityMesh;
 		}
 
-		private Mesh BuildQuadWithSides(UnityTile tile)
+		private void BuildQuadWithSides(UnityTile tile)
 		{
-			var unityMesh = new Mesh();
+			var unityMesh = tile.MeshFilter.sharedMesh;
 			var verts = new Vector3[20];
 			var norms = new Vector3[20];
 			verts[0] = tile.TileScale * ((tile.Rect.Min - tile.Rect.Center).ToVector3xz());
@@ -166,10 +170,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				uvlist[i + 3] = new Vector2(0, 0);
 			}
 			unityMesh.uv = uvlist;
-			tile.MeshFilter.sharedMesh = unityMesh;
 			_cachedQuad = unityMesh;
-
-			return unityMesh;
 		}
 	}
 }

@@ -204,7 +204,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		internal void Recycle()
 		{
-			if (_loadingTexture && MeshRenderer != null)
+			if (_loadingTexture && MeshRenderer != null && MeshRenderer.sharedMaterial != null)
 			{
 				MeshRenderer.sharedMaterial.mainTexture = _loadingTexture;
 			}
@@ -302,28 +302,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					_rasterData.Compress(false);
 				}
 
-				Material material;
-
-				if(MeshRenderer.sharedMaterial != null)
-				{
-					material = new Material(MeshRenderer.sharedMaterial);
-
-					if (Application.isEditor && !Application.isPlaying)
-					{
-						DestroyImmediate(MeshRenderer.sharedMaterial, true);
-					}
-					else
-					{
-						Destroy(MeshRenderer.sharedMaterial);
-					}
-				}
-				else
-				{
-					material = new Material(Shader.Find("Standard"));
-				}
-
-				material.mainTexture = _rasterData;
-				MeshRenderer.sharedMaterial = material;
+				MeshRenderer.sharedMaterial.mainTexture = _rasterData;
 
 				RasterDataState = TilePropertyState.Loaded;
 			}
@@ -386,6 +365,16 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		internal void AddTile(Tile tile)
 		{
 			_tiles.Add(tile);
+		}
+
+		public void ClearAssets()
+		{
+			if (Application.isEditor && !Application.isPlaying)
+			{
+				DestroyImmediate(_heightTexture, true);
+				DestroyImmediate(_rasterData, true);
+				DestroyImmediate(_meshFilter.sharedMesh);
+			}
 		}
 
 		public void Cancel()

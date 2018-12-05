@@ -387,7 +387,7 @@ namespace Mapbox.Unity.Map
 			//Initialize(Conversions.StringToLatLon(_options.locationOptions.latitudeLongitude), (int)_options.locationOptions.zoom);
 
 			_mapVisualizer.UnregisterAllTiles();
-			_mapVisualizer.ClearCaches();
+			_mapVisualizer.ClearMap();
 			_mapVisualizer.ReregisterAllTiles();
 		}
 

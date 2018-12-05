@@ -23,7 +23,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 		private MeshData _currentTileMeshData;
 		private Dictionary<UnityTile, MeshDataArray> _cachedMeshDataArrays;
 		private Dictionary<UnwrappedTileId, MeshDataArray> _dataArrays;
-		private Dictionary<int, Mesh> _meshSamples;
+		private Dictionary<int, MeshDataArray> _meshSamples;
 
 		private List<Vector3> _newVertexList;
 		private List<Vector3> _newNormalList;
@@ -42,13 +42,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 		{
 			base.Initialize(elOptions);
 
-			_meshSamples = new Dictionary<int, Mesh>();
+			_meshSamples = new Dictionary<int, MeshDataArray>();
 			_dataArrays = new Dictionary<UnwrappedTileId, MeshDataArray>();
 			_cachedMeshDataArrays = new Dictionary<UnityTile, MeshDataArray>();
 
 			_meshData = new Dictionary<UnwrappedTileId, Mesh>();
 			_currentTileMeshData = new MeshData();
-			//_stitchTargetMeshData = new MeshData();
 			var sampleCountSquare = _elevationOptions.modificationOptions.sampleCount * _elevationOptions.modificationOptions.sampleCount;
 			_newVertexList = new List<Vector3>(sampleCountSquare);
 			_newNormalList = new List<Vector3>(sampleCountSquare);
@@ -63,29 +62,36 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				tile.gameObject.layer = _elevationOptions.unityLayerOptions.layerId;
 			}
 
-			if (tile.MeshFilter.mesh.vertexCount != RequiredVertexCount || !_cachedMeshDataArrays.ContainsKey(tile))
+			if (tile.MeshFilter.sharedMesh.vertexCount != RequiredVertexCount || !_cachedMeshDataArrays.ContainsKey(tile))
 			{
-				tile.MeshFilter.mesh.Clear();
+				tile.MeshFilter.sharedMesh.Clear();
 
 				if (_meshSamples.ContainsKey(_elevationOptions.modificationOptions.sampleCount))
 				{
-					tile.MeshFilter.mesh = GameObject.Instantiate(_meshSamples[_elevationOptions.modificationOptions.sampleCount]);
+					var newMesh = _meshSamples[_elevationOptions.modificationOptions.sampleCount];
+					tile.MeshFilter.sharedMesh.vertices = newMesh.Vertices;
+					tile.MeshFilter.sharedMesh.normals = newMesh.Normals;
+					tile.MeshFilter.sharedMesh.triangles = newMesh.Triangles;
+					tile.MeshFilter.sharedMesh.uv = newMesh.Uvs;
 				}
 				else
 				{
 					//TODO remoev tile dependency from CreateBaseMesh method
-					var mesh = CreateBaseMesh(tile, _elevationOptions.modificationOptions.sampleCount);
-					_meshSamples.Add(_elevationOptions.modificationOptions.sampleCount, mesh);
-					tile.MeshFilter.mesh = mesh;
+					var newMesh = CreateBaseMesh(tile, _elevationOptions.modificationOptions.sampleCount);
+					_meshSamples.Add(_elevationOptions.modificationOptions.sampleCount, newMesh);
+					tile.MeshFilter.sharedMesh.vertices = newMesh.Vertices;
+					tile.MeshFilter.sharedMesh.normals = newMesh.Normals;
+					tile.MeshFilter.sharedMesh.triangles = newMesh.Triangles;
+					tile.MeshFilter.sharedMesh.uv = newMesh.Uvs;
 				}
 
 				if (!_dataArrays.ContainsKey(tile.UnwrappedTileId))
 				{
 					_dataArrays.Add(tile.UnwrappedTileId, new MeshDataArray()
 					{
-						Normals = tile.MeshFilter.mesh.normals,
-						Vertices = tile.MeshFilter.mesh.vertices,
-						Triangles = tile.MeshFilter.mesh.triangles
+						Normals = tile.MeshFilter.sharedMesh.normals,
+						Vertices = tile.MeshFilter.sharedMesh.vertices,
+						Triangles = tile.MeshFilter.sharedMesh.triangles
 					});
 				}
 			}
@@ -122,7 +128,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 
 		#region mesh gen
 
-		private Mesh CreateBaseMesh(UnityTile tile, int sampleCount)
+		private MeshDataArray CreateBaseMesh(UnityTile tile, int sampleCount)
 		{
 			//TODO use arrays instead of lists
 			_newVertexList.Clear();
@@ -170,11 +176,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				}
 			}
 
-			var mesh = tile.MeshFilter.mesh;
-			mesh.SetVertices(_newVertexList);
-			mesh.SetNormals(_newNormalList);
-			mesh.SetUVs(0, _newUvList);
-			mesh.SetTriangles(_newTriangleList, 0);
+			var mesh = new MeshDataArray();
+			mesh.Vertices = _newVertexList.ToArray();
+			mesh.Normals = _newNormalList.ToArray();
+			mesh.Uvs = _newUvList.ToArray();
+			mesh.Triangles = _newTriangleList.ToArray();
 			return mesh;
 		}
 
@@ -206,14 +212,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 
 			FixStitches(tile.UnwrappedTileId, _verts, _normals);
 
-			tile.MeshFilter.mesh.vertices = _verts;
-			tile.MeshFilter.mesh.RecalculateNormals();
+			tile.MeshFilter.sharedMesh.vertices = _verts;
+			tile.MeshFilter.sharedMesh.RecalculateNormals();
 
-			tile.MeshFilter.mesh.RecalculateBounds();
+			tile.MeshFilter.sharedMesh.RecalculateBounds();
 
 			if (!_meshData.ContainsKey(tile.UnwrappedTileId))
 			{
-				_meshData.Add(tile.UnwrappedTileId, tile.MeshFilter.mesh);
+				_meshData.Add(tile.UnwrappedTileId, tile.MeshFilter.sharedMesh);
 			}
 
 			if (_elevationOptions.colliderOptions.addCollider)
@@ -221,21 +227,21 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				var meshCollider = tile.Collider as MeshCollider;
 				if (meshCollider)
 				{
-					meshCollider.sharedMesh = tile.MeshFilter.mesh;
+					meshCollider.sharedMesh = tile.MeshFilter.sharedMesh;
 				}
 			}
 		}
 
 		private void ResetToFlatMesh(UnityTile tile)
 		{
-			if (tile.MeshFilter.mesh.vertexCount == 0)
+			if (tile.MeshFilter.sharedMesh.vertexCount == 0)
 			{
 				CreateBaseMesh(tile, _elevationOptions.modificationOptions.sampleCount);
 			}
 			else
 			{
-				tile.MeshFilter.mesh.GetVertices(_currentTileMeshData.Vertices);
-				tile.MeshFilter.mesh.GetNormals(_currentTileMeshData.Normals);
+				tile.MeshFilter.sharedMesh.GetVertices(_currentTileMeshData.Vertices);
+				tile.MeshFilter.sharedMesh.GetNormals(_currentTileMeshData.Normals);
 
 				_counter = _currentTileMeshData.Vertices.Count;
 				for (int i = 0; i < _counter; i++)
@@ -247,10 +253,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 					_currentTileMeshData.Normals[i] = Mapbox.Unity.Constants.Math.Vector3Up;
 				}
 
-				tile.MeshFilter.mesh.SetVertices(_currentTileMeshData.Vertices);
-				tile.MeshFilter.mesh.SetNormals(_currentTileMeshData.Normals);
+				tile.MeshFilter.sharedMesh.SetVertices(_currentTileMeshData.Vertices);
+				tile.MeshFilter.sharedMesh.SetNormals(_currentTileMeshData.Normals);
 
-				tile.MeshFilter.mesh.RecalculateBounds();
+				tile.MeshFilter.sharedMesh.RecalculateBounds();
 			}
 		}
 

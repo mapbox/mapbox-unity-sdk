@@ -165,7 +165,7 @@ namespace Mapbox.Unity.Map
 				if (_map.CurrentExtent.Count == _activeTiles.Count)
 				{
 					bool allDone = true;
-					// Check if all tiles are loaded. 
+					// Check if all tiles are loaded.
 					foreach (var currentTile in _map.CurrentExtent)
 					{
 						allDone = allDone && (_activeTiles.ContainsKey(currentTile) && _activeTiles[currentTile].TileState == TilePropertyState.Loaded);
@@ -262,15 +262,22 @@ namespace Mapbox.Unity.Map
 		public void ClearMap()
 		{
 			UnregisterAllTiles();
-			ClearCaches();
+
+			foreach (var tileFactory in Factories)
+			{
+				tileFactory.Clear();
+				DestroyImmediate(tileFactory);
+			}
 
 			foreach (var tileId in _activeTiles.Keys.ToList())
 			{
+				_activeTiles[tileId].ClearAssets();
 				DisposeTile(tileId);
 			}
 
 			foreach (var tile in _inactiveTiles)
 			{
+				tile.ClearAssets();
 				DestroyImmediate(tile.gameObject);
 			}
 
@@ -328,6 +335,7 @@ namespace Mapbox.Unity.Map
 			{
 				factory.UnregisterLayer(tileBundle.Value, layerVisualizer);
 			}
+			layerVisualizer.Clear();
 			layerVisualizer.UnbindSubLayerEvents();
 			layerVisualizer.SetProperties(layerVisualizer.SubLayerProperties);
 			layerVisualizer.InitializeStack();
@@ -359,17 +367,6 @@ namespace Mapbox.Unity.Map
 			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
 			{
 				factory.UpdateTileProperty(tileBundle.Value, updateArgs);
-			}
-		}
-
-		public void ClearCaches()
-		{
-			if (Factories != null)
-			{
-				foreach (var abstractTileFactory in Factories)
-				{
-					abstractTileFactory.Reset();
-				}
 			}
 		}
 		#endregion

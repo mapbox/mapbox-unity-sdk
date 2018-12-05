@@ -79,6 +79,17 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 			ve.MeshRenderer.materials = mats;
 		}
+
+		public override void OnPoolItem(VectorEntity vectorEntity)
+		{
+			if (_options.style == StyleTypes.Satellite)
+			{
+				foreach (var material in vectorEntity.MeshRenderer.sharedMaterials)
+				{
+					DestroyImmediate(material, true);
+				}
+			}
+		}
 	}
 
 	[Serializable]

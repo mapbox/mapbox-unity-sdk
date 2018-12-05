@@ -110,7 +110,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
-		public override void ClearCaches()
+		public override void Clear()
 		{
 			foreach (var go in _pool)
 			{

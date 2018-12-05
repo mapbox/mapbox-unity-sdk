@@ -52,7 +52,7 @@
 				{
 					if (replaceFeatureModifier != null)
 					{
-						replaceFeatureModifier.ClearCaches();
+						replaceFeatureModifier.Clear();
 					}
 				}
 			}
@@ -137,11 +137,11 @@
 			}
 		}
 
-		public override void ClearCaches()
+		public override void Clear()
 		{
 			foreach (var subModules in _replaceFeatureModifiers)
 			{
-				subModules.ClearCaches();
+				subModules.Clear();
 			}
 		}
 	}

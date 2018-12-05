@@ -33,7 +33,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		}
 
-		public virtual void ClearCaches()
+		public virtual void Clear()
 		{
 
 		}
