@@ -204,7 +204,7 @@ namespace Mapbox.Unity.Map
 			if (unityTile == null)
 			{
 				unityTile = new GameObject().AddComponent<UnityTile>();
-				unityTile.MeshRenderer.material = _map.TileMaterial;
+				unityTile.MeshRenderer.sharedMaterial = Instantiate(_map.TileMaterial);
 				unityTile.transform.SetParent(_map.Root, false);
 			}
 

@@ -374,6 +374,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				DestroyImmediate(_heightTexture, true);
 				DestroyImmediate(_rasterData, true);
 				DestroyImmediate(_meshFilter.sharedMesh);
+				DestroyImmediate(_meshRenderer.sharedMaterial);
 			}
 		}
 
