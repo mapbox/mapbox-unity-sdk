@@ -97,7 +97,7 @@ namespace Mapbox.Unity.Ar
 
 			// TODO: not available in ARInterface yet?!
 			//UnityARSessionNativeInterface.ARSessionTrackingChangedEvent += UnityARSessionNativeInterface_ARSessionTrackingChanged;
-			ARInterface.planeAdded += PlaneAddedHandler;
+			//ARInterface.planeAdded += PlaneAddedHandler;
 		}
 
 
@@ -105,7 +105,7 @@ namespace Mapbox.Unity.Ar
 		{
 			_alignmentStrategy.Unregister(this);
 			LocationProvider.OnLocationUpdated -= LocationProvider_OnLocationUpdated;
-			ARInterface.planeAdded -= PlaneAddedHandler;
+			//ARInterface.planeAdded -= PlaneAddedHandler;
 		}
 
 
@@ -118,11 +118,11 @@ namespace Mapbox.Unity.Ar
 		}
 
 
-		void PlaneAddedHandler(BoundedPlane plane)
-		{
-			_lastHeight = plane.center.y;
-			//Unity.Utilities.Console.Instance.Log(string.Format("AR Plane Height: {0}", _lastHeight), "yellow");
-		}
+		//void PlaneAddedHandler(BoundedPlane plane)
+		//{
+		//	_lastHeight = plane.center.y;
+		//	//Unity.Utilities.Console.Instance.Log(string.Format("AR Plane Height: {0}", _lastHeight), "yellow");
+		//}
 
 
 		//void UnityARSessionNativeInterface_ARSessionTrackingChanged(UnityEngine.XR.iOS.UnityARCamera camera)

@@ -8,16 +8,16 @@
 		[SerializeField]
 		Transform _mapRoot;
 
-		void Start()
-		{
-			ARInterface.planeAdded += UpdateMapPosOnY;
-			ARInterface.planeUpdated += UpdateMapPosOnY;
-		}
+		//void Start()
+		//{
+		//	ARInterface.planeAdded += UpdateMapPosOnY;
+		//	ARInterface.planeUpdated += UpdateMapPosOnY;
+		//}
 
-		void UpdateMapPosOnY(BoundedPlane plane)
-		{
-			var pos = _mapRoot.position;
-			_mapRoot.position = new Vector3(pos.x, plane.center.y, pos.z);
-		}
+		//void UpdateMapPosOnY(BoundedPlane plane)
+		//{
+		//	var pos = _mapRoot.position;
+		//	_mapRoot.position = new Vector3(pos.x, plane.center.y, pos.z);
+		//}
 	}
 }

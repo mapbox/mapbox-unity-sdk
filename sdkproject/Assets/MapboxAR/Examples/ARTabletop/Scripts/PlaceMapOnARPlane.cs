@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using UnityARInterface;
+using UnityEngine.XR.ARFoundation;
+using System;
 
 public class PlaceMapOnARPlane : MonoBehaviour
 {
@@ -11,16 +13,30 @@ public class PlaceMapOnARPlane : MonoBehaviour
 	{
 		ARPlaneHandler.returnARPlane += PlaceMap;
 		ARPlaneHandler.resetARPlane += ResetPlane;
+		Debug.Log("Place Map on AR");
 	}
 
-	void PlaceMap(BoundedPlane plane)
+	void PlaceMap(ARPlane plane)
 	{
-		if (!_mapTransform.gameObject.activeSelf)
+		try
 		{
-			_mapTransform.gameObject.SetActive(true);
-		}
+			if (!_mapTransform.gameObject.activeSelf)
+			{
+				_mapTransform.gameObject.SetActive(true);
+				Debug.Log("Map Active");
+			}
+			else
+			{
+				Debug.Log("ActiveSelf failed");
+			}
 
-		_mapTransform.position = plane.center;
+			_mapTransform.position = plane.boundedPlane.Center;
+			Debug.Log("Updating Map Position");
+		}
+		catch (Exception e)
+		{
+			Debug.Log("Exception ----> " + e.Message);
+		}
 	}
 
 	void ResetPlane()

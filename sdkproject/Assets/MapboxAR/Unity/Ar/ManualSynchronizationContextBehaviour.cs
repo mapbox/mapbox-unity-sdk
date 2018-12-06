@@ -30,14 +30,14 @@
 		{
 			_alignmentStrategy.Register(this);
 			_map.OnInitialized += Map_OnInitialized;
-			ARInterface.planeAdded += PlaneAddedHandler;
+			//ARInterface.planeAdded += PlaneAddedHandler;
 		}
 
 		void OnDestroy()
 		{
 			_alignmentStrategy.Unregister(this);
 			_locationProvider.OnLocationUpdated -= LocationProvider_OnLocationUpdated;
-			ARInterface.planeAdded -= PlaneAddedHandler;
+			//ARInterface.planeAdded -= PlaneAddedHandler;
 		}
 
 		void Map_OnInitialized()
@@ -73,10 +73,10 @@
 			}
 		}
 
-		void PlaneAddedHandler(BoundedPlane plane)
-		{
-			_lastHeight = plane.center.y;
-			Unity.Utilities.Console.Instance.Log(string.Format("AR Plane Height: {0}", _lastHeight), "yellow");
-		}
+		//void PlaneAddedHandler(BoundedPlane plane)
+		//{
+		//	_lastHeight = plane.center.y;
+		//	Unity.Utilities.Console.Instance.Log(string.Format("AR Plane Height: {0}", _lastHeight), "yellow");
+		//}
 	}
 }
