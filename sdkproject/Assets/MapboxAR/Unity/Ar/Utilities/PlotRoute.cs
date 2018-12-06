@@ -35,7 +35,7 @@
 		void Awake()
 		{
 			// HACK: this needs to move somewhere else (marshal).
-			ARInterface.planeAdded += AddAnchor;
+			//ARInterface.planeAdded += AddAnchor;
 
 			_lineRenderer = GetComponent<LineRenderer>();
 			_lineRenderer.startColor = _color;
@@ -44,11 +44,11 @@
 			_sqDistance = _minDistance * _minDistance;
 		}
 
-		void AddAnchor(BoundedPlane anchorData)
-		{
-			ARInterface.planeAdded -= AddAnchor;
-			AddNode(_target.localPosition);
-		}
+		//void AddAnchor(BoundedPlane anchorData)
+		//{
+		//	ARInterface.planeAdded -= AddAnchor;
+		//	AddNode(_target.localPosition);
+		//}
 
 		public void AdjustLineWidth(bool isMapMode)
 		{
