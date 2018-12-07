@@ -113,18 +113,20 @@
 			GUIStyle style = new GUIStyle("Button");
 			style.alignment = TextAnchor.MiddleCenter;
 
-			prevProp.boolValue = GUILayout.Toggle(prevProp.boolValue, "Enable Preview", style);
-			GUI.color = guiColor;
-			if (prevProp.boolValue && !prev)
+			if(!Application.isPlaying)
 			{
-				((AbstractMap)serializedObject.targetObject).EnableEditorPreview();
+				prevProp.boolValue = GUILayout.Toggle(prevProp.boolValue, "Enable Preview", style);
+				GUI.color = guiColor;
+				if (prevProp.boolValue && !prev)
+				{
+					((AbstractMap)serializedObject.targetObject).EnableEditorPreview();
+				}
+				else if (prev && !prevProp.boolValue)
+				{
+					((AbstractMap)serializedObject.targetObject).DisableEditorPreview();
+				}
+				EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 			}
-			else if(prev && !prevProp.boolValue)
-			{
-				((AbstractMap)serializedObject.targetObject).DisableEditorPreview();
-			}
-
-			EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 
 			ShowGeneral = EditorGUILayout.Foldout(ShowGeneral, new GUIContent { text = "GENERAL", tooltip = "Options related to map data" });
 
