@@ -49,7 +49,7 @@ namespace Mapbox.Unity.Map.TileProviders
 			OnExtentChanged();
 		}
 
-		public virtual void Update()
+		public override void UpdateTileProvider()
 		{
 			if (_waitingForTargetTransform && !_initialized)
 			{

@@ -33,11 +33,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		}
 
-		public virtual void ClearCaches()
+		public virtual void Clear()
 		{
 
 		}
-		
+
 		public void UnregisterTile(UnityTile tile)
 		{
 			OnUnregisterTile(tile);

@@ -305,7 +305,7 @@
 			go.transform.SetParent(_poolGameObject.transform, false);
 		}
 
-		public override void ClearCaches()
+		public override void Clear()
 		{
 			foreach (var gameObject in _objects.Values)
 			{

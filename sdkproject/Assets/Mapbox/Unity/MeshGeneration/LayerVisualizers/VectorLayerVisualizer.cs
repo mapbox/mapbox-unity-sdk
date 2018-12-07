@@ -159,8 +159,14 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			if (_layerProperties.coreOptions.combineMeshes)
 			{
-				if (_defaultStack == null || !(_defaultStack is MergedModifierStack))
+				if (_defaultStack == null)
 				{
+					_defaultStack = ScriptableObject.CreateInstance<MergedModifierStack>();
+				}
+				else if (!(_defaultStack is MergedModifierStack))
+				{
+					_defaultStack.Clear();
+					DestroyImmediate(_defaultStack);
 					_defaultStack = ScriptableObject.CreateInstance<MergedModifierStack>();
 				}
 				else
@@ -173,8 +179,15 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 			else
 			{
-				if (_defaultStack == null || !(_defaultStack is ModifierStack))
+				if (_defaultStack == null)
 				{
+					_defaultStack = ScriptableObject.CreateInstance<ModifierStack>();
+					((ModifierStack)_defaultStack).moveFeaturePositionTo = _layerProperties.moveFeaturePositionTo;
+				}
+				if (!(_defaultStack is ModifierStack))
+				{
+					_defaultStack.Clear();
+					DestroyImmediate(_defaultStack);
 					_defaultStack = ScriptableObject.CreateInstance<ModifierStack>();
 					((ModifierStack)_defaultStack).moveFeaturePositionTo = _layerProperties.moveFeaturePositionTo;
 				}
@@ -254,15 +267,15 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 							AddOrCreateMeshModifier<SnapTerrainModifier>();
 						}
 
-						AddOrCreateMeshModifier<PolygonMeshModifier>();
+						var poly = AddOrCreateMeshModifier<PolygonMeshModifier>();
 
 						UVModifierOptions uvModOptions = new UVModifierOptions();
 						uvModOptions.texturingType = (_layerProperties.materialOptions.style == StyleTypes.Custom) ? _layerProperties.materialOptions.customStyleOptions.texturingType : _layerProperties.materialOptions.texturingType;
 						uvModOptions.atlasInfo = (_layerProperties.materialOptions.style == StyleTypes.Custom) ? _layerProperties.materialOptions.customStyleOptions.atlasInfo : _layerProperties.materialOptions.atlasInfo;
 						uvModOptions.style = _layerProperties.materialOptions.style;
-
-						var uvMod = AddOrCreateMeshModifier<UvModifier>();
-						uvMod.SetProperties(uvModOptions);
+						poly.SetProperties(uvModOptions);
+						//var uvMod = AddOrCreateMeshModifier<UvModifier>();
+						//uvMod.SetProperties(uvModOptions);
 
 						if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
 						{
@@ -683,47 +696,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 		}
 
-		protected void PostProcessFeatures(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
-		{
-			//var mergedStack = _defaultStack as MergedModifierStack;
-			//if (mergedStack != null && tile != null)
-			//{
-			//	mergedStack.End(tile, tile.gameObject, _vectorFeaturesPerTile[tile].vectorTileLayer.Name);
-			//}
-		}
-		private string FindSelectorKey(VectorFeatureUnity feature)
-		{
-			// TODO: FIX THIS!!
-			//if (string.IsNullOrEmpty(_classificationKey))
-			//{
-			//	if (feature.Properties.ContainsKey("type"))
-			//	{
-			//		return feature.Properties["type"].ToString().ToLowerInvariant();
-			//	}
-			//	else if (feature.Properties.ContainsKey("class"))
-			//	{
-			//		return feature.Properties["class"].ToString().ToLowerInvariant();
-			//	}
-			//}
-			//else
-			//TODO: Come back to this.
-			//var size = _layerProperties.coreOptions.propertyValuePairs.Count;
-			//for (int i = 0; i < size; i++)
-			//{
-			//	var key = _layerProperties.coreOptions.propertyValuePairs[i].featureKey;
-			//	if (feature.Properties.ContainsKey(key))
-			//	{
-			//		if (feature.Properties.ContainsKey(key))
-			//		{
-			//			return feature.Properties[key].ToString().ToLowerInvariant();
-			//		}
-			//	}
-			//}
-
-
-			return Key;
-		}
-
 		/// <summary>
 		/// Handle tile destruction event and propagate it to modifier stacks
 		/// </summary>
@@ -757,10 +729,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			//UnbindSubLayerEvents();
 		}
 
-		public override void ClearCaches()
+		public override void Clear()
 		{
 			_idPool.Clear();
-			_defaultStack.ClearCaches();
+			_defaultStack.Clear();
+			DestroyImmediate(_defaultStack);
 		}
 	}
 }
