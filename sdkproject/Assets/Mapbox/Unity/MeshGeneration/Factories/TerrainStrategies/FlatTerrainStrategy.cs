@@ -8,7 +8,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 {
 	public class FlatTerrainStrategy : TerrainStrategy
 	{
-		Mesh _cachedQuad;
+		MeshDataArray _cachedQuad;
 
 		public override int RequiredVertexCount
 		{
@@ -55,11 +55,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			if (_cachedQuad != null)
 			{
 				var mesh = tile.MeshFilter.sharedMesh;
-				mesh.vertices = _cachedQuad.vertices;
-				mesh.normals = _cachedQuad.normals;
-				mesh.tangents = _cachedQuad.tangents;
-				mesh.triangles = _cachedQuad.triangles;
-				mesh.uv = _cachedQuad.uv;
+				mesh.vertices = _cachedQuad.Vertices;
+				mesh.normals = _cachedQuad.Normals;
+				mesh.triangles = _cachedQuad.Triangles;
+				mesh.uv = _cachedQuad.Uvs;
 			}
 			else
 			{
@@ -102,7 +101,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 					new Vector2(0,0)
 			};
 			unityMesh.uv = uvlist;
-			_cachedQuad = unityMesh;
+			_cachedQuad = new MeshDataArray()
+			{
+				Vertices =  verts,
+				Normals = norms,
+				Triangles = trilist,
+				Uvs = uvlist
+			};
 		}
 
 		private void BuildQuadWithSides(UnityTile tile)
@@ -170,7 +175,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				uvlist[i + 3] = new Vector2(0, 0);
 			}
 			unityMesh.uv = uvlist;
-			_cachedQuad = unityMesh;
+			_cachedQuad = new MeshDataArray()
+			{
+				Vertices =  verts,
+				Normals = norms,
+				Triangles = trilist.ToArray(),
+				Uvs = uvlist
+			};
 		}
 	}
 }
