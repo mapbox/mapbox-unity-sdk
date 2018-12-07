@@ -84,14 +84,7 @@ namespace Mapbox.Unity.Map
 
 		public void UnbindAllEvents()
 		{
-			_layerProperty.PropertyHasChanged -= RedrawVectorLayer;
-			_layerProperty.SubLayerPropertyAdded -= AddVectorLayer;
-			_layerProperty.SubLayerPropertyRemoved -= RemoveVectorLayer;
-			if (_vectorTileFactory != null)
-			{
-				_vectorTileFactory.TileFactoryHasChanged -= OnVectorTileFactoryOnTileFactoryHasChanged;
-				_vectorTileFactory.UnbindEvents();
-			}
+			_vectorTileFactory.UnbindEvents();
 		}
 
 		public void UpdateFactorySettings()
