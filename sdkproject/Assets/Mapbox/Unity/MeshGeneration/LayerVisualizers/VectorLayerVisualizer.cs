@@ -63,6 +63,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		private Dictionary<UnityTile, List<ulong>> _idPool; //necessary to keep _activeIds list up to date when unloading tiles
 		private string _key;
 
+		private HashSet<ModifierBase> _coreModifiers = new HashSet<ModifierBase>();
+
 		public override string Key
 		{
 			get { return _layerProperties.coreOptions.layerName; }
@@ -87,6 +89,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			if (mod == null)
 			{
 				mod = (MeshModifier)CreateInstance(typeof(T));
+				_coreModifiers.Add(mod);
 				_defaultStack.MeshModifiers.Add(mod);
 			}
 			return (T)mod;
@@ -98,6 +101,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			if (mod == null)
 			{
 				mod = (GameObjectModifier)CreateInstance(typeof(T));
+				_coreModifiers.Add(mod);
 				_defaultStack.GoModifiers.Add(mod);
 			}
 			return (T)mod;
@@ -475,6 +479,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			_activeCoroutines = new Dictionary<UnityTile, List<int>>();
 			_activeIds = new HashSet<ulong>();
 			_idPool = new Dictionary<UnityTile, List<ulong>>();
+			_coreModifiers = new HashSet<ModifierBase>();
 
 			if (_defaultStack != null)
 			{
@@ -732,6 +737,30 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		public override void Clear()
 		{
 			_idPool.Clear();
+
+			foreach (var mod in _defaultStack.MeshModifiers)
+			{
+				if (_coreModifiers.Contains(mod))
+				{
+					DestroyImmediate(mod);
+				}
+				else
+				{
+					Resources.UnloadAsset(mod);
+				}
+			}
+			foreach (var mod in _defaultStack.GoModifiers)
+			{
+				if (_coreModifiers.Contains(mod))
+				{
+					DestroyImmediate(mod);
+				}
+				else
+				{
+					Resources.UnloadAsset(mod);
+				}
+			}
+
 			_defaultStack.Clear();
 			DestroyImmediate(_defaultStack);
 		}
