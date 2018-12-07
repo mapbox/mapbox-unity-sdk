@@ -99,9 +99,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
-		public override void ClearCaches()
+		public override void Clear()
 		{
-			base.ClearCaches();
+			base.Clear();
 			foreach (var gameObject in _objects.Values)
 			{
 				Destroy(gameObject);

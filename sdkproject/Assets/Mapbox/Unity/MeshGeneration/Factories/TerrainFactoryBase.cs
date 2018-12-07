@@ -62,7 +62,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			if (Properties.sourceType == ElevationSourceType.None)
 			{
 				tile.SetHeightData(null);
-				tile.MeshFilter.mesh.Clear();
+				tile.MeshFilter.sharedMesh.Clear();
 				tile.ElevationType = TileTerrainType.None;
 				return;
 			}
@@ -96,6 +96,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			Strategy.UnregisterTile(tile);
 		}
 
+		public override void Clear()
+		{
+			DestroyImmediate(DataFetcher);
+		}
+
 		protected override void OnPostProcess(UnityTile tile)
 		{
 			Strategy.PostProcessTile(tile);
@@ -109,32 +114,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		protected override void OnUnbindEvents()
 		{
 		}
-		//public override void UpdateTileProperty(UnityTile tile, LayerUpdateArgs updateArgs)
-		//{
-		//	updateArgs.property.UpdateProperty(tile);
-
-		//	if (updateArgs.property.NeedsForceUpdate())
-		//	{
-		//		Register(tile);
-		//	}
-
-		//	//if (updateArgs.property is TerrainColliderOptions)
-		//	//{
-		//	//	var existingCollider = tileBundleValue.Collider;
-		//	//	if (Properties.colliderOptions.addCollider)
-		//	//	{
-		//	//		if (existingCollider == null)
-		//	//		{
-		//	//			tileBundleValue.gameObject.AddComponent<MeshCollider>();
-		//	//		}
-		//	//	}
-		//	//	else
-		//	//	{
-		//	//		Destroy(tileBundleValue.Collider);
-		//	//	}
-		//	//}
-		//}
-
 		#endregion
 
 		#region DataFetcherEvents

@@ -34,7 +34,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void Run(VectorEntity ve, UnityTile tile)
 		{
-			var min = Math.Min(_options.materials.Length, ve.MeshFilter.mesh.subMeshCount);
+			var min = Math.Min(_options.materials.Length, ve.MeshFilter.sharedMesh.subMeshCount);
 			var mats = new Material[min];
 
 			if (_options.style == StyleTypes.Custom)
@@ -78,6 +78,17 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				}
 			}
 			ve.MeshRenderer.materials = mats;
+		}
+
+		public override void OnPoolItem(VectorEntity vectorEntity)
+		{
+			if (_options.style == StyleTypes.Satellite)
+			{
+				foreach (var material in vectorEntity.MeshRenderer.sharedMaterials)
+				{
+					DestroyImmediate(material, true);
+				}
+			}
 		}
 	}
 

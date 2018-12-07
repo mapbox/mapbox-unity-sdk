@@ -148,6 +148,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
+		public override void Clear()
+		{
+			DestroyImmediate(DataFetcher);
+		}
+
 		protected override void OnPostProcess(UnityTile tile)
 		{
 

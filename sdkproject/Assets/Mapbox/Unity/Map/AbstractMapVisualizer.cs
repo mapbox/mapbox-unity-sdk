@@ -165,7 +165,7 @@ namespace Mapbox.Unity.Map
 				if (_map.CurrentExtent.Count == _activeTiles.Count)
 				{
 					bool allDone = true;
-					// Check if all tiles are loaded. 
+					// Check if all tiles are loaded.
 					foreach (var currentTile in _map.CurrentExtent)
 					{
 						allDone = allDone && (_activeTiles.ContainsKey(currentTile) && _activeTiles[currentTile].TileState == TilePropertyState.Loaded);
@@ -204,7 +204,7 @@ namespace Mapbox.Unity.Map
 			if (unityTile == null)
 			{
 				unityTile = new GameObject().AddComponent<UnityTile>();
-				unityTile.MeshRenderer.material = _map.TileMaterial;
+				unityTile.MeshRenderer.sharedMaterial = Instantiate(_map.TileMaterial);
 				unityTile.transform.SetParent(_map.Root, false);
 			}
 
@@ -259,6 +259,31 @@ namespace Mapbox.Unity.Map
 
 		protected abstract void PlaceTile(UnwrappedTileId tileId, UnityTile tile, IMapReadable map);
 
+		public void ClearMap()
+		{
+			UnregisterAllTiles();
+
+			foreach (var tileFactory in Factories)
+			{
+				tileFactory.Clear();
+				DestroyImmediate(tileFactory);
+			}
+
+			foreach (var tileId in _activeTiles.Keys.ToList())
+			{
+				_activeTiles[tileId].ClearAssets();
+				DisposeTile(tileId);
+			}
+
+			foreach (var tile in _inactiveTiles)
+			{
+				tile.ClearAssets();
+				DestroyImmediate(tile.gameObject);
+			}
+
+			_inactiveTiles.Clear();
+		}
+
 		#region Events
 		/// <summary>
 		/// The  <c>OnTileError</c> event triggers when there's a <c>Tile</c> error.
@@ -310,6 +335,7 @@ namespace Mapbox.Unity.Map
 			{
 				factory.UnregisterLayer(tileBundle.Value, layerVisualizer);
 			}
+			layerVisualizer.Clear();
 			layerVisualizer.UnbindSubLayerEvents();
 			layerVisualizer.SetProperties(layerVisualizer.SubLayerProperties);
 			layerVisualizer.InitializeStack();
@@ -343,14 +369,8 @@ namespace Mapbox.Unity.Map
 				factory.UpdateTileProperty(tileBundle.Value, updateArgs);
 			}
 		}
-
-		public void ClearCaches()
-		{
-			foreach (var abstractTileFactory in Factories)
-			{
-				abstractTileFactory.Reset();
-			}
-		}
 		#endregion
+
+
 	}
 }

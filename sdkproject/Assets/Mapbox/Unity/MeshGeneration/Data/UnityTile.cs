@@ -58,6 +58,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					if (_meshFilter == null)
 					{
 						_meshFilter = gameObject.AddComponent<MeshFilter>();
+						_meshFilter.sharedMesh = new Mesh();
 						ElevationType = TileTerrainType.None;
 					}
 				}
@@ -172,6 +173,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, float scale, int zoom, Texture2D loadingTexture = null)
 		{
+			gameObject.hideFlags = HideFlags.DontSave;
+
 			ElevationType = TileTerrainType.None;
 			TileScale = scale;
 			_relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
@@ -192,7 +195,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			gameObject.SetActive(true);
 
 			IsRecycled = false;
-			//MeshRenderer.enabled = true;
 
 
 			// Setup Loading as initial state - Unregistered
@@ -202,10 +204,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		internal void Recycle()
 		{
-			if (_loadingTexture && MeshRenderer != null)
+			if (_loadingTexture && MeshRenderer != null && MeshRenderer.sharedMaterial != null)
 			{
-				MeshRenderer.material.mainTexture = _loadingTexture;
-				//MeshRenderer.enabled = false;
+				MeshRenderer.sharedMaterial.mainTexture = _loadingTexture;
 			}
 
 			gameObject.SetActive(false);
@@ -236,7 +237,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					HeightDataState = TilePropertyState.None;
 					return;
 				}
-				
+
 				// HACK: compute height values for terrain. We could probably do this without a texture2d.
 				if (_heightTexture == null)
 				{
@@ -287,7 +288,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					MeshRenderer.material.mainTexture = null;
 					return;
 				}
-				
+
 				if (_rasterData == null)
 				{
 					_rasterData = new Texture2D(0, 0, TextureFormat.RGB24, useMipMap);
@@ -301,7 +302,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					_rasterData.Compress(false);
 				}
 
-				MeshRenderer.material.mainTexture = _rasterData;
+				MeshRenderer.sharedMaterial.mainTexture = _rasterData;
+
 				RasterDataState = TilePropertyState.Loaded;
 			}
 		}
@@ -363,6 +365,17 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		internal void AddTile(Tile tile)
 		{
 			_tiles.Add(tile);
+		}
+
+		public void ClearAssets()
+		{
+			if (Application.isEditor && !Application.isPlaying)
+			{
+				DestroyImmediate(_heightTexture, true);
+				DestroyImmediate(_rasterData, true);
+				DestroyImmediate(_meshFilter.sharedMesh);
+				DestroyImmediate(_meshRenderer.sharedMaterial);
+			}
 		}
 
 		public void Cancel()
