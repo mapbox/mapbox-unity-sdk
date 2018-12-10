@@ -113,19 +113,10 @@
 			GUIStyle style = new GUIStyle("Button");
 			style.alignment = TextAnchor.MiddleCenter;
 
-			if(!Application.isPlaying)
+			if (!Application.isPlaying)
 			{
 				prevProp.boolValue = GUILayout.Toggle(prevProp.boolValue, "Enable Preview", style);
 				GUI.color = guiColor;
-				if (prevProp.boolValue && !prev)
-				{
-					((AbstractMap)serializedObject.targetObject).EnableEditorPreview();
-				}
-				else if (prev && !prevProp.boolValue)
-				{
-					((AbstractMap)serializedObject.targetObject).DisableEditorPreview();
-				}
-				EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 			}
 
 			ShowGeneral = EditorGUILayout.Foldout(ShowGeneral, new GUIContent { text = "GENERAL", tooltip = "Options related to map data" });
@@ -162,6 +153,19 @@
 			EditorGUILayout.EndVertical();
 
 			serializedObject.ApplyModifiedProperties();
+
+			if (!Application.isPlaying)
+			{
+				if (prevProp.boolValue && !prev)
+				{
+					((AbstractMap)serializedObject.targetObject).EnableEditorPreview();
+				}
+				else if (prev && !prevProp.boolValue)
+				{
+					((AbstractMap)serializedObject.targetObject).DisableEditorPreview();
+				}
+				EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+			}
 		}
 
 		void ShowSection(SerializedProperty property, string propertyName)
