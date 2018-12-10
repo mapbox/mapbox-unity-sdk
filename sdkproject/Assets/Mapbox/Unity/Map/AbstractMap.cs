@@ -420,8 +420,10 @@ namespace Mapbox.Unity.Map
 
 		#region Private/Protected Methods
 
-		private void OnValidate()
+		private void OnEnable()
 		{
+			IsPreviewEnabled = false;
+
 			if (_options.tileMaterial == null)
 			{
 				_options.tileMaterial = new Material(Shader.Find("Standard"));
@@ -774,11 +776,6 @@ namespace Mapbox.Unity.Map
 		private void OnMapExtentChanged(object sender, ExtentArgs currentExtent)
 		{
 			TriggerTileRedrawForExtent(currentExtent);
-		}
-
-		void OnEnable()
-		{
-			IsPreviewEnabled = false;
 		}
 
 		// TODO: implement IDisposable, instead?
