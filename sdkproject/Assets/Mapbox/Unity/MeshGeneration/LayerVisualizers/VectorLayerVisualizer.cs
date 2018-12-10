@@ -63,7 +63,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		private Dictionary<UnityTile, List<ulong>> _idPool; //necessary to keep _activeIds list up to date when unloading tiles
 		private string _key;
 
-		private HashSet<ModifierBase> _coreModifiers = new HashSet<ModifierBase>();
+		private HashSet<ModifierBase> _coreModifiers;
 
 		public override string Key
 		{
@@ -152,6 +152,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		public override void SetProperties(VectorSubLayerProperties properties)
 		{
+			_coreModifiers = new HashSet<ModifierBase>();
+
 			if (_layerProperties == null && properties != null)
 			{
 				_layerProperties = properties;
@@ -476,10 +478,10 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		{
 			base.Initialize();
 			_entityInCurrentCoroutine = 0;
+
 			_activeCoroutines = new Dictionary<UnityTile, List<int>>();
 			_activeIds = new HashSet<ulong>();
 			_idPool = new Dictionary<UnityTile, List<ulong>>();
-			_coreModifiers = new HashSet<ModifierBase>();
 
 			if (_defaultStack != null)
 			{
@@ -740,6 +742,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			foreach (var mod in _defaultStack.MeshModifiers)
 			{
+				if (mod == null)
+				{
+					continue;
+				}
+
 				if (_coreModifiers.Contains(mod))
 				{
 					DestroyImmediate(mod);

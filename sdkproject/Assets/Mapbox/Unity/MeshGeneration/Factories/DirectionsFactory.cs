@@ -135,14 +135,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			if (_directionsGO != null)
 			{
-				if (Application.isEditor && !Application.isPlaying)
-				{
-					DestroyImmediate(_directionsGO);
-				}
-				else
-				{
-					Destroy(_directionsGO);
-				}
+				_directionsGO.Destroy();
 			}
 			_directionsGO = new GameObject("direction waypoint " + " entity");
 			var mesh = _directionsGO.AddComponent<MeshFilter>().mesh;

@@ -391,25 +391,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			Cancel();
 			if (_heightTexture != null)
 			{
-				if (Application.isEditor && !Application.isPlaying)
-				{
-					DestroyImmediate(_heightTexture);
-				}
-				else
-				{
-					Destroy(_heightTexture);
-				}
+				_heightTexture.Destroy();
 			}
 			if (_rasterData != null)
 			{
-				if (Application.isEditor && !Application.isPlaying)
-				{
-					DestroyImmediate(_rasterData);
-				}
-				else
-				{
-					Destroy(_rasterData);
-				}
+				_rasterData.Destroy();
 			}
 		}
 	}

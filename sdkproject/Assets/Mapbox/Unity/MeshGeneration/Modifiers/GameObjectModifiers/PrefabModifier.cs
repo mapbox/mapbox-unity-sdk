@@ -106,26 +106,12 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			base.Clear();
 			foreach (var gameObject in _objects.Values)
 			{
-				if (Application.isEditor && !Application.isPlaying)
-				{
-					DestroyImmediate(gameObject);
-				}
-				else
-				{
-					Destroy(gameObject);
-				}
+				gameObject.Destroy();
 			}
 
 			foreach (var gameObject in _prefabList)
 			{
-				if (Application.isEditor && !Application.isPlaying)
-				{
-					DestroyImmediate(gameObject);
-				}
-				else
-				{
-					Destroy(gameObject);
-				}
+				gameObject.Destroy();
 			}
 		}
 	}

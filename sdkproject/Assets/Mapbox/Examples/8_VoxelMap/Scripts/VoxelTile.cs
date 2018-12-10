@@ -101,14 +101,7 @@ namespace Mapbox.Examples.Voxels
 			_voxels.Clear();
 			foreach (var voxel in _instantiatedVoxels)
 			{
-				if (Application.isEditor && !Application.isPlaying)
-				{
-					DestroyImmediate(voxel);
-				}
-				else
-				{
-					Destroy(voxel);
-				}
+				voxel.Destroy();
 			}
 		}
 

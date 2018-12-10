@@ -21,14 +21,7 @@
 			}
 			else
 			{
-				if (Application.isEditor && !Application.isPlaying)
-				{
-					UnityEngine.Object.DestroyImmediate(tile.Collider);
-				}
-				else
-				{
-					UnityEngine.Object.Destroy(tile.Collider);
-				}
+				tile.Collider.Destroy();
 			}
 		}
 	}
