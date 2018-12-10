@@ -69,14 +69,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			var existingCollider = ve.GameObject.GetComponent<Collider>();
 			if (existingCollider != null)
 			{
-				if (Application.isEditor && !Application.isPlaying)
-				{
-					DestroyImmediate(existingCollider);
-				}
-				else
-				{
-					Destroy(existingCollider);
-				}
+				existingCollider.Destroy();
 				if (_colliderStrategy != null)
 				{
 					_colliderStrategy.Reset();

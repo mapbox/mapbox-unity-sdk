@@ -114,14 +114,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		{
 			foreach (var go in _pool)
 			{
-				if (Application.isEditor && !Application.isPlaying)
-				{
-					DestroyImmediate(go);
-				}
-				else
-				{
-					Destroy(go);
-				}
+				go.Destroy();
 			}
 			_pool.Clear();
 			foreach (var tileObject in _objects)

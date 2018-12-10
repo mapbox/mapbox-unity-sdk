@@ -239,24 +239,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				if (vectorEntity.Mesh != null)
 				{
-					if (Application.isEditor && !Application.isPlaying)
-					{
-						DestroyImmediate(vectorEntity.Mesh, true);
-					}
-					else
-					{
-						Destroy(vectorEntity.Mesh);
-					}
+					vectorEntity.Mesh.Destroy(true);
 				}
 
-				if (Application.isEditor && !Application.isPlaying)
-				{
-					DestroyImmediate(vectorEntity.GameObject);
-				}
-				else
-				{
-					Destroy(vectorEntity.GameObject);
-				}
+				vectorEntity.GameObject.Destroy();
 			}
 
 			foreach (var tileTuple in _activeObjects)
@@ -265,24 +251,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				{
 					if (vectorEntity.Mesh != null)
 					{
-						if (Application.isEditor && !Application.isPlaying)
-						{
-							DestroyImmediate(vectorEntity.Mesh, true);
-						}
-						else
-						{
-							Destroy(vectorEntity.Mesh);
-						}
-
+						vectorEntity.Mesh.Destroy(true);
 					}
-					if (Application.isEditor && !Application.isPlaying)
-					{
-						DestroyImmediate(vectorEntity.GameObject);
-					}
-					else
-					{
-						Destroy(vectorEntity.GameObject);
-					}
+					vectorEntity.GameObject.Destroy();
 				}
 			}
 			_pool.Clear();
