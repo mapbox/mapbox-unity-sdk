@@ -117,7 +117,10 @@ namespace Mapbox.Unity.Map
 
 			layerUpdateArgs.factory = _vectorTileFactory;
 
-			SubLayerAdded(this, layerUpdateArgs);
+			if (SubLayerAdded != null)
+			{
+				SubLayerAdded(this, layerUpdateArgs);
+			}
 		}
 
 		private void RemoveVectorLayer(object sender, EventArgs args)
@@ -127,7 +130,10 @@ namespace Mapbox.Unity.Map
 			layerUpdateArgs.visualizer = _vectorTileFactory.FindVectorLayerVisualizer((VectorSubLayerProperties)layerUpdateArgs.property);
 			layerUpdateArgs.factory = _vectorTileFactory;
 
-			SubLayerRemoved(this, layerUpdateArgs);
+			if (SubLayerRemoved != null)
+			{
+				SubLayerRemoved(this, layerUpdateArgs);
+			}
 		}
 
 		private void RedrawVectorLayer(object sender, System.EventArgs e)
