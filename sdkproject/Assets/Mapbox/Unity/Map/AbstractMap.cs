@@ -369,7 +369,10 @@ namespace Mapbox.Unity.Map
 			}
 
 			//Update Tile extent.
-			_tileProvider.UpdateTileExtent();
+			if (_tileProvider != null)
+			{
+				_tileProvider.UpdateTileExtent();
+			}
 
 			if (OnUpdated != null)
 			{
@@ -416,6 +419,22 @@ namespace Mapbox.Unity.Map
 		#endregion
 
 		#region Private/Protected Methods
+
+		private void OnEnable()
+		{
+			IsPreviewEnabled = false;
+
+			if (_options.tileMaterial == null)
+			{
+				_options.tileMaterial = new Material(Shader.Find("Standard"));
+			}
+
+			if (_options.loadingTexture == null)
+			{
+				_options.loadingTexture = new Texture2D(1, 1);
+			}
+		}
+
 		protected virtual void Awake()
 		{
 			// Setup a visualizer to get a "Starter" map.
@@ -757,11 +776,6 @@ namespace Mapbox.Unity.Map
 		private void OnMapExtentChanged(object sender, ExtentArgs currentExtent)
 		{
 			TriggerTileRedrawForExtent(currentExtent);
-		}
-
-		void OnEnable()
-		{
-			IsPreviewEnabled = false;
 		}
 
 		// TODO: implement IDisposable, instead?
