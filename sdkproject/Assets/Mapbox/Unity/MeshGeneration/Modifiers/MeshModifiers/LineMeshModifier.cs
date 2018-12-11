@@ -263,7 +263,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 							Vector3 approxFractionalJoinNormal;
 							for (var m = 0f; m < n; m++)
 							{
-								var aaa = (m + 1f) / (n + 1f);
 								approxFractionalJoinNormal = (_nextNormal * ((m + 1f) / (n + 1f)) + (_prevNormal)).normalized;
 								AddPieSliceVertex(_currentVertex, _distance, approxFractionalJoinNormal, lineTurnsLeft, md);
 							}
