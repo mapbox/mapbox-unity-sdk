@@ -565,7 +565,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 					ProcessFeature(i, tile, tempLayerProperties, layer.Extent);
 
-					if (IsCoroutineBucketFull)
+					if (IsCoroutineBucketFull && !(Application.isEditor && !Application.isPlaying))
 					{
 						//Reset bucket..
 						_entityInCurrentCoroutine = 0;
@@ -592,7 +592,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				callback(tile, this);
 		}
 
-		private bool ProcessFeature(int index, UnityTile tile, VectorLayerVisualizerProperties layerProperties, float layerExtent)
+		private bool  ProcessFeature(int index, UnityTile tile, VectorLayerVisualizerProperties layerProperties, float layerExtent)
 		{
 			var fe = layerProperties.vectorTileLayer.GetFeature(index);
 			List<List<Point2d<float>>> geom;
