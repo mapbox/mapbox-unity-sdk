@@ -12,7 +12,7 @@ public static class GameObjectExtensions
 		}
 		else
 		{
-			Destroy(obj);
+			GameObject.Destroy(obj);
 		}
 	}
 }
