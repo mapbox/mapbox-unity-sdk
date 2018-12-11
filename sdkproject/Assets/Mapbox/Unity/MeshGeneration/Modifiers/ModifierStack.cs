@@ -235,24 +235,14 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void Clear()
 		{
-			foreach (var modifier in MeshModifiers)
-			{
-				DestroyImmediate(modifier);
-			}
-
-			foreach (var modifier in GoModifiers)
-			{
-				modifier.Clear();
-				DestroyImmediate(modifier);
-			}
 			foreach (var vectorEntity in _pool.GetQueue())
 			{
 				if (vectorEntity.Mesh != null)
 				{
-					DestroyImmediate(vectorEntity.Mesh, true);
+					vectorEntity.Mesh.Destroy(true);
 				}
 
-				DestroyImmediate(vectorEntity.GameObject);
+				vectorEntity.GameObject.Destroy();
 			}
 
 			foreach (var tileTuple in _activeObjects)
@@ -261,9 +251,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				{
 					if (vectorEntity.Mesh != null)
 					{
-						DestroyImmediate(vectorEntity.Mesh, true);
+						vectorEntity.Mesh.Destroy(true);
 					}
-					Destroy(vectorEntity.GameObject);
+					vectorEntity.GameObject.Destroy();
 				}
 			}
 			_pool.Clear();

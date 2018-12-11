@@ -1,3 +1,5 @@
+using UnityEditor;
+
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
 	using UnityEngine;
@@ -104,12 +106,12 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			base.Clear();
 			foreach (var gameObject in _objects.Values)
 			{
-				Destroy(gameObject);
+				gameObject.Destroy();
 			}
 
 			foreach (var gameObject in _prefabList)
 			{
-				Destroy(gameObject);
+				gameObject.Destroy();
 			}
 		}
 	}

@@ -101,7 +101,7 @@ namespace Mapbox.Examples.Voxels
 			_voxels.Clear();
 			foreach (var voxel in _instantiatedVoxels)
 			{
-				Destroy(voxel);
+				voxel.Destroy();
 			}
 		}
 
