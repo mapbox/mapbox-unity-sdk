@@ -4,7 +4,11 @@ namespace Mapbox.Unity
 
 	public static class Constants
 	{
+<<<<<<< HEAD
 		public const string SDK_VERSION = "2.0.0";
+=======
+		public const string SDK_VERSION = "1.4.4";
+>>>>>>> master merge (#907)
 
 		public static class Path
 		{

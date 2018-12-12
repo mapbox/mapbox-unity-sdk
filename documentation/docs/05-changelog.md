@@ -1,65 +1,25 @@
 ## CHANGELOG
-### v.2.0.1
-##### Improvements
-- Improves line mesh generation, adds options for join and cap types. Users have greater control over quality and styles of line meshes.
-- Improves terrain tile loading times by optimizing terrain pipeline.
-- Remove UV Modifier class and merge the functionality into polygon mesh modifier.
-#### Bug Fixes
-- Fixes a bug with uv calculation which caused textures to be stretched intead of tiled.
-
-
-### v.2.0.0
-10/15/2018
-##### New Features
-- *Runtime editing of map features* - Map elements like Imagery, Terrain, Feature Properties can now be updated during runtime, using AbstractMap UI in the Editor , or by using the API methods.
-- *Map API’s* - Maps SDK for Unity now has API methods to build and edit maps entirely using scripts.
-##### Improvements
-- Improves fallback for terrain tiles with missing or no data. Image will be now rendered on flat tiles instead of blank tiles.
-- Improves terrain height query by using local position/rotation/scale of a tile. Use `QueryElevationInUnityUnitsAt` or `QueryElevationInMetersAt` API methods to query height.
-- Terrain module “Sample Count” property changed to a slider.
-- Improves tile loading and recycling performance.
-##### Bug Fixes
-- Fixes issue where Terrain was not turned off with `None` option.
-- Fixes issue where Node Editor script was throwing a compilation error due to deprecated API in Unity 2018.2
-- Fixes issue where SnapToZero moved the map for each new tile loaded instead of only using the first one.
-- Fixes issue with the height modifier where floor height calculations were wrong causing overlapping floors.
-- Fixes issue where dispose buffer setting was being ignored by `RangeAroundTransform` extent type.
-- Fixes builds for UWP/ Hololens environments.
-- Fixes issue where ARTableTop map would not snap to the detected plane on zooming in/out.
-- Fixes issue where `BuildingsWithUniqueIds`  setting was getting applied incorrectly, resulting in missing buildings.
-
-##### Breaking Changes
-- Any `Feature` layers under `Map Layers` using a `Custom` style type will need to be re-assigned through the AbstractMap UI. This change was necessary to persist custom style options when switching between different styles.
-
-### v.1.4.5
-08/20/2018
-##### New Features
-- Added a **ReplaceFeatureCollectionModifier** class that allows multiple ReplaceFeatureModifiers to be run from one modifier.
-- Added seven hero structures - Transamerica Pyramid, Coit Tower, Salesforce Tower, Empire State Building, Chrysler Building, One World Trade Center, Statue of Liberty.
-##### Improvements
-- Added color option to texturing style
-- Added color palettes drop down to Simple texturing option. Allows users to choose between different color palettes.
-- Improvements to Tile states and map states. Map extent finished state is robust and deterministic.
-- Removed dependency of Tile Providers on Update methods.
 
 ### v.1.4.4
 *07/10/2018*
-##### New Features
-- Selecting `Simple` Texturing Style in a `Vector Layer Visualizer` exposes a drop down menu which allows users to select a color palette for that layer.
 ##### Improvements
-- Added 2 examples to the setup dialog
+- Added 2 examples to the setup dialog 
 - AstronautGame - enhanced version of the Location Based game with custom styling and Astronaut asset
 - TrafficAndDirections - example built around using Mapbox's traffic data layer and directions API
 - Fix an issue with factories where a racing condition causing tiles without imagery
 - Fixes the issue with Replacement Modifier to prevent duplicate prefab spawning and blocking wrong features.
 - Fixes the issue with custom styles that go missing after building to a device.
 - Fix an issue with factories where a racing condition causing tiles without imagery
-- Added a separate Traffic and Directions demo scene
-- Changed loft modifier to stretch texture horizontally
-- Changed Directions Factory to check waypoints on timer and recalculate path if there's a chance
 
 ### v.1.4.3
 *06/18/2018*
+##### Improvements
+- Added a separate Traffic and Directions demo scene 
+- Changed loft modifier to stretch texture horizontally
+- Changed Directions Factory to check waypoints on timer and recalculate path if there's a chance
+
+ ### v.1.4.3
+*05/29/2018*
 ##### New Features
 - Added a **Feature Replacement Modifer** that allows replacement of a vector feature at a given Latitude,Longitude with a supplied prefab. Enables replacing a procedurally generated building at a given Latitude,Longitude with a custom 3D model.
 - Texturing Style dropdown now allows users to select from prepackaged texture styles or custom, which allows for user-defined texturing.

@@ -308,11 +308,20 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
+<<<<<<< HEAD
 		public void SetVectorData(VectorTile vectorTile)
 		{
 			if (VectorDataState != TilePropertyState.Unregistered)
 			{
 				VectorData = vectorTile;
+=======
+			HeightDataState = TilePropertyState.Loaded;
+			OnHeightDataChanged(this);
+
+			if (_rasterData != null)
+			{
+				_meshRenderer.material.mainTexture = _rasterData;
+>>>>>>> master merge (#907)
 			}
 		}
 

@@ -13,7 +13,7 @@ OcclusionCullingSettings:
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 8
+  serializedVersion: 9
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
@@ -38,7 +38,8 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.45006508, g: 0.5001157, b: 0.57548237, a: 1}
+  m_IndirectSpecularColor: {r: 0.45006472, g: 0.50011563, b: 0.575482, a: 1}
+  m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -54,11 +55,10 @@ LightmapSettings:
     m_EnableBakedLightmaps: 1
     m_EnableRealtimeLightmaps: 1
   m_LightmapEditorSettings:
-    serializedVersion: 9
+    serializedVersion: 10
     m_Resolution: 2
     m_BakeResolution: 40
-    m_TextureWidth: 1024
-    m_TextureHeight: 1024
+    m_AtlasSize: 1024
     m_AO: 0
     m_AOMaxDistance: 1
     m_CompAOExponent: 1
@@ -202,20 +202,20 @@ MonoBehaviour:
       zoom: 16
     extentOptions:
       extentType: 0
-      defaultExtents:
-        cameraBoundsOptions:
-          camera: {fileID: 0}
-          visibleBuffer: 0
-          disposeBuffer: 0
-        rangeAroundCenterOptions:
-          west: 1
-          north: 1
-          east: 1
-          south: 1
-        rangeAroundTransformOptions:
-          targetTransform: {fileID: 0}
-          visibleBuffer: 0
-          disposeBuffer: 0
+      cameraBoundsOptions:
+        camera: {fileID: 234181019}
+        visibleBuffer: 0
+        disposeBuffer: 0
+        updateInterval: 0
+      rangeAroundCenterOptions:
+        west: 1
+        north: 1
+        east: 1
+        south: 1
+      rangeAroundTransformOptions:
+        targetTransform: {fileID: 0}
+        visibleBuffer: 0
+        disposeBuffer: 0
     placementOptions:
       placementType: 1
       snapMapToZero: 0
@@ -223,7 +223,6 @@ MonoBehaviour:
       scalingType: 1
       unityTileSize: 100
     loadingTexture: {fileID: 2800000, guid: e2896a92727704803a9c422b043eae89, type: 3}
-    tileMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
   _imagery:
     _layerProperty:
       sourceType: 2
@@ -250,9 +249,9 @@ MonoBehaviour:
           UserName: 
       elevationLayerType: 0
       requiredOptions:
-        exaggerationFactor: 1
-      colliderOptions:
+        baseMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
         addCollider: 0
+        exaggerationFactor: 1
       modificationOptions:
         sampleCount: 10
         useRelativeHeight: 1
@@ -320,9 +319,8 @@ MonoBehaviour:
           geometryType: 2
           layerName: building
           snapToTerrain: 1
-          combineMeshes: 0
-        lineGeometryOptions:
-          Width: 1
+          groupFeatures: 0
+          lineWidth: 1
         filterOptions:
           _selectedLayerName: building
           filters: []
@@ -347,31 +345,12 @@ MonoBehaviour:
           - Materials:
             - {fileID: 2100000, guid: 6ec7317f2ac57e2448326cdc68816797, type: 2}
           atlasInfo: {fileID: 0}
-          lightStyleOpacity: 1
-          darkStyleOpacity: 1
-          colorStyleColor: {r: 1, g: 1, b: 1, a: 1}
-          samplePalettes: 0
           colorPalette: {fileID: 0}
-          customStyleOptions:
-            texturingType: 0
-            materials:
-            - Materials:
-              - {fileID: 2100000, guid: 0f9e3de68a3085e469bd62c8b40e9487, type: 2}
-            - Materials:
-              - {fileID: 2100000, guid: 6ec7317f2ac57e2448326cdc68816797, type: 2}
-            atlasInfo: {fileID: 0}
-            colorPalette: {fileID: 0}
-        performanceOptions:
-          isEnabled: 1
-          entityPerCoroutine: 20
         honorBuildingIdSetting: 1
-        buildingsWithUniqueIds: 1
+        buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers: []
         GoModifiers: []
-        presetFeatureType: 0
-        _maskValue: 0
-        selectedTypes: 
       - coreOptions:
           sourceId: 
           isActive: 1
@@ -379,9 +358,8 @@ MonoBehaviour:
           geometryType: 2
           layerName: landuse
           snapToTerrain: 1
-          combineMeshes: 0
-        lineGeometryOptions:
-          Width: 1
+          groupFeatures: 0
+          lineWidth: 1
         filterOptions:
           _selectedLayerName: landuse
           filters: []
@@ -406,23 +384,7 @@ MonoBehaviour:
           - Materials:
             - {fileID: 0}
           atlasInfo: {fileID: 0}
-          lightStyleOpacity: 1
-          darkStyleOpacity: 1
-          colorStyleColor: {r: 1, g: 1, b: 1, a: 1}
-          samplePalettes: 0
           colorPalette: {fileID: 0}
-          customStyleOptions:
-            texturingType: 0
-            materials:
-            - Materials:
-              - {fileID: 2100000, guid: dd22d0eb52da4594e90fbb4dd7ae0baf, type: 2}
-            - Materials:
-              - {fileID: 2100000, guid: dd22d0eb52da4594e90fbb4dd7ae0baf, type: 2}
-            atlasInfo: {fileID: 0}
-            colorPalette: {fileID: 0}
-        performanceOptions:
-          isEnabled: 1
-          entityPerCoroutine: 20
         honorBuildingIdSetting: 1
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
@@ -430,9 +392,6 @@ MonoBehaviour:
         GoModifiers:
         - {fileID: 11400000, guid: 3505ec4e61e3f4c4d88fc3c5548e7144, type: 2}
         - {fileID: 11400000, guid: e425dc440a40d9a4080794105e9f66ef, type: 2}
-        presetFeatureType: 2
-        _maskValue: 0
-        selectedTypes: 
       - coreOptions:
           sourceId: 
           isActive: 1
@@ -440,9 +399,8 @@ MonoBehaviour:
           geometryType: 3
           layerName: road
           snapToTerrain: 0
-          combineMeshes: 0
-        lineGeometryOptions:
-          Width: 1
+          groupFeatures: 0
+          lineWidth: 1
         filterOptions:
           _selectedLayerName: road
           filters:
@@ -512,33 +470,14 @@ MonoBehaviour:
           - Materials:
             - {fileID: 0}
           atlasInfo: {fileID: 0}
-          lightStyleOpacity: 1
-          darkStyleOpacity: 1
-          colorStyleColor: {r: 1, g: 1, b: 1, a: 1}
-          samplePalettes: 0
           colorPalette: {fileID: 0}
-          customStyleOptions:
-            texturingType: 0
-            materials:
-            - Materials:
-              - {fileID: 0}
-            - Materials:
-              - {fileID: 0}
-            atlasInfo: {fileID: 0}
-            colorPalette: {fileID: 0}
-        performanceOptions:
-          isEnabled: 1
-          entityPerCoroutine: 20
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers:
         - {fileID: 11400000, guid: ed4da4864f7b7394399b675a217cd637, type: 2}
         GoModifiers:
         - {fileID: 11400000, guid: 5ad7c36a7a62f8b4cbcbcea8139a12a5, type: 2}
-        presetFeatureType: 1
-        _maskValue: 0
-        selectedTypes: 
       - coreOptions:
           sourceId: 
           isActive: 0
@@ -546,9 +485,8 @@ MonoBehaviour:
           geometryType: 3
           layerName: building
           snapToTerrain: 1
-          combineMeshes: 0
-        lineGeometryOptions:
-          Width: 1
+          groupFeatures: 0
+          lineWidth: 1
         filterOptions:
           _selectedLayerName: building
           filters: []
@@ -573,24 +511,8 @@ MonoBehaviour:
           - Materials:
             - {fileID: 0}
           atlasInfo: {fileID: 0}
-          lightStyleOpacity: 1
-          darkStyleOpacity: 1
-          colorStyleColor: {r: 1, g: 1, b: 1, a: 1}
-          samplePalettes: 0
           colorPalette: {fileID: 0}
-          customStyleOptions:
-            texturingType: 0
-            materials:
-            - Materials:
-              - {fileID: 0}
-            - Materials:
-              - {fileID: 0}
-            atlasInfo: {fileID: 0}
-            colorPalette: {fileID: 0}
-        performanceOptions:
-          isEnabled: 1
-          entityPerCoroutine: 20
-        honorBuildingIdSetting: 1
+        honorBuildingIdSetting: 0
         buildingsWithUniqueIds: 0
         moveFeaturePositionTo: 0
         MeshModifiers:
@@ -599,9 +521,6 @@ MonoBehaviour:
         - {fileID: 11400000, guid: 4dbdd9c4bb7ba4d41ac1b710cf40de49, type: 2}
         GoModifiers:
         - {fileID: 11400000, guid: cd82d41d9097fef4fb5dafaebde20bfa, type: 2}
-        presetFeatureType: 0
-        _maskValue: 0
-        selectedTypes: 
       locationPrefabList: []
   _tileProvider: {fileID: 0}
 --- !u!114 &159634026
@@ -642,6 +561,7 @@ GameObject:
   - component: {fileID: 234181019}
   - component: {fileID: 234181018}
   - component: {fileID: 234181017}
+  - component: {fileID: 234181016}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -663,6 +583,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 35.7, y: 0, z: 0}
+--- !u!114 &234181016
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 234181014}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff26db721962cdf4a8edcdfa9a767d2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!81 &234181017
 AudioListener:
   m_ObjectHideFlags: 0
@@ -916,7 +847,7 @@ Prefab:
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -0.000015258789
       objectReference: {fileID: 0}
     - target: {fileID: 114731470950229392, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
@@ -950,10 +881,11 @@ Prefab:
 
 
         This is an enhanced version of the "Location-based Game Starting Point." It
-        features custom styling, procedural vehicle movement based on real road data,
-        and dynamic lighting. Click on the road in the editor to navigate the astronaut
-        character to a point via the Directions API. On a device, this example uses
-        GPS location information to move and rotate the character.'
+        features custom styling, procedural vehicle movement based on real traffic
+        data, and dynamic lighting. Click on the road in the editor to navigate the
+        astronaut character there using our directions API response. On device, this
+        example uses device GPS location information to move/rotate the character
+        alongside the device position.'
       objectReference: {fileID: 0}
     - target: {fileID: 1912118435774886, guid: 98be219873e6d4dffb5949746f515a33, type: 2}
       propertyPath: m_IsActive
@@ -1698,6 +1630,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 4294967295
   m_Materials:
   - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:

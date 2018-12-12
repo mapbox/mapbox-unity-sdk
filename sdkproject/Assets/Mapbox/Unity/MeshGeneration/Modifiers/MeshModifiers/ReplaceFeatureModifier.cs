@@ -10,8 +10,11 @@
 	using Mapbox.VectorTile.Geometry;
 	using Mapbox.Unity.MeshGeneration.Interfaces;
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> master merge (#907)
 	/// <summary>
 	/// ReplaceBuildingFeatureModifier takes in POIs and checks if the feature layer has those points and deletes them
 	/// </summary>
@@ -19,10 +22,14 @@
 	public class ReplaceFeatureModifier : GameObjectModifier, IReplacementCriteria
 	{
 
+<<<<<<< HEAD
 		private List<Vector2d> _latLonToSpawn;
 
 		private Dictionary<ulong, GameObject> _objects;
 		private Dictionary<ulong, Vector2d> _objectPosition;
+=======
+		private Dictionary<ulong, GameObject> _objects;
+>>>>>>> master merge (#907)
 		private GameObject _poolGameObject;
 		[SerializeField]
 		private SpawnPrefabOptions _options;
@@ -83,6 +90,7 @@
 			if (_objects == null)
 			{
 				_objects = new Dictionary<ulong, GameObject>();
+<<<<<<< HEAD
 				_objectPosition = new Dictionary<ulong, Vector2d>();
 				_poolGameObject = new GameObject("_inactive_prefabs_pool");
 			}
@@ -90,6 +98,9 @@
 			foreach (var loc in _prefabLocations)
 			{
 				_latLonToSpawn.Add(Conversions.StringToLatLon(loc));
+=======
+				_poolGameObject = new GameObject("_inactive_prefabs_pool");
+>>>>>>> master merge (#907)
 			}
 		}
 
@@ -157,6 +168,17 @@
 							{
 								return false;
 							}
+<<<<<<< HEAD
+=======
+
+							var from = Conversions.LatitudeLongitudeToVectorTilePosition(Conversions.StringToLatLon(point), feature.Tile.InitialZoom);
+							var to = feature.Data.Geometry<float>()[0][0];
+							if( Vector2.SqrMagnitude( new Vector2(from.x, from.y) - new Vector2(to.X, to.Y)) > Math.Pow(_maxDistanceToBlockFeature_tilespace, 2f))
+							{
+								return false;
+							}
+
+>>>>>>> master merge (#907)
 							if (feature.Data.Id.ToString().StartsWith(featureId, StringComparison.CurrentCulture))
 							{
 								return true;
@@ -193,14 +215,20 @@
 				go = _objects[featureId];
 				go.SetActive(true);
 				go.transform.SetParent(ve.GameObject.transform, false);
+<<<<<<< HEAD
 
+=======
+>>>>>>> master merge (#907)
 			}
 			else
 			{
 				go = Instantiate(_options.prefab);
 				_prefabList.Add(go);
 				_objects.Add(featureId, go);
+<<<<<<< HEAD
 				_objectPosition.Add(featureId, latLong);
+=======
+>>>>>>> master merge (#907)
 				go.transform.SetParent(ve.GameObject.transform, false);
 			}
 
@@ -268,8 +296,11 @@
 
 			if (_objects.ContainsKey(feature.Data.Id))
 			{
+<<<<<<< HEAD
 				_objectPosition.TryGetValue(feature.Data.Id, out latLong);
 				_latLonToSpawn.Remove(latLong);
+=======
+>>>>>>> master merge (#907)
 				return true;
 			}
 
@@ -296,7 +327,11 @@
 			}
 
 			var go = _objects[featureId];
+<<<<<<< HEAD
 			if (go == null || _poolGameObject == null)
+=======
+			if(go == null || _poolGameObject == null)
+>>>>>>> master merge (#907)
 			{
 				return;
 			}
@@ -304,6 +339,7 @@
 			go.SetActive(false);
 			go.transform.SetParent(_poolGameObject.transform, false);
 		}
+<<<<<<< HEAD
 
 		public override void Clear()
 		{
@@ -315,5 +351,7 @@
 			_objectPosition.Clear();
 			Destroy(_poolGameObject);
 		}
+=======
+>>>>>>> master merge (#907)
 	}
 }

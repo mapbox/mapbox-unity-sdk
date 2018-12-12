@@ -426,8 +426,29 @@
 			}
 			if (sideMatArray.arraySize == 0)
 			{
+<<<<<<< HEAD
 				sideMatArray.arraySize = 1;
 			}
+=======
+				if ((primitiveTypeProp == VectorPrimitiveType.Polygon || primitiveTypeProp == VectorPrimitiveType.Custom) && sourceType != VectorSourceType.MapboxStreets)
+				{
+					EditorGUI.indentLevel--;
+					layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue = true;
+					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("buildingsWithUniqueIds"), new GUIContent
+					{
+						text = "Buildings With Unique Ids",
+						tooltip =
+							"Turn on this setting only when rendering 3D buildings from the Mapbox Streets with Building Ids tileset. Using this setting with any other polygon layers or source will result in visual artifacts. "
+					});
+					EditorGUI.indentLevel++;
+				}
+				else
+				{
+					layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue = false;
+				}
+				var filterOptions = layerProperty.FindPropertyRelative("filterOptions");
+				filterOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
+>>>>>>> master merge (#907)
 
 			var topMat = topMatArray.GetArrayElementAtIndex(0);
 			var sideMat = sideMatArray.GetArrayElementAtIndex(0);

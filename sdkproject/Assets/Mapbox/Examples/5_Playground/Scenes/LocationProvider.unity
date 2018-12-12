@@ -752,6 +752,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+<<<<<<< HEAD
 --- !u!1 &655763301
 GameObject:
   m_ObjectHideFlags: 0
@@ -971,6 +972,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _measurements: 5
+=======
+>>>>>>> master merge (#907)
 --- !u!1 &1086928928
 GameObject:
   m_ObjectHideFlags: 0
@@ -1052,6 +1055,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_IsOn: 0
+<<<<<<< HEAD
 --- !u!1 &1165220199
 GameObject:
   m_ObjectHideFlags: 0
@@ -1150,6 +1154,60 @@ MonoBehaviour:
   - 48.859489, 2.32045
   - 48.859489, 2.32060
   _heading: 112
+=======
+--- !u!1001 &1097227486
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4806497037511362, guid: fa49ad38da3e540fca722d2ca9e1d026, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: -18.677399
+      objectReference: {fileID: 0}
+    - target: {fileID: 4806497037511362, guid: fa49ad38da3e540fca722d2ca9e1d026, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 12.257265
+      objectReference: {fileID: 0}
+    - target: {fileID: 4806497037511362, guid: fa49ad38da3e540fca722d2ca9e1d026, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 21.646572
+      objectReference: {fileID: 0}
+    - target: {fileID: 4806497037511362, guid: fa49ad38da3e540fca722d2ca9e1d026, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4806497037511362, guid: fa49ad38da3e540fca722d2ca9e1d026, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4806497037511362, guid: fa49ad38da3e540fca722d2ca9e1d026, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4806497037511362, guid: fa49ad38da3e540fca722d2ca9e1d026, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4806497037511362, guid: fa49ad38da3e540fca722d2ca9e1d026, type: 2}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114061583707577078, guid: fa49ad38da3e540fca722d2ca9e1d026,
+        type: 2}
+      propertyPath: _targetTransform
+      value: 
+      objectReference: {fileID: 1411663282}
+    - target: {fileID: 114834956557871126, guid: fa49ad38da3e540fca722d2ca9e1d026,
+        type: 2}
+      propertyPath: mapManager
+      value: 
+      objectReference: {fileID: 1411663281}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: fa49ad38da3e540fca722d2ca9e1d026, type: 2}
+  m_IsPrefabParent: 0
+>>>>>>> master merge (#907)
 --- !u!1 &1304608535
 GameObject:
   m_ObjectHideFlags: 0
@@ -1885,6 +1943,7 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1587024384}
+<<<<<<< HEAD
 --- !u!1 &1643236478
 GameObject:
   m_ObjectHideFlags: 0
@@ -2066,6 +2125,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _measurements: 10
+=======
+>>>>>>> master merge (#907)
 --- !u!43 &1856438662
 Mesh:
   m_ObjectHideFlags: 0

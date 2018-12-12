@@ -28,14 +28,23 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField]
 		[Range(1,10)]
 		private float UpdateFrequency = 2;
+<<<<<<< HEAD
 
 
+=======
+
+		
+>>>>>>> master merge (#907)
 
 		private Directions _directions;
 		private int _counter;
 
 		GameObject _directionsGO;
+<<<<<<< HEAD
 		private bool _recalculateNext;
+=======
+		private bool _recalculateNext; 
+>>>>>>> master merge (#907)
 
 		protected virtual void Awake()
 		{

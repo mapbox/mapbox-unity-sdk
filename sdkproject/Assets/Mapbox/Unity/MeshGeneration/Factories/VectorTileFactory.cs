@@ -269,9 +269,19 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		public override void UpdateTileProperty(UnityTile tile, LayerUpdateArgs updateArgs)
 		{
+<<<<<<< HEAD
 			updateArgs.property.UpdateProperty(tile);
 
 			if (updateArgs.property.NeedsForceUpdate())
+=======
+			if (string.IsNullOrEmpty(MapId) || _properties.sourceOptions.isActive == false || (_properties.vectorSubLayers.Count + _properties.locationPrefabList.Count) == 0)
+			{
+				// Do nothing; 
+				Progress++;
+				Progress--;
+			}
+			else
+>>>>>>> master merge (#907)
 			{
 				Unregister(tile);
 			}

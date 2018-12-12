@@ -115,6 +115,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 					if (_nextNormal != Constants.Math.Vector3Unused)
 					{
+<<<<<<< HEAD
 						_prevNormal = _nextNormal;
 					}
 
@@ -360,6 +361,32 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					}
 
 					_startOfLine = false;
+=======
+						norm = GetNormal(p1, p1, p2) * _scaledWidth; //road width
+						newVerticeList[0] = (p1 + norm);
+						newVerticeList[roadSegmentCount * 2 - 1] = (p1 - norm);
+						newNorms[0] = Constants.Math.Vector3Up;
+						newNorms[roadSegmentCount * 2 - 1] = Constants.Math.Vector3Up;
+						uvList[0] = new Vector2(0, 0);
+						uvList[roadSegmentCount * 2 - 1] = new Vector2(1, 0);
+						newTangents[0] = new Vector4(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z, 1).normalized;
+						newTangents[roadSegmentCount * 2 - 1] = newTangents[0];
+					}
+
+					var dist = Vector3.Distance(p1, p2);
+					lastUv += dist;
+					norm = GetNormal(p1, p2, p3) * _scaledWidth;
+					newVerticeList[i] = (p2 + norm);
+					newVerticeList[2 * roadSegmentCount - 1 - i] = (p2 - norm);
+					newNorms[i] = Constants.Math.Vector3Up;
+					newNorms[2 * roadSegmentCount - 1 - i] = Constants.Math.Vector3Up;
+
+					uvList[i] = new Vector2(0, lastUv);
+					uvList[2 * roadSegmentCount - 1 - i] = new Vector2(1, lastUv);
+
+					newTangents[i] = new Vector4(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z, 1).normalized;
+					newTangents[2 * roadSegmentCount - 1 - i] = newTangents[i];
+>>>>>>> master merge (#907)
 				}
 
 				md.Edges.Add(md.Vertices.Count);
