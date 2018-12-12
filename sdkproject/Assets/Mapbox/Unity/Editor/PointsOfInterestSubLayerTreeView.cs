@@ -13,8 +13,6 @@
 		private float kToggleWidth = 18f;
 		private const int uniqueId = 0;//100000;
 
-		public bool hasChanged = false;
-
 		public PointsOfInterestSubLayerTreeView(TreeViewState state)
 			: base(state)
 		{
@@ -69,12 +67,7 @@
 			Rect toggleRect = args.rowRect;
 			toggleRect.width = kToggleWidth;
 			var item = Layers.GetArrayElementAtIndex(args.item.id - uniqueId);
-			EditorGUI.BeginChangeCheck();
 			item.FindPropertyRelative("coreOptions.isActive").boolValue = EditorGUI.Toggle(toggleRect, item.FindPropertyRelative("coreOptions.isActive").boolValue);
-			if(EditorGUI.EndChangeCheck())
-			{
-				hasChanged = true;
-			}
 			args.item.displayName = item.FindPropertyRelative("coreOptions.sublayerName").stringValue;
 			base.RowGUI(args);
 		}

@@ -8,12 +8,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 {
 	public class FlatTerrainStrategy : TerrainStrategy
 	{
-		MeshDataArray _cachedQuad;
-
-		public override int RequiredVertexCount
-		{
-			get { return 4; }
-		}
+		Mesh _cachedQuad;
 
 		public override void Initialize(ElevationLayerProperties elOptions)
 		{
@@ -27,8 +22,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				tile.gameObject.layer = _elevationOptions.unityLayerOptions.layerId;
 			}
 
-			if (tile.RasterDataState != Enums.TilePropertyState.Loaded ||
-			    tile.MeshFilter.sharedMesh.vertexCount != RequiredVertexCount)
+			if (tile.RasterDataState != Enums.TilePropertyState.Loaded)
 			{
 				if (_elevationOptions.sideWallOptions.isActive)
 				{
@@ -41,41 +35,23 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				}
 			}
 
-			if ((int)tile.ElevationType != (int)ElevationLayerType.FlatTerrain)
-			{
-				tile.MeshFilter.sharedMesh.Clear();
-				// HACK: This is here in to make the system trigger a finished state.
-				GetQuad(tile, _elevationOptions.sideWallOptions.isActive);
-				tile.ElevationType = TileTerrainType.Flat;
-			}
+			// HACK: This is here in to make the system trigger a finished state.
+			tile.MeshFilter.sharedMesh = GetQuad(tile, _elevationOptions.sideWallOptions.isActive);
 		}
 
-		private void GetQuad(UnityTile tile, bool buildSide)
+		private Mesh GetQuad(UnityTile tile, bool buildSide)
 		{
 			if (_cachedQuad != null)
 			{
-				var mesh = tile.MeshFilter.sharedMesh;
-				mesh.vertices = _cachedQuad.Vertices;
-				mesh.normals = _cachedQuad.Normals;
-				mesh.triangles = _cachedQuad.Triangles;
-				mesh.uv = _cachedQuad.Uvs;
+				return _cachedQuad;
 			}
-			else
-			{
-				if (buildSide)
-				{
-					BuildQuadWithSides(tile);
-				}
-				else
-				{
-					BuildQuad(tile);
-				}
-			}
+
+			return buildSide ? BuildQuadWithSides(tile) : BuildQuad(tile);
 		}
 
-		private void BuildQuad(UnityTile tile)
+		Mesh BuildQuad(UnityTile tile)
 		{
-			var unityMesh = tile.MeshFilter.sharedMesh;
+			var unityMesh = new Mesh();
 			var verts = new Vector3[4];
 			var norms = new Vector3[4];
 			verts[0] = tile.TileScale * ((tile.Rect.Min - tile.Rect.Center).ToVector3xz());
@@ -91,7 +67,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			unityMesh.normals = norms;
 
 			var trilist = new int[6] { 0, 1, 2, 0, 2, 3 };
-			unityMesh.triangles = trilist;
+			unityMesh.SetTriangles(trilist, 0);
 
 			var uvlist = new Vector2[4]
 			{
@@ -101,18 +77,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 					new Vector2(0,0)
 			};
 			unityMesh.uv = uvlist;
-			_cachedQuad = new MeshDataArray()
-			{
-				Vertices =  verts,
-				Normals = norms,
-				Triangles = trilist,
-				Uvs = uvlist
-			};
+			tile.MeshFilter.sharedMesh = unityMesh;
+			_cachedQuad = unityMesh;
+
+			return unityMesh;
 		}
 
-		private void BuildQuadWithSides(UnityTile tile)
+		private Mesh BuildQuadWithSides(UnityTile tile)
 		{
-			var unityMesh = tile.MeshFilter.sharedMesh;
+			var unityMesh = new Mesh();
 			var verts = new Vector3[20];
 			var norms = new Vector3[20];
 			verts[0] = tile.TileScale * ((tile.Rect.Min - tile.Rect.Center).ToVector3xz());
@@ -175,13 +148,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				uvlist[i + 3] = new Vector2(0, 0);
 			}
 			unityMesh.uv = uvlist;
-			_cachedQuad = new MeshDataArray()
-			{
-				Vertices =  verts,
-				Normals = norms,
-				Triangles = trilist.ToArray(),
-				Uvs = uvlist
-			};
+			tile.MeshFilter.sharedMesh = unityMesh;
+			_cachedQuad = unityMesh;
+
+			return unityMesh;
 		}
 	}
 }

@@ -22,11 +22,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 		private Vector3 _newDir;
 		private int _vertA, _vertB, _vertC;
 		private int _counter;
-		public override int RequiredVertexCount
-		{
-			get { return _elevationOptions.modificationOptions.sampleCount * _elevationOptions.modificationOptions.sampleCount
-			             + (4 * _elevationOptions.modificationOptions.sampleCount); }
-		}
 
 		public override void Initialize(ElevationLayerProperties elOptions)
 		{
@@ -41,6 +36,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			_newUvList = new List<Vector2>(sampleCountSquare);
 			_newTriangleList = new List<int>();
 		}
+
 
 		public override void RegisterTile(UnityTile tile)
 		{
@@ -62,12 +58,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				}
 			}
 
-			if (tile.MeshFilter.sharedMesh.vertexCount != RequiredVertexCount)
+			if (tile.MeshFilter.mesh.vertexCount == 0)
 			{
 				CreateBaseMesh(tile);
 			}
 
-			if (_elevationOptions.colliderOptions.addCollider && tile.Collider == null)
+			if (_elevationOptions.requiredOptions.addCollider && tile.Collider == null)
 			{
 				tile.gameObject.AddComponent<MeshCollider>();
 			}
@@ -75,11 +71,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			GenerateTerrainMesh(tile);
 		}
 
-		public override void DataErrorOccurred(UnityTile t, TileErrorEventArgs e)
-		{
-			ResetToFlatMesh(t);
-		}
-		
 		private void CreateBaseMesh(UnityTile tile)
 		{
 			//TODO use arrays instead of lists
@@ -249,8 +240,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 		// <param name="heightMultiplier">Multiplier for queried height value</param>
 		private void GenerateTerrainMesh(UnityTile tile)
 		{
-			tile.MeshFilter.sharedMesh.GetVertices(_currentTileMeshData.Vertices);
-			tile.MeshFilter.sharedMesh.GetNormals(_currentTileMeshData.Normals);
+			tile.MeshFilter.mesh.GetVertices(_currentTileMeshData.Vertices);
+			tile.MeshFilter.mesh.GetNormals(_currentTileMeshData.Normals);
 
 			var _sampleCount = _elevationOptions.modificationOptions.sampleCount;
 			int sideStart = _sampleCount * _sampleCount;
@@ -284,7 +275,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				}
 			}
 
-			tile.MeshFilter.sharedMesh.SetVertices(_currentTileMeshData.Vertices);
+			tile.MeshFilter.mesh.SetVertices(_currentTileMeshData.Vertices);
 
 			for (int y = 0; y < _sampleCount - 1; y++)
 			{
@@ -310,17 +301,17 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 
 			FixStitches(tile.UnwrappedTileId, _currentTileMeshData);
 
-			tile.MeshFilter.sharedMesh.SetNormals(_currentTileMeshData.Normals);
-			tile.MeshFilter.sharedMesh.SetVertices(_currentTileMeshData.Vertices);
+			tile.MeshFilter.mesh.SetNormals(_currentTileMeshData.Normals);
+			tile.MeshFilter.mesh.SetVertices(_currentTileMeshData.Vertices);
 
-			tile.MeshFilter.sharedMesh.RecalculateBounds();
+			tile.MeshFilter.mesh.RecalculateBounds();
 
 			if (!_meshData.ContainsKey(tile.UnwrappedTileId))
 			{
 				_meshData.Add(tile.UnwrappedTileId, tile.MeshFilter.mesh);
 			}
 
-			if (_elevationOptions.colliderOptions.addCollider)
+			if (_elevationOptions.requiredOptions.addCollider)
 			{
 				var meshCollider = tile.Collider as MeshCollider;
 				if (meshCollider)
@@ -332,30 +323,23 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 
 		private void ResetToFlatMesh(UnityTile tile)
 		{
-			if (tile.MeshFilter.sharedMesh.vertexCount == 0)
+			tile.MeshFilter.mesh.GetVertices(_currentTileMeshData.Vertices);
+			tile.MeshFilter.mesh.GetNormals(_currentTileMeshData.Normals);
+
+			_counter = _currentTileMeshData.Vertices.Count;
+			for (int i = 0; i < _counter; i++)
 			{
-				CreateBaseMesh(tile);
+				_currentTileMeshData.Vertices[i] = new Vector3(
+					_currentTileMeshData.Vertices[i].x,
+					0,
+					_currentTileMeshData.Vertices[i].z);
+				_currentTileMeshData.Normals[i] = Mapbox.Unity.Constants.Math.Vector3Up;
 			}
-			else
-			{
-				tile.MeshFilter.sharedMesh.GetVertices(_currentTileMeshData.Vertices);
-				tile.MeshFilter.sharedMesh.GetNormals(_currentTileMeshData.Normals);
 
-				_counter = _currentTileMeshData.Vertices.Count;
-				for (int i = 0; i < _counter; i++)
-				{
-					_currentTileMeshData.Vertices[i] = new Vector3(
-						_currentTileMeshData.Vertices[i].x,
-						0,
-						_currentTileMeshData.Vertices[i].z);
-					_currentTileMeshData.Normals[i] = Mapbox.Unity.Constants.Math.Vector3Up;
-				}
+			tile.MeshFilter.mesh.SetVertices(_currentTileMeshData.Vertices);
+			tile.MeshFilter.mesh.SetNormals(_currentTileMeshData.Normals);
 
-				tile.MeshFilter.sharedMesh.SetVertices(_currentTileMeshData.Vertices);
-				tile.MeshFilter.sharedMesh.SetNormals(_currentTileMeshData.Normals);
-
-				tile.MeshFilter.sharedMesh.RecalculateBounds();
-			}
+			tile.MeshFilter.mesh.RecalculateBounds();
 		}
 
 		/// <summary>

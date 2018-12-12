@@ -1,5 +1,3 @@
-using Mapbox.Unity.Map.Interfaces;
-
 namespace Mapbox.Unity.MeshGeneration.Data
 {
 	using UnityEngine;
@@ -14,18 +12,15 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 	public class UnityTile : MonoBehaviour
 	{
-		public TileTerrainType ElevationType;
-
 		[SerializeField]
 		private Texture2D _rasterData;
 		public VectorTile VectorData { get; private set; }
 		private Texture2D _heightTexture;
-		public float[] HeightData;
+		private float[] _heightData;
 
 		private Texture2D _loadingTexture;
 		//keeping track of tile objects to be able to cancel them safely if tile is destroyed before data fetching finishes
 		private List<Tile> _tiles = new List<Tile>();
-		[SerializeField] private float _tileScale;
 
 		public bool IsRecycled = false;
 
@@ -58,8 +53,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					if (_meshFilter == null)
 					{
 						_meshFilter = gameObject.AddComponent<MeshFilter>();
-						_meshFilter.sharedMesh = new Mesh();
-						ElevationType = TileTerrainType.None;
 					}
 				}
 				return _meshFilter;
@@ -84,13 +77,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public RectD Rect { get; private set; }
 		public int InitialZoom { get; private set; }
 		public int CurrentZoom { get; private set; }
-
-		public float TileScale
-		{
-			get { return _tileScale; }
-			private set { _tileScale = value; }
-		}
-
+		public float TileScale { get; private set; }
 		public UnwrappedTileId UnwrappedTileId { get; private set; }
 		public CanonicalTileId CanonicalTileId { get; private set; }
 
@@ -170,12 +157,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		private bool _isInitialized = false;
 
-
 		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, float scale, int zoom, Texture2D loadingTexture = null)
 		{
-			gameObject.hideFlags = HideFlags.DontSave;
-
-			ElevationType = TileTerrainType.None;
 			TileScale = scale;
 			_relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
 			Rect = Conversions.TileBounds(tileId);
@@ -195,6 +178,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			gameObject.SetActive(true);
 
 			IsRecycled = false;
+			//MeshRenderer.enabled = true;
 
 
 			// Setup Loading as initial state - Unregistered
@@ -204,9 +188,10 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		internal void Recycle()
 		{
-			if (_loadingTexture && MeshRenderer != null && MeshRenderer.sharedMaterial != null)
+			if (_loadingTexture && MeshRenderer != null)
 			{
-				MeshRenderer.sharedMaterial.mainTexture = _loadingTexture;
+				MeshRenderer.material.mainTexture = _loadingTexture;
+				//MeshRenderer.enabled = false;
 			}
 
 			gameObject.SetActive(false);
@@ -230,14 +215,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		{
 			if (HeightDataState != TilePropertyState.Unregistered)
 			{
-				//reset height data
-				if(data == null)
-				{
-					HeightData = new float[256 * 256];
-					HeightDataState = TilePropertyState.None;
-					return;
-				}
-
 				// HACK: compute height values for terrain. We could probably do this without a texture2d.
 				if (_heightTexture == null)
 				{
@@ -250,9 +227,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				// Get rid of this temporary texture. We don't need to bloat memory.
 				_heightTexture.LoadImage(null);
 
-				if (HeightData == null)
+				if (_heightData == null)
 				{
-					HeightData = new float[256 * 256];
+					_heightData = new float[256 * 256];
 				}
 
 				var relativeScale = useRelative ? _relativeScale : 1f;
@@ -263,8 +240,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 						float r = rgbData[(xx * 256 + yy) * 4 + 1];
 						float g = rgbData[(xx * 256 + yy) * 4 + 2];
 						float b = rgbData[(xx * 256 + yy) * 4 + 3];
-						//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
-						HeightData[xx * 256 + yy] = relativeScale * heightMultiplier * (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
+						_heightData[xx * 256 + yy] = relativeScale * heightMultiplier * Conversions.GetAbsoluteHeightFromColor(r, g, b);
 					}
 				}
 
@@ -277,18 +253,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		public void SetRasterData(byte[] data, bool useMipMap = true, bool useCompression = false)
+		public void SetRasterData(byte[] data, bool useMipMap, bool useCompression)
 		{
 			// Don't leak the texture, just reuse it.
 			if (RasterDataState != TilePropertyState.Unregistered)
 			{
-				//reset image on null data
-				if (data == null)
-				{
-					MeshRenderer.material.mainTexture = null;
-					return;
-				}
-
 				if (_rasterData == null)
 				{
 					_rasterData = new Texture2D(0, 0, TextureFormat.RGB24, useMipMap);
@@ -302,60 +271,26 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					_rasterData.Compress(false);
 				}
 
-				MeshRenderer.sharedMaterial.mainTexture = _rasterData;
-
+				MeshRenderer.material.mainTexture = _rasterData;
 				RasterDataState = TilePropertyState.Loaded;
 			}
 		}
 
-<<<<<<< HEAD
 		public void SetVectorData(VectorTile vectorTile)
 		{
 			if (VectorDataState != TilePropertyState.Unregistered)
 			{
 				VectorData = vectorTile;
-=======
-			HeightDataState = TilePropertyState.Loaded;
-			OnHeightDataChanged(this);
-
-			if (_rasterData != null)
-			{
-				_meshRenderer.material.mainTexture = _rasterData;
->>>>>>> master merge (#907)
 			}
 		}
 
-		/// <summary>
-		/// Method to query elevation data in any point in the tile using [0-1] range inputs.
-		/// Input values are clamped for safety and QueryHeightDataNonclamped method should be used for
-		/// higher performance usage.
-		/// </summary>
-		/// <param name="x"></param>
-		/// <param name="y"></param>
-		/// <returns></returns>
 		public float QueryHeightData(float x, float y)
 		{
-			if (HeightData != null)
+			if (_heightData != null)
 			{
-				return HeightData[(int)(Mathf.Clamp01(y) * 255) * 256 + (int)(Mathf.Clamp01(x) * 255)] * _tileScale;
-			}
-
-			return 0;
-		}
-
-		/// <summary>
-		///  Method to query elevation data in any point in the tile using [0-1] range inputs.
-		/// Input values aren't clamped for improved performance and assuring they are in [0-1] range
-		/// is left to caller.
-		/// </summary>
-		/// <param name="x"></param>
-		/// <param name="y"></param>
-		/// <returns></returns>
-		public float QueryHeightDataNonclamped(float x, float y)
-		{
-			if (HeightData != null)
-			{
-				return HeightData[(int)(y * 255) * 256 + (int)(x * 255)] * _tileScale;
+				var intX = (int)Mathf.Clamp(x * 256, 0, 255);
+				var intY = (int)Mathf.Clamp(y * 256, 0, 255);
+				return _heightData[intY * 256 + intX] * TileScale;
 			}
 
 			return 0;
@@ -376,17 +311,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			_tiles.Add(tile);
 		}
 
-		public void ClearAssets()
-		{
-			if (Application.isEditor && !Application.isPlaying)
-			{
-				DestroyImmediate(_heightTexture, true);
-				DestroyImmediate(_rasterData, true);
-				DestroyImmediate(_meshFilter.sharedMesh);
-				DestroyImmediate(_meshRenderer.sharedMaterial);
-			}
-		}
-
 		public void Cancel()
 		{
 			for (int i = 0, _tilesCount = _tiles.Count; i < _tilesCount; i++)
@@ -400,11 +324,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			Cancel();
 			if (_heightTexture != null)
 			{
-				_heightTexture.Destroy();
+				Destroy(_heightTexture);
 			}
 			if (_rasterData != null)
 			{
-				_rasterData.Destroy();
+				Destroy(_rasterData);
 			}
 		}
 	}

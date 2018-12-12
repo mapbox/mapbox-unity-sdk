@@ -751,12 +751,12 @@ MonoBehaviour:
     tileMaterial: {fileID: 0}
   _imagery:
     _layerProperty:
-      sourceType: 2
+      sourceType: 0
       sourceOptions:
         isActive: 1
         layerSource:
           Name: Streets
-          Id: mapbox://styles/mapbox/dark-v9
+          Id: mapbox://styles/mapbox/streets-v10
           Modified: 
           UserName: 
       rasterOptions:

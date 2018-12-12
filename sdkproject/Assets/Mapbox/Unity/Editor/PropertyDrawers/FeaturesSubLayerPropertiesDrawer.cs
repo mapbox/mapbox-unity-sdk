@@ -10,7 +10,6 @@
 	using Mapbox.VectorTile.ExtensionMethods;
 	using Mapbox.Unity.MeshGeneration.Filters;
 	using Mapbox.Platform.TilesetTileJSON;
-	using Mapbox.Editor;
 	using System;
 
 	public class FeaturesSubLayerPropertiesDrawer
@@ -81,11 +80,10 @@
 		IList<int> selectedLayers = new List<int>();
 		public void DrawUI(SerializedProperty property)
 		{
-
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 			var serializedMapObject = property.serializedObject;
 			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
-			tileJSONData = mapObject.VectorData.GetTileJsonData();
+			tileJSONData = mapObject.VectorData.LayerProperty.tileJsonData;
 
 			var sourceTypeProperty = property.FindPropertyRelative("_sourceType");
 			var sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
@@ -205,12 +203,6 @@
 				layerTreeView.Reload();
 				layerTreeView.OnGUI(layersRect);
 
-				if (layerTreeView.hasChanged)
-				{
-					EditorHelper.CheckForModifiedProperty(property);
-					layerTreeView.hasChanged = false;
-				}
-
 				selectedLayers = layerTreeView.GetSelection();
 
 				//if there are selected elements, set the selection index at the first element.
@@ -218,16 +210,16 @@
 				if (selectedLayers.Count > 0)
 				{
 					//ensure that selectedLayers[0] isn't out of bounds
-					if (selectedLayers[0] - FeatureSubLayerTreeView.uniqueIdFeature > subLayerArray.arraySize - 1)
+					if (selectedLayers[0] - FeatureSubLayerTreeView.uniqueId > subLayerArray.arraySize - 1)
 					{
-						selectedLayers[0] = subLayerArray.arraySize - 1 + FeatureSubLayerTreeView.uniqueIdFeature;
+						selectedLayers[0] = subLayerArray.arraySize - 1 + FeatureSubLayerTreeView.uniqueId;
 					}
 
 					SelectionIndex = selectedLayers[0];
 				}
 				else
 				{
-					if (SelectionIndex > 0 && (SelectionIndex - FeatureSubLayerTreeView.uniqueIdFeature <= subLayerArray.arraySize - 1))
+					if (SelectionIndex > 0 && (SelectionIndex - FeatureSubLayerTreeView.uniqueId <= subLayerArray.arraySize - 1))
 					{
 						selectedLayers = new int[1] { SelectionIndex };
 						layerTreeView.SetSelection(selectedLayers);
@@ -264,14 +256,9 @@
 					layerTreeView.AddElementToTree(subLayer);
 					layerTreeView.Reload();
 
-					selectedLayers = new int[1] { subLayerArray.arraySize - 1 + FeatureSubLayerTreeView.uniqueIdFeature };
+					selectedLayers = new int[1] { subLayerArray.arraySize - 1 + FeatureSubLayerTreeView.uniqueId };
 					layerTreeView.SetSelection(selectedLayers);
 					subLayerProperties = null; // setting this to null so that the if block is not called again
-
-					if (EditorHelper.DidModifyProperty(property))
-					{
-						((VectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property)).OnSubLayerPropertyAdded(new VectorLayerUpdateArgs { property = EditorHelper.GetTargetObjectOfProperty(subLayer) as MapboxDataProperty });
-					}
 				}
 
 				if (GUILayout.Button(new GUIContent("Remove Selected"), (GUIStyle)"minibuttonright"))
@@ -280,15 +267,8 @@
 					{
 						if (layerTreeView != null)
 						{
-							var subLayer = subLayerArray.GetArrayElementAtIndex(index - FeatureSubLayerTreeView.uniqueIdFeature);
-
-							VectorLayerProperties vectorLayerProperties = (VectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property);
-							VectorSubLayerProperties vectorSubLayerProperties = (VectorSubLayerProperties)EditorHelper.GetTargetObjectOfProperty(subLayer);
-
-							vectorLayerProperties.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = vectorSubLayerProperties });
-
 							layerTreeView.RemoveItemFromTree(index);
-							subLayerArray.DeleteArrayElementAtIndex(index - FeatureSubLayerTreeView.uniqueIdFeature);
+							subLayerArray.DeleteArrayElementAtIndex(index - FeatureSubLayerTreeView.uniqueId);
 							layerTreeView.treeModel.SetData(GetData(subLayerArray));
 						}
 					}
@@ -301,17 +281,17 @@
 
 				GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
-				if (selectedLayers.Count == 1 && subLayerArray.arraySize != 0 && selectedLayers[0] - FeatureSubLayerTreeView.uniqueIdFeature >= 0)
+				if (selectedLayers.Count == 1 && subLayerArray.arraySize != 0 && selectedLayers[0] - FeatureSubLayerTreeView.uniqueId >= 0)
 				{
 					//ensure that selectedLayers[0] isn't out of bounds
-					if (selectedLayers[0] - FeatureSubLayerTreeView.uniqueIdFeature > subLayerArray.arraySize - 1)
+					if (selectedLayers[0] - FeatureSubLayerTreeView.uniqueId > subLayerArray.arraySize - 1)
 					{
-						selectedLayers[0] = subLayerArray.arraySize - 1 + FeatureSubLayerTreeView.uniqueIdFeature;
+						selectedLayers[0] = subLayerArray.arraySize - 1 + FeatureSubLayerTreeView.uniqueId;
 					}
 
 					SelectionIndex = selectedLayers[0];
 
-					var layerProperty = subLayerArray.GetArrayElementAtIndex(SelectionIndex - FeatureSubLayerTreeView.uniqueIdFeature);
+					var layerProperty = subLayerArray.GetArrayElementAtIndex(SelectionIndex - FeatureSubLayerTreeView.uniqueId);
 
 					layerProperty.isExpanded = true;
 					var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
@@ -347,7 +327,7 @@
 			{
 				var subLayer = subLayerArray.GetArrayElementAtIndex(i);
 				name = subLayer.FindPropertyRelative("coreOptions.sublayerName").stringValue;
-				id = i + FeatureSubLayerTreeView.uniqueIdFeature;
+				id = i + FeatureSubLayerTreeView.uniqueId;
 				type = ((PresetFeatureType)subLayer.FindPropertyRelative("presetFeatureType").enumValueIndex).ToString();
 				FeatureTreeElement element = new FeatureTreeElement(name, 0, id);
 				element.Name = name;
@@ -384,15 +364,7 @@
 			subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex = (int)coreOptions.geometryType;
 			subLayerCoreOptions.FindPropertyRelative("snapToTerrain").boolValue = coreOptions.snapToTerrain;
 			subLayerCoreOptions.FindPropertyRelative("combineMeshes").boolValue = coreOptions.combineMeshes;
-
-			var subLayerlineGeometryOptions = subLayer.FindPropertyRelative("lineGeometryOptions");
-			var lineGeometryOptions = subLayerProperties.lineGeometryOptions;
-			subLayerlineGeometryOptions.FindPropertyRelative("Width").floatValue = lineGeometryOptions.Width;
-			subLayerlineGeometryOptions.FindPropertyRelative("CapType").enumValueIndex = (int) lineGeometryOptions.CapType;
-			subLayerlineGeometryOptions.FindPropertyRelative("JoinType").enumValueIndex = (int) lineGeometryOptions.JoinType;
-			subLayerlineGeometryOptions.FindPropertyRelative("MiterLimit").floatValue = lineGeometryOptions.MiterLimit;
-			subLayerlineGeometryOptions.FindPropertyRelative("RoundLimit").floatValue = lineGeometryOptions.RoundLimit;
-
+			subLayerCoreOptions.FindPropertyRelative("lineWidth").floatValue = coreOptions.lineWidth;
 
 			var subLayerExtrusionOptions = subLayer.FindPropertyRelative("extrusionOptions");
 			var extrusionOptions = subLayerProperties.extrusionOptions;
@@ -400,7 +372,6 @@
 			subLayerExtrusionOptions.FindPropertyRelative("extrusionGeometryType").enumValueIndex = (int)extrusionOptions.extrusionGeometryType;
 			subLayerExtrusionOptions.FindPropertyRelative("propertyName").stringValue = extrusionOptions.propertyName;
 			subLayerExtrusionOptions.FindPropertyRelative("extrusionScaleFactor").floatValue = extrusionOptions.extrusionScaleFactor;
-			subLayerExtrusionOptions.FindPropertyRelative("maximumHeight").floatValue = extrusionOptions.maximumHeight;
 
 			var subLayerFilterOptions = subLayer.FindPropertyRelative("filterOptions");
 			var filterOptions = subLayerProperties.filterOptions;
@@ -412,7 +383,7 @@
 			var materialOptions = subLayerProperties.materialOptions;
 			subLayerGeometryMaterialOptions.FindPropertyRelative("style").enumValueIndex = (int)materialOptions.style;
 
-			//GeometryMaterialOptions geometryMaterialOptionsReference = MapboxDefaultStyles.GetDefaultAssets();
+			GeometryMaterialOptions geometryMaterialOptionsReference = MapboxDefaultStyles.GetDefaultAssets();
 
 			var mats = subLayerGeometryMaterialOptions.FindPropertyRelative("materials");
 			mats.arraySize = 2;
@@ -426,71 +397,19 @@
 			}
 			if (sideMatArray.arraySize == 0)
 			{
-<<<<<<< HEAD
 				sideMatArray.arraySize = 1;
 			}
-=======
-				if ((primitiveTypeProp == VectorPrimitiveType.Polygon || primitiveTypeProp == VectorPrimitiveType.Custom) && sourceType != VectorSourceType.MapboxStreets)
-				{
-					EditorGUI.indentLevel--;
-					layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue = true;
-					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("buildingsWithUniqueIds"), new GUIContent
-					{
-						text = "Buildings With Unique Ids",
-						tooltip =
-							"Turn on this setting only when rendering 3D buildings from the Mapbox Streets with Building Ids tileset. Using this setting with any other polygon layers or source will result in visual artifacts. "
-					});
-					EditorGUI.indentLevel++;
-				}
-				else
-				{
-					layerProperty.FindPropertyRelative("honorBuildingIdSetting").boolValue = false;
-				}
-				var filterOptions = layerProperty.FindPropertyRelative("filterOptions");
-				filterOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
->>>>>>> master merge (#907)
 
 			var topMat = topMatArray.GetArrayElementAtIndex(0);
 			var sideMat = sideMatArray.GetArrayElementAtIndex(0);
 
 			var atlas = subLayerGeometryMaterialOptions.FindPropertyRelative("atlasInfo");
 			var palette = subLayerGeometryMaterialOptions.FindPropertyRelative("colorPalette");
-			var lightStyleOpacity = subLayerGeometryMaterialOptions.FindPropertyRelative("lightStyleOpacity");
-			var darkStyleOpacity = subLayerGeometryMaterialOptions.FindPropertyRelative("darkStyleOpacity");
-			var customStyleOptions = subLayerGeometryMaterialOptions.FindPropertyRelative("customStyleOptions");
 
-			topMat.objectReferenceValue = materialOptions.materials[0].Materials[0];
-			sideMat.objectReferenceValue = materialOptions.materials[1].Materials[0];
-			atlas.objectReferenceValue = materialOptions.atlasInfo;
-			palette.objectReferenceValue = materialOptions.colorPalette;
-			lightStyleOpacity.floatValue = materialOptions.lightStyleOpacity;
-			darkStyleOpacity.floatValue = materialOptions.darkStyleOpacity;
-
-
-			//set custom style options.
-			var customMats = customStyleOptions.FindPropertyRelative("materials");
-			customMats.arraySize = 2;
-
-			var customTopMatArray = customMats.GetArrayElementAtIndex(0).FindPropertyRelative("Materials");
-			var customSideMatArray = customMats.GetArrayElementAtIndex(1).FindPropertyRelative("Materials");
-
-			if (customTopMatArray.arraySize == 0)
-			{
-				customTopMatArray.arraySize = 1;
-			}
-			if (customSideMatArray.arraySize == 0)
-			{
-				customSideMatArray.arraySize = 1;
-			}
-
-			var customTopMat = customTopMatArray.GetArrayElementAtIndex(0);
-			var customSideMat = customSideMatArray.GetArrayElementAtIndex(0);
-
-
-			customTopMat.objectReferenceValue = materialOptions.customStyleOptions.materials[0].Materials[0];
-			customSideMat.objectReferenceValue = materialOptions.customStyleOptions.materials[1].Materials[0];
-			customStyleOptions.FindPropertyRelative("atlasInfo").objectReferenceValue = materialOptions.customStyleOptions.atlasInfo;
-			customStyleOptions.FindPropertyRelative("colorPalette").objectReferenceValue = materialOptions.customStyleOptions.colorPalette;
+			topMat.objectReferenceValue = geometryMaterialOptionsReference.materials[0].Materials[0];
+			sideMat.objectReferenceValue = geometryMaterialOptionsReference.materials[1].Materials[0];
+			atlas.objectReferenceValue = geometryMaterialOptionsReference.atlasInfo;
+			palette.objectReferenceValue = geometryMaterialOptionsReference.colorPalette;
 
 			subLayer.FindPropertyRelative("buildingsWithUniqueIds").boolValue = subLayerProperties.buildingsWithUniqueIds;
 			subLayer.FindPropertyRelative("moveFeaturePositionTo").enumValueIndex = (int)subLayerProperties.moveFeaturePositionTo;
@@ -501,10 +420,6 @@
 			subLayerColliderOptions.FindPropertyRelative("colliderType").enumValueIndex = (int)subLayerProperties.colliderOptions.colliderType;
 		}
 
-		private void UpdateMe()
-		{
-			Debug.Log("Update!");
-		}
 
 		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty, SerializedProperty property)
 		{
@@ -529,16 +444,11 @@
 
 			var serializedMapObject = property.serializedObject;
 			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
-			tileJsonData = mapObject.VectorData.GetTileJsonData();
+			tileJsonData = mapObject.VectorData.LayerProperty.tileJsonData;
 
 			var layerDisplayNames = tileJsonData.LayerDisplayNames;
 
-			EditorGUI.BeginChangeCheck();
 			DrawLayerName(subLayerCoreOptions, layerDisplayNames);
-			if (EditorGUI.EndChangeCheck())
-			{
-				EditorHelper.CheckForModifiedProperty(subLayerCoreOptions);
-			}
 			//*********************** LAYER NAME ENDS ***********************************//
 
 			//*********************** TYPE DROPDOWN BEGINS ***********************************//
@@ -581,6 +491,8 @@
 			//*********************** MODELING SECTION BEGINS ***********************************//
 			_modelingSectionDrawer.DrawUI(subLayerCoreOptions, layerProperty, primitiveTypeProp);
 			//*********************** MODELING SECTION ENDS ***********************************//
+
+
 
 
 			//*********************** TEXTURING SECTION BEGINS ***********************************//

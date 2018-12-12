@@ -10,16 +10,10 @@
 	{
 		public SerializedProperty Layers;
 		private float kToggleWidth = 18f;
-		public int uniqueId;
-		public static int uniqueIdPoI = 1000;
-		public static int uniqueIdFeature = 3000;
+		public static int uniqueId = 3000;
 		public int maxElementsAdded = 0;
-
-		public bool hasChanged = false;
-
 		const float kRowHeights = 15f;
 		const float nameOffset = 15f;
-
 		MultiColumnHeaderState m_MultiColumnHeaderState;
 		private GUIStyle columnStyle = new GUIStyle()
 		{
@@ -27,7 +21,7 @@
 			normal = new GUIStyleState() { textColor = Color.white }
 		};
 
-		public FeatureSubLayerTreeView(TreeViewState state, MultiColumnHeader multicolumnHeader, TreeModel<FeatureTreeElement> model, int uniqueIdentifier = 3000) : base(state, multicolumnHeader, model)
+		public FeatureSubLayerTreeView(TreeViewState state, MultiColumnHeader multicolumnHeader, TreeModel<FeatureTreeElement> model) : base(state, multicolumnHeader, model)
 		{
 			// Custom setup
 			//rowHeight = kRowHeights;
@@ -35,7 +29,6 @@
 			showBorder = true;
 			customFoldoutYOffset = (kRowHeights - EditorGUIUtility.singleLineHeight) * 0.5f; // center foldout in the row since we also center content. See RowGUI
 			extraSpaceBeforeIconAndLabel = kToggleWidth;
-			uniqueId = uniqueIdentifier;
 			Reload();
 		}
 
@@ -125,18 +118,12 @@
 				toggleRect.x += GetContentIndent(item);
 				toggleRect.width = kToggleWidth;
 
-				EditorGUI.BeginChangeCheck();
 				item.data.isActive = layer.FindPropertyRelative("coreOptions.isActive").boolValue;
 				if (toggleRect.xMax < cellRect.xMax)
 				{
 					item.data.isActive = EditorGUI.Toggle(toggleRect, item.data.isActive); // hide when outside cell rect
 				}
 				layer.FindPropertyRelative("coreOptions.isActive").boolValue = item.data.isActive;
-				if (EditorGUI.EndChangeCheck())
-				{
-					VectorSubLayerProperties vectorSubLayerProperties = (VectorSubLayerProperties)EditorHelper.GetTargetObjectOfProperty(layer);
-					EditorHelper.CheckForModifiedProperty(layer, vectorSubLayerProperties.coreOptions);
-				}
 
 				cellRect.xMin += nameOffset; // Adding some gap between the checkbox and the name
 				args.rowRect = cellRect;

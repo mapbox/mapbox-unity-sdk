@@ -244,36 +244,6 @@ Prefab:
       value: 
       objectReference: {fileID: 11400000, guid: 68f1c8a1aa79a4a7cb5af3c591ccbea9,
         type: 2}
-    - target: {fileID: 114196496685157712, guid: 5bb46bae81bf04608ac699be504c5e66,
-        type: 2}
-      propertyPath: _vectorData._layerProperty.vectorSubLayers.Array.data[0].presetFeatureType
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114196496685157712, guid: 5bb46bae81bf04608ac699be504c5e66,
-        type: 2}
-      propertyPath: _vectorData._layerProperty.vectorSubLayers.Array.data[1].filterOptions._selectedLayerName
-      value: road
-      objectReference: {fileID: 0}
-    - target: {fileID: 114196496685157712, guid: 5bb46bae81bf04608ac699be504c5e66,
-        type: 2}
-      propertyPath: _vectorData._layerProperty.vectorSubLayers.Array.data[1].honorBuildingIdSetting
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114196496685157712, guid: 5bb46bae81bf04608ac699be504c5e66,
-        type: 2}
-      propertyPath: _vectorData._layerProperty.vectorSubLayers.Array.data[1].presetFeatureType
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114196496685157712, guid: 5bb46bae81bf04608ac699be504c5e66,
-        type: 2}
-      propertyPath: _vectorData._layerProperty.vectorSubLayers.Array.data[1].materialOptions.customStyleOptions.materials.Array.data[0].Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 8e8afdee0a225a84282f04f2fb89b8b6, type: 2}
-    - target: {fileID: 114196496685157712, guid: 5bb46bae81bf04608ac699be504c5e66,
-        type: 2}
-      propertyPath: _vectorData._layerProperty.vectorSubLayers.Array.data[1].materialOptions.customStyleOptions.materials.Array.data[1].Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: b00db1eb69ea64eb4adb30b2c0fb01cb, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5bb46bae81bf04608ac699be504c5e66, type: 2}
   m_IsPrefabParent: 0

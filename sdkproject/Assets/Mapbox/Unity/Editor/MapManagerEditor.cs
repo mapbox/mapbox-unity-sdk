@@ -11,8 +11,8 @@
 	[CanEditMultipleObjects]
 	public class MapManagerEditor : Editor
 	{
+
 		private string objectId = "";
-		private Color previewButtonColor = new Color(0.7f, 1.0f, 0.7f);
 		/// <summary>
 		/// Gets or sets a value indicating whether to show general section <see cref="T:Mapbox.Editor.MapManagerEditor"/>.
 		/// </summary>
@@ -104,22 +104,6 @@
 			EditorGUILayout.BeginVertical();
 			EditorGUILayout.Space();
 
-			var prevProp = serializedObject.FindProperty("IsPreviewEnabled");
-			var prev = prevProp.boolValue;
-
-			Color guiColor = GUI.color;
-			GUI.color = (prev) ? previewButtonColor : guiColor;
-
-			GUIStyle style = new GUIStyle("Button");
-			style.alignment = TextAnchor.MiddleCenter;
-
-			if (!Application.isPlaying)
-			{
-				prevProp.boolValue = GUILayout.Toggle(prevProp.boolValue, "Enable Preview", style);
-				GUI.color = guiColor;
-				EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-			}
-
 			ShowGeneral = EditorGUILayout.Foldout(ShowGeneral, new GUIContent { text = "GENERAL", tooltip = "Options related to map data" });
 
 			if (ShowGeneral)
@@ -153,21 +137,7 @@
 			}
 			EditorGUILayout.EndVertical();
 
-			EditorGUILayout.Space();
-
 			serializedObject.ApplyModifiedProperties();
-
-			if (!Application.isPlaying)
-			{
-				if (prevProp.boolValue && !prev)
-				{
-					((AbstractMap)serializedObject.targetObject).EnableEditorPreview();
-				}
-				else if (prev && !prevProp.boolValue)
-				{
-					((AbstractMap)serializedObject.targetObject).DisableEditorPreview();
-				}
-			}
 		}
 
 		void ShowSection(SerializedProperty property, string propertyName)
@@ -190,73 +160,37 @@
 				EditorGUILayout.HelpBox("Invalid Access Token. Please add a valid access token using the Mapbox  > Setup Menu", MessageType.Error);
 			}
 
+
 			EditorGUILayout.LabelField("Location ", GUILayout.Height(_lineHeight));
 
 			EditorGUILayout.PropertyField(property.FindPropertyRelative("locationOptions"));
-
-
 			var extentOptions = property.FindPropertyRelative("extentOptions");
 			var extentOptionsType = extentOptions.FindPropertyRelative("extentType");
-
-
 			if ((MapExtentType)extentOptionsType.enumValueIndex == MapExtentType.Custom)
 			{
-				var tileProviderProperty = mapObject.FindProperty("_tileProvider");
-				EditorGUI.BeginChangeCheck();
+				var test = mapObject.FindProperty("_tileProvider");
 				EditorGUILayout.PropertyField(extentOptionsType);
-				if (EditorGUI.EndChangeCheck())
-				{
-					EditorHelper.CheckForModifiedProperty(extentOptions);
-				}
 				EditorGUI.indentLevel++;
-				EditorGUILayout.PropertyField(tileProviderProperty);
+				EditorGUILayout.PropertyField(test);
 				EditorGUI.indentLevel--;
 			}
 			else
 			{
 				GUILayout.Space(-_lineHeight);
-				EditorGUILayout.PropertyField(extentOptions);
+				EditorGUILayout.PropertyField(property.FindPropertyRelative("extentOptions"));
 			}
-
-			EditorGUI.BeginChangeCheck();
 
 			EditorGUILayout.PropertyField(serializedObject.FindProperty("_initializeOnStart"));
-
-			if (EditorGUI.EndChangeCheck())
-			{
-				EditorHelper.CheckForModifiedProperty(property);
-			}
 
 			ShowPosition = EditorGUILayout.Foldout(ShowPosition, "Others");
 			if (ShowPosition)
 			{
 				GUILayout.Space(-_lineHeight);
-
-				EditorGUI.BeginChangeCheck();
-				var placementOptions = property.FindPropertyRelative("placementOptions");
-				EditorGUILayout.PropertyField(placementOptions);
-				if (EditorGUI.EndChangeCheck())
-				{
-					EditorHelper.CheckForModifiedProperty(placementOptions);
-				}
-
+				EditorGUILayout.PropertyField(property.FindPropertyRelative("placementOptions"));
 				GUILayout.Space(-_lineHeight);
-
-				EditorGUI.BeginChangeCheck();
-				var scalingOptions = property.FindPropertyRelative("scalingOptions");
-				EditorGUILayout.PropertyField(scalingOptions);
-				if (EditorGUI.EndChangeCheck())
-				{
-					EditorHelper.CheckForModifiedProperty(scalingOptions);
-				}
-
-				EditorGUI.BeginChangeCheck();
+				EditorGUILayout.PropertyField(property.FindPropertyRelative("scalingOptions"));
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("loadingTexture"));
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("tileMaterial"));
-				if (EditorGUI.EndChangeCheck())
-				{
-					EditorHelper.CheckForModifiedProperty(property);
-				}
 			}
 		}
 
@@ -288,7 +222,6 @@
 				_isGUIContentSet = true;
 			}
 
-			EditorGUI.BeginChangeCheck();
 			sourceTypeProperty.enumValueIndex = EditorGUILayout.Popup(new GUIContent
 			{
 				text = "Data Source",
@@ -318,11 +251,6 @@
 				default:
 					isActiveProperty.boolValue = false;
 					break;
-			}
-
-			if (EditorGUI.EndChangeCheck())
-			{
-				EditorHelper.CheckForModifiedProperty(layerProperty);
 			}
 
 			if (sourceTypeValue != VectorSourceType.None)

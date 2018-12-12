@@ -33,13 +33,9 @@
 			{
 				case VectorSourceType.MapboxStreets:
 				case VectorSourceType.MapboxStreetsWithBuildingIds:
-					using (Stream stream = new FileStream(_filePath, FileMode.Open))
-					{
-						using (StreamReader reader = new StreamReader(stream))
-						{
-							stats = JsonConvert.DeserializeObject<TileStats>(reader.ReadToEnd());
-						}
-					}
+					StreamReader reader = new StreamReader(_filePath);
+					stats = JsonConvert.DeserializeObject<TileStats>(reader.ReadToEnd());
+					reader.Close();
 					break;
 				default:
 					break;

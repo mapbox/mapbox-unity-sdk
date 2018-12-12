@@ -56,15 +56,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_options = options;
 		}
 
-		protected virtual void OnErrorOccurred(UnityTile tile, TileErrorEventArgs e)
-		{
-			EventHandler<TileErrorEventArgs> handler = OnTileError;
-			if (handler != null)
-			{
-				handler(this, e);
-			}
-		}
-
 		public virtual void Initialize(IFileSource fileSource)
 		{
 			_fileSource = fileSource;
@@ -87,27 +78,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			OnUnregistered(tile);
 		}
 
-		public virtual void UnbindEvents()
-		{
-			OnUnbindEvents();
-		}
-
-		public virtual void UpdateTileProperty(UnityTile tile, LayerUpdateArgs updateArgs)
-		{
-			updateArgs.property.UpdateProperty(tile);
-
-			if (updateArgs.property.NeedsForceUpdate())
-			{
-				Register(tile);
-			}
-		}
-
 		protected abstract void OnInitialized();
 
 		protected abstract void OnRegistered(UnityTile tile);
 		protected abstract void OnPostProcess(UnityTile tile);
 		protected abstract void OnUnregistered(UnityTile tile);
-		protected abstract void OnUnbindEvents();
 
 		#region Events
 		public event EventHandler<TileErrorEventArgs> OnTileError;
@@ -119,21 +94,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				handler(this, e);
 			}
 		}
-
-		public event EventHandler TileFactoryHasChanged;
-		protected virtual void UpdateTileFactory(object sender, System.EventArgs args)
-		{
-			System.EventHandler handler = TileFactoryHasChanged;
-			if (handler != null)
-			{
-				handler(this, args);
-			}
-		}
 		#endregion
-
-		public virtual void Clear()
-		{
-
-		}
 	}
 }

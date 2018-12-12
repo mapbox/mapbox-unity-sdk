@@ -1,13 +1,8 @@
-using Mapbox.Unity.Map.Interfaces;
-using Mapbox.Unity.Map.Strategies;
-using Mapbox.Unity.Map.TileProviders;
-
 namespace Mapbox.Unity.Map
 {
 	using System;
 	using System.Collections;
 	using System.Collections.Generic;
-	using System.Linq;
 	using Mapbox.Unity.Utilities;
 	using Utils;
 	using UnityEngine;
@@ -16,50 +11,143 @@ namespace Mapbox.Unity.Map
 	using Mapbox.Unity.MeshGeneration.Data;
 	using System.Globalization;
 
+	public interface IUnifiedMap
+	{
+		//void InitializeMap(MapOptions options);
+		void UpdateMap(Vector2d latLon, float zoom);
+		void ResetMap();
+	}
+
+	public interface IMapScalingStrategy
+	{
+		void SetUpScaling(AbstractMap map);
+	}
+
+	public class MapScalingAtWorldScaleStrategy : IMapScalingStrategy
+	{
+		public void SetUpScaling(AbstractMap map)
+		{
+			var scaleFactor = Mathf.Pow(2, (map.AbsoluteZoom - map.InitialZoom));
+			map.SetWorldRelativeScale(scaleFactor * Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x));
+		}
+	}
+
+	public class MapScalingAtUnityScaleStrategy : IMapScalingStrategy
+	{
+		public void SetUpScaling(AbstractMap map)
+		{
+			var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(map.CenterLatitudeLongitude, map.AbsoluteZoom));
+			map.SetWorldRelativeScale((float)(map.Options.scalingOptions.unityTileSize / referenceTileRect.Size.x));
+		}
+	}
+
+	public interface IMapPlacementStrategy
+	{
+		void SetUpPlacement(AbstractMap map);
+	}
+
+	public class MapPlacementAtTileCenterStrategy : IMapPlacementStrategy
+	{
+		public void SetUpPlacement(AbstractMap map)
+		{
+			var referenceTileRect = Conversions.TileBounds(TileCover.CoordinateToTileId(map.CenterLatitudeLongitude, map.AbsoluteZoom));
+			map.SetCenterMercator(referenceTileRect.Center);
+		}
+	}
+
+	public class MapPlacementAtLocationCenterStrategy : IMapPlacementStrategy
+	{
+		public void SetUpPlacement(AbstractMap map)
+		{
+			map.SetCenterMercator(Conversions.LatLonToMeters(map.CenterLatitudeLongitude));
+		}
+	}
 	/// <summary>
 	/// Abstract map.
 	/// This is the main monobehavior which controls the map. It controls the visualization of map data.
 	/// Abstract map encapsulates the image, terrain and vector sources and provides a centralized interface to control the visualization of the map.
 	/// </summary>
-	[ExecuteInEditMode]
 	public class AbstractMap : MonoBehaviour, IMap
 	{
-		#region Private Fields
-
-		[SerializeField] private MapOptions _options = new MapOptions();
-		[SerializeField] private bool _initializeOnStart = true;
-		[SerializeField] protected ImageryLayer _imagery = new ImageryLayer();
-		[SerializeField] protected TerrainLayer _terrain = new TerrainLayer();
-		[SerializeField] protected VectorLayer _vectorData = new VectorLayer();
-		[SerializeField] protected AbstractTileProvider _tileProvider;
-		[SerializeField] protected HashSet<UnwrappedTileId> _currentExtent;
-
-		protected AbstractMapVisualizer _mapVisualizer;
-		protected float _unityTileSize = 1;
-		protected bool _worldHeightFixed = false;
-		protected MapboxAccess _fileSource;
-		protected int _initialZoom;
-		protected Vector2d _centerLatitudeLongitude;
-		protected Vector2d _centerMercator;
-		protected float _worldRelativeScale;
-		protected Vector3 _mapScaleFactor;
-		#endregion
-
-		#region Properties
-		public bool IsPreviewEnabled = false;
-
-		public AbstractMapVisualizer MapVisualizer
+		/// <summary>
+		/// Setting to trigger map initialization in Unity's Start method.
+		/// if set to false, Initialize method should be called explicitly to initialize the map.
+		/// </summary>
+		[SerializeField]
+		private bool _initializeOnStart = true;
+		public bool InitializeOnStart
 		{
 			get
 			{
-				return _mapVisualizer;
+				return _initializeOnStart;
 			}
 			set
 			{
-				_mapVisualizer = value;
+				_initializeOnStart = value;
+			}
+		}
+		/// <summary>
+		/// The map options.
+		/// Options to control the behaviour of the map like location,extent, scale and placement.
+		/// </summary>
+		[SerializeField]
+		private MapOptions _options;
+		public MapOptions Options
+		{
+			get
+			{
+				return _options;
+			}
+			set
+			{
+				_options = value;
+			}
+		}
+		/// <summary>
+		/// Options to control the imagery component of the map.
+		/// </summary>
+		[SerializeField]
+		ImageryLayer _imagery = new ImageryLayer();
+		[NodeEditorElement("Layers")]
+		public ImageryLayer ImageLayer
+		{
+			get
+			{
+				return _imagery;
+			}
+		}
+		/// <summary>
+		/// Options to control the terrain/ elevation component of the map.
+		/// </summary>
+		[SerializeField]
+		TerrainLayer _terrain = new TerrainLayer();
+		[NodeEditorElement("Layers")]
+		public TerrainLayer Terrain
+		{
+			get
+			{
+				return _terrain;
 			}
 		}
 
+		/// <summary>
+		/// The vector data.
+		/// Options to control the vector data component of the map.
+		/// Adds a vector source and visualizers to define the rendering behaviour of vector data layers.
+		/// </summary>
+		[SerializeField]
+		VectorLayer _vectorData = new VectorLayer();
+		[NodeEditorElement("Layers")]
+		public VectorLayer VectorData
+		{
+			get
+			{
+				return _vectorData;
+			}
+		}
+
+		[SerializeField]
+		protected AbstractTileProvider _tileProvider;
 		public AbstractTileProvider TileProvider
 		{
 			get
@@ -73,91 +161,73 @@ namespace Mapbox.Unity.Map
 					_tileProvider.ExtentChanged -= OnMapExtentChanged;
 				}
 				_tileProvider = value;
-				if (_tileProvider != null)
+				_tileProvider.ExtentChanged += OnMapExtentChanged;
+			}
+		}
+		[SerializeField]
+		protected HashSet<UnwrappedTileId> _currentExtent;
+		public HashSet<UnwrappedTileId> CurrentExtent
+		{
+			get
+			{
+				return _currentExtent;
+			}
+		}
+
+		private void TriggerTileRedrawForExtent(ExtentArgs currentExtent)
+		{
+			var _activeTiles = _mapVisualizer.ActiveTiles;
+			_currentExtent = new HashSet<UnwrappedTileId>(currentExtent.activeTiles);
+			// Change Map Visualizer state
+			_mapVisualizer.State = ModuleState.Working;
+			List<UnwrappedTileId> _toRemove = new List<UnwrappedTileId>();
+			foreach (var item in _activeTiles)
+			{
+				if (!_currentExtent.Contains(item.Key))
 				{
-					_tileProvider.ExtentChanged += OnMapExtentChanged;
+					_toRemove.Add(item.Key);
+				}
+			}
+
+			foreach (var t2r in _toRemove)
+			{
+				TileProvider_OnTileRemoved(t2r);
+			}
+
+			foreach (var tile in _activeTiles)
+			{
+				// Reposition tiles in case we panned.
+				TileProvider_OnTileRepositioned(tile.Key);
+			}
+
+			foreach (var tile in _currentExtent)
+			{
+				if (!_activeTiles.ContainsKey(tile))
+				{
+					TileProvider_OnTileAdded(tile);
 				}
 			}
 		}
 
-		/// <summary>
-		/// The map options.
-		/// Options to control the behaviour of the map like location,extent, scale and placement.
-		/// </summary>
-		public MapOptions Options
+		private void OnMapExtentChanged(object sender, ExtentArgs currentExtent)
+		{
+			TriggerTileRedrawForExtent(currentExtent);
+		}
+
+		protected AbstractMapVisualizer _mapVisualizer;
+		public AbstractMapVisualizer MapVisualizer
 		{
 			get
 			{
-				return _options;
+				return _mapVisualizer;
 			}
 			set
 			{
-				_options = value;
+				_mapVisualizer = value;
 			}
 		}
 
-		/// <summary>
-		/// Options to control the imagery component of the map.
-		/// </summary>
-		[NodeEditorElement("Layers")]
-		public IImageryLayer ImageLayer
-		{
-			get
-			{
-				return _imagery;
-			}
-		}
-
-		/// <summary>
-		/// Options to control the terrain/ elevation component of the map.
-		/// </summary>
-		[NodeEditorElement("Layers")]
-		public ITerrainLayer Terrain
-		{
-			get
-			{
-				return _terrain;
-			}
-		}
-
-		/// <summary>
-		/// The vector data.
-		/// Options to control the vector data component of the map.
-		/// Adds a vector source and visualizers to define the rendering behaviour of vector data layers.
-		/// </summary>
-		[NodeEditorElement("Layers")]
-		public IVectorDataLayer VectorData
-		{
-			get
-			{
-				return _vectorData;
-			}
-		}
-
-		public Vector2d CenterLatitudeLongitude
-		{
-			get
-			{
-				return _centerLatitudeLongitude;
-			}
-		}
-
-		public Vector2d CenterMercator
-		{
-			get
-			{
-				return _centerMercator;
-			}
-		}
-
-		public float WorldRelativeScale
-		{
-			get
-			{
-				return _worldRelativeScale;
-			}
-		}
-
+		protected float _unityTileSize = 1;
 		public float UnityTileSize
 		{
 			get
@@ -165,7 +235,6 @@ namespace Mapbox.Unity.Map
 				return _unityTileSize;
 			}
 		}
-
 		/// <summary>
 		/// Gets the absolute zoom of the tiles being currently rendered.
 		/// <seealso cref="Zoom"/>
@@ -179,6 +248,52 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
+		protected int _initialZoom;
+		/// <summary>
+		/// Gets the initial zoom at which the map was initialized.
+		/// This parameter is useful in calculating the scale of the tiles and the map.
+		/// </summary>
+		/// <value>The initial zoom.</value>
+		public int InitialZoom
+		{
+			get
+			{
+				return _initialZoom;
+			}
+		}
+
+		protected bool _worldHeightFixed = false;
+
+		protected MapboxAccess _fileSource;
+
+		protected Vector2d _centerLatitudeLongitude;
+		public Vector2d CenterLatitudeLongitude
+		{
+			get
+			{
+				return _centerLatitudeLongitude;
+			}
+		}
+
+		protected Vector2d _centerMercator;
+		public Vector2d CenterMercator
+		{
+			get
+			{
+				return _centerMercator;
+			}
+		}
+
+		protected float _worldRelativeScale;
+		private Vector3 _mapScaleFactor;
+
+		public float WorldRelativeScale
+		{
+			get
+			{
+				return _worldRelativeScale;
+			}
+		}
 		/// <summary>
 		/// Gets the current zoom value of the map.
 		/// Use <c>AbsoluteZoom</c> to get the zoom level of the tileset.
@@ -198,20 +313,6 @@ namespace Mapbox.Unity.Map
 			Options.locationOptions.zoom = zoom;
 		}
 
-		/// <summary>
-		/// Gets the initial zoom at which the map was initialized.
-		/// This parameter is useful in calculating the scale of the tiles and the map.
-		/// </summary>
-		/// <value>The initial zoom.</value>
-		public int InitialZoom
-		{
-			get
-			{
-				return _initialZoom;
-			}
-		}
-
-
 		public Transform Root
 		{
 			get
@@ -220,178 +321,20 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		/// <summary>
-		/// Setting to trigger map initialization in Unity's Start method.
-		/// if set to false, Initialize method should be called explicitly to initialize the map.
-		/// </summary>
-		public bool InitializeOnStart
+		public void SetCenterMercator(Vector2d centerMercator)
 		{
-			get
-			{
-				return _initializeOnStart;
-			}
-			set
-			{
-				_initializeOnStart = value;
-			}
+			_centerMercator = centerMercator;
 		}
 
-		public HashSet<UnwrappedTileId> CurrentExtent
+		public void SetCenterLatitudeLongitude(Vector2d centerLatitudeLongitude)
 		{
-			get
-			{
-				return _currentExtent;
-			}
+			_options.locationOptions.latitudeLongitude = string.Format("{0}, {1}", centerLatitudeLongitude.x, centerLatitudeLongitude.y);
+			_centerLatitudeLongitude = centerLatitudeLongitude;
 		}
 
-		/// <summary>
-		/// Gets the loading texture used as a placeholder while the image tile is loading.
-		/// </summary>
-		/// <value>The loading texture.</value>
-		public Texture2D LoadingTexture
+		public void SetWorldRelativeScale(float scale)
 		{
-			get
-			{
-				return _options.loadingTexture;
-			}
-		}
-
-		/// <summary>
-		/// Gets the tile material used for map tiles.
-		/// </summary>
-		/// <value>The tile material.</value>
-		public Material TileMaterial
-		{
-			get
-			{
-				return _options.tileMaterial;
-			}
-		}
-
-		public Type ExtentCalculatorType
-		{
-			get
-			{
-				return _tileProvider.GetType();
-			}
-		}
-
-		#endregion
-
-		#region Public Methods
-		/// <summary>
-		/// Initialize the map using the specified latLon and zoom.
-		/// Map will automatically get initialized in the <c>Start</c> method.
-		/// Use this method to explicitly initialize the map and disable intialize on <c>Start</c>
-		/// </summary>
-		/// <returns>The initialize.</returns>
-		/// <param name="latLon">Lat lon.</param>
-		/// <param name="zoom">Zoom.</param>
-		public virtual void Initialize(Vector2d latLon, int zoom)
-		{
-			_initializeOnStart = false;
-			if (_options == null)
-			{
-				_options = new MapOptions();
-			}
-			_options.locationOptions.latitudeLongitude = String.Format(CultureInfo.InvariantCulture, "{0},{1}", latLon.x, latLon.y);
-			_options.locationOptions.zoom = zoom;
-
-			SetUpMap();
-		}
-
-		//Unity Update
-		private void Update()
-		{
-			if (_tileProvider != null)
-			{
-				_tileProvider.UpdateTileProvider();
-			}
-		}
-
-		public virtual void UpdateMap()
-		{
-			UpdateMap(Conversions.StringToLatLon(_options.locationOptions.latitudeLongitude), Zoom);
-		}
-
-		public virtual void UpdateMap(Vector2d latLon)
-		{
-			UpdateMap(latLon, Zoom);
-		}
-
-		public virtual void UpdateMap(float zoom)
-		{
-			UpdateMap(Conversions.StringToLatLon(_options.locationOptions.latitudeLongitude), zoom);
-		}
-
-		/// <summary>
-		/// Updates the map.
-		/// Use this method to update the location of the map.
-		/// Update method should be used when panning, zooming or changing location of the map.
-		/// This method avoid startup delays that might occur on re-initializing the map.
-		/// </summary>
-		/// <param name="latLon">LatitudeLongitude.</param>
-		/// <param name="zoom">Zoom level.</param>
-		public virtual void UpdateMap(Vector2d latLon, float zoom)
-		{
-			//so map will be snapped to zero using next new tile loaded
-			_worldHeightFixed = false;
-			float differenceInZoom = 0.0f;
-			bool isAtInitialZoom = false;
-			// Update map zoom, if it has changed.
-			if (Math.Abs(Zoom - zoom) > Constants.EpsilonFloatingPoint)
-			{
-				SetZoom(zoom);
-			}
-
-			// Compute difference in zoom. Will be used to calculate correct scale of the map.
-			differenceInZoom = Zoom - InitialZoom;
-			isAtInitialZoom = (differenceInZoom - 0.0 < Constants.EpsilonFloatingPoint);
-
-			//Update center latitude longitude
-			var centerLatitudeLongitude = latLon;
-			double xDelta = centerLatitudeLongitude.x;
-			double zDelta = centerLatitudeLongitude.y;
-
-			xDelta = xDelta > 0 ? Mathd.Min(xDelta, Mapbox.Utils.Constants.LatitudeMax) : Mathd.Max(xDelta, -Mapbox.Utils.Constants.LatitudeMax);
-			zDelta = zDelta > 0 ? Mathd.Min(zDelta, Mapbox.Utils.Constants.LongitudeMax) : Mathd.Max(zDelta, -Mapbox.Utils.Constants.LongitudeMax);
-
-			//Set Center in Latitude Longitude and Mercator.
-			SetCenterLatitudeLongitude(new Vector2d(xDelta, zDelta));
-			Options.scalingOptions.scalingStrategy.SetUpScaling(this);
-			Options.placementOptions.placementStrategy.SetUpPlacement(this);
-
-			//Scale the map accordingly.
-			if (Math.Abs(differenceInZoom) > Constants.EpsilonFloatingPoint || isAtInitialZoom)
-			{
-				_mapScaleFactor = Vector3.one * Mathf.Pow(2, differenceInZoom);
-				Root.localScale = _mapScaleFactor;
-			}
-
-			//Update Tile extent.
-			if (_tileProvider != null)
-			{
-				_tileProvider.UpdateTileExtent();
-			}
-
-			if (OnUpdated != null)
-			{
-				OnUpdated();
-			}
-		}
-
-		/// <summary>
-		/// Resets the map.
-		/// Use this method to reset the map to and reset all parameters.
-		/// </summary>
-		[ContextMenu("ResetMap")]
-		public void ResetMap()
-		{
-			//Initialize(Conversions.StringToLatLon(_options.locationOptions.latitudeLongitude), (int)_options.locationOptions.zoom);
-
-			_mapVisualizer.UnregisterAllTiles();
-			_mapVisualizer.ClearMap();
-			_mapVisualizer.ReregisterAllTiles();
+			_worldRelativeScale = scale;
 		}
 
 		public bool IsAccessTokenValid
@@ -416,33 +359,22 @@ namespace Mapbox.Unity.Map
 				return isAccessTokenValid;
 			}
 		}
-		#endregion
 
-		#region Private/Protected Methods
-
-		private void OnEnable()
-		{
-			IsPreviewEnabled = false;
-
-			if (_options.tileMaterial == null)
-			{
-				_options.tileMaterial = new Material(Shader.Find("Standard"));
-			}
-
-			if (_options.loadingTexture == null)
-			{
-				_options.loadingTexture = new Texture2D(1, 1);
-			}
-		}
+		/// <summary>
+		/// Event delegate, gets called after map is initialized
+		/// <seealso cref="OnUpdated"/>
+		/// </summary>
+		public event Action OnInitialized = delegate { };
+		/// <summary>
+		/// Event delegate, gets called after map is updated.
+		/// <c>UpdateMap</c> will trigger this event.
+		/// <seealso cref="OnInitialized"/>
+		/// </summary>
+		public event Action OnUpdated = delegate { };
 
 		protected virtual void Awake()
 		{
 			// Setup a visualizer to get a "Starter" map.
-			foreach (Transform tr in transform)
-			{
-				Destroy(tr.gameObject);
-			}
-
 			_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
 		}
 
@@ -450,27 +382,10 @@ namespace Mapbox.Unity.Map
 		protected virtual void Start()
 		{
 			StartCoroutine("SetupAccess");
-			if (_initializeOnStart && Application.isPlaying)
+			if (_initializeOnStart)
 			{
 				SetUpMap();
 			}
-		}
-
-		public void EnableEditorPreview()
-		{
-			SetUpMap();
-		}
-
-		public void DisableEditorPreview()
-		{
-			TileProvider = null;
-			_imagery.UpdateLayer -= OnImageOrTerrainUpdateLayer;
-			_terrain.UpdateLayer -= OnImageOrTerrainUpdateLayer;
-			_vectorData.SubLayerRemoved -= OnVectorDataSubLayerRemoved;
-			_vectorData.SubLayerAdded -= OnVectorDataSubLayerAdded;
-			_vectorData.UpdateLayer -= OnVectorDataUpdateLayer;
-			_vectorData.UnbindAllEvents();
-			_mapVisualizer.ClearMap();
 		}
 
 		protected IEnumerator SetupAccess()
@@ -486,11 +401,55 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		protected virtual void SetUpMap()
 		{
-			SetPlacementStrategy();
+			switch (_options.placementOptions.placementType)
+			{
+				case MapPlacementType.AtTileCenter:
+					_options.placementOptions.placementStrategy = new MapPlacementAtTileCenterStrategy();
+					break;
+				case MapPlacementType.AtLocationCenter:
+					_options.placementOptions.placementStrategy = new MapPlacementAtLocationCenterStrategy();
+					break;
+				default:
+					_options.placementOptions.placementStrategy = new MapPlacementAtTileCenterStrategy();
+					break;
+			}
 
-			SetScalingStrategy();
+			switch (_options.scalingOptions.scalingType)
+			{
+				case MapScalingType.WorldScale:
+					_options.scalingOptions.scalingStrategy = new MapScalingAtWorldScaleStrategy();
+					break;
+				case MapScalingType.Custom:
+					_options.scalingOptions.scalingStrategy = new MapScalingAtUnityScaleStrategy();
+					break;
+				default:
+					break;
+			}
+			if (_options.extentOptions.extentType != MapExtentType.Custom)
+			{
+				ITileProviderOptions tileProviderOptions = _options.extentOptions.GetTileProviderOptions();
+				// Setup tileprovider based on type.
+				switch (_options.extentOptions.extentType)
+				{
+					case MapExtentType.CameraBounds:
+						TileProvider = gameObject.AddComponent<QuadTreeTileProvider>();
+						break;
+					case MapExtentType.RangeAroundCenter:
+						TileProvider = gameObject.AddComponent<RangeTileProvider>();
+						break;
+					case MapExtentType.RangeAroundTransform:
+						TileProvider = gameObject.AddComponent<RangeAroundTransformTileProvider>();
+						break;
+					default:
+						break;
+				}
+				TileProvider.SetOptions(tileProviderOptions);
+			}
+			else
+			{
+				TileProvider = _tileProvider;
+			}
 
-			SetTileProvider();
 
 			if (_imagery == null)
 			{
@@ -510,30 +469,178 @@ namespace Mapbox.Unity.Map
 			}
 			_vectorData.Initialize();
 
-			_mapVisualizer.Factories = new List<AbstractTileFactory>
+			if (Options.loadingTexture != null)
 			{
-				_terrain.Factory,
-				_imagery.Factory,
-				_vectorData.Factory
-			};
+				_mapVisualizer.SetLoadingTexture(Options.loadingTexture);
+			}
+
+			if (Options.tileMaterial != null)
+			{
+				_mapVisualizer.SetTileMaterial(Options.tileMaterial);
+			}
+
+			_mapVisualizer.Factories = new List<AbstractTileFactory>();
+
+			_mapVisualizer.Factories.Add(_terrain.Factory);
+			_mapVisualizer.Factories.Add(_imagery.Factory);
+			_mapVisualizer.Factories.Add(_vectorData.Factory);
 
 			InitializeMap(_options);
 		}
 
+		// TODO: implement IDisposable, instead?
+		protected virtual void OnDestroy()
+		{
+			if (_tileProvider != null)
+			{
+				_tileProvider.ExtentChanged -= OnMapExtentChanged;
+			}
+
+			_mapVisualizer.Destroy();
+		}
+		/// <summary>
+		/// Initializes the map using the mapOptions.
+		/// </summary>
+		/// <param name="options">Options.</param>
+		protected virtual void InitializeMap(MapOptions options)
+		{
+			Options = options;
+			_worldHeightFixed = false;
+			_fileSource = MapboxAccess.Instance;
+			_centerLatitudeLongitude = Conversions.StringToLatLon(options.locationOptions.latitudeLongitude);
+			_initialZoom = (int)options.locationOptions.zoom;
+
+			options.scalingOptions.scalingStrategy.SetUpScaling(this);
+
+			options.placementOptions.placementStrategy.SetUpPlacement(this);
+
+			_mapVisualizer.Initialize(this, _fileSource);
+			_tileProvider.Initialize(this);
+
+			SendInitialized();
+
+			_tileProvider.UpdateTileExtent();
+		}
+		/// <summary>
+		/// Initialize the map using the specified latLon and zoom.
+		/// Map will automatically get initialized in the <c>Start</c> method.
+		/// Use this method to explicitly initialize the map and disable intialize on <c>Start</c>
+		/// </summary>
+		/// <returns>The initialize.</returns>
+		/// <param name="latLon">Lat lon.</param>
+		/// <param name="zoom">Zoom.</param>
+		public virtual void Initialize(Vector2d latLon, int zoom)
+		{
+			_initializeOnStart = false;
+			if (_options == null)
+			{
+				_options = new MapOptions();
+			}
+			_options.locationOptions.latitudeLongitude = String.Format(CultureInfo.InvariantCulture, "{0},{1}", latLon.x, latLon.y);
+			_options.locationOptions.zoom = zoom;
+
+			SetUpMap();
+		}
+
+		public virtual void UpdateMap()
+		{
+			UpdateMap(_centerLatitudeLongitude, Zoom);
+		}
+
+		public virtual void UpdateMap(Vector2d latLon)
+		{
+			UpdateMap(latLon, Zoom);
+		}
+
+		public virtual void UpdateMap(float zoom)
+		{
+			UpdateMap(_centerLatitudeLongitude, zoom);
+		}
+
+		/// <summary>
+		/// Updates the map.
+		/// Use this method to update the location of the map.
+		/// Update method should be used when panning, zooming or changing location of the map.
+		/// This method avoid startup delays that might occur on re-initializing the map.
+		/// </summary>
+		/// <param name="latLon">LatitudeLongitude.</param>
+		/// <param name="zoom">Zoom level.</param>
+		public virtual void UpdateMap(Vector2d latLon, float zoom)
+		{
+			float differenceInZoom = 0.0f;
+			bool isAtInitialZoom = false;
+			if (Math.Abs(Zoom - zoom) > Constants.EpsilonFloatingPoint)
+			{
+				SetZoom(zoom);
+				differenceInZoom = Zoom - InitialZoom;
+				isAtInitialZoom = (differenceInZoom - 0.0 < Constants.EpsilonFloatingPoint);
+			}
+			//Update center latitude longitude
+			var centerLatitudeLongitude = latLon;
+			double xDelta = centerLatitudeLongitude.x;
+			double zDelta = centerLatitudeLongitude.y;
+
+			xDelta = xDelta > 0 ? Mathd.Min(xDelta, Mapbox.Utils.Constants.LatitudeMax) : Mathd.Max(xDelta, -Mapbox.Utils.Constants.LatitudeMax);
+			zDelta = zDelta > 0 ? Mathd.Min(zDelta, Mapbox.Utils.Constants.LongitudeMax) : Mathd.Max(zDelta, -Mapbox.Utils.Constants.LongitudeMax);
+
+			//Set Center in Latitude Longitude and Mercator.
+			SetCenterLatitudeLongitude(new Vector2d(xDelta, zDelta));
+			Options.scalingOptions.scalingStrategy.SetUpScaling(this);
+
+			Options.placementOptions.placementStrategy.SetUpPlacement(this);
+
+			//Scale the map accordingly.
+			if (Math.Abs(differenceInZoom) > Constants.EpsilonFloatingPoint || isAtInitialZoom)
+			{
+				_mapScaleFactor = Vector3.one * Mathf.Pow(2, differenceInZoom);
+				Root.localScale = _mapScaleFactor;
+			}
+
+			_tileProvider.UpdateTileExtent();
+
+			if (OnUpdated != null)
+			{
+				OnUpdated();
+			}
+		}
+		/// <summary>
+		/// Resets the map.
+		/// Use this method to reset the map to and reset all parameters.
+		/// </summary>
+		public void ResetMap()
+		{
+			Initialize(Conversions.StringToLatLon(_options.locationOptions.latitudeLongitude), (int)_options.locationOptions.zoom);
+		}
+
 		protected virtual void TileProvider_OnTileAdded(UnwrappedTileId tileId)
 		{
-			var tile = _mapVisualizer.LoadTile(tileId);
-			if (Options.placementOptions.snapMapToZero && !_worldHeightFixed)
+			if (Options.placementOptions.snapMapToZero)
 			{
 				_worldHeightFixed = true;
+				var tile = _mapVisualizer.LoadTile(tileId);
 				if (tile.HeightDataState == MeshGeneration.Enums.TilePropertyState.Loaded)
 				{
-					ApplySnapWorldToZero(tile);
+					var h = tile.QueryHeightData(.5f, .5f);
+					Root.transform.position = new Vector3(
+					 Root.transform.position.x,
+					 -h,
+					 Root.transform.position.z);
 				}
 				else
 				{
-					tile.OnHeightDataChanged += (s) => { ApplySnapWorldToZero(tile); };
+					tile.OnHeightDataChanged += (s) =>
+					{
+						var h = s.QueryHeightData(.5f, .5f);
+						Root.transform.position = new Vector3(
+							 Root.transform.position.x,
+							 -h,
+							 Root.transform.position.z);
+					};
 				}
+			}
+			else
+			{
+				_mapVisualizer.LoadTile(tileId);
 			}
 		}
 
@@ -552,318 +659,6 @@ namespace Mapbox.Unity.Map
 			OnInitialized();
 		}
 
-		/// <summary>
-		/// Apply Snap World to Zero setting by moving map in Y Axis such that
-		/// center of the given tile will be at y=0.
-		/// </summary>
-		/// <param name="referenceTile">Tile to use for Y axis correction.</param>
-		private void ApplySnapWorldToZero(UnityTile referenceTile)
-		{
-			if (_options.placementOptions.snapMapToZero)
-			{
-				var h = referenceTile.QueryHeightData(.5f, .5f);
-				Root.transform.position = new Vector3(
-					Root.transform.position.x,
-					-h,
-					Root.transform.position.z);
-			}
-			else
-			{
-				Root.transform.position = new Vector3(
-					Root.transform.position.x,
-					0,
-					Root.transform.position.z);
-			}
-		}
-
-		/// <summary>
-		/// Initializes the map using the mapOptions.
-		/// </summary>
-		/// <param name="options">Options.</param>
-		protected virtual void InitializeMap(MapOptions options)
-		{
-			Options = options;
-			_worldHeightFixed = false;
-			_fileSource = MapboxAccess.Instance;
-			_centerLatitudeLongitude = Conversions.StringToLatLon(options.locationOptions.latitudeLongitude);
-			_initialZoom = (int)options.locationOptions.zoom;
-
-			options.scalingOptions.scalingStrategy.SetUpScaling(this);
-			options.placementOptions.placementStrategy.SetUpPlacement(this);
-
-
-			//Set up events for changes.
-			_imagery.UpdateLayer += OnImageOrTerrainUpdateLayer;
-			_terrain.UpdateLayer += OnImageOrTerrainUpdateLayer;
-
-			_vectorData.SubLayerRemoved += OnVectorDataSubLayerRemoved;
-			_vectorData.SubLayerAdded += OnVectorDataSubLayerAdded;
-			_vectorData.UpdateLayer += OnVectorDataUpdateLayer;
-
-			_options.locationOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
-			{
-				//take care of redraw map business...
-				UpdateMap();
-			};
-
-			_options.extentOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
-			{
-				//take care of redraw map business...
-				OnTileProviderChanged();
-			};
-
-			_options.extentOptions.defaultExtents.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
-			{
-				//take care of redraw map business...
-				if (_tileProvider != null)
-				{
-					_tileProvider.UpdateTileExtent();
-				}
-			};
-
-			_options.placementOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
-			{
-				//take care of redraw map business...
-				SetPlacementStrategy();
-				UpdateMap();
-			};
-
-			_options.scalingOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
-			{
-				//take care of redraw map business...
-				SetScalingStrategy();
-				UpdateMap();
-			};
-
-			_mapVisualizer.Initialize(this, _fileSource);
-			_tileProvider.Initialize(this);
-
-			SendInitialized();
-
-			_tileProvider.UpdateTileExtent();
-		}
-
-		private void SetScalingStrategy()
-		{
-			switch (_options.scalingOptions.scalingType)
-			{
-				case MapScalingType.WorldScale:
-					_options.scalingOptions.scalingStrategy = new MapScalingAtWorldScaleStrategy();
-					break;
-				case MapScalingType.Custom:
-					_options.scalingOptions.scalingStrategy = new MapScalingAtUnityScaleStrategy();
-					break;
-			}
-		}
-
-		private void SetPlacementStrategy()
-		{
-			switch (_options.placementOptions.placementType)
-			{
-				case MapPlacementType.AtTileCenter:
-					_options.placementOptions.placementStrategy = new MapPlacementAtTileCenterStrategy();
-					break;
-				case MapPlacementType.AtLocationCenter:
-					_options.placementOptions.placementStrategy = new MapPlacementAtLocationCenterStrategy();
-					break;
-				default:
-					_options.placementOptions.placementStrategy = new MapPlacementAtTileCenterStrategy();
-					break;
-			}
-		}
-
-		private void SetTileProvider()
-		{
-			//TileProvider = GetComponent<AbstractTileProvider>();
-			if (_options.extentOptions.extentType != MapExtentType.Custom)
-			{
-				ITileProviderOptions tileProviderOptions = _options.extentOptions.GetTileProviderOptions();
-				// Setup tileprovider based on type.
-				switch (_options.extentOptions.extentType)
-				{
-					case MapExtentType.CameraBounds:
-					{
-						if (TileProvider != null)
-						{
-							if (!(TileProvider is QuadTreeTileProvider))
-							{
-								TileProvider = new QuadTreeTileProvider();
-							}
-						}
-						else
-						{
-							TileProvider = new QuadTreeTileProvider();
-						}
-						break;
-					}
-					case MapExtentType.RangeAroundCenter:
-					{
-						if (TileProvider != null)
-						{
-							if (!(TileProvider is RangeTileProvider))
-							{
-								TileProvider = new RangeTileProvider();
-							}
-						}
-						else
-						{
-							TileProvider = new RangeTileProvider();
-						}
-						break;
-					}
-					case MapExtentType.RangeAroundTransform:
-					{
-						if (TileProvider != null)
-						{
-							if (!(TileProvider is RangeAroundTransformTileProvider))
-							{
-								TileProvider = new RangeAroundTransformTileProvider();
-							}
-						}
-						else
-						{
-							TileProvider = new RangeAroundTransformTileProvider();
-						}
-						break;
-					}
-					default:
-						break;
-				}
-				TileProvider.SetOptions(tileProviderOptions);
-			}
-			else
-			{
-				TileProvider = _tileProvider;
-			}
-		}
-
-		private void TriggerTileRedrawForExtent(ExtentArgs currentExtent)
-		{
-			var _activeTiles = _mapVisualizer.ActiveTiles;
-			_currentExtent = new HashSet<UnwrappedTileId>(currentExtent.activeTiles);
-
-			List<UnwrappedTileId> _toRemove = new List<UnwrappedTileId>();
-			foreach (var item in _activeTiles)
-			{
-				if (_tileProvider.Cleanup(item.Key)) //(!_currentExtent.Contains(item.Key))
-				{
-					_toRemove.Add(item.Key);
-				}
-			}
-
-			foreach (var t2r in _toRemove)
-			{
-				TileProvider_OnTileRemoved(t2r);
-			}
-
-			foreach (var tile in _activeTiles)
-			{
-				// Reposition tiles in case we panned.
-				TileProvider_OnTileRepositioned(tile.Key);
-			}
-
-			foreach (var tile in _currentExtent)
-			{
-				if (!_activeTiles.ContainsKey(tile))
-				{
-					// Change Map Visualizer state
-					_mapVisualizer.State = ModuleState.Working;
-					TileProvider_OnTileAdded(tile);
-				}
-			}
-		}
-
-		private void OnMapExtentChanged(object sender, ExtentArgs currentExtent)
-		{
-			TriggerTileRedrawForExtent(currentExtent);
-		}
-
-		// TODO: implement IDisposable, instead?
-		protected virtual void OnDestroy()
-		{
-			if (_tileProvider != null)
-			{
-				_tileProvider.ExtentChanged -= OnMapExtentChanged;
-			}
-
-			_mapVisualizer.Destroy();
-		}
-
-		private void OnImageOrTerrainUpdateLayer(object sender, System.EventArgs eventArgs)
-		{
-			LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
-			if (layerUpdateArgs != null)
-			{
-				_mapVisualizer.UpdateTileForProperty(layerUpdateArgs.factory, layerUpdateArgs);
-				if (layerUpdateArgs.effectsVectorLayer)
-				{
-					RedrawVectorDataLayer();
-				}
-				OnMapRedrawn();
-			}
-		}
-
-		private void RedrawVectorDataLayer()
-		{
-			_mapVisualizer.UnregisterTilesFrom(_vectorData.Factory);
-			_vectorData.UnbindAllEvents();
-			_vectorData.UpdateFactorySettings();
-			_mapVisualizer.ReregisterTilesTo(_vectorData.Factory);
-		}
-
-		private void OnVectorDataSubLayerRemoved(object sender, EventArgs eventArgs)
-		{
-			VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
-
-			if (layerUpdateArgs.visualizer != null)
-			{
-				_mapVisualizer.RemoveTilesFromLayer((VectorTileFactory)layerUpdateArgs.factory, layerUpdateArgs.visualizer);
-			}
-			OnMapRedrawn();
-		}
-
-		private void OnVectorDataSubLayerAdded(object sender, EventArgs eventArgs)
-		{
-			RedrawVectorDataLayer();
-			OnMapRedrawn();
-		}
-
-		private void OnVectorDataUpdateLayer(object sender, System.EventArgs eventArgs)
-		{
-
-			VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
-
-			if (layerUpdateArgs.visualizer != null)
-			{
-				//we got a visualizer. Update only the visualizer.
-				// No need to unload the entire factory to apply changes.
-				_mapVisualizer.UnregisterAndRedrawTilesFromLayer((VectorTileFactory)layerUpdateArgs.factory, layerUpdateArgs.visualizer);
-			}
-			else
-			{
-				//We are updating a core property of vector section.
-				//All vector features need to get unloaded and re-created.
-				RedrawVectorDataLayer();
-			}
-			OnMapRedrawn();
-		}
-
-		private void OnTileProviderChanged()
-		{
-//			var currentTileProvider = gameObject.GetComponent<AbstractTileProvider>();
-//
-//			if (currentTileProvider != null)
-//			{
-//				Destroy(currentTileProvider);
-//			}
-			SetTileProvider();
-			_tileProvider.Initialize(this);
-			_tileProvider.UpdateTileExtent();
-		}
-
-		#endregion
-
-		#region Conversion and Height Query Methods
 		private Vector3 GeoToWorldPositionXZ(Vector2d latitudeLongitude)
 		{
 			// For quadtree implementation of the map, the map scale needs to be compensated for.
@@ -890,7 +685,6 @@ namespace Mapbox.Unity.Map
 			}
 
 		}
-
 		/// <summary>
 		/// Converts a latitude longitude into map space position.
 		/// </summary>
@@ -899,33 +693,17 @@ namespace Mapbox.Unity.Map
 		/// <param name="queryHeight">If set to <c>true</c> will return the terrain height(in Unity units) at that point.</param>
 		public virtual Vector3 GeoToWorldPosition(Vector2d latitudeLongitude, bool queryHeight = true)
 		{
-			Vector3 worldPos = GeoToWorldPositionXZ(latitudeLongitude);
+			var worldPos = GeoToWorldPositionXZ(latitudeLongitude);
 
 			if (queryHeight)
 			{
 				//Query Height.
 				float tileScale = 1f;
-				float height = QueryElevationAtInternal(latitudeLongitude, out tileScale);
-
-				// Apply height inside the unity tile space
-				UnityTile tile;
-				if (MapVisualizer.ActiveTiles.TryGetValue(Conversions.LatitudeLongitudeToTileId(latitudeLongitude.x, latitudeLongitude.y, (int)Zoom), out tile))
-				{
-					if (tile != null)
-					{
-						// Calculate height in the local space of the tile gameObject.
-						// Height is aligned with the y axis in local space.
-						// This also helps us avoid scale values when setting the height.
-						var localPos = tile.gameObject.transform.InverseTransformPoint(worldPos);
-						localPos.y = height;
-						worldPos = tile.gameObject.transform.TransformPoint(localPos);
-					}
-				}
+				worldPos.y = QueryElevationAtInternal(latitudeLongitude, out tileScale);
 			}
 
 			return worldPos;
 		}
-
 		/// <summary>
 		/// Converts a position in map space into a laitude longitude.
 		/// </summary>
@@ -961,123 +739,157 @@ namespace Mapbox.Unity.Map
 			float height = QueryElevationAtInternal(latlong, out tileScale);
 			return (height / tileScale);
 		}
-		#endregion
 
-		#region Map Property Related Changes Methods
-		public virtual void SetCenterMercator(Vector2d centerMercator)
-		{
-			_centerMercator = centerMercator;
-		}
-
-		public virtual void SetCenterLatitudeLongitude(Vector2d centerLatitudeLongitude)
-		{
-			_options.locationOptions.latitudeLongitude = string.Format("{0}, {1}", centerLatitudeLongitude.x, centerLatitudeLongitude.y);
-			_centerLatitudeLongitude = centerLatitudeLongitude;
-		}
-
-		public virtual void SetWorldRelativeScale(float scale)
-		{
-			_worldRelativeScale = scale;
-		}
-
-		public virtual void SetLoadingTexture(Texture2D loadingTexture)
+		public void SetLoadingTexture(Texture2D loadingTexture)
 		{
 			Options.loadingTexture = loadingTexture;
+			_mapVisualizer.SetLoadingTexture(loadingTexture);
 		}
 
-		public virtual void SetTileMaterial(Material tileMaterial)
+		#region Location Prefabs Methods
+
+		/// <summary>
+		/// Places a prefab at the specified LatLon on the Map.
+		/// </summary>
+		/// <param name="prefab"> A Game Object Prefab.</param>
+		/// <param name="LatLon">A Vector2d(Latitude Longitude) object</param>
+		public void SpawnPrefabAtGeoLocation(GameObject prefab,
+											 Vector2d LatLon,
+											 Action<List<GameObject>> callback = null,
+											 bool scaleDownWithWorld = true,
+											 string locationItemName = "New Location")
 		{
-			Options.tileMaterial = tileMaterial;
+			var latLonArray = new Vector2d[] { LatLon };
+			SpawnPrefabAtGeoLocation(prefab, latLonArray, callback, scaleDownWithWorld, locationItemName);
 		}
 
 		/// <summary>
-		/// Sets the extent type and parameters to control the maps extent.
+		/// Places a prefab at all locations specified by the LatLon array.
 		/// </summary>
-		/// <param name="extentType">Extent type.</param>
-		/// <param name="extentOptions">Extent options.</param>
-		public virtual void SetExtent(MapExtentType extentType, ExtentOptions extentOptions = null)
+		/// <param name="prefab"> A Game Object Prefab.</param>
+		/// <param name="LatLon">A Vector2d(Latitude Longitude) object</param>
+		public void SpawnPrefabAtGeoLocation(GameObject prefab,
+											 Vector2d[] LatLon,
+											 Action<List<GameObject>> callback = null,
+											 bool scaleDownWithWorld = true,
+											 string locationItemName = "New Location")
 		{
-			_options.extentOptions.extentType = extentType;
-
-			if (extentOptions != null)
+			var coordinateArray = new string[LatLon.Length];
+			for (int i = 0; i < LatLon.Length; i++)
 			{
-				var currentOptions = _options.extentOptions.GetTileProviderOptions();
-				if (currentOptions.GetType() == extentOptions.GetType())
-				{
-					currentOptions = extentOptions;
-				}
+				coordinateArray[i] = LatLon[i].x + ", " + LatLon[i].y;
 			}
-			OnTileProviderChanged();
+
+			PrefabItemOptions item = new PrefabItemOptions()
+			{
+				findByType = LocationPrefabFindBy.AddressOrLatLon,
+				prefabItemName = locationItemName,
+				spawnPrefabOptions = new SpawnPrefabOptions()
+				{
+					prefab = prefab,
+					scaleDownWithWorld = scaleDownWithWorld
+				},
+
+				coordinates = coordinateArray
+			};
+
+			if (callback != null)
+			{
+				item.OnAllPrefabsInstantiated += callback;
+			}
+
+			CreatePrefabLayer(item);
 		}
 
 		/// <summary>
-		/// Set parameters for current extent calculator strategy.
+		/// Places the prefab for supplied categories.
 		/// </summary>
-		/// <param name="extentOptions">Parameters to control the map extent.</param>
-		public virtual void SetExtentOptions(ExtentOptions extentOptions)
+		/// <param name="prefab">GameObject Prefab</param>
+		/// <param name="categories"><see cref="LocationPrefabCategories"/> For more than one category separate them by pipe 
+		/// (eg: LocationPrefabCategories.Food | LocationPrefabCategories.Nightlife)</param>
+		/// <param name="density">Density controls the number of POIs on the map.(Integer value between 1 and 30)</param>
+		/// <param name="locationItemName">Name of this location prefab item for future reference</param>
+		/// <param name="scaleDownWithWorld">Should the prefab scale up/down along with the map game object?</param>
+		public void SpawnPrefabByCategory(GameObject prefab,
+										  LocationPrefabCategories categories = LocationPrefabCategories.AnyCategory,
+										  int density = 30, Action<List<GameObject>> callback = null,
+										  bool scaleDownWithWorld = true,
+										  string locationItemName = "New Location")
 		{
-			_options.extentOptions.GetTileProviderOptions().SetOptions(extentOptions);
-			_options.extentOptions.defaultExtents.HasChanged = true;
+			PrefabItemOptions item = new PrefabItemOptions()
+			{
+				findByType = LocationPrefabFindBy.MapboxCategory,
+				categories = categories,
+				density = density,
+				prefabItemName = locationItemName,
+				spawnPrefabOptions = new SpawnPrefabOptions()
+				{
+					prefab = prefab,
+					scaleDownWithWorld = scaleDownWithWorld
+				}
+			};
+
+			if (callback != null)
+			{
+				item.OnAllPrefabsInstantiated += callback;
+			}
+
+			CreatePrefabLayer(item);
 		}
 
 		/// <summary>
-		/// Sets the positions of the map's root transform.
-		/// Use <paramref name="placementType"/> = <c> MapPlacementType.AtTileCenter</c> to place map root at the center of tile containing the latitude,longitude.
-		/// Use <paramref name="placementType"/> = <c> MapPlacementType.AtLocationCenter</c> to place map root at the latitude,longitude.
+		/// Places the prefab at POI locations if its name contains the supplied string
+		/// <param name="prefab">GameObject Prefab</param>
+		/// <param name="nameString">This is the string that will be checked against the POI name to see if is contained in it, and ony those POIs will be spawned</param>
+		/// <param name="density">Density (Integer value between 1 and 30)</param>
+		/// <param name="locationItemName">Name of this location prefab item for future reference</param>
+		/// <param name="scaleDownWithWorld">Should the prefab scale up/down along with the map game object?</param>
 		/// </summary>
-		/// <param name="placementType">Placement type.</param>
-		public virtual void SetPlacementType(MapPlacementType placementType)
+		public void SpawnPrefabByName(GameObject prefab,
+									  string nameString,
+									  int density = 30,
+									  Action<List<GameObject>> callback = null,
+									  bool scaleDownWithWorld = true,
+									  string locationItemName = "New Location")
 		{
-			_options.placementOptions.placementType = placementType;
-			_options.placementOptions.HasChanged = true;
+			PrefabItemOptions item = new PrefabItemOptions()
+			{
+				findByType = LocationPrefabFindBy.POIName,
+				nameString = nameString,
+				density = density,
+				prefabItemName = locationItemName,
+				spawnPrefabOptions = new SpawnPrefabOptions()
+				{
+					prefab = prefab,
+					scaleDownWithWorld = scaleDownWithWorld
+				}
+			};
+
+			CreatePrefabLayer(item);
 		}
 
 		/// <summary>
-		/// Translates map root by the terrain elevation at the center geo location.
-		/// Use this method with <c>TerrainWithElevation</c>
+		/// Creates the prefab layer.
 		/// </summary>
-		/// <param name="active">If set to <c>true</c> active.</param>
-		public virtual void SnapMapToZero(bool active)
+		/// <param name="item"> the options of the prefab layer.</param>
+		private void CreatePrefabLayer(PrefabItemOptions item)
 		{
-			_options.placementOptions.snapMapToZero = active;
-			_options.placementOptions.HasChanged = true;
+			if (_vectorData.LayerProperty.sourceType == VectorSourceType.None
+			|| !_vectorData.LayerProperty.sourceOptions.Id.Contains(MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id))
+			{
+				Debug.LogError("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the list of vector data sources");
+				return;
+			}
+
+			//ensure that there is a vector layer
+			if (_vectorData == null)
+			{
+				_vectorData = new VectorLayer();
+			}
+
+			_vectorData.AddLocationPrefabItem(item);
 		}
 
-		/// <summary>
-		/// Sets the map to use real world scale for map tile.
-		/// Use world scale for AR use cases or applications that need true world scale.
-		/// </summary>
-		public virtual void UseWorldScale()
-		{
-			_options.scalingOptions.scalingType = MapScalingType.WorldScale;
-			_options.scalingOptions.HasChanged = true;
-		}
-
-		/// <summary>
-		/// Sets the map to use custom scale for map tiles.
-		/// </summary>
-		/// <param name="tileSizeInUnityUnits">Tile size in unity units to scale each Web Mercator tile.</param>
-		public virtual void UseCustomScale(float tileSizeInUnityUnits)
-		{
-			_options.scalingOptions.scalingType = MapScalingType.Custom;
-			_options.scalingOptions.unityTileSize = tileSizeInUnityUnits;
-			_options.scalingOptions.HasChanged = true;
-		}
-		#endregion
-
-		#region Events
-		/// <summary>
-		/// Event delegate, gets called after map is initialized
-		/// <seealso cref="OnUpdated"/>
-		/// </summary>
-		public event Action OnInitialized = delegate { };
-		/// <summary>
-		/// Event delegate, gets called after map is updated.
-		/// <c>UpdateMap</c> will trigger this event.
-		/// <seealso cref="OnInitialized"/>
-		/// </summary>
-		public event Action OnUpdated = delegate { };
-		public event Action OnMapRedrawn = delegate { };
 		#endregion
 	}
 }
