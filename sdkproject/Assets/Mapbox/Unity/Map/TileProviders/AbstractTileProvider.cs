@@ -12,7 +12,7 @@ namespace Mapbox.Unity.Map.TileProviders
 		public HashSet<UnwrappedTileId> activeTiles;
 	}
 
-	public abstract class AbstractTileProvider : ITileProvider
+	public abstract class AbstractTileProvider : MonoBehaviour, ITileProvider
 	{
 		public event EventHandler<ExtentArgs> ExtentChanged;
 
@@ -36,10 +36,7 @@ namespace Mapbox.Unity.Map.TileProviders
 
 		public virtual void OnExtentChanged()
 		{
-			if (ExtentChanged != null)
-			{
-				ExtentChanged(this, _currentExtent);
-			}
+			ExtentChanged(this, _currentExtent);
 		}
 
 		public abstract void OnInitialized();
@@ -50,11 +47,6 @@ namespace Mapbox.Unity.Map.TileProviders
 		public virtual void SetOptions(ITileProviderOptions options)
 		{
 			_options = options;
-		}
-
-		public virtual void UpdateTileProvider()
-		{
-
 		}
 	}
 }

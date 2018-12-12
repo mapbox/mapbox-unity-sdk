@@ -135,23 +135,4 @@ public class ModelTest : MonoBehaviour
 			layer.Modeling.LineOptions.SetLineWidth(10);
 		}
 	}
-
-	[ContextMenu("Toggle Line Join Type")]
-	public void SetLineJoinType()
-	{
-		foreach (var layer in _abstractMap.VectorData.GetAllLineFeatureSubLayers())
-		{
-
-			layer.Modeling.LineOptions.SetJoinType((LineJoinType) ((((int)(LineJoinType)layer.lineGeometryOptions.JoinType) + 1) % 3));
-		}
-	}
-
-	[ContextMenu("Toggle Line Cap Type")]
-	public void SetLineCapType()
-	{
-		foreach (var layer in _abstractMap.VectorData.GetAllLineFeatureSubLayers())
-		{
-			layer.Modeling.LineOptions.SetCapType((LineCapType) ((((int)(LineCapType)layer.lineGeometryOptions.CapType) + 1) % 3));
-		}
-	}
 }

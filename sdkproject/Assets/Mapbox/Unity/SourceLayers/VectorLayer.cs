@@ -73,9 +73,12 @@ namespace Mapbox.Unity.Map
 			_layerProperty.PropertyHasChanged += RedrawVectorLayer;
 			_layerProperty.SubLayerPropertyAdded += AddVectorLayer;
 			_layerProperty.SubLayerPropertyRemoved += RemoveVectorLayer;
-			_vectorTileFactory.TileFactoryHasChanged += OnVectorTileFactoryOnTileFactoryHasChanged;
-		}
+			_vectorTileFactory.TileFactoryHasChanged += (sender, args) =>
+			{
+				NotifyUpdateLayer(args as LayerUpdateArgs);
+			};
 
+		}
 
 		public void Update(LayerProperties properties)
 		{
@@ -117,10 +120,7 @@ namespace Mapbox.Unity.Map
 
 			layerUpdateArgs.factory = _vectorTileFactory;
 
-			if (SubLayerAdded != null)
-			{
-				SubLayerAdded(this, layerUpdateArgs);
-			}
+			SubLayerAdded(this, layerUpdateArgs);
 		}
 
 		private void RemoveVectorLayer(object sender, EventArgs args)
@@ -130,20 +130,12 @@ namespace Mapbox.Unity.Map
 			layerUpdateArgs.visualizer = _vectorTileFactory.FindVectorLayerVisualizer((VectorSubLayerProperties)layerUpdateArgs.property);
 			layerUpdateArgs.factory = _vectorTileFactory;
 
-			if (SubLayerRemoved != null)
-			{
-				SubLayerRemoved(this, layerUpdateArgs);
-			}
+			SubLayerRemoved(this, layerUpdateArgs);
 		}
 
 		private void RedrawVectorLayer(object sender, System.EventArgs e)
 		{
 			NotifyUpdateLayer(_vectorTileFactory, sender as MapboxDataProperty, true);
-		}
-
-		private void OnVectorTileFactoryOnTileFactoryHasChanged(object sender, EventArgs args)
-		{
-			NotifyUpdateLayer(args as LayerUpdateArgs);
 		}
 
 		#region Api Methods

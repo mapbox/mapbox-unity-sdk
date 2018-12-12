@@ -401,6 +401,7 @@ public class ApiTest : MonoBehaviour
 			new List<MeshModifier>()
 			{
 				ScriptableObject.CreateInstance<PolygonMeshModifier>(),
+				ScriptableObject.CreateInstance<UvModifier>(),
 				ScriptableObject.CreateInstance<HeightModifier>()
 			},
 			new List<GameObjectModifier>()

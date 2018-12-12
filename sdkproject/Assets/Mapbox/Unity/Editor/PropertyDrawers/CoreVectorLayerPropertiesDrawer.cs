@@ -7,6 +7,7 @@
 	using System.Linq;
 	using System;
 	using Mapbox.VectorTile.ExtensionMethods;
+	using Mapbox.Editor;
 
 	[CustomPropertyDrawer(typeof(CoreVectorLayerProperties))]
 	public class CoreVectorLayerPropertiesDrawer : PropertyDrawer
@@ -16,9 +17,9 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+
 			EditorGUI.BeginProperty(position, null, property);
 
-			// Draw label.
 			var primitiveType = property.FindPropertyRelative("geometryType");
 
 			var primitiveTypeLabel = new GUIContent
@@ -44,18 +45,23 @@
 				_isGUIContentSet = true;
 			}
 
+			EditorGUI.BeginChangeCheck();
 			primitiveType.enumValueIndex = EditorGUILayout.Popup(primitiveTypeLabel, primitiveType.enumValueIndex, _primitiveTypeContent);
-
-			var serializedMapObject = property.serializedObject;
-			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
-
-			if ((VectorPrimitiveType)primitiveType.enumValueIndex == VectorPrimitiveType.Line)
+			if (EditorGUI.EndChangeCheck())
 			{
-				EditorGUILayout.PropertyField(property.FindPropertyRelative("lineWidth"));
+				EditorHelper.CheckForModifiedProperty(property);
 			}
+//
+//			if ((VectorPrimitiveType)primitiveType.enumValueIndex == VectorPrimitiveType.Line)
+//			{
+//				EditorGUI.BeginChangeCheck();
+//				EditorGUILayout.PropertyField(property.FindPropertyRelative("lineWidth"));
+//				if (EditorGUI.EndChangeCheck())
+//				{
+//					EditorHelper.CheckForModifiedProperty(property);
+//				}
+//			}
 			EditorGUI.EndProperty();
 		}
-		//private static int count = 0;
-
 	}
 }

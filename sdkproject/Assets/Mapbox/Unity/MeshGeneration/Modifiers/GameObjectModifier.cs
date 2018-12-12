@@ -33,5 +33,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		{
 
 		}
+
+		public virtual void ClearCaches()
+		{
+
+		}
 	}
 }

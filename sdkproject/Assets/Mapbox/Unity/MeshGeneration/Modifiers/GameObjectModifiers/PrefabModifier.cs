@@ -1,5 +1,3 @@
-using UnityEditor;
-
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
 	using UnityEngine;
@@ -101,17 +99,17 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
-		public override void Clear()
+		public override void ClearCaches()
 		{
-			base.Clear();
+			base.ClearCaches();
 			foreach (var gameObject in _objects.Values)
 			{
-				gameObject.Destroy();
+				Destroy(gameObject);
 			}
 
 			foreach (var gameObject in _prefabList)
 			{
-				gameObject.Destroy();
+				Destroy(gameObject);
 			}
 		}
 	}

@@ -1,5 +1,28 @@
 ## CHANGELOG
 
+### v.2.0.0
+10/15/2018
+##### New Features
+- *Runtime editing of map features* - Map elements like Imagery, Terrain, Feature Properties can now be updated during runtime, using AbstractMap UI in the Editor , or by using the API methods.
+- *Map API’s* - Maps SDK for Unity now has API methods to build and edit maps entirely using scripts.
+##### Improvements
+- Improves fallback for terrain tiles with missing or no data. Image will be now rendered on flat tiles instead of blank tiles.
+- Improves terrain height query by using local position/rotation/scale of a tile. Use `QueryElevationInUnityUnitsAt` or `QueryElevationInMetersAt` API methods to query height.
+- Terrain module “Sample Count” property changed to a slider.
+- Improves tile loading and recycling performance.
+##### Bug Fixes
+- Fixes issue where Terrain was not turned off with `None` option.
+- Fixes issue where Node Editor script was throwing a compilation error due to deprecated API in Unity 2018.2
+- Fixes issue where SnapToZero moved the map for each new tile loaded instead of only using the first one.
+- Fixes issue with the height modifier where floor height calculations were wrong causing overlapping floors.
+- Fixes issue where dispose buffer setting was being ignored by `RangeAroundTransform` extent type.
+- Fixes builds for UWP/ Hololens environments.
+- Fixes issue where ARTableTop map would not snap to the detected plane on zooming in/out.
+- Fixes issue where `BuildingsWithUniqueIds`  setting was getting applied incorrectly, resulting in missing buildings.
+
+##### Breaking Changes
+- Any `Feature` layers under `Map Layers` using a `Custom` style type will need to be re-assigned through the AbstractMap UI. This change was necessary to persist custom style options when switching between different styles.
+
 ### v.1.4.5
 08/20/2018
 ##### New Features
