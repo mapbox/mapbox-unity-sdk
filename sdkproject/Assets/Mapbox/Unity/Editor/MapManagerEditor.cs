@@ -117,6 +117,7 @@
 			{
 				prevProp.boolValue = GUILayout.Toggle(prevProp.boolValue, "Enable Preview", style);
 				GUI.color = guiColor;
+				EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 			}
 
 			ShowGeneral = EditorGUILayout.Foldout(ShowGeneral, new GUIContent { text = "GENERAL", tooltip = "Options related to map data" });
@@ -152,6 +153,8 @@
 			}
 			EditorGUILayout.EndVertical();
 
+			EditorGUILayout.Space();
+
 			serializedObject.ApplyModifiedProperties();
 
 			if (!Application.isPlaying)
@@ -164,7 +167,6 @@
 				{
 					((AbstractMap)serializedObject.targetObject).DisableEditorPreview();
 				}
-				EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 			}
 		}
 
