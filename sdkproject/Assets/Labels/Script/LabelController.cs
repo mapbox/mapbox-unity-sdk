@@ -30,7 +30,7 @@ public class LabelController : MonoBehaviour
     public Transform LabelContainer;
     public Dictionary<VectorEntity, List<LabelAnchor>> _positions;
 
-    private float _collisionRadius = 20;
+    [SerializeField] private float _collisionRadius = 20;
     private TextGenerator _generator = new TextGenerator();
     private TextGenerationSettings _textSettings;
     
