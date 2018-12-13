@@ -449,10 +449,13 @@ namespace Mapbox.Unity.Map
 		// Use this for initialization
 		protected virtual void Start()
 		{
-			StartCoroutine("SetupAccess");
-			if (_initializeOnStart && Application.isPlaying)
+			if (Application.isPlaying)
 			{
-				SetUpMap();
+				StartCoroutine("SetupAccess");
+				if (_initializeOnStart)
+				{
+					SetUpMap();
+				}
 			}
 		}
 
