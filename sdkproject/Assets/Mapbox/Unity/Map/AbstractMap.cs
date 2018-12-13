@@ -462,6 +462,10 @@ namespace Mapbox.Unity.Map
 		public void EnableEditorPreview()
 		{
 			SetUpMap();
+			if (OnEditorPreviewEnabled != null)
+			{
+				OnEditorPreviewEnabled();
+			}
 		}
 
 		public void DisableEditorPreview()
@@ -474,6 +478,10 @@ namespace Mapbox.Unity.Map
 			_vectorData.UpdateLayer -= OnVectorDataUpdateLayer;
 			_vectorData.UnbindAllEvents();
 			_mapVisualizer.ClearMap();
+			if (OnEditorPreviewDisabled != null)
+			{
+				OnEditorPreviewDisabled();
+			}
 		}
 
 		protected IEnumerator SetupAccess()
@@ -685,50 +693,50 @@ namespace Mapbox.Unity.Map
 				switch (_options.extentOptions.extentType)
 				{
 					case MapExtentType.CameraBounds:
-					{
-						if (TileProvider != null)
 						{
-							if (!(TileProvider is QuadTreeTileProvider))
+							if (TileProvider != null)
+							{
+								if (!(TileProvider is QuadTreeTileProvider))
+								{
+									TileProvider = new QuadTreeTileProvider();
+								}
+							}
+							else
 							{
 								TileProvider = new QuadTreeTileProvider();
 							}
+							break;
 						}
-						else
-						{
-							TileProvider = new QuadTreeTileProvider();
-						}
-						break;
-					}
 					case MapExtentType.RangeAroundCenter:
-					{
-						if (TileProvider != null)
 						{
-							if (!(TileProvider is RangeTileProvider))
+							if (TileProvider != null)
+							{
+								if (!(TileProvider is RangeTileProvider))
+								{
+									TileProvider = new RangeTileProvider();
+								}
+							}
+							else
 							{
 								TileProvider = new RangeTileProvider();
 							}
+							break;
 						}
-						else
-						{
-							TileProvider = new RangeTileProvider();
-						}
-						break;
-					}
 					case MapExtentType.RangeAroundTransform:
-					{
-						if (TileProvider != null)
 						{
-							if (!(TileProvider is RangeAroundTransformTileProvider))
+							if (TileProvider != null)
+							{
+								if (!(TileProvider is RangeAroundTransformTileProvider))
+								{
+									TileProvider = new RangeAroundTransformTileProvider();
+								}
+							}
+							else
 							{
 								TileProvider = new RangeAroundTransformTileProvider();
 							}
+							break;
 						}
-						else
-						{
-							TileProvider = new RangeAroundTransformTileProvider();
-						}
-						break;
-					}
 					default:
 						break;
 				}
@@ -853,12 +861,12 @@ namespace Mapbox.Unity.Map
 
 		private void OnTileProviderChanged()
 		{
-//			var currentTileProvider = gameObject.GetComponent<AbstractTileProvider>();
-//
-//			if (currentTileProvider != null)
-//			{
-//				Destroy(currentTileProvider);
-//			}
+			//			var currentTileProvider = gameObject.GetComponent<AbstractTileProvider>();
+			//
+			//			if (currentTileProvider != null)
+			//			{
+			//				Destroy(currentTileProvider);
+			//			}
 			SetTileProvider();
 			_tileProvider.Initialize(this);
 			_tileProvider.UpdateTileExtent();
@@ -1081,6 +1089,9 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		public event Action OnUpdated = delegate { };
 		public event Action OnMapRedrawn = delegate { };
+
+		public event Action OnEditorPreviewEnabled = delegate { };
+		public event Action OnEditorPreviewDisabled = delegate { };
 		#endregion
 	}
 }

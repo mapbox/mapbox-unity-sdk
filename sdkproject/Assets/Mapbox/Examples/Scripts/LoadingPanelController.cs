@@ -5,6 +5,7 @@ namespace Mapbox.Examples
 	using Mapbox.Unity.Map;
 	using UnityEngine.UI;
 
+	[ExecuteInEditMode]
 	public class LoadingPanelController : MonoBehaviour
 	{
 		[SerializeField]
@@ -19,8 +20,12 @@ namespace Mapbox.Examples
 		AbstractMap _map;
 		void Awake()
 		{
+
 			_map = FindObjectOfType<AbstractMap>();
 			_map.OnInitialized += _map_OnInitialized;
+
+			_map.OnEditorPreviewEnabled += OnEditorPreviewEnabled;
+			_map.OnEditorPreviewDisabled += OnEditorPreviewDisabled;
 		}
 
 		void _map_OnInitialized()
@@ -44,8 +49,20 @@ namespace Mapbox.Examples
 					// when loading new tiles.
 					//_content.SetActive(true);
 				}
+
 			};
 		}
+
+		void OnEditorPreviewEnabled()
+		{
+			_content.SetActive(false);
+		}
+
+		void OnEditorPreviewDisabled()
+		{
+			_content.SetActive(true);
+		}
+
 
 		void Update()
 		{
