@@ -63,7 +63,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		private Dictionary<UnityTile, List<ulong>> _idPool; //necessary to keep _activeIds list up to date when unloading tiles
 		private string _key;
 
-		private HashSet<ModifierBase> _coreModifiers;
+		protected HashSet<ModifierBase> _coreModifiers = new HashSet<ModifierBase>();
 
 		public override string Key
 		{
@@ -592,7 +592,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				callback(tile, this);
 		}
 
-		private bool  ProcessFeature(int index, UnityTile tile, VectorLayerVisualizerProperties layerProperties, float layerExtent)
+		private bool ProcessFeature(int index, UnityTile tile, VectorLayerVisualizerProperties layerProperties, float layerExtent)
 		{
 			var fe = layerProperties.vectorTileLayer.GetFeature(index);
 			List<List<Point2d<float>>> geom;
