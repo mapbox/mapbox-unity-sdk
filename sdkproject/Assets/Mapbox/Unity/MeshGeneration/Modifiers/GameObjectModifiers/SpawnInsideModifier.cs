@@ -110,18 +110,25 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
-		public override void ClearCaches()
+		public override void Clear()
 		{
 			foreach (var go in _pool)
 			{
-				Destroy(go);
+				go.Destroy();
 			}
 			_pool.Clear();
 			foreach (var tileObject in _objects)
 			{
 				foreach (var go in tileObject.Value)
 				{
-					Destroy(go);
+					if (Application.isEditor && !Application.isPlaying)
+					{
+						DestroyImmediate(go);
+					}
+					else
+					{
+						Destroy(go);
+					}
 				}
 			}
 			_objects.Clear();

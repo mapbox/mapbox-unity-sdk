@@ -175,8 +175,8 @@
 		}
 
 		/// <summary>
-		/// Sets up default values for GeometryMaterial Options. 
-		/// If style is set to Custom, user defined values will be used. 
+		/// Sets up default values for GeometryMaterial Options.
+		/// If style is set to Custom, user defined values will be used.
 		/// </summary>
 		public void SetDefaultMaterialOptions()
 		{
@@ -252,8 +252,8 @@
 			AtlasInfo atlas = Resources.Load(styleAssetPathBundle.atlasPath, typeof(AtlasInfo)) as AtlasInfo;
 			ScriptablePalette palette = Resources.Load(styleAssetPathBundle.palettePath, typeof(ScriptablePalette)) as ScriptablePalette;
 
-			materials[0].Materials[0] = new Material(topMaterial);
-			materials[1].Materials[0] = new Material(sideMaterial);
+			materials[0].Materials[0] = topMaterial;
+			materials[1].Materials[0] = sideMaterial;
 			atlasInfo = atlas;
 			colorPalette = palette;
 		}
@@ -293,7 +293,7 @@
 		{
 			get
 			{
-				return typeof(UvModifier);
+				return typeof(PolygonMeshModifier);
 			}
 		}
 		public StyleTypes style;

@@ -29,13 +29,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[Range(1,10)]
 		private float UpdateFrequency = 2;
 
-		
+
 
 		private Directions _directions;
 		private int _counter;
 
 		GameObject _directionsGO;
-		private bool _recalculateNext; 
+		private bool _recalculateNext;
 
 		protected virtual void Awake()
 		{
@@ -135,7 +135,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			if (_directionsGO != null)
 			{
-				Destroy(_directionsGO);
+				_directionsGO.Destroy();
 			}
 			_directionsGO = new GameObject("direction waypoint " + " entity");
 			var mesh = _directionsGO.AddComponent<MeshFilter>().mesh;

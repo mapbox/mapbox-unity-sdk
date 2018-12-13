@@ -388,6 +388,11 @@
 			var subLayerlineGeometryOptions = subLayer.FindPropertyRelative("lineGeometryOptions");
 			var lineGeometryOptions = subLayerProperties.lineGeometryOptions;
 			subLayerlineGeometryOptions.FindPropertyRelative("Width").floatValue = lineGeometryOptions.Width;
+			subLayerlineGeometryOptions.FindPropertyRelative("CapType").enumValueIndex = (int) lineGeometryOptions.CapType;
+			subLayerlineGeometryOptions.FindPropertyRelative("JoinType").enumValueIndex = (int) lineGeometryOptions.JoinType;
+			subLayerlineGeometryOptions.FindPropertyRelative("MiterLimit").floatValue = lineGeometryOptions.MiterLimit;
+			subLayerlineGeometryOptions.FindPropertyRelative("RoundLimit").floatValue = lineGeometryOptions.RoundLimit;
+
 
 			var subLayerExtrusionOptions = subLayer.FindPropertyRelative("extrusionOptions");
 			var extrusionOptions = subLayerProperties.extrusionOptions;

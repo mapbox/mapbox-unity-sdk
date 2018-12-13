@@ -1,4 +1,6 @@
-﻿namespace Mapbox.Platform.Cache
+﻿using Mapbox.Unity.Telemetry;
+
+namespace Mapbox.Platform.Cache
 {
 	using System;
 	using Mapbox.Platform;
@@ -116,7 +118,6 @@
 			, string mapId = null
 		)
 		{
-
 			if (string.IsNullOrEmpty(mapId))
 			{
 				throw new Exception("Cannot cache without a map id");
@@ -134,20 +135,11 @@
 				}
 			}
 
-			var uriBuilder = new UriBuilder(uri);
+			var finalUrl = uri + "?" + TelemetryFactory.EventQuery;
 			if (!string.IsNullOrEmpty(_accessToken))
 			{
-				string accessTokenQuery = "access_token=" + _accessToken;
-				if (uriBuilder.Query != null && uriBuilder.Query.Length > 1)
-				{
-					uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery;
-				}
-				else
-				{
-					uriBuilder.Query = accessTokenQuery;
-				}
+				finalUrl += "&access_token=" + _accessToken;
 			}
-			string finalUrl = uriBuilder.ToString();
 
 #if MAPBOX_DEBUG_CACHE
 			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;

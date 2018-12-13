@@ -21,7 +21,7 @@
 			}
 			else
 			{
-				UnityEngine.Object.Destroy(tile.Collider);
+				tile.Collider.Destroy();
 			}
 		}
 	}

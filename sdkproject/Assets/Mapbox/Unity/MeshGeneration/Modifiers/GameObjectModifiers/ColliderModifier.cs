@@ -56,7 +56,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public override void Run(VectorEntity ve, UnityTile tile)
 		{
-			// if collider exists. remove it. 
+			// if collider exists. remove it.
 			RemoveColliderFrom(ve);
 			if (_colliderStrategy != null)
 			{
@@ -69,7 +69,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			var existingCollider = ve.GameObject.GetComponent<Collider>();
 			if (existingCollider != null)
 			{
-				UnityEngine.Object.Destroy(existingCollider);
+				existingCollider.Destroy();
 				if (_colliderStrategy != null)
 				{
 					_colliderStrategy.Reset();
