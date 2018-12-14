@@ -1,5 +1,3 @@
-using UnityEditor;
-
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
 	using UnityEngine;
