@@ -690,12 +690,14 @@ namespace Mapbox.Unity.Map
 						{
 							if (!(TileProvider is QuadTreeTileProvider))
 							{
-								TileProvider = new QuadTreeTileProvider();
+								Destroy(TileProvider);
+								TileProvider = gameObject.AddComponent<QuadTreeTileProvider>();
 							}
 						}
 						else
 						{
-							TileProvider = new QuadTreeTileProvider();
+							Destroy(TileProvider);
+							TileProvider = gameObject.AddComponent<QuadTreeTileProvider>();
 						}
 						break;
 					}
@@ -705,12 +707,14 @@ namespace Mapbox.Unity.Map
 						{
 							if (!(TileProvider is RangeTileProvider))
 							{
-								TileProvider = new RangeTileProvider();
+								Destroy(TileProvider);
+								TileProvider = gameObject.AddComponent<RangeTileProvider>();
 							}
 						}
 						else
 						{
-							TileProvider = new RangeTileProvider();
+							Destroy(TileProvider);
+							TileProvider = gameObject.AddComponent<RangeTileProvider>();
 						}
 						break;
 					}
@@ -720,12 +724,14 @@ namespace Mapbox.Unity.Map
 						{
 							if (!(TileProvider is RangeAroundTransformTileProvider))
 							{
-								TileProvider = new RangeAroundTransformTileProvider();
+								Destroy(TileProvider);
+								TileProvider = gameObject.AddComponent<RangeAroundTransformTileProvider>();
 							}
 						}
 						else
 						{
-							TileProvider = new RangeAroundTransformTileProvider();
+							Destroy(TileProvider);
+							TileProvider = gameObject.AddComponent<RangeAroundTransformTileProvider>();
 						}
 						break;
 					}

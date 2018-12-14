@@ -12,7 +12,7 @@ namespace Mapbox.Unity.Map.TileProviders
 		public HashSet<UnwrappedTileId> activeTiles;
 	}
 
-	public abstract class AbstractTileProvider : ITileProvider
+	public abstract class AbstractTileProvider : MonoBehaviour, ITileProvider
 	{
 		public event EventHandler<ExtentArgs> ExtentChanged;
 
