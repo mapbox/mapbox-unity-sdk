@@ -104,7 +104,8 @@
 			EditorGUILayout.BeginVertical();
 			EditorGUILayout.Space();
 
-			var prevProp = serializedObject.FindProperty("IsPreviewEnabled");
+			var previewOptions = serializedObject.FindProperty("_previewOptions");
+			var prevProp = previewOptions.FindPropertyRelative("isPreviewEnabled");
 			var prev = prevProp.boolValue;
 
 			Color guiColor = GUI.color;
