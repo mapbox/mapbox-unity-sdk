@@ -717,7 +717,6 @@ namespace Mapbox.Unity.Map
 
 		private void SetTileProvider()
 		{
-			//TileProvider = GetComponent<AbstractTileProvider>();
 			if (_options.extentOptions.extentType != MapExtentType.Custom)
 			{
 				ITileProviderOptions tileProviderOptions = _options.extentOptions.GetTileProviderOptions();
@@ -730,6 +729,7 @@ namespace Mapbox.Unity.Map
 							{
 								if (!(TileProvider is QuadTreeTileProvider))
 								{
+									TileProvider.Destroy();
 									TileProvider = gameObject.AddComponent<QuadTreeTileProvider>();
 								}
 							}
@@ -745,6 +745,7 @@ namespace Mapbox.Unity.Map
 							{
 								if (!(TileProvider is RangeTileProvider))
 								{
+									TileProvider.Destroy();
 									TileProvider = gameObject.AddComponent<RangeTileProvider>();
 								}
 							}
@@ -760,6 +761,7 @@ namespace Mapbox.Unity.Map
 							{
 								if (!(TileProvider is RangeAroundTransformTileProvider))
 								{
+									TileProvider.Destroy();
 									TileProvider = gameObject.AddComponent<RangeAroundTransformTileProvider>();
 								}
 							}
