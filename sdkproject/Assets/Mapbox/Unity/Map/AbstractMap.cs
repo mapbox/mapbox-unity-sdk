@@ -22,7 +22,7 @@ namespace Mapbox.Unity.Map
 	/// Abstract map encapsulates the image, terrain and vector sources and provides a centralized interface to control the visualization of the map.
 	/// </summary>
 	[ExecuteInEditMode]
-	public class AbstractMap : MonoBehaviour, IMap, ISerializationCallbackReceiver
+	public class AbstractMap : MonoBehaviour, IMap
 	{
 		#region Private Fields
 
@@ -711,7 +711,6 @@ namespace Mapbox.Unity.Map
 
 		private void SetTileProvider()
 		{
-			//TileProvider = GetComponent<AbstractTileProvider>();
 			if (_options.extentOptions.extentType != MapExtentType.Custom)
 			{
 				ITileProviderOptions tileProviderOptions = _options.extentOptions.GetTileProviderOptions();
@@ -724,6 +723,7 @@ namespace Mapbox.Unity.Map
 							{
 								if (!(TileProvider is QuadTreeTileProvider))
 								{
+									TileProvider.Destroy();
 									TileProvider = gameObject.AddComponent<QuadTreeTileProvider>();
 								}
 							}
@@ -739,6 +739,7 @@ namespace Mapbox.Unity.Map
 							{
 								if (!(TileProvider is RangeTileProvider))
 								{
+									TileProvider.Destroy();
 									TileProvider = gameObject.AddComponent<RangeTileProvider>();
 								}
 							}
@@ -754,6 +755,7 @@ namespace Mapbox.Unity.Map
 							{
 								if (!(TileProvider is RangeAroundTransformTileProvider))
 								{
+									TileProvider.Destroy();
 									TileProvider = gameObject.AddComponent<RangeAroundTransformTileProvider>();
 								}
 							}
