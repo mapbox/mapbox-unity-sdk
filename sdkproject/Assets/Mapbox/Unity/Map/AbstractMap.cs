@@ -22,7 +22,7 @@ namespace Mapbox.Unity.Map
 	/// Abstract map encapsulates the image, terrain and vector sources and provides a centralized interface to control the visualization of the map.
 	/// </summary>
 	[ExecuteInEditMode]
-	public class AbstractMap : MonoBehaviour, IMap, ISerializationCallbackReceiver
+	public class AbstractMap : MonoBehaviour, IMap
 	{
 		#region Private Fields
 
@@ -47,40 +47,6 @@ namespace Mapbox.Unity.Map
 		#endregion
 
 		#region Properties
-		//public bool IsPreviewEnabled = false;
-
-		public void OnBeforeSerialize()
-		{
-			if (_mapVisualizer == null)
-			{
-				return;
-			}
-			_mapVisualizer.SerializeActiveTileDictionary();
-			//Debug.Log("OnBeforeSerialize");
-			//_keys.Clear();
-			//_values.Clear();
-
-			//foreach (var kvp in _myDictionary)
-			//{
-			//	_keys.Add(kvp.Key);
-			//	_values.Add(kvp.Value);
-			//}
-		}
-
-		public void OnAfterDeserialize()
-		{
-			//Debug.Log("OnAfterDeserialize");
-
-			if(_mapVisualizer == null)
-			{
-				return;
-			}
-			_mapVisualizer.DeserializeActiveTileDictionary();
-			//_myDictionary = new Dictionary<int, string>();
-
-			//for (int i = 0; i != Math.Min(_keys.Count, _values.Count); i++)
-				//_myDictionary.Add(_keys[i], _values[i]);
-		}
 
 		public AbstractMapVisualizer MapVisualizer
 		{
@@ -497,6 +463,12 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
+		public void RestartMapFromScriptReload()
+		{
+			Awake();
+			Start();
+		}
+
 		private void EnableDisablePreview(object sender, EventArgs e)
 		{
 			if (!Application.isPlaying)
@@ -525,6 +497,7 @@ namespace Mapbox.Unity.Map
 
 		public void DisableEditorPreview()
 		{
+			//_mapVisualizer.ClearActiveTileKeyValueLists();
 			if (_options.extentOptions.extentType != MapExtentType.Custom)
 			{
 				TileProvider.Destroy();

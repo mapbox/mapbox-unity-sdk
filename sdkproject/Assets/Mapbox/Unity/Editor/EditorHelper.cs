@@ -7,6 +7,8 @@
 	using System.Linq;
 	using System.Reflection;
 	using Mapbox.Unity.Map;
+	using Mapbox.Unity.MeshGeneration.Data;
+
 	/// <summary>
 	/// EditorHelper class provides methods for working with serialzed properties.
 	/// Methods in this class are based on the spacepuppy-unity-framework, available at the url below.
@@ -14,6 +16,30 @@
 	/// </summary>
 	public static class EditorHelper
 	{
+
+		[UnityEditor.Callbacks.DidReloadScripts]
+		private static void OnScriptsReloaded()
+		{
+			AbstractMap abstractMap = UnityEngine.Object.FindObjectOfType<AbstractMap>();
+
+			if(abstractMap == null)
+			{
+				return;
+			}
+
+			UnityTile[] unityTiles = abstractMap.GetComponentsInChildren<UnityTile>();
+
+			for (int i = 0; i < unityTiles.Length; i++)
+			{
+				UnityEngine.Object.DestroyImmediate(unityTiles[i].gameObject);
+			}
+
+			if(Application.isEditor && EditorApplication.isPlaying)
+			{
+				EditorApplication.isPlaying = false;
+			}
+		}
+
 		public static void CheckForModifiedProperty<T>(SerializedProperty property, T targetObject, bool forceHasChanged = false)
 		{
 			MapboxDataProperty targetObjectAsDataProperty = GetMapboxDataPropertyObject(targetObject);
