@@ -34,6 +34,9 @@ namespace Mapbox.Unity.Map
 		protected Queue<UnityTile> _inactiveTiles = new Queue<UnityTile>();
 		private int _counter;
 
+		public List<UnwrappedTileId> _activeTilesKeys = new List<UnwrappedTileId>();
+		public List<UnityTile> _activeTilesValues = new List<UnityTile>();
+
 		private ModuleState _state;
 		public ModuleState State
 		{
@@ -65,6 +68,41 @@ namespace Mapbox.Unity.Map
 		public UnityTile GetUnityTileFromUnwrappedTileId(UnwrappedTileId tileId)
 		{
 			return _activeTiles[tileId];
+		}
+
+		public void SerializeActiveTileDictionary()
+		{
+			Debug.Log("..");
+			if(_activeTiles == null || _activeTiles.Count == 0)
+			{
+				return;
+			}
+
+			int count = Math.Min(_activeTilesKeys.Count, _activeTilesValues.Count);
+
+			if(_activeTiles.Count == count)
+			{
+				return;
+			}
+
+			Debug.Log("SerializeActiveTileDictionary");
+			_activeTilesKeys.Clear();
+			_activeTilesValues.Clear();
+
+			foreach (var kvp in _activeTiles)
+			{
+				_activeTilesKeys.Add(kvp.Key);
+				_activeTilesValues.Add(kvp.Value);
+			}
+		}
+
+		public void DeserializeActiveTileDictionary()
+		{
+			Debug.Log("DeserializeActiveTileDictionary");
+			_activeTiles = new Dictionary<UnwrappedTileId, UnityTile>();
+
+			for (int i = 0; i != Math.Min(_activeTilesKeys.Count, _activeTilesValues.Count); i++)
+				_activeTiles.Add(_activeTilesKeys[i], _activeTilesValues[i]);
 		}
 
 		/// <summary>

@@ -49,6 +49,39 @@ namespace Mapbox.Unity.Map
 		#region Properties
 		//public bool IsPreviewEnabled = false;
 
+		public void OnBeforeSerialize()
+		{
+			if (_mapVisualizer == null)
+			{
+				return;
+			}
+			_mapVisualizer.SerializeActiveTileDictionary();
+			//Debug.Log("OnBeforeSerialize");
+			//_keys.Clear();
+			//_values.Clear();
+
+			//foreach (var kvp in _myDictionary)
+			//{
+			//	_keys.Add(kvp.Key);
+			//	_values.Add(kvp.Value);
+			//}
+		}
+
+		public void OnAfterDeserialize()
+		{
+			//Debug.Log("OnAfterDeserialize");
+
+			if(_mapVisualizer == null)
+			{
+				return;
+			}
+			_mapVisualizer.DeserializeActiveTileDictionary();
+			//_myDictionary = new Dictionary<int, string>();
+
+			//for (int i = 0; i != Math.Min(_keys.Count, _values.Count); i++)
+				//_myDictionary.Add(_keys[i], _values[i]);
+		}
+
 		public AbstractMapVisualizer MapVisualizer
 		{
 			get
