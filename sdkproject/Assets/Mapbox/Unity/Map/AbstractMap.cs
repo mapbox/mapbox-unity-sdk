@@ -80,6 +80,14 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
+		public EditorPreviewOptions PreviewOptions
+		{
+			get
+			{
+				return _previewOptions;
+			}
+		}
+
 		/// <summary>
 		/// The map options.
 		/// Options to control the behaviour of the map like location,extent, scale and placement.
@@ -425,6 +433,7 @@ namespace Mapbox.Unity.Map
 			if (_previewOptions.isPreviewEnabled == true)
 			{
 				DisableEditorPreview();
+				_previewOptions.wasPreviewDisabledFromOnEnable = true;
 			}
 			_previewOptions.isPreviewEnabled = false;
 
@@ -448,6 +457,7 @@ namespace Mapbox.Unity.Map
 			}
 
 			_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
+			_previewOptions.wasPreviewDisabledFromOnEnable = false;
 		}
 
 		// Use this for initialization
@@ -461,12 +471,6 @@ namespace Mapbox.Unity.Map
 					SetUpMap();
 				}
 			}
-		}
-
-		public void RestartMapFromScriptReload()
-		{
-			Awake();
-			Start();
 		}
 
 		private void EnableDisablePreview(object sender, EventArgs e)
@@ -489,6 +493,7 @@ namespace Mapbox.Unity.Map
 		public void EnableEditorPreview()
 		{
 			SetUpMap();
+			_previewOptions.wasPreviewDisabledFromOnEnable = false;
 			if (OnEditorPreviewEnabled != null)
 			{
 				OnEditorPreviewEnabled();

@@ -34,9 +34,18 @@
 				UnityEngine.Object.DestroyImmediate(unityTiles[i].gameObject);
 			}
 
-			if(Application.isEditor && EditorApplication.isPlaying)
+			if(Application.isEditor)
 			{
-				EditorApplication.isPlaying = false;
+				if (EditorApplication.isPlaying)
+				{
+					EditorApplication.isPlaying = false;
+					return;
+				}
+				if (abstractMap.PreviewOptions.wasPreviewDisabledFromOnEnable)
+				{
+					abstractMap.EnableEditorPreview();
+					abstractMap.PreviewOptions.isPreviewEnabled = true;
+				}
 			}
 		}
 
