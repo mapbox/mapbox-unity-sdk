@@ -285,7 +285,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				//reset image on null data
 				if (data == null)
 				{
-					MeshRenderer.material.mainTexture = null;
+					MeshRenderer.sharedMaterial.mainTexture = null;
 					return;
 				}
 
