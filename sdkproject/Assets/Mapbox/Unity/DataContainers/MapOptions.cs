@@ -18,6 +18,5 @@
 	public class EditorPreviewOptions : MapboxDataProperty
 	{
 		public bool isPreviewEnabled = false;
-		public bool wasPreviewDisabledFromOnEnable = false;
 	}
 }

@@ -38,13 +38,14 @@
 			{
 				if (EditorApplication.isPlaying)
 				{
-					EditorApplication.isPlaying = false;
+					abstractMap.DisableEditorPreview();
+					abstractMap.ForceRestartMap();
 					return;
 				}
-				if (abstractMap.PreviewOptions.wasPreviewDisabledFromOnEnable)
+				if (abstractMap.PreviewOptions.isPreviewEnabled == true)
 				{
+					abstractMap.DisableEditorPreview();
 					abstractMap.EnableEditorPreview();
-					abstractMap.PreviewOptions.isPreviewEnabled = true;
 				}
 			}
 		}
