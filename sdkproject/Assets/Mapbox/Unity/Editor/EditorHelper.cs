@@ -20,22 +20,22 @@
 		[UnityEditor.Callbacks.DidReloadScripts]
 		private static void OnScriptsReloaded()
 		{
-			AbstractMap abstractMap = UnityEngine.Object.FindObjectOfType<AbstractMap>();
-
-			if(abstractMap == null)
+			if (Application.isEditor)
 			{
-				return;
-			}
+				AbstractMap abstractMap = UnityEngine.Object.FindObjectOfType<AbstractMap>();
 
-			UnityTile[] unityTiles = abstractMap.GetComponentsInChildren<UnityTile>();
+				if(abstractMap == null)
+				{
+					return;
+				}
 
-			for (int i = 0; i < unityTiles.Length; i++)
-			{
-				UnityEngine.Object.DestroyImmediate(unityTiles[i].gameObject);
-			}
+				UnityTile[] unityTiles = abstractMap.GetComponentsInChildren<UnityTile>();
 
-			if(Application.isEditor)
-			{
+				for (int i = 0; i < unityTiles.Length; i++)
+				{
+					UnityEngine.Object.DestroyImmediate(unityTiles[i].gameObject);
+				}
+
 				if (EditorApplication.isPlaying)
 				{
 					abstractMap.DisableEditorPreview();
