@@ -8,13 +8,16 @@
 namespace Mapbox.Unity.Utilities
 {
 	using System;
+	using System.Collections.Generic;
+	using UnityEngine;
 	using UnityEngine.Networking;
 	using System.Collections;
 	using Mapbox.Platform;
-	using UnityEngine;
 
 #if UNITY_EDITOR
 	using UnityEditor;
+	using System.Linq;
+
 #endif
 
 	public enum HttpRequestType
@@ -26,15 +29,28 @@ namespace Mapbox.Unity.Utilities
 
 	internal sealed class HTTPRequest : IAsyncRequest
 	{
-
+		private const int REQUEST_COUNT = 10;
 		private UnityWebRequest _request;
 		private HttpRequestType _requestType;
 		private int _timeout;
 		private readonly Action<Response> _callback;
 
 		public bool IsCompleted { get; private set; }
+		public bool IsCanceled { get; private set; }
 
 		public HttpRequestType RequestType { get { return _requestType; } }
+
+
+		/// <summary>
+		///TODO UWRRunnableQueue should be outside of HTTPRequest;
+		/// </summary>
+		private static UWRRunnableQueue _queue;
+		static HTTPRequest()
+		{
+			/// TODO reimplement.
+			_queue = new GameObject("UWRRunnableQueue").AddComponent<UWRRunnableQueue>();
+		}
+
 
 		// TODO: simplify timeout for Unity 5.6+
 		// https://docs.unity3d.com/ScriptReference/Networking.UnityWebRequest-timeout.html
@@ -59,13 +75,7 @@ namespace Mapbox.Unity.Utilities
 			_request.timeout = timeout;
 			_callback = callback;
 
-#if UNITY_EDITOR
-			if (!EditorApplication.isPlaying)
-			{
-				Runnable.EnableRunnableInEditor();
-			}
-#endif
-			Runnable.Run(DoRequest());
+			_queue.AddToRun(this);
 		}
 
 		public void Cancel()
@@ -74,15 +84,17 @@ namespace Mapbox.Unity.Utilities
 			{
 				_request.Abort();
 			}
+			IsCanceled = true;
 		}
 
-		private IEnumerator DoRequest()
+		public IEnumerator StartRequest()
 		{
+
 #if UNITY_EDITOR
 			// otherwise requests don't work in Edit mode, eg geocoding
 			// also lot of EditMode tests fail otherwise
 #pragma warning disable 0618
-			_request.Send();
+			_request.SendWebRequest();
 #pragma warning restore 0618
 			while (!_request.isDone) { yield return null; }
 #else
@@ -92,11 +104,67 @@ namespace Mapbox.Unity.Utilities
 #endif
 
 			var response = Response.FromWebResponse(this, _request, null);
-
 			_callback(response);
 			_request.Dispose();
 			_request = null;
 			IsCompleted = true;
+		}
+
+
+
+		private Queue<HTTPRequest> _requests = new Queue<HTTPRequest>();
+		private List<HTTPRequest> _runnableRequests = new List<HTTPRequest>();
+
+		//avoiding to create a list object at every update.
+		private List<HTTPRequest> _requestsToRemove = new List<HTTPRequest>();
+
+		internal void AddToRun(HTTPRequest request)
+		{
+			_requests.Enqueue(request);
+		}
+
+		private void Update()
+		{
+			RemoveCompletedRequests();
+			StartRequests(REQUEST_COUNT - _runnableRequests.Count);
+
+		}
+
+		private void RemoveCompletedRequests()
+		{
+			for (int i = 0; i < _runnableRequests.Count; i++)
+			{
+				var req = _runnableRequests[i];
+				if (req.IsCompleted)
+				{
+					_requestsToRemove.Add(req);
+				}
+			}
+
+			for (int i = 0; i < _requestsToRemove.Count; i++)
+			{
+				_runnableRequests.Remove(_requestsToRemove[i]);
+			}
+		}
+
+		private void StartRequests(int requestsCount)
+		{
+			for (int i = requestsCount; i > 0; i--)
+			{
+				if (_requests.Count == 0)
+					break;
+
+				HTTPRequest requestToRun = _requests.Dequeue();
+#if UNITY_EDITOR
+				if (!EditorApplication.isPlaying)
+				{
+					Runnable.EnableRunnableInEditor();
+				}
+#endif
+				Runnable.Run(requestToRun.StartRequest());
+				_runnableRequests.Add(requestToRun);
+
+			}
 		}
 	}
 }
