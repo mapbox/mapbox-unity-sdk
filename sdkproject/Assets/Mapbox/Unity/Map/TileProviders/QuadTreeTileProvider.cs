@@ -13,7 +13,7 @@ namespace Mapbox.Unity.Map.TileProviders
 
 		private Plane _groundPlane;
 		private bool _shouldUpdate;
-		private CameraBoundsTileProviderOptions _cbtpOptions;
+		[SerializeField] private CameraBoundsTileProviderOptions _cbtpOptions;
 
 		//private List<UnwrappedTileId> _toRemove;
 		//private HashSet<UnwrappedTileId> _tilesToRequest;
@@ -36,7 +36,14 @@ namespace Mapbox.Unity.Map.TileProviders
 		{
 			_tiles = new HashSet<UnwrappedTileId>();
 			_canonicalTiles = new HashSet<CanonicalTileId>();
-			_cbtpOptions = (CameraBoundsTileProviderOptions)_options;
+			if (Options != null)
+			{
+				_cbtpOptions = (CameraBoundsTileProviderOptions)_options;
+			}
+			else
+			{
+				_cbtpOptions = new CameraBoundsTileProviderOptions();
+			}
 
 			if (_cbtpOptions.camera == null)
 			{
@@ -169,7 +176,7 @@ namespace Mapbox.Unity.Map.TileProviders
 
 			Vector2d hitPntSWGeoPos = new Vector2d(minLat, minLong);
 			Vector2d hitPntNEGeoPos = new Vector2d(maxLat, maxLong);
-			Vector2dBounds tileBounds = new Vector2dBounds(Conversions.LatLonToMeters(hitPntSWGeoPos), Conversions.LatLonToMeters(hitPntNEGeoPos));			// Bounds debugging.
+			Vector2dBounds tileBounds = new Vector2dBounds(Conversions.LatLonToMeters(hitPntSWGeoPos), Conversions.LatLonToMeters(hitPntNEGeoPos));         // Bounds debugging.
 #if UNITY_EDITOR
 			Debug.DrawLine(_cbtpOptions.camera.transform.position, _map.GeoToWorldPosition(hitPntSWGeoPos), Color.blue);
 			Debug.DrawLine(_cbtpOptions.camera.transform.position, _map.GeoToWorldPosition(hitPntNEGeoPos), Color.red);

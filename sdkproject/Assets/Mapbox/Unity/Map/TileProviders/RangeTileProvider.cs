@@ -29,7 +29,7 @@ namespace Mapbox.Unity.Map.TileProviders
 
 		public override void UpdateTileExtent()
 		{
-			if (!_initialized || Options == null)
+			if (!_initialized || _rangeTileProviderOptions == null)
 			{
 				return;
 			}
