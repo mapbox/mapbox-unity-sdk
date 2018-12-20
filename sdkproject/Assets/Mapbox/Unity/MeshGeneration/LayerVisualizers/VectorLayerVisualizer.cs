@@ -399,7 +399,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			_activeIds.Add(feature.Data.Id);
 			if (!_idPool.ContainsKey(tile))
 			{
-				_idPool.Add(tile, new List<ulong>());
+				_idPool.Add(tile, new List<ulong>() { feature.Data.Id });
 			}
 			else
 			{
