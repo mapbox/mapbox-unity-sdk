@@ -17,15 +17,28 @@
 	public static class EditorHelper
 	{
 
+
 		[UnityEditor.Callbacks.DidReloadScripts]
 		private static void OnScriptsReloaded()
 		{
 			if (Application.isEditor)
 			{
+				
 				AbstractMap abstractMap = UnityEngine.Object.FindObjectOfType<AbstractMap>();
 
-				if(abstractMap == null)
+				if(abstractMap == null) 
 				{
+					return;
+				}
+				//we DO NOT want to reload the map when the user first presses the play button, but
+				//OnScriptsReloaded will get called when the user first hits play, so....
+				//...
+				//if we are in play or about to be in play and late update has not yet been called,
+				//then we should do nothing here, as we know that OnScriptsReloaded was called from 
+				//pressing the play button and not from a script reload during a play session...
+				if (EditorApplication.isPlayingOrWillChangePlaymode && !abstractMap.LateUpdateWasCalled)
+				{
+					Debug.Log("Play just started, do not reload anything...");
 					return;
 				}
 
@@ -38,17 +51,21 @@
 
 				if (EditorApplication.isPlaying)
 				{
+					Debug.Log("Reload PREVIEW mode");
 					abstractMap.DisableEditorPreview();
 					abstractMap.ForceRestartMap();
 					return;
 				}
+
 				if (abstractMap.PreviewOptions.isPreviewEnabled == true)
 				{
+					Debug.Log("Reload PLAY mode");
 					abstractMap.DisableEditorPreview();
 					abstractMap.EnableEditorPreview();
 				}
 			}
 		}
+
 
 		public static void CheckForModifiedProperty<T>(SerializedProperty property, T targetObject, bool forceHasChanged = false)
 		{

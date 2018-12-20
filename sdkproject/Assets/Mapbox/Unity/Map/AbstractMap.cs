@@ -44,6 +44,9 @@ namespace Mapbox.Unity.Map
 		protected Vector2d _centerMercator;
 		protected float _worldRelativeScale;
 		protected Vector3 _mapScaleFactor;
+
+		private bool _lateUpdateWasCalled = false;
+
 		#endregion
 
 		#region Properties
@@ -284,6 +287,15 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
+		public bool LateUpdateWasCalled
+		{
+			get
+			{
+				return _lateUpdateWasCalled;
+			}
+		}
+
+
 		#endregion
 
 		#region Public Methods
@@ -314,6 +326,14 @@ namespace Mapbox.Unity.Map
 			if (_tileProvider != null)
 			{
 				_tileProvider.UpdateTileProvider();
+			}
+		}
+
+		private void LateUpdate()
+		{
+			if(Application.isPlaying && !_lateUpdateWasCalled)
+			{
+				_lateUpdateWasCalled = true;
 			}
 		}
 
@@ -443,11 +463,11 @@ namespace Mapbox.Unity.Map
 
 		protected virtual void Awake()
 		{
-			
 			foreach (Transform tr in transform)
 			{
 				Destroy(tr.gameObject);
 			}
+
 
 			// Setup a visualizer to get a "Starter" map.
 			_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
@@ -455,9 +475,10 @@ namespace Mapbox.Unity.Map
 			if (_previewOptions.isPreviewEnabled == true)
 			{
 				DisableEditorPreview();
-				_previewOptions.isPreviewEnabled = false;
 			}
+			_previewOptions.isPreviewEnabled = false;
 		}
+
 
 		// Use this for initialization
 		protected virtual void Start()
@@ -470,6 +491,11 @@ namespace Mapbox.Unity.Map
 					SetUpMap();
 				}
 			}
+		}
+
+		private void OnApplicationQuit()
+		{
+			_lateUpdateWasCalled = false;
 		}
 
 		private void EnableDisablePreview(object sender, EventArgs e)
@@ -498,11 +524,15 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
+
 		public void DisableEditorPreview()
 		{
 			if (_options.extentOptions.extentType != MapExtentType.Custom)
 			{
-				TileProvider.Destroy();
+				//if(Application.isEditor && Applica)
+				//TileProvider.Destroy();
+				Debug.Log("DestroyImmediate");
+				DestroyImmediate(TileProvider, true);
 				TileProvider = null;
 			}
 			_imagery.UpdateLayer -= OnImageOrTerrainUpdateLayer;
@@ -570,6 +600,7 @@ namespace Mapbox.Unity.Map
 
 			InitializeMap(_options);
 		}
+
 
 		protected virtual void TileProvider_OnTileAdded(UnwrappedTileId tileId)
 		{
@@ -725,8 +756,17 @@ namespace Mapbox.Unity.Map
 
 		private void SetTileProvider()
 		{
+			Debug.Log("SetTileProvider");
+			Debug.Log((TileProvider == null) ? "Tileprovider is NULL" : "Tileprovider is NOT NULL!!!!");
+
 			if (_options.extentOptions.extentType != MapExtentType.Custom)
 			{
+				AbstractTileProvider tileProvider = GetComponent<AbstractTileProvider>();
+				if(tileProvider != null)
+				{
+					Debug.Log("The is already a tile provider COMPONENT attached to this gameobject");
+					Destroy(tileProvider);
+				}
 				ITileProviderOptions tileProviderOptions = _options.extentOptions.GetTileProviderOptions();
 				// Setup tileprovider based on type.
 				switch (_options.extentOptions.extentType)
