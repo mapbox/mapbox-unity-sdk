@@ -6,7 +6,7 @@ namespace Mapbox.Unity.Map.TileProviders
 {
 	public class RangeAroundTransformTileProvider : AbstractTileProvider
 	{
-		private RangeAroundTransformTileProviderOptions _rangeTileProviderOptions;
+		[SerializeField] private RangeAroundTransformTileProviderOptions _rangeTileProviderOptions;
 
 		private bool _initialized = false;
 		private UnwrappedTileId _currentTile;
@@ -14,7 +14,14 @@ namespace Mapbox.Unity.Map.TileProviders
 
 		public override void OnInitialized()
 		{
-			_rangeTileProviderOptions = (RangeAroundTransformTileProviderOptions)Options;
+			if (Options != null)
+			{
+				_rangeTileProviderOptions = (RangeAroundTransformTileProviderOptions)Options;
+			}
+			else if (_rangeTileProviderOptions == null)
+			{
+				_rangeTileProviderOptions = new RangeAroundTransformTileProviderOptions();
+			}
 
 			if (_rangeTileProviderOptions.targetTransform == null)
 			{

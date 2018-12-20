@@ -33,6 +33,7 @@ namespace Mapbox.Unity.Map
 		[SerializeField] protected VectorLayer _vectorData = new VectorLayer();
 		[SerializeField] protected AbstractTileProvider _tileProvider;
 		[SerializeField] protected HashSet<UnwrappedTileId> _currentExtent;
+		[SerializeField] protected EditorPreviewOptions _previewOptions = new EditorPreviewOptions();
 
 		protected AbstractMapVisualizer _mapVisualizer;
 		protected float _unityTileSize = 1;
@@ -46,7 +47,7 @@ namespace Mapbox.Unity.Map
 		#endregion
 
 		#region Properties
-		public bool IsPreviewEnabled = false;
+		//public bool IsPreviewEnabled = false;
 
 		public AbstractMapVisualizer MapVisualizer
 		{
@@ -422,7 +423,11 @@ namespace Mapbox.Unity.Map
 
 		private void OnEnable()
 		{
-			IsPreviewEnabled = false;
+			if (_previewOptions.isPreviewEnabled == true)
+			{
+				DisableEditorPreview();
+			}
+			_previewOptions.isPreviewEnabled = false;
 
 			if (_options.tileMaterial == null)
 			{
@@ -459,6 +464,23 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
+		private void EnableDisablePreview(object sender, EventArgs e)
+		{
+			if (!Application.isPlaying)
+			{
+				if (_previewOptions.isPreviewEnabled)
+				{
+					Debug.Log("Preview Enabled");
+					EnableEditorPreview();
+				}
+				else
+				{
+					Debug.Log("Preview Disbaled");
+					DisableEditorPreview();
+				}
+			}
+		}
+
 		public void EnableEditorPreview()
 		{
 			SetUpMap();
@@ -470,7 +492,11 @@ namespace Mapbox.Unity.Map
 
 		public void DisableEditorPreview()
 		{
-			TileProvider = null;
+			if (_options.extentOptions.extentType != MapExtentType.Custom)
+			{
+				TileProvider.Destroy();
+				TileProvider = null;
+			}
 			_imagery.UpdateLayer -= OnImageOrTerrainUpdateLayer;
 			_terrain.UpdateLayer -= OnImageOrTerrainUpdateLayer;
 			_vectorData.SubLayerRemoved -= OnVectorDataSubLayerRemoved;
@@ -685,7 +711,6 @@ namespace Mapbox.Unity.Map
 
 		private void SetTileProvider()
 		{
-			//TileProvider = GetComponent<AbstractTileProvider>();
 			if (_options.extentOptions.extentType != MapExtentType.Custom)
 			{
 				ITileProviderOptions tileProviderOptions = _options.extentOptions.GetTileProviderOptions();
@@ -698,12 +723,13 @@ namespace Mapbox.Unity.Map
 							{
 								if (!(TileProvider is QuadTreeTileProvider))
 								{
-									TileProvider = new QuadTreeTileProvider();
+									TileProvider.Destroy();
+									TileProvider = gameObject.AddComponent<QuadTreeTileProvider>();
 								}
 							}
 							else
 							{
-								TileProvider = new QuadTreeTileProvider();
+								TileProvider = gameObject.AddComponent<QuadTreeTileProvider>();
 							}
 							break;
 						}
@@ -713,12 +739,13 @@ namespace Mapbox.Unity.Map
 							{
 								if (!(TileProvider is RangeTileProvider))
 								{
-									TileProvider = new RangeTileProvider();
+									TileProvider.Destroy();
+									TileProvider = gameObject.AddComponent<RangeTileProvider>();
 								}
 							}
 							else
 							{
-								TileProvider = new RangeTileProvider();
+								TileProvider = gameObject.AddComponent<RangeTileProvider>();
 							}
 							break;
 						}
@@ -728,12 +755,13 @@ namespace Mapbox.Unity.Map
 							{
 								if (!(TileProvider is RangeAroundTransformTileProvider))
 								{
-									TileProvider = new RangeAroundTransformTileProvider();
+									TileProvider.Destroy();
+									TileProvider = gameObject.AddComponent<RangeAroundTransformTileProvider>();
 								}
 							}
 							else
 							{
-								TileProvider = new RangeAroundTransformTileProvider();
+								TileProvider = gameObject.AddComponent<RangeAroundTransformTileProvider>();
 							}
 							break;
 						}
@@ -1074,6 +1102,7 @@ namespace Mapbox.Unity.Map
 			_options.scalingOptions.unityTileSize = tileSizeInUnityUnits;
 			_options.scalingOptions.HasChanged = true;
 		}
+
 		#endregion
 
 		#region Events

@@ -84,7 +84,10 @@ namespace Mapbox.Unity.Map
 
 		public void UnbindAllEvents()
 		{
-			_vectorTileFactory.UnbindEvents();
+			if (_vectorTileFactory != null)
+			{
+				_vectorTileFactory.UnbindEvents();
+			}
 		}
 
 		public void UpdateFactorySettings()
