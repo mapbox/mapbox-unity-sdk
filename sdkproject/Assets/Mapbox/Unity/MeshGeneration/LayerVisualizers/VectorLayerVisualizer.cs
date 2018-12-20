@@ -450,10 +450,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		/// <param name="featureId">Feature identifier.</param>
 		private bool ShouldSkipProcessingFeatureWithId(ulong featureId, UnityTile tile, VectorLayerVisualizerProperties layerProperties)
 		{
-			if (_activeIds.Contains(featureId))
-			{
-				Debug.Log(featureId);
-			}
 			return (layerProperties.buildingsWithUniqueIds && _activeIds.Contains(featureId));
 		}
 
@@ -731,7 +727,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			//removing ids from activeIds list so they'll be recreated next time tile loads (necessary when you're unloading/loading tiles)
 			if (_idPool.ContainsKey(tile))
 			{
-				Debug.Log(_idPool[tile].Count + " " + _activeIds.Count);
 				foreach (var item in _idPool[tile])
 				{
 					_activeIds.Remove(item);
