@@ -160,8 +160,20 @@
 
 			if (!Application.isPlaying)
 			{
+				var test = serializedObject.FindProperty("ReEnablePreview");
+				if (test.boolValue == true)
+				{
+					((AbstractMap)serializedObject.targetObject).DisableEditorPreview();
+					((AbstractMap)serializedObject.targetObject).EnableEditorPreview();
+					((AbstractMap)serializedObject.targetObject).ReEnablePreview = false;
+				}
+			}
+
+			if (!Application.isPlaying)
+			{
 				if (prevProp.boolValue && !prev)
 				{
+					Debug.Log("Enable Preview button!!");
 					((AbstractMap)serializedObject.targetObject).EnableEditorPreview();
 				}
 				else if (prev && !prevProp.boolValue)
