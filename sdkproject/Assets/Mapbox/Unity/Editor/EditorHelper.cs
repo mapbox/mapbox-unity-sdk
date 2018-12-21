@@ -51,15 +51,16 @@
 
 				if (EditorApplication.isPlaying)
 				{
-					Debug.Log("Reload PREVIEW mode");
+					Debug.Log("Reload PLAY mode");
 					abstractMap.DisableEditorPreview();
 					abstractMap.ForceRestartMap();
 					return;
 				}
 
+
 				if (abstractMap.PreviewOptions.isPreviewEnabled == true)
 				{
-					Debug.Log("Reload PLAY mode");
+					Debug.Log("Reload PREVIEW mode");
 					abstractMap.DisableEditorPreview();
 					abstractMap.EnableEditorPreview();
 				}

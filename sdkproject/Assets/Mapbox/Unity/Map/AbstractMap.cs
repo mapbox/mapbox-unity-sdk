@@ -496,6 +496,21 @@ namespace Mapbox.Unity.Map
 		private void OnApplicationQuit()
 		{
 			_lateUpdateWasCalled = false;
+			if (_options.extentOptions.extentType != MapExtentType.Custom)
+			{
+				AbstractTileProvider tileProvider = GetComponent<AbstractTileProvider>();
+				if (tileProvider != null)
+				{
+					if (Application.isPlaying)
+					{
+						Destroy(tileProvider);
+					}
+					else
+					{
+						DestroyImmediate(tileProvider);
+					}
+				}
+			}
 		}
 
 		private void EnableDisablePreview(object sender, EventArgs e)
@@ -523,7 +538,6 @@ namespace Mapbox.Unity.Map
 				OnEditorPreviewEnabled();
 			}
 		}
-
 
 		public void DisableEditorPreview()
 		{
@@ -765,8 +779,16 @@ namespace Mapbox.Unity.Map
 				if(tileProvider != null)
 				{
 					Debug.Log("The is already a tile provider COMPONENT attached to this gameobject");
-					Destroy(tileProvider);
+					if(Application.isPlaying)
+					{
+						Destroy(tileProvider);
+					}
+					else
+					{
+						DestroyImmediate(tileProvider);
+					}
 				}
+
 				ITileProviderOptions tileProviderOptions = _options.extentOptions.GetTileProviderOptions();
 				// Setup tileprovider based on type.
 				switch (_options.extentOptions.extentType)
