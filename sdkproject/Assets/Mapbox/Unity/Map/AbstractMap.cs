@@ -315,7 +315,7 @@ namespace Mapbox.Unity.Map
 		}
 
 		//Unity Update
-		private void Update()
+		protected virtual void Update()
 		{
 			if (TileProvider != null)
 			{
@@ -470,16 +470,7 @@ namespace Mapbox.Unity.Map
 		{
 			Debug.Log("Awake!!");
 
-			// Destroy any ghost game objects. 
-			foreach (Transform tr in transform)
-			{
-				Destroy(tr.gameObject);
-			}
-			//Destroy default tileproviders that might be orphaned due to serialization. 
-			DestroyTileProvider();
-
-			// Setup a visualizer to get a "Starter" map.
-			_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
+			MapOnAwakeRoutine();
 
 			if (_previewOptions.isPreviewEnabled == true)
 			{
@@ -499,6 +490,40 @@ namespace Mapbox.Unity.Map
 					SetUpMap();
 				}
 			}
+		}
+
+		private void MapOnAwakeRoutine()
+		{
+			// Destroy any ghost game objects. 
+			foreach (Transform tr in transform)
+			{
+				Destroy(tr.gameObject);
+			}
+			//Destroy default tileproviders that might be orphaned due to serialization. 
+			DestroyTileProvider();
+
+			// Setup a visualizer to get a "Starter" map.
+			_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
+		}
+
+
+		private void MapOnStartRoutine()
+		{
+			if (Application.isPlaying)
+			{
+				//StartCoroutine("SetupAccess");
+				if (_initializeOnStart)
+				{
+					SetUpMap();
+				}
+			}
+		}
+
+
+		public void RestartMap()
+		{
+			MapOnAwakeRoutine();
+			MapOnStartRoutine();
 		}
 
 		private void EnableDisablePreview(object sender, EventArgs e)

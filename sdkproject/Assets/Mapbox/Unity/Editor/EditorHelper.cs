@@ -45,14 +45,13 @@
 					UnityEngine.Object.DestroyImmediate(unityTiles[i].gameObject);
 				}
 
-				//if (EditorApplication.isPlaying)
-				//{
-				//	Debug.Log("Reload PREVIEW mode");
-				//	abstractMap.DisableEditorPreview();
-				//	abstractMap.ForceRestartMap();
-				//	return;
-				//}
-				Debug.Log("OnScriptsReloaded --> Step 3");
+				if (EditorApplication.isPlaying)
+				{
+					Debug.Log("Restart Map mode");
+					abstractMap.RestartMap();
+					return;
+				}
+				Debug.Log("OnScriptsReloaded --> Step 3.0");
 				if (abstractMap.IsEditorPreviewEnabled == true)
 				{
 					Debug.Log("EditorPreview = true");
