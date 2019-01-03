@@ -476,14 +476,7 @@ namespace Mapbox.Unity.Map
 		// Use this for initialization
 		protected virtual void Start()
 		{
-			if (Application.isPlaying)
-			{
-				StartCoroutine("SetupAccess");
-				if (_initializeOnStart)
-				{
-					SetUpMap();
-				}
-			}
+			MapOnStartRoutine();
 		}
 
 		private void MapOnAwakeRoutine()
@@ -501,11 +494,14 @@ namespace Mapbox.Unity.Map
 		}
 
 
-		private void MapOnStartRoutine()
+		private void MapOnStartRoutine(bool coroutine = true)
 		{
 			if (Application.isPlaying)
 			{
-				//StartCoroutine("SetupAccess");
+				if(coroutine)
+				{
+					StartCoroutine("SetupAccess");
+				}
 				if (_initializeOnStart)
 				{
 					SetUpMap();
@@ -513,11 +509,10 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-
 		public void RestartMap()
 		{
 			MapOnAwakeRoutine();
-			MapOnStartRoutine();
+			MapOnStartRoutine(false);
 		}
 
 		private void EnableDisablePreview(object sender, EventArgs e)
