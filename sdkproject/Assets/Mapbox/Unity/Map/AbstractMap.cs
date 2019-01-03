@@ -22,7 +22,7 @@ namespace Mapbox.Unity.Map
 	/// Abstract map encapsulates the image, terrain and vector sources and provides a centralized interface to control the visualization of the map.
 	/// </summary>
 	[ExecuteInEditMode]
-	public class AbstractMap : MonoBehaviour, IMap, ISerializationCallbackReceiver
+	public class AbstractMap : MonoBehaviour, IMap
 	{
 		#region Private Fields
 
@@ -1151,19 +1151,6 @@ namespace Mapbox.Unity.Map
 			_options.scalingOptions.scalingType = MapScalingType.Custom;
 			_options.scalingOptions.unityTileSize = tileSizeInUnityUnits;
 			_options.scalingOptions.HasChanged = true;
-		}
-
-		public void OnBeforeSerialize()
-		{
-			//if (TileProvider != null)
-			//{
-			//	DestroyTileProvider();
-			//}
-		}
-
-		public void OnAfterDeserialize()
-		{
-			//throw new NotImplementedException();
 		}
 
 		#endregion
