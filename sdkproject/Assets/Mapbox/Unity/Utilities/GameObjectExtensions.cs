@@ -8,12 +8,10 @@ public static class GameObjectExtensions
 	{
 		if (Application.isEditor && !Application.isPlaying)
 		{
-			Debug.Log("Destroy Immediate");
 			GameObject.DestroyImmediate(obj, deleteAsset);
 		}
 		else
 		{
-			Debug.Log("Destroy Delayed");
 			GameObject.Destroy(obj);
 		}
 	}

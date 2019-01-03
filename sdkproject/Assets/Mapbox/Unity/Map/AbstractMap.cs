@@ -44,7 +44,6 @@ namespace Mapbox.Unity.Map
 		protected Vector2d _centerMercator;
 		protected float _worldRelativeScale;
 		protected Vector3 _mapScaleFactor;
-		public bool ReEnablePreview = false;
 		#endregion
 
 		#region Properties
@@ -436,8 +435,6 @@ namespace Mapbox.Unity.Map
 
 		private void OnEnable()
 		{
-			Debug.Log("On Enable");
-			//DestroyTileProvider();
 
 			if (_options.tileMaterial == null)
 			{
@@ -453,7 +450,6 @@ namespace Mapbox.Unity.Map
 		// TODO: implement IDisposable, instead?
 		protected virtual void OnDestroy()
 		{
-			Debug.Log("OnDestroy");
 			if (TileProvider != null)
 			{
 				TileProvider.ExtentChanged -= OnMapExtentChanged;
@@ -468,8 +464,6 @@ namespace Mapbox.Unity.Map
 
 		protected virtual void Awake()
 		{
-			Debug.Log("Awake!!");
-
 			MapOnAwakeRoutine();
 
 			if (_previewOptions.isPreviewEnabled == true)
@@ -545,8 +539,6 @@ namespace Mapbox.Unity.Map
 
 		public void EnableEditorPreview()
 		{
-			Debug.Log("Preview Enabled!!");
-
 			SetUpMap();
 			if (OnEditorPreviewEnabled != null)
 			{
@@ -556,8 +548,6 @@ namespace Mapbox.Unity.Map
 
 		public void DisableEditorPreview()
 		{
-			Debug.Log("Preview Disabled!!!!");
-
 			_imagery.UpdateLayer -= OnImageOrTerrainUpdateLayer;
 			_terrain.UpdateLayer -= OnImageOrTerrainUpdateLayer;
 			_vectorData.SubLayerRemoved -= OnVectorDataSubLayerRemoved;
@@ -575,13 +565,9 @@ namespace Mapbox.Unity.Map
 
 		public void DestroyTileProvider()
 		{
-
 			var tileProvider = TileProvider ?? gameObject.GetComponent<AbstractTileProvider>();
-			string state = (_tileProvider == null) ? "NULL" : "NOT NULL";
-			Debug.Log("_tileProvider state --> " + state);
 			if (_options.extentOptions.extentType != MapExtentType.Custom && tileProvider != null)
 			{
-				Debug.Log("Tile Provider Destroyer!!!!!!!!!");
 				tileProvider.Destroy();
 			}
 		}
@@ -813,16 +799,11 @@ namespace Mapbox.Unity.Map
 						{
 							if (TileProvider != null)
 							{
-								//if (!(TileProvider is RangeTileProvider))
-								Debug.Log("TileProvider NOT NULL !!!");
-								{
-									TileProvider.Destroy();
-									TileProvider = gameObject.AddComponent<RangeTileProvider>();
-								}
+								TileProvider.Destroy();
+								TileProvider = gameObject.AddComponent<RangeTileProvider>();
 							}
 							else
 							{
-								Debug.Log("TileProvider NULL");
 								TileProvider = gameObject.AddComponent<RangeTileProvider>();
 							}
 							break;
