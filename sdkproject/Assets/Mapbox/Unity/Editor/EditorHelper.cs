@@ -20,24 +20,15 @@
 		[UnityEditor.Callbacks.DidReloadScripts]
 		private static void OnScriptsReloaded()
 		{
-			Debug.Log("OnScriptsReloaded");
 			if (Application.isEditor)
 			{
-				Debug.Log("OnScriptsReloaded --> Step 1");
 				AbstractMap abstractMap = UnityEngine.Object.FindObjectOfType<AbstractMap>();
 
 				if (abstractMap == null)
 				{
 					return;
 				}
-				//we DO NOT want to reload the map when the user first presses the play button, but
-				//OnScriptsReloaded will get called when the user first hits play, so....
-				//...
-				//if we are in play or about to be in play and late update has not yet been called,
-				//then we should do nothing here, as we know that OnScriptsReloaded was called from 
-				//pressing the play button and not from a script reload during a play session...
 
-				Debug.Log("OnScriptsReloaded --> Step 2");
 				UnityTile[] unityTiles = abstractMap.GetComponentsInChildren<UnityTile>();
 
 				for (int i = 0; i < unityTiles.Length; i++)
@@ -45,32 +36,22 @@
 					UnityEngine.Object.DestroyImmediate(unityTiles[i].gameObject);
 				}
 
-				//if (EditorApplication.isPlaying)
-				//{
-				//	Debug.Log("Reload PREVIEW mode");
-				//	abstractMap.DisableEditorPreview();
-				//	abstractMap.ForceRestartMap();
-				//	return;
-				//}
-				Debug.Log("OnScriptsReloaded --> Step 3");
+				if (EditorApplication.isPlaying)
+				{
+					abstractMap.RestartMap();
+					return;
+				}
 				if (abstractMap.IsEditorPreviewEnabled == true)
 				{
-					Debug.Log("EditorPreview = true");
 					if (EditorApplication.isPlayingOrWillChangePlaymode)
 					{
-						//abstractMap.IsEditorPreviewEnabled = false;
-						//abstractMap.DestroyTileProvider();
-						Debug.Log("Play just started, do not reload anything.......");
 						return;
 					}
 					else
 					{
-						Debug.Log("Reload mode reset --> take 2");
-						//abstractMap.DisableEditorPreview();
-						abstractMap.ReEnablePreview = true;
-						//abstractMap.EnableEditorPreview();
+						abstractMap.DisableEditorPreview();
+						abstractMap.EnableEditorPreview();
 					}
-
 				}
 			}
 		}
