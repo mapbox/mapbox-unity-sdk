@@ -393,6 +393,11 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
+		private void Reset()
+		{
+			DisableEditorPreview();
+		}
+
 		/// <summary>
 		/// Resets the map.
 		/// Use this method to reset the map.
