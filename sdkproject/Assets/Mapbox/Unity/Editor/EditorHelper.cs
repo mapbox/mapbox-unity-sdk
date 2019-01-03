@@ -38,7 +38,7 @@
 
 				if (EditorApplication.isPlaying)
 				{
-					abstractMap.RestartMap();
+					abstractMap.ResetMap();
 					return;
 				}
 				if (abstractMap.IsEditorPreviewEnabled == true)
