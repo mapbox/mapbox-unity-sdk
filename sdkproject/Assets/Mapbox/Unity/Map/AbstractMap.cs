@@ -395,16 +395,21 @@ namespace Mapbox.Unity.Map
 
 		/// <summary>
 		/// Resets the map.
-		/// Use this method to reset the map to and reset all parameters.
+		/// Use this method to reset the map.
 		/// </summary>
 		[ContextMenu("ResetMap")]
 		public void ResetMap()
 		{
-			//Initialize(Conversions.StringToLatLon(_options.locationOptions.latitudeLongitude), (int)_options.locationOptions.zoom);
-
-			_mapVisualizer.UnregisterAllTiles();
-			_mapVisualizer.ClearMap();
-			_mapVisualizer.ReregisterAllTiles();
+			if(_previewOptions.isPreviewEnabled)
+			{
+				DisableEditorPreview();
+				EnableEditorPreview();
+			}
+			else
+			{
+				MapOnAwakeRoutine();
+				MapOnStartRoutine(false);
+			}
 		}
 
 		public bool IsAccessTokenValid
@@ -481,7 +486,7 @@ namespace Mapbox.Unity.Map
 
 		private void MapOnAwakeRoutine()
 		{
-			// Destroy any ghost game objects. 
+			// Destroy any ghost game objects.
 			foreach (Transform tr in transform)
 			{
 				Destroy(tr.gameObject);
@@ -507,12 +512,6 @@ namespace Mapbox.Unity.Map
 					SetUpMap();
 				}
 			}
-		}
-
-		public void RestartMap()
-		{
-			MapOnAwakeRoutine();
-			MapOnStartRoutine(false);
 		}
 
 		private void EnableDisablePreview(object sender, EventArgs e)
