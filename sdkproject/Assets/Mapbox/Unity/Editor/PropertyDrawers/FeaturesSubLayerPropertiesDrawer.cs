@@ -237,7 +237,6 @@
 				GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
 				EditorGUILayout.BeginHorizontal();
-				//var presetTypes = property.FindPropertyRelative("presetFeatureTypes");
 				GenericMenu menu = new GenericMenu();
 				foreach (var name in Enum.GetNames(typeof(PresetFeatureType)))
 				{
@@ -412,8 +411,6 @@
 			var materialOptions = subLayerProperties.materialOptions;
 			subLayerGeometryMaterialOptions.FindPropertyRelative("style").enumValueIndex = (int)materialOptions.style;
 
-			//GeometryMaterialOptions geometryMaterialOptionsReference = MapboxDefaultStyles.GetDefaultAssets();
-
 			var mats = subLayerGeometryMaterialOptions.FindPropertyRelative("materials");
 			mats.arraySize = 2;
 
@@ -488,20 +485,14 @@
 		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty, SerializedProperty property)
 		{
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
-			//var layerName = layerProperty.FindPropertyRelative("coreOptions.layerName");
-			//var roadLayerName = layerProperty.FindPropertyRelative("roadLayer");
-			//var landuseLayerName = layerProperty.FindPropertyRelative("landuseLayer");
-
 
 			var subLayerName = subLayerCoreOptions.FindPropertyRelative("sublayerName").stringValue;
 			var visualizerLayer = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
 			var subLayerType = PresetSubLayerPropertiesFetcher.GetPresetTypeFromLayerName(visualizerLayer);
-			//var maskValue = layerProperty.FindPropertyRelative("_maskValue");
-			//var selectedTypes = layerProperty.FindPropertyRelative("selectedTypes");
 
 			GUILayout.Space(-_lineHeight);
 			layerProperty.FindPropertyRelative("presetFeatureType").intValue = (int)subLayerType;
-			//EditorGUILayout.LabelField("Sub-type : " + "Highway", visualizerNameAndType);
+
 			GUILayout.Space(_lineHeight);
 			//*********************** LAYER NAME BEGINS ***********************************//
 			VectorPrimitiveType primitiveTypeProp = (VectorPrimitiveType)subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex;
@@ -519,32 +510,6 @@
 				EditorHelper.CheckForModifiedProperty(subLayerCoreOptions);
 			}
 			//*********************** LAYER NAME ENDS ***********************************//
-
-			//*********************** TYPE DROPDOWN BEGINS ***********************************//
-			//if (_streetsV7TileStats == null || subTypeValues == null)
-			//{
-			//	subTypeValues = GetSubTypeValues(layerProperty, visualizerLayer, sourceType);
-			//}
-
-			//if ((layerName.stringValue == roadLayerName.stringValue || layerName.stringValue == landuseLayerName.stringValue) && subTypeValues!=null)
-			//{
-			//	maskValue.intValue = EditorGUILayout.MaskField("Type",maskValue.intValue, subTypeValues);
-			//	string selectedOptions = string.Empty;
-			//	for (int i = 0; i < subTypeValues.Length; i++)
-			//	{
-			//		if ((maskValue.intValue & (1 << i)) == (1 << i))
-			//		{
-			//			if (string.IsNullOrEmpty(selectedOptions))
-			//			{
-			//				selectedOptions = subTypeValues[i];
-			//				continue;
-			//			}
-			//			selectedOptions += "," + subTypeValues[i];
-			//		}
-			//	}
-			//	selectedTypes.stringValue = selectedOptions;
-			//}
-			//*********************** TYPE DROPDOWN ENDS ***********************************//
 
 			EditorGUI.indentLevel++;
 
@@ -584,7 +549,6 @@
 			{
 				if (tileJSONResponse == null || string.IsNullOrEmpty(sourceString) || sourceString != TilesetId)
 				{
-					//tileJSONData.ClearData();
 					try
 					{
 						Unity.MapboxAccess.Instance.TileJSON.Get(sourceString, (response) =>

@@ -340,10 +340,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						{
 							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md, 0, 0);
 							AddCurrentVertex(_currentVertex, _distance, _nextNormal, md, 0, 0);
-							//adding extra vertices instead of switching indexing as it looks better on sharp corners
-							//var t = _index1;
-							//_index1 = _index2;
-							//_index2 = t;
 						}
 					}
 

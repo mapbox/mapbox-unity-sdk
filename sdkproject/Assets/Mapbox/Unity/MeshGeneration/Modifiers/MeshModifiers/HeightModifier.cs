@@ -41,10 +41,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	{
 		private float _scale = 1;
 
-		//[SerializeField]
-		//[Tooltip("Create side walls from calculated height down to terrain level. Suggested for buildings, not suggested for roads.")]
-		//private bool _createSideWalls = true;
-
 		GeometryExtrusionOptions _options;
 
 		[SerializeField]
@@ -190,7 +186,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 								md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.min + maxHeight, md.Vertices[i].z);
 							}
 						}
-						//hf += max - min;
 						break;
 					case ExtrusionType.MaxHeight:
 						{
@@ -247,7 +242,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						if (feature.Properties.ContainsKey("min_height"))
 						{
 							minHeight = Convert.ToSingle(feature.Properties["min_height"]);
-							//maxHeight -= minHeight;
 						}
 					}
 					break;

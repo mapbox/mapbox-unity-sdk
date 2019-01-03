@@ -118,7 +118,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						md.Vertices.Add(vl[ind + _sliceCount]);
 						md.Vertices.Add(vl[ind + _sliceCount + 1]);
 
-						//h = (vl[ind + 1] - vl[ind]).magnitude;
 						h = (float)j / _sliceCount;
 
 						md.UV[0].Add(new Vector2(uvDist, ((float)j - 1) / _sliceCount));

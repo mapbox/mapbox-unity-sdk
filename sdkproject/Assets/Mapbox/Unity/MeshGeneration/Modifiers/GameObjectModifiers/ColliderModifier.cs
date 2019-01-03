@@ -11,7 +11,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	public class ColliderModifier : GameObjectModifier
 	{
 		//[SerializeField]
-		//private ColliderType _colliderType;
 		private IColliderStrategy _colliderStrategy;
 
 		[SerializeField]

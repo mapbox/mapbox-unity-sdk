@@ -20,8 +20,6 @@
 			materials = new MaterialList[2];
 			materials[0] = new MaterialList();
 			materials[1] = new MaterialList();
-
-			//SetDefaultAssets();
 		}
 
 		private void AssignAssets(StyleAssetPathBundle styleAssetPathBundle)
