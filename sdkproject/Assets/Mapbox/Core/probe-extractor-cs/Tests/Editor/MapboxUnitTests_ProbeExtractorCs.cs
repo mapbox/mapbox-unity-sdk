@@ -106,8 +106,6 @@ namespace Mapbox.ProbeExtractorCs.UnitTest
 			ProbeExtractor extractor = new ProbeExtractor(ruler, options);
 			List<Probe> extractedProbes = extractor.ExtractProbes(_footTrace);
 
-			//Debug.Log(probesToGeojson(extractedProbes));
-
 			Assert.AreEqual(40, extractedProbes.Count);
 		}
 
@@ -215,21 +213,6 @@ namespace Mapbox.ProbeExtractorCs.UnitTest
 			sb.Append("{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"properties\":{},\"geometry\":{\"type\":\"LineString\",\"coordinates\":[");
 			sb.Append(string.Join(",", probes.Select(p => string.Format(CultureInfo.InvariantCulture, "[{0},{1}]", p.Longitude, p.Latitude)).ToArray()));
 			sb.Append("]}}");
-
-			//points - too much noise - find a way to just show small circles on vertices
-			/*
-			List<string> points = new List<string>();
-			foreach (var p in probes)
-			{
-				points.Add(string.Format(
-					CultureInfo.InvariantCulture
-					, "{{\"type\":\"Feature\",\"properties\":{{\"marker-size\":\"small\",\"marker-symbol\":\"star\"}},\"geometry\":{{\"type\":\"Point\",\"coordinates\":[{0},{1}]}}}}"
-					, p.Longitude
-					, p.Latitude
-				));
-			}
-			sb.Append("," + string.Join(",", points.ToArray()));
-			*/
 
 			sb.Append("]}");
 			return sb.ToString();

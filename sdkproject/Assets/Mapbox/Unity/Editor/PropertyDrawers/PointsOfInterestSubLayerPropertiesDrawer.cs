@@ -12,8 +12,7 @@ namespace Mapbox.Unity.Map
 		string objectId = "";
 		static float _lineHeight = EditorGUIUtility.singleLineHeight;
 
-		//PointsOfInterestSubLayerTreeView layerTreeView = new PointsOfInterestSubLayerTreeView(new TreeViewState());
-		FeatureSubLayerTreeView layerTreeView;// = new FeatureSubLayerTreeView
+		FeatureSubLayerTreeView layerTreeView;
 		IList<int> selectedLayers = new List<int>();
 
 		private TreeModel<FeatureTreeElement> treeModel;
@@ -115,8 +114,6 @@ namespace Mapbox.Unity.Map
 
 			if (GUILayout.Button(new GUIContent("Add Layer"), (GUIStyle)"minibuttonleft"))
 			{
-
-				//GUILayout.Space(EditorGUIUtility.singleLineHeight);
 				prefabItemArray.arraySize++;
 
 				var prefabItem = prefabItemArray.GetArrayElementAtIndex(prefabItemArray.arraySize - 1);
@@ -222,7 +219,7 @@ namespace Mapbox.Unity.Map
 				var subLayer = subLayerArray.GetArrayElementAtIndex(i);
 				name = subLayer.FindPropertyRelative("coreOptions.sublayerName").stringValue;
 				id = i + FeatureSubLayerTreeView.uniqueIdPoI;
-				type = PresetFeatureType.Points.ToString();//((PresetFeatureType)subLayer.FindPropertyRelative("presetFeatureType").enumValueIndex).ToString();
+				type = PresetFeatureType.Points.ToString();
 				FeatureTreeElement element = new FeatureTreeElement(name, 0, id);
 				element.Name = name;
 				element.name = name;

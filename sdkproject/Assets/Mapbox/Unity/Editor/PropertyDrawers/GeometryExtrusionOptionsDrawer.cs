@@ -24,7 +24,6 @@
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			//property.serializedObject.Update();
 			var extrusionTypeProperty = property.FindPropertyRelative("extrusionType");
 			var displayNames = extrusionTypeProperty.enumDisplayNames;
 			int count = extrusionTypeProperty.enumDisplayNames.Length;
@@ -232,10 +231,9 @@
 		private void DrawWarningMessage(Rect position)
 		{
 			GUIStyle labelStyle = new GUIStyle(EditorStyles.popup);
-			//labelStyle.normal.textColor = Color.red;
 			labelStyle.fontStyle = FontStyle.Bold;
 			var layerNameLabel = new GUIContent { text = "Property Name", tooltip = "The name of the property in the selected Mapbox layer that will be used for extrusion" };
-			EditorGUILayout.LabelField(layerNameLabel, new GUIContent("No properties found in layer"), labelStyle);//(GUIStyle)"minipopUp");
+			EditorGUILayout.LabelField(layerNameLabel, new GUIContent("No properties found in layer"), labelStyle);
 			return;
 		}
 	}

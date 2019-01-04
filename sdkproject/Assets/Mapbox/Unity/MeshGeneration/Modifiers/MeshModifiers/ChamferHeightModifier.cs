@@ -275,7 +275,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					md.Triangles[0].Add(3 * current);
 					md.Triangles[0].Add(3 * current + 2);
 					md.Triangles[0].Add(3 * prev);
-					//Debug.Log(i + " - " + j + " - " + k);
+
 					md.Edges.Add(3 * prev + 1);
 					md.Edges.Add(3 * current + 2);
 				}

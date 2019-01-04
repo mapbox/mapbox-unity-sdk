@@ -15,8 +15,6 @@ namespace Mapbox.Unity.Map.TileProviders
 		private bool _shouldUpdate;
 		[SerializeField] private CameraBoundsTileProviderOptions _cbtpOptions;
 
-		//private List<UnwrappedTileId> _toRemove;
-		//private HashSet<UnwrappedTileId> _tilesToRequest;
 		private Vector2dBounds _viewPortWebMercBounds;
 
 		#region Tile decision and raycasting fields
@@ -80,12 +78,8 @@ namespace Mapbox.Unity.Map.TileProviders
 			Vector2d swWebMerc = new Vector2d(Math.Max(bounds.SouthWest.x, -Utils.Constants.WebMercMax), Math.Max(bounds.SouthWest.y, -Utils.Constants.WebMercMax));
 			Vector2d neWebMerc = new Vector2d(Math.Min(bounds.NorthEast.x, Utils.Constants.WebMercMax), Math.Min(bounds.NorthEast.y, Utils.Constants.WebMercMax));
 
-			//UnityEngine.Debug.LogFormat("swWebMerc:{0}/{1} neWebMerc:{2}/{3}", swWebMerc.x, swWebMerc.y, neWebMerc.x, neWebMerc.y);
-
 			UnwrappedTileId swTile = WebMercatorToTileId(swWebMerc, zoom);
 			UnwrappedTileId neTile = WebMercatorToTileId(neWebMerc, zoom);
-
-			//UnityEngine.Debug.LogFormat("swTile:{0} neTile:{1}", swTile, neTile);
 
 			for (int x = swTile.X; x <= neTile.X; x++)
 			{
@@ -96,7 +90,6 @@ namespace Mapbox.Unity.Map.TileProviders
 					//investigate formulas, this worked before
 					if (!_canonicalTiles.Contains(uwtid.Canonical))
 					{
-						//Debug.LogFormat("TileCover.GetWithWebMerc: {0}/{1}/{2}", zoom, x, y);
 						_tiles.Add(uwtid);
 						_canonicalTiles.Add(uwtid.Canonical);
 					}

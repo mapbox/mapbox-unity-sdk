@@ -66,10 +66,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				var ray = new Ray(bounds.center + new Vector3(x, 100, z), Vector3.down * 2000);
 
 				RaycastHit hit;
-				//Debug.DrawRay(ray.origin, ray.direction * 1000, Color.yellow, 1000);
 				if (Physics.Raycast(ray, out hit, 150, _layerMask))
 				{
-					//Debug.DrawLine(ray.origin, hit.point, Color.red, 1000);
 					var index = UnityEngine.Random.Range(0, _prefabs.Length);
 					var transform = GetObject(index, ve.GameObject).transform;
 					transform.position = hit.point;

@@ -155,7 +155,6 @@ namespace Mapbox.Editor.NodeEditor
 			if (_activeProp != null)
 			{
 				_activeProp.coreOptions.isActive = EditorGUI.Toggle(toggleRect, _activeProp.coreOptions.isActive);
-				//_activeProp.serializedObject.ApplyModifiedProperties();
 			}
 
 			GUI.Label(inLabelRect, inLabel, _inLabelStyle);

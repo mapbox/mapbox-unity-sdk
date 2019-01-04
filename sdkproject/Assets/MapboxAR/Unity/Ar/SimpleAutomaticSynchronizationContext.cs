@@ -129,8 +129,6 @@
 			// Add the weighted delta.
 			_position = (delta * bias) + originOffset;
 
-			//_rotation = _gpsNodes[_count - 1].Heading;
-			//_position = _gpsPositions[_count - 1];
 
 
 #if UNITY_EDITOR

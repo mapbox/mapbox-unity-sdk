@@ -17,14 +17,9 @@ namespace Mapbox.Editor.NodeEditor
 		private float _nodeHeight = 50;
 		[NonSerialized]
 		private Vector2 _topLeft = new Vector2(50, 50);
-		//[NonSerialized]
-		//private Vector2 _padding = new Vector2(50, 100);
 
-		//private List<Node> nodes;
-		//private List<Connection> connections;
 		private int _activeMap = 0;
 		private List<Node> _maps;
-		//private Node _rootNode;
 
 		public static GUIStyle nodeStyle;
 		public static GUIStyle leafNodeStyle;
@@ -46,9 +41,6 @@ namespace Mapbox.Editor.NodeEditor
 		}
 		private GUIStyle _optionLabel;
 
-		//private ConnectionPoint selectedInPoint;
-		//private ConnectionPoint selectedOutPoint;
-
 		private Vector2 offset;
 		private Vector2 drag;
 		private float zoomScale = 1;
@@ -68,7 +60,7 @@ namespace Mapbox.Editor.NodeEditor
 		private void OnEnable()
 		{
 			GUIScaleUtility.CheckInit();
-			//MagnifierTexture = EditorGUIUtility.FindTexture("d_ViewToolZoom");
+
 			var textOffset = new RectOffset(12, 0, 10, 0);
 
 			nodeStyle = new GUIStyle();
@@ -111,33 +103,13 @@ namespace Mapbox.Editor.NodeEditor
 
 			var abstractMaps = FindObjectsOfType<AbstractMap>();
 
-			//foreach (var abstractMap in abstractMaps)
-			//{
-			//	foreach (FieldInfo fi in abstractMap.GetType().GetFields().Where(x => x.IsDefined(typeof(NodeEditorElementAttribute), true)))
-			//	{
-			//		var val = fi.GetValue(abstractMap) as ScriptableObject;
-			//		if (typeof(ScriptableObject).IsAssignableFrom(fi.FieldType) && val != null)
-			//		{
-			//			var map = abstractMap.MapVisualizer;
-			//			var mapNode = new Node(map as ScriptableObject);
-			//			mapNode.title = map.name;
-			//			mapNode.subtitle = "Map Visualizer";
-			//			_maps.Add(mapNode);
-			//			mapNode.Dive(map, showModifiers);
-			//		}
-			//	}
-			//}
-
 			foreach (var abstractMap in abstractMaps)
 			{
 				if (abstractMap != null)
 				{
 					var map = abstractMap;
 					var mapNode = new Node(map);
-					//{
-					//	title = "Map",
-					//	subtitle = "Map Visualizer"
-					//};
+
 					_maps.Add(mapNode);
 					mapNode.Dive(map, showModifiers);
 				}
@@ -273,7 +245,6 @@ namespace Mapbox.Editor.NodeEditor
 					if (e.button == 0)
 					{
 						_clickedPosition = e.mousePosition;
-						ClearConnectionSelection();
 					}
 					break;
 
@@ -317,12 +288,6 @@ namespace Mapbox.Editor.NodeEditor
 		private void ProcessNodeEvents(Event e)
 		{
 			_maps[_activeMap].ProcessNodeEvents(e);
-		}
-
-		private void ClearConnectionSelection()
-		{
-			//selectedInPoint = null;
-			//selectedOutPoint = null;
 		}
 	}
 }

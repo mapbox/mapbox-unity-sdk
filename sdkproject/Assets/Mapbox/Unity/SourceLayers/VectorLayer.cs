@@ -530,7 +530,6 @@ namespace Mapbox.Unity.Map
 			var layerToRemove = FindFeatureSubLayerWithName(featureLayerName);
 			if (layerToRemove != null)
 			{
-				//vectorSubLayers.Remove(layerToRemove);
 				_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = layerToRemove });
 			}
 		}
@@ -603,7 +602,6 @@ namespace Mapbox.Unity.Map
 			var layerToRemove = FindPointsofInterestSubLayerWithName(poiLayerName);
 			if (layerToRemove != null)
 			{
-				//vectorSubLayers.Remove(layerToRemove);
 				_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = layerToRemove });
 			}
 		}

@@ -240,7 +240,6 @@
 					// if the request was successful add tile to all caches
 					if (!r.HasError && null != r.Data)
 					{
-						//UnityEngine.Debug.Log(uri);
 						string eTag = string.Empty;
 						DateTime? lastModified = null;
 

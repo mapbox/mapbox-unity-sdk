@@ -19,7 +19,6 @@ namespace Mapbox.Editor.NodeEditor
 
 		private bool _isRoot = false;
 		private Vector2 _panDelta;
-		//private Vector2 _topLeft = new Vector2(50, 50);
 		private Vector2 _padding = new Vector2(50, 100);
 		private float _propTopTest = 0f;
 
@@ -58,7 +57,6 @@ namespace Mapbox.Editor.NodeEditor
 		private int _propCount = 0;
 		private float _inbuff;
 
-		//Vector2 position, float width, float height
 		public Node(object so = null)
 		{
 			_propTopTest = 0f;
@@ -77,7 +75,6 @@ namespace Mapbox.Editor.NodeEditor
 				}
 				else
 				{
-					//title = Regex.Replace(ScriptableObject., "(\\B[A-Z])", " $1");
 					title = Regex.Replace(ScriptableObject.GetType().Name, "(\\B[A-Z])", " $1");
 				}
 			}
@@ -207,19 +204,16 @@ namespace Mapbox.Editor.NodeEditor
 							isDragged = true;
 							GUI.changed = true;
 							isSelected = true;
-							//nodeStyle = selectedNodeStyle;
 						}
 						else
 						{
 							GUI.changed = true;
 							isSelected = false;
-							//nodeStyle = defaultNodeStyle;
 						}
 					}
 
 					if (e.button == 1 && isSelected && rect.Contains(e.mousePosition))
 					{
-						ProcessContextMenu();
 						e.Use();
 					}
 					break;
@@ -227,25 +221,9 @@ namespace Mapbox.Editor.NodeEditor
 				case EventType.MouseUp:
 					isDragged = false;
 					break;
-
-					//case EventType.MouseDrag:
-					//	if (e.button == 0 && isDragged)
-					//	{
-					//		rect.position += e.delta;
-					//		e.Use();
-					//		return true;
-					//	}
-					//	break;
 			}
 
 			return false;
-		}
-
-		private void ProcessContextMenu()
-		{
-			//GenericMenu genericMenu = new GenericMenu();
-			//genericMenu.AddItem(new GUIContent("Remove node"), false, OnClickRemoveNode);
-			//genericMenu.ShowAsContext();
 		}
 
 		private void OnClickRemoveNode()
@@ -299,7 +277,6 @@ namespace Mapbox.Editor.NodeEditor
 						_propCount++;
 					}
 				}
-
 				//field list<SO>
 				Type type = fi.FieldType;
 				if (type.IsGenericType && type.GetGenericTypeDefinition()
@@ -314,7 +291,6 @@ namespace Mapbox.Editor.NodeEditor
 							{
 								foreach (VectorSubLayerProperties listitem in val as IEnumerable)
 								{
-									//var prop = new SerializedObject(listitem);
 									var cc = new ConnectionPoint(this, "", listitem.coreOptions.sublayerName, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle, listitem);
 
 									ConnectionPoints.Add(cc);
@@ -329,7 +305,6 @@ namespace Mapbox.Editor.NodeEditor
 							{
 								foreach (PrefabItemOptions listitem in val as IEnumerable)
 								{
-									//var prop = new SerializedObject(listitem);
 									var cc = new ConnectionPoint(this, "", listitem.coreOptions.sublayerName, _headerHeight + _propertyHeight * _propCount, ConnectionPointType.Out, NodeBasedEditor.outPointStyle, listitem);
 
 									ConnectionPoints.Add(cc);
@@ -433,7 +408,6 @@ namespace Mapbox.Editor.NodeEditor
 						_propCount++;
 					}
 				}
-
 				//property list<SO>
 				Type type = pi.PropertyType;
 				if (type.IsGenericType && type.GetGenericTypeDefinition()

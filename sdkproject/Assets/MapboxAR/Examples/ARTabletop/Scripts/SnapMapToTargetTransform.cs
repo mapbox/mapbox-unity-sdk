@@ -18,7 +18,6 @@ public class SnapMapToTargetTransform : MonoBehaviour
 		}
 	}
 
-	// Use this for initialization
 	void Start()
 	{
 		_map.OnUpdated += SnapMapToTarget;

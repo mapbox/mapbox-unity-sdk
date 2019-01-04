@@ -185,7 +185,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 
 			map.SetVector2dBoundsZoom(Vector2dBounds.World(), 2);
 			map.Update();
-			Assert.Less(map.Tiles.Count, Map<RasterTile>.TileMax); // 16
+			Assert.Less(map.Tiles.Count, Map<RasterTile>.TileMax);
 
 			// Should stay the same, ignore requests.
 			map.SetVector2dBoundsZoom(Vector2dBounds.World(), 5);

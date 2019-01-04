@@ -102,7 +102,6 @@ namespace Mapbox.Unity.Map
 
 		private void RegisterEvents(AbstractTileFactory factory)
 		{
-			//directly relaying to map visualizer event for now, nothing doing special
 			factory.OnTileError += Factory_OnTileError;
 		}
 
@@ -159,7 +158,6 @@ namespace Mapbox.Unity.Map
 			if (rasterDone && terrainDone && vectorDone)
 			{
 				tile.TileState = MeshGeneration.Enums.TilePropertyState.Loaded;
-				//tile.gameObject.SetActive(true);
 
 				// Check if all tiles in extent are active tiles
 				if (_map.CurrentExtent.Count == _activeTiles.Count)

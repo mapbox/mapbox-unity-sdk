@@ -6,8 +6,6 @@
 
 	public class ImmediatePositionWithLocationProvider : MonoBehaviour
 	{
-		//[SerializeField]
-		//private UnifiedMap _map;
 
 		bool _isInitialized;
 
