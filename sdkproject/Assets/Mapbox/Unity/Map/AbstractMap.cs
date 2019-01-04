@@ -464,20 +464,16 @@ namespace Mapbox.Unity.Map
 			}
 			_mapVisualizer.ClearMap();
 			_mapVisualizer.Destroy();
-			if (_previewOptions.isPreviewEnabled == true)
-			{
-				DisableEditorPreview();
-			}
 		}
 
 		protected virtual void Awake()
 		{
-			MapOnAwakeRoutine();
-
 			if (_previewOptions.isPreviewEnabled == true)
 			{
+				DisableEditorPreview();
 				_previewOptions.isPreviewEnabled = false;
 			}
+			MapOnAwakeRoutine();
 		}
 
 		protected virtual void Start()
@@ -492,8 +488,6 @@ namespace Mapbox.Unity.Map
 			{
 				Destroy(tr.gameObject);
 			}
-			//Destroy default tileproviders that might be orphaned due to serialization. 
-			DestroyTileProvider();
 
 			// Setup a visualizer to get a "Starter" map.
 			_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
@@ -549,7 +543,10 @@ namespace Mapbox.Unity.Map
 			_vectorData.SubLayerAdded -= OnVectorDataSubLayerAdded;
 			_vectorData.UpdateLayer -= OnVectorDataUpdateLayer;
 			_vectorData.UnbindAllEvents();
-			_mapVisualizer.ClearMap();
+			if(_mapVisualizer != null)
+			{
+				_mapVisualizer.ClearMap();
+			}
 			DestroyTileProvider();
 
 			if (OnEditorPreviewDisabled != null)
@@ -564,6 +561,7 @@ namespace Mapbox.Unity.Map
 			if (_options.extentOptions.extentType != MapExtentType.Custom && tileProvider != null)
 			{
 				tileProvider.Destroy();
+				_tileProvider = null;
 			}
 		}
 

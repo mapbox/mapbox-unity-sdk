@@ -8,10 +8,7 @@ public static class GameObjectExtensions
 	{
 		if (Application.isEditor && !Application.isPlaying)
 		{
-			UnityEditor.EditorApplication.delayCall += () =>
-			{
-				if (obj) GameObject.DestroyImmediate(obj, deleteAsset);
-			};
+			GameObject.DestroyImmediate(obj, deleteAsset);
 		}
 		else
 		{
