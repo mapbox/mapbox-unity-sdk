@@ -17,6 +17,8 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 	[TestFixture]
 	internal class PolylineToVector2dListConverterTest
 	{
+		
+		// (38.5, -120.2), (40.7, -120.95), (43.252, -126.453)
 		private readonly List<Vector2d> _polyLineObj = new List<Vector2d>()
 		{
 			new Vector2d(38.5, -120.2),

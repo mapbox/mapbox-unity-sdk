@@ -256,6 +256,7 @@ namespace Mapbox.Editor.NodeEditor
 
 			foreach (FieldInfo fi in obj.GetType().GetFields().Where(prop => prop.IsDefined(typeof(NodeEditorElementAttribute), false)))
 			{
+				//field SO
 #if ENABLE_WINMD_SUPPORT
 				if (typeof(ILayer).GetTypeInfo().IsAssignableFrom(fi.FieldType.GetTypeInfo()))
 #else
@@ -276,7 +277,7 @@ namespace Mapbox.Editor.NodeEditor
 						_propCount++;
 					}
 				}
-
+				//field list<SO>
 				Type type = fi.FieldType;
 				if (type.IsGenericType && type.GetGenericTypeDefinition()
 						== typeof(List<>))
@@ -375,6 +376,7 @@ namespace Mapbox.Editor.NodeEditor
 
 			foreach (PropertyInfo pi in obj.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(NodeEditorElementAttribute), false)))
 			{
+				//property SO
 				if (typeof(LayerProperties).IsAssignableFrom(pi.PropertyType))
 				{
 					var val = pi.GetValue(obj, null) as LayerProperties;
@@ -406,7 +408,7 @@ namespace Mapbox.Editor.NodeEditor
 						_propCount++;
 					}
 				}
-
+				//property list<SO>
 				Type type = pi.PropertyType;
 				if (type.IsGenericType && type.GetGenericTypeDefinition()
 						== typeof(List<>))

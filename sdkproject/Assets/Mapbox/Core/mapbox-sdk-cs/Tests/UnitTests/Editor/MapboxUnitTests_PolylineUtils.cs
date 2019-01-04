@@ -27,9 +27,11 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		[Test]
 		public void TestDecode()
 		{
+			// _p~iF~ps|U_ulLnnqC_mqNvxq`@
 			List<Vector2d> path = PolylineUtils.Decode(
 			  "_p~iF~ps|U_ulLnnqC_mqNvxq`@");
 
+			// (38.5, -120.2), (40.7, -120.95), (43.252, -126.453)
 			Assert.AreEqual(-120.2, path[0].y);
 			Assert.AreEqual(38.5, path[0].x);
 			Assert.AreEqual(-120.95, path[1].y);
@@ -43,11 +45,13 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		[Test]
 		public void TestEncode()
 		{
+			// (38.5, -120.2), (40.7, -120.95), (43.252, -126.453)
 			var path = new List<Vector2d>();
 			path.Add(new Vector2d(38.5, -120.2));
 			path.Add(new Vector2d(40.7, -120.95));
 			path.Add(new Vector2d(43.252, -126.453));
 
+			// _p~iF~ps|U_ulLnnqC_mqNvxq`@
 			Assert.AreEqual("_p~iF~ps|U_ulLnnqC_mqNvxq`@", PolylineUtils.Encode(path));
 		}
 

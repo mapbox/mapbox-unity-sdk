@@ -60,5 +60,11 @@
 				}
 			};
 		}
+
+		public void Run()
+		{
+			//TODO : FIX THIS ERROR	
+			//_map.Reset();
+		}
 	}
 }
