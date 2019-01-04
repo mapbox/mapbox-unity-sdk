@@ -12,7 +12,7 @@ public class SetCameraHeight : MonoBehaviour
 	Camera _referenceCamera;
 	[SerializeField]
 	float _cameraOffset = 100f;
-	// Use this for initialization
+
 	void Start()
 	{
 		if (_map == null)
@@ -26,12 +26,10 @@ public class SetCameraHeight : MonoBehaviour
 
 	}
 
-	// Update is called once per frame
 	void Update()
 	{
 		var position = _referenceCamera.transform.position;
 		position.y = _map.QueryElevationInMetersAt(_map.CenterLatitudeLongitude) + _cameraOffset;
 		_referenceCamera.transform.position = position;
-
 	}
 }

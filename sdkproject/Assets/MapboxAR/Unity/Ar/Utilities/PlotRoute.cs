@@ -1,7 +1,6 @@
 ﻿namespace Mapbox.Unity.Ar.Utilities
 {
 	using UnityEngine;
-	//using UnityEngine.XR.iOS;
 	using UnityARInterface;
 
 	[RequireComponent(typeof(LineRenderer))]

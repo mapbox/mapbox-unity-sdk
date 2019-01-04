@@ -239,7 +239,6 @@
 			{
 				goRectTransform.anchoredPosition3D = centroidVector;
 			}
-			//go.transform.localScale = Constants.Math.Vector3One;
 
 			settable = go.GetComponent<IFeaturePropertySettable>();
 			if (settable != null)

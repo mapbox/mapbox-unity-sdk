@@ -228,7 +228,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					foreach (var visualizer in layer)
 					{
 						visualizer.UnregisterTile(tile);
-						//visualizer.LayerVisualizerHasChanged -= UpdateTileFactory;
 					}
 				}
 			}

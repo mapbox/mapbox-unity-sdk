@@ -32,13 +32,6 @@
 				{
 					Triangles += tris[i] + "," + tris[i + 1] + "," + tris[i + 2] + "\r\n";
 				}
-
-				//var tang = mesh.tangents;
-				//Tangents = "";
-				//for (int i = 0; i < tang.Length; i += 1)
-				//{
-				//	Tangents += tang[i].x + "," + tang[i].y + "," + tang[i].z + "," + tang[i].w + "\r\n";
-				//}
 			}
 		}
 		

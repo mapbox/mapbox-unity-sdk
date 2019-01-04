@@ -148,12 +148,6 @@
 				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, true);
 			};
 		}
-		// public void RedrawLayer(object sender, System.EventArgs e)
-		// {
-		// 	SetFactoryOptions();
-		// 	//notifying map to reload existing tiles
-		// 	NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, false);
-		// }
 
 		private void SetFactoryOptions()
 		{

@@ -15,7 +15,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		private float _scaledTopFloorHeight = 0;
 
-		//private int _maxEdgeSectionCount = 40;
 		private float _scaledPreferredWallLength;
 		[SerializeField] private bool _centerSegments = true;
 		[SerializeField] private bool _separateSubmesh = true;
@@ -31,7 +30,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		Vector3 wallSegmentDirection;
 		float wallSegmentLength;
 
-		//public AtlasInfo AtlasInfo;
 		private AtlasEntity _currentFacade;
 		private Rect _currentTextureRect;
 
@@ -138,7 +136,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				finalFirstHeight = Mathf.Min(height, _scaledFirstFloorHeight);
 				finalTopHeight = (height - finalFirstHeight) < _scaledTopFloorHeight ? 0 : _scaledTopFloorHeight;
 				finalMidHeight = Mathf.Max(0, height - (finalFirstHeight + finalTopHeight));
-				//scaledFloorHeight = midHeight / floorCount;
 				wallTriangles = new List<int>();
 
 				//cuts long edges into smaller ones using PreferredEdgeSectionLength
@@ -500,7 +497,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 								md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.min + maxHeight, md.Vertices[i].z);
 							}
 						}
-						//hf += max - min;
 						break;
 					case ExtrusionType.MaxHeight:
 						{
@@ -554,7 +550,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						if (feature.Properties.ContainsKey("min_height"))
 						{
 							minHeight = Convert.ToSingle(feature.Properties["min_height"]);
-							//hf -= minHeight;
 						}
 					}
 
@@ -576,7 +571,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						{
 							var featureMinHeight = Convert.ToSingle(feature.Properties["min_height"]);
 							minHeight = Math.Min(featureMinHeight, _options.maximumHeight);
-							//maxHeight -= minHeight;
 						}
 					}
 

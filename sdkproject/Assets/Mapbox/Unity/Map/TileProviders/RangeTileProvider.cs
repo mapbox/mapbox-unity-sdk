@@ -8,9 +8,6 @@ namespace Mapbox.Unity.Map.TileProviders
 		private RangeTileProviderOptions _rangeTileProviderOptions;
 		private bool _initialized = false;
 
-		//private List<UnwrappedTileId> _toRemove;
-		//private HashSet<UnwrappedTileId> _tilesToRequest;
-
 		public override void OnInitialized()
 		{
 			if (Options != null)
@@ -23,7 +20,6 @@ namespace Mapbox.Unity.Map.TileProviders
 			}
 
 			_initialized = true;
-			//_toRemove = new List<UnwrappedTileId>((_rangeTileProviderOptions.east + _rangeTileProviderOptions.west) * (_rangeTileProviderOptions.north + _rangeTileProviderOptions.south));
 			_currentExtent.activeTiles = new HashSet<UnwrappedTileId>();
 		}
 
@@ -35,7 +31,6 @@ namespace Mapbox.Unity.Map.TileProviders
 			}
 
 			_currentExtent.activeTiles.Clear();
-			//_toRemove.Clear();
 			var centerTile = TileCover.CoordinateToTileId(_map.CenterLatitudeLongitude, _map.AbsoluteZoom);
 			_currentExtent.activeTiles.Add(new UnwrappedTileId(_map.AbsoluteZoom, centerTile.X, centerTile.Y));
 

@@ -30,9 +30,6 @@ namespace Mapbox.Unity.Telemetry
 
 		public void SendTurnstile()
 		{
-			// This is only needed for maps at design-time.
-			//Runnable.EnableRunnableInEditor();
-
 			var ticks = DateTime.Now.Ticks;
 			if (ShouldPostTurnstile(ticks))
 			{
