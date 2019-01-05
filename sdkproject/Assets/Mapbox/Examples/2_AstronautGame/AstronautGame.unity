@@ -195,7 +195,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd961b1c9541a4cee99686069ecce852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _initializeOnStart: 0
   _options:
     locationOptions:
       latitudeLongitude: 37.784179, -122.401583
@@ -204,7 +203,7 @@ MonoBehaviour:
       extentType: 0
       defaultExtents:
         cameraBoundsOptions:
-          camera: {fileID: 0}
+          camera: {fileID: 234181019}
           visibleBuffer: 0
           disposeBuffer: 0
         rangeAroundCenterOptions:
@@ -224,13 +223,14 @@ MonoBehaviour:
       unityTileSize: 100
     loadingTexture: {fileID: 2800000, guid: e2896a92727704803a9c422b043eae89, type: 3}
     tileMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
+  _initializeOnStart: 0
   _imagery:
     _layerProperty:
       sourceType: 2
       sourceOptions:
         isActive: 1
         layerSource:
-          Name: Streets
+          Name: Dark
           Id: mapbox://styles/mapbox/dark-v9
           Modified: 
           UserName: 
@@ -323,6 +323,10 @@ MonoBehaviour:
           combineMeshes: 0
         lineGeometryOptions:
           Width: 1
+          MiterLimit: 0.2
+          RoundLimit: 1.05
+          JoinType: 1
+          CapType: 1
         filterOptions:
           _selectedLayerName: building
           filters: []
@@ -340,7 +344,7 @@ MonoBehaviour:
           colliderType: 0
         materialOptions:
           style: 0
-          texturingType: 0
+          texturingType: 2
           materials:
           - Materials:
             - {fileID: 2100000, guid: 0f9e3de68a3085e469bd62c8b40e9487, type: 2}
@@ -382,6 +386,10 @@ MonoBehaviour:
           combineMeshes: 0
         lineGeometryOptions:
           Width: 1
+          MiterLimit: 0.2
+          RoundLimit: 1.05
+          JoinType: 1
+          CapType: 1
         filterOptions:
           _selectedLayerName: landuse
           filters: []
@@ -399,7 +407,7 @@ MonoBehaviour:
           colliderType: 2
         materialOptions:
           style: 0
-          texturingType: 0
+          texturingType: 2
           materials:
           - Materials:
             - {fileID: 2100000, guid: dd22d0eb52da4594e90fbb4dd7ae0baf, type: 2}
@@ -443,6 +451,10 @@ MonoBehaviour:
           combineMeshes: 0
         lineGeometryOptions:
           Width: 1
+          MiterLimit: 0.2
+          RoundLimit: 1.05
+          JoinType: 1
+          CapType: 1
         filterOptions:
           _selectedLayerName: road
           filters:
@@ -505,7 +517,7 @@ MonoBehaviour:
           colliderType: 0
         materialOptions:
           style: 0
-          texturingType: 0
+          texturingType: 2
           materials:
           - Materials:
             - {fileID: 0}
@@ -539,71 +551,10 @@ MonoBehaviour:
         presetFeatureType: 1
         _maskValue: 0
         selectedTypes: 
-      - coreOptions:
-          sourceId: 
-          isActive: 0
-          sublayerName: b2
-          geometryType: 3
-          layerName: building
-          snapToTerrain: 1
-          combineMeshes: 0
-        lineGeometryOptions:
-          Width: 1
-        filterOptions:
-          _selectedLayerName: building
-          filters: []
-          combinerType: 0
-        extrusionOptions:
-          _selectedLayerName: building
-          extrusionType: 0
-          extrusionGeometryType: 0
-          propertyName: height
-          propertyDescription: Number. Height of building or part of building.
-          minimumHeight: 3
-          maximumHeight: 0.2
-          extrusionScaleFactor: 1
-        colliderOptions:
-          colliderType: 0
-        materialOptions:
-          style: 0
-          texturingType: 0
-          materials:
-          - Materials:
-            - {fileID: 0}
-          - Materials:
-            - {fileID: 0}
-          atlasInfo: {fileID: 0}
-          lightStyleOpacity: 1
-          darkStyleOpacity: 1
-          colorStyleColor: {r: 1, g: 1, b: 1, a: 1}
-          samplePalettes: 0
-          colorPalette: {fileID: 0}
-          customStyleOptions:
-            texturingType: 0
-            materials:
-            - Materials:
-              - {fileID: 0}
-            - Materials:
-              - {fileID: 0}
-            atlasInfo: {fileID: 0}
-            colorPalette: {fileID: 0}
-        performanceOptions:
-          isEnabled: 1
-          entityPerCoroutine: 20
-        honorBuildingIdSetting: 1
-        buildingsWithUniqueIds: 0
-        moveFeaturePositionTo: 0
-        MeshModifiers:
-        - {fileID: 11400000, guid: 4fe5c136889ae0347af431be7e59e489, type: 2}
-        - {fileID: 11400000, guid: b432bf85b0df280468dcfdaf5a9b90d0, type: 2}
-        - {fileID: 11400000, guid: 4dbdd9c4bb7ba4d41ac1b710cf40de49, type: 2}
-        GoModifiers:
-        - {fileID: 11400000, guid: cd82d41d9097fef4fb5dafaebde20bfa, type: 2}
-        presetFeatureType: 0
-        _maskValue: 0
-        selectedTypes: 
       locationPrefabList: []
   _tileProvider: {fileID: 0}
+  _previewOptions:
+    isPreviewEnabled: 0
 --- !u!114 &159634026
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -916,7 +867,7 @@ Prefab:
     - target: {fileID: 224857786874416376, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 0.000015258789
       objectReference: {fileID: 0}
     - target: {fileID: 114731470950229392, guid: 98be219873e6d4dffb5949746f515a33,
         type: 2}
