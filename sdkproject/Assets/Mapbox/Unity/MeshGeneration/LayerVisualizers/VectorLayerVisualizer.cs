@@ -751,20 +751,12 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				{
 					DestroyImmediate(mod);
 				}
-				else
-				{
-					Resources.UnloadAsset(mod);
-				}
 			}
 			foreach (var mod in _defaultStack.GoModifiers)
 			{
 				if (_coreModifiers.Contains(mod))
 				{
 					DestroyImmediate(mod);
-				}
-				else
-				{
-					Resources.UnloadAsset(mod);
 				}
 			}
 
