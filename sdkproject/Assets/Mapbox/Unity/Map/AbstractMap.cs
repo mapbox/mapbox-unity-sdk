@@ -560,7 +560,17 @@ namespace Mapbox.Unity.Map
 			var tileProvider = TileProvider ?? gameObject.GetComponent<AbstractTileProvider>();
 			if (_options.extentOptions.extentType != MapExtentType.Custom && tileProvider != null)
 			{
-				tileProvider.Destroy();
+				Debug.Log("Is Preview Enabled? : " + _previewOptions.isPreviewEnabled);
+				if(_previewOptions.isPreviewEnabled)
+				{
+					Debug.Log("Destroy");
+					tileProvider.Destroy();
+				}
+				else
+				{
+					Debug.Log("DelayDestroy");
+					tileProvider.DelayDestroy();
+				}
 				_tileProvider = null;
 			}
 		}

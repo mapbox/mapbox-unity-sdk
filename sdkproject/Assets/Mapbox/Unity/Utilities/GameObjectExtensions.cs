@@ -15,4 +15,15 @@ public static class GameObjectExtensions
 			GameObject.Destroy(obj);
 		}
 	}
+
+	public static void DelayDestroy(this Object obj, bool deleteAsset = false)
+	{
+		if (Application.isEditor && !Application.isPlaying)
+		{
+			if (obj != null)
+			{
+				UnityEditor.EditorApplication.delayCall += () => GameObject.DestroyImmediate(obj, deleteAsset);
+			}
+		}
+	}
 }
