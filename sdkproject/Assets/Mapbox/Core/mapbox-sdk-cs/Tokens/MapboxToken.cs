@@ -8,7 +8,7 @@ namespace Mapbox.Tokens
 
 
 	/// <summary>
-	/// Mapbox Token: https://www.mapbox.com/api-documentation/#retrieve-a-token
+	/// Mapbox Token: https://www.mapbox.com/api-documentation/accounts/#retrieve-a-token
 	/// </summary>
 	public class MapboxToken
 	{
@@ -82,7 +82,7 @@ namespace Mapbox.Tokens
 
 	/// <summary>
 	/// Every token has a metadata object that contains information about the capabilities of the token.
-	/// https://www.mapbox.com/api-documentation/#the-token-metadata-object
+	/// https://www.mapbox.com/api-documentation/accounts/#token-metadata-object
 	/// </summary>
 	public class TokenMetadata
 	{

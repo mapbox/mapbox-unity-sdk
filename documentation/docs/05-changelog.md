@@ -300,7 +300,7 @@
 - Ensure your `MapImageFactories` have the expected `Map Id`! We've updated the way Ids are serialized, and your old Ids may have been lost--sorry!
 
 ##### Memory/Performance
-- Added support for style-optimized vector tiles! [Read more here.](https://www.mapbox.com/api-documentation/#retrieve-tiles)
+- Added support for style-optimized vector tiles! [Read more here.](https://www.mapbox.com/api-documentation/maps/#request-style-optimized-tiles)
     - You will need to use the new `StyleOptimizedVectorTileFactory`.
     - This can result in far less data transfer/data processing.
 - Replaced Triangle.NET with `Earcut` which results if much faster geometry construction.

@@ -69,7 +69,7 @@ namespace Mapbox.MapMatching
 
 
 	/// <summary>
-	/// https://www.mapbox.com/api-documentation/#retrieve-directions
+	/// https://www.mapbox.com/api-documentation/navigation/#retrieve-directions
 	/// </summary>
 	public enum InstructionLanguages
 	{

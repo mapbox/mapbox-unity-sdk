@@ -42,7 +42,7 @@ namespace Mapbox.Tokens
 
 		// use internal FileSource without(!) passing access token from config into constructor
 		// otherwise access token would be appended to url twice
-		// https://www.mapbox.com/api-documentation/#retrieve-a-token
+		// https://www.mapbox.com/api-documentation/accounts/#retrieve-a-token
 		// if we should ever implement other API methods: creating, deleting, updating ... tokens
 		// we will need another FileSource with the token from the config
 		private FileSource _fs = new FileSource();
