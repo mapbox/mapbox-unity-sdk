@@ -560,7 +560,7 @@ namespace Mapbox.Unity.Map
 			var tileProvider = TileProvider ?? gameObject.GetComponent<AbstractTileProvider>();
 			if (_options.extentOptions.extentType != MapExtentType.Custom && tileProvider != null)
 			{
-				tileProvider.Destroy();
+				tileProvider.gameObject.Destroy();
 				_tileProvider = null;
 			}
 		}
@@ -773,13 +773,17 @@ namespace Mapbox.Unity.Map
 							{
 								if (!(TileProvider is QuadTreeTileProvider))
 								{
-									TileProvider.Destroy();
-									TileProvider = gameObject.AddComponent<QuadTreeTileProvider>();
+									TileProvider.gameObject.Destroy();
+									var go = new GameObject();
+									go.transform.parent = transform;
+									TileProvider = go.AddComponent<QuadTreeTileProvider>();
 								}
 							}
 							else
 							{
-								TileProvider = gameObject.AddComponent<QuadTreeTileProvider>();
+								var go = new GameObject();
+								go.transform.parent = transform;
+								TileProvider = go.AddComponent<QuadTreeTileProvider>();
 							}
 							break;
 						}
@@ -787,12 +791,16 @@ namespace Mapbox.Unity.Map
 						{
 							if (TileProvider != null)
 							{
-								TileProvider.Destroy();
-								TileProvider = gameObject.AddComponent<RangeTileProvider>();
+								TileProvider.gameObject.Destroy();
+								var go = new GameObject();
+								go.transform.parent = transform;
+								TileProvider = go.AddComponent<RangeTileProvider>();
 							}
 							else
 							{
-								TileProvider = gameObject.AddComponent<RangeTileProvider>();
+								var go = new GameObject();
+								go.transform.parent = transform;
+								TileProvider = go.AddComponent<RangeTileProvider>();
 							}
 							break;
 						}
@@ -802,13 +810,17 @@ namespace Mapbox.Unity.Map
 							{
 								if (!(TileProvider is RangeAroundTransformTileProvider))
 								{
-									TileProvider.Destroy();
-									TileProvider = gameObject.AddComponent<RangeAroundTransformTileProvider>();
+									TileProvider.gameObject.Destroy();
+									var go = new GameObject();
+									go.transform.parent = transform;
+									TileProvider = go.AddComponent<RangeAroundTransformTileProvider>();
 								}
 							}
 							else
 							{
-								TileProvider = gameObject.AddComponent<RangeAroundTransformTileProvider>();
+								var go = new GameObject();
+								go.transform.parent = transform;
+								TileProvider = go.AddComponent<RangeAroundTransformTileProvider>();
 							}
 							break;
 						}
@@ -929,7 +941,10 @@ namespace Mapbox.Unity.Map
 		{
 			SetTileProvider();
 			TileProvider.Initialize(this);
-			TileProvider.UpdateTileExtent();
+			if (IsEditorPreviewEnabled)
+			{
+				TileProvider.UpdateTileExtent();
+			}
 		}
 
 		#endregion
