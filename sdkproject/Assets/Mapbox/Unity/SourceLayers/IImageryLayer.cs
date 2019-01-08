@@ -9,7 +9,7 @@
 
 		/// <summary>
 		/// Sets the `Data Source` for the `IMAGE` component. This can be one of the
-		/// [Mapbox default styles](https://www.mapbox.com/api-documentation/#styles),
+		/// [Mapbox default styles](https://www.mapbox.com/api-documentation/maps/#styles),
 		/// or a custom style. The style url is set as the `Map ID`.
 		/// </summary>
 		/// <param name="imageSource">Source of imagery for map. Can be a Mapbox default, or custom style.</param>

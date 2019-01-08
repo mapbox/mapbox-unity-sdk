@@ -13,7 +13,7 @@ namespace Mapbox.MapMatching
 	using Mapbox.Utils.JsonConverters;
 
 	/// <summary>
-	///     Wrapper around the <see href="https://www.mapbox.com/api-documentation/#map-matching">
+	///     Wrapper around the <see href="https://www.mapbox.com/api-documentation/navigation/#map-matching">
 	///     Mapbox Map Matching API</see>.
 	/// </summary>
 	public class MapMatcher

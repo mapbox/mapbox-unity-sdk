@@ -13,7 +13,7 @@ namespace Mapbox.Geocoding
 	using Mapbox.Utils.JsonConverters;
 
 	/// <summary>
-	///     Wrapper around the <see href="https://www.mapbox.com/api-documentation/#geocoding">
+	///     Wrapper around the <see href="https://www.mapbox.com/api-documentation/search/#geocoding">
 	///     Mapbox Geocoding API</see>. The Geocoder does two things: geocoding and reverse geocoding.
 	/// </summary>
 	public sealed class Geocoder

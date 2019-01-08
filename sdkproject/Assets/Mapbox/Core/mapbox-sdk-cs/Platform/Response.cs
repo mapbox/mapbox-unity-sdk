@@ -66,15 +66,15 @@ namespace Mapbox.Platform
 		public string ContentType;
 
 
-		/// <summary>Length of rate-limiting interval in seconds. https://www.mapbox.com/api-documentation/#rate-limits </summary>
+		/// <summary>Length of rate-limiting interval in seconds. https://www.mapbox.com/api-documentation/#rate-limit-headers </summary>
 		public int? XRateLimitInterval;
 
 
-		/// <summary>Maximum number of requests you may make in the current interval before reaching the limit. https://www.mapbox.com/api-documentation/#rate-limits </summary>
+		/// <summary>Maximum number of requests you may make in the current interval before reaching the limit. https://www.mapbox.com/api-documentation/#rate-limit-headers </summary>
 		public long? XRateLimitLimit;
 
 
-		/// <summary>Timestamp of when the current interval will end and the ratelimit counter is reset. https://www.mapbox.com/api-documentation/#rate-limits </summary>
+		/// <summary>Timestamp of when the current interval will end and the ratelimit counter is reset. https://www.mapbox.com/api-documentation/#rate-limit-headers </summary>
 		public DateTime? XRateLimitReset;
 
 
@@ -133,7 +133,7 @@ namespace Mapbox.Platform
 			if (null == apiResponse) {
 				response.AddException(new Exception("No Reponse."));
 			} else {
-				// https://www.mapbox.com/api-documentation/#rate-limits
+				// https://www.mapbox.com/api-documentation/#rate-limit-headers
 				if (null != apiResponse.Headers) {
 					response.Headers = new Dictionary<string, string>();
 					for (int i = 0; i < apiResponse.Headers.Count; i++) {
@@ -200,7 +200,7 @@ namespace Mapbox.Platform
 			if (null == apiResponse) {
 				response.AddException(new Exception("No Reponse."));
 			} else {
-				// https://www.mapbox.com/api-documentation/#rate-limits
+				// https://www.mapbox.com/api-documentation/#rate-limit-headers
 				if (null != apiResponse.Headers) {
 					response.Headers = new Dictionary<string, string>();
 					foreach (var hdr in apiResponse.Headers) {
