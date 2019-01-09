@@ -8,6 +8,7 @@
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Unity.Map;
 	using System.Collections;
+	using UnityEngine.Networking;
 
 	public class StyleSearchWindow : EditorWindow
 	{
@@ -149,6 +150,23 @@
 
 		IEnumerator ListStyles(string token)
 		{
+#if UNITY_2017_1_OR_NEWER
+			UnityWebRequest webRequest = new UnityWebRequest(Utils.Constants.BaseAPI + string.Format("styles/v1/{0}?access_token={1}", _username, token))
+			{
+				downloadHandler = new DownloadHandlerBuffer()
+			};
+			yield return webRequest.SendWebRequest();
+
+			while (!webRequest.isDone)
+			{
+				yield return 0;
+			}
+			var json = webRequest.downloadHandler.text;
+			if (!string.IsNullOrEmpty(json))
+			{
+				ParseResponse(json);
+			}
+#else
 			// "https://api.mapbox.com/styles/v1/{username}?access_token=your-access-token"
 			var www = new WWW(Utils.Constants.BaseAPI + string.Format("styles/v1/{0}?access_token={1}", _username, token));
 			while (!www.isDone)
@@ -160,6 +178,7 @@
 			{
 				ParseResponse(json);
 			}
+#endif
 		}
 
 		void ParseResponse(string json)

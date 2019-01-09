@@ -7,6 +7,7 @@
 	using Mapbox.Unity.Utilities;
 	using UnityEngine;
 	using System.Text;
+	using UnityEngine.Networking;
 
 	public class TelemetryWebgl : ITelemetryLibrary
 	{
@@ -73,11 +74,21 @@
 		IEnumerator PostWWW(string url, string bodyJsonString)
 		{
 			byte[] bodyRaw = Encoding.UTF8.GetBytes(bodyJsonString);
+#if UNITY_2017_1_OR_NEWER
+			UnityWebRequest postRequest = new UnityWebRequest(url, "POST");
+			postRequest.SetRequestHeader("Content-Type", "application/json");
+
+			postRequest.downloadHandler = new DownloadHandlerBuffer();
+			postRequest.uploadHandler = new UploadHandlerRaw(bodyRaw);
+
+			yield return postRequest.SendWebRequest();
+#else
 			var headers = new Dictionary<string, string>();
 			headers.Add("Content-Type", "application/json");
-
+			headers.Add("user-agent", GetUserAgent());
 			var www = new WWW(url, bodyRaw, headers);
 			yield return www;
+#endif
 		}
 
 		static string GetUserAgent()
