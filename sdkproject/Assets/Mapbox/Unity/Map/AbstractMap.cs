@@ -318,6 +318,10 @@ namespace Mapbox.Unity.Map
 
 		protected virtual void Update()
 		{
+			if (Application.isEditor && !Application.isPlaying && IsEditorPreviewEnabled == false)
+			{
+				return;
+			}
 			if (TileProvider != null)
 			{
 				TileProvider.UpdateTileProvider();
@@ -537,9 +541,9 @@ namespace Mapbox.Unity.Map
 
 		public void EnableEditorPreview()
 		{
-			_cachedPosition = transform.position;
-			_cachedRotation = transform.rotation;
-			_cachedScale = transform.localScale;
+			//_cachedPosition = transform.position;
+			//_cachedRotation = transform.rotation;
+			//_cachedScale = transform.localScale;
 
 			SetUpMap();
 			if (OnEditorPreviewEnabled != null)
@@ -567,9 +571,9 @@ namespace Mapbox.Unity.Map
 				OnEditorPreviewDisabled();
 			}
 
-			transform.position = _cachedPosition;
-			transform.rotation = _cachedRotation;
-			transform.localScale = _cachedScale;
+			//transform.position = _cachedPosition;
+			//transform.rotation = _cachedRotation;
+			//transform.localScale = _cachedScale;
 		}
 
 		public void DestroyTileProvider()
@@ -721,6 +725,11 @@ namespace Mapbox.Unity.Map
 
 			_options.extentOptions.defaultExtents.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
 			{
+				if (Application.isEditor && !Application.isPlaying && IsEditorPreviewEnabled == false)
+				{
+					Debug.Log("defaultExtents");
+					return;
+				}
 				if (TileProvider != null)
 				{
 					TileProvider.UpdateTileExtent();
@@ -893,8 +902,6 @@ namespace Mapbox.Unity.Map
 			TriggerTileRedrawForExtent(currentExtent);
 		}
 
-
-
 		private void OnImageOrTerrainUpdateLayer(object sender, System.EventArgs eventArgs)
 		{
 			LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
@@ -956,6 +963,12 @@ namespace Mapbox.Unity.Map
 
 		private void OnTileProviderChanged()
 		{
+			if (Application.isEditor && !Application.isPlaying && IsEditorPreviewEnabled == false)
+			{
+				Debug.Log("extentOptions");
+				return;
+			}
+
 			SetTileProvider();
 			TileProvider.Initialize(this);
 			if (IsEditorPreviewEnabled)
