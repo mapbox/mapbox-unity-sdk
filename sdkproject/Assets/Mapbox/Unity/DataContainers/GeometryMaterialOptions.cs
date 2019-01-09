@@ -172,7 +172,8 @@
 			materials[1] = new MaterialList();
 		}
 
-
+		//Maps with multiple vector layers with the same texture style (Color, Light, Dark) will need thier own layer-specific version of the materials for the style.
+		//This ensures that said layers that use the same texture style with different parameters (such as color and opacity) render correctly.
 		private void InstantiateLayerMaterials()
 		{
 			materials[0].Materials[0] = new Material(materials[0].Materials[0]);
@@ -182,8 +183,10 @@
 		/// <summary>
 		/// Sets up default values for GeometryMaterial Options.
 		/// If style is set to Custom, user defined values will be used.
+		/// This method is called on both Add Feature in editor and when features are created in VectorLayerVisualizer.
+		/// Optional param instantiateMaterials is used to conditionally create material instances if called from VectorLayerVisualizer.
 		/// </summary>
-		public void SetDefaultMaterialOptions()
+		public void SetDefaultMaterialOptions(bool instantiateMaterials = false)
 		{
 			string styleName = style.ToString();
 
@@ -210,7 +213,10 @@
 			switch (style)
 			{
 				case StyleTypes.Light:
-					InstantiateLayerMaterials();
+					if(instantiateMaterials)
+					{
+						InstantiateLayerMaterials();
+					}
 					Color lightColor = materials[0].Materials[0].color;
 					lightColor.a = lightStyleOpacity;
 					materials[0].Materials[0].color = lightColor;
@@ -220,7 +226,10 @@
 					materials[1].Materials[0].color = lightColor;
 					break;
 				case StyleTypes.Dark:
-					InstantiateLayerMaterials();
+					if (instantiateMaterials)
+					{
+						InstantiateLayerMaterials();
+					}
 					Color darkColor = materials[0].Materials[0].color;
 					darkColor.a = darkStyleOpacity;
 					materials[0].Materials[0].color = darkColor;
@@ -230,7 +239,10 @@
 					materials[1].Materials[0].color = darkColor;
 					break;
 				case StyleTypes.Color:
-					InstantiateLayerMaterials();
+					if (instantiateMaterials)
+					{
+						InstantiateLayerMaterials();
+					}
 					Color color = colorStyleColor;
 					materials[0].Materials[0].color = color;
 					materials[1].Materials[0].color = color;
