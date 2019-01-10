@@ -239,7 +239,6 @@
 			{
 				texturingType = (style != StyleTypes.Custom && style == StyleTypes.Simple) ? UvMapType.AtlasWithColorPalette : UvMapType.Atlas;
 			}
-
 		}
 
 		private void AssignAssets(StyleAssetPathBundle styleAssetPathBundle)
