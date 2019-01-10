@@ -215,7 +215,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 
 			// Setup material options.
-			_layerProperties.materialOptions.SetDefaultMaterialOptions(true);
+			_layerProperties.materialOptions.SetDefaultMaterialOptions();
 
 			switch (_layerProperties.coreOptions.geometryType)
 			{
