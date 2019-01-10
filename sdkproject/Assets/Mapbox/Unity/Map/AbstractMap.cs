@@ -44,6 +44,10 @@ namespace Mapbox.Unity.Map
 		protected Vector2d _centerMercator;
 		protected float _worldRelativeScale;
 		protected Vector3 _mapScaleFactor;
+
+		protected Vector3 _cachedPosition;
+		protected Quaternion _cachedRotation;
+		protected Vector3 _cachedScale = Vector3.one;
 		#endregion
 
 		#region Properties
@@ -314,6 +318,10 @@ namespace Mapbox.Unity.Map
 
 		protected virtual void Update()
 		{
+			if (Application.isEditor && !Application.isPlaying && IsEditorPreviewEnabled == false)
+			{
+				return;
+			}
 			if (TileProvider != null)
 			{
 				TileProvider.UpdateTileProvider();
@@ -345,6 +353,11 @@ namespace Mapbox.Unity.Map
 		/// <param name="zoom">Zoom level.</param>
 		public virtual void UpdateMap(Vector2d latLon, float zoom)
 		{
+			if (Application.isEditor && !Application.isPlaying && !IsEditorPreviewEnabled)
+			{
+				return;
+			}
+
 			//so map will be snapped to zero using next new tile loaded
 			_worldHeightFixed = false;
 			float differenceInZoom = 0.0f;
@@ -528,6 +541,10 @@ namespace Mapbox.Unity.Map
 
 		public void EnableEditorPreview()
 		{
+			_cachedPosition = transform.position;
+			_cachedRotation = transform.rotation;
+			_cachedScale = transform.localScale;
+
 			SetUpMap();
 			if (OnEditorPreviewEnabled != null)
 			{
@@ -553,6 +570,10 @@ namespace Mapbox.Unity.Map
 			{
 				OnEditorPreviewDisabled();
 			}
+
+			transform.position = _cachedPosition;
+			transform.rotation = _cachedRotation;
+			transform.localScale = _cachedScale;
 		}
 
 		public void DestroyTileProvider()
@@ -654,14 +675,14 @@ namespace Mapbox.Unity.Map
 			if (_options.placementOptions.snapMapToZero)
 			{
 				var h = referenceTile.QueryHeightData(.5f, .5f);
-				Root.transform.position = new Vector3(
+				Root.transform.localPosition = new Vector3(
 					Root.transform.position.x,
 					-h,
 					Root.transform.position.z);
 			}
 			else
 			{
-				Root.transform.position = new Vector3(
+				Root.transform.localPosition = new Vector3(
 					Root.transform.position.x,
 					0,
 					Root.transform.position.z);
@@ -704,6 +725,11 @@ namespace Mapbox.Unity.Map
 
 			_options.extentOptions.defaultExtents.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
 			{
+				if (Application.isEditor && !Application.isPlaying && IsEditorPreviewEnabled == false)
+				{
+					Debug.Log("defaultExtents");
+					return;
+				}
 				if (TileProvider != null)
 				{
 					TileProvider.UpdateTileExtent();
@@ -876,8 +902,6 @@ namespace Mapbox.Unity.Map
 			TriggerTileRedrawForExtent(currentExtent);
 		}
 
-
-
 		private void OnImageOrTerrainUpdateLayer(object sender, System.EventArgs eventArgs)
 		{
 			LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
@@ -939,6 +963,12 @@ namespace Mapbox.Unity.Map
 
 		private void OnTileProviderChanged()
 		{
+			if (Application.isEditor && !Application.isPlaying && IsEditorPreviewEnabled == false)
+			{
+				Debug.Log("extentOptions");
+				return;
+			}
+
 			SetTileProvider();
 			TileProvider.Initialize(this);
 			if (IsEditorPreviewEnabled)
