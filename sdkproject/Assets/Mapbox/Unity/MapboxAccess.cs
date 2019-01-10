@@ -301,7 +301,7 @@ namespace Mapbox.Unity
 
 		TileJSON _tileJson;
 		/// <summary>
-		/// Lazy TileJSON wrapper: https://www.mapbox.com/api-documentation/#retrieve-tilejson-metadata
+		/// Lazy TileJSON wrapper: https://www.mapbox.com/api-documentation/maps/#retrieve-tilejson-metadata
 		/// </summary>
 		public TileJSON TileJSON
 		{
