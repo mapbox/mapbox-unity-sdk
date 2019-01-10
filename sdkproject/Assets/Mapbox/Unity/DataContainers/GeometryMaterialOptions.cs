@@ -175,8 +175,6 @@
 		/// <summary>
 		/// Sets up default values for GeometryMaterial Options.
 		/// If style is set to Custom, user defined values will be used.
-		/// This method is called on both Add Feature in editor and when features are created in VectorLayerVisualizer.
-		/// Optional param instantiateMaterials is used to conditionally create material instances if called from VectorLayerVisualizer.
 		/// </summary>
 		public void SetDefaultMaterialOptions()
 		{
