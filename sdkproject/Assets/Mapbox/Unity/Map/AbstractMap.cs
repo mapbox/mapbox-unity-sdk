@@ -682,7 +682,7 @@ namespace Mapbox.Unity.Map
 			}
 			else
 			{
-				Root.transform.position = new Vector3(
+				Root.transform.localPosition = new Vector3(
 					Root.transform.position.x,
 					0,
 					Root.transform.position.z);
