@@ -47,7 +47,7 @@ namespace Mapbox.Unity.Map
 
 		protected Vector3 _cachedPosition;
 		protected Quaternion _cachedRotation;
-		protected Vector3 _cachedScale;
+		protected Vector3 _cachedScale = Vector3.one;
 		#endregion
 
 		#region Properties
@@ -541,9 +541,9 @@ namespace Mapbox.Unity.Map
 
 		public void EnableEditorPreview()
 		{
-			//_cachedPosition = transform.position;
-			//_cachedRotation = transform.rotation;
-			//_cachedScale = transform.localScale;
+			_cachedPosition = transform.position;
+			_cachedRotation = transform.rotation;
+			_cachedScale = transform.localScale;
 
 			SetUpMap();
 			if (OnEditorPreviewEnabled != null)
@@ -571,9 +571,9 @@ namespace Mapbox.Unity.Map
 				OnEditorPreviewDisabled();
 			}
 
-			//transform.position = _cachedPosition;
-			//transform.rotation = _cachedRotation;
-			//transform.localScale = _cachedScale;
+			transform.position = _cachedPosition;
+			transform.rotation = _cachedRotation;
+			transform.localScale = _cachedScale;
 		}
 
 		public void DestroyTileProvider()
