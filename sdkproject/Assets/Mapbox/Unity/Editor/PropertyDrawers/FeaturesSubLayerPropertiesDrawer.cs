@@ -433,6 +433,7 @@
 			var palette = subLayerGeometryMaterialOptions.FindPropertyRelative("colorPalette");
 			var lightStyleOpacity = subLayerGeometryMaterialOptions.FindPropertyRelative("lightStyleOpacity");
 			var darkStyleOpacity = subLayerGeometryMaterialOptions.FindPropertyRelative("darkStyleOpacity");
+			var colorStyleColor = subLayerGeometryMaterialOptions.FindPropertyRelative("colorStyleColor");
 			var customStyleOptions = subLayerGeometryMaterialOptions.FindPropertyRelative("customStyleOptions");
 
 			topMat.objectReferenceValue = materialOptions.materials[0].Materials[0];
@@ -441,8 +442,7 @@
 			palette.objectReferenceValue = materialOptions.colorPalette;
 			lightStyleOpacity.floatValue = materialOptions.lightStyleOpacity;
 			darkStyleOpacity.floatValue = materialOptions.darkStyleOpacity;
-
-
+			colorStyleColor.colorValue = materialOptions.colorStyleColor;
 			//set custom style options.
 			var customMats = customStyleOptions.FindPropertyRelative("materials");
 			customMats.arraySize = 2;
