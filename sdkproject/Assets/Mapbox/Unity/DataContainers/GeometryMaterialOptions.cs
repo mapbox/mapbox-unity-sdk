@@ -262,6 +262,7 @@
 
 			atlasInfo = atlas;
 			colorPalette = palette;
+			Debug.Log("AssignAssets");
 		}
 
 		public void SetDefaultAssets(UvMapType mapType = UvMapType.Atlas)
