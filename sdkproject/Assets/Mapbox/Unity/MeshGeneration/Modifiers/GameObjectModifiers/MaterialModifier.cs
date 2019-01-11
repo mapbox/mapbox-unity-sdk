@@ -73,7 +73,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				}
 				for (int i = 0; i < min; i++)
 				{
+					Debug.Log(_options.materials[i].Materials.Length);
+					Debug.Log(_options.materials[i].Materials[0] == null);
 					mats[i] = _options.materials[i].Materials[UnityEngine.Random.Range(0, _options.materials[i].Materials.Length)];
+					Debug.Log(mats[i] == null);
 					mats[i].SetFloat("_Mode", renderMode);
 				}
 			}
