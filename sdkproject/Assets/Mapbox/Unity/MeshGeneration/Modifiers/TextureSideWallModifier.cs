@@ -130,7 +130,15 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			maxHeight = maxHeight * _options.extrusionScaleFactor * _scale;
 			minHeight = minHeight * _options.extrusionScaleFactor * _scale;
 			height = (maxHeight - minHeight);
+
+			//we cann GenerateRoofMesh even if extrusion type is sidewall-only
+			//it pushes the vertices to building height, then we clear top polygon triangles
+			//to remove roof.
 			GenerateRoofMesh(md, minHeight, maxHeight);
+			if (_options.extrusionGeometryType == ExtrusionGeometryType.SideOnly)
+			{
+				md.Triangles[0].Clear();
+			}
 
 			if (_options.extrusionGeometryType != ExtrusionGeometryType.RoofOnly)
 			{
@@ -477,61 +485,58 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		private void GenerateRoofMesh(MeshData md, float minHeight, float maxHeight)
 		{
-			if (_options.extrusionGeometryType != ExtrusionGeometryType.SideOnly)
+			_counter = md.Vertices.Count;
+			switch (_options.extrusionType)
 			{
-				_counter = md.Vertices.Count;
-				switch (_options.extrusionType)
+				case ExtrusionType.None:
+					break;
+				case ExtrusionType.PropertyHeight:
+					for (int i = 0; i < _counter; i++)
+					{
+						md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + maxHeight,
+							md.Vertices[i].z);
+					}
+
+					break;
+				case ExtrusionType.MinHeight:
 				{
-					case ExtrusionType.None:
-						break;
-					case ExtrusionType.PropertyHeight:
-						for (int i = 0; i < _counter; i++)
-						{
-							md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + maxHeight,
-								md.Vertices[i].z);
-						}
-
-						break;
-					case ExtrusionType.MinHeight:
-						{
-							var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
-							for (int i = 0; i < _counter; i++)
-							{
-								md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.min + maxHeight, md.Vertices[i].z);
-							}
-						}
-						//hf += max - min;
-						break;
-					case ExtrusionType.MaxHeight:
-						{
-							var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
-							for (int i = 0; i < _counter; i++)
-							{
-								md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.max + maxHeight, md.Vertices[i].z);
-							}
-
-							height += minmax.max - minmax.min;
-						}
-						break;
-					case ExtrusionType.RangeHeight:
-						for (int i = 0; i < _counter; i++)
-						{
-							md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + maxHeight,
-								md.Vertices[i].z);
-						}
-
-						break;
-					case ExtrusionType.AbsoluteHeight:
-						for (int i = 0; i < _counter; i++)
-						{
-							md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + maxHeight,
-								md.Vertices[i].z);
-						}
-
-						break;
-					default:
-						break;
+					var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
+					for (int i = 0; i < _counter; i++)
+					{
+						md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.min + maxHeight, md.Vertices[i].z);
+					}
 				}
+					//hf += max - min;
+					break;
+				case ExtrusionType.MaxHeight:
+				{
+					var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
+					for (int i = 0; i < _counter; i++)
+					{
+						md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.max + maxHeight, md.Vertices[i].z);
+					}
+
+					height += minmax.max - minmax.min;
+				}
+					break;
+				case ExtrusionType.RangeHeight:
+					for (int i = 0; i < _counter; i++)
+					{
+						md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + maxHeight,
+							md.Vertices[i].z);
+					}
+
+					break;
+				case ExtrusionType.AbsoluteHeight:
+					for (int i = 0; i < _counter; i++)
+					{
+						md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + maxHeight,
+							md.Vertices[i].z);
+					}
+
+					break;
+				default:
+					break;
 			}
 		}
 
