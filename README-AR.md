@@ -123,7 +123,7 @@ You can think of a synchronization node as a comparison of ARKit and location da
 
 This class is mostly a monobehaviour wrapper around the context itself, which allows you to specify settings in the inspector. However, it also has knowledge of when ARAnchors are added, so as to offset the `Alignment` height based on a detected anchor height.
 
-This class is also responisble for listening to location updates from the `LocationProvider` and adding synchronization nodes (gps + ar positions) to the context. **Important: GPS positions must be converted to Unity coordinate space before adding to the context!**
+This class is also responsible for listening to location updates from the `LocationProvider` and adding synchronization nodes (gps + ar positions) to the context. **Important: GPS positions must be converted to Unity coordinate space before adding to the context!**
 
 Lastly, this object needs an `AbstractAlignmentStrategy` which is used to determine how an `Alignment` should be processed. For example, you can snap, lerp, or filter and then lerp a transform (such as the `WorldRoot`). I've had the best success and most stable results using the `AverageHeadingAlignmentStrategy`.
 
@@ -153,7 +153,7 @@ When we get a new alignment (that should not be dismissed), this value represent
 
 ### DeviceLocationProvider
 
-You will need to experiment with various `DesiredAccuracyInMeters` and `UpdateDistanceInMeters` settings. I recommend keeping your update distance on the higher side to prevent unnecssary alignment computation. The tradeoff, of course, is that you may begin to drift. Which value you use depdends entirely on your application.
+You will need to experiment with various `DesiredAccuracyInMeters` and `UpdateDistanceInMeters` settings. I recommend keeping your update distance on the higher side to prevent unnecessary alignment computation. The tradeoff, of course, is that you may begin to drift. Which value you use depends entirely on your application.
 
 ## Limitations
 
