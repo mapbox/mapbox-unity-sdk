@@ -34,6 +34,7 @@
 		[SerializeField]
 		MultiColumnHeaderState m_MultiColumnHeaderState;
 
+		public bool isLayerAdded = false;
 		bool m_Initialized = false;
 		string objectId = "";
 		private string TilesetId
@@ -269,7 +270,7 @@
 
 					if (EditorHelper.DidModifyProperty(property))
 					{
-						((VectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property)).OnSubLayerPropertyAdded(new VectorLayerUpdateArgs { property = EditorHelper.GetTargetObjectOfProperty(subLayer) as MapboxDataProperty });
+						isLayerAdded = true;
 					}
 				}
 
