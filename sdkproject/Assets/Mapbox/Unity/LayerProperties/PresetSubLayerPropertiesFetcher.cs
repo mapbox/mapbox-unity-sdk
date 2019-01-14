@@ -118,7 +118,7 @@
 			_properties.materialOptions = new GeometryMaterialOptions
 			{
 				style = style,
-				colorStyleColor = UnityEngine.Color.green
+				colorStyleColor = Constants.GUI.Colors.EDITOR_FEATURE_DEFAULT_COLOR
 			};
 			_properties.materialOptions.SetDefaultMaterialOptions();
 			_properties.buildingsWithUniqueIds = buildingsWithUniqueIds;

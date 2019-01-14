@@ -260,8 +260,12 @@
 
 			Resources.UnloadUnusedAssets();
 
+			Debug.Log(materials[0].Materials[0] == null);
+			Debug.Log(materials[1].Materials[0] == null);
+
 			atlasInfo = atlas;
 			colorPalette = palette;
+
 		}
 
 		public void SetDefaultAssets(UvMapType mapType = UvMapType.Atlas)
