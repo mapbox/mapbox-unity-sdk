@@ -59,7 +59,7 @@
 					layerName = "road";
 					geometryType = VectorPrimitiveType.Line;
 					lineWidth = 1.0f;
-					style = StyleTypes.Custom;
+					style = StyleTypes.Dark;
 					extrusionType = ExtrusionType.AbsoluteHeight;
 					extrusionGeometryType = ExtrusionGeometryType.RoofAndSide;
 					break;
