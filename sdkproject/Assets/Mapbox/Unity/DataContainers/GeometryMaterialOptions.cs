@@ -247,21 +247,30 @@
 			AtlasInfo atlas = Resources.Load(styleAssetPathBundle.atlasPath, typeof(AtlasInfo)) as AtlasInfo;
 			ScriptablePalette palette = Resources.Load(styleAssetPathBundle.palettePath, typeof(ScriptablePalette)) as ScriptablePalette;
 
+			Material[] tempMaterials = new Material[2];
+
+
 			for (int i = 0; i < materials.Length; i++)
 			{
-				if(materials[i].Materials[0] != null)
+				if (materials[i].Materials[0] != null)
 				{
-					materials[i].Materials[0].Destroy();
+					tempMaterials[i] = materials[i].Materials[0];
+					materials[i].Materials[0] = null;
 				}
 			}
 
 			materials[0].Materials[0] = new Material(topMaterial);
 			materials[1].Materials[0] = new Material(sideMaterial);
 
-			Resources.UnloadUnusedAssets();
+			for (int i = 0; i < materials.Length; i++)
+			{
+				if (tempMaterials[i] != null)
+				{
+					tempMaterials[i].Destroy();
+				}
+			}
 
-			Debug.Log(materials[0].Materials[0] == null);
-			Debug.Log(materials[1].Materials[0] == null);
+			Resources.UnloadUnusedAssets();
 
 			atlasInfo = atlas;
 			colorPalette = palette;
