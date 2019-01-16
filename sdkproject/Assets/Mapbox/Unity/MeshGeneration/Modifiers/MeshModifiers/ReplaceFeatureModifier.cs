@@ -308,11 +308,11 @@
 		{
 			foreach (var gameObject in _objects.Values)
 			{
-				Destroy(gameObject);
+				gameObject.Destroy();
 			}
 			_objects.Clear();
 			_objectPosition.Clear();
-			Destroy(_poolGameObject);
+			_poolGameObject.Destroy();
 		}
 	}
 }
