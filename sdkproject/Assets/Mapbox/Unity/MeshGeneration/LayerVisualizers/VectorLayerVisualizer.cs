@@ -712,6 +712,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		public override void Clear()
 		{
 			_idPool.Clear();
+			_defaultStack.Clear();
 
 			foreach (var mod in _defaultStack.MeshModifiers)
 			{
@@ -725,15 +726,21 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					DestroyImmediate(mod);
 				}
 			}
+
 			foreach (var mod in _defaultStack.GoModifiers)
 			{
+				if (mod == null)
+				{
+					continue;
+				}
+
+				mod.Clear();
 				if (_coreModifiers.Contains(mod))
 				{
 					DestroyImmediate(mod);
 				}
 			}
 
-			_defaultStack.Clear();
 			DestroyImmediate(_defaultStack);
 		}
 	}
