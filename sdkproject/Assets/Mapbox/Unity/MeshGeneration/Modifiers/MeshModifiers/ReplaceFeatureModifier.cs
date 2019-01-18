@@ -85,6 +85,11 @@
 				_objects = new Dictionary<ulong, GameObject>();
 				_objectPosition = new Dictionary<ulong, Vector2d>();
 				_poolGameObject = new GameObject("_inactive_prefabs_pool");
+				AbstractMap abstractMap = FindObjectOfType<AbstractMap>();
+				if(abstractMap != null)
+				{
+					_poolGameObject.transform.SetParent(abstractMap.transform, true);
+				}
 			}
 			_latLonToSpawn = new List<Vector2d>();
 			foreach (var loc in _prefabLocations)
