@@ -36,6 +36,7 @@
 					UnityEngine.Object.DestroyImmediate(unityTiles[i].gameObject);
 				}
 
+				abstractMap.DestroyChildObjects();
 				if (EditorApplication.isPlaying)
 				{
 					abstractMap.ResetMap();
