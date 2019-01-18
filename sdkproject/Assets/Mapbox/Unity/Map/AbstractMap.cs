@@ -499,7 +499,7 @@ namespace Mapbox.Unity.Map
 			// Destroy any ghost game objects.
 			foreach (Transform tr in transform)
 			{
-				Destroy(tr.gameObject);
+				tr.gameObject.Destroy();
 			}
 
 			// Setup a visualizer to get a "Starter" map.
