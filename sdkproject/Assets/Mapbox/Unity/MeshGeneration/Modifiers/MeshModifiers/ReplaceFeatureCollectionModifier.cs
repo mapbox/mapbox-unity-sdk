@@ -46,18 +46,6 @@
 		{
 			base.Initialize();
 
-			if (_replaceFeatureModifiers != null && _replaceFeatureModifiers.Count > 0)
-			{
-				foreach (var replaceFeatureModifier in _replaceFeatureModifiers)
-				{
-					if (replaceFeatureModifier != null)
-					{
-						replaceFeatureModifier.Clear();
-					}
-				}
-			}
-
-
 			_replaceFeatureModifiers = new List<ReplaceFeatureModifier>();
 			foreach (FeatureBundle feature in features)
 			{
