@@ -8,8 +8,6 @@ namespace Mapbox.Unity.Utilities.DebugTools
 	public static class PathHelpers
 	{
 		static readonly string kScenesPath = Path.Combine(Application.dataPath, "Mapbox/Examples");
-		static readonly string arScenesPath = Path.Combine(Application.dataPath, "MapboxAR/Examples");
-
 
 		public static List<string> AllScenes
 		{
