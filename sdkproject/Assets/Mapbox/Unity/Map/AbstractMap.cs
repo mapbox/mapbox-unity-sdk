@@ -790,6 +790,7 @@ namespace Mapbox.Unity.Map
 			if (_options.extentOptions.extentType != MapExtentType.Custom)
 			{
 				ITileProviderOptions tileProviderOptions = _options.extentOptions.GetTileProviderOptions();
+				string tileProviderName = "TileProvider";
 				// Setup tileprovider based on type.
 				switch (_options.extentOptions.extentType)
 				{
@@ -800,14 +801,14 @@ namespace Mapbox.Unity.Map
 								if (!(TileProvider is QuadTreeTileProvider))
 								{
 									TileProvider.gameObject.Destroy();
-									var go = new GameObject();
+									var go = new GameObject(tileProviderName);
 									go.transform.parent = transform;
 									TileProvider = go.AddComponent<QuadTreeTileProvider>();
 								}
 							}
 							else
 							{
-								var go = new GameObject();
+								var go = new GameObject(tileProviderName);
 								go.transform.parent = transform;
 								TileProvider = go.AddComponent<QuadTreeTileProvider>();
 							}
@@ -818,13 +819,13 @@ namespace Mapbox.Unity.Map
 							if (TileProvider != null)
 							{
 								TileProvider.gameObject.Destroy();
-								var go = new GameObject();
+								var go = new GameObject(tileProviderName);
 								go.transform.parent = transform;
 								TileProvider = go.AddComponent<RangeTileProvider>();
 							}
 							else
 							{
-								var go = new GameObject();
+								var go = new GameObject(tileProviderName);
 								go.transform.parent = transform;
 								TileProvider = go.AddComponent<RangeTileProvider>();
 							}
@@ -837,14 +838,14 @@ namespace Mapbox.Unity.Map
 								if (!(TileProvider is RangeAroundTransformTileProvider))
 								{
 									TileProvider.gameObject.Destroy();
-									var go = new GameObject();
+									var go = new GameObject(tileProviderName);
 									go.transform.parent = transform;
 									TileProvider = go.AddComponent<RangeAroundTransformTileProvider>();
 								}
 							}
 							else
 							{
-								var go = new GameObject();
+								var go = new GameObject(tileProviderName);
 								go.transform.parent = transform;
 								TileProvider = go.AddComponent<RangeAroundTransformTileProvider>();
 							}
