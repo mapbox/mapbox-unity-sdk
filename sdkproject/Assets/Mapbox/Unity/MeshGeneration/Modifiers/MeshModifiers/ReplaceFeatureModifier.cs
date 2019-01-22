@@ -45,6 +45,8 @@
 		private List<List<string>> _featureId;
 		private string _tempFeatureId;
 
+		private static AbstractMap _abstractMap;
+
 		public SpawnPrefabOptions SpawnPrefabOptions
 		{
 			set
@@ -85,10 +87,13 @@
 				_objects = new Dictionary<ulong, GameObject>();
 				_objectPosition = new Dictionary<ulong, Vector2d>();
 				_poolGameObject = new GameObject("_inactive_prefabs_pool");
-				AbstractMap abstractMap = FindObjectOfType<AbstractMap>();
-				if(abstractMap != null)
+				if(_abstractMap == null)
 				{
-					_poolGameObject.transform.SetParent(abstractMap.transform, true);
+					_abstractMap = FindObjectOfType<AbstractMap>();
+				}
+				if(_abstractMap != null)
+				{
+					_poolGameObject.transform.SetParent(_abstractMap.transform, true);
 				}
 			}
 			_latLonToSpawn = new List<Vector2d>();
