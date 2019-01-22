@@ -504,7 +504,6 @@ namespace Mapbox.Unity.Map
 
 		public void DestroyChildObjects()
 		{
-			UnityEngine.Debug.Log("DestroyChildObjects");
 			int destroyChildStartIndex = transform.childCount - 1;
 			for (int i = destroyChildStartIndex; i >= 0; i--)
 			{
