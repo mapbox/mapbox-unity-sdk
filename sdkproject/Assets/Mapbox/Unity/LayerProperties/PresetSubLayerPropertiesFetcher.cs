@@ -59,7 +59,7 @@
 					layerName = "road";
 					geometryType = VectorPrimitiveType.Line;
 					lineWidth = 1.0f;
-					style = StyleTypes.Custom;
+					style = StyleTypes.Dark;
 					extrusionType = ExtrusionType.AbsoluteHeight;
 					extrusionGeometryType = ExtrusionGeometryType.RoofAndSide;
 					break;
@@ -118,7 +118,7 @@
 			_properties.materialOptions = new GeometryMaterialOptions
 			{
 				style = style,
-				colorStyleColor = UnityEngine.Color.green
+				colorStyleColor = Constants.GUI.Colors.EDITOR_FEATURE_DEFAULT_COLOR
 			};
 			_properties.materialOptions.SetDefaultMaterialOptions();
 			_properties.buildingsWithUniqueIds = buildingsWithUniqueIds;

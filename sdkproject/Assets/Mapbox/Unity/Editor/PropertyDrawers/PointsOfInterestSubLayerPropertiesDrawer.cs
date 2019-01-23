@@ -23,6 +23,7 @@ namespace Mapbox.Unity.Map
 		MultiColumnHeaderState m_MultiColumnHeaderState;
 
 		bool m_Initialized = false;
+		public bool isLayerAdded = false;
 
 		int SelectionIndex
 		{
@@ -141,8 +142,7 @@ namespace Mapbox.Unity.Map
 
 				if (EditorHelper.DidModifyProperty(property))
 				{
-					PrefabItemOptions prefabItemOptionToAdd = (PrefabItemOptions)EditorHelper.GetTargetObjectOfProperty(prefabItem) as PrefabItemOptions;
-					((VectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property)).OnSubLayerPropertyAdded(new VectorLayerUpdateArgs { property = prefabItemOptionToAdd });
+					isLayerAdded = true;
 				}
 			}
 

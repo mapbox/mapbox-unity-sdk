@@ -97,6 +97,8 @@
 		GUIContent[] _sourceTypeContent;
 		static float _lineHeight = EditorGUIUtility.singleLineHeight;
 
+		VectorLayerPropertiesDrawer _vectorLayerDrawer = new VectorLayerPropertiesDrawer();
+
 		public override void OnInspectorGUI()
 		{
 			objectId = serializedObject.targetObject.GetInstanceID().ToString();
@@ -157,7 +159,9 @@
 			EditorGUILayout.Space();
 
 			serializedObject.ApplyModifiedProperties();
-
+			var vectorDataProperty = serializedObject.FindProperty("_vectorData");
+			var layerProperty = vectorDataProperty.FindPropertyRelative("_layerProperty");
+			_vectorLayerDrawer.PostProcessLayerProperties(layerProperty);
 			if (!Application.isPlaying)
 			{
 				if (prevProp.boolValue && !prev)
@@ -321,11 +325,6 @@
 					break;
 			}
 
-			if (EditorGUI.EndChangeCheck())
-			{
-				EditorHelper.CheckForModifiedProperty(layerProperty);
-			}
-
 			if (sourceTypeValue != VectorSourceType.None)
 			{
 				var isStyleOptimized = layerProperty.FindPropertyRelative("useOptimizedStyle");
@@ -342,8 +341,12 @@
 			EditorGUILayout.Space();
 			ShowSepartor();
 
-			GUILayout.Space(-2.0f * _lineHeight);
-			ShowSection(serializedObject.FindProperty("_vectorData"), "_layerProperty");
+			_vectorLayerDrawer.DrawUI(layerProperty);
+
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(layerProperty);
+			}
 		}
 	}
 }
