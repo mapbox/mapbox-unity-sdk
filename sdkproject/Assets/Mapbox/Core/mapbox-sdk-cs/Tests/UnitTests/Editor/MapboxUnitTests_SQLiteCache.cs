@@ -76,7 +76,6 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		{
 			if (null != _cache)
 			{
-				//_cache.Clear();
 				_cache.Dispose();
 				_cache = null;
 			}
@@ -232,14 +231,6 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			yield return null;
 
 			List<long> elapsed = simpleInsert(tileSetName, forceInsert, tileIds);
-
-			//List<long> elapsed = new List<long>();
-			//foreach (CanonicalTileId tileId in tileIds)
-			//{
-			//	HashSet<CanonicalTileId> tmpIds = new HashSet<CanonicalTileId>(new CanonicalTileId[] { tileId });
-			//	elapsed.AddRange(simpleInsert(tileSetName, forceInsert, tmpIds));
-			//	yield return null;
-			//}
 
 			ued.Log(string.Format("coroutine [{0}] finished", tileSetName));
 			logTime(tileSetName, elapsed);

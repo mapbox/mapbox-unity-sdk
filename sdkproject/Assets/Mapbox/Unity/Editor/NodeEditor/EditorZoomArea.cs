@@ -88,18 +88,6 @@ namespace Mapbox.Editor.NodeEditor
 				return;
 			}
 
-			// Sometimes, strange errors pop up (related to Mac?), which we try to catch and enable a compability Mode no supporting zooming in groups
-			/*try
-			{
-				topmostRectDelegate.Invoke ();
-			}
-			catch (Exception e)
-			{
-				Debug.LogWarning ("GUIScaleUtility cannot run on this system! Compability mode enabled. For you that means you're not able to use the Node Editor inside more than one group:( Please PM me (Seneral @UnityForums) so I can figure out what causes this! Thanks!");
-				Debug.Log (e.Message);
-				compabilityMode = true;
-			}*/
-
 			initiated = true;
 		}
 

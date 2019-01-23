@@ -55,35 +55,6 @@ namespace Mapbox.Unity.MeshGeneration.Components
                 _meshRenderer.materials[0].mainTextureScale = new Vector2(1f, 1f);
             }
         }
-
-        //private void TextureTop(Material topmat)
-        //{
-        //    if (_useSatelliteRoof)
-        //    {
-        //        topmat.mainTexture = _tile.ImageData;
-        //        topmat.mainTextureScale = new Vector2(1f, 1f);
-        //    }
-        //    else
-        //    {
-        //        topmat.mainTextureScale = new Vector2(0.07f, 0.07f);
-        //        if (_topTextures.Any())
-        //            _meshRenderer.materials[0].SetTexture("_MainTex", );
-        //    }
-
-        //    var c = 1 - (Random.Range(0, 10) / 40f);
-        //    _meshRenderer.materials[0].color = new Color(c, c, c);
-        //}
-
-        //private void TextureSides(Material sidemat)
-        //{
-        //    var c = 1 - (Random.Range(0, 10) / 40f);
-        //    _meshRenderer.materials[1].color = new Color(c, c, c);
-
-        //    if (_sideTextures.Any())
-        //        _meshRenderer.materials[1].SetTexture("_MainTex", _sideTextures[Random.Range(0, _sideTextures.Length)]);
-
-        //}
-
     }
 
 }

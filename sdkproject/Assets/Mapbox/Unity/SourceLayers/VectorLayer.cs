@@ -84,7 +84,10 @@ namespace Mapbox.Unity.Map
 
 		public void UnbindAllEvents()
 		{
-			_vectorTileFactory.UnbindEvents();
+			if (_vectorTileFactory != null)
+			{
+				_vectorTileFactory.UnbindEvents();
+			}
 		}
 
 		public void UpdateFactorySettings()
@@ -527,7 +530,6 @@ namespace Mapbox.Unity.Map
 			var layerToRemove = FindFeatureSubLayerWithName(featureLayerName);
 			if (layerToRemove != null)
 			{
-				//vectorSubLayers.Remove(layerToRemove);
 				_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = layerToRemove });
 			}
 		}
@@ -600,7 +602,6 @@ namespace Mapbox.Unity.Map
 			var layerToRemove = FindPointsofInterestSubLayerWithName(poiLayerName);
 			if (layerToRemove != null)
 			{
-				//vectorSubLayers.Remove(layerToRemove);
 				_layerProperty.OnSubLayerPropertyRemoved(new VectorLayerUpdateArgs { property = layerToRemove });
 			}
 		}

@@ -1,6 +1,4 @@
-﻿using Mapbox.Unity.Telemetry;
-
-namespace Mapbox.Platform.Cache
+﻿namespace Mapbox.Platform.Cache
 {
 	using System;
 	using Mapbox.Platform;
@@ -118,6 +116,7 @@ namespace Mapbox.Platform.Cache
 			, string mapId = null
 		)
 		{
+
 			if (string.IsNullOrEmpty(mapId))
 			{
 				throw new Exception("Cannot cache without a map id");
@@ -135,11 +134,20 @@ namespace Mapbox.Platform.Cache
 				}
 			}
 
-			var finalUrl = uri + "?" + TelemetryFactory.EventQuery;
+			var uriBuilder = new UriBuilder(uri);
 			if (!string.IsNullOrEmpty(_accessToken))
 			{
-				finalUrl += "&access_token=" + _accessToken;
+				string accessTokenQuery = "access_token=" + _accessToken;
+				if (uriBuilder.Query != null && uriBuilder.Query.Length > 1)
+				{
+					uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery;
+				}
+				else
+				{
+					uriBuilder.Query = accessTokenQuery;
+				}
 			}
+			string finalUrl = uriBuilder.ToString();
 
 #if MAPBOX_DEBUG_CACHE
 			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
@@ -232,7 +240,6 @@ namespace Mapbox.Platform.Cache
 					// if the request was successful add tile to all caches
 					if (!r.HasError && null != r.Data)
 					{
-						//UnityEngine.Debug.Log(uri);
 						string eTag = string.Empty;
 						DateTime? lastModified = null;
 

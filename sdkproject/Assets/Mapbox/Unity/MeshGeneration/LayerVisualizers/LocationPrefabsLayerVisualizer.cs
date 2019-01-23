@@ -30,7 +30,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		{
 			var item = properties as PrefabItemOptions;
 			SubLayerProperties = item;
-			//Active = item.isActive;
+
 			_performanceOptions = item.performanceOptions;
 
 			item.filterOptions.filters.Clear();

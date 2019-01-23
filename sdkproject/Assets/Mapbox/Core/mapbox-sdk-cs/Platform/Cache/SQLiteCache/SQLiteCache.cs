@@ -112,8 +112,6 @@ name  STRING  NOT NULL
 			List<SQLiteConnection.ColumnInfo> colInfoTiles = _sqlite.GetTableInfo(typeof(tiles).Name);
 			if (0 == colInfoTiles.Count)
 			{
-				//sqlite does not support multiple PK columns, create table manually
-				//_sqlite.CreateTable<tiles>();
 
 				string cmdCreateTableTiles = @"CREATE TABLE tiles(
 tile_set     INTEGER REFERENCES tilesets (id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -174,7 +172,6 @@ lastmodified INTEGER,
 		{
 			_dbPath = GetFullDbPath(dbName);
 			_sqlite = new SQLiteConnection(_dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
-			//Debug.LogFormat("SQLiteCache path ----> {0}", _dbPath);
 		}
 
 
@@ -243,7 +240,6 @@ lastmodified INTEGER,
 					return;
 				}
 
-				//_sqlite.BeginTransaction();
 				int rowsAffected = _sqlite.InsertOrReplace(new tiles
 				{
 					tile_set = tilesetId.Value,
@@ -262,10 +258,6 @@ lastmodified INTEGER,
 			catch (Exception ex)
 			{
 				Debug.LogErrorFormat("Error inserting {0} {1} {2} ", tilesetName, tileId, ex);
-			}
-			finally
-			{
-				//_sqlite.Commit();
 			}
 
 			// update counter only when new tile gets inserted
@@ -299,7 +291,6 @@ lastmodified INTEGER,
 			{
 				// no 'ORDER BY' or 'LIMIT' possible if sqlite hasn't been compiled with 'SQLITE_ENABLE_UPDATE_DELETE_LIMIT'
 				// https://sqlite.org/compile.html#enable_update_delete_limit
-				// int rowsAffected = _sqlite.Execute("DELETE FROM tiles ORDER BY timestamp ASC LIMIT ?", toDelete);
 				_sqlite.Execute("DELETE FROM tiles WHERE rowid IN ( SELECT rowid FROM tiles ORDER BY timestamp ASC LIMIT ? );", toDelete);
 			}
 			catch (Exception ex)
@@ -393,7 +384,6 @@ lastmodified INTEGER,
 			try
 			{
 				_sqlite.BeginTransaction(true);
-				//return _sqlite.Insert(new tilesets { name = tilesetName });
 				tilesets newTileset = new tilesets { name = tilesetName };
 				int rowsAffected = _sqlite.Insert(newTileset);
 				if (1 != rowsAffected)

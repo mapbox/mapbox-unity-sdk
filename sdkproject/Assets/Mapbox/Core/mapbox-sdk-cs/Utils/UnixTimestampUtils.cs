@@ -26,7 +26,6 @@ namespace Mapbox.Utils
 		/// <returns></returns>
 		public static double To(DateTime date)
 		{
-			//return date.ToLocalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
 			return date.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
 		}
 
@@ -38,7 +37,6 @@ namespace Mapbox.Utils
 		/// <returns></returns>
 		public static DateTime From(double timestamp)
 		{
-			//return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Add(TimeSpan.FromSeconds(timestamp)).ToLocalTime();
 			return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Add(TimeSpan.FromSeconds(timestamp));
 		}
 
@@ -49,7 +47,6 @@ namespace Mapbox.Utils
 		/// <returns></returns>
 		public static DateTime FromMilliseconds(double timestamp)
 		{
-			//return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Add(TimeSpan.FromSeconds(timestamp)).ToLocalTime();
 			return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Add(TimeSpan.FromMilliseconds(timestamp));
 		}
 
@@ -60,7 +57,6 @@ namespace Mapbox.Utils
 		/// <returns></returns>
 		public static DateTime From(long timestamp)
 		{
-			//return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Add(TimeSpan.FromSeconds(timestamp)).ToLocalTime();
 			return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Add(TimeSpan.FromTicks(timestamp));
 		}
 

@@ -6,7 +6,7 @@ namespace Mapbox.Unity.Map.TileProviders
 {
 	public class RangeAroundTransformTileProvider : AbstractTileProvider
 	{
-		private RangeAroundTransformTileProviderOptions _rangeTileProviderOptions;
+		[SerializeField] private RangeAroundTransformTileProviderOptions _rangeTileProviderOptions;
 
 		private bool _initialized = false;
 		private UnwrappedTileId _currentTile;
@@ -14,7 +14,14 @@ namespace Mapbox.Unity.Map.TileProviders
 
 		public override void OnInitialized()
 		{
-			_rangeTileProviderOptions = (RangeAroundTransformTileProviderOptions)Options;
+			if (Options != null)
+			{
+				_rangeTileProviderOptions = (RangeAroundTransformTileProviderOptions)Options;
+			}
+			else if (_rangeTileProviderOptions == null)
+			{
+				_rangeTileProviderOptions = new RangeAroundTransformTileProviderOptions();
+			}
 
 			if (_rangeTileProviderOptions.targetTransform == null)
 			{
@@ -25,7 +32,6 @@ namespace Mapbox.Unity.Map.TileProviders
 			{
 				_initialized = true;
 			}
-			//_toRemove = new List<UnwrappedTileId>(((_rangeTileProviderOptions.visibleBuffer * 2) + 1) * ((_rangeTileProviderOptions.visibleBuffer * 2) + 1));
 			_currentExtent.activeTiles = new HashSet<UnwrappedTileId>();
 			_map.OnInitialized += UpdateTileExtent;
 			_map.OnUpdated += UpdateTileExtent;
@@ -36,7 +42,6 @@ namespace Mapbox.Unity.Map.TileProviders
 			if (!_initialized) return;
 
 			_currentExtent.activeTiles.Clear();
-			//_toRemove.Clear();
 			_currentTile = TileCover.CoordinateToTileId(_map.WorldToGeoPosition(_rangeTileProviderOptions.targetTransform.localPosition), _map.AbsoluteZoom);
 
 			for (int x = _currentTile.X - _rangeTileProviderOptions.visibleBuffer; x <= (_currentTile.X + _rangeTileProviderOptions.visibleBuffer); x++)

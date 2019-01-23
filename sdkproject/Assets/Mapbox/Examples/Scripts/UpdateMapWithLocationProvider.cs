@@ -70,7 +70,6 @@
 		{
 			_isLerping = true;
 			_timeStartedLerping = Time.time;
-			//Debug.Log(Time.deltaTime);
 			timeTakenDuringLerp = Time.deltaTime;
 
 			//We set the start position to the current position
@@ -95,7 +94,6 @@
 				//Perform the actual lerping.  Notice that the first two parameters will always be the same
 				//throughout a single lerp-processs (ie. they won't change until we hit the space-bar again
 				//to start another lerp)
-				//_startPosition = _map.GeoToWorldPosition(_map.CenterLatitudeLongitude, false);
 				_startPosition = _map.GeoToWorldPosition(_startLatLong, false);
 				_endPosition = _map.GeoToWorldPosition(_endLatlong, false);
 				var position = Vector3.Lerp(_startPosition, _endPosition, percentageComplete);

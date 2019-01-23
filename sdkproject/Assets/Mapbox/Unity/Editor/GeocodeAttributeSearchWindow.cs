@@ -179,14 +179,6 @@
 			}
 			_isSearching = false;
 			this.Repaint();
-
-			//_hasResponse = true;
-			//_coordinate = res.Features[0].Center;
-			//Response = res;
-			//if (OnGeocoderResponse != null)
-			//{
-			//	OnGeocoderResponse(this, EventArgs.Empty);
-			//}
 		}
 	}
 }

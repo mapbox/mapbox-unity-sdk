@@ -33,6 +33,7 @@ namespace Mapbox.Unity.Map
 		[SerializeField] protected VectorLayer _vectorData = new VectorLayer();
 		[SerializeField] protected AbstractTileProvider _tileProvider;
 		[SerializeField] protected HashSet<UnwrappedTileId> _currentExtent;
+		[SerializeField] protected EditorPreviewOptions _previewOptions = new EditorPreviewOptions();
 
 		protected AbstractMapVisualizer _mapVisualizer;
 		protected float _unityTileSize = 1;
@@ -43,10 +44,25 @@ namespace Mapbox.Unity.Map
 		protected Vector2d _centerMercator;
 		protected float _worldRelativeScale;
 		protected Vector3 _mapScaleFactor;
+
+		protected Vector3 _cachedPosition;
+		protected Quaternion _cachedRotation;
+		protected Vector3 _cachedScale = Vector3.one;
 		#endregion
 
 		#region Properties
-		public bool IsPreviewEnabled = false;
+
+		public bool IsEditorPreviewEnabled
+		{
+			get
+			{
+				return _previewOptions.isPreviewEnabled;
+			}
+			set
+			{
+				_previewOptions.isPreviewEnabled = value;
+			}
+		}
 
 		public AbstractMapVisualizer MapVisualizer
 		{
@@ -272,7 +288,7 @@ namespace Mapbox.Unity.Map
 		{
 			get
 			{
-				return _tileProvider.GetType();
+				return TileProvider.GetType();
 			}
 		}
 
@@ -300,12 +316,15 @@ namespace Mapbox.Unity.Map
 			SetUpMap();
 		}
 
-		//Unity Update
-		private void Update()
+		protected virtual void Update()
 		{
-			if (_tileProvider != null)
+			if (Application.isEditor && !Application.isPlaying && IsEditorPreviewEnabled == false)
 			{
-				_tileProvider.UpdateTileProvider();
+				return;
+			}
+			if (TileProvider != null)
+			{
+				TileProvider.UpdateTileProvider();
 			}
 		}
 
@@ -334,6 +353,11 @@ namespace Mapbox.Unity.Map
 		/// <param name="zoom">Zoom level.</param>
 		public virtual void UpdateMap(Vector2d latLon, float zoom)
 		{
+			if (Application.isEditor && !Application.isPlaying && !IsEditorPreviewEnabled)
+			{
+				return;
+			}
+
 			//so map will be snapped to zero using next new tile loaded
 			_worldHeightFixed = false;
 			float differenceInZoom = 0.0f;
@@ -369,9 +393,9 @@ namespace Mapbox.Unity.Map
 			}
 
 			//Update Tile extent.
-			if (_tileProvider != null)
+			if (TileProvider != null)
 			{
-				_tileProvider.UpdateTileExtent();
+				TileProvider.UpdateTileExtent();
 			}
 
 			if (OnUpdated != null)
@@ -380,18 +404,28 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
+		private void Reset()
+		{
+			DisableEditorPreview();
+		}
+
 		/// <summary>
 		/// Resets the map.
-		/// Use this method to reset the map to and reset all parameters.
+		/// Use this method to reset the map.
 		/// </summary>
 		[ContextMenu("ResetMap")]
 		public void ResetMap()
 		{
-			//Initialize(Conversions.StringToLatLon(_options.locationOptions.latitudeLongitude), (int)_options.locationOptions.zoom);
-
-			_mapVisualizer.UnregisterAllTiles();
-			_mapVisualizer.ClearMap();
-			_mapVisualizer.ReregisterAllTiles();
+			if(_previewOptions.isPreviewEnabled)
+			{
+				DisableEditorPreview();
+				EnableEditorPreview();
+			}
+			else
+			{
+				MapOnAwakeRoutine();
+				MapOnStartRoutine(false);
+			}
 		}
 
 		public bool IsAccessTokenValid
@@ -422,7 +456,6 @@ namespace Mapbox.Unity.Map
 
 		private void OnEnable()
 		{
-			IsPreviewEnabled = false;
 
 			if (_options.tileMaterial == null)
 			{
@@ -435,23 +468,57 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
+		// TODO: implement IDisposable, instead?
+		protected virtual void OnDestroy()
+		{
+			if (TileProvider != null)
+			{
+				TileProvider.ExtentChanged -= OnMapExtentChanged;
+			}
+			_mapVisualizer.ClearMap();
+			_mapVisualizer.Destroy();
+		}
+
 		protected virtual void Awake()
 		{
-			// Setup a visualizer to get a "Starter" map.
-			foreach (Transform tr in transform)
+			if (_previewOptions.isPreviewEnabled == true)
 			{
-				Destroy(tr.gameObject);
+				DisableEditorPreview();
+				_previewOptions.isPreviewEnabled = false;
 			}
+			MapOnAwakeRoutine();
+		}
 
+		protected virtual void Start()
+		{
+			MapOnStartRoutine();
+		}
+
+		private void MapOnAwakeRoutine()
+		{
+			// Destroy any ghost game objects.
+			DestroyChildObjects();
+			// Setup a visualizer to get a "Starter" map.
 			_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
 		}
 
-		// Use this for initialization
-		protected virtual void Start()
+		public void DestroyChildObjects()
+		{
+			int destroyChildStartIndex = transform.childCount - 1;
+			for (int i = destroyChildStartIndex; i >= 0; i--)
+			{
+				transform.GetChild(i).gameObject.Destroy();
+			}
+		}
+
+		private void MapOnStartRoutine(bool coroutine = true)
 		{
 			if (Application.isPlaying)
 			{
-				StartCoroutine("SetupAccess");
+				if(coroutine)
+				{
+					StartCoroutine("SetupAccess");
+				}
 				if (_initializeOnStart)
 				{
 					SetUpMap();
@@ -459,8 +526,29 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
+		private void EnableDisablePreview(object sender, EventArgs e)
+		{
+			if (!Application.isPlaying)
+			{
+				if (_previewOptions.isPreviewEnabled)
+				{
+
+					EnableEditorPreview();
+				}
+				else
+				{
+
+					DisableEditorPreview();
+				}
+			}
+		}
+
 		public void EnableEditorPreview()
 		{
+			_cachedPosition = transform.position;
+			_cachedRotation = transform.rotation;
+			_cachedScale = transform.localScale;
+
 			SetUpMap();
 			if (OnEditorPreviewEnabled != null)
 			{
@@ -470,17 +558,35 @@ namespace Mapbox.Unity.Map
 
 		public void DisableEditorPreview()
 		{
-			TileProvider = null;
 			_imagery.UpdateLayer -= OnImageOrTerrainUpdateLayer;
 			_terrain.UpdateLayer -= OnImageOrTerrainUpdateLayer;
 			_vectorData.SubLayerRemoved -= OnVectorDataSubLayerRemoved;
 			_vectorData.SubLayerAdded -= OnVectorDataSubLayerAdded;
 			_vectorData.UpdateLayer -= OnVectorDataUpdateLayer;
 			_vectorData.UnbindAllEvents();
-			_mapVisualizer.ClearMap();
+			if(_mapVisualizer != null)
+			{
+				_mapVisualizer.ClearMap();
+			}
+			DestroyTileProvider();
+
 			if (OnEditorPreviewDisabled != null)
 			{
 				OnEditorPreviewDisabled();
+			}
+
+			transform.position = _cachedPosition;
+			transform.rotation = _cachedRotation;
+			transform.localScale = _cachedScale;
+		}
+
+		public void DestroyTileProvider()
+		{
+			var tileProvider = TileProvider ?? gameObject.GetComponent<AbstractTileProvider>();
+			if (_options.extentOptions.extentType != MapExtentType.Custom && tileProvider != null)
+			{
+				tileProvider.gameObject.Destroy();
+				_tileProvider = null;
 			}
 		}
 
@@ -573,14 +679,14 @@ namespace Mapbox.Unity.Map
 			if (_options.placementOptions.snapMapToZero)
 			{
 				var h = referenceTile.QueryHeightData(.5f, .5f);
-				Root.transform.position = new Vector3(
+				Root.transform.localPosition = new Vector3(
 					Root.transform.position.x,
 					-h,
 					Root.transform.position.z);
 			}
 			else
 			{
-				Root.transform.position = new Vector3(
+				Root.transform.localPosition = new Vector3(
 					Root.transform.position.x,
 					0,
 					Root.transform.position.z);
@@ -613,45 +719,45 @@ namespace Mapbox.Unity.Map
 
 			_options.locationOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
 			{
-				//take care of redraw map business...
 				UpdateMap();
 			};
 
 			_options.extentOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
 			{
-				//take care of redraw map business...
 				OnTileProviderChanged();
 			};
 
 			_options.extentOptions.defaultExtents.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
 			{
-				//take care of redraw map business...
-				if (_tileProvider != null)
+				if (Application.isEditor && !Application.isPlaying && IsEditorPreviewEnabled == false)
 				{
-					_tileProvider.UpdateTileExtent();
+					Debug.Log("defaultExtents");
+					return;
+				}
+				if (TileProvider != null)
+				{
+					TileProvider.UpdateTileExtent();
 				}
 			};
 
 			_options.placementOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
 			{
-				//take care of redraw map business...
 				SetPlacementStrategy();
 				UpdateMap();
 			};
 
 			_options.scalingOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
 			{
-				//take care of redraw map business...
 				SetScalingStrategy();
 				UpdateMap();
 			};
 
 			_mapVisualizer.Initialize(this, _fileSource);
-			_tileProvider.Initialize(this);
+			TileProvider.Initialize(this);
 
 			SendInitialized();
 
-			_tileProvider.UpdateTileExtent();
+			TileProvider.UpdateTileExtent();
 		}
 
 		private void SetScalingStrategy()
@@ -685,10 +791,10 @@ namespace Mapbox.Unity.Map
 
 		private void SetTileProvider()
 		{
-			//TileProvider = GetComponent<AbstractTileProvider>();
 			if (_options.extentOptions.extentType != MapExtentType.Custom)
 			{
 				ITileProviderOptions tileProviderOptions = _options.extentOptions.GetTileProviderOptions();
+				string tileProviderName = "TileProvider";
 				// Setup tileprovider based on type.
 				switch (_options.extentOptions.extentType)
 				{
@@ -698,12 +804,17 @@ namespace Mapbox.Unity.Map
 							{
 								if (!(TileProvider is QuadTreeTileProvider))
 								{
-									TileProvider = new QuadTreeTileProvider();
+									TileProvider.gameObject.Destroy();
+									var go = new GameObject(tileProviderName);
+									go.transform.parent = transform;
+									TileProvider = go.AddComponent<QuadTreeTileProvider>();
 								}
 							}
 							else
 							{
-								TileProvider = new QuadTreeTileProvider();
+								var go = new GameObject(tileProviderName);
+								go.transform.parent = transform;
+								TileProvider = go.AddComponent<QuadTreeTileProvider>();
 							}
 							break;
 						}
@@ -711,14 +822,16 @@ namespace Mapbox.Unity.Map
 						{
 							if (TileProvider != null)
 							{
-								if (!(TileProvider is RangeTileProvider))
-								{
-									TileProvider = new RangeTileProvider();
-								}
+								TileProvider.gameObject.Destroy();
+								var go = new GameObject(tileProviderName);
+								go.transform.parent = transform;
+								TileProvider = go.AddComponent<RangeTileProvider>();
 							}
 							else
 							{
-								TileProvider = new RangeTileProvider();
+								var go = new GameObject(tileProviderName);
+								go.transform.parent = transform;
+								TileProvider = go.AddComponent<RangeTileProvider>();
 							}
 							break;
 						}
@@ -728,12 +841,17 @@ namespace Mapbox.Unity.Map
 							{
 								if (!(TileProvider is RangeAroundTransformTileProvider))
 								{
-									TileProvider = new RangeAroundTransformTileProvider();
+									TileProvider.gameObject.Destroy();
+									var go = new GameObject(tileProviderName);
+									go.transform.parent = transform;
+									TileProvider = go.AddComponent<RangeAroundTransformTileProvider>();
 								}
 							}
 							else
 							{
-								TileProvider = new RangeAroundTransformTileProvider();
+								var go = new GameObject(tileProviderName);
+								go.transform.parent = transform;
+								TileProvider = go.AddComponent<RangeAroundTransformTileProvider>();
 							}
 							break;
 						}
@@ -756,7 +874,7 @@ namespace Mapbox.Unity.Map
 			List<UnwrappedTileId> _toRemove = new List<UnwrappedTileId>();
 			foreach (var item in _activeTiles)
 			{
-				if (_tileProvider.Cleanup(item.Key)) //(!_currentExtent.Contains(item.Key))
+				if (TileProvider.Cleanup(item.Key))
 				{
 					_toRemove.Add(item.Key);
 				}
@@ -787,17 +905,6 @@ namespace Mapbox.Unity.Map
 		private void OnMapExtentChanged(object sender, ExtentArgs currentExtent)
 		{
 			TriggerTileRedrawForExtent(currentExtent);
-		}
-
-		// TODO: implement IDisposable, instead?
-		protected virtual void OnDestroy()
-		{
-			if (_tileProvider != null)
-			{
-				_tileProvider.ExtentChanged -= OnMapExtentChanged;
-			}
-			_mapVisualizer.ClearMap();
-			_mapVisualizer.Destroy();
 		}
 
 		private void OnImageOrTerrainUpdateLayer(object sender, System.EventArgs eventArgs)
@@ -846,8 +953,8 @@ namespace Mapbox.Unity.Map
 
 			if (layerUpdateArgs.visualizer != null)
 			{
-				//we got a visualizer. Update only the visualizer.
-				// No need to unload the entire factory to apply changes.
+				//We have a visualizer. Update only the visualizer.
+				//No need to unload the entire factory to apply changes.
 				_mapVisualizer.UnregisterAndRedrawTilesFromLayer((VectorTileFactory)layerUpdateArgs.factory, layerUpdateArgs.visualizer);
 			}
 			else
@@ -861,15 +968,18 @@ namespace Mapbox.Unity.Map
 
 		private void OnTileProviderChanged()
 		{
-			//			var currentTileProvider = gameObject.GetComponent<AbstractTileProvider>();
-			//
-			//			if (currentTileProvider != null)
-			//			{
-			//				Destroy(currentTileProvider);
-			//			}
+			if (Application.isEditor && !Application.isPlaying && IsEditorPreviewEnabled == false)
+			{
+				Debug.Log("extentOptions");
+				return;
+			}
+
 			SetTileProvider();
-			_tileProvider.Initialize(this);
-			_tileProvider.UpdateTileExtent();
+			TileProvider.Initialize(this);
+			if (IsEditorPreviewEnabled)
+			{
+				TileProvider.UpdateTileExtent();
+			}
 		}
 
 		#endregion
@@ -1074,6 +1184,7 @@ namespace Mapbox.Unity.Map
 			_options.scalingOptions.unityTileSize = tileSizeInUnityUnits;
 			_options.scalingOptions.HasChanged = true;
 		}
+
 		#endregion
 
 		#region Events

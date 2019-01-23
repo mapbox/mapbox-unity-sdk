@@ -38,7 +38,6 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			string basicReserialized = _directions.Serialize(basicResp);
 
 			// Ensure the two match
-			//UnityEngine.Debug.Log(_basicResponse + System.Environment.NewLine + basicReserialized);
 			Assert.AreEqual(_basicResponse, basicReserialized);
 		}
 
@@ -52,11 +51,9 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			DirectionsResponse withStepsResp = _directions.Deserialize(_responseWithSteps);
 
 			// Then deserialize it back to a string.
-			//string withStepsReserialized = JsonConvert.SerializeObject(withStepsResp);
 			string withStepsReserialized = _directions.Serialize(withStepsResp);
 
 			// Ensure the two match.
-			//UnityEngine.Debug.Log(_responseWithSteps + System.Environment.NewLine + withStepsReserialized);
 			Assert.AreEqual(_responseWithSteps, withStepsReserialized);
 		}
 

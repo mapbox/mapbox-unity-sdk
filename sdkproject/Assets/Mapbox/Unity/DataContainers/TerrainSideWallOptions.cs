@@ -10,6 +10,6 @@
 		[Tooltip("Height of side walls.")]
 		public float wallHeight = 10;
 		[Tooltip("Unity material to use for side walls.")]
-		public Material wallMaterial;// = Resources.Load("TerrainMaterial", typeof(Material)) as Material;
+		public Material wallMaterial;
 	}
 }

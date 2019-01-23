@@ -64,9 +64,7 @@ namespace Mapbox.Editor
 
 		GUIStyle _textFieldStyle;
 		GUIStyle _submitButtonStyle;
-		//GUIStyle _checkingButtonStyle;
 
-		//GUIStyle _validFieldStyle;
 		GUIStyle _validButtonStyle;
 		Color _validContentColor;
 		Color _validBackgroundColor;
@@ -336,11 +334,8 @@ namespace Mapbox.Editor
 
 			_titleStyle = new GUIStyle(GUI.skin.FindStyle("IN TitleText"));
 			_titleStyle.padding.left = 3;
-			//_titleStyle.fontSize = 16;
 			_bodyStyle = new GUIStyle(GUI.skin.FindStyle("WordWrapLabel"));
-			//_bodyStyle.fontSize = 14;
 			_linkStyle = new GUIStyle(GUI.skin.FindStyle("PR PrefabLabel"));
-			//_linkStyle.fontSize = 14;
 			_linkStyle.padding.left = 0;
 			_linkStyle.padding.top = -1;
 
@@ -353,9 +348,6 @@ namespace Mapbox.Editor
 			_submitButtonStyle.margin.top = 0;
 			_submitButtonStyle.fixedWidth = 200;
 
-			//_checkingButtonStyle = new GUIStyle(_submitButtonStyle);
-
-			//_validFieldStyle = new GUIStyle(_textFieldStyle);
 			_validButtonStyle = new GUIStyle(GUI.skin.FindStyle("LODSliderRange"));
 			_validButtonStyle.alignment = TextAnchor.MiddleCenter;
 			_validButtonStyle.padding = new RectOffset(0, 0, 0, 0);
@@ -522,10 +514,6 @@ namespace Mapbox.Editor
 			{
 				EditorGUILayout.LabelField(_currentTokenStatus.ToString(), _errorStyle);
 			}
-			else
-			{
-				//EditorGUILayout.LabelField("", _errorStyle);
-			}
 
 			EditorGUILayout.EndHorizontal();
 
@@ -533,25 +521,16 @@ namespace Mapbox.Editor
 
 		void DrawChangelog()
 		{
-			//_showChangelogFoldout = EditorGUILayout.Foldout(_showChangelogFoldout, "v" + Constants.SDK_VERSION + " Changelog", true);
-
-			//if (_showChangelogFoldout)
-			//{
 			EditorGUI.indentLevel = 2;
-			//EditorGUILayout.BeginHorizontal(_horizontalGroup);
-			//	GUIContent labelContent = new GUIContent("SDK version " + Constants.SDK_VERSION + " changelog, and learn how to contribute at");
+
 			GUIContent linkContent = new GUIContent("v" + Constants.SDK_VERSION + " changelog");
-			//	EditorGUILayout.LabelField(labelContent, _bodyStyle, GUILayout.Width(_bodyStyle.CalcSize(labelContent).x));
 
 			if (GUILayout.Button(linkContent, _linkStyle))
 			{
 				Application.OpenURL("https://github.com/mapbox/mapbox-unity-sdk/blob/develop/documentation/docs/05-changelog.md");
 			}
 
-			//	GUILayout.FlexibleSpace();
-			//EditorGUILayout.EndHorizontal();
 			EditorGUI.indentLevel = 0;
-			//}
 		}
 
 		void DrawConfigurationSettings()

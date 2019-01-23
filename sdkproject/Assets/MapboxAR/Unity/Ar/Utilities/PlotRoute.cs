@@ -1,7 +1,6 @@
 ﻿namespace Mapbox.Unity.Ar.Utilities
 {
 	using UnityEngine;
-	//using UnityEngine.XR.iOS;
 	using UnityARInterface;
 
 	[RequireComponent(typeof(LineRenderer))]
@@ -30,7 +29,6 @@
 		int _currentIndex = 0;
 		float _sqDistance;
 		Vector3 _lastPosition;
-		bool _isStable = false;
 
 		void Awake()
 		{

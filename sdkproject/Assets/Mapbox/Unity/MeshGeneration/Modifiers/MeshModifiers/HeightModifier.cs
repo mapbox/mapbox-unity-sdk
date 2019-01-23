@@ -41,10 +41,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	{
 		private float _scale = 1;
 
-		//[SerializeField]
-		//[Tooltip("Create side walls from calculated height down to terrain level. Suggested for buildings, not suggested for roads.")]
-		//private bool _createSideWalls = true;
-
 		GeometryExtrusionOptions _options;
 
 		[SerializeField]
@@ -183,46 +179,42 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					{
 						md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + maxHeight, md.Vertices[i].z);
 					}
-
 					break;
 				case ExtrusionType.MinHeight:
-				{
-					var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
-					for (int i = 0; i < _counter; i++)
 					{
-						md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.min + maxHeight, md.Vertices[i].z);
+						var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
+						for (int i = 0; i < _counter; i++)
+						{
+							md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.min + maxHeight, md.Vertices[i].z);
+						}
 					}
-				}
-					//hf += max - min;
 					break;
 				case ExtrusionType.MaxHeight:
-				{
-					var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
-					for (int i = 0; i < _counter; i++)
 					{
-						md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.max + maxHeight, md.Vertices[i].z);
+						var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
+						for (int i = 0; i < _counter; i++)
+						{
+							md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.max + maxHeight, md.Vertices[i].z);
+						}
+						height += (minmax.max - minmax.min);
 					}
-
-					height += (minmax.max - minmax.min);
-				}
 					break;
 				case ExtrusionType.RangeHeight:
 					for (int i = 0; i < _counter; i++)
 					{
 						md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + maxHeight, md.Vertices[i].z);
 					}
-
 					break;
 				case ExtrusionType.AbsoluteHeight:
 					for (int i = 0; i < _counter; i++)
 					{
 						md.Vertices[i] = new Vector3(md.Vertices[i].x, md.Vertices[i].y + maxHeight, md.Vertices[i].z);
 					}
-
 					break;
 				default:
 					break;
 			}
+
 		}
 
 		protected virtual void QueryHeight(VectorFeatureUnity feature, MeshData md, UnityTile tile, out float maxHeight, out float minHeight)
@@ -252,7 +244,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						if (feature.Properties.ContainsKey("min_height"))
 						{
 							minHeight = Convert.ToSingle(feature.Properties["min_height"]);
-							//maxHeight -= minHeight;
 						}
 					}
 					break;

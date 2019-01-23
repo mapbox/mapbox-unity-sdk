@@ -14,9 +14,6 @@ namespace Mapbox.Unity.Location
 	/// </summary>
 	public class TransformLocationProvider : AbstractEditorLocationProvider
 	{
-		//[SerializeField]
-		//private AbstractMap _map;
-
 		/// <summary>
 		/// The transform that will be queried for location and heading data.
 		/// </summary>

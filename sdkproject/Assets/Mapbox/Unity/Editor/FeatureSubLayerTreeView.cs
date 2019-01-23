@@ -29,8 +29,6 @@
 
 		public FeatureSubLayerTreeView(TreeViewState state, MultiColumnHeader multicolumnHeader, TreeModel<FeatureTreeElement> model, int uniqueIdentifier = 3000) : base(state, multicolumnHeader, model)
 		{
-			// Custom setup
-			//rowHeight = kRowHeights;
 			showAlternatingRowBackgrounds = true;
 			showBorder = true;
 			customFoldoutYOffset = (kRowHeights - EditorGUIUtility.singleLineHeight) * 0.5f; // center foldout in the row since we also center content. See RowGUI

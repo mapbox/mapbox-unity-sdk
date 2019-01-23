@@ -1,3 +1,5 @@
+using Mapbox.Unity.Map;
+
 namespace Mapbox.Examples
 {
 	using Mapbox.Unity.MeshGeneration.Data;
@@ -11,8 +13,10 @@ namespace Mapbox.Examples
 	public class ObjectInspectorModifier : GameObjectModifier
 	{
 		private Dictionary<GameObject, FeatureSelectionDetector> _detectors;
+		private Canvas _canvas;
 		private FeatureUiMarker _marker;
 		private FeatureSelectionDetector _tempDetector;
+		private Transform _root;
 
 		public override void Initialize()
 		{
@@ -23,13 +27,18 @@ namespace Mapbox.Examples
 
 			if (_marker == null)
 			{
-				Canvas canvas;
+				if(_root == null)
+				{
+					_root = FindObjectOfType<AbstractMap>().transform;
+				}
+
 				var go = new GameObject("InteractiveSelectionCanvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
-				canvas = go.GetComponent<Canvas>();
-				canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+				go.transform.SetParent(_root);
+				_canvas = go.GetComponent<Canvas>();
+				_canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 
 				var sel = Instantiate(Resources.Load<GameObject>("selector"));
-				sel.transform.SetParent(canvas.transform);
+				sel.transform.SetParent(_canvas.transform);
 				_marker = sel.GetComponent<FeatureUiMarker>();
 			}
 		}
@@ -45,6 +54,14 @@ namespace Mapbox.Examples
 				_tempDetector = ve.GameObject.AddComponent<FeatureSelectionDetector>();
 				_detectors.Add(ve.GameObject, _tempDetector);
 				_tempDetector.Initialize(_marker, ve);
+			}
+		}
+
+		public override void Clear()
+		{
+			if (_canvas != null)
+			{
+				_canvas.gameObject.Destroy();
 			}
 		}
 	}
