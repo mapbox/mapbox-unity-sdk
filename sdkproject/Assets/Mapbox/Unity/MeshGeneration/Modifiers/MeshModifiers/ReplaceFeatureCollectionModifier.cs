@@ -57,7 +57,6 @@
 				}
 			}
 
-
 			_replaceFeatureModifiers = new List<ReplaceFeatureModifier>();
 			foreach (FeatureBundle feature in features)
 			{

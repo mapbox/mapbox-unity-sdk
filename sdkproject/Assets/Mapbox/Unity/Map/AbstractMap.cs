@@ -497,15 +497,19 @@ namespace Mapbox.Unity.Map
 		private void MapOnAwakeRoutine()
 		{
 			// Destroy any ghost game objects.
-			foreach (Transform tr in transform)
-			{
-				Destroy(tr.gameObject);
-			}
-
+			DestroyChildObjects();
 			// Setup a visualizer to get a "Starter" map.
 			_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
 		}
 
+		public void DestroyChildObjects()
+		{
+			int destroyChildStartIndex = transform.childCount - 1;
+			for (int i = destroyChildStartIndex; i >= 0; i--)
+			{
+				transform.GetChild(i).gameObject.Destroy();
+			}
+		}
 
 		private void MapOnStartRoutine(bool coroutine = true)
 		{
