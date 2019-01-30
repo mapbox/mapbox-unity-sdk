@@ -15,7 +15,7 @@ namespace Mapbox.Unity.Utilities.DebugTools
 			get
 			{
 				List<FileInfo> files = DirSearch(new DirectoryInfo(kScenesPath), "*.unity");
-#if ENABLE_WINMD_SUPPORT
+#if !ENABLE_WINMD_SUPPORT
 				List<FileInfo> arfiles = DirSearch(new DirectoryInfo(arScenesPath), "*.unity");
 				files.AddRange(arfiles);
 #endif
