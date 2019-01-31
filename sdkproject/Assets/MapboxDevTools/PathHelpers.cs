@@ -8,16 +8,18 @@ namespace Mapbox.Unity.Utilities.DebugTools
 	public static class PathHelpers
 	{
 		static readonly string kScenesPath = Path.Combine(Application.dataPath, "Mapbox/Examples");
+		static readonly string arScenesPath = Path.Combine(Application.dataPath, "MapboxAR/Examples");
 
 		public static List<string> AllScenes
 		{
 			get
 			{
 				List<FileInfo> files = DirSearch(new DirectoryInfo(kScenesPath), "*.unity");
-#if ENABLE_WINMD_SUPPORT
 				List<FileInfo> arfiles = DirSearch(new DirectoryInfo(arScenesPath), "*.unity");
-				files.AddRange(arfiles);
-#endif
+				if (arfiles != null)
+				{
+					files.AddRange(arfiles);
+				}
 				List<string> assetRefs = new List<string>();
 				foreach (var fi in files)
 				{
@@ -33,14 +35,18 @@ namespace Mapbox.Unity.Utilities.DebugTools
 
 		static List<FileInfo> DirSearch(DirectoryInfo d, string searchFor)
 		{
-			List<FileInfo> founditems = d.GetFiles(searchFor).ToList();
+			List<FileInfo> founditems = null;
 
-			DirectoryInfo[] dis = d.GetDirectories();
-			foreach (DirectoryInfo di in dis)
+			if (d.Exists)
 			{
-				founditems.AddRange(DirSearch(di, searchFor));
-			}
+				founditems = d.GetFiles(searchFor).ToList();
 
+				DirectoryInfo[] dis = d.GetDirectories();
+				foreach (DirectoryInfo di in dis)
+				{
+					founditems.AddRange(DirSearch(di, searchFor));
+				}
+			}
 			return founditems;
 		}
 		static string GetRelativeAssetPathFromFullPath(string fullPath)
