@@ -291,6 +291,7 @@
 		public void SetStyleType(StyleTypes styleType)
 		{
 			style = styleType;
+			HasChanged = true;
 		}
 
 
