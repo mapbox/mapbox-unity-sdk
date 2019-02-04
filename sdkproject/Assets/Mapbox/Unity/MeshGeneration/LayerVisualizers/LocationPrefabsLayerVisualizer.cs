@@ -353,7 +353,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					//check if the coordinate is in the tile
 					Utils.Vector2d coordinate = Conversions.StringToLatLon(coordinates[i]);
 					Mapbox.Map.UnwrappedTileId coordinateTileId = Conversions.LatitudeLongitudeToTileId(
-						coordinate.x, coordinate.y, tile.InitialZoom);
+						coordinate.x, coordinate.y, tile.CurrentZoom);
 
 					if (coordinateTileId.Canonical.Equals(tile.CanonicalTileId))
 					{
