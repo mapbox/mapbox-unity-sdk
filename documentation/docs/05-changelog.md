@@ -11,8 +11,8 @@
 #### Bug Fixes
 - Fixes a bug with UV calculation which caused textures to be stretched instead of tiled.
 - Fixes a bug where Vector feature layers that used the same texture style would not preserve layer-specific style parameter settings.
-- Fixes a bug where decoration spawning (SpawnInsideModifier) didn't work well with recycled tiles.
-- Fixes a bug where point placement didn't work with zoom level changes.
+- Fixes a bug where decoration spawning (SpawnInsideModifier) placed objects at wrong locations on recycled tiles.
+- Fixes a bug where point placement didn't pate point location properly when zoom level changes.
 
 ### v.2.0.0
 10/15/2018
