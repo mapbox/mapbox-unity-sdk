@@ -1,12 +1,16 @@
 ## CHANGELOG
 ### v.2.0.1
+02/11/2019
+##### New Features
+- *Editor Preview* - Adds ability to preview maps in editor at design time. AbstractMap now has an `Enable Preview` toggle which displays the map with all current settings, and provides ability to modify settings while viewing the map outside of Play mode.
 ##### Improvements
 - Improves line mesh generation, adds options for join and cap types. Users have greater control over quality and styles of line meshes.
 - Improves terrain tile loading times by optimizing terrain pipeline.
 - Remove UV Modifier class and merge the functionality into polygon mesh modifier.
+- Optimized Vector feature textures, resulting in smaller file sizes.
 #### Bug Fixes
 - Fixes a bug with uv calculation which caused textures to be stretched intead of tiled.
-
+- Fixes a bug where Vector feature layers that used the same texture style would not preserve layer-specific style parameter settings.
 
 ### v.2.0.0
 10/15/2018
