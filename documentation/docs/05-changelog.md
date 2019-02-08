@@ -9,8 +9,10 @@
 - Remove UV Modifier class and merge the functionality into polygon mesh modifier.
 - Optimized Vector feature textures, resulting in smaller file sizes.
 #### Bug Fixes
-- Fixes a bug with uv calculation which caused textures to be stretched intead of tiled.
+- Fixes a bug with UV calculation which caused textures to be stretched instead of tiled.
 - Fixes a bug where Vector feature layers that used the same texture style would not preserve layer-specific style parameter settings.
+- Fixes a bug where decoration spawning (SpawnInsideModifier) didn't work well with recycled tiles.
+- Fixes a bug where point placement didn't work with zoom level changes.
 
 ### v.2.0.0
 10/15/2018
