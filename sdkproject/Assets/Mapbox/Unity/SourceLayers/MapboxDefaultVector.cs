@@ -17,6 +17,14 @@
 					};
 
 					break;
+				case VectorSourceType.MapboxStreetsV8:
+					defaultStyle = new Style
+					{
+						Id = "mapbox.mapbox-streets-v8",
+						Name = "Mapbox Streets v8"
+					};
+
+					break;
 				case VectorSourceType.MapboxStreetsWithBuildingIds:
 					defaultStyle = new Style
 					{
