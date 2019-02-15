@@ -176,7 +176,7 @@
 #if !ENABLE_WINMD_SUPPORT
 		[Description("Mapbox Streets vector tiles are largely based on data from OpenStreetMap, a free & global source of geographic data built by volunteers.")]
 #endif
-		MapboxStreetsV8 = 4,
+		MapboxStreetsV8 = -1,
 #if !ENABLE_WINMD_SUPPORT
 		[Description("Use custom tilesets created using Mapbox studio. ")]
 #endif
