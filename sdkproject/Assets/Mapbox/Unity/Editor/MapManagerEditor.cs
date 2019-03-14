@@ -295,15 +295,15 @@ namespace Mapbox.Editor
 					};
 					index++;
 				}
-//
-//				for (int extIdx = 0; extIdx < count; extIdx++)
-//				{
-//					_sourceTypeContent[extIdx] = new GUIContent
-//					{
-//						text = displayNames[extIdx],
-//						tooltip = ((VectorSourceType)extIdx).Description(),
-//					};
-//				}
+				//
+				//				for (int extIdx = 0; extIdx < count; extIdx++)
+				//				{
+				//					_sourceTypeContent[extIdx] = new GUIContent
+				//					{
+				//						text = displayNames[extIdx],
+				//						tooltip = ((VectorSourceType)extIdx).Description(),
+				//					};
+				//				}
 
 				_isGUIContentSet = true;
 			}
@@ -316,13 +316,14 @@ namespace Mapbox.Editor
 			}, sourceTypeProperty.enumValueIndex, _sourceTypeContent);
 
 			//sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
-			sourceTypeValue = ((VectorSourceType) Enum.Parse(typeof(VectorSourceType), names[sourceTypeProperty.enumValueIndex]));
-			
+			sourceTypeValue = ((VectorSourceType)Enum.Parse(typeof(VectorSourceType), names[sourceTypeProperty.enumValueIndex]));
+
 			switch (sourceTypeValue)
 			{
 				case VectorSourceType.MapboxStreets:
 				case VectorSourceType.MapboxStreetsV8:
 				case VectorSourceType.MapboxStreetsWithBuildingIds:
+				case VectorSourceType.MapboxStreetsV8WithBuildingIds:
 					var sourcePropertyValue = MapboxDefaultVector.GetParameters(sourceTypeValue);
 					layerSourceId.stringValue = sourcePropertyValue.Id;
 					GUI.enabled = false;

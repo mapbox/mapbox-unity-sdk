@@ -109,19 +109,19 @@
 					index++;
 				}
 
-//				for (int index0 = 0; index0 < count; index0++)
-//				{
-//					_sourceTypeContent[index0] = new GUIContent
-//					{
-//						text = displayNames[index0],
-//						tooltip = ((VectorSourceType)index0).Description(),
-//					};
-//				}
+				//				for (int index0 = 0; index0 < count; index0++)
+				//				{
+				//					_sourceTypeContent[index0] = new GUIContent
+				//					{
+				//						text = displayNames[index0],
+				//						tooltip = ((VectorSourceType)index0).Description(),
+				//					};
+				//				}
 				_isGUIContentSet = true;
 			}
 
 			//sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
-			sourceTypeValue = ((VectorSourceType) Enum.Parse(typeof(VectorSourceType), names[sourceTypeProperty.enumValueIndex]));
+			sourceTypeValue = ((VectorSourceType)Enum.Parse(typeof(VectorSourceType), names[sourceTypeProperty.enumValueIndex]));
 			var sourceOptionsProperty = property.FindPropertyRelative("sourceOptions");
 			var layerSourceProperty = sourceOptionsProperty.FindPropertyRelative("layerSource");
 			var layerSourceId = layerSourceProperty.FindPropertyRelative("Id");
@@ -131,6 +131,7 @@
 				case VectorSourceType.MapboxStreets:
 				case VectorSourceType.MapboxStreetsV8:
 				case VectorSourceType.MapboxStreetsWithBuildingIds:
+				case VectorSourceType.MapboxStreetsV8WithBuildingIds:
 					var sourcePropertyValue = MapboxDefaultVector.GetParameters(sourceTypeValue);
 					layerSourceId.stringValue = sourcePropertyValue.Id;
 					GUI.enabled = false;
@@ -402,8 +403,8 @@
 			var subLayerlineGeometryOptions = subLayer.FindPropertyRelative("lineGeometryOptions");
 			var lineGeometryOptions = subLayerProperties.lineGeometryOptions;
 			subLayerlineGeometryOptions.FindPropertyRelative("Width").floatValue = lineGeometryOptions.Width;
-			subLayerlineGeometryOptions.FindPropertyRelative("CapType").enumValueIndex = (int) lineGeometryOptions.CapType;
-			subLayerlineGeometryOptions.FindPropertyRelative("JoinType").enumValueIndex = (int) lineGeometryOptions.JoinType;
+			subLayerlineGeometryOptions.FindPropertyRelative("CapType").enumValueIndex = (int)lineGeometryOptions.CapType;
+			subLayerlineGeometryOptions.FindPropertyRelative("JoinType").enumValueIndex = (int)lineGeometryOptions.JoinType;
 			subLayerlineGeometryOptions.FindPropertyRelative("MiterLimit").floatValue = lineGeometryOptions.MiterLimit;
 			subLayerlineGeometryOptions.FindPropertyRelative("RoundLimit").floatValue = lineGeometryOptions.RoundLimit;
 
