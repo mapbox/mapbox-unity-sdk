@@ -13,7 +13,7 @@ namespace Mapbox.Directions
     using Mapbox.Utils.JsonConverters;
 
     /// <summary>
-    ///     Wrapper around the <see href="https://www.mapbox.com/api-documentation/#directions">
+    ///     Wrapper around the <see href="https://www.mapbox.com/api-documentation/navigation/#directions">
     ///     Mapbox Directions API</see>. The Mapbox Directions API will show you how to get where
     ///     you're going.
     /// </summary>

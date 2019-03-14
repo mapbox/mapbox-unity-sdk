@@ -2,13 +2,13 @@
 
 The goal of the Unity API is to make it easy for game developers to build beautiful location based games. The API should be flexible enough to allow creative developers to use location data in novel ways, but easy enough to prototype a game environment with a map in a couple minutes.
 
-The API will include a core C# library for requesting data from Mapbox APIS, and then a higher-level set of components designed to work specifically with Unity. 
+The API will include a core C# library for requesting data from Mapbox APIS, and then a higher-level set of components designed to work specifically with Unity.
 
 There are four parts to the Unity SDK: core API support, utilities, Unity components, and custom inspectors:
 
 ## Core API support
 
-The Unity SDK will provide an interface to the following [Mapbox web services](https://www.mapbox.com/api-documentation/). I separated services into two priority levels. Priority level 1 is the base level of support we need to release the Unity SDK. Priority level 2 features are those that would be necessary to make the SDK feel complete and up to par with our SDKs on other platforms. 
+The Unity SDK will provide an interface to the following [Mapbox web services](https://www.mapbox.com/api-documentation/). I separated services into two priority levels. Priority level 1 is the base level of support we need to release the Unity SDK. Priority level 2 features are those that would be necessary to make the SDK feel complete and up to par with our SDKs on other platforms.
 
 ### Vector tilesets
 _Priority level 1_
@@ -22,28 +22,28 @@ To support vector tileset resources, the SDK will need to:
 
 First version of vector tile support can leave the rendering implementation to the user of the SDK.
 
-Documentation: https://www.mapbox.com/api-documentation/#retrieve-tiles
+Documentation: https://www.mapbox.com/api-documentation/maps/#retrieve-tiles
 
 ### Raster tilesets
 _Priority level 2_
 
 Much of the work we do to support vector tiles will be applicable to raster tiles. The main difference between vector tiles and raster tiles is that raster tiles would need to be used as textures. We could also add support for 3D terrain meshes based on raster elevation data.
 
-Documentation: https://www.mapbox.com/api-documentation/#retrieve-tiles
+Documentation: https://www.mapbox.com/api-documentation/maps/#retrieve-tiles
 
 ### Static maps
 _Priority level 2_
 
 Make it easy for a developer to request and apply a map texture of a fixed size to a game object.
 
-Documentation: https://www.mapbox.com/api-documentation/#static
+Documentation: https://www.mapbox.com/api-documentation/maps/#static
 
 ### Datasets
 _Priority level 2_
 
 Provide methods for both requesting data from a dataset and for posting changes to a dataset based on game objects.
 
-Documentation: https://www.mapbox.com/api-documentation/#datasets
+Documentation: https://www.mapbox.com/api-documentation/maps/#datasets
 
 ### Geocoding
 _Priority level 1_
@@ -52,7 +52,7 @@ Provide methods for requesting and storing forward geocode and reverse geocode r
 
 Will use callback functions like `GetForwardGeocode(GeocoderOptions, callback())` where `GeocoderOptions` is an object that includes the geocode query and all options, and callback is a function that receives the geocode response object. The response object can be used to do things like position points on the map or fill a UI template with search results.
 
-Documentation: https://www.mapbox.com/api-documentation/#geocoding
+Documentation: https://www.mapbox.com/api-documentation/search/#geocoding
 
 ### Directions
 _Priority level 1_
@@ -61,14 +61,14 @@ Provide a method for requesting and storing directions results. Support all opti
 
 Will use callback functions like `GetDirections(DirectionsOptions, callback())` where `DirectionsOptions` is an object that includes the directions query and all options, and callback is a function that receives the directions response object. The response object can then be used to do things like build a path on the map or to fill a UI template with instructions.
 
-Documentation: https://www.mapbox.com/api-documentation/#directions
+Documentation: https://www.mapbox.com/api-documentation/navigation/#directions
 
 ### Map matching
 _Priority level 2_
 
-Provide a method for sending user location and getting a match back. Support all optional parameters. Useful for snapping user position to road path. 
+Provide a method for sending user location and getting a match back. Support all optional parameters. Useful for snapping user position to road path.
 
-Documentation: https://www.mapbox.com/api-documentation/#map-matching
+Documentation: https://www.mapbox.com/api-documentation/navigation/#map-matching
 
 ## Utilities
 _Priority level 1_
