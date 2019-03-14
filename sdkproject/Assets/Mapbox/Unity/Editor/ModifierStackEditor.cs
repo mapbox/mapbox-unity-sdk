@@ -2,7 +2,6 @@
 {
 	using UnityEngine;
 	using UnityEditor;
-	using Mapbox.Editor.NodeEditor;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
 
 	[CustomEditor(typeof(ModifierStack))]
@@ -11,10 +10,13 @@
 
 		private MonoScript script;
 		private SerializedProperty _positionType;
+		private Texture2D _magnifier;
+
 		private void OnEnable()
 		{
 			script = MonoScript.FromScriptableObject((ModifierStack)target);
 			_positionType = serializedObject.FindProperty("moveFeaturePositionTo");
+			_magnifier = EditorGUIUtility.FindTexture("d_ViewToolZoom");
 		}
 
 		public override void OnInspectorGUI()
@@ -39,7 +41,7 @@
 				GUILayout.Space(5);
 				meshfac.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(meshfac.GetArrayElementAtIndex(i).objectReferenceValue, typeof(MeshModifier), false) as ScriptableObject;
 				EditorGUILayout.EndVertical();
-				if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
+				if (GUILayout.Button(_magnifier, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
 				{
 					ScriptableCreatorWindow.Open(typeof(MeshModifier), meshfac, ind);
 				}
@@ -75,7 +77,7 @@
 				gofac.GetArrayElementAtIndex(ind).objectReferenceValue = EditorGUILayout.ObjectField(gofac.GetArrayElementAtIndex(i).objectReferenceValue, typeof(GameObjectModifier), false) as ScriptableObject;
 				EditorGUILayout.EndVertical();
 
-				if (GUILayout.Button(NodeBasedEditor.magnifierTexture, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
+				if (GUILayout.Button(_magnifier, (GUIStyle)"minibuttonleft", GUILayout.Width(30)))
 				{
 					ScriptableCreatorWindow.Open(typeof(GameObjectModifier), gofac, ind);
 				}

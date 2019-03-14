@@ -2,7 +2,6 @@
 {
 	using UnityEngine;
 	using UnityEditor;
-	using Mapbox.Editor.NodeEditor;
 	using Mapbox.Unity.MeshGeneration.Modifiers;
 
 	[CustomEditor(typeof(MaterialModifier))]
