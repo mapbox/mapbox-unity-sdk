@@ -481,9 +481,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		protected IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, UnwrappedTileId tileId, Action<UnityTile, LayerVisualizerBase> callback = null)
 		{
-			//HACK to prevent request finishing on same frame which breaks modules started/finished events
-			yield return null;
-
 			if (tile == null)
 			{
 				yield break;
