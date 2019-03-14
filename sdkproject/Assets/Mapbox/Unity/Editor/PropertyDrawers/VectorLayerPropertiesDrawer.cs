@@ -60,7 +60,10 @@
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 			var layerSourceProperty = property.FindPropertyRelative("sourceOptions");
 			var sourceTypeProperty = property.FindPropertyRelative("_sourceType");
-			VectorSourceType sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
+
+			var names = sourceTypeProperty.enumNames;
+			VectorSourceType sourceTypeValue = ((VectorSourceType) Enum.Parse(typeof(VectorSourceType), names[sourceTypeProperty.enumValueIndex]));
+			//VectorSourceType sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
 			string streets_v7 = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id;
 			var layerSourceId = layerSourceProperty.FindPropertyRelative("layerSource.Id");
 			string layerString = layerSourceId.stringValue;
