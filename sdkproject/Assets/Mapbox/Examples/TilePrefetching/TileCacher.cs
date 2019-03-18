@@ -16,7 +16,7 @@ public class TileCacher : MonoBehaviour
     public string ImageMapId;
     public string VectorMapId;
     public int ZoomLevel;
-    
+
     [Header("Output")]
     public float Progress;
     [TextArea(10,20)]
@@ -29,26 +29,30 @@ public class TileCacher : MonoBehaviour
     [SerializeField] private int _currentProgress;
     private Vector2 _anchor;
     [SerializeField] private Transform _canvas;
-    
+
     private void Start()
     {
         TerrainFetcher = new TerrainDataFetcher();
         TerrainFetcher.DataRecieved += TerrainDataReceived;
-        TerrainFetcher.FetchingError += TerrainDataError;   
-            
+        TerrainFetcher.FetchingError += TerrainDataError;
+
         ImageFetcher = new ImageDataFetcher();
         ImageFetcher.DataRecieved += ImageDataReceived;
-        ImageFetcher.FetchingError += ImageDataError;   
-        
+        ImageFetcher.FetchingError += ImageDataError;
+
         VectorFetcher = new VectorDataFetcher();
         VectorFetcher.DataRecieved += VectorDataReceived;
-        VectorFetcher.FetchingError += VectorDataError;   
+        VectorFetcher.FetchingError += VectorDataError;
     }
 
 
     [ContextMenu("Download Tiles")]
     public void PullTiles()
     {
+	    Progress = 0;
+	    _tileCountToFetch = 0;
+	    _currentProgress = 0;
+
         var pointMeters = new List<UnwrappedTileId>();
         foreach (var point in Points)
         {
@@ -56,7 +60,7 @@ public class TileCacher : MonoBehaviour
             var pointMeter = Conversions.LatitudeLongitudeToTileId(pointVector.x, pointVector.y, ZoomLevel);
             pointMeters.Add(pointMeter);
         }
-        
+
         var minx = int.MaxValue;
         var maxx = int.MinValue;
         var miny = int.MaxValue;
@@ -73,7 +77,7 @@ public class TileCacher : MonoBehaviour
             {
                 maxx = meter.X;
             }
-            
+
             if (meter.Y < miny)
             {
                 miny = meter.Y;
@@ -85,12 +89,10 @@ public class TileCacher : MonoBehaviour
             }
         }
 
-        _tileCountToFetch = (maxx - minx) * (maxy - miny);
-        _currentProgress = 0;
-
+        _tileCountToFetch = (maxx - minx) * (maxy - miny) * 3;
         _anchor = new Vector2((maxx + minx) / 2, (maxy + miny) / 2);
         Log += string.Format("{0}, {1}, {2}, {3}", minx, maxx, miny, maxy);
-        StartCoroutine(StartPulling(minx, maxx, miny, maxy));     
+        StartCoroutine(StartPulling(minx, maxx, miny, maxy));
     }
 
     private IEnumerator StartPulling(int minx, int maxx, int miny, int maxy)
@@ -124,7 +126,7 @@ public class TileCacher : MonoBehaviour
             }
         }
     }
-    
+
     #region Fetcher Events
     private void VectorDataError(UnityTile arg1, VectorTile arg2, TileErrorEventArgs arg3)
     {
@@ -133,10 +135,10 @@ public class TileCacher : MonoBehaviour
 
     private void VectorDataReceived(UnityTile arg1, VectorTile arg2)
     {
-        //Log += (string.Format("Vector data received for {0}\r\n",  arg2.Id));
         _currentProgress++;
+	    Progress = (float)_currentProgress / _tileCountToFetch * 100 ;
     }
-    
+
     private void ImageDataError(UnityTile arg1, RasterTile arg2, TileErrorEventArgs arg3)
     {
         Log += (string.Format("Image data fetching failed for {0}\r\n",  arg2.Id));
@@ -144,8 +146,8 @@ public class TileCacher : MonoBehaviour
 
     private void ImageDataReceived(UnityTile arg1, RasterTile arg2)
     {
-        //Log += (string.Format("Image data received for {0}\r\n",  arg2.Id));
         _currentProgress++;
+	    Progress = (float)_currentProgress / _tileCountToFetch * 100;
         RenderImagery(arg2);
     }
 
@@ -156,11 +158,11 @@ public class TileCacher : MonoBehaviour
 
     private void TerrainDataReceived(UnityTile arg1, RawPngRasterTile arg2)
     {
-        //Log += (string.Format("Terrain data received for {0}\r\n", arg2.Id));
         _currentProgress++;
+	    Progress = (float)_currentProgress / _tileCountToFetch * 100;
     }
     #endregion
-    
+
     private void RenderImagery(RasterTile rasterTile)
     {
         var go = new GameObject("image");
