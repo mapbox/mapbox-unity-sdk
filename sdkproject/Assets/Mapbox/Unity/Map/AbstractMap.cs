@@ -500,6 +500,7 @@ namespace Mapbox.Unity.Map
 			DestroyChildObjects();
 			// Setup a visualizer to get a "Starter" map.
 			_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
+			_mapVisualizer.OnTileFinished += OnTileFinished;
 		}
 
 		public void DestroyChildObjects()
@@ -639,6 +640,7 @@ namespace Mapbox.Unity.Map
 
 		protected virtual void TileProvider_OnTileAdded(UnwrappedTileId tileId)
 		{
+			OnTileRequestRecieved(tileId);
 			var tile = _mapVisualizer.LoadTile(tileId);
 			if (Options.placementOptions.snapMapToZero && !_worldHeightFixed)
 			{
@@ -1203,6 +1205,8 @@ namespace Mapbox.Unity.Map
 
 		public event Action OnEditorPreviewEnabled = delegate { };
 		public event Action OnEditorPreviewDisabled = delegate { };
+		public event Action<UnityTile> OnTileFinished = delegate { };
+		public event Action<UnwrappedTileId> OnTileRequestRecieved = delegate { };
 		#endregion
 	}
 }

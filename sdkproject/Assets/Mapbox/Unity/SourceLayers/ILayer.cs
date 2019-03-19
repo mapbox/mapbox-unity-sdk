@@ -1,4 +1,5 @@
 using System.Linq;
+using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.SourceLayers;
 
 namespace Mapbox.Unity.Map
@@ -33,6 +34,7 @@ namespace Mapbox.Unity.Map
 		void Update(LayerProperties properties);
 		void Remove();
 
+		event Action<UnityTile> OnTileFinished;
 	}
 
 	public interface IVectorDataLayer : ILayer

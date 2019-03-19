@@ -56,6 +56,7 @@ namespace Mapbox.Unity.Map
 		public Dictionary<UnwrappedTileId, int> _tileProgress;
 
 		public event Action<ModuleState> OnMapVisualizerStateChanged = delegate { };
+		public event Action<UnityTile> OnTileFinished = delegate { };
 
 		/// <summary>
 		/// Gets the unity tile from unwrapped tile identifier.
@@ -158,6 +159,7 @@ namespace Mapbox.Unity.Map
 			if (rasterDone && terrainDone && vectorDone)
 			{
 				tile.TileState = MeshGeneration.Enums.TilePropertyState.Loaded;
+				OnTileFinished(tile);
 
 				// Check if all tiles in extent are active tiles
 				if (_map.CurrentExtent.Count == _activeTiles.Count)
@@ -182,6 +184,8 @@ namespace Mapbox.Unity.Map
 				{
 					State = ModuleState.Working;
 				}
+
+
 			}
 		}
 		#endregion

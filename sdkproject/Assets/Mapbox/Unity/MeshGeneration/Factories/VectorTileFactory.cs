@@ -59,6 +59,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		#region Public Methods
 		public void RedrawSubLayer(UnityTile tile, LayerVisualizerBase visualizer)
 		{
+			TrackFeatureWithBuilder(tile, visualizer.SubLayerProperties.coreOptions.layerName, visualizer);
 			CreateFeatureWithBuilder(tile, visualizer.SubLayerProperties.coreOptions.layerName, visualizer);
 		}
 
@@ -377,6 +378,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				if (_layerBuilder.ContainsKey(layerName))
 				{
+					//two loops; first one to add it to waiting/tracking list, second to start it
+					foreach (var builder in _layerBuilder[layerName])
+					{
+						TrackFeatureWithBuilder(tile, layerName, builder);
+					}
+
 					foreach (var builder in _layerBuilder[layerName])
 					{
 						CreateFeatureWithBuilder(tile, layerName, builder);
@@ -388,6 +395,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			string emptyLayer = "";
 			if (_layerBuilder.ContainsKey(emptyLayer))
 			{
+				//two loops; first one to add it to waiting/tracking list, second to start it
+				foreach (var builder in _layerBuilder[emptyLayer])
+				{
+					TrackFeatureWithBuilder(tile, emptyLayer, builder);
+				}
+
 				foreach (var builder in _layerBuilder[emptyLayer])
 				{
 					CreateFeatureWithBuilder(tile, emptyLayer, builder);
@@ -400,7 +413,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		private void CreateFeatureWithBuilder(UnityTile tile, string layerName, LayerVisualizerBase builder)
+		private void TrackFeatureWithBuilder(UnityTile tile, string layerName, LayerVisualizerBase builder)
 		{
 			if (builder.Active)
 			{
@@ -410,12 +423,19 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 				else
 				{
-					_layerProgress.Add(tile, new HashSet<LayerVisualizerBase> { builder });
+					_layerProgress.Add(tile, new HashSet<LayerVisualizerBase> {builder});
 					if (!_tilesWaitingProcessing.Contains(tile))
 					{
 						_tilesWaitingProcessing.Add(tile);
 					}
 				}
+			}
+		}
+
+		private void CreateFeatureWithBuilder(UnityTile tile, string layerName, LayerVisualizerBase builder)
+		{
+			if (builder.Active)
+			{
 				if (layerName != "")
 				{
 					builder.Create(tile.VectorData.Data.GetLayer(layerName), tile, DecreaseProgressCounter);
@@ -428,6 +448,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
+
 		private void DecreaseProgressCounter(UnityTile tile, LayerVisualizerBase builder)
 		{
 			if (_layerProgress.ContainsKey(tile))
@@ -439,6 +460,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 				if (_layerProgress[tile].Count == 0)
 				{
+					OnTileFinished(tile);
 					_layerProgress.Remove(tile);
 					_tilesWaitingProcessing.Remove(tile);
 					tile.VectorDataState = TilePropertyState.Loaded;

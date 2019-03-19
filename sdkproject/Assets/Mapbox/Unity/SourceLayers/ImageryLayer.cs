@@ -1,4 +1,6 @@
-﻿namespace Mapbox.Unity.Map
+﻿using Mapbox.Unity.MeshGeneration.Data;
+
+namespace Mapbox.Unity.Map
 {
 	using System;
 	using UnityEngine;
@@ -109,6 +111,7 @@
 			}
 			_imageFactory = ScriptableObject.CreateInstance<MapImageFactory>();
 			_imageFactory.SetOptions(_layerProperty);
+			_imageFactory.OnTileFinished += OnTileFinished;
 			_layerProperty.PropertyHasChanged += RedrawLayer;
 			_layerProperty.rasterOptions.PropertyHasChanged += (property, e) =>
 			{
@@ -230,5 +233,7 @@
 			}
 		}
 		#endregion
+
+		public event Action<UnityTile> OnTileFinished;
 	}
 }
