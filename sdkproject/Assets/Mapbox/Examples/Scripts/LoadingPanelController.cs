@@ -1,4 +1,6 @@
 
+using System.Linq;
+
 namespace Mapbox.Examples
 {
 	using UnityEngine;
@@ -27,18 +29,19 @@ namespace Mapbox.Examples
 			_map.OnEditorPreviewEnabled += OnEditorPreviewEnabled;
 			_map.OnEditorPreviewDisabled += OnEditorPreviewDisabled;
 
-			_map.OnTileRequestRecieved += (s) => { Debug.Log("Starting " + s); };
-			_map.OnTileFinished += (s) => { Debug.Log("Finished " + s.CanonicalTileId); };
-
-			_map.Terrain.OnTileFinished += (s) => { Debug.Log("Terrain finished " + s.CanonicalTileId); };
-			_map.ImageLayer.OnTileFinished += (s) => { Debug.Log("Image finished " + s.CanonicalTileId); };
-			_map.VectorData.OnTileFinished += (s) => { Debug.Log("Vector finished " + s.CanonicalTileId); };
-
 
 		}
 
 		void _map_OnInitialized()
 		{
+			_map.OnTilesStarting += (s) => { Debug.Log("Starting " + string.Join(",", s.Select(x => x.ToString()).ToArray())); };
+			_map.OnTileFinished += (s) => { Debug.Log("Finished " + s.CanonicalTileId); };
+			_map.OnTilesDisposing += (s) => { Debug.Log("Disposing " + string.Join(",", s.Select(x => x.ToString()).ToArray())); };
+
+			_map.MapVisualizer.OnTileHeightProcessingFinished += (s) => { Debug.Log("Terrain finished " + s.CanonicalTileId); };
+			_map.MapVisualizer.OnTileImageProcessingFinished += (s) => { Debug.Log("Image finished " + s.CanonicalTileId); };
+			_map.MapVisualizer.OnTileVectorProcessingFinished += (s) => { Debug.Log("Vector finished " + s.CanonicalTileId); };
+
 			var visualizer = _map.MapVisualizer;
 			_text.text = "LOADING";
 			visualizer.OnMapVisualizerStateChanged += (s) =>
