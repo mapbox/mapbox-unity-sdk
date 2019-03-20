@@ -122,7 +122,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			if (tile != null)
 			{
 				_tilesWaitingResponse.Remove(tile);
-				OnTileFinished(tile);
 
 				if (tile.HeightDataState != TilePropertyState.Unregistered)
 				{

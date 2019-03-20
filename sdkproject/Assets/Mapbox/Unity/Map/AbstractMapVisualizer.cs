@@ -140,6 +140,34 @@ namespace Mapbox.Unity.Map
 		#region Factory event callbacks
 		//factory event callback, not relaying this up for now
 
+
+		private void TileHeightStateChanged(UnityTile tile)
+		{
+			if (tile.HeightDataState == TilePropertyState.Loaded)
+			{
+				OnTileHeightProcessingFinished(tile);
+			}
+			TileStateChanged(tile);
+		}
+
+		private void TileRasterStateChanged(UnityTile tile)
+		{
+			if (tile.RasterDataState == TilePropertyState.Loaded)
+			{
+				OnTileImageProcessingFinished(tile);
+			}
+			TileStateChanged(tile);
+		}
+
+		private void TileVectorStateChanged(UnityTile tile)
+		{
+			if (tile.VectorDataState == TilePropertyState.Loaded)
+			{
+				OnTileVectorProcessingFinished(tile);
+			}
+			TileStateChanged(tile);
+		}
+
 		public virtual void TileStateChanged(UnityTile tile)
 		{
 			bool rasterDone = (tile.RasterDataState == TilePropertyState.None ||
@@ -217,9 +245,9 @@ namespace Mapbox.Unity.Map
 #if UNITY_EDITOR
 			unityTile.gameObject.name = unityTile.CanonicalTileId.ToString();
 #endif
-			unityTile.OnHeightDataChanged += TileStateChanged;
-			unityTile.OnRasterDataChanged += TileStateChanged;
-			unityTile.OnVectorDataChanged += TileStateChanged;
+			unityTile.OnHeightDataChanged += TileHeightStateChanged;
+			unityTile.OnRasterDataChanged += TileRasterStateChanged;
+			unityTile.OnVectorDataChanged += TileVectorStateChanged;
 
 			unityTile.TileState = MeshGeneration.Enums.TilePropertyState.Loading;
 			ActiveTiles.Add(tileId, unityTile);
@@ -378,6 +406,12 @@ namespace Mapbox.Unity.Map
 		}
 		#endregion
 
+//		public event Action<UnityTile> OnTileHeightProcessingStarting;
+//		public event Action<UnityTile> OnTileImageProcessingStarting;
+//		public event Action<UnityTile> OnTileVectorProcessingStarting;
 
+		public event Action<UnityTile> OnTileHeightProcessingFinished = delegate {};
+		public event Action<UnityTile> OnTileImageProcessingFinished = delegate {};
+		public event Action<UnityTile> OnTileVectorProcessingFinished = delegate {};
 	}
 }

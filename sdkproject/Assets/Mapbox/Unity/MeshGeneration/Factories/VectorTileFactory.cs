@@ -460,7 +460,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 				if (_layerProgress[tile].Count == 0)
 				{
-					OnTileFinished(tile);
 					_layerProgress.Remove(tile);
 					_tilesWaitingProcessing.Remove(tile);
 					tile.VectorDataState = TilePropertyState.Loaded;

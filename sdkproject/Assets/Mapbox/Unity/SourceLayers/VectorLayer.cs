@@ -69,7 +69,6 @@ namespace Mapbox.Unity.Map
 		public void Initialize()
 		{
 			_vectorTileFactory = ScriptableObject.CreateInstance<VectorTileFactory>();
-			_vectorTileFactory.OnTileFinished += OnTileFinished;
 			UpdateFactorySettings();
 
 			_layerProperty.PropertyHasChanged += RedrawVectorLayer;
@@ -658,6 +657,5 @@ namespace Mapbox.Unity.Map
 		}
 		#endregion
 
-		public event Action<UnityTile> OnTileFinished;
 	}
 }

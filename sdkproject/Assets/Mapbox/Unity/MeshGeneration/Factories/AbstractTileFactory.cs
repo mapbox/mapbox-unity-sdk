@@ -44,8 +44,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		protected HashSet<UnityTile> _tilesWaitingResponse;
 		protected HashSet<UnityTile> _tilesWaitingProcessing;
 
-		public Action<UnityTile> OnTileFinished = delegate {};
-
 		public virtual void SetOptions(LayerProperties options)
 		{
 			_options = options;

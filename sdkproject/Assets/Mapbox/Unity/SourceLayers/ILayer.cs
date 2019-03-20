@@ -33,8 +33,6 @@ namespace Mapbox.Unity.Map
 		void Initialize(LayerProperties properties);
 		void Update(LayerProperties properties);
 		void Remove();
-
-		event Action<UnityTile> OnTileFinished;
 	}
 
 	public interface IVectorDataLayer : ILayer

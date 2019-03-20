@@ -126,7 +126,6 @@ namespace Mapbox.Unity.Map
 		public void Initialize()
 		{
 			_elevationFactory = ScriptableObject.CreateInstance<TerrainFactoryBase>();
-			_elevationFactory.OnTileFinished += OnTileFinished;
 			SetFactoryOptions();
 
 			_layerProperty.colliderOptions.PropertyHasChanged += (property, e) =>
@@ -369,7 +368,5 @@ namespace Mapbox.Unity.Map
 
 
 		#endregion
-
-		public event Action<UnityTile> OnTileFinished;
 	}
 }

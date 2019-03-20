@@ -111,7 +111,6 @@ namespace Mapbox.Unity.Map
 			}
 			_imageFactory = ScriptableObject.CreateInstance<MapImageFactory>();
 			_imageFactory.SetOptions(_layerProperty);
-			_imageFactory.OnTileFinished += OnTileFinished;
 			_layerProperty.PropertyHasChanged += RedrawLayer;
 			_layerProperty.rasterOptions.PropertyHasChanged += (property, e) =>
 			{
@@ -233,7 +232,5 @@ namespace Mapbox.Unity.Map
 			}
 		}
 		#endregion
-
-		public event Action<UnityTile> OnTileFinished;
 	}
 }
