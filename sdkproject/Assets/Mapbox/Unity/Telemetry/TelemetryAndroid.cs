@@ -80,12 +80,6 @@ namespace Mapbox.Unity.Telemetry
 					Debug.LogError("Could not get class 'AppUserTurnstile'");
 					return;
 				}
-				//AndroidJavaObject mbxEvent = MapboxAndroidTurnstileEvent.Cast("com.mapbox.android.telemetry.Event");
-				//if (null == mbxEvent)
-				//{
-				//	Debug.LogError("Could not get class 'MapLoadEvent'");
-				//	return;
-				//}
 				_telemInstance.Call<bool>("push", MapboxAndroidTurnstileEvent);
 			}
 		}
