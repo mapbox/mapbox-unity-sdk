@@ -3,6 +3,28 @@ namespace Mapbox.Unity.Telemetry
 {
 	using UnityEngine;
 
+	public static class AndroidJavaObjectExtensions
+	{
+
+		public static AndroidJavaObject ClassForName(string className)
+		{
+			using (var clazz = new AndroidJavaClass("java.lang.Class"))
+			{
+				return clazz.CallStatic<AndroidJavaObject>("forName", className);
+			}
+		}
+
+		// Cast extension method
+		public static AndroidJavaObject Cast(this AndroidJavaObject source, string destClass)
+		{
+			using (var destClassAJC = ClassForName(destClass))
+			{
+				return destClassAJC.Call<AndroidJavaObject>("cast", source);
+			}
+		}
+
+	}
+
 	public class TelemetryAndroid : ITelemetryLibrary
 	{
 		AndroidJavaObject _activityContext = null;
@@ -35,51 +57,53 @@ namespace Mapbox.Unity.Telemetry
 				return;
 			}
 
-			using (AndroidJavaClass MapboxAndroidTelem = new AndroidJavaClass("com.mapbox.services.android.telemetry.MapboxTelemetry"))
+			_telemInstance = new AndroidJavaObject("com.mapbox.android.telemetry.MapboxTelemetry",
+													_activityContext,
+													accessToken,
+													"MapboxEventsUnityAndroid/" + Constants.SDK_VERSION);
+
+			if (null == _telemInstance)
 			{
-				if (null == MapboxAndroidTelem)
-				{
-					Debug.LogError("Could not get class 'MapboxTelemetry'");
-					return;
-				}
-
-				_telemInstance = MapboxAndroidTelem.CallStatic<AndroidJavaObject>("getInstance");
-				if (null == _telemInstance)
-				{
-					Debug.LogError("Could not get MapboxTelemetry instance");
-					return;
-				}
-
-				_telemInstance.Call(
-					"initialize"
-					, _activityContext
-					, accessToken
-					, "MapboxEventsUnityAndroid/" + Constants.SDK_VERSION
-				);
+				Debug.LogError("Could not get class 'MapboxTelemetry'");
+				return;
 			}
+			else
+				_telemInstance.Call<bool>("disable");
 		}
 
 		public void SendTurnstile()
 		{
-			using (AndroidJavaClass MapboxAndroidEvent = new AndroidJavaClass("com.mapbox.services.android.telemetry.MapboxEvent"))
+			using (AndroidJavaObject MapboxAndroidTurnstileEvent = new AndroidJavaObject("com.mapbox.android.telemetry.AppUserTurnstile", "MapboxEventsUnityAndroid", Constants.SDK_VERSION))
 			{
-				if (null == MapboxAndroidEvent)
+				if (null == MapboxAndroidTurnstileEvent)
 				{
-					Debug.LogError("Could not get class 'MapboxEvent'");
+					Debug.LogError("Could not get class 'AppUserTurnstile'");
 					return;
 				}
-
-				AndroidJavaObject mapLoadEvent = MapboxAndroidEvent.CallStatic<AndroidJavaObject>("buildMapLoadEvent");
-				_telemInstance.Call("pushEvent", mapLoadEvent);
+				//AndroidJavaObject mbxEvent = MapboxAndroidTurnstileEvent.Cast("com.mapbox.android.telemetry.Event");
+				//if (null == mbxEvent)
+				//{
+				//	Debug.LogError("Could not get class 'MapLoadEvent'");
+				//	return;
+				//}
+				_telemInstance.Call<bool>("push", MapboxAndroidTurnstileEvent);
 			}
 		}
 
 		public void SetLocationCollectionState(bool enable)
 		{
-			_telemInstance.Call(
-				"setTelemetryEnabled"
-				, enable
-			);
+			if (enable)
+			{
+				_telemInstance.Call<bool>("enable");
+			}
+			else
+			{
+				_telemInstance.Call<bool>("disable");
+			}
+			//_telemInstance.Call(
+			//	"setTelemetryEnabled"
+			//	, enable
+			//);
 		}
 	}
 }
