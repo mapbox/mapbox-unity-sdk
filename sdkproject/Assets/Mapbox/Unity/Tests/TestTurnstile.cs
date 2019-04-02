@@ -12,13 +12,13 @@ public class TestTurnstile : MonoBehaviour
 
 	[SerializeField]
 	public bool _sendEvent = false;
-	TelemetryIos _telemetryLibrary;
+	ITelemetryLibrary _telemetryLibrary;
 
 	public void SendTurnstileEvent()
 	{
 		try
 		{
-			_telemetryLibrary = (TelemetryIos)TelemetryIos.Instance;
+			_telemetryLibrary = TelemetryFactory.GetTelemetryInstance();
 			_telemetryLibrary.Initialize(accessToken);
 			//_telemetryLibrary.SetLocationCollectionState(GetTelemetryCollectionState());
 			_telemetryLibrary.SendTurnstile();
