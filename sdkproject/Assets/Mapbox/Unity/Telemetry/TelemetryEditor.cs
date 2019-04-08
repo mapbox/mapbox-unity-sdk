@@ -49,6 +49,7 @@ namespace Mapbox.Unity.Telemetry
 			jsonDict.Add("created", unixTimestamp);
 			jsonDict.Add("userId", SystemInfo.deviceUniqueIdentifier);
 			jsonDict.Add("enabled.telemetry", false);
+			jsonDict.Add("sdkIdentifier", GetSDKIdentifier());
 			eventList.Add(jsonDict);
 
 			var jsonString = JsonConvert.SerializeObject(eventList);
@@ -121,6 +122,14 @@ namespace Mapbox.Unity.Telemetry
 				 Constants.SDK_VERSION
 			);
 			return userAgent;
+		}
+
+		private string GetSDKIdentifier()
+		{
+			var sdkIdentifier = string.Format("MapboxEventsUnity{0}",
+										  Application.platform
+										 );
+			return sdkIdentifier;
 		}
 
 		public void SetLocationCollectionState(bool enable)
