@@ -70,6 +70,10 @@ namespace Mapbox.Unity.Map
 		{
 			get
 			{
+				if(_mapVisualizer == null)
+				{
+					_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
+				}
 				return _mapVisualizer;
 			}
 			set
@@ -501,7 +505,11 @@ namespace Mapbox.Unity.Map
 			// Destroy any ghost game objects.
 			DestroyChildObjects();
 			// Setup a visualizer to get a "Starter" map.
-			_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
+
+			if(_mapVisualizer == null)
+			{
+				_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
+			}
 			_mapVisualizer.OnTileFinished += (s) =>
 			{
 				OnTileFinished(s);

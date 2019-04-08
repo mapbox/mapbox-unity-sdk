@@ -22,18 +22,12 @@ namespace Mapbox.Examples
 		AbstractMap _map;
 		void Awake()
 		{
-
 			_map = FindObjectOfType<AbstractMap>();
 			_map.OnInitialized += _map_OnInitialized;
 
 			_map.OnEditorPreviewEnabled += OnEditorPreviewEnabled;
 			_map.OnEditorPreviewDisabled += OnEditorPreviewDisabled;
 
-
-		}
-
-		void _map_OnInitialized()
-		{
 			_map.OnTilesStarting += (s) => { Debug.Log("Starting " + string.Join(",", s.Select(x => x.ToString()).ToArray())); };
 			_map.OnTileFinished += (s) => { Debug.Log("Finished " + s.CanonicalTileId); };
 			_map.OnTilesDisposing += (s) => { Debug.Log("Disposing " + string.Join(",", s.Select(x => x.ToString()).ToArray())); };
@@ -41,6 +35,11 @@ namespace Mapbox.Examples
 			_map.MapVisualizer.OnTileHeightProcessingFinished += (s) => { Debug.Log("Terrain finished " + s.CanonicalTileId); };
 			_map.MapVisualizer.OnTileImageProcessingFinished += (s) => { Debug.Log("Image finished " + s.CanonicalTileId); };
 			_map.MapVisualizer.OnTileVectorProcessingFinished += (s) => { Debug.Log("Vector finished " + s.CanonicalTileId); };
+
+		}
+
+		void _map_OnInitialized()
+		{
 
 			var visualizer = _map.MapVisualizer;
 			_text.text = "LOADING";
