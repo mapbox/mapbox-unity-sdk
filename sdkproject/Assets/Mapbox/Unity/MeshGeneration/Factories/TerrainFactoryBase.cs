@@ -64,6 +64,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				tile.SetHeightData(null);
 				tile.MeshFilter.sharedMesh.Clear();
 				tile.ElevationType = TileTerrainType.None;
+				tile.HeightDataState = TilePropertyState.None;
 				return;
 			}
 
