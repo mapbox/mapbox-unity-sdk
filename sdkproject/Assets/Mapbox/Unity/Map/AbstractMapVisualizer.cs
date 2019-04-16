@@ -186,6 +186,7 @@ namespace Mapbox.Unity.Map
 
 			if (rasterDone && terrainDone && vectorDone)
 			{
+				Debug.Log("Tile Done");
 				tile.TileState = MeshGeneration.Enums.TilePropertyState.Loaded;
 				OnTileFinished(tile);
 
@@ -319,21 +320,6 @@ namespace Mapbox.Unity.Map
 			State = ModuleState.Initialized;
 		}
 
-		#region Events
-		/// <summary>
-		/// The  <c>OnTileError</c> event triggers when there's a <c>Tile</c> error.
-		/// Returns a <see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance as a parameter, for the tile on which error occurred.
-		/// </summary>
-		public event EventHandler<TileErrorEventArgs> OnTileError;
-		private void Factory_OnTileError(object sender, TileErrorEventArgs e)
-		{
-			EventHandler<TileErrorEventArgs> handler = OnTileError;
-			if (handler != null)
-			{
-				handler(this, e);
-			}
-		}
-
 		public void ReregisterAllTiles()
 		{
 			foreach (var activeTile in _activeTiles)
@@ -404,14 +390,36 @@ namespace Mapbox.Unity.Map
 				factory.UpdateTileProperty(tileBundle.Value, updateArgs);
 			}
 		}
-		#endregion
 
-//		public event Action<UnityTile> OnTileHeightProcessingStarting;
-//		public event Action<UnityTile> OnTileImageProcessingStarting;
-//		public event Action<UnityTile> OnTileVectorProcessingStarting;
 
+		#region Events
+		/// <summary>
+		/// The  <c>OnTileError</c> event triggers when there's a <c>Tile</c> error.
+		/// Returns a <see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance as a parameter, for the tile on which error occurred.
+		/// </summary>
+		public event EventHandler<TileErrorEventArgs> OnTileError;
+		private void Factory_OnTileError(object sender, TileErrorEventArgs e)
+		{
+			EventHandler<TileErrorEventArgs> handler = OnTileError;
+			if (handler != null)
+			{
+				handler(this, e);
+			}
+		}
+
+		/// <summary>
+		/// Event delegate, gets called when terrain factory finishes processing a tile.
+		/// </summary>
 		public event Action<UnityTile> OnTileHeightProcessingFinished = delegate {};
+		/// <summary>
+		/// Event delegate, gets called when image factory finishes processing a tile.
+		/// </summary>
 		public event Action<UnityTile> OnTileImageProcessingFinished = delegate {};
+		/// <summary>
+		/// Event delegate, gets called when vector factory finishes processing a tile.
+		/// </summary>
 		public event Action<UnityTile> OnTileVectorProcessingFinished = delegate {};
+
+		#endregion
 	}
 }

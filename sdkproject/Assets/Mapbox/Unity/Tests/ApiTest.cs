@@ -31,6 +31,15 @@ public class ApiTest : MonoBehaviour
 	void Start()
 	{
 		_abstractMap = FindObjectOfType<AbstractMap>();
+
+		_abstractMap.OnTilesStarting += (s) => { Debug.Log("Starting " + string.Join(",", s.Select(x => x.ToString()).ToArray())); };
+		_abstractMap.OnTileFinished += (s) => { Debug.Log("Finished " + s.CanonicalTileId); };
+		_abstractMap.OnTilesDisposing += (s) => { Debug.Log("Disposing " + string.Join(",", s.Select(x => x.ToString()).ToArray())); };
+
+		_abstractMap.MapVisualizer.OnTileHeightProcessingFinished += (s) => { Debug.Log("Terrain finished " + s.CanonicalTileId); };
+		_abstractMap.MapVisualizer.OnTileImageProcessingFinished += (s) => { Debug.Log("Image finished " + s.CanonicalTileId); };
+		_abstractMap.MapVisualizer.OnTileVectorProcessingFinished += (s) => { Debug.Log("Vector finished " + s.CanonicalTileId); };
+
 	}
 
 	[ContextMenu("ChangeExtentType")]

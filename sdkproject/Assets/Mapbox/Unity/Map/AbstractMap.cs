@@ -1229,10 +1229,25 @@ namespace Mapbox.Unity.Map
 		public event Action OnUpdated = delegate { };
 		public event Action OnMapRedrawn = delegate { };
 
+		/// <summary>
+		/// Event delegate, gets called when map preview is enabled
+		/// </summary>
 		public event Action OnEditorPreviewEnabled = delegate { };
+		/// <summary>
+		/// Event delegate, gets called when map preview is disabled
+		/// </summary>
 		public event Action OnEditorPreviewDisabled = delegate { };
+		/// <summary>
+		/// Event delegate, gets called when a tile is completed.
+		/// </summary>
 		public event Action<UnityTile> OnTileFinished = delegate { };
+		/// <summary>
+		/// Event delegate, gets called when new tiles coordinates are registered.
+		/// </summary>
 		public event Action<List<UnwrappedTileId>> OnTilesStarting = delegate { };
+		/// <summary>
+		/// Event delegate, gets called before a tile is getting recycled.
+		/// </summary>
 		public event Action<List<UnwrappedTileId>> OnTilesDisposing = delegate { };
 		#endregion
 	}

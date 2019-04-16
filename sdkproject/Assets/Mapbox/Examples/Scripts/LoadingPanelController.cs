@@ -28,14 +28,6 @@ namespace Mapbox.Examples
 			_map.OnEditorPreviewEnabled += OnEditorPreviewEnabled;
 			_map.OnEditorPreviewDisabled += OnEditorPreviewDisabled;
 
-			_map.OnTilesStarting += (s) => { Debug.Log("Starting " + string.Join(",", s.Select(x => x.ToString()).ToArray())); };
-			_map.OnTileFinished += (s) => { Debug.Log("Finished " + s.CanonicalTileId); };
-			_map.OnTilesDisposing += (s) => { Debug.Log("Disposing " + string.Join(",", s.Select(x => x.ToString()).ToArray())); };
-
-			_map.MapVisualizer.OnTileHeightProcessingFinished += (s) => { Debug.Log("Terrain finished " + s.CanonicalTileId); };
-			_map.MapVisualizer.OnTileImageProcessingFinished += (s) => { Debug.Log("Image finished " + s.CanonicalTileId); };
-			_map.MapVisualizer.OnTileVectorProcessingFinished += (s) => { Debug.Log("Vector finished " + s.CanonicalTileId); };
-
 		}
 
 		void _map_OnInitialized()
