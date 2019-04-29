@@ -56,6 +56,7 @@ namespace Mapbox.Unity.Map
 		public Dictionary<UnwrappedTileId, int> _tileProgress;
 
 		public event Action<ModuleState> OnMapVisualizerStateChanged = delegate { };
+		public event Action<UnityTile> OnTileFinished = delegate { };
 
 		/// <summary>
 		/// Gets the unity tile from unwrapped tile identifier.
@@ -139,6 +140,34 @@ namespace Mapbox.Unity.Map
 		#region Factory event callbacks
 		//factory event callback, not relaying this up for now
 
+
+		private void TileHeightStateChanged(UnityTile tile)
+		{
+			if (tile.HeightDataState == TilePropertyState.Loaded)
+			{
+				OnTileHeightProcessingFinished(tile);
+			}
+			TileStateChanged(tile);
+		}
+
+		private void TileRasterStateChanged(UnityTile tile)
+		{
+			if (tile.RasterDataState == TilePropertyState.Loaded)
+			{
+				OnTileImageProcessingFinished(tile);
+			}
+			TileStateChanged(tile);
+		}
+
+		private void TileVectorStateChanged(UnityTile tile)
+		{
+			if (tile.VectorDataState == TilePropertyState.Loaded)
+			{
+				OnTileVectorProcessingFinished(tile);
+			}
+			TileStateChanged(tile);
+		}
+
 		public virtual void TileStateChanged(UnityTile tile)
 		{
 			bool rasterDone = (tile.RasterDataState == TilePropertyState.None ||
@@ -158,6 +187,7 @@ namespace Mapbox.Unity.Map
 			if (rasterDone && terrainDone && vectorDone)
 			{
 				tile.TileState = MeshGeneration.Enums.TilePropertyState.Loaded;
+				OnTileFinished(tile);
 
 				// Check if all tiles in extent are active tiles
 				if (_map.CurrentExtent.Count == _activeTiles.Count)
@@ -182,6 +212,8 @@ namespace Mapbox.Unity.Map
 				{
 					State = ModuleState.Working;
 				}
+
+
 			}
 		}
 		#endregion
@@ -213,9 +245,9 @@ namespace Mapbox.Unity.Map
 #if UNITY_EDITOR
 			unityTile.gameObject.name = unityTile.CanonicalTileId.ToString();
 #endif
-			unityTile.OnHeightDataChanged += TileStateChanged;
-			unityTile.OnRasterDataChanged += TileStateChanged;
-			unityTile.OnVectorDataChanged += TileStateChanged;
+			unityTile.OnHeightDataChanged += TileHeightStateChanged;
+			unityTile.OnRasterDataChanged += TileRasterStateChanged;
+			unityTile.OnVectorDataChanged += TileVectorStateChanged;
 
 			unityTile.TileState = MeshGeneration.Enums.TilePropertyState.Loading;
 			ActiveTiles.Add(tileId, unityTile);
@@ -285,21 +317,6 @@ namespace Mapbox.Unity.Map
 
 			_inactiveTiles.Clear();
 			State = ModuleState.Initialized;
-		}
-
-		#region Events
-		/// <summary>
-		/// The  <c>OnTileError</c> event triggers when there's a <c>Tile</c> error.
-		/// Returns a <see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance as a parameter, for the tile on which error occurred.
-		/// </summary>
-		public event EventHandler<TileErrorEventArgs> OnTileError;
-		private void Factory_OnTileError(object sender, TileErrorEventArgs e)
-		{
-			EventHandler<TileErrorEventArgs> handler = OnTileError;
-			if (handler != null)
-			{
-				handler(this, e);
-			}
 		}
 
 		public void ReregisterAllTiles()
@@ -372,8 +389,36 @@ namespace Mapbox.Unity.Map
 				factory.UpdateTileProperty(tileBundle.Value, updateArgs);
 			}
 		}
+
+
+		#region Events
+		/// <summary>
+		/// The  <c>OnTileError</c> event triggers when there's a <c>Tile</c> error.
+		/// Returns a <see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance as a parameter, for the tile on which error occurred.
+		/// </summary>
+		public event EventHandler<TileErrorEventArgs> OnTileError;
+		private void Factory_OnTileError(object sender, TileErrorEventArgs e)
+		{
+			EventHandler<TileErrorEventArgs> handler = OnTileError;
+			if (handler != null)
+			{
+				handler(this, e);
+			}
+		}
+
+		/// <summary>
+		/// Event delegate, gets called when terrain factory finishes processing a tile.
+		/// </summary>
+		public event Action<UnityTile> OnTileHeightProcessingFinished = delegate {};
+		/// <summary>
+		/// Event delegate, gets called when image factory finishes processing a tile.
+		/// </summary>
+		public event Action<UnityTile> OnTileImageProcessingFinished = delegate {};
+		/// <summary>
+		/// Event delegate, gets called when vector factory finishes processing a tile.
+		/// </summary>
+		public event Action<UnityTile> OnTileVectorProcessingFinished = delegate {};
+
 		#endregion
-
-
 	}
 }

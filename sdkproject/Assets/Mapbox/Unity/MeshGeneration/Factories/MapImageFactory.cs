@@ -64,9 +64,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			if (tile != null)
 			{
+				_tilesWaitingResponse.Remove(tile);
+
 				if (tile.RasterDataState != TilePropertyState.Unregistered)
 				{
-					_tilesWaitingResponse.Remove(tile);
 					tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
 				}
 			}

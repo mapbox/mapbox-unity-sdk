@@ -35,12 +35,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		protected IFileSource _fileSource;
 
 		protected LayerProperties _options;
+
 		public LayerProperties Options
 		{
-			get
-			{
-				return _options;
-			}
+			get { return _options; }
 		}
 
 		protected HashSet<UnityTile> _tilesWaitingResponse;
