@@ -1,3 +1,4 @@
+using Mapbox.Platform.Cache;
 using Mapbox.Unity.Map.Interfaces;
 using Mapbox.Unity.Map.Strategies;
 using Mapbox.Unity.Map.TileProviders;
@@ -34,6 +35,7 @@ namespace Mapbox.Unity.Map
 		[SerializeField] protected AbstractTileProvider _tileProvider;
 		[SerializeField] protected HashSet<UnwrappedTileId> _currentExtent;
 		[SerializeField] protected EditorPreviewOptions _previewOptions = new EditorPreviewOptions();
+		private List<UnwrappedTileId> tilesToProcess;
 
 		protected AbstractMapVisualizer _mapVisualizer;
 		protected float _unityTileSize = 1;
@@ -68,6 +70,10 @@ namespace Mapbox.Unity.Map
 		{
 			get
 			{
+				if(_mapVisualizer == null)
+				{
+					_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
+				}
 				return _mapVisualizer;
 			}
 			set
@@ -456,7 +462,7 @@ namespace Mapbox.Unity.Map
 
 		private void OnEnable()
 		{
-
+			tilesToProcess = new List<UnwrappedTileId>();
 			if (_options.tileMaterial == null)
 			{
 				_options.tileMaterial = new Material(Shader.Find("Standard"));
@@ -499,7 +505,15 @@ namespace Mapbox.Unity.Map
 			// Destroy any ghost game objects.
 			DestroyChildObjects();
 			// Setup a visualizer to get a "Starter" map.
-			_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
+
+			if(_mapVisualizer == null)
+			{
+				_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
+			}
+			_mapVisualizer.OnTileFinished += (s) =>
+			{
+				OnTileFinished(s);
+			};
 		}
 
 		public void DestroyChildObjects()
@@ -871,18 +885,23 @@ namespace Mapbox.Unity.Map
 			var _activeTiles = _mapVisualizer.ActiveTiles;
 			_currentExtent = new HashSet<UnwrappedTileId>(currentExtent.activeTiles);
 
-			List<UnwrappedTileId> _toRemove = new List<UnwrappedTileId>();
+			tilesToProcess.Clear();
 			foreach (var item in _activeTiles)
 			{
 				if (TileProvider.Cleanup(item.Key))
 				{
-					_toRemove.Add(item.Key);
+					tilesToProcess.Add(item.Key);
 				}
 			}
 
-			foreach (var t2r in _toRemove)
+			if (tilesToProcess.Count > 0)
 			{
-				TileProvider_OnTileRemoved(t2r);
+				OnTilesDisposing(tilesToProcess);
+
+				foreach (var t2r in tilesToProcess)
+				{
+					TileProvider_OnTileRemoved(t2r);
+				}
 			}
 
 			foreach (var tile in _activeTiles)
@@ -891,13 +910,22 @@ namespace Mapbox.Unity.Map
 				TileProvider_OnTileRepositioned(tile.Key);
 			}
 
+			tilesToProcess.Clear();
 			foreach (var tile in _currentExtent)
 			{
 				if (!_activeTiles.ContainsKey(tile))
 				{
-					// Change Map Visualizer state
+					tilesToProcess.Add(tile);
+				}
+			}
+
+			if (tilesToProcess.Count > 0)
+			{
+				OnTilesStarting(tilesToProcess);
+				foreach (var tileId in tilesToProcess)
+				{
 					_mapVisualizer.State = ModuleState.Working;
-					TileProvider_OnTileAdded(tile);
+					TileProvider_OnTileAdded(tileId);
 				}
 			}
 		}
@@ -1201,8 +1229,26 @@ namespace Mapbox.Unity.Map
 		public event Action OnUpdated = delegate { };
 		public event Action OnMapRedrawn = delegate { };
 
+		/// <summary>
+		/// Event delegate, gets called when map preview is enabled
+		/// </summary>
 		public event Action OnEditorPreviewEnabled = delegate { };
+		/// <summary>
+		/// Event delegate, gets called when map preview is disabled
+		/// </summary>
 		public event Action OnEditorPreviewDisabled = delegate { };
+		/// <summary>
+		/// Event delegate, gets called when a tile is completed.
+		/// </summary>
+		public event Action<UnityTile> OnTileFinished = delegate { };
+		/// <summary>
+		/// Event delegate, gets called when new tiles coordinates are registered.
+		/// </summary>
+		public event Action<List<UnwrappedTileId>> OnTilesStarting = delegate { };
+		/// <summary>
+		/// Event delegate, gets called before a tile is getting recycled.
+		/// </summary>
+		public event Action<List<UnwrappedTileId>> OnTilesDisposing = delegate { };
 		#endregion
 	}
 }

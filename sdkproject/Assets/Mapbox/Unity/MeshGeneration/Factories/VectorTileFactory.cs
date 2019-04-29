@@ -59,6 +59,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		#region Public Methods
 		public void RedrawSubLayer(UnityTile tile, LayerVisualizerBase visualizer)
 		{
+			TrackFeatureWithBuilder(tile, visualizer.SubLayerProperties.coreOptions.layerName, visualizer);
 			CreateFeatureWithBuilder(tile, visualizer.SubLayerProperties.coreOptions.layerName, visualizer);
 		}
 
@@ -373,25 +374,42 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		#region Private Methods
 		private void CreateMeshes(UnityTile tile)
 		{
+			var nameList = new List<string>();
+			var builderList = new List<LayerVisualizerBase>();
+
 			foreach (var layerName in tile.VectorData.Data.LayerNames())
 			{
 				if (_layerBuilder.ContainsKey(layerName))
 				{
+					//two loops; first one to add it to waiting/tracking list, second to start it
 					foreach (var builder in _layerBuilder[layerName])
 					{
-						CreateFeatureWithBuilder(tile, layerName, builder);
+						nameList.Add(layerName);
+						builderList.Add(builder);
+						TrackFeatureWithBuilder(tile, layerName, builder);
 					}
 				}
 			}
+			for (int i = 0; i < nameList.Count; i++)
+			{
+				CreateFeatureWithBuilder(tile, nameList[i], builderList[i]);
+			}
 
+			builderList.Clear();
 			//emptylayer for visualizers that don't depend on outside data sources
 			string emptyLayer = "";
 			if (_layerBuilder.ContainsKey(emptyLayer))
 			{
+				//two loops; first one to add it to waiting/tracking list, second to start it
 				foreach (var builder in _layerBuilder[emptyLayer])
 				{
-					CreateFeatureWithBuilder(tile, emptyLayer, builder);
+					builderList.Add(builder);
+					TrackFeatureWithBuilder(tile, emptyLayer, builder);
 				}
+			}
+			for (int i = 0; i < builderList.Count; i++)
+			{
+				CreateFeatureWithBuilder(tile, emptyLayer, builderList[i]);
 			}
 
 			if (!_layerProgress.ContainsKey(tile))
@@ -400,7 +418,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		private void CreateFeatureWithBuilder(UnityTile tile, string layerName, LayerVisualizerBase builder)
+		private void TrackFeatureWithBuilder(UnityTile tile, string layerName, LayerVisualizerBase builder)
 		{
 			if (builder.Active)
 			{
@@ -410,12 +428,19 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 				else
 				{
-					_layerProgress.Add(tile, new HashSet<LayerVisualizerBase> { builder });
+					_layerProgress.Add(tile, new HashSet<LayerVisualizerBase> {builder});
 					if (!_tilesWaitingProcessing.Contains(tile))
 					{
 						_tilesWaitingProcessing.Add(tile);
 					}
 				}
+			}
+		}
+
+		private void CreateFeatureWithBuilder(UnityTile tile, string layerName, LayerVisualizerBase builder)
+		{
+			if (builder.Active)
+			{
 				if (layerName != "")
 				{
 					builder.Create(tile.VectorData.Data.GetLayer(layerName), tile, DecreaseProgressCounter);
@@ -427,6 +452,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 			}
 		}
+
 
 		private void DecreaseProgressCounter(UnityTile tile, LayerVisualizerBase builder)
 		{

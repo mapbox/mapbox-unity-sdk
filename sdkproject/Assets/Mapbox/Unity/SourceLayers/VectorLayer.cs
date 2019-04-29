@@ -3,6 +3,7 @@ using Mapbox.Utils;
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Factories;
 using Mapbox.Unity.Utilities;
 
@@ -237,7 +238,7 @@ namespace Mapbox.Unity.Map
 		/// of them each frame.
 		/// </summary>
 		/// <param name="entityPerCoroutine">Numbers of features to process each frame.</param>
-		/// 
+		///
 		public virtual void EnableVectorFeatureProcessingWithCoroutines(int entityPerCoroutine = 20)
 		{
 			if (_layerProperty.performanceOptions.isEnabled != true ||
@@ -655,5 +656,6 @@ namespace Mapbox.Unity.Map
 			}
 		}
 		#endregion
+
 	}
 }

@@ -1,4 +1,6 @@
 
+using System.Linq;
+
 namespace Mapbox.Examples
 {
 	using UnityEngine;
@@ -20,16 +22,17 @@ namespace Mapbox.Examples
 		AbstractMap _map;
 		void Awake()
 		{
-
 			_map = FindObjectOfType<AbstractMap>();
 			_map.OnInitialized += _map_OnInitialized;
 
 			_map.OnEditorPreviewEnabled += OnEditorPreviewEnabled;
 			_map.OnEditorPreviewDisabled += OnEditorPreviewDisabled;
+
 		}
 
 		void _map_OnInitialized()
 		{
+
 			var visualizer = _map.MapVisualizer;
 			_text.text = "LOADING";
 			visualizer.OnMapVisualizerStateChanged += (s) =>
