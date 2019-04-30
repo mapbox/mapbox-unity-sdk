@@ -223,8 +223,8 @@ if (!publishDocs) {
 			"git config user.name \"appveyor\"",
 			$"git commit -m \"pushed via [{originalCommit}] by [{commitAuthor}]\"",
 			$"git remote add origin https://{githubToken}@github.com/{repoName}.git",
-			"git checkout -b mb-pages",
-			"git push -f origin mb-pages"
+			"git checkout -b publisher-production",
+			"git push -f origin publisher-production"
 		});
 		foreach (var cmd in cmds) {
 			if (!RunCommand(cmd)) {
