@@ -30,7 +30,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		{
 			var item = properties as PrefabItemOptions;
 			SubLayerProperties = item;
-			//Active = item.isActive;
+
 			_performanceOptions = item.performanceOptions;
 
 			item.filterOptions.filters.Clear();
@@ -353,7 +353,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					//check if the coordinate is in the tile
 					Utils.Vector2d coordinate = Conversions.StringToLatLon(coordinates[i]);
 					Mapbox.Map.UnwrappedTileId coordinateTileId = Conversions.LatitudeLongitudeToTileId(
-						coordinate.x, coordinate.y, tile.InitialZoom);
+						coordinate.x, coordinate.y, tile.CurrentZoom);
 
 					if (coordinateTileId.Canonical.Equals(tile.CanonicalTileId))
 					{

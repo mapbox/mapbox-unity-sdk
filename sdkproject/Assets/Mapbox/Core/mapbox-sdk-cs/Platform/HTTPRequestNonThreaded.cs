@@ -29,8 +29,6 @@ namespace Mapbox.Platform {
 	using System.Linq;
 #endif
 
-	//using System.Windows.Threading;
-
 	internal sealed class HTTPRequestNonThreaded : IAsyncRequest {
 
 

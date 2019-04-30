@@ -43,7 +43,6 @@ namespace Mapbox.Examples
 
 		public ForwardGeocodeResponse Response { get; private set; }
 
-		//public event Action<> OnGeocoderResponse = delegate { };
 		public event Action<ForwardGeocodeResponse, bool> OnGeocoderResponse = delegate { };
 
 		void Awake()

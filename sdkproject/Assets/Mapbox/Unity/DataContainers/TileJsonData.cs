@@ -54,8 +54,6 @@
 		{
 			tileJSONLoaded = true;
 			List<string> layerPropertiesList = new List<string>();
-			// Un-comment if required. Throws a warning right now. 
-			//List<string> sourceLayersList = new List<string>();
 
 			if (tjr == null || tjr.VectorLayers == null || tjr.VectorLayers.Length == 0)
 			{
@@ -74,8 +72,6 @@
 				var layerName = layer.Id;
 				layerPropertiesList = new List<string>();
 				layerSource = layer.Source;
-				//if (layer.Fields.Count == 0)
-				//continue;
 
 				//loading layer sources
 				if (LayerSourcesDictionary.ContainsKey(layerName))
@@ -109,7 +105,6 @@
 							LayerDisplayNames.Remove(layerName);
 						}
 						LayerDisplayNames.Add(layerName);
-						//						LayerDisplayNames.Add(layerName + " " + commonLayersKey);
 					}
 					else
 					{
@@ -163,7 +158,6 @@
 									}
 
 									PropertyDisplayNames[layerName].Add(propertyName);
-									//PropertyDisplayNames[layerName].Add(propertyName + " " + optionalPropertiesString);
 								}
 							}
 						}

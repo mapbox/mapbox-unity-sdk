@@ -1,5 +1,3 @@
-using UnityEditor;
-
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
 	using UnityEngine;
@@ -91,8 +89,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					goRectTransform.localScale = _options.prefab.transform.localScale * (tile.TileScale);
 				}
 			}
-
-			//go.transform.localScale = Constants.Math.Vector3One;
 
 			settable = go.GetComponent<IFeaturePropertySettable>();
 			if (settable != null)

@@ -29,9 +29,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void CalculateParameters()
 		{
-			bottomOfTopUv = TextureRect.yMax - (TextureRect.size.y * TopSectionRatio); //not doing that scaling thing for y axis and floors yet
+			bottomOfTopUv = TextureRect.yMax - (TextureRect.size.y * TopSectionRatio);
 			topOfMidUv = TextureRect.yMax - (TextureRect.height * TopSectionRatio);
-			topOfBottomUv = TextureRect.yMin + (TextureRect.size.y * BottomSectionRatio); // * (Mathf.Max(1, (float)Math.Floor(tby * textureSection.TopSectionFloorCount)) / textureSection.TopSectionFloorCount);
+			topOfBottomUv = TextureRect.yMin + (TextureRect.size.y * BottomSectionRatio);
 			midUvHeight = TextureRect.height * (1 - TopSectionRatio - BottomSectionRatio);
 			WallToFloorRatio = (1 - TopSectionRatio - BottomSectionRatio) * (TextureRect.height / TextureRect.width);
 		}

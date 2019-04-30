@@ -11,7 +11,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	public class ColliderModifier : GameObjectModifier
 	{
 		//[SerializeField]
-		//private ColliderType _colliderType;
 		private IColliderStrategy _colliderStrategy;
 
 		[SerializeField]
@@ -69,7 +68,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			var existingCollider = ve.GameObject.GetComponent<Collider>();
 			if (existingCollider != null)
 			{
-				existingCollider.Destroy();
+				DestroyImmediate(existingCollider);
 				if (_colliderStrategy != null)
 				{
 					_colliderStrategy.Reset();

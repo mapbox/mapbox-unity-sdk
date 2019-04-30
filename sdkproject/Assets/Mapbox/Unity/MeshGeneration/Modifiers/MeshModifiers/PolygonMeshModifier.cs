@@ -25,8 +25,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		#region Atlas Fields
 
-		//texture uv fields
-		//public AtlasInfo AtlasInfo;
 		private Vector3 _vert;
 		private AtlasEntity _currentFacade;
 		private Quaternion _textureDirection;

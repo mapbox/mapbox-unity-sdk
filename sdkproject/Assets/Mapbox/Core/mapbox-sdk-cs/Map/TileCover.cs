@@ -85,12 +85,8 @@ namespace Mapbox.Map
 			Vector2d swWebMerc = new Vector2d(Math.Max(bounds.SouthWest.x, -Constants.WebMercMax), Math.Max(bounds.SouthWest.y, -Constants.WebMercMax));
 			Vector2d neWebMerc = new Vector2d(Math.Min(bounds.NorthEast.x, Constants.WebMercMax), Math.Min(bounds.NorthEast.y, Constants.WebMercMax));
 
-			//UnityEngine.Debug.LogFormat("swWebMerc:{0}/{1} neWebMerc:{2}/{3}", swWebMerc.x, swWebMerc.y, neWebMerc.x, neWebMerc.y);
-
 			UnwrappedTileId swTile = WebMercatorToTileId(swWebMerc, zoom);
 			UnwrappedTileId neTile = WebMercatorToTileId(neWebMerc, zoom);
-
-			//UnityEngine.Debug.LogFormat("swTile:{0} neTile:{1}", swTile, neTile);
 
 			for (int x = swTile.X; x <= neTile.X; x++)
 			{
@@ -101,7 +97,6 @@ namespace Mapbox.Map
 					//investigate formulas, this worked before
 					if (!canonicalTiles.Contains(uwtid.Canonical))
 					{
-						//Debug.LogFormat("TileCover.GetWithWebMerc: {0}/{1}/{2}", zoom, x, y);
 						tiles.Add(uwtid);
 						canonicalTiles.Add(uwtid.Canonical);
 					}
@@ -153,16 +148,6 @@ namespace Mapbox.Map
 			//same for WebMerc, so we have to flip x/y to make this formula work
 			double dblX = webMerc.x / Constants.WebMercMax;
 			double dblY = webMerc.y / Constants.WebMercMax;
-
-			//dblX = 1 + dblX;
-			//dblY = 1 - dblY;
-			//dblX /= 2;
-			//dblY /= 2;
-			//dblX *= tileCount;
-			//dblY *= tileCount;
-			//int x = (int)Math.Floor(dblX);
-			//int y = (int)Math.Floor(dblY);
-			//return new UnwrappedTileId(zoom, x, y);
 
 			int x = (int)Math.Floor((1 + dblX) / 2 * tileCount);
 			int y = (int)Math.Floor((1 - dblY) / 2 * tileCount);

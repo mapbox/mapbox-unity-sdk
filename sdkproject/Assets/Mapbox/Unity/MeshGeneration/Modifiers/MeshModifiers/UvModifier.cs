@@ -15,7 +15,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	public class UvModifier : MeshModifier
 	{
 		UVModifierOptions _options;
-		//public UvMapType UvType;
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
 		private int _mdVertexCount;
@@ -24,8 +23,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private List<Vector2> _uv = new List<Vector2>();
 
 		#region Atlas Fields
-		//texture uv fields
-		//public AtlasInfo AtlasInfo;
 		private AtlasEntity _currentFacade;
 		private Quaternion _textureDirection;
 		private Vector2[] _textureUvCoordinates;

@@ -52,9 +52,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		public override void Run(VectorEntity ve, UnityTile tile)
 		{
 			_spawnedCount = 0;
-			var collider = ve.GameObject.GetComponent<Collider>();
-			var bounds = collider.bounds;
-			var center = bounds.center;
+			var bounds = ve.Mesh.bounds;
+			var center = ve.Transform.position + bounds.center;
 			center.y = 0;
 
 			var area = (int)(bounds.size.x * bounds.size.z);
@@ -63,13 +62,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				var x = UnityEngine.Random.Range(-bounds.extents.x, bounds.extents.x);
 				var z = UnityEngine.Random.Range(-bounds.extents.z, bounds.extents.z);
-				var ray = new Ray(bounds.center + new Vector3(x, 100, z), Vector3.down * 2000);
+				var ray = new Ray(center + new Vector3(x, 100, z), Vector3.down * 2000);
 
 				RaycastHit hit;
-				//Debug.DrawRay(ray.origin, ray.direction * 1000, Color.yellow, 1000);
 				if (Physics.Raycast(ray, out hit, 150, _layerMask))
 				{
-					//Debug.DrawLine(ray.origin, hit.point, Color.red, 1000);
 					var index = UnityEngine.Random.Range(0, _prefabs.Length);
 					var transform = GetObject(index, ve.GameObject).transform;
 					transform.position = hit.point;

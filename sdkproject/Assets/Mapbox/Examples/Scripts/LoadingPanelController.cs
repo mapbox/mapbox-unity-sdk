@@ -1,10 +1,13 @@
 
+using System.Linq;
+
 namespace Mapbox.Examples
 {
 	using UnityEngine;
 	using Mapbox.Unity.Map;
 	using UnityEngine.UI;
 
+	[ExecuteInEditMode]
 	public class LoadingPanelController : MonoBehaviour
 	{
 		[SerializeField]
@@ -21,10 +24,15 @@ namespace Mapbox.Examples
 		{
 			_map = FindObjectOfType<AbstractMap>();
 			_map.OnInitialized += _map_OnInitialized;
+
+			_map.OnEditorPreviewEnabled += OnEditorPreviewEnabled;
+			_map.OnEditorPreviewDisabled += OnEditorPreviewDisabled;
+
 		}
 
 		void _map_OnInitialized()
 		{
+
 			var visualizer = _map.MapVisualizer;
 			_text.text = "LOADING";
 			visualizer.OnMapVisualizerStateChanged += (s) =>
@@ -44,8 +52,20 @@ namespace Mapbox.Examples
 					// when loading new tiles.
 					//_content.SetActive(true);
 				}
+
 			};
 		}
+
+		void OnEditorPreviewEnabled()
+		{
+			_content.SetActive(false);
+		}
+
+		void OnEditorPreviewDisabled()
+		{
+			_content.SetActive(true);
+		}
+
 
 		void Update()
 		{

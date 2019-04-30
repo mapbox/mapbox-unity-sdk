@@ -13,10 +13,8 @@ namespace Mapbox.Unity.Map.TileProviders
 
 		private Plane _groundPlane;
 		private bool _shouldUpdate;
-		private CameraBoundsTileProviderOptions _cbtpOptions;
+		[SerializeField] private CameraBoundsTileProviderOptions _cbtpOptions;
 
-		//private List<UnwrappedTileId> _toRemove;
-		//private HashSet<UnwrappedTileId> _tilesToRequest;
 		private Vector2dBounds _viewPortWebMercBounds;
 
 		#region Tile decision and raycasting fields
@@ -36,7 +34,14 @@ namespace Mapbox.Unity.Map.TileProviders
 		{
 			_tiles = new HashSet<UnwrappedTileId>();
 			_canonicalTiles = new HashSet<CanonicalTileId>();
-			_cbtpOptions = (CameraBoundsTileProviderOptions)_options;
+			if (Options != null)
+			{
+				_cbtpOptions = (CameraBoundsTileProviderOptions)_options;
+			}
+			else
+			{
+				_cbtpOptions = new CameraBoundsTileProviderOptions();
+			}
 
 			if (_cbtpOptions.camera == null)
 			{
@@ -73,12 +78,8 @@ namespace Mapbox.Unity.Map.TileProviders
 			Vector2d swWebMerc = new Vector2d(Math.Max(bounds.SouthWest.x, -Utils.Constants.WebMercMax), Math.Max(bounds.SouthWest.y, -Utils.Constants.WebMercMax));
 			Vector2d neWebMerc = new Vector2d(Math.Min(bounds.NorthEast.x, Utils.Constants.WebMercMax), Math.Min(bounds.NorthEast.y, Utils.Constants.WebMercMax));
 
-			//UnityEngine.Debug.LogFormat("swWebMerc:{0}/{1} neWebMerc:{2}/{3}", swWebMerc.x, swWebMerc.y, neWebMerc.x, neWebMerc.y);
-
 			UnwrappedTileId swTile = WebMercatorToTileId(swWebMerc, zoom);
 			UnwrappedTileId neTile = WebMercatorToTileId(neWebMerc, zoom);
-
-			//UnityEngine.Debug.LogFormat("swTile:{0} neTile:{1}", swTile, neTile);
 
 			for (int x = swTile.X; x <= neTile.X; x++)
 			{
@@ -89,7 +90,6 @@ namespace Mapbox.Unity.Map.TileProviders
 					//investigate formulas, this worked before
 					if (!_canonicalTiles.Contains(uwtid.Canonical))
 					{
-						//Debug.LogFormat("TileCover.GetWithWebMerc: {0}/{1}/{2}", zoom, x, y);
 						_tiles.Add(uwtid);
 						_canonicalTiles.Add(uwtid.Canonical);
 					}
@@ -169,7 +169,7 @@ namespace Mapbox.Unity.Map.TileProviders
 
 			Vector2d hitPntSWGeoPos = new Vector2d(minLat, minLong);
 			Vector2d hitPntNEGeoPos = new Vector2d(maxLat, maxLong);
-			Vector2dBounds tileBounds = new Vector2dBounds(Conversions.LatLonToMeters(hitPntSWGeoPos), Conversions.LatLonToMeters(hitPntNEGeoPos));			// Bounds debugging.
+			Vector2dBounds tileBounds = new Vector2dBounds(Conversions.LatLonToMeters(hitPntSWGeoPos), Conversions.LatLonToMeters(hitPntNEGeoPos));         // Bounds debugging.
 #if UNITY_EDITOR
 			Debug.DrawLine(_cbtpOptions.camera.transform.position, _map.GeoToWorldPosition(hitPntSWGeoPos), Color.blue);
 			Debug.DrawLine(_cbtpOptions.camera.transform.position, _map.GeoToWorldPosition(hitPntNEGeoPos), Color.red);

@@ -38,7 +38,7 @@
 		private bool _disposed;
 		private static object _lock = new object();
 		private Coroutine _pollLocation;
-		//private CultureInfo _invariantCulture = CultureInfo.InvariantCulture;
+
 		private AndroidJavaObject _activityContext = null;
 		private AndroidJavaObject _gpsInstance;
 		private AndroidJavaObject _sensorInstance;
@@ -187,14 +187,10 @@
 					return;
 				}
 
-				//_activityContext.Call("runOnUiThread", new AndroidJavaRunnable(() => { _sensorInstance.Call("showMessage", "starting sensor listeners"); }));
-
 				_sensorInstance.Call("startSensorListeners");
 			}
 		}
 
-
-		//private void Update() {
 		private IEnumerator locationRoutine()
 		{
 
@@ -346,7 +342,6 @@
 			else
 			{
 				_currentLocation.HasGpsFix = _gpsInstance.Get<bool>("hasGpsFix");
-				//int time2firstFix = _gpsInstance.Get<int>("timeToFirstGpsFix");
 				_currentLocation.SatellitesInView = _gpsInstance.Get<int>("satellitesInView");
 				_currentLocation.SatellitesUsed = _gpsInstance.Get<int>("satellitesUsedInFix");
 			}
@@ -382,31 +377,6 @@
 
 			// default to network
 			populateCurrentLocation(locNetwork);
-		}
-
-
-
-		protected virtual void Update()
-		{
-
-			/*
-			if (Input.GetKeyDown(KeyCode.Escape))
-			{
-				Debug.LogWarning("EXIT");
-#if UNITY_EDITOR
-				UnityEditor.EditorApplication.isPlaying = false;
-#else
-			if (Application.platform == RuntimePlatform.Android) {
-				AndroidJavaObject activity = new AndroidJavaClass("com.unity3d.player.UnityPlayer").GetStatic<AndroidJavaObject>("currentActivity");
-				//activity.Call<bool>("moveTaskToBack", true);
-				activity.Call("finishAndRemoveTask");
-				//activity.Call("finish");
-			} else {
-				Application.Quit();
-			}
-#endif
-			}
-			*/
 		}
 
 #if UNITY_ANDROID

@@ -9,6 +9,7 @@ namespace Mapbox.Unity.Telemetry
 	using UnityEngine;
 	using System.Text;
 	using UnityEditor;
+	using UnityEngine.Networking;
 
 	public class TelemetryEditor : ITelemetryLibrary
 	{
@@ -30,9 +31,6 @@ namespace Mapbox.Unity.Telemetry
 
 		public void SendTurnstile()
 		{
-			// This is only needed for maps at design-time.
-			//Runnable.EnableRunnableInEditor();
-
 			var ticks = DateTime.Now.Ticks;
 			if (ShouldPostTurnstile(ticks))
 			{
@@ -51,6 +49,7 @@ namespace Mapbox.Unity.Telemetry
 			jsonDict.Add("created", unixTimestamp);
 			jsonDict.Add("userId", SystemInfo.deviceUniqueIdentifier);
 			jsonDict.Add("enabled.telemetry", false);
+			jsonDict.Add("sdkIdentifier", GetSDKIdentifier());
 			eventList.Add(jsonDict);
 
 			var jsonString = JsonConvert.SerializeObject(eventList);
@@ -72,17 +71,33 @@ namespace Mapbox.Unity.Telemetry
 		IEnumerator PostWWW(string url, string bodyJsonString)
 		{
 			byte[] bodyRaw = Encoding.UTF8.GetBytes(bodyJsonString);
-			var headers = new Dictionary<string, string>();
-			headers.Add("Content-Type", "application/json");
-			headers.Add("user-agent", GetUserAgent());
 
-			var www = new WWW(url, bodyRaw, headers);
-			yield return www;
-			while (!www.isDone) { yield return null; }
+#if UNITY_2017_1_OR_NEWER
+			UnityWebRequest postRequest = new UnityWebRequest(url, "POST");
+			postRequest.SetRequestHeader("Content-Type", "application/json");
 
-			// www doesn't expose HTTP status code, relay on 'error' property
-			if (!string.IsNullOrEmpty(www.error))
+			postRequest.downloadHandler = new DownloadHandlerBuffer();
+			postRequest.uploadHandler = new UploadHandlerRaw(bodyRaw);
+
+			yield return postRequest.SendWebRequest();
+
+			while (!postRequest.isDone) { yield return null; }
+
+			if (!postRequest.isNetworkError)
 			{
+#else
+				var headers = new Dictionary<string, string>();
+				headers.Add("Content-Type", "application/json");
+				headers.Add("user-agent", GetUserAgent());
+				var www = new WWW(url, bodyRaw, headers);
+				yield return www;
+
+				while (!www.isDone) { yield return null; }
+
+				// www doesn't expose HTTP status code, relay on 'error' property
+				if (!string.IsNullOrEmpty(www.error))
+				{
+#endif
 				PlayerPrefs.SetString(Constants.Path.TELEMETRY_TURNSTILE_LAST_TICKS_EDITOR_KEY, "0");
 			}
 			else
@@ -107,6 +122,14 @@ namespace Mapbox.Unity.Telemetry
 				 Constants.SDK_VERSION
 			);
 			return userAgent;
+		}
+
+		private string GetSDKIdentifier()
+		{
+			var sdkIdentifier = string.Format("MapboxEventsUnity{0}",
+										  Application.platform
+										 );
+			return sdkIdentifier;
 		}
 
 		public void SetLocationCollectionState(bool enable)

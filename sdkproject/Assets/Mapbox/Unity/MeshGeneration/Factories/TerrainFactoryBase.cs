@@ -64,6 +64,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				tile.SetHeightData(null);
 				tile.MeshFilter.sharedMesh.Clear();
 				tile.ElevationType = TileTerrainType.None;
+				tile.HeightDataState = TilePropertyState.None;
 				return;
 			}
 
@@ -122,11 +123,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			if (tile != null)
 			{
 				_tilesWaitingResponse.Remove(tile);
+
 				if (tile.HeightDataState != TilePropertyState.Unregistered)
 				{
 					tile.SetHeightData(pngRasterTile.Data, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
 					Strategy.RegisterTile(tile);
 				}
+
+
 			}
 		}
 

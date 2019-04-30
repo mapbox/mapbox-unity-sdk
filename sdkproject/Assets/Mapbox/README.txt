@@ -11,7 +11,7 @@ API: https://www.mapbox.com/mapbox-unity-sdk/api/
 
 
 
-Current version: 2.0.0, as of October 15th, 2018
+Current version: 2.0.1, as of December 21st, 2018
 
 Changelog: https://www.mapbox.com/mapbox-unity-sdk/docs/05-changelog.html
 

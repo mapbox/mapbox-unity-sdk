@@ -54,12 +54,14 @@
 			switch (kind)
 			{
 				case MapExtentType.CameraBounds:
+					GUILayout.Space(_lineHeight);
 					EditorGUILayout.PropertyField(defaultExtentsProp.FindPropertyRelative("cameraBoundsOptions"), new GUIContent { text = "CameraOptions-" });
 					break;
 				case MapExtentType.RangeAroundCenter:
 					EditorGUILayout.PropertyField(defaultExtentsProp.FindPropertyRelative("rangeAroundCenterOptions"), new GUIContent { text = "RangeAroundCenter" });
 					break;
 				case MapExtentType.RangeAroundTransform:
+					GUILayout.Space(_lineHeight);
 					EditorGUILayout.PropertyField(defaultExtentsProp.FindPropertyRelative("rangeAroundTransformOptions"), new GUIContent { text = "RangeAroundTransform" });
 					break;
 				default:
