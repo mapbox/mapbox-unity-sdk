@@ -59,7 +59,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		#region Public Methods
 		public void RedrawSubLayer(UnityTile tile, LayerVisualizerBase visualizer)
 		{
-			TrackFeatureWithBuilder(tile, visualizer.SubLayerProperties.coreOptions.layerName, visualizer);
 			CreateFeatureWithBuilder(tile, visualizer.SubLayerProperties.coreOptions.layerName, visualizer);
 		}
 
@@ -441,6 +440,18 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			if (builder.Active)
 			{
+				if (_layerProgress.ContainsKey(tile))
+				{
+					_layerProgress[tile].Add(builder);
+				}
+				else
+				{
+					_layerProgress.Add(tile, new HashSet<LayerVisualizerBase> { builder });
+					if (!_tilesWaitingProcessing.Contains(tile))
+					{
+						_tilesWaitingProcessing.Add(tile);
+					}
+				}
 				if (layerName != "")
 				{
 					builder.Create(tile.VectorData.Data.GetLayer(layerName), tile, DecreaseProgressCounter);
@@ -452,7 +463,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 			}
 		}
-
 
 		private void DecreaseProgressCounter(UnityTile tile, LayerVisualizerBase builder)
 		{

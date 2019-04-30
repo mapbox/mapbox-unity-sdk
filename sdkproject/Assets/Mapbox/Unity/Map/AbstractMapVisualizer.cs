@@ -186,7 +186,6 @@ namespace Mapbox.Unity.Map
 
 			if (rasterDone && terrainDone && vectorDone)
 			{
-				Debug.Log("Tile Done");
 				tile.TileState = MeshGeneration.Enums.TilePropertyState.Loaded;
 				OnTileFinished(tile);
 
