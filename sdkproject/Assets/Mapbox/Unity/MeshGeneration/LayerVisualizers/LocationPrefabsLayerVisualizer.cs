@@ -30,17 +30,10 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		{
 			var item = properties as PrefabItemOptions;
 			SubLayerProperties = item;
-			//Active = item.isActive;
+
 			_performanceOptions = item.performanceOptions;
 
 			item.filterOptions.filters.Clear();
-
-			if (item.spawnPrefabOptions.prefab == null)
-			{
-				//item.spawnPrefabOptions.prefab = GameObject.CreatePrimitive(PrimitiveType.Cube);
-				item.spawnPrefabOptions.prefab = Resources.Load<GameObject>("MapboxPin");
-				Debug.LogError("No prefab found. Please assign a prefab to spawn it on the map");
-			}
 
 			//These are fixed properties
 			item.coreOptions.geometryType = item.primitiveType;
@@ -57,6 +50,12 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			{
 				item.coreOptions.layerName = layerName;
 				base.Key = layerName;
+			}
+
+			if (item.spawnPrefabOptions.prefab == null)
+			{
+				item.spawnPrefabOptions.prefab = Resources.Load<GameObject>("MapboxPin");
+				Debug.LogWarning("No prefab assigned for POI Layer - " + layerName + " , using default prefab! You may want to assign a custom prefab.");
 			}
 
 			//These properties are dependent on user choices
@@ -105,7 +104,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 						{
 							if (_prefabModifier != null)
 							{
-								_prefabModifier.ClearCaches();
+								_prefabModifier.Clear();
 							}
 							_defaultStack.GoModifiers.Clear();
 						}
@@ -354,7 +353,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					//check if the coordinate is in the tile
 					Utils.Vector2d coordinate = Conversions.StringToLatLon(coordinates[i]);
 					Mapbox.Map.UnwrappedTileId coordinateTileId = Conversions.LatitudeLongitudeToTileId(
-						coordinate.x, coordinate.y, tile.InitialZoom);
+						coordinate.x, coordinate.y, tile.CurrentZoom);
 
 					if (coordinateTileId.Canonical.Equals(tile.CanonicalTileId))
 					{

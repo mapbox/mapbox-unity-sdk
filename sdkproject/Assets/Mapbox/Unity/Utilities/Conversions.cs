@@ -390,7 +390,7 @@ namespace Mapbox.Unity.Utilities
 
 		public static float GetAbsoluteHeightFromColor(float r, float g, float b)
 		{
-			return (float)(-10000 + ((r * 256 * 256 + g * 256 + b) * 0.1));
+			return (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
 		}
 
 		private static double Resolution(int zoom)

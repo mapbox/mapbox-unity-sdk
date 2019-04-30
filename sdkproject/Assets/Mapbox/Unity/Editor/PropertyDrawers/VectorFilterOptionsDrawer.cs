@@ -156,6 +156,7 @@
 			if (GUILayout.Button(new GUIContent(" X "), (GUIStyle)"minibuttonright", GUILayout.Width(30)))
 			{
 				vectorFilterOptions.RemoveFilter(index);
+				propertyFilters.DeleteArrayElementAtIndex(index);
 			}
 
 			EditorGUILayout.EndHorizontal();
@@ -265,7 +266,7 @@
 		{
 			GUIStyle labelStyle = new GUIStyle(EditorStyles.popup);
 			labelStyle.fontStyle = FontStyle.Bold;
-			EditorGUILayout.LabelField(new GUIContent(), new GUIContent("No properties"), labelStyle, new GUILayoutOption[] { GUILayout.MaxWidth(155) });//(GUIStyle)"minipopUp");
+			EditorGUILayout.LabelField(new GUIContent(), new GUIContent("No properties"), labelStyle, new GUILayoutOption[] { GUILayout.MaxWidth(155) });
 			return;
 		}
 	}

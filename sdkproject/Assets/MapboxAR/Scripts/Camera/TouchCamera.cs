@@ -75,8 +75,6 @@
 				}
 				else
 				{
-					//Vector2 screen = new Vector2(_camera.pixelWidth, _camera.pixelHeight);
-
 					Vector2[] newTouchPositions = { Input.GetTouch(0).position, Input.GetTouch(1).position };
 					Vector2 newTouchVector = newTouchPositions[0] - newTouchPositions[1];
 					float newTouchDistance = newTouchVector.magnitude;

@@ -52,8 +52,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 		}
 
-		//public event System.EventHandler VectorHasChanged;
-
 		protected LayerPerformanceOptions _performanceOptions;
 		protected Dictionary<UnityTile, List<int>> _activeCoroutines;
 		int _entityInCurrentCoroutine = 0;
@@ -62,6 +60,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		private HashSet<ulong> _activeIds;
 		private Dictionary<UnityTile, List<ulong>> _idPool; //necessary to keep _activeIds list up to date when unloading tiles
 		private string _key;
+
+		protected HashSet<ModifierBase> _coreModifiers = new HashSet<ModifierBase>();
 
 		public override string Key
 		{
@@ -87,6 +87,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			if (mod == null)
 			{
 				mod = (MeshModifier)CreateInstance(typeof(T));
+				_coreModifiers.Add(mod);
 				_defaultStack.MeshModifiers.Add(mod);
 			}
 			return (T)mod;
@@ -98,6 +99,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			if (mod == null)
 			{
 				mod = (GameObjectModifier)CreateInstance(typeof(T));
+				_coreModifiers.Add(mod);
 				_defaultStack.GoModifiers.Add(mod);
 			}
 			return (T)mod;
@@ -148,6 +150,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		public override void SetProperties(VectorSubLayerProperties properties)
 		{
+			_coreModifiers = new HashSet<ModifierBase>();
+
 			if (_layerProperties == null && properties != null)
 			{
 				_layerProperties = properties;
@@ -159,8 +163,14 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			if (_layerProperties.coreOptions.combineMeshes)
 			{
-				if (_defaultStack == null || !(_defaultStack is MergedModifierStack))
+				if (_defaultStack == null)
 				{
+					_defaultStack = ScriptableObject.CreateInstance<MergedModifierStack>();
+				}
+				else if (!(_defaultStack is MergedModifierStack))
+				{
+					_defaultStack.Clear();
+					DestroyImmediate(_defaultStack);
 					_defaultStack = ScriptableObject.CreateInstance<MergedModifierStack>();
 				}
 				else
@@ -173,8 +183,15 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 			else
 			{
-				if (_defaultStack == null || !(_defaultStack is ModifierStack))
+				if (_defaultStack == null)
 				{
+					_defaultStack = ScriptableObject.CreateInstance<ModifierStack>();
+					((ModifierStack)_defaultStack).moveFeaturePositionTo = _layerProperties.moveFeaturePositionTo;
+				}
+				if (!(_defaultStack is ModifierStack))
+				{
+					_defaultStack.Clear();
+					DestroyImmediate(_defaultStack);
 					_defaultStack = ScriptableObject.CreateInstance<ModifierStack>();
 					((ModifierStack)_defaultStack).moveFeaturePositionTo = _layerProperties.moveFeaturePositionTo;
 				}
@@ -208,7 +225,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 						// Let the user add anything that they want
 						if (_layerProperties.coreOptions.snapToTerrain == true)
 						{
-							//defaultMeshModifierStack.Add(CreateInstance<SnapTerrainModifier>());
 							AddOrCreateMeshModifier<SnapTerrainModifier>();
 						}
 
@@ -254,15 +270,13 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 							AddOrCreateMeshModifier<SnapTerrainModifier>();
 						}
 
-						AddOrCreateMeshModifier<PolygonMeshModifier>();
+						var poly = AddOrCreateMeshModifier<PolygonMeshModifier>();
 
 						UVModifierOptions uvModOptions = new UVModifierOptions();
 						uvModOptions.texturingType = (_layerProperties.materialOptions.style == StyleTypes.Custom) ? _layerProperties.materialOptions.customStyleOptions.texturingType : _layerProperties.materialOptions.texturingType;
 						uvModOptions.atlasInfo = (_layerProperties.materialOptions.style == StyleTypes.Custom) ? _layerProperties.materialOptions.customStyleOptions.atlasInfo : _layerProperties.materialOptions.atlasInfo;
 						uvModOptions.style = _layerProperties.materialOptions.style;
-
-						var uvMod = AddOrCreateMeshModifier<UvModifier>();
-						uvMod.SetProperties(uvModOptions);
+						poly.SetProperties(uvModOptions);
 
 						if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
 						{
@@ -329,27 +343,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			{
 				_defaultStack.GoModifiers.AddRange(_layerProperties.GoModifiers);
 			}
-			//Adding filters from the types dropdown
-
-			//if ((MapboxSpecialLayerParameters.LayerNameTypeProperty.ContainsKey(properties.coreOptions.layerName)) && !string.IsNullOrEmpty(properties.selectedTypes))
-			//{
-			//	LayerFilter filter = new LayerFilter(LayerFilterOperationType.Contains);
-
-			//	filter.Key = MapboxSpecialLayerParameters.LayerNameTypeProperty[properties.coreOptions.layerName];
-			//	filter.PropertyValue = properties.selectedTypes;
-
-			//	//if (properties.coreOptions.layerName == properties.roadLayer)
-			//	//{
-			//	//	filter.Key = properties.roadLayer_TypeProperty;
-			//	//	filter.PropertyValue = properties.selectedTypes;
-			//	//}
-			//	//else if (properties.coreOptions.layerName == "landuse")
-			//	//{
-			//	//	filter.Key = properties.landuseLayer_TypeProperty;
-			//	//	filter.PropertyValue = properties.selectedTypes;
-			//	//}
-			//	properties.filterOptions.filters.Add(filter);
-			//}
 
 			_layerProperties.PropertyHasChanged += UpdateVector;
 		}
@@ -380,7 +373,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			_activeIds.Add(feature.Data.Id);
 			if (!_idPool.ContainsKey(tile))
 			{
-				_idPool.Add(tile, new List<ulong>());
+				_idPool.Add(tile, new List<ulong>() { feature.Data.Id });
 			}
 			else
 			{
@@ -459,6 +452,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		{
 			base.Initialize();
 			_entityInCurrentCoroutine = 0;
+
 			_activeCoroutines = new Dictionary<UnityTile, List<int>>();
 			_activeIds = new HashSet<ulong>();
 			_idPool = new Dictionary<UnityTile, List<ulong>>();
@@ -487,9 +481,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		protected IEnumerator ProcessLayer(VectorTileLayer layer, UnityTile tile, UnwrappedTileId tileId, Action<UnityTile, LayerVisualizerBase> callback = null)
 		{
-			//HACK to prevent request finishing on same frame which breaks modules started/finished events
-			yield return null;
-
 			if (tile == null)
 			{
 				yield break;
@@ -521,7 +512,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			tempLayerProperties.buildingsWithUniqueIds = (_layerProperties.honorBuildingIdSetting) && _layerProperties.buildingsWithUniqueIds;
 
-			////find any replacement criteria and assign them
+			//find any replacement criteria and assign them
 			foreach (var goModifier in _defaultStack.GoModifiers)
 			{
 				if (goModifier is IReplacementCriteria && goModifier.Active)
@@ -545,7 +536,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 					ProcessFeature(i, tile, tempLayerProperties, layer.Extent);
 
-					if (IsCoroutineBucketFull)
+					if (IsCoroutineBucketFull && !(Application.isEditor && !Application.isPlaying))
 					{
 						//Reset bucket..
 						_entityInCurrentCoroutine = 0;
@@ -647,7 +638,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		protected void PreProcessFeatures(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
 		{
-			////find any replacement criteria and assign them
+			//find any replacement criteria and assign them
 			foreach (var goModifier in _defaultStack.GoModifiers)
 			{
 				if (goModifier is IReplacementCriteria && goModifier.Active)
@@ -683,47 +674,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 		}
 
-		protected void PostProcessFeatures(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
-		{
-			//var mergedStack = _defaultStack as MergedModifierStack;
-			//if (mergedStack != null && tile != null)
-			//{
-			//	mergedStack.End(tile, tile.gameObject, _vectorFeaturesPerTile[tile].vectorTileLayer.Name);
-			//}
-		}
-		private string FindSelectorKey(VectorFeatureUnity feature)
-		{
-			// TODO: FIX THIS!!
-			//if (string.IsNullOrEmpty(_classificationKey))
-			//{
-			//	if (feature.Properties.ContainsKey("type"))
-			//	{
-			//		return feature.Properties["type"].ToString().ToLowerInvariant();
-			//	}
-			//	else if (feature.Properties.ContainsKey("class"))
-			//	{
-			//		return feature.Properties["class"].ToString().ToLowerInvariant();
-			//	}
-			//}
-			//else
-			//TODO: Come back to this.
-			//var size = _layerProperties.coreOptions.propertyValuePairs.Count;
-			//for (int i = 0; i < size; i++)
-			//{
-			//	var key = _layerProperties.coreOptions.propertyValuePairs[i].featureKey;
-			//	if (feature.Properties.ContainsKey(key))
-			//	{
-			//		if (feature.Properties.ContainsKey(key))
-			//		{
-			//			return feature.Properties[key].ToString().ToLowerInvariant();
-			//		}
-			//	}
-			//}
-
-
-			return Key;
-		}
-
 		/// <summary>
 		/// Handle tile destruction event and propagate it to modifier stacks
 		/// </summary>
@@ -754,13 +704,41 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				}
 				_idPool[tile].Clear();
 			}
-			//UnbindSubLayerEvents();
 		}
 
-		public override void ClearCaches()
+		public override void Clear()
 		{
 			_idPool.Clear();
-			_defaultStack.ClearCaches();
+			_defaultStack.Clear();
+
+			foreach (var mod in _defaultStack.MeshModifiers)
+			{
+				if (mod == null)
+				{
+					continue;
+				}
+
+				if (_coreModifiers.Contains(mod))
+				{
+					DestroyImmediate(mod);
+				}
+			}
+
+			foreach (var mod in _defaultStack.GoModifiers)
+			{
+				if (mod == null)
+				{
+					continue;
+				}
+
+				mod.Clear();
+				if (_coreModifiers.Contains(mod))
+				{
+					DestroyImmediate(mod);
+				}
+			}
+
+			DestroyImmediate(_defaultStack);
 		}
 	}
 }

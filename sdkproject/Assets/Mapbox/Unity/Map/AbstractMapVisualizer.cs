@@ -56,6 +56,7 @@ namespace Mapbox.Unity.Map
 		public Dictionary<UnwrappedTileId, int> _tileProgress;
 
 		public event Action<ModuleState> OnMapVisualizerStateChanged = delegate { };
+		public event Action<UnityTile> OnTileFinished = delegate { };
 
 		/// <summary>
 		/// Gets the unity tile from unwrapped tile identifier.
@@ -102,7 +103,6 @@ namespace Mapbox.Unity.Map
 
 		private void RegisterEvents(AbstractTileFactory factory)
 		{
-			//directly relaying to map visualizer event for now, nothing doing special
 			factory.OnTileError += Factory_OnTileError;
 		}
 
@@ -140,6 +140,34 @@ namespace Mapbox.Unity.Map
 		#region Factory event callbacks
 		//factory event callback, not relaying this up for now
 
+
+		private void TileHeightStateChanged(UnityTile tile)
+		{
+			if (tile.HeightDataState == TilePropertyState.Loaded)
+			{
+				OnTileHeightProcessingFinished(tile);
+			}
+			TileStateChanged(tile);
+		}
+
+		private void TileRasterStateChanged(UnityTile tile)
+		{
+			if (tile.RasterDataState == TilePropertyState.Loaded)
+			{
+				OnTileImageProcessingFinished(tile);
+			}
+			TileStateChanged(tile);
+		}
+
+		private void TileVectorStateChanged(UnityTile tile)
+		{
+			if (tile.VectorDataState == TilePropertyState.Loaded)
+			{
+				OnTileVectorProcessingFinished(tile);
+			}
+			TileStateChanged(tile);
+		}
+
 		public virtual void TileStateChanged(UnityTile tile)
 		{
 			bool rasterDone = (tile.RasterDataState == TilePropertyState.None ||
@@ -159,13 +187,13 @@ namespace Mapbox.Unity.Map
 			if (rasterDone && terrainDone && vectorDone)
 			{
 				tile.TileState = MeshGeneration.Enums.TilePropertyState.Loaded;
-				//tile.gameObject.SetActive(true);
+				OnTileFinished(tile);
 
 				// Check if all tiles in extent are active tiles
 				if (_map.CurrentExtent.Count == _activeTiles.Count)
 				{
 					bool allDone = true;
-					// Check if all tiles are loaded. 
+					// Check if all tiles are loaded.
 					foreach (var currentTile in _map.CurrentExtent)
 					{
 						allDone = allDone && (_activeTiles.ContainsKey(currentTile) && _activeTiles[currentTile].TileState == TilePropertyState.Loaded);
@@ -184,6 +212,8 @@ namespace Mapbox.Unity.Map
 				{
 					State = ModuleState.Working;
 				}
+
+
 			}
 		}
 		#endregion
@@ -204,7 +234,7 @@ namespace Mapbox.Unity.Map
 			if (unityTile == null)
 			{
 				unityTile = new GameObject().AddComponent<UnityTile>();
-				unityTile.MeshRenderer.material = _map.TileMaterial;
+				unityTile.MeshRenderer.sharedMaterial = Instantiate(_map.TileMaterial);
 				unityTile.transform.SetParent(_map.Root, false);
 			}
 
@@ -215,9 +245,9 @@ namespace Mapbox.Unity.Map
 #if UNITY_EDITOR
 			unityTile.gameObject.name = unityTile.CanonicalTileId.ToString();
 #endif
-			unityTile.OnHeightDataChanged += TileStateChanged;
-			unityTile.OnRasterDataChanged += TileStateChanged;
-			unityTile.OnVectorDataChanged += TileStateChanged;
+			unityTile.OnHeightDataChanged += TileHeightStateChanged;
+			unityTile.OnRasterDataChanged += TileRasterStateChanged;
+			unityTile.OnVectorDataChanged += TileVectorStateChanged;
 
 			unityTile.TileState = MeshGeneration.Enums.TilePropertyState.Loading;
 			ActiveTiles.Add(tileId, unityTile);
@@ -259,19 +289,34 @@ namespace Mapbox.Unity.Map
 
 		protected abstract void PlaceTile(UnwrappedTileId tileId, UnityTile tile, IMapReadable map);
 
-		#region Events
-		/// <summary>
-		/// The  <c>OnTileError</c> event triggers when there's a <c>Tile</c> error.
-		/// Returns a <see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance as a parameter, for the tile on which error occurred.
-		/// </summary>
-		public event EventHandler<TileErrorEventArgs> OnTileError;
-		private void Factory_OnTileError(object sender, TileErrorEventArgs e)
+		public void ClearMap()
 		{
-			EventHandler<TileErrorEventArgs> handler = OnTileError;
-			if (handler != null)
+			UnregisterAllTiles();
+			if (Factories != null)
 			{
-				handler(this, e);
+				foreach (var tileFactory in Factories)
+				{
+					if (tileFactory != null)
+					{
+						tileFactory.Clear();
+						DestroyImmediate(tileFactory);
+					}
+				}
 			}
+			foreach (var tileId in _activeTiles.Keys.ToList())
+			{
+				_activeTiles[tileId].ClearAssets();
+				DisposeTile(tileId);
+			}
+
+			foreach (var tile in _inactiveTiles)
+			{
+				tile.ClearAssets();
+				DestroyImmediate(tile.gameObject);
+			}
+
+			_inactiveTiles.Clear();
+			State = ModuleState.Initialized;
 		}
 
 		public void ReregisterAllTiles()
@@ -310,6 +355,7 @@ namespace Mapbox.Unity.Map
 			{
 				factory.UnregisterLayer(tileBundle.Value, layerVisualizer);
 			}
+			layerVisualizer.Clear();
 			layerVisualizer.UnbindSubLayerEvents();
 			layerVisualizer.SetProperties(layerVisualizer.SubLayerProperties);
 			layerVisualizer.InitializeStack();
@@ -344,13 +390,35 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public void ClearCaches()
+
+		#region Events
+		/// <summary>
+		/// The  <c>OnTileError</c> event triggers when there's a <c>Tile</c> error.
+		/// Returns a <see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance as a parameter, for the tile on which error occurred.
+		/// </summary>
+		public event EventHandler<TileErrorEventArgs> OnTileError;
+		private void Factory_OnTileError(object sender, TileErrorEventArgs e)
 		{
-			foreach (var abstractTileFactory in Factories)
+			EventHandler<TileErrorEventArgs> handler = OnTileError;
+			if (handler != null)
 			{
-				abstractTileFactory.Reset();
+				handler(this, e);
 			}
 		}
+
+		/// <summary>
+		/// Event delegate, gets called when terrain factory finishes processing a tile.
+		/// </summary>
+		public event Action<UnityTile> OnTileHeightProcessingFinished = delegate {};
+		/// <summary>
+		/// Event delegate, gets called when image factory finishes processing a tile.
+		/// </summary>
+		public event Action<UnityTile> OnTileImageProcessingFinished = delegate {};
+		/// <summary>
+		/// Event delegate, gets called when vector factory finishes processing a tile.
+		/// </summary>
+		public event Action<UnityTile> OnTileVectorProcessingFinished = delegate {};
+
 		#endregion
 	}
 }

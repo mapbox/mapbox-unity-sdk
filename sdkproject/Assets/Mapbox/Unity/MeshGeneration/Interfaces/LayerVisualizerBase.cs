@@ -14,8 +14,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		public abstract bool Active { get; }
 		public abstract string Key { get; set; }
 		public abstract VectorSubLayerProperties SubLayerProperties { get; set; }
-		//public event Action FeaturePreProcessEvent;
-		//public event Action FeaturePostProcessEvent;
+
 		public abstract void Create(VectorTileLayer layer, UnityTile tile, Action<UnityTile, LayerVisualizerBase> callback = null);
 
 		public event System.EventHandler LayerVisualizerHasChanged;
@@ -33,11 +32,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		}
 
-		public virtual void ClearCaches()
+		public virtual void Clear()
 		{
 
 		}
-		
+
 		public void UnregisterTile(UnityTile tile)
 		{
 			OnUnregisterTile(tile);

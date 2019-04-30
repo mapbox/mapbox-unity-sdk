@@ -19,7 +19,6 @@ namespace Mapbox.Unity.Utilities.DebugTools
 			for (int i = 0; i < allScenes.Count; i++)
 			{
 				EditorBuildSettingsScene sceneToAdd = new EditorBuildSettingsScene(allScenes[i], true);
-				//sceneToAdd.enabled = false;
 				buildScenes[i + 1] = sceneToAdd;
 			}
 

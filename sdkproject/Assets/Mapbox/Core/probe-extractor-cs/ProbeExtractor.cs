@@ -79,13 +79,6 @@
 				bearings[insertIdx] = bearing < 0 ? 360 + bearing : bearing;
 			}
 
-
-			//UnityEngine.Debug.Log("durations:" + string.Join(", ", durations.Select(d => d.ToString(CultureInfo.InvariantCulture)).ToArray()));
-			//UnityEngine.Debug.Log("distances:" + string.Join(", ", distances.Select(d => d.ToString(CultureInfo.InvariantCulture)).ToArray()));
-			//UnityEngine.Debug.Log("speeds:" + string.Join(", ", speeds.Select(s => s.ToString(CultureInfo.InvariantCulture)).ToArray()));
-			//UnityEngine.Debug.Log("bearings:" + string.Join(", ", bearings.Select(b => b.ToString(CultureInfo.InvariantCulture)).ToArray()));
-
-
 			List<Probe> probes = new List<Probe>();
 
 			// 1st pass: iterate trace points and determine if they are good

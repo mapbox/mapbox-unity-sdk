@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Mapbox.Map;
 using Mapbox.Unity.Utilities;
@@ -9,12 +9,12 @@ namespace Mapbox.Unity.Map.TileProviders
 {
 	public class QuadTreeTileProvider : AbstractTileProvider
 	{
+		private static readonly int HIT_POINTS_COUNT = 4;
+
 		private Plane _groundPlane;
 		private bool _shouldUpdate;
-		private CameraBoundsTileProviderOptions _cbtpOptions;
+		[SerializeField] private CameraBoundsTileProviderOptions _cbtpOptions;
 
-		//private List<UnwrappedTileId> _toRemove;
-		//private HashSet<UnwrappedTileId> _tilesToRequest;
 		private Vector2dBounds _viewPortWebMercBounds;
 
 		#region Tile decision and raycasting fields
@@ -25,7 +25,8 @@ namespace Mapbox.Unity.Map.TileProviders
 		private Ray _ray01;
 		private Ray _ray10;
 		private Ray _ray11;
-		private Vector3[] _hitPnt = new Vector3[4];
+		private Vector3[] _hitPnt = new Vector3[HIT_POINTS_COUNT];
+		private Vector2d[] _hitPntGeoPos = new Vector2d[HIT_POINTS_COUNT];
 		private bool _isFirstLoad;
 		#endregion
 
@@ -33,7 +34,14 @@ namespace Mapbox.Unity.Map.TileProviders
 		{
 			_tiles = new HashSet<UnwrappedTileId>();
 			_canonicalTiles = new HashSet<CanonicalTileId>();
-			_cbtpOptions = (CameraBoundsTileProviderOptions)_options;
+			if (Options != null)
+			{
+				_cbtpOptions = (CameraBoundsTileProviderOptions)_options;
+			}
+			else
+			{
+				_cbtpOptions = new CameraBoundsTileProviderOptions();
+			}
 
 			if (_cbtpOptions.camera == null)
 			{
@@ -70,12 +78,8 @@ namespace Mapbox.Unity.Map.TileProviders
 			Vector2d swWebMerc = new Vector2d(Math.Max(bounds.SouthWest.x, -Utils.Constants.WebMercMax), Math.Max(bounds.SouthWest.y, -Utils.Constants.WebMercMax));
 			Vector2d neWebMerc = new Vector2d(Math.Min(bounds.NorthEast.x, Utils.Constants.WebMercMax), Math.Min(bounds.NorthEast.y, Utils.Constants.WebMercMax));
 
-			//UnityEngine.Debug.LogFormat("swWebMerc:{0}/{1} neWebMerc:{2}/{3}", swWebMerc.x, swWebMerc.y, neWebMerc.x, neWebMerc.y);
-
 			UnwrappedTileId swTile = WebMercatorToTileId(swWebMerc, zoom);
 			UnwrappedTileId neTile = WebMercatorToTileId(neWebMerc, zoom);
-
-			//UnityEngine.Debug.LogFormat("swTile:{0} neTile:{1}", swTile, neTile);
 
 			for (int x = swTile.X; x <= neTile.X; x++)
 			{
@@ -86,7 +90,6 @@ namespace Mapbox.Unity.Map.TileProviders
 					//investigate formulas, this worked before
 					if (!_canonicalTiles.Contains(uwtid.Canonical))
 					{
-						//Debug.LogFormat("TileCover.GetWithWebMerc: {0}/{1}/{2}", zoom, x, y);
 						_tiles.Add(uwtid);
 						_canonicalTiles.Add(uwtid.Canonical);
 					}
@@ -124,11 +127,17 @@ namespace Mapbox.Unity.Map.TileProviders
 
 			// Find min max bounding box.
 			// TODO : Find a better way of doing this.
-			float minX = float.MaxValue;
-			float minZ = float.MaxValue;
-			float maxX = float.MinValue;
-			float maxZ = float.MinValue;
-			for (int i = 0; i < 4; i++)
+			double minLat = double.MaxValue;
+			double minLong = double.MaxValue;
+			double maxLat = double.MinValue;
+			double maxLong = double.MinValue;
+
+			for (int pointIndex = 0; pointIndex < HIT_POINTS_COUNT; ++pointIndex)
+			{
+				_hitPntGeoPos[pointIndex] = _map.WorldToGeoPosition(_hitPnt[pointIndex]);
+			}
+
+			for (int i = 0; i < HIT_POINTS_COUNT; i++)
 			{
 				if (_hitPnt[i] == Vector3.zero)
 				{
@@ -136,42 +145,34 @@ namespace Mapbox.Unity.Map.TileProviders
 				}
 				else
 				{
-					if (minX > _hitPnt[i].x)
+					if (minLat > _hitPntGeoPos[i].x)
 					{
-						minX = _hitPnt[i].x;
+						minLat = _hitPntGeoPos[i].x;
 					}
 
-					if (minZ > _hitPnt[i].z)
+					if (minLong > _hitPntGeoPos[i].y)
 					{
-						minZ = _hitPnt[i].z;
+						minLong = _hitPntGeoPos[i].y;
 					}
 
-					if (maxX < _hitPnt[i].x)
+					if (maxLat < _hitPntGeoPos[i].x)
 					{
-						maxX = _hitPnt[i].x;
+						maxLat = _hitPntGeoPos[i].x;
 					}
 
-					if (maxZ < _hitPnt[i].z)
+					if (maxLong < _hitPntGeoPos[i].y)
 					{
-						maxZ = _hitPnt[i].z;
+						maxLong = _hitPntGeoPos[i].y;
 					}
 				}
 			}
 
-			Vector3 hitPntLL = new Vector3(minX, 0, minZ);
-			Vector3 hitPntUR = new Vector3(maxX, 0, maxZ);
-
-			//Debug.Log(hitPntLL + " - " + hitPntUR);
-
-			var llLatLong = _map.WorldToGeoPosition(hitPntLL);
-			var urLatLong = _map.WorldToGeoPosition(hitPntUR);
-
-			Vector2dBounds tileBounds = new Vector2dBounds(Conversions.LatLonToMeters(llLatLong), Conversions.LatLonToMeters(urLatLong));
-
-			// Bounds debugging.
+			Vector2d hitPntSWGeoPos = new Vector2d(minLat, minLong);
+			Vector2d hitPntNEGeoPos = new Vector2d(maxLat, maxLong);
+			Vector2dBounds tileBounds = new Vector2dBounds(Conversions.LatLonToMeters(hitPntSWGeoPos), Conversions.LatLonToMeters(hitPntNEGeoPos));         // Bounds debugging.
 #if UNITY_EDITOR
-			Debug.DrawLine(_cbtpOptions.camera.transform.position, hitPntLL, Color.blue);
-			Debug.DrawLine(_cbtpOptions.camera.transform.position, hitPntUR, Color.red);
+			Debug.DrawLine(_cbtpOptions.camera.transform.position, _map.GeoToWorldPosition(hitPntSWGeoPos), Color.blue);
+			Debug.DrawLine(_cbtpOptions.camera.transform.position, _map.GeoToWorldPosition(hitPntNEGeoPos), Color.red);
 #endif
 			return tileBounds;
 		}
@@ -182,7 +183,7 @@ namespace Mapbox.Unity.Map.TileProviders
 			return ray.GetPoint(distance);
 		}
 
-		public virtual void Update()
+		public override void UpdateTileProvider()
 		{
 			if (_cbtpOptions != null && _cbtpOptions.camera != null && _cbtpOptions.camera.transform.hasChanged)
 			{

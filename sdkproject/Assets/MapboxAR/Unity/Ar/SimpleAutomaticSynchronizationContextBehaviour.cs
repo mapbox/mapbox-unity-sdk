@@ -121,14 +121,7 @@ namespace Mapbox.Unity.Ar
 		void PlaneAddedHandler(BoundedPlane plane)
 		{
 			_lastHeight = plane.center.y;
-			//Unity.Utilities.Console.Instance.Log(string.Format("AR Plane Height: {0}", _lastHeight), "yellow");
 		}
-
-
-		//void UnityARSessionNativeInterface_ARSessionTrackingChanged(UnityEngine.XR.iOS.UnityARCamera camera)
-		//{
-		//	Unity.Utilities.Console.Instance.Log(string.Format("AR Tracking State Changed: {0}: {1}", camera.trackingState, camera.trackingReason), "silver");
-		//}
 
 		void LocationProvider_OnLocationUpdated(Location location)
 		{
@@ -152,16 +145,6 @@ namespace Mapbox.Unity.Ar
 				}
 				else
 				{
-					//_kalman.Process(
-					//	location.LatitudeLongitude.x
-					//	, location.LatitudeLongitude.y
-					//	, location.Accuracy
-					//	, (long)location.Timestamp
-					//);
-					//location.LatitudeLongitude.x = _kalman.Lat;
-					//location.LatitudeLongitude.y = _kalman.Lng;
-					//location.Accuracy = (int)_kalman.Accuracy;
-
 					var latitudeLongitude = location.LatitudeLongitude;
 					Unity.Utilities.Console.Instance.Log(
 						string.Format(

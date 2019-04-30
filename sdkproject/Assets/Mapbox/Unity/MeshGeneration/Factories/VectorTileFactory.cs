@@ -154,7 +154,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		public virtual void RemoveVectorLayerVisualizer(LayerVisualizerBase subLayer)
 		{
-			subLayer.ClearCaches();
+			subLayer.Clear();
 			if (_layerBuilder.ContainsKey(subLayer.Key))
 			{
 				if (Properties.vectorSubLayers.Contains(subLayer.SubLayerProperties))
@@ -228,24 +228,29 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					foreach (var visualizer in layer)
 					{
 						visualizer.UnregisterTile(tile);
-						//visualizer.LayerVisualizerHasChanged -= UpdateTileFactory;
 					}
 				}
 			}
 		}
 
-		public override void Reset()
+		public override void Clear()
 		{
-			foreach (var layerList in _layerBuilder.Values)
+			DestroyImmediate(DataFetcher);
+			if (_layerBuilder != null)
 			{
-				foreach (var layerVisualizerBase in layerList)
+				foreach (var layerList in _layerBuilder.Values)
 				{
-					layerVisualizerBase.ClearCaches();
+					foreach (var layerVisualizerBase in layerList)
+					{
+						layerVisualizerBase.Clear();
+						DestroyImmediate(layerVisualizerBase);
+					}
 				}
+
+				_layerProgress.Clear();
+				_tilesWaitingResponse.Clear();
+				_tilesWaitingProcessing.Clear();
 			}
-			_layerProgress.Clear();
-			_tilesWaitingResponse.Clear();
-			_tilesWaitingProcessing.Clear();
 		}
 
 		public override void SetOptions(LayerProperties options)
@@ -368,30 +373,66 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		#region Private Methods
 		private void CreateMeshes(UnityTile tile)
 		{
+			var nameList = new List<string>();
+			var builderList = new List<LayerVisualizerBase>();
+
 			foreach (var layerName in tile.VectorData.Data.LayerNames())
 			{
 				if (_layerBuilder.ContainsKey(layerName))
 				{
+					//two loops; first one to add it to waiting/tracking list, second to start it
 					foreach (var builder in _layerBuilder[layerName])
 					{
-						CreateFeatureWithBuilder(tile, layerName, builder);
+						nameList.Add(layerName);
+						builderList.Add(builder);
+						TrackFeatureWithBuilder(tile, layerName, builder);
 					}
 				}
 			}
+			for (int i = 0; i < nameList.Count; i++)
+			{
+				CreateFeatureWithBuilder(tile, nameList[i], builderList[i]);
+			}
 
+			builderList.Clear();
 			//emptylayer for visualizers that don't depend on outside data sources
 			string emptyLayer = "";
 			if (_layerBuilder.ContainsKey(emptyLayer))
 			{
+				//two loops; first one to add it to waiting/tracking list, second to start it
 				foreach (var builder in _layerBuilder[emptyLayer])
 				{
-					CreateFeatureWithBuilder(tile, emptyLayer, builder);
+					builderList.Add(builder);
+					TrackFeatureWithBuilder(tile, emptyLayer, builder);
 				}
+			}
+			for (int i = 0; i < builderList.Count; i++)
+			{
+				CreateFeatureWithBuilder(tile, emptyLayer, builderList[i]);
 			}
 
 			if (!_layerProgress.ContainsKey(tile))
 			{
 				tile.VectorDataState = TilePropertyState.Loaded;
+			}
+		}
+
+		private void TrackFeatureWithBuilder(UnityTile tile, string layerName, LayerVisualizerBase builder)
+		{
+			if (builder.Active)
+			{
+				if (_layerProgress.ContainsKey(tile))
+				{
+					_layerProgress[tile].Add(builder);
+				}
+				else
+				{
+					_layerProgress.Add(tile, new HashSet<LayerVisualizerBase> {builder});
+					if (!_tilesWaitingProcessing.Contains(tile))
+					{
+						_tilesWaitingProcessing.Add(tile);
+					}
+				}
 			}
 		}
 
@@ -464,7 +505,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				foreach (var layerVisualizerBase in pairs.Value)
 				{
-					layerVisualizerBase.ClearCaches();
+					layerVisualizerBase.Clear();
 				}
 			}
 			_layerBuilder.Clear();

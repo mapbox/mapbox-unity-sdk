@@ -11,7 +11,7 @@
 	{
 		public SerializedProperty Layers;
 		private float kToggleWidth = 18f;
-		private const int uniqueId = 0;//100000;
+		private const int uniqueId = 0;
 
 		public bool hasChanged = false;
 

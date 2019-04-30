@@ -7,6 +7,7 @@ namespace Mapbox.Unity.Telemetry
 	using Mapbox.Unity.Utilities;
 	using UnityEngine;
 	using System.Text;
+	using UnityEngine.Networking;
 
 	public class TelemetryFallback : ITelemetryLibrary
 	{
@@ -47,6 +48,7 @@ namespace Mapbox.Unity.Telemetry
 			jsonDict.Add("created", unixTimestamp);
 			jsonDict.Add("userId", SystemInfo.deviceUniqueIdentifier);
 			jsonDict.Add("enabled.telemetry", false);
+			jsonDict.Add("sdkIdentifier", GetSDKIdentifier());
 			eventList.Add(jsonDict);
 
 			var jsonString = JsonConvert.SerializeObject(eventList);
@@ -68,12 +70,22 @@ namespace Mapbox.Unity.Telemetry
 		IEnumerator PostWWW(string url, string bodyJsonString)
 		{
 			byte[] bodyRaw = Encoding.UTF8.GetBytes(bodyJsonString);
+
+#if UNITY_2017_1_OR_NEWER
+			UnityWebRequest postRequest = new UnityWebRequest(url, "POST");
+			postRequest.SetRequestHeader("Content-Type", "application/json");
+
+			postRequest.downloadHandler = new DownloadHandlerBuffer();
+			postRequest.uploadHandler = new UploadHandlerRaw(bodyRaw);
+
+			yield return postRequest.SendWebRequest();
+#else
 			var headers = new Dictionary<string, string>();
 			headers.Add("Content-Type", "application/json");
 			headers.Add("user-agent", GetUserAgent());
-
 			var www = new WWW(url, bodyRaw, headers);
 			yield return www;
+#endif
 		}
 
 		static string GetUserAgent()
@@ -86,6 +98,14 @@ namespace Mapbox.Unity.Telemetry
 										  Constants.SDK_VERSION
 										 );
 			return userAgent;
+		}
+
+		private string GetSDKIdentifier()
+		{
+			var sdkIdentifier = string.Format("MapboxEventsUnity{0}",
+										  Application.platform
+										 );
+			return sdkIdentifier;
 		}
 
 		public void SetLocationCollectionState(bool enable)

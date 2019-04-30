@@ -112,7 +112,6 @@ namespace KDTree
                     // If it is greater than the threshold, skip.
                     if (fThreshold >= 0 && fDistance > fThreshold)
                     {
-                        //pPending.Insert(fDistance, pNotTaken);
                         continue;
                     }
 

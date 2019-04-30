@@ -34,6 +34,7 @@
 		[SerializeField]
 		MultiColumnHeaderState m_MultiColumnHeaderState;
 
+		public bool isLayerAdded = false;
 		bool m_Initialized = false;
 		string objectId = "";
 		private string TilesetId
@@ -91,23 +92,36 @@
 			var sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
 
 			var displayNames = sourceTypeProperty.enumDisplayNames;
+			var names = sourceTypeProperty.enumNames;
 			int count = sourceTypeProperty.enumDisplayNames.Length;
 			if (!_isGUIContentSet)
 			{
 				_sourceTypeContent = new GUIContent[count];
-				for (int extIdx = 0; extIdx < count; extIdx++)
+
+				var index = 0;
+				foreach (var name in names)
 				{
-					_sourceTypeContent[extIdx] = new GUIContent
+					_sourceTypeContent[index] = new GUIContent
 					{
-						text = displayNames[extIdx],
-						tooltip = ((VectorSourceType)extIdx).Description(),
+						text = displayNames[index],
+						tooltip = ((VectorSourceType)Enum.Parse(typeof(VectorSourceType), name)).Description(),
 					};
+					index++;
 				}
+
+				//				for (int index0 = 0; index0 < count; index0++)
+				//				{
+				//					_sourceTypeContent[index0] = new GUIContent
+				//					{
+				//						text = displayNames[index0],
+				//						tooltip = ((VectorSourceType)index0).Description(),
+				//					};
+				//				}
 				_isGUIContentSet = true;
 			}
 
-			sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
-
+			//sourceTypeValue = (VectorSourceType)sourceTypeProperty.enumValueIndex;
+			sourceTypeValue = ((VectorSourceType)Enum.Parse(typeof(VectorSourceType), names[sourceTypeProperty.enumValueIndex]));
 			var sourceOptionsProperty = property.FindPropertyRelative("sourceOptions");
 			var layerSourceProperty = sourceOptionsProperty.FindPropertyRelative("layerSource");
 			var layerSourceId = layerSourceProperty.FindPropertyRelative("Id");
@@ -115,7 +129,9 @@
 			switch (sourceTypeValue)
 			{
 				case VectorSourceType.MapboxStreets:
+				case VectorSourceType.MapboxStreetsV8:
 				case VectorSourceType.MapboxStreetsWithBuildingIds:
+				case VectorSourceType.MapboxStreetsV8WithBuildingIds:
 					var sourcePropertyValue = MapboxDefaultVector.GetParameters(sourceTypeValue);
 					layerSourceId.stringValue = sourcePropertyValue.Id;
 					GUI.enabled = false;
@@ -237,7 +253,6 @@
 				GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
 				EditorGUILayout.BeginHorizontal();
-				//var presetTypes = property.FindPropertyRelative("presetFeatureTypes");
 				GenericMenu menu = new GenericMenu();
 				foreach (var name in Enum.GetNames(typeof(PresetFeatureType)))
 				{
@@ -270,7 +285,7 @@
 
 					if (EditorHelper.DidModifyProperty(property))
 					{
-						((VectorLayerProperties)EditorHelper.GetTargetObjectOfProperty(property)).OnSubLayerPropertyAdded(new VectorLayerUpdateArgs { property = EditorHelper.GetTargetObjectOfProperty(subLayer) as MapboxDataProperty });
+						isLayerAdded = true;
 					}
 				}
 
@@ -388,6 +403,11 @@
 			var subLayerlineGeometryOptions = subLayer.FindPropertyRelative("lineGeometryOptions");
 			var lineGeometryOptions = subLayerProperties.lineGeometryOptions;
 			subLayerlineGeometryOptions.FindPropertyRelative("Width").floatValue = lineGeometryOptions.Width;
+			subLayerlineGeometryOptions.FindPropertyRelative("CapType").enumValueIndex = (int)lineGeometryOptions.CapType;
+			subLayerlineGeometryOptions.FindPropertyRelative("JoinType").enumValueIndex = (int)lineGeometryOptions.JoinType;
+			subLayerlineGeometryOptions.FindPropertyRelative("MiterLimit").floatValue = lineGeometryOptions.MiterLimit;
+			subLayerlineGeometryOptions.FindPropertyRelative("RoundLimit").floatValue = lineGeometryOptions.RoundLimit;
+
 
 			var subLayerExtrusionOptions = subLayer.FindPropertyRelative("extrusionOptions");
 			var extrusionOptions = subLayerProperties.extrusionOptions;
@@ -406,8 +426,6 @@
 			var subLayerGeometryMaterialOptions = subLayer.FindPropertyRelative("materialOptions");
 			var materialOptions = subLayerProperties.materialOptions;
 			subLayerGeometryMaterialOptions.FindPropertyRelative("style").enumValueIndex = (int)materialOptions.style;
-
-			//GeometryMaterialOptions geometryMaterialOptionsReference = MapboxDefaultStyles.GetDefaultAssets();
 
 			var mats = subLayerGeometryMaterialOptions.FindPropertyRelative("materials");
 			mats.arraySize = 2;
@@ -431,6 +449,7 @@
 			var palette = subLayerGeometryMaterialOptions.FindPropertyRelative("colorPalette");
 			var lightStyleOpacity = subLayerGeometryMaterialOptions.FindPropertyRelative("lightStyleOpacity");
 			var darkStyleOpacity = subLayerGeometryMaterialOptions.FindPropertyRelative("darkStyleOpacity");
+			var colorStyleColor = subLayerGeometryMaterialOptions.FindPropertyRelative("colorStyleColor");
 			var customStyleOptions = subLayerGeometryMaterialOptions.FindPropertyRelative("customStyleOptions");
 
 			topMat.objectReferenceValue = materialOptions.materials[0].Materials[0];
@@ -439,8 +458,7 @@
 			palette.objectReferenceValue = materialOptions.colorPalette;
 			lightStyleOpacity.floatValue = materialOptions.lightStyleOpacity;
 			darkStyleOpacity.floatValue = materialOptions.darkStyleOpacity;
-
-
+			colorStyleColor.colorValue = materialOptions.colorStyleColor;
 			//set custom style options.
 			var customMats = customStyleOptions.FindPropertyRelative("materials");
 			customMats.arraySize = 2;
@@ -483,20 +501,14 @@
 		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty, SerializedProperty property)
 		{
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
-			//var layerName = layerProperty.FindPropertyRelative("coreOptions.layerName");
-			//var roadLayerName = layerProperty.FindPropertyRelative("roadLayer");
-			//var landuseLayerName = layerProperty.FindPropertyRelative("landuseLayer");
-
 
 			var subLayerName = subLayerCoreOptions.FindPropertyRelative("sublayerName").stringValue;
 			var visualizerLayer = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
 			var subLayerType = PresetSubLayerPropertiesFetcher.GetPresetTypeFromLayerName(visualizerLayer);
-			//var maskValue = layerProperty.FindPropertyRelative("_maskValue");
-			//var selectedTypes = layerProperty.FindPropertyRelative("selectedTypes");
 
 			GUILayout.Space(-_lineHeight);
 			layerProperty.FindPropertyRelative("presetFeatureType").intValue = (int)subLayerType;
-			//EditorGUILayout.LabelField("Sub-type : " + "Highway", visualizerNameAndType);
+
 			GUILayout.Space(_lineHeight);
 			//*********************** LAYER NAME BEGINS ***********************************//
 			VectorPrimitiveType primitiveTypeProp = (VectorPrimitiveType)subLayerCoreOptions.FindPropertyRelative("geometryType").enumValueIndex;
@@ -514,32 +526,6 @@
 				EditorHelper.CheckForModifiedProperty(subLayerCoreOptions);
 			}
 			//*********************** LAYER NAME ENDS ***********************************//
-
-			//*********************** TYPE DROPDOWN BEGINS ***********************************//
-			//if (_streetsV7TileStats == null || subTypeValues == null)
-			//{
-			//	subTypeValues = GetSubTypeValues(layerProperty, visualizerLayer, sourceType);
-			//}
-
-			//if ((layerName.stringValue == roadLayerName.stringValue || layerName.stringValue == landuseLayerName.stringValue) && subTypeValues!=null)
-			//{
-			//	maskValue.intValue = EditorGUILayout.MaskField("Type",maskValue.intValue, subTypeValues);
-			//	string selectedOptions = string.Empty;
-			//	for (int i = 0; i < subTypeValues.Length; i++)
-			//	{
-			//		if ((maskValue.intValue & (1 << i)) == (1 << i))
-			//		{
-			//			if (string.IsNullOrEmpty(selectedOptions))
-			//			{
-			//				selectedOptions = subTypeValues[i];
-			//				continue;
-			//			}
-			//			selectedOptions += "," + subTypeValues[i];
-			//		}
-			//	}
-			//	selectedTypes.stringValue = selectedOptions;
-			//}
-			//*********************** TYPE DROPDOWN ENDS ***********************************//
 
 			EditorGUI.indentLevel++;
 
@@ -579,7 +565,6 @@
 			{
 				if (tileJSONResponse == null || string.IsNullOrEmpty(sourceString) || sourceString != TilesetId)
 				{
-					//tileJSONData.ClearData();
 					try
 					{
 						Unity.MapboxAccess.Instance.TileJSON.Get(sourceString, (response) =>

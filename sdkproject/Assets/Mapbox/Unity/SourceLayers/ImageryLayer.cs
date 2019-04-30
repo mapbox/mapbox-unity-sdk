@@ -1,4 +1,6 @@
-﻿namespace Mapbox.Unity.Map
+﻿using Mapbox.Unity.MeshGeneration.Data;
+
+namespace Mapbox.Unity.Map
 {
 	using System;
 	using UnityEngine;
