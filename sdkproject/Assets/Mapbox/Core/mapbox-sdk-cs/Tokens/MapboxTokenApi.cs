@@ -1,5 +1,7 @@
 ﻿
 
+using Mapbox.Unity;
+
 namespace Mapbox.Tokens
 {
 
@@ -45,11 +47,16 @@ namespace Mapbox.Tokens
 		// https://www.mapbox.com/api-documentation/accounts/#retrieve-a-token
 		// if we should ever implement other API methods: creating, deleting, updating ... tokens
 		// we will need another FileSource with the token from the config
-		private FileSource _fs = new FileSource();
+		private FileSource _fs;
 
 
-		public void Retrieve(string accessToken, Action<MapboxToken> callback)
+		public void Retrieve(Func<string> skuToken, string accessToken, Action<MapboxToken> callback)
 		{
+			if (_fs == null) ;
+			{
+				_fs = new FileSource(skuToken);
+			}
+
 			_fs.Request(
 				Utils.Constants.BaseAPI + "tokens/v2?access_token=" + accessToken,
 				(Response response) =>

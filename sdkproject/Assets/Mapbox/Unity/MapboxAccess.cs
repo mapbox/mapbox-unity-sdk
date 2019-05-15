@@ -1,3 +1,5 @@
+using MapboxAccountsUnity;
+
 namespace Mapbox.Unity
 {
 	using UnityEngine;
@@ -85,7 +87,7 @@ namespace Mapbox.Unity
 			}
 			else
 			{
-				TokenValidator.Retrieve(configuration.AccessToken, (response) =>
+				TokenValidator.Retrieve(configuration.GetMapsSkuToken, configuration.AccessToken, (response) =>
 				{
 					if (OnTokenValidation != null)
 					{
@@ -155,7 +157,8 @@ namespace Mapbox.Unity
 			}
 
 #if !WINDOWS_UWP
-			SetConfiguration(ConfigurationJSON == null ? null : JsonUtility.FromJson<MapboxConfiguration>(ConfigurationJSON));
+			var test = JsonUtility.FromJson<MapboxConfiguration>(ConfigurationJSON);
+			SetConfiguration(ConfigurationJSON == null ? null : test);
 #else
 			SetConfiguration(ConfigurationJSON == null ? null : Mapbox.Json.JsonConvert.DeserializeObject<MapboxConfiguration>(ConfigurationJSON));
 #endif
@@ -164,7 +167,7 @@ namespace Mapbox.Unity
 
 		void ConfigureFileSource()
 		{
-			_fileSource = new CachingWebFileSource(_configuration.AccessToken, _configuration.AutoRefreshCache)
+			_fileSource = new CachingWebFileSource(_configuration.AccessToken, _configuration.GetMapsSkuToken, _configuration.AutoRefreshCache)
 				.AddCache(new MemoryCache(_configuration.MemoryCacheSize))
 #if !UNITY_WEBGL
 				.AddCache(new SQLiteCache(_configuration.FileCacheSize))
@@ -242,7 +245,7 @@ namespace Mapbox.Unity
 			{
 				if (_geocoder == null)
 				{
-					_geocoder = new Geocoder(new FileSource(_configuration.AccessToken));
+					_geocoder = new Geocoder(new FileSource(Instance.Configuration.GetMapsSkuToken, _configuration.AccessToken));
 				}
 				return _geocoder;
 			}
@@ -259,7 +262,7 @@ namespace Mapbox.Unity
 			{
 				if (_directions == null)
 				{
-					_directions = new Directions(new FileSource(_configuration.AccessToken));
+					_directions = new Directions(new FileSource(Instance.Configuration.GetMapsSkuToken, _configuration.AccessToken));
 				}
 				return _directions;
 			}
@@ -275,7 +278,7 @@ namespace Mapbox.Unity
 			{
 				if (_mapMatcher == null)
 				{
-					_mapMatcher = new MapMatcher(new FileSource(_configuration.AccessToken), _configuration.DefaultTimeout);
+					_mapMatcher = new MapMatcher(new FileSource(Instance.Configuration.GetMapsSkuToken, _configuration.AccessToken), _configuration.DefaultTimeout);
 				}
 				return _mapMatcher;
 			}
@@ -309,7 +312,7 @@ namespace Mapbox.Unity
 			{
 				if (_tileJson == null)
 				{
-					_tileJson = new TileJSON(new FileSource(_configuration.AccessToken), _configuration.DefaultTimeout);
+					_tileJson = new TileJSON(new FileSource(Instance.Configuration.GetMapsSkuToken, _configuration.AccessToken), _configuration.DefaultTimeout);
 				}
 				return _tileJson;
 			}
@@ -326,10 +329,59 @@ namespace Mapbox.Unity
 
 	public class MapboxConfiguration
 	{
+		[NonSerialized] private string _endUserId;
+		[NonSerialized] private TokenGenerator _mapsTokenGenerator= new TokenGenerator(MapboxAccounts.ObtainMapsSkuUserToken, 1);
+		[NonSerialized] private TokenGenerator _navigationTokenGenerator = new TokenGenerator(MapboxAccounts.ObtainNavigationSkuUserToken, 1);
+
 		public string AccessToken;
 		public uint MemoryCacheSize = 500;
 		public uint FileCacheSize = 2500;
 		public int DefaultTimeout = 30;
 		public bool AutoRefreshCache = false;
+
+		public string GetMapsSkuToken()
+		{
+			if (string.IsNullOrEmpty(_endUserId))
+			{
+				_endUserId = MapboxAccounts.ObtainEndUserId();
+			}
+
+			return _mapsTokenGenerator.GetToken(_endUserId);
+		}
+
+		public string GetNavigationSkuToken()
+		{
+			if (string.IsNullOrEmpty(_endUserId))
+			{
+				_endUserId = MapboxAccounts.ObtainEndUserId();
+			}
+
+			return _navigationTokenGenerator.GetToken(_endUserId);
+		}
+	}
+
+	[Serializable]
+	public class TokenGenerator
+	{
+		private readonly Func<string, string> _method;
+		private float _timeLimit;
+		private DateTime _lastTokenGenerationTime;
+		private string _currentMapsSkuToken;
+
+		public TokenGenerator(Func<string, string> method, float timeLimitInHours)
+		{
+			_method = method;
+			_timeLimit = timeLimitInHours;
+		}
+		public string GetToken(string userId)
+		{
+			if (string.IsNullOrEmpty(_currentMapsSkuToken) || (DateTime.Now - _lastTokenGenerationTime).TotalHours > _timeLimit)
+			{
+				_currentMapsSkuToken = _method(userId);
+				_lastTokenGenerationTime = DateTime.Now;
+			}
+
+			return _currentMapsSkuToken;
+		}
 	}
 }
