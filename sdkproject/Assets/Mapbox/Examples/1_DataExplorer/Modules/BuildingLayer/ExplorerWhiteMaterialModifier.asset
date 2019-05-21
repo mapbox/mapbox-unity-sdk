@@ -21,4 +21,17 @@ MonoBehaviour:
     - Materials:
       - {fileID: 2100000, guid: 508236771313ff54788fa797ece5c0e8, type: 2}
     atlasInfo: {fileID: 0}
+    lightStyleOpacity: 1
+    darkStyleOpacity: 1
+    colorStyleColor: {r: 1, g: 1, b: 1, a: 1}
+    samplePalettes: 0
     colorPalette: {fileID: 0}
+    customStyleOptions:
+      texturingType: 0
+      materials:
+      - Materials:
+        - {fileID: 2100000, guid: 1c7d76a44fa2d4908bf4ee096556a5db, type: 2}
+      - Materials:
+        - {fileID: 2100000, guid: 5cb4277d0de1443ce84170893d05adca, type: 2}
+      atlasInfo: {fileID: 0}
+      colorPalette: {fileID: 0}

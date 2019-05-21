@@ -80,6 +80,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				if (tile.RasterDataState != TilePropertyState.Unregistered)
 				{
+					Debug.Log(rasterTile.ExceptionsAsString);
 					tile.RasterDataState = TilePropertyState.Error;
 					_tilesWaitingResponse.Remove(tile);
 					OnErrorOccurred(e);

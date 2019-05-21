@@ -143,11 +143,11 @@
 				string mapsSkuToken = "sku" + _getMapsSkuToken();
 				if (uriBuilder.Query != null && uriBuilder.Query.Length > 1)
 				{
-					uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery + "&" + mapsSkuToken;
+					uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery;// + "&" + mapsSkuToken;
 				}
 				else
 				{
-					uriBuilder.Query = accessTokenQuery + "&" + mapsSkuToken;
+					uriBuilder.Query = accessTokenQuery;// + "&" + mapsSkuToken;
 				}
 			}
 			string finalUrl = uriBuilder.ToString();
