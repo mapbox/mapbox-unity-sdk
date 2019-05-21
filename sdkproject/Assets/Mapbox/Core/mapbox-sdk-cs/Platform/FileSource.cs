@@ -89,7 +89,7 @@ namespace Mapbox.Platform
 			{
 				var uriBuilder = new UriBuilder(url);
 				string accessTokenQuery = "access_token=" + _accessToken;
-				string skuToken = "sku" + _getMapsSkuToken();
+				string skuToken = "sku=" + _getMapsSkuToken();
 				if (uriBuilder.Query != null && uriBuilder.Query.Length > 1)
 				{
 					uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery + "&" + skuToken;;

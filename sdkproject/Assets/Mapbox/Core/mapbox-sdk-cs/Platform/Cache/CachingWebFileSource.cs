@@ -140,7 +140,7 @@
 			if (!string.IsNullOrEmpty(_accessToken))
 			{
 				string accessTokenQuery = "access_token=" + _accessToken;
-				string mapsSkuToken = "sku" + _getMapsSkuToken();
+				string mapsSkuToken = "sku=" + _getMapsSkuToken();
 				if (uriBuilder.Query != null && uriBuilder.Query.Length > 1)
 				{
 					uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery + "&" + mapsSkuToken;
