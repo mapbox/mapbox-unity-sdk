@@ -53,12 +53,12 @@ public class TerrainDataFetcher : DataFetcher
 		var terrainDataParameters = parameters as TerrainDataFetcherParameters;
 		if(terrainDataParameters == null)
 		{
-			return;	
+			return;
 		}
 		var pngRasterTile = new RawPngRasterTile();
 		pngRasterTile.Initialize(_fileSource, terrainDataParameters.canonicalTileId, terrainDataParameters.mapid, () =>
 		{
-			if (terrainDataParameters.tile.CanonicalTileId != pngRasterTile.Id)
+			if (terrainDataParameters.tile != null && terrainDataParameters.tile.CanonicalTileId != pngRasterTile.Id)
 			{
 				//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
 				return;
