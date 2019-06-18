@@ -28,9 +28,9 @@ namespace Mapbox.Map
 	/// </example>
 	public sealed class RawPngRasterTile : RasterTile
 	{
-		internal override TileResource MakeTileResource(string mapId)
+		internal override TileResource MakeTileResource(string tilesetId)
 		{
-			return TileResource.MakeRawPngRaster(Id, mapId);
+			return TileResource.MakeRawPngRaster(Id, tilesetId);
 		}
 	}
 }

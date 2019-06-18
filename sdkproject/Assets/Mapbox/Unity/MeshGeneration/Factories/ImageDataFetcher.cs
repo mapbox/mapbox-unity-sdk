@@ -18,7 +18,7 @@ public class ImageDataFetcher : DataFetcher
 			return;
 		}
 		RasterTile rasterTile;
-		if (imageDataParameters.mapid.StartsWith("mapbox://", StringComparison.Ordinal))
+		if (imageDataParameters.tilesetId.StartsWith("mapbox://", StringComparison.Ordinal))
 		{
 			rasterTile = imageDataParameters.useRetina ? new RetinaRasterTile() : new RasterTile();
 		}
@@ -32,7 +32,7 @@ public class ImageDataFetcher : DataFetcher
 			imageDataParameters.tile.AddTile(rasterTile);
 		}
 
-		rasterTile.Initialize(_fileSource, imageDataParameters.tile.CanonicalTileId, imageDataParameters.mapid, () =>
+		rasterTile.Initialize(_fileSource, imageDataParameters.tile.CanonicalTileId, imageDataParameters.tilesetId, () =>
 		{
 			if (imageDataParameters.tile.CanonicalTileId != rasterTile.Id)
 			{

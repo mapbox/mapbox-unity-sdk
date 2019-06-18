@@ -74,7 +74,7 @@ namespace Mapbox.Examples.Playground
 		void Start()
 		{
 			_map = new Map<RasterTile>(MapboxAccess.Instance);
-			_map.MapId = _mapboxStyles[_mapstyle];
+			_map.TilesetId = _mapboxStyles[_mapstyle];
 			_map.Center = _startLoc;
 			_map.Zoom = (int)_zoomSlider.value;
 			_map.Subscribe(this);
@@ -109,7 +109,7 @@ namespace Mapbox.Examples.Playground
 		void ToggleDropdownStyles(int target)
 		{
 			_mapstyle = target;
-			_map.MapId = _mapboxStyles[target];
+			_map.TilesetId = _mapboxStyles[target];
 			_map.Update();
 		}
 

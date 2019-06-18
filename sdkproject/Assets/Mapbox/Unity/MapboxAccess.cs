@@ -225,10 +225,10 @@ namespace Mapbox.Unity
 			, Action<Response> callback
 			, int timeout = 10
 			, CanonicalTileId tileId = new CanonicalTileId()
-			, string mapId = null
+			, string tilesetId = null
 		)
 		{
-			return _fileSource.Request(url, callback, _configuration.DefaultTimeout, tileId, mapId);
+			return _fileSource.Request(url, callback, _configuration.DefaultTimeout, tileId, tilesetId);
 		}
 
 

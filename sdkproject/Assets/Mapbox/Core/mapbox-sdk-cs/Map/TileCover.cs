@@ -35,7 +35,7 @@ namespace Mapbox.Map
 		/// 	var parameters = new Tile.Parameters();
 		/// 	parameters.Id = id;
 		///		parameters.Fs = MapboxAccess.Instance;
-		///		parameters.MapId = "mapbox://styles/mapbox/outdoors-v10";
+		///		parameters.TilesetId = "mapbox://styles/mapbox/outdoors-v10";
 		///		tile.Initialize(parameters, (Action)(() =&gt;
 		///		{
 		///			// Place tiles and load textures.

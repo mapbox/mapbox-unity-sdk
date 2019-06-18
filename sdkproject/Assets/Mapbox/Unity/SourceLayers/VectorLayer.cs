@@ -158,11 +158,11 @@ namespace Mapbox.Unity.Map
 		}
 
 		/// <summary>
-		/// Add provided data source (mapid) to existing ones.
-		/// Mapbox vector api supports comma separated mapids and this method
-		/// adds the provided mapid at the end of the existing source.
+		/// Add provided data source (TilesetId) to existing ones.
+		/// Mapbox vector api supports comma separated TilesetIds and this method
+		/// adds the provided TilesetId at the end of the existing source.
 		/// </summary>
-		/// <param name="vectorSource">Data source (Mapid) to add to existing sources.</param>
+		/// <param name="vectorSource">Data source (TilesetId) to add to existing sources.</param>
 		public virtual void AddLayerSource(string vectorSource)
 		{
 			if (!string.IsNullOrEmpty(vectorSource))
@@ -185,9 +185,9 @@ namespace Mapbox.Unity.Map
 		}
 
 		/// <summary>
-		/// Change existing data source (mapid) with provided source.
+		/// Change existing data source (TilesetId) with provided source.
 		/// </summary>
-		/// <param name="vectorSource">Data source (Mapid) to use.</param>
+		/// <param name="vectorSource">Data source (TilesetId) to use.</param>
 		public virtual void SetLayerSource(string vectorSource)
 		{
 			SetLayerSourceInternal(vectorSource);
@@ -195,9 +195,9 @@ namespace Mapbox.Unity.Map
 		}
 
 		/// <summary>
-		/// Change existing data source (mapid) with provided source.
+		/// Change existing data source (TilesetId) with provided source.
 		/// </summary>
-		/// <param name="vectorSource">Data source (Mapid) to use.</param>
+		/// <param name="vectorSource">Data source (TilesetId) to use.</param>
 		public virtual void SetLayerSource(VectorSourceType vectorSource)
 		{
 			SetLayerSourceInternal(vectorSource);

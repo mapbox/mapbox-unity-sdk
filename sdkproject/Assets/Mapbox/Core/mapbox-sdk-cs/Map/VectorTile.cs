@@ -15,7 +15,7 @@ namespace Mapbox.Map
 	/// <summary>
 	///    A decoded vector tile, as specified by the
 	///    <see href="https://www.mapbox.com/vector-tiles/specification/">
-	///    Mapbox Vector Tile specification</see>. 
+	///    Mapbox Vector Tile specification</see>.
 	///    See available layers and features <see href="https://www.mapbox.com/vector-tiles/mapbox-streets-v7/">here</see>.
 	///    The tile might be incomplete if the network request and parsing are still pending.
 	/// </summary>
@@ -25,9 +25,9 @@ namespace Mapbox.Map
 	/// var parameters = new Tile.Parameters();
 	/// parameters.Fs = MapboxAccess.Instance;
 	/// parameters.Id = new CanonicalTileId(_zoom, _tileCoorindateX, _tileCoordinateY);
-	/// parameters.MapId = "mapbox.mapbox-streets-v7";
+	/// parameters.TilesetId = "mapbox.mapbox-streets-v7";
 	/// var vectorTile = new VectorTile();
-	/// 
+	///
 	/// // Make the request.
 	/// vectorTile.Initialize(parameters, (Action)(() =>
 	/// {
@@ -35,7 +35,7 @@ namespace Mapbox.Map
 	/// 	{
 	///			// Handle the error.
 	///		}
-	/// 
+	///
 	/// 	// Consume the <see cref="Data"/>.
 	///	}));
 	/// </code>
@@ -182,12 +182,12 @@ namespace Mapbox.Map
 		}
 
 
-		internal override TileResource MakeTileResource(string mapId)
+		internal override TileResource MakeTileResource(string tilesetId)
 		{
 
 			return (_isStyleOptimized) ?
-				TileResource.MakeStyleOptimizedVector(Id, mapId, _optimizedStyleId, _modifiedDate)
-			  : TileResource.MakeVector(Id, mapId);
+				TileResource.MakeStyleOptimizedVector(Id, tilesetId, _optimizedStyleId, _modifiedDate)
+			  : TileResource.MakeVector(Id, tilesetId);
 		}
 
 
