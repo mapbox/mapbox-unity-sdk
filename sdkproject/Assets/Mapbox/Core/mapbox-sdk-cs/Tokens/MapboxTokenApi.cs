@@ -52,7 +52,7 @@ namespace Mapbox.Tokens
 
 		public void Retrieve(Func<string> skuToken, string accessToken, Action<MapboxToken> callback)
 		{
-			if (_fs == null) ;
+			if (_fs == null)
 			{
 				_fs = new FileSource(skuToken);
 			}
