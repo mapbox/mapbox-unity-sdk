@@ -4,6 +4,8 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using Mapbox.Unity;
+
 namespace Mapbox.Platform
 {
 	using Mapbox.Map;
@@ -39,7 +41,7 @@ namespace Mapbox.Platform
 	public sealed class FileSource : IFileSource
 	{
 
-
+		private Func<string> _getMapsSkuToken;
 		private readonly Dictionary<IAsyncRequest, int> _requests = new Dictionary<IAsyncRequest, int>();
 		private readonly string _accessToken;
 		private readonly object _lock = new object();
@@ -54,8 +56,9 @@ namespace Mapbox.Platform
 #pragma warning restore 0414
 
 
-		public FileSource(string acessToken = null)
+		public FileSource(Func<string> getMapsSkuToken, string acessToken = null)
 		{
+			_getMapsSkuToken = getMapsSkuToken;
 			if (string.IsNullOrEmpty(acessToken))
 			{
 				_accessToken = Environment.GetEnvironmentVariable("MAPBOX_ACCESS_TOKEN");
@@ -86,13 +89,14 @@ namespace Mapbox.Platform
 			{
 				var uriBuilder = new UriBuilder(url);
 				string accessTokenQuery = "access_token=" + _accessToken;
+				string skuToken = "sku=" + _getMapsSkuToken();
 				if (uriBuilder.Query != null && uriBuilder.Query.Length > 1)
 				{
-					uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery;
+					uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery + "&" + skuToken;;
 				}
 				else
 				{
-					uriBuilder.Query = accessTokenQuery;
+					uriBuilder.Query = accessTokenQuery + "&" + skuToken;
 				}
 
 				url = uriBuilder.ToString();

@@ -19,15 +19,17 @@
 		private bool _disposed;
 		private List<ICache> _caches = new List<ICache>();
 		private string _accessToken;
+		private Func<string> _getMapsSkuToken;
 		private bool _autoRefreshCache;
 
 
-		public CachingWebFileSource(string accessToken, bool autoRefreshCache)
+		public CachingWebFileSource(string accessToken, Func<string> getMapsSkuToken, bool autoRefreshCache)
 		{
 #if MAPBOX_DEBUG_CACHE
 			_className = this.GetType().Name;
 #endif
 			_accessToken = accessToken;
+			_getMapsSkuToken = getMapsSkuToken;
 			_autoRefreshCache = autoRefreshCache;
 		}
 
@@ -138,13 +140,14 @@
 			if (!string.IsNullOrEmpty(_accessToken))
 			{
 				string accessTokenQuery = "access_token=" + _accessToken;
+				string mapsSkuToken = "sku=" + _getMapsSkuToken();
 				if (uriBuilder.Query != null && uriBuilder.Query.Length > 1)
 				{
-					uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery;
+					uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery + "&" + mapsSkuToken;
 				}
 				else
 				{
-					uriBuilder.Query = accessTokenQuery;
+					uriBuilder.Query = accessTokenQuery + "&" + mapsSkuToken;
 				}
 			}
 			string finalUrl = uriBuilder.ToString();

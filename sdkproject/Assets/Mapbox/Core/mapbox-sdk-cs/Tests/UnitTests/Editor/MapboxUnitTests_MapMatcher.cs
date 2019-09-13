@@ -34,7 +34,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		[SetUp]
 		public void SetUp()
 		{
-			_fs = new FileSource(Unity.MapboxAccess.Instance.Configuration.AccessToken);
+			_fs = new FileSource(Unity.MapboxAccess.Instance.Configuration.GetMapsSkuToken, Unity.MapboxAccess.Instance.Configuration.AccessToken);
 			_timeout = Unity.MapboxAccess.Instance.Configuration.DefaultTimeout;
 		}
 
