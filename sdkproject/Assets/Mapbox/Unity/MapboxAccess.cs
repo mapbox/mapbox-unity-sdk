@@ -329,9 +329,7 @@ namespace Mapbox.Unity
 
 	public class MapboxConfiguration
 	{
-		[NonSerialized] private string _endUserId;
-		[NonSerialized] private TokenGenerator _mapsTokenGenerator= new TokenGenerator(MapboxAccounts.ObtainMapsSkuUserToken, 1);
-		[NonSerialized] private TokenGenerator _navigationTokenGenerator = new TokenGenerator(MapboxAccounts.ObtainNavigationSkuUserToken, 1);
+		[NonSerialized] private MapboxAccounts mapboxAccounts = new MapboxAccounts();
 
 		public string AccessToken;
 		public uint MemoryCacheSize = 500;
@@ -341,47 +339,7 @@ namespace Mapbox.Unity
 
 		public string GetMapsSkuToken()
 		{
-			if (string.IsNullOrEmpty(_endUserId))
-			{
-				_endUserId = MapboxAccounts.ObtainEndUserId();
-			}
-
-			return _mapsTokenGenerator.GetToken(_endUserId);
-		}
-
-		public string GetNavigationSkuToken()
-		{
-			if (string.IsNullOrEmpty(_endUserId))
-			{
-				_endUserId = MapboxAccounts.ObtainEndUserId();
-			}
-
-			return _navigationTokenGenerator.GetToken(_endUserId);
-		}
-	}
-
-	[Serializable]
-	public class TokenGenerator
-	{
-		private readonly Func<string, string> _method;
-		private float _timeLimit;
-		private DateTime _lastTokenGenerationTime;
-		private string _currentMapsSkuToken;
-
-		public TokenGenerator(Func<string, string> method, float timeLimitInHours)
-		{
-			_method = method;
-			_timeLimit = timeLimitInHours;
-		}
-		public string GetToken(string userId)
-		{
-			if (string.IsNullOrEmpty(_currentMapsSkuToken) || (DateTime.Now - _lastTokenGenerationTime).TotalHours > _timeLimit)
-			{
-				_currentMapsSkuToken = _method(userId);
-				_lastTokenGenerationTime = DateTime.Now;
-			}
-
-			return _currentMapsSkuToken;
+			return mapboxAccounts.ObtainMapsSkuUserToken(Application.persistentDataPath);
 		}
 	}
 }
