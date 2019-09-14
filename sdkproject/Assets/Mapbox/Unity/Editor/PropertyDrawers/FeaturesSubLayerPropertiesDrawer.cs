@@ -145,7 +145,7 @@
 					}
 					if (tileJSONData.PropertyDisplayNames.Count == 0 && tileJSONData.tileJSONLoaded)
 					{
-						EditorGUILayout.HelpBox("Invalid Map Id / There might be a problem with the internet connection.", MessageType.Error);
+						EditorGUILayout.HelpBox("Invalid Tileset Id / There might be a problem with the internet connection.", MessageType.Error);
 					}
 					GUI.enabled = true;
 					isActiveProperty.boolValue = true;
@@ -162,7 +162,7 @@
 					}
 					if (tileJSONData.PropertyDisplayNames.Count == 0 && tileJSONData.tileJSONLoaded)
 					{
-						EditorGUILayout.HelpBox("Invalid Map Id / There might be a problem with the internet connection.", MessageType.Error);
+						EditorGUILayout.HelpBox("Invalid Tileset Id / There might be a problem with the internet connection.", MessageType.Error);
 					}
 					isActiveProperty.boolValue = true;
 					break;
@@ -609,7 +609,7 @@
 			//disable the selection if there is no layer
 			if (layerDisplayNames.Count == 0)
 			{
-				EditorGUILayout.LabelField(layerNameLabel, new GUIContent("No layers found: Invalid MapId / No Internet."), (GUIStyle)"minipopUp");
+				EditorGUILayout.LabelField(layerNameLabel, new GUIContent("No layers found: Invalid TilesetId / No Internet."), (GUIStyle)"minipopUp");
 				return;
 			}
 

@@ -115,13 +115,13 @@
 			, Action<Response> callback
 			, int timeout = 10
 			, CanonicalTileId tileId = new CanonicalTileId()
-			, string mapId = null
+			, string tilesetId = null
 		)
 		{
 
-			if (string.IsNullOrEmpty(mapId))
+			if (string.IsNullOrEmpty(tilesetId))
 			{
-				throw new Exception("Cannot cache without a map id");
+				throw new Exception("Cannot cache without a tileset id");
 			}
 
 			CacheItem cachedItem = null;
@@ -129,7 +129,7 @@
 			// go through existing caches and check if we already have the requested tile available
 			foreach (var cache in _caches)
 			{
-				cachedItem = cache.Get(mapId, tileId);
+				cachedItem = cache.Get(tilesetId, tileId);
 				if (null != cachedItem)
 				{
 					break;
@@ -160,7 +160,7 @@
 			if (null != cachedItem)
 			{
 #if MAPBOX_DEBUG_CACHE
-				UnityEngine.Debug.LogFormat("{0} {1} {2} {3}", methodName, mapId, tileId, null != cachedItem.Data ? cachedItem.Data.Length.ToString() : "cachedItem.Data is NULL");
+				UnityEngine.Debug.LogFormat("{0} {1} {2} {3}", methodName, tilesetId, tileId, null != cachedItem.Data ? cachedItem.Data.Length.ToString() : "cachedItem.Data is NULL");
 #endif
 				// immediately return cached tile
 				callback(Response.FromCache(cachedItem.Data));
@@ -196,24 +196,24 @@
 							{
 								foreach (var cache in _caches)
 								{
-									cache.Add(mapId, tileId, cachedItem, false);
+									cache.Add(tilesetId, tileId, cachedItem, false);
 								}
 							}
 							else
 							{
 								// TODO: remove Debug.Log before PR
 								UnityEngine.Debug.LogWarningFormat(
-										"updating cached tile {1} mapid:{2}{0}cached etag:{3}{0}remote etag:{4}{0}{5}"
+										"updating cached tile {1} tilesetId:{2}{0}cached etag:{3}{0}remote etag:{4}{0}{5}"
 										, Environment.NewLine
 										, tileId
-										, mapId
+										, tilesetId
 										, cachedItem.ETag
 										, headerOnly.Headers["ETag"]
 										, finalUrl
 									);
 
 								// request updated tile and pass callback to return new data to subscribers
-								requestTileAndCache(finalUrl, mapId, tileId, timeout, callback);
+								requestTileAndCache(finalUrl, tilesetId, tileId, timeout, callback);
 							}
 						}
 						, timeout
@@ -227,14 +227,14 @@
 			{
 				// requested tile is not in any of the caches yet, get it
 #if MAPBOX_DEBUG_CACHE
-				UnityEngine.Debug.LogFormat("{0} {1} {2} not cached", methodName, mapId, tileId);
+				UnityEngine.Debug.LogFormat("{0} {1} {2} not cached", methodName, tilesetId, tileId);
 #endif
-				return requestTileAndCache(finalUrl, mapId, tileId, timeout, callback);
+				return requestTileAndCache(finalUrl, tilesetId, tileId, timeout, callback);
 			}
 		}
 
 
-		private IAsyncRequest requestTileAndCache(string url, string mapId, CanonicalTileId tileId, int timeout, Action<Response> callback)
+		private IAsyncRequest requestTileAndCache(string url, string tilesetId, CanonicalTileId tileId, int timeout, Action<Response> callback)
 		{
 			return IAsyncRequestFactory.CreateRequest(
 				url,
@@ -266,7 +266,7 @@
 						foreach (var cache in _caches)
 						{
 							cache.Add(
-								mapId
+								tilesetId
 								, tileId
 								, new CacheItem()
 								{

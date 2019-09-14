@@ -40,9 +40,9 @@
 			}
 		}
 
-		private GUIContent _requiredMapIdGui = new GUIContent
+		private GUIContent _requiredTilesetIdGui = new GUIContent
 		{
-			text = "Required Map Id",
+			text = "Required Tileset Id",
 			tooltip = "For location prefabs to spawn the \"streets-v7\" tileset needs to be a part of the Vector data source"
 		};
 
@@ -80,7 +80,7 @@
 				if (sourceTypeValue != VectorSourceType.None && layerString.Contains(streets_v7))
 				{
 					GUI.enabled = false;
-					EditorGUILayout.TextField(_requiredMapIdGui, streets_v7);
+					EditorGUILayout.TextField(_requiredTilesetIdGui, streets_v7);
 					GUI.enabled = true;
 					_poiSublayerDrawer.DrawUI(property);
 				}
@@ -92,7 +92,7 @@
 
 			ShowSepartor();
 
-			//Draw Feature section. 
+			//Draw Feature section.
 			ShowFeatures = EditorGUILayout.Foldout(ShowFeatures, "FEATURES");
 			if (ShowFeatures)
 			{

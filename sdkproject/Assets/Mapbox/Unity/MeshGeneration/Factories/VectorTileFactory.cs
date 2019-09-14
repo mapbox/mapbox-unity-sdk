@@ -34,7 +34,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		#endregion
 
 		#region Properties
-		public string MapId
+		public string TilesetId
 		{
 			get
 			{
@@ -192,7 +192,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		protected override void OnRegistered(UnityTile tile)
 		{
-			if (string.IsNullOrEmpty(MapId) || _properties.sourceOptions.isActive == false || (_properties.vectorSubLayers.Count + _properties.locationPrefabList.Count) == 0)
+			if (string.IsNullOrEmpty(TilesetId) || _properties.sourceOptions.isActive == false || (_properties.vectorSubLayers.Count + _properties.locationPrefabList.Count) == 0)
 			{
 				tile.VectorDataState = TilePropertyState.None;
 				return;
@@ -202,7 +202,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			VectorDataFetcherParameters parameters = new VectorDataFetcherParameters()
 			{
 				canonicalTileId = tile.CanonicalTileId,
-				mapid = MapId,
+				tilesetId = TilesetId,
 				tile = tile,
 				useOptimizedStyle = _properties.useOptimizedStyle,
 				style = _properties.optimizedStyle

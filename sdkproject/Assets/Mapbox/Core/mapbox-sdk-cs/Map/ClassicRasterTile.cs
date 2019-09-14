@@ -14,9 +14,9 @@ namespace Mapbox.Map
 	/// </summary>
 	public class ClassicRasterTile : RasterTile
 	{
-		internal override TileResource MakeTileResource(string mapId)
+		internal override TileResource MakeTileResource(string tilesetId)
 		{
-			return TileResource.MakeClassicRaster(Id, mapId);
+			return TileResource.MakeClassicRaster(Id, tilesetId);
 		}
 	}
 }

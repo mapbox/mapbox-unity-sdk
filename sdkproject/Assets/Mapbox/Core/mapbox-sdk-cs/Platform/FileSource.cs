@@ -82,7 +82,7 @@ namespace Mapbox.Platform
 			, Action<Response> callback
 			, int timeout = 10
 			, CanonicalTileId tileId = new CanonicalTileId()
-			, string mapId = null
+			, string tilesetId = null
 		)
 		{
 			if (!string.IsNullOrEmpty(_accessToken))
@@ -113,7 +113,7 @@ namespace Mapbox.Platform
 
 			//return request;
 
-			return proxyResponse(url, callback, timeout, tileId, mapId);
+			return proxyResponse(url, callback, timeout, tileId, tilesetId);
 		}
 
 
@@ -124,7 +124,7 @@ namespace Mapbox.Platform
 			, Action<Response> callback
 			, int timeout
 			, CanonicalTileId tileId
-			, string mapId
+			, string tilesetId
 		)
 		{
 

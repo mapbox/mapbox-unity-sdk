@@ -18,7 +18,7 @@ public class VectorDataFetcher : DataFetcher
 		}
 		var vectorTile = (vectorDaraParameters.useOptimizedStyle) ? new VectorTile(vectorDaraParameters.style.Id, vectorDaraParameters.style.Modified) : new VectorTile();
 		vectorDaraParameters.tile.AddTile(vectorTile);
-		vectorTile.Initialize(_fileSource, vectorDaraParameters.tile.CanonicalTileId, vectorDaraParameters.mapid, () =>
+		vectorTile.Initialize(_fileSource, vectorDaraParameters.tile.CanonicalTileId, vectorDaraParameters.tilesetId, () =>
 		{
 			if (vectorDaraParameters.tile.CanonicalTileId != vectorTile.Id)
 			{

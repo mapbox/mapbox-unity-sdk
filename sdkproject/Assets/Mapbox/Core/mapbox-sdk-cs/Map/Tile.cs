@@ -131,17 +131,17 @@ namespace Mapbox.Map
 			_state = State.Loading;
 			_id = param.Id;
 			_callback = callback;
-			_request = param.Fs.Request(MakeTileResource(param.MapId).GetUrl(), HandleTileResponse, tileId: _id, mapId: param.MapId);
+			_request = param.Fs.Request(MakeTileResource(param.TilesetId).GetUrl(), HandleTileResponse, tileId: _id, tilesetId: param.TilesetId);
 		}
 
-		internal void Initialize(IFileSource fileSource, CanonicalTileId canonicalTileId, string mapId, Action p)
+		internal void Initialize(IFileSource fileSource, CanonicalTileId canonicalTileId, string tilesetId, Action p)
 		{
 			Cancel();
 
 			_state = State.Loading;
 			_id = canonicalTileId;
 			_callback = p;
-			_request = fileSource.Request(MakeTileResource(mapId).GetUrl(), HandleTileResponse, tileId: _id, mapId: mapId);
+			_request = fileSource.Request(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse, tileId: _id, tilesetId: tilesetId);
 		}
 
 		/// <summary>
@@ -177,7 +177,7 @@ namespace Mapbox.Map
 		///		{
 		///			tile.Cancel();
 		///			NotifyNext(tile);
-		///			return true;			
+		///			return true;
 		/// 	}
 		///	});
 		/// </code>
@@ -195,7 +195,7 @@ namespace Mapbox.Map
 
 
 		// Get the tile resource (raster/vector/etc).
-		internal abstract TileResource MakeTileResource(string mapid);
+		internal abstract TileResource MakeTileResource(string tilesetId);
 
 
 		// Decode the tile.
@@ -253,7 +253,7 @@ namespace Mapbox.Map
 		/// var parameters = new Tile.Parameters();
 		/// parameters.Fs = MapboxAccess.Instance;
 		/// parameters.Id = new CanonicalTileId(_zoom, _tileCoorindateX, _tileCoordinateY);
-		/// parameters.MapId = "mapbox.mapbox-streets-v7";
+		/// parameters.TilesetId = "mapbox.mapbox-streets-v7";
 		/// </code>
 		/// </example>
 		public struct Parameters
@@ -262,11 +262,11 @@ namespace Mapbox.Map
 			public CanonicalTileId Id;
 
 			/// <summary>
-			///     The tileset map ID, usually in the format "user.mapid". Exceptionally,
+			///     The tileset ID, usually in the format "user.mapid". Exceptionally,
 			///     <see cref="T:Mapbox.Map.RasterTile"/> will take the full style URL
 			///     from where the tile is composited from, like mapbox://styles/mapbox/streets-v9.
 			/// </summary>
-			public string MapId;
+			public string TilesetId;
 
 			/// <summary> The data source abstraction. </summary>
 			public IFileSource Fs;

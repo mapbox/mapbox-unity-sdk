@@ -34,7 +34,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		public string MapId
+		public string TilesetId
 		{
 			get
 			{
@@ -121,7 +121,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				{
 					canonicalTileId = tile.CanonicalTileId,
 					tile = tile,
-					mapid = MapId,
+					tilesetId = TilesetId,
 					useRetina = _properties.rasterOptions.useRetina
 				};
 				DataFetcher.FetchData(parameters);

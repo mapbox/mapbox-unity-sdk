@@ -28,29 +28,29 @@ namespace Mapbox.Map
 			return new TileResource(string.Format("{0}/{1}@2x", MapUtils.NormalizeStaticStyleURL(styleUrl ?? "mapbox://styles/mapbox/satellite-v9"), id));
 		}
 
-		public static TileResource MakeClassicRaster(CanonicalTileId id, string mapId)
+		public static TileResource MakeClassicRaster(CanonicalTileId id, string tilesetId)
 		{
-			return new TileResource(string.Format("{0}/{1}.png", MapUtils.MapIdToUrl(mapId ?? "mapbox.satellite"), id));
+			return new TileResource(string.Format("{0}/{1}.png", MapUtils.TilesetIdToUrl(tilesetId ?? "mapbox.satellite"), id));
 		}
 
-		internal static TileResource MakeClassicRetinaRaster(CanonicalTileId id, string mapId)
+		internal static TileResource MakeClassicRetinaRaster(CanonicalTileId id, string tilesetId)
 		{
-			return new TileResource(string.Format("{0}/{1}@2x.png", MapUtils.MapIdToUrl(mapId ?? "mapbox.satellite"), id));
+			return new TileResource(string.Format("{0}/{1}@2x.png", MapUtils.TilesetIdToUrl(tilesetId ?? "mapbox.satellite"), id));
 		}
 
-		public static TileResource MakeRawPngRaster(CanonicalTileId id, string mapId)
+		public static TileResource MakeRawPngRaster(CanonicalTileId id, string tilesetId)
 		{
-			return new TileResource(string.Format("{0}/{1}.pngraw", MapUtils.MapIdToUrl(mapId ?? "mapbox.terrain-rgb"), id));
+			return new TileResource(string.Format("{0}/{1}.pngraw", MapUtils.TilesetIdToUrl(tilesetId ?? "mapbox.terrain-rgb"), id));
 		}
 
-		public static TileResource MakeVector(CanonicalTileId id, string mapId)
+		public static TileResource MakeVector(CanonicalTileId id, string tilesetId)
 		{
-			return new TileResource(string.Format("{0}/{1}.vector.pbf", MapUtils.MapIdToUrl(mapId ?? "mapbox.mapbox-streets-v7"), id));
+			return new TileResource(string.Format("{0}/{1}.vector.pbf", MapUtils.TilesetIdToUrl(tilesetId ?? "mapbox.mapbox-streets-v7"), id));
 		}
 
-		internal static TileResource MakeStyleOptimizedVector(CanonicalTileId id, string mapId, string optimizedStyleId, string modifiedDate)
+		internal static TileResource MakeStyleOptimizedVector(CanonicalTileId id, string tilesetId, string optimizedStyleId, string modifiedDate)
 		{
-			return new TileResource(string.Format("{0}/{1}.vector.pbf?style={2}@{3}", MapUtils.MapIdToUrl(mapId ?? "mapbox.mapbox-streets-v7"), id, optimizedStyleId, modifiedDate));
+			return new TileResource(string.Format("{0}/{1}.vector.pbf?style={2}@{3}", MapUtils.TilesetIdToUrl(tilesetId ?? "mapbox.mapbox-streets-v7"), id, optimizedStyleId, modifiedDate));
 		}
 
 		public string GetUrl()

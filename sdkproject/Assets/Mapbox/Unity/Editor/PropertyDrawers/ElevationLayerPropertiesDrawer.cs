@@ -25,21 +25,21 @@
 			}
 		}
 
-		private GUIContent _mapIdGui = new GUIContent
+		private GUIContent _tilesetIdGui = new GUIContent
 		{
-			text = "Map Id",
-			tooltip = "Map Id corresponding to the tileset."
+			text = "Tileset Id",
+			tooltip = "Id of the tileset."
 		};
 
-		string CustomSourceMapId
+		string CustomSourceTilesetId
 		{
 			get
 			{
-				return EditorPrefs.GetString(objectId + "ElevationLayerProperties_customSourceMapId");
+				return EditorPrefs.GetString(objectId + "ElevationLayerProperties_customSourceTilesetId");
 			}
 			set
 			{
-				EditorPrefs.SetString(objectId + "ElevationLayerProperties_customSourceMapId", value);
+				EditorPrefs.SetString(objectId + "ElevationLayerProperties_customSourceTilesetId", value);
 			}
 		}
 
@@ -87,13 +87,13 @@
 					var sourcePropertyValue = MapboxDefaultElevation.GetParameters(sourceTypeValue);
 					layerSourceId.stringValue = sourcePropertyValue.Id;
 					GUI.enabled = false;
-					EditorGUILayout.PropertyField(sourceOptionsProperty, _mapIdGui);
+					EditorGUILayout.PropertyField(sourceOptionsProperty, _tilesetIdGui);
 					GUI.enabled = true;
 					break;
 				case ElevationSourceType.Custom:
-					layerSourceId.stringValue = string.IsNullOrEmpty(CustomSourceMapId) ? MapboxDefaultElevation.GetParameters(ElevationSourceType.MapboxTerrain).Id : CustomSourceMapId;
-					EditorGUILayout.PropertyField(sourceOptionsProperty, _mapIdGui);
-					CustomSourceMapId = layerSourceId.stringValue;
+					layerSourceId.stringValue = string.IsNullOrEmpty(CustomSourceTilesetId) ? MapboxDefaultElevation.GetParameters(ElevationSourceType.MapboxTerrain).Id : CustomSourceTilesetId;
+					EditorGUILayout.PropertyField(sourceOptionsProperty, _tilesetIdGui);
+					CustomSourceTilesetId = layerSourceId.stringValue;
 					break;
 				default:
 					break;

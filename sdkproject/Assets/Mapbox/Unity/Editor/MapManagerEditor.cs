@@ -89,10 +89,10 @@ namespace Mapbox.Editor
 			}
 		}
 
-		private GUIContent mapIdGui = new GUIContent
+		private GUIContent tilesetIdGui = new GUIContent
 		{
-			text = "Map Id",
-			tooltip = "Map Id corresponding to the tileset."
+			text = "Tileset Id",
+			tooltip = "Id of the tileset."
 		};
 
 		bool _isGUIContentSet = false;
@@ -327,12 +327,12 @@ namespace Mapbox.Editor
 					var sourcePropertyValue = MapboxDefaultVector.GetParameters(sourceTypeValue);
 					layerSourceId.stringValue = sourcePropertyValue.Id;
 					GUI.enabled = false;
-					EditorGUILayout.PropertyField(layerSourceProperty, mapIdGui);
+					EditorGUILayout.PropertyField(layerSourceProperty, tilesetIdGui);
 					GUI.enabled = true;
 					isActiveProperty.boolValue = true;
 					break;
 				case VectorSourceType.Custom:
-					EditorGUILayout.PropertyField(layerSourceProperty, mapIdGui);
+					EditorGUILayout.PropertyField(layerSourceProperty, tilesetIdGui);
 					isActiveProperty.boolValue = true;
 					break;
 				case VectorSourceType.None:

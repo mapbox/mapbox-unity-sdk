@@ -25,11 +25,11 @@ namespace Mapbox.Map
 	/// var map = new Map&lt;RasterTile&gt;(MapboxAccess.Instance);
 	/// map.Zoom = 2
 	/// map.Vector2dBounds = Vector2dBounds.World();
-	/// map.MapId = "mapbox://styles/mapbox/streets-v10
-	/// 
+	/// map.TilesetId = "mapbox://styles/mapbox/streets-v10
+	///
 	/// // Register for tile updates.
 	/// map.Subscribe(this);
-	/// 
+	///
 	/// // Trigger the request.
 	/// map.Update();
 	/// </code>
@@ -44,7 +44,7 @@ namespace Mapbox.Map
 		private readonly IFileSource fs;
 		private Vector2dBounds latLngBounds;
 		private int zoom;
-		private string mapId;
+		private string tilesetId;
 
 		private HashSet<T> tiles = new HashSet<T>();
 		private List<Mapbox.Utils.IObserver<T>> observers = new List<Mapbox.Utils.IObserver<T>>();
@@ -61,30 +61,30 @@ namespace Mapbox.Map
 		}
 
 		/// <summary>
-		///     Gets or sets the tileset map ID. If not set, it will use the default
-		///     map ID for the tile type. I.e. "mapbox.satellite" for raster tiles
+		///     Gets or sets the tileset ID. If not set, it will use the default
+		///     tileset ID for the tile type. I.e. "mapbox.satellite" for raster tiles
 		///     and "mapbox.mapbox-streets-v7" for vector tiles.
 		/// </summary>
-		/// <value> 
-		///     The tileset map ID, usually in the format "user.mapid". Exceptionally,
+		/// <value>
+		///     The tileset ID, usually in the format "user.mapid". Exceptionally,
 		///     <see cref="T:Mapbox.Map.RasterTile"/> will take the full style URL
 		///     from where the tile is composited from, like "mapbox://styles/mapbox/streets-v9".
 		/// </value>
-		public string MapId
+		public string TilesetId
 		{
 			get
 			{
-				return this.mapId;
+				return this.tilesetId;
 			}
 
 			set
 			{
-				if (this.mapId == value)
+				if (this.tilesetId == value)
 				{
 					return;
 				}
 
-				this.mapId = value;
+				this.tilesetId = value;
 
 				foreach (Tile tile in this.tiles)
 				{
@@ -224,12 +224,12 @@ namespace Mapbox.Map
 
 				Tile.Parameters param;
 				param.Id = id;
-				param.MapId = this.mapId;
+				param.TilesetId = this.tilesetId;
 				param.Fs = this.fs;
 
 				tile.Initialize(param, () => { this.NotifyNext(tile); });
 
-				this.tiles.Add(tile);				
+				this.tiles.Add(tile);
 			}
 		}
 	}

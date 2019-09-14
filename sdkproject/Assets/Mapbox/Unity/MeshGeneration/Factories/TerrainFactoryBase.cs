@@ -74,7 +74,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				TerrainDataFetcherParameters parameters = new TerrainDataFetcherParameters()
 				{
 					canonicalTileId = tile.CanonicalTileId,
-					mapid = _elevationOptions.sourceOptions.Id,
+					tilesetId = _elevationOptions.sourceOptions.Id,
 					tile = tile
 				};
 				DataFetcher.FetchData(parameters);
