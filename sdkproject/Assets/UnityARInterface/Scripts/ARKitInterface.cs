@@ -9,6 +9,7 @@ using UnityEngine.XR.iOS;
 
 namespace UnityARInterface
 {
+    #if !UNITY_EDITOR && UNITY_IOS
     public class ARKitInterface : ARInterface
     {
         private Material m_ClearMaterial;
@@ -137,7 +138,7 @@ namespace UnityARInterface
                 m_TexturesInitialized = true;
             }
 
-            m_PointCloudData = camera.pointCloudData;
+            m_PointCloudData = camera.pointCloud.Points;
             m_LightEstimate.capabilities = LightEstimateCapabilities.AmbientColorTemperature | LightEstimateCapabilities.AmbientIntensity;
             m_LightEstimate.ambientColorTemperature = camera.lightData.arLightEstimate.ambientColorTemperature;
 
@@ -240,7 +241,7 @@ namespace UnityARInterface
         public override bool TryGetCameraImage(ref CameraImage cameraImage)
         {
             ARTextureHandles handles = nativeInterface.GetARVideoTextureHandles();
-            if (handles.textureY == System.IntPtr.Zero || handles.textureCbCr == System.IntPtr.Zero)
+            if (handles.TextureY == System.IntPtr.Zero || handles.TextureCbCr == System.IntPtr.Zero)
                 return false;
 
             if (!m_TexturesInitialized)
@@ -300,7 +301,7 @@ namespace UnityARInterface
                 return;
 
             ARTextureHandles handles = UnityARSessionNativeInterface.GetARSessionNativeInterface().GetARVideoTextureHandles();
-            if (handles.textureY == System.IntPtr.Zero || handles.textureCbCr == System.IntPtr.Zero)
+            if (handles.TextureY == System.IntPtr.Zero || handles.TextureCbCr == System.IntPtr.Zero)
             {
                 m_CanRenderBackground = false;
                 return;
@@ -315,7 +316,7 @@ namespace UnityARInterface
             if (_videoTextureY == null)
             {
                 _videoTextureY = Texture2D.CreateExternalTexture(currentResolution.width, currentResolution.height,
-                    TextureFormat.R8, false, false, (System.IntPtr)handles.textureY);
+                    TextureFormat.R8, false, false, (System.IntPtr)handles.TextureY);
                 _videoTextureY.filterMode = FilterMode.Bilinear;
                 _videoTextureY.wrapMode = TextureWrapMode.Repeat;
                 m_ClearMaterial.SetTexture("_textureY", _videoTextureY);
@@ -325,14 +326,14 @@ namespace UnityARInterface
             if (_videoTextureCbCr == null)
             {
                 _videoTextureCbCr = Texture2D.CreateExternalTexture(currentResolution.width, currentResolution.height,
-                    TextureFormat.RG16, false, false, (System.IntPtr)handles.textureCbCr);
+                    TextureFormat.RG16, false, false, (System.IntPtr)handles.TextureCbCr);
                 _videoTextureCbCr.filterMode = FilterMode.Bilinear;
                 _videoTextureCbCr.wrapMode = TextureWrapMode.Repeat;
                 m_ClearMaterial.SetTexture("_textureCbCr", _videoTextureCbCr);
             }
 
-            _videoTextureY.UpdateExternalTexture(handles.textureY);
-            _videoTextureCbCr.UpdateExternalTexture(handles.textureCbCr);
+            _videoTextureY.UpdateExternalTexture(handles.TextureY);
+            _videoTextureCbCr.UpdateExternalTexture(handles.TextureCbCr);
 
             m_ClearMaterial.SetMatrix("_DisplayTransform", m_DisplayTransform);
         }
@@ -377,4 +378,5 @@ namespace UnityARInterface
             }
         }
     }
+#endif
 }

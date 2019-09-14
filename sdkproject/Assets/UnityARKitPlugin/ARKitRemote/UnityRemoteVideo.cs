@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -21,7 +21,7 @@ namespace UnityEngine.XR.iOS
 		private GCHandle m_pinnedYArray;
 		private GCHandle m_pinnedUVArray;
 
-		#if !UNITY_EDITOR
+		#if !UNITY_EDITOR && UNITY_IOS
 
 		public void Start()
 		{
@@ -88,7 +88,7 @@ namespace UnityEngine.XR.iOS
 		public void OnPreRender()
 		{
 			ARTextureHandles handles = m_Session.GetARVideoTextureHandles();
-			if (handles.textureY == System.IntPtr.Zero || handles.textureCbCr == System.IntPtr.Zero)
+            if (handles.IsNull())
 			{
 				return;
 			}
@@ -103,8 +103,10 @@ namespace UnityEngine.XR.iOS
 
 			m_Session.SetCapturePixelData (true, PinByteArray(ref m_pinnedYArray,YByteArrayForFrame(currentFrameIndex)), PinByteArray(ref m_pinnedUVArray,UVByteArrayForFrame(currentFrameIndex)));
 
-			connectToEditor.SendToEditor (ConnectionMessageIds.screenCaptureYMsgId, YByteArrayForFrame(1-currentFrameIndex));
-			connectToEditor.SendToEditor (ConnectionMessageIds.screenCaptureUVMsgId, UVByteArrayForFrame(1-currentFrameIndex));
+			connectToEditor.SendToEditor (ConnectionMessageIds.screenCaptureYMsgId, 
+					CompressionHelper.ByteArrayCompress(YByteArrayForFrame(1-currentFrameIndex)));
+			connectToEditor.SendToEditor (ConnectionMessageIds.screenCaptureUVMsgId, 
+					CompressionHelper.ByteArrayCompress(UVByteArrayForFrame(1-currentFrameIndex)));
 			
 		}
 		#endif

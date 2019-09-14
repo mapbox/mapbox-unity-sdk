@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking.PlayerConnection;
-using Utils;
+using UnityEngine.XR.iOS.Utils;
 
 // Runs on the remote device. Talks to the Editor.
 namespace UnityARInterface

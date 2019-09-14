@@ -2,8 +2,9 @@ using System;
 using UnityEngine;
 using UnityEngine.XR.iOS;
 using System.Text;
+using System.Collections.Generic;
 
-namespace Utils
+namespace UnityEngine.XR.iOS.Utils
 {
 	/// <summary>
 	/// Since unity doesn't flag the Vector4 as serializable, we
@@ -240,9 +241,11 @@ namespace Utils
 		public serializableUnityARLightData lightData;
 		public serializablePointCloud pointCloud;
 		public serializableUnityARMatrix4x4 displayTransform;
+		public ARWorldMappingStatus worldMappingStatus;
 
 
-		public serializableUnityARCamera( serializableUnityARMatrix4x4 wt, serializableUnityARMatrix4x4 pm, ARTrackingState ats, ARTrackingStateReason atsr, UnityVideoParams uvp, UnityARLightData lightDat, serializableUnityARMatrix4x4 dt, serializablePointCloud spc)
+		public serializableUnityARCamera( serializableUnityARMatrix4x4 wt, serializableUnityARMatrix4x4 pm, ARTrackingState ats, ARTrackingStateReason atsr, UnityVideoParams uvp, UnityARLightData lightDat, serializableUnityARMatrix4x4 dt, serializablePointCloud spc, 
+				ARWorldMappingStatus awms)
 		{
 			worldTransform = wt;
 			projectionMatrix = pm;
@@ -252,20 +255,139 @@ namespace Utils
 			lightData = lightDat;
 			displayTransform = dt;
 			pointCloud = spc;
+			worldMappingStatus = awms;
 		}
-
-		public static implicit operator serializableUnityARCamera(UnityARCamera rValue)
-		{
-			return new serializableUnityARCamera(rValue.worldTransform, rValue.projectionMatrix, rValue.trackingState, rValue.trackingReason, rValue.videoParams, rValue.lightData, rValue.displayTransform, rValue.pointCloudData);
-		}
-
+		#if UNITY_EDITOR
 		public static implicit operator UnityARCamera(serializableUnityARCamera rValue)
 		{
-			return new UnityARCamera (rValue.worldTransform, rValue.projectionMatrix, rValue.trackingState, rValue.trackingReason, rValue.videoParams, rValue.lightData, rValue.displayTransform, rValue.pointCloud);
+			return new UnityARCamera (rValue.worldTransform, rValue.projectionMatrix, rValue.trackingState, rValue.trackingReason, rValue.videoParams, rValue.lightData, rValue.displayTransform, rValue.pointCloud, rValue.worldMappingStatus);
+		}
+		#else //!UNITY_EDITOR
+		public static implicit operator serializableUnityARCamera(UnityARCamera rValue)
+		{
+			return new serializableUnityARCamera(rValue.worldTransform, rValue.projectionMatrix, rValue.trackingState, rValue.trackingReason, rValue.videoParams, rValue.lightData, rValue.displayTransform, rValue.pointCloud, rValue.worldMappingStatus);
+		}
+		#endif
+	};
+
+	[Serializable]
+	public class serializablePlaneGeometry
+	{
+		public byte [] vertices;
+		public byte [] texCoords;
+		public byte [] triIndices;
+		public byte[] boundaryVertices;
+
+
+		public serializablePlaneGeometry(byte [] inputVertices, byte [] inputTexCoords, byte [] inputTriIndices, byte [] boundaryVerts)
+		{
+			vertices = inputVertices;
+			texCoords = inputTexCoords;
+			triIndices = inputTriIndices;
+			boundaryVertices = boundaryVerts;
+
 		}
 
+		#if !UNITY_EDITOR
+		public static implicit operator serializablePlaneGeometry(ARPlaneGeometry planeGeom)
+		{
+			if (planeGeom.vertexCount != 0 && planeGeom.textureCoordinateCount != 0 && planeGeom.triangleCount != 0)
+			{
+				Vector3 [] planeVertices = planeGeom.vertices;
+				byte [] cbVerts = new byte[planeGeom.vertexCount * sizeof(float) * 3];
+				Buffer.BlockCopy( planeVertices, 0, cbVerts, 0, planeGeom.vertexCount * sizeof(float) * 3 );
+			
+				Vector3 [] boundaryVertices = planeGeom.boundaryVertices;
+				byte [] cbBVerts = new byte[planeGeom.boundaryVertexCount * sizeof(float) * 3];
+				Buffer.BlockCopy( boundaryVertices, 0, cbBVerts, 0, planeGeom.boundaryVertexCount * sizeof(float) * 3 );
+
+
+				Vector2 [] planeTexCoords = planeGeom.textureCoordinates;
+				byte [] cbTexCoords = new byte[planeGeom.textureCoordinateCount * sizeof(float) * 2];
+				Buffer.BlockCopy( planeTexCoords, 0, cbTexCoords, 0, planeGeom.textureCoordinateCount * sizeof(float) * 2 );
+
+
+				int [] triIndices = planeGeom.triangleIndices;
+				byte [] cbTriIndices = triIndices.SerializeToByteArray();
+
+				return new serializablePlaneGeometry (cbVerts, cbTexCoords, cbTriIndices, cbBVerts);
+			}
+			else 
+			{
+				return new serializablePlaneGeometry(null, null, null, null);
+			}
+		}
+		#endif //!UNITY_EDITOR
+
+		public Vector3 [] Vertices {
+			get {
+				if (vertices != null) {
+					int numVectors = vertices.Length / (3 * sizeof(float));
+					Vector3[] verticesVec = new Vector3[numVectors];
+					for (int i = 0; i < numVectors; i++) {
+						int bufferStart = i * 3;
+						verticesVec [i].x = BitConverter.ToSingle (vertices, (bufferStart) * sizeof(float));
+						verticesVec [i].y = BitConverter.ToSingle (vertices, (bufferStart + 1) * sizeof(float));
+						verticesVec [i].z = BitConverter.ToSingle (vertices, (bufferStart + 2) * sizeof(float));
+
+					}
+					return verticesVec;
+				} else {
+					return null;
+				}
+			}
+		}
+
+		public Vector3 [] BoundaryVertices {
+			get {
+				if (boundaryVertices != null) {
+					int numVectors = boundaryVertices.Length / (3 * sizeof(float));
+					Vector3[] verticesVec = new Vector3[numVectors];
+					for (int i = 0; i < numVectors; i++) {
+						int bufferStart = i * 3;
+						verticesVec [i].x = BitConverter.ToSingle (boundaryVertices, (bufferStart) * sizeof(float));
+						verticesVec [i].y = BitConverter.ToSingle (boundaryVertices, (bufferStart + 1) * sizeof(float));
+						verticesVec [i].z = BitConverter.ToSingle (boundaryVertices, (bufferStart + 2) * sizeof(float));
+
+					}
+					return verticesVec;
+				} else {
+					return null;
+				}
+			}
+		}
+
+		public Vector2 [] TexCoords {
+			get {
+				if (texCoords != null) {
+					int numVectors = texCoords.Length / (2 * sizeof(float));
+					Vector2[] texCoordVec = new Vector2[numVectors];
+					for (int i = 0; i < numVectors; i++) {
+						int bufferStart = i * 2;
+						texCoordVec [i].x = BitConverter.ToSingle (texCoords, (bufferStart) * sizeof(float));
+						texCoordVec [i].y = BitConverter.ToSingle (texCoords, (bufferStart + 1) * sizeof(float));
+
+					}
+					return texCoordVec;
+				} else {
+					return null;
+				}
+			}
+		}
+
+		public int [] TriangleIndices {
+			get {
+				if (triIndices != null) {
+					int[] triIndexVec = triIndices.Deserialize<int[]>();
+					return triIndexVec;
+				} else {
+					return null;
+				}
+			}
+		}
 
 	};
+
 
 	[Serializable]  
 	public class serializableUnityARPlaneAnchor
@@ -274,94 +396,220 @@ namespace Utils
 		public SerializableVector4 center;
 		public SerializableVector4 extent;
 		public ARPlaneAnchorAlignment planeAlignment;
+		public serializablePlaneGeometry planeGeometry;
 		public byte[] identifierStr;
 
 		public serializableUnityARPlaneAnchor( serializableUnityARMatrix4x4 wt, SerializableVector4 ctr, SerializableVector4 ext, ARPlaneAnchorAlignment apaa,
-			byte [] idstr)
+			serializablePlaneGeometry spg, byte [] idstr)
 		{
 			worldTransform = wt;
 			center = ctr;
 			extent = ext;
 			planeAlignment = apaa;
 			identifierStr = idstr;
+			planeGeometry = spg;
 		}
 
+		#if UNITY_EDITOR
+		public static implicit operator ARPlaneAnchor(serializableUnityARPlaneAnchor rValue)
+		{
+			return  new ARPlaneAnchor(rValue);
+		}
+		#else //!UNITY_EDITOR
 		public static implicit operator serializableUnityARPlaneAnchor(ARPlaneAnchor rValue)
 		{
 			serializableUnityARMatrix4x4 wt = rValue.transform;
 			SerializableVector4 ctr = new SerializableVector4 (rValue.center.x, rValue.center.y, rValue.center.z, 1.0f);
 			SerializableVector4 ext = new SerializableVector4 (rValue.extent.x, rValue.extent.y, rValue.extent.z, 1.0f);
 			byte[] idstr = Encoding.UTF8.GetBytes (rValue.identifier);
-			return new serializableUnityARPlaneAnchor(wt, ctr, ext, rValue.alignment, idstr);
+			serializablePlaneGeometry spg = rValue.planeGeometry;
+			return new serializableUnityARPlaneAnchor(wt, ctr, ext, rValue.alignment, spg,  idstr);
+		}
+		#endif
+
+	};
+
+
+	[Serializable]
+	public class serializableFaceGeometry
+	{
+		public byte [] vertices;
+		public byte [] texCoords;
+		public byte [] triIndices;
+
+
+		public serializableFaceGeometry(byte [] inputVertices, byte [] inputTexCoords, byte [] inputTriIndices)
+		{
+			vertices = inputVertices;
+			texCoords = inputTexCoords;
+			triIndices = inputTriIndices;
+
 		}
 
-		public static implicit operator ARPlaneAnchor(serializableUnityARPlaneAnchor rValue)
+		#if !UNITY_EDITOR
+		public static implicit operator serializableFaceGeometry(ARFaceGeometry faceGeom)
 		{
-			ARPlaneAnchor retValue;
+			if (faceGeom.vertexCount != 0 && faceGeom.textureCoordinateCount != 0 && faceGeom.triangleCount != 0)
+			{
+				Vector3 [] faceVertices = faceGeom.vertices;
+				byte [] cbVerts = new byte[faceGeom.vertexCount * sizeof(float) * 3];
+				Buffer.BlockCopy( faceVertices, 0, cbVerts, 0, faceGeom.vertexCount * sizeof(float) * 3 );
+				
 
-			retValue.identifier = Encoding.UTF8.GetString (rValue.identifierStr);
-			retValue.center = new Vector3 (rValue.center.x, rValue.center.y, rValue.center.z);
-			retValue.extent = new Vector3 (rValue.extent.x, rValue.extent.y, rValue.extent.z);
-			retValue.alignment = rValue.planeAlignment;
-			retValue.transform = rValue.worldTransform;
-			
-			return retValue;
+				Vector2 [] faceTexCoords = faceGeom.textureCoordinates;
+				byte [] cbTexCoords = new byte[faceGeom.textureCoordinateCount * sizeof(float) * 2];
+				Buffer.BlockCopy( faceTexCoords, 0, cbTexCoords, 0, faceGeom.textureCoordinateCount * sizeof(float) * 2 );
+
+
+				int [] triIndices = faceGeom.triangleIndices;
+				byte [] cbTriIndices = triIndices.SerializeToByteArray();
+
+				return new serializableFaceGeometry (cbVerts, cbTexCoords, cbTriIndices);
+			}
+			else 
+			{
+				return new serializableFaceGeometry(null, null, null);
+			}
+		}
+		#endif //!UNITY_EDITOR
+
+		public Vector3 [] Vertices {
+			get {
+				if (vertices != null) {
+					int numVectors = vertices.Length / (3 * sizeof(float));
+					Vector3[] verticesVec = new Vector3[numVectors];
+					for (int i = 0; i < numVectors; i++) {
+						int bufferStart = i * 3;
+						verticesVec [i].x = BitConverter.ToSingle (vertices, (bufferStart) * sizeof(float));
+						verticesVec [i].y = BitConverter.ToSingle (vertices, (bufferStart + 1) * sizeof(float));
+						verticesVec [i].z = BitConverter.ToSingle (vertices, (bufferStart + 2) * sizeof(float));
+
+					}
+					return verticesVec;
+				} else {
+					return null;
+				}
+			}
+		}
+
+		public Vector2 [] TexCoords {
+			get {
+				if (texCoords != null) {
+					int numVectors = texCoords.Length / (2 * sizeof(float));
+					Vector2[] texCoordVec = new Vector2[numVectors];
+					for (int i = 0; i < numVectors; i++) {
+						int bufferStart = i * 2;
+						texCoordVec [i].x = BitConverter.ToSingle (texCoords, (bufferStart) * sizeof(float));
+						texCoordVec [i].y = BitConverter.ToSingle (texCoords, (bufferStart + 1) * sizeof(float));
+
+					}
+					return texCoordVec;
+				} else {
+					return null;
+				}
+			}
+		}
+
+		public int [] TriangleIndices {
+			get {
+				if (triIndices != null) {
+					int[] triIndexVec = triIndices.Deserialize<int[]>();
+					return triIndexVec;
+				} else {
+					return null;
+				}
+			}
 		}
 
 	};
+
+
+	[Serializable]  
+	public class serializableUnityARFaceAnchor
+	{
+		public serializableUnityARMatrix4x4 worldTransform;
+		public serializableFaceGeometry faceGeometry;
+		public Dictionary<string, float> arBlendShapes;
+		public byte[] identifierStr;
+		public bool isTracked;
+
+		public serializableUnityARFaceAnchor( serializableUnityARMatrix4x4 wt, serializableFaceGeometry fg, Dictionary<string, float> bs, byte [] idstr, bool bIsTracked)
+		{
+			worldTransform = wt;
+			faceGeometry = fg;
+			arBlendShapes = bs;
+			identifierStr = idstr;
+			isTracked = bIsTracked;
+		}
+
+
+		#if UNITY_EDITOR
+		public static implicit operator ARFaceAnchor(serializableUnityARFaceAnchor rValue)
+		{
+			return new ARFaceAnchor(rValue);
+		}
+		#else
+		public static implicit operator serializableUnityARFaceAnchor(ARFaceAnchor rValue)
+		{
+			serializableUnityARMatrix4x4 wt = rValue.transform;
+			serializableFaceGeometry sfg = rValue.faceGeometry;
+			byte[] idstr = Encoding.UTF8.GetBytes (rValue.identifierStr);
+			return new serializableUnityARFaceAnchor(wt, sfg, rValue.blendShapes, idstr, rValue.isTracked);
+		}
+		#endif
+	};
+
 
 	[Serializable]
 	public class serializablePointCloud
 	{
 		public byte [] pointCloudData;
+		public byte[] pointCloudIds;
 
-		public serializablePointCloud(byte [] inputPoints)
+		public serializablePointCloud(byte [] inputPoints, byte [] inputIds)
 		{
 			pointCloudData = inputPoints;
+			pointCloudIds = inputIds;
 		}
 
-		public static implicit operator serializablePointCloud(Vector3 [] vecPointCloud)
+		#if !UNITY_EDITOR 
+		public static implicit operator serializablePointCloud(ARPointCloud pointCloud)
 		{
-			if (vecPointCloud != null)
+			byte[] pointsBuf = null;
+			byte[] idsBuf = null;
+
+			if (pointCloud != null)
 			{
-				byte [] createBuf = new byte[vecPointCloud.Length * sizeof(float) * 3];
-				for(int i = 0; i < vecPointCloud.Length; i++)
+				Vector3[] vecPointCloud = pointCloud.Points;
+				if (vecPointCloud != null && vecPointCloud.Length > 0)
 				{
-					int bufferStart = i * 3;
-					Buffer.BlockCopy( BitConverter.GetBytes( vecPointCloud[i].x ), 0, createBuf, (bufferStart)*sizeof(float), sizeof(float) );
-					Buffer.BlockCopy( BitConverter.GetBytes( vecPointCloud[i].y ), 0, createBuf, (bufferStart+1)*sizeof(float), sizeof(float) );
-					Buffer.BlockCopy( BitConverter.GetBytes( vecPointCloud[i].z ), 0, createBuf, (bufferStart+2)*sizeof(float), sizeof(float) );
+					pointsBuf = new byte[vecPointCloud.Length * sizeof(float) * 3];
+					for(int i = 0; i < vecPointCloud.Length; i++)
+					{
+						int bufferStart = i * 3;
+						Buffer.BlockCopy( BitConverter.GetBytes( vecPointCloud[i].x ), 0, pointsBuf, (bufferStart)*sizeof(float), sizeof(float) );
+						Buffer.BlockCopy( BitConverter.GetBytes( vecPointCloud[i].y ), 0, pointsBuf, (bufferStart+1)*sizeof(float), sizeof(float) );
+						Buffer.BlockCopy( BitConverter.GetBytes( vecPointCloud[i].z ), 0, pointsBuf, (bufferStart+2)*sizeof(float), sizeof(float) );
 
+					}
 				}
-				return new serializablePointCloud (createBuf);
-			}
-			else 
-			{
-				return new serializablePointCloud(null);
-			}
-		}
 
-		public static implicit operator Vector3 [] (serializablePointCloud spc)
+				UInt64 [] idsPointCloud = pointCloud.Identifiers;
+				if (idsPointCloud != null && idsPointCloud.Length > 0)
+				{
+					idsBuf = new byte[idsPointCloud.Length * sizeof(ulong)];
+					Buffer.BlockCopy( BitConverter.GetBytes( idsPointCloud[0] ), 0, idsBuf, 0, idsPointCloud.Length * sizeof(ulong) );
+				}
+			}
+			
+			return new serializablePointCloud(pointsBuf, idsBuf);
+		}
+		#else  //in editor
+		public static implicit operator ARPointCloud (serializablePointCloud spc)
 		{
-			if (spc.pointCloudData != null) 
-			{
-				int numVectors = spc.pointCloudData.Length / (3 * sizeof(float));
-				Vector3 [] pointCloudVec = new Vector3[numVectors];
-				for (int i = 0; i < numVectors; i++) 
-				{
-					int bufferStart = i * 3;
-					pointCloudVec [i].x = BitConverter.ToSingle (spc.pointCloudData, (bufferStart) * sizeof(float));
-					pointCloudVec [i].y = BitConverter.ToSingle (spc.pointCloudData, (bufferStart+1) * sizeof(float));
-					pointCloudVec [i].z = BitConverter.ToSingle (spc.pointCloudData, (bufferStart+2) * sizeof(float));
-					
-				}
-				return pointCloudVec;
-			} 
-			else 
-			{
-				return null;
-			}
+			return new ARPointCloud(spc);
 		}
+		#endif
 	};
 
 	[Serializable]
@@ -371,24 +619,32 @@ namespace Utils
 		public UnityARPlaneDetection planeDetection;
 		public bool getPointCloudData;
 		public bool enableLightEstimation;
+		public bool enableAutoFocus;
 
-		public serializableARSessionConfiguration(UnityARAlignment align, UnityARPlaneDetection planeDet, bool getPtCloud, bool enableLightEst)
+		public serializableARSessionConfiguration(UnityARAlignment align, UnityARPlaneDetection planeDet, bool getPtCloud, bool enableLightEst, bool enableAutoFoc)
 		{
 			alignment = align;
 			planeDetection = planeDet;
 			getPointCloudData = getPtCloud;
 			enableLightEstimation = enableLightEst;
+			enableAutoFocus = enableAutoFoc;
 		}
 
 		public static implicit operator serializableARSessionConfiguration(ARKitWorldTrackingSessionConfiguration awtsc)
 		{
-			return new serializableARSessionConfiguration (awtsc.alignment, awtsc.planeDetection, awtsc.getPointCloudData, awtsc.enableLightEstimation);
+			return new serializableARSessionConfiguration (awtsc.alignment, awtsc.planeDetection, awtsc.getPointCloudData, awtsc.enableLightEstimation, awtsc.enableAutoFocus);
 		}
 
 		public static implicit operator ARKitWorldTrackingSessionConfiguration (serializableARSessionConfiguration sasc)
 		{
-			return new ARKitWorldTrackingSessionConfiguration (sasc.alignment, sasc.planeDetection, sasc.getPointCloudData, sasc.enableLightEstimation);
+			return new ARKitWorldTrackingSessionConfiguration (sasc.alignment, sasc.planeDetection, sasc.getPointCloudData, sasc.enableLightEstimation, sasc.enableAutoFocus);
 		}
+
+		public static implicit operator ARKitFaceTrackingConfiguration (serializableARSessionConfiguration sasc)
+		{
+			return new ARKitFaceTrackingConfiguration (sasc.alignment, sasc.enableLightEstimation);
+		}
+
 	};
 
 	[Serializable]
