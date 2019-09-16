@@ -885,7 +885,14 @@ namespace Mapbox.Unity.Map
 			var _activeTiles = _mapVisualizer.ActiveTiles;
 			_currentExtent = new HashSet<UnwrappedTileId>(currentExtent.activeTiles);
 
-			tilesToProcess.Clear();
+			if (tilesToProcess == null)
+			{
+				tilesToProcess = new List<UnwrappedTileId>();
+			}
+			else
+			{
+				tilesToProcess.Clear();
+			}
 			foreach (var item in _activeTiles)
 			{
 				if (TileProvider.Cleanup(item.Key))
