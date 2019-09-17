@@ -57,7 +57,7 @@ namespace Mapbox.Unity.Ar
 					Debug.LogWarningFormat("SimpleAutomaticSynchronizationContextBehaviour, isRemoteConnected:{0}", UnityEditor.EditorApplication.isRemoteConnected);
 					if (!UnityEditor.EditorApplication.isRemoteConnected)
 					{
-						_locationProvider = LocationProviderFactory.Instance.TransformLocationProvider;
+						_locationProvider = LocationProviderFactory.Instance.EditorLocationProvider;
 					}
 					else
 					{
