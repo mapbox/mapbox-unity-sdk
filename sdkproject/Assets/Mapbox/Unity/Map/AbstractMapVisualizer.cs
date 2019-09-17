@@ -238,7 +238,7 @@ namespace Mapbox.Unity.Map
 				{
 					unityTile.MeshRenderer.sharedMaterial = Instantiate(_map.TileMaterial);
 				}
-				catch (Exception ex)
+				catch
 				{
 					Debug.Log("Tile Material not set. Using default material");
 					unityTile.MeshRenderer.sharedMaterial = Instantiate(new Material(Shader.Find("Diffuse")));
