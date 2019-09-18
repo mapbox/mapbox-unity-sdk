@@ -1,8 +1,9 @@
 ## CHANGELOG
-### v.2.0.1
-02/11/2019
+### v.2.1.0
+09/20/2019
 ##### New Features
 - *Editor Preview* - Adds ability to preview maps in editor at design time. AbstractMap now has an `Enable Preview` toggle which displays the map with all current settings, and provides ability to modify settings while viewing the map outside of Play mode.
+- Pricing Update - Introduces new pricing framework.
 ##### Improvements
 - Improves line mesh generation, adds options for join and cap types. Users have greater control over quality and styles of line meshes.
 - Improves terrain tile loading times by optimizing terrain pipeline.
