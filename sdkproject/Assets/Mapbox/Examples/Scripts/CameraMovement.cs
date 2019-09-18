@@ -121,6 +121,15 @@ namespace Mapbox.Examples
 					throw new System.Exception("You must have a reference camera assigned!");
 				}
 			}
+
+			if (_map == null)
+			{
+				_map = FindObjectOfType<AbstractMap>();
+				if (_map == null)
+				{
+					throw new System.Exception("You must have a reference map assigned!");
+				}
+			}
 		}
 
 		void LateUpdate()
