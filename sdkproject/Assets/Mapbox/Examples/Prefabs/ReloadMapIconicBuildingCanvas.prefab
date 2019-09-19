@@ -1169,8 +1169,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   location: One World Trade Center
-  _cameraPosition: {x: -43.47, y: 16, z: -82.8}
-  _cameraRotation: {x: 346.971, y: 39.799988, z: 0.077998556}
+  _cameraPosition: {x: -85, y: 40, z: -35}
+  _cameraRotation: {x: 0, y: 40, z: 0}
 --- !u!114 &114991531217100008
 MonoBehaviour:
   m_ObjectHideFlags: 1
