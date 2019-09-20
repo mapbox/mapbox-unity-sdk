@@ -234,7 +234,16 @@ namespace Mapbox.Unity.Map
 			if (unityTile == null)
 			{
 				unityTile = new GameObject().AddComponent<UnityTile>();
-				unityTile.MeshRenderer.sharedMaterial = Instantiate(_map.TileMaterial);
+				try
+				{
+					unityTile.MeshRenderer.sharedMaterial = Instantiate(_map.TileMaterial);
+				}
+				catch
+				{
+					Debug.Log("Tile Material not set. Using default material");
+					unityTile.MeshRenderer.sharedMaterial = Instantiate(new Material(Shader.Find("Diffuse")));
+				}
+
 				unityTile.transform.SetParent(_map.Root, false);
 			}
 

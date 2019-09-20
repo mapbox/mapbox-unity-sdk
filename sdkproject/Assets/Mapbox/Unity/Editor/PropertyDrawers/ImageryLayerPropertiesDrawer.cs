@@ -11,10 +11,10 @@
 		GUIContent[] sourceTypeContent;
 		bool isGUIContentSet = false;
 
-		private GUIContent _mapIdGui = new GUIContent
+		private GUIContent _tilesetIdGui = new GUIContent
 		{
-			text = "Map Id",
-			tooltip = "Map Id corresponding to the tileset."
+			text = "Tileset Id",
+			tooltip = "Id of the tileset."
 		};
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -66,11 +66,11 @@
 					var sourcePropertyValue = MapboxDefaultImagery.GetParameters(sourceTypeValue);
 					layerSourceId.stringValue = sourcePropertyValue.Id;
 					GUI.enabled = false;
-					EditorGUILayout.PropertyField(sourceOptionsProperty, _mapIdGui);
+					EditorGUILayout.PropertyField(sourceOptionsProperty, _tilesetIdGui);
 					GUI.enabled = true;
 					break;
 				case ImagerySourceType.Custom:
-					EditorGUILayout.PropertyField(sourceOptionsProperty, new GUIContent { text = "Map Id / Style URL", tooltip = _mapIdGui.tooltip });
+					EditorGUILayout.PropertyField(sourceOptionsProperty, new GUIContent { text = "Tileset Id / Style URL", tooltip = _tilesetIdGui.tooltip });
 					break;
 				case ImagerySourceType.None:
 					break;

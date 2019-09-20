@@ -16,9 +16,9 @@ namespace Mapbox.Map
 	/// var parameters = new Tile.Parameters();
 	/// parameters.Fs = MapboxAccess.Instance;
 	/// parameters.Id = new CanonicalTileId(_zoom, _tileCoorindateX, _tileCoordinateY);
-	/// parameters.MapId = "mapbox://styles/mapbox/satellite-v9";
+	/// parameters.TilesetId = "mapbox://styles/mapbox/satellite-v9";
 	/// var rasterTile = new RasterTile();
-	/// 
+	///
 	/// // Make the request.
 	/// rasterTile.Initialize(parameters, (Action)(() =>
 	/// {
@@ -26,7 +26,7 @@ namespace Mapbox.Map
 	/// 	{
 	///			// Handle the error.
 	///		}
-	/// 
+	///
 	/// 	// Consume the <see cref="Data"/>.
 	///	}));
 	/// </code>
@@ -37,7 +37,7 @@ namespace Mapbox.Map
 
 		/// <summary> Gets the raster tile raw data. </summary>
 		/// <value> The raw data, usually an encoded JPEG or PNG. </value>
-		/// <example> 
+		/// <example>
 		/// Consuming data in Unity to create a Texture2D:
 		/// <code>
 		/// var texture = new Texture2D(0, 0);
@@ -53,9 +53,9 @@ namespace Mapbox.Map
 			}
 		}
 
-		internal override TileResource MakeTileResource(string styleUrl)
+		internal override TileResource MakeTileResource(string tilesetId)
 		{
-			return TileResource.MakeRaster(Id, styleUrl);
+			return TileResource.MakeRaster(Id, tilesetId);
 		}
 
 		internal override bool ParseTileData(byte[] data)

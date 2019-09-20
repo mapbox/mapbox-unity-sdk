@@ -12,9 +12,6 @@ EditorBuildSettings:
     path: Assets/Mapbox/Examples/0_PrefabScenes/CitySimulator.unity
     guid: e9aaa5d7902ec4a07bb4b1f2923cafc8
   - enabled: 1
-    path: Assets/Mapbox/Examples/0_PrefabScenes/IconicBuildings.unity
-    guid: 2047e93df64ce478c91225d834c82f3d
-  - enabled: 1
     path: Assets/Mapbox/Examples/0_PrefabScenes/Location-basedGame.unity
     guid: 42f6aa7ce7a604f16ade319663f46ceb
   - enabled: 1
@@ -33,6 +30,9 @@ EditorBuildSettings:
     path: Assets/Mapbox/Examples/3_POIPlacement/POIPlacement.unity
     guid: c600a8b272a5846a1b71bdc2d0796637
   - enabled: 1
+    path: Assets/Mapbox/Examples/4_ReplaceFeatures/IconicBuildings.unity
+    guid: 2047e93df64ce478c91225d834c82f3d
+  - enabled: 1
     path: Assets/Mapbox/Examples/4_ReplaceFeatures/ReplaceFeatures.unity
     guid: 54d1b7ee40bee49559dd74210c7d5a57
   - enabled: 1
@@ -47,6 +47,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Mapbox/Examples/5_Playground/Scenes/RasterTile.unity
     guid: 893d0b4deb5544335b798dafd12ff9a7
+  - enabled: 1
+    path: Assets/Mapbox/Examples/5_Playground/Scenes/RemoveZ-Fighting.unity
+    guid: 7cc595021f9e346b2a073e4503d5978a
   - enabled: 1
     path: Assets/Mapbox/Examples/5_Playground/Scenes/ReverseGeocoder.unity
     guid: 9a904a5fcec05469db76712a52999b39

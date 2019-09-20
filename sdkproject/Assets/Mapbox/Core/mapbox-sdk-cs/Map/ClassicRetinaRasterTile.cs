@@ -14,9 +14,9 @@ namespace Mapbox.Map
 	/// </summary>
     public class ClassicRetinaRasterTile : ClassicRasterTile
 	{
-		internal override TileResource MakeTileResource(string mapId)
+		internal override TileResource MakeTileResource(string tilesetId)
 		{
-			return TileResource.MakeClassicRetinaRaster(Id, mapId);
+			return TileResource.MakeClassicRetinaRaster(Id, tilesetId);
 		}
 	}
 }

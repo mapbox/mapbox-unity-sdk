@@ -41,7 +41,7 @@ namespace Mapbox.Examples.Playground
 
 		void Start()
 		{
-			_map = new Map<VectorTile>(new FileSource(MapboxAccess.Instance.Configuration.AccessToken));
+			_map = new Map<VectorTile>(new FileSource(MapboxAccess.Instance.Configuration.GetMapsSkuToken, MapboxAccess.Instance.Configuration.AccessToken));
 			_map.Zoom = 18;
 			// This marks us an an observer to map.
 			// We will get each tile in OnNext(VectorTile tile) as they become available.

@@ -76,9 +76,9 @@ namespace Mapbox.Examples.Voxels
 
 			if (!string.IsNullOrEmpty(_styleUrl))
 			{
-				_raster.MapId = _styleUrl;
+				_raster.TilesetId = _styleUrl;
 			}
-			_elevation.MapId = "mapbox.terrain-rgb";
+			_elevation.TilesetId = "mapbox.terrain-rgb";
 
 			_elevation.Subscribe(this);
 			_raster.Subscribe(this);

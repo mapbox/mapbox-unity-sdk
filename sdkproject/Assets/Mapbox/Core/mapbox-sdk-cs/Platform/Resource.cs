@@ -36,8 +36,13 @@ namespace Mapbox.Platform
 				// see 'ForwardGeocodeResource' for more details
 				var encodedValues = from p in values
 #if UNITY_IOS
+#if UNITY_2017_1_OR_NEWER
+									let k = UnityEngine.Networking.UnityWebRequest.EscapeURL(p.Key.Trim())
+									let v = UnityEngine.Networking.UnityWebRequest.EscapeURL(p.Value)
+#else
 									let k = WWW.EscapeURL(p.Key.Trim())
 									let v = WWW.EscapeURL(p.Value)
+#endif
 #else
 									let k = Uri.EscapeDataString(p.Key.Trim())
 									let v = Uri.EscapeDataString(p.Value)

@@ -31,7 +31,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		public void SetUp()
 		{
 #if UNITY_5_6_OR_NEWER
-			_fs = new FileSource(Unity.MapboxAccess.Instance.Configuration.AccessToken);
+			_fs = new FileSource(Unity.MapboxAccess.Instance.Configuration.GetMapsSkuToken, Unity.MapboxAccess.Instance.Configuration.AccessToken);
 #else
 			// when run outside of Unity FileSource gets the access token from environment variable 'MAPBOX_ACCESS_TOKEN'
 			_fs = new FileSource();
@@ -45,7 +45,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		public IEnumerator World()
 #else
 		[Test]
-		public void World() 
+		public void World()
 #endif
 		{
 			var map = new Map<VectorTile>(_fs);
@@ -76,7 +76,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 		public IEnumerator RasterHelsinki()
 #else
 		[Test]
-		public void RasterHelsinki() 
+		public void RasterHelsinki()
 #endif
 		{
 			var map = new Map<RasterTile>(_fs);
@@ -105,10 +105,10 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 
 #if UNITY_5_6_OR_NEWER
 		[UnityTest]
-		public IEnumerator ChangeMapId()
+		public IEnumerator ChangeTilesetId()
 #else
 		[Test]
-		public void ChangeMapId() 
+		public void ChangeTilesetId()
 #endif
 		{
 			var map = new Map<ClassicRasterTile>(_fs);
@@ -118,7 +118,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 
 			map.Center = new Vector2d(60.163200, 24.937700);
 			map.Zoom = 13;
-			map.MapId = "invalid";
+			map.TilesetId = "invalid";
 			map.Update();
 
 #if UNITY_5_6_OR_NEWER
@@ -130,7 +130,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 
 			Assert.AreEqual(0, mapObserver.Tiles.Count);
 
-			map.MapId = "mapbox.terrain-rgb";
+			map.TilesetId = "mapbox.terrain-rgb";
 			map.Update();
 
 #if UNITY_5_6_OR_NEWER
@@ -142,7 +142,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 
 			Assert.AreEqual(1, mapObserver.Tiles.Count);
 
-			map.MapId = null; // Use default map ID.
+			map.TilesetId = null; // Use default tileset ID.
 			map.Update();
 
 #if UNITY_5_6_OR_NEWER
@@ -154,7 +154,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 
 			Assert.AreEqual(2, mapObserver.Tiles.Count);
 
-			// Should have fetched tiles from different map IDs.
+			// Should have fetched tiles from different tileset IDs.
 			Assert.AreNotEqual(mapObserver.Tiles[0], mapObserver.Tiles[1]);
 
 			map.Unsubscribe(mapObserver);

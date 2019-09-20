@@ -43,11 +43,11 @@ namespace Mapbox.Map
 		}
 
 		/// <summary>
-		/// Converts a MapId to a URL.
+		/// Converts a TilesetId to a URL.
 		/// </summary>
 		/// <returns>The identifier to URL.</returns>
 		/// <param name="id">The style id.</param>
-		public static string MapIdToUrl(string id)
+		public static string TilesetIdToUrl(string id)
 		{
 			// TODO: Validate that id is a real id
 			const string MapBaseApi = Constants.BaseAPI + "v4/";
