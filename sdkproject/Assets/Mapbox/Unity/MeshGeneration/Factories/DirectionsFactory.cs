@@ -1,3 +1,5 @@
+using System;
+using JetBrains.Annotations;
 using Mapbox.Examples;
 
 namespace Mapbox.Unity.MeshGeneration.Factories
@@ -15,16 +17,26 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 	public class DirectionsFactory : MonoBehaviour
 	{
+		public Action ArrangingWaypointsStarted = () => { };
+		public Action QuerySent = () => { };
+		public Action ArrangingWaypoints = () => { };
+		public Action ArrangingWaypointsFinished = () => { };
+		public Action<Vector3, float> RouteDrawn = (midPoint, TotalLength) => { };
+
 		[SerializeField] float RoadSizeMultiplier = 1;
 		[SerializeField] private AnimationCurve RoadSizeCurve;
 		[SerializeField] AbstractMap _map;
-
-		//[SerializeField] MeshModifier[] MeshModifiers;
+		[SerializeField] private LineRenderer _lineRenderer;
 		[SerializeField] private LoftModifier _loftModifier;
 		[SerializeField] Material _material;
 
 		[SerializeField] Transform[] _waypoints;
 		private List<Vector3> _cachedWaypoints;
+		public Vector3 WaypointsMidpoint
+		{
+			get { return (_waypoints[0].position + _waypoints[1].position) / 2; }
+		}
+
 
 		private Directions _directions;
 		private int _counter;
@@ -48,17 +60,26 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				wp.MouseDown += () =>
 				{
+					ArrangingWaypointsStarted();
+					_lineRenderer.gameObject.SetActive(true);
 					_directionsGO.SetActive(false);
 					_isDragging = true;
 				};
 
 				wp.MouseDraging += () =>
 				{
-
-
+					_lineRenderer.positionCount = 2;
+					_lineRenderer.SetPositions(new []
+					{
+						_waypoints[0].transform.position + _lineRenderer.transform.position,
+						_waypoints[1].transform.position + _lineRenderer.transform.position,
+					});
+					ArrangingWaypoints();
 				};
 				wp.MouseDrop += () =>
 				{
+					ArrangingWaypointsFinished();
+					_lineRenderer.gameObject.SetActive(false);
 					_isDragging = false;
 					Query();
 				};
@@ -95,6 +116,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			var _directionResource = new DirectionResource(wp, RoutingProfile.Driving);
 			_directionResource.Steps = true;
 			_directions.Query(_directionResource, HandleDirectionsResponse);
+			QuerySent();
 		}
 
 		void HandleDirectionsResponse(DirectionsResponse response)
@@ -107,10 +129,22 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			var meshData = new MeshData();
 			var unitySpacePositions = new List<Vector3>();
+
+			var totalLength = 0f;
+			Vector3 prevPoint = Unity.Constants.Math.Vector3Zero;
 			foreach (var point in response.Routes[0].Geometry)
 			{
-				unitySpacePositions.Add(Conversions.GeoToWorldPosition(point.x, point.y, _map.CenterMercator, _map.WorldRelativeScale).ToVector3xz());
+				var newPoint = Conversions.GeoToWorldPosition(point.x, point.y, _map.CenterMercator, _map.WorldRelativeScale).ToVector3xz();
+				unitySpacePositions.Add(newPoint);
+
+				if (prevPoint != Unity.Constants.Math.Vector3Zero)
+				{
+					totalLength += Vector3.Distance(prevPoint, newPoint);
+				}
+				prevPoint = newPoint;
 			}
+
+			var midLength = totalLength / 2;
 
 			if (_waypoints.Length > 0 && unitySpacePositions.Count > 0)
 			{
@@ -126,6 +160,24 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			CreateGameObject(meshData);
 			_directionsGO.SetActive(true);
+
+
+			var midPoint = unitySpacePositions[0];
+			for (int i = 1; i < unitySpacePositions.Count; i++)
+			{
+				var dist = (unitySpacePositions[i] - unitySpacePositions[i - 1]).magnitude;
+				if (midLength > dist)
+				{
+					midLength -= dist;
+				}
+				else
+				{
+					midPoint = Vector3.Lerp(unitySpacePositions[i - 1], unitySpacePositions[i], (float)midLength / dist);
+					break;
+				}
+			}
+
+			RouteDrawn(midPoint, totalLength / _map.WorldRelativeScale);
 		}
 
 		GameObject CreateGameObject(MeshData data)
@@ -136,6 +188,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 
 			_directionsGO = new GameObject("direction waypoint " + " entity");
+			if (_map != null)
+			{
+				_directionsGO.transform.SetParent(_map.transform);
+			}
 			var mesh = _directionsGO.AddComponent<MeshFilter>().mesh;
 			mesh.subMeshCount = data.Triangles.Count;
 
