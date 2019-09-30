@@ -110,9 +110,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				wp[i] = _waypoints[i].GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
 			}
 
-			var _directionResource = new DirectionResource(wp, RoutingProfile.Driving);
-			_directionResource.Steps = true;
-			_directions.Query(_directionResource, HandleDirectionsResponse);
+			var directionResource = new DirectionResource(wp, RoutingProfile.Driving);
+			directionResource.Steps = true;
+			_directions.Query(directionResource, HandleDirectionsResponse);
 			QuerySent();
 		}
 
