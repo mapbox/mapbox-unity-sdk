@@ -19,7 +19,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	{
 		public Action ArrangingWaypointsStarted = () => { };
 		public Action QuerySent = () => { };
-		public Action ArrangingWaypoints = () => { };
+		public Action<Vector3[]> ArrangingWaypoints = (positions) => { };
 		public Action ArrangingWaypointsFinished = () => { };
 		public Action<Vector3, float> RouteDrawn = (midPoint, TotalLength) => { };
 
@@ -29,13 +29,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField] private LineRenderer _lineRenderer;
 		[SerializeField] private LoftModifier _loftModifier;
 		[SerializeField] Material _material;
-
 		[SerializeField] Transform[] _waypoints;
-		private List<Vector3> _cachedWaypoints;
-		public Vector3 WaypointsMidpoint
-		{
-			get { return (_waypoints[0].position + _waypoints[1].position) / 2; }
-		}
 
 		public int WaypointCount
 		{
@@ -45,7 +39,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-
+		private List<Vector3> _cachedWaypoints;
 		private Directions _directions;
 		private int _counter;
 		private bool _isDragging = false;
@@ -85,7 +79,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 						_pointArray[i] = _waypoints[i].position + _pointUpDelta;
 					}
 					_lineRenderer.SetPositions(_pointArray);
-					ArrangingWaypoints();
+					ArrangingWaypoints(_pointArray);
 				};
 				wp.MouseDrop += () =>
 				{

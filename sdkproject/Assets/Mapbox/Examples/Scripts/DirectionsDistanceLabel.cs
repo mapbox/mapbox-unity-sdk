@@ -16,7 +16,6 @@ public class DirectionsDistanceLabel : MonoBehaviour
     public Text Text;
     private Camera _camera;
 
-    private Vector3[] _positions;
     private Vector2d _pos1LatLng;
     private Vector2d _pos2LatLng;
     private float _lineDistance;
@@ -24,26 +23,24 @@ public class DirectionsDistanceLabel : MonoBehaviour
     private void Start()
     {
         _camera = Camera.main;
-        _positions = new Vector3[DirectionsFactory.WaypointCount];
-        DirectionsFactory.ArrangingWaypoints += () =>
-        {
-            LineRenderer.GetPositions(_positions);
 
+        DirectionsFactory.ArrangingWaypoints += (positions) =>
+        {
             var midLength = 0f;
-            for (int i = 1; i < _positions.Length; i++)
+            for (int i = 1; i < positions.Length; i++)
             {
-                _pos1LatLng = AbstractMap.WorldToGeoPosition(_positions[i]);
-                _pos2LatLng = AbstractMap.WorldToGeoPosition(_positions[i - 1]);
+                _pos1LatLng = AbstractMap.WorldToGeoPosition(positions[i]);
+                _pos2LatLng = AbstractMap.WorldToGeoPosition(positions[i - 1]);
                 midLength += (float)Conversions.GeoDistance(_pos1LatLng.y, _pos1LatLng.x, _pos2LatLng.y, _pos2LatLng.x) * 1000;
             }
 
             midLength /= 2;
 
-            var midPoint = _positions[0];
-            for (int i = 1; i < _positions.Length; i++)
+            var midPoint = positions[0];
+            for (int i = 1; i < positions.Length; i++)
             {
-                _pos1LatLng = AbstractMap.WorldToGeoPosition(_positions[i]);
-                _pos2LatLng = AbstractMap.WorldToGeoPosition(_positions[i - 1]);
+                _pos1LatLng = AbstractMap.WorldToGeoPosition(positions[i]);
+                _pos2LatLng = AbstractMap.WorldToGeoPosition(positions[i - 1]);
                 _lineDistance = (float)Conversions.GeoDistance(_pos1LatLng.y, _pos1LatLng.x, _pos2LatLng.y, _pos2LatLng.x) * 1000;
                 if (midLength > _lineDistance)
                 {
@@ -51,7 +48,7 @@ public class DirectionsDistanceLabel : MonoBehaviour
                 }
                 else
                 {
-                    midPoint = Vector3.Lerp(_positions[i - 1], _positions[i], (float)midLength / _lineDistance);
+                    midPoint = Vector3.Lerp(positions[i - 1], positions[i], (float)midLength / _lineDistance);
                     break;
                 }
             }
