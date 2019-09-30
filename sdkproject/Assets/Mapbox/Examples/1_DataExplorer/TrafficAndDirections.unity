@@ -1752,8 +1752,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b3f30f8063ade1469b48dbcb941529f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DirectionsFactory: {fileID: 0}
-  UiLabel: {fileID: 0}
+  AbstractMap: {fileID: 110210642}
+  DirectionsFactory: {fileID: 580700369}
+  LineRenderer: {fileID: 1583972079}
+  UiLabel: {fileID: 51376467}
+  Text: {fileID: 546313013}
 --- !u!21 &640558721
 Material:
   serializedVersion: 6
