@@ -31,14 +31,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField] Material _material;
 		[SerializeField] Transform[] _waypoints;
 
-		public int WaypointCount
-		{
-			get
-			{
-				return _waypoints.Length;
-			}
-		}
-
 		private List<Vector3> _cachedWaypoints;
 		private Directions _directions;
 		private int _counter;
