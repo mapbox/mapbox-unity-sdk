@@ -37,11 +37,20 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			get { return (_waypoints[0].position + _waypoints[1].position) / 2; }
 		}
 
+		public int WaypointCount
+		{
+			get
+			{
+				return _waypoints.Length;
+			}
+		}
+
 
 		private Directions _directions;
 		private int _counter;
 		private bool _isDragging = false;
-
+		private Vector3[] _pointArray;
+		private Vector3 _pointUpDelta = new Vector3(0, 3, 0);
 		GameObject _directionsGO;
 		private bool _recalculateNext;
 
@@ -56,6 +65,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_map.OnInitialized += Query;
 			_map.OnUpdated += Query;
 
+			_pointArray = new Vector3[_waypoints.Length];
+
 			foreach (var wp in GetComponentsInChildren<DragableDirectionWaypoint>())
 			{
 				wp.MouseDown += () =>
@@ -68,12 +79,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 				wp.MouseDraging += () =>
 				{
-					_lineRenderer.positionCount = 2;
-					_lineRenderer.SetPositions(new []
+					_lineRenderer.positionCount = _waypoints.Length;
+					for (int i = 0; i < _waypoints.Length; i++)
 					{
-						_waypoints[0].transform.position + _lineRenderer.transform.position,
-						_waypoints[1].transform.position + _lineRenderer.transform.position,
-					});
+						_pointArray[i] = _waypoints[i].position + _pointUpDelta;
+					}
+					_lineRenderer.SetPositions(_pointArray);
 					ArrangingWaypoints();
 				};
 				wp.MouseDrop += () =>
