@@ -419,5 +419,20 @@ namespace Mapbox.Unity.Utilities
 			var t = new Vector2((int)Math.Ceiling(p.x / (double)TileSize) - 1, (int)Math.Ceiling(p.y / (double)TileSize) - 1);
 			return t;
 		}
+
+		public static double GeoDistance(
+			double lon1,
+			double lat1,
+			double lon2,
+			double lat2)
+		{
+			var toRad = 3.141592653589793 / 180;
+			double dlon = (lon2 - lon1) * toRad;
+			double dlat = (lat2 - lat1) * toRad;
+
+			double a = (Math.Sin(dlat / 2) * Math.Sin(dlat / 2)) + Math.Cos(lat1 * toRad) * Math.Cos(lat2 * toRad) * (Math.Sin(dlon / 2) * Math.Sin(dlon / 2));
+			double angle = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+			return angle * 6378.16;
+		}
 	}
 }
