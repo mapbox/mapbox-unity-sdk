@@ -12,8 +12,8 @@ public class DirectionsDistanceLabel : MonoBehaviour
     public AbstractMap AbstractMap;
     public DirectionsFactory DirectionsFactory;
     public LineRenderer LineRenderer;
-    public GameObject UiLabel;
-    public Text Text;
+    public GameObject DistanceLabelWrapper;
+    public Text DistanceText;
     private Camera _camera;
 
     private Vector2d _pos1LatLng;
@@ -53,31 +53,31 @@ public class DirectionsDistanceLabel : MonoBehaviour
                 }
             }
 
-            UiLabel.transform.position = _camera.WorldToScreenPoint(midPoint);
-            Text.text = (midLength * 2).ToString("F1") + "m";
+            DistanceLabelWrapper.transform.position = _camera.WorldToScreenPoint(midPoint);
+            DistanceText.text = (midLength * 2).ToString("F1") + "m";
         };
 
         DirectionsFactory.ArrangingWaypointsStarted += () =>
         {
-            UiLabel.SetActive(true);
+            DistanceLabelWrapper.SetActive(true);
         };
 
         DirectionsFactory.ArrangingWaypointsFinished += () =>
         {
-            UiLabel.SetActive(false);
+            DistanceLabelWrapper.SetActive(false);
         };
 
         DirectionsFactory.RouteDrawn += (midPoint, totalLength) =>
         {
-            UiLabel.SetActive(true);
-            UiLabel.transform.position = _camera.WorldToScreenPoint(midPoint);
-            Text.text = totalLength.ToString("F1") + "m";
+            DistanceLabelWrapper.SetActive(true);
+            DistanceLabelWrapper.transform.position = _camera.WorldToScreenPoint(midPoint);
+            DistanceText.text = totalLength.ToString("F1") + "m";
         };
 
         DirectionsFactory.QuerySent += () =>
         {
-            UiLabel.SetActive(true);
-            Text.text = "Loading";
+            DistanceLabelWrapper.SetActive(true);
+            DistanceText.text = "Loading";
         };
     }
 }

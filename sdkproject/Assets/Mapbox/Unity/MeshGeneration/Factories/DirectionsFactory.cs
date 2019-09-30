@@ -1,6 +1,8 @@
 using System;
+using System.Diagnostics;
 using JetBrains.Annotations;
 using Mapbox.Examples;
+using UnityEngine.UI;
 
 namespace Mapbox.Unity.MeshGeneration.Factories
 {
@@ -29,7 +31,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField] private LineRenderer _lineRenderer;
 		[SerializeField] private LoftModifier _loftModifier;
 		[SerializeField] Material _material;
-		[SerializeField] Transform[] _waypoints;
+		[SerializeField] Transform _waypointsParent;
+		[SerializeField] private Dropdown RouteTypeDropdown;
+		Transform[] _waypoints;
 
 		private List<Vector3> _cachedWaypoints;
 		private Directions _directions;
@@ -46,11 +50,16 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				_map = FindObjectOfType<AbstractMap>();
 			}
-
 			_directions = MapboxAccess.Instance.Directions;
 			_map.OnInitialized += Query;
 			_map.OnUpdated += Query;
+			RouteTypeDropdown.onValueChanged.AddListener((i) => { Query(); });
 
+			_waypoints = new Transform[_waypointsParent.childCount];
+			for (int i = 0; i < _waypointsParent.childCount; i++)
+			{
+				_waypoints[i] = _waypointsParent.GetChild(i);
+			}
 			_pointArray = new Vector3[_waypoints.Length];
 
 			foreach (var wp in GetComponentsInChildren<DragableDirectionWaypoint>())
@@ -110,7 +119,21 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				wp[i] = _waypoints[i].GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
 			}
 
-			var directionResource = new DirectionResource(wp, RoutingProfile.Driving);
+			var routeProfile = RoutingProfile.Driving;
+			switch (RouteTypeDropdown.value)
+			{
+				case 0:
+					routeProfile = RoutingProfile.Driving;
+					break;
+				case 1:
+					routeProfile = RoutingProfile.Walking;
+					break;
+				case 2:
+					routeProfile = RoutingProfile.Cycling;
+					break;
+			}
+
+			var directionResource = new DirectionResource(wp, routeProfile);
 			directionResource.Steps = true;
 			_directions.Query(directionResource, HandleDirectionsResponse);
 			QuerySent();
