@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Factories;
+using Mapbox.Unity.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,7 +24,9 @@ public class DirectionsDistanceLabel : MonoBehaviour
         {
             LineRenderer.GetPositions(_positions);
             UiLabel.transform.position = _camera.WorldToScreenPoint((_positions[0] + _positions[1]) / 2);
-            Text.text = ((_positions[1] - _positions[0]).magnitude / AbstractMap.WorldRelativeScale).ToString("F1") + "m";
+            var ll1 = AbstractMap.WorldToGeoPosition(_positions[1]);
+            var ll2 = AbstractMap.WorldToGeoPosition(_positions[0]);
+            Text.text = (Conversions.GeoDistance(ll1.y, ll1.x, ll2.y, ll2.x) * 1000).ToString("F1") + "m";
         };
 
         DirectionsFactory.ArrangingWaypointsStarted += () =>
