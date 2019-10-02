@@ -5,6 +5,7 @@ using Mapbox.Unity.Map;
 using Mapbox.Unity.Utilities;
 using Mapbox.Utils;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using Constants = Mapbox.Unity.Constants;
 
@@ -13,11 +14,15 @@ public class Scalebar : MonoBehaviour
     [SerializeField] private AbstractMap Map;
     [SerializeField] private Transform FirstPoint;
     [SerializeField] private Transform SecondPoint;
+    [SerializeField] private Transform Bar;
     [SerializeField] private Text ScaleText;
+    [SerializeField] private Button ResetButton;
 
     private Camera _camera;
     private RaycastHit _hit;
 
+    private Vector3 _firstPointDefaultPosition;
+    private Vector3 _secondPointDefaultPosition;
     Vector2d _ll1 = new Vector2d();
     Vector2d _ll2 = new Vector2d();
     private Ray _ray;
@@ -27,12 +32,31 @@ public class Scalebar : MonoBehaviour
     private void Start()
     {
         _camera = Camera.main;
+        ResetButton.onClick.AddListener(ResetPositions);
+
+        _secondPointDefaultPosition = SecondPoint.position;
+        _firstPointDefaultPosition = FirstPoint.position;
+    }
+
+    private void ResetPositions()
+    {
+        FirstPoint.position = _firstPointDefaultPosition;
+        SecondPoint.position = _secondPointDefaultPosition;
     }
 
     void Update()
     {
         MidBar();
         UpdateDistanceLabel();
+
+        if (_firstPointDefaultPosition != FirstPoint.position || _secondPointDefaultPosition != SecondPoint.position)
+        {
+            ResetButton.gameObject.SetActive(true);
+        }
+        else
+        {
+            ResetButton.gameObject.SetActive(false);
+        }
     }
 
     private void UpdateDistanceLabel()
@@ -56,8 +80,8 @@ public class Scalebar : MonoBehaviour
     {
         _distanceLineAngle = Vector3.SignedAngle(SecondPoint.position - FirstPoint.position, new Vector3(1, 0, 0), new Vector3(0, 0, 1));
         _distanceVectorMagnitude = (SecondPoint.position - FirstPoint.position).magnitude / 10;
-        transform.localScale = new Vector3(_distanceVectorMagnitude, 1, 1);
-        transform.rotation = Quaternion.Euler(0, 0, -_distanceLineAngle);
-        transform.position = FirstPoint.position;
+        Bar.localScale = new Vector3(_distanceVectorMagnitude, 1, 1);
+        Bar.rotation = Quaternion.Euler(0, 0, -_distanceLineAngle);
+        Bar.position = FirstPoint.position;
     }
 }
