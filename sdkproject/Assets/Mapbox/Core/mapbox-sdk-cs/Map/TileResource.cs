@@ -58,13 +58,8 @@ namespace Mapbox.Map
 			var uriBuilder = new UriBuilder(_query);
 			if (uriBuilder.Query != null && uriBuilder.Query.Length > 1)
 			{
-				uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + TelemetryFactory.EventQuery;
+				uriBuilder.Query = uriBuilder.Query.Substring(1);
 			}
-			else
-			{
-				uriBuilder.Query = TelemetryFactory.EventQuery;
-			}
-
 			//return uriBuilder.ToString();
 			return uriBuilder.Uri.ToString();
 		}
