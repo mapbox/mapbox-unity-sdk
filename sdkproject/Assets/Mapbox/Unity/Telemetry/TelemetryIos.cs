@@ -14,6 +14,9 @@ namespace Mapbox.Unity.Telemetry
 		[DllImport("__Internal")]
 		private static extern void setLocationCollectionState(bool enable);
 
+		[DllImport("__Internal")]
+		private static extern void setSkuId(string skuId);
+
 		static ITelemetryLibrary _instance = new TelemetryIos();
 		public static ITelemetryLibrary Instance
 		{
@@ -30,6 +33,7 @@ namespace Mapbox.Unity.Telemetry
 
 		public void SendTurnstile()
 		{
+			setSkuId(Constants.SDK_SKU_ID);
 			sendTurnstileEvent();
 		}
 
