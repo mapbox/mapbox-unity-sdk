@@ -49,6 +49,9 @@
 			jsonDict.Add("created", unixTimestamp);
 			jsonDict.Add("userId", SystemInfo.deviceUniqueIdentifier);
 			jsonDict.Add("enabled.telemetry", false);
+			jsonDict.Add("sdkIdentifier", GetSDKIdentifier());
+			jsonDict.Add("skuId", Constants.SDK_SKU_ID);
+			jsonDict.Add("sdkVersion", Constants.SDK_VERSION);
 
 			// user-agent cannot be set from web broswer, so we send in payload, instead!
 			jsonDict.Add("userAgent", GetUserAgent());
@@ -101,6 +104,14 @@
 										  Constants.SDK_VERSION
 										 );
 			return userAgent;
+		}
+
+		private string GetSDKIdentifier()
+		{
+			var sdkIdentifier = string.Format("MapboxEventsUnity{0}",
+										  Application.platform
+										 );
+			return sdkIdentifier;
 		}
 
 		public void SetLocationCollectionState(bool enable)
