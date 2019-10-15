@@ -1,0 +1,259 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class GameObjectModifier
+   | Mapbox SDK for Unity </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class GameObjectModifier
+   | Mapbox SDK for Unity ">
+    <meta name="generator" content="docfx 2.15.1.0">
+    
+    <link rel="shortcut icon" href="../../docs/images/favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:newtab" content="true">
+  </head>
+  <body data-spy="scroll" data-target="#affix">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../docs/images/mapbox-logo.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content">
+              
+              
+              <h1 id="Mapbox_Unity_MeshGeneration_Modifiers_GameObjectModifier" data-uid="Mapbox.Unity.MeshGeneration.Modifiers.GameObjectModifier">Class GameObjectModifier
+              </h1>
+              <div class="markdown level0 summary"><p>GameObject Modifiers
+Game object modifiers ran after the mesh modifiers and game object creation.Their main purpose is to work on
+game object and decorate/improve them in their own ways.They ran for each game object individually.
+It&#39;s possible to do lots of different things with GameObject Modifiers.A simple example would be MaterialModifier,
+which simply sets random materials to gameobject and submeshes.A more complicated example would be
+SpawnInside Modifier which instantiates prefabs in a polygon, like trees in a park.
+Any operation, you want to perform on generated entity, that would require a game object is a good candidate
+for game object modifiers. For example, things like adding a collider or animation would require a gameobject
+hence cannot be done in mesh modifier.
+Game object modifiers is the suggested way of customizing generated game object and we expect developers to
+fully utilize this by creating their own custom game object modifiers.</p>
+</div>
+              <div class="markdown level0 conceptual"></div>
+              <div class="inheritance">
+                <h5>Inheritance</h5>
+                  <div class="level0"><span class="xref">ScriptableObject</span></div>
+                  <div class="level1"><a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.ModifierBase.html">ModifierBase</a></div>
+                  <div class="level2"><span class="xref">GameObjectModifier</span></div>
+                  <div class="level3"><a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.AddMonoBehavioursModifier.html">AddMonoBehavioursModifier</a></div>
+                  <div class="level3"><a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.AddToCollectionModifier.html">AddToCollectionModifier</a></div>
+                  <div class="level3"><a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.ColliderModifier.html">ColliderModifier</a></div>
+                  <div class="level3"><a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.DisableMeshRendererModifier.html">DisableMeshRendererModifier</a></div>
+                  <div class="level3"><a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.FeatureBehaviourModifier.html">FeatureBehaviourModifier</a></div>
+                  <div class="level3"><a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.LayerModifier.html">LayerModifier</a></div>
+                  <div class="level3"><a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.MapboxStylesColorModifier.html">MapboxStylesColorModifier</a></div>
+                  <div class="level3"><a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.MaterialModifier.html">MaterialModifier</a></div>
+                  <div class="level3"><a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.NoiseOffsetModifier.html">NoiseOffsetModifier</a></div>
+                  <div class="level3"><a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.PrefabModifier.html">PrefabModifier</a></div>
+                  <div class="level3"><a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.ReplaceFeatureCollectionModifier.html">ReplaceFeatureCollectionModifier</a></div>
+                  <div class="level3"><a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.ReplaceFeatureModifier.html">ReplaceFeatureModifier</a></div>
+                  <div class="level3"><a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.SpawnInsideModifier.html">SpawnInsideModifier</a></div>
+                  <div class="level3"><a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.TagModifier.html">TagModifier</a></div>
+                  <div class="level3"><a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.TextureModifier.html">TextureModifier</a></div>
+                  <div class="level3"><a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.TextureMonoBehaviourModifier.html">TextureMonoBehaviourModifier</a></div>
+              </div>
+              <div class="inheritedMembers">
+                <h5>Inherited Members</h5>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.ModifierBase.html#Mapbox_Unity_MeshGeneration_Modifiers_ModifierBase_Active">ModifierBase.Active</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.ModifierBase.html#Mapbox_Unity_MeshGeneration_Modifiers_ModifierBase_SetProperties_Mapbox_Unity_MeshGeneration_Modifiers_ModifierProperties_">ModifierBase.SetProperties(ModifierProperties)</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.ModifierBase.html#Mapbox_Unity_MeshGeneration_Modifiers_ModifierBase_Initialize">ModifierBase.Initialize()</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.ModifierBase.html#Mapbox_Unity_MeshGeneration_Modifiers_ModifierBase_FeaturePreProcess_Mapbox_Unity_MeshGeneration_Data_VectorFeatureUnity_">ModifierBase.FeaturePreProcess(VectorFeatureUnity)</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.ModifierBase.html#Mapbox_Unity_MeshGeneration_Modifiers_ModifierBase_UnbindProperties">ModifierBase.UnbindProperties()</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.ModifierBase.html#Mapbox_Unity_MeshGeneration_Modifiers_ModifierBase_UpdateModifier_System_Object_System_EventArgs_">ModifierBase.UpdateModifier(Object, EventArgs)</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.ModifierBase.html#Mapbox_Unity_MeshGeneration_Modifiers_ModifierBase_ModifierHasChanged">ModifierBase.ModifierHasChanged</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Modifiers.ModifierBase.html#Mapbox_Unity_MeshGeneration_Modifiers_ModifierBase_NotifyUpdateModifier_Mapbox_Unity_Map_VectorLayerUpdateArgs_">ModifierBase.NotifyUpdateModifier(VectorLayerUpdateArgs)</a>
+                </div>
+              </div>
+              <h6><strong>Namespace</strong>:Mapbox.Unity.MeshGeneration.Modifiers</h6>
+              <h6><strong>Assembly</strong>:cs.temp.dll.dll</h6>
+              <h5 id="Mapbox_Unity_MeshGeneration_Modifiers_GameObjectModifier_syntax">Syntax</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public class GameObjectModifier : ModifierBase</code></pre>
+              </div>
+              <h3 id="methods">Methods
+              </h3>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Modifiers_GameObjectModifier_Clear_" data-uid="Mapbox.Unity.MeshGeneration.Modifiers.GameObjectModifier.Clear*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Modifiers_GameObjectModifier_Clear" data-uid="Mapbox.Unity.MeshGeneration.Modifiers.GameObjectModifier.Clear">Clear()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void Clear()</code></pre>
+              </div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Modifiers_GameObjectModifier_ClearCaches_" data-uid="Mapbox.Unity.MeshGeneration.Modifiers.GameObjectModifier.ClearCaches*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Modifiers_GameObjectModifier_ClearCaches" data-uid="Mapbox.Unity.MeshGeneration.Modifiers.GameObjectModifier.ClearCaches">ClearCaches()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void ClearCaches()</code></pre>
+              </div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Modifiers_GameObjectModifier_OnPoolItem_" data-uid="Mapbox.Unity.MeshGeneration.Modifiers.GameObjectModifier.OnPoolItem*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Modifiers_GameObjectModifier_OnPoolItem_Mapbox_Unity_MeshGeneration_Data_VectorEntity_" data-uid="Mapbox.Unity.MeshGeneration.Modifiers.GameObjectModifier.OnPoolItem(Mapbox.Unity.MeshGeneration.Data.VectorEntity)">OnPoolItem(VectorEntity)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void OnPoolItem(VectorEntity vectorEntity)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.MeshGeneration.Data.VectorEntity.html">VectorEntity</a></td>
+                    <td><span class="parametername">vectorEntity</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Modifiers_GameObjectModifier_Run_" data-uid="Mapbox.Unity.MeshGeneration.Modifiers.GameObjectModifier.Run*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Modifiers_GameObjectModifier_Run_Mapbox_Unity_MeshGeneration_Data_VectorEntity_Mapbox_Unity_MeshGeneration_Data_UnityTile_" data-uid="Mapbox.Unity.MeshGeneration.Modifiers.GameObjectModifier.Run(Mapbox.Unity.MeshGeneration.Data.VectorEntity,Mapbox.Unity.MeshGeneration.Data.UnityTile)">Run(VectorEntity, UnityTile)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void Run(VectorEntity ve, UnityTile tile)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.MeshGeneration.Data.VectorEntity.html">VectorEntity</a></td>
+                    <td><span class="parametername">ve</span></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.MeshGeneration.Data.UnityTile.html">UnityTile</a></td>
+                    <td><span class="parametername">tile</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+                        </article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            &#0169; 2017 Mapbox
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

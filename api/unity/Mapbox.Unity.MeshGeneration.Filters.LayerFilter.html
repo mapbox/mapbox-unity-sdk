@@ -1,0 +1,1132 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class LayerFilter
+   | Mapbox SDK for Unity </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class LayerFilter
+   | Mapbox SDK for Unity ">
+    <meta name="generator" content="docfx 2.15.1.0">
+    
+    <link rel="shortcut icon" href="../../docs/images/favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:newtab" content="true">
+  </head>
+  <body data-spy="scroll" data-target="#affix">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../docs/images/mapbox-logo.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content">
+              
+              
+              <h1 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter">Class LayerFilter
+              </h1>
+              <div class="markdown level0 summary"></div>
+              <div class="markdown level0 conceptual"></div>
+              <div class="inheritance">
+                <h5>Inheritance</h5>
+                  <div class="level0"><span class="xref">System.Object</span></div>
+                  <div class="level1"><a class="xref" href="Mapbox.Unity.Map.MapboxDataProperty.html">MapboxDataProperty</a></div>
+                  <div class="level2"><span class="xref">LayerFilter</span></div>
+              </div>
+              <div class="inheritedMembers">
+                <h5>Inherited Members</h5>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.Map.MapboxDataProperty.html#Mapbox_Unity_Map_MapboxDataProperty_PropertyHasChanged">MapboxDataProperty.PropertyHasChanged</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.Map.MapboxDataProperty.html#Mapbox_Unity_Map_MapboxDataProperty_OnPropertyHasChanged_System_EventArgs_">MapboxDataProperty.OnPropertyHasChanged(EventArgs)</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.Map.MapboxDataProperty.html#Mapbox_Unity_Map_MapboxDataProperty_HasChanged">MapboxDataProperty.HasChanged</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.Map.MapboxDataProperty.html#Mapbox_Unity_Map_MapboxDataProperty_NeedsForceUpdate">MapboxDataProperty.NeedsForceUpdate()</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.Map.MapboxDataProperty.html#Mapbox_Unity_Map_MapboxDataProperty_UpdateProperty_UnityTile_">MapboxDataProperty.UpdateProperty(UnityTile)</a>
+                </div>
+                <div>
+                  <span class="xref">System.Object.Equals(System.Object)</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.GetHashCode()</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.GetType()</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.MemberwiseClone()</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.ToString()</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+                </div>
+              </div>
+              <h6><strong>Namespace</strong>:Mapbox.Unity.MeshGeneration.Filters</h6>
+              <h6><strong>Assembly</strong>:cs.temp.dll.dll</h6>
+              <h5 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_syntax">Syntax</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">[Serializable]
+public class LayerFilter : MapboxDataProperty, ILayerFilter</code></pre>
+              </div>
+              <h3 id="constructors">Constructors
+              </h3>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter__ctor_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.#ctor*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter__ctor_Mapbox_Unity_MeshGeneration_Filters_LayerFilterOperationType_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.#ctor(Mapbox.Unity.MeshGeneration.Filters.LayerFilterOperationType)">LayerFilter(LayerFilterOperationType)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public LayerFilter(LayerFilterOperationType filterOperation = LayerFilterOperationType.Contains)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.MeshGeneration.Filters.LayerFilterOperationType.html">LayerFilterOperationType</a></td>
+                    <td><span class="parametername">filterOperation</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h3 id="fields">Fields
+              </h3>
+              
+              
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_filterOperator" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.filterOperator">filterOperator</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public LayerFilterOperationType filterOperator</code></pre>
+              </div>
+              <h5 class="fieldValue">Field Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.MeshGeneration.Filters.LayerFilterOperationType.html">LayerFilterOperationType</a></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_Key" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.Key">Key</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public string Key</code></pre>
+              </div>
+              <h5 class="fieldValue">Field Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_Max" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.Max">Max</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public float Max</code></pre>
+              </div>
+              <h5 class="fieldValue">Field Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_Min" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.Min">Min</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public float Min</code></pre>
+              </div>
+              <h5 class="fieldValue">Field Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_PropertyValue" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.PropertyValue">PropertyValue</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public string PropertyValue</code></pre>
+              </div>
+              <h5 class="fieldValue">Field Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h3 id="properties">Properties
+              </h3>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_GetFilterOperationType_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.GetFilterOperationType*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_GetFilterOperationType" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.GetFilterOperationType">GetFilterOperationType</h4>
+              <div class="markdown level1 summary"><p>Gets the type of the filter operation.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual LayerFilterOperationType GetFilterOperationType { get; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.MeshGeneration.Filters.LayerFilterOperationType.html">LayerFilterOperationType</a></td>
+                    <td><p>The filter operation type.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html#Mapbox_Unity_Map_ILayerFilter_GetFilterOperationType">ILayerFilter.GetFilterOperationType</a></div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_GetKey_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.GetKey*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_GetKey" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.GetKey">GetKey</h4>
+              <div class="markdown level1 summary"><p>Gets the key.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual string GetKey { get; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><p>The key.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html#Mapbox_Unity_Map_ILayerFilter_GetKey">ILayerFilter.GetKey</a></div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_GetMaxValue_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.GetMaxValue*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_GetMaxValue" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.GetMaxValue">GetMaxValue</h4>
+              <div class="markdown level1 summary"><p>Gets the max value.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual float GetMaxValue { get; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><p>The max value.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html#Mapbox_Unity_Map_ILayerFilter_GetMaxValue">ILayerFilter.GetMaxValue</a></div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_GetMinValue_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.GetMinValue*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_GetMinValue" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.GetMinValue">GetMinValue</h4>
+              <div class="markdown level1 summary"><p>Gets the minimum value.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual float GetMinValue { get; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><p>The minimum value.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html#Mapbox_Unity_Map_ILayerFilter_GetMinValue">ILayerFilter.GetMinValue</a></div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_GetNumberValue_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.GetNumberValue*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_GetNumberValue" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.GetNumberValue">GetNumberValue</h4>
+              <div class="markdown level1 summary"><p>Gets the minimum value.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual float GetNumberValue { get; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><p>The minimum value.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html#Mapbox_Unity_Map_ILayerFilter_GetNumberValue">ILayerFilter.GetNumberValue</a></div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_GetPropertyValue_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.GetPropertyValue*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_GetPropertyValue" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.GetPropertyValue">GetPropertyValue</h4>
+              <div class="markdown level1 summary"><p>Gets the property value.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual string GetPropertyValue { get; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><p>The property value.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html#Mapbox_Unity_Map_ILayerFilter_GetPropertyValue">ILayerFilter.GetPropertyValue</a></div>
+              <h3 id="methods">Methods
+              </h3>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_FilterIsInRangeValueContains_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.FilterIsInRangeValueContains*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_FilterIsInRangeValueContains_System_Single_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.FilterIsInRangeValueContains(System.Single)">FilterIsInRangeValueContains(Single)</h4>
+              <div class="markdown level1 summary"><p>Returns true if filter range values contain a given number.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual bool FilterIsInRangeValueContains(float value)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">value</span></td>
+                    <td><p>Value.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Boolean</span></td>
+                    <td><p><code>true</code>, if is in range value contains was filtered, <code>false</code> otherwise.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html#Mapbox_Unity_Map_ILayerFilter_FilterIsInRangeValueContains_System_Single_">ILayerFilter.FilterIsInRangeValueContains(Single)</a></div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_FilterKeyContains_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.FilterKeyContains*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_FilterKeyContains_System_String_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.FilterKeyContains(System.String)">FilterKeyContains(String)</h4>
+              <div class="markdown level1 summary"><p>Returns true if filter key contains a given string.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual bool FilterKeyContains(string key)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">key</span></td>
+                    <td><p>Key.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Boolean</span></td>
+                    <td><p><code>true</code>, if key contains was filtered, <code>false</code> otherwise.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html#Mapbox_Unity_Map_ILayerFilter_FilterKeyContains_System_String_">ILayerFilter.FilterKeyContains(String)</a></div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_FilterKeyMatchesExact_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.FilterKeyMatchesExact*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_FilterKeyMatchesExact_System_String_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.FilterKeyMatchesExact(System.String)">FilterKeyMatchesExact(String)</h4>
+              <div class="markdown level1 summary"><p>Returns true if filter key matches a given string exactly.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual bool FilterKeyMatchesExact(string key)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">key</span></td>
+                    <td><p>Key.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Boolean</span></td>
+                    <td><p><code>true</code>, if key matches exact was filtered, <code>false</code> otherwise.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html#Mapbox_Unity_Map_ILayerFilter_FilterKeyMatchesExact_System_String_">ILayerFilter.FilterKeyMatchesExact(String)</a></div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_FilterNumberValueEquals_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.FilterNumberValueEquals*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_FilterNumberValueEquals_System_Single_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.FilterNumberValueEquals(System.Single)">FilterNumberValueEquals(Single)</h4>
+              <div class="markdown level1 summary"><p>Returns true if filter number value is equal to a given number.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual bool FilterNumberValueEquals(float value)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">value</span></td>
+                    <td><p>Value.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Boolean</span></td>
+                    <td><p><code>true</code>, if number value equals was filtered, <code>false</code> otherwise.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html#Mapbox_Unity_Map_ILayerFilter_FilterNumberValueEquals_System_Single_">ILayerFilter.FilterNumberValueEquals(Single)</a></div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_FilterNumberValueIsGreaterThan_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.FilterNumberValueIsGreaterThan*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_FilterNumberValueIsGreaterThan_System_Single_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.FilterNumberValueIsGreaterThan(System.Single)">FilterNumberValueIsGreaterThan(Single)</h4>
+              <div class="markdown level1 summary"><p>Returns true if filter number value is greater than a given number.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual bool FilterNumberValueIsGreaterThan(float value)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">value</span></td>
+                    <td><p>Value.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Boolean</span></td>
+                    <td><p><code>true</code>, if number value is greater than was filtered, <code>false</code> otherwise.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html#Mapbox_Unity_Map_ILayerFilter_FilterNumberValueIsGreaterThan_System_Single_">ILayerFilter.FilterNumberValueIsGreaterThan(Single)</a></div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_FilterNumberValueIsLessThan_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.FilterNumberValueIsLessThan*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_FilterNumberValueIsLessThan_System_Single_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.FilterNumberValueIsLessThan(System.Single)">FilterNumberValueIsLessThan(Single)</h4>
+              <div class="markdown level1 summary"><p>Returns true if filter number value is less than a given number.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual bool FilterNumberValueIsLessThan(float value)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">value</span></td>
+                    <td><p>Value.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Boolean</span></td>
+                    <td><p><code>true</code>, if number value is less than was filtered, <code>false</code> otherwise.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html#Mapbox_Unity_Map_ILayerFilter_FilterNumberValueIsLessThan_System_Single_">ILayerFilter.FilterNumberValueIsLessThan(Single)</a></div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_FilterPropertyContains_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.FilterPropertyContains*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_FilterPropertyContains_System_String_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.FilterPropertyContains(System.String)">FilterPropertyContains(String)</h4>
+              <div class="markdown level1 summary"><p>Returns true if filter property contains a given string.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual bool FilterPropertyContains(string property)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">property</span></td>
+                    <td><p>Property.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Boolean</span></td>
+                    <td><p><code>true</code>, if property contains was filtered, <code>false</code> otherwise.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html#Mapbox_Unity_Map_ILayerFilter_FilterPropertyContains_System_String_">ILayerFilter.FilterPropertyContains(String)</a></div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_FilterPropertyMatchesExact_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.FilterPropertyMatchesExact*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_FilterPropertyMatchesExact_System_String_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.FilterPropertyMatchesExact(System.String)">FilterPropertyMatchesExact(String)</h4>
+              <div class="markdown level1 summary"><p>Returns true if filter property matches a given string exactly.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual bool FilterPropertyMatchesExact(string property)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">property</span></td>
+                    <td><p>Property.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Boolean</span></td>
+                    <td><p><code>true</code>, if property matches exact was filtered, <code>false</code> otherwise.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html#Mapbox_Unity_Map_ILayerFilter_FilterPropertyMatchesExact_System_String_">ILayerFilter.FilterPropertyMatchesExact(String)</a></div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_FilterUsesOperationType_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.FilterUsesOperationType*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_FilterUsesOperationType_Mapbox_Unity_MeshGeneration_Filters_LayerFilterOperationType_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.FilterUsesOperationType(Mapbox.Unity.MeshGeneration.Filters.LayerFilterOperationType)">FilterUsesOperationType(LayerFilterOperationType)</h4>
+              <div class="markdown level1 summary"><p>Returns true if filter uses a given operation type.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual bool FilterUsesOperationType(LayerFilterOperationType layerFilterOperationType)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.MeshGeneration.Filters.LayerFilterOperationType.html">LayerFilterOperationType</a></td>
+                    <td><span class="parametername">layerFilterOperationType</span></td>
+                    <td><p>Layer filter operation type.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Boolean</span></td>
+                    <td><p><code>true</code>, if uses operation type was filtered, <code>false</code> otherwise.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html#Mapbox_Unity_Map_ILayerFilter_FilterUsesOperationType_Mapbox_Unity_MeshGeneration_Filters_LayerFilterOperationType_">ILayerFilter.FilterUsesOperationType(LayerFilterOperationType)</a></div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_GetFilterComparer_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.GetFilterComparer*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_GetFilterComparer" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.GetFilterComparer">GetFilterComparer()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public ILayerFeatureFilterComparer GetFilterComparer()</code></pre>
+              </div>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.MeshGeneration.Filters.ILayerFeatureFilterComparer.html">ILayerFeatureFilterComparer</a></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_SetNumberIsEqual_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.SetNumberIsEqual*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_SetNumberIsEqual_System_String_System_Single_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.SetNumberIsEqual(System.String,System.Single)">SetNumberIsEqual(String, Single)</h4>
+              <div class="markdown level1 summary"><p>Sets the number is equal.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void SetNumberIsEqual(string key, float value)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">key</span></td>
+                    <td><p>Key.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">value</span></td>
+                    <td><p>Value.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html#Mapbox_Unity_Map_ILayerFilter_SetNumberIsEqual_System_String_System_Single_">ILayerFilter.SetNumberIsEqual(String, Single)</a></div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_SetNumberIsGreaterThan_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.SetNumberIsGreaterThan*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_SetNumberIsGreaterThan_System_String_System_Single_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.SetNumberIsGreaterThan(System.String,System.Single)">SetNumberIsGreaterThan(String, Single)</h4>
+              <div class="markdown level1 summary"><p>Sets the number is greater than.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void SetNumberIsGreaterThan(string key, float value)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">key</span></td>
+                    <td><p>Key.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">value</span></td>
+                    <td><p>Value.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html#Mapbox_Unity_Map_ILayerFilter_SetNumberIsGreaterThan_System_String_System_Single_">ILayerFilter.SetNumberIsGreaterThan(String, Single)</a></div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_SetNumberIsInRange_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.SetNumberIsInRange*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_SetNumberIsInRange_System_String_System_Single_System_Single_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.SetNumberIsInRange(System.String,System.Single,System.Single)">SetNumberIsInRange(String, Single, Single)</h4>
+              <div class="markdown level1 summary"><p>Sets the number is in range.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void SetNumberIsInRange(string key, float min, float max)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">key</span></td>
+                    <td><p>Key.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">min</span></td>
+                    <td><p>Minimum.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">max</span></td>
+                    <td><p>Max.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html#Mapbox_Unity_Map_ILayerFilter_SetNumberIsInRange_System_String_System_Single_System_Single_">ILayerFilter.SetNumberIsInRange(String, Single, Single)</a></div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_SetNumberIsLessThan_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.SetNumberIsLessThan*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_SetNumberIsLessThan_System_String_System_Single_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.SetNumberIsLessThan(System.String,System.Single)">SetNumberIsLessThan(String, Single)</h4>
+              <div class="markdown level1 summary"><p>Sets the number is less than.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void SetNumberIsLessThan(string key, float value)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">key</span></td>
+                    <td><p>Key.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">value</span></td>
+                    <td><p>Value.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html#Mapbox_Unity_Map_ILayerFilter_SetNumberIsLessThan_System_String_System_Single_">ILayerFilter.SetNumberIsLessThan(String, Single)</a></div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_SetStringContains_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.SetStringContains*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Filters_LayerFilter_SetStringContains_System_String_System_String_" data-uid="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.SetStringContains(System.String,System.String)">SetStringContains(String, String)</h4>
+              <div class="markdown level1 summary"><p>Sets the string contains.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void SetStringContains(string key, string property)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">key</span></td>
+                    <td><p>Key.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">property</span></td>
+                    <td><p>Property.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html#Mapbox_Unity_Map_ILayerFilter_SetStringContains_System_String_System_String_">ILayerFilter.SetStringContains(String, String)</a></div>
+                        </article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            &#0169; 2017 Mapbox
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

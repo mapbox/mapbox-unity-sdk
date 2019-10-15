@@ -1,0 +1,647 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>CHANGELOG | Mapbox SDK for Unity </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="CHANGELOG | Mapbox SDK for Unity ">
+    <meta name="generator" content="docfx 2.15.1.0">
+    
+    <link rel="shortcut icon" href="../docs/images/favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:newtab" content="true">
+  </head>
+  <body data-spy="scroll" data-target="#affix">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../docs/images/mapbox-logo.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+              <h2 id="changelog">CHANGELOG</h2>
+              
+<h3 id="v211">v2.1.1</h3>
+<p>10/15/2019</p>
+<h3 id="bug-fixes">Bug Fixes</h3>
+<ul>
+<li>Fixes a bug where users were being double counted on mobile platforms</li>
+<li>Fixes a bug which send incomplete telemetry events.</li>
+</ul>
+<h3 id="v210">v.2.1.0</h3>
+<p>09/20/2019</p>
+<h5 id="new-features">New Features</h5>
+<ul>
+<li><em>Editor Preview</em> - Adds ability to preview maps in editor at design time. AbstractMap now has an <code>Enable Preview</code> toggle which displays the map with all current settings, and provides ability to modify settings while viewing the map outside of Play mode.</li>
+<li>Pricing Update - Introduces new pricing framework.</li>
+</ul>
+<h5 id="improvements">Improvements</h5>
+<ul>
+<li>Improves line mesh generation, adds options for join and cap types. Users have greater control over quality and styles of line meshes.</li>
+<li>Improves terrain tile loading times by optimizing terrain pipeline.</li>
+<li>Remove UV Modifier class and merge the functionality into polygon mesh modifier.</li>
+<li>Optimized Vector feature textures, resulting in smaller file sizes.</li>
+</ul>
+<h4 id="bug-fixes-1">Bug Fixes</h4>
+<ul>
+<li>Fixes a bug with UV calculation which caused textures to be stretched instead of tiled.</li>
+<li>Fixes a bug where Vector feature layers that used the same texture style would not preserve layer-specific style parameter settings.</li>
+<li>Fixes a bug where decoration spawning (SpawnInsideModifier) placed objects at wrong locations on recycled tiles.</li>
+<li>Fixes a bug where point placement didn&#39;t pate point location properly when zoom level changes.</li>
+</ul>
+<h3 id="v200">v.2.0.0</h3>
+<p>10/15/2018</p>
+<h5 id="new-features-1">New Features</h5>
+<ul>
+<li><em>Runtime editing of map features</em> - Map elements like Imagery, Terrain, Feature Properties can now be updated during runtime, using AbstractMap UI in the Editor , or by using the API methods.</li>
+<li><em>Map API’s</em> - Maps SDK for Unity now has API methods to build and edit maps entirely using scripts.</li>
+</ul>
+<h5 id="improvements-1">Improvements</h5>
+<ul>
+<li>Improves fallback for terrain tiles with missing or no data. Image will be now rendered on flat tiles instead of blank tiles.</li>
+<li>Improves terrain height query by using local position/rotation/scale of a tile. Use <code>QueryElevationInUnityUnitsAt</code> or <code>QueryElevationInMetersAt</code> API methods to query height.</li>
+<li>Terrain module “Sample Count” property changed to a slider.</li>
+<li>Improves tile loading and recycling performance.</li>
+</ul>
+<h5 id="bug-fixes-2">Bug Fixes</h5>
+<ul>
+<li>Fixes issue where Terrain was not turned off with <code>None</code> option.</li>
+<li>Fixes issue where Node Editor script was throwing a compilation error due to deprecated API in Unity 2018.2</li>
+<li>Fixes issue where SnapToZero moved the map for each new tile loaded instead of only using the first one.</li>
+<li>Fixes issue with the height modifier where floor height calculations were wrong causing overlapping floors.</li>
+<li>Fixes issue where dispose buffer setting was being ignored by <code>RangeAroundTransform</code> extent type.</li>
+<li>Fixes builds for UWP/ Hololens environments.</li>
+<li>Fixes issue where ARTableTop map would not snap to the detected plane on zooming in/out.</li>
+<li>Fixes issue where <code>BuildingsWithUniqueIds</code>  setting was getting applied incorrectly, resulting in missing buildings.</li>
+</ul>
+<h5 id="breaking-changes">Breaking Changes</h5>
+<ul>
+<li>Any <code>Feature</code> layers under <code>Map Layers</code> using a <code>Custom</code> style type will need to be re-assigned through the AbstractMap UI. This change was necessary to persist custom style options when switching between different styles.</li>
+</ul>
+<h3 id="v145">v.1.4.5</h3>
+<p>08/20/2018</p>
+<h5 id="new-features-2">New Features</h5>
+<ul>
+<li>Added a <strong>ReplaceFeatureCollectionModifier</strong> class that allows multiple ReplaceFeatureModifiers to be run from one modifier.</li>
+<li>Added seven hero structures - Transamerica Pyramid, Coit Tower, Salesforce Tower, Empire State Building, Chrysler Building, One World Trade Center, Statue of Liberty.</li>
+</ul>
+<h5 id="improvements-2">Improvements</h5>
+<ul>
+<li>Added color option to texturing style</li>
+<li>Added color palettes drop down to Simple texturing option. Allows users to choose between different color palettes.</li>
+<li>Improvements to Tile states and map states. Map extent finished state is robust and deterministic.</li>
+<li>Removed dependency of Tile Providers on Update methods.</li>
+</ul>
+<h3 id="v144">v.1.4.4</h3>
+<p><em>07/10/2018</em></p>
+<h5 id="new-features-3">New Features</h5>
+<ul>
+<li>Selecting <code>Simple</code> Texturing Style in a <code>Vector Layer Visualizer</code> exposes a drop down menu which allows users to select a color palette for that layer.</li>
+</ul>
+<h5 id="improvements-3">Improvements</h5>
+<ul>
+<li>Added 2 examples to the setup dialog</li>
+<li>AstronautGame - enhanced version of the Location Based game with custom styling and Astronaut asset</li>
+<li>TrafficAndDirections - example built around using Mapbox&#39;s traffic data layer and directions API</li>
+<li>Fix an issue with factories where a racing condition causing tiles without imagery</li>
+<li>Fixes the issue with Replacement Modifier to prevent duplicate prefab spawning and blocking wrong features.</li>
+<li>Fixes the issue with custom styles that go missing after building to a device.</li>
+<li>Fix an issue with factories where a racing condition causing tiles without imagery</li>
+<li>Added a separate Traffic and Directions demo scene</li>
+<li>Changed loft modifier to stretch texture horizontally</li>
+<li>Changed Directions Factory to check waypoints on timer and recalculate path if there&#39;s a chance</li>
+</ul>
+<h3 id="v143">v.1.4.3</h3>
+<p><em>06/18/2018</em></p>
+<h5 id="new-features-4">New Features</h5>
+<ul>
+<li>Added a <strong>Feature Replacement Modifer</strong> that allows replacement of a vector feature at a given Latitude,Longitude with a supplied prefab. Enables replacing a procedurally generated building at a given Latitude,Longitude with a custom 3D model.</li>
+<li>Texturing Style dropdown now allows users to select from prepackaged texture styles or custom, which allows for user-defined texturing.</li>
+<li>Mesh and GameObject modifiers can now be created and added to AbstractMap via <code>Add New</code> buttons.</li>
+<li>Example scene <code>LocationProvider</code> can be used to log GPS traces. See documentation on how to copy logs from devices.</li>
+<li>GPS traces can be played back in the Editor with <code>EditorLocationProviderLocationLog</code>.</li>
+<li><code>UserHeading</code> and <code>DeviceOrientation</code> values can be smoothed via different smoothing algorithms.</li>
+</ul>
+<h5 id="improvements-4">Improvements</h5>
+<ul>
+<li>Improvements to UV mapping for side walls of extruded polygons when using atlas textures. Enables better handling of leftover areas when creating columns.</li>
+<li>DeviceLocationProvider should work on devices. Tested with iPhone 7/8/X, Google Pixel 2, Samsung S8, Samsung Galaxy Note 8, OnePlus 3</li>
+</ul>
+<h5 id="bug-fixes-3">Bug Fixes</h5>
+<ul>
+<li>Fix issue with UvModifier which caused wrong roof uv positions calculations.</li>
+<li>Fix issue with data fetcher to handle failed connections properly, which caused IndexOutOfRangeException during tile loading/unloading.</li>
+<li>Fix issue with ambient file caching on Windows with .NET4.6 runtime and long file names. <a href="https://github.com/mapbox/mapbox-unity-sdk/pull/825">https://github.com/mapbox/mapbox-unity-sdk/pull/825</a> <a href="https://github.com/mapbox/mapbox-unity-sdk/issues/815">https://github.com/mapbox/mapbox-unity-sdk/issues/815</a></li>
+</ul>
+<h5 id="known-issues">Known Issues</h5>
+<ul>
+<li>ARInterface related errors and crashes on Unity 2018.1.1f1 related to bug in Unity  <a href="https://issuetracker.unity3d.com/issues/vuforia-gameobject-transforms-are-not-being-disabled-when-the-player-is-stopped">https://issuetracker.unity3d.com/issues/vuforia-gameobject-transforms-are-not-being-disabled-when-the-player-is-stopped</a></li>
+</ul>
+<h3 id="v142">v.1.4.2</h3>
+<p><em>05/14/2018</em></p>
+<h5 id="new-features-5">New Features</h5>
+<ul>
+<li>Layer names and property names are preloaded from the data source into a dropdown.</li>
+<li>Add <code>Location Prefabs</code> section to <code>AbstractMap</code>. Enables users to spawn prefabs at points-of-interest on the map directly from the <code>AbstractMap</code> UI.</li>
+<li>Add options to spawn prefabs on points-of-interest using <code>Mapbox Category</code>, <code>Name</code>, or a list of <code>Address or LatLon</code>.</li>
+<li>Add methods on <code>AbstractMap</code> to spawn prefabs. Enables users to add layers via script.</li>
+<li>Add the <code>LocationPrefabs.unity</code> example scene. Demonstrates the basics of using the <code>Location Prefabs</code> feature.</li>
+<li>Add <code>OnUpdated</code> event to <code>AbstractMap</code>. Enables subscribers to get a notification when the map location and/or zoom gets updated.</li>
+<li><code>DeviceLocationProviderAndroidNative</code>: a native location provider for Android that directly accesses location and orientation provided by the operating system not using Unity&#39;s <code>Input.location</code> which has some shortcomings, eg coordinates truncated to <code>float</code> precision.
+<strong>Only available on Android 7.0 (Nougat, API Level 24) and up!</strong></li>
+<li><code>EditorGpsLogLocationProvider</code>: an Editor location provider to replay real world GPS traces logged with <a href="https://github.com/google/gps-measurement-tools/tree/master/GNSSLogger">GNSSLogger</a></li>
+<li>New example scene showing <code>UserHeading</code> and <code>DeviceOrientation</code></li>
+</ul>
+<h5 id="improvements-5">Improvements</h5>
+<ul>
+<li><code>UnityARInterface</code> updated to <a href="https://github.com/Unity-Technologies/experimental-ARInterface/commit/67351b66ff9af28380e7dd5f5b2f4ba1bf802ca8">commit 67351b6</a> from March 1st 2018</li>
+<li>Additional properties on <code>RotateWithLocationProvider</code> to account for new <code>Location</code> properties <code>UserHeading</code> and <code>DeviceOrientation</code>.</li>
+<li>Changes to terrain factory (#623)<ul>
+<li>Create a new base class</li>
+<li>Introduce all different terrains as strategies</li>
+<li>Change sidewalls as a property on elevated terrain strategy</li>
+</ul>
+</li>
+<li>Data Fetching Changes (#622)<ul>
+<li>Move data calls from factories to DataFetcher classes</li>
+<li>Factories register to events in DataFetchers</li>
+</ul>
+</li>
+<li><code>Layer Name</code> , <code>Extrusion Property Name</code> and <code>Filter Key</code> are now selectable dropdowns indicating the layers and properties available in the current <code>Data Source</code>. Layers and properties no longer require manual string entry.</li>
+</ul>
+<h5 id="bug-fixes-4">Bug Fixes</h5>
+<ul>
+<li>Added checks to prevent NRE in <code>GeocodeAttributeSearchWindow</code> when searching with an invalid token or no connection.</li>
+<li>Fix issue where side wall mesh generation did not work with elevated terrain.</li>
+<li>Fix issue with scaling prefabs for POI&#39;s. Enables correct scaling of objects with map.</li>
+</ul>
+<h5 id="known-issues-1">Known Issues</h5>
+<ul>
+<li><code>Filters</code> with empty key or value parameters will exclude all features in a layer.</li>
+<li>SDK will throw <code>[Physics.PhysX] cleaning the mesh failed</code> error if a MapFeature is used with the following options: {Primitive Type: <code>Line</code>, LayerName: <code>Road</code>, Collider Type: <code>Mesh Collider</code>}</li>
+</ul>
+<h5 id="breaking-changes-1">BREAKING CHANGES</h5>
+<ul>
+<li>Property <code>Heading</code> on <code>Location</code> object has been split into <code>UserHeading</code> and <code>DeviceOrientation</code>.<ul>
+<li><code>UserHeading</code>: the direction the user is moving. This is calculated from the latest position. If the user stops moving the last heading value is kept.</li>
+<li><code>DeviceOrientation</code>: value obtained from the device compass. Where the device is looking to.</li>
+</ul>
+</li>
+</ul>
+<h3 id="v141">v.1.4.1</h3>
+<p><em>04/17/2018</em></p>
+<h5 id="new-features-6">New Features</h5>
+<ul>
+<li>Add two new modules, KdTreeCollection and AddToCollection Gameobject modifier.</li>
+<li>Add Collider option for vector features.</li>
+<li>Add scale factor for extrusion value derived from feature property.</li>
+<li>Add camera script with zoom &amp; pan support for TabletopAR scene.</li>
+</ul>
+<h5 id="bug-fixes-5">Bug Fixes</h5>
+<ul>
+<li>Remove <code>buildingsWithUniqueIds</code> setting for <code>Mapbox Streets</code> data source.</li>
+<li>Change <code>Style Name</code> to <code>Data Source</code></li>
+<li>Fix to make filter values case insensitive.</li>
+<li>Fix issue where position vector features was not being set.</li>
+<li>Fix <code>Range Property</code> extrusion option for vector features.</li>
+<li>Select newly created layer visualizer.</li>
+<li>Fix typo in colorPalette.</li>
+<li>Add defaults for all sublayer properties to not carry over any options from the previous layer.</li>
+<li>Don&#39;t allow empty names for layer visualizers.</li>
+<li>Fix foldouts not retaining states between play mode &amp; editor.</li>
+<li>Add missing tooltips.</li>
+<li>Fix issue with Satellite TextureType.</li>
+<li>Added a check to prevent NRE on tile update because map was not initialized.</li>
+<li>Added method to disable <code>InitializeOnStart</code> in the <code>Initialize With Location Provider</code> script.</li>
+<li>Fix loop counter in <code>SpawnInsidePrefabModifier</code> which was causing an infinite loop.</li>
+</ul>
+<h3 id="v140">v.1.4.0</h3>
+<p><em>03/20/2018</em></p>
+<p>#####</p>
+<ul>
+<li>Drag and drop prefabs for most common use cases.</li>
+<li>New Abstract Map UI</li>
+<li>Style development - colorization and atlas template generator</li>
+<li>Use texture atlas for building geometries.</li>
+<li>Merge buildings with unique ids using the experimental 3D buildings tileset.</li>
+<li>Added a API call on AbstractMap to query height at a certain latitude longitude.</li>
+<li>Included EditorConfig file to enforce coding style</li>
+<li>Integration of previously seperate AR support <a href="https://github.com/mapbox/mapbox-unity-sdk/pull/544">https://github.com/mapbox/mapbox-unity-sdk/pull/544</a></li>
+</ul>
+<h3 id="v130">v.1.3.0</h3>
+<p><em>12/18/2017</em></p>
+<h5 id="upgrade-instructions">Upgrade Instructions</h5>
+<ul>
+<li>As always, if you already have a project with a previous version of the SDK, please remove older versions before installing this new one!</li>
+<li><code>FeatureBehaviour</code> is no longer added to feature gameobjects by default. Use a <code>FeatureBehaviourModifier</code> to add this component (optimization).</li>
+<li><code>TextureModifier</code> is obsolete. Please use <code>MaterialModifier</code>.</li>
+<li><code>LocationProvider</code> has been heavily modified to support additional features. Please update you references accordingly.</li>
+<li><code>MeshFactory</code> and <code>PoiVisualizer</code> have been deprecated (previously obsolete).</li>
+</ul>
+<h5 id="memoryperformance-upgrades">Memory/Performance Upgrades</h5>
+<ul>
+<li>Added ability to use coroutines inside <code>VectorLayerVisualizer</code>—this option will help prevent locking main thread during tile creation. Note that this will normally result in longer map load times, however.</li>
+<li>Objects generated from vector tiles (meshes, game objects, colliders, renderers, etc.) are now pooled and re-used accordingly. This expedites feature creation and helps prevent memory fragmentation.</li>
+<li>Fixed some memory leaks.</li>
+<li>General performance improvements—maps should now load much faster, in general.</li>
+</ul>
+<h5 id="new-features-7">New Features</h5>
+<ul>
+<li>Added convenience methods to <code>AbstractMap</code>  to convert between Lat/Lon ↔ Vector3. This also works for maps that have been translated, rotated, or scaled! #387</li>
+<li>Added tile error exception events that you can hook into to know when specific tiles fail to load. We provide an example <code>TileErrorHandler</code> object that logs these to console.</li>
+<li>Added C# wrapper for Mapbox Token API (to validate tokens).</li>
+<li>Added transparency shader for raster tiles—this enables you to convert black to alpha from Mapbox studio styles (to render just road labels, for example).</li>
+<li>Added new <code>LoftModifier</code>—use this to make complex geometry from line features.</li>
+<li>Added prefabs for location provider and “player” avatar for convenience. #382</li>
+<li>Added Mapbox Map Matching API #302</li>
+</ul>
+<p><img src="images/changelog/map-matching.gif" alt="image"></p>
+<h5 id="bug-fixes-6">Bug Fixes</h5>
+<ul>
+<li>It should now be safe to nest the Mapbox folder (SDK) in your own projects.</li>
+<li>You can now properly change/load scenes at runtime. #381</li>
+<li>Fixed token validation issues (validate token when initializing <code>MapboxAccess</code>). #430</li>
+<li>Custom inspectors now properly serialize assets assigned via built-in object browser.</li>
+<li>Fix for certain tile providers not updating properly when re-initializing a map.</li>
+<li>Fixed issue where clipped features would result in several new features. #398</li>
+<li>Fixed one potential race condition with <code>DeviceLocationProvider</code> on iOS devices, where location would not properly send locations as expected.</li>
+<li><code>Conversions.cs</code> are now properly supported in zoomable map implementations.</li>
+<li>Fixed bug where certain tile providers would give out of sync exception.</li>
+<li>Fixed <code>duplicate keys</code> exception related to some slippy maps.</li>
+<li>Fixed bugs related to snap modifiers not working properly depending on <code>feature position</code> of the stack.</li>
+<li>Removed duplicate event registration in <code>MapVisualizer</code>.</li>
+<li>Fixed bugs associated with <code>Filters</code> and string comparisons in <code>VectorLayerVisualizer</code>.</li>
+</ul>
+<h5 id="improvements-6">Improvements</h5>
+<ul>
+<li>Made several methods virtual to better support extension.</li>
+<li>Improvements to map editor. #343<ul>
+<li>Map editor will refresh automatically when window receives focus.</li>
+<li>VectorTileFactory now has checkboxes to toggle specific layer visualizers.</li>
+</ul>
+</li>
+<li>Use <code>InitializeMapWithLocationProvider</code> to initialize a map at a specific location (device location), but don’t forget to disable <code>InitializeOnStart</code> on your map object!</li>
+<li>LocationProvider has been abstracted for easier serialization/assignment in the Unity editor.</li>
+<li>LocationProvider now supports sending additional data with <code>Location</code> object.</li>
+<li>It is now easier to mock locations in the editor.<ul>
+<li>Array support to mock a specific route (<code>LocationArrayEditorLocationProvider</code>).</li>
+<li>Transform support on <code>EditorLocationProvider</code> to create simple offsets.</li>
+<li>Use Unity Remote app to send location updates directly to the Unity editor from your device!</li>
+</ul>
+</li>
+<li><code>DynamicZoom</code> example has been improved, see new <code>Zoomable</code> map example.</li>
+<li>Added string to lat/lon conversion method.</li>
+<li>Various nodes in the map factory framework now have public fields to support run-time styling or modification before map generation (based on settings, for example).</li>
+<li>Maps now support float values for zoom level—you can use this to inform camera controllers, for example.</li>
+<li>Added UnityTile getter to AbstractMapVisualizer. This enables <code>UnityTile</code> lookup at runtime. #382</li>
+</ul>
+<h5 id="examples">Examples</h5>
+<ul>
+<li>Optimized and consolidated examples.<ul>
+<li>Removed <code>Drive</code> example.</li>
+<li>Removed <code>DynamicZoom</code> example (replaced with <code>ZoomableMap</code>).</li>
+<li>Removed <code>LowPoly</code>.</li>
+<li>Removed <code>MapReload</code> (many examples now support this functionality).</li>
+<li>Removed <code>SlippyTerrain</code> example (see <code>ZoomableMap</code> for similar and improved functionality).</li>
+<li>Removed <code>TerracedWorld</code>.</li>
+<li>Added <code>Explorer</code> example—vector map example covering a variety of layers and features.</li>
+<li>Added <code>ZoomableMap</code> example.</li>
+<li>Combined MeshGeneration Examples into BasicVectorMap folder.</li>
+</ul>
+</li>
+<li>See here for the latest.</li>
+</ul>
+<h5 id="known-issues-2">Known Issues</h5>
+<ul>
+<li><code>ZoomableMap</code> does not constrain map position to camera bounds. At some zoom levels, the map will go above the camera.</li>
+<li>iOS/Unity 2017.1+ sometimes location updates are delayed or not sent properly. We suspect this is an iOS/Unity issue.</li>
+<li>If you have issues with missing libraries in Xcode, please check that you are not using <code>symlink</code> in your Unity build settings and that your min. target OS is 8.</li>
+<li>Requesting too many tiles at once (on client) will often lead to many failed tile requests. We recommend that you distribute these requests over many frames!</li>
+</ul>
+<h3 id="v120">v.1.2.0</h3>
+<p><em>09/26/2017</em></p>
+<p><em>Please note: this release marks the beginning of official support for the Unity 2017 lifecycle.</em></p>
+<h5 id="upgrade-instructions-1">Upgrade Instructions</h5>
+<ul>
+<li>As always, please remove older versions before installing!</li>
+<li><code>AbstractMap</code> has officially been abstracted! This means that you must substitute, in your own scenes, a concrete implementation. We offer <code>BasicMap</code>, <code>MapAtSpecificLocation</code> and <code>DynamicZoomMap</code>.</li>
+<li>MapVisualizer has also been abstracted for tile placement purposes. You may need to point your existing maps to the new concrete implementation (<code>MapVisualizer</code>) and re-serialize your references (<code>Factories</code>).</li>
+</ul>
+<h5 id="memoryperformance">Memory/Performance</h5>
+<ul>
+<li>General performance optimizations.</li>
+</ul>
+<h5 id="new-features-8">New Features</h5>
+<ul>
+<li><code>DynamicZoomMap</code>, <code>DynamicMapVisualizer</code> and <code>DynamicZoomTileProvider</code> demonstrate how to build web-like maps that can pan and zoom smoothly.</li>
+<li>You can now convert latitude/longitude to a position on the sphere (see <code>Conversions.cs</code> and the <code>Globe</code> example).</li>
+<li>Use the new <code>MapAtSpecificLocation</code> component to create a map that is centered precisely at a given location.</li>
+<li>Use the new <code>RangeAroundTransformTileProvider</code> component to procedurally load tiles as a transform changes. This is useful for loading map content as a player avatar moves based on physical location. Check the <code>LocationProvider</code> example for more information.</li>
+<li>Map Editor (Mapbox --&gt; Map Editor)<ul>
+<li>Allows navigation of any Map Factory Frameworks referenced in the current scene</li>
+<li>Selecting a node will select the corresponding asset for manipulation in the inspector</li>
+<li>Added new asset browsing capabilities to these nodes (factories, modifiers, etc.)</li>
+</ul>
+</li>
+</ul>
+<p><img src="images/changelog/node-editor.gif" alt="image"></p>
+<h5 id="bug-fixes-7">Bug Fixes</h5>
+<ul>
+<li>We now catch exceptions when parsing Android library file names (duplicate library check).</li>
+<li>Fixed some wrong <code>Conversions</code> values and methods that would lead to improper positioning or gaps between tiles.</li>
+<li>The Mapbox configuration window no longer gets stuck validating a token.</li>
+<li>Wolfulus line ending fixer issues in Unity 2017 have been resolved.</li>
+<li>Fixed broken <code>VectorTileExample</code>.</li>
+<li><code>AbstractMapVisualizer</code> state change events no longer fire improperly when loading tiles from cache.</li>
+<li>Tiles should no longer appear all white or all black when using very small <code>UnityTileSize</code>.</li>
+<li><code>Map.cs</code> no longer executes the notify callback twice.</li>
+</ul>
+<h5 id="improvements-7">Improvements</h5>
+<ul>
+<li>Maps can now be <code>Initialized</code> with a latitude/longitude and a zoom level, at any time!<ul>
+<li>This means that you can re-use a map for a new location or zoom.</li>
+</ul>
+</li>
+<li>Scaling is now performed at a vertex level, which helps prevent floating-point imprecision and leads to a cleaner hierarchy.</li>
+<li><code>Vector2d</code> is now  serializable (for inspector purposes).</li>
+<li><code>MapId</code> and <code>Factories</code> are now public so that you can change them at runtime.</li>
+</ul>
+<h5 id="new-examples">New Examples</h5>
+<ul>
+<li><a href="https://www.mapbox.com/unity-sdk">See here for the latest.</a></li>
+</ul>
+<h3 id="v110">v.1.1.0</h3>
+<p><em>08/01/2017</em></p>
+<p><em>Please note: our next release will end support for the Unity 5.x lifecycle. We look forward to taking advantage of Unity 2017 optimizations and features.</em></p>
+<h5 id="upgrade-instructions-2">Upgrade Instructions</h5>
+<ul>
+<li>As always, please remove older versions before installing!</li>
+<li><code>TypeFilter</code> now uses an array. You will need to update your filters!</li>
+<li><code>MeshFactory</code> is obsolete. Please replace with <code>VectorTileFactory</code> or <code>StyleOptimizedVectorTileFactory</code>.</li>
+<li><code>PoiVisualizer</code> is obsolete. Please use a standard <code>VectorLayerVisualizer</code> with a <code>PrefabModifier</code>.</li>
+<li>Triangle.NET has been replaced with <code>Earcut</code>. If you were using Triangle features, you will need to <a href="https://github.com/mapbox/triangle.net-uwp">import that library yourself</a>.</li>
+<li>If you were using a <code>RangeTileProvider</code>, you will need to update its parameters, which are now described in terms of North, East, South, and West (for readability).</li>
+<li><code>ChamferModifier</code> has been replaced with <code>ChamferHeightModifier</code>. This new version looks and performs better.</li>
+<li>Ensure your <code>MapImageFactories</code> have the expected <code>Map Id</code>! We&#39;ve updated the way Ids are serialized, and your old Ids may have been lost--sorry!</li>
+</ul>
+<h5 id="memoryperformance-1">Memory/Performance</h5>
+<ul>
+<li>Added support for style-optimized vector tiles! <a href="https://www.mapbox.com/api-documentation/maps/#request-style-optimized-tiles">Read more here.</a><ul>
+<li>You will need to use the new <code>StyleOptimizedVectorTileFactory</code>.</li>
+<li>This can result in far less data transfer/data processing.</li>
+</ul>
+</li>
+<li>Replaced Triangle.NET with <code>Earcut</code> which results if much faster geometry construction.</li>
+<li>Removed expensive string concatenation process in <code>FeatureBehaviour</code>.</li>
+<li><code>MeshFactory</code> no longer waits for <code>Terrain</code> or <code>Raster</code> results before making its own web request.</li>
+</ul>
+<h5 id="new-features-9">New Features</h5>
+<ul>
+<li>Added ability to cache successful tile requests to disk (via SQL database). If a tile is found in the database, it will not make a web request.<ul>
+<li>Note that tiles in this database only expire when the cache fills up!</li>
+</ul>
+</li>
+<li>Want to create a low-poly landscape? Use the new <code>LowPolyTerrainFactory</code>!</li>
+<li>Maps can now be snapped to <code>y=0</code> (this prevents the need to reposition your camera at higher elevations).</li>
+<li>Added ability to choose pivot of objects generated with the <code>ModifierStack</code> (tile center, first vertex, or vertex average).</li>
+<li>Use the new <code>GameObjectModifier</code> <code>AddMonoBehavioursModifier</code> to &quot;generically&quot; add <code>Components</code> to your game objects.</li>
+<li>Added ability to snap to terrain/other objects with <code>SnapTerrainRaycastModifier</code>. This is more accurate (but slower) than <code>SnapTerrainModifier</code>.</li>
+<li>Added &quot;example&quot; <code>SpawnInsideModifier</code> which can be used to add procedural decoration inside a mesh (for example, <code>Landuse</code>).</li>
+<li>Added <code>ChamferHeightModifier</code> which, obviously, combines <code>Chamfer</code> and <code>Height</code> modifiers.</li>
+<li>Added <code>GlobeTileProvider</code> to request the entire world at once (be advised that this may result in MANY tile requests!).</li>
+<li>Project your tiles on a sphere! Use the new <code>GlobeTerrainFactory</code> to make a globe.</li>
+<li>Added ability to pick a custom style from the Mapbox Styles API.<ul>
+<li>Use the search button and enter your user name (for Mapbox Studio).</li>
+<li>Note that this requires you to <a href="https://www.mapbox.com/studio/account/tokens/">create an API token</a> that supports <code>styles:list</code>!</li>
+</ul>
+</li>
+</ul>
+<h5 id="bug-fixes-8">Bug Fixes</h5>
+<ul>
+<li>WebGL builds now work as expected!</li>
+<li>Fixed Unity Cloud Build and iOS signing issues that were related to native iOS libraries.</li>
+<li>Map tiles are now parented correctly to the map root (on device). If you previously had trouble rotating/moving/scaling a map on device, fret no longer!</li>
+<li>Fixed some bad height calculations for buildings.</li>
+<li><code>PolygonModifier</code> now correctly generates holes and better handles multiple <code>parts</code>.</li>
+<li>Tiles should now wrap at world boundaries correctly (rather than producing invalid tile requests).</li>
+</ul>
+<h5 id="improvements-8">Improvements</h5>
+<ul>
+<li>Unity/C# warnings have been addressed.</li>
+<li>Added preprocess build step and a unit test that checks for duplicate Android libraries.</li>
+<li>Example <code>CameraMovement</code> script has been improved to allow for mouse wheel translational zoom and precise touch drag (for panning).</li>
+<li>Added option to remove sidewalls from height-extruded geometry (for roads, for example).</li>
+<li>Use <code>VertexDebugger</code> to debug vertices for procedurally generated meshes.</li>
+<li>Added timeout exception to <code>HttpRequest</code>.</li>
+<li>RangeTileProvider is now more readable.</li>
+</ul>
+<h5 id="new-examples-1">New Examples</h5>
+<ul>
+<li>See <code>Globe</code> example for one method of spherically projecting tiles.</li>
+<li><code>MeshGenerationBasics</code> has new interactive elements to demonstrate some of the new features we&#39;ve added.</li>
+<li><code>StylingDemoMeshGeneration</code> uses <code>SpawnInsideModifier</code> to add &quot;bushes&quot; to <code>landuse:park</code>.</li>
+<li>Check <code>TerracedWorld</code> to see an example of how to use contour data to generate Godus-like worlds.</li>
+</ul>
+<h3 id="v100">v.1.0.0</h3>
+<p><em>05/26/2017</em></p>
+<h5 id="memoryperformance-2">Memory/Performance</h5>
+<ul>
+<li>Added support for runtime texture compression (DXT) in the <code>MapImageFactory</code></li>
+<li><code>MapVisualizer</code> now pools gameobjects/textures/data to avoid instantiation and destruction costs</li>
+<li>TerrainFactory now allocates less memory when manipulating geometry</li>
+<li>Elevation textures are no longer held in memory and height data parsing and access is much faster</li>
+<li>Added new <code>FlatTerrainFactory</code> that is optimized specifically for flat maps</li>
+<li>Tiles can now be cached in memory—configure the cache size in <code>MapboxAccess.cs</code> (default size is 500)</li>
+<li>Slippy maps now dispose tiles that determined to be &quot;out of range&quot;<ul>
+<li>Tiles that are out of range before completion are properly cancelled</li>
+</ul>
+</li>
+<li>Terrain generation in Unity 5.5+ should be much faster and allocate less memory</li>
+</ul>
+<h5 id="new-features-10">New Features</h5>
+<ul>
+<li>Added new retina-resolution raster tiles</li>
+<li>Added mipmap, compression, and retina-resolution support to <code>MapImageFactory</code></li>
+<li>The <code>PoiGeneration</code> example now includes clickable 3D world-space gameobjects—use these as reference for placing objects in Unity space according to a latitude/longitude</li>
+<li><p><code>MapVisualizer</code> and <code>TileFactories</code> now invoke state change events—use these to know when a map or specific factory is completed (loaded)</p>
+<ul>
+<li>See an example of implementing a loading screen in <code>Drive.unity</code></li>
+</ul>
+</li>
+<li>You can now specify GameObject <code>Layer</code> for tiles in the <code>TerrainFactory</code></li>
+<li>Add colliders to your terrain by checking the <code>Add Collider</code> flag in the <code>TerrainFactory</code></li>
+<li>Add colliders or specify GameObject <code>Layer</code> for buildings, roads, etc. with <code>ColliderModifier</code> and <code>LayerModifier</code></li>
+</ul>
+<h5 id="bug-fixes-9">Bug Fixes</h5>
+<ul>
+<li>Building snapped to terrain are now rendered correctly (check <code>Flat Tops</code> in the <code>HeightModifier</code>)</li>
+<li>Web request exceptions are now properly forwarded to the <code>Response</code> (should fix <code>Unknown tile tag: 15</code>)</li>
+<li>Complex building geometry should now be rendered correctly (holes, floating parts, etc.)</li>
+<li>Materials assigned to a <code>TerrainFactory</code> are now properly applied at runtime</li>
+<li>Because of <code>UnityTile</code> pooling, you should no longer encounter <code>key already exists in dictionary</code> exceptions related to tile factories—this means you can change map attributes (location, zoom, terrain, etc.) at runtime without throwing exceptions</li>
+</ul>
+<h5 id="improvements-9">Improvements</h5>
+<ul>
+<li>Map configuration values are no longer static, and an <code>OnInitialized</code> event is invoked when the <code>AbstractMap</code> reference values have been computed (prevents temporal coupling)</li>
+<li>Snapping to terrain has been simplified—just add a <code>SnapToTerrainModifier</code> to your <code>ModifierStack</code></li>
+<li><code>Slippy.cs</code> has been refactored to <code>CameraBoundsTileProvider.cs</code> and the backing abstraction enables you to write your own tile provider system (zoomable, path-based, region, etc.)</li>
+<li><code>MapController.cs</code> has been refactored to <code>AbstractMap</code> —this is not yet abstract, but should provide an example of how to construct a map using a <code>MapVisualizer</code> and a <code>TileProvider</code></li>
+<li><code>UnityTile</code> has been refactored to support reuse and has the ability to cancel its backing web requests</li>
+<li><code>DirectionsFactory</code> no longer relies on a <code>MapVisualizer</code> or <code>DirectionsHelper</code>, but can still use existing <code>MeshModifiers</code></li>
+</ul>
+<h3 id="v051">v0.5.1</h3>
+<p><em>05/01/2017</em></p>
+<ul>
+<li>Terrain height works as intended again (fixed out of range exception)</li>
+<li>Fixed issue where visualizers for <code>MeshFactories</code> were not being serialized properly</li>
+<li>Fixed null reference exception when creating a new <code>MeshFactory</code></li>
+</ul>
+<h3 id="v050">v0.5.0</h3>
+<p><em>04/26/2017</em></p>
+<ul>
+<li>Added support for UWP<ul>
+<li>Share your Hololens creations with us!</li>
+</ul>
+</li>
+<li>Fixed precision issue with tile conversions<ul>
+<li>Replaced <code>Geocoordinate</code> with <code>Vector2d</code></li>
+</ul>
+</li>
+<li>Mapbox API Token is now stored in MapboxAccess.txt<ul>
+<li><code>MapboxConvenience</code> has been removed</li>
+</ul>
+</li>
+<li>Added <code>LocationProviders</code> and example scene to build maps or place objects based on a latitude/longitude</li>
+<li>Mesh Generation:<ul>
+<li>General performance improvements (local tile geometry)</li>
+<li>Custom editors for map factories</li>
+<li>Added new <code>MergedModifierStack</code> which will reduce the number of transforms and draw calls in dense maps</li>
+<li>Continuous UVs for building facades</li>
+<li><code>DirectionsFactory</code> now draws full geometry, not just waypoints</li>
+<li>Fixed occasional vertex mismatch in <code>PolygonMeshModifier.cs</code> (which caused an index out of range exception)</li>
+</ul>
+</li>
+</ul>
+<h3 id="v040">v0.4.0</h3>
+<ul>
+<li>Updates mapbox-sdk-unity-core to v1.0.0-alpha13; features vector tile overzooming<ul>
+<li>Updates to attribution guidelines in README.MD</li>
+<li>Added Conversions.cs and VectorExtensions.cs to enable simple conversions from geocoordinate to unity coordinate space</li>
+</ul>
+</li>
+</ul>
+<h3 id="v030">v0.3.0</h3>
+<ul>
+<li>Added new infrastructure for mesh generation<ul>
+<li>Added new demos for basic, styled, point of interest vector mesh generation</li>
+<li>Added new demo for vector tiles + terrain with a slippy implementation (dynamic tile loading)</li>
+<li>Added a new demo for Mapbox Directions &amp; Traffic</li>
+<li>Deprecated old slippy demo</li>
+<li>Deprecated old directions component demo</li>
+</ul>
+</li>
+</ul>
+<h3 id="v020">v0.2.0</h3>
+<ul>
+<li>Added core sdk support for mapbox styles<ul>
+<li>vector tile decoding optimizations for speed and lazy decoding</li>
+<li>Added attribution prefab</li>
+<li>new Directions example</li>
+<li>All examples scripts updated streamlined to use MapboxConvenience object</li>
+</ul>
+</li>
+</ul>
+<h3 id="v011">v0.1.1</h3>
+<ul>
+<li>removed orphaned references from link.xml, this was causing build errors<ul>
+<li>moved JSON utility to Mapbox namespace to avoid conflicts with pre-exisiting frameworks</li>
+</ul>
+</li>
+</ul>
+
+            </article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/mapbox/mapbox-unity-sdk/blob/develop/documentation/docs/05-changelog.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            &#0169; 2017 Mapbox
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

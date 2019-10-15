@@ -1,0 +1,468 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class TerrainFactoryBase
+   | Mapbox SDK for Unity </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class TerrainFactoryBase
+   | Mapbox SDK for Unity ">
+    <meta name="generator" content="docfx 2.15.1.0">
+    
+    <link rel="shortcut icon" href="../../docs/images/favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:newtab" content="true">
+  </head>
+  <body data-spy="scroll" data-target="#affix">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../docs/images/mapbox-logo.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content">
+              
+              
+              <h1 id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase">Class TerrainFactoryBase
+              </h1>
+              <div class="markdown level0 summary"></div>
+              <div class="markdown level0 conceptual"></div>
+              <div class="inheritance">
+                <h5>Inheritance</h5>
+                  <div class="level0"><span class="xref">ScriptableObject</span></div>
+                  <div class="level1"><a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html">AbstractTileFactory</a></div>
+                  <div class="level2"><span class="xref">TerrainFactoryBase</span></div>
+              </div>
+              <div class="inheritedMembers">
+                <h5>Inherited Members</h5>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory__fileSource">AbstractTileFactory._fileSource</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory__options">AbstractTileFactory._options</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory_Options">AbstractTileFactory.Options</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory__tilesWaitingResponse">AbstractTileFactory._tilesWaitingResponse</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory__tilesWaitingProcessing">AbstractTileFactory._tilesWaitingProcessing</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory_SetOptions_Mapbox_Unity_Map_LayerProperties_">AbstractTileFactory.SetOptions(LayerProperties)</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory_OnErrorOccurred_Mapbox_Unity_MeshGeneration_Data_UnityTile_TileErrorEventArgs_">AbstractTileFactory.OnErrorOccurred(UnityTile, TileErrorEventArgs)</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory_Initialize_IFileSource_">AbstractTileFactory.Initialize(IFileSource)</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory_Register_Mapbox_Unity_MeshGeneration_Data_UnityTile_">AbstractTileFactory.Register(UnityTile)</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory_PostProcess_Mapbox_Unity_MeshGeneration_Data_UnityTile_">AbstractTileFactory.PostProcess(UnityTile)</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory_Unregister_Mapbox_Unity_MeshGeneration_Data_UnityTile_">AbstractTileFactory.Unregister(UnityTile)</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory_UpdateTileProperty_Mapbox_Unity_MeshGeneration_Data_UnityTile_Mapbox_Unity_Map_LayerUpdateArgs_">AbstractTileFactory.UpdateTileProperty(UnityTile, LayerUpdateArgs)</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory_OnRegistered_Mapbox_Unity_MeshGeneration_Data_UnityTile_">AbstractTileFactory.OnRegistered(UnityTile)</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory_OnPostProcess_Mapbox_Unity_MeshGeneration_Data_UnityTile_">AbstractTileFactory.OnPostProcess(UnityTile)</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory_OnUnregistered_Mapbox_Unity_MeshGeneration_Data_UnityTile_">AbstractTileFactory.OnUnregistered(UnityTile)</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory_OnTileError">AbstractTileFactory.OnTileError</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory_OnErrorOccurred_TileErrorEventArgs_">AbstractTileFactory.OnErrorOccurred(TileErrorEventArgs)</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory_TileFactoryHasChanged">AbstractTileFactory.TileFactoryHasChanged</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory_UpdateTileFactory_System_Object_System_EventArgs_">AbstractTileFactory.UpdateTileFactory(Object, EventArgs)</a>
+                </div>
+              </div>
+              <h6><strong>Namespace</strong>:Mapbox.Unity.MeshGeneration.Factories</h6>
+              <h6><strong>Assembly</strong>:cs.temp.dll.dll</h6>
+              <h5 id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_syntax">Syntax</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public class TerrainFactoryBase : AbstractTileFactory</code></pre>
+              </div>
+              <h3 id="fields">Fields
+              </h3>
+              
+              
+              <h4 id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase__elevationOptions" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase._elevationOptions">_elevationOptions</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">protected ElevationLayerProperties _elevationOptions</code></pre>
+              </div>
+              <h5 class="fieldValue">Field Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">ElevationLayerProperties</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <h4 id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_DataFetcher" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase.DataFetcher">DataFetcher</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">protected TerrainDataFetcher DataFetcher</code></pre>
+              </div>
+              <h5 class="fieldValue">Field Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">TerrainDataFetcher</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <h4 id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_Strategy" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase.Strategy">Strategy</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public TerrainStrategy Strategy</code></pre>
+              </div>
+              <h5 class="fieldValue">Field Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">TerrainStrategy</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h3 id="properties">Properties
+              </h3>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_Properties_" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase.Properties*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_Properties" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase.Properties">Properties</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public ElevationLayerProperties Properties { get; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">ElevationLayerProperties</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h3 id="methods">Methods
+              </h3>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_Clear_" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase.Clear*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_Clear" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase.Clear">Clear()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public override void Clear()</code></pre>
+              </div>
+              <h5 class="overrides">Overrides</h5>
+              <div><a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory_Clear">AbstractTileFactory.Clear()</a></div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_GetFetcher_" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase.GetFetcher*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_GetFetcher" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase.GetFetcher">GetFetcher()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public TerrainDataFetcher GetFetcher()</code></pre>
+              </div>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">TerrainDataFetcher</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_OnInitialized_" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase.OnInitialized*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_OnInitialized" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase.OnInitialized">OnInitialized()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">protected override void OnInitialized()</code></pre>
+              </div>
+              <h5 class="overrides">Overrides</h5>
+              <div><a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory_OnInitialized">AbstractTileFactory.OnInitialized()</a></div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_OnPostProcess_" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase.OnPostProcess*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_OnPostProcess_UnityTile_" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase.OnPostProcess(UnityTile)">OnPostProcess(UnityTile)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">protected override void OnPostProcess(UnityTile tile)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">UnityTile</span></td>
+                    <td><span class="parametername">tile</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_OnRegistered_" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase.OnRegistered*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_OnRegistered_UnityTile_" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase.OnRegistered(UnityTile)">OnRegistered(UnityTile)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">protected override void OnRegistered(UnityTile tile)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">UnityTile</span></td>
+                    <td><span class="parametername">tile</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_OnUnbindEvents_" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase.OnUnbindEvents*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_OnUnbindEvents" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase.OnUnbindEvents">OnUnbindEvents()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">protected override void OnUnbindEvents()</code></pre>
+              </div>
+              <h5 class="overrides">Overrides</h5>
+              <div><a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory_OnUnbindEvents">AbstractTileFactory.OnUnbindEvents()</a></div>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_OnUnregistered_" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase.OnUnregistered*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_OnUnregistered_UnityTile_" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase.OnUnregistered(UnityTile)">OnUnregistered(UnityTile)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">protected override void OnUnregistered(UnityTile tile)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">UnityTile</span></td>
+                    <td><span class="parametername">tile</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_SetOptions_" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase.SetOptions*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_SetOptions_LayerProperties_" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase.SetOptions(LayerProperties)">SetOptions(LayerProperties)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public override void SetOptions(LayerProperties options)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">LayerProperties</span></td>
+                    <td><span class="parametername">options</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_UnbindEvents_" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase.UnbindEvents*"></a>
+              <h4 id="Mapbox_Unity_MeshGeneration_Factories_TerrainFactoryBase_UnbindEvents" data-uid="Mapbox.Unity.MeshGeneration.Factories.TerrainFactoryBase.UnbindEvents">UnbindEvents()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public override void UnbindEvents()</code></pre>
+              </div>
+              <h5 class="overrides">Overrides</h5>
+              <div><a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html#Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory_UnbindEvents">AbstractTileFactory.UnbindEvents()</a></div>
+                        </article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            &#0169; 2017 Mapbox
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

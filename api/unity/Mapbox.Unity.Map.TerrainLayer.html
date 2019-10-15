@@ -1,0 +1,845 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class TerrainLayer
+   | Mapbox SDK for Unity </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class TerrainLayer
+   | Mapbox SDK for Unity ">
+    <meta name="generator" content="docfx 2.15.1.0">
+    
+    <link rel="shortcut icon" href="../../docs/images/favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:newtab" content="true">
+  </head>
+  <body data-spy="scroll" data-target="#affix">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../docs/images/mapbox-logo.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content">
+              
+              
+              <h1 id="Mapbox_Unity_Map_TerrainLayer" data-uid="Mapbox.Unity.Map.TerrainLayer">Class TerrainLayer
+              </h1>
+              <div class="markdown level0 summary"></div>
+              <div class="markdown level0 conceptual"></div>
+              <div class="inheritance">
+                <h5>Inheritance</h5>
+                  <div class="level0"><span class="xref">System.Object</span></div>
+                  <div class="level1"><a class="xref" href="Mapbox.Unity.Map.AbstractLayer.html">AbstractLayer</a></div>
+                  <div class="level2"><span class="xref">TerrainLayer</span></div>
+              </div>
+              <div class="inheritedMembers">
+                <h5>Inherited Members</h5>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.Map.AbstractLayer.html#Mapbox_Unity_Map_AbstractLayer_UpdateLayer">AbstractLayer.UpdateLayer</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.Map.AbstractLayer.html#Mapbox_Unity_Map_AbstractLayer_NotifyUpdateLayer_Mapbox_Unity_Map_LayerUpdateArgs_">AbstractLayer.NotifyUpdateLayer(LayerUpdateArgs)</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.Map.AbstractLayer.html#Mapbox_Unity_Map_AbstractLayer_NotifyUpdateLayer_Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory_Mapbox_Unity_Map_MapboxDataProperty_System_Boolean_">AbstractLayer.NotifyUpdateLayer(AbstractTileFactory, MapboxDataProperty, Boolean)</a>
+                </div>
+                <div>
+                  <span class="xref">System.Object.Equals(System.Object)</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.GetHashCode()</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.GetType()</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.MemberwiseClone()</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.ToString()</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+                </div>
+              </div>
+              <h6><strong>Namespace</strong>:Mapbox.Unity.Map</h6>
+              <h6><strong>Assembly</strong>:cs.temp.dll.dll</h6>
+              <h5 id="Mapbox_Unity_Map_TerrainLayer_syntax">Syntax</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">[Serializable]
+public class TerrainLayer : AbstractLayer, IGlobeTerrainLayer, ITerrainLayer, ILayer</code></pre>
+              </div>
+              <h3 id="constructors">Constructors
+              </h3>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer__ctor_" data-uid="Mapbox.Unity.Map.TerrainLayer.#ctor*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer__ctor" data-uid="Mapbox.Unity.Map.TerrainLayer.#ctor">TerrainLayer()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public TerrainLayer()</code></pre>
+              </div>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer__ctor_" data-uid="Mapbox.Unity.Map.TerrainLayer.#ctor*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer__ctor_Mapbox_Unity_Map_ElevationLayerProperties_" data-uid="Mapbox.Unity.Map.TerrainLayer.#ctor(Mapbox.Unity.Map.ElevationLayerProperties)">TerrainLayer(ElevationLayerProperties)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public TerrainLayer(ElevationLayerProperties properties)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.ElevationLayerProperties.html">ElevationLayerProperties</a></td>
+                    <td><span class="parametername">properties</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h3 id="properties">Properties
+              </h3>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_EarthRadius_" data-uid="Mapbox.Unity.Map.TerrainLayer.EarthRadius*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_EarthRadius" data-uid="Mapbox.Unity.Map.TerrainLayer.EarthRadius">EarthRadius</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public float EarthRadius { get; set; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.IGlobeTerrainLayer.html#Mapbox_Unity_Map_IGlobeTerrainLayer_EarthRadius">IGlobeTerrainLayer.EarthRadius</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_ElevationType_" data-uid="Mapbox.Unity.Map.TerrainLayer.ElevationType*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_ElevationType" data-uid="Mapbox.Unity.Map.TerrainLayer.ElevationType">ElevationType</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public ElevationLayerType ElevationType { get; set; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.ElevationLayerType.html">ElevationLayerType</a></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ITerrainLayer.html#Mapbox_Unity_Map_ITerrainLayer_ElevationType">ITerrainLayer.ElevationType</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_ExaggerationFactor_" data-uid="Mapbox.Unity.Map.TerrainLayer.ExaggerationFactor*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_ExaggerationFactor" data-uid="Mapbox.Unity.Map.TerrainLayer.ExaggerationFactor">ExaggerationFactor</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public float ExaggerationFactor { get; set; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ITerrainLayer.html#Mapbox_Unity_Map_ITerrainLayer_ExaggerationFactor">ITerrainLayer.ExaggerationFactor</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_Factory_" data-uid="Mapbox.Unity.Map.TerrainLayer.Factory*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_Factory" data-uid="Mapbox.Unity.Map.TerrainLayer.Factory">Factory</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public AbstractTileFactory Factory { get; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.MeshGeneration.Factories.AbstractTileFactory.html">AbstractTileFactory</a></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_IsLayerActive_" data-uid="Mapbox.Unity.Map.TerrainLayer.IsLayerActive*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_IsLayerActive" data-uid="Mapbox.Unity.Map.TerrainLayer.IsLayerActive">IsLayerActive</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public bool IsLayerActive { get; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Boolean</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayer.html#Mapbox_Unity_Map_ILayer_IsLayerActive">ILayer.IsLayerActive</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_LayerProperty_" data-uid="Mapbox.Unity.Map.TerrainLayer.LayerProperty*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_LayerProperty" data-uid="Mapbox.Unity.Map.TerrainLayer.LayerProperty">LayerProperty</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">[NodeEditorElement(&quot;Terrain Layer&quot;)]
+public ElevationLayerProperties LayerProperty { get; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.ElevationLayerProperties.html">ElevationLayerProperties</a></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_LayerSource_" data-uid="Mapbox.Unity.Map.TerrainLayer.LayerSource*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_LayerSource" data-uid="Mapbox.Unity.Map.TerrainLayer.LayerSource">LayerSource</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public ElevationSourceType LayerSource { get; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.ElevationSourceType.html">ElevationSourceType</a></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ITerrainLayer.html#Mapbox_Unity_Map_ITerrainLayer_LayerSource">ITerrainLayer.LayerSource</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_LayerSourceId_" data-uid="Mapbox.Unity.Map.TerrainLayer.LayerSourceId*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_LayerSourceId" data-uid="Mapbox.Unity.Map.TerrainLayer.LayerSourceId">LayerSourceId</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public string LayerSourceId { get; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayer.html#Mapbox_Unity_Map_ILayer_LayerSourceId">ILayer.LayerSourceId</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_LayerType_" data-uid="Mapbox.Unity.Map.TerrainLayer.LayerType*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_LayerType" data-uid="Mapbox.Unity.Map.TerrainLayer.LayerType">LayerType</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public MapLayerType LayerType { get; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.MapLayerType.html">MapLayerType</a></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayer.html#Mapbox_Unity_Map_ILayer_LayerType">ILayer.LayerType</a></div>
+              <h3 id="methods">Methods
+              </h3>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_AddToUnityLayer_" data-uid="Mapbox.Unity.Map.TerrainLayer.AddToUnityLayer*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_AddToUnityLayer_System_Int32_" data-uid="Mapbox.Unity.Map.TerrainLayer.AddToUnityLayer(System.Int32)">AddToUnityLayer(Int32)</h4>
+              <div class="markdown level1 summary"><p>Adds Terrain GameObject to Unity layer.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void AddToUnityLayer(int layerId)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">layerId</span></td>
+                    <td><p>Layer identifier.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ITerrainLayer.html#Mapbox_Unity_Map_ITerrainLayer_AddToUnityLayer_System_Int32_">ITerrainLayer.AddToUnityLayer(Int32)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_DisableSideWalls_" data-uid="Mapbox.Unity.Map.TerrainLayer.DisableSideWalls*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_DisableSideWalls" data-uid="Mapbox.Unity.Map.TerrainLayer.DisableSideWalls">DisableSideWalls()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public void DisableSideWalls()</code></pre>
+              </div>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ITerrainLayer.html#Mapbox_Unity_Map_ITerrainLayer_DisableSideWalls">ITerrainLayer.DisableSideWalls()</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_EnableCollider_" data-uid="Mapbox.Unity.Map.TerrainLayer.EnableCollider*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_EnableCollider_System_Boolean_" data-uid="Mapbox.Unity.Map.TerrainLayer.EnableCollider(System.Boolean)">EnableCollider(Boolean)</h4>
+              <div class="markdown level1 summary"><p>Add/Remove terrain collider. Terrain uses mesh collider.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void EnableCollider(bool enable)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Boolean</span></td>
+                    <td><span class="parametername">enable</span></td>
+                    <td><p>Boolean for enabling/disabling mesh collider</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ITerrainLayer.html#Mapbox_Unity_Map_ITerrainLayer_EnableCollider_System_Boolean_">ITerrainLayer.EnableCollider(Boolean)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_EnableSideWalls_" data-uid="Mapbox.Unity.Map.TerrainLayer.EnableSideWalls*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_EnableSideWalls_System_Single_Material_" data-uid="Mapbox.Unity.Map.TerrainLayer.EnableSideWalls(System.Single,Material)">EnableSideWalls(Single, Material)</h4>
+              <div class="markdown level1 summary"><p>Turn on terrain side walls.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void EnableSideWalls(float wallHeight, Material wallMaterial)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">wallHeight</span></td>
+                    <td><p>Wall height.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">Material</span></td>
+                    <td><span class="parametername">wallMaterial</span></td>
+                    <td><p>Wall material.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ITerrainLayer.html#Mapbox_Unity_Map_ITerrainLayer_EnableSideWalls_System_Single_Material_">ITerrainLayer.EnableSideWalls(Single, Material)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_Initialize_" data-uid="Mapbox.Unity.Map.TerrainLayer.Initialize*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_Initialize" data-uid="Mapbox.Unity.Map.TerrainLayer.Initialize">Initialize()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public void Initialize()</code></pre>
+              </div>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayer.html#Mapbox_Unity_Map_ILayer_Initialize">ILayer.Initialize()</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_Initialize_" data-uid="Mapbox.Unity.Map.TerrainLayer.Initialize*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_Initialize_Mapbox_Unity_Map_LayerProperties_" data-uid="Mapbox.Unity.Map.TerrainLayer.Initialize(Mapbox.Unity.Map.LayerProperties)">Initialize(LayerProperties)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public void Initialize(LayerProperties properties)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.LayerProperties.html">LayerProperties</a></td>
+                    <td><span class="parametername">properties</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayer.html#Mapbox_Unity_Map_ILayer_Initialize_Mapbox_Unity_Map_LayerProperties_">ILayer.Initialize(LayerProperties)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_Remove_" data-uid="Mapbox.Unity.Map.TerrainLayer.Remove*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_Remove" data-uid="Mapbox.Unity.Map.TerrainLayer.Remove">Remove()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public void Remove()</code></pre>
+              </div>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayer.html#Mapbox_Unity_Map_ILayer_Remove">ILayer.Remove()</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_RemoveFromUnityLayer_" data-uid="Mapbox.Unity.Map.TerrainLayer.RemoveFromUnityLayer*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_RemoveFromUnityLayer_System_Int32_" data-uid="Mapbox.Unity.Map.TerrainLayer.RemoveFromUnityLayer(System.Int32)">RemoveFromUnityLayer(Int32)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public void RemoveFromUnityLayer(int layerId)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">layerId</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ITerrainLayer.html#Mapbox_Unity_Map_ITerrainLayer_RemoveFromUnityLayer_System_Int32_">ITerrainLayer.RemoveFromUnityLayer(Int32)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_SetElevationType_" data-uid="Mapbox.Unity.Map.TerrainLayer.SetElevationType*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_SetElevationType_Mapbox_Unity_Map_ElevationLayerType_" data-uid="Mapbox.Unity.Map.TerrainLayer.SetElevationType(Mapbox.Unity.Map.ElevationLayerType)">SetElevationType(ElevationLayerType)</h4>
+              <div class="markdown level1 summary"><p>Sets the main strategy for terrain mesh generation.
+Flat terrain doesn&#39;t pull data from servers and just uses a quad as terrain.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void SetElevationType(ElevationLayerType elevationType)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.ElevationLayerType.html">ElevationLayerType</a></td>
+                    <td><span class="parametername">elevationType</span></td>
+                    <td><p>Type of the elevation strategy</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ITerrainLayer.html#Mapbox_Unity_Map_ITerrainLayer_SetElevationType_Mapbox_Unity_Map_ElevationLayerType_">ITerrainLayer.SetElevationType(ElevationLayerType)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_SetExaggerationFactor_" data-uid="Mapbox.Unity.Map.TerrainLayer.SetExaggerationFactor*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_SetExaggerationFactor_System_Single_" data-uid="Mapbox.Unity.Map.TerrainLayer.SetExaggerationFactor(System.Single)">SetExaggerationFactor(Single)</h4>
+              <div class="markdown level1 summary"><p>Sets the elevation multiplier for terrain. It&#39;ll regenerate terrain mesh, multiplying each point elevation by provided value.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void SetExaggerationFactor(float factor)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">factor</span></td>
+                    <td><p>Elevation multiplier</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ITerrainLayer.html#Mapbox_Unity_Map_ITerrainLayer_SetExaggerationFactor_System_Single_">ITerrainLayer.SetExaggerationFactor(Single)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_SetLayerSource_" data-uid="Mapbox.Unity.Map.TerrainLayer.SetLayerSource*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_SetLayerSource_Mapbox_Unity_Map_ElevationSourceType_" data-uid="Mapbox.Unity.Map.TerrainLayer.SetLayerSource(Mapbox.Unity.Map.ElevationSourceType)">SetLayerSource(ElevationSourceType)</h4>
+              <div class="markdown level1 summary"><p>Sets the data source for Terrain Layer.
+Defaults to MapboxTerrain.
+Use <span class="paramref">terrainSource</span> = None, to disable the Terrain Layer.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void SetLayerSource(ElevationSourceType terrainSource = ElevationSourceType.MapboxTerrain)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.ElevationSourceType.html">ElevationSourceType</a></td>
+                    <td><span class="parametername">terrainSource</span></td>
+                    <td><p>Terrain source.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ITerrainLayer.html#Mapbox_Unity_Map_ITerrainLayer_SetLayerSource_Mapbox_Unity_Map_ElevationSourceType_">ITerrainLayer.SetLayerSource(ElevationSourceType)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_SetLayerSource_" data-uid="Mapbox.Unity.Map.TerrainLayer.SetLayerSource*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_SetLayerSource_System_String_" data-uid="Mapbox.Unity.Map.TerrainLayer.SetLayerSource(System.String)">SetLayerSource(String)</h4>
+              <div class="markdown level1 summary"><p>Sets the data source to a custom source for Terrain Layer.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void SetLayerSource(string terrainSource)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">terrainSource</span></td>
+                    <td><p>Terrain source.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayer.html#Mapbox_Unity_Map_ILayer_SetLayerSource_System_String_">ILayer.SetLayerSource(String)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_SetProperties_" data-uid="Mapbox.Unity.Map.TerrainLayer.SetProperties*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_SetProperties_Mapbox_Unity_Map_ElevationSourceType_Mapbox_Unity_Map_ElevationLayerType_System_Boolean_System_Single_System_Int32_" data-uid="Mapbox.Unity.Map.TerrainLayer.SetProperties(Mapbox.Unity.Map.ElevationSourceType,Mapbox.Unity.Map.ElevationLayerType,System.Boolean,System.Single,System.Int32)">SetProperties(ElevationSourceType, ElevationLayerType, Boolean, Single, Int32)</h4>
+              <div class="markdown level1 summary"><p>Change terrain layer settings.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void SetProperties(ElevationSourceType dataSource = ElevationSourceType.MapboxTerrain, ElevationLayerType elevationType = ElevationLayerType.TerrainWithElevation, bool enableCollider = false, float factor = 1F, int layerId = 0)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.ElevationSourceType.html">ElevationSourceType</a></td>
+                    <td><span class="parametername">dataSource</span></td>
+                    <td><p>The data source for the terrain height map.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.ElevationLayerType.html">ElevationLayerType</a></td>
+                    <td><span class="parametername">elevationType</span></td>
+                    <td><p>Mesh generation strategy for the tile/height.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Boolean</span></td>
+                    <td><span class="parametername">enableCollider</span></td>
+                    <td><p>Enable/Disable collider component for the tile game object.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">factor</span></td>
+                    <td><p>Multiplier for the height data.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">layerId</span></td>
+                    <td><p>Unity Layer for the tile game object.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ITerrainLayer.html#Mapbox_Unity_Map_ITerrainLayer_SetProperties_Mapbox_Unity_Map_ElevationSourceType_Mapbox_Unity_Map_ElevationLayerType_System_Boolean_System_Single_System_Int32_">ITerrainLayer.SetProperties(ElevationSourceType, ElevationLayerType, Boolean, Single, Int32)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_TerrainLayer_Update_" data-uid="Mapbox.Unity.Map.TerrainLayer.Update*"></a>
+              <h4 id="Mapbox_Unity_Map_TerrainLayer_Update_Mapbox_Unity_Map_LayerProperties_" data-uid="Mapbox.Unity.Map.TerrainLayer.Update(Mapbox.Unity.Map.LayerProperties)">Update(LayerProperties)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public void Update(LayerProperties properties)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.LayerProperties.html">LayerProperties</a></td>
+                    <td><span class="parametername">properties</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayer.html#Mapbox_Unity_Map_ILayer_Update_Mapbox_Unity_Map_LayerProperties_">ILayer.Update(LayerProperties)</a></div>
+                        </article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            &#0169; 2017 Mapbox
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

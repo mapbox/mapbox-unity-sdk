@@ -1,0 +1,832 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class VectorFilterOptions
+   | Mapbox SDK for Unity </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class VectorFilterOptions
+   | Mapbox SDK for Unity ">
+    <meta name="generator" content="docfx 2.15.1.0">
+    
+    <link rel="shortcut icon" href="../../docs/images/favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:newtab" content="true">
+  </head>
+  <body data-spy="scroll" data-target="#affix">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../docs/images/mapbox-logo.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content">
+              
+              
+              <h1 id="Mapbox_Unity_Map_VectorFilterOptions" data-uid="Mapbox.Unity.Map.VectorFilterOptions">Class VectorFilterOptions
+              </h1>
+              <div class="markdown level0 summary"></div>
+              <div class="markdown level0 conceptual"></div>
+              <div class="inheritance">
+                <h5>Inheritance</h5>
+                  <div class="level0"><span class="xref">System.Object</span></div>
+                  <div class="level1"><a class="xref" href="Mapbox.Unity.Map.MapboxDataProperty.html">MapboxDataProperty</a></div>
+                  <div class="level2"><span class="xref">VectorFilterOptions</span></div>
+              </div>
+              <div class="inheritedMembers">
+                <h5>Inherited Members</h5>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.Map.MapboxDataProperty.html#Mapbox_Unity_Map_MapboxDataProperty_PropertyHasChanged">MapboxDataProperty.PropertyHasChanged</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.Map.MapboxDataProperty.html#Mapbox_Unity_Map_MapboxDataProperty_OnPropertyHasChanged_System_EventArgs_">MapboxDataProperty.OnPropertyHasChanged(EventArgs)</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.Map.MapboxDataProperty.html#Mapbox_Unity_Map_MapboxDataProperty_NeedsForceUpdate">MapboxDataProperty.NeedsForceUpdate()</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.Map.MapboxDataProperty.html#Mapbox_Unity_Map_MapboxDataProperty_UpdateProperty_UnityTile_">MapboxDataProperty.UpdateProperty(UnityTile)</a>
+                </div>
+                <div>
+                  <span class="xref">System.Object.Equals(System.Object)</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.GetHashCode()</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.GetType()</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.MemberwiseClone()</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.ToString()</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+                </div>
+              </div>
+              <h6><strong>Namespace</strong>:Mapbox.Unity.Map</h6>
+              <h6><strong>Assembly</strong>:cs.temp.dll.dll</h6>
+              <h5 id="Mapbox_Unity_Map_VectorFilterOptions_syntax">Syntax</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">[Serializable]
+public class VectorFilterOptions : MapboxDataProperty, ISubLayerFiltering</code></pre>
+              </div>
+              <h3 id="fields">Fields
+              </h3>
+              
+              
+              <h4 id="Mapbox_Unity_Map_VectorFilterOptions_combinerType" data-uid="Mapbox.Unity.Map.VectorFilterOptions.combinerType">combinerType</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public LayerFilterCombinerOperationType combinerType</code></pre>
+              </div>
+              <h5 class="fieldValue">Field Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.MeshGeneration.Filters.LayerFilterCombinerOperationType.html">LayerFilterCombinerOperationType</a></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <h4 id="Mapbox_Unity_Map_VectorFilterOptions_filters" data-uid="Mapbox.Unity.Map.VectorFilterOptions.filters">filters</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public List&lt;LayerFilter&gt; filters</code></pre>
+              </div>
+              <h5 class="fieldValue">Field Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Collections.Generic.List</span>&lt;<a class="xref" href="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.html">LayerFilter</a>&gt;</td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h3 id="properties">Properties
+              </h3>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorFilterOptions_HasChanged_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.HasChanged*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorFilterOptions_HasChanged" data-uid="Mapbox.Unity.Map.VectorFilterOptions.HasChanged">HasChanged</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public override bool HasChanged { set; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Boolean</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="overrides">Overrides</h5>
+              <div><a class="xref" href="Mapbox.Unity.Map.MapboxDataProperty.html#Mapbox_Unity_Map_MapboxDataProperty_HasChanged">MapboxDataProperty.HasChanged</a></div>
+              <h3 id="methods">Methods
+              </h3>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorFilterOptions_AddFilter_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.AddFilter*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorFilterOptions_AddFilter" data-uid="Mapbox.Unity.Map.VectorFilterOptions.AddFilter">AddFilter()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public void AddFilter()</code></pre>
+              </div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorFilterOptions_AddNumericFilterEquals_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.AddNumericFilterEquals*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorFilterOptions_AddNumericFilterEquals_System_String_System_Single_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.AddNumericFilterEquals(System.String,System.Single)">AddNumericFilterEquals(String, Single)</h4>
+              <div class="markdown level1 summary"><p>Adds a number filter that uses an equals operator.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual ILayerFilter AddNumericFilterEquals(string key, float value)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">key</span></td>
+                    <td><p>Key.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">value</span></td>
+                    <td><p>Value.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html">ILayerFilter</a></td>
+                    <td><p>The filter.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ISubLayerFiltering.html#Mapbox_Unity_Map_ISubLayerFiltering_AddNumericFilterEquals_System_String_System_Single_">ISubLayerFiltering.AddNumericFilterEquals(String, Single)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorFilterOptions_AddNumericFilterGreaterThan_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.AddNumericFilterGreaterThan*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorFilterOptions_AddNumericFilterGreaterThan_System_String_System_Single_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.AddNumericFilterGreaterThan(System.String,System.Single)">AddNumericFilterGreaterThan(String, Single)</h4>
+              <div class="markdown level1 summary"><p>Adds a number filter that uses a greater than operator.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual ILayerFilter AddNumericFilterGreaterThan(string key, float value)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">key</span></td>
+                    <td><p>Key.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">value</span></td>
+                    <td><p>Value.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html">ILayerFilter</a></td>
+                    <td><p>The filter.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ISubLayerFiltering.html#Mapbox_Unity_Map_ISubLayerFiltering_AddNumericFilterGreaterThan_System_String_System_Single_">ISubLayerFiltering.AddNumericFilterGreaterThan(String, Single)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorFilterOptions_AddNumericFilterInRange_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.AddNumericFilterInRange*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorFilterOptions_AddNumericFilterInRange_System_String_System_Single_System_Single_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.AddNumericFilterInRange(System.String,System.Single,System.Single)">AddNumericFilterInRange(String, Single, Single)</h4>
+              <div class="markdown level1 summary"><p>Adds a number filter that uses an in range operator.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual ILayerFilter AddNumericFilterInRange(string key, float min, float max)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">key</span></td>
+                    <td><p>Key.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">min</span></td>
+                    <td><p>Minimum.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">max</span></td>
+                    <td><p>Max.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html">ILayerFilter</a></td>
+                    <td><p>The filter.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ISubLayerFiltering.html#Mapbox_Unity_Map_ISubLayerFiltering_AddNumericFilterInRange_System_String_System_Single_System_Single_">ISubLayerFiltering.AddNumericFilterInRange(String, Single, Single)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorFilterOptions_AddNumericFilterLessThan_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.AddNumericFilterLessThan*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorFilterOptions_AddNumericFilterLessThan_System_String_System_Single_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.AddNumericFilterLessThan(System.String,System.Single)">AddNumericFilterLessThan(String, Single)</h4>
+              <div class="markdown level1 summary"><p>Adds a number filter that uses a less than operator.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual ILayerFilter AddNumericFilterLessThan(string key, float value)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">key</span></td>
+                    <td><p>Key.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">value</span></td>
+                    <td><p>Value.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html">ILayerFilter</a></td>
+                    <td><p>The filter.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ISubLayerFiltering.html#Mapbox_Unity_Map_ISubLayerFiltering_AddNumericFilterLessThan_System_String_System_Single_">ISubLayerFiltering.AddNumericFilterLessThan(String, Single)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorFilterOptions_AddStringFilterContains_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.AddStringFilterContains*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorFilterOptions_AddStringFilterContains_System_String_System_String_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.AddStringFilterContains(System.String,System.String)">AddStringFilterContains(String, String)</h4>
+              <div class="markdown level1 summary"><p>Adds a string filter that uses a contains operator.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual ILayerFilter AddStringFilterContains(string key, string property)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">key</span></td>
+                    <td><p>Key.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">property</span></td>
+                    <td><p>Property.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html">ILayerFilter</a></td>
+                    <td><p>The filter.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ISubLayerFiltering.html#Mapbox_Unity_Map_ISubLayerFiltering_AddStringFilterContains_System_String_System_String_">ISubLayerFiltering.AddStringFilterContains(String, String)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorFilterOptions_GetAllFilters_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.GetAllFilters*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorFilterOptions_GetAllFilters" data-uid="Mapbox.Unity.Map.VectorFilterOptions.GetAllFilters">GetAllFilters()</h4>
+              <div class="markdown level1 summary"><p>Gets all filters.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual IEnumerable&lt;ILayerFilter&gt; GetAllFilters()</code></pre>
+              </div>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html">ILayerFilter</a>&gt;</td>
+                    <td><p>All filters.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ISubLayerFiltering.html#Mapbox_Unity_Map_ISubLayerFiltering_GetAllFilters">ISubLayerFiltering.GetAllFilters()</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorFilterOptions_GetFilter_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.GetFilter*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorFilterOptions_GetFilter_System_Int32_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.GetFilter(System.Int32)">GetFilter(Int32)</h4>
+              <div class="markdown level1 summary"><p>Gets a filter using an index lookup.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual ILayerFilter GetFilter(int index)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">index</span></td>
+                    <td><p>Index.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html">ILayerFilter</a></td>
+                    <td><p>The filter.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ISubLayerFiltering.html#Mapbox_Unity_Map_ISubLayerFiltering_GetFilter_System_Int32_">ISubLayerFiltering.GetFilter(Int32)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorFilterOptions_GetFilterCombinerType_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.GetFilterCombinerType*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorFilterOptions_GetFilterCombinerType" data-uid="Mapbox.Unity.Map.VectorFilterOptions.GetFilterCombinerType">GetFilterCombinerType()</h4>
+              <div class="markdown level1 summary"><p>Gets the type of the filter combiner.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual LayerFilterCombinerOperationType GetFilterCombinerType()</code></pre>
+              </div>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.MeshGeneration.Filters.LayerFilterCombinerOperationType.html">LayerFilterCombinerOperationType</a></td>
+                    <td><p>The filter combiner type.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ISubLayerFiltering.html#Mapbox_Unity_Map_ISubLayerFiltering_GetFilterCombinerType">ISubLayerFiltering.GetFilterCombinerType()</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorFilterOptions_GetFiltersByQuery_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.GetFiltersByQuery*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorFilterOptions_GetFiltersByQuery_System_Func_Mapbox_Unity_Map_ILayerFilter_System_Boolean__" data-uid="Mapbox.Unity.Map.VectorFilterOptions.GetFiltersByQuery(System.Func{Mapbox.Unity.Map.ILayerFilter,System.Boolean})">GetFiltersByQuery(Func&lt;ILayerFilter, Boolean&gt;)</h4>
+              <div class="markdown level1 summary"><p>Gets the filters by query.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual IEnumerable&lt;ILayerFilter&gt; GetFiltersByQuery(Func&lt;ILayerFilter, bool&gt; query)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Func</span>&lt;<a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html">ILayerFilter</a>, <span class="xref">System.Boolean</span>&gt;</td>
+                    <td><span class="parametername">query</span></td>
+                    <td><p>Query.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html">ILayerFilter</a>&gt;</td>
+                    <td><p>Filters by query.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ISubLayerFiltering.html#Mapbox_Unity_Map_ISubLayerFiltering_GetFiltersByQuery_System_Func_Mapbox_Unity_Map_ILayerFilter_System_Boolean__">ISubLayerFiltering.GetFiltersByQuery(Func&lt;ILayerFilter, Boolean&gt;)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorFilterOptions_RegisterFilters_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.RegisterFilters*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorFilterOptions_RegisterFilters" data-uid="Mapbox.Unity.Map.VectorFilterOptions.RegisterFilters">RegisterFilters()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public void RegisterFilters()</code></pre>
+              </div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorFilterOptions_RemoveAllFilters_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.RemoveAllFilters*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorFilterOptions_RemoveAllFilters" data-uid="Mapbox.Unity.Map.VectorFilterOptions.RemoveAllFilters">RemoveAllFilters()</h4>
+              <div class="markdown level1 summary"><p>Removes all filters.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void RemoveAllFilters()</code></pre>
+              </div>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ISubLayerFiltering.html#Mapbox_Unity_Map_ISubLayerFiltering_RemoveAllFilters">ISubLayerFiltering.RemoveAllFilters()</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorFilterOptions_RemoveFilter_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.RemoveFilter*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorFilterOptions_RemoveFilter_Mapbox_Unity_Map_ILayerFilter_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.RemoveFilter(Mapbox.Unity.Map.ILayerFilter)">RemoveFilter(ILayerFilter)</h4>
+              <div class="markdown level1 summary"><p>Removes a filter.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void RemoveFilter(ILayerFilter filter)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.ILayerFilter.html">ILayerFilter</a></td>
+                    <td><span class="parametername">filter</span></td>
+                    <td><p>Filter.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ISubLayerFiltering.html#Mapbox_Unity_Map_ISubLayerFiltering_RemoveFilter_Mapbox_Unity_Map_ILayerFilter_">ISubLayerFiltering.RemoveFilter(ILayerFilter)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorFilterOptions_RemoveFilter_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.RemoveFilter*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorFilterOptions_RemoveFilter_Mapbox_Unity_MeshGeneration_Filters_LayerFilter_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.RemoveFilter(Mapbox.Unity.MeshGeneration.Filters.LayerFilter)">RemoveFilter(LayerFilter)</h4>
+              <div class="markdown level1 summary"><p>Removes a filter.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void RemoveFilter(LayerFilter layerFilter)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.MeshGeneration.Filters.LayerFilter.html">LayerFilter</a></td>
+                    <td><span class="parametername">layerFilter</span></td>
+                    <td><p>Layer filter.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ISubLayerFiltering.html#Mapbox_Unity_Map_ISubLayerFiltering_RemoveFilter_Mapbox_Unity_MeshGeneration_Filters_LayerFilter_">ISubLayerFiltering.RemoveFilter(LayerFilter)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorFilterOptions_RemoveFilter_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.RemoveFilter*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorFilterOptions_RemoveFilter_System_Int32_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.RemoveFilter(System.Int32)">RemoveFilter(Int32)</h4>
+              <div class="markdown level1 summary"><p>Removes the filter using an index lookup.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void RemoveFilter(int index)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">index</span></td>
+                    <td><p>Index.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ISubLayerFiltering.html#Mapbox_Unity_Map_ISubLayerFiltering_RemoveFilter_System_Int32_">ISubLayerFiltering.RemoveFilter(Int32)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorFilterOptions_SetFilterCombinerType_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.SetFilterCombinerType*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorFilterOptions_SetFilterCombinerType_Mapbox_Unity_MeshGeneration_Filters_LayerFilterCombinerOperationType_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.SetFilterCombinerType(Mapbox.Unity.MeshGeneration.Filters.LayerFilterCombinerOperationType)">SetFilterCombinerType(LayerFilterCombinerOperationType)</h4>
+              <div class="markdown level1 summary"><p>Sets the type of the filter combiner.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void SetFilterCombinerType(LayerFilterCombinerOperationType layerFilterCombinerOperationType)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.MeshGeneration.Filters.LayerFilterCombinerOperationType.html">LayerFilterCombinerOperationType</a></td>
+                    <td><span class="parametername">layerFilterCombinerOperationType</span></td>
+                    <td><p>Layer filter combiner operation type.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ISubLayerFiltering.html#Mapbox_Unity_Map_ISubLayerFiltering_SetFilterCombinerType_Mapbox_Unity_MeshGeneration_Filters_LayerFilterCombinerOperationType_">ISubLayerFiltering.SetFilterCombinerType(LayerFilterCombinerOperationType)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorFilterOptions_UnRegisterFilters_" data-uid="Mapbox.Unity.Map.VectorFilterOptions.UnRegisterFilters*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorFilterOptions_UnRegisterFilters" data-uid="Mapbox.Unity.Map.VectorFilterOptions.UnRegisterFilters">UnRegisterFilters()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public void UnRegisterFilters()</code></pre>
+              </div>
+                        </article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            &#0169; 2017 Mapbox
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

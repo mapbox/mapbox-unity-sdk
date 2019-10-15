@@ -1,0 +1,1625 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class VectorLayer
+   | Mapbox SDK for Unity </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class VectorLayer
+   | Mapbox SDK for Unity ">
+    <meta name="generator" content="docfx 2.15.1.0">
+    
+    <link rel="shortcut icon" href="../../docs/images/favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:newtab" content="true">
+  </head>
+  <body data-spy="scroll" data-target="#affix">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../docs/images/mapbox-logo.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content">
+              
+              
+              <h1 id="Mapbox_Unity_Map_VectorLayer" data-uid="Mapbox.Unity.Map.VectorLayer">Class VectorLayer
+              </h1>
+              <div class="markdown level0 summary"></div>
+              <div class="markdown level0 conceptual"></div>
+              <div class="inheritance">
+                <h5>Inheritance</h5>
+                  <div class="level0"><span class="xref">System.Object</span></div>
+                  <div class="level1"><a class="xref" href="Mapbox.Unity.Map.AbstractLayer.html">AbstractLayer</a></div>
+                  <div class="level2"><span class="xref">VectorLayer</span></div>
+              </div>
+              <div class="inheritedMembers">
+                <h5>Inherited Members</h5>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.Map.AbstractLayer.html#Mapbox_Unity_Map_AbstractLayer_UpdateLayer">AbstractLayer.UpdateLayer</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.Map.AbstractLayer.html#Mapbox_Unity_Map_AbstractLayer_NotifyUpdateLayer_Mapbox_Unity_Map_LayerUpdateArgs_">AbstractLayer.NotifyUpdateLayer(LayerUpdateArgs)</a>
+                </div>
+                <div>
+                  <a class="xref" href="Mapbox.Unity.Map.AbstractLayer.html#Mapbox_Unity_Map_AbstractLayer_NotifyUpdateLayer_Mapbox_Unity_MeshGeneration_Factories_AbstractTileFactory_Mapbox_Unity_Map_MapboxDataProperty_System_Boolean_">AbstractLayer.NotifyUpdateLayer(AbstractTileFactory, MapboxDataProperty, Boolean)</a>
+                </div>
+                <div>
+                  <span class="xref">System.Object.Equals(System.Object)</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.GetHashCode()</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.GetType()</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.MemberwiseClone()</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.ToString()</span>
+                </div>
+                <div>
+                  <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+                </div>
+              </div>
+              <h6><strong>Namespace</strong>:Mapbox.Unity.Map</h6>
+              <h6><strong>Assembly</strong>:cs.temp.dll.dll</h6>
+              <h5 id="Mapbox_Unity_Map_VectorLayer_syntax">Syntax</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public class VectorLayer : AbstractLayer, IVectorDataLayer, ILayer</code></pre>
+              </div>
+              <h3 id="fields">Fields
+              </h3>
+              
+              
+              <h4 id="Mapbox_Unity_Map_VectorLayer_SubLayerAdded" data-uid="Mapbox.Unity.Map.VectorLayer.SubLayerAdded">SubLayerAdded</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public EventHandler SubLayerAdded</code></pre>
+              </div>
+              <h5 class="fieldValue">Field Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">EventHandler</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <h4 id="Mapbox_Unity_Map_VectorLayer_SubLayerRemoved" data-uid="Mapbox.Unity.Map.VectorLayer.SubLayerRemoved">SubLayerRemoved</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public EventHandler SubLayerRemoved</code></pre>
+              </div>
+              <h5 class="fieldValue">Field Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">EventHandler</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h3 id="properties">Properties
+              </h3>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_Factory_" data-uid="Mapbox.Unity.Map.VectorLayer.Factory*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_Factory" data-uid="Mapbox.Unity.Map.VectorLayer.Factory">Factory</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public VectorTileFactory Factory { get; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">VectorTileFactory</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_IsLayerActive_" data-uid="Mapbox.Unity.Map.VectorLayer.IsLayerActive*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_IsLayerActive" data-uid="Mapbox.Unity.Map.VectorLayer.IsLayerActive">IsLayerActive</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public bool IsLayerActive { get; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Boolean</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayer.html#Mapbox_Unity_Map_ILayer_IsLayerActive">ILayer.IsLayerActive</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_LayerProperty_" data-uid="Mapbox.Unity.Map.VectorLayer.LayerProperty*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_LayerProperty" data-uid="Mapbox.Unity.Map.VectorLayer.LayerProperty">LayerProperty</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public VectorLayerProperties LayerProperty { get; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.VectorLayerProperties.html">VectorLayerProperties</a></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_LayerSourceId_" data-uid="Mapbox.Unity.Map.VectorLayer.LayerSourceId*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_LayerSourceId" data-uid="Mapbox.Unity.Map.VectorLayer.LayerSourceId">LayerSourceId</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public string LayerSourceId { get; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayer.html#Mapbox_Unity_Map_ILayer_LayerSourceId">ILayer.LayerSourceId</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_LayerType_" data-uid="Mapbox.Unity.Map.VectorLayer.LayerType*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_LayerType" data-uid="Mapbox.Unity.Map.VectorLayer.LayerType">LayerType</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public MapLayerType LayerType { get; }</code></pre>
+              </div>
+              <h5 class="propertyValue">Property Value</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.MapLayerType.html">MapLayerType</a></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayer.html#Mapbox_Unity_Map_ILayer_LayerType">ILayer.LayerType</a></div>
+              <h3 id="methods">Methods
+              </h3>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_AddCustomFeatureSubLayer_" data-uid="Mapbox.Unity.Map.VectorLayer.AddCustomFeatureSubLayer*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_AddCustomFeatureSubLayer_System_String_System_String_" data-uid="Mapbox.Unity.Map.VectorLayer.AddCustomFeatureSubLayer(System.String,System.String)">AddCustomFeatureSubLayer(String, String)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void AddCustomFeatureSubLayer(string assignedSubLayerName, string dataLayerNameInService)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">assignedSubLayerName</span></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">dataLayerNameInService</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.IVectorDataLayer.html#Mapbox_Unity_Map_IVectorDataLayer_AddCustomFeatureSubLayer_System_String_System_String_">IVectorDataLayer.AddCustomFeatureSubLayer(String, String)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_AddFeatureSubLayer_" data-uid="Mapbox.Unity.Map.VectorLayer.AddFeatureSubLayer*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_AddFeatureSubLayer_Mapbox_Unity_Map_VectorSubLayerProperties_" data-uid="Mapbox.Unity.Map.VectorLayer.AddFeatureSubLayer(Mapbox.Unity.Map.VectorSubLayerProperties)">AddFeatureSubLayer(VectorSubLayerProperties)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void AddFeatureSubLayer(VectorSubLayerProperties subLayerProperties)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.VectorSubLayerProperties.html">VectorSubLayerProperties</a></td>
+                    <td><span class="parametername">subLayerProperties</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.IVectorDataLayer.html#Mapbox_Unity_Map_IVectorDataLayer_AddFeatureSubLayer_Mapbox_Unity_Map_VectorSubLayerProperties_">IVectorDataLayer.AddFeatureSubLayer(VectorSubLayerProperties)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_AddLayerSource_" data-uid="Mapbox.Unity.Map.VectorLayer.AddLayerSource*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_AddLayerSource_System_String_" data-uid="Mapbox.Unity.Map.VectorLayer.AddLayerSource(System.String)">AddLayerSource(String)</h4>
+              <div class="markdown level1 summary"><p>Add provided data source (TilesetId) to existing ones.
+Mapbox vector api supports comma separated TilesetIds and this method
+adds the provided TilesetId at the end of the existing source.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void AddLayerSource(string vectorSource)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">vectorSource</span></td>
+                    <td><p>Data source (TilesetId) to add to existing sources.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.IVectorDataLayer.html#Mapbox_Unity_Map_IVectorDataLayer_AddLayerSource_System_String_">IVectorDataLayer.AddLayerSource(String)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_AddLineFeatureSubLayer_" data-uid="Mapbox.Unity.Map.VectorLayer.AddLineFeatureSubLayer*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_AddLineFeatureSubLayer_System_String_System_String_System_Single_" data-uid="Mapbox.Unity.Map.VectorLayer.AddLineFeatureSubLayer(System.String,System.String,System.Single)">AddLineFeatureSubLayer(String, String, Single)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void AddLineFeatureSubLayer(string assignedSubLayerName, string dataLayerNameInService, float lineWidth = 1F)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">assignedSubLayerName</span></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">dataLayerNameInService</span></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">lineWidth</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.IVectorDataLayer.html#Mapbox_Unity_Map_IVectorDataLayer_AddLineFeatureSubLayer_System_String_System_String_System_Single_">IVectorDataLayer.AddLineFeatureSubLayer(String, String, Single)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_AddPointFeatureSubLayer_" data-uid="Mapbox.Unity.Map.VectorLayer.AddPointFeatureSubLayer*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_AddPointFeatureSubLayer_System_String_System_String_" data-uid="Mapbox.Unity.Map.VectorLayer.AddPointFeatureSubLayer(System.String,System.String)">AddPointFeatureSubLayer(String, String)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void AddPointFeatureSubLayer(string assignedSubLayerName, string dataLayerNameInService)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">assignedSubLayerName</span></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">dataLayerNameInService</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.IVectorDataLayer.html#Mapbox_Unity_Map_IVectorDataLayer_AddPointFeatureSubLayer_System_String_System_String_">IVectorDataLayer.AddPointFeatureSubLayer(String, String)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_AddPointsOfInterestSubLayer_" data-uid="Mapbox.Unity.Map.VectorLayer.AddPointsOfInterestSubLayer*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_AddPointsOfInterestSubLayer_Mapbox_Unity_Map_PrefabItemOptions_" data-uid="Mapbox.Unity.Map.VectorLayer.AddPointsOfInterestSubLayer(Mapbox.Unity.Map.PrefabItemOptions)">AddPointsOfInterestSubLayer(PrefabItemOptions)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void AddPointsOfInterestSubLayer(PrefabItemOptions poiLayerProperties)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.PrefabItemOptions.html">PrefabItemOptions</a></td>
+                    <td><span class="parametername">poiLayerProperties</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.IVectorDataLayer.html#Mapbox_Unity_Map_IVectorDataLayer_AddPointsOfInterestSubLayer_Mapbox_Unity_Map_PrefabItemOptions_">IVectorDataLayer.AddPointsOfInterestSubLayer(PrefabItemOptions)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_AddPolygonFeatureSubLayer_" data-uid="Mapbox.Unity.Map.VectorLayer.AddPolygonFeatureSubLayer*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_AddPolygonFeatureSubLayer_System_String_System_String_" data-uid="Mapbox.Unity.Map.VectorLayer.AddPolygonFeatureSubLayer(System.String,System.String)">AddPolygonFeatureSubLayer(String, String)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void AddPolygonFeatureSubLayer(string assignedSubLayerName, string dataLayerNameInService)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">assignedSubLayerName</span></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">dataLayerNameInService</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.IVectorDataLayer.html#Mapbox_Unity_Map_IVectorDataLayer_AddPolygonFeatureSubLayer_System_String_System_String_">IVectorDataLayer.AddPolygonFeatureSubLayer(String, String)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_DisableVectorFeatureProcessingWithCoroutines_" data-uid="Mapbox.Unity.Map.VectorLayer.DisableVectorFeatureProcessingWithCoroutines*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_DisableVectorFeatureProcessingWithCoroutines" data-uid="Mapbox.Unity.Map.VectorLayer.DisableVectorFeatureProcessingWithCoroutines">DisableVectorFeatureProcessingWithCoroutines()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public void DisableVectorFeatureProcessingWithCoroutines()</code></pre>
+              </div>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.IVectorDataLayer.html#Mapbox_Unity_Map_IVectorDataLayer_DisableVectorFeatureProcessingWithCoroutines">IVectorDataLayer.DisableVectorFeatureProcessingWithCoroutines()</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_EnableVectorFeatureProcessingWithCoroutines_" data-uid="Mapbox.Unity.Map.VectorLayer.EnableVectorFeatureProcessingWithCoroutines*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_EnableVectorFeatureProcessingWithCoroutines_System_Int32_" data-uid="Mapbox.Unity.Map.VectorLayer.EnableVectorFeatureProcessingWithCoroutines(System.Int32)">EnableVectorFeatureProcessingWithCoroutines(Int32)</h4>
+              <div class="markdown level1 summary"><p>Enable coroutines for vector features, processing choosen amount
+of them each frame.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void EnableVectorFeatureProcessingWithCoroutines(int entityPerCoroutine = 20)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">entityPerCoroutine</span></td>
+                    <td><p>Numbers of features to process each frame.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.IVectorDataLayer.html#Mapbox_Unity_Map_IVectorDataLayer_EnableVectorFeatureProcessingWithCoroutines_System_Int32_">IVectorDataLayer.EnableVectorFeatureProcessingWithCoroutines(Int32)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_FindFeatureSubLayerWithName_" data-uid="Mapbox.Unity.Map.VectorLayer.FindFeatureSubLayerWithName*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_FindFeatureSubLayerWithName_System_String_" data-uid="Mapbox.Unity.Map.VectorLayer.FindFeatureSubLayerWithName(System.String)">FindFeatureSubLayerWithName(String)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual VectorSubLayerProperties FindFeatureSubLayerWithName(string featureLayerName)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">featureLayerName</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.VectorSubLayerProperties.html">VectorSubLayerProperties</a></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.IVectorDataLayer.html#Mapbox_Unity_Map_IVectorDataLayer_FindFeatureSubLayerWithName_System_String_">IVectorDataLayer.FindFeatureSubLayerWithName(String)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_FindPointsofInterestSubLayerWithName_" data-uid="Mapbox.Unity.Map.VectorLayer.FindPointsofInterestSubLayerWithName*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_FindPointsofInterestSubLayerWithName_System_String_" data-uid="Mapbox.Unity.Map.VectorLayer.FindPointsofInterestSubLayerWithName(System.String)">FindPointsofInterestSubLayerWithName(String)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual PrefabItemOptions FindPointsofInterestSubLayerWithName(string poiLayerName)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">poiLayerName</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.PrefabItemOptions.html">PrefabItemOptions</a></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.IVectorDataLayer.html#Mapbox_Unity_Map_IVectorDataLayer_FindPointsofInterestSubLayerWithName_System_String_">IVectorDataLayer.FindPointsofInterestSubLayerWithName(String)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_GetAllFeatureSubLayers_" data-uid="Mapbox.Unity.Map.VectorLayer.GetAllFeatureSubLayers*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_GetAllFeatureSubLayers" data-uid="Mapbox.Unity.Map.VectorLayer.GetAllFeatureSubLayers">GetAllFeatureSubLayers()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual IEnumerable&lt;VectorSubLayerProperties&gt; GetAllFeatureSubLayers()</code></pre>
+              </div>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="Mapbox.Unity.Map.VectorSubLayerProperties.html">VectorSubLayerProperties</a>&gt;</td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_GetAllLineFeatureSubLayers_" data-uid="Mapbox.Unity.Map.VectorLayer.GetAllLineFeatureSubLayers*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_GetAllLineFeatureSubLayers" data-uid="Mapbox.Unity.Map.VectorLayer.GetAllLineFeatureSubLayers">GetAllLineFeatureSubLayers()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual IEnumerable&lt;VectorSubLayerProperties&gt; GetAllLineFeatureSubLayers()</code></pre>
+              </div>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="Mapbox.Unity.Map.VectorSubLayerProperties.html">VectorSubLayerProperties</a>&gt;</td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_GetAllPointFeatureSubLayers_" data-uid="Mapbox.Unity.Map.VectorLayer.GetAllPointFeatureSubLayers*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_GetAllPointFeatureSubLayers" data-uid="Mapbox.Unity.Map.VectorLayer.GetAllPointFeatureSubLayers">GetAllPointFeatureSubLayers()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual IEnumerable&lt;VectorSubLayerProperties&gt; GetAllPointFeatureSubLayers()</code></pre>
+              </div>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="Mapbox.Unity.Map.VectorSubLayerProperties.html">VectorSubLayerProperties</a>&gt;</td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_GetAllPointsOfInterestSubLayers_" data-uid="Mapbox.Unity.Map.VectorLayer.GetAllPointsOfInterestSubLayers*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_GetAllPointsOfInterestSubLayers" data-uid="Mapbox.Unity.Map.VectorLayer.GetAllPointsOfInterestSubLayers">GetAllPointsOfInterestSubLayers()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual IEnumerable&lt;PrefabItemOptions&gt; GetAllPointsOfInterestSubLayers()</code></pre>
+              </div>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="Mapbox.Unity.Map.PrefabItemOptions.html">PrefabItemOptions</a>&gt;</td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_GetAllPolygonFeatureSubLayers_" data-uid="Mapbox.Unity.Map.VectorLayer.GetAllPolygonFeatureSubLayers*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_GetAllPolygonFeatureSubLayers" data-uid="Mapbox.Unity.Map.VectorLayer.GetAllPolygonFeatureSubLayers">GetAllPolygonFeatureSubLayers()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual IEnumerable&lt;VectorSubLayerProperties&gt; GetAllPolygonFeatureSubLayers()</code></pre>
+              </div>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="Mapbox.Unity.Map.VectorSubLayerProperties.html">VectorSubLayerProperties</a>&gt;</td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_GetFeatureSubLayerAtIndex_" data-uid="Mapbox.Unity.Map.VectorLayer.GetFeatureSubLayerAtIndex*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_GetFeatureSubLayerAtIndex_System_Int32_" data-uid="Mapbox.Unity.Map.VectorLayer.GetFeatureSubLayerAtIndex(System.Int32)">GetFeatureSubLayerAtIndex(Int32)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual VectorSubLayerProperties GetFeatureSubLayerAtIndex(int i)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">i</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.VectorSubLayerProperties.html">VectorSubLayerProperties</a></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.IVectorDataLayer.html#Mapbox_Unity_Map_IVectorDataLayer_GetFeatureSubLayerAtIndex_System_Int32_">IVectorDataLayer.GetFeatureSubLayerAtIndex(Int32)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_GetFeatureSubLayerByQuery_" data-uid="Mapbox.Unity.Map.VectorLayer.GetFeatureSubLayerByQuery*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_GetFeatureSubLayerByQuery_Func_Mapbox_Unity_Map_VectorSubLayerProperties_System_Boolean__" data-uid="Mapbox.Unity.Map.VectorLayer.GetFeatureSubLayerByQuery(Func{Mapbox.Unity.Map.VectorSubLayerProperties,System.Boolean})">GetFeatureSubLayerByQuery(Func&lt;VectorSubLayerProperties, Boolean&gt;)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual IEnumerable&lt;VectorSubLayerProperties&gt; GetFeatureSubLayerByQuery(Func&lt;VectorSubLayerProperties, bool&gt; query)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">Func</span>&lt;<a class="xref" href="Mapbox.Unity.Map.VectorSubLayerProperties.html">VectorSubLayerProperties</a>, <span class="xref">System.Boolean</span>&gt;</td>
+                    <td><span class="parametername">query</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="Mapbox.Unity.Map.VectorSubLayerProperties.html">VectorSubLayerProperties</a>&gt;</td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_GetPointsOfInterestSubLayerAtIndex_" data-uid="Mapbox.Unity.Map.VectorLayer.GetPointsOfInterestSubLayerAtIndex*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_GetPointsOfInterestSubLayerAtIndex_System_Int32_" data-uid="Mapbox.Unity.Map.VectorLayer.GetPointsOfInterestSubLayerAtIndex(System.Int32)">GetPointsOfInterestSubLayerAtIndex(Int32)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual PrefabItemOptions GetPointsOfInterestSubLayerAtIndex(int i)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">i</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.PrefabItemOptions.html">PrefabItemOptions</a></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.IVectorDataLayer.html#Mapbox_Unity_Map_IVectorDataLayer_GetPointsOfInterestSubLayerAtIndex_System_Int32_">IVectorDataLayer.GetPointsOfInterestSubLayerAtIndex(Int32)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_GetPointsOfInterestSubLayerByQuery_" data-uid="Mapbox.Unity.Map.VectorLayer.GetPointsOfInterestSubLayerByQuery*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_GetPointsOfInterestSubLayerByQuery_Func_Mapbox_Unity_Map_PrefabItemOptions_System_Boolean__" data-uid="Mapbox.Unity.Map.VectorLayer.GetPointsOfInterestSubLayerByQuery(Func{Mapbox.Unity.Map.PrefabItemOptions,System.Boolean})">GetPointsOfInterestSubLayerByQuery(Func&lt;PrefabItemOptions, Boolean&gt;)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual IEnumerable&lt;PrefabItemOptions&gt; GetPointsOfInterestSubLayerByQuery(Func&lt;PrefabItemOptions, bool&gt; query)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">Func</span>&lt;<a class="xref" href="Mapbox.Unity.Map.PrefabItemOptions.html">PrefabItemOptions</a>, <span class="xref">System.Boolean</span>&gt;</td>
+                    <td><span class="parametername">query</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">IEnumerable</span>&lt;<a class="xref" href="Mapbox.Unity.Map.PrefabItemOptions.html">PrefabItemOptions</a>&gt;</td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_GetTileJsonData_" data-uid="Mapbox.Unity.Map.VectorLayer.GetTileJsonData*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_GetTileJsonData" data-uid="Mapbox.Unity.Map.VectorLayer.GetTileJsonData">GetTileJsonData()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual TileJsonData GetTileJsonData()</code></pre>
+              </div>
+              <h5 class="returns">Returns</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.TileJsonData.html">TileJsonData</a></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.IVectorDataLayer.html#Mapbox_Unity_Map_IVectorDataLayer_GetTileJsonData">IVectorDataLayer.GetTileJsonData()</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_Initialize_" data-uid="Mapbox.Unity.Map.VectorLayer.Initialize*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_Initialize" data-uid="Mapbox.Unity.Map.VectorLayer.Initialize">Initialize()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public void Initialize()</code></pre>
+              </div>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayer.html#Mapbox_Unity_Map_ILayer_Initialize">ILayer.Initialize()</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_Initialize_" data-uid="Mapbox.Unity.Map.VectorLayer.Initialize*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_Initialize_Mapbox_Unity_Map_LayerProperties_" data-uid="Mapbox.Unity.Map.VectorLayer.Initialize(Mapbox.Unity.Map.LayerProperties)">Initialize(LayerProperties)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public void Initialize(LayerProperties properties)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.LayerProperties.html">LayerProperties</a></td>
+                    <td><span class="parametername">properties</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayer.html#Mapbox_Unity_Map_ILayer_Initialize_Mapbox_Unity_Map_LayerProperties_">ILayer.Initialize(LayerProperties)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_Remove_" data-uid="Mapbox.Unity.Map.VectorLayer.Remove*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_Remove" data-uid="Mapbox.Unity.Map.VectorLayer.Remove">Remove()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public void Remove()</code></pre>
+              </div>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayer.html#Mapbox_Unity_Map_ILayer_Remove">ILayer.Remove()</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_RemoveFeatureSubLayer_" data-uid="Mapbox.Unity.Map.VectorLayer.RemoveFeatureSubLayer*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_RemoveFeatureSubLayer_Mapbox_Unity_Map_VectorSubLayerProperties_" data-uid="Mapbox.Unity.Map.VectorLayer.RemoveFeatureSubLayer(Mapbox.Unity.Map.VectorSubLayerProperties)">RemoveFeatureSubLayer(VectorSubLayerProperties)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void RemoveFeatureSubLayer(VectorSubLayerProperties layer)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.VectorSubLayerProperties.html">VectorSubLayerProperties</a></td>
+                    <td><span class="parametername">layer</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.IVectorDataLayer.html#Mapbox_Unity_Map_IVectorDataLayer_RemoveFeatureSubLayer_Mapbox_Unity_Map_VectorSubLayerProperties_">IVectorDataLayer.RemoveFeatureSubLayer(VectorSubLayerProperties)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_RemoveFeatureSubLayerWithName_" data-uid="Mapbox.Unity.Map.VectorLayer.RemoveFeatureSubLayerWithName*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_RemoveFeatureSubLayerWithName_System_String_" data-uid="Mapbox.Unity.Map.VectorLayer.RemoveFeatureSubLayerWithName(System.String)">RemoveFeatureSubLayerWithName(String)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void RemoveFeatureSubLayerWithName(string featureLayerName)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">featureLayerName</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.IVectorDataLayer.html#Mapbox_Unity_Map_IVectorDataLayer_RemoveFeatureSubLayerWithName_System_String_">IVectorDataLayer.RemoveFeatureSubLayerWithName(String)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_RemovePointsOfInterestSubLayer_" data-uid="Mapbox.Unity.Map.VectorLayer.RemovePointsOfInterestSubLayer*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_RemovePointsOfInterestSubLayer_Mapbox_Unity_Map_PrefabItemOptions_" data-uid="Mapbox.Unity.Map.VectorLayer.RemovePointsOfInterestSubLayer(Mapbox.Unity.Map.PrefabItemOptions)">RemovePointsOfInterestSubLayer(PrefabItemOptions)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void RemovePointsOfInterestSubLayer(PrefabItemOptions layer)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.PrefabItemOptions.html">PrefabItemOptions</a></td>
+                    <td><span class="parametername">layer</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.IVectorDataLayer.html#Mapbox_Unity_Map_IVectorDataLayer_RemovePointsOfInterestSubLayer_Mapbox_Unity_Map_PrefabItemOptions_">IVectorDataLayer.RemovePointsOfInterestSubLayer(PrefabItemOptions)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_RemovePointsOfInterestSubLayerWithName_" data-uid="Mapbox.Unity.Map.VectorLayer.RemovePointsOfInterestSubLayerWithName*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_RemovePointsOfInterestSubLayerWithName_System_String_" data-uid="Mapbox.Unity.Map.VectorLayer.RemovePointsOfInterestSubLayerWithName(System.String)">RemovePointsOfInterestSubLayerWithName(String)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void RemovePointsOfInterestSubLayerWithName(string poiLayerName)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">poiLayerName</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.IVectorDataLayer.html#Mapbox_Unity_Map_IVectorDataLayer_RemovePointsOfInterestSubLayerWithName_System_String_">IVectorDataLayer.RemovePointsOfInterestSubLayerWithName(String)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_SetLayerSource_" data-uid="Mapbox.Unity.Map.VectorLayer.SetLayerSource*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_SetLayerSource_Mapbox_Unity_Map_VectorSourceType_" data-uid="Mapbox.Unity.Map.VectorLayer.SetLayerSource(Mapbox.Unity.Map.VectorSourceType)">SetLayerSource(VectorSourceType)</h4>
+              <div class="markdown level1 summary"><p>Change existing data source (TilesetId) with provided source.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void SetLayerSource(VectorSourceType vectorSource)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.VectorSourceType.html">VectorSourceType</a></td>
+                    <td><span class="parametername">vectorSource</span></td>
+                    <td><p>Data source (TilesetId) to use.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.IVectorDataLayer.html#Mapbox_Unity_Map_IVectorDataLayer_SetLayerSource_Mapbox_Unity_Map_VectorSourceType_">IVectorDataLayer.SetLayerSource(VectorSourceType)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_SetLayerSource_" data-uid="Mapbox.Unity.Map.VectorLayer.SetLayerSource*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_SetLayerSource_System_String_" data-uid="Mapbox.Unity.Map.VectorLayer.SetLayerSource(System.String)">SetLayerSource(String)</h4>
+              <div class="markdown level1 summary"><p>Change existing data source (TilesetId) with provided source.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void SetLayerSource(string vectorSource)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">vectorSource</span></td>
+                    <td><p>Data source (TilesetId) to use.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayer.html#Mapbox_Unity_Map_ILayer_SetLayerSource_System_String_">ILayer.SetLayerSource(String)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_SetLayerSourceWithOptimizedStyle_" data-uid="Mapbox.Unity.Map.VectorLayer.SetLayerSourceWithOptimizedStyle*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_SetLayerSourceWithOptimizedStyle_Mapbox_Unity_Map_VectorSourceType_System_String_System_String_System_String_" data-uid="Mapbox.Unity.Map.VectorLayer.SetLayerSourceWithOptimizedStyle(Mapbox.Unity.Map.VectorSourceType,System.String,System.String,System.String)">SetLayerSourceWithOptimizedStyle(VectorSourceType, String, String, String)</h4>
+              <div class="markdown level1 summary"><p>Sets the layer source as Style-optimized vector tiles</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void SetLayerSourceWithOptimizedStyle(VectorSourceType vectorSource, string styleId, string modifiedDate, string styleName = null)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.VectorSourceType.html">VectorSourceType</a></td>
+                    <td><span class="parametername">vectorSource</span></td>
+                    <td><p>Vector source.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">styleId</span></td>
+                    <td><p>Style-Optimized style id.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">modifiedDate</span></td>
+                    <td><p>Modified date.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">styleName</span></td>
+                    <td><p>Style name.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.IVectorDataLayer.html#Mapbox_Unity_Map_IVectorDataLayer_SetLayerSourceWithOptimizedStyle_Mapbox_Unity_Map_VectorSourceType_System_String_System_String_System_String_">IVectorDataLayer.SetLayerSourceWithOptimizedStyle(VectorSourceType, String, String, String)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_SetLayerSourceWithOptimizedStyle_" data-uid="Mapbox.Unity.Map.VectorLayer.SetLayerSourceWithOptimizedStyle*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_SetLayerSourceWithOptimizedStyle_System_String_System_String_System_String_System_String_" data-uid="Mapbox.Unity.Map.VectorLayer.SetLayerSourceWithOptimizedStyle(System.String,System.String,System.String,System.String)">SetLayerSourceWithOptimizedStyle(String, String, String, String)</h4>
+              <div class="markdown level1 summary"><p>Sets the layer source as Style-optimized vector tiles</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void SetLayerSourceWithOptimizedStyle(string vectorSource, string styleId, string modifiedDate, string styleName = null)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">vectorSource</span></td>
+                    <td><p>Vector source.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">styleId</span></td>
+                    <td><p>Style-Optimized style id.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">modifiedDate</span></td>
+                    <td><p>Modified date.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">styleName</span></td>
+                    <td><p>Style name.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.IVectorDataLayer.html#Mapbox_Unity_Map_IVectorDataLayer_SetLayerSourceWithOptimizedStyle_System_String_System_String_System_String_System_String_">IVectorDataLayer.SetLayerSourceWithOptimizedStyle(String, String, String, String)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_SpawnPrefabAtGeoLocation_" data-uid="Mapbox.Unity.Map.VectorLayer.SpawnPrefabAtGeoLocation*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_SpawnPrefabAtGeoLocation_GameObject_Vector2d_Action_List_GameObject___System_Boolean_System_String_" data-uid="Mapbox.Unity.Map.VectorLayer.SpawnPrefabAtGeoLocation(GameObject,Vector2d,Action{List{GameObject}},System.Boolean,System.String)">SpawnPrefabAtGeoLocation(GameObject, Vector2d, Action&lt;List&lt;GameObject&gt;&gt;, Boolean, String)</h4>
+              <div class="markdown level1 summary"><p>Places a prefab at the specified LatLon on the Map.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void SpawnPrefabAtGeoLocation(GameObject prefab, Vector2d LatLon, Action&lt;List&lt;GameObject&gt;&gt; callback = null, bool scaleDownWithWorld = true, string locationItemName = &quot;New Location&quot;)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">GameObject</span></td>
+                    <td><span class="parametername">prefab</span></td>
+                    <td><p>A Game Object Prefab.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">Vector2d</span></td>
+                    <td><span class="parametername">LatLon</span></td>
+                    <td><p>A Vector2d(Latitude Longitude) object</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">Action</span>&lt;<span class="xref">List</span>&lt;<span class="xref">GameObject</span>&gt;&gt;</td>
+                    <td><span class="parametername">callback</span></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Boolean</span></td>
+                    <td><span class="parametername">scaleDownWithWorld</span></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">locationItemName</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_SpawnPrefabAtGeoLocation_" data-uid="Mapbox.Unity.Map.VectorLayer.SpawnPrefabAtGeoLocation*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_SpawnPrefabAtGeoLocation_GameObject_Vector2d___Action_List_GameObject___System_Boolean_System_String_" data-uid="Mapbox.Unity.Map.VectorLayer.SpawnPrefabAtGeoLocation(GameObject,Vector2d[],Action{List{GameObject}},System.Boolean,System.String)">SpawnPrefabAtGeoLocation(GameObject, Vector2d[], Action&lt;List&lt;GameObject&gt;&gt;, Boolean, String)</h4>
+              <div class="markdown level1 summary"><p>Places a prefab at all locations specified by the LatLon array.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void SpawnPrefabAtGeoLocation(GameObject prefab, Vector2d[] LatLon, Action&lt;List&lt;GameObject&gt;&gt; callback = null, bool scaleDownWithWorld = true, string locationItemName = &quot;New Location&quot;)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">GameObject</span></td>
+                    <td><span class="parametername">prefab</span></td>
+                    <td><p>A Game Object Prefab.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">Vector2d</span>[]</td>
+                    <td><span class="parametername">LatLon</span></td>
+                    <td><p>A Vector2d(Latitude Longitude) object</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">Action</span>&lt;<span class="xref">List</span>&lt;<span class="xref">GameObject</span>&gt;&gt;</td>
+                    <td><span class="parametername">callback</span></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Boolean</span></td>
+                    <td><span class="parametername">scaleDownWithWorld</span></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">locationItemName</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_SpawnPrefabByCategory_" data-uid="Mapbox.Unity.Map.VectorLayer.SpawnPrefabByCategory*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_SpawnPrefabByCategory_GameObject_Mapbox_Unity_Map_LocationPrefabCategories_System_Int32_Action_List_GameObject___System_Boolean_System_String_" data-uid="Mapbox.Unity.Map.VectorLayer.SpawnPrefabByCategory(GameObject,Mapbox.Unity.Map.LocationPrefabCategories,System.Int32,Action{List{GameObject}},System.Boolean,System.String)">SpawnPrefabByCategory(GameObject, LocationPrefabCategories, Int32, Action&lt;List&lt;GameObject&gt;&gt;, Boolean, String)</h4>
+              <div class="markdown level1 summary"><p>Places the prefab for supplied categories.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void SpawnPrefabByCategory(GameObject prefab, LocationPrefabCategories categories = LocationPrefabCategories.AnyCategory, int density = 30, Action&lt;List&lt;GameObject&gt;&gt; callback = null, bool scaleDownWithWorld = true, string locationItemName = &quot;New Location&quot;)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">GameObject</span></td>
+                    <td><span class="parametername">prefab</span></td>
+                    <td><p>GameObject Prefab</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.LocationPrefabCategories.html">LocationPrefabCategories</a></td>
+                    <td><span class="parametername">categories</span></td>
+                    <td><p><a class="xref" href="Mapbox.Unity.Map.LocationPrefabCategories.html">LocationPrefabCategories</a> For more than one category separate them by pipe
+    (eg: LocationPrefabCategories.Food | LocationPrefabCategories.Nightlife)</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">density</span></td>
+                    <td><p>Density controls the number of POIs on the map.(Integer value between 1 and 30)</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">Action</span>&lt;<span class="xref">List</span>&lt;<span class="xref">GameObject</span>&gt;&gt;</td>
+                    <td><span class="parametername">callback</span></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Boolean</span></td>
+                    <td><span class="parametername">scaleDownWithWorld</span></td>
+                    <td><p>Should the prefab scale up/down along with the map game object?</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">locationItemName</span></td>
+                    <td><p>Name of this location prefab item for future reference</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_SpawnPrefabByName_" data-uid="Mapbox.Unity.Map.VectorLayer.SpawnPrefabByName*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_SpawnPrefabByName_GameObject_System_String_System_Int32_Action_List_GameObject___System_Boolean_System_String_" data-uid="Mapbox.Unity.Map.VectorLayer.SpawnPrefabByName(GameObject,System.String,System.Int32,Action{List{GameObject}},System.Boolean,System.String)">SpawnPrefabByName(GameObject, String, Int32, Action&lt;List&lt;GameObject&gt;&gt;, Boolean, String)</h4>
+              <div class="markdown level1 summary"><p>Places the prefab at POI locations if its name contains the supplied string
+<param name="prefab">GameObject Prefab
+<param name="nameString">This is the string that will be checked against the POI name to see if is contained in it, and ony those POIs will be spawned
+<param name="density">Density (Integer value between 1 and 30)
+<param name="locationItemName">Name of this location prefab item for future reference
+<param name="scaleDownWithWorld">Should the prefab scale up/down along with the map game object?</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public virtual void SpawnPrefabByName(GameObject prefab, string nameString, int density = 30, Action&lt;List&lt;GameObject&gt;&gt; callback = null, bool scaleDownWithWorld = true, string locationItemName = &quot;New Location&quot;)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">GameObject</span></td>
+                    <td><span class="parametername">prefab</span></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">nameString</span></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Int32</span></td>
+                    <td><span class="parametername">density</span></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">Action</span>&lt;<span class="xref">List</span>&lt;<span class="xref">GameObject</span>&gt;&gt;</td>
+                    <td><span class="parametername">callback</span></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Boolean</span></td>
+                    <td><span class="parametername">scaleDownWithWorld</span></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">locationItemName</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_UnbindAllEvents_" data-uid="Mapbox.Unity.Map.VectorLayer.UnbindAllEvents*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_UnbindAllEvents" data-uid="Mapbox.Unity.Map.VectorLayer.UnbindAllEvents">UnbindAllEvents()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public void UnbindAllEvents()</code></pre>
+              </div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_Update_" data-uid="Mapbox.Unity.Map.VectorLayer.Update*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_Update_Mapbox_Unity_Map_LayerProperties_" data-uid="Mapbox.Unity.Map.VectorLayer.Update(Mapbox.Unity.Map.LayerProperties)">Update(LayerProperties)</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public void Update(LayerProperties properties)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="xref" href="Mapbox.Unity.Map.LayerProperties.html">LayerProperties</a></td>
+                    <td><span class="parametername">properties</span></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              <h5 class="implements">Implements</h5>
+                  <div><a class="xref" href="Mapbox.Unity.Map.ILayer.html#Mapbox_Unity_Map_ILayer_Update_Mapbox_Unity_Map_LayerProperties_">ILayer.Update(LayerProperties)</a></div>
+              
+              
+              <a id="Mapbox_Unity_Map_VectorLayer_UpdateFactorySettings_" data-uid="Mapbox.Unity.Map.VectorLayer.UpdateFactorySettings*"></a>
+              <h4 id="Mapbox_Unity_Map_VectorLayer_UpdateFactorySettings" data-uid="Mapbox.Unity.Map.VectorLayer.UpdateFactorySettings">UpdateFactorySettings()</h4>
+              <div class="markdown level1 summary"></div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public void UpdateFactorySettings()</code></pre>
+              </div>
+                        </article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            &#0169; 2017 Mapbox
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

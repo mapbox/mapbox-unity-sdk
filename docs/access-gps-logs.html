@@ -1,0 +1,131 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Accessing GPS log files | Mapbox SDK for Unity </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Accessing GPS log files | Mapbox SDK for Unity ">
+    <meta name="generator" content="docfx 2.15.1.0">
+    
+    <link rel="shortcut icon" href="../docs/images/favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:newtab" content="true">
+  </head>
+  <body data-spy="scroll" data-target="#affix">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../docs/images/mapbox-logo.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+              <h1 id="accessing-gps-log-files">Accessing GPS log files</h1>
+              
+<p><code>LocationProvider</code> scene has the option to write location data into files.
+Follow these steps download the logs from your device.</p>
+<h2 id="android">Android</h2>
+<p>Log files can be accessed directly via Explorer after plugging in the device.</p>
+<p><strong>Note:</strong> If files don&#39;t show up disconnect/connect your device. Sometimes even a reboot seems to be required as folders/files only get synced on first connection.</p>
+<p><strong>Alternative:</strong> use a file manager (eg <a href="https://play.google.com/store/apps/details?id=pl.solidexplorer">Solid Explorer Classic</a>) on your device and copy files to eg <code>&lt;storage&gt;/Download</code> that should trigger a refresh.</p>
+<p>Location:</p>
+<pre><code>/&lt;your-device&gt;/&lt;storage&gt;/Android/data/&lt;bundle-identifier&gt;/files/
+</code></pre><p><img src="images/access-gps-logs/android-logfile-location.png" alt="log file location on Android"></p>
+<h2 id="ios">iOS</h2>
+<p>Open the exported project in <code>XCode</code> and add <code>Application supports iTunes file sharing : YES</code> key to <code>Info.plist</code> file:</p>
+<p><img src="images/access-gps-logs/info.plist.png" alt="edit info.plist"></p>
+<p>Build to the device, run, log and connect device to your computer.</p>
+<p>Select the device in <code>iTunes</code>:</p>
+<p><img src="images/access-gps-logs/itunes-select-device.png" alt="select device in itunes"></p>
+<ol>
+<li>Click on <code>File Sharing</code></li>
+<li>Select <code>Bundle Identifier</code> eg <code>MBX-SDK</code> from the <code>Apps</code> list</li>
+<li>Access log files</li>
+</ol>
+<p><img src="images/access-gps-logs/itunes-file-sharing.png" alt="get log files in itunes"></p>
+
+            </article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/mapbox/mapbox-unity-sdk/blob/develop/documentation/docs/access-gps-logs.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            &#0169; 2017 Mapbox
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

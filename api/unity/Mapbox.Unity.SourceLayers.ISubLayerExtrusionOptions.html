@@ -1,0 +1,448 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Interface ISubLayerExtrusionOptions
+   | Mapbox SDK for Unity </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Interface ISubLayerExtrusionOptions
+   | Mapbox SDK for Unity ">
+    <meta name="generator" content="docfx 2.15.1.0">
+    
+    <link rel="shortcut icon" href="../../docs/images/favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:newtab" content="true">
+  </head>
+  <body data-spy="scroll" data-target="#affix">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../docs/images/mapbox-logo.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content">
+              
+              
+              <h1 id="Mapbox_Unity_SourceLayers_ISubLayerExtrusionOptions" data-uid="Mapbox.Unity.SourceLayers.ISubLayerExtrusionOptions">Interface ISubLayerExtrusionOptions
+              </h1>
+              <div class="markdown level0 summary"></div>
+              <div class="markdown level0 conceptual"></div>
+              <h6><strong>Namespace</strong>:Mapbox.Unity.SourceLayers</h6>
+              <h6><strong>Assembly</strong>:cs.temp.dll.dll</h6>
+              <h5 id="Mapbox_Unity_SourceLayers_ISubLayerExtrusionOptions_syntax">Syntax</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">public interface ISubLayerExtrusionOptions</code></pre>
+              </div>
+              <h3 id="methods">Methods
+              </h3>
+              
+              
+              <a id="Mapbox_Unity_SourceLayers_ISubLayerExtrusionOptions_DisableExtrusion_" data-uid="Mapbox.Unity.SourceLayers.ISubLayerExtrusionOptions.DisableExtrusion*"></a>
+              <h4 id="Mapbox_Unity_SourceLayers_ISubLayerExtrusionOptions_DisableExtrusion" data-uid="Mapbox.Unity.SourceLayers.ISubLayerExtrusionOptions.DisableExtrusion">DisableExtrusion()</h4>
+              <div class="markdown level1 summary"><p>Disable mesh extrusion for the features in this layer.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">void DisableExtrusion()</code></pre>
+              </div>
+              
+              
+              <a id="Mapbox_Unity_SourceLayers_ISubLayerExtrusionOptions_EnableAbsoluteExtrusion_" data-uid="Mapbox.Unity.SourceLayers.ISubLayerExtrusionOptions.EnableAbsoluteExtrusion*"></a>
+              <h4 id="Mapbox_Unity_SourceLayers_ISubLayerExtrusionOptions_EnableAbsoluteExtrusion_ExtrusionGeometryType_System_Single_System_Single_" data-uid="Mapbox.Unity.SourceLayers.ISubLayerExtrusionOptions.EnableAbsoluteExtrusion(ExtrusionGeometryType,System.Single,System.Single)">EnableAbsoluteExtrusion(ExtrusionGeometryType, Single, Single)</h4>
+              <div class="markdown level1 summary"><p>Changes extrusion type to &quot;Absolute height&quot; and extrudes all features by
+the given fixed value.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">void EnableAbsoluteExtrusion(ExtrusionGeometryType extrusionGeometryType, float height, float extrusionScaleFactor = 1F)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">ExtrusionGeometryType</span></td>
+                    <td><span class="parametername">extrusionGeometryType</span></td>
+                    <td><p>Option to create top and side polygons after extrusion.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">height</span></td>
+                    <td><p>Extrusion value</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">extrusionScaleFactor</span></td>
+                    <td><p>Height multiplier</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_SourceLayers_ISubLayerExtrusionOptions_EnableMaxExtrusion_" data-uid="Mapbox.Unity.SourceLayers.ISubLayerExtrusionOptions.EnableMaxExtrusion*"></a>
+              <h4 id="Mapbox_Unity_SourceLayers_ISubLayerExtrusionOptions_EnableMaxExtrusion_ExtrusionGeometryType_System_String_System_Single_" data-uid="Mapbox.Unity.SourceLayers.ISubLayerExtrusionOptions.EnableMaxExtrusion(ExtrusionGeometryType,System.String,System.Single)">EnableMaxExtrusion(ExtrusionGeometryType, String, Single)</h4>
+              <div class="markdown level1 summary"><p>Changes extrusion type to &quot;Range Height&quot; and extrudes all features by
+the choosen property&#39;s value such that all vertices (roof) will be
+flat at the highest vertex elevation (after terrain elevation taken into account).</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">void EnableMaxExtrusion(ExtrusionGeometryType extrusionGeometryType, string propertyName = &quot;height&quot;, float extrusionScaleFactor = 1F)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">ExtrusionGeometryType</span></td>
+                    <td><span class="parametername">extrusionGeometryType</span></td>
+                    <td><p>Option to create top and side polygons after extrusion.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">propertyName</span></td>
+                    <td><p>Name of the property to use for extrusion</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">extrusionScaleFactor</span></td>
+                    <td><p>Height multiplier</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_SourceLayers_ISubLayerExtrusionOptions_EnableMinExtrusion_" data-uid="Mapbox.Unity.SourceLayers.ISubLayerExtrusionOptions.EnableMinExtrusion*"></a>
+              <h4 id="Mapbox_Unity_SourceLayers_ISubLayerExtrusionOptions_EnableMinExtrusion_ExtrusionGeometryType_System_String_System_Single_" data-uid="Mapbox.Unity.SourceLayers.ISubLayerExtrusionOptions.EnableMinExtrusion(ExtrusionGeometryType,System.String,System.Single)">EnableMinExtrusion(ExtrusionGeometryType, String, Single)</h4>
+              <div class="markdown level1 summary"><p>Changes extrusion type to &quot;Minimum Height&quot; and extrudes all features by
+the choosen property&#39;s value such that all vertices (roof) will be
+flat at the lowest vertex elevation (after terrain elevation taken into account).</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">void EnableMinExtrusion(ExtrusionGeometryType extrusionGeometryType, string propertyName = &quot;height&quot;, float extrusionScaleFactor = 1F)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">ExtrusionGeometryType</span></td>
+                    <td><span class="parametername">extrusionGeometryType</span></td>
+                    <td><p>Option to create top and side polygons after extrusion.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">propertyName</span></td>
+                    <td><p>Name of the property to use for extrusion</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">extrusionScaleFactor</span></td>
+                    <td><p>Height multiplier</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_SourceLayers_ISubLayerExtrusionOptions_EnablePropertyExtrusion_" data-uid="Mapbox.Unity.SourceLayers.ISubLayerExtrusionOptions.EnablePropertyExtrusion*"></a>
+              <h4 id="Mapbox_Unity_SourceLayers_ISubLayerExtrusionOptions_EnablePropertyExtrusion_ExtrusionGeometryType_System_String_System_Single_" data-uid="Mapbox.Unity.SourceLayers.ISubLayerExtrusionOptions.EnablePropertyExtrusion(ExtrusionGeometryType,System.String,System.Single)">EnablePropertyExtrusion(ExtrusionGeometryType, String, Single)</h4>
+              <div class="markdown level1 summary"><p>Changes extrusion type to &quot;Property&quot; and extrudes all features by
+the choosen property&#39;s value.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">void EnablePropertyExtrusion(ExtrusionGeometryType extrusionGeometryType, string propertyName = &quot;height&quot;, float extrusionScaleFactor = 1F)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">ExtrusionGeometryType</span></td>
+                    <td><span class="parametername">extrusionGeometryType</span></td>
+                    <td><p>Option to create top and side polygons after extrusion.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.String</span></td>
+                    <td><span class="parametername">propertyName</span></td>
+                    <td><p>Name of the property to use for extrusion</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">extrusionScaleFactor</span></td>
+                    <td><p>Height multiplier</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_SourceLayers_ISubLayerExtrusionOptions_EnableRangeExtrusion_" data-uid="Mapbox.Unity.SourceLayers.ISubLayerExtrusionOptions.EnableRangeExtrusion*"></a>
+              <h4 id="Mapbox_Unity_SourceLayers_ISubLayerExtrusionOptions_EnableRangeExtrusion_ExtrusionGeometryType_System_Single_System_Single_System_Single_" data-uid="Mapbox.Unity.SourceLayers.ISubLayerExtrusionOptions.EnableRangeExtrusion(ExtrusionGeometryType,System.Single,System.Single,System.Single)">EnableRangeExtrusion(ExtrusionGeometryType, Single, Single, Single)</h4>
+              <div class="markdown level1 summary"><p>Changes extrusion type to &quot;Minimum Height&quot; and extrudes all features by
+the choosen property&#39;s value such that they&#39;ll be in provided range.
+Lower values will be increase to Minimum Height and higher values will
+be lowered to Maximum height.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">void EnableRangeExtrusion(ExtrusionGeometryType extrusionGeometryType, float minHeight, float maxHeight, float extrusionScaleFactor = 1F)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">ExtrusionGeometryType</span></td>
+                    <td><span class="parametername">extrusionGeometryType</span></td>
+                    <td><p>Option to create top and side polygons after extrusion.</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">minHeight</span></td>
+                    <td><p>Lower bound to be used for extrusion</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">maxHeight</span></td>
+                    <td><p>Top bound to be used for extrusion</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">extrusionScaleFactor</span></td>
+                    <td><p>Height multiplier</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_SourceLayers_ISubLayerExtrusionOptions_SetAbsoluteHeight_" data-uid="Mapbox.Unity.SourceLayers.ISubLayerExtrusionOptions.SetAbsoluteHeight*"></a>
+              <h4 id="Mapbox_Unity_SourceLayers_ISubLayerExtrusionOptions_SetAbsoluteHeight_System_Single_" data-uid="Mapbox.Unity.SourceLayers.ISubLayerExtrusionOptions.SetAbsoluteHeight(System.Single)">SetAbsoluteHeight(Single)</h4>
+              <div class="markdown level1 summary"><p>Sets the height value to be used for Absolute Height extrusion type.
+Same field is used for the maximum height of Range Extrusion type so beware
+of possible side effects.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">void SetAbsoluteHeight(float absoluteHeight)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">absoluteHeight</span></td>
+                    <td><p>Fixed height value for all features in the layer.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_SourceLayers_ISubLayerExtrusionOptions_SetExtrusionMultiplier_" data-uid="Mapbox.Unity.SourceLayers.ISubLayerExtrusionOptions.SetExtrusionMultiplier*"></a>
+              <h4 id="Mapbox_Unity_SourceLayers_ISubLayerExtrusionOptions_SetExtrusionMultiplier_System_Single_" data-uid="Mapbox.Unity.SourceLayers.ISubLayerExtrusionOptions.SetExtrusionMultiplier(System.Single)">SetExtrusionMultiplier(Single)</h4>
+              <div class="markdown level1 summary"><p>Sets the extrusion multiplier which will be used only in the Y axis (height).</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">void SetExtrusionMultiplier(float multiplier)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">multiplier</span></td>
+                    <td><p>Multiplier value.</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              
+              <a id="Mapbox_Unity_SourceLayers_ISubLayerExtrusionOptions_SetHeightRange_" data-uid="Mapbox.Unity.SourceLayers.ISubLayerExtrusionOptions.SetHeightRange*"></a>
+              <h4 id="Mapbox_Unity_SourceLayers_ISubLayerExtrusionOptions_SetHeightRange_System_Single_System_Single_" data-uid="Mapbox.Unity.SourceLayers.ISubLayerExtrusionOptions.SetHeightRange(System.Single,System.Single)">SetHeightRange(Single, Single)</h4>
+              <div class="markdown level1 summary"><p>Change the minimum and maximum height values used for Range Height option.
+Maximum height is also used for Absolute Height option so beware of possible side
+effects.</p>
+</div>
+              <div class="markdown level1 conceptual"></div>
+              <h5 class="decalaration">Declaration</h5>
+              <div class="codewrapper">
+                <pre><code class="lang-csharp hljs">void SetHeightRange(float minHeight, float maxHeight)</code></pre>
+              </div>
+              <h5 class="parameters">Parameters</h5>
+              <table class="table table-bordered table-striped table-condensed">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">minHeight</span></td>
+                    <td><p>Lower bound to be used for extrusion</p>
+</td>
+                  </tr>
+                  <tr>
+                    <td><span class="xref">System.Single</span></td>
+                    <td><span class="parametername">maxHeight</span></td>
+                    <td><p>Top bound to be used for extrusion</p>
+</td>
+                  </tr>
+                </tbody>
+              </table>
+                        </article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            &#0169; 2017 Mapbox
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>
