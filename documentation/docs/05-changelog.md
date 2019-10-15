@@ -1,6 +1,6 @@
 ## CHANGELOG
 ### v2.1.1
-10/11/2019
+10/15/2019
 ### Bug Fixes
 - Fixes a bug where users were being double counted on mobile platforms
 - Fixes a bug which send incomplete telemetry events.
