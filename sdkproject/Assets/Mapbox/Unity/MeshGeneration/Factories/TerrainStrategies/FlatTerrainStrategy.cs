@@ -48,6 +48,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				GetQuad(tile, _elevationOptions.sideWallOptions.isActive);
 				tile.ElevationType = TileTerrainType.Flat;
 			}
+
+			if (_elevationOptions.colliderOptions.addCollider)
+			{
+				var meshCollider = tile.Collider as MeshCollider;
+				if (meshCollider)
+				{
+					meshCollider.sharedMesh = tile.MeshFilter.sharedMesh;
+				}
+			}
 		}
 
 		private void GetQuad(UnityTile tile, bool buildSide)
