@@ -20,7 +20,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			get { return ModifierType.Preprocess; }
 		}
 
-		private UVModifierOptions _options;
+		[SerializeField] private UVModifierOptions _options = new UVModifierOptions();
 		private Vector3 _v1, _v2;
 
 		#region Atlas Fields

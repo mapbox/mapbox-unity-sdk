@@ -50,7 +50,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private float _narrowWallWidthDelta = 0.01f;
 		private float _shortRowHeightDelta = 0.015f;
 
-		GeometryExtrusionWithAtlasOptions _options;
+		[SerializeField] GeometryExtrusionWithAtlasOptions _options = new GeometryExtrusionWithAtlasOptions();
 		private int _counter = 0;
 		private float height = 0.0f;
 		private float _scale = 1f;
@@ -112,10 +112,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_currentTextureRect = _currentFacade.TextureRect;
 
 			//this can be moved to initialize or in an if clause if you're sure all your tiles will be same level/scale
-			_singleFloorHeight = (tile.TileScale * _currentFacade.FloorHeight) / _currentFacade.MidFloorCount;
-			_scaledFirstFloorHeight = tile.TileScale * _currentFacade.FirstFloorHeight;
-			_scaledTopFloorHeight = tile.TileScale * _currentFacade.TopFloorHeight;
-			_scaledPreferredWallLength = tile.TileScale * _currentFacade.PreferredEdgeSectionLength;
+			_singleFloorHeight = (_scale * _currentFacade.FloorHeight) / _currentFacade.MidFloorCount;
+			_scaledFirstFloorHeight = _scale * _currentFacade.FirstFloorHeight;
+			_scaledTopFloorHeight = _scale * _currentFacade.TopFloorHeight;
+			_scaledPreferredWallLength = _scale * _currentFacade.PreferredEdgeSectionLength;
 			_scaledFloorHeight = _scaledPreferredWallLength * _currentFacade.WallToFloorRatio;
 			_singleColumnLength = _scaledPreferredWallLength / _currentFacade.ColumnCount;
 
