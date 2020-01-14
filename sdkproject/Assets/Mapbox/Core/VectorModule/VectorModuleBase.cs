@@ -11,7 +11,7 @@ namespace Mapbox.Core.VectorModule
 	{
 		public AbstractMap AbstractMap;
 		[SerializeField] private VectorProcessor _vectorProcessor;
-		private Dictionary<UnwrappedTileId, System.Collections.Generic.List<MeshData>> _cachedMeshData;
+		private Dictionary<UnwrappedTileId, List<MeshData>> _cachedMeshData;
 
 		private HashSet<UnwrappedTileId> _processing = new HashSet<UnwrappedTileId>();
 		private Dictionary<UnwrappedTileId, List<GameObject>> _trackedObjects = new Dictionary<UnwrappedTileId, List<GameObject>>();
@@ -21,7 +21,7 @@ namespace Mapbox.Core.VectorModule
 		private void Awake()
 		{
 			_cachedMeshData = new Dictionary<UnwrappedTileId, List<MeshData>>();
-			_vectorProcessor.MeshOutput += MeshOutputRecieved;
+			_vectorProcessor.MeshOutput += MeshOutputReceived;
 			AbstractMap.OnTilesStarting += LoadTiles;
 			AbstractMap.OnTileFinished += CheckTileData;
 			AbstractMap.OnTilesDisposing += DisposeTile;
@@ -66,7 +66,7 @@ namespace Mapbox.Core.VectorModule
 			}
 		}
 
-		private void MeshOutputRecieved(CanonicalTileId tileId, List<MeshData> meshDataList)
+		private void MeshOutputReceived(CanonicalTileId tileId, List<MeshData> meshDataList)
 		{
 			var uwt = new UnwrappedTileId(tileId.Z, tileId.X, tileId.Y);
 			_processing.Remove(uwt);
