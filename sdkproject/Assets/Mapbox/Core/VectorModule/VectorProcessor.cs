@@ -8,7 +8,6 @@ using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Interfaces;
 using Mapbox.Unity.MeshGeneration.Modifiers;
 using Mapbox.VectorTile.Geometry;
-using Unity.UNetWeaver;
 using UnityEngine;
 
 namespace Mapbox.Core.VectorModule
