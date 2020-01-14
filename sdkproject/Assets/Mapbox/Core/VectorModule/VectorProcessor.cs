@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Mapbox.Map;
-using Mapbox.Unity;
-using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Interfaces;
 using Mapbox.Unity.MeshGeneration.Modifiers;
@@ -26,6 +24,9 @@ namespace Mapbox.Core.VectorModule
 
 		[SerializeField] private VectorProcessorModifierStack _modifierStack;
 
+		//for vector calls dependant on elevation data
+		private Dictionary<CanonicalTileId, UnityTile> _waitingTiles = new Dictionary<CanonicalTileId, UnityTile>();
+
 		public VectorProcessor()
 		{
 			_dataFetcher = new VectorProcessorDataFetcher();
@@ -40,7 +41,39 @@ namespace Mapbox.Core.VectorModule
 			}
 		}
 
+		public void CreateVectorVisuals(UnityTile tile)
+		{
+			if (!_waitingTiles.ContainsKey(tile.CanonicalTileId))
+			{
+				_waitingTiles.Add(tile.CanonicalTileId, tile);
+				_dataFetcher.FetchData(false, null, tile.CanonicalTileId, _tilesetId);
+			}
+		}
+
 		private void ProcessData(CanonicalTileId tileId, Map.VectorTile vectorTile)
+		{
+			if (_waitingTiles.ContainsKey(tileId))
+			{
+				FlatVectorProcessing(tileId, vectorTile, (v) => SnapTerrain(v, _waitingTiles[tileId]));
+			}
+			else
+			{
+				FlatVectorProcessing(tileId, vectorTile);
+			}
+		}
+
+		private Vector3 SnapTerrain(Vector3 original, UnityTile tile)
+		{
+			var scaledX = tile.Rect.Size.x * tile.TileScale;
+			var scaledY = tile.Rect.Size.y * tile.TileScale;
+
+			var h = tile.QueryHeightData(
+				(float) ((original.x + scaledX / 2) / scaledX),
+				(float) ((original.z + scaledY / 2) / scaledY));
+			return original + new Vector3(0, h, 0);
+		}
+
+		private void FlatVectorProcessing(CanonicalTileId tileId, Map.VectorTile vectorTile, Func<Vector3, Vector3> snapTerrainFunc = null)
 		{
 			var meshDataList = new List<MeshData>();
 
@@ -69,7 +102,12 @@ namespace Mapbox.Core.VectorModule
 					for (int k = 0; k < pointCount; k++)
 					{
 						var point = geom[j][k];
-						newPoints.Add(new Vector3((float) (point.X / layer.Extent * _tileSize - (_tileSize / 2)) * _tileScale, 0, (float) ((layer.Extent - point.Y) / layer.Extent * _tileSize - (_tileSize / 2)) * _tileScale));
+						var newPoint = new Vector3((point.X / layer.Extent * _tileSize - (_tileSize / 2)) * _tileScale, 0, ((layer.Extent - point.Y) / layer.Extent * _tileSize - (_tileSize / 2)) * _tileScale);
+						if (snapTerrainFunc != null)
+						{
+							newPoint = snapTerrainFunc(newPoint);
+						}
+						newPoints.Add(newPoint);
 					}
 
 					vfu.Points.Add(newPoints);
@@ -80,34 +118,6 @@ namespace Mapbox.Core.VectorModule
 
 
 			MeshOutput(tileId, meshDataList);
-		}
-	}
-
-	public class VectorProcessorDataFetcher
-	{
-		public Action<string> ErrorRecieved = (s) => { };
-		public Action<CanonicalTileId, Map.VectorTile> DataRecieved = (tileId, vectorTile) => { };
-
-		protected MapboxAccess _fileSource;
-
-		public void FetchData(bool useOptimizedStyle, Style style, CanonicalTileId tileId, string tilesetId)
-		{
-			if (_fileSource == null)
-				_fileSource = MapboxAccess.Instance;
-
-			var vectorTile = (useOptimizedStyle) ? new Map.VectorTile(style.Id, style.Modified) : new Map.VectorTile();
-			vectorTile.Initialize(_fileSource, tileId, tilesetId, () =>
-			{
-				if (vectorTile.HasError)
-				{
-					//FetchingError(vectorDaraParameters.tile, vectorTile, new TileErrorEventArgs(vectorDaraParameters.tile.CanonicalTileId, vectorTile.GetType(), vectorDaraParameters.tile, vectorTile.Exceptions));
-					ErrorRecieved(vectorTile.ExceptionsAsString);
-				}
-				else
-				{
-					DataRecieved(tileId, vectorTile);
-				}
-			});
 		}
 	}
 }

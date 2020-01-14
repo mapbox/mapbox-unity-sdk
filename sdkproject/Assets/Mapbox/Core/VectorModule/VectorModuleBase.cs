@@ -22,9 +22,15 @@ namespace Mapbox.Core.VectorModule
 		{
 			_cachedMeshData = new Dictionary<UnwrappedTileId, List<MeshData>>();
 			_vectorProcessor.MeshOutput += MeshOutputReceived;
-			AbstractMap.OnTilesStarting += LoadTiles;
+			//AbstractMap.OnTilesStarting += LoadTiles;
+			AbstractMap.OnTileFinished += TilesLoaded;
 			AbstractMap.OnTileFinished += CheckTileData;
 			AbstractMap.OnTilesDisposing += DisposeTile;
+		}
+
+		private void TilesLoaded(UnityTile tile)
+		{
+			_vectorProcessor.CreateVectorVisuals(tile);
 		}
 
 		private void LoadTiles(List<UnwrappedTileId> tileIdList)
@@ -37,7 +43,7 @@ namespace Mapbox.Core.VectorModule
 				}
 				else
 				{
-					Debug.Log("wtf");
+					Debug.Log("this shouldn't happen");
 				}
 			}
 			_vectorProcessor.CreateVectorVisuals(tileIdList);
