@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa21b5f2e2cb4a347ae152f6b6ec1e68, type: 3}
-  m_Name: New Texture Side Wall Modifier
+  m_Script: {fileID: 11500000, guid: d84cd7e54e2cf40d4931dbee6ea55bde, type: 3}
+  m_Name: New Vector Module Walls
   m_EditorClassIdentifier: 
   Active: 1
   _centerSegments: 1
@@ -18,7 +18,7 @@ MonoBehaviour:
   _options:
     texturingType: 0
     atlasInfo: {fileID: 11400000, guid: c422f39ca8fe566479230c87805b3301, type: 2}
-    extrusionType: 1
+    extrusionType: 3
     extrusionGeometryType: 0
     propertyName: height
     propertyDescription: 

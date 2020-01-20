@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using Mapbox.Map;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Interfaces;
@@ -10,55 +11,50 @@ using UnityEngine;
 
 namespace Mapbox.Core.VectorModule
 {
-	[Serializable]
 	public class VectorProcessor
 	{
 		public Action<CanonicalTileId, List<MeshData>> MeshOutput = (tileId, meshList) => { };
 		private VectorProcessorDataFetcher _dataFetcher;
 
 		private string _tilesetId = "mapbox.mapbox-streets-v8";
-		//private Dictionary<string, LayerVisualizerBase> _layerBuilder;
-
 		private float _tileSize = 100;
 		private float _tileScale = 1;
 
-		[SerializeField] private VectorProcessorModifierStack _modifierStack;
+		public VectorModuleMergedModifierStack ModifierStack;
 
 		//for vector calls dependant on elevation data
-		private Dictionary<CanonicalTileId, UnityTile> _waitingTiles = new Dictionary<CanonicalTileId, UnityTile>();
+		private Dictionary<CanonicalTileId, UnityTile> _waitingTiles;
 
 		public VectorProcessor()
 		{
 			_dataFetcher = new VectorProcessorDataFetcher();
 			_dataFetcher.DataRecieved += ProcessData;
+			_waitingTiles = new Dictionary<CanonicalTileId, UnityTile>();
 		}
 
+		//used for loading before tile finished
 		public void CreateVectorVisuals(List<UnwrappedTileId> unwrappedTileIds)
 		{
+			if (_dataFetcher == null)
+			{
+				_dataFetcher = new VectorProcessorDataFetcher();
+				_dataFetcher.DataRecieved += ProcessData;
+				_waitingTiles = new Dictionary<CanonicalTileId, UnityTile>();
+			}
+
 			foreach (var tileId in unwrappedTileIds)
 			{
 				_dataFetcher.FetchData(false, null, tileId.Canonical, _tilesetId);
 			}
 		}
 
+		//used for loading after tile finished
 		public void CreateVectorVisuals(UnityTile tile)
 		{
 			if (!_waitingTiles.ContainsKey(tile.CanonicalTileId))
 			{
 				_waitingTiles.Add(tile.CanonicalTileId, tile);
 				_dataFetcher.FetchData(false, null, tile.CanonicalTileId, _tilesetId);
-			}
-		}
-
-		private void ProcessData(CanonicalTileId tileId, Map.VectorTile vectorTile)
-		{
-			if (_waitingTiles.ContainsKey(tileId))
-			{
-				FlatVectorProcessing(tileId, vectorTile, (v) => SnapTerrain(v, _waitingTiles[tileId]));
-			}
-			else
-			{
-				FlatVectorProcessing(tileId, vectorTile);
 			}
 		}
 
@@ -73,11 +69,51 @@ namespace Mapbox.Core.VectorModule
 			return original + new Vector3(0, h, 0);
 		}
 
-		private void FlatVectorProcessing(CanonicalTileId tileId, Map.VectorTile vectorTile, Func<Vector3, Vector3> snapTerrainFunc = null)
+		private void ProcessData(CanonicalTileId tileId, Map.VectorTile vectorTile)
 		{
-			var meshDataList = new List<MeshData>();
+			if (_waitingTiles.ContainsKey(tileId))
+			{
+				//post processing uses terrain elevation
+				ProcessVectorData(tileId, vectorTile, (v) => SnapTerrain(v, _waitingTiles[tileId]));
+			}
+			else
+			{
+				//pre processing doesn't use elevation yet
+				ProcessVectorData(tileId, vectorTile);
+			}
+		}
 
-			var layer = vectorTile.Data.GetLayer("building");
+		private void ProcessVectorData(CanonicalTileId tileId, Map.VectorTile vectorTile, Func<Vector3, Vector3> snapTerrainFunc = null)
+		{
+			var worker = new Worker();
+			worker.MeshWorkComplete += (sender, results) => { MeshOutput(results.TileId, results.MeshDataList); };
+			worker.Start(new ThreadParamaters()
+			{
+				ModifierStack = ModifierStack,
+				TileId = tileId,
+				VectorTile = vectorTile,
+				SnapTerrainFunction = snapTerrainFunc
+			});
+		}
+	}
+
+	public class Worker
+	{
+		public event EventHandler<ThreadResults> MeshWorkComplete = delegate { };
+
+		public void Start(object parameters)
+		{
+			new Thread(CreateMeshes).Start(parameters);
+		}
+
+		private void CreateMeshes(object parameters)
+		{
+			var threadParameters = parameters as ThreadParamaters;
+			var meshDataList = new List<MeshData>();
+			var _tileSize = 100;
+			var _tileScale = 1;
+
+			var layer = threadParameters.VectorTile.Data.GetLayer("building");
 			if (layer == null)
 				return;
 
@@ -103,21 +139,41 @@ namespace Mapbox.Core.VectorModule
 					{
 						var point = geom[j][k];
 						var newPoint = new Vector3((point.X / layer.Extent * _tileSize - (_tileSize / 2)) * _tileScale, 0, ((layer.Extent - point.Y) / layer.Extent * _tileSize - (_tileSize / 2)) * _tileScale);
-						if (snapTerrainFunc != null)
+						if (threadParameters.SnapTerrainFunction != null)
 						{
-							newPoint = snapTerrainFunc(newPoint);
+							newPoint = threadParameters.SnapTerrainFunction(newPoint);
 						}
+
 						newPoints.Add(newPoint);
 					}
 
 					vfu.Points.Add(newPoints);
 				}
 
-				meshDataList.Add(_modifierStack.Execute(vfu, new MeshData()));
+				threadParameters.ModifierStack.Execute(threadParameters.TileId, vfu, new MeshData());
 			}
 
+			meshDataList.Add(threadParameters.ModifierStack.End(threadParameters.TileId));
 
-			MeshOutput(tileId, meshDataList);
+			MeshWorkComplete(this, new ThreadResults()
+			{
+				TileId = threadParameters.TileId,
+				MeshDataList = meshDataList
+			});
 		}
+	}
+
+	public class ThreadResults : EventArgs
+	{
+		public CanonicalTileId TileId;
+		public List<MeshData> MeshDataList;
+	}
+
+	public class ThreadParamaters
+	{
+		public VectorModuleMergedModifierStack ModifierStack;
+		public CanonicalTileId TileId;
+		public Map.VectorTile VectorTile;
+		public Func<Vector3, Vector3> SnapTerrainFunction;
 	}
 }
