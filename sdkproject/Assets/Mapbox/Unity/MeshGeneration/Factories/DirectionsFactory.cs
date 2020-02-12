@@ -24,6 +24,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		public Action<Vector3[]> ArrangingWaypoints = (positions) => { };
 		public Action ArrangingWaypointsFinished = () => { };
 		public Action<Vector3, float> RouteDrawn = (midPoint, TotalLength) => { };
+		public RoutingProfile RoutingProfile = RoutingProfile.Driving;
 
 		[SerializeField] float RoadSizeMultiplier = 1;
 		[SerializeField] private AnimationCurve RoadSizeCurve;
@@ -32,7 +33,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		[SerializeField] private LoftModifier _loftModifier;
 		[SerializeField] Material _material;
 		[SerializeField] Transform _waypointsParent;
-		[SerializeField] private Dropdown RouteTypeDropdown;
+		//[SerializeField] private Dropdown RouteTypeDropdown;
+
+
 		Transform[] _waypoints;
 
 		private List<Vector3> _cachedWaypoints;
@@ -54,10 +57,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_directions = MapboxAccess.Instance.Directions;
 			_map.OnInitialized += Query;
 			_map.OnUpdated += Query;
-			if (RouteTypeDropdown != null)
-			{
-				RouteTypeDropdown.onValueChanged.AddListener((i) => { Query(); });
-			}
 
 			_waypoints = new Transform[_waypointsParent.childCount];
 			for (int i = 0; i < _waypointsParent.childCount; i++)
@@ -125,24 +124,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				wp[i] = _waypoints[i].GetGeoPosition(_map.CenterMercator, _map.WorldRelativeScale);
 			}
 
-			var routeProfile = RoutingProfile.Driving;
-			if (RouteTypeDropdown != null)
-			{
-				switch (RouteTypeDropdown.value)
-				{
-					case 0:
-						routeProfile = RoutingProfile.Driving;
-						break;
-					case 1:
-						routeProfile = RoutingProfile.Walking;
-						break;
-					case 2:
-						routeProfile = RoutingProfile.Cycling;
-						break;
-				}
-			}
-
-			var directionResource = new DirectionResource(wp, routeProfile);
+			var directionResource = new DirectionResource(wp, RoutingProfile);
 			directionResource.Steps = true;
 			_directions.Query(directionResource, HandleDirectionsResponse);
 			QuerySent();
@@ -243,6 +225,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			mesh.RecalculateNormals();
 			_directionsGO.AddComponent<MeshRenderer>().material = _material;
 			return _directionsGO;
+		}
+
+		public void ChangeRoutingProfile(RoutingProfile profile, bool forceQuery = true)
+		{
+			RoutingProfile = profile;
+			if (forceQuery)
+			{
+				Query();
+			}
 		}
 	}
 }

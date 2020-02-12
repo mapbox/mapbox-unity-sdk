@@ -1182,10 +1182,6 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Text: {fileID: 1200766944}
-  m_Image: {fileID: 0}
-  m_RectTransform: {fileID: 180741621}
-  m_Toggle: {fileID: 180741623}
 --- !u!114 &180741623
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1320,6 +1316,7 @@ GameObject:
   - component: {fileID: 268774354}
   - component: {fileID: 268774353}
   - component: {fileID: 268774352}
+  - component: {fileID: 268774355}
   m_Layer: 5
   m_Name: Dropdown
   m_TagString: Untagged
@@ -1443,6 +1440,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 268774350}
   m_CullTransparentMesh: 0
+--- !u!114 &268774355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 268774350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed638ed8146f0044cba62d608c45ba4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &292302023
 GameObject:
   m_ObjectHideFlags: 0
@@ -2280,7 +2289,6 @@ MonoBehaviour:
   _loftModifier: {fileID: 11400000, guid: 72a54fd58e79618408c60d91df61d553, type: 2}
   _material: {fileID: 2100000, guid: 49b5d148287c83443bd632e6d5b5bd6f, type: 2}
   _waypointsParent: {fileID: 718025077}
-  RouteTypeDropdown: {fileID: 268774352}
 --- !u!4 &580700370
 Transform:
   m_ObjectHideFlags: 0
@@ -3696,19 +3704,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 114603753021256032, guid: 98be219873e6d4dffb5949746f515a33,
-        type: 3}
-      propertyPath: m_Text
-      value: '<b>Traffic and Directions</b>
-
-
-        Mapbox provides traffic information through the traffic vector layer. In this
-        example you can see an additional traffic map id added to Abstract Map under
-        Map Layers segment. It''s then visualized by a simple 3D geometry. The Directions
-        API returns the shortest route between two points. You can drag & drop the
-        two markers to update the route in this example. The Directions API call can
-        also be used for walking directions. '
-      objectReference: {fileID: 0}
     - target: {fileID: 224907856650798614, guid: 98be219873e6d4dffb5949746f515a33,
         type: 3}
       propertyPath: m_AnchorMax.x
@@ -3728,6 +3723,19 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114603753021256032, guid: 98be219873e6d4dffb5949746f515a33,
+        type: 3}
+      propertyPath: m_Text
+      value: '<b>Traffic and Directions</b>
+
+
+        Mapbox provides traffic information through the traffic vector layer. In this
+        example you can see an additional traffic map id added to Abstract Map under
+        Map Layers segment. It''s then visualized by a simple 3D geometry. The Directions
+        API returns the shortest route between two points. You can drag & drop the
+        two markers to update the route in this example. The Directions API call can
+        also be used for walking directions. '
       objectReference: {fileID: 0}
     - target: {fileID: 114731470950229392, guid: 98be219873e6d4dffb5949746f515a33,
         type: 3}
