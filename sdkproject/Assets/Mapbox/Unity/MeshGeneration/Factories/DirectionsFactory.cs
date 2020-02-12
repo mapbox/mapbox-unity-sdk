@@ -50,16 +50,21 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				_map = FindObjectOfType<AbstractMap>();
 			}
+
 			_directions = MapboxAccess.Instance.Directions;
 			_map.OnInitialized += Query;
 			_map.OnUpdated += Query;
-			RouteTypeDropdown.onValueChanged.AddListener((i) => { Query(); });
+			if (RouteTypeDropdown != null)
+			{
+				RouteTypeDropdown.onValueChanged.AddListener((i) => { Query(); });
+			}
 
 			_waypoints = new Transform[_waypointsParent.childCount];
 			for (int i = 0; i < _waypointsParent.childCount; i++)
 			{
 				_waypoints[i] = _waypointsParent.GetChild(i);
 			}
+
 			_pointArray = new Vector3[_waypoints.Length];
 
 			foreach (var wp in GetComponentsInChildren<DragableDirectionWaypoint>())
@@ -79,6 +84,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					{
 						_pointArray[i] = _waypoints[i].position + _pointUpDelta;
 					}
+
 					_lineRenderer.SetPositions(_pointArray);
 					ArrangingWaypoints(_pointArray);
 				};
@@ -120,17 +126,20 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 
 			var routeProfile = RoutingProfile.Driving;
-			switch (RouteTypeDropdown.value)
+			if (RouteTypeDropdown != null)
 			{
-				case 0:
-					routeProfile = RoutingProfile.Driving;
-					break;
-				case 1:
-					routeProfile = RoutingProfile.Walking;
-					break;
-				case 2:
-					routeProfile = RoutingProfile.Cycling;
-					break;
+				switch (RouteTypeDropdown.value)
+				{
+					case 0:
+						routeProfile = RoutingProfile.Driving;
+						break;
+					case 1:
+						routeProfile = RoutingProfile.Walking;
+						break;
+					case 2:
+						routeProfile = RoutingProfile.Cycling;
+						break;
+				}
 			}
 
 			var directionResource = new DirectionResource(wp, routeProfile);
@@ -141,7 +150,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		void HandleDirectionsResponse(DirectionsResponse response)
 		{
-
 			if (response == null || null == response.Routes || response.Routes.Count < 1)
 			{
 				return;
@@ -161,6 +169,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				{
 					totalLength += Vector3.Distance(prevPoint, newPoint);
 				}
+
 				prevPoint = newPoint;
 			}
 
@@ -192,7 +201,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 				else
 				{
-					midPoint = Vector3.Lerp(unitySpacePositions[i - 1], unitySpacePositions[i], (float)midLength / dist);
+					midPoint = Vector3.Lerp(unitySpacePositions[i - 1], unitySpacePositions[i], (float) midLength / dist);
 					break;
 				}
 			}
@@ -212,6 +221,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				_directionsGO.transform.SetParent(_map.transform);
 			}
+
 			var mesh = _directionsGO.AddComponent<MeshFilter>().mesh;
 			mesh.subMeshCount = data.Triangles.Count;
 

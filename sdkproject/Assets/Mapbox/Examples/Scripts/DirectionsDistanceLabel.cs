@@ -9,75 +9,90 @@ using UnityEngine.UI;
 
 public class DirectionsDistanceLabel : MonoBehaviour
 {
-    public AbstractMap AbstractMap;
-    public DirectionsFactory DirectionsFactory;
-    public LineRenderer LineRenderer;
-    public GameObject DistanceLabelWrapper;
-    public Text DistanceText;
-    private Camera _camera;
+	public AbstractMap AbstractMap;
+	public DirectionsFactory DirectionsFactory;
+	public LineRenderer LineRenderer;
+	public GameObject DistanceLabelWrapper;
+	public Text DistanceText;
+	private Camera _camera;
 
-    private Vector2d _pos1LatLng;
-    private Vector2d _pos2LatLng;
-    private float _lineDistance;
+	private Vector2d _pos1LatLng;
+	private Vector2d _pos2LatLng;
+	private float _lineDistance;
 
-    private void Start()
-    {
-        _camera = Camera.main;
+	private void Start()
+	{
+		_camera = Camera.main;
 
-        DirectionsFactory.ArrangingWaypoints += (positions) =>
-        {
-            var midLength = 0f;
-            for (int i = 1; i < positions.Length; i++)
-            {
-                _pos1LatLng = AbstractMap.WorldToGeoPosition(positions[i]);
-                _pos2LatLng = AbstractMap.WorldToGeoPosition(positions[i - 1]);
-                midLength += (float)Conversions.GeoDistance(_pos1LatLng.y, _pos1LatLng.x, _pos2LatLng.y, _pos2LatLng.x) * 1000;
-            }
+		DirectionsFactory.ArrangingWaypoints += (positions) =>
+		{
+			var midLength = 0f;
+			for (int i = 1; i < positions.Length; i++)
+			{
+				_pos1LatLng = AbstractMap.WorldToGeoPosition(positions[i]);
+				_pos2LatLng = AbstractMap.WorldToGeoPosition(positions[i - 1]);
+				midLength += (float) Conversions.GeoDistance(_pos1LatLng.y, _pos1LatLng.x, _pos2LatLng.y, _pos2LatLng.x) * 1000;
+			}
 
-            midLength /= 2;
+			midLength /= 2;
 
-            var midPoint = positions[0];
-            for (int i = 1; i < positions.Length; i++)
-            {
-                _pos1LatLng = AbstractMap.WorldToGeoPosition(positions[i]);
-                _pos2LatLng = AbstractMap.WorldToGeoPosition(positions[i - 1]);
-                _lineDistance = (float)Conversions.GeoDistance(_pos1LatLng.y, _pos1LatLng.x, _pos2LatLng.y, _pos2LatLng.x) * 1000;
-                if (midLength > _lineDistance)
-                {
-                    midLength -= _lineDistance;
-                }
-                else
-                {
-                    midPoint = Vector3.Lerp(positions[i - 1], positions[i], (float)midLength / _lineDistance);
-                    break;
-                }
-            }
+			var midPoint = positions[0];
+			for (int i = 1; i < positions.Length; i++)
+			{
+				_pos1LatLng = AbstractMap.WorldToGeoPosition(positions[i]);
+				_pos2LatLng = AbstractMap.WorldToGeoPosition(positions[i - 1]);
+				_lineDistance = (float) Conversions.GeoDistance(_pos1LatLng.y, _pos1LatLng.x, _pos2LatLng.y, _pos2LatLng.x) * 1000;
+				if (midLength > _lineDistance)
+				{
+					midLength -= _lineDistance;
+				}
+				else
+				{
+					midPoint = Vector3.Lerp(positions[i - 1], positions[i], (float) midLength / _lineDistance);
+					break;
+				}
+			}
 
-            DistanceLabelWrapper.transform.position = _camera.WorldToScreenPoint(midPoint);
-            DistanceText.text = (midLength * 2).ToString("F1") + "m";
-        };
+			if (DistanceLabelWrapper != null)
+			{
+				DistanceLabelWrapper.transform.position = _camera.WorldToScreenPoint(midPoint);
+				DistanceText.text = (midLength * 2).ToString("F1") + "m";
+			}
+		};
 
-        DirectionsFactory.ArrangingWaypointsStarted += () =>
-        {
-            DistanceLabelWrapper.SetActive(true);
-        };
+		DirectionsFactory.ArrangingWaypointsStarted += () =>
+		{
+			if (DistanceLabelWrapper != null)
+			{
+				DistanceLabelWrapper.SetActive(true);
+			}
+		};
 
-        DirectionsFactory.ArrangingWaypointsFinished += () =>
-        {
-            DistanceLabelWrapper.SetActive(false);
-        };
+		DirectionsFactory.ArrangingWaypointsFinished += () =>
+		{
+			if (DistanceLabelWrapper != null)
+			{
+				DistanceLabelWrapper.SetActive(false);
+			}
+		};
 
-        DirectionsFactory.RouteDrawn += (midPoint, totalLength) =>
-        {
-            DistanceLabelWrapper.SetActive(true);
-            DistanceLabelWrapper.transform.position = _camera.WorldToScreenPoint(midPoint);
-            DistanceText.text = totalLength.ToString("F1") + "m";
-        };
+		DirectionsFactory.RouteDrawn += (midPoint, totalLength) =>
+		{
+			if (DistanceLabelWrapper != null)
+			{
+				DistanceLabelWrapper.SetActive(true);
+				DistanceLabelWrapper.transform.position = _camera.WorldToScreenPoint(midPoint);
+				DistanceText.text = totalLength.ToString("F1") + "m";
+			}
+		};
 
-        DirectionsFactory.QuerySent += () =>
-        {
-            DistanceLabelWrapper.SetActive(true);
-            DistanceText.text = "Loading";
-        };
-    }
+		DirectionsFactory.QuerySent += () =>
+		{
+			if (DistanceLabelWrapper != null)
+			{
+				DistanceLabelWrapper.SetActive(true);
+				DistanceText.text = "Loading";
+			}
+		};
+	}
 }
