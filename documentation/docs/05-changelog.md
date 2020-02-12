@@ -1,4 +1,8 @@
 ## CHANGELOG
+### v2.1.2
+### Bug Fixes
+- Fix a bug where vector tile processing fired multiple times depending on Terrain/Image data states
+
 ### v2.1.1
 10/15/2019
 ### Bug Fixes
