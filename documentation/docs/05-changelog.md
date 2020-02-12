@@ -1,4 +1,8 @@
 ## CHANGELOG
+### v2.1.2
+### Bug Fixes
+- Fixes a bug where add collider feature didn't work for flat terrain mesh.
+
 ### v2.1.1
 10/15/2019
 ### Bug Fixes
