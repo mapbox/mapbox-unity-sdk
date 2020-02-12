@@ -73,7 +73,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			{
 				if (_collider == null)
 				{
-					_collider = gameObject.AddComponent<MeshCollider>();
+					_collider = gameObject.GetComponent<MeshCollider>();
+					if (_collider == null)
+					{
+						_collider = gameObject.AddComponent<MeshCollider>();
+					}
 				}
 				return _collider;
 			}
