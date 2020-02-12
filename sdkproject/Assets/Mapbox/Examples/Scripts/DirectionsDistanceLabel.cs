@@ -23,6 +23,10 @@ public class DirectionsDistanceLabel : MonoBehaviour
 	private void Start()
 	{
 		_camera = Camera.main;
+		if (AbstractMap == null)
+		{
+			AbstractMap = FindObjectOfType<AbstractMap>();
+		}
 
 		DirectionsFactory.ArrangingWaypoints += (positions) =>
 		{
