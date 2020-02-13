@@ -146,7 +146,7 @@ namespace Mapbox.Examples
 			}
 			else
 			{
-				euler.y = -newAngle;
+				euler.y = newAngle;
 
 				euler.x = currentEuler.x;
 				euler.z = currentEuler.z;
