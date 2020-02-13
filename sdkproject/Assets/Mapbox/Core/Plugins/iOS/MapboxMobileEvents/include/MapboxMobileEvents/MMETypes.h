@@ -23,6 +23,32 @@
 typedef NS_DICTIONARY_OF(NSString *, id) MMEMapboxEventAttributes;
 typedef NS_MUTABLE_DICTIONARY_OF(NSString *, id) MMEMutableMapboxEventAttributes;
 
-@interface MMETypes : NSObject
+#ifdef MME_DEPRECATION_WARNINGS
 
-@end
+#ifndef MME_DEPRECATED
+    #define MME_DEPRECATED __attribute__((deprecated))
+#endif
+
+#ifndef MME_DEPRECATED_MSG
+    #define MME_DEPRECATED_MSG(msg) __attribute((deprecated((msg))))
+#endif
+
+#ifndef MME_DEPRECATED_GOTO
+    #define MME_DEPRECATED_GOTO(msg,label) __attribute((deprecated((msg),(label))))
+#endif
+
+#else
+
+#ifndef MME_DEPRECATED
+    #define MME_DEPRECATED
+#endif
+
+#ifndef MME_DEPRECATED_MSG
+    #define MME_DEPRECATED_MSG(msg)
+#endif
+
+#ifndef MME_DEPRECATED_GOTO
+    #define MME_DEPRECATED_GOTO(msg,label)
+#endif
+
+#endif // MME_DEPRECATION_WARNINGS

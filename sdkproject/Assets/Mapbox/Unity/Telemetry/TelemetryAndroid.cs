@@ -80,6 +80,7 @@ namespace Mapbox.Unity.Telemetry
 					Debug.LogError("Could not get class 'AppUserTurnstile'");
 					return;
 				}
+				MapboxAndroidTurnstileEvent.Call("setSkuId", Constants.SDK_SKU_ID);
 				_telemInstance.Call<bool>("push", MapboxAndroidTurnstileEvent);
 			}
 		}

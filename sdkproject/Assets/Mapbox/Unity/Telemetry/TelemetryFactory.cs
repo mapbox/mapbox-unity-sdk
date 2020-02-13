@@ -2,12 +2,6 @@
 {
 	public static class TelemetryFactory
 	{
-#if UNITY_EDITOR || UNITY_IOS || UNITY_ANDROID
-		public static readonly string EventQuery = "events=true";
-#else
-		public static readonly string EventQuery = "events=false";
-#endif
-
 		public static ITelemetryLibrary GetTelemetryInstance()
 		{
 #if UNITY_EDITOR
