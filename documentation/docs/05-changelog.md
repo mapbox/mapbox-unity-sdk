@@ -1,4 +1,8 @@
 ## CHANGELOG
+### v2.1.2
+### Improvements
+- Improves Directions factory and prefabs to provide better UX and support for all types of maps
+
 ### v.2.1.0
 09/20/2019
 ##### New Features
