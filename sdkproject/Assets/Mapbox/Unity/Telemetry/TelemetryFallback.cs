@@ -49,6 +49,8 @@ namespace Mapbox.Unity.Telemetry
 			jsonDict.Add("userId", SystemInfo.deviceUniqueIdentifier);
 			jsonDict.Add("enabled.telemetry", false);
 			jsonDict.Add("sdkIdentifier", GetSDKIdentifier());
+			jsonDict.Add("skuId", Constants.SDK_SKU_ID);
+			jsonDict.Add("sdkVersion", Constants.SDK_VERSION);
 			eventList.Add(jsonDict);
 
 			var jsonString = JsonConvert.SerializeObject(eventList);

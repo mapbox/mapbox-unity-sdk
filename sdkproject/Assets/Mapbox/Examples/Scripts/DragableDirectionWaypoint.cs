@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,10 @@ namespace Mapbox.Examples
 {
 	public class DragableDirectionWaypoint : MonoBehaviour
 	{
+		public Action MouseDown = () => { };
+		public Action MouseDraging = () => { };
+		public Action MouseDrop = () => { };
+
 		public Transform MoveTarget;
 		private Vector3 screenPoint;
 		private Vector3 offset;
@@ -18,12 +23,23 @@ namespace Mapbox.Examples
 
 		void OnMouseDrag()
 		{
+			MouseDraging();
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 			float enter = 0.0f;
 			if (_yPlane.Raycast(ray, out enter))
 			{
 				MoveTarget.position = ray.GetPoint(enter);
 			}
+		}
+
+		private void OnMouseDown()
+		{
+			MouseDown();
+		}
+
+		private void OnMouseUp()
+		{
+			MouseDrop();
 		}
 	}
 }
