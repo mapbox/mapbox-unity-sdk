@@ -2,6 +2,8 @@
 ### v2.1.2
 ### Bug Fixes
 - Fixes a bug where add collider feature didn't work for flat terrain mesh.
+- Fix a bug where vector tile processing fired multiple times depending on Terrain/Image data states
+
 
 ### v2.1.1
 10/15/2019
