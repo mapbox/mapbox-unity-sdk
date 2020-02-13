@@ -43,17 +43,19 @@ namespace UnityEngine.XR.iOS
 
 		void OnDestroy()
 		{
-			GetComponent<Camera>().RemoveCommandBuffer(CameraEvent.BeforeForwardOpaque, m_VideoCommandBuffer);
+			if (m_VideoCommandBuffer != null) {
+				GetComponent<Camera>().RemoveCommandBuffer(CameraEvent.BeforeForwardOpaque, m_VideoCommandBuffer);
+			}
 			UnityARSessionNativeInterface.ARFrameUpdatedEvent -= UpdateFrame;
 			bCommandBufferInitialized = false;
 		}
 
-#if !UNITY_EDITOR
+#if !UNITY_EDITOR && UNITY_IOS
 
         public void OnPreRender()
         {
-			ARTextureHandles handles = UnityARSessionNativeInterface.GetARSessionNativeInterface ().GetARVideoTextureHandles();
-            if (handles.textureY == System.IntPtr.Zero || handles.textureCbCr == System.IntPtr.Zero)
+			ARTextureHandles handles = UnityARSessionNativeInterface.GetARSessionNativeInterface().GetARVideoTextureHandles();
+            if (handles.IsNull())
             {
                 return;
             }
@@ -67,7 +69,7 @@ namespace UnityEngine.XR.iOS
             // Texture Y
             if (_videoTextureY == null) {
               _videoTextureY = Texture2D.CreateExternalTexture(currentResolution.width, currentResolution.height,
-                  TextureFormat.R8, false, false, (System.IntPtr)handles.textureY);
+                  TextureFormat.R8, false, false, (System.IntPtr)handles.TextureY);
               _videoTextureY.filterMode = FilterMode.Bilinear;
               _videoTextureY.wrapMode = TextureWrapMode.Repeat;
               m_ClearMaterial.SetTexture("_textureY", _videoTextureY);
@@ -76,14 +78,14 @@ namespace UnityEngine.XR.iOS
             // Texture CbCr
             if (_videoTextureCbCr == null) {
               _videoTextureCbCr = Texture2D.CreateExternalTexture(currentResolution.width, currentResolution.height,
-                  TextureFormat.RG16, false, false, (System.IntPtr)handles.textureCbCr);
+                  TextureFormat.RG16, false, false, (System.IntPtr)handles.TextureCbCr);
               _videoTextureCbCr.filterMode = FilterMode.Bilinear;
               _videoTextureCbCr.wrapMode = TextureWrapMode.Repeat;
               m_ClearMaterial.SetTexture("_textureCbCr", _videoTextureCbCr);
             }
 
-            _videoTextureY.UpdateExternalTexture(handles.textureY);
-            _videoTextureCbCr.UpdateExternalTexture(handles.textureCbCr);
+            _videoTextureY.UpdateExternalTexture(handles.TextureY);
+            _videoTextureCbCr.UpdateExternalTexture(handles.TextureCbCr);
 
 			m_ClearMaterial.SetMatrix("_DisplayTransform", _displayTransform);
         }

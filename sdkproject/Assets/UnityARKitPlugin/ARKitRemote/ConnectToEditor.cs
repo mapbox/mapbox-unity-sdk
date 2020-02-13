@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking.PlayerConnection;
 using System.Text;
-using Utils;
+using UnityEngine.XR.iOS.Utils;
 
 namespace UnityEngine.XR.iOS
 {
@@ -37,15 +37,19 @@ namespace UnityEngine.XR.iOS
 		void HandleEditorMessage(MessageEventArgs mea)
 		{
 			serializableFromEditorMessage sfem = mea.data.Deserialize<serializableFromEditorMessage>();
-			if (sfem != null && sfem.subMessageId == SubMessageIds.editorInitARKit) {
+			if (sfem != null && sfem.subMessageId == SubMessageIds.editorInitARKit) 
+			{
 				InitializeARKit ( sfem.arkitConfigMsg );
+			} 
+			else if (sfem != null && sfem.subMessageId == SubMessageIds.editorInitARKitFaceTracking) 
+			{
+				InitializeARKitFaceTracking( sfem.arkitConfigMsg);
 			}
 		}
 
 		void InitializeARKit(serializableARKitInit sai)
 		{
 			#if !UNITY_EDITOR
-
 			//get the config and runoption from editor and use them to initialize arkit on device
 			Application.targetFrameRate = 60;
 			m_session = UnityARSessionNativeInterface.GetARSessionNativeInterface();
@@ -57,33 +61,80 @@ namespace UnityEngine.XR.iOS
 			UnityARSessionNativeInterface.ARAnchorAddedEvent += ARAnchorAdded;
 			UnityARSessionNativeInterface.ARAnchorUpdatedEvent += ARAnchorUpdated;
 			UnityARSessionNativeInterface.ARAnchorRemovedEvent += ARAnchorRemoved;
+			#endif
+		}
 
+		void InitializeARKitFaceTracking(serializableARKitInit sai)
+		{
+			#if !UNITY_EDITOR
+			//get the config and runoption from editor and use them to initialize arkit for facetracking on device
+			Application.targetFrameRate = 60;
+			m_session = UnityARSessionNativeInterface.GetARSessionNativeInterface();
+			ARKitFaceTrackingConfiguration config = sai.config;
+			UnityARSessionRunOption runOptions = sai.runOption;
+			m_session.RunWithConfigAndOptions(config, runOptions);
+
+			UnityARSessionNativeInterface.ARFrameUpdatedEvent += ARFrameUpdated;
+			UnityARSessionNativeInterface.ARFaceAnchorAddedEvent += ARFaceAnchorAdded;
+			UnityARSessionNativeInterface.ARFaceAnchorUpdatedEvent += ARFaceAnchorUpdated;
+			UnityARSessionNativeInterface.ARFaceAnchorRemovedEvent += ARFaceAnchorRemoved;
 			#endif
 		}
 
 		public void ARFrameUpdated(UnityARCamera camera)
 		{
+			#if !UNITY_EDITOR
 			serializableUnityARCamera serARCamera = camera;
 			SendToEditor(ConnectionMessageIds.updateCameraFrameMsgId, serARCamera);
-
+			#endif
 		}
 
 		public void ARAnchorAdded(ARPlaneAnchor planeAnchor)
 		{
+			#if !UNITY_EDITOR
 			serializableUnityARPlaneAnchor serPlaneAnchor = planeAnchor;
 			SendToEditor (ConnectionMessageIds.addPlaneAnchorMsgeId, serPlaneAnchor);
+			#endif
 		}
 
 		public void ARAnchorUpdated(ARPlaneAnchor planeAnchor)
 		{
+			#if !UNITY_EDITOR
 			serializableUnityARPlaneAnchor serPlaneAnchor = planeAnchor;
 			SendToEditor (ConnectionMessageIds.updatePlaneAnchorMsgeId, serPlaneAnchor);
+			#endif
 		}
 
 		public void ARAnchorRemoved(ARPlaneAnchor planeAnchor)
 		{
+			#if !UNITY_EDITOR
 			serializableUnityARPlaneAnchor serPlaneAnchor = planeAnchor;
 			SendToEditor (ConnectionMessageIds.removePlaneAnchorMsgeId, serPlaneAnchor);
+			#endif
+		}
+
+		public void ARFaceAnchorAdded(ARFaceAnchor faceAnchor)
+		{
+			#if !UNITY_EDITOR
+			serializableUnityARFaceAnchor serFaceAnchor = faceAnchor;
+			SendToEditor (ConnectionMessageIds.addFaceAnchorMsgeId, serFaceAnchor);
+			#endif
+		}
+
+		public void ARFaceAnchorUpdated(ARFaceAnchor faceAnchor)
+		{
+			#if !UNITY_EDITOR
+			serializableUnityARFaceAnchor serFaceAnchor = faceAnchor;
+			SendToEditor (ConnectionMessageIds.updateFaceAnchorMsgeId, serFaceAnchor);
+			#endif
+		}
+
+		public void ARFaceAnchorRemoved(ARFaceAnchor faceAnchor)
+		{
+			#if !UNITY_EDITOR
+			serializableUnityARFaceAnchor serFaceAnchor = faceAnchor;
+			SendToEditor (ConnectionMessageIds.removeFaceAnchorMsgeId, serFaceAnchor);
+			#endif
 		}
 
 		void EditorConnected(int playerID)

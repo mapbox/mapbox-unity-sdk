@@ -3,7 +3,7 @@ using System.Collections;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
-namespace Utils
+namespace UnityEngine.XR.iOS.Utils
 {
 	//Extension class to provide serialize / deserialize methods to object.
 	//src: http://stackoverflow.com/questions/1446547/how-to-convert-an-object-to-a-byte-array-in-c-sharp

@@ -1,16 +1,14 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.XR.iOS;
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 public class UnityPointCloudExample : MonoBehaviour
 {
     public uint numPointsToShow = 100;
     public GameObject PointCloudPrefab = null;
-    private List<GameObject> pointCloudObjects;
-    private Vector3[] m_PointCloudData;
+    List<GameObject> pointCloudObjects;
+    Vector3[] m_PointCloudData;
 
     public void Start()
     {
@@ -27,7 +25,7 @@ public class UnityPointCloudExample : MonoBehaviour
 
     public void ARFrameUpdated(UnityARCamera camera)
     {
-        m_PointCloudData = camera.pointCloudData;
+        m_PointCloudData = camera.pointCloud.Points;
     }
 
     public void Update()
