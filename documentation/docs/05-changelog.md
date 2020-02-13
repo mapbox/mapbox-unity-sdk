@@ -3,7 +3,8 @@
 ### Bug Fixes
 - Fixes a bug where add collider feature didn't work for flat terrain mesh.
 - Fix a bug where vector tile processing fired multiple times depending on Terrain/Image data states
-
+### Improvements
+- Improves Directions factory and prefabs to provide better UX and support for all types of maps
 
 ### v2.1.1
 10/15/2019
