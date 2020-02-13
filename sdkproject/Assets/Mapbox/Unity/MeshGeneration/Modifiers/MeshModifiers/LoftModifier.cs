@@ -12,8 +12,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
 		public GameObject Slice;
 		public bool _closeEdges = false;
-		private int _counter = 0;
+		public float SliceScaleMultiplier = 1;
 
+		private int _counter = 0;
 		private List<Vector3> _slice;
 		private int _sliceCount;
 		private float _sliceTotalMagnitude;
@@ -82,7 +83,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					co = _slice.Count;
 					for (int i = 0; i < co; i++)
 					{
-						var p = q * _slice[i];
+						var p = (q * _slice[i]) * SliceScaleMultiplier;
 						vl.Add(p + current);
 						if (i == co - 1) //last item capped
 						{
@@ -98,7 +99,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				md.Vertices.Capacity = md.Vertices.Count + (vl.Count - _sliceCount) * 4;
 				md.Normals.Capacity = md.Normals.Count + (vl.Count - _sliceCount) * 4;
 				md.Triangles.Capacity = md.Triangles.Count + (vl.Count - _sliceCount) * 6;
-				
+
 				var uvDist = 0f;
 				float edMag = 0f, h = 0f;
 				co = 0;
