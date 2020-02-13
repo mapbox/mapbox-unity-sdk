@@ -56,6 +56,10 @@ public class TerrainDataFetcher : DataFetcher
 			return;
 		}
 		var pngRasterTile = new RawPngRasterTile();
+		if (terrainDataParameters.tile != null)
+		{
+			terrainDataParameters.tile.AddTile(pngRasterTile);
+		}
 		pngRasterTile.Initialize(_fileSource, terrainDataParameters.canonicalTileId, terrainDataParameters.tilesetId, () =>
 		{
 			if (terrainDataParameters.tile.CanonicalTileId != pngRasterTile.Id)
