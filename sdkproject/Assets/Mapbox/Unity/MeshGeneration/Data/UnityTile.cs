@@ -73,7 +73,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			{
 				if (_collider == null)
 				{
-					_collider = GetComponent<Collider>();
+					_collider = gameObject.GetComponent<MeshCollider>();
+					if (_collider == null)
+					{
+						_collider = gameObject.AddComponent<MeshCollider>();
+					}
 				}
 				return _collider;
 			}
@@ -268,10 +272,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					}
 				}
 
-				if (addCollider && gameObject.GetComponent<MeshCollider>() == null)
-				{
-					gameObject.AddComponent<MeshCollider>();
-				}
+
 
 				HeightDataState = TilePropertyState.Loaded;
 			}
