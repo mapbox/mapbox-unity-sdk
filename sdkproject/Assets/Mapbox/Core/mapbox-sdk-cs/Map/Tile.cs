@@ -21,7 +21,7 @@ namespace Mapbox.Map
 	/// </summary>
 	public abstract class Tile : IAsyncRequest
 	{
-
+		public bool IsLoadedFromCache;
 
 		private CanonicalTileId _id;
 		private List<Exception> _exceptions;
@@ -241,6 +241,8 @@ namespace Mapbox.Map
 					_state = State.Loaded;
 				}
 			}
+
+			IsLoadedFromCache = response.LoadedFromCache;
 			_callback();
 		}
 

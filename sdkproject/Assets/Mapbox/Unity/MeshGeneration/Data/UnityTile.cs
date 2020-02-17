@@ -278,7 +278,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		public void SetRasterData(byte[] data, bool useMipMap = true, bool useCompression = false)
+		public void SetRasterData(byte[] data, bool useMipMap = true, bool useCompression = false, bool isLoadedFromCache = false)
 		{
 			// Don't leak the texture, just reuse it.
 			if (RasterDataState != TilePropertyState.Unregistered)
@@ -306,6 +306,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				MeshRenderer.sharedMaterial.mainTexture = _rasterData;
 
 				RasterDataState = TilePropertyState.Loaded;
+
+				if (isLoadedFromCache)
+				{
+					gameObject.name += " from cache";
+				}
 			}
 		}
 

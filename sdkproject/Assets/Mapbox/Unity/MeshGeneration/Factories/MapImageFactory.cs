@@ -68,7 +68,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 				if (tile.RasterDataState != TilePropertyState.Unregistered)
 				{
-					tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
+					tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression, rasterTile.IsLoadedFromCache);
 				}
 			}
 		}
