@@ -534,6 +534,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 						yield break;
 					}
 
+					if (tile.IsRecycled)
+					{
+						yield break;
+					}
+
 					ProcessFeature(i, tile, tempLayerProperties, layer.Extent);
 
 					if (IsCoroutineBucketFull && !(Application.isEditor && !Application.isPlaying))
