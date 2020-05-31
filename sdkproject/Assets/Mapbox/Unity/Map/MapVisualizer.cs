@@ -39,7 +39,7 @@ namespace Mapbox.Unity.Map
 
 			// TODO: this is constant for all tiles--cache.
 			var scale = tile.TileScale;
-			var scaleFactor = Mathf.Pow(2, (map.InitialZoom - map.AbsoluteZoom));
+			var scaleFactor = Mathf.Pow(2, (map.InitialZoom - tile.UnwrappedTileId.Z));
 
 			var position = new Vector3(
 				(float)(rect.Center.x - map.CenterMercator.x) * scale * scaleFactor,

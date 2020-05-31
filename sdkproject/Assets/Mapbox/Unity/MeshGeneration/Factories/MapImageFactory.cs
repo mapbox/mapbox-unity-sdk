@@ -68,7 +68,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 				if (tile.RasterDataState != TilePropertyState.Unregistered)
 				{
-					tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
+					if (rasterTile.Texture2D != null)
+					{
+						tile.SetRasterTexture(rasterTile.Texture2D);
+					}
+					else
+					{
+						tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
+					}
 				}
 			}
 		}
@@ -128,6 +135,46 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
+		protected override void OnRegistered(UnityTile tile, UnwrappedTileId parent)
+		{
+			if (_properties.sourceType == ImagerySourceType.None)
+			{
+				tile.SetRasterData(null);
+				tile.RasterDataState = TilePropertyState.None;
+				return;
+			}
+			else
+			{
+				tile.RasterDataState = TilePropertyState.Loading;
+
+				parent = tile.UnwrappedTileId.Parent;
+				for (int i = 0; i < 4; i++)
+				{
+					var parentTexture = _fileSource.GetTextureFromMemoryCache(TilesetId, parent.Canonical);
+					if (parentTexture != null)
+					{
+						tile.SetParentTexture(parent, parentTexture);
+						break;
+					}
+
+					parent = parent.Parent;
+				}
+
+				if (_properties.sourceType != ImagerySourceType.Custom)
+				{
+					_properties.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(_properties.sourceType);
+				}
+				ImageDataFetcherParameters parameters = new ImageDataFetcherParameters()
+				{
+					canonicalTileId = tile.CanonicalTileId,
+					tile = tile,
+					tilesetId = TilesetId,
+					useRetina = _properties.rasterOptions.useRetina
+				};
+				DataFetcher.FetchData(parameters);
+			}
+		}
+
 		/// <summary>
 		/// Method to be called when a tile error has occurred.
 		/// </summary>
@@ -138,6 +185,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			if (tile != null)
 			{
 				tile.RasterDataState = TilePropertyState.Error;
+				foreach (var exception in e.Exceptions)
+				{
+					Debug.Log(exception);
+				}
+
+				;
 			}
 		}
 

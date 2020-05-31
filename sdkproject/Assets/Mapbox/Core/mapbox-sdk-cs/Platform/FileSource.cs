@@ -116,7 +116,20 @@ namespace Mapbox.Platform
 			return proxyResponse(url, callback, timeout, tileId, tilesetId);
 		}
 
+		public void UnityImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null)
+		{
+			throw new NotImplementedException();
+		}
 
+		public Texture2D GetTextureFromMemoryCache(string mapId, CanonicalTileId tileId)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void UnityElevationRequest(string getUrl, Action<float[]> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null)
+		{
+			throw new NotImplementedException();
+		}
 		// TODO: look at requests and implement throttling if needed
 		//private IEnumerator<IAsyncRequest> proxyResponse(string url, Action<Response> callback) {
 		private IAsyncRequest proxyResponse(

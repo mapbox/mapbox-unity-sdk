@@ -4,6 +4,8 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using UnityEngine;
+
 namespace Mapbox.Map
 {
 	using System;
@@ -21,25 +23,27 @@ namespace Mapbox.Map
 	/// </summary>
 	public abstract class Tile : IAsyncRequest
 	{
-
-
-		private CanonicalTileId _id;
-		private List<Exception> _exceptions;
-		private State _state = State.New;
-		private IAsyncRequest _request;
-		private Action _callback;
+		protected CanonicalTileId _id;
+		protected List<Exception> _exceptions;
+		protected State _state = State.New;
+		protected IAsyncRequest _request;
+		protected Action _callback;
 
 		/// <summary> Tile state. </summary>
 		public enum State
 		{
 			/// <summary> New tile, not yet initialized. </summary>
 			New,
+
 			/// <summary> Loading data. </summary>
 			Loading,
+
 			/// <summary> Data loaded and parsed. </summary>
 			Loaded,
+
 			/// <summary> Data loading cancelled. </summary>
 			Canceled,
+
 			/// <summary> Data has been loaded before and got updated. </summary>
 			Updated
 		}
@@ -56,10 +60,7 @@ namespace Mapbox.Map
 		/// <summary>Flag to indicate if the request was successful</summary>
 		public bool HasError
 		{
-			get
-			{
-				return _exceptions == null ? false : _exceptions.Count > 0;
-			}
+			get { return _exceptions == null ? false : _exceptions.Count > 0; }
 		}
 
 
@@ -75,7 +76,11 @@ namespace Mapbox.Map
 		{
 			get
 			{
-				if (null == _exceptions || _exceptions.Count == 0) { return string.Empty; }
+				if (null == _exceptions || _exceptions.Count == 0)
+				{
+					return string.Empty;
+				}
+
 				return string.Join(Environment.NewLine, _exceptions.Select(e => e.Message).ToArray());
 			}
 		}
@@ -87,7 +92,11 @@ namespace Mapbox.Map
 		/// <param name="errorMessage"></param>
 		internal void AddException(Exception ex)
 		{
-			if (null == _exceptions) { _exceptions = new List<Exception>(); }
+			if (null == _exceptions)
+			{
+				_exceptions = new List<Exception>();
+			}
+
 			_exceptions.Add(ex);
 		}
 
@@ -100,22 +109,19 @@ namespace Mapbox.Map
 		/// <value> The tile state. </value>
 		public State CurrentState
 		{
-			get
-			{
-				return _state;
-			}
+			get { return _state; }
 		}
 
 
-		public HttpRequestType RequestType { get { return _request.RequestType; } }
+		public HttpRequestType RequestType
+		{
+			get { return _request.RequestType; }
+		}
 
 
 		public bool IsCompleted
 		{
-			get
-			{
-				return _state == State.Loaded;
-			}
+			get { return _state == State.Loaded; }
 		}
 
 		/// <summary>
@@ -134,13 +140,14 @@ namespace Mapbox.Map
 			_request = param.Fs.Request(MakeTileResource(param.TilesetId).GetUrl(), HandleTileResponse, tileId: _id, tilesetId: param.TilesetId);
 		}
 
-		internal void Initialize(IFileSource fileSource, CanonicalTileId canonicalTileId, string tilesetId, Action p)
+		internal virtual void Initialize(IFileSource fileSource, CanonicalTileId canonicalTileId, string tilesetId, Action p)
 		{
 			Cancel();
 
 			_state = State.Loading;
 			_id = canonicalTileId;
 			_callback = p;
+
 			_request = fileSource.Request(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse, tileId: _id, tilesetId: tilesetId);
 		}
 
@@ -207,9 +214,9 @@ namespace Mapbox.Map
 		// on the desktop, Android, etc) we can use worker threads and when building for
 		// the browser, we keep it single-threaded.
 		List<string> ids = new List<string>();
+
 		private void HandleTileResponse(Response response)
 		{
-
 			if (response.HasError)
 			{
 				if (!ids.Contains(_id.ToString()))
@@ -241,6 +248,7 @@ namespace Mapbox.Map
 					_state = State.Loaded;
 				}
 			}
+
 			_callback();
 		}
 
@@ -271,7 +279,5 @@ namespace Mapbox.Map
 			/// <summary> The data source abstraction. </summary>
 			public IFileSource Fs;
 		}
-
-
 	}
 }

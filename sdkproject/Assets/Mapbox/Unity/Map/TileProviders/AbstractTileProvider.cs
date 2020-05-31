@@ -10,6 +10,10 @@ namespace Mapbox.Unity.Map.TileProviders
 	{
 		//TODO: Override GetHashCode for UnwrappedTileId
 		public HashSet<UnwrappedTileId> activeTiles;
+
+		public Dictionary<UnwrappedTileId, UnwrappedTileId> ZoomOutTileRelationships;
+		public Dictionary<UnwrappedTileId, UnwrappedTileId> ZoomInTileRelationships;
+		public bool IsZoomingIn = false;
 	}
 
 	public abstract class AbstractTileProvider : MonoBehaviour, ITileProvider

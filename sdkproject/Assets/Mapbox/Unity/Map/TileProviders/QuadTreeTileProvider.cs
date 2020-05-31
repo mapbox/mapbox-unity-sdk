@@ -28,6 +28,9 @@ namespace Mapbox.Unity.Map.TileProviders
 		private Vector3[] _hitPnt = new Vector3[HIT_POINTS_COUNT];
 		private Vector2d[] _hitPntGeoPos = new Vector2d[HIT_POINTS_COUNT];
 		private bool _isFirstLoad;
+
+		private float _zoomLevel;
+
 		#endregion
 
 		public override void OnInitialized()
@@ -47,10 +50,13 @@ namespace Mapbox.Unity.Map.TileProviders
 			{
 				_cbtpOptions.camera = Camera.main;
 			}
+
 			_cbtpOptions.camera.transform.hasChanged = false;
 			_groundPlane = new Plane(Vector3.up, 0);
 			_shouldUpdate = true;
 			_currentExtent.activeTiles = new HashSet<UnwrappedTileId>();
+
+			_zoomLevel = _map.Zoom;
 		}
 
 		public override void UpdateTileExtent()
@@ -60,19 +66,77 @@ namespace Mapbox.Unity.Map.TileProviders
 				return;
 			}
 
-			//update viewport in case it was changed by switching zoom level
-			_viewPortWebMercBounds = getcurrentViewPortWebMerc();
-			_currentExtent.activeTiles = GetWithWebMerc(_viewPortWebMercBounds, _map.AbsoluteZoom);
+			if ((int) _zoomLevel != (int) _map.Zoom)
+			{
+				_currentExtent.IsZoomingIn = (int) _zoomLevel < (int) _map.Zoom;
 
-			OnExtentChanged();
+				_viewPortWebMercBounds = getcurrentViewPortWebMerc();
+				var newTiles = GetWithWebMerc(_viewPortWebMercBounds, _map.AbsoluteZoom);
+				_currentExtent.ZoomOutTileRelationships = new Dictionary<UnwrappedTileId, UnwrappedTileId>();
+				_currentExtent.ZoomInTileRelationships = new Dictionary<UnwrappedTileId, UnwrappedTileId>();
+
+				foreach (var tile in _currentExtent.activeTiles)
+				{
+					if (_currentExtent.IsZoomingIn)
+					{
+						var v1 = new UnwrappedTileId(tile.Z + 1, tile.X * 2, tile.Y * 2);
+						if (newTiles.Contains(v1))
+						{
+							_currentExtent.ZoomInTileRelationships.Add(v1, tile);
+						}
+						v1 = new UnwrappedTileId(tile.Z + 1, tile.X * 2 + 1, tile.Y * 2);
+						if (newTiles.Contains(v1))
+						{
+							_currentExtent.ZoomInTileRelationships.Add(v1, tile);
+						}
+						v1 = new UnwrappedTileId(tile.Z + 1, tile.X * 2 + 1, tile.Y * 2 + 1);
+						if (newTiles.Contains(v1))
+						{
+							_currentExtent.ZoomInTileRelationships.Add(v1, tile);
+						}
+						v1 = new UnwrappedTileId(tile.Z + 1, tile.X * 2, tile.Y * 2 + 1);
+						if (newTiles.Contains(v1))
+						{
+							_currentExtent.ZoomInTileRelationships.Add(v1, tile);
+						}
+					}
+					else
+					{
+						var parent = new UnwrappedTileId(tile.Z - 1, tile.X >> 1, tile.Y >> 1);
+						if (!newTiles.Contains(parent))
+						{
+							continue;
+						}
+
+						if (!_currentExtent.ZoomOutTileRelationships.ContainsKey(tile))
+						{
+							_currentExtent.ZoomOutTileRelationships.Add(tile, parent);
+						}
+					}
+				}
+
+				_zoomLevel = _map.Zoom;
+
+			}
+			else
+			{
+				//update viewport in case it was changed by switching zoom level
+				_viewPortWebMercBounds = getcurrentViewPortWebMerc();
+				_currentExtent.activeTiles = GetWithWebMerc(_viewPortWebMercBounds, _map.AbsoluteZoom);
+
+				OnExtentChanged();
+			}
 		}
 
 		public HashSet<UnwrappedTileId> GetWithWebMerc(Vector2dBounds bounds, int zoom)
 		{
-			_tiles.Clear();
+			_tiles = new HashSet<UnwrappedTileId>();
 			_canonicalTiles.Clear();
 
-			if (bounds.IsEmpty()) { return _tiles; }
+			if (bounds.IsEmpty())
+			{
+				return _tiles;
+			}
 
 			//stay within WebMerc bounds
 			Vector2d swWebMerc = new Vector2d(Math.Max(bounds.SouthWest.x, -Utils.Constants.WebMercMax), Math.Max(bounds.SouthWest.y, -Utils.Constants.WebMercMax));

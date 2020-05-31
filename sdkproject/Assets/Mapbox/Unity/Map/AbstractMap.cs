@@ -50,6 +50,7 @@ namespace Mapbox.Unity.Map
 		protected Vector3 _cachedPosition;
 		protected Quaternion _cachedRotation;
 		protected Vector3 _cachedScale = Vector3.one;
+		protected Dictionary<UnwrappedTileId, List<UnwrappedTileId>> TileTracker = new Dictionary<UnwrappedTileId, List<UnwrappedTileId>>();
 		#endregion
 
 		#region Properties
@@ -513,6 +514,19 @@ namespace Mapbox.Unity.Map
 			_mapVisualizer.OnTileFinished += (s) =>
 			{
 				OnTileFinished(s);
+
+				if (TileTracker.ContainsKey(s.UnwrappedTileId))
+				{
+					foreach (var tileId in TileTracker[s.UnwrappedTileId])
+					{
+						if (MapVisualizer.ActiveTiles.ContainsKey(tileId))
+						{
+							TileProvider_OnTileRemoved(tileId);
+						}
+					}
+
+					TileTracker.Remove(s.UnwrappedTileId);
+				}
 			};
 		}
 
@@ -654,6 +668,23 @@ namespace Mapbox.Unity.Map
 		protected virtual void TileProvider_OnTileAdded(UnwrappedTileId tileId)
 		{
 			var tile = _mapVisualizer.LoadTile(tileId);
+			if (Options.placementOptions.snapMapToZero && !_worldHeightFixed)
+			{
+				_worldHeightFixed = true;
+				if (tile.HeightDataState == MeshGeneration.Enums.TilePropertyState.Loaded)
+				{
+					ApplySnapWorldToZero(tile);
+				}
+				else
+				{
+					tile.OnHeightDataChanged += (s) => { ApplySnapWorldToZero(tile); };
+				}
+			}
+		}
+
+		protected virtual void TileProvider_OnTileAdded2(UnwrappedTileId tileId, UnwrappedTileId parent)
+		{
+			var tile = _mapVisualizer.LoadTile(tileId, parent);
 			if (Options.placementOptions.snapMapToZero && !_worldHeightFixed)
 			{
 				_worldHeightFixed = true;
@@ -903,11 +934,22 @@ namespace Mapbox.Unity.Map
 
 			if (tilesToProcess.Count > 0)
 			{
-				OnTilesDisposing(tilesToProcess);
+				//OnTilesDisposing(tilesToProcess);
 
 				foreach (var t2r in tilesToProcess)
 				{
-					TileProvider_OnTileRemoved(t2r);
+					if (currentExtent.ZoomOutTileRelationships != null && currentExtent.ZoomOutTileRelationships.ContainsKey(t2r))
+					{
+						if (!TileTracker.ContainsKey(currentExtent.ZoomOutTileRelationships[t2r]))
+						{
+							TileTracker.Add(currentExtent.ZoomOutTileRelationships[t2r], new List<UnwrappedTileId>());
+						}
+						TileTracker[currentExtent.ZoomOutTileRelationships[t2r]].Add(t2r);
+					}
+					else
+					{
+						TileProvider_OnTileRemoved(t2r);
+					}
 				}
 			}
 
@@ -932,7 +974,14 @@ namespace Mapbox.Unity.Map
 				foreach (var tileId in tilesToProcess)
 				{
 					_mapVisualizer.State = ModuleState.Working;
-					TileProvider_OnTileAdded(tileId);
+					if (currentExtent.IsZoomingIn && currentExtent.ZoomInTileRelationships != null && currentExtent.ZoomInTileRelationships.ContainsKey(tileId))
+					{
+						TileProvider_OnTileAdded2(tileId, currentExtent.ZoomInTileRelationships[tileId]);
+					}
+					else
+					{
+						TileProvider_OnTileAdded(tileId);
+					}
 				}
 			}
 		}

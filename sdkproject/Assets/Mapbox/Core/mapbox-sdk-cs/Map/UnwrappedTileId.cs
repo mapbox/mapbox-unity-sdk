@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Mapbox.Map
 {
@@ -141,6 +142,28 @@ namespace Mapbox.Map
 			get
 			{
 				return new UnwrappedTileId(Z, X - 1, Y + 1);
+			}
+		}
+
+		public UnwrappedTileId Parent
+		{
+			get
+			{
+				return new UnwrappedTileId(Z - 1, X >> 1, Y >> 1);
+			}
+		}
+
+		public IEnumerable<UnwrappedTileId> Children
+		{
+			get
+			{
+				return new UnwrappedTileId[4]
+				{
+					new UnwrappedTileId(this.Z + 1, this.X * 2, this.Y * 2),
+					new UnwrappedTileId(this.Z + 1, this.X * 2 + 1, this.Y * 2),
+					new UnwrappedTileId(this.Z + 1, this.X * 2 + 1, this.Y * 2 + 1),
+					new UnwrappedTileId(this.Z + 1, this.X * 2, this.Y * 2 + 1)
+				};
 			}
 		}
 	}

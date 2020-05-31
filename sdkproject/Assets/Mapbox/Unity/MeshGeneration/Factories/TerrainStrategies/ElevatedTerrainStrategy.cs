@@ -136,6 +136,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			_newUvList.Clear();
 			_newTriangleList.Clear();
 
+			//012
+			//345
+			//678
 			for (float y = 0; y < sampleCount; y++)
 			{
 				var yrat = y / (sampleCount - 1);
@@ -197,6 +200,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 
 			var _sampleCount = _elevationOptions.modificationOptions.sampleCount;
 			var hd = tile.HeightData;
+			var heightDataRowSize = (int)Mathf.Sqrt(hd.Length);
 			var ts = tile.TileScale;
 			for (float y = 0; y < _sampleCount; y++)
 			{
@@ -204,7 +208,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				{
 					_verts[(int) (y * _sampleCount + x)] = new Vector3(
 						_verts[(int) (y * _sampleCount + x)].x,
-						hd[((int)((1 - y / (_sampleCount - 1)) * 255) * 256) + ((int)(x / (_sampleCount - 1) * 255))] * ts,
+						hd[((int)((1 - y / (_sampleCount - 1)) * (heightDataRowSize-1)) * heightDataRowSize) + ((int)(x / (_sampleCount - 1) * (heightDataRowSize-1)))] * ts,
 						_verts[(int) (y * _sampleCount + x)].z);
 					_normals[(int) (y * _sampleCount + x)] = Mapbox.Unity.Constants.Math.Vector3Zero;
 				}

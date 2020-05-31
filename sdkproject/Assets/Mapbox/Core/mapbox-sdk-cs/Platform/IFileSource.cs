@@ -4,6 +4,8 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using UnityEngine;
+
 namespace Mapbox.Platform
 {
 	using Mapbox.Map;
@@ -26,5 +28,7 @@ namespace Mapbox.Platform
 		///     canceling the request.
 		/// </returns>
 		IAsyncRequest Request(string uri, Action<Response> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null);
+		void UnityImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null);
+		Texture2D GetTextureFromMemoryCache(string mapId, CanonicalTileId tileId);
 	}
 }

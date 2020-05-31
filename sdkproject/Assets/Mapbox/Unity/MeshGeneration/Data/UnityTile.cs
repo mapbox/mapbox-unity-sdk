@@ -1,7 +1,9 @@
-using Mapbox.Unity.Map.Interfaces;
+
+using UnityEditor;
 
 namespace Mapbox.Unity.MeshGeneration.Data
 {
+	using Mapbox.Unity.Map.Interfaces;
 	using UnityEngine;
 	using Mapbox.Unity.MeshGeneration.Enums;
 	using Mapbox.Unity.Utilities;
@@ -10,19 +12,18 @@ namespace Mapbox.Unity.MeshGeneration.Data
 	using System;
 	using Mapbox.Unity.Map;
 	using System.Collections.Generic;
-	using Mapbox.Unity.MeshGeneration.Factories;
 
 	public class UnityTile : MonoBehaviour
 	{
 		public TileTerrainType ElevationType;
-
-		[SerializeField]
-		private Texture2D _rasterData;
+		[SerializeField] private Texture2D _rasterData;
 		public VectorTile VectorData { get; private set; }
-		private Texture2D _heightTexture;
+		[SerializeField] private Texture2D _heightTexture;
 		public float[] HeightData;
 
 		private Texture2D _loadingTexture;
+
+		private int _heightDataResolution = 100;
 		//keeping track of tile objects to be able to cancel them safely if tile is destroyed before data fetching finishes
 		private List<Tile> _tiles = new List<Tile>();
 		[SerializeField] private float _tileScale;
@@ -196,7 +197,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			CurrentZoom = zoom;
 			scaleFactor = Mathf.Pow(2, (map.InitialZoom - zoom));
 			gameObject.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
-			gameObject.SetActive(true);
+			//gameObject.SetActive(true);
 
 			IsRecycled = false;
 
@@ -235,7 +236,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			if (HeightDataState != TilePropertyState.Unregistered)
 			{
 				//reset height data
-				if(data == null)
+				if (data == null)
 				{
 					HeightData = new float[256 * 256];
 					HeightDataState = TilePropertyState.None;
@@ -271,10 +272,121 @@ namespace Mapbox.Unity.MeshGeneration.Data
 						HeightData[xx * 256 + yy] = relativeScale * heightMultiplier * (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
 					}
 				}
+			}
+		}
+
+		public void SetElevationData(float[] data, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false)
+		{
+			if (HeightDataState != TilePropertyState.Unregistered)
+			{
+				//reset height data
+				if (data == null)
+				{
+					HeightData = new float[256 * 256];
+					HeightDataState = TilePropertyState.None;
+					return;
+				}
+
+				HeightData = data;
 
 
 
 				HeightDataState = TilePropertyState.Loaded;
+			}
+		}
+
+		public void SetHeightTexture(Texture2D elevationTexture, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false, Action<UnityTile> callback = null)
+		{
+			if (HeightDataState != TilePropertyState.Unregistered)
+			{
+				//reset height data
+				if (elevationTexture == null)
+				{
+					HeightData = new float[_heightDataResolution * _heightDataResolution];
+					HeightDataState = TilePropertyState.None;
+					return;
+				}
+
+				if (HeightData == null)
+				{
+					HeightData = new float[_heightDataResolution * _heightDataResolution];
+				}
+
+				_heightTexture = elevationTexture;
+				byte[] rgbData = _heightTexture.GetRawTextureData();
+				//var rgbData = _heightTexture.GetRawTextureData<Color32>();
+				var relativeScale = useRelative ? _relativeScale : 1f;
+				var width = _heightTexture.width;
+				for (float yy = 0; yy < _heightDataResolution; yy++)
+				{
+					for (float xx = 0; xx < _heightDataResolution; xx++)
+					{
+						var index = (((int) ((yy / _heightDataResolution) * width) * width) + (int) ((xx / _heightDataResolution) * width));
+
+						float r = rgbData[index * 4 + 1];
+						float g = rgbData[index * 4 + 2];
+						float b = rgbData[index * 4 + 3];
+						//var color = rgbData[index];
+						// float r = color.g;
+						// float g = color.b;
+						// float b = color.a;
+						//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
+						HeightData[(int) (yy * _heightDataResolution + xx)] = relativeScale * heightMultiplier * (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
+						//678 ==> 012345678
+						//345
+						//012
+					}
+				}
+
+				MeshRenderer.sharedMaterial.SetTexture("_HeightTexture", _heightTexture);
+				MeshRenderer.sharedMaterial.SetFloat("_TileScale", _tileScale);
+				HeightDataState = TilePropertyState.Loaded;
+
+				// AsyncGPUReadback.Request(_heightTexture, 0, (t) =>
+				// {
+				// 	Debug.Log(UnwrappedTileId);
+				// 	var data = t.GetData<Color32>();
+				//
+				// 	if (HeightData == null)
+				// 	{
+				// 		HeightData = new float[_heightDataResolution * _heightDataResolution];
+				// 	}
+				//
+				// 	var relativeScale = useRelative ? _relativeScale : 1f;
+				// 	//tt = new Texture2D(_heightDataResolution, _heightDataResolution, TextureFormat.RGBA32, false);
+				// 	for (float yy = 0; yy < _heightDataResolution; yy++)
+				// 	{
+				// 		for (float xx = 0; xx < _heightDataResolution; xx++)
+				// 		{
+				// 			var xx2 = (xx / _heightDataResolution) * t.width;
+				// 			var yy2 = (yy / _heightDataResolution) * t.width;
+				// 			var index = (((int)yy2 * t.width) + (int)xx2);
+				// 			//var color = _heightTexture.GetPixel((int)xx2, (int)yy2);
+				// 			//var index = (int)(((float)xx / _heightDataResolution) * 255 * 256 + (((float)yy / _heightDataResolution) * 255));
+				//
+				// 			float r = data[(int) index].g;
+				// 			float g = data[(int) index].b;
+				// 			float b = data[(int) index].a;
+				// 			//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
+				// 			HeightData[(int) (yy * _heightDataResolution + xx)] = relativeScale * heightMultiplier * (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
+				// 			//678 ==> 012345678
+				// 			//345
+				// 			//012
+				//
+				// 			//tt.SetPixel((int) xx, (int) yy, new Color(r/256, g/256, b/256));
+				// 			//tt.SetPixel((int) xx, (int) yy, color); //new Color(rgbData[index * 4 + 1] / 256f, rgbData[index * 4 + 2] / 256f, rgbData[index * 4 + 3] / 256f, 1));
+				// 		}
+				// 	}
+				// 	//tt.Apply();
+				// 	if (callback != null)
+				// 	{
+				// 		callback(this);
+				// 	}
+				// 	HeightDataState = TilePropertyState.Loaded;
+				//
+				// });
+				// Get rid of this temporary texture. We don't need to bloat memory.
+				//_heightTexture.LoadImage(null);
 			}
 		}
 
@@ -309,6 +421,41 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
+		public void SetRasterTexture(Texture2D rasterTileTexture2D, bool useMipMap = true, bool useCompression = false)
+		{
+			if (!EditorApplication.isPaused)
+			{
+				if (RasterDataState != TilePropertyState.Unregistered)
+				{
+					//reset image on null data
+					if (rasterTileTexture2D == null)
+					{
+						MeshRenderer.material.mainTexture = null;
+						return;
+					}
+
+					_rasterData = rasterTileTexture2D;
+					_rasterData.wrapMode = TextureWrapMode.Clamp;
+					if (useCompression)
+					{
+						// High quality = true seems to decrease image quality?
+						_rasterData.Compress(false);
+					}
+
+					MeshRenderer.sharedMaterial.mainTextureScale = Unity.Constants.Math.Vector3One;
+					MeshRenderer.sharedMaterial.mainTextureOffset = Unity.Constants.Math.Vector3Zero;
+
+					//MeshRenderer.sharedMaterial.mainTexture = _rasterData;
+					MeshRenderer.sharedMaterial.mainTextureScale = Unity.Constants.Math.Vector3One;
+                    MeshRenderer.sharedMaterial.mainTextureOffset = Unity.Constants.Math.Vector3Zero;
+
+                    MeshRenderer.sharedMaterial.SetTexture("_MainTex", _rasterData);
+
+					RasterDataState = TilePropertyState.Loaded;
+				}
+			}
+		}
+
 		public void SetVectorData(VectorTile vectorTile)
 		{
 			if (VectorDataState != TilePropertyState.Unregistered)
@@ -329,7 +476,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		{
 			if (HeightData != null)
 			{
-				return HeightData[(int)(Mathf.Clamp01(y) * 255) * 256 + (int)(Mathf.Clamp01(x) * 255)] * _tileScale;
+				return HeightData[(int) (Mathf.Clamp01(y) * (_heightDataResolution - 1)) * _heightDataResolution + (int) (Mathf.Clamp01(x) * (_heightDataResolution - 1))] * _tileScale;
 			}
 
 			return 0;
@@ -398,6 +545,61 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			{
 				_rasterData.Destroy();
 			}
+		}
+
+		public void SetParentTexture(UnwrappedTileId parent, Texture2D parentTexture)
+		{
+			MeshRenderer.sharedMaterial.mainTexture = parentTexture;
+
+			var tileZoom = this.UnwrappedTileId.Z;
+			var parentZoom = parent.Z;
+
+			var scale = 1f;
+			var offsetX = 0f;
+			var offsetY = 0f;
+
+			var current = this.UnwrappedTileId;
+			var currentParent = current.Parent;
+
+			for (int i = tileZoom - 1; i >= parentZoom; i--)
+			{
+				scale /= 2;
+
+				var bottomLeftChildX = currentParent.X * 2;
+				var bottomLeftChildY = currentParent.Y * 2;
+
+				//top left
+				if (current.X == bottomLeftChildX && current.Y == bottomLeftChildY)
+				{
+					offsetY = 0.5f + (offsetY/2);
+					offsetX = offsetX / 2;
+				}
+				//top right
+				else if (current.X == bottomLeftChildX + 1 && current.Y == bottomLeftChildY)
+				{
+					offsetX = 0.5f + (offsetX / 2);
+					offsetY = 0.5f + (offsetY / 2);
+				}
+				//bottom left
+				else if (current.X == bottomLeftChildX && current.Y == bottomLeftChildY + 1)
+				{
+					offsetX = offsetX / 2;
+					offsetY = offsetY / 2;
+				}
+				//bottom right
+				else if (current.X == bottomLeftChildX + 1 && current.Y == bottomLeftChildY + 1)
+				{
+					offsetX = 0.5f + (offsetX / 2);
+					offsetY = offsetY / 2;
+				}
+
+				current = currentParent;
+				currentParent = currentParent.Parent;
+			}
+
+
+			MeshRenderer.sharedMaterial.mainTextureScale = new Vector2(scale, scale);
+			MeshRenderer.sharedMaterial.mainTextureOffset = new Vector2(offsetX, offsetY);
 		}
 	}
 }

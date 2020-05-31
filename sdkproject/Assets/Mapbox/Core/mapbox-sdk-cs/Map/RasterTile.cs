@@ -4,6 +4,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using Mapbox.Platform;
+using UnityEngine;
+
 namespace Mapbox.Map
 {
 	/// <summary>
@@ -33,9 +37,10 @@ namespace Mapbox.Map
 	/// </example>
 	public class RasterTile : Tile
 	{
+		private Texture2D texture2D;
 		private byte[] data;
 
-		/// <summary> Gets the raster tile raw data. </summary>
+		/// <summary> Gets the raster tile raw data. This field is only used if texture is fetched/stored as byte array. Otherwise, if it's fetched as texture, you should use Texture2D.</summary>
 		/// <value> The raw data, usually an encoded JPEG or PNG. </value>
 		/// <example>
 		/// Consuming data in Unity to create a Texture2D:
@@ -47,10 +52,44 @@ namespace Mapbox.Map
 		/// </example>
 		public byte[] Data
 		{
-			get
+			get { return this.data; }
+		}
+
+		/// <summary> Gets the imagery as Texture2d object. This field is only used if texture is fetched/stored as Texture2d. Otherwise, if it's fetched as byte array, you should use Data. </summary>
+		/// <value> The raw data, usually an encoded JPEG or PNG. </value>
+		/// <example>
+		/// <code>
+		/// _sampleMaterial.mainTexture = rasterTile.Texture2D;
+		/// </code>
+		/// </example>
+		public Texture2D Texture2D
+		{
+			get { return this.texture2D; }
+		}
+
+		internal override void Initialize(IFileSource fileSource, CanonicalTileId canonicalTileId, string tilesetId, Action p)
+		{
+			Cancel();
+
+			_state = State.Loading;
+			_id = canonicalTileId;
+			_callback = p;
+
+			fileSource.UnityImageRequest(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse, tileId: _id, tilesetId: tilesetId);
+		}
+
+
+		private void HandleTileResponse(TextureResponse textureResponse)
+		{
+			SetTexture2D(textureResponse.Texture2D);
+			
+			// Cancelled is not the same as loaded!
+			if (_state != State.Canceled)
 			{
-				return this.data;
+				_state = State.Loaded;
 			}
+
+			_callback();
 		}
 
 		internal override TileResource MakeTileResource(string tilesetId)
@@ -64,6 +103,11 @@ namespace Mapbox.Map
 			this.data = data;
 
 			return true;
+		}
+
+		internal virtual void SetTexture2D(Texture2D texture)
+		{
+			this.texture2D = texture;
 		}
 	}
 }

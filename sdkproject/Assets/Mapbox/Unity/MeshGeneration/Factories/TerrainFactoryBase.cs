@@ -126,11 +126,18 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 				if (tile.HeightDataState != TilePropertyState.Unregistered)
 				{
-					tile.SetHeightData(pngRasterTile.Data, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
-					Strategy.RegisterTile(tile);
+					if (pngRasterTile.Texture2D != null)
+					{
+						tile.SetHeightTexture(pngRasterTile.Texture2D, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
+						Strategy.RegisterTile(tile);
+					}
+					else
+					{
+						//tile.SetHeightData(pngRasterTile.Data, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
+						// tile.SetElevationData(pngRasterTile.Elevation, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
+						// Strategy.RegisterTile(tile);
+					}
 				}
-
-
 			}
 		}
 

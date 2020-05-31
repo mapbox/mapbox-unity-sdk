@@ -168,10 +168,13 @@ namespace Mapbox.Unity
 		void ConfigureFileSource()
 		{
 			_fileSource = new CachingWebFileSource(_configuration.AccessToken, _configuration.GetMapsSkuToken, _configuration.AutoRefreshCache)
+				.AddTextureCache(new TextureMemoryCache(_configuration.MemoryCacheSize))
+				//.AddTextureCache(new FileCache(_configuration.MemoryCacheSize))
 				.AddCache(new MemoryCache(_configuration.MemoryCacheSize))
-#if !UNITY_WEBGL
-				.AddCache(new SQLiteCache(_configuration.FileCacheSize))
-#endif
+				.AddCache(new SQLiteCache())
+// #if !UNITY_WEBGL
+// 				.AddCache(new SQLiteCache(_configuration.FileCacheSize))
+// #endif
 				;
 		}
 
@@ -234,6 +237,22 @@ namespace Mapbox.Unity
 			return _fileSource.Request(url, callback, _configuration.DefaultTimeout, tileId, tilesetId);
 		}
 
+		public void UnityImageRequest(
+			string url
+			, Action<TextureResponse> callback
+			, int timeout = 10
+			, CanonicalTileId tileId = new CanonicalTileId()
+			, string tilesetId = null
+		)
+		{
+			_fileSource.UnityImageRequest(url, callback, _configuration.DefaultTimeout, tileId, tilesetId);
+		}
+
+
+		public Texture2D GetTextureFromMemoryCache(string mapId, CanonicalTileId tileId)
+		{
+			return _fileSource.GetTextureFromMemoryCache(mapId, tileId);
+		}
 
 		Geocoder _geocoder;
 		/// <summary>

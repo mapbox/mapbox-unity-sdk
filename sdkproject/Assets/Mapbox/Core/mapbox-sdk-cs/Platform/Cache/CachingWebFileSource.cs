@@ -1,4 +1,8 @@
-﻿namespace Mapbox.Platform.Cache
+﻿using System.IO;
+using UnityEngine;
+using UnityEngine.Networking;
+
+namespace Mapbox.Platform.Cache
 {
 	using System;
 	using Mapbox.Platform;
@@ -11,17 +15,16 @@
 
 	public class CachingWebFileSource : IFileSource, IDisposable
 	{
-
-
 #if MAPBOX_DEBUG_CACHE
 		private string _className;
 #endif
 		private bool _disposed;
 		private List<ICache> _caches = new List<ICache>();
+		private List<ITextureCache> _textureCaches = new List<ITextureCache>();
 		private string _accessToken;
 		private Func<string> _getMapsSkuToken;
 		private bool _autoRefreshCache;
-
+		private TextureMemoryCache _memoryTextureCache;
 
 		public CachingWebFileSource(string accessToken, Func<string> getMapsSkuToken, bool autoRefreshCache)
 		{
@@ -33,9 +36,7 @@
 			_autoRefreshCache = autoRefreshCache;
 		}
 
-
-#region idisposable
-
+		#region idisposable
 
 		~CachingWebFileSource()
 		{
@@ -64,12 +65,12 @@
 						}
 					}
 				}
+
 				_disposed = true;
 			}
 		}
 
-
-#endregion
+		#endregion
 
 
 		/// <summary>
@@ -86,6 +87,24 @@
 			}
 
 			_caches.Add(cache);
+
+			return this;
+		}
+
+		public CachingWebFileSource AddTextureCache(ITextureCache cache)
+		{
+			// don't add cache when cache size is 0
+			if (0 == cache.MaxCacheSize)
+			{
+				return this;
+			}
+
+			_textureCaches.Add(cache as ITextureCache);
+			if (cache is TextureMemoryCache)
+			{
+				_memoryTextureCache = cache as TextureMemoryCache;
+			}
+
 			return this;
 		}
 
@@ -99,11 +118,22 @@
 			{
 				cache.Clear();
 			}
+
+			foreach (var cache in _textureCaches)
+			{
+				cache.Clear();
+			}
 		}
 
 
-		public void ReInit() {
+		public void ReInit()
+		{
 			foreach (var cache in _caches)
+			{
+				cache.ReInit();
+			}
+
+			foreach (var cache in _textureCaches)
 			{
 				cache.ReInit();
 			}
@@ -118,7 +148,6 @@
 			, string tilesetId = null
 		)
 		{
-
 			if (string.IsNullOrEmpty(tilesetId))
 			{
 				throw new Exception("Cannot cache without a tileset id");
@@ -150,6 +179,7 @@
 					uriBuilder.Query = accessTokenQuery + "&" + mapsSkuToken;
 				}
 			}
+
 			string finalUrl = uriBuilder.ToString();
 
 #if MAPBOX_DEBUG_CACHE
@@ -203,14 +233,14 @@
 							{
 								// TODO: remove Debug.Log before PR
 								UnityEngine.Debug.LogWarningFormat(
-										"updating cached tile {1} tilesetId:{2}{0}cached etag:{3}{0}remote etag:{4}{0}{5}"
-										, Environment.NewLine
-										, tileId
-										, tilesetId
-										, cachedItem.ETag
-										, headerOnly.Headers["ETag"]
-										, finalUrl
-									);
+									"updating cached tile {1} tilesetId:{2}{0}cached etag:{3}{0}remote etag:{4}{0}{5}"
+									, Environment.NewLine
+									, tileId
+									, tilesetId
+									, cachedItem.ETag
+									, headerOnly.Headers["ETag"]
+									, finalUrl
+								);
 
 								// request updated tile and pass callback to return new data to subscribers
 								requestTileAndCache(finalUrl, tilesetId, tileId, timeout, callback);
@@ -233,6 +263,121 @@
 			}
 		}
 
+		public void UnityImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null)
+		{
+			if (string.IsNullOrEmpty(tilesetId))
+			{
+				throw new Exception("Cannot cache without a tileset id");
+			}
+
+			//go through existing caches and check if we already have the requested tile available
+			foreach (var cache in _textureCaches)
+			{
+				if (cache.Exists(tilesetId, tileId))
+				{
+					//if it's on file cache, we add it to memory cache after reading the file
+					if (cache is FileCache)
+					{
+						cache.GetAsync(tilesetId, tileId, (textureCacheItem) =>
+						{
+							_memoryTextureCache.Add(tilesetId, tileId, textureCacheItem, true);
+							var textureResponse = new TextureResponse {Texture2D = textureCacheItem.Texture2D};
+							callback(textureResponse);
+						});
+					}
+					else
+					{
+						cache.GetAsync(tilesetId, tileId, (textureCacheItem) =>
+						{
+							var textureResponse = new TextureResponse {Texture2D = textureCacheItem.Texture2D};
+							callback(textureResponse);
+						});
+					}
+
+					return;
+				}
+			}
+
+			var uriBuilder = new UriBuilder(uri);
+			if (!string.IsNullOrEmpty(_accessToken))
+			{
+				string accessTokenQuery = "access_token=" + _accessToken;
+				string mapsSkuToken = "sku=" + _getMapsSkuToken();
+				if (uriBuilder.Query != null && uriBuilder.Query.Length > 1)
+				{
+					uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery + "&" + mapsSkuToken;
+				}
+				else
+				{
+					uriBuilder.Query = accessTokenQuery + "&" + mapsSkuToken;
+				}
+			}
+
+			string finalUrl = uriBuilder.ToString();
+
+			Runnable.Run(FetchTexture(finalUrl, callback, tilesetId, tileId));
+		}
+
+		public Texture2D GetTextureFromMemoryCache(string mapId, CanonicalTileId tileId)
+		{
+			if (_memoryTextureCache.Exists(mapId, tileId))
+			{
+				return _memoryTextureCache.GetTexture(mapId, tileId);
+			}
+
+			return null;
+		}
+
+		private IEnumerator FetchTexture(string finalUrl, Action<TextureResponse> callback, string tilesetId, CanonicalTileId tileId)
+		{
+			using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(finalUrl))
+			{
+				yield return uwr.SendWebRequest();
+
+				var response = new TextureResponse();
+				response.StatusCode = uwr.responseCode;
+				if (uwr.isNetworkError || uwr.isHttpError)
+				{
+					response.AddException(new Exception(uwr.error));
+				}
+				else
+				{
+					string eTag = string.Empty;
+					DateTime? lastModified = null;
+					var responseHeaders = uwr.GetResponseHeaders();
+					if (!responseHeaders.ContainsKey("ETag"))
+					{
+						UnityEngine.Debug.LogWarningFormat("no 'ETag' header present in response for {0}", uwr.url);
+					}
+					else
+					{
+						eTag = responseHeaders["ETag"];
+					}
+
+					// not all APIs populate 'Last-Modified' header
+					// don't log error if it's missing
+					if (responseHeaders.ContainsKey("Last-Modified"))
+					{
+						lastModified = DateTime.ParseExact(responseHeaders["Last-Modified"], "r", null);
+					}
+
+					var texture = DownloadHandlerTexture.GetContent(uwr);
+					texture.wrapMode = TextureWrapMode.Clamp;
+					response.Texture2D = texture;
+					foreach (var cache in _textureCaches)
+					{
+						cache.Add(tilesetId, tileId, new TextureCacheItem()
+						{
+							Texture2D = texture,
+							ETag = eTag,
+							LastModified = lastModified
+						}, true);
+					}
+
+					callback(response);
+				}
+			}
+		}
 
 		private IAsyncRequest requestTileAndCache(string url, string tilesetId, CanonicalTileId tileId, int timeout, Action<Response> callback)
 		{
@@ -278,6 +423,7 @@
 							);
 						}
 					}
+
 					if (null != callback)
 					{
 						r.IsUpdate = true;
@@ -289,8 +435,6 @@
 
 		class MemoryCacheAsyncRequest : IAsyncRequest
 		{
-
-
 			public string RequestUrl { get; private set; }
 
 
@@ -302,14 +446,14 @@
 
 			public bool IsCompleted
 			{
-				get
-				{
-					return true;
-				}
+				get { return true; }
 			}
 
 
-			public HttpRequestType RequestType { get { return HttpRequestType.Get; } }
+			public HttpRequestType RequestType
+			{
+				get { return HttpRequestType.Get; }
+			}
 
 
 			public void Cancel()
@@ -317,5 +461,91 @@
 				// Empty. We can't cancel an instantaneous response.
 			}
 		}
+
+
+		// public void UnityElevationRequest(string uri, Action<float[]> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null)
+		// {
+		// 	if (string.IsNullOrEmpty(tilesetId))
+		// 	{
+		// 		throw new Exception("Cannot cache without a tileset id");
+		// 	}
+		//
+		// 	CacheItem cachedItem = null;
+		//
+		// 	//go through existing caches and check if we already have the requested tile available
+		// 	foreach (var cache in _caches.Cast<ITextureCache>())
+		// 	{
+		// 		if (cache.Exists(tilesetId, tileId))
+		// 		{
+		// 			cache.GetAsync(tilesetId, tileId, callback);
+		// 			return;
+		// 		}
+		// 	}
+		//
+		// 	var uriBuilder = new UriBuilder(uri);
+		// 	if (!string.IsNullOrEmpty(_accessToken))
+		// 	{
+		// 		string accessTokenQuery = "access_token=" + _accessToken;
+		// 		string mapsSkuToken = "sku=" + _getMapsSkuToken();
+		// 		if (uriBuilder.Query != null && uriBuilder.Query.Length > 1)
+		// 		{
+		// 			uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery + "&" + mapsSkuToken;
+		// 		}
+		// 		else
+		// 		{
+		// 			uriBuilder.Query = accessTokenQuery + "&" + mapsSkuToken;
+		// 		}
+		// 	}
+		//
+		// 	string finalUrl = uriBuilder.ToString();
+		//
+		// 	Runnable.Run(FetchElevation(finalUrl, callback, tilesetId, tileId));
+		// 	// }
+		// }
+
+
+		// private IEnumerator FetchElevation(string finalUrl, Action<float[]> callback, string tilesetId, CanonicalTileId tileId)
+		// {
+		// 	using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(finalUrl))
+		// 	{
+		// 		yield return uwr.SendWebRequest();
+		//
+		// 		if (uwr.isNetworkError || uwr.isHttpError)
+		// 		{
+		// 			UnityEngine.Debug.LogErrorFormat(uwr.error);
+		// 		}
+		// 		else
+		// 		{
+		// 			var texture = DownloadHandlerTexture.GetContent(uwr);
+		//
+		//
+		// 			byte[] rgbData = texture.GetRawTextureData();
+		//
+		// 			// Get rid of this temporary texture. We don't need to bloat memory.
+		// 			//_heightTexture.LoadImage(null);
+		//
+		// 			var heightData = new float[256 * 256];
+		//
+		// 			for (int xx = 0; xx < 256; ++xx)
+		// 			{
+		// 				for (int yy = 0; yy < 256; ++yy)
+		// 				{
+		// 					float r = rgbData[(xx * 256 + yy) * 4 + 1];
+		// 					float g = rgbData[(xx * 256 + yy) * 4 + 2];
+		// 					float b = rgbData[(xx * 256 + yy) * 4 + 3];
+		// 					//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
+		// 					heightData[xx * 256 + yy] = (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
+		// 				}
+		// 			}
+		//
+		// 			foreach (var cache in _caches.Cast<ITextureCache>())
+		// 			{
+		// 				cache.Add(tilesetId, tileId, heightData, true);
+		// 			}
+		//
+		// 			callback(heightData);
+		// 		}
+		// 	}
+		// }
 	}
 }
