@@ -270,6 +270,8 @@ namespace Mapbox.Platform.Cache
 				throw new Exception("Cannot cache without a tileset id");
 			}
 
+			var finalUrl = CreateFinalUrl(uri);
+
 			//go through existing caches and check if we already have the requested tile available
 			foreach (var cache in _textureCaches)
 			{
@@ -283,6 +285,41 @@ namespace Mapbox.Platform.Cache
 							_memoryTextureCache.Add(tilesetId, tileId, textureCacheItem, true);
 							var textureResponse = new TextureResponse {Texture2D = textureCacheItem.Texture2D};
 							callback(textureResponse);
+							
+							IAsyncRequestFactory.CreateRequest(
+								finalUrl,
+								(Response headerOnly) =>
+								{
+									// on error getting information from API just return. tile we have locally has already been returned above
+									if (headerOnly.HasError)
+									{
+										return;
+									}
+									
+									if (!string.IsNullOrEmpty(textureCacheItem.ETag) && textureCacheItem.ETag.Equals(headerOnly.Headers["ETag"]))
+									{
+										
+									}
+									else
+									{
+										// TODO: remove Debug.Log before PR
+										UnityEngine.Debug.LogWarningFormat(
+											"updating cached tile {1} tilesetId:{2}{0}cached etag:{3}{0}remote etag:{4}{0}{5}"
+											, Environment.NewLine
+											, tileId
+											, tilesetId
+											, textureCacheItem.ETag
+											, headerOnly.Headers["ETag"]
+											, finalUrl
+										);
+
+										// request updated tile and pass callback to return new data to subscribers
+										Runnable.Run(FetchTexture(finalUrl, callback, tilesetId, tileId));
+									}
+								}
+								, timeout
+								, HttpRequestType.Head
+							);
 						});
 					}
 					else
@@ -298,6 +335,11 @@ namespace Mapbox.Platform.Cache
 				}
 			}
 
+			Runnable.Run(FetchTexture(finalUrl, callback, tilesetId, tileId));
+		}
+
+		private string CreateFinalUrl(string uri)
+		{
 			var uriBuilder = new UriBuilder(uri);
 			if (!string.IsNullOrEmpty(_accessToken))
 			{
@@ -314,8 +356,7 @@ namespace Mapbox.Platform.Cache
 			}
 
 			string finalUrl = uriBuilder.ToString();
-
-			Runnable.Run(FetchTexture(finalUrl, callback, tilesetId, tileId));
+			return finalUrl;
 		}
 
 		public Texture2D GetTextureFromMemoryCache(string mapId, CanonicalTileId tileId)
@@ -431,7 +472,6 @@ namespace Mapbox.Platform.Cache
 					}
 				}, timeout);
 		}
-
 
 		class MemoryCacheAsyncRequest : IAsyncRequest
 		{

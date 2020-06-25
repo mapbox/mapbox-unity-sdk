@@ -169,7 +169,7 @@ namespace Mapbox.Unity
 		{
 			_fileSource = new CachingWebFileSource(_configuration.AccessToken, _configuration.GetMapsSkuToken, _configuration.AutoRefreshCache)
 				.AddTextureCache(new TextureMemoryCache(_configuration.MemoryCacheSize))
-				//.AddTextureCache(new FileCache(_configuration.MemoryCacheSize))
+				.AddTextureCache(new FileCache(_configuration.FileCacheSize))
 				.AddCache(new MemoryCache(_configuration.MemoryCacheSize))
 				.AddCache(new SQLiteCache())
 // #if !UNITY_WEBGL

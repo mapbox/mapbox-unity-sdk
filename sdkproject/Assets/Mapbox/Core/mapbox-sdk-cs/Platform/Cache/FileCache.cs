@@ -4,9 +4,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Mapbox.Unity.Utilities;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 
 namespace Mapbox.Platform.Cache
@@ -15,8 +18,9 @@ namespace Mapbox.Platform.Cache
 	{
 		private static string PersistantDataPath = Application.persistentDataPath;
 		private static string CacheRootFolderName = "FileCache";
-		private static string PersistantCacheRootFolderPath = Path.Combine(Application.persistentDataPath, CacheRootFolderName);
+		public static string PersistantCacheRootFolderPath = Path.Combine(Application.persistentDataPath, CacheRootFolderName);
 		private static string FileExtension = ".png";
+		private Queue<string> _cacheFiles = new Queue<string>();
 		
 		public FileCache(uint maxCacheSize)
 		{
@@ -27,6 +31,21 @@ namespace Mapbox.Platform.Cache
 			_cachedResponses = new Dictionary<string, CacheItem>();
 			_infosToSave = new Queue<InfoWrapper>();
 			Runnable.Run(FileScheduler());
+			
+			DirectoryInfo di = new DirectoryInfo(PersistantCacheRootFolderPath);	
+			var _files = new List<FileInfo>();
+			foreach (DirectoryInfo folder in di.GetDirectories())
+			{
+				foreach (var fileInfo in folder.GetFiles())
+				{
+					_files.Add(fileInfo);
+				}
+			}
+
+			foreach (var file in _files.OrderBy(x => x.CreationTime))
+			{
+				_cacheFiles.Enqueue(file.FullName);
+			}
 		}
 
 #if MAPBOX_DEBUG_CACHE
@@ -165,20 +184,46 @@ namespace Mapbox.Platform.Cache
 			}
 
 			byte[] bytes = info.TextureCacheItem.Texture2D.EncodeToPNG();
-			//File.WriteAllBytes(filePath, bytes);
+			
 			using (FileStream sourceStream = new FileStream(filePath,
 				FileMode.Create, FileAccess.Write, FileShare.Read,
 				bufferSize: 4096, useAsync: true))
 			{
 				sourceStream.Write(bytes, 0, bytes.Length);
 			}
+			_cacheFiles.Enqueue(filePath);
+
+			var txtFullName = Path.Combine(folderPath, TileIdToFileName(info.TileId) + ".txt");
+			File.WriteAllLines(txtFullName,
+				new string[]
+				{
+					info.TextureCacheItem.ETag,
+					info.TextureCacheItem.LastModified.ToString(),
+					info.TextureCacheItem.AddedToCacheTicksUtc.ToString()
+				});
+			_cacheFiles.Enqueue(txtFullName);
+
+			CheckFileCoiuntLimit();
+
+		}
+
+		private void CheckFileCoiuntLimit()
+		{
+			if (_cacheFiles.Count > _maxCacheSize)
+			{
+				for (int i = 0; i < 20; i++)
+				{
+					var fileInfo = new FileInfo(_cacheFiles.Dequeue());
+					fileInfo.Delete();
+				}
+			}
 		}
 
 		public void GetAsync(string mapId, CanonicalTileId tileId, Action<TextureCacheItem> callback)
 		{
-			string filePath = Path.Combine(PersistantCacheRootFolderPath, mapId + "/" + TileIdToFileName(tileId) + FileExtension);
+			string filePath = Path.Combine(PersistantCacheRootFolderPath, mapId + "/" + TileIdToFileName(tileId));
 
-			if (File.Exists(filePath))
+			if (File.Exists(filePath + FileExtension))
 			{
 				Runnable.Run(LoadImageCoroutine(filePath, callback));
 			}
@@ -186,7 +231,7 @@ namespace Mapbox.Platform.Cache
 
 		private IEnumerator LoadImageCoroutine(string filePath, Action<TextureCacheItem> callback)
 		{
-			using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture("file:///" + filePath))
+			using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture("file:///" + filePath + FileExtension))
 			{
 				yield return uwr.SendWebRequest();
 
@@ -198,9 +243,11 @@ namespace Mapbox.Platform.Cache
 				{
 					//we don't store metadata yet so only passing texture here
 					//etag and last modified date should be added somewhere here
+					string[] meta = File.ReadAllLines(filePath + ".txt");
 					var textureCacheItem = new TextureCacheItem();
 					textureCacheItem.Texture2D = DownloadHandlerTexture.GetContent(uwr);
 					textureCacheItem.Texture2D.wrapMode = TextureWrapMode.Clamp;
+					textureCacheItem.ETag = meta[0];
 					callback(textureCacheItem);
 				}
 			}
@@ -222,6 +269,31 @@ namespace Mapbox.Platform.Cache
 				MapId = mapId;
 				TileId = tileId;
 				TextureCacheItem = textureCacheItem;
+			}
+		}
+
+		public static void ClearFolder(string folderPath)
+		{
+			DirectoryInfo di = new DirectoryInfo(folderPath);
+
+			foreach (FileInfo file in di.GetFiles())
+			{
+				file.Delete(); 
+			}
+		}
+		
+		public static void ClearStyle(string style)
+		{
+			ClearFolder(Path.Combine(PersistantCacheRootFolderPath, style));
+		}
+		
+		public static void ClearAll()
+		{
+			DirectoryInfo di = new DirectoryInfo(PersistantCacheRootFolderPath);
+
+			foreach (DirectoryInfo folder in di.GetDirectories())
+			{
+				ClearFolder(folder.FullName);
 			}
 		}
 	}

@@ -1,3 +1,5 @@
+using Mapbox.Platform.Cache;
+
 namespace Mapbox.Editor
 {
 	using System.Collections.Generic;
@@ -16,6 +18,7 @@ namespace Mapbox.Editor
 
 	public class MapboxConfigurationWindow : EditorWindow
 	{
+		private static List<CacheDirectoryInfo> _fileCacheFolderSizes = new List<CacheDirectoryInfo>();
 		public static MapboxConfigurationWindow instance;
 		static MapboxConfiguration _mapboxConfig;
 		static MapboxTokenStatus _currentTokenStatus = MapboxTokenStatus.StatusNotYetSet;
@@ -181,6 +184,8 @@ namespace Mapbox.Editor
 			GetSceneList();
 			_selectedSample = -1;
 
+			UpdateFileCacheSizes();
+			
 			//instantiate the config window
 			instance = GetWindow(typeof(MapboxConfigurationWindow)) as MapboxConfigurationWindow;
 			instance.minSize = new Vector2(800, 350);
@@ -242,6 +247,10 @@ namespace Mapbox.Editor
 
 		private void OnLostFocus() { AssetDatabase.Refresh(); }
 
+		private void OnFocus()
+		{
+			UpdateFileCacheSizes();
+		}
 
 		/// <summary>
 		/// Mapbox access
@@ -542,9 +551,60 @@ namespace Mapbox.Editor
 				EditorGUIUtility.labelWidth = 240f;
 				EditorGUI.indentLevel = 2;
 				_memoryCacheSize = EditorGUILayout.IntSlider("Mem Cache Size (# of tiles)", _memoryCacheSize, 0, 1000);
-				_fileCacheSize = EditorGUILayout.IntSlider("File Cache Size (# of tiles)", _fileCacheSize, 0, 3000);
+				
 				_autoRefreshCache = EditorGUILayout.Toggle(new GUIContent("Auto refresh cache", "Automatically update tiles in the local ambient cache if there is a newer version available online. ATTENTION: for every tile displayed (even a cached one) a webrequest needs to be made to check for updates."), _autoRefreshCache);
 				_webRequestTimeout = EditorGUILayout.IntField("Default Web Request Timeout (s)", _webRequestTimeout);
+
+				if (Directory.Exists(FileCache.PersistantCacheRootFolderPath))
+				{
+					EditorGUILayout.Space();
+					EditorGUILayout.LabelField("File Cache", _titleStyle);
+					var fi = new FileInfo(FileCache.PersistantCacheRootFolderPath);
+
+					
+					
+					EditorGUILayout.BeginHorizontal();
+					_fileCacheSize = EditorGUILayout.IntSlider("File Cache Size (# of tiles per style)", _fileCacheSize, 0, 3000);
+
+					EditorGUILayout.EndHorizontal();
+					EditorGUILayout.Space();
+
+					EditorGUILayout.LabelField("Style Caches");
+
+					foreach (var dirInfo in _fileCacheFolderSizes)
+					{
+						
+						EditorGUILayout.BeginHorizontal();
+						
+						EditorGUILayout.LabelField(dirInfo.Name, GUILayout.Width(200));
+						GUILayout.FlexibleSpace();
+						
+						EditorGUILayout.LabelField(string.Format("({0} files | {1} MB)", dirInfo.FileCount, (dirInfo.Size/1024/1024).ToString("F2")), GUILayout.Width(200));
+						
+						if (GUILayout.Button("Show", GUILayout.Width(100)))
+						{
+							EditorUtility.RevealInFinder(dirInfo.FullName);
+						}
+
+						if (GUILayout.Button("Clear", GUILayout.Width(100)))
+						{
+							FileCache.ClearFolder(dirInfo.FullName);
+							UpdateFileCacheSizes();
+						}
+
+						EditorGUILayout.EndHorizontal();
+					}
+
+					EditorGUILayout.BeginHorizontal();
+					GUILayout.FlexibleSpace();
+					if (GUILayout.Button("Clear All", GUILayout.Width(100)))
+					{
+						FileCache.ClearAll();
+						UpdateFileCacheSizes();
+					}
+					EditorGUILayout.EndHorizontal();
+					EditorGUILayout.Space(40);
+				}
 
 				EditorGUILayout.BeginHorizontal(_horizontalGroup);
 				GUILayout.Space(35f);
@@ -663,6 +723,38 @@ namespace Mapbox.Editor
 			}
 
 			return PlayerPrefs.GetInt(Constants.Path.DID_PROMPT_CONFIGURATION) == 0;
+		}
+
+		private static void UpdateFileCacheSizes()
+		{
+			_fileCacheFolderSizes.Clear();
+			var dir = Directory.GetDirectories(FileCache.PersistantCacheRootFolderPath);
+			foreach (var rasterDirectory in dir)
+			{
+				var di = new DirectoryInfo(rasterDirectory);
+				var size = 0.1;
+				FileInfo[] fis = di.GetFiles();
+				foreach (FileInfo file in fis) 
+				{      
+					size += file.Length;    
+				}
+				
+				_fileCacheFolderSizes.Add(new CacheDirectoryInfo()
+				{
+					Name = di.Name,
+					FullName = di.FullName,
+					FileCount = fis.Length,
+					Size = size
+				});
+			}
+		}
+
+		private class CacheDirectoryInfo
+		{
+			public string Name;
+			public string FullName;
+			public int FileCount;
+			public double Size;
 		}
 	}
 }

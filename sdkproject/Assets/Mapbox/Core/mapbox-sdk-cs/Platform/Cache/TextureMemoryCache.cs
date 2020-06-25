@@ -67,6 +67,11 @@ namespace Mapbox.Platform.Cache
 					_cachedTextures.Add(key, textureCacheItem);
 					_textureOrderQueue.Enqueue(key);
 				}
+				else
+				{
+					textureCacheItem.AddedToCacheTicksUtc = DateTime.UtcNow.Ticks;
+					_cachedTextures[key] = textureCacheItem;
+				}
 			}
 		}
 
