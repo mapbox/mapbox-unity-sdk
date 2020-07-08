@@ -31,7 +31,12 @@ namespace Mapbox.Platform.Cache
 			_cachedResponses = new Dictionary<string, CacheItem>();
 			_infosToSave = new Queue<InfoWrapper>();
 			Runnable.Run(FileScheduler());
-			
+
+			if (!Directory.Exists(PersistantCacheRootFolderPath))
+			{
+				Directory.CreateDirectory(PersistantCacheRootFolderPath);
+			}
+
 			DirectoryInfo di = new DirectoryInfo(PersistantCacheRootFolderPath);	
 			var _files = new List<FileInfo>();
 			foreach (DirectoryInfo folder in di.GetDirectories())
