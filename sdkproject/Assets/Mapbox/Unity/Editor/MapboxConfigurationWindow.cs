@@ -732,21 +732,29 @@ namespace Mapbox.Editor
 			foreach (var rasterDirectory in dir)
 			{
 				var di = new DirectoryInfo(rasterDirectory);
-				var size = 0.1;
-				FileInfo[] fis = di.GetFiles();
-				foreach (FileInfo file in fis) 
-				{      
-					size += file.Length;    
-				}
-				
+
+				var size = GetDirectorySize(di, true);
 				_fileCacheFolderSizes.Add(new CacheDirectoryInfo()
 				{
 					Name = di.Name,
 					FullName = di.FullName,
-					FileCount = fis.Length,
-					Size = size
+					FileCount = size.Item2,
+					Size = size.Item1
 				});
 			}
+		}
+
+		public static Tuple<long, int> GetDirectorySize(System.IO.DirectoryInfo directoryInfo, bool recursive = true)
+		{
+			var startDirectorySize = default(long);
+			if (directoryInfo == null || !directoryInfo.Exists)
+				return new Tuple<long, int>(startDirectorySize, 0);
+			var files = directoryInfo.GetFiles();
+			foreach (var fileInfo in files)
+				System.Threading.Interlocked.Add(ref startDirectorySize, fileInfo.Length);
+
+
+			return new Tuple<long, int>(startDirectorySize, files.Length);
 		}
 
 		private class CacheDirectoryInfo
