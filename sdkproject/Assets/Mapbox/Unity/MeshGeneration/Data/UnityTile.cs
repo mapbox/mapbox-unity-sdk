@@ -423,36 +423,33 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void SetRasterTexture(Texture2D rasterTileTexture2D, bool useMipMap = true, bool useCompression = false)
 		{
-			if (!EditorApplication.isPaused)
+			if (RasterDataState != TilePropertyState.Unregistered)
 			{
-				if (RasterDataState != TilePropertyState.Unregistered)
+				//reset image on null data
+				if (rasterTileTexture2D == null)
 				{
-					//reset image on null data
-					if (rasterTileTexture2D == null)
-					{
-						MeshRenderer.material.mainTexture = null;
-						return;
-					}
-
-					_rasterData = rasterTileTexture2D;
-					_rasterData.wrapMode = TextureWrapMode.Clamp;
-					if (useCompression)
-					{
-						// High quality = true seems to decrease image quality?
-						_rasterData.Compress(false);
-					}
-
-					MeshRenderer.sharedMaterial.mainTextureScale = Unity.Constants.Math.Vector3One;
-					MeshRenderer.sharedMaterial.mainTextureOffset = Unity.Constants.Math.Vector3Zero;
-
-					//MeshRenderer.sharedMaterial.mainTexture = _rasterData;
-					MeshRenderer.sharedMaterial.mainTextureScale = Unity.Constants.Math.Vector3One;
-                    MeshRenderer.sharedMaterial.mainTextureOffset = Unity.Constants.Math.Vector3Zero;
-
-                    MeshRenderer.sharedMaterial.SetTexture("_MainTex", _rasterData);
-
-					RasterDataState = TilePropertyState.Loaded;
+					MeshRenderer.material.mainTexture = null;
+					return;
 				}
+
+				_rasterData = rasterTileTexture2D;
+				_rasterData.wrapMode = TextureWrapMode.Clamp;
+				if (useCompression)
+				{
+					// High quality = true seems to decrease image quality?
+					_rasterData.Compress(false);
+				}
+
+				MeshRenderer.sharedMaterial.mainTextureScale = Unity.Constants.Math.Vector3One;
+				MeshRenderer.sharedMaterial.mainTextureOffset = Unity.Constants.Math.Vector3Zero;
+
+				//MeshRenderer.sharedMaterial.mainTexture = _rasterData;
+				MeshRenderer.sharedMaterial.mainTextureScale = Unity.Constants.Math.Vector3One;
+                MeshRenderer.sharedMaterial.mainTextureOffset = Unity.Constants.Math.Vector3Zero;
+
+                MeshRenderer.sharedMaterial.SetTexture("_MainTex", _rasterData);
+
+				RasterDataState = TilePropertyState.Loaded;
 			}
 		}
 
