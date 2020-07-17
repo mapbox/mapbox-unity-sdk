@@ -81,8 +81,18 @@ namespace Mapbox.Map
 
 		private void HandleTileResponse(TextureResponse textureResponse)
 		{
-			SetTexture2D(textureResponse.Texture2D);
-			
+			if (textureResponse.HasError)
+			{
+				foreach (var exception in textureResponse.Exceptions)
+				{
+					AddException(exception);
+				}
+			}
+			else
+			{
+				SetTexture2D(textureResponse.Texture2D);
+			}
+
 			// Cancelled is not the same as loaded!
 			if (_state != State.Canceled)
 			{
