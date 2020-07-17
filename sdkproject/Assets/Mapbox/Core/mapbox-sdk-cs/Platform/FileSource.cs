@@ -59,11 +59,7 @@ namespace Mapbox.Platform
 		public FileSource(Func<string> getMapsSkuToken, string acessToken = null)
 		{
 			_getMapsSkuToken = getMapsSkuToken;
-			if (string.IsNullOrEmpty(acessToken))
-			{
-				_accessToken = Environment.GetEnvironmentVariable("MAPBOX_ACCESS_TOKEN");
-			}
-			else
+			if (!string.IsNullOrEmpty(acessToken))
 			{
 				_accessToken = acessToken;
 			}
