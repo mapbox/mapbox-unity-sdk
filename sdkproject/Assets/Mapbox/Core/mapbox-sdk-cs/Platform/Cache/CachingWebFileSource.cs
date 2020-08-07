@@ -1,4 +1,6 @@
-﻿namespace Mapbox.Platform.Cache
+﻿using UnityEngine;
+
+namespace Mapbox.Platform.Cache
 {
 	using System;
 	using Mapbox.Platform;
@@ -166,8 +168,13 @@
 				callback(Response.FromCache(cachedItem.Data));
 
 				// check for updated tiles online if this is enabled in the settings
-				if (_autoRefreshCache)
+				if (cachedItem.LastModified > DateTime.Now)
 				{
+					Debug.Log("not refreshing");
+				}
+				else
+				{
+					Debug.Log("refreshing");
 					// check if tile on the web is newer than the one we already have locally
 					IAsyncRequestFactory.CreateRequest(
 						finalUrl,
@@ -194,9 +201,13 @@
 							// additional ETag empty check: for backwards compability with old caches
 							if (!string.IsNullOrEmpty(cachedItem.ETag) && cachedItem.ETag.Equals(headerOnly.Headers["ETag"]))
 							{
+								var cacheControlValue = int.Parse(headerOnly.Headers["Cache-Control"].Split(',')[0].Split('=')[1]);
+								var cacheToTime = DateTime.Now + TimeSpan.FromSeconds(cacheControlValue);
+								cachedItem.ExpirationDate = cacheToTime;
+
 								foreach (var cache in _caches)
 								{
-									cache.Add(tilesetId, tileId, cachedItem, false);
+									cache.Add(tilesetId, tileId, cachedItem, true);
 								}
 							}
 							else
@@ -244,6 +255,7 @@
 					if (!r.HasError && null != r.Data)
 					{
 						string eTag = string.Empty;
+						DateTime expirationDate = DateTime.Now;
 						DateTime? lastModified = null;
 
 						if (!r.Headers.ContainsKey("ETag"))
@@ -262,6 +274,13 @@
 							lastModified = DateTime.ParseExact(r.Headers["Last-Modified"], "r", null);
 						}
 
+						if (r.Headers.ContainsKey("Cache-Control"))
+						{
+							var cacheControlValue = int.Parse(r.Headers["Cache-Control"].Split(',')[0].Split('=')[1]);
+							var cacheToTime = DateTime.Now + TimeSpan.FromSeconds(cacheControlValue);
+							expirationDate = cacheToTime;
+						}
+
 						// propagate to all caches forcing update
 						foreach (var cache in _caches)
 						{
@@ -272,7 +291,8 @@
 								{
 									Data = r.Data,
 									ETag = eTag,
-									LastModified = lastModified
+									LastModified = lastModified,
+									ExpirationDate = expirationDate
 								}
 								, true // force insert/update
 							);
