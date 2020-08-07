@@ -281,12 +281,12 @@ namespace SQLite4Unity3d
 		/// </summary>
 		/// <param name="type">
 		/// The type whose mapping to the database is returned.
-		/// </param>         
+		/// </param>
 		/// <param name="createFlags">
 		/// Optional flags allowing implicit PK and indexes based on naming conventions
-		/// </param>     
+		/// </param>
 		/// <returns>
-		/// The mapping represents the schema of the columns of the database and contains 
+		/// The mapping represents the schema of the columns of the database and contains
 		/// methods to set and get properties of objects.
 		/// </returns>
 		public TableMapping GetMapping(Type type, CreateFlags createFlags = CreateFlags.None)
@@ -308,7 +308,7 @@ namespace SQLite4Unity3d
 		/// Retrieves the mapping that is automatically generated for the given type.
 		/// </summary>
 		/// <returns>
-		/// The mapping represents the schema of the columns of the database and contains 
+		/// The mapping represents the schema of the columns of the database and contains
 		/// methods to set and get properties of objects.
 		/// </returns>
 		public TableMapping GetMapping<T>()
@@ -363,7 +363,7 @@ namespace SQLite4Unity3d
 		/// later access this schema by calling GetMapping.
 		/// </summary>
 		/// <param name="ty">Type to reflect to a database table.</param>
-		/// <param name="createFlags">Optional flags allowing implicit PK and indexes based on naming conventions.</param>  
+		/// <param name="createFlags">Optional flags allowing implicit PK and indexes based on naming conventions.</param>
 		/// <returns>
 		/// The number of entries added to the database schema.
 		/// </returns>
@@ -805,7 +805,7 @@ namespace SQLite4Unity3d
 
 		/// <summary>
 		/// Attempts to retrieve the first object that matches the predicate from the table
-		/// associated with the specified type. 
+		/// associated with the specified type.
 		/// </summary>
 		/// <param name="predicate">
 		/// A predicate for which object to find.
@@ -859,7 +859,7 @@ namespace SQLite4Unity3d
 
 		/// <summary>
 		/// Attempts to retrieve the first object that matches the predicate from the table
-		/// associated with the specified type. 
+		/// associated with the specified type.
 		/// </summary>
 		/// <param name="predicate">
 		/// A predicate for which object to find.
@@ -887,9 +887,9 @@ namespace SQLite4Unity3d
 		/// <example cref="System.InvalidOperationException">Throws if a transaction has already begun.</example>
 		public void BeginTransaction(bool exclusive = false)
 		{
-			// The BEGIN command only works if the transaction stack is empty, 
-			//    or in other words if there are no pending transactions. 
-			// If the transaction stack is not empty when the BEGIN command is invoked, 
+			// The BEGIN command only works if the transaction stack is empty,
+			//    or in other words if there are no pending transactions.
+			// If the transaction stack is not empty when the BEGIN command is invoked,
 			//    then the command fails with an error.
 			// Rather than crash with an error, we will just ignore calls to BeginTransaction
 			//    that would result in an error.
@@ -911,7 +911,7 @@ namespace SQLite4Unity3d
 					var sqlExp = ex as SQLiteException;
 					if (sqlExp != null)
 					{
-						// It is recommended that applications respond to the errors listed below 
+						// It is recommended that applications respond to the errors listed below
 						//    by explicitly issuing a ROLLBACK command.
 						// TODO: This rollback failsafe should be localized to all throw sites.
 						switch (sqlExp.Result)
@@ -927,7 +927,7 @@ namespace SQLite4Unity3d
 					}
 					else
 					{
-						// Call decrement and not VolatileWrite in case we've already 
+						// Call decrement and not VolatileWrite in case we've already
 						//    created a transaction point in SaveTransactionPoint since the catch.
 						Interlocked.Decrement(ref _transactionDepth);
 					}
@@ -945,7 +945,7 @@ namespace SQLite4Unity3d
 		/// <summary>
 		/// Creates a savepoint in the database at the current point in the transaction timeline.
 		/// Begins a new transaction if one is not in progress.
-		/// 
+		///
 		/// Call <see cref="RollbackTo"/> to undo transactions since the returned savepoint.
 		/// Call <see cref="Release"/> to commit transactions after the savepoint returned here.
 		/// Call <see cref="Commit"/> to end the transaction, committing all changes.
@@ -965,7 +965,7 @@ namespace SQLite4Unity3d
 				var sqlExp = ex as SQLiteException;
 				if (sqlExp != null)
 				{
-					// It is recommended that applications respond to the errors listed below 
+					// It is recommended that applications respond to the errors listed below
 					//    by explicitly issuing a ROLLBACK command.
 					// TODO: This rollback failsafe should be localized to all throw sites.
 					switch (sqlExp.Result)
@@ -1013,8 +1013,8 @@ namespace SQLite4Unity3d
 		/// <param name="noThrow">true to avoid throwing exceptions, false otherwise</param>
 		void RollbackTo(string savepoint, bool noThrow)
 		{
-			// Rolling back without a TO clause rolls backs all transactions 
-			//    and leaves the transaction stack empty.   
+			// Rolling back without a TO clause rolls backs all transactions
+			//    and leaves the transaction stack empty.
 			try
 			{
 				if (String.IsNullOrEmpty(savepoint))
@@ -1039,10 +1039,10 @@ namespace SQLite4Unity3d
 		}
 
 		/// <summary>
-		/// Releases a savepoint returned from <see cref="SaveTransactionPoint"/>.  Releasing a savepoint 
+		/// Releases a savepoint returned from <see cref="SaveTransactionPoint"/>.  Releasing a savepoint
 		///    makes changes since that savepoint permanent if the savepoint began the transaction,
 		///    or otherwise the changes are permanent pending a call to <see cref="Commit"/>.
-		/// 
+		///
 		/// The RELEASE command is like a COMMIT for a SAVEPOINT.
 		/// </summary>
 		/// <param name="savepoint">The name of the savepoint to release.  The string should be the result of a call to <see cref="SaveTransactionPoint"/></param>
@@ -1325,13 +1325,13 @@ namespace SQLite4Unity3d
                 {
                     var info = objType.GetTypeInfo();
                     prop = info.GetDeclaredProperty(map.PK.PropertyName);
-                    if (prop != null) 
+                    if (prop != null)
                     {
                         if (prop.GetValue(obj, null).Equals(Guid.Empty))
                         {
                             prop.SetValue(obj, Guid.NewGuid(), null);
                         }
-                        break; 
+                        break;
                     }
 
                     objType = info.BaseType;

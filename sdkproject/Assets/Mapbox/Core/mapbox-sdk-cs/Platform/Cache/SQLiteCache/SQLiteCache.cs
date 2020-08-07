@@ -1,6 +1,7 @@
-﻿namespace Mapbox.Platform.Cache
-{
+﻿using UnityEngine.PlayerLoop;
 
+namespace Mapbox.Platform.Cache
+{
 	using Mapbox.Map;
 	using Mapbox.Utils;
 	using SQLite4Unity3d;
@@ -12,18 +13,22 @@
 
 	public class SQLiteCache : ICache, IDisposable
 	{
-
-
 		/// <summary>
 		/// maximum number tiles that get cached
 		/// </summary>
-		public uint MaxCacheSize { get { return _maxTileCount; } }
+		public uint MaxCacheSize
+		{
+			get { return _maxTileCount; }
+		}
 
 
 		/// <summary>
 		/// Check cache size every n inserts
 		/// </summary>
-		public uint PruneCacheDelta { get { return _pruneCacheDelta; } }
+		public uint PruneCacheDelta
+		{
+			get { return _pruneCacheDelta; }
+		}
 
 
 #if MAPBOX_DEBUG_CACHE
@@ -34,10 +39,13 @@
 		private string _dbPath;
 		private SQLiteConnection _sqlite;
 		private readonly uint _maxTileCount;
+
 		/// <summary>check cache size only every '_pruneCacheDelta' calls to 'Add()' to avoid being too chatty with the database</summary>
 		private const int _pruneCacheDelta = 20;
+
 		/// <summary>counter to keep track of calls to `Add()`</summary>
 		private int _pruneCacheCounter = 0;
+
 		private object _lock = new object();
 
 
@@ -50,7 +58,6 @@
 
 
 		#region idisposable
-
 
 		~SQLiteCache()
 		{
@@ -77,17 +84,16 @@
 						_sqlite = null;
 					}
 				}
+
 				_disposed = true;
 			}
 		}
-
 
 		#endregion
 
 
 		private void init()
 		{
-
 #if MAPBOX_DEBUG_CACHE
 			_className = this.GetType().Name;
 #endif
@@ -112,7 +118,6 @@ name  STRING  NOT NULL
 			List<SQLiteConnection.ColumnInfo> colInfoTiles = _sqlite.GetTableInfo(typeof(tiles).Name);
 			if (0 == colInfoTiles.Count)
 			{
-
 				string cmdCreateTableTiles = @"CREATE TABLE tiles(
 tile_set     INTEGER REFERENCES tilesets (id) ON DELETE CASCADE ON UPDATE CASCADE,
 zoom_level   INTEGER NOT NULL,
@@ -122,6 +127,7 @@ tile_data    BLOB    NOT NULL,
 timestamp    INTEGER NOT NULL,
 etag         TEXT,
 lastmodified INTEGER,
+offlineMapTags TEXT,
 	PRIMARY KEY(
 		tile_set ASC,
 		zoom_level ASC,
@@ -198,17 +204,19 @@ lastmodified INTEGER,
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_WSA
 			dbPath = Path.GetFullPath(dbPath);
 #endif
-			if (!Directory.Exists(dbPath)) { Directory.CreateDirectory(dbPath); }
+			if (!Directory.Exists(dbPath))
+			{
+				Directory.CreateDirectory(dbPath);
+			}
+
 			dbPath = Path.Combine(dbPath, dbName);
 
 			return dbPath;
 		}
 
 
-
 		public void Add(string tilesetName, CanonicalTileId tileId, CacheItem item, bool forceInsert = false)
 		{
-
 #if MAPBOX_DEBUG_CACHE
 			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
 			UnityEngine.Debug.LogFormat("{0} {1} {2} forceInsert:{3}", methodName, tileset, tileId, forceInsert);
@@ -247,8 +255,9 @@ lastmodified INTEGER,
 					tile_column = tileId.X,
 					tile_row = tileId.Y,
 					tile_data = item.Data,
-					timestamp = (int)UnixTimestampUtils.To(DateTime.Now),
-					etag = item.ETag
+					timestamp = (int) UnixTimestampUtils.To(DateTime.Now),
+					etag = item.ETag,
+					offlineMapTags = ""
 				});
 				if (1 != rowsAffected)
 				{
@@ -265,20 +274,52 @@ lastmodified INTEGER,
 			{
 				_pruneCacheCounter++;
 			}
+
 			if (0 == _pruneCacheCounter % _pruneCacheDelta)
 			{
 				_pruneCacheCounter = 0;
-				prune();
+				//prune();
+				pruneNonOfflineTiles();
 			}
 		}
 
 
 		private void prune()
 		{
-
 			long tileCnt = _sqlite.ExecuteScalar<long>("SELECT COUNT(zoom_level) FROM tiles");
 
-			if (tileCnt < _maxTileCount) { return; }
+			if (tileCnt < _maxTileCount)
+			{
+				return;
+			}
+
+			long toDelete = tileCnt - _maxTileCount;
+
+#if MAPBOX_DEBUG_CACHE
+			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
+			Debug.LogFormat("{0} {1} about to prune()", methodName, _tileset);
+#endif
+
+			try
+			{
+				// no 'ORDER BY' or 'LIMIT' possible if sqlite hasn't been compiled with 'SQLITE_ENABLE_UPDATE_DELETE_LIMIT'
+				// https://sqlite.org/compile.html#enable_update_delete_limit
+				_sqlite.Execute("DELETE FROM tiles WHERE rowid IN ( SELECT rowid FROM tiles WHERE offlineMapTags == \"\" ORDER BY timestamp ASC LIMIT ? );", toDelete);
+			}
+			catch (Exception ex)
+			{
+				Debug.LogErrorFormat("error pruning: {0}", ex);
+			}
+		}
+
+		private void pruneNonOfflineTiles()
+		{
+			long tileCnt = _sqlite.ExecuteScalar<long>("SELECT COUNT(zoom_level) FROM tiles");
+
+			if (tileCnt < _maxTileCount)
+			{
+				return;
+			}
 
 			long toDelete = tileCnt - _maxTileCount;
 
@@ -328,7 +369,7 @@ lastmodified INTEGER,
 						&& t.zoom_level == tileId.Z
 						&& t.tile_column == tileId.X
 						&& t.tile_row == tileId.Y
-						)
+					)
 					.FirstOrDefault();
 			}
 			catch (Exception ex)
@@ -336,13 +377,17 @@ lastmodified INTEGER,
 				Debug.LogErrorFormat("error getting tile {1} {2} from cache{0}{3}", Environment.NewLine, tilesetName, tileId, ex);
 				return null;
 			}
+
 			if (null == tile)
 			{
 				return null;
 			}
 
 			DateTime? lastModified = null;
-			if (tile.lastmodified.HasValue) { lastModified = UnixTimestampUtils.From((double)tile.lastmodified.Value); }
+			if (tile.lastmodified.HasValue)
+			{
+				lastModified = UnixTimestampUtils.From((double) tile.lastmodified.Value);
+			}
 
 			return new CacheItem()
 			{
@@ -353,6 +398,20 @@ lastmodified INTEGER,
 			};
 		}
 
+		private tiles GetTile(CanonicalTileId tileId, int tilesetId)
+		{
+			tiles tile;
+			tile = _sqlite
+				.Table<tiles>()
+				.Where(t =>
+					t.tile_set == tilesetId
+					&& t.zoom_level == tileId.Z
+					&& t.tile_column == tileId.X
+					&& t.tile_row == tileId.Y
+				)
+				.FirstOrDefault();
+			return tile;
+		}
 
 		/// <summary>
 		/// Check if tile exists
@@ -374,22 +433,22 @@ lastmodified INTEGER,
 					&& t.zoom_level == tileId.Z
 					&& t.tile_column == tileId.X
 					&& t.tile_row == tileId.Y
-					)
+				)
 				.FirstOrDefault();
 		}
-
 
 		private int insertTileset(string tilesetName)
 		{
 			try
 			{
 				_sqlite.BeginTransaction(true);
-				tilesets newTileset = new tilesets { name = tilesetName };
+				tilesets newTileset = new tilesets {name = tilesetName};
 				int rowsAffected = _sqlite.Insert(newTileset);
 				if (1 != rowsAffected)
 				{
 					throw new Exception(string.Format("tileset [{0}] was not inserted, rows affected:{1}", tilesetName, rowsAffected));
 				}
+
 				return newTileset.id;
 			}
 			catch (Exception ex)
@@ -403,16 +462,14 @@ lastmodified INTEGER,
 			}
 		}
 
-
 		private int? getTilesetId(string tilesetName)
 		{
 			tilesets tileset = _sqlite
 				.Table<tilesets>()
 				.Where(ts => ts.name.Equals(tilesetName))
 				.FirstOrDefault();
-			return null == tileset ? (int?)null : tileset.id;
+			return null == tileset ? (int?) null : tileset.id;
 		}
-
 
 		/// <summary>
 		/// FOR INTERNAL DEBUGGING ONLY - DON'T RELY ON IN PRODUCTION
@@ -422,14 +479,16 @@ lastmodified INTEGER,
 		public long TileCount(string tilesetName)
 		{
 			int? tilesetId = getTilesetId(tilesetName);
-			if (!tilesetId.HasValue) { return 0; }
+			if (!tilesetId.HasValue)
+			{
+				return 0;
+			}
 
 			return _sqlite
 				.Table<tiles>()
 				.Where(t => t.tile_set == tilesetId.Value)
 				.LongCount();
 		}
-
 
 		/// <summary>
 		/// Clear cache for one tile set
@@ -438,7 +497,11 @@ lastmodified INTEGER,
 		public void Clear(string tilesetName)
 		{
 			int? tilesetId = getTilesetId(tilesetName);
-			if (!tilesetId.HasValue) { return; }
+			if (!tilesetId.HasValue)
+			{
+				return;
+			}
+
 			//just delete on table 'tilesets', we've setup cascading which should take care of tabls 'tiles'
 			_sqlite.Delete<tilesets>(tilesetId.Value);
 		}
@@ -451,7 +514,10 @@ lastmodified INTEGER,
 		public void Clear()
 		{
 			//already disposed
-			if (null == _sqlite) { return; }
+			if (null == _sqlite)
+			{
+				return;
+			}
 
 			_sqlite.Close();
 			_sqlite.Dispose();
@@ -481,5 +547,151 @@ lastmodified INTEGER,
 			File.Delete(_dbPath);
 		}
 
+		public void AddOffline(string tilesetName, string offlineMapName, CanonicalTileId tileId, CacheItem cacheItem, bool forceInsert)
+		{
+			try
+			{
+				int? tilesetId = null;
+				lock (_lock)
+				{
+					tilesetId = getTilesetId(tilesetName);
+					if (!tilesetId.HasValue)
+					{
+						tilesetId = insertTileset(tilesetName);
+					}
+				}
+
+				var tile = GetTile(tileId, tilesetId.Value);
+				if (tile != null)
+				{
+					//UpdateTileOfflineTag(tile, offlineMapName);
+					UpdateOfflineTile(offlineMapName, tile, true);
+					//_sqlite.Update(tile);
+					return;
+				}
+
+
+				if (tilesetId < 0)
+				{
+					Debug.LogErrorFormat("could not get tilesetID for [{0}] tile: {1}", tilesetName, tileId);
+					return;
+				}
+
+				int rowsAffected = _sqlite.InsertOrReplace(new tiles
+				{
+					tile_set = tilesetId.Value,
+					zoom_level = tileId.Z,
+					tile_column = tileId.X,
+					tile_row = tileId.Y,
+					tile_data = cacheItem.Data,
+					timestamp = (int) UnixTimestampUtils.To(DateTime.Now),
+					etag = cacheItem.ETag,
+					offlineMapTags = offlineMapName
+				});
+				if (1 != rowsAffected)
+				{
+					throw new Exception(string.Format("tile [{0} / {1}] was not inserted, rows affected:{2}", tilesetName, tileId, rowsAffected));
+				}
+			}
+			catch (Exception ex)
+			{
+				Debug.LogErrorFormat("Error inserting {0} {1} {2} ", tilesetName, tileId, ex);
+			}
+		}
+
+		private void UpdateOfflineTile(string offlineMapName, tiles tile, bool add)
+		{
+			string tagString = "";
+			if (string.IsNullOrWhiteSpace(tile.offlineMapTags))
+			{
+				tagString = offlineMapName;
+			}
+			else
+			{
+				var tagArray = tile.offlineMapTags.Split(',').ToList();
+				if (add && !tagArray.Contains(offlineMapName))
+				{
+					tagArray.Add(offlineMapName);
+				}
+				else if (!add && tagArray.Contains(offlineMapName))
+				{
+					tagArray.Remove(offlineMapName);
+				}
+
+				tagString = string.Join(",", tagArray);
+			}
+
+			try
+			{
+				var query = string.Format("UPDATE tiles SET offlineMapTags = '{0}' WHERE tile_set={1} AND zoom_level={2} AND tile_column={3} AND tile_row={4};",
+					tagString,
+					tile.tile_set,
+					tile.zoom_level,
+					tile.tile_column,
+					tile.tile_row);
+				_sqlite.Execute(query);
+			}
+			catch (Exception ex)
+			{
+				Debug.LogErrorFormat("error adding offline tile name to : {0}", ex);
+			}
+		}
+
+		public void DeleteOfflineMap(string offlineMapName)
+		{
+			var tiles = _sqlite
+				.Table<tiles>()
+				.Where(t => t.offlineMapTags.Contains(offlineMapName));
+
+			foreach (var tile in tiles)
+			{
+				UpdateOfflineTile(offlineMapName, tile, false);
+			}
+		}
+
+		public int GetTileCountOfMap(string offlineMapName)
+		{
+			return _sqlite
+				.Table<tiles>()
+				.Where(t => t.offlineMapTags.Contains(offlineMapName))
+				.Count();
+		}
+
+		public int GetOfflineTileCount()
+		{
+			return _sqlite
+				.Table<tiles>()
+				.Where(t => t.offlineMapTags != "")
+				.Count();
+		}
+
+		public Dictionary<string, int> GetOfflineMapList()
+		{
+			var mapList = new Dictionary<string, int>();
+			var tiles = _sqlite
+				.Table<tiles>()
+				.Where(t => t.offlineMapTags != "");
+
+			foreach (var tile in tiles)
+			{
+				if (!string.IsNullOrWhiteSpace(tile.offlineMapTags))
+				{
+					var maps = tile.offlineMapTags.Split(',');
+					foreach (var mapName in maps)
+					{
+						if (!mapList.ContainsKey(mapName))
+						{
+							mapList.Add(mapName, 1);
+						}
+						else
+						{
+							mapList[mapName]++;
+						}
+					}
+				}
+			}
+
+			return mapList;
+		}
 	}
 }
