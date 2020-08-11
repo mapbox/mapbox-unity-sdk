@@ -168,13 +168,8 @@ namespace Mapbox.Platform.Cache
 				callback(Response.FromCache(cachedItem.Data));
 
 				// check for updated tiles online if this is enabled in the settings
-				if (cachedItem.ExpirationDate > DateTime.Now)
+				if (cachedItem.ExpirationDate < DateTime.Now)
 				{
-					Debug.Log("not refreshing");
-				}
-				else
-				{
-					Debug.Log("refreshing");
 					// check if tile on the web is newer than the one we already have locally
 					IAsyncRequestFactory.CreateRequest(
 						finalUrl,
@@ -194,14 +189,13 @@ namespace Mapbox.Platform.Cache
 							// additional ETag empty check: for backwards compability with old caches
 							if (response.StatusCode == 304) // 304 NOT MODIFIED
 							{
-								Debug.Log("304");
 								var cacheControlValue = int.Parse(response.Headers["Cache-Control"].Split(',')[0].Split('=')[1]);
 								var cacheToTime = DateTime.Now + TimeSpan.FromSeconds(cacheControlValue);
 								cachedItem.ExpirationDate = cacheToTime;
 							}
 							else if(response.StatusCode == 200) // 200 OK, it means etag&data has changed so need to update cache
 							{
-								Debug.Log("200");
+								Debug.Log("200 - Updating cache");
 								string eTag = string.Empty;
 								DateTime expirationDate = DateTime.Now;
 								DateTime? lastModified = null;
