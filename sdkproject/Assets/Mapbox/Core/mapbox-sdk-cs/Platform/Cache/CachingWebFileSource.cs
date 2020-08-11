@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.UNetWeaver;
+using UnityEngine;
 
 namespace Mapbox.Platform.Cache
 {
@@ -23,7 +24,6 @@ namespace Mapbox.Platform.Cache
 		private string _accessToken;
 		private Func<string> _getMapsSkuToken;
 		private bool _autoRefreshCache;
-
 
 		public CachingWebFileSource(string accessToken, Func<string> getMapsSkuToken, bool autoRefreshCache)
 		{
@@ -168,7 +168,7 @@ namespace Mapbox.Platform.Cache
 				callback(Response.FromCache(cachedItem.Data));
 
 				// check for updated tiles online if this is enabled in the settings
-				if (cachedItem.LastModified > DateTime.Now)
+				if (cachedItem.ExpirationDate > DateTime.Now)
 				{
 					Debug.Log("not refreshing");
 				}
@@ -178,57 +178,68 @@ namespace Mapbox.Platform.Cache
 					// check if tile on the web is newer than the one we already have locally
 					IAsyncRequestFactory.CreateRequest(
 						finalUrl,
-						(Response headerOnly) =>
+						timeout,
+						"If-None-Match", cachedItem.ETag,
+						(Response response) =>
 						{
 							// on error getting information from API just return. tile we have locally has already been returned above
-							if (headerOnly.HasError)
+							if (response.HasError || response.StatusCode == null)
 							{
 								return;
 							}
-
-							// TODO: remove Debug.Log before PR
-							//UnityEngine.Debug.LogFormat(
-							//	"{1}{0}cached:{2}{0}header:{3}"
-							//	, Environment.NewLine
-							//	, finalUrl
-							//	, cachedItem.ETag
-							//	, headerOnly.Headers["ETag"]
-							//);
 
 							// data from cache is the same as on the web:
 							//   * tile has already been returned above
 							//   * make sure all all other caches have it too, but don't force insert via cache.add(false)
 							// additional ETag empty check: for backwards compability with old caches
-							if (!string.IsNullOrEmpty(cachedItem.ETag) && cachedItem.ETag.Equals(headerOnly.Headers["ETag"]))
+							if (response.StatusCode == 304) // 304 NOT MODIFIED
 							{
-								var cacheControlValue = int.Parse(headerOnly.Headers["Cache-Control"].Split(',')[0].Split('=')[1]);
+								Debug.Log("304");
+								var cacheControlValue = int.Parse(response.Headers["Cache-Control"].Split(',')[0].Split('=')[1]);
 								var cacheToTime = DateTime.Now + TimeSpan.FromSeconds(cacheControlValue);
 								cachedItem.ExpirationDate = cacheToTime;
+							}
+							else if(response.StatusCode == 200) // 200 OK, it means etag&data has changed so need to update cache
+							{
+								Debug.Log("200");
+								string eTag = string.Empty;
+								DateTime expirationDate = DateTime.Now;
+								DateTime? lastModified = null;
 
-								foreach (var cache in _caches)
+								if (response.Headers.ContainsKey("ETag"))
 								{
-									cache.Add(tilesetId, tileId, cachedItem, true);
+									eTag = response.Headers["ETag"];
 								}
+
+								// not all APIs populate 'Last-Modified' header
+								// don't log error if it's missing
+								if (response.Headers.ContainsKey("Last-Modified"))
+								{
+									lastModified = DateTime.ParseExact(response.Headers["Last-Modified"], "r", null);
+								}
+
+								if (response.Headers.ContainsKey("Cache-Control"))
+								{
+									var cacheControlValue = int.Parse(response.Headers["Cache-Control"].Split(',')[0].Split('=')[1]);
+									var cacheToTime = DateTime.Now + TimeSpan.FromSeconds(cacheControlValue);
+									expirationDate = cacheToTime;
+								}
+
+								cachedItem.Data = response.Data;
+								cachedItem.ETag = eTag;
+								cachedItem.LastModified = lastModified;
+								cachedItem.ExpirationDate = expirationDate;
 							}
 							else
 							{
-								// TODO: remove Debug.Log before PR
-								UnityEngine.Debug.LogWarningFormat(
-										"updating cached tile {1} tilesetId:{2}{0}cached etag:{3}{0}remote etag:{4}{0}{5}"
-										, Environment.NewLine
-										, tileId
-										, tilesetId
-										, cachedItem.ETag
-										, headerOnly.Headers["ETag"]
-										, finalUrl
-									);
+								Debug.Log(response.StatusCode);
+							}
 
-								// request updated tile and pass callback to return new data to subscribers
-								requestTileAndCache(finalUrl, tilesetId, tileId, timeout, callback);
+							foreach (var cache in _caches)
+							{
+								cache.Add(tilesetId, tileId, cachedItem, true);
 							}
 						}
-						, timeout
-						, HttpRequestType.Head
 					);
 				}
 
@@ -277,7 +288,7 @@ namespace Mapbox.Platform.Cache
 						if (r.Headers.ContainsKey("Cache-Control"))
 						{
 							var cacheControlValue = int.Parse(r.Headers["Cache-Control"].Split(',')[0].Split('=')[1]);
-							var cacheToTime = DateTime.Now + TimeSpan.FromSeconds(cacheControlValue);
+							var cacheToTime = DateTime.Now + TimeSpan.FromSeconds(60);
 							expirationDate = cacheToTime;
 						}
 
