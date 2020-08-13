@@ -14,8 +14,6 @@ namespace Mapbox.Platform.Cache
 
 	public class CachingWebFileSource : IFileSource, IDisposable
 	{
-
-
 #if MAPBOX_DEBUG_CACHE
 		private string _className;
 #endif
@@ -24,6 +22,10 @@ namespace Mapbox.Platform.Cache
 		private string _accessToken;
 		private Func<string> _getMapsSkuToken;
 		private bool _autoRefreshCache;
+
+		private const string EtagHeaderName = "ETag";
+		private const string LastModifiedHeaderName = "Last-Modified";
+		private const string CacheControlHeaderName = "Cache-Control";
 
 		public CachingWebFileSource(string accessToken, Func<string> getMapsSkuToken, bool autoRefreshCache)
 		{
@@ -36,8 +38,7 @@ namespace Mapbox.Platform.Cache
 		}
 
 
-#region idisposable
-
+		#region idisposable
 
 		~CachingWebFileSource()
 		{
@@ -66,12 +67,12 @@ namespace Mapbox.Platform.Cache
 						}
 					}
 				}
+
 				_disposed = true;
 			}
 		}
 
-
-#endregion
+		#endregion
 
 
 		/// <summary>
@@ -104,7 +105,8 @@ namespace Mapbox.Platform.Cache
 		}
 
 
-		public void ReInit() {
+		public void ReInit()
+		{
 			foreach (var cache in _caches)
 			{
 				cache.ReInit();
@@ -120,7 +122,6 @@ namespace Mapbox.Platform.Cache
 			, string tilesetId = null
 		)
 		{
-
 			if (string.IsNullOrEmpty(tilesetId))
 			{
 				throw new Exception("Cannot cache without a tileset id");
@@ -152,6 +153,7 @@ namespace Mapbox.Platform.Cache
 					uriBuilder.Query = accessTokenQuery + "&" + mapsSkuToken;
 				}
 			}
+
 			string finalUrl = uriBuilder.ToString();
 
 #if MAPBOX_DEBUG_CACHE
@@ -189,50 +191,30 @@ namespace Mapbox.Platform.Cache
 							// additional ETag empty check: for backwards compability with old caches
 							if (response.StatusCode == 304) // 304 NOT MODIFIED
 							{
-								var cacheControlValue = int.Parse(response.Headers["Cache-Control"].Split(',')[0].Split('=')[1]);
-								var cacheToTime = DateTime.Now + TimeSpan.FromSeconds(cacheControlValue);
-								cachedItem.ExpirationDate = cacheToTime;
+								cachedItem.ExpirationDate = GetExpirationDate(response);
 							}
-							else if(response.StatusCode == 200) // 200 OK, it means etag&data has changed so need to update cache
+							else if (response.StatusCode == 200) // 200 OK, it means etag&data has changed so need to update cache
 							{
-								Debug.Log("200 - Updating cache");
-								string eTag = string.Empty;
-								DateTime expirationDate = DateTime.Now;
-								DateTime? lastModified = null;
-
-								if (response.Headers.ContainsKey("ETag"))
-								{
-									eTag = response.Headers["ETag"];
-								}
+								string eTag = ETag(response);
 
 								// not all APIs populate 'Last-Modified' header
 								// don't log error if it's missing
-								if (response.Headers.ContainsKey("Last-Modified"))
-								{
-									lastModified = DateTime.ParseExact(response.Headers["Last-Modified"], "r", null);
-								}
+								DateTime? lastModified = GetLastModified(response);
 
-								if (response.Headers.ContainsKey("Cache-Control"))
-								{
-									var cacheControlValue = int.Parse(response.Headers["Cache-Control"].Split(',')[0].Split('=')[1]);
-									var cacheToTime = DateTime.Now + TimeSpan.FromSeconds(cacheControlValue);
-									expirationDate = cacheToTime;
-								}
+								DateTime expirationDate = GetExpirationDate(response);
 
 								cachedItem.Data = response.Data;
 								cachedItem.ETag = eTag;
 								cachedItem.LastModified = lastModified;
 								cachedItem.ExpirationDate = expirationDate;
 							}
-							else
-							{
-								Debug.Log(response.StatusCode);
-							}
 
 							foreach (var cache in _caches)
 							{
 								cache.Add(tilesetId, tileId, cachedItem, true);
 							}
+
+							callback(Response.FromCache(cachedItem.Data));
 						}
 					);
 				}
@@ -249,42 +231,22 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 
-
 		private IAsyncRequest requestTileAndCache(string url, string tilesetId, CanonicalTileId tileId, int timeout, Action<Response> callback)
 		{
 			return IAsyncRequestFactory.CreateRequest(
 				url,
-				(Response r) =>
+				(Response response) =>
 				{
 					// if the request was successful add tile to all caches
-					if (!r.HasError && null != r.Data)
+					if (!response.HasError && null != response.Data)
 					{
-						string eTag = string.Empty;
-						DateTime expirationDate = DateTime.Now;
-						DateTime? lastModified = null;
-
-						if (!r.Headers.ContainsKey("ETag"))
-						{
-							UnityEngine.Debug.LogWarningFormat("no 'ETag' header present in response for {0}", url);
-						}
-						else
-						{
-							eTag = r.Headers["ETag"];
-						}
+						string eTag = ETag(response);
 
 						// not all APIs populate 'Last-Modified' header
 						// don't log error if it's missing
-						if (r.Headers.ContainsKey("Last-Modified"))
-						{
-							lastModified = DateTime.ParseExact(r.Headers["Last-Modified"], "r", null);
-						}
+						DateTime? lastModified = GetLastModified(response);
 
-						if (r.Headers.ContainsKey("Cache-Control"))
-						{
-							var cacheControlValue = int.Parse(r.Headers["Cache-Control"].Split(',')[0].Split('=')[1]);
-							var cacheToTime = DateTime.Now + TimeSpan.FromSeconds(60);
-							expirationDate = cacheToTime;
-						}
+						DateTime expirationDate = GetExpirationDate(response);
 
 						// propagate to all caches forcing update
 						foreach (var cache in _caches)
@@ -294,7 +256,7 @@ namespace Mapbox.Platform.Cache
 								, tileId
 								, new CacheItem()
 								{
-									Data = r.Data,
+									Data = response.Data,
 									ETag = eTag,
 									LastModified = lastModified,
 									ExpirationDate = expirationDate
@@ -303,19 +265,67 @@ namespace Mapbox.Platform.Cache
 							);
 						}
 					}
+
 					if (null != callback)
 					{
-						r.IsUpdate = true;
-						callback(r);
+						response.IsUpdate = true;
+						callback(response);
 					}
 				}, timeout);
+		}
+
+		private string ETag(Response response)
+		{
+			string eTag = String.Empty;
+			if (!response.Headers.ContainsKey(EtagHeaderName))
+			{
+				Debug.LogWarning("no 'ETag' header present in response");
+			}
+			else
+			{
+				eTag = response.Headers[EtagHeaderName];
+			}
+
+			return eTag;
+		}
+
+		private DateTime? GetLastModified(Response response)
+		{
+			DateTime? lastModified = null;
+			if (response.Headers.ContainsKey(LastModifiedHeaderName))
+			{
+				lastModified = DateTime.ParseExact(response.Headers[LastModifiedHeaderName], "r", null);
+			}
+
+			return lastModified;
+		}
+
+		private DateTime GetExpirationDate(Response response)
+		{
+			DateTime expirationDate = DateTime.Now;
+			if (response.Headers.ContainsKey(CacheControlHeaderName))
+			{
+				var cacheEntries = response.Headers[CacheControlHeaderName].Split(',');
+				if (cacheEntries.Length > 0)
+				{
+					foreach (var entry in cacheEntries)
+					{
+						var value = entry.Split('=');
+						if (value[0] == "max-age")
+						{
+							expirationDate = expirationDate + TimeSpan.FromSeconds(int.Parse(value[1]));
+							return expirationDate;
+						}
+					}
+				}
+			}
+
+			return expirationDate;
 		}
 
 
 		class MemoryCacheAsyncRequest : IAsyncRequest
 		{
-
-
 			public string RequestUrl { get; private set; }
 
 
@@ -327,14 +337,14 @@ namespace Mapbox.Platform.Cache
 
 			public bool IsCompleted
 			{
-				get
-				{
-					return true;
-				}
+				get { return true; }
 			}
 
 
-			public HttpRequestType RequestType { get { return HttpRequestType.Get; } }
+			public HttpRequestType RequestType
+			{
+				get { return HttpRequestType.Get; }
+			}
 
 
 			public void Cancel()
