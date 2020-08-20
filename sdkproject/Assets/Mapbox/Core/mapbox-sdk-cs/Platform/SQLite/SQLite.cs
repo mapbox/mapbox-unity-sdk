@@ -31,7 +31,7 @@ using System.Reflection;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
-
+using Mapbox.Platform.Cache;
 #if USE_CSHARP_SQLITE
 using Sqlite3 = Community.CsharpSqlite.Sqlite3;
 using Sqlite3DatabaseHandle = Community.CsharpSqlite.Sqlite3.sqlite3;
@@ -1594,6 +1594,8 @@ namespace SQLite4Unity3d
 				}
 			}
 		}
+
+
 	}
 
 	/// <summary>

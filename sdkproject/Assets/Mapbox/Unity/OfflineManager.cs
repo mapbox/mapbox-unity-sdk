@@ -40,9 +40,16 @@ public class OfflineManager
 		_getMapsSkuToken = getMapsSkuToken;
 	}
 
-	public int GetTileCountOfMap(string offlineMapName)
+	public void SetOfflineCache(SQLiteCache sqliteCache)
 	{
-		return _offlineCache.GetTileCountOfMap(offlineMapName);
+		_offlineCache = sqliteCache;
+	}
+
+
+	//QUERY
+	public int GetAmbientTileCount()
+	{
+		return _offlineCache.GetAmbientTileCount();
 	}
 
 	public int GetOfflineTileCount()
@@ -50,32 +57,29 @@ public class OfflineManager
 		return _offlineCache.GetOfflineTileCount();
 	}
 
+	public int GetOfflineTileCount(string offlineMapName)
+	{
+		return _offlineCache.GetOfflineTileCount(offlineMapName);
+	}
+
+	public int GetOfflineDataSize(int mapId)
+	{
+		return _offlineCache.GetOfflineDataSize(mapId);
+	}
+
+	public int GetOfflineDataSize(string mapName)
+	{
+		return _offlineCache.GetOfflineDataSize(mapName);
+	}
+
 	public Dictionary<string, int> GetOfflineMapList()
 	{
 		return _offlineCache.GetOfflineMapList();
 	}
 
-	public void SetOfflineCache(SQLiteCache sqliteCache)
-	{
-		_offlineCache = sqliteCache;
-	}
-
-	public void DeleteOfflineMap(string offlineMapName)
-	{
-		NewLog("Starting to delete resources of offline map: " + offlineMapName);
-		_offlineCache.DeleteOfflineMap(offlineMapName);
-		NewLog("Finished deleting the resources of offline map: " + offlineMapName);
-	}
-
-	public void RequestTile(OfflineTileType type, CanonicalTileId tileId, string tilesetId, string offlineMapName, Action<Response> callback)
-	{
-		var uri = GetUri(type, tileId, tilesetId);
-		Request(uri, tileId, tilesetId, offlineMapName, callback);
-	}
-
+	//OPERATIONS
 	public OfflineMapResponse CreateOfflineMap(string cacheName, OfflineRegion region)
 	{
-
 		var tiles = EstimatedTileList(region);
 		if (tiles.Count <= 0)
 		{
@@ -100,7 +104,7 @@ public class OfflineManager
 		if (capacityLeft < tiles.Count)
 		{
 			_offlineMapDownloadInfo = new OfflineMapDownloadInfo(cacheName, capacityLeft);
-			_currentCoroutine = Runnable.Run(DownloadCoroutine(cacheName, tiles.Take(capacityLeft).ToList()));
+			_currentCoroutine = Runnable.Run(DownloadTileListCoroutine(cacheName, tiles.Take(capacityLeft).ToList()));
 			return new OfflineMapResponse()
 			{
 				HasErrors = true,
@@ -110,13 +114,72 @@ public class OfflineManager
 		else
 		{
 			_offlineMapDownloadInfo = new OfflineMapDownloadInfo(cacheName, tiles.Count);
-			_currentCoroutine = Runnable.Run(DownloadCoroutine(cacheName, tiles));
+			_currentCoroutine = Runnable.Run(DownloadTileListCoroutine(cacheName, tiles));
 			return new OfflineMapResponse()
 			{
 				HasErrors = false,
 				ErrorMessage = "Downloading " + tiles.Count + " tiles."
 			};
 		}
+	}
+
+	public void DeleteOfflineMap(string offlineMapName)
+	{
+		NewLog("Starting to delete resources of offline map: " + offlineMapName);
+		_offlineCache.DeleteOfflineMap(offlineMapName);
+		NewLog("Finished deleting the resources of offline map: " + offlineMapName);
+	}
+
+
+	private void RequestTile(OfflineTileType type, CanonicalTileId tileId, string tilesetId, int offlineMapId, Action<Response> callback)
+	{
+		var requestUrl = CreateTileRequestUrl(type, tileId, tilesetId);
+
+		IAsyncRequestFactory.CreateRequest(
+			requestUrl,
+			(Response r) =>
+			{
+				// if the request was successful add tile to all caches
+				if (!r.HasError && null != r.Data)
+				{
+					string eTag = string.Empty;
+					if (!r.Headers.ContainsKey("ETag"))
+					{
+						Debug.LogWarningFormat("no 'ETag' header present in response for {0}", requestUrl);
+					}
+					else
+					{
+						eTag = r.Headers["ETag"];
+					}
+
+					_offlineMapDownloadInfo.SuccesfulTileDownloads++;
+					_offlineCache.Add(
+						tilesetId
+						, tileId
+						, new CacheItem()
+						{
+							Data = r.Data,
+							ETag = eTag
+						}
+						, true
+					);
+					_offlineCache.MarkOffline(offlineMapId, tilesetId, tileId);
+				}
+				else
+				{
+					_offlineMapDownloadInfo.FailedTileDownloads++;
+					_offlineMapDownloadInfo.FailedDownloadLogs.Add(string.Format("Download Failed. TileId: {0}, Tileset:{1}, Error:{2}",
+						tileId,
+						tilesetId,
+						r.ExceptionsAsString));
+				}
+
+				if (null != callback)
+				{
+					r.IsUpdate = true;
+					callback(r);
+				}
+			}, 10);
 	}
 
 	public List<OfflineTileInfo> EstimatedTileList(OfflineRegion region)
@@ -206,14 +269,48 @@ public class OfflineManager
 	}
 
 	//PRIVATE
-	private void Request(
-		string uri
-		, CanonicalTileId tileId
-		, string tilesetId
-		, string offlineMapName
-		, Action<Response> callback
-	)
+	private IEnumerator DownloadTileListCoroutine(string cacheName, List<OfflineTileInfo> tiles)
 	{
+		_currentlyDownloadedFileCount = 0;
+		_currentlyRequestedFileCount = 0;
+		_totalTileCount = tiles.Count;
+
+		_isDownloading = true;
+		NewLog(string.Format("Starting download of offline map '{0}' ({1} tiles)", cacheName, _totalTileCount));
+
+		var batchSize = 5;
+		var currentBatchSize = 0;
+
+		var offlineMapId = _offlineCache.GetOrAddOfflineMapId(cacheName);
+
+		while (_currentlyRequestedFileCount < _totalTileCount)
+		{
+			foreach (var tile in tiles)
+			{
+				if (!_offlineCache.TileExists(tile.TilesetId, tile.CanonicalTileId))
+				{
+					RequestTile(tile.Type, tile.CanonicalTileId, tile.TilesetId, offlineMapId, HandleOfflineRequestResponse);
+				}
+				else
+				{
+					_offlineCache.MarkOffline(offlineMapId, tile.TilesetId, tile.CanonicalTileId);
+				}
+
+				_currentlyRequestedFileCount++;
+				currentBatchSize++;
+
+				if (currentBatchSize > batchSize)
+				{
+					currentBatchSize = 0;
+					yield return new WaitForSeconds(1f);
+				}
+			}
+		}
+	}
+
+	private string CreateTileRequestUrl(OfflineTileType type, CanonicalTileId tileId, string tilesetId)
+	{
+		var uri = GetUriForDataType(type, tileId, tilesetId);
 		if (string.IsNullOrEmpty(tilesetId))
 		{
 			throw new Exception("Cannot cache without a tileset id");
@@ -224,82 +321,22 @@ public class OfflineManager
 		{
 			string accessTokenQuery = "access_token=" + _accessToken;
 			string mapsSkuToken = "sku=" + _getMapsSkuToken();
+			string offlineRequest = "events=true";
 			if (uriBuilder.Query.Length > 1)
 			{
-				uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery + "&" + mapsSkuToken;
+				uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery + "&" + mapsSkuToken + "&" + offlineRequest;
 			}
 			else
 			{
-				uriBuilder.Query = accessTokenQuery + "&" + mapsSkuToken;
+				uriBuilder.Query = accessTokenQuery + "&" + mapsSkuToken + "&" + offlineRequest;
 			}
 		}
 
-		string finalUrl = uriBuilder.ToString();
-
-		RequestTileAndCache(finalUrl, tilesetId, tileId, offlineMapName, callback);
+		string url = uriBuilder.ToString();
+		return url;
 	}
 
-	private void RequestTileAndCache(string url, string tilesetId, CanonicalTileId tileId, string offlineMapName, Action<Response> callback)
-	{
-		IAsyncRequestFactory.CreateRequest(
-			url,
-			(Response r) =>
-			{
-				// if the request was successful add tile to all caches
-				if (!r.HasError && null != r.Data)
-				{
-					string eTag = string.Empty;
-					DateTime? lastModified = null;
-
-					if (!r.Headers.ContainsKey("ETag"))
-					{
-						UnityEngine.Debug.LogWarningFormat("no 'ETag' header present in response for {0}", url);
-					}
-					else
-					{
-						eTag = r.Headers["ETag"];
-					}
-
-					// not all APIs populate 'Last-Modified' header
-					// don't log error if it's missing
-					if (r.Headers.ContainsKey("Last-Modified"))
-					{
-						lastModified = DateTime.ParseExact(r.Headers["Last-Modified"], "r", null);
-					}
-
-					_offlineMapDownloadInfo.SuccesfulTileDownloads++;
-
-					_offlineCache.AddOffline(
-						tilesetId
-						, offlineMapName
-						, tileId
-						, new CacheItem()
-						{
-							Data = r.Data,
-							ETag = eTag,
-							LastModified = lastModified
-						}
-						, true // force insert/update
-					);
-				}
-				else
-				{
-					_offlineMapDownloadInfo.FailedTileDownloads++;
-					_offlineMapDownloadInfo.FailedDownloadLogs.Add(string.Format("Download Failed. TileId: {0}, Tileset:{1}, Error:{2}",
-						tileId,
-						tilesetId,
-						r.ExceptionsAsString));
-				}
-
-				if (null != callback)
-				{
-					r.IsUpdate = true;
-					callback(r);
-				}
-			}, 10);
-	}
-
-	private string GetUri(OfflineTileType type, CanonicalTileId tileId, string tilesetId)
+	private string GetUriForDataType(OfflineTileType type, CanonicalTileId tileId, string tilesetId)
 	{
 		switch (type)
 		{
@@ -320,35 +357,7 @@ public class OfflineManager
 		}
 	}
 
-	private IEnumerator DownloadCoroutine(string cacheName, List<OfflineTileInfo> tiles)
-	{
-		_currentlyDownloadedFileCount = 0;
-		_currentlyRequestedFileCount = 0;
-		_totalTileCount = tiles.Count;
-
-		_isDownloading = true;
-		NewLog(string.Format("Starting download of offline map '{0}' ({1} tiles)", cacheName, _totalTileCount));
-
-		var batchSize = 5;
-		var currentBatchSize = 0;
-		while (_currentlyRequestedFileCount < _totalTileCount)
-		{
-			foreach (var tile in tiles)
-			{
-				RequestTile(tile.Type, tile.CanonicalTileId, tile.TilesetId, cacheName, OfflineRequestCallback);
-				_currentlyRequestedFileCount++;
-				currentBatchSize++;
-
-				if (currentBatchSize > batchSize)
-				{
-					currentBatchSize = 0;
-					yield return new WaitForSeconds(1f);
-				}
-			}
-		}
-	}
-
-	private void OfflineRequestCallback(Response obj)
+	private void HandleOfflineRequestResponse(Response obj)
 	{
 		_currentlyDownloadedFileCount++;
 		Progress = (float) _currentlyDownloadedFileCount / _totalTileCount;

@@ -21,21 +21,6 @@ namespace Mapbox.Platform.Cache
 		public string name { get; set; }
 	}
 
-	public class offlinemaps
-	{
-		[PrimaryKey, AutoIncrement]
-		public int id { get; set; }
-
-		public string name { get; set; }
-	}
-
-	public class offlinemaptotile
-	{
-		public int tile { get; set; }
-
-		public int offlinemap { get; set; }
-	}
-
 	public class sqlite_sequence
 	{
 		public string name { get; set; }

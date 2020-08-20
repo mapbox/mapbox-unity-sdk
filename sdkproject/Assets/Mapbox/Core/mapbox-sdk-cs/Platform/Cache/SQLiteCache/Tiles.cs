@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using SQLite4Unity3d;
@@ -11,6 +12,8 @@ namespace Mapbox.Platform.Cache
 	/// </summary>
 	public class tiles
 	{
+		[PrimaryKey, AutoIncrement]
+		public int id { get; set; }
 
 		public int tile_set { get; set; }
 
@@ -34,9 +37,23 @@ namespace Mapbox.Platform.Cache
 		/// <summary> ETag Header value of the reponse for auto updating cache</summary>
 		public string etag { get; set; }
 
-		/// <summary>Last-Modified header value of API response. Not all APIs populate it, will be -1 in that case. </summary>
-		public int? lastmodified { get; set; }
+		/// <summary>Last time entry accessed </summary>
+		public int accessed { get; set; }
 
-		public string offlineMapTags { get; set; }
+		/// <summary>datetime when tile forced to update </summary>
+		public int expirationdate { get; set; }
+	}
+
+	public class offlineMaps
+	{
+		[PrimaryKey, AutoIncrement]
+		public int id { get; set; }
+		public string name { get; set; }
+	}
+
+	public class tile2offline
+	{
+		public int tileId { get; set; }
+		public int mapId { get; set; }
 	}
 }

@@ -68,6 +68,25 @@ namespace Mapbox.Unity.Utilities
 			Runnable.Run(DoRequest());
 		}
 
+		public HTTPRequest(string url, Action<Response> callback, int timeout, string headerName, string headerValue)
+		{
+			IsCompleted = false;
+			_requestType = HttpRequestType.Get;
+			_request = UnityWebRequest.Get(url);
+			_request.SetRequestHeader(headerName, headerValue);
+
+			_request.timeout = timeout;
+			_callback = callback;
+
+#if UNITY_EDITOR
+			if (!EditorApplication.isPlaying)
+			{
+				Runnable.EnableRunnableInEditor();
+			}
+#endif
+			Runnable.Run(DoRequest());
+		}
+
 		public void Cancel()
 		{
 			if (_request != null)

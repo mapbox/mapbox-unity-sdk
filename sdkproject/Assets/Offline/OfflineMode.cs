@@ -87,6 +87,23 @@ public class OfflineModeWindow : EditorWindow
 			}
 		}
 
+		if (GUILayout.Button("Ambient Tile Count"))
+		{
+			NewLog("Ambient cache tile count: " + MapboxAccess.Instance.OfflineManager.GetAmbientTileCount());
+		}
+
+		if (GUILayout.Button("Offline Tile Count"))
+		{
+			NewLog("Offline cache tile count: " + MapboxAccess.Instance.OfflineManager.GetOfflineTileCount());
+		}
+
+		if (GUILayout.Button("Offline Tile Count and Size"))
+		{
+			NewLog(string.Format("Offline cache tile count: {0} tiles", MapboxAccess.Instance.OfflineManager.GetOfflineTileCount(_offlineCacheName)));
+			NewLog(string.Format("Offline cache data size: {0} bytes", MapboxAccess.Instance.OfflineManager.GetOfflineDataSize(_offlineCacheName)));
+		}
+
+
 
 		_scroll = EditorGUILayout.BeginScrollView(_scroll);
 		_logs = EditorGUILayout.TextArea(_logs, GUILayout.Height(500));

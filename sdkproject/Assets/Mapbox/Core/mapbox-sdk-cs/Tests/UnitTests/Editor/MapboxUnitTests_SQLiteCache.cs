@@ -253,8 +253,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 					AddedToCacheTicksUtc = now.Ticks,
 					// simulate 100KB data
 					Data = Enumerable.Repeat((byte)0x58, 100 * 1024).ToArray(),
-					ETag = "etag",
-					LastModified = now
+					ETag = "etag"
 				};
 
 				sw.Start();
