@@ -60,7 +60,7 @@ public class OfflineModeWindow : EditorWindow
 
 		if (GUI.changed)
 		{
-			_estimateTileCount = MapboxAccess.Instance.OfflineManager.EstimatedOfflineTileCount(OfflineRegion);
+			_estimateTileCount = MapboxAccess.Instance.OfflineManager.EstimatedTileList(OfflineRegion).Count;
 		}
 
 		EditorGUILayout.LabelField("Estimate: " + _estimateTileCount + " tiles");
@@ -112,19 +112,19 @@ public class OfflineModeWindow : EditorWindow
 
 	public void Test()
 	{
-
-
 		var offlineRegion = new OfflineRegion()
 		{
-			MinLatLng = "37.7402769,-122.5984467",
-			MaxLatLng = "37.9327687,-122.2179695",
+			Name = "TestMap",
+			MinLatLng = Conversions.StringToLatLon("37.7402769,-122.5984467"),
+			MaxLatLng = Conversions.StringToLatLon("37.9327687,-122.2179695"),
 			MinZoom = 6,
 			MaxZoom = 11,
 			ElevationTilesetId = "mapbox.terrain-rgb",
 			ImageTilesetId = "mapbox://styles/mapbox/streets-v10"
 		};
 		MapboxAccess.Instance.OfflineManager.CreateOfflineMap("San Francisco", offlineRegion);
-
+		MapboxAccess.Instance.OfflineManager.ProgressUpdated += (s) => { Debug.Log(s); };
+		MapboxAccess.Instance.OfflineManager.Stop();
 
 	}
 
@@ -152,9 +152,9 @@ Logs: {3}",
 		GUILayout.Label("Area Settings", EditorStyles.boldLabel);
 		GUILayout.Space(10);
 		EditorGUILayout.LabelField("Minimum Longitude Latitude");
-		OfflineRegion.MinLatLng = EditorGUILayout.TextField(OfflineRegion.MinLatLng);
+		OfflineRegion.MinLatLng = Conversions.StringToLatLon(EditorGUILayout.TextField(OfflineRegion.MinLatLng.ToString()));
 		EditorGUILayout.LabelField("Maximum Longitude Latitude");
-		OfflineRegion.MaxLatLng = EditorGUILayout.TextField(OfflineRegion.MaxLatLng);
+		OfflineRegion.MaxLatLng = Conversions.StringToLatLon(EditorGUILayout.TextField(OfflineRegion.MaxLatLng.ToString()));
 		EditorGUILayout.LabelField("Minimum Zoom");
 		OfflineRegion.MinZoom = EditorGUILayout.IntSlider(OfflineRegion.MinZoom, 0, 22);
 		EditorGUILayout.LabelField("Maximum Zoom");
@@ -269,7 +269,7 @@ Logs: {3}",
 	{
 		var data = EditorPrefs.GetString("MapboxOfflineMaps", JsonUtility.ToJson(this, false));
 		JsonUtility.FromJsonOverwrite(data, this);
-		_estimateTileCount = MapboxAccess.Instance.OfflineManager.EstimatedOfflineTileCount(OfflineRegion);
+		_estimateTileCount = MapboxAccess.Instance.OfflineManager.EstimatedTileList(OfflineRegion).Count;
 		MapboxAccess.Instance.OfflineManager.ProgressUpdated += UpdateProgressBar;
 		MapboxAccess.Instance.OfflineManager.DownloadFinished += DownloadFinished;
 		MapboxAccess.Instance.OfflineManager.NewLog += NewLog;
@@ -299,18 +299,4 @@ Logs: {3}",
 		_logs += "-------------------------" + Environment.NewLine;
 	}
 
-}
-
-[Serializable]
-public class OfflineRegion
-{
-	public string MinLatLng = "";
-	public string MaxLatLng = "";
-
-	[Range(0, 16)] public int MinZoom;
-	[Range(0, 16)] public int MaxZoom;
-
-	public string ElevationTilesetId;
-	public string ImageTilesetId;
-	public string VectorTilesetId;
 }
