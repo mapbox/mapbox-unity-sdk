@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using Mapbox.Unity;
 using Mapbox.Unity.Map;
 using Mapbox.Utils;
@@ -15,6 +16,9 @@ public class OfflineMapDemoController : MonoBehaviour
 
     public GameObject MinLatLngGo;
     public GameObject MaxLatLngGo;
+
+    public Transform OfflineMapListContainer;
+    public GameObject OfflineMapListPrefab;
 
     public Text MinLatLngText;
     public Text MaxLatLngText;
@@ -53,6 +57,8 @@ public class OfflineMapDemoController : MonoBehaviour
         CancelButton.onClick.AddListener(CancelDownload);
         MapboxAccess.Instance.OfflineManager.ProgressUpdated += DownloadProgressChanged;
         MapboxAccess.Instance.OfflineManager.DownloadFinished += DownloadFinished;
+
+        UpdateMapList();
     }
 
     void Update()
@@ -94,6 +100,26 @@ public class OfflineMapDemoController : MonoBehaviour
         DownloadButton.interactable = !_isDownloading;
     }
 
+    private void UpdateMapList()
+    {
+        foreach (Transform button in OfflineMapListContainer.transform)
+        {
+            Destroy(button.gameObject);
+        }
+
+        var maps = MapboxAccess.Instance.OfflineManager.GetOfflineMapList();
+        foreach (var map in maps)
+        {
+            var go = Instantiate(OfflineMapListPrefab, OfflineMapListContainer);
+            go.GetComponentInChildren<Text>().text = string.Format("{0} ({1} tiles)", map.Key, map.Value);
+            go.GetComponentInChildren<Button>().onClick.AddListener(() =>
+            {
+                MapboxAccess.Instance.OfflineManager.DeleteOfflineMap(map.Key);
+                UpdateMapList();
+            });
+        }
+    }
+
     private void DownloadProgressChanged(float value)
     {
         ProgressBar.value = value;
@@ -102,8 +128,7 @@ public class OfflineMapDemoController : MonoBehaviour
     private void DownloadFinished(OfflineMapDownloadInfo info)
     {
         _isDownloading = false;
-        ReportField.text = "Download Finished!" + Environment.NewLine;
-        ReportField.text += string.Format(@"Finished download of offline map '{0}'.
+        ReportField.text = string.Format(@"Finished download of offline map '{0}'.
 Succesful tiles:{1}
 Failed tiles: {2}
 Logs: {3}",
@@ -111,6 +136,7 @@ Logs: {3}",
             info.SuccesfulTileDownloads,
             info.FailedTileDownloads,
             string.Join(Environment.NewLine, info.FailedDownloadLogs));
+        UpdateMapList();
     }
 
     private void DownloadMap()
@@ -136,12 +162,13 @@ Logs: {3}",
             vectorTilesetId);
 
         var response = MapboxAccess.Instance.OfflineManager.CreateOfflineMap(region.Name, region);
-        if (response.HasErrors)
+
+        if (response.HasErrors) //download haven't started for some reason
         {
             ReportField.text = response.ErrorMessage;
             _isDownloading = false;
         }
-        else
+        else //download started, you can use events to track progress and state
         {
             _isDownloading = true;
         }
@@ -155,5 +182,6 @@ Logs: {3}",
         MapboxAccess.Instance.OfflineManager.Stop();
         _isDownloading = false;
         ReportField.text = string.Format("{0} download cancelled", name);
+        UpdateMapList();
     }
 }
