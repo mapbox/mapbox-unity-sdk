@@ -146,6 +146,9 @@ public class OfflineManager
 	//OPERATIONS
 	//This is the main method for creating offline maps.
 	//It takes a region and zoom level range, then marks all tiles in there using the name you passed.
+	//Tiles are stored in Sqlite tiles table as regular ambient cache tiles
+	//Offline map name is stored in another table and this entry linked to tiles in a third connection table
+	//So offline tiles are just regular tiles marked/flagged as offline by given name
 	public OfflineMapResponse CreateOfflineMap(string cacheName, OfflineRegion region)
 	{
 		var tiles = EstimatedTileList(region);
