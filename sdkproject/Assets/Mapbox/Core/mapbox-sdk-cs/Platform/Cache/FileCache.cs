@@ -188,13 +188,13 @@ namespace Mapbox.Platform.Cache
 				Directory.CreateDirectory(folderPath);
 			}
 
-			byte[] bytes = info.TextureCacheItem.Texture2D.EncodeToPNG();
+			//byte[] bytes = info.TextureCacheItem.Texture2D.EncodeToPNG();
 			
 			using (FileStream sourceStream = new FileStream(filePath,
 				FileMode.Create, FileAccess.Write, FileShare.Read,
 				bufferSize: 4096, useAsync: true))
 			{
-				sourceStream.Write(bytes, 0, bytes.Length);
+				sourceStream.Write(info.TextureCacheItem.Data, 0, info.TextureCacheItem.Data.Length);
 			}
 			_cacheFiles.Enqueue(filePath);
 
@@ -263,20 +263,6 @@ namespace Mapbox.Platform.Cache
 			return tileId.Z.ToString() + "_" + tileId.X + "_" + tileId.Y;
 		}
 
-		private class InfoWrapper
-		{
-			public string MapId;
-			public CanonicalTileId TileId;
-			public TextureCacheItem TextureCacheItem;
-
-			public InfoWrapper(string mapId, CanonicalTileId tileId, TextureCacheItem textureCacheItem)
-			{
-				MapId = mapId;
-				TileId = tileId;
-				TextureCacheItem = textureCacheItem;
-			}
-		}
-
 		public static void ClearFolder(string folderPath)
 		{
 			DirectoryInfo di = new DirectoryInfo(folderPath);
@@ -301,5 +287,20 @@ namespace Mapbox.Platform.Cache
 				ClearFolder(folder.FullName);
 			}
 		}
+
+		private class InfoWrapper
+		{
+			public string MapId;
+			public CanonicalTileId TileId;
+			public TextureCacheItem TextureCacheItem;
+
+			public InfoWrapper(string mapId, CanonicalTileId tileId, TextureCacheItem textureCacheItem)
+			{
+				MapId = mapId;
+				TileId = tileId;
+				TextureCacheItem = textureCacheItem;
+			}
+		}
+
 	}
 }

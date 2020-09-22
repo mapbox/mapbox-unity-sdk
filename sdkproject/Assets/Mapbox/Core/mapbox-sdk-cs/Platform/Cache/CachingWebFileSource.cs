@@ -411,7 +411,8 @@ namespace Mapbox.Platform.Cache
 						{
 							Texture2D = texture,
 							ETag = eTag,
-							LastModified = lastModified
+							LastModified = lastModified,
+							Data = uwr.downloadHandler.data
 						}, true);
 					}
 
