@@ -231,15 +231,8 @@ public class OfflineManager
 				// if the request was successful add tile to all caches
 				if (!r.HasError && null != r.Data)
 				{
-					string eTag = string.Empty;
-					if (!r.Headers.ContainsKey("ETag"))
-					{
-						Debug.LogWarningFormat("no 'ETag' header present in response for {0}", requestUrl);
-					}
-					else
-					{
-						eTag = r.Headers["ETag"];
-					}
+					string eTag = r.GetETag();
+					DateTime expirationDate = r.GetExpirationDate();
 
 					CurrentMapDownloadInfo.SuccesfulTileDownloads++;
 					_offlineCache.Add(
@@ -248,7 +241,8 @@ public class OfflineManager
 						, new CacheItem()
 						{
 							Data = r.Data,
-							ETag = eTag
+							ETag = eTag,
+							ExpirationDate =expirationDate
 						}
 						, true
 					);

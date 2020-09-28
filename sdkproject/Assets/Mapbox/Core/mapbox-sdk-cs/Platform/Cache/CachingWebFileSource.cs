@@ -1,4 +1,6 @@
-﻿using Unity.UNetWeaver;
+﻿using System;
+using Mapbox.Platform;
+using Unity.UNetWeaver;
 using UnityEngine;
 
 namespace Mapbox.Platform.Cache
@@ -190,15 +192,15 @@ namespace Mapbox.Platform.Cache
 							// additional ETag empty check: for backwards compability with old caches
 							if (response.StatusCode == 304) // 304 NOT MODIFIED
 							{
-								cachedItem.ExpirationDate = GetExpirationDate(response);
+								cachedItem.ExpirationDate = response.GetExpirationDate();
 							}
 							else if (response.StatusCode == 200) // 200 OK, it means etag&data has changed so need to update cache
 							{
-								string eTag = ETag(response);
+								string eTag = response.GetETag();
 
 								// not all APIs populate 'Last-Modified' header
 								// don't log error if it's missing
-								DateTime expirationDate = GetExpirationDate(response);
+								DateTime expirationDate = response.GetExpirationDate();
 
 								cachedItem.Data = response.Data;
 								cachedItem.ETag = eTag;
@@ -236,9 +238,9 @@ namespace Mapbox.Platform.Cache
 					// if the request was successful add tile to all caches
 					if (!response.HasError && null != response.Data)
 					{
-						string eTag = ETag(response);
+						string eTag = response.GetETag();
 
-						DateTime expirationDate = GetExpirationDate(response);
+						DateTime expirationDate = response.GetExpirationDate();
 
 						// propagate to all caches forcing update
 						foreach (var cache in _caches)
@@ -264,45 +266,6 @@ namespace Mapbox.Platform.Cache
 					}
 				}, timeout);
 		}
-
-		private string ETag(Response response)
-		{
-			string eTag = String.Empty;
-			if (!response.Headers.ContainsKey(EtagHeaderName))
-			{
-				Debug.LogWarning("no 'ETag' header present in response");
-			}
-			else
-			{
-				eTag = response.Headers[EtagHeaderName];
-			}
-
-			return eTag;
-		}
-
-		private DateTime GetExpirationDate(Response response)
-		{
-			DateTime expirationDate = DateTime.Now;
-			if (response.Headers.ContainsKey(CacheControlHeaderName))
-			{
-				var cacheEntries = response.Headers[CacheControlHeaderName].Split(',');
-				if (cacheEntries.Length > 0)
-				{
-					foreach (var entry in cacheEntries)
-					{
-						var value = entry.Split('=');
-						if (value[0] == "max-age")
-						{
-							expirationDate = expirationDate + TimeSpan.FromSeconds(int.Parse(value[1]));
-							return expirationDate;
-						}
-					}
-				}
-			}
-
-			return expirationDate;
-		}
-
 
 		class MemoryCacheAsyncRequest : IAsyncRequest
 		{
@@ -333,4 +296,49 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 	}
+}
+
+public static class ResponseStatic
+{
+	private static string EtagHeaderName = "ETag";
+	private static string CacheControlHeaderName = "Cache-Control";
+
+	public static DateTime GetExpirationDate(this Response response)
+	{
+		DateTime expirationDate = DateTime.Now;
+		if (response.Headers.ContainsKey(CacheControlHeaderName))
+		{
+			var cacheEntries = response.Headers[CacheControlHeaderName].Split(',');
+			if (cacheEntries.Length > 0)
+			{
+				foreach (var entry in cacheEntries)
+				{
+					var value = entry.Split('=');
+					if (value[0] == "max-age")
+					{
+						expirationDate = expirationDate + TimeSpan.FromSeconds(int.Parse(value[1]));
+						return expirationDate;
+					}
+				}
+			}
+		}
+
+		return expirationDate;
+	}
+
+	public static string GetETag(this Response response)
+	{
+		string eTag = String.Empty;
+		if (!response.Headers.ContainsKey(EtagHeaderName))
+		{
+			Debug.LogWarning("no 'ETag' header present in response");
+		}
+		else
+		{
+			eTag = response.Headers[EtagHeaderName];
+		}
+
+		return eTag;
+	}
+
 }
