@@ -727,20 +727,23 @@ namespace Mapbox.Editor
 
 		private static void UpdateFileCacheSizes()
 		{
-			_fileCacheFolderSizes.Clear();
-			var dir = Directory.GetDirectories(FileCache.PersistantCacheRootFolderPath);
-			foreach (var rasterDirectory in dir)
+			if (Directory.Exists(FileCache.PersistantCacheRootFolderPath))
 			{
-				var di = new DirectoryInfo(rasterDirectory);
-
-				var size = GetDirectorySize(di, true);
-				_fileCacheFolderSizes.Add(new CacheDirectoryInfo()
+				_fileCacheFolderSizes.Clear();
+				var dir = Directory.GetDirectories(FileCache.PersistantCacheRootFolderPath);
+				foreach (var rasterDirectory in dir)
 				{
-					Name = di.Name,
-					FullName = di.FullName,
-					FileCount = size.Item2,
-					Size = size.Item1
-				});
+					var di = new DirectoryInfo(rasterDirectory);
+
+					var size = GetDirectorySize(di, true);
+					_fileCacheFolderSizes.Add(new CacheDirectoryInfo()
+					{
+						Name = di.Name,
+						FullName = di.FullName,
+						FileCount = size.Item2,
+						Size = size.Item1
+					});
+				}
 			}
 		}
 
