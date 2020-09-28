@@ -1,14 +1,10 @@
-﻿using Unity.UNetWeaver;
-
-namespace Mapbox.Platform.Cache
+﻿namespace Mapbox.Platform.Cache
 {
 	using System;
 	using Mapbox.Platform;
 	using System.Collections.Generic;
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Map;
-	using System.Collections;
-	using System.Linq;
 
 
 	public class CachingWebFileSource : IFileSource, IDisposable
