@@ -150,7 +150,7 @@ Logs: {3}",
 
         //null or empty tilesetId means that data type will be skipped
         var elevationTilesetId = ElevationToggle.isOn ? "mapbox.terrain-rgb" : null;
-        var imageryTilesetId = ImageryToggle.isOn ? "mapbox://styles/mapbox/streets-v10" : null;
+        var imageryTilesetId = ImageryToggle.isOn ? "mapbox.satellite" : null;
         var vectorTilesetId = VectorToggle.isOn ? "mapbox.mapbox-streets-v8" : null;
 
         var region = new OfflineRegion(
