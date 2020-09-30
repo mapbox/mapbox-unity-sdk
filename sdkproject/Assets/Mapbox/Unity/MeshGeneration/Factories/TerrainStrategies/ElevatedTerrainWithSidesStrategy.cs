@@ -4,6 +4,7 @@ using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.Map;
 using Mapbox.Map;
 using Mapbox.Utils;
+using UnityEngine.Rendering;
 
 namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 {
@@ -228,6 +229,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 
 
 			var mesh = tile.MeshFilter.mesh;
+			mesh.indexFormat = IndexFormat.UInt32;
 			mesh.SetVertices(_newVertexList);
 			mesh.SetNormals(_newNormalList);
 			mesh.SetUVs(0, _newUvList);
