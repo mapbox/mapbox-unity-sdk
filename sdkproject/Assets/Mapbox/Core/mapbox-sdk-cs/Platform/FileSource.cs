@@ -27,6 +27,7 @@ namespace Mapbox.Platform
 #endif
 #if UNITY_5_3_OR_NEWER
 	using UnityEngine;
+
 #endif
 
 	/// <summary>
@@ -40,7 +41,6 @@ namespace Mapbox.Platform
 	/// </remarks>
 	public sealed class FileSource : IFileSource
 	{
-
 		private Func<string> _getMapsSkuToken;
 		private readonly Dictionary<IAsyncRequest, int> _requests = new Dictionary<IAsyncRequest, int>();
 		private readonly string _accessToken;
@@ -49,8 +49,10 @@ namespace Mapbox.Platform
 		/// <summary>Length of rate-limiting interval in seconds. https://www.mapbox.com/api-documentation/#rate-limit-headers </summary>
 #pragma warning disable 0414
 		private int? XRateLimitInterval;
+
 		/// <summary>Maximum number of requests you may make in the current interval before reaching the limit. https://www.mapbox.com/api-documentation/#rate-limit-headers </summary>
 		private long? XRateLimitLimit;
+
 		/// <summary>Timestamp of when the current interval will end and the ratelimit counter is reset. https://www.mapbox.com/api-documentation/#rate-limit-headers </summary>
 		private DateTime? XRateLimitReset;
 #pragma warning restore 0414
@@ -59,14 +61,7 @@ namespace Mapbox.Platform
 		public FileSource(Func<string> getMapsSkuToken, string acessToken = null)
 		{
 			_getMapsSkuToken = getMapsSkuToken;
-			if (string.IsNullOrEmpty(acessToken))
-			{
-				_accessToken = Environment.GetEnvironmentVariable("MAPBOX_ACCESS_TOKEN");
-			}
-			else
-			{
-				_accessToken = acessToken;
-			}
+			_accessToken = acessToken;
 		}
 
 		/// <summary> Performs a request asynchronously. </summary>
@@ -92,7 +87,8 @@ namespace Mapbox.Platform
 				string skuToken = "sku=" + _getMapsSkuToken();
 				if (uriBuilder.Query != null && uriBuilder.Query.Length > 1)
 				{
-					uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery + "&" + skuToken;;
+					uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery + "&" + skuToken;
+					;
 				}
 				else
 				{
@@ -127,16 +123,27 @@ namespace Mapbox.Platform
 			, string tilesetId
 		)
 		{
-
 			// TODO: plugin caching somewhere around here
 
 			var request = IAsyncRequestFactory.CreateRequest(
 				url
 				, (Response response) =>
 				{
-					if (response.XRateLimitInterval.HasValue) { XRateLimitInterval = response.XRateLimitInterval; }
-					if (response.XRateLimitLimit.HasValue) { XRateLimitLimit = response.XRateLimitLimit; }
-					if (response.XRateLimitReset.HasValue) { XRateLimitReset = response.XRateLimitReset; }
+					if (response.XRateLimitInterval.HasValue)
+					{
+						XRateLimitInterval = response.XRateLimitInterval;
+					}
+
+					if (response.XRateLimitLimit.HasValue)
+					{
+						XRateLimitLimit = response.XRateLimitLimit;
+					}
+
+					if (response.XRateLimitReset.HasValue)
+					{
+						XRateLimitReset = response.XRateLimitReset;
+					}
+
 					callback(response);
 					lock (_lock)
 					{
@@ -161,6 +168,7 @@ namespace Mapbox.Platform
 					_requests.Add(request, 0);
 				}
 			}
+
 			//yield return request;
 			return request;
 		}
@@ -193,11 +201,11 @@ namespace Mapbox.Platform
 						}
 					}
 				}
+
 				yield return new WaitForSeconds(0.2f);
 			}
 		}
 #endif
-
 
 
 #if !UNITY_5_3_OR_NEWER

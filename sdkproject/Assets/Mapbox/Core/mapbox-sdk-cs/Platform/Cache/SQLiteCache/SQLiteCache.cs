@@ -120,6 +120,7 @@ tile_column  BIGINT  NOT NULL,
 tile_row     BIGINT  NOT NULL,
 tile_data    BLOB    NOT NULL,
 timestamp    INTEGER NOT NULL,
+expirationdate    INTEGER NOT NULL,
 etag         TEXT,
 lastmodified INTEGER,
 	PRIMARY KEY(
@@ -248,6 +249,7 @@ lastmodified INTEGER,
 					tile_row = tileId.Y,
 					tile_data = item.Data,
 					timestamp = (int)UnixTimestampUtils.To(DateTime.Now),
+					expirationdate = (int)UnixTimestampUtils.To(item.ExpirationDate),
 					etag = item.ETag
 				});
 				if (1 != rowsAffected)

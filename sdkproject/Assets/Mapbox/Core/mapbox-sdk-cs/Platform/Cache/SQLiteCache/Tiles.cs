@@ -36,5 +36,8 @@ namespace Mapbox.Platform.Cache
 
 		/// <summary>Last-Modified header value of API response. Not all APIs populate it, will be -1 in that case. </summary>
 		public int? lastmodified { get; set; }
+
+		/// <summary>Last-Modified header value of API response. Not all APIs populate it, will be -1 in that case. </summary>
+		public int expirationdate { get; set; }
 	}
 }
