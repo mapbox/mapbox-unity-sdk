@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Mapbox.Core.Platform.Cache;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -196,7 +197,7 @@ namespace Mapbox.Platform.Cache
 				callback(Response.FromCache(cachedItem.Data));
 
 				// check for updated tiles online if this is enabled in the settings
-				if (_autoRefreshCache)
+				if (cachedItem.ExpirationDate < DateTime.Now)
 				{
 					// check if tile on the web is newer than the one we already have locally
 					IAsyncRequestFactory.CreateRequest(
@@ -285,41 +286,14 @@ namespace Mapbox.Platform.Cache
 							_memoryTextureCache.Add(tilesetId, tileId, textureCacheItem, true);
 							var textureResponse = new TextureResponse {Texture2D = textureCacheItem.Texture2D};
 							callback(textureResponse);
-							
-							IAsyncRequestFactory.CreateRequest(
-								finalUrl,
-								(Response headerOnly) =>
-								{
-									// on error getting information from API just return. tile we have locally has already been returned above
-									if (headerOnly.HasError)
-									{
-										return;
-									}
-									
-									if (!string.IsNullOrEmpty(textureCacheItem.ETag) && textureCacheItem.ETag.Equals(headerOnly.Headers["ETag"]))
-									{
-										
-									}
-									else
-									{
-										// TODO: remove Debug.Log before PR
-										UnityEngine.Debug.LogWarningFormat(
-											"updating cached tile {1} tilesetId:{2}{0}cached etag:{3}{0}remote etag:{4}{0}{5}"
-											, Environment.NewLine
-											, tileId
-											, tilesetId
-											, textureCacheItem.ETag
-											, headerOnly.Headers["ETag"]
-											, finalUrl
-										);
 
-										// request updated tile and pass callback to return new data to subscribers
-										Runnable.Run(FetchTexture(finalUrl, callback, tilesetId, tileId));
-									}
-								}
-								, timeout
-								, HttpRequestType.Head
-							);
+							if (textureCacheItem.ExpirationDate < DateTime.Now)
+							{
+								Runnable.Run(FetchTextureIfNoneMatch(tileId, tilesetId, finalUrl, textureCacheItem, (response) =>
+								{
+									callback(response);
+								}));
+							}
 						});
 					}
 					else
@@ -337,6 +311,7 @@ namespace Mapbox.Platform.Cache
 
 			Runnable.Run(FetchTexture(finalUrl, callback, tilesetId, tileId));
 		}
+
 
 		private string CreateFinalUrl(string uri)
 		{
@@ -369,6 +344,52 @@ namespace Mapbox.Platform.Cache
 			return null;
 		}
 
+		private IEnumerator FetchTextureIfNoneMatch(CanonicalTileId tileId, string tilesetId, string finalUrl, TextureCacheItem textureCacheItem, Action<TextureResponse> callback)
+		{
+			using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(finalUrl))
+			{
+				if (!string.IsNullOrEmpty(textureCacheItem.ETag))
+				{
+					uwr.SetRequestHeader("If-None-Match", textureCacheItem.ETag);
+				}
+
+				yield return uwr.SendWebRequest();
+
+				if (uwr.responseCode == 304) // 304 NOT MODIFIED
+				{
+					textureCacheItem.ExpirationDate = uwr.GetExpirationDate();
+					foreach (var cache in _textureCaches)
+					{
+						cache.Add(tilesetId, tileId, textureCacheItem, true);
+					}
+				}
+				else if (uwr.responseCode == 200) // 200 OK, it means etag&data has changed so need to update cache
+				{
+					var response = new TextureResponse();
+					response.StatusCode = uwr.responseCode;
+
+					string eTag = uwr.GetETag();
+					var texture = DownloadHandlerTexture.GetContent(uwr);
+					texture.wrapMode = TextureWrapMode.Clamp;
+					response.Texture2D = texture;
+
+					var expirationDate = uwr.GetExpirationDate();
+					textureCacheItem.Texture2D = texture;
+					textureCacheItem.ETag = eTag;
+					textureCacheItem.ExpirationDate = expirationDate;
+					textureCacheItem.Data = uwr.downloadHandler.data;
+					foreach (var cache in _textureCaches)
+					{
+						cache.Add(tilesetId, tileId, textureCacheItem, true);
+					}
+
+					callback(response);
+				}
+
+
+			}
+		}
+
 		private IEnumerator FetchTexture(string finalUrl, Action<TextureResponse> callback, string tilesetId, CanonicalTileId tileId)
 		{
 			using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(finalUrl))
@@ -383,24 +404,8 @@ namespace Mapbox.Platform.Cache
 				}
 				else
 				{
-					string eTag = string.Empty;
-					DateTime? lastModified = null;
-					var responseHeaders = uwr.GetResponseHeaders();
-					if (!responseHeaders.ContainsKey("ETag"))
-					{
-						UnityEngine.Debug.LogWarningFormat("no 'ETag' header present in response for {0}", uwr.url);
-					}
-					else
-					{
-						eTag = responseHeaders["ETag"];
-					}
-
-					// not all APIs populate 'Last-Modified' header
-					// don't log error if it's missing
-					if (responseHeaders.ContainsKey("Last-Modified"))
-					{
-						lastModified = DateTime.ParseExact(responseHeaders["Last-Modified"], "r", null);
-					}
+					string eTag = uwr.GetETag();
+					DateTime expirationDate = uwr.GetExpirationDate();
 
 					var texture = DownloadHandlerTexture.GetContent(uwr);
 					texture.wrapMode = TextureWrapMode.Clamp;
@@ -411,7 +416,7 @@ namespace Mapbox.Platform.Cache
 						{
 							Texture2D = texture,
 							ETag = eTag,
-							LastModified = lastModified,
+							ExpirationDate = expirationDate,
 							Data = uwr.downloadHandler.data
 						}, true);
 					}
@@ -425,29 +430,13 @@ namespace Mapbox.Platform.Cache
 		{
 			return IAsyncRequestFactory.CreateRequest(
 				url,
-				(Response r) =>
+				(Response response) =>
 				{
 					// if the request was successful add tile to all caches
-					if (!r.HasError && null != r.Data)
+					if (!response.HasError && null != response.Data)
 					{
-						string eTag = string.Empty;
-						DateTime? lastModified = null;
-
-						if (!r.Headers.ContainsKey("ETag"))
-						{
-							UnityEngine.Debug.LogWarningFormat("no 'ETag' header present in response for {0}", url);
-						}
-						else
-						{
-							eTag = r.Headers["ETag"];
-						}
-
-						// not all APIs populate 'Last-Modified' header
-						// don't log error if it's missing
-						if (r.Headers.ContainsKey("Last-Modified"))
-						{
-							lastModified = DateTime.ParseExact(r.Headers["Last-Modified"], "r", null);
-						}
+						string eTag = response.GetETag();
+						DateTime expirationDate = response.GetExpirationDate();
 
 						// propagate to all caches forcing update
 						foreach (var cache in _caches)
@@ -457,9 +446,9 @@ namespace Mapbox.Platform.Cache
 								, tileId
 								, new CacheItem()
 								{
-									Data = r.Data,
+									Data = response.Data,
 									ETag = eTag,
-									LastModified = lastModified
+									ExpirationDate = expirationDate
 								}
 								, true // force insert/update
 							);
@@ -468,8 +457,8 @@ namespace Mapbox.Platform.Cache
 
 					if (null != callback)
 					{
-						r.IsUpdate = true;
-						callback(r);
+						response.IsUpdate = true;
+						callback(response);
 					}
 				}, timeout);
 		}

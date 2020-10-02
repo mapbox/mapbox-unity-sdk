@@ -34,7 +34,7 @@ namespace Mapbox.Platform.Cache
 		/// <summary> ETag Header value of the reponse for auto updating cache</summary>
 		public string etag { get; set; }
 
-		/// <summary>Last-Modified header value of API response. Not all APIs populate it, will be -1 in that case. </summary>
-		public int? lastmodified { get; set; }
+		/// <summary>Expiration date of cached data </summary>
+		public int? expirationDate { get; set; }
 	}
 }

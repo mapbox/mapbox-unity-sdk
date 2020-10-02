@@ -254,7 +254,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 					// simulate 100KB data
 					Data = Enumerable.Repeat((byte)0x58, 100 * 1024).ToArray(),
 					ETag = "etag",
-					LastModified = now
+					ExpirationDate = now
 				};
 
 				sw.Start();

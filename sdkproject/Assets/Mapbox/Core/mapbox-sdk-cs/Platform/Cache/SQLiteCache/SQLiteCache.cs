@@ -341,15 +341,15 @@ lastmodified INTEGER,
 				return null;
 			}
 
-			DateTime? lastModified = null;
-			if (tile.lastmodified.HasValue) { lastModified = UnixTimestampUtils.From((double)tile.lastmodified.Value); }
+			DateTime? expirationDate = null;
+			if (tile.expirationDate.HasValue) { expirationDate = UnixTimestampUtils.From((double)tile.expirationDate.Value); }
 
 			return new CacheItem()
 			{
 				Data = tile.tile_data,
 				AddedToCacheTicksUtc = tile.timestamp,
 				ETag = tile.etag,
-				LastModified = lastModified
+				ExpirationDate = expirationDate
 			};
 		}
 

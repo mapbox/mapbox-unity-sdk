@@ -2,11 +2,13 @@ using Mapbox.Map;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Mapbox.Unity.Utilities;
+using Mapbox.Utils;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -62,6 +64,7 @@ namespace Mapbox.Platform.Cache
 
 		private Queue<InfoWrapper> _infosToSave;
 		private int _lastFileSaveFrame = 0;
+		private string DataSerializationCulture = "en-US";
 
 		public uint MaxCacheSize
 		{
@@ -192,7 +195,7 @@ namespace Mapbox.Platform.Cache
 			
 			using (FileStream sourceStream = new FileStream(filePath,
 				FileMode.Create, FileAccess.Write, FileShare.Read,
-				bufferSize: 4096, useAsync: true))
+				bufferSize: 4096, useAsync: false))
 			{
 				sourceStream.Write(info.TextureCacheItem.Data, 0, info.TextureCacheItem.Data.Length);
 			}
@@ -203,7 +206,7 @@ namespace Mapbox.Platform.Cache
 				new string[]
 				{
 					info.TextureCacheItem.ETag,
-					info.TextureCacheItem.LastModified.ToString(),
+					info.TextureCacheItem.ExpirationDate != null ? UnixTimestampUtils.To(info.TextureCacheItem.ExpirationDate.Value).ToString(CultureInfo.GetCultureInfo(DataSerializationCulture)) : string.Empty,
 					info.TextureCacheItem.AddedToCacheTicksUtc.ToString()
 				});
 			_cacheFiles.Enqueue(txtFullName);
@@ -253,6 +256,7 @@ namespace Mapbox.Platform.Cache
 					textureCacheItem.Texture2D = DownloadHandlerTexture.GetContent(uwr);
 					textureCacheItem.Texture2D.wrapMode = TextureWrapMode.Clamp;
 					textureCacheItem.ETag = meta[0];
+					textureCacheItem.ExpirationDate = UnixTimestampUtils.From(double.Parse(meta[1], CultureInfo.GetCultureInfo(DataSerializationCulture)));
 					callback(textureCacheItem);
 				}
 			}
