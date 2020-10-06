@@ -22,10 +22,12 @@ namespace Mapbox.Platform.Cache
 		private static string CacheRootFolderName = "FileCache";
 		public static string PersistantCacheRootFolderPath = Path.Combine(Application.persistentDataPath, CacheRootFolderName);
 		private static string FileExtension = ".png";
-		private Queue<string> _cacheFiles = new Queue<string>();
-		
-		public FileCache(uint maxCacheSize)
+
+		private SQLiteCache _sqliteCache;
+
+		public FileCache(SQLiteCache sqliteCache, uint maxCacheSize)
 		{
+			_sqliteCache = sqliteCache;
 #if MAPBOX_DEBUG_CACHE
 			_className = this.GetType().Name;
 #endif
@@ -39,20 +41,7 @@ namespace Mapbox.Platform.Cache
 				Directory.CreateDirectory(PersistantCacheRootFolderPath);
 			}
 
-			DirectoryInfo di = new DirectoryInfo(PersistantCacheRootFolderPath);	
-			var _files = new List<FileInfo>();
-			foreach (DirectoryInfo folder in di.GetDirectories())
-			{
-				foreach (var fileInfo in folder.GetFiles())
-				{
-					_files.Add(fileInfo);
-				}
-			}
 
-			foreach (var file in _files.OrderBy(x => x.CreationTime))
-			{
-				_cacheFiles.Enqueue(file.FullName);
-			}
 		}
 
 #if MAPBOX_DEBUG_CACHE
@@ -76,9 +65,28 @@ namespace Mapbox.Platform.Cache
 			_cachedResponses = new Dictionary<string, CacheItem>();
 		}
 
-		public void Add(string mapId, CanonicalTileId tileId, CacheItem item, bool forceInsert)
+		public void CheckIntegrity()
 		{
+			var tiles = _sqliteCache.GetAllTiles();
 
+			var filePathsToDelete = new List<string>();
+			foreach (var tile in tiles)
+			{
+				if (!File.Exists(tile.tile_path))
+				{
+					filePathsToDelete.Add(tile.tile_path);
+				}
+			}
+
+			DirectoryInfo di = new DirectoryInfo(PersistantCacheRootFolderPath);
+			var _files = new List<FileInfo>();
+			foreach (DirectoryInfo folder in di.GetDirectories())
+			{
+				foreach (var fileInfo in folder.GetFiles())
+				{
+					_files.Add(fileInfo);
+				}
+			}
 		}
 
 		public CacheItem Get(string tilesetId, CanonicalTileId tileId)
@@ -162,6 +170,11 @@ namespace Mapbox.Platform.Cache
 		// 	callback(elevations);
 		// }
 
+		public void Add(string mapId, CanonicalTileId tileId, CacheItem item, bool forceInsert)
+		{
+
+		}
+
 		public void Add(string mapId, CanonicalTileId tileId, TextureCacheItem textureCacheItem, bool forceInsert)
 		{
 			var infoWrapper = new InfoWrapper(mapId, tileId, textureCacheItem);
@@ -199,32 +212,9 @@ namespace Mapbox.Platform.Cache
 			{
 				sourceStream.Write(info.TextureCacheItem.Data, 0, info.TextureCacheItem.Data.Length);
 			}
-			_cacheFiles.Enqueue(filePath);
 
-			var txtFullName = Path.Combine(folderPath, TileIdToFileName(info.TileId) + ".txt");
-			File.WriteAllLines(txtFullName,
-				new string[]
-				{
-					info.TextureCacheItem.ETag,
-					info.TextureCacheItem.ExpirationDate != null ? UnixTimestampUtils.To(info.TextureCacheItem.ExpirationDate.Value).ToString(CultureInfo.GetCultureInfo(DataSerializationCulture)) : string.Empty,
-					info.TextureCacheItem.AddedToCacheTicksUtc.ToString()
-				});
-			_cacheFiles.Enqueue(txtFullName);
-
-			CheckFileCoiuntLimit();
-
-		}
-
-		private void CheckFileCoiuntLimit()
-		{
-			if (_cacheFiles.Count > _maxCacheSize)
-			{
-				for (int i = 0; i < 20; i++)
-				{
-					var fileInfo = new FileInfo(_cacheFiles.Dequeue());
-					fileInfo.Delete();
-				}
-			}
+			//We probably shouldn't delay this. It will only cause problems and it should be fast enough anyway
+			_sqliteCache.Add(info.MapId, info.TileId, info.TextureCacheItem.ETag, filePath);
 		}
 
 		public void GetAsync(string mapId, CanonicalTileId tileId, Action<TextureCacheItem> callback)
@@ -233,11 +223,11 @@ namespace Mapbox.Platform.Cache
 
 			if (File.Exists(filePath + FileExtension))
 			{
-				Runnable.Run(LoadImageCoroutine(filePath, callback));
+				Runnable.Run(LoadImageCoroutine(mapId, tileId, filePath, callback));
 			}
 		}
 
-		private IEnumerator LoadImageCoroutine(string filePath, Action<TextureCacheItem> callback)
+		private IEnumerator LoadImageCoroutine(string mapId, CanonicalTileId tileId, string filePath, Action<TextureCacheItem> callback)
 		{
 			using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture("file:///" + filePath + FileExtension))
 			{
@@ -249,15 +239,26 @@ namespace Mapbox.Platform.Cache
 				}
 				else
 				{
-					//we don't store metadata yet so only passing texture here
-					//etag and last modified date should be added somewhere here
-					string[] meta = File.ReadAllLines(filePath + ".txt");
 					var textureCacheItem = new TextureCacheItem();
 					textureCacheItem.Texture2D = DownloadHandlerTexture.GetContent(uwr);
 					textureCacheItem.Texture2D.wrapMode = TextureWrapMode.Clamp;
-					textureCacheItem.ETag = meta[0];
-					textureCacheItem.ExpirationDate = UnixTimestampUtils.From(double.Parse(meta[1], CultureInfo.GetCultureInfo(DataSerializationCulture)));
-					callback(textureCacheItem);
+					var tile = _sqliteCache.Get(mapId, tileId);
+
+					//TODO: Should we schedule metadata read? Or is it fast enough?
+					if (tile != null)
+					{
+						textureCacheItem.ETag = tile.ETag;
+						textureCacheItem.ExpirationDate = tile.ExpirationDate;
+						callback(textureCacheItem);
+					}
+					else
+					{
+						//file exists but sqlite entry does not
+						//entry was probably pruned but file deletion didn't go through (crashed/closed app)
+						//serve the image without metadata for now
+						//delete tile, next tile it'll be updated
+						_sqliteCache.DeleteTile(mapId, tileId);
+					}
 				}
 			}
 		}

@@ -28,6 +28,8 @@ namespace Mapbox.Platform.Cache
 
 		public byte[] tile_data { get; set; }
 
+		public string tile_path { get; set; }
+		
 		/// <summary>Unix epoch for simple FIFO pruning </summary>
 		public int timestamp { get; set; }
 
@@ -36,5 +38,7 @@ namespace Mapbox.Platform.Cache
 
 		/// <summary>Expiration date of cached data </summary>
 		public int? expirationDate { get; set; }
+
+
 	}
 }

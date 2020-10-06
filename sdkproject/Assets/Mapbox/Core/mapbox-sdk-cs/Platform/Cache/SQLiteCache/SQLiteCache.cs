@@ -1,4 +1,6 @@
-﻿namespace Mapbox.Platform.Cache
+﻿using System.Threading;
+
+namespace Mapbox.Platform.Cache
 {
 
 	using Mapbox.Map;
@@ -118,10 +120,11 @@ tile_set     INTEGER REFERENCES tilesets (id) ON DELETE CASCADE ON UPDATE CASCAD
 zoom_level   INTEGER NOT NULL,
 tile_column  BIGINT  NOT NULL,
 tile_row     BIGINT  NOT NULL,
-tile_data    BLOB    NOT NULL,
+tile_data    BLOB,
+tile_path    TEXT,
 timestamp    INTEGER NOT NULL,
 etag         TEXT,
-lastmodified INTEGER,
+expirationDate INTEGER,
 	PRIMARY KEY(
 		tile_set ASC,
 		zoom_level ASC,
@@ -191,7 +194,6 @@ lastmodified INTEGER,
 			init();
 		}
 
-
 		public static string GetFullDbPath(string dbName)
 		{
 			string dbPath = Path.Combine(Application.persistentDataPath, "cache");
@@ -203,8 +205,6 @@ lastmodified INTEGER,
 
 			return dbPath;
 		}
-
-
 
 		public void Add(string tilesetName, CanonicalTileId tileId, CacheItem item, bool forceInsert = false)
 		{
@@ -272,6 +272,70 @@ lastmodified INTEGER,
 			}
 		}
 
+		public void Add(string tilesetName, CanonicalTileId tileId, string etag, string path, bool forceInsert = false)
+		{
+#if MAPBOX_DEBUG_CACHE
+			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
+			UnityEngine.Debug.LogFormat("{0} {1} {2} forceInsert:{3}", methodName, tileset, tileId, forceInsert);
+#endif
+			try
+			{
+				// tile exists and we don't want to overwrite -> exit early
+				if (
+					TileExists(tilesetName, tileId)
+					&& !forceInsert
+				)
+				{
+					return;
+				}
+
+				int? tilesetId = null;
+				lock (_lock)
+				{
+					tilesetId = getTilesetId(tilesetName);
+					if (!tilesetId.HasValue)
+					{
+						tilesetId = insertTileset(tilesetName);
+					}
+				}
+
+				if (tilesetId < 0)
+				{
+					Debug.LogErrorFormat("could not get tilesetID for [{0}] tile: {1}", tilesetName, tileId);
+					return;
+				}
+
+				int rowsAffected = _sqlite.InsertOrReplace(new tiles
+				{
+					tile_set = tilesetId.Value,
+					zoom_level = tileId.Z,
+					tile_column = tileId.X,
+					tile_row = tileId.Y,
+					tile_path = path,
+					timestamp = (int)UnixTimestampUtils.To(DateTime.Now),
+					etag = etag
+				});
+				if (1 != rowsAffected)
+				{
+					throw new Exception(string.Format("tile [{0} / {1}] was not inserted, rows affected:{2}", tilesetName, tileId, rowsAffected));
+				}
+			}
+			catch (Exception ex)
+			{
+				Debug.LogErrorFormat("Error inserting {0} {1} {2} ", tilesetName, tileId, ex);
+			}
+
+			// update counter only when new tile gets inserted
+			if (!forceInsert)
+			{
+				_pruneCacheCounter++;
+			}
+			if (0 == _pruneCacheCounter % _pruneCacheDelta)
+			{
+				_pruneCacheCounter = 0;
+				prune();
+			}
+		}
 
 		private void prune()
 		{
@@ -280,15 +344,22 @@ lastmodified INTEGER,
 
 			if (tileCnt < _maxTileCount) { return; }
 
-			long toDelete = tileCnt - _maxTileCount;
+			long toDelete = (tileCnt - _maxTileCount) * 2;
 
 #if MAPBOX_DEBUG_CACHE
 			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
 			Debug.LogFormat("{0} {1} about to prune()", methodName, _tileset);
 #endif
 
+			tiles tile = null;
 			try
 			{
+				var cmd = _sqlite.CreateCommand("SELECT * FROM tiles WHERE rowid IN ( SELECT rowid FROM tiles ORDER BY timestamp ASC LIMIT ? );", toDelete);
+				var tilesToDelete = cmd.ExecuteQuery<tiles>();
+				var thread = new Thread(DeleteFile);
+				thread.IsBackground = true;
+				thread.Start(tilesToDelete);
+
 				// no 'ORDER BY' or 'LIMIT' possible if sqlite hasn't been compiled with 'SQLITE_ENABLE_UPDATE_DELETE_LIMIT'
 				// https://sqlite.org/compile.html#enable_update_delete_limit
 				_sqlite.Execute("DELETE FROM tiles WHERE rowid IN ( SELECT rowid FROM tiles ORDER BY timestamp ASC LIMIT ? );", toDelete);
@@ -296,9 +367,30 @@ lastmodified INTEGER,
 			catch (Exception ex)
 			{
 				Debug.LogErrorFormat("error pruning: {0}", ex);
+				Debug.Log(string.Format("{0},{1},{2},{3}",tile.tile_set, tile.zoom_level, tile.tile_column, tile.tile_row));
 			}
 		}
 
+		private void DeleteFile(object o)
+		{
+			var tilesToDelete = (List<tiles>) o;
+			foreach (var tileToDelete in tilesToDelete)
+			{
+				if (tileToDelete != null)
+				{
+					if (File.Exists(tileToDelete.tile_path))
+					{
+						try
+						{
+							File.Delete(tileToDelete.tile_path);
+						}
+						catch
+						{
+						}
+					}
+				}
+			}
+		}
 
 		/// <summary>
 		/// Returns the tile data, otherwise null
@@ -361,21 +453,36 @@ lastmodified INTEGER,
 		/// <returns>True if tile exists</returns>
 		public bool TileExists(string tilesetName, CanonicalTileId tileId)
 		{
-			int? tilesetId = getTilesetId(tilesetName);
-			if (!tilesetId.HasValue)
-			{
-				return false;
-			}
+			var query = "SELECT EXISTS(SELECT 1 " +
+			            "FROM tiles " +
+			            "WHERE tile_set    = ?1 " +
+			            "  AND zoom_level  = ?2 " +
+			            "  AND tile_column = ?3 " +
+			            "  AND tile_row    = ?4 " +
+			            "LIMIT 1)";
+			var countCommand = _sqlite.CreateCommand(query,
+				tilesetName,
+				tileId.Z,
+				tileId.X,
+				tileId.Y);
+			var count = countCommand.ExecuteScalar<int>();
 
-			return null != _sqlite
-				.Table<tiles>()
-				.Where(t =>
-					t.tile_set == tilesetId.Value
-					&& t.zoom_level == tileId.Z
-					&& t.tile_column == tileId.X
-					&& t.tile_row == tileId.Y
-					)
-				.FirstOrDefault();
+			return count > 0;
+			// int? tilesetId = getTilesetId(tilesetName);
+			// if (!tilesetId.HasValue)
+			// {
+			// 	return false;
+			// }
+			//
+			// return null != _sqlite
+			// 	.Table<tiles>()
+			// 	.Where(t =>
+			// 		t.tile_set == tilesetId.Value
+			// 		&& t.zoom_level == tileId.Z
+			// 		&& t.tile_column == tileId.X
+			// 		&& t.tile_row == tileId.Y
+			// 		)
+			// 	.FirstOrDefault();
 		}
 
 
@@ -481,5 +588,14 @@ lastmodified INTEGER,
 			File.Delete(_dbPath);
 		}
 
+		public void DeleteTile(string mapId, CanonicalTileId tileId)
+		{
+			Debug.Log("Cleaning leftover files, NYI");
+		}
+
+		public List<tiles> GetAllTiles()
+		{
+			return _sqlite.Table<tiles>().ToList();
+		}
 	}
 }

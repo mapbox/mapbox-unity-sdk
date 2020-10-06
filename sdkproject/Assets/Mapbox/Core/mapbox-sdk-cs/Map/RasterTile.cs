@@ -39,6 +39,7 @@ namespace Mapbox.Map
 	{
 		private Texture2D texture2D;
 		private byte[] data;
+		private string _tilesetId;
 
 		/// <summary> Gets the raster tile raw data. This field is only used if texture is fetched/stored as byte array. Otherwise, if it's fetched as texture, you should use Texture2D.</summary>
 		/// <value> The raw data, usually an encoded JPEG or PNG. </value>
@@ -73,11 +74,17 @@ namespace Mapbox.Map
 
 			_state = State.Loading;
 			_id = canonicalTileId;
+			_tilesetId = tilesetId;
 			_callback = p;
 
 			fileSource.UnityImageRequest(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse, tileId: _id, tilesetId: tilesetId);
 		}
 
+		public override void Cancel()
+		{
+			base.Cancel();
+
+		}
 
 		private void HandleTileResponse(TextureResponse textureResponse)
 		{

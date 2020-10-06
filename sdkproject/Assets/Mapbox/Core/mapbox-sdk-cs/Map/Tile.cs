@@ -189,7 +189,7 @@ namespace Mapbox.Map
 		///	});
 		/// </code>
 		/// </example>
-		public void Cancel()
+		public virtual void Cancel()
 		{
 			if (_request != null)
 			{
