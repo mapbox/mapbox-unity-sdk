@@ -208,71 +208,15 @@ expirationDate INTEGER,
 
 		public void Add(string tilesetName, CanonicalTileId tileId, CacheItem item, bool forceInsert = false)
 		{
-
-#if MAPBOX_DEBUG_CACHE
-			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
-			UnityEngine.Debug.LogFormat("{0} {1} {2} forceInsert:{3}", methodName, tileset, tileId, forceInsert);
-#endif
-			try
-			{
-				// tile exists and we don't want to overwrite -> exit early
-				if (
-					TileExists(tilesetName, tileId)
-					&& !forceInsert
-				)
-				{
-					return;
-				}
-
-				int? tilesetId = null;
-				lock (_lock)
-				{
-					tilesetId = getTilesetId(tilesetName);
-					if (!tilesetId.HasValue)
-					{
-						tilesetId = insertTileset(tilesetName);
-					}
-				}
-
-				if (tilesetId < 0)
-				{
-					Debug.LogErrorFormat("could not get tilesetID for [{0}] tile: {1}", tilesetName, tileId);
-					return;
-				}
-
-				int rowsAffected = _sqlite.InsertOrReplace(new tiles
-				{
-					tile_set = tilesetId.Value,
-					zoom_level = tileId.Z,
-					tile_column = tileId.X,
-					tile_row = tileId.Y,
-					tile_data = item.Data,
-					timestamp = (int)UnixTimestampUtils.To(DateTime.Now),
-					etag = item.ETag
-				});
-				if (1 != rowsAffected)
-				{
-					throw new Exception(string.Format("tile [{0} / {1}] was not inserted, rows affected:{2}", tilesetName, tileId, rowsAffected));
-				}
-			}
-			catch (Exception ex)
-			{
-				Debug.LogErrorFormat("Error inserting {0} {1} {2} ", tilesetName, tileId, ex);
-			}
-
-			// update counter only when new tile gets inserted
-			if (!forceInsert)
-			{
-				_pruneCacheCounter++;
-			}
-			if (0 == _pruneCacheCounter % _pruneCacheDelta)
-			{
-				_pruneCacheCounter = 0;
-				prune();
-			}
+			Add(tilesetName,tileId, item.Data, string.Empty, item.ETag, item.ExpirationDate, forceInsert);
+		}
+		
+		public void Add(string tilesetName, CanonicalTileId tileId, TextureCacheItem infoTextureCacheItem, string path, bool forceInsert = false)
+		{
+			Add(tilesetName,tileId, null, path, infoTextureCacheItem.ETag, infoTextureCacheItem.ExpirationDate, forceInsert);
 		}
 
-		public void Add(string tilesetName, CanonicalTileId tileId, string etag, string path, bool forceInsert = false)
+		public void Add(string tilesetName, CanonicalTileId tileId, byte[] data, string path, string etag, DateTime? expirationDate, bool forceInsert = false)
 		{
 #if MAPBOX_DEBUG_CACHE
 			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
@@ -305,15 +249,18 @@ expirationDate INTEGER,
 					return;
 				}
 
+				var nowInUnix = (int) UnixTimestampUtils.To(DateTime.Now);
 				int rowsAffected = _sqlite.InsertOrReplace(new tiles
 				{
 					tile_set = tilesetId.Value,
 					zoom_level = tileId.Z,
 					tile_column = tileId.X,
 					tile_row = tileId.Y,
+					tile_data = data,
 					tile_path = path,
-					timestamp = (int)UnixTimestampUtils.To(DateTime.Now),
-					etag = etag
+					timestamp = nowInUnix,
+					etag = etag,
+					expirationDate = expirationDate.HasValue ? (int)UnixTimestampUtils.To(expirationDate.Value) : nowInUnix
 				});
 				if (1 != rowsAffected)
 				{

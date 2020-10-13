@@ -214,7 +214,7 @@ namespace Mapbox.Platform.Cache
 			}
 
 			//We probably shouldn't delay this. It will only cause problems and it should be fast enough anyway
-			_sqliteCache.Add(info.MapId, info.TileId, info.TextureCacheItem.ETag, filePath);
+			_sqliteCache.Add(info.MapId, info.TileId, info.TextureCacheItem, filePath);
 		}
 
 		public void GetAsync(string mapId, CanonicalTileId tileId, Action<TextureCacheItem> callback)
@@ -249,7 +249,6 @@ namespace Mapbox.Platform.Cache
 					{
 						textureCacheItem.ETag = tile.ETag;
 						textureCacheItem.ExpirationDate = tile.ExpirationDate;
-						callback(textureCacheItem);
 					}
 					else
 					{
@@ -259,6 +258,8 @@ namespace Mapbox.Platform.Cache
 						//delete tile, next tile it'll be updated
 						_sqliteCache.DeleteTile(mapId, tileId);
 					}
+					
+					callback(textureCacheItem);
 				}
 			}
 		}
