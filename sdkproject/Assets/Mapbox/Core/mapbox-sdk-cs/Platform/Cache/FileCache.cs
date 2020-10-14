@@ -16,18 +16,15 @@ using UnityEngine.UI;
 
 namespace Mapbox.Platform.Cache
 {
-	public class FileCache : ITextureCache
+	public class FileCache
 	{
-		private static string PersistantDataPath = Application.persistentDataPath;
+		public Action<string, CanonicalTileId, string, DateTime, string> FileSaved = (tilesetName, tileId, etag, expiration, path) => { }; 
 		private static string CacheRootFolderName = "FileCache";
 		public static string PersistantCacheRootFolderPath = Path.Combine(Application.persistentDataPath, CacheRootFolderName);
 		private static string FileExtension = ".png";
 
-		private SQLiteCache _sqliteCache;
-
-		public FileCache(SQLiteCache sqliteCache, uint maxCacheSize)
+		public FileCache(uint maxCacheSize)
 		{
-			_sqliteCache = sqliteCache;
 #if MAPBOX_DEBUG_CACHE
 			_className = this.GetType().Name;
 #endif
@@ -40,8 +37,6 @@ namespace Mapbox.Platform.Cache
 			{
 				Directory.CreateDirectory(PersistantCacheRootFolderPath);
 			}
-
-
 		}
 
 #if MAPBOX_DEBUG_CACHE
@@ -65,18 +60,16 @@ namespace Mapbox.Platform.Cache
 			_cachedResponses = new Dictionary<string, CacheItem>();
 		}
 
-		public void CheckIntegrity()
+		public void CheckIntegrity(List<tiles> tiles)
 		{
-			var tiles = _sqliteCache.GetAllTiles();
-
-			var filePathsToDelete = new List<string>();
-			foreach (var tile in tiles)
-			{
-				if (!File.Exists(tile.tile_path))
-				{
-					filePathsToDelete.Add(tile.tile_path);
-				}
-			}
+//			var filePathsToDelete = new List<string>();
+//			foreach (var tile in tiles)
+//			{
+//				if (!File.Exists(tile.tile_path))
+//				{
+//					filePathsToDelete.Add(tile.tile_path);
+//				}
+//			}
 
 			DirectoryInfo di = new DirectoryInfo(PersistantCacheRootFolderPath);
 			var _files = new List<FileInfo>();
@@ -136,45 +129,6 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 
-		// public void Add(string tilesetId, CanonicalTileId tileId, float[] heightData, bool forceInsert)
-		// {
-		// 	string folderPath = Path.Combine(PersistantCacheRootFolderPath, "ElevationData");
-		// 	string filePath = Path.Combine(folderPath, tileId.ToString('_') + FileExtension);
-		//
-		// 	if (!Directory.Exists(folderPath))
-		// 	{
-		// 		Directory.CreateDirectory(folderPath);
-		// 	}
-		//
-		// 	StringBuilder sb = new StringBuilder();
-		//
-		// 	for (int i = 0; i < heightData.Length; i++)
-		// 	{
-		// 		sb.Append(heightData[i] + ";");
-		// 	}
-		// 	File.WriteAllText(filePath, sb.ToString());
-		// }
-
-		// public void GetAsync(string tilesetId, CanonicalTileId tileId, Action<float[]> callback)
-		// {
-		// 	string folderPath = Path.Combine(PersistantCacheRootFolderPath, "ElevationData");
-		// 	string filePath = Path.Combine(folderPath, tileId.ToString('_') + FileExtension);
-		//
-		// 	var elevations = new float[256 * 256];
-		// 	var text = File.ReadAllText(filePath).Split(';');
-		// 	for (int i = 0; i < text.Length; i++)
-		// 	{
-		// 		elevations[i] = float.Parse(text[i]);
-		// 	}
-		//
-		// 	callback(elevations);
-		// }
-
-		public void Add(string mapId, CanonicalTileId tileId, CacheItem item, bool forceInsert)
-		{
-
-		}
-
 		public void Add(string mapId, CanonicalTileId tileId, TextureCacheItem textureCacheItem, bool forceInsert)
 		{
 			var infoWrapper = new InfoWrapper(mapId, tileId, textureCacheItem);
@@ -214,7 +168,7 @@ namespace Mapbox.Platform.Cache
 			}
 
 			//We probably shouldn't delay this. It will only cause problems and it should be fast enough anyway
-			_sqliteCache.Add(info.MapId, info.TileId, info.TextureCacheItem, filePath);
+			FileSaved(info.MapId, info.TileId, info.TextureCacheItem.ETag, info.TextureCacheItem.ExpirationDate.Value, filePath);
 		}
 
 		public void GetAsync(string mapId, CanonicalTileId tileId, Action<TextureCacheItem> callback)
@@ -242,22 +196,7 @@ namespace Mapbox.Platform.Cache
 					var textureCacheItem = new TextureCacheItem();
 					textureCacheItem.Texture2D = DownloadHandlerTexture.GetContent(uwr);
 					textureCacheItem.Texture2D.wrapMode = TextureWrapMode.Clamp;
-					var tile = _sqliteCache.Get(mapId, tileId);
-
-					//TODO: Should we schedule metadata read? Or is it fast enough?
-					if (tile != null)
-					{
-						textureCacheItem.ETag = tile.ETag;
-						textureCacheItem.ExpirationDate = tile.ExpirationDate;
-					}
-					else
-					{
-						//file exists but sqlite entry does not
-						//entry was probably pruned but file deletion didn't go through (crashed/closed app)
-						//serve the image without metadata for now
-						//delete tile, next tile it'll be updated
-						_sqliteCache.DeleteTile(mapId, tileId);
-					}
+					textureCacheItem.FilePath = filePath;
 					
 					callback(textureCacheItem);
 				}
@@ -307,6 +246,5 @@ namespace Mapbox.Platform.Cache
 				TextureCacheItem = textureCacheItem;
 			}
 		}
-
 	}
 }

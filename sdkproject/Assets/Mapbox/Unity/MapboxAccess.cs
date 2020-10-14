@@ -168,11 +168,19 @@ namespace Mapbox.Unity
 		void ConfigureFileSource()
 		{
 			var sqliteCache = new SQLiteCache(100);
-			_fileSource = new CachingWebFileSource(_configuration.AccessToken, _configuration.GetMapsSkuToken, _configuration.AutoRefreshCache)
-				.AddTextureCache(new TextureMemoryCache(_configuration.MemoryCacheSize))
-				.AddTextureCache(new FileCache(sqliteCache, _configuration.FileCacheSize))
-				.AddCache(new MemoryCache(_configuration.MemoryCacheSize))
-				.AddCache(sqliteCache)
+			var fileCache = new FileCache(100);
+			var memoryCache = new MemoryCache(_configuration.MemoryCacheSize);
+			var textureMemoryCache = new TextureMemoryCache(_configuration.MemoryCacheSize);
+			var cacheManager = new MapboxCacheManager(textureMemoryCache, memoryCache, fileCache, sqliteCache);
+			
+			_fileSource = new CachingWebFileSource(_configuration.AccessToken, _configuration.GetMapsSkuToken, _configuration.AutoRefreshCache);
+			_fileSource.AddCacheManager(cacheManager);
+			
+//			_fileSource = new CachingWebFileSource(_configuration.AccessToken, _configuration.GetMapsSkuToken, _configuration.AutoRefreshCache)
+//				.AddTextureCache(new TextureMemoryCache(_configuration.MemoryCacheSize))
+//				.AddTextureCache(new FileCache(sqliteCache, _configuration.FileCacheSize))
+//				.AddCache(new MemoryCache(_configuration.MemoryCacheSize))
+//				.AddCache(sqliteCache)
 // #if !UNITY_WEBGL
 // 				.AddCache(new SQLiteCache(_configuration.FileCacheSize))
 // #endif

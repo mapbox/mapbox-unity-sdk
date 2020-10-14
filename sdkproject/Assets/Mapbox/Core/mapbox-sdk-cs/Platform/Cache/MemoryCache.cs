@@ -43,9 +43,9 @@ namespace Mapbox.Platform.Cache
 		}
 
 
-		public void Add(string mapdId, CanonicalTileId tilesetId, CacheItem item, bool forceInsert)
+		public void Add(string mapdId, CanonicalTileId tileId, CacheItem item, bool forceInsert)
 		{
-			string key = mapdId + "||" + tilesetId;
+			string key = mapdId + "||" + tileId;
 
 			lock (_lock)
 			{

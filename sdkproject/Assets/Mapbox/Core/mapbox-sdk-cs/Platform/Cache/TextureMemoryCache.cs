@@ -17,7 +17,8 @@ namespace Mapbox.Platform.Cache
 #endif
 			_maxCacheSize = maxCacheSize;
 			_cachedTextures = new Dictionary<string, TextureCacheItem>();
-			_textureOrderQueue = new Queue<string>();
+			//_textureOrderQueue = new Queue<string>();
+			_texOrder = new List<string>();
 		}
 
 
@@ -27,8 +28,8 @@ namespace Mapbox.Platform.Cache
 		private uint _maxCacheSize;
 		private object _lock = new object();
 		private Dictionary<string, TextureCacheItem> _cachedTextures;
-		private Queue<string> _textureOrderQueue;
-
+		//private Queue<string> _textureOrderQueue;
+		private List<string> _texOrder;
 
 		public uint MaxCacheSize
 		{
@@ -38,11 +39,11 @@ namespace Mapbox.Platform.Cache
 		public void ReInit()
 		{
 			_cachedTextures = new Dictionary<string, TextureCacheItem>();
+			
 		}
 
 		public void Add(string mapdId, CanonicalTileId tilesetId, CacheItem item, bool forceInsert)
 		{
-
 		}
 
 		public void Add(string mapId, CanonicalTileId tileId, TextureCacheItem textureCacheItem, bool forceInsert)
@@ -55,7 +56,8 @@ namespace Mapbox.Platform.Cache
 				{
 					// var toRemove = _cachedTextures.OrderBy(c => c.Value.AddedToCacheTicksUtc).First();
 					// toRemove.Value.Texture2D.Destroy();
-					var keyToRemove = _textureOrderQueue.Dequeue();
+					var keyToRemove = _texOrder[0];
+					_texOrder.RemoveAt(0);
 					_cachedTextures[keyToRemove].Texture2D.Destroy();
 					_cachedTextures.Remove(keyToRemove);
 				}
@@ -65,7 +67,8 @@ namespace Mapbox.Platform.Cache
 				{
 					textureCacheItem.AddedToCacheTicksUtc = DateTime.UtcNow.Ticks;
 					_cachedTextures.Add(key, textureCacheItem);
-					_textureOrderQueue.Enqueue(key);
+					//_textureOrderQueue.Enqueue(key);
+					_texOrder.Add(key);
 				}
 				else
 				{
@@ -91,6 +94,8 @@ namespace Mapbox.Platform.Cache
 					return null;
 				}
 
+				_texOrder.Remove(key);
+				_texOrder.Add(key);
 				return _cachedTextures[key];
 			}
 		}
@@ -140,7 +145,8 @@ namespace Mapbox.Platform.Cache
 			lock (_lock)
 			{
 				_cachedTextures.Clear();
-				_textureOrderQueue.Clear();
+				//_textureOrderQueue.Clear();
+				_texOrder.Clear();
 			}
 		}
 

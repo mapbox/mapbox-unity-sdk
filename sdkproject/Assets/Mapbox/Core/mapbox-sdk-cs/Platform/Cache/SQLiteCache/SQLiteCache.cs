@@ -86,7 +86,6 @@ namespace Mapbox.Platform.Cache
 
 		#endregion
 
-
 		private void init()
 		{
 
@@ -170,13 +169,11 @@ expirationDate INTEGER,
 			}
 		}
 
-
 		private void openOrCreateDb(string dbName)
 		{
 			_dbPath = GetFullDbPath(dbName);
 			_sqlite = new SQLiteConnection(_dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
 		}
-
 
 		/// <summary>
 		/// <para>Reinitialize cache.</para>
@@ -383,6 +380,9 @@ expirationDate INTEGER,
 			DateTime? expirationDate = null;
 			if (tile.expirationDate.HasValue) { expirationDate = UnixTimestampUtils.From((double)tile.expirationDate.Value); }
 
+			tile.timestamp = (int) UnixTimestampUtils.To(DateTime.Now);
+			_sqlite.InsertOrReplace(tile);
+			
 			return new CacheItem()
 			{
 				Data = tile.tile_data,
@@ -432,7 +432,6 @@ expirationDate INTEGER,
 			// 	.FirstOrDefault();
 		}
 
-
 		private int insertTileset(string tilesetName)
 		{
 			try
@@ -457,7 +456,6 @@ expirationDate INTEGER,
 			}
 		}
 
-
 		private int? getTilesetId(string tilesetName)
 		{
 			tilesets tileset = _sqlite
@@ -466,7 +464,6 @@ expirationDate INTEGER,
 				.FirstOrDefault();
 			return null == tileset ? (int?)null : tileset.id;
 		}
-
 
 		/// <summary>
 		/// FOR INTERNAL DEBUGGING ONLY - DON'T RELY ON IN PRODUCTION
@@ -483,7 +480,6 @@ expirationDate INTEGER,
 				.Where(t => t.tile_set == tilesetId.Value)
 				.LongCount();
 		}
-
 
 		/// <summary>
 		/// Clear cache for one tile set
@@ -535,9 +531,12 @@ expirationDate INTEGER,
 			File.Delete(_dbPath);
 		}
 
-		public void DeleteTile(string mapId, CanonicalTileId tileId)
+		public void DeleteTileFile(string filePath, string mapId, CanonicalTileId tileId)
 		{
-			Debug.Log("Cleaning leftover files, NYI");
+			if (File.Exists(filePath))
+			{
+				File.Delete(filePath);
+			}
 		}
 
 		public List<tiles> GetAllTiles()

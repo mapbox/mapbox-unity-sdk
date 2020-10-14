@@ -13,19 +13,20 @@ namespace Mapbox.Platform.Cache
 	using System.Collections;
 	using System.Linq;
 
-
 	public class CachingWebFileSource : IFileSource, IDisposable
 	{
 #if MAPBOX_DEBUG_CACHE
 		private string _className;
 #endif
+
+		private MapboxCacheManager _cacheManager;
+		
 		private bool _disposed;
-		private List<ICache> _caches = new List<ICache>();
-		private List<ITextureCache> _textureCaches = new List<ITextureCache>();
+		
 		private string _accessToken;
 		private Func<string> _getMapsSkuToken;
 		private bool _autoRefreshCache;
-		private TextureMemoryCache _memoryTextureCache;
+		
 
 		public CachingWebFileSource(string accessToken, Func<string> getMapsSkuToken, bool autoRefreshCache)
 		{
@@ -56,90 +57,40 @@ namespace Mapbox.Platform.Cache
 			{
 				if (disposeManagedResources)
 				{
-					for (int i = 0; i < _caches.Count; i++)
-					{
-						IDisposable cache = _caches[i] as IDisposable;
-						if (null != cache)
-						{
-							cache.Dispose();
-							cache = null;
-						}
-					}
+//					for (int i = 0; i < _caches.Count; i++)
+//					{
+//						IDisposable cache = _caches[i] as IDisposable;
+//						if (null != cache)
+//						{
+//							cache.Dispose();
+//							cache = null;
+//						}
+//					}
 				}
 
 				_disposed = true;
 			}
 		}
-
 		#endregion
 
-
-		/// <summary>
-		/// Add an ICache instance
-		/// </summary>
-		/// <param name="cache">Implementation of ICache</param>
-		/// <returns></returns>
-		public CachingWebFileSource AddCache(ICache cache)
+		public CachingWebFileSource AddCacheManager(MapboxCacheManager cacheManager)
 		{
-			// don't add cache when cache size is 0
-			if (0 == cache.MaxCacheSize)
-			{
-				return this;
-			}
-
-			_caches.Add(cache);
-
+			_cacheManager = cacheManager;
 			return this;
 		}
-
-		public CachingWebFileSource AddTextureCache(ITextureCache cache)
-		{
-			// don't add cache when cache size is 0
-			if (0 == cache.MaxCacheSize)
-			{
-				return this;
-			}
-
-			_textureCaches.Add(cache as ITextureCache);
-			if (cache is TextureMemoryCache)
-			{
-				_memoryTextureCache = cache as TextureMemoryCache;
-			}
-
-			return this;
-		}
-
-
+		
 		/// <summary>
 		/// Clear all caches
 		/// </summary>
 		public void Clear()
 		{
-			foreach (var cache in _caches)
-			{
-				cache.Clear();
-			}
-
-			foreach (var cache in _textureCaches)
-			{
-				cache.Clear();
-			}
+			_cacheManager.Clear();
 		}
-
 
 		public void ReInit()
 		{
-			foreach (var cache in _caches)
-			{
-				cache.ReInit();
-			}
-
-			foreach (var cache in _textureCaches)
-			{
-				cache.ReInit();
-			}
+			_cacheManager.ReInit();
 		}
-
 
 		public IAsyncRequest Request(
 			string uri
@@ -154,17 +105,7 @@ namespace Mapbox.Platform.Cache
 				throw new Exception("Cannot cache without a tileset id");
 			}
 
-			CacheItem cachedItem = null;
-
-			// go through existing caches and check if we already have the requested tile available
-			foreach (var cache in _caches)
-			{
-				cachedItem = cache.Get(tilesetId, tileId);
-				if (null != cachedItem)
-				{
-					break;
-				}
-			}
+			CacheItem cachedItem = _cacheManager.GetDataItem(tilesetId, tileId);
 
 			var uriBuilder = new UriBuilder(uri);
 			if (!string.IsNullOrEmpty(_accessToken))
@@ -225,10 +166,7 @@ namespace Mapbox.Platform.Cache
 							// additional ETag empty check: for backwards compability with old caches
 							if (!string.IsNullOrEmpty(cachedItem.ETag) && cachedItem.ETag.Equals(headerOnly.Headers["ETag"]))
 							{
-								foreach (var cache in _caches)
-								{
-									cache.Add(tilesetId, tileId, cachedItem, false);
-								}
+								_cacheManager.AddDataItem(tilesetId, tileId, cachedItem, false);
 							}
 							else
 							{
@@ -274,36 +212,24 @@ namespace Mapbox.Platform.Cache
 			var finalUrl = CreateFinalUrl(uri);
 
 			//go through existing caches and check if we already have the requested tile available
-			foreach (var cache in _textureCaches)
+			var textureItem = _cacheManager.GetTextureItem(tilesetId, tileId); //_cacheManager.GetTextureItem(tilesetId, tileId);
+			if (textureItem == null)
 			{
-				if (cache.Exists(tilesetId, tileId))
+				if (_cacheManager.TextureExists(tilesetId, tileId))
 				{
-					//if it's on file cache, we add it to memory cache after reading the file
-					if (cache is FileCache)
+					_cacheManager.GetTextureItem(tilesetId, tileId, (textureCacheItem) =>
 					{
-						cache.GetAsync(tilesetId, tileId, (textureCacheItem) =>
-						{
-							_memoryTextureCache.Add(tilesetId, tileId, textureCacheItem, true);
-							var textureResponse = new TextureResponse {Texture2D = textureCacheItem.Texture2D};
-							callback(textureResponse);
+						var textureResponse = new TextureResponse {Texture2D = textureCacheItem.Texture2D};
+						callback(textureResponse);
 
-							if (textureCacheItem.ExpirationDate < DateTime.Now)
-							{
-								Runnable.Run(FetchTextureIfNoneMatch(tileId, tilesetId, finalUrl, textureCacheItem, (response) =>
-								{
-									callback(response);
-								}));
-							}
-						});
-					}
-					else
-					{
-						cache.GetAsync(tilesetId, tileId, (textureCacheItem) =>
+						if (textureCacheItem.ExpirationDate < DateTime.Now)
 						{
-							var textureResponse = new TextureResponse {Texture2D = textureCacheItem.Texture2D};
-							callback(textureResponse);
-						});
-					}
+							Runnable.Run(FetchTextureIfNoneMatch(tileId, tilesetId, finalUrl, textureCacheItem, (response) =>
+							{
+								callback(response);
+							}));
+						}
+					});
 
 					return;
 				}
@@ -311,7 +237,6 @@ namespace Mapbox.Platform.Cache
 
 			Runnable.Run(FetchTexture(finalUrl, callback, tilesetId, tileId));
 		}
-
 
 		private string CreateFinalUrl(string uri)
 		{
@@ -336,12 +261,15 @@ namespace Mapbox.Platform.Cache
 
 		public Texture2D GetTextureFromMemoryCache(string mapId, CanonicalTileId tileId)
 		{
-			if (_memoryTextureCache.Exists(mapId, tileId))
+			var cacheItem = _cacheManager.GetTextureItem(mapId, tileId);
+			if (cacheItem != null)
 			{
-				return _memoryTextureCache.GetTexture(mapId, tileId);
+				return cacheItem.Texture2D;
 			}
-
-			return null;
+			else
+			{
+				return null;
+			}
 		}
 
 		private IEnumerator FetchTextureIfNoneMatch(CanonicalTileId tileId, string tilesetId, string finalUrl, TextureCacheItem textureCacheItem, Action<TextureResponse> callback)
@@ -358,10 +286,7 @@ namespace Mapbox.Platform.Cache
 				if (uwr.responseCode == 304) // 304 NOT MODIFIED
 				{
 					textureCacheItem.ExpirationDate = uwr.GetExpirationDate();
-					foreach (var cache in _textureCaches)
-					{
-						cache.Add(tilesetId, tileId, textureCacheItem, true);
-					}
+					_cacheManager.AddTextureItem(tilesetId, tileId, textureCacheItem, true);
 				}
 				else if (uwr.responseCode == 200) // 200 OK, it means etag&data has changed so need to update cache
 				{
@@ -378,15 +303,10 @@ namespace Mapbox.Platform.Cache
 					textureCacheItem.ETag = eTag;
 					textureCacheItem.ExpirationDate = expirationDate;
 					textureCacheItem.Data = uwr.downloadHandler.data;
-					foreach (var cache in _textureCaches)
-					{
-						cache.Add(tilesetId, tileId, textureCacheItem, true);
-					}
+					_cacheManager.AddTextureItem(tilesetId, tileId, textureCacheItem, true);
 
 					callback(response);
 				}
-
-
 			}
 		}
 
@@ -410,16 +330,13 @@ namespace Mapbox.Platform.Cache
 					var texture = DownloadHandlerTexture.GetContent(uwr);
 					texture.wrapMode = TextureWrapMode.Clamp;
 					response.Texture2D = texture;
-					foreach (var cache in _textureCaches)
+					_cacheManager.AddTextureItem(tilesetId, tileId, new TextureCacheItem()
 					{
-						cache.Add(tilesetId, tileId, new TextureCacheItem()
-						{
-							Texture2D = texture,
-							ETag = eTag,
-							ExpirationDate = expirationDate,
-							Data = uwr.downloadHandler.data
-						}, true);
-					}
+						Texture2D = texture,
+						ETag = eTag,
+						ExpirationDate = expirationDate,
+						Data = uwr.downloadHandler.data
+					}, true);
 
 					callback(response);
 				}
@@ -439,20 +356,17 @@ namespace Mapbox.Platform.Cache
 						DateTime expirationDate = response.GetExpirationDate();
 
 						// propagate to all caches forcing update
-						foreach (var cache in _caches)
-						{
-							cache.Add(
-								tilesetId
-								, tileId
-								, new CacheItem()
-								{
-									Data = response.Data,
-									ETag = eTag,
-									ExpirationDate = expirationDate
-								}
-								, true // force insert/update
-							);
-						}
+						_cacheManager.AddDataItem(
+							tilesetId
+							, tileId
+							, new CacheItem()
+							{
+								Data = response.Data,
+								ETag = eTag,
+								ExpirationDate = expirationDate
+							}
+							, true // force insert/update
+						);
 					}
 
 					if (null != callback)
@@ -491,91 +405,5 @@ namespace Mapbox.Platform.Cache
 				// Empty. We can't cancel an instantaneous response.
 			}
 		}
-
-
-		// public void UnityElevationRequest(string uri, Action<float[]> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null)
-		// {
-		// 	if (string.IsNullOrEmpty(tilesetId))
-		// 	{
-		// 		throw new Exception("Cannot cache without a tileset id");
-		// 	}
-		//
-		// 	CacheItem cachedItem = null;
-		//
-		// 	//go through existing caches and check if we already have the requested tile available
-		// 	foreach (var cache in _caches.Cast<ITextureCache>())
-		// 	{
-		// 		if (cache.Exists(tilesetId, tileId))
-		// 		{
-		// 			cache.GetAsync(tilesetId, tileId, callback);
-		// 			return;
-		// 		}
-		// 	}
-		//
-		// 	var uriBuilder = new UriBuilder(uri);
-		// 	if (!string.IsNullOrEmpty(_accessToken))
-		// 	{
-		// 		string accessTokenQuery = "access_token=" + _accessToken;
-		// 		string mapsSkuToken = "sku=" + _getMapsSkuToken();
-		// 		if (uriBuilder.Query != null && uriBuilder.Query.Length > 1)
-		// 		{
-		// 			uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery + "&" + mapsSkuToken;
-		// 		}
-		// 		else
-		// 		{
-		// 			uriBuilder.Query = accessTokenQuery + "&" + mapsSkuToken;
-		// 		}
-		// 	}
-		//
-		// 	string finalUrl = uriBuilder.ToString();
-		//
-		// 	Runnable.Run(FetchElevation(finalUrl, callback, tilesetId, tileId));
-		// 	// }
-		// }
-
-
-		// private IEnumerator FetchElevation(string finalUrl, Action<float[]> callback, string tilesetId, CanonicalTileId tileId)
-		// {
-		// 	using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(finalUrl))
-		// 	{
-		// 		yield return uwr.SendWebRequest();
-		//
-		// 		if (uwr.isNetworkError || uwr.isHttpError)
-		// 		{
-		// 			UnityEngine.Debug.LogErrorFormat(uwr.error);
-		// 		}
-		// 		else
-		// 		{
-		// 			var texture = DownloadHandlerTexture.GetContent(uwr);
-		//
-		//
-		// 			byte[] rgbData = texture.GetRawTextureData();
-		//
-		// 			// Get rid of this temporary texture. We don't need to bloat memory.
-		// 			//_heightTexture.LoadImage(null);
-		//
-		// 			var heightData = new float[256 * 256];
-		//
-		// 			for (int xx = 0; xx < 256; ++xx)
-		// 			{
-		// 				for (int yy = 0; yy < 256; ++yy)
-		// 				{
-		// 					float r = rgbData[(xx * 256 + yy) * 4 + 1];
-		// 					float g = rgbData[(xx * 256 + yy) * 4 + 2];
-		// 					float b = rgbData[(xx * 256 + yy) * 4 + 3];
-		// 					//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
-		// 					heightData[xx * 256 + yy] = (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
-		// 				}
-		// 			}
-		//
-		// 			foreach (var cache in _caches.Cast<ITextureCache>())
-		// 			{
-		// 				cache.Add(tilesetId, tileId, heightData, true);
-		// 			}
-		//
-		// 			callback(heightData);
-		// 		}
-		// 	}
-		// }
 	}
 }
