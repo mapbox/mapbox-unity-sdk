@@ -259,28 +259,19 @@ namespace Mapbox.Unity
 			_fileSource.UnityImageRequest(url, callback, _configuration.DefaultTimeout, tileId, tilesetId);
 		}
 
-		public void MarkBaseTilesMemoryCache(CanonicalTileId tileId, string tilesetId)
-		{
-			var url = TileResource.MakeClassicRetinaRaster(tileId, tilesetId).GetUrl();
-			UnityImageRequest(url, (t) =>
-			{
-				_textureMemoryCache.MarkFixed(tileId, tilesetId);
-			}, 10, tileId, tilesetId);
-		}
-
 		public Texture2D GetTextureFromMemoryCache(string mapId, CanonicalTileId tileId)
 		{
 			return _fileSource.GetTextureFromMemoryCache(mapId, tileId);
 		}
 
-		public void DownloadAndCacheBaseTiles()
+		public void DownloadAndCacheBaseTiles(string imageryLayerSourceId, bool rasterOptionsUseRetina)
 		{
 			for (int i = 0; i < 4; i++)
 			{
 				for (int j = 0; j < 4; j++)
 				{
 					var tileId = new CanonicalTileId(2, i, j);
-					MarkBaseTilesMemoryCache(tileId, "mapbox.satellite");
+					MarkBaseTilesMemoryCache(tileId, imageryLayerSourceId, rasterOptionsUseRetina);
 				}
 			}
 
@@ -289,10 +280,33 @@ namespace Mapbox.Unity
 				for (int j = 0; j < 2; j++)
 				{
 					var tileId = new CanonicalTileId(1, i, j);
-					MarkBaseTilesMemoryCache(tileId, "mapbox.satellite");
+					MarkBaseTilesMemoryCache(tileId, imageryLayerSourceId, rasterOptionsUseRetina);
 				}
 			}
 		}
+
+		public void MarkBaseTilesMemoryCache(CanonicalTileId tileId, string tilesetId, bool retina)
+		{
+			string url;
+			if (tilesetId.StartsWith("mapbox://", StringComparison.Ordinal))
+			{
+				url = retina
+					? TileResource.MakeRetinaRaster(tileId, tilesetId).GetUrl()
+					: TileResource.MakeRaster(tileId, tilesetId).GetUrl();
+			}
+			else
+			{
+				url = retina
+					? TileResource.MakeClassicRetinaRaster(tileId, tilesetId).GetUrl()
+					: TileResource.MakeClassicRaster(tileId, tilesetId).GetUrl();
+			}
+
+			UnityImageRequest(url, (t) =>
+			{
+				_textureMemoryCache.MarkFixed(tileId, tilesetId);
+			}, 10, tileId, tilesetId);
+		}
+
 
 		Geocoder _geocoder;
 		/// <summary>

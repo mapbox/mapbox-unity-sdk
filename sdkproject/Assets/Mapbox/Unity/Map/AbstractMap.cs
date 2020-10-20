@@ -631,8 +631,6 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		protected virtual void SetUpMap()
 		{
-			MapboxAccess.Instance.DownloadAndCacheBaseTiles();
-
 			SetPlacementStrategy();
 
 			SetScalingStrategy();
@@ -663,6 +661,8 @@ namespace Mapbox.Unity.Map
 				_imagery.Factory,
 				_vectorData.Factory
 			};
+
+			MapboxAccess.Instance.DownloadAndCacheBaseTiles(_imagery.LayerSourceId, _imagery.LayerProperty.rasterOptions.useRetina);
 
 			InitializeMap(_options);
 		}
