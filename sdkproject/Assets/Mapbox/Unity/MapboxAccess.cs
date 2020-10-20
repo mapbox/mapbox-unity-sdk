@@ -259,7 +259,7 @@ namespace Mapbox.Unity
 			_fileSource.UnityImageRequest(url, callback, _configuration.DefaultTimeout, tileId, tilesetId);
 		}
 
-		public Texture2D GetTextureFromMemoryCache(string mapId, CanonicalTileId tileId)
+		public TextureCacheItem GetTextureFromMemoryCache(string mapId, CanonicalTileId tileId)
 		{
 			return _fileSource.GetTextureFromMemoryCache(mapId, tileId);
 		}
@@ -306,7 +306,6 @@ namespace Mapbox.Unity
 				_textureMemoryCache.MarkFixed(tileId, tilesetId);
 			}, 10, tileId, tilesetId);
 		}
-
 
 		Geocoder _geocoder;
 		/// <summary>

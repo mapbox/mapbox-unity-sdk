@@ -64,8 +64,7 @@ namespace Mapbox.Platform.Cache
 		
         public TextureCacheItem GetTextureItem(string tilesetId, CanonicalTileId tileId)
         {
-            var textureCacheItem = _textureMemoryCache.Get(tilesetId, tileId);
-            return (TextureCacheItem) textureCacheItem;
+            return (TextureCacheItem) _textureMemoryCache.Get(tilesetId, tileId);
         }
 		
         public void GetTextureItem(string tilesetId, CanonicalTileId tileId, Action<TextureCacheItem> callback)

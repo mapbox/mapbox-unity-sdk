@@ -259,17 +259,9 @@ namespace Mapbox.Platform.Cache
 			return finalUrl;
 		}
 
-		public Texture2D GetTextureFromMemoryCache(string mapId, CanonicalTileId tileId)
+		public TextureCacheItem GetTextureFromMemoryCache(string mapId, CanonicalTileId tileId)
 		{
-			var cacheItem = _cacheManager.GetTextureItem(mapId, tileId);
-			if (cacheItem != null)
-			{
-				return cacheItem.Texture2D;
-			}
-			else
-			{
-				return null;
-			}
+			return _cacheManager.GetTextureItem(mapId, tileId);
 		}
 
 		private IEnumerator FetchTextureIfNoneMatch(CanonicalTileId tileId, string tilesetId, string finalUrl, TextureCacheItem textureCacheItem, Action<TextureResponse> callback)

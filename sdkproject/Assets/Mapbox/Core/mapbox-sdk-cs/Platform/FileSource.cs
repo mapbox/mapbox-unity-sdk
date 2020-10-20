@@ -4,6 +4,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using Mapbox.Platform.Cache;
 using Mapbox.Unity;
 
 namespace Mapbox.Platform
@@ -117,7 +118,7 @@ namespace Mapbox.Platform
 			throw new NotImplementedException();
 		}
 
-		public Texture2D GetTextureFromMemoryCache(string mapId, CanonicalTileId tileId)
+		public TextureCacheItem GetTextureFromMemoryCache(string mapId, CanonicalTileId tileId)
 		{
 			throw new NotImplementedException();
 		}
