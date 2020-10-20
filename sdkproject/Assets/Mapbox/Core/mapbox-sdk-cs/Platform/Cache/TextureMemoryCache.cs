@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Mapbox.Platform.Cache
 {
-	public class TextureMemoryCache : ITextureCache
+	public class TextureMemoryCache
 	{
 		// TODO: add support for disposal strategy (timestamp, distance, etc.)
 		public TextureMemoryCache(uint maxCacheSize)
@@ -17,6 +17,7 @@ namespace Mapbox.Platform.Cache
 #endif
 			_maxCacheSize = maxCacheSize;
 			_cachedTextures = new Dictionary<string, TextureCacheItem>();
+			_fixedTextures = new Dictionary<string, TextureCacheItem>();
 			//_textureOrderQueue = new Queue<string>();
 			_texOrder = new List<string>();
 		}
@@ -28,6 +29,9 @@ namespace Mapbox.Platform.Cache
 		private uint _maxCacheSize;
 		private object _lock = new object();
 		private Dictionary<string, TextureCacheItem> _cachedTextures;
+
+		private Dictionary<string, TextureCacheItem> _fixedTextures;
+
 		//private Queue<string> _textureOrderQueue;
 		private List<string> _texOrder;
 
@@ -39,11 +43,6 @@ namespace Mapbox.Platform.Cache
 		public void ReInit()
 		{
 			_cachedTextures = new Dictionary<string, TextureCacheItem>();
-			
-		}
-
-		public void Add(string mapdId, CanonicalTileId tilesetId, CacheItem item, bool forceInsert)
-		{
 		}
 
 		public void Add(string mapId, CanonicalTileId tileId, TextureCacheItem textureCacheItem, bool forceInsert)
@@ -80,64 +79,31 @@ namespace Mapbox.Platform.Cache
 
 		public CacheItem Get(string tilesetId, CanonicalTileId tileId)
 		{
-			string key = tilesetId + "||" + tileId;
+			string key = GenerateKey(tilesetId, tileId);
 
 #if MAPBOX_DEBUG_CACHE
 			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
 			UnityEngine.Debug.LogFormat("{0} {1}", methodName, key);
 #endif
 
-			lock (_lock)
+			if (!_cachedTextures.ContainsKey(key))
 			{
-				if (!_cachedTextures.ContainsKey(key))
+				if (_fixedTextures != null && _fixedTextures.ContainsKey(key))
 				{
-					return null;
+					return _fixedTextures[key];
 				}
 
-				_texOrder.Remove(key);
-				_texOrder.Add(key);
-				return _cachedTextures[key];
+				return null;
 			}
+
+			_texOrder.Remove(key);
+			_texOrder.Add(key);
+			return _cachedTextures[key];
 		}
 
-		public Texture2D GetTexture(string tilesetId, CanonicalTileId tileId)
+		private static string GenerateKey(string tilesetId, CanonicalTileId tileId)
 		{
-			string key = tilesetId + "||" + tileId;
-
-#if MAPBOX_DEBUG_CACHE
-			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
-			UnityEngine.Debug.LogFormat("{0} {1}", methodName, key);
-#endif
-
-			lock (_lock)
-			{
-				if (!_cachedTextures.ContainsKey(key))
-				{
-					return null;
-				}
-
-				return _cachedTextures[key].Texture2D;
-			}
-		}
-
-		public void GetAsync(string tilesetId, CanonicalTileId tileId, Action<TextureCacheItem> callback)
-		{
-			string key = tilesetId + "||" + tileId;
-
-#if MAPBOX_DEBUG_CACHE
-			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
-			UnityEngine.Debug.LogFormat("{0} {1}", methodName, key);
-#endif
-
-			lock (_lock)
-			{
-				if (!_cachedTextures.ContainsKey(key))
-				{
-					callback(null);
-				}
-
-				callback(_cachedTextures[key]);
-			}
+			return tilesetId + "||" + tileId;
 		}
 
 		public void Clear()
@@ -167,6 +133,22 @@ namespace Mapbox.Platform.Cache
 		{
 			string key = tilesetId + "||" + tileId;
 			return _cachedTextures.ContainsKey(key);
+		}
+
+		public void MarkFixed(CanonicalTileId tileId, string tilesetId)
+		{
+			var key = GenerateKey(tilesetId, tileId);
+			if (_cachedTextures.ContainsKey(key))
+			{
+				var cacheItem = _cachedTextures[key];
+				_cachedTextures.Remove(key);
+				_texOrder.Remove(key);
+				_fixedTextures.Add(key, cacheItem);
+			}
+			else
+			{
+				Debug.Log("Texture isn't in memory cache, this shouldn't happen really");
+			}
 		}
 	}
 }

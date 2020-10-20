@@ -22,6 +22,7 @@ namespace Mapbox.Unity
 	public class MapboxAccess : IFileSource
 	{
 		ITelemetryLibrary _telemetryLibrary;
+		private TextureMemoryCache _textureMemoryCache;
 		CachingWebFileSource _fileSource;
 
 		public delegate void TokenValidationEvent(MapboxTokenStatus response);
@@ -109,8 +110,9 @@ namespace Mapbox.Unity
 
 				Configured = true;
 			}
-		}
 
+
+		}
 
 		public void ClearAllCacheFiles()
 		{
@@ -164,18 +166,19 @@ namespace Mapbox.Unity
 #endif
 		}
 
-
 		void ConfigureFileSource()
 		{
 			var sqliteCache = new SQLiteCache(100);
 			var fileCache = new FileCache(100);
 			var memoryCache = new MemoryCache(_configuration.MemoryCacheSize);
-			var textureMemoryCache = new TextureMemoryCache(_configuration.MemoryCacheSize);
-			var cacheManager = new MapboxCacheManager(textureMemoryCache, memoryCache, fileCache, sqliteCache);
+			_textureMemoryCache = new TextureMemoryCache(_configuration.MemoryCacheSize);
+			var cacheManager = new MapboxCacheManager(_textureMemoryCache, memoryCache, fileCache, sqliteCache);
 			
 			_fileSource = new CachingWebFileSource(_configuration.AccessToken, _configuration.GetMapsSkuToken, _configuration.AutoRefreshCache);
 			_fileSource.AddCacheManager(cacheManager);
-			
+
+
+
 //			_fileSource = new CachingWebFileSource(_configuration.AccessToken, _configuration.GetMapsSkuToken, _configuration.AutoRefreshCache)
 //				.AddTextureCache(new TextureMemoryCache(_configuration.MemoryCacheSize))
 //				.AddTextureCache(new FileCache(sqliteCache, _configuration.FileCacheSize))
@@ -186,7 +189,6 @@ namespace Mapbox.Unity
 // #endif
 				;
 		}
-
 
 		void ConfigureTelemetry()
 		{
@@ -257,10 +259,39 @@ namespace Mapbox.Unity
 			_fileSource.UnityImageRequest(url, callback, _configuration.DefaultTimeout, tileId, tilesetId);
 		}
 
+		public void MarkBaseTilesMemoryCache(CanonicalTileId tileId, string tilesetId)
+		{
+			var url = TileResource.MakeClassicRetinaRaster(tileId, tilesetId).GetUrl();
+			UnityImageRequest(url, (t) =>
+			{
+				_textureMemoryCache.MarkFixed(tileId, tilesetId);
+			}, 10, tileId, tilesetId);
+		}
 
 		public Texture2D GetTextureFromMemoryCache(string mapId, CanonicalTileId tileId)
 		{
 			return _fileSource.GetTextureFromMemoryCache(mapId, tileId);
+		}
+
+		public void DownloadAndCacheBaseTiles()
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				for (int j = 0; j < 4; j++)
+				{
+					var tileId = new CanonicalTileId(2, i, j);
+					MarkBaseTilesMemoryCache(tileId, "mapbox.satellite");
+				}
+			}
+
+			for (int i = 0; i < 2; i++)
+			{
+				for (int j = 0; j < 2; j++)
+				{
+					var tileId = new CanonicalTileId(1, i, j);
+					MarkBaseTilesMemoryCache(tileId, "mapbox.satellite");
+				}
+			}
 		}
 
 		Geocoder _geocoder;
@@ -278,7 +309,6 @@ namespace Mapbox.Unity
 				return _geocoder;
 			}
 		}
-
 
 		Directions _directions;
 		/// <summary>
@@ -312,7 +342,6 @@ namespace Mapbox.Unity
 			}
 		}
 
-
 		MapboxTokenApi _tokenValidator;
 		/// <summary>
 		/// Lazy token validator.
@@ -329,7 +358,6 @@ namespace Mapbox.Unity
 			}
 		}
 
-
 		TileJSON _tileJson;
 		/// <summary>
 		/// Lazy TileJSON wrapper: https://www.mapbox.com/api-documentation/maps/#retrieve-tilejson-metadata
@@ -345,7 +373,6 @@ namespace Mapbox.Unity
 				return _tileJson;
 			}
 		}
-
 
 		class InvalidTokenException : Exception
 		{

@@ -71,11 +71,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			OnRegistered(tile);
 		}
 
-		public virtual void Register(UnityTile tile, UnwrappedTileId parent)
-		{
-			OnRegistered(tile, parent);
-		}
-
 		public virtual void PostProcess(UnityTile tile)
 		{
 			OnPostProcess(tile);

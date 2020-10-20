@@ -631,6 +631,8 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		protected virtual void SetUpMap()
 		{
+			MapboxAccess.Instance.DownloadAndCacheBaseTiles();
+
 			SetPlacementStrategy();
 
 			SetScalingStrategy();
@@ -665,26 +667,9 @@ namespace Mapbox.Unity.Map
 			InitializeMap(_options);
 		}
 
-		protected virtual void TileProvider_OnTileAdded(UnwrappedTileId tileId)
+		protected virtual void TileProvider_OnTileAdded(UnwrappedTileId tileId, bool enableTileRightAway = false)
 		{
-			var tile = _mapVisualizer.LoadTile(tileId);
-			if (Options.placementOptions.snapMapToZero && !_worldHeightFixed)
-			{
-				_worldHeightFixed = true;
-				if (tile.HeightDataState == MeshGeneration.Enums.TilePropertyState.Loaded)
-				{
-					ApplySnapWorldToZero(tile);
-				}
-				else
-				{
-					tile.OnHeightDataChanged += (s) => { ApplySnapWorldToZero(tile); };
-				}
-			}
-		}
-
-		protected virtual void TileProvider_OnTileAdded2(UnwrappedTileId tileId, UnwrappedTileId parent)
-		{
-			var tile = _mapVisualizer.LoadTile(tileId, parent);
+			var tile = _mapVisualizer.LoadTile(tileId, enableTileRightAway);
 			if (Options.placementOptions.snapMapToZero && !_worldHeightFixed)
 			{
 				_worldHeightFixed = true;
@@ -701,6 +686,7 @@ namespace Mapbox.Unity.Map
 
 		protected virtual void TileProvider_OnTileRemoved(UnwrappedTileId tileId)
 		{
+			OnTileDisposing(tileId);
 			_mapVisualizer.DisposeTile(tileId);
 		}
 
@@ -974,14 +960,7 @@ namespace Mapbox.Unity.Map
 				foreach (var tileId in tilesToProcess)
 				{
 					_mapVisualizer.State = ModuleState.Working;
-					if (currentExtent.IsZoomingIn && currentExtent.ZoomInTileRelationships != null && currentExtent.ZoomInTileRelationships.ContainsKey(tileId))
-					{
-						TileProvider_OnTileAdded2(tileId, currentExtent.ZoomInTileRelationships[tileId]);
-					}
-					else
-					{
-						TileProvider_OnTileAdded(tileId);
-					}
+					TileProvider_OnTileAdded(tileId, true);
 				}
 			}
 		}
@@ -1304,7 +1283,7 @@ namespace Mapbox.Unity.Map
 		/// <summary>
 		/// Event delegate, gets called before a tile is getting recycled.
 		/// </summary>
-		public event Action<List<UnwrappedTileId>> OnTilesDisposing = delegate { };
+		public event Action<UnwrappedTileId> OnTileDisposing = delegate { };
 		#endregion
 	}
 }

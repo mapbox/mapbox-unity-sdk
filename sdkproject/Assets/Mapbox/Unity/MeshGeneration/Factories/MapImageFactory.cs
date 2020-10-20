@@ -120,35 +120,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			else
 			{
 				tile.RasterDataState = TilePropertyState.Loading;
-				if (_properties.sourceType != ImagerySourceType.Custom)
-				{
-					_properties.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(_properties.sourceType);
-				}
-				ImageDataFetcherParameters parameters = new ImageDataFetcherParameters()
-				{
-					canonicalTileId = tile.CanonicalTileId,
-					tile = tile,
-					tilesetId = TilesetId,
-					useRetina = _properties.rasterOptions.useRetina
-				};
-				DataFetcher.FetchData(parameters);
-			}
-		}
 
-		protected override void OnRegistered(UnityTile tile, UnwrappedTileId parent)
-		{
-			if (_properties.sourceType == ImagerySourceType.None)
-			{
-				tile.SetRasterData(null);
-				tile.RasterDataState = TilePropertyState.None;
-				return;
-			}
-			else
-			{
-				tile.RasterDataState = TilePropertyState.Loading;
-
-				parent = tile.UnwrappedTileId.Parent;
-				for (int i = 0; i < 4; i++)
+				var parent = tile.UnwrappedTileId.Parent;
+				for (int i = 0; i < 16; i++)
 				{
 					var parentTexture = _fileSource.GetTextureFromMemoryCache(TilesetId, parent.Canonical);
 					if (parentTexture != null)

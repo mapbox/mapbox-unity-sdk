@@ -223,7 +223,7 @@ namespace Mapbox.Unity.Map
 		/// Registers requested tiles to the factories
 		/// </summary>
 		/// <param name="tileId"></param>
-		public virtual UnityTile LoadTile(UnwrappedTileId tileId)
+		public virtual UnityTile LoadTile(UnwrappedTileId tileId, bool enableTile = false)
 		{
 			UnityTile unityTile = null;
 
@@ -249,6 +249,10 @@ namespace Mapbox.Unity.Map
 			}
 
 			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale, _map.AbsoluteZoom, _map.LoadingTexture);
+			if (enableTile)
+			{
+				unityTile.gameObject.SetActive(true);
+			}
 			PlaceTile(tileId, unityTile, _map);
 
 			// Don't spend resources naming objects, as you shouldn't find objects by name anyway!
@@ -265,54 +269,6 @@ namespace Mapbox.Unity.Map
 			foreach (var factory in Factories)
 			{
 				factory.Register(unityTile);
-			}
-
-			return unityTile;
-		}
-
-		public virtual UnityTile LoadTile(UnwrappedTileId tileId, UnwrappedTileId parent)
-		{
-			UnityTile unityTile = null;
-
-			if (_inactiveTiles.Count > 0)
-			{
-				unityTile = _inactiveTiles.Dequeue();
-			}
-
-			if (unityTile == null)
-			{
-				unityTile = new GameObject().AddComponent<UnityTile>();
-				try
-				{
-					unityTile.MeshRenderer.sharedMaterial = Instantiate(_map.TileMaterial);
-				}
-				catch
-				{
-					Debug.Log("Tile Material not set. Using default material");
-					unityTile.MeshRenderer.sharedMaterial = Instantiate(new Material(Shader.Find("Diffuse")));
-				}
-
-				unityTile.transform.SetParent(_map.Root, false);
-			}
-
-			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale, _map.AbsoluteZoom, _map.LoadingTexture);
-			unityTile.gameObject.SetActive(true);
-			PlaceTile(tileId, unityTile, _map);
-
-			// Don't spend resources naming objects, as you shouldn't find objects by name anyway!
-#if UNITY_EDITOR
-			unityTile.gameObject.name = unityTile.CanonicalTileId.ToString();
-#endif
-			unityTile.OnHeightDataChanged += TileHeightStateChanged;
-			unityTile.OnRasterDataChanged += TileRasterStateChanged;
-			unityTile.OnVectorDataChanged += TileVectorStateChanged;
-
-			unityTile.TileState = MeshGeneration.Enums.TilePropertyState.Loading;
-			ActiveTiles.Add(tileId, unityTile);
-
-			foreach (var factory in Factories)
-			{
-				factory.Register(unityTile, parent);
 			}
 
 			return unityTile;
