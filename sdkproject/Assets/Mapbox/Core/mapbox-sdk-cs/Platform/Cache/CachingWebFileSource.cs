@@ -212,12 +212,12 @@ namespace Mapbox.Platform.Cache
 			var finalUrl = CreateFinalUrl(uri);
 
 			//go through existing caches and check if we already have the requested tile available
-			var textureItem = _cacheManager.GetTextureItem(tilesetId, tileId); //_cacheManager.GetTextureItem(tilesetId, tileId);
+			var textureItem = _cacheManager.GetTextureItemFromMemory(tilesetId, tileId); //_cacheManager.GetTextureItem(tilesetId, tileId);
 			if (textureItem == null)
 			{
-				if (_cacheManager.TextureExists(tilesetId, tileId))
+				if (_cacheManager.TextureFileExists(tilesetId, tileId))
 				{
-					_cacheManager.GetTextureItem(tilesetId, tileId, (textureCacheItem) =>
+					_cacheManager.GetTextureItemFromFile(tilesetId, tileId, (textureCacheItem) =>
 					{
 						var textureResponse = new TextureResponse {Texture2D = textureCacheItem.Texture2D};
 						callback(textureResponse);
@@ -261,7 +261,7 @@ namespace Mapbox.Platform.Cache
 
 		public TextureCacheItem GetTextureFromMemoryCache(string mapId, CanonicalTileId tileId)
 		{
-			return _cacheManager.GetTextureItem(mapId, tileId);
+			return _cacheManager.GetTextureItemFromMemory(mapId, tileId);
 		}
 
 		private IEnumerator FetchTextureIfNoneMatch(CanonicalTileId tileId, string tilesetId, string finalUrl, TextureCacheItem textureCacheItem, Action<TextureResponse> callback)

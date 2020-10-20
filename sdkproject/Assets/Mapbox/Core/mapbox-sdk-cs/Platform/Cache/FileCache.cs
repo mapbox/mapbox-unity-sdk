@@ -18,17 +18,16 @@ namespace Mapbox.Platform.Cache
 {
 	public class FileCache
 	{
-		public Action<string, CanonicalTileId, string, DateTime, string> FileSaved = (tilesetName, tileId, etag, expiration, path) => { }; 
+		public Action<string, CanonicalTileId, TextureCacheItem> FileSaved = (tilesetName, tileId, cacheItem) => { };
 		private static string CacheRootFolderName = "FileCache";
 		public static string PersistantCacheRootFolderPath = Path.Combine(Application.persistentDataPath, CacheRootFolderName);
 		private static string FileExtension = ".png";
 
-		public FileCache(uint maxCacheSize)
+		public FileCache()
 		{
 #if MAPBOX_DEBUG_CACHE
 			_className = this.GetType().Name;
 #endif
-			_maxCacheSize = maxCacheSize;
 			_cachedResponses = new Dictionary<string, CacheItem>();
 			_infosToSave = new Queue<InfoWrapper>();
 			Runnable.Run(FileScheduler());
@@ -151,7 +150,7 @@ namespace Mapbox.Platform.Cache
 		private void SaveInfo(InfoWrapper info)
 		{
 			string folderPath = Path.Combine(PersistantCacheRootFolderPath, info.MapId);
-			string filePath = Path.Combine(folderPath, TileIdToFileName(info.TileId) + FileExtension);
+			info.TextureCacheItem.FilePath = Path.Combine(folderPath, TileIdToFileName(info.TileId) + FileExtension);
 
 			if (!Directory.Exists(folderPath))
 			{
@@ -160,7 +159,7 @@ namespace Mapbox.Platform.Cache
 
 			//byte[] bytes = info.TextureCacheItem.Texture2D.EncodeToPNG();
 			
-			using (FileStream sourceStream = new FileStream(filePath,
+			using (FileStream sourceStream = new FileStream(info.TextureCacheItem.FilePath,
 				FileMode.Create, FileAccess.Write, FileShare.Read,
 				bufferSize: 4096, useAsync: false))
 			{
@@ -168,7 +167,7 @@ namespace Mapbox.Platform.Cache
 			}
 
 			//We probably shouldn't delay this. It will only cause problems and it should be fast enough anyway
-			FileSaved(info.MapId, info.TileId, info.TextureCacheItem.ETag, info.TextureCacheItem.ExpirationDate.Value, filePath);
+			FileSaved(info.MapId, info.TileId, info.TextureCacheItem);
 		}
 
 		public void GetAsync(string mapId, CanonicalTileId tileId, Action<TextureCacheItem> callback)

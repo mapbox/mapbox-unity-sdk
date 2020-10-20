@@ -10,28 +10,29 @@ namespace Mapbox.Platform.Cache
         private FileCache _textureFileCache;
         private SQLiteCache _sqLiteCache;
 
-        public MapboxCacheManager(TextureMemoryCache textureMemoryCache, MemoryCache memoryCache, FileCache fileCache, SQLiteCache sqliteCache)
+        public MapboxCacheManager(TextureMemoryCache textureMemoryCache, MemoryCache memoryCache, FileCache fileCache = null, SQLiteCache sqliteCache = null)
         {
             _textureMemoryCache = textureMemoryCache;
             _vectorMemoryCache = memoryCache;
             _textureFileCache = fileCache;
             _sqLiteCache = sqliteCache;
+            _textureFileCache.FileSaved += TextureFileSaved;
         }
-		
+
         public void Clear()
         {
             _textureMemoryCache.Clear();
             _vectorMemoryCache.Clear();
-            _textureFileCache.Clear();
-            _sqLiteCache.Clear();
+            _textureFileCache?.Clear();
+            _sqLiteCache?.Clear();
         }
 
         public void ReInit()
         {
             _textureMemoryCache.ReInit();
             _vectorMemoryCache.ReInit();
-            _textureFileCache.ReInit();
-            _sqLiteCache.ReInit();
+            _textureFileCache?.ReInit();
+            _sqLiteCache?.ReInit();
         }
 
         public CacheItem GetDataItem(string tilesetId, CanonicalTileId tileId)
@@ -42,10 +43,13 @@ namespace Mapbox.Platform.Cache
                 return cacheItem;
             }
 
-            cacheItem = _sqLiteCache.Get(tilesetId, tileId);
-            if (cacheItem != null)
+            if (_sqLiteCache != null)
             {
-                _vectorMemoryCache.Add(tilesetId, tileId, cacheItem, true);
+                cacheItem = _sqLiteCache.Get(tilesetId, tileId);
+                if (cacheItem != null)
+                {
+                    _vectorMemoryCache.Add(tilesetId, tileId, cacheItem, true);
+                }
             }
 
             return cacheItem;
@@ -54,21 +58,38 @@ namespace Mapbox.Platform.Cache
         public void AddDataItem(string tilesetId, CanonicalTileId tileId, CacheItem cachedItem, bool forceInsert)
         {
             _vectorMemoryCache.Add(tilesetId, tileId, cachedItem, forceInsert);
-            _sqLiteCache.Add(tilesetId, tileId, cachedItem, forceInsert);
+            _sqLiteCache?.Add(tilesetId, tileId, cachedItem, forceInsert);
         }
 
-        public bool TextureExists(string tilesetId, CanonicalTileId tileId)
-        {
-            return _textureFileCache.Exists(tilesetId, tileId);
-        }
-		
-        public TextureCacheItem GetTextureItem(string tilesetId, CanonicalTileId tileId)
+        public TextureCacheItem GetTextureItemFromMemory(string tilesetId, CanonicalTileId tileId)
         {
             return (TextureCacheItem) _textureMemoryCache.Get(tilesetId, tileId);
         }
-		
-        public void GetTextureItem(string tilesetId, CanonicalTileId tileId, Action<TextureCacheItem> callback)
+
+        public bool TextureFileExists(string tilesetId, CanonicalTileId tileId)
         {
+            if (_textureFileCache != null)
+            {
+                return _textureFileCache.Exists(tilesetId, tileId);
+            }
+
+            return false;
+        }
+
+        public void AddTextureItem(string tilesetId, CanonicalTileId tileId, TextureCacheItem textureCacheItem, bool forceInsert)
+        {
+            _textureMemoryCache.Add(tilesetId, tileId, textureCacheItem, forceInsert);
+            _textureFileCache?.Add(tilesetId, tileId, textureCacheItem, forceInsert);
+        }
+
+        public void GetTextureItemFromFile(string tilesetId, CanonicalTileId tileId, Action<TextureCacheItem> callback)
+        {
+            if (_textureFileCache == null)
+            {
+                callback(null);
+                return;
+            }
+
             _textureFileCache.GetAsync(tilesetId, tileId, (textureCacheItem) =>
             {
                 var tile = _sqLiteCache.Get(tilesetId, tileId);
@@ -92,10 +113,10 @@ namespace Mapbox.Platform.Cache
             });
         }
 
-        public void AddTextureItem(string tilesetId, CanonicalTileId tileId, TextureCacheItem textureCacheItem, bool forceInsert)
+        private void TextureFileSaved(string tilesetId, CanonicalTileId tileId, TextureCacheItem textureCacheItem)
         {
-            _textureMemoryCache.Add(tilesetId, tileId, textureCacheItem, forceInsert);
-            _textureFileCache.Add(tilesetId, tileId, textureCacheItem, forceInsert);
+            _sqLiteCache?.Add(tilesetId, tileId, textureCacheItem, true);
         }
+
     }
 }

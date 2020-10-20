@@ -208,9 +208,9 @@ expirationDate INTEGER,
 			Add(tilesetName,tileId, item.Data, string.Empty, item.ETag, item.ExpirationDate, forceInsert);
 		}
 		
-		public void Add(string tilesetName, CanonicalTileId tileId, TextureCacheItem infoTextureCacheItem, string path, bool forceInsert = false)
+		public void Add(string tilesetName, CanonicalTileId tileId, TextureCacheItem infoTextureCacheItem, bool forceInsert = false)
 		{
-			Add(tilesetName,tileId, null, path, infoTextureCacheItem.ETag, infoTextureCacheItem.ExpirationDate, forceInsert);
+			Add(tilesetName,tileId, null, infoTextureCacheItem.FilePath, infoTextureCacheItem.ETag, infoTextureCacheItem.ExpirationDate, forceInsert);
 		}
 
 		public void Add(string tilesetName, CanonicalTileId tileId, byte[] data, string path, string etag, DateTime? expirationDate, bool forceInsert = false)

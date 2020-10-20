@@ -168,8 +168,8 @@ namespace Mapbox.Unity
 
 		void ConfigureFileSource()
 		{
-			var sqliteCache = new SQLiteCache(100);
-			var fileCache = new FileCache(100);
+			var sqliteCache = new SQLiteCache(_configuration.FileCacheSize);
+			var fileCache = new FileCache();
 			var memoryCache = new MemoryCache(_configuration.MemoryCacheSize);
 			_textureMemoryCache = new TextureMemoryCache(_configuration.MemoryCacheSize);
 			var cacheManager = new MapboxCacheManager(_textureMemoryCache, memoryCache, fileCache, sqliteCache);
