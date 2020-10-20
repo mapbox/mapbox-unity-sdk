@@ -124,7 +124,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				var parent = tile.UnwrappedTileId.Parent;
 				for (int i = 0; i < 16; i++)
 				{
-					var cacheItem = _fileSource.GetTextureFromMemoryCache(TilesetId, parent.Canonical);
+					var cacheItem = MapboxAccess.Instance.GetTextureFromMemoryCache(TilesetId, parent.Canonical);
 					if (cacheItem != null && cacheItem.Texture2D != null)
 					{
 						tile.SetParentTexture(parent, cacheItem.Texture2D);

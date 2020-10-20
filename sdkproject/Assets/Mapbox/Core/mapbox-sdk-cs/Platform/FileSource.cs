@@ -118,15 +118,6 @@ namespace Mapbox.Platform
 			throw new NotImplementedException();
 		}
 
-		public TextureCacheItem GetTextureFromMemoryCache(string mapId, CanonicalTileId tileId)
-		{
-			throw new NotImplementedException();
-		}
-
-		public void UnityElevationRequest(string getUrl, Action<float[]> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null)
-		{
-			throw new NotImplementedException();
-		}
 		// TODO: look at requests and implement throttling if needed
 		//private IEnumerator<IAsyncRequest> proxyResponse(string url, Action<Response> callback) {
 		private IAsyncRequest proxyResponse(
