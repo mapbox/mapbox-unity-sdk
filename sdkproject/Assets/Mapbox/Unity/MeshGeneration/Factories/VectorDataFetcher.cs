@@ -39,3 +39,9 @@ public class VectorDataFetcher : DataFetcher
 		});
 	}
 }
+
+public class VectorDataFetcherParameters : DataFetcherParameters
+{
+	public bool useOptimizedStyle = false;
+	public Style style = null;
+}

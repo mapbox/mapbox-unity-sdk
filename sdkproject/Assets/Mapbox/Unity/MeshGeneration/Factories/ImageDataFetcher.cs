@@ -2,7 +2,9 @@
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Enums;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using Mapbox.Unity.Utilities;
 
 public class ImageDataFetcher : DataFetcher
 {
@@ -32,23 +34,36 @@ public class ImageDataFetcher : DataFetcher
 			imageDataParameters.tile.AddTile(rasterTile);
 		}
 
-		rasterTile.Initialize(_fileSource, imageDataParameters.canonicalTileId, imageDataParameters.tilesetId, () =>
+		_fetchingQueue.Enqueue(new FetchInfo()
 		{
-			if (imageDataParameters.tile != null && imageDataParameters.tile.CanonicalTileId != rasterTile.Id)
+			TileId = imageDataParameters.tile.CanonicalTileId,
+			TilesetId = imageDataParameters.tilesetId,
+			RasterTile = rasterTile,
+			Callback = () =>
 			{
-				//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
-				return;
-			}
+				if (imageDataParameters.tile.CanonicalTileId != rasterTile.Id)
+				{
+					//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
+					return;
+				}
 
-			if (rasterTile.HasError)
-			{
-				FetchingError(imageDataParameters.tile, rasterTile, new TileErrorEventArgs(imageDataParameters.tile.CanonicalTileId, rasterTile.GetType(), imageDataParameters.tile, rasterTile.Exceptions));
-			}
-			else
-			{
-				DataRecieved(imageDataParameters.tile, rasterTile);
-			}
+				if (rasterTile.HasError)
+				{
+					FetchingError(imageDataParameters.tile, rasterTile, new TileErrorEventArgs(imageDataParameters.tile.CanonicalTileId, rasterTile.GetType(), imageDataParameters.tile, rasterTile.Exceptions));
+				}
+				else
+				{
+					DataRecieved(imageDataParameters.tile, rasterTile);
+				}
 
+			}
 		});
 	}
+
+
+}
+
+public class ImageDataFetcherParameters : DataFetcherParameters
+{
+	public bool useRetina = true;
 }
