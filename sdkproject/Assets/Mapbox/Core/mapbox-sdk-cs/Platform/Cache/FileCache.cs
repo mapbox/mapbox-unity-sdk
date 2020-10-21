@@ -22,6 +22,7 @@ namespace Mapbox.Platform.Cache
 		private static string CacheRootFolderName = "FileCache";
 		public static string PersistantCacheRootFolderPath = Path.Combine(Application.persistentDataPath, CacheRootFolderName);
 		private static string FileExtension = ".png";
+		private Dictionary<string, string> MapIdToFolderNameDictionary;
 
 		public FileCache()
 		{
@@ -30,6 +31,7 @@ namespace Mapbox.Platform.Cache
 #endif
 			_cachedResponses = new Dictionary<string, CacheItem>();
 			_infosToSave = new Queue<InfoWrapper>();
+			MapIdToFolderNameDictionary = new Dictionary<string, string>();
 			Runnable.Run(FileScheduler());
 
 			if (!Directory.Exists(PersistantCacheRootFolderPath))
@@ -103,7 +105,7 @@ namespace Mapbox.Platform.Cache
 
 		public bool Exists(string mapId, CanonicalTileId tileId)
 		{
-			string filePath = Path.Combine(PersistantCacheRootFolderPath, mapId + "/" + TileIdToFileName(tileId) + FileExtension);
+			string filePath = Path.Combine(PersistantCacheRootFolderPath, MapIdToFolderName(mapId) + "/" + TileIdToFileName(tileId) + FileExtension);
 			return File.Exists(filePath);
 		}
 
@@ -149,7 +151,7 @@ namespace Mapbox.Platform.Cache
 
 		private void SaveInfo(InfoWrapper info)
 		{
-			string folderPath = Path.Combine(PersistantCacheRootFolderPath, info.MapId);
+			string folderPath = Path.Combine(PersistantCacheRootFolderPath, MapIdToFolderName(info.MapId));
 			info.TextureCacheItem.FilePath = Path.Combine(folderPath, TileIdToFileName(info.TileId) + FileExtension);
 
 			if (!Directory.Exists(folderPath))
@@ -172,7 +174,7 @@ namespace Mapbox.Platform.Cache
 
 		public void GetAsync(string mapId, CanonicalTileId tileId, Action<TextureCacheItem> callback)
 		{
-			string filePath = Path.Combine(PersistantCacheRootFolderPath, mapId + "/" + TileIdToFileName(tileId));
+			string filePath = Path.Combine(PersistantCacheRootFolderPath, MapIdToFolderName(mapId) + "/" + TileIdToFileName(tileId));
 
 			if (File.Exists(filePath + FileExtension))
 			{
@@ -200,6 +202,22 @@ namespace Mapbox.Platform.Cache
 					callback(textureCacheItem);
 				}
 			}
+		}
+
+		private string MapIdToFolderName(string mapId)
+		{
+			if (MapIdToFolderNameDictionary.ContainsKey(mapId))
+			{
+				return MapIdToFolderNameDictionary[mapId];
+			}
+			var folderName = mapId;
+			var chars = Path.GetInvalidFileNameChars();
+			foreach (Char c in chars)
+			{
+				folderName = folderName.Replace(c, '-');
+			}
+			MapIdToFolderNameDictionary.Add(mapId, folderName);
+			return folderName;
 		}
 
 		private string TileIdToFileName(CanonicalTileId tileId)
