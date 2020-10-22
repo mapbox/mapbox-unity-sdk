@@ -170,6 +170,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		protected override void OnUnregistered(UnityTile tile)
 		{
+			DataFetcher.CancelFetching(tile.UnwrappedTileId);
 			if (_tilesWaitingResponse != null && _tilesWaitingResponse.Contains(tile))
 			{
 				_tilesWaitingResponse.Remove(tile);

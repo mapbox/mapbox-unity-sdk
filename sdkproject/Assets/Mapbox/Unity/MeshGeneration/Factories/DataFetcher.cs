@@ -10,16 +10,29 @@ using UnityEngine;
 public abstract class DataFetcher : ScriptableObject
 {
 	protected MapboxAccess _fileSource;
-	protected Queue<FetchInfo> _fetchingQueue;
+	//protected Queue<FetchInfo> _fetchingQueue;
+
+	private Queue<CanonicalTileId> _tileOrder;
+	private Dictionary<CanonicalTileId, FetchInfo> _tileFetchInfos;
 
 	public IEnumerator UpdateTick()
 	{
 		while (true)
 		{
-			if (_fetchingQueue.Count > 0)
+			// if (_fetchingQueue.Count > 0)
+			// {
+			// 	var fi = _fetchingQueue.Dequeue();
+			// 	fi.RasterTile.Initialize(_fileSource, fi.TileId, fi.TilesetId, fi.Callback);
+			// }
+			while (_tileOrder.Count > 0)
 			{
-				var fi = _fetchingQueue.Dequeue();
-				fi.RasterTile.Initialize(_fileSource, fi.TileId, fi.TilesetId, fi.Callback);
+				var tileId = _tileOrder.Dequeue();
+				if (_tileFetchInfos.ContainsKey(tileId))
+				{
+					var fi = _tileFetchInfos[tileId];
+					fi.RasterTile.Initialize(_fileSource, fi.TileId, fi.TilesetId, fi.Callback);
+					yield return null;
+				}
 			}
 
 			yield return null;
@@ -29,11 +42,32 @@ public abstract class DataFetcher : ScriptableObject
 	public virtual void OnEnable()
 	{
 		_fileSource = MapboxAccess.Instance;
-		_fetchingQueue = new Queue<FetchInfo>();
+		_tileOrder = new Queue<CanonicalTileId>();
+		_tileFetchInfos = new Dictionary<CanonicalTileId, FetchInfo>();
+		//_fetchingQueue = new Queue<FetchInfo>();
 		Runnable.Run(UpdateTick());
 	}
 
 	public abstract void FetchData(DataFetcherParameters parameters);
+
+	protected void EnqueueForFetching(FetchInfo info)
+	{
+		//_fetchingQueue.Enqueue(info);
+		if (!_tileFetchInfos.ContainsKey(info.TileId))
+		{
+			_tileOrder.Enqueue(info.TileId);
+			_tileFetchInfos.Add(info.TileId, info);
+		}
+	}
+
+	public virtual void CancelFetching(UnwrappedTileId tileUnwrappedTileId)
+	{
+		var canonical = tileUnwrappedTileId.Canonical;
+		if (_tileFetchInfos.ContainsKey(canonical))
+		{
+			_tileFetchInfos.Remove(canonical);
+		}
+	}
 }
 
 public class DataFetcherParameters

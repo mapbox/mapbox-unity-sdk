@@ -18,7 +18,7 @@ public class TerrainDataFetcher : DataFetcher
 		}
 		var pngRasterTile = new RawPngRasterTile();
 
-		_fetchingQueue.Enqueue(new FetchInfo()
+		EnqueueForFetching(new FetchInfo()
 		{
 			TileId = terrainDataParameters.tile.CanonicalTileId,
 			TilesetId = terrainDataParameters.tilesetId,

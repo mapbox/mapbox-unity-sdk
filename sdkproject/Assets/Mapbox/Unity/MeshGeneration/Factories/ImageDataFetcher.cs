@@ -34,7 +34,7 @@ public class ImageDataFetcher : DataFetcher
 			imageDataParameters.tile.AddTile(rasterTile);
 		}
 
-		_fetchingQueue.Enqueue(new FetchInfo()
+		EnqueueForFetching(new FetchInfo()
 		{
 			TileId = imageDataParameters.tile.CanonicalTileId,
 			TilesetId = imageDataParameters.tilesetId,
@@ -59,8 +59,6 @@ public class ImageDataFetcher : DataFetcher
 			}
 		});
 	}
-
-
 }
 
 public class ImageDataFetcherParameters : DataFetcherParameters
