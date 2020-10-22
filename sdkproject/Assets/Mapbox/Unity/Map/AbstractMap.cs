@@ -333,8 +333,6 @@ namespace Mapbox.Unity.Map
 			{
 				TileProvider.UpdateTileProvider();
 			}
-
-			UpdateTileLoadQueue();
 		}
 
 		public virtual void UpdateMap()
@@ -669,12 +667,8 @@ namespace Mapbox.Unity.Map
 			InitializeMap(_options);
 		}
 
-		private Queue<UnwrappedTileId> _tileOrder = new Queue<UnwrappedTileId>();
-		private HashSet<UnwrappedTileId> _tilesToLoad = new HashSet<UnwrappedTileId>();
 		protected virtual void TileProvider_OnTileAdded(UnwrappedTileId tileId, bool enableTileRightAway = false)
 		{
-			// _tileOrder.Enqueue(tileId);
-			// _tilesToLoad.Add(tileId);
 			var tile = _mapVisualizer.LoadTile(tileId, enableTileRightAway);
 			if (Options.placementOptions.snapMapToZero && !_worldHeightFixed)
 			{
@@ -690,42 +684,8 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		private void UpdateTileLoadQueue()
-		{
-			while (_tileOrder.Count > 0)
-			{
-				var tileId = _tileOrder.Dequeue();
-				if (!_tilesToLoad.Contains(tileId))
-				{
-					continue;
-				}
-
-				_tilesToLoad.Remove(tileId);
-				var tile = _mapVisualizer.LoadTile(tileId, true);
-				if (Options.placementOptions.snapMapToZero && !_worldHeightFixed)
-				{
-					_worldHeightFixed = true;
-					if (tile.HeightDataState == MeshGeneration.Enums.TilePropertyState.Loaded)
-					{
-						ApplySnapWorldToZero(tile);
-					}
-					else
-					{
-						tile.OnHeightDataChanged += (s) => { ApplySnapWorldToZero(tile); };
-					}
-				}
-
-				return;
-			}
-		}
-
 		protected virtual void TileProvider_OnTileRemoved(UnwrappedTileId tileId)
 		{
-			if (_tilesToLoad.Contains(tileId))
-			{
-				_tilesToLoad.Remove(tileId);
-				return;
-			}
 			OnTileDisposing(tileId);
 			_mapVisualizer.DisposeTile(tileId);
 		}

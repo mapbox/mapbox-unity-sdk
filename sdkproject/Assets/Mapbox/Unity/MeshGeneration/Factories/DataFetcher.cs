@@ -30,6 +30,7 @@ public abstract class DataFetcher : ScriptableObject
 				if (_tileFetchInfos.ContainsKey(tileId))
 				{
 					var fi = _tileFetchInfos[tileId];
+					_tileFetchInfos.Remove(tileId);
 					fi.RasterTile.Initialize(_fileSource, fi.TileId, fi.TilesetId, fi.Callback);
 					yield return null;
 				}
