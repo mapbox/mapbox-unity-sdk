@@ -44,6 +44,7 @@
 			{
 				_isInitialized = true;
 			};
+			Application.targetFrameRate = 120;
 		}
 
 		public void Update()
@@ -148,7 +149,7 @@
 				// Divide it by the tile width in pixels ( 256 in our case)
 				// to get degrees represented by each pixel.
 				// Keyboard offset is in pixels, therefore multiply the factor with the offset to move the center.
-				float factor = _panSpeed * (Conversions.GetTileScaleInDegrees((float)_mapManager.CenterLatitudeLongitude.x, _mapManager.AbsoluteZoom));
+				float factor = _panSpeed * (Conversions.GetTileScaleInDegrees((float) _mapManager.CenterLatitudeLongitude.x, _mapManager.AbsoluteZoom));
 
 				var latitudeLongitude = new Vector2d(_mapManager.CenterLatitudeLongitude.x + zMove * factor * 2.0f, _mapManager.CenterLatitudeLongitude.y + xMove * factor * 4.0f);
 
@@ -179,7 +180,7 @@
 				var pos = _referenceCamera.ScreenToWorldPoint(mousePosScreen);
 
 				var latlongDelta = _mapManager.WorldToGeoPosition(pos);
-				Debug.Log("Latitude: " + latlongDelta.x + " Longitude: " + latlongDelta.y);
+				//Debug.Log("Latitude: " + latlongDelta.x + " Longitude: " + latlongDelta.y);
 			}
 
 			if (Input.GetMouseButton(0) && !EventSystem.current.IsPointerOverGameObject())
@@ -213,7 +214,7 @@
 					{
 						if (null != _mapManager)
 						{
-							float factor = _panSpeed * Conversions.GetTileScaleInMeters((float)0, _mapManager.AbsoluteZoom) / _mapManager.UnityTileSize;
+							float factor = Time.deltaTime * Application.targetFrameRate * _panSpeed * Conversions.GetTileScaleInMeters((float) 0, _mapManager.AbsoluteZoom) / _mapManager.UnityTileSize;
 							var latlongDelta = Conversions.MetersToLatLon(new Vector2d(offset.x * factor, offset.z * factor));
 							var newLatLong = _mapManager.CenterLatitudeLongitude + latlongDelta;
 
@@ -271,7 +272,7 @@
 							// Divide it by the tile width in pixels ( 256 in our case)
 							// to get degrees represented by each pixel.
 							// Mouse offset is in pixels, therefore multiply the factor with the offset to move the center.
-							float factor = _panSpeed * Conversions.GetTileScaleInDegrees((float)_mapManager.CenterLatitudeLongitude.x, _mapManager.AbsoluteZoom) / _mapManager.UnityTileSize;
+							float factor = Time.deltaTime * Application.targetFrameRate * _panSpeed * Conversions.GetTileScaleInDegrees((float) _mapManager.CenterLatitudeLongitude.x, _mapManager.AbsoluteZoom) / _mapManager.UnityTileSize;
 
 							var latitudeLongitude = new Vector2d(_mapManager.CenterLatitudeLongitude.x + offset.z * factor, _mapManager.CenterLatitudeLongitude.y + offset.x * factor);
 							_mapManager.UpdateMap(latitudeLongitude, _mapManager.Zoom);
