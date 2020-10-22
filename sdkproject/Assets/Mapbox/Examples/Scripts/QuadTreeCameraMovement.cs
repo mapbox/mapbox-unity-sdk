@@ -28,6 +28,7 @@
 		private Vector3 _origin;
 		private Vector3 _mousePosition;
 		private Vector3 _mousePositionPrevious;
+		private int _touchCountPrevious;
 		private bool _shouldDrag;
 		private bool _isInitialized = false;
 		private Plane _groundPlane = new Plane(Vector3.up, 0);
@@ -44,7 +45,7 @@
 			{
 				_isInitialized = true;
 			};
-			Application.targetFrameRate = 120;
+			Application.targetFrameRate = 90;
 		}
 
 		public void Update()
@@ -65,8 +66,8 @@
 		{
 			if (!_isInitialized) { return; }
 
-			if (!_dragStartedOnUI)
-			{
+			// if (!_dragStartedOnUI)
+			// {
 				if (Input.touchSupported && Input.touchCount > 0)
 				{
 					HandleTouch();
@@ -75,7 +76,7 @@
 				{
 					HandleMouseAndKeyBoard();
 				}
-			}
+			// }
 		}
 
 		void HandleMouseAndKeyBoard()
@@ -90,7 +91,7 @@
 			float xMove = Input.GetAxis("Horizontal");
 			float zMove = Input.GetAxis("Vertical");
 
-			PanMapUsingKeyBoard(xMove, zMove);
+			// PanMapUsingKeyBoard(xMove, zMove);
 
 
 			//pan mouse
@@ -104,30 +105,33 @@
 			switch (Input.touchCount)
 			{
 				case 1:
-					{
-						PanMapUsingTouchOrMouse();
-					}
+				{
+					PanMapUsingTouchOrMouse();
+					_touchCountPrevious = 1;
+				}
 					break;
 				case 2:
-					{
-						// Store both touches.
-						Touch touchZero = Input.GetTouch(0);
-						Touch touchOne = Input.GetTouch(1);
+				{
+					// Store both touches.
+					Touch touchZero = Input.GetTouch(0);
+					Touch touchOne = Input.GetTouch(1);
 
-						// Find the position in the previous frame of each touch.
-						Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
-						Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
+					// Find the position in the previous frame of each touch.
+					Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
+					Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
 
-						// Find the magnitude of the vector (the distance) between the touches in each frame.
-						float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
-						float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
+					// Find the magnitude of the vector (the distance) between the touches in each frame.
+					float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
+					float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
 
-						// Find the difference in the distances between each frame.
-						zoomFactor = 0.01f * (touchDeltaMag - prevTouchDeltaMag);
-					}
+					// Find the difference in the distances between each frame.
+					zoomFactor = 0.01f * (touchDeltaMag - prevTouchDeltaMag) * Time.deltaTime * Application.targetFrameRate;
+				}
 					ZoomMapUsingTouchOrMouse(zoomFactor);
+					_touchCountPrevious = 2;
 					break;
 				default:
+					_touchCountPrevious = Input.touchCount;
 					break;
 			}
 		}
@@ -137,7 +141,12 @@
 			var zoom = Mathf.Max(0.0f, Mathf.Min(_mapManager.Zoom + zoomFactor * _zoomSpeed, 21.0f));
 			if (Math.Abs(zoom - _mapManager.Zoom) > 0.0f)
 			{
+				//Debug.Log($"UpdateMap {zoom}, {_mapManager.Zoom}");
 				_mapManager.UpdateMap(_mapManager.CenterLatitudeLongitude, zoom);
+			}
+			else
+			{
+				//Debug.Log($"Don't UpdateMap {zoom}, {_mapManager.Zoom}");
 			}
 		}
 
@@ -204,6 +213,8 @@
 
 			if (_shouldDrag == true)
 			{
+				if (_touchCountPrevious > 1)
+					_mousePositionPrevious = _mousePosition;
 				var changeFromPreviousPosition = _mousePositionPrevious - _mousePosition;
 				if (Mathf.Abs(changeFromPreviousPosition.x) > 0.0f || Mathf.Abs(changeFromPreviousPosition.y) > 0.0f)
 				{
@@ -221,6 +232,7 @@
 							_mapManager.UpdateMap(newLatLong, _mapManager.Zoom);
 						}
 					}
+
 					_origin = _mousePosition;
 				}
 				else
@@ -229,6 +241,7 @@
 					{
 						return;
 					}
+
 					_mousePositionPrevious = _mousePosition;
 					_origin = _mousePosition;
 				}
@@ -258,6 +271,8 @@
 
 			if (_shouldDrag == true)
 			{
+				if (_touchCountPrevious > 1)
+					_mousePositionPrevious = _mousePosition;
 				var changeFromPreviousPosition = _mousePositionPrevious - _mousePosition;
 				if (Mathf.Abs(changeFromPreviousPosition.x) > 0.0f || Mathf.Abs(changeFromPreviousPosition.y) > 0.0f)
 				{
@@ -278,6 +293,7 @@
 							_mapManager.UpdateMap(latitudeLongitude, _mapManager.Zoom);
 						}
 					}
+
 					_origin = _mousePosition;
 				}
 				else
@@ -286,6 +302,7 @@
 					{
 						return;
 					}
+
 					_mousePositionPrevious = _mousePosition;
 					_origin = _mousePosition;
 				}
