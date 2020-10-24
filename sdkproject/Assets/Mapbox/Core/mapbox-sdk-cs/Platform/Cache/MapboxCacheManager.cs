@@ -1,5 +1,6 @@
 ﻿using System;
 using Mapbox.Map;
+using UnityEngine;
 
 namespace Mapbox.Platform.Cache
 {
@@ -16,15 +17,24 @@ namespace Mapbox.Platform.Cache
             _vectorMemoryCache = memoryCache;
             _textureFileCache = fileCache;
             _sqLiteCache = sqliteCache;
-            _textureFileCache.FileSaved += TextureFileSaved;
-        }
 
-        public void Clear()
-        {
-            _textureMemoryCache.Clear();
-            _vectorMemoryCache.Clear();
-            _textureFileCache?.Clear();
-            _sqLiteCache?.Clear();
+            if (_textureFileCache != null)
+            {
+                _textureFileCache.FileSaved += TextureFileSaved;
+            }
+
+            if (_sqLiteCache != null)
+            {
+                if (!_sqLiteCache.IsUpToDate())
+                {
+                    var sqliteDeleteSuccess = _sqLiteCache.ClearDatabase();
+                    if (sqliteDeleteSuccess && _textureFileCache != null)
+                    {
+                        _textureFileCache.ClearAll();
+                    }
+                    _sqLiteCache.ReadySqliteDatabase();
+                }
+            }
         }
 
         public void ReInit()
@@ -33,6 +43,14 @@ namespace Mapbox.Platform.Cache
             _vectorMemoryCache.ReInit();
             _textureFileCache?.ReInit();
             _sqLiteCache?.ReInit();
+        }
+
+        public void Clear()
+        {
+            _textureMemoryCache.Clear();
+            _vectorMemoryCache.Clear();
+            _textureFileCache?.Clear();
+            _sqLiteCache?.Clear();
         }
 
         public CacheItem GetDataItem(string tilesetId, CanonicalTileId tileId)
@@ -105,7 +123,7 @@ namespace Mapbox.Platform.Cache
                     //serve the image without metadata for now
                     //delete tile, next tile it'll be updated
                     
-                    _sqLiteCache.DeleteTileFile(textureCacheItem.FilePath, tilesetId, tileId);
+                    _textureFileCache.DeleteTileFile(textureCacheItem.FilePath);
                 }
                 
                 _textureMemoryCache.Add(tilesetId, tileId, textureCacheItem, true);
@@ -118,5 +136,17 @@ namespace Mapbox.Platform.Cache
             _sqLiteCache?.Add(tilesetId, tileId, textureCacheItem, true);
         }
 
+        public void ClearAndReinitCacheFiles()
+        {
+            var sqliteDeleteSuccess = _sqLiteCache.ClearDatabase();
+            if (sqliteDeleteSuccess && _textureFileCache != null)
+            {
+                _textureFileCache.ClearAll();
+            }
+
+            Debug.Log("Cached files all cleared");
+            ReInit();
+            Debug.Log("Caches reinitialized");
+        }
     }
 }

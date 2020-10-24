@@ -18,17 +18,15 @@ namespace Mapbox.Platform.Cache
 {
 	public class FileCache
 	{
-		public Action<string, CanonicalTileId, TextureCacheItem> FileSaved = (tilesetName, tileId, cacheItem) => { };
 		private static string CacheRootFolderName = "FileCache";
 		public static string PersistantCacheRootFolderPath = Path.Combine(Application.persistentDataPath, CacheRootFolderName);
 		private static string FileExtension = ".png";
+
+		public Action<string, CanonicalTileId, TextureCacheItem> FileSaved = (tilesetName, tileId, cacheItem) => { };
 		private Dictionary<string, string> MapIdToFolderNameDictionary;
 
 		public FileCache()
 		{
-#if MAPBOX_DEBUG_CACHE
-			_className = this.GetType().Name;
-#endif
 			_cachedResponses = new Dictionary<string, CacheItem>();
 			_infosToSave = new Queue<InfoWrapper>();
 			MapIdToFolderNameDictionary = new Dictionary<string, string>();
@@ -225,7 +223,7 @@ namespace Mapbox.Platform.Cache
 			return tileId.Z.ToString() + "_" + tileId.X + "_" + tileId.Y;
 		}
 
-		public static void ClearFolder(string folderPath)
+		public void ClearFolder(string folderPath)
 		{
 			DirectoryInfo di = new DirectoryInfo(folderPath);
 
@@ -235,12 +233,12 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 		
-		public static void ClearStyle(string style)
+		public void ClearStyle(string style)
 		{
 			ClearFolder(Path.Combine(PersistantCacheRootFolderPath, style));
 		}
 		
-		public static void ClearAll()
+		public void ClearAll()
 		{
 			DirectoryInfo di = new DirectoryInfo(PersistantCacheRootFolderPath);
 
@@ -261,6 +259,14 @@ namespace Mapbox.Platform.Cache
 				MapId = mapId;
 				TileId = tileId;
 				TextureCacheItem = textureCacheItem;
+			}
+		}
+
+		public void DeleteTileFile(string filePath)
+		{
+			if (File.Exists(filePath))
+			{
+				File.Delete(filePath);
 			}
 		}
 	}

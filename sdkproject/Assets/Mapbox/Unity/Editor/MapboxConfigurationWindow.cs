@@ -569,41 +569,27 @@ namespace Mapbox.Editor
 					EditorGUILayout.EndHorizontal();
 					EditorGUILayout.Space();
 
-					EditorGUILayout.LabelField("Style Caches");
-
-					foreach (var dirInfo in _fileCacheFolderSizes)
-					{
-						
-						EditorGUILayout.BeginHorizontal();
-						
-						EditorGUILayout.LabelField(dirInfo.Name, GUILayout.Width(200));
-						GUILayout.FlexibleSpace();
-						
-						EditorGUILayout.LabelField(string.Format("({0} files | {1} MB)", dirInfo.FileCount, (dirInfo.Size/1024/1024).ToString("F2")), GUILayout.Width(200));
-						
-						if (GUILayout.Button("Show", GUILayout.Width(100)))
-						{
-							EditorUtility.RevealInFinder(dirInfo.FullName);
-						}
-
-						if (GUILayout.Button("Clear", GUILayout.Width(100)))
-						{
-							FileCache.ClearFolder(dirInfo.FullName);
-							UpdateFileCacheSizes();
-						}
-
-						EditorGUILayout.EndHorizontal();
-					}
-
-					EditorGUILayout.BeginHorizontal();
-					GUILayout.FlexibleSpace();
-					if (GUILayout.Button("Clear All", GUILayout.Width(100)))
-					{
-						FileCache.ClearAll();
-						UpdateFileCacheSizes();
-					}
-					EditorGUILayout.EndHorizontal();
-					EditorGUILayout.Space(40);
+					// EditorGUILayout.LabelField("Style Caches");
+					//
+					// foreach (var dirInfo in _fileCacheFolderSizes)
+					// {
+					//
+					// 	EditorGUILayout.BeginHorizontal();
+					//
+					// 	EditorGUILayout.LabelField(dirInfo.Name, GUILayout.Width(200));
+					// 	GUILayout.FlexibleSpace();
+					//
+					// 	EditorGUILayout.LabelField(string.Format("({0} files | {1} MB)", dirInfo.FileCount, (dirInfo.Size/1024/1024).ToString("F2")), GUILayout.Width(200));
+					//
+					// 	if (GUILayout.Button("Show", GUILayout.Width(100)))
+					// 	{
+					// 		EditorUtility.RevealInFinder(dirInfo.FullName);
+					// 	}
+					//
+					// 	EditorGUILayout.EndHorizontal();
+					// }
+					//
+					// EditorGUILayout.Space(10);
 				}
 
 				EditorGUILayout.BeginHorizontal(_horizontalGroup);

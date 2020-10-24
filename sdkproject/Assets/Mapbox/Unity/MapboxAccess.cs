@@ -21,6 +21,8 @@ namespace Mapbox.Unity
 	/// </summary>
 	public class MapboxAccess : IFileSource
 	{
+		public MapboxCacheManager CacheManager;
+
 		ITelemetryLibrary _telemetryLibrary;
 		private TextureMemoryCache _textureMemoryCache;
 		CachingWebFileSource _fileSource;
@@ -110,36 +112,11 @@ namespace Mapbox.Unity
 
 				Configured = true;
 			}
-
-
 		}
 
-		public void ClearAllCacheFiles()
+		public void ClearAndReinitCacheFiles()
 		{
-			// explicity call Clear() to close any connections that might be referenced by the current scene
-			CachingWebFileSource cwfs = _fileSource as CachingWebFileSource;
-			if (null != cwfs) { cwfs.Clear(); }
-
-			// remove all left over files (eg orphaned .journal) from the cache directory
-			string cacheDirectory = Path.Combine(Application.persistentDataPath, "cache");
-			if (!Directory.Exists(cacheDirectory)) { return; }
-
-			foreach (var file in Directory.GetFiles(cacheDirectory))
-			{
-				try
-				{
-					File.Delete(file);
-				}
-				catch (Exception deleteEx)
-				{
-					Debug.LogErrorFormat("Could not delete [{0}]: {1}", file, deleteEx);
-				}
-			}
-
-			//reinit caches after clear
-			if (null != cwfs) { cwfs.ReInit(); }
-
-			Debug.Log("done clearing caches");
+			CacheManager?.ClearAndReinitCacheFiles();
 		}
 
 		/// <summary>
@@ -172,10 +149,10 @@ namespace Mapbox.Unity
 			var fileCache = new FileCache();
 			var memoryCache = new MemoryCache(_configuration.MemoryCacheSize);
 			_textureMemoryCache = new TextureMemoryCache(_configuration.MemoryCacheSize);
-			var cacheManager = new MapboxCacheManager(_textureMemoryCache, memoryCache, fileCache, sqliteCache);
+			CacheManager = new MapboxCacheManager(_textureMemoryCache, memoryCache, fileCache, sqliteCache);
 			
 			_fileSource = new CachingWebFileSource(_configuration.AccessToken, _configuration.GetMapsSkuToken, _configuration.AutoRefreshCache);
-			_fileSource.AddCacheManager(cacheManager);
+			_fileSource.AddCacheManager(CacheManager);
 
 
 

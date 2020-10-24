@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using SQLite4Unity3d;
 
 namespace Mapbox.Platform.Cache
 {
@@ -14,7 +15,7 @@ namespace Mapbox.Platform.Cache
 
 	public class SQLiteCache : ICache, IDisposable
 	{
-
+		private const int DATABASE_CODE_VERSION = 1;
 
 		/// <summary>
 		/// maximum number tiles that get cached
@@ -47,56 +48,41 @@ namespace Mapbox.Platform.Cache
 		{
 			_maxTileCount = maxTileCount ?? 3000;
 			_dbName = dbName;
-			init();
+			OpenOrCreateDatabase();
 		}
 
-
-		#region idisposable
-
-
-		~SQLiteCache()
+		/// <summary>
+		/// <para>Reinitialize cache.</para>
+		/// <para>This is needed after 'Clear()' to recreate the cache database.</para>
+		/// <para>And has been implemented on purpose to not hold on to any references to the cache directory after 'Clear()'</para>
+		/// </summary>
+		public void ReInit()
 		{
-			Dispose(false);
-		}
-
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		protected virtual void Dispose(bool disposeManagedResources)
-		{
-			if (!_disposed)
+			if (null != _sqlite)
 			{
-				if (disposeManagedResources)
-				{
-					if (null != _sqlite)
-					{
-						_sqlite.Execute("VACUUM;"); // compact db to keep file size small
-						_sqlite.Close();
-						_sqlite.Dispose();
-						_sqlite = null;
-					}
-				}
-				_disposed = true;
+				_sqlite.Dispose();
+				_sqlite = null;
 			}
+
+			OpenOrCreateDatabase();
 		}
 
-
-		#endregion
-
-		private void init()
+		public bool IsUpToDate()
 		{
+			var fileVersion = _sqlite.ExecuteScalar<int>("PRAGMA user_version");
+			return fileVersion == DATABASE_CODE_VERSION;
+		}
 
-#if MAPBOX_DEBUG_CACHE
-			_className = this.GetType().Name;
-#endif
-			openOrCreateDb(_dbName);
-
-			//hrmpf: multiple PKs not supported by sqlite.net
-			//https://github.com/praeclarum/sqlite-net/issues/282
-			//do it via plain SQL
+		/// <summary>
+		/// Creates file if necessary
+		/// Creates tables and indexes
+		/// </summary>
+		public void ReadySqliteDatabase()
+		{
+			if (_sqlite == null)
+			{
+				OpenOrCreateDatabase();
+			}
 
 			List<SQLiteConnection.ColumnInfo> colInfoTileset = _sqlite.GetTableInfo(typeof(tilesets).Name);
 			if (0 == colInfoTileset.Count)
@@ -147,7 +133,8 @@ expirationDate INTEGER,
 				"PRAGMA synchronous=OFF",
 				"PRAGMA count_changes=OFF",
 				"PRAGMA journal_mode=MEMORY",
-				"PRAGMA temp_store=MEMORY"
+				"PRAGMA temp_store=MEMORY",
+				"PRAGMA user_version=" + DATABASE_CODE_VERSION
 			};
 			foreach (var cmd in cmds)
 			{
@@ -169,27 +156,124 @@ expirationDate INTEGER,
 			}
 		}
 
-		private void openOrCreateDb(string dbName)
+		private void OpenOrCreateDatabase()
 		{
-			_dbPath = GetFullDbPath(dbName);
+			_dbPath = GetFullDbPath(_dbName);
 			_sqlite = new SQLiteConnection(_dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
 		}
 
-		/// <summary>
-		/// <para>Reinitialize cache.</para>
-		/// <para>This is needed after 'Clear()' to recreate the cache database.</para>
-		/// <para>And has been implemented on purpose to not hold on to any references to the cache directory after 'Clear()'</para>
-		/// </summary>
-		public void ReInit()
+		public bool ClearDatabase()
 		{
-			if (null != _sqlite)
+			try
 			{
-				_sqlite.Dispose();
-				_sqlite = null;
+				var tableNames = _sqlite.Table<SqliteSchemaObject>().Where
+					(x => x.type == "table");
+
+				foreach (var table in tableNames)
+				{
+					if (table.name == "sqlite_sequence") //sqlites own table, cannot be dropped
+					{
+						continue;
+					}
+
+					_sqlite.Execute("DROP TABLE " + table.name);
+				}
+
+				var indexNames = _sqlite.Table<SqliteSchemaObject>().Where
+					(x => x.type == "index");
+
+				foreach (var index in indexNames)
+				{
+					_sqlite.Execute("DROP INDEX "+ index.name );
+				}
+
+				_sqlite.Execute("VACUUM;");
+			}
+			catch (Exception e)
+			{
+				Debug.Log(e.ToString());
+				return false;
 			}
 
-			init();
+			return true;
 		}
+
+		public void Clear()
+		{
+			ClearDatabase();
+			//DeleteSqliteFile();
+		}
+
+		public bool DeleteSqliteFile()
+		{
+			if (null == _sqlite) { return false; }
+
+			_sqlite.Dispose();
+			_sqlite = null;
+
+			string cacheDirectory = Path.Combine(Application.persistentDataPath, "cache");
+			if (!Directory.Exists(cacheDirectory)) { return true; }
+			var filePath = GetFullDbPath(_dbName);
+
+			var isDeletedSuccesfully = true;
+			var error = string.Empty;
+			for (int i = 0; i < 5; i++)
+			{
+				Thread.Sleep(10);
+				try
+				{
+					isDeletedSuccesfully = true;
+					File.Delete(filePath);
+				}
+				catch (Exception e)
+				{
+					isDeletedSuccesfully = false;
+					error = e.ToString();
+				}
+			}
+
+			if (!isDeletedSuccesfully)
+			{
+				Debug.LogError(error);
+			}
+
+			return isDeletedSuccesfully;
+		}
+
+		#region idisposable
+
+
+		~SQLiteCache()
+		{
+			Dispose(false);
+		}
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool disposeManagedResources)
+		{
+			if (!_disposed)
+			{
+				if (disposeManagedResources)
+				{
+					if (null != _sqlite)
+					{
+						_sqlite.Execute("VACUUM;"); // compact db to keep file size small
+						_sqlite.Close();
+						_sqlite.Dispose();
+						_sqlite = null;
+					}
+				}
+				_disposed = true;
+			}
+		}
+
+
+		#endregion
 
 		public static string GetFullDbPath(string dbName)
 		{
@@ -415,21 +499,6 @@ expirationDate INTEGER,
 			var count = countCommand.ExecuteScalar<int>();
 
 			return count > 0;
-			// int? tilesetId = getTilesetId(tilesetName);
-			// if (!tilesetId.HasValue)
-			// {
-			// 	return false;
-			// }
-			//
-			// return null != _sqlite
-			// 	.Table<tiles>()
-			// 	.Where(t =>
-			// 		t.tile_set == tilesetId.Value
-			// 		&& t.zoom_level == tileId.Z
-			// 		&& t.tile_column == tileId.X
-			// 		&& t.tile_row == tileId.Y
-			// 		)
-			// 	.FirstOrDefault();
 		}
 
 		private int insertTileset(string tilesetName)
@@ -466,7 +535,6 @@ expirationDate INTEGER,
 		}
 
 		/// <summary>
-		/// FOR INTERNAL DEBUGGING ONLY - DON'T RELY ON IN PRODUCTION
 		/// </summary>
 		/// <param name="tilesetName"></param>
 		/// <returns></returns>
@@ -492,56 +560,15 @@ expirationDate INTEGER,
 			//just delete on table 'tilesets', we've setup cascading which should take care of tabls 'tiles'
 			_sqlite.Delete<tilesets>(tilesetId.Value);
 		}
-
-
-		/// <summary>
-		/// <para>Delete the database file.</para>
-		/// <para>Call 'ReInit()' if you intend to continue using the cache after 'Clear()!</para>
-		/// </summary>
-		public void Clear()
-		{
-			//already disposed
-			if (null == _sqlite) { return; }
-
-			_sqlite.Close();
-			_sqlite.Dispose();
-			_sqlite = null;
-
-			Debug.LogFormat("deleting {0}", _dbPath);
-
-			// try several times in case SQLite needs a bit more time to dispose
-			for (int i = 0; i < 5; i++)
-			{
-				try
-				{
-					File.Delete(_dbPath);
-					return;
-				}
-				catch
-				{
-#if !WINDOWS_UWP
-					System.Threading.Thread.Sleep(100);
-#else
-					System.Threading.Tasks.Task.Delay(100).Wait();
-#endif
-				}
-			}
-
-			// if we got till here, throw on last try
-			File.Delete(_dbPath);
-		}
-
-		public void DeleteTileFile(string filePath, string mapId, CanonicalTileId tileId)
-		{
-			if (File.Exists(filePath))
-			{
-				File.Delete(filePath);
-			}
-		}
-
-		public List<tiles> GetAllTiles()
-		{
-			return _sqlite.Table<tiles>().ToList();
-		}
 	}
+}
+
+[Table("sqlite_master")]
+public class SqliteSchemaObject
+{
+	public string type { get; set; }
+	public string name { get; set; }
+	public string tbl_name { get; set; }
+	public int rootpage { get; set; }
+	public string sql { get; set; }
 }
