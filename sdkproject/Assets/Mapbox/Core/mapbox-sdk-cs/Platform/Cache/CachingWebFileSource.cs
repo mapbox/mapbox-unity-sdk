@@ -87,11 +87,6 @@ namespace Mapbox.Platform.Cache
 			_cacheManager.Clear();
 		}
 
-		public void ReInit()
-		{
-			_cacheManager.ReInit();
-		}
-
 		public IAsyncRequest Request(
 			string uri
 			, Action<Response> callback

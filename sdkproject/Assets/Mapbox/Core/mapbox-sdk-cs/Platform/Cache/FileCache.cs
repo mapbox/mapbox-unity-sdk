@@ -60,28 +60,6 @@ namespace Mapbox.Platform.Cache
 			_cachedResponses = new Dictionary<string, CacheItem>();
 		}
 
-		public void CheckIntegrity(List<tiles> tiles)
-		{
-//			var filePathsToDelete = new List<string>();
-//			foreach (var tile in tiles)
-//			{
-//				if (!File.Exists(tile.tile_path))
-//				{
-//					filePathsToDelete.Add(tile.tile_path);
-//				}
-//			}
-
-			DirectoryInfo di = new DirectoryInfo(PersistantCacheRootFolderPath);
-			var _files = new List<FileInfo>();
-			foreach (DirectoryInfo folder in di.GetDirectories())
-			{
-				foreach (var fileInfo in folder.GetFiles())
-				{
-					_files.Add(fileInfo);
-				}
-			}
-		}
-
 		public CacheItem Get(string tilesetId, CanonicalTileId tileId)
 		{
 			string key = tilesetId + "||" + tileId;
@@ -156,19 +134,16 @@ namespace Mapbox.Platform.Cache
 			{
 				Directory.CreateDirectory(folderPath);
 			}
-			
-			var finalPath = Path.Combine(folderPath, TileIdToFileName(info.TileId) + FileExtension);
+
+			info.TextureCacheItem.FilePath = Path.GetFullPath(Path.Combine(folderPath, TileIdToFileName(info.TileId) + FileExtension));
 			//byte[] bytes = info.TextureCacheItem.Texture2D.EncodeToPNG();
 
-			using (FileStream sourceStream = new FileStream(finalPath,
+			using (FileStream sourceStream = new FileStream(info.TextureCacheItem.FilePath,
 				FileMode.Create, FileAccess.Write, FileShare.Read,
 				bufferSize: 4096, useAsync: false))
 			{
 				sourceStream.Write(info.TextureCacheItem.Data, 0, info.TextureCacheItem.Data.Length);
 			}
-
-			var fi = new FileInfo(finalPath);
-			info.TextureCacheItem.FilePath = fi.FullName;
 
 			//We probably shouldn't delay this. It will only cause problems and it should be fast enough anyway
 			FileSaved(info.MapId, info.TileId, info.TextureCacheItem);

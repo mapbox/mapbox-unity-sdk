@@ -145,26 +145,21 @@ namespace Mapbox.Unity
 
 		void ConfigureFileSource()
 		{
-			var sqliteCache = new SQLiteCache(_configuration.FileCacheSize);
-			var fileCache = new FileCache();
 			var memoryCache = new MemoryCache(_configuration.MemoryCacheSize);
 			_textureMemoryCache = new TextureMemoryCache(_configuration.MemoryCacheSize);
+
+#if !UNITY_WEBGL
+			var sqliteCache = new SQLiteCache(_configuration.FileCacheSize);
+			var fileCache = new FileCache();
 			CacheManager = new MapboxCacheManager(_textureMemoryCache, memoryCache, fileCache, sqliteCache);
-			
+#endif
+
+#if UNITY_WEBGL
+			CacheManager = new MapboxCacheManager(_textureMemoryCache, memoryCache);
+#endif
+
 			_fileSource = new CachingWebFileSource(_configuration.AccessToken, _configuration.GetMapsSkuToken, _configuration.AutoRefreshCache);
 			_fileSource.AddCacheManager(CacheManager);
-
-
-
-//			_fileSource = new CachingWebFileSource(_configuration.AccessToken, _configuration.GetMapsSkuToken, _configuration.AutoRefreshCache)
-//				.AddTextureCache(new TextureMemoryCache(_configuration.MemoryCacheSize))
-//				.AddTextureCache(new FileCache(sqliteCache, _configuration.FileCacheSize))
-//				.AddCache(new MemoryCache(_configuration.MemoryCacheSize))
-//				.AddCache(sqliteCache)
-// #if !UNITY_WEBGL
-// 				.AddCache(new SQLiteCache(_configuration.FileCacheSize))
-// #endif
-				;
 		}
 
 		void ConfigureTelemetry()

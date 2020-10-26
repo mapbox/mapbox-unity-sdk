@@ -35,9 +35,9 @@ namespace Mapbox.Platform.Cache
                     }
                     _sqLiteCache.ReadySqliteDatabase();
                 }
-            }
 
-            CheckSqlAndFileIntegrity();
+                CheckSqlAndFileIntegrity();
+            }
         }
 
         /// <summary>

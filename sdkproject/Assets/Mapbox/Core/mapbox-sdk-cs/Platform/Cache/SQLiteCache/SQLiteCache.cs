@@ -1,5 +1,4 @@
-﻿using System.Runtime.Remoting.Messaging;
-using System.Threading;
+﻿using System.Threading;
 using SQLite4Unity3d;
 
 namespace Mapbox.Platform.Cache
@@ -300,10 +299,6 @@ expirationDate INTEGER,
 
 		public void Add(string tilesetName, CanonicalTileId tileId, byte[] data, string path, string etag, DateTime? expirationDate, bool forceInsert = false)
 		{
-#if MAPBOX_DEBUG_CACHE
-			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
-			UnityEngine.Debug.LogFormat("{0} {1} {2} forceInsert:{3}", methodName, tileset, tileId, forceInsert);
-#endif
 			try
 			{
 				// tile exists and we don't want to overwrite -> exit early
