@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Mapbox.Unity.Utilities;
@@ -150,21 +151,24 @@ namespace Mapbox.Platform.Cache
 		private void SaveInfo(InfoWrapper info)
 		{
 			string folderPath = Path.Combine(PersistantCacheRootFolderPath, MapIdToFolderName(info.MapId));
-			info.TextureCacheItem.FilePath = Path.Combine(folderPath, TileIdToFileName(info.TileId) + FileExtension);
 
 			if (!Directory.Exists(folderPath))
 			{
 				Directory.CreateDirectory(folderPath);
 			}
-
-			//byte[] bytes = info.TextureCacheItem.Texture2D.EncodeToPNG();
 			
-			using (FileStream sourceStream = new FileStream(info.TextureCacheItem.FilePath,
+			var finalPath = Path.Combine(folderPath, TileIdToFileName(info.TileId) + FileExtension);
+			//byte[] bytes = info.TextureCacheItem.Texture2D.EncodeToPNG();
+
+			using (FileStream sourceStream = new FileStream(finalPath,
 				FileMode.Create, FileAccess.Write, FileShare.Read,
 				bufferSize: 4096, useAsync: false))
 			{
 				sourceStream.Write(info.TextureCacheItem.Data, 0, info.TextureCacheItem.Data.Length);
 			}
+
+			var fi = new FileInfo(finalPath);
+			info.TextureCacheItem.FilePath = fi.FullName;
 
 			//We probably shouldn't delay this. It will only cause problems and it should be fast enough anyway
 			FileSaved(info.MapId, info.TileId, info.TextureCacheItem);
@@ -268,6 +272,26 @@ namespace Mapbox.Platform.Cache
 			{
 				File.Delete(filePath);
 			}
+		}
+
+		public HashSet<string> GetFileList()
+		{
+			var _pathList = new HashSet<string>();
+			if (Directory.Exists(FileCache.PersistantCacheRootFolderPath))
+			{
+				var dir = Directory.GetDirectories(FileCache.PersistantCacheRootFolderPath);
+				foreach (var rasterDirectory in dir)
+				{
+					var directoryInfo = new DirectoryInfo(rasterDirectory);
+					var files = directoryInfo.GetFiles();
+					foreach (var fileInfo in files)
+					{
+						_pathList.Add(fileInfo.FullName);
+					}
+				}
+			}
+
+			return _pathList;
 		}
 	}
 }

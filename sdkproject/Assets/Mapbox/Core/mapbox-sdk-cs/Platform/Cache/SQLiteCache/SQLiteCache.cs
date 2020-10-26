@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Runtime.Remoting.Messaging;
+using System.Threading;
 using SQLite4Unity3d;
 
 namespace Mapbox.Platform.Cache
@@ -559,6 +560,11 @@ expirationDate INTEGER,
 			if (!tilesetId.HasValue) { return; }
 			//just delete on table 'tilesets', we've setup cascading which should take care of tabls 'tiles'
 			_sqlite.Delete<tilesets>(tilesetId.Value);
+		}
+
+		public List<tiles> GetAllTiles()
+		{
+			return _sqlite.Table<tiles>().ToList();
 		}
 	}
 }

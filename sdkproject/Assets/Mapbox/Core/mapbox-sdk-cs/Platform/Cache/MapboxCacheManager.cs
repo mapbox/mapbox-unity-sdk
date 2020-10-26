@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Mapbox.Map;
 using UnityEngine;
 
@@ -34,6 +35,38 @@ namespace Mapbox.Platform.Cache
                     }
                     _sqLiteCache.ReadySqliteDatabase();
                 }
+            }
+
+            CheckSqlAndFileIntegrity();
+        }
+
+        /// <summary>
+        /// We check for files that exists but not tracked in sqlite file and delete them all
+        /// If we don't do that, those files will pile up (assuming systems loses track due to a bug somehow) and fill all the disk
+        /// Vice versa (file doesn't exists, sqlite entry does) isn't important as entry will be cycled out soon anyway
+        /// </summary>
+        private void CheckSqlAndFileIntegrity()
+        {
+            var sqlTileList = _sqLiteCache.GetAllTiles();
+            var fileList = _textureFileCache.GetFileList();
+
+            foreach (var tile in sqlTileList)
+            {
+                if (fileList.Contains(tile.tile_path))
+                {
+                    fileList.Remove(tile.tile_path);
+                }
+            }
+
+            if (fileList.Count > 0)
+            {
+                foreach (var filePath in fileList)
+                {
+                    File.Delete(filePath);
+                }
+
+                //double checking just in case
+                CheckSqlAndFileIntegrity();
             }
         }
 
@@ -147,6 +180,11 @@ namespace Mapbox.Platform.Cache
             Debug.Log("Cached files all cleared");
             ReInit();
             Debug.Log("Caches reinitialized");
+            if (_sqLiteCache != null)
+            {
+                _sqLiteCache.ReadySqliteDatabase();
+                Debug.Log("SQlite cache tables recreated");
+            }
         }
     }
 }
