@@ -36,13 +36,6 @@ namespace Mapbox.Platform.Cache
 			get { return _maxCacheSize; }
 		}
 
-
-		public void ReInit()
-		{
-			_cachedResponses = new Dictionary<string, CacheItem>();
-		}
-
-
 		public void Add(string mapdId, CanonicalTileId tileId, CacheItem item, bool forceInsert)
 		{
 			string key = mapdId + "||" + tileId;
@@ -89,7 +82,14 @@ namespace Mapbox.Platform.Cache
 		{
 			lock (_lock)
 			{
-				_cachedResponses.Clear();
+				if (_cachedResponses != null)
+				{
+					_cachedResponses.Clear();
+				}
+				else
+				{
+					_cachedResponses = new Dictionary<string, CacheItem>();
+				}
 			}
 		}
 

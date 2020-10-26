@@ -43,11 +43,5 @@ namespace Mapbox.Platform.Cache
 		/// </summary>
 		/// <param name="tilesetId"></param>
 		void Clear(string tilesetId);
-
-
-		/// <summary>
-		/// Reinitialize cache. Might be needed after 'Clear', eg for SQLiteCache
-		/// </summary>
-		void ReInit();
 	}
 }

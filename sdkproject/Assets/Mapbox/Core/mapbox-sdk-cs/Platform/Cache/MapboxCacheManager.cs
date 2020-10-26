@@ -70,22 +70,6 @@ namespace Mapbox.Platform.Cache
             }
         }
 
-        public void ReInit()
-        {
-            _textureMemoryCache.ReInit();
-            _vectorMemoryCache.ReInit();
-            _textureFileCache?.ReInit();
-            _sqLiteCache?.ReInit();
-        }
-
-        public void Clear()
-        {
-            _textureMemoryCache.Clear();
-            _vectorMemoryCache.Clear();
-            _textureFileCache?.Clear();
-            _sqLiteCache?.Clear();
-        }
-
         public CacheItem GetDataItem(string tilesetId, CanonicalTileId tileId)
         {
             var cacheItem = _vectorMemoryCache.Get(tilesetId, tileId);
@@ -178,13 +162,24 @@ namespace Mapbox.Platform.Cache
             }
 
             Debug.Log("Cached files all cleared");
-            ReInit();
+
+            _textureMemoryCache.Clear(); //clear tracked objects
+            _vectorMemoryCache.Clear(); //clear tracked objects
+            _textureFileCache?.Clear(); //clear tracked objects
+            _sqLiteCache?.Reopen(); //close existing, reopen and create if necessary
+
             Debug.Log("Caches reinitialized");
             if (_sqLiteCache != null)
             {
                 _sqLiteCache.ReadySqliteDatabase();
                 Debug.Log("SQlite cache tables recreated");
             }
+        }
+
+        public void ClearMemoryCache()
+        {
+            _vectorMemoryCache.Clear();
+            _textureMemoryCache?.Clear();
         }
     }
 }

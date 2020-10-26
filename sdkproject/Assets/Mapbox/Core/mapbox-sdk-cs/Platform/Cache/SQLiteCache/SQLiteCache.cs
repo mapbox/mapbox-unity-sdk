@@ -56,7 +56,7 @@ namespace Mapbox.Platform.Cache
 		/// <para>This is needed after 'Clear()' to recreate the cache database.</para>
 		/// <para>And has been implemented on purpose to not hold on to any references to the cache directory after 'Clear()'</para>
 		/// </summary>
-		public void ReInit()
+		public void Reopen()
 		{
 			if (null != _sqlite)
 			{
@@ -201,7 +201,6 @@ expirationDate INTEGER,
 		public void Clear()
 		{
 			ClearDatabase();
-			//DeleteSqliteFile();
 		}
 
 		public bool DeleteSqliteFile()
@@ -471,7 +470,6 @@ expirationDate INTEGER,
 				ExpirationDate = expirationDate
 			};
 		}
-
 
 		/// <summary>
 		/// Check if tile exists

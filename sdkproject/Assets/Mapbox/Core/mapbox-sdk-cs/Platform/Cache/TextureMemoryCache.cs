@@ -30,7 +30,6 @@ namespace Mapbox.Platform.Cache
 		private uint _maxCacheSize;
 		private object _lock = new object();
 		private Dictionary<string, TextureCacheItem> _cachedTextures;
-
 		private Dictionary<string, TextureCacheItem> _fixedTextures;
 
 		//private Queue<string> _textureOrderQueue;
@@ -39,11 +38,6 @@ namespace Mapbox.Platform.Cache
 		public uint MaxCacheSize
 		{
 			get { return _maxCacheSize; }
-		}
-
-		public void ReInit()
-		{
-			_cachedTextures = new Dictionary<string, TextureCacheItem>();
 		}
 
 		public void Add(string mapId, CanonicalTileId tileId, TextureCacheItem textureCacheItem, bool forceInsert)
@@ -111,9 +105,24 @@ namespace Mapbox.Platform.Cache
 		{
 			lock (_lock)
 			{
-				_cachedTextures.Clear();
-				//_textureOrderQueue.Clear();
-				_texOrder.Clear();
+				if (_cachedTextures != null)
+				{
+					foreach (var item in _cachedTextures)
+					{
+						if (item.Value.Texture2D != null)
+						{
+							item.Value.Texture2D.Destroy();
+						}
+					}
+
+					_cachedTextures.Clear();
+					_texOrder.Clear();
+				}
+				else
+				{
+					_cachedTextures = new Dictionary<string, TextureCacheItem>();
+					_texOrder = new List<string>();
+				}
 			}
 		}
 

@@ -176,8 +176,6 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			Assert.GreaterOrEqual(tileCnt, _cache.MaxCacheSize, "number of tiles lower than expected");
 
 			_cache.Clear();
-			// have to Reinit after Clear()
-			_cache.ReInit();
 
 			tileCnt = getAllTilesCount();
 
@@ -196,7 +194,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			tileCnt = getAllTilesCount();
 			Assert.AreEqual(1, tileCnt, "one tile was not inserted");
 
-			_cache.ReInit();
+			_cache.Clear();
 
 			Assert.AreEqual(1, tileCnt, "tile was lost during 'ReInit()'");
 		}

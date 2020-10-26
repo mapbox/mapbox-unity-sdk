@@ -55,11 +55,6 @@ namespace Mapbox.Platform.Cache
 			get { return _maxCacheSize; }
 		}
 
-		public void ReInit()
-		{
-			_cachedResponses = new Dictionary<string, CacheItem>();
-		}
-
 		public CacheItem Get(string tilesetId, CanonicalTileId tileId)
 		{
 			string key = tilesetId + "||" + tileId;
@@ -69,29 +64,18 @@ namespace Mapbox.Platform.Cache
 			UnityEngine.Debug.LogFormat("{0} {1}", methodName, key);
 #endif
 
-			lock (_lock)
+			if (!_cachedResponses.ContainsKey(key))
 			{
-				if (!_cachedResponses.ContainsKey(key))
-				{
-					return null;
-				}
-
-				return _cachedResponses[key];
+				return null;
 			}
+
+			return _cachedResponses[key];
 		}
 
 		public bool Exists(string mapId, CanonicalTileId tileId)
 		{
 			string filePath = Path.Combine(PersistantCacheRootFolderPath, MapIdToFolderName(mapId) + "/" + TileIdToFileName(tileId) + FileExtension);
 			return File.Exists(filePath);
-		}
-
-		public void Clear()
-		{
-			lock (_lock)
-			{
-				_cachedResponses.Clear();
-			}
 		}
 
 		public void Clear(string tilesetId)
@@ -167,7 +151,7 @@ namespace Mapbox.Platform.Cache
 
 				if (uwr.isNetworkError || uwr.isHttpError)
 				{
-					UnityEngine.Debug.LogErrorFormat(uwr.error);
+					Debug.LogErrorFormat(uwr.error);
 				}
 				else
 				{
@@ -175,7 +159,7 @@ namespace Mapbox.Platform.Cache
 					textureCacheItem.Texture2D = DownloadHandlerTexture.GetContent(uwr);
 					textureCacheItem.Texture2D.wrapMode = TextureWrapMode.Clamp;
 					textureCacheItem.FilePath = filePath;
-					
+
 					callback(textureCacheItem);
 				}
 			}
@@ -202,21 +186,33 @@ namespace Mapbox.Platform.Cache
 			return tileId.Z.ToString() + "_" + tileId.X + "_" + tileId.Y;
 		}
 
-		public void ClearFolder(string folderPath)
+		public void Clear()
+		{
+			if (_cachedResponses != null)
+			{
+				_cachedResponses.Clear();
+			}
+			else
+			{
+				_cachedResponses = new Dictionary<string, CacheItem>();
+			}
+		}
+
+		private void ClearFolder(string folderPath)
 		{
 			DirectoryInfo di = new DirectoryInfo(folderPath);
 
 			foreach (FileInfo file in di.GetFiles())
 			{
-				file.Delete(); 
+				file.Delete();
 			}
 		}
-		
+
 		public void ClearStyle(string style)
 		{
 			ClearFolder(Path.Combine(PersistantCacheRootFolderPath, style));
 		}
-		
+
 		public void ClearAll()
 		{
 			DirectoryInfo di = new DirectoryInfo(PersistantCacheRootFolderPath);

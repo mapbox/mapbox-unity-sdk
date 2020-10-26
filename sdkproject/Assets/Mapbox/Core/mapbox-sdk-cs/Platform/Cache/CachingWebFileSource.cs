@@ -78,14 +78,6 @@ namespace Mapbox.Platform.Cache
 			_cacheManager = cacheManager;
 			return this;
 		}
-		
-		/// <summary>
-		/// Clear all caches
-		/// </summary>
-		public void Clear()
-		{
-			_cacheManager.Clear();
-		}
 
 		public IAsyncRequest Request(
 			string uri
