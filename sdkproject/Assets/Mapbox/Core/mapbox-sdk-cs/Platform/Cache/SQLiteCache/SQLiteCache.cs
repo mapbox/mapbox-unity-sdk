@@ -125,7 +125,11 @@ expirationDate INTEGER,
 				_sqlite.Execute(cmdIdxTimestamp);
 			}
 
+			_sqlite.Execute("PRAGMA user_version=" + DATABASE_CODE_VERSION);
+		}
 
+		private void RunPragmas()
+		{
 			// some pragmas to speed things up a bit :-)
 			// inserting 1,000 tiles takes 1-2 sec as opposed to ~20 sec
 			string[] cmds = new string[]
@@ -133,8 +137,7 @@ expirationDate INTEGER,
 				"PRAGMA synchronous=OFF",
 				"PRAGMA count_changes=OFF",
 				"PRAGMA journal_mode=MEMORY",
-				"PRAGMA temp_store=MEMORY",
-				"PRAGMA user_version=" + DATABASE_CODE_VERSION
+				"PRAGMA temp_store=MEMORY"
 			};
 			foreach (var cmd in cmds)
 			{
@@ -160,6 +163,7 @@ expirationDate INTEGER,
 		{
 			_dbPath = GetFullDbPath(_dbName);
 			_sqlite = new SQLiteConnection(_dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
+			RunPragmas();
 		}
 
 		public bool ClearDatabase()
