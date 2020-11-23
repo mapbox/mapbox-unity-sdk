@@ -53,6 +53,7 @@ namespace Mapbox.Platform.Cache
 					var keyToRemove = _texOrder[0];
 					_texOrder.RemoveAt(0);
 					_cachedTextures[keyToRemove].Texture2D.Destroy();
+					_cachedTextures[keyToRemove].Data = null;
 					_destroyedTextureCounter++;
 					_cachedTextures.Remove(keyToRemove);
 				}
