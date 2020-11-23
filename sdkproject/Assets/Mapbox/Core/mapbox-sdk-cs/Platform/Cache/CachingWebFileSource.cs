@@ -307,6 +307,10 @@ namespace Mapbox.Platform.Cache
 					DateTime expirationDate = uwr.GetExpirationDate();
 
 					var texture = DownloadHandlerTexture.GetContent(uwr);
+#if UNITY_EDITOR
+					//helpful for debugging memory
+					texture.name = tileId.ToString() + "_" + tilesetId;
+#endif
 					texture.wrapMode = TextureWrapMode.Clamp;
 					response.Texture2D = texture;
 					_cacheManager.AddTextureItem(tilesetId, tileId, new TextureCacheItem()

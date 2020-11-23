@@ -214,6 +214,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				MeshRenderer.sharedMaterial.mainTexture = _loadingTexture;
 			}
 
+			_rasterData = null;
+			_heightTexture = null;
 			gameObject.SetActive(false);
 			IsRecycled = true;
 
@@ -533,6 +535,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		protected virtual void OnDestroy()
 		{
+			//Tiles doesn't get destroy frequently (or at all) as we recycle and reuse them
 			Cancel();
 			if (_heightTexture != null)
 			{

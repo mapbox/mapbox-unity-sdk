@@ -31,6 +31,8 @@ namespace Mapbox.Platform.Cache
 		private object _lock = new object();
 		private Dictionary<string, TextureCacheItem> _cachedTextures;
 		private Dictionary<string, TextureCacheItem> _fixedTextures;
+		private int _destroyedTextureCounter = 0;
+		private int _destroyedTextureLimit = 20;
 
 		//private Queue<string> _textureOrderQueue;
 		private List<string> _texOrder;
@@ -48,20 +50,17 @@ namespace Mapbox.Platform.Cache
 			{
 				if (_cachedTextures.Count >= _maxCacheSize)
 				{
-					// var toRemove = _cachedTextures.OrderBy(c => c.Value.AddedToCacheTicksUtc).First();
-					// toRemove.Value.Texture2D.Destroy();
 					var keyToRemove = _texOrder[0];
 					_texOrder.RemoveAt(0);
 					_cachedTextures[keyToRemove].Texture2D.Destroy();
+					_destroyedTextureCounter++;
 					_cachedTextures.Remove(keyToRemove);
 				}
 
-				// TODO: forceInsert
 				if (!_cachedTextures.ContainsKey(key))
 				{
 					textureCacheItem.AddedToCacheTicksUtc = DateTime.UtcNow.Ticks;
 					_cachedTextures.Add(key, textureCacheItem);
-					//_textureOrderQueue.Enqueue(key);
 					_texOrder.Add(key);
 				}
 				else
@@ -69,6 +68,12 @@ namespace Mapbox.Platform.Cache
 					textureCacheItem.AddedToCacheTicksUtc = DateTime.UtcNow.Ticks;
 					_cachedTextures[key] = textureCacheItem;
 				}
+			}
+
+			if (_destroyedTextureCounter >= _destroyedTextureLimit)
+			{
+				_destroyedTextureCounter = 0;
+				Resources.UnloadUnusedAssets();
 			}
 		}
 
