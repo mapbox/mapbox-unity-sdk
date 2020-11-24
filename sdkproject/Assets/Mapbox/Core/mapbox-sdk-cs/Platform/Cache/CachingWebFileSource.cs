@@ -200,8 +200,16 @@ namespace Mapbox.Platform.Cache
 
 			//go through existing caches and check if we already have the requested tile available
 			var textureItem = _cacheManager.GetTextureItemFromMemory(tilesetId, tileId); //_cacheManager.GetTextureItem(tilesetId, tileId);
-			if (textureItem == null)
+			if (textureItem != null)
 			{
+				//return texture from memory cache
+				var textureResponse = new TextureResponse {Texture2D = textureItem.Texture2D};
+				callback(textureResponse);
+				return;
+			}
+			else
+			{
+				//not in memory, check file cache
 				if (_cacheManager.TextureFileExists(tilesetId, tileId))
 				{
 					_cacheManager.GetTextureItemFromFile(tilesetId, tileId, (textureCacheItem) =>
@@ -221,6 +229,7 @@ namespace Mapbox.Platform.Cache
 					return;
 				}
 			}
+
 
 			Runnable.Run(FetchTexture(finalUrl, callback, tilesetId, tileId));
 		}
