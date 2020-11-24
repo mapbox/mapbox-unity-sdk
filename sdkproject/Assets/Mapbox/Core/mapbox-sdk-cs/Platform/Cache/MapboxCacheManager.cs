@@ -127,6 +127,11 @@ namespace Mapbox.Platform.Cache
 
             _textureFileCache.GetAsync(tilesetId, tileId, (textureCacheItem) =>
             {
+
+#if UNITY_EDITOR
+                //helpful for debugging memory
+                textureCacheItem.Texture2D.name = tileId.ToString() + "_" + tilesetId;
+#endif
                 var tile = _sqLiteCache.Get(tilesetId, tileId);
                 if (tile != null)
                 {

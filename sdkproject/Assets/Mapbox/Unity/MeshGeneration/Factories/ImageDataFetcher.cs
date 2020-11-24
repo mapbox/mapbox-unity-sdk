@@ -56,6 +56,11 @@ public class ImageDataFetcher : DataFetcher
 					DataRecieved(imageDataParameters.tile, rasterTile);
 				}
 
+				if (imageDataParameters.tile != null)
+				{
+					imageDataParameters.tile.RemoveTile(rasterTile);
+				}
+
 			}
 		});
 	}

@@ -18,6 +18,11 @@ public class TerrainDataFetcher : DataFetcher
 		}
 		var pngRasterTile = new RawPngRasterTile();
 
+		if (terrainDataParameters.tile != null)
+		{
+			terrainDataParameters.tile.AddTile(pngRasterTile);
+		}
+
 		EnqueueForFetching(new FetchInfo()
 		{
 			TileId = terrainDataParameters.tile.CanonicalTileId,
@@ -38,6 +43,11 @@ public class TerrainDataFetcher : DataFetcher
 				else
 				{
 					DataRecieved(terrainDataParameters.tile, pngRasterTile);
+				}
+
+				if (terrainDataParameters.tile != null)
+				{
+					terrainDataParameters.tile.RemoveTile(pngRasterTile);
 				}
 			}
 		});

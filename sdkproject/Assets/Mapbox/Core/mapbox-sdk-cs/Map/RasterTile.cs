@@ -126,5 +126,12 @@ namespace Mapbox.Map
 		{
 			this.texture2D = texture;
 		}
+
+		public void ClearDataReferences()
+		{
+			//clearing references for simplicity. It doesn't really block GC but it's clearer this way
+			data = null;
+			texture2D = null;
+		}
 	}
 }

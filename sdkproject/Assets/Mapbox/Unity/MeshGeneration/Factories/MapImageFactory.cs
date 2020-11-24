@@ -78,6 +78,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					}
 				}
 			}
+
+			rasterTile.ClearDataReferences();
 		}
 
 		//merge this with OnErrorOccurred?

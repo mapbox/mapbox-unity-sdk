@@ -274,6 +274,10 @@ namespace Mapbox.Platform.Cache
 
 					string eTag = uwr.GetETag();
 					var texture = DownloadHandlerTexture.GetContent(uwr);
+#if UNITY_EDITOR
+					//helpful for debugging memory
+					texture.name = tileId.ToString() + "_" + tilesetId;
+#endif
 					texture.wrapMode = TextureWrapMode.Clamp;
 					response.Texture2D = texture;
 

@@ -11,30 +11,37 @@ public class VectorDataFetcher : DataFetcher
 	//tile here should be totally optional and used only not to have keep a dictionary in terrain factory base
 	public override void FetchData(DataFetcherParameters parameters)
 	{
-		var vectorDataParameters = parameters as VectorDataFetcherParameters;
-		if(vectorDataParameters == null)
+		var vectorDaraParameters = parameters as VectorDataFetcherParameters;
+		if(vectorDaraParameters == null)
 		{
 			return;
 		}
-		var vectorTile = (vectorDataParameters.useOptimizedStyle) ? new VectorTile(vectorDataParameters.style.Id, vectorDataParameters.style.Modified) : new VectorTile();
-		if (vectorDataParameters.tile != null)
+		var vectorTile = (vectorDaraParameters.useOptimizedStyle) ? new VectorTile(vectorDaraParameters.style.Id, vectorDaraParameters.style.Modified) : new VectorTile();
+
+		if (vectorDaraParameters.tile != null)
 		{
-			vectorDataParameters.tile.AddTile(vectorTile);
+			vectorDaraParameters.tile.AddTile(vectorTile);
 		}
-		vectorTile.Initialize(_fileSource, vectorDataParameters.canonicalTileId, vectorDataParameters.tilesetId, () =>
+
+		vectorTile.Initialize(_fileSource, vectorDaraParameters.tile.CanonicalTileId, vectorDaraParameters.tilesetId, () =>
 		{
-			if (vectorDataParameters.tile != null && vectorDataParameters.tile.CanonicalTileId != vectorTile.Id)
+			if (vectorDaraParameters.tile.CanonicalTileId != vectorTile.Id)
 			{
 				//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
 				return;
 			}
 			if (vectorTile.HasError)
 			{
-				FetchingError(vectorDataParameters.tile, vectorTile, new TileErrorEventArgs(vectorDataParameters.canonicalTileId, vectorTile.GetType(), vectorDataParameters.tile, vectorTile.Exceptions));
+				FetchingError(vectorDaraParameters.tile, vectorTile, new TileErrorEventArgs(vectorDaraParameters.tile.CanonicalTileId, vectorTile.GetType(), vectorDaraParameters.tile, vectorTile.Exceptions));
 			}
 			else
 			{
-				DataRecieved(vectorDataParameters.tile, vectorTile);
+				DataRecieved(vectorDaraParameters.tile, vectorTile);
+			}
+
+			if (vectorDaraParameters.tile != null)
+			{
+				vectorDaraParameters.tile.RemoveTile(vectorTile);
 			}
 		});
 	}

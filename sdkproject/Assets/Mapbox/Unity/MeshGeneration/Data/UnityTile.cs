@@ -25,7 +25,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		private int _heightDataResolution = 100;
 		//keeping track of tile objects to be able to cancel them safely if tile is destroyed before data fetching finishes
-		private List<Tile> _tiles = new List<Tile>();
+		private HashSet<Tile> _tiles = new HashSet<Tile>();
 		[SerializeField] private float _tileScale;
 
 		public bool IsRecycled = false;
@@ -514,6 +514,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			_tiles.Add(tile);
 		}
 
+		internal void RemoveTile(Tile tile)
+		{
+			_tiles.Remove(tile);
+		}
+
 		public void ClearAssets()
 		{
 			if (Application.isEditor && !Application.isPlaying)
@@ -527,9 +532,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void Cancel()
 		{
-			for (int i = 0, _tilesCount = _tiles.Count; i < _tilesCount; i++)
+			foreach (var tile in _tiles)
 			{
-				_tiles[i].Cancel();
+				tile.Cancel();
 			}
 		}
 
