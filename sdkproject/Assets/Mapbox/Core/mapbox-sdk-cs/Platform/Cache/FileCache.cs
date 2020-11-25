@@ -30,6 +30,7 @@ namespace Mapbox.Platform.Cache
 		{
 			_cachedResponses = new Dictionary<string, CacheItem>();
 			_infosToSave = new Queue<InfoWrapper>();
+			_infoKeys = new HashSet<string>();
 			MapIdToFolderNameDictionary = new Dictionary<string, string>();
 			Runnable.Run(FileScheduler());
 
@@ -47,6 +48,8 @@ namespace Mapbox.Platform.Cache
 		private Dictionary<string, CacheItem> _cachedResponses;
 
 		private Queue<InfoWrapper> _infosToSave;
+		private HashSet<string> _infoKeys;
+
 		private int _lastFileSaveFrame = 0;
 		private string DataSerializationCulture = "en-US";
 
@@ -91,9 +94,19 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 
-		public void Add(string mapId, CanonicalTileId tileId, TextureCacheItem textureCacheItem, bool forceInsert)
+		public void Add(string tilesetId, CanonicalTileId tileId, TextureCacheItem textureCacheItem, bool forceInsert)
 		{
-			var infoWrapper = new InfoWrapper(mapId, tileId, textureCacheItem);
+			var key = tileId.GenerateKey(tilesetId);
+			if (_infoKeys.Contains(key))
+			{
+				if(Debug.isDebugBuild) Debug.Log(string.Format("This image file ({0}) is already queued for saving. Removing (and destroying) first instance, adding new one.", key));
+				//we can't find the first info object here in O(n) but we are removing it from _infoKeys
+				//so we can find it and destroy the texture inside on update below
+				_infoKeys.Remove(key);
+			}
+
+			_infoKeys.Add(key);
+			var infoWrapper = new InfoWrapper(key, tilesetId, tileId, textureCacheItem);
 			_infosToSave.Enqueue(infoWrapper);
 		}
 
@@ -103,7 +116,20 @@ namespace Mapbox.Platform.Cache
 			{
 				if (_infosToSave.Count > 0)
 				{
-					SaveInfo(_infosToSave.Dequeue());
+					var info = _infosToSave.Dequeue();
+					if (_infoKeys.Contains(info.Key))
+					{
+						_infoKeys.Remove(info.Key);
+						SaveInfo(info);
+					}
+					else
+					{
+						//this object was removed from queue, probably updates
+						//texture inside should be destroyed
+						GameObject.Destroy(info.TextureCacheItem.Texture2D);
+						info.TextureCacheItem.Data = null;
+						if(Debug.isDebugBuild) Debug.Log("Destroying the first copy of the same tile in file save queue");
+					}
 				}
 
 				yield return null;
@@ -112,6 +138,11 @@ namespace Mapbox.Platform.Cache
 
 		private void SaveInfo(InfoWrapper info)
 		{
+			if (info.TextureCacheItem == null || info.TextureCacheItem.Data == null)
+			{
+				return;
+			}
+
 			string folderPath = Path.Combine(PersistantCacheRootFolderPath, MapIdToFolderName(info.MapId));
 
 			if (!Directory.Exists(folderPath))
@@ -120,7 +151,6 @@ namespace Mapbox.Platform.Cache
 			}
 
 			info.TextureCacheItem.FilePath = Path.GetFullPath(Path.Combine(folderPath, TileIdToFileName(info.TileId) + FileExtension));
-			//byte[] bytes = info.TextureCacheItem.Texture2D.EncodeToPNG();
 
 			using (FileStream sourceStream = new FileStream(info.TextureCacheItem.FilePath,
 				FileMode.Create, FileAccess.Write, FileShare.Read,
@@ -225,12 +255,14 @@ namespace Mapbox.Platform.Cache
 
 		private class InfoWrapper
 		{
+			public string Key;
 			public string MapId;
 			public CanonicalTileId TileId;
 			public TextureCacheItem TextureCacheItem;
 
-			public InfoWrapper(string mapId, CanonicalTileId tileId, TextureCacheItem textureCacheItem)
+			public InfoWrapper(string key, string mapId, CanonicalTileId tileId, TextureCacheItem textureCacheItem)
 			{
+				Key = key;
 				MapId = mapId;
 				TileId = tileId;
 				TextureCacheItem = textureCacheItem;

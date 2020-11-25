@@ -199,38 +199,45 @@ namespace Mapbox.Platform.Cache
 			var finalUrl = CreateFinalUrl(uri);
 
 			//go through existing caches and check if we already have the requested tile available
-			var textureItem = _cacheManager.GetTextureItemFromMemory(tilesetId, tileId); //_cacheManager.GetTextureItem(tilesetId, tileId);
+			var textureItem = _cacheManager.GetTextureItemFromMemory(tilesetId, tileId);
 			if (textureItem != null)
 			{
 				//return texture from memory cache
-				var textureResponse = new TextureResponse {Texture2D = textureItem.Texture2D};
+				var textureResponse = new TextureResponse
+				{
+					Texture2D = textureItem.Texture2D,
+					LoadedFromCache = true
+				};
 				callback(textureResponse);
 				return;
 			}
-			else
+			else if (_cacheManager.TextureFileExists(tilesetId, tileId)) //not in memory, check file cache
 			{
-				//not in memory, check file cache
-				if (_cacheManager.TextureFileExists(tilesetId, tileId))
+				_cacheManager.GetTextureItemFromFile(tilesetId, tileId, (textureCacheItem) =>
 				{
-					_cacheManager.GetTextureItemFromFile(tilesetId, tileId, (textureCacheItem) =>
+					//create a response object and return that asap
+					var textureResponse = new TextureResponse
 					{
-						var textureResponse = new TextureResponse {Texture2D = textureCacheItem.Texture2D};
-						callback(textureResponse);
+						Texture2D = textureCacheItem.Texture2D,
+						LoadedFromCache = true
+					};
+					callback(textureResponse);
 
-						if (textureCacheItem.ExpirationDate < DateTime.Now)
+					//after returning what we already have
+					//check if it's out of date, if so check server for update
+					if (textureCacheItem.ExpirationDate < DateTime.Now)
+					{
+						Runnable.Run(FetchTextureIfNoneMatch(tileId, tilesetId, finalUrl, textureCacheItem, (response) =>
 						{
-							Runnable.Run(FetchTextureIfNoneMatch(tileId, tilesetId, finalUrl, textureCacheItem, (response) =>
-							{
-								callback(response);
-							}));
-						}
-					});
+							callback(response);
+						}));
+					}
+				});
 
-					return;
-				}
+				return;
 			}
 
-
+			// couldn't find texture in caches
 			Runnable.Run(FetchTexture(finalUrl, callback, tilesetId, tileId));
 		}
 

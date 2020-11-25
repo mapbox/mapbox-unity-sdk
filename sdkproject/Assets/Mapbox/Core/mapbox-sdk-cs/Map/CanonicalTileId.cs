@@ -113,5 +113,14 @@ namespace Mapbox.Map
 		}
 
 		#endregion
+
+	}
+
+	public static class TileIdExtensions
+	{
+		public static string GenerateKey(this CanonicalTileId tileId, string tilesetId)
+		{
+			return string.Format("{0}_{1}", tilesetId, tileId);
+		}
 	}
 }

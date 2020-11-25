@@ -23,10 +23,6 @@ namespace Mapbox.Platform.Cache
 			_texOrder = new List<string>();
 		}
 
-
-#if MAPBOX_DEBUG_CACHE
-		private string _className;
-#endif
 		private uint _maxCacheSize;
 		private object _lock = new object();
 		private Dictionary<string, TextureCacheItem> _cachedTextures;
@@ -34,7 +30,6 @@ namespace Mapbox.Platform.Cache
 		private int _destroyedTextureCounter = 0;
 		private int _destroyedTextureLimit = 20;
 
-		//private Queue<string> _textureOrderQueue;
 		private List<string> _texOrder;
 
 		public uint MaxCacheSize
@@ -42,35 +37,46 @@ namespace Mapbox.Platform.Cache
 			get { return _maxCacheSize; }
 		}
 
-		public void Add(string mapId, CanonicalTileId tileId, TextureCacheItem textureCacheItem, bool forceInsert)
+		public void Add(string tilesetId, CanonicalTileId tileId, TextureCacheItem textureCacheItem, bool forceInsert)
 		{
-			string key = mapId + "||" + tileId;
+			string key = tileId.GenerateKey(tilesetId);
 
-			lock (_lock)
+			if (!_cachedTextures.ContainsKey(key))
 			{
-				if (_cachedTextures.Count >= _maxCacheSize)
-				{
-					var keyToRemove = _texOrder[0];
-					_texOrder.RemoveAt(0);
-					_cachedTextures[keyToRemove].Texture2D.Destroy();
-					_cachedTextures[keyToRemove].Data = null;
-					_destroyedTextureCounter++;
-					_cachedTextures.Remove(keyToRemove);
-				}
+				//item doesn't exists, we simply add it to list
+				textureCacheItem.AddedToCacheTicksUtc = DateTime.UtcNow.Ticks;
+				_cachedTextures.Add(key, textureCacheItem);
+				_texOrder.Add(key);
+			}
+			else
+			{
+				//an item with same key exists, we destroy older one to prevent memory leak first
+				//then add new one to list
+				if(Debug.isDebugBuild) Debug.Log("An texture item with same key exists in memory cache. Destroying older one, caching new one.");
 
-				if (!_cachedTextures.ContainsKey(key))
-				{
-					textureCacheItem.AddedToCacheTicksUtc = DateTime.UtcNow.Ticks;
-					_cachedTextures.Add(key, textureCacheItem);
-					_texOrder.Add(key);
-				}
-				else
-				{
-					textureCacheItem.AddedToCacheTicksUtc = DateTime.UtcNow.Ticks;
-					_cachedTextures[key] = textureCacheItem;
-				}
+				RemoveTextureCacheItem(key);
+				textureCacheItem.AddedToCacheTicksUtc = DateTime.UtcNow.Ticks;
+				_cachedTextures[key] = textureCacheItem;
 			}
 
+			CheckCacheLimit();
+			CheckForUnloadingAssets();
+		}
+
+		private void CheckCacheLimit()
+		{
+			if (_cachedTextures.Count >= _maxCacheSize)
+			{
+				var keyToRemove = _texOrder[0];
+				_texOrder.RemoveAt(0);
+				RemoveTextureCacheItem(keyToRemove);
+				_destroyedTextureCounter++;
+				_cachedTextures.Remove(keyToRemove);
+			}
+		}
+
+		private void CheckForUnloadingAssets()
+		{
 			if (_destroyedTextureCounter >= _destroyedTextureLimit)
 			{
 				_destroyedTextureCounter = 0;
@@ -78,9 +84,15 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 
+		private void RemoveTextureCacheItem(string keyToRemove)
+		{
+			_cachedTextures[keyToRemove].Texture2D.Destroy();
+			_cachedTextures[keyToRemove].Data = null;
+		}
+
 		public CacheItem Get(string tilesetId, CanonicalTileId tileId)
 		{
-			string key = GenerateKey(tilesetId, tileId);
+			string key = tileId.GenerateKey(tilesetId);
 
 #if MAPBOX_DEBUG_CACHE
 			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
@@ -102,10 +114,10 @@ namespace Mapbox.Platform.Cache
 			return _cachedTextures[key];
 		}
 
-		private static string GenerateKey(string tilesetId, CanonicalTileId tileId)
-		{
-			return tilesetId + "||" + tileId;
-		}
+		// private static string GenerateKey(string tilesetId, CanonicalTileId tileId)
+		// {
+		// 	return string.Format("{0}_{1}", tilesetId, tileId);
+		// }
 
 		public void Clear()
 		{
@@ -136,7 +148,6 @@ namespace Mapbox.Platform.Cache
 		{
 			lock (_lock)
 			{
-				tilesetId += "||";
 				List<string> toDelete = _cachedTextures.Keys.Where(k => k.Contains(tilesetId)).ToList();
 				foreach (string key in toDelete)
 				{
@@ -147,13 +158,13 @@ namespace Mapbox.Platform.Cache
 
 		public bool Exists(string tilesetId, CanonicalTileId tileId)
 		{
-			string key = tilesetId + "||" + tileId;
+			string key = tileId.GenerateKey(tilesetId);
 			return _cachedTextures.ContainsKey(key);
 		}
 
 		public void MarkFixed(CanonicalTileId tileId, string tilesetId)
 		{
-			var key = GenerateKey(tilesetId, tileId);
+			var key = tileId.GenerateKey(tilesetId);
 			if (_cachedTextures.ContainsKey(key))
 			{
 				var cacheItem = _cachedTextures[key];
