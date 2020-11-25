@@ -4,8 +4,6 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using Mapbox.Map;
-
 namespace Mapbox.Unity.Utilities
 {
 	using Mapbox.Utils;
