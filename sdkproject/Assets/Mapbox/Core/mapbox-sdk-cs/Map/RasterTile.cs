@@ -56,6 +56,8 @@ namespace Mapbox.Map
 			get { return this.data; }
 		}
 
+		public string TilesetId => _tilesetId;
+
 		/// <summary> Gets the imagery as Texture2d object. This field is only used if texture is fetched/stored as Texture2d. Otherwise, if it's fetched as byte array, you should use Data. </summary>
 		/// <value> The raw data, usually an encoded JPEG or PNG. </value>
 		/// <example>
@@ -97,7 +99,11 @@ namespace Mapbox.Map
 			}
 			else
 			{
-				SetTexture2D(textureResponse.Texture2D);
+				StatusCode = textureResponse.StatusCode;
+				texture2D = textureResponse.Texture2D;
+				data = textureResponse.Data;
+				ETag = textureResponse.ETag;
+				ExpirationDate = textureResponse.ExpirationDate;
 			}
 
 			// Cancelled is not the same as loaded!

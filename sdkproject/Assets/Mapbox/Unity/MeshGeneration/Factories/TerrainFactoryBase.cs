@@ -37,6 +37,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			if (DataFetcher != null)
 			{
 				DataFetcher.DataRecieved -= OnTerrainRecieved;
+				DataFetcher.TextureRecieved -= OnTerrainRecieved;
 				DataFetcher.FetchingError -= OnDataError;
 			}
 		}
@@ -48,6 +49,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			Strategy.Initialize(_elevationOptions);
 			DataFetcher = ScriptableObject.CreateInstance<TerrainDataFetcher>();
 			DataFetcher.DataRecieved += OnTerrainRecieved;
+			DataFetcher.TextureRecieved += OnTerrainRecieved;
 			DataFetcher.FetchingError += OnDataError;
 		}
 
@@ -118,6 +120,30 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		#endregion
 
 		#region DataFetcherEvents
+
+		private void OnTerrainRecieved(UnityTile tile, Texture2D texture)
+		{
+			if (tile != null)
+			{
+				_tilesWaitingResponse.Remove(tile);
+
+				if (tile.HeightDataState != TilePropertyState.Unregistered)
+				{
+					if (texture != null)
+					{
+						tile.SetHeightTexture(texture, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
+						Strategy.RegisterTile(tile);
+					}
+					else
+					{
+						//tile.SetHeightData(pngRasterTile.Data, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
+						// tile.SetElevationData(pngRasterTile.Elevation, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
+						// Strategy.RegisterTile(tile);
+					}
+				}
+			}
+		}
+
 		private void OnTerrainRecieved(UnityTile tile, RawPngRasterTile pngRasterTile)
 		{
 			if (tile != null)

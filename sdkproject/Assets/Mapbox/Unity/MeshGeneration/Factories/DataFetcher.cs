@@ -19,11 +19,6 @@ public abstract class DataFetcher : ScriptableObject
 	{
 		while (true)
 		{
-			// if (_fetchingQueue.Count > 0)
-			// {
-			// 	var fi = _fetchingQueue.Dequeue();
-			// 	fi.RasterTile.Initialize(_fileSource, fi.TileId, fi.TilesetId, fi.Callback);
-			// }
 			while (_tileOrder.Count > 0)
 			{
 				var tileId = _tileOrder.Dequeue();
@@ -84,4 +79,5 @@ public class FetchInfo
 	public string TilesetId;
 	public Action Callback;
 	public Tile RasterTile;
+	public string ETag;
 }

@@ -54,6 +54,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			if (DataFetcher != null)
 			{
 				DataFetcher.DataRecieved -= OnImageRecieved;
+				DataFetcher.TextureRecieved -= OnImageRecieved;
 				DataFetcher.FetchingError -= OnDataError;
 			}
 		}
@@ -82,6 +83,26 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			rasterTile.ClearDataReferences();
 		}
 
+		private void OnImageRecieved(UnityTile tile, Texture2D texture)
+		{
+			if (tile != null)
+			{
+				_tilesWaitingResponse.Remove(tile);
+
+				if (tile.RasterDataState != TilePropertyState.Unregistered)
+				{
+					if (texture != null)
+					{
+						tile.SetRasterTexture(texture);
+					}
+					else
+					{
+						//tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
+					}
+				}
+			}
+		}
+
 		//merge this with OnErrorOccurred?
 		protected virtual void OnDataError(UnityTile tile, RasterTile rasterTile, TileErrorEventArgs e)
 		{
@@ -103,6 +124,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			DataFetcher = ScriptableObject.CreateInstance<ImageDataFetcher>();
 			DataFetcher.DataRecieved += OnImageRecieved;
+			DataFetcher.TextureRecieved += OnImageRecieved;
 			DataFetcher.FetchingError += OnDataError;
 		}
 
@@ -126,7 +148,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				var parent = tile.UnwrappedTileId.Parent;
 				for (int i = 0; i < 16; i++)
 				{
-					var cacheItem = MapboxAccess.Instance.GetTextureFromMemoryCache(TilesetId, parent.Canonical);
+					var cacheItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(TilesetId, parent.Canonical);
 					if (cacheItem != null && cacheItem.Texture2D != null)
 					{
 						tile.SetParentTexture(parent, cacheItem.Texture2D);

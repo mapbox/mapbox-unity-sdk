@@ -40,6 +40,10 @@ namespace Mapbox.Platform
 			get { return _exceptions == null ? false : _exceptions.Count > 0; }
 		}
 
+		public byte[] Data;
+		public DateTime ExpirationDate;
+		public string ETag;
+
 		public void AddException(Exception exception)
 		{
 			if (null == _exceptions) { _exceptions = new List<Exception>(); }

@@ -4,14 +4,17 @@ using Mapbox.Unity.MeshGeneration.Enums;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Mapbox.Platform.Cache;
+using Mapbox.Unity;
 using Mapbox.Unity.Utilities;
+using UnityEngine;
 
 public class ImageDataFetcher : DataFetcher
 {
 	public Action<UnityTile, RasterTile> DataRecieved = (t, s) => { };
+	public Action<UnityTile, Texture2D> TextureRecieved = (t, s) => { };
 	public Action<UnityTile, RasterTile, TileErrorEventArgs> FetchingError = (t, r, s) => { };
 
-	//tile here should be totally optional and used only not to have keep a dictionary in terrain factory base
 	public override void FetchData(DataFetcherParameters parameters)
 	{
 		var imageDataParameters = parameters as ImageDataFetcherParameters;
@@ -19,50 +22,110 @@ public class ImageDataFetcher : DataFetcher
 		{
 			return;
 		}
-		RasterTile rasterTile;
-		if (imageDataParameters.tilesetId.StartsWith("mapbox://", StringComparison.Ordinal))
+
+		FetchData(imageDataParameters.tilesetId, imageDataParameters.canonicalTileId, imageDataParameters.useRetina, imageDataParameters.tile);
+	}
+
+	//tile here should be totally optional and used only not to have keep a dictionary in terrain factory base
+	public void FetchData(string tilesetId, CanonicalTileId tileId, bool useRetina, UnityTile unityTile = null)
+	{
+		//MemoryCacheCheck
+		var textureItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(tilesetId, tileId);
+		if (textureItem != null)
 		{
-			rasterTile = imageDataParameters.useRetina ? new RetinaRasterTile() : new RasterTile();
+			TextureRecieved(unityTile, textureItem.Texture2D);
+			return;
+		}
+
+		//FileCacheCheck
+		if (MapboxAccess.Instance.CacheManager.TextureFileExists(tilesetId, tileId)) //not in memory, check file cache
+		{
+			MapboxAccess.Instance.CacheManager.GetTextureItemFromFile(tilesetId, tileId, (textureCacheItem) =>
+			{
+				TextureRecieved(unityTile, textureCacheItem.Texture2D);
+
+				//after returning what we already have
+				//check if it's out of date, if so check server for update
+				if (textureCacheItem.ExpirationDate < DateTime.Now)
+				{
+					CreateWebRequest(tilesetId, tileId, useRetina, textureCacheItem.ETag, unityTile);
+				}
+			});
+
+			return;
+		}
+
+		//not in cache so web request
+		CreateWebRequest(tilesetId, tileId, useRetina, String.Empty, unityTile);
+	}
+
+	private void CreateWebRequest(string tilesetId, CanonicalTileId tileId, bool useRetina, string etag, UnityTile unityTile = null)
+	{
+		RasterTile rasterTile;
+		if (tilesetId.StartsWith("mapbox://", StringComparison.Ordinal))
+		{
+			rasterTile = useRetina ? new RetinaRasterTile() : new RasterTile();
+		}
+		else if (tilesetId.StartsWith("http"))
+		{
+			rasterTile = new CustomRasterTile();
 		}
 		else
 		{
-			rasterTile = imageDataParameters.useRetina ? new ClassicRetinaRasterTile() : new ClassicRasterTile();
+			rasterTile = useRetina ? new ClassicRetinaRasterTile() : new ClassicRasterTile();
 		}
 
-		if (imageDataParameters.tile != null)
+		if (unityTile != null)
 		{
-			imageDataParameters.tile.AddTile(rasterTile);
+			unityTile.AddTile(rasterTile);
 		}
 
 		EnqueueForFetching(new FetchInfo()
 		{
-			TileId = imageDataParameters.tile.CanonicalTileId,
-			TilesetId = imageDataParameters.tilesetId,
+			TileId = tileId,
+			TilesetId = tilesetId,
 			RasterTile = rasterTile,
-			Callback = () =>
-			{
-				if (imageDataParameters.tile.CanonicalTileId != rasterTile.Id)
-				{
-					//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
-					return;
-				}
-
-				if (rasterTile.HasError)
-				{
-					FetchingError(imageDataParameters.tile, rasterTile, new TileErrorEventArgs(imageDataParameters.tile.CanonicalTileId, rasterTile.GetType(), imageDataParameters.tile, rasterTile.Exceptions));
-				}
-				else
-				{
-					DataRecieved(imageDataParameters.tile, rasterTile);
-				}
-
-				if (imageDataParameters.tile != null)
-				{
-					imageDataParameters.tile.RemoveTile(rasterTile);
-				}
-
-			}
+			ETag = etag,
+			Callback = () => { FetchingCallback(tileId, rasterTile, unityTile); }
 		});
+	}
+
+	private void FetchingCallback(CanonicalTileId tileId, RasterTile rasterTile, UnityTile unityTile = null)
+	{
+		if (unityTile != null && unityTile.CanonicalTileId != rasterTile.Id)
+		{
+			//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
+			return;
+		}
+
+		if (rasterTile.HasError)
+		{
+			FetchingError(unityTile, rasterTile, new TileErrorEventArgs(tileId, rasterTile.GetType(), unityTile, rasterTile.Exceptions));
+		}
+		else
+		{
+			MapboxAccess.Instance.CacheManager.AddTextureItem(
+				rasterTile.TilesetId,
+				rasterTile.Id,
+				new TextureCacheItem()
+				{
+					ETag = rasterTile.ETag,
+					Data = rasterTile.Data,
+					ExpirationDate = rasterTile.ExpirationDate,
+					Texture2D = rasterTile.Texture2D
+				},
+				true);
+
+			if (rasterTile.StatusCode != 304) //NOT MODIFIED
+			{
+				DataRecieved(unityTile, rasterTile);
+			}
+		}
+
+		if (unityTile != null)
+		{
+			unityTile.RemoveTile(rasterTile);
+		}
 	}
 }
 

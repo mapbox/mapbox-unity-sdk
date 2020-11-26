@@ -19,11 +19,17 @@ namespace Mapbox.Platform.Cache
 {
 	public class FileCache
 	{
+		public Action<string, CanonicalTileId, TextureCacheItem> FileSaved = (tilesetName, tileId, cacheItem) => { };
+
 		private static string CacheRootFolderName = "FileCache";
 		public static string PersistantCacheRootFolderPath = Path.Combine(Application.persistentDataPath, CacheRootFolderName);
-		private static string FileExtension = ".png";
+		private static string FileExtension = "png";
 
-		public Action<string, CanonicalTileId, TextureCacheItem> FileSaved = (tilesetName, tileId, cacheItem) => { };
+		private Dictionary<string, CacheItem> _cachedResponses;
+
+		private Queue<InfoWrapper> _infosToSave;
+		private HashSet<string> _infoKeys;
+
 		private Dictionary<string, string> MapIdToFolderNameDictionary;
 
 		public FileCache()
@@ -40,57 +46,18 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 
-#if MAPBOX_DEBUG_CACHE
-		private string _className;
-#endif
-		private uint _maxCacheSize;
-		private object _lock = new object();
-		private Dictionary<string, CacheItem> _cachedResponses;
-
-		private Queue<InfoWrapper> _infosToSave;
-		private HashSet<string> _infoKeys;
-
-		private int _lastFileSaveFrame = 0;
-		private string DataSerializationCulture = "en-US";
-
-		public uint MaxCacheSize
-		{
-			get { return _maxCacheSize; }
-		}
-
-		public CacheItem Get(string tilesetId, CanonicalTileId tileId)
-		{
-			string key = tilesetId + "||" + tileId;
-
-#if MAPBOX_DEBUG_CACHE
-			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
-			UnityEngine.Debug.LogFormat("{0} {1}", methodName, key);
-#endif
-
-			if (!_cachedResponses.ContainsKey(key))
-			{
-				return null;
-			}
-
-			return _cachedResponses[key];
-		}
-
 		public bool Exists(string mapId, CanonicalTileId tileId)
 		{
-			string filePath = Path.Combine(PersistantCacheRootFolderPath, MapIdToFolderName(mapId) + "/" + TileIdToFileName(tileId) + FileExtension);
+			string filePath = Path.Combine(PersistantCacheRootFolderPath, string.Format("{0}/{1}.{2}", MapIdToFolderName(mapId), tileId.ToFileSafeString(), FileExtension));
 			return File.Exists(filePath);
 		}
 
 		public void Clear(string tilesetId)
 		{
-			lock (_lock)
+			List<string> toDelete = _cachedResponses.Keys.Where(k => k.Contains(tilesetId)).ToList();
+			foreach (string key in toDelete)
 			{
-				tilesetId += "||";
-				List<string> toDelete = _cachedResponses.Keys.Where(k => k.Contains(tilesetId)).ToList();
-				foreach (string key in toDelete)
-				{
-					_cachedResponses.Remove(key);
-				}
+				_cachedResponses.Remove(key);
 			}
 		}
 
@@ -110,29 +77,86 @@ namespace Mapbox.Platform.Cache
 			_infosToSave.Enqueue(infoWrapper);
 		}
 
+		public void GetAsync(string mapId, CanonicalTileId tileId, Action<TextureCacheItem> callback)
+		{
+			string filePath = Path.Combine(PersistantCacheRootFolderPath, string.Format("{0}/{1}", MapIdToFolderName(mapId), tileId.ToFileSafeString()));
+
+			if (File.Exists(filePath + FileExtension))
+			{
+				Runnable.Run(LoadImageCoroutine(mapId, tileId, filePath, callback));
+			}
+		}
+
+		public void ClearStyle(string style)
+		{
+			ClearFolder(Path.Combine(PersistantCacheRootFolderPath, style));
+		}
+
+		public void ClearAll()
+		{
+			DirectoryInfo di = new DirectoryInfo(PersistantCacheRootFolderPath);
+
+			foreach (DirectoryInfo folder in di.GetDirectories())
+			{
+				ClearFolder(folder.FullName);
+			}
+		}
+
+		public void DeleteTileFile(string filePath)
+		{
+			if (File.Exists(filePath))
+			{
+				File.Delete(filePath);
+			}
+		}
+
+		public HashSet<string> GetFileList()
+		{
+			var pathList = new HashSet<string>();
+			if (Directory.Exists(FileCache.PersistantCacheRootFolderPath))
+			{
+				var dir = Directory.GetDirectories(FileCache.PersistantCacheRootFolderPath);
+				foreach (var rasterDirectory in dir)
+				{
+					var directoryInfo = new DirectoryInfo(rasterDirectory);
+					var files = directoryInfo.GetFiles();
+					foreach (var fileInfo in files)
+					{
+						pathList.Add(fileInfo.FullName);
+					}
+				}
+			}
+
+			return pathList;
+		}
+
 		private IEnumerator FileScheduler()
 		{
 			while (true)
 			{
-				if (_infosToSave.Count > 0)
-				{
-					var info = _infosToSave.Dequeue();
-					if (_infoKeys.Contains(info.Key))
-					{
-						_infoKeys.Remove(info.Key);
-						SaveInfo(info);
-					}
-					else
-					{
-						//this object was removed from queue, probably updates
-						//texture inside should be destroyed
-						GameObject.Destroy(info.TextureCacheItem.Texture2D);
-						info.TextureCacheItem.Data = null;
-						if(Debug.isDebugBuild) Debug.Log("Destroying the first copy of the same tile in file save queue");
-					}
-				}
-
+				SaveFromQueue();
 				yield return null;
+			}
+		}
+
+		private void SaveFromQueue()
+		{
+			if (_infosToSave.Count > 0)
+			{
+				var info = _infosToSave.Dequeue();
+				if (_infoKeys.Contains(info.Key))
+				{
+					_infoKeys.Remove(info.Key);
+					SaveInfo(info);
+				}
+				else
+				{
+					//this object was removed from queue, probably updates
+					//texture inside should be destroyed
+					GameObject.Destroy(info.TextureCacheItem.Texture2D);
+					info.TextureCacheItem.Data = null;
+					if (Debug.isDebugBuild) Debug.Log("Destroying the first copy of the same tile in file save queue");
+				}
 			}
 		}
 
@@ -150,27 +174,22 @@ namespace Mapbox.Platform.Cache
 				Directory.CreateDirectory(folderPath);
 			}
 
-			info.TextureCacheItem.FilePath = Path.GetFullPath(Path.Combine(folderPath, TileIdToFileName(info.TileId) + FileExtension));
+			info.TextureCacheItem.FilePath = Path.GetFullPath(Path.Combine(folderPath, info.TileId.ToFileSafeString() + FileExtension));
 
-			using (FileStream sourceStream = new FileStream(info.TextureCacheItem.FilePath,
+			FileStream sourceStream = new FileStream(info.TextureCacheItem.FilePath,
 				FileMode.Create, FileAccess.Write, FileShare.Read,
-				bufferSize: 4096, useAsync: false))
-			{
-				sourceStream.Write(info.TextureCacheItem.Data, 0, info.TextureCacheItem.Data.Length);
-			}
+				bufferSize: 4096, useAsync: false);
+
+			Task t = sourceStream
+				.WriteAsync(info.TextureCacheItem.Data, 0, info.TextureCacheItem.Data.Length)
+				.ContinueWith((task) =>
+				{
+					sourceStream.Close();
+					FileSaved(info.MapId, info.TileId, info.TextureCacheItem);
+				});
 
 			//We probably shouldn't delay this. It will only cause problems and it should be fast enough anyway
-			FileSaved(info.MapId, info.TileId, info.TextureCacheItem);
-		}
-
-		public void GetAsync(string mapId, CanonicalTileId tileId, Action<TextureCacheItem> callback)
-		{
-			string filePath = Path.Combine(PersistantCacheRootFolderPath, MapIdToFolderName(mapId) + "/" + TileIdToFileName(tileId));
-
-			if (File.Exists(filePath + FileExtension))
-			{
-				Runnable.Run(LoadImageCoroutine(mapId, tileId, filePath, callback));
-			}
+			//FileSaved(info.MapId, info.TileId, info.TextureCacheItem);
 		}
 
 		private IEnumerator LoadImageCoroutine(string mapId, CanonicalTileId tileId, string filePath, Action<TextureCacheItem> callback)
@@ -211,11 +230,6 @@ namespace Mapbox.Platform.Cache
 			return folderName;
 		}
 
-		private string TileIdToFileName(CanonicalTileId tileId)
-		{
-			return tileId.Z.ToString() + "_" + tileId.X + "_" + tileId.Y;
-		}
-
 		public void Clear()
 		{
 			if (_cachedResponses != null)
@@ -238,21 +252,6 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 
-		public void ClearStyle(string style)
-		{
-			ClearFolder(Path.Combine(PersistantCacheRootFolderPath, style));
-		}
-
-		public void ClearAll()
-		{
-			DirectoryInfo di = new DirectoryInfo(PersistantCacheRootFolderPath);
-
-			foreach (DirectoryInfo folder in di.GetDirectories())
-			{
-				ClearFolder(folder.FullName);
-			}
-		}
-
 		private class InfoWrapper
 		{
 			public string Key;
@@ -267,34 +266,6 @@ namespace Mapbox.Platform.Cache
 				TileId = tileId;
 				TextureCacheItem = textureCacheItem;
 			}
-		}
-
-		public void DeleteTileFile(string filePath)
-		{
-			if (File.Exists(filePath))
-			{
-				File.Delete(filePath);
-			}
-		}
-
-		public HashSet<string> GetFileList()
-		{
-			var _pathList = new HashSet<string>();
-			if (Directory.Exists(FileCache.PersistantCacheRootFolderPath))
-			{
-				var dir = Directory.GetDirectories(FileCache.PersistantCacheRootFolderPath);
-				foreach (var rasterDirectory in dir)
-				{
-					var directoryInfo = new DirectoryInfo(rasterDirectory);
-					var files = directoryInfo.GetFiles();
-					foreach (var fileInfo in files)
-					{
-						_pathList.Add(fileInfo.FullName);
-					}
-				}
-			}
-
-			return _pathList;
 		}
 	}
 }

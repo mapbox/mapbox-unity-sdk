@@ -50,7 +50,7 @@ namespace Mapbox.Platform.Cache
 			}
 			else
 			{
-				//an item with same key exists, we destroy older one to prevent memory leak first
+				//an item with samea key exists, we destroy older one to prevent memory leak first
 				//then add new one to list
 				if(Debug.isDebugBuild) Debug.Log("An texture item with same key exists in memory cache. Destroying older one, caching new one.");
 

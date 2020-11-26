@@ -4,6 +4,8 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System.Text;
+
 namespace Mapbox.Map
 {
 	using System;
@@ -76,7 +78,12 @@ namespace Mapbox.Map
 		/// </returns>
 		public override string ToString()
 		{
-			return this.Z + "/" + this.X + "/" + this.Y;
+			return string.Format("{0}/{1}/{2}", this.Z, this.X, this.Y);
+		}
+
+		public string ToFileSafeString()
+		{
+			return string.Format("{0}_{1}_{2}", this.Z, this.X, this.Y);
 		}
 
 		#region Equality 
