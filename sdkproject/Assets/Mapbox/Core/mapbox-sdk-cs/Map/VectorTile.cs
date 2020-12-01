@@ -54,6 +54,12 @@ namespace Mapbox.Map
 
 		private bool isDisposed = false;
 
+		private byte[] byteData;
+		public byte[] ByteData
+		{
+			get { return this.byteData; }
+		}
+
 		/// <summary> Gets the vector decoded using Mapbox.VectorTile library. </summary>
 		/// <value> The GeoJson data. </value>
 		public Mapbox.VectorTile.VectorTile Data
@@ -195,6 +201,7 @@ namespace Mapbox.Map
 		{
 			try
 			{
+				byteData = data;
 				var decompressed = Compression.Decompress(data);
 				this.data = new Mapbox.VectorTile.VectorTile(decompressed);
 				return true;

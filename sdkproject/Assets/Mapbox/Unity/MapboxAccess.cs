@@ -213,22 +213,33 @@ namespace Mapbox.Unity
 			string url
 			, Action<Response> callback
 			, int timeout = 10
-			, CanonicalTileId tileId = new CanonicalTileId()
-			, string tilesetId = null
 		)
 		{
-			return _fileSource.Request(url, callback, _configuration.DefaultTimeout, tileId, tilesetId);
+			return _fileSource.Request(url, callback, _configuration.DefaultTimeout);
 		}
 
-		public void UnityImageRequest(
+		public void MapboxImageRequest(
 			string url
 			, Action<TextureResponse> callback
 			, int timeout = 10
 			, CanonicalTileId tileId = new CanonicalTileId()
 			, string tilesetId = null
+			, string etag = null
 		)
 		{
-			_fileSource.UnityImageRequest(url, callback, _configuration.DefaultTimeout, tileId, tilesetId);
+			_fileSource.MapboxImageRequest(url, callback, _configuration.DefaultTimeout, tileId, tilesetId);
+		}
+
+		public void CustomImageRequest(
+			string url
+			, Action<TextureResponse> callback
+			, int timeout = 10
+			, CanonicalTileId tileId = new CanonicalTileId()
+			, string tilesetId = null
+			, string etag = null
+		)
+		{
+			_fileSource.CustomImageRequest(url, callback, _configuration.DefaultTimeout, tileId, tilesetId);
 		}
 
 		// public TextureCacheItem GetTextureFromMemoryCache(string mapId, CanonicalTileId tileId)
@@ -276,7 +287,7 @@ namespace Mapbox.Unity
 					: TileResource.MakeClassicRaster(tileId, tilesetId).GetUrl();
 			}
 
-			UnityImageRequest(url, (t) =>
+			MapboxImageRequest(url, (t) =>
 			{
 				_textureMemoryCache.MarkFixed(tileId, tilesetId);
 			}, 10, tileId, tilesetId);

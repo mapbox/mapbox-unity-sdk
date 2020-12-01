@@ -17,7 +17,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 	{
 		public TileTerrainType ElevationType;
 		[SerializeField] private Texture2D _rasterData;
-		public VectorTile VectorData { get; private set; }
+		public Mapbox.VectorTile.VectorTile VectorData { get; private set; }
 		[SerializeField] private Texture2D _heightTexture;
 		public float[] HeightData;
 
@@ -455,7 +455,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		public void SetVectorData(VectorTile vectorTile)
+		public void SetVectorData(Mapbox.VectorTile.VectorTile vectorTile)
 		{
 			if (VectorDataState != TilePropertyState.Unregistered)
 			{

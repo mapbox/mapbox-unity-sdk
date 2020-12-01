@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------
+﻿	//-----------------------------------------------------------------------
 // <copyright file="FileSource.cs" company="Mapbox">
 //     Copyright (c) 2016 Mapbox. All rights reserved.
 // </copyright>
@@ -78,8 +78,6 @@ namespace Mapbox.Platform
 			string url
 			, Action<Response> callback
 			, int timeout = 10
-			, CanonicalTileId tileId = new CanonicalTileId()
-			, string tilesetId = null
 		)
 		{
 			if (!string.IsNullOrEmpty(_accessToken))
@@ -110,10 +108,15 @@ namespace Mapbox.Platform
 
 			//return request;
 
-			return proxyResponse(url, callback, timeout, tileId, tilesetId);
+			return proxyResponse(url, callback, timeout);
 		}
 
-		public void UnityImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null)
+		public void MapboxImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void CustomImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null)
 		{
 			throw new NotImplementedException();
 		}
@@ -124,8 +127,6 @@ namespace Mapbox.Platform
 			string url
 			, Action<Response> callback
 			, int timeout
-			, CanonicalTileId tileId
-			, string tilesetId
 		)
 		{
 

@@ -320,7 +320,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		#endregion
 
 		#region DataFetcherEvents
-		private void OnVectorDataRecieved(UnityTile tile, Mapbox.Map.VectorTile vectorTile)
+		private void OnVectorDataRecieved(UnityTile tile, VectorTile.VectorTile vectorTile)
 		{
 			if (tile != null)
 			{
@@ -377,7 +377,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			var nameList = new List<string>();
 			var builderList = new List<LayerVisualizerBase>();
 
-			foreach (var layerName in tile.VectorData.Data.LayerNames())
+			foreach (var layerName in tile.VectorData.LayerNames())
 			{
 				if (_layerBuilder.ContainsKey(layerName))
 				{
@@ -455,12 +455,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 				if (layerName != "")
 				{
-					builder.Create(tile.VectorData.Data.GetLayer(layerName), tile, DecreaseProgressCounter);
+					builder.Create(tile.VectorData.GetLayer(layerName), tile, DecreaseProgressCounter);
 				}
 				else
 				{
 					//just pass the first available layer - we should create a static null layer for this
-					builder.Create(tile.VectorData.Data.GetLayer(tile.VectorData.Data.LayerNames()[0]), tile, DecreaseProgressCounter);
+					builder.Create(tile.VectorData.GetLayer(tile.VectorData.LayerNames()[0]), tile, DecreaseProgressCounter);
 				}
 			}
 		}

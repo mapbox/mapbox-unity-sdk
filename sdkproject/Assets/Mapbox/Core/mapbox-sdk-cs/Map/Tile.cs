@@ -4,6 +4,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers;
 using UnityEngine;
 
 namespace Mapbox.Map
@@ -26,6 +27,7 @@ namespace Mapbox.Map
 		public long StatusCode;
 		public DateTime ExpirationDate;
 		public string ETag;
+		protected string _tilesetId;
 
 		protected CanonicalTileId _id;
 		protected List<Exception> _exceptions;
@@ -60,6 +62,7 @@ namespace Mapbox.Map
 			set { _id = value; }
 		}
 
+		public string TilesetId => _tilesetId;
 
 		/// <summary>Flag to indicate if the request was successful</summary>
 		public bool HasError
@@ -141,7 +144,7 @@ namespace Mapbox.Map
 			_state = State.Loading;
 			_id = param.Id;
 			_callback = callback;
-			_request = param.Fs.Request(MakeTileResource(param.TilesetId).GetUrl(), HandleTileResponse, tileId: _id, tilesetId: param.TilesetId);
+			_request = param.Fs.Request(MakeTileResource(param.TilesetId).GetUrl(), HandleTileResponse);
 		}
 
 		internal virtual void Initialize(IFileSource fileSource, CanonicalTileId canonicalTileId, string tilesetId, Action p)
@@ -151,8 +154,9 @@ namespace Mapbox.Map
 			_state = State.Loading;
 			_id = canonicalTileId;
 			_callback = p;
+			_tilesetId = tilesetId;
 
-			_request = fileSource.Request(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse, tileId: _id, tilesetId: tilesetId);
+			_request = fileSource.Request(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse);
 		}
 
 		/// <summary>
@@ -237,6 +241,7 @@ namespace Mapbox.Map
 				// current implementation doesn't need to check if parsing is successful:
 				// * Mapbox.Map.VectorTile.ParseTileData() already adds any exception to the list
 				// * Mapbox.Map.RasterTile.ParseTileData() doesn't do any parsing
+
 				ParseTileData(response.Data);
 			}
 
