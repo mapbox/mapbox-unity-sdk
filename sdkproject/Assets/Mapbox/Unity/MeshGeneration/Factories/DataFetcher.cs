@@ -2,20 +2,33 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Mapbox.Map;
+using Mapbox.Platform;
 using Mapbox.Unity;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.Utilities;
 using UnityEngine;
 
-public abstract class DataFetcher : ScriptableObject
+public abstract class DataFetcher
 {
 	protected MapboxAccess _fileSource;
 	//protected Queue<FetchInfo> _fetchingQueue;
 
-	private Queue<CanonicalTileId> _tileOrder;
-	private Dictionary<CanonicalTileId, FetchInfo> _tileFetchInfos;
+	private static Queue<int> _tileOrder;
+	private static Dictionary<int, FetchInfo> _tileFetchInfos;
 
-	public IEnumerator UpdateTick()
+	protected DataFetcher()
+	{
+		_fileSource = MapboxAccess.Instance;
+		if (_tileOrder == null)
+		{
+			_tileOrder = new Queue<int>();
+			_tileFetchInfos = new Dictionary<int, FetchInfo>();
+			//_fetchingQueue = new Queue<FetchInfo>();
+			Runnable.Run(UpdateTick(_fileSource));
+		}
+	}
+
+	public static IEnumerator UpdateTick(IFileSource fileSource)
 	{
 		while (true)
 		{
@@ -26,7 +39,7 @@ public abstract class DataFetcher : ScriptableObject
 				{
 					var fi = _tileFetchInfos[tileId];
 					_tileFetchInfos.Remove(tileId);
-					fi.RasterTile.Initialize(_fileSource, fi.TileId, fi.TilesetId, fi.Callback);
+					fi.RasterTile.Initialize(fileSource, fi.TileId, fi.TilesetId, fi.Callback);
 					yield return null;
 				}
 			}
@@ -35,33 +48,24 @@ public abstract class DataFetcher : ScriptableObject
 		}
 	}
 
-	public virtual void OnEnable()
-	{
-		_fileSource = MapboxAccess.Instance;
-		_tileOrder = new Queue<CanonicalTileId>();
-		_tileFetchInfos = new Dictionary<CanonicalTileId, FetchInfo>();
-		//_fetchingQueue = new Queue<FetchInfo>();
-		Runnable.Run(UpdateTick());
-	}
-
 	public abstract void FetchData(DataFetcherParameters parameters);
 
 	protected void EnqueueForFetching(FetchInfo info)
 	{
-		//_fetchingQueue.Enqueue(info);
-		if (!_tileFetchInfos.ContainsKey(info.TileId))
+		var key = info.TileId.GenerateKey(info.TilesetId);
+		if (!_tileFetchInfos.ContainsKey(key))
 		{
-			_tileOrder.Enqueue(info.TileId);
-			_tileFetchInfos.Add(info.TileId, info);
+			_tileOrder.Enqueue(key);
+			_tileFetchInfos.Add(key, info);
 		}
 	}
 
-	public virtual void CancelFetching(UnwrappedTileId tileUnwrappedTileId)
+	public virtual void CancelFetching(UnwrappedTileId tileUnwrappedTileId, string tilesetId)
 	{
-		var canonical = tileUnwrappedTileId.Canonical;
-		if (_tileFetchInfos.ContainsKey(canonical))
+		var key = tileUnwrappedTileId.Canonical.GenerateKey(tilesetId);
+		if (_tileFetchInfos.ContainsKey(key))
 		{
-			_tileFetchInfos.Remove(canonical);
+			_tileFetchInfos.Remove(key);
 		}
 	}
 }

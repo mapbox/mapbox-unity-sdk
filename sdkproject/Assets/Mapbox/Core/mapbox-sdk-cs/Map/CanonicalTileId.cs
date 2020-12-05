@@ -26,6 +26,9 @@ namespace Mapbox.Map
 		/// <summary> The Y coordinate in the tile grid. </summary>
 		public readonly int Y;
 
+		private string _stringCache;
+		private string _fileNameStringCache;
+
 		/// <summary>
 		///     Initializes a new instance of the <see cref="CanonicalTileId"/> struct,
 		///     representing a tile coordinate in a slippy map.
@@ -38,6 +41,8 @@ namespace Mapbox.Map
 			this.Z = z;
 			this.X = x;
 			this.Y = y;
+			_stringCache = "";
+			_fileNameStringCache = "";
 		}
 
 		internal CanonicalTileId(UnwrappedTileId unwrapped)
@@ -51,6 +56,9 @@ namespace Mapbox.Map
 			this.Z = z;
 			this.X = x - wrap * (1 << z);
 			this.Y = y < 0 ? 0 : Math.Min(y, (1 << z) - 1);
+
+			_stringCache = "";
+			_fileNameStringCache = "";
 		}
 
 		/// <summary>
@@ -78,12 +86,22 @@ namespace Mapbox.Map
 		/// </returns>
 		public override string ToString()
 		{
-			return string.Format("{0}/{1}/{2}", this.Z, this.X, this.Y);
+			if(string.IsNullOrEmpty(_stringCache))
+			{
+				_stringCache = string.Format("{0}/{1}/{2}", this.Z, this.X, this.Y);
+			}
+
+			return _stringCache;
 		}
 
 		public string ToFileSafeString()
 		{
-			return string.Format("{0}_{1}_{2}", this.Z, this.X, this.Y);
+			if (string.IsNullOrEmpty(_fileNameStringCache))
+			{
+				_fileNameStringCache = string.Format("{0}_{1}_{2}", this.Z, this.X, this.Y);
+			}
+
+			return _fileNameStringCache;
 		}
 
 		#region Equality 
@@ -125,9 +143,16 @@ namespace Mapbox.Map
 
 	public static class TileIdExtensions
 	{
-		public static string GenerateKey(this CanonicalTileId tileId, string tilesetId)
+		public static int GenerateKey(this CanonicalTileId tileId, string tilesetId)
 		{
-			return string.Format("{0}_{1}", tilesetId, tileId);
+			unchecked // Overflow is fine, just wrap
+			{
+				int hash = 17;
+				hash = hash * 23 + "mapbox".GetHashCode();
+				hash = hash * 23 + tilesetId.GetHashCode();
+				hash = hash * 23 + tileId.ToString().GetHashCode();
+				return hash;
+			}
 		}
 	}
 }

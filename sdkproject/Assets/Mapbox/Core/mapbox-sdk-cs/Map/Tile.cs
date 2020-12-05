@@ -6,6 +6,7 @@
 
 using Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace Mapbox.Map
 {
@@ -33,6 +34,7 @@ namespace Mapbox.Map
 		protected List<Exception> _exceptions;
 		protected State _state = State.New;
 		protected IAsyncRequest _request;
+		protected UnityWebRequest _unityRequest;
 		protected Action _callback;
 
 		/// <summary> Tile state. </summary>

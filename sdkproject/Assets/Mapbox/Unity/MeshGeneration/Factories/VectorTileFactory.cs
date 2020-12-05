@@ -181,7 +181,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_layerProgress = new Dictionary<UnityTile, HashSet<LayerVisualizerBase>>();
 			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
 
-			DataFetcher = ScriptableObject.CreateInstance<VectorDataFetcher>();
+			DataFetcher = new VectorDataFetcher();
 			DataFetcher.DataRecieved += OnVectorDataRecieved;
 			DataFetcher.FetchingError += OnDataError;
 
@@ -212,6 +212,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		protected override void OnUnregistered(UnityTile tile)
 		{
+			DataFetcher.CancelFetching(tile.UnwrappedTileId, TilesetId);
 			if (_layerProgress != null && _layerProgress.ContainsKey(tile))
 			{
 				_layerProgress.Remove(tile);
@@ -235,7 +236,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		public override void Clear()
 		{
-			DestroyImmediate(DataFetcher);
+			//DestroyImmediate(DataFetcher);
 			if (_layerBuilder != null)
 			{
 				foreach (var layerList in _layerBuilder.Values)

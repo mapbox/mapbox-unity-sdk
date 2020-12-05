@@ -26,11 +26,19 @@ namespace Mapbox.Map
 	/// }
 	/// </code>
 	/// </example>
-	public sealed class RawPngRasterTile : RasterTile
+	public class RawPngRasterTile : RasterTile
 	{
 		internal override TileResource MakeTileResource(string tilesetId)
 		{
 			return TileResource.MakeRawPngRaster(Id, tilesetId);
+		}
+	}
+
+	public class DemTile : RasterTile
+	{
+		internal override TileResource MakeTileResource(string tilesetId)
+		{
+			return TileResource.MakeDemRaster(Id, tilesetId);
 		}
 	}
 }

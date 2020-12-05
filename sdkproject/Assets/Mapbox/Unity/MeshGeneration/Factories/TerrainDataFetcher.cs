@@ -8,9 +8,9 @@ using UnityEngine;
 
 public class TerrainDataFetcher : DataFetcher
 {
-	public Action<UnityTile, RawPngRasterTile> DataRecieved = (t, s) => { };
+	public Action<UnityTile, RasterTile> DataRecieved = (t, s) => { };
 	public Action<UnityTile, Texture2D> TextureRecieved = (t, s) => { };
-	public Action<UnityTile, RawPngRasterTile, TileErrorEventArgs> FetchingError = (t, r, s) => { };
+	public Action<UnityTile, RasterTile, TileErrorEventArgs> FetchingError = (t, r, s) => { };
 
 	public override void FetchData(DataFetcherParameters parameters)
 	{
@@ -58,7 +58,15 @@ public class TerrainDataFetcher : DataFetcher
 
 	private void CreateWebRequest(string tilesetId, CanonicalTileId tileId, bool useRetina, string etag, UnityTile unityTile = null)
 	{
-		var rasterTile = new RawPngRasterTile();
+		RasterTile rasterTile;
+		if (tilesetId.StartsWith("mapbox://", StringComparison.Ordinal))
+		{
+			rasterTile = new DemTile();
+		}
+		else
+		{
+			rasterTile = new RawPngRasterTile();
+		}
 
 		if (unityTile != null)
 		{
@@ -75,7 +83,7 @@ public class TerrainDataFetcher : DataFetcher
 		});
 	}
 
-	private void FetchingCallback(CanonicalTileId tileId, RawPngRasterTile rasterTile, UnityTile unityTile = null)
+	private void FetchingCallback(CanonicalTileId tileId, RasterTile rasterTile, UnityTile unityTile = null)
 	{
 		if (unityTile != null && unityTile.CanonicalTileId != rasterTile.Id)
 		{

@@ -28,7 +28,7 @@ namespace Mapbox.Platform.Cache
 		private Dictionary<string, CacheItem> _cachedResponses;
 
 		private Queue<InfoWrapper> _infosToSave;
-		private HashSet<string> _infoKeys;
+		private HashSet<int> _infoKeys;
 
 		private Dictionary<string, string> MapIdToFolderNameDictionary;
 
@@ -36,7 +36,7 @@ namespace Mapbox.Platform.Cache
 		{
 			_cachedResponses = new Dictionary<string, CacheItem>();
 			_infosToSave = new Queue<InfoWrapper>();
-			_infoKeys = new HashSet<string>();
+			_infoKeys = new HashSet<int>();
 			MapIdToFolderNameDictionary = new Dictionary<string, string>();
 			Runnable.Run(FileScheduler());
 
@@ -81,7 +81,7 @@ namespace Mapbox.Platform.Cache
 		{
 			string filePath = Path.Combine(PersistantCacheRootFolderPath, string.Format("{0}/{1}", MapIdToFolderName(mapId), tileId.ToFileSafeString()));
 
-			if (File.Exists(filePath + FileExtension))
+			if (File.Exists(string.Format("{0}.{1}", filePath, FileExtension)))
 			{
 				Runnable.Run(LoadImageCoroutine(mapId, tileId, filePath, callback));
 			}
@@ -174,7 +174,8 @@ namespace Mapbox.Platform.Cache
 				Directory.CreateDirectory(folderPath);
 			}
 
-			info.TextureCacheItem.FilePath = Path.GetFullPath(Path.Combine(folderPath, info.TileId.ToFileSafeString() + FileExtension));
+
+			info.TextureCacheItem.FilePath = Path.GetFullPath(Path.Combine(PersistantCacheRootFolderPath, string.Format("{0}/{1}.{2}", MapIdToFolderName(info.MapId), info.TileId.ToFileSafeString(), FileExtension)));
 
 			FileStream sourceStream = new FileStream(info.TextureCacheItem.FilePath,
 				FileMode.Create, FileAccess.Write, FileShare.Read,
@@ -194,7 +195,8 @@ namespace Mapbox.Platform.Cache
 
 		private IEnumerator LoadImageCoroutine(string mapId, CanonicalTileId tileId, string filePath, Action<TextureCacheItem> callback)
 		{
-			using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture("file:///" + filePath + FileExtension))
+			var path = Path.GetFullPath(Path.Combine("file:///", PersistantCacheRootFolderPath, string.Format("{0}/{1}.{2}", MapIdToFolderName(mapId), tileId.ToFileSafeString(), FileExtension)));
+			using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(path))
 			{
 				yield return uwr.SendWebRequest();
 
@@ -250,16 +252,18 @@ namespace Mapbox.Platform.Cache
 			{
 				file.Delete();
 			}
+
+			di.Delete();
 		}
 
 		private class InfoWrapper
 		{
-			public string Key;
+			public int Key;
 			public string MapId;
 			public CanonicalTileId TileId;
 			public TextureCacheItem TextureCacheItem;
 
-			public InfoWrapper(string key, string mapId, CanonicalTileId tileId, TextureCacheItem textureCacheItem)
+			public InfoWrapper(int key, string mapId, CanonicalTileId tileId, TextureCacheItem textureCacheItem)
 			{
 				Key = key;
 				MapId = mapId;

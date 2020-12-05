@@ -23,6 +23,19 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			return DataFetcher;
 		}
 
+		public string TilesetId
+		{
+			get
+			{
+				return _elevationOptions.sourceOptions.Id;
+			}
+
+			set
+			{
+				_elevationOptions.sourceOptions.Id = value;
+			}
+		}
+
 		public ElevationLayerProperties Properties
 		{
 			get
@@ -47,7 +60,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		protected override void OnInitialized()
 		{
 			Strategy.Initialize(_elevationOptions);
-			DataFetcher = ScriptableObject.CreateInstance<TerrainDataFetcher>();
+			DataFetcher = new TerrainDataFetcher();
 			DataFetcher.DataRecieved += OnTerrainRecieved;
 			DataFetcher.TextureRecieved += OnTerrainRecieved;
 			DataFetcher.FetchingError += OnDataError;
@@ -92,6 +105,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		protected override void OnUnregistered(UnityTile tile)
 		{
+			DataFetcher.CancelFetching(tile.UnwrappedTileId, TilesetId);
 			if (_tilesWaitingResponse != null && _tilesWaitingResponse.Contains(tile))
 			{
 				_tilesWaitingResponse.Remove(tile);
@@ -101,7 +115,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		public override void Clear()
 		{
-			DestroyImmediate(DataFetcher);
+			//DestroyImmediate(DataFetcher);
 		}
 
 		protected override void OnPostProcess(UnityTile tile)
@@ -144,7 +158,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		private void OnTerrainRecieved(UnityTile tile, RawPngRasterTile pngRasterTile)
+		private void OnTerrainRecieved(UnityTile tile, RasterTile pngRasterTile)
 		{
 			if (tile != null)
 			{
@@ -167,7 +181,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		private void OnDataError(UnityTile tile, RawPngRasterTile rawTile, TileErrorEventArgs e)
+		private void OnDataError(UnityTile tile, RasterTile rawTile, TileErrorEventArgs e)
 		{
 			base.OnErrorOccurred(tile, e);
 			if (tile != null)

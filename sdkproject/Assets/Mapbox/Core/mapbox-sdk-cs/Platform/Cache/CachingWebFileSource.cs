@@ -111,22 +111,25 @@ namespace Mapbox.Platform.Cache
 			return requestTileAndCache(finalUrl, timeout, callback);
 		}
 
-		public void MapboxImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null)
+		public UnityWebRequest MapboxImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null)
 		{
 			var finalUrl = CreateFinalUrl(uri);
-			CustomImageRequest(finalUrl, callback, timeout, tileId, tilesetId, etag);
+			return CustomImageRequest(finalUrl, callback, timeout, tileId, tilesetId, etag);
 		}
 
-		public void CustomImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null)
+		public UnityWebRequest CustomImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null)
 		{
+			UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(uri);
 			if (string.IsNullOrEmpty(etag))
 			{
-				Runnable.Run(FetchTexture(uri, callback));
+				Runnable.Run(FetchTexture(uwr, callback));
 			}
 			else
 			{
-				Runnable.Run(FetchTextureIfNoneMatch(uri, callback, etag));
+				Runnable.Run(FetchTextureIfNoneMatch(uwr, callback, etag));
 			}
+
+			return uwr;
 		}
 
 		private string CreateFinalUrl(string uri)
@@ -150,9 +153,9 @@ namespace Mapbox.Platform.Cache
          			return finalUrl;
          		}
 
-		private IEnumerator FetchTextureIfNoneMatch(string finalUrl,  Action<TextureResponse> callback, string etag)
+		private IEnumerator FetchTextureIfNoneMatch(UnityWebRequest uwr,  Action<TextureResponse> callback, string etag)
 		{
-			using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(finalUrl))
+			using (uwr)
 			{
 				if (!string.IsNullOrEmpty(etag))
 				{
@@ -193,39 +196,38 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 
-		private IEnumerator FetchTexture(string finalUrl, Action<TextureResponse> callback)
+		private IEnumerator FetchTexture(UnityWebRequest webRequest, Action<TextureResponse> callback)
 		{
 			// Stopwatch sw = new Stopwatch();
 			// sw.Start();
 
-			using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(finalUrl))
+			using (webRequest)
 			{
-				yield return uwr.SendWebRequest();
+				yield return webRequest.SendWebRequest();
 
 				// sw.Stop();
 				// Debug.Log(sw.ElapsedMilliseconds);
 
 				var response = new TextureResponse();
-				response.StatusCode = uwr.responseCode;
-				if (uwr.isNetworkError || uwr.isHttpError)
+				response.StatusCode = webRequest.responseCode;
+				if (webRequest.isNetworkError || webRequest.isHttpError)
 				{
-					response.AddException(new Exception(uwr.error));
+					response.AddException(new Exception(webRequest.error));
 				}
 				else
 				{
-					string eTag = uwr.GetETag();
-					DateTime expirationDate = uwr.GetExpirationDate();
+					string eTag = webRequest.GetETag();
+					DateTime expirationDate = webRequest.GetExpirationDate();
 
-					var texture = DownloadHandlerTexture.GetContent(uwr);
-
+					var texture = DownloadHandlerTexture.GetContent(webRequest);
 					texture.wrapMode = TextureWrapMode.Clamp;
 					response.Texture2D = texture;
 					response.ETag = eTag;
 					response.ExpirationDate = expirationDate;
-					response.Data = uwr.downloadHandler.data;
-
-					callback(response);
+					response.Data = webRequest.downloadHandler.data;
 				}
+
+				callback(response);
 			}
 		}
 

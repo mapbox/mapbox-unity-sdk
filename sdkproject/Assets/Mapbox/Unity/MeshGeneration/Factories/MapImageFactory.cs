@@ -53,7 +53,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			//unregister events
 			if (DataFetcher != null)
 			{
-				DataFetcher.DataRecieved -= OnImageRecieved;
 				DataFetcher.TextureRecieved -= OnImageRecieved;
 				DataFetcher.FetchingError -= OnDataError;
 			}
@@ -122,8 +121,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		#region AbstractFactoryOverrides
 		protected override void OnInitialized()
 		{
-			DataFetcher = ScriptableObject.CreateInstance<ImageDataFetcher>();
-			DataFetcher.DataRecieved += OnImageRecieved;
+			DataFetcher = new ImageDataFetcher();
 			DataFetcher.TextureRecieved += OnImageRecieved;
 			DataFetcher.FetchingError += OnDataError;
 		}
@@ -146,7 +144,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				tile.RasterDataState = TilePropertyState.Loading;
 
 				var parent = tile.UnwrappedTileId.Parent;
-				for (int i = 0; i < 16; i++)
+				for (int i = tile.CanonicalTileId.Z - 1; i > 0; i--)
 				{
 					var cacheItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(TilesetId, parent.Canonical);
 					if (cacheItem != null && cacheItem.Texture2D != null)
@@ -194,7 +192,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		protected override void OnUnregistered(UnityTile tile)
 		{
-			DataFetcher.CancelFetching(tile.UnwrappedTileId);
+			DataFetcher.CancelFetching(tile.UnwrappedTileId, TilesetId);
 			if (_tilesWaitingResponse != null && _tilesWaitingResponse.Contains(tile))
 			{
 				_tilesWaitingResponse.Remove(tile);
@@ -203,7 +201,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		public override void Clear()
 		{
-			DestroyImmediate(DataFetcher);
+			//DestroyImmediate(DataFetcher);
 		}
 
 		protected override void OnPostProcess(UnityTile tile)

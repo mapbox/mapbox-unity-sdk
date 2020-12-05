@@ -11,7 +11,7 @@ using UnityEngine;
 
 public class ImageDataFetcher : DataFetcher
 {
-	public Action<UnityTile, RasterTile> DataRecieved = (t, s) => { };
+	//public Action<UnityTile, RasterTile> DataRecieved = (t, s) => { };
 	public Action<UnityTile, Texture2D> TextureRecieved = (t, s) => { };
 	public Action<UnityTile, RasterTile, TileErrorEventArgs> FetchingError = (t, r, s) => { };
 
@@ -59,7 +59,7 @@ public class ImageDataFetcher : DataFetcher
 		CreateWebRequest(tilesetId, tileId, useRetina, String.Empty, unityTile);
 	}
 
-	private void CreateWebRequest(string tilesetId, CanonicalTileId tileId, bool useRetina, string etag, UnityTile unityTile = null)
+	protected virtual void CreateWebRequest(string tilesetId, CanonicalTileId tileId, bool useRetina, string etag, UnityTile unityTile = null)
 	{
 		RasterTile rasterTile;
 		if (tilesetId.StartsWith("mapbox://", StringComparison.Ordinal))
@@ -90,7 +90,7 @@ public class ImageDataFetcher : DataFetcher
 		});
 	}
 
-	private void FetchingCallback(CanonicalTileId tileId, RasterTile rasterTile, UnityTile unityTile = null)
+	protected virtual void FetchingCallback(CanonicalTileId tileId, RasterTile rasterTile, UnityTile unityTile = null)
 	{
 		if (unityTile != null && unityTile.CanonicalTileId != rasterTile.Id)
 		{
@@ -118,7 +118,7 @@ public class ImageDataFetcher : DataFetcher
 
 			if (rasterTile.StatusCode != 304) //NOT MODIFIED
 			{
-				DataRecieved(unityTile, rasterTile);
+				TextureRecieved(unityTile, rasterTile.Texture2D);
 			}
 		}
 

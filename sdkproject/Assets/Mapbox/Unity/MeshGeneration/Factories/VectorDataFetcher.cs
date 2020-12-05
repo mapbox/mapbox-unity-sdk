@@ -6,6 +6,7 @@ using System;
 using Mapbox.Platform.Cache;
 using Mapbox.Unity;
 using Mapbox.Utils;
+using UnityEngine;
 
 public class VectorDataFetcher : DataFetcher
 {
@@ -27,20 +28,34 @@ public class VectorDataFetcher : DataFetcher
 	public void FetchData(string tilesetId, CanonicalTileId tileId, bool useOptimizedStyle, Style optimizedStyle, UnityTile unityTile = null)
 	{
 		//MemoryCacheCheck
-		var dataItem = MapboxAccess.Instance.CacheManager.GetDataItem(tilesetId, tileId);
+		var dataItem = MapboxAccess.Instance.CacheManager.GetVectorItemFromMemory(tilesetId, tileId);
 		if (dataItem != null)
 		{
-			var decompressed = Compression.Decompress(dataItem.Data);
-			var vectorTile = new Mapbox.VectorTile.VectorTile(decompressed);
-			DataRecieved(unityTile, vectorTile);
-			return;
+			if (dataItem.VectorTile != null)
+			{
+				DataRecieved(unityTile, dataItem.VectorTile);
+				return;
+			}
+			else if (dataItem.Data != null)
+			{
+				Debug.Log("Memory cached vector item has raw data but not decompressed data, this shouldn't ever happen.");
+				var decompressed = Compression.Decompress(dataItem.Data);
+				var vectorTile = new Mapbox.VectorTile.VectorTile(decompressed);
+				DataRecieved(unityTile, vectorTile);
+				return;
+			}
 		}
 
-		//FileCacheCheck
-		if (MapboxAccess.Instance.CacheManager.TextureFileExists(tilesetId, tileId)) //not in memory, check file cache
+		if (MapboxAccess.Instance.CacheManager.TileExistsInSqlite(tilesetId, tileId)) //not in memory, check sqlite cache
 		{
-			MapboxAccess.Instance.CacheManager.GetTextureItemFromFile(tilesetId, tileId, (cachedDataItem) =>
+			MapboxAccess.Instance.CacheManager.GetVectorItemFromSqlite(tilesetId, tileId, (cachedDataItem) =>
 			{
+				//sqlite stores raw binary data for now so we have to decompress it
+				//two things should be done here;
+				//(1) store serialized vector tile so we won't need to decompress again
+				//(2) decompress async
+				//so two lines below should cause a big big perf hit at the moment
+
 				var decompressed = Compression.Decompress(cachedDataItem.Data);
 				var vectorTile = new Mapbox.VectorTile.VectorTile(decompressed);
 				DataRecieved(unityTile, vectorTile);
@@ -132,13 +147,14 @@ public class VectorDataFetcher : DataFetcher
 		}
 		else
 		{
-			MapboxAccess.Instance.CacheManager.AddDataItem(
+			MapboxAccess.Instance.CacheManager.AddVectorDataItem(
 				vectorTile.TilesetId,
 				vectorTile.Id,
-				new CacheItem()
+				new VectorCacheItem()
 				{
 					ETag = vectorTile.ETag,
 					Data = vectorTile.ByteData,
+					VectorTile = vectorTile.Data,
 					ExpirationDate = vectorTile.ExpirationDate
 				},
 				true);
