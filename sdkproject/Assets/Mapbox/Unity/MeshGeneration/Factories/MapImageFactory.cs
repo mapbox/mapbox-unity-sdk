@@ -53,7 +53,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			//unregister events
 			if (DataFetcher != null)
 			{
-				DataFetcher.TextureRecieved -= OnImageRecieved;
+				DataFetcher.TextureReceived -= OnImageRecieved;
 				DataFetcher.FetchingError -= OnDataError;
 			}
 		}
@@ -122,7 +122,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		protected override void OnInitialized()
 		{
 			DataFetcher = new ImageDataFetcher();
-			DataFetcher.TextureRecieved += OnImageRecieved;
+			DataFetcher.TextureReceived += OnImageRecieved;
 			DataFetcher.FetchingError += OnDataError;
 		}
 

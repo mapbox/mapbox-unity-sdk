@@ -11,8 +11,7 @@ using UnityEngine;
 
 public class ImageDataFetcher : DataFetcher
 {
-	//public Action<UnityTile, RasterTile> DataRecieved = (t, s) => { };
-	public Action<UnityTile, Texture2D> TextureRecieved = (t, s) => { };
+	public Action<UnityTile, Texture2D> TextureReceived = (t, s) => { };
 	public Action<UnityTile, RasterTile, TileErrorEventArgs> FetchingError = (t, r, s) => { };
 
 	public override void FetchData(DataFetcherParameters parameters)
@@ -33,7 +32,7 @@ public class ImageDataFetcher : DataFetcher
 		var textureItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(tilesetId, tileId);
 		if (textureItem != null)
 		{
-			TextureRecieved(unityTile, textureItem.Texture2D);
+			TextureReceived(unityTile, textureItem.Texture2D);
 			return;
 		}
 
@@ -42,13 +41,24 @@ public class ImageDataFetcher : DataFetcher
 		{
 			MapboxAccess.Instance.CacheManager.GetTextureItemFromFile(tilesetId, tileId, (textureCacheItem) =>
 			{
-				TextureRecieved(unityTile, textureCacheItem.Texture2D);
-
-				//after returning what we already have
-				//check if it's out of date, if so check server for update
-				if (textureCacheItem.ExpirationDate < DateTime.Now)
+				//even though we just checked file exists, system couldn't find&load it
+				//this shouldn't happen frequently, only in some corner cases
+				//one possibility might be file being pruned due to hitting cache limit
+				//after that first check few lines above and actual loading (loading is scheduled and delayed so it's not in same frame)
+				if (textureCacheItem != null)
 				{
-					CreateWebRequest(tilesetId, tileId, useRetina, textureCacheItem.ETag, unityTile);
+					TextureReceived(unityTile, textureCacheItem.Texture2D);
+
+					//after returning what we already have
+					//check if it's out of date, if so check server for update
+					if (textureCacheItem.ExpirationDate < DateTime.Now)
+					{
+						CreateWebRequest(tilesetId, tileId, useRetina, textureCacheItem.ETag, unityTile);
+					}
+				}
+				else
+				{
+					CreateWebRequest(tilesetId, tileId, useRetina, String.Empty, unityTile);
 				}
 			});
 
@@ -62,13 +72,11 @@ public class ImageDataFetcher : DataFetcher
 	protected virtual void CreateWebRequest(string tilesetId, CanonicalTileId tileId, bool useRetina, string etag, UnityTile unityTile = null)
 	{
 		RasterTile rasterTile;
+		//`starts with` is weak and string operations are slow
+		//but caching type and using Activator.CreateInstance (or caching func and calling it)  is even slower
 		if (tilesetId.StartsWith("mapbox://", StringComparison.Ordinal))
 		{
 			rasterTile = useRetina ? new RetinaRasterTile() : new RasterTile();
-		}
-		else if (tilesetId.StartsWith("http"))
-		{
-			rasterTile = new CustomRasterTile();
 		}
 		else
 		{
@@ -118,7 +126,7 @@ public class ImageDataFetcher : DataFetcher
 
 			if (rasterTile.StatusCode != 304) //NOT MODIFIED
 			{
-				TextureRecieved(unityTile, rasterTile.Texture2D);
+				TextureReceived(unityTile, rasterTile.Texture2D);
 			}
 		}
 

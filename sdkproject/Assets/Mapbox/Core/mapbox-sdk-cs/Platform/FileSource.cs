@@ -6,8 +6,9 @@
 
 using Mapbox.Platform.Cache;
 using Mapbox.Unity;
+using UnityEngine.Networking;
 
-namespace Mapbox.Platform
+	namespace Mapbox.Platform
 {
 	using Mapbox.Map;
 	using Mapbox.Unity.Utilities;
@@ -111,12 +112,12 @@ namespace Mapbox.Platform
 			return proxyResponse(url, callback, timeout);
 		}
 
-		public void MapboxImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null)
+		public UnityWebRequest MapboxImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null)
 		{
 			throw new NotImplementedException();
 		}
 
-		public void CustomImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null)
+		public UnityWebRequest CustomImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null)
 		{
 			throw new NotImplementedException();
 		}

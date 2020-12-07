@@ -2,14 +2,14 @@
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Enums;
 using System;
+using System.Collections.Generic;
 using Mapbox.Platform.Cache;
 using Mapbox.Unity;
 using UnityEngine;
 
 public class TerrainDataFetcher : DataFetcher
 {
-	public Action<UnityTile, RasterTile> DataRecieved = (t, s) => { };
-	public Action<UnityTile, Texture2D> TextureRecieved = (t, s) => { };
+	public Action<UnityTile, Texture2D> TextureReceived = (t, s) => { };
 	public Action<UnityTile, RasterTile, TileErrorEventArgs> FetchingError = (t, r, s) => { };
 
 	public override void FetchData(DataFetcherParameters parameters)
@@ -30,7 +30,7 @@ public class TerrainDataFetcher : DataFetcher
 		var textureItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(tilesetId, tileId);
 		if (textureItem != null)
 		{
-			TextureRecieved(unityTile, textureItem.Texture2D);
+			TextureReceived(unityTile, textureItem.Texture2D);
 			return;
 		}
 
@@ -39,13 +39,24 @@ public class TerrainDataFetcher : DataFetcher
 		{
 			MapboxAccess.Instance.CacheManager.GetTextureItemFromFile(tilesetId, tileId, (textureCacheItem) =>
 			{
-				TextureRecieved(unityTile, textureCacheItem.Texture2D);
-
-				//after returning what we already have
-				//check if it's out of date, if so check server for update
-				if (textureCacheItem.ExpirationDate < DateTime.Now)
+				//even though we just checked file exists, system couldn't find&load it
+				//this shouldn't happen frequently, only in some corner cases
+				//one possibility might be file being pruned due to hitting cache limit
+				//after that first check few lines above and actual loading (loading is scheduled and delayed so it's not in same frame)
+				if (textureCacheItem != null)
 				{
-					CreateWebRequest(tilesetId, tileId, useRetina, textureCacheItem.ETag, unityTile);
+					TextureReceived(unityTile, textureCacheItem.Texture2D);
+
+					//after returning what we already have
+					//check if it's out of date, if so check server for update
+					if (textureCacheItem.ExpirationDate < DateTime.Now)
+					{
+						CreateWebRequest(tilesetId, tileId, useRetina, textureCacheItem.ETag, unityTile);
+					}
+				}
+				else
+				{
+					CreateWebRequest(tilesetId, tileId, useRetina, String.Empty, unityTile);
 				}
 			});
 
@@ -58,7 +69,8 @@ public class TerrainDataFetcher : DataFetcher
 
 	private void CreateWebRequest(string tilesetId, CanonicalTileId tileId, bool useRetina, string etag, UnityTile unityTile = null)
 	{
-		RasterTile rasterTile;
+		RasterTile rasterTile;// = GetTileObject(tilesetId);
+
 		if (tilesetId.StartsWith("mapbox://", StringComparison.Ordinal))
 		{
 			rasterTile = new DemTile();
@@ -111,7 +123,7 @@ public class TerrainDataFetcher : DataFetcher
 
 			if (rasterTile.StatusCode != 304) //NOT MODIFIED
 			{
-				DataRecieved(unityTile, rasterTile);
+				TextureReceived(unityTile, rasterTile.Texture2D);
 			}
 		}
 

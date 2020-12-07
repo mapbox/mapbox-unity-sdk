@@ -121,6 +121,14 @@ namespace Mapbox.Platform.Cache
 
             _textureFileCache.GetAsync(tilesetId, tileId, (textureCacheItem) =>
             {
+                //this might happen in some corner cases
+                //it means file was supposed to be there but couldn't be found in the last step when requested
+                //maybe deleted in an earlier frame by cache limit?
+                if (textureCacheItem == null)
+                {
+                    callback(null);
+                    return;
+                }
 
 #if UNITY_EDITOR
                 //helpful for debugging memory

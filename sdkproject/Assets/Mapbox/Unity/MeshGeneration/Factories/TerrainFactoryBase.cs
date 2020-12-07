@@ -49,8 +49,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			if (DataFetcher != null)
 			{
-				DataFetcher.DataRecieved -= OnTerrainRecieved;
-				DataFetcher.TextureRecieved -= OnTerrainRecieved;
+				DataFetcher.TextureReceived -= OnTerrainRecieved;
 				DataFetcher.FetchingError -= OnDataError;
 			}
 		}
@@ -61,8 +60,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			Strategy.Initialize(_elevationOptions);
 			DataFetcher = new TerrainDataFetcher();
-			DataFetcher.DataRecieved += OnTerrainRecieved;
-			DataFetcher.TextureRecieved += OnTerrainRecieved;
+			DataFetcher.TextureReceived += OnTerrainRecieved;
 			DataFetcher.FetchingError += OnDataError;
 		}
 
@@ -169,7 +167,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					if (pngRasterTile.Texture2D != null)
 					{
 						tile.SetHeightTexture(pngRasterTile.Texture2D, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
-						Strategy.RegisterTile(tile);
+						//Strategy.RegisterTile(tile);
 					}
 					else
 					{

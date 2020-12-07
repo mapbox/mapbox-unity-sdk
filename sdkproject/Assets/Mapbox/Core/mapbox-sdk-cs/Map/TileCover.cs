@@ -92,13 +92,14 @@ namespace Mapbox.Map
 			{
 				for (int y = neTile.Y; y <= swTile.Y; y++)
 				{
-					UnwrappedTileId uwtid = new UnwrappedTileId(zoom, x, y);
+					var unwrappedTileId = new UnwrappedTileId(zoom, x, y);
+					var canonicalId = unwrappedTileId.Canonical;
 					//hack: currently too many tiles are created at lower zoom levels
 					//investigate formulas, this worked before
-					if (!canonicalTiles.Contains(uwtid.Canonical))
+					if (!canonicalTiles.Contains(canonicalId))
 					{
-						tiles.Add(uwtid);
-						canonicalTiles.Add(uwtid.Canonical);
+						tiles.Add(unwrappedTileId);
+						canonicalTiles.Add(canonicalId);
 					}
 				}
 			}

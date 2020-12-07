@@ -48,7 +48,7 @@ namespace Mapbox.Platform.Cache
 
 		public bool Exists(string mapId, CanonicalTileId tileId)
 		{
-			string filePath = Path.Combine(PersistantCacheRootFolderPath, string.Format("{0}/{1}.{2}", MapIdToFolderName(mapId), tileId.ToFileSafeString(), FileExtension));
+			string filePath = string.Format("{0}/{1}/{2}.{3}", PersistantCacheRootFolderPath, MapIdToFolderName(mapId), tileId.GenerateKey(mapId), FileExtension);
 			return File.Exists(filePath);
 		}
 
@@ -79,12 +79,8 @@ namespace Mapbox.Platform.Cache
 
 		public void GetAsync(string mapId, CanonicalTileId tileId, Action<TextureCacheItem> callback)
 		{
-			string filePath = Path.Combine(PersistantCacheRootFolderPath, string.Format("{0}/{1}", MapIdToFolderName(mapId), tileId.ToFileSafeString()));
-
-			if (File.Exists(string.Format("{0}.{1}", filePath, FileExtension)))
-			{
-				Runnable.Run(LoadImageCoroutine(mapId, tileId, filePath, callback));
-			}
+			string filePath = string.Format("{0}/{1}/{2}", PersistantCacheRootFolderPath, MapIdToFolderName(mapId), tileId.GenerateKey(mapId));
+			Runnable.Run(LoadImageCoroutine(filePath, callback));
 		}
 
 		public void ClearStyle(string style)
@@ -113,7 +109,7 @@ namespace Mapbox.Platform.Cache
 		public HashSet<string> GetFileList()
 		{
 			var pathList = new HashSet<string>();
-			if (Directory.Exists(FileCache.PersistantCacheRootFolderPath))
+			if (Directory.Exists(PersistantCacheRootFolderPath))
 			{
 				var dir = Directory.GetDirectories(FileCache.PersistantCacheRootFolderPath);
 				foreach (var rasterDirectory in dir)
@@ -167,7 +163,7 @@ namespace Mapbox.Platform.Cache
 				return;
 			}
 
-			string folderPath = Path.Combine(PersistantCacheRootFolderPath, MapIdToFolderName(info.MapId));
+			string folderPath = string.Format("{0}/{1}", PersistantCacheRootFolderPath, MapIdToFolderName(info.MapId));
 
 			if (!Directory.Exists(folderPath))
 			{
@@ -175,7 +171,7 @@ namespace Mapbox.Platform.Cache
 			}
 
 
-			info.TextureCacheItem.FilePath = Path.GetFullPath(Path.Combine(PersistantCacheRootFolderPath, string.Format("{0}/{1}.{2}", MapIdToFolderName(info.MapId), info.TileId.ToFileSafeString(), FileExtension)));
+			info.TextureCacheItem.FilePath = Path.GetFullPath(string.Format("{0}/{1}/{2}.{3}", PersistantCacheRootFolderPath, MapIdToFolderName(info.MapId), info.TileId.GenerateKey(info.MapId), FileExtension));
 
 			FileStream sourceStream = new FileStream(info.TextureCacheItem.FilePath,
 				FileMode.Create, FileAccess.Write, FileShare.Read,
@@ -193,26 +189,34 @@ namespace Mapbox.Platform.Cache
 			//FileSaved(info.MapId, info.TileId, info.TextureCacheItem);
 		}
 
-		private IEnumerator LoadImageCoroutine(string mapId, CanonicalTileId tileId, string filePath, Action<TextureCacheItem> callback)
+		private IEnumerator LoadImageCoroutine(string filePath, Action<TextureCacheItem> callback)
 		{
-			var path = Path.GetFullPath(Path.Combine("file:///", PersistantCacheRootFolderPath, string.Format("{0}/{1}.{2}", MapIdToFolderName(mapId), tileId.ToFileSafeString(), FileExtension)));
-			using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(path))
+			var fullFilePath = string.Format("{0}.{1}", filePath, FileExtension);
+			if (File.Exists(fullFilePath))
 			{
-				yield return uwr.SendWebRequest();
-
-				if (uwr.isNetworkError || uwr.isHttpError)
+				using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(fullFilePath))
 				{
-					Debug.LogErrorFormat(uwr.error);
-				}
-				else
-				{
-					var textureCacheItem = new TextureCacheItem();
-					textureCacheItem.Texture2D = DownloadHandlerTexture.GetContent(uwr);
-					textureCacheItem.Texture2D.wrapMode = TextureWrapMode.Clamp;
-					textureCacheItem.FilePath = filePath;
+					yield return uwr.SendWebRequest();
 
-					callback(textureCacheItem);
+					if (uwr.isNetworkError || uwr.isHttpError)
+					{
+						Debug.LogErrorFormat(fullFilePath + " - " + uwr.error);
+					}
+					else
+					{
+						var textureCacheItem = new TextureCacheItem();
+						textureCacheItem.Texture2D = DownloadHandlerTexture.GetContent(uwr);
+						textureCacheItem.Texture2D.wrapMode = TextureWrapMode.Clamp;
+						textureCacheItem.FilePath = fullFilePath;
+
+						callback(textureCacheItem);
+					}
 				}
+			}
+			else
+			{
+				Debug.Log("Requested file not found");
+				callback(null);
 			}
 		}
 

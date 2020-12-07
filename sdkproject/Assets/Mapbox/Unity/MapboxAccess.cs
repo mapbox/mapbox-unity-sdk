@@ -1,4 +1,5 @@
 using MapboxAccountsUnity;
+using UnityEngine.Networking;
 
 namespace Mapbox.Unity
 {
@@ -24,7 +25,7 @@ namespace Mapbox.Unity
 		public MapboxCacheManager CacheManager;
 
 		ITelemetryLibrary _telemetryLibrary;
-		private TextureMemoryCache _textureMemoryCache;
+		private MemoryCache _memoryCache;
 		CachingWebFileSource _fileSource;
 
 		public delegate void TokenValidationEvent(MapboxTokenStatus response);
@@ -145,13 +146,12 @@ namespace Mapbox.Unity
 
 		void ConfigureFileSource()
 		{
-			var memoryCache = new MemoryCache(_configuration.MemoryCacheSize);
-			_textureMemoryCache = new TextureMemoryCache(_configuration.MemoryCacheSize);
+			_memoryCache = new MemoryCache(_configuration.MemoryCacheSize);
 
 #if !UNITY_WEBGL
 			var sqliteCache = new SQLiteCache(_configuration.FileCacheSize);
 			var fileCache = new FileCache();
-			CacheManager = new MapboxCacheManager(_textureMemoryCache, memoryCache, fileCache, sqliteCache);
+			CacheManager = new MapboxCacheManager(_memoryCache, fileCache, sqliteCache);
 #endif
 
 #if UNITY_WEBGL
@@ -218,7 +218,7 @@ namespace Mapbox.Unity
 			return _fileSource.Request(url, callback, _configuration.DefaultTimeout);
 		}
 
-		public void MapboxImageRequest(
+		public UnityWebRequest MapboxImageRequest(
 			string url
 			, Action<TextureResponse> callback
 			, int timeout = 10
@@ -227,10 +227,10 @@ namespace Mapbox.Unity
 			, string etag = null
 		)
 		{
-			_fileSource.MapboxImageRequest(url, callback, _configuration.DefaultTimeout, tileId, tilesetId);
+			return _fileSource.MapboxImageRequest(url, callback, _configuration.DefaultTimeout, tileId, tilesetId);
 		}
 
-		public void CustomImageRequest(
+		public UnityWebRequest CustomImageRequest(
 			string url
 			, Action<TextureResponse> callback
 			, int timeout = 10
@@ -239,24 +239,19 @@ namespace Mapbox.Unity
 			, string etag = null
 		)
 		{
-			_fileSource.CustomImageRequest(url, callback, _configuration.DefaultTimeout, tileId, tilesetId);
+			return _fileSource.CustomImageRequest(url, callback, _configuration.DefaultTimeout, tileId, tilesetId);
 		}
-
-		// public TextureCacheItem GetTextureFromMemoryCache(string mapId, CanonicalTileId tileId)
-		// {
-		// 	return _fileSource.GetTextureFromMemoryCache(mapId, tileId);
-		// }
 
 		public void DownloadAndCacheBaseTiles(string imageryLayerSourceId, bool rasterOptionsUseRetina)
 		{
-			var imageDataFetcher = ScriptableObject.CreateInstance<ImageDataFetcher>();
+			var imageDataFetcher = new ImageDataFetcher();
 			for (int i = 0; i < 4; i++)
 			{
 				for (int j = 0; j < 4; j++)
 				{
 					var tileId = new CanonicalTileId(2, i, j);
-					imageDataFetcher.FetchData(imageryLayerSourceId, tileId, true);
-					//MarkBaseTilesMemoryCache(tileId, imageryLayerSourceId, rasterOptionsUseRetina);
+					//imageDataFetcher.FetchData(imageryLayerSourceId, tileId, true);
+					MarkBaseTilesMemoryCache(tileId, imageryLayerSourceId, rasterOptionsUseRetina);
 				}
 			}
 
@@ -265,8 +260,8 @@ namespace Mapbox.Unity
 				for (int j = 0; j < 2; j++)
 				{
 					var tileId = new CanonicalTileId(1, i, j);
-					imageDataFetcher.FetchData(imageryLayerSourceId, tileId, true);
-					//MarkBaseTilesMemoryCache(tileId, imageryLayerSourceId, rasterOptionsUseRetina);
+					//imageDataFetcher.FetchData(imageryLayerSourceId, tileId, true);
+					MarkBaseTilesMemoryCache(tileId, imageryLayerSourceId, rasterOptionsUseRetina);
 				}
 			}
 		}
@@ -289,7 +284,18 @@ namespace Mapbox.Unity
 
 			MapboxImageRequest(url, (t) =>
 			{
-				_textureMemoryCache.MarkFixed(tileId, tilesetId);
+				MapboxAccess.Instance.CacheManager.AddTextureItem(
+					tilesetId,
+					tileId,
+					new TextureCacheItem()
+					{
+						ETag = t.ETag,
+						Data = t.Data,
+						ExpirationDate = t.ExpirationDate,
+						Texture2D = t.Texture2D
+					},
+					true);
+				_memoryCache.MarkFixed(tileId, tilesetId);
 			}, 10, tileId, tilesetId);
 		}
 

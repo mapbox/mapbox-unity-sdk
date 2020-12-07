@@ -61,6 +61,12 @@ namespace Mapbox.Map
 			_fileNameStringCache = "";
 		}
 
+		public static CanonicalTileId FromUnwrappedValues(int z, int x, int y)
+		{
+			var wrap = (x < 0 ? x - (1 << z) + 1 : x) / (1 << z);
+			return new CanonicalTileId(z, x - wrap * (1 << z), y < 0 ? 0 : Math.Min(y, (1 << z) - 1));
+		}
+
 		/// <summary>
 		///     Get the cordinate at the top left of corner of the tile.
 		/// </summary>
@@ -112,7 +118,14 @@ namespace Mapbox.Map
 		
 		public override int GetHashCode()
 		{
-			return X ^ Y ^ Z;
+			//old hashcode
+			//return X ^ Y ^ Z;
+
+			int hash = X.GetHashCode();
+			hash = (hash * 397) ^ Y.GetHashCode();
+			hash = (hash * 397) ^ Z.GetHashCode();
+
+			return hash;
 		}
 
 		public static bool operator ==(CanonicalTileId a, CanonicalTileId b)
@@ -150,7 +163,7 @@ namespace Mapbox.Map
 				int hash = 17;
 				hash = hash * 23 + "mapbox".GetHashCode();
 				hash = hash * 23 + tilesetId.GetHashCode();
-				hash = hash * 23 + tileId.ToString().GetHashCode();
+				hash = hash * 23 + tileId.GetHashCode();
 				return hash;
 			}
 		}
