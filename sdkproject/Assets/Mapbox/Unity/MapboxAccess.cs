@@ -244,14 +244,14 @@ namespace Mapbox.Unity
 
 		public void DownloadAndCacheBaseTiles(string imageryLayerSourceId, bool rasterOptionsUseRetina)
 		{
-			var imageDataFetcher = new ImageDataFetcher();
+			var baseImageDataFetcher = new BaseImageDataFetcher();
+			CanonicalTileId tileId;
 			for (int i = 0; i < 4; i++)
 			{
 				for (int j = 0; j < 4; j++)
 				{
-					var tileId = new CanonicalTileId(2, i, j);
-					//imageDataFetcher.FetchData(imageryLayerSourceId, tileId, true);
-					MarkBaseTilesMemoryCache(tileId, imageryLayerSourceId, rasterOptionsUseRetina);
+					tileId = new CanonicalTileId(2, i, j);
+					baseImageDataFetcher.FetchData(imageryLayerSourceId, tileId, true);
 				}
 			}
 
@@ -259,44 +259,13 @@ namespace Mapbox.Unity
 			{
 				for (int j = 0; j < 2; j++)
 				{
-					var tileId = new CanonicalTileId(1, i, j);
-					//imageDataFetcher.FetchData(imageryLayerSourceId, tileId, true);
-					MarkBaseTilesMemoryCache(tileId, imageryLayerSourceId, rasterOptionsUseRetina);
+					tileId = new CanonicalTileId(1, i, j);
+					baseImageDataFetcher.FetchData(imageryLayerSourceId, tileId, true);
 				}
 			}
-		}
 
-		public void MarkBaseTilesMemoryCache(CanonicalTileId tileId, string tilesetId, bool retina)
-		{
-			string url;
-			if (tilesetId.StartsWith("mapbox://", StringComparison.Ordinal))
-			{
-				url = retina
-					? TileResource.MakeRetinaRaster(tileId, tilesetId).GetUrl()
-					: TileResource.MakeRaster(tileId, tilesetId).GetUrl();
-			}
-			else
-			{
-				url = retina
-					? TileResource.MakeClassicRetinaRaster(tileId, tilesetId).GetUrl()
-					: TileResource.MakeClassicRaster(tileId, tilesetId).GetUrl();
-			}
-
-			MapboxImageRequest(url, (t) =>
-			{
-				MapboxAccess.Instance.CacheManager.AddTextureItem(
-					tilesetId,
-					tileId,
-					new TextureCacheItem()
-					{
-						ETag = t.ETag,
-						Data = t.Data,
-						ExpirationDate = t.ExpirationDate,
-						Texture2D = t.Texture2D
-					},
-					true);
-				_memoryCache.MarkFixed(tileId, tilesetId);
-			}, 10, tileId, tilesetId);
+			tileId = new CanonicalTileId(0, 0, 0);
+			baseImageDataFetcher.FetchData(imageryLayerSourceId, tileId, true);
 		}
 
 		Geocoder _geocoder;

@@ -8,6 +8,7 @@ using Mapbox.Platform.Cache;
 using Mapbox.Unity;
 using Mapbox.Unity.Utilities;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ImageDataFetcher : DataFetcher
 {
@@ -134,6 +135,15 @@ public class ImageDataFetcher : DataFetcher
 		{
 			unityTile.RemoveTile(rasterTile);
 		}
+	}
+}
+
+public class BaseImageDataFetcher : ImageDataFetcher
+{
+	protected override void FetchingCallback(CanonicalTileId tileId, RasterTile rasterTile, UnityTile unityTile = null)
+	{
+		base.FetchingCallback(tileId, rasterTile, unityTile);
+		MapboxAccess.Instance.CacheManager.MarkFixed(rasterTile.Id, rasterTile.TilesetId);
 	}
 }
 
