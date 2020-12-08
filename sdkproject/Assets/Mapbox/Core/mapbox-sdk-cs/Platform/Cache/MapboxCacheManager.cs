@@ -180,6 +180,11 @@ namespace Mapbox.Platform.Cache
             _sqLiteCache?.Add(tilesetId, tileId, textureCacheItem, true);
         }
 
+        public void MarkFixed(CanonicalTileId tileId, string tilesetId)
+        {
+            _memoryCache.MarkFixed(tileId, tilesetId);
+        }
+
         public void ClearAndReinitCacheFiles()
         {
             var sqliteDeleteSuccess = _sqLiteCache.ClearDatabase();
