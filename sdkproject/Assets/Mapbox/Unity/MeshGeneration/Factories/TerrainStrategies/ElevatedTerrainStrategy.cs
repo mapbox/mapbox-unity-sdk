@@ -55,79 +55,84 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			_newTriangleList = new List<int>();
 		}
 
-		public override void RegisterTile(UnityTile tile)
+		public override void RegisterTile(UnityTile tile, bool createElevatedMesh)
 		{
 			if (_elevationOptions.unityLayerOptions.addToLayer && tile.gameObject.layer != _elevationOptions.unityLayerOptions.layerId)
 			{
 				tile.gameObject.layer = _elevationOptions.unityLayerOptions.layerId;
 			}
 
-			if (tile.MeshFilter.sharedMesh.vertexCount != RequiredVertexCount)
+			if (!createElevatedMesh)
 			{
-				tile.MeshFilter.sharedMesh.Clear();
-
-				if (_meshSamples.ContainsKey(_elevationOptions.modificationOptions.sampleCount))
+				if (tile.MeshFilter.sharedMesh.vertexCount != RequiredVertexCount)
 				{
-					var newMesh = _meshSamples[_elevationOptions.modificationOptions.sampleCount];
-					tile.MeshFilter.sharedMesh.vertices = newMesh.Vertices;
-					tile.MeshFilter.sharedMesh.normals = newMesh.Normals;
-					tile.MeshFilter.sharedMesh.triangles = newMesh.Triangles;
-					tile.MeshFilter.sharedMesh.uv = newMesh.Uvs;
+					tile.MeshFilter.sharedMesh.Clear();
+
+					if (_meshSamples.ContainsKey(_elevationOptions.modificationOptions.sampleCount))
+					{
+						var newMesh = _meshSamples[_elevationOptions.modificationOptions.sampleCount];
+						tile.MeshFilter.sharedMesh.vertices = newMesh.Vertices;
+						tile.MeshFilter.sharedMesh.normals = newMesh.Normals;
+						tile.MeshFilter.sharedMesh.triangles = newMesh.Triangles;
+						tile.MeshFilter.sharedMesh.uv = newMesh.Uvs;
+					}
+					else
+					{
+						//TODO remoev tile dependency from CreateBaseMesh method
+						var newMesh = CreateBaseMesh(tile, _elevationOptions.modificationOptions.sampleCount);
+						_meshSamples.Add(_elevationOptions.modificationOptions.sampleCount, newMesh);
+						tile.MeshFilter.sharedMesh.vertices = newMesh.Vertices;
+						tile.MeshFilter.sharedMesh.normals = newMesh.Normals;
+						tile.MeshFilter.sharedMesh.triangles = newMesh.Triangles;
+						tile.MeshFilter.sharedMesh.uv = newMesh.Uvs;
+					}
+				}
+			}
+			else
+			{
+				if (tile.MeshFilter.sharedMesh.vertexCount != RequiredVertexCount || !_cachedMeshDataArrays.ContainsKey(tile))
+				{
+					tile.MeshFilter.sharedMesh.Clear();
+
+					if (_meshSamples.ContainsKey(_elevationOptions.modificationOptions.sampleCount))
+					{
+						var newMesh = _meshSamples[_elevationOptions.modificationOptions.sampleCount];
+						tile.MeshFilter.sharedMesh.vertices = newMesh.Vertices;
+						tile.MeshFilter.sharedMesh.normals = newMesh.Normals;
+						tile.MeshFilter.sharedMesh.triangles = newMesh.Triangles;
+						tile.MeshFilter.sharedMesh.uv = newMesh.Uvs;
+					}
+					else
+					{
+						//TODO remoev tile dependency from CreateBaseMesh method
+						var newMesh = CreateBaseMesh(tile, _elevationOptions.modificationOptions.sampleCount);
+						_meshSamples.Add(_elevationOptions.modificationOptions.sampleCount, newMesh);
+						tile.MeshFilter.sharedMesh.vertices = newMesh.Vertices;
+						tile.MeshFilter.sharedMesh.normals = newMesh.Normals;
+						tile.MeshFilter.sharedMesh.triangles = newMesh.Triangles;
+						tile.MeshFilter.sharedMesh.uv = newMesh.Uvs;
+					}
+
+					if (!_dataArrays.ContainsKey(tile.UnwrappedTileId))
+					{
+						_dataArrays.Add(tile.UnwrappedTileId, new MeshDataArray()
+						{
+							Normals = tile.MeshFilter.sharedMesh.normals,
+							Vertices = tile.MeshFilter.sharedMesh.vertices,
+							Triangles = tile.MeshFilter.sharedMesh.triangles
+						});
+					}
 				}
 				else
 				{
-					//TODO remoev tile dependency from CreateBaseMesh method
-					var newMesh = CreateBaseMesh(tile, _elevationOptions.modificationOptions.sampleCount);
-					_meshSamples.Add(_elevationOptions.modificationOptions.sampleCount, newMesh);
-					tile.MeshFilter.sharedMesh.vertices = newMesh.Vertices;
-					tile.MeshFilter.sharedMesh.normals = newMesh.Normals;
-					tile.MeshFilter.sharedMesh.triangles = newMesh.Triangles;
-					tile.MeshFilter.sharedMesh.uv = newMesh.Uvs;
+					_dataArrays.Add(tile.UnwrappedTileId, _cachedMeshDataArrays[tile]);
+					_cachedMeshDataArrays.Remove(tile);
 				}
+
+				tile.ElevationType = TileTerrainType.Elevated;
+
+				GenerateTerrainMesh(tile);
 			}
-
-			// if (tile.MeshFilter.sharedMesh.vertexCount != RequiredVertexCount || !_cachedMeshDataArrays.ContainsKey(tile))
-			// {
-			// 	tile.MeshFilter.sharedMesh.Clear();
-			//
-			// 	if (_meshSamples.ContainsKey(_elevationOptions.modificationOptions.sampleCount))
-			// 	{
-			// 		var newMesh = _meshSamples[_elevationOptions.modificationOptions.sampleCount];
-			// 		tile.MeshFilter.sharedMesh.vertices = newMesh.Vertices;
-			// 		tile.MeshFilter.sharedMesh.normals = newMesh.Normals;
-			// 		tile.MeshFilter.sharedMesh.triangles = newMesh.Triangles;
-			// 		tile.MeshFilter.sharedMesh.uv = newMesh.Uvs;
-			// 	}
-			// 	else
-			// 	{
-			// 		//TODO remoev tile dependency from CreateBaseMesh method
-			// 		var newMesh = CreateBaseMesh(tile, _elevationOptions.modificationOptions.sampleCount);
-			// 		_meshSamples.Add(_elevationOptions.modificationOptions.sampleCount, newMesh);
-			// 		tile.MeshFilter.sharedMesh.vertices = newMesh.Vertices;
-			// 		tile.MeshFilter.sharedMesh.normals = newMesh.Normals;
-			// 		tile.MeshFilter.sharedMesh.triangles = newMesh.Triangles;
-			// 		tile.MeshFilter.sharedMesh.uv = newMesh.Uvs;
-			// 	}
-			//
-			// 	if (!_dataArrays.ContainsKey(tile.UnwrappedTileId))
-			// 	{
-			// 		_dataArrays.Add(tile.UnwrappedTileId, new MeshDataArray()
-			// 		{
-			// 			Normals = tile.MeshFilter.sharedMesh.normals,
-			// 			Vertices = tile.MeshFilter.sharedMesh.vertices,
-			// 			Triangles = tile.MeshFilter.sharedMesh.triangles
-			// 		});
-			// 	}
-			// }
-			// else
-			// {
-			// 	_dataArrays.Add(tile.UnwrappedTileId, _cachedMeshDataArrays[tile]);
-			// 	_cachedMeshDataArrays.Remove(tile);
-			// }
-
-			tile.ElevationType = TileTerrainType.Elevated;
-
-			//GenerateTerrainMesh(tile);
 		}
 
 		public override void UnregisterTile(UnityTile tile)

@@ -316,30 +316,56 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				}
 
 				_heightTexture = elevationTexture;
-				// byte[] rgbData = _heightTexture.GetRawTextureData();
-				// //var rgbData = _heightTexture.GetRawTextureData<Color32>();
-				// var relativeScale = useRelative ? _relativeScale : 1f;
-				// var width = _heightTexture.width;
-				// for (float yy = 0; yy < _heightDataResolution; yy++)
-				// {
-				// 	for (float xx = 0; xx < _heightDataResolution; xx++)
-				// 	{
-				// 		var index = (((int) ((yy / _heightDataResolution) * width) * width) + (int) ((xx / _heightDataResolution) * width));
-				//
-				// 		float r = rgbData[index * 4 + 1];
-				// 		float g = rgbData[index * 4 + 2];
-				// 		float b = rgbData[index * 4 + 3];
-				// 		//var color = rgbData[index];
-				// 		// float r = color.g;
-				// 		// float g = color.b;
-				// 		// float b = color.a;
-				// 		//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
-				// 		HeightData[(int) (yy * _heightDataResolution + xx)] = relativeScale * heightMultiplier * (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
-				// 		//678 ==> 012345678
-				// 		//345
-				// 		//012
-				// 	}
-				// }
+				byte[] rgbData = _heightTexture.GetRawTextureData();
+				//var rgbData = _heightTexture.GetRawTextureData<Color32>();
+				var relativeScale = useRelative ? _relativeScale : 1f;
+				var width = _heightTexture.width;
+				for (float yy = 0; yy < _heightDataResolution; yy++)
+				{
+					for (float xx = 0; xx < _heightDataResolution; xx++)
+					{
+						var index = (((int) ((yy / _heightDataResolution) * width) * width) + (int) ((xx / _heightDataResolution) * width));
+
+						float r = rgbData[index * 4 + 1];
+						float g = rgbData[index * 4 + 2];
+						float b = rgbData[index * 4 + 3];
+						//var color = rgbData[index];
+						// float r = color.g;
+						// float g = color.b;
+						// float b = color.a;
+						//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
+						HeightData[(int) (yy * _heightDataResolution + xx)] = relativeScale * heightMultiplier * (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
+						//678 ==> 012345678
+						//345
+						//012
+					}
+				}
+
+				HeightDataState = TilePropertyState.Loaded;
+
+				// Get rid of this temporary texture. We don't need to bloat memory.
+				//_heightTexture.LoadImage(null);
+			}
+		}
+
+		public void SetHeightTextureForShader(Texture2D elevationTexture, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false, Action<UnityTile> callback = null)
+		{
+			if (HeightDataState != TilePropertyState.Unregistered)
+			{
+				//reset height data
+				if (elevationTexture == null)
+				{
+					HeightData = new float[_heightDataResolution * _heightDataResolution];
+					HeightDataState = TilePropertyState.None;
+					return;
+				}
+
+				if (HeightData == null)
+				{
+					HeightData = new float[_heightDataResolution * _heightDataResolution];
+				}
+
+				_heightTexture = elevationTexture;
 
 				MeshRenderer.sharedMaterial.SetTexture("_HeightTexture", _heightTexture);
 				MeshRenderer.sharedMaterial.SetFloat("_TileScale", _tileScale);
@@ -418,10 +444,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					_rasterData.Compress(false);
 				}
 
-				//MeshRenderer.sharedMaterial.mainTexture = _rasterData;
-				MeshRenderer.sharedMaterial.SetTexture("_MainTex", _rasterData);
-				MeshRenderer.sharedMaterial.SetVector("_MainTextureScale", Unity.Constants.Math.Vector3One);
-				MeshRenderer.sharedMaterial.SetVector("_MainTextureOffset", Unity.Constants.Math.Vector3Zero);
+				MeshRenderer.sharedMaterial.mainTexture = _rasterData;
+				MeshRenderer.sharedMaterial.mainTextureScale = Unity.Constants.Math.Vector3One;
+				MeshRenderer.sharedMaterial.mainTextureOffset = Unity.Constants.Math.Vector3Zero;
 
 				RasterDataState = TilePropertyState.Loaded;
 			}
@@ -446,14 +471,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					_rasterData.Compress(false);
 				}
 
-				// MeshRenderer.sharedMaterial.mainTextureScale = Unity.Constants.Math.Vector3One;
-				// MeshRenderer.sharedMaterial.mainTextureOffset = Unity.Constants.Math.Vector3Zero;
-
-				//MeshRenderer.sharedMaterial.mainTexture = _rasterData;
-				MeshRenderer.sharedMaterial.SetVector("_MainTextureScale", Unity.Constants.Math.Vector3One);
-                MeshRenderer.sharedMaterial.SetVector("_MainTextureOffset", Unity.Constants.Math.Vector3Zero);
-
-                MeshRenderer.sharedMaterial.SetTexture("_MainTex", _rasterData);
+				MeshRenderer.sharedMaterial.mainTexture = _rasterData;
+				MeshRenderer.sharedMaterial.mainTextureScale = Unity.Constants.Math.Vector3One;
+				MeshRenderer.sharedMaterial.mainTextureOffset = Unity.Constants.Math.Vector3Zero;
 
 				RasterDataState = TilePropertyState.Loaded;
 			}
@@ -501,12 +521,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 
 			return 0;
-		}
-
-		public void SetLoadingTexture(Texture2D texture)
-		{
-			//MeshRenderer.material.mainTexture = texture;
-			MeshRenderer.sharedMaterial.SetTexture("_MainTex", texture);
 		}
 
 		public Texture2D GetRasterData()
@@ -559,8 +573,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void SetParentTexture(UnwrappedTileId parent, Texture2D parentTexture)
 		{
-			//MeshRenderer.sharedMaterial.mainTexture = parentTexture;
-			MeshRenderer.sharedMaterial.SetTexture("_MainTex", parentTexture);
+			MeshRenderer.sharedMaterial.mainTexture = parentTexture;
 
 			var tileZoom = this.UnwrappedTileId.Z;
 			var parentZoom = parent.Z;
@@ -608,9 +621,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				currentParent = currentParent.Parent;
 			}
 
-
-			MeshRenderer.sharedMaterial.SetVector("_MainTextureScale", new Vector2(scale, scale));
-			MeshRenderer.sharedMaterial.SetVector("_MainTextureOffset", new Vector2(offsetX, offsetY));
+			MeshRenderer.sharedMaterial.mainTextureScale = new Vector2(scale, scale);
+			MeshRenderer.sharedMaterial.mainTextureOffset = new Vector2(offsetX, offsetY);
 		}
 	}
 }

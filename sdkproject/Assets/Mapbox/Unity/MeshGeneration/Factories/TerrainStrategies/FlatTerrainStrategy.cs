@@ -20,7 +20,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			_elevationOptions = elOptions;
 		}
 
-		public override void RegisterTile(UnityTile tile)
+		public override void RegisterTile(UnityTile tile, bool b)
 		{
 			if (_elevationOptions.unityLayerOptions.addToLayer && tile.gameObject.layer != _elevationOptions.unityLayerOptions.layerId)
 			{

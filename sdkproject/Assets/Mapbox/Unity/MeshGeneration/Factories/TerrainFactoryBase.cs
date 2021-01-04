@@ -96,7 +96,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				//reseting height data
 				tile.SetHeightData(null);
-				Strategy.RegisterTile(tile);
+				Strategy.RegisterTile(tile, false);
 				tile.HeightDataState = TilePropertyState.Loaded;
 			}
 		}
@@ -143,14 +143,18 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				{
 					if (texture != null)
 					{
-						tile.SetHeightTexture(texture, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
-						Strategy.RegisterTile(tile);
-					}
-					else
-					{
-						//tile.SetHeightData(pngRasterTile.Data, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
-						// tile.SetElevationData(pngRasterTile.Elevation, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
-						// Strategy.RegisterTile(tile);
+						//if collider is disabled, we switch to a shader based solution
+						//no elevated mesh is generated
+						if (!_elevationOptions.colliderOptions.addCollider)
+						{
+							tile.SetHeightTextureForShader(texture, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
+							Strategy.RegisterTile(tile, false);
+						}
+						else
+						{
+							tile.SetHeightTexture(texture, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
+							Strategy.RegisterTile(tile, true);
+						}
 					}
 				}
 			}
@@ -166,14 +170,24 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				{
 					if (pngRasterTile.Texture2D != null)
 					{
-						tile.SetHeightTexture(pngRasterTile.Texture2D, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
-						//Strategy.RegisterTile(tile);
+						//if collider is disabled, we switch to a shader based solution
+						//no elevated mesh is generated
+						if (!_elevationOptions.colliderOptions.addCollider)
+						{
+							tile.SetHeightTextureForShader(pngRasterTile.Texture2D, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
+							Strategy.RegisterTile(tile, false);
+						}
+						else
+						{
+							tile.SetHeightTexture(pngRasterTile.Texture2D, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
+							Strategy.RegisterTile(tile, true);
+						}
 					}
 					else
 					{
 						//tile.SetHeightData(pngRasterTile.Data, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
-						// tile.SetElevationData(pngRasterTile.Elevation, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
-						// Strategy.RegisterTile(tile);
+						//tile.SetElevationData(pngRasterTile.Elevation, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
+						//Strategy.RegisterTile(tile);
 					}
 				}
 			}
