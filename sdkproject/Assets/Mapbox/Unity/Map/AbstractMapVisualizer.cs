@@ -278,14 +278,19 @@ namespace Mapbox.Unity.Map
 		{
 			var unityTile = ActiveTiles[tileId];
 
-			foreach (var factory in Factories)
+			if (unityTile != null)
 			{
-				factory.Unregister(unityTile);
-			}
+				OnTileDisposing(unityTile);
 
-			unityTile.Recycle();
-			ActiveTiles.Remove(tileId);
-			_inactiveTiles.Enqueue(unityTile);
+				foreach (var factory in Factories)
+				{
+					factory.Unregister(unityTile);
+				}
+
+				unityTile.Recycle();
+				ActiveTiles.Remove(tileId);
+				_inactiveTiles.Enqueue(unityTile);
+			}
 		}
 
 		/// <summary>
@@ -432,6 +437,7 @@ namespace Mapbox.Unity.Map
 		/// Event delegate, gets called when vector factory finishes processing a tile.
 		/// </summary>
 		public event Action<UnityTile> OnTileVectorProcessingFinished = delegate {};
+		public event Action<UnityTile> OnTileDisposing = delegate {};
 
 		#endregion
 	}

@@ -109,6 +109,9 @@ public class TerrainDataFetcher : DataFetcher
 		}
 		else
 		{
+#if UNITY_EDITOR
+			rasterTile.Texture2D.name = string.Format("{0}_{1}", tileId.ToString(), rasterTile.TilesetId);
+#endif
 			MapboxAccess.Instance.CacheManager.AddTextureItem(
 				rasterTile.TilesetId,
 				rasterTile.Id,

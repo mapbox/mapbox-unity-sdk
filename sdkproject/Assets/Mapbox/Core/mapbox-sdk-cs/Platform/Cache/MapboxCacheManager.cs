@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Mapbox.Map;
+using Mapbox.Unity.MeshGeneration.Data;
 using UnityEngine;
 
 namespace Mapbox.Platform.Cache
@@ -121,6 +122,9 @@ namespace Mapbox.Platform.Cache
 
             _textureFileCache.GetAsync(tilesetId, tileId, (textureCacheItem) =>
             {
+#if UNITY_EDITOR
+                textureCacheItem.Texture2D.name = string.Format("{0}_{1}", tileId.ToString(), tilesetId);
+#endif
                 //this might happen in some corner cases
                 //it means file was supposed to be there but couldn't be found in the last step when requested
                 //maybe deleted in an earlier frame by cache limit?
@@ -204,6 +208,25 @@ namespace Mapbox.Platform.Cache
             {
                 _sqLiteCache.ReadySqliteDatabase();
                 Debug.Log("SQlite cache tables recreated");
+            }
+        }
+
+        //when a tile is disposed&recycled, we mark data used in that for priority on removal
+        public void TileDisposed(UnityTile tile)
+        {
+            if (!string.IsNullOrEmpty(tile.RasterDataTilesetId))
+            {
+                _memoryCache?.AddToDisposeList(tile.RasterDataTilesetId, tile.CanonicalTileId);
+            }
+
+            if (!string.IsNullOrEmpty(tile.ElevationDataTilesetId))
+            {
+                _memoryCache?.AddToDisposeList(tile.ElevationDataTilesetId, tile.CanonicalTileId);
+            }
+
+            if (!string.IsNullOrEmpty(tile.VectorDataTilesetId))
+            {
+                _memoryCache?.AddToDisposeList(tile.VectorDataTilesetId, tile.CanonicalTileId);
             }
         }
 

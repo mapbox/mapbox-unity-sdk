@@ -44,11 +44,11 @@ namespace Mapbox.Platform.Cache
 				//item doesn't exists, we simply add it to list
 				cacheItem.AddedToCacheTicksUtc = DateTime.UtcNow.Ticks;
 				_cachedItems.Add(key, cacheItem);
-				_texOrder.Add(key);
+				//_texOrder.Add(key);
 			}
 			else
 			{
-				//an item with samea key exists, we destroy older one to prevent memory leak first
+				//an item with same key exists, we destroy older one to prevent memory leak first
 				//then add new one to list
 				if(Debug.isDebugBuild) Debug.Log("An item with same key exists in memory cache. Destroying older one, caching new one.");
 
@@ -61,15 +61,40 @@ namespace Mapbox.Platform.Cache
 			CheckForUnloadingAssets();
 		}
 
+		public void AddToDisposeList(string tilesetId, CanonicalTileId tileId)
+		{
+			var key = tileId.GenerateKey(tilesetId);
+			if (!_texOrder.Contains(key) && _cachedItems.ContainsKey(key))
+			{
+				_texOrder.Add(key);
+			}
+		}
+
 		private void CheckCacheLimit()
 		{
 			if (_cachedItems.Count >= _maxCacheSize)
 			{
-				var keyToRemove = _texOrder[0];
-				_texOrder.RemoveAt(0);
-				RemoveItemCacheItem(keyToRemove);
-				_destroyedItemCounter++;
-				_cachedItems.Remove(keyToRemove);
+				if (_texOrder.Count == 0)
+				{
+					//something is horribly wrong
+					Debug.Log("Memory cache is in a very wrong state, destroying all cached items.");
+					var keys = _cachedItems.Keys.ToArray();
+					foreach (var keyToRemove in keys)
+					{
+						_texOrder.RemoveAt(0);
+						RemoveItemCacheItem(keyToRemove);
+						_destroyedItemCounter++;
+						_cachedItems.Remove(keyToRemove);
+					}
+				}
+				else
+				{
+					var keyToRemove = _texOrder[0];
+					_texOrder.RemoveAt(0);
+					RemoveItemCacheItem(keyToRemove);
+					_destroyedItemCounter++;
+					_cachedItems.Remove(keyToRemove);
+				}
 			}
 		}
 

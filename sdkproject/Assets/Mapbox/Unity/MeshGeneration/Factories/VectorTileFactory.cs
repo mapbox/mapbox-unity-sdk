@@ -328,7 +328,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				_tilesWaitingResponse.Remove(tile);
 				if (tile.VectorDataState != TilePropertyState.Unregistered)
 				{
-					tile.SetVectorData(vectorTile);
+					tile.SetVectorData(TilesetId, vectorTile);
 					// FIXME: we can make the request BEFORE getting a response from these!
 					if (tile.HeightDataState == TilePropertyState.Loading ||
 							tile.RasterDataState == TilePropertyState.Loading)
@@ -363,7 +363,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				_tilesWaitingResponse.Remove(tile);
 				if (tile.VectorDataState != TilePropertyState.Unregistered)
 				{
-					tile.SetVectorData(null);
+					tile.SetVectorData(TilesetId, null);
 					tile.VectorDataState = TilePropertyState.Error;
 					OnErrorOccurred(e);
 				}

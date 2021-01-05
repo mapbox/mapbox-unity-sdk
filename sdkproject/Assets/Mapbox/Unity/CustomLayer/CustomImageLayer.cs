@@ -28,7 +28,7 @@ namespace CustomImageLayerSample
         {
             if (tile != null)
             {
-                tile.SetRasterTexture(texture);
+                tile.SetRasterTexture(_customTilesetId, texture);
             }
             else
             {

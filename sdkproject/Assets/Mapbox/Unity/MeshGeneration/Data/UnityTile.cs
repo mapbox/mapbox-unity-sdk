@@ -17,8 +17,14 @@ namespace Mapbox.Unity.MeshGeneration.Data
 	public class UnityTile : MonoBehaviour
 	{
 		public TileTerrainType ElevationType;
+
+		public string RasterDataTilesetId;
 		[SerializeField] private Texture2D _rasterData;
+
+		public string VectorDataTilesetId;
 		public Mapbox.VectorTile.VectorTile VectorData { get; private set; }
+
+		public string ElevationDataTilesetId;
 		[SerializeField] private Texture2D _heightTexture;
 		public float[] HeightData;
 
@@ -215,8 +221,29 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				MeshRenderer.sharedMaterial.SetTexture("_MainTex", _loadingTexture);
 			}
 
-			_rasterData = null;
-			_heightTexture = null;
+			RasterDataTilesetId = string.Empty;
+			ElevationDataTilesetId = string.Empty;
+			VectorDataTilesetId = string.Empty;
+
+			if (_rasterData != null)
+			{
+				//if you have memory cache module active and then destroy textures here
+				//it'll break the system as memory cache will think it still has the textures
+				//and serve null textures
+				//They are actually destroyed after first usage here
+				//so revisited tiles will not appear
+				//if you ever need to disable memory caching though, you'll need to destroy textures somewhere
+				//and this might be a good place for that
+				//_rasterData.Destroy();
+				_rasterData = null;
+			}
+
+			if (_heightTexture != null)
+			{
+				//_heightTexture.Destroy();
+				_heightTexture = null;
+			}
+
 			gameObject.SetActive(false);
 			IsRecycled = true;
 
@@ -234,10 +261,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			_tiles.Clear();
 		}
 
-		public void SetHeightData(byte[] data, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false)
+		public void SetHeightData(string tileset, byte[] data, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false)
 		{
 			if (HeightDataState != TilePropertyState.Unregistered)
 			{
+				ElevationDataTilesetId = tileset;
 				//reset height data
 				if (data == null)
 				{
@@ -278,30 +306,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		public void SetElevationData(float[] data, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false)
+		public void SetHeightTexture(string tileset, Texture2D elevationTexture, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false, Action<UnityTile> callback = null)
 		{
 			if (HeightDataState != TilePropertyState.Unregistered)
 			{
-				//reset height data
-				if (data == null)
-				{
-					HeightData = new float[256 * 256];
-					HeightDataState = TilePropertyState.None;
-					return;
-				}
-
-				HeightData = data;
-
-
-
-				HeightDataState = TilePropertyState.Loaded;
-			}
-		}
-
-		public void SetHeightTexture(Texture2D elevationTexture, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false, Action<UnityTile> callback = null)
-		{
-			if (HeightDataState != TilePropertyState.Unregistered)
-			{
+				ElevationDataTilesetId = tileset;
 				//reset height data
 				if (elevationTexture == null)
 				{
@@ -348,10 +357,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		public void SetHeightTextureForShader(Texture2D elevationTexture, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false, Action<UnityTile> callback = null)
+		public void SetHeightTextureForShader(string tileset, Texture2D elevationTexture, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false, Action<UnityTile> callback = null)
 		{
 			if (HeightDataState != TilePropertyState.Unregistered)
 			{
+				ElevationDataTilesetId = tileset;
 				//reset height data
 				if (elevationTexture == null)
 				{
@@ -419,11 +429,12 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		public void SetRasterData(byte[] data, bool useMipMap = true, bool useCompression = false)
+		public void SetRasterData(string tileset, byte[] data, bool useMipMap = true, bool useCompression = false)
 		{
 			// Don't leak the texture, just reuse it.
 			if (RasterDataState != TilePropertyState.Unregistered)
 			{
+				RasterDataTilesetId = tileset;
 				//reset image on null data
 				if (data == null)
 				{
@@ -452,10 +463,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		public void SetRasterTexture(Texture2D rasterTileTexture2D, bool useMipMap = true, bool useCompression = false)
+		public void SetRasterTexture(string tileset, Texture2D rasterTileTexture2D, bool useMipMap = true, bool useCompression = false)
 		{
 			if (RasterDataState != TilePropertyState.Unregistered)
 			{
+				RasterDataTilesetId = tileset;
 				//reset image on null data
 				if (rasterTileTexture2D == null)
 				{
@@ -479,10 +491,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		public void SetVectorData(Mapbox.VectorTile.VectorTile vectorTile)
+		public void SetVectorData(string tileset, Mapbox.VectorTile.VectorTile vectorTile)
 		{
 			if (VectorDataState != TilePropertyState.Unregistered)
 			{
+				VectorDataTilesetId = tileset;
 				VectorData = vectorTile;
 			}
 		}
@@ -497,7 +510,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		/// <returns></returns>
 		public float QueryHeightData(float x, float y)
 		{
-			if (HeightData != null)
+			if (HeightData != null && HeightData.Length > 0)
 			{
 				return HeightData[(int) (Mathf.Clamp01(y) * (_heightDataResolution - 1)) * _heightDataResolution + (int) (Mathf.Clamp01(x) * (_heightDataResolution - 1))] * _tileScale;
 			}

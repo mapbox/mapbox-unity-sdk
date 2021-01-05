@@ -25,12 +25,13 @@ namespace Mapbox.Map
 	/// </summary>
 	public abstract class Tile : IAsyncRequest
 	{
+		protected string _tilesetId;
+		protected CanonicalTileId _id;
+		
 		public long StatusCode;
 		public DateTime ExpirationDate;
 		public string ETag;
-		protected string _tilesetId;
 
-		protected CanonicalTileId _id;
 		protected List<Exception> _exceptions;
 		protected State _state = State.New;
 		protected IAsyncRequest _request;

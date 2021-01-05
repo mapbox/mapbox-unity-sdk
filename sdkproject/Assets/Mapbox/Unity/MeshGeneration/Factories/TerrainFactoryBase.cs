@@ -74,7 +74,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			if (Properties.sourceType == ElevationSourceType.None)
 			{
-				tile.SetHeightData(null);
+				tile.SetHeightData(TilesetId,null);
 				tile.MeshFilter.sharedMesh.Clear();
 				tile.ElevationType = TileTerrainType.None;
 				tile.HeightDataState = TilePropertyState.None;
@@ -95,7 +95,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			else
 			{
 				//reseting height data
-				tile.SetHeightData(null);
+				tile.SetHeightData(TilesetId, null);
 				Strategy.RegisterTile(tile, false);
 				tile.HeightDataState = TilePropertyState.Loaded;
 			}
@@ -147,12 +147,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 						//no elevated mesh is generated
 						if (!_elevationOptions.colliderOptions.addCollider)
 						{
-							tile.SetHeightTextureForShader(texture, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
+							tile.SetHeightTextureForShader(TilesetId, texture, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
 							Strategy.RegisterTile(tile, false);
 						}
 						else
 						{
-							tile.SetHeightTexture(texture, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
+							tile.SetHeightTexture(TilesetId, texture, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
 							Strategy.RegisterTile(tile, true);
 						}
 					}
@@ -174,12 +174,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 						//no elevated mesh is generated
 						if (!_elevationOptions.colliderOptions.addCollider)
 						{
-							tile.SetHeightTextureForShader(pngRasterTile.Texture2D, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
+							tile.SetHeightTextureForShader(TilesetId, pngRasterTile.Texture2D, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
 							Strategy.RegisterTile(tile, false);
 						}
 						else
 						{
-							tile.SetHeightTexture(pngRasterTile.Texture2D, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
+							tile.SetHeightTexture(TilesetId, pngRasterTile.Texture2D, _elevationOptions.requiredOptions.exaggerationFactor, _elevationOptions.modificationOptions.useRelativeHeight, _elevationOptions.colliderOptions.addCollider);
 							Strategy.RegisterTile(tile, true);
 						}
 					}

@@ -507,27 +507,30 @@ namespace Mapbox.Unity.Map
 			DestroyChildObjects();
 			// Setup a visualizer to get a "Starter" map.
 
-			if(_mapVisualizer == null)
+			if (_mapVisualizer == null)
 			{
 				_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
-			}
-			_mapVisualizer.OnTileFinished += (s) =>
-			{
-				OnTileFinished(s);
 
-				if (TileTracker.ContainsKey(s.UnwrappedTileId))
+				_mapVisualizer.OnTileFinished += (s) =>
 				{
-					foreach (var tileId in TileTracker[s.UnwrappedTileId])
-					{
-						if (MapVisualizer.ActiveTiles.ContainsKey(tileId))
-						{
-							TileProvider_OnTileRemoved(tileId);
-						}
-					}
+					OnTileFinished(s);
 
-					TileTracker.Remove(s.UnwrappedTileId);
-				}
-			};
+					if (TileTracker.ContainsKey(s.UnwrappedTileId))
+					{
+						foreach (var tileId in TileTracker[s.UnwrappedTileId])
+						{
+							if (MapVisualizer.ActiveTiles.ContainsKey(tileId))
+							{
+								TileProvider_OnTileRemoved(tileId);
+							}
+						}
+
+						TileTracker.Remove(s.UnwrappedTileId);
+					}
+				};
+				_mapVisualizer.OnTileDisposing += OnTileDisposing;
+				_mapVisualizer.OnTileDisposing += tile => { MapboxAccess.Instance.CacheManager.TileDisposed(tile); };
+			}
 		}
 
 		public void DestroyChildObjects()
@@ -686,7 +689,7 @@ namespace Mapbox.Unity.Map
 
 		protected virtual void TileProvider_OnTileRemoved(UnwrappedTileId tileId)
 		{
-			OnTileDisposing(tileId);
+			//OnTileDisposing(tileId);
 			_mapVisualizer.DisposeTile(tileId);
 		}
 
@@ -1281,7 +1284,8 @@ namespace Mapbox.Unity.Map
 		/// <summary>
 		/// Event delegate, gets called before a tile is getting recycled.
 		/// </summary>
-		public event Action<UnwrappedTileId> OnTileDisposing = delegate { };
+		//public event Action<UnwrappedTileId> OnTileDisposing = delegate { };
+		public event Action<UnityTile> OnTileDisposing = delegate { };
 		#endregion
 	}
 }

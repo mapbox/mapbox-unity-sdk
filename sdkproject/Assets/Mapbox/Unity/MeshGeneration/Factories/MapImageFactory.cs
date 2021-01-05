@@ -70,11 +70,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				{
 					if (rasterTile.Texture2D != null)
 					{
-						tile.SetRasterTexture(rasterTile.Texture2D);
+						tile.SetRasterTexture(TilesetId, rasterTile.Texture2D);
 					}
 					else
 					{
-						tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
+						tile.SetRasterData(TilesetId, rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
 					}
 				}
 			}
@@ -92,7 +92,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				{
 					if (texture != null)
 					{
-						tile.SetRasterTexture(texture);
+						tile.SetRasterTexture(TilesetId, texture);
 					}
 					else
 					{
@@ -135,7 +135,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			if (_properties.sourceType == ImagerySourceType.None)
 			{
-				tile.SetRasterData(null);
+				tile.SetRasterData(TilesetId, null);
 				tile.RasterDataState = TilePropertyState.None;
 				return;
 			}
