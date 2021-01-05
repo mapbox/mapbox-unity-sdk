@@ -18,7 +18,7 @@ namespace Mapbox.Platform.Cache
 			_maxCacheSize = maxCacheSize;
 			_cachedItems = new Dictionary<int, CacheItem>();
 			_fixedItems = new Dictionary<int, CacheItem>();
-			_texOrder = new List<int>();
+			_itemsToDestroy = new List<int>();
 		}
 
 		private uint _maxCacheSize;
@@ -28,7 +28,7 @@ namespace Mapbox.Platform.Cache
 		private int _destroyedItemCounter = 0;
 		private int _destroyedItemLimit = 20;
 
-		private List<int> _texOrder;
+		private List<int> _itemsToDestroy;
 
 		public uint MaxCacheSize
 		{
@@ -38,6 +38,13 @@ namespace Mapbox.Platform.Cache
 		public void Add(string tilesetId, CanonicalTileId tileId, CacheItem cacheItem, bool forceInsert)
 		{
 			var key = tileId.GenerateKey(tilesetId);
+
+			//this tile was recycled so the data was marked for pruning
+			//but then user loaded same tile again so we are removing that flag from _texOrder list
+			if (_itemsToDestroy.Contains(key))
+			{
+				_itemsToDestroy.Remove(key);
+			}
 
 			if (!_cachedItems.ContainsKey(key))
 			{
@@ -64,9 +71,9 @@ namespace Mapbox.Platform.Cache
 		public void AddToDisposeList(string tilesetId, CanonicalTileId tileId)
 		{
 			var key = tileId.GenerateKey(tilesetId);
-			if (!_texOrder.Contains(key) && _cachedItems.ContainsKey(key))
+			if (!_itemsToDestroy.Contains(key) && _cachedItems.ContainsKey(key))
 			{
-				_texOrder.Add(key);
+				_itemsToDestroy.Add(key);
 			}
 		}
 
@@ -74,14 +81,14 @@ namespace Mapbox.Platform.Cache
 		{
 			if (_cachedItems.Count >= _maxCacheSize)
 			{
-				if (_texOrder.Count == 0)
+				if (_itemsToDestroy.Count == 0)
 				{
 					//something is horribly wrong
 					Debug.Log("Memory cache is in a very wrong state, destroying all cached items.");
 					var keys = _cachedItems.Keys.ToArray();
 					foreach (var keyToRemove in keys)
 					{
-						_texOrder.RemoveAt(0);
+						_itemsToDestroy.RemoveAt(0);
 						RemoveItemCacheItem(keyToRemove);
 						_destroyedItemCounter++;
 						_cachedItems.Remove(keyToRemove);
@@ -89,8 +96,8 @@ namespace Mapbox.Platform.Cache
 				}
 				else
 				{
-					var keyToRemove = _texOrder[0];
-					_texOrder.RemoveAt(0);
+					var keyToRemove = _itemsToDestroy[0];
+					_itemsToDestroy.RemoveAt(0);
 					RemoveItemCacheItem(keyToRemove);
 					_destroyedItemCounter++;
 					_cachedItems.Remove(keyToRemove);
@@ -137,8 +144,8 @@ namespace Mapbox.Platform.Cache
 				return null;
 			}
 
-			_texOrder.Remove(key);
-			_texOrder.Add(key);
+			_itemsToDestroy.Remove(key);
+			_itemsToDestroy.Add(key);
 			return _cachedItems[key];
 		}
 
@@ -163,12 +170,12 @@ namespace Mapbox.Platform.Cache
 					}
 
 					_cachedItems.Clear();
-					_texOrder.Clear();
+					_itemsToDestroy.Clear();
 				}
 				else
 				{
 					_cachedItems = new Dictionary<int, CacheItem>();
-					_texOrder = new List<int>();
+					_itemsToDestroy = new List<int>();
 				}
 			}
 		}
@@ -186,7 +193,7 @@ namespace Mapbox.Platform.Cache
 			{
 				var cacheItem = _cachedItems[key];
 				_cachedItems.Remove(key);
-				_texOrder.Remove(key);
+				_itemsToDestroy.Remove(key);
 				_fixedItems.Add(key, cacheItem);
 			}
 			else
