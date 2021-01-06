@@ -75,7 +75,12 @@ namespace Mapbox.Map
 			_isStyleOptimized = false;
 		}
 
-		public VectorTile(string styleId, string modifiedDate)
+		public VectorTile(CanonicalTileId tileId, string tilesetId) : base(tileId, tilesetId)
+		{
+
+		}
+
+		public VectorTile(CanonicalTileId tileId, string tilesetId, string styleId, string modifiedDate) : base(tileId, tilesetId)
 		{
 			if (string.IsNullOrEmpty(styleId) || string.IsNullOrEmpty(modifiedDate))
 			{

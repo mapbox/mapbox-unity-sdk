@@ -1,4 +1,5 @@
 
+using Sirenix.Serialization;
 using UnityEditor;
 using UnityEngine.Rendering;
 
@@ -16,6 +17,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 	public class UnityTile : MonoBehaviour
 	{
+		public string CustomDataName;
+
 		public TileTerrainType ElevationType;
 
 		public string RasterDataTilesetId;
@@ -32,7 +35,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		private int _heightDataResolution = 100;
 		//keeping track of tile objects to be able to cancel them safely if tile is destroyed before data fetching finishes
-		private HashSet<Tile> _tiles = new HashSet<Tile>();
+		[OdinSerialize] public HashSet<Tile> Tiles = new HashSet<Tile>();
 		[SerializeField] private float _tileScale;
 
 		public bool IsRecycled = false;
@@ -215,6 +218,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		internal void Recycle()
 		{
+			CustomDataName = "";
 			if (_loadingTexture && MeshRenderer != null && MeshRenderer.sharedMaterial != null)
 			{
 				//MeshRenderer.sharedMaterial.mainTexture = _loadingTexture;
@@ -258,16 +262,21 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			OnVectorDataChanged = delegate { };
 
 			Cancel();
-			_tiles.Clear();
+
+			foreach (var tile in Tiles)
+			{
+				tile.Clear();
+			}
+			Tiles.Clear();
 		}
 
-		public void SetHeightData(string tileset, byte[] data, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false)
+		public void SetHeightData(RasterTile rasterTile, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false)
 		{
 			if (HeightDataState != TilePropertyState.Unregistered)
 			{
-				ElevationDataTilesetId = tileset;
+				ElevationDataTilesetId = rasterTile.TilesetId;
 				//reset height data
-				if (data == null)
+				if (rasterTile.Data == null)
 				{
 					HeightData = new float[256 * 256];
 					HeightDataState = TilePropertyState.None;
@@ -280,7 +289,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					_heightTexture = new Texture2D(0, 0);
 				}
 
-				_heightTexture.LoadImage(data);
+				_heightTexture.LoadImage(rasterTile.Data);
 				byte[] rgbData = _heightTexture.GetRawTextureData();
 
 				// Get rid of this temporary texture. We don't need to bloat memory.
@@ -306,13 +315,13 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		public void SetHeightTexture(string tileset, Texture2D elevationTexture, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false, Action<UnityTile> callback = null)
+		public void SetHeightTexture(RasterTile rasterTile, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false, Action<UnityTile> callback = null)
 		{
 			if (HeightDataState != TilePropertyState.Unregistered)
 			{
-				ElevationDataTilesetId = tileset;
+				ElevationDataTilesetId = rasterTile.TilesetId;
 				//reset height data
-				if (elevationTexture == null)
+				if (rasterTile.Texture2D == null)
 				{
 					HeightData = new float[_heightDataResolution * _heightDataResolution];
 					HeightDataState = TilePropertyState.None;
@@ -324,7 +333,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					HeightData = new float[_heightDataResolution * _heightDataResolution];
 				}
 
-				_heightTexture = elevationTexture;
+				_heightTexture = rasterTile.Texture2D;
 				byte[] rgbData = _heightTexture.GetRawTextureData();
 				//var rgbData = _heightTexture.GetRawTextureData<Color32>();
 				var relativeScale = useRelative ? _relativeScale : 1f;
@@ -357,13 +366,13 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		public void SetHeightTextureForShader(string tileset, Texture2D elevationTexture, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false, Action<UnityTile> callback = null)
+		public void SetHeightTextureForShader(RasterTile rasterTile, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false, Action<UnityTile> callback = null)
 		{
 			if (HeightDataState != TilePropertyState.Unregistered)
 			{
-				ElevationDataTilesetId = tileset;
+				ElevationDataTilesetId = rasterTile.TilesetId;
 				//reset height data
-				if (elevationTexture == null)
+				if (rasterTile.Texture2D == null)
 				{
 					HeightData = new float[_heightDataResolution * _heightDataResolution];
 					HeightDataState = TilePropertyState.None;
@@ -375,7 +384,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					HeightData = new float[_heightDataResolution * _heightDataResolution];
 				}
 
-				_heightTexture = elevationTexture;
+				_heightTexture = rasterTile.Texture2D;
 
 				MeshRenderer.sharedMaterial.SetTexture("_HeightTexture", _heightTexture);
 				MeshRenderer.sharedMaterial.SetFloat("_TileScale", _tileScale);
@@ -429,14 +438,14 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		public void SetRasterData(string tileset, byte[] data, bool useMipMap = true, bool useCompression = false)
+		public void SetRasterData(RasterTile rasterTile, bool useMipMap = true, bool useCompression = false)
 		{
 			// Don't leak the texture, just reuse it.
 			if (RasterDataState != TilePropertyState.Unregistered)
 			{
-				RasterDataTilesetId = tileset;
+				RasterDataTilesetId = rasterTile.TilesetId;
 				//reset image on null data
-				if (data == null)
+				if (rasterTile.Data == null)
 				{
 					MeshRenderer.material.mainTexture = null;
 					return;
@@ -448,7 +457,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					_rasterData.wrapMode = TextureWrapMode.Clamp;
 				}
 
-				_rasterData.LoadImage(data);
+				_rasterData.LoadImage(rasterTile.Data);
 				if (useCompression)
 				{
 					// High quality = true seems to decrease image quality?
@@ -463,19 +472,20 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		public void SetRasterTexture(string tileset, Texture2D rasterTileTexture2D, bool useMipMap = true, bool useCompression = false)
+		public void SetRasterTexture(RasterTile rasterTile, bool useMipMap = true, bool useCompression = false)
 		{
 			if (RasterDataState != TilePropertyState.Unregistered)
 			{
-				RasterDataTilesetId = tileset;
+				RasterDataTilesetId = rasterTile.TilesetId;
 				//reset image on null data
-				if (rasterTileTexture2D == null)
+				if (rasterTile.Texture2D == null)
 				{
 					MeshRenderer.material.mainTexture = null;
+					_rasterData = null;
 					return;
 				}
 
-				_rasterData = rasterTileTexture2D;
+				_rasterData = rasterTile.Texture2D;
 				_rasterData.wrapMode = TextureWrapMode.Clamp;
 				if (useCompression)
 				{
@@ -543,12 +553,17 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		internal void AddTile(Tile tile)
 		{
-			_tiles.Add(tile);
+			Tiles.Add(tile);
+		}
+
+		public bool ContainsDataTile(Tile tile)
+		{
+			return Tiles.Contains(tile);
 		}
 
 		internal void RemoveTile(Tile tile)
 		{
-			_tiles.Remove(tile);
+			Tiles.Remove(tile);
 		}
 
 		public void ClearAssets()
@@ -564,7 +579,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void Cancel()
 		{
-			foreach (var tile in _tiles)
+			foreach (var tile in Tiles)
 			{
 				tile.Cancel();
 			}
@@ -584,9 +599,16 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 		}
 
-		public void SetParentTexture(UnwrappedTileId parent, Texture2D parentTexture)
+		public void SetParentTexture(UnwrappedTileId parent, Texture2D parentTexture, string textureName = "", string textureScaleOffsetName = "")
 		{
-			MeshRenderer.sharedMaterial.mainTexture = parentTexture;
+			if (string.IsNullOrEmpty(textureName))
+			{
+				MeshRenderer.sharedMaterial.mainTexture = parentTexture;
+			}
+			else
+			{
+				MeshRenderer.sharedMaterial.SetTexture(textureName, parentTexture);
+			}
 
 			var tileZoom = this.UnwrappedTileId.Z;
 			var parentZoom = parent.Z;
@@ -634,8 +656,16 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				currentParent = currentParent.Parent;
 			}
 
-			MeshRenderer.sharedMaterial.mainTextureScale = new Vector2(scale, scale);
-			MeshRenderer.sharedMaterial.mainTextureOffset = new Vector2(offsetX, offsetY);
+			if (string.IsNullOrEmpty(textureName))
+			{
+				MeshRenderer.sharedMaterial.mainTextureScale = new Vector2(scale, scale);
+				MeshRenderer.sharedMaterial.mainTextureOffset = new Vector2(offsetX, offsetY);
+			}
+			else
+			{
+				MeshRenderer.sharedMaterial.SetVector(textureScaleOffsetName, new Vector4(scale, scale, offsetX, offsetY));
+			}
+
 		}
 	}
 }

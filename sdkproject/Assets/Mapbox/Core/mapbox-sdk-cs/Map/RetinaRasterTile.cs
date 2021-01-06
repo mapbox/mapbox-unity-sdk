@@ -14,6 +14,10 @@ namespace Mapbox.Map
     /// </summary>
     public class RetinaRasterTile : RasterTile
     {
+        public RetinaRasterTile(CanonicalTileId tileId, string tilesetId) : base(tileId, tilesetId)
+        {
+        }
+
         internal override TileResource MakeTileResource(string tilesetId)
         {
             return TileResource.MakeRetinaRaster(Id, tilesetId);

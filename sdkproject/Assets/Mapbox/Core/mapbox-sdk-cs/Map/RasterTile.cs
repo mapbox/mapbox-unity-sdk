@@ -37,9 +37,7 @@ namespace Mapbox.Map
 	/// </example>
 	public class RasterTile : Tile
 	{
-		private Texture2D texture2D;
 		private byte[] data;
-
 
 		/// <summary> Gets the raster tile raw data. This field is only used if texture is fetched/stored as byte array. Otherwise, if it's fetched as texture, you should use Texture2D.</summary>
 		/// <value> The raw data, usually an encoded JPEG or PNG. </value>
@@ -56,8 +54,6 @@ namespace Mapbox.Map
 			get { return this.data; }
 		}
 
-		
-
 		/// <summary> Gets the imagery as Texture2d object. This field is only used if texture is fetched/stored as Texture2d. Otherwise, if it's fetched as byte array, you should use Data. </summary>
 		/// <value> The raw data, usually an encoded JPEG or PNG. </value>
 		/// <example>
@@ -65,9 +61,16 @@ namespace Mapbox.Map
 		/// _sampleMaterial.mainTexture = rasterTile.Texture2D;
 		/// </code>
 		/// </example>
-		public Texture2D Texture2D
+		public Texture2D Texture2D;
+
+		public RasterTile()
 		{
-			get { return this.texture2D; }
+
+		}
+
+		public RasterTile(CanonicalTileId tileId, string tilesetId) : base(tileId, tilesetId)
+		{
+
 		}
 
 		internal override void Initialize(IFileSource fileSource, CanonicalTileId canonicalTileId, string tilesetId, Action p)
@@ -75,14 +78,14 @@ namespace Mapbox.Map
 			Cancel();
 
 			_state = State.Loading;
-			_id = canonicalTileId;
-			_tilesetId = tilesetId;
+			Id = canonicalTileId;
+			TilesetId = tilesetId;
 			_callback = p;
 
 			//we are passing etag here as well
 			//if it's not null, filesource will make a `FetchTextureIfNoneMatch` request
 			//else it'll be a regular request
-			_unityRequest = fileSource.MapboxImageRequest(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse, 10, _id, tilesetId, ETag);
+			_unityRequest = fileSource.MapboxImageRequest(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse, 10, Id, tilesetId, ETag);
 		}
 
 		public override void Cancel()
@@ -107,7 +110,7 @@ namespace Mapbox.Map
 			else
 			{
 				StatusCode = textureResponse.StatusCode;
-				texture2D = textureResponse.Texture2D;
+				Texture2D = textureResponse.Texture2D;
 				data = textureResponse.Data;
 				ETag = textureResponse.ETag;
 				ExpirationDate = textureResponse.ExpirationDate;
@@ -135,16 +138,13 @@ namespace Mapbox.Map
 			return true;
 		}
 
-		internal virtual void SetTexture2D(Texture2D texture)
+		public override void Clear()
 		{
-			this.texture2D = texture;
-		}
-
-		public void ClearDataReferences()
-		{
+			base.Clear();
 			//clearing references for simplicity. It doesn't really block GC but it's clearer this way
 			data = null;
-			texture2D = null;
+			Texture2D = null;
 		}
+
 	}
 }

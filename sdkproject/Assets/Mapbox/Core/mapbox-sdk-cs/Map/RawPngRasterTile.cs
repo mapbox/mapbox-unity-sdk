@@ -32,6 +32,10 @@ namespace Mapbox.Map
 		{
 			return TileResource.MakeRawPngRaster(Id, tilesetId);
 		}
+
+		public RawPngRasterTile(CanonicalTileId tileId, string tilesetId) : base(tileId, tilesetId)
+		{
+		}
 	}
 
 	public class DemTile : RasterTile
@@ -39,6 +43,10 @@ namespace Mapbox.Map
 		internal override TileResource MakeTileResource(string tilesetId)
 		{
 			return TileResource.MakeDemRaster(Id, tilesetId);
+		}
+
+		public DemTile(CanonicalTileId tileId, string tilesetId) : base(tileId, tilesetId)
+		{
 		}
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Mapbox.Map;
 using Mapbox.Unity;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
@@ -7,58 +8,99 @@ using UnityEngine;
 
 namespace CustomImageLayerSample
 {
-    public class CustomImageLayer : MonoBehaviour
-    {
-        [SerializeField] private string _customTilesetId = "AerisHeatMap";
-        [SerializeField] private string UrlFormat = "https://maps.aerisapi.com/anh3TB1Xu9Wr6cPndbPwF_EuOSGuqkH433UmnajaOP0MD9rpIh5dZ38g2SUwvu/flat,ftemperatures-max-text,admin/{0}/{1}/{2}/current.png";
-        private AbstractMap _map;
-        private CustomImageDataFetcher _fetcher;
+	public class CustomImageLayer : MonoBehaviour
+	{
+		[SerializeField] private string _customTilesetId = "AerisHeatMap";
+		[SerializeField] private string UrlFormat = "https://maps.aerisapi.com/anh3TB1Xu9Wr6cPndbPwF_EuOSGuqkH433UmnajaOP0MD9rpIh5dZ38g2SUwvu/flat,ftemperatures-max-text,admin/{0}/{1}/{2}/current.png";
+		private AbstractMap _map;
+		private CustomImageDataFetcher _fetcher;
+		private string CustomTextureFieldName = "_CustomOne";
+		private string CustomTextureScaleOffsetFieldName = "_CustomOne_ST";
 
-        public void Start()
-        {
-            _map = FindObjectOfType<AbstractMap>();
-            _fetcher = new CustomImageDataFetcher(UrlFormat);
+		public void Start()
+		{
+			_map = FindObjectOfType<AbstractMap>();
+			_fetcher = new CustomImageDataFetcher(UrlFormat);
 
-            _fetcher.TextureReceived += TextureReceived;
-            _fetcher.FetchingError += (tile, rasterTile, TileErrorEventArgs) => { Debug.Log(TileErrorEventArgs.Exceptions); };
-            _map.OnTileFinished += LoadTile;
-        }
+			_fetcher.TextureReceived += TextureReceived;
+			_fetcher.FetchingError += (tile, rasterTile, TileErrorEventArgs) => { Debug.Log(TileErrorEventArgs.Exceptions); };
+			_map.OnTileFinished += LoadTile;
+			_map.OnTileDisposing += UnregisterTile;
 
-        private void TextureReceived(UnityTile tile, Texture2D texture)
-        {
-            if (tile != null)
-            {
-                tile.SetRasterTexture(_customTilesetId, texture);
-            }
-            else
-            {
-                Debug.Log("here");
-            }
-        }
+			DownloadAndCacheBaseTiles(_customTilesetId, true);
+		}
 
-        private void LoadTile(UnityTile tile)
-        {
-            var tileLocal = tile;
-            var tileId = tileLocal.CanonicalTileId;
+		public void DownloadAndCacheBaseTiles(string imageryLayerSourceId, bool rasterOptionsUseRetina)
+		{
+			var baseImageDataFetcher = new CustomBaseImageDataFetcher(imageryLayerSourceId);
+			CanonicalTileId tileId;
+			for (int i = 0; i < 4; i++)
+			{
+				for (int j = 0; j < 4; j++)
+				{
+					tileId = new CanonicalTileId(2, i, j);
+					baseImageDataFetcher.FetchData(imageryLayerSourceId, tileId, true);
+				}
+			}
 
-            ApplyParentTexture(tile);
-            _fetcher.FetchData(_customTilesetId, tileId, true, tile);
-        }
+			for (int i = 0; i < 2; i++)
+			{
+				for (int j = 0; j < 2; j++)
+				{
+					tileId = new CanonicalTileId(1, i, j);
+					baseImageDataFetcher.FetchData(imageryLayerSourceId, tileId, true);
+				}
+			}
 
-        private void ApplyParentTexture(UnityTile tile)
-        {
-            var parent = tile.UnwrappedTileId.Parent;
-            for (int i = 0; i < 16; i++)
-            {
-                var cacheItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(_customTilesetId, parent.Canonical);
-                if (cacheItem != null && cacheItem.Texture2D != null)
-                {
-                    tile.SetParentTexture(parent, cacheItem.Texture2D);
-                    break;
-                }
+			tileId = new CanonicalTileId(0, 0, 0);
+			baseImageDataFetcher.FetchData(imageryLayerSourceId, tileId, true);
+		}
 
-                parent = parent.Parent;
-            }
-        }
-    }
+		private void TextureReceived(UnityTile tile, RasterTile rasterTile)
+		{
+			if (tile.CanonicalTileId != rasterTile.Id)
+			{
+				Debug.Log("wtf");
+			}
+
+			if (tile != null)
+			{
+				tile.CustomDataName = rasterTile.Id.ToString();
+				tile.MeshRenderer.sharedMaterial.SetTexture(CustomTextureFieldName, rasterTile.Texture2D);
+				tile.MeshRenderer.sharedMaterial.SetVector(CustomTextureScaleOffsetFieldName, new Vector4(1, 1, 0, 0));
+			}
+		}
+
+		private void LoadTile(UnityTile tile)
+		{
+			var tileLocal = tile;
+			var tileId = tileLocal.CanonicalTileId;
+
+			ApplyParentTexture(tile);
+			_fetcher.FetchData(_customTilesetId, tileId, true, tile);
+		}
+
+		protected void UnregisterTile(UnityTile tile)
+		{
+			tile.MeshRenderer.sharedMaterial.SetTexture(CustomTextureFieldName, null);
+			tile.MeshRenderer.sharedMaterial.SetVector(CustomTextureScaleOffsetFieldName, new Vector4(1, 1, 0, 0));
+			_fetcher.CancelFetching(tile.UnwrappedTileId, _customTilesetId);
+		}
+
+		private void ApplyParentTexture(UnityTile tile)
+		{
+			var parent = tile.UnwrappedTileId.Parent;
+			for (int i = tile.CanonicalTileId.Z - 1; i > 0; i--)
+			{
+				var cacheItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(_customTilesetId, parent.Canonical);
+				if (cacheItem != null && cacheItem.Texture2D != null)
+				{
+					tile.SetParentTexture(parent, cacheItem.Texture2D, CustomTextureFieldName, CustomTextureScaleOffsetFieldName);
+					break;
+				}
+
+				parent = parent.Parent;
+			}
+		}
+	}
 }

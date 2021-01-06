@@ -115,7 +115,7 @@ public class VectorDataFetcher : DataFetcher
 
 	private void CreateWebRequest(string tilesetId, CanonicalTileId tileId, bool useOptimizedStyle, Style optimizedStyle, string etag, UnityTile unityTile = null)
 	{
-		var vectorTile = (useOptimizedStyle) ? new VectorTile(optimizedStyle.Id, optimizedStyle.Modified) : new VectorTile();
+		var vectorTile = (useOptimizedStyle) ? new VectorTile(tileId, tilesetId, optimizedStyle.Id, optimizedStyle.Modified) : new VectorTile(tileId, tilesetId);
 
 
 		if (unityTile != null)
@@ -165,10 +165,10 @@ public class VectorDataFetcher : DataFetcher
 			}
 		}
 
-		if (unityTile != null)
-		{
-			unityTile.RemoveTile(vectorTile);
-		}
+		// if (unityTile != null)
+		// {
+		// 	unityTile.RemoveTile(vectorTile);
+		// }
 	}
 }
 

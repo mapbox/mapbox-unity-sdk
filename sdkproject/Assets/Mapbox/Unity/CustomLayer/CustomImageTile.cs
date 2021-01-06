@@ -11,7 +11,7 @@ namespace CustomImageLayerSample
 	{
 		private string _urlFormat = "https://maps.aerisapi.com/anh3TB1Xu9Wr6cPndbPwF_EuOSGuqkH433UmnajaOP0MD9rpIh5dZ38g2SUwvu/flat,ftemperatures-max-text,admin/{0}/{1}/{2}/current.png";
 
-		public CustomImageTile(string format)
+		public CustomImageTile(CanonicalTileId tileId, string tilesetId, string format) : base(tileId, tilesetId)
 		{
 			_urlFormat = format;
 		}
@@ -21,16 +21,18 @@ namespace CustomImageLayerSample
 			Cancel();
 
 			_state = State.Loading;
-			_id = canonicalTileId;
-			_tilesetId = tilesetId;
+			Id = canonicalTileId;
+			TilesetId = tilesetId;
 			_callback = p;
 
-			fileSource.CustomImageRequest(GetURL(_id), HandleTileResponse, tileId: _id, tilesetId: tilesetId);
+			fileSource.CustomImageRequest(GetURL(Id), HandleTileResponse, tileId: Id, tilesetId: tilesetId);
 		}
 
 		private string GetURL(CanonicalTileId id)
 		{
 			return string.Format(_urlFormat, id.Z, id.X, id.Y);
 		}
+
+
 	}
 }

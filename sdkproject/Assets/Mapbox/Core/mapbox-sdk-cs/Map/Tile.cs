@@ -23,11 +23,12 @@ namespace Mapbox.Map
 	///    bounding box. More info <see href="https://en.wikipedia.org/wiki/Tiled_web_map">
 	///    here </see>.
 	/// </summary>
+	[Serializable]
 	public abstract class Tile : IAsyncRequest
 	{
-		protected string _tilesetId;
-		protected CanonicalTileId _id;
-		
+		public string TilesetId;
+		public CanonicalTileId Id;
+
 		public long StatusCode;
 		public DateTime ExpirationDate;
 		public string ETag;
@@ -37,6 +38,17 @@ namespace Mapbox.Map
 		protected IAsyncRequest _request;
 		protected UnityWebRequest _unityRequest;
 		protected Action _callback;
+
+		protected Tile()
+		{
+
+		}
+
+		protected Tile(CanonicalTileId tileId, string tilesetId)
+		{
+			TilesetId = tilesetId;
+			Id = tileId;
+		}
 
 		/// <summary> Tile state. </summary>
 		public enum State
@@ -59,13 +71,6 @@ namespace Mapbox.Map
 
 		/// <summary> Gets the <see cref="T:Mapbox.Map.CanonicalTileId"/> identifier. </summary>
 		/// <value> The canonical tile identifier. </value>
-		public CanonicalTileId Id
-		{
-			get { return _id; }
-			set { _id = value; }
-		}
-
-		public string TilesetId => _tilesetId;
 
 		/// <summary>Flag to indicate if the request was successful</summary>
 		public bool HasError
@@ -145,7 +150,7 @@ namespace Mapbox.Map
 			Cancel();
 
 			_state = State.Loading;
-			_id = param.Id;
+			Id = param.Id;
 			_callback = callback;
 			_request = param.Fs.Request(MakeTileResource(param.TilesetId).GetUrl(), HandleTileResponse);
 		}
@@ -155,9 +160,9 @@ namespace Mapbox.Map
 			Cancel();
 
 			_state = State.Loading;
-			_id = canonicalTileId;
+			Id = canonicalTileId;
 			_callback = p;
-			_tilesetId = tilesetId;
+			TilesetId = tilesetId;
 
 			_request = fileSource.Request(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse);
 		}
@@ -230,8 +235,8 @@ namespace Mapbox.Map
 		{
 			if (response.HasError)
 			{
-				if (!ids.Contains(_id.ToString()))
-					ids.Add(_id.ToString());
+				if (!ids.Contains(Id.ToString()))
+					ids.Add(Id.ToString());
 				else
 					return;
 
@@ -264,6 +269,14 @@ namespace Mapbox.Map
 			_callback();
 		}
 
+		public virtual void Clear()
+		{
+			if (_request != null)
+			{
+				_request.Cancel();
+				_request = null;
+			}
+		}
 
 		/// <summary>
 		///    Parameters for initializing a Tile object.

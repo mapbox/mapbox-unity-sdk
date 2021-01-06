@@ -70,36 +70,16 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				{
 					if (rasterTile.Texture2D != null)
 					{
-						tile.SetRasterTexture(TilesetId, rasterTile.Texture2D);
+						tile.SetRasterTexture(rasterTile);
 					}
 					else
 					{
-						tile.SetRasterData(TilesetId, rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
+						tile.SetRasterData(rasterTile, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
 					}
 				}
 			}
 
-			rasterTile.ClearDataReferences();
-		}
-
-		private void OnImageRecieved(UnityTile tile, Texture2D texture)
-		{
-			if (tile != null)
-			{
-				_tilesWaitingResponse.Remove(tile);
-
-				if (tile.RasterDataState != TilePropertyState.Unregistered)
-				{
-					if (texture != null)
-					{
-						tile.SetRasterTexture(TilesetId, texture);
-					}
-					else
-					{
-						//tile.SetRasterData(rasterTile.Data, _properties.rasterOptions.useMipMap, _properties.rasterOptions.useCompression);
-					}
-				}
-			}
+			rasterTile.Clear();
 		}
 
 		//merge this with OnErrorOccurred?
@@ -135,7 +115,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			if (_properties.sourceType == ImagerySourceType.None)
 			{
-				tile.SetRasterData(TilesetId, null);
+				tile.SetRasterData(null);
 				tile.RasterDataState = TilePropertyState.None;
 				return;
 			}

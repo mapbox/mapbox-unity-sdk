@@ -17,21 +17,27 @@ namespace Mapbox.Map
 	/// </summary>
 	public class CustomRasterTile : RasterTile
 	{
+		public CustomRasterTile(CanonicalTileId tileId, string tilesetId) : base(tileId, tilesetId)
+		{
+			
+		}
+
 		internal override void Initialize(IFileSource fileSource, CanonicalTileId canonicalTileId, string tilesetId, Action p)
 		{
 			Cancel();
 
 			_state = State.Loading;
-			_id = canonicalTileId;
-			_tilesetId = tilesetId;
+			Id = canonicalTileId;
+			TilesetId = tilesetId;
 			_callback = p;
 
-			fileSource.CustomImageRequest(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse, tileId: _id, tilesetId: tilesetId);
+			fileSource.CustomImageRequest(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse, tileId: Id, tilesetId: tilesetId);
 		}
 
 		internal override TileResource MakeTileResource(string tilesetId)
 		{
 			return TileResource.MakeCustomRaster(Id, tilesetId);
 		}
+
 	}
 }

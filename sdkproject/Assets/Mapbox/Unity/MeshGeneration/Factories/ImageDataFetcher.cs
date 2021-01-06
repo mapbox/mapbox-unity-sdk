@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 public class ImageDataFetcher : DataFetcher
 {
-	public Action<UnityTile, Texture2D> TextureReceived = (t, s) => { };
+	public Action<UnityTile, RasterTile> TextureReceived = (t, s) => { };
 	public Action<UnityTile, RasterTile, TileErrorEventArgs> FetchingError = (t, r, s) => { };
 
 	public override void FetchData(DataFetcherParameters parameters)
@@ -33,7 +33,10 @@ public class ImageDataFetcher : DataFetcher
 		var textureItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(tilesetId, tileId);
 		if (textureItem != null)
 		{
-			TextureReceived(unityTile, textureItem.Texture2D);
+			var rasterTile = new RasterTile(tileId, tilesetId) {Texture2D = textureItem.Texture2D};
+			if (unityTile != null) { unityTile.AddTile(rasterTile); }
+
+			TextureReceived(unityTile, rasterTile);
 			return;
 		}
 
@@ -42,13 +45,22 @@ public class ImageDataFetcher : DataFetcher
 		{
 			MapboxAccess.Instance.CacheManager.GetTextureItemFromFile(tilesetId, tileId, (textureCacheItem) =>
 			{
+				if (unityTile != null && unityTile.CanonicalTileId != tileId)
+				{
+					//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
+					return;
+				}
+
 				//even though we just checked file exists, system couldn't find&load it
 				//this shouldn't happen frequently, only in some corner cases
 				//one possibility might be file being pruned due to hitting cache limit
 				//after that first check few lines above and actual loading (loading is scheduled and delayed so it's not in same frame)
 				if (textureCacheItem != null)
 				{
-					TextureReceived(unityTile, textureCacheItem.Texture2D);
+					var rasterTile = new RasterTile(tileId, tilesetId) {Texture2D = textureCacheItem.Texture2D};
+					if (unityTile != null) { unityTile.AddTile(rasterTile); }
+
+					TextureReceived(unityTile, rasterTile);
 
 					//after returning what we already have
 					//check if it's out of date, if so check server for update
@@ -77,11 +89,11 @@ public class ImageDataFetcher : DataFetcher
 		//but caching type and using Activator.CreateInstance (or caching func and calling it)  is even slower
 		if (tilesetId.StartsWith("mapbox://", StringComparison.Ordinal))
 		{
-			rasterTile = useRetina ? new RetinaRasterTile() : new RasterTile();
+			rasterTile = useRetina ? new RetinaRasterTile(tileId, tilesetId) : new RasterTile(tileId, tilesetId);
 		}
 		else
 		{
-			rasterTile = useRetina ? new ClassicRetinaRasterTile() : new ClassicRasterTile();
+			rasterTile = useRetina ? new ClassicRetinaRasterTile(tileId, tilesetId) : new ClassicRasterTile(tileId, tilesetId);
 		}
 
 		if (unityTile != null)
@@ -101,7 +113,7 @@ public class ImageDataFetcher : DataFetcher
 
 	protected virtual void FetchingCallback(CanonicalTileId tileId, RasterTile rasterTile, UnityTile unityTile = null)
 	{
-		if (unityTile != null && unityTile.CanonicalTileId != rasterTile.Id)
+		if (unityTile != null && !unityTile.ContainsDataTile(rasterTile))
 		{
 			//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
 			return;
@@ -114,7 +126,10 @@ public class ImageDataFetcher : DataFetcher
 		else
 		{
 #if UNITY_EDITOR
-			rasterTile.Texture2D.name = string.Format("{0}_{1}", tileId.ToString(), rasterTile.TilesetId);
+			if (rasterTile.Texture2D != null)
+			{
+				rasterTile.Texture2D.name = string.Format("{0}_{1}", tileId.ToString(), rasterTile.TilesetId);
+			}
 #endif
 			MapboxAccess.Instance.CacheManager.AddTextureItem(
 				rasterTile.TilesetId,
@@ -130,14 +145,14 @@ public class ImageDataFetcher : DataFetcher
 
 			if (rasterTile.StatusCode != 304) //NOT MODIFIED
 			{
-				TextureReceived(unityTile, rasterTile.Texture2D);
+				TextureReceived(unityTile, rasterTile);
 			}
 		}
 
-		if (unityTile != null)
-		{
-			unityTile.RemoveTile(rasterTile);
-		}
+		// if (unityTile != null)
+		// {
+		// 	unityTile.RemoveTile(rasterTile);
+		// }
 	}
 }
 
@@ -149,7 +164,12 @@ public class BaseImageDataFetcher : ImageDataFetcher
 		var textureItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(tilesetId, tileId);
 		if (textureItem != null)
 		{
-			TextureReceived(unityTile, textureItem.Texture2D);
+			TextureReceived(
+				unityTile,
+				new RasterTile(tileId, tilesetId)
+				{
+					Texture2D = textureItem.Texture2D
+				});
 			return;
 		}
 
@@ -164,7 +184,12 @@ public class BaseImageDataFetcher : ImageDataFetcher
 				//after that first check few lines above and actual loading (loading is scheduled and delayed so it's not in same frame)
 				if (textureCacheItem != null)
 				{
-					TextureReceived(unityTile, textureCacheItem.Texture2D);
+					TextureReceived(
+						unityTile,
+						new RasterTile(tileId, tilesetId)
+						{
+							Texture2D = textureCacheItem.Texture2D
+						});
 					MapboxAccess.Instance.CacheManager.MarkFixed(tileId, tilesetId);
 
 					//after returning what we already have

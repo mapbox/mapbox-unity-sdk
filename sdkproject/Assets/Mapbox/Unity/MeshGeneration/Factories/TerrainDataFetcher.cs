@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class TerrainDataFetcher : DataFetcher
 {
-	public Action<UnityTile, Texture2D> TextureReceived = (t, s) => { };
+	public Action<UnityTile, RasterTile> TextureReceived = (t, s) => { };
 	public Action<UnityTile, RasterTile, TileErrorEventArgs> FetchingError = (t, r, s) => { };
 
 	public override void FetchData(DataFetcherParameters parameters)
@@ -30,7 +30,10 @@ public class TerrainDataFetcher : DataFetcher
 		var textureItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(tilesetId, tileId);
 		if (textureItem != null)
 		{
-			TextureReceived(unityTile, textureItem.Texture2D);
+			var rasterTile = new RasterTile(tileId, tilesetId) {Texture2D = textureItem.Texture2D};
+			if(unityTile != null)  unityTile.AddTile(rasterTile);
+
+			TextureReceived(unityTile, rasterTile);
 			return;
 		}
 
@@ -45,7 +48,10 @@ public class TerrainDataFetcher : DataFetcher
 				//after that first check few lines above and actual loading (loading is scheduled and delayed so it's not in same frame)
 				if (textureCacheItem != null)
 				{
-					TextureReceived(unityTile, textureCacheItem.Texture2D);
+					var rasterTile = new RasterTile(tileId, tilesetId) {Texture2D = textureCacheItem.Texture2D};
+					if(unityTile != null) { unityTile.AddTile(rasterTile); }
+
+					TextureReceived(unityTile, rasterTile);
 
 					//after returning what we already have
 					//check if it's out of date, if so check server for update
@@ -73,11 +79,11 @@ public class TerrainDataFetcher : DataFetcher
 
 		if (tilesetId.StartsWith("mapbox://", StringComparison.Ordinal))
 		{
-			rasterTile = new DemTile();
+			rasterTile = new DemTile(tileId, tilesetId);
 		}
 		else
 		{
-			rasterTile = new RawPngRasterTile();
+			rasterTile = new RawPngRasterTile(tileId, tilesetId);
 		}
 
 		if (unityTile != null)
@@ -126,14 +132,19 @@ public class TerrainDataFetcher : DataFetcher
 
 			if (rasterTile.StatusCode != 304) //NOT MODIFIED
 			{
-				TextureReceived(unityTile, rasterTile.Texture2D);
+				TextureReceived(
+					unityTile,
+					new RasterTile(tileId, rasterTile.TilesetId)
+					{
+						Texture2D = rasterTile.Texture2D
+					});
 			}
 		}
 
-		if (unityTile != null)
-		{
-			unityTile.RemoveTile(rasterTile);
-		}
+		// if (unityTile != null)
+		// {
+		// 	unityTile.RemoveTile(rasterTile);
+		// }
 	}
 }
 

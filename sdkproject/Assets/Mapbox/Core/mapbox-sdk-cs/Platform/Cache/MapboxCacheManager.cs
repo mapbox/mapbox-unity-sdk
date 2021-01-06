@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Mapbox.Map;
 using Mapbox.Unity.MeshGeneration.Data;
@@ -214,19 +215,9 @@ namespace Mapbox.Platform.Cache
         //when a tile is disposed&recycled, we mark data used in that for priority on removal
         public void TileDisposed(UnityTile tile)
         {
-            if (!string.IsNullOrEmpty(tile.RasterDataTilesetId))
+            foreach (var dataTile in tile.Tiles)
             {
-                _memoryCache?.AddToDisposeList(tile.RasterDataTilesetId, tile.CanonicalTileId);
-            }
-
-            if (!string.IsNullOrEmpty(tile.ElevationDataTilesetId))
-            {
-                _memoryCache?.AddToDisposeList(tile.ElevationDataTilesetId, tile.CanonicalTileId);
-            }
-
-            if (!string.IsNullOrEmpty(tile.VectorDataTilesetId))
-            {
-                _memoryCache?.AddToDisposeList(tile.VectorDataTilesetId, tile.CanonicalTileId);
+                _memoryCache?.AddToDisposeList(dataTile.TilesetId, dataTile.Id);
             }
         }
 

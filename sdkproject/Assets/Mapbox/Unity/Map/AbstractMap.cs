@@ -665,7 +665,7 @@ namespace Mapbox.Unity.Map
 				_vectorData.Factory
 			};
 
-			MapboxAccess.Instance.DownloadAndCacheBaseTiles(_imagery.LayerSourceId, _imagery.LayerProperty.rasterOptions.useRetina);
+			//MapboxAccess.Instance.DownloadAndCacheBaseTiles(_imagery.LayerSourceId, _imagery.LayerProperty.rasterOptions.useRetina);
 
 			InitializeMap(_options);
 		}
