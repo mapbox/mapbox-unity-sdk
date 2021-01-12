@@ -529,6 +529,8 @@
 
 			EditorGUI.indentLevel++;
 
+			EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("performanceOptions"), new GUIContent("Perfomance Options"));
+
 			//*********************** FILTERS SECTION BEGINS ***********************************//
 			var filterOptions = layerProperty.FindPropertyRelative("filterOptions");
 			filterOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
