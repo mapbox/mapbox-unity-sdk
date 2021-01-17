@@ -88,7 +88,6 @@ namespace Mapbox.Platform.Cache
 					var keys = _cachedItems.Keys.ToArray();
 					foreach (var keyToRemove in keys)
 					{
-						_itemsToDestroy.RemoveAt(0);
 						RemoveItemCacheItem(keyToRemove);
 						_destroyedItemCounter++;
 						_cachedItems.Remove(keyToRemove);
@@ -191,10 +190,17 @@ namespace Mapbox.Platform.Cache
 			var key = tileId.GenerateKey(tilesetId);
 			if (_cachedItems.ContainsKey(key))
 			{
+				if(!_fixedItems.ContainsKey(key))
+				{
 				var cacheItem = _cachedItems[key];
 				_cachedItems.Remove(key);
 				_itemsToDestroy.Remove(key);
 				_fixedItems.Add(key, cacheItem);
+				}
+				else
+				{
+					Debug.Log("Item is already marked as base image");
+				}
 			}
 			else
 			{

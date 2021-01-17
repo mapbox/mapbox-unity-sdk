@@ -242,32 +242,6 @@ namespace Mapbox.Unity
 			return _fileSource.CustomImageRequest(url, callback, _configuration.DefaultTimeout, tileId, tilesetId);
 		}
 
-		public void DownloadAndCacheBaseTiles(string imageryLayerSourceId, bool rasterOptionsUseRetina)
-		{
-			var baseImageDataFetcher = new BaseImageDataFetcher();
-			CanonicalTileId tileId;
-			for (int i = 0; i < 4; i++)
-			{
-				for (int j = 0; j < 4; j++)
-				{
-					tileId = new CanonicalTileId(2, i, j);
-					baseImageDataFetcher.FetchData(imageryLayerSourceId, tileId, true);
-				}
-			}
-
-			for (int i = 0; i < 2; i++)
-			{
-				for (int j = 0; j < 2; j++)
-				{
-					tileId = new CanonicalTileId(1, i, j);
-					baseImageDataFetcher.FetchData(imageryLayerSourceId, tileId, true);
-				}
-			}
-
-			tileId = new CanonicalTileId(0, 0, 0);
-			baseImageDataFetcher.FetchData(imageryLayerSourceId, tileId, true);
-		}
-
 		Geocoder _geocoder;
 		/// <summary>
 		/// Lazy geocoder.

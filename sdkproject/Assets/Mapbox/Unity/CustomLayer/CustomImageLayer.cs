@@ -32,7 +32,7 @@ namespace CustomImageLayerSample
 
 		public void DownloadAndCacheBaseTiles(string imageryLayerSourceId, bool rasterOptionsUseRetina)
 		{
-			var baseImageDataFetcher = new CustomBaseImageDataFetcher(imageryLayerSourceId);
+			var baseImageDataFetcher = new CustomBaseImageDataFetcher(UrlFormat);
 			CanonicalTileId tileId;
 			for (int i = 0; i < 4; i++)
 			{

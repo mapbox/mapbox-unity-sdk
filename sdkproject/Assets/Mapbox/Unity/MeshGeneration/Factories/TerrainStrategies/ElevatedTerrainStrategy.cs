@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using UnityEngine;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.Map;
@@ -21,7 +22,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 	{
 		private Dictionary<UnwrappedTileId, Mesh> _meshData;
 		private MeshData _currentTileMeshData;
-		private Dictionary<UnityTile, MeshDataArray> _cachedMeshDataArrays;
+		private Dictionary<GameObject, MeshDataArray> _cachedMeshDataArrays;
 		private Dictionary<UnwrappedTileId, MeshDataArray> _dataArrays;
 		private Dictionary<int, MeshDataArray> _meshSamples;
 
@@ -44,7 +45,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 
 			_meshSamples = new Dictionary<int, MeshDataArray>();
 			_dataArrays = new Dictionary<UnwrappedTileId, MeshDataArray>();
-			_cachedMeshDataArrays = new Dictionary<UnityTile, MeshDataArray>();
+			_cachedMeshDataArrays = new Dictionary<GameObject, MeshDataArray>();
 
 			_meshData = new Dictionary<UnwrappedTileId, Mesh>();
 			_currentTileMeshData = new MeshData();
@@ -90,28 +91,26 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			}
 			else
 			{
-				if (tile.MeshFilter.sharedMesh.vertexCount != RequiredVertexCount || !_cachedMeshDataArrays.ContainsKey(tile))
+				if (tile.MeshFilter.sharedMesh.vertexCount != RequiredVertexCount || !_cachedMeshDataArrays.ContainsKey(tile.gameObject))
 				{
 					tile.MeshFilter.sharedMesh.Clear();
 
+					MeshDataArray newMesh;
 					if (_meshSamples.ContainsKey(_elevationOptions.modificationOptions.sampleCount))
 					{
-						var newMesh = _meshSamples[_elevationOptions.modificationOptions.sampleCount];
-						tile.MeshFilter.sharedMesh.vertices = newMesh.Vertices;
-						tile.MeshFilter.sharedMesh.normals = newMesh.Normals;
-						tile.MeshFilter.sharedMesh.triangles = newMesh.Triangles;
-						tile.MeshFilter.sharedMesh.uv = newMesh.Uvs;
+						newMesh = _meshSamples[_elevationOptions.modificationOptions.sampleCount];
 					}
 					else
 					{
-						//TODO remoev tile dependency from CreateBaseMesh method
-						var newMesh = CreateBaseMesh(tile, _elevationOptions.modificationOptions.sampleCount);
+						//TODO remove tile dependency from CreateBaseMesh method
+						newMesh = CreateBaseMesh(tile, _elevationOptions.modificationOptions.sampleCount);
 						_meshSamples.Add(_elevationOptions.modificationOptions.sampleCount, newMesh);
-						tile.MeshFilter.sharedMesh.vertices = newMesh.Vertices;
-						tile.MeshFilter.sharedMesh.normals = newMesh.Normals;
-						tile.MeshFilter.sharedMesh.triangles = newMesh.Triangles;
-						tile.MeshFilter.sharedMesh.uv = newMesh.Uvs;
 					}
+
+					tile.MeshFilter.sharedMesh.vertices = newMesh.Vertices;
+					tile.MeshFilter.sharedMesh.normals = newMesh.Normals;
+					tile.MeshFilter.sharedMesh.triangles = newMesh.Triangles;
+					tile.MeshFilter.sharedMesh.uv = newMesh.Uvs;
 
 					if (!_dataArrays.ContainsKey(tile.UnwrappedTileId))
 					{
@@ -125,8 +124,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				}
 				else
 				{
-					_dataArrays.Add(tile.UnwrappedTileId, _cachedMeshDataArrays[tile]);
-					_cachedMeshDataArrays.Remove(tile);
+					_dataArrays.Add(tile.UnwrappedTileId, _cachedMeshDataArrays[tile.gameObject]);
+					_cachedMeshDataArrays.Remove(tile.gameObject);
 				}
 
 				tile.ElevationType = TileTerrainType.Elevated;
@@ -140,7 +139,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			_meshData.Remove(tile.UnwrappedTileId);
 			if (_dataArrays.ContainsKey(tile.UnwrappedTileId))
 			{
-				_cachedMeshDataArrays.Add(tile, _dataArrays[tile.UnwrappedTileId]);
+				if (!_cachedMeshDataArrays.ContainsKey(tile.gameObject))
+				{
+					_cachedMeshDataArrays.Add(tile.gameObject, _dataArrays[tile.UnwrappedTileId]);
+				}
 				_dataArrays.Remove(tile.UnwrappedTileId);
 			}
 		}

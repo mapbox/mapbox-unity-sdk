@@ -528,7 +528,10 @@ namespace Mapbox.Unity.Map
 						TileTracker.Remove(s.UnwrappedTileId);
 					}
 				};
-				_mapVisualizer.OnTileDisposing += OnTileDisposing;
+				_mapVisualizer.OnTileDisposing += tile =>
+				{
+					OnTileDisposing(tile);
+				};
 				_mapVisualizer.OnTileDisposing += tile => { MapboxAccess.Instance.CacheManager.TileDisposed(tile); };
 			}
 		}
@@ -665,14 +668,13 @@ namespace Mapbox.Unity.Map
 				_vectorData.Factory
 			};
 
-			//MapboxAccess.Instance.DownloadAndCacheBaseTiles(_imagery.LayerSourceId, _imagery.LayerProperty.rasterOptions.useRetina);
-
 			InitializeMap(_options);
 		}
 
 		protected virtual void TileProvider_OnTileAdded(UnwrappedTileId tileId, bool enableTileRightAway = false)
 		{
 			var tile = _mapVisualizer.LoadTile(tileId, enableTileRightAway);
+			OnTileRegisteredToFactories(tile);
 			if (Options.placementOptions.snapMapToZero && !_worldHeightFixed)
 			{
 				_worldHeightFixed = true;
@@ -937,6 +939,7 @@ namespace Mapbox.Unity.Map
 					{
 						TileProvider_OnTileRemoved(t2r);
 					}
+					//TileProvider_OnTileRemoved(t2r);
 				}
 			}
 
@@ -1286,6 +1289,9 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		//public event Action<UnwrappedTileId> OnTileDisposing = delegate { };
 		public event Action<UnityTile> OnTileDisposing = delegate { };
+
+		public event Action<UnityTile> OnTileRegisteredToFactories = delegate { };
+
 		#endregion
 	}
 }

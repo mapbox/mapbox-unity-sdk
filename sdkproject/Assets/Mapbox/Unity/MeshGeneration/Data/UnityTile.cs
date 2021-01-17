@@ -270,56 +270,10 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			Tiles.Clear();
 		}
 
-		public void SetHeightData(RasterTile rasterTile, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false)
+		public void SetHeightData(RasterTile rasterTile, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false, Action<UnityTile> callback = null)
 		{
 			if (HeightDataState != TilePropertyState.Unregistered)
 			{
-				ElevationDataTilesetId = rasterTile.TilesetId;
-				//reset height data
-				if (rasterTile.Data == null)
-				{
-					HeightData = new float[256 * 256];
-					HeightDataState = TilePropertyState.None;
-					return;
-				}
-
-				// HACK: compute height values for terrain. We could probably do this without a texture2d.
-				if (_heightTexture == null)
-				{
-					_heightTexture = new Texture2D(0, 0);
-				}
-
-				_heightTexture.LoadImage(rasterTile.Data);
-				byte[] rgbData = _heightTexture.GetRawTextureData();
-
-				// Get rid of this temporary texture. We don't need to bloat memory.
-				_heightTexture.LoadImage(null);
-
-				if (HeightData == null)
-				{
-					HeightData = new float[256 * 256];
-				}
-
-				var relativeScale = useRelative ? _relativeScale : 1f;
-				for (int xx = 0; xx < 256; ++xx)
-				{
-					for (int yy = 0; yy < 256; ++yy)
-					{
-						float r = rgbData[(xx * 256 + yy) * 4 + 1];
-						float g = rgbData[(xx * 256 + yy) * 4 + 2];
-						float b = rgbData[(xx * 256 + yy) * 4 + 3];
-						//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
-						HeightData[xx * 256 + yy] = relativeScale * heightMultiplier * (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
-					}
-				}
-			}
-		}
-
-		public void SetHeightTexture(RasterTile rasterTile, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false, Action<UnityTile> callback = null)
-		{
-			if (HeightDataState != TilePropertyState.Unregistered)
-			{
-				ElevationDataTilesetId = rasterTile.TilesetId;
 				//reset height data
 				if (rasterTile.Texture2D == null)
 				{
@@ -333,65 +287,15 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					HeightData = new float[_heightDataResolution * _heightDataResolution];
 				}
 
-				_heightTexture = rasterTile.Texture2D;
-				byte[] rgbData = _heightTexture.GetRawTextureData();
-				//var rgbData = _heightTexture.GetRawTextureData<Color32>();
-				var relativeScale = useRelative ? _relativeScale : 1f;
-				var width = _heightTexture.width;
-				for (float yy = 0; yy < _heightDataResolution; yy++)
+				var tileId = rasterTile.Id;
+
+				AsyncGPUReadback.Request(rasterTile.Texture2D, 0, (t) =>
 				{
-					for (float xx = 0; xx < _heightDataResolution; xx++)
+					if (CanonicalTileId != tileId || IsRecycled)
 					{
-						var index = (((int) ((yy / _heightDataResolution) * width) * width) + (int) ((xx / _heightDataResolution) * width));
-
-						float r = rgbData[index * 4 + 1];
-						float g = rgbData[index * 4 + 2];
-						float b = rgbData[index * 4 + 3];
-						//var color = rgbData[index];
-						// float r = color.g;
-						// float g = color.b;
-						// float b = color.a;
-						//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
-						HeightData[(int) (yy * _heightDataResolution + xx)] = relativeScale * heightMultiplier * (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
-						//678 ==> 012345678
-						//345
-						//012
+						return;
 					}
-				}
 
-				HeightDataState = TilePropertyState.Loaded;
-
-				// Get rid of this temporary texture. We don't need to bloat memory.
-				//_heightTexture.LoadImage(null);
-			}
-		}
-
-		public void SetHeightTextureForShader(RasterTile rasterTile, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false, Action<UnityTile> callback = null)
-		{
-			if (HeightDataState != TilePropertyState.Unregistered)
-			{
-				ElevationDataTilesetId = rasterTile.TilesetId;
-				//reset height data
-				if (rasterTile.Texture2D == null)
-				{
-					HeightData = new float[_heightDataResolution * _heightDataResolution];
-					HeightDataState = TilePropertyState.None;
-					return;
-				}
-
-				if (HeightData == null)
-				{
-					HeightData = new float[_heightDataResolution * _heightDataResolution];
-				}
-
-				_heightTexture = rasterTile.Texture2D;
-
-				MeshRenderer.sharedMaterial.SetTexture("_HeightTexture", _heightTexture);
-				MeshRenderer.sharedMaterial.SetFloat("_TileScale", _tileScale);
-				HeightDataState = TilePropertyState.Loaded;
-
-				AsyncGPUReadback.Request(_heightTexture, 0, (t) =>
-				{
 					var width = t.width;
 					var data = t.GetData<Color32>().ToArray();
 
