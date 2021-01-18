@@ -194,10 +194,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			if (string.IsNullOrEmpty(TilesetId) || _properties.sourceOptions.isActive == false || (_properties.vectorSubLayers.Count + _properties.locationPrefabList.Count) == 0)
 			{
-				tile.VectorDataState = TilePropertyState.None;
 				return;
 			}
-			tile.VectorDataState = TilePropertyState.Loading;
 			_tilesWaitingResponse.Add(tile);
 			VectorDataFetcherParameters parameters = new VectorDataFetcherParameters()
 			{
@@ -323,50 +321,46 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		#region DataFetcherEvents
 		private void OnVectorDataRecieved(UnityTile tile, VectorTile.VectorTile vectorTile)
 		{
-			if (tile != null)
-			{
-				_tilesWaitingResponse.Remove(tile);
-				if (tile.VectorDataState != TilePropertyState.Unregistered)
-				{
-					tile.SetVectorData(TilesetId, vectorTile);
-					// FIXME: we can make the request BEFORE getting a response from these!
-					if (tile.HeightDataState == TilePropertyState.Loading ||
-							tile.RasterDataState == TilePropertyState.Loading)
-					{
-						tile.OnHeightDataChanged += DataChangedHandler;
-						tile.OnRasterDataChanged += DataChangedHandler;
-					}
-					else
-					{
-						CreateMeshes(tile);
-					}
-				}
-			}
+			CreateMeshes(tile);
+			// if (tile != null)
+			// {
+			// 	_tilesWaitingResponse.Remove(tile);
+			// 	tile.SetVectorData(TilesetId, vectorTile);
+			// 	// FIXME: we can make the request BEFORE getting a response from these!
+			// 	if (tile.HeightDataState == TilePropertyState.Loading ||
+			// 			tile.RasterDataState == TilePropertyState.Loading)
+			// 	{
+			// 		tile.OnHeightDataChanged += DataChangedHandler;
+			// 		tile.OnRasterDataChanged += DataChangedHandler;
+			// 	}
+			// 	else
+			// 	{
+			// 		tile.OnHeightDataChanged -= DataChangedHandler;
+			// 		tile.OnRasterDataChanged -= DataChangedHandler;
+			// 		CreateMeshes(tile);
+			// 	}
+			// }
 		}
-
-		private void DataChangedHandler(UnityTile tile)
-		{
-			if (tile.VectorDataState != TilePropertyState.Unregistered &&
-				tile.RasterDataState != TilePropertyState.Loading &&
-				tile.HeightDataState != TilePropertyState.Loading)
-			{
-				tile.OnHeightDataChanged -= DataChangedHandler;
-				tile.OnRasterDataChanged -= DataChangedHandler;
-				CreateMeshes(tile);
-			}
-		}
+		//
+		// private void DataChangedHandler(UnityTile tile)
+		// {
+		// 	if (tile.VectorDataState != TilePropertyState.Unregistered &&
+		// 		tile.RasterDataState != TilePropertyState.Loading &&
+		// 		tile.HeightDataState != TilePropertyState.Loading)
+		// 	{
+		// 		tile.OnHeightDataChanged -= DataChangedHandler;
+		// 		tile.OnRasterDataChanged -= DataChangedHandler;
+		// 		CreateMeshes(tile);
+		// 	}
+		// }
 
 		private void OnDataError(UnityTile tile, Mapbox.Map.VectorTile vectorTile, TileErrorEventArgs e)
 		{
 			if (tile != null)
 			{
 				_tilesWaitingResponse.Remove(tile);
-				if (tile.VectorDataState != TilePropertyState.Unregistered)
-				{
-					tile.SetVectorData(TilesetId, null);
-					tile.VectorDataState = TilePropertyState.Error;
-					OnErrorOccurred(e);
-				}
+				tile.SetVectorData(TilesetId, null);
+				OnErrorOccurred(e);
 			}
 
 		}
@@ -411,11 +405,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			for (int i = 0; i < builderList.Count; i++)
 			{
 				CreateFeatureWithBuilder(tile, emptyLayer, builderList[i]);
-			}
-
-			if (!_layerProgress.ContainsKey(tile))
-			{
-				tile.VectorDataState = TilePropertyState.Loaded;
 			}
 		}
 
@@ -479,7 +468,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				{
 					_layerProgress.Remove(tile);
 					_tilesWaitingProcessing.Remove(tile);
-					tile.VectorDataState = TilePropertyState.Loaded;
 				}
 			}
 		}

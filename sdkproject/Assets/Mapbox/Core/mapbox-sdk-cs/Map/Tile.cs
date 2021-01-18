@@ -26,6 +26,11 @@ namespace Mapbox.Map
 	[Serializable]
 	public abstract class Tile : IAsyncRequest
 	{
+#if UNITY_EDITOR
+		public bool IsMapboxTile = false;
+		public bool IsFromCache = true;
+#endif
+
 		public string TilesetId;
 		public CanonicalTileId Id;
 

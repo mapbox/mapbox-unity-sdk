@@ -529,7 +529,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				for (int i = 0; i < featureCount; i++)
 				{
 					//checking if tile is recycled and changed
-					if (tile.UnwrappedTileId != tileId || !_activeCoroutines.ContainsKey(tile) || tile.TileState == Enums.TilePropertyState.Unregistered)
+					if (tile.UnwrappedTileId != tileId || !_activeCoroutines.ContainsKey(tile))
 					{
 						yield break;
 					}
@@ -595,7 +595,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			if (IsFeatureEligibleAfterFiltering(feature, tile, layerProperties))
 			{
-				if (tile != null && tile.gameObject != null && tile.VectorDataState != Enums.TilePropertyState.Cancelled)
+				if (tile != null && tile.gameObject != null)
 				{
 					switch (layerProperties.featureProcessingStage)
 					{

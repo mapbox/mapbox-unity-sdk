@@ -9,7 +9,7 @@ namespace Mapbox.Platform.Cache
 {
     public class MapboxCacheManager
     {
-        private MemoryCache _memoryCache;
+        private IMemoryCache _memoryCache;
         private FileCache _textureFileCache;
         private SQLiteCache _sqLiteCache;
 
@@ -225,5 +225,12 @@ namespace Mapbox.Platform.Cache
         {
             _memoryCache?.Clear();
         }
+
+#if UNITY_EDITOR
+        public MemoryCache GetMemoryCache()
+        {
+            return _memoryCache as MemoryCache;
+        }
+#endif
     }
 }

@@ -27,8 +27,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				tile.gameObject.layer = _elevationOptions.unityLayerOptions.layerId;
 			}
 
-			if (tile.RasterDataState != Enums.TilePropertyState.Loaded ||
-			    tile.MeshFilter.sharedMesh.vertexCount != RequiredVertexCount)
+			if (tile.MeshFilter.sharedMesh.vertexCount != RequiredVertexCount)
 			{
 				if (_elevationOptions.sideWallOptions.isActive)
 				{

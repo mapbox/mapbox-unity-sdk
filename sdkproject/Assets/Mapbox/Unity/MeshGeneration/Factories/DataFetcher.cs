@@ -13,8 +13,8 @@ public abstract class DataFetcher
 	protected MapboxAccess _fileSource;
 	//protected Queue<FetchInfo> _fetchingQueue;
 
-	private static Queue<int> _tileOrder;
-	private static Dictionary<int, FetchInfo> _tileFetchInfos;
+	protected static Queue<int> _tileOrder;
+	protected static Dictionary<int, FetchInfo> _tileFetchInfos;
 
 	protected DataFetcher()
 	{

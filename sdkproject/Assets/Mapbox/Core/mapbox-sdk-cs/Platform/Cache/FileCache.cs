@@ -80,7 +80,7 @@ namespace Mapbox.Platform.Cache
 		public void GetAsync(string mapId, CanonicalTileId tileId, Action<TextureCacheItem> callback)
 		{
 			string filePath = string.Format("{0}/{1}/{2}", PersistantCacheRootFolderPath, MapIdToFolderName(mapId), tileId.GenerateKey(mapId));
-			Runnable.Run(LoadImageCoroutine(filePath, callback));
+			Runnable.Run(LoadImageCoroutine(tileId, mapId, filePath, callback));
 		}
 
 		public void ClearStyle(string style)
@@ -189,7 +189,7 @@ namespace Mapbox.Platform.Cache
 			//FileSaved(info.MapId, info.TileId, info.TextureCacheItem);
 		}
 
-		private IEnumerator LoadImageCoroutine(string filePath, Action<TextureCacheItem> callback)
+		private IEnumerator LoadImageCoroutine(CanonicalTileId tileId, string tilesetId, string filePath, Action<TextureCacheItem> callback)
 		{
 			var fullFilePath = string.Format("{0}.{1}", filePath, FileExtension);
 			if (File.Exists(fullFilePath))
@@ -204,8 +204,12 @@ namespace Mapbox.Platform.Cache
 					}
 					else
 					{
-						var textureCacheItem = new TextureCacheItem();
-						textureCacheItem.Texture2D = DownloadHandlerTexture.GetContent(uwr);
+						var textureCacheItem = new TextureCacheItem
+						{
+							TileId = tileId,
+							TilesetId = tilesetId, 
+							Texture2D = DownloadHandlerTexture.GetContent(uwr)
+						};
 						textureCacheItem.Texture2D.wrapMode = TextureWrapMode.Clamp;
 						textureCacheItem.FilePath = fullFilePath;
 

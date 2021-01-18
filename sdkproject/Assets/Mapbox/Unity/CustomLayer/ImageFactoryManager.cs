@@ -56,7 +56,6 @@ namespace CustomImageLayerSample
 
 			if (unityTile != null)
 			{
-				unityTile.CustomDataName = dataTile.Id.ToString();
 				SetTexture(unityTile, dataTile);
 			}
 

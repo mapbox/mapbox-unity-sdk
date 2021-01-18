@@ -17,26 +17,22 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 	public class UnityTile : MonoBehaviour
 	{
-		public string CustomDataName;
-
 		public TileTerrainType ElevationType;
 
-		public string RasterDataTilesetId;
-		[SerializeField] private Texture2D _rasterData;
 
-		public string VectorDataTilesetId;
-		public Mapbox.VectorTile.VectorTile VectorData { get; private set; }
+		private RasterTile _rasterTile;
+		public RasterTile BaseRasterData => _rasterTile;
 
-		public string ElevationDataTilesetId;
-		[SerializeField] private Texture2D _heightTexture;
+		private RasterTile _terrainTile;
+		public RasterTile TerrainData => _terrainTile;
 		public float[] HeightData;
 
-		private Texture2D _loadingTexture;
+		private Mapbox.VectorTile.VectorTile _vectorTile;
+		public Mapbox.VectorTile.VectorTile VectorData => _vectorTile;
 
 		private int _heightDataResolution = 100;
 		//keeping track of tile objects to be able to cancel them safely if tile is destroyed before data fetching finishes
-		[OdinSerialize] public HashSet<Tile> Tiles = new HashSet<Tile>();
-		[SerializeField] private float _tileScale;
+		public HashSet<Tile> Tiles = new HashSet<Tile>();
 
 		public bool IsRecycled = false;
 
@@ -96,94 +92,21 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		#endregion
 
 		#region Tile Positon/Scale Properties
-		public RectD Rect { get; private set; }
-		public int InitialZoom { get; private set; }
-		public int CurrentZoom { get; private set; }
-
+		[SerializeField] private float _tileScale;
 		public float TileScale
 		{
 			get { return _tileScale; }
 			private set { _tileScale = value; }
 		}
 
+		public RectD Rect { get; private set; }
+		public int CurrentZoom { get; private set; }
+
 		public UnwrappedTileId UnwrappedTileId { get; private set; }
 		public CanonicalTileId CanonicalTileId { get; private set; }
 
 		private float _relativeScale;
 		#endregion
-
-		[SerializeField]
-		private TilePropertyState _rasterDataState;
-		public TilePropertyState RasterDataState
-		{
-			get
-			{
-				return _rasterDataState;
-			}
-			internal set
-			{
-				if (_rasterDataState != value)
-				{
-					_rasterDataState = value;
-					OnRasterDataChanged(this);
-				}
-			}
-		}
-		[SerializeField]
-		private TilePropertyState _heightDataState;
-		public TilePropertyState HeightDataState
-		{
-			get
-			{
-				return _heightDataState;
-			}
-			internal set
-			{
-				if (_heightDataState != value)
-				{
-					_heightDataState = value;
-					OnHeightDataChanged(this);
-				}
-			}
-		}
-		[SerializeField]
-		private TilePropertyState _vectorDataState;
-		public TilePropertyState VectorDataState
-		{
-			get
-			{
-				return _vectorDataState;
-			}
-			internal set
-			{
-				if (_vectorDataState != value)
-				{
-					_vectorDataState = value;
-					OnVectorDataChanged(this);
-				}
-			}
-		}
-		private TilePropertyState _tileState = TilePropertyState.None;
-		public TilePropertyState TileState
-		{
-			get
-			{
-				return _tileState;
-			}
-			set
-			{
-				if (_tileState != value)
-				{
-					_tileState = value;
-				}
-			}
-		}
-
-		public event Action<UnityTile> OnHeightDataChanged = delegate { };
-		public event Action<UnityTile> OnRasterDataChanged = delegate { };
-		public event Action<UnityTile> OnVectorDataChanged = delegate { };
-
-		private bool _isInitialized = false;
 
 		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, float scale, int zoom, Texture2D loadingTexture = null)
 		{
@@ -195,21 +118,14 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			Rect = Conversions.TileBounds(tileId);
 			UnwrappedTileId = tileId;
 			CanonicalTileId = tileId.Canonical;
-			_loadingTexture = loadingTexture;
 
 			float scaleFactor = 1.0f;
-			if (_isInitialized == false)
-			{
-				_isInitialized = true;
-				InitialZoom = zoom;
-			}
 			CurrentZoom = zoom;
 			scaleFactor = Mathf.Pow(2, (map.InitialZoom - zoom));
 			gameObject.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
 			//gameObject.SetActive(true);
 
 			IsRecycled = false;
-
 
 			// Setup Loading as initial state - Unregistered
 			// When tile registers with factories, it will set the appropriate state.
@@ -218,48 +134,13 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		internal void Recycle()
 		{
-			CustomDataName = "";
-			if (_loadingTexture && MeshRenderer != null && MeshRenderer.sharedMaterial != null)
+			if (MeshRenderer != null && MeshRenderer.sharedMaterial != null)
 			{
-				//MeshRenderer.sharedMaterial.mainTexture = _loadingTexture;
-				MeshRenderer.sharedMaterial.SetTexture("_MainTex", _loadingTexture);
-			}
-
-			RasterDataTilesetId = string.Empty;
-			ElevationDataTilesetId = string.Empty;
-			VectorDataTilesetId = string.Empty;
-
-			if (_rasterData != null)
-			{
-				//if you have memory cache module active and then destroy textures here
-				//it'll break the system as memory cache will think it still has the textures
-				//and serve null textures
-				//They are actually destroyed after first usage here
-				//so revisited tiles will not appear
-				//if you ever need to disable memory caching though, you'll need to destroy textures somewhere
-				//and this might be a good place for that
-				//_rasterData.Destroy();
-				_rasterData = null;
-			}
-
-			if (_heightTexture != null)
-			{
-				//_heightTexture.Destroy();
-				_heightTexture = null;
+				MeshRenderer.sharedMaterial.mainTexture = null;
 			}
 
 			gameObject.SetActive(false);
 			IsRecycled = true;
-
-			// Reset internal state.
-			RasterDataState = TilePropertyState.Unregistered;
-			HeightDataState = TilePropertyState.Unregistered;
-			VectorDataState = TilePropertyState.Unregistered;
-			TileState = TilePropertyState.Unregistered;
-
-			OnHeightDataChanged = delegate { };
-			OnRasterDataChanged = delegate { };
-			OnVectorDataChanged = delegate { };
 
 			Cancel();
 
@@ -272,146 +153,107 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void SetHeightData(RasterTile rasterTile, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false, Action<UnityTile> callback = null)
 		{
-			if (HeightDataState != TilePropertyState.Unregistered)
+			//reset height data
+			if (rasterTile.Texture2D == null)
 			{
-				//reset height data
-				if (rasterTile.Texture2D == null)
+				HeightData = new float[_heightDataResolution * _heightDataResolution];
+				return;
+			}
+
+			if (HeightData == null)
+			{
+				HeightData = new float[_heightDataResolution * _heightDataResolution];
+			}
+
+			_terrainTile = rasterTile;
+
+			var tileId = rasterTile.Id;
+
+			AsyncGPUReadback.Request(rasterTile.Texture2D, 0, (t) =>
+			{
+				if (CanonicalTileId != tileId || IsRecycled)
 				{
-					HeightData = new float[_heightDataResolution * _heightDataResolution];
-					HeightDataState = TilePropertyState.None;
 					return;
 				}
 
-				if (HeightData == null)
+				var width = t.width;
+				var data = t.GetData<Color32>().ToArray();
+
+				if (HeightData == null || HeightData.Length != _heightDataResolution * _heightDataResolution)
 				{
 					HeightData = new float[_heightDataResolution * _heightDataResolution];
 				}
 
-				var tileId = rasterTile.Id;
-
-				AsyncGPUReadback.Request(rasterTile.Texture2D, 0, (t) =>
+				var relativeScale = useRelative ? _relativeScale : 1f;
+				//tt = new Texture2D(_heightDataResolution, _heightDataResolution, TextureFormat.RGBA32, false);
+				for (float yy = 0; yy < _heightDataResolution; yy++)
 				{
-					if (CanonicalTileId != tileId || IsRecycled)
+					for (float xx = 0; xx < _heightDataResolution; xx++)
 					{
-						return;
+						var xx2 = (xx / _heightDataResolution) * width;
+						var yy2 = (yy / _heightDataResolution) * width;
+						var index = (((int) yy2 * width) + (int) xx2);
+						//var color = _heightTexture.GetPixel((int)xx2, (int)yy2);
+						//var index = (int)(((float)xx / _heightDataResolution) * 255 * 256 + (((float)yy / _heightDataResolution) * 255));
+
+						float r = data[(int) index].g;
+						float g = data[(int) index].b;
+						float b = data[(int) index].a;
+						//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
+						HeightData[(int) (yy * _heightDataResolution + xx)] = relativeScale * heightMultiplier * (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
+						//678 ==> 012345678
+						//345
+						//012
+
+						//tt.SetPixel((int) xx, (int) yy, new Color(r/256, g/256, b/256));
+						//tt.SetPixel((int) xx, (int) yy, color); //new Color(rgbData[index * 4 + 1] / 256f, rgbData[index * 4 + 2] / 256f, rgbData[index * 4 + 3] / 256f, 1));
 					}
+				}
 
-					var width = t.width;
-					var data = t.GetData<Color32>().ToArray();
 
-					if (HeightData == null)
-					{
-						HeightData = new float[_heightDataResolution * _heightDataResolution];
-					}
 
-					var relativeScale = useRelative ? _relativeScale : 1f;
-					//tt = new Texture2D(_heightDataResolution, _heightDataResolution, TextureFormat.RGBA32, false);
-					for (float yy = 0; yy < _heightDataResolution; yy++)
-					{
-						for (float xx = 0; xx < _heightDataResolution; xx++)
-						{
-							var xx2 = (xx / _heightDataResolution) * width;
-							var yy2 = (yy / _heightDataResolution) * width;
-							var index = (((int)yy2 * width) + (int)xx2);
-							//var color = _heightTexture.GetPixel((int)xx2, (int)yy2);
-							//var index = (int)(((float)xx / _heightDataResolution) * 255 * 256 + (((float)yy / _heightDataResolution) * 255));
-
-							float r = data[(int) index].g;
-							float g = data[(int) index].b;
-							float b = data[(int) index].a;
-							//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
-							HeightData[(int) (yy * _heightDataResolution + xx)] = relativeScale * heightMultiplier * (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
-							//678 ==> 012345678
-							//345
-							//012
-
-							//tt.SetPixel((int) xx, (int) yy, new Color(r/256, g/256, b/256));
-							//tt.SetPixel((int) xx, (int) yy, color); //new Color(rgbData[index * 4 + 1] / 256f, rgbData[index * 4 + 2] / 256f, rgbData[index * 4 + 3] / 256f, 1));
-						}
-					}
-					//tt.Apply();
-					if (callback != null)
-					{
-						callback(this);
-					}
-					HeightDataState = TilePropertyState.Loaded;
-
-				});
-				// Get rid of this temporary texture. We don't need to bloat memory.
-				//_heightTexture.LoadImage(null);
-			}
+				//tt.Apply();
+				if (callback != null)
+				{
+					callback(this);
+				}
+			});
 		}
 
 		public void SetRasterData(RasterTile rasterTile, bool useMipMap = true, bool useCompression = false)
 		{
 			// Don't leak the texture, just reuse it.
-			if (RasterDataState != TilePropertyState.Unregistered)
+			//reset image on null data
+			if (rasterTile.Texture2D == null && rasterTile.Data == null)
 			{
-				RasterDataTilesetId = rasterTile.TilesetId;
-				//reset image on null data
-				if (rasterTile.Data == null)
-				{
-					MeshRenderer.material.mainTexture = null;
-					return;
-				}
+				MeshRenderer.material.mainTexture = null;
+				return;
+			}
 
-				if (_rasterData == null)
-				{
-					_rasterData = new Texture2D(0, 0, TextureFormat.RGB24, useMipMap);
-					_rasterData.wrapMode = TextureWrapMode.Clamp;
-				}
-
-				_rasterData.LoadImage(rasterTile.Data);
+			if (rasterTile.Texture2D != null)
+			{
+				rasterTile.Texture2D.Compress(false);
+			}
+			else if (rasterTile.Texture2D == null && rasterTile.Data != null)
+			{
+				rasterTile.SetTextureFromCache(new Texture2D(0, 0, TextureFormat.RGB24, useMipMap));
+				rasterTile.Texture2D.wrapMode = TextureWrapMode.Clamp;
+				rasterTile.Texture2D.LoadImage(rasterTile.Data);
 				if (useCompression)
 				{
 					// High quality = true seems to decrease image quality?
-					_rasterData.Compress(false);
+					rasterTile.Texture2D.Compress(false);
 				}
-
-				MeshRenderer.sharedMaterial.mainTexture = _rasterData;
-				MeshRenderer.sharedMaterial.mainTextureScale = Unity.Constants.Math.Vector3One;
-				MeshRenderer.sharedMaterial.mainTextureOffset = Unity.Constants.Math.Vector3Zero;
-
-				RasterDataState = TilePropertyState.Loaded;
 			}
-		}
 
-		public void SetRasterTexture(RasterTile rasterTile, bool useMipMap = true, bool useCompression = false)
-		{
-			if (RasterDataState != TilePropertyState.Unregistered)
-			{
-				RasterDataTilesetId = rasterTile.TilesetId;
-				//reset image on null data
-				if (rasterTile.Texture2D == null)
-				{
-					MeshRenderer.material.mainTexture = null;
-					_rasterData = null;
-					return;
-				}
-
-				_rasterData = rasterTile.Texture2D;
-				_rasterData.wrapMode = TextureWrapMode.Clamp;
-				if (useCompression)
-				{
-					// High quality = true seems to decrease image quality?
-					_rasterData.Compress(false);
-				}
-
-				MeshRenderer.sharedMaterial.mainTexture = _rasterData;
-				MeshRenderer.sharedMaterial.mainTextureScale = Unity.Constants.Math.Vector3One;
-				MeshRenderer.sharedMaterial.mainTextureOffset = Unity.Constants.Math.Vector3Zero;
-
-				RasterDataState = TilePropertyState.Loaded;
-			}
+			MeshRenderer.sharedMaterial.mainTexture = rasterTile.Texture2D;
+			MeshRenderer.sharedMaterial.mainTextureScale = Unity.Constants.Math.Vector3One;
+			MeshRenderer.sharedMaterial.mainTextureOffset = Unity.Constants.Math.Vector3Zero;
 		}
 
 		public void SetVectorData(string tileset, Mapbox.VectorTile.VectorTile vectorTile)
 		{
-			if (VectorDataState != TilePropertyState.Unregistered)
-			{
-				VectorDataTilesetId = tileset;
-				VectorData = vectorTile;
-			}
+			_vectorTile = vectorTile;
 		}
 
 		/// <summary>
@@ -428,7 +270,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			{
 				return HeightData[(int) (Mathf.Clamp01(y) * (_heightDataResolution - 1)) * _heightDataResolution + (int) (Mathf.Clamp01(x) * (_heightDataResolution - 1))] * _tileScale;
 			}
-
 			return 0;
 		}
 
@@ -452,7 +293,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public Texture2D GetRasterData()
 		{
-			return _rasterData;
+			return _rasterTile.Texture2D;
 		}
 
 		internal void AddTile(Tile tile)
@@ -474,8 +315,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		{
 			if (Application.isEditor && !Application.isPlaying)
 			{
-				DestroyImmediate(_heightTexture, true);
-				DestroyImmediate(_rasterData, true);
+				// DestroyImmediate(_heightTexture, true);
+				// DestroyImmediate(_rasterData, true);
 				DestroyImmediate(_meshFilter.sharedMesh);
 				DestroyImmediate(_meshRenderer.sharedMaterial);
 			}
@@ -493,14 +334,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		{
 			//Tiles doesn't get destroy frequently (or at all) as we recycle and reuse them
 			Cancel();
-			if (_heightTexture != null)
-			{
-				_heightTexture.Destroy();
-			}
-			if (_rasterData != null)
-			{
-				_rasterData.Destroy();
-			}
 		}
 
 		public void SetParentTexture(UnwrappedTileId parent, Texture2D parentTexture, string textureName = "", string textureScaleOffsetName = "")

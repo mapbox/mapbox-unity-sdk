@@ -49,17 +49,15 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				tile.gameObject.layer = _elevationOptions.unityLayerOptions.layerId;
 			}
 
-			if (tile.RasterDataState != Enums.TilePropertyState.Loaded)
+
+			if (_elevationOptions.sideWallOptions.isActive)
 			{
-				if (_elevationOptions.sideWallOptions.isActive)
+				var firstMat = tile.MeshRenderer.materials[0];
+				tile.MeshRenderer.materials = new Material[2]
 				{
-					var firstMat = tile.MeshRenderer.materials[0];
-					tile.MeshRenderer.materials = new Material[2]
-					{
-						firstMat,
-						_elevationOptions.sideWallOptions.wallMaterial
-					};
-				}
+					firstMat,
+					_elevationOptions.sideWallOptions.wallMaterial
+				};
 			}
 
 			if (tile.MeshFilter.sharedMesh.vertexCount != RequiredVertexCount)

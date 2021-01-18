@@ -424,6 +424,7 @@ GameObject:
   - component: {fileID: 555018383}
   - component: {fileID: 555018386}
   - component: {fileID: 555018385}
+  - component: {fileID: 555018387}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -496,7 +497,7 @@ MonoBehaviour:
           Id: mapbox.terrain-rgb
           Modified: 
           UserName: 
-      elevationLayerType: 0
+      elevationLayerType: 1
       requiredOptions:
         exaggerationFactor: 1
       colliderOptions:
@@ -584,11 +585,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 555018382}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a02fd8bdc1471644f98123a05d007200, type: 3}
+  m_Script: {fileID: 11500000, guid: 10333f5033e540ac930ef4dd8915fef7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _customTilesetId: AerisHeatMap
+  Map: {fileID: 555018383}
+  CustomTilesetId: AerisHeatMap
   UrlFormat: https://maps.aerisapi.com/anh3TB1Xu9Wr6cPndbPwF_EuOSGuqkH433UmnajaOP0MD9rpIh5dZ38g2SUwvu/satellite-infrared-color/{0}/{1}/{2}/current.png
+  TextureFieldName: _CustomOne
+  TextureScaleOffsetFieldName: _CustomOne_ST
 --- !u!114 &555018386
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -606,6 +610,23 @@ MonoBehaviour:
   _referenceCamera: {fileID: 1787361574}
   _mapManager: {fileID: 555018383}
   _useDegreeMethod: 0
+--- !u!114 &555018387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 555018382}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10333f5033e540ac930ef4dd8915fef7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Map: {fileID: 555018383}
+  CustomTilesetId: AerisDotMap
+  UrlFormat: https://maps.aerisapi.com/anh3TB1Xu9Wr6cPndbPwF_EuOSGuqkH433UmnajaOP0MD9rpIh5dZ38g2SUwvu/lightning-strikes,temperatures-text,stormreports,stormcells/{0}/{1}/{2}/current.png
+  TextureFieldName: _CustomTwo
+  TextureScaleOffsetFieldName: _CustomTwo_ST
 --- !u!1001 &1178802930
 PrefabInstance:
   m_ObjectHideFlags: 0

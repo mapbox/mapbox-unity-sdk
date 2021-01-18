@@ -141,81 +141,81 @@ namespace Mapbox.Unity.Map
 		//factory event callback, not relaying this up for now
 
 
-		private void TileHeightStateChanged(UnityTile tile)
-		{
-			if (tile.HeightDataState == TilePropertyState.Loaded)
-			{
-				OnTileHeightProcessingFinished(tile);
-			}
-			TileStateChanged(tile);
-		}
-
-		private void TileRasterStateChanged(UnityTile tile)
-		{
-			if (tile.RasterDataState == TilePropertyState.Loaded)
-			{
-				OnTileImageProcessingFinished(tile);
-			}
-			TileStateChanged(tile);
-		}
-
-		private void TileVectorStateChanged(UnityTile tile)
-		{
-			if (tile.VectorDataState == TilePropertyState.Loaded)
-			{
-				OnTileVectorProcessingFinished(tile);
-			}
-			TileStateChanged(tile);
-		}
+		// private void TileHeightStateChanged(UnityTile tile)
+		// {
+		// 	if (tile.HeightDataState == TilePropertyState.Loaded)
+		// 	{
+		// 		OnTileHeightProcessingFinished(tile);
+		// 	}
+		// 	TileStateChanged(tile);
+		// }
+		//
+		// private void TileRasterStateChanged(UnityTile tile)
+		// {
+		// 	if (tile.RasterDataState == TilePropertyState.Loaded)
+		// 	{
+		// 		OnTileImageProcessingFinished(tile);
+		// 	}
+		// 	TileStateChanged(tile);
+		// }
+		//
+		// private void TileVectorStateChanged(UnityTile tile)
+		// {
+		// 	if (tile.VectorDataState == TilePropertyState.Loaded)
+		// 	{
+		// 		OnTileVectorProcessingFinished(tile);
+		// 	}
+		// 	TileStateChanged(tile);
+		// }
 
 		public virtual void TileStateChanged(UnityTile tile)
 		{
-			bool rasterDone = (tile.RasterDataState == TilePropertyState.None ||
-								tile.RasterDataState == TilePropertyState.Loaded ||
-								tile.RasterDataState == TilePropertyState.Error ||
-								tile.RasterDataState == TilePropertyState.Cancelled);
+			// bool rasterDone = (tile.RasterDataState == TilePropertyState.None ||
+			// 					tile.RasterDataState == TilePropertyState.Loaded ||
+			// 					tile.RasterDataState == TilePropertyState.Error ||
+			// 					tile.RasterDataState == TilePropertyState.Cancelled);
+			//
+			// bool terrainDone = (tile.HeightDataState == TilePropertyState.None ||
+			// 					tile.HeightDataState == TilePropertyState.Loaded ||
+			// 					 tile.HeightDataState == TilePropertyState.Error ||
+			// 					 tile.HeightDataState == TilePropertyState.Cancelled);
+			// bool vectorDone = (tile.VectorDataState == TilePropertyState.None ||
+			// 					tile.VectorDataState == TilePropertyState.Loaded ||
+			// 					tile.VectorDataState == TilePropertyState.Error ||
+			// 					tile.VectorDataState == TilePropertyState.Cancelled);
 
-			bool terrainDone = (tile.HeightDataState == TilePropertyState.None ||
-								tile.HeightDataState == TilePropertyState.Loaded ||
-								 tile.HeightDataState == TilePropertyState.Error ||
-								 tile.HeightDataState == TilePropertyState.Cancelled);
-			bool vectorDone = (tile.VectorDataState == TilePropertyState.None ||
-								tile.VectorDataState == TilePropertyState.Loaded ||
-								tile.VectorDataState == TilePropertyState.Error ||
-								tile.VectorDataState == TilePropertyState.Cancelled);
-
-			if (rasterDone && terrainDone && vectorDone)
-			{
-				tile.gameObject.SetActive(true);
-				tile.TileState = MeshGeneration.Enums.TilePropertyState.Loaded;
-				OnTileFinished(tile);
-
-				// Check if all tiles in extent are active tiles
-				if (_map.CurrentExtent.Count == _activeTiles.Count)
-				{
-					bool allDone = true;
-					// Check if all tiles are loaded.
-					foreach (var currentTile in _map.CurrentExtent)
-					{
-						allDone = allDone && (_activeTiles.ContainsKey(currentTile) && _activeTiles[currentTile].TileState == TilePropertyState.Loaded);
-					}
-
-					if (allDone)
-					{
-						State = ModuleState.Finished;
-					}
-					else
-					{
-						State = ModuleState.Working;
-					}
-				}
-				else
-				{
-					State = ModuleState.Working;
-				}
-
-
-			}
+			// if (rasterDone && terrainDone && vectorDone)
+			// {
+			// 	tile.gameObject.SetActive(true);
+			// 	tile.TileState = MeshGeneration.Enums.TilePropertyState.Loaded;
+			// 	OnTileFinished(tile);
+			//
+			// 	// Check if all tiles in extent are active tiles
+			// 	if (_map.CurrentExtent.Count == _activeTiles.Count)
+			// 	{
+			// 		bool allDone = true;
+			// 		// Check if all tiles are loaded.
+			// 		foreach (var currentTile in _map.CurrentExtent)
+			// 		{
+			// 			allDone = allDone && (_activeTiles.ContainsKey(currentTile) && _activeTiles[currentTile].TileState == TilePropertyState.Loaded);
+			// 		}
+			//
+			// 		if (allDone)
+			// 		{
+			// 			State = ModuleState.Finished;
+			// 		}
+			// 		else
+			// 		{
+			// 			State = ModuleState.Working;
+			// 		}
+			// 	}
+			// 	else
+			// 	{
+			// 		State = ModuleState.Working;
+			// 	}
+			//
+			//
+			// }
 		}
 		#endregion
 
@@ -259,11 +259,7 @@ namespace Mapbox.Unity.Map
 #if UNITY_EDITOR
 			unityTile.gameObject.name = unityTile.CanonicalTileId.ToString();
 #endif
-			unityTile.OnHeightDataChanged += TileHeightStateChanged;
-			unityTile.OnRasterDataChanged += TileRasterStateChanged;
-			unityTile.OnVectorDataChanged += TileVectorStateChanged;
 
-			unityTile.TileState = MeshGeneration.Enums.TilePropertyState.Loading;
 			ActiveTiles.Add(tileId, unityTile);
 
 			foreach (var factory in Factories)

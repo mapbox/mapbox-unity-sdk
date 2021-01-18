@@ -7,7 +7,17 @@ using UnityEngine;
 
 namespace Mapbox.Platform.Cache
 {
-	public class MemoryCache
+	public interface IMemoryCache
+	{
+		void Add(string tilesetId, CanonicalTileId tileId, CacheItem cacheItem, bool forceInsert);
+		void AddToDisposeList(string tilesetId, CanonicalTileId tileId);
+		CacheItem Get(string tilesetId, CanonicalTileId tileId);
+		void Clear();
+		bool Exists(string tilesetId, CanonicalTileId tileId);
+		void MarkFixed(CanonicalTileId tileId, string tilesetId);
+	}
+
+	public class MemoryCache : IMemoryCache
 	{
 		// TODO: add support for disposal strategy (timestamp, distance, etc.)
 		public MemoryCache(uint maxCacheSize)
@@ -22,7 +32,6 @@ namespace Mapbox.Platform.Cache
 		}
 
 		private uint _maxCacheSize;
-		private object _lock = new object();
 		private Dictionary<int, CacheItem> _cachedItems;
 		private Dictionary<int, CacheItem> _fixedItems;
 		private int _destroyedItemCounter = 0;
@@ -148,34 +157,26 @@ namespace Mapbox.Platform.Cache
 			return _cachedItems[key];
 		}
 
-		// private static string GenerateKey(string tilesetId, CanonicalTileId tileId)
-		// {
-		// 	return string.Format("{0}_{1}", tilesetId, tileId);
-		// }
-
 		public void Clear()
 		{
-			lock (_lock)
+			if (_cachedItems != null)
 			{
-				if (_cachedItems != null)
+				foreach (var item in _cachedItems)
 				{
-					foreach (var item in _cachedItems)
+					if (item.Value is TextureCacheItem)
 					{
-						if (item.Value is TextureCacheItem)
-						{
-							(item.Value as TextureCacheItem).Texture2D?.Destroy();
-						}
-
+						(item.Value as TextureCacheItem).Texture2D?.Destroy();
 					}
 
-					_cachedItems.Clear();
-					_itemsToDestroy.Clear();
 				}
-				else
-				{
-					_cachedItems = new Dictionary<int, CacheItem>();
-					_itemsToDestroy = new List<int>();
-				}
+
+				_cachedItems.Clear();
+				_itemsToDestroy.Clear();
+			}
+			else
+			{
+				_cachedItems = new Dictionary<int, CacheItem>();
+				_itemsToDestroy = new List<int>();
 			}
 		}
 
@@ -207,5 +208,11 @@ namespace Mapbox.Platform.Cache
 				Debug.Log("Item isn't in memory cache, this shouldn't happen really");
 			}
 		}
+
+
+#if UNITY_EDITOR
+		public Dictionary<int, CacheItem> GetCachedItems => _cachedItems;
+		public Dictionary<int, CacheItem> GetFixedItems => _fixedItems;
+#endif
 	}
 }

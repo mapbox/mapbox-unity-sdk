@@ -50,7 +50,6 @@ namespace Mapbox.Unity.Map
 		protected Vector3 _cachedPosition;
 		protected Quaternion _cachedRotation;
 		protected Vector3 _cachedScale = Vector3.one;
-		protected Dictionary<UnwrappedTileId, List<UnwrappedTileId>> TileTracker = new Dictionary<UnwrappedTileId, List<UnwrappedTileId>>();
 		#endregion
 
 		#region Properties
@@ -312,6 +311,8 @@ namespace Mapbox.Unity.Map
 		/// <param name="zoom">Zoom.</param>
 		public virtual void Initialize(Vector2d latLon, int zoom)
 		{
+			tilesToProcess = new List<UnwrappedTileId>();
+
 			_initializeOnStart = false;
 			if (_options == null)
 			{
@@ -511,27 +512,8 @@ namespace Mapbox.Unity.Map
 			{
 				_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
 
-				_mapVisualizer.OnTileFinished += (s) =>
-				{
-					OnTileFinished(s);
-
-					if (TileTracker.ContainsKey(s.UnwrappedTileId))
-					{
-						foreach (var tileId in TileTracker[s.UnwrappedTileId])
-						{
-							if (MapVisualizer.ActiveTiles.ContainsKey(tileId))
-							{
-								TileProvider_OnTileRemoved(tileId);
-							}
-						}
-
-						TileTracker.Remove(s.UnwrappedTileId);
-					}
-				};
-				_mapVisualizer.OnTileDisposing += tile =>
-				{
-					OnTileDisposing(tile);
-				};
+				_mapVisualizer.OnTileFinished += (s) => { OnTileFinished(s); };
+				_mapVisualizer.OnTileDisposing += tile => { OnTileDisposing(tile); };
 				_mapVisualizer.OnTileDisposing += tile => { MapboxAccess.Instance.CacheManager.TileDisposed(tile); };
 			}
 		}
@@ -678,14 +660,6 @@ namespace Mapbox.Unity.Map
 			if (Options.placementOptions.snapMapToZero && !_worldHeightFixed)
 			{
 				_worldHeightFixed = true;
-				if (tile.HeightDataState == MeshGeneration.Enums.TilePropertyState.Loaded)
-				{
-					ApplySnapWorldToZero(tile);
-				}
-				else
-				{
-					tile.OnHeightDataChanged += (s) => { ApplySnapWorldToZero(tile); };
-				}
 			}
 		}
 
@@ -703,30 +677,6 @@ namespace Mapbox.Unity.Map
 		protected void SendInitialized()
 		{
 			OnInitialized();
-		}
-
-		/// <summary>
-		/// Apply Snap World to Zero setting by moving map in Y Axis such that
-		/// center of the given tile will be at y=0.
-		/// </summary>
-		/// <param name="referenceTile">Tile to use for Y axis correction.</param>
-		private void ApplySnapWorldToZero(UnityTile referenceTile)
-		{
-			if (_options.placementOptions.snapMapToZero)
-			{
-				var h = referenceTile.QueryHeightData(.5f, .5f);
-				Root.transform.localPosition = new Vector3(
-					Root.transform.position.x,
-					-h,
-					Root.transform.position.z);
-			}
-			else
-			{
-				Root.transform.localPosition = new Vector3(
-					Root.transform.position.x,
-					0,
-					Root.transform.position.z);
-			}
 		}
 
 		/// <summary>
@@ -904,60 +854,38 @@ namespace Mapbox.Unity.Map
 
 		private void TriggerTileRedrawForExtent(ExtentArgs currentExtent)
 		{
-			var _activeTiles = _mapVisualizer.ActiveTiles;
-			_currentExtent = new HashSet<UnwrappedTileId>(currentExtent.activeTiles);
+			var activeTiles = _mapVisualizer.ActiveTiles;
+			tilesToProcess.Clear();
 
-			if (tilesToProcess == null)
-			{
-				tilesToProcess = new List<UnwrappedTileId>();
-			}
-			else
-			{
-				tilesToProcess.Clear();
-			}
-			foreach (var item in _activeTiles)
+			//remove tiles
+			foreach (var item in activeTiles)
 			{
 				if (TileProvider.Cleanup(item.Key))
 				{
 					tilesToProcess.Add(item.Key);
 				}
 			}
-
-			if (tilesToProcess.Count > 0)
+			foreach (var tile in tilesToProcess)
 			{
-				foreach (var t2r in tilesToProcess)
-				{
-					if (currentExtent.ZoomOutTileRelationships != null && currentExtent.ZoomOutTileRelationships.ContainsKey(t2r))
-					{
-						if (!TileTracker.ContainsKey(currentExtent.ZoomOutTileRelationships[t2r]))
-						{
-							TileTracker.Add(currentExtent.ZoomOutTileRelationships[t2r], new List<UnwrappedTileId>());
-						}
-						TileTracker[currentExtent.ZoomOutTileRelationships[t2r]].Add(t2r);
-					}
-					else
-					{
-						TileProvider_OnTileRemoved(t2r);
-					}
-					//TileProvider_OnTileRemoved(t2r);
-				}
+				TileProvider_OnTileRemoved(tile);
 			}
 
-			foreach (var tile in _activeTiles)
+			//reposition existing tile
+			foreach (var tile in activeTiles)
 			{
 				// Reposition tiles in case we panned.
 				TileProvider_OnTileRepositioned(tile.Key);
 			}
 
+			//add new tiles
 			tilesToProcess.Clear();
-			foreach (var tile in _currentExtent)
+			foreach (var tile in currentExtent.activeTiles)
 			{
-				if (!_activeTiles.ContainsKey(tile))
+				if (!activeTiles.ContainsKey(tile))
 				{
 					tilesToProcess.Add(tile);
 				}
 			}
-
 			if (tilesToProcess.Count > 0)
 			{
 				OnTilesStarting(tilesToProcess);

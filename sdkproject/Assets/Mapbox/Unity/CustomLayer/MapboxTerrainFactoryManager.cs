@@ -77,6 +77,10 @@ namespace CustomImageLayerSample
 				rasterTile = new RawPngRasterTile(tileId, tilesetId);
 			}
 
+#if UNITY_EDITOR
+			rasterTile.IsMapboxTile = true;
+#endif
+			
 			return rasterTile;
 		}
 

@@ -33,6 +33,10 @@ namespace CustomImageLayerSample
 				rasterTile = UseRetina ? new ClassicRetinaRasterTile(tileId, tilesetId) : new ClassicRasterTile(tileId, tilesetId);
 			}
 
+#if UNITY_EDITOR
+			rasterTile.IsMapboxTile = true;
+#endif
+
 			return rasterTile;
 		}
 
@@ -40,7 +44,7 @@ namespace CustomImageLayerSample
 		{
 			if (dataTile.Texture2D != null)
 			{
-				unityTile.SetRasterTexture(dataTile);
+				unityTile.SetRasterData(dataTile);
 			}
 			else
 			{

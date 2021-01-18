@@ -77,13 +77,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			if (_properties.sourceType == ImagerySourceType.None)
 			{
 				tile.SetRasterData(null);
-				tile.RasterDataState = TilePropertyState.None;
-				return;
 			}
 			else
 			{
-				tile.RasterDataState = TilePropertyState.Loading;
-
 				ImageFactoryManager.RegisterTile(tile);
 			}
 		}
@@ -103,7 +99,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			base.OnErrorOccurred(tile, e);
 			if (tile != null)
 			{
-				tile.RasterDataState = TilePropertyState.Error;
 				foreach (var exception in e.Exceptions)
 				{
 					Debug.Log(exception);

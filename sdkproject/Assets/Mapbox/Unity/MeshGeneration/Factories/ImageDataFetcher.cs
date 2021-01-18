@@ -32,10 +32,8 @@ public class ImageDataFetcher : DataFetcher
 		var textureItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(tilesetId, tileId);
 		if (textureItem != null)
 		{
-			var rasterTile = new RasterTile(tileId, tilesetId) {Texture2D = textureItem.Texture2D};
-			if (unityTile != null) { unityTile.AddTile(rasterTile); }
-
-			TextureReceived(unityTile, rasterTile);
+			tile.SetTextureFromCache(textureItem.Texture2D);
+			TextureReceived(unityTile, tile);
 			return;
 		}
 
@@ -56,10 +54,8 @@ public class ImageDataFetcher : DataFetcher
 				//after that first check few lines above and actual loading (loading is scheduled and delayed so it's not in same frame)
 				if (textureCacheItem != null)
 				{
-					var rasterTile = new RasterTile(tileId, tilesetId) {Texture2D = textureCacheItem.Texture2D};
-					if (unityTile != null) { unityTile.AddTile(rasterTile); }
-
-					TextureReceived(unityTile, rasterTile);
+					tile.SetTextureFromCache(textureCacheItem.Texture2D);
+					TextureReceived(unityTile, tile);
 
 					//after returning what we already have
 					//check if it's out of date, if so check server for update
@@ -76,6 +72,11 @@ public class ImageDataFetcher : DataFetcher
 
 			return;
 		}
+
+
+#if UNITY_EDITOR
+		tile.IsFromCache = false;
+#endif
 
 		//not in cache so web request
 		//CreateWebRequest(tilesetId, tileId, useRetina, String.Empty, unityTile);
@@ -96,7 +97,8 @@ public class ImageDataFetcher : DataFetcher
 		var textureItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(tilesetId, tileId);
 		if (textureItem != null)
 		{
-			var rasterTile = new RasterTile(tileId, tilesetId) {Texture2D = textureItem.Texture2D};
+			var rasterTile = new RasterTile(tileId, tilesetId);
+			rasterTile.SetTextureFromCache(textureItem.Texture2D);
 			if (unityTile != null) { unityTile.AddTile(rasterTile); }
 
 			TextureReceived(unityTile, rasterTile);
@@ -120,7 +122,8 @@ public class ImageDataFetcher : DataFetcher
 				//after that first check few lines above and actual loading (loading is scheduled and delayed so it's not in same frame)
 				if (textureCacheItem != null)
 				{
-					var rasterTile = new RasterTile(tileId, tilesetId) {Texture2D = textureCacheItem.Texture2D};
+					var rasterTile = new RasterTile(tileId, tilesetId);
+					rasterTile.SetTextureFromCache(textureItem.Texture2D);
 					if (unityTile != null) { unityTile.AddTile(rasterTile); }
 
 					TextureReceived(unityTile, rasterTile);
@@ -199,6 +202,8 @@ public class ImageDataFetcher : DataFetcher
 				rasterTile.Id,
 				new TextureCacheItem()
 				{
+					TileId = tileId,
+					TilesetId = rasterTile.TilesetId,
 					ETag = rasterTile.ETag,
 					Data = rasterTile.Data,
 					ExpirationDate = rasterTile.ExpirationDate,
@@ -227,12 +232,9 @@ public class BaseImageDataFetcher : ImageDataFetcher
 		var textureItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(tilesetId, tileId);
 		if (textureItem != null)
 		{
-			TextureReceived(
-				unityTile,
-				new RasterTile(tileId, tilesetId)
-				{
-					Texture2D = textureItem.Texture2D
-				});
+			var rasterTile = new RasterTile(tileId, tilesetId);
+			rasterTile.SetTextureFromCache(textureItem.Texture2D);
+			TextureReceived(unityTile, rasterTile);
 			return;
 		}
 
@@ -247,12 +249,9 @@ public class BaseImageDataFetcher : ImageDataFetcher
 				//after that first check few lines above and actual loading (loading is scheduled and delayed so it's not in same frame)
 				if (textureCacheItem != null)
 				{
-					TextureReceived(
-						unityTile,
-						new RasterTile(tileId, tilesetId)
-						{
-							Texture2D = textureCacheItem.Texture2D
-						});
+					var rasterTile = new RasterTile(tileId, tilesetId);
+					rasterTile.SetTextureFromCache(textureCacheItem.Texture2D);
+					TextureReceived(unityTile, rasterTile);
 					MapboxAccess.Instance.CacheManager.MarkFixed(tileId, tilesetId);
 
 					//after returning what we already have
@@ -288,12 +287,9 @@ public class BaseImageDataFetcher : ImageDataFetcher
 		var textureItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(tilesetId, tileId);
 		if (textureItem != null)
 		{
-			TextureReceived(
-				unityTile,
-				new RasterTile(tileId, tilesetId)
-				{
-					Texture2D = textureItem.Texture2D
-				});
+			var rasterTile = new RasterTile(tileId, tilesetId);
+			rasterTile.SetTextureFromCache(textureItem.Texture2D);
+			TextureReceived(unityTile, rasterTile);
 			return;
 		}
 
@@ -308,12 +304,9 @@ public class BaseImageDataFetcher : ImageDataFetcher
 				//after that first check few lines above and actual loading (loading is scheduled and delayed so it's not in same frame)
 				if (textureCacheItem != null)
 				{
-					TextureReceived(
-						unityTile,
-						new RasterTile(tileId, tilesetId)
-						{
-							Texture2D = textureCacheItem.Texture2D
-						});
+					var rasterTile = new RasterTile(tileId, tilesetId);
+					rasterTile.SetTextureFromCache(textureCacheItem.Texture2D);
+					TextureReceived(unityTile, rasterTile);
 					MapboxAccess.Instance.CacheManager.MarkFixed(tileId, tilesetId);
 
 					//after returning what we already have

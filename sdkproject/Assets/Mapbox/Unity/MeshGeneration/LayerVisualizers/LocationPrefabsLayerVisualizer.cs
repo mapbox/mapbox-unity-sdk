@@ -339,47 +339,44 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		/// <param name="tile">Tile.</param>
 		private void BuildFeatureFromLatLon(VectorTileLayer layer, UnityTile tile)
 		{
-			if (tile.TileState != Enums.TilePropertyState.Unregistered)
-			{
-				string[] coordinates = (SubLayerProperties as PrefabItemOptions).coordinates;
+			string[] coordinates = (SubLayerProperties as PrefabItemOptions).coordinates;
 
-				for (int i = 0; i < coordinates.Length; i++)
+			for (int i = 0; i < coordinates.Length; i++)
+			{
+				if (string.IsNullOrEmpty(coordinates[i]))
 				{
-					if (string.IsNullOrEmpty(coordinates[i]))
+					return;
+				}
+
+				//check if the coordinate is in the tile
+				Utils.Vector2d coordinate = Conversions.StringToLatLon(coordinates[i]);
+				Mapbox.Map.UnwrappedTileId coordinateTileId = Conversions.LatitudeLongitudeToTileId(
+					coordinate.x, coordinate.y, tile.CurrentZoom);
+
+				if (coordinateTileId.Canonical.Equals(tile.CanonicalTileId))
+				{
+					if (String.IsNullOrEmpty(coordinates[i]))
 					{
 						return;
 					}
 
-					//check if the coordinate is in the tile
-					Utils.Vector2d coordinate = Conversions.StringToLatLon(coordinates[i]);
-					Mapbox.Map.UnwrappedTileId coordinateTileId = Conversions.LatitudeLongitudeToTileId(
-						coordinate.x, coordinate.y, tile.CurrentZoom);
+					//create new vector feature
+					VectorFeatureUnity feature = new VectorFeatureUnity();
+					feature.Properties = new Dictionary<string, object>();
+					feature.Points = new List<List<Vector3>>();
 
-					if (coordinateTileId.Canonical.Equals(tile.CanonicalTileId))
-					{
-						if (String.IsNullOrEmpty(coordinates[i]))
-						{
-							return;
-						}
+					//create submesh for feature
+					List<Vector3> latLonPoint = new List<Vector3>();
+					//add point to submesh, and submesh to feature
+					latLonPoint.Add(Conversions.LatitudeLongitudeToUnityTilePosition(coordinate, tile.CurrentZoom, tile.TileScale, layer.Extent).ToVector3xz());
+					feature.Points.Add(latLonPoint);
 
-						//create new vector feature
-						VectorFeatureUnity feature = new VectorFeatureUnity();
-						feature.Properties = new Dictionary<string, object>();
-						feature.Points = new List<List<Vector3>>();
+					//pass valid feature.Data to modifiers
+					//this data has no relation to the features being drawn
+					feature.Data = layer.GetFeature(0);
 
-						//create submesh for feature
-						List<Vector3> latLonPoint = new List<Vector3>();
-						//add point to submesh, and submesh to feature
-						latLonPoint.Add(Conversions.LatitudeLongitudeToUnityTilePosition(coordinate, tile.CurrentZoom, tile.TileScale, layer.Extent).ToVector3xz());
-						feature.Points.Add(latLonPoint);
-
-						//pass valid feature.Data to modifiers
-						//this data has no relation to the features being drawn
-						feature.Data = layer.GetFeature(0);
-
-						//pass the feature to the mod stack
-						base.Build(feature, tile, tile.gameObject);
-					}
+					//pass the feature to the mod stack
+					base.Build(feature, tile, tile.gameObject);
 				}
 			}
 		}

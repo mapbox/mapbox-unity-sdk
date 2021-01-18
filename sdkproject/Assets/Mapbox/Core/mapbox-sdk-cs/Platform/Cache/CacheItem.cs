@@ -1,4 +1,6 @@
 ﻿
+using Mapbox.Map;
+
 namespace Mapbox.Platform.Cache
 {
 
@@ -7,6 +9,8 @@ namespace Mapbox.Platform.Cache
 
 	public class CacheItem
 	{
+		public CanonicalTileId TileId;
+		public string TilesetId;
 		/// <summary> Raw response data- </summary>
 		public byte[] Data;
 		/// <summary> UTC ticks when item was added to the cache. </summary>

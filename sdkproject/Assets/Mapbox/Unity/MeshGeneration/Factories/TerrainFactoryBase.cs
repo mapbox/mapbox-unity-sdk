@@ -18,7 +18,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		public TerrainStrategy Strategy;
 		[SerializeField]
 		protected ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
-		
+
 		public string TilesetId
 		{
 			get
@@ -75,11 +75,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				tile.SetHeightData(null);
 				tile.MeshFilter.sharedMesh.Clear();
 				tile.ElevationType = TileTerrainType.None;
-				tile.HeightDataState = TilePropertyState.None;
 				return;
 			}
 
-			tile.HeightDataState = TilePropertyState.Loading;
 			TerrainFactoryManager.RegisterTile(tile);
 		}
 
@@ -99,11 +97,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			if (tile != null)
 			{
 				_tilesWaitingResponse.Remove(tile);
-				if (tile.HeightDataState != TilePropertyState.Unregistered)
-				{
-					Strategy.DataErrorOccurred(tile, e);
-					tile.HeightDataState = TilePropertyState.Error;
-				}
+				Strategy.DataErrorOccurred(tile, e);
 			}
 		}
 

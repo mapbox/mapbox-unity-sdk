@@ -7,6 +7,7 @@
 using System;
 using Mapbox.Platform;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Mapbox.Map
 {
@@ -61,7 +62,7 @@ namespace Mapbox.Map
 		/// _sampleMaterial.mainTexture = rasterTile.Texture2D;
 		/// </code>
 		/// </example>
-		public Texture2D Texture2D;
+		public Texture2D Texture2D { get; private set; }
 
 		public RasterTile()
 		{
@@ -106,6 +107,8 @@ namespace Mapbox.Map
 				{
 					AddException(exception);
 				}
+
+				_state = State.Canceled;
 			}
 			else
 			{
@@ -114,12 +117,12 @@ namespace Mapbox.Map
 				data = textureResponse.Data;
 				ETag = textureResponse.ETag;
 				ExpirationDate = textureResponse.ExpirationDate;
-			}
 
-			// Cancelled is not the same as loaded!
-			if (_state != State.Canceled)
-			{
-				_state = State.Loaded;
+				// Cancelled is not the same as loaded!
+				if (_state != State.Canceled)
+				{
+					_state = State.Loaded;
+				}
 			}
 
 			_callback();
@@ -134,7 +137,6 @@ namespace Mapbox.Map
 		{
 			// We do not parse raster tiles as they are
 			this.data = data;
-
 			return true;
 		}
 
@@ -146,5 +148,10 @@ namespace Mapbox.Map
 			Texture2D = null;
 		}
 
+		public void SetTextureFromCache(Texture2D texture)
+		{
+			Texture2D = texture;
+			_state = State.Loaded;
+		}
 	}
 }
