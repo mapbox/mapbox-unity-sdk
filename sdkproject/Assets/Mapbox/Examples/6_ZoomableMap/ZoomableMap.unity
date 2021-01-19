@@ -583,12 +583,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 555018382}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 10333f5033e540ac930ef4dd8915fef7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Map: {fileID: 555018383}
+  DownloadFallbackImagery: 1
   CustomTilesetId: AerisHeatMap
   UrlFormat: https://maps.aerisapi.com/anh3TB1Xu9Wr6cPndbPwF_EuOSGuqkH433UmnajaOP0MD9rpIh5dZ38g2SUwvu/satellite-infrared-color/{0}/{1}/{2}/current.png
   TextureFieldName: _CustomOne
@@ -623,6 +624,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Map: {fileID: 555018383}
+  DownloadFallbackImagery: 0
   CustomTilesetId: AerisDotMap
   UrlFormat: https://maps.aerisapi.com/anh3TB1Xu9Wr6cPndbPwF_EuOSGuqkH433UmnajaOP0MD9rpIh5dZ38g2SUwvu/lightning-strikes,temperatures-text,stormreports,stormcells/{0}/{1}/{2}/current.png
   TextureFieldName: _CustomTwo
