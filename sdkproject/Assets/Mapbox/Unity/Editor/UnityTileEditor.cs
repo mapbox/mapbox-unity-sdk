@@ -46,7 +46,7 @@ public class UnityTileEditor : Editor
 			}
 
 			var type = tile.GetType();
-			var isFromCacheAdd = tile.IsFromCache ? 1 : 0;
+			var isFromCacheAdd = (tile.FromCache == CacheType.NoCache) ? 1 : 0;
 			if (!dataTileDictionary.ContainsKey(type))
 			{
 				dataTileDictionary.Add(type, new Tuple<int, int>(1, isFromCacheAdd));
@@ -98,9 +98,10 @@ public class UnityTileEditor : Editor
 
 					EditorGUILayout.LabelField(string.Format("{0} : {1}", "Tile Id", dataTile.Id), EditorStyles.label);
 					EditorGUILayout.LabelField(string.Format("{0} : {1}", "Tileset", dataTile.TilesetId), EditorStyles.label);
+					EditorGUILayout.LabelField(string.Format("{0} : {1}", "From", dataTile.FromCache), EditorStyles.label);
 					EditorGUILayout.LabelField(string.Format("{0} : {1}", "State", dataTile.CurrentState), EditorStyles.label);
 					EditorGUILayout.LabelField(string.Format("Is Mapbox : {0}", dataTile.IsMapboxTile), EditorStyles.label);
-					EditorGUILayout.LabelField(string.Format("Is From Cache {0}", dataTile.IsFromCache), EditorStyles.label);
+					EditorGUILayout.LabelField(string.Format("Is From Cache {0}", dataTile.FromCache), EditorStyles.label);
 
 					if (dataTile.HasError)
 					{

@@ -11,10 +11,11 @@ using UnityEngine;
 public abstract class DataFetcher
 {
 	protected MapboxAccess _fileSource;
-	//protected Queue<FetchInfo> _fetchingQueue;
 
 	protected static Queue<int> _tileOrder;
 	protected static Dictionary<int, FetchInfo> _tileFetchInfos;
+	protected static Dictionary<int, Tile> _activeRequests;
+	protected static int _activeRequestLimit = 10;
 
 	protected DataFetcher()
 	{
@@ -23,7 +24,7 @@ public abstract class DataFetcher
 		{
 			_tileOrder = new Queue<int>();
 			_tileFetchInfos = new Dictionary<int, FetchInfo>();
-			//_fetchingQueue = new Queue<FetchInfo>();
+			_activeRequests = new Dictionary<int, Tile>();
 			Runnable.Run(UpdateTick(_fileSource));
 		}
 	}
@@ -32,14 +33,23 @@ public abstract class DataFetcher
 	{
 		while (true)
 		{
-			while (_tileOrder.Count > 0)
+			while (_tileOrder.Count > 0 && _activeRequests.Count < _activeRequestLimit)
 			{
-				var tileId = _tileOrder.Dequeue();
-				if (_tileFetchInfos.ContainsKey(tileId))
+				var tileKey = _tileOrder.Dequeue();
+				if (_tileFetchInfos.ContainsKey(tileKey))
 				{
-					var fi = _tileFetchInfos[tileId];
-					_tileFetchInfos.Remove(tileId);
-					fi.RasterTile.Initialize(fileSource, fi.TileId, fi.TilesetId, fi.Callback);
+					var fi = _tileFetchInfos[tileKey];
+					_tileFetchInfos.Remove(tileKey);
+					_activeRequests.Add(tileKey, fi.RasterTile);
+					fi.RasterTile.Initialize(
+						fileSource,
+						fi.TileId,
+						fi.TilesetId,
+						() =>
+						{
+							_activeRequests.Remove(tileKey);
+							fi.Callback();
+						});
 					yield return null;
 				}
 			}
@@ -62,10 +72,17 @@ public abstract class DataFetcher
 
 	public virtual void CancelFetching(UnwrappedTileId tileUnwrappedTileId, string tilesetId)
 	{
-		var key = tileUnwrappedTileId.Canonical.GenerateKey(tilesetId);
+		var canonical = tileUnwrappedTileId.Canonical;
+		var key = canonical.GenerateKey(tilesetId);
 		if (_tileFetchInfos.ContainsKey(key))
 		{
 			_tileFetchInfos.Remove(key);
+		}
+
+		if (_activeRequests.ContainsKey(key))
+		{
+			_activeRequests[key].Cancel();
+			_activeRequests.Remove(key);
 		}
 	}
 }

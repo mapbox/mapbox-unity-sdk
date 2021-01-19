@@ -17,6 +17,13 @@ namespace Mapbox.Map
 	using System.Collections.ObjectModel;
 	using Mapbox.Unity.Utilities;
 
+	public enum CacheType
+	{
+		MemoryCache,
+		FileCache,
+		SqliteCache,
+		NoCache
+	}
 
 	/// <summary>
 	///    A Map tile, a square with vector or raster data representing a geographic
@@ -28,7 +35,7 @@ namespace Mapbox.Map
 	{
 #if UNITY_EDITOR
 		public bool IsMapboxTile = false;
-		public bool IsFromCache = true;
+		public CacheType FromCache = CacheType.NoCache;
 #endif
 
 		public string TilesetId;
@@ -41,6 +48,7 @@ namespace Mapbox.Map
 		protected List<Exception> _exceptions;
 		protected State _state = State.New;
 		protected IAsyncRequest _request;
+
 		protected UnityWebRequest _unityRequest;
 		protected Action _callback;
 
@@ -218,6 +226,12 @@ namespace Mapbox.Map
 				_request = null;
 			}
 
+			if (_unityRequest != null)
+			{
+				_unityRequest.Abort();
+				_unityRequest = null;
+			}
+
 			_state = State.Canceled;
 		}
 
@@ -280,6 +294,12 @@ namespace Mapbox.Map
 			{
 				_request.Cancel();
 				_request = null;
+			}
+
+			if (_unityRequest != null)
+			{
+				_unityRequest.Abort();
+				_unityRequest = null;
 			}
 		}
 

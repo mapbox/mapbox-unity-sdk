@@ -10,19 +10,22 @@ namespace CustomImageLayerSample
 	{
 		public Action<UnityTile, RasterTile> TextureReceived = (t, s) => { };
 		public Action<UnityTile, RasterTile, TileErrorEventArgs> FetchingError = (t, r, s) => { };
+		public bool DownloadFallbackImagery = false;
 
 		protected BaseImageDataFetcher _baseImageDataFetcher;
 		protected ImageDataFetcher _fetcher;
 		protected string _tilesetId;
 
-		protected ImageFactoryManager(string tilesetId)
+		protected ImageFactoryManager(string tilesetId, bool downloadFallbackImagery)
 		{
+			DownloadFallbackImagery = downloadFallbackImagery;
 			_tilesetId = tilesetId;
 
 			_baseImageDataFetcher = new BaseImageDataFetcher();
 			_fetcher = new ImageDataFetcher();
 			_fetcher.TextureReceived += OnTextureReceived;
 			_fetcher.FetchingError += OnFetcherError;
+
 		}
 
 		protected abstract RasterTile CreateTile(CanonicalTileId tileId, string tilesetId);

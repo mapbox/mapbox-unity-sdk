@@ -155,6 +155,7 @@ namespace Mapbox.Platform.Cache
 
 		private IEnumerator FetchTextureIfNoneMatch(UnityWebRequest uwr,  Action<TextureResponse> callback, string etag)
 		{
+			var response = new TextureResponse();
 			using (uwr)
 			{
 				if (!string.IsNullOrEmpty(etag))
@@ -166,7 +167,7 @@ namespace Mapbox.Platform.Cache
 
 				if (uwr.responseCode == 304) // 304 NOT MODIFIED
 				{
-					var response = new TextureResponse();
+
 					response.StatusCode = uwr.responseCode;
 					response.ExpirationDate = uwr.GetExpirationDate();
 					callback(response);
@@ -175,7 +176,6 @@ namespace Mapbox.Platform.Cache
 				}
 				else if (uwr.responseCode == 200) // 200 OK, it means etag&data has changed so need to update cache
 				{
-					var response = new TextureResponse();
 					response.StatusCode = uwr.responseCode;
 
 					string eTag = uwr.GetETag();
@@ -191,8 +191,8 @@ namespace Mapbox.Platform.Cache
 					response.ExpirationDate = expirationDate;
 					response.Data = uwr.downloadHandler.data;
 
-					callback(response);
 				}
+				callback(response);
 			}
 		}
 
@@ -201,6 +201,7 @@ namespace Mapbox.Platform.Cache
 			// Stopwatch sw = new Stopwatch();
 			// sw.Start();
 
+			var response = new TextureResponse();
 			using (webRequest)
 			{
 				yield return webRequest.SendWebRequest();
@@ -208,14 +209,17 @@ namespace Mapbox.Platform.Cache
 				// sw.Stop();
 				// Debug.Log(sw.ElapsedMilliseconds);
 
-				var response = new TextureResponse();
-				response.StatusCode = webRequest.responseCode;
-				if (webRequest.isNetworkError || webRequest.isHttpError)
+				if (webRequest != null && webRequest.isNetworkError || webRequest.isHttpError)
 				{
 					response.AddException(new Exception(webRequest.error));
 				}
 				else
 				{
+					response.StatusCode = webRequest.responseCode;
+
+					if (!webRequest.isDone)
+						Debug.Log("here");
+
 					string eTag = webRequest.GetETag();
 					DateTime expirationDate = webRequest.GetExpirationDate();
 
@@ -227,8 +231,8 @@ namespace Mapbox.Platform.Cache
 					response.Data = webRequest.downloadHandler.data;
 				}
 
-				callback(response);
 			}
+			callback(response);
 		}
 
 		private IAsyncRequest requestTileAndCache(string url, int timeout, Action<Response> callback)

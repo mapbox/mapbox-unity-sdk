@@ -8,16 +8,19 @@ namespace CustomImageLayerSample
 	public sealed class CustomImageFactoryManager : ImageFactoryManager
 	{
 		public string _urlFormat;
-
 		private string CustomTextureFieldName;
 		private string CustomTextureScaleOffsetFieldName;
 
-		public CustomImageFactoryManager(string urlFormat, string tilesetId, string textureFieldName = "_MainTex", string textureScaleOffsetFieldName= "_MainTex_ST") : base(tilesetId)
+		public CustomImageFactoryManager(string urlFormat, string tilesetId, bool downloadFallbackImagery, string textureFieldName = "_MainTex", string textureScaleOffsetFieldName = "_MainTex_ST") : base(tilesetId, downloadFallbackImagery)
 		{
 			_urlFormat = urlFormat;
 			CustomTextureFieldName = textureFieldName;
 			CustomTextureScaleOffsetFieldName = textureScaleOffsetFieldName;
-			DownloadAndCacheBaseTiles(_tilesetId, true);
+
+			if (DownloadFallbackImagery)
+			{
+				DownloadAndCacheBaseTiles(_tilesetId, true);
+			}
 		}
 
 		protected override RasterTile CreateTile(CanonicalTileId tileId, string tilesetId)

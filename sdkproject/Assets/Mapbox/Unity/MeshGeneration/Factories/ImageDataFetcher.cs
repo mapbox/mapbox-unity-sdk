@@ -8,6 +8,7 @@ using Mapbox.Platform.Cache;
 using Mapbox.Unity;
 using Mapbox.Unity.Utilities;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class ImageDataFetcher : DataFetcher
@@ -33,6 +34,9 @@ public class ImageDataFetcher : DataFetcher
 		if (textureItem != null)
 		{
 			tile.SetTextureFromCache(textureItem.Texture2D);
+#if UNITY_EDITOR
+			tile.FromCache = CacheType.MemoryCache;
+#endif
 			TextureReceived(unityTile, tile);
 			return;
 		}
@@ -55,6 +59,9 @@ public class ImageDataFetcher : DataFetcher
 				if (textureCacheItem != null)
 				{
 					tile.SetTextureFromCache(textureCacheItem.Texture2D);
+#if UNITY_EDITOR
+					tile.FromCache = CacheType.FileCache;
+#endif
 					TextureReceived(unityTile, tile);
 
 					//after returning what we already have
@@ -72,11 +79,6 @@ public class ImageDataFetcher : DataFetcher
 
 			return;
 		}
-
-
-#if UNITY_EDITOR
-		tile.IsFromCache = false;
-#endif
 
 		//not in cache so web request
 		//CreateWebRequest(tilesetId, tileId, useRetina, String.Empty, unityTile);
@@ -181,6 +183,7 @@ public class ImageDataFetcher : DataFetcher
 	{
 		if (unityTile != null && !unityTile.ContainsDataTile(rasterTile))
 		{
+			rasterTile.Clear();
 			//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
 			return;
 		}
@@ -204,6 +207,7 @@ public class ImageDataFetcher : DataFetcher
 				{
 					TileId = tileId,
 					TilesetId = rasterTile.TilesetId,
+					From = rasterTile.FromCache,
 					ETag = rasterTile.ETag,
 					Data = rasterTile.Data,
 					ExpirationDate = rasterTile.ExpirationDate,
@@ -234,6 +238,9 @@ public class BaseImageDataFetcher : ImageDataFetcher
 		{
 			var rasterTile = new RasterTile(tileId, tilesetId);
 			rasterTile.SetTextureFromCache(textureItem.Texture2D);
+#if UNITY_EDITOR
+			rasterTile.FromCache = CacheType.MemoryCache;
+#endif
 			TextureReceived(unityTile, rasterTile);
 			return;
 		}
@@ -251,6 +258,9 @@ public class BaseImageDataFetcher : ImageDataFetcher
 				{
 					var rasterTile = new RasterTile(tileId, tilesetId);
 					rasterTile.SetTextureFromCache(textureCacheItem.Texture2D);
+#if UNITY_EDITOR
+					rasterTile.FromCache = CacheType.FileCache;
+#endif
 					TextureReceived(unityTile, rasterTile);
 					MapboxAccess.Instance.CacheManager.MarkFixed(tileId, tilesetId);
 
@@ -281,57 +291,15 @@ public class BaseImageDataFetcher : ImageDataFetcher
 		});
 	}
 
-	public void FetchData(string tilesetId, CanonicalTileId tileId, bool useRetina, UnityTile unityTile = null)
-	{
-		//MemoryCacheCheck
-		var textureItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(tilesetId, tileId);
-		if (textureItem != null)
-		{
-			var rasterTile = new RasterTile(tileId, tilesetId);
-			rasterTile.SetTextureFromCache(textureItem.Texture2D);
-			TextureReceived(unityTile, rasterTile);
-			return;
-		}
-
-		//FileCacheCheck
-		if (MapboxAccess.Instance.CacheManager.TextureFileExists(tilesetId, tileId)) //not in memory, check file cache
-		{
-			MapboxAccess.Instance.CacheManager.GetTextureItemFromFile(tilesetId, tileId, (textureCacheItem) =>
-			{
-				//even though we just checked file exists, system couldn't find&load it
-				//this shouldn't happen frequently, only in some corner cases
-				//one possibility might be file being pruned due to hitting cache limit
-				//after that first check few lines above and actual loading (loading is scheduled and delayed so it's not in same frame)
-				if (textureCacheItem != null)
-				{
-					var rasterTile = new RasterTile(tileId, tilesetId);
-					rasterTile.SetTextureFromCache(textureCacheItem.Texture2D);
-					TextureReceived(unityTile, rasterTile);
-					MapboxAccess.Instance.CacheManager.MarkFixed(tileId, tilesetId);
-
-					//after returning what we already have
-					//check if it's out of date, if so check server for update
-					if (textureCacheItem.ExpirationDate < DateTime.Now)
-					{
-						CreateWebRequest(tilesetId, tileId, useRetina, textureCacheItem.ETag, unityTile);
-					}
-				}
-				else
-				{
-					CreateWebRequest(tilesetId, tileId, useRetina, String.Empty, unityTile);
-				}
-			});
-
-			return;
-		}
-
-		//not in cache so web request
-		CreateWebRequest(tilesetId, tileId, useRetina, String.Empty, unityTile);
-	}
-
 	protected override void FetchingCallback(CanonicalTileId tileId, RasterTile rasterTile, UnityTile unityTile = null)
 	{
 		base.FetchingCallback(tileId, rasterTile, unityTile);
+#if UNITY_EDITOR
+		if (rasterTile.Texture2D != null)
+		{
+			rasterTile.Texture2D.name += "_fallbackImage";
+		}
+#endif
 		MapboxAccess.Instance.CacheManager.MarkFixed(rasterTile.Id, rasterTile.TilesetId);
 	}
 }

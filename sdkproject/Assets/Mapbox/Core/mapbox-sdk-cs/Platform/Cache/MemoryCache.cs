@@ -94,13 +94,13 @@ namespace Mapbox.Platform.Cache
 				{
 					//something is horribly wrong
 					Debug.Log("Memory cache is in a very wrong state, destroying all cached items.");
-					var keys = _cachedItems.Keys.ToArray();
-					foreach (var keyToRemove in keys)
-					{
-						RemoveItemCacheItem(keyToRemove);
-						_destroyedItemCounter++;
-						_cachedItems.Remove(keyToRemove);
-					}
+					// var keys = _cachedItems.Keys.ToArray();
+					// foreach (var keyToRemove in keys)
+					// {
+					// 	RemoveItemCacheItem(keyToRemove);
+					// 	_destroyedItemCounter++;
+					// 	_cachedItems.Remove(keyToRemove);
+					// }
 				}
 				else
 				{

@@ -19,5 +19,9 @@ namespace Mapbox.Platform.Cache
 		public string ETag;
 		/// <summary> Expiration date of the cached data </summary>
 		public DateTime? ExpirationDate;
+
+#if UNITY_EDITOR
+		public CacheType From;
+#endif
 	}
 }

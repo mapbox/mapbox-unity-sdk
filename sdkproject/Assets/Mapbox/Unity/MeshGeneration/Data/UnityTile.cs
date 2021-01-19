@@ -220,7 +220,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			});
 		}
 
-		public void SetRasterData(RasterTile rasterTile, bool useMipMap = true, bool useCompression = false)
+		public void SetRasterData(RasterTile rasterTile, bool useMipMap = false, bool useCompression = false)
 		{
 			// Don't leak the texture, just reuse it.
 			//reset image on null data
@@ -230,7 +230,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				return;
 			}
 
-			if (rasterTile.Texture2D != null)
+			if (rasterTile.Texture2D != null && useCompression)
 			{
 				rasterTile.Texture2D.Compress(false);
 			}

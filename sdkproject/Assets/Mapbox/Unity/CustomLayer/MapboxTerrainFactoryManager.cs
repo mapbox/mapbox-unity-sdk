@@ -21,10 +21,11 @@ namespace CustomImageLayerSample
 		public MapboxTerrainFactoryManager(
 			TerrainStrategy terrainStrategy,
 			string tilesetId,
+			bool downloadFallbackImagery,
 			bool useRetina = true,
 			bool addCollider = false,
 			bool useRelativeHeight = false,
-			float exaggerationFactor = 1) : base(tilesetId)
+			float exaggerationFactor = 1) : base(tilesetId, downloadFallbackImagery)
 		{
 			TerrainStrategy = terrainStrategy;
 			ExaggerationFactor = exaggerationFactor;
@@ -80,7 +81,7 @@ namespace CustomImageLayerSample
 #if UNITY_EDITOR
 			rasterTile.IsMapboxTile = true;
 #endif
-			
+
 			return rasterTile;
 		}
 

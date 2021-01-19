@@ -262,6 +262,7 @@ public class MemoryTabController
 		{
 			EditorGUILayout.LabelField(string.Format("Tile Id: {0}", cacheItem.TileId), EditorStyles.label);
 			EditorGUILayout.LabelField(string.Format("Tileset {0}", cacheItem.TilesetId), EditorStyles.label);
+			EditorGUILayout.LabelField(string.Format("From {0}", cacheItem.From), EditorStyles.label);
 			EditorGUILayout.LabelField(string.Format("Expiration {0}", cacheItem.ExpirationDate), EditorStyles.label);
 			if (cacheItem.Texture2D != null)
 			{
@@ -315,7 +316,7 @@ public class UnityTilesTabController
 				}
 
 				var type = tile.GetType();
-				var isFromCacheAdd = tile.IsFromCache ? 1 : 0;
+				var isFromCacheAdd = tile.FromCache != CacheType.NoCache ? 1 : 0;
 				if (!dataTileDictionary.ContainsKey(type))
 				{
 					dataTileDictionary.Add(type, new Tuple<int, int>(1, isFromCacheAdd));
@@ -347,10 +348,10 @@ public class UnityTilesTabController
 								typeof(Texture2D));
 							}
 						}
-						EditorGUILayout.LabelField(string.Format("{0} : {1}", "Tileset", dataTile.TilesetId), EditorStyles.miniLabel);
-						EditorGUILayout.LabelField(string.Format("{0} : {1}", "State", dataTile.CurrentState), EditorStyles.miniLabel);
+						EditorGUILayout.LabelField(string.Format("Tileset : {0}", dataTile.TilesetId), EditorStyles.miniLabel);
+						EditorGUILayout.LabelField(string.Format("State : {0}", dataTile.CurrentState), EditorStyles.miniLabel);
 						EditorGUILayout.LabelField(string.Format("Is Mapbox : {0}", dataTile.IsMapboxTile), EditorStyles.miniLabel);
-						EditorGUILayout.LabelField(string.Format("Is From Cache {0}", dataTile.IsFromCache), EditorStyles.miniLabel);
+						EditorGUILayout.LabelField(string.Format("From : {0}", dataTile.FromCache), EditorStyles.miniLabel);
 						if (dataTile.HasError)
 						{
 							EditorGUILayout.LabelField(string.Format("Error : {0}", dataTile.Exceptions[0].Message), EditorStyles.miniLabel);
@@ -385,8 +386,11 @@ public class DataFetcherTabController
 	{
 		var order = _dataFetcher.GetTileOrderQueue();
 		var items = _dataFetcher.GetFetchInfoQueue();
+		var activeRequests = _dataFetcher.GetActiveRequests();
+		var activeRequestsLimit = _dataFetcher.GetActiveRequestLimit();
 
 		GUILayout.Label ("Data Fetcher", EditorStyles.boldLabel);
+		GUILayout.Label (string.Format("{0} : {1}/{2}", "Active Request Count", activeRequests.Count.ToString(), activeRequestsLimit), EditorStyles.miniLabel);
 		GUILayout.Label (string.Format("{0} : {1}", "Order Queue Size", order.Count.ToString()), EditorStyles.miniLabel);
 		GUILayout.Label (string.Format("{0} : {1}", "Item List Size", items.Count.ToString()), EditorStyles.miniLabel);
 		GUILayout.Label (string.Format("{0} : {1}", "Order - Item (Cancelled)", order.Count - items.Count), EditorStyles.miniLabel);
@@ -443,5 +447,15 @@ public class DebuggerDataFetcherWrapper : DataFetcher
 	public Dictionary<int, FetchInfo> GetFetchInfoQueue()
 	{
 		return _tileFetchInfos;
+	}
+
+	public int GetActiveRequestLimit()
+	{
+		return _activeRequestLimit;
+	}
+
+	public Dictionary<int, Tile> GetActiveRequests()
+	{
+		return _activeRequests;
 	}
 }

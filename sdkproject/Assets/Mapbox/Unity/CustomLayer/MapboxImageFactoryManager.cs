@@ -11,12 +11,16 @@ namespace CustomImageLayerSample
 		public bool UseMipMap = false;
 		public bool UseCompression = false;
 
-		public MapboxImageFactoryManager(string tilesetId, bool useRetina = true, bool useMipMap = false, bool useCompression = false) : base(tilesetId)
+		public MapboxImageFactoryManager(string tilesetId, bool downloadFallbackImagery, bool useRetina = true, bool useMipMap = false, bool useCompression = false) : base(tilesetId, downloadFallbackImagery)
 		{
 			UseRetina = useRetina;
 			UseMipMap = useMipMap;
 			UseCompression = useCompression;
-			DownloadAndCacheBaseTiles(_tilesetId, true);
+
+			if (DownloadFallbackImagery)
+			{
+				DownloadAndCacheBaseTiles(_tilesetId, true);
+			}
 		}
 
 		protected override RasterTile CreateTile(CanonicalTileId tileId, string tilesetId)

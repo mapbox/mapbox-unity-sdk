@@ -62,6 +62,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				Strategy,
 				TilesetId,
 				false,
+				false,
 				_elevationOptions.colliderOptions.addCollider,
 				_elevationOptions.modificationOptions.useRelativeHeight,
 				_elevationOptions.requiredOptions.exaggerationFactor);

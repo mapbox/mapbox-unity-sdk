@@ -7,6 +7,7 @@
 using System;
 using Mapbox.Platform;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 namespace Mapbox.Map
@@ -92,14 +93,12 @@ namespace Mapbox.Map
 		public override void Cancel()
 		{
 			base.Cancel();
-			if (_unityRequest != null)
-			{
-				_unityRequest.Abort();
-			}
 		}
 
 		protected void HandleTileResponse(TextureResponse textureResponse)
 		{
+			//this is a callback and after this chain, unity web request will be aborted
+			//and disposed as it'll hit the end of the using block in CachingWebFileSource
 			_unityRequest = null;
 			if (textureResponse.HasError)
 			{
