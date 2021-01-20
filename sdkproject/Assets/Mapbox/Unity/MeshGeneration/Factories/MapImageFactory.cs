@@ -68,7 +68,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		public override void SetOptions(LayerProperties options)
 		{
 			_properties = (ImageryLayerProperties)options;
-			ImageFactoryManager = new MapboxImageFactoryManager(TilesetId, true);
+			ImageFactoryManager = new MapboxImageFactoryManager(_fileSource, TilesetId, true);
 			ImageFactoryManager.FetchingError += OnFetchingError;
 		}
 

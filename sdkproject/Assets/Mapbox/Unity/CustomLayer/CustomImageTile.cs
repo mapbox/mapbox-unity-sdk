@@ -25,7 +25,7 @@ namespace CustomImageLayerSample
 			TilesetId = tilesetId;
 			_callback = p;
 
-			fileSource.CustomImageRequest(GetURL(Id), HandleTileResponse, tileId: Id, tilesetId: tilesetId);
+			_unityRequest = fileSource.CustomImageRequest(GetURL(Id), HandleTileResponse, tileId: Id, tilesetId: tilesetId);
 		}
 
 		private string GetURL(CanonicalTileId id)
@@ -34,5 +34,27 @@ namespace CustomImageLayerSample
 		}
 
 
+	}
+
+	public class FileImageTile : RasterTile
+	{
+		public string FilePath;
+
+		public FileImageTile(CanonicalTileId tileId, string tilesetId, string filePath) : base(tileId, tilesetId)
+		{
+			FilePath = filePath;
+		}
+
+		internal override void Initialize(IFileSource fileSource, CanonicalTileId canonicalTileId, string tilesetId, Action p)
+		{
+			Cancel();
+
+			_state = State.Loading;
+			Id = canonicalTileId;
+			TilesetId = tilesetId;
+			_callback = p;
+
+			_unityRequest = fileSource.CustomImageRequest(FilePath, HandleTileResponse, tileId: Id, tilesetId: tilesetId);
+		}
 	}
 }

@@ -10,12 +10,24 @@ using UnityEngine;
 
 public abstract class DataFetcher
 {
-	protected MapboxAccess _fileSource;
+	protected IFileSource _fileSource;
 
 	protected static Queue<int> _tileOrder;
 	protected static Dictionary<int, FetchInfo> _tileFetchInfos;
 	protected static Dictionary<int, Tile> _activeRequests;
 	protected static int _activeRequestLimit = 10;
+
+	protected DataFetcher(IFileSource fileSource)
+	{
+		_fileSource = fileSource;
+		if (_tileOrder == null)
+		{
+			_tileOrder = new Queue<int>();
+			_tileFetchInfos = new Dictionary<int, FetchInfo>();
+			_activeRequests = new Dictionary<int, Tile>();
+			Runnable.Run(UpdateTick(_fileSource));
+		}
+	}
 
 	protected DataFetcher()
 	{
@@ -58,7 +70,10 @@ public abstract class DataFetcher
 		}
 	}
 
-	public abstract void FetchData(DataFetcherParameters parameters);
+	public virtual void FetchData(DataFetcherParameters parameters)
+	{
+
+	}
 
 	protected void EnqueueForFetching(FetchInfo info)
 	{
@@ -101,4 +116,13 @@ public class FetchInfo
 	public Action Callback;
 	public Tile RasterTile;
 	public string ETag;
+
+	public FetchInfo(CanonicalTileId tileId, string tilesetId, Tile tile, string eTag = "", Action callback = null)
+	{
+		TileId = tileId;
+		TilesetId = tilesetId;
+		RasterTile = tile;
+		ETag = eTag;
+		callback = callback;
+	}
 }

@@ -123,6 +123,13 @@ namespace Mapbox.Platform.Cache
 
             _textureFileCache.GetAsync(tilesetId, tileId, (textureCacheItem) =>
             {
+
+                if (textureCacheItem == null || textureCacheItem.HasError)
+                {
+                    callback(null);
+                    return;
+                }
+
 #if UNITY_EDITOR
                 textureCacheItem.Texture2D.name = string.Format("{0}_{1}", tileId.ToString(), tilesetId);
 #endif
@@ -135,10 +142,7 @@ namespace Mapbox.Platform.Cache
                     return;
                 }
 
-#if UNITY_EDITOR
-                //helpful for debugging memory
-                textureCacheItem.Texture2D.name = tileId.ToString() + "_" + tilesetId;
-#endif
+                //this isn't async. shouldn't it be?
                 var tile = _sqLiteCache.Get(tilesetId, tileId);
                 if (tile != null)
                 {

@@ -4,6 +4,7 @@ using Mapbox.Unity.MeshGeneration.Enums;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Mapbox.Platform;
 using Mapbox.Platform.Cache;
 using Mapbox.Unity;
 using Mapbox.Unity.Utilities;
@@ -16,6 +17,11 @@ public class ImageDataFetcher : DataFetcher
 	public Action<UnityTile, RasterTile> TextureReceived = (t, s) => { };
 	public Action<UnityTile, RasterTile, TileErrorEventArgs> FetchingError = (t, r, s) => { };
 
+	public ImageDataFetcher(IFileSource fileSource) : base(fileSource)
+	{
+
+	}
+
 	public override void FetchData(DataFetcherParameters parameters)
 	{
 		var imageDataParameters = parameters as ImageDataFetcherParameters;
@@ -27,7 +33,7 @@ public class ImageDataFetcher : DataFetcher
 		FetchData(imageDataParameters.tilesetId, imageDataParameters.canonicalTileId, imageDataParameters.useRetina, imageDataParameters.tile);
 	}
 
-	public void FetchData(RasterTile tile, string tilesetId, CanonicalTileId tileId, bool useRetina, UnityTile unityTile = null)
+	public virtual void FetchData(RasterTile tile, string tilesetId, CanonicalTileId tileId, bool useRetina, UnityTile unityTile = null)
 	{
 		//MemoryCacheCheck
 		var textureItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(tilesetId, tileId);
@@ -62,18 +68,31 @@ public class ImageDataFetcher : DataFetcher
 #if UNITY_EDITOR
 					tile.FromCache = CacheType.FileCache;
 #endif
+					//do we need these for live products or are they only for debugging?
+					tile.ETag = textureCacheItem.ETag;
+					if (textureCacheItem.ExpirationDate.HasValue)
+					{
+						tile.ExpirationDate = textureCacheItem.ExpirationDate.Value;
+					}
+
 					TextureReceived(unityTile, tile);
 
 					//after returning what we already have
 					//check if it's out of date, if so check server for update
 					if (textureCacheItem.ExpirationDate < DateTime.Now)
 					{
-						CreateWebRequest(tilesetId, tileId, useRetina, textureCacheItem.ETag, unityTile);
+						EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, textureCacheItem.ETag)
+						{
+							Callback = () => { FetchingCallback(tileId, tile, unityTile); }
+						});
 					}
 				}
 				else
 				{
-					CreateWebRequest(tilesetId, tileId, useRetina, String.Empty, unityTile);
+					EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, String.Empty)
+					{
+						Callback = () => { FetchingCallback(tileId, tile, unityTile); }
+					});
 				}
 			});
 
@@ -82,12 +101,8 @@ public class ImageDataFetcher : DataFetcher
 
 		//not in cache so web request
 		//CreateWebRequest(tilesetId, tileId, useRetina, String.Empty, unityTile);
-		EnqueueForFetching(new FetchInfo()
+		EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, String.Empty)
 		{
-			TileId = tileId,
-			TilesetId = tilesetId,
-			RasterTile = tile,
-			ETag = String.Empty,
 			Callback = () => { FetchingCallback(tileId, tile, unityTile); }
 		});
 	}
@@ -125,7 +140,9 @@ public class ImageDataFetcher : DataFetcher
 				if (textureCacheItem != null)
 				{
 					var rasterTile = new RasterTile(tileId, tilesetId);
-					rasterTile.SetTextureFromCache(textureItem.Texture2D);
+					rasterTile.SetTextureFromCache(textureCacheItem.Texture2D);
+					rasterTile.ETag = textureCacheItem.ETag;
+					rasterTile.ExpirationDate = textureCacheItem.ExpirationDate.Value;
 					if (unityTile != null) { unityTile.AddTile(rasterTile); }
 
 					TextureReceived(unityTile, rasterTile);
@@ -169,12 +186,8 @@ public class ImageDataFetcher : DataFetcher
 			unityTile.AddTile(rasterTile);
 		}
 
-		EnqueueForFetching(new FetchInfo()
+		EnqueueForFetching(new FetchInfo(tileId, tilesetId, rasterTile, etag)
 		{
-			TileId = tileId,
-			TilesetId = tilesetId,
-			RasterTile = rasterTile,
-			ETag = etag,
 			Callback = () => { FetchingCallback(tileId, rasterTile, unityTile); }
 		});
 	}
@@ -183,7 +196,7 @@ public class ImageDataFetcher : DataFetcher
 	{
 		if (unityTile != null && !unityTile.ContainsDataTile(rasterTile))
 		{
-			rasterTile.Clear();
+			//rasterTile.Clear();
 			//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
 			return;
 		}
@@ -194,6 +207,9 @@ public class ImageDataFetcher : DataFetcher
 		}
 		else
 		{
+
+			rasterTile.ExtractTextureFromRequest();
+
 #if UNITY_EDITOR
 			if (rasterTile.Texture2D != null)
 			{
@@ -220,16 +236,16 @@ public class ImageDataFetcher : DataFetcher
 				TextureReceived(unityTile, rasterTile);
 			}
 		}
-
-		// if (unityTile != null)
-		// {
-		// 	unityTile.RemoveTile(rasterTile);
-		// }
 	}
 }
 
 public class BaseImageDataFetcher : ImageDataFetcher
 {
+	public BaseImageDataFetcher(IFileSource fileSource) : base(fileSource)
+	{
+
+	}
+
 	public void FetchData(RasterTile tile, string tilesetId, CanonicalTileId tileId, bool useRetina, UnityTile unityTile = null)
 	{
 		//MemoryCacheCheck
@@ -261,6 +277,8 @@ public class BaseImageDataFetcher : ImageDataFetcher
 #if UNITY_EDITOR
 					rasterTile.FromCache = CacheType.FileCache;
 #endif
+					rasterTile.ETag = textureCacheItem.ETag;
+					rasterTile.ExpirationDate = textureCacheItem.ExpirationDate.Value;
 					TextureReceived(unityTile, rasterTile);
 					MapboxAccess.Instance.CacheManager.MarkFixed(tileId, tilesetId);
 
@@ -281,12 +299,8 @@ public class BaseImageDataFetcher : ImageDataFetcher
 		}
 
 		//not in cache so web request
-		EnqueueForFetching(new FetchInfo()
+		EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, String.Empty)
 		{
-			TileId = tileId,
-			TilesetId = tilesetId,
-			RasterTile = tile,
-			ETag = String.Empty,
 			Callback = () => { FetchingCallback(tileId, tile, unityTile); }
 		});
 	}

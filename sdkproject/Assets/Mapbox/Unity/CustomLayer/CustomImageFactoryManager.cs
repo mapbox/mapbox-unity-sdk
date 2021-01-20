@@ -1,4 +1,5 @@
 using Mapbox.Map;
+using Mapbox.Platform;
 using Mapbox.Unity;
 using Mapbox.Unity.MeshGeneration.Data;
 using UnityEngine;
@@ -11,7 +12,7 @@ namespace CustomImageLayerSample
 		private string CustomTextureFieldName;
 		private string CustomTextureScaleOffsetFieldName;
 
-		public CustomImageFactoryManager(string urlFormat, string tilesetId, bool downloadFallbackImagery, string textureFieldName = "_MainTex", string textureScaleOffsetFieldName = "_MainTex_ST") : base(tilesetId, downloadFallbackImagery)
+		public CustomImageFactoryManager(IFileSource fileSource, string urlFormat, string tilesetId, bool downloadFallbackImagery, string textureFieldName = "_MainTex", string textureScaleOffsetFieldName = "_MainTex_ST") : base(fileSource, tilesetId, downloadFallbackImagery)
 		{
 			_urlFormat = urlFormat;
 			CustomTextureFieldName = textureFieldName;

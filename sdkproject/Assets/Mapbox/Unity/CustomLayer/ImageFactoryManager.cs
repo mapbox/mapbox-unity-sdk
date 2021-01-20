@@ -1,5 +1,6 @@
 using System;
 using Mapbox.Map;
+using Mapbox.Platform;
 using Mapbox.Unity;
 using Mapbox.Unity.MeshGeneration.Data;
 using UnityEngine;
@@ -16,13 +17,13 @@ namespace CustomImageLayerSample
 		protected ImageDataFetcher _fetcher;
 		protected string _tilesetId;
 
-		protected ImageFactoryManager(string tilesetId, bool downloadFallbackImagery)
+		protected ImageFactoryManager(IFileSource fileSource, string tilesetId, bool downloadFallbackImagery)
 		{
 			DownloadFallbackImagery = downloadFallbackImagery;
 			_tilesetId = tilesetId;
 
-			_baseImageDataFetcher = new BaseImageDataFetcher();
-			_fetcher = new ImageDataFetcher();
+			_baseImageDataFetcher = new BaseImageDataFetcher(fileSource);
+			_fetcher = new ImageDataFetcher(fileSource);
 			_fetcher.TextureReceived += OnTextureReceived;
 			_fetcher.FetchingError += OnFetcherError;
 

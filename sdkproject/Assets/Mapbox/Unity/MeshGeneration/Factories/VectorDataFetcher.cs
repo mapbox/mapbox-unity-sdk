@@ -123,12 +123,8 @@ public class VectorDataFetcher : DataFetcher
 			unityTile.AddTile(vectorTile);
 		}
 
-		EnqueueForFetching(new FetchInfo()
+		EnqueueForFetching(new FetchInfo(tileId, tilesetId, vectorTile, etag)
 		{
-			TileId = tileId,
-			TilesetId = tilesetId,
-			RasterTile = vectorTile,
-			ETag = etag,
 			Callback = () => { FetchingCallback(tileId, vectorTile, unityTile); }
 		});
 	}

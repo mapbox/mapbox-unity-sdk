@@ -1,5 +1,6 @@
 using System;
 using Mapbox.Map;
+using Mapbox.Platform;
 using Mapbox.Unity;
 using Mapbox.Unity.MeshGeneration.Data;
 
@@ -11,7 +12,7 @@ namespace CustomImageLayerSample
 		public bool UseMipMap = false;
 		public bool UseCompression = false;
 
-		public MapboxImageFactoryManager(string tilesetId, bool downloadFallbackImagery, bool useRetina = true, bool useMipMap = false, bool useCompression = false) : base(tilesetId, downloadFallbackImagery)
+		public MapboxImageFactoryManager(IFileSource fileSource, string tilesetId, bool downloadFallbackImagery, bool useRetina = true, bool useMipMap = false, bool useCompression = false) : base(fileSource, tilesetId, downloadFallbackImagery)
 		{
 			UseRetina = useRetina;
 			UseMipMap = useMipMap;

@@ -99,7 +99,7 @@ namespace Mapbox.Map
 		{
 			//this is a callback and after this chain, unity web request will be aborted
 			//and disposed as it'll hit the end of the using block in CachingWebFileSource
-			_unityRequest = null;
+
 			if (textureResponse.HasError)
 			{
 				foreach (var exception in textureResponse.Exceptions)
@@ -125,6 +125,7 @@ namespace Mapbox.Map
 			}
 
 			_callback();
+			_unityRequest = null;
 		}
 
 		internal override TileResource MakeTileResource(string tilesetId)
@@ -151,6 +152,15 @@ namespace Mapbox.Map
 		{
 			Texture2D = texture;
 			_state = State.Loaded;
+		}
+
+		public void ExtractTextureFromRequest()
+		{
+			if (_unityRequest != null)
+			{
+				Texture2D = DownloadHandlerTexture.GetContent(_unityRequest);
+				Texture2D.wrapMode = TextureWrapMode.Clamp;
+			}
 		}
 	}
 }

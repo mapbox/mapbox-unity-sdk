@@ -155,9 +155,9 @@ namespace Mapbox.Platform.Cache
 
 		private IEnumerator FetchTextureIfNoneMatch(UnityWebRequest uwr,  Action<TextureResponse> callback, string etag)
 		{
-			var response = new TextureResponse();
 			using (uwr)
 			{
+				var response = new TextureResponse();
 				if (!string.IsNullOrEmpty(etag))
 				{
 					uwr.SetRequestHeader("If-None-Match", etag);
@@ -179,14 +179,21 @@ namespace Mapbox.Platform.Cache
 					response.StatusCode = uwr.responseCode;
 
 					string eTag = uwr.GetETag();
-					var texture = DownloadHandlerTexture.GetContent(uwr);
 
-					texture.wrapMode = TextureWrapMode.Clamp;
-					response.Texture2D = texture;
+					//IMPORTANT
+					//we used to extract texture from UWR here
+					//but I moved it up to image data fetcher as I felt better
+					//having it right by the code where we send it to the cache.
+					//It feels better control over possible texture leaks
+					//call hierarchy should go like
+					//ImageDataFetcher=>Raster Tile=>here=>callback to RasterTile=>callback to ImageDataFetcher
+
+					//var texture = DownloadHandlerTexture.GetContent(uwr);
+					// texture.wrapMode = TextureWrapMode.Clamp;
+					//response.Texture2D = texture;
 
 					var expirationDate = uwr.GetExpirationDate();
 
-					response.Texture2D = texture;
 					response.ETag = eTag;
 					response.ExpirationDate = expirationDate;
 					response.Data = uwr.downloadHandler.data;
@@ -201,9 +208,9 @@ namespace Mapbox.Platform.Cache
 			// Stopwatch sw = new Stopwatch();
 			// sw.Start();
 
-			var response = new TextureResponse();
 			using (webRequest)
 			{
+				var response = new TextureResponse();
 				yield return webRequest.SendWebRequest();
 
 				// sw.Stop();
@@ -223,16 +230,25 @@ namespace Mapbox.Platform.Cache
 					string eTag = webRequest.GetETag();
 					DateTime expirationDate = webRequest.GetExpirationDate();
 
-					var texture = DownloadHandlerTexture.GetContent(webRequest);
-					texture.wrapMode = TextureWrapMode.Clamp;
-					response.Texture2D = texture;
+					//IMPORTANT
+					//we used to extract texture from UWR here
+					//but I moved it up to image data fetcher as I felt better
+					//having it right by the code where we send it to the cache.
+					//It feels better control over possible texture leaks
+					//call hierarchy should go like
+					//ImageDataFetcher=>Raster Tile=>here=>callback to RasterTile=>callback to ImageDataFetcher
+
+					//var texture = DownloadHandlerTexture.GetContent(uwr);
+					// texture.wrapMode = TextureWrapMode.Clamp;
+					//response.Texture2D = texture;
+
 					response.ETag = eTag;
 					response.ExpirationDate = expirationDate;
 					response.Data = webRequest.downloadHandler.data;
 				}
 
+				callback(response);
 			}
-			callback(response);
 		}
 
 		private IAsyncRequest requestTileAndCache(string url, int timeout, Action<Response> callback)

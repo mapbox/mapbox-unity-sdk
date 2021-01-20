@@ -40,7 +40,7 @@ namespace Mapbox.Core.Platform.Cache
 			string eTag = response.GetResponseHeader(EtagHeaderName);
 			if (string.IsNullOrEmpty(eTag))
 			{
-				Debug.LogWarning("no 'ETag' header present in response");
+				//Debug.LogWarning("no 'ETag' header present in response");
 			}
 
 			return eTag;

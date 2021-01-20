@@ -19,6 +19,8 @@ namespace Mapbox.Platform.Cache
 		public string ETag;
 		/// <summary> Expiration date of the cached data </summary>
 		public DateTime? ExpirationDate;
+		/// <summary> Has an error occured reading from cache or operation cancelled while system is reading from cache async </summary>
+		public bool HasError = false;
 
 #if UNITY_EDITOR
 		public CacheType From;

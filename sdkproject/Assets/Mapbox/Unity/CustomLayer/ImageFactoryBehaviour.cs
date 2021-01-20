@@ -1,4 +1,5 @@
 using System;
+using Mapbox.Unity;
 using Mapbox.Unity.Map;
 using UnityEngine;
 
@@ -19,7 +20,7 @@ namespace CustomImageLayerSample
 		{
 			if (enabled)
 			{
-				ImageFactoryManager = new CustomImageFactoryManager(UrlFormat, CustomTilesetId, DownloadFallbackImagery, TextureFieldName, TextureScaleOffsetFieldName);
+				ImageFactoryManager = new CustomImageFactoryManager(MapboxAccess.Instance, UrlFormat, CustomTilesetId, DownloadFallbackImagery, TextureFieldName, TextureScaleOffsetFieldName);
 				ImageFactoryManager.FetchingError += (tile, rasterTile, args) => { Debug.Log(args.Exceptions[0]); };
 				Map.OnTileRegisteredToFactories += ImageFactoryManager.RegisterTile;
 				Map.OnTileDisposing += tile => { ImageFactoryManager.UnregisterTile(tile); };

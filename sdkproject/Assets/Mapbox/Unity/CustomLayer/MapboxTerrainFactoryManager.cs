@@ -1,5 +1,6 @@
 using System;
 using Mapbox.Map;
+using Mapbox.Platform;
 using Mapbox.Unity;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies;
@@ -19,13 +20,14 @@ namespace CustomImageLayerSample
 		private bool _isUsingShaderSolution = true;
 
 		public MapboxTerrainFactoryManager(
+			IFileSource fileSource,
 			TerrainStrategy terrainStrategy,
 			string tilesetId,
 			bool downloadFallbackImagery,
 			bool useRetina = true,
 			bool addCollider = false,
 			bool useRelativeHeight = false,
-			float exaggerationFactor = 1) : base(tilesetId, downloadFallbackImagery)
+			float exaggerationFactor = 1) : base(fileSource, tilesetId, downloadFallbackImagery)
 		{
 			TerrainStrategy = terrainStrategy;
 			ExaggerationFactor = exaggerationFactor;

@@ -436,5 +436,9 @@ namespace Mapbox.Unity.Map
 		public event Action<UnityTile> OnTileDisposing = delegate {};
 
 		#endregion
+
+#if UNITY_EDITOR
+		public Queue<UnityTile> GetInactiveTiles => _inactiveTiles;
+#endif
 	}
 }

@@ -280,95 +280,215 @@ public class UnityTilesTabController
 		_map = GameObject.FindObjectOfType<AbstractMap>();
 	}
 
-	private UnityTile _openTile;
 	private Tile _openDataTile;
+	private bool _activeTilesFold;
+	private bool _inactiveTilesFold;
+	private bool[] _subFoldList1;
+	private bool[] _subFoldList2;
 
 	public void Draw()
 	{
 		GUILayout.Label ("Unity Tiles", EditorStyles.boldLabel);
 		var tiles = _map.MapVisualizer.ActiveTiles;
+		var inactiveTiles = _map.MapVisualizer.GetInactiveTiles;
+
 		GUILayout.Label (string.Format("{0} : {1}", "Unity Tile Count", tiles.Count), EditorStyles.miniLabel);
 
-		GUILayout.Space(10);
-		var zoomLevelDictionary = new Dictionary<int, int>();
-		var dataTileDictionary = new Dictionary<Type, Tuple<int, int>>();
-		foreach (var unityTile in tiles)
+		DrawActiveTiles(tiles);
+
+		DrawInactiveTiles(inactiveTiles);
+	}
+
+	private void DrawInactiveTiles(Queue<UnityTile> tiles)
+	{
+		_inactiveTilesFold = EditorGUILayout.Foldout(_inactiveTilesFold, string.Format("Inactive Tiles ({0})", tiles.Count));
+		if (_inactiveTilesFold)
 		{
-			var zoom = unityTile.Value.CurrentZoom;
-			if (!zoomLevelDictionary.ContainsKey(zoom))
+			Array.Resize(ref _subFoldList1, tiles.Count);
+			var zoomLevelDictionary = new Dictionary<int, int>();
+			var dataTileDictionary = new Dictionary<Type, Tuple<int, int>>();
+			var index = 0;
+			foreach (var unityTile in tiles)
 			{
-				zoomLevelDictionary.Add(zoom, 1);
-			}
-			else
-			{
-				zoomLevelDictionary[zoom]++;
-			}
-
-			var dataErrors = new List<string>();
-			foreach (var tile in unityTile.Value.Tiles)
-			{
-				if (tile.HasError)
+				var zoom = unityTile.CurrentZoom;
+				if (!zoomLevelDictionary.ContainsKey(zoom))
 				{
-					foreach (var exception in tile.Exceptions)
-					{
-						dataErrors.Add(exception.ToString());
-					}
-				}
-
-				var type = tile.GetType();
-				var isFromCacheAdd = tile.FromCache != CacheType.NoCache ? 1 : 0;
-				if (!dataTileDictionary.ContainsKey(type))
-				{
-					dataTileDictionary.Add(type, new Tuple<int, int>(1, isFromCacheAdd));
+					zoomLevelDictionary.Add(zoom, 1);
 				}
 				else
 				{
-					dataTileDictionary[type] = new Tuple<int, int>(dataTileDictionary[type].Item1 + 1, dataTileDictionary[type].Item2 + isFromCacheAdd);
+					zoomLevelDictionary[zoom]++;
 				}
-			}
 
-			var unityTileFold = EditorGUILayout.Foldout(_openTile == unityTile.Value, unityTile.Value.CanonicalTileId.ToString());
-			if (unityTileFold)
-			{
-				EditorGUI.indentLevel++;
-				_openTile = unityTile.Value;
-				foreach (var dataTile in unityTile.Value.Tiles)
+				var dataErrors = new List<string>();
+				foreach (var tile in unityTile.Tiles)
 				{
-					var dataTileFold = EditorGUILayout.Foldout(_openDataTile == dataTile, dataTile.GetType().ToString());
-					if (dataTileFold)
+					if (tile.HasError)
 					{
-						EditorGUI.indentLevel++;
-						_openDataTile = dataTile;
-						if(dataTile is RasterTile)
+						foreach (var exception in tile.Exceptions)
 						{
-							if ((dataTile as RasterTile).Texture2D != null)
-							{
-								EditorGUILayout.ObjectField(
-								(dataTile as RasterTile).Texture2D,
-								typeof(Texture2D));
-							}
+							dataErrors.Add(exception.ToString());
 						}
-						EditorGUILayout.LabelField(string.Format("Tileset : {0}", dataTile.TilesetId), EditorStyles.miniLabel);
-						EditorGUILayout.LabelField(string.Format("State : {0}", dataTile.CurrentState), EditorStyles.miniLabel);
-						EditorGUILayout.LabelField(string.Format("Is Mapbox : {0}", dataTile.IsMapboxTile), EditorStyles.miniLabel);
-						EditorGUILayout.LabelField(string.Format("From : {0}", dataTile.FromCache), EditorStyles.miniLabel);
-						if (dataTile.HasError)
-						{
-							EditorGUILayout.LabelField(string.Format("Error : {0}", dataTile.Exceptions[0].Message), EditorStyles.miniLabel);
-						}
-						EditorGUI.indentLevel--;
+					}
+
+					var type = tile.GetType();
+					var isFromCacheAdd = tile.FromCache != CacheType.NoCache ? 1 : 0;
+					if (!dataTileDictionary.ContainsKey(type))
+					{
+						dataTileDictionary.Add(type, new Tuple<int, int>(1, isFromCacheAdd));
+					}
+					else
+					{
+						dataTileDictionary[type] = new Tuple<int, int>(dataTileDictionary[type].Item1 + 1, dataTileDictionary[type].Item2 + isFromCacheAdd);
 					}
 				}
-				EditorGUI.indentLevel--;
+
+				_subFoldList1[index] = EditorGUILayout.Foldout(_subFoldList1[index], unityTile.CanonicalTileId.ToString());
+				if (_subFoldList1[index])
+				{
+					EditorGUI.indentLevel++;
+					foreach (var dataTile in unityTile.Tiles)
+					{
+						var dataTileFold = EditorGUILayout.Foldout(_openDataTile == dataTile, dataTile.GetType().ToString());
+						if (dataTileFold)
+						{
+							EditorGUI.indentLevel++;
+							_openDataTile = dataTile;
+							if (dataTile is RasterTile)
+							{
+								if ((dataTile as RasterTile).Texture2D != null)
+								{
+									EditorGUILayout.ObjectField(
+										(dataTile as RasterTile).Texture2D,
+										typeof(Texture2D));
+								}
+							}
+
+							EditorGUILayout.LabelField(string.Format("Tileset : {0}", dataTile.TilesetId), EditorStyles.miniLabel);
+							EditorGUILayout.LabelField(string.Format("State : {0}", dataTile.CurrentState), EditorStyles.miniLabel);
+							EditorGUILayout.LabelField(string.Format("Is Mapbox : {0}", dataTile.IsMapboxTile), EditorStyles.miniLabel);
+							EditorGUILayout.LabelField(string.Format("From : {0}", dataTile.FromCache), EditorStyles.miniLabel);
+							if (dataTile.HasError)
+							{
+								EditorGUILayout.LabelField(string.Format("Error : {0}", dataTile.Exceptions[0].Message), EditorStyles.miniLabel);
+							}
+
+							EditorGUI.indentLevel--;
+						}
+					}
+
+					EditorGUI.indentLevel--;
+				}
+
+				index++;
+			}
+
+			foreach (var entry in zoomLevelDictionary)
+			{
+				GUILayout.Label(string.Format("{1} tiles at zoom level {0}", entry.Key, entry.Value), EditorStyles.miniLabel);
+			}
+
+			foreach (var entry in dataTileDictionary)
+			{
+				GUILayout.Label(string.Format("{1} data tile of type {0}", entry.Key, entry.Value), EditorStyles.miniLabel);
 			}
 		}
-		foreach (var entry in zoomLevelDictionary)
+	}
+
+	private void DrawActiveTiles(Dictionary<UnwrappedTileId, UnityTile> tiles)
+	{
+		_activeTilesFold = EditorGUILayout.Foldout(_activeTilesFold, string.Format("Active Tiles ({0})", tiles.Count));
+		if (_activeTilesFold)
 		{
-			GUILayout.Label (string.Format("{1} tiles at zoom level {0}", entry.Key, entry.Value), EditorStyles.miniLabel);
-		}
-		foreach (var entry in dataTileDictionary)
-		{
-			GUILayout.Label (string.Format("{1} data tile of type {0}", entry.Key, entry.Value), EditorStyles.miniLabel);
+			Array.Resize(ref _subFoldList2, tiles.Count);
+			var zoomLevelDictionary = new Dictionary<int, int>();
+			var dataTileDictionary = new Dictionary<Type, Tuple<int, int>>();
+			var index = 0;
+			foreach (var unityTile in tiles)
+			{
+				var zoom = unityTile.Value.CurrentZoom;
+				if (!zoomLevelDictionary.ContainsKey(zoom))
+				{
+					zoomLevelDictionary.Add(zoom, 1);
+				}
+				else
+				{
+					zoomLevelDictionary[zoom]++;
+				}
+
+				var dataErrors = new List<string>();
+				foreach (var tile in unityTile.Value.Tiles)
+				{
+					if (tile.HasError)
+					{
+						foreach (var exception in tile.Exceptions)
+						{
+							dataErrors.Add(exception.ToString());
+						}
+					}
+
+					var type = tile.GetType();
+					var isFromCacheAdd = tile.FromCache != CacheType.NoCache ? 1 : 0;
+					if (!dataTileDictionary.ContainsKey(type))
+					{
+						dataTileDictionary.Add(type, new Tuple<int, int>(1, isFromCacheAdd));
+					}
+					else
+					{
+						dataTileDictionary[type] = new Tuple<int, int>(dataTileDictionary[type].Item1 + 1, dataTileDictionary[type].Item2 + isFromCacheAdd);
+					}
+				}
+
+				_subFoldList2[index] = EditorGUILayout.Foldout(_subFoldList2[index], unityTile.Value.CanonicalTileId.ToString());
+				if (_subFoldList2[index])
+				{
+					EditorGUI.indentLevel++;
+					foreach (var dataTile in unityTile.Value.Tiles)
+					{
+						var dataTileFold = EditorGUILayout.Foldout(_openDataTile == dataTile, dataTile.GetType().ToString());
+						if (dataTileFold)
+						{
+							EditorGUI.indentLevel++;
+							_openDataTile = dataTile;
+							if (dataTile is RasterTile)
+							{
+								if ((dataTile as RasterTile).Texture2D != null)
+								{
+									EditorGUILayout.ObjectField(
+										(dataTile as RasterTile).Texture2D,
+										typeof(Texture2D));
+								}
+							}
+
+							EditorGUILayout.LabelField(string.Format("Tileset : {0}", dataTile.TilesetId), EditorStyles.miniLabel);
+							EditorGUILayout.LabelField(string.Format("State : {0}", dataTile.CurrentState), EditorStyles.miniLabel);
+							EditorGUILayout.LabelField(string.Format("Is Mapbox : {0}", dataTile.IsMapboxTile), EditorStyles.miniLabel);
+							EditorGUILayout.LabelField(string.Format("From : {0}", dataTile.FromCache), EditorStyles.miniLabel);
+							if (dataTile.HasError)
+							{
+								EditorGUILayout.LabelField(string.Format("Error : {0}", dataTile.Exceptions[0].Message), EditorStyles.miniLabel);
+							}
+
+							EditorGUI.indentLevel--;
+						}
+					}
+
+					EditorGUI.indentLevel--;
+				}
+
+				index++;
+			}
+
+			foreach (var entry in zoomLevelDictionary)
+			{
+				GUILayout.Label(string.Format("{1} tiles at zoom level {0}", entry.Key, entry.Value), EditorStyles.miniLabel);
+			}
+
+			foreach (var entry in dataTileDictionary)
+			{
+				GUILayout.Label(string.Format("{1} data tile of type {0}", entry.Key, entry.Value), EditorStyles.miniLabel);
+			}
+
 		}
 	}
 }

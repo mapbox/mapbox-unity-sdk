@@ -59,6 +59,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			Strategy.Initialize(_elevationOptions);
 
 			TerrainFactoryManager = new MapboxTerrainFactoryManager(
+				_fileSource,
 				Strategy,
 				TilesetId,
 				false,

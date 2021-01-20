@@ -100,6 +100,7 @@ public class UnityTileEditor : Editor
 					EditorGUILayout.LabelField(string.Format("{0} : {1}", "Tileset", dataTile.TilesetId), EditorStyles.label);
 					EditorGUILayout.LabelField(string.Format("{0} : {1}", "From", dataTile.FromCache), EditorStyles.label);
 					EditorGUILayout.LabelField(string.Format("{0} : {1}", "State", dataTile.CurrentState), EditorStyles.label);
+					EditorGUILayout.LabelField(string.Format("{0} : {1}", "ETag", dataTile.ETag), EditorStyles.label);
 					EditorGUILayout.LabelField(string.Format("Is Mapbox : {0}", dataTile.IsMapboxTile), EditorStyles.label);
 					EditorGUILayout.LabelField(string.Format("Is From Cache {0}", dataTile.FromCache), EditorStyles.label);
 
