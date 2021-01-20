@@ -200,44 +200,6 @@ namespace Mapbox.Platform.Cache
 					sourceStream.Close();
 					FileSaved(info.MapId, info.TileId, info.TextureCacheItem);
 				});
-
-			//We probably shouldn't delay this. It will only cause problems and it should be fast enough anyway
-			//FileSaved(info.MapId, info.TileId, info.TextureCacheItem);
-		}
-
-		private IEnumerator LoadImageCoroutine(CanonicalTileId tileId, string tilesetId, string filePath, Action<TextureCacheItem> callback)
-		{
-			var fullFilePath = string.Format("{0}.{1}", filePath, FileExtension);
-			if (File.Exists(fullFilePath))
-			{
-				using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(fullFilePath))
-				{
-					yield return uwr.SendWebRequest();
-
-					if (uwr.isNetworkError || uwr.isHttpError)
-					{
-						Debug.LogErrorFormat(fullFilePath + " - " + uwr.error);
-					}
-					else
-					{
-						var textureCacheItem = new TextureCacheItem
-						{
-							TileId = tileId,
-							TilesetId = tilesetId,
-							Texture2D = DownloadHandlerTexture.GetContent(uwr)
-						};
-						textureCacheItem.Texture2D.wrapMode = TextureWrapMode.Clamp;
-						textureCacheItem.FilePath = fullFilePath;
-
-						callback(textureCacheItem);
-					}
-				}
-			}
-			else
-			{
-				Debug.Log("Requested file not found");
-				callback(null);
-			}
 		}
 
 		private string MapIdToFolderName(string mapId)
@@ -326,6 +288,7 @@ namespace Mapbox.Platform.Cache
 						HasError = tile.CurrentState == Tile.State.Canceled
 					};
 
+					tile.Clear();
 					callback(textureCacheItem);
 				}
 			});

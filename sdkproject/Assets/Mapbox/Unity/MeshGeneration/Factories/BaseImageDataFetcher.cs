@@ -45,6 +45,7 @@ public class BaseImageDataFetcher : ImageDataFetcher
 					rasterTile.ETag = textureCacheItem.ETag;
 					rasterTile.ExpirationDate = textureCacheItem.ExpirationDate.Value;
 					TextureReceived(unityTile, rasterTile);
+					MapboxAccess.Instance.CacheManager.AddTextureItemToMemory(tilesetId, tileId, textureCacheItem, true);
 					MapboxAccess.Instance.CacheManager.MarkFixed(tileId, tilesetId);
 
 					//after returning what we already have

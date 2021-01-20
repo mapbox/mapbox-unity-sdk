@@ -112,7 +112,6 @@ namespace Mapbox.Map
 			else
 			{
 				StatusCode = textureResponse.StatusCode;
-				Texture2D = textureResponse.Texture2D;
 				data = textureResponse.Data;
 				ETag = textureResponse.ETag;
 				ExpirationDate = textureResponse.ExpirationDate;
@@ -159,7 +158,14 @@ namespace Mapbox.Map
 			if (_unityRequest != null)
 			{
 				Texture2D = DownloadHandlerTexture.GetContent(_unityRequest);
-				Texture2D.wrapMode = TextureWrapMode.Clamp;
+				if (Texture2D != null)
+				{
+					Texture2D.wrapMode = TextureWrapMode.Clamp;
+				}
+				else
+				{
+					Debug.Log("here");
+				}
 			}
 		}
 	}

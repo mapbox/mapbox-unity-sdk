@@ -108,6 +108,16 @@ namespace Mapbox.Platform.Cache
             _textureFileCache?.Add(tilesetId, tileId, textureCacheItem, forceInsert);
         }
 
+        public void AddTextureItemToMemory(string tilesetId, CanonicalTileId tileId, TextureCacheItem textureCacheItem, bool forceInsert)
+        {
+            _memoryCache.Add(tilesetId, tileId, textureCacheItem, forceInsert);
+        }
+
+        public void UpdateExpirationDate(string tilesetId, CanonicalTileId tileId, DateTime textureCacheItem)
+        {
+            _sqLiteCache?.UpdateTile(tilesetId, tileId, textureCacheItem);
+        }
+
         public TextureCacheItem GetTextureItemFromMemory(string tilesetId, CanonicalTileId tileId)
         {
             return (TextureCacheItem) _memoryCache.Get(tilesetId, tileId);
@@ -158,8 +168,11 @@ namespace Mapbox.Platform.Cache
                     
                     _textureFileCache.DeleteTileFile(textureCacheItem.FilePath);
                 }
-                
-                _memoryCache.Add(tilesetId, tileId, textureCacheItem, true);
+
+                //decided not to do this and leave control to caller
+                //they can add it to memory cache using AddTextureItemToMemory
+                //_memoryCache.Add(tilesetId, tileId, textureCacheItem, true);
+
                 callback(textureCacheItem);
             });
         }
@@ -236,5 +249,6 @@ namespace Mapbox.Platform.Cache
             return _memoryCache as MemoryCache;
         }
 #endif
+
     }
 }

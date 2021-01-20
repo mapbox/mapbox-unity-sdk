@@ -1,16 +1,10 @@
 ﻿using Mapbox.Map;
 using Mapbox.Unity.MeshGeneration.Data;
-using Mapbox.Unity.MeshGeneration.Enums;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Mapbox.Platform;
 using Mapbox.Platform.Cache;
 using Mapbox.Unity;
-using Mapbox.Unity.Utilities;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.UI;
 
 public class ImageDataFetcher : DataFetcher
 {
@@ -58,7 +52,7 @@ public class ImageDataFetcher : DataFetcher
 #if UNITY_EDITOR
 					tile.FromCache = CacheType.FileCache;
 #endif
-					//do we need these for live products or are they only for debugging?
+
 					tile.ETag = textureCacheItem.ETag;
 					if (textureCacheItem.ExpirationDate.HasValue)
 					{
@@ -112,19 +106,16 @@ public class ImageDataFetcher : DataFetcher
 		}
 		else
 		{
-
-			rasterTile.ExtractTextureFromRequest();
-
-#if UNITY_EDITOR
-			if (rasterTile.Texture2D != null)
+			//304 means data was in file cache and sql
+			//we fetched it from file/sql and had to update due to expiration date
+			//so the file and the metadata is already there and server verified they
+			//are all still good.
+			//We just need to update the expiration date now and for current session
+			//add it to memory cache
+			if (rasterTile.StatusCode == 304)
 			{
-				rasterTile.Texture2D.name = string.Format("{0}_{1}", tileId.ToString(), rasterTile.TilesetId);
-			}
-#endif
-			MapboxAccess.Instance.CacheManager.AddTextureItem(
-				rasterTile.TilesetId,
-				rasterTile.Id,
-				new TextureCacheItem()
+				Debug.Log("here " + tileId);
+				var newTextureCacheItem = new TextureCacheItem()
 				{
 					TileId = tileId,
 					TilesetId = rasterTile.TilesetId,
@@ -133,11 +124,51 @@ public class ImageDataFetcher : DataFetcher
 					Data = rasterTile.Data,
 					ExpirationDate = rasterTile.ExpirationDate,
 					Texture2D = rasterTile.Texture2D
-				},
-				true);
+				};
 
-			if (rasterTile.StatusCode != 304) //NOT MODIFIED
+				MapboxAccess.Instance.CacheManager.AddTextureItemToMemory(
+					rasterTile.TilesetId,
+					rasterTile.Id,
+					newTextureCacheItem,
+					true);
+
+				MapboxAccess.Instance.CacheManager.UpdateExpirationDate(
+					rasterTile.TilesetId,
+					rasterTile.Id,
+					rasterTile.ExpirationDate);
+			}
+			else
 			{
+				//IMPORTANT This is where we create a Texture2D
+				rasterTile.ExtractTextureFromRequest();
+
+#if UNITY_EDITOR
+				if (rasterTile.Texture2D != null)
+				{
+					rasterTile.Texture2D.name = string.Format("{0}_{1}", tileId.ToString(), rasterTile.TilesetId);
+				}
+#endif
+
+				var newTextureCacheItem = new TextureCacheItem()
+				{
+					TileId = tileId,
+					TilesetId = rasterTile.TilesetId,
+					From = rasterTile.FromCache,
+					ETag = rasterTile.ETag,
+					Data = rasterTile.Data,
+					ExpirationDate = rasterTile.ExpirationDate,
+					Texture2D = rasterTile.Texture2D
+				};
+
+				//IMPORTANT And this is where we pass it to cache
+				//cache will be responsible for tracking it all the way
+				//and destroying it when it's not used anymore
+				MapboxAccess.Instance.CacheManager.AddTextureItem(
+					rasterTile.TilesetId,
+					rasterTile.Id,
+					newTextureCacheItem,
+					true);
+
 				TextureReceived(unityTile, rasterTile);
 			}
 		}

@@ -364,6 +364,30 @@ expirationDate INTEGER,
 			}
 		}
 
+		public void UpdateTile(string tilesetName, CanonicalTileId tileId, DateTime expirationDate)
+		{
+			var tilesetId = getTilesetId(tilesetName);
+			if (!tilesetId.HasValue)
+			{
+				tilesetId = insertTileset(tilesetName);
+			}
+
+			var query = "UPDATE tiles " +
+			            "SET expirationdate = ?1" +
+			            "WHERE tile_set = ?2 AND zoom_level = ?3 AND tile_column = ?4 AND tile_row = ?5 ";
+			var command = _sqlite.CreateCommand(query,
+				(int)UnixTimestampUtils.To(expirationDate),
+				tilesetId,
+				tileId.Z,
+				tileId.X,
+				tileId.Y);
+			var rowsAffected = command.ExecuteNonQuery();
+			if (1 != rowsAffected)
+			{
+				throw new Exception(string.Format("tile [{0} / {1}] was not updated, rows affected:{2}", tilesetName, tileId, rowsAffected));
+			}
+		}
+
 		private void prune()
 		{
 

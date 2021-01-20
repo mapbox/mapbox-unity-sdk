@@ -38,6 +38,8 @@ namespace Mapbox.Map
 		public CacheType FromCache = CacheType.NoCache;
 #endif
 
+		public Action Cancelled = () => { };
+
 		public string TilesetId;
 		public CanonicalTileId Id;
 
@@ -233,6 +235,7 @@ namespace Mapbox.Map
 			}
 
 			_state = State.Canceled;
+			Cancelled();
 		}
 
 
