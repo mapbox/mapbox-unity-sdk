@@ -112,12 +112,12 @@ using UnityEngine.Networking;
 			return proxyResponse(url, callback, timeout);
 		}
 
-		public UnityWebRequest MapboxImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null)
+		public UnityWebRequest MapboxImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null, bool isNonreadable = true)
 		{
 			throw new NotImplementedException();
 		}
 
-		public UnityWebRequest CustomImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null)
+		public UnityWebRequest CustomImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null, bool isNonreadable = true)
 		{
 			throw new NotImplementedException();
 		}

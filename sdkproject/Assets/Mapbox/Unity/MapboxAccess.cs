@@ -226,6 +226,7 @@ namespace Mapbox.Unity
 			, CanonicalTileId tileId = new CanonicalTileId()
 			, string tilesetId = null
 			, string etag = null
+			, bool isNonreadable = true
 		)
 		{
 			return _fileSource.MapboxImageRequest(url, callback, _configuration.DefaultTimeout, tileId, tilesetId);
@@ -238,6 +239,7 @@ namespace Mapbox.Unity
 			, CanonicalTileId tileId = new CanonicalTileId()
 			, string tilesetId = null
 			, string etag = null
+			, bool isNonreadable = true
 		)
 		{
 			return _fileSource.CustomImageRequest(url, callback, _configuration.DefaultTimeout, tileId, tilesetId);

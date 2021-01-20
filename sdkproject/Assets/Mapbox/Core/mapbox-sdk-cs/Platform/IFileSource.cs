@@ -30,7 +30,7 @@ namespace Mapbox.Platform
 		///     canceling the request.
 		/// </returns>
 		IAsyncRequest Request(string uri, Action<Response> callback, int timeout = 10);
-		UnityWebRequest MapboxImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null);
-		UnityWebRequest CustomImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null);
+		UnityWebRequest MapboxImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null, bool isNonReadable = true);
+		UnityWebRequest CustomImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null, bool isNonReadable = true);
 	}
 }

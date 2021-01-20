@@ -28,6 +28,8 @@ namespace Mapbox.Map
 	/// </example>
 	public class RawPngRasterTile : RasterTile
 	{
+		protected override bool IsTexturesNonreadable => false;
+
 		internal override TileResource MakeTileResource(string tilesetId)
 		{
 			return TileResource.MakeRawPngRaster(Id, tilesetId);

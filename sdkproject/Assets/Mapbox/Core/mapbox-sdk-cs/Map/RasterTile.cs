@@ -65,6 +65,8 @@ namespace Mapbox.Map
 		/// </example>
 		public Texture2D Texture2D { get; private set; }
 
+		protected virtual bool IsTexturesNonreadable => true;
+
 		public RasterTile()
 		{
 
@@ -87,7 +89,7 @@ namespace Mapbox.Map
 			//we are passing etag here as well
 			//if it's not null, filesource will make a `FetchTextureIfNoneMatch` request
 			//else it'll be a regular request
-			_unityRequest = fileSource.MapboxImageRequest(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse, 10, Id, tilesetId, ETag);
+			_unityRequest = fileSource.MapboxImageRequest(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse, 10, Id, tilesetId, ETag, IsTexturesNonreadable);
 		}
 
 		public override void Cancel()

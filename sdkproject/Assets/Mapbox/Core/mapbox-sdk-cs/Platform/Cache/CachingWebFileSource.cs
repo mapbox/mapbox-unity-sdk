@@ -111,15 +111,15 @@ namespace Mapbox.Platform.Cache
 			return requestTileAndCache(finalUrl, timeout, callback);
 		}
 
-		public UnityWebRequest MapboxImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null)
+		public UnityWebRequest MapboxImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null, bool isNonreadable = true)
 		{
 			var finalUrl = CreateFinalUrl(uri);
-			return CustomImageRequest(finalUrl, callback, timeout, tileId, tilesetId, etag);
+			return CustomImageRequest(finalUrl, callback, timeout, tileId, tilesetId, etag, isNonreadable);
 		}
 
-		public UnityWebRequest CustomImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null)
+		public UnityWebRequest CustomImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null, bool isNonreadable = true)
 		{
-			UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(uri);
+			UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(uri, isNonreadable);
 			if (string.IsNullOrEmpty(etag))
 			{
 				Runnable.Run(FetchTexture(uwr, callback));
