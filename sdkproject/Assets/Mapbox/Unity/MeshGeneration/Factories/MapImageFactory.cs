@@ -63,13 +63,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		protected override void OnInitialized()
 		{
+			ImageFactoryManager = new MapboxImageFactoryManager(_fileSource, TilesetId, true);
+			ImageFactoryManager.FetchingError += OnFetchingError;
 		}
 
 		public override void SetOptions(LayerProperties options)
 		{
 			_properties = (ImageryLayerProperties)options;
-			ImageFactoryManager = new MapboxImageFactoryManager(_fileSource, TilesetId, true);
-			ImageFactoryManager.FetchingError += OnFetchingError;
 		}
 
 		protected override void OnRegistered(UnityTile tile)

@@ -51,13 +51,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		protected override void OnInitialized()
 		{
-		}
-
-		public override void SetOptions(LayerProperties options)
-		{
-			_elevationOptions = (ElevationLayerProperties)options;
-			Strategy.Initialize(_elevationOptions);
-
 			TerrainFactoryManager = new MapboxTerrainFactoryManager(
 				_fileSource,
 				Strategy,
@@ -68,6 +61,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				_elevationOptions.modificationOptions.useRelativeHeight,
 				_elevationOptions.requiredOptions.exaggerationFactor);
 			TerrainFactoryManager.FetchingError += OnFetchingError;
+		}
+
+		public override void SetOptions(LayerProperties options)
+		{
+			_elevationOptions = (ElevationLayerProperties)options;
+			Strategy.Initialize(_elevationOptions);
 		}
 
 		protected override void OnRegistered(UnityTile tile)
