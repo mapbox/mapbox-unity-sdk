@@ -31,7 +31,7 @@ namespace Mapbox.Map
 			TilesetId = tilesetId;
 			_callback = p;
 
-			fileSource.CustomImageRequest(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse, tileId: Id, tilesetId: tilesetId);
+			_unityRequest = fileSource.CustomImageRequest(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse, tileId: Id, tilesetId: tilesetId);
 		}
 
 		internal override TileResource MakeTileResource(string tilesetId)
