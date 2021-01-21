@@ -114,7 +114,6 @@ public class ImageDataFetcher : DataFetcher
 			//add it to memory cache
 			if (rasterTile.StatusCode == 304)
 			{
-				Debug.Log("here " + tileId);
 				var newTextureCacheItem = new TextureCacheItem()
 				{
 					TileId = tileId,

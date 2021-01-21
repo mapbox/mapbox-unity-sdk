@@ -146,7 +146,7 @@ namespace Mapbox.Unity
 
 		void ConfigureFileSource()
 		{
-			_fileSource = new CachingWebFileSource(_configuration.AccessToken, _configuration.GetMapsSkuToken, _configuration.AutoRefreshCache);
+			_fileSource = new CachingWebFileSource(_configuration.AccessToken, _configuration.GetMapsSkuToken);
 			_memoryCache = new MemoryCache(_configuration.MemoryCacheSize);
 
 #if !UNITY_WEBGL
@@ -158,9 +158,6 @@ namespace Mapbox.Unity
 #if UNITY_WEBGL
 			CacheManager = new MapboxCacheManager(_textureMemoryCache, memoryCache);
 #endif
-
-
-			_fileSource.AddCacheManager(CacheManager);
 		}
 
 		void ConfigureTelemetry()
@@ -341,7 +338,6 @@ namespace Mapbox.Unity
 		public uint MemoryCacheSize = 500;
 		public uint FileCacheSize = 2500;
 		public int DefaultTimeout = 30;
-		public bool AutoRefreshCache = false;
 
 		public string GetMapsSkuToken()
 		{

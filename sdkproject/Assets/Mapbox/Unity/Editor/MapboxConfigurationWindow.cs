@@ -138,7 +138,6 @@ namespace Mapbox.Editor
 					AccessToken = _accessToken,
 					MemoryCacheSize = (uint)_memoryCacheSize,
 					FileCacheSize = (uint)_fileCacheSize,
-					AutoRefreshCache = _autoRefreshCache,
 					DefaultTimeout = _webRequestTimeout
 				};
 				var json = JsonUtility.ToJson(_mapboxConfig);
@@ -169,7 +168,6 @@ namespace Mapbox.Editor
 				_accessToken = _mapboxConfig.AccessToken;
 				_memoryCacheSize = (int)_mapboxConfig.MemoryCacheSize;
 				_fileCacheSize = (int)_mapboxConfig.FileCacheSize;
-				_autoRefreshCache = _mapboxConfig.AutoRefreshCache;
 				_webRequestTimeout = (int)_mapboxConfig.DefaultTimeout;
 
 			}
@@ -262,7 +260,6 @@ namespace Mapbox.Editor
 				AccessToken = _accessToken,
 				MemoryCacheSize = (uint)_memoryCacheSize,
 				FileCacheSize = (uint)_fileCacheSize,
-				AutoRefreshCache = _autoRefreshCache,
 				DefaultTimeout = _webRequestTimeout
 			};
 			_mapboxAccess.SetConfiguration(mapboxConfiguration, false);
