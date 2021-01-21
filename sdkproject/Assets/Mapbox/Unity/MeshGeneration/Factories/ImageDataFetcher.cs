@@ -126,12 +126,15 @@ public class ImageDataFetcher : DataFetcher
 				{
 					TileId = tileId,
 					TilesetId = rasterTile.TilesetId,
-					From = rasterTile.FromCache,
 					ETag = rasterTile.ETag,
 					Data = rasterTile.Data,
 					ExpirationDate = rasterTile.ExpirationDate,
 					Texture2D = rasterTile.Texture2D
 				};
+
+#if UNITY_EDITOR
+				newTextureCacheItem.From = rasterTile.FromCache;
+#endif
 
 				MapboxAccess.Instance.CacheManager.AddTextureItemToMemory(
 					rasterTile.TilesetId,
@@ -160,12 +163,15 @@ public class ImageDataFetcher : DataFetcher
 				{
 					TileId = tileId,
 					TilesetId = rasterTile.TilesetId,
-					From = rasterTile.FromCache,
 					ETag = rasterTile.ETag,
 					Data = rasterTile.Data,
 					ExpirationDate = rasterTile.ExpirationDate,
 					Texture2D = rasterTile.Texture2D
 				};
+
+#if UNITY_EDITOR
+				newTextureCacheItem.From = rasterTile.FromCache;
+#endif
 
 				//IMPORTANT And this is where we pass it to cache
 				//cache will be responsible for tracking it all the way

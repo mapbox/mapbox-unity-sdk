@@ -153,10 +153,6 @@ namespace Mapbox.Unity
 			_memoryCache = new MemoryCache(_configuration.MemoryCacheSize);
 #endif
 
-
-
-
-
 #if !UNITY_WEBGL
 			var sqliteCache = new SQLiteCache(_configuration.FileCacheSize);
 
@@ -167,17 +163,9 @@ namespace Mapbox.Unity
 	#endif
 
 			CacheManager = new MapboxCacheManager(_memoryCache, fileCache, sqliteCache);
+#else
+			CacheManager = new MapboxCacheManager(_memoryCache);
 #endif
-
-
-
-
-#if UNITY_WEBGL
-			CacheManager = new MapboxCacheManager(_textureMemoryCache, memoryCache);
-#endif
-
-
-
 		}
 
 		void ConfigureTelemetry()
