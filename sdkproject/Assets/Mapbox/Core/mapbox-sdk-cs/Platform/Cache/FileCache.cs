@@ -9,7 +9,6 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using CustomImageLayerSample;
-using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.Utilities;
 using Mapbox.Utils;
 using UnityEngine;
@@ -19,21 +18,32 @@ using UnityEngine.UI;
 
 namespace Mapbox.Platform.Cache
 {
-	public class FileCache
+	public interface IFileCache
 	{
-		public Action<string, CanonicalTileId, TextureCacheItem> FileSaved = (tilesetName, tileId, cacheItem) => { };
+		event Action<CanonicalTileId, string, TextureCacheItem> FileSaved;
+		void Add(CanonicalTileId tileId, string tilesetId, TextureCacheItem textureCacheItem, bool forceInsert);
+		void GetAsync(CanonicalTileId tileId, string tilesetId, Action<TextureCacheItem> callback);
+		bool Exists(CanonicalTileId tileId, string mapId);
+		void Clear(string tilesetId);
+		void ClearAll();
+		void DeleteTileFile(string filePath);
+		HashSet<string> GetFileList();
+		void Clear();
+	}
+
+	public class FileCache : IFileCache
+	{
+		public event Action<CanonicalTileId, string, TextureCacheItem> FileSaved = (tileId, tilesetName, cacheItem) => { };
 
 		private static string CacheRootFolderName = "FileCache";
 		public static string PersistantCacheRootFolderPath = Path.Combine(Application.persistentDataPath, CacheRootFolderName);
 		private static string FileExtension = "png";
 
-		private FileDataFetcher _fileDataFetcher;
-		private Dictionary<string, CacheItem> _cachedResponses;
-
-		private Queue<InfoWrapper> _infosToSave;
-		private HashSet<int> _infoKeys;
-
-		private Dictionary<string, string> MapIdToFolderNameDictionary;
+		protected FileDataFetcher _fileDataFetcher;
+		protected Dictionary<string, CacheItem> _cachedResponses;
+		protected Queue<InfoWrapper> _infosToSave;
+		protected HashSet<int> _infoKeys;
+		protected Dictionary<string, string> MapIdToFolderNameDictionary;
 
 		public FileCache(IFileSource fileSource)
 		{
@@ -50,13 +60,13 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 
-		public bool Exists(string mapId, CanonicalTileId tileId)
+		public virtual bool Exists(CanonicalTileId tileId, string mapId)
 		{
 			string filePath = string.Format("{0}/{1}/{2}.{3}", PersistantCacheRootFolderPath, MapIdToFolderName(mapId), tileId.GenerateKey(mapId), FileExtension);
 			return File.Exists(filePath);
 		}
 
-		public void Clear(string tilesetId)
+		public virtual void Clear(string tilesetId)
 		{
 			List<string> toDelete = _cachedResponses.Keys.Where(k => k.Contains(tilesetId)).ToList();
 			foreach (string key in toDelete)
@@ -65,7 +75,7 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 
-		public void Add(string tilesetId, CanonicalTileId tileId, TextureCacheItem textureCacheItem, bool forceInsert)
+		public virtual void Add(CanonicalTileId tileId, string tilesetId, TextureCacheItem textureCacheItem, bool forceInsert)
 		{
 			var key = tileId.GenerateKey(tilesetId);
 			if (_infoKeys.Contains(key))
@@ -81,7 +91,7 @@ namespace Mapbox.Platform.Cache
 			_infosToSave.Enqueue(infoWrapper);
 		}
 
-		public void GetAsync(string tilesetId, CanonicalTileId tileId, Action<TextureCacheItem> callback)
+		public virtual void GetAsync(CanonicalTileId tileId, string tilesetId, Action<TextureCacheItem> callback)
 		{
 			string filePath = string.Format("{0}/{1}/{2}", PersistantCacheRootFolderPath, MapIdToFolderName(tilesetId), tileId.GenerateKey(tilesetId));
 			//Runnable.Run(LoadImageCoroutine(tileId, mapId, filePath, callback));
@@ -99,12 +109,7 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 
-		public void ClearStyle(string style)
-		{
-			ClearFolder(Path.Combine(PersistantCacheRootFolderPath, style));
-		}
-
-		public void ClearAll()
+		public virtual void ClearAll()
 		{
 			DirectoryInfo di = new DirectoryInfo(PersistantCacheRootFolderPath);
 
@@ -114,7 +119,7 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 
-		public void DeleteTileFile(string filePath)
+		public virtual void DeleteTileFile(string filePath)
 		{
 			if (File.Exists(filePath))
 			{
@@ -122,7 +127,7 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 
-		public HashSet<string> GetFileList()
+		public virtual HashSet<string> GetFileList()
 		{
 			var pathList = new HashSet<string>();
 			if (Directory.Exists(PersistantCacheRootFolderPath))
@@ -140,6 +145,18 @@ namespace Mapbox.Platform.Cache
 			}
 
 			return pathList;
+		}
+
+		public virtual void Clear()
+		{
+			if (_cachedResponses != null)
+			{
+				_cachedResponses.Clear();
+			}
+			else
+			{
+				_cachedResponses = new Dictionary<string, CacheItem>();
+			}
 		}
 
 		private IEnumerator FileScheduler()
@@ -172,14 +189,14 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 
-		private void SaveInfo(InfoWrapper info)
+		protected virtual void SaveInfo(InfoWrapper info)
 		{
 			if (info.TextureCacheItem == null || info.TextureCacheItem.Data == null)
 			{
 				return;
 			}
 
-			string folderPath = string.Format("{0}/{1}", PersistantCacheRootFolderPath, MapIdToFolderName(info.MapId));
+			string folderPath = string.Format("{0}/{1}", PersistantCacheRootFolderPath, MapIdToFolderName(info.TilesetId));
 
 			if (!Directory.Exists(folderPath))
 			{
@@ -187,7 +204,7 @@ namespace Mapbox.Platform.Cache
 			}
 
 
-			info.TextureCacheItem.FilePath = Path.GetFullPath(string.Format("{0}/{1}/{2}.{3}", PersistantCacheRootFolderPath, MapIdToFolderName(info.MapId), info.TileId.GenerateKey(info.MapId), FileExtension));
+			info.TextureCacheItem.FilePath = Path.GetFullPath(string.Format("{0}/{1}/{2}.{3}", PersistantCacheRootFolderPath, MapIdToFolderName(info.TilesetId), info.TileId.GenerateKey(info.TilesetId), FileExtension));
 
 			FileStream sourceStream = new FileStream(info.TextureCacheItem.FilePath,
 				FileMode.Create, FileAccess.Write, FileShare.Read,
@@ -198,8 +215,17 @@ namespace Mapbox.Platform.Cache
 				.ContinueWith((task) =>
 				{
 					sourceStream.Close();
-					FileSaved(info.MapId, info.TileId, info.TextureCacheItem);
+					OnFileSaved(info.TileId, info.TilesetId, info.TextureCacheItem);
+
+#if UNITY_EDITOR
+					FileCacheDebugView.AddToLogs(string.Format("Saved {0, 20} - {1, -20}", info.TilesetId, info.TileId));
+#endif
 				});
+		}
+
+		protected virtual void OnFileSaved(CanonicalTileId infoTileId, string infoTilesetId, TextureCacheItem infoTextureCacheItem)
+		{
+			FileSaved(infoTileId, infoTilesetId, infoTextureCacheItem);
 		}
 
 		private string MapIdToFolderName(string mapId)
@@ -218,18 +244,6 @@ namespace Mapbox.Platform.Cache
 			return folderName;
 		}
 
-		public void Clear()
-		{
-			if (_cachedResponses != null)
-			{
-				_cachedResponses.Clear();
-			}
-			else
-			{
-				_cachedResponses = new Dictionary<string, CacheItem>();
-			}
-		}
-
 		private void ClearFolder(string folderPath)
 		{
 			DirectoryInfo di = new DirectoryInfo(folderPath);
@@ -242,86 +256,68 @@ namespace Mapbox.Platform.Cache
 			di.Delete();
 		}
 
-		private class InfoWrapper
+		protected class InfoWrapper
 		{
 			public int Key;
-			public string MapId;
+			public string TilesetId;
 			public CanonicalTileId TileId;
 			public TextureCacheItem TextureCacheItem;
 
-			public InfoWrapper(int key, string mapId, CanonicalTileId tileId, TextureCacheItem textureCacheItem)
+			public InfoWrapper(int key, string tilesetId, CanonicalTileId tileId, TextureCacheItem textureCacheItem)
 			{
 				Key = key;
-				MapId = mapId;
+				TilesetId = tilesetId;
 				TileId = tileId;
 				TextureCacheItem = textureCacheItem;
 			}
 		}
-	}
-
-	public class FileDataFetcher : ImageDataFetcher
-	{
-		public FileDataFetcher(IFileSource fileSource) : base(fileSource)
-		{
-
-		}
-
-		public void FetchData(FileImageTile tile, string tilesetId, CanonicalTileId tileId, bool useRetina, Action<TextureCacheItem> callback)
-		{
-			EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, String.Empty)
-			{
-				Callback = () =>
-				{
-					FetchingCallback(tileId, tile, null);
-
-					//file cache is using datafetcher queue and items in queue might get cancelled at any time
-					//cancelled counts as an error, if a file fetching order is cancelled
-					//setting error flag here is important so cache manager won't follow up with
-					//sql queries for file details like etag
-
-					var textureCacheItem = new TextureCacheItem
-					{
-						TileId = tileId,
-						TilesetId = tilesetId,
-						Texture2D = tile.Texture2D,
-						FilePath = tile.FilePath,
-						HasError = tile.CurrentState == Tile.State.Canceled
-					};
-
-					tile.Clear();
-					callback(textureCacheItem);
-				}
-			});
-		}
-
-		protected override void FetchingCallback(CanonicalTileId tileId, RasterTile rasterTile, UnityTile unityTile = null)
-		{
-			if (unityTile != null && !unityTile.ContainsDataTile(rasterTile))
-			{
-				return;
-			}
-
-			if (rasterTile.HasError)
-			{
-				FetchingError(unityTile, rasterTile, new TileErrorEventArgs(tileId, rasterTile.GetType(), unityTile, rasterTile.Exceptions));
-			}
-			else
-			{
-
-				rasterTile.ExtractTextureFromRequest();
 
 #if UNITY_EDITOR
-				if (rasterTile.Texture2D != null)
-				{
-					rasterTile.Texture2D.name = string.Format("{0}_{1}", tileId.ToString(), rasterTile.TilesetId);
-				}
+		public int GetInfosToSaveListCount()
+		{
+			return _infosToSave.Count;
+		}
 #endif
+	}
 
-				if (rasterTile.StatusCode != 304) //NOT MODIFIED
-				{
-					TextureReceived(unityTile, rasterTile);
-				}
-			}
+	public class EditorFileCache : FileCache
+	{
+		public Action<CanonicalTileId, string, TextureCacheItem, bool> TileAdded = (id, s, arg3, arg4) => { };
+		public Action<CanonicalTileId, string> TileRequested = (id, s) => { };
+		public Action<CanonicalTileId, string> SavingInfo = (id, s) => { };
+		public Action<CanonicalTileId, string, TextureCacheItem> FileSaved = (s, id, item) => { };
+
+		public int GetInfosToSaveListCount()
+		{
+			return _infosToSave.Count;
+		}
+
+		public EditorFileCache(IFileSource fileSource) : base(fileSource)
+		{
+		}
+
+		public override void Add(CanonicalTileId tileId, string tilesetId, TextureCacheItem textureCacheItem, bool forceInsert)
+		{
+			base.Add(tileId, tilesetId, textureCacheItem, forceInsert);
+			TileAdded(tileId, tilesetId, textureCacheItem, forceInsert);
+		}
+
+		public override void GetAsync(CanonicalTileId tileId, string tilesetId, Action<TextureCacheItem> callback)
+		{
+			base.GetAsync(tileId, tilesetId, callback);
+			TileRequested(tileId, tilesetId);
+		}
+
+		protected override void SaveInfo(InfoWrapper info)
+		{
+			base.SaveInfo(info);
+			SavingInfo(info.TileId, info.TilesetId);
+		}
+
+		protected override void OnFileSaved(CanonicalTileId infoTileId, string infoTilesetId, TextureCacheItem infoTextureCacheItem)
+		{
+			base.OnFileSaved(infoTileId, infoTilesetId, infoTextureCacheItem);
+			FileSaved(infoTileId, infoTilesetId, infoTextureCacheItem);
 		}
 	}
 }

@@ -9,42 +9,38 @@ namespace Mapbox.Platform.Cache
 {
 	public interface IMemoryCache
 	{
-		void Add(string tilesetId, CanonicalTileId tileId, CacheItem cacheItem, bool forceInsert);
-		void AddToDisposeList(string tilesetId, CanonicalTileId tileId);
-		CacheItem Get(string tilesetId, CanonicalTileId tileId);
+		void Add(CanonicalTileId tileId, string tilesetId, CacheItem cacheItem, bool forceInsert);
+		void AddToDisposeList(CanonicalTileId tileId, string tilesetId);
+		CacheItem Get(CanonicalTileId tileId, string tilesetId);
 		void Clear();
-		bool Exists(string tilesetId, CanonicalTileId tileId);
+		bool Exists(CanonicalTileId tileId, string tilesetId);
 		void MarkFixed(CanonicalTileId tileId, string tilesetId);
 	}
 
 	public class MemoryCache : IMemoryCache
 	{
-		// TODO: add support for disposal strategy (timestamp, distance, etc.)
+		protected uint _maxCacheSize;
+		protected Dictionary<int, CacheItem> _cachedItems;
+		protected Dictionary<int, CacheItem> _fixedItems;
+		protected int _destroyedItemCounter = 0;
+		protected int _destroyedItemLimit = 20;
+
+		private List<int> _itemsToDestroy;
+
 		public MemoryCache(uint maxCacheSize)
 		{
-#if MAPBOX_DEBUG_CACHE
-			_className = this.GetType().Name;
-#endif
 			_maxCacheSize = maxCacheSize;
 			_cachedItems = new Dictionary<int, CacheItem>();
 			_fixedItems = new Dictionary<int, CacheItem>();
 			_itemsToDestroy = new List<int>();
 		}
 
-		private uint _maxCacheSize;
-		private Dictionary<int, CacheItem> _cachedItems;
-		private Dictionary<int, CacheItem> _fixedItems;
-		private int _destroyedItemCounter = 0;
-		private int _destroyedItemLimit = 20;
-
-		private List<int> _itemsToDestroy;
-
 		public uint MaxCacheSize
 		{
 			get { return _maxCacheSize; }
 		}
 
-		public void Add(string tilesetId, CanonicalTileId tileId, CacheItem cacheItem, bool forceInsert)
+		public virtual void Add(CanonicalTileId tileId, string tilesetId, CacheItem cacheItem, bool forceInsert)
 		{
 			var key = tileId.GenerateKey(tilesetId);
 
@@ -77,7 +73,7 @@ namespace Mapbox.Platform.Cache
 			CheckForUnloadingAssets();
 		}
 
-		public void AddToDisposeList(string tilesetId, CanonicalTileId tileId)
+		public virtual void AddToDisposeList(CanonicalTileId tileId, string tilesetId)
 		{
 			var key = tileId.GenerateKey(tilesetId);
 			if (!_itemsToDestroy.Contains(key) && _cachedItems.ContainsKey(key))
@@ -86,61 +82,9 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 
-		private void CheckCacheLimit()
-		{
-			if (_cachedItems.Count >= _maxCacheSize)
-			{
-				if (_itemsToDestroy.Count == 0)
-				{
-					//something is horribly wrong
-					Debug.Log("Memory cache is in a very wrong state, destroying all cached items.");
-					// var keys = _cachedItems.Keys.ToArray();
-					// foreach (var keyToRemove in keys)
-					// {
-					// 	RemoveItemCacheItem(keyToRemove);
-					// 	_destroyedItemCounter++;
-					// 	_cachedItems.Remove(keyToRemove);
-					// }
-				}
-				else
-				{
-					var keyToRemove = _itemsToDestroy[0];
-					_itemsToDestroy.RemoveAt(0);
-					RemoveItemCacheItem(keyToRemove);
-					_destroyedItemCounter++;
-				}
-			}
-		}
-
-		private void CheckForUnloadingAssets()
-		{
-			if (_destroyedItemCounter >= _destroyedItemLimit)
-			{
-				_destroyedItemCounter = 0;
-				Resources.UnloadUnusedAssets();
-			}
-		}
-
-		private void RemoveItemCacheItem(int keyToRemove)
-		{
-			var item = _cachedItems[keyToRemove];
-			if (item is TextureCacheItem)
-			{
-				(item as TextureCacheItem).Texture2D.Destroy();
-			}
-
-			item.Data = null;
-			_cachedItems.Remove(keyToRemove);
-		}
-
-		public CacheItem Get(string tilesetId, CanonicalTileId tileId)
+		public virtual CacheItem Get(CanonicalTileId tileId, string tilesetId)
 		{
 			var key = tileId.GenerateKey(tilesetId);
-
-#if MAPBOX_DEBUG_CACHE
-			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
-			UnityEngine.Debug.LogFormat("{0} {1}", methodName, key);
-#endif
 
 			if (!_cachedItems.ContainsKey(key))
 			{
@@ -157,7 +101,7 @@ namespace Mapbox.Platform.Cache
 			return _cachedItems[key];
 		}
 
-		public void Clear()
+		public virtual void Clear()
 		{
 			if (_cachedItems != null)
 			{
@@ -180,13 +124,13 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 
-		public bool Exists(string tilesetId, CanonicalTileId tileId)
+		public virtual bool Exists(CanonicalTileId tileId, string tilesetId)
 		{
 			var key = tileId.GenerateKey(tilesetId);
 			return _cachedItems.ContainsKey(key);
 		}
 
-		public void MarkFixed(CanonicalTileId tileId, string tilesetId)
+		public virtual void MarkFixed(CanonicalTileId tileId, string tilesetId)
 		{
 			var key = tileId.GenerateKey(tilesetId);
 			if (_cachedItems.ContainsKey(key))
@@ -209,10 +153,112 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 
+		private void CheckCacheLimit()
+		{
+			if (_cachedItems.Count >= _maxCacheSize)
+			{
+				if (_itemsToDestroy.Count == 0)
+				{
+					Debug.Log("Memory cache is full. Most likely with textures aren't " +
+					          "disposed properly as memory cache hasn't received unregister signal. Might be a bug with image (prob custom) layers." +
+					          "Destroying everything untracked in cache. It will break materials and textures and most likely fill up again just as usual.");
+					var keys = _cachedItems.Keys.ToArray();
+					foreach (var keyToRemove in keys)
+					{
+						RemoveItemCacheItem(keyToRemove);
+						_destroyedItemCounter++;
+					}
+				}
+				else
+				{
+					var keyToRemove = _itemsToDestroy[0];
+					_itemsToDestroy.RemoveAt(0);
+					RemoveItemCacheItem(keyToRemove);
+					_destroyedItemCounter++;
+				}
+			}
+		}
+
+		private void CheckForUnloadingAssets()
+		{
+			if (_destroyedItemCounter >= _destroyedItemLimit)
+			{
+				_destroyedItemCounter = 0;
+				Resources.UnloadUnusedAssets();
+			}
+		}
+
+		protected virtual void RemoveItemCacheItem(int keyToRemove)
+		{
+			var item = _cachedItems[keyToRemove];
+			if (item is TextureCacheItem)
+			{
+				(item as TextureCacheItem).Texture2D.Destroy();
+			}
+
+			item.Data = null;
+			_cachedItems.Remove(keyToRemove);
+		}
 
 #if UNITY_EDITOR
+
+#endif
+	}
+
+	public class EditorMemoryCache : MemoryCache
+	{
+		public Action<CanonicalTileId, string, CacheItem, bool> TileAdded = (s, id, arg3, arg4) => {};
+		public Action<CanonicalTileId, string> TileDisposed = (s, id) => {};
+		public Action<CanonicalTileId, string> TileRead = (s, id) => {};
+		public Action<CanonicalTileId, string> TileFixated = (s, id) => {};
+		public Action<CanonicalTileId, string> TilePruned = (s, id) => {};
+
 		public Dictionary<int, CacheItem> GetCachedItems => _cachedItems;
 		public Dictionary<int, CacheItem> GetFixedItems => _fixedItems;
-#endif
+
+		public EditorMemoryCache(uint maxCacheSize) : base(maxCacheSize)
+		{
+		}
+
+		public override void Add(CanonicalTileId tileId, string tilesetId, CacheItem cacheItem, bool forceInsert)
+		{
+			base.Add(tileId, tilesetId, cacheItem, forceInsert);
+			TileAdded(tileId, tilesetId, cacheItem, forceInsert);
+		}
+
+		public override void AddToDisposeList(CanonicalTileId tileId, string tilesetId)
+		{
+			base.AddToDisposeList(tileId, tilesetId);
+			TileDisposed(tileId, tilesetId);
+		}
+
+		public override CacheItem Get(CanonicalTileId tileId, string tilesetId)
+		{
+			return base.Get(tileId, tilesetId);
+			TileRead(tileId, tilesetId);
+		}
+
+		public override void Clear()
+		{
+			base.Clear();
+		}
+
+		public override bool Exists(CanonicalTileId tileId, string tilesetId)
+		{
+			return base.Exists(tileId, tilesetId);
+		}
+
+		protected override void RemoveItemCacheItem(int keyToRemove)
+		{
+			var item = _cachedItems[keyToRemove];
+			base.RemoveItemCacheItem(keyToRemove);
+			TilePruned(item.TileId, item.TilesetId);
+		}
+
+		public override void MarkFixed(CanonicalTileId tileId, string tilesetId)
+		{
+			base.MarkFixed(tileId, tilesetId);
+			TileFixated(tileId, tilesetId);
+		}
 	}
 }

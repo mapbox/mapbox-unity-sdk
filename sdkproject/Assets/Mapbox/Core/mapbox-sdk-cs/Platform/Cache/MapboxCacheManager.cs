@@ -10,7 +10,7 @@ namespace Mapbox.Platform.Cache
     public class MapboxCacheManager
     {
         private IMemoryCache _memoryCache;
-        private FileCache _textureFileCache;
+        private IFileCache _textureFileCache;
         private SQLiteCache _sqLiteCache;
 
         public MapboxCacheManager(MemoryCache memoryCache, FileCache fileCache = null, SQLiteCache sqliteCache = null)
@@ -72,13 +72,13 @@ namespace Mapbox.Platform.Cache
 
         public void AddVectorDataItem(string tilesetId, CanonicalTileId tileId, CacheItem cachedItem, bool forceInsert)
         {
-            _memoryCache.Add(tilesetId, tileId, cachedItem, forceInsert);
+            _memoryCache.Add(tileId, tilesetId, cachedItem, forceInsert);
             _sqLiteCache?.Add(tilesetId, tileId, cachedItem, forceInsert);
         }
 
         public VectorCacheItem GetVectorItemFromMemory(string tilesetId, CanonicalTileId tileId)
         {
-            return (VectorCacheItem) _memoryCache.Get(tilesetId, tileId);
+            return (VectorCacheItem) _memoryCache.Get(tileId, tilesetId);
         }
 
         public void GetVectorItemFromSqlite(string tilesetId, CanonicalTileId tileId, Action<VectorCacheItem> callback)
@@ -92,7 +92,7 @@ namespace Mapbox.Platform.Cache
             var cacheItem = (VectorCacheItem) _sqLiteCache.Get(tilesetId, tileId);
             if (cacheItem != null)
             {
-                _memoryCache.Add(tilesetId, tileId, cacheItem, true);
+                _memoryCache.Add(tileId, tilesetId, cacheItem, true);
             }
 
             //kept callback behaviour from texture operations here as we'll most likely need to change this to async
@@ -104,13 +104,13 @@ namespace Mapbox.Platform.Cache
 
         public void AddTextureItem(string tilesetId, CanonicalTileId tileId, TextureCacheItem textureCacheItem, bool forceInsert)
         {
-            _memoryCache.Add(tilesetId, tileId, textureCacheItem, forceInsert);
-            _textureFileCache?.Add(tilesetId, tileId, textureCacheItem, forceInsert);
+            _memoryCache.Add(tileId, tilesetId, textureCacheItem, forceInsert);
+            _textureFileCache?.Add(tileId, tilesetId, textureCacheItem, forceInsert);
         }
 
         public void AddTextureItemToMemory(string tilesetId, CanonicalTileId tileId, TextureCacheItem textureCacheItem, bool forceInsert)
         {
-            _memoryCache.Add(tilesetId, tileId, textureCacheItem, forceInsert);
+            _memoryCache.Add(tileId, tilesetId, textureCacheItem, forceInsert);
         }
 
         public void UpdateExpirationDate(string tilesetId, CanonicalTileId tileId, DateTime textureCacheItem)
@@ -120,7 +120,7 @@ namespace Mapbox.Platform.Cache
 
         public TextureCacheItem GetTextureItemFromMemory(string tilesetId, CanonicalTileId tileId)
         {
-            return (TextureCacheItem) _memoryCache.Get(tilesetId, tileId);
+            return (TextureCacheItem) _memoryCache.Get(tileId, tilesetId);
         }
 
         public void GetTextureItemFromFile(string tilesetId, CanonicalTileId tileId, Action<TextureCacheItem> callback)
@@ -131,7 +131,7 @@ namespace Mapbox.Platform.Cache
                 return;
             }
 
-            _textureFileCache.GetAsync(tilesetId, tileId, (textureCacheItem) =>
+            _textureFileCache.GetAsync(tileId, tilesetId, (textureCacheItem) =>
             {
 
                 if (textureCacheItem == null || textureCacheItem.HasError)
@@ -191,13 +191,13 @@ namespace Mapbox.Platform.Cache
         {
             if (_textureFileCache != null)
             {
-                return _textureFileCache.Exists(tilesetId, tileId);
+                return _textureFileCache.Exists(tileId, tilesetId);
             }
 
             return false;
         }
 
-        private void TextureFileSaved(string tilesetId, CanonicalTileId tileId, TextureCacheItem textureCacheItem)
+        private void TextureFileSaved(CanonicalTileId tileId, string tilesetId, TextureCacheItem textureCacheItem)
         {
             _sqLiteCache?.Add(tilesetId, tileId, textureCacheItem, true);
         }
@@ -234,7 +234,7 @@ namespace Mapbox.Platform.Cache
         {
             foreach (var dataTile in tile.Tiles)
             {
-                _memoryCache?.AddToDisposeList(dataTile.TilesetId, dataTile.Id);
+                _memoryCache?.AddToDisposeList(dataTile.Id, dataTile.TilesetId);
             }
         }
 
@@ -244,9 +244,14 @@ namespace Mapbox.Platform.Cache
         }
 
 #if UNITY_EDITOR
-        public MemoryCache GetMemoryCache()
+        public EditorMemoryCache GetMemoryCache()
         {
-            return _memoryCache as MemoryCache;
+            return _memoryCache as EditorMemoryCache;
+        }
+
+        public EditorFileCache GetFileCache()
+        {
+            return _textureFileCache as EditorFileCache;
         }
 #endif
 

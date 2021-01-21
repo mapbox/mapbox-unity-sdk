@@ -147,17 +147,37 @@ namespace Mapbox.Unity
 		void ConfigureFileSource()
 		{
 			_fileSource = new CachingWebFileSource(_configuration.AccessToken, _configuration.GetMapsSkuToken);
+#if UNITY_EDITOR
+			_memoryCache = new EditorMemoryCache(_configuration.MemoryCacheSize);
+#else
 			_memoryCache = new MemoryCache(_configuration.MemoryCacheSize);
+#endif
+
+
+
+
 
 #if !UNITY_WEBGL
 			var sqliteCache = new SQLiteCache(_configuration.FileCacheSize);
+
+	#if UNITY_EDITOR
+			var fileCache = new EditorFileCache(_fileSource);
+	#else
 			var fileCache = new FileCache(_fileSource);
+	#endif
+
 			CacheManager = new MapboxCacheManager(_memoryCache, fileCache, sqliteCache);
 #endif
+
+
+
 
 #if UNITY_WEBGL
 			CacheManager = new MapboxCacheManager(_textureMemoryCache, memoryCache);
 #endif
+
+
+
 		}
 
 		void ConfigureTelemetry()

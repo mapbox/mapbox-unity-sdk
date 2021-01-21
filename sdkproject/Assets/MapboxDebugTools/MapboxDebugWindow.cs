@@ -13,9 +13,10 @@ public class MapboxDebugWindow : EditorWindow
 {
 	private int _currentTab;
 	private string[] _tabList = new string[] {"DataFetcher", "UnityTiles" , "Memory Cache", "File Cache"};
-	private static DataFetcherTabController _dataFetcherTabController;
-	private static UnityTilesTabController _unityTilesTabController;
-	private static MemoryTabController _memoryTabController;
+	private static DataFetcherTabDebugView _dataFetcherTabDebugView;
+	private static UnityTilesTabDebugView _unityTilesTabDebugView;
+	private static MemoryTabDebugView _memoryTabDebugView;
+	private static FileCacheDebugView _fileCacheDebugView;
 
 
 	[MenuItem("Mapbox/Debug Window")]
@@ -27,17 +28,21 @@ public class MapboxDebugWindow : EditorWindow
 
 	private static void ReadyObjects()
 	{
-		if (_dataFetcherTabController == null)
+		if (_dataFetcherTabDebugView == null)
 		{
-			_dataFetcherTabController = new DataFetcherTabController();
+			_dataFetcherTabDebugView = new DataFetcherTabDebugView();
 		}
-		if (_unityTilesTabController == null)
+		if (_unityTilesTabDebugView == null)
 		{
-			_unityTilesTabController = new UnityTilesTabController();
+			_unityTilesTabDebugView = new UnityTilesTabDebugView();
 		}
-		if (_memoryTabController == null)
+		if (_memoryTabDebugView == null)
 		{
-			_memoryTabController = new MemoryTabController();
+			_memoryTabDebugView = new MemoryTabDebugView();
+		}
+		if (_fileCacheDebugView == null)
+		{
+			_fileCacheDebugView = new FileCacheDebugView();
 		}
 	}
 
@@ -48,13 +53,16 @@ public class MapboxDebugWindow : EditorWindow
 		switch (_currentTab)
 		{
 			case 0 : 
-				_dataFetcherTabController.Draw();
+				_dataFetcherTabDebugView.Draw();
 				break;
 			case 1 :
-				_unityTilesTabController.Draw();
+				_unityTilesTabDebugView.Draw();
 				break;
 			case 2 :
-				_memoryTabController.Draw();
+				_memoryTabDebugView.Draw();
+				break;
+			case 3 :
+				_fileCacheDebugView.Draw();
 				break;
 		}
 	}
@@ -66,11 +74,12 @@ public class MapboxDebugWindow : EditorWindow
 	}
 }
 
-public class MemoryTabController
+public class MemoryTabDebugView
 {
-	private MemoryCache _memoryCache;
+	private EditorMemoryCache _memoryCache;
 	private bool _cachedFold;
 	private bool _fixedFold;
+	private bool _logFold;
 	private bool[] _cachedItemFolds;
 	private bool[] _fixedItemFolds;
 	private Vector2 _cachedScrollPos;
@@ -81,9 +90,43 @@ public class MemoryTabController
 	private bool[] _cacheByTileFolds;
 	private bool[] _cacheByTilesetFolds;
 
-	public MemoryTabController()
+	private Queue<string> _logs;
+	private Vector2 _logScrollPos;
+
+	public MemoryTabDebugView()
 	{
 		_memoryCache = MapboxAccess.Instance.CacheManager.GetMemoryCache();
+		_logs = new Queue<string>();
+		_memoryCache.TileAdded += (s, id, arg3, arg4) =>
+		{
+			Log(string.Format("{0,10} - Tile Added    : {1}-{2}", Time.frameCount, id, s));
+		};
+		_memoryCache.TileDisposed += (id, s) =>
+		{
+			Log(string.Format("{0,10} - Tile Disposed : {1}-{2}", Time.frameCount, id, s));
+		};
+		_memoryCache.TileRead += (id, s) =>
+		{
+			Log(string.Format("{0,10} - Tile Read     : {1}-{2}", Time.frameCount, id, s));
+		};
+		_memoryCache.TileFixated += (id, s) =>
+		{
+			Log(string.Format("{0,10} - Tile Fixated  : {1}-{2}", Time.frameCount, id, s));
+		};
+		_memoryCache.TilePruned += (id, s) =>
+		{
+			Log(string.Format("{0,10} - Tile Pruned   : {1}-{2}", Time.frameCount, id, s));
+		};
+	}
+
+	private void Log(string s)
+	{
+		_logs.Enqueue(s);
+		if (_logs.Count > 100)
+		{
+			_logs.Dequeue();
+		}
+		_logScrollPos = new Vector2(0, 40 * _logs.Count);
 	}
 
 	public void Draw()
@@ -138,6 +181,28 @@ public class MemoryTabController
 		}
 
 		FixedFold(_fixedList);
+
+		DrawLogs();
+	}
+
+	private void DrawLogs()
+	{
+		_logFold = EditorGUILayout.Foldout(_logFold, string.Format("Logs ({0})", _logs.Count));
+		if (_logFold)
+		{
+			using (var h = new EditorGUILayout.HorizontalScope())
+			{
+				using (var scrollView = new EditorGUILayout.ScrollViewScope(_logScrollPos, GUILayout.Height(300)))
+				{
+					_logScrollPos = scrollView.scrollPosition;
+					foreach (var log in _logs)
+					{
+						EditorGUILayout.LabelField(string.Format(log), EditorStyles.miniLabel);
+					}
+				}
+			}
+		}
+
 	}
 
 	private void FixedFold(Dictionary<int, CacheItem> _fixedList)
@@ -272,10 +337,10 @@ public class MemoryTabController
 	}
 }
 
-public class UnityTilesTabController
+public class UnityTilesTabDebugView
 {
 	private AbstractMap _map;
-	public UnityTilesTabController()
+	public UnityTilesTabDebugView()
 	{
 		_map = GameObject.FindObjectOfType<AbstractMap>();
 	}
@@ -493,11 +558,11 @@ public class UnityTilesTabController
 	}
 }
 
-public class DataFetcherTabController
+public class DataFetcherTabDebugView
 {
 	private DebuggerDataFetcherWrapper _dataFetcher;
 
-	public DataFetcherTabController()
+	public DataFetcherTabDebugView()
 	{
 		_dataFetcher = new DebuggerDataFetcherWrapper();
 	}
@@ -577,5 +642,45 @@ public class DebuggerDataFetcherWrapper : DataFetcher
 	public Dictionary<int, Tile> GetActiveRequests()
 	{
 		return _activeRequests;
+	}
+}
+
+public class FileCacheDebugView
+{
+	private static Queue<string> SavedLogs;
+
+	private EditorFileCache _fileCache;
+	private Vector2 _logsScrollPos;
+
+	public FileCacheDebugView()
+	{
+		_fileCache = MapboxAccess.Instance.CacheManager.GetFileCache();
+		SavedLogs = new Queue<string>();
+	}
+
+	public static void AddToLogs(string s)
+	{
+		SavedLogs.Enqueue(s);
+		if (SavedLogs.Count > 50)
+		{
+			SavedLogs.Dequeue();
+		}
+	}
+
+	public void Draw()
+	{
+		var infosToSaveCount = _fileCache.GetInfosToSaveListCount();
+
+		GUILayout.Label(string.Format("Info in queue for saving : {0}", infosToSaveCount), EditorStyles.label);
+
+		EditorGUILayout.BeginHorizontal();
+		_logsScrollPos = EditorGUILayout.BeginScrollView(_logsScrollPos, GUILayout.Height(300), GUILayout.ExpandWidth(true));
+
+		foreach (var log in SavedLogs)
+		{
+			GUILayout.Label(log, EditorStyles.miniLabel);
+		}
+		EditorGUILayout.EndScrollView();
+		EditorGUILayout.EndHorizontal();
 	}
 }
