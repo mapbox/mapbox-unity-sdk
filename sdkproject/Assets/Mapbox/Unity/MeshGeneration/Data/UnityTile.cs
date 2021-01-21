@@ -154,7 +154,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public void SetHeightData(RasterTile rasterTile, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false, Action<UnityTile> callback = null)
 		{
 			//reset height data
-			if (rasterTile.Texture2D == null)
+			if (rasterTile == null || rasterTile.Texture2D == null)
 			{
 				HeightData = new float[_heightDataResolution * _heightDataResolution];
 				return;

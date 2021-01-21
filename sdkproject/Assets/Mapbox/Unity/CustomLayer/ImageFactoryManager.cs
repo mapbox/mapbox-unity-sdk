@@ -73,7 +73,7 @@ namespace CustomImageLayerSample
 
 		protected virtual void ApplyParentTexture(UnityTile tile)
 		{
-			var parent = tile.UnwrappedTileId.Parent;
+			var parent = tile.UnwrappedTileId;
 			for (int i = tile.CanonicalTileId.Z - 1; i > 0; i--)
 			{
 				var cacheItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(_tilesetId, parent.Canonical);

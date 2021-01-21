@@ -108,7 +108,6 @@ namespace Mapbox.Platform.Cache
 					_itemsToDestroy.RemoveAt(0);
 					RemoveItemCacheItem(keyToRemove);
 					_destroyedItemCounter++;
-					_cachedItems.Remove(keyToRemove);
 				}
 			}
 		}
@@ -131,6 +130,7 @@ namespace Mapbox.Platform.Cache
 			}
 
 			item.Data = null;
+			_cachedItems.Remove(keyToRemove);
 		}
 
 		public CacheItem Get(string tilesetId, CanonicalTileId tileId)
