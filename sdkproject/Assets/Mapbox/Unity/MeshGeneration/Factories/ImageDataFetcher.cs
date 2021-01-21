@@ -61,6 +61,14 @@ public class ImageDataFetcher : DataFetcher
 
 					TextureReceived(unityTile, tile);
 
+					//IMPORTANT file is read from file cache and it's not automatically
+					//moved to memory cache. we have to do it here.
+					MapboxAccess.Instance.CacheManager.AddTextureItemToMemory(
+						textureCacheItem.TilesetId,
+						textureCacheItem.TileId,
+						textureCacheItem,
+						true);
+
 					//after returning what we already have
 					//check if it's out of date, if so check server for update
 					if (textureCacheItem.ExpirationDate < DateTime.Now)
