@@ -25,14 +25,18 @@ namespace Mapbox.Platform.Cache
 		protected int _destroyedItemCounter = 0;
 		protected int _destroyedItemLimit = 20;
 
-		private List<int> _itemsToDestroy;
+		//this is bad, this should be a linked list or something
+		//private List<int> _itemsToDestroy;
+		private HashSet<int> _destructionHashset;
+		private Queue<int> _destructionList;
 
 		public MemoryCache(uint maxCacheSize)
 		{
 			_maxCacheSize = maxCacheSize;
 			_cachedItems = new Dictionary<int, CacheItem>();
 			_fixedItems = new Dictionary<int, CacheItem>();
-			_itemsToDestroy = new List<int>();
+			_destructionList = new Queue<int>();
+			_destructionHashset = new HashSet<int>();
 		}
 
 		public uint MaxCacheSize
@@ -46,9 +50,10 @@ namespace Mapbox.Platform.Cache
 
 			//this tile was recycled so the data was marked for pruning
 			//but then user loaded same tile again so we are removing that flag from _texOrder list
-			if (_itemsToDestroy.Contains(key))
+
+			if (_destructionHashset.Contains(key))
 			{
-				_itemsToDestroy.Remove(key);
+				_destructionHashset.Remove(key);
 			}
 
 			if (!_cachedItems.ContainsKey(key))
@@ -76,9 +81,10 @@ namespace Mapbox.Platform.Cache
 		public virtual void AddToDisposeList(CanonicalTileId tileId, string tilesetId)
 		{
 			var key = tileId.GenerateKey(tilesetId);
-			if (!_itemsToDestroy.Contains(key) && _cachedItems.ContainsKey(key))
+			if (!_destructionHashset.Contains(key) && _cachedItems.ContainsKey(key))
 			{
-				_itemsToDestroy.Add(key);
+				_destructionHashset.Add(key);
+				_destructionList.Enqueue(key);
 			}
 		}
 
@@ -96,8 +102,7 @@ namespace Mapbox.Platform.Cache
 				return null;
 			}
 
-			_itemsToDestroy.Remove(key);
-			_itemsToDestroy.Add(key);
+			_destructionHashset.Remove(key);
 			return _cachedItems[key];
 		}
 
@@ -115,12 +120,14 @@ namespace Mapbox.Platform.Cache
 				}
 
 				_cachedItems.Clear();
-				_itemsToDestroy.Clear();
+				_destructionHashset.Clear();
+				_destructionList.Clear();
 			}
 			else
 			{
 				_cachedItems = new Dictionary<int, CacheItem>();
-				_itemsToDestroy = new List<int>();
+				_destructionHashset.Clear();
+				_destructionList.Clear();
 			}
 		}
 
@@ -139,7 +146,8 @@ namespace Mapbox.Platform.Cache
 				{
 				var cacheItem = _cachedItems[key];
 				_cachedItems.Remove(key);
-				_itemsToDestroy.Remove(key);
+				//_itemsToDestroy.Remove(key);
+				_destructionHashset.Remove(key);
 				_fixedItems.Add(key, cacheItem);
 				}
 				else
@@ -157,7 +165,7 @@ namespace Mapbox.Platform.Cache
 		{
 			if (_cachedItems.Count >= _maxCacheSize)
 			{
-				if (_itemsToDestroy.Count == 0)
+				if (_destructionHashset.Count == 0)
 				{
 					Debug.Log("Memory cache is full. Most likely with textures aren't " +
 					          "disposed properly as memory cache hasn't received unregister signal. Might be a bug with image (prob custom) layers." +
@@ -171,10 +179,19 @@ namespace Mapbox.Platform.Cache
 				}
 				else
 				{
-					var keyToRemove = _itemsToDestroy[0];
-					_itemsToDestroy.RemoveAt(0);
-					RemoveItemCacheItem(keyToRemove);
-					_destroyedItemCounter++;
+					var removed = 5;
+					while (_destructionList.Count > 0 && removed > 0)
+					{
+						var keyToRemove = _destructionList.Dequeue();
+						if (_destructionHashset.Contains(keyToRemove))
+						{
+							_destructionHashset.Remove(keyToRemove);
+							RemoveItemCacheItem(keyToRemove);
+							_destroyedItemCounter++;
+							removed--;
+						}
+					}
+
 				}
 			}
 		}
