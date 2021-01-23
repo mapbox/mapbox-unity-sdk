@@ -54,6 +54,14 @@ namespace Mapbox.Platform.Cache
 				_destructionHashset.Remove(key);
 			}
 
+			//data is already in fixated items list
+			//no need to keep a clone in temp cache as well
+			//get method will check both
+			if (_fixedItems.ContainsKey(key))
+			{
+				return;
+			}
+
 			if (!_cachedItems.ContainsKey(key))
 			{
 				//item doesn't exists, we simply add it to list

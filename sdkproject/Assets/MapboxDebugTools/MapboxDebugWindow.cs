@@ -125,7 +125,7 @@ public class MemoryTabDebugView
 	private void Log(string s)
 	{
 		_logs.Enqueue(s);
-		if (_logs.Count > 10000)
+		if (_logs.Count > 100)
 		{
 			_logs.Dequeue();
 		}
