@@ -14,14 +14,14 @@ namespace Mapbox.Platform.Cache
 		CacheItem Get(CanonicalTileId tileId, string tilesetId);
 		void Clear();
 		bool Exists(CanonicalTileId tileId, string tilesetId);
-		void MarkFixed(CanonicalTileId tileId, string tilesetId);
+		void MarkFallback(CanonicalTileId tileId, string tilesetId);
 	}
 
 	public class MemoryCache : IMemoryCache
 	{
 		protected uint _maxCacheSize;
 		protected Dictionary<int, CacheItem> _cachedItems;
-		protected Dictionary<int, CacheItem> _fixedItems;
+		protected Dictionary<int, CacheItem> _fallbackItems;
 		protected int _destroyedItemCounter = 0;
 		protected int _destroyedItemLimit = 20;
 
@@ -35,7 +35,7 @@ namespace Mapbox.Platform.Cache
 		{
 			_maxCacheSize = maxCacheSize;
 			_cachedItems = new Dictionary<int, CacheItem>();
-			_fixedItems = new Dictionary<int, CacheItem>();
+			_fallbackItems = new Dictionary<int, CacheItem>();
 			_destructionQueue = new Queue<int>();
 			_destructionHashset = new HashSet<int>();
 		}
@@ -54,10 +54,10 @@ namespace Mapbox.Platform.Cache
 				_destructionHashset.Remove(key);
 			}
 
-			//data is already in fixated items list
+			//data is already in fallback items list
 			//no need to keep a clone in temp cache as well
 			//get method will check both
-			if (_fixedItems.ContainsKey(key))
+			if (_fallbackItems.ContainsKey(key))
 			{
 				return;
 			}
@@ -100,9 +100,9 @@ namespace Mapbox.Platform.Cache
 
 			if (!_cachedItems.ContainsKey(key))
 			{
-				if (_fixedItems != null && _fixedItems.ContainsKey(key))
+				if (_fallbackItems != null && _fallbackItems.ContainsKey(key))
 				{
-					return _fixedItems[key];
+					return _fallbackItems[key];
 				}
 
 				return null;
@@ -144,17 +144,17 @@ namespace Mapbox.Platform.Cache
 			return _cachedItems.ContainsKey(key);
 		}
 
-		public virtual void MarkFixed(CanonicalTileId tileId, string tilesetId)
+		public virtual void MarkFallback(CanonicalTileId tileId, string tilesetId)
 		{
 			var key = tileId.GenerateKey(tilesetId);
 			if (_cachedItems.ContainsKey(key))
 			{
-				if(!_fixedItems.ContainsKey(key))
+				if(!_fallbackItems.ContainsKey(key))
 				{
 				var cacheItem = _cachedItems[key];
 				_cachedItems.Remove(key);
 				_destructionHashset.Remove(key);
-				_fixedItems.Add(key, cacheItem);
+				_fallbackItems.Add(key, cacheItem);
 				}
 				else
 				{
@@ -235,11 +235,11 @@ namespace Mapbox.Platform.Cache
 		public Action<CanonicalTileId, string, CacheItem, bool> TileAdded = (s, id, arg3, arg4) => {};
 		public Action<CanonicalTileId, string> TileDisposed = (s, id) => {};
 		public Action<CanonicalTileId, string> TileRead = (s, id) => {};
-		public Action<CanonicalTileId, string> TileFixated = (s, id) => {};
+		public Action<CanonicalTileId, string> TileSetFallback = (s, id) => {};
 		public Action<CanonicalTileId, string> TilePruned = (s, id) => {};
 
 		public Dictionary<int, CacheItem> GetCachedItems => _cachedItems;
-		public Dictionary<int, CacheItem> GetFixedItems => _fixedItems;
+		public Dictionary<int, CacheItem> GetFallbackItems => _fallbackItems;
 		public Queue<int> GetDestructionQueue => _destructionQueue;
 
 		public EditorMemoryCache(uint maxCacheSize) : base(maxCacheSize)
@@ -281,10 +281,10 @@ namespace Mapbox.Platform.Cache
 			TilePruned(item.TileId, item.TilesetId);
 		}
 
-		public override void MarkFixed(CanonicalTileId tileId, string tilesetId)
+		public override void MarkFallback(CanonicalTileId tileId, string tilesetId)
 		{
-			base.MarkFixed(tileId, tilesetId);
-			TileFixated(tileId, tilesetId);
+			base.MarkFallback(tileId, tilesetId);
+			TileSetFallback(tileId, tilesetId);
 		}
 	}
 }

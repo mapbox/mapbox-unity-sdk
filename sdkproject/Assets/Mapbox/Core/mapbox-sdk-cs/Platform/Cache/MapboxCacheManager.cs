@@ -165,7 +165,7 @@ namespace Mapbox.Platform.Cache
                     //entry was probably pruned but file deletion didn't go through (crashed/closed app)
                     //serve the image without metadata for now
                     //delete tile, next tile it'll be updated
-                    
+
                     _textureFileCache.DeleteTileFile(textureCacheItem.FilePath);
                 }
 
@@ -202,9 +202,9 @@ namespace Mapbox.Platform.Cache
             _sqLiteCache?.Add(tilesetId, tileId, textureCacheItem, true);
         }
 
-        public void MarkFixed(CanonicalTileId tileId, string tilesetId)
+        public void MarkFallback(CanonicalTileId tileId, string tilesetId)
         {
-            _memoryCache.MarkFixed(tileId, tilesetId);
+            _memoryCache.MarkFallback(tileId, tilesetId);
         }
 
         public void ClearAndReinitCacheFiles()

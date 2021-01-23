@@ -112,7 +112,7 @@ public class MemoryTabDebugView
 		{
 			Log(string.Format("{0,10} - Tile Read     : {1}-{2}", Time.frameCount, id, s));
 		};
-		_memoryCache.TileFixated += (id, s) =>
+		_memoryCache.TileSetFallback += (id, s) =>
 		{
 			Log(string.Format("{0,10} - Tile Fixated  : {1}-{2}", Time.frameCount, id, s));
 		};
@@ -135,7 +135,7 @@ public class MemoryTabDebugView
 	public void Draw()
 	{
 		_cachedList = _memoryCache.GetCachedItems;
-		_fixedList = _memoryCache.GetFixedItems;
+		_fixedList = _memoryCache.GetFallbackItems;
 		_destructionQueue = _memoryCache.GetDestructionQueue;
 
 		_cachedFold = EditorGUILayout.Foldout(_cachedFold, string.Format("Cached Items ({0})", _cachedList.Count));

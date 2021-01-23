@@ -46,7 +46,7 @@ public class BaseImageDataFetcher : ImageDataFetcher
 					rasterTile.ExpirationDate = textureCacheItem.ExpirationDate.Value;
 					TextureReceived(unityTile, rasterTile);
 					MapboxAccess.Instance.CacheManager.AddTextureItemToMemory(tilesetId, tileId, textureCacheItem, true);
-					MapboxAccess.Instance.CacheManager.MarkFixed(tileId, tilesetId);
+					MapboxAccess.Instance.CacheManager.MarkFallback(tileId, tilesetId);
 
 					//after returning what we already have
 					//check if it's out of date, if so check server for update
@@ -86,6 +86,6 @@ public class BaseImageDataFetcher : ImageDataFetcher
 			rasterTile.Texture2D.name += "_fallbackImage";
 		}
 #endif
-		MapboxAccess.Instance.CacheManager.MarkFixed(rasterTile.Id, rasterTile.TilesetId);
+		MapboxAccess.Instance.CacheManager.MarkFallback(rasterTile.Id, rasterTile.TilesetId);
 	}
 }
