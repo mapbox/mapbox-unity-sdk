@@ -27,22 +27,20 @@ namespace Mapbox.Platform.Cache
 
 		//this is bad, this should be a linked list or something
 		//private List<int> _itemsToDestroy;
-		private HashSet<int> _destructionHashset;
-		private Queue<int> _destructionList;
+		protected HashSet<int> _destructionHashset;
+		protected Queue<int> _destructionQueue;
+		protected bool _cacheSizeWarningShown = false;
 
 		public MemoryCache(uint maxCacheSize)
 		{
 			_maxCacheSize = maxCacheSize;
 			_cachedItems = new Dictionary<int, CacheItem>();
 			_fixedItems = new Dictionary<int, CacheItem>();
-			_destructionList = new Queue<int>();
+			_destructionQueue = new Queue<int>();
 			_destructionHashset = new HashSet<int>();
 		}
 
-		public uint MaxCacheSize
-		{
-			get { return _maxCacheSize; }
-		}
+		public uint MaxCacheSize => _maxCacheSize;
 
 		public virtual void Add(CanonicalTileId tileId, string tilesetId, CacheItem cacheItem, bool forceInsert)
 		{
@@ -84,7 +82,7 @@ namespace Mapbox.Platform.Cache
 			if (!_destructionHashset.Contains(key) && _cachedItems.ContainsKey(key))
 			{
 				_destructionHashset.Add(key);
-				_destructionList.Enqueue(key);
+				_destructionQueue.Enqueue(key);
 			}
 		}
 
@@ -102,7 +100,8 @@ namespace Mapbox.Platform.Cache
 				return null;
 			}
 
-			_destructionHashset.Remove(key);
+			//this would have made sense but temp parent texture feature breaks it
+			//_destructionHashset.Remove(key);
 			return _cachedItems[key];
 		}
 
@@ -121,13 +120,13 @@ namespace Mapbox.Platform.Cache
 
 				_cachedItems.Clear();
 				_destructionHashset.Clear();
-				_destructionList.Clear();
+				_destructionQueue.Clear();
 			}
 			else
 			{
 				_cachedItems = new Dictionary<int, CacheItem>();
 				_destructionHashset.Clear();
-				_destructionList.Clear();
+				_destructionQueue.Clear();
 			}
 		}
 
@@ -146,7 +145,6 @@ namespace Mapbox.Platform.Cache
 				{
 				var cacheItem = _cachedItems[key];
 				_cachedItems.Remove(key);
-				//_itemsToDestroy.Remove(key);
 				_destructionHashset.Remove(key);
 				_fixedItems.Add(key, cacheItem);
 				}
@@ -165,24 +163,26 @@ namespace Mapbox.Platform.Cache
 		{
 			if (_cachedItems.Count >= _maxCacheSize)
 			{
-				if (_destructionHashset.Count == 0)
+				if (_destructionHashset.Count == 0 && !_cacheSizeWarningShown)
 				{
-					Debug.Log("Memory cache is full. Most likely with textures aren't " +
-					          "disposed properly as memory cache hasn't received unregister signal. Might be a bug with image (prob custom) layers." +
-					          "Destroying everything untracked in cache. It will break materials and textures and most likely fill up again just as usual.");
-					var keys = _cachedItems.Keys.ToArray();
-					foreach (var keyToRemove in keys)
-					{
-						RemoveItemCacheItem(keyToRemove);
-						_destroyedItemCounter++;
-					}
+					_cacheSizeWarningShown = true;
+					Debug.Log(string.Format("Memory cache is full ({0} texture at the moment). Either your cache setting is too low ({1}) for your camera view and settings " +
+					                        "or textures aren't disposed properly as memory cache hasn't received unregister signal. " +
+					                        "Not taking any actions but latter might crash the app due to memory usage soon." +
+					                        "This message won't repeat to prevent spam but issue will consist.", _cachedItems.Count, _maxCacheSize));
+					// var keys = _cachedItems.Keys.ToArray();
+					// foreach (var keyToRemove in keys)
+					// {
+					// 	RemoveItemCacheItem(keyToRemove);
+					// 	_destroyedItemCounter++;
+					// }
 				}
 				else
 				{
 					var removed = 5;
-					while (_destructionList.Count > 0 && removed > 0)
+					while (_destructionQueue.Count > 0 && removed > 0)
 					{
-						var keyToRemove = _destructionList.Dequeue();
+						var keyToRemove = _destructionQueue.Dequeue();
 						if (_destructionHashset.Contains(keyToRemove))
 						{
 							_destructionHashset.Remove(keyToRemove);
@@ -232,6 +232,7 @@ namespace Mapbox.Platform.Cache
 
 		public Dictionary<int, CacheItem> GetCachedItems => _cachedItems;
 		public Dictionary<int, CacheItem> GetFixedItems => _fixedItems;
+		public Queue<int> GetDestructionQueue => _destructionQueue;
 
 		public EditorMemoryCache(uint maxCacheSize) : base(maxCacheSize)
 		{

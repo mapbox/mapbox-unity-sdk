@@ -313,15 +313,7 @@ expirationDate INTEGER,
 					return;
 				}
 
-				int? tilesetId = null;
-				lock (_lock)
-				{
-					tilesetId = getTilesetId(tilesetName);
-					if (!tilesetId.HasValue)
-					{
-						tilesetId = insertTileset(tilesetName);
-					}
-				}
+				int? tilesetId = GetOrCreateTilesetId(tilesetName);
 
 				if (tilesetId < 0)
 				{
@@ -329,22 +321,25 @@ expirationDate INTEGER,
 					return;
 				}
 
-				var nowInUnix = (int) UnixTimestampUtils.To(DateTime.Now);
-				int rowsAffected = _sqlite.InsertOrReplace(new tiles
+				lock (_lock)
 				{
-					tile_set = tilesetId.Value,
-					zoom_level = tileId.Z,
-					tile_column = tileId.X,
-					tile_row = tileId.Y,
-					tile_data = data,
-					tile_path = path,
-					timestamp = nowInUnix,
-					etag = etag,
-					expirationDate = expirationDate.HasValue ? (int)UnixTimestampUtils.To(expirationDate.Value) : nowInUnix
-				});
-				if (1 != rowsAffected)
-				{
-					throw new Exception(string.Format("tile [{0} / {1}] was not inserted, rows affected:{2}", tilesetName, tileId, rowsAffected));
+					var nowInUnix = (int) UnixTimestampUtils.To(DateTime.Now);
+					int rowsAffected = _sqlite.InsertOrReplace(new tiles
+					{
+						tile_set = tilesetId.Value,
+						zoom_level = tileId.Z,
+						tile_column = tileId.X,
+						tile_row = tileId.Y,
+						tile_data = data,
+						tile_path = path,
+						timestamp = nowInUnix,
+						etag = etag,
+						expirationDate = expirationDate.HasValue ? (int) UnixTimestampUtils.To(expirationDate.Value) : nowInUnix
+					});
+					if (1 != rowsAffected)
+					{
+						throw new Exception(string.Format("tile [{0} / {1}] was not inserted, rows affected:{2}", tilesetName, tileId, rowsAffected));
+					}
 				}
 			}
 			catch (Exception ex)
@@ -362,6 +357,21 @@ expirationDate INTEGER,
 				_pruneCacheCounter = 0;
 				prune();
 			}
+		}
+
+		private int? GetOrCreateTilesetId(string tilesetName)
+		{
+			int? tilesetId;
+			lock (_lock)
+			{
+				tilesetId = getTilesetId(tilesetName);
+				if (!tilesetId.HasValue)
+				{
+					tilesetId = insertTileset(tilesetName);
+				}
+			}
+
+			return tilesetId;
 		}
 
 		public void UpdateTile(string tilesetName, CanonicalTileId tileId, DateTime expirationDate)
@@ -390,35 +400,41 @@ expirationDate INTEGER,
 
 		private void prune()
 		{
+			lock (_lock)
+			{
 
-			long tileCnt = _sqlite.ExecuteScalar<long>("SELECT COUNT(zoom_level) FROM tiles");
+				long tileCnt = _sqlite.ExecuteScalar<long>("SELECT COUNT(zoom_level) FROM tiles");
 
-			if (tileCnt < _maxTileCount) { return; }
+				if (tileCnt < _maxTileCount)
+				{
+					return;
+				}
 
-			long toDelete = (tileCnt - _maxTileCount) * 2;
+				long toDelete = (tileCnt - _maxTileCount) * 2;
 
 #if MAPBOX_DEBUG_CACHE
 			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
 			Debug.LogFormat("{0} {1} about to prune()", methodName, _tileset);
 #endif
 
-			tiles tile = null;
-			try
-			{
-				var cmd = _sqlite.CreateCommand("SELECT * FROM tiles WHERE rowid IN ( SELECT rowid FROM tiles ORDER BY timestamp ASC LIMIT ? );", toDelete);
-				var tilesToDelete = cmd.ExecuteQuery<tiles>();
-				var thread = new Thread(DeleteFile);
-				thread.IsBackground = true;
-				thread.Start(tilesToDelete);
+				tiles tile = null;
+				try
+				{
+					var cmd = _sqlite.CreateCommand("SELECT * FROM tiles WHERE rowid IN ( SELECT rowid FROM tiles ORDER BY timestamp ASC LIMIT ? );", toDelete);
+					var tilesToDelete = cmd.ExecuteQuery<tiles>();
+					var thread = new Thread(DeleteFile);
+					thread.IsBackground = true;
+					thread.Start(tilesToDelete);
 
-				// no 'ORDER BY' or 'LIMIT' possible if sqlite hasn't been compiled with 'SQLITE_ENABLE_UPDATE_DELETE_LIMIT'
-				// https://sqlite.org/compile.html#enable_update_delete_limit
-				_sqlite.Execute("DELETE FROM tiles WHERE rowid IN ( SELECT rowid FROM tiles ORDER BY timestamp ASC LIMIT ? );", toDelete);
-			}
-			catch (Exception ex)
-			{
-				Debug.LogErrorFormat("error pruning: {0}", ex);
-				Debug.Log(string.Format("{0},{1},{2},{3}",tile.tile_set, tile.zoom_level, tile.tile_column, tile.tile_row));
+					// no 'ORDER BY' or 'LIMIT' possible if sqlite hasn't been compiled with 'SQLITE_ENABLE_UPDATE_DELETE_LIMIT'
+					// https://sqlite.org/compile.html#enable_update_delete_limit
+					_sqlite.Execute("DELETE FROM tiles WHERE rowid IN ( SELECT rowid FROM tiles ORDER BY timestamp ASC LIMIT ? );", toDelete);
+				}
+				catch (Exception ex)
+				{
+					Debug.LogErrorFormat("error pruning: {0}", ex);
+					Debug.Log(string.Format("{0},{1},{2},{3}", tile.tile_set, tile.zoom_level, tile.tile_column, tile.tile_row));
+				}
 			}
 		}
 
@@ -506,21 +522,24 @@ expirationDate INTEGER,
 		/// <returns>True if tile exists</returns>
 		public bool TileExists(string tilesetName, CanonicalTileId tileId)
 		{
-			var query = "SELECT EXISTS(SELECT 1 " +
-			            "FROM tiles " +
-			            "WHERE tile_set    = ?1 " +
-			            "  AND zoom_level  = ?2 " +
-			            "  AND tile_column = ?3 " +
-			            "  AND tile_row    = ?4 " +
-			            "LIMIT 1)";
-			var countCommand = _sqlite.CreateCommand(query,
-				tilesetName,
-				tileId.Z,
-				tileId.X,
-				tileId.Y);
-			var count = countCommand.ExecuteScalar<int>();
+			lock (_lock)
+			{
+				var query = "SELECT EXISTS(SELECT 1 " +
+				            "FROM tiles " +
+				            "WHERE tile_set    = ?1 " +
+				            "  AND zoom_level  = ?2 " +
+				            "  AND tile_column = ?3 " +
+				            "  AND tile_row    = ?4 " +
+				            "LIMIT 1)";
+				var countCommand = _sqlite.CreateCommand(query,
+					tilesetName,
+					tileId.Z,
+					tileId.X,
+					tileId.Y);
+				var count = countCommand.ExecuteScalar<int>();
 
-			return count > 0;
+				return count > 0;
+			}
 		}
 
 		private int insertTileset(string tilesetName)
@@ -528,12 +547,13 @@ expirationDate INTEGER,
 			try
 			{
 				_sqlite.BeginTransaction(true);
-				tilesets newTileset = new tilesets { name = tilesetName };
+				tilesets newTileset = new tilesets {name = tilesetName};
 				int rowsAffected = _sqlite.Insert(newTileset);
 				if (1 != rowsAffected)
 				{
 					throw new Exception(string.Format("tileset [{0}] was not inserted, rows affected:{1}", tilesetName, rowsAffected));
 				}
+
 				return newTileset.id;
 			}
 			catch (Exception ex)
@@ -553,7 +573,7 @@ expirationDate INTEGER,
 				.Table<tilesets>()
 				.Where(ts => ts.name.Equals(tilesetName))
 				.FirstOrDefault();
-			return null == tileset ? (int?)null : tileset.id;
+			return null == tileset ? (int?) null : tileset.id;
 		}
 
 		/// <summary>

@@ -85,13 +85,16 @@ public class MemoryTabDebugView
 	private Vector2 _cachedScrollPos;
 	private Vector2 _fixedScrollPos;
 	private int _currentTab;
-	private string[] _tabList = new string[2] {"Group By Tile", "Group By Tileset"};
+	private string[] _tabList = new string[3] {"Group By Tile", "Group By Tileset", "Queue"};
 
 	private bool[] _cacheByTileFolds;
 	private bool[] _cacheByTilesetFolds;
 
 	private Queue<string> _logs;
 	private Vector2 _logScrollPos;
+	private Dictionary<int,CacheItem> _cachedList;
+	private Dictionary<int, CacheItem> _fixedList;
+	private Queue<int> _destructionQueue;
 
 	public MemoryTabDebugView()
 	{
@@ -122,7 +125,7 @@ public class MemoryTabDebugView
 	private void Log(string s)
 	{
 		_logs.Enqueue(s);
-		if (_logs.Count > 100)
+		if (_logs.Count > 10000)
 		{
 			_logs.Dequeue();
 		}
@@ -131,8 +134,9 @@ public class MemoryTabDebugView
 
 	public void Draw()
 	{
-		var _cachedList = _memoryCache.GetCachedItems;
-		var _fixedList = _memoryCache.GetFixedItems;
+		_cachedList = _memoryCache.GetCachedItems;
+		_fixedList = _memoryCache.GetFixedItems;
+		_destructionQueue = _memoryCache.GetDestructionQueue;
 
 		_cachedFold = EditorGUILayout.Foldout(_cachedFold, string.Format("Cached Items ({0})", _cachedList.Count));
 		if (_cachedFold)
@@ -175,6 +179,10 @@ public class MemoryTabDebugView
 			{
 				DrawCachesByTileset(_groupByTileset);
 			}
+			else if (_currentTab == 2)
+			{
+				ShowQueue(_destructionQueue);
+			}
 
 
 			EditorGUI.indentLevel--;
@@ -183,6 +191,30 @@ public class MemoryTabDebugView
 		FixedFold(_fixedList);
 
 		DrawLogs();
+	}
+
+	private void ShowQueue(Queue<int> destructionQueue)
+	{
+		Array.Resize(ref _cachedItemFolds, destructionQueue.Count);
+		_cachedScrollPos = EditorGUILayout.BeginScrollView(_cachedScrollPos, GUILayout.Height(500), GUILayout.ExpandWidth(true));
+		foreach (var i in destructionQueue)
+		{
+			var index = 0;
+			if (_cachedList.ContainsKey(i))
+			{
+				var item = _cachedList[i];
+				EditorGUILayout.BeginVertical();
+				_cachedItemFolds[index] = EditorGUILayout.Foldout(
+					_cachedItemFolds[index],
+					string.Format("{0} ({1})", item.TileId, item.TilesetId));
+				if (_cachedItemFolds[index])
+				{
+					DrawCacheItem(item);
+				}
+			}
+			index++;
+		}
+		EditorGUILayout.EndScrollView();
 	}
 
 	private void DrawLogs()
@@ -240,7 +272,7 @@ public class MemoryTabDebugView
 
 	private void DrawCachesByTile(Dictionary<CanonicalTileId,List<CacheItem>> groupById)
 	{
-		Array.Resize(ref _cachedItemFolds, groupById.Count + 1);
+		Array.Resize(ref _cachedItemFolds, groupById.Count);
 		EditorGUILayout.BeginHorizontal();
 		_cachedScrollPos = EditorGUILayout.BeginScrollView(_cachedScrollPos, GUILayout.Height(500), GUILayout.ExpandWidth(true));
 
@@ -254,7 +286,7 @@ public class MemoryTabDebugView
 			if (_cachedItemFolds[index])
 			{
 				EditorGUI.indentLevel++;
-				Array.Resize(ref _cacheByTileFolds, tile.Value.Count + 1);
+				Array.Resize(ref _cacheByTileFolds, tile.Value.Count);
 				var index2 = 0;
 				foreach (var item in tile.Value)
 				{
@@ -669,6 +701,11 @@ public class FileCacheDebugView
 
 	public void Draw()
 	{
+		if (_fileCache == null)
+		{
+			return;
+		}
+
 		var infosToSaveCount = _fileCache.GetInfosToSaveListCount();
 
 		GUILayout.Label(string.Format("Info in queue for saving : {0}", infosToSaveCount), EditorStyles.label);
