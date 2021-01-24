@@ -125,7 +125,7 @@ public class MemoryTabDebugView
 	private void Log(string s)
 	{
 		_logs.Enqueue(s);
-		if (_logs.Count > 100)
+		if (_logs.Count > 10000)
 		{
 			_logs.Dequeue();
 		}
@@ -217,8 +217,10 @@ public class MemoryTabDebugView
 		EditorGUILayout.EndScrollView();
 	}
 
+	private string _filter;
 	private void DrawLogs()
 	{
+		_filter = EditorGUILayout.TextField(_filter);
 		_logFold = EditorGUILayout.Foldout(_logFold, string.Format("Logs ({0})", _logs.Count));
 		if (_logFold)
 		{
@@ -229,7 +231,10 @@ public class MemoryTabDebugView
 					_logScrollPos = scrollView.scrollPosition;
 					foreach (var log in _logs)
 					{
-						EditorGUILayout.LabelField(string.Format(log), EditorStyles.miniLabel);
+						if (string.IsNullOrEmpty(_filter) || log.Contains(_filter))
+						{
+							EditorGUILayout.LabelField(string.Format(log), EditorStyles.miniLabel);
+						}
 					}
 				}
 			}

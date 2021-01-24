@@ -22,6 +22,11 @@ public class BaseImageDataFetcher : ImageDataFetcher
 #if UNITY_EDITOR
 			rasterTile.FromCache = CacheType.MemoryCache;
 #endif
+			MapboxAccess.Instance.CacheManager.AddTextureItemToMemory(
+				textureItem.TilesetId,
+				textureItem.TileId,
+				textureItem,
+				true);
 			TextureReceived(unityTile, rasterTile);
 			return;
 		}

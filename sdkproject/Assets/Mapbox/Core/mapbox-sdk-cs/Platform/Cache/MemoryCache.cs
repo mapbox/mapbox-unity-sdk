@@ -72,14 +72,9 @@ namespace Mapbox.Platform.Cache
 			}
 			else
 			{
-				//an item with same key exists, we destroy older one to prevent memory leak first
-				//then add new one to list
-				if(Debug.isDebugBuild) Debug.Log("An item with same key exists in memory cache. Destroying older one, caching new one.");
-
-				RemoveItemCacheItem(key);
-				cacheItem.AddedToCacheTicksUtc = DateTime.UtcNow.Ticks;
-				cacheItem.Tile.Released += TileRecycled;
-				_cachedItems.Add(key, cacheItem);
+				//an item with same key exists, we just update the added time
+				//do we need to check if tile/data inside is same?
+				_cachedItems[key].AddedToCacheTicksUtc = DateTime.UtcNow.Ticks;
 			}
 
 			CheckCacheLimit();
