@@ -146,6 +146,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 			foreach (var tile in Tiles)
 			{
+				tile.ReleaseTile();
 				tile.Clear();
 			}
 			Tiles.Clear();

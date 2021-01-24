@@ -514,7 +514,6 @@ namespace Mapbox.Unity.Map
 
 				_mapVisualizer.OnTileFinished += (s) => { OnTileFinished(s); };
 				_mapVisualizer.OnTileDisposing += tile => { OnTileDisposing(tile); };
-				_mapVisualizer.OnTileDisposing += tile => { MapboxAccess.Instance.CacheManager.TileDisposed(tile); };
 			}
 		}
 

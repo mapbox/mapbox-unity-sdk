@@ -34,7 +34,6 @@ namespace Mapbox.Platform.Cache
 						HasError = tile.CurrentState == Tile.State.Canceled
 					};
 
-					tile.Clear();
 					callback(textureCacheItem);
 				}
 			});

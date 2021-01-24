@@ -10,11 +10,16 @@
 		private Queue<T> _objects;
 		private Func<T> _objectGenerator;
 
-		public ObjectPool(Func<T> objectGenerator)
+		public ObjectPool(Func<T> objectGenerator, int initialItemCount = 0)
 		{
 			if (objectGenerator == null) throw new ArgumentNullException("objectGenerator");
 			_objects = new Queue<T>();
 			_objectGenerator = objectGenerator;
+
+			for (int i = 0; i < initialItemCount; i++)
+			{
+				_objects.Enqueue(_objectGenerator());
+			}
 		}
 
 		public T GetObject()

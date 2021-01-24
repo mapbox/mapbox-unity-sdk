@@ -38,6 +38,7 @@ namespace Mapbox.Map
 		public CacheType FromCache = CacheType.NoCache;
 #endif
 
+		public Action<Tile> Released = (t) => { };
 		public Action Cancelled = () => { };
 
 		public string TilesetId;
@@ -236,6 +237,11 @@ namespace Mapbox.Map
 
 			_state = State.Canceled;
 			Cancelled();
+		}
+
+		public virtual void ReleaseTile()
+		{
+			Released(this);
 		}
 
 

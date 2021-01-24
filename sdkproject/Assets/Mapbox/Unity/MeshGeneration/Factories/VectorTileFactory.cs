@@ -321,6 +321,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		#region DataFetcherEvents
 		private void OnVectorDataRecieved(UnityTile tile, VectorTile.VectorTile vectorTile)
 		{
+			tile.SetVectorData(TilesetId, vectorTile);
 			CreateMeshes(tile);
 			// if (tile != null)
 			// {

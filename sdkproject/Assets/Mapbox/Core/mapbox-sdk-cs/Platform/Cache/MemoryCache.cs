@@ -10,11 +10,11 @@ namespace Mapbox.Platform.Cache
 	public interface IMemoryCache
 	{
 		void Add(CanonicalTileId tileId, string tilesetId, CacheItem cacheItem, bool forceInsert);
-		void AddToDisposeList(CanonicalTileId tileId, string tilesetId);
 		CacheItem Get(CanonicalTileId tileId, string tilesetId);
 		void Clear();
 		bool Exists(CanonicalTileId tileId, string tilesetId);
 		void MarkFallback(CanonicalTileId tileId, string tilesetId);
+		void UpdateExpiration(string tilesetId, CanonicalTileId tileId, DateTime expirationDate);
 	}
 
 	public class MemoryCache : IMemoryCache
@@ -66,6 +66,7 @@ namespace Mapbox.Platform.Cache
 			{
 				//item doesn't exists, we simply add it to list
 				cacheItem.AddedToCacheTicksUtc = DateTime.UtcNow.Ticks;
+				cacheItem.Tile.Released += TileRecycled;
 				_cachedItems.Add(key, cacheItem);
 				//_texOrder.Add(key);
 			}
@@ -77,20 +78,24 @@ namespace Mapbox.Platform.Cache
 
 				RemoveItemCacheItem(key);
 				cacheItem.AddedToCacheTicksUtc = DateTime.UtcNow.Ticks;
-				_cachedItems[key] = cacheItem;
+				cacheItem.Tile.Released += TileRecycled;
+				_cachedItems.Add(key, cacheItem);
 			}
 
 			CheckCacheLimit();
 			CheckForUnloadingAssets();
 		}
 
-		public virtual void AddToDisposeList(CanonicalTileId tileId, string tilesetId)
+		public void UpdateExpiration(string tilesetId, CanonicalTileId tileId, DateTime expirationDate)
 		{
 			var key = tileId.GenerateKey(tilesetId);
-			if (!_destructionHashset.Contains(key) && _cachedItems.ContainsKey(key))
+			if (_cachedItems.ContainsKey(key))
 			{
-				_destructionHashset.Add(key);
-				_destructionQueue.Enqueue(key);
+				_cachedItems[key].ExpirationDate = expirationDate;
+			}
+			else if (_fallbackItems.ContainsKey(key))
+			{
+				_fallbackItems[key].ExpirationDate = expirationDate;
 			}
 		}
 
@@ -167,6 +172,16 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 
+		protected virtual void TileRecycled(Tile t)
+		{
+			var key = t.Id.GenerateKey(t.TilesetId);
+			if (!_fallbackItems.ContainsKey(key))
+			{
+				_destructionHashset.Add(key);
+				_destructionQueue.Enqueue(key);
+			}
+		}
+
 		private void CheckCacheLimit()
 		{
 			if (_cachedItems.Count >= _maxCacheSize)
@@ -233,7 +248,7 @@ namespace Mapbox.Platform.Cache
 	public class EditorMemoryCache : MemoryCache
 	{
 		public Action<CanonicalTileId, string, CacheItem, bool> TileAdded = (s, id, arg3, arg4) => {};
-		public Action<CanonicalTileId, string> TileDisposed = (s, id) => {};
+		public Action<CanonicalTileId, string> TileReleased = (s, id) => {};
 		public Action<CanonicalTileId, string> TileRead = (s, id) => {};
 		public Action<CanonicalTileId, string> TileSetFallback = (s, id) => {};
 		public Action<CanonicalTileId, string> TilePruned = (s, id) => {};
@@ -252,10 +267,10 @@ namespace Mapbox.Platform.Cache
 			TileAdded(tileId, tilesetId, cacheItem, forceInsert);
 		}
 
-		public override void AddToDisposeList(CanonicalTileId tileId, string tilesetId)
+		protected override void TileRecycled(Tile t)
 		{
-			base.AddToDisposeList(tileId, tilesetId);
-			TileDisposed(tileId, tilesetId);
+			base.TileRecycled(t);
+			TileReleased(t.Id, t.TilesetId);
 		}
 
 		public override CacheItem Get(CanonicalTileId tileId, string tilesetId)

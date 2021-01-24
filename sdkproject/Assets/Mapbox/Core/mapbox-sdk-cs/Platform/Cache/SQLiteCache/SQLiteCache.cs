@@ -374,7 +374,7 @@ expirationDate INTEGER,
 			return tilesetId;
 		}
 
-		public void UpdateTile(string tilesetName, CanonicalTileId tileId, DateTime expirationDate)
+		public void UpdateExpiration(string tilesetName, CanonicalTileId tileId, DateTime expirationDate)
 		{
 			var tilesetId = getTilesetId(tilesetName);
 			if (!tilesetId.HasValue)

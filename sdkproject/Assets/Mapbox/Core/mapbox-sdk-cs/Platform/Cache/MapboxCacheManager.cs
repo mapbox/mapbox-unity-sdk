@@ -113,9 +113,10 @@ namespace Mapbox.Platform.Cache
             _memoryCache.Add(tileId, tilesetId, textureCacheItem, forceInsert);
         }
 
-        public void UpdateExpirationDate(string tilesetId, CanonicalTileId tileId, DateTime textureCacheItem)
+        public void UpdateExpirationDate(string tilesetId, CanonicalTileId tileId, DateTime expirationDate)
         {
-            _sqLiteCache?.UpdateTile(tilesetId, tileId, textureCacheItem);
+            _memoryCache.UpdateExpiration(tilesetId, tileId, expirationDate);
+            _sqLiteCache?.UpdateExpiration(tilesetId, tileId, expirationDate);
         }
 
         public TextureCacheItem GetTextureItemFromMemory(string tilesetId, CanonicalTileId tileId)
@@ -226,15 +227,6 @@ namespace Mapbox.Platform.Cache
             {
                 _sqLiteCache.ReadySqliteDatabase();
                 Debug.Log("SQlite cache tables recreated");
-            }
-        }
-
-        //when a tile is disposed&recycled, we mark data used in that for priority on removal
-        public void TileDisposed(UnityTile tile)
-        {
-            foreach (var dataTile in tile.Tiles)
-            {
-                _memoryCache?.AddToDisposeList(dataTile.Id, dataTile.TilesetId);
             }
         }
 

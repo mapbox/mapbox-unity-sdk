@@ -19,6 +19,8 @@ public class ImageDataFetcher : DataFetcher
 	public virtual void FetchData(RasterTile tile, string tilesetId, CanonicalTileId tileId, bool useRetina, UnityTile unityTile = null)
 	{
 		//MemoryCacheCheck
+		//we do not check for tile expiration of memory cached items
+		//we only do expiration check for item from file/sql
 		var textureItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(tilesetId, tileId);
 		if (textureItem != null)
 		{
@@ -48,9 +50,11 @@ public class ImageDataFetcher : DataFetcher
 				//after that first check few lines above and actual loading (loading is scheduled and delayed so it's not in same frame)
 				if (textureCacheItem != null)
 				{
+					textureCacheItem.Tile = tile;
 					tile.SetTextureFromCache(textureCacheItem.Texture2D);
 #if UNITY_EDITOR
 					tile.FromCache = CacheType.FileCache;
+					textureCacheItem.From = tile.FromCache;
 #endif
 
 					tile.ETag = textureCacheItem.ETag;
@@ -81,6 +85,9 @@ public class ImageDataFetcher : DataFetcher
 				}
 				else
 				{
+					//this else part technically should rarely ever happen.
+					//it means file exists check returned true but while the command is in queue
+					//file is probably deleted so cannot find it anymore.
 					EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, String.Empty)
 					{
 						Callback = () => { FetchingCallback(tileId, tile, unityTile); }
@@ -92,7 +99,6 @@ public class ImageDataFetcher : DataFetcher
 		}
 
 		//not in cache so web request
-		//CreateWebRequest(tilesetId, tileId, useRetina, String.Empty, unityTile);
 		EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, String.Empty)
 		{
 			Callback = () => { FetchingCallback(tileId, tile, unityTile); }
@@ -122,25 +128,16 @@ public class ImageDataFetcher : DataFetcher
 			//add it to memory cache
 			if (rasterTile.StatusCode == 304)
 			{
-				var newTextureCacheItem = new TextureCacheItem()
-				{
-					TileId = tileId,
-					TilesetId = rasterTile.TilesetId,
-					ETag = rasterTile.ETag,
-					Data = rasterTile.Data,
-					ExpirationDate = rasterTile.ExpirationDate,
-					Texture2D = rasterTile.Texture2D
-				};
-
-#if UNITY_EDITOR
-				newTextureCacheItem.From = rasterTile.FromCache;
-#endif
-
-				MapboxAccess.Instance.CacheManager.AddTextureItemToMemory(
-					rasterTile.TilesetId,
-					rasterTile.Id,
-					newTextureCacheItem,
-					true);
+				//304 means expired data from file/sql
+				//it has already been processed and added to memory
+				//304 means server says everything is same (except expiration date of course)
+				//no need to add to memory cache again
+				//expiration date will be updated in next call
+				// MapboxAccess.Instance.CacheManager.AddTextureItemToMemory(
+				// 	rasterTile.TilesetId,
+				// 	rasterTile.Id,
+				// 	newTextureCacheItem,
+				// 	true);
 
 				MapboxAccess.Instance.CacheManager.UpdateExpirationDate(
 					rasterTile.TilesetId,
@@ -161,6 +158,7 @@ public class ImageDataFetcher : DataFetcher
 
 				var newTextureCacheItem = new TextureCacheItem()
 				{
+					Tile = rasterTile,
 					TileId = tileId,
 					TilesetId = rasterTile.TilesetId,
 					ETag = rasterTile.ETag,

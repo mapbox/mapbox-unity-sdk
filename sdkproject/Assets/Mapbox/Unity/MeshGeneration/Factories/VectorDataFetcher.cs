@@ -148,6 +148,9 @@ public class VectorDataFetcher : DataFetcher
 				vectorTile.Id,
 				new VectorCacheItem()
 				{
+					Tile = vectorTile,
+					TileId = vectorTile.Id,
+					TilesetId = vectorTile.TilesetId,
 					ETag = vectorTile.ETag,
 					Data = vectorTile.ByteData,
 					VectorTile = vectorTile.Data,

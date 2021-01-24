@@ -37,10 +37,12 @@ public class BaseImageDataFetcher : ImageDataFetcher
 				//after that first check few lines above and actual loading (loading is scheduled and delayed so it's not in same frame)
 				if (textureCacheItem != null)
 				{
+					textureCacheItem.Tile = tile;
 					var rasterTile = new RasterTile(tileId, tilesetId);
 					rasterTile.SetTextureFromCache(textureCacheItem.Texture2D);
 #if UNITY_EDITOR
 					rasterTile.FromCache = CacheType.FileCache;
+					textureCacheItem.From = rasterTile.FromCache;
 #endif
 					rasterTile.ETag = textureCacheItem.ETag;
 					rasterTile.ExpirationDate = textureCacheItem.ExpirationDate.Value;

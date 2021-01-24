@@ -9,6 +9,7 @@ namespace Mapbox.Platform.Cache
 
 	public class CacheItem
 	{
+		public Tile Tile;
 		public CanonicalTileId TileId;
 		public string TilesetId;
 		/// <summary> Raw response data- </summary>

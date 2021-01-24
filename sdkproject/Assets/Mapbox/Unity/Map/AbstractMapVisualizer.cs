@@ -31,7 +31,7 @@ namespace Mapbox.Unity.Map
 
 		protected IMapReadable _map;
 		protected Dictionary<UnwrappedTileId, UnityTile> _activeTiles = new Dictionary<UnwrappedTileId, UnityTile>();
-		protected Queue<UnityTile> _inactiveTiles = new Queue<UnityTile>();
+		protected ObjectPool<UnityTile> _tilePool;
 		private int _counter;
 
 		private ModuleState _state;
@@ -59,16 +59,6 @@ namespace Mapbox.Unity.Map
 		public event Action<UnityTile> OnTileFinished = delegate { };
 
 		/// <summary>
-		/// Gets the unity tile from unwrapped tile identifier.
-		/// </summary>
-		/// <returns>The unity tile from unwrapped tile identifier.</returns>
-		/// <param name="tileId">Tile identifier.</param>
-		public UnityTile GetUnityTileFromUnwrappedTileId(UnwrappedTileId tileId)
-		{
-			return _activeTiles[tileId];
-		}
-
-		/// <summary>
 		/// Initializes the factories by passing the file source down, which is necessary for data (web/file) calls
 		/// </summary>
 		/// <param name="fileSource"></param>
@@ -83,6 +73,14 @@ namespace Mapbox.Unity.Map
 			{
 				DisposeTile(tile);
 			}
+
+			_tilePool = new ObjectPool<UnityTile>(() =>
+			{
+				var tile = new GameObject().AddComponent<UnityTile>();
+				tile.MeshRenderer.sharedMaterial = Instantiate(_map.TileMaterial);
+				tile.transform.SetParent(_map.Root, false);
+				return tile;
+			});
 
 			State = ModuleState.Initialized;
 
@@ -134,12 +132,11 @@ namespace Mapbox.Unity.Map
 			}
 
 			_activeTiles.Clear();
-			_inactiveTiles.Clear();
+			_tilePool?.Clear();
 		}
 
 		#region Factory event callbacks
 		//factory event callback, not relaying this up for now
-
 
 		// private void TileHeightStateChanged(UnityTile tile)
 		// {
@@ -225,28 +222,7 @@ namespace Mapbox.Unity.Map
 		/// <param name="tileId"></param>
 		public virtual UnityTile LoadTile(UnwrappedTileId tileId, bool enableTile = false)
 		{
-			UnityTile unityTile = null;
-
-			if (_inactiveTiles.Count > 0)
-			{
-				unityTile = _inactiveTiles.Dequeue();
-			}
-
-			if (unityTile == null)
-			{
-				unityTile = new GameObject().AddComponent<UnityTile>();
-				try
-				{
-					unityTile.MeshRenderer.sharedMaterial = Instantiate(_map.TileMaterial);
-				}
-				catch
-				{
-					Debug.Log("Tile Material not set. Using default material");
-					unityTile.MeshRenderer.sharedMaterial = Instantiate(new Material(Shader.Find("Diffuse")));
-				}
-
-				unityTile.transform.SetParent(_map.Root, false);
-			}
+			var unityTile = _tilePool.GetObject();
 
 			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale, _map.AbsoluteZoom, _map.LoadingTexture);
 			if (enableTile)
@@ -285,7 +261,7 @@ namespace Mapbox.Unity.Map
 
 				unityTile.Recycle();
 				ActiveTiles.Remove(tileId);
-				_inactiveTiles.Enqueue(unityTile);
+				_tilePool.Put(unityTile);
 			}
 		}
 
@@ -324,13 +300,16 @@ namespace Mapbox.Unity.Map
 				DisposeTile(tileId);
 			}
 
-			foreach (var tile in _inactiveTiles)
+			if(_tilePool != null)
 			{
-				tile.ClearAssets();
-				DestroyImmediate(tile.gameObject);
+				foreach (var tile in _tilePool.GetQueue())
+				{
+					tile.ClearAssets();
+					DestroyImmediate(tile.gameObject);
+				}
+				_tilePool.Clear();
 			}
 
-			_inactiveTiles.Clear();
 			State = ModuleState.Initialized;
 		}
 
@@ -438,7 +417,7 @@ namespace Mapbox.Unity.Map
 		#endregion
 
 #if UNITY_EDITOR
-		public Queue<UnityTile> GetInactiveTiles => _inactiveTiles;
+		public Queue<UnityTile> GetInactiveTiles => _tilePool.GetQueue() as Queue<UnityTile>;
 #endif
 	}
 }
