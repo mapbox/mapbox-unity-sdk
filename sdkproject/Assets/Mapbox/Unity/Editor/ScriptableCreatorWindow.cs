@@ -21,7 +21,7 @@
 		private Action<UnityEngine.Object> _act;
 		int activeIndex = 0;
 
-		GUIStyle headerFoldout = new GUIStyle("Foldout");
+		GUIStyle headerFoldout;
 		GUIStyle header;
 
 		void OnEnable()
@@ -63,6 +63,8 @@
 
 		void OnGUI()
 		{
+			headerFoldout = new GUIStyle("Foldout");
+
 			if (_assets == null || _assets.Count == 0)
 			{
 				var list = AssetDatabase.FindAssets("t:" + _type.Name);
@@ -128,7 +130,7 @@
 					GUI.enabled = false;
 					var ed = UnityEditor.Editor.CreateEditor(asset);
 					ed.hideFlags = HideFlags.NotEditable;
-					ed.OnInspectorGUI();
+					ed.DrawDefaultInspector();
 					GUI.enabled = true;
 					EditorGUI.indentLevel -= 4;
 					EditorGUILayout.Space();

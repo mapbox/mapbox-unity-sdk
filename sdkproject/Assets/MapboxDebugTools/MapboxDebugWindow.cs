@@ -104,7 +104,7 @@ public class MemoryTabDebugView
 		{
 			Log(string.Format("{0,10} - Tile Added    : {1}-{2}", Time.frameCount, id, s));
 		};
-		_memoryCache.TileDisposed += (id, s) =>
+		_memoryCache.TileReleased += (id, s) =>
 		{
 			Log(string.Format("{0,10} - Tile Disposed : {1}-{2}", Time.frameCount, id, s));
 		};
