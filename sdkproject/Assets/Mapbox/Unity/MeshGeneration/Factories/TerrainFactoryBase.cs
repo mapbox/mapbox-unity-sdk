@@ -87,6 +87,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			TerrainFactoryManager.UnregisterTile(tile);
 		}
 
+		public void PregenerateTileMesh(UnityTile tile)
+		{
+			TerrainFactoryManager.PregenerateTileMesh(tile);
+		}
+
 		private void OnFetchingError(UnityTile tile, RasterTile rasterTile, TileErrorEventArgs errorEventArgs)
 		{
 			OnDataError(tile, rasterTile, errorEventArgs);

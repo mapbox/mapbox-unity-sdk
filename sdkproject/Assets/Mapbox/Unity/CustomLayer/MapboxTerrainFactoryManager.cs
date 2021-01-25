@@ -123,6 +123,11 @@ namespace CustomImageLayerSample
 			}
 		}
 
+		public void PregenerateTileMesh(UnityTile tile)
+		{
+			//TerrainStrategy.RegisterTile(tile, false);
+		}
+
 		protected override void ApplyParentTexture(UnityTile tile)
 		{
 			var parent = tile.UnwrappedTileId.Parent;

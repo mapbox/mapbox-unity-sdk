@@ -74,11 +74,16 @@ namespace Mapbox.Unity.Map
 				DisposeTile(tile);
 			}
 
+			var terrainFactory = (TerrainFactoryBase) Factories.First(x => x is TerrainFactoryBase);
 			_tilePool = new ObjectPool<UnityTile>(() =>
 			{
 				var tile = new GameObject().AddComponent<UnityTile>();
 				tile.MeshRenderer.sharedMaterial = Instantiate(_map.TileMaterial);
 				tile.transform.SetParent(_map.Root, false);
+				if (terrainFactory != null)
+				{
+					terrainFactory.PregenerateTileMesh(tile);
+				}
 				return tile;
 			});
 

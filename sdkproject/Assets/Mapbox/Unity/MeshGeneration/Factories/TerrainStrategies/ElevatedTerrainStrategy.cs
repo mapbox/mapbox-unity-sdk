@@ -42,7 +42,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 		public override void Initialize(ElevationLayerProperties elOptions)
 		{
 			base.Initialize(elOptions);
-
+			
 			_meshSamples = new Dictionary<int, MeshDataArray>();
 			_dataArrays = new Dictionary<UnwrappedTileId, MeshDataArray>();
 			_cachedMeshDataArrays = new Dictionary<GameObject, MeshDataArray>();
