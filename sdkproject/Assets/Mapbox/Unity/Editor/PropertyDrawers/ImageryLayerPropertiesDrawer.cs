@@ -43,17 +43,12 @@
 
 			EditorGUI.BeginChangeCheck();
 			sourceTypeProperty.enumValueIndex = EditorGUILayout.Popup(sourceTypeLabel, sourceTypeProperty.enumValueIndex, sourceTypeContent);
-			if(EditorGUI.EndChangeCheck())
-			{
-				EditorHelper.CheckForModifiedProperty(property);
-			}
+
 			sourceTypeValue = (ImagerySourceType)sourceTypeProperty.enumValueIndex;
 
 			var sourceOptionsProperty = property.FindPropertyRelative("sourceOptions");
 			var layerSourceProperty = sourceOptionsProperty.FindPropertyRelative("layerSource");
 			var layerSourceId = layerSourceProperty.FindPropertyRelative("Id");
-
-			EditorGUI.BeginChangeCheck();
 
 			switch (sourceTypeValue)
 			{

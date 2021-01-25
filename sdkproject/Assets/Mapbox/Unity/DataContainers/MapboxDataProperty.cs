@@ -25,7 +25,7 @@ namespace Mapbox.Unity.Map
 		}
 		public virtual bool NeedsForceUpdate()
 		{
-			return false;
+			return true;
 		}
 		public virtual void UpdateProperty(UnityTile tile)
 		{

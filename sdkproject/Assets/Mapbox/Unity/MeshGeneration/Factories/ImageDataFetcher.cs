@@ -16,7 +16,7 @@ public class ImageDataFetcher : DataFetcher
 
 	}
 
-	public virtual void FetchData(RasterTile tile, string tilesetId, CanonicalTileId tileId, bool useRetina, UnityTile unityTile = null)
+	public virtual void FetchData(RasterTile tile, string tilesetId, CanonicalTileId tileId, UnityTile unityTile = null)
 	{
 		//MemoryCacheCheck
 		//we do not check for tile expiration of memory cached items

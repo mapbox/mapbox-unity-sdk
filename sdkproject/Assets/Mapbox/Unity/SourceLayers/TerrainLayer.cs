@@ -126,38 +126,25 @@ namespace Mapbox.Unity.Map
 		public void Initialize()
 		{
 			_elevationFactory = ScriptableObject.CreateInstance<TerrainFactoryBase>();
-			SetFactoryOptions();
-
-			_layerProperty.colliderOptions.PropertyHasChanged += (property, e) =>
-			{
-				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, true);
-			};
-			_layerProperty.requiredOptions.PropertyHasChanged += (property, e) =>
-			{
-				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, true);
-			};
-			_layerProperty.unityLayerOptions.PropertyHasChanged += (property, e) =>
-			{
-				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, true);
-			};
-			_layerProperty.PropertyHasChanged += (property, e) =>
-			{
-				//terrain factory uses strategy objects and they are controlled by layer
-				//so we have to refresh that first
-				//pushing new settings to factory directly
-				SetFactoryOptions();
-				//notifying map to reload existing tiles
-				NotifyUpdateLayer(_elevationFactory, property as MapboxDataProperty, true);
-			};
-		}
-
-		private void SetFactoryOptions()
-		{
 			//terrain factory uses strategy objects and they are controlled by layer
 			//so we have to refresh that first
 			SetStrategy();
 			//pushing new settings to factory directly
 			Factory.SetOptions(_layerProperty);
+
+			_layerProperty.colliderOptions.PropertyHasChanged += SetFactoryOptions;
+			_layerProperty.requiredOptions.PropertyHasChanged += SetFactoryOptions;
+			_layerProperty.unityLayerOptions.PropertyHasChanged += SetFactoryOptions;
+			_layerProperty.PropertyHasChanged += SetFactoryOptions;
+		}
+
+		private void SetFactoryOptions(object sender, System.EventArgs e)
+		{
+			//terrain factory uses strategy objects and they are controlled by layer
+			//so we have to refresh that first
+			SetStrategy();
+			Factory.SetOptions(_layerProperty);
+			NotifyUpdateLayer(_elevationFactory, sender as MapboxDataProperty, true);
 		}
 
 		private void SetStrategy()
@@ -165,24 +152,38 @@ namespace Mapbox.Unity.Map
 			switch (_layerProperty.elevationLayerType)
 			{
 				case ElevationLayerType.FlatTerrain:
-					_elevationFactory.Strategy = new FlatTerrainStrategy();
+				{
+					if (!(_elevationFactory.Strategy is FlatTerrainStrategy))
+						_elevationFactory.Strategy = new FlatTerrainStrategy();
 					break;
+				}
 				case ElevationLayerType.LowPolygonTerrain:
-					_elevationFactory.Strategy = new LowPolyTerrainStrategy();
+				{
+					if (!(_elevationFactory.Strategy is LowPolyTerrainStrategy))
+						_elevationFactory.Strategy = new LowPolyTerrainStrategy();
 					break;
+				}
 				case ElevationLayerType.TerrainWithElevation:
+				{
 					if (_layerProperty.sideWallOptions.isActive)
 					{
-						_elevationFactory.Strategy = new ElevatedTerrainWithSidesStrategy();
+						if (!(_elevationFactory.Strategy is ElevatedTerrainWithSidesStrategy))
+							_elevationFactory.Strategy = new ElevatedTerrainWithSidesStrategy();
 					}
 					else
 					{
-						_elevationFactory.Strategy = new ElevatedTerrainStrategy();
+						if (!(_elevationFactory.Strategy is ElevatedTerrainStrategy))
+							_elevationFactory.Strategy = new ElevatedTerrainStrategy();
 					}
+
+				}
 					break;
 				case ElevationLayerType.GlobeTerrain:
-					_elevationFactory.Strategy = new FlatSphereTerrainStrategy();
+				{
+					if (!(_elevationFactory.Strategy is FlatSphereTerrainStrategy))
+						_elevationFactory.Strategy = new FlatSphereTerrainStrategy();
 					break;
+				}
 				default:
 					break;
 			}

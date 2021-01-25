@@ -112,10 +112,7 @@ namespace Mapbox.Unity.Map
 			_imageFactory = ScriptableObject.CreateInstance<MapImageFactory>();
 			_imageFactory.SetOptions(_layerProperty);
 			_layerProperty.PropertyHasChanged += RedrawLayer;
-			_layerProperty.rasterOptions.PropertyHasChanged += (property, e) =>
-			{
-				NotifyUpdateLayer(_imageFactory, property as MapboxDataProperty, false);
-			};
+			_layerProperty.rasterOptions.PropertyHasChanged += RedrawLayer;
 		}
 
 		public void RedrawLayer(object sender, System.EventArgs e)

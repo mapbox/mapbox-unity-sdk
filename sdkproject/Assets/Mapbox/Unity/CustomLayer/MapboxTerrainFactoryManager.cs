@@ -2,6 +2,7 @@ using System;
 using Mapbox.Map;
 using Mapbox.Platform;
 using Mapbox.Unity;
+using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies;
 using UnityEngine;
@@ -13,27 +14,19 @@ namespace CustomImageLayerSample
 		public TerrainStrategy TerrainStrategy;
 		public string ShaderElevationTextureFieldName = "_HeightTexture";
 		public string ShaderElevationTextureScaleOffsetFieldName = "_HeightTexture_ST";
-		public float ExaggerationFactor;
-		public bool UseRelativeHeight;
-		public bool AddCollider;
 
+		private ElevationLayerProperties _elevationSettings;
 		private bool _isUsingShaderSolution = true;
 
 		public MapboxTerrainFactoryManager(
 			IFileSource fileSource,
+			ElevationLayerProperties elevationSettings,
 			TerrainStrategy terrainStrategy,
-			string tilesetId,
-			bool downloadFallbackImagery,
-			bool useRetina = true,
-			bool addCollider = false,
-			bool useRelativeHeight = false,
-			float exaggerationFactor = 1) : base(fileSource, tilesetId, downloadFallbackImagery)
+			bool downloadFallbackImagery) : base(fileSource, elevationSettings.sourceOptions, downloadFallbackImagery)
 		{
+			_elevationSettings = elevationSettings;
 			TerrainStrategy = terrainStrategy;
-			ExaggerationFactor = exaggerationFactor;
-			UseRelativeHeight = useRelativeHeight;
-			AddCollider = addCollider;
-			_isUsingShaderSolution = !addCollider;
+			_isUsingShaderSolution = !_elevationSettings.colliderOptions.addCollider;
 		}
 
 		public override void RegisterTile(UnityTile tile)
@@ -45,13 +38,13 @@ namespace CustomImageLayerSample
 					ApplyParentTexture(tile);
 				}
 
-				var dataTile = CreateTile(tile.CanonicalTileId, _tilesetId);
+				var dataTile = CreateTile(tile.CanonicalTileId, _sourceSettings.Id);
 				if (tile != null)
 				{
 					tile.AddTile(dataTile);
 				}
 
-				_fetcher.FetchData(dataTile, _tilesetId, tile.CanonicalTileId, true, tile);
+				_fetcher.FetchData(dataTile, _sourceSettings.Id, tile.CanonicalTileId, tile);
 			}
 			else
 			{
@@ -99,12 +92,12 @@ namespace CustomImageLayerSample
 					unityTile.MeshRenderer.sharedMaterial.SetTexture(ShaderElevationTextureFieldName, dataTile.Texture2D);
 					unityTile.MeshRenderer.sharedMaterial.SetVector(ShaderElevationTextureScaleOffsetFieldName, new Vector4(1, 1, 0, 0));
 					unityTile.MeshRenderer.sharedMaterial.SetFloat("_TileScale", unityTile.TileScale);
-					unityTile.SetHeightData(dataTile, ExaggerationFactor, UseRelativeHeight, AddCollider);
+					unityTile.SetHeightData(dataTile, _elevationSettings.requiredOptions.exaggerationFactor, _elevationSettings.modificationOptions.useRelativeHeight, _elevationSettings.colliderOptions.addCollider);
 					TerrainStrategy.RegisterTile(unityTile, false);
 				}
 				else
 				{
-					unityTile.SetHeightData(dataTile, ExaggerationFactor, UseRelativeHeight, AddCollider, (tile) =>
+					unityTile.SetHeightData(dataTile, _elevationSettings.requiredOptions.exaggerationFactor, _elevationSettings.modificationOptions.useRelativeHeight, _elevationSettings.colliderOptions.addCollider, (tile) =>
 					{
 						TerrainStrategy.RegisterTile(unityTile, true);
 					});
@@ -112,7 +105,7 @@ namespace CustomImageLayerSample
 			}
 			else
 			{
-				unityTile.SetHeightData(dataTile, ExaggerationFactor, UseRelativeHeight, AddCollider, (tile) =>
+				unityTile.SetHeightData(dataTile, _elevationSettings.requiredOptions.exaggerationFactor, _elevationSettings.modificationOptions.useRelativeHeight, _elevationSettings.colliderOptions.addCollider, (tile) =>
 				{
 					if (tile.CanonicalTileId == cachedTileIdForCallbackCheck)
 					{
@@ -133,7 +126,7 @@ namespace CustomImageLayerSample
 			var parent = tile.UnwrappedTileId.Parent;
 			for (int i = tile.CanonicalTileId.Z - 1; i > 0; i--)
 			{
-				var cacheItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(_tilesetId, parent.Canonical);
+				var cacheItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(_sourceSettings.Id, parent.Canonical);
 				if (cacheItem != null && cacheItem.Texture2D != null)
 				{
 					tile.SetParentTexture(parent, cacheItem.Texture2D);

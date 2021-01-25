@@ -2,6 +2,7 @@ using System;
 using Mapbox.Map;
 using Mapbox.Platform;
 using Mapbox.Unity;
+using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
 using UnityEngine;
 
@@ -15,12 +16,12 @@ namespace CustomImageLayerSample
 
 		protected BaseImageDataFetcher _baseImageDataFetcher;
 		protected ImageDataFetcher _fetcher;
-		protected string _tilesetId;
+		protected LayerSourceOptions _sourceSettings;
 
-		protected ImageFactoryManager(IFileSource fileSource, string tilesetId, bool downloadFallbackImagery)
+		protected ImageFactoryManager(IFileSource fileSource, LayerSourceOptions sourceSettings, bool downloadFallbackImagery)
 		{
 			DownloadFallbackImagery = downloadFallbackImagery;
-			_tilesetId = tilesetId;
+			_sourceSettings = sourceSettings;
 
 			_baseImageDataFetcher = new BaseImageDataFetcher(fileSource);
 			_fetcher = new ImageDataFetcher(fileSource);
@@ -35,18 +36,18 @@ namespace CustomImageLayerSample
 		public virtual void RegisterTile(UnityTile tile)
 		{
 			ApplyParentTexture(tile);
-			var dataTile = CreateTile(tile.CanonicalTileId, _tilesetId);
+			var dataTile = CreateTile(tile.CanonicalTileId, _sourceSettings.Id);
 			if (tile != null)
 			{
 				tile.AddTile(dataTile);
 			}
 
-			_fetcher.FetchData(dataTile, _tilesetId, tile.CanonicalTileId, true, tile);
+			_fetcher.FetchData(dataTile, _sourceSettings.Id, tile.CanonicalTileId, tile);
 		}
 
 		public virtual void UnregisterTile(UnityTile tile)
 		{
-			_fetcher.CancelFetching(tile.UnwrappedTileId, _tilesetId);
+			_fetcher.CancelFetching(tile.UnwrappedTileId, _sourceSettings.Id);
 		}
 
 		protected virtual void OnTextureReceived(UnityTile unityTile, RasterTile dataTile)
@@ -76,7 +77,7 @@ namespace CustomImageLayerSample
 			var parent = tile.UnwrappedTileId;
 			for (int i = tile.CanonicalTileId.Z - 1; i > 0; i--)
 			{
-				var cacheItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(_tilesetId, parent.Canonical);
+				var cacheItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(_sourceSettings.Id, parent.Canonical);
 				if (cacheItem != null && cacheItem.Texture2D != null)
 				{
 					tile.SetParentTexture(parent, cacheItem.Texture2D);
@@ -95,7 +96,7 @@ namespace CustomImageLayerSample
 				for (int j = 0; j < 4; j++)
 				{
 					tileId = new CanonicalTileId(2, i, j);
-					_baseImageDataFetcher.FetchData(CreateTile(tileId, _tilesetId), imageryLayerSourceId, tileId, rasterOptionsUseRetina);
+					_baseImageDataFetcher.FetchData(CreateTile(tileId, _sourceSettings.Id), imageryLayerSourceId, tileId, rasterOptionsUseRetina);
 				}
 			}
 
@@ -104,12 +105,17 @@ namespace CustomImageLayerSample
 				for (int j = 0; j < 2; j++)
 				{
 					tileId = new CanonicalTileId(1, i, j);
-					_baseImageDataFetcher.FetchData(CreateTile(tileId, _tilesetId), imageryLayerSourceId, tileId, rasterOptionsUseRetina);
+					_baseImageDataFetcher.FetchData(CreateTile(tileId, _sourceSettings.Id), imageryLayerSourceId, tileId, rasterOptionsUseRetina);
 				}
 			}
 
 			tileId = new CanonicalTileId(0, 0, 0);
-			_baseImageDataFetcher.FetchData(CreateTile(tileId, _tilesetId), imageryLayerSourceId, tileId, rasterOptionsUseRetina);
+			_baseImageDataFetcher.FetchData(CreateTile(tileId, _sourceSettings.Id), imageryLayerSourceId, tileId, rasterOptionsUseRetina);
+		}
+
+		public void SetSourceOptions(LayerSourceOptions properties)
+		{
+			_sourceSettings = properties;
 		}
 	}
 }

@@ -2,25 +2,22 @@ using System;
 using Mapbox.Map;
 using Mapbox.Platform;
 using Mapbox.Unity;
+using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
 
 namespace CustomImageLayerSample
 {
 	public sealed class MapboxImageFactoryManager : ImageFactoryManager
 	{
-		public bool UseRetina = true;
-		public bool UseMipMap = false;
-		public bool UseCompression = false;
+		private ImageryLayerProperties _imageSettings;
 
-		public MapboxImageFactoryManager(IFileSource fileSource, string tilesetId, bool downloadFallbackImagery, bool useRetina = true, bool useMipMap = false, bool useCompression = false) : base(fileSource, tilesetId, downloadFallbackImagery)
+		public MapboxImageFactoryManager(IFileSource fileSource, ImageryLayerProperties imageSettings, bool downloadFallbackImagery) : base(fileSource, imageSettings.sourceOptions, downloadFallbackImagery)
 		{
-			UseRetina = useRetina;
-			UseMipMap = useMipMap;
-			UseCompression = useCompression;
+			_imageSettings = imageSettings;
 
 			if (DownloadFallbackImagery)
 			{
-				DownloadAndCacheBaseTiles(_tilesetId, true);
+				DownloadAndCacheBaseTiles(_sourceSettings.Id, true);
 			}
 		}
 
@@ -31,11 +28,11 @@ namespace CustomImageLayerSample
 			//but caching type and using Activator.CreateInstance (or caching func and calling it)  is even slower
 			if (tilesetId.StartsWith("mapbox://", StringComparison.Ordinal))
 			{
-				rasterTile = UseRetina ? new RetinaRasterTile(tileId, tilesetId) : new RasterTile(tileId, tilesetId);
+				rasterTile = _imageSettings.rasterOptions.useRetina ? new RetinaRasterTile(tileId, tilesetId) : new RasterTile(tileId, tilesetId);
 			}
 			else
 			{
-				rasterTile = UseRetina ? new ClassicRetinaRasterTile(tileId, tilesetId) : new ClassicRasterTile(tileId, tilesetId);
+				rasterTile = _imageSettings.rasterOptions.useRetina ? new ClassicRetinaRasterTile(tileId, tilesetId) : new ClassicRasterTile(tileId, tilesetId);
 			}
 
 #if UNITY_EDITOR
@@ -53,7 +50,7 @@ namespace CustomImageLayerSample
 			}
 			else
 			{
-				unityTile.SetRasterData(dataTile, UseMipMap, UseCompression);
+				unityTile.SetRasterData(dataTile, _imageSettings.rasterOptions.useMipMap, _imageSettings.rasterOptions.useCompression);
 			}
 		}
 	}

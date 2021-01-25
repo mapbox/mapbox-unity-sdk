@@ -53,13 +53,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			TerrainFactoryManager = new MapboxTerrainFactoryManager(
 				_fileSource,
+				_elevationOptions,
 				Strategy,
-				TilesetId,
-				false,
-				false,
-				_elevationOptions.colliderOptions.addCollider,
-				_elevationOptions.modificationOptions.useRelativeHeight,
-				_elevationOptions.requiredOptions.exaggerationFactor);
+				false);
 			TerrainFactoryManager.FetchingError += OnFetchingError;
 		}
 

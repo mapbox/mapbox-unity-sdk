@@ -1,6 +1,7 @@
 using Mapbox.Map;
 using Mapbox.Platform;
 using Mapbox.Unity;
+using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
 using UnityEngine;
 
@@ -12,7 +13,7 @@ namespace CustomImageLayerSample
 		private string CustomTextureFieldName;
 		private string CustomTextureScaleOffsetFieldName;
 
-		public CustomImageFactoryManager(IFileSource fileSource, string urlFormat, string tilesetId, bool downloadFallbackImagery, string textureFieldName = "_MainTex", string textureScaleOffsetFieldName = "_MainTex_ST") : base(fileSource, tilesetId, downloadFallbackImagery)
+		public CustomImageFactoryManager(IFileSource fileSource, string urlFormat, ImageryLayerProperties settings, bool downloadFallbackImagery, string textureFieldName = "_MainTex", string textureScaleOffsetFieldName = "_MainTex_ST") : base(fileSource, settings.sourceOptions, downloadFallbackImagery)
 		{
 			_urlFormat = urlFormat;
 			CustomTextureFieldName = textureFieldName;
@@ -20,7 +21,7 @@ namespace CustomImageLayerSample
 
 			if (DownloadFallbackImagery)
 			{
-				DownloadAndCacheBaseTiles(_tilesetId, true);
+				DownloadAndCacheBaseTiles(_sourceSettings.Id, true);
 			}
 		}
 
@@ -40,7 +41,7 @@ namespace CustomImageLayerSample
 			var parent = tile.UnwrappedTileId.Parent;
 			for (int i = tile.CanonicalTileId.Z - 1; i > 0; i--)
 			{
-				var cacheItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(_tilesetId, parent.Canonical);
+				var cacheItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(_sourceSettings.Id, parent.Canonical);
 				if (cacheItem != null && cacheItem.Texture2D != null)
 				{
 					tile.SetParentTexture(parent, cacheItem.Texture2D, CustomTextureFieldName, CustomTextureScaleOffsetFieldName);

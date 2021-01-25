@@ -24,5 +24,10 @@
 				tile.Collider.Destroy();
 			}
 		}
+
+		public override bool NeedsForceUpdate()
+		{
+			return true;
+		}
 	}
 }
