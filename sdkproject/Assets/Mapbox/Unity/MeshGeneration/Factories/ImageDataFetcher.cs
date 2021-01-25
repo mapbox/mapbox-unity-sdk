@@ -28,8 +28,8 @@ public class ImageDataFetcher : DataFetcher
 #if UNITY_EDITOR
 			tile.FromCache = CacheType.MemoryCache;
 #endif
-			//IMPORTANT file is read from file cache and it's not automatically
-			//moved to memory cache. we have to do it here.
+
+			//this is mostly to update the caching time
 			MapboxAccess.Instance.CacheManager.AddTextureItemToMemory(
 				textureItem.TilesetId,
 				textureItem.TileId,

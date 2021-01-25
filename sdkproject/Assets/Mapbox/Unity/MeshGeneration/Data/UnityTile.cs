@@ -144,9 +144,12 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 			Cancel();
 
+			_rasterTile = null;
+			_terrainTile = null;
+			_vectorTile = null;
+
 			foreach (var tile in Tiles)
 			{
-				tile.ReleaseTile();
 				tile.Clear();
 			}
 			Tiles.Clear();
@@ -223,6 +226,15 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void SetRasterData(RasterTile rasterTile, bool useMipMap = false, bool useCompression = false)
 		{
+			// if (_rasterTile != null)
+			// {
+			// 	_rasterTile.ReleaseTile();
+			// 	_rasterTile.Clear();
+			// 	_rasterTile.Cancel();
+			// 	Tiles.Remove(_rasterTile);
+			// }
+			//
+			// _rasterTile = rasterTile;
 			// Don't leak the texture, just reuse it.
 			//reset image on null data
 			if (rasterTile.Texture2D == null && rasterTile.Data == null)

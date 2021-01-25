@@ -27,7 +27,6 @@ namespace CustomImageLayerSample
 			_fetcher = new ImageDataFetcher(fileSource);
 			_fetcher.TextureReceived += OnTextureReceived;
 			_fetcher.FetchingError += OnFetcherError;
-
 		}
 
 		protected abstract RasterTile CreateTile(CanonicalTileId tileId, string tilesetId);
@@ -48,6 +47,7 @@ namespace CustomImageLayerSample
 		public virtual void UnregisterTile(UnityTile tile)
 		{
 			_fetcher.CancelFetching(tile.UnwrappedTileId, _sourceSettings.Id);
+			MapboxAccess.Instance.CacheManager.TileDisposed(tile, _sourceSettings.Id);
 		}
 
 		protected virtual void OnTextureReceived(UnityTile unityTile, RasterTile dataTile)

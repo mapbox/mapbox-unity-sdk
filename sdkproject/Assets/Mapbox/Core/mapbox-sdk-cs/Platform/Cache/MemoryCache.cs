@@ -2,6 +2,7 @@ using Mapbox.Map;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mapbox.Unity.MeshGeneration.Data;
 using UnityEngine;
 
 
@@ -15,6 +16,7 @@ namespace Mapbox.Platform.Cache
 		bool Exists(CanonicalTileId tileId, string tilesetId);
 		void MarkFallback(CanonicalTileId tileId, string tilesetId);
 		void UpdateExpiration(string tilesetId, CanonicalTileId tileId, DateTime expirationDate);
+		void TileDisposed(UnityTile tile, string tilesetId);
 	}
 
 	public class MemoryCache : IMemoryCache
@@ -49,11 +51,6 @@ namespace Mapbox.Platform.Cache
 			//this tile was recycled so the data was marked for pruning
 			//but then user loaded same tile again so we are removing that flag from _texOrder list
 
-			if (_destructionHashset.Contains(key))
-			{
-				_destructionHashset.Remove(key);
-			}
-
 			//data is already in fallback items list
 			//no need to keep a clone in temp cache as well
 			//get method will check both
@@ -66,14 +63,18 @@ namespace Mapbox.Platform.Cache
 			{
 				//item doesn't exists, we simply add it to list
 				cacheItem.AddedToCacheTicksUtc = DateTime.UtcNow.Ticks;
-				cacheItem.Tile.Released += TileRecycled;
+				//cacheItem.Tile.Released += TileRecycled;
 				_cachedItems.Add(key, cacheItem);
-				//_texOrder.Add(key);
 			}
 			else
 			{
-				//an item with same key exists, we just update the added time
-				//do we need to check if tile/data inside is same?
+				//WRONG an item with same key exists, we just update the added time
+				//WRONG do we need to check if tile/data inside is same?
+				//remember when a tile is unloaded and reloaded, it'll have same cache item key
+				//BUT the tiles inside it will be different. New cache item will have new tiles in it
+				//and if we don't handle them properly, they'll leak.
+				//_cachedItems[key].AddedToCacheTicksUtc = DateTime.UtcNow.Ticks;
+
 				_cachedItems[key].AddedToCacheTicksUtc = DateTime.UtcNow.Ticks;
 			}
 
@@ -111,6 +112,19 @@ namespace Mapbox.Platform.Cache
 			//this would have made sense but temp parent texture feature breaks it
 			//_destructionHashset.Remove(key);
 			return _cachedItems[key];
+		}
+
+		public virtual void TileDisposed(UnityTile tile, string tilesetId)
+		{
+			var key = tile.CanonicalTileId.GenerateKey(tilesetId);
+			if (!_fallbackItems.ContainsKey(key))
+			{
+				if (_cachedItems.ContainsKey(key))
+				{
+					_destructionHashset.Add(key);
+					_destructionQueue.Enqueue(key);
+				}
+			}
 		}
 
 		public virtual void Clear()
@@ -167,16 +181,6 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 
-		protected virtual void TileRecycled(Tile t)
-		{
-			var key = t.Id.GenerateKey(t.TilesetId);
-			if (!_fallbackItems.ContainsKey(key))
-			{
-				_destructionHashset.Add(key);
-				_destructionQueue.Enqueue(key);
-			}
-		}
-
 		private void CheckCacheLimit()
 		{
 			if (_cachedItems.Count >= _maxCacheSize)
@@ -226,13 +230,13 @@ namespace Mapbox.Platform.Cache
 		protected virtual void RemoveItemCacheItem(int keyToRemove)
 		{
 			var item = _cachedItems[keyToRemove];
+			_cachedItems.Remove(keyToRemove);
 			if (item is TextureCacheItem)
 			{
 				(item as TextureCacheItem).Texture2D.Destroy();
 			}
 
 			item.Data = null;
-			_cachedItems.Remove(keyToRemove);
 		}
 
 #if UNITY_EDITOR
@@ -262,10 +266,10 @@ namespace Mapbox.Platform.Cache
 			TileAdded(tileId, tilesetId, cacheItem, forceInsert);
 		}
 
-		protected override void TileRecycled(Tile t)
+		public override void TileDisposed(UnityTile tile, string tilesetId)
 		{
-			base.TileRecycled(t);
-			TileReleased(t.Id, t.TilesetId);
+			base.TileDisposed(tile, tilesetId);
+			TileReleased(tile.CanonicalTileId, tilesetId);
 		}
 
 		public override CacheItem Get(CanonicalTileId tileId, string tilesetId)
@@ -286,9 +290,16 @@ namespace Mapbox.Platform.Cache
 
 		protected override void RemoveItemCacheItem(int keyToRemove)
 		{
-			var item = _cachedItems[keyToRemove];
-			base.RemoveItemCacheItem(keyToRemove);
-			TilePruned(item.TileId, item.TilesetId);
+			if (_cachedItems.ContainsKey(keyToRemove))
+			{
+				var item = _cachedItems[keyToRemove];
+				base.RemoveItemCacheItem(keyToRemove);
+				TilePruned(item.TileId, item.TilesetId);
+			}
+			else
+			{
+				Debug.Log("why?");
+			}
 		}
 
 		public override void MarkFallback(CanonicalTileId tileId, string tilesetId)

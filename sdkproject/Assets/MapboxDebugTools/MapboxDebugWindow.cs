@@ -106,7 +106,7 @@ public class MemoryTabDebugView
 		};
 		_memoryCache.TileReleased += (id, s) =>
 		{
-			Log(string.Format("{0,10} - Tile Disposed : {1}-{2}", Time.frameCount, id, s));
+			Log(string.Format("{0,10} - Tile Released : {1}-{2}", Time.frameCount, id, s));
 		};
 		_memoryCache.TileRead += (id, s) =>
 		{
@@ -197,9 +197,9 @@ public class MemoryTabDebugView
 	{
 		Array.Resize(ref _cachedItemFolds, destructionQueue.Count);
 		_cachedScrollPos = EditorGUILayout.BeginScrollView(_cachedScrollPos, GUILayout.Height(500), GUILayout.ExpandWidth(true));
+		var index = 0;
 		foreach (var i in destructionQueue)
 		{
-			var index = 0;
 			if (_cachedList.ContainsKey(i))
 			{
 				var item = _cachedList[i];

@@ -238,13 +238,7 @@ namespace Mapbox.Map
 			_state = State.Canceled;
 			Cancelled();
 		}
-
-		public virtual void ReleaseTile()
-		{
-			Released(this);
-		}
-
-
+		
 		// Get the tile resource (raster/vector/etc).
 		internal abstract TileResource MakeTileResource(string tilesetId);
 
