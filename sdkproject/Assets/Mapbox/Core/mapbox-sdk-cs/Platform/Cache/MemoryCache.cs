@@ -51,6 +51,11 @@ namespace Mapbox.Platform.Cache
 			//this tile was recycled so the data was marked for pruning
 			//but then user loaded same tile again so we are removing that flag from _texOrder list
 
+			if (_destructionHashset.Contains(key))
+			{
+				_destructionHashset.Remove(key);
+			}
+
 			//data is already in fallback items list
 			//no need to keep a clone in temp cache as well
 			//get method will check both
