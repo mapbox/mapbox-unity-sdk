@@ -30,7 +30,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	/// and apply height data on that. By creating a custom terrain factory, you can have a custom mesh instead of a grid,
 	/// optimize and minimize vertex count etc.
 	/// </summary>
-	public abstract class AbstractTileFactory : ScriptableObject
+	public abstract class AbstractTileFactory
 	{
 		protected IFileSource _fileSource;
 
@@ -44,6 +44,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		protected HashSet<UnityTile> _tilesWaitingResponse;
 		protected HashSet<UnityTile> _tilesWaitingProcessing;
 
+		protected AbstractTileFactory(IFileSource fileSource)
+		{
+			_fileSource = fileSource;
+			_tilesWaitingResponse = new HashSet<UnityTile>();
+			_tilesWaitingProcessing = new HashSet<UnityTile>();
+		}
+
 		public virtual void SetOptions(LayerProperties options)
 		{
 			_options = options;
@@ -56,14 +63,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				handler(this, e);
 			}
-		}
-
-		public virtual void Initialize(IFileSource fileSource)
-		{
-			_fileSource = fileSource;
-			_tilesWaitingResponse = new HashSet<UnityTile>();
-			_tilesWaitingProcessing = new HashSet<UnityTile>();
-			OnInitialized();
 		}
 
 		public virtual void Register(UnityTile tile)
@@ -94,8 +93,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				Register(tile);
 			}
 		}
-
-		protected abstract void OnInitialized();
 
 		protected abstract void OnRegistered(UnityTile tile);
 

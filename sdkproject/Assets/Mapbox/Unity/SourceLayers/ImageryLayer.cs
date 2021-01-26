@@ -1,4 +1,6 @@
-﻿using Mapbox.Unity.MeshGeneration.Data;
+﻿using Mapbox.Map;
+using Mapbox.Platform;
+using Mapbox.Unity.MeshGeneration.Data;
 
 namespace Mapbox.Unity.Map
 {
@@ -7,40 +9,23 @@ namespace Mapbox.Unity.Map
 	using Mapbox.Unity.MeshGeneration.Factories;
 	using Mapbox.Unity.Utilities;
 
+	/// <summary>
+	/// Layers control setting, update
+	/// </summary>
 	[Serializable]
 	public class ImageryLayer : AbstractLayer, IImageryLayer
 	{
-		[SerializeField]
-		ImageryLayerProperties _layerProperty = new ImageryLayerProperties();
-
-		[NodeEditorElement("Image Layer")]
 		public ImageryLayerProperties LayerProperty
 		{
-			get
-			{
-				return _layerProperty;
-			}
-			set
-			{
-				_layerProperty = value;
-			}
+			get => _layerProperty;
+			set => _layerProperty = value;
 		}
-		public MapLayerType LayerType
-		{
-			get
-			{
-				return MapLayerType.Imagery;
-			}
-		}
-
-		public bool IsLayerActive
-		{
-			get
-			{
-				return (_layerProperty.sourceType != ImagerySourceType.None);
-			}
-		}
-
+		public MapLayerType LayerType => MapLayerType.Imagery;
+		public bool IsLayerActive => (_layerProperty.sourceType != ImagerySourceType.None);
+		public ImagerySourceType LayerSource => _layerProperty.sourceType;
+		public MapImageFactory Factory => _imageFactory;
+		[SerializeField] protected ImageryLayerProperties _layerProperty = new ImageryLayerProperties();
+		private MapImageFactory _imageFactory;
 		public string LayerSourceId
 		{
 			get
@@ -57,24 +42,20 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public ImagerySourceType LayerSource
+		public Action<AbstractTileFactory, TileErrorEventArgs> FactoryError = (factory, args) => { };
+
+		public void Initialize(IFileSource fileSource)
 		{
-			get
+			if (_layerProperty.sourceType != ImagerySourceType.Custom && _layerProperty.sourceType != ImagerySourceType.None)
 			{
-				return _layerProperty.sourceType;
+				_layerProperty.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(_layerProperty.sourceType);
 			}
+			_imageFactory = new MapImageFactory(fileSource, _layerProperty);
+			_imageFactory.OnTileError += delegate(object sender, TileErrorEventArgs args) { FactoryError(_imageFactory, args); };
+
+			_layerProperty.PropertyHasChanged += RedrawLayer;
+			_layerProperty.rasterOptions.PropertyHasChanged += RedrawLayer;
 		}
-
-		public ImageryLayer()
-		{
-
-		}
-
-		public ImageryLayer(ImageryLayerProperties properties)
-		{
-			_layerProperty = properties;
-		}
-
 
 		public void SetLayerSource(string imageSource)
 		{
@@ -91,57 +72,36 @@ namespace Mapbox.Unity.Map
 			_layerProperty.HasChanged = true;
 		}
 
-		public void SetRasterOptions(ImageryRasterOptions rasterOptions)
-		{
-			_layerProperty.rasterOptions = rasterOptions;
-			_layerProperty.HasChanged = true;
-		}
-
-		public void Initialize(LayerProperties properties)
-		{
-			_layerProperty = (ImageryLayerProperties)properties;
-			Initialize();
-		}
-
-		public void Initialize()
-		{
-			if (_layerProperty.sourceType != ImagerySourceType.Custom && _layerProperty.sourceType != ImagerySourceType.None)
-			{
-				_layerProperty.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(_layerProperty.sourceType);
-			}
-			_imageFactory = ScriptableObject.CreateInstance<MapImageFactory>();
-			_imageFactory.SetOptions(_layerProperty);
-			_layerProperty.PropertyHasChanged += RedrawLayer;
-			_layerProperty.rasterOptions.PropertyHasChanged += RedrawLayer;
-		}
-
 		public void RedrawLayer(object sender, System.EventArgs e)
 		{
 			Factory.SetOptions(_layerProperty);
 			NotifyUpdateLayer(_imageFactory, sender as MapboxDataProperty, false);
 		}
 
-		public void Remove()
-		{
-			_layerProperty = new ImageryLayerProperties
-			{
-				sourceType = ImagerySourceType.None
-			};
-		}
-
-		public void Update(LayerProperties properties)
-		{
-			Initialize(properties);
-		}
-
-		private MapImageFactory _imageFactory;
-		public MapImageFactory Factory
-		{
-			get
-			{
-				return _imageFactory;
-			}
-		}
+		// public void Remove()
+		// {
+		// 	_layerProperty = new ImageryLayerProperties
+		// 	{
+		// 		sourceType = ImagerySourceType.None
+		// 	};
+		// }
+		//
+		// public void SetRasterOptions(ImageryRasterOptions rasterOptions)
+		// {
+		// 	_layerProperty.rasterOptions = rasterOptions;
+		// 	_layerProperty.HasChanged = true;
+		// }
+		//
+		// public void Initialize(LayerProperties properties)
+		// {
+		// 	_layerProperty = (ImageryLayerProperties)properties;
+		// 	Initialize();
+		// }
+		//
+		// public void Update(LayerProperties properties)
+		// {
+		// 	Initialize(properties);
+		// }
 
 		#region API Methods
 

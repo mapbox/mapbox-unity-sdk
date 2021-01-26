@@ -28,16 +28,15 @@ namespace Mapbox.Unity.Map
 		#region Private Fields
 
 		[SerializeField] private MapOptions _options = new MapOptions();
-		[SerializeField] private bool _initializeOnStart = true;
-		[SerializeField] protected ImageryLayer _imagery = new ImageryLayer();
-		[SerializeField] protected TerrainLayer _terrain = new TerrainLayer();
-		[SerializeField] protected VectorLayer _vectorData = new VectorLayer();
+		[SerializeField] protected AbstractMapVisualizer _mapVisualizer;
 		[SerializeField] protected AbstractTileProvider _tileProvider;
+
+		[SerializeField] private bool _initializeOnStart = true;
+
 		[SerializeField] protected HashSet<UnwrappedTileId> _currentExtent;
 		[SerializeField] protected EditorPreviewOptions _previewOptions = new EditorPreviewOptions();
 		private List<UnwrappedTileId> tilesToProcess;
 
-		protected AbstractMapVisualizer _mapVisualizer;
 		protected float _unityTileSize = 1;
 		protected bool _worldHeightFixed = false;
 		protected MapboxAccess _fileSource;
@@ -115,44 +114,6 @@ namespace Mapbox.Unity.Map
 			set
 			{
 				_options = value;
-			}
-		}
-
-		/// <summary>
-		/// Options to control the imagery component of the map.
-		/// </summary>
-		[NodeEditorElement("Layers")]
-		public IImageryLayer ImageLayer
-		{
-			get
-			{
-				return _imagery;
-			}
-		}
-
-		/// <summary>
-		/// Options to control the terrain/ elevation component of the map.
-		/// </summary>
-		[NodeEditorElement("Layers")]
-		public ITerrainLayer Terrain
-		{
-			get
-			{
-				return _terrain;
-			}
-		}
-
-		/// <summary>
-		/// The vector data.
-		/// Options to control the vector data component of the map.
-		/// Adds a vector source and visualizers to define the rendering behaviour of vector data layers.
-		/// </summary>
-		[NodeEditorElement("Layers")]
-		public IVectorDataLayer VectorData
-		{
-			get
-			{
-				return _vectorData;
 			}
 		}
 
@@ -412,11 +373,6 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		private void Reset()
-		{
-			DisableEditorPreview();
-		}
-
 		/// <summary>
 		/// Resets the map.
 		/// Use this method to reset the map.
@@ -426,8 +382,8 @@ namespace Mapbox.Unity.Map
 		{
 			if(_previewOptions.isPreviewEnabled)
 			{
-				DisableEditorPreview();
-				EnableEditorPreview();
+				// DisableEditorPreview();
+				// EnableEditorPreview();
 			}
 			else
 			{
@@ -491,7 +447,7 @@ namespace Mapbox.Unity.Map
 		{
 			if (_previewOptions.isPreviewEnabled == true)
 			{
-				DisableEditorPreview();
+				//DisableEditorPreview();
 				_previewOptions.isPreviewEnabled = false;
 			}
 			MapOnAwakeRoutine();
@@ -541,60 +497,6 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		private void EnableDisablePreview(object sender, EventArgs e)
-		{
-			if (!Application.isPlaying)
-			{
-				if (_previewOptions.isPreviewEnabled)
-				{
-
-					EnableEditorPreview();
-				}
-				else
-				{
-
-					DisableEditorPreview();
-				}
-			}
-		}
-
-		public void EnableEditorPreview()
-		{
-			_cachedPosition = transform.position;
-			_cachedRotation = transform.rotation;
-			_cachedScale = transform.localScale;
-
-			SetUpMap();
-			if (OnEditorPreviewEnabled != null)
-			{
-				OnEditorPreviewEnabled();
-			}
-		}
-
-		public void DisableEditorPreview()
-		{
-			_imagery.UpdateLayer -= OnImageOrTerrainUpdateLayer;
-			_terrain.UpdateLayer -= OnImageOrTerrainUpdateLayer;
-			_vectorData.SubLayerRemoved -= OnVectorDataSubLayerRemoved;
-			_vectorData.SubLayerAdded -= OnVectorDataSubLayerAdded;
-			_vectorData.UpdateLayer -= OnVectorDataUpdateLayer;
-			_vectorData.UnbindAllEvents();
-			if(_mapVisualizer != null)
-			{
-				_mapVisualizer.ClearMap();
-			}
-			DestroyTileProvider();
-
-			if (OnEditorPreviewDisabled != null)
-			{
-				OnEditorPreviewDisabled();
-			}
-
-			transform.position = _cachedPosition;
-			transform.rotation = _cachedRotation;
-			transform.localScale = _cachedScale;
-		}
-
 		public void DestroyTileProvider()
 		{
 			var tileProvider = TileProvider ?? gameObject.GetComponent<AbstractTileProvider>();
@@ -624,30 +526,7 @@ namespace Mapbox.Unity.Map
 
 			SetTileProvider();
 
-			if (_imagery == null)
-			{
-				_imagery = new ImageryLayer();
-			}
-			_imagery.Initialize();
 
-			if (_terrain == null)
-			{
-				_terrain = new TerrainLayer();
-			}
-			_terrain.Initialize();
-
-			if (_vectorData == null)
-			{
-				_vectorData = new VectorLayer();
-			}
-			_vectorData.Initialize();
-
-			_mapVisualizer.Factories = new List<AbstractTileFactory>
-			{
-				_terrain.Factory,
-				_imagery.Factory,
-				_vectorData.Factory
-			};
 
 			InitializeMap(_options);
 		}
@@ -694,13 +573,6 @@ namespace Mapbox.Unity.Map
 			options.placementOptions.placementStrategy.SetUpPlacement(this);
 
 
-			//Set up events for changes.
-			_imagery.UpdateLayer += OnImageOrTerrainUpdateLayer;
-			_terrain.UpdateLayer += OnImageOrTerrainUpdateLayer;
-
-			_vectorData.SubLayerRemoved += OnVectorDataSubLayerRemoved;
-			_vectorData.SubLayerAdded += OnVectorDataSubLayerAdded;
-			_vectorData.UpdateLayer += OnVectorDataUpdateLayer;
 
 			_options.locationOptions.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
 			{
@@ -917,10 +789,10 @@ namespace Mapbox.Unity.Map
 
 		private void RedrawVectorDataLayer()
 		{
-			_mapVisualizer.UnregisterTilesFrom(_vectorData.Factory);
-			_vectorData.UnbindAllEvents();
-			_vectorData.UpdateFactorySettings();
-			_mapVisualizer.ReregisterTilesTo(_vectorData.Factory);
+			// _mapVisualizer.UnregisterTilesFrom(_vectorData.Factory);
+			// _vectorData.UnbindAllEvents();
+			// _vectorData.UpdateFactorySettings();
+			// _mapVisualizer.ReregisterTilesTo(_vectorData.Factory);
 		}
 
 		private void OnVectorDataSubLayerRemoved(object sender, EventArgs eventArgs)

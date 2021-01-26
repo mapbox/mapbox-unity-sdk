@@ -1,4 +1,5 @@
 using System.Linq;
+using Mapbox.Platform;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.SourceLayers;
 
@@ -29,10 +30,10 @@ namespace Mapbox.Unity.Map
 		/// Gets the `Data Source` for the `MAP LAYERS` section.
 		/// </summary>
 		void SetLayerSource(string source);
-		void Initialize();
-		void Initialize(LayerProperties properties);
-		void Update(LayerProperties properties);
-		void Remove();
+		void Initialize(IFileSource fileSource);
+		//void Initialize(LayerProperties properties);
+		//void Update(LayerProperties properties);
+		//void Remove();
 	}
 
 	public interface IVectorDataLayer : ILayer

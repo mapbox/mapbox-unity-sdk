@@ -1,4 +1,6 @@
-﻿using Mapbox.Unity.MeshGeneration.Data;
+﻿using Mapbox.Map;
+using Mapbox.Platform;
+using Mapbox.Unity.MeshGeneration.Data;
 
 namespace Mapbox.Unity.Map
 {
@@ -12,56 +14,15 @@ namespace Mapbox.Unity.Map
 	[Serializable]
 	public class TerrainLayer : AbstractLayer, ITerrainLayer, IGlobeTerrainLayer
 	{
-		[SerializeField]
-		[NodeEditorElement("Terrain Layer")]
-		ElevationLayerProperties _layerProperty = new ElevationLayerProperties();
-		[NodeEditorElement("Terrain Layer")]
-		public ElevationLayerProperties LayerProperty
-		{
-			get
-			{
-				return _layerProperty;
-			}
-		}
-
-		public MapLayerType LayerType
-		{
-			get
-			{
-				return MapLayerType.Elevation;
-			}
-		}
-
-		public bool IsLayerActive
-		{
-			get
-			{
-				return (_layerProperty.sourceType != ElevationSourceType.None);
-			}
-		}
-
-		public string LayerSourceId
-		{
-			get
-			{
-				return _layerProperty.sourceOptions.Id;
-			}
-		}
-
-		public ElevationSourceType LayerSource
-		{
-			get
-			{
-				return _layerProperty.sourceType;
-			}
-		}
-
+		[SerializeField] ElevationLayerProperties _layerProperty = new ElevationLayerProperties();
+		public ElevationLayerProperties LayerProperty => _layerProperty;
+		public MapLayerType LayerType => MapLayerType.Elevation;
+		public bool IsLayerActive => (_layerProperty.sourceType != ElevationSourceType.None);
+		public string LayerSourceId => _layerProperty.sourceOptions.Id;
+		public ElevationSourceType LayerSource => _layerProperty.sourceType;
 		public ElevationLayerType ElevationType
 		{
-			get
-			{
-				return _layerProperty.elevationLayerType;
-			}
+			get => _layerProperty.elevationLayerType;
 			set
 			{
 				if (_layerProperty.elevationLayerType != value)
@@ -73,64 +34,31 @@ namespace Mapbox.Unity.Map
 		}
 		public float ExaggerationFactor
 		{
-			get
-			{
-				return _layerProperty.requiredOptions.exaggerationFactor;
-			}
+			get => _layerProperty.requiredOptions.exaggerationFactor;
 			set
 			{
 				_layerProperty.requiredOptions.exaggerationFactor = value;
 				_layerProperty.requiredOptions.HasChanged = true;
 			}
 		}
-
+		public TerrainFactoryBase Factory => _elevationFactory;
 		public float EarthRadius
 		{
-			get
-			{
-				return _layerProperty.modificationOptions.earthRadius;
-			}
+			get => _layerProperty.modificationOptions.earthRadius;
 
-			set
-			{
-				_layerProperty.modificationOptions.earthRadius = value;
-			}
+			set => _layerProperty.modificationOptions.earthRadius = value;
 		}
+
 		private TerrainFactoryBase _elevationFactory;
-		public AbstractTileFactory Factory
+
+		public Action<AbstractTileFactory, TileErrorEventArgs> FactoryError = (factory, args) => { };
+
+		public void Initialize(IFileSource fileSource)
 		{
-			get
-			{
-				return _elevationFactory;
-			}
-		}
-
-
-
-		public TerrainLayer()
-		{
-		}
-
-		public TerrainLayer(ElevationLayerProperties properties)
-		{
-			_layerProperty = properties;
-		}
-
-		public void Initialize(LayerProperties properties)
-		{
-			_layerProperty = (ElevationLayerProperties)properties;
-
-			Initialize();
-		}
-
-		public void Initialize()
-		{
-			_elevationFactory = ScriptableObject.CreateInstance<TerrainFactoryBase>();
+			_elevationFactory = new TerrainFactoryBase(fileSource, _layerProperty);
 			//terrain factory uses strategy objects and they are controlled by layer
 			//so we have to refresh that first
-			SetStrategy();
-			//pushing new settings to factory directly
-			Factory.SetOptions(_layerProperty);
+			_elevationFactory.OnTileError += delegate(object sender, TileErrorEventArgs args) { FactoryError(_elevationFactory, args); };
 
 			_layerProperty.colliderOptions.PropertyHasChanged += SetFactoryOptions;
 			_layerProperty.requiredOptions.PropertyHasChanged += SetFactoryOptions;
@@ -142,67 +70,11 @@ namespace Mapbox.Unity.Map
 		{
 			//terrain factory uses strategy objects and they are controlled by layer
 			//so we have to refresh that first
-			SetStrategy();
 			Factory.SetOptions(_layerProperty);
 			NotifyUpdateLayer(_elevationFactory, sender as MapboxDataProperty, true);
 		}
 
-		private void SetStrategy()
-		{
-			switch (_layerProperty.elevationLayerType)
-			{
-				case ElevationLayerType.FlatTerrain:
-				{
-					if (!(_elevationFactory.Strategy is FlatTerrainStrategy))
-						_elevationFactory.Strategy = new FlatTerrainStrategy();
-					break;
-				}
-				case ElevationLayerType.LowPolygonTerrain:
-				{
-					if (!(_elevationFactory.Strategy is LowPolyTerrainStrategy))
-						_elevationFactory.Strategy = new LowPolyTerrainStrategy();
-					break;
-				}
-				case ElevationLayerType.TerrainWithElevation:
-				{
-					if (_layerProperty.sideWallOptions.isActive)
-					{
-						if (!(_elevationFactory.Strategy is ElevatedTerrainWithSidesStrategy))
-							_elevationFactory.Strategy = new ElevatedTerrainWithSidesStrategy();
-					}
-					else
-					{
-						if (!(_elevationFactory.Strategy is ElevatedTerrainStrategy))
-							_elevationFactory.Strategy = new ElevatedTerrainStrategy();
-					}
 
-				}
-					break;
-				case ElevationLayerType.GlobeTerrain:
-				{
-					if (!(_elevationFactory.Strategy is FlatSphereTerrainStrategy))
-						_elevationFactory.Strategy = new FlatSphereTerrainStrategy();
-					break;
-				}
-				default:
-					break;
-			}
-		}
-
-		public void Remove()
-		{
-			_layerProperty = new ElevationLayerProperties
-			{
-				sourceType = ElevationSourceType.None
-			};
-		}
-
-
-
-		public void Update(LayerProperties properties)
-		{
-			Initialize(properties);
-		}
 
 		#region API Methods
 

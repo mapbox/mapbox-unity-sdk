@@ -6,6 +6,7 @@ using Mapbox.Unity.MeshGeneration.Interfaces;
 using Mapbox.Map;
 using Mapbox.Unity.Map;
 using System;
+using Mapbox.Platform;
 
 namespace Mapbox.Unity.MeshGeneration.Factories
 {
@@ -34,6 +35,22 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		#endregion
 
 		#region Properties
+
+		public VectorTileFactory(IFileSource fileSource, VectorLayerProperties properties) : base(fileSource)
+		{
+			_properties = properties;
+			_layerProgress = new Dictionary<UnityTile, HashSet<LayerVisualizerBase>>();
+			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
+
+			DataFetcher = new VectorDataFetcher();
+			DataFetcher.DataRecieved += OnVectorDataRecieved;
+			DataFetcher.FetchingError += OnDataError;
+
+			CreatePOILayerVisualizers();
+
+			CreateLayerVisualizers();
+		}
+
 		public string TilesetId
 		{
 			get
@@ -84,7 +101,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		public virtual LayerVisualizerBase AddVectorLayerVisualizer(VectorSubLayerProperties subLayer)
 		{
 			//if its of type prefabitemoptions then separate the visualizer type
-			LayerVisualizerBase visualizer = CreateInstance<VectorLayerVisualizer>();
+			LayerVisualizerBase visualizer = ScriptableObject.CreateInstance<VectorLayerVisualizer>();
 
 			//TODO : FIX THIS !!
 			visualizer.LayerVisualizerHasChanged += UpdateTileFactory;
@@ -118,7 +135,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		public virtual LayerVisualizerBase AddPOIVectorLayerVisualizer(PrefabItemOptions poiSubLayer)
 		{
-			LayerVisualizerBase visualizer = CreateInstance<LocationPrefabsLayerVisualizer>();
+			LayerVisualizerBase visualizer = ScriptableObject.CreateInstance<LocationPrefabsLayerVisualizer>();
 			poiSubLayer.performanceOptions = _properties.performanceOptions;
 			((LocationPrefabsLayerVisualizer)visualizer).SetProperties((PrefabItemOptions)poiSubLayer);
 
@@ -173,23 +190,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		#endregion
 
 		#region AbstractFactoryOverrides
-		/// <summary>
-		/// Set up sublayers using VectorLayerVisualizers.
-		/// </summary>
-		protected override void OnInitialized()
-		{
-			_layerProgress = new Dictionary<UnityTile, HashSet<LayerVisualizerBase>>();
-			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
-
-			DataFetcher = new VectorDataFetcher();
-			DataFetcher.DataRecieved += OnVectorDataRecieved;
-			DataFetcher.FetchingError += OnDataError;
-
-			CreatePOILayerVisualizers();
-
-			CreateLayerVisualizers();
-		}
-
 		protected override void OnRegistered(UnityTile tile)
 		{
 			if (string.IsNullOrEmpty(TilesetId) || _properties.sourceOptions.isActive == false || (_properties.vectorSubLayers.Count + _properties.locationPrefabList.Count) == 0)
@@ -230,6 +230,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					}
 				}
 			}
+			MapboxAccess.Instance.CacheManager.TileDisposed(tile, _properties.sourceOptions.Id);
 		}
 
 		public override void Clear()
@@ -242,7 +243,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					foreach (var layerVisualizerBase in layerList)
 					{
 						layerVisualizerBase.Clear();
-						DestroyImmediate(layerVisualizerBase);
+						GameObject.DestroyImmediate(layerVisualizerBase);
 					}
 				}
 

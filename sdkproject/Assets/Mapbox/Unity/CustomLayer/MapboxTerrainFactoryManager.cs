@@ -92,6 +92,7 @@ namespace CustomImageLayerSample
 					unityTile.MeshRenderer.sharedMaterial.SetTexture(ShaderElevationTextureFieldName, dataTile.Texture2D);
 					unityTile.MeshRenderer.sharedMaterial.SetVector(ShaderElevationTextureScaleOffsetFieldName, new Vector4(1, 1, 0, 0));
 					unityTile.MeshRenderer.sharedMaterial.SetFloat("_TileScale", unityTile.TileScale);
+					unityTile.MeshRenderer.sharedMaterial.SetFloat("_ElevationMultiplier", _elevationSettings.requiredOptions.exaggerationFactor);
 					unityTile.SetHeightData(dataTile, _elevationSettings.requiredOptions.exaggerationFactor, _elevationSettings.modificationOptions.useRelativeHeight, _elevationSettings.colliderOptions.addCollider);
 					TerrainStrategy.RegisterTile(unityTile, false);
 				}
@@ -118,7 +119,7 @@ namespace CustomImageLayerSample
 
 		public void PregenerateTileMesh(UnityTile tile)
 		{
-			//TerrainStrategy.RegisterTile(tile, false);
+			TerrainStrategy.RegisterTile(tile, false);
 		}
 
 		protected override void ApplyParentTexture(UnityTile tile)
@@ -129,7 +130,7 @@ namespace CustomImageLayerSample
 				var cacheItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(_sourceSettings.Id, parent.Canonical);
 				if (cacheItem != null && cacheItem.Texture2D != null)
 				{
-					tile.SetParentTexture(parent, cacheItem.Texture2D);
+					tile.SetParentTexture(parent, cacheItem.Texture2D, ShaderElevationTextureFieldName, ShaderElevationTextureScaleOffsetFieldName);
 					break;
 				}
 

@@ -9,6 +9,7 @@ using Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies;
 using System;
 using System.Collections.Generic;
 using CustomImageLayerSample;
+using Mapbox.Platform;
 
 namespace Mapbox.Unity.MeshGeneration.Factories
 {
@@ -16,19 +17,31 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	{
 		public MapboxTerrainFactoryManager TerrainFactoryManager;
 		public TerrainStrategy Strategy;
-		[SerializeField]
-		protected ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
+		protected ElevationLayerProperties _properties = new ElevationLayerProperties();
+
+		public TerrainFactoryBase(IFileSource fileSource, ElevationLayerProperties layerProperty) : base(fileSource)
+		{
+			_properties = layerProperty;
+			SetStrategy();
+			Strategy.Initialize(_properties);
+			TerrainFactoryManager = new MapboxTerrainFactoryManager(
+				_fileSource,
+				_properties,
+				Strategy,
+				false);
+			TerrainFactoryManager.FetchingError += OnFetchingError;
+		}
 
 		public string TilesetId
 		{
 			get
 			{
-				return _elevationOptions.sourceOptions.Id;
+				return _properties.sourceOptions.Id;
 			}
 
 			set
 			{
-				_elevationOptions.sourceOptions.Id = value;
+				_properties.sourceOptions.Id = value;
 			}
 		}
 
@@ -36,7 +49,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			get
 			{
-				return _elevationOptions;
+				return _properties;
 			}
 		}
 
@@ -49,20 +62,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		protected override void OnInitialized()
-		{
-			TerrainFactoryManager = new MapboxTerrainFactoryManager(
-				_fileSource,
-				_elevationOptions,
-				Strategy,
-				false);
-			TerrainFactoryManager.FetchingError += OnFetchingError;
-		}
-
 		public override void SetOptions(LayerProperties options)
 		{
-			_elevationOptions = (ElevationLayerProperties)options;
-			Strategy.Initialize(_elevationOptions);
+			_properties = (ElevationLayerProperties)options;
+			Strategy.Initialize(_properties);
 		}
 
 		protected override void OnRegistered(UnityTile tile)
@@ -109,6 +112,48 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		protected override void OnUnbindEvents()
 		{
+		}
+
+		private void SetStrategy()
+		{
+			switch (_properties.elevationLayerType)
+			{
+				case ElevationLayerType.FlatTerrain:
+				{
+					if (!(Strategy is FlatTerrainStrategy))
+						Strategy = new FlatTerrainStrategy();
+					break;
+				}
+				case ElevationLayerType.LowPolygonTerrain:
+				{
+					if (!(Strategy is LowPolyTerrainStrategy))
+						Strategy = new LowPolyTerrainStrategy();
+					break;
+				}
+				case ElevationLayerType.TerrainWithElevation:
+				{
+					if (_properties.sideWallOptions.isActive)
+					{
+						if (!(Strategy is ElevatedTerrainWithSidesStrategy))
+							Strategy = new ElevatedTerrainWithSidesStrategy();
+					}
+					else
+					{
+						if (!(Strategy is ElevatedTerrainStrategy))
+							Strategy = new ElevatedTerrainStrategy();
+					}
+
+				}
+					break;
+				case ElevationLayerType.GlobeTerrain:
+				{
+					if (!(Strategy is FlatSphereTerrainStrategy))
+						Strategy = new FlatSphereTerrainStrategy();
+					break;
+				}
+				default:
+					break;
+			}
 		}
 	}
 }

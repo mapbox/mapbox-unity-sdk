@@ -121,7 +121,7 @@
 
 			var serializedMapObject = property.serializedObject;
 			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
-			tileJsonData = mapObject.VectorData.GetTileJsonData();
+			tileJsonData = mapObject.MapVisualizer.VectorLayer.GetTileJsonData();
 
 			DrawPropertyName(property, position, selectedLayerName);
 		}

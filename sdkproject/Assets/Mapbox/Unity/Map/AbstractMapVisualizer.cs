@@ -1,4 +1,5 @@
 using Mapbox.Unity.Map.Interfaces;
+using UnityEngine.UI;
 
 namespace Mapbox.Unity.Map
 {
@@ -24,10 +25,19 @@ namespace Mapbox.Unity.Map
 	/// </summary>
 	public abstract class AbstractMapVisualizer : ScriptableObject
 	{
-		[SerializeField]
-		[NodeEditorElementAttribute("Factories")]
-		[FormerlySerializedAs("_factories")]
-		public List<AbstractTileFactory> Factories;
+		private IEnumerable<AbstractTileFactory> Factories
+		{
+			get
+			{
+				yield return ImageryLayer.Factory;
+				yield return TerrainLayer.Factory;
+				yield return VectorLayer.Factory;
+			}
+		}
+
+		public TerrainLayer TerrainLayer;
+		public ImageryLayer ImageryLayer;
+		public VectorLayer VectorLayer;
 
 		protected IMapReadable _map;
 		protected Dictionary<UnwrappedTileId, UnityTile> _activeTiles = new Dictionary<UnwrappedTileId, UnityTile>();
@@ -67,6 +77,30 @@ namespace Mapbox.Unity.Map
 			_map = map;
 			_tileProgress = new Dictionary<UnwrappedTileId, int>();
 
+			//Layers serialize so we are using Initialize method to pass parameters
+			//on map start. Otherwise Layer object will not be null because of serialization
+			//but everything not-serialized inside will be null.
+			if (ImageryLayer == null)
+			{
+				ImageryLayer = new ImageryLayer();
+				ImageryLayer.FactoryError += Factory_OnTileError;
+			}
+			ImageryLayer.Initialize(fileSource);
+
+			if (TerrainLayer == null)
+			{
+				TerrainLayer = new TerrainLayer();
+				TerrainLayer.FactoryError += Factory_OnTileError;
+			}
+			TerrainLayer.Initialize(fileSource);
+
+			if (VectorLayer == null)
+			{
+				VectorLayer = new VectorLayer();
+				VectorLayer.FactoryError += Factory_OnTileError;
+			}
+			VectorLayer.Initialize(fileSource);
+
 			// Allow for map re-use by recycling any active tiles.
 			var activeTiles = _activeTiles.Keys.ToList();
 			foreach (var tile in activeTiles)
@@ -74,59 +108,113 @@ namespace Mapbox.Unity.Map
 				DisposeTile(tile);
 			}
 
-			var terrainFactory = (TerrainFactoryBase) Factories.First(x => x is TerrainFactoryBase);
 			_tilePool = new ObjectPool<UnityTile>(() =>
 			{
 				var tile = new GameObject().AddComponent<UnityTile>();
 				tile.MeshRenderer.sharedMaterial = Instantiate(_map.TileMaterial);
 				tile.transform.SetParent(_map.Root, false);
-				if (terrainFactory != null)
+				if ( TerrainLayer.Factory != null)
 				{
-					terrainFactory.PregenerateTileMesh(tile);
+					TerrainLayer.Factory.PregenerateTileMesh(tile);
 				}
 				return tile;
 			});
 
 			State = ModuleState.Initialized;
 
-			foreach (var factory in Factories)
+			// foreach (var factory in Factories)
+			// {
+			// 	if (null == factory)
+			// 	{
+			// 		Debug.LogError("AbstractMapVisualizer: Factory is NULL");
+			// 	}
+			// 	else
+			// 	{
+			// 		factory.Initialize(fileSource);
+			// 		UnregisterEvents(factory);
+			// 		RegisterEvents(factory);
+			// 	}
+			// }
+
+
+
+			//Set up events for changes.
+			 ImageryLayer.UpdateLayer += OnImageOrTerrainUpdateLayer;
+			 TerrainLayer.UpdateLayer += OnImageOrTerrainUpdateLayer;
+
+			 VectorLayer.SubLayerRemoved += OnVectorDataSubLayerRemoved;
+			 VectorLayer.SubLayerAdded += OnVectorDataSubLayerAdded;
+			 VectorLayer.UpdateLayer += OnVectorDataUpdateLayer;
+		}
+
+		private void OnImageOrTerrainUpdateLayer(object sender, System.EventArgs eventArgs)
+		{
+			LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
+			if (layerUpdateArgs != null)
 			{
-				if (null == factory)
+				UpdateTileForProperty(layerUpdateArgs.factory, layerUpdateArgs);
+				if (layerUpdateArgs.effectsVectorLayer)
 				{
-					Debug.LogError("AbstractMapVisualizer: Factory is NULL");
-				}
-				else
-				{
-					factory.Initialize(fileSource);
-					UnregisterEvents(factory);
-					RegisterEvents(factory);
+					RedrawVectorDataLayer();
 				}
 			}
 		}
 
-		private void RegisterEvents(AbstractTileFactory factory)
+		private void OnVectorDataSubLayerRemoved(object sender, EventArgs eventArgs)
 		{
-			factory.OnTileError += Factory_OnTileError;
+			VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
+
+			if (layerUpdateArgs.visualizer != null)
+			{
+				RemoveTilesFromLayer((VectorTileFactory)layerUpdateArgs.factory, layerUpdateArgs.visualizer);
+			}
 		}
 
-		private void UnregisterEvents(AbstractTileFactory factory)
+		private void OnVectorDataSubLayerAdded(object sender, EventArgs eventArgs)
 		{
-			factory.OnTileError -= Factory_OnTileError;
+			RedrawVectorDataLayer();
+		}
+
+		private void OnVectorDataUpdateLayer(object sender, System.EventArgs eventArgs)
+		{
+
+			VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
+
+			if (layerUpdateArgs.visualizer != null)
+			{
+				//We have a visualizer. Update only the visualizer.
+				//No need to unload the entire factory to apply changes.
+				UnregisterAndRedrawTilesFromLayer((VectorTileFactory)layerUpdateArgs.factory, layerUpdateArgs.visualizer);
+			}
+			else
+			{
+				//We are updating a core property of vector section.
+				//All vector features need to get unloaded and re-created.
+				RedrawVectorDataLayer();
+			}
+		}
+
+		private void RedrawVectorDataLayer()
+		{
+			UnregisterTilesFrom(VectorLayer.Factory);
+			// VectorLayer.UnbindAllEvents();
+			// VectorLayer.UpdateFactorySettings();
+			ReregisterTilesTo(VectorLayer.Factory);
 		}
 
 		public virtual void Destroy()
 		{
-			if (Factories != null)
-			{
-				_counter = Factories.Count;
-				for (int i = 0; i < _counter; i++)
-				{
-					if (Factories[i] != null)
-					{
-						UnregisterEvents(Factories[i]);
-					}
-				}
-			}
+			// if (Factories != null)
+			// {
+			// 	_counter = Factories.Count;
+			// 	for (int i = 0; i < _counter; i++)
+			// 	{
+			// 		if (Factories[i] != null)
+			// 		{
+			// 			UnregisterEvents(Factories[i]);
+			// 		}
+			// 	}
+			// }
 
 			// Inform all downstream nodes that we no longer need to process these tiles.
 			// This scriptable object may be re-used, but it's gameobjects are likely
@@ -295,7 +383,7 @@ namespace Mapbox.Unity.Map
 					if (tileFactory != null)
 					{
 						tileFactory.Clear();
-						DestroyImmediate(tileFactory);
+						//DestroyImmediate(tileFactory);
 					}
 				}
 			}
@@ -388,6 +476,7 @@ namespace Mapbox.Unity.Map
 				factory.UpdateTileProperty(tileBundle.Value, updateArgs);
 			}
 		}
+
 
 
 		#region Events

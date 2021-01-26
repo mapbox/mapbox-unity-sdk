@@ -141,6 +141,14 @@
 				EditorHelper.CheckForModifiedProperty(property);
 			}
 
+			EditorGUI.BeginChangeCheck();
+			var tileSizeProperty = property.FindPropertyRelative("TileSize");
+			tileSizeProperty.floatValue = EditorGUILayout.FloatField("Tile Size", tileSizeProperty.floatValue);
+			if (EditorGUI.EndChangeCheck())
+			{
+				EditorHelper.CheckForModifiedProperty(property);
+			}
+
 			ShowPosition = EditorGUILayout.Foldout(ShowPosition, "Others");
 
 			if (ShowPosition)

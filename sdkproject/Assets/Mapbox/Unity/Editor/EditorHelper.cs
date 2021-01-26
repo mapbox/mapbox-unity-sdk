@@ -50,8 +50,8 @@
 					}
 					else
 					{
-						abstractMap.DisableEditorPreview();
-						abstractMap.EnableEditorPreview();
+						// abstractMap.DisableEditorPreview();
+						// abstractMap.EnableEditorPreview();
 					}
 				}
 			}

@@ -34,6 +34,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 		private int _vertA, _vertB, _vertC;
 		private int _counter;
 
+		private float TileSize = 0;
+
 		public override int RequiredVertexCount
 		{
 			get { return _elevationOptions.modificationOptions.sampleCount * _elevationOptions.modificationOptions.sampleCount; }
@@ -54,6 +56,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			_newNormalList = new List<Vector3>(sampleCountSquare);
 			_newUvList = new List<Vector2>(sampleCountSquare);
 			_newTriangleList = new List<int>();
+
+			TileSize = elOptions.TileSize;
 		}
 
 		public override void RegisterTile(UnityTile tile, bool createElevatedMesh)
@@ -80,7 +84,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 					else
 					{
 						//TODO remoev tile dependency from CreateBaseMesh method
-						var newMesh = CreateBaseMesh(tile, _elevationOptions.modificationOptions.sampleCount);
+						var newMesh = TileSize != 0
+							? CreateBaseMesh(TileSize, _elevationOptions.modificationOptions.sampleCount)
+							: CreateBaseMesh(tile, _elevationOptions.modificationOptions.sampleCount);
 						_meshSamples.Add(_elevationOptions.modificationOptions.sampleCount, newMesh);
 						tile.MeshFilter.sharedMesh.vertices = newMesh.Vertices;
 						tile.MeshFilter.sharedMesh.normals = newMesh.Normals;
@@ -218,11 +224,70 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			return mesh;
 		}
 
+		private MeshDataArray CreateBaseMesh(float tileSize, int sampleCount)
+		{
+			var half = tileSize/2;
+			//TODO use arrays instead of lists
+			_newVertexList.Clear();
+			_newNormalList.Clear();
+			_newUvList.Clear();
+			_newTriangleList.Clear();
+
+			//012
+			//345
+			//678
+			for (float y = 0; y < sampleCount; y++)
+			{
+				var yrat = y / (sampleCount - 1);
+				for (float x = 0; x < sampleCount; x++)
+				{
+					var xrat = x / (sampleCount - 1);
+
+					var xx = Mathd.Lerp(-half, half, xrat);
+					var yy = Mathd.Lerp(half, -half, yrat);
+
+					_newVertexList.Add(new Vector3(
+						(float) xx,
+						0,
+						(float) yy));
+					_newNormalList.Add(Mapbox.Unity.Constants.Math.Vector3Up);
+					_newUvList.Add(new Vector2(x * 1f / (sampleCount - 1), 1 - (y * 1f / (sampleCount - 1))));
+				}
+			}
+
+			int vertA, vertB, vertC;
+			for (int y = 0; y < sampleCount - 1; y++)
+			{
+				for (int x = 0; x < sampleCount - 1; x++)
+				{
+					vertA = (y * sampleCount) + x;
+					vertB = (y * sampleCount) + x + sampleCount + 1;
+					vertC = (y * sampleCount) + x + sampleCount;
+					_newTriangleList.Add(vertA);
+					_newTriangleList.Add(vertB);
+					_newTriangleList.Add(vertC);
+
+					vertA = (y * sampleCount) + x;
+					vertB = (y * sampleCount) + x + 1;
+					vertC = (y * sampleCount) + x + sampleCount + 1;
+					_newTriangleList.Add(vertA);
+					_newTriangleList.Add(vertB);
+					_newTriangleList.Add(vertC);
+				}
+			}
+
+			var mesh = new MeshDataArray();
+			mesh.Vertices = _newVertexList.ToArray();
+			mesh.Normals = _newNormalList.ToArray();
+			mesh.Uvs = _newUvList.ToArray();
+			mesh.Triangles = _newTriangleList.ToArray();
+			return mesh;
+		}
+
 		private Vector3[] _verts;
 		private Vector3[] _normals;
 		private Vector3[] _targetVerts;
 		private Vector3[] _targetNormals;
-
 
 		private void GenerateTerrainMesh(UnityTile tile)
 		{

@@ -169,7 +169,7 @@
 
 			var selectedLayerName = originalProperty.FindPropertyRelative("_selectedLayerName").stringValue;
 			AbstractMap mapObject = (AbstractMap)originalProperty.serializedObject.targetObject;
-			TileJsonData tileJsonData = mapObject.VectorData.GetTileJsonData();
+			TileJsonData tileJsonData = mapObject.MapVisualizer.VectorLayer.GetTileJsonData();
 
 			if (string.IsNullOrEmpty(selectedLayerName) || !tileJsonData.PropertyDisplayNames.ContainsKey(selectedLayerName))
 			{

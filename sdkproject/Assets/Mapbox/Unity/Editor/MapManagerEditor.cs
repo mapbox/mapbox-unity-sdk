@@ -133,11 +133,14 @@ namespace Mapbox.Editor
 			}
 			ShowSepartor();
 
+			var _mapVisualizerProperty = serializedObject.FindProperty("_mapVisualizer");
+			var _mapVisualizerObject = new SerializedObject(_mapVisualizerProperty.objectReferenceValue);
+
 			ShowImage = EditorGUILayout.Foldout(ShowImage, "IMAGE");
 			if (ShowImage)
 			{
 				GUILayout.Space(-1.5f * _lineHeight);
-				ShowSection(serializedObject.FindProperty("_imagery"), "_layerProperty");
+				ShowSection(_mapVisualizerObject.FindProperty("ImageryLayer"), "_layerProperty");
 			}
 
 			ShowSepartor();
@@ -146,7 +149,7 @@ namespace Mapbox.Editor
 			if (ShowTerrain)
 			{
 				GUILayout.Space(-1.5f * _lineHeight);
-				ShowSection(serializedObject.FindProperty("_terrain"), "_layerProperty");
+				ShowSection(_mapVisualizerObject.FindProperty("TerrainLayer"), "_layerProperty");
 			}
 
 			ShowSepartor();
@@ -161,18 +164,18 @@ namespace Mapbox.Editor
 			EditorGUILayout.Space();
 
 			serializedObject.ApplyModifiedProperties();
-			var vectorDataProperty = serializedObject.FindProperty("_vectorData");
+			var vectorDataProperty = _mapVisualizerObject.FindProperty("VectorLayer");
 			var layerProperty = vectorDataProperty.FindPropertyRelative("_layerProperty");
 			_vectorLayerDrawer.PostProcessLayerProperties(layerProperty);
 			if (!Application.isPlaying)
 			{
 				if (prevProp.boolValue && !prev)
 				{
-					((AbstractMap)serializedObject.targetObject).EnableEditorPreview();
+					//((AbstractMap)serializedObject.targetObject).EnableEditorPreview();
 				}
 				else if (prev && !prevProp.boolValue)
 				{
-					((AbstractMap)serializedObject.targetObject).DisableEditorPreview();
+					//((AbstractMap)serializedObject.targetObject).DisableEditorPreview();
 				}
 			}
 		}
@@ -269,7 +272,10 @@ namespace Mapbox.Editor
 
 		void DrawMapLayerOptions()
 		{
-			var vectorDataProperty = serializedObject.FindProperty("_vectorData");
+			var _mapVisualizerProperty = serializedObject.FindProperty("_mapVisualizer");
+			var _mapVisualizerObject = new SerializedObject(_mapVisualizerProperty.objectReferenceValue);
+
+			var vectorDataProperty = _mapVisualizerObject.FindProperty("VectorLayer");
 			var layerProperty = vectorDataProperty.FindPropertyRelative("_layerProperty");
 			var layerSourceProperty = layerProperty.FindPropertyRelative("sourceOptions");
 			var sourceTypeProperty = layerProperty.FindPropertyRelative("_sourceType");
