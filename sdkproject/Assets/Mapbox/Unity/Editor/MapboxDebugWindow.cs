@@ -13,11 +13,12 @@ using UnityEditor;
 public class MapboxDebugWindow : EditorWindow
 {
 	private int _currentTab;
-	private string[] _tabList = new string[] {"DataFetcher", "UnityTiles" , "Memory Cache", "File Cache"};
+	private string[] _tabList = new string[] {"Map", "DataFetcher", "UnityTiles" , "Memory Cache", "File Cache"};
 	private static DataFetcherTabDebugView _dataFetcherTabDebugView;
 	private static UnityTilesTabDebugView _unityTilesTabDebugView;
 	private static MemoryTabDebugView _memoryTabDebugView;
 	private static FileCacheDebugView _fileCacheDebugView;
+	private static AbstractMapDebugView _abstractMapDebugView;
 
 
 	[MenuItem("Mapbox/Debug Window")]
@@ -45,6 +46,10 @@ public class MapboxDebugWindow : EditorWindow
 		{
 			_fileCacheDebugView = new FileCacheDebugView();
 		}
+		if (_abstractMapDebugView == null)
+		{
+			_abstractMapDebugView = new AbstractMapDebugView();
+		}
 	}
 
 	void OnGUI()
@@ -53,16 +58,19 @@ public class MapboxDebugWindow : EditorWindow
 		_currentTab = GUILayout.Toolbar (_currentTab, _tabList);
 		switch (_currentTab)
 		{
-			case 0 : 
-				_dataFetcherTabDebugView.Draw();
+			case 0 :
+				_abstractMapDebugView.Draw();
 				break;
 			case 1 :
-				_unityTilesTabDebugView.Draw();
+				_dataFetcherTabDebugView.Draw();
 				break;
 			case 2 :
-				_memoryTabDebugView.Draw();
+				_unityTilesTabDebugView.Draw();
 				break;
 			case 3 :
+				_memoryTabDebugView.Draw();
+				break;
+			case 4 :
 				_fileCacheDebugView.Draw();
 				break;
 		}
@@ -468,7 +476,7 @@ public class UnityTilesTabDebugView
 							}
 
 							EditorGUILayout.LabelField(string.Format("Tileset : {0}", dataTile.TilesetId), EditorStyles.miniLabel);
-							EditorGUILayout.LabelField(string.Format("State : {0}", dataTile.CurrentState), EditorStyles.miniLabel);
+							EditorGUILayout.LabelField(string.Format("State : {0}", dataTile.CurrentTileState), EditorStyles.miniLabel);
 							EditorGUILayout.LabelField(string.Format("Is Mapbox : {0}", dataTile.IsMapboxTile), EditorStyles.miniLabel);
 							EditorGUILayout.LabelField(string.Format("From : {0}", dataTile.FromCache), EditorStyles.miniLabel);
 							if (dataTile.HasError)
@@ -564,7 +572,7 @@ public class UnityTilesTabDebugView
 							}
 
 							EditorGUILayout.LabelField(string.Format("Tileset : {0}", dataTile.TilesetId), EditorStyles.miniLabel);
-							EditorGUILayout.LabelField(string.Format("State : {0}", dataTile.CurrentState), EditorStyles.miniLabel);
+							EditorGUILayout.LabelField(string.Format("State : {0}", dataTile.CurrentTileState), EditorStyles.miniLabel);
 							EditorGUILayout.LabelField(string.Format("Is Mapbox : {0}", dataTile.IsMapboxTile), EditorStyles.miniLabel);
 							EditorGUILayout.LabelField(string.Format("From : {0}", dataTile.FromCache), EditorStyles.miniLabel);
 							if (dataTile.HasError)
@@ -655,6 +663,34 @@ public class DataFetcherTabDebugView
 	}
 }
 
+public class DebuggerDataFetcherWrapper : DataFetcher
+{
+	public override void FetchData(DataFetcherParameters parameters)
+	{
+
+	}
+
+	public Queue<int> GetTileOrderQueue()
+	{
+		return _tileOrder;
+	}
+
+	public Dictionary<int, FetchInfo> GetFetchInfoQueue()
+	{
+		return _tileFetchInfos;
+	}
+
+	public int GetActiveRequestLimit()
+	{
+		return _activeRequestLimit;
+	}
+
+	public Dictionary<int, Tile> GetActiveRequests()
+	{
+		return _globalActiveRequests;
+	}
+}
+
 public class FileCacheDebugView
 {
 	private static Queue<string> SavedLogs;
@@ -697,5 +733,22 @@ public class FileCacheDebugView
 		}
 		EditorGUILayout.EndScrollView();
 		EditorGUILayout.EndHorizontal();
+	}
+}
+
+public class AbstractMapDebugView
+{
+	private AbstractMap _map;
+
+	public AbstractMapDebugView()
+	{
+		_map = GameObject.FindObjectOfType<AbstractMap>();
+	}
+
+	public void Draw()
+	{
+		GUILayout.Label(string.Format("Image Layer Queue : {0}", _map.MapVisualizer.ImageryLayer?.Factory?.QueuedRequestCount), EditorStyles.label);
+		GUILayout.Label(string.Format("Terrain Layer Queue : {0}", _map.MapVisualizer.TerrainLayer?.Factory?.QueuedRequestCount), EditorStyles.label);
+		GUILayout.Label(string.Format("Vector Layer Queue : {0}", _map.MapVisualizer.VectorLayer?.Factory?.QueuedRequestCount), EditorStyles.label);
 	}
 }

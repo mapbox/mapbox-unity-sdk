@@ -9,6 +9,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 {
 	public class TerrainStrategy
 	{
+		protected float TileSize = 0;
+
 		[SerializeField]
 		protected ElevationLayerProperties _elevationOptions = new ElevationLayerProperties();
 
@@ -20,6 +22,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 		public virtual void Initialize(ElevationLayerProperties elOptions)
 		{
 			_elevationOptions = elOptions;
+			TileSize = _elevationOptions.TileSize;
 		}
 
 		public virtual void RegisterTile(UnityTile tile, bool createElevatedMesh)

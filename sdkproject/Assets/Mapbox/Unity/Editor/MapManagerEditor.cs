@@ -15,7 +15,6 @@ namespace Mapbox.Editor
 	public class MapManagerEditor : Editor
 	{
 		private string objectId = "";
-
 		/// <summary>
 		/// Gets or sets a value indicating whether to show general section <see cref="T:Mapbox.Editor.MapManagerEditor"/>.
 		/// </summary>
@@ -107,6 +106,7 @@ namespace Mapbox.Editor
 			objectId = serializedObject.targetObject.GetInstanceID().ToString();
 			serializedObject.Update();
 			EditorGUILayout.BeginVertical();
+			EditorGUILayout.Space();
 
 			ShowGeneral = EditorGUILayout.Foldout(ShowGeneral, new GUIContent { text = "GENERAL", tooltip = "Options related to map data" });
 
@@ -166,7 +166,7 @@ namespace Mapbox.Editor
 
 		void DrawMapOptions(SerializedObject mapObject)
 		{
-			var property = mapObject.FindProperty("_options");
+			var property = mapObject.FindProperty("Options");
 			if (!((AbstractMap)serializedObject.targetObject).IsAccessTokenValid)
 			{
 				EditorGUILayout.HelpBox("Invalid Access Token. Please add a valid access token using the Mapbox  > Setup Menu", MessageType.Error);
@@ -331,7 +331,7 @@ namespace Mapbox.Editor
 					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("optimizedStyle"), new GUIContent("Style Options"));
 				}
 				GUILayout.Space(-_lineHeight);
-				//EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("performanceOptions"), new GUIContent("Perfomance Options"));
+
 			}
 
 			EditorGUILayout.Space();

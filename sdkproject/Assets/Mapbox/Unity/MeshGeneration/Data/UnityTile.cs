@@ -26,8 +26,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public RasterTile TerrainData => _terrainTile;
 		public float[] HeightData;
 
-		private Mapbox.VectorTile.VectorTile _vectorTile;
-		public Mapbox.VectorTile.VectorTile VectorData => _vectorTile;
+		private VectorTile _vectorTile;
+		public VectorTile VectorData => _vectorTile;
 
 		private int _heightDataResolution = 100;
 		//keeping track of tile objects to be able to cancel them safely if tile is destroyed before data fetching finishes
@@ -98,6 +98,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			private set { _tileScale = value; }
 		}
 
+		public float TileSize;
+
 		public RectD Rect { get; private set; }
 		public int CurrentZoom { get; private set; }
 
@@ -110,7 +112,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, float scale, int zoom, Texture2D loadingTexture = null)
 		{
 			gameObject.hideFlags = HideFlags.DontSave;
-
+			TileSize = map.UnityTileSize;
 			ElevationType = TileTerrainType.None;
 			TileScale = scale;
 			_relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
@@ -306,7 +308,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			MeshRenderer.sharedMaterial.mainTextureOffset = Unity.Constants.Math.Vector3Zero;
 		}
 
-		public void SetVectorData(string tileset, Mapbox.VectorTile.VectorTile vectorTile)
+		public void SetVectorData(string tileset, VectorTile vectorTile)
 		{
 			_vectorTile = vectorTile;
 		}

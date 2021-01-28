@@ -4,6 +4,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Mapbox.Platform;
+using Mapbox.Unity.MeshGeneration.Data;
+using UnityEngine;
+
 namespace Mapbox.Map
 {
 	using System.Collections.ObjectModel;
@@ -42,6 +48,7 @@ namespace Mapbox.Map
 	/// </example>
 	public sealed class VectorTile : Tile, IDisposable
 	{
+		public VectorResult VectorResults;
 		// FIXME: Namespace here is very confusing and conflicts (sematically)
 		// with his class. Something has to be renamed here.
 		private Mapbox.VectorTile.VectorTile data;
@@ -95,13 +102,134 @@ namespace Mapbox.Map
 			}
 		}
 
-		//TODO: uncomment if 'VectorTile' class changes from 'sealed'
-		//protected override void Dispose(bool disposeManagedResources)
-		//~VectorTile()
-		//{
-		//    Dispose(false);
-		//}
+		internal override void Initialize(IFileSource fileSource, CanonicalTileId canonicalTileId, string tilesetId, Action p)
+		{
+			Cancel();
 
+			TileState = TileState.Loading;
+			Id = canonicalTileId;
+			_callback = p;
+			TilesetId = tilesetId;
+
+			_request = fileSource.Request(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse);
+		}
+
+		private void HandleTileResponse(Response response)
+		{
+			if (response.HasError)
+			{
+				foreach (var exception in response.Exceptions)
+				{
+					AddException(exception);
+				}
+			}
+			else
+			{
+				// only try to parse if request was successful
+
+				// current implementation doesn't need to check if parsing is successful:
+				// * Mapbox.Map.VectorTile.ParseTileData() already adds any exception to the list
+				// * Mapbox.Map.RasterTile.ParseTileData() doesn't do any parsing
+
+				VectorResults = new VectorResult();
+				var task = new Task( () => ParseTileData(response.Data));
+
+				task.ContinueWith((t) =>
+				{
+					// Cancelled is not the same as loaded!
+					if (TileState != TileState.Canceled)
+					{
+						if (response.IsUpdate)
+						{
+							TileState = TileState.Updated;
+						}
+						else
+						{
+							TileState = TileState.Loaded;
+						}
+					}
+
+					_callback();
+				}, TaskScheduler.FromCurrentSynchronizationContext());
+
+				task.Start();
+			}
+		}
+
+		public class VectorResult
+		{
+			public Dictionary<string, VectorLayerResult> Layers;
+
+			public VectorResult()
+			{
+				Layers = new Dictionary<string, VectorLayerResult>();
+			}
+		}
+
+		public class VectorLayerResult
+		{
+			public string Name;
+			public float Extent;
+			public List<VectorFeatureUnity> Features;
+
+			public VectorLayerResult()
+			{
+				Features = new List<VectorFeatureUnity>();
+			}
+
+		}
+
+		internal override bool ParseTileData(byte[] byteData)
+		{
+			try
+			{
+				var decompressed = Compression.Decompress(byteData);
+				data = new Mapbox.VectorTile.VectorTile(decompressed);
+
+				foreach (var layerName in data.LayerNames())
+				{
+					var layerResult = new VectorLayerResult();
+					var layer = data.GetLayer(layerName);
+					layerResult.Name = layerName;
+					layerResult.Extent = layer.Extent;
+
+					for (int i = 0; i < layer.FeatureCount(); i++)
+					{
+						var featureResult = new VectorFeatureUnity();
+						var feature = layer.GetFeature(i);
+						var geometry = feature.Geometry<float>(0);
+						var points = new List<List<Vector3>>();
+						for (int j = 0; j < geometry.Count; j++)
+						{
+							var pointCount = geometry[j].Count;
+							var newPoints = new List<Vector3>(pointCount);
+							for (int k = 0; k < pointCount; k++)
+							{
+								var point = geometry[j][k];
+								newPoints.Add(new Vector3(
+									((point.X - layerResult.Extent/2) / layerResult.Extent),
+									0,
+									(((layerResult.Extent - point.Y)- layerResult.Extent/2) / layerResult.Extent)));
+							}
+							points.Add(newPoints);
+						}
+
+						featureResult.Points = points;
+						featureResult.Data = feature;
+						featureResult.Properties = feature.GetProperties();
+						layerResult.Features.Add(featureResult);
+					}
+					VectorResults.Layers.Add(layerName, layerResult);
+				}
+
+				return true;
+			}
+			catch (Exception ex)
+			{
+				AddException(ex);
+				return false;
+			}
+		}
 
 		public void Dispose()
 		{
@@ -126,7 +254,6 @@ namespace Mapbox.Map
 			}
 		}
 
-
 		/// <summary>
 		/// <para>Gets the vector in a GeoJson format.</para>
 		/// <para>
@@ -148,7 +275,6 @@ namespace Mapbox.Map
 				return this.data.ToGeoJson((ulong)Id.Z, (ulong)Id.X, (ulong)Id.Y, 0);
 			}
 		}
-
 
 		/// <summary>
 		/// Gets all availble layer names.
@@ -200,24 +326,5 @@ namespace Mapbox.Map
 				TileResource.MakeStyleOptimizedVector(Id, tilesetId, _optimizedStyleId, _modifiedDate)
 			  : TileResource.MakeVector(Id, tilesetId);
 		}
-
-
-		internal override bool ParseTileData(byte[] data)
-		{
-			try
-			{
-				byteData = data;
-				var decompressed = Compression.Decompress(data);
-				this.data = new Mapbox.VectorTile.VectorTile(decompressed);
-				return true;
-			}
-			catch (Exception ex)
-			{
-				AddException(ex);
-				return false;
-			}
-		}
-
-
 	}
 }

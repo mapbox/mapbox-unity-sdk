@@ -34,6 +34,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		private VectorLayerProperties _properties;
 		private Dictionary<UnityTile, HashSet<LayerVisualizerBase>> _layerProgress;
 		protected VectorDataFetcher DataFetcher;
+		public int QueuedRequestCount => DataFetcher.QueuedRequestCount;
 		#endregion
 
 		#region Properties
@@ -78,7 +79,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		#region Public Methods
 		public void RedrawSubLayer(UnityTile tile, LayerVisualizerBase visualizer)
 		{
-			CreateFeatureWithBuilder(tile, visualizer.SubLayerProperties.coreOptions.layerName, visualizer);
+			//CreateFeatureWithBuilder(tile, visualizer.SubLayerProperties.coreOptions.layerName, visualizer);
 		}
 
 		public void UnregisterLayer(UnityTile tile, LayerVisualizerBase visualizer)
@@ -322,7 +323,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		#endregion
 
 		#region DataFetcherEvents
-		private void OnVectorDataRecieved(UnityTile tile, VectorTile.VectorTile vectorTile)
+		private void OnVectorDataRecieved(UnityTile tile, Mapbox.Map.VectorTile vectorTile)
 		{
 			tile.SetVectorData(TilesetId, vectorTile);
 			CreateMeshes(tile);
@@ -373,19 +374,19 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		#region Private Methods
 		private void CreateMeshes(UnityTile tile)
 		{
-			var nameList = new List<string>();
+			var nameList = new List<Mapbox.Map.VectorTile.VectorLayerResult>();
 			var builderList = new List<LayerVisualizerBase>();
 
-			foreach (var layerName in tile.VectorData.LayerNames())
+			foreach (var layer in tile.VectorData.VectorResults.Layers)
 			{
-				if (_layerBuilder.ContainsKey(layerName))
+				if (_layerBuilder.ContainsKey(layer.Key))
 				{
 					//two loops; first one to add it to waiting/tracking list, second to start it
-					foreach (var builder in _layerBuilder[layerName])
+					foreach (var builder in _layerBuilder[layer.Key])
 					{
-						nameList.Add(layerName);
+						nameList.Add(layer.Value);
 						builderList.Add(builder);
-						TrackFeatureWithBuilder(tile, layerName, builder);
+						TrackFeatureWithBuilder(tile, layer.Value, builder);
 					}
 				}
 			}
@@ -396,23 +397,23 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			builderList.Clear();
 			//emptylayer for visualizers that don't depend on outside data sources
-			string emptyLayer = "";
-			if (_layerBuilder.ContainsKey(emptyLayer))
-			{
-				//two loops; first one to add it to waiting/tracking list, second to start it
-				foreach (var builder in _layerBuilder[emptyLayer])
-				{
-					builderList.Add(builder);
-					TrackFeatureWithBuilder(tile, emptyLayer, builder);
-				}
-			}
-			for (int i = 0; i < builderList.Count; i++)
-			{
-				CreateFeatureWithBuilder(tile, emptyLayer, builderList[i]);
-			}
+			// string emptyLayer = "";
+			// if (_layerBuilder.ContainsKey(emptyLayer))
+			// {
+			// 	//two loops; first one to add it to waiting/tracking list, second to start it
+			// 	foreach (var builder in _layerBuilder[emptyLayer])
+			// 	{
+			// 		builderList.Add(builder);
+			// 		TrackFeatureWithBuilder(tile, emptyLayer, builder);
+			// 	}
+			// }
+			// for (int i = 0; i < builderList.Count; i++)
+			// {
+			// 	CreateFeatureWithBuilder(tile, emptyLayer, builderList[i]);
+			// }
 		}
 
-		private void TrackFeatureWithBuilder(UnityTile tile, string layerName, LayerVisualizerBase builder)
+		private void TrackFeatureWithBuilder(UnityTile tile, Mapbox.Map.VectorTile.VectorLayerResult layerName, LayerVisualizerBase builder)
 		{
 			if (builder.Active)
 			{
@@ -431,7 +432,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		private void CreateFeatureWithBuilder(UnityTile tile, string layerName, LayerVisualizerBase builder)
+		private void CreateFeatureWithBuilder(UnityTile tile, Mapbox.Map.VectorTile.VectorLayerResult layer, LayerVisualizerBase builder)
 		{
 			if (builder.Active)
 			{
@@ -447,14 +448,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 						_tilesWaitingProcessing.Add(tile);
 					}
 				}
-				if (layerName != "")
+				if (layer != null)
 				{
-					builder.Create(tile.VectorData.GetLayer(layerName), tile, DecreaseProgressCounter);
-				}
-				else
-				{
-					//just pass the first available layer - we should create a static null layer for this
-					builder.Create(tile.VectorData.GetLayer(tile.VectorData.LayerNames()[0]), tile, DecreaseProgressCounter);
+					builder.Create(layer, tile, DecreaseProgressCounter);
 				}
 			}
 		}

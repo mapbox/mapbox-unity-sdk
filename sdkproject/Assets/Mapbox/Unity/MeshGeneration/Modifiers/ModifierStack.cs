@@ -1,3 +1,6 @@
+using System.Threading.Tasks;
+using Mapbox.Map;
+
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
 	using UnityEngine;
@@ -41,16 +44,16 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		[SerializeField] public PositionTargetType moveFeaturePositionTo;
 
 
-		[NonSerialized] private int vertexIndex = 1;
+		//[NonSerialized] private int vertexIndex = 1;
 		[NonSerialized] private Dictionary<UnityTile, List<VectorEntity>> _activeObjects;
 		[NonSerialized] private ObjectPool<VectorEntity> _pool;
 
-		[NonSerialized] private Vector3 _tempPoint;
-		[NonSerialized] private VectorEntity _tempVectorEntity;
+		//[NonSerialized] private Vector3 _tempPoint;
+		//[NonSerialized] private VectorEntity _tempVectorEntity;
 		[NonSerialized] private ObjectPool<List<VectorEntity>> _listPool;
 
-		[NonSerialized] private int _counter;
-		[NonSerialized] private int _secondCounter;
+		//[NonSerialized] private int _counter;
+		//[NonSerialized] private int _secondCounter;
 		protected virtual void OnEnable()
 		{
 			_pool = new ObjectPool<VectorEntity>(() =>
@@ -60,7 +63,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				mf.sharedMesh = new Mesh();
 				mf.sharedMesh.name = "feature";
 				var mr = go.AddComponent<MeshRenderer>();
-				_tempVectorEntity = new VectorEntity()
+				var tempVectorEntity = new VectorEntity()
 				{
 					GameObject = go,
 					Transform = go.transform,
@@ -68,7 +71,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					MeshRenderer = mr,
 					Mesh = mf.sharedMesh
 				};
-				return _tempVectorEntity;
+				return tempVectorEntity;
 			});
 			_listPool = new ObjectPool<List<VectorEntity>>(() => { return new List<VectorEntity>(); });
 			_activeObjects = new Dictionary<UnityTile, List<VectorEntity>>();
@@ -78,8 +81,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		{
 			if (_activeObjects.ContainsKey(tile))
 			{
-				_counter = _activeObjects[tile].Count;
-				for (int i = 0; i < _counter; i++)
+				var counter = _activeObjects[tile].Count;
+				for (int i = 0; i < counter; i++)
 				{
 					foreach (var item in GoModifiers)
 					{
@@ -103,134 +106,222 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		{
 			base.Initialize();
 
-			_counter = MeshModifiers.Count;
-			for (int i = 0; i < _counter; i++)
+			var counter = MeshModifiers.Count;
+			for (int i = 0; i < counter; i++)
 			{
 				MeshModifiers[i].Initialize();
 			}
 
-			_counter = GoModifiers.Count;
-			for (int i = 0; i < _counter; i++)
+			counter = GoModifiers.Count;
+			for (int i = 0; i < counter; i++)
 			{
 				GoModifiers[i].Initialize();
 			}
 		}
 
-		public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
+		private Dictionary<CanonicalTileId, List<Tuple<VectorFeatureUnity, MeshData>>> _allMeshes = new Dictionary<CanonicalTileId, List<Tuple<VectorFeatureUnity, MeshData>>>();
+		public override void RunLayer(Mapbox.Map.VectorTile.VectorLayerResult vectorTileLayer, UnityTile tt, GameObject parent, string type = "")
 		{
-			_counter = feature.Points.Count;
-			_secondCounter = 0;
+			var layer = vectorTileLayer;
+			var tile = tt;
+			var localTile = tile.CanonicalTileId;
+			var task = Task.Run(() =>
+			{
+				var lineMeshCore = new LineMeshCore();
+				foreach (var feature in layer.Features)
+				{
+					if (feature.Properties.ContainsKey("extrude") && !bool.Parse(feature.Properties["extrude"].ToString()))
+						continue;
 
+					if (feature.Points.Count < 1)
+						continue;
+
+					var meshData = new MeshData();
+					Taskable(tile, feature, meshData, lineMeshCore);
+					if (!_allMeshes.ContainsKey(localTile))
+					{
+						_allMeshes.Add(localTile, new List<Tuple<VectorFeatureUnity, MeshData>>());
+					}
+					_allMeshes[localTile].Add(new Tuple<VectorFeatureUnity, MeshData>(feature, meshData));
+				}
+			});
+
+			task.ContinueWith((t) =>
+			{
+				if (tile.CanonicalTileId == localTile)
+				{
+					foreach (var mesh in _allMeshes[localTile])
+					{
+						CreateObject(tile, mesh.Item1, mesh.Item2, parent, type);
+					}
+				}
+				else
+				{
+					Debug.Log("Recycled");
+				}
+			}, TaskScheduler.FromCurrentSynchronizationContext());
+
+		}
+
+		// public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData asd, GameObject parent = null, string type = "")
+		// {
+		// 	var counter = feature.Points.Count;
+		// 	var secondCounter = 0;
+		//
+		// 	var meshData = new MeshData();
+		// 	var task = new Task( () => Taskable(tile, feature, meshData));
+		// 	task.ContinueWith((t) =>
+		// 	{
+		// 		CreateObject(tile, feature, meshData, parent, type);
+		// 	}, TaskScheduler.FromCurrentSynchronizationContext());
+		// 	task.Start();
+		//
+		// 	return null; //CreateObject(tile, feature, meshData, parent, type);
+		// }
+
+
+		private MeshData Taskable(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, LineMeshCore lineMeshCore)
+		{
+			foreach (var subfeature in feature.Points)
+			{
+				for (var index = 0; index < subfeature.Count; index++)
+				{
+					subfeature[index] *= tile.TileSize;
+				}
+			}
+
+			var tempPoint = Constants.Math.Vector3Zero;
+			var counter = feature.Points.Count;
+			var secondCounter = 0;
 			if (moveFeaturePositionTo != PositionTargetType.TileCenter)
 			{
-				_tempPoint = Constants.Math.Vector3Zero;
+
 				if (moveFeaturePositionTo == PositionTargetType.FirstVertex)
 				{
-					_tempPoint = feature.Points[0][0];
+					tempPoint = feature.Points[0][0];
 				}
 				else if (moveFeaturePositionTo == PositionTargetType.CenterOfVertices)
 				{
 					//this is not precisely the center because of the duplicates  (first/last vertex) but close to center
-					_tempPoint = feature.Points[0][0];
-					vertexIndex = 1;
+					tempPoint = feature.Points[0][0];
+					var vertexIndex = 1;
 
-					for (int i = 0; i < _counter; i++)
+					for (int i = 0; i < counter; i++)
 					{
-						_secondCounter = feature.Points[i].Count;
-						for (int j = 0; j < _secondCounter; j++)
+						secondCounter = feature.Points[i].Count;
+						for (int j = 0; j < secondCounter; j++)
 						{
-							_tempPoint += feature.Points[i][j];
+							tempPoint += feature.Points[i][j];
 							vertexIndex++;
 						}
 					}
-					_tempPoint /= vertexIndex;
+
+					tempPoint /= vertexIndex;
 				}
 
-				for (int i = 0; i < _counter; i++)
+				for (int i = 0; i < counter; i++)
 				{
-					_secondCounter = feature.Points[i].Count;
-					for (int j = 0; j < _secondCounter; j++)
+					secondCounter = feature.Points[i].Count;
+					for (int j = 0; j < secondCounter; j++)
 					{
-						feature.Points[i][j] = new Vector3(feature.Points[i][j].x - _tempPoint.x, 0, feature.Points[i][j].z - _tempPoint.z);
+						feature.Points[i][j] = new Vector3(feature.Points[i][j].x - tempPoint.x, 0, feature.Points[i][j].z - tempPoint.z);
 					}
 				}
-				meshData.PositionInTile = _tempPoint;
+
+				meshData.PositionInTile = tempPoint;
 			}
 
-			meshData.PositionInTile = _tempPoint;
-			_counter = MeshModifiers.Count;
-			for (int i = 0; i < _counter; i++)
+			meshData.PositionInTile = tempPoint;
+			counter = MeshModifiers.Count;
+			for (int i = 0; i < counter; i++)
 			{
 				if (MeshModifiers[i] != null && MeshModifiers[i].Active)
 				{
+					if (MeshModifiers[i] is ICoreWrapper)
+					{
+						(MeshModifiers[i] as ICoreWrapper).SetCore(lineMeshCore);
+					}
 					MeshModifiers[i].Run(feature, meshData, tile);
 				}
 			}
 
-			_tempVectorEntity = _pool.GetObject();
+			return meshData;
+		}
 
-			// It is possible that we changed scenes in the middle of map generation.
-			// This object can be null as a result of Unity cleaning up game objects in the scene.
-			// Let's bail if we don't have our object.
-			if (_tempVectorEntity.GameObject == null)
+		private GameObject CreateObject(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent, string type)
+		{
+			if (meshData.Vertices.Count != meshData.UV[0].Count ||
+			    meshData.Vertices.Count != meshData.Tangents.Count)
 			{
 				return null;
 			}
 
-			_tempVectorEntity.GameObject.SetActive(true);
-			_tempVectorEntity.Mesh.Clear();
-			_tempVectorEntity.Feature = feature;
+			var tempVectorEntity = _pool.GetObject();
+
+			// It is possible that we changed scenes in the middle of map generation.
+			// This object can be null as a result of Unity cleaning up game objects in the scene.
+			// Let's bail if we don't have our object.
+			if (tempVectorEntity.GameObject == null)
+			{
+				return null;
+			}
+
+			tempVectorEntity.GameObject.SetActive(true);
+			tempVectorEntity.Mesh.Clear();
+			tempVectorEntity.Feature = feature;
 
 #if UNITY_EDITOR
 			if (feature.Data != null)
 			{
-				_tempVectorEntity.GameObject.name = type + " - " + feature.Data.Id;
+				tempVectorEntity.GameObject.name = type + " - " + feature.Data.Id;
 			}
 			else
 			{
-				_tempVectorEntity.GameObject.name = type;
+				tempVectorEntity.GameObject.name = type;
 			}
 #endif
-			_tempVectorEntity.Mesh.subMeshCount = meshData.Triangles.Count;
-			_tempVectorEntity.Mesh.SetVertices(meshData.Vertices);
-			_tempVectorEntity.Mesh.SetNormals(meshData.Normals);
+			tempVectorEntity.Mesh.subMeshCount = meshData.Triangles.Count;
+			tempVectorEntity.Mesh.SetVertices(meshData.Vertices);
+			tempVectorEntity.Mesh.SetNormals(meshData.Normals);
 			if (meshData.Tangents.Count > 0)
 			{
-				_tempVectorEntity.Mesh.SetTangents(meshData.Tangents);
+				tempVectorEntity.Mesh.SetTangents(meshData.Tangents);
 			}
 
-			_counter = meshData.Triangles.Count;
-			for (int i = 0; i < _counter; i++)
+			var counter = meshData.Triangles.Count;
+			for (int i = 0; i < counter; i++)
 			{
-				_tempVectorEntity.Mesh.SetTriangles(meshData.Triangles[i], i);
-			}
-			_counter = meshData.UV.Count;
-			for (int i = 0; i < _counter; i++)
-			{
-				_tempVectorEntity.Mesh.SetUVs(i, meshData.UV[i]);
+				tempVectorEntity.Mesh.SetTriangles(meshData.Triangles[i], i);
 			}
 
-			_tempVectorEntity.Transform.SetParent(parent.transform, false);
+			counter = meshData.UV.Count;
+			for (int i = 0; i < counter; i++)
+			{
+				tempVectorEntity.Mesh.SetUVs(i, meshData.UV[i]);
+			}
+
+			tempVectorEntity.Transform.SetParent(parent.transform, false);
 
 			if (!_activeObjects.ContainsKey(tile))
 			{
 				_activeObjects.Add(tile, _listPool.GetObject());
 			}
-			_activeObjects[tile].Add(_tempVectorEntity);
+
+			_activeObjects[tile].Add(tempVectorEntity);
 
 
-			_tempVectorEntity.Transform.localPosition = meshData.PositionInTile;
+			tempVectorEntity.Transform.localPosition = meshData.PositionInTile;
 
-			_counter = GoModifiers.Count;
-			for (int i = 0; i < _counter; i++)
+			counter = GoModifiers.Count;
+			for (int i = 0; i < counter; i++)
 			{
 				if (GoModifiers[i].Active)
 				{
-					GoModifiers[i].Run(_tempVectorEntity, tile);
+					GoModifiers[i].Run(tempVectorEntity, tile);
 				}
 			}
 
-			return _tempVectorEntity.GameObject;
+			return tempVectorEntity.GameObject;
 		}
 
 		public override void Clear()

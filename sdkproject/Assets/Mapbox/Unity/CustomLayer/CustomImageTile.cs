@@ -17,12 +17,12 @@ namespace Mapbox.Unity.CustomLayer
 		{
 			Cancel();
 
-			_state = State.Loading;
+			TileState = TileState.Loading;
 			Id = canonicalTileId;
 			TilesetId = tilesetId;
 			_callback = p;
 
-			_unityRequest = fileSource.CustomImageRequest(GetURL(Id), HandleTileResponse, tileId: Id, tilesetId: tilesetId);
+			_unityRequest = fileSource.CustomImageRequest(GetURL(Id), HandleTileResponse);
 		}
 
 		private string GetURL(CanonicalTileId id)
@@ -46,7 +46,7 @@ namespace Mapbox.Unity.CustomLayer
 		{
 			Cancel();
 
-			_state = State.Loading;
+			TileState = TileState.Loading;
 			Id = canonicalTileId;
 			TilesetId = tilesetId;
 			_callback = p;

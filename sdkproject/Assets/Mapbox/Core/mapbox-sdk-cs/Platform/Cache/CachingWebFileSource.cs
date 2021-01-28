@@ -63,15 +63,16 @@ namespace Mapbox.Platform.Cache
 		}
 		#endregion
 
-		public UnityWebRequest MapboxImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null, bool isNonreadable = true)
+		public UnityWebRequest MapboxImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, string etag = null, bool isNonreadable = true)
 		{
 			var finalUrl = CreateFinalUrl(uri);
-			return CustomImageRequest(finalUrl, callback, timeout, tileId, tilesetId, etag, isNonreadable);
+			return CustomImageRequest(finalUrl, callback, timeout, etag, isNonreadable);
 		}
 
-		public UnityWebRequest CustomImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, CanonicalTileId tileId = new CanonicalTileId(), string tilesetId = null, string etag = null, bool isNonreadable = true)
+		public UnityWebRequest CustomImageRequest(string uri, Action<TextureResponse> callback, int timeout = 10, string etag = null, bool isNonreadable = true)
 		{
 			var webRequest = UnityWebRequestTexture.GetTexture(uri, isNonreadable);
+			webRequest.timeout = timeout;
 			if (!string.IsNullOrEmpty(etag))
 			{
 				webRequest.SetRequestHeader("If-None-Match", etag);

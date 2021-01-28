@@ -429,10 +429,6 @@ namespace Mapbox.Editor
 			var materialOptions = subLayerProperties.materialOptions;
 			subLayerGeometryMaterialOptions.FindPropertyRelative("style").enumValueIndex = (int)materialOptions.style;
 
-			var subLayerGeometryPerformanceOptions = subLayer.FindPropertyRelative("performanceOptions");
-			subLayerGeometryPerformanceOptions.FindPropertyRelative("isEnabled").boolValue = true;
-			subLayerGeometryPerformanceOptions.FindPropertyRelative("entityPerCoroutine").intValue = 20;
-
 			var mats = subLayerGeometryMaterialOptions.FindPropertyRelative("materials");
 			mats.arraySize = 2;
 
@@ -536,7 +532,7 @@ namespace Mapbox.Editor
 			EditorGUI.indentLevel++;
 
 			EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("performanceOptions"), new GUIContent("Perfomance Options"));
-
+			
 			//*********************** FILTERS SECTION BEGINS ***********************************//
 			var filterOptions = layerProperty.FindPropertyRelative("filterOptions");
 			filterOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;

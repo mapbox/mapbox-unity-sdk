@@ -235,30 +235,22 @@ namespace Mapbox.Unity
 			return _fileSource.Request(url, callback, _configuration.DefaultTimeout);
 		}
 
-		public UnityWebRequest MapboxImageRequest(
-			string url
+		public UnityWebRequest MapboxImageRequest(string url
 			, Action<TextureResponse> callback
 			, int timeout = 10
-			, CanonicalTileId tileId = new CanonicalTileId()
-			, string tilesetId = null
 			, string etag = null
-			, bool isNonreadable = true
-		)
+			, bool isNonreadable = true)
 		{
-			return _fileSource.MapboxImageRequest(url, callback, _configuration.DefaultTimeout, tileId, tilesetId);
+			return _fileSource.MapboxImageRequest(url, callback, _configuration.DefaultTimeout);
 		}
 
-		public UnityWebRequest CustomImageRequest(
-			string url
+		public UnityWebRequest CustomImageRequest(string url
 			, Action<TextureResponse> callback
 			, int timeout = 10
-			, CanonicalTileId tileId = new CanonicalTileId()
-			, string tilesetId = null
 			, string etag = null
-			, bool isNonreadable = true
-		)
+			, bool isNonreadable = true)
 		{
-			return _fileSource.CustomImageRequest(url, callback, _configuration.DefaultTimeout, tileId, tilesetId);
+			return _fileSource.CustomImageRequest(url, callback, _configuration.DefaultTimeout);
 		}
 
 		Geocoder _geocoder;

@@ -44,18 +44,6 @@ namespace Mapbox.Editor
 					abstractMap.ResetMap();
 					return;
 				}
-				if (abstractMap.IsEditorPreviewEnabled == true)
-				{
-					if (EditorApplication.isPlayingOrWillChangePlaymode)
-					{
-						return;
-					}
-					else
-					{
-						// abstractMap.DisableEditorPreview();
-						// abstractMap.EnableEditorPreview();
-					}
-				}
 			}
 		}
 

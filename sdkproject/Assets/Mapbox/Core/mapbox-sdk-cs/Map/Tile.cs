@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------
 
 using Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -25,6 +26,24 @@ namespace Mapbox.Map
 		NoCache
 	}
 
+	public enum TileState
+	{
+		/// <summary> New tile, not yet initialized. </summary>
+		New,
+
+		/// <summary> Loading data. </summary>
+		Loading,
+
+		/// <summary> Data loaded and parsed. </summary>
+		Loaded,
+
+		/// <summary> Data loading cancelled. </summary>
+		Canceled,
+
+		/// <summary> Data has been loaded before and got updated. </summary>
+		Updated
+	}
+
 	/// <summary>
 	///    A Map tile, a square with vector or raster data representing a geographic
 	///    bounding box. More info <see href="https://en.wikipedia.org/wiki/Tiled_web_map">
@@ -38,18 +57,31 @@ namespace Mapbox.Map
 		public CacheType FromCache = CacheType.NoCache;
 #endif
 
-		public Action<Tile> Released = (t) => { };
 		public Action Cancelled = () => { };
 
 		public string TilesetId;
 		public CanonicalTileId Id;
+		private int _key = 0;
+
+		public int Key
+		{
+			get
+			{
+				if (_key == 0)
+				{
+					_key = Id.GenerateKey(TilesetId);
+				}
+
+				return _key;
+			}
+		}
 
 		public long StatusCode;
 		public DateTime ExpirationDate;
 		public string ETag;
 
 		protected List<Exception> _exceptions;
-		protected State _state = State.New;
+		protected TileState TileState = TileState.New;
 		protected IAsyncRequest _request;
 
 		protected UnityWebRequest _unityRequest;
@@ -64,25 +96,6 @@ namespace Mapbox.Map
 		{
 			TilesetId = tilesetId;
 			Id = tileId;
-		}
-
-		/// <summary> Tile state. </summary>
-		public enum State
-		{
-			/// <summary> New tile, not yet initialized. </summary>
-			New,
-
-			/// <summary> Loading data. </summary>
-			Loading,
-
-			/// <summary> Data loaded and parsed. </summary>
-			Loaded,
-
-			/// <summary> Data loading cancelled. </summary>
-			Canceled,
-
-			/// <summary> Data has been loaded before and got updated. </summary>
-			Updated
 		}
 
 		/// <summary> Gets the <see cref="T:Mapbox.Map.CanonicalTileId"/> identifier. </summary>
@@ -138,9 +151,9 @@ namespace Mapbox.Map
 		///     is accusing any error.
 		/// </summary>
 		/// <value> The tile state. </value>
-		public State CurrentState
+		public TileState CurrentTileState
 		{
-			get { return _state; }
+			get { return TileState; }
 		}
 
 
@@ -152,7 +165,7 @@ namespace Mapbox.Map
 
 		public bool IsCompleted
 		{
-			get { return _state == State.Loaded; }
+			get { return TileState == TileState.Loaded; }
 		}
 
 		/// <summary>
@@ -163,19 +176,14 @@ namespace Mapbox.Map
 		/// <param name="callback"> The completion callback. </param>
 		public void Initialize(Parameters param, Action callback)
 		{
-			Cancel();
-
-			_state = State.Loading;
-			Id = param.Id;
-			_callback = callback;
-			_request = param.Fs.Request(MakeTileResource(param.TilesetId).GetUrl(), HandleTileResponse);
+			Initialize(param.Fs, param.Id, param.TilesetId, callback);
 		}
 
 		internal virtual void Initialize(IFileSource fileSource, CanonicalTileId canonicalTileId, string tilesetId, Action p)
 		{
 			Cancel();
 
-			_state = State.Loading;
+			TileState = TileState.Loading;
 			Id = canonicalTileId;
 			_callback = p;
 			TilesetId = tilesetId;
@@ -235,10 +243,10 @@ namespace Mapbox.Map
 				_unityRequest = null;
 			}
 
-			_state = State.Canceled;
+			TileState = TileState.Canceled;
 			Cancelled();
 		}
-		
+
 		// Get the tile resource (raster/vector/etc).
 		internal abstract TileResource MakeTileResource(string tilesetId);
 
@@ -251,17 +259,11 @@ namespace Mapbox.Map
 		// a Worker class to abstract this, so on platforms that support threads (like Unity
 		// on the desktop, Android, etc) we can use worker threads and when building for
 		// the browser, we keep it single-threaded.
-		List<string> ids = new List<string>();
 
 		private void HandleTileResponse(Response response)
 		{
 			if (response.HasError)
 			{
-				if (!ids.Contains(Id.ToString()))
-					ids.Add(Id.ToString());
-				else
-					return;
-
 				response.Exceptions.ToList().ForEach(e => AddException(e));
 			}
 			else
@@ -276,15 +278,15 @@ namespace Mapbox.Map
 			}
 
 			// Cancelled is not the same as loaded!
-			if (_state != State.Canceled)
+			if (TileState != TileState.Canceled)
 			{
 				if (response.IsUpdate)
 				{
-					_state = State.Updated;
+					TileState = TileState.Updated;
 				}
 				else
 				{
-					_state = State.Loaded;
+					TileState = TileState.Loaded;
 				}
 			}
 

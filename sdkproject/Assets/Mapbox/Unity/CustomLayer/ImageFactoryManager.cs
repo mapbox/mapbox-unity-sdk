@@ -13,6 +13,7 @@ namespace Mapbox.Unity.CustomLayer
 		public Action<UnityTile, RasterTile> TextureReceived = (t, s) => { };
 		public Action<UnityTile, RasterTile, TileErrorEventArgs> FetchingError = (t, r, s) => { };
 		public bool DownloadFallbackImagery = false;
+		public int QueuedRequestCount => _baseImageDataFetcher.QueuedRequestCount + _fetcher.QueuedRequestCount;
 
 		protected BaseImageDataFetcher _baseImageDataFetcher;
 		protected ImageDataFetcher _fetcher;

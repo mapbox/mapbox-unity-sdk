@@ -8,62 +8,30 @@ using Mapbox.Unity.MeshGeneration.Data;
 
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
-	/// <summary>
-	/// Line Mesh Modifier creates line polygons from a list of vertices. It offsets the original vertices to both sides using Width parameter and triangulates them manually.
-	/// It also creates tiled UV mapping using the line length.
-	/// </summary>
-	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Line Mesh For Polygons Modifier")]
-	public class LineMeshForPolygonsModifier : MeshModifier
+	public class LineMeshCore
 	{
-		#region Constants
+		public float Width = 1.0f;
+		public float MiterLimit = 0.2f;
+		public float RoundLimit = 1.05f;
+		public JoinType JoinType = JoinType.Round;
+		public JoinType CapType = JoinType.Round;
+		public Vector3 PushUp = new Vector3(0, 1, 0);
 
 		private readonly float _cosHalfSharpCorner = Mathf.Cos(75f / 2f * (Mathf.PI / 180f));
 		private readonly float _sharpCornerOffset = 15f;
-
-		#endregion
-
-		#region Line Parameters
-
-		//[SerializeField] private LineGeometryOptions _options;
-
-		[Tooltip("Width of the line feature.")]
-		public float Width = 1.0f;
-		[Tooltip("Miter Limit")]
-		public float MiterLimit = 0.2f;
-
-		[Tooltip("Round Limit")]
-		public float RoundLimit = 1.05f;
-
-		[Tooltip("Join type of the line feature")]
-		public JoinType JoinType = JoinType.Round;
-
-		[Tooltip("Cap type of the line feature")]
-		public JoinType CapType = JoinType.Round;
-
-		public Vector3 PushUp = new Vector3(0, 1, 0);
-
 		private float _scaledWidth;
-		private float _tileSize; 
-
-		#endregion
-
-		#region Mesh Generation Fields
-
+		private float _tileSize;
 		private List<Vector3> _vertexList;
 		private List<Vector3> _normalList;
 		private List<int> _triangleList;
 		private List<Vector2> _uvList;
 		private List<Vector4> _tangentList;
-
-		//triangle indices
 		private int _index1 = -1;
 		private int _index2 = -1;
 		private int _index3 = -1;
 		private float _cornerOffsetA;
 		private float _cornerOffsetB;
 		private bool _startOfLine = true;
-
-
 		private Vector3 _prevVertex;
 		private Vector3 _currentVertex;
 		private Vector3 _nextVertex;
@@ -71,16 +39,12 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private Vector3 _nextNormal;
 		private float _distance = 0f;
 
-		#endregion
-
-		#region Modifier Overrides
-
-		public override ModifierType Type
+		public ModifierType Type
 		{
 			get { return ModifierType.Preprocess; }
 		}
 
-		public override void Initialize()
+		public void Initialize()
 		{
 			_scaledWidth = Width;
 			_vertexList = new List<Vector3>();
@@ -90,28 +54,18 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_tangentList = new List<Vector4>();
 		}
 
-		public override void SetProperties(ModifierProperties properties)
-		{
-			//_options = (LineGeometryOptions) properties;
-			properties.PropertyHasChanged += UpdateModifier;
-		}
-
-		public override void Run(VectorFeatureUnity feature, MeshData md, float scale)
+		public void Run(VectorFeatureUnity feature, MeshData md, float scale)
 		{
 			_scaledWidth = Width * scale;
 			ExtrudeLine(feature, md);
 		}
 
-		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
+		public void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
 			_scaledWidth = tile != null ? Width * tile.TileScale : Width;
 			_tileSize = Convert.ToSingle(tile.Rect.Size.x * tile.TileScale);
 			ExtrudeLine(feature, md);
 		}
-
-		#endregion
-
-		#region Mesh Generations
 
 		private void ExtrudeLine(VectorFeatureUnity feature, MeshData md)
 		{
@@ -328,8 +282,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 							_index2 = -1;
 						}
 
-
-
 						if (_nextVertex != Constants.Math.Vector3Unused)
 						{
 							AddCurrentVertex(_currentVertex, _distance, _nextNormal, md, -_cornerOffsetA, -_cornerOffsetB);
@@ -422,6 +374,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
+
+
 		private static bool IsOnEdge(Vector3 p1, Vector3 p2, float _tileSize, float tolerance)
 		{
 			return ((Math.Abs(Math.Abs(p1.x) - (_tileSize/2)) < tolerance && Math.Abs(Math.Abs(p2.x) - (_tileSize/2)) < tolerance && Math.Sign(p1.x) == Math.Sign(p2.x)) ||
@@ -489,7 +443,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
-
 		private void AddCurrentVertex(Vector3 vertexPosition, float dist, Vector3 normal, MeshData md, float endLeft = 0, float endRight = 0)
 		{
 			var triIndexStart = md.Vertices.Count;
@@ -542,6 +495,85 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			_index1 = _index2;
 			_index2 = _index3;
+		}
+	}
+
+	public interface ICoreWrapper
+	{
+		void SetCore(LineMeshCore core);
+	}
+	/// <summary>
+	/// Line Mesh Modifier creates line polygons from a list of vertices. It offsets the original vertices to both sides using Width parameter and triangulates them manually.
+	/// It also creates tiled UV mapping using the line length.
+	/// </summary>
+	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Line Mesh For Polygons Modifier")]
+	public class LineMeshForPolygonsModifier : MeshModifier, ICoreWrapper
+	{
+		#region Line Parameters
+
+		//[SerializeField] private LineGeometryOptions _options;
+
+		[Tooltip("Width of the line feature.")]
+		public float Width = 1.0f;
+		[Tooltip("Miter Limit")]
+		public float MiterLimit = 0.2f;
+
+		[Tooltip("Round Limit")]
+		public float RoundLimit = 1.05f;
+
+		[Tooltip("Join type of the line feature")]
+		public JoinType JoinType = JoinType.Round;
+
+		[Tooltip("Cap type of the line feature")]
+		public JoinType CapType = JoinType.Round;
+
+		public Vector3 PushUp = new Vector3(0, 1, 0);
+		#endregion
+
+		#region Constants
+
+		#endregion
+
+		#region Mesh Generation Fields
+
+		//triangle indices
+
+		private LineMeshCore _lineMeshCore;
+
+		#endregion
+
+		#region Modifier Overrides
+
+		public override ModifierType Type
+		{
+			get { return _lineMeshCore.Type; }
+		}
+
+		public void SetCore(LineMeshCore core)
+		{
+			_lineMeshCore = core;
+			_lineMeshCore.Width = Width;
+			_lineMeshCore.MiterLimit = MiterLimit;
+			_lineMeshCore.RoundLimit = RoundLimit;
+			_lineMeshCore.JoinType = JoinType;
+			_lineMeshCore.CapType = CapType;
+			_lineMeshCore.PushUp = PushUp;
+			_lineMeshCore.Initialize();
+		}
+
+		public override void Initialize()
+		{
+			_lineMeshCore?.Initialize();
+		}
+
+		public override void Run(VectorFeatureUnity feature, MeshData md, float scale)
+		{
+			_lineMeshCore.Run(feature, md, scale);
+		}
+
+		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
+		{
+			_lineMeshCore.Run(feature, md, tile);
 		}
 
 		#endregion

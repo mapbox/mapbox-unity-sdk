@@ -15,23 +15,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	using Mapbox.Unity.Map;
 	using System.Collections.Generic;
 
-	public enum MapImageType
-	{
-		BasicMapboxStyle,
-		Custom,
-		None
-	}
-
-	/// <summary>
-	/// Uses raster image services to create materials & textures for terrain
-	/// </summary>
-	[CreateAssetMenu(menuName = "Mapbox/Factories/Image Factory")]
 	public class MapImageFactory : AbstractTileFactory
 	{
 		public ImageFactoryManager ImageFactoryManager;
+		public int QueuedRequestCount => ImageFactoryManager.QueuedRequestCount;
 
-		[SerializeField]
-		ImageryLayerProperties _properties;
+		[SerializeField] ImageryLayerProperties _properties;
 		protected ImageDataFetcher DataFetcher;
 
 		public MapImageFactory(ImageryLayerProperties properties)

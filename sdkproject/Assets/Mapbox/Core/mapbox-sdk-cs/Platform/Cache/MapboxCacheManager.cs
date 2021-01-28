@@ -250,6 +250,7 @@ namespace Mapbox.Platform.Cache
         public void TileDisposed(UnityTile tile, string tilesetId)
         {
             _memoryCache?.TileDisposed(tile, tilesetId);
+            _textureFileCache?.TileDisposed(tile, tilesetId);
         }
     }
 }

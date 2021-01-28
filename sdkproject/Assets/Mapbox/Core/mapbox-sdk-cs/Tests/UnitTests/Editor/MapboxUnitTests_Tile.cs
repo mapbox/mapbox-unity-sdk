@@ -85,10 +85,10 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			parameters.Id = new CanonicalTileId(1, 1, 1);
 
 			var tile = new RawPngRasterTile(parameters.Id, "");
-			Assert.AreEqual(Tile.State.New, tile.CurrentState);
+			Assert.AreEqual(TileState.New, tile.CurrentTileState);
 
 			tile.Initialize(parameters, () => { });
-			Assert.AreEqual(Tile.State.Loading, tile.CurrentState);
+			Assert.AreEqual(TileState.Loading, tile.CurrentTileState);
 
 #if UNITY_5_6_OR_NEWER
 			IEnumerator enumerator = _fs.WaitForAllRequests();
@@ -97,10 +97,10 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			_fs.WaitForAllRequests();
 #endif
 
-			Assert.AreEqual(Tile.State.Loaded, tile.CurrentState);
+			Assert.AreEqual(TileState.Loaded, tile.CurrentTileState);
 
 			tile.Cancel();
-			Assert.AreEqual(Tile.State.Canceled, tile.CurrentState);
+			Assert.AreEqual(TileState.Canceled, tile.CurrentTileState);
 		}
 	}
 }
