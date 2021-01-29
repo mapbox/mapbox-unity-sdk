@@ -127,7 +127,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			var localTile = tile.CanonicalTileId;
 			var task = Task.Run(() =>
 			{
-				var lineMeshCore = new LineMeshCore();
+				var lineMeshCore = new LineMeshCore(tile.TileSize);
 				foreach (var feature in layer.Features)
 				{
 					if (feature.Properties.ContainsKey("extrude") && !bool.Parse(feature.Properties["extrude"].ToString()))
@@ -137,7 +137,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						continue;
 
 					var meshData = new MeshData();
-					Taskable(tile, feature, meshData, lineMeshCore);
+					Taskable(tile, feature, meshData, tile.TileScale);
 					if (!_allMeshes.ContainsKey(localTile))
 					{
 						_allMeshes.Add(localTile, new List<Tuple<VectorFeatureUnity, MeshData>>());
@@ -148,88 +148,66 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			task.ContinueWith((t) =>
 			{
-				if (tile.CanonicalTileId == localTile)
+				if (tile.CanonicalTileId != localTile || tile.IsRecycled)
+				{
+					Debug.Log("Recycled");
+				}
+				else
 				{
 					foreach (var mesh in _allMeshes[localTile])
 					{
 						CreateObject(tile, mesh.Item1, mesh.Item2, parent, type);
 					}
-				}
-				else
-				{
-					Debug.Log("Recycled");
+
+					_allMeshes[localTile].Clear();
+					_allMeshes.Remove(localTile);
 				}
 			}, TaskScheduler.FromCurrentSynchronizationContext());
 
 		}
 
-		// public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData asd, GameObject parent = null, string type = "")
-		// {
-		// 	var counter = feature.Points.Count;
-		// 	var secondCounter = 0;
-		//
-		// 	var meshData = new MeshData();
-		// 	var task = new Task( () => Taskable(tile, feature, meshData));
-		// 	task.ContinueWith((t) =>
-		// 	{
-		// 		CreateObject(tile, feature, meshData, parent, type);
-		// 	}, TaskScheduler.FromCurrentSynchronizationContext());
-		// 	task.Start();
-		//
-		// 	return null; //CreateObject(tile, feature, meshData, parent, type);
-		// }
-
-
-		private MeshData Taskable(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, LineMeshCore lineMeshCore)
+		private MeshData Taskable(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, float scaler)
 		{
-			foreach (var subfeature in feature.Points)
-			{
-				for (var index = 0; index < subfeature.Count; index++)
-				{
-					subfeature[index] *= tile.TileSize;
-				}
-			}
-
 			var tempPoint = Constants.Math.Vector3Zero;
 			var counter = feature.Points.Count;
 			var secondCounter = 0;
-			if (moveFeaturePositionTo != PositionTargetType.TileCenter)
-			{
-
-				if (moveFeaturePositionTo == PositionTargetType.FirstVertex)
-				{
-					tempPoint = feature.Points[0][0];
-				}
-				else if (moveFeaturePositionTo == PositionTargetType.CenterOfVertices)
-				{
-					//this is not precisely the center because of the duplicates  (first/last vertex) but close to center
-					tempPoint = feature.Points[0][0];
-					var vertexIndex = 1;
-
-					for (int i = 0; i < counter; i++)
-					{
-						secondCounter = feature.Points[i].Count;
-						for (int j = 0; j < secondCounter; j++)
-						{
-							tempPoint += feature.Points[i][j];
-							vertexIndex++;
-						}
-					}
-
-					tempPoint /= vertexIndex;
-				}
-
-				for (int i = 0; i < counter; i++)
-				{
-					secondCounter = feature.Points[i].Count;
-					for (int j = 0; j < secondCounter; j++)
-					{
-						feature.Points[i][j] = new Vector3(feature.Points[i][j].x - tempPoint.x, 0, feature.Points[i][j].z - tempPoint.z);
-					}
-				}
-
-				meshData.PositionInTile = tempPoint;
-			}
+			// if (moveFeaturePositionTo != PositionTargetType.TileCenter)
+			// {
+			//
+			// 	if (moveFeaturePositionTo == PositionTargetType.FirstVertex)
+			// 	{
+			// 		tempPoint = feature.Points[0][0];
+			// 	}
+			// 	else if (moveFeaturePositionTo == PositionTargetType.CenterOfVertices)
+			// 	{
+			// 		//this is not precisely the center because of the duplicates  (first/last vertex) but close to center
+			// 		tempPoint = feature.Points[0][0];
+			// 		var vertexIndex = 1;
+			//
+			// 		for (int i = 0; i < counter; i++)
+			// 		{
+			// 			secondCounter = feature.Points[i].Count;
+			// 			for (int j = 0; j < secondCounter; j++)
+			// 			{
+			// 				tempPoint += feature.Points[i][j];
+			// 				vertexIndex++;
+			// 			}
+			// 		}
+			//
+			// 		tempPoint /= vertexIndex;
+			// 	}
+			//
+			// 	for (int i = 0; i < counter; i++)
+			// 	{
+			// 		secondCounter = feature.Points[i].Count;
+			// 		for (int j = 0; j < secondCounter; j++)
+			// 		{
+			// 			feature.Points[i][j] = new Vector3(feature.Points[i][j].x - tempPoint.x, 0, feature.Points[i][j].z - tempPoint.z);
+			// 		}
+			// 	}
+			//
+			// 	meshData.PositionInTile = tempPoint;
+			// }
 
 			meshData.PositionInTile = tempPoint;
 			counter = MeshModifiers.Count;
@@ -239,7 +217,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				{
 					if (MeshModifiers[i] is ICoreWrapper)
 					{
-						(MeshModifiers[i] as ICoreWrapper).SetCore(lineMeshCore);
+						(MeshModifiers[i] as ICoreWrapper).SetCore(new LineMeshCore(tile.TileScale));
 					}
 					MeshModifiers[i].Run(feature, meshData, tile);
 				}
@@ -253,6 +231,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			if (meshData.Vertices.Count != meshData.UV[0].Count ||
 			    meshData.Vertices.Count != meshData.Tangents.Count)
 			{
+				Debug.Log("data mismatch");
 				return null;
 			}
 
@@ -273,7 +252,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 #if UNITY_EDITOR
 			if (feature.Data != null)
 			{
-				tempVectorEntity.GameObject.name = type + " - " + feature.Data.Id;
+				tempVectorEntity.GameObject.name = type + " - " + feature.Data.Id + " - " + Time.frameCount;
 			}
 			else
 			{
