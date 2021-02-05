@@ -25,6 +25,8 @@
 		[SerializeField]
 		bool _useDegreeMethod;
 
+		[SerializeField] private bool _keyboardPanEnabled;
+
 		private Vector3 _origin;
 		private Vector3 _mousePosition;
 		private Vector3 _mousePositionPrevious;
@@ -89,7 +91,10 @@
 			float xMove = Input.GetAxis("Horizontal");
 			float zMove = Input.GetAxis("Vertical");
 
-			PanMapUsingKeyBoard(xMove, zMove);
+			if (_keyboardPanEnabled)
+			{
+				PanMapUsingKeyBoard(xMove, zMove);
+			}
 
 
 			//pan mouse

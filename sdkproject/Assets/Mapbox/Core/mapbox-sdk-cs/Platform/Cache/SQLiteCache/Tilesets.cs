@@ -20,4 +20,10 @@ namespace Mapbox.Platform.Cache
 
 		public string name { get; set; }
 	}
+
+	public class sqlite_sequence
+	{
+		public string name { get; set; }
+		public int seq { get; set; }
+	}
 }

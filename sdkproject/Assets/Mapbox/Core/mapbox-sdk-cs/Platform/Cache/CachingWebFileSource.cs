@@ -5,14 +5,10 @@
 	using System.Collections.Generic;
 	using Mapbox.Unity.Utilities;
 	using Mapbox.Map;
-	using System.Collections;
-	using System.Linq;
 
 
 	public class CachingWebFileSource : IFileSource, IDisposable
 	{
-
-
 #if MAPBOX_DEBUG_CACHE
 		private string _className;
 #endif
@@ -22,6 +18,8 @@
 		private Func<string> _getMapsSkuToken;
 		private bool _autoRefreshCache;
 
+		private const string EtagHeaderName = "ETag";
+		private const string CacheControlHeaderName = "Cache-Control";
 
 		public CachingWebFileSource(string accessToken, Func<string> getMapsSkuToken, bool autoRefreshCache)
 		{
@@ -34,8 +32,7 @@
 		}
 
 
-#region idisposable
-
+		#region idisposable
 
 		~CachingWebFileSource()
 		{
@@ -64,12 +61,12 @@
 						}
 					}
 				}
+
 				_disposed = true;
 			}
 		}
 
-
-#endregion
+		#endregion
 
 
 		/// <summary>
@@ -102,7 +99,8 @@
 		}
 
 
-		public void ReInit() {
+		public void ReInit()
+		{
 			foreach (var cache in _caches)
 			{
 				cache.ReInit();
@@ -118,7 +116,6 @@
 			, string tilesetId = null
 		)
 		{
-
 			if (string.IsNullOrEmpty(tilesetId))
 			{
 				throw new Exception("Cannot cache without a tileset id");
@@ -150,6 +147,7 @@
 					uriBuilder.Query = accessTokenQuery + "&" + mapsSkuToken;
 				}
 			}
+
 			string finalUrl = uriBuilder.ToString();
 
 #if MAPBOX_DEBUG_CACHE
@@ -166,58 +164,49 @@
 				callback(Response.FromCache(cachedItem.Data));
 
 				// check for updated tiles online if this is enabled in the settings
-				if (_autoRefreshCache)
+				if (cachedItem.ExpirationDate < DateTime.Now)
 				{
 					// check if tile on the web is newer than the one we already have locally
 					IAsyncRequestFactory.CreateRequest(
 						finalUrl,
-						(Response headerOnly) =>
+						timeout,
+						"If-None-Match", cachedItem.ETag,
+						(Response response) =>
 						{
 							// on error getting information from API just return. tile we have locally has already been returned above
-							if (headerOnly.HasError)
+							if (response.HasError || response.StatusCode == null)
 							{
 								return;
 							}
-
-							// TODO: remove Debug.Log before PR
-							//UnityEngine.Debug.LogFormat(
-							//	"{1}{0}cached:{2}{0}header:{3}"
-							//	, Environment.NewLine
-							//	, finalUrl
-							//	, cachedItem.ETag
-							//	, headerOnly.Headers["ETag"]
-							//);
 
 							// data from cache is the same as on the web:
 							//   * tile has already been returned above
 							//   * make sure all all other caches have it too, but don't force insert via cache.add(false)
 							// additional ETag empty check: for backwards compability with old caches
-							if (!string.IsNullOrEmpty(cachedItem.ETag) && cachedItem.ETag.Equals(headerOnly.Headers["ETag"]))
+							if (response.StatusCode == 304) // 304 NOT MODIFIED
 							{
-								foreach (var cache in _caches)
-								{
-									cache.Add(tilesetId, tileId, cachedItem, false);
-								}
+								cachedItem.ExpirationDate = response.GetExpirationDate();
 							}
-							else
+							else if (response.StatusCode == 200) // 200 OK, it means etag&data has changed so need to update cache
 							{
-								// TODO: remove Debug.Log before PR
-								UnityEngine.Debug.LogWarningFormat(
-										"updating cached tile {1} tilesetId:{2}{0}cached etag:{3}{0}remote etag:{4}{0}{5}"
-										, Environment.NewLine
-										, tileId
-										, tilesetId
-										, cachedItem.ETag
-										, headerOnly.Headers["ETag"]
-										, finalUrl
-									);
+								string eTag = response.GetETag();
 
-								// request updated tile and pass callback to return new data to subscribers
-								requestTileAndCache(finalUrl, tilesetId, tileId, timeout, callback);
+								// not all APIs populate 'Last-Modified' header
+								// don't log error if it's missing
+								DateTime expirationDate = response.GetExpirationDate();
+
+								cachedItem.Data = response.Data;
+								cachedItem.ETag = eTag;
+								cachedItem.ExpirationDate = expirationDate;
 							}
+
+							foreach (var cache in _caches)
+							{
+								cache.Add(tilesetId, tileId, cachedItem, true);
+							}
+
+							callback(Response.FromCache(cachedItem.Data));
 						}
-						, timeout
-						, HttpRequestType.Head
 					);
 				}
 
@@ -233,34 +222,18 @@
 			}
 		}
 
-
 		private IAsyncRequest requestTileAndCache(string url, string tilesetId, CanonicalTileId tileId, int timeout, Action<Response> callback)
 		{
 			return IAsyncRequestFactory.CreateRequest(
 				url,
-				(Response r) =>
+				(Response response) =>
 				{
 					// if the request was successful add tile to all caches
-					if (!r.HasError && null != r.Data)
+					if (!response.HasError && null != response.Data)
 					{
-						string eTag = string.Empty;
-						DateTime? lastModified = null;
+						string eTag = response.GetETag();
 
-						if (!r.Headers.ContainsKey("ETag"))
-						{
-							UnityEngine.Debug.LogWarningFormat("no 'ETag' header present in response for {0}", url);
-						}
-						else
-						{
-							eTag = r.Headers["ETag"];
-						}
-
-						// not all APIs populate 'Last-Modified' header
-						// don't log error if it's missing
-						if (r.Headers.ContainsKey("Last-Modified"))
-						{
-							lastModified = DateTime.ParseExact(r.Headers["Last-Modified"], "r", null);
-						}
+						DateTime expirationDate = response.GetExpirationDate();
 
 						// propagate to all caches forcing update
 						foreach (var cache in _caches)
@@ -270,27 +243,25 @@
 								, tileId
 								, new CacheItem()
 								{
-									Data = r.Data,
+									Data = response.Data,
 									ETag = eTag,
-									LastModified = lastModified
+									ExpirationDate = expirationDate
 								}
 								, true // force insert/update
 							);
 						}
 					}
+
 					if (null != callback)
 					{
-						r.IsUpdate = true;
-						callback(r);
+						response.IsUpdate = true;
+						callback(response);
 					}
 				}, timeout);
 		}
 
-
 		class MemoryCacheAsyncRequest : IAsyncRequest
 		{
-
-
 			public string RequestUrl { get; private set; }
 
 
@@ -302,14 +273,14 @@
 
 			public bool IsCompleted
 			{
-				get
-				{
-					return true;
-				}
+				get { return true; }
 			}
 
 
-			public HttpRequestType RequestType { get { return HttpRequestType.Get; } }
+			public HttpRequestType RequestType
+			{
+				get { return HttpRequestType.Get; }
+			}
 
 
 			public void Cancel()

@@ -21,6 +21,7 @@ namespace Mapbox.Unity
 	/// </summary>
 	public class MapboxAccess : IFileSource
 	{
+		public OfflineManager OfflineManager;
 		ITelemetryLibrary _telemetryLibrary;
 		CachingWebFileSource _fileSource;
 
@@ -167,10 +168,14 @@ namespace Mapbox.Unity
 
 		void ConfigureFileSource()
 		{
+			var sqliteCache = new SQLiteCache(_configuration.FileCacheSize);
+			OfflineManager = new OfflineManager(_configuration.AccessToken, _configuration.GetMapsSkuToken);
+			OfflineManager.SetOfflineCache(sqliteCache);
+
 			_fileSource = new CachingWebFileSource(_configuration.AccessToken, _configuration.GetMapsSkuToken, _configuration.AutoRefreshCache)
 				.AddCache(new MemoryCache(_configuration.MemoryCacheSize))
 #if !UNITY_WEBGL
-				.AddCache(new SQLiteCache(_configuration.FileCacheSize))
+				.AddCache(sqliteCache)
 #endif
 				;
 		}
@@ -233,7 +238,6 @@ namespace Mapbox.Unity
 		{
 			return _fileSource.Request(url, callback, _configuration.DefaultTimeout, tileId, tilesetId);
 		}
-
 
 		Geocoder _geocoder;
 		/// <summary>

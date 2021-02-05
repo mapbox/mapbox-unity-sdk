@@ -34,6 +34,22 @@ namespace Mapbox.Platform {
 #endif
 		}
 
-
+		public static IAsyncRequest CreateRequest(
+			string url
+			, int timeout
+			, string headerName
+			, string headerValue
+			, Action<Response> callback
+		) {
+#if !UNITY
+			if (Environment.ProcessorCount > 2) {
+				return new HTTPRequestThreaded(url, callback, timeout);
+			} else {
+				return new HTTPRequestNonThreaded(url, callback, timeout);
+			}
+#else
+			return new Mapbox.Unity.Utilities.HTTPRequest(url, callback, timeout, headerName, headerValue);
+#endif
+		}
 	}
 }
