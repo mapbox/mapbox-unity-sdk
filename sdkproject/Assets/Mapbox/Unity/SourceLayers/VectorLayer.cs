@@ -77,6 +77,7 @@ namespace Mapbox.Unity.Map
 
 		private void RedrawVectorLayer(object sender, System.EventArgs e)
 		{
+			Factory.SetOptions(_layerProperty);
 			NotifyUpdateLayer(_vectorTileFactory, sender as MapboxDataProperty, true);
 		}
 

@@ -33,7 +33,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		}
 
-		public virtual MeshData Taskable(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, float scaler)
+		public virtual MeshData RunMeshModifiers(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, float scaler)
 		{
 			return null;
 		}
@@ -44,6 +44,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		}
 
 		public virtual void RunLayer(Mapbox.Map.VectorTile.VectorLayerResult vectorTileLayer, UnityTile tile, GameObject parent = null, string type = "")
+		{
+
+		}
+
+		public virtual void RunGoModifiers(VectorEntity entity, UnityTile tile)
 		{
 
 		}

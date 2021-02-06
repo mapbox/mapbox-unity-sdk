@@ -19,9 +19,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 	public class VectorLayerVisualizerProperties
 	{
-		public FeatureProcessingStage featureProcessingStage;
 		public bool buildingsWithUniqueIds = false;
-		public Mapbox.Map.VectorTile.VectorLayerResult vectorTileLayer;
 		public ILayerFeatureFilterComparer[] layerFeatureFilters;
 		public ILayerFeatureFilterComparer layerFeatureFilterCombiner;
 	}
@@ -42,11 +40,12 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		}
 
 		private Dictionary<CanonicalTileId, List<Tuple<Task, CancellationTokenSource>>> _tasks = new Dictionary<CanonicalTileId, List<Tuple<Task, CancellationTokenSource>>>();
-
 		private ObjectPool<VectorEntity> _pool;
 		private ObjectPool<List<VectorEntity>> _listPool;
 		private Dictionary<UnityTile, List<VectorEntity>> _activeObjects;
+		private VectorLayerVisualizerProperties _tempLayerProperties;
 
+		//id tracking stuff, only necessary for unique id layers like `buildings with ids`
 		private HashSet<ulong> _activeIds;
 		private Dictionary<UnityTile, List<ulong>> _idPool; //necessary to keep _activeIds list up to date when unloading tiles
 
@@ -61,6 +60,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			base.Initialize();
 			_activeIds = new HashSet<ulong>();
 			_idPool = new Dictionary<UnityTile, List<ulong>>();
+			_tempLayerProperties = GetLayerTempProperties();
 
 			if (_defaultStack != null)
 			{
@@ -97,38 +97,10 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				_defaultStack.UnregisterTile(tile);
 			}
 
-			//ids = unique ids in some certain layers (building-id layer)
-			//removing ids from activeIds list so they'll be recreated next time tile loads (necessary when you're unloading/loading tiles)
-			if (_idPool.ContainsKey(tile))
-			{
-				foreach (var item in _idPool[tile])
-				{
-					_activeIds.Remove(item);
-				}
-				_idPool[tile].Clear();
-			}
+			ClearTasksOnUnregister(tile);
+			ClearIdsOnUnregister(tile);
 
-			if (_activeObjects.ContainsKey(tile))
-			{
-				var counter = _activeObjects[tile].Count;
-				for (int i = 0; i < counter; i++)
-				{
-					// foreach (var item in GoModifiers)
-					// {
-					// 	item.OnPoolItem(_activeObjects[tile][i]);
-					// }
-					if (null != _activeObjects[tile][i].GameObject)
-					{
-						_activeObjects[tile][i].GameObject.SetActive(false);
-					}
-					_pool.Put(_activeObjects[tile][i]);
-				}
-				_activeObjects[tile].Clear();
-
-				//pooling these lists as they'll reused anyway, saving hundreds of list instantiations
-				_listPool.Put(_activeObjects[tile]);
-				_activeObjects.Remove(tile);
-			}
+			ClearObjectOnUnregister(tile);
 		}
 
 		public override void Clear()
@@ -191,6 +163,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			DestroyImmediate(_defaultStack);
 		}
 
+		public override void Create(Mapbox.Map.VectorTile.VectorLayerResult layer, UnityTile tile, Action<UnityTile, LayerVisualizerBase> callback)
+		{
+			ProcessLayer(layer, tile, tile.UnwrappedTileId, callback);
+		}
+
 		private void ProcessLayer(Mapbox.Map.VectorTile.VectorLayerResult layer, UnityTile tile, UnwrappedTileId tileId, Action<UnityTile, LayerVisualizerBase> callback = null)
 		{
 			if (tile == null)
@@ -198,11 +175,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				return;
 			}
 
-			var tempLayerProperties = GetLayerTempProperties(layer);
-
-			#region PreProcess & Process.
-
-			var localTile = tile.CanonicalTileId;
+			var cachedTileId = tile.CanonicalTileId;
 
 			var source = new CancellationTokenSource();
 			var token = source.Token;
@@ -214,16 +187,19 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 				foreach (var feature in layer.Features)
 				{
-					if (IsFeatureInvalid(tile, feature, tempLayerProperties)) continue;
-
-					if (capturedToken.IsCancellationRequested)
-					{
-						return;
-					}
+					if (IsFeatureInvalid(tile, feature, _tempLayerProperties)) continue;
+					if (capturedToken.IsCancellationRequested) return;
 
 					var meshData = new MeshData();
-					meshData = _defaultStack.Taskable(tile, feature, meshData, tile.TileSize);
+					meshData = _defaultStack.RunMeshModifiers(tile, feature, meshData, tile.TileSize);
 					meshDataList.Add(new Tuple<VectorFeatureUnity, MeshData>(feature, meshData));
+				}
+
+				if (_sublayerProperties.coreOptions.combineMeshes)
+				{
+					var mergedData = CombineMeshData(meshDataList);
+					meshDataList.Clear();
+					meshDataList.Add(new Tuple<VectorFeatureUnity, MeshData>(null, mergedData));
 				}
 			}, token);
 
@@ -242,31 +218,23 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				}
 
 				//is there a better way to check this?
-				if (tile.CanonicalTileId == localTile && !tile.IsRecycled)
+				if (tile.CanonicalTileId == cachedTileId && !tile.IsRecycled)
 				{
 					foreach (var feature in meshDataList)
 					{
 						var entity = CreateObject(tile, feature.Item2, tile.gameObject, layer.Name);
 						entity.Feature = feature.Item1;
 #if UNITY_EDITOR
-						if (feature.Item1.Data != null)
+						if (feature.Item1 != null && feature.Item1.Data != null)
 							entity.GameObject.name = layer.Name + " - " + feature.Item1.Data.Id;
 #endif
 
-						// counter = GoModifiers.Count;
-						// for (int i = 0; i < counter; i++)
-						// {
-						// 	if (GoModifiers[i].Active)
-						// 	{
-						// 		GoModifiers[i].Run(tempVectorEntity, tile);
-						// 	}
-						// }
+						_defaultStack.RunGoModifiers(entity, tile);
+
 					}
 				}
 
 			}, TaskScheduler.FromCurrentSynchronizationContext());
-
-			#endregion
 
 			// #region PostProcess
 			// // TODO : Clean this up to follow the same pattern.
@@ -277,67 +245,67 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			// }
 			// #endregion
 
-			if (callback != null)
-				callback(tile, this);
+			callback?.Invoke(tile, this);
 		}
 
-		private bool IsFeatureInvalid(UnityTile tile, VectorFeatureUnity feature, VectorLayerVisualizerProperties tempLayerProperties)
+		private static MeshData CombineMeshData(List<Tuple<VectorFeatureUnity, MeshData>> meshDataList)
 		{
-			if (!IsFeatureEligibleAfterFiltering(feature, tile, tempLayerProperties))
-				return true;
-
-			//this part is necessary for unique id layers (buildings)
-			//it keeps track of processed ids and doesn't recreate them
-			if (ShouldSkipProcessingFeatureWithId(feature.Data.Id, tile, tempLayerProperties))
-				return true;
-			AddFeatureToTileObjectPool(feature, tile);
-
-			if (feature.Properties.ContainsKey("extrude") && !bool.Parse(feature.Properties["extrude"].ToString()))
-				return true;
-
-			if (feature.Points.Count < 1)
-				return true;
-			return false;
-		}
-
-		private VectorLayerVisualizerProperties GetLayerTempProperties(Mapbox.Map.VectorTile.VectorLayerResult layer)
-		{
-			VectorLayerVisualizerProperties tempLayerProperties = new VectorLayerVisualizerProperties();
-			tempLayerProperties.vectorTileLayer = layer;
-			tempLayerProperties.featureProcessingStage = FeatureProcessingStage.PreProcess;
-
-			//Get all filters in the array.
-			tempLayerProperties.layerFeatureFilters = _sublayerProperties.filterOptions.filters.Select(m => m.GetFilterComparer()).ToArray();
-
-			// Pass them to the combiner
-			tempLayerProperties.layerFeatureFilterCombiner = new Filters.LayerFilterComparer();
-			switch (_sublayerProperties.filterOptions.combinerType)
+			var mergedData = new MeshData();
+			var _counter = meshDataList.Count;
+			for (int i = 0; i < _counter; i++)
 			{
-				case Filters.LayerFilterCombinerOperationType.Any:
-					tempLayerProperties.layerFeatureFilterCombiner = Filters.LayerFilterComparer.AnyOf(tempLayerProperties.layerFeatureFilters);
-					break;
-				case Filters.LayerFilterCombinerOperationType.All:
-					tempLayerProperties.layerFeatureFilterCombiner = Filters.LayerFilterComparer.AllOf(tempLayerProperties.layerFeatureFilters);
-					break;
-				case Filters.LayerFilterCombinerOperationType.None:
-					tempLayerProperties.layerFeatureFilterCombiner = Filters.LayerFilterComparer.NoneOf(tempLayerProperties.layerFeatureFilters);
-					break;
-				default:
-					break;
+				var currentData = meshDataList[i].Item2;
+				if (currentData.Vertices.Count <= 3)
+					continue;
+
+				var st = mergedData.Vertices.Count;
+				mergedData.Vertices.AddRange(currentData.Vertices);
+				mergedData.Normals.AddRange(currentData.Normals);
+
+				var c2 = currentData.UV.Count;
+				for (int j = 0; j < c2; j++)
+				{
+					if (mergedData.UV.Count <= j)
+					{
+						mergedData.UV.Add(new List<Vector2>(currentData.UV[j].Count));
+					}
+				}
+
+				c2 = currentData.UV.Count;
+				for (int j = 0; j < c2; j++)
+				{
+					mergedData.UV[j].AddRange(currentData.UV[j]);
+				}
+
+				c2 = currentData.Triangles.Count;
+				for (int j = 0; j < c2; j++)
+				{
+					if (mergedData.Triangles.Count <= j)
+					{
+						mergedData.Triangles.Add(new List<int>(currentData.Triangles[j].Count));
+					}
+				}
+
+				for (int j = 0; j < c2; j++)
+				{
+					for (int k = 0; k < currentData.Triangles[j].Count; k++)
+					{
+						mergedData.Triangles[j].Add(currentData.Triangles[j][k] + st);
+					}
+				}
 			}
 
-			tempLayerProperties.buildingsWithUniqueIds = (_sublayerProperties.honorBuildingIdSetting) && _sublayerProperties.buildingsWithUniqueIds;
-			return tempLayerProperties;
+			return mergedData;
 		}
 
 		private VectorEntity CreateObject(UnityTile tile, MeshData meshData, GameObject parent, string type)
 		{
-			if (meshData.Vertices.Count != meshData.UV[0].Count ||
-			    meshData.Vertices.Count != meshData.Tangents.Count)
-			{
-				Debug.Log("data mismatch");
-				return null;
-			}
+			// if (meshData.Vertices.Count != meshData.UV[0].Count ||
+			//     meshData.Vertices.Count != meshData.Tangents.Count)
+			// {
+			// 	Debug.Log("data mismatch");
+			// 	return null;
+			// }
 
 			var tempVectorEntity = _pool.GetObject();
 
@@ -389,8 +357,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		protected override void UpdateVector(object sender, System.EventArgs eventArgs)
 		{
-			VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
-
+			var layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
 			layerUpdateArgs.visualizer = this;
 			layerUpdateArgs.effectsVectorLayer = true;
 
@@ -404,11 +371,117 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				layerUpdateArgs.property.PropertyHasChanged -= UpdateVector;
 			}
 			UnbindSubLayerEvents();
-
 			OnUpdateLayerVisualizer(layerUpdateArgs);
 		}
 
 		#region Private Helper Methods
+		private bool IsFeatureInvalid(UnityTile tile, VectorFeatureUnity feature, VectorLayerVisualizerProperties tempLayerProperties)
+		{
+			if (!IsFeatureEligibleAfterFiltering(feature, tempLayerProperties))
+				return true;
+
+			//this part is necessary for unique id layers (buildings)
+			//it keeps track of processed ids and doesn't recreate them
+			if (ShouldSkipProcessingFeatureWithId(feature.Data.Id, tempLayerProperties))
+				return true;
+
+			AddFeatureToTileObjectPool(feature, tile);
+
+			if (feature.Properties.ContainsKey("extrude") && !bool.Parse(feature.Properties["extrude"].ToString()))
+				return true;
+
+			if (feature.Points.Count < 1)
+				return true;
+
+			return false;
+		}
+
+		private VectorLayerVisualizerProperties GetLayerTempProperties()
+		{
+			var tempLayerProperties = new VectorLayerVisualizerProperties
+			{
+				buildingsWithUniqueIds = _sublayerProperties.buildingsWithUniqueIds,
+				layerFeatureFilters = _sublayerProperties.filterOptions.filters.Select(m => m.GetFilterComparer()).ToArray(),
+				layerFeatureFilterCombiner = new LayerFilterComparer()
+			};
+
+			//Get all filters in the array.
+
+			// Pass them to the combiner
+			switch (_sublayerProperties.filterOptions.combinerType)
+			{
+				case Filters.LayerFilterCombinerOperationType.Any:
+					tempLayerProperties.layerFeatureFilterCombiner = LayerFilterComparer.AnyOf(tempLayerProperties.layerFeatureFilters);
+					break;
+				case Filters.LayerFilterCombinerOperationType.All:
+					tempLayerProperties.layerFeatureFilterCombiner = LayerFilterComparer.AllOf(tempLayerProperties.layerFeatureFilters);
+					break;
+				case Filters.LayerFilterCombinerOperationType.None:
+					tempLayerProperties.layerFeatureFilterCombiner = LayerFilterComparer.NoneOf(tempLayerProperties.layerFeatureFilters);
+					break;
+				default:
+					break;
+			}
+
+			tempLayerProperties.buildingsWithUniqueIds = (_sublayerProperties.honorBuildingIdSetting) && _sublayerProperties.buildingsWithUniqueIds;
+			return tempLayerProperties;
+		}
+
+		private void ClearObjectOnUnregister(UnityTile tile)
+		{
+			if (_activeObjects.ContainsKey(tile))
+			{
+				var counter = _activeObjects[tile].Count;
+				for (int i = 0; i < counter; i++)
+				{
+					// foreach (var item in GoModifiers)
+					// {
+					// 	item.OnPoolItem(_activeObjects[tile][i]);
+					// }
+					if (null != _activeObjects[tile][i].GameObject)
+					{
+						_activeObjects[tile][i].GameObject.SetActive(false);
+					}
+
+					_pool.Put(_activeObjects[tile][i]);
+				}
+
+				_activeObjects[tile].Clear();
+
+				//pooling these lists as they'll reused anyway, saving hundreds of list instantiations
+				_listPool.Put(_activeObjects[tile]);
+				_activeObjects.Remove(tile);
+			}
+		}
+
+		private void ClearIdsOnUnregister(UnityTile tile)
+		{
+			//ids = unique ids in some certain layers (building-id layer)
+			//removing ids from activeIds list so they'll be recreated next time tile loads (necessary when you're unloading/loading tiles)
+			if (_idPool.ContainsKey(tile))
+			{
+				foreach (var item in _idPool[tile])
+				{
+					_activeIds.Remove(item);
+				}
+
+				_idPool[tile].Clear();
+			}
+		}
+
+		private void ClearTasksOnUnregister(UnityTile tile)
+		{
+			if (_tasks.ContainsKey(tile.CanonicalTileId))
+			{
+				foreach (var tuple in _tasks[tile.CanonicalTileId])
+				{
+					tuple.Item2.Cancel();
+				}
+
+				_tasks.Remove(tile.CanonicalTileId);
+			}
+		}
+
 		/// <summary>
 		/// Convenience function to add feature to Tile object pool.
 		/// </summary>
@@ -432,7 +505,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		/// </summary>
 		/// <returns><c>true</c>, if feature eligible after filtering was applied, <c>false</c> otherwise.</returns>
 		/// <param name="feature">Feature.</param>
-		private bool IsFeatureEligibleAfterFiltering(VectorFeatureUnity feature, UnityTile tile, VectorLayerVisualizerProperties layerProperties)
+		private bool IsFeatureEligibleAfterFiltering(VectorFeatureUnity feature, VectorLayerVisualizerProperties layerProperties)
 		{
 			if (layerProperties.layerFeatureFilters.Count() == 0)
 			{
@@ -454,7 +527,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		/// </summary>
 		/// <returns><c>true</c>, if feature is already in activeId pool or if the layer has buildingsWithUniqueId flag set to <see langword="true"/>, <c>false</c> otherwise.</returns>
 		/// <param name="featureId">Feature identifier.</param>
-		private bool ShouldSkipProcessingFeatureWithId(ulong featureId, UnityTile tile, VectorLayerVisualizerProperties layerProperties)
+		private bool ShouldSkipProcessingFeatureWithId(ulong featureId, VectorLayerVisualizerProperties layerProperties)
 		{
 			return (layerProperties.buildingsWithUniqueIds && _activeIds.Contains(featureId));
 		}
@@ -468,16 +541,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		}
 
 		#endregion
-
-		//only used by poi stuff, to be removed
-		public override void Create(Mapbox.Map.VectorTile.VectorLayerResult layer, UnityTile tile, Action<UnityTile, LayerVisualizerBase> callback)
-		{
-			// if (!_activeCoroutines.ContainsKey(tile))
-			// 	_activeCoroutines.Add(tile, new List<int>());
-			// _activeCoroutines[tile].Add(Runnable.Run(ProcessLayer(layer, tile, tile.UnwrappedTileId, callback)));
-			ProcessLayer(layer, tile, tile.UnwrappedTileId, callback);
-		}
-
 		//used for pois or something, to be removed
 		protected void Build(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
 		{

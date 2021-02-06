@@ -44,16 +44,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	{
 		[SerializeField] public PositionTargetType moveFeaturePositionTo;
 
-
-
-
-		private Dictionary<CanonicalTileId, List<Tuple<Task, CancellationTokenSource>>> _tasks = new Dictionary<CanonicalTileId, List<Tuple<Task, CancellationTokenSource>>>();
-
-		protected virtual void OnEnable()
-		{
-			
-		}
-
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -71,25 +61,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
-		public override void RunLayer(Mapbox.Map.VectorTile.VectorLayerResult vectorTileLayer, UnityTile tt, GameObject parent, string type = "")
-		{
-
-		}
-
-		public override void OnUnregisterTile(UnityTile tile)
-		{
-			if (_tasks.ContainsKey(tile.CanonicalTileId))
-			{
-				foreach (var tuple in _tasks[tile.CanonicalTileId])
-				{
-					tuple.Item2.Cancel();
-				}
-
-				_tasks.Remove(tile.CanonicalTileId);
-			}
-		}
-
-		public override MeshData Taskable(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, float scaler)
+		public override MeshData RunMeshModifiers(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, float scaler)
 		{
 			// var tempPoint = Constants.Math.Vector3Zero;
 			// var counter = feature.Points.Count;
@@ -140,13 +112,25 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				{
 					if (MeshModifiers[i] is ICoreWrapper)
 					{
-						(MeshModifiers[i] as ICoreWrapper).GetAsycCore(scaler).Run(feature, meshData, tile);
+						(MeshModifiers[i] as ICoreWrapper).GetAsycCore().Run(feature, meshData, tile);
 					}
 					//MeshModifiers[i].Run(feature, meshData, tile);
 				}
 			}
 
 			return meshData;
+		}
+
+		public override void RunGoModifiers(VectorEntity entity, UnityTile tile)
+		{
+			var counter = GoModifiers.Count;
+			for (int i = 0; i < counter; i++)
+			{
+				if (GoModifiers[i].Active)
+				{
+					GoModifiers[i].Run(entity, tile);
+				}
+			}
 		}
 
 		public override void Clear()
