@@ -29,9 +29,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	//[CreateAssetMenu(menuName = "Mapbox/Factories/Vector Tile Factory")]
 	public class VectorTileFactory : AbstractTileFactory
 	{
-		#region Private/Protected Fields
 		private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;
 		private VectorLayerProperties _properties;
+		public VectorLayerProperties Properties => _properties;
 		private Dictionary<UnityTile, HashSet<LayerVisualizerBase>> _layerProgress;
 		protected VectorDataFetcher DataFetcher;
 		public int QueuedRequestCount => DataFetcher.QueuedRequestCount;
@@ -67,19 +67,25 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		public VectorLayerProperties Properties
+		public VectorTileFactory(IFileSource fileSource, VectorLayerProperties properties) : base(fileSource)
 		{
-			get
-			{
-				return _properties;
-			}
+			_properties = properties;
+			_layerProgress = new Dictionary<UnityTile, HashSet<LayerVisualizerBase>>();
+			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
+
+			_fetcher = new VectorDataFetcher(fileSource);
+			_fetcher.DataReceived += OnVectorDataRecieved;
+			_fetcher.FetchingError += OnDataError;
+
+			CreatePOILayerVisualizers();
+
+			CreateLayerVisualizers();
 		}
-		#endregion
 
 		#region Public Methods
 		public void RedrawSubLayer(UnityTile tile, LayerVisualizerBase visualizer)
 		{
-			//CreateFeatureWithBuilder(tile, visualizer.SubLayerProperties.coreOptions.layerName, visualizer);
+			CreateFeatureWithBuilder(tile, tile.VectorData.VectorResults.Layers[visualizer.SubLayerProperties.coreOptions.layerName], visualizer);
 		}
 
 		public void UnregisterLayer(UnityTile tile, LayerVisualizerBase visualizer)
@@ -100,97 +106,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		}
 		#endregion
 
-		#region Public Layer Operation Api Methods for
-		public virtual LayerVisualizerBase AddVectorLayerVisualizer(VectorSubLayerProperties subLayer)
-		{
-			//if its of type prefabitemoptions then separate the visualizer type
-			LayerVisualizerBase visualizer = ScriptableObject.CreateInstance<VectorLayerVisualizer>();
-
-			//TODO : FIX THIS !!
-			visualizer.LayerVisualizerHasChanged += UpdateTileFactory;
-
-			// Set honorBuildingSettings - need to set here in addition to the UI.
-			// Not setting it here can lead to wrong filtering.
-
-			bool isPrimitiveTypeValidForBuidingIds = (subLayer.coreOptions.geometryType == VectorPrimitiveType.Polygon) || (subLayer.coreOptions.geometryType == VectorPrimitiveType.Custom);
-			bool isSourceValidForBuildingIds = _properties.sourceType != VectorSourceType.MapboxStreets;
-
-			subLayer.honorBuildingIdSetting = isPrimitiveTypeValidForBuidingIds && isSourceValidForBuildingIds;
-			// Setup visualizer.
-			((VectorLayerVisualizer)visualizer).SetProperties(subLayer);
-
-			visualizer.Initialize();
-			if (visualizer == null)
-			{
-				return visualizer;
-			}
-
-			if (_layerBuilder.ContainsKey(visualizer.Key))
-			{
-				_layerBuilder[visualizer.Key].Add(visualizer);
-			}
-			else
-			{
-				_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase> { visualizer });
-			}
-			return visualizer;
-		}
-
-		public virtual LayerVisualizerBase AddPOIVectorLayerVisualizer(PrefabItemOptions poiSubLayer)
-		{
-			LayerVisualizerBase visualizer = ScriptableObject.CreateInstance<LocationPrefabsLayerVisualizer>();
-			poiSubLayer.performanceOptions = _properties.performanceOptions;
-			((LocationPrefabsLayerVisualizer)visualizer).SetProperties((PrefabItemOptions)poiSubLayer);
-
-			visualizer.LayerVisualizerHasChanged += UpdateTileFactory;
-
-			visualizer.Initialize();
-			if (visualizer == null)
-			{
-				return null;
-			}
-
-			if (_layerBuilder.ContainsKey(visualizer.Key))
-			{
-				_layerBuilder[visualizer.Key].Add(visualizer);
-			}
-			else
-			{
-				_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase>() { visualizer });
-			}
-
-			return visualizer;
-		}
-
-		public virtual LayerVisualizerBase FindVectorLayerVisualizer(VectorSubLayerProperties subLayer)
-		{
-			if (_layerBuilder.ContainsKey(subLayer.Key))
-			{
-				var visualizer = _layerBuilder[subLayer.Key].Find((obj) => obj.SubLayerProperties == subLayer);
-				return visualizer;
-			}
-			return null;
-		}
-
-		public virtual void RemoveVectorLayerVisualizer(LayerVisualizerBase subLayer)
-		{
-			subLayer.Clear();
-			if (_layerBuilder.ContainsKey(subLayer.Key))
-			{
-				if (Properties.vectorSubLayers.Contains(subLayer.SubLayerProperties))
-				{
-					Properties.vectorSubLayers.Remove(subLayer.SubLayerProperties);
-				}
-				else if (subLayer.SubLayerProperties is PrefabItemOptions && Properties.locationPrefabList.Contains(subLayer.SubLayerProperties as PrefabItemOptions))
-				{
-					Properties.locationPrefabList.Remove(subLayer.SubLayerProperties as PrefabItemOptions);
-				}
-				subLayer.LayerVisualizerHasChanged -= UpdateTileFactory;
-				subLayer.UnbindSubLayerEvents();
-				_layerBuilder[subLayer.Key].Remove(subLayer);
-			}
-		}
-		#endregion
 
 		#region AbstractFactoryOverrides
 		protected override void OnRegistered(UnityTile tile)
@@ -200,20 +115,30 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				return;
 			}
 			_tilesWaitingResponse.Add(tile);
-			VectorDataFetcherParameters parameters = new VectorDataFetcherParameters()
+
+			var dataTile = CreateTile(tile.CanonicalTileId, TilesetId);
+			if (tile != null)
 			{
-				canonicalTileId = tile.CanonicalTileId,
-				tilesetId = TilesetId,
-				tile = tile,
-				useOptimizedStyle = _properties.useOptimizedStyle,
-				style = _properties.optimizedStyle
-			};
-			DataFetcher.FetchData(parameters);
+				tile.AddTile(dataTile);
+			}
+
+			_fetcher.FetchData(dataTile, TilesetId, tile.CanonicalTileId, tile);
+		}
+
+		private Mapbox.Map.VectorTile CreateTile(CanonicalTileId canonicalTileId, string tilesetId)
+		{
+			var vectorTile = (_properties.useOptimizedStyle)
+				? new Mapbox.Map.VectorTile(canonicalTileId, tilesetId, _properties.optimizedStyle.Id, _properties.optimizedStyle.Modified)
+				: new Mapbox.Map.VectorTile(canonicalTileId, tilesetId);
+#if UNITY_EDITOR
+			vectorTile.IsMapboxTile = true;
+#endif
+			return vectorTile;
 		}
 
 		protected override void OnUnregistered(UnityTile tile)
 		{
-			DataFetcher.CancelFetching(tile.UnwrappedTileId, TilesetId);
+			_fetcher.CancelFetching(tile.UnwrappedTileId, TilesetId);
 			if (_layerProgress != null && _layerProgress.ContainsKey(tile))
 			{
 				_layerProgress.Remove(tile);
@@ -238,7 +163,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		public override void Clear()
 		{
-			//DestroyImmediate(DataFetcher);
 			if (_layerBuilder != null)
 			{
 				foreach (var layerList in _layerBuilder.Values)
@@ -282,28 +206,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		protected override void UpdateTileFactory(object sender, EventArgs args)
 		{
-			VectorLayerUpdateArgs layerUpdateArgs = args as VectorLayerUpdateArgs;
+			var layerUpdateArgs = args as VectorLayerUpdateArgs;
 			layerUpdateArgs.factory = this;
 			base.UpdateTileFactory(sender, layerUpdateArgs);
-		}
-
-		/// <summary>
-		/// Method to be called when a tile error has occurred.
-		/// </summary>
-		/// <param name="e"><see cref="T:Mapbox.Map.TileErrorEventArgs"/> instance/</param>
-		protected override void OnErrorOccurred(UnityTile tile, TileErrorEventArgs e)
-		{
-			base.OnErrorOccurred(tile, e);
-		}
-
-		protected override void OnPostProcess(UnityTile tile)
-		{
-
-		}
-
-		public override void UnbindEvents()
-		{
-			base.UnbindEvents();
 		}
 
 		protected override void OnUnbindEvents()
@@ -396,21 +301,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 
 			builderList.Clear();
-			//emptylayer for visualizers that don't depend on outside data sources
-			// string emptyLayer = "";
-			// if (_layerBuilder.ContainsKey(emptyLayer))
-			// {
-			// 	//two loops; first one to add it to waiting/tracking list, second to start it
-			// 	foreach (var builder in _layerBuilder[emptyLayer])
-			// 	{
-			// 		builderList.Add(builder);
-			// 		TrackFeatureWithBuilder(tile, emptyLayer, builder);
-			// 	}
-			// }
-			// for (int i = 0; i < builderList.Count; i++)
-			// {
-			// 	CreateFeatureWithBuilder(tile, emptyLayer, builderList[i]);
-			// }
 		}
 
 		private void TrackFeatureWithBuilder(UnityTile tile, Mapbox.Map.VectorTile.VectorLayerResult layerName, LayerVisualizerBase builder)
@@ -450,12 +340,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 				if (layer != null)
 				{
-					builder.Create(layer, tile, DecreaseProgressCounter);
+					builder.Create(layer, tile, LayerFinishedCallback);
 				}
 			}
 		}
 
-		private void DecreaseProgressCounter(UnityTile tile, LayerVisualizerBase builder)
+		private void LayerFinishedCallback(UnityTile tile, LayerVisualizerBase builder)
 		{
 			if (_layerProgress.ContainsKey(tile))
 			{
@@ -499,6 +389,99 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				}
 			}
 			_layerBuilder.Clear();
+		}
+		#endregion
+
+
+		#region Public Layer Operation Api Methods for
+		public virtual LayerVisualizerBase AddVectorLayerVisualizer(VectorSubLayerProperties subLayer)
+		{
+			//if its of type prefabitemoptions then separate the visualizer type
+			LayerVisualizerBase visualizer = ScriptableObject.CreateInstance<VectorLayerVisualizer>();
+
+			//TODO : FIX THIS !!
+			visualizer.LayerVisualizerHasChanged += UpdateTileFactory;
+
+			// Set honorBuildingSettings - need to set here in addition to the UI.
+			// Not setting it here can lead to wrong filtering.
+
+			bool isPrimitiveTypeValidForBuidingIds = (subLayer.coreOptions.geometryType == VectorPrimitiveType.Polygon) || (subLayer.coreOptions.geometryType == VectorPrimitiveType.Custom);
+			bool isSourceValidForBuildingIds = _properties.sourceType != VectorSourceType.MapboxStreets;
+
+			subLayer.honorBuildingIdSetting = isPrimitiveTypeValidForBuidingIds && isSourceValidForBuildingIds;
+			// Setup visualizer.
+			((VectorLayerVisualizer)visualizer).SetProperties(subLayer);
+
+			visualizer.Initialize();
+			if (visualizer == null)
+			{
+				return visualizer;
+			}
+
+			if (_layerBuilder.ContainsKey(visualizer.Key))
+			{
+				_layerBuilder[visualizer.Key].Add(visualizer);
+			}
+			else
+			{
+				_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase> { visualizer });
+			}
+			return visualizer;
+		}
+
+		public virtual LayerVisualizerBase AddPOIVectorLayerVisualizer(PrefabItemOptions poiSubLayer)
+		{
+			LayerVisualizerBase visualizer = ScriptableObject.CreateInstance<LocationPrefabsLayerVisualizer>();
+			poiSubLayer.performanceOptions = _properties.performanceOptions;
+			((LocationPrefabsLayerVisualizer)visualizer).SetProperties((PrefabItemOptions)poiSubLayer);
+
+			visualizer.LayerVisualizerHasChanged += UpdateTileFactory;
+
+			visualizer.Initialize();
+			if (visualizer == null)
+			{
+				return null;
+			}
+
+			if (_layerBuilder.ContainsKey(visualizer.Key))
+			{
+				_layerBuilder[visualizer.Key].Add(visualizer);
+			}
+			else
+			{
+				_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase>() { visualizer });
+			}
+
+			return visualizer;
+		}
+
+		public virtual LayerVisualizerBase FindVectorLayerVisualizer(VectorSubLayerProperties subLayer)
+		{
+			if (_layerBuilder.ContainsKey(subLayer.Key))
+			{
+				var visualizer = _layerBuilder[subLayer.Key].Find((obj) => obj.SubLayerProperties == subLayer);
+				return visualizer;
+			}
+			return null;
+		}
+
+		public virtual void RemoveVectorLayerVisualizer(LayerVisualizerBase subLayer)
+		{
+			subLayer.Clear();
+			if (_layerBuilder.ContainsKey(subLayer.Key))
+			{
+				if (Properties.vectorSubLayers.Contains(subLayer.SubLayerProperties))
+				{
+					Properties.vectorSubLayers.Remove(subLayer.SubLayerProperties);
+				}
+				else if (subLayer.SubLayerProperties is PrefabItemOptions && Properties.locationPrefabList.Contains(subLayer.SubLayerProperties as PrefabItemOptions))
+				{
+					Properties.locationPrefabList.Remove(subLayer.SubLayerProperties as PrefabItemOptions);
+				}
+				subLayer.LayerVisualizerHasChanged -= UpdateTileFactory;
+				subLayer.UnbindSubLayerEvents();
+				_layerBuilder[subLayer.Key].Remove(subLayer);
+			}
 		}
 		#endregion
 

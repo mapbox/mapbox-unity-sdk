@@ -665,11 +665,6 @@ public class DataFetcherTabDebugView
 
 public class DebuggerDataFetcherWrapper : DataFetcher
 {
-	public override void FetchData(DataFetcherParameters parameters)
-	{
-
-	}
-
 	public Queue<int> GetTileOrderQueue()
 	{
 		return _tileOrder;

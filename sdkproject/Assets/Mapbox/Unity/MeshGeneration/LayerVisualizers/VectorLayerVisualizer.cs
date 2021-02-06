@@ -1,4 +1,5 @@
-using Mapbox.Unity.DataContainers;
+using System.Threading;
+using System.Threading.Tasks;
 using Mapbox.VectorTile.Geometry;
 
 namespace Mapbox.Unity.MeshGeneration.Interfaces
@@ -28,85 +29,365 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 	public class VectorLayerVisualizer : LayerVisualizerBase
 	{
-		VectorSubLayerProperties _layerProperties;
 		public override VectorSubLayerProperties SubLayerProperties
 		{
 			get
 			{
-				return _layerProperties;
+				return _sublayerProperties;
 			}
 			set
 			{
-				_layerProperties = value;
+				_sublayerProperties = value;
 			}
 		}
 
-		public ModifierStackBase DefaultModifierStack
-		{
-			get
-			{
-				return _defaultStack;
-			}
-			set
-			{
-				_defaultStack = value;
-			}
-		}
+		private Dictionary<CanonicalTileId, List<Tuple<Task, CancellationTokenSource>>> _tasks = new Dictionary<CanonicalTileId, List<Tuple<Task, CancellationTokenSource>>>();
 
-		protected LayerPerformanceOptions _performanceOptions;
-		protected Dictionary<UnityTile, List<int>> _activeCoroutines;
-		int _entityInCurrentCoroutine = 0;
+		private ObjectPool<VectorEntity> _pool;
+		private ObjectPool<List<VectorEntity>> _listPool;
+		private Dictionary<UnityTile, List<VectorEntity>> _activeObjects;
 
-		protected ModifierStackBase _defaultStack;
 		private HashSet<ulong> _activeIds;
 		private Dictionary<UnityTile, List<ulong>> _idPool; //necessary to keep _activeIds list up to date when unloading tiles
-		private string _key;
-
-		protected HashSet<ModifierBase> _coreModifiers = new HashSet<ModifierBase>();
 
 		public override string Key
 		{
-			get { return _layerProperties.coreOptions.layerName; }
-			set { _layerProperties.coreOptions.layerName = value; }
+			get { return _sublayerProperties.coreOptions.layerName; }
+			set { _sublayerProperties.coreOptions.layerName = value; }
 		}
 
-		public T FindMeshModifier<T>() where T : MeshModifier
+		public override void Initialize()
 		{
-			MeshModifier mod = _defaultStack.MeshModifiers.FirstOrDefault(x => x.GetType() == typeof(T));
-			return (T)mod;
-		}
+			base.Initialize();
+			_activeIds = new HashSet<ulong>();
+			_idPool = new Dictionary<UnityTile, List<ulong>>();
 
-		public T FindGameObjectModifier<T>() where T : GameObjectModifier
-		{
-			GameObjectModifier mod = _defaultStack.GoModifiers.FirstOrDefault(x => x.GetType() == typeof(T));
-			return (T)mod;
-		}
-
-		public T AddOrCreateMeshModifier<T>() where T : MeshModifier
-		{
-			MeshModifier mod = _defaultStack.MeshModifiers.FirstOrDefault(x => x.GetType() == typeof(T));
-			if (mod == null)
+			if (_defaultStack != null)
 			{
-				mod = (MeshModifier)CreateInstance(typeof(T));
-				_coreModifiers.Add(mod);
-				_defaultStack.MeshModifiers.Add(mod);
+				_defaultStack.Initialize();
 			}
-			return (T)mod;
-		}
 
-		public T AddOrCreateGameObjectModifier<T>() where T : GameObjectModifier
-		{
-			GameObjectModifier mod = _defaultStack.GoModifiers.FirstOrDefault(x => x.GetType() == typeof(T));
-			if (mod == null)
+			_pool = new ObjectPool<VectorEntity>(() =>
 			{
-				mod = (GameObjectModifier)CreateInstance(typeof(T));
-				_coreModifiers.Add(mod);
-				_defaultStack.GoModifiers.Add(mod);
-			}
-			return (T)mod;
+				var go = new GameObject();
+				var mf = go.AddComponent<MeshFilter>();
+				mf.sharedMesh = new Mesh();
+				mf.sharedMesh.name = "feature";
+				var mr = go.AddComponent<MeshRenderer>();
+				var tempVectorEntity = new VectorEntity()
+				{
+					GameObject = go,
+					Transform = go.transform,
+					MeshFilter = mf,
+					MeshRenderer = mr,
+					Mesh = mf.sharedMesh
+				};
+				return tempVectorEntity;
+			});
+			_activeObjects = new Dictionary<UnityTile, List<VectorEntity>>();
+			_listPool = new ObjectPool<List<VectorEntity>>(() => { return new List<VectorEntity>(); });
 		}
 
-		private void UpdateVector(object sender, System.EventArgs eventArgs)
+		public override void OnUnregisterTile(UnityTile tile)
+		{
+			base.OnUnregisterTile(tile);
+
+			if (_defaultStack != null)
+			{
+				_defaultStack.UnregisterTile(tile);
+			}
+
+			//ids = unique ids in some certain layers (building-id layer)
+			//removing ids from activeIds list so they'll be recreated next time tile loads (necessary when you're unloading/loading tiles)
+			if (_idPool.ContainsKey(tile))
+			{
+				foreach (var item in _idPool[tile])
+				{
+					_activeIds.Remove(item);
+				}
+				_idPool[tile].Clear();
+			}
+
+			if (_activeObjects.ContainsKey(tile))
+			{
+				var counter = _activeObjects[tile].Count;
+				for (int i = 0; i < counter; i++)
+				{
+					// foreach (var item in GoModifiers)
+					// {
+					// 	item.OnPoolItem(_activeObjects[tile][i]);
+					// }
+					if (null != _activeObjects[tile][i].GameObject)
+					{
+						_activeObjects[tile][i].GameObject.SetActive(false);
+					}
+					_pool.Put(_activeObjects[tile][i]);
+				}
+				_activeObjects[tile].Clear();
+
+				//pooling these lists as they'll reused anyway, saving hundreds of list instantiations
+				_listPool.Put(_activeObjects[tile]);
+				_activeObjects.Remove(tile);
+			}
+		}
+
+		public override void Clear()
+		{
+			_idPool.Clear();
+			_defaultStack.Clear();
+
+			foreach (var mod in _defaultStack.MeshModifiers)
+			{
+				if (mod == null)
+				{
+					continue;
+				}
+
+				if (_coreModifiers.Contains(mod))
+				{
+					DestroyImmediate(mod);
+				}
+			}
+
+			foreach (var mod in _defaultStack.GoModifiers)
+			{
+				if (mod == null)
+				{
+					continue;
+				}
+
+				mod.Clear();
+				if (_coreModifiers.Contains(mod))
+				{
+					DestroyImmediate(mod);
+				}
+			}
+
+			foreach (var vectorEntity in _pool.GetQueue())
+			{
+				if (vectorEntity.Mesh != null)
+				{
+					vectorEntity.Mesh.Destroy(true);
+				}
+
+				vectorEntity.GameObject.Destroy();
+			}
+
+			foreach (var tileTuple in _activeObjects)
+			{
+				foreach (var vectorEntity in tileTuple.Value)
+				{
+					if (vectorEntity.Mesh != null)
+					{
+						vectorEntity.Mesh.Destroy(true);
+					}
+					vectorEntity.GameObject.Destroy();
+				}
+			}
+			_pool.Clear();
+			_activeObjects.Clear();
+			_pool.Clear();
+
+			DestroyImmediate(_defaultStack);
+		}
+
+		private void ProcessLayer(Mapbox.Map.VectorTile.VectorLayerResult layer, UnityTile tile, UnwrappedTileId tileId, Action<UnityTile, LayerVisualizerBase> callback = null)
+		{
+			if (tile == null)
+			{
+				return;
+			}
+
+			var tempLayerProperties = GetLayerTempProperties(layer);
+
+			#region PreProcess & Process.
+
+			var localTile = tile.CanonicalTileId;
+
+			var source = new CancellationTokenSource();
+			var token = source.Token;
+			var meshDataList = new List<Tuple<VectorFeatureUnity, MeshData>>();
+
+			var task = Task.Run(() =>
+			{
+				var capturedToken = token;
+
+				foreach (var feature in layer.Features)
+				{
+					if (IsFeatureInvalid(tile, feature, tempLayerProperties)) continue;
+
+					if (capturedToken.IsCancellationRequested)
+					{
+						return;
+					}
+
+					var meshData = new MeshData();
+					meshData = _defaultStack.Taskable(tile, feature, meshData, tile.TileSize);
+					meshDataList.Add(new Tuple<VectorFeatureUnity, MeshData>(feature, meshData));
+				}
+			}, token);
+
+			if (!_tasks.ContainsKey(tile.CanonicalTileId))
+			{
+				_tasks.Add(tile.CanonicalTileId, new List<Tuple<Task, CancellationTokenSource>>());
+			}
+			_tasks[tile.CanonicalTileId].Add(new Tuple<Task, CancellationTokenSource>(task, source));
+
+			task.ContinueWith((t) =>
+			{
+				if (t.IsCanceled)
+				{
+					meshDataList.Clear();
+					return;
+				}
+
+				//is there a better way to check this?
+				if (tile.CanonicalTileId == localTile && !tile.IsRecycled)
+				{
+					foreach (var feature in meshDataList)
+					{
+						var entity = CreateObject(tile, feature.Item2, tile.gameObject, layer.Name);
+						entity.Feature = feature.Item1;
+#if UNITY_EDITOR
+						if (feature.Item1.Data != null)
+							entity.GameObject.name = layer.Name + " - " + feature.Item1.Data.Id;
+#endif
+
+						// counter = GoModifiers.Count;
+						// for (int i = 0; i < counter; i++)
+						// {
+						// 	if (GoModifiers[i].Active)
+						// 	{
+						// 		GoModifiers[i].Run(tempVectorEntity, tile);
+						// 	}
+						// }
+					}
+				}
+
+			}, TaskScheduler.FromCurrentSynchronizationContext());
+
+			#endregion
+
+			// #region PostProcess
+			// // TODO : Clean this up to follow the same pattern.
+			// var mergedStack = _defaultStack as MergedModifierStack;
+			// if (mergedStack != null && tile != null)
+			// {
+			// 	mergedStack.End(tile, tile.gameObject, layer.Name);
+			// }
+			// #endregion
+
+			if (callback != null)
+				callback(tile, this);
+		}
+
+		private bool IsFeatureInvalid(UnityTile tile, VectorFeatureUnity feature, VectorLayerVisualizerProperties tempLayerProperties)
+		{
+			if (!IsFeatureEligibleAfterFiltering(feature, tile, tempLayerProperties))
+				return true;
+
+			//this part is necessary for unique id layers (buildings)
+			//it keeps track of processed ids and doesn't recreate them
+			if (ShouldSkipProcessingFeatureWithId(feature.Data.Id, tile, tempLayerProperties))
+				return true;
+			AddFeatureToTileObjectPool(feature, tile);
+
+			if (feature.Properties.ContainsKey("extrude") && !bool.Parse(feature.Properties["extrude"].ToString()))
+				return true;
+
+			if (feature.Points.Count < 1)
+				return true;
+			return false;
+		}
+
+		private VectorLayerVisualizerProperties GetLayerTempProperties(Mapbox.Map.VectorTile.VectorLayerResult layer)
+		{
+			VectorLayerVisualizerProperties tempLayerProperties = new VectorLayerVisualizerProperties();
+			tempLayerProperties.vectorTileLayer = layer;
+			tempLayerProperties.featureProcessingStage = FeatureProcessingStage.PreProcess;
+
+			//Get all filters in the array.
+			tempLayerProperties.layerFeatureFilters = _sublayerProperties.filterOptions.filters.Select(m => m.GetFilterComparer()).ToArray();
+
+			// Pass them to the combiner
+			tempLayerProperties.layerFeatureFilterCombiner = new Filters.LayerFilterComparer();
+			switch (_sublayerProperties.filterOptions.combinerType)
+			{
+				case Filters.LayerFilterCombinerOperationType.Any:
+					tempLayerProperties.layerFeatureFilterCombiner = Filters.LayerFilterComparer.AnyOf(tempLayerProperties.layerFeatureFilters);
+					break;
+				case Filters.LayerFilterCombinerOperationType.All:
+					tempLayerProperties.layerFeatureFilterCombiner = Filters.LayerFilterComparer.AllOf(tempLayerProperties.layerFeatureFilters);
+					break;
+				case Filters.LayerFilterCombinerOperationType.None:
+					tempLayerProperties.layerFeatureFilterCombiner = Filters.LayerFilterComparer.NoneOf(tempLayerProperties.layerFeatureFilters);
+					break;
+				default:
+					break;
+			}
+
+			tempLayerProperties.buildingsWithUniqueIds = (_sublayerProperties.honorBuildingIdSetting) && _sublayerProperties.buildingsWithUniqueIds;
+			return tempLayerProperties;
+		}
+
+		private VectorEntity CreateObject(UnityTile tile, MeshData meshData, GameObject parent, string type)
+		{
+			if (meshData.Vertices.Count != meshData.UV[0].Count ||
+			    meshData.Vertices.Count != meshData.Tangents.Count)
+			{
+				Debug.Log("data mismatch");
+				return null;
+			}
+
+			var tempVectorEntity = _pool.GetObject();
+
+			// It is possible that we changed scenes in the middle of map generation.
+			// This object can be null as a result of Unity cleaning up game objects in the scene.
+			// Let's bail if we don't have our object.
+			if (tempVectorEntity.GameObject == null)
+			{
+				return null;
+			}
+
+			tempVectorEntity.GameObject.SetActive(true);
+			tempVectorEntity.Mesh.Clear();
+
+			tempVectorEntity.Mesh.subMeshCount = meshData.Triangles.Count;
+			tempVectorEntity.Mesh.SetVertices(meshData.Vertices);
+			tempVectorEntity.Mesh.SetNormals(meshData.Normals);
+			if (meshData.Tangents.Count > 0)
+			{
+				tempVectorEntity.Mesh.SetTangents(meshData.Tangents);
+			}
+
+			var counter = meshData.Triangles.Count;
+			for (int i = 0; i < counter; i++)
+			{
+				tempVectorEntity.Mesh.SetTriangles(meshData.Triangles[i], i);
+			}
+
+			counter = meshData.UV.Count;
+			for (int i = 0; i < counter; i++)
+			{
+				tempVectorEntity.Mesh.SetUVs(i, meshData.UV[i]);
+			}
+
+			tempVectorEntity.Transform.SetParent(parent.transform, false);
+
+			if (!_activeObjects.ContainsKey(tile))
+			{
+				_activeObjects.Add(tile, _listPool.GetObject());
+			}
+
+			_activeObjects[tile].Add(tempVectorEntity);
+
+
+			tempVectorEntity.Transform.localPosition = meshData.PositionInTile;
+
+			return tempVectorEntity;
+		}
+
+		protected override void UpdateVector(object sender, System.EventArgs eventArgs)
 		{
 			VectorLayerUpdateArgs layerUpdateArgs = eventArgs as VectorLayerUpdateArgs;
 
@@ -125,242 +406,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			UnbindSubLayerEvents();
 
 			OnUpdateLayerVisualizer(layerUpdateArgs);
-		}
-
-		public override void UnbindSubLayerEvents()
-		{
-			foreach (var modifier in _defaultStack.MeshModifiers)
-			{
-				modifier.UnbindProperties();
-				modifier.ModifierHasChanged -= UpdateVector;
-			}
-			foreach (var modifier in _defaultStack.GoModifiers)
-			{
-				modifier.UnbindProperties();
-				modifier.ModifierHasChanged -= UpdateVector;
-			}
-
-			_layerProperties.extrusionOptions.PropertyHasChanged -= UpdateVector;
-			_layerProperties.coreOptions.PropertyHasChanged -= UpdateVector;
-			_layerProperties.filterOptions.PropertyHasChanged -= UpdateVector;
-			_layerProperties.filterOptions.UnRegisterFilters();
-			_layerProperties.materialOptions.PropertyHasChanged -= UpdateVector;
-
-			_layerProperties.PropertyHasChanged -= UpdateVector;
-		}
-
-		public override void SetProperties(VectorSubLayerProperties properties)
-		{
-			_coreModifiers = new HashSet<ModifierBase>();
-
-			if (_layerProperties == null && properties != null)
-			{
-				_layerProperties = properties;
-				if (_performanceOptions == null && properties.performanceOptions != null)
-				{
-					_performanceOptions = properties.performanceOptions;
-				}
-			}
-
-			if (_layerProperties.coreOptions.combineMeshes)
-			{
-				if (_defaultStack == null)
-				{
-					_defaultStack = ScriptableObject.CreateInstance<MergedModifierStack>();
-				}
-				else if (!(_defaultStack is MergedModifierStack))
-				{
-					_defaultStack.Clear();
-					DestroyImmediate(_defaultStack);
-					_defaultStack = ScriptableObject.CreateInstance<MergedModifierStack>();
-				}
-				else
-				{
-					// HACK - to clean out the Modifiers.
-					// Will this trigger GC that we could avoid ??
-					_defaultStack.MeshModifiers.Clear();
-					_defaultStack.GoModifiers.Clear();
-				}
-			}
-			else
-			{
-				if (_defaultStack == null)
-				{
-					_defaultStack = ScriptableObject.CreateInstance<ModifierStack>();
-					((ModifierStack)_defaultStack).moveFeaturePositionTo = _layerProperties.moveFeaturePositionTo;
-				}
-				if (!(_defaultStack is ModifierStack))
-				{
-					_defaultStack.Clear();
-					DestroyImmediate(_defaultStack);
-					_defaultStack = ScriptableObject.CreateInstance<ModifierStack>();
-					((ModifierStack)_defaultStack).moveFeaturePositionTo = _layerProperties.moveFeaturePositionTo;
-				}
-				else
-				{
-					// HACK - to clean out the Modifiers.
-					// Will this trigger GC that we could avoid ??
-					_defaultStack.MeshModifiers.Clear();
-					_defaultStack.GoModifiers.Clear();
-				}
-			}
-
-			//Add any additional modifiers that were added.
-			if (_defaultStack.MeshModifiers == null)
-			{
-				_defaultStack.MeshModifiers = new List<MeshModifier>();
-			}
-			if (_defaultStack.GoModifiers == null)
-			{
-				_defaultStack.GoModifiers = new List<GameObjectModifier>();
-			}
-
-			// Setup material options.
-			_layerProperties.materialOptions.SetDefaultMaterialOptions();
-
-			switch (_layerProperties.coreOptions.geometryType)
-			{
-				case VectorPrimitiveType.Point:
-				case VectorPrimitiveType.Custom:
-					{
-						// Let the user add anything that they want
-						if (_layerProperties.coreOptions.snapToTerrain == true)
-						{
-							AddOrCreateMeshModifier<SnapTerrainModifier>();
-						}
-
-						break;
-					}
-				case VectorPrimitiveType.Line:
-					{
-						if (_layerProperties.coreOptions.snapToTerrain == true)
-						{
-							AddOrCreateMeshModifier<SnapTerrainModifier>();
-						}
-
-						var lineMeshMod = AddOrCreateMeshModifier<LineMeshModifier>();
-						lineMeshMod.SetProperties(_layerProperties.lineGeometryOptions);
-						lineMeshMod.ModifierHasChanged += UpdateVector;
-
-						if (_layerProperties.extrusionOptions.extrusionType != ExtrusionType.None)
-						{
-							var heightMod = AddOrCreateMeshModifier<HeightModifier>();
-							heightMod.SetProperties(_layerProperties.extrusionOptions);
-							heightMod.ModifierHasChanged += UpdateVector;
-						}
-						else
-						{
-							_layerProperties.extrusionOptions.PropertyHasChanged += UpdateVector;
-						}
-
-						//collider modifier options
-						var lineColliderMod = AddOrCreateGameObjectModifier<ColliderModifier>();
-						lineColliderMod.SetProperties(_layerProperties.colliderOptions);
-						lineColliderMod.ModifierHasChanged += UpdateVector;
-
-						var lineStyleMod = AddOrCreateGameObjectModifier<MaterialModifier>();
-						lineStyleMod.SetProperties(_layerProperties.materialOptions);
-						lineStyleMod.ModifierHasChanged += UpdateVector;
-
-						break;
-					}
-				case VectorPrimitiveType.Polygon:
-					{
-						if (_layerProperties.coreOptions.snapToTerrain == true)
-						{
-							AddOrCreateMeshModifier<SnapTerrainModifier>();
-						}
-
-						var poly = AddOrCreateMeshModifier<PolygonMeshModifier>();
-
-						UVModifierOptions uvModOptions = new UVModifierOptions();
-						uvModOptions.texturingType = (_layerProperties.materialOptions.style == StyleTypes.Custom) ? _layerProperties.materialOptions.customStyleOptions.texturingType : _layerProperties.materialOptions.texturingType;
-						uvModOptions.atlasInfo = (_layerProperties.materialOptions.style == StyleTypes.Custom) ? _layerProperties.materialOptions.customStyleOptions.atlasInfo : _layerProperties.materialOptions.atlasInfo;
-						uvModOptions.style = _layerProperties.materialOptions.style;
-						poly.SetProperties(uvModOptions);
-
-						if (_layerProperties.extrusionOptions.extrusionType != ExtrusionType.None)
-						{
-							//replace materialOptions with styleOptions
-							bool useTextureSideWallModifier =
-							(_layerProperties.materialOptions.style == StyleTypes.Custom) ?
-								(_layerProperties.materialOptions.customStyleOptions.texturingType == UvMapType.Atlas || _layerProperties.materialOptions.customStyleOptions.texturingType == UvMapType.AtlasWithColorPalette)
-								: (_layerProperties.materialOptions.texturingType == UvMapType.Atlas || _layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette);
-
-							if (useTextureSideWallModifier)
-							{
-								var atlasMod = AddOrCreateMeshModifier<TextureSideWallModifier>();
-								GeometryExtrusionWithAtlasOptions atlasOptions = new GeometryExtrusionWithAtlasOptions(_layerProperties.extrusionOptions, uvModOptions);
-								atlasMod.SetProperties(atlasOptions);
-								_layerProperties.extrusionOptions.PropertyHasChanged += UpdateVector;
-							}
-							else
-							{
-								var heightMod = AddOrCreateMeshModifier<HeightModifier>();
-								heightMod.SetProperties(_layerProperties.extrusionOptions);
-								heightMod.ModifierHasChanged += UpdateVector;
-							}
-						}
-						else
-						{
-							_layerProperties.extrusionOptions.PropertyHasChanged += UpdateVector;
-						}
-
-						//collider modifier options
-						var polyColliderMod = AddOrCreateGameObjectModifier<ColliderModifier>();
-						polyColliderMod.SetProperties(_layerProperties.colliderOptions);
-						polyColliderMod.ModifierHasChanged += UpdateVector;
-
-						var styleMod = AddOrCreateGameObjectModifier<MaterialModifier>();
-						styleMod.SetProperties(_layerProperties.materialOptions);
-						styleMod.ModifierHasChanged += UpdateVector;
-
-
-						bool isCustomStyle = (_layerProperties.materialOptions.style == StyleTypes.Custom);
-						if ((isCustomStyle) ? (_layerProperties.materialOptions.customStyleOptions.texturingType == UvMapType.AtlasWithColorPalette)
-							: (_layerProperties.materialOptions.texturingType == UvMapType.AtlasWithColorPalette))
-						{
-							var colorPaletteMod = AddOrCreateGameObjectModifier<MapboxStylesColorModifier>();
-							colorPaletteMod.m_scriptablePalette = (isCustomStyle) ? _layerProperties.materialOptions.customStyleOptions.colorPalette : _layerProperties.materialOptions.colorPalette;
-							_layerProperties.materialOptions.PropertyHasChanged += UpdateVector;
-							//TODO: Add SetProperties Method to MapboxStylesColorModifier
-						}
-
-						break;
-					}
-				default:
-					break;
-			}
-
-			_layerProperties.coreOptions.PropertyHasChanged += UpdateVector;
-			_layerProperties.filterOptions.PropertyHasChanged += UpdateVector;
-
-			_layerProperties.filterOptions.RegisterFilters();
-			if (_layerProperties.MeshModifiers != null)
-			{
-				_defaultStack.MeshModifiers.AddRange(_layerProperties.MeshModifiers);
-			}
-			if (_layerProperties.GoModifiers != null)
-			{
-				_defaultStack.GoModifiers.AddRange(_layerProperties.GoModifiers);
-			}
-
-			_layerProperties.PropertyHasChanged += UpdateVector;
-		}
-
-		/// <summary>
-		/// Add the replacement criteria to any mesh modifiers implementing IReplaceable
-		/// </summary>
-		/// <param name="criteria">Criteria.</param>
-		protected void SetReplacementCriteria(IReplacementCriteria criteria)
-		{
-			foreach (var meshMod in _defaultStack.MeshModifiers)
-			{
-				if (meshMod is IReplaceable)
-				{
-					((IReplaceable)meshMod).Criteria.Add(criteria);
-				}
-			}
 		}
 
 		#region Private Helper Methods
@@ -405,20 +450,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		}
 
 		/// <summary>
-		/// Function to fetch feature in vector tile at the index specified.
-		/// </summary>
-		/// <returns>The feature in tile at the index requested.</returns>
-		/// <param name="tile">Unity Tile containing the feature.</param>
-		/// <param name="index">Index of the vector feature being requested.</param>
-		// private VectorFeatureUnity GetFeatureinTileAtIndex(int index, UnityTile tile, VectorLayerVisualizerProperties layerProperties)
-		// {
-		// 	return new VectorFeatureUnity(layerProperties.vectorTileLayer.GetFeature(index),
-		// 											 tile,
-		// 								  layerProperties.vectorTileLayer.Extent,
-		// 								  layerProperties.buildingsWithUniqueIds);
-		// }
-
-		/// <summary>
 		/// Function to check if the feature is already in the active Id pool, features already in active Id pool should be skipped from processing.
 		/// </summary>
 		/// <returns><c>true</c>, if feature is already in activeId pool or if the layer has buildingsWithUniqueId flag set to <see langword="true"/>, <c>false</c> otherwise.</returns>
@@ -428,205 +459,26 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			return (layerProperties.buildingsWithUniqueIds && _activeIds.Contains(featureId));
 		}
 
-		/// <summary>
-		/// Gets a value indicating whether this entity per coroutine bucket is full.
-		/// </summary>
-		/// <value><c>true</c> if coroutine bucket is full; otherwise, <c>false</c>.</value>
-		private bool IsCoroutineBucketFull
-		{
-			get
-			{
-				return (_performanceOptions != null && _performanceOptions.isEnabled && _entityInCurrentCoroutine >= _performanceOptions.entityPerCoroutine);
-			}
-		}
-
 		public override bool Active
 		{
 			get
 			{
-				return _layerProperties.coreOptions.isActive;
+				return _sublayerProperties.coreOptions.isActive;
 			}
 		}
 
 		#endregion
-		public override void Initialize()
-		{
-			base.Initialize();
-			_entityInCurrentCoroutine = 0;
 
-			_activeCoroutines = new Dictionary<UnityTile, List<int>>();
-			_activeIds = new HashSet<ulong>();
-			_idPool = new Dictionary<UnityTile, List<ulong>>();
-
-			if (_defaultStack != null)
-			{
-				_defaultStack.Initialize();
-			}
-		}
-
-		public override void InitializeStack()
-		{
-			if (_defaultStack != null)
-			{
-				_defaultStack.Initialize();
-			}
-		}
-
-
+		//only used by poi stuff, to be removed
 		public override void Create(Mapbox.Map.VectorTile.VectorLayerResult layer, UnityTile tile, Action<UnityTile, LayerVisualizerBase> callback)
 		{
-			if (!_activeCoroutines.ContainsKey(tile))
-				_activeCoroutines.Add(tile, new List<int>());
-			_activeCoroutines[tile].Add(Runnable.Run(ProcessLayer(layer, tile, tile.UnwrappedTileId, callback)));
+			// if (!_activeCoroutines.ContainsKey(tile))
+			// 	_activeCoroutines.Add(tile, new List<int>());
+			// _activeCoroutines[tile].Add(Runnable.Run(ProcessLayer(layer, tile, tile.UnwrappedTileId, callback)));
+			ProcessLayer(layer, tile, tile.UnwrappedTileId, callback);
 		}
 
-		protected IEnumerator ProcessLayer(Mapbox.Map.VectorTile.VectorLayerResult layer, UnityTile tile, UnwrappedTileId tileId, Action<UnityTile, LayerVisualizerBase> callback = null)
-		{
-			if (tile == null)
-			{
-				yield break;
-			}
-
-			VectorLayerVisualizerProperties tempLayerProperties = new VectorLayerVisualizerProperties();
-			tempLayerProperties.vectorTileLayer = layer;
-			tempLayerProperties.featureProcessingStage = FeatureProcessingStage.PreProcess;
-
-			//Get all filters in the array.
-			tempLayerProperties.layerFeatureFilters = _layerProperties.filterOptions.filters.Select(m => m.GetFilterComparer()).ToArray();
-
-			// Pass them to the combiner
-			tempLayerProperties.layerFeatureFilterCombiner = new Filters.LayerFilterComparer();
-			switch (_layerProperties.filterOptions.combinerType)
-			{
-				case Filters.LayerFilterCombinerOperationType.Any:
-					tempLayerProperties.layerFeatureFilterCombiner = Filters.LayerFilterComparer.AnyOf(tempLayerProperties.layerFeatureFilters);
-					break;
-				case Filters.LayerFilterCombinerOperationType.All:
-					tempLayerProperties.layerFeatureFilterCombiner = Filters.LayerFilterComparer.AllOf(tempLayerProperties.layerFeatureFilters);
-					break;
-				case Filters.LayerFilterCombinerOperationType.None:
-					tempLayerProperties.layerFeatureFilterCombiner = Filters.LayerFilterComparer.NoneOf(tempLayerProperties.layerFeatureFilters);
-					break;
-				default:
-					break;
-			}
-
-			tempLayerProperties.buildingsWithUniqueIds = (_layerProperties.honorBuildingIdSetting) && _layerProperties.buildingsWithUniqueIds;
-
-			//find any replacement criteria and assign them
-			foreach (var goModifier in _defaultStack.GoModifiers)
-			{
-				if (goModifier is IReplacementCriteria && goModifier.Active)
-				{
-					SetReplacementCriteria((IReplacementCriteria)goModifier);
-				}
-			}
-
-			#region PreProcess & Process.
-
-			_defaultStack.RunLayer(tempLayerProperties.vectorTileLayer, tile, tile.gameObject, layer.Name);
-
-			// do
-			// {
-			// 	foreach (var feature in tempLayerProperties.vectorTileLayer.Features)
-			// 	{
-			// 		if (tile.UnwrappedTileId != tileId || !_activeCoroutines.ContainsKey(tile) || tile.IsRecycled)
-			// 		{
-			// 			yield break;
-			// 		}
-			//
-			// 		ProcessFeature(feature, tile, tempLayerProperties);
-			//
-			// 		if (IsCoroutineBucketFull && !(Application.isEditor && !Application.isPlaying))
-			// 		{
-			// 			//Reset bucket..
-			// 			_entityInCurrentCoroutine = 0;
-			// 			yield return null;
-			// 		}
-			// 	}
-			//
-			// 	// move processing to next stage.
-			// 	tempLayerProperties.featureProcessingStage++;
-			// } while (tempLayerProperties.featureProcessingStage == FeatureProcessingStage.PreProcess
-			// || tempLayerProperties.featureProcessingStage == FeatureProcessingStage.Process);
-
-			#endregion
-
-			#region PostProcess
-			// TODO : Clean this up to follow the same pattern.
-			var mergedStack = _defaultStack as MergedModifierStack;
-			if (mergedStack != null && tile != null)
-			{
-				mergedStack.End(tile, tile.gameObject, layer.Name);
-			}
-			#endregion
-
-			if (callback != null)
-				callback(tile, this);
-		}
-
-		private bool ProcessFeature(VectorFeatureUnity feature, UnityTile tile, VectorLayerVisualizerProperties layerProperties)
-		{
-			if (IsFeatureEligibleAfterFiltering(feature, tile, layerProperties))
-			{
-				if (tile != null && tile.gameObject != null)
-				{
-					switch (layerProperties.featureProcessingStage)
-					{
-						case FeatureProcessingStage.PreProcess:
-							//pre process features.
-							PreProcessFeatures(feature, tile, tile.gameObject);
-							break;
-						case FeatureProcessingStage.Process:
-							//skip existing features, only works on tilesets with unique ids
-							if (ShouldSkipProcessingFeatureWithId(feature.Data.Id, tile, layerProperties))
-							{
-								return false;
-							}
-							//feature not skipped. Add to pool only if features are in preprocess stage.
-							AddFeatureToTileObjectPool(feature, tile);
-							Build(feature, tile, tile.gameObject);
-							break;
-						case FeatureProcessingStage.PostProcess:
-							break;
-						default:
-							break;
-					}
-					_entityInCurrentCoroutine++;
-				}
-			}
-			return true;
-		}
-
-		/// <summary>
-		/// Preprocess features, finds the relevant modifier stack and passes the feature to that stack
-		/// </summary>
-		/// <param name="feature"></param>
-		/// <param name="tile"></param>
-		/// <param name="parent"></param>
-		private bool IsFeatureValid(VectorFeatureUnity feature)
-		{
-			if (feature.Properties.ContainsKey("extrude") && !bool.Parse(feature.Properties["extrude"].ToString()))
-				return false;
-
-			if (feature.Points.Count < 1)
-				return false;
-
-			return true;
-		}
-
-		protected void PreProcessFeatures(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
-		{
-			//find any replacement criteria and assign them
-			foreach (var goModifier in _defaultStack.GoModifiers)
-			{
-				if (goModifier is IReplacementCriteria && goModifier.Active)
-				{
-					goModifier.FeaturePreProcess(feature);
-				}
-			}
-		}
-
+		//used for pois or something, to be removed
 		protected void Build(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
 		{
 			if (feature.Properties.ContainsKey("extrude") && !Convert.ToBoolean(feature.Properties["extrude"]))
@@ -636,7 +488,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				return;
 
 			//this will be improved in next version and will probably be replaced by filters
-			var styleSelectorKey = _layerProperties.coreOptions.sublayerName;
+			var styleSelectorKey = _sublayerProperties.coreOptions.sublayerName;
 
 			var meshData = new MeshData();
 			meshData.TileRect = tile.Rect;
@@ -653,71 +505,5 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 		}
 
-		/// <summary>
-		/// Handle tile destruction event and propagate it to modifier stacks
-		/// </summary>
-		/// <param name="tile">Destroyed tile object</param>
-		public override void OnUnregisterTile(UnityTile tile)
-		{
-			base.OnUnregisterTile(tile);
-			if (_activeCoroutines.ContainsKey(tile))
-			{
-				foreach (var cor in _activeCoroutines[tile])
-				{
-					Runnable.Stop(cor);
-				}
-			}
-			_activeCoroutines.Remove(tile);
-
-			if (_defaultStack != null)
-			{
-				_defaultStack.UnregisterTile(tile);
-			}
-
-			//removing ids from activeIds list so they'll be recreated next time tile loads (necessary when you're unloading/loading tiles)
-			if (_idPool.ContainsKey(tile))
-			{
-				foreach (var item in _idPool[tile])
-				{
-					_activeIds.Remove(item);
-				}
-				_idPool[tile].Clear();
-			}
-		}
-
-		public override void Clear()
-		{
-			_idPool.Clear();
-			_defaultStack.Clear();
-
-			foreach (var mod in _defaultStack.MeshModifiers)
-			{
-				if (mod == null)
-				{
-					continue;
-				}
-
-				if (_coreModifiers.Contains(mod))
-				{
-					DestroyImmediate(mod);
-				}
-			}
-
-			foreach (var mod in _defaultStack.GoModifiers)
-			{
-				if (mod == null)
-				{
-					continue;
-				}
-
-				mod.Clear();
-				if (_coreModifiers.Contains(mod))
-				{
-					DestroyImmediate(mod);
-				}
-			}
-
-			DestroyImmediate(_defaultStack);
-		}
 	}
 }

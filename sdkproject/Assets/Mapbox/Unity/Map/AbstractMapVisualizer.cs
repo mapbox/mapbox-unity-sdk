@@ -445,7 +445,6 @@ namespace Mapbox.Unity.Map
 			layerVisualizer.Clear();
 			layerVisualizer.UnbindSubLayerEvents();
 			layerVisualizer.SetProperties(layerVisualizer.SubLayerProperties);
-			layerVisualizer.InitializeStack();
 			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
 			{
 				factory.RedrawSubLayer(tileBundle.Value, layerVisualizer);
@@ -476,8 +475,6 @@ namespace Mapbox.Unity.Map
 				factory.UpdateTileProperty(tileBundle.Value, updateArgs);
 			}
 		}
-
-
 
 		#region Events
 		/// <summary>

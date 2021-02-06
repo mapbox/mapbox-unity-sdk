@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using Mapbox.Map;
 
@@ -44,62 +45,13 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		[SerializeField] public PositionTargetType moveFeaturePositionTo;
 
 
-		//[NonSerialized] private int vertexIndex = 1;
-		[NonSerialized] private Dictionary<UnityTile, List<VectorEntity>> _activeObjects;
-		[NonSerialized] private ObjectPool<VectorEntity> _pool;
 
-		//[NonSerialized] private Vector3 _tempPoint;
-		//[NonSerialized] private VectorEntity _tempVectorEntity;
-		[NonSerialized] private ObjectPool<List<VectorEntity>> _listPool;
 
-		//[NonSerialized] private int _counter;
-		//[NonSerialized] private int _secondCounter;
+		private Dictionary<CanonicalTileId, List<Tuple<Task, CancellationTokenSource>>> _tasks = new Dictionary<CanonicalTileId, List<Tuple<Task, CancellationTokenSource>>>();
+
 		protected virtual void OnEnable()
 		{
-			_pool = new ObjectPool<VectorEntity>(() =>
-			{
-				var go = new GameObject();
-				var mf = go.AddComponent<MeshFilter>();
-				mf.sharedMesh = new Mesh();
-				mf.sharedMesh.name = "feature";
-				var mr = go.AddComponent<MeshRenderer>();
-				var tempVectorEntity = new VectorEntity()
-				{
-					GameObject = go,
-					Transform = go.transform,
-					MeshFilter = mf,
-					MeshRenderer = mr,
-					Mesh = mf.sharedMesh
-				};
-				return tempVectorEntity;
-			});
-			_listPool = new ObjectPool<List<VectorEntity>>(() => { return new List<VectorEntity>(); });
-			_activeObjects = new Dictionary<UnityTile, List<VectorEntity>>();
-		}
-
-		public override void OnUnregisterTile(UnityTile tile)
-		{
-			if (_activeObjects.ContainsKey(tile))
-			{
-				var counter = _activeObjects[tile].Count;
-				for (int i = 0; i < counter; i++)
-				{
-					foreach (var item in GoModifiers)
-					{
-						item.OnPoolItem(_activeObjects[tile][i]);
-					}
-					if (null != _activeObjects[tile][i].GameObject)
-					{
-						_activeObjects[tile][i].GameObject.SetActive(false);
-					}
-					_pool.Put(_activeObjects[tile][i]);
-				}
-				_activeObjects[tile].Clear();
-
-				//pooling these lists as they'll reused anyway, saving hundreds of list instantiations
-				_listPool.Put(_activeObjects[tile]);
-				_activeObjects.Remove(tile);
-			}
+			
 		}
 
 		public override void Initialize()
@@ -119,58 +71,29 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
-		private Dictionary<CanonicalTileId, List<Tuple<VectorFeatureUnity, MeshData>>> _allMeshes = new Dictionary<CanonicalTileId, List<Tuple<VectorFeatureUnity, MeshData>>>();
 		public override void RunLayer(Mapbox.Map.VectorTile.VectorLayerResult vectorTileLayer, UnityTile tt, GameObject parent, string type = "")
 		{
-			var layer = vectorTileLayer;
-			var tile = tt;
-			var localTile = tile.CanonicalTileId;
-			var task = Task.Run(() =>
-			{
-				var lineMeshCore = new LineMeshCore(tile.TileSize);
-				foreach (var feature in layer.Features)
-				{
-					if (feature.Properties.ContainsKey("extrude") && !bool.Parse(feature.Properties["extrude"].ToString()))
-						continue;
-
-					if (feature.Points.Count < 1)
-						continue;
-
-					var meshData = new MeshData();
-					Taskable(tile, feature, meshData, tile.TileScale);
-					if (!_allMeshes.ContainsKey(localTile))
-					{
-						_allMeshes.Add(localTile, new List<Tuple<VectorFeatureUnity, MeshData>>());
-					}
-					_allMeshes[localTile].Add(new Tuple<VectorFeatureUnity, MeshData>(feature, meshData));
-				}
-			});
-
-			task.ContinueWith((t) =>
-			{
-				if (tile.CanonicalTileId != localTile || tile.IsRecycled)
-				{
-					Debug.Log("Recycled");
-				}
-				else
-				{
-					foreach (var mesh in _allMeshes[localTile])
-					{
-						CreateObject(tile, mesh.Item1, mesh.Item2, parent, type);
-					}
-
-					_allMeshes[localTile].Clear();
-					_allMeshes.Remove(localTile);
-				}
-			}, TaskScheduler.FromCurrentSynchronizationContext());
 
 		}
 
-		private MeshData Taskable(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, float scaler)
+		public override void OnUnregisterTile(UnityTile tile)
 		{
-			var tempPoint = Constants.Math.Vector3Zero;
-			var counter = feature.Points.Count;
-			var secondCounter = 0;
+			if (_tasks.ContainsKey(tile.CanonicalTileId))
+			{
+				foreach (var tuple in _tasks[tile.CanonicalTileId])
+				{
+					tuple.Item2.Cancel();
+				}
+
+				_tasks.Remove(tile.CanonicalTileId);
+			}
+		}
+
+		public override MeshData Taskable(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, float scaler)
+		{
+			// var tempPoint = Constants.Math.Vector3Zero;
+			// var counter = feature.Points.Count;
+			// var secondCounter = 0;
 			// if (moveFeaturePositionTo != PositionTargetType.TileCenter)
 			// {
 			//
@@ -209,126 +132,26 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			// 	meshData.PositionInTile = tempPoint;
 			// }
 
-			meshData.PositionInTile = tempPoint;
-			counter = MeshModifiers.Count;
+			//meshData.PositionInTile = tempPoint;
+			var counter = MeshModifiers.Count;
 			for (int i = 0; i < counter; i++)
 			{
 				if (MeshModifiers[i] != null && MeshModifiers[i].Active)
 				{
 					if (MeshModifiers[i] is ICoreWrapper)
 					{
-						(MeshModifiers[i] as ICoreWrapper).SetCore(new LineMeshCore(tile.TileScale));
+						(MeshModifiers[i] as ICoreWrapper).GetAsycCore(scaler).Run(feature, meshData, tile);
 					}
-					MeshModifiers[i].Run(feature, meshData, tile);
+					//MeshModifiers[i].Run(feature, meshData, tile);
 				}
 			}
 
 			return meshData;
 		}
 
-		private GameObject CreateObject(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent, string type)
-		{
-			if (meshData.Vertices.Count != meshData.UV[0].Count ||
-			    meshData.Vertices.Count != meshData.Tangents.Count)
-			{
-				Debug.Log("data mismatch");
-				return null;
-			}
-
-			var tempVectorEntity = _pool.GetObject();
-
-			// It is possible that we changed scenes in the middle of map generation.
-			// This object can be null as a result of Unity cleaning up game objects in the scene.
-			// Let's bail if we don't have our object.
-			if (tempVectorEntity.GameObject == null)
-			{
-				return null;
-			}
-
-			tempVectorEntity.GameObject.SetActive(true);
-			tempVectorEntity.Mesh.Clear();
-			tempVectorEntity.Feature = feature;
-
-#if UNITY_EDITOR
-			if (feature.Data != null)
-			{
-				tempVectorEntity.GameObject.name = type + " - " + feature.Data.Id + " - " + Time.frameCount;
-			}
-			else
-			{
-				tempVectorEntity.GameObject.name = type;
-			}
-#endif
-			tempVectorEntity.Mesh.subMeshCount = meshData.Triangles.Count;
-			tempVectorEntity.Mesh.SetVertices(meshData.Vertices);
-			tempVectorEntity.Mesh.SetNormals(meshData.Normals);
-			if (meshData.Tangents.Count > 0)
-			{
-				tempVectorEntity.Mesh.SetTangents(meshData.Tangents);
-			}
-
-			var counter = meshData.Triangles.Count;
-			for (int i = 0; i < counter; i++)
-			{
-				tempVectorEntity.Mesh.SetTriangles(meshData.Triangles[i], i);
-			}
-
-			counter = meshData.UV.Count;
-			for (int i = 0; i < counter; i++)
-			{
-				tempVectorEntity.Mesh.SetUVs(i, meshData.UV[i]);
-			}
-
-			tempVectorEntity.Transform.SetParent(parent.transform, false);
-
-			if (!_activeObjects.ContainsKey(tile))
-			{
-				_activeObjects.Add(tile, _listPool.GetObject());
-			}
-
-			_activeObjects[tile].Add(tempVectorEntity);
-
-
-			tempVectorEntity.Transform.localPosition = meshData.PositionInTile;
-
-			counter = GoModifiers.Count;
-			for (int i = 0; i < counter; i++)
-			{
-				if (GoModifiers[i].Active)
-				{
-					GoModifiers[i].Run(tempVectorEntity, tile);
-				}
-			}
-
-			return tempVectorEntity.GameObject;
-		}
-
 		public override void Clear()
 		{
-			foreach (var vectorEntity in _pool.GetQueue())
-			{
-				if (vectorEntity.Mesh != null)
-				{
-					vectorEntity.Mesh.Destroy(true);
-				}
 
-				vectorEntity.GameObject.Destroy();
-			}
-
-			foreach (var tileTuple in _activeObjects)
-			{
-				foreach (var vectorEntity in tileTuple.Value)
-				{
-					if (vectorEntity.Mesh != null)
-					{
-						vectorEntity.Mesh.Destroy(true);
-					}
-					vectorEntity.GameObject.Destroy();
-				}
-			}
-			_pool.Clear();
-			_activeObjects.Clear();
-			_pool.Clear();
 		}
 	}
 }

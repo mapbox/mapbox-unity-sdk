@@ -69,11 +69,6 @@ public abstract class DataFetcher
 		}
 	}
 
-	public virtual void FetchData(DataFetcherParameters parameters)
-	{
-
-	}
-
 	protected void EnqueueForFetching(FetchInfo info)
 	{
 		var key = info.TileId.GenerateKey(info.TilesetId);

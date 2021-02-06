@@ -10,6 +10,6 @@ namespace Mapbox.Platform.Cache
 
 	public class VectorCacheItem : CacheItem
 	{
-		public Map.VectorTile VectorTile;
+		public VectorTile.VectorTile VectorTile;
 	}
 }

@@ -97,7 +97,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			OnRegistered(tile);
 		}
-		protected abstract void OnPostProcess(UnityTile tile);
+		protected virtual void OnPostProcess(UnityTile tile){}
 		protected abstract void OnUnregistered(UnityTile tile);
 		protected abstract void OnUnbindEvents();
 

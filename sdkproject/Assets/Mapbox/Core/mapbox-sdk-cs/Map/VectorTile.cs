@@ -326,5 +326,11 @@ namespace Mapbox.Map
 				TileResource.MakeStyleOptimizedVector(Id, tilesetId, _optimizedStyleId, _modifiedDate)
 			  : TileResource.MakeVector(Id, tilesetId);
 		}
+
+		public void SetVectorFromCache(VectorTile vectorTile)
+		{
+			VectorResults = vectorTile.VectorResults;
+			TileState = TileState.Loaded;
+		}
 	}
 }

@@ -33,6 +33,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		}
 
+		public virtual MeshData Taskable(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, float scaler)
+		{
+			return null;
+		}
+
 		public virtual void Clear()
 		{
 

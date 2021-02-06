@@ -70,7 +70,12 @@ namespace Mapbox.Platform.Cache
             }
         }
 
-        public void AddVectorDataItem(string tilesetId, CanonicalTileId tileId, CacheItem cachedItem, bool forceInsert)
+        public void AddVectorItemToMemory(string tilesetId, CanonicalTileId tileId, VectorCacheItem vectorCacheItem, bool forceInsert)
+        {
+            _memoryCache.Add(tileId, tilesetId, vectorCacheItem, forceInsert);
+        }
+
+        public void AddVectorDataItem(string tilesetId, CanonicalTileId tileId, VectorCacheItem cachedItem, bool forceInsert)
         {
             _memoryCache.Add(tileId, tilesetId, cachedItem, forceInsert);
             _sqLiteCache?.Add(tilesetId, tileId, cachedItem, forceInsert);

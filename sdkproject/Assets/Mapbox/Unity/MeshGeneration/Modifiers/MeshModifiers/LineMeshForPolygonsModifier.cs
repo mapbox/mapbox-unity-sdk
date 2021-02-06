@@ -380,7 +380,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
-		private static bool IsOnEdge(Vector3 p1, Vector3 p2, float _tileSize, float tolerance)
+		private bool IsOnEdge(Vector3 p1, Vector3 p2, float _tileSize, float tolerance)
 		{
 			return ((Math.Abs(Math.Abs(p1.x) - (_tileSize/2)) < tolerance && Math.Abs(Math.Abs(p2.x) - (_tileSize/2)) < tolerance && Math.Sign(p1.x) == Math.Sign(p2.x)) ||
 			        (Math.Abs(Math.Abs(p1.z) - (_tileSize/2)) < tolerance && Math.Abs(Math.Abs(p2.z) - (_tileSize/2)) < tolerance && Math.Sign(p1.z) == Math.Sign(p2.z)));
@@ -504,7 +504,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 	public interface ICoreWrapper
 	{
-		void SetCore(LineMeshCore core);
+		LineMeshCore GetAsycCore(float scaler);
 	}
 	/// <summary>
 	/// Line Mesh Modifier creates line polygons from a list of vertices. It offsets the original vertices to both sides using Width parameter and triangulates them manually.
@@ -553,23 +553,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			get { return _lineMeshCore.Type; }
 		}
 
-		public void SetCore(LineMeshCore core)
-		{
-			_lineMeshCore = core;
-			_lineMeshCore.Width = Width;
-			_lineMeshCore.MiterLimit = MiterLimit;
-			_lineMeshCore.RoundLimit = RoundLimit;
-			_lineMeshCore.JoinType = JoinType;
-			_lineMeshCore.CapType = CapType;
-			_lineMeshCore.PushUp = PushUp;
-			_lineMeshCore.Initialize();
-		}
-
-		public override void Initialize()
-		{
-			_lineMeshCore?.Initialize();
-		}
-
 		public override void Run(VectorFeatureUnity feature, MeshData md, float scale)
 		{
 			_lineMeshCore.Run(feature, md, scale);
@@ -581,5 +564,18 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		}
 
 		#endregion
+
+		public LineMeshCore GetAsycCore(float scaler)
+		{
+			var core = new LineMeshCore(scaler);
+			core.Width = Width;
+			core.MiterLimit = MiterLimit;
+			core.RoundLimit = RoundLimit;
+			core.JoinType = JoinType;
+			core.CapType = CapType;
+			core.PushUp = PushUp;
+			core.Initialize();
+			return core;
+		}
 	}
 }
