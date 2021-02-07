@@ -1,6 +1,9 @@
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Mapbox.Map;
+using Mapbox.Unity.Map;
+using Mapbox.Unity.MeshGeneration.Filters;
 
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
@@ -42,7 +45,12 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Modifier Stack")]
 	public class ModifierStack : ModifierStackBase
 	{
+		[Tooltip("Groups features into one Unity GameObject.")]
+		[SerializeField] public bool combineMeshes = false;
 		[SerializeField] public PositionTargetType moveFeaturePositionTo;
+		[SerializeField] public VectorFilterOptions filterOptions;
+
+		public ILayerFeatureFilterComparer FeatureFilterCombiner;
 
 		public override void Initialize()
 		{
@@ -58,6 +66,23 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			for (int i = 0; i < counter; i++)
 			{
 				GoModifiers[i].Initialize();
+			}
+
+			if (filterOptions != null)
+			{
+				var layerFeatureFilters = filterOptions.filters.Select(m => m.GetFilterComparer()).ToArray();
+				switch (filterOptions.combinerType)
+				{
+					case LayerFilterCombinerOperationType.Any:
+						FeatureFilterCombiner = LayerFilterComparer.AnyOf(layerFeatureFilters);
+						break;
+					case LayerFilterCombinerOperationType.All:
+						FeatureFilterCombiner = LayerFilterComparer.AllOf(layerFeatureFilters);
+						break;
+					case LayerFilterCombinerOperationType.None:
+						FeatureFilterCombiner = LayerFilterComparer.NoneOf(layerFeatureFilters);
+						break;
+				}
 			}
 		}
 

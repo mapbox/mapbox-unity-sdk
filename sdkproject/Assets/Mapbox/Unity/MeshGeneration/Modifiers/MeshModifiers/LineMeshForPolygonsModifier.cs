@@ -8,7 +8,13 @@ using Mapbox.Unity.MeshGeneration.Data;
 
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
-	public class LineMeshCore
+	public interface IModifierCore
+	{
+		void Run(VectorFeatureUnity feature, MeshData md, float tileSize, float zoom);
+		void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null);
+	}
+
+	public class LineMeshCore : IModifierCore
 	{
 		public float MiterLimit = 0.2f;
 		public float RoundLimit = 1.05f;
@@ -42,7 +48,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		{
 			get { return ModifierType.Preprocess; }
 		}
-
 
 		public void Initialize()
 		{
@@ -495,7 +500,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 	public interface ICoreWrapper
 	{
-		LineMeshCore GetAsycCore();
+		IModifierCore GetAsycCore();
 	}
 	/// <summary>
 	/// Line Mesh Modifier creates line polygons from a list of vertices. It offsets the original vertices to both sides using Width parameter and triangulates them manually.
@@ -557,7 +562,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		#endregion
 
-		public LineMeshCore GetAsycCore()
+		public IModifierCore GetAsycCore()
 		{
 			var core = new LineMeshCore();
 			core.WidthCurve = WidthCurve;

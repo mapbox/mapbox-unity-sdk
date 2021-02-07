@@ -1,19 +1,16 @@
 using System.Threading;
 using System.Threading.Tasks;
+using Mapbox.Unity.MeshGeneration.Modifiers;
 using Mapbox.VectorTile.Geometry;
 
 namespace Mapbox.Unity.MeshGeneration.Interfaces
 {
 	using System;
-	using System.Collections;
 	using System.Collections.Generic;
 	using System.Linq;
 	using Mapbox.Unity.MeshGeneration.Data;
-	using Mapbox.Unity.MeshGeneration.Modifiers;
-	using Mapbox.VectorTile;
 	using UnityEngine;
 	using Mapbox.Unity.Map;
-	using Mapbox.Unity.Utilities;
 	using Mapbox.Unity.MeshGeneration.Filters;
 	using Mapbox.Map;
 
@@ -23,7 +20,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		public ILayerFeatureFilterComparer[] layerFeatureFilters;
 		public ILayerFeatureFilterComparer layerFeatureFilterCombiner;
 	}
-
 
 	public class VectorLayerVisualizer : LayerVisualizerBase
 	{
@@ -65,6 +61,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			if (_defaultStack != null)
 			{
 				_defaultStack.Initialize();
+			}
+
+			foreach (var modifierStack in _modifierStacks)
+			{
+				modifierStack.Initialize();
 			}
 
 			_pool = new ObjectPool<VectorEntity>(() =>
@@ -179,7 +180,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			var source = new CancellationTokenSource();
 			var token = source.Token;
-			var meshDataList = new List<Tuple<VectorFeatureUnity, MeshData>>();
+			var meshDataList = new Dictionary<ModifierStack, List<Tuple<VectorFeatureUnity, MeshData>>>();
 
 			var task = Task.Run(() =>
 			{
@@ -187,19 +188,31 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 				foreach (var feature in layer.Features)
 				{
-					if (IsFeatureInvalid(tile, feature, _tempLayerProperties)) continue;
 					if (capturedToken.IsCancellationRequested) return;
+					if (IsFeatureInvalid(tile, feature, _tempLayerProperties)) continue;
 
-					var meshData = new MeshData();
-					meshData = _defaultStack.RunMeshModifiers(tile, feature, meshData, tile.TileSize);
-					meshDataList.Add(new Tuple<VectorFeatureUnity, MeshData>(feature, meshData));
+					foreach (var modifierStack in _modifierStacks)
+					{
+						if (modifierStack.FeatureFilterCombiner.Try(feature))
+						{
+							var meshData = new MeshData();
+							meshData = modifierStack.RunMeshModifiers(tile, feature, meshData, tile.TileSize);
+							if(!meshDataList.ContainsKey(modifierStack))
+								meshDataList.Add(modifierStack, new List<Tuple<VectorFeatureUnity, MeshData>>());
+							meshDataList[modifierStack].Add(new Tuple<VectorFeatureUnity, MeshData>(feature, meshData));
+						}
+					}
 				}
 
-				if (_sublayerProperties.coreOptions.combineMeshes)
+				foreach (var pairs in meshDataList)
 				{
-					var mergedData = CombineMeshData(meshDataList);
-					meshDataList.Clear();
-					meshDataList.Add(new Tuple<VectorFeatureUnity, MeshData>(null, mergedData));
+					if (pairs.Key.combineMeshes)
+					{
+						var mergedData = CombineMeshData(pairs.Value);
+						pairs.Value.Clear();
+						pairs.Value.Add(new Tuple<VectorFeatureUnity, MeshData>(null, mergedData));
+					}
+
 				}
 			}, token);
 
@@ -220,16 +233,19 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				//is there a better way to check this?
 				if (tile.CanonicalTileId == cachedTileId && !tile.IsRecycled)
 				{
-					foreach (var feature in meshDataList)
+					foreach (var pair in meshDataList)
 					{
-						var entity = CreateObject(tile, feature.Item2, tile.gameObject, layer.Name);
-						entity.Feature = feature.Item1;
-#if UNITY_EDITOR
-						if (feature.Item1 != null && feature.Item1.Data != null)
-							entity.GameObject.name = layer.Name + " - " + feature.Item1.Data.Id;
-#endif
+						foreach (var meshTuples in pair.Value)
+						{
+							var entity = CreateObject(tile, meshTuples.Item2, tile.gameObject, layer.Name);
+							entity.Feature = meshTuples.Item1;
+	#if UNITY_EDITOR
+							if (meshTuples.Item1 != null && meshTuples.Item1.Data != null)
+								entity.GameObject.name = layer.Name;// + " - " + meshTuples.Item1.Data.Id;
+	#endif
 
-						_defaultStack.RunGoModifiers(entity, tile);
+							pair.Key.RunGoModifiers(entity, tile);
+						}
 
 					}
 				}
@@ -377,8 +393,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		#region Private Helper Methods
 		private bool IsFeatureInvalid(UnityTile tile, VectorFeatureUnity feature, VectorLayerVisualizerProperties tempLayerProperties)
 		{
-			if (!IsFeatureEligibleAfterFiltering(feature, tempLayerProperties))
-				return true;
+			// if (!IsFeatureEligibleAfterFiltering(feature, tempLayerProperties))
+			// 	return true;
 
 			//this part is necessary for unique id layers (buildings)
 			//it keeps track of processed ids and doesn't recreate them

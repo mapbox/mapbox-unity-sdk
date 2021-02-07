@@ -123,7 +123,15 @@ namespace Mapbox.Editor
 
 			var selectedLayerName = originalProperty.FindPropertyRelative("_selectedLayerName").stringValue;
 
-			DrawPropertyDropDown(originalProperty, property);
+			var mapObject = originalProperty.serializedObject.targetObject as MapVisualizer;
+			if (mapObject != null)
+			{
+				DrawPropertyDropDown(originalProperty, property);
+			}
+			else
+			{
+				property.FindPropertyRelative("Key").stringValue = EditorGUILayout.TextField(property.FindPropertyRelative("Key").stringValue);
+			}
 
 			EditorGUI.BeginChangeCheck();
 			filterOperatorProp.enumValueIndex = EditorGUILayout.Popup(filterOperatorProp.enumValueIndex, filterOperatorProp.enumDisplayNames, GUILayout.MaxWidth(150));
@@ -171,7 +179,7 @@ namespace Mapbox.Editor
 
 			var selectedLayerName = originalProperty.FindPropertyRelative("_selectedLayerName").stringValue;
 			var mapObject = (MapVisualizer)originalProperty.serializedObject.targetObject;
-			TileJsonData tileJsonData = mapObject.VectorLayer.GetTileJsonData();
+			var tileJsonData = mapObject.VectorLayer.GetTileJsonData();
 
 			if (string.IsNullOrEmpty(selectedLayerName) || !tileJsonData.PropertyDisplayNames.ContainsKey(selectedLayerName))
 			{

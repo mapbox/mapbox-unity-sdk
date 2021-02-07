@@ -22,6 +22,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		protected LayerPerformanceOptions _performanceOptions;
 		protected VectorSubLayerProperties _sublayerProperties;
 		protected ModifierStackBase _defaultStack;
+		protected List<ModifierStack> _modifierStacks;
 		protected HashSet<ModifierBase> _coreModifiers = new HashSet<ModifierBase>();
 
 		public abstract void Create(Mapbox.Map.VectorTile.VectorLayerResult layer, UnityTile tile, Action<UnityTile, LayerVisualizerBase> callback = null);
@@ -46,48 +47,25 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				}
 			}
 
-			if (_sublayerProperties.coreOptions.combineMeshes)
+			_modifierStacks = new List<ModifierStack>();
+			foreach (var modifierStack in _sublayerProperties.ModifierStacks)
 			{
-				if (_defaultStack == null)
-				{
-					_defaultStack = ScriptableObject.CreateInstance<MergedModifierStack>();
-				}
-				else if (!(_defaultStack is MergedModifierStack))
-				{
-					_defaultStack.Clear();
-					DestroyImmediate(_defaultStack);
-					_defaultStack = ScriptableObject.CreateInstance<MergedModifierStack>();
-				}
-				else
-				{
-					// HACK - to clean out the Modifiers.
-					// Will this trigger GC that we could avoid ??
-					_defaultStack.MeshModifiers.Clear();
-					_defaultStack.GoModifiers.Clear();
-				}
+				_modifierStacks.Add(modifierStack);
+			}
+
+			if (_defaultStack == null)
+			{
+				_defaultStack = ScriptableObject.CreateInstance<ModifierStack>();
+				((ModifierStack)_defaultStack).moveFeaturePositionTo = _sublayerProperties.moveFeaturePositionTo;
 			}
 			else
 			{
-				if (_defaultStack == null)
-				{
-					_defaultStack = ScriptableObject.CreateInstance<ModifierStack>();
-					((ModifierStack)_defaultStack).moveFeaturePositionTo = _sublayerProperties.moveFeaturePositionTo;
-				}
-				if (!(_defaultStack is ModifierStack))
-				{
-					_defaultStack.Clear();
-					DestroyImmediate(_defaultStack);
-					_defaultStack = ScriptableObject.CreateInstance<ModifierStack>();
-					((ModifierStack)_defaultStack).moveFeaturePositionTo = _sublayerProperties.moveFeaturePositionTo;
-				}
-				else
-				{
-					// HACK - to clean out the Modifiers.
-					// Will this trigger GC that we could avoid ??
-					_defaultStack.MeshModifiers.Clear();
-					_defaultStack.GoModifiers.Clear();
-				}
+				// HACK - to clean out the Modifiers.
+				// Will this trigger GC that we could avoid ??
+				_defaultStack.MeshModifiers.Clear();
+				_defaultStack.GoModifiers.Clear();
 			}
+
 
 			//Add any additional modifiers that were added.
 			if (_defaultStack.MeshModifiers == null)

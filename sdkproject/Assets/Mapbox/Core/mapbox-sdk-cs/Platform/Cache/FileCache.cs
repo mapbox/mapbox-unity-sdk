@@ -214,22 +214,21 @@ namespace Mapbox.Platform.Cache
 
 			info.TextureCacheItem.FilePath = Path.GetFullPath(string.Format("{0}/{1}/{2}.{3}", PersistantCacheRootFolderPath, MapIdToFolderName(info.TilesetId), info.TileId.GenerateKey(info.TilesetId), FileExtension));
 
-			FileStream sourceStream = new FileStream(info.TextureCacheItem.FilePath,
-				FileMode.Create, FileAccess.Write, FileShare.Read,
-				bufferSize: 4096, useAsync: false);
+			Task.Run(() =>
+			{
+				FileStream sourceStream = new FileStream(info.TextureCacheItem.FilePath,
+					FileMode.Create, FileAccess.Write, FileShare.Read,
+					bufferSize: 4096, useAsync: false);
 
-			Task t = sourceStream
-				.WriteAsync(info.TextureCacheItem.Data, 0, info.TextureCacheItem.Data.Length)
-				.ContinueWith((task) =>
-				{
-					sourceStream.Close();
-					OnFileSaved(info.TileId, info.TilesetId, info.TextureCacheItem);
+				sourceStream.Write(info.TextureCacheItem.Data, 0, info.TextureCacheItem.Data.Length);
+				sourceStream.Close();
+				OnFileSaved(info.TileId, info.TilesetId, info.TextureCacheItem);
 
 //this is not a good way to do it
 // #if UNITY_EDITOR
 // 					FileCacheDebugView.AddToLogs(string.Format("Saved {0, 20} - {1, -20}", info.TilesetId, info.TileId));
 // #endif
-				});
+			});
 		}
 
 		protected virtual void OnFileSaved(CanonicalTileId infoTileId, string infoTilesetId, TextureCacheItem infoTextureCacheItem)
