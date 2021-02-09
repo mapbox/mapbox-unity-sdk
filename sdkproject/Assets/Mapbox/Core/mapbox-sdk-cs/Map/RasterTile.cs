@@ -134,10 +134,10 @@ namespace Mapbox.Map
 			return TileResource.MakeRaster(Id, tilesetId);
 		}
 
-		internal override bool ParseTileData(byte[] data)
+		internal override bool ParseTileData(byte[] newData)
 		{
 			// We do not parse raster tiles as they are
-			this.data = data;
+			this.data = newData;
 			return true;
 		}
 

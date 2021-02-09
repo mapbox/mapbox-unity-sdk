@@ -252,7 +252,7 @@ namespace Mapbox.Map
 
 
 		// Decode the tile.
-		internal abstract bool ParseTileData(byte[] data);
+		internal abstract bool ParseTileData(byte[] newData);
 
 
 		// TODO: Currently the tile decoding is done on the main thread. We must implement

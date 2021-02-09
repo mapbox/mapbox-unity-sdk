@@ -130,9 +130,10 @@ namespace Mapbox.Map
 				// current implementation doesn't need to check if parsing is successful:
 				// * Mapbox.Map.VectorTile.ParseTileData() already adds any exception to the list
 				// * Mapbox.Map.RasterTile.ParseTileData() doesn't do any parsing
-
-				VectorResults = new VectorResult();
-				var task = new Task( () => ParseTileData(response.Data));
+				var task = new Task(() =>
+				{
+					SetByteData(response.Data);
+				});
 
 				task.ContinueWith((t) =>
 				{
@@ -149,11 +150,22 @@ namespace Mapbox.Map
 						}
 					}
 
-					_callback();
+					if (_callback != null)
+					{
+						_callback();
+					}
 				}, TaskScheduler.FromCurrentSynchronizationContext());
 
 				task.Start();
 			}
+		}
+
+		public void SetByteData(byte[] newData)
+		{
+			byteData = newData;
+			VectorResults = new VectorResult();
+			ParseTileData(byteData);
+			TileState = TileState.Loaded;
 		}
 
 		public class VectorResult
@@ -179,11 +191,11 @@ namespace Mapbox.Map
 
 		}
 
-		internal override bool ParseTileData(byte[] byteData)
+		internal override bool ParseTileData(byte[] newData)
 		{
 			try
 			{
-				var decompressed = Compression.Decompress(byteData);
+				var decompressed = Compression.Decompress(newData);
 				data = new Mapbox.VectorTile.VectorTile(decompressed);
 
 				foreach (var layerName in data.LayerNames())

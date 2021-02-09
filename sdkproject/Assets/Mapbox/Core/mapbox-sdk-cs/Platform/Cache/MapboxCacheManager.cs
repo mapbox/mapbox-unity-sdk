@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Mapbox.Map;
 using Mapbox.Unity.MeshGeneration.Data;
 using UnityEngine;
@@ -70,23 +71,23 @@ namespace Mapbox.Platform.Cache
             }
         }
 
-        public void AddVectorItemToMemory(string tilesetId, CanonicalTileId tileId, VectorCacheItem vectorCacheItem, bool forceInsert)
+        public void AddVectorItemToMemory(string tilesetId, CanonicalTileId tileId, CacheItem vectorCacheItem, bool forceInsert)
         {
             _memoryCache.Add(tileId, tilesetId, vectorCacheItem, forceInsert);
         }
 
-        public void AddVectorDataItem(string tilesetId, CanonicalTileId tileId, VectorCacheItem cachedItem, bool forceInsert)
+        public void AddVectorDataItem(string tilesetId, CanonicalTileId tileId, CacheItem vectorCacheItem, bool forceInsert)
         {
-            _memoryCache.Add(tileId, tilesetId, cachedItem, forceInsert);
-            _sqLiteCache?.Add(tilesetId, tileId, cachedItem, forceInsert);
+            _memoryCache.Add(tileId, tilesetId, vectorCacheItem, forceInsert);
+            _sqLiteCache?.Add(tilesetId, tileId, vectorCacheItem, forceInsert);
         }
 
-        public VectorCacheItem GetVectorItemFromMemory(string tilesetId, CanonicalTileId tileId)
+        public CacheItem GetVectorItemFromMemory(string tilesetId, CanonicalTileId tileId)
         {
-            return (VectorCacheItem) _memoryCache.Get(tileId, tilesetId);
+            return _memoryCache.Get(tileId, tilesetId);
         }
 
-        public void GetVectorItemFromSqlite(string tilesetId, CanonicalTileId tileId, Action<VectorCacheItem> callback)
+        public void GetVectorItemFromSqlite(Map.VectorTile tile, string tilesetId, CanonicalTileId tileId, Action<CacheItem> callback)
         {
             if (_sqLiteCache == null)
             {
@@ -94,17 +95,48 @@ namespace Mapbox.Platform.Cache
                 return;
             }
 
-            var cacheItem = (VectorCacheItem) _sqLiteCache.Get(tilesetId, tileId);
-            if (cacheItem != null)
+            var localTilesetId = tilesetId;
+            var localTileId = tileId;
+            var localCopy = tile;
+            CacheItem cacheItem = null;
+            var task = new Task(() =>
             {
-                _memoryCache.Add(tileId, tilesetId, cacheItem, true);
-            }
+                cacheItem = _sqLiteCache.Get(localTilesetId, localTileId);
+                if (cacheItem.Data != null)
+                {
+                    localCopy.SetByteData(cacheItem.Data);
+                }
+            });
+
+            task.ContinueWith((t) =>
+            {
+                if (t.Exception != null)
+                {
+                    callback(null);
+                }
+                else
+                {
+#if UNITY_EDITOR
+                    localCopy.FromCache = CacheType.SqliteCache;
+                    cacheItem.From = localCopy.FromCache;
+#endif
+                    localCopy.ETag = cacheItem.ETag;
+                    cacheItem.Tile = localCopy;
+                    callback(cacheItem);
+                }
+            }, TaskScheduler.FromCurrentSynchronizationContext());
+            task.Start();
+
+            // if (cacheItem != null)
+            // {
+            //     _memoryCache.Add(tileId, tilesetId, cacheItem, true);
+            // }
 
             //kept callback behaviour from texture operations here as we'll most likely need to change this to async
             //either due to sqlite read or vector tile decompressing
             //so it's not async or using the callback thing properly at the moment
 
-            callback(cacheItem);
+
         }
 
         public void AddTextureItem(string tilesetId, CanonicalTileId tileId, TextureCacheItem textureCacheItem, bool forceInsert)
