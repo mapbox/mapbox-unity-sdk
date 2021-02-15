@@ -59,13 +59,19 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			var counter = MeshModifiers.Count;
 			for (int i = 0; i < counter; i++)
 			{
-				MeshModifiers[i].Initialize();
+				if (MeshModifiers[i] != null)
+				{
+					MeshModifiers[i].Initialize();
+				}
 			}
 
 			counter = GoModifiers.Count;
 			for (int i = 0; i < counter; i++)
 			{
-				GoModifiers[i].Initialize();
+				if (GoModifiers[i] != null)
+				{
+					GoModifiers[i].Initialize();
+				}
 			}
 
 			if (filterOptions != null)

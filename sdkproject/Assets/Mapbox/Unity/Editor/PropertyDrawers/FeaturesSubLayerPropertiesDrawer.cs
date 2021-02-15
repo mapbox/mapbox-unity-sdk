@@ -618,8 +618,13 @@ namespace Mapbox.Editor
 				if (_modStackArray[i])
 				{
 					EditorGUI.indentLevel+=2;
-					var editor = Editor.CreateEditor(modStackList.GetArrayElementAtIndex(i).objectReferenceValue as ModifierStack, typeof(ModifierStackEditor)) as ModifierStackEditor;
-					editor.OnInspectorGUI();
+					var mod = modStackList.GetArrayElementAtIndex(i).objectReferenceValue as ModifierStack;
+					if (mod)
+					{
+						var editor = Editor.CreateEditor(modStackList.GetArrayElementAtIndex(i).objectReferenceValue as ModifierStack, typeof(ModifierStackEditor)) as ModifierStackEditor;
+						editor.OnInspectorGUI();
+					}
+
 					EditorGUI.indentLevel-=2;
 				}
 
