@@ -182,7 +182,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			var token = source.Token;
 			var meshDataList = new Dictionary<ModifierStack, List<Tuple<VectorFeatureUnity, MeshData>>>();
 
-			var task = new Task(() =>
+			var task = Task.Run(() =>
 			{
 				var capturedToken = token;
 
@@ -251,8 +251,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				}
 
 			}, TaskScheduler.FromCurrentSynchronizationContext());
-
-			task.Start();
 
 			// #region PostProcess
 			// // TODO : Clean this up to follow the same pattern.

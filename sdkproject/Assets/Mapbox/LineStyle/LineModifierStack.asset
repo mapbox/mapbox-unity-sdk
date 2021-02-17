@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: LineModifierStack
   m_EditorClassIdentifier: 
   MeshModifiers:
-  - {fileID: 11400000, guid: c96db1c214c2644eabbe21bd518cf75f, type: 2}
+  - {fileID: 11400000, guid: cc881ee1b58e744cdb9d31644dc04208, type: 2}
   GoModifiers:
   - {fileID: 11400000, guid: b6b1232c5b9024d27b380c70d49d93a3, type: 2}
   combineMeshes: 0

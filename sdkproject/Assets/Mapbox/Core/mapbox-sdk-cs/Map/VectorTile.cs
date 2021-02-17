@@ -130,7 +130,7 @@ namespace Mapbox.Map
 				// current implementation doesn't need to check if parsing is successful:
 				// * Mapbox.Map.VectorTile.ParseTileData() already adds any exception to the list
 				// * Mapbox.Map.RasterTile.ParseTileData() doesn't do any parsing
-				var task = new Task(() =>
+				var task = Task.Run(() =>
 				{
 					SetByteData(response.Data);
 				});
@@ -155,8 +155,6 @@ namespace Mapbox.Map
 						_callback();
 					}
 				}, TaskScheduler.FromCurrentSynchronizationContext());
-
-				task.Start();
 			}
 		}
 
