@@ -192,6 +192,9 @@ namespace Mapbox.Unity.Map
 		/// <param name="zoom">Zoom level.</param>
 		public virtual void UpdateMap(Vector2d latLon, float zoom)
 		{
+			if (zoom > 20 || zoom < 0)
+				return;
+			
 			if (Application.isEditor && !Application.isPlaying)
 			{
 				return;

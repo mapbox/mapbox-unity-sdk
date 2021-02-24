@@ -50,6 +50,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		[SerializeField] public PositionTargetType moveFeaturePositionTo;
 		[SerializeField] public VectorFilterOptions filterOptions;
 
+		private Dictionary<UnityTile, List<VectorEntity>> _goTracker = new Dictionary<UnityTile, List<VectorEntity>>();
+
 		public ILayerFeatureFilterComparer FeatureFilterCombiner;
 
 		public override void Initialize()
@@ -160,6 +162,27 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				if (GoModifiers[i].Active)
 				{
 					GoModifiers[i].Run(entity, tile);
+				}
+			}
+
+			if (!_goTracker.ContainsKey(tile))
+			{
+				_goTracker.Add(tile, new List<VectorEntity>());
+			}
+			
+			_goTracker[tile].Add(entity);
+		}
+
+		public override void OnUnregisterTile(UnityTile tile)
+		{
+			base.OnUnregisterTile(tile);
+
+			var counter = GoModifiers.Count;
+			for (int i = 0; i < counter; i++)
+			{
+				if (GoModifiers[i].Active)
+				{
+					GoModifiers[i].Unregister(tile);
 				}
 			}
 		}
