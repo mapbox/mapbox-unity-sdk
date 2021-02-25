@@ -432,7 +432,6 @@ GameObject:
   - component: {fileID: 555018384}
   - component: {fileID: 555018383}
   - component: {fileID: 555018385}
-  - component: {fileID: 555018387}
   - component: {fileID: 555018389}
   - component: {fileID: 555018388}
   - component: {fileID: 555018390}
@@ -482,7 +481,7 @@ MonoBehaviour:
       scalingType: 1
       unityTileSize: 100
     loadingTexture: {fileID: 1976258137}
-    tileMaterial: {fileID: 2100000, guid: b9f23e9bce724fa4daac57ecded470b8, type: 2}
+    tileMaterial: {fileID: 2100000, guid: 764fa5e39b2479249af645452ac5d740, type: 2}
   _mapVisualizer: {fileID: 1087372577}
   _tileProvider: {fileID: 0}
   _initializeOnStart: 1
@@ -515,55 +514,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Map: {fileID: 555018383}
-  ImageSettings:
-    sourceType: 0
-    sourceOptions:
-      isActive: 1
-      layerSource:
-        Name: Streets
-        Id: mapbox://styles/mapbox/streets-v10
-        Modified: 
-        UserName: 
-    rasterOptions:
-      useRetina: 0
-      useCompression: 0
-      useMipMap: 0
-  DownloadFallbackImagery: 1
   CustomTilesetId: AerisHeatMap
-  UrlFormat: https://maps.aerisapi.com/anh3TB1Xu9Wr6cPndbPwF_EuOSGuqkH433UmnajaOP0MD9rpIh5dZ38g2SUwvu/satellite-infrared-color/{0}/{1}/{2}/current.png
+  UrlFormat: https://maps.aerisapi.com/(api_key_here)/satellite-infrared-color/{0}/{1}/{2}/current.png
   TextureFieldName: _CustomOne
   TextureScaleOffsetFieldName: _CustomOne_ST
---- !u!114 &555018387
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 555018382}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10333f5033e540ac930ef4dd8915fef7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Map: {fileID: 555018383}
-  ImageSettings:
-    sourceType: 0
-    sourceOptions:
-      isActive: 1
-      layerSource:
-        Name: Streets
-        Id: mapbox://styles/mapbox/streets-v10
-        Modified: 
-        UserName: 
-    rasterOptions:
-      useRetina: 0
-      useCompression: 0
-      useMipMap: 0
-  DownloadFallbackImagery: 0
-  CustomTilesetId: AerisDotMap
-  UrlFormat: https://maps.aerisapi.com/anh3TB1Xu9Wr6cPndbPwF_EuOSGuqkH433UmnajaOP0MD9rpIh5dZ38g2SUwvu/lightning-strikes,temperatures-text,stormreports,stormcells/{0}/{1}/{2}/current.png
-  TextureFieldName: _CustomTwo
-  TextureScaleOffsetFieldName: _CustomTwo_ST
+  DownloadFallbackImagery: 1
+  Retina: 1
+  Compress: 0
+  UseMipmap: 0
 --- !u!114 &555018388
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -676,7 +634,6 @@ MonoBehaviour:
       tileJsonData:
         tileJSONLoaded: 0
         LayerDisplayNames:
-        - Class_Airspace-7palx6
         - admin
         - aeroway
         - airport_label

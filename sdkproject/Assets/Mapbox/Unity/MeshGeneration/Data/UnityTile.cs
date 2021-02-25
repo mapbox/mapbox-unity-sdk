@@ -1,5 +1,3 @@
-
-using Sirenix.Serialization;
 using UnityEditor;
 using UnityEngine.Rendering;
 

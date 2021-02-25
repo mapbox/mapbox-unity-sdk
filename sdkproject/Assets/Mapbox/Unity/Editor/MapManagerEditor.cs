@@ -14,7 +14,7 @@ namespace Mapbox.Editor
 	public class MapManagerEditor : Editor
 	{
 		private string objectId = "";
-		private Color previewButtonColor = new Color(0.7f, 1.0f, 0.7f);
+
 		/// <summary>
 		/// Gets or sets a value indicating whether to show general section <see cref="T:Mapbox.Editor.MapManagerEditor"/>.
 		/// </summary>
@@ -106,24 +106,6 @@ namespace Mapbox.Editor
 			objectId = serializedObject.targetObject.GetInstanceID().ToString();
 			serializedObject.Update();
 			EditorGUILayout.BeginVertical();
-			EditorGUILayout.Space();
-
-			var previewOptions = serializedObject.FindProperty("_previewOptions");
-			var prevProp = previewOptions.FindPropertyRelative("isPreviewEnabled");
-			var prev = prevProp.boolValue;
-
-			Color guiColor = GUI.color;
-			GUI.color = (prev) ? previewButtonColor : guiColor;
-
-			GUIStyle style = new GUIStyle("Button");
-			style.alignment = TextAnchor.MiddleCenter;
-
-			if (!Application.isPlaying)
-			{
-				prevProp.boolValue = GUILayout.Toggle(prevProp.boolValue, "Enable Preview", style);
-				GUI.color = guiColor;
-				EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-			}
 
 			ShowGeneral = EditorGUILayout.Foldout(ShowGeneral, new GUIContent { text = "GENERAL", tooltip = "Options related to map data" });
 
@@ -167,17 +149,6 @@ namespace Mapbox.Editor
 			var vectorDataProperty = _mapVisualizerObject.FindProperty("VectorLayer");
 			var layerProperty = vectorDataProperty.FindPropertyRelative("_layerProperty");
 			_vectorLayerDrawer.PostProcessLayerProperties(layerProperty);
-			if (!Application.isPlaying)
-			{
-				if (prevProp.boolValue && !prev)
-				{
-					//((AbstractMap)serializedObject.targetObject).EnableEditorPreview();
-				}
-				else if (prev && !prevProp.boolValue)
-				{
-					//((AbstractMap)serializedObject.targetObject).DisableEditorPreview();
-				}
-			}
 		}
 
 		void ShowSection(SerializedProperty property, string propertyName)
@@ -359,7 +330,7 @@ namespace Mapbox.Editor
 					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("optimizedStyle"), new GUIContent("Style Options"));
 				}
 				GUILayout.Space(-_lineHeight);
-				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("performanceOptions"), new GUIContent("Perfomance Options"));
+				//EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("performanceOptions"), new GUIContent("Perfomance Options"));
 			}
 
 			EditorGUILayout.Space();

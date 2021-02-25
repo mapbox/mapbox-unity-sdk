@@ -10,18 +10,38 @@ namespace CustomImageLayerSample
 	{
 		public AbstractMap Map;
 		public ImageFactoryManager ImageFactoryManager;
-		public ImageryLayerProperties ImageSettings;
-		public bool DownloadFallbackImagery = false;
+		//[HideInInspector] public ImageryLayerProperties ImageSettings;
 		public string CustomTilesetId = "AerisHeatMap";
-		public string UrlFormat = "https://maps.aerisapi.com/anh3TB1Xu9Wr6cPndbPwF_EuOSGuqkH433UmnajaOP0MD9rpIh5dZ38g2SUwvu/flat,ftemperatures-max-text,admin/{0}/{1}/{2}/current.png";
+		public string UrlFormat = "";
 		public string TextureFieldName = "_CustomOne";
 		public string TextureScaleOffsetFieldName = "_CustomOne_ST";
+
+		public bool DownloadFallbackImagery = false;
+		public bool Retina = false;
+		public bool Compress = false;
+		public bool UseMipmap = false;
 
 		public void Awake()
 		{
 			if (enabled)
 			{
-				ImageFactoryManager = new CustomImageFactoryManager(MapboxAccess.Instance, UrlFormat, ImageSettings, DownloadFallbackImagery, TextureFieldName, TextureScaleOffsetFieldName);
+				var imageSettings = new ImageryLayerProperties();
+				imageSettings.rasterOptions = new ImageryRasterOptions()
+				{
+					useRetina = Retina,
+					useCompression = Compress,
+					useMipMap = UseMipmap
+				};
+				imageSettings.sourceOptions = new LayerSourceOptions()
+				{
+					layerSource = new Style()
+					{
+						Name = CustomTilesetId,
+						Id = CustomTilesetId
+					}
+				};
+
+				ImageFactoryManager = new CustomImageFactoryManager(MapboxAccess.Instance, UrlFormat, imageSettings, DownloadFallbackImagery, TextureFieldName, TextureScaleOffsetFieldName);
 				ImageFactoryManager.FetchingError += (tile, rasterTile, args) => { Debug.Log(args.Exceptions[0]); };
 				Map.OnTileRegisteredToFactories += ImageFactoryManager.RegisterTile;
 				Map.OnTileDisposing += tile => { ImageFactoryManager.UnregisterTile(tile); };

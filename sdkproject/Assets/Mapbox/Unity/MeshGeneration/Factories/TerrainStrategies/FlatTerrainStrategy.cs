@@ -83,30 +83,32 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 
 		private void BuildQuad(UnityTile tile)
 		{
+			var tileHalfSize = _elevationOptions.TileSize / 2;
 			var unityMesh = tile.MeshFilter.sharedMesh;
 			var verts = new Vector3[4];
 			var norms = new Vector3[4];
-			verts[0] = tile.TileScale * ((tile.Rect.Min - tile.Rect.Center).ToVector3xz());
-			verts[1] = tile.TileScale * (new Vector3((float)(tile.Rect.Max.x - tile.Rect.Center.x), 0, (float)(tile.Rect.Min.y - tile.Rect.Center.y)));
-			verts[2] = tile.TileScale * ((tile.Rect.Max - tile.Rect.Center).ToVector3xz());
-			verts[3] = tile.TileScale * (new Vector3((float)(tile.Rect.Min.x - tile.Rect.Center.x), 0, (float)(tile.Rect.Max.y - tile.Rect.Center.y)));
-			norms[0] = Mapbox.Unity.Constants.Math.Vector3Up;
-			norms[1] = Mapbox.Unity.Constants.Math.Vector3Up;
-			norms[2] = Mapbox.Unity.Constants.Math.Vector3Up;
-			norms[3] = Mapbox.Unity.Constants.Math.Vector3Up;
+			verts[0] = new Vector3(-tileHalfSize, 0, -tileHalfSize);
+			verts[1] = new Vector3(tileHalfSize, 0, -tileHalfSize);
+			verts[2] = new Vector3(tileHalfSize, 0, tileHalfSize);
+			verts[3] = new Vector3(-tileHalfSize, 0, tileHalfSize);
+			norms[0] = Constants.Math.Vector3Up;
+			norms[1] = Constants.Math.Vector3Up;
+			norms[2] = Constants.Math.Vector3Up;
+			norms[3] = Constants.Math.Vector3Up;
+
 
 			unityMesh.vertices = verts;
 			unityMesh.normals = norms;
 
-			var trilist = new int[6] { 0, 1, 2, 0, 2, 3 };
+			var trilist = new int[6] { 0, 2, 1, 0, 3, 2 };
 			unityMesh.triangles = trilist;
 
 			var uvlist = new Vector2[4]
 			{
-					new Vector2(0,1),
-					new Vector2(1,1),
-					new Vector2(1,0),
-					new Vector2(0,0)
+				new Vector2(0,0),
+				new Vector2(1,0),
+				new Vector2(1,1),
+				new Vector2(0,1)
 			};
 			unityMesh.uv = uvlist;
 			_cachedQuad = new MeshDataArray()
