@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.4465934, g: 0.49642956, b: 0.5748249, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -481,7 +481,7 @@ MonoBehaviour:
       scalingType: 1
       unityTileSize: 100
     loadingTexture: {fileID: 1976258137}
-    tileMaterial: {fileID: 2100000, guid: 764fa5e39b2479249af645452ac5d740, type: 2}
+    tileMaterial: {fileID: 2100000, guid: 03fcf11879198499f9e71b4e087af3c0, type: 2}
   _mapVisualizer: {fileID: 1087372577}
   _tileProvider: {fileID: 0}
   _initializeOnStart: 1
@@ -598,7 +598,7 @@ MonoBehaviour:
           Id: mapbox.terrain-rgb
           Modified: 
           UserName: 
-      elevationLayerType: 1
+      elevationLayerType: 0
       requiredOptions:
         exaggerationFactor: 1
       colliderOptions:
@@ -614,7 +614,7 @@ MonoBehaviour:
         isActive: 0
         wallHeight: 10
         wallMaterial: {fileID: 0}
-      TileSize: 101
+      TileSize: 100
   ImageryLayer:
     _layerProperty:
       sourceType: 4
@@ -637,31 +637,25 @@ MonoBehaviour:
         - admin
         - aeroway
         - airport_label
-        - barrier_line
         - building
-        - country_label
         - housenum_label
         - landuse
         - landuse_overlay
-        - marine_label
         - motorway_junction
-        - mountain_peak_label
+        - natural_label
         - place_label
         - poi_label
-        - rail_station_label
         - road
-        - road_label
-        - state_label
+        - structure
+        - transit_stop_label
         - water
-        - water_label
         - waterway
-        - waterway_label
       _sourceType: 3
       sourceOptions:
         isActive: 0
         layerSource:
           Name: Mapbox Streets v7
-          Id: mapbox.mapbox-streets-v7
+          Id: mapbox.mapbox-streets-v8
           Modified: 
           UserName: 
       useOptimizedStyle: 0
