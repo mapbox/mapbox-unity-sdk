@@ -560,8 +560,9 @@ namespace Mapbox.Editor
 			}
 			//*********************** LAYER NAME ENDS ***********************************//
 
+			var uniqueIdProperty = layerProperty.FindPropertyRelative("buildingsWithUniqueIds");
+			uniqueIdProperty.boolValue = EditorGUILayout.Toggle("Unique Ids", uniqueIdProperty.boolValue);
 
-			EditorGUI.indentLevel++;
 			var modStackList = layerProperty.FindPropertyRelative("ModifierStacks");
 
 			EditorGUILayout.BeginVertical();
@@ -632,7 +633,6 @@ namespace Mapbox.Editor
 			}
 
 			EditorGUILayout.EndVertical();
-			EditorGUI.indentLevel--;
 			// EditorGUI.indentLevel++;
 			//
 			// EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("performanceOptions"), new GUIContent("Perfomance Options"));

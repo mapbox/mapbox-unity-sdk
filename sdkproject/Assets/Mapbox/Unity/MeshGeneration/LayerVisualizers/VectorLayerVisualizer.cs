@@ -183,13 +183,12 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			var source = new CancellationTokenSource();
 			var token = source.Token;
 			var meshDataList = new Dictionary<ModifierStack, List<Tuple<VectorFeatureUnity, MeshData>>>();
-			var name = "";
-			
+
 			var task = Task.Run(() =>
 			{
 				var capturedToken = token;
 
-				foreach (var feature in cachedLayer.Features.Where(x => x.Properties.ContainsKey("name")))
+				foreach (var feature in cachedLayer.Features)
 				{
 					if (capturedToken.IsCancellationRequested) return;
 					if (IsFeatureInvalid(tile, feature, _tempLayerProperties)) continue;
@@ -198,7 +197,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					{
 						if (modifierStack.FeatureFilterCombiner.Try(feature))
 						{
-							name += feature.Properties["name"].ToString();
 							var meshData = new MeshData();
 							meshData = modifierStack.RunMeshModifiers(tile, feature, meshData, tile.TileSize);
 							if (!meshDataList.ContainsKey(modifierStack))
