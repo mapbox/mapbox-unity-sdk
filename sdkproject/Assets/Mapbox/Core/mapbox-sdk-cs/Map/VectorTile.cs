@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Mapbox.Platform;
 using Mapbox.Unity.MeshGeneration.Data;
@@ -116,11 +117,19 @@ namespace Mapbox.Map
 
 		private void HandleTileResponse(Response response)
 		{
+			//callback has to be called here
+			//otherwise requests are never complete (success or failure) and pipeline gets blocked
 			if (response.HasError)
 			{
+				TileState = TileState.Canceled;
 				foreach (var exception in response.Exceptions)
 				{
 					AddException(exception);
+				}
+
+				if (_callback != null)
+				{
+					_callback();
 				}
 			}
 			else
@@ -140,14 +149,7 @@ namespace Mapbox.Map
 					// Cancelled is not the same as loaded!
 					if (TileState != TileState.Canceled)
 					{
-						if (response.IsUpdate)
-						{
-							TileState = TileState.Updated;
-						}
-						else
-						{
-							TileState = TileState.Loaded;
-						}
+						TileState = TileState.Loaded;
 					}
 
 					if (_callback != null)
