@@ -22,24 +22,24 @@ public class VectorDataFetcher : DataFetcher
 		// MemoryCacheCheck
 		// we do not check for tile expiration of memory cached items
 		// we only do expiration check for item from file/sql
- // 		var vectorItemFromMemory = MapboxAccess.Instance.CacheManager.GetVectorItemFromMemory(tilesetId, tileId);
- // 		if (vectorItemFromMemory != null)
- // 		{
- // 			tile.SetVectorFromCache(vectorItemFromMemory.Tile as VectorTile);
- //
- // #if UNITY_EDITOR
- // 			tile.FromCache = CacheType.MemoryCache;
- // #endif
- //
- // 			//this is mostly to update the caching time
- // 			MapboxAccess.Instance.CacheManager.AddVectorItemToMemory(
- // 				vectorItemFromMemory.TilesetId,
- // 				vectorItemFromMemory.TileId,
- // 				vectorItemFromMemory,
- // 				true);
- // 			DataReceived(unityTile, tile);
- // 			return;
- // 		}
+ 		var vectorItemFromMemory = MapboxAccess.Instance.CacheManager.GetVectorItemFromMemory(tilesetId, tileId);
+ 		if (vectorItemFromMemory != null)
+ 		{
+ 			tile.SetVectorFromCache(vectorItemFromMemory.Tile as VectorTile);
+
+ #if UNITY_EDITOR
+ 			tile.FromCache = CacheType.MemoryCache;
+ #endif
+
+ 			//this is mostly to update the caching time
+ 			MapboxAccess.Instance.CacheManager.AddVectorItemToMemory(
+ 				vectorItemFromMemory.TilesetId,
+ 				vectorItemFromMemory.TileId,
+ 				vectorItemFromMemory,
+ 				true);
+ 			DataReceived(unityTile, tile);
+ 			return;
+ 		}
 
         // MapboxAccess.Instance.CacheManager.GetVectorItemFromSqlite(tile, tilesetId, tileId, (vectorCacheItemFromSqlite) =>
         // {

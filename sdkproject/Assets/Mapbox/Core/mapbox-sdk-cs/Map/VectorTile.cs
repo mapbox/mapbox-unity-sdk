@@ -112,7 +112,7 @@ namespace Mapbox.Map
 			_callback = p;
 			TilesetId = tilesetId;
 
-			_request = fileSource.Request(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse);
+			_request = fileSource.Request(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse, 2);
 		}
 
 		private void HandleTileResponse(Response response)
