@@ -43,7 +43,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		//id tracking stuff, only necessary for unique id layers like `buildings with ids`
 		private HashSet<ulong> _activeIds;
-		private Dictionary<UnityTile, List<ulong>> _idPool; //necessary to keep _activeIds list up to date when unloading tiles
+		private Dictionary<CanonicalTileId, List<ulong>> _idPool; //necessary to keep _activeIds list up to date when unloading tiles
 
 		public override string Key
 		{
@@ -55,7 +55,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		{
 			base.Initialize();
 			_activeIds = new HashSet<ulong>();
-			_idPool = new Dictionary<UnityTile, List<ulong>>();
+			_idPool = new Dictionary<CanonicalTileId, List<ulong>>();
 			_tempLayerProperties = GetLayerTempProperties();
 
 			if (_defaultStack != null)
@@ -191,7 +191,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				foreach (var feature in cachedLayer.Features)
 				{
 					if (capturedToken.IsCancellationRequested) return;
-					if (IsFeatureInvalid(tile, feature, _tempLayerProperties)) continue;
+					if (IsFeatureInvalid(cachedTileId, feature, _tempLayerProperties)) continue;
 					
 					foreach (var modifierStack in _modifierStacks)
 					{
@@ -216,8 +216,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 						pairs.Value.Clear();
 						pairs.Value.Add(new Tuple<VectorFeatureUnity, MeshData>(null, mergedData));
 					}
-
 				}
+
 			}, token);
 
 			if (!_tasks.ContainsKey(tile.CanonicalTileId))
@@ -234,7 +234,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					return;
 				}
 
-				tile.name = name;
 				//is there a better way to check this?
 				if (tile.CanonicalTileId == cachedTileId && !tile.IsRecycled)
 				{
@@ -255,7 +254,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					}
 				}
 				
-				callback?.Invoke(tile, this);
+				cachedCallback?.Invoke(tile, this);
 
 
 			}, TaskScheduler.FromCurrentSynchronizationContext());
@@ -398,17 +397,20 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		}
 
 		#region Private Helper Methods
-		private bool IsFeatureInvalid(UnityTile tile, VectorFeatureUnity feature, VectorLayerVisualizerProperties tempLayerProperties)
+		private bool IsFeatureInvalid(CanonicalTileId tileId, VectorFeatureUnity feature, VectorLayerVisualizerProperties tempLayerProperties)
 		{
 			// if (!IsFeatureEligibleAfterFiltering(feature, tempLayerProperties))
 			// 	return true;
 
 			//this part is necessary for unique id layers (buildings)
 			//it keeps track of processed ids and doesn't recreate them
-			if (ShouldSkipProcessingFeatureWithId(feature.Data.Id, tempLayerProperties))
-				return true;
+			if (tempLayerProperties.buildingsWithUniqueIds)
+			{
+				if (ShouldSkipProcessingFeatureWithId(feature.Data.Id, tempLayerProperties))
+					return true;
 
-			AddFeatureToTileObjectPool(feature, tile);
+				AddFeatureToTileObjectPool(feature, tileId);
+			}
 
 			if (feature.Properties.ContainsKey("extrude") && !bool.Parse(feature.Properties["extrude"].ToString()))
 				return true;
@@ -481,14 +483,14 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		{
 			//ids = unique ids in some certain layers (building-id layer)
 			//removing ids from activeIds list so they'll be recreated next time tile loads (necessary when you're unloading/loading tiles)
-			if (_idPool.ContainsKey(tile))
+			if (_idPool.ContainsKey(tile.CanonicalTileId))
 			{
-				foreach (var item in _idPool[tile])
+				foreach (var item in _idPool[tile.CanonicalTileId])
 				{
 					_activeIds.Remove(item);
 				}
 
-				_idPool[tile].Clear();
+				_idPool[tile.CanonicalTileId].Clear();
 			}
 		}
 
@@ -510,16 +512,16 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		/// </summary>
 		/// <param name="feature">Feature to be added to the pool.</param>
 		/// <param name="tile">Tile currently being processed.</param>
-		private void AddFeatureToTileObjectPool(VectorFeatureUnity feature, UnityTile tile)
+		private void AddFeatureToTileObjectPool(VectorFeatureUnity feature, CanonicalTileId tileId)
 		{
 			_activeIds.Add(feature.Data.Id);
-			if (!_idPool.ContainsKey(tile))
+			if (!_idPool.ContainsKey(tileId))
 			{
-				_idPool.Add(tile, new List<ulong>() { feature.Data.Id });
+				_idPool.Add(tileId, new List<ulong>() { feature.Data.Id });
 			}
 			else
 			{
-				_idPool[tile].Add(feature.Data.Id);
+				_idPool[tileId].Add(feature.Data.Id);
 			}
 		}
 
