@@ -99,7 +99,7 @@ namespace Mapbox.Platform.Cache
             var localTileId = tileId;
             var localCopy = tile;
             CacheItem cacheItem = null;
-            var task = new Task(() =>
+            var task = Task.Run(() =>
             {
                 cacheItem = _sqLiteCache.Get(localTilesetId, localTileId);
                 if (cacheItem.Data != null)
@@ -125,7 +125,6 @@ namespace Mapbox.Platform.Cache
                     callback(cacheItem);
                 }
             }, TaskScheduler.FromCurrentSynchronizationContext());
-            task.Start();
 
             // if (cacheItem != null)
             // {
@@ -190,28 +189,54 @@ namespace Mapbox.Platform.Cache
                     return;
                 }
 
-                //this isn't async. shouldn't it be?
-                var tile = _sqLiteCache.Get(tilesetId, tileId);
-                if (tile != null)
+                CacheItem cacheItem = null;
+                var task = Task.Run(() =>
                 {
-                    textureCacheItem.ETag = tile.ETag;
-                    textureCacheItem.ExpirationDate = tile.ExpirationDate;
-                }
-                else
-                {
-                    //file exists but sqlite entry does not
-                    //entry was probably pruned but file deletion didn't go through (crashed/closed app)
-                    //serve the image without metadata for now
-                    //delete tile, next tile it'll be updated
+                    cacheItem = _sqLiteCache.Get(tilesetId, tileId);
+                });
 
-                    _textureFileCache.DeleteTileFile(textureCacheItem.FilePath);
-                }
+                task.ContinueWith((t) =>
+                {
+                    if (cacheItem != null)
+                    {
+                        textureCacheItem.ETag = cacheItem.ETag;
+                        textureCacheItem.ExpirationDate = cacheItem.ExpirationDate;
+                    }
+                    else
+                    {
+                        //file exists but sqlite entry does not
+                        //entry was probably pruned but file deletion didn't go through (crashed/closed app)
+                        //serve the image without metadata for now
+                        //delete tile, next tile it'll be updated
+
+                        _textureFileCache.DeleteTileFile(textureCacheItem.FilePath);
+                    }
+
+                    callback(textureCacheItem);
+                }, TaskScheduler.FromCurrentSynchronizationContext());
+
+                //this isn't async. shouldn't it be?
+                // var tile = _sqLiteCache.Get(tilesetId, tileId);
+                // if (tile != null)
+                // {
+                //     textureCacheItem.ETag = tile.ETag;
+                //     textureCacheItem.ExpirationDate = tile.ExpirationDate;
+                // }
+                // else
+                // {
+                //     //file exists but sqlite entry does not
+                //     //entry was probably pruned but file deletion didn't go through (crashed/closed app)
+                //     //serve the image without metadata for now
+                //     //delete tile, next tile it'll be updated
+                //
+                //     _textureFileCache.DeleteTileFile(textureCacheItem.FilePath);
+                // }
 
                 //decided not to do this and leave control to caller
                 //they can add it to memory cache using AddTextureItemToMemory
                 //_memoryCache.Add(tilesetId, tileId, textureCacheItem, true);
 
-                callback(textureCacheItem);
+                //callback(textureCacheItem);
             });
         }
 

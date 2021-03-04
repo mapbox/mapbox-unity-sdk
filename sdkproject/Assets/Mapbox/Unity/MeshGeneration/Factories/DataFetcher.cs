@@ -10,6 +10,7 @@ using UnityEngine;
 
 public abstract class DataFetcher
 {
+	private const float _requestDelay = 0.2f;
 	public int QueuedRequestCount => _localQueuedRequests.Count;
 
 	private Dictionary<int, Tile> _localQueuedRequests = new Dictionary<int, Tile>();
@@ -48,11 +49,20 @@ public abstract class DataFetcher
 	{
 		while (true)
 		{
-			while (_tileOrder.Count > 0 && _globalActiveRequests.Count < _activeRequestLimit)
+			var fallbackCounter = 0;
+			while (_tileOrder.Count > 0 && _globalActiveRequests.Count < _activeRequestLimit && fallbackCounter < _activeRequestLimit)
 			{
-				var tileKey = _tileOrder.Dequeue();
-				if (_tileFetchInfos.ContainsKey(tileKey))
+				fallbackCounter++;
+				var tileKey = _tileOrder.Peek(); //we just peek first as we might want to hold it until delay timer runs out
+				if (!_tileFetchInfos.ContainsKey(tileKey))
 				{
+					_tileOrder.Dequeue(); //but we dequeue it if it's not in tileFetchInfos, which means it's cancelled
+					continue;
+				}
+
+				if (QueueTimeHasMatured(_tileFetchInfos[tileKey].QueueTime, _requestDelay))
+				{
+					tileKey = _tileOrder.Dequeue();
 					var fi = _tileFetchInfos[tileKey];
 					_tileFetchInfos.Remove(tileKey);
 					_globalActiveRequests.Add(tileKey, fi.RasterTile);
@@ -69,9 +79,15 @@ public abstract class DataFetcher
 		}
 	}
 
+	private static bool QueueTimeHasMatured(float queueTime, float maturationAge)
+	{
+		return Time.time - queueTime >= maturationAge;
+	}
+
 	protected void EnqueueForFetching(FetchInfo info)
 	{
 		var key = info.TileId.GenerateKey(info.TilesetId);
+
 		if (!_localQueuedRequests.ContainsKey(key))
 		{
 			info.Callback += () =>
@@ -82,6 +98,7 @@ public abstract class DataFetcher
 
 			_tileOrder.Enqueue(key);
 			_localQueuedRequests.Add(key, info.RasterTile);
+			info.QueueTime = Time.time;
 			_tileFetchInfos.Add(key, info);
 		}
 		else
@@ -127,6 +144,7 @@ public class FetchInfo
 	public Action Callback;
 	public Tile RasterTile;
 	public string ETag;
+	public float QueueTime;
 
 	public FetchInfo(CanonicalTileId tileId, string tilesetId, Tile tile, string eTag = "", Action callback = null)
 	{
@@ -136,4 +154,5 @@ public class FetchInfo
 		ETag = eTag;
 		callback = callback;
 	}
+
 }

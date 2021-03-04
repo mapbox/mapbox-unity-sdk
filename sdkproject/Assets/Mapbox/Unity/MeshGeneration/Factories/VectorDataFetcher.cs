@@ -41,44 +41,44 @@ public class VectorDataFetcher : DataFetcher
  			return;
  		}
 
-        // MapboxAccess.Instance.CacheManager.GetVectorItemFromSqlite(tile, tilesetId, tileId, (vectorCacheItemFromSqlite) =>
-        // {
-	       //  if (unityTile != null && !unityTile.ContainsDataTile(tile))
-	       //  {
-		      //   //this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
-		      //   return;
-	       //  }
-        //
-	       //  if (vectorCacheItemFromSqlite?.Data != null)
-	       //  {
-		      //   if (vectorCacheItemFromSqlite.ExpirationDate.HasValue)
-		      //   {
-			     //    tile.ExpirationDate = vectorCacheItemFromSqlite.ExpirationDate.Value;
-		      //   }
-        //
-		      //   DataReceived(unityTile, tile);
-        //
-		      //   //IMPORTANT file is read from file cache and it's not automatically
-		      //   //moved to memory cache. we have to do it here.
-		      //   MapboxAccess.Instance.CacheManager.AddVectorItemToMemory(
-			     //    vectorCacheItemFromSqlite.TilesetId,
-			     //    vectorCacheItemFromSqlite.TileId,
-			     //    vectorCacheItemFromSqlite,
-			     //    true);
-	       //  }
-	       //  else
-	       //  {
-		      //   EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, string.Empty)
-		      //   {
-			     //    Callback = () => { FetchingCallback(tileId, tile, unityTile); }
-		      //   });
-	       //  }
-        // });
+        MapboxAccess.Instance.CacheManager.GetVectorItemFromSqlite(tile, tilesetId, tileId, (vectorCacheItemFromSqlite) =>
+        {
+	        if (unityTile != null && !unityTile.ContainsDataTile(tile))
+	        {
+		        //this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
+		        return;
+	        }
 
-		EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, string.Empty)
-		{
-			Callback = () => { FetchingCallback(tileId, tile, unityTile); }
-		});
+	        if (vectorCacheItemFromSqlite?.Data != null)
+	        {
+		        if (vectorCacheItemFromSqlite.ExpirationDate.HasValue)
+		        {
+			        tile.ExpirationDate = vectorCacheItemFromSqlite.ExpirationDate.Value;
+		        }
+
+		        DataReceived(unityTile, tile);
+
+		        //IMPORTANT file is read from file cache and it's not automatically
+		        //moved to memory cache. we have to do it here.
+		        MapboxAccess.Instance.CacheManager.AddVectorItemToMemory(
+			        vectorCacheItemFromSqlite.TilesetId,
+			        vectorCacheItemFromSqlite.TileId,
+			        vectorCacheItemFromSqlite,
+			        true);
+	        }
+	        else
+	        {
+		        EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, string.Empty)
+		        {
+			        Callback = () => { FetchingCallback(tileId, tile, unityTile); }
+		        });
+	        }
+        });
+
+		// EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, string.Empty)
+		// {
+		// 	Callback = () => { FetchingCallback(tileId, tile, unityTile); }
+		// });
 
 		//FileCacheCheck
 //         MapboxAccess.Instance.CacheManager.GetVectorItemFromSqlite(tilesetId, tileId, (vectorCacheItemFromSqlite) =>
@@ -185,9 +185,6 @@ public class VectorDataFetcher : DataFetcher
 			}
 			else
 			{
-				//IMPORTANT This is where we create a Texture2D
-				//rasterTile.ExtractTextureFromRequest();
-
 				var cacheItem = new CacheItem()
 				{
 					Tile = vectorTile,
