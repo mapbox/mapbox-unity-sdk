@@ -11,7 +11,9 @@ namespace Mapbox.Platform.Cache
 	/// </summary>
 	public class tiles
 	{
-
+		[PrimaryKey, AutoIncrement]
+		public int id { get; set; }
+		
 		public int tile_set { get; set; }
 
 		//hrmpf: multiple PKs not supported by sqlite.net
@@ -38,7 +40,18 @@ namespace Mapbox.Platform.Cache
 
 		/// <summary>Expiration date of cached data </summary>
 		public int? expirationDate { get; set; }
+	}
 
+	public class offlineMaps
+	{
+		[PrimaryKey, AutoIncrement]
+		public int id { get; set; }
+		public string name { get; set; }
+	}
 
+	public class tile2offline
+	{
+		public int tileId { get; set; }
+		public int mapId { get; set; }
 	}
 }

@@ -15,7 +15,7 @@ namespace Mapbox.Platform.Cache
 
 	public class SQLiteCache : ICache, IDisposable
 	{
-		private const int DATABASE_CODE_VERSION = 1;
+		private const int DATABASE_CODE_VERSION = 2;
 
 		/// <summary>
 		/// maximum number tiles that get cached
@@ -101,6 +101,7 @@ name  STRING  NOT NULL
 			{
 
 				string cmdCreateTableTiles = @"CREATE TABLE tiles(
+id 			 INTEGER PRIMARY KEY ASC AUTOINCREMENT NOT NULL UNIQUE, 
 tile_set     INTEGER REFERENCES tilesets (id) ON DELETE CASCADE ON UPDATE CASCADE,
 zoom_level   INTEGER NOT NULL,
 tile_column  BIGINT  NOT NULL,
@@ -110,12 +111,7 @@ tile_path    TEXT,
 timestamp    INTEGER NOT NULL,
 etag         TEXT,
 expirationDate INTEGER,
-	PRIMARY KEY(
-		tile_set ASC,
-		zoom_level ASC,
-		tile_column ASC,
-		tile_row ASC
-	)
+CONSTRAINT tileConstraint UNIQUE (tile_set, zoom_level, tile_column, tile_row)
 );";
 				_sqlite.Execute(cmdCreateTableTiles);
 
@@ -123,6 +119,31 @@ expirationDate INTEGER,
 				_sqlite.Execute(cmdIdxTileset);
 				string cmdIdxTimestamp = "CREATE INDEX idx_timestamp ON tiles (timestamp ASC);";
 				_sqlite.Execute(cmdIdxTimestamp);
+			}
+
+			List<SQLiteConnection.ColumnInfo> colInfoOfflineMaps = _sqlite.GetTableInfo(typeof(offlineMaps).Name);
+			if (0 == colInfoOfflineMaps.Count)
+			{
+				string cmdCreateTableOfflineMaps = @"CREATE TABLE offlinemaps(
+id    INTEGER PRIMARY KEY ASC AUTOINCREMENT NOT NULL UNIQUE,
+name  STRING  NOT NULL
+);";
+				_sqlite.Execute(cmdCreateTableOfflineMaps);
+				string cmdCreateIdxOfflineMapNames = @"CREATE UNIQUE INDEX idx_offlineMapNames ON offlinemaps (name ASC);";
+				_sqlite.Execute(cmdCreateIdxOfflineMapNames);
+			}
+
+			List<SQLiteConnection.ColumnInfo> colInfoTileToOffline = _sqlite.GetTableInfo(typeof(tile2offline).Name);
+			if (0 == colInfoTileToOffline.Count)
+			{
+				string cmdCreateTableTile2Offline = @"CREATE TABLE tile2offline(
+tileId    INTEGER NOT NULL,
+mapId    INTEGER NOT NULL,
+CONSTRAINT tileAssignmentConstraint UNIQUE (tileId, mapId)
+);";
+				_sqlite.Execute(cmdCreateTableTile2Offline);
+				string cmdCreateIdxOfflineMap2Tiles = @"CREATE UNIQUE INDEX idx_offlineMapToTiles ON tile2offline (tileId, mapId ASC);";
+				_sqlite.Execute(cmdCreateIdxOfflineMap2Tiles);
 			}
 
 			_sqlite.Execute("PRAGMA user_version=" + DATABASE_CODE_VERSION);
@@ -324,7 +345,7 @@ expirationDate INTEGER,
 				lock (_lock)
 				{
 					var nowInUnix = (int) UnixTimestampUtils.To(DateTime.Now);
-					int rowsAffected = _sqlite.InsertOrReplace(new tiles
+					var newTile = new tiles
 					{
 						tile_set = tilesetId.Value,
 						zoom_level = tileId.Z,
@@ -335,11 +356,37 @@ expirationDate INTEGER,
 						timestamp = nowInUnix,
 						etag = etag,
 						expirationDate = expirationDate.HasValue ? (int) UnixTimestampUtils.To(expirationDate.Value) : nowInUnix
-					});
-					if (1 != rowsAffected)
+					};
+					int rowsAffected = UpdateTile(newTile);
+					if (rowsAffected == 0)
+					{
+						rowsAffected = (int) InsertTile(newTile);
+						if (rowsAffected > 0)
+						{
+							_pruneCacheCounter++;
+						}
+					}
+					if (rowsAffected < 1)
 					{
 						throw new Exception(string.Format("tile [{0} / {1}] was not inserted, rows affected:{2}", tilesetName, tileId, rowsAffected));
 					}
+
+					// int rowsAffected = _sqlite.InsertOrReplace(new tiles
+					// {
+					// 	tile_set = tilesetId.Value,
+					// 	zoom_level = tileId.Z,
+					// 	tile_column = tileId.X,
+					// 	tile_row = tileId.Y,
+					// 	tile_data = data,
+					// 	tile_path = path,
+					// 	timestamp = nowInUnix,
+					// 	etag = etag,
+					// 	expirationDate = expirationDate.HasValue ? (int) UnixTimestampUtils.To(expirationDate.Value) : nowInUnix
+					// });
+					// if (1 != rowsAffected)
+					// {
+					// 	throw new Exception(string.Format("tile [{0} / {1}] was not inserted, rows affected:{2}", tilesetName, tileId, rowsAffected));
+					// }
 				}
 			}
 			catch (Exception ex)
@@ -607,6 +654,195 @@ expirationDate INTEGER,
 		{
 			return _sqlite.Table<tiles>().ToList();
 		}
+
+		public int UpdateTile(tiles newTile)
+		{
+			var query = "UPDATE tiles " +
+			            "SET tile_data = ?1, tile_path = ?2, timestamp = ?3, expirationDate = ?4, etag = ?5" +
+			            "WHERE tile_set = ?6 AND zoom_level = ?7 AND tile_column = ?8 AND tile_row = ?9 ";
+			var command = _sqlite.CreateCommand(query,
+				newTile.tile_data,
+				newTile.tile_path,
+				newTile.timestamp,
+				newTile.expirationDate,
+				newTile.etag,
+				newTile.tile_set,
+				newTile.zoom_level,
+				newTile.tile_column,
+				newTile.tile_row);
+			return command.ExecuteNonQuery();
+		}
+
+		public long InsertTile(tiles newTile)
+		{
+			var query = "INSERT INTO tiles " +
+			            "(tile_set, zoom_level, tile_column, tile_row, tile_data, tile_path, timestamp, expirationDate, etag)" +
+			            "VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)";
+
+			var command = _sqlite.CreateCommand(query,
+				newTile.tile_set,
+				newTile.zoom_level,
+				newTile.tile_column,
+				newTile.tile_row,
+				newTile.tile_data,
+				newTile.tile_path,
+				newTile.timestamp,
+				newTile.expirationDate,
+				newTile.etag);
+			var rowsChanged = command.ExecuteNonQuery();
+			if (rowsChanged > 0)
+			{
+				newTile.id = (int) SQLite3.LastInsertRowid(_sqlite.Handle);
+			}
+
+			return rowsChanged;
+		}
+
+		#region OfflineCache
+
+		public int GetAmbientTileCount()
+		{
+			return _sqlite.ExecuteScalar<int>("SELECT COUNT(id) FROM (SELECT id FROM tiles LEFT JOIN tile2offline ON id = tileId WHERE tileId IS NULL)");
+		}
+
+		public int GetOfflineTileCount()
+		{
+			return _sqlite.ExecuteScalar<int>("SELECT COUNT(id) FROM (SELECT id FROM tiles LEFT JOIN tile2offline ON id = tileId WHERE tileId IS NOT NULL)");
+		}
+
+		public int GetOfflineTileCount(string offlineMapName)
+		{
+			var query = "SELECT COUNT(tileId) FROM tile2offline WHERE mapId = (SELECT id FROM offlinemaps WHERE name = ?1)";
+			var command = _sqlite.CreateCommand(query, offlineMapName);
+			return command.ExecuteScalar<int>();
+		}
+
+		public int GetOfflineDataSize(int offlineMapId)
+		{
+			var query = "SELECT SUM(LENGTH(tile_data)) " +
+			            "FROM tile2offline, tiles " +
+			            "WHERE mapId = ?1 " +
+			            "AND tileId = tiles.id ";
+			var command = _sqlite.CreateCommand(query, offlineMapId);
+			return command.ExecuteScalar<int>();
+		}
+
+		public int GetOfflineDataSize(string offlineMapName)
+		{
+			var query = "SELECT SUM(LENGTH(tile_data)) " +
+			            "FROM tile2offline, tiles " +
+			            "WHERE mapId = (SELECT id FROM offlinemaps WHERE name = ?1) " +
+			            "AND tileId = tiles.id ";
+			var command = _sqlite.CreateCommand(query, offlineMapName);
+			return command.ExecuteScalar<int>();
+		}
+
+		public void ClearAmbientCache()
+		{
+			var query = "DELETE FROM tiles WHERE id NOT IN ( SELECT tileId FROM tile2offline)";
+			var clearAmbientCommand = _sqlite.CreateCommand(query);
+			clearAmbientCommand.ExecuteNonQuery();
+		}
+
+		public void MarkOffline(int offlineMapId, string tilesetName, CanonicalTileId tileId)
+		{
+			try
+			{
+				var query = "INSERT OR IGNORE INTO tile2offline (mapId, tileId)" +
+				            "SELECT ?1, tiles.id " +
+				            "FROM tiles " +
+				            "WHERE tile_set    = (SELECT id FROM tilesets WHERE name = ?2) " +
+				            "  AND zoom_level  = ?3 " +
+				            "  AND tile_column = ?4 " +
+				            "  AND tile_row    = ?5";
+				var command = _sqlite.CreateCommand(query,
+					offlineMapId,
+					tilesetName,
+					tileId.Z,
+					tileId.X,
+					tileId.Y);
+				command.ExecuteNonQuery();
+			}
+			catch (Exception ex)
+			{
+				Debug.LogErrorFormat("Error inserting {0} {1} {2} ", offlineMapId, tileId, ex);
+			}
+		}
+
+		public void DeleteOfflineMap(int offlineMapId)
+		{
+			var query = "DELETE FROM offlinemaps WHERE id = ?";
+			var command = _sqlite.CreateCommand(query, offlineMapId);
+			command.ExecuteNonQuery();
+		}
+
+		public void DeleteOfflineMap(string offlineMapName)
+		{
+			var query = "DELETE FROM offlinemaps WHERE name = ?";
+			var command = _sqlite.CreateCommand(query, offlineMapName);
+			command.ExecuteNonQuery();
+		}
+
+		public Dictionary<string, int> GetOfflineMapList()
+		{
+			var mapList = new Dictionary<string, int>();
+
+			var maps = _sqlite.Table<offlineMaps>().ToList();
+
+			foreach (var offlineMap in maps)
+			{
+				mapList.Add(offlineMap.name, _sqlite.Table<tile2offline>().Where(x => x.mapId == offlineMap.id).Count());
+			}
+
+			return mapList;
+		}
+
+		public int GetOrAddOfflineMapId(string offlineMapName)
+		{
+			int? offlineMapId;
+			offlineMapId = getOfflineMapId(offlineMapName);
+			if (!offlineMapId.HasValue)
+			{
+				offlineMapId = insertOfflineMap(offlineMapName);
+			}
+
+			return offlineMapId.Value;
+		}
+
+		private int insertOfflineMap(string offlineMapName)
+		{
+			try
+			{
+				_sqlite.BeginTransaction(true);
+				var newOfflineMap = new offlineMaps() {name = offlineMapName};
+				int rowsAffected = _sqlite.Insert(newOfflineMap);
+				if (1 != rowsAffected)
+				{
+					throw new Exception(string.Format("tileset [{0}] was not inserted, rows affected:{1}", offlineMapName, rowsAffected));
+				}
+
+				return newOfflineMap.id;
+			}
+			catch (Exception ex)
+			{
+				Debug.LogErrorFormat("could not insert offlinemaps [{0}]: {1}", offlineMapName, ex);
+				return -1;
+			}
+			finally
+			{
+				_sqlite.Commit();
+			}
+		}
+
+		private int? getOfflineMapId(string offlineMapName)
+		{
+			var offlineMap = _sqlite
+				.Table<offlineMaps>()
+				.Where(ts => ts.name.Equals(offlineMapName))
+				.FirstOrDefault();
+			return null == offlineMap ? (int?) null : offlineMap.id;
+		}
+		#endregion
 	}
 }
 
