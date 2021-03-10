@@ -432,9 +432,6 @@ GameObject:
   - component: {fileID: 555018384}
   - component: {fileID: 555018383}
   - component: {fileID: 555018385}
-  - component: {fileID: 555018389}
-  - component: {fileID: 555018388}
-  - component: {fileID: 555018390}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -522,60 +519,6 @@ MonoBehaviour:
   Retina: 1
   Compress: 0
   UseMipmap: 0
---- !u!114 &555018388
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 555018382}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ed2b893f84f34a74eac3a3515f95c2c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  drag:
-    curve:
-      howLittleIsConsumedPerFrame: 40
-      howAbruptlyDoWeStop: 1.6
-    fingerUpKick: 13000
-    kickEnabledThreshold: 0.007
-  zoom:
-    curve:
-      howLittleIsConsumedPerFrame: 40
-      howAbruptlyDoWeStop: 1.6
-    fingerUpKick: 2
-    kickEnabledThreshold: 0.004
-  DRAG_SNAP_THRESHOLD: 0.0001
-  ZOOM_SNAP_THRESHOLD: 0.0001
-  MOUSE_WHEEL_ZOOM_SCALE: 0.01
-  TWO_FINGER_PINCH_ZOOM_SCALE: 0.34144
---- !u!114 &555018389
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 555018382}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a263ca3289adc8d468d19a6306fed7f3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &555018390
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 555018382}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae26346cb03852646b80b550149978b7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  referenceCamera: {fileID: 1787361574}
-  scale: 0
 --- !u!114 &1087372577
 MonoBehaviour:
   m_ObjectHideFlags: 0
