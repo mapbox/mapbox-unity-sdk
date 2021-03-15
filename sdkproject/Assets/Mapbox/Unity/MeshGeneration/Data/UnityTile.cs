@@ -241,7 +241,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				return;
 			}
 
-			if (rasterTile.Texture2D != null && useCompression)
+			if (rasterTile.Texture2D != null && useCompression && rasterTile.Texture2D.isReadable)
 			{
 				rasterTile.Texture2D.Compress(false);
 			}
