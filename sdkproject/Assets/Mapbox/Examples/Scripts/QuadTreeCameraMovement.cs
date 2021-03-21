@@ -9,26 +9,19 @@
 
 	public class QuadTreeCameraMovement : MonoBehaviour
 	{
-		[SerializeField]
-		[Range(1, 20)]
-		public float _panSpeed = 1.0f;
+		[SerializeField] [Range(1, 20)] public float _panSpeed = 1.0f;
 
-		[SerializeField]
-		float _zoomSpeed = 0.25f;
+		[SerializeField] float _zoomSpeed = 0.25f;
 
-		[SerializeField]
-		public Camera _referenceCamera;
+		[SerializeField] public Camera _referenceCamera;
 
-		[SerializeField]
-		AbstractMap _mapManager;
+		[SerializeField] AbstractMap _mapManager;
 
-		[SerializeField]
-		bool _useDegreeMethod;
+		[SerializeField] bool _useDegreeMethod;
 
 		private Vector3 _origin;
 		private Vector3 _mousePosition;
 		private Vector3 _mousePositionPrevious;
-		private int _touchCountPrevious;
 		private bool _shouldDrag;
 		private bool _isInitialized = false;
 		private Plane _groundPlane = new Plane(Vector3.up, 0);
@@ -39,13 +32,13 @@
 			if (null == _referenceCamera)
 			{
 				_referenceCamera = GetComponent<Camera>();
-				if (null == _referenceCamera) { Debug.LogErrorFormat("{0}: reference camera not set", this.GetType().Name); }
+				if (null == _referenceCamera)
+				{
+					Debug.LogErrorFormat("{0}: reference camera not set", this.GetType().Name);
+				}
 			}
-			_mapManager.OnInitialized += () =>
-			{
-				_isInitialized = true;
-			};
-			Application.targetFrameRate = 90;
+
+			_mapManager.OnInitialized += () => { _isInitialized = true; };
 		}
 
 		public void Update()
@@ -61,12 +54,16 @@
 			}
 		}
 
+
 		private void LateUpdate()
 		{
-			if (!_isInitialized) { return; }
+			if (!_isInitialized)
+			{
+				return;
+			}
 
-			// if (!_dragStartedOnUI)
-			// {
+			if (!_dragStartedOnUI)
+			{
 				if (Input.touchSupported && Input.touchCount > 0)
 				{
 					HandleTouch();
@@ -75,7 +72,7 @@
 				{
 					HandleMouseAndKeyBoard();
 				}
-			// }
+			}
 		}
 
 		void HandleMouseAndKeyBoard()
@@ -90,7 +87,7 @@
 			float xMove = Input.GetAxis("Horizontal");
 			float zMove = Input.GetAxis("Vertical");
 
-			// PanMapUsingKeyBoard(xMove, zMove);
+			PanMapUsingKeyBoard(xMove, zMove);
 
 
 			//pan mouse
@@ -106,7 +103,6 @@
 				case 1:
 				{
 					PanMapUsingTouchOrMouse();
-					_touchCountPrevious = 1;
 				}
 					break;
 				case 2:
@@ -124,56 +120,34 @@
 					float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
 
 					// Find the difference in the distances between each frame.
-					zoomFactor = 0.01f * (touchDeltaMag - prevTouchDeltaMag) * Time.deltaTime * Application.targetFrameRate;
+					zoomFactor = 0.01f * (touchDeltaMag - prevTouchDeltaMag);
 				}
 					ZoomMapUsingTouchOrMouse(zoomFactor);
-					_touchCountPrevious = 2;
 					break;
 				default:
-					_touchCountPrevious = Input.touchCount;
 					break;
 			}
 		}
 
 		void ZoomMapUsingTouchOrMouse(float zoomFactor)
 		{
-			// var zoom = Mathf.Max(0.0f, Mathf.Min(_mapManager.Zoom + zoomFactor * _zoomSpeed, 21.0f));
-			// if (Math.Abs(zoom - _mapManager.Zoom) > 0.0f)
-			// {
-			// 	//Debug.Log($"UpdateMap {zoom}, {_mapManager.Zoom}");
-			// 	_mapManager.UpdateMap(_mapManager.CenterLatitudeLongitude, zoom);
-			// }
-			// else
-			// {
-			// 	//Debug.Log($"Don't UpdateMap {zoom}, {_mapManager.Zoom}");
-			// }
+			var zoom = Mathf.Max(0.0f, Mathf.Min(_mapManager.Zoom + zoomFactor * _zoomSpeed, 21.0f));
+			if (Math.Abs(zoom - _mapManager.Zoom) > 0.0f)
+			{
 
-			var camPosition = _referenceCamera.transform.position;
-			var bottomLeft = _referenceCamera.ScreenToWorldPoint(new Vector3(0, 0, camPosition.y));
-			var topRight = _referenceCamera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, camPosition.y));
-			var scale = Vector3.Distance(bottomLeft, topRight);
+				var mousePosScreen = Input.mousePosition;
+				mousePosScreen.z = _referenceCamera.transform.localPosition.y;
+				_mousePosition = _referenceCamera.ScreenToWorldPoint(mousePosScreen);
+				var geo = _mapManager.WorldToGeoPosition(_mousePosition);
+				var pos1 = Conversions.LatLonToMeters(geo);
 
-			var drag = new Vector3(0, 0, zoomFactor * _zoomSpeed);
-			var dragMappedToMapSurface = new Vector3(-drag.x, 0f, -drag.y);
-			var scaledInput = dragMappedToMapSurface * scale;
-			var preLatLng = _mapManager.WorldToGeoPosition(scaledInput);
-			var preMeters = Conversions.LatLonToMeters(preLatLng);
+				_mapManager.UpdateMap(_mapManager.CenterLatitudeLongitude, zoom);
+				geo = _mapManager.WorldToGeoPosition(_mousePosition);
 
-			//calculating new zoom value
-			var zoomExtents = new Vector2(0, 19);
-			var zoomRange = zoomExtents.y - zoomExtents.x;
-			var postZoom = _mapManager.Zoom + zoomRange * drag.z;
-
-			var mousePosScreen = Input.mousePosition;
-			mousePosScreen.z = _referenceCamera.transform.localPosition.y;
-			var _mousePosition = _referenceCamera.ScreenToWorldPoint(mousePosScreen);
-			var geo = _mapManager.WorldToGeoPosition(_mousePosition);
-			var pos1 = Conversions.LatLonToMeters(geo);
-			_mapManager.UpdateMap(_mapManager.CenterLatitudeLongitude, postZoom);
-			geo = _mapManager.WorldToGeoPosition(_mousePosition);
-			var pos2 = Conversions.LatLonToMeters(geo);
-			var delta = pos2 - pos1;
-			_mapManager.UpdateMap(Conversions.MetersToLatLon(preMeters - new Vector2d(delta.x, delta.y)));
+				var pos2 = Conversions.LatLonToMeters(geo);
+				var delta = pos2 - pos1;
+				_mapManager.UpdateMap(Conversions.MetersToLatLon(_mapManager.CenterMercator - new Vector2d(delta.x, delta.y)));
+			}
 		}
 
 		void PanMapUsingKeyBoard(float xMove, float zMove)
@@ -215,7 +189,7 @@
 				var pos = _referenceCamera.ScreenToWorldPoint(mousePosScreen);
 
 				var latlongDelta = _mapManager.WorldToGeoPosition(pos);
-				//Debug.Log("Latitude: " + latlongDelta.x + " Longitude: " + latlongDelta.y);
+				Debug.Log("Latitude: " + latlongDelta.x + " Longitude: " + latlongDelta.y);
 			}
 
 			if (Input.GetMouseButton(0) && !EventSystem.current.IsPointerOverGameObject())
@@ -239,8 +213,6 @@
 
 			if (_shouldDrag == true)
 			{
-				if (_touchCountPrevious > 1)
-					_mousePositionPrevious = _mousePosition;
 				var changeFromPreviousPosition = _mousePositionPrevious - _mousePosition;
 				if (Mathf.Abs(changeFromPreviousPosition.x) > 0.0f || Mathf.Abs(changeFromPreviousPosition.y) > 0.0f)
 				{
@@ -251,10 +223,10 @@
 					{
 						if (null != _mapManager)
 						{
-							float factor = Time.deltaTime * Application.targetFrameRate * _panSpeed * Conversions.GetTileScaleInMeters((float) 0, _mapManager.AbsoluteZoom) / _mapManager.UnityTileSize;
-							var latlongDelta = Conversions.MetersToLatLon(new Vector2d(offset.x * factor, offset.z * factor));
-							var newLatLong = _mapManager.CenterLatitudeLongitude + latlongDelta;
-
+							var offset2D = new Vector2d(offset.x, offset.z);
+							var gameobjectScalingMultiplier = _mapManager.transform.localScale.x * (Mathf.Pow(2, (_mapManager.InitialZoom - _mapManager.AbsoluteZoom)));
+							var newLatLong = Conversions.MetersToLatLon(
+								Conversions.LatLonToMeters(_mapManager.CenterLatitudeLongitude) + (offset2D / _mapManager.WorldRelativeScale) / gameobjectScalingMultiplier);
 							_mapManager.UpdateMap(newLatLong, _mapManager.Zoom);
 						}
 					}
@@ -297,8 +269,6 @@
 
 			if (_shouldDrag == true)
 			{
-				if (_touchCountPrevious > 1)
-					_mousePositionPrevious = _mousePosition;
 				var changeFromPreviousPosition = _mousePositionPrevious - _mousePosition;
 				if (Mathf.Abs(changeFromPreviousPosition.x) > 0.0f || Mathf.Abs(changeFromPreviousPosition.y) > 0.0f)
 				{
@@ -313,7 +283,7 @@
 							// Divide it by the tile width in pixels ( 256 in our case)
 							// to get degrees represented by each pixel.
 							// Mouse offset is in pixels, therefore multiply the factor with the offset to move the center.
-							float factor = Time.deltaTime * Application.targetFrameRate * _panSpeed * Conversions.GetTileScaleInDegrees((float) _mapManager.CenterLatitudeLongitude.x, _mapManager.AbsoluteZoom) / _mapManager.UnityTileSize;
+							float factor = _panSpeed * Conversions.GetTileScaleInDegrees((float) _mapManager.CenterLatitudeLongitude.x, _mapManager.AbsoluteZoom) / _mapManager.UnityTileSize;
 
 							var latitudeLongitude = new Vector2d(_mapManager.CenterLatitudeLongitude.x + offset.z * factor, _mapManager.CenterLatitudeLongitude.y + offset.x * factor);
 							_mapManager.UpdateMap(latitudeLongitude, _mapManager.Zoom);
@@ -338,7 +308,11 @@
 		private Vector3 getGroundPlaneHitPoint(Ray ray)
 		{
 			float distance;
-			if (!_groundPlane.Raycast(ray, out distance)) { return Vector3.zero; }
+			if (!_groundPlane.Raycast(ray, out distance))
+			{
+				return Vector3.zero;
+			}
+
 			return ray.GetPoint(distance);
 		}
 	}
