@@ -61,7 +61,6 @@
 			}
 		}
 
-
 		private void LateUpdate()
 		{
 			if (!_isInitialized) { return; }
@@ -138,16 +137,43 @@
 
 		void ZoomMapUsingTouchOrMouse(float zoomFactor)
 		{
-			var zoom = Mathf.Max(0.0f, Mathf.Min(_mapManager.Zoom + zoomFactor * _zoomSpeed, 21.0f));
-			if (Math.Abs(zoom - _mapManager.Zoom) > 0.0f)
-			{
-				//Debug.Log($"UpdateMap {zoom}, {_mapManager.Zoom}");
-				_mapManager.UpdateMap(_mapManager.CenterLatitudeLongitude, zoom);
-			}
-			else
-			{
-				//Debug.Log($"Don't UpdateMap {zoom}, {_mapManager.Zoom}");
-			}
+			// var zoom = Mathf.Max(0.0f, Mathf.Min(_mapManager.Zoom + zoomFactor * _zoomSpeed, 21.0f));
+			// if (Math.Abs(zoom - _mapManager.Zoom) > 0.0f)
+			// {
+			// 	//Debug.Log($"UpdateMap {zoom}, {_mapManager.Zoom}");
+			// 	_mapManager.UpdateMap(_mapManager.CenterLatitudeLongitude, zoom);
+			// }
+			// else
+			// {
+			// 	//Debug.Log($"Don't UpdateMap {zoom}, {_mapManager.Zoom}");
+			// }
+
+			var camPosition = _referenceCamera.transform.position;
+			var bottomLeft = _referenceCamera.ScreenToWorldPoint(new Vector3(0, 0, camPosition.y));
+			var topRight = _referenceCamera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, camPosition.y));
+			var scale = Vector3.Distance(bottomLeft, topRight);
+
+			var drag = new Vector3(0, 0, zoomFactor * _zoomSpeed);
+			var dragMappedToMapSurface = new Vector3(-drag.x, 0f, -drag.y);
+			var scaledInput = dragMappedToMapSurface * scale;
+			var preLatLng = _mapManager.WorldToGeoPosition(scaledInput);
+			var preMeters = Conversions.LatLonToMeters(preLatLng);
+
+			//calculating new zoom value
+			var zoomExtents = new Vector2(0, 19);
+			var zoomRange = zoomExtents.y - zoomExtents.x;
+			var postZoom = _mapManager.Zoom + zoomRange * drag.z;
+
+			var mousePosScreen = Input.mousePosition;
+			mousePosScreen.z = _referenceCamera.transform.localPosition.y;
+			var _mousePosition = _referenceCamera.ScreenToWorldPoint(mousePosScreen);
+			var geo = _mapManager.WorldToGeoPosition(_mousePosition);
+			var pos1 = Conversions.LatLonToMeters(geo);
+			_mapManager.UpdateMap(_mapManager.CenterLatitudeLongitude, postZoom);
+			geo = _mapManager.WorldToGeoPosition(_mousePosition);
+			var pos2 = Conversions.LatLonToMeters(geo);
+			var delta = pos2 - pos1;
+			_mapManager.UpdateMap(Conversions.MetersToLatLon(preMeters - new Vector2d(delta.x, delta.y)));
 		}
 
 		void PanMapUsingKeyBoard(float xMove, float zMove)

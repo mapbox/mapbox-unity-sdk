@@ -432,6 +432,7 @@ GameObject:
   - component: {fileID: 555018384}
   - component: {fileID: 555018383}
   - component: {fileID: 555018385}
+  - component: {fileID: 555018386}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -519,6 +520,23 @@ MonoBehaviour:
   Retina: 1
   Compress: 0
   UseMipmap: 0
+--- !u!114 &555018386
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 555018382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c699b8e1864b4b248acb7a04ede9480, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _panSpeed: 1
+  _zoomSpeed: 0.25
+  _referenceCamera: {fileID: 1787361574}
+  _mapManager: {fileID: 555018383}
+  _useDegreeMethod: 0
 --- !u!114 &1087372577
 MonoBehaviour:
   m_ObjectHideFlags: 0
