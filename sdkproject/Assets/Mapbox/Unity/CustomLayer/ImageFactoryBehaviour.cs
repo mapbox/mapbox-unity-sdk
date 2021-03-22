@@ -10,13 +10,13 @@ namespace CustomImageLayerSample
 	{
 		public AbstractMap Map;
 		public ImageFactoryManager ImageFactoryManager;
-		//[HideInInspector] public ImageryLayerProperties ImageSettings;
+		
 		public string CustomTilesetId = "AerisHeatMap";
 		public string UrlFormat = "";
 		public string TextureFieldName = "_CustomOne";
 		public string TextureScaleOffsetFieldName = "_CustomOne_ST";
 
-		public bool DownloadFallbackImagery = false;
+		[HideInInspector] public bool DownloadFallbackImagery = false;
 		public bool Retina = false;
 		public bool Compress = false;
 		public bool UseMipmap = false;

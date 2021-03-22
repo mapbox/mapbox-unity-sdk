@@ -44,14 +44,7 @@ namespace CustomImageLayerSample
 
 		protected override void SetTexture(UnityTile unityTile, RasterTile dataTile)
 		{
-			if (dataTile.Texture2D != null)
-			{
-				unityTile.SetRasterData(dataTile);
-			}
-			else
-			{
-				unityTile.SetRasterData(dataTile, _imageSettings.rasterOptions.useMipMap, _imageSettings.rasterOptions.useCompression);
-			}
+			unityTile.SetRasterData(dataTile, _imageSettings.rasterOptions.useMipMap, _imageSettings.rasterOptions.useCompression);
 		}
 	}
 }

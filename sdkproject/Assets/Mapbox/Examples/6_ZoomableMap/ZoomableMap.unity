@@ -431,7 +431,6 @@ GameObject:
   m_Component:
   - component: {fileID: 555018384}
   - component: {fileID: 555018383}
-  - component: {fileID: 555018385}
   - component: {fileID: 555018386}
   m_Layer: 0
   m_Name: Map
@@ -499,27 +498,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &555018385
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 555018382}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10333f5033e540ac930ef4dd8915fef7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Map: {fileID: 555018383}
-  CustomTilesetId: AerisHeatMap
-  UrlFormat: https://maps.aerisapi.com/(api_key_here)/satellite-infrared-color/{0}/{1}/{2}/current.png
-  TextureFieldName: _CustomOne
-  TextureScaleOffsetFieldName: _CustomOne_ST
-  DownloadFallbackImagery: 1
-  Retina: 1
-  Compress: 0
-  UseMipmap: 0
 --- !u!114 &555018386
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -611,9 +589,9 @@ MonoBehaviour:
         - transit_stop_label
         - water
         - waterway
-      _sourceType: 3
+      _sourceType: -2
       sourceOptions:
-        isActive: 0
+        isActive: 1
         layerSource:
           Name: Mapbox Streets v7
           Id: mapbox.mapbox-streets-v8
