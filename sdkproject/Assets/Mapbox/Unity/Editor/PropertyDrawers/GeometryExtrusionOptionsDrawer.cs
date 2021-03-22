@@ -120,8 +120,8 @@
 			var selectedLayerName = property.FindPropertyRelative("_selectedLayerName").stringValue;
 
 			var serializedMapObject = property.serializedObject;
-			AbstractMap mapObject = (AbstractMap)serializedMapObject.targetObject;
-			tileJsonData = mapObject.MapVisualizer.VectorLayer.GetTileJsonData();
+			var mapObject = (MapVisualizer)serializedMapObject.targetObject;
+			tileJsonData = mapObject.VectorLayer.GetTileJsonData();
 
 			DrawPropertyName(property, position, selectedLayerName);
 		}

@@ -427,6 +427,10 @@
 			var materialOptions = subLayerProperties.materialOptions;
 			subLayerGeometryMaterialOptions.FindPropertyRelative("style").enumValueIndex = (int)materialOptions.style;
 
+			var subLayerGeometryPerformanceOptions = subLayer.FindPropertyRelative("performanceOptions");
+			subLayerGeometryPerformanceOptions.FindPropertyRelative("isEnabled").boolValue = true;
+			subLayerGeometryPerformanceOptions.FindPropertyRelative("entityPerCoroutine").intValue = 20;
+
 			var mats = subLayerGeometryMaterialOptions.FindPropertyRelative("materials");
 			mats.arraySize = 2;
 

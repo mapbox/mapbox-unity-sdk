@@ -24,7 +24,7 @@
 		public ElevationModificationOptions modificationOptions = new ElevationModificationOptions();
 		public UnityLayerOptions unityLayerOptions = new UnityLayerOptions();
 		public TerrainSideWallOptions sideWallOptions = new TerrainSideWallOptions();
-		public float TileSize;
+		public float TileSize = 100;
 
 		public override bool NeedsForceUpdate()
 		{
