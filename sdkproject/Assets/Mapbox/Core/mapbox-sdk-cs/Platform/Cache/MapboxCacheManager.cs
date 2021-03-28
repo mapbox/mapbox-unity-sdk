@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Mapbox.Map;
+using Mapbox.Unity;
 using Mapbox.Unity.MeshGeneration.Data;
 using UnityEngine;
 
@@ -99,32 +100,39 @@ namespace Mapbox.Platform.Cache
             var localTileId = tileId;
             var localCopy = tile;
             CacheItem cacheItem = null;
-            var task = Task.Run(() =>
-            {
-                cacheItem = _sqLiteCache.Get(localTilesetId, localTileId);
-                if (cacheItem.Data != null)
-                {
-                    localCopy.SetByteData(cacheItem.Data);
-                }
-            });
 
-            task.ContinueWith((t) =>
-            {
-                if (t.Exception != null)
+            MapboxAccess.Instance.TaskManager.AddTask(
+                new TaskWrapper()
                 {
-                    callback(null);
-                }
-                else
-                {
+                    Action = () =>
+                    {
+                        cacheItem = _sqLiteCache.Get(localTilesetId, localTileId);
+                        if (cacheItem.Data != null)
+                        {
+                            localCopy.SetByteData(cacheItem.Data);
+                        }
+                    },
+                    ContinueWith = (t) =>
+                    {
+                        if (t.Exception != null)
+                        {
+                            callback(null);
+                        }
+                        else
+                        {
 #if UNITY_EDITOR
-                    localCopy.FromCache = CacheType.SqliteCache;
-                    cacheItem.From = localCopy.FromCache;
+                            localCopy.FromCache = CacheType.SqliteCache;
+                            cacheItem.From = localCopy.FromCache;
 #endif
-                    localCopy.ETag = cacheItem.ETag;
-                    cacheItem.Tile = localCopy;
-                    callback(cacheItem);
-                }
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+                            localCopy.ETag = cacheItem.ETag;
+                            cacheItem.Tile = localCopy;
+                            callback(cacheItem);
+                        }
+                    },
+#if UNITY_EDITOR
+                    Info = "MapboxCacheManager.GetVectorItemFromSqlite"
+#endif
+                });
 
             // if (cacheItem != null)
             // {
@@ -190,30 +198,34 @@ namespace Mapbox.Platform.Cache
                 }
 
                 CacheItem cacheItem = null;
-                var task = Task.Run(() =>
-                {
-                    cacheItem = _sqLiteCache.Get(tilesetId, tileId);
-                });
 
-                task.ContinueWith((t) =>
-                {
-                    if (cacheItem != null)
+                MapboxAccess.Instance.TaskManager.AddTask(
+                    new TaskWrapper()
                     {
-                        textureCacheItem.ETag = cacheItem.ETag;
-                        textureCacheItem.ExpirationDate = cacheItem.ExpirationDate;
-                    }
-                    else
-                    {
-                        //file exists but sqlite entry does not
-                        //entry was probably pruned but file deletion didn't go through (crashed/closed app)
-                        //serve the image without metadata for now
-                        //delete tile, next tile it'll be updated
+                        Action = () => { cacheItem = _sqLiteCache.Get(tilesetId, tileId); },
+                        ContinueWith = (t) =>
+                        {
+                            if (cacheItem != null)
+                            {
+                                textureCacheItem.ETag = cacheItem.ETag;
+                                textureCacheItem.ExpirationDate = cacheItem.ExpirationDate;
+                            }
+                            else
+                            {
+                                //file exists but sqlite entry does not
+                                //entry was probably pruned but file deletion didn't go through (crashed/closed app)
+                                //serve the image without metadata for now
+                                //delete tile, next tile it'll be updated
 
-                        _textureFileCache.DeleteTileFile(textureCacheItem.FilePath);
-                    }
+                                _textureFileCache.DeleteTileFile(textureCacheItem.FilePath);
+                            }
 
-                    callback(textureCacheItem);
-                }, TaskScheduler.FromCurrentSynchronizationContext());
+                            callback(textureCacheItem);
+                        },
+#if UNITY_EDITOR
+                        Info = "MapboxCacheManager.GetTextureItemFromFile"
+#endif
+                    });
 
                 //this isn't async. shouldn't it be?
                 // var tile = _sqLiteCache.Get(tilesetId, tileId);

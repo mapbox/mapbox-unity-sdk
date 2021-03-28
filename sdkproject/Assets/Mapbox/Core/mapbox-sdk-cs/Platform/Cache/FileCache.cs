@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Mapbox.Unity.CustomLayer;
 using Mapbox.Unity.DataFetching;
+using Mapbox.Unity;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.Utilities;
 using Mapbox.Utils;
@@ -214,21 +215,28 @@ namespace Mapbox.Platform.Cache
 
 			info.TextureCacheItem.FilePath = Path.GetFullPath(string.Format("{0}/{1}/{2}.{3}", PersistantCacheRootFolderPath, MapIdToFolderName(info.TilesetId), info.TileId.GenerateKey(info.TilesetId), FileExtension));
 
-			Task.Run(() =>
-			{
-				FileStream sourceStream = new FileStream(info.TextureCacheItem.FilePath,
-					FileMode.Create, FileAccess.Write, FileShare.Read,
-					bufferSize: 4096, useAsync: false);
+			MapboxAccess.Instance.TaskManager.AddTask(
+				new TaskWrapper()
+				{
+					Action = () =>
+					{
+						FileStream sourceStream = new FileStream(info.TextureCacheItem.FilePath,
+							FileMode.Create, FileAccess.Write, FileShare.Read,
+							bufferSize: 4096, useAsync: false);
 
-				sourceStream.Write(info.TextureCacheItem.Data, 0, info.TextureCacheItem.Data.Length);
-				sourceStream.Close();
-				OnFileSaved(info.TileId, info.TilesetId, info.TextureCacheItem);
+						sourceStream.Write(info.TextureCacheItem.Data, 0, info.TextureCacheItem.Data.Length);
+						sourceStream.Close();
+						OnFileSaved(info.TileId, info.TilesetId, info.TextureCacheItem);
 
 //this is not a good way to do it
 // #if UNITY_EDITOR
 // 					FileCacheDebugView.AddToLogs(string.Format("Saved {0, 20} - {1, -20}", info.TilesetId, info.TileId));
 // #endif
-			});
+					},
+#if UNITY_EDITOR
+					Info = "FileCache.SaveInfo"
+#endif
+				}, 100);
 		}
 
 		protected virtual void OnFileSaved(CanonicalTileId infoTileId, string infoTilesetId, TextureCacheItem infoTextureCacheItem)

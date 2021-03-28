@@ -281,7 +281,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			// _rasterTile = rasterTile;
 			// Don't leak the texture, just reuse it.
 			//reset image on null data
-			if (rasterTile.Texture2D == null && rasterTile.Data == null)
+			if (rasterTile == null || rasterTile.Texture2D == null && rasterTile.Data == null)
 			{
 				MeshRenderer.material.mainTexture = null;
 				return;

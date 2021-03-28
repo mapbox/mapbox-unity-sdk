@@ -105,12 +105,15 @@ public class ImageDataFetcher : DataFetcher
 
 			return;
 		}
-
-		//not in cache so web request
-		EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, String.Empty)
+		else
 		{
-			Callback = () => { FetchingCallback(tileId, tile, unityTile); }
-		});
+			//not in cache so web request
+			EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, String.Empty)
+			{
+				Callback = () => { FetchingCallback(tileId, tile, unityTile); }
+			});
+		}
+
 	}
 
 	protected virtual void FetchingCallback(CanonicalTileId tileId, RasterTile rasterTile, UnityTile unityTile = null)

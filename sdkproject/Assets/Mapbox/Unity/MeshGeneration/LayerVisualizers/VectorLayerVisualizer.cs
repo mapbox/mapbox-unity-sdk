@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Mapbox.Unity.MeshGeneration.Modifiers;
 using Mapbox.VectorTile.Geometry;
+using UnityEngine.Rendering;
 
 namespace Mapbox.Unity.MeshGeneration.Interfaces
 {
@@ -35,7 +36,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 		}
 
-		private Dictionary<CanonicalTileId, List<Tuple<Task, CancellationTokenSource>>> _tasks = new Dictionary<CanonicalTileId, List<Tuple<Task, CancellationTokenSource>>>();
+		private Dictionary<CanonicalTileId, List<TaskWrapper>> _tasks = new Dictionary<CanonicalTileId, List<TaskWrapper>>();
 		private ObjectPool<VectorEntity> _pool;
 		private ObjectPool<List<VectorEntity>> _listPool;
 		private Dictionary<UnityTile, List<VectorEntity>> _activeObjects;
@@ -184,15 +185,14 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			var token = source.Token;
 			var meshDataList = new Dictionary<ModifierStack, List<Tuple<VectorFeatureUnity, MeshData>>>();
 
-			var task = Task.Run(() =>
+			void Action()
 			{
 				var capturedToken = token;
-
 				foreach (var feature in cachedLayer.Features)
 				{
-					if (capturedToken.IsCancellationRequested) return;
+					if (capturedToken.IsCancellationRequested) break;
 					if (IsFeatureInvalid(cachedTileId, feature, _tempLayerProperties)) continue;
-					
+
 					foreach (var modifierStack in _modifierStacks)
 					{
 						if (modifierStack.FeatureFilterCombiner.Try(feature))
@@ -203,61 +203,149 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 							{
 								meshDataList.Add(modifierStack, new List<Tuple<VectorFeatureUnity, MeshData>>());
 							}
+
 							meshDataList[modifierStack].Add(new Tuple<VectorFeatureUnity, MeshData>(feature, meshData));
 						}
 					}
 				}
 
-				foreach (var pairs in meshDataList)
+				if (!capturedToken.IsCancellationRequested)
 				{
-					if (pairs.Key.combineMeshes)
+					foreach (var pairs in meshDataList)
 					{
-						var mergedData = CombineMeshData(pairs.Value);
-						pairs.Value.Clear();
-						pairs.Value.Add(new Tuple<VectorFeatureUnity, MeshData>(null, mergedData));
+						if (pairs.Key.combineMeshes)
+						{
+							var mergedData = CombineMeshData(pairs.Value);
+							pairs.Value.Clear();
+							pairs.Value.Add(new Tuple<VectorFeatureUnity, MeshData>(null, mergedData));
+						}
 					}
 				}
-
-			}, token);
-
-			if (!_tasks.ContainsKey(tile.CanonicalTileId))
-			{
-				_tasks.Add(tile.CanonicalTileId, new List<Tuple<Task, CancellationTokenSource>>());
 			}
-			_tasks[tile.CanonicalTileId].Add(new Tuple<Task, CancellationTokenSource>(task, source));
-
-			task.ContinueWith((t) =>
+			void ContinueWith(Task t)
 			{
 				if (t.IsCanceled)
 				{
 					meshDataList.Clear();
-					return;
 				}
-
-				//is there a better way to check this?
-				if (tile.CanonicalTileId == cachedTileId && !tile.IsRecycled)
+				else
 				{
-					foreach (var pair in meshDataList)
+					//is there a better way to check this?
+					if (tile.CanonicalTileId == cachedTileId && !tile.IsRecycled)
 					{
-						foreach (var meshTuples in pair.Value)
+						foreach (var pair in meshDataList)
 						{
-							var entity = CreateObject(tile, meshTuples.Item2, tile.gameObject, cachedLayer.Name);
-							entity.Feature = meshTuples.Item1;
-	#if UNITY_EDITOR
-							if (meshTuples.Item1 != null && meshTuples.Item1.Data != null)
-								entity.GameObject.name = cachedLayer.Name;// + " - " + meshTuples.Item1.Data.Id;
-	#endif
+							foreach (var meshTuples in pair.Value)
+							{
+								var entity = CreateObject(tile, meshTuples.Item2, tile.gameObject, cachedLayer.Name);
+								entity.Feature = meshTuples.Item1;
+#if UNITY_EDITOR
+								if (meshTuples.Item1 != null && meshTuples.Item1.Data != null) entity.GameObject.name = cachedLayer.Name; // + " - " + meshTuples.Item1.Data.Id;
+#endif
 
-							pair.Key.RunGoModifiers(entity, tile);
+								pair.Key.RunGoModifiers(entity, tile);
+							}
 						}
-
 					}
 				}
-				
+
 				cachedCallback?.Invoke(tile, this);
+			}
 
+			var taskWrapper = new TaskWrapper()
+			{
+				TileId = tile.CanonicalTileId,
+				Action = Action,
+				Token = source,
+				ContinueWith = ContinueWith,
+				#if UNITY_EDITOR
+				Info = "VectorLayerVisualizer.ProcessLayer"
+				#endif
+			};
 
-			}, TaskScheduler.FromCurrentSynchronizationContext());
+			if (!_tasks.ContainsKey(tile.CanonicalTileId))
+			{
+				_tasks.Add(tile.CanonicalTileId, new List<TaskWrapper>());
+			}
+			_tasks[tile.CanonicalTileId].Add(taskWrapper);
+			taskWrapper.Finished += (t) => _tasks.Remove(t.TileId);
+
+			MapboxAccess.Instance.TaskManager.AddTask(taskWrapper, 1);
+
+			// var task = Task.Run(() =>
+			// {
+			// 	var capturedToken = token;
+			//
+			// 	foreach (var feature in cachedLayer.Features)
+			// 	{
+			// 		if (capturedToken.IsCancellationRequested) return;
+			// 		if (IsFeatureInvalid(cachedTileId, feature, _tempLayerProperties)) continue;
+			//
+			// 		foreach (var modifierStack in _modifierStacks)
+			// 		{
+			// 			if (modifierStack.FeatureFilterCombiner.Try(feature))
+			// 			{
+			// 				var meshData = new MeshData();
+			// 				meshData = modifierStack.RunMeshModifiers(tile, feature, meshData, tile.TileSize);
+			// 				if (!meshDataList.ContainsKey(modifierStack))
+			// 				{
+			// 					meshDataList.Add(modifierStack, new List<Tuple<VectorFeatureUnity, MeshData>>());
+			// 				}
+			// 				meshDataList[modifierStack].Add(new Tuple<VectorFeatureUnity, MeshData>(feature, meshData));
+			// 			}
+			// 		}
+			// 	}
+			//
+			// 	foreach (var pairs in meshDataList)
+			// 	{
+			// 		if (pairs.Key.combineMeshes)
+			// 		{
+			// 			var mergedData = CombineMeshData(pairs.Value);
+			// 			pairs.Value.Clear();
+			// 			pairs.Value.Add(new Tuple<VectorFeatureUnity, MeshData>(null, mergedData));
+			// 		}
+			// 	}
+			//
+			// }, token);
+
+			// if (!_tasks.ContainsKey(tile.CanonicalTileId))
+			// {
+			// 	_tasks.Add(tile.CanonicalTileId, new List<Tuple<Task, CancellationTokenSource>>());
+			// }
+			// _tasks[tile.CanonicalTileId].Add(new Tuple<Task, CancellationTokenSource>(task, source));
+
+			// 		task.ContinueWith((t) =>
+			// 		{
+			// 			if (t.IsCanceled)
+			// 			{
+			// 				meshDataList.Clear();
+			// 				return;
+			// 			}
+			//
+			// 			//is there a better way to check this?
+			// 			if (tile.CanonicalTileId == cachedTileId && !tile.IsRecycled)
+			// 			{
+			// 				foreach (var pair in meshDataList)
+			// 				{
+			// 					foreach (var meshTuples in pair.Value)
+			// 					{
+			// 						var entity = CreateObject(tile, meshTuples.Item2, tile.gameObject, cachedLayer.Name);
+			// 						entity.Feature = meshTuples.Item1;
+			// #if UNITY_EDITOR
+			// 						if (meshTuples.Item1 != null && meshTuples.Item1.Data != null)
+			// 							entity.GameObject.name = cachedLayer.Name;// + " - " + meshTuples.Item1.Data.Id;
+			// #endif
+			//
+			// 						pair.Key.RunGoModifiers(entity, tile);
+			// 					}
+			//
+			// 				}
+			// 			}
+			//
+			// 			cachedCallback?.Invoke(tile, this);
+			//
+			//
+			// 		}, TaskScheduler.FromCurrentSynchronizationContext());
 
 			// #region PostProcess
 			// // TODO : Clean this up to follow the same pattern.
@@ -342,7 +430,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			tempVectorEntity.GameObject.SetActive(true);
 			tempVectorEntity.Mesh.Clear();
 
+
 			tempVectorEntity.Mesh.subMeshCount = meshData.Triangles.Count;
+			tempVectorEntity.Mesh.indexFormat = IndexFormat.UInt32;
 			tempVectorEntity.Mesh.SetVertices(meshData.Vertices);
 			tempVectorEntity.Mesh.SetNormals(meshData.Normals);
 			if (meshData.Tangents.Count > 0)
@@ -404,13 +494,13 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			//this part is necessary for unique id layers (buildings)
 			//it keeps track of processed ids and doesn't recreate them
-			if (tempLayerProperties.buildingsWithUniqueIds)
-			{
-				if (ShouldSkipProcessingFeatureWithId(feature.Data.Id, tempLayerProperties))
-					return true;
-
-				AddFeatureToTileObjectPool(feature, tileId);
-			}
+			// if (tempLayerProperties.buildingsWithUniqueIds)
+			// {
+			// 	if (ShouldSkipProcessingFeatureWithId(feature.Data.Id, tempLayerProperties))
+			// 		return true;
+			//
+			// 	AddFeatureToTileObjectPool(feature, tileId);
+			// }
 
 			if (feature.Properties.ContainsKey("extrude") && !bool.Parse(feature.Properties["extrude"].ToString()))
 				return true;
@@ -498,9 +588,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		{
 			if (_tasks.ContainsKey(tile.CanonicalTileId))
 			{
-				foreach (var tuple in _tasks[tile.CanonicalTileId])
+				foreach (var task in _tasks[tile.CanonicalTileId])
 				{
-					tuple.Item2.Cancel();
+					task.Cancelled(task);
 				}
 
 				_tasks.Remove(tile.CanonicalTileId);

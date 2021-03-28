@@ -6,8 +6,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Mapbox.Platform;
+using Mapbox.Unity;
 using Mapbox.Unity.MeshGeneration.Data;
 using UnityEngine;
 
@@ -139,24 +141,53 @@ namespace Mapbox.Map
 				// current implementation doesn't need to check if parsing is successful:
 				// * Mapbox.Map.VectorTile.ParseTileData() already adds any exception to the list
 				// * Mapbox.Map.RasterTile.ParseTileData() doesn't do any parsing
-				var task = Task.Run(() =>
-				{
-					SetByteData(response.Data);
-				});
 
-				task.ContinueWith((t) =>
-				{
-					// Cancelled is not the same as loaded!
-					if (TileState != TileState.Canceled)
+				MapboxAccess.Instance.TaskManager.AddTask(
+					new TaskWrapper()
 					{
-						TileState = TileState.Loaded;
-					}
+						Action = () =>
+						{
+							byteData = response.Data;
+							VectorResults = new VectorResult();
+							ParseTileData(byteData);
+							TileState = TileState.Loaded;
+						},
+						ContinueWith = (t) =>
+						{
+							// Cancelled is not the same as loaded!
+							if (TileState != TileState.Canceled)
+							{
+								TileState = TileState.Loaded;
+							}
 
-					if (_callback != null)
-					{
-						_callback();
-					}
-				}, TaskScheduler.FromCurrentSynchronizationContext());
+							if (_callback != null)
+							{
+								_callback();
+							}
+						},
+#if UNITY_EDITOR
+						Info = "VectorTile.HandleTileResponse"
+#endif
+					});
+
+				// var task = Task.Run(() =>
+				// {
+				// 	SetByteData(response.Data);
+				// });
+				//
+				// task.ContinueWith((t) =>
+				// {
+				// 	// Cancelled is not the same as loaded!
+				// 	if (TileState != TileState.Canceled)
+				// 	{
+				// 		TileState = TileState.Loaded;
+				// 	}
+				//
+				// 	if (_callback != null)
+				// 	{
+				// 		_callback();
+				// 	}
+				// }, TaskScheduler.FromCurrentSynchronizationContext());
 			}
 		}
 
@@ -193,54 +224,49 @@ namespace Mapbox.Map
 
 		internal override bool ParseTileData(byte[] newData)
 		{
-			try
-			{
-				var decompressed = Compression.Decompress(newData);
-				data = new Mapbox.VectorTile.VectorTile(decompressed);
+			var decompressed = Compression.Decompress(newData);
+			data = new Mapbox.VectorTile.VectorTile(decompressed);
 
-				foreach (var layerName in data.LayerNames())
+			foreach (var layerName in data.LayerNames())
+			{
+				if (layerName != "building")
+					continue;
+
+				var layerResult = new VectorLayerResult();
+				var layer = data.GetLayer(layerName);
+				layerResult.Name = layerName;
+				layerResult.Extent = layer.Extent;
+
+				for (int i = 0; i < layer.FeatureCount(); i++)
 				{
-					var layerResult = new VectorLayerResult();
-					var layer = data.GetLayer(layerName);
-					layerResult.Name = layerName;
-					layerResult.Extent = layer.Extent;
-
-					for (int i = 0; i < layer.FeatureCount(); i++)
+					var featureResult = new VectorFeatureUnity();
+					var feature = layer.GetFeature(i);
+					var geometry = feature.Geometry<float>(0);
+					var points = new List<List<Vector3>>();
+					for (int j = 0; j < geometry.Count; j++)
 					{
-						var featureResult = new VectorFeatureUnity();
-						var feature = layer.GetFeature(i);
-						var geometry = feature.Geometry<float>(0);
-						var points = new List<List<Vector3>>();
-						for (int j = 0; j < geometry.Count; j++)
+						var pointCount = geometry[j].Count;
+						var newPoints = new List<Vector3>(pointCount);
+						for (int k = 0; k < pointCount; k++)
 						{
-							var pointCount = geometry[j].Count;
-							var newPoints = new List<Vector3>(pointCount);
-							for (int k = 0; k < pointCount; k++)
-							{
-								var point = geometry[j][k];
-								newPoints.Add(new Vector3(
-									((point.X - layerResult.Extent/2) / layerResult.Extent),
-									0,
-									(((layerResult.Extent - point.Y)- layerResult.Extent/2) / layerResult.Extent)));
-							}
-							points.Add(newPoints);
+							var point = geometry[j][k];
+							newPoints.Add(new Vector3(
+								((point.X - layerResult.Extent/2) / layerResult.Extent),
+								0,
+								(((layerResult.Extent - point.Y)- layerResult.Extent/2) / layerResult.Extent)));
 						}
-
-						featureResult.Points = points;
-						featureResult.Data = feature;
-						featureResult.Properties = feature.GetProperties();
-						layerResult.Features.Add(featureResult);
+						points.Add(newPoints);
 					}
-					VectorResults.Layers.Add(layerName, layerResult);
-				}
 
-				return true;
+					featureResult.Points = points;
+					featureResult.Data = feature;
+					featureResult.Properties = feature.GetProperties();
+					layerResult.Features.Add(featureResult);
+				}
+				VectorResults.Layers.Add(layerName, layerResult);
 			}
-			catch (Exception ex)
-			{
-				AddException(ex);
-				return false;
-			}
+
+			return true;
 		}
 
 		public void Dispose()
