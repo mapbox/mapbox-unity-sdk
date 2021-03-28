@@ -33,51 +33,37 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		}
 	}
 
-	/// <summary>
-	/// Height Modifier is responsible for the y axis placement of the feature. It pushes the original vertices upwards by "height" value and creates side walls around that new polygon down to "min_height" value.
-	/// It also checkes for "ele" (elevation) value used for contour lines in Mapbox Terrain data.
-	/// Height Modifier also creates a continuous UV mapping for side walls.
-	/// </summary>
-	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Height Modifier")]
-	public class HeightModifier : MeshModifier
+	public class HeightModifierCore : IModifierCore
 	{
-		private float _scale = 1;
-
 		GeometryExtrusionOptions _options;
-
-		[SerializeField]
-		[Tooltip("Create side walls as separate submesh.")]
-		private bool _separateSubmesh = true;
-
-		public override ModifierType Type { get { return ModifierType.Preprocess; } }
-
+		private bool _separateSubmesh = false;
+		private float _scale = 1;
 		private int _counter = 0;
 		float height = 0.0f;
 
-		public override void SetProperties(ModifierProperties properties)
+		public HeightModifierCore(GeometryExtrusionOptions options)
 		{
-			_options = (GeometryExtrusionOptions)properties;
-			_options.PropertyHasChanged += UpdateModifier;
-		}
-		public override void UnbindProperties()
-		{
-			_options.PropertyHasChanged -= UpdateModifier;
+			_options = options;
 		}
 
-		public override void Run(VectorFeatureUnity feature, MeshData md, float scale)
+		public void Run(VectorFeatureUnity feature, MeshData md, float scale)
 		{
 			_scale = scale;
 			Run(feature, md);
 		}
 
-		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
+		public void Run(VectorFeatureUnity feature, MeshData md, float tileSize, float zoom)
+		{
+
+		}
+
+		public void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
 			_counter = 0;
 			if (md.Vertices.Count == 0 || feature == null || feature.Points.Count < 1)
 				return;
 
-			if (tile != null)
-				_scale = tile.TileScale;
+			if (tile != null) _scale = tile.TileScale;
 
 			float maxHeight = 1.0f;
 			float minHeight = 0.0f;
@@ -99,7 +85,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		}
 
-		protected virtual void GenerateWallMesh(MeshData md)
+		public virtual void GenerateWallMesh(MeshData md)
 		{
 			md.Vertices.Capacity = _counter + md.Edges.Count * 2;
 			float d = 0f;
@@ -169,7 +155,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
-		protected virtual void GenerateRoofMesh(MeshData md, float minHeight, float maxHeight)
+		public virtual void GenerateRoofMesh(MeshData md, float minHeight, float maxHeight)
 		{
 			_counter = md.Vertices.Count;
 			switch (_options.extrusionType)
@@ -183,23 +169,24 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					}
 					break;
 				case ExtrusionType.MinHeight:
+				{
+					var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
+					for (int i = 0; i < _counter; i++)
 					{
-						var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
-						for (int i = 0; i < _counter; i++)
-						{
-							md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.min + maxHeight, md.Vertices[i].z);
-						}
+						md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.min + maxHeight, md.Vertices[i].z);
 					}
+				}
 					break;
 				case ExtrusionType.MaxHeight:
+				{
+					var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
+					for (int i = 0; i < _counter; i++)
 					{
-						var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
-						for (int i = 0; i < _counter; i++)
-						{
-							md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.max + maxHeight, md.Vertices[i].z);
-						}
-						height += (minmax.max - minmax.min);
+						md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.max + maxHeight, md.Vertices[i].z);
 					}
+
+					height += (minmax.max - minmax.min);
+				}
 					break;
 				case ExtrusionType.RangeHeight:
 					for (int i = 0; i < _counter; i++)
@@ -219,7 +206,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		}
 
-		protected virtual void QueryHeight(VectorFeatureUnity feature, MeshData md, UnityTile tile, out float maxHeight, out float minHeight)
+		public virtual void QueryHeight(VectorFeatureUnity feature, MeshData md, UnityTile tile, out float maxHeight, out float minHeight)
 		{
 			minHeight = 0.0f;
 			maxHeight = 0.0f;
@@ -285,6 +272,41 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				default:
 					break;
 			}
+		}
+	}
+
+	/// <summary>
+	/// Height Modifier is responsible for the y axis placement of the feature. It pushes the original vertices upwards by "height" value and creates side walls around that new polygon down to "min_height" value.
+	/// It also checkes for "ele" (elevation) value used for contour lines in Mapbox Terrain data.
+	/// Height Modifier also creates a continuous UV mapping for side walls.
+	/// </summary>
+	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Height Modifier")]
+	public class HeightModifier : MeshModifier, ICoreWrapper
+	{
+		[SerializeField] private GeometryExtrusionOptions _options;
+
+		public override ModifierType Type { get { return ModifierType.Preprocess; } }
+
+		private readonly HeightModifierCore _heightModifierCore;
+
+		public HeightModifier()
+		{
+			_heightModifierCore = new HeightModifierCore(_options);
+		}
+
+		public override void SetProperties(ModifierProperties properties)
+		{
+			_options = (GeometryExtrusionOptions)properties;
+			_options.PropertyHasChanged += UpdateModifier;
+		}
+		public override void UnbindProperties()
+		{
+			_options.PropertyHasChanged -= UpdateModifier;
+		}
+
+		public IModifierCore GetAsycCore()
+		{
+			return new HeightModifierCore(_options);
 		}
 	}
 }
