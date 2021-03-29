@@ -170,7 +170,9 @@ namespace Mapbox.Unity
 
 #if !UNITY_WEBGL
 			var sqliteCache = new SQLiteCache(_configuration.FileCacheSize);
-
+			OfflineManager = new OfflineManager(_configuration.AccessToken, _configuration.GetMapsSkuToken);
+			OfflineManager.SetOfflineCache(sqliteCache);
+			
 	#if UNITY_EDITOR
 			var fileCache = new EditorFileCache();
 	#else
