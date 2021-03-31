@@ -99,10 +99,7 @@ namespace Mapbox.Unity.Map
 				sublayerName = sublayerName
 			};
 
-			_properties.lineGeometryOptions = new LineGeometryOptions
-			{
-				Width = lineWidth
-			};
+			_properties.lineGeometryOptions = new LineGeometryOptions();
 
 			_properties.extrusionOptions = new GeometryExtrusionOptions
 			{

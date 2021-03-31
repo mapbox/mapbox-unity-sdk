@@ -51,7 +51,6 @@ namespace Mapbox.Map
 	/// </example>
 	public sealed class VectorTile : Tile, IDisposable
 	{
-		public VectorResult VectorResults;
 		// FIXME: Namespace here is very confusing and conflicts (sematically)
 		// with his class. Something has to be renamed here.
 		private Mapbox.VectorTile.VectorTile data;
@@ -148,7 +147,6 @@ namespace Mapbox.Map
 						Action = () =>
 						{
 							byteData = response.Data;
-							VectorResults = new VectorResult();
 							ParseTileData(byteData);
 							TileState = TileState.Loaded;
 						},
@@ -166,106 +164,23 @@ namespace Mapbox.Map
 							}
 						},
 #if UNITY_EDITOR
-						Info = "VectorTile.HandleTileResponse"
+						Info = string.Format("{0} - {1} - {2}", "VectorTile.HandleTileResponse", TilesetId, Id)
 #endif
 					});
-
-				// var task = Task.Run(() =>
-				// {
-				// 	SetByteData(response.Data);
-				// });
-				//
-				// task.ContinueWith((t) =>
-				// {
-				// 	// Cancelled is not the same as loaded!
-				// 	if (TileState != TileState.Canceled)
-				// 	{
-				// 		TileState = TileState.Loaded;
-				// 	}
-				//
-				// 	if (_callback != null)
-				// 	{
-				// 		_callback();
-				// 	}
-				// }, TaskScheduler.FromCurrentSynchronizationContext());
 			}
 		}
 
 		public void SetByteData(byte[] newData)
 		{
 			byteData = newData;
-			VectorResults = new VectorResult();
 			ParseTileData(byteData);
 			TileState = TileState.Loaded;
-		}
-
-		public class VectorResult
-		{
-			public Dictionary<string, VectorLayerResult> Layers;
-
-			public VectorResult()
-			{
-				Layers = new Dictionary<string, VectorLayerResult>();
-			}
-		}
-
-		public class VectorLayerResult
-		{
-			public string Name;
-			public float Extent;
-			public List<VectorFeatureUnity> Features;
-
-			public VectorLayerResult()
-			{
-				Features = new List<VectorFeatureUnity>();
-			}
-
 		}
 
 		internal override bool ParseTileData(byte[] newData)
 		{
 			var decompressed = Compression.Decompress(newData);
 			data = new Mapbox.VectorTile.VectorTile(decompressed);
-
-			foreach (var layerName in data.LayerNames())
-			{
-				if (layerName != "building")
-					continue;
-
-				var layerResult = new VectorLayerResult();
-				var layer = data.GetLayer(layerName);
-				layerResult.Name = layerName;
-				layerResult.Extent = layer.Extent;
-
-				for (int i = 0; i < layer.FeatureCount(); i++)
-				{
-					var featureResult = new VectorFeatureUnity();
-					var feature = layer.GetFeature(i);
-					var geometry = feature.Geometry<float>(0);
-					var points = new List<List<Vector3>>();
-					for (int j = 0; j < geometry.Count; j++)
-					{
-						var pointCount = geometry[j].Count;
-						var newPoints = new List<Vector3>(pointCount);
-						for (int k = 0; k < pointCount; k++)
-						{
-							var point = geometry[j][k];
-							newPoints.Add(new Vector3(
-								((point.X - layerResult.Extent/2) / layerResult.Extent),
-								0,
-								(((layerResult.Extent - point.Y)- layerResult.Extent/2) / layerResult.Extent)));
-						}
-						points.Add(newPoints);
-					}
-
-					featureResult.Points = points;
-					featureResult.Data = feature;
-					featureResult.Properties = feature.GetProperties();
-					layerResult.Features.Add(featureResult);
-				}
-				VectorResults.Layers.Add(layerName, layerResult);
-			}
-
 			return true;
 		}
 
@@ -367,7 +282,7 @@ namespace Mapbox.Map
 
 		public void SetVectorFromCache(VectorTile vectorTile)
 		{
-			VectorResults = vectorTile.VectorResults;
+			data = vectorTile.Data;
 			TileState = TileState.Loaded;
 		}
 	}

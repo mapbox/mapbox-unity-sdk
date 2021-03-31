@@ -310,7 +310,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			return containingCategories;
 		}
 
-		public override void Create(Mapbox.Map.VectorTile.VectorLayerResult layer, UnityTile tile, Action<UnityTile, LayerVisualizerBase> callback)
+		public override void Create(UnityTile tile, Action<UnityTile, LayerVisualizerBase> callback)
 		{
 			//for layers using specific locations, ignore VectorTileLayer and
 			//pass coordinates to the modifierstack using BuildFeatureFromLatLon.

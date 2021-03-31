@@ -25,7 +25,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		protected List<ModifierStack> _modifierStacks;
 		protected HashSet<ModifierBase> _coreModifiers = new HashSet<ModifierBase>();
 
-		public abstract void Create(Mapbox.Map.VectorTile.VectorLayerResult layer, UnityTile tile, Action<UnityTile, LayerVisualizerBase> callback = null);
+		public abstract void Create(UnityTile tile, Action<UnityTile, LayerVisualizerBase> callback = null);
 
 		public event System.EventHandler LayerVisualizerHasChanged;
 
@@ -100,7 +100,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 							AddOrCreateMeshModifier<SnapTerrainModifier>();
 						}
 
-						var lineMeshMod = AddOrCreateMeshModifier<LineMeshModifier>();
+						var lineMeshMod = AddOrCreateMeshModifier<LineMeshForPolygonsModifier>();
 						lineMeshMod.SetProperties(_sublayerProperties.lineGeometryOptions);
 						lineMeshMod.ModifierHasChanged += UpdateVector;
 

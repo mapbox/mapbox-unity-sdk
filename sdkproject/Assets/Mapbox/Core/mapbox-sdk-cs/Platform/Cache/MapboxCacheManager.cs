@@ -129,8 +129,9 @@ namespace Mapbox.Platform.Cache
                             callback(cacheItem);
                         }
                     },
+                    TileId = localTileId,
 #if UNITY_EDITOR
-                    Info = "MapboxCacheManager.GetVectorItemFromSqlite"
+                    Info = string.Format("{0} - {1} - {2}", "MapboxCacheManager.GetVectorItemFromSqlite", tilesetId, tileId)
 #endif
                 });
 
@@ -223,7 +224,7 @@ namespace Mapbox.Platform.Cache
                             callback(textureCacheItem);
                         },
 #if UNITY_EDITOR
-                        Info = "MapboxCacheManager.GetTextureItemFromFile"
+                        Info = string.Format("{0} - {1} - {2}", "MapboxCacheManager.GetTextureItemFromFile", tilesetId, tileId)
 #endif
                     });
 

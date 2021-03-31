@@ -166,28 +166,13 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		private void CreateMeshes(UnityTile tile)
 		{
-			var nameList = new List<Mapbox.Map.VectorTile.VectorLayerResult>();
-			var builderList = new List<LayerVisualizerBase>();
-
-			foreach (var layer in tile.VectorData.VectorResults.Layers)
+			foreach (var layerVisualizerTuple in _layerBuilder)
 			{
-				if (_layerBuilder.ContainsKey(layer.Key))
+				foreach (var visualizer in layerVisualizerTuple.Value)
 				{
-					//two loops; first one to add it to waiting/tracking list, second to start it
-					foreach (var builder in _layerBuilder[layer.Key])
-					{
-						nameList.Add(layer.Value);
-						builderList.Add(builder);
-						TrackFeatureWithBuilder(tile, layer.Value, builder);
-					}
+					CreateFeatureWithBuilder(tile, visualizer);
 				}
 			}
-			for (int i = 0; i < nameList.Count; i++)
-			{
-				CreateFeatureWithBuilder(tile, nameList[i], builderList[i]);
-			}
-
-			builderList.Clear();
 		}
 
 		private void OnFetcherDataRecieved(UnityTile tile, Mapbox.Map.VectorTile vectorTile)
@@ -256,7 +241,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		public void RedrawSubLayer(UnityTile tile, LayerVisualizerBase visualizer)
 		{
-			CreateFeatureWithBuilder(tile, tile.VectorData.VectorResults.Layers[visualizer.SubLayerProperties.coreOptions.layerName], visualizer);
+			CreateFeatureWithBuilder(tile, visualizer);
 		}
 
 		public void UnregisterLayer(UnityTile tile, LayerVisualizerBase visualizer)
@@ -292,7 +277,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		}
 
 		#region Private Methods
-		private void TrackFeatureWithBuilder(UnityTile tile, Mapbox.Map.VectorTile.VectorLayerResult layerName, LayerVisualizerBase builder)
+		private void TrackFeatureWithBuilder(UnityTile tile, LayerVisualizerBase builder)
 		{
 			if (builder.Active)
 			{
@@ -311,7 +296,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		private void CreateFeatureWithBuilder(UnityTile tile, Mapbox.Map.VectorTile.VectorLayerResult layer, LayerVisualizerBase builder)
+		private void CreateFeatureWithBuilder(UnityTile tile, LayerVisualizerBase builder)
 		{
 			if (builder.Active)
 			{
@@ -327,10 +312,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 						_tilesWaitingProcessing.Add(tile);
 					}
 				}
-				if (layer != null)
-				{
-					builder.Create(layer, tile, LayerFinishedCallback);
-				}
+				builder.Create(tile, LayerFinishedCallback);
 			}
 		}
 

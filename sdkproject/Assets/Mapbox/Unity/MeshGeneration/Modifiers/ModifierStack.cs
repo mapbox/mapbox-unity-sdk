@@ -143,11 +143,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				if (MeshModifiers[i] != null && MeshModifiers[i].Active)
 				{
-					if (MeshModifiers[i] is ICoreWrapper)
-					{
-						(MeshModifiers[i] as ICoreWrapper).GetAsycCore().Run(feature, meshData, tile);
-					}
-					//MeshModifiers[i].Run(feature, meshData, tile);
+					// if (MeshModifiers[i] is ICoreWrapper)
+					// {
+					// 	(MeshModifiers[i] as ICoreWrapper).GetAsycCore().Run(feature, meshData, tile);
+					// }
+					MeshModifiers[i].Run(feature, meshData, tile);
 				}
 			}
 

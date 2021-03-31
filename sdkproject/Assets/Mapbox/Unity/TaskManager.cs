@@ -38,7 +38,10 @@ namespace Mapbox.Unity
 					{
 						_runningTasks.Remove(w);
 					};
-					task.ContinueWith((t) => { ContinueWrapper(t, wrapper); }, TaskScheduler.FromCurrentSynchronizationContext());
+					task.ContinueWith((t) =>
+					{
+						ContinueWrapper(t, wrapper);
+					}, TaskScheduler.FromCurrentSynchronizationContext());
                     TaskStarted(wrapper);
 					yield return null;
 
@@ -65,12 +68,12 @@ namespace Mapbox.Unity
 
 		private void ContinueWrapper(Task task, TaskWrapper taskWrapper)
 		{
+			_runningTasks.Remove(taskWrapper);
 			taskWrapper.Finished(taskWrapper);
 			if (taskWrapper.ContinueWith != null)
 			{
 				taskWrapper.ContinueWith(task);
 			}
-			_runningTasks.Remove(taskWrapper);
 		}
 
 		public void AddTask(TaskWrapper taskWrapper, int priority = 5)

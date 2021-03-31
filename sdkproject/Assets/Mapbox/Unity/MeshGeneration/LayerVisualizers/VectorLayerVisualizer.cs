@@ -165,12 +165,12 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			DestroyImmediate(_defaultStack);
 		}
 
-		public override void Create(Mapbox.Map.VectorTile.VectorLayerResult layer, UnityTile tile, Action<UnityTile, LayerVisualizerBase> callback)
+		public override void Create(UnityTile tile, Action<UnityTile, LayerVisualizerBase> callback)
 		{
-			ProcessLayer(layer, tile, tile.UnwrappedTileId, callback);
+			ProcessLayer(tile, tile.UnwrappedTileId, callback);
 		}
 
-		private void ProcessLayer(Mapbox.Map.VectorTile.VectorLayerResult slayer, UnityTile tile, UnwrappedTileId tileId, Action<UnityTile, LayerVisualizerBase> callback = null)
+		private void ProcessLayer(UnityTile tile, UnwrappedTileId tileId, Action<UnityTile, LayerVisualizerBase> callback = null)
 		{
 			if (tile == null)
 			{
@@ -178,7 +178,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 
 			var cachedTileId = tile.CanonicalTileId;
-			var cachedLayer = slayer;
 			var cachedCallback = callback;
 
 			var source = new CancellationTokenSource();
@@ -188,23 +187,59 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			void Action()
 			{
 				var capturedToken = token;
-				foreach (var feature in cachedLayer.Features)
+				var layer = tile.VectorData.Data.GetLayer(Key);
+				if (layer == null)
 				{
+					return;
+				}
+
+				var layerExtent = layer.Extent;
+				for (int i = 0; i < layer.FeatureCount(); i++)
+				{
+					var feature = layer.GetFeature(i);
+					var featureResult = new VectorFeatureUnity();
+					featureResult.Properties = feature.GetProperties();
+
 					if (capturedToken.IsCancellationRequested) break;
-					if (IsFeatureInvalid(cachedTileId, feature, _tempLayerProperties)) continue;
+					if (IsFeatureInvalid(cachedTileId, featureResult, _tempLayerProperties)) continue;
+
+					var geometry = feature.Geometry<float>(0);
+					var points = new List<List<Vector3>>();
+					foreach (var t in geometry)
+					{
+						var pointCount = t.Count;
+						var newPoints = new List<Vector3>(pointCount);
+						for (int k = 0; k < pointCount; k++)
+						{
+							var point = t[k];
+							newPoints.Add(new Vector3(
+								((point.X - layerExtent/2) / layerExtent),
+								0,
+								(((layerExtent - point.Y)- layerExtent/2) / layerExtent)));
+						}
+						points.Add(newPoints);
+					}
+
+					featureResult.Points = points;
+					if (featureResult.Points.Count < 1)
+					{
+						continue;
+					}
+
+					featureResult.Data = feature;
 
 					foreach (var modifierStack in _modifierStacks)
 					{
-						if (modifierStack.FeatureFilterCombiner.Try(feature))
+						if (modifierStack.FeatureFilterCombiner.Try(featureResult))
 						{
 							var meshData = new MeshData();
-							meshData = modifierStack.RunMeshModifiers(tile, feature, meshData, tile.TileSize);
+							meshData = modifierStack.RunMeshModifiers(tile, featureResult, meshData, tile.TileSize);
 							if (!meshDataList.ContainsKey(modifierStack))
 							{
 								meshDataList.Add(modifierStack, new List<Tuple<VectorFeatureUnity, MeshData>>());
 							}
 
-							meshDataList[modifierStack].Add(new Tuple<VectorFeatureUnity, MeshData>(feature, meshData));
+							meshDataList[modifierStack].Add(new Tuple<VectorFeatureUnity, MeshData>(featureResult, meshData));
 						}
 					}
 				}
@@ -237,10 +272,10 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 						{
 							foreach (var meshTuples in pair.Value)
 							{
-								var entity = CreateObject(tile, meshTuples.Item2, tile.gameObject, cachedLayer.Name);
+								var entity = CreateObject(tile, meshTuples.Item2, tile.gameObject, Key);
 								entity.Feature = meshTuples.Item1;
 #if UNITY_EDITOR
-								if (meshTuples.Item1 != null && meshTuples.Item1.Data != null) entity.GameObject.name = cachedLayer.Name; // + " - " + meshTuples.Item1.Data.Id;
+								if (meshTuples.Item1 != null && meshTuples.Item1.Data != null) entity.GameObject.name = Key; // + " - " + meshTuples.Item1.Data.Id;
 #endif
 
 								pair.Key.RunGoModifiers(entity, tile);
@@ -259,7 +294,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				Token = source,
 				ContinueWith = ContinueWith,
 				#if UNITY_EDITOR
-				Info = "VectorLayerVisualizer.ProcessLayer"
+				Info = string.Format("{0} - {1} - {2}", "VectorLayerVisualizer.ProcessLayer", Key, tile.CanonicalTileId)
 				#endif
 			};
 
@@ -268,94 +303,12 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				_tasks.Add(tile.CanonicalTileId, new List<TaskWrapper>());
 			}
 			_tasks[tile.CanonicalTileId].Add(taskWrapper);
-			taskWrapper.Finished += (t) => _tasks.Remove(t.TileId);
+			taskWrapper.Finished += (t) =>
+			{
+				_tasks.Remove(t.TileId);
+			};
 
 			MapboxAccess.Instance.TaskManager.AddTask(taskWrapper, 1);
-
-			// var task = Task.Run(() =>
-			// {
-			// 	var capturedToken = token;
-			//
-			// 	foreach (var feature in cachedLayer.Features)
-			// 	{
-			// 		if (capturedToken.IsCancellationRequested) return;
-			// 		if (IsFeatureInvalid(cachedTileId, feature, _tempLayerProperties)) continue;
-			//
-			// 		foreach (var modifierStack in _modifierStacks)
-			// 		{
-			// 			if (modifierStack.FeatureFilterCombiner.Try(feature))
-			// 			{
-			// 				var meshData = new MeshData();
-			// 				meshData = modifierStack.RunMeshModifiers(tile, feature, meshData, tile.TileSize);
-			// 				if (!meshDataList.ContainsKey(modifierStack))
-			// 				{
-			// 					meshDataList.Add(modifierStack, new List<Tuple<VectorFeatureUnity, MeshData>>());
-			// 				}
-			// 				meshDataList[modifierStack].Add(new Tuple<VectorFeatureUnity, MeshData>(feature, meshData));
-			// 			}
-			// 		}
-			// 	}
-			//
-			// 	foreach (var pairs in meshDataList)
-			// 	{
-			// 		if (pairs.Key.combineMeshes)
-			// 		{
-			// 			var mergedData = CombineMeshData(pairs.Value);
-			// 			pairs.Value.Clear();
-			// 			pairs.Value.Add(new Tuple<VectorFeatureUnity, MeshData>(null, mergedData));
-			// 		}
-			// 	}
-			//
-			// }, token);
-
-			// if (!_tasks.ContainsKey(tile.CanonicalTileId))
-			// {
-			// 	_tasks.Add(tile.CanonicalTileId, new List<Tuple<Task, CancellationTokenSource>>());
-			// }
-			// _tasks[tile.CanonicalTileId].Add(new Tuple<Task, CancellationTokenSource>(task, source));
-
-			// 		task.ContinueWith((t) =>
-			// 		{
-			// 			if (t.IsCanceled)
-			// 			{
-			// 				meshDataList.Clear();
-			// 				return;
-			// 			}
-			//
-			// 			//is there a better way to check this?
-			// 			if (tile.CanonicalTileId == cachedTileId && !tile.IsRecycled)
-			// 			{
-			// 				foreach (var pair in meshDataList)
-			// 				{
-			// 					foreach (var meshTuples in pair.Value)
-			// 					{
-			// 						var entity = CreateObject(tile, meshTuples.Item2, tile.gameObject, cachedLayer.Name);
-			// 						entity.Feature = meshTuples.Item1;
-			// #if UNITY_EDITOR
-			// 						if (meshTuples.Item1 != null && meshTuples.Item1.Data != null)
-			// 							entity.GameObject.name = cachedLayer.Name;// + " - " + meshTuples.Item1.Data.Id;
-			// #endif
-			//
-			// 						pair.Key.RunGoModifiers(entity, tile);
-			// 					}
-			//
-			// 				}
-			// 			}
-			//
-			// 			cachedCallback?.Invoke(tile, this);
-			//
-			//
-			// 		}, TaskScheduler.FromCurrentSynchronizationContext());
-
-			// #region PostProcess
-			// // TODO : Clean this up to follow the same pattern.
-			// var mergedStack = _defaultStack as MergedModifierStack;
-			// if (mergedStack != null && tile != null)
-			// {
-			// 	mergedStack.End(tile, tile.gameObject, layer.Name);
-			// }
-			// #endregion
-
 		}
 
 		private static MeshData CombineMeshData(List<Tuple<VectorFeatureUnity, MeshData>> meshDataList)
@@ -410,13 +363,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		private VectorEntity CreateObject(UnityTile tile, MeshData meshData, GameObject parent, string type)
 		{
-			// if (meshData.Vertices.Count != meshData.UV[0].Count ||
-			//     meshData.Vertices.Count != meshData.Tangents.Count)
-			// {
-			// 	Debug.Log("data mismatch");
-			// 	return null;
-			// }
-
 			var tempVectorEntity = _pool.GetObject();
 
 			// It is possible that we changed scenes in the middle of map generation.
@@ -503,9 +449,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			// }
 
 			if (feature.Properties.ContainsKey("extrude") && !bool.Parse(feature.Properties["extrude"].ToString()))
-				return true;
-
-			if (feature.Points.Count < 1)
 				return true;
 
 			return false;

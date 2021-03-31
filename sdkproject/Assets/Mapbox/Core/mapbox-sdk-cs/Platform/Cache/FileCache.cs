@@ -234,7 +234,7 @@ namespace Mapbox.Platform.Cache
 // #endif
 					},
 #if UNITY_EDITOR
-					Info = "FileCache.SaveInfo"
+					Info = string.Format("{0} - {1} - {2}", "FileCache.SaveInfo", info.TilesetId, info.TileId)
 #endif
 				}, 100);
 		}

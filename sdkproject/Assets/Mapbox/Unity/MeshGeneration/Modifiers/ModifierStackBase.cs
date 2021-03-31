@@ -43,11 +43,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		}
 
-		public virtual void RunLayer(Mapbox.Map.VectorTile.VectorLayerResult vectorTileLayer, UnityTile tile, GameObject parent = null, string type = "")
-		{
-
-		}
-
 		public virtual void RunGoModifiers(VectorEntity entity, UnityTile tile)
 		{
 

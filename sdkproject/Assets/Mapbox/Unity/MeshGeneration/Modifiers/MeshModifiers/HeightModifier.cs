@@ -33,7 +33,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		}
 	}
 
-	public class HeightModifierCore : IModifierCore
+	public class HeightModifierCore
 	{
 		GeometryExtrusionOptions _options;
 		private bool _separateSubmesh = false;
@@ -281,7 +281,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	/// Height Modifier also creates a continuous UV mapping for side walls.
 	/// </summary>
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Height Modifier")]
-	public class HeightModifier : MeshModifier, ICoreWrapper
+	public class HeightModifier : MeshModifier
 	{
 		[SerializeField] private GeometryExtrusionOptions _options;
 
@@ -304,9 +304,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_options.PropertyHasChanged -= UpdateModifier;
 		}
 
-		public IModifierCore GetAsycCore()
+		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
-			return new HeightModifierCore(_options);
+			var core = new HeightModifierCore(_options);
+			core.Run(feature, md, tile);
 		}
 	}
 }

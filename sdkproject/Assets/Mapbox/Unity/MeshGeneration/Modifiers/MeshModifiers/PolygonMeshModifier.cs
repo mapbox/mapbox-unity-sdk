@@ -9,7 +9,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers;
 	using System;
 
-	public class PolyMeshCore : IModifierCore
+	public class PolyMeshCore
 	{
 		private UVModifierOptions _options;
 		private Vector3 _pushUp;
@@ -207,7 +207,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	/// Currently uses Triangle.Net for triangulation, which occasionally adds extra vertices to maintain a good triangulation so output vertex list might not be exactly same as the original vertex list.
 	/// </summary>
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Polygon Mesh Modifier")]
-	public class PolygonMeshModifier : MeshGenerationBase, ICoreWrapper
+	public class PolygonMeshModifier : MeshGenerationBase
 	{
 		public override ModifierType Type => ModifierType.Preprocess;
 		[SerializeField] private UVModifierOptions _options;
@@ -224,21 +224,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_options.PropertyHasChanged -= UpdateModifier;
 		}
 
-		private readonly PolyMeshCore _polyMeshCore;
-
-		public PolygonMeshModifier()
-		{
-			_polyMeshCore = new PolyMeshCore(_options, Height);
-		}
-
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
-			_polyMeshCore.Run(feature, md, tile);
-		}
-
-		public IModifierCore GetAsycCore()
-		{
-			return new PolyMeshCore(_options, Height);
+			var core = new PolyMeshCore(_options, Height);
+			core.Run(feature, md, tile);
 		}
 	}
 }

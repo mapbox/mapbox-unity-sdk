@@ -364,7 +364,7 @@ namespace Mapbox.Unity.Map
 			VectorSubLayerProperties subLayer = PresetSubLayerPropertiesFetcher.GetSubLayerProperties(PresetFeatureType.Roads);
 			subLayer.coreOptions.layerName = dataLayerNameInService;
 			subLayer.coreOptions.sublayerName = assignedSubLayerName;
-			subLayer.lineGeometryOptions.Width = lineWidth;
+			//subLayer.lineGeometryOptions.Width = lineWidth;
 
 			AddFeatureSubLayer(subLayer);
 		}
