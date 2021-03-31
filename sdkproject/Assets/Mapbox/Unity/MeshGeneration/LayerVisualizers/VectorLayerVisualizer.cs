@@ -275,7 +275,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 								var entity = CreateObject(tile, meshTuples.Item2, tile.gameObject, Key);
 								entity.Feature = meshTuples.Item1;
 #if UNITY_EDITOR
-								if (meshTuples.Item1 != null && meshTuples.Item1.Data != null) entity.GameObject.name = Key; // + " - " + meshTuples.Item1.Data.Id;
+								if (meshTuples.Item1 != null && meshTuples.Item1.Data != null) entity.GameObject.name = Key;
 #endif
 
 								pair.Key.RunGoModifiers(entity, tile);
@@ -308,7 +308,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				_tasks.Remove(t.TileId);
 			};
 
-			MapboxAccess.Instance.TaskManager.AddTask(taskWrapper, 1);
+			MapboxAccess.Instance.TaskManager.AddTask(taskWrapper);
 		}
 
 		private static MeshData CombineMeshData(List<Tuple<VectorFeatureUnity, MeshData>> meshDataList)

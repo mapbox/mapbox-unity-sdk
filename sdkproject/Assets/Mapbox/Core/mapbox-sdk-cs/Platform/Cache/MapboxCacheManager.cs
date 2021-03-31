@@ -179,7 +179,9 @@ namespace Mapbox.Platform.Cache
 
             _textureFileCache.GetAsync(tileId, tilesetId, isTextureNonreadable, (textureCacheItem) =>
             {
-
+                //this might happen in some corner cases
+                //it means file was supposed to be there but couldn't be found in the last step when requested
+                //maybe deleted in an earlier frame by cache limit?
                 if (textureCacheItem == null || textureCacheItem.HasError)
                 {
                     callback(null);
@@ -189,15 +191,7 @@ namespace Mapbox.Platform.Cache
 #if UNITY_EDITOR
                 textureCacheItem.Texture2D.name = string.Format("{0}_{1}", tileId.ToString(), tilesetId);
 #endif
-                //this might happen in some corner cases
-                //it means file was supposed to be there but couldn't be found in the last step when requested
-                //maybe deleted in an earlier frame by cache limit?
-                if (textureCacheItem == null)
-                {
-                    callback(null);
-                    return;
-                }
-
+                
                 CacheItem cacheItem = null;
 
                 MapboxAccess.Instance.TaskManager.AddTask(

@@ -76,7 +76,7 @@ namespace Mapbox.Unity
 			}
 		}
 
-		public void AddTask(TaskWrapper taskWrapper, int priority = 5)
+		public void AddTask(TaskWrapper taskWrapper)
 		{
 			_taskQueue.Enqueue(taskWrapper);
             //_taskPriorityQueue.Enqueue(taskWrapper, priority);
