@@ -31,7 +31,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_pushUp = new Vector3(0, height, 0);
 		}
 
-		public void Run(VectorFeatureUnity feature, MeshData md, float tileSize, float zoom)
+		public void Run(VectorFeatureUnity feature, MeshData md, float zoom)
 		{
 			var _counter = feature.Points.Count;
 			var subset = new List<List<Vector3>>(_counter);
@@ -42,7 +42,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			List<int> triList = null;
 			List<Vector3> sub = null;
 
-			Polygonize(feature, md, tileSize, _counter, subset, triList, currentIndex);
+			Polygonize(feature, md, _counter, subset, triList, currentIndex);
 		}
 
 		public void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
@@ -56,10 +56,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			List<int> triList = null;
 			List<Vector3> sub = null;
 
-			Polygonize(feature, md, tile.TileSize, _counter, subset, triList, currentIndex);
+			Polygonize(feature, md, _counter, subset, triList, currentIndex);
 		}
 
-		private void Polygonize(VectorFeatureUnity feature, MeshData md, float tileSize, int _counter, List<List<Vector3>> subset, List<int> triList, int currentIndex)
+		private void Polygonize(VectorFeatureUnity feature, MeshData md, int _counter, List<List<Vector3>> subset, List<int> triList, int currentIndex)
 		{
 			List<Vector3> sub;
 			int vertCount;
@@ -108,7 +108,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				{
 					md.Edges.Add(vertCount + ((j + 1) % polygonVertexCount));
 					md.Edges.Add(vertCount + j);
-					md.Vertices.Add((sub[j] * tileSize) + _pushUp);
+					md.Vertices.Add((sub[j]) + _pushUp);
 					md.Tangents.Add(Constants.Math.Vector3Forward);
 					md.Normals.Add(Constants.Math.Vector3Up);
 

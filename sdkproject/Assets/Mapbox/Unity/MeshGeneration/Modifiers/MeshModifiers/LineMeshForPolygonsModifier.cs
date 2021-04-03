@@ -62,16 +62,16 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		public void Run(VectorFeatureUnity feature, MeshData md, float tileSize, float zoom)
 		{
-			ExtrudeLine(feature, md, tileSize, zoom);
+			ExtrudeLine(feature, md, zoom);
 		}
 
 		public void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
 			_tileSize = Convert.ToSingle(tile.Rect.Size.x * tile.TileScale);
-			ExtrudeLine(feature, md, tile.TileSize, tile.CurrentZoom);
+			ExtrudeLine(feature, md, tile.CurrentZoom);
 		}
 
-		private void ExtrudeLine(VectorFeatureUnity feature, MeshData md, float tileSize, float zoom)
+		private void ExtrudeLine(VectorFeatureUnity feature, MeshData md, float zoom)
 		{
 			if (feature.Points.Count < 1)
 			{
@@ -85,9 +85,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				var tolerance = 0.001f;
 				for (int i = 0; i < segment.Count - 1; i++)
 				{
-					var p1 = segment[i] * tileSize;
-					var p2 = segment[i + 1] * tileSize;
-					if (!IsOnEdge(p1, p2, _tileSize, tolerance))
+					var p1 = segment[i];
+					var p2 = segment[i + 1];
+					if (!IsOnEdge(p1, p2, tolerance))
 					{
 						filteredRoadSegment.Add(p1);
 						if (i == segment.Count - 2)
@@ -378,7 +378,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
-		private bool IsOnEdge(Vector3 p1, Vector3 p2, float _tileSize, float tolerance)
+		private bool IsOnEdge(Vector3 p1, Vector3 p2, float tolerance)
 		{
 			return ((Math.Abs(Math.Abs(p1.x) - (_tileSize/2)) < tolerance && Math.Abs(Math.Abs(p2.x) - (_tileSize/2)) < tolerance && Math.Sign(p1.x) == Math.Sign(p2.x)) ||
 			        (Math.Abs(Math.Abs(p1.z) - (_tileSize/2)) < tolerance && Math.Abs(Math.Abs(p2.z) - (_tileSize/2)) < tolerance && Math.Sign(p1.z) == Math.Sign(p2.z)));

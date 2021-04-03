@@ -317,7 +317,7 @@ namespace Mapbox.Unity.Map
 		{
 			var unityTile = _tilePool.GetObject();
 
-			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale, _map.AbsoluteZoom, _map.LoadingTexture);
+			unityTile.Initialize(_map, tileId, TerrainLayer.IsLayerActive && TerrainLayer.ElevationType != ElevationLayerType.FlatTerrain);
 			if (enableTile)
 			{
 				unityTile.gameObject.SetActive(true);

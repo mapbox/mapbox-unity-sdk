@@ -213,9 +213,9 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 						{
 							var point = t[k];
 							newPoints.Add(new Vector3(
-								((point.X - layerExtent/2) / layerExtent),
+								((point.X - layerExtent/2) / layerExtent) * tile.TileSize,
 								0,
-								(((layerExtent - point.Y)- layerExtent/2) / layerExtent)));
+								(((layerExtent - point.Y)- layerExtent/2) / layerExtent) * tile.TileSize));
 						}
 						points.Add(newPoints);
 					}
@@ -387,6 +387,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 
 			var counter = meshData.Triangles.Count;
+			tempVectorEntity.Mesh.subMeshCount = counter;
 			for (int i = 0; i < counter; i++)
 			{
 				tempVectorEntity.Mesh.SetTriangles(meshData.Triangles[i], i);
