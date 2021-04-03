@@ -912,7 +912,7 @@ MonoBehaviour:
       requiredOptions:
         exaggerationFactor: 1
       colliderOptions:
-        addCollider: 0
+        addCollider: 1
       modificationOptions:
         sampleCount: 10
         useRelativeHeight: 0
