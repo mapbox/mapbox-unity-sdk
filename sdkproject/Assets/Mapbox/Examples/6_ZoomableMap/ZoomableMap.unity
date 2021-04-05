@@ -595,7 +595,7 @@ MonoBehaviour:
       scalingType: 1
       unityTileSize: 100
     loadingTexture: {fileID: 291977720}
-    tileMaterial: {fileID: 2100000, guid: 03fcf11879198499f9e71b4e087af3c0, type: 2}
+    tileMaterial: {fileID: 2100000, guid: 764fa5e39b2479249af645452ac5d740, type: 2}
   _mapVisualizer: {fileID: 1087372577}
   _tileProvider: {fileID: 0}
   _initializeOnStart: 1
@@ -912,7 +912,7 @@ MonoBehaviour:
       requiredOptions:
         exaggerationFactor: 1
       colliderOptions:
-        addCollider: 1
+        addCollider: 0
       modificationOptions:
         sampleCount: 10
         useRelativeHeight: 0
