@@ -21,7 +21,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			BuildQuad();
 		}
 
-		public override void RegisterTile(UnityTile tile, bool b)
+		public override void RegisterTile(UnityTile tile, bool createElevatedMesh)
 		{
 			var meshFilter = tile.MeshFilter;
 
@@ -70,7 +70,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 
 		private void BuildQuad()
 		{
-			var halfSize = _elevationOptions.TileSize / 2;
+			var halfSize = _elevationOptions.TileMeshSize / 2;
 
 			//32
 			//01

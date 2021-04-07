@@ -57,7 +57,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			_newUvList = new List<Vector2>(sampleCountSquare);
 			_newTriangleList = new List<int>();
 
-			TileSize = elOptions.TileSize;
+			TileSize = elOptions.TileMeshSize;
 		}
 
 		public override void RegisterTile(UnityTile tile, bool createElevatedMesh)

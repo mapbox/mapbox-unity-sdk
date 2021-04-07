@@ -39,16 +39,4 @@ namespace Mapbox.Map
 		{
 		}
 	}
-
-	public class DemTile : RasterTile
-	{
-		internal override TileResource MakeTileResource(string tilesetId)
-		{
-			return TileResource.MakeDemRaster(Id, tilesetId);
-		}
-
-		public DemTile(CanonicalTileId tileId, string tilesetId) : base(tileId, tilesetId)
-		{
-		}
-	}
 }

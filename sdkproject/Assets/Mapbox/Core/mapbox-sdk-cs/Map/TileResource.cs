@@ -43,11 +43,6 @@ namespace Mapbox.Map
 			return new TileResource(string.Format("{0}/{1}.pngraw", MapUtils.TilesetIdToUrl(tilesetId ?? "mapbox.terrain-rgb"), id));
 		}
 
-		internal static TileResource MakeDemRaster(CanonicalTileId id, string styleUrl)
-		{
-			return new TileResource(string.Format("{0}/{1}.png", MapUtils.NormalizeDemStyleURL(styleUrl ?? "mapbox://mapbox.mapbox-terrain-dem-v1"), id));
-		}
-
 		public static TileResource MakeVector(CanonicalTileId id, string tilesetId)
 		{
 			return new TileResource(string.Format("{0}/{1}.vector.pbf", MapUtils.TilesetIdToUrl(tilesetId ?? "mapbox.mapbox-streets-v7"), id));

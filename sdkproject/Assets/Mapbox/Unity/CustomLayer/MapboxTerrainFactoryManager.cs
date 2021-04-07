@@ -64,11 +64,11 @@ namespace CustomImageLayerSample
 		{
 			RasterTile rasterTile;
 
-			if (tilesetId.StartsWith("mapbox://", StringComparison.Ordinal))
-			{
-				rasterTile = new DemTile(tileId, tilesetId);
-			}
-			else
+			// if (tilesetId.StartsWith("mapbox://", StringComparison.Ordinal))
+			// {
+			// 	  dem tiles will be here in the future
+			// }
+			// else
 			{
 				rasterTile = new RawPngRasterTile(tileId, tilesetId);
 			}

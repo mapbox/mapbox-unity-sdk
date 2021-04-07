@@ -142,8 +142,8 @@
 			}
 
 			EditorGUI.BeginChangeCheck();
-			var tileSizeProperty = property.FindPropertyRelative("TileSize");
-			tileSizeProperty.floatValue = EditorGUILayout.FloatField("Tile Size", tileSizeProperty.floatValue);
+			var tileSizeProperty = property.FindPropertyRelative("TileMeshSize");
+			tileSizeProperty.floatValue = EditorGUILayout.FloatField("Tile Mesh Size", tileSizeProperty.floatValue);
 			if (EditorGUI.EndChangeCheck())
 			{
 				EditorHelper.CheckForModifiedProperty(property);
