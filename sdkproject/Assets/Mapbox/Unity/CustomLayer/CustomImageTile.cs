@@ -9,7 +9,7 @@ namespace CustomImageLayerSample
 {
 	public class CustomImageTile : RasterTile
 	{
-		private string _urlFormat = "https://maps.aerisapi.com/anh3TB1Xu9Wr6cPndbPwF_EuOSGuqkH433UmnajaOP0MD9rpIh5dZ38g2SUwvu/flat,ftemperatures-max-text,admin/{0}/{1}/{2}/current.png";
+		private string _urlFormat = "https://maps.aerisapi.com/(API_KEY_HERE)/flat,ftemperatures-max-text,admin/{0}/{1}/{2}/current.png";
 
 		public CustomImageTile(CanonicalTileId tileId, string tilesetId, string format) : base(tileId, tilesetId)
 		{
