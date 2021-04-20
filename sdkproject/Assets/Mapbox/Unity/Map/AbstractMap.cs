@@ -1,4 +1,5 @@
 using Mapbox.Platform.Cache;
+using Mapbox.Unity.DataContainers;
 using Mapbox.Unity.Map.Interfaces;
 using Mapbox.Unity.Map.Strategies;
 using Mapbox.Unity.Map.TileProviders;
@@ -39,7 +40,6 @@ namespace Mapbox.Unity.Map
 
 		protected float _unityTileSize = 1;
 		protected bool _worldHeightFixed = false;
-		protected MapboxAccess _fileSource;
 		protected int _initialZoom;
 		protected Vector2d _centerLatitudeLongitude;
 		protected Vector2d _centerMercator;
@@ -509,8 +509,6 @@ namespace Mapbox.Unity.Map
 
 		protected IEnumerator SetupAccess()
 		{
-			_fileSource = MapboxAccess.Instance;
-
 			yield return new WaitUntil(() => MapboxAccess.Configured);
 		}
 		/// <summary>
@@ -565,7 +563,6 @@ namespace Mapbox.Unity.Map
 		{
 			Options = options;
 			_worldHeightFixed = false;
-			_fileSource = MapboxAccess.Instance;
 			_centerLatitudeLongitude = Conversions.StringToLatLon(options.locationOptions.latitudeLongitude);
 			_initialZoom = (int)options.locationOptions.zoom;
 
@@ -609,7 +606,7 @@ namespace Mapbox.Unity.Map
 				UpdateMap();
 			};
 
-			_mapVisualizer.Initialize(this, _fileSource);
+			_mapVisualizer.Initialize(this);
 			TileProvider.Initialize(this);
 
 			SendInitialized();

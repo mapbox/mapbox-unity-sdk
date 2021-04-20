@@ -1,17 +1,13 @@
 using System;
-using CustomImageLayerSample;
 using Mapbox.Map;
+using Mapbox.Platform.Cache;
+using Mapbox.Unity.CustomLayer;
 using Mapbox.Unity.MeshGeneration.Data;
 
-namespace Mapbox.Platform.Cache
+namespace Mapbox.Unity.DataFetching
 {
 	public class FileDataFetcher : ImageDataFetcher
 	{
-		public FileDataFetcher(IFileSource fileSource) : base(fileSource)
-		{
-
-		}
-
 		public void FetchData(FileImageTile tile, string tilesetId, CanonicalTileId tileId, bool useRetina, Action<TextureCacheItem> callback)
 		{
 			EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, String.Empty)

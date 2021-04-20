@@ -1,17 +1,15 @@
 using System;
 using Mapbox.Map;
-using Mapbox.Platform;
-using Mapbox.Unity;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
 
-namespace CustomImageLayerSample
+namespace Mapbox.Unity.CustomLayer
 {
 	public sealed class MapboxImageFactoryManager : ImageFactoryManager
 	{
 		private ImageryLayerProperties _imageSettings;
 
-		public MapboxImageFactoryManager(IFileSource fileSource, ImageryLayerProperties imageSettings, bool downloadFallbackImagery) : base(fileSource, imageSettings.sourceOptions, downloadFallbackImagery)
+		public MapboxImageFactoryManager(ImageryLayerProperties imageSettings, bool downloadFallbackImagery) : base(imageSettings.sourceOptions, downloadFallbackImagery)
 		{
 			_imageSettings = imageSettings;
 

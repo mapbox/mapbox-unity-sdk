@@ -1,4 +1,6 @@
-﻿namespace Mapbox.Editor
+﻿using Mapbox.Unity.DataContainers;
+
+namespace Mapbox.Editor
 {
 	using System.Collections;
 	using System.Collections.Generic;

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Mapbox.Map;
 using Mapbox.Platform.Cache;
 using Mapbox.Unity;
+using Mapbox.Unity.DataFetching;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
 using UnityEngine;
@@ -597,11 +598,11 @@ public class UnityTilesTabDebugView
 
 public class DataFetcherTabDebugView
 {
-	private DebuggerDataFetcherWrapper _dataFetcher;
+	private EditorDataFetchingManager _dataFetcher;
 
 	public DataFetcherTabDebugView()
 	{
-		_dataFetcher = new DebuggerDataFetcherWrapper();
+		_dataFetcher = MapboxAccess.Instance.DataManager as EditorDataFetchingManager;
 	}
 
 	public void Draw()
@@ -651,34 +652,6 @@ public class DataFetcherTabDebugView
 		{
 			GUILayout.Label (string.Format("{0} : {1}", entry.Key, entry.Value), EditorStyles.miniLabel);
 		}
-	}
-}
-
-public class DebuggerDataFetcherWrapper : DataFetcher
-{
-	public override void FetchData(DataFetcherParameters parameters)
-	{
-
-	}
-
-	public Queue<int> GetTileOrderQueue()
-	{
-		return _tileOrder;
-	}
-
-	public Dictionary<int, FetchInfo> GetFetchInfoQueue()
-	{
-		return _tileFetchInfos;
-	}
-
-	public int GetActiveRequestLimit()
-	{
-		return _activeRequestLimit;
-	}
-
-	public Dictionary<int, Tile> GetActiveRequests()
-	{
-		return _activeRequests;
 	}
 }
 

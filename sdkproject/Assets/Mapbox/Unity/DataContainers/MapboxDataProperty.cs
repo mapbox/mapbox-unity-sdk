@@ -1,6 +1,6 @@
 ﻿using Mapbox.Unity.MeshGeneration.Data;
 
-namespace Mapbox.Unity.Map
+namespace Mapbox.Unity.DataContainers
 {
 	public abstract class MapboxDataProperty
 	{

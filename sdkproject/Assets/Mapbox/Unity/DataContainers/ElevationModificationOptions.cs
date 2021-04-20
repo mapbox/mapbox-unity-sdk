@@ -1,8 +1,8 @@
-﻿namespace Mapbox.Unity.Map
-{
-	using System;
-	using UnityEngine;
+﻿using System;
+using UnityEngine;
 
+namespace Mapbox.Unity.DataContainers
+{
 	[Serializable]
 	public class ElevationModificationOptions
 	{

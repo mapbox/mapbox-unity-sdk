@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using Mapbox.Unity;
 using Mapbox.Unity.Map;
+using Mapbox.Unity.OfflineMaps;
 using Mapbox.Utils;
 using UnityEngine;
 using UnityEngine.Events;

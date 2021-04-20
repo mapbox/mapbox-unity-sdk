@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using Mapbox.Map;
 using Mapbox.Platform;
+using Mapbox.Unity.DataContainers;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Factories;
 using Mapbox.Unity.Utilities;
@@ -28,9 +29,9 @@ namespace Mapbox.Unity.Map
 
 		private VectorTileFactory _vectorTileFactory;
 
-		public void Initialize(IFileSource fileSource)
+		public void Initialize()
 		{
-			_vectorTileFactory = new VectorTileFactory(fileSource, _layerProperty);
+			_vectorTileFactory = new VectorTileFactory(_layerProperty);
 			_vectorTileFactory.OnTileError += delegate(object sender, TileErrorEventArgs args) { FactoryError(_vectorTileFactory, args); };
 
 			_layerProperty.PropertyHasChanged += RedrawVectorLayer;

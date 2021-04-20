@@ -1,3 +1,5 @@
+using Mapbox.Unity.DataContainers;
+
 namespace Mapbox.Editor
 {
 	using UnityEngine;

@@ -1,12 +1,11 @@
-﻿using Mapbox.Unity.SourceLayers;
+﻿using System;
+using Mapbox.Unity.MeshGeneration.Data;
+using Mapbox.Unity.MeshGeneration.Modifiers;
+using Mapbox.Unity.SourceLayers;
+using UnityEngine;
 
-namespace Mapbox.Unity.Map
+namespace Mapbox.Unity.DataContainers
 {
-	using System;
-	using Mapbox.Unity.MeshGeneration.Modifiers;
-	using Mapbox.Unity.MeshGeneration.Data;
-	using UnityEngine;
-
 	[Serializable]
 	public class GeometryExtrusionOptions : ModifierProperties, ISubLayerExtrusionOptions
 	{

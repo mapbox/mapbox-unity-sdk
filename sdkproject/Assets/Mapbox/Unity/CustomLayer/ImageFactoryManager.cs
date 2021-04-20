@@ -1,12 +1,12 @@
 using System;
 using Mapbox.Map;
-using Mapbox.Platform;
-using Mapbox.Unity;
+using Mapbox.Unity.DataContainers;
+using Mapbox.Unity.DataFetching;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
 using UnityEngine;
 
-namespace CustomImageLayerSample
+namespace Mapbox.Unity.CustomLayer
 {
 	public abstract class ImageFactoryManager
 	{
@@ -18,13 +18,13 @@ namespace CustomImageLayerSample
 		protected ImageDataFetcher _fetcher;
 		protected LayerSourceOptions _sourceSettings;
 
-		protected ImageFactoryManager(IFileSource fileSource, LayerSourceOptions sourceSettings, bool downloadFallbackImagery)
+		protected ImageFactoryManager(LayerSourceOptions sourceSettings, bool downloadFallbackImagery)
 		{
 			DownloadFallbackImagery = downloadFallbackImagery;
 			_sourceSettings = sourceSettings;
 
-			_baseImageDataFetcher = new BaseImageDataFetcher(fileSource);
-			_fetcher = new ImageDataFetcher(fileSource);
+			_baseImageDataFetcher = new BaseImageDataFetcher();
+			_fetcher = new ImageDataFetcher();
 			_fetcher.TextureReceived += OnTextureReceived;
 			_fetcher.FetchingError += OnFetcherError;
 		}

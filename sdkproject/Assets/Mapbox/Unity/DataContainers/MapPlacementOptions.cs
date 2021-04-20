@@ -1,8 +1,8 @@
-﻿using Mapbox.Unity.Map.Interfaces;
+﻿using System;
+using Mapbox.Unity.Map.Interfaces;
 
-namespace Mapbox.Unity.Map
+namespace Mapbox.Unity.DataContainers
 {
-	using System;
 	[Serializable]
 	public class MapPlacementOptions : MapboxDataProperty
 	{

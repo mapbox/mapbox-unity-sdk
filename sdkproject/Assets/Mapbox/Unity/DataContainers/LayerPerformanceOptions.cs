@@ -1,8 +1,9 @@
-﻿namespace Mapbox.Unity.Map
-{
-	using System;
-	using UnityEngine;
+﻿using System;
+using Mapbox.Unity.Map;
+using UnityEngine;
 
+namespace Mapbox.Unity.DataContainers
+{
 	[Serializable]
 	public class LayerPerformanceOptions : MapboxDataProperty
 	{

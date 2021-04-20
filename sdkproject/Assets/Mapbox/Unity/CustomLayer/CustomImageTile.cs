@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using Mapbox.Map;
 using Mapbox.Platform;
-using UnityEngine;
 
-namespace CustomImageLayerSample
+namespace Mapbox.Unity.CustomLayer
 {
 	public class CustomImageTile : RasterTile
 	{

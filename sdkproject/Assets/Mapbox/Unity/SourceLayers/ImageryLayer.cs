@@ -1,5 +1,6 @@
 ﻿using Mapbox.Map;
 using Mapbox.Platform;
+using Mapbox.Unity.DataContainers;
 using Mapbox.Unity.MeshGeneration.Data;
 
 namespace Mapbox.Unity.Map
@@ -44,13 +45,13 @@ namespace Mapbox.Unity.Map
 
 		public Action<AbstractTileFactory, TileErrorEventArgs> FactoryError = (factory, args) => { };
 
-		public void Initialize(IFileSource fileSource)
+		public void Initialize()
 		{
 			if (_layerProperty.sourceType != ImagerySourceType.Custom && _layerProperty.sourceType != ImagerySourceType.None)
 			{
 				_layerProperty.sourceOptions.layerSource = MapboxDefaultImagery.GetParameters(_layerProperty.sourceType);
 			}
-			_imageFactory = new MapImageFactory(fileSource, _layerProperty);
+			_imageFactory = new MapImageFactory(_layerProperty);
 			_imageFactory.OnTileError += delegate(object sender, TileErrorEventArgs args) { FactoryError(_imageFactory, args); };
 
 			_layerProperty.PropertyHasChanged += RedrawLayer;

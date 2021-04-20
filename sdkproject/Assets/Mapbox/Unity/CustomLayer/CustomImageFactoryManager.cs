@@ -1,11 +1,9 @@
 using Mapbox.Map;
-using Mapbox.Platform;
-using Mapbox.Unity;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
 using UnityEngine;
 
-namespace CustomImageLayerSample
+namespace Mapbox.Unity.CustomLayer
 {
 	public sealed class CustomImageFactoryManager : ImageFactoryManager
 	{
@@ -13,7 +11,7 @@ namespace CustomImageLayerSample
 		private string CustomTextureFieldName;
 		private string CustomTextureScaleOffsetFieldName;
 
-		public CustomImageFactoryManager(IFileSource fileSource, string urlFormat, ImageryLayerProperties settings, bool downloadFallbackImagery, string textureFieldName = "_MainTex", string textureScaleOffsetFieldName = "_MainTex_ST") : base(fileSource, settings.sourceOptions, downloadFallbackImagery)
+		public CustomImageFactoryManager(string urlFormat, ImageryLayerProperties settings, bool downloadFallbackImagery, string textureFieldName = "_MainTex", string textureScaleOffsetFieldName = "_MainTex_ST") : base(settings.sourceOptions, downloadFallbackImagery)
 		{
 			_urlFormat = urlFormat;
 			CustomTextureFieldName = textureFieldName;

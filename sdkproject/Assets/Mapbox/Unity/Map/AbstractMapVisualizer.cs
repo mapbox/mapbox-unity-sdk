@@ -72,7 +72,7 @@ namespace Mapbox.Unity.Map
 		/// Initializes the factories by passing the file source down, which is necessary for data (web/file) calls
 		/// </summary>
 		/// <param name="fileSource"></param>
-		public virtual void Initialize(IMapReadable map, IFileSource fileSource)
+		public virtual void Initialize(IMapReadable map)
 		{
 			_map = map;
 			_tileProgress = new Dictionary<UnwrappedTileId, int>();
@@ -85,21 +85,21 @@ namespace Mapbox.Unity.Map
 				ImageryLayer = new ImageryLayer();
 				ImageryLayer.FactoryError += Factory_OnTileError;
 			}
-			ImageryLayer.Initialize(fileSource);
+			ImageryLayer.Initialize();
 
 			if (TerrainLayer == null)
 			{
 				TerrainLayer = new TerrainLayer();
 				TerrainLayer.FactoryError += Factory_OnTileError;
 			}
-			TerrainLayer.Initialize(fileSource);
+			TerrainLayer.Initialize();
 
 			if (VectorLayer == null)
 			{
 				VectorLayer = new VectorLayer();
 				VectorLayer.FactoryError += Factory_OnTileError;
 			}
-			VectorLayer.Initialize(fileSource);
+			VectorLayer.Initialize();
 
 			// Allow for map re-use by recycling any active tiles.
 			var activeTiles = _activeTiles.Keys.ToList();

@@ -1,13 +1,10 @@
-using System;
 using Mapbox.Map;
-using Mapbox.Platform;
-using Mapbox.Unity;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies;
 using UnityEngine;
 
-namespace CustomImageLayerSample
+namespace Mapbox.Unity.CustomLayer
 {
 	public sealed class MapboxTerrainFactoryManager : ImageFactoryManager
 	{
@@ -19,10 +16,9 @@ namespace CustomImageLayerSample
 		private bool _isUsingShaderSolution = true;
 
 		public MapboxTerrainFactoryManager(
-			IFileSource fileSource,
 			ElevationLayerProperties elevationSettings,
 			TerrainStrategy terrainStrategy,
-			bool downloadFallbackImagery) : base(fileSource, elevationSettings.sourceOptions, downloadFallbackImagery)
+			bool downloadFallbackImagery) : base(elevationSettings.sourceOptions, downloadFallbackImagery)
 		{
 			_elevationSettings = elevationSettings;
 			TerrainStrategy = terrainStrategy;

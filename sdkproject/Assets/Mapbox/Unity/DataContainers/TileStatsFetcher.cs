@@ -1,11 +1,8 @@
-﻿namespace Mapbox.Unity.Map
-{
-	using System.IO;
-	using Mapbox.Unity.Map;
-	using UnityEngine;
-	using System.Text;
-	using Mapbox.Json;
+﻿using System.IO;
+using Mapbox.Json;
 
+namespace Mapbox.Unity.DataContainers
+{
 	public class TileStatsFetcher
 	{
 		private static TileStatsFetcher _instance;

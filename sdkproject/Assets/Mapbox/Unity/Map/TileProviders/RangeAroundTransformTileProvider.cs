@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Mapbox.Map;
+using Mapbox.Unity.DataContainers;
 using UnityEngine;
 
 namespace Mapbox.Unity.Map.TileProviders

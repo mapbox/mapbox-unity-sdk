@@ -1,10 +1,9 @@
-﻿using Mapbox.Unity.Map.Interfaces;
+﻿using System;
+using Mapbox.Unity.Map.Interfaces;
+using UnityEngine;
 
-namespace Mapbox.Unity.Map
+namespace Mapbox.Unity.DataContainers
 {
-	using System;
-	using UnityEngine;
-
 	[Serializable]
 	public class MapScalingOptions : MapboxDataProperty
 	{

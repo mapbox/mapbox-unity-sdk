@@ -1,8 +1,9 @@
-﻿namespace Mapbox.Unity.Map
+﻿using System;
+using Mapbox.Unity.Utilities;
+using UnityEngine;
+
+namespace Mapbox.Unity.DataContainers
 {
-	using System;
-	using UnityEngine;
-	using Mapbox.Unity.Utilities;
 	[Serializable]
 	public class MapLocationOptions : MapboxDataProperty
 	{

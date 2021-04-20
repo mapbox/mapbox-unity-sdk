@@ -1,3 +1,6 @@
+using System.Data;
+using Mapbox.Unity.DataFetching;
+using Mapbox.Unity.OfflineMaps;
 using MapboxAccountsUnity;
 using UnityEngine.Networking;
 
@@ -22,6 +25,7 @@ namespace Mapbox.Unity
 	/// </summary>
 	public class MapboxAccess : IFileSource
 	{
+		public DataFetchingManager DataManager;
 		public OfflineManager OfflineManager;
 		public MapboxCacheManager CacheManager;
 
@@ -147,11 +151,14 @@ namespace Mapbox.Unity
 
 		void ConfigureFileSource()
 		{
+
 			_fileSource = new CachingWebFileSource(_configuration.AccessToken, _configuration.GetMapsSkuToken);
 #if UNITY_EDITOR
 			_memoryCache = new EditorMemoryCache(_configuration.MemoryCacheSize);
+			DataManager = new EditorDataFetchingManager(_fileSource);
 #else
 			_memoryCache = new MemoryCache(_configuration.MemoryCacheSize);
+			DataManager = new MapboxDataFetchingManager(_fileSource);
 #endif
 
 #if !UNITY_WEBGL
@@ -161,7 +168,7 @@ namespace Mapbox.Unity
 			OfflineManager.SetOfflineCache(sqliteCache);
 
 	#if UNITY_EDITOR
-			var fileCache = new EditorFileCache(_fileSource);
+			var fileCache = new EditorFileCache();
 	#else
 			var fileCache = new FileCache(_fileSource);
 	#endif

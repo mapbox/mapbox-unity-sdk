@@ -32,8 +32,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	/// </summary>
 	public abstract class AbstractTileFactory
 	{
-		protected IFileSource _fileSource;
-
 		protected LayerProperties _options;
 
 		public LayerProperties Options
@@ -44,9 +42,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		protected HashSet<UnityTile> _tilesWaitingResponse;
 		protected HashSet<UnityTile> _tilesWaitingProcessing;
 
-		protected AbstractTileFactory(IFileSource fileSource)
+		protected AbstractTileFactory()
 		{
-			_fileSource = fileSource;
 			_tilesWaitingResponse = new HashSet<UnityTile>();
 			_tilesWaitingProcessing = new HashSet<UnityTile>();
 		}

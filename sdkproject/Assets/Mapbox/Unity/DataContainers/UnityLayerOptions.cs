@@ -1,10 +1,9 @@
-﻿using Mapbox.Unity.MeshGeneration.Data;
+﻿using System;
+using Mapbox.Unity.MeshGeneration.Data;
+using UnityEngine;
 
-namespace Mapbox.Unity.Map
+namespace Mapbox.Unity.DataContainers
 {
-	using System;
-	using UnityEngine;
-
 	[Serializable]
 	public class UnityLayerOptions : MapboxDataProperty
 	{

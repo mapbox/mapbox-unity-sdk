@@ -1,7 +1,7 @@
-﻿namespace Mapbox.Unity.Map
-{
-	using System.ComponentModel;
+﻿using System.ComponentModel;
 
+namespace Mapbox.Unity.DataContainers
+{
 	// Map related enums
 	public enum MapPresetType
 	{

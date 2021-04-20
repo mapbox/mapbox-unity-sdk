@@ -1,12 +1,12 @@
-﻿namespace Mapbox.Unity.Map
-{
-	using System;
-	using UnityEngine;
-	using System.IO;
-	using System.Collections.Generic;
-	using Mapbox.Unity.MeshGeneration.Modifiers;
-	using Mapbox.Unity.MeshGeneration.Data;
+﻿using System;
+using System.IO;
+using Mapbox.Unity.Map;
+using Mapbox.Unity.MeshGeneration.Data;
+using Mapbox.Unity.MeshGeneration.Modifiers;
+using UnityEngine;
 
+namespace Mapbox.Unity.DataContainers
+{
 	[Serializable]
 	public class CustomStyleBundle
 	{

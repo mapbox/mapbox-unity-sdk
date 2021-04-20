@@ -1,17 +1,20 @@
 using System.Collections.Generic;
 
-public class OfflineMapDownloadInfo
+namespace Mapbox.Unity.OfflineMaps
 {
-	public string MapName;
-	public int InitializedTileCount;
-	public int SuccesfulTileDownloads = 0;
-	public int FailedTileDownloads = 0;
-	public List<string> FailedDownloadLogs;
-
-	public OfflineMapDownloadInfo(string name, int tilesCount)
+	public class OfflineMapDownloadInfo
 	{
-		MapName = name;
-		InitializedTileCount = tilesCount;
-		FailedDownloadLogs = new List<string>();
+		public string MapName;
+		public int InitializedTileCount;
+		public int SuccesfulTileDownloads = 0;
+		public int FailedTileDownloads = 0;
+		public List<string> FailedDownloadLogs;
+
+		public OfflineMapDownloadInfo(string name, int tilesCount)
+		{
+			MapName = name;
+			InitializedTileCount = tilesCount;
+			FailedDownloadLogs = new List<string>();
+		}
 	}
 }

@@ -1,10 +1,10 @@
-﻿namespace Mapbox.Unity.Map
-{
-	using System;
-	using System.Collections.Generic;
-	using Mapbox.Unity.MeshGeneration.Modifiers;
-	using Mapbox.Unity.Utilities;
+﻿using System;
+using System.Collections.Generic;
+using Mapbox.Unity.MeshGeneration.Modifiers;
+using Mapbox.Unity.Utilities;
 
+namespace Mapbox.Unity.DataContainers
+{
 	[Serializable]
 	public class LayerModifierOptions
 	{

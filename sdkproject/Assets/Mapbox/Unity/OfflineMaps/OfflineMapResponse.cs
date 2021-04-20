@@ -1,5 +1,8 @@
-public class OfflineMapResponse
+namespace Mapbox.Unity.OfflineMaps
 {
-	public bool HasErrors = false;
-	public string ErrorMessage;
+	public class OfflineMapResponse
+	{
+		public bool HasErrors = false;
+		public string ErrorMessage;
+	}
 }

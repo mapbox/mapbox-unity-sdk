@@ -1,4 +1,5 @@
-﻿using Mapbox.Unity.Map.TileProviders;
+﻿using Mapbox.Unity.DataContainers;
+using Mapbox.Unity.Map.TileProviders;
 
 namespace Mapbox.Editor
 {

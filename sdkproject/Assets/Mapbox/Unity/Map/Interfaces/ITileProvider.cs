@@ -1,5 +1,6 @@
 ﻿using System;
 using Mapbox.Map;
+using Mapbox.Unity.DataContainers;
 using Mapbox.Unity.Map.TileProviders;
 
 namespace Mapbox.Unity.Map.Interfaces

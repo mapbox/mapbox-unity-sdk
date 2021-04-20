@@ -1,3 +1,4 @@
+using Mapbox.Unity.DataContainers;
 using Mapbox.VectorTile.Geometry;
 
 namespace Mapbox.Unity.MeshGeneration.Interfaces
@@ -241,7 +242,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 						lineMeshMod.SetProperties(_layerProperties.lineGeometryOptions);
 						lineMeshMod.ModifierHasChanged += UpdateVector;
 
-						if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
+						if (_layerProperties.extrusionOptions.extrusionType != ExtrusionType.None)
 						{
 							var heightMod = AddOrCreateMeshModifier<HeightModifier>();
 							heightMod.SetProperties(_layerProperties.extrusionOptions);
@@ -278,7 +279,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 						uvModOptions.style = _layerProperties.materialOptions.style;
 						poly.SetProperties(uvModOptions);
 
-						if (_layerProperties.extrusionOptions.extrusionType != Map.ExtrusionType.None)
+						if (_layerProperties.extrusionOptions.extrusionType != ExtrusionType.None)
 						{
 							//replace materialOptions with styleOptions
 							bool useTextureSideWallModifier =

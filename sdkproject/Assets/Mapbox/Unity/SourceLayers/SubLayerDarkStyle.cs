@@ -1,4 +1,6 @@
-﻿namespace Mapbox.Unity.Map
+﻿using Mapbox.Unity.DataContainers;
+
+namespace Mapbox.Unity.Map
 {
 	public class SubLayerDarkStyle : ISubLayerDarkStyle
 	{

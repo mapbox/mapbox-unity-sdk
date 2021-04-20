@@ -1,4 +1,5 @@
 using System.Linq;
+using Mapbox.Unity.DataContainers;
 
 namespace Mapbox.Unity.MeshGeneration.Interfaces
 {

@@ -1,9 +1,7 @@
-﻿namespace Mapbox.Unity.Map
-{
-	using System;
-	using System.Collections.Generic;
-	using Mapbox.Json;
+﻿using Mapbox.Json;
 
+namespace Mapbox.Unity.DataContainers
+{
 	public class TileStats
 	{
 		[JsonProperty("account")]

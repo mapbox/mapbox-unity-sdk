@@ -1,15 +1,18 @@
 using Mapbox.Map;
 
-public class OfflineTileInfo
+namespace Mapbox.Unity.OfflineMaps
 {
-	public CanonicalTileId CanonicalTileId;
-	public OfflineTileType Type;
-	public string TilesetId;
-
-	public OfflineTileInfo(UnwrappedTileId tileId, OfflineTileType type, string tilesetId)
+	public class OfflineTileInfo
 	{
-		CanonicalTileId = tileId.Canonical;
-		Type = type;
-		TilesetId = tilesetId;
+		public CanonicalTileId CanonicalTileId;
+		public OfflineTileType Type;
+		public string TilesetId;
+
+		public OfflineTileInfo(UnwrappedTileId tileId, OfflineTileType type, string tilesetId)
+		{
+			CanonicalTileId = tileId.Canonical;
+			Type = type;
+			TilesetId = tilesetId;
+		}
 	}
 }

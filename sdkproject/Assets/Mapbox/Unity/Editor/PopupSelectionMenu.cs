@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using Mapbox.Unity;
+using Mapbox.Unity.DataContainers;
 using Mapbox.Unity.Map;
 
 namespace Mapbox.Editor

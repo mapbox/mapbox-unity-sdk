@@ -3,6 +3,7 @@ using UnityEngine;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.Map;
 using Mapbox.Map;
+using Mapbox.Unity.DataContainers;
 using Mapbox.Utils;
 using UnityEngine.Rendering;
 

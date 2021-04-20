@@ -1,4 +1,6 @@
-﻿namespace Mapbox.Unity.MeshGeneration.Modifiers
+﻿using Mapbox.Unity.DataContainers;
+
+namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
 	using System.Collections.Generic;
 	using UnityEngine;

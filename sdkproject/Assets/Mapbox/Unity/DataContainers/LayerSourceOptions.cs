@@ -1,7 +1,7 @@
-﻿namespace Mapbox.Unity.Map
-{
-	using System;
+﻿using System;
 
+namespace Mapbox.Unity.DataContainers
+{
 	[Serializable]
 	public class Style
 	{

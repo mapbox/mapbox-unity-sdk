@@ -8,7 +8,8 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using CustomImageLayerSample;
+using Mapbox.Unity.CustomLayer;
+using Mapbox.Unity.DataFetching;
 using Mapbox.Unity.Utilities;
 using Mapbox.Utils;
 using UnityEngine;
@@ -45,9 +46,9 @@ namespace Mapbox.Platform.Cache
 		protected HashSet<int> _infoKeys;
 		protected Dictionary<string, string> MapIdToFolderNameDictionary;
 
-		public FileCache(IFileSource fileSource)
+		public FileCache()
 		{
-			_fileDataFetcher = new FileDataFetcher(fileSource);
+			_fileDataFetcher = new FileDataFetcher();
 			_cachedResponses = new Dictionary<string, CacheItem>();
 			_infosToSave = new Queue<InfoWrapper>();
 			_infoKeys = new HashSet<int>();
@@ -290,10 +291,6 @@ namespace Mapbox.Platform.Cache
 		public int GetInfosToSaveListCount()
 		{
 			return _infosToSave.Count;
-		}
-
-		public EditorFileCache(IFileSource fileSource) : base(fileSource)
-		{
 		}
 
 		public override void Add(CanonicalTileId tileId, string tilesetId, TextureCacheItem textureCacheItem, bool forceInsert)

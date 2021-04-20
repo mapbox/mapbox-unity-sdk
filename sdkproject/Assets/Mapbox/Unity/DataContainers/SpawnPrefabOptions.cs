@@ -1,12 +1,10 @@
-namespace Mapbox.Unity.Map
-{
-	using System.Collections;
-	using System.Collections.Generic;
-	using UnityEngine;
-	using Mapbox.Unity.MeshGeneration.Modifiers;
-	using System;
-	using Mapbox.Unity.Map;
+using System;
+using System.Collections.Generic;
+using Mapbox.Unity.MeshGeneration.Modifiers;
+using UnityEngine;
 
+namespace Mapbox.Unity.DataContainers
+{
 	[Serializable]
 	public class SpawnPrefabOptions : ModifierProperties
 	{

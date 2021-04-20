@@ -1,7 +1,5 @@
-﻿namespace Mapbox.Unity.Map
+﻿namespace Mapbox.Unity.DataContainers
 {
-	using UnityEngine;
-
 	public interface ITileProviderOptions
 	{
 	}

@@ -1,8 +1,9 @@
-﻿namespace Mapbox.Unity.Map
-{
-	using System;
-	using Mapbox.Unity.Utilities;
+﻿using System;
+using Mapbox.Unity.Map;
+using Mapbox.Unity.Utilities;
 
+namespace Mapbox.Unity.DataContainers
+{
 	[Serializable]
 	public class UnifiedMapOptions
 	{

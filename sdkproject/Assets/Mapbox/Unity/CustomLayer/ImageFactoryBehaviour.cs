@@ -1,9 +1,8 @@
-using System;
-using Mapbox.Unity;
+using Mapbox.Unity.DataContainers;
 using Mapbox.Unity.Map;
 using UnityEngine;
 
-namespace CustomImageLayerSample
+namespace Mapbox.Unity.CustomLayer
 {
 	[RequireComponent(typeof(AbstractMap))]
 	public class ImageFactoryBehaviour : MonoBehaviour
@@ -41,7 +40,7 @@ namespace CustomImageLayerSample
 					}
 				};
 
-				ImageFactoryManager = new CustomImageFactoryManager(MapboxAccess.Instance, UrlFormat, imageSettings, DownloadFallbackImagery, TextureFieldName, TextureScaleOffsetFieldName);
+				ImageFactoryManager = new CustomImageFactoryManager(UrlFormat, imageSettings, DownloadFallbackImagery, TextureFieldName, TextureScaleOffsetFieldName);
 				ImageFactoryManager.FetchingError += (tile, rasterTile, args) => { Debug.Log(args.Exceptions[0]); };
 				Map.OnTileRegisteredToFactories += ImageFactoryManager.RegisterTile;
 				Map.OnTileDisposing += tile => { ImageFactoryManager.UnregisterTile(tile); };

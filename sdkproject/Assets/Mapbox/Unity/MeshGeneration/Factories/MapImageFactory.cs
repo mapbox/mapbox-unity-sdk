@@ -1,5 +1,7 @@
-using CustomImageLayerSample;
 using Mapbox.Platform;
+using Mapbox.Unity.CustomLayer;
+using Mapbox.Unity.DataContainers;
+using Mapbox.Unity.DataFetching;
 using UnityEngine.UI;
 
 namespace Mapbox.Unity.MeshGeneration.Factories
@@ -32,10 +34,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		ImageryLayerProperties _properties;
 		protected ImageDataFetcher DataFetcher;
 
-		public MapImageFactory(IFileSource fileSource, ImageryLayerProperties properties) : base(fileSource)
+		public MapImageFactory(ImageryLayerProperties properties)
 		{
 			_properties = properties;
-			ImageFactoryManager = new MapboxImageFactoryManager(_fileSource, _properties, true);
+			ImageFactoryManager = new MapboxImageFactoryManager(_properties, true);
 			ImageFactoryManager.FetchingError += OnFetchingError;
 		}
 

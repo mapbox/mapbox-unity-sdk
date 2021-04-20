@@ -1,5 +1,6 @@
 ﻿using Mapbox.Map;
 using Mapbox.Platform;
+using Mapbox.Unity.DataContainers;
 using Mapbox.Unity.MeshGeneration.Data;
 
 namespace Mapbox.Unity.Map
@@ -53,9 +54,9 @@ namespace Mapbox.Unity.Map
 
 		public Action<AbstractTileFactory, TileErrorEventArgs> FactoryError = (factory, args) => { };
 
-		public void Initialize(IFileSource fileSource)
+		public void Initialize()
 		{
-			_elevationFactory = new TerrainFactoryBase(fileSource, _layerProperty);
+			_elevationFactory = new TerrainFactoryBase(_layerProperty);
 			//terrain factory uses strategy objects and they are controlled by layer
 			//so we have to refresh that first
 			_elevationFactory.OnTileError += delegate(object sender, TileErrorEventArgs args) { FactoryError(_elevationFactory, args); };

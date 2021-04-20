@@ -1,10 +1,9 @@
-﻿namespace Mapbox.Unity.Map
-{
-	using System;
-	using System.Collections.Generic;
-	using Mapbox.Platform.TilesetTileJSON;
-	using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using Mapbox.Platform.TilesetTileJSON;
 
+namespace Mapbox.Unity.DataContainers
+{
 	[Serializable]
 	public class TileJsonData
 	{

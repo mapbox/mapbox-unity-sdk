@@ -1,7 +1,10 @@
-public enum OfflineTileType
+namespace Mapbox.Unity.OfflineMaps
 {
-	Elevation,
-	Imagery,
-	RetinaImagery,
-	Vector
+	public enum OfflineTileType
+	{
+		Elevation,
+		Imagery,
+		RetinaImagery,
+		Vector
+	}
 }

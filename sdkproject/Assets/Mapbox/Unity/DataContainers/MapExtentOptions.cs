@@ -1,8 +1,7 @@
-﻿namespace Mapbox.Unity.Map
-{
-	using System;
-	using UnityEngine;
+﻿using System;
 
+namespace Mapbox.Unity.DataContainers
+{
 	[Serializable]
 	public class MapExtentOptions : MapboxDataProperty
 	{

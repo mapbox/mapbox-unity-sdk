@@ -1,10 +1,9 @@
-﻿using Mapbox.Unity.SourceLayers;
+﻿using System;
+using Mapbox.Unity.MeshGeneration.Modifiers;
+using Mapbox.Unity.SourceLayers;
 
-namespace Mapbox.Unity.Map
+namespace Mapbox.Unity.DataContainers
 {
-	using Mapbox.Unity.MeshGeneration.Modifiers;
-	using System;
-
 	[Serializable]
 	public class ColliderOptions : ModifierProperties, ISubLayerColliderOptions
 	{

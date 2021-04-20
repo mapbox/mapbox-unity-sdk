@@ -7,6 +7,8 @@ using Mapbox.Map;
 using Mapbox.Unity.Map;
 using System;
 using Mapbox.Platform;
+using Mapbox.Unity.DataContainers;
+using Mapbox.Unity.DataFetching;
 
 namespace Mapbox.Unity.MeshGeneration.Factories
 {
@@ -36,7 +38,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		#region Properties
 
-		public VectorTileFactory(IFileSource fileSource, VectorLayerProperties properties) : base(fileSource)
+		public VectorTileFactory(VectorLayerProperties properties)
 		{
 			_properties = properties;
 			_layerProgress = new Dictionary<UnityTile, HashSet<LayerVisualizerBase>>();

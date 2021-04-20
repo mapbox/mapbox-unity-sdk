@@ -8,8 +8,9 @@ using Mapbox.Unity.MeshGeneration.Enums;
 using Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies;
 using System;
 using System.Collections.Generic;
-using CustomImageLayerSample;
 using Mapbox.Platform;
+using Mapbox.Unity.CustomLayer;
+using Mapbox.Unity.DataContainers;
 
 namespace Mapbox.Unity.MeshGeneration.Factories
 {
@@ -19,13 +20,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		public TerrainStrategy Strategy;
 		protected ElevationLayerProperties _properties = new ElevationLayerProperties();
 
-		public TerrainFactoryBase(IFileSource fileSource, ElevationLayerProperties layerProperty) : base(fileSource)
+		public TerrainFactoryBase(ElevationLayerProperties layerProperty)
 		{
 			_properties = layerProperty;
 			SetStrategy();
 			Strategy.Initialize(_properties);
 			TerrainFactoryManager = new MapboxTerrainFactoryManager(
-				_fileSource,
 				_properties,
 				Strategy,
 				false);

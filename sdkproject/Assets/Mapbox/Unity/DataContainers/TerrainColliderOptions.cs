@@ -1,8 +1,9 @@
-﻿namespace Mapbox.Unity.Map
+﻿using System;
+using Mapbox.Unity.MeshGeneration.Data;
+using UnityEngine;
+
+namespace Mapbox.Unity.DataContainers
 {
-	using System;
-	using Mapbox.Unity.MeshGeneration.Data;
-	using UnityEngine;
 	[Serializable]
 	public class TerrainColliderOptions : MapboxDataProperty
 	{

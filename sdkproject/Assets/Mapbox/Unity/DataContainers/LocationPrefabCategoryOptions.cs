@@ -1,8 +1,7 @@
-namespace Mapbox.Unity.Map
-{
-	using UnityEngine;
-	using System.Collections.Generic;
+using System.Collections.Generic;
 
+namespace Mapbox.Unity.DataContainers
+{
 	public static class LocationPrefabCategoryOptions
 	{
 
