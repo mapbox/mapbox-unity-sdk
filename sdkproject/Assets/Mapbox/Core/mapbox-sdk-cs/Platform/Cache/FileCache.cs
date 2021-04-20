@@ -218,9 +218,10 @@ namespace Mapbox.Platform.Cache
 					sourceStream.Close();
 					OnFileSaved(info.TileId, info.TilesetId, info.TextureCacheItem);
 
-#if UNITY_EDITOR
-					FileCacheDebugView.AddToLogs(string.Format("Saved {0, 20} - {1, -20}", info.TilesetId, info.TileId));
-#endif
+//this is not a good way to do it
+// #if UNITY_EDITOR
+// 					FileCacheDebugView.AddToLogs(string.Format("Saved {0, 20} - {1, -20}", info.TilesetId, info.TileId));
+// #endif
 				});
 		}
 
