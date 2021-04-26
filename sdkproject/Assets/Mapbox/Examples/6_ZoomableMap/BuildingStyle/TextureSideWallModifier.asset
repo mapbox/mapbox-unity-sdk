@@ -9,12 +9,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6c7ba03c743d46c4a99f4971c74f7cbd, type: 3}
-  m_Name: PolygonModifier
+  m_Script: {fileID: 11500000, guid: fa21b5f2e2cb4a347ae152f6b6ec1e68, type: 3}
+  m_Name: New Texture Side Wall Modifier
   m_EditorClassIdentifier: 
   Active: 1
   _options:
-    style: 0
     texturingType: 2
     atlasInfo: {fileID: 11400000, guid: c422f39ca8fe566479230c87805b3301, type: 2}
-  Height: 0
+    extrusionType: 1
+    extrusionGeometryType: 0
+    propertyName: height
+    propertyDescription: 
+    minimumHeight: 0
+    maximumHeight: 0
+    extrusionScaleFactor: 1
+  _centerSegments: 1
+  _separateSubmesh: 1

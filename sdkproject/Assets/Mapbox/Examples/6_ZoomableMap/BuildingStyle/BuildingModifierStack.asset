@@ -15,7 +15,7 @@ MonoBehaviour:
   MeshModifiers:
   - {fileID: 11400000, guid: f8634b13eb55e2e47aad054338c862f6, type: 2}
   - {fileID: 11400000, guid: ecbb855650a14734bbb91bc1bfefef1e, type: 2}
-  - {fileID: 11400000, guid: 659c825ee2498d9438956c2d31bef827, type: 2}
+  - {fileID: 11400000, guid: 16bbb07e060f45a418bf3bab3ec1b893, type: 2}
   GoModifiers:
   - {fileID: 11400000, guid: 81edff1933bee5d4487224dd8f26f54e, type: 2}
   combineMeshes: 1

@@ -24,14 +24,16 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private float miny;
 		private float maxx;
 		private float maxy;
+		private System.Random _random;
 
 		public PolyMeshCore(UVModifierOptions options, float height)
 		{
 			_options = options;
 			_pushUp = new Vector3(0, height, 0);
+			_random = new System.Random();
 		}
 
-		public void Run(VectorFeatureUnity feature, MeshData md, float zoom)
+		public void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile)
 		{
 			var _counter = feature.Points.Count;
 			var subset = new List<List<Vector3>>(_counter);
@@ -42,24 +44,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			List<int> triList = null;
 			List<Vector3> sub = null;
 
-			Polygonize(feature, md, _counter, subset, triList, currentIndex);
+			Polygonize(feature, md, tile.TileSize, _counter, subset, triList, currentIndex);
 		}
 
-		public void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
-		{
-			var _counter = feature.Points.Count;
-			var subset = new List<List<Vector3>>(_counter);
-			Data flatData = null;
-			List<int> result = null;
-			var currentIndex = 0;
-			int vertCount = 0, polygonVertexCount = 0;
-			List<int> triList = null;
-			List<Vector3> sub = null;
-
-			Polygonize(feature, md, _counter, subset, triList, currentIndex);
-		}
-
-		private void Polygonize(VectorFeatureUnity feature, MeshData md, int _counter, List<List<Vector3>> subset, List<int> triList, int currentIndex)
+		private void Polygonize(VectorFeatureUnity feature, MeshData md, float tileSize, int _counter, List<List<Vector3>> subset, List<int> triList, int currentIndex)
 		{
 			List<Vector3> sub;
 			int vertCount;
@@ -112,17 +100,17 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					md.Tangents.Add(Constants.Math.Vector3Forward);
 					md.Normals.Add(Constants.Math.Vector3Up);
 
-					// if (_options.style == StyleTypes.Satellite)
-					// {
-					// 	var fromBottomLeft = new Vector2(
-					// 		(float) (((sub[j].x + md.PositionInTile.x) / tileSize.TileScale + _size.x / 2) / _size.x),
-					// 		(float) (((sub[j].z + md.PositionInTile.z) / tileSize.TileScale + _size.x / 2) / _size.x));
-					// 	md.UV[0].Add(fromBottomLeft);
-					// }
-					// else if (_options.texturingType == UvMapType.Tiled)
-					// {
+					if (_options.style == StyleTypes.Satellite)
+					{
+						var fromBottomLeft = new Vector2(
+							(float) (((sub[j].x + md.PositionInTile.x) / tileSize + tileSize / 2) / tileSize),
+							(float) (((sub[j].z + md.PositionInTile.z) / tileSize + tileSize / 2) / tileSize));
+						md.UV[0].Add(fromBottomLeft);
+					}
+					else if (_options.texturingType == UvMapType.Tiled)
+					{
 						md.UV[0].Add(new Vector2(sub[j].x, sub[j].z));
-					//}
+					}
 				}
 			}
 
@@ -132,7 +120,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			if (_options.texturingType == UvMapType.Atlas || _options.texturingType == UvMapType.AtlasWithColorPalette)
 			{
-				_currentFacade = _options.atlasInfo.Roofs[UnityEngine.Random.Range(0, _options.atlasInfo.Roofs.Count)];
+				_currentFacade = _options.atlasInfo.Roofs[_random.Next(0, _options.atlasInfo.Roofs.Count)];
 
 				minx = float.MaxValue;
 				miny = float.MaxValue;
