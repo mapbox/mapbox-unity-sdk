@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Mapbox.Unity.DataContainers
 {
 	[Serializable]
-	public class ElevationModificationOptions
+	public class ElevationModificationOptions : MapboxDataProperty
 	{
 		[Tooltip("Mesh resolution of terrain, results in n x n grid")]
 		[Range(2,255)]

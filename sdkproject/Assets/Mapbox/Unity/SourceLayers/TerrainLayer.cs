@@ -145,6 +145,12 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
+		public virtual void SetSampleCount(int sampleCount)
+		{
+			_layerProperty.modificationOptions.sampleCount = sampleCount;
+			_layerProperty.modificationOptions.HasChanged = true;
+		}
+		
 		/// <summary>
 		/// Sets the elevation multiplier for terrain. It'll regenerate terrain mesh, multiplying each point elevation by provided value.
 		/// </summary>
@@ -170,6 +176,7 @@ namespace Mapbox.Unity.Map
 			_layerProperty.sideWallOptions.wallMaterial = wallMaterial;
 			_layerProperty.HasChanged = true;
 		}
+
 		public void DisableSideWalls()
 		{
 			_layerProperty.sideWallOptions.isActive = false;
