@@ -500,26 +500,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		}
 	}
 
-	public class LineMeshProperties
-	{
-		[Tooltip("Width of the line feature.")]
-		public AnimationCurve WidthCurve;
-
-		[Tooltip("Miter Limit")]
-		public float MiterLimit = 0.2f;
-
-		[Tooltip("Round Limit")]
-		public float RoundLimit = 1.05f;
-
-		[Tooltip("Join type of the line feature")]
-		public JoinType JoinType = JoinType.Round;
-
-		[Tooltip("Cap type of the line feature")]
-		public JoinType CapType = JoinType.Round;
-
-		public Vector3 PushUp = new Vector3(0, 1, 0);
-	}
-
 	/// <summary>
 	/// Line Mesh Modifier creates line polygons from a list of vertices. It offsets the original vertices to both sides using Width parameter and triangulates them manually.
 	/// It also creates tiled UV mapping using the line length.
@@ -527,22 +507,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Line Mesh For Polygons Modifier")]
 	public class LineMeshForPolygonsModifier : MeshModifier
 	{
-		#region Line Parameters
-
-		public LineGeometryOptions _options;
-
-		#endregion
-
-		#region Constants
-
-		#endregion
-
-
-		public LineMeshProperties _lineMeshProperties;
+		public LineGeometryOptions Options;
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
-			var core = new LineMeshCore(_options);
+			var core = new LineMeshCore(Options);
 			core.Initialize();
 			core.Run(feature, md, tile);
 		}
