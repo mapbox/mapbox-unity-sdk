@@ -172,6 +172,51 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 			var tileId = rasterTile.Id;
 
+			if (SystemInfo.supportsAsyncGPUReadback)
+			{
+				AsyncGpuReadbackForElevation(rasterTile, heightMultiplier, useRelative, callback, tileId);
+			}
+			else
+			{
+				SyncReadForElevation(rasterTile, heightMultiplier, useRelative, callback);
+			}
+		}
+
+		private void SyncReadForElevation(RasterTile rasterTile, float heightMultiplier, bool useRelative, Action<UnityTile> callback)
+		{
+			byte[] rgbData = rasterTile.Texture2D.GetRawTextureData();
+			//var rgbData = _heightTexture.GetRawTextureData<Color32>();
+			var relativeScale = useRelative ? _relativeScale : 1f;
+			var width = rasterTile.Texture2D.width;
+			for (float yy = 0; yy < _heightDataResolution; yy++)
+			{
+				for (float xx = 0; xx < _heightDataResolution; xx++)
+				{
+					var index = (((int) ((yy / _heightDataResolution) * width) * width) + (int) ((xx / _heightDataResolution) * width));
+
+					float r = rgbData[index * 4 + 1];
+					float g = rgbData[index * 4 + 2];
+					float b = rgbData[index * 4 + 3];
+					//var color = rgbData[index];
+					// float r = color.g;
+					// float g = color.b;
+					// float b = color.a;
+					//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
+					HeightData[(int) (yy * _heightDataResolution + xx)] = relativeScale * heightMultiplier * (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
+					//678 ==> 012345678
+					//345
+					//012
+				}
+			}
+
+			if (callback != null)
+			{
+				callback(this);
+			}
+		}
+
+		private void AsyncGpuReadbackForElevation(RasterTile rasterTile, float heightMultiplier, bool useRelative, Action<UnityTile> callback, CanonicalTileId tileId)
+		{
 			AsyncGPUReadback.Request(rasterTile.Texture2D, 0, (t) =>
 			{
 				if (CanonicalTileId != tileId || IsRecycled)
@@ -212,8 +257,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 						//tt.SetPixel((int) xx, (int) yy, color); //new Color(rgbData[index * 4 + 1] / 256f, rgbData[index * 4 + 2] / 256f, rgbData[index * 4 + 3] / 256f, 1));
 					}
 				}
-
-
 
 				//tt.Apply();
 				if (callback != null)
