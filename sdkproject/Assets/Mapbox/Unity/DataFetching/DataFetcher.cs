@@ -46,7 +46,7 @@ namespace Mapbox.Unity.DataFetching
 			TilesetId = tilesetId;
 			RasterTile = tile;
 			ETag = eTag;
-			callback = callback;
+			Callback = callback;
 		}
 
 	}
