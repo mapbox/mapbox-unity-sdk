@@ -158,7 +158,7 @@ namespace Mapbox.Unity
 			DataManager = new EditorDataFetchingManager(_fileSource);
 #else
 			_memoryCache = new MemoryCache(_configuration.MemoryCacheSize);
-			DataManager = new MapboxDataFetchingManager(_fileSource);
+			DataManager = new DataFetchingManager(_fileSource);
 #endif
 
 #if !UNITY_WEBGL
@@ -170,7 +170,7 @@ namespace Mapbox.Unity
 	#if UNITY_EDITOR
 			var fileCache = new EditorFileCache();
 	#else
-			var fileCache = new FileCache(_fileSource);
+			var fileCache = new FileCache();
 	#endif
 
 			CacheManager = new MapboxCacheManager(_memoryCache, fileCache, sqliteCache);
