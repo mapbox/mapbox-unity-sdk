@@ -71,13 +71,9 @@ namespace Mapbox.Unity.Map
 			{
 				if(_mapVisualizer == null)
 				{
-					_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
+					CreateMapVisualizer();
 				}
 				return _mapVisualizer;
-			}
-			set
-			{
-				_mapVisualizer = value;
 			}
 		}
 
@@ -466,11 +462,23 @@ namespace Mapbox.Unity.Map
 
 			if (_mapVisualizer == null)
 			{
-				_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
-
-				_mapVisualizer.OnTileFinished += (s) => { OnTileFinished(s); };
-				_mapVisualizer.OnTileDisposing += tile => { OnTileDisposing(tile); };
+				CreateMapVisualizer();
 			}
+			else
+			{
+				_mapVisualizer.OnTileFinished  -= OnTileFinished;
+				_mapVisualizer.OnTileDisposing -= OnTileDisposing;
+				_mapVisualizer.OnTileFinished  += (t) => { OnTileFinished(t); };
+				_mapVisualizer.OnTileDisposing += (t) => { OnTileDisposing(t); };
+			}
+		}
+
+		private void CreateMapVisualizer()
+		{
+			_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
+
+			_mapVisualizer.OnTileFinished  += t => { OnTileFinished(t); };
+			_mapVisualizer.OnTileDisposing += t => { OnTileDisposing(t); };
 		}
 
 		public void DestroyChildObjects()

@@ -14,7 +14,7 @@ namespace Mapbox.Map
     /// </summary>
     public class RetinaRasterTile : RasterTile
     {
-        public RetinaRasterTile(CanonicalTileId tileId, string tilesetId) : base(tileId, tilesetId)
+        public RetinaRasterTile(CanonicalTileId tileId, string tilesetId, bool useReadonlyTexture) : base(tileId, tilesetId, useReadonlyTexture)
         {
         }
 

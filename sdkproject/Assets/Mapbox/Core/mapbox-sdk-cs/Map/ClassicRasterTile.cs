@@ -19,7 +19,7 @@ namespace Mapbox.Map
 			
 		}
 
-		public ClassicRasterTile(CanonicalTileId tileId, string tilesetId) : base(tileId, tilesetId)
+		public ClassicRasterTile(CanonicalTileId tileId, string tilesetId, bool useReadonlyTexture) : base(tileId, tilesetId, useReadonlyTexture)
 		{
 
 		}

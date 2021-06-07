@@ -8,7 +8,7 @@ namespace Mapbox.Unity.CustomLayer
 	{
 		private string _urlFormat = "https://maps.aerisapi.com/(API_KEY_HERE)/flat,ftemperatures-max-text,admin/{0}/{1}/{2}/current.png";
 
-		public CustomImageTile(CanonicalTileId tileId, string tilesetId, string format) : base(tileId, tilesetId)
+		public CustomImageTile(CanonicalTileId tileId, string tilesetId, string format) : base(tileId, tilesetId, true)
 		{
 			_urlFormat = format;
 		}
@@ -37,7 +37,7 @@ namespace Mapbox.Unity.CustomLayer
 	{
 		public string FilePath;
 
-		public FileImageTile(CanonicalTileId tileId, string tilesetId, string filePath) : base(tileId, tilesetId)
+		public FileImageTile(CanonicalTileId tileId, string tilesetId, string filePath, bool isTextureNonreadable) : base(tileId, tilesetId, isTextureNonreadable)
 		{
 			FilePath = filePath;
 		}
@@ -51,7 +51,7 @@ namespace Mapbox.Unity.CustomLayer
 			TilesetId = tilesetId;
 			_callback = p;
 
-			_unityRequest = fileSource.CustomImageRequest(FilePath, HandleTileResponse, tileId: Id, tilesetId: tilesetId);
+			_unityRequest = fileSource.CustomImageRequest(FilePath, HandleTileResponse, 10, Id, tilesetId, ETag, IsTextureNonreadable);
 		}
 	}
 }

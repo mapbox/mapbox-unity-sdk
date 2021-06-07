@@ -39,7 +39,7 @@ namespace Mapbox.Unity.DataFetching
 			//FileCacheCheck
 			if (MapboxAccess.Instance.CacheManager.TextureFileExists(tilesetId, tileId)) //not in memory, check file cache
 			{
-				MapboxAccess.Instance.CacheManager.GetTextureItemFromFile(tilesetId, tileId, (textureCacheItem) =>
+				MapboxAccess.Instance.CacheManager.GetTextureItemFromFile(tilesetId, tileId, tile.IsTextureNonreadable, (textureCacheItem) =>
 				{
 					if (unityTile != null && !unityTile.ContainsDataTile(tile))
 					{

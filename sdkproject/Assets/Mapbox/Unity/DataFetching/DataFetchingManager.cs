@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Mapbox.Map;
 using Mapbox.Platform;
 using Mapbox.Unity.Utilities;
+using UnityEngine;
 
 namespace Mapbox.Unity.DataFetching
 {
@@ -60,16 +61,24 @@ namespace Mapbox.Unity.DataFetching
 					{
 						var fi = _tileFetchInfos[tileKey];
 						_tileFetchInfos.Remove(tileKey);
-						_activeRequests.Add(tileKey, fi.RasterTile);
-						fi.RasterTile.Initialize(
-							_fileSource,
-							fi.TileId,
-							fi.TilesetId,
-							() =>
-							{
-								_activeRequests.Remove(tileKey);
-								fi.Callback();
-							});
+						if (_activeRequests.ContainsKey(tileKey))
+						{
+							//skip this info, a clone of it is already running
+						}
+						else
+						{
+							_activeRequests.Add(tileKey, fi.RasterTile);
+							fi.RasterTile.Initialize(
+								_fileSource,
+								fi.TileId,
+								fi.TilesetId,
+								() =>
+								{
+									_activeRequests.Remove(tileKey);
+									fi.Callback();
+								});
+						}
+
 						yield return null;
 					}
 				}

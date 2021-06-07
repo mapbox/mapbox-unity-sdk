@@ -12,7 +12,7 @@ namespace Mapbox.Unity.DataFetching
 			var textureItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(tilesetId, tileId);
 			if (textureItem != null)
 			{
-				var rasterTile = new RasterTile(tileId, tilesetId);
+				var rasterTile = new RasterTile(tileId, tilesetId, tile.IsTextureNonreadable);
 				rasterTile.SetTextureFromCache(textureItem.Texture2D);
 #if UNITY_EDITOR
 				rasterTile.FromCache = CacheType.MemoryCache;
@@ -29,7 +29,7 @@ namespace Mapbox.Unity.DataFetching
 			//FileCacheCheck
 			if (MapboxAccess.Instance.CacheManager.TextureFileExists(tilesetId, tileId)) //not in memory, check file cache
 			{
-				MapboxAccess.Instance.CacheManager.GetTextureItemFromFile(tilesetId, tileId, (textureCacheItem) =>
+				MapboxAccess.Instance.CacheManager.GetTextureItemFromFile(tilesetId, tileId, tile.IsTextureNonreadable, (textureCacheItem) =>
 				{
 					//even though we just checked file exists, system couldn't find&load it
 					//this shouldn't happen frequently, only in some corner cases
@@ -38,7 +38,7 @@ namespace Mapbox.Unity.DataFetching
 					if (textureCacheItem != null)
 					{
 						textureCacheItem.Tile = tile;
-						var rasterTile = new RasterTile(tileId, tilesetId);
+						var rasterTile = new RasterTile(tileId, tilesetId, tile.IsTextureNonreadable);
 						rasterTile.SetTextureFromCache(textureCacheItem.Texture2D);
 #if UNITY_EDITOR
 						rasterTile.FromCache = CacheType.FileCache;

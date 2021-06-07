@@ -42,8 +42,20 @@ namespace Mapbox.Unity.CustomLayer
 
 				ImageFactoryManager = new CustomImageFactoryManager(UrlFormat, imageSettings, DownloadFallbackImagery, TextureFieldName, TextureScaleOffsetFieldName);
 				ImageFactoryManager.FetchingError += (tile, rasterTile, args) => { Debug.Log(args.Exceptions[0]); };
-				Map.OnTileRegisteredToFactories += ImageFactoryManager.RegisterTile;
-				Map.OnTileDisposing += tile => { ImageFactoryManager.UnregisterTile(tile); };
+				Map.OnTileRegisteredToFactories += (t) =>
+				{
+					if (enabled)
+					{
+						ImageFactoryManager.RegisterTile(t);
+					}
+				};
+				Map.OnTileDisposing += t =>
+				{
+					if (enabled)
+					{
+						ImageFactoryManager.UnregisterTile(t);
+					}
+				};
 			}
 		}
 

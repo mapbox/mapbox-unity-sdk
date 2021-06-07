@@ -124,7 +124,7 @@ namespace Mapbox.Platform.Cache
             return (TextureCacheItem) _memoryCache.Get(tileId, tilesetId);
         }
 
-        public void GetTextureItemFromFile(string tilesetId, CanonicalTileId tileId, Action<TextureCacheItem> callback)
+        public void GetTextureItemFromFile(string tilesetId, CanonicalTileId tileId, bool isTextureNonreadable, Action<TextureCacheItem> callback)
         {
             if (_textureFileCache == null)
             {
@@ -132,7 +132,7 @@ namespace Mapbox.Platform.Cache
                 return;
             }
 
-            _textureFileCache.GetAsync(tileId, tilesetId, (textureCacheItem) =>
+            _textureFileCache.GetAsync(tileId, tilesetId, isTextureNonreadable, (textureCacheItem) =>
             {
 
                 if (textureCacheItem == null || textureCacheItem.HasError)

@@ -23,7 +23,7 @@ namespace Mapbox.Platform.Cache
 	{
 		event Action<CanonicalTileId, string, TextureCacheItem> FileSaved;
 		void Add(CanonicalTileId tileId, string tilesetId, TextureCacheItem textureCacheItem, bool forceInsert);
-		void GetAsync(CanonicalTileId tileId, string tilesetId, Action<TextureCacheItem> callback);
+		void GetAsync(CanonicalTileId tileId, string tilesetId, bool isTextureNonreadable, Action<TextureCacheItem> callback);
 		bool Exists(CanonicalTileId tileId, string mapId);
 		void Clear(string tilesetId);
 		void ClearAll();
@@ -92,7 +92,7 @@ namespace Mapbox.Platform.Cache
 			_infosToSave.Enqueue(infoWrapper);
 		}
 
-		public virtual void GetAsync(CanonicalTileId tileId, string tilesetId, Action<TextureCacheItem> callback)
+		public virtual void GetAsync(CanonicalTileId tileId, string tilesetId, bool isTextureNonreadable, Action<TextureCacheItem> callback)
 		{
 			string filePath = string.Format("{0}/{1}/{2}", PersistantCacheRootFolderPath, MapIdToFolderName(tilesetId), tileId.GenerateKey(tilesetId));
 			//Runnable.Run(LoadImageCoroutine(tileId, mapId, filePath, callback));
@@ -100,7 +100,7 @@ namespace Mapbox.Platform.Cache
 			var fullFilePath = string.Format("{0}.{1}", filePath, FileExtension);
 			if (File.Exists(fullFilePath))
 			{
-				var tile = new FileImageTile(tileId, tilesetId, fullFilePath);
+				var tile = new FileImageTile(tileId, tilesetId, fullFilePath, isTextureNonreadable);
 				_fileDataFetcher.FetchData(tile, tilesetId, tileId, false, callback);
 			}
 			else
@@ -300,9 +300,9 @@ namespace Mapbox.Platform.Cache
 			TileAdded(tileId, tilesetId, textureCacheItem, forceInsert);
 		}
 
-		public override void GetAsync(CanonicalTileId tileId, string tilesetId, Action<TextureCacheItem> callback)
+		public override void GetAsync(CanonicalTileId tileId, string tilesetId, bool isTextureNonreadable, Action<TextureCacheItem> callback)
 		{
-			base.GetAsync(tileId, tilesetId, callback);
+			base.GetAsync(tileId, tilesetId, isTextureNonreadable, callback);
 			TileRequested(tileId, tilesetId);
 		}
 
