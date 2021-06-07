@@ -37,6 +37,7 @@ namespace Mapbox.Unity.CustomLayer
 		protected override void ApplyParentTexture(UnityTile tile)
 		{
 			var parent = tile.UnwrappedTileId.Parent;
+			tile.SetParentTexture(parent, null, CustomTextureFieldName, CustomTextureScaleOffsetFieldName);
 			for (int i = tile.CanonicalTileId.Z - 1; i > 0; i--)
 			{
 				var cacheItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(_sourceSettings.Id, parent.Canonical);
