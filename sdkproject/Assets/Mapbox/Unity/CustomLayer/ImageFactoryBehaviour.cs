@@ -1,3 +1,4 @@
+using System;
 using Mapbox.Unity.DataContainers;
 using Mapbox.Unity.Map;
 using UnityEngine;
@@ -69,6 +70,37 @@ namespace Mapbox.Unity.CustomLayer
 			if (Map == null)
 			{
 				Map = GetComponent<AbstractMap>();
+			}
+		}
+
+		private void OnEnable()
+		{
+			if (Map != null)
+			{
+				foreach (var tilePair in Map.MapVisualizer.ActiveTiles)
+				{
+					ImageFactoryManager.RegisterTile(tilePair.Value);
+				}
+			}
+		}
+
+		private void OnDisable()
+		{
+			if (Map != null)
+			{
+				foreach (var tilePair in Map.MapVisualizer.ActiveTiles)
+				{
+					var material = tilePair.Value.MeshRenderer.sharedMaterial;
+					material.SetTexture(TextureFieldName, null);
+					material.SetVector(TextureScaleOffsetFieldName, new Vector4(1, 1, 0, 0));
+				}
+				foreach (var tile in Map.MapVisualizer.GetInactiveTiles)
+				{
+					var material = tile.MeshRenderer.sharedMaterial;
+					material.SetTexture(TextureFieldName, null);
+					material.SetVector(TextureScaleOffsetFieldName, new Vector4(1, 1, 0, 0));
+				}
+
 			}
 		}
 	}
