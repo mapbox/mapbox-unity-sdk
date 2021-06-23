@@ -28,6 +28,13 @@ namespace Mapbox.Geocoding {
 		/// <value>The type.</value>
 		[JsonProperty("type")]
 		public string Type { get; set; }
+		
+		/// <summary>
+		/// Gets or sets the types of the place.
+		/// </summary>
+		/// <value>The types of the place.</value>
+		[JsonProperty("place_type")]
+		public List<string> PlaceType{ get; set; }
 
 		/// <summary>
 		/// Gets or sets the text.
