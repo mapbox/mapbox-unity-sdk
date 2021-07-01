@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 0
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -423,17 +423,17 @@ MonoBehaviour:
       latitudeLongitude: 37.7648, -122.463
       zoom: 12
     extentOptions:
-      extentType: 0
+      extentType: 1
       defaultExtents:
         cameraBoundsOptions:
           camera: {fileID: 0}
           visibleBuffer: 0
           disposeBuffer: 0
         rangeAroundCenterOptions:
-          west: 1
-          north: 1
-          east: 1
-          south: 1
+          west: 0
+          north: 0
+          east: 0
+          south: 0
         rangeAroundTransformOptions:
           targetTransform: {fileID: 0}
           visibleBuffer: 0
@@ -482,6 +482,50 @@ MonoBehaviour:
   _referenceCamera: {fileID: 1787361574}
   _mapManager: {fileID: 555018383}
   _useDegreeMethod: 0
+--- !u!1 &951946382
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 951946384}
+  - component: {fileID: 951946383}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &951946383
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 951946382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1f5295ce2264b34381146973cb77149, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Map: {fileID: 555018383}
+--- !u!4 &951946384
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 951946382}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 23.68418, y: -125.76819, z: 0.36561143}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!21 &997688921
 Material:
   serializedVersion: 6
@@ -599,7 +643,7 @@ MonoBehaviour:
         isActive: 0
         wallHeight: 10
         wallMaterial: {fileID: 0}
-      TileSize: 100
+      TileMeshSize: 100
   ImageryLayer:
     _layerProperty:
       sourceType: 4

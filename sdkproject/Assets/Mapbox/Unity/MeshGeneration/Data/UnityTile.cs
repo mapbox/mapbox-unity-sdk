@@ -16,6 +16,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 	public class UnityTile : MonoBehaviour
 	{
+		public Action<UnityTile> TileFinished = (t) => {};
+
 		public TileTerrainType ElevationType;
 
 
@@ -32,7 +34,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		private int _heightDataResolution = 100;
 		//keeping track of tile objects to be able to cancel them safely if tile is destroyed before data fetching finishes
 		public HashSet<Tile> Tiles = new HashSet<Tile>();
-
+		private HashSet<Tile> _finishConditionTiles = new HashSet<Tile>();
 		public bool IsRecycled = false;
 
 		#region CachedUnityComponents
@@ -147,6 +149,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			_terrainTile = null;
 			_vectorTile = null;
 
+			_finishConditionTiles.Clear();
 			foreach (var tile in Tiles)
 			{
 				tile.Clear();
@@ -184,10 +187,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		private void SyncReadForElevation(RasterTile rasterTile, float heightMultiplier, bool useRelative, Action<UnityTile> callback)
 		{
-			byte[] rgbData = rasterTile.Texture2D.GetRawTextureData();
+			_rasterTile = rasterTile;
+			byte[] rgbData = _rasterTile.Texture2D.GetRawTextureData();
 			//var rgbData = _heightTexture.GetRawTextureData<Color32>();
 			var relativeScale = useRelative ? _relativeScale : 1f;
-			var width = rasterTile.Texture2D.width;
+			var width = _rasterTile.Texture2D.width;
 			for (float yy = 0; yy < _heightDataResolution; yy++)
 			{
 				for (float xx = 0; xx < _heightDataResolution; xx++)
@@ -213,11 +217,14 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			{
 				callback(this);
 			}
+
+			CheckFinishedCondition(_rasterTile);
 		}
 
 		private void AsyncGpuReadbackForElevation(RasterTile rasterTile, float heightMultiplier, bool useRelative, Action<UnityTile> callback, CanonicalTileId tileId)
 		{
-			AsyncGPUReadback.Request(rasterTile.Texture2D, 0, (t) =>
+			_rasterTile = rasterTile;
+			AsyncGPUReadback.Request(_rasterTile.Texture2D, 0, (t) =>
 			{
 				if (CanonicalTileId != tileId || IsRecycled)
 				{
@@ -263,47 +270,42 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				{
 					callback(this);
 				}
+
+				CheckFinishedCondition(_rasterTile);
 			});
 		}
 
 		public void SetRasterData(RasterTile rasterTile, bool useMipMap = false, bool useCompression = false)
 		{
-			// if (_rasterTile != null)
-			// {
-			// 	_rasterTile.ReleaseTile();
-			// 	_rasterTile.Clear();
-			// 	_rasterTile.Cancel();
-			// 	Tiles.Remove(_rasterTile);
-			// }
-			//
-			// _rasterTile = rasterTile;
-			// Don't leak the texture, just reuse it.
-			//reset image on null data
-			if (rasterTile.Texture2D == null && rasterTile.Data == null)
+			_rasterTile = rasterTile;
+
+			if (_rasterTile.Texture2D == null && _rasterTile.Data == null)
 			{
 				MeshRenderer.material.mainTexture = null;
 				return;
 			}
 
-			if (rasterTile.Texture2D != null && useCompression && rasterTile.Texture2D.isReadable)
+			if (_rasterTile.Texture2D != null && useCompression && _rasterTile.Texture2D.isReadable)
 			{
-				rasterTile.Texture2D.Compress(false);
+				_rasterTile.Texture2D.Compress(false);
 			}
-			else if (rasterTile.Texture2D == null && rasterTile.Data != null)
+			else if (_rasterTile.Texture2D == null && _rasterTile.Data != null)
 			{
-				rasterTile.SetTextureFromCache(new Texture2D(0, 0, TextureFormat.RGB24, useMipMap));
-				rasterTile.Texture2D.wrapMode = TextureWrapMode.Clamp;
-				rasterTile.Texture2D.LoadImage(rasterTile.Data);
+				_rasterTile.SetTextureFromCache(new Texture2D(0, 0, TextureFormat.RGB24, useMipMap));
+				_rasterTile.Texture2D.wrapMode = TextureWrapMode.Clamp;
+				_rasterTile.Texture2D.LoadImage(_rasterTile.Data);
 				if (useCompression)
 				{
 					// High quality = true seems to decrease image quality?
-					rasterTile.Texture2D.Compress(false);
+					_rasterTile.Texture2D.Compress(false);
 				}
 			}
 
 			MeshRenderer.sharedMaterial.mainTexture = rasterTile.Texture2D;
 			MeshRenderer.sharedMaterial.mainTextureScale = Unity.Constants.Math.Vector3One;
 			MeshRenderer.sharedMaterial.mainTextureOffset = Unity.Constants.Math.Vector3Zero;
+
+			CheckFinishedCondition(_rasterTile);
 		}
 
 		public void SetVectorData(string tileset, Mapbox.VectorTile.VectorTile vectorTile)
@@ -457,7 +459,35 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			{
 				MeshRenderer.sharedMaterial.SetVector(textureScaleOffsetName, new Vector4(scale, scale, offsetX, offsetY));
 			}
+		}
 
+		private void CheckFinishedCondition(Tile tile)
+		{
+			if (_finishConditionTiles.Contains(tile))
+			{
+				_finishConditionTiles.Remove(tile);
+				if (_finishConditionTiles.Count == 0)
+				{
+					TileFinished(this);
+				}
+			}
+		}
+
+		public void SetFinishCondition()
+		{
+			_finishConditionTiles.Clear();
+			foreach (var tile in Tiles)
+			{
+				if (tile.CurrentState == Tile.State.Loading || tile.CurrentState == Tile.State.New)
+				{
+					_finishConditionTiles.Add(tile);
+				}
+			}
+
+			if (_finishConditionTiles.Count == 0)
+			{
+				TileFinished(this);
+			}
 		}
 	}
 }

@@ -117,6 +117,7 @@ namespace Mapbox.Unity.Map
 				{
 					TerrainLayer.Factory.PregenerateTileMesh(tile);
 				}
+				tile.TileFinished += OnTileFinished;
 				return tile;
 			});
 
@@ -336,6 +337,8 @@ namespace Mapbox.Unity.Map
 				factory.Register(unityTile);
 			}
 
+			unityTile.SetFinishCondition();
+
 			return unityTile;
 		}
 
@@ -494,18 +497,6 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		/// <summary>
-		/// Event delegate, gets called when terrain factory finishes processing a tile.
-		/// </summary>
-		public event Action<UnityTile> OnTileHeightProcessingFinished = delegate {};
-		/// <summary>
-		/// Event delegate, gets called when image factory finishes processing a tile.
-		/// </summary>
-		public event Action<UnityTile> OnTileImageProcessingFinished = delegate {};
-		/// <summary>
-		/// Event delegate, gets called when vector factory finishes processing a tile.
-		/// </summary>
-		public event Action<UnityTile> OnTileVectorProcessingFinished = delegate {};
 		public event Action<UnityTile> OnTileDisposing = delegate {};
 
 		#endregion
