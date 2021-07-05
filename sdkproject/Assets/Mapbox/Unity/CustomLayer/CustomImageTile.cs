@@ -51,7 +51,7 @@ namespace Mapbox.Unity.CustomLayer
 			TilesetId = tilesetId;
 			_callback = p;
 
-			_unityRequest = fileSource.CustomImageRequest(FilePath, HandleTileResponse, 10, Id, tilesetId, ETag, IsTextureNonreadable);
+			_unityRequest = fileSource.CustomImageRequest(FilePath, HandleTileResponse, 10, ETag, IsTextureNonreadable);
 		}
 	}
 }

@@ -17,7 +17,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	public class TerrainFactoryBase : AbstractTileFactory
 	{
 		public MapboxTerrainFactoryManager TerrainFactoryManager;
-		public int QueuedRequestCount => TerrainFactoryManager.QueuedRequestCount;
 
 		public TerrainStrategy Strategy;
 		protected ElevationLayerProperties _properties = new ElevationLayerProperties();

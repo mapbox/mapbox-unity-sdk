@@ -1,4 +1,5 @@
-﻿using Mapbox.Unity.Map;
+﻿using Mapbox.Unity.DataContainers;
+using Mapbox.Unity.Map;
 using UnityEngine;
 
 namespace Mapbox.Unity.SourceLayers

@@ -18,7 +18,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 	public class MapImageFactory : AbstractTileFactory
 	{
 		public ImageFactoryManager ImageFactoryManager;
-		public int QueuedRequestCount => ImageFactoryManager.QueuedRequestCount;
 
 		[SerializeField] ImageryLayerProperties _properties;
 		protected ImageDataFetcher DataFetcher;

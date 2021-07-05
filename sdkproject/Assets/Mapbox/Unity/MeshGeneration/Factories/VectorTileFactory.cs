@@ -34,10 +34,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		public VectorLayerProperties Properties => _properties;
 		private Dictionary<UnityTile, HashSet<LayerVisualizerBase>> _layerProgress;
 		protected VectorDataFetcher DataFetcher;
-		public int QueuedRequestCount => DataFetcher.QueuedRequestCount;
-		#endregion
-
-		#region Properties
 
 		public VectorTileFactory(VectorLayerProperties properties)
 		{
@@ -46,8 +42,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
 
 			DataFetcher = new VectorDataFetcher();
-			DataFetcher.DataRecieved += OnVectorDataRecieved;
-			DataFetcher.FetchingError += OnDataError;
+			DataFetcher.DataReceived += OnFetcherDataRecieved;
+			DataFetcher.FetchingError += OnFetcherError;
 
 			CreatePOILayerVisualizers();
 
@@ -65,18 +61,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				_properties.sourceOptions.Id = value;
 			}
-		}
-
-		public VectorTileFactory(IFileSource fileSource, VectorLayerProperties properties) : base(fileSource)
-		{
-			_layerProgress = new Dictionary<UnityTile, HashSet<LayerVisualizerBase>>();
-			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
-
-			_fetcher = new VectorDataFetcher(fileSource);
-			_fetcher.DataReceived += OnFetcherDataRecieved;
-			_fetcher.FetchingError += OnFetcherError;
-
-			SetOptions(properties);
 		}
 
 		public override void SetOptions(LayerProperties options)
@@ -106,12 +90,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				tile.AddTile(dataTile);
 			}
 
-			_fetcher.FetchData(dataTile, TilesetId, tile.CanonicalTileId, tile);
+			DataFetcher.FetchData(dataTile, TilesetId, tile.CanonicalTileId, tile);
 		}
 
 		protected override void OnUnregistered(UnityTile tile)
 		{
-			_fetcher.CancelFetching(tile.UnwrappedTileId, TilesetId);
+			DataFetcher.CancelFetching(tile.UnwrappedTileId, TilesetId);
 			if (_layerProgress != null && _layerProgress.ContainsKey(tile))
 			{
 				_layerProgress.Remove(tile);

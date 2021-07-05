@@ -722,29 +722,6 @@ public class DataFetcherTabDebugView
 	}
 }
 
-public class DebuggerDataFetcherWrapper : DataFetcher
-{
-	public Queue<int> GetTileOrderQueue()
-	{
-		return _tileOrder;
-	}
-
-	public Dictionary<int, FetchInfo> GetFetchInfoQueue()
-	{
-		return _tileFetchInfos;
-	}
-
-	public int GetActiveRequestLimit()
-	{
-		return _activeRequestLimit;
-	}
-
-	public Dictionary<int, Tile> GetActiveRequests()
-	{
-		return _globalActiveRequests;
-	}
-}
-
 public class FileCacheDebugView
 {
 	private static Queue<string> SavedLogs;
@@ -801,8 +778,6 @@ public class AbstractMapDebugView
 
 	public void Draw()
 	{
-		GUILayout.Label(string.Format("Image Layer Queue : {0}", _map.MapVisualizer.ImageryLayer?.Factory?.QueuedRequestCount), EditorStyles.label);
-		GUILayout.Label(string.Format("Terrain Layer Queue : {0}", _map.MapVisualizer.TerrainLayer?.Factory?.QueuedRequestCount), EditorStyles.label);
-		GUILayout.Label(string.Format("Vector Layer Queue : {0}", _map.MapVisualizer.VectorLayer?.Factory?.QueuedRequestCount), EditorStyles.label);
+
 	}
 }

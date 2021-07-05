@@ -22,7 +22,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 		public virtual void Initialize(ElevationLayerProperties elOptions)
 		{
 			_elevationOptions = elOptions;
-			TileSize = _elevationOptions.TileSize;
+			TileSize = _elevationOptions.TileMeshSize;
 		}
 
 		public virtual void RegisterTile(UnityTile tile, bool createElevatedMesh)

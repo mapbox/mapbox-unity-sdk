@@ -89,7 +89,7 @@ namespace Mapbox.Map
 			//we are passing etag here as well
 			//if it's not null, filesource will make a `FetchTextureIfNoneMatch` request
 			//else it'll be a regular request
-			_unityRequest = fileSource.MapboxImageRequest(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse, 10, ETag, IsTexturesNonreadable);
+			_unityRequest = fileSource.MapboxImageRequest(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse, 10, ETag, IsTextureNonreadable);
 		}
 
 		public override void Cancel()

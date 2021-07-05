@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa21b5f2e2cb4a347ae152f6b6ec1e68, type: 3}
-  m_Name: New Texture Side Wall Modifier
+  m_Name: TextureSideWallModifier
   m_EditorClassIdentifier: 
   Active: 1
   _options:
