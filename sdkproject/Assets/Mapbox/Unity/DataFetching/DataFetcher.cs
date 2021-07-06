@@ -39,6 +39,7 @@ namespace Mapbox.Unity.DataFetching
 		public Action Callback;
 		public Tile RasterTile;
 		public string ETag;
+		public float QueueTime;
 
 		public FetchInfo(CanonicalTileId tileId, string tilesetId, Tile tile, string eTag = "", Action callback = null)
 		{
