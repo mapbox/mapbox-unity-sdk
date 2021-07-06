@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Mapbox.Map;
+using Mapbox.Unity;
 using Mapbox.Unity.MeshGeneration.Data;
 using UnityEngine;
 
@@ -70,18 +72,23 @@ namespace Mapbox.Platform.Cache
             }
         }
 
-        public void AddVectorDataItem(string tilesetId, CanonicalTileId tileId, CacheItem cachedItem, bool forceInsert)
+        public void AddVectorItemToMemory(string tilesetId, CanonicalTileId tileId, CacheItem vectorCacheItem, bool forceInsert)
         {
-            _memoryCache.Add(tileId, tilesetId, cachedItem, forceInsert);
-            _sqLiteCache?.Add(tilesetId, tileId, cachedItem, forceInsert);
+            _memoryCache.Add(tileId, tilesetId, vectorCacheItem, forceInsert);
         }
 
-        public VectorCacheItem GetVectorItemFromMemory(string tilesetId, CanonicalTileId tileId)
+        public void AddVectorDataItem(string tilesetId, CanonicalTileId tileId, CacheItem vectorCacheItem, bool forceInsert)
         {
-            return (VectorCacheItem) _memoryCache.Get(tileId, tilesetId);
+            _memoryCache.Add(tileId, tilesetId, vectorCacheItem, forceInsert);
+            _sqLiteCache?.Add(tilesetId, tileId, vectorCacheItem, forceInsert);
         }
 
-        public void GetVectorItemFromSqlite(string tilesetId, CanonicalTileId tileId, Action<VectorCacheItem> callback)
+        public CacheItem GetVectorItemFromMemory(string tilesetId, CanonicalTileId tileId)
+        {
+            return _memoryCache.Get(tileId, tilesetId);
+        }
+
+        public void GetVectorItemFromSqlite(Map.VectorTile tile, string tilesetId, CanonicalTileId tileId, Action<CacheItem> callback)
         {
             if (_sqLiteCache == null)
             {
@@ -89,17 +96,55 @@ namespace Mapbox.Platform.Cache
                 return;
             }
 
-            var cacheItem = (VectorCacheItem) _sqLiteCache.Get(tilesetId, tileId);
-            if (cacheItem != null)
-            {
-                _memoryCache.Add(tileId, tilesetId, cacheItem, true);
-            }
+            var localTilesetId = tilesetId;
+            var localTileId = tileId;
+            var localCopy = tile;
+            CacheItem cacheItem = null;
+
+            MapboxAccess.Instance.TaskManager.AddTask(
+                new TaskWrapper()
+                {
+                    Action = () =>
+                    {
+                        cacheItem = _sqLiteCache.Get(localTilesetId, localTileId);
+                        if (cacheItem.Data != null)
+                        {
+                            localCopy.SetByteData(cacheItem.Data);
+                        }
+                    },
+                    ContinueWith = (t) =>
+                    {
+                        if (t.Exception != null)
+                        {
+                            callback(null);
+                        }
+                        else
+                        {
+#if UNITY_EDITOR
+                            localCopy.FromCache = CacheType.SqliteCache;
+                            cacheItem.From = localCopy.FromCache;
+#endif
+                            localCopy.ETag = cacheItem.ETag;
+                            cacheItem.Tile = localCopy;
+                            callback(cacheItem);
+                        }
+                    },
+                    TileId = localTileId,
+#if UNITY_EDITOR
+                    Info = string.Format("{0} - {1} - {2}", "MapboxCacheManager.GetVectorItemFromSqlite", tilesetId, tileId)
+#endif
+                });
+
+            // if (cacheItem != null)
+            // {
+            //     _memoryCache.Add(tileId, tilesetId, cacheItem, true);
+            // }
 
             //kept callback behaviour from texture operations here as we'll most likely need to change this to async
             //either due to sqlite read or vector tile decompressing
             //so it's not async or using the callback thing properly at the moment
 
-            callback(cacheItem);
+
         }
 
         public void AddTextureItem(string tilesetId, CanonicalTileId tileId, TextureCacheItem textureCacheItem, bool forceInsert)
@@ -134,7 +179,9 @@ namespace Mapbox.Platform.Cache
 
             _textureFileCache.GetAsync(tileId, tilesetId, isTextureNonreadable, (textureCacheItem) =>
             {
-
+                //this might happen in some corner cases
+                //it means file was supposed to be there but couldn't be found in the last step when requested
+                //maybe deleted in an earlier frame by cache limit?
                 if (textureCacheItem == null || textureCacheItem.HasError)
                 {
                     callback(null);
@@ -144,37 +191,59 @@ namespace Mapbox.Platform.Cache
 #if UNITY_EDITOR
                 textureCacheItem.Texture2D.name = string.Format("{0}_{1}", tileId.ToString(), tilesetId);
 #endif
-                //this might happen in some corner cases
-                //it means file was supposed to be there but couldn't be found in the last step when requested
-                //maybe deleted in an earlier frame by cache limit?
-                if (textureCacheItem == null)
-                {
-                    callback(null);
-                    return;
-                }
+                
+                CacheItem cacheItem = null;
+
+                MapboxAccess.Instance.TaskManager.AddTask(
+                    new TaskWrapper()
+                    {
+                        Action = () => { cacheItem = _sqLiteCache.Get(tilesetId, tileId); },
+                        ContinueWith = (t) =>
+                        {
+                            if (cacheItem != null)
+                            {
+                                textureCacheItem.ETag = cacheItem.ETag;
+                                textureCacheItem.ExpirationDate = cacheItem.ExpirationDate;
+                            }
+                            else
+                            {
+                                //file exists but sqlite entry does not
+                                //entry was probably pruned but file deletion didn't go through (crashed/closed app)
+                                //serve the image without metadata for now
+                                //delete tile, next tile it'll be updated
+
+                                _textureFileCache.DeleteTileFile(textureCacheItem.FilePath);
+                            }
+
+                            callback(textureCacheItem);
+                        },
+#if UNITY_EDITOR
+                        Info = string.Format("{0} - {1} - {2}", "MapboxCacheManager.GetTextureItemFromFile", tilesetId, tileId)
+#endif
+                    });
 
                 //this isn't async. shouldn't it be?
-                var tile = _sqLiteCache.Get(tilesetId, tileId);
-                if (tile != null)
-                {
-                    textureCacheItem.ETag = tile.ETag;
-                    textureCacheItem.ExpirationDate = tile.ExpirationDate;
-                }
-                else
-                {
-                    //file exists but sqlite entry does not
-                    //entry was probably pruned but file deletion didn't go through (crashed/closed app)
-                    //serve the image without metadata for now
-                    //delete tile, next tile it'll be updated
-
-                    _textureFileCache.DeleteTileFile(textureCacheItem.FilePath);
-                }
+                // var tile = _sqLiteCache.Get(tilesetId, tileId);
+                // if (tile != null)
+                // {
+                //     textureCacheItem.ETag = tile.ETag;
+                //     textureCacheItem.ExpirationDate = tile.ExpirationDate;
+                // }
+                // else
+                // {
+                //     //file exists but sqlite entry does not
+                //     //entry was probably pruned but file deletion didn't go through (crashed/closed app)
+                //     //serve the image without metadata for now
+                //     //delete tile, next tile it'll be updated
+                //
+                //     _textureFileCache.DeleteTileFile(textureCacheItem.FilePath);
+                // }
 
                 //decided not to do this and leave control to caller
                 //they can add it to memory cache using AddTextureItemToMemory
                 //_memoryCache.Add(tilesetId, tileId, textureCacheItem, true);
 
-                callback(textureCacheItem);
+                //callback(textureCacheItem);
             });
         }
 
@@ -250,6 +319,7 @@ namespace Mapbox.Platform.Cache
         public void TileDisposed(UnityTile tile, string tilesetId)
         {
             _memoryCache?.TileDisposed(tile, tilesetId);
+            _textureFileCache?.TileDisposed(tile, tilesetId);
         }
     }
 }

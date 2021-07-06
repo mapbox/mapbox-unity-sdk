@@ -46,6 +46,10 @@ namespace Mapbox.Platform.Cache
 
 		public virtual void Add(CanonicalTileId tileId, string tilesetId, CacheItem cacheItem, bool forceInsert)
 		{
+			if (cacheItem.Tile == null)
+			{
+				Debug.Log("what");
+			}
 			var key = tileId.GenerateKey(tilesetId);
 
 			//this tile was recycled so the data was marked for pruning

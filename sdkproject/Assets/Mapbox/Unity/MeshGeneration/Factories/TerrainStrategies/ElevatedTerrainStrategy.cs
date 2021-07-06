@@ -35,7 +35,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 		private int _vertA, _vertB, _vertC;
 		private int _counter;
 
-		private float TileSize = 0;
+
 
 		public override int RequiredVertexCount
 		{
@@ -57,8 +57,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			_newNormalList = new List<Vector3>(sampleCountSquare);
 			_newUvList = new List<Vector2>(sampleCountSquare);
 			_newTriangleList = new List<int>();
-
-			TileSize = elOptions.TileMeshSize;
 		}
 
 		public override void RegisterTile(UnityTile tile, bool createElevatedMesh)

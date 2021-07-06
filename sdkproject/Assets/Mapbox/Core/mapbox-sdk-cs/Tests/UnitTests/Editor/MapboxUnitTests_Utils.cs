@@ -27,7 +27,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 
 			public void OnNext(VectorTile tile)
 			{
-				if (tile.CurrentState == Tile.State.Loaded)
+				if (tile.CurrentTileState == TileState.Loaded)
 				{
 					tiles.Add(tile);
 				}
@@ -48,7 +48,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 
 			public void OnNext(RasterTile tile)
 			{
-				if (tile.CurrentState == Tile.State.Loaded && !tile.HasError)
+				if (tile.CurrentTileState == TileState.Loaded && !tile.HasError)
 				{
 					tiles.Add(tile.Data);
 				}
@@ -69,7 +69,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 
 			public void OnNext(ClassicRasterTile tile)
 			{
-				if (tile.CurrentState == Tile.State.Loaded && !tile.HasError)
+				if (tile.CurrentTileState == TileState.Loaded && !tile.HasError)
 				{
 					tiles.Add(tile.Data);
 				}

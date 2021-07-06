@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa5aced94242c6a4db543360ddc446ab, type: 3}
+  m_Name: New Line Mesh For Polygons Modifier
+  m_EditorClassIdentifier: 
+  Active: 1
+  _options:
+    Width:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0.088737786
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 11.672482
+        value: 0.15894681
+        inSlope: 0.0068732672
+        outSlope: 0.0068732672
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.08394957
+        outWeight: 0.3016205
+      - serializedVersion: 3
+        time: 14.883377
+        value: 0.1993584
+        inSlope: 0.024134666
+        outSlope: 0.024134666
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.25023958
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 20
+        value: 0.5
+        inSlope: 0.013382322
+        outSlope: 0.013382322
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.049545
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    MiterLimit: 0.2
+    RoundLimit: 1.05
+    JoinType: 0
+    CapType: 3

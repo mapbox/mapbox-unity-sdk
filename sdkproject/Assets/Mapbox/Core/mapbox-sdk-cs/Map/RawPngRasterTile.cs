@@ -4,6 +4,9 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using Mapbox.Platform;
+
 namespace Mapbox.Map
 {
 	/// <summary>

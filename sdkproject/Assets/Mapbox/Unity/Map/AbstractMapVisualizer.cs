@@ -1,3 +1,4 @@
+using Mapbox.Unity.DataContainers;
 using Mapbox.Unity.Map.Interfaces;
 using UnityEngine.UI;
 
@@ -318,7 +319,7 @@ namespace Mapbox.Unity.Map
 		{
 			var unityTile = _tilePool.GetObject();
 
-			unityTile.Initialize(_map, tileId, _map.WorldRelativeScale, _map.AbsoluteZoom, _map.LoadingTexture);
+			unityTile.Initialize(_map, tileId, TerrainLayer.IsLayerActive && TerrainLayer.ElevationType != ElevationLayerType.FlatTerrain);
 			if (enableTile)
 			{
 				unityTile.gameObject.SetActive(true);
@@ -448,7 +449,6 @@ namespace Mapbox.Unity.Map
 			layerVisualizer.Clear();
 			layerVisualizer.UnbindSubLayerEvents();
 			layerVisualizer.SetProperties(layerVisualizer.SubLayerProperties);
-			layerVisualizer.InitializeStack();
 			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
 			{
 				factory.RedrawSubLayer(tileBundle.Value, layerVisualizer);
@@ -479,8 +479,6 @@ namespace Mapbox.Unity.Map
 				factory.UpdateTileProperty(tileBundle.Value, updateArgs);
 			}
 		}
-
-
 
 		#region Events
 		/// <summary>

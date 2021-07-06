@@ -12,12 +12,12 @@ namespace Mapbox.Unity.DataContainers
 		{
 			get
 			{
-				return typeof(LineMeshModifier);
+				return typeof(LineMeshForPolygonsModifier);
 			}
 		}
 
 		[Tooltip("Width of the line feature.")]
-		public float Width = 1.0f;
+		public AnimationCurve Width;
 
 		[Tooltip("Miter Limit")]
 		public float MiterLimit = 0.2f;
@@ -35,7 +35,7 @@ namespace Mapbox.Unity.DataContainers
 		/// Sets the width of the mesh generated for line features.
 		/// </summary>
 		/// <param name="width">Width of the mesh generated for line features.</param>
-		public void SetLineWidth(float width)
+		public void SetLineWidth(AnimationCurve width)
 		{
 			if (Width != width)
 			{

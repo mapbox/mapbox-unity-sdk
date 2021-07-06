@@ -51,6 +51,9 @@ namespace Mapbox.Editor
 			}
 		}
 
+		private GUIStyle headerFoldout;
+		private GUIStyle header;
+
 		bool ShowPosition
 		{
 			get
@@ -84,6 +87,14 @@ namespace Mapbox.Editor
 		IList<int> selectedLayers = new List<int>();
 		public void DrawUI(SerializedProperty property)
 		{
+			headerFoldout = new GUIStyle("Foldout");
+			header = new GUIStyle("ShurikenModuleTitle")
+			{
+				font = (new GUIStyle("Label")).font,
+				border = new RectOffset(15, 7, 4, 4),
+				fixedHeight = 22,
+				contentOffset = new Vector2(20f, -2f)
+			};
 
 			objectId = property.serializedObject.targetObject.GetInstanceID().ToString();
 			var serializedMapObject = property.serializedObject;
@@ -329,7 +340,6 @@ namespace Mapbox.Editor
 					SelectionIndex = selectedLayers[0];
 
 					var layerProperty = subLayerArray.GetArrayElementAtIndex(SelectionIndex - FeatureSubLayerTreeView.uniqueIdFeature);
-
 					layerProperty.isExpanded = true;
 					var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
 					bool isLayerActive = subLayerCoreOptions.FindPropertyRelative("isActive").boolValue;
@@ -404,7 +414,7 @@ namespace Mapbox.Editor
 
 			var subLayerlineGeometryOptions = subLayer.FindPropertyRelative("lineGeometryOptions");
 			var lineGeometryOptions = subLayerProperties.lineGeometryOptions;
-			subLayerlineGeometryOptions.FindPropertyRelative("Width").floatValue = lineGeometryOptions.Width;
+			//subLayerlineGeometryOptions.FindPropertyRelative("Width").floatValue = lineGeometryOptions.Width;
 			subLayerlineGeometryOptions.FindPropertyRelative("CapType").enumValueIndex = (int)lineGeometryOptions.CapType;
 			subLayerlineGeometryOptions.FindPropertyRelative("JoinType").enumValueIndex = (int)lineGeometryOptions.JoinType;
 			subLayerlineGeometryOptions.FindPropertyRelative("MiterLimit").floatValue = lineGeometryOptions.MiterLimit;
@@ -428,10 +438,6 @@ namespace Mapbox.Editor
 			var subLayerGeometryMaterialOptions = subLayer.FindPropertyRelative("materialOptions");
 			var materialOptions = subLayerProperties.materialOptions;
 			subLayerGeometryMaterialOptions.FindPropertyRelative("style").enumValueIndex = (int)materialOptions.style;
-
-			var subLayerGeometryPerformanceOptions = subLayer.FindPropertyRelative("performanceOptions");
-			subLayerGeometryPerformanceOptions.FindPropertyRelative("isEnabled").boolValue = true;
-			subLayerGeometryPerformanceOptions.FindPropertyRelative("entityPerCoroutine").intValue = 20;
 
 			var mats = subLayerGeometryMaterialOptions.FindPropertyRelative("materials");
 			mats.arraySize = 2;
@@ -494,16 +500,37 @@ namespace Mapbox.Editor
 			subLayer.FindPropertyRelative("moveFeaturePositionTo").enumValueIndex = (int)subLayerProperties.moveFeaturePositionTo;
 			subLayer.FindPropertyRelative("MeshModifiers").ClearArray();
 			subLayer.FindPropertyRelative("GoModifiers").ClearArray();
+			subLayer.FindPropertyRelative("ModifierStacks").ClearArray();
 
 			var subLayerColliderOptions = subLayer.FindPropertyRelative("colliderOptions");
 			subLayerColliderOptions.FindPropertyRelative("colliderType").enumValueIndex = (int)subLayerProperties.colliderOptions.colliderType;
 		}
 
-		private void UpdateMe()
+		public bool Header(string title, bool show)
 		{
-			Debug.Log("Update!");
+			var rect = GUILayoutUtility.GetRect(16f, 22f, header);
+			GUI.Box(rect, title, header);
+
+			var foldoutRect = new Rect(rect.x + 4f, rect.y + 2f, 13f, 13f);
+			var e = Event.current;
+
+			if (e.type == EventType.Repaint)
+				headerFoldout.Draw(foldoutRect, false, false, show, false);
+
+			if (e.type == EventType.MouseDown)
+			{
+				if (rect.Contains(e.mousePosition))
+				{
+					show = !show;
+
+					e.Use();
+				}
+			}
+
+			return show;
 		}
 
+		private bool[] _modStackArray;
 		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty, SerializedProperty property)
 		{
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
@@ -533,36 +560,109 @@ namespace Mapbox.Editor
 			}
 			//*********************** LAYER NAME ENDS ***********************************//
 
-			EditorGUI.indentLevel++;
+			var uniqueIdProperty = layerProperty.FindPropertyRelative("buildingsWithUniqueIds");
+			uniqueIdProperty.boolValue = EditorGUILayout.Toggle("Unique Ids", uniqueIdProperty.boolValue);
 
-			EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("performanceOptions"), new GUIContent("Perfomance Options"));
+			var modStackList = layerProperty.FindPropertyRelative("ModifierStacks");
 
-			//*********************** FILTERS SECTION BEGINS ***********************************//
-			var filterOptions = layerProperty.FindPropertyRelative("filterOptions");
-			filterOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
-			GUILayout.Space(-_lineHeight);
-			EditorGUILayout.PropertyField(filterOptions, new GUIContent("Filters"));
-			//*********************** FILTERS SECTION ENDS ***********************************//
+			EditorGUILayout.BeginVertical();
 
+				EditorGUILayout.BeginHorizontal();
+				GUILayout.Space(EditorGUI.indentLevel * 12);
+				EditorGUILayout.LabelField(new GUIContent
+				{
+					text = "Modifier Stacks"
+				});
+				Rect buttonRect = GUILayoutUtility.GetLastRect();
+				if (GUILayout.Button(new GUIContent("Add New"), (GUIStyle)"minibuttonleft"))
+				{
+					PopupWindow.Show(buttonRect, new PopupSelectionMenu(typeof(ModifierStack), modStackList));
+					if (Event.current.type == EventType.Repaint) buttonRect = GUILayoutUtility.GetLastRect();
+				}
 
+				if (GUILayout.Button(new GUIContent("Add Existing"), (GUIStyle)"minibuttonright"))
+				{
+					ScriptableCreatorWindow.Open(typeof(ModifierStack), modStackList, -1, null, property);
+				}
 
-			//*********************** MODELING SECTION BEGINS ***********************************//
-			_modelingSectionDrawer.DrawUI(subLayerCoreOptions, layerProperty, primitiveTypeProp);
-			//*********************** MODELING SECTION ENDS ***********************************//
+				EditorGUILayout.EndHorizontal();
 
-
-			//*********************** TEXTURING SECTION BEGINS ***********************************//
-			if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
+			Array.Resize(ref _modStackArray, modStackList.arraySize);
+			for (int i = 0; i < modStackList.arraySize; i++)
 			{
-				GUILayout.Space(-_lineHeight);
-				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
+				var ind = i;
+
+				EditorGUILayout.BeginVertical();
+				var name = modStackList.GetArrayElementAtIndex(i).displayName;
+				EditorGUILayout.BeginHorizontal();
+				_modStackArray[i] = Header(string.Format("{0,-40} - {1, -15}", name, name), _modStackArray[i]);
+				if (GUILayout.Button(new GUIContent("REMOVE"), header, GUILayout.Width(80)))
+				{
+					bool elementWasDeleted = false;
+					if (modStackList.arraySize > 0)
+					{
+						modStackList.DeleteArrayElementAtIndex(ind);
+						elementWasDeleted = true;
+					}
+					if (modStackList.arraySize > 0)
+					{
+						modStackList.DeleteArrayElementAtIndex(ind);
+					}
+					if (elementWasDeleted)
+					{
+						EditorHelper.CheckForModifiedProperty(property);
+					}
+				}
+
+				EditorGUILayout.EndHorizontal();
+
+				if (_modStackArray[i])
+				{
+					EditorGUI.indentLevel+=2;
+					var mod = modStackList.GetArrayElementAtIndex(i).objectReferenceValue as ModifierStack;
+					if (mod)
+					{
+						var editor = Editor.CreateEditor(modStackList.GetArrayElementAtIndex(i).objectReferenceValue as ModifierStack, typeof(ModifierStackEditor)) as ModifierStackEditor;
+						editor.OnInspectorGUI();
+					}
+
+					EditorGUI.indentLevel-=2;
+				}
+
+				EditorGUILayout.EndVertical();
 			}
-			//*********************** TEXTURING SECTION ENDS ***********************************//
 
-
-			//*********************** GAMEPLAY SECTION BEGINS ***********************************//
-			_behaviorModifierSectionDrawer.DrawUI(layerProperty, primitiveTypeProp, sourceType);
-			//*********************** GAMEPLAY SECTION ENDS ***********************************//
+			EditorGUILayout.EndVertical();
+			// EditorGUI.indentLevel++;
+			//
+			// EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("performanceOptions"), new GUIContent("Perfomance Options"));
+			//
+			// //*********************** FILTERS SECTION BEGINS ***********************************//
+			// var filterOptions = layerProperty.FindPropertyRelative("filterOptions");
+			// filterOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
+			// GUILayout.Space(-_lineHeight);
+			// EditorGUILayout.PropertyField(filterOptions, new GUIContent("Filters"));
+			// //*********************** FILTERS SECTION ENDS ***********************************//
+			//
+			//
+			//
+			// //*********************** MODELING SECTION BEGINS ***********************************//
+			// _modelingSectionDrawer.DrawUI(subLayerCoreOptions, layerProperty, primitiveTypeProp);
+			// //*********************** MODELING SECTION ENDS ***********************************//
+			//
+			//
+			// //*********************** TEXTURING SECTION BEGINS ***********************************//
+			// if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)
+			// {
+			// 	GUILayout.Space(-_lineHeight);
+			// 	EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("materialOptions"));
+			// }
+			// //*********************** TEXTURING SECTION ENDS ***********************************//
+			//
+			//
+			// //*********************** GAMEPLAY SECTION BEGINS ***********************************//
+			// _behaviorModifierSectionDrawer.DrawUI(layerProperty, primitiveTypeProp, sourceType);
+			// //*********************** GAMEPLAY SECTION ENDS ***********************************//
 
 			EditorGUI.indentLevel--;
 		}

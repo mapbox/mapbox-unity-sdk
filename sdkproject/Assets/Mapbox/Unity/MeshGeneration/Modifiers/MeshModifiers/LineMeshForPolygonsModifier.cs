@@ -8,62 +8,28 @@ using Mapbox.Unity.MeshGeneration.Data;
 
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
-	/// <summary>
-	/// Line Mesh Modifier creates line polygons from a list of vertices. It offsets the original vertices to both sides using Width parameter and triangulates them manually.
-	/// It also creates tiled UV mapping using the line length.
-	/// </summary>
-	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Line Mesh For Polygons Modifier")]
-	public class LineMeshForPolygonsModifier : MeshModifier
+	public class LineMeshCore
 	{
-		#region Constants
+		public float MiterLimit = 0.2f;
+		public float RoundLimit = 1.05f;
+		public JoinType JoinType = JoinType.Round;
+		public JoinType CapType = JoinType.Round;
+		public AnimationCurve WidthCurve;
 
 		private readonly float _cosHalfSharpCorner = Mathf.Cos(75f / 2f * (Mathf.PI / 180f));
 		private readonly float _sharpCornerOffset = 15f;
-
-		#endregion
-
-		#region Line Parameters
-
-		//[SerializeField] private LineGeometryOptions _options;
-
-		[Tooltip("Width of the line feature.")]
-		public float Width = 1.0f;
-		[Tooltip("Miter Limit")]
-		public float MiterLimit = 0.2f;
-
-		[Tooltip("Round Limit")]
-		public float RoundLimit = 1.05f;
-
-		[Tooltip("Join type of the line feature")]
-		public JoinType JoinType = JoinType.Round;
-
-		[Tooltip("Cap type of the line feature")]
-		public JoinType CapType = JoinType.Round;
-
-		public Vector3 PushUp = new Vector3(0, 1, 0);
-
-		private float _scaledWidth;
-		private float _tileSize; 
-
-		#endregion
-
-		#region Mesh Generation Fields
-
+		private float _tileSize;
 		private List<Vector3> _vertexList;
 		private List<Vector3> _normalList;
 		private List<int> _triangleList;
 		private List<Vector2> _uvList;
 		private List<Vector4> _tangentList;
-
-		//triangle indices
 		private int _index1 = -1;
 		private int _index2 = -1;
 		private int _index3 = -1;
 		private float _cornerOffsetA;
 		private float _cornerOffsetB;
 		private bool _startOfLine = true;
-
-
 		private Vector3 _prevVertex;
 		private Vector3 _currentVertex;
 		private Vector3 _nextVertex;
@@ -71,18 +37,22 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private Vector3 _nextNormal;
 		private float _distance = 0f;
 
-		#endregion
-
-		#region Modifier Overrides
-
-		public override ModifierType Type
+		public ModifierType Type
 		{
 			get { return ModifierType.Preprocess; }
 		}
 
-		public override void Initialize()
+		public LineMeshCore(LineGeometryOptions options)
 		{
-			_scaledWidth = Width;
+			WidthCurve = options.Width;
+			MiterLimit = options.MiterLimit;
+			RoundLimit = options.RoundLimit;
+			JoinType = options.JoinType;
+			CapType = options.CapType;
+		}
+
+		public void Initialize()
+		{
 			_vertexList = new List<Vector3>();
 			_normalList = new List<Vector3>();
 			_triangleList = new List<int>();
@@ -90,30 +60,18 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_tangentList = new List<Vector4>();
 		}
 
-		public override void SetProperties(ModifierProperties properties)
+		public void Run(VectorFeatureUnity feature, MeshData md, float tileSize, float zoom)
 		{
-			//_options = (LineGeometryOptions) properties;
-			properties.PropertyHasChanged += UpdateModifier;
+			ExtrudeLine(feature, md, zoom);
 		}
 
-		public override void Run(VectorFeatureUnity feature, MeshData md, float scale)
+		public void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
-			_scaledWidth = Width * scale;
-			ExtrudeLine(feature, md);
-		}
-
-		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
-		{
-			_scaledWidth = tile != null ? Width * tile.TileScale : Width;
 			_tileSize = Convert.ToSingle(tile.Rect.Size.x * tile.TileScale);
-			ExtrudeLine(feature, md);
+			ExtrudeLine(feature, md, tile.CurrentZoom);
 		}
 
-		#endregion
-
-		#region Mesh Generations
-
-		private void ExtrudeLine(VectorFeatureUnity feature, MeshData md)
+		private void ExtrudeLine(VectorFeatureUnity feature, MeshData md, float zoom)
 		{
 			if (feature.Points.Count < 1)
 			{
@@ -129,7 +87,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				{
 					var p1 = segment[i];
 					var p2 = segment[i + 1];
-					if (!IsOnEdge(p1, p2, _tileSize, tolerance))
+					if (!IsOnEdge(p1, p2, tolerance))
 					{
 						filteredRoadSegment.Add(p1);
 						if (i == segment.Count - 2)
@@ -204,7 +162,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 							var dir = (_currentVertex - _prevVertex);
 							var newPrevVertex = _currentVertex - (dir * (_sharpCornerOffset / prevSegmentLength));
 							_distance += Vector3.Distance(newPrevVertex, _prevVertex);
-							AddCurrentVertex(newPrevVertex, _distance, _prevNormal, md);
+							AddCurrentVertex(newPrevVertex, _distance, _prevNormal, md, zoom);
 							_prevVertex = newPrevVertex;
 						}
 					}
@@ -254,7 +212,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 					if (currentJoin == JoinType.Miter)
 					{
 						joinNormal *= miterLength;
-						AddCurrentVertex(_currentVertex, _distance, joinNormal, md);
+						AddCurrentVertex(_currentVertex, _distance, joinNormal, md, zoom);
 					}
 					else if (currentJoin == JoinType.Flipbevel)
 					{
@@ -272,8 +230,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 							joinNormal = joinNormal.Perpendicular() * (bevelLength * direction);
 						}
 
-						AddCurrentVertex(_currentVertex, _distance, joinNormal, md, 0, 0);
-						AddCurrentVertex(_currentVertex, _distance, joinNormal * -1, md, 0, 0);
+						AddCurrentVertex(_currentVertex, _distance, joinNormal, md, zoom, 0, 0);
+						AddCurrentVertex(_currentVertex, _distance, joinNormal * -1, md, zoom, 0, 0);
 					}
 					else if (currentJoin == JoinType.Bevel || currentJoin == JoinType.Fakeround)
 					{
@@ -293,7 +251,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						// Close previous segment with a bevel
 						if (!_startOfLine)
 						{
-							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md, _cornerOffsetA, _cornerOffsetB);
+							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md, zoom, _cornerOffsetA, _cornerOffsetB);
 						}
 
 						if (currentJoin == JoinType.Fakeround)
@@ -310,17 +268,17 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 							for (var m = 0f; m < n; m++)
 							{
 								approxFractionalJoinNormal = (_nextNormal * ((m + 1f) / (n + 1f)) + (_prevNormal)).normalized;
-								AddPieSliceVertex(_currentVertex, _distance, approxFractionalJoinNormal, lineTurnsLeft, md);
+								AddPieSliceVertex(_currentVertex, _distance, approxFractionalJoinNormal, lineTurnsLeft, md, zoom);
 							}
 
-							AddPieSliceVertex(_currentVertex, _distance, joinNormal, lineTurnsLeft, md);
+							AddPieSliceVertex(_currentVertex, _distance, joinNormal, lineTurnsLeft, md, zoom);
 
 							//change it to go -1, not sure if it's a good idea but it adds the last vertex in the corner,
 							//as duplicate of next road segment start
 							for (var k = n - 1; k >= -1; k--)
 							{
 								approxFractionalJoinNormal = (_prevNormal * ((k + 1) / (n + 1)) + (_nextNormal)).normalized;
-								AddPieSliceVertex(_currentVertex, _distance, approxFractionalJoinNormal, lineTurnsLeft, md);
+								AddPieSliceVertex(_currentVertex, _distance, approxFractionalJoinNormal, lineTurnsLeft, md, zoom);
 							}
 
 							//ending corner
@@ -328,11 +286,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 							_index2 = -1;
 						}
 
-
-
 						if (_nextVertex != Constants.Math.Vector3Unused)
 						{
-							AddCurrentVertex(_currentVertex, _distance, _nextNormal, md, -_cornerOffsetA, -_cornerOffsetB);
+							AddCurrentVertex(_currentVertex, _distance, _nextNormal, md, zoom, -_cornerOffsetA, -_cornerOffsetB);
 						}
 					}
 					else if (currentJoin == JoinType.Butt)
@@ -340,13 +296,13 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						if (!_startOfLine)
 						{
 							// Close previous segment with a butt
-							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md, 0, 0);
+							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md, zoom, 0, 0);
 						}
 
 						// Start next segment with a butt
 						if (_nextVertex != Constants.Math.Vector3Unused)
 						{
-							AddCurrentVertex(_currentVertex, _distance, _nextNormal, md, 0, 0);
+							AddCurrentVertex(_currentVertex, _distance, _nextNormal, md, zoom, 0, 0);
 						}
 					}
 					else if (currentJoin == JoinType.Square)
@@ -354,7 +310,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						if (!_startOfLine)
 						{
 							// Close previous segment with a square cap
-							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md, 1, 1);
+							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md, zoom, 1, 1);
 
 							// The segment is done. Unset vertices to disconnect segments.
 							_index1 = _index2 = -1;
@@ -363,29 +319,29 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						// Start next segment
 						if (_nextVertex != Constants.Math.Vector3Unused)
 						{
-							AddCurrentVertex(_currentVertex, _distance, _nextNormal, md, -1, -1);
+							AddCurrentVertex(_currentVertex, _distance, _nextNormal, md, zoom, -1, -1);
 						}
 					}
 					else if (currentJoin == JoinType.Round)
 					{
 						if (_startOfLine)
 						{
-							AddCurrentVertex(_currentVertex, _distance, _prevNormal * 0.33f, md, -2f, -2f);
-							AddCurrentVertex(_currentVertex, _distance, _prevNormal * 0.66f, md, -.7f, -.7f);
+							AddCurrentVertex(_currentVertex, _distance, _prevNormal * 0.33f, md, zoom, -2f, -2f);
+							AddCurrentVertex(_currentVertex, _distance, _prevNormal * 0.66f, md, zoom, -.7f, -.7f);
 							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md, 0, 0);
 						}
 						else if (_nextVertex == Constants.Math.Vector3Unused)
 						{
 							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md, 0, 0);
-							AddCurrentVertex(_currentVertex, _distance, _prevNormal * 0.66f, md, .7f, .7f);
-							AddCurrentVertex(_currentVertex, _distance, _prevNormal * 0.33f, md, 2f, 2f);
+							AddCurrentVertex(_currentVertex, _distance, _prevNormal * 0.66f, md, zoom, .7f, .7f);
+							AddCurrentVertex(_currentVertex, _distance, _prevNormal * 0.33f, md, zoom, 2f, 2f);
 							_index1 = -1;
 							_index2 = -1;
 						}
 						else
 						{
-							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md, 0, 0);
-							AddCurrentVertex(_currentVertex, _distance, _nextNormal, md, 0, 0);
+							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md, zoom, 0, 0);
+							AddCurrentVertex(_currentVertex, _distance, _nextNormal, md, zoom, 0, 0);
 						}
 					}
 
@@ -396,7 +352,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						{
 							var newCurrentVertex = _currentVertex + ((_nextVertex - _currentVertex) * (_sharpCornerOffset / nextSegmentLength)); //._round()
 							_distance += Vector3.Distance(newCurrentVertex, _currentVertex);
-							AddCurrentVertex(newCurrentVertex, _distance, _nextNormal, md);
+							AddCurrentVertex(newCurrentVertex, _distance, _nextNormal, md, zoom);
 							_currentVertex = newCurrentVertex;
 						}
 					}
@@ -422,7 +378,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
-		private static bool IsOnEdge(Vector3 p1, Vector3 p2, float _tileSize, float tolerance)
+		private bool IsOnEdge(Vector3 p1, Vector3 p2, float tolerance)
 		{
 			return ((Math.Abs(Math.Abs(p1.x) - (_tileSize/2)) < tolerance && Math.Abs(Math.Abs(p2.x) - (_tileSize/2)) < tolerance && Math.Sign(p1.x) == Math.Sign(p2.x)) ||
 			        (Math.Abs(Math.Abs(p1.z) - (_tileSize/2)) < tolerance && Math.Abs(Math.Abs(p2.z) - (_tileSize/2)) < tolerance && Math.Sign(p1.z) == Math.Sign(p2.z)));
@@ -452,11 +408,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_distance = 0f;
 		}
 
-		private void AddPieSliceVertex(Vector3 vertexPosition, float dist, Vector3 normal, bool lineTurnsLeft, MeshData md)
+		private void AddPieSliceVertex(Vector3 vertexPosition, float dist, Vector3 normal, bool lineTurnsLeft, MeshData md, float zoom)
 		{
 			var triIndexStart = md.Vertices.Count;
 			var extrude = normal * (lineTurnsLeft ? -1 : 1);
-			_vertexList.Add(vertexPosition + extrude * _scaledWidth + PushUp);
+			_vertexList.Add(vertexPosition + extrude * WidthCurve.Evaluate(zoom));
 			_normalList.Add(Constants.Math.Vector3Up);
 			_uvList.Add(new Vector2(1, dist));
 			_tangentList.Add(normal.Perpendicular() * -1);
@@ -489,8 +445,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 		}
 
-
-		private void AddCurrentVertex(Vector3 vertexPosition, float dist, Vector3 normal, MeshData md, float endLeft = 0, float endRight = 0)
+		private void AddCurrentVertex(Vector3 vertexPosition, float dist, Vector3 normal, MeshData md, float zoom, float endLeft = 0, float endRight = 0)
 		{
 			var triIndexStart = md.Vertices.Count;
 			var extrude = normal;
@@ -499,8 +454,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				extrude -= (normal.Perpendicular() * endLeft);
 			}
 
-			var vert = vertexPosition + extrude * _scaledWidth;
-			_vertexList.Add(vert + PushUp);
+			var vert = vertexPosition + extrude * WidthCurve.Evaluate(zoom);
+			_vertexList.Add(vert);
 			_normalList.Add(Constants.Math.Vector3Up);
 			_uvList.Add(new Vector2(1, dist));
 			_tangentList.Add(normal.Perpendicular() * -1);
@@ -525,7 +480,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				extrude -= normal.Perpendicular() * endRight;
 			}
 
-			_vertexList.Add(vertexPosition + extrude * _scaledWidth + PushUp);
+			_vertexList.Add(vertexPosition + extrude * WidthCurve.Evaluate(zoom));
 			_normalList.Add(Constants.Math.Vector3Up);
 			_uvList.Add(new Vector2(0, dist));
 			_tangentList.Add(normal.Perpendicular() * -1);
@@ -543,7 +498,22 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			_index1 = _index2;
 			_index2 = _index3;
 		}
+	}
 
-		#endregion
+	/// <summary>
+	/// Line Mesh Modifier creates line polygons from a list of vertices. It offsets the original vertices to both sides using Width parameter and triangulates them manually.
+	/// It also creates tiled UV mapping using the line length.
+	/// </summary>
+	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Line Mesh For Polygons Modifier")]
+	public class LineMeshForPolygonsModifier : MeshModifier
+	{
+		public LineGeometryOptions Options;
+
+		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
+		{
+			var core = new LineMeshCore(Options);
+			core.Initialize();
+			core.Run(feature, md, tile);
+		}
 	}
 }

@@ -10,8 +10,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
 	public class ModifierStackBase : ScriptableObject
 	{
-		[NodeEditorElement("Mesh Modifiers")] public List<MeshModifier> MeshModifiers = new List<MeshModifier>();
-		[NodeEditorElement("Game Object Modifiers")] public List<GameObjectModifier> GoModifiers = new List<GameObjectModifier>();
+		public List<MeshModifier> MeshModifiers = new List<MeshModifier>();
+		public List<GameObjectModifier> GoModifiers = new List<GameObjectModifier>();
 
 		public virtual GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
 		{
@@ -33,7 +33,17 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 		}
 
+		public virtual MeshData RunMeshModifiers(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, float scaler)
+		{
+			return null;
+		}
+
 		public virtual void Clear()
+		{
+
+		}
+
+		public virtual void RunGoModifiers(VectorEntity entity, UnityTile tile)
 		{
 
 		}

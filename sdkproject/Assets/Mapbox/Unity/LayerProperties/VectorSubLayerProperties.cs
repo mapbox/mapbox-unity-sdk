@@ -90,7 +90,7 @@ namespace Mapbox.Unity.Map
 
 		public LayerPerformanceOptions performanceOptions;
 
-		//HACK : workaround to avoid users accidentaly leaving the buildingsWithUniqueIds settign on and have missing buildings.
+		//HACK : workaround to avoid users accidentaly leaving the buildingsWithUniqueIds setting on and have missing buildings.
 		public bool honorBuildingIdSetting = true;
 		public bool buildingsWithUniqueIds = false;
 
@@ -100,6 +100,8 @@ namespace Mapbox.Unity.Map
 		[NodeEditorElement("Game Object Modifiers")]
 		public List<GameObjectModifier> GoModifiers;
 		public PresetFeatureType presetFeatureType = PresetFeatureType.Custom;
+
+		public List<ModifierStack> ModifierStacks;
 
 		[SerializeField]
 		private int _maskValue;

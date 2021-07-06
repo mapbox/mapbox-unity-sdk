@@ -13,10 +13,14 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Prefab Modifier")]
 	public class PrefabModifier : GameObjectModifier
 	{
+		public float Scaler = 100;
 		private Dictionary<GameObject, GameObject> _objects;
 		[SerializeField]
 		private SpawnPrefabOptions _options;
 		private List<GameObject> _prefabList = new List<GameObject>();
+		
+		private ObjectPool<GameObject> _pool;
+		private Dictionary<UnityTile, List<GameObject>> _labelTracker = new Dictionary<UnityTile, List<GameObject>>();
 
 		public override void Initialize()
 		{
@@ -24,6 +28,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				_objects = new Dictionary<GameObject, GameObject>();
 			}
+			
+			_pool = new ObjectPool<GameObject>(() => Instantiate(_options.prefab));
 		}
 
 		public override void SetProperties(ModifierProperties properties)
@@ -47,11 +53,19 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 			else
 			{
-				go = Instantiate(_options.prefab);
+				go = _pool.GetObject(); //Instantiate(_options.prefab);
 				_prefabList.Add(go);
 				_objects.Add(ve.GameObject, go);
 				go.transform.SetParent(ve.GameObject.transform, false);
+				go.SetActive(true);
 			}
+
+			if (!_labelTracker.ContainsKey(tile))
+			{
+				_labelTracker.Add(tile, new List<GameObject>());
+			}
+
+			_labelTracker[tile].Add(go);
 
 			PositionScaleRectTransform(ve, tile, go);
 
@@ -71,7 +85,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				centroidVector += point;
 			}
 			centroidVector = centroidVector / ve.Feature.Points[0].Count;
-
+			centroidVector *= tile.TileSize;
+			
+			
 			go.name = ve.Feature.Data.Id.ToString();
 
 			goRectTransform = go.GetComponent<RectTransform>();
@@ -80,7 +96,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				go.transform.localPosition = centroidVector;
 				if (_options.scaleDownWithWorld)
 				{
-					go.transform.localScale = _options.prefab.transform.localScale * (tile.TileScale);
+					go.transform.localScale = _options.prefab.transform.localScale * (tile.TileScale) * Scaler;
 				}
 			}
 			else
@@ -88,7 +104,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				goRectTransform.anchoredPosition3D = centroidVector;
 				if (_options.scaleDownWithWorld)
 				{
-					goRectTransform.localScale = _options.prefab.transform.localScale * (tile.TileScale);
+					goRectTransform.localScale = _options.prefab.transform.localScale * (tile.TileScale) * Scaler;
 				}
 			}
 
@@ -111,6 +127,21 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			{
 				gameObject.Destroy();
 			}
+		}
+
+		public override void Unregister(UnityTile tile)
+		{
+			if (_labelTracker.ContainsKey(tile))
+			{
+				foreach (var o in _labelTracker[tile])
+				{
+					o.SetActive(false);
+					_pool.Put(o);
+				}
+				_labelTracker[tile].Clear();
+				_labelTracker.Remove(tile);
+			}
+			
 		}
 	}
 }

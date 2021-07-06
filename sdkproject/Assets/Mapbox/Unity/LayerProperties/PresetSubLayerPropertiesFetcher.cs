@@ -39,12 +39,14 @@ namespace Mapbox.Unity.Map
 			StyleTypes style = StyleTypes.Realistic;
 
 			//Misc options
-			bool buildingsWithUniqueIds = true;
+			bool buildingsWithUniqueIds = false;
 			PositionTargetType positionTargetType = PositionTargetType.TileCenter;
 
 			//Modifiers
 			List<MeshModifier> meshModifiers = new List<MeshModifier>();
 			List<GameObjectModifier> gameObjectModifiers = new List<GameObjectModifier>();
+			var modifierStacks = new List<ModifierStack>();
+
 			ColliderType colliderType = ColliderType.None;
 
 			switch (type)
@@ -97,10 +99,7 @@ namespace Mapbox.Unity.Map
 				sublayerName = sublayerName
 			};
 
-			_properties.lineGeometryOptions = new LineGeometryOptions
-			{
-				Width = lineWidth
-			};
+			_properties.lineGeometryOptions = new LineGeometryOptions();
 
 			_properties.extrusionOptions = new GeometryExtrusionOptions
 			{
@@ -125,6 +124,7 @@ namespace Mapbox.Unity.Map
 			_properties.materialOptions.SetDefaultMaterialOptions();
 			_properties.buildingsWithUniqueIds = buildingsWithUniqueIds;
 			_properties.moveFeaturePositionTo = positionTargetType;
+			_properties.ModifierStacks = modifierStacks;
 			_properties.MeshModifiers = meshModifiers;
 			_properties.GoModifiers = gameObjectModifiers;
 			_properties.colliderOptions = new ColliderOptions

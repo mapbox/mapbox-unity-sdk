@@ -13,11 +13,13 @@ using UnityEditor;
 public class MapboxDebugWindow : EditorWindow
 {
 	private int _currentTab;
-	private string[] _tabList = new string[] {"DataFetcher", "UnityTiles" , "Memory Cache", "File Cache"};
+	private string[] _tabList = new string[] {"Map", "DataFetcher", "UnityTiles" , "Memory Cache", "File Cache", "Task Manager"};
 	private static DataFetcherTabDebugView _dataFetcherTabDebugView;
 	private static UnityTilesTabDebugView _unityTilesTabDebugView;
 	private static MemoryTabDebugView _memoryTabDebugView;
 	private static FileCacheDebugView _fileCacheDebugView;
+	private static AbstractMapDebugView _abstractMapDebugView;
+	private static TaskManagerTabDebugView _taskManagerTabDebugView;
 
 
 	[MenuItem("Mapbox/Debug Window")]
@@ -45,6 +47,14 @@ public class MapboxDebugWindow : EditorWindow
 		{
 			_fileCacheDebugView = new FileCacheDebugView();
 		}
+		if (_abstractMapDebugView == null)
+		{
+			_abstractMapDebugView = new AbstractMapDebugView();
+		}
+		if (_taskManagerTabDebugView == null)
+		{
+			_taskManagerTabDebugView = new TaskManagerTabDebugView();
+		}
 	}
 
 	void OnGUI()
@@ -53,17 +63,23 @@ public class MapboxDebugWindow : EditorWindow
 		_currentTab = GUILayout.Toolbar (_currentTab, _tabList);
 		switch (_currentTab)
 		{
-			case 0 : 
-				_dataFetcherTabDebugView.Draw();
+			case 0 :
+				_abstractMapDebugView.Draw();
 				break;
 			case 1 :
-				_unityTilesTabDebugView.Draw();
+				_dataFetcherTabDebugView.Draw();
 				break;
 			case 2 :
-				_memoryTabDebugView.Draw();
+				_unityTilesTabDebugView.Draw();
 				break;
 			case 3 :
+				_memoryTabDebugView.Draw();
+				break;
+			case 4 :
 				_fileCacheDebugView.Draw();
+				break;
+			case 5 :
+				_taskManagerTabDebugView.Draw();
 				break;
 		}
 	}
@@ -72,6 +88,57 @@ public class MapboxDebugWindow : EditorWindow
 	{
 		// This will only get called 10 times per second.
 		Repaint();
+	}
+}
+
+public class TaskManagerTabDebugView
+{
+	private EditorTaskManager _taskManager;
+	private Queue<string> _logs = new Queue<string>();
+	private Vector2 _logScrollPos;
+	private bool _logFold;
+
+	public TaskManagerTabDebugView()
+	{
+		_taskManager = (EditorTaskManager) MapboxAccess.Instance.TaskManager;
+		_taskManager.TaskStarted += (t) =>
+		{
+			_logs.Enqueue(Time.frameCount + " - " + t.Info);
+			if (_logs.Count > 10000)
+			{
+				_logs.Dequeue();
+			}
+			_logScrollPos = new Vector2(0, 40 * _logs.Count);
+		};
+	}
+
+	public void Draw()
+	{
+		GUILayout.Label ("Task Manager", EditorStyles.boldLabel);
+		GUILayout.Label (string.Format("{0} : {1}/{2}", "Active Task Count", _taskManager.ActiveTaskCount, _taskManager.ActiveTaskLimit), EditorStyles.miniLabel);
+		GUILayout.Label (string.Format("{0} : {1}", "Task Queue Size",_taskManager.TaskQueueSize), EditorStyles.miniLabel);
+
+		DrawLogs();
+	}
+
+	private void DrawLogs()
+	{
+		_logFold = EditorGUILayout.Foldout(_logFold, string.Format("Logs ({0})", _logs.Count));
+		if (_logFold)
+		{
+			using (var h = new EditorGUILayout.HorizontalScope())
+			{
+				using (var scrollView = new EditorGUILayout.ScrollViewScope(_logScrollPos, GUILayout.Height(300)))
+				{
+					_logScrollPos = scrollView.scrollPosition;
+					foreach (var log in _logs)
+					{
+						EditorGUILayout.LabelField(string.Format(log), EditorStyles.miniLabel);
+					}
+				}
+			}
+		}
+
 	}
 }
 
@@ -468,7 +535,7 @@ public class UnityTilesTabDebugView
 							}
 
 							EditorGUILayout.LabelField(string.Format("Tileset : {0}", dataTile.TilesetId), EditorStyles.miniLabel);
-							EditorGUILayout.LabelField(string.Format("State : {0}", dataTile.CurrentState), EditorStyles.miniLabel);
+							EditorGUILayout.LabelField(string.Format("State : {0}", dataTile.CurrentTileState), EditorStyles.miniLabel);
 							EditorGUILayout.LabelField(string.Format("Is Mapbox : {0}", dataTile.IsMapboxTile), EditorStyles.miniLabel);
 							EditorGUILayout.LabelField(string.Format("From : {0}", dataTile.FromCache), EditorStyles.miniLabel);
 							if (dataTile.HasError)
@@ -564,7 +631,7 @@ public class UnityTilesTabDebugView
 							}
 
 							EditorGUILayout.LabelField(string.Format("Tileset : {0}", dataTile.TilesetId), EditorStyles.miniLabel);
-							EditorGUILayout.LabelField(string.Format("State : {0}", dataTile.CurrentState), EditorStyles.miniLabel);
+							EditorGUILayout.LabelField(string.Format("State : {0}", dataTile.CurrentTileState), EditorStyles.miniLabel);
 							EditorGUILayout.LabelField(string.Format("Is Mapbox : {0}", dataTile.IsMapboxTile), EditorStyles.miniLabel);
 							EditorGUILayout.LabelField(string.Format("From : {0}", dataTile.FromCache), EditorStyles.miniLabel);
 							if (dataTile.HasError)
@@ -697,5 +764,20 @@ public class FileCacheDebugView
 		}
 		EditorGUILayout.EndScrollView();
 		EditorGUILayout.EndHorizontal();
+	}
+}
+
+public class AbstractMapDebugView
+{
+	private AbstractMap _map;
+
+	public AbstractMapDebugView()
+	{
+		_map = GameObject.FindObjectOfType<AbstractMap>();
+	}
+
+	public void Draw()
+	{
+
 	}
 }

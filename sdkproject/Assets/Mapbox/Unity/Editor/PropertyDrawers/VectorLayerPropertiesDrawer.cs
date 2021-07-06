@@ -76,23 +76,23 @@ namespace Mapbox.Editor
 				return;
 			}
 
-			ShowLocationPrefabs = EditorGUILayout.Foldout(ShowLocationPrefabs, "POINTS OF INTEREST");
-			if (ShowLocationPrefabs)
-			{
-				if (sourceTypeValue != VectorSourceType.None && layerString.Contains(streets_v7))
-				{
-					GUI.enabled = false;
-					EditorGUILayout.TextField(_requiredTilesetIdGui, streets_v7);
-					GUI.enabled = true;
-					_poiSublayerDrawer.DrawUI(property);
-				}
-				else
-				{
-					EditorGUILayout.HelpBox("In order to place points of interest please add \"mapbox.mapbox-streets-v7\" to the data source.", MessageType.Error);
-				}
-			}
-
-			ShowSepartor();
+			// ShowLocationPrefabs = EditorGUILayout.Foldout(ShowLocationPrefabs, "POINTS OF INTEREST");
+			// if (ShowLocationPrefabs)
+			// {
+			// 	if (sourceTypeValue != VectorSourceType.None && layerString.Contains(streets_v7))
+			// 	{
+			// 		GUI.enabled = false;
+			// 		EditorGUILayout.TextField(_requiredTilesetIdGui, streets_v7);
+			// 		GUI.enabled = true;
+			// 		_poiSublayerDrawer.DrawUI(property);
+			// 	}
+			// 	else
+			// 	{
+			// 		EditorGUILayout.HelpBox("In order to place points of interest please add \"mapbox.mapbox-streets-v7\" to the data source.", MessageType.Error);
+			// 	}
+			// }
+			//
+			// ShowSepartor();
 
 			//Draw Feature section.
 			ShowFeatures = EditorGUILayout.Foldout(ShowFeatures, "FEATURES");

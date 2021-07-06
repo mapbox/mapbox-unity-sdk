@@ -77,6 +77,7 @@ namespace Mapbox.Unity.Map
 
 		private void RedrawVectorLayer(object sender, System.EventArgs e)
 		{
+			Factory.SetOptions(_layerProperty);
 			NotifyUpdateLayer(_vectorTileFactory, sender as MapboxDataProperty, true);
 		}
 
@@ -363,7 +364,7 @@ namespace Mapbox.Unity.Map
 			VectorSubLayerProperties subLayer = PresetSubLayerPropertiesFetcher.GetSubLayerProperties(PresetFeatureType.Roads);
 			subLayer.coreOptions.layerName = dataLayerNameInService;
 			subLayer.coreOptions.sublayerName = assignedSubLayerName;
-			subLayer.lineGeometryOptions.Width = lineWidth;
+			//subLayer.lineGeometryOptions.Width = lineWidth;
 
 			AddFeatureSubLayer(subLayer);
 		}

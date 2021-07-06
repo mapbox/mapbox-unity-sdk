@@ -1,3 +1,10 @@
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Mapbox.Map;
+using Mapbox.Unity.Map;
+using Mapbox.Unity.MeshGeneration.Filters;
+
 namespace Mapbox.Unity.MeshGeneration.Modifiers
 {
 	using UnityEngine;
@@ -38,227 +45,151 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Modifier Stack")]
 	public class ModifierStack : ModifierStackBase
 	{
+		[Tooltip("Groups features into one Unity GameObject.")]
+		[SerializeField] public bool combineMeshes = false;
 		[SerializeField] public PositionTargetType moveFeaturePositionTo;
+		[SerializeField] public VectorFilterOptions filterOptions;
 
+		private Dictionary<UnityTile, List<VectorEntity>> _goTracker = new Dictionary<UnityTile, List<VectorEntity>>();
 
-		[NonSerialized] private int vertexIndex = 1;
-		[NonSerialized] private Dictionary<UnityTile, List<VectorEntity>> _activeObjects;
-		[NonSerialized] private ObjectPool<VectorEntity> _pool;
-
-		[NonSerialized] private Vector3 _tempPoint;
-		[NonSerialized] private VectorEntity _tempVectorEntity;
-		[NonSerialized] private ObjectPool<List<VectorEntity>> _listPool;
-
-		[NonSerialized] private int _counter;
-		[NonSerialized] private int _secondCounter;
-		protected virtual void OnEnable()
-		{
-			_pool = new ObjectPool<VectorEntity>(() =>
-			{
-				var go = new GameObject();
-				var mf = go.AddComponent<MeshFilter>();
-				mf.sharedMesh = new Mesh();
-				mf.sharedMesh.name = "feature";
-				var mr = go.AddComponent<MeshRenderer>();
-				_tempVectorEntity = new VectorEntity()
-				{
-					GameObject = go,
-					Transform = go.transform,
-					MeshFilter = mf,
-					MeshRenderer = mr,
-					Mesh = mf.sharedMesh
-				};
-				return _tempVectorEntity;
-			});
-			_listPool = new ObjectPool<List<VectorEntity>>(() => { return new List<VectorEntity>(); });
-			_activeObjects = new Dictionary<UnityTile, List<VectorEntity>>();
-		}
-
-		public override void OnUnregisterTile(UnityTile tile)
-		{
-			if (_activeObjects.ContainsKey(tile))
-			{
-				_counter = _activeObjects[tile].Count;
-				for (int i = 0; i < _counter; i++)
-				{
-					foreach (var item in GoModifiers)
-					{
-						item.OnPoolItem(_activeObjects[tile][i]);
-					}
-					if (null != _activeObjects[tile][i].GameObject)
-					{
-						_activeObjects[tile][i].GameObject.SetActive(false);
-					}
-					_pool.Put(_activeObjects[tile][i]);
-				}
-				_activeObjects[tile].Clear();
-
-				//pooling these lists as they'll reused anyway, saving hundreds of list instantiations
-				_listPool.Put(_activeObjects[tile]);
-				_activeObjects.Remove(tile);
-			}
-		}
+		public ILayerFeatureFilterComparer FeatureFilterCombiner;
 
 		public override void Initialize()
 		{
 			base.Initialize();
 
-			_counter = MeshModifiers.Count;
-			for (int i = 0; i < _counter; i++)
+			var counter = MeshModifiers.Count;
+			for (int i = 0; i < counter; i++)
 			{
-				MeshModifiers[i].Initialize();
+				if (MeshModifiers[i] != null)
+				{
+					MeshModifiers[i].Initialize();
+				}
 			}
 
-			_counter = GoModifiers.Count;
-			for (int i = 0; i < _counter; i++)
+			counter = GoModifiers.Count;
+			for (int i = 0; i < counter; i++)
 			{
-				GoModifiers[i].Initialize();
+				if (GoModifiers[i] != null)
+				{
+					GoModifiers[i].Initialize();
+				}
+			}
+
+			if (filterOptions != null)
+			{
+				var layerFeatureFilters = filterOptions.filters.Select(m => m.GetFilterComparer()).ToArray();
+				switch (filterOptions.combinerType)
+				{
+					case LayerFilterCombinerOperationType.Any:
+						FeatureFilterCombiner = LayerFilterComparer.AnyOf(layerFeatureFilters);
+						break;
+					case LayerFilterCombinerOperationType.All:
+						FeatureFilterCombiner = LayerFilterComparer.AllOf(layerFeatureFilters);
+						break;
+					case LayerFilterCombinerOperationType.None:
+						FeatureFilterCombiner = LayerFilterComparer.NoneOf(layerFeatureFilters);
+						break;
+				}
 			}
 		}
 
-		public override GameObject Execute(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, GameObject parent = null, string type = "")
+		public override MeshData RunMeshModifiers(UnityTile tile, VectorFeatureUnity feature, MeshData meshData, float scaler)
 		{
-			_counter = feature.Points.Count;
-			_secondCounter = 0;
+			// var tempPoint = Constants.Math.Vector3Zero;
+			// var counter = feature.Points.Count;
+			// var secondCounter = 0;
+			// if (moveFeaturePositionTo != PositionTargetType.TileCenter)
+			// {
+			//
+			// 	if (moveFeaturePositionTo == PositionTargetType.FirstVertex)
+			// 	{
+			// 		tempPoint = feature.Points[0][0];
+			// 	}
+			// 	else if (moveFeaturePositionTo == PositionTargetType.CenterOfVertices)
+			// 	{
+			// 		//this is not precisely the center because of the duplicates  (first/last vertex) but close to center
+			// 		tempPoint = feature.Points[0][0];
+			// 		var vertexIndex = 1;
+			//
+			// 		for (int i = 0; i < counter; i++)
+			// 		{
+			// 			secondCounter = feature.Points[i].Count;
+			// 			for (int j = 0; j < secondCounter; j++)
+			// 			{
+			// 				tempPoint += feature.Points[i][j];
+			// 				vertexIndex++;
+			// 			}
+			// 		}
+			//
+			// 		tempPoint /= vertexIndex;
+			// 	}
+			//
+			// 	for (int i = 0; i < counter; i++)
+			// 	{
+			// 		secondCounter = feature.Points[i].Count;
+			// 		for (int j = 0; j < secondCounter; j++)
+			// 		{
+			// 			feature.Points[i][j] = new Vector3(feature.Points[i][j].x - tempPoint.x, 0, feature.Points[i][j].z - tempPoint.z);
+			// 		}
+			// 	}
+			//
+			// 	meshData.PositionInTile = tempPoint;
+			// }
 
-			if (moveFeaturePositionTo != PositionTargetType.TileCenter)
-			{
-				_tempPoint = Constants.Math.Vector3Zero;
-				if (moveFeaturePositionTo == PositionTargetType.FirstVertex)
-				{
-					_tempPoint = feature.Points[0][0];
-				}
-				else if (moveFeaturePositionTo == PositionTargetType.CenterOfVertices)
-				{
-					//this is not precisely the center because of the duplicates  (first/last vertex) but close to center
-					_tempPoint = feature.Points[0][0];
-					vertexIndex = 1;
-
-					for (int i = 0; i < _counter; i++)
-					{
-						_secondCounter = feature.Points[i].Count;
-						for (int j = 0; j < _secondCounter; j++)
-						{
-							_tempPoint += feature.Points[i][j];
-							vertexIndex++;
-						}
-					}
-					_tempPoint /= vertexIndex;
-				}
-
-				for (int i = 0; i < _counter; i++)
-				{
-					_secondCounter = feature.Points[i].Count;
-					for (int j = 0; j < _secondCounter; j++)
-					{
-						feature.Points[i][j] = new Vector3(feature.Points[i][j].x - _tempPoint.x, 0, feature.Points[i][j].z - _tempPoint.z);
-					}
-				}
-				meshData.PositionInTile = _tempPoint;
-			}
-
-			meshData.PositionInTile = _tempPoint;
-			_counter = MeshModifiers.Count;
-			for (int i = 0; i < _counter; i++)
+			//meshData.PositionInTile = tempPoint;
+			var counter = MeshModifiers.Count;
+			for (int i = 0; i < counter; i++)
 			{
 				if (MeshModifiers[i] != null && MeshModifiers[i].Active)
 				{
+					// if (MeshModifiers[i] is ICoreWrapper)
+					// {
+					// 	(MeshModifiers[i] as ICoreWrapper).GetAsycCore().Run(feature, meshData, tile);
+					// }
 					MeshModifiers[i].Run(feature, meshData, tile);
 				}
 			}
 
-			_tempVectorEntity = _pool.GetObject();
+			return meshData;
+		}
 
-			// It is possible that we changed scenes in the middle of map generation.
-			// This object can be null as a result of Unity cleaning up game objects in the scene.
-			// Let's bail if we don't have our object.
-			if (_tempVectorEntity.GameObject == null)
-			{
-				return null;
-			}
-
-			_tempVectorEntity.GameObject.SetActive(true);
-			_tempVectorEntity.Mesh.Clear();
-			_tempVectorEntity.Feature = feature;
-
-#if UNITY_EDITOR
-			if (feature.Data != null)
-			{
-				_tempVectorEntity.GameObject.name = type + " - " + feature.Data.Id;
-			}
-			else
-			{
-				_tempVectorEntity.GameObject.name = type;
-			}
-#endif
-			_tempVectorEntity.Mesh.subMeshCount = meshData.Triangles.Count;
-			_tempVectorEntity.Mesh.SetVertices(meshData.Vertices);
-			_tempVectorEntity.Mesh.SetNormals(meshData.Normals);
-			if (meshData.Tangents.Count > 0)
-			{
-				_tempVectorEntity.Mesh.SetTangents(meshData.Tangents);
-			}
-
-			_counter = meshData.Triangles.Count;
-			for (int i = 0; i < _counter; i++)
-			{
-				_tempVectorEntity.Mesh.SetTriangles(meshData.Triangles[i], i);
-			}
-			_counter = meshData.UV.Count;
-			for (int i = 0; i < _counter; i++)
-			{
-				_tempVectorEntity.Mesh.SetUVs(i, meshData.UV[i]);
-			}
-
-			_tempVectorEntity.Transform.SetParent(parent.transform, false);
-
-			if (!_activeObjects.ContainsKey(tile))
-			{
-				_activeObjects.Add(tile, _listPool.GetObject());
-			}
-			_activeObjects[tile].Add(_tempVectorEntity);
-
-
-			_tempVectorEntity.Transform.localPosition = meshData.PositionInTile;
-
-			_counter = GoModifiers.Count;
-			for (int i = 0; i < _counter; i++)
+		public override void RunGoModifiers(VectorEntity entity, UnityTile tile)
+		{
+			var counter = GoModifiers.Count;
+			for (int i = 0; i < counter; i++)
 			{
 				if (GoModifiers[i].Active)
 				{
-					GoModifiers[i].Run(_tempVectorEntity, tile);
+					GoModifiers[i].Run(entity, tile);
 				}
 			}
 
-			return _tempVectorEntity.GameObject;
+			if (!_goTracker.ContainsKey(tile))
+			{
+				_goTracker.Add(tile, new List<VectorEntity>());
+			}
+			
+			_goTracker[tile].Add(entity);
+		}
+
+		public override void OnUnregisterTile(UnityTile tile)
+		{
+			base.OnUnregisterTile(tile);
+
+			var counter = GoModifiers.Count;
+			for (int i = 0; i < counter; i++)
+			{
+				if (GoModifiers[i].Active)
+				{
+					GoModifiers[i].Unregister(tile);
+				}
+			}
 		}
 
 		public override void Clear()
 		{
-			foreach (var vectorEntity in _pool.GetQueue())
-			{
-				if (vectorEntity.Mesh != null)
-				{
-					vectorEntity.Mesh.Destroy(true);
-				}
 
-				vectorEntity.GameObject.Destroy();
-			}
-
-			foreach (var tileTuple in _activeObjects)
-			{
-				foreach (var vectorEntity in tileTuple.Value)
-				{
-					if (vectorEntity.Mesh != null)
-					{
-						vectorEntity.Mesh.Destroy(true);
-					}
-					vectorEntity.GameObject.Destroy();
-				}
-			}
-			_pool.Clear();
-			_activeObjects.Clear();
-			_pool.Clear();
 		}
 	}
 }
