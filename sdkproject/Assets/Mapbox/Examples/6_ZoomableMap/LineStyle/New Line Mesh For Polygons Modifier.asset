@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: New Line Mesh For Polygons Modifier
   m_EditorClassIdentifier: 
   Active: 1
-  _options:
+  Options:
     Width:
       serializedVersion: 2
       m_Curve:
@@ -28,7 +28,7 @@ MonoBehaviour:
         outWeight: 0
       - serializedVersion: 3
         time: 11.672482
-        value: 0.15894681
+        value: 0.3024747
         inSlope: 0.0068732672
         outSlope: 0.0068732672
         tangentMode: 0
@@ -37,7 +37,7 @@ MonoBehaviour:
         outWeight: 0.3016205
       - serializedVersion: 3
         time: 14.883377
-        value: 0.1993584
+        value: 0.3428863
         inSlope: 0.024134666
         outSlope: 0.024134666
         tangentMode: 0
@@ -46,7 +46,7 @@ MonoBehaviour:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 20
-        value: 0.5
+        value: 0.64352787
         inSlope: 0.013382322
         outSlope: 0.013382322
         tangentMode: 0
@@ -58,5 +58,5 @@ MonoBehaviour:
       m_RotationOrder: 4
     MiterLimit: 0.2
     RoundLimit: 1.05
-    JoinType: 0
+    JoinType: 3
     CapType: 3
