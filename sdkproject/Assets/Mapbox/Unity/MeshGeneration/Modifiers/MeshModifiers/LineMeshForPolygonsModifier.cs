@@ -328,11 +328,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						{
 							AddCurrentVertex(_currentVertex, _distance, _prevNormal * 0.33f, md, zoom, -2f, -2f);
 							AddCurrentVertex(_currentVertex, _distance, _prevNormal * 0.66f, md, zoom, -.7f, -.7f);
-							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md, 0, 0);
+							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md, zoom, 0, 0);
 						}
 						else if (_nextVertex == Constants.Math.Vector3Unused)
 						{
-							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md, 0, 0);
+							AddCurrentVertex(_currentVertex, _distance, _prevNormal, md, zoom, 0, 0);
 							AddCurrentVertex(_currentVertex, _distance, _prevNormal * 0.66f, md, zoom, .7f, .7f);
 							AddCurrentVertex(_currentVertex, _distance, _prevNormal * 0.33f, md, zoom, 2f, 2f);
 							_index1 = -1;
