@@ -87,6 +87,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 			if (updateArgs.property.NeedsForceUpdate())
 			{
+				Unregister(tile);
 				Register(tile);
 			}
 		}
