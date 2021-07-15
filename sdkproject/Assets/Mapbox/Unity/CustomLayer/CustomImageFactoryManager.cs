@@ -7,7 +7,7 @@ namespace Mapbox.Unity.CustomLayer
 {
 	public sealed class CustomImageFactoryManager : ImageFactoryManager
 	{
-		public string _urlFormat;
+		private string _urlFormat;
 		private string CustomTextureFieldName;
 		private string CustomTextureScaleOffsetFieldName;
 
@@ -49,6 +49,17 @@ namespace Mapbox.Unity.CustomLayer
 
 				parent = parent.Parent;
 			}
+		}
+
+		public void SetUrlFormat(string urlFormat)
+		{
+			_urlFormat = urlFormat;
+		}
+
+		public void SetMaterialFieldNames(string textureFieldName, string textureScaleOffsetFieldName)
+		{
+			CustomTextureFieldName = textureFieldName;
+			CustomTextureScaleOffsetFieldName = textureScaleOffsetFieldName;
 		}
 	}
 }
