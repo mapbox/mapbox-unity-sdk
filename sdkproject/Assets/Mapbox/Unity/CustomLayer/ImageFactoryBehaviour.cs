@@ -9,7 +9,7 @@ namespace Mapbox.Unity.CustomLayer
 	public class ImageFactoryBehaviour : MonoBehaviour
 	{
 		public AbstractMap Map;
-		public ImageFactoryManager ImageFactoryManager;
+		public CustomImageFactoryManager ImageFactoryManager;
 		
 		public string CustomTilesetId = "AerisHeatMap";
 		public string UrlFormat = "";
@@ -102,6 +102,13 @@ namespace Mapbox.Unity.CustomLayer
 				}
 
 			}
+		}
+
+		public void SetMaterialFieldNames(string textureFieldName, string textureScaleOffsetFieldName)
+		{
+			OnDisable();
+			ImageFactoryManager.SetMaterialFieldNames(textureFieldName, textureScaleOffsetFieldName);
+			OnEnable();
 		}
 	}
 }
