@@ -11,9 +11,12 @@ If AR support is not needed these subfolders of `sdkproject/Assets/` maybe delet
 * GoogleARCore
 * UnityARKitPlugin
 
-(for 5.4x compatible versions, please use [this commit](https://github.com/mapbox/mapbox-unity-sdk/releases/tag/Last-official-Unity5x-support))
+(for 5.4x compatible versions, please use
 
-Tools for using Mapbox APIs with C# / Unity. If you'd like to contribute to the project, [read CONTRIBUTING.md](CONTRIBUTING.md).
+ [this commit](https://github.com/mapbox/mapbox-unity-sdk/releases/tag/Last-official-Unity5x-support))
+
+Tools for using Mapbox APIs with C# / Unity. If you'd like to contribute to the project, 
+[read CONTRIBUTING.md](CONTRIBUTING.md).
 
 This repo contains:
 - Unity specific tools and libraries for processing Mapbox data
@@ -25,9 +28,15 @@ This repo contains:
 
 ## Versioned SDK (easy, current stable release)
 
-* Download `unitypackage` from https://www.mapbox.com/unity-sdk/#download
-* If you've installed the SDK before, delete `Assets/Mapbox` folder from your project
-* Within Unity: `Assets -> Import Package -> Custom Package... -> All -> Import`, wait :smirk:
+* Download `unitypackage` from 
+* 'https://www.mapbox.com/unity-sdk/#download'
+* If you've installed the SDK before, delete `Assets/Mapbox`
+*  folder from your project
+* Within Uni
+* ty: 
+* `Assets -> Import Package -> Custom Package... -> All -> Import`,
+*  wait 
+*  :smirk:
 
 ## From this Repository (advanced, latest development)
 
@@ -44,7 +53,7 @@ Linux/Mac: `./update-mapbox-unity-sdk-core.sh`
 
 
 # Documentation
-Documentation is generated using DocFX from this repo and is hosted at: https://www.mapbox.com/mapbox-unity-sdk/.
+Documentation is generated using DocFX from this repo and is hosted at: 'https://www.mapbox.com/mapbox-unity-sdk/'.
 
 # Building a Unity Package
 To build a Unity Package for import into your own project from the included `sdkproject`:
@@ -97,7 +106,7 @@ Beta support for creating tilesets
 This Mapbox Tiling Service API endpoint is in public beta and is subject to potential changes.
 
 POST
-/tilesets/v1/sources/{username}/{id}
+/tilesets/v1/sources/{quantomphantom573}/{id}
 tilesets:writetoken scope
 Creates a tileset source. A tileset source is raw geographic data formatted as line-delimited GeoJSON and uploaded to Mapbox.com. (Learn more about how line-delimited GeoJSON is used by MTS in the Tileset sources guide.)
 
@@ -821,8 +830,10 @@ DELETE
 tilesets:writetoken scope
 Delete a tileset. Note that you can only delete your own tileset.
 
-Required parameter	Description
-username.tileset_id	The ID the tileset you want to delete, which is composed of your username followed by a period and the tileset's unique identifier.
+Required parameter	
+Description
+username.tileset_id	
+The ID the tileset you want to delete, which is composed of your username followed by a period and the tileset's unique identifier.
 Example request: Delete tileset
 $ curl -X DELETE "https://api.mapbox.com/tilesets/v1/{username.tileset_id}?access_token=YOUR MAPBOX ACCESS TOKEN
 This endpoint requires a token with tilesets:write scope.
