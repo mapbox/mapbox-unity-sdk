@@ -1,25 +1,25 @@
-# mapbox-unity-sdk
-Mapbox Unity SDK - https://www.mapbox.com/unity/
-Mapbox-unity-sdk
-For Unity 2017.1.2+
-AR support requires Unity 2017.3+, Android 7+ (Nougat), iOS 11.3
-
+### mapbox-unity-sdk
+# Mapbox Unity SDK - 'https://www.mapbox.com/unity/'
+# Mapbox-unity-sdk
+# For Unity 2017.1.2+
+## AR support requires Unity 2017.3+, Android 7+ (Nougat), iOS 11.3
+>
 Find the AR specific README here.
-
+>
 If AR support is not needed these subfolders of sdkproject/Assets/ maybe deleted:
-
-MapboxAR
+>
+# MapboxAR
 UnityARInterface
 GoogleARCore
 UnityARKitPlugin
 (for 5.4x compatible versions, please use
-
+>
 this commit)
-
+>
 Tools for using Mapbox APIs with C# / Unity. If you'd like to contribute to the project, read CONTRIBUTING.md.
-
+>
 This repo contains:
-
+>
 Unity specific tools and libraries for processing Mapbox data
 Example projects using Mapbox Maps SDK for Unity
 DocFX project for generating API documentation
@@ -37,19 +37,19 @@ wait
 smirk
 From this Repository (advanced, latest development)
 Downloading the repo as a zip does not work!
-
+>
 git clone git@github.com:mapbox/mapbox-unity-sdk.git
 cd mapbox-unity-sdk
 Windows: update-mapbox-unity-sdk-core.bat
-
+>
 Linux/Mac: ./update-mapbox-unity-sdk-core.sh
-
+>
 Documentation
 Documentation is generated using DocFX from this repo and is hosted at: 'https://www.mapbox.com/mapbox-unity-sdk/'.
-
+>
 Building a Unity Package
 To build a Unity Package for import into your own project from the included sdkproject:
-
+>
 Select Mapbox folder in the project view.
 Right-click and choose Export Package....
 screen shot 2017-05-26 at 1 14 01 pm
@@ -57,124 +57,124 @@ Uncheck Include Dependencies.
 screen shot 2017-05-26 at 1 14 55 pm
 Click Export and choose a location. <--< Mapbox Tiling Service On this page Create a tileset source Append to an existing tileset source Replace a tileset source Retrieve tileset source information List tileset sources Delete a tileset source Create a tileset Update a tileset Publish a tileset Update tileset information Retrieve information about a single tileset job List information about all jobs for a tileset View the global queue Validate a recipe Retrieve a tileset's recipe Update a tileset's recipe List tilesets Delete tileset Retrieve TileJSON metadata Mapbox Tiling Service errors Mapbox Tiling Service restrictions and limits Mapbox Tiling Service pricing Mapbox Tiling Service (MTS) supports reading metadata for raster and vector tilesets. To request the tiles themselves, use the Vector Tiles API for vector tiles or the Raster Tiles API for raster tiles instead.
 Besides accessing MTS programmatically using the API endpoints described in this documentation, you can also prepare and upload data for MTS using the Tilesets CLI, a command-line Python tool. For more information about the Tilesets CLI, see the Tilesets CLI documentation and the Get started with MTS and the Tilesets CLI tutorial.
-
+>
 Beta support for creating tilesets The Mapbox Tiling Service endpoints for creating and interacting with tileset sources, tileset recipes, and tilesets are in public beta, and are subject to potential changes.
-
+>
 For a general overview of MTS, its use cases, and typical workflows for using it, see the Mapbox Tiling Service overview documentation.
-
+>
 Create a tileset source Beta support for creating tilesets This Mapbox Tiling Service API endpoint is in public beta and is subject to potential changes.
-
+>
 POST /tilesets/v1/sources/{quantomphantom573}/{pk.eyJ1IjoicXVhbnRvbXBoYW50b201NzMiLCJhIjoiY2p2eTZkMWpxMDhmZzQzcDFrbjRobXY2YiJ9.cJqSyyaC5iXcDT1O4ztrQQ} tilesets:writetoken scope Creates a tileset source. A tileset source is raw geographic data formatted as line-delimited GeoJSON and uploaded to Mapbox.com. (Learn more about how line-delimited GeoJSON is used by MTS in the Tileset sources guide.)
-
+>
 Tileset sources are necessary to use MTS to create a new vector tileset, and they are referenced via a tileset source ID. The same tileset source can be used across multiple tilesets.
-
+>
 A tileset source can be composed of up to 10 source files. Each individual source file must not exceed 20 GB. The maximum combined total size of all files that compose a tileset source is 50 GB. If the total size of all the files that compose a tileset source is greater than 50 GB, MTS will return a response that contains an error property with more details. To add multiple source files to a tileset source, see the Append to an existing tileset source endpoint. To replace a tileset source with new source files, use the Replace a tileset source endpoint.
-
+>
 If you no longer need a tileset source, you should manually delete it after any related tilesets are finished processing using the Delete a tileset source endpoint. The related tilesets will continue working normally.
-
+>
 Required parameters Description username The Mapbox username of the account for which to create a tileset source. id The ID for the tileset source to be created. Limited to 32 characters. The only allowed special characters are - and _. The request body must be line-delimited GeoJSON. For information about how to convert GeoJSON or other data formats to line-delimited GeoJSON, see the Tileset sources troubleshooting guide.
-
+>
 Example request: Create a tileset source $ curl -X POST "https://api.mapbox.com/tilesets/v1/sources/quantomphantom573/hello-world?access_token=pk.eyJ1IjoicXVhbnRvbXBoYW50b201NzMiLCJhIjoiY2p2eTZkMWpxMDhmZzQzcDFrbjRobXY2YiJ9.cJqSyyaC5iXcDT1O4ztrQQ This endpoint requires a token with tilesets:write scope. "
 -F file=@/Users/quantomphantom573/data/mts/countries.geojson.ld
 --header "Content-Type: multipart/form-data" Response: Create a tileset source If the request is successful, the response will contain the following properties:
-
+>
 Property Description file_size The size in bytes of the individual file you have added to your tileset source. files The total number of files in the tileset source. id The unique identifier for the tileset source. source_size The total size in bytes of all the files in the tileset source. Example response: Create a tileset source { "file_size": 10592, "files": 1, "id": "mapbox://tileset-source/quantomphantom573/hello-world", "source_size": 10592 } Append to an existing tileset source Beta support for creating tilesets This Mapbox Tiling Service API endpoint is in public beta and is subject to potential changes.
-
+>
 POST /tilesets/v1/sources/{quantomphantom573}/{pk.eyJ1IjoicXVhbnRvbXBoYW50b201NzMiLCJhIjoiY2p2eTZkMWpxMDhmZzQzcDFrbjRobXY2YiJ9.cJqSyyaC5iXcDT1O4ztrQQ } tilesets:writetoken scope Appends new source data to a tileset source, or creates a source if it does not exist already. A tileset source is raw geographic data formatted as line-delimited GeoJSON and uploaded to Mapbox.com. (Learn more about how line-delimited GeoJSON is used by MTS in the Tileset sources guide.)
-
+>
 Tileset sources are necessary to use MTS to create a new vector tileset, and they are referenced via a tileset source ID. The same tileset source can be used across multiple tilesets.
-
+>
 A tileset source can be composed of up to 10 source files. Each individual source file must not exceed 20 GB. The maximum combined total size of all files that compose a tileset source is 50 GB. If the total size of all the files that compose a tileset source is greater than 50 GB, MTS will return a response that contains an error property with more details. To add multiple source files to a tileset source, post to this endpoint multiple times. This will append the uploaded files to the tileset source. To replace a tileset source with new source files, use the Replace a tileset source endpoint.
-
+>
 If you no longer need a tileset source, you should manually delete it after any related tilesets are finished processing using the Delete a tileset source endpoint. The related tilesets will continue working normally.
-
+>
 Required parameters Description username The Mapbox username of the account for which to create a tileset source. id The ID for the tileset source to be append the new source data. The request body must be line-delimited GeoJSON. For information about how to convert GeoJSON or other data formats to line-delimited GeoJSON, see the Tileset sources troubleshooting guide.
-
+>
 Example request: Append to an existing tileset source $ curl -X POST "https://api.mapbox.com/tilesets/v1/sources/quantomphantom573/hello-world?access_token=YOUR MAPBOX ACCESS TOKEN This endpoint requires a token with tilesets:write scope. "
 -F file=@/Users/quantomphantom573/data/mts/countries.geojson.ld
 --header "Content-Type: multipart/form-data" Response: Append to an existing tileset source If the request is successful, the response will contain the following properties:
-
+>
 Property Description file_size The size in bytes of the individual file you have added to your tileset source. files The total number of files in the tileset source. id The unique identifier for the tileset source. source_size The total size in bytes of all the files in the tileset source. Example response: Append to an existing tileset source { "file_size": 10592, "files": 2, "id": "mapbox://tileset-source/quantomphantom573/hello-world", "source_size": 20884 } Replace a tileset source Beta support for creating tilesets This Mapbox Tiling Service API endpoint is in public beta and is subject to potential changes.
-
+>
 PUT /tilesets/v1/sources/{quantomphantom573}/{pk.eyJ1IjoicXVhbnRvbXBoYW50b201NzMiLCJhIjoiY2p2eTZkMWpxMDhmZzQzcDFrbjRobXY2YiJ9.cJqSyyaC5iXcDT1O4ztrQQ } tilesets:writetoken scope Replaces a tileset source with new source data, or creates a source if it does not exist already. If the total size of the uploaded file is greater than 20 GB, MTS will return a response that contains an error property with more details.
-
+>
 If you no longer need a tileset source, you should manually delete it after any related tilesets are finished processing using the Delete a tileset source endpoint. The related tilesets will continue working normally.
-
+>
 Required parameters Description username The Mapbox username of the account for which to create a tileset source. id The ID for the tileset source to be replaced. The request body must be line-delimited GeoJSON. For information about how to convert GeoJSON or other data formats to line-delimited GeoJSON, see the Tileset sources troubleshooting guide.
-
+>
 Example request: Replace a tileset source $ curl -X PUT "https://api.mapbox.com/tilesets/v1/sources/quantomphantom573/hello-world?access_token=YOUR MAPBOX ACCESS TOKEN This endpoint requires a token with tilesets:write scope. "
 -F file=@/Users/username/data/mts/countries.geojson.ld
 --header "Content-Type: multipart/form-data" Response: Replace a tileset source If the request is successful, the response will contain the following properties:
-
+>
 Property Description file_size The size in bytes of the individual file you have added to your tileset source. files The total number of files in the tileset source. id The unique identifier for the tileset source. source_size The total size in bytes of all the files in the tileset source. Example response: Replace a tileset source { "file_size": 10592, "files": 1, "id": "mapbox://tileset-source/username/hello-world", "source_size": 10592 } Retrieve tileset source information Beta support for creating tilesets This Mapbox Tiling Service API endpoint is in public beta and is subject to potential changes.
-
+>
 GET /tilesets/v1/sources/{username}/{id} tilesets:readtoken scope Get information for a specific tileset source, including the number and total size of the files in the tileset source.
-
+>
 Required parameters Description username The Mapbox username of the account for which to retrieve tileset source information. id The ID for the tileset source to be retrieved. Example request: Retrieve tileset source information $ curl "https://api.mapbox.com/tilesets/v1/sources/quantomphantom573/hello-world?access_token=YOUR MAPBOX ACCESS TOKEN This endpoint requires a token with tilesets:read scope. " Response: Retrieve tileset source information If the request is successful, the response will contain the following properties:
-
+>
 Property Description files The total number of files in the tileset source. id The unique identifier for the tileset source. size The total size in bytes of all files in the tileset source. size_nice The total size of all files in the tileset source, in a human-readable format. Example response: Retrieve tileset source information { "files": 2, "id": "mapbox://tileset-source/username/hello-world", "size": 20884, "size_nice": "20.39KB" } List tileset sources Beta support for creating tilesets This Mapbox Tiling Service API endpoint is in public beta and is subject to potential changes.
-
+>
 GET /tilesets/v1/sources/{username} tilesets:listtoken scope List all the tileset sources that belong to an account. This endpoint supports pagination.
-
+>
 Required parameters Description username The Mapbox username of the account for which to retrieve tileset source information. You can further refine the results from this endpoint with the following optional parameters:
-
+>
 Optional parameters Description sortby Sort the listings by their created or modified timestamps. limit The maximum number of tilesets to return, from 1 to 500. The default is 100. start The tileset after which to start the listing. The key is found in the Link header of a response. See the pagination section for details. Example request: List tileset sources $ curl "https://api.mapbox.com/tilesets/v1/sources/quantomphantom573?access_token=YOUR MAPBOX ACCESS TOKEN This endpoint requires a token with tilesets:list scope. " Response: List tileset sources If the request is successful, the response will be a list of the tileset sources that belong to the specified account. If the account has more than 2000 tileset sources, the response list will be capped at 2000.
-
+>
 Example response: List tileset sources [ { "files": 2, "id": "mapbox://tileset-source/username/hello-world", "size": 20884 }, { "files": 3, "id": "mapbox://tileset-source/username/hola-mundo", "size": 650332 } ] Delete a tileset source Beta support for creating tilesets This Mapbox Tiling Service API endpoint is in public beta and is subject to potential changes.
-
+>
 DELETE /tilesets/v1/sources/{username}/{id} tilesets:writetoken scope Permanently delete a tileset source and all its files. This is not a recoverable action.
-
+>
 Don't delete a tileset source while it's in use If you delete a tileset source, any in-progress jobs that use that tileset source will fail.
-
+>
 Required parameters Description username The Mapbox username of the account for which to delete a tileset source. id The ID for the tileset source to be deleted. Example request: Delete a tileset source $ curl -X DELETE "https://api.mapbox.com/tilesets/v1/sources/quantomphantom573/hello-world?access_token=YOUR MAPBOX ACCESS TOKEN This endpoint requires a token with tilesets:write scope. " Response: Delete a tileset source If the tileset source is successfully deleted, the response will be HTTP 204 No Content.
-
+>
 Create a tileset Beta support for creating tilesets This Mapbox Tiling Service API endpoint is in public beta and is subject to potential changes.
-
+>
 POST /tilesets/v1/{tileset} tilesets:writetoken scope Prerequisites for creating a new tileset Before you can create a new tileset, you need to create a tileset source and write a tileset recipe. The tileset recipe defines how to transform the data in the tileset source into vector tiles.
-
+>
 Create a new tileset.
-
+>
 Required parameters Description tileset The ID for the tileset to be created, which is composed of your username followed by a period and the tileset's unique name (username.tileset_name). Limited to 32 characters. This character limit does not include your username. The only allowed special characters are - and _. The request body must be a JSON object that contains the following properties:
-
+>
 Required request body property Description recipe A recipe that describes how the GeoJSON data you uploaded should be transformed into tiles. For more information on how to create and format recipes, see the Recipe reference and Recipe examples. name The name of the tileset. Limited to 64 characters. Additionally, the request body may contain the following optional properties:
-
+>
 Optional request body properties Description private A boolean that describes whether the tileset must be used with an access token from your Mapbox account. Default is true. description A description of the tileset. Limited to 500 characters. attribution An array of attribution objects, each with text and link keys. Limited to three attribution objects, 80 characters maximum combined across all text values, and 1000 characters maximum combined across all link values. attribution.text The attribution text for the tileset. attribution.link The URL used for the tileset's attribution. Example request: Create a tileset $ curl -X POST "https://api.mapbox.com/tilesets/v1/{tileset}?access_token=YOUR MAPBOX ACCESS TOKEN This endpoint requires a token with tilesets:write scope. "
 -d @tileset-recipe.json
 --header "Content-Type:application/json" Example request body: Create a tileset { "recipe": { "version": 1, "layers": { "hello_world": { "source": "mapbox://tileset-source/username/hello-world", "minzoom": 0, "maxzoom": 5 } } }, "name": "Hello World", "description": "Spaceship Earth with all of the people, places, and things.", "attribution": [ { "text": "© Hello Legal World", "link": "https://docs.mapbox.com" } ] } Response: Create a tileset { "message": "Successfully created empty tileset <tileset_id>. Publish your tileset to begin processing your data into vector tiles." } If a tileset with the specified ID already exists, MTS will return an HTTP 400 status code.
-
+>
 Update a tileset You can update an existing tileset's source, recipe, metadata, and tiles using MTS:
-
+>
 Update a tileset's source using the Update a tileset’s recipe endpoint. You can reference a new tileset source in the updated tileset recipe. Update a tileset’s recipe using the Update a tileset’s recipe endpoint. The updated recipe can specify a new minzoom, maxzoom, and more following the rules in the MTS recipe specification. Update a tileset's metadata using the Update tileset information MTS endpoint. You can update a tileset's name, description, private or public state, and attribution information. Update a tileset’s tiles using the Publish a tileset MTS endpoint. The steps to do so are outlined in the Update a tileset with MTS guide. This process can be repeated indefinitely for the same tileset when your source data updates or your recipe requires changes. Publish a tileset Beta support for creating tilesets This Mapbox Tiling Service API endpoint is in public beta and is subject to potential changes.
-
+>
 POST /tilesets/v1/{tileset}/publish tilesets:writetoken scope Once you’ve created a tileset, you can request that the data be "published" into vector tiles. This action will start an asynchronous process known as a job that retrieves your data and processes it into vector tiles according to the recipe you have defined.
-
+>
 This endpoint can also be used to update an existing tileset. Note that due to tile caching, when updating an existing tileset new tiles will only become visible as the cached versions of those tiles expire.
 
 A given tileset can only have one active processing publish job at a time. This ensures the data you have staged is processed before any future data you have staged is processed. If your tileset has an active publish request being processed, all later publish requests will be queued to run in the order they were received. You can only have five jobs in the queue per account.
-
+>
 All jobs are entered into a global Mapbox queue. The larger the queue, the longer it will take your tileset to process. For instructions on how to see the size of the queue, see the View the global queue section.
-
+>
 The size of a single vector tile is limited to 500 KB. If a job drops features due to tile size, this will be noted in the warnings field of the job object.
-
+>
 Required parameters Description tileset The ID of the tileset to be published, which is composed of your username followed by a period and the tileset's unique name (username.tileset_name). Processing time There are a number of factors that can influence the processing time when you publish a tileset, including:
-
+>
 The size of the geographical area represented by the data that is being processed. For example, data for a city block will be processed much faster than data for the entire earth. The maximum zoom level applied to each layer. The higher the maximum zoom level, the more tiles that need to be created. Each additional zoom level creates four times as many tiles as the previous zoom level did. As an example, a maximum zoom level of 1 produces four tiles, while a maximum zoom level of 2 produces 16 tiles. The complexity of the tileset recipe, in particular filters, attributes, and union configurations will likely add to the processing time. The size of the global queue, which you can check with the View the global queue endpoint. MTS global queue indicates the number of tileset jobs waiting to be processed. Example request: Publish a tileset $ curl -X POST "https://api.mapbox.com/tilesets/v1/{tileset}/publish?access_token=YOUR MAPBOX ACCESS TOKEN This endpoint requires a token with tilesets:write scope. " Response: Publish a tileset { "message": "Processing <tileset_id>",
 "jobId": "<job_id>" } If your recipe references a non-existent tileset source, MTS will return an HTTP 400 status code.
-
+>
 Update tileset information Beta support for creating tilesets This Mapbox Tiling Service API endpoint is in public beta and is subject to potential changes.
-
+>
 PATCH /tilesets/v1/{tileset} tilesets:writetoken scope Update a tileset's information such as name, description, and privacy settings. This is not the endpoint for updating a tileset's recipe, sources, or tiles.
-
+>
 Optional request body properties Description name The name of the tileset. Limited to 64 characters. description A description of the tileset. Limited to 500 characters. private A boolean that describes whether the tileset must be used with an access token from your Mapbox account. attribution An array of attribution objects, each with text and link keys. Limited to three attribution objects, 80 characters maximum combined across all text values, and 1000 characters maximum combined across all link values. For more details on how attribution is displayed when multiple tilesets with custom attribution are composited together, see the attribution display section. attribution.text The attribution text for the tileset. attribution.link The URL used for the tileset's attribution. Attribution display with multiple tilesets Custom map attribution strings are composited in reverse order of the composite request and are separated by a space character. For example, the following request to mapbox.mapbox-streets-v8,example.custom-tileset (in which the first tileset is a Mapbox tileset and the second tileset is a custom tileset) will show attribution that looks like:
-
+>
 © Example Maps 2020 © Mapbox © OpenStreetMap Example request: Update a tileset $ curl -X PATCH "https://api.mapbox.com/tilesets/v1/{tileset}?access_token=YOUR MAPBOX ACCESS TOKEN This endpoint requires a token with tilesets:write scope. "
 --data '{"name":"New name same me","attribution":[{"text":"New data license","link":"https://example.com"}]}'
 --header "Content-Type:application/json" Response: Update a tileset HTTP 204 No Content Retrieve information about a single tileset job Beta support for creating tilesets This Mapbox Tiling Service API endpoint is in public beta and is subject to potential changes.
-
+>
 GET /tilesets/v1/{tileset}/jobs/{job_id} tilesets:readtoken scope Retrieve information about a single job associated with a tileset, based on its unique job ID.
-
+>
 Required parameters Description tileset The ID for the tileset for which to retrieve information, which is composed of your username followed by a period and the tileset's unique name (username.tileset_name). job_id The publish job's unique identifier. This identifier is returned in the jobId field of a Publish a tileset response. Example request: Retrieve information about a single tileset job $ curl "https://api.mapbox.com/tilesets/v1/{tileset}/jobs/{job_id}?access_token=YOUR MAPBOX ACCESS TOKEN This endpoint requires a token with tilesets:read scope. " Response: Retrieve information about a single tileset job A successful request will return a JSON response that contains the following properties:
-
+>
 Property Description id The publish job's unique identifier. stage The status of the job. Possible values are queued, processing, success, or failed. created Timestamp indicating when the job was created. created_nice Human-readable timestamp indicating when the job was created. published Timestamp indicating when the job was published. tilesetId The specified tileset's unique identifier. errors The errors related to the tileset, if relevant. If there are no errors, this will be an empty array. For more information, see our MTS errors documentation. warnings Any warnings related to the tileset, if relevant. If there are no warnings, this will be an empty array. For more information about warnings, see our MTS warnings documentation. recipe The MTS recipe that was used to publish the job. tileset_precisions An object listing the Tileset Processing billing tiers that were used by one or more layers in the job's recipe and the number of square kilometers that were processed in each tier. layer_stats An object that contains statistics about the given layer: layer_stats.total_tiles The total number of tiles in the tileset that contain this layer. layer_stats.point_count The total number of point features for the layer, multiplied by the number of tiles there are in the tileset. layer_stats.linestring_count The total number of linestring features for the layer, multiplied by the number of tiles there are in the tileset. layer_stats.polygon_count The total number of polygon features for the layer, multiplied by the number of tiles there are in the tileset. layer_stats.capped The number of tiles in which features were no longer added to the layer during tiling due to the size of the layer. layer_stats.maxzoom The maximum zoom level of the layer. layer_stats.minzoom The minimum zoom level of the layer. layer_stats.checksum A checksum of the geometry and attributes of the features in the layer, including the order of the features but not including their IDs. If two checksums are the same, the tiles from the two tiling jobs are almost certainly identical, but identical recipes and sources are not strictly guaranteed to produce identical checksums. layer_stats.zooms An object that contains statistics for each zoom level in the layer: layer_stats.zooms.ymin The minimum y tile coordinate at the zoom level. layer_stats.zooms.ymax The maximum y tile coordinate at the zoom level. layer_stats.zooms.xmin The minimum x tile coordinate at the zoom level. layer_stats.zooms.xmax The maximum x tile coordinate at the zoom level. layer_stats.zooms.tiles The total number of tiles at this zoom level for the layer. layer_stats.zooms.capped The number of tiles in which features were no longer added during tiling due to the size of the layer at this zoom level. layer_stats.zooms.capped_list A list of tiles in this zoom level that exceeded the layer_size. The list may be truncated if large numbers of tiles exceeded the limit. Each element in the capped_list is an object containing a tile (referred to by its zoom/x/y coordinates) and the layer_size that would have been required for that tile to have avoided being capped (or "more than maximum" if the required size exceeds system limits). layer_stats.zooms.sum_area The total area that tiles cover at this zoom level for the layer. layer_stats.zooms.sum_size The total size in bytes of all tiles for this layer at this zoom level, uncompressed. layer_stats.zooms.avg_size The average size of a tile for this layer at this zoom level, uncompressed. layer_stats.zooms.max_size The maximum size of a tile at this zoom level for this layer. layer_stats.zooms.size_histogram An array of 20 counts of tiles that shows the distribution of tile layer sizes. The first count is the number of tiles between 1 byte and 25 kilobytes, with each subsequent count representing another 25 kilobyte range, up to 500 kilobytes. Any tile layers larger than 500 kilobytes are also included in the last count. Example response: Retrieve information about a single tileset job { "id": "unique_hash", "stage": "success", "created": 1560981902377, "created_nice": "Wed Jun 19 2019 22:05:02 GMT+0000 (UTC)", "published": 1560982158721, "tilesetId": "user.id", "errors": [], "warnings": [], "tileset_precisions": { "1m": 658731.7540137176 }, "layer_stats": { "sample_pois": { "total_tiles": 71, "linestring_count": 0, "capped": 15, "maxzoom": 12, "zooms": { "0": { "ymin": 0, "ymax": 0, "xmin": 0, "xmax": 0, "tiles": 1, "capped": 1, "capped_list": [ { "layer_size": 1337, "tile": "0/0/0" } ], "sum_size": 512036, "sum_area": 508164394.24620897, "avg_size": 512036, "max_size": 512036, "size_histogram": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ] } }
 } }, "recipe": { "version": 1, "layers": { "sample_pois": { "minzoom": 1, "maxzoom": 12, "source": "mapbox://tileset-source/user/source" } } } } List information about all jobs for a tileset Beta support for creating tilesets This Mapbox Tiling Service API endpoint is in public beta and is subject to potential changes.
 
