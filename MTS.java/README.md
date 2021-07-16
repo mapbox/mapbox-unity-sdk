@@ -976,3 +976,14 @@ When you use Mapbox Tiling Service, usage statistics can be reviewed on your Sta
 To see details on the precision level and area tiled for a specific tileset, go to your Tilesets page and click on the tileset's name to visit the Tileset explorer. The Tileset explorer provides a link to the pricing calculator in the Billing metrics section, where you can input the square kilometers of your tiled data for a pricing estimate.
 
 To learn more about how pricing works for this service, see the MTS pricing guide.
+
+var map = L.map('map');
+
+L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+    attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>',
+    tileSize: 512,
+    maxZoom: 18,
+    zoomOffset: -1,
+    id: 'mapbox/streets-v11',
+    accessToken: 'pk.eyJ1IjoicXVhbnRvbXBoYW50b201NzMiLCJhIjoiY2p2eTZkMWpxMDhmZzQzcDFrbjRobXY2YiJ9.cJqSyyaC5iXcDT1O4ztrQQ'
+}).addTo(map);
