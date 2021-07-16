@@ -64,26 +64,29 @@ For a general overview of MTS, its use cases, and typical workflows for using it
 >
 Create a tileset source Beta support for creating tilesets This Mapbox Tiling Service API endpoint is in public beta and is subject to potential changes.
 >
-Class EarcutLibrary
-Inheritance
-System.Object
-EarcutLibrary
-Inherited Members
-System.Object.Equals(System.Object)
-System.Object.Equals(System.Object, System.Object)
-System.Object.GetHashCode()
-System.Object.GetType()
-System.Object.MemberwiseClone()
-System.Object.ToString()
-System.Object.ReferenceEquals(System.Object, System.Object)
-Namespace:Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers
-Assembly:cs.temp.dll.dll
-Syntax
-public static class EarcutLibrary
-Methods
-Earcut(List<Single>, List<Int32>, Int32)
-Declaration
-public static List<int> Earcut(List<float> data, List<int> holeIndices, int dim)
+# Class EarcutLibrary
+# Inheritance
+# System.Object
+# EarcutLibrary
+# Inherited Members
+# System.Object.Equals(System.Object)
+# System.Object.Equals(System.Object, System.Object)
+# System.Object.GetHashCode()
+# System.Object.GetType()
+# System.Object.MemberwiseClone()
+# System.Object.ToString()
+# System.Object.ReferenceEquals(System.Object, System.Object)
+# Namespace:Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers
+# Assembly:cs.temp.dll.dll
+# Syntax
+# public static class EarcutLibrary
+# Methods
+# Earcut(List
+>```
+<Single>, List<Int32>, Int32)
+    ><
+# Declaration
+# public static List<int> Earcut(List<float> data, List<int> holeIndices, int dim)
 Parameters
 Type	Name	Description
 List<System.Single>	data	
@@ -99,9 +102,9 @@ Parameters
 Type	Name	Description
 List<List<Vector3>>	data	
 Returns
-Type	Description
+Type	Description```><][
 Data
-POST /tilesets/v1/sources/{quantomphantom573}/{pk.eyJ1IjoicXVhbnRvbXBoYW50b201NzMiLCJhIjoiY2p2eTZkMWpxMDhmZzQzcDFrbjRobXY2YiJ9.cJqSyyaC5iXcDT1O4ztrQQ} tilesets:writetoken scope Creates a tileset source. A tileset source is raw geographic data formatted as line-delimited GeoJSON and uploaded to Mapbox.com. (Learn more about how line-delimited GeoJSON is used by MTS in the Tileset sources guide.)
+]POST /tilesets/v1/sources/{quantomphantom573}/{pk.eyJ1IjoicXVhbnRvbXBoYW50b201NzMiLCJhIjoiY2p2eTZkMWpxMDhmZzQzcDFrbjRobXY2YiJ9.cJqSyyaC5iXcDT1O4ztrQQ} tilesets:writetoken scope Creates a tileset source. A tileset source is raw geographic data formatted as line-delimited GeoJSON and uploaded to Mapbox.com. (Learn more about how line-delimited GeoJSON is used by MTS in the Tileset sources guide.)
 >
 Tileset sources are necessary to use MTS to create a new vector tileset, and they are referenced via a tileset source ID. The same tileset source can be used across multiple tilesets.
 >
