@@ -106,7 +106,7 @@ Beta support for creating tilesets
 This Mapbox Tiling Service API endpoint is in public beta and is subject to potential changes.
 
 POST
-/tilesets/v1/sources/{quantomphantom573}/{id}
+/tilesets/v1/sources/{quantomphantom573}/{pk.eyJ1IjoicXVhbnRvbXBoYW50b201NzMiLCJhIjoiY2p2eTZkMWpxMDhmZzQzcDFrbjRobXY2YiJ9.cJqSyyaC5iXcDT1O4ztrQQ}
 tilesets:writetoken scope
 Creates a tileset source. A tileset source is raw geographic data formatted as line-delimited GeoJSON and uploaded to Mapbox.com. (Learn more about how line-delimited GeoJSON is used by MTS in the Tileset sources guide.)
 
@@ -122,10 +122,10 @@ id	The ID for the tileset source to be created. Limited to 32 characters. The on
 The request body must be line-delimited GeoJSON. For information about how to convert GeoJSON or other data formats to line-delimited GeoJSON, see the Tileset sources troubleshooting guide.
 
 Example request: Create a tileset source
-$ curl -X POST "https://api.mapbox.com/tilesets/v1/sources/quantomphantom573/hello-world?access_token=YOUR MAPBOX ACCESS TOKEN
+$ curl -X POST "https://api.mapbox.com/tilesets/v1/sources/quantomphantom573/hello-world?access_token=pk.eyJ1IjoicXVhbnRvbXBoYW50b201NzMiLCJhIjoiY2p2eTZkMWpxMDhmZzQzcDFrbjRobXY2YiJ9.cJqSyyaC5iXcDT1O4ztrQQ
 This endpoint requires a token with tilesets:write scope.
 " \
-    -F file=@/Users/username/data/mts/countries.geojson.ld \
+    -F file=@/Users/quantomphantom573/data/mts/countries.geojson.ld \
     --header "Content-Type: multipart/form-data"
 Response: Create a tileset source
 If the request is successful, the response will contain the following properties:
@@ -139,7 +139,7 @@ Example response: Create a tileset source
 {
   "file_size": 10592,
   "files": 1,
-  "id": "mapbox://tileset-source/username/hello-world",
+  "id": "mapbox://tileset-source/quantomphantom573/hello-world",
   "source_size": 10592
 }
 Append to an existing tileset source
@@ -147,7 +147,7 @@ Beta support for creating tilesets
 This Mapbox Tiling Service API endpoint is in public beta and is subject to potential changes.
 
 POST
-/tilesets/v1/sources/{username}/{id}
+/tilesets/v1/sources/{quantomphantom573}/{pk.eyJ1IjoicXVhbnRvbXBoYW50b201NzMiLCJhIjoiY2p2eTZkMWpxMDhmZzQzcDFrbjRobXY2YiJ9.cJqSyyaC5iXcDT1O4ztrQQ }
 tilesets:writetoken scope
 Appends new source data to a tileset source, or creates a source if it does not exist already. A tileset source is raw geographic data formatted as line-delimited GeoJSON and uploaded to Mapbox.com. (Learn more about how line-delimited GeoJSON is used by MTS in the Tileset sources guide.)
 
@@ -166,7 +166,7 @@ Example request: Append to an existing tileset source
 $ curl -X POST "https://api.mapbox.com/tilesets/v1/sources/quantomphantom573/hello-world?access_token=YOUR MAPBOX ACCESS TOKEN
 This endpoint requires a token with tilesets:write scope.
 " \
-    -F file=@/Users/username/data/mts/countries.geojson.ld \
+    -F file=@/Users/quantomphantom573/data/mts/countries.geojson.ld \
     --header "Content-Type: multipart/form-data"
 Response: Append to an existing tileset source
 If the request is successful, the response will contain the following properties:
@@ -180,7 +180,7 @@ Example response: Append to an existing tileset source
 {
   "file_size": 10592,
   "files": 2,
-  "id": "mapbox://tileset-source/username/hello-world",
+  "id": "mapbox://tileset-source/quantomphantom573/hello-world",
   "source_size": 20884
 }
 Replace a tileset source
@@ -188,7 +188,7 @@ Beta support for creating tilesets
 This Mapbox Tiling Service API endpoint is in public beta and is subject to potential changes.
 
 PUT
-/tilesets/v1/sources/{username}/{id}
+/tilesets/v1/sources/{quantomphantom573}/{pk.eyJ1IjoicXVhbnRvbXBoYW50b201NzMiLCJhIjoiY2p2eTZkMWpxMDhmZzQzcDFrbjRobXY2YiJ9.cJqSyyaC5iXcDT1O4ztrQQ }
 tilesets:writetoken scope
 Replaces a tileset source with new source data, or creates a source if it does not exist already. If the total size of the uploaded file is greater than 20 GB, MTS will return a response that contains an error property with more details.
 
