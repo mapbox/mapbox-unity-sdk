@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Mapbox.Map;
 using Mapbox.Unity.DataContainers;
 using Mapbox.Unity.DataFetching;
@@ -32,10 +33,13 @@ namespace Mapbox.Unity.CustomLayer
 		protected abstract RasterTile CreateTile(CanonicalTileId tileId, string tilesetId);
 		protected abstract void SetTexture(UnityTile unityTile, RasterTile dataTile);
 
+		private Dictionary<UnityTile, Tile> _tileTracker = new Dictionary<UnityTile, Tile>();
+
 		public virtual void RegisterTile(UnityTile tile)
 		{
 			ApplyParentTexture(tile);
 			var dataTile = CreateTile(tile.CanonicalTileId, _sourceSettings.Id);
+			_tileTracker.Add(tile, dataTile);
 			if (tile != null)
 			{
 				tile.AddTile(dataTile);
@@ -46,6 +50,11 @@ namespace Mapbox.Unity.CustomLayer
 
 		public virtual void UnregisterTile(UnityTile tile)
 		{
+			if (_tileTracker.ContainsKey(tile))
+			{
+				tile.RemoveTile(_tileTracker[tile]);
+				_tileTracker.Remove(tile);
+			}
 			_fetcher.CancelFetching(tile.UnwrappedTileId, _sourceSettings.Id);
 			MapboxAccess.Instance.CacheManager.TileDisposed(tile, _sourceSettings.Id);
 		}
