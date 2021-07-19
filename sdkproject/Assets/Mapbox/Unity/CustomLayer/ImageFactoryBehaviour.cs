@@ -93,14 +93,15 @@ namespace Mapbox.Unity.CustomLayer
 					var material = tilePair.Value.MeshRenderer.sharedMaterial;
 					material.SetTexture(TextureFieldName, null);
 					material.SetVector(TextureScaleOffsetFieldName, new Vector4(1, 1, 0, 0));
+					ImageFactoryManager.UnregisterTile(tilePair.Value);
 				}
 				foreach (var tile in Map.MapVisualizer.GetInactiveTiles)
 				{
 					var material = tile.MeshRenderer.sharedMaterial;
 					material.SetTexture(TextureFieldName, null);
 					material.SetVector(TextureScaleOffsetFieldName, new Vector4(1, 1, 0, 0));
+					ImageFactoryManager.UnregisterTile(tile);
 				}
-
 			}
 		}
 
