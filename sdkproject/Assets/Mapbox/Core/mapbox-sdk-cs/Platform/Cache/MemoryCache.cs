@@ -11,7 +11,7 @@ namespace Mapbox.Platform.Cache
 	public interface IMemoryCache
 	{
 		void Add(CanonicalTileId tileId, string tilesetId, CacheItem cacheItem, bool forceInsert);
-		CacheItem Get(CanonicalTileId tileId, string tilesetId);
+		CacheItem Get(CanonicalTileId tileId, string tilesetId, bool resetDestructionIndex = false);
 		void Clear();
 		bool Exists(CanonicalTileId tileId, string tilesetId);
 		void MarkFallback(CanonicalTileId tileId, string tilesetId);
@@ -46,6 +46,10 @@ namespace Mapbox.Platform.Cache
 
 		public virtual void Add(CanonicalTileId tileId, string tilesetId, CacheItem cacheItem, bool forceInsert)
 		{
+			if (cacheItem.Tile == null)
+			{
+				Debug.Log("what");
+			}
 			var key = tileId.GenerateKey(tilesetId);
 
 			//this tile was recycled so the data was marked for pruning
@@ -100,23 +104,43 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 
-		public virtual CacheItem Get(CanonicalTileId tileId, string tilesetId)
+		public virtual CacheItem Get(CanonicalTileId tileId, string tilesetId, bool resetDestructionIndex = false)
 		{
 			var key = tileId.GenerateKey(tilesetId);
 
-			if (!_cachedItems.ContainsKey(key))
+			if (_fallbackItems != null && _fallbackItems.ContainsKey(key))
 			{
-				if (_fallbackItems != null && _fallbackItems.ContainsKey(key))
-				{
-					return _fallbackItems[key];
-				}
-
-				return null;
+				return _fallbackItems[key];
 			}
 
-			//this would have made sense but temp parent texture feature breaks it
-			//_destructionHashset.Remove(key);
-			return _cachedItems[key];
+			if (_cachedItems.ContainsKey(key))
+			{
+
+				//this is reseting destruction queue index to prevent
+				//system delete in-use parent tile images which causes black tiles.
+				//this is a slow and temp solution, should be replaced by a better solution.
+				if (resetDestructionIndex)
+				{
+					var size = _destructionQueue.Count;
+					for (int i = 0; i < size; i++)
+					{
+						var item = _destructionQueue.Dequeue();
+						if (item != key)
+						{
+							_destructionQueue.Enqueue(item);
+						}
+					}
+
+					_destructionQueue.Enqueue(key);
+				}
+
+				//this would have made sense but temp parent texture feature breaks it
+				//_destructionHashset.Remove(key);
+				return _cachedItems[key];
+			}
+
+			return null;
+
 		}
 
 		public virtual void TileDisposed(UnityTile tile, string tilesetId)
@@ -277,7 +301,7 @@ namespace Mapbox.Platform.Cache
 			TileReleased(tile.CanonicalTileId, tilesetId);
 		}
 
-		public override CacheItem Get(CanonicalTileId tileId, string tilesetId)
+		public override CacheItem Get(CanonicalTileId tileId, string tilesetId, bool b)
 		{
 			return base.Get(tileId, tilesetId);
 			TileRead(tileId, tilesetId);

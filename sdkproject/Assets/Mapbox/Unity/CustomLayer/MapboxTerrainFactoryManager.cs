@@ -123,7 +123,7 @@ namespace Mapbox.Unity.CustomLayer
 			var parent = tile.UnwrappedTileId.Parent;
 			for (int i = tile.CanonicalTileId.Z - 1; i > 0; i--)
 			{
-				var cacheItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(_sourceSettings.Id, parent.Canonical);
+				var cacheItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(_sourceSettings.Id, parent.Canonical, true);
 				if (cacheItem != null && cacheItem.Texture2D != null)
 				{
 					tile.SetParentTexture(parent, cacheItem.Texture2D, ShaderElevationTextureFieldName, ShaderElevationTextureScaleOffsetFieldName);
