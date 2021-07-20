@@ -77,11 +77,6 @@ namespace Mapbox.Platform.Cache
             _memoryCache.Add(tileId, tilesetId, vectorCacheItem, forceInsert);
         }
 
-        public VectorCacheItem GetVectorItemFromMemory(string tilesetId, CanonicalTileId tileId, bool resetDestructionIndex = false)
-        {
-            return (VectorCacheItem) _memoryCache.Get(tileId, tilesetId, resetDestructionIndex);
-        }
-
         public void AddVectorDataItem(string tilesetId, CanonicalTileId tileId, CacheItem vectorCacheItem, bool forceInsert)
         {
             _memoryCache.Add(tileId, tilesetId, vectorCacheItem, forceInsert);
