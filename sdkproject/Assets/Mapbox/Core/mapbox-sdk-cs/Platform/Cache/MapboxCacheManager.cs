@@ -77,6 +77,11 @@ namespace Mapbox.Platform.Cache
             _memoryCache.Add(tileId, tilesetId, vectorCacheItem, forceInsert);
         }
 
+        public VectorCacheItem GetVectorItemFromMemory(string tilesetId, CanonicalTileId tileId, bool resetDestructionIndex = false)
+        {
+            return (VectorCacheItem) _memoryCache.Get(tileId, tilesetId, resetDestructionIndex);
+        }
+
         public void AddVectorDataItem(string tilesetId, CanonicalTileId tileId, CacheItem vectorCacheItem, bool forceInsert)
         {
             _memoryCache.Add(tileId, tilesetId, vectorCacheItem, forceInsert);
@@ -164,9 +169,9 @@ namespace Mapbox.Platform.Cache
             _sqLiteCache?.UpdateExpiration(tilesetId, tileId, expirationDate);
         }
 
-        public TextureCacheItem GetTextureItemFromMemory(string tilesetId, CanonicalTileId tileId)
+        public TextureCacheItem GetTextureItemFromMemory(string tilesetId, CanonicalTileId tileId, bool resetDestructionIndex = false)
         {
-            return (TextureCacheItem) _memoryCache.Get(tileId, tilesetId);
+            return (TextureCacheItem) _memoryCache.Get(tileId, tilesetId, resetDestructionIndex);
         }
 
         public void GetTextureItemFromFile(string tilesetId, CanonicalTileId tileId, bool isTextureNonreadable, Action<TextureCacheItem> callback)
