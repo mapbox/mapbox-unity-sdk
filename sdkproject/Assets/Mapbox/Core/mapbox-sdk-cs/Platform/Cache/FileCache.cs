@@ -102,7 +102,7 @@ namespace Mapbox.Platform.Cache
 			{
 
 #if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
-				fullfilePath = fullFilePath.Insert(0, "file://");
+				fullFilePath = fullFilePath.Insert(0, "file://");
 #endif
 				fullFilePath = new Uri(fullFilePath).ToString();
 				var tile = new FileImageTile(tileId, tilesetId, fullFilePath, isTextureNonreadable);
