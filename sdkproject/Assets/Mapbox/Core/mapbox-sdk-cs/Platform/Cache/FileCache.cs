@@ -100,6 +100,11 @@ namespace Mapbox.Platform.Cache
 			var fullFilePath = string.Format("{0}.{1}", filePath, FileExtension);
 			if (File.Exists(fullFilePath))
 			{
+
+#if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
+				fullfilePath = fullFilePath.Insert(0, "file://");
+#endif
+				fullFilePath = new Uri(fullFilePath).ToString();
 				var tile = new FileImageTile(tileId, tilesetId, fullFilePath, isTextureNonreadable);
 				_fileDataFetcher.FetchData(tile, tilesetId, tileId, false, callback);
 			}

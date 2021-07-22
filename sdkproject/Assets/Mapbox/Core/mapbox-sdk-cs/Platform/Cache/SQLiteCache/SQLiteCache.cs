@@ -315,7 +315,7 @@ CONSTRAINT tileAssignmentConstraint UNIQUE (tileId, mapId)
 		{
 			Add(tilesetName,tileId, item.Data, string.Empty, item.ETag, item.ExpirationDate, forceInsert);
 		}
-		
+
 		public void Add(string tilesetName, CanonicalTileId tileId, TextureCacheItem infoTextureCacheItem, bool forceInsert = false)
 		{
 			Add(tilesetName,tileId, null, infoTextureCacheItem.FilePath, infoTextureCacheItem.ETag, infoTextureCacheItem.ExpirationDate, forceInsert);
@@ -513,53 +513,60 @@ CONSTRAINT tileAssignmentConstraint UNIQUE (tileId, mapId)
 		/// <returns>tile data as byte[], if tile is not cached returns null</returns>
 		public CacheItem Get(string tilesetName, CanonicalTileId tileId)
 		{
+			lock (_lock)
+			{
 #if MAPBOX_DEBUG_CACHE
 			string methodName = _className + "." + new System.Diagnostics.StackFrame().GetMethod().Name;
 			Debug.LogFormat("{0} {1} {2}", methodName, _tileset, tileId);
 #endif
-			tiles tile = null;
+				tiles tile = null;
 
-			try
-			{
-				int? tilesetId = getTilesetId(tilesetName);
-				if (!tilesetId.HasValue)
+				try
+				{
+					int? tilesetId = getTilesetId(tilesetName);
+					if (!tilesetId.HasValue)
+					{
+						return null;
+					}
+
+					tile = _sqlite
+						.Table<tiles>()
+						.Where(t =>
+							t.tile_set == tilesetId.Value
+							&& t.zoom_level == tileId.Z
+							&& t.tile_column == tileId.X
+							&& t.tile_row == tileId.Y
+						)
+						.FirstOrDefault();
+				}
+				catch (Exception ex)
+				{
+					Debug.LogErrorFormat("error getting tile {1} {2} from cache{0}{3}", Environment.NewLine, tilesetName, tileId, ex);
+					return null;
+				}
+
+				if (null == tile)
 				{
 					return null;
 				}
 
-				tile = _sqlite
-					.Table<tiles>()
-					.Where(t =>
-						t.tile_set == tilesetId.Value
-						&& t.zoom_level == tileId.Z
-						&& t.tile_column == tileId.X
-						&& t.tile_row == tileId.Y
-						)
-					.FirstOrDefault();
-			}
-			catch (Exception ex)
-			{
-				Debug.LogErrorFormat("error getting tile {1} {2} from cache{0}{3}", Environment.NewLine, tilesetName, tileId, ex);
-				return null;
-			}
-			if (null == tile)
-			{
-				return null;
-			}
+				DateTime? expirationDate = null;
+				if (tile.expirationDate.HasValue)
+				{
+					expirationDate = UnixTimestampUtils.From((double) tile.expirationDate.Value);
+				}
 
-			DateTime? expirationDate = null;
-			if (tile.expirationDate.HasValue) { expirationDate = UnixTimestampUtils.From((double)tile.expirationDate.Value); }
+				tile.timestamp = (int) UnixTimestampUtils.To(DateTime.Now);
+				_sqlite.InsertOrReplace(tile);
 
-			tile.timestamp = (int) UnixTimestampUtils.To(DateTime.Now);
-			_sqlite.InsertOrReplace(tile);
-			
-			return new CacheItem()
-			{
-				Data = tile.tile_data,
-				AddedToCacheTicksUtc = tile.timestamp,
-				ETag = tile.etag,
-				ExpirationDate = expirationDate
-			};
+				return new CacheItem()
+				{
+					Data = tile.tile_data,
+					AddedToCacheTicksUtc = tile.timestamp,
+					ETag = tile.etag,
+					ExpirationDate = expirationDate
+				};
+			}
 		}
 
 		/// <summary>
