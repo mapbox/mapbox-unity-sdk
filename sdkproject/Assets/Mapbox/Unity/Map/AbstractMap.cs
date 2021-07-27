@@ -45,25 +45,9 @@ namespace Mapbox.Unity.Map
 		protected Vector2d _centerMercator;
 		protected float _worldRelativeScale;
 		protected Vector3 _mapScaleFactor;
-
-		protected Vector3 _cachedPosition;
-		protected Quaternion _cachedRotation;
-		protected Vector3 _cachedScale = Vector3.one;
 		#endregion
 
 		#region Properties
-
-		public bool IsEditorPreviewEnabled
-		{
-			get
-			{
-				return _previewOptions.isPreviewEnabled;
-			}
-			set
-			{
-				_previewOptions.isPreviewEnabled = value;
-			}
-		}
 
 		public AbstractMapVisualizer MapVisualizer
 		{
@@ -283,7 +267,7 @@ namespace Mapbox.Unity.Map
 
 		protected virtual void Update()
 		{
-			if (Application.isEditor && !Application.isPlaying && IsEditorPreviewEnabled == false)
+			if (Application.isEditor && !Application.isPlaying)
 			{
 				return;
 			}
@@ -318,10 +302,12 @@ namespace Mapbox.Unity.Map
 		/// <param name="zoom">Zoom level.</param>
 		public virtual void UpdateMap(Vector2d latLon, float zoom)
 		{
-			if (Application.isEditor && !Application.isPlaying && !IsEditorPreviewEnabled)
+			if (Application.isEditor && !Application.isPlaying)
 			{
 				return;
 			}
+
+			zoom = Mathf.Clamp(zoom, _options.locationOptions.MinZoom, _options.locationOptions.MaxZoom);
 
 			//so map will be snapped to zero using next new tile loaded
 			_worldHeightFixed = false;
@@ -591,7 +577,7 @@ namespace Mapbox.Unity.Map
 
 			_options.extentOptions.defaultExtents.PropertyHasChanged += (object sender, System.EventArgs eventArgs) =>
 			{
-				if (Application.isEditor && !Application.isPlaying && IsEditorPreviewEnabled == false)
+				if (Application.isEditor && !Application.isPlaying)
 				{
 					Debug.Log("defaultExtents");
 					return;
@@ -839,7 +825,7 @@ namespace Mapbox.Unity.Map
 
 		private void OnTileProviderChanged()
 		{
-			if (Application.isEditor && !Application.isPlaying && IsEditorPreviewEnabled == false)
+			if (Application.isEditor && !Application.isPlaying)
 			{
 				Debug.Log("extentOptions");
 				return;
@@ -847,10 +833,6 @@ namespace Mapbox.Unity.Map
 
 			SetTileProvider();
 			TileProvider.Initialize(this);
-			if (IsEditorPreviewEnabled)
-			{
-				TileProvider.UpdateTileExtent();
-			}
 		}
 
 		#endregion
@@ -1058,6 +1040,11 @@ namespace Mapbox.Unity.Map
 
 		#endregion
 
+		public bool AreTilesLoaded()
+		{
+			return MapVisualizer.ActiveTiles.All(x => x.Value.Tiles.All(x => x.CurrentState == Tile.State.Loaded));
+		}
+
 		#region Events
 		/// <summary>
 		/// Event delegate, gets called after map is initialized
@@ -1072,14 +1059,6 @@ namespace Mapbox.Unity.Map
 		public event Action OnUpdated = delegate { };
 		public event Action OnMapRedrawn = delegate { };
 
-		/// <summary>
-		/// Event delegate, gets called when map preview is enabled
-		/// </summary>
-		public event Action OnEditorPreviewEnabled = delegate { };
-		/// <summary>
-		/// Event delegate, gets called when map preview is disabled
-		/// </summary>
-		public event Action OnEditorPreviewDisabled = delegate { };
 		/// <summary>
 		/// Event delegate, gets called when a tile is completed.
 		/// </summary>

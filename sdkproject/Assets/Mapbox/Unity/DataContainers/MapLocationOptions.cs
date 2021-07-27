@@ -10,7 +10,10 @@ namespace Mapbox.Unity.DataContainers
 		[Geocode]
 		[Tooltip("The coordinates to build a map around")]
 		public string latitudeLongitude = "0,0";
-		[Range(0, 22)]
+
+		public float MinZoom;
+		public float MaxZoom;
+
 		[Tooltip("The zoom level of the map")]
 		public float zoom = 4.0f;
 

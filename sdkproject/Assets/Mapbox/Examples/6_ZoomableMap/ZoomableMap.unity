@@ -232,7 +232,9 @@ MonoBehaviour:
   _options:
     locationOptions:
       latitudeLongitude: 37.7648, -122.463
-      zoom: 12
+      MinZoom: 3
+      MaxZoom: 15
+      zoom: 7
     extentOptions:
       extentType: 0
       defaultExtents:
