@@ -133,7 +133,7 @@ namespace Mapbox.Unity.Map.TileProviders
 				}
 				else
 				{
-
+					Debug.Log("Too many tiles in viewport, cancelling map update.");
 				}
 			}
 		}
