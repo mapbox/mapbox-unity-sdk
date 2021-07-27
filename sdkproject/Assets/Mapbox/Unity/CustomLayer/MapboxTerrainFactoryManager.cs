@@ -66,7 +66,14 @@ namespace Mapbox.Unity.CustomLayer
 			// }
 			// else
 			{
-				rasterTile = new RawPngRasterTile(tileId, tilesetId);
+				if (SystemInfo.supportsAsyncGPUReadback)
+				{
+					rasterTile = new RawPngRasterTile(tileId, tilesetId, true);
+				}
+				else
+				{
+					rasterTile = new RawPngRasterTile(tileId, tilesetId, false);
+				}
 			}
 
 #if UNITY_EDITOR

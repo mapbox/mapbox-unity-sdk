@@ -33,7 +33,7 @@ namespace Mapbox.Map
 			return TileResource.MakeRawPngRaster(Id, tilesetId);
 		}
 
-		public RawPngRasterTile(CanonicalTileId tileId, string tilesetId) : base(tileId, tilesetId, true)
+		public RawPngRasterTile(CanonicalTileId tileId, string tilesetId, bool useReadonlyTexture = false) : base(tileId, tilesetId, useReadonlyTexture)
 		{
 		}
 	}
