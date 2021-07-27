@@ -10,6 +10,7 @@ namespace Mapbox.Unity.Map.TileProviders
 {
 	public class QuadTreeTileProvider : AbstractTileProvider
 	{
+		private const int MaxTileRequestLimit = 30;
 		private static readonly int HIT_POINTS_COUNT = 4;
 
 		private Plane _groundPlane;
@@ -123,9 +124,17 @@ namespace Mapbox.Unity.Map.TileProviders
 			{
 				//update viewport in case it was changed by switching zoom level
 				_viewPortWebMercBounds = getcurrentViewPortWebMerc();
-				_currentExtent.activeTiles = GetWithWebMerc(_viewPortWebMercBounds, _map.AbsoluteZoom);
+				var newTiles = GetWithWebMerc(_viewPortWebMercBounds, _map.AbsoluteZoom);
 
-				OnExtentChanged();
+				if (newTiles.Count < MaxTileRequestLimit)
+				{
+					_currentExtent.activeTiles = newTiles;
+					OnExtentChanged();
+				}
+				else
+				{
+
+				}
 			}
 		}
 
