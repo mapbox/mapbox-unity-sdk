@@ -34,7 +34,7 @@ namespace Mapbox.Unity.Map
 				yield return VectorLayer.Factory;
 			}
 		}
-
+		
 		public TerrainLayer TerrainLayer;
 		public ImageryLayer ImageryLayer;
 		public VectorLayer VectorLayer;
@@ -42,7 +42,6 @@ namespace Mapbox.Unity.Map
 		protected IMapReadable _map;
 		protected Dictionary<UnwrappedTileId, UnityTile> _activeTiles = new Dictionary<UnwrappedTileId, UnityTile>();
 		protected ObjectPool<UnityTile> _tilePool;
-		private int _counter;
 
 		private ModuleState _state;
 		public ModuleState State
@@ -61,9 +60,8 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public IMapReadable Map { get { return _map; } }
 		public Dictionary<UnwrappedTileId, UnityTile> ActiveTiles { get { return _activeTiles; } }
-		public Dictionary<UnwrappedTileId, int> _tileProgress;
+		public Queue<UnityTile> GetInactiveTiles => _tilePool.GetQueue() as Queue<UnityTile>;
 
 		public event Action<ModuleState> OnMapVisualizerStateChanged = delegate { };
 		public event Action<UnityTile> OnTileFinished = delegate { };
@@ -75,7 +73,6 @@ namespace Mapbox.Unity.Map
 		public virtual void Initialize(IMapReadable map)
 		{
 			_map = map;
-			_tileProgress = new Dictionary<UnwrappedTileId, int>();
 
 			//Layers serialize so we are using Initialize method to pass parameters
 			//on map start. Otherwise Layer object will not be null because of serialization
@@ -500,9 +497,5 @@ namespace Mapbox.Unity.Map
 		public event Action<UnityTile> OnTileDisposing = delegate {};
 
 		#endregion
-
-#if UNITY_EDITOR
-		public Queue<UnityTile> GetInactiveTiles => _tilePool.GetQueue() as Queue<UnityTile>;
-#endif
 	}
 }
