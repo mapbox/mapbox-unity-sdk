@@ -39,7 +39,6 @@ namespace Mapbox.Unity.Map
 		private List<UnwrappedTileId> tilesToProcess;
 
 		protected float _unityTileSize = 1;
-		protected bool _worldHeightFixed = false;
 		protected int _initialZoom;
 		protected Vector2d _centerLatitudeLongitude;
 		protected Vector2d _centerMercator;
@@ -309,8 +308,6 @@ namespace Mapbox.Unity.Map
 
 			zoom = Mathf.Clamp(zoom, _options.locationOptions.MinZoom, _options.locationOptions.MaxZoom);
 
-			//so map will be snapped to zero using next new tile loaded
-			_worldHeightFixed = false;
 			float differenceInZoom = 0.0f;
 			bool isAtInitialZoom = false;
 			// Update map zoom, if it has changed.
@@ -527,10 +524,6 @@ namespace Mapbox.Unity.Map
 		{
 			var tile = _mapVisualizer.LoadTile(tileId, enableTileRightAway);
 			OnTileRegisteredToFactories(tile);
-			if (Options.placementOptions.snapMapToZero && !_worldHeightFixed)
-			{
-				_worldHeightFixed = true;
-			}
 		}
 
 		protected virtual void TileProvider_OnTileRemoved(UnwrappedTileId tileId)
@@ -556,7 +549,6 @@ namespace Mapbox.Unity.Map
 		protected virtual void InitializeMap(MapOptions options)
 		{
 			Options = options;
-			_worldHeightFixed = false;
 			_centerLatitudeLongitude = Conversions.StringToLatLon(options.locationOptions.latitudeLongitude);
 			_initialZoom = (int)options.locationOptions.zoom;
 

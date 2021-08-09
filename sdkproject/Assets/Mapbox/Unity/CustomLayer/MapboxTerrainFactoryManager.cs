@@ -134,6 +134,12 @@ namespace Mapbox.Unity.CustomLayer
 				if (cacheItem != null && cacheItem.Texture2D != null)
 				{
 					tile.SetParentTexture(parent, cacheItem.Texture2D, ShaderElevationTextureFieldName, ShaderElevationTextureScaleOffsetFieldName);
+
+					if (_isUsingShaderSolution)
+					{
+						tile.MeshRenderer.sharedMaterial.SetFloat("_TileScale", tile.TileScale);
+						tile.MeshRenderer.sharedMaterial.SetFloat("_ElevationMultiplier", _elevationSettings.requiredOptions.exaggerationFactor);
+					}
 					break;
 				}
 
