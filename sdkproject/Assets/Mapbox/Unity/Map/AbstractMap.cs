@@ -35,7 +35,7 @@ namespace Mapbox.Unity.Map
 		[SerializeField] private bool _initializeOnStart = true;
 
 		[SerializeField] protected HashSet<UnwrappedTileId> _currentExtent;
-		private List<UnwrappedTileId> tilesToProcess;
+		private List<UnwrappedTileId> _tilesToProcess = new List<UnwrappedTileId>();
 
 		protected bool _worldHeightFixed = false;
 		protected int _initialZoom;
@@ -43,7 +43,11 @@ namespace Mapbox.Unity.Map
 		protected Vector2d _centerMercator;
 		protected float _worldRelativeScale;
 		protected Vector3 _mapScaleFactor;
+		const float MIN_ZOOM = 0;
+		const float MAX_ZOOM = 20;
 
+		protected Dictionary<UnwrappedTileId, HashSet<UnwrappedTileId>> TileTracker = new Dictionary<UnwrappedTileId, HashSet<UnwrappedTileId>>();
+		protected HashSet<UnwrappedTileId> _destructionList = new HashSet<UnwrappedTileId>();
 		#endregion
 
 		#region Properties
@@ -51,7 +55,7 @@ namespace Mapbox.Unity.Map
 		{
 			get
 			{
-				if(_mapVisualizer == null)
+				if (_mapVisualizer == null)
 				{
 					CreateMapVisualizer();
 				}
@@ -142,7 +146,7 @@ namespace Mapbox.Unity.Map
 		/// <param name="zoom">Zoom.</param>
 		public virtual void Initialize(Vector2d latLon, int zoom)
 		{
-			tilesToProcess = new List<UnwrappedTileId>();
+			_tilesToProcess = new List<UnwrappedTileId>();
 
 			_initializeOnStart = false;
 			if (Options == null)
@@ -161,10 +165,10 @@ namespace Mapbox.Unity.Map
 			{
 				return;
 			}
-			if (TileProvider != null)
-			{
-				TileProvider.UpdateTileProvider();
-			}
+			// if (TileProvider != null)
+			// {
+			// 	TileProvider.UpdateTileProvider();
+			// }
 		}
 
 		public virtual void UpdateMap()
@@ -192,9 +196,11 @@ namespace Mapbox.Unity.Map
 		/// <param name="zoom">Zoom level.</param>
 		public virtual void UpdateMap(Vector2d latLon, float zoom)
 		{
-			if (zoom > 20 || zoom < 0)
-				return;
-			
+			if (zoom > MAX_ZOOM || zoom < MIN_ZOOM)
+			{
+				throw new Exception($"AbstractMap must stay within {MIN_ZOOM}, {MAX_ZOOM} zoom level.");
+			}
+
 			if (Application.isEditor && !Application.isPlaying)
 			{
 				return;
@@ -285,7 +291,7 @@ namespace Mapbox.Unity.Map
 
 		private void OnEnable()
 		{
-			tilesToProcess = new List<UnwrappedTileId>();
+			_tilesToProcess = new List<UnwrappedTileId>();
 			if (Options.tileMaterial == null)
 			{
 				Options.tileMaterial = new Material(Shader.Find("Standard"));
@@ -330,9 +336,26 @@ namespace Mapbox.Unity.Map
 			}
 			else
 			{
-				_mapVisualizer.OnTileFinished  -= OnTileFinished;
+				_mapVisualizer.OnTileFinished -= OnTileFinished;
 				_mapVisualizer.OnTileDisposing -= OnTileDisposing;
-				_mapVisualizer.OnTileFinished  += (t) => { OnTileFinished(t); };
+				_mapVisualizer.OnTileFinished += (t) =>
+			   {
+				   if (TileTracker.ContainsKey(t.UnwrappedTileId))
+				   {
+					   foreach (var tileId in TileTracker[t.UnwrappedTileId])
+					   {
+						   if (MapVisualizer.ActiveTiles.ContainsKey(tileId))
+						   {
+							   _destructionList.Remove(tileId);
+							   TileProvider_OnTileRemoved(tileId);
+						   }
+					   }
+
+					   TileTracker.Remove(t.UnwrappedTileId);
+				   }
+
+				   OnTileFinished(t);
+			   };
 				_mapVisualizer.OnTileDisposing += (t) => { OnTileDisposing(t); };
 			}
 		}
@@ -341,7 +364,24 @@ namespace Mapbox.Unity.Map
 		{
 			_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
 
-			_mapVisualizer.OnTileFinished  += t => { OnTileFinished(t); };
+			_mapVisualizer.OnTileFinished += (t) =>
+		   {
+			   if (TileTracker.ContainsKey(t.UnwrappedTileId))
+			   {
+				   foreach (var tileId in TileTracker[t.UnwrappedTileId])
+				   {
+					   if (MapVisualizer.ActiveTiles.ContainsKey(tileId))
+					   {
+						   TileProvider_OnTileRemoved(tileId);
+						   _destructionList.Remove(tileId);
+					   }
+				   }
+
+				   TileTracker.Remove(t.UnwrappedTileId);
+			   }
+
+			   OnTileFinished(t);
+		   };
 			_mapVisualizer.OnTileDisposing += t => { OnTileDisposing(t); };
 		}
 
@@ -358,7 +398,7 @@ namespace Mapbox.Unity.Map
 		{
 			if (Application.isPlaying)
 			{
-				if(coroutine)
+				if (coroutine)
 				{
 					StartCoroutine("SetupAccess");
 				}
@@ -590,44 +630,106 @@ namespace Mapbox.Unity.Map
 		private void TriggerTileRedrawForExtent(ExtentArgs currentExtent)
 		{
 			var activeTiles = _mapVisualizer.ActiveTiles;
-			tilesToProcess.Clear();
 
-			//remove tiles
+			_currentExtent = new HashSet<UnwrappedTileId>(currentExtent.ActiveTiles);
+
+			_tilesToProcess.Clear();
 			foreach (var item in activeTiles)
 			{
 				if (TileProvider.Cleanup(item.Key))
 				{
-					tilesToProcess.Add(item.Key);
+					_tilesToProcess.Add(item.Key);
 				}
 			}
-			foreach (var tile in tilesToProcess)
+
+			if (_tilesToProcess.Count > 0)
 			{
-				TileProvider_OnTileRemoved(tile);
+				foreach (var tileToRemove in _tilesToProcess)
+				{
+					if (currentExtent.ZoomState == ZoomState.ZoomOut)
+					{
+						if (currentExtent.ZoomOutTileRelationships != null && (currentExtent.ZoomOutTileRelationships.ContainsKey(tileToRemove)))
+						{
+							var parent = currentExtent.ZoomOutTileRelationships[tileToRemove];
+							//we add tile and parent duo to a list so we can remove child when parent is ready
+							if (!TileTracker.ContainsKey(parent))
+							{
+								TileTracker.Add(parent, new HashSet<UnwrappedTileId>());
+							}
+
+							if (!TileTracker[parent].Contains(tileToRemove))
+							{
+								TileTracker[parent].Add(tileToRemove);
+								_destructionList.Add(tileToRemove);
+							}
+
+							//we check if removed tile is actually already in list as parent.
+							//this happens when you zoom out too fast before a level is complete.
+							//so we merge lists and 2nd+ parent removes tile when it is done
+							if (TileTracker.ContainsKey(tileToRemove))
+							{
+								foreach (var subTileId in TileTracker[tileToRemove])
+								{
+									TileTracker[parent].Add(subTileId);
+								}
+								TileTracker.Remove(tileToRemove);
+								TileProvider_OnTileRemoved(tileToRemove);
+							}
+						}
+						else
+						{
+							//BaseRasterData being null means tile is not finished
+							//so we remove all non-finished tiles
+							//finished tiles will be removed by TileTracker logic
+							//if (!_activeTiles.ContainsKey(tileToRemove) || _activeTiles[tileToRemove].BaseRasterData == null)
+							if(!_destructionList.Contains(tileToRemove))
+							{
+								TileProvider_OnTileRemoved(tileToRemove);
+							}
+						}
+					}
+					else
+					{
+						if (!_destructionList.Contains(tileToRemove) || !currentExtent.Bounds.Overlap(Conversions.TileBounds(tileToRemove)))
+						{
+							TileProvider_OnTileRemoved(tileToRemove);
+						}
+					}
+				}
 			}
 
-			//reposition existing tile
 			foreach (var tile in activeTiles)
 			{
 				// Reposition tiles in case we panned.
 				TileProvider_OnTileRepositioned(tile.Key);
 			}
 
-			//add new tiles
-			tilesToProcess.Clear();
-			foreach (var tile in currentExtent.activeTiles)
+			_tilesToProcess.Clear();
+			foreach (var tile in _currentExtent)
 			{
 				if (!activeTiles.ContainsKey(tile))
 				{
-					tilesToProcess.Add(tile);
+					_tilesToProcess.Add(tile);
 				}
 			}
-			if (tilesToProcess.Count > 0)
+
+			if (_tilesToProcess.Count > 0)
 			{
-				OnTilesStarting(tilesToProcess);
-				foreach (var tileId in tilesToProcess)
+				OnTilesStarting(_tilesToProcess);
+				foreach (var tileId in _tilesToProcess)
 				{
 					_mapVisualizer.State = ModuleState.Working;
-					TileProvider_OnTileAdded(tileId, true);
+					TileProvider_OnTileAdded(tileId, currentExtent.ZoomState == ZoomState.ZoomIn);
+				}
+			}
+
+			_tilesToProcess.Clear();
+			foreach (var pair in TileTracker)
+			{
+				if (pair.Key.Z != (int) Zoom)
+				{
+					_tilesToProcess.Add(pair.Key);
+
 				}
 			}
 		}
@@ -669,7 +771,7 @@ namespace Mapbox.Unity.Map
 			{
 				tileScale = tile.TileScale;
 				var _rect = tile.Rect;
-				return tile.QueryHeightData((float)((_meters - _rect.Min).x / _rect.Size.x), (float)((_meters.y - _rect.Max.y) / _rect.Size.y));
+				return tile.QueryHeightData((float)((_meters - _rect.TopLeft).x / _rect.Size.x), (float)((_meters.y - _rect.BottomRight.y) / _rect.Size.y));
 			}
 			else
 			{

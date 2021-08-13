@@ -226,8 +226,8 @@ namespace Mapbox.Unity.Utilities
 			var _rect = Conversions.TileBounds(coordinateTileId);
 
 			//vectortile space point (0 - layerExtent)
-			var vectorTilePoint = new Vector2((float)((_meters - _rect.Min).x / _rect.Size.x) * layerExtent,
-											  (float)(layerExtent - ((_meters - _rect.Max).y / _rect.Size.y) * layerExtent));
+			var vectorTilePoint = new Vector2((float)((_meters - _rect.TopLeft).x / _rect.Size.x) * layerExtent,
+											  (float)(layerExtent - ((_meters - _rect.BottomRight).y / _rect.Size.y) * layerExtent));
 
 			return vectorTilePoint;
 		}

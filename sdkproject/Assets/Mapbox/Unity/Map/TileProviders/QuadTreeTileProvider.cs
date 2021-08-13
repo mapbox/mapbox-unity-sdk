@@ -8,9 +8,9 @@ using UnityEngine;
 
 namespace Mapbox.Unity.Map.TileProviders
 {
+
 	public class QuadTreeTileProvider : AbstractTileProvider
 	{
-		private const int MaxTileRequestLimit = 30;
 		private static readonly int HIT_POINTS_COUNT = 4;
 
 		private Plane _groundPlane;
@@ -56,7 +56,7 @@ namespace Mapbox.Unity.Map.TileProviders
 			_cbtpOptions.camera.transform.hasChanged = false;
 			_groundPlane = new Plane(Vector3.up, 0);
 			_shouldUpdate = true;
-			_currentExtent.activeTiles = new HashSet<UnwrappedTileId>();
+			_currentExtent.ActiveTiles = new HashSet<UnwrappedTileId>();
 
 			_zoomLevel = _map.Zoom;
 		}
@@ -68,18 +68,30 @@ namespace Mapbox.Unity.Map.TileProviders
 				return;
 			}
 
+			if (_zoomLevel < _map.Zoom)
+			{
+				_currentExtent.ZoomState = ZoomState.ZoomIn;
+			}
+			else if (_zoomLevel > _map.Zoom)
+			{
+				_currentExtent.ZoomState = ZoomState.ZoomOut;
+			}
+			else
+			{
+				_currentExtent.ZoomState = ZoomState.NoChange;
+			}
+
 			if ((int) _zoomLevel != (int) _map.Zoom)
 			{
-				_currentExtent.IsZoomingIn = (int) _zoomLevel < (int) _map.Zoom;
 
 				_viewPortWebMercBounds = getcurrentViewPortWebMerc();
 				var newTiles = GetWithWebMerc(_viewPortWebMercBounds, _map.AbsoluteZoom);
 				_currentExtent.ZoomOutTileRelationships = new Dictionary<UnwrappedTileId, UnwrappedTileId>();
 				_currentExtent.ZoomInTileRelationships = new Dictionary<UnwrappedTileId, UnwrappedTileId>();
 
-				foreach (var tile in _currentExtent.activeTiles)
+				foreach (var tile in _currentExtent.ActiveTiles)
 				{
-					if (_currentExtent.IsZoomingIn)
+					if (_currentExtent.ZoomState == ZoomState.ZoomIn)
 					{
 						var v1 = new UnwrappedTileId(tile.Z + 1, tile.X * 2, tile.Y * 2);
 						if (newTiles.Contains(v1))
@@ -102,7 +114,7 @@ namespace Mapbox.Unity.Map.TileProviders
 							_currentExtent.ZoomInTileRelationships.Add(v1, tile);
 						}
 					}
-					else
+					else if (_currentExtent.ZoomState == ZoomState.ZoomOut)
 					{
 						var parent = new UnwrappedTileId(tile.Z - 1, tile.X >> 1, tile.Y >> 1);
 						if (!newTiles.Contains(parent))
@@ -117,25 +129,20 @@ namespace Mapbox.Unity.Map.TileProviders
 					}
 				}
 
-				_zoomLevel = _map.Zoom;
+
 
 			}
 			else
 			{
 				//update viewport in case it was changed by switching zoom level
 				_viewPortWebMercBounds = getcurrentViewPortWebMerc();
-				var newTiles = GetWithWebMerc(_viewPortWebMercBounds, _map.AbsoluteZoom);
+				_currentExtent.Bounds = _viewPortWebMercBounds;
+				_currentExtent.ActiveTiles = GetWithWebMerc(_viewPortWebMercBounds, _map.AbsoluteZoom);
 
-				if (newTiles.Count < MaxTileRequestLimit)
-				{
-					_currentExtent.activeTiles = newTiles;
-					OnExtentChanged();
-				}
-				else
-				{
-					Debug.Log("Too many tiles in viewport, cancelling map update.");
-				}
 			}
+
+			_zoomLevel = _map.Zoom;
+			OnExtentChanged();
 		}
 
 		public HashSet<UnwrappedTileId> GetWithWebMerc(Vector2dBounds bounds, int zoom)
@@ -269,7 +276,7 @@ namespace Mapbox.Unity.Map.TileProviders
 
 		public override bool Cleanup(UnwrappedTileId tile)
 		{
-			return (!_currentExtent.activeTiles.Contains(tile));
+			return (!_currentExtent.ActiveTiles.Contains(tile));
 		}
 	}
 }

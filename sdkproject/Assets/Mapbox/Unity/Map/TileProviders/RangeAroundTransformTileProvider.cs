@@ -33,7 +33,7 @@ namespace Mapbox.Unity.Map.TileProviders
 			{
 				_initialized = true;
 			}
-			_currentExtent.activeTiles = new HashSet<UnwrappedTileId>();
+			_currentExtent.ActiveTiles = new HashSet<UnwrappedTileId>();
 			_map.OnInitialized += UpdateTileExtent;
 			_map.OnUpdated += UpdateTileExtent;
 		}
@@ -42,14 +42,14 @@ namespace Mapbox.Unity.Map.TileProviders
 		{
 			if (!_initialized) return;
 
-			_currentExtent.activeTiles.Clear();
+			_currentExtent.ActiveTiles.Clear();
 			_currentTile = TileCover.CoordinateToTileId(_map.WorldToGeoPosition(_rangeTileProviderOptions.targetTransform.localPosition), _map.AbsoluteZoom);
 
 			for (int x = _currentTile.X - _rangeTileProviderOptions.visibleBuffer; x <= (_currentTile.X + _rangeTileProviderOptions.visibleBuffer); x++)
 			{
 				for (int y = _currentTile.Y - _rangeTileProviderOptions.visibleBuffer; y <= (_currentTile.Y + _rangeTileProviderOptions.visibleBuffer); y++)
 				{
-					_currentExtent.activeTiles.Add(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
+					_currentExtent.ActiveTiles.Add(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
 				}
 			}
 			OnExtentChanged();

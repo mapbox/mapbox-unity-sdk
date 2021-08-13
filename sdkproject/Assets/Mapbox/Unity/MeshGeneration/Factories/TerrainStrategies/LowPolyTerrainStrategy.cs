@@ -72,10 +72,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			{
 				for (float x = 0; x < cap; x++)
 				{
-					var x1 = tile.TileScale * (float)(Mathd.Lerp(tile.Rect.Min.x, tile.Rect.Max.x, x / cap) - tile.Rect.Center.x);
-					var y1 = tile.TileScale * (float)(Mathd.Lerp(tile.Rect.Min.y, tile.Rect.Max.y, y / cap) - tile.Rect.Center.y);
-					var x2 = tile.TileScale * (float)(Mathd.Lerp(tile.Rect.Min.x, tile.Rect.Max.x, (x + 1) / cap) - tile.Rect.Center.x);
-					var y2 = tile.TileScale * (float)(Mathd.Lerp(tile.Rect.Min.y, tile.Rect.Max.y, (y + 1) / cap) - tile.Rect.Center.y);
+					var x1 = tile.TileScale * (float)(Mathd.Lerp(tile.Rect.TopLeft.x, tile.Rect.BottomRight.x, x / cap) - tile.Rect.Center.x);
+					var y1 = tile.TileScale * (float)(Mathd.Lerp(tile.Rect.TopLeft.y, tile.Rect.BottomRight.y, y / cap) - tile.Rect.Center.y);
+					var x2 = tile.TileScale * (float)(Mathd.Lerp(tile.Rect.TopLeft.x, tile.Rect.BottomRight.x, (x + 1) / cap) - tile.Rect.Center.x);
+					var y2 = tile.TileScale * (float)(Mathd.Lerp(tile.Rect.TopLeft.y, tile.Rect.BottomRight.y, (y + 1) / cap) - tile.Rect.Center.y);
 
 					var triStart = _newVertexList.Count;
 					_newVertexList.Add(new Vector3(x1, 0, y1));

@@ -28,7 +28,7 @@ namespace Mapbox.Utils
 		/// <value> The south latitude. </value>
 		public double South {
 			get {
-				return this.SouthWest.x;
+				return this.SouthWest.y;
 			}
 		}
 
@@ -36,7 +36,7 @@ namespace Mapbox.Utils
 		/// <value> The west longitude. </value>
 		public double West {
 			get {
-				return this.SouthWest.y;
+				return this.SouthWest.x;
 			}
 		}
 
@@ -44,7 +44,7 @@ namespace Mapbox.Utils
 		/// <value> The north latitude. </value>
 		public double North {
 			get {
-				return this.NorthEast.x;
+				return this.NorthEast.y;
 			}
 		}
 
@@ -52,7 +52,7 @@ namespace Mapbox.Utils
 		/// <value> The east longitude. </value>
 		public double East {
 			get {
-				return this.NorthEast.y;
+				return this.NorthEast.x;
 			}
 		}
 
@@ -168,6 +168,13 @@ namespace Mapbox.Utils
 		public override string ToString()
 		{
 			return string.Format("{0},{1}", this.SouthWest.ToString(), this.NorthEast.ToString());
+		}
+
+		public bool Overlap(RectD tileBounds)
+		{
+			var test = (tileBounds.TopLeft.x <= this.East && tileBounds.BottomRight.x >= this.West) &&
+			           (tileBounds.BottomRight.y <= this.North && tileBounds.TopLeft.y >= this.South);
+			return test;
 		}
 	}
 }

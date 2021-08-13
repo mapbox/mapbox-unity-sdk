@@ -48,9 +48,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			{
 				for (float y = 0; y < _sampleCount; y++)
 				{
-					var xx = Mathf.Lerp((float)tile.Rect.Min.x, ((float)tile.Rect.Min.x + (float)tile.Rect.Size.x),
+					var xx = Mathf.Lerp((float)tile.Rect.TopLeft.x, ((float)tile.Rect.TopLeft.x + (float)tile.Rect.Size.x),
 						x / (_sampleCount - 1));
-					var yy = Mathf.Lerp((float)tile.Rect.Max.y, ((float)tile.Rect.Max.y + (float)tile.Rect.Size.y),
+					var yy = Mathf.Lerp((float)tile.Rect.BottomRight.y, ((float)tile.Rect.BottomRight.y + (float)tile.Rect.Size.y),
 						y / (_sampleCount - 1));
 
 					var ll = Conversions.MetersToLatLon(new Vector2d(xx, yy));

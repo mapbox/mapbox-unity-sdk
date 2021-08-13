@@ -21,7 +21,7 @@ namespace Mapbox.Unity.Map.TileProviders
 			}
 
 			_initialized = true;
-			_currentExtent.activeTiles = new HashSet<UnwrappedTileId>();
+			_currentExtent.ActiveTiles = new HashSet<UnwrappedTileId>();
 		}
 
 		public override void UpdateTileExtent()
@@ -31,15 +31,15 @@ namespace Mapbox.Unity.Map.TileProviders
 				return;
 			}
 
-			_currentExtent.activeTiles.Clear();
+			_currentExtent.ActiveTiles.Clear();
 			var centerTile = TileCover.CoordinateToTileId(_map.CenterLatitudeLongitude, _map.AbsoluteZoom);
-			_currentExtent.activeTiles.Add(new UnwrappedTileId(_map.AbsoluteZoom, centerTile.X, centerTile.Y));
+			_currentExtent.ActiveTiles.Add(new UnwrappedTileId(_map.AbsoluteZoom, centerTile.X, centerTile.Y));
 
 			for (int x = (centerTile.X - _rangeTileProviderOptions.west); x <= (centerTile.X + _rangeTileProviderOptions.east); x++)
 			{
 				for (int y = (centerTile.Y - _rangeTileProviderOptions.north); y <= (centerTile.Y + _rangeTileProviderOptions.south); y++)
 				{
-					_currentExtent.activeTiles.Add(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
+					_currentExtent.ActiveTiles.Add(new UnwrappedTileId(_map.AbsoluteZoom, x, y));
 				}
 			}
 
@@ -47,7 +47,7 @@ namespace Mapbox.Unity.Map.TileProviders
 		}
 		public override bool Cleanup(UnwrappedTileId tile)
 		{
-			return (!_currentExtent.activeTiles.Contains(tile));
+			return (!_currentExtent.ActiveTiles.Contains(tile));
 		}
 
 	}

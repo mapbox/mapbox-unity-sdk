@@ -342,6 +342,11 @@ namespace Mapbox.Unity.Map
 
 		public virtual void DisposeTile(UnwrappedTileId tileId)
 		{
+			if (!ActiveTiles.ContainsKey(tileId))
+			{
+				return;
+			}
+			
 			var unityTile = ActiveTiles[tileId];
 
 			if (unityTile != null)

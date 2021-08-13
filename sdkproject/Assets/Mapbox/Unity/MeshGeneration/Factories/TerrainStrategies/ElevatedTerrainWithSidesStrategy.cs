@@ -94,8 +94,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				{
 					var xrat = x / (_sampleCount - 1);
 
-					var xx = Mathd.Lerp(tile.Rect.Min.x, tile.Rect.Max.x, xrat);
-					var yy = Mathd.Lerp(tile.Rect.Min.y, tile.Rect.Max.y, yrat);
+					var xx = Mathd.Lerp(tile.Rect.TopLeft.x, tile.Rect.BottomRight.x, xrat);
+					var yy = Mathd.Lerp(tile.Rect.TopLeft.y, tile.Rect.BottomRight.y, yrat);
 
 					_newVertexList.Add(new Vector3(
 						(float)(xx - tile.Rect.Center.x) * tile.TileScale,

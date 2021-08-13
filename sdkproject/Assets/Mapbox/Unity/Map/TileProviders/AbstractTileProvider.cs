@@ -3,18 +3,27 @@ using System.Collections.Generic;
 using Mapbox.Map;
 using Mapbox.Unity.DataContainers;
 using Mapbox.Unity.Map.Interfaces;
+using Mapbox.Utils;
 using UnityEngine;
 
 namespace Mapbox.Unity.Map.TileProviders
 {
+	public enum ZoomState
+	{
+		ZoomIn,
+		NoChange,
+		ZoomOut
+
+	}
 	public class ExtentArgs : EventArgs
 	{
 		//TODO: Override GetHashCode for UnwrappedTileId
-		public HashSet<UnwrappedTileId> activeTiles;
+		public HashSet<UnwrappedTileId> ActiveTiles;
 
 		public Dictionary<UnwrappedTileId, UnwrappedTileId> ZoomOutTileRelationships;
 		public Dictionary<UnwrappedTileId, UnwrappedTileId> ZoomInTileRelationships;
-		public bool IsZoomingIn = false;
+		public ZoomState ZoomState = ZoomState.NoChange;
+		public Vector2dBounds Bounds;
 	}
 
 	public abstract class AbstractTileProvider : MonoBehaviour, ITileProvider
