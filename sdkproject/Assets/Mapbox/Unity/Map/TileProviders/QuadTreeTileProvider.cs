@@ -129,8 +129,7 @@ namespace Mapbox.Unity.Map.TileProviders
 					}
 				}
 
-
-
+				_currentExtent.ActiveTiles = newTiles;
 			}
 			else
 			{

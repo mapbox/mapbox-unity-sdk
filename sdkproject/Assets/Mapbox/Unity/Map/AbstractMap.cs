@@ -344,11 +344,8 @@ namespace Mapbox.Unity.Map
 				   {
 					   foreach (var tileId in TileTracker[t.UnwrappedTileId])
 					   {
-						   if (MapVisualizer.ActiveTiles.ContainsKey(tileId))
-						   {
-							   _destructionList.Remove(tileId);
-							   TileProvider_OnTileRemoved(tileId);
-						   }
+						   _destructionList.Remove(tileId);
+						   TileProvider_OnTileRemoved(tileId);
 					   }
 
 					   TileTracker.Remove(t.UnwrappedTileId);
@@ -356,7 +353,22 @@ namespace Mapbox.Unity.Map
 
 				   OnTileFinished(t);
 			   };
-				_mapVisualizer.OnTileDisposing += (t) => { OnTileDisposing(t); };
+				_mapVisualizer.OnTileDisposing += (t) =>
+				{
+					if (TileTracker.ContainsKey(t.UnwrappedTileId))
+					{
+						foreach (var tileId in TileTracker[t.UnwrappedTileId])
+						{
+
+							_destructionList.Remove(tileId);
+							TileProvider_OnTileRemoved(tileId);
+						}
+
+						TileTracker.Remove(t.UnwrappedTileId);
+					}
+
+					OnTileDisposing(t);
+				};
 			}
 		}
 
@@ -630,72 +642,46 @@ namespace Mapbox.Unity.Map
 		private void TriggerTileRedrawForExtent(ExtentArgs currentExtent)
 		{
 			var activeTiles = _mapVisualizer.ActiveTiles;
-
 			_currentExtent = new HashSet<UnwrappedTileId>(currentExtent.ActiveTiles);
 
-			_tilesToProcess.Clear();
-			foreach (var item in activeTiles)
+			var tilesToRemove = new List<UnwrappedTileId>();
+			foreach (var activeTile in _mapVisualizer.ActiveTiles)
 			{
-				if (TileProvider.Cleanup(item.Key))
+				var tile = activeTile.Value;
+				if (tile.CurrentZoom < AbsoluteZoom || !currentExtent.Bounds.Overlap(tile.Rect))
 				{
-					_tilesToProcess.Add(item.Key);
+					tilesToRemove.Add(activeTile.Key);
 				}
-			}
-
-			if (_tilesToProcess.Count > 0)
-			{
-				foreach (var tileToRemove in _tilesToProcess)
+				else
 				{
-					if (currentExtent.ZoomState == ZoomState.ZoomOut)
+					if (tile.CurrentZoom > (int) Zoom)
 					{
-						if (currentExtent.ZoomOutTileRelationships != null && (currentExtent.ZoomOutTileRelationships.ContainsKey(tileToRemove)))
+						UnwrappedTileId parent = tile.UnwrappedTileId;
+						for (int i = 0; i < (tile.CurrentZoom - (int)Zoom); i++)
 						{
-							var parent = currentExtent.ZoomOutTileRelationships[tileToRemove];
-							//we add tile and parent duo to a list so we can remove child when parent is ready
+							parent = parent.Parent;
+						}
+
+						if (currentExtent.ActiveTiles.Contains(parent))
+						{
 							if (!TileTracker.ContainsKey(parent))
 							{
 								TileTracker.Add(parent, new HashSet<UnwrappedTileId>());
 							}
 
-							if (!TileTracker[parent].Contains(tileToRemove))
-							{
-								TileTracker[parent].Add(tileToRemove);
-								_destructionList.Add(tileToRemove);
-							}
-
-							//we check if removed tile is actually already in list as parent.
-							//this happens when you zoom out too fast before a level is complete.
-							//so we merge lists and 2nd+ parent removes tile when it is done
-							if (TileTracker.ContainsKey(tileToRemove))
-							{
-								foreach (var subTileId in TileTracker[tileToRemove])
-								{
-									TileTracker[parent].Add(subTileId);
-								}
-								TileTracker.Remove(tileToRemove);
-								TileProvider_OnTileRemoved(tileToRemove);
-							}
+							TileTracker[parent].Add(tile.UnwrappedTileId);
 						}
 						else
 						{
-							//BaseRasterData being null means tile is not finished
-							//so we remove all non-finished tiles
-							//finished tiles will be removed by TileTracker logic
-							//if (!_activeTiles.ContainsKey(tileToRemove) || _activeTiles[tileToRemove].BaseRasterData == null)
-							if(!_destructionList.Contains(tileToRemove))
-							{
-								TileProvider_OnTileRemoved(tileToRemove);
-							}
-						}
-					}
-					else
-					{
-						if (!_destructionList.Contains(tileToRemove) || !currentExtent.Bounds.Overlap(Conversions.TileBounds(tileToRemove)))
-						{
-							TileProvider_OnTileRemoved(tileToRemove);
+							Debug.Log("miscalculation?");
 						}
 					}
 				}
+			}
+
+			foreach (var tileId in tilesToRemove)
+			{
+				TileProvider_OnTileRemoved(tileId);
 			}
 
 			foreach (var tile in activeTiles)
@@ -720,16 +706,6 @@ namespace Mapbox.Unity.Map
 				{
 					_mapVisualizer.State = ModuleState.Working;
 					TileProvider_OnTileAdded(tileId, currentExtent.ZoomState == ZoomState.ZoomIn);
-				}
-			}
-
-			_tilesToProcess.Clear();
-			foreach (var pair in TileTracker)
-			{
-				if (pair.Key.Z != (int) Zoom)
-				{
-					_tilesToProcess.Add(pair.Key);
-
 				}
 			}
 		}
