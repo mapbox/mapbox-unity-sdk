@@ -5,23 +5,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using Mapbox.Map;
 using Mapbox.Unity.Utilities;
-using Unity.UNetWeaver;
 
 namespace Mapbox.Unity
 {
 	public class TaskManager
-    {
-        public Action<TaskWrapper> TaskStarted = (t) => { };
+	{
+		public Action<TaskWrapper> TaskStarted = (t) => { };
 		public int ActiveTaskLimit = 3;
 		protected HashSet<TaskWrapper> _runningTasks;
 		protected Queue<TaskWrapper> _taskQueue;
-        //protected PriorityQueue<TaskWrapper, int> _taskPriorityQueue;
+		//protected PriorityQueue<TaskWrapper, int> _taskPriorityQueue;
 
 		public TaskManager()
 		{
 			_runningTasks = new HashSet<TaskWrapper>();
 			_taskQueue = new Queue<TaskWrapper>();
-            //_taskPriorityQueue = new PriorityQueue<TaskWrapper, int>();
+			//_taskPriorityQueue = new PriorityQueue<TaskWrapper, int>();
 			Runnable.Run(UpdateTaskManager());
 		}
 
@@ -32,6 +31,11 @@ namespace Mapbox.Unity
 				while (_taskQueue.Count > 0 && _runningTasks.Count < ActiveTaskLimit)
 				{
 					var wrapper = _taskQueue.Dequeue();
+					if (wrapper == null)
+					{
+						continue;
+					}
+					
 					var task = Task.Run(wrapper.Action);
 					_runningTasks.Add(wrapper);
 					wrapper.Cancelled += (w) =>
@@ -42,25 +46,25 @@ namespace Mapbox.Unity
 					{
 						ContinueWrapper(t, wrapper);
 					}, TaskScheduler.FromCurrentSynchronizationContext());
-                    TaskStarted(wrapper);
+					TaskStarted(wrapper);
 					yield return null;
 
 				}
 
-                // while (_taskPriorityQueue.Count > 0 && _runningTasks.Count < ActiveTaskLimit)
-                // {
-                //     var wrapper = _taskPriorityQueue.Dequeue();
-                //     var task = Task.Run(wrapper.Action);
-                //     _runningTasks.Add(wrapper);
-                //     wrapper.Cancelled += (w) =>
-                //     {
-                //         _runningTasks.Remove(w);
-                //     };
-                //     task.ContinueWith((t) => { ContinueWrapper(t, wrapper); }, TaskScheduler.FromCurrentSynchronizationContext());
-                //     TaskStarted(wrapper);
-                //     yield return null;
-                //
-                // }
+				// while (_taskPriorityQueue.Count > 0 && _runningTasks.Count < ActiveTaskLimit)
+				// {
+				//     var wrapper = _taskPriorityQueue.Dequeue();
+				//     var task = Task.Run(wrapper.Action);
+				//     _runningTasks.Add(wrapper);
+				//     wrapper.Cancelled += (w) =>
+				//     {
+				//         _runningTasks.Remove(w);
+				//     };
+				//     task.ContinueWith((t) => { ContinueWrapper(t, wrapper); }, TaskScheduler.FromCurrentSynchronizationContext());
+				//     TaskStarted(wrapper);
+				//     yield return null;
+				//
+				// }
 
 				yield return null;
 			}
@@ -78,9 +82,12 @@ namespace Mapbox.Unity
 
 		public void AddTask(TaskWrapper taskWrapper)
 		{
-			_taskQueue.Enqueue(taskWrapper);
-            //_taskPriorityQueue.Enqueue(taskWrapper, priority);
-        }
+			if (taskWrapper != null)
+			{
+				_taskQueue.Enqueue(taskWrapper);
+			}
+			//_taskPriorityQueue.Enqueue(taskWrapper, priority);
+		}
 	}
 
 	public class TaskWrapper
@@ -93,13 +100,13 @@ namespace Mapbox.Unity
 		public Action<Task> ContinueWith;
 
 #if UNITY_EDITOR
-        public string Info;
+		public string Info;
 #endif
-    }
+	}
 
 	public class EditorTaskManager : TaskManager
 	{
 		public int ActiveTaskCount => _runningTasks.Count;
-        public int TaskQueueSize => _taskQueue.Count; //_taskQueue.Count;
-    }
+		public int TaskQueueSize => _taskQueue.Count; //_taskQueue.Count;
+	}
 }
