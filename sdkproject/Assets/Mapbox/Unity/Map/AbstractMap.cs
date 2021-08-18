@@ -355,18 +355,6 @@ namespace Mapbox.Unity.Map
 			   };
 				_mapVisualizer.OnTileDisposing += (t) =>
 				{
-					if (TileTracker.ContainsKey(t.UnwrappedTileId))
-					{
-						foreach (var tileId in TileTracker[t.UnwrappedTileId])
-						{
-
-							_destructionList.Remove(tileId);
-							TileProvider_OnTileRemoved(tileId);
-						}
-
-						TileTracker.Remove(t.UnwrappedTileId);
-					}
-
 					OnTileDisposing(t);
 				};
 			}
@@ -652,29 +640,32 @@ namespace Mapbox.Unity.Map
 				{
 					tilesToRemove.Add(activeTile.Key);
 				}
-				else
+				else if (tile.CurrentZoom > (int) Zoom)
 				{
-					if (tile.CurrentZoom > (int) Zoom)
+					UnwrappedTileId parent = tile.UnwrappedTileId;
+					for (int i = 0; i < (tile.CurrentZoom - (int)Zoom); i++)
 					{
-						UnwrappedTileId parent = tile.UnwrappedTileId;
-						for (int i = 0; i < (tile.CurrentZoom - (int)Zoom); i++)
+						parent = parent.Parent;
+					}
+
+					if (tile.BaseRasterData == null || tile.BaseRasterData.CurrentTileState != TileState.Loaded)
+					{
+						tilesToRemove.Add(tile.UnwrappedTileId);
+					}
+					else if (currentExtent.ActiveTiles.Contains(parent))
+					{
+						if (!TileTracker.ContainsKey(parent))
 						{
-							parent = parent.Parent;
+							TileTracker.Add(parent, new HashSet<UnwrappedTileId>());
 						}
-
-						if (currentExtent.ActiveTiles.Contains(parent))
+						if (!TileTracker[parent].Contains(tile.UnwrappedTileId))
 						{
-							if (!TileTracker.ContainsKey(parent))
-							{
-								TileTracker.Add(parent, new HashSet<UnwrappedTileId>());
-							}
-
 							TileTracker[parent].Add(tile.UnwrappedTileId);
 						}
-						else
-						{
-							Debug.Log("miscalculation?");
-						}
+					}
+					else
+					{
+						Debug.Log("miscalculation?");
 					}
 				}
 			}
