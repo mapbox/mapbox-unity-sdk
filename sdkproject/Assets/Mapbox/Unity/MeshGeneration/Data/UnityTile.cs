@@ -157,10 +157,10 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			Tiles.Clear();
 		}
 
-		public void SetHeightData(RasterTile rasterTile, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false, Action<UnityTile> callback = null)
+		public void SetHeightData(RasterTile terrainTile, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false, Action<UnityTile> callback = null)
 		{
 			//reset height data
-			if (rasterTile == null || rasterTile.Texture2D == null)
+			if (terrainTile == null || terrainTile.Texture2D == null)
 			{
 				HeightData = new float[_heightDataResolution * _heightDataResolution];
 				return;
@@ -171,27 +171,27 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				HeightData = new float[_heightDataResolution * _heightDataResolution];
 			}
 
-			_terrainTile = rasterTile;
+			_terrainTile = terrainTile;
 
-			var tileId = rasterTile.Id;
+			var tileId = terrainTile.Id;
 
 			if (SystemInfo.supportsAsyncGPUReadback)
 			{
-				AsyncGpuReadbackForElevation(rasterTile, heightMultiplier, useRelative, callback, tileId);
+				AsyncGpuReadbackForElevation(terrainTile, heightMultiplier, useRelative, callback, tileId);
 			}
 			else
 			{
-				SyncReadForElevation(rasterTile, heightMultiplier, useRelative, callback);
+				SyncReadForElevation(terrainTile, heightMultiplier, useRelative, callback);
 			}
 		}
 
-		private void SyncReadForElevation(RasterTile rasterTile, float heightMultiplier, bool useRelative, Action<UnityTile> callback)
+		private void SyncReadForElevation(RasterTile terrainTile, float heightMultiplier, bool useRelative, Action<UnityTile> callback)
 		{
-			_rasterTile = rasterTile;
-			byte[] rgbData = _rasterTile.Texture2D.GetRawTextureData();
+			_terrainTile = terrainTile;
+			byte[] rgbData = _terrainTile.Texture2D.GetRawTextureData();
 			//var rgbData = _heightTexture.GetRawTextureData<Color32>();
 			var relativeScale = useRelative ? _relativeScale : 1f;
-			var width = _rasterTile.Texture2D.width;
+			var width = _terrainTile.Texture2D.width;
 			for (float yy = 0; yy < _heightDataResolution; yy++)
 			{
 				for (float xx = 0; xx < _heightDataResolution; xx++)
@@ -218,13 +218,13 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				callback(this);
 			}
 
-			CheckFinishedCondition(_rasterTile);
+			CheckFinishedCondition(_terrainTile);
 		}
 
-		private void AsyncGpuReadbackForElevation(RasterTile rasterTile, float heightMultiplier, bool useRelative, Action<UnityTile> callback, CanonicalTileId tileId)
+		private void AsyncGpuReadbackForElevation(RasterTile terrainTile, float heightMultiplier, bool useRelative, Action<UnityTile> callback, CanonicalTileId tileId)
 		{
-			_rasterTile = rasterTile;
-			AsyncGPUReadback.Request(_rasterTile.Texture2D, 0, (t) =>
+			_terrainTile = terrainTile;
+			AsyncGPUReadback.Request(_terrainTile.Texture2D, 0, (t) =>
 			{
 				if (CanonicalTileId != tileId || IsRecycled)
 				{
@@ -271,7 +271,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					callback(this);
 				}
 
-				CheckFinishedCondition(_rasterTile);
+				CheckFinishedCondition(_terrainTile);
 			});
 		}
 
