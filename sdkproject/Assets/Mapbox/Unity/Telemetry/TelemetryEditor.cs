@@ -80,6 +80,8 @@ namespace Mapbox.Unity.Telemetry
 
 			postRequest.downloadHandler = new DownloadHandlerBuffer();
 			postRequest.uploadHandler = new UploadHandlerRaw(bodyRaw);
+			
+			postRequest.uploadHandler.Dispose();
 
 			yield return postRequest.SendWebRequest();
 
