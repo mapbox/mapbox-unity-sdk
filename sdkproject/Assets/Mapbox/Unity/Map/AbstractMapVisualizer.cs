@@ -340,6 +340,17 @@ namespace Mapbox.Unity.Map
 			return unityTile;
 		}
 
+		public virtual void StopTile(UnityTile unityTile)
+		{
+			if (unityTile != null)
+			{
+				foreach (var factory in Factories)
+				{
+					factory.Unregister(unityTile);
+				}
+			}
+		}
+
 		public virtual void DisposeTile(UnwrappedTileId tileId)
 		{
 			if (!ActiveTiles.ContainsKey(tileId))

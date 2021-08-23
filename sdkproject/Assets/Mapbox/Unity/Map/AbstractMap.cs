@@ -648,11 +648,13 @@ namespace Mapbox.Unity.Map
 						parent = parent.Parent;
 					}
 
-					if (tile.BaseRasterData == null || tile.BaseRasterData.CurrentTileState != TileState.Loaded)
+					if ((tile.BaseRasterData == null || tile.BaseRasterData.CurrentTileState != TileState.Loaded))
 					{
-						tilesToRemove.Add(tile.UnwrappedTileId);
+						_mapVisualizer.StopTile(tile);
+						//tilesToRemove.Add(tile.UnwrappedTileId);
 					}
-					else if (currentExtent.ActiveTiles.Contains(parent))
+
+					if (currentExtent.ActiveTiles.Contains(parent))
 					{
 						if (!TileTracker.ContainsKey(parent))
 						{
