@@ -639,19 +639,21 @@ namespace Mapbox.Unity.Map
 				if (tile.CurrentZoom < AbsoluteZoom || !currentExtent.Bounds.Overlap(tile.Rect))
 				{
 					tilesToRemove.Add(activeTile.Key);
+					TileTracker.Remove(activeTile.Key);
 				}
 				else if (tile.CurrentZoom > (int) Zoom)
 				{
+					if ((tile.BaseRasterData == null || tile.BaseRasterData.CurrentTileState != TileState.Loaded))
+					{
+						_mapVisualizer.StopTile(tile);
+						TileTracker.Remove(tile.UnwrappedTileId);
+						//tilesToRemove.Add(tile.UnwrappedTileId);
+					}
+
 					UnwrappedTileId parent = tile.UnwrappedTileId;
 					for (int i = 0; i < (tile.CurrentZoom - (int)Zoom); i++)
 					{
 						parent = parent.Parent;
-					}
-
-					if ((tile.BaseRasterData == null || tile.BaseRasterData.CurrentTileState != TileState.Loaded))
-					{
-						_mapVisualizer.StopTile(tile);
-						//tilesToRemove.Add(tile.UnwrappedTileId);
 					}
 
 					if (currentExtent.ActiveTiles.Contains(parent))

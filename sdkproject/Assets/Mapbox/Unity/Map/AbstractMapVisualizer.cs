@@ -317,10 +317,7 @@ namespace Mapbox.Unity.Map
 			var unityTile = _tilePool.GetObject();
 
 			unityTile.Initialize(_map, tileId, TerrainLayer.IsLayerActive && TerrainLayer.ElevationType != ElevationLayerType.FlatTerrain);
-			if (enableTile)
-			{
-				unityTile.gameObject.SetActive(true);
-			}
+
 			PlaceTile(tileId, unityTile, _map);
 
 			// Don't spend resources naming objects, as you shouldn't find objects by name anyway!
@@ -336,6 +333,11 @@ namespace Mapbox.Unity.Map
 			}
 
 			unityTile.SetFinishCondition();
+
+			if (enableTile && unityTile.BackgroundImageInUse)
+			{
+				unityTile.gameObject.SetActive(true);
+			}
 
 			return unityTile;
 		}

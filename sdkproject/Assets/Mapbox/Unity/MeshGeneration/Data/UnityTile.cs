@@ -39,6 +39,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public HashSet<Tile> Tiles = new HashSet<Tile>();
 		private HashSet<Tile> _finishConditionTiles = new HashSet<Tile>();
 		public bool IsRecycled = false;
+		public bool BackgroundImageInUse = false;
 
 		#region CachedUnityComponents
 		MeshRenderer _meshRenderer;
@@ -148,6 +149,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 			gameObject.SetActive(false);
 			IsRecycled = true;
+			BackgroundImageInUse = false;
 
 			Cancel();
 
@@ -318,6 +320,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			MeshRenderer.sharedMaterial.mainTexture = rasterTile.Texture2D;
 			MeshRenderer.sharedMaterial.mainTextureScale = Unity.Constants.Math.Vector3One;
 			MeshRenderer.sharedMaterial.mainTextureOffset = Unity.Constants.Math.Vector3Zero;
+			BackgroundImageInUse = false;
 
 			CheckFinishedCondition(_rasterTile);
 		}
@@ -483,6 +486,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			{
 				MeshRenderer.sharedMaterial.SetVector(textureScaleOffsetName, new Vector4(scale, scale, offsetX, offsetY));
 			}
+
+			BackgroundImageInUse = (parentTexture != null);
 		}
 
 		private void CheckFinishedCondition(Tile tile)
