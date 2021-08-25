@@ -645,9 +645,15 @@ namespace Mapbox.Unity.Map
 				{
 					if ((tile.BaseRasterData == null || tile.BaseRasterData.CurrentTileState != TileState.Loaded))
 					{
-						_mapVisualizer.StopTile(tile);
+						if (tile.BackgroundImageInUse)
+						{
+							_mapVisualizer.StopTile(tile);
+						}
+						else
+						{
+							tilesToRemove.Add(tile.UnwrappedTileId);
+						}
 						TileTracker.Remove(tile.UnwrappedTileId);
-						//tilesToRemove.Add(tile.UnwrappedTileId);
 					}
 
 					UnwrappedTileId parent = tile.UnwrappedTileId;
