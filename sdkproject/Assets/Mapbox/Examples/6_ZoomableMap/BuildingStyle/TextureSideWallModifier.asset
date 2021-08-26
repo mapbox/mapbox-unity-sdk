@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Active: 1
   _options:
-    texturingType: 2
-    atlasInfo: {fileID: 11400000, guid: c422f39ca8fe566479230c87805b3301, type: 2}
+    texturingType: 0
+    atlasInfo: {fileID: 0}
     extrusionType: 1
     extrusionGeometryType: 0
     propertyName: height
@@ -23,5 +23,5 @@ MonoBehaviour:
     minimumHeight: 0
     maximumHeight: 0
     extrusionScaleFactor: 1
-  _centerSegments: 1
-  _separateSubmesh: 1
+  _centerSegments: 0
+  _separateSubmesh: 0

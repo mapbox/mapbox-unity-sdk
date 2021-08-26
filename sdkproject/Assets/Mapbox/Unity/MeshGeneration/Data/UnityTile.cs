@@ -338,6 +338,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			{
 				_createMeshCallback(this);
 			}
+
+			CheckFinishedCondition(_vectorTile);
 		}
 
 		/// <summary>
