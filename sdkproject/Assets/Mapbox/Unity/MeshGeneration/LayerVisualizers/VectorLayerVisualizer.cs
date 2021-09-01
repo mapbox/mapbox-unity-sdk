@@ -103,6 +103,14 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			ClearIdsOnUnregister(tile);
 
 			ClearObjectOnUnregister(tile);
+
+			if (_tasks.ContainsKey(tile.CanonicalTileId))
+			{
+				foreach (var taskWrapper in _tasks[tile.CanonicalTileId])
+				{
+					MapboxAccess.Instance.TaskManager.CancelTask(taskWrapper);
+				}
+			}
 		}
 
 		public override void Clear()

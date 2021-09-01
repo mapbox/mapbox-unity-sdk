@@ -13,6 +13,8 @@ namespace Mapbox.Unity
 		public Action<TaskWrapper> TaskStarted = (t) => { };
 		public int ActiveTaskLimit = 3;
 		protected HashSet<TaskWrapper> _runningTasks;
+
+		protected HashSet<TaskWrapper> _tasksInQueue;
 		protected Queue<TaskWrapper> _taskQueue;
 		//protected PriorityQueue<TaskWrapper, int> _taskPriorityQueue;
 
@@ -20,6 +22,7 @@ namespace Mapbox.Unity
 		{
 			_runningTasks = new HashSet<TaskWrapper>();
 			_taskQueue = new Queue<TaskWrapper>();
+			_tasksInQueue = new HashSet<TaskWrapper>();
 			//_taskPriorityQueue = new PriorityQueue<TaskWrapper, int>();
 			Runnable.Run(UpdateTaskManager());
 		}
@@ -31,9 +34,13 @@ namespace Mapbox.Unity
 				while (_taskQueue.Count > 0 && _runningTasks.Count < ActiveTaskLimit)
 				{
 					var wrapper = _taskQueue.Dequeue();
-					if (wrapper == null)
+					if (wrapper == null || !_tasksInQueue.Contains(wrapper))
 					{
 						continue;
+					}
+					else
+					{
+						_tasksInQueue.Remove(wrapper);
 					}
 					
 					var task = Task.Run(wrapper.Action);
@@ -47,8 +54,6 @@ namespace Mapbox.Unity
 						ContinueWrapper(t, wrapper);
 					}, TaskScheduler.FromCurrentSynchronizationContext());
 					TaskStarted(wrapper);
-					yield return null;
-
 				}
 
 				// while (_taskPriorityQueue.Count > 0 && _runningTasks.Count < ActiveTaskLimit)
@@ -84,9 +89,18 @@ namespace Mapbox.Unity
 		{
 			if (taskWrapper != null)
 			{
+				_tasksInQueue.Add(taskWrapper);
 				_taskQueue.Enqueue(taskWrapper);
 			}
 			//_taskPriorityQueue.Enqueue(taskWrapper, priority);
+		}
+
+		public void CancelTask(TaskWrapper task)
+		{
+			if (_tasksInQueue.Contains(task))
+			{
+				_tasksInQueue.Remove(task);
+			}
 		}
 	}
 

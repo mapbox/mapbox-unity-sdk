@@ -15,6 +15,8 @@ namespace Mapbox.Platform.Cache
         private IFileCache _textureFileCache;
         private SQLiteCache _sqLiteCache;
 
+        private Dictionary<int, TaskWrapper> _tileGetTasks = new Dictionary<int, TaskWrapper>();
+
         public MapboxCacheManager(MemoryCache memoryCache, FileCache fileCache = null, SQLiteCache sqliteCache = null)
         {
             _memoryCache = memoryCache;
@@ -101,39 +103,46 @@ namespace Mapbox.Platform.Cache
             var localCopy = tile;
             CacheItem cacheItem = null;
 
-            MapboxAccess.Instance.TaskManager.AddTask(
-                new TaskWrapper()
+            var taskKey = tileId.GenerateKey(tilesetId);
+            var task = new TaskWrapper()
+            {
+                Action = () =>
                 {
-                    Action = () =>
+                    cacheItem = _sqLiteCache.Get(localTilesetId, localTileId);
+                    if (cacheItem.Data != null)
                     {
-                        cacheItem = _sqLiteCache.Get(localTilesetId, localTileId);
-                        if (cacheItem.Data != null)
-                        {
-                            localCopy.SetByteData(cacheItem.Data);
-                        }
-                    },
-                    ContinueWith = (t) =>
+                        localCopy.SetByteData(cacheItem.Data);
+                    }
+                },
+                ContinueWith = (t) =>
+                {
+                    if(_tileGetTasks.ContainsKey(taskKey))
                     {
-                        if (t.Exception != null)
-                        {
-                            callback(null);
-                        }
-                        else
-                        {
+                        _tileGetTasks.Remove(taskKey);
+                    }
+
+                    if (t.Exception != null)
+                    {
+                        callback(null);
+                    }
+                    else
+                    {
 #if UNITY_EDITOR
-                            localCopy.FromCache = CacheType.SqliteCache;
-                            cacheItem.From = localCopy.FromCache;
+                        localCopy.FromCache = CacheType.SqliteCache;
+                        cacheItem.From = localCopy.FromCache;
 #endif
-                            localCopy.ETag = cacheItem.ETag;
-                            cacheItem.Tile = localCopy;
-                            callback(cacheItem);
-                        }
-                    },
-                    TileId = localTileId,
+                        localCopy.ETag = cacheItem.ETag;
+                        cacheItem.Tile = localCopy;
+                        callback(cacheItem);
+                    }
+                },
+                TileId = localTileId,
 #if UNITY_EDITOR
-                    Info = string.Format("{0} - {1} - {2}", "MapboxCacheManager.GetVectorItemFromSqlite", tilesetId, tileId)
+                Info = string.Format("{0} - {1} - {2}", "MapboxCacheManager.GetVectorItemFromSqlite", tilesetId, tileId)
 #endif
-                });
+            };
+            _tileGetTasks.Add(taskKey, task);
+            MapboxAccess.Instance.TaskManager.AddTask(task);
 
             // if (cacheItem != null)
             // {
@@ -143,8 +152,6 @@ namespace Mapbox.Platform.Cache
             //kept callback behaviour from texture operations here as we'll most likely need to change this to async
             //either due to sqlite read or vector tile decompressing
             //so it's not async or using the callback thing properly at the moment
-
-
         }
 
         public void AddTextureItem(string tilesetId, CanonicalTileId tileId, TextureCacheItem textureCacheItem, bool forceInsert)
@@ -318,8 +325,15 @@ namespace Mapbox.Platform.Cache
 
         public void TileDisposed(UnityTile tile, string tilesetId)
         {
+            var key = tile.CanonicalTileId.GenerateKey(tilesetId);
             _memoryCache?.TileDisposed(tile, tilesetId);
             _textureFileCache?.TileDisposed(tile, tilesetId);
+
+            if (_tileGetTasks.ContainsKey(key))
+            {
+                MapboxAccess.Instance.TaskManager.CancelTask(_tileGetTasks[key]);
+                _tileGetTasks.Remove(key);
+            }
         }
     }
 }

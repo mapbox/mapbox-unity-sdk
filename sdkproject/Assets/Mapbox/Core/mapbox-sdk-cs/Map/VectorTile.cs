@@ -69,6 +69,8 @@ namespace Mapbox.Map
 			get { return this.byteData; }
 		}
 
+		private TaskWrapper _parseTask;
+
 		/// <summary> Gets the vector decoded using Mapbox.VectorTile library. </summary>
 		/// <value> The GeoJson data. </value>
 		public Mapbox.VectorTile.VectorTile Data
@@ -141,32 +143,34 @@ namespace Mapbox.Map
 				// * Mapbox.Map.VectorTile.ParseTileData() already adds any exception to the list
 				// * Mapbox.Map.RasterTile.ParseTileData() doesn't do any parsing
 
-				MapboxAccess.Instance.TaskManager.AddTask(
-					new TaskWrapper()
+				_parseTask = new TaskWrapper()
+				{
+					Action = () =>
 					{
-						Action = () =>
+						byteData = response.Data;
+						ParseTileData(byteData);
+						TileState = TileState.Loaded;
+					},
+					ContinueWith = (t) =>
+					{
+						_parseTask = null;
+						// Cancelled is not the same as loaded!
+						if (TileState != TileState.Canceled)
 						{
-							byteData = response.Data;
-							ParseTileData(byteData);
 							TileState = TileState.Loaded;
-						},
-						ContinueWith = (t) =>
-						{
-							// Cancelled is not the same as loaded!
-							if (TileState != TileState.Canceled)
-							{
-								TileState = TileState.Loaded;
-							}
+						}
 
-							if (_callback != null)
-							{
-								_callback();
-							}
-						},
+						if (_callback != null)
+						{
+							_callback();
+						}
+					},
 #if UNITY_EDITOR
-						Info = string.Format("{0} - {1} - {2}", "VectorTile.HandleTileResponse", TilesetId, Id)
+					Info = string.Format("{0} - {1} - {2}", "VectorTile.HandleTileResponse", TilesetId, Id)
 #endif
-					});
+				};
+
+				MapboxAccess.Instance.TaskManager.AddTask(_parseTask);
 			}
 		}
 
@@ -182,6 +186,15 @@ namespace Mapbox.Map
 			var decompressed = Compression.Decompress(newData);
 			data = new Mapbox.VectorTile.VectorTile(decompressed);
 			return true;
+		}
+
+		public override void Cancel()
+		{
+			base.Cancel();
+			if (_parseTask != null)
+			{
+				MapboxAccess.Instance.TaskManager.CancelTask(_parseTask);
+			}
 		}
 
 		public void Dispose()
