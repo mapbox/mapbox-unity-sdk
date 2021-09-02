@@ -14,15 +14,15 @@ namespace Mapbox.Unity
 		public int ActiveTaskLimit = 3;
 		protected HashSet<TaskWrapper> _runningTasks;
 
-		protected HashSet<TaskWrapper> _tasksInQueue;
-		protected Queue<TaskWrapper> _taskQueue;
+		protected Dictionary<int, TaskWrapper> _tasksInQueue;
+		protected Queue<int> _taskQueue;
 		//protected PriorityQueue<TaskWrapper, int> _taskPriorityQueue;
 
 		public TaskManager()
 		{
 			_runningTasks = new HashSet<TaskWrapper>();
-			_taskQueue = new Queue<TaskWrapper>();
-			_tasksInQueue = new HashSet<TaskWrapper>();
+			_taskQueue = new Queue<int>();
+			_tasksInQueue = new Dictionary<int, TaskWrapper>();
 			//_taskPriorityQueue = new PriorityQueue<TaskWrapper, int>();
 			Runnable.Run(UpdateTaskManager());
 		}
@@ -33,22 +33,24 @@ namespace Mapbox.Unity
 			{
 				while (_taskQueue.Count > 0 && _runningTasks.Count < ActiveTaskLimit)
 				{
-					var wrapper = _taskQueue.Dequeue();
-					if (wrapper == null || !_tasksInQueue.Contains(wrapper))
+					var wrapperId = _taskQueue.Dequeue();
+					TaskWrapper wrapper;
+					if (wrapperId == null || !_tasksInQueue.ContainsKey(wrapperId))
 					{
 						continue;
 					}
 					else
 					{
-						_tasksInQueue.Remove(wrapper);
+						wrapper = _tasksInQueue[wrapperId];
+						_tasksInQueue.Remove(wrapperId);
 					}
-					
+
 					var task = Task.Run(wrapper.Action);
 					_runningTasks.Add(wrapper);
-					wrapper.Cancelled += (w) =>
-					{
-						_runningTasks.Remove(w);
-					};
+					// wrapper.Cancelled += (w) =>
+					// {
+					// 	_runningTasks.Remove(w);
+					// };
 					task.ContinueWith((t) =>
 					{
 						ContinueWrapper(t, wrapper);
@@ -78,7 +80,7 @@ namespace Mapbox.Unity
 		private void ContinueWrapper(Task task, TaskWrapper taskWrapper)
 		{
 			_runningTasks.Remove(taskWrapper);
-			taskWrapper.Finished(taskWrapper);
+			//taskWrapper.Finished(taskWrapper);
 			if (taskWrapper.ContinueWith != null)
 			{
 				taskWrapper.ContinueWith(task);
@@ -89,29 +91,45 @@ namespace Mapbox.Unity
 		{
 			if (taskWrapper != null)
 			{
-				_tasksInQueue.Add(taskWrapper);
-				_taskQueue.Enqueue(taskWrapper);
+				if (!_tasksInQueue.ContainsKey(taskWrapper.Id))
+				{
+					_tasksInQueue.Add(taskWrapper.Id, taskWrapper);
+					_taskQueue.Enqueue(taskWrapper.Id);
+				}
+				else
+				{
+					_tasksInQueue.Remove(taskWrapper.Id);
+					_tasksInQueue.Add(taskWrapper.Id, taskWrapper);
+					_taskQueue.Enqueue(taskWrapper.Id);
+				}
 			}
 			//_taskPriorityQueue.Enqueue(taskWrapper, priority);
 		}
 
-		public void CancelTask(TaskWrapper task)
+		public void CancelTask(int taskId)
 		{
-			if (_tasksInQueue.Contains(task))
+			if (_tasksInQueue.ContainsKey(taskId))
 			{
-				_tasksInQueue.Remove(task);
+				_tasksInQueue.Remove(taskId);
 			}
 		}
 	}
 
 	public class TaskWrapper
 	{
-		public Action<TaskWrapper> Cancelled = (t) => { };
-		public Action<TaskWrapper> Finished = (t) => { };
+		public int Id;
+		// public Action<TaskWrapper> Cancelled = (t) => { };
+		// public Action<TaskWrapper> Finished = (t) => { };
 		public CanonicalTileId TileId;
 		public Action Action;
 		public CancellationTokenSource Token;
 		public Action<Task> ContinueWith;
+		public Action OnCancelled;
+
+		public TaskWrapper(int id)
+		{
+			Id = id;
+		}
 
 #if UNITY_EDITOR
 		public string Info;

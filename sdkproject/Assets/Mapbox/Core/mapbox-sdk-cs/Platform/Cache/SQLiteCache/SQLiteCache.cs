@@ -325,7 +325,7 @@ CONSTRAINT tileAssignmentConstraint UNIQUE (tileId, mapId)
 		public void Add(string tilesetName, CanonicalTileId tileId, byte[] data, string path, string etag, DateTime? expirationDate, bool forceInsert = false)
 		{
 			MapboxAccess.Instance.TaskManager.AddTask(
-				new TaskWrapper()
+				new TaskWrapper(tileId.GenerateKey(tilesetName))
 				{
 					Action = () =>
 					{
@@ -577,6 +577,8 @@ CONSTRAINT tileAssignmentConstraint UNIQUE (tileId, mapId)
 
 				return new CacheItem()
 				{
+					TileId = tileId,
+					TilesetId = tilesetName,
 					Data = tile.tile_data,
 					AddedToCacheTicksUtc = tile.timestamp,
 					ETag = tile.etag,

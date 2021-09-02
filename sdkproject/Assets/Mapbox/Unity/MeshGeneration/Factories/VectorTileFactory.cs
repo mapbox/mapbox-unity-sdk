@@ -96,6 +96,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		protected override void OnUnregistered(UnityTile tile)
 		{
 			DataFetcher.CancelFetching(tile.UnwrappedTileId, TilesetId);
+			MapboxAccess.Instance.CacheManager.TileDisposed(tile, _properties.sourceOptions.Id);
 			if (_layerProgress != null && _layerProgress.ContainsKey(tile))
 			{
 				_layerProgress.Remove(tile);
@@ -115,7 +116,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					}
 				}
 			}
-			MapboxAccess.Instance.CacheManager.TileDisposed(tile, _properties.sourceOptions.Id);
 		}
 
 		public override void Clear()

@@ -148,7 +148,7 @@ namespace Mapbox.Platform.Cache
 			var key = tile.CanonicalTileId.GenerateKey(tilesetId);
 			if (!_fallbackItems.ContainsKey(key))
 			{
-				if (_cachedItems.ContainsKey(key))
+				if (_cachedItems.ContainsKey(key) && !_destructionHashset.Contains(key))
 				{
 					_destructionHashset.Add(key);
 					_destructionQueue.Enqueue(key);

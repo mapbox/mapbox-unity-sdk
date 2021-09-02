@@ -13,7 +13,7 @@ using UnityEditor;
 public class MapboxDebugWindow : EditorWindow
 {
 	private int _currentTab;
-	private string[] _tabList = new string[] {"Map", "DataFetcher", "UnityTiles" , "Memory Cache", "File Cache", "Task Manager"};
+	private string[] _tabList = new string[] { "Map", "DataFetcher", "UnityTiles", "Memory Cache", "File Cache", "Task Manager" };
 	private static DataFetcherTabDebugView _dataFetcherTabDebugView;
 	private static UnityTilesTabDebugView _unityTilesTabDebugView;
 	private static MemoryTabDebugView _memoryTabDebugView;
@@ -60,25 +60,25 @@ public class MapboxDebugWindow : EditorWindow
 	void OnGUI()
 	{
 		ReadyObjects();
-		_currentTab = GUILayout.Toolbar (_currentTab, _tabList);
+		_currentTab = GUILayout.Toolbar(_currentTab, _tabList);
 		switch (_currentTab)
 		{
-			case 0 :
+			case 0:
 				_abstractMapDebugView.Draw();
 				break;
-			case 1 :
+			case 1:
 				_dataFetcherTabDebugView.Draw();
 				break;
-			case 2 :
+			case 2:
 				_unityTilesTabDebugView.Draw();
 				break;
-			case 3 :
+			case 3:
 				_memoryTabDebugView.Draw();
 				break;
-			case 4 :
+			case 4:
 				_fileCacheDebugView.Draw();
 				break;
-			case 5 :
+			case 5:
 				_taskManagerTabDebugView.Draw();
 				break;
 		}
@@ -100,7 +100,7 @@ public class TaskManagerTabDebugView
 
 	public TaskManagerTabDebugView()
 	{
-		_taskManager = (EditorTaskManager) MapboxAccess.Instance.TaskManager;
+		_taskManager = (EditorTaskManager)MapboxAccess.Instance.TaskManager;
 		_taskManager.TaskStarted += (t) =>
 		{
 			_logs.Enqueue(Time.frameCount + " - " + t.Info);
@@ -114,9 +114,9 @@ public class TaskManagerTabDebugView
 
 	public void Draw()
 	{
-		GUILayout.Label ("Task Manager", EditorStyles.boldLabel);
-		GUILayout.Label (string.Format("{0} : {1}/{2}", "Active Task Count", _taskManager.ActiveTaskCount, _taskManager.ActiveTaskLimit), EditorStyles.miniLabel);
-		GUILayout.Label (string.Format("{0} : {1}", "Task Queue Size",_taskManager.TaskQueueSize), EditorStyles.miniLabel);
+		GUILayout.Label("Task Manager", EditorStyles.boldLabel);
+		GUILayout.Label(string.Format("{0} : {1}/{2}", "Active Task Count", _taskManager.ActiveTaskCount, _taskManager.ActiveTaskLimit), EditorStyles.miniLabel);
+		GUILayout.Label(string.Format("{0} : {1}", "Task Queue Size", _taskManager.TaskQueueSize), EditorStyles.miniLabel);
 
 		DrawLogs();
 	}
@@ -153,14 +153,14 @@ public class MemoryTabDebugView
 	private Vector2 _cachedScrollPos;
 	private Vector2 _fixedScrollPos;
 	private int _currentTab;
-	private string[] _tabList = new string[3] {"Group By Tile", "Group By Tileset", "Queue"};
+	private string[] _tabList = new string[3] { "Group By Tile", "Group By Tileset", "Queue" };
 
 	private bool[] _cacheByTileFolds;
 	private bool[] _cacheByTilesetFolds;
 
 	private Queue<string> _logs;
 	private Vector2 _logScrollPos;
-	private Dictionary<int,CacheItem> _cachedList;
+	private Dictionary<int, CacheItem> _cachedList;
 	private Dictionary<int, CacheItem> _fixedList;
 	private Queue<int> _destructionQueue;
 
@@ -210,7 +210,6 @@ public class MemoryTabDebugView
 		if (_cachedFold)
 		{
 			EditorGUI.indentLevel++;
-			var index = 0;
 
 			var _groupById = new Dictionary<CanonicalTileId, List<CacheItem>>();
 			var _groupByTileset = new Dictionary<string, List<CacheItem>>();
@@ -219,7 +218,7 @@ public class MemoryTabDebugView
 			{
 				if (!_groupById.ContainsKey(item.Value.TileId))
 				{
-					_groupById.Add(item.Value.TileId, new List<CacheItem>() {item.Value});
+					_groupById.Add(item.Value.TileId, new List<CacheItem>() { item.Value });
 				}
 				else
 				{
@@ -228,7 +227,7 @@ public class MemoryTabDebugView
 
 				if (!_groupByTileset.ContainsKey(item.Value.TilesetId))
 				{
-					_groupByTileset.Add(item.Value.TilesetId, new List<CacheItem>() {item.Value});
+					_groupByTileset.Add(item.Value.TilesetId, new List<CacheItem>() { item.Value });
 				}
 				else
 				{
@@ -238,7 +237,8 @@ public class MemoryTabDebugView
 
 			GUILayout.Label(string.Format("{0} tiles {1} tilesets", _groupById.Count, _groupByTileset), EditorStyles.miniLabel);
 
-			_currentTab = GUILayout.Toolbar (_currentTab, _tabList);
+			_tabList[2] = "Destruction Queue (" + _destructionQueue.Count + ")";
+			_currentTab = GUILayout.Toolbar(_currentTab, _tabList);
 			if (_currentTab == 0)
 			{
 				DrawCachesByTile(_groupById);
@@ -343,7 +343,7 @@ public class MemoryTabDebugView
 		}
 	}
 
-	private void DrawCachesByTile(Dictionary<CanonicalTileId,List<CacheItem>> groupById)
+	private void DrawCachesByTile(Dictionary<CanonicalTileId, List<CacheItem>> groupById)
 	{
 		Array.Resize(ref _cachedItemFolds, groupById.Count);
 		EditorGUILayout.BeginHorizontal();
@@ -384,7 +384,7 @@ public class MemoryTabDebugView
 		EditorGUILayout.EndHorizontal();
 	}
 
-	private void DrawCachesByTileset(Dictionary<string,List<CacheItem>> groupByTileset)
+	private void DrawCachesByTileset(Dictionary<string, List<CacheItem>> groupByTileset)
 	{
 		Array.Resize(ref _cachedItemFolds, groupByTileset.Count + 1);
 		EditorGUILayout.BeginHorizontal();
@@ -427,16 +427,16 @@ public class MemoryTabDebugView
 
 	private void DrawCacheItem(CacheItem item)
 	{
-		var cacheItem = (TextureCacheItem) item;
+		var cacheItem = (CacheItem) item;
 		if (cacheItem != null)
 		{
 			EditorGUILayout.LabelField(string.Format("Tile Id: {0}", cacheItem.TileId), EditorStyles.label);
 			EditorGUILayout.LabelField(string.Format("Tileset {0}", cacheItem.TilesetId), EditorStyles.label);
 			EditorGUILayout.LabelField(string.Format("From {0}", cacheItem.From), EditorStyles.label);
 			EditorGUILayout.LabelField(string.Format("Expiration {0}", cacheItem.ExpirationDate), EditorStyles.label);
-			if (cacheItem.Texture2D != null)
+			if (cacheItem is TextureCacheItem && (cacheItem as TextureCacheItem).Texture2D != null)
 			{
-				EditorGUILayout.ObjectField(cacheItem.Texture2D, typeof(Texture2D));
+				EditorGUILayout.ObjectField((cacheItem as TextureCacheItem).Texture2D, typeof(Texture2D));
 			}
 		}
 	}
@@ -458,11 +458,11 @@ public class UnityTilesTabDebugView
 
 	public void Draw()
 	{
-		GUILayout.Label ("Unity Tiles", EditorStyles.boldLabel);
+		GUILayout.Label("Unity Tiles", EditorStyles.boldLabel);
 		var tiles = _map.MapVisualizer.ActiveTiles;
 		var inactiveTiles = _map.MapVisualizer.GetInactiveTiles;
 
-		GUILayout.Label (string.Format("{0} : {1}", "Unity Tile Count", tiles.Count), EditorStyles.miniLabel);
+		GUILayout.Label(string.Format("{0} : {1}", "Unity Tile Count", tiles.Count), EditorStyles.miniLabel);
 
 		DrawActiveTiles(tiles);
 
@@ -679,11 +679,11 @@ public class DataFetcherTabDebugView
 		var activeRequests = _dataFetcher.GetActiveRequests();
 		var activeRequestsLimit = _dataFetcher.GetActiveRequestLimit();
 
-		GUILayout.Label ("Data Fetcher", EditorStyles.boldLabel);
-		GUILayout.Label (string.Format("{0} : {1}/{2}", "Active Request Count", activeRequests.Count.ToString(), activeRequestsLimit), EditorStyles.miniLabel);
-		GUILayout.Label (string.Format("{0} : {1}", "Order Queue Size", order.Count.ToString()), EditorStyles.miniLabel);
-		GUILayout.Label (string.Format("{0} : {1}", "Item List Size", items.Count.ToString()), EditorStyles.miniLabel);
-		GUILayout.Label (string.Format("{0} : {1}", "Order - Item (Cancelled)", order.Count - items.Count), EditorStyles.miniLabel);
+		GUILayout.Label("Data Fetcher", EditorStyles.boldLabel);
+		GUILayout.Label(string.Format("{0} : {1}/{2}", "Active Request Count", activeRequests.Count.ToString(), activeRequestsLimit), EditorStyles.miniLabel);
+		GUILayout.Label(string.Format("{0} : {1}", "Order Queue Size", order.Count.ToString()), EditorStyles.miniLabel);
+		GUILayout.Label(string.Format("{0} : {1}", "Item List Size", items.Count.ToString()), EditorStyles.miniLabel);
+		GUILayout.Label(string.Format("{0} : {1}", "Order - Item (Cancelled)", order.Count - items.Count), EditorStyles.miniLabel);
 
 		GUILayout.Space(10);
 		var mapboxTiles = 0;
@@ -710,14 +710,14 @@ public class DataFetcherTabDebugView
 			}
 		}
 
-		GUILayout.Label (string.Format("{0} : {1}", "Mapbox tiles", mapboxTiles.ToString()), EditorStyles.miniLabel);
-		GUILayout.Label (string.Format("{0} : {1}", "Custom tiles", customTiles.ToString()), EditorStyles.miniLabel);
+		GUILayout.Label(string.Format("{0} : {1}", "Mapbox tiles", mapboxTiles.ToString()), EditorStyles.miniLabel);
+		GUILayout.Label(string.Format("{0} : {1}", "Custom tiles", customTiles.ToString()), EditorStyles.miniLabel);
 
 		GUILayout.Space(10);
-		GUILayout.Label (string.Format("{0}", "Tilesets in list"), EditorStyles.miniLabel);
+		GUILayout.Label(string.Format("{0}", "Tilesets in list"), EditorStyles.miniLabel);
 		foreach (var entry in tilesetDictionary)
 		{
-			GUILayout.Label (string.Format("{0} : {1}", entry.Key, entry.Value), EditorStyles.miniLabel);
+			GUILayout.Label(string.Format("{0} : {1}", entry.Key, entry.Value), EditorStyles.miniLabel);
 		}
 	}
 }

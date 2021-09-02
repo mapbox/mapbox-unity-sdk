@@ -36,7 +36,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 		}
 
-		private Dictionary<CanonicalTileId, List<TaskWrapper>> _tasks = new Dictionary<CanonicalTileId, List<TaskWrapper>>();
 		private ObjectPool<VectorEntity> _pool;
 		private ObjectPool<List<VectorEntity>> _listPool;
 		private Dictionary<UnityTile, List<VectorEntity>> _activeObjects;
@@ -104,13 +103,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			ClearObjectOnUnregister(tile);
 
-			if (_tasks.ContainsKey(tile.CanonicalTileId))
-			{
-				foreach (var taskWrapper in _tasks[tile.CanonicalTileId])
-				{
-					MapboxAccess.Instance.TaskManager.CancelTask(taskWrapper);
-				}
-			}
+			MapboxAccess.Instance.TaskManager.CancelTask(tile.CanonicalTileId.GenerateKey(Key));
 		}
 
 		public override void Clear()
@@ -295,7 +288,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				cachedCallback?.Invoke(tile, this);
 			}
 
-			var taskWrapper = new TaskWrapper()
+			var taskWrapper = new TaskWrapper(tile.CanonicalTileId.GenerateKey(Key))
 			{
 				TileId = tile.CanonicalTileId,
 				Action = Action,
@@ -304,16 +297,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				#if UNITY_EDITOR
 				Info = string.Format("{0} - {1} - {2}", "VectorLayerVisualizer.ProcessLayer", Key, tile.CanonicalTileId)
 				#endif
-			};
-
-			if (!_tasks.ContainsKey(tile.CanonicalTileId))
-			{
-				_tasks.Add(tile.CanonicalTileId, new List<TaskWrapper>());
-			}
-			_tasks[tile.CanonicalTileId].Add(taskWrapper);
-			taskWrapper.Finished += (t) =>
-			{
-				_tasks.Remove(t.TileId);
 			};
 
 			MapboxAccess.Instance.TaskManager.AddTask(taskWrapper);
@@ -538,15 +521,15 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		private void ClearTasksOnUnregister(UnityTile tile)
 		{
-			if (_tasks.ContainsKey(tile.CanonicalTileId))
-			{
-				foreach (var task in _tasks[tile.CanonicalTileId])
-				{
-					task.Cancelled(task);
-				}
-
-				_tasks.Remove(tile.CanonicalTileId);
-			}
+			// if (_tasks.ContainsKey(tile.CanonicalTileId))
+			// {
+			// 	foreach (var task in _tasks[tile.CanonicalTileId])
+			// 	{
+			// 		task.Cancelled(task);
+			// 	}
+			//
+			// 	_tasks.Remove(tile.CanonicalTileId);
+			// }
 		}
 
 		/// <summary>

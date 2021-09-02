@@ -49,7 +49,7 @@ namespace Mapbox.Map
 	///	}));
 	/// </code>
 	/// </example>
-	public sealed class VectorTile : Tile, IDisposable
+	public sealed class VectorTile : Tile
 	{
 		// FIXME: Namespace here is very confusing and conflicts (sematically)
 		// with his class. Something has to be renamed here.
@@ -68,8 +68,6 @@ namespace Mapbox.Map
 		{
 			get { return this.byteData; }
 		}
-
-		private TaskWrapper _parseTask;
 
 		/// <summary> Gets the vector decoded using Mapbox.VectorTile library. </summary>
 		/// <value> The GeoJson data. </value>
@@ -115,11 +113,19 @@ namespace Mapbox.Map
 			_callback = p;
 			TilesetId = tilesetId;
 
-			_request = fileSource.Request(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse, 2);
+			_unityRequest = fileSource.MapboxImageRequest(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse, 2);
 		}
 
-		private void HandleTileResponse(Response response)
+		private void HandleTileResponse(TextureResponse response)
 		{
+			_unityRequest = null;
+			//unlike rastertile, we are able to null this field at the beginning of this method
+			//as the data we need is stored in the response anyway and we are pretty much done with
+			//request object.
+			//to understand why we need to null the request object,
+			//please check RasterTile.cs HandleTileResponse
+
+
 			//callback has to be called here
 			//otherwise requests are never complete (success or failure) and pipeline gets blocked
 			if (response.HasError)
@@ -129,48 +135,16 @@ namespace Mapbox.Map
 				{
 					AddException(exception);
 				}
-
-				if (_callback != null)
-				{
-					_callback();
-				}
 			}
 			else
 			{
 				// only try to parse if request was successful
+				byteData = response.Data;
+			}
 
-				// current implementation doesn't need to check if parsing is successful:
-				// * Mapbox.Map.VectorTile.ParseTileData() already adds any exception to the list
-				// * Mapbox.Map.RasterTile.ParseTileData() doesn't do any parsing
-
-				_parseTask = new TaskWrapper()
-				{
-					Action = () =>
-					{
-						byteData = response.Data;
-						ParseTileData(byteData);
-						TileState = TileState.Loaded;
-					},
-					ContinueWith = (t) =>
-					{
-						_parseTask = null;
-						// Cancelled is not the same as loaded!
-						if (TileState != TileState.Canceled)
-						{
-							TileState = TileState.Loaded;
-						}
-
-						if (_callback != null)
-						{
-							_callback();
-						}
-					},
-#if UNITY_EDITOR
-					Info = string.Format("{0} - {1} - {2}", "VectorTile.HandleTileResponse", TilesetId, Id)
-#endif
-				};
-
-				MapboxAccess.Instance.TaskManager.AddTask(_parseTask);
+			if (_callback != null)
+			{
+				_callback();
 			}
 		}
 
@@ -181,26 +155,60 @@ namespace Mapbox.Map
 			TileState = TileState.Loaded;
 		}
 
-		internal override bool ParseTileData(byte[] newData)
+		public void ExtractVectorDataFromRequest(Action continueWith, Action cancelled)
 		{
-			var decompressed = Compression.Decompress(newData);
-			data = new Mapbox.VectorTile.VectorTile(decompressed);
-			return true;
+			if (data != null)
+			{
+				Debug.Log("Vector data is already parsed. Is there an unnecessary/wrong recall?");
+			}
+
+			var task = new TaskWrapper(Id.GenerateKey(TilesetId))
+			{
+				Action = () =>
+				{
+					ParseTileData(byteData);
+					TileState = TileState.Loaded;
+				},
+				ContinueWith = (t) =>
+				{
+					// Cancelled is not the same as loaded!
+					if (TileState != TileState.Canceled)
+					{
+						TileState = TileState.Loaded;
+					}
+
+					if (continueWith != null)
+					{
+						continueWith();
+					}
+				},
+				OnCancelled = () =>
+				{
+					TileState = TileState.Canceled;
+
+					if (cancelled != null)
+					{
+						cancelled();
+					}
+				},
+#if UNITY_EDITOR
+				Info = string.Format("{0} - {1} - {2}", "VectorTile.HandleTileResponse", TilesetId, Id)
+#endif
+			};
+			MapboxAccess.Instance.TaskManager.AddTask(task);
 		}
 
 		public override void Cancel()
 		{
 			base.Cancel();
-			if (_parseTask != null)
-			{
-				MapboxAccess.Instance.TaskManager.CancelTask(_parseTask);
-			}
+			MapboxAccess.Instance.TaskManager.CancelTask(Id.GenerateKey(TilesetId));
 		}
 
-		public void Dispose()
+		internal override bool ParseTileData(byte[] newData)
 		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
+			var decompressed = Compression.Decompress(newData);
+			data = new Mapbox.VectorTile.VectorTile(decompressed);
+			return true;
 		}
 
 		//TODO: change signature if 'VectorTile' class changes from 'sealed'

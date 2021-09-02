@@ -127,6 +127,14 @@ namespace Mapbox.Map
 
 			_callback();
 			_unityRequest = null;
+			//have to null the unity request AFTER the callback as texture itself is kept
+			//in the request object and request object should be kept until that's done.
+			//we need to null the unity request after we are done with it though because
+			//if we don't, Request.Abort line in Tile.Cancel will pop nonsense errors
+			//because obviously you cannot call abort on a disposed object. It's disposed
+			//as we are using `using` for webrequest objects which disposes objects in the end.
+			//anyway if it's disposed but not null, `Tile.Cancel` will try to Abort() it and
+			//Unity will go crazy because Unity is like that sometimes.
 		}
 
 		internal override TileResource MakeTileResource(string tilesetId)

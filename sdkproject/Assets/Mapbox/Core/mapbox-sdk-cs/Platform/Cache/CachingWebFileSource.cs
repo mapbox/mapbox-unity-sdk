@@ -84,25 +84,25 @@ namespace Mapbox.Platform.Cache
 		}
 
 		private string CreateFinalUrl(string uri)
-         		{
-         			var uriBuilder = new UriBuilder(uri);
-         			if (!string.IsNullOrEmpty(_accessToken))
-         			{
-         				string accessTokenQuery = "access_token=" + _accessToken;
-         				string mapsSkuToken = "sku=" + _getMapsSkuToken();
-         				if (uriBuilder.Query != null && uriBuilder.Query.Length > 1)
-         				{
-         					uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery + "&" + mapsSkuToken;
-         				}
-         				else
-         				{
-         					uriBuilder.Query = accessTokenQuery + "&" + mapsSkuToken;
-         				}
-         			}
+		{
+			var uriBuilder = new UriBuilder(uri);
+			if (!string.IsNullOrEmpty(_accessToken))
+			{
+				string accessTokenQuery = "access_token=" + _accessToken;
+				string mapsSkuToken = "sku=" + _getMapsSkuToken();
+				if (uriBuilder.Query != null && uriBuilder.Query.Length > 1)
+				{
+					uriBuilder.Query = uriBuilder.Query.Substring(1) + "&" + accessTokenQuery + "&" + mapsSkuToken;
+				}
+				else
+				{
+					uriBuilder.Query = accessTokenQuery + "&" + mapsSkuToken;
+				}
+			}
 
-         			string finalUrl = uriBuilder.ToString();
-         			return finalUrl;
-         		}
+			string finalUrl = uriBuilder.ToString();
+			return finalUrl;
+		}
 
 		private IEnumerator FetchTexture(UnityWebRequest webRequest, Action<TextureResponse> callback)
 		{
@@ -190,9 +190,10 @@ namespace Mapbox.Platform.Cache
 						response.AddException(new Exception(response.ExceptionsAsString));
 					}
 
-					if (null != callback)
+					response.IsUpdate = true;
+
+					if (callback != null)
 					{
-						response.IsUpdate = true;
 						callback(response);
 					}
 				}, timeout);

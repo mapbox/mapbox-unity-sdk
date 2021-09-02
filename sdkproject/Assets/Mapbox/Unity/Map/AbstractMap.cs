@@ -198,7 +198,8 @@ namespace Mapbox.Unity.Map
 		{
 			if (zoom > MAX_ZOOM || zoom < MIN_ZOOM)
 			{
-				throw new Exception($"AbstractMap must stay within {MIN_ZOOM}, {MAX_ZOOM} zoom level.");
+				zoom = Mathf.Clamp(zoom, MIN_ZOOM, MAX_ZOOM);
+				//throw new Exception($"AbstractMap must stay within {MIN_ZOOM}, {MAX_ZOOM} zoom level.");
 			}
 
 			if (Application.isEditor && !Application.isPlaying)
