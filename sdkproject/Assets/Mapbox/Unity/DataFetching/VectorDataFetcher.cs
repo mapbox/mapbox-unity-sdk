@@ -125,24 +125,11 @@ public class VectorDataFetcher : DataFetcher
 				cacheItem.From = vectorTile.FromCache;
 #endif
 
-				if (vectorTile.Data == null)
-				{
-					vectorTile.ExtractVectorDataFromRequest(
-						continueWith: () =>
-						{
-							//IMPORTANT And this is where we pass it to cache
-							//cache will be responsible for tracking it all the way
-							//and destroying it when it's not used anymore
-							FinalizeVectorTile(vectorTile, unityTile, cacheItem);
-						}, null);
-				}
-				else
-				{
-					//IMPORTANT And this is where we pass it to cache
-					//cache will be responsible for tracking it all the way
-					//and destroying it when it's not used anymore
-					FinalizeVectorTile(vectorTile, unityTile, cacheItem);
-				}
+				//IMPORTANT And this is where we pass it to cache
+				//cache will be responsible for tracking it all the way
+				//and destroying it when it's not used anymore
+				FinalizeVectorTile(vectorTile, unityTile, cacheItem);
+
 			}
 		}
 	}

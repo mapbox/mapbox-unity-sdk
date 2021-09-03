@@ -81,10 +81,10 @@ namespace Mapbox.Unity.Map.TileProviders
 				_currentExtent.ZoomState = ZoomState.NoChange;
 			}
 
+			_viewPortWebMercBounds = getcurrentViewPortWebMerc();
+			_currentExtent.Bounds = _viewPortWebMercBounds;
 			if ((int) _zoomLevel != (int) _map.Zoom)
 			{
-
-				_viewPortWebMercBounds = getcurrentViewPortWebMerc();
 				var newTiles = GetWithWebMerc(_viewPortWebMercBounds, _map.AbsoluteZoom);
 				_currentExtent.ZoomOutTileRelationships = new Dictionary<UnwrappedTileId, UnwrappedTileId>();
 				_currentExtent.ZoomInTileRelationships = new Dictionary<UnwrappedTileId, UnwrappedTileId>();
@@ -135,10 +135,10 @@ namespace Mapbox.Unity.Map.TileProviders
 			{
 				//update viewport in case it was changed by switching zoom level
 				_viewPortWebMercBounds = getcurrentViewPortWebMerc();
-				_currentExtent.Bounds = _viewPortWebMercBounds;
 				_currentExtent.ActiveTiles = GetWithWebMerc(_viewPortWebMercBounds, _map.AbsoluteZoom);
 
 			}
+
 
 			_zoomLevel = _map.Zoom;
 			OnExtentChanged();

@@ -221,7 +221,7 @@ namespace Mapbox.Platform.Cache
 			info.TextureCacheItem.FilePath = Path.GetFullPath(string.Format("{0}/{1}/{2}.{3}", PersistantCacheRootFolderPath, MapIdToFolderName(info.TilesetId), info.TileId.GenerateKey(info.TilesetId), FileExtension));
 
 			MapboxAccess.Instance.TaskManager.AddTask(
-				new TaskWrapper(info.Key)
+				new TaskWrapper(info.TileId.GenerateKey("FileCache"))
 				{
 					Action = () =>
 					{

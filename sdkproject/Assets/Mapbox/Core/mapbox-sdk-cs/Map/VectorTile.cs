@@ -135,16 +135,51 @@ namespace Mapbox.Map
 				{
 					AddException(exception);
 				}
+
+				if (_callback != null)
+				{
+					_callback();
+				}
 			}
 			else
 			{
 				// only try to parse if request was successful
 				byteData = response.Data;
-			}
+				var task = new TaskWrapper(Id.GenerateKey("VectorTile"))
+				{
+					Action = () =>
+					{
+						ParseTileData(byteData);
+						TileState = TileState.Loaded;
+					},
+					ContinueWith = (t) =>
+					{
+						// Cancelled is not the same as loaded!
+						if (TileState != TileState.Canceled)
+						{
+							TileState = TileState.Loaded;
+						}
 
-			if (_callback != null)
-			{
-				_callback();
+						if (_callback != null)
+						{
+							_callback();
+						}
+					},
+					OnCancelled = () =>
+					{
+						TileState = TileState.Canceled;
+
+						if (_callback != null)
+						{
+							_callback();
+						}
+					},
+#if UNITY_EDITOR
+					Info = string.Format("{0} - {1} - {2}", "VectorTile.HandleTileResponse", TilesetId, Id)
+#endif
+				};
+
+				MapboxAccess.Instance.TaskManager.AddTask(task);
 			}
 		}
 
@@ -153,55 +188,6 @@ namespace Mapbox.Map
 			byteData = newData;
 			ParseTileData(byteData);
 			TileState = TileState.Loaded;
-		}
-
-		public void ExtractVectorDataFromRequest(Action continueWith, Action cancelled)
-		{
-			if (data != null)
-			{
-				Debug.Log("Vector data is already parsed. Is there an unnecessary/wrong recall?");
-			}
-
-			var task = new TaskWrapper(Id.GenerateKey(TilesetId))
-			{
-				Action = () =>
-				{
-					ParseTileData(byteData);
-					TileState = TileState.Loaded;
-				},
-				ContinueWith = (t) =>
-				{
-					// Cancelled is not the same as loaded!
-					if (TileState != TileState.Canceled)
-					{
-						TileState = TileState.Loaded;
-					}
-
-					if (continueWith != null)
-					{
-						continueWith();
-					}
-				},
-				OnCancelled = () =>
-				{
-					TileState = TileState.Canceled;
-
-					if (cancelled != null)
-					{
-						cancelled();
-					}
-				},
-#if UNITY_EDITOR
-				Info = string.Format("{0} - {1} - {2}", "VectorTile.HandleTileResponse", TilesetId, Id)
-#endif
-			};
-			MapboxAccess.Instance.TaskManager.AddTask(task);
-		}
-
-		public override void Cancel()
-		{
-			base.Cancel();
-			MapboxAccess.Instance.TaskManager.CancelTask(Id.GenerateKey(TilesetId));
 		}
 
 		internal override bool ParseTileData(byte[] newData)

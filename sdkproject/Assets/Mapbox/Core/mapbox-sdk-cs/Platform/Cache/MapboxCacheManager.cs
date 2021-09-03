@@ -101,7 +101,7 @@ namespace Mapbox.Platform.Cache
             var localCopy = tile;
             CacheItem cacheItem = null;
 
-            var task = new TaskWrapper(tileId.GenerateKey(tilesetId))
+            var task = new TaskWrapper(tileId.GenerateKey("GetVectorItemSqlite"))
             {
                 Action = () =>
                 {
@@ -193,7 +193,7 @@ namespace Mapbox.Platform.Cache
                 CacheItem cacheItem = null;
 
                 MapboxAccess.Instance.TaskManager.AddTask(
-                    new TaskWrapper(tileId.GenerateKey(tilesetId))
+                    new TaskWrapper(tileId.GenerateKey("GetTextureItemFile"))
                     {
                         Action = () => { cacheItem = _sqLiteCache.Get(tilesetId, tileId); },
                         ContinueWith = (t) =>

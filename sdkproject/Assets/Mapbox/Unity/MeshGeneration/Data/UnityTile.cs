@@ -171,7 +171,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			if (terrainTile == null || terrainTile.Texture2D == null)
 			{
 				HeightData = new float[_heightDataResolution * _heightDataResolution];
-				if (!_isElevationActive && _createMeshCallback != null)
+				if (_createMeshCallback != null && _vectorTile != null)
 				{
 					_createMeshCallback(this);
 				}
@@ -231,6 +231,10 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 
 			CheckFinishedCondition(_terrainTile);
+			if (_createMeshCallback != null && _vectorTile != null)
+			{
+				_createMeshCallback(this);
+			}
 		}
 
 		private void AsyncGpuReadbackForElevation(RasterTile terrainTile, float heightMultiplier, bool useRelative, Action<UnityTile> callback, CanonicalTileId tileId)
@@ -284,7 +288,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				}
 
 				CheckFinishedCondition(_terrainTile);
-				if (_createMeshCallback != null)
+				if (_createMeshCallback != null && _vectorTile != null)
 				{
 					_createMeshCallback(this);
 				}
@@ -334,7 +338,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				_createMeshCallback(this);
 			}
 
-			if (_isElevationActive && _terrainTile != null && _terrainTile.CurrentTileState == TileState.Loaded)
+			if (_isElevationActive && _terrainTile != null && _createMeshCallback != null && _terrainTile.CurrentTileState == TileState.Loaded)
 			{
 				_createMeshCallback(this);
 			}

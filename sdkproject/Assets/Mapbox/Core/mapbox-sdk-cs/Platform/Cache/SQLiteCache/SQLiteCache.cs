@@ -325,7 +325,7 @@ CONSTRAINT tileAssignmentConstraint UNIQUE (tileId, mapId)
 		public void Add(string tilesetName, CanonicalTileId tileId, byte[] data, string path, string etag, DateTime? expirationDate, bool forceInsert = false)
 		{
 			MapboxAccess.Instance.TaskManager.AddTask(
-				new TaskWrapper(tileId.GenerateKey(tilesetName))
+				new TaskWrapper(tileId.GenerateKey("SqliteCache"))
 				{
 					Action = () =>
 					{

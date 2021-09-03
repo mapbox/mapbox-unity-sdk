@@ -161,7 +161,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		private void OnFetcherDataRecieved(UnityTile tile, Mapbox.Map.VectorTile vectorTile)
 		{
-			tile.SetVectorData(TilesetId, vectorTile, CreateMeshes);
+			if (vectorTile.CurrentTileState != TileState.Canceled &&
+			    _tilesWaitingResponse.Contains(tile))
+			{
+				tile.SetVectorData(TilesetId, vectorTile, CreateMeshes);
+			}
 			//CreateMeshes(tile);
 			// if (tile != null)
 			// {
