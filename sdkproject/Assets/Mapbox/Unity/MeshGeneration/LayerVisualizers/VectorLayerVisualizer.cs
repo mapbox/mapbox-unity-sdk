@@ -103,7 +103,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			ClearObjectOnUnregister(tile);
 
-			MapboxAccess.Instance.TaskManager.CancelTask(tile.CanonicalTileId.GenerateKey(Key));
+			//MapboxAccess.Instance.TaskManager.CancelTask(tile.CanonicalTileId.GenerateKey(Key));
 		}
 
 		public override void Clear()
@@ -173,7 +173,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		private void ProcessLayer(UnityTile tile, UnwrappedTileId tileId, Action<UnityTile, LayerVisualizerBase> callback = null)
 		{
-			if (tile == null)
+			if (tile == null || tile.IsStopped || tile.IsRecycled)
 			{
 				return;
 			}
@@ -187,6 +187,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			void Action()
 			{
+				if (tile.IsRecycled || tile.IsStopped)
+				{
+					return;
+				}
+
 				var capturedToken = token;
 				var layer = tile.VectorData.Data.GetLayer(Key);
 				if (layer == null)
@@ -260,7 +265,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 			void ContinueWith(Task t)
 			{
-				if (t.IsCanceled)
+				if (t.IsCanceled || tile.IsRecycled || tile.IsStopped)
 				{
 					meshDataList.Clear();
 				}

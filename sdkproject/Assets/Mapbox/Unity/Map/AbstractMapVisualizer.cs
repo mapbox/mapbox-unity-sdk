@@ -327,9 +327,24 @@ namespace Mapbox.Unity.Map
 
 			ActiveTiles.Add(tileId, unityTile);
 
-			foreach (var factory in Factories)
+			// foreach (var factory in Factories)
+			// {
+			// 	factory.Register(unityTile);
+			// }
+
+			if (ImageryLayer.IsLayerActive)
 			{
-				factory.Register(unityTile);
+				ImageryLayer.Factory.Register(unityTile);
+			}
+
+			if (TerrainLayer.IsLayerActive)
+			{
+				TerrainLayer.Factory.Register(unityTile);
+			}
+
+			if (VectorLayer.IsLayerActive)
+			{
+				VectorLayer.Factory.Register(unityTile);
 			}
 
 			unityTile.SetFinishCondition();
@@ -344,12 +359,29 @@ namespace Mapbox.Unity.Map
 
 		public virtual void StopTile(UnityTile unityTile)
 		{
-			if (unityTile != null)
+			if (unityTile != null && unityTile.Tiles.Count > 0)
 			{
-				foreach (var factory in Factories)
+				// foreach (var factory in Factories)
+				// {
+				// 	factory.Unregister(unityTile);
+				// }
+
+				if (ImageryLayer.IsLayerActive)
 				{
-					factory.Unregister(unityTile);
+					ImageryLayer.Factory.Unregister(unityTile);
 				}
+
+				if (TerrainLayer.IsLayerActive)
+				{
+					TerrainLayer.Factory.Unregister(unityTile);
+				}
+
+				if (VectorLayer.IsLayerActive)
+				{
+					VectorLayer.Factory.Unregister(unityTile);
+				}
+
+				unityTile.IsStopped = true;
 			}
 		}
 
@@ -364,11 +396,30 @@ namespace Mapbox.Unity.Map
 
 			if (unityTile != null)
 			{
+				MapboxAccess.Instance.TaskManager.CancelTile(unityTile.CanonicalTileId);
 				OnTileDisposing(unityTile);
 
-				foreach (var factory in Factories)
+				// foreach (var factory in Factories)
+				// {
+				// 	factory.Unregister(unityTile);
+				// }
+
+				if (!unityTile.IsStopped)
 				{
-					factory.Unregister(unityTile);
+					if (ImageryLayer.IsLayerActive)
+					{
+						ImageryLayer.Factory.Unregister(unityTile);
+					}
+
+					if (TerrainLayer.IsLayerActive)
+					{
+						TerrainLayer.Factory.Unregister(unityTile);
+					}
+
+					if (VectorLayer.IsLayerActive)
+					{
+						VectorLayer.Factory.Unregister(unityTile);
+					}
 				}
 
 				unityTile.Recycle();
@@ -449,9 +500,12 @@ namespace Mapbox.Unity.Map
 
 		public void UnregisterTilesFrom(AbstractTileFactory factory)
 		{
-			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
+			if (VectorLayer.IsLayerActive)
 			{
-				factory.Unregister(tileBundle.Value);
+				foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
+				{
+					factory.Unregister(tileBundle.Value);
+				}
 			}
 		}
 

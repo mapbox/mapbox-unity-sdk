@@ -4,25 +4,42 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Mapbox.Map;
+using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.Utilities;
+using UnityEngine;
 
 namespace Mapbox.Unity
 {
+	public class TaskLevel
+	{
+
+
+	}
+
 	public class TaskManager
 	{
 		public Action<TaskWrapper> TaskStarted = (t) => { };
+		public Action<CanonicalTileId> TaskCancelled = (t) => { };
 		public int ActiveTaskLimit = 3;
 		protected HashSet<TaskWrapper> _runningTasks;
 
-		protected Dictionary<int, TaskWrapper> _tasksInQueue;
-		protected Queue<int> _taskQueue;
+		private Dictionary<int, TaskWrapper> _allTasks;
+		public Queue<int> _taskQueue;
+
+		// protected Dictionary<int, TaskWrapper> _tasksInQueue;
+		// protected Queue<int> _taskQueue;
+		protected Dictionary<CanonicalTileId, HashSet<int>> _tasksByTile = new Dictionary<CanonicalTileId, HashSet<int>>();
 		//protected PriorityQueue<TaskWrapper, int> _taskPriorityQueue;
+
+		private static object _lock = new object();
 
 		public TaskManager()
 		{
 			_runningTasks = new HashSet<TaskWrapper>();
 			_taskQueue = new Queue<int>();
-			_tasksInQueue = new Dictionary<int, TaskWrapper>();
+			_allTasks = new Dictionary<int, TaskWrapper>();
+
+			_tasksByTile = new Dictionary<CanonicalTileId, HashSet<int>>();
 			//_taskPriorityQueue = new PriorityQueue<TaskWrapper, int>();
 			Runnable.Run(UpdateTaskManager());
 		}
@@ -33,45 +50,37 @@ namespace Mapbox.Unity
 			{
 				while (_taskQueue.Count > 0 && _runningTasks.Count < ActiveTaskLimit)
 				{
-					var wrapperId = _taskQueue.Dequeue();
-					TaskWrapper wrapper;
-					if (wrapperId == null || !_tasksInQueue.ContainsKey(wrapperId))
+					var firstPeek = _taskQueue.Peek();
+					if (_allTasks.ContainsKey(firstPeek) &&
+					    _allTasks[firstPeek].EnqueueFrame > Time.frameCount - 15)
 					{
-						continue;
+						yield return null;
 					}
 					else
 					{
-						wrapper = _tasksInQueue[wrapperId];
-						_tasksInQueue.Remove(wrapperId);
+						var wrapperId = _taskQueue.Dequeue();
+						TaskWrapper wrapper;
+						if (!_allTasks.ContainsKey(wrapperId))
+						{
+							continue;
+						}
+						else
+						{
+							wrapper = _allTasks[wrapperId];
+							_allTasks.Remove(wrapperId);
+							_tasksByTile[wrapper.TileId].Remove(wrapperId);
+							if (_tasksByTile[wrapper.TileId].Count == 0)
+							{
+								_tasksByTile.Remove(wrapper.TileId);
+							}
+						}
+
+						var task = Task.Run(wrapper.Action);
+						_runningTasks.Add(wrapper);
+						task.ContinueWith((t) => { ContinueWrapper(t, wrapper); }, TaskScheduler.FromCurrentSynchronizationContext());
+						TaskStarted(wrapper);
 					}
-
-					var task = Task.Run(wrapper.Action);
-					_runningTasks.Add(wrapper);
-					// wrapper.Cancelled += (w) =>
-					// {
-					// 	_runningTasks.Remove(w);
-					// };
-					task.ContinueWith((t) =>
-					{
-						ContinueWrapper(t, wrapper);
-					}, TaskScheduler.FromCurrentSynchronizationContext());
-					TaskStarted(wrapper);
 				}
-
-				// while (_taskPriorityQueue.Count > 0 && _runningTasks.Count < ActiveTaskLimit)
-				// {
-				//     var wrapper = _taskPriorityQueue.Dequeue();
-				//     var task = Task.Run(wrapper.Action);
-				//     _runningTasks.Add(wrapper);
-				//     wrapper.Cancelled += (w) =>
-				//     {
-				//         _runningTasks.Remove(w);
-				//     };
-				//     task.ContinueWith((t) => { ContinueWrapper(t, wrapper); }, TaskScheduler.FromCurrentSynchronizationContext());
-				//     TaskStarted(wrapper);
-				//     yield return null;
-				//
-				// }
 
 				yield return null;
 			}
@@ -87,30 +96,66 @@ namespace Mapbox.Unity
 			}
 		}
 
-		public void AddTask(TaskWrapper taskWrapper)
+		public void AddTask(TaskWrapper taskWrapper, int priorityLevel = 3)
 		{
-			if (taskWrapper != null)
+			lock (_lock)
 			{
-				if (!_tasksInQueue.ContainsKey(taskWrapper.Id))
+				if (taskWrapper != null)
 				{
-					_tasksInQueue.Add(taskWrapper.Id, taskWrapper);
-					_taskQueue.Enqueue(taskWrapper.Id);
-				}
-				else
-				{
-					_tasksInQueue.Remove(taskWrapper.Id);
-					_tasksInQueue.Add(taskWrapper.Id, taskWrapper);
-					_taskQueue.Enqueue(taskWrapper.Id);
+					if (!_allTasks.ContainsKey(taskWrapper.Id))
+					{
+						taskWrapper.EnqueueFrame = Time.frameCount;
+						_allTasks.Add(taskWrapper.Id, taskWrapper);
+
+						if (!_tasksByTile.ContainsKey(taskWrapper.TileId))
+						{
+							_tasksByTile.Add(taskWrapper.TileId, new HashSet<int>());
+						}
+						_tasksByTile[taskWrapper.TileId].Add(taskWrapper.Id);
+						_taskQueue.Enqueue(taskWrapper.Id);
+					}
+					else
+					{
+						_allTasks.Remove(taskWrapper.Id);
+						_tasksByTile[taskWrapper.TileId].Remove(taskWrapper.Id);
+						if (_tasksByTile[taskWrapper.TileId].Count == 0)
+						{
+							_tasksByTile.Remove(taskWrapper.TileId);
+						}
+
+
+						taskWrapper.EnqueueFrame = Time.frameCount;
+						_allTasks.Add(taskWrapper.Id, taskWrapper);
+
+						if (!_tasksByTile.ContainsKey(taskWrapper.TileId))
+						{
+							_tasksByTile.Add(taskWrapper.TileId, new HashSet<int>());
+						}
+						_tasksByTile[taskWrapper.TileId].Add(taskWrapper.Id);
+						_taskQueue.Enqueue(taskWrapper.Id);
+					}
 				}
 			}
+
 			//_taskPriorityQueue.Enqueue(taskWrapper, priority);
 		}
 
-		public void CancelTask(int taskId)
+		public void CancelTile(CanonicalTileId tileId)
 		{
-			if (_tasksInQueue.ContainsKey(taskId))
+			if (_tasksByTile.ContainsKey(tileId))
 			{
-				_tasksInQueue.Remove(taskId);
+				foreach (var taskId in _tasksByTile[tileId])
+				{
+					if (_allTasks.ContainsKey(taskId))
+					{
+						var task = _allTasks[taskId];
+						TaskCancelled(tileId);
+						_allTasks.Remove(taskId);
+						task.OnCancelled?.Invoke();
+					}
+				}
+
+				_tasksByTile.Remove(tileId);
 			}
 		}
 	}
@@ -118,6 +163,8 @@ namespace Mapbox.Unity
 	public class TaskWrapper
 	{
 		public int Id;
+
+		public int EnqueueFrame;
 		// public Action<TaskWrapper> Cancelled = (t) => { };
 		// public Action<TaskWrapper> Finished = (t) => { };
 		public CanonicalTileId TileId;
@@ -140,5 +187,6 @@ namespace Mapbox.Unity
 	{
 		public int ActiveTaskCount => _runningTasks.Count;
 		public int TaskQueueSize => _taskQueue.Count; //_taskQueue.Count;
+		public int TasksInQueue => _taskQueue.Count;
 	}
 }

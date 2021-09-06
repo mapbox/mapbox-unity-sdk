@@ -51,6 +51,7 @@ namespace Mapbox.Map
 	/// </example>
 	public sealed class VectorTile : Tile
 	{
+		public Action<bool> DataProcessingFinished = (success) => { };
 		// FIXME: Namespace here is very confusing and conflicts (sematically)
 		// with his class. Something has to be renamed here.
 		private Mapbox.VectorTile.VectorTile data;
@@ -143,10 +144,16 @@ namespace Mapbox.Map
 			}
 			else
 			{
+				StatusCode = response.StatusCode;
+				ETag = response.ETag;
+				ExpirationDate = response.ExpirationDate;
 				// only try to parse if request was successful
 				byteData = response.Data;
-				var task = new TaskWrapper(Id.GenerateKey("VectorTile"))
+				_callback();
+
+				var task = new TaskWrapper(Id.GenerateKey(TilesetId, "VectorTile"))
 				{
+					TileId = Id,
 					Action = () =>
 					{
 						ParseTileData(byteData);
@@ -159,20 +166,12 @@ namespace Mapbox.Map
 						{
 							TileState = TileState.Loaded;
 						}
-
-						if (_callback != null)
-						{
-							_callback();
-						}
+						DataProcessingFinished(true);
 					},
 					OnCancelled = () =>
 					{
 						TileState = TileState.Canceled;
-
-						if (_callback != null)
-						{
-							_callback();
-						}
+						DataProcessingFinished(false);
 					},
 #if UNITY_EDITOR
 					Info = string.Format("{0} - {1} - {2}", "VectorTile.HandleTileResponse", TilesetId, Id)

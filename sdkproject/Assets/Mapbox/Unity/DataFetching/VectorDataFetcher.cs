@@ -2,6 +2,7 @@
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
 using System;
+using System.Collections.Generic;
 using Mapbox.Platform;
 using Mapbox.Platform.Cache;
 using Mapbox.Unity;
@@ -16,6 +17,7 @@ public class VectorDataFetcher : DataFetcher
 
 	public virtual void FetchData(VectorTile tile, string tilesetId, CanonicalTileId tileId, UnityTile unityTile = null)
 	{
+		//tile.Logs.Add(string.Format("{0} checking memory", Time.frameCount));
 		// MemoryCacheCheck
 		// we do not check for tile expiration of memory cached items
 		// we only do expiration check for item from file/sql
@@ -39,7 +41,7 @@ public class VectorDataFetcher : DataFetcher
  			return;
  		}
 
-        MapboxAccess.Instance.CacheManager.GetVectorItemFromSqlite(tile, tilesetId, tileId, (vectorCacheItemFromSqlite) =>
+        void FailureCallback()
         {
 	        if (unityTile != null && !unityTile.ContainsDataTile(tile))
 	        {
@@ -47,23 +49,45 @@ public class VectorDataFetcher : DataFetcher
 		        return;
 	        }
 
-	        if (vectorCacheItemFromSqlite != null)
-	        {
-		        if (vectorCacheItemFromSqlite.ExpirationDate.HasValue)
-		        {
-			        vectorCacheItemFromSqlite.Tile.ExpirationDate = vectorCacheItemFromSqlite.ExpirationDate.Value;
-		        }
+	        EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, string.Empty) {Callback = () => { FetchingCallback(tileId, tile, unityTile); }});
+        }
 
-		        FinalizeVectorTile(tile, unityTile, vectorCacheItemFromSqlite);
-	        }
-	        else
+        void CancelledCallback()
+        {
+	        FetchingError(unityTile, tile, new TileErrorEventArgs(tileId, tile.GetType(), unityTile, tile.Exceptions));
+        }
+
+        void SuccessCallback(CacheItem vectorCacheItemFromSqlite)
+        {
+	        if (tile.CurrentTileState == TileState.Canceled) return;
+
+	        if (unityTile != null && !unityTile.ContainsDataTile(tile))
 	        {
-		        EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, string.Empty)
-		        {
-			        Callback = () => { FetchingCallback(tileId, tile, unityTile); }
-		        });
+		        //this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
+		        return;
 	        }
-        });
+
+	        if (vectorCacheItemFromSqlite.ExpirationDate.HasValue)
+	        {
+		        vectorCacheItemFromSqlite.Tile.ExpirationDate = vectorCacheItemFromSqlite.ExpirationDate.Value;
+	        }
+
+	        DataReceived(unityTile, tile);
+	        MapboxAccess.Instance.CacheManager.AddVectorItemToMemory(tile.TilesetId, tile.Id, vectorCacheItemFromSqlite, true);
+
+	        if (vectorCacheItemFromSqlite.ExpirationDate < DateTime.Now)
+	        {
+		        EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, vectorCacheItemFromSqlite.ETag) {Callback = () => { FetchingCallback(tileId, tile, unityTile); }});
+	        }
+        }
+
+        MapboxAccess.Instance.CacheManager.GetVectorItemFromSqlite(
+	        tile,
+	        tilesetId,
+	        tileId,
+	        SuccessCallback,
+	        FailureCallback,
+	        CancelledCallback);
 	}
 
 	protected virtual void FetchingCallback(CanonicalTileId tileId, VectorTile vectorTile, UnityTile unityTile = null)
@@ -72,12 +96,12 @@ public class VectorDataFetcher : DataFetcher
 		{
 			//rasterTile.Clear();
 			//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
-			return;
+			FetchingError(unityTile, vectorTile, new TileErrorEventArgs(tileId, vectorTile.GetType(), unityTile, vectorTile.Exceptions));
 		}
 
 		if (vectorTile.CurrentTileState == TileState.Canceled)
 		{
-			return;
+			FetchingError(unityTile, vectorTile, new TileErrorEventArgs(tileId, vectorTile.GetType(), unityTile, vectorTile.Exceptions));
 		}
 		else if (vectorTile.HasError)
 		{
@@ -128,20 +152,15 @@ public class VectorDataFetcher : DataFetcher
 				//IMPORTANT And this is where we pass it to cache
 				//cache will be responsible for tracking it all the way
 				//and destroying it when it's not used anymore
-				FinalizeVectorTile(vectorTile, unityTile, cacheItem);
+				DataReceived(unityTile, vectorTile);
+				MapboxAccess.Instance.CacheManager.AddVectorDataItem(
+					vectorTile.TilesetId,
+					vectorTile.Id,
+					cacheItem,
+					true);
 
 			}
 		}
-	}
-
-	private void FinalizeVectorTile(VectorTile vectorTile, UnityTile unityTile, CacheItem cacheItem)
-	{
-		DataReceived(unityTile, vectorTile);
-		MapboxAccess.Instance.CacheManager.AddVectorDataItem(
-			vectorTile.TilesetId,
-			vectorTile.Id,
-			cacheItem,
-			true);
 	}
 }
 

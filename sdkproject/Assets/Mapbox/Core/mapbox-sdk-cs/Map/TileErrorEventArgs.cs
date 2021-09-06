@@ -50,12 +50,16 @@
 		public TileErrorEventArgs(CanonicalTileId TileId, Type TileType, UnityTile UnityTileInstance, ReadOnlyCollection<Exception> Exceptions)
 		{
 			this.TileId = TileId;
-			List<Exception> _exceptions = new List<Exception>();
-			foreach (var exception in Exceptions)
+			if (Exceptions != null)
 			{
-				_exceptions.Add(exception);
+				List<Exception> _exceptions = new List<Exception>();
+				foreach (var exception in Exceptions)
+				{
+					_exceptions.Add(exception);
+				}
+				this.Exceptions = _exceptions;
 			}
-			this.Exceptions = _exceptions;
+
 			this.UnityTileInstance = UnityTileInstance;
 			this.TileType = TileType;
 		}

@@ -167,5 +167,17 @@ namespace Mapbox.Map
 				return hash;
 			}
 		}
+
+		public static int GenerateKey(this CanonicalTileId tileId, string tilesetId, string third)
+		{
+			unchecked // Overflow is fine, just wrap
+			{
+				int hash = 17;
+				hash = hash * 23 + third.GetHashCode();
+				hash = hash * 23 + tilesetId.GetHashCode();
+				hash = hash * 23 + tileId.GetHashCode();
+				return hash;
+			}
+		}
 	}
 }

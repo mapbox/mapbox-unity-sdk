@@ -103,13 +103,23 @@ public class TaskManagerTabDebugView
 		_taskManager = (EditorTaskManager)MapboxAccess.Instance.TaskManager;
 		_taskManager.TaskStarted += (t) =>
 		{
-			_logs.Enqueue(Time.frameCount + " - " + t.Info);
+			_logs.Enqueue(Time.frameCount  + " - " + t.Info);
 			if (_logs.Count > 10000)
 			{
 				_logs.Dequeue();
 			}
 			_logScrollPos = new Vector2(0, 40 * _logs.Count);
 		};
+
+		// _taskManager.TaskCancelled += (t) =>
+		// {
+		// 	_logs.Enqueue(Time.frameCount + " - " + t);
+		// 	if (_logs.Count > 10000)
+		// 	{
+		// 		_logs.Dequeue();
+		// 	}
+		// 	_logScrollPos = new Vector2(0, 40 * _logs.Count);
+		// };
 	}
 
 	public void Draw()
@@ -117,6 +127,7 @@ public class TaskManagerTabDebugView
 		GUILayout.Label("Task Manager", EditorStyles.boldLabel);
 		GUILayout.Label(string.Format("{0} : {1}/{2}", "Active Task Count", _taskManager.ActiveTaskCount, _taskManager.ActiveTaskLimit), EditorStyles.miniLabel);
 		GUILayout.Label(string.Format("{0} : {1}", "Task Queue Size", _taskManager.TaskQueueSize), EditorStyles.miniLabel);
+		GUILayout.Label(string.Format("{0} : {1}", "Tasks In Queue List Size", _taskManager.TasksInQueue), EditorStyles.miniLabel);
 
 		DrawLogs();
 	}

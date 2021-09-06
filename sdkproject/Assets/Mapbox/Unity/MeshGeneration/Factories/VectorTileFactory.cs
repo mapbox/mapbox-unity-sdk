@@ -33,7 +33,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		private VectorLayerProperties _properties;
 		public VectorLayerProperties Properties => _properties;
 		private Dictionary<UnityTile, HashSet<LayerVisualizerBase>> _layerProgress;
-		protected VectorDataFetcher DataFetcher;
+		protected VectorDataFetcher _fetcher;
+
+		private Dictionary<UnityTile, Tile> _tileTracker = new Dictionary<UnityTile, Tile>();
 
 		public VectorTileFactory(VectorLayerProperties properties)
 		{
@@ -41,9 +43,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_layerProgress = new Dictionary<UnityTile, HashSet<LayerVisualizerBase>>();
 			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
 
-			DataFetcher = new VectorDataFetcher();
-			DataFetcher.DataReceived += OnFetcherDataRecieved;
-			DataFetcher.FetchingError += OnFetcherError;
+			_fetcher = new VectorDataFetcher();
+			_fetcher.DataReceived += OnFetcherDataRecieved;
+			_fetcher.FetchingError += OnFetcherError;
 
 			CreatePOILayerVisualizers();
 
@@ -83,20 +85,29 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				return;
 			}
 			_tilesWaitingResponse.Add(tile);
-
 			var dataTile = CreateDataTile(tile.CanonicalTileId, TilesetId);
+			_tileTracker.Add(tile, dataTile);
 			if (tile != null)
 			{
+				//Debug.Log(string.Format("{0} - {1}",tile.CanonicalTileId, "add Vector"));
 				tile.AddTile(dataTile);
 			}
 
-			DataFetcher.FetchData(dataTile, TilesetId, tile.CanonicalTileId, tile);
+			_fetcher.FetchData(dataTile, TilesetId, tile.CanonicalTileId, tile);
 		}
 
 		protected override void OnUnregistered(UnityTile tile)
 		{
-			DataFetcher.CancelFetching(tile.UnwrappedTileId, TilesetId);
+			if (_tileTracker.ContainsKey(tile))
+			{
+				//Debug.Log(string.Format("{0} - {1}",tile.CanonicalTileId, "remove Vector"));
+				tile.RemoveTile(_tileTracker[tile]);
+				_tileTracker.Remove(tile);
+			}
+
+			_fetcher.CancelFetching(tile.UnwrappedTileId, TilesetId);
 			MapboxAccess.Instance.CacheManager.TileDisposed(tile, _properties.sourceOptions.Id);
+
 			if (_layerProgress != null && _layerProgress.ContainsKey(tile))
 			{
 				_layerProgress.Remove(tile);

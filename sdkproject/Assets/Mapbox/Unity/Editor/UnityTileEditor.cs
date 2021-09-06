@@ -16,6 +16,8 @@ public class UnityTileEditor : Editor
 	private bool _errorFold;
 
 	private bool _tilesFold;
+	private Vector2[] _logScrollPos = new Vector2[3];
+	private bool[] _logFold = new bool[3];
 
 	//SerializedProperty lookAtPoint;
 	private bool[] _tileTabs;
@@ -108,15 +110,38 @@ public class UnityTileEditor : Editor
 						EditorGUILayout.LabelField(string.Format("Error : {0}", dataTile.Exceptions[0].Message), EditorStyles.label);
 					}
 
+					DrawLogs(dataTile, index);
 					EditorGUI.indentLevel--;
 				}
 
 				index++;
 			}
 
+
+
 			EditorGUI.indentLevel--;
 		}
 
 		serializedObject.ApplyModifiedProperties();
+	}
+
+	private void DrawLogs(Tile dataTile, int i)
+	{
+		// _logFold[i] = EditorGUILayout.Foldout(_logFold[i], string.Format("Logs ({0})", dataTile.Logs.Count));
+		// if (_logFold[i])
+		// {
+		// 	using (var h = new EditorGUILayout.HorizontalScope())
+		// 	{
+		// 		using (var scrollView = new EditorGUILayout.ScrollViewScope(_logScrollPos[i], GUILayout.Height(300)))
+		// 		{
+		// 			_logScrollPos[i] = scrollView.scrollPosition;
+		// 			foreach (var log in dataTile.Logs)
+		// 			{
+		// 				EditorGUILayout.LabelField(string.Format(log), EditorStyles.miniLabel);
+		// 			}
+		// 		}
+		// 	}
+		// }
+
 	}
 }

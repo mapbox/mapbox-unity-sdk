@@ -20,7 +20,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public TileTerrainType ElevationType;
 
-
 		private RasterTile _rasterTile;
 		public RasterTile BaseRasterData => _rasterTile;
 
@@ -40,6 +39,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		private HashSet<Tile> _finishConditionTiles = new HashSet<Tile>();
 		public bool IsRecycled = false;
 		public bool BackgroundImageInUse = false;
+		public bool IsStopped = false;
 
 		#region CachedUnityComponents
 		MeshRenderer _meshRenderer;
@@ -106,6 +106,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public float TileSize;
 
+		public List<string> Logs = new List<string>();
+
 		public RectD Rect { get; private set; }
 		public int CurrentZoom { get; private set; }
 
@@ -117,6 +119,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, bool isElevationActive)
 		{
+			IsStopped = false;
 			gameObject.hideFlags = HideFlags.DontSave;
 			TileSize = map.UnityTileSize;
 			_isElevationActive = isElevationActive;
@@ -147,6 +150,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				MeshRenderer.sharedMaterial.mainTexture = null;
 			}
 
+			IsStopped = false;
 			gameObject.SetActive(false);
 			IsRecycled = true;
 			BackgroundImageInUse = false;
@@ -333,15 +337,34 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		{
 			_vectorTile = vectorTile;
 			_createMeshCallback = createMeshCallback;
-			if (!_isElevationActive && _createMeshCallback != null)
-			{
-				_createMeshCallback(this);
-			}
 
-			if (_isElevationActive && _terrainTile != null && _createMeshCallback != null && _terrainTile.CurrentTileState == TileState.Loaded)
+			if (_vectorTile != null)
 			{
-				_createMeshCallback(this);
+				if (vectorTile.Data != null)
+				{
+					_createMeshCallback(this);
+				}
+				else
+				{
+					_vectorTile.DataProcessingFinished += (success) =>
+					{
+						if (success)
+						{
+							_createMeshCallback(this);
+						}
+					};
+				}
 			}
+			// _createMeshCallback = createMeshCallback;
+			// if (!_isElevationActive && _createMeshCallback != null)
+			// {
+			// 	_createMeshCallback(this);
+			// }
+			//
+			// if (_isElevationActive && _terrainTile != null && _createMeshCallback != null && _terrainTile.CurrentTileState == TileState.Loaded)
+			// {
+			// 	_createMeshCallback(this);
+			// }
 
 			CheckFinishedCondition(_vectorTile);
 		}

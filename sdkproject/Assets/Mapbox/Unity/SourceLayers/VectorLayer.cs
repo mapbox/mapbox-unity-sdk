@@ -561,6 +561,7 @@ namespace Mapbox.Unity.Map
 			}
 			else
 			{
+				_layerProperty.sourceType = vectorSource;
 				Debug.LogWarning("Invalid style - trying to set " + vectorSource.ToString() + " as default style!");
 			}
 		}
