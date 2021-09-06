@@ -149,7 +149,7 @@ namespace Mapbox.Map
 				ExpirationDate = response.ExpirationDate;
 				// only try to parse if request was successful
 				byteData = response.Data;
-				_callback();
+
 
 				var task = new TaskWrapper(Id.GenerateKey(TilesetId, "VectorTile"))
 				{
@@ -179,6 +179,9 @@ namespace Mapbox.Map
 				};
 
 				MapboxAccess.Instance.TaskManager.AddTask(task);
+				//first add the parsing task,
+				//THEN call the callback which will lead into caching etc.
+				_callback();
 			}
 		}
 
