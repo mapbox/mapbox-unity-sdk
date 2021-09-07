@@ -173,11 +173,11 @@ namespace Mapbox.Unity
 			OfflineManager = new OfflineManager(_configuration.AccessToken, _configuration.GetMapsSkuToken);
 			OfflineManager.SetOfflineCache(sqliteCache);
 			
-	#if UNITY_EDITOR
+#if UNITY_EDITOR
 			var fileCache = new EditorFileCache();
-	#else
+#else
 			var fileCache = new FileCache();
-	#endif
+#endif
 
 			CacheManager = new MapboxCacheManager(_memoryCache, fileCache, sqliteCache);
 #else

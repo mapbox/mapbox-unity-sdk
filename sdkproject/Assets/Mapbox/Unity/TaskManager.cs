@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Mapbox.Map;
@@ -23,7 +24,7 @@ namespace Mapbox.Unity
 		public int ActiveTaskLimit = 3;
 		protected HashSet<TaskWrapper> _runningTasks;
 
-		private Dictionary<int, TaskWrapper> _allTasks;
+		protected Dictionary<int, TaskWrapper> _allTasks;
 		public Queue<int> _taskQueue;
 
 		// protected Dictionary<int, TaskWrapper> _tasksInQueue;
@@ -96,7 +97,7 @@ namespace Mapbox.Unity
 			}
 		}
 
-		public void AddTask(TaskWrapper taskWrapper, int priorityLevel = 3)
+		public virtual void AddTask(TaskWrapper taskWrapper, int priorityLevel = 3)
 		{
 			lock (_lock)
 			{
@@ -140,7 +141,7 @@ namespace Mapbox.Unity
 			//_taskPriorityQueue.Enqueue(taskWrapper, priority);
 		}
 
-		public void CancelTile(CanonicalTileId tileId)
+		public virtual void CancelTile(CanonicalTileId tileId)
 		{
 			if (_tasksByTile.ContainsKey(tileId))
 			{
@@ -163,6 +164,7 @@ namespace Mapbox.Unity
 	public class TaskWrapper
 	{
 		public int Id;
+		public string TilesetId;
 
 		public int EnqueueFrame;
 		// public Action<TaskWrapper> Cancelled = (t) => { };
@@ -185,8 +187,74 @@ namespace Mapbox.Unity
 
 	public class EditorTaskManager : TaskManager
 	{
+		public bool EnableLogging = false;
+		public int TotalTaskEnqueuedCount;
+		public int TotalCancelledCount;
+		public List<string> Logs = new List<string>();
+
 		public int ActiveTaskCount => _runningTasks.Count;
 		public int TaskQueueSize => _taskQueue.Count; //_taskQueue.Count;
 		public int TasksInQueue => _taskQueue.Count;
+
+		public Dictionary<string, int> TaskType = new Dictionary<string, int>();
+
+		public EditorTaskManager()
+		{
+			base.TaskStarted += (t) =>
+			{
+				if (EnableLogging)
+				{
+					Logs.Add(Time.frameCount + " - " + t.Info);
+
+					if (!TaskType.ContainsKey(t.Info))
+					{
+						TaskType.Add(t.Info, 0);
+					}
+
+					TaskType[t.Info]++;
+				}
+			};
+		}
+
+		public override void AddTask(TaskWrapper taskWrapper, int priorityLevel = 3)
+		{
+			if (EnableLogging)
+			{
+				TotalTaskEnqueuedCount++;
+				Logs.Add(string.Format("{0,-10} {2,-10} {1, -30}", Time.frameCount, "added" , taskWrapper.Info));
+			}
+			base.AddTask(taskWrapper, priorityLevel);
+		}
+
+		public override void CancelTile(CanonicalTileId tileId)
+		{
+			if (EnableLogging)
+			{
+				var taskCount = 0;
+				var tileTypes = "";
+				if (_tasksByTile.ContainsKey(tileId))
+				{
+					taskCount = _tasksByTile[tileId].Count;
+					tileTypes = string.Join(" | ", _tasksByTile[tileId].Select(x => _allTasks[x].Info));
+				}
+
+				Logs.Add(string.Format("{0,-10} {1,-15} {2,-30}; ({3}) {4}", Time.frameCount, tileId, "cancel", taskCount, tileTypes));
+				TotalCancelledCount += taskCount;
+			}
+
+			base.CancelTile(tileId);
+		}
+
+		public void ClearLogsAndStats()
+		{
+			TotalTaskEnqueuedCount = 0;
+			TotalCancelledCount = 0;
+			Logs.Clear();
+		}
+
+		public void ToggleLogging()
+		{
+			EnableLogging = !EnableLogging;
+		}
 	}
 }

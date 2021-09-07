@@ -174,7 +174,7 @@ namespace Mapbox.Map
 						DataProcessingFinished(false);
 					},
 #if UNITY_EDITOR
-					Info = string.Format("{0} - {1} - {2}", "VectorTile.HandleTileResponse", TilesetId, Id)
+					Info = "VectorTile.HandleTileResponse"
 #endif
 				};
 

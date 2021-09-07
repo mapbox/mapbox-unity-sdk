@@ -1,14 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Mapbox.Map;
 using Mapbox.Platform;
 using Mapbox.Unity.Utilities;
+using Unity.UNetWeaver;
 using UnityEngine;
 
 namespace Mapbox.Unity.DataFetching
 {
 	public class DataFetchingManager
 	{
+		protected Action<FetchInfo> TileInitialized = (t)=> {};
 		private const float _requestDelay = 0.2f;
 
 		protected IFileSource _fileSource;
@@ -92,12 +95,12 @@ namespace Mapbox.Unity.DataFetching
 						var fi = _tileFetchInfos[tileKey];
 						_tileFetchInfos.Remove(tileKey);
 						_globalActiveRequests.Add(tileKey, fi.RasterTile);
-						//fi.RasterTile.Logs.Add(string.Format("{0} Before Initialize", Time.frameCount));
 						fi.RasterTile.Initialize(
 							_fileSource,
 							fi.TileId,
 							fi.TilesetId,
 							fi.Callback);
+						TileInitialized(fi);
 						yield return null;
 					}
 				}
@@ -114,25 +117,34 @@ namespace Mapbox.Unity.DataFetching
 
 	public class EditorDataFetchingManager : DataFetchingManager
 	{
+		public int TotalRequestCount;
+		public int TotalCancelledCount;
+
 		public List<string> Logs = new List<string>();
 		public EditorDataFetchingManager(IFileSource fileSource) : base(fileSource)
 		{
+			base.TileInitialized += (f) =>
+			{
+				TotalRequestCount++;
+				Logs.Add(string.Format("{0,-15} | {1,-30} {3,-30} {2, -10}", f.TileId, f.TilesetId, (Time.time - f.QueueTime), "initialized after"));
+			};
 		}
 
 		public override void EnqueueForFetching(FetchInfo info)
 		{
-			//info.RasterTile.Logs.Add(string.Format("{0} Data Fetcher enqueued", Time.frameCount));
+			Logs.Add(string.Format("{0,-15} | {1,-30} {3,-30} {2, -10}", info.TileId, info.TilesetId, Time.time, "enqueued at"));
 			base.EnqueueForFetching(info);
 		}
 
 		public override void CancelFetching(UnwrappedTileId tileUnwrappedTileId, string tilesetId)
 		{
-			// var key = tileUnwrappedTileId.Canonical.GenerateKey(tilesetId);
-			// if (_tileFetchInfos.ContainsKey(key))
-			// {
-			// 	var info = _tileFetchInfos[key];
-			// 	info.RasterTile.Logs.Add(string.Format("{0} Data Fetcher cancelled", Time.frameCount));
-			// }
+			var key = tileUnwrappedTileId.Canonical.GenerateKey(tilesetId);
+			if (_tileFetchInfos.ContainsKey(key))
+			{
+				TotalCancelledCount++;
+				var f = _tileFetchInfos[key];
+				Logs.Add(string.Format("{0,-15} | {1,-30} {3,-30} {2, -10}", f.TileId, f.TilesetId, (Time.time - f.QueueTime), "cancelled after"));
+			}
 			base.CancelFetching(tileUnwrappedTileId, tilesetId);
 		}
 
@@ -154,6 +166,13 @@ namespace Mapbox.Unity.DataFetching
 		public Dictionary<int, Tile> GetActiveRequests()
 		{
 			return _globalActiveRequests;
+		}
+
+		public void ClearLogsAndStats()
+		{
+			TotalRequestCount = 0;
+			TotalCancelledCount = 0;
+			Logs.Clear();
 		}
 	}
 }

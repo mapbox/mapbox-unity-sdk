@@ -296,11 +296,12 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			var taskWrapper = new TaskWrapper(tile.CanonicalTileId.GenerateKey(Key))
 			{
 				TileId = tile.CanonicalTileId,
+				TilesetId = Key,
 				Action = Action,
 				Token = source,
 				ContinueWith = ContinueWith,
 				#if UNITY_EDITOR
-				Info = string.Format("{0} - {1} - {2}", "VectorLayerVisualizer.ProcessLayer", Key, tile.CanonicalTileId)
+				Info = "VectorLayerVisualizer.ProcessLayer"
 				#endif
 			};
 

@@ -94,32 +94,13 @@ public class MapboxDebugWindow : EditorWindow
 public class TaskManagerTabDebugView
 {
 	private EditorTaskManager _taskManager;
-	private Queue<string> _logs = new Queue<string>();
+	//private Queue<string> _logs = new Queue<string>();
 	private Vector2 _logScrollPos;
 	private bool _logFold;
 
 	public TaskManagerTabDebugView()
 	{
 		_taskManager = (EditorTaskManager)MapboxAccess.Instance.TaskManager;
-		_taskManager.TaskStarted += (t) =>
-		{
-			_logs.Enqueue(Time.frameCount  + " - " + t.Info);
-			if (_logs.Count > 10000)
-			{
-				_logs.Dequeue();
-			}
-			_logScrollPos = new Vector2(0, 40 * _logs.Count);
-		};
-
-		// _taskManager.TaskCancelled += (t) =>
-		// {
-		// 	_logs.Enqueue(Time.frameCount + " - " + t);
-		// 	if (_logs.Count > 10000)
-		// 	{
-		// 		_logs.Dequeue();
-		// 	}
-		// 	_logScrollPos = new Vector2(0, 40 * _logs.Count);
-		// };
 	}
 
 	public void Draw()
@@ -129,12 +110,32 @@ public class TaskManagerTabDebugView
 		GUILayout.Label(string.Format("{0} : {1}", "Task Queue Size", _taskManager.TaskQueueSize), EditorStyles.miniLabel);
 		GUILayout.Label(string.Format("{0} : {1}", "Tasks In Queue List Size", _taskManager.TasksInQueue), EditorStyles.miniLabel);
 
+
+		GUILayout.Label(string.Format("{0,-30} : {1}", "Total Enqueued",_taskManager.TotalTaskEnqueuedCount), EditorStyles.miniLabel);
+		GUILayout.Label(string.Format("{0,-30} : {1}", "Total Cancelled", _taskManager.TotalCancelledCount), EditorStyles.miniLabel);
+
+
+		foreach (var i in _taskManager.TaskType)
+		{
+			GUILayout.Label(string.Format("{0,-30} : {1}", i.Key,i.Value, EditorStyles.miniLabel));
+		}
+
 		DrawLogs();
+
+		if (GUILayout.Button("Toggle Logging (" + _taskManager.EnableLogging +")"))
+		{
+			_taskManager.ToggleLogging();
+		}
+
+		if (GUILayout.Button("Clear"))
+		{
+			_taskManager.ClearLogsAndStats();
+		}
 	}
 
 	private void DrawLogs()
 	{
-		_logFold = EditorGUILayout.Foldout(_logFold, string.Format("Logs ({0})", _logs.Count));
+		_logFold = EditorGUILayout.Foldout(_logFold, string.Format("Logs ({0})", _taskManager.Logs.Count));
 		if (_logFold)
 		{
 			using (var h = new EditorGUILayout.HorizontalScope())
@@ -142,7 +143,7 @@ public class TaskManagerTabDebugView
 				using (var scrollView = new EditorGUILayout.ScrollViewScope(_logScrollPos, GUILayout.Height(300)))
 				{
 					_logScrollPos = scrollView.scrollPosition;
-					foreach (var log in _logs)
+					foreach (var log in _taskManager.Logs)
 					{
 						EditorGUILayout.LabelField(string.Format(log), EditorStyles.miniLabel);
 					}
@@ -151,6 +152,33 @@ public class TaskManagerTabDebugView
 		}
 
 	}
+}
+
+public class DebugViewBase
+{
+	private Vector2 _logScrollPos;
+	private bool _logFold;
+
+	private void DrawLogs(List<string> logs)
+	{
+		_logFold = EditorGUILayout.Foldout(_logFold, string.Format("Logs ({0})", logs.Count));
+		if (_logFold)
+		{
+			using (var h = new EditorGUILayout.HorizontalScope())
+			{
+				using (var scrollView = new EditorGUILayout.ScrollViewScope(_logScrollPos, GUILayout.Height(300)))
+				{
+					_logScrollPos = scrollView.scrollPosition;
+					foreach (var log in logs)
+					{
+						EditorGUILayout.LabelField(string.Format(log), EditorStyles.miniLabel);
+					}
+				}
+			}
+		}
+
+	}
+
 }
 
 public class MemoryTabDebugView
@@ -677,6 +705,8 @@ public class UnityTilesTabDebugView
 public class DataFetcherTabDebugView
 {
 	private EditorDataFetchingManager _dataFetcher;
+	private Vector2 _logScrollPos;
+	private bool _logFold;
 
 	public DataFetcherTabDebugView()
 	{
@@ -730,6 +760,37 @@ public class DataFetcherTabDebugView
 		{
 			GUILayout.Label(string.Format("{0} : {1}", entry.Key, entry.Value), EditorStyles.miniLabel);
 		}
+
+		GUILayout.Label(string.Format("{0,-30} : {1}", "Total Fired",_dataFetcher.TotalRequestCount), EditorStyles.miniLabel);
+		GUILayout.Label(string.Format("{0,-30} : {1}", "Total Cancelled", _dataFetcher.TotalCancelledCount), EditorStyles.miniLabel);
+
+
+		DrawLogs();
+
+		if (GUILayout.Button("Clear"))
+		{
+			_dataFetcher.ClearLogsAndStats();
+		}
+	}
+
+	private void DrawLogs()
+	{
+		_logFold = EditorGUILayout.Foldout(_logFold, string.Format("Logs ({0})", _dataFetcher.Logs.Count));
+		if (_logFold)
+		{
+			using (var h = new EditorGUILayout.HorizontalScope())
+			{
+				using (var scrollView = new EditorGUILayout.ScrollViewScope(_logScrollPos, GUILayout.Height(300)))
+				{
+					_logScrollPos = scrollView.scrollPosition;
+					foreach (var log in _dataFetcher.Logs)
+					{
+						EditorGUILayout.LabelField(string.Format(log), EditorStyles.miniLabel);
+					}
+				}
+			}
+		}
+
 	}
 }
 

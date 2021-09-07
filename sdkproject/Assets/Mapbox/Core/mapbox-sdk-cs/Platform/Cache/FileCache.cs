@@ -222,6 +222,7 @@ namespace Mapbox.Platform.Cache
 				new TaskWrapper(info.TileId.GenerateKey(info.TilesetId, "FileCache"))
 				{
 					TileId = info.TileId,
+					TilesetId = info.TilesetId,
 					Action = () =>
 					{
 						FileStream sourceStream = new FileStream(info.TextureCacheItem.FilePath,
@@ -241,7 +242,7 @@ namespace Mapbox.Platform.Cache
 						OnFileSaved(info.TileId, info.TilesetId, info.TextureCacheItem);
 					},
 #if UNITY_EDITOR
-					Info = string.Format("{0} - {1} - {2}", "FileCache.SaveInfo", info.TilesetId, info.TileId)
+					Info = "FileCache.SaveInfo"
 #endif
 				}, 4);
 		}

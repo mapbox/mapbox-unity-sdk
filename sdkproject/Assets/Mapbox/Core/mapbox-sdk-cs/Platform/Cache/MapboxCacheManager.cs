@@ -111,6 +111,7 @@ namespace Mapbox.Platform.Cache
             var task = new TaskWrapper(tileId.GenerateKey(localTilesetId, "GetVectorItemSqlite"))
             {
                 TileId = localTileId,
+                TilesetId = tilesetId,
                 Action = () =>
                 {
                     cacheItem = _sqLiteCache.Get(localTilesetId, localTileId);
@@ -141,7 +142,7 @@ namespace Mapbox.Platform.Cache
                     cancelledCallback();
                 },
 #if UNITY_EDITOR
-                Info = string.Format("{0} - {1} - {2}", "MapboxCacheManager.GetVectorItemFromSqlite", tilesetId, tileId)
+                Info = "MapboxCacheManager.GetVectorItemFromSqlite"
 #endif
             };
             MapboxAccess.Instance.TaskManager.AddTask(task);
@@ -221,6 +222,7 @@ namespace Mapbox.Platform.Cache
                     new TaskWrapper(tileId.GenerateKey(tilesetId, "GetTextureItemInfoSql"))
                     {
                         TileId = tileId,
+                        TilesetId = tilesetId,
                         Action = () => { cacheItem = _sqLiteCache.Get(tilesetId, tileId); },
                         ContinueWith = (t) =>
                         {
@@ -242,7 +244,7 @@ namespace Mapbox.Platform.Cache
                             textureInfoReadyCallback(textureCacheItem);
                         },
 #if UNITY_EDITOR
-                        Info = string.Format("{0} - {1} - {2}", "MapboxCacheManager.GetTextureItemInfoSql", tilesetId, tileId)
+                        Info = "MapboxCacheManager.GetTextureItemInfoSql"
 #endif
                     }, 4);
 
