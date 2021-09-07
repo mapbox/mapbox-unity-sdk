@@ -125,7 +125,7 @@ namespace Mapbox.Platform.Cache
 					for (int i = 0; i < size; i++)
 					{
 						var item = _destructionQueue.Dequeue();
-						if (item != key)
+						if (item != key && _destructionHashset.Contains(item))
 						{
 							_destructionQueue.Enqueue(item);
 						}
@@ -303,6 +303,7 @@ namespace Mapbox.Platform.Cache
 
 		public override CacheItem Get(CanonicalTileId tileId, string tilesetId, bool b)
 		{
+			TileRead(tileId, tilesetId);
 			return base.Get(tileId, tilesetId);
 			TileRead(tileId, tilesetId);
 		}

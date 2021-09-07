@@ -70,6 +70,9 @@ public class UnityTileEditor : Editor
 
 		EditorGUILayout.LabelField("Tile Id", _tile.CanonicalTileId.ToString(), EditorStyles.label);
 		EditorGUILayout.LabelField("Tile Scale", _tile.TileScale.ToString(), EditorStyles.label);
+		EditorGUILayout.LabelField("Fallback Image Tile", _tile.BackgroundImageTile.ToString(), EditorStyles.label);
+		//EditorGUILayout.LabelField("Waiting to Finish", _tile._finishConditionTiles.Count.ToString(), EditorStyles.label);
+
 
 		_tilesFold = EditorGUILayout.Foldout(_tilesFold, string.Format("{0} Data Tiles", _tile.Tiles.Count));
 		if (_tilesFold)

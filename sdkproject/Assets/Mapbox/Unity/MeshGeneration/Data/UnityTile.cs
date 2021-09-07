@@ -39,6 +39,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		private HashSet<Tile> _finishConditionTiles = new HashSet<Tile>();
 		public bool IsRecycled = false;
 		public bool BackgroundImageInUse = false;
+		public UnwrappedTileId BackgroundImageTile;
 		public bool IsStopped = false;
 
 		#region CachedUnityComponents
@@ -129,7 +130,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			Rect = Conversions.TileBounds(tileId);
 			UnwrappedTileId = tileId;
 			CanonicalTileId = tileId.Canonical;
-
+			BackgroundImageTile = UnwrappedTileId;
+			
 			float scaleFactor = 1.0f;
 			CurrentZoom = map.AbsoluteZoom;
 			scaleFactor = Mathf.Pow(2, (map.InitialZoom - CurrentZoom));
@@ -153,6 +155,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			IsStopped = false;
 			gameObject.SetActive(false);
 			IsRecycled = true;
+			BackgroundImageTile = UnwrappedTileId;
 			BackgroundImageInUse = false;
 
 			Cancel();
@@ -460,6 +463,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				MeshRenderer.sharedMaterial.SetTexture(textureName, parentTexture);
 			}
 
+			BackgroundImageTile = parent;
 			var tileZoom = this.UnwrappedTileId.Z;
 			var parentZoom = parent.Z;
 

@@ -644,7 +644,8 @@ namespace Mapbox.Unity.Map
 				}
 				else if (tile.CurrentZoom > (int) Zoom)
 				{
-					if ((tile.BaseRasterData == null || tile.BaseRasterData.CurrentTileState != TileState.Loaded))
+					if ((tile.BaseRasterData == null ||
+					     tile.BaseRasterData.CurrentTileState != TileState.Loaded))
 					{
 						if (tile.BackgroundImageInUse)
 						{
@@ -656,9 +657,13 @@ namespace Mapbox.Unity.Map
 						}
 						TileTracker.Remove(tile.UnwrappedTileId);
 					}
+					else
+					{
+						_mapVisualizer.StopTile(tile);
+					}
 
 					UnwrappedTileId parent = tile.UnwrappedTileId;
-					for (int i = 0; i < (tile.CurrentZoom - (int)Zoom); i++)
+					for (int i = 0; i < (tile.CurrentZoom - (int) Zoom); i++)
 					{
 						parent = parent.Parent;
 					}
@@ -669,6 +674,7 @@ namespace Mapbox.Unity.Map
 						{
 							TileTracker.Add(parent, new HashSet<UnwrappedTileId>());
 						}
+
 						if (!TileTracker[parent].Contains(tile.UnwrappedTileId))
 						{
 							TileTracker[parent].Add(tile.UnwrappedTileId);
