@@ -735,6 +735,20 @@ namespace Mapbox.Unity.Map
 			TileProvider.Initialize(this);
 		}
 
+		public void DisposeAllTiles()
+		{
+			var tilesToDestroy = new List<UnwrappedTileId>();
+			foreach (var tilePair in MapVisualizer.ActiveTiles)
+			{
+				tilesToDestroy.Add(tilePair.Key);
+			}
+
+			foreach (var tileId in tilesToDestroy)
+			{
+				MapVisualizer.DisposeTile(tileId);
+			}
+		}
+
 		#endregion
 
 		#region Conversion and Height Query Methods

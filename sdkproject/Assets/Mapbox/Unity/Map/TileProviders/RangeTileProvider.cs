@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using Mapbox.Map;
 using Mapbox.Unity.DataContainers;
+using Mapbox.Unity.Utilities;
+using Mapbox.Utils;
+using UnityEngine;
 
 namespace Mapbox.Unity.Map.TileProviders
 {
@@ -8,12 +11,13 @@ namespace Mapbox.Unity.Map.TileProviders
 	{
 		private RangeTileProviderOptions _rangeTileProviderOptions;
 		private bool _initialized = false;
+		private float _zoomLevel;
 
 		public override void OnInitialized()
 		{
 			if (Options != null)
 			{
-				_rangeTileProviderOptions = (RangeTileProviderOptions)Options;
+				_rangeTileProviderOptions = (RangeTileProviderOptions) Options;
 			}
 			else
 			{
@@ -31,8 +35,25 @@ namespace Mapbox.Unity.Map.TileProviders
 				return;
 			}
 
-			_currentExtent.ActiveTiles.Clear();
+			if (_zoomLevel < _map.Zoom)
+			{
+				_currentExtent.ZoomState = ZoomState.ZoomIn;
+			}
+			else if (_zoomLevel > _map.Zoom)
+			{
+				_currentExtent.ZoomState = ZoomState.ZoomOut;
+			}
+			else
+			{
+				_currentExtent.ZoomState = ZoomState.NoChange;
+			}
+
+			//_currentExtent.Bounds = new Vector2dBounds();
 			var centerTile = TileCover.CoordinateToTileId(_map.CenterLatitudeLongitude, _map.AbsoluteZoom);
+			var bottomLeft = Conversions.TileIdToBounds(centerTile.X - 1, centerTile.Y + 1, centerTile.Z);
+			var topRight = Conversions.TileIdToBounds(centerTile.X + 1, centerTile.Y - 1, centerTile.Z);
+			_currentExtent.Bounds = new Vector2dBounds(Conversions.LatLonToMeters(bottomLeft.SouthWest.y, bottomLeft.SouthWest.x), Conversions.LatLonToMeters(topRight.NorthEast.y, topRight.NorthEast.x));
+			_currentExtent.ActiveTiles.Clear();
 			_currentExtent.ActiveTiles.Add(new UnwrappedTileId(_map.AbsoluteZoom, centerTile.X, centerTile.Y));
 
 			for (int x = (centerTile.X - _rangeTileProviderOptions.west); x <= (centerTile.X + _rangeTileProviderOptions.east); x++)
@@ -43,12 +64,13 @@ namespace Mapbox.Unity.Map.TileProviders
 				}
 			}
 
+			_zoomLevel = _map.Zoom;
 			OnExtentChanged();
 		}
+
 		public override bool Cleanup(UnwrappedTileId tile)
 		{
 			return (!_currentExtent.ActiveTiles.Contains(tile));
 		}
-
 	}
 }

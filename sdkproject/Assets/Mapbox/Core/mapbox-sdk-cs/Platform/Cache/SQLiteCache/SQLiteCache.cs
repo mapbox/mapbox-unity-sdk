@@ -418,7 +418,7 @@ CONSTRAINT tileAssignmentConstraint UNIQUE (tileId, mapId)
 						}
 					},
 #if UNITY_EDITOR
-					Info = string.Format("{0} - {1} - {2}", "SqliteCache.Add", tilesetName, tileId)
+					Info = "SqliteCache.Add"
 #endif
 				});
 		}

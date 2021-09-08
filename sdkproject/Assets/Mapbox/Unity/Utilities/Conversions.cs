@@ -299,8 +299,8 @@ namespace Mapbox.Unity.Utilities
 		/// <returns> The <see cref="T:Mapbox.Utils.Vector2dBounds"/> of the tile. </returns>
 		public static Vector2dBounds TileIdToBounds(int x, int y, int zoom)
 		{
-			var sw = new Vector2d(TileYToNWLatitude(y, zoom), TileXToNWLongitude(x + 1, zoom));
-			var ne = new Vector2d(TileYToNWLatitude(y + 1, zoom), TileXToNWLongitude(x, zoom));
+			var sw = new Vector2d(TileXToNWLongitude(x, zoom), TileYToNWLatitude(y + 1, zoom));
+			var ne = new Vector2d(TileXToNWLongitude(x + 1, zoom), TileYToNWLatitude(y, zoom));
 			return new Vector2dBounds(sw, ne);
 		}
 

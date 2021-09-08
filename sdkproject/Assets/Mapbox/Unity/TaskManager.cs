@@ -249,6 +249,7 @@ namespace Mapbox.Unity
 		{
 			TotalTaskEnqueuedCount = 0;
 			TotalCancelledCount = 0;
+			TaskType.Clear();
 			Logs.Clear();
 		}
 
