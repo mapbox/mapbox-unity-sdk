@@ -22,7 +22,7 @@
 		int activeIndex = 0;
 		private List<Editor> assetEditors;
 
-		GUIStyle headerFoldout = new GUIStyle("Foldout");
+		GUIStyle headerFoldout;
 		GUIStyle header;
 
 		void OnEnable()
@@ -78,13 +78,16 @@
 			}
 
 			var st = new GUIStyle();
+			headerFoldout = new GUIStyle("Foldout");
 			st.padding = new RectOffset(15, 15, 15, 15);
 			scrollPos = EditorGUILayout.BeginScrollView(scrollPos, st);
 			for (int i = 0; i < _assets.Count; i++)
 			{
 				var asset = _assets[i];
 				if (asset == null) //yea turns out this can happen
-					continue;
+				{
+					continue; 
+				}
 				GUILayout.BeginHorizontal();
 
 				var b = Header(string.Format("{0,-40} - {1, -15}", asset.GetType().Name, asset.name), i == activeIndex);
@@ -127,7 +130,7 @@
 					EditorGUILayout.Space();
 					EditorGUI.indentLevel += 4;
 					GUI.enabled = false;
-					DrawTheAsset(i);
+					DrawAssetEditorInspectors(i);
 					GUI.enabled = true;
 					EditorGUI.indentLevel -= 4;
 					EditorGUILayout.Space();
@@ -163,7 +166,6 @@
 			return asset;
 		}
 
-
 		public bool Header(string title, bool show)
 		{
 			var rect = GUILayoutUtility.GetRect(16f, 22f, header);
@@ -188,38 +190,46 @@
 			return show;
 		}
 		
-		private void DrawTheAsset(int assetIndex)
-		{
-			if (assetEditors == null) assetEditors = new List<Editor>();
+		/// <summary>
+		/// Draws the InspectorGUI for the assetIndex passed in.
+		/// <para>Ensures ArgumentException: GUILayout: Mismatched LayoutGroup.repaint is not thrown by maintaining refs to editors</para>
+		/// </summary>
+		/// <param name="assetIndex">The asset index of the inspector gui we will draw</param>
+        private void DrawAssetEditorInspectors(int assetIndex)
+        {
+	        assetEditors = assetEditors ?? new List<Editor>();
 
-			while (assetEditors.Count < _assets.Count)
-			{
-				assetEditors.Add(null);
-			}
+            while (assetEditors.Count < _assets.Count)
+            {
+                assetEditors.Add(null);
+            }
 
-			while (assetEditors.Count > _assets.Count)
-			{
-				var index = assetEditors.Count - 1;
-				if (assetEditors[index] != null) DestroyImmediate(assetEditors[index]);
-				assetEditors.RemoveAt(index);
-			}
+            while (assetEditors.Count > _assets.Count)
+            {
+                var index = assetEditors.Count - 1;
+                if (assetEditors[index] != null)
+                {
+	                DestroyImmediate(assetEditors[index]);
+                }
+                assetEditors.RemoveAt(index);
+            }
 
-			ScriptableObject asset = _assets[assetIndex];
-			Editor editor = assetEditors[assetIndex];
+            var asset = _assets[assetIndex];
+            var editor = assetEditors[assetIndex];
 
-			if (Event.current.type == EventType.Repaint && editor != null && editor.target != asset)
-			{
-				DestroyImmediate(editor);
-				editor = null;
-			}
+            if (Event.current.type == EventType.Repaint && editor != null && editor.target != asset)
+            {
+                DestroyImmediate(editor);
+                editor = null;
+            }
 
-			if (editor == null)
-			{
-				editor = Editor.CreateEditor(asset);
-				assetEditors[assetIndex] = editor;
-			}
+            if (editor == null)
+            {
+                editor = Editor.CreateEditor(asset);
+                assetEditors[assetIndex] = editor;
+            }
 
-			editor.OnInspectorGUI();
-		}
+            editor.OnInspectorGUI();
+        }
 	}
 }
