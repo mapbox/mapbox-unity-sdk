@@ -20,6 +20,7 @@
 		int _index = -1;
 		private Action<UnityEngine.Object> _act;
 		int activeIndex = 0;
+		private List<Editor> assetEditors;
 
 		GUIStyle headerFoldout = new GUIStyle("Foldout");
 		GUIStyle header;
@@ -126,9 +127,7 @@
 					EditorGUILayout.Space();
 					EditorGUI.indentLevel += 4;
 					GUI.enabled = false;
-					var ed = UnityEditor.Editor.CreateEditor(asset);
-					ed.hideFlags = HideFlags.NotEditable;
-					ed.OnInspectorGUI();
+					DrawTheAsset(i);
 					GUI.enabled = true;
 					EditorGUI.indentLevel -= 4;
 					EditorGUILayout.Space();
@@ -187,6 +186,40 @@
 			}
 
 			return show;
+		}
+		
+		private void DrawTheAsset(int assetIndex)
+		{
+			if (assetEditors == null) assetEditors = new List<Editor>();
+
+			while (assetEditors.Count < _assets.Count)
+			{
+				assetEditors.Add(null);
+			}
+
+			while (assetEditors.Count > _assets.Count)
+			{
+				var index = assetEditors.Count - 1;
+				if (assetEditors[index] != null) DestroyImmediate(assetEditors[index]);
+				assetEditors.RemoveAt(index);
+			}
+
+			ScriptableObject asset = _assets[assetIndex];
+			Editor editor = assetEditors[assetIndex];
+
+			if (Event.current.type == EventType.Repaint && editor != null && editor.target != asset)
+			{
+				DestroyImmediate(editor);
+				editor = null;
+			}
+
+			if (editor == null)
+			{
+				editor = Editor.CreateEditor(asset);
+				assetEditors[assetIndex] = editor;
+			}
+
+			editor.OnInspectorGUI();
 		}
 	}
 }
