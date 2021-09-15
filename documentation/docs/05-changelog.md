@@ -3,6 +3,7 @@
 ### Bug Fixes
 - Fixes a bug where add collider feature didn't work for flat terrain mesh.
 - Fix a bug where vector tile processing fired multiple times depending on Terrain/Image data states
+- Fix bug that caused ScriptableCreatorWindow to throw ArgumentException: GUILayout: Mismatched LayoutGroup.repaint in some environments.
 ### Improvements
 - Improves Directions factory and prefabs to provide better UX and support for all types of maps
 
