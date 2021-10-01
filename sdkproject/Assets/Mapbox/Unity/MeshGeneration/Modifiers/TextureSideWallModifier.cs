@@ -8,33 +8,21 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using Mapbox.Unity.Map;
 	using System;
 
-	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Textured Side Wall Modifier")]
-	public class TextureSideWallModifier : MeshModifier
+	public class TexturedSideWallCore
 	{
-		#region ModifierOptions
-
+		private GeometryExtrusionWithAtlasOptions _options;
 		private float _scaledFirstFloorHeight = 0;
-
 		private float _scaledTopFloorHeight = 0;
-
 		private float _scaledPreferredWallLength;
-		[SerializeField] private bool _centerSegments = true;
-		[SerializeField] private bool _separateSubmesh = true;
-
-		#endregion
-
-		float currentWallLength = 0;
-		Vector3 start = Constants.Math.Vector3Zero;
-		Vector3 wallDirection = Constants.Math.Vector3Zero;
-
-		Vector3 wallSegmentFirstVertex;
-		Vector3 wallSegmentSecondVertex;
-		Vector3 wallSegmentDirection;
-		float wallSegmentLength;
-
+		private float currentWallLength = 0;
+		private Vector3 start = Constants.Math.Vector3Zero;
+		private Vector3 wallDirection = Constants.Math.Vector3Zero;
+		private Vector3 wallSegmentFirstVertex;
+		private Vector3 wallSegmentSecondVertex;
+		private Vector3 wallSegmentDirection;
+		private float wallSegmentLength;
 		private AtlasEntity _currentFacade;
 		private Rect _currentTextureRect;
-
 		private float finalFirstHeight;
 		private float finalTopHeight;
 		private float finalMidHeight;
@@ -45,14 +33,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private List<int> wallTriangles;
 		private float columnScaleRatio;
 		private float rightOfEdgeUv;
-
 		private float currentY1;
 		private float currentY2;
 		private float _wallSizeEpsilon = 0.99f;
 		private float _narrowWallWidthDelta = 0.01f;
 		private float _shortRowHeightDelta = 0.015f;
-
-		GeometryExtrusionWithAtlasOptions _options;
 		private int _counter = 0;
 		private float height = 0.0f;
 		private float _scale = 1f;
@@ -63,53 +48,36 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private float _singleColumnLength;
 		private float _leftOverColumnLength;
 
-		public override void SetProperties(ModifierProperties properties)
+		private bool _centerSegments;
+		private bool _separateSubmesh;
+		private System.Random _random;
+
+		public TexturedSideWallCore(GeometryExtrusionWithAtlasOptions options, bool centerSegments, bool separateSubmesh)
 		{
-			if (properties is GeometryExtrusionWithAtlasOptions)
-			{
-				_options = (GeometryExtrusionWithAtlasOptions)properties;
-			}
-			else if (properties is GeometryExtrusionOptions)
-			{
-				_options = ((GeometryExtrusionOptions)properties).ToGeometryExtrusionWithAtlasOptions();
-			}
-			else if (properties is UVModifierOptions)
-			{
-				_options = ((UVModifierOptions)properties).ToGeometryExtrusionWithAtlasOptions();
-			}
+			_options = options;
+			_centerSegments = centerSegments;
+			_separateSubmesh = separateSubmesh;
+			_random = new System.Random();
 		}
 
-		public override void UnbindProperties()
-		{
-			_options.PropertyHasChanged -= UpdateModifier;
-		}
 
-		public override void Initialize()
+		public void Initialize()
 		{
-			base.Initialize();
 			foreach (var atlasEntity in _options.atlasInfo.Textures)
 			{
 				atlasEntity.CalculateParameters();
 			}
 		}
 
-		public override void UpdateModifier(object sender, System.EventArgs layerArgs)
-		{
-			SetProperties((ModifierProperties)sender);
-			NotifyUpdateModifier(new VectorLayerUpdateArgs { property = sender as MapboxDataProperty, modifier = this });
-		}
-
-		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
+		public void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile)
 		{
 			if (md.Vertices.Count == 0 || feature == null || feature.Points.Count < 1)
 				return;
 
-			if (tile != null)
-				_scale = tile.TileScale;
+			_scale = tile.TileScale;
 
 			//facade texture to decorate this building
-			_currentFacade =
-				_options.atlasInfo.Textures[UnityEngine.Random.Range(0, _options.atlasInfo.Textures.Count)];
+			_currentFacade = _options.atlasInfo.Textures[_random.Next(0, _options.atlasInfo.Textures.Count)];
 			//rect is a struct so we're caching this
 			_currentTextureRect = _currentFacade.TextureRect;
 
@@ -195,7 +163,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 						wallSegmentFirstVertex = start;
 						//columns fitting wall / max column we have in texture
 						var stepRatio =
-							(float)Math.Min(_currentFacade.ColumnCount,
+							(float) Math.Min(_currentFacade.ColumnCount,
 								Math.Floor(currentWallLength / _singleColumnLength)) / _currentFacade.ColumnCount;
 						wallSegmentLength = stepRatio * _scaledPreferredWallLength;
 						start += wallSegmentDirection * wallSegmentLength;
@@ -322,7 +290,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				//first part is the number of floors fitting current wall segment. You can fit max of "row count in mid". Or if wall
 				//is smaller and it can only fit i.e. 3 floors instead of 5; we use 3/5 of the mid section texture as well.
 				_midUvInCurrentStep =
-					((float)Math.Min(_currentFacade.MidFloorCount,
+					((float) Math.Min(_currentFacade.MidFloorCount,
 						Math.Round(_currentMidHeight / _singleFloorHeight))) / _currentFacade.MidFloorCount;
 
 				//top two vertices
@@ -498,24 +466,24 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 					break;
 				case ExtrusionType.MinHeight:
+				{
+					var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
+					for (int i = 0; i < _counter; i++)
 					{
-						var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
-						for (int i = 0; i < _counter; i++)
-						{
-							md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.min + maxHeight, md.Vertices[i].z);
-						}
+						md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.min + maxHeight, md.Vertices[i].z);
 					}
+				}
 					break;
 				case ExtrusionType.MaxHeight:
+				{
+					var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
+					for (int i = 0; i < _counter; i++)
 					{
-						var minmax = MinMaxPair.GetMinMaxHeight(md.Vertices);
-						for (int i = 0; i < _counter; i++)
-						{
-							md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.max + maxHeight, md.Vertices[i].z);
-						}
-
-						height += minmax.max - minmax.min;
+						md.Vertices[i] = new Vector3(md.Vertices[i].x, minmax.max + maxHeight, md.Vertices[i].z);
 					}
+
+					height += minmax.max - minmax.min;
+				}
 					break;
 				case ExtrusionType.RangeHeight:
 					for (int i = 0; i < _counter; i++)
@@ -588,6 +556,37 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				default:
 					break;
 			}
+		}
+	}
+
+	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Textured Side Wall Modifier")]
+	public class TextureSideWallModifier : MeshModifier
+	{
+		[SerializeField] GeometryExtrusionWithAtlasOptions _options;
+		[SerializeField] private bool _centerSegments = true;
+		[SerializeField] private bool _separateSubmesh = true;
+
+		public override void SetProperties(ModifierProperties properties)
+		{
+			if (properties is GeometryExtrusionWithAtlasOptions)
+			{
+				_options = (GeometryExtrusionWithAtlasOptions) properties;
+			}
+			else if (properties is GeometryExtrusionOptions)
+			{
+				_options = ((GeometryExtrusionOptions) properties).ToGeometryExtrusionWithAtlasOptions();
+			}
+			else if (properties is UVModifierOptions)
+			{
+				_options = ((UVModifierOptions) properties).ToGeometryExtrusionWithAtlasOptions();
+			}
+		}
+
+		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
+		{
+			var core = new TexturedSideWallCore(_options, _centerSegments, _separateSubmesh);
+			core.Initialize();
+			core.Run(feature, md, tile);
 		}
 	}
 }

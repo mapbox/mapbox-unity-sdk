@@ -9,61 +9,32 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using Assets.Mapbox.Unity.MeshGeneration.Modifiers.MeshModifiers;
 	using System;
 
-	/// <summary>
-	/// Polygon modifier creates the polygon (vertex&triangles) using the original vertex list.
-	/// Currently uses Triangle.Net for triangulation, which occasionally adds extra vertices to maintain a good triangulation so output vertex list might not be exactly same as the original vertex list.
-	/// </summary>
-	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Polygon Mesh Modifier")]
-	public class PolygonMeshModifier : MeshGenerationBase
+	public class PolyMeshCore
 	{
-		public override ModifierType Type
-		{
-			get { return ModifierType.Preprocess; }
-		}
-
 		private UVModifierOptions _options;
+		private Vector3 _pushUp;
 		private Vector3 _v1, _v2;
-
-		#region Atlas Fields
-
 		private Vector3 _vert;
 		private AtlasEntity _currentFacade;
 		private Quaternion _textureDirection;
 		private Vector2[] _textureUvCoordinates;
 		private Vector3 _vertexRelativePos;
 		private Vector3 _firstVert;
-
 		private float minx;
 		private float miny;
 		private float maxx;
 		private float maxy;
+		private System.Random _random;
 
-		#endregion
-
-		public override void SetProperties(ModifierProperties properties)
+		public PolyMeshCore(UVModifierOptions options, float height)
 		{
-			_options = (UVModifierOptions) properties;
-			_options.PropertyHasChanged += UpdateModifier;
+			_options = options;
+			_pushUp = new Vector3(0, height, 0);
+			_random = new System.Random();
 		}
 
-		public override void UnbindProperties()
+		public void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile)
 		{
-			_options.PropertyHasChanged -= UpdateModifier;
-		}
-
-		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
-		{
-			if (Criteria != null && Criteria.Count > 0)
-			{
-				foreach (var criterion in Criteria)
-				{
-					if (criterion.ShouldReplaceFeature(feature))
-					{
-						return;
-					}
-				}
-			}
-
 			var _counter = feature.Points.Count;
 			var subset = new List<List<Vector3>>(_counter);
 			Data flatData = null;
@@ -73,8 +44,16 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			List<int> triList = null;
 			List<Vector3> sub = null;
 
+			Polygonize(feature, md, tile.TileSize, _counter, subset, triList, currentIndex);
+		}
 
-
+		private void Polygonize(VectorFeatureUnity feature, MeshData md, float tileSize, int _counter, List<List<Vector3>> subset, List<int> triList, int currentIndex)
+		{
+			List<Vector3> sub;
+			int vertCount;
+			Data flatData;
+			List<int> result;
+			int polygonVertexCount;
 			for (int i = 0; i < _counter; i++)
 			{
 				sub = feature.Points[i];
@@ -117,15 +96,15 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				{
 					md.Edges.Add(vertCount + ((j + 1) % polygonVertexCount));
 					md.Edges.Add(vertCount + j);
-					md.Vertices.Add(sub[j]);
+					md.Vertices.Add((sub[j]) + _pushUp);
 					md.Tangents.Add(Constants.Math.Vector3Forward);
 					md.Normals.Add(Constants.Math.Vector3Up);
 
 					if (_options.style == StyleTypes.Satellite)
 					{
 						var fromBottomLeft = new Vector2(
-							(float) (((sub[j].x + md.PositionInTile.x) / tile.TileScale + _size.x / 2) / _size.x),
-							(float) (((sub[j].z + md.PositionInTile.z) / tile.TileScale + _size.x / 2) / _size.x));
+							(float) (((sub[j].x + md.PositionInTile.x) / tileSize + tileSize / 2) / tileSize),
+							(float) (((sub[j].z + md.PositionInTile.z) / tileSize + tileSize / 2) / tileSize));
 						md.UV[0].Add(fromBottomLeft);
 					}
 					else if (_options.texturingType == UvMapType.Tiled)
@@ -141,7 +120,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			if (_options.texturingType == UvMapType.Atlas || _options.texturingType == UvMapType.AtlasWithColorPalette)
 			{
-				_currentFacade = _options.atlasInfo.Roofs[UnityEngine.Random.Range(0, _options.atlasInfo.Roofs.Count)];
+				_currentFacade = _options.atlasInfo.Roofs[_random.Next(0, _options.atlasInfo.Roofs.Count)];
 
 				minx = float.MaxValue;
 				miny = float.MaxValue;
@@ -196,7 +175,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			md.Triangles.Add(triList);
 		}
 
-
 		private bool IsClockwise(IList<Vector3> vertices)
 		{
 			double sum = 0.0;
@@ -209,6 +187,35 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 
 			return sum > 0.0;
+		}
+	}
+
+	/// <summary>
+	/// Polygon modifier creates the polygon (vertex&triangles) using the original vertex list.
+	/// Currently uses Triangle.Net for triangulation, which occasionally adds extra vertices to maintain a good triangulation so output vertex list might not be exactly same as the original vertex list.
+	/// </summary>
+	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Polygon Mesh Modifier")]
+	public class PolygonMeshModifier : MeshGenerationBase
+	{
+		public override ModifierType Type => ModifierType.Preprocess;
+		[SerializeField] private UVModifierOptions _options;
+		public float Height = 0f;
+
+		public override void SetProperties(ModifierProperties properties)
+		{
+			_options = (UVModifierOptions) properties;
+			_options.PropertyHasChanged += UpdateModifier;
+		}
+
+		public override void UnbindProperties()
+		{
+			_options.PropertyHasChanged -= UpdateModifier;
+		}
+
+		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
+		{
+			var core = new PolyMeshCore(_options, Height);
+			core.Run(feature, md, tile);
 		}
 	}
 }

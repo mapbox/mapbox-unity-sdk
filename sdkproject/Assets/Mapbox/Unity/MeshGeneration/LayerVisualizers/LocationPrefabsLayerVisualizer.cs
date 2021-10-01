@@ -310,27 +310,27 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			return containingCategories;
 		}
 
-		public override void Create(VectorTileLayer layer, UnityTile tile, Action<UnityTile, LayerVisualizerBase> callback)
+		public override void Create(UnityTile tile, Action<UnityTile, LayerVisualizerBase> callback)
 		{
 			//for layers using specific locations, ignore VectorTileLayer and
 			//pass coordinates to the modifierstack using BuildFeatureFromLatLon.
-			if ((SubLayerProperties as PrefabItemOptions).findByType == LocationPrefabFindBy.AddressOrLatLon)
-			{
-				BuildFeatureFromLatLon(layer, tile);
-				if (callback != null)
-				{
-					callback(tile, this);
-				}
-			}
-			else
-			{
-				var item = (SubLayerProperties as PrefabItemOptions);
-				bool isCategoryNone = (item.findByType == LocationPrefabFindBy.MapboxCategory && item.categories == LocationPrefabCategories.None);
-				if (!isCategoryNone)
-				{
-					base.Create(layer, tile, callback);
-				}
-			}
+			// if ((SubLayerProperties as PrefabItemOptions).findByType == LocationPrefabFindBy.AddressOrLatLon)
+			// {
+			// 	BuildFeatureFromLatLon(layer, tile);
+			// 	if (callback != null)
+			// 	{
+			// 		callback(tile, this);
+			// 	}
+			// }
+			// else
+			// {
+			// 	var item = (SubLayerProperties as PrefabItemOptions);
+			// 	bool isCategoryNone = (item.findByType == LocationPrefabFindBy.MapboxCategory && item.categories == LocationPrefabCategories.None);
+			// 	if (!isCategoryNone)
+			// 	{
+			// 		base.Create(layer, tile, callback);
+			// 	}
+			// }
 		}
 
 		/// <summary>

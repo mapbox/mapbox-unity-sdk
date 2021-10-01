@@ -10,6 +10,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Mapbox.Unity.CustomLayer;
 using Mapbox.Unity.DataFetching;
+using Mapbox.Unity;
+using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.Utilities;
 using Mapbox.Utils;
 using UnityEngine;
@@ -24,6 +26,7 @@ namespace Mapbox.Platform.Cache
 		event Action<CanonicalTileId, string, TextureCacheItem> FileSaved;
 		void Add(CanonicalTileId tileId, string tilesetId, TextureCacheItem textureCacheItem, bool forceInsert);
 		void GetAsync(CanonicalTileId tileId, string tilesetId, bool isTextureNonreadable, Action<TextureCacheItem> callback);
+		void TileDisposed(UnityTile tile, string tilesetId);
 		bool Exists(CanonicalTileId tileId, string mapId);
 		void Clear(string tilesetId);
 		void ClearAll();
@@ -113,6 +116,11 @@ namespace Mapbox.Platform.Cache
 				Debug.Log("Requested file not found");
 				callback(null);
 			}
+		}
+
+		public void TileDisposed(UnityTile tile, string tilesetId)
+		{
+			_fileDataFetcher.CancelFetching(tile.UnwrappedTileId, tilesetId);
 		}
 
 		public virtual void ClearAll()
@@ -212,21 +220,27 @@ namespace Mapbox.Platform.Cache
 
 			info.TextureCacheItem.FilePath = Path.GetFullPath(string.Format("{0}/{1}/{2}.{3}", PersistantCacheRootFolderPath, MapIdToFolderName(info.TilesetId), info.TileId.GenerateKey(info.TilesetId), FileExtension));
 
-			FileStream sourceStream = new FileStream(info.TextureCacheItem.FilePath,
-				FileMode.Create, FileAccess.Write, FileShare.Read,
-				bufferSize: 4096, useAsync: false);
-
-			Task t = sourceStream
-				.WriteAsync(info.TextureCacheItem.Data, 0, info.TextureCacheItem.Data.Length)
-				.ContinueWith((task) =>
+			MapboxAccess.Instance.TaskManager.AddTask(
+				new TaskWrapper()
 				{
-					sourceStream.Close();
-					OnFileSaved(info.TileId, info.TilesetId, info.TextureCacheItem);
+					Action = () =>
+					{
+						FileStream sourceStream = new FileStream(info.TextureCacheItem.FilePath,
+							FileMode.Create, FileAccess.Write, FileShare.Read,
+							bufferSize: 4096, useAsync: false);
+
+						sourceStream.Write(info.TextureCacheItem.Data, 0, info.TextureCacheItem.Data.Length);
+						sourceStream.Close();
+						OnFileSaved(info.TileId, info.TilesetId, info.TextureCacheItem);
 
 //this is not a good way to do it
 // #if UNITY_EDITOR
 // 					FileCacheDebugView.AddToLogs(string.Format("Saved {0, 20} - {1, -20}", info.TilesetId, info.TileId));
 // #endif
+					},
+#if UNITY_EDITOR
+					Info = string.Format("{0} - {1} - {2}", "FileCache.SaveInfo", info.TilesetId, info.TileId)
+#endif
 				});
 		}
 

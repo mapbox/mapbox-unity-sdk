@@ -81,7 +81,7 @@ namespace Mapbox.Map
 		{
 			Cancel();
 
-			_state = State.Loading;
+			TileState = TileState.Loading;
 			Id = canonicalTileId;
 			TilesetId = tilesetId;
 			_callback = p;
@@ -89,7 +89,7 @@ namespace Mapbox.Map
 			//we are passing etag here as well
 			//if it's not null, filesource will make a `FetchTextureIfNoneMatch` request
 			//else it'll be a regular request
-			_unityRequest = fileSource.MapboxImageRequest(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse, 10, Id, tilesetId, ETag, IsTextureNonreadable);
+			_unityRequest = fileSource.MapboxImageRequest(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse, 10, ETag, IsTextureNonreadable);
 		}
 
 		public override void Cancel()
@@ -109,7 +109,7 @@ namespace Mapbox.Map
 					AddException(exception);
 				}
 
-				_state = State.Canceled;
+				TileState = TileState.Canceled;
 			}
 			else
 			{
@@ -119,9 +119,9 @@ namespace Mapbox.Map
 				ExpirationDate = textureResponse.ExpirationDate;
 
 				// Cancelled is not the same as loaded!
-				if (_state != State.Canceled)
+				if (TileState != TileState.Canceled)
 				{
-					_state = State.Loaded;
+					TileState = TileState.Loaded;
 				}
 			}
 
@@ -134,10 +134,10 @@ namespace Mapbox.Map
 			return TileResource.MakeRaster(Id, tilesetId);
 		}
 
-		internal override bool ParseTileData(byte[] data)
+		internal override bool ParseTileData(byte[] newData)
 		{
 			// We do not parse raster tiles as they are
-			this.data = data;
+			this.data = newData;
 			return true;
 		}
 
@@ -152,7 +152,7 @@ namespace Mapbox.Map
 		public void SetTextureFromCache(Texture2D texture)
 		{
 			Texture2D = texture;
-			_state = State.Loaded;
+			TileState = TileState.Loaded;
 		}
 
 		public void ExtractTextureFromRequest()

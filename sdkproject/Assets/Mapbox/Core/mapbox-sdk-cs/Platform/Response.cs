@@ -279,37 +279,58 @@ namespace Mapbox.Platform
 #endif
 
 			Dictionary<string, string> apiHeaders = apiResponse.GetResponseHeaders();
+
+
 			if (null != apiHeaders)
 			{
 				response.Headers = new Dictionary<string, string>();
-				foreach (var apiHdr in apiHeaders)
+				if (apiHeaders.ContainsKey("X-Rate-Limit-Interval"))
 				{
-					string key = apiHdr.Key;
-					string val = apiHdr.Value;
-					response.Headers.Add(key, val);
-					if (key.Equals("X-Rate-Limit-Interval", stringComp))
-					{
-						int limitInterval;
-						if (int.TryParse(val, out limitInterval)) { response.XRateLimitInterval = limitInterval; }
-					}
-					else if (key.Equals("X-Rate-Limit-Limit", stringComp))
-					{
-						long limitLimit;
-						if (long.TryParse(val, out limitLimit)) { response.XRateLimitLimit = limitLimit; }
-					}
-					else if (key.Equals("X-Rate-Limit-Reset", stringComp))
-					{
-						double unixTimestamp;
-						if (double.TryParse(val, out unixTimestamp))
-						{
-							response.XRateLimitReset = UnixTimestampUtils.From(unixTimestamp);
-						}
-					}
-					else if (key.Equals("Content-Type", stringComp))
-					{
-						response.ContentType = val;
-					}
+					response.XRateLimitInterval = int.Parse(apiHeaders["X-Rate-Limit-Interval"]);
 				}
+
+				if (apiHeaders.ContainsKey("X-Rate-Limit-Limit"))
+				{
+					response.XRateLimitLimit = int.Parse(apiHeaders["X-Rate-Limit-Limit"]);
+				}
+
+				if (apiHeaders.ContainsKey("X-Rate-Limit-Reset"))
+				{
+					response.XRateLimitReset = UnixTimestampUtils.From(double.Parse(apiHeaders["X-Rate-Limit-Reset"]));
+				}
+
+				if (apiHeaders.ContainsKey("Content-Type"))
+				{
+					response.ContentType = apiHeaders["Content-Type"];
+				}
+				// foreach (var apiHdr in apiHeaders)
+				// {
+				// 	string key = apiHdr.Key;
+				// 	string val = apiHdr.Value;
+				// 	response.Headers.Add(key, val);
+				// 	// if (key.Equals("X-Rate-Limit-Interval", stringComp))
+				// 	// {
+				// 	// 	int limitInterval;
+				// 	// 	if (int.TryParse(val, out limitInterval)) { response.XRateLimitInterval = limitInterval; }
+				// 	// }
+				// 	// else if (key.Equals("X-Rate-Limit-Limit", stringComp))
+				// 	// {
+				// 	// 	long limitLimit;
+				// 	// 	if (long.TryParse(val, out limitLimit)) { response.XRateLimitLimit = limitLimit; }
+				// 	// }
+				// 	// else if (key.Equals("X-Rate-Limit-Reset", stringComp))
+				// 	// {
+				// 	// 	double unixTimestamp;
+				// 	// 	if (double.TryParse(val, out unixTimestamp))
+				// 	// 	{
+				// 	// 		response.XRateLimitReset = UnixTimestampUtils.From(unixTimestamp);
+				// 	// 	}
+				// 	// }
+				// 	// else if (key.Equals("Content-Type", stringComp))
+				// 	// {
+				// 	// 	response.ContentType = val;
+				// 	// }
+				// }
 			}
 
 			int statusCode = (int)apiResponse.responseCode;

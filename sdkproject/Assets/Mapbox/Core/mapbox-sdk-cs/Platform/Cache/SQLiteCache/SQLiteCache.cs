@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using Mapbox.Unity;
 using SQLite4Unity3d;
 
 namespace Mapbox.Platform.Cache
@@ -323,87 +324,102 @@ CONSTRAINT tileAssignmentConstraint UNIQUE (tileId, mapId)
 
 		public void Add(string tilesetName, CanonicalTileId tileId, byte[] data, string path, string etag, DateTime? expirationDate, bool forceInsert = false)
 		{
-			try
-			{
-				// tile exists and we don't want to overwrite -> exit early
-				if (
-					TileExists(tilesetName, tileId)
-					&& !forceInsert
-				)
+			MapboxAccess.Instance.TaskManager.AddTask(
+				new TaskWrapper()
 				{
-					return;
-				}
-
-				int? tilesetId = GetOrCreateTilesetId(tilesetName);
-
-				if (tilesetId < 0)
-				{
-					Debug.LogErrorFormat("could not get tilesetID for [{0}] tile: {1}", tilesetName, tileId);
-					return;
-				}
-
-				lock (_lock)
-				{
-					var nowInUnix = (int) UnixTimestampUtils.To(DateTime.Now);
-					var newTile = new tiles
+					Action = () =>
 					{
-						tile_set = tilesetId.Value,
-						zoom_level = tileId.Z,
-						tile_column = tileId.X,
-						tile_row = tileId.Y,
-						tile_data = data,
-						tile_path = path,
-						timestamp = nowInUnix,
-						etag = etag,
-						expirationDate = expirationDate.HasValue ? (int) UnixTimestampUtils.To(expirationDate.Value) : nowInUnix
-					};
-					int rowsAffected = UpdateTile(newTile);
-					if (rowsAffected == 0)
-					{
-						rowsAffected = (int) InsertTile(newTile);
-						if (rowsAffected > 0)
+						lock (_lock)
 						{
-							_pruneCacheCounter++;
+							try
+							{
+								// tile exists and we don't want to overwrite -> exit early
+								if (
+									TileExists(tilesetName, tileId)
+									&& !forceInsert
+								)
+								{
+									return;
+								}
+
+								int? tilesetId = GetOrCreateTilesetId(tilesetName);
+
+								if (tilesetId < 0)
+								{
+									Debug.LogErrorFormat("could not get tilesetID for [{0}] tile: {1}", tilesetName, tileId);
+									return;
+								}
+
+								lock (_lock)
+								{
+									var nowInUnix = (int) UnixTimestampUtils.To(DateTime.Now);
+									var newTile = new tiles
+									{
+										tile_set = tilesetId.Value,
+										zoom_level = tileId.Z,
+										tile_column = tileId.X,
+										tile_row = tileId.Y,
+										tile_data = data,
+										tile_path = path,
+										timestamp = nowInUnix,
+										etag = etag,
+										expirationDate = expirationDate.HasValue ? (int) UnixTimestampUtils.To(expirationDate.Value) : nowInUnix
+									};
+									int rowsAffected = UpdateTile(newTile);
+									if (rowsAffected == 0)
+									{
+										rowsAffected = (int) InsertTile(newTile);
+										if (rowsAffected > 0)
+										{
+											_pruneCacheCounter++;
+										}
+									}
+
+									if (rowsAffected < 1)
+									{
+										throw new Exception(string.Format("tile [{0} / {1}] was not inserted, rows affected:{2}", tilesetName, tileId, rowsAffected));
+									}
+
+									// int rowsAffected = _sqlite.InsertOrReplace(new tiles
+									// {
+									// 	tile_set = tilesetId.Value,
+									// 	zoom_level = tileId.Z,
+									// 	tile_column = tileId.X,
+									// 	tile_row = tileId.Y,
+									// 	tile_data = data,
+									// 	tile_path = path,
+									// 	timestamp = nowInUnix,
+									// 	etag = etag,
+									// 	expirationDate = expirationDate.HasValue ? (int) UnixTimestampUtils.To(expirationDate.Value) : nowInUnix
+									// });
+									// if (1 != rowsAffected)
+									// {
+									// 	throw new Exception(string.Format("tile [{0} / {1}] was not inserted, rows affected:{2}", tilesetName, tileId, rowsAffected));
+									// }
+								}
+							}
+							catch (Exception ex)
+							{
+								Debug.LogErrorFormat("Error inserting {0} {1} {2} ", tilesetName, tileId, ex);
+							}
+
+							// update counter only when new tile gets inserted
+							if (!forceInsert)
+							{
+								_pruneCacheCounter++;
+							}
+
+							if (0 == _pruneCacheCounter % _pruneCacheDelta)
+							{
+								_pruneCacheCounter = 0;
+								prune();
+							}
 						}
-					}
-					if (rowsAffected < 1)
-					{
-						throw new Exception(string.Format("tile [{0} / {1}] was not inserted, rows affected:{2}", tilesetName, tileId, rowsAffected));
-					}
-
-					// int rowsAffected = _sqlite.InsertOrReplace(new tiles
-					// {
-					// 	tile_set = tilesetId.Value,
-					// 	zoom_level = tileId.Z,
-					// 	tile_column = tileId.X,
-					// 	tile_row = tileId.Y,
-					// 	tile_data = data,
-					// 	tile_path = path,
-					// 	timestamp = nowInUnix,
-					// 	etag = etag,
-					// 	expirationDate = expirationDate.HasValue ? (int) UnixTimestampUtils.To(expirationDate.Value) : nowInUnix
-					// });
-					// if (1 != rowsAffected)
-					// {
-					// 	throw new Exception(string.Format("tile [{0} / {1}] was not inserted, rows affected:{2}", tilesetName, tileId, rowsAffected));
-					// }
-				}
-			}
-			catch (Exception ex)
-			{
-				Debug.LogErrorFormat("Error inserting {0} {1} {2} ", tilesetName, tileId, ex);
-			}
-
-			// update counter only when new tile gets inserted
-			if (!forceInsert)
-			{
-				_pruneCacheCounter++;
-			}
-			if (0 == _pruneCacheCounter % _pruneCacheDelta)
-			{
-				_pruneCacheCounter = 0;
-				prune();
-			}
+					},
+#if UNITY_EDITOR
+					Info = string.Format("{0} - {1} - {2}", "SqliteCache.Add", tilesetName, tileId)
+#endif
+				});
 		}
 
 		private int? GetOrCreateTilesetId(string tilesetName)

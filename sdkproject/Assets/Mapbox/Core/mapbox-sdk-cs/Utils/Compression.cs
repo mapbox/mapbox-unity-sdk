@@ -4,11 +4,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System.IO.Compression;
+
 namespace Mapbox.Utils
 {
 
 	using System.IO;
-	using Mapbox.IO.Compression;
 
 
 	/// <summary> Collection of constants used across the project. </summary>

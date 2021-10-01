@@ -5,26 +5,35 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using Mapbox.Unity.MeshGeneration.Data;
 	using System;
 
-	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Smooth Height for Buildings Modifier")]
-	public class ChamferHeightModifier : MeshModifier
+	public class ChamferHeightCore
 	{
 		[SerializeField]
 		[Tooltip("Flatten top polygons to prevent unwanted slanted roofs because of the bumpy terrain")]
 		private bool _flatTops;
+
 		[SerializeField]
 		[Tooltip("Fixed height value for ForceHeight option")]
 		private float _height;
+
 		[SerializeField]
 		[Tooltip("Fix all features to certain height, suggested to be used for pushing roads above terrain level to prevent z-fighting.")]
 		private bool _forceHeight;
+
 		[SerializeField]
 		[Range(0.1f,2)]
 		[Tooltip("Chamfer width value")]
 		private float _offset = 0.2f;
 
-		public override ModifierType Type { get { return ModifierType.Preprocess; } }
+		public ChamferHeightCore(ChamferModifierSettings settings)
+		{
+			_flatTops = settings.FlatTops;
+			_height = settings.Height;
+			_forceHeight = settings.ForceHeight;
+			_offset = settings.Offset;
+		}
 
-		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
+
+		public void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
 			if (md.Vertices.Count == 0 || feature == null || feature.Points.Count < 1)
 				return;
@@ -204,8 +213,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 
 					v1 = new Vector3(
-							md.Vertices[current].x - md.Vertices[next].x, 0,
-							md.Vertices[current].z - md.Vertices[next].z);
+						md.Vertices[current].x - md.Vertices[next].x, 0,
+						md.Vertices[current].z - md.Vertices[next].z);
 					v1.Normalize();
 					v1 *= -_offset;
 					n1 = new Vector3(-v1.z, 0, v1.x);
@@ -343,8 +352,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			return enlarged_points;
 		}
 
-		// Find the point of intersection between
-		// the lines p1 --> p2 and p3 --> p4.
 		private void FindIntersection(
 			Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4,
 			out bool lines_intersect, out bool segments_intersect,
@@ -362,7 +369,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			float t1 =
 				((p1.x - p3.x) * dy34 + (p3.z - p1.z) * dx34)
-					/ denominator;
+				/ denominator;
 			if (float.IsInfinity(t1))
 			{
 				// The lines are parallel (or close enough to it).
@@ -377,7 +384,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			float t2 =
 				((p3.x - p1.x) * dy12 + (p1.z - p3.z) * dx12)
-					/ -denominator;
+				/ -denominator;
 
 			// Find the point of intersection.
 			intersection = new Vector3(p1.x + dx12 * t1, 0, p1.z + dy12 * t1);
@@ -408,6 +415,37 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 			close_p1 = new Vector3(p1.x + dx12 * t1, 0, p1.z + dy12 * t1);
 			close_p2 = new Vector3(p3.x + dx34 * t2, 0, p3.z + dy34 * t2);
+		}
+	}
+
+	[Serializable]
+	public class ChamferModifierSettings
+	{
+		[Tooltip("Flatten top polygons to prevent unwanted slanted roofs because of the bumpy terrain")]
+		public bool FlatTops;
+
+		[Tooltip("Fixed height value for ForceHeight option")]
+		public float Height;
+
+		[Tooltip("Fix all features to certain height, suggested to be used for pushing roads above terrain level to prevent z-fighting.")]
+		public bool ForceHeight;
+
+		[Range(0.1f,2)]
+		[Tooltip("Chamfer width value")]
+		public float Offset = 0.2f;
+	}
+
+	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Smooth Height for Buildings Modifier")]
+	public class ChamferHeightModifier : MeshModifier
+	{
+		[SerializeField] private ChamferModifierSettings _chamferModifierSettings;
+
+		public ModifierType Type { get { return ModifierType.Preprocess; } }
+
+		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
+		{
+			var core = new ChamferHeightCore(_chamferModifierSettings);
+			core.Run(feature, md, tile);
 		}
 	}
 }

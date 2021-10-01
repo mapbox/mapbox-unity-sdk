@@ -7,9 +7,4 @@ namespace Mapbox.Platform.Cache
 		public Texture2D Texture2D;
 		public string FilePath;
 	}
-
-	public class VectorCacheItem : CacheItem
-	{
-		public VectorTile.VectorTile VectorTile;
-	}
 }

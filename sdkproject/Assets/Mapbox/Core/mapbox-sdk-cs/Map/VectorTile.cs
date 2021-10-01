@@ -4,6 +4,15 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Mapbox.Platform;
+using Mapbox.Unity;
+using Mapbox.Unity.MeshGeneration.Data;
+using UnityEngine;
+
 namespace Mapbox.Map
 {
 	using System.Collections.ObjectModel;
@@ -95,13 +104,85 @@ namespace Mapbox.Map
 			}
 		}
 
-		//TODO: uncomment if 'VectorTile' class changes from 'sealed'
-		//protected override void Dispose(bool disposeManagedResources)
-		//~VectorTile()
-		//{
-		//    Dispose(false);
-		//}
+		internal override void Initialize(IFileSource fileSource, CanonicalTileId canonicalTileId, string tilesetId, Action p)
+		{
+			Cancel();
 
+			TileState = TileState.Loading;
+			Id = canonicalTileId;
+			_callback = p;
+			TilesetId = tilesetId;
+
+			_request = fileSource.Request(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse, 2);
+		}
+
+		private void HandleTileResponse(Response response)
+		{
+			//callback has to be called here
+			//otherwise requests are never complete (success or failure) and pipeline gets blocked
+			if (response.HasError)
+			{
+				TileState = TileState.Canceled;
+				foreach (var exception in response.Exceptions)
+				{
+					AddException(exception);
+				}
+
+				if (_callback != null)
+				{
+					_callback();
+				}
+			}
+			else
+			{
+				// only try to parse if request was successful
+
+				// current implementation doesn't need to check if parsing is successful:
+				// * Mapbox.Map.VectorTile.ParseTileData() already adds any exception to the list
+				// * Mapbox.Map.RasterTile.ParseTileData() doesn't do any parsing
+
+				MapboxAccess.Instance.TaskManager.AddTask(
+					new TaskWrapper()
+					{
+						Action = () =>
+						{
+							byteData = response.Data;
+							ParseTileData(byteData);
+							TileState = TileState.Loaded;
+						},
+						ContinueWith = (t) =>
+						{
+							// Cancelled is not the same as loaded!
+							if (TileState != TileState.Canceled)
+							{
+								TileState = TileState.Loaded;
+							}
+
+							if (_callback != null)
+							{
+								_callback();
+							}
+						},
+#if UNITY_EDITOR
+						Info = string.Format("{0} - {1} - {2}", "VectorTile.HandleTileResponse", TilesetId, Id)
+#endif
+					});
+			}
+		}
+
+		public void SetByteData(byte[] newData)
+		{
+			byteData = newData;
+			ParseTileData(byteData);
+			TileState = TileState.Loaded;
+		}
+
+		internal override bool ParseTileData(byte[] newData)
+		{
+			var decompressed = Compression.Decompress(newData);
+			data = new Mapbox.VectorTile.VectorTile(decompressed);
+			return true;
+		}
 
 		public void Dispose()
 		{
@@ -126,7 +207,6 @@ namespace Mapbox.Map
 			}
 		}
 
-
 		/// <summary>
 		/// <para>Gets the vector in a GeoJson format.</para>
 		/// <para>
@@ -148,7 +228,6 @@ namespace Mapbox.Map
 				return this.data.ToGeoJson((ulong)Id.Z, (ulong)Id.X, (ulong)Id.Y, 0);
 			}
 		}
-
 
 		/// <summary>
 		/// Gets all availble layer names.
@@ -201,23 +280,10 @@ namespace Mapbox.Map
 			  : TileResource.MakeVector(Id, tilesetId);
 		}
 
-
-		internal override bool ParseTileData(byte[] data)
+		public void SetVectorFromCache(VectorTile vectorTile)
 		{
-			try
-			{
-				byteData = data;
-				var decompressed = Compression.Decompress(data);
-				this.data = new Mapbox.VectorTile.VectorTile(decompressed);
-				return true;
-			}
-			catch (Exception ex)
-			{
-				AddException(ex);
-				return false;
-			}
+			data = vectorTile.Data;
+			TileState = TileState.Loaded;
 		}
-
-
 	}
 }

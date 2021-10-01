@@ -28,8 +28,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public RasterTile TerrainData => _terrainTile;
 		public float[] HeightData;
 
-		private Mapbox.VectorTile.VectorTile _vectorTile;
-		public Mapbox.VectorTile.VectorTile VectorData => _vectorTile;
+		private VectorTile _vectorTile;
+		public VectorTile VectorData => _vectorTile;
+
+		private Action<UnityTile> _createMeshCallback;
+		private bool _isElevationActive;
 
 		private int _heightDataResolution = 100;
 		//keeping track of tile objects to be able to cancel them safely if tile is destroyed before data fetching finishes
@@ -100,6 +103,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			private set { _tileScale = value; }
 		}
 
+		public float TileSize;
+
 		public RectD Rect { get; private set; }
 		public int CurrentZoom { get; private set; }
 
@@ -109,20 +114,21 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		private float _relativeScale;
 		#endregion
 
-		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, float scale, int zoom, Texture2D loadingTexture = null)
+		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, bool isElevationActive)
 		{
 			gameObject.hideFlags = HideFlags.DontSave;
-
+			TileSize = map.UnityTileSize;
+			_isElevationActive = isElevationActive;
 			ElevationType = TileTerrainType.None;
-			TileScale = scale;
+			TileScale = map.WorldRelativeScale;
 			_relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
 			Rect = Conversions.TileBounds(tileId);
 			UnwrappedTileId = tileId;
 			CanonicalTileId = tileId.Canonical;
 
 			float scaleFactor = 1.0f;
-			CurrentZoom = zoom;
-			scaleFactor = Mathf.Pow(2, (map.InitialZoom - zoom));
+			CurrentZoom = map.AbsoluteZoom;
+			scaleFactor = Mathf.Pow(2, (map.InitialZoom - CurrentZoom));
 			gameObject.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
 			//gameObject.SetActive(true);
 
@@ -157,12 +163,16 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			Tiles.Clear();
 		}
 
-		public void SetHeightData(RasterTile terrainTile, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false, Action<UnityTile> callback = null)
+		public void SetHeightData(RasterTile rasterTile, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false, Action<UnityTile> callback = null)
 		{
 			//reset height data
-			if (terrainTile == null || terrainTile.Texture2D == null)
+			if (rasterTile == null || rasterTile.Texture2D == null)
 			{
 				HeightData = new float[_heightDataResolution * _heightDataResolution];
+				if (!_isElevationActive && _createMeshCallback != null)
+				{
+					_createMeshCallback(this);
+				}
 				return;
 			}
 
@@ -171,27 +181,27 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				HeightData = new float[_heightDataResolution * _heightDataResolution];
 			}
 
-			_terrainTile = terrainTile;
+			_terrainTile = rasterTile;
 
-			var tileId = terrainTile.Id;
+			var tileId = rasterTile.Id;
 
 			if (SystemInfo.supportsAsyncGPUReadback)
 			{
-				AsyncGpuReadbackForElevation(terrainTile, heightMultiplier, useRelative, callback, tileId);
+				AsyncGpuReadbackForElevation(rasterTile, heightMultiplier, useRelative, callback, tileId);
 			}
 			else
 			{
-				SyncReadForElevation(terrainTile, heightMultiplier, useRelative, callback);
+				SyncReadForElevation(rasterTile, heightMultiplier, useRelative, callback);
 			}
 		}
 
-		private void SyncReadForElevation(RasterTile terrainTile, float heightMultiplier, bool useRelative, Action<UnityTile> callback)
+		private void SyncReadForElevation(RasterTile rasterTile, float heightMultiplier, bool useRelative, Action<UnityTile> callback)
 		{
-			_terrainTile = terrainTile;
-			byte[] rgbData = _terrainTile.Texture2D.GetRawTextureData();
+			_rasterTile = rasterTile;
+			byte[] rgbData = _rasterTile.Texture2D.GetRawTextureData();
 			//var rgbData = _heightTexture.GetRawTextureData<Color32>();
 			var relativeScale = useRelative ? _relativeScale : 1f;
-			var width = _terrainTile.Texture2D.width;
+			var width = _rasterTile.Texture2D.width;
 			for (float yy = 0; yy < _heightDataResolution; yy++)
 			{
 				for (float xx = 0; xx < _heightDataResolution; xx++)
@@ -218,13 +228,13 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				callback(this);
 			}
 
-			CheckFinishedCondition(_terrainTile);
+			CheckFinishedCondition(_rasterTile);
 		}
 
-		private void AsyncGpuReadbackForElevation(RasterTile terrainTile, float heightMultiplier, bool useRelative, Action<UnityTile> callback, CanonicalTileId tileId)
+		private void AsyncGpuReadbackForElevation(RasterTile rasterTile, float heightMultiplier, bool useRelative, Action<UnityTile> callback, CanonicalTileId tileId)
 		{
-			_terrainTile = terrainTile;
-			AsyncGPUReadback.Request(_terrainTile.Texture2D, 0, (t) =>
+			_rasterTile = rasterTile;
+			AsyncGPUReadback.Request(_rasterTile.Texture2D, 0, (t) =>
 			{
 				if (CanonicalTileId != tileId || IsRecycled)
 				{
@@ -271,7 +281,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					callback(this);
 				}
 
-				CheckFinishedCondition(_terrainTile);
+				CheckFinishedCondition(_rasterTile);
+				if (_createMeshCallback != null)
+				{
+					_createMeshCallback(this);
+				}
 			});
 		}
 
@@ -308,9 +322,19 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			CheckFinishedCondition(_rasterTile);
 		}
 
-		public void SetVectorData(string tileset, Mapbox.VectorTile.VectorTile vectorTile)
+		public void SetVectorData(string tileset, VectorTile vectorTile, Action<UnityTile> createMeshCallback = null)
 		{
 			_vectorTile = vectorTile;
+			_createMeshCallback = createMeshCallback;
+			if (!_isElevationActive && _createMeshCallback != null)
+			{
+				_createMeshCallback(this);
+			}
+
+			if (_isElevationActive && _terrainTile != null && _terrainTile.CurrentTileState == TileState.Loaded)
+			{
+				_createMeshCallback(this);
+			}
 		}
 
 		/// <summary>
@@ -478,7 +502,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			_finishConditionTiles.Clear();
 			foreach (var tile in Tiles)
 			{
-				if (tile.CurrentState == Tile.State.Loading || tile.CurrentState == Tile.State.New)
+				if (tile.CurrentTileState == TileState.Loading || tile.CurrentTileState == TileState.New)
 				{
 					_finishConditionTiles.Add(tile);
 				}

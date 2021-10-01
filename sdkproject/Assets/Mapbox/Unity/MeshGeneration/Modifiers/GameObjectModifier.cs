@@ -38,5 +38,10 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		{
 
 		}
+
+		public virtual void Unregister(UnityTile tile)
+		{
+			
+		}
 	}
 }
