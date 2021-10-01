@@ -42,18 +42,14 @@ namespace Mapbox.Unity.DataFetching
 					rasterTile.FromCache = CacheType.FileCache;
 					textureCacheItem.From = rasterTile.FromCache;
 #endif
-					rasterTile.ETag = textureCacheItem.ETag;
-					rasterTile.ExpirationDate = textureCacheItem.ExpirationDate.Value;
+					tile.ETag = textureCacheItem.ETag;
+					if (textureCacheItem.ExpirationDate.HasValue)
+					{
+						tile.ExpirationDate = textureCacheItem.ExpirationDate.Value;
+					}
 					TextureReceived(unityTile, rasterTile);
 					MapboxAccess.Instance.CacheManager.AddTextureItemToMemory(tilesetId, tileId, textureCacheItem, true);
 					MapboxAccess.Instance.CacheManager.MarkFallback(tileId, tilesetId);
-
-					//after returning what we already have
-					//check if it's out of date, if so check server for update
-					if (textureCacheItem.ExpirationDate < DateTime.Now)
-					{
-						EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, textureCacheItem.ETag) {Callback = () => { FetchingCallback(tileId, tile, unityTile); }});
-					}
 				}
 				else
 				{

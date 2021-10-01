@@ -35,7 +35,7 @@ namespace Mapbox.Unity.Map
 				yield return VectorLayer.Factory;
 			}
 		}
-		
+
 		public TerrainLayer TerrainLayer;
 		public ImageryLayer ImageryLayer;
 		public VectorLayer VectorLayer;
@@ -43,6 +43,7 @@ namespace Mapbox.Unity.Map
 		protected IMapReadable _map;
 		protected Dictionary<UnwrappedTileId, UnityTile> _activeTiles = new Dictionary<UnwrappedTileId, UnityTile>();
 		protected ObjectPool<UnityTile> _tilePool;
+		private int _counter;
 
 		private ModuleState _state;
 		public ModuleState State
@@ -61,8 +62,9 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
+		public IMapReadable Map { get { return _map; } }
 		public Dictionary<UnwrappedTileId, UnityTile> ActiveTiles { get { return _activeTiles; } }
-		public Queue<UnityTile> GetInactiveTiles => _tilePool.GetQueue() as Queue<UnityTile>;
+		public Dictionary<UnwrappedTileId, int> _tileProgress;
 
 		public event Action<ModuleState> OnMapVisualizerStateChanged = delegate { };
 		public event Action<UnityTile> OnTileFinished = delegate { };
@@ -74,6 +76,7 @@ namespace Mapbox.Unity.Map
 		public virtual void Initialize(IMapReadable map)
 		{
 			_map = map;
+			_tileProgress = new Dictionary<UnwrappedTileId, int>();
 
 			//Layers serialize so we are using Initialize method to pass parameters
 			//on map start. Otherwise Layer object will not be null because of serialization
@@ -111,11 +114,17 @@ namespace Mapbox.Unity.Map
 				var tile = new GameObject().AddComponent<UnityTile>();
 				tile.MeshRenderer.sharedMaterial = Instantiate(_map.TileMaterial);
 				tile.transform.SetParent(_map.Root, false);
-				if ( TerrainLayer.Factory != null)
+				tile.gameObject.SetActive(false);
+				if (TerrainLayer.Factory != null)
 				{
 					TerrainLayer.Factory.PregenerateTileMesh(tile);
 				}
-				tile.TileFinished += OnTileFinished;
+
+				tile.TileFinished += (t) =>
+				{
+					t.gameObject.SetActive(true);
+					OnTileFinished(t);
+				};
 				return tile;
 			});
 
@@ -138,12 +147,12 @@ namespace Mapbox.Unity.Map
 
 
 			//Set up events for changes.
-			 ImageryLayer.UpdateLayer += OnImageOrTerrainUpdateLayer;
-			 TerrainLayer.UpdateLayer += OnImageOrTerrainUpdateLayer;
+			ImageryLayer.UpdateLayer += OnImageOrTerrainUpdateLayer;
+			TerrainLayer.UpdateLayer += OnImageOrTerrainUpdateLayer;
 
-			 VectorLayer.SubLayerRemoved += OnVectorDataSubLayerRemoved;
-			 VectorLayer.SubLayerAdded += OnVectorDataSubLayerAdded;
-			 VectorLayer.UpdateLayer += OnVectorDataUpdateLayer;
+			VectorLayer.SubLayerRemoved += OnVectorDataSubLayerRemoved;
+			VectorLayer.SubLayerAdded += OnVectorDataSubLayerAdded;
+			VectorLayer.UpdateLayer += OnVectorDataUpdateLayer;
 		}
 
 		private void OnImageOrTerrainUpdateLayer(object sender, System.EventArgs eventArgs)
@@ -463,7 +472,7 @@ namespace Mapbox.Unity.Map
 				DisposeTile(tileId);
 			}
 
-			if(_tilePool != null)
+			if (_tilePool != null)
 			{
 				foreach (var tile in _tilePool.GetQueue())
 				{
@@ -564,8 +573,10 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public event Action<UnityTile> OnTileDisposing = delegate {};
+		public event Action<UnityTile> OnTileDisposing = delegate { };
 
 		#endregion
+
+		public Queue<UnityTile> GetInactiveTiles => _tilePool.GetQueue() as Queue<UnityTile>;
 	}
 }

@@ -118,12 +118,14 @@ namespace Mapbox.Unity
 					else
 					{
 						_allTasks.Remove(taskWrapper.Id);
-						_tasksByTile[taskWrapper.TileId].Remove(taskWrapper.Id);
-						if (_tasksByTile[taskWrapper.TileId].Count == 0)
+						if (_tasksByTile.ContainsKey(taskWrapper.TileId))
 						{
-							_tasksByTile.Remove(taskWrapper.TileId);
+							_tasksByTile[taskWrapper.TileId].Remove(taskWrapper.Id);
+							if (_tasksByTile[taskWrapper.TileId].Count == 0)
+							{
+								_tasksByTile.Remove(taskWrapper.TileId);
+							}
 						}
-
 
 						taskWrapper.EnqueueFrame = Time.frameCount;
 						_allTasks.Add(taskWrapper.Id, taskWrapper);

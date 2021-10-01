@@ -440,7 +440,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	{
 		[SerializeField] private ChamferModifierSettings _chamferModifierSettings;
 
-		public ModifierType Type { get { return ModifierType.Preprocess; } }
+		public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{

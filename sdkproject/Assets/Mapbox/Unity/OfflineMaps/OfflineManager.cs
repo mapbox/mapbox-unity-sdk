@@ -101,7 +101,7 @@ namespace Mapbox.Unity.OfflineMaps
 
 				return estimatedTileList;
 			}
-			catch (Exception e)
+			catch
 			{
 				// ignored
 				return null;
@@ -134,7 +134,7 @@ namespace Mapbox.Unity.OfflineMaps
 					tileCount += GetWithWebMerc(minLatlng, maxLatlng, currentZoom).Count();
 				}
 			}
-			catch (Exception e)
+			catch
 			{
 				// ignored
 				return 0;

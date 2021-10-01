@@ -37,12 +37,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		{
 			var _counter = feature.Points.Count;
 			var subset = new List<List<Vector3>>(_counter);
-			Data flatData = null;
-			List<int> result = null;
 			var currentIndex = 0;
-			int vertCount = 0, polygonVertexCount = 0;
 			List<int> triList = null;
-			List<Vector3> sub = null;
 
 			Polygonize(feature, md, tile.TileSize, _counter, subset, triList, currentIndex);
 		}

@@ -192,12 +192,12 @@ namespace Mapbox.Platform.Cache
 			var key = tileId.GenerateKey(tilesetId);
 			if (_cachedItems.ContainsKey(key))
 			{
-				if(!_fallbackItems.ContainsKey(key))
+				if (!_fallbackItems.ContainsKey(key))
 				{
-				var cacheItem = _cachedItems[key];
-				_cachedItems.Remove(key);
-				_destructionHashset.Remove(key);
-				_fallbackItems.Add(key, cacheItem);
+					var cacheItem = _cachedItems[key];
+					_cachedItems.Remove(key);
+					_destructionHashset.Remove(key);
+					_fallbackItems.Add(key, cacheItem);
 				}
 				else
 				{
@@ -218,9 +218,9 @@ namespace Mapbox.Platform.Cache
 				{
 					_cacheSizeWarningShown = true;
 					Debug.Log(string.Format("Memory cache is full ({0} texture at the moment). Either your cache setting is too low ({1}) for your camera view and settings " +
-					                        "or textures aren't disposed properly as memory cache hasn't received unregister signal. " +
-					                        "Not taking any actions but latter might crash the app due to memory usage soon." +
-					                        "This message won't repeat to prevent spam but issue will consist.", _cachedItems.Count, _maxCacheSize));
+											"or textures aren't disposed properly as memory cache hasn't received unregister signal. " +
+											"Not taking any actions but latter might crash the app due to memory usage soon." +
+											"This message won't repeat to prevent spam but issue will consist.", _cachedItems.Count, _maxCacheSize));
 					// var keys = _cachedItems.Keys.ToArray();
 					// foreach (var keyToRemove in keys)
 					// {
@@ -275,11 +275,11 @@ namespace Mapbox.Platform.Cache
 
 	public class EditorMemoryCache : MemoryCache
 	{
-		public Action<CanonicalTileId, string, CacheItem, bool> TileAdded = (s, id, arg3, arg4) => {};
-		public Action<CanonicalTileId, string> TileReleased = (s, id) => {};
-		public Action<CanonicalTileId, string> TileRead = (s, id) => {};
-		public Action<CanonicalTileId, string> TileSetFallback = (s, id) => {};
-		public Action<CanonicalTileId, string> TilePruned = (s, id) => {};
+		public Action<CanonicalTileId, string, CacheItem, bool> TileAdded = (s, id, arg3, arg4) => { };
+		public Action<CanonicalTileId, string> TileReleased = (s, id) => { };
+		public Action<CanonicalTileId, string> TileRead = (s, id) => { };
+		public Action<CanonicalTileId, string> TileSetFallback = (s, id) => { };
+		public Action<CanonicalTileId, string> TilePruned = (s, id) => { };
 
 		public Dictionary<int, CacheItem> GetCachedItems => _cachedItems;
 		public Dictionary<int, CacheItem> GetFallbackItems => _fallbackItems;
@@ -305,7 +305,6 @@ namespace Mapbox.Platform.Cache
 		{
 			TileRead(tileId, tilesetId);
 			return base.Get(tileId, tilesetId);
-			TileRead(tileId, tilesetId);
 		}
 
 		public override void Clear()

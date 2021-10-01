@@ -111,7 +111,9 @@ namespace Mapbox.Platform.Cache
 				var response = new TextureResponse();
 				yield return webRequest.SendWebRequest();
 
-				if (webRequest != null && webRequest.isNetworkError || webRequest.isHttpError)
+				if (webRequest != null &&
+					webRequest.result == UnityWebRequest.Result.ConnectionError ||
+					webRequest.result == UnityWebRequest.Result.ProtocolError)
 				{
 					response.AddException(new Exception(webRequest.error));
 				}

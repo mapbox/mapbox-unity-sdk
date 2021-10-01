@@ -631,89 +631,44 @@ namespace Mapbox.Unity.Map
 		private void TriggerTileRedrawForExtent(ExtentArgs currentExtent)
 		{
 			var activeTiles = _mapVisualizer.ActiveTiles;
-			_currentExtent = new HashSet<UnwrappedTileId>(currentExtent.ActiveTiles);
+			var tilesToProcess = new List<UnwrappedTileId>();
 
-			var tilesToRemove = new List<UnwrappedTileId>();
-			foreach (var activeTile in _mapVisualizer.ActiveTiles)
+			//remove tiles
+			foreach (var item in activeTiles)
 			{
-				var tile = activeTile.Value;
-				if (tile.CurrentZoom < AbsoluteZoom || !currentExtent.Bounds.Overlap(tile.Rect))
+				if (TileProvider.Cleanup(item.Key))
 				{
-					tilesToRemove.Add(activeTile.Key);
-					TileTracker.Remove(activeTile.Key);
-				}
-				else if (tile.CurrentZoom > (int) Zoom)
-				{
-					if ((tile.BaseRasterData == null ||
-					     tile.BaseRasterData.CurrentTileState != TileState.Loaded))
-					{
-						if (tile.BackgroundImageInUse)
-						{
-							_mapVisualizer.StopTile(tile);
-						}
-						else
-						{
-							tilesToRemove.Add(tile.UnwrappedTileId);
-						}
-						TileTracker.Remove(tile.UnwrappedTileId);
-					}
-					else
-					{
-						_mapVisualizer.StopTile(tile);
-					}
-
-					UnwrappedTileId parent = tile.UnwrappedTileId;
-					for (int i = 0; i < (tile.CurrentZoom - (int) Zoom); i++)
-					{
-						parent = parent.Parent;
-					}
-
-					if (currentExtent.ActiveTiles.Contains(parent))
-					{
-						if (!TileTracker.ContainsKey(parent))
-						{
-							TileTracker.Add(parent, new HashSet<UnwrappedTileId>());
-						}
-
-						if (!TileTracker[parent].Contains(tile.UnwrappedTileId))
-						{
-							TileTracker[parent].Add(tile.UnwrappedTileId);
-						}
-					}
-					else
-					{
-						Debug.Log("miscalculation?");
-					}
+					tilesToProcess.Add(item.Key);
 				}
 			}
-
-			foreach (var tileId in tilesToRemove)
+			foreach (var tile in tilesToProcess)
 			{
-				TileProvider_OnTileRemoved(tileId);
+				TileProvider_OnTileRemoved(tile);
 			}
 
+			//reposition existing tile
 			foreach (var tile in activeTiles)
 			{
 				// Reposition tiles in case we panned.
 				TileProvider_OnTileRepositioned(tile.Key);
 			}
 
-			_tilesToProcess.Clear();
-			foreach (var tile in _currentExtent)
+			//add new tiles
+			tilesToProcess.Clear();
+			foreach (var tile in currentExtent.ActiveTiles)
 			{
 				if (!activeTiles.ContainsKey(tile))
 				{
-					_tilesToProcess.Add(tile);
+					tilesToProcess.Add(tile);
 				}
 			}
-
-			if (_tilesToProcess.Count > 0)
+			if (tilesToProcess.Count > 0)
 			{
-				OnTilesStarting(_tilesToProcess);
-				foreach (var tileId in _tilesToProcess)
+				OnTilesStarting(tilesToProcess);
+				foreach (var tileId in tilesToProcess)
 				{
 					_mapVisualizer.State = ModuleState.Working;
-					TileProvider_OnTileAdded(tileId, currentExtent.ZoomState == ZoomState.ZoomIn);
+					TileProvider_OnTileAdded(tileId, true);
 				}
 			}
 		}

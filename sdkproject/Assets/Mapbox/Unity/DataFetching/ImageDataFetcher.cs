@@ -90,6 +90,12 @@ namespace Mapbox.Unity.DataFetching
 
 				if (textureCacheItem != null)
 				{
+					tile.ETag = textureCacheItem.ETag;
+					if (textureCacheItem.ExpirationDate.HasValue)
+					{
+						tile.ExpirationDate = textureCacheItem.ExpirationDate.Value;
+					}
+
 					//after returning what we already have
 					//check if it's out of date, if so check server for update
 					if (textureCacheItem.ExpirationDate < DateTime.Now)

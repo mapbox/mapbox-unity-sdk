@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Mapbox.Map;
 using Mapbox.Platform;
 using Mapbox.Unity.Utilities;
-using Unity.UNetWeaver;
 using UnityEngine;
 
 namespace Mapbox.Unity.DataFetching
@@ -17,7 +16,7 @@ namespace Mapbox.Unity.DataFetching
 		protected IFileSource _fileSource;
 		protected Queue<int> _tileOrder;
 		protected Dictionary<int, FetchInfo> _tileFetchInfos;
-		private Dictionary<int, Tile> _localQueuedRequests = new Dictionary<int, Tile>();
+		private Dictionary<int, Tile> _localQueuedRequests;
 		protected Dictionary<int, Tile> _globalActiveRequests;
 		protected int _activeRequestLimit = 10;
 
@@ -27,6 +26,7 @@ namespace Mapbox.Unity.DataFetching
 			_tileOrder = new Queue<int>();
 			_tileFetchInfos = new Dictionary<int, FetchInfo>();
 			_globalActiveRequests = new Dictionary<int, Tile>();
+			_localQueuedRequests = new Dictionary<int, Tile>();
 			Runnable.Run(UpdateTick());
 		}
 
@@ -53,7 +53,9 @@ namespace Mapbox.Unity.DataFetching
 				//this probably means first one was supposed to be cancelled but for some reason has not.
 				//ensure all data fetchers (including unorthodox ones like file data fetcher) handling
 				//tile cancelling properly
+#if DEPLOY_DEV || UNITY_EDITOR
 				Debug.Log("tile request is already in queue. This most likely means first request was supposed to be cancelled but not.");
+#endif
 			}
 		}
 

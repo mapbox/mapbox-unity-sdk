@@ -21,7 +21,7 @@ namespace Mapbox.Unity.Map
 			string sublayerName = "Untitled";
 
 			//Line Geometry Options
-			float lineWidth = 1.0f;
+			//float lineWidth = 1.0f;
 
 			//Geometry Extrusion Options
 			ExtrusionType extrusionType = ExtrusionType.None;
@@ -62,7 +62,7 @@ namespace Mapbox.Unity.Map
 				case PresetFeatureType.Roads:
 					layerName = "road";
 					geometryType = VectorPrimitiveType.Line;
-					lineWidth = 1.0f;
+					//lineWidth = 1.0f;
 					style = StyleTypes.Dark;
 					extrusionType = ExtrusionType.AbsoluteHeight;
 					extrusionGeometryType = ExtrusionGeometryType.RoofAndSide;

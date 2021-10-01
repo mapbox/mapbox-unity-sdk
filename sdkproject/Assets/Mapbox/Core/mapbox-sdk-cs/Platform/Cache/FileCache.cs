@@ -84,7 +84,7 @@ namespace Mapbox.Platform.Cache
 			var key = tileId.GenerateKey(tilesetId);
 			if (_infoKeys.Contains(key))
 			{
-				if(Debug.isDebugBuild) Debug.Log(string.Format("This image file ({0}) is already queued for saving. Removing (and destroying) first instance, adding new one.", key));
+				if (Debug.isDebugBuild) Debug.Log(string.Format("This image file ({0}) is already queued for saving. Removing (and destroying) first instance, adding new one.", key));
 				//we can't find the first info object here in O(n) but we are removing it from _infoKeys
 				//so we can find it and destroy the texture inside on update below
 				_infoKeys.Remove(key);
@@ -232,10 +232,10 @@ namespace Mapbox.Platform.Cache
 						sourceStream.Write(info.TextureCacheItem.Data, 0, info.TextureCacheItem.Data.Length);
 						sourceStream.Close();
 
-//this is not a good way to do it
-// #if UNITY_EDITOR
-// 					FileCacheDebugView.AddToLogs(string.Format("Saved {0, 20} - {1, -20}", info.TilesetId, info.TileId));
-// #endif
+						//this is not a good way to do it
+						// #if UNITY_EDITOR
+						// 					FileCacheDebugView.AddToLogs(string.Format("Saved {0, 20} - {1, -20}", info.TilesetId, info.TileId));
+						// #endif
 					},
 					ContinueWith = (t) =>
 					{
@@ -296,12 +296,10 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 
-#if UNITY_EDITOR
 		public int GetInfosToSaveListCount()
 		{
 			return _infosToSave.Count;
 		}
-#endif
 	}
 
 	public class EditorFileCache : FileCache
@@ -309,9 +307,9 @@ namespace Mapbox.Platform.Cache
 		public Action<CanonicalTileId, string, TextureCacheItem, bool> TileAdded = (id, s, arg3, arg4) => { };
 		public Action<CanonicalTileId, string> TileRequested = (id, s) => { };
 		public Action<CanonicalTileId, string> SavingInfo = (id, s) => { };
-		public Action<CanonicalTileId, string, TextureCacheItem> FileSaved = (s, id, item) => { };
+		public new Action<CanonicalTileId, string, TextureCacheItem> FileSaved = (s, id, item) => { };
 
-		public int GetInfosToSaveListCount()
+		public new int GetInfosToSaveListCount()
 		{
 			return _infosToSave.Count;
 		}
