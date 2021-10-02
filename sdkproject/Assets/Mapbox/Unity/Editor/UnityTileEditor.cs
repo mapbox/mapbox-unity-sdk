@@ -97,7 +97,8 @@ public class UnityTileEditor : Editor
 						{
 							EditorGUILayout.ObjectField(
 								(dataTile as RasterTile).Texture2D,
-								typeof(Texture2D));
+								typeof(Texture2D),
+								true);
 						}
 					}
 

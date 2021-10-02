@@ -119,6 +119,7 @@ namespace Mapbox.Unity.DataFetching
 
 	public class EditorDataFetchingManager : DataFetchingManager
 	{
+		public bool EnableLogging = false;
 		public int TotalRequestCount;
 		public int TotalCancelledCount;
 
@@ -128,13 +129,20 @@ namespace Mapbox.Unity.DataFetching
 			base.TileInitialized += (f) =>
 			{
 				TotalRequestCount++;
-				Logs.Add(string.Format("{0,-15} | {1,-30} {3,-30} {2, -10}", f.TileId, f.TilesetId, (Time.time - f.QueueTime), "initialized after"));
+				if (EnableLogging)
+				{
+					Logs.Add(string.Format("{0,-15} | {1,-30} {3,-30} {2, -10}", f.TileId, f.TilesetId, (Time.time - f.QueueTime), "initialized after"));
+				}
 			};
 		}
 
 		public override void EnqueueForFetching(FetchInfo info)
 		{
-			Logs.Add(string.Format("{0,-15} | {1,-30} {3,-30} {2, -10}", info.TileId, info.TilesetId, Time.time, "enqueued at"));
+			if (EnableLogging)
+			{
+				Logs.Add(string.Format("{0,-15} | {1,-30} {3,-30} {2, -10}", info.TileId, info.TilesetId, Time.time, "enqueued at"));
+			}
+
 			base.EnqueueForFetching(info);
 		}
 
@@ -144,8 +152,11 @@ namespace Mapbox.Unity.DataFetching
 			if (_tileFetchInfos.ContainsKey(key))
 			{
 				TotalCancelledCount++;
-				var f = _tileFetchInfos[key];
-				Logs.Add(string.Format("{0,-15} | {1,-30} {3,-30} {2, -10}", f.TileId, f.TilesetId, (Time.time - f.QueueTime), "cancelled after"));
+				if (EnableLogging)
+				{
+					var f = _tileFetchInfos[key];
+					Logs.Add(string.Format("{0,-15} | {1,-30} {3,-30} {2, -10}", f.TileId, f.TilesetId, (Time.time - f.QueueTime), "cancelled after"));
+				}
 			}
 			base.CancelFetching(tileUnwrappedTileId, tilesetId);
 		}
@@ -175,6 +186,11 @@ namespace Mapbox.Unity.DataFetching
 			TotalRequestCount = 0;
 			TotalCancelledCount = 0;
 			Logs.Clear();
+		}
+
+		public void ToggleLogging()
+		{
+			EnableLogging = !EnableLogging;
 		}
 	}
 }

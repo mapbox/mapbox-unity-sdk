@@ -475,7 +475,7 @@ public class MemoryTabDebugView
 			EditorGUILayout.LabelField(string.Format("Expiration {0}", cacheItem.ExpirationDate), EditorStyles.label);
 			if (cacheItem is TextureCacheItem && (cacheItem as TextureCacheItem).Texture2D != null)
 			{
-				EditorGUILayout.ObjectField((cacheItem as TextureCacheItem).Texture2D, typeof(Texture2D));
+				EditorGUILayout.ObjectField((cacheItem as TextureCacheItem).Texture2D, typeof(Texture2D), true);
 			}
 		}
 	}
@@ -569,7 +569,8 @@ public class UnityTilesTabDebugView
 								{
 									EditorGUILayout.ObjectField(
 										(dataTile as RasterTile).Texture2D,
-										typeof(Texture2D));
+										typeof(Texture2D),
+										true);
 								}
 							}
 
@@ -665,7 +666,8 @@ public class UnityTilesTabDebugView
 								{
 									EditorGUILayout.ObjectField(
 										(dataTile as RasterTile).Texture2D,
-										typeof(Texture2D));
+										typeof(Texture2D),
+										true);
 								}
 							}
 
@@ -764,6 +766,10 @@ public class DataFetcherTabDebugView
 		GUILayout.Label(string.Format("{0,-30} : {1}", "Total Fired",_dataFetcher.TotalRequestCount), EditorStyles.miniLabel);
 		GUILayout.Label(string.Format("{0,-30} : {1}", "Total Cancelled", _dataFetcher.TotalCancelledCount), EditorStyles.miniLabel);
 
+		if (GUILayout.Button("Toggle Logging (" + _dataFetcher.EnableLogging +")"))
+		{
+			_dataFetcher.ToggleLogging();
+		}
 
 		DrawLogs();
 
