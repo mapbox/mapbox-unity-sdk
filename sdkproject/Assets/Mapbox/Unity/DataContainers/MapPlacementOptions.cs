@@ -7,7 +7,6 @@ namespace Mapbox.Unity.DataContainers
 	public class MapPlacementOptions : MapboxDataProperty
 	{
 		public MapPlacementType placementType = MapPlacementType.AtLocationCenter;
-		public bool snapMapToZero = false;
 		public IMapPlacementStrategy placementStrategy;
 	}
 }

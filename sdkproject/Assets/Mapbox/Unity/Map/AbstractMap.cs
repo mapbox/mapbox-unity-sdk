@@ -37,7 +37,6 @@ namespace Mapbox.Unity.Map
 		[SerializeField] protected HashSet<UnwrappedTileId> _currentExtent;
 		private List<UnwrappedTileId> _tilesToProcess = new List<UnwrappedTileId>();
 
-		protected bool _worldHeightFixed = false;
 		protected int _initialZoom;
 		protected Vector2d _centerLatitudeLongitude;
 		protected Vector2d _centerMercator;
@@ -122,11 +121,6 @@ namespace Mapbox.Unity.Map
 		}
 		public HashSet<UnwrappedTileId> CurrentExtent => _currentExtent;
 		/// <summary>
-		/// Gets the loading texture used as a placeholder while the image tile is loading.
-		/// </summary>
-		/// <value>The loading texture.</value>
-		public Texture2D LoadingTexture => Options.loadingTexture;
-		/// <summary>
 		/// Gets the tile material used for map tiles.
 		/// </summary>
 		/// <value>The tile material.</value>
@@ -207,8 +201,6 @@ namespace Mapbox.Unity.Map
 				return;
 			}
 
-			//so map will be snapped to zero using next new tile loaded
-			_worldHeightFixed = false;
 			float differenceInZoom = 0.0f;
 			bool isAtInitialZoom = false;
 			// Update map zoom, if it has changed.
@@ -296,11 +288,6 @@ namespace Mapbox.Unity.Map
 			if (Options.tileMaterial == null)
 			{
 				Options.tileMaterial = new Material(Shader.Find("Standard"));
-			}
-
-			if (Options.loadingTexture == null)
-			{
-				Options.loadingTexture = new Texture2D(1, 1);
 			}
 		}
 
@@ -446,10 +433,6 @@ namespace Mapbox.Unity.Map
 		{
 			var tile = _mapVisualizer.LoadTile(tileId, enableTileRightAway);
 			OnTileRegisteredToFactories(tile);
-			if (Options.placementOptions.snapMapToZero && !_worldHeightFixed)
-			{
-				_worldHeightFixed = true;
-			}
 		}
 
 		protected virtual void TileProvider_OnTileRemoved(UnwrappedTileId tileId)
@@ -470,7 +453,6 @@ namespace Mapbox.Unity.Map
 		protected virtual void InitializeMap(MapOptions options)
 		{
 			Options = options;
-			_worldHeightFixed = false;
 			_centerLatitudeLongitude = Conversions.StringToLatLon(options.locationOptions.latitudeLongitude);
 			_initialZoom = (int)options.locationOptions.zoom;
 
@@ -823,11 +805,6 @@ namespace Mapbox.Unity.Map
 			_worldRelativeScale = scale;
 		}
 
-		public virtual void SetLoadingTexture(Texture2D loadingTexture)
-		{
-			Options.loadingTexture = loadingTexture;
-		}
-
 		public virtual void SetTileMaterial(Material tileMaterial)
 		{
 			Options.tileMaterial = tileMaterial;
@@ -872,17 +849,6 @@ namespace Mapbox.Unity.Map
 		public virtual void SetPlacementType(MapPlacementType placementType)
 		{
 			Options.placementOptions.placementType = placementType;
-			Options.placementOptions.HasChanged = true;
-		}
-
-		/// <summary>
-		/// Translates map root by the terrain elevation at the center geo location.
-		/// Use this method with <c>TerrainWithElevation</c>
-		/// </summary>
-		/// <param name="active">If set to <c>true</c> active.</param>
-		public virtual void SnapMapToZero(bool active)
-		{
-			Options.placementOptions.snapMapToZero = active;
 			Options.placementOptions.HasChanged = true;
 		}
 

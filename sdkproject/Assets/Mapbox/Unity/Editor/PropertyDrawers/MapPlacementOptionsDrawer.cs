@@ -15,7 +15,6 @@ namespace Mapbox.Editor
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
 			var placementType = property.FindPropertyRelative("placementType");
-			var snapMapToTerrain = property.FindPropertyRelative("snapMapToZero");
 
 			var displayNames = placementType.enumDisplayNames;
 			int count = placementType.enumDisplayNames.Length;
@@ -34,7 +33,6 @@ namespace Mapbox.Editor
 			}
 
 			placementType.enumValueIndex = EditorGUILayout.Popup(new GUIContent { text = label.text, tooltip = "Placement of Map root.", }, placementType.enumValueIndex, placementTypeContent);
-			EditorGUILayout.PropertyField(snapMapToTerrain, new GUIContent { text = snapMapToTerrain.displayName, tooltip = "If checked, map's root will be snapped to zero. " });
 		}
 	}
 }

@@ -233,7 +233,6 @@ namespace Mapbox.Editor
 				}
 
 				EditorGUI.BeginChangeCheck();
-				EditorGUILayout.PropertyField(property.FindPropertyRelative("loadingTexture"));
 				EditorGUILayout.PropertyField(property.FindPropertyRelative("tileMaterial"));
 				if (EditorGUI.EndChangeCheck())
 				{

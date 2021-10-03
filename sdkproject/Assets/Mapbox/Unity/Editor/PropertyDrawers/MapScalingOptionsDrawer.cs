@@ -41,7 +41,8 @@ namespace Mapbox.Editor
 			if ((MapScalingType)scalingType.enumValueIndex == MapScalingType.Custom)
 			{
 				position.y += lineHeight;
-				EditorGUILayout.PropertyField(property.FindPropertyRelative("unityTileSize"));
+				var sizeLabel = new GUIContent { text = "Tile Spacing"};
+				EditorGUILayout.PropertyField(property.FindPropertyRelative("unityTileSize"), sizeLabel);
 			}
 		}
 	}
