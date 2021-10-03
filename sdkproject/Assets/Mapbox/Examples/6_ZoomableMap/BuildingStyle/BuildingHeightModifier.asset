@@ -13,12 +13,30 @@ MonoBehaviour:
   m_Name: BuildingHeightModifier
   m_EditorClassIdentifier: 
   Active: 1
-  _options:
+  HeightModifierType: 1
+  _basicOptions:
     _selectedLayerName: 
-    extrusionType: 3
+    extrusionType: 1
     extrusionGeometryType: 0
     propertyName: height
     propertyDescription: 
     minimumHeight: 0
     maximumHeight: 0
     extrusionScaleFactor: 1
+  _texturedOptions:
+    texturingType: 2
+    atlasInfo: {fileID: 11400000, guid: c422f39ca8fe566479230c87805b3301, type: 2}
+    extrusionType: 1
+    extrusionGeometryType: 0
+    propertyName: height
+    propertyDescription: 
+    minimumHeight: 0
+    maximumHeight: 0
+    extrusionScaleFactor: 1
+    CenterSegments: 1
+    SeparateSubmesh: 1
+  _chamferOptions:
+    FlatTops: 0
+    Height: 0
+    ForceHeight: 0
+    Offset: 1

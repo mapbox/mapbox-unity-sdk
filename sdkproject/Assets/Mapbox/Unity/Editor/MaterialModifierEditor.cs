@@ -7,7 +7,6 @@
 	[CustomEditor(typeof(MaterialModifier))]
 	public class MaterialModifierEditor : UnityEditor.Editor
 	{
-
 		private MonoScript script;
 		private SerializedProperty _materials;
 

@@ -33,7 +33,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		}
 	}
 
-	public class HeightModifierCore
+	public class HeightModifierCore : IHeightModifier
 	{
 		GeometryExtrusionOptions _options;
 		private bool _separateSubmesh = false;
@@ -278,31 +278,82 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Height Modifier")]
 	public class HeightModifier : MeshModifier
 	{
-		[SerializeField] private GeometryExtrusionOptions _options;
+		public HeightModifierTypes HeightModifierType;
+
+		[SerializeField] private GeometryExtrusionOptions _basicOptions;
+		[SerializeField] private GeometryExtrusionWithAtlasOptions _texturedOptions;
+		[SerializeField] private ChamferModifierSettings _chamferOptions;
 
 		public override ModifierType Type { get { return ModifierType.Preprocess; } }
 
-		private readonly HeightModifierCore _heightModifierCore;
+		private Func<IHeightModifier> _heightModifierCore;
 
-		public HeightModifier()
+		public override void Initialize()
 		{
-			_heightModifierCore = new HeightModifierCore(_options);
+			switch (HeightModifierType)
+			{
+				case HeightModifierTypes.Basic:
+				{
+					_heightModifierCore = () => new HeightModifierCore(_basicOptions);
+					break;
+				}
+				case HeightModifierTypes.Textured:
+				{
+					_heightModifierCore = () => new TexturedSideWallCore(_texturedOptions);
+					break;
+				}
+				case HeightModifierTypes.Chamfered:
+				{
+					_heightModifierCore = () => new ChamferHeightCore(_chamferOptions);
+					break;
+				}
+				default:
+				{
+					break;
+				}
+			}
 		}
 
-		public override void SetProperties(ModifierProperties properties)
+		public void SetProperties(GeometryExtrusionOptions properties)
 		{
-			_options = (GeometryExtrusionOptions)properties;
-			_options.PropertyHasChanged += UpdateModifier;
+			_basicOptions = properties;
+			_basicOptions.PropertyHasChanged += UpdateModifier;
 		}
+
+		public void SetProperties(GeometryExtrusionWithAtlasOptions properties)
+		{
+			_texturedOptions = properties;
+			_texturedOptions.PropertyHasChanged += UpdateModifier;
+		}
+
+		public void SetProperties(ChamferModifierSettings properties)
+		{
+			_chamferOptions = properties;
+			//_chamferOptions.PropertyHasChanged += UpdateModifier;
+		}
+
 		public override void UnbindProperties()
 		{
-			_options.PropertyHasChanged -= UpdateModifier;
+			_basicOptions.PropertyHasChanged -= UpdateModifier;
+			_texturedOptions.PropertyHasChanged -= UpdateModifier;
+			//_chamferOptions.PropertyHasChanged -= UpdateModifier;
 		}
 
 		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
-			var core = new HeightModifierCore(_options);
-			core.Run(feature, md, tile);
+			_heightModifierCore().Run(feature, md, tile);
 		}
+	}
+
+	public interface IHeightModifier
+	{
+		public void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null);
+	}
+
+	public enum HeightModifierTypes
+	{
+		Basic,
+		Textured,
+		Chamfered
 	}
 }

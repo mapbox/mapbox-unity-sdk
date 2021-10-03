@@ -74,19 +74,19 @@ namespace Mapbox.Editor
 					break;
 				case ExtrusionType.PropertyHeight:
 					EditorGUILayout.PropertyField(extrusionGeometryType, extrusionGeometryGUI);
-					DrawPropertyDropDown(property, position);
+					//DrawPropertyDropDown(property, position);
 					break;
 				case ExtrusionType.MinHeight:
 					EditorGUILayout.PropertyField(extrusionGeometryType, extrusionGeometryGUI);
-					DrawPropertyDropDown(property, position);
+					//DrawPropertyDropDown(property, position);
 					break;
 				case ExtrusionType.MaxHeight:
 					EditorGUILayout.PropertyField(extrusionGeometryType, extrusionGeometryGUI);
-					DrawPropertyDropDown(property, position);
+					//DrawPropertyDropDown(property, position);
 					break;
 				case ExtrusionType.RangeHeight:
 					EditorGUILayout.PropertyField(extrusionGeometryType, extrusionGeometryGUI);
-					DrawPropertyDropDown(property, position);
+					//DrawPropertyDropDown(property, position);
 					EditorGUILayout.PropertyField(minHeightProperty);
 					EditorGUILayout.PropertyField(maxHeightProperty);
 					if (minHeightProperty.floatValue > maxHeightProperty.floatValue)

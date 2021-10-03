@@ -152,7 +152,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 							if (useTextureSideWallModifier)
 							{
-								var atlasMod = AddOrCreateMeshModifier<TextureSideWallModifier>();
+								var atlasMod = AddOrCreateMeshModifier<HeightModifier>();
+								atlasMod.HeightModifierType = HeightModifierTypes.Textured;
 								GeometryExtrusionWithAtlasOptions atlasOptions = new GeometryExtrusionWithAtlasOptions(_sublayerProperties.extrusionOptions, uvModOptions);
 								atlasMod.SetProperties(atlasOptions);
 								_sublayerProperties.extrusionOptions.PropertyHasChanged += UpdateVector;

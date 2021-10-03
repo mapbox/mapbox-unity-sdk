@@ -218,7 +218,7 @@ namespace Mapbox.Unity.DataContainers
 		{
 			get
 			{
-				return typeof(TextureSideWallModifier);
+				return typeof(MeshModifier);
 			}
 		}
 		public UvMapType texturingType = UvMapType.Tiled;
@@ -230,6 +230,8 @@ namespace Mapbox.Unity.DataContainers
 		public float minimumHeight = 0f;
 		public float maximumHeight = 0f;
 		public float extrusionScaleFactor = 1f;
+		public bool CenterSegments = true;
+		public bool SeparateSubmesh = true;
 
 		public GeometryExtrusionWithAtlasOptions()
 		{

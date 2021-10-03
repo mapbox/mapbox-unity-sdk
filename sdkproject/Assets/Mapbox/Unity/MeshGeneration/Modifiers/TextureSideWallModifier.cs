@@ -8,7 +8,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using Mapbox.Unity.Map;
 	using System;
 
-	public class TexturedSideWallCore
+	public class TexturedSideWallCore : IHeightModifier
 	{
 		private GeometryExtrusionWithAtlasOptions _options;
 		private float _scaledFirstFloorHeight = 0;
@@ -52,11 +52,11 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private bool _separateSubmesh;
 		private System.Random _random;
 
-		public TexturedSideWallCore(GeometryExtrusionWithAtlasOptions options, bool centerSegments, bool separateSubmesh)
+		public TexturedSideWallCore(GeometryExtrusionWithAtlasOptions options)
 		{
 			_options = options;
-			_centerSegments = centerSegments;
-			_separateSubmesh = separateSubmesh;
+			_centerSegments = _options.CenterSegments;
+			_separateSubmesh = _options.SeparateSubmesh;
 			_random = new System.Random();
 		}
 
@@ -556,37 +556,6 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				default:
 					break;
 			}
-		}
-	}
-
-	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Textured Side Wall Modifier")]
-	public class TextureSideWallModifier : MeshModifier
-	{
-		[SerializeField] GeometryExtrusionWithAtlasOptions _options;
-		[SerializeField] private bool _centerSegments = true;
-		[SerializeField] private bool _separateSubmesh = true;
-
-		public override void SetProperties(ModifierProperties properties)
-		{
-			if (properties is GeometryExtrusionWithAtlasOptions)
-			{
-				_options = (GeometryExtrusionWithAtlasOptions) properties;
-			}
-			else if (properties is GeometryExtrusionOptions)
-			{
-				_options = ((GeometryExtrusionOptions) properties).ToGeometryExtrusionWithAtlasOptions();
-			}
-			else if (properties is UVModifierOptions)
-			{
-				_options = ((UVModifierOptions) properties).ToGeometryExtrusionWithAtlasOptions();
-			}
-		}
-
-		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
-		{
-			var core = new TexturedSideWallCore(_options, _centerSegments, _separateSubmesh);
-			core.Initialize();
-			core.Run(feature, md, tile);
 		}
 	}
 }

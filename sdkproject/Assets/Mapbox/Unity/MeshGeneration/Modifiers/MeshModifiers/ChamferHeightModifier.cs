@@ -5,7 +5,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 	using Mapbox.Unity.MeshGeneration.Data;
 	using System;
 
-	public class ChamferHeightCore
+	public class ChamferHeightCore : IHeightModifier
 	{
 		[SerializeField]
 		[Tooltip("Flatten top polygons to prevent unwanted slanted roofs because of the bumpy terrain")]
@@ -433,19 +433,5 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		[Range(0.1f,2)]
 		[Tooltip("Chamfer width value")]
 		public float Offset = 0.2f;
-	}
-
-	[CreateAssetMenu(menuName = "Mapbox/Modifiers/Smooth Height for Buildings Modifier")]
-	public class ChamferHeightModifier : MeshModifier
-	{
-		[SerializeField] private ChamferModifierSettings _chamferModifierSettings;
-
-		public override ModifierType Type { get { return ModifierType.Preprocess; } }
-
-		public override void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
-		{
-			var core = new ChamferHeightCore(_chamferModifierSettings);
-			core.Run(feature, md, tile);
-		}
 	}
 }
