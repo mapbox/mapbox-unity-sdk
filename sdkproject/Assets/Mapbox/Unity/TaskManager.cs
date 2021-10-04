@@ -49,11 +49,11 @@ namespace Mapbox.Unity
 		{
 			while (true)
 			{
-				while (_taskQueue.Count > 0 && _runningTasks.Count < ActiveTaskLimit)
+				while (_taskQueue.Count > 0 && _runningTasks.Count <= ActiveTaskLimit)
 				{
 					var firstPeek = _taskQueue.Peek();
 					if (_allTasks.ContainsKey(firstPeek) &&
-					    _allTasks[firstPeek].EnqueueFrame > Time.frameCount - 15)
+						_allTasks[firstPeek].EnqueueFrame > Time.frameCount - 15)
 					{
 						yield return null;
 					}
@@ -126,6 +126,10 @@ namespace Mapbox.Unity
 								_tasksByTile.Remove(taskWrapper.TileId);
 							}
 						}
+						else
+						{
+							Debug.Log(taskWrapper.TileId);
+						}
 
 						taskWrapper.EnqueueFrame = Time.frameCount;
 						_allTasks.Add(taskWrapper.Id, taskWrapper);
@@ -182,9 +186,7 @@ namespace Mapbox.Unity
 			Id = id;
 		}
 
-#if UNITY_EDITOR
 		public string Info;
-#endif
 	}
 
 	public class EditorTaskManager : TaskManager
@@ -223,7 +225,7 @@ namespace Mapbox.Unity
 			if (EnableLogging)
 			{
 				TotalTaskEnqueuedCount++;
-				Logs.Add(string.Format("{0,-10} {2,-10} {1, -30}", Time.frameCount, "added" , taskWrapper.Info));
+				Logs.Add(string.Format("{0,-10} {2,-10} {1, -30}", Time.frameCount, "added", taskWrapper.Info));
 			}
 			base.AddTask(taskWrapper, priorityLevel);
 		}

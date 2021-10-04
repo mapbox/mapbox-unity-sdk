@@ -118,7 +118,9 @@ namespace Mapbox.Platform.Cache
 
 		public void TileDisposed(UnityTile tile, string tilesetId)
 		{
-			_fileDataFetcher.CancelFetching(tile.UnwrappedTileId, tilesetId);
+			//this should be unnecessary as fetching should be already cancelled at this point
+			//by main factory manager/factory and data fetcher (image data fetcher, vector data fetcher etc).
+			//_fileDataFetcher.CancelFetching(tile.UnwrappedTileId, tilesetId);
 		}
 
 		public virtual void ClearAll()

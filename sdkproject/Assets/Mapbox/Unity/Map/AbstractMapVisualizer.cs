@@ -358,7 +358,7 @@ namespace Mapbox.Unity.Map
 
 			unityTile.SetFinishCondition();
 
-			if (enableTile && unityTile.BackgroundImageInUse)
+			if (enableTile || unityTile.BackgroundImageInUse)
 			{
 				unityTile.gameObject.SetActive(true);
 			}
@@ -498,12 +498,10 @@ namespace Mapbox.Unity.Map
 
 		public void UnregisterAllTiles()
 		{
-			foreach (var activeTile in _activeTiles)
+			var tileIds = _activeTiles.Select(x => x.Key).ToList();
+			foreach (var tileId in tileIds)
 			{
-				foreach (var abstractTileFactory in Factories)
-				{
-					abstractTileFactory.Unregister(activeTile.Value);
-				}
+				DisposeTile(tileId);
 			}
 		}
 

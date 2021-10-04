@@ -1,6 +1,7 @@
 using System;
 using Mapbox.Unity.DataContainers;
 using Mapbox.Unity.Map;
+using Mapbox.Unity.MeshGeneration.Data;
 using UnityEngine;
 
 namespace Mapbox.Unity.CustomLayer
@@ -10,11 +11,13 @@ namespace Mapbox.Unity.CustomLayer
 	{
 		public AbstractMap Map;
 		public CustomImageFactoryManager ImageFactoryManager;
-		
+
 		public string CustomTilesetId = "AerisHeatMap";
 		public string UrlFormat = "";
 		public string TextureFieldName = "_CustomOne";
 		public string TextureScaleOffsetFieldName = "_CustomOne_ST";
+		public string OpacityFieldName = "_CustomOne_Lerp";
+		public float Opacity = 1;
 
 		[HideInInspector] public bool DownloadFallbackImagery = false;
 		public bool Retina = false;
@@ -23,46 +26,52 @@ namespace Mapbox.Unity.CustomLayer
 
 		public void Awake()
 		{
-			if (enabled)
+			var imageSettings = new ImageryLayerProperties();
+			imageSettings.rasterOptions = new ImageryRasterOptions()
 			{
-				var imageSettings = new ImageryLayerProperties();
-				imageSettings.rasterOptions = new ImageryRasterOptions()
+				useRetina = Retina,
+				useCompression = Compress,
+				useMipMap = UseMipmap
+			};
+			imageSettings.sourceOptions = new LayerSourceOptions()
+			{
+				layerSource = new Style()
 				{
-					useRetina = Retina,
-					useCompression = Compress,
-					useMipMap = UseMipmap
-				};
-				imageSettings.sourceOptions = new LayerSourceOptions()
-				{
-					layerSource = new Style()
-					{
-						Name = CustomTilesetId,
-						Id = CustomTilesetId
-					}
-				};
+					Name = CustomTilesetId,
+					Id = CustomTilesetId
+				}
+			};
 
-				ImageFactoryManager = new CustomImageFactoryManager(UrlFormat, imageSettings, DownloadFallbackImagery, TextureFieldName, TextureScaleOffsetFieldName);
-				ImageFactoryManager.FetchingError += (tile, rasterTile, args) => { Debug.Log(args.Exceptions[0]); };
-				Map.OnTileRegisteredToFactories += (t) =>
+			ImageFactoryManager = new CustomImageFactoryManager(UrlFormat, imageSettings, DownloadFallbackImagery, TextureFieldName, TextureScaleOffsetFieldName);
+			ImageFactoryManager.FetchingError += (tile, rasterTile, args) =>
+			{
+				//Debug.Log(args.Exceptions[0]);
+			};
+			Map.OnTileRegisteredToFactories += (t) =>
+			{
+				if (enabled)
 				{
-					if (enabled)
-					{
-						ImageFactoryManager.RegisterTile(t);
-					}
-				};
-				Map.OnTileDisposing += t =>
+					ImageFactoryManager.RegisterTile(t);
+					SetOpacity(t);
+				}
+			};
+			Map.OnTileDisposing += t =>
+			{
+				//if (enabled)
 				{
-					if (enabled)
+					ImageFactoryManager.UnregisterTile(t);
+				}
+			};
+			Map.OnTileStopping += unityTile =>
+			{
+				//if (enabled)
+				{
+					if (unityTile != null && unityTile.Tiles.Count > 0)
 					{
-						ImageFactoryManager.UnregisterTile(t);
+						ImageFactoryManager.UnregisterTile(unityTile);
 					}
-				};
-			}
-		}
-
-		public void Start()
-		{
-
+				}
+			};
 		}
 
 		private void OnValidate()
@@ -82,6 +91,7 @@ namespace Mapbox.Unity.CustomLayer
 					ImageFactoryManager.RegisterTile(tilePair.Value);
 				}
 			}
+			SetOpacity();
 		}
 
 		private void OnDisable()
@@ -105,11 +115,35 @@ namespace Mapbox.Unity.CustomLayer
 			}
 		}
 
-		public void SetMaterialFieldNames(string textureFieldName, string textureScaleOffsetFieldName)
+		public void SetCustomFieldNames(string customTextureFieldName, string customTextureScaleOffsetFieldName, string customOpacityFieldName)
 		{
-			OnDisable();
-			ImageFactoryManager.SetMaterialFieldNames(textureFieldName, textureScaleOffsetFieldName);
-			OnEnable();
+			this.enabled = false;
+			if (Map != null)
+			{
+				TextureFieldName = customTextureFieldName;
+				TextureScaleOffsetFieldName = customTextureScaleOffsetFieldName;
+				OpacityFieldName = customOpacityFieldName;
+				ImageFactoryManager.SetMaterialFieldNames(customTextureFieldName, customTextureScaleOffsetFieldName);
+			}
+		}
+
+		public void SetOpacity()
+		{
+			SetOpacity(Opacity);
+		}
+
+		public void SetOpacity(float Opacity)
+		{
+			this.Opacity = Opacity;
+			foreach (var tilePair in Map.MapVisualizer.ActiveTiles)
+			{
+				tilePair.Value.MeshRenderer.sharedMaterial.SetFloat(OpacityFieldName, Opacity);
+			}
+		}
+
+		public void SetOpacity(UnityTile tile)
+		{
+			tile.MeshRenderer.sharedMaterial.SetFloat(OpacityFieldName, Opacity);
 		}
 	}
 }

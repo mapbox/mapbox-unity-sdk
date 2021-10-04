@@ -41,7 +41,7 @@ namespace Mapbox.Editor
 				abstractMap.DestroyChildObjects();
 				if (EditorApplication.isPlaying)
 				{
-					abstractMap.ResetMap();
+					//abstractMap.ResetMap();
 					return;
 				}
 			}
