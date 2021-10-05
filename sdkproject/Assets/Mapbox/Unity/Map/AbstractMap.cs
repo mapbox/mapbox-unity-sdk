@@ -23,7 +23,6 @@ namespace Mapbox.Unity.Map
 	/// This is the main monobehavior which controls the map. It controls the visualization of map data.
 	/// Abstract map encapsulates the image, terrain and vector sources and provides a centralized interface to control the visualization of the map.
 	/// </summary>
-	[ExecuteInEditMode]
 	public class AbstractMap : MonoBehaviour, IMap
 	{
 		#region Private Fields
