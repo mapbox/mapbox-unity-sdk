@@ -301,8 +301,8 @@ namespace Mapbox.Unity.Map
 			{
 				TileProvider.ExtentChanged -= OnMapExtentChanged;
 			}
-			_mapVisualizer.ClearMap();
-			_mapVisualizer.Destroy();
+			MapVisualizer.ClearMap();
+			MapVisualizer.Destroy();
 		}
 
 		protected virtual void Start()
@@ -318,27 +318,39 @@ namespace Mapbox.Unity.Map
 
 		private void CreateMapVisualizer()
 		{
-			_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
+			if (_mapVisualizer == null)
+			{
+				_mapVisualizer = ScriptableObject.CreateInstance<MapVisualizer>();
+			}
 
-			_mapVisualizer.OnTileFinished += (t) =>
-		   {
-			   if (TileTracker.ContainsKey(t.UnwrappedTileId))
-			   {
-				   foreach (var tileId in TileTracker[t.UnwrappedTileId])
-				   {
-					   if (MapVisualizer.ActiveTiles.ContainsKey(tileId))
-					   {
-						   TileProvider_OnTileRemoved(tileId);
-						   _destructionList.Remove(tileId);
-					   }
-				   }
+			_mapVisualizer.OnTileFinished -= OnMapVisualizerOnOnTileFinished;
+			_mapVisualizer.OnTileDisposing -= OnMapVisualizerOnOnTileDisposing;
+			_mapVisualizer.OnTileFinished += OnMapVisualizerOnOnTileFinished;
+			_mapVisualizer.OnTileDisposing += OnMapVisualizerOnOnTileDisposing;
+		}
 
-				   TileTracker.Remove(t.UnwrappedTileId);
-			   }
+		private void OnMapVisualizerOnOnTileDisposing(UnityTile t)
+		{
+			OnTileDisposing(t);
+		}
 
-			   OnTileFinished(t);
-		   };
-			_mapVisualizer.OnTileDisposing += t => { OnTileDisposing(t); };
+		private void OnMapVisualizerOnOnTileFinished(UnityTile t)
+		{
+			if (TileTracker.ContainsKey(t.UnwrappedTileId))
+			{
+				foreach (var tileId in TileTracker[t.UnwrappedTileId])
+				{
+					if (MapVisualizer.ActiveTiles.ContainsKey(tileId))
+					{
+						TileProvider_OnTileRemoved(tileId);
+						_destructionList.Remove(tileId);
+					}
+				}
+
+				TileTracker.Remove(t.UnwrappedTileId);
+			}
+
+			OnTileFinished(t);
 		}
 
 		public void DestroyChildObjects()
@@ -347,14 +359,6 @@ namespace Mapbox.Unity.Map
 			for (int i = destroyChildStartIndex; i >= 0; i--)
 			{
 				transform.GetChild(i).gameObject.Destroy();
-			}
-		}
-
-		public void MapOnStartRoutine(bool coroutine = true)
-		{
-			if (Application.isPlaying)
-			{
-
 			}
 		}
 
@@ -379,6 +383,7 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		public virtual void SetUpMap()
 		{
+			CreateMapVisualizer();
 			SetPlacementStrategy();
 
 			SetScalingStrategy();
@@ -460,7 +465,7 @@ namespace Mapbox.Unity.Map
 				UpdateMap();
 			};
 
-			_mapVisualizer.Initialize(this);
+			MapVisualizer.Initialize(this);
 			TileProvider.Initialize(this);
 
 			OnInitialized();

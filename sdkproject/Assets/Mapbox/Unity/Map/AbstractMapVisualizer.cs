@@ -358,7 +358,7 @@ namespace Mapbox.Unity.Map
 
 			unityTile.SetFinishCondition();
 
-			if (enableTile || unityTile.BackgroundImageInUse)
+			if (enableTile && unityTile.BackgroundImageInUse)
 			{
 				unityTile.gameObject.SetActive(true);
 			}
