@@ -16,7 +16,7 @@ namespace Mapbox.Unity.DataFetching
 		protected IFileSource _fileSource;
 		protected Queue<int> _tileOrder;
 		protected Dictionary<int, FetchInfo> _tileFetchInfos;
-		private Dictionary<int, Tile> _localQueuedRequests;
+		protected Dictionary<int, Tile> _localQueuedRequests;
 		protected Dictionary<int, Tile> _globalActiveRequests;
 		protected int _activeRequestLimit = 10;
 
@@ -36,11 +36,7 @@ namespace Mapbox.Unity.DataFetching
 
 			if (!_localQueuedRequests.ContainsKey(key))
 			{
-				info.Callback += () =>
-				{
-					_globalActiveRequests.Remove(key);
-					_localQueuedRequests.Remove(key);
-				};
+				info.Callback += () => { InfoCallback(info, key); };
 
 				_tileOrder.Enqueue(key);
 				_localQueuedRequests.Add(key, info.RasterTile);
@@ -57,6 +53,12 @@ namespace Mapbox.Unity.DataFetching
 				Debug.Log("tile request is already in queue. This most likely means first request was supposed to be cancelled but not.");
 #endif
 			}
+		}
+
+		protected virtual void InfoCallback(FetchInfo info, int key)
+		{
+			_globalActiveRequests.Remove(key);
+			_localQueuedRequests.Remove(key);
 		}
 
 		public virtual void CancelFetching(UnwrappedTileId tileUnwrappedTileId, string tilesetId)
@@ -136,6 +138,8 @@ namespace Mapbox.Unity.DataFetching
 			};
 		}
 
+		public Dictionary<string, int> StatusCodeLog = new Dictionary<string, int>();
+
 		public override void EnqueueForFetching(FetchInfo info)
 		{
 			if (EnableLogging)
@@ -144,6 +148,20 @@ namespace Mapbox.Unity.DataFetching
 			}
 
 			base.EnqueueForFetching(info);
+		}
+
+		protected override void InfoCallback(FetchInfo info, int key)
+		{
+			_globalActiveRequests.Remove(key);
+			_localQueuedRequests.Remove(key);
+			var code = string.Format("{0} - {1}", info.RasterTile.FromCache.ToString(),info.RasterTile.StatusCode);
+
+			if (!StatusCodeLog.ContainsKey(code))
+			{
+				StatusCodeLog.Add(code, 0);
+			}
+
+			StatusCodeLog[code]++;
 		}
 
 		public override void CancelFetching(UnwrappedTileId tileUnwrappedTileId, string tilesetId)

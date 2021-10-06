@@ -6,7 +6,6 @@ using Mapbox.Map;
 using Mapbox.Unity.DataContainers;
 using Mapbox.Unity.Map;
 using TMPro;
-using TMPro.EditorUtilities;
 using UnityEngine;
 using UnityEngine.UI;
 

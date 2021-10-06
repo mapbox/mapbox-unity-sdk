@@ -40,6 +40,9 @@ namespace Mapbox.Unity.CustomLayer
 		public FileImageTile(CanonicalTileId tileId, string tilesetId, string filePath, bool isTextureNonreadable) : base(tileId, tilesetId, isTextureNonreadable)
 		{
 			FilePath = filePath;
+#if UNITY_EDITOR
+			FromCache = CacheType.FileCache;
+#endif
 		}
 
 		internal override void Initialize(IFileSource fileSource, CanonicalTileId canonicalTileId, string tilesetId, Action p)
