@@ -36,7 +36,6 @@ namespace Mapbox.Unity.Map
 		[SerializeField] protected HashSet<UnwrappedTileId> _currentExtent;
 		private List<UnwrappedTileId> _tilesToProcess = new List<UnwrappedTileId>();
 
-		protected bool _worldHeightFixed = false;
 		protected int _initialZoom;
 		protected Vector2d _centerLatitudeLongitude;
 		protected Vector2d _centerMercator;
@@ -120,11 +119,7 @@ namespace Mapbox.Unity.Map
 			set => _initializeOnStart = value;
 		}
 		public HashSet<UnwrappedTileId> CurrentExtent => _currentExtent;
-		/// <summary>
-		/// Gets the loading texture used as a placeholder while the image tile is loading.
-		/// </summary>
-		/// <value>The loading texture.</value>
-		public Texture2D LoadingTexture => Options.loadingTexture;
+
 		/// <summary>
 		/// Gets the tile material used for map tiles.
 		/// </summary>
@@ -208,8 +203,6 @@ namespace Mapbox.Unity.Map
 				return;
 			}
 
-			//so map will be snapped to zero using next new tile loaded
-			_worldHeightFixed = false;
 			float differenceInZoom = 0.0f;
 			bool isAtInitialZoom = false;
 			// Update map zoom, if it has changed.
@@ -286,11 +279,6 @@ namespace Mapbox.Unity.Map
 			if (Options.tileMaterial == null)
 			{
 				Options.tileMaterial = new Material(Shader.Find("Standard"));
-			}
-
-			if (Options.loadingTexture == null)
-			{
-				Options.loadingTexture = new Texture2D(1, 1);
 			}
 		}
 
@@ -397,10 +385,6 @@ namespace Mapbox.Unity.Map
 		{
 			var tile = _mapVisualizer.LoadTile(tileId, enableTileRightAway);
 			OnTileRegisteredToFactories(tile);
-			if (Options.placementOptions.snapMapToZero && !_worldHeightFixed)
-			{
-				_worldHeightFixed = true;
-			}
 		}
 
 		protected virtual void TileProvider_OnTileRemoved(UnwrappedTileId tileId)
@@ -421,7 +405,6 @@ namespace Mapbox.Unity.Map
 		protected virtual void InitializeMap(MapOptions options)
 		{
 			Options = options;
-			_worldHeightFixed = false;
 			_centerLatitudeLongitude = Conversions.StringToLatLon(options.locationOptions.latitudeLongitude);
 			_initialZoom = (int)options.locationOptions.zoom;
 
@@ -581,91 +564,44 @@ namespace Mapbox.Unity.Map
 		private void TriggerTileRedrawForExtent(ExtentArgs currentExtent)
 		{
 			var activeTiles = _mapVisualizer.ActiveTiles;
-			_currentExtent = new HashSet<UnwrappedTileId>(currentExtent.ActiveTiles);
+			var tilesToProcess = new List<UnwrappedTileId>();
 
-			var tilesToRemove = new List<UnwrappedTileId>();
-			foreach (var activeTile in _mapVisualizer.ActiveTiles)
+			//remove tiles
+			foreach (var item in activeTiles)
 			{
-				var tile = activeTile.Value;
-				if (tile.CurrentZoom < AbsoluteZoom || !currentExtent.Bounds.Overlap(tile.Rect))
+				if (TileProvider.Cleanup(item.Key))
 				{
-					tilesToRemove.Add(activeTile.Key);
-					TileTracker.Remove(activeTile.Key);
-				}
-				else if (tile.CurrentZoom > (int) Zoom)
-				{
-					if ((tile.BaseRasterData == null ||
-					     tile.BaseRasterData.CurrentTileState != TileState.Loaded))
-					{
-						if (tile.BackgroundImageInUse)
-						{
-							OnTileStopping(tile);
-							_mapVisualizer.StopTile(tile);
-						}
-						else
-						{
-							tilesToRemove.Add(tile.UnwrappedTileId);
-						}
-						TileTracker.Remove(tile.UnwrappedTileId);
-					}
-					else
-					{
-						OnTileStopping(tile);
-						_mapVisualizer.StopTile(tile);
-					}
-
-					UnwrappedTileId parent = tile.UnwrappedTileId;
-					for (int i = 0; i < (tile.CurrentZoom - (int) Zoom); i++)
-					{
-						parent = parent.Parent;
-					}
-
-					if (currentExtent.ActiveTiles.Contains(parent))
-					{
-						if (!TileTracker.ContainsKey(parent))
-						{
-							TileTracker.Add(parent, new HashSet<UnwrappedTileId>());
-						}
-
-						if (!TileTracker[parent].Contains(tile.UnwrappedTileId))
-						{
-							TileTracker[parent].Add(tile.UnwrappedTileId);
-						}
-					}
-					else
-					{
-						Debug.Log("miscalculation?");
-					}
+					tilesToProcess.Add(item.Key);
 				}
 			}
-
-			foreach (var tileId in tilesToRemove)
+			foreach (var tile in tilesToProcess)
 			{
-				TileProvider_OnTileRemoved(tileId);
+				TileProvider_OnTileRemoved(tile);
 			}
 
+			//reposition existing tile
 			foreach (var tile in activeTiles)
 			{
 				// Reposition tiles in case we panned.
 				TileProvider_OnTileRepositioned(tile.Key);
 			}
 
-			_tilesToProcess.Clear();
-			foreach (var tile in _currentExtent)
+			//add new tiles
+			tilesToProcess.Clear();
+			foreach (var tile in currentExtent.ActiveTiles)
 			{
 				if (!activeTiles.ContainsKey(tile))
 				{
-					_tilesToProcess.Add(tile);
+					tilesToProcess.Add(tile);
 				}
 			}
-
-			if (_tilesToProcess.Count > 0)
+			if (tilesToProcess.Count > 0)
 			{
-				OnTilesStarting(_tilesToProcess);
-				foreach (var tileId in _tilesToProcess)
+				OnTilesStarting(tilesToProcess);
+				foreach (var tileId in tilesToProcess)
 				{
 					_mapVisualizer.State = ModuleState.Working;
-					TileProvider_OnTileAdded(tileId, currentExtent.ZoomState == ZoomState.ZoomIn);
+					TileProvider_OnTileAdded(tileId, true);
 				}
 			}
 		}
@@ -820,11 +756,6 @@ namespace Mapbox.Unity.Map
 			_worldRelativeScale = scale;
 		}
 
-		public virtual void SetLoadingTexture(Texture2D loadingTexture)
-		{
-			Options.loadingTexture = loadingTexture;
-		}
-
 		public virtual void SetTileMaterial(Material tileMaterial)
 		{
 			Options.tileMaterial = tileMaterial;
@@ -869,17 +800,6 @@ namespace Mapbox.Unity.Map
 		public virtual void SetPlacementType(MapPlacementType placementType)
 		{
 			Options.placementOptions.placementType = placementType;
-			Options.placementOptions.HasChanged = true;
-		}
-
-		/// <summary>
-		/// Translates map root by the terrain elevation at the center geo location.
-		/// Use this method with <c>TerrainWithElevation</c>
-		/// </summary>
-		/// <param name="active">If set to <c>true</c> active.</param>
-		public virtual void SnapMapToZero(bool active)
-		{
-			Options.placementOptions.snapMapToZero = active;
 			Options.placementOptions.HasChanged = true;
 		}
 
