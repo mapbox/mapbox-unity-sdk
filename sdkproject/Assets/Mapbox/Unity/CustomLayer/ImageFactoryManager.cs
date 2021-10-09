@@ -37,6 +37,10 @@ namespace Mapbox.Unity.CustomLayer
 
 		public virtual void RegisterTile(UnityTile tile)
 		{
+			if (_tileTracker.ContainsKey(tile))
+			{
+				Debug.Log("Tile is already in tracking list?");
+			}
 			ApplyParentTexture(tile);
 			var dataTile = CreateTile(tile.CanonicalTileId, _sourceSettings.Id);
 			_tileTracker.Add(tile, dataTile);

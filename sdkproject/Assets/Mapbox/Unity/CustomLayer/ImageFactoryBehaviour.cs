@@ -6,7 +6,6 @@ using UnityEngine;
 
 namespace Mapbox.Unity.CustomLayer
 {
-	[RequireComponent(typeof(AbstractMap))]
 	public class ImageFactoryBehaviour : MonoBehaviour
 	{
 		public AbstractMap Map;
