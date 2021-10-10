@@ -16,13 +16,6 @@ namespace Mapbox.Unity.Map
 	[Serializable]
 	public class ImageryLayer : AbstractLayer, IImageryLayer
 	{
-		public ImageryLayerProperties LayerProperty
-		{
-			get => _layerProperty;
-			set => _layerProperty = value;
-		}
-		public MapLayerType LayerType => MapLayerType.Imagery;
-		public bool IsLayerActive => (_layerProperty.sourceType != ImagerySourceType.None);
 		public ImagerySourceType LayerSource => _layerProperty.sourceType;
 		public MapImageFactory Factory => _imageFactory;
 		[SerializeField] protected ImageryLayerProperties _layerProperty = new ImageryLayerProperties();
@@ -56,6 +49,28 @@ namespace Mapbox.Unity.Map
 
 			_layerProperty.PropertyHasChanged += RedrawLayer;
 			_layerProperty.rasterOptions.PropertyHasChanged += RedrawLayer;
+		}
+
+		public override void Enable()
+		{
+			IsEnabled = true;
+			OnEnabled(this);
+		}
+
+		public override void Disable()
+		{
+			IsEnabled = false;
+			OnDisabled(this);
+		}
+
+		public override void Register(UnityTile tile)
+		{
+			Factory.Register(tile);
+		}
+
+		public override void Unregister(UnityTile tile)
+		{
+			Factory.Unregister(tile);
 		}
 
 		public void SetLayerSource(string imageSource)

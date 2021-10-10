@@ -16,9 +16,6 @@ namespace Mapbox.Unity.Map
 	public class TerrainLayer : AbstractLayer, ITerrainLayer, IGlobeTerrainLayer
 	{
 		[SerializeField] ElevationLayerProperties _layerProperty = new ElevationLayerProperties();
-		public ElevationLayerProperties LayerProperty => _layerProperty;
-		public MapLayerType LayerType => MapLayerType.Elevation;
-		public bool IsLayerActive => (_layerProperty.sourceType != ElevationSourceType.None);
 		public string LayerSourceId => _layerProperty.sourceOptions.Id;
 		public ElevationSourceType LayerSource => _layerProperty.sourceType;
 		public ElevationLayerType ElevationType
@@ -67,6 +64,28 @@ namespace Mapbox.Unity.Map
 			_layerProperty.PropertyHasChanged += SetFactoryOptions;
 		}
 
+		public override void Enable()
+		{
+			IsEnabled = true;
+			OnEnabled(this);
+		}
+
+		public override void Disable()
+		{
+			IsEnabled = false;
+			OnDisabled(this);
+		}
+
+		public override void Register(UnityTile tile)
+		{
+			Factory.Register(tile);
+		}
+
+		public override void Unregister(UnityTile tile)
+		{
+			Factory.Unregister(tile);
+		}
+
 		private void SetFactoryOptions(object sender, System.EventArgs e)
 		{
 			//terrain factory uses strategy objects and they are controlled by layer
@@ -74,8 +93,6 @@ namespace Mapbox.Unity.Map
 			Factory.SetOptions(_layerProperty);
 			NotifyUpdateLayer(_elevationFactory, sender as MapboxDataProperty, true);
 		}
-
-
 
 		#region API Methods
 

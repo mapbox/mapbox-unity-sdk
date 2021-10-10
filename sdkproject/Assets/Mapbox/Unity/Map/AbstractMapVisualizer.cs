@@ -26,16 +26,6 @@ namespace Mapbox.Unity.Map
 	/// </summary>
 	public abstract class AbstractMapVisualizer : ScriptableObject
 	{
-		private IEnumerable<AbstractTileFactory> Factories
-		{
-			get
-			{
-				yield return ImageryLayer.Factory;
-				yield return TerrainLayer.Factory;
-				yield return VectorLayer.Factory;
-			}
-		}
-
 		public TerrainLayer TerrainLayer;
 		public ImageryLayer ImageryLayer;
 		public VectorLayer VectorLayer;
@@ -84,22 +74,28 @@ namespace Mapbox.Unity.Map
 			if (ImageryLayer == null)
 			{
 				ImageryLayer = new ImageryLayer();
-				ImageryLayer.FactoryError += Factory_OnTileError;
 			}
+			ImageryLayer.FactoryError += Factory_OnTileError;
+			ImageryLayer.OnEnabled += OnLayerOnEnabled;
+			ImageryLayer.OnDisabled += OnLayerOnDisabled;
 			ImageryLayer.Initialize();
 
 			if (TerrainLayer == null)
 			{
 				TerrainLayer = new TerrainLayer();
-				TerrainLayer.FactoryError += Factory_OnTileError;
 			}
+			TerrainLayer.FactoryError += Factory_OnTileError;
+			TerrainLayer.OnEnabled += OnLayerOnEnabled;
+			TerrainLayer.OnDisabled += OnLayerOnDisabled;
 			TerrainLayer.Initialize();
 
 			if (VectorLayer == null)
 			{
 				VectorLayer = new VectorLayer();
-				VectorLayer.FactoryError += Factory_OnTileError;
 			}
+			VectorLayer.FactoryError += Factory_OnTileError;
+			VectorLayer.OnEnabled += OnLayerOnEnabled;
+			VectorLayer.OnDisabled += OnLayerOnDisabled;
 			VectorLayer.Initialize();
 
 			// Allow for map re-use by recycling any active tiles.
@@ -155,6 +151,22 @@ namespace Mapbox.Unity.Map
 			VectorLayer.UpdateLayer += OnVectorDataUpdateLayer;
 		}
 
+		private void OnLayerOnEnabled(AbstractLayer layer)
+		{
+			foreach (var tile in _activeTiles)
+			{
+				layer.Register(tile.Value);
+			}
+		}
+
+		private void OnLayerOnDisabled(AbstractLayer layer)
+		{
+			foreach (var tile in _activeTiles)
+			{
+				layer.Unregister(tile.Value);
+			}
+		}
+
 		private void OnImageOrTerrainUpdateLayer(object sender, System.EventArgs eventArgs)
 		{
 			LayerUpdateArgs layerUpdateArgs = eventArgs as LayerUpdateArgs;
@@ -199,15 +211,15 @@ namespace Mapbox.Unity.Map
 				//We are updating a core property of vector section.
 				//All vector features need to get unloaded and re-created.
 				RedrawVectorDataLayer();
-			}
+ 			}
 		}
 
 		private void RedrawVectorDataLayer()
 		{
-			UnregisterTilesFrom(VectorLayer.Factory);
+			UnregisterTilesFrom(VectorLayer);
 			// VectorLayer.UnbindAllEvents();
 			// VectorLayer.UpdateFactorySettings();
-			ReregisterTilesTo(VectorLayer.Factory);
+			ReregisterTilesTo(VectorLayer);
 		}
 
 		public virtual void Destroy()
@@ -343,17 +355,17 @@ namespace Mapbox.Unity.Map
 
 			if (ImageryLayer.IsLayerActive)
 			{
-				ImageryLayer.Factory.Register(unityTile);
+				ImageryLayer.Register(unityTile);
 			}
 
 			if (TerrainLayer.IsLayerActive)
 			{
-				TerrainLayer.Factory.Register(unityTile);
+				TerrainLayer.Register(unityTile);
 			}
 
 			if (VectorLayer.IsLayerActive)
 			{
-				VectorLayer.Factory.Register(unityTile);
+				VectorLayer.Register(unityTile);
 			}
 
 			unityTile.SetFinishCondition();
@@ -377,17 +389,17 @@ namespace Mapbox.Unity.Map
 
 				if (ImageryLayer.IsLayerActive)
 				{
-					ImageryLayer.Factory.Unregister(unityTile);
+					ImageryLayer.Unregister(unityTile);
 				}
 
 				if (TerrainLayer.IsLayerActive)
 				{
-					TerrainLayer.Factory.Unregister(unityTile);
+					TerrainLayer.Unregister(unityTile);
 				}
 
 				if (VectorLayer.IsLayerActive)
 				{
-					VectorLayer.Factory.Unregister(unityTile);
+					VectorLayer.Unregister(unityTile);
 				}
 
 				unityTile.IsStopped = true;
@@ -417,17 +429,17 @@ namespace Mapbox.Unity.Map
 				{
 					if (ImageryLayer.IsLayerActive)
 					{
-						ImageryLayer.Factory.Unregister(unityTile);
+						ImageryLayer.Unregister(unityTile);
 					}
 
 					if (TerrainLayer.IsLayerActive)
 					{
-						TerrainLayer.Factory.Unregister(unityTile);
+						TerrainLayer.Unregister(unityTile);
 					}
 
 					if (VectorLayer.IsLayerActive)
 					{
-						VectorLayer.Factory.Unregister(unityTile);
+						VectorLayer.Unregister(unityTile);
 					}
 				}
 
@@ -455,17 +467,9 @@ namespace Mapbox.Unity.Map
 		public void ClearMap()
 		{
 			UnregisterAllTiles();
-			if (Factories != null)
-			{
-				foreach (var tileFactory in Factories)
-				{
-					if (tileFactory != null)
-					{
-						tileFactory.Clear();
-						//DestroyImmediate(tileFactory);
-					}
-				}
-			}
+			TerrainLayer.Clear();
+			ImageryLayer.Clear();
+			VectorLayer.Clear();
 			foreach (var tileId in _activeTiles.Keys.ToList())
 			{
 				_activeTiles[tileId].ClearAssets();
@@ -489,10 +493,9 @@ namespace Mapbox.Unity.Map
 		{
 			foreach (var activeTile in _activeTiles)
 			{
-				foreach (var abstractTileFactory in Factories)
-				{
-					abstractTileFactory.Register(activeTile.Value);
-				}
+				TerrainLayer.Register(activeTile.Value);
+				ImageryLayer.Register(activeTile.Value);
+				VectorLayer.Register(activeTile.Value);
 			}
 		}
 
@@ -505,13 +508,13 @@ namespace Mapbox.Unity.Map
 			}
 		}
 
-		public void UnregisterTilesFrom(AbstractTileFactory factory)
+		public void UnregisterTilesFrom(AbstractLayer layer)
 		{
 			if (VectorLayer.IsLayerActive)
 			{
 				foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
 				{
-					factory.Unregister(tileBundle.Value);
+					layer.Unregister(tileBundle.Value);
 				}
 			}
 		}
@@ -540,11 +543,11 @@ namespace Mapbox.Unity.Map
 			factory.RemoveVectorLayerVisualizer(layerVisualizer);
 		}
 
-		public void ReregisterTilesTo(VectorTileFactory factory)
+		public void ReregisterTilesTo(AbstractLayer layer)
 		{
 			foreach (KeyValuePair<UnwrappedTileId, UnityTile> tileBundle in _activeTiles)
 			{
-				factory.Register(tileBundle.Value);
+				layer.Register(tileBundle.Value);
 			}
 		}
 

@@ -86,7 +86,7 @@ namespace Mapbox.Unity.CustomLayer
 		protected override void SetTexture(UnityTile unityTile, RasterTile dataTile)
 		{
 			var cachedTileIdForCallbackCheck = unityTile.CanonicalTileId;
-			if (dataTile.Texture2D != null)
+			if (dataTile != null && dataTile.Texture2D != null)
 			{
 				//if collider is disabled, we switch to a shader based solution
 				//no elevated mesh is generated
@@ -109,14 +109,33 @@ namespace Mapbox.Unity.CustomLayer
 			}
 			else
 			{
-				unityTile.SetHeightData(dataTile, _elevationSettings.requiredOptions.exaggerationFactor, _elevationSettings.modificationOptions.useRelativeHeight, _elevationSettings.colliderOptions.addCollider, (tile) =>
+				if (_isUsingShaderSolution)
 				{
-					if (tile.CanonicalTileId == cachedTileIdForCallbackCheck)
-					{
-						TerrainStrategy.RegisterTile(unityTile, true);
-					}
-				});
-
+					//unityTile.MeshRenderer.sharedMaterial.SetTexture(ShaderElevationTextureFieldName, null);
+					unityTile.MeshRenderer.sharedMaterial.SetVector(ShaderElevationTextureScaleOffsetFieldName, new Vector4(1, 1, 0, 0));
+					unityTile.MeshRenderer.sharedMaterial.SetFloat("_TileScale", unityTile.TileScale);
+					unityTile.MeshRenderer.sharedMaterial.SetFloat("_ElevationMultiplier", 0);
+					unityTile.SetHeightData(
+						dataTile,
+						_elevationSettings.requiredOptions.exaggerationFactor,
+						_elevationSettings.modificationOptions.useRelativeHeight,
+						_elevationSettings.colliderOptions.addCollider);
+					TerrainStrategy.RegisterTile(unityTile, false);
+				}
+				else
+				{
+					unityTile.SetHeightData(
+						dataTile,
+						0,
+						_elevationSettings.modificationOptions.useRelativeHeight,
+						_elevationSettings.colliderOptions.addCollider,
+						(tile) => {
+						if (tile.CanonicalTileId == cachedTileIdForCallbackCheck)
+						{
+							TerrainStrategy.RegisterTile(unityTile, true);
+						}
+					});
+				}
 			}
 		}
 

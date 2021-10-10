@@ -15,10 +15,6 @@ namespace Mapbox.Unity.Map
 	public interface ILayer
 	{
 		/// <summary>
-		/// Gets the type of feature from the `FEATURES` section.
-		/// </summary>
-		MapLayerType LayerType { get; }
-		/// <summary>
 		/// Boolean for setting the feature layer active or inactive.
 		/// </summary>
 		bool IsLayerActive { get; }

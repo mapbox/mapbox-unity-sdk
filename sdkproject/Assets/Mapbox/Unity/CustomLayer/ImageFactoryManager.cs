@@ -59,6 +59,7 @@ namespace Mapbox.Unity.CustomLayer
 				tile.RemoveTile(_tileTracker[tile]);
 				_tileTracker.Remove(tile);
 			}
+			SetTexture(tile, null);
 			_fetcher.CancelFetching(tile.UnwrappedTileId, _sourceSettings.Id);
 			MapboxAccess.Instance.CacheManager.TileDisposed(tile, _sourceSettings.Id);
 		}

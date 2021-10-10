@@ -306,7 +306,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		{
 			_rasterTile = rasterTile;
 
-			if (_rasterTile.Texture2D == null && _rasterTile.Data == null)
+			if (_rasterTile == null || (_rasterTile.Texture2D == null && _rasterTile.Data == null))
 			{
 				MeshRenderer.material.mainTexture = null;
 				return;

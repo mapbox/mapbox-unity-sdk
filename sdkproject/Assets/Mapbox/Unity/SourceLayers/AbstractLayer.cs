@@ -1,4 +1,7 @@
-﻿using Mapbox.Unity.DataContainers;
+﻿using System;
+using Mapbox.Map;
+using Mapbox.Unity.DataContainers;
+using Mapbox.Unity.MeshGeneration.Data;
 
 namespace Mapbox.Unity.Map
 {
@@ -19,8 +22,10 @@ namespace Mapbox.Unity.Map
 		public ModifierBase modifier;
 	}
 
-	public class AbstractLayer
+	public abstract class AbstractLayer
 	{
+		protected bool IsEnabled = true;
+		public bool IsLayerActive => IsEnabled;
 		public event System.EventHandler UpdateLayer;
 		protected virtual void NotifyUpdateLayer(LayerUpdateArgs layerUpdateArgs)
 		{
@@ -53,5 +58,28 @@ namespace Mapbox.Unity.Map
 				handler(this, layerUpdateArgs);
 			}
 		}
+
+		public virtual void Enable()
+		{
+			IsEnabled = true;
+			OnEnabled(null);
+		}
+
+		public virtual void Disable()
+		{
+			IsEnabled = false;
+			OnDisabled(null);
+		}
+
+		public virtual void Clear()
+		{
+			
+		}
+
+		public abstract void Register(UnityTile tile);
+		public abstract void Unregister(UnityTile tile);
+
+		public Action<AbstractLayer> OnDisabled = (f) => { };
+		public Action<AbstractLayer> OnEnabled = (f) => { };
 	}
 }

@@ -17,11 +17,8 @@ namespace Mapbox.Unity.Map
 	{
 		//Private Fields
 		[SerializeField] private VectorLayerProperties _layerProperty = new VectorLayerProperties();
-		public VectorLayerProperties LayerProperty => _layerProperty;
-		public MapLayerType LayerType => MapLayerType.Vector;
-		public bool IsLayerActive => (_layerProperty.sourceType != VectorSourceType.None);
 		public string LayerSourceId => _layerProperty.sourceOptions.Id;
-		public VectorTileFactory Factory => _vectorTileFactory;
+		//public VectorTileFactory Factory => _vectorTileFactory;
 
 		public EventHandler SubLayerAdded;
 		public EventHandler SubLayerRemoved;
@@ -38,6 +35,28 @@ namespace Mapbox.Unity.Map
 			_layerProperty.SubLayerPropertyAdded += AddVectorLayer;
 			_layerProperty.SubLayerPropertyRemoved += RemoveVectorLayer;
 			_vectorTileFactory.TileFactoryHasChanged += OnVectorTileFactoryOnTileFactoryHasChanged;
+		}
+
+		public override void Enable()
+		{
+			IsEnabled = true;
+			OnEnabled(this);
+		}
+
+		public override void Disable()
+		{
+			IsEnabled = false;
+			OnDisabled(this);
+		}
+
+		public override void Register(UnityTile tile)
+		{
+			_vectorTileFactory.Register(tile);
+		}
+
+		public override void Unregister(UnityTile tile)
+		{
+			_vectorTileFactory.Unregister(tile);
 		}
 
 		private void AddVectorLayer(object sender, EventArgs args)
@@ -77,8 +96,13 @@ namespace Mapbox.Unity.Map
 
 		private void RedrawVectorLayer(object sender, System.EventArgs e)
 		{
-			Factory.SetOptions(_layerProperty);
+			_vectorTileFactory.SetOptions(_layerProperty);
 			NotifyUpdateLayer(_vectorTileFactory, sender as MapboxDataProperty, true);
+
+			if (!IsLayerActive)
+			{
+				_vectorTileFactory.Clear();
+			}
 		}
 
 		private void OnVectorTileFactoryOnTileFactoryHasChanged(object sender, EventArgs args)
@@ -201,8 +225,8 @@ namespace Mapbox.Unity.Map
 		/// <param name="item"> the options of the prefab layer.</param>
 		private void CreatePrefabLayer(PrefabItemOptions item)
 		{
-			if (LayerProperty.sourceType == VectorSourceType.None
-				|| !LayerProperty.sourceOptions.Id.Contains(MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id))
+			if (_layerProperty.sourceType == VectorSourceType.None
+				|| !_layerProperty.sourceOptions.Id.Contains(MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreets).Id))
 			{
 				Debug.LogError("In order to place location prefabs please add \"mapbox.mapbox-streets-v7\" to the list of vector data sources");
 				return;
