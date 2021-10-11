@@ -24,6 +24,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 	public class VectorLayerVisualizer : LayerVisualizerBase
 	{
+
 		public override VectorSubLayerProperties SubLayerProperties
 		{
 			get
@@ -87,6 +88,21 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			});
 			_activeObjects = new Dictionary<UnityTile, List<VectorEntity>>();
 			_listPool = new ObjectPool<List<VectorEntity>>(() => { return new List<VectorEntity>(); });
+		}
+
+		public override void Disable()
+		{
+			base.Disable();
+			foreach (var tilePair in _activeObjects)
+			{
+				foreach (var entity in tilePair.Value)
+				{
+					entity.GameObject.SetActive(false);
+					_pool.Put(entity);
+				}
+				tilePair.Value.Clear();
+			}
+			_activeObjects.Clear();
 		}
 
 		public override void OnUnregisterTile(UnityTile tile)
@@ -588,13 +604,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			return (layerProperties.buildingsWithUniqueIds && _activeIds.Contains(featureId));
 		}
 
-		public override bool Active
-		{
-			get
-			{
-				return _sublayerProperties.coreOptions.isActive;
-			}
-		}
+		public override bool Active => _sublayerProperties.coreOptions.isActive;
 
 		#endregion
 		//used for pois or something, to be removed

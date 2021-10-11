@@ -35,6 +35,16 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		}
 
+		public virtual void Enable()
+		{
+			_sublayerProperties.coreOptions.isActive = true;
+		}
+
+		public virtual void Disable()
+		{
+			_sublayerProperties.coreOptions.isActive = false;
+		}
+
 		public virtual void SetProperties(VectorSubLayerProperties properties)
 		{
 			_coreModifiers = new HashSet<ModifierBase>();

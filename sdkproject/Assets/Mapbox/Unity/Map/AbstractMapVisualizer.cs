@@ -96,7 +96,7 @@ namespace Mapbox.Unity.Map
 			VectorLayer.FactoryError += Factory_OnTileError;
 			VectorLayer.OnEnabled += OnLayerOnEnabled;
 			VectorLayer.OnDisabled += OnLayerOnDisabled;
-			VectorLayer.Initialize();
+			VectorLayer.Initialize(() => _activeTiles.Values);
 
 			// Allow for map re-use by recycling any active tiles.
 			var activeTiles = _activeTiles.Keys.ToList();
@@ -518,6 +518,7 @@ namespace Mapbox.Unity.Map
 				}
 			}
 		}
+
 
 		public void UnregisterAndRedrawTilesFromLayer(VectorTileFactory factory, LayerVisualizerBase layerVisualizer)
 		{

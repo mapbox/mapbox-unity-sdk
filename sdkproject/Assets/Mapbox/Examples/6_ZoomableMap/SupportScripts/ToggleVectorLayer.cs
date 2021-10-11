@@ -45,4 +45,30 @@ public class ToggleVectorLayer : MonoBehaviour
             Map.MapVisualizer.VectorLayer.Disable();
         }
     }
+
+    public void ToggleBuildings(bool isEnabled)
+    {
+        if (isEnabled)
+        {
+            Map.MapVisualizer.VectorLayer.EnableSublayerType("building");
+        }
+        else
+        {
+            Map.MapVisualizer.VectorLayer.DisableSublayerType("building");
+        }
+    }
+
+    public void ToggleAirspace(bool isEnabled)
+    {
+        if (isEnabled)
+        {
+            Map.MapVisualizer.VectorLayer.EnableSublayerType("Class_Airspace-7palx6");
+        }
+        else
+        {
+            Map.MapVisualizer.VectorLayer.DisableSublayerType("Class_Airspace-7palx6");
+        }
+    }
+
+
 }

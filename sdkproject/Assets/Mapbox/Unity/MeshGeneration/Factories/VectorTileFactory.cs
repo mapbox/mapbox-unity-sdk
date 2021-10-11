@@ -12,30 +12,85 @@ using Mapbox.Unity.DataFetching;
 
 namespace Mapbox.Unity.MeshGeneration.Factories
 {
-	/// <summary>
-	///	Vector Tile Factory
-	/// Vector data is much more detailed compared to terrain and image data so we have a different structure to process
-	/// vector data(compared to other factories). First of all, how does the vector data itself structured? Vector tile
-	/// data contains 'vector layers' as immediate children.And then each of these vector layers contains a number of
-	/// 'features' inside.I.e.vector data for a tile has 'building', 'road', 'landuse' etc layers. Then building layer
-	/// has a number of polygon features, road layer has line features etc.
-	/// Similar to this, vector tile factory contains bunch of 'layer visualizers' and each one of them corresponds to
-	/// one (or more) vector layers in data.So when data is received, factory goes through all layers inside and passes
-	/// them to designated layer visualizers.We're using layer name as key here, to find the designated layer visualizer,
-	/// like 'building', 'road'. (vector tile factory visual would help here). If it can't find a layer visualizer for
-	/// that layer, it'll be skipped and not processed at all.If all you need is 1-2 layers, it's indeed a big waste to
-	/// pull whole vector data and you can use 'Style Optimized Vector Tile Factory' to pull only the layer you want to use.
-	/// </summary>
-	//[CreateAssetMenu(menuName = "Mapbox/Factories/Vector Tile Factory")]
+	public class VectorFactoryManager
+	{
+		public Action<UnityTile, Mapbox.Map.VectorTile> DataReceived = (t, s) => { };
+		public Action<UnityTile, Mapbox.Map.VectorTile, TileErrorEventArgs> FetchingError = (t, r, s) => { };
+
+		protected VectorLayerProperties _properties;
+		protected VectorDataFetcher _fetcher;
+		protected Dictionary<UnityTile, Tile> _tileTracker = new Dictionary<UnityTile, Tile>();
+
+		public VectorFactoryManager(VectorLayerProperties properties)
+		{
+			_properties = properties;
+			_fetcher = new VectorDataFetcher();
+			_fetcher.DataReceived += OnFetcherDataRecieved;
+			_fetcher.FetchingError += OnFetcherError;
+		}
+
+		public void RegisterTile(UnityTile tile)
+		{
+			if (string.IsNullOrEmpty(_properties.sourceOptions.Id) || _properties.sourceOptions.isActive == false)
+			{
+				return;
+			}
+
+			var dataTile = CreateDataTile(tile.CanonicalTileId, _properties.sourceOptions.Id);
+			_tileTracker.Add(tile, dataTile);
+			if (tile != null)
+			{
+				//Debug.Log(string.Format("{0} - {1}",tile.CanonicalTileId, "add Vector"));
+				tile.AddTile(dataTile);
+			}
+
+			_fetcher.FetchData(dataTile, _properties.sourceOptions.Id, tile.CanonicalTileId, tile);
+		}
+
+		public void UnregisterTile(UnityTile tile)
+		{
+			if (_tileTracker.ContainsKey(tile))
+			{
+				//Debug.Log(string.Format("{0} - {1}",tile.CanonicalTileId, "remove Vector"));
+				var dataTile = _tileTracker[tile];
+				dataTile.Cancel();
+				tile.RemoveTile(dataTile);
+				_tileTracker.Remove(tile);
+			}
+
+			_fetcher.CancelFetching(tile.UnwrappedTileId, _properties.sourceOptions.Id);
+			MapboxAccess.Instance.CacheManager.TileDisposed(tile, _properties.sourceOptions.Id);
+		}
+
+		private void OnFetcherDataRecieved(UnityTile unityTile, Mapbox.Map.VectorTile vectorTile)
+		{
+			DataReceived(unityTile, vectorTile);
+		}
+
+		protected virtual Mapbox.Map.VectorTile CreateDataTile(CanonicalTileId canonicalTileId, string tilesetId)
+		{
+			var vectorTile = (_properties.useOptimizedStyle)
+				? new Mapbox.Map.VectorTile(canonicalTileId, tilesetId, _properties.optimizedStyle.Id, _properties.optimizedStyle.Modified)
+				: new Mapbox.Map.VectorTile(canonicalTileId, tilesetId);
+#if UNITY_EDITOR
+			vectorTile.IsMapboxTile = true;
+#endif
+			return vectorTile;
+		}
+
+		private void OnFetcherError(UnityTile unityTile, Mapbox.Map.VectorTile dataTile, TileErrorEventArgs errorEventArgs)
+		{
+			FetchingError(unityTile, dataTile, errorEventArgs);
+		}
+	}
+
 	public class VectorTileFactory : AbstractTileFactory
 	{
+		public VectorFactoryManager VectorFactoryManager;
 		private Dictionary<string, List<LayerVisualizerBase>> _layerBuilder;
 		private VectorLayerProperties _properties;
 		public VectorLayerProperties Properties => _properties;
 		private Dictionary<UnityTile, HashSet<LayerVisualizerBase>> _layerProgress;
-		protected VectorDataFetcher _fetcher;
-
-		private Dictionary<UnityTile, Tile> _tileTracker = new Dictionary<UnityTile, Tile>();
 
 		public VectorTileFactory(VectorLayerProperties properties)
 		{
@@ -43,26 +98,12 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			_layerProgress = new Dictionary<UnityTile, HashSet<LayerVisualizerBase>>();
 			_layerBuilder = new Dictionary<string, List<LayerVisualizerBase>>();
 
-			_fetcher = new VectorDataFetcher();
-			_fetcher.DataReceived += OnFetcherDataRecieved;
-			_fetcher.FetchingError += OnFetcherError;
+			VectorFactoryManager = new VectorFactoryManager(_properties);
+			VectorFactoryManager.DataReceived += OnFetcherDataReceived;
+			VectorFactoryManager.FetchingError += OnFetchingError;
 
 			CreatePOILayerVisualizers();
-
 			CreateLayerVisualizers();
-		}
-
-		public string TilesetId
-		{
-			get
-			{
-				return _properties.sourceOptions.Id;
-			}
-
-			set
-			{
-				_properties.sourceOptions.Id = value;
-			}
 		}
 
 		public override void SetOptions(LayerProperties options)
@@ -74,58 +115,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 				CreatePOILayerVisualizers();
 				CreateLayerVisualizers();
-			}
-		}
-
-		protected override void OnRegistered(UnityTile tile)
-		{
-			//if (string.IsNullOrEmpty(TilesetId) || _properties.sourceOptions.isActive == false || (_properties.vectorSubLayers.Count + _properties.locationPrefabList.Count) == 0)
-			if (string.IsNullOrEmpty(TilesetId) || _properties.sourceOptions.isActive == false)
-			{
-				return;
-			}
-			_tilesWaitingResponse.Add(tile);
-			var dataTile = CreateDataTile(tile.CanonicalTileId, TilesetId);
-			_tileTracker.Add(tile, dataTile);
-			if (tile != null)
-			{
-				//Debug.Log(string.Format("{0} - {1}",tile.CanonicalTileId, "add Vector"));
-				tile.AddTile(dataTile);
-			}
-
-			_fetcher.FetchData(dataTile, TilesetId, tile.CanonicalTileId, tile);
-		}
-
-		protected override void OnUnregistered(UnityTile tile)
-		{
-			if (_tileTracker.ContainsKey(tile))
-			{
-				//Debug.Log(string.Format("{0} - {1}",tile.CanonicalTileId, "remove Vector"));
-				tile.RemoveTile(_tileTracker[tile]);
-				_tileTracker.Remove(tile);
-			}
-
-			_fetcher.CancelFetching(tile.UnwrappedTileId, TilesetId);
-			MapboxAccess.Instance.CacheManager.TileDisposed(tile, _properties.sourceOptions.Id);
-
-			if (_layerProgress != null && _layerProgress.ContainsKey(tile))
-			{
-				_layerProgress.Remove(tile);
-			}
-			if (_tilesWaitingResponse != null && _tilesWaitingProcessing.Contains(tile))
-			{
-				_tilesWaitingProcessing.Remove(tile);
-			}
-
-			if (_layerBuilder != null)
-			{
-				foreach (var layer in _layerBuilder.Values)
-				{
-					foreach (var visualizer in layer)
-					{
-						visualizer.UnregisterTile(tile);
-					}
-				}
 			}
 		}
 
@@ -148,15 +137,35 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		protected virtual Mapbox.Map.VectorTile CreateDataTile(CanonicalTileId canonicalTileId, string tilesetId)
+		protected override void OnRegistered(UnityTile tile)
 		{
-			var vectorTile = (_properties.useOptimizedStyle)
-				? new Mapbox.Map.VectorTile(canonicalTileId, tilesetId, _properties.optimizedStyle.Id, _properties.optimizedStyle.Modified)
-				: new Mapbox.Map.VectorTile(canonicalTileId, tilesetId);
-#if UNITY_EDITOR
-			vectorTile.IsMapboxTile = true;
-#endif
-			return vectorTile;
+			_tilesWaitingResponse.Add(tile);
+			VectorFactoryManager.RegisterTile(tile);
+		}
+
+		protected override void OnUnregistered(UnityTile tile)
+		{
+			VectorFactoryManager.UnregisterTile(tile);
+			tile.SetVectorData(null);
+			if (_layerProgress != null && _layerProgress.ContainsKey(tile))
+			{
+				_layerProgress.Remove(tile);
+			}
+			if (_tilesWaitingResponse != null && _tilesWaitingProcessing.Contains(tile))
+			{
+				_tilesWaitingProcessing.Remove(tile);
+			}
+
+			if (_layerBuilder != null)
+			{
+				foreach (var layer in _layerBuilder.Values)
+				{
+					foreach (var visualizer in layer)
+					{
+						visualizer.UnregisterTile(tile);
+					}
+				}
+			}
 		}
 
 		private void CreateMeshes(UnityTile tile)
@@ -170,40 +179,22 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		private void OnFetcherDataRecieved(UnityTile tile, Mapbox.Map.VectorTile vectorTile)
+		private void OnFetcherDataReceived(UnityTile tile, Mapbox.Map.VectorTile vectorTile)
 		{
 			if (vectorTile.CurrentTileState != TileState.Canceled &&
+			    tile.ContainsDataTile(vectorTile) &&
 			    _tilesWaitingResponse.Contains(tile))
 			{
-				tile.SetVectorData(TilesetId, vectorTile, CreateMeshes);
+				tile.SetVectorData(vectorTile, CreateMeshes);
 			}
-			//CreateMeshes(tile);
-			// if (tile != null)
-			// {
-			// 	_tilesWaitingResponse.Remove(tile);
-			// 	tile.SetVectorData(TilesetId, vectorTile);
-			// 	// FIXME: we can make the request BEFORE getting a response from these!
-			// 	if (tile.HeightDataState == TilePropertyState.Loading ||
-			// 			tile.RasterDataState == TilePropertyState.Loading)
-			// 	{
-			// 		tile.OnHeightDataChanged += DataChangedHandler;
-			// 		tile.OnRasterDataChanged += DataChangedHandler;
-			// 	}
-			// 	else
-			// 	{
-			// 		tile.OnHeightDataChanged -= DataChangedHandler;
-			// 		tile.OnRasterDataChanged -= DataChangedHandler;
-			// 		CreateMeshes(tile);
-			// 	}
-			// }
 		}
 
-		private void OnFetcherError(UnityTile tile, Mapbox.Map.VectorTile vectorTile, TileErrorEventArgs e)
+		private void OnFetchingError(UnityTile tile, Mapbox.Map.VectorTile vectorTile, TileErrorEventArgs e)
 		{
 			if (tile != null)
 			{
 				_tilesWaitingResponse.Remove(tile);
-				tile.SetVectorData(TilesetId, null);
+				tile.SetVectorData(null);
 				OnErrorOccurred(e);
 			}
 		}
@@ -442,5 +433,16 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		}
 		#endregion
 
+		public List<LayerVisualizerBase> GetVisualizersOfLayerType(string sublayerTypeName)
+		{
+			if (_layerBuilder.ContainsKey(sublayerTypeName))
+			{
+				return _layerBuilder[sublayerTypeName];
+			}
+			else
+			{
+				return null;
+			}
+		}
 	}
 }

@@ -21,11 +21,5 @@ MonoBehaviour:
   moveFeaturePositionTo: 0
   filterOptions:
     _selectedLayerName: 
-    filters:
-    - Key: LOCAL_TYPE
-      KeyDescription: 
-      PropertyValue: CLASS_E6
-      Min: 0
-      Max: 0
-      filterOperator: 0
+    filters: []
     combinerType: 1

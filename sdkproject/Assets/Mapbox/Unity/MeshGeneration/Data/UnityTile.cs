@@ -25,6 +25,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		private RasterTile _terrainTile;
 		public RasterTile TerrainData => _terrainTile;
+		private bool _terrainReady = false;
+		public bool IsTerrainReady => _terrainReady;
 		public float[] HeightData;
 
 		private VectorTile _vectorTile;
@@ -152,6 +154,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				MeshRenderer.sharedMaterial.mainTexture = null;
 			}
 
+			_terrainReady = false;
+			_createMeshCallback = null;
 			IsStopped = false;
 			gameObject.SetActive(false);
 			IsRecycled = true;
@@ -232,6 +236,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				}
 			}
 
+			_terrainReady = true;
+
 			if (callback != null)
 			{
 				callback(this);
@@ -288,6 +294,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					}
 				}
 
+				_terrainReady = true;
 				//tt.Apply();
 				if (callback != null)
 				{
@@ -295,7 +302,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				}
 
 				CheckFinishedCondition(_terrainTile);
-				if (_createMeshCallback != null && _vectorTile != null)
+				if (_createMeshCallback != null && _vectorTile?.CurrentTileState == TileState.Loaded)
 				{
 					_createMeshCallback(this);
 				}
@@ -336,16 +343,24 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			CheckFinishedCondition(_rasterTile);
 		}
 
-		public void SetVectorData(string tileset, VectorTile vectorTile, Action<UnityTile> createMeshCallback = null)
+		public void SetVectorData(VectorTile vectorTile, Action<UnityTile> createMeshCallback = null)
 		{
 			_vectorTile = vectorTile;
+			if (_vectorTile == null)
+			{
+				_createMeshCallback = null;
+				return;
+			}
 			_createMeshCallback = createMeshCallback;
 
 			if (_vectorTile != null)
 			{
 				if (vectorTile.Data != null)
 				{
-					_createMeshCallback(this);
+					if (_terrainTile == null || _terrainReady)
+					{
+						_createMeshCallback(this);
+					}
 				}
 				else
 				{
@@ -353,7 +368,10 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					{
 						if (success)
 						{
-							_createMeshCallback(this);
+							if (_terrainTile == null || _terrainReady)
+							{
+								_createMeshCallback(this);
+							}
 						}
 					};
 				}

@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Mapbox.Utils;
 using System;
+using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
 using Mapbox.Map;
@@ -8,6 +9,7 @@ using Mapbox.Platform;
 using Mapbox.Unity.DataContainers;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Factories;
+using Mapbox.Unity.MeshGeneration.Interfaces;
 using Mapbox.Unity.Utilities;
 
 namespace Mapbox.Unity.Map
@@ -15,15 +17,14 @@ namespace Mapbox.Unity.Map
 	[Serializable]
 	public class VectorLayer : AbstractLayer, IVectorDataLayer
 	{
-		//Private Fields
 		[SerializeField] private VectorLayerProperties _layerProperty = new VectorLayerProperties();
 		public string LayerSourceId => _layerProperty.sourceOptions.Id;
-		//public VectorTileFactory Factory => _vectorTileFactory;
 
 		public EventHandler SubLayerAdded;
 		public EventHandler SubLayerRemoved;
 		public Action<AbstractTileFactory, TileErrorEventArgs> FactoryError = (factory, args) => { };
 
+		private Func<IEnumerable<UnityTile>> _getTileList;
 		private VectorTileFactory _vectorTileFactory;
 
 		public void Initialize()
@@ -35,6 +36,12 @@ namespace Mapbox.Unity.Map
 			_layerProperty.SubLayerPropertyAdded += AddVectorLayer;
 			_layerProperty.SubLayerPropertyRemoved += RemoveVectorLayer;
 			_vectorTileFactory.TileFactoryHasChanged += OnVectorTileFactoryOnTileFactoryHasChanged;
+		}
+
+		public void Initialize(Func<IEnumerable<UnityTile>> getTileList)
+		{
+			_getTileList = getTileList;
+			Initialize();
 		}
 
 		public override void Enable()
@@ -618,5 +625,32 @@ namespace Mapbox.Unity.Map
 		}
 		#endregion
 
+		public void EnableSublayerType(string sublayerTypeName)
+		{
+			var sublayers = _vectorTileFactory.GetVisualizersOfLayerType(sublayerTypeName);
+			if (sublayers != null)
+			{
+				foreach (var layerVisualizer in sublayers)
+				{
+					layerVisualizer.Enable();
+					foreach (var unityTile in _getTileList())
+					{
+						_vectorTileFactory.RedrawSubLayer(unityTile, layerVisualizer);
+					}
+				}
+			}
+		}
+
+		public void DisableSublayerType(string sublayerTypeName)
+		{
+			var sublayers = _vectorTileFactory.GetVisualizersOfLayerType(sublayerTypeName);
+			if (sublayers != null)
+			{
+				foreach (var visualizerBase in sublayers)
+				{
+					visualizerBase.Disable();
+				}
+			}
+		}
 	}
 }
