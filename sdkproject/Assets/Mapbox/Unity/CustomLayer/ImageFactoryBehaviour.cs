@@ -48,7 +48,7 @@ namespace Mapbox.Unity.CustomLayer
 			};
 			Map.OnTileRegisteredToFactories += (t) =>
 			{
-				if (enabled)
+				if (isActiveAndEnabled)
 				{
 					ImageFactoryManager.RegisterTile(t);
 					SetOpacity(t);
