@@ -321,6 +321,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				#endif
 			};
 
+			if (_activeObjects.ContainsKey(tile))
+			{
+				ClearObjectOnUnregister(tile);
+			}
+
 			MapboxAccess.Instance.TaskManager.AddTask(taskWrapper);
 		}
 

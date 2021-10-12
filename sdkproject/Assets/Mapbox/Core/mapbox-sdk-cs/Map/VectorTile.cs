@@ -178,6 +178,7 @@ namespace Mapbox.Map
 #endif
 				};
 
+				TileState = TileState.Processing;
 				MapboxAccess.Instance.TaskManager.AddTask(task);
 				//first add the parsing task,
 				//THEN call the callback which will lead into caching etc.

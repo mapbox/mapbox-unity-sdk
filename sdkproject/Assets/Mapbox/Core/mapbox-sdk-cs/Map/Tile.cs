@@ -41,7 +41,9 @@ namespace Mapbox.Map
 		Canceled,
 
 		/// <summary> Data has been loaded before and got updated. </summary>
-		Updated
+		Updated,
+
+		Processing
 	}
 
 	/// <summary>

@@ -37,7 +37,7 @@ public class VectorDataFetcher : DataFetcher
  				vectorCacheItemFromMemory.TileId,
  				vectorCacheItemFromMemory,
  				true);
- 			DataReceived(unityTile, tile);
+            FireDataReceived(unityTile, tile);
  			return;
  		}
 
@@ -72,7 +72,7 @@ public class VectorDataFetcher : DataFetcher
 		        vectorCacheItemFromSqlite.Tile.ExpirationDate = vectorCacheItemFromSqlite.ExpirationDate.Value;
 	        }
 
-	        DataReceived(unityTile, tile);
+	        FireDataReceived(unityTile, tile);
 	        MapboxAccess.Instance.CacheManager.AddVectorItemToMemory(tile.TilesetId, tile.Id, vectorCacheItemFromSqlite, true);
 
 	        if (vectorCacheItemFromSqlite.ExpirationDate < DateTime.Now)
@@ -152,7 +152,7 @@ public class VectorDataFetcher : DataFetcher
 				//IMPORTANT And this is where we pass it to cache
 				//cache will be responsible for tracking it all the way
 				//and destroying it when it's not used anymore
-				DataReceived(unityTile, vectorTile);
+				FireDataReceived(unityTile, vectorTile);
 				MapboxAccess.Instance.CacheManager.AddVectorDataItem(
 					vectorTile.TilesetId,
 					vectorTile.Id,
@@ -160,6 +160,25 @@ public class VectorDataFetcher : DataFetcher
 					true);
 
 			}
+		}
+	}
+
+	public void FireDataReceived(UnityTile unityTile, VectorTile tile)
+	{
+		if (tile.Data == null && tile.CurrentTileState == TileState.Processing)
+		{
+			tile.DataProcessingFinished += (b) =>
+			{
+				DataReceived(unityTile, tile);
+			};
+		}
+		else if (tile.CurrentTileState == TileState.Loaded)
+		{
+			DataReceived(unityTile, tile);
+		}
+		else
+		{
+			Debug.Log("error with vector tile");
 		}
 	}
 }
