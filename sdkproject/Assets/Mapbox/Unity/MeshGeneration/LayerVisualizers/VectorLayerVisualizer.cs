@@ -105,10 +105,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			_activeObjects.Clear();
 		}
 
-		public override void OnUnregisterTile(UnityTile tile)
+		protected override void OnUnregisterTile(UnityTile tile)
 		{
-			base.OnUnregisterTile(tile);
-
 			if (_defaultStack != null)
 			{
 				_defaultStack.UnregisterTile(tile);
@@ -117,9 +115,12 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			ClearTasksOnUnregister(tile);
 			ClearIdsOnUnregister(tile);
 
-			ClearObjectOnUnregister(tile);
-
 			//MapboxAccess.Instance.TaskManager.CancelTask(tile.CanonicalTileId.GenerateKey(Key));
+		}
+
+		protected override void OnClearTile(UnityTile tile)
+		{
+			ClearObjectOnUnregister(tile);
 		}
 
 		public override void Clear()
@@ -281,6 +282,11 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 			void ContinueWith(Task t)
 			{
+				if (_activeObjects.ContainsKey(tile))
+				{
+					ClearObjectOnUnregister(tile);
+				}
+
 				if (t.IsCanceled || tile.IsRecycled || tile.IsStopped)
 				{
 					meshDataList.Clear();
@@ -321,10 +327,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				#endif
 			};
 
-			if (_activeObjects.ContainsKey(tile))
-			{
-				ClearObjectOnUnregister(tile);
-			}
+
 
 			MapboxAccess.Instance.TaskManager.AddTask(taskWrapper);
 		}

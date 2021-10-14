@@ -76,6 +76,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			OnUnregistered(tile);
 		}
 
+		public virtual void ClearTile(UnityTile tile)
+		{
+			OnClearTile(tile);
+		}
+
 		public virtual void UnbindEvents()
 		{
 			OnUnbindEvents();
@@ -94,10 +99,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		protected abstract void OnRegistered(UnityTile tile);
 
-		protected virtual void OnRegistered(UnityTile tile, UnwrappedTileId parent)
-		{
-			OnRegistered(tile);
-		}
+		protected abstract void OnClearTile(UnityTile tile);
 		protected virtual void OnPostProcess(UnityTile tile){}
 		protected abstract void OnUnregistered(UnityTile tile);
 		protected abstract void OnUnbindEvents();

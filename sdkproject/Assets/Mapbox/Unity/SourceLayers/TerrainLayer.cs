@@ -86,6 +86,11 @@ namespace Mapbox.Unity.Map
 			Factory.Unregister(tile);
 		}
 
+		public override void ClearTile(UnityTile tile)
+		{
+			Factory.ClearTile(tile);
+		}
+
 		private void SetFactoryOptions(object sender, System.EventArgs e)
 		{
 			//terrain factory uses strategy objects and they are controlled by layer

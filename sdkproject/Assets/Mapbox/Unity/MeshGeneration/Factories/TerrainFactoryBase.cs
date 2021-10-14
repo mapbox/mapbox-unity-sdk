@@ -87,6 +87,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			TerrainFactoryManager.UnregisterTile(tile);
 		}
 
+		protected override void OnClearTile(UnityTile tile)
+		{
+			TerrainFactoryManager.ClearTile(tile);
+		}
+
 		public void PregenerateTileMesh(UnityTile tile)
 		{
 			TerrainFactoryManager.PregenerateTileMesh(tile);

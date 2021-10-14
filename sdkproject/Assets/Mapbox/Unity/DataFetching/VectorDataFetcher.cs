@@ -167,6 +167,15 @@ public class VectorDataFetcher : DataFetcher
 	{
 		if (tile.Data == null && tile.CurrentTileState == TileState.Processing)
 		{
+			//new data fetched and processing
+			tile.DataProcessingFinished += (b) =>
+			{
+				DataReceived(unityTile, tile);
+			};
+		}
+		else if (tile.Data != null && tile.CurrentTileState == TileState.Processing)
+		{
+			//this is updating
 			tile.DataProcessingFinished += (b) =>
 			{
 				DataReceived(unityTile, tile);

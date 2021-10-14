@@ -32,7 +32,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		private VectorTile _vectorTile;
 		public VectorTile VectorData => _vectorTile;
 
-		private Action<UnityTile> _createMeshCallback;
+		private Action<UnityTile, Action> _createMeshCallback;
 		private bool _isElevationActive;
 
 		private int _heightDataResolution = 100;
@@ -184,7 +184,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				HeightData = new float[_heightDataResolution * _heightDataResolution];
 				if (_createMeshCallback != null && _vectorTile != null)
 				{
-					_createMeshCallback(this);
+					CallCreateMeshCallback();
 				}
 				return;
 			}
@@ -244,7 +244,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			CheckFinishedCondition(_terrainTile);
 			if (_createMeshCallback != null && _vectorTile?.CurrentTileState == TileState.Loaded)
 			{
-				_createMeshCallback(this);
+				CallCreateMeshCallback();
 			}
 		}
 
@@ -302,7 +302,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				CheckFinishedCondition(_terrainTile);
 				if (_createMeshCallback != null && _vectorTile?.CurrentTileState == TileState.Loaded)
 				{
-					_createMeshCallback(this);
+					CallCreateMeshCallback();
 				}
 			});
 		}
@@ -311,7 +311,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		{
 			_rasterTile = rasterTile;
 
-			if (_rasterTile.Texture2D == null && _rasterTile.Data == null)
+			if (_rasterTile == null || (_rasterTile.Texture2D == null && _rasterTile.Data == null))
 			{
 				MeshRenderer.material.mainTexture = null;
 				return;
@@ -341,7 +341,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			CheckFinishedCondition(_rasterTile);
 		}
 
-		public void SetVectorData(string tileset, VectorTile vectorTile, Action<UnityTile> createMeshCallback = null)
+		public void SetVectorData(VectorTile vectorTile, Action<UnityTile, Action> createMeshCallback = null)
 		{
 			_vectorTile = vectorTile;
 			if (_vectorTile == null)
@@ -357,7 +357,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				{
 					if (_terrainTile == null || _terrainReady)
 					{
-						_createMeshCallback(this);
+						CallCreateMeshCallback();
 					}
 				}
 				else
@@ -368,7 +368,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 						{
 							if (_terrainTile == null || _terrainReady)
 							{
-								_createMeshCallback(this);
+								CallCreateMeshCallback();
 							}
 						}
 					};
@@ -385,6 +385,16 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			// 	_createMeshCallback(this);
 			// }
 
+
+		}
+
+		public void CallCreateMeshCallback()
+		{
+			_createMeshCallback(this, VectorGenerationCompleted);
+		}
+
+		public void VectorGenerationCompleted()
+		{
 			CheckFinishedCondition(_vectorTile);
 		}
 
@@ -566,6 +576,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			{
 				TileFinished(this);
 			}
+		}
+
+		public void SetRenderDepth(int depth)
+		{
+			_meshRenderer.material.renderQueue = 2000 - (10 * depth);
 		}
 	}
 }

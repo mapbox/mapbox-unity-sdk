@@ -50,9 +50,9 @@ namespace Mapbox.Unity.CustomLayer
 			}
 		}
 
-		public override void UnregisterTile(UnityTile tile)
+		public override void UnregisterTile(UnityTile tile, bool clearData = true)
 		{
-			base.UnregisterTile(tile);
+			base.UnregisterTile(tile, clearData);
 			TerrainStrategy.UnregisterTile(tile);
 		}
 

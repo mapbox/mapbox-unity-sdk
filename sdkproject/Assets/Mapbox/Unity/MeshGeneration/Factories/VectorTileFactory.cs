@@ -146,7 +146,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		protected override void OnUnregistered(UnityTile tile)
 		{
 			VectorFactoryManager.UnregisterTile(tile);
-			tile.SetVectorData(null);
 			if (_layerProgress != null && _layerProgress.ContainsKey(tile))
 			{
 				_layerProgress.Remove(tile);
@@ -168,13 +167,28 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		private void CreateMeshes(UnityTile tile)
+		protected override void OnClearTile(UnityTile tile)
+		{
+			tile.SetVectorData(null);
+			if (_layerBuilder != null)
+			{
+				foreach (var layer in _layerBuilder.Values)
+				{
+					foreach (var visualizer in layer)
+					{
+						visualizer.ClearTile(tile);
+					}
+				}
+			}
+		}
+
+		private void CreateMeshes(UnityTile tile, Action callback)
 		{
 			foreach (var layerVisualizerTuple in _layerBuilder)
 			{
 				foreach (var visualizer in layerVisualizerTuple.Value)
 				{
-					CreateFeatureWithBuilder(tile, visualizer);
+					CreateFeatureWithBuilder(tile, visualizer, callback);
 				}
 			}
 		}
@@ -274,7 +288,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		private void CreateFeatureWithBuilder(UnityTile tile, LayerVisualizerBase builder)
+		private void CreateFeatureWithBuilder(UnityTile tile, LayerVisualizerBase builder, Action callback = null)
 		{
 			if (builder.Active)
 			{
@@ -290,7 +304,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 						_tilesWaitingProcessing.Add(tile);
 					}
 				}
-				builder.Create(tile, LayerFinishedCallback);
+				builder.Create(tile, (t, b) =>
+				{
+					LayerFinishedCallback(t, b);
+					if (callback != null)
+					{
+						callback();
+					}
+				});
 			}
 		}
 

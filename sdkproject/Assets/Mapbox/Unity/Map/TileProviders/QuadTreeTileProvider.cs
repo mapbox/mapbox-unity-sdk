@@ -83,11 +83,12 @@ namespace Mapbox.Unity.Map.TileProviders
 
 			_viewPortWebMercBounds = getcurrentViewPortWebMerc();
 			_currentExtent.Bounds = _viewPortWebMercBounds;
+			_currentExtent.ZoomOutTileRelationships = new Dictionary<UnwrappedTileId, UnwrappedTileId>();
+			_currentExtent.ZoomInTileRelationships = new Dictionary<UnwrappedTileId, UnwrappedTileId>();
+
 			if ((int) _zoomLevel != (int) _map.Zoom)
 			{
 				var newTiles = GetWithWebMerc(_viewPortWebMercBounds, _map.AbsoluteZoom);
-				_currentExtent.ZoomOutTileRelationships = new Dictionary<UnwrappedTileId, UnwrappedTileId>();
-				_currentExtent.ZoomInTileRelationships = new Dictionary<UnwrappedTileId, UnwrappedTileId>();
 
 				foreach (var tile in _currentExtent.ActiveTiles)
 				{

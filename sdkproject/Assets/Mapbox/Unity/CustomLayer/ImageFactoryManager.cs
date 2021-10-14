@@ -52,16 +52,20 @@ namespace Mapbox.Unity.CustomLayer
 			_fetcher.FetchData(dataTile, _sourceSettings.Id, tile.CanonicalTileId, tile);
 		}
 
-		public virtual void UnregisterTile(UnityTile tile)
+		public virtual void UnregisterTile(UnityTile tile, bool clearData = true)
 		{
 			if (_tileTracker.ContainsKey(tile))
 			{
 				tile.RemoveTile(_tileTracker[tile]);
 				_tileTracker.Remove(tile);
 			}
-			SetTexture(tile, null);
 			_fetcher.CancelFetching(tile.UnwrappedTileId, _sourceSettings.Id);
 			MapboxAccess.Instance.CacheManager.TileDisposed(tile, _sourceSettings.Id);
+		}
+
+		public virtual void ClearTile(UnityTile tile)
+		{
+			SetTexture(tile, null);
 		}
 
 		protected virtual void OnTextureReceived(UnityTile unityTile, RasterTile dataTile)

@@ -44,7 +44,9 @@ namespace Mapbox.Unity.Map
 		const float MIN_ZOOM = 0;
 		const float MAX_ZOOM = 20;
 
-		protected Dictionary<UnwrappedTileId, HashSet<UnwrappedTileId>> TileTracker = new Dictionary<UnwrappedTileId, HashSet<UnwrappedTileId>>();
+		protected Dictionary<UnwrappedTileId, UnwrappedTileId> ZoomInRelations = new Dictionary<UnwrappedTileId, UnwrappedTileId>();
+		protected Dictionary<UnwrappedTileId, HashSet<UnwrappedTileId>> ZoomInTracker = new Dictionary<UnwrappedTileId, HashSet<UnwrappedTileId>>();
+		protected Dictionary<UnwrappedTileId, HashSet<UnwrappedTileId>> ZoomOutTracker = new Dictionary<UnwrappedTileId, HashSet<UnwrappedTileId>>();
 		protected HashSet<UnwrappedTileId> _destructionList = new HashSet<UnwrappedTileId>();
 		#endregion
 
@@ -320,22 +322,53 @@ namespace Mapbox.Unity.Map
 		private void OnMapVisualizerOnOnTileDisposing(UnityTile t)
 		{
 			OnTileDisposing(t);
+			if (ZoomInRelations.ContainsKey(t.UnwrappedTileId))
+			{
+				var parent = ZoomInRelations[t.UnwrappedTileId];
+				if (ZoomInTracker.ContainsKey(parent))
+				{
+					ZoomInTracker[parent].Remove(t.UnwrappedTileId);
+					if (ZoomInTracker[parent].Count == 0)
+					{
+						TileProvider_OnTileRemoved(parent);
+						ZoomInTracker.Remove(parent);
+					}
+				}
+
+				ZoomInRelations.Remove(t.UnwrappedTileId);
+			}
 		}
 
 		private void OnMapVisualizerOnOnTileFinished(UnityTile t)
 		{
-			if (TileTracker.ContainsKey(t.UnwrappedTileId))
+			if (ZoomOutTracker.ContainsKey(t.UnwrappedTileId))
 			{
-				foreach (var tileId in TileTracker[t.UnwrappedTileId])
+				foreach (var tileId in ZoomOutTracker[t.UnwrappedTileId])
 				{
 					if (MapVisualizer.ActiveTiles.ContainsKey(tileId))
 					{
 						TileProvider_OnTileRemoved(tileId);
-						_destructionList.Remove(tileId);
+						//_destructionList.Remove(tileId);
 					}
 				}
 
-				TileTracker.Remove(t.UnwrappedTileId);
+				ZoomOutTracker.Remove(t.UnwrappedTileId);
+			}
+
+			if (ZoomInRelations.ContainsKey(t.UnwrappedTileId))
+			{
+				var parent = ZoomInRelations[t.UnwrappedTileId];
+				if (ZoomInTracker.ContainsKey(parent))
+				{
+					ZoomInTracker[parent].Remove(t.UnwrappedTileId);
+					if (ZoomInTracker[parent].Count == 0)
+					{
+						TileProvider_OnTileRemoved(parent);
+						ZoomInTracker.Remove(parent);
+					}
+				}
+
+				ZoomInRelations.Remove(t.UnwrappedTileId);
 			}
 
 			OnTileFinished(t);
@@ -566,10 +599,61 @@ namespace Mapbox.Unity.Map
 			var activeTiles = _mapVisualizer.ActiveTiles;
 			var tilesToProcess = new List<UnwrappedTileId>();
 
+			if (currentExtent?.ZoomInTileRelationships != null)
+			{
+				foreach (var pair in currentExtent.ZoomInTileRelationships)
+				{
+					var parent = pair.Value;
+					var child = pair.Key;
+
+					if (!ZoomInRelations.ContainsKey(child))
+					{
+						ZoomInRelations.Add(child, parent);
+						if (!ZoomInTracker.ContainsKey(parent))
+						{
+							ZoomInTracker.Add(parent, new HashSet<UnwrappedTileId>());
+						}
+
+						ZoomInTracker[parent].Add(child);
+					}
+				}
+			}
+
+			if (currentExtent?.ZoomOutTileRelationships != null)
+			{
+				foreach (var pair in currentExtent.ZoomOutTileRelationships)
+				{
+					var parent = pair.Value;
+					var child = pair.Key;
+
+					_mapVisualizer.StopTile(child);
+
+					if (!ZoomOutTracker.ContainsKey(parent))
+					{
+						ZoomOutTracker.Add(parent, new HashSet<UnwrappedTileId>());
+					}
+
+					if (ZoomOutTracker.ContainsKey(child))
+					{
+						foreach (var subchild in ZoomOutTracker[child])
+						{
+							ZoomOutTracker[parent].Add(subchild);
+						}
+
+						ZoomOutTracker.Remove(child);
+						TileProvider_OnTileRemoved(child);
+					}
+					else
+					{
+						ZoomOutTracker[parent].Add(child);
+					}
+				}
+			}
+
 			//remove tiles
 			foreach (var item in activeTiles)
 			{
-				if (TileProvider.Cleanup(item.Key))
+				if (!currentExtent.Bounds.Overlap(item.Value.Rect))
 				{
 					tilesToProcess.Add(item.Key);
 				}
@@ -584,13 +668,14 @@ namespace Mapbox.Unity.Map
 			{
 				// Reposition tiles in case we panned.
 				TileProvider_OnTileRepositioned(tile.Key);
+				tile.Value.SetRenderDepth((int)Zoom - tile.Key.Z );
 			}
 
 			//add new tiles
 			tilesToProcess.Clear();
 			foreach (var tile in currentExtent.ActiveTiles)
 			{
-				if (!activeTiles.ContainsKey(tile))
+				if (!activeTiles.ContainsKey(tile) && tile.Z == (int)Zoom)
 				{
 					tilesToProcess.Add(tile);
 				}

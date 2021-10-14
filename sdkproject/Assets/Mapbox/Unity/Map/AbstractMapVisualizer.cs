@@ -370,12 +370,21 @@ namespace Mapbox.Unity.Map
 
 			unityTile.SetFinishCondition();
 
-			if (enableTile && unityTile.BackgroundImageInUse)
+			if (enableTile)
 			{
 				unityTile.gameObject.SetActive(true);
 			}
 
 			return unityTile;
+		}
+
+		public virtual void StopTile(UnwrappedTileId tileId)
+		{
+			if (_activeTiles.ContainsKey(tileId))
+			{
+				var unityTile = _activeTiles[tileId];
+				StopTile(unityTile);
+			}
 		}
 
 		public virtual void StopTile(UnityTile unityTile)
@@ -442,6 +451,9 @@ namespace Mapbox.Unity.Map
 						VectorLayer.Unregister(unityTile);
 					}
 				}
+				ImageryLayer.ClearTile(unityTile);
+				TerrainLayer.ClearTile(unityTile);
+				VectorLayer.ClearTile(unityTile);
 
 				unityTile.Recycle();
 				ActiveTiles.Remove(tileId);

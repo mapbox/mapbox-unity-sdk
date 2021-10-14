@@ -76,6 +76,7 @@ namespace Mapbox.Unity.Map
 			
 		}
 
+		public abstract void ClearTile(UnityTile tile);
 		public abstract void Register(UnityTile tile);
 		public abstract void Unregister(UnityTile tile);
 

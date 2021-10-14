@@ -232,10 +232,16 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			OnUnregisterTile(tile);
 		}
 
-		public virtual void OnUnregisterTile(UnityTile tile)
+		public void ClearTile(UnityTile tile)
 		{
-
+			OnClearTile(tile);
 		}
+
+
+
+		protected abstract void OnUnregisterTile(UnityTile tile);
+
+		protected abstract void OnClearTile(UnityTile tile);
 
 		public virtual void UnbindSubLayerEvents()
 		{

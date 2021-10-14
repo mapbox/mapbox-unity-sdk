@@ -66,6 +66,11 @@ namespace Mapbox.Unity.Map
 			_vectorTileFactory.Unregister(tile);
 		}
 
+		public override void ClearTile(UnityTile tile)
+		{
+			_vectorTileFactory.ClearTile(tile);
+		}
+
 		private void AddVectorLayer(object sender, EventArgs args)
 		{
 			VectorLayerUpdateArgs layerUpdateArgs = args as VectorLayerUpdateArgs;

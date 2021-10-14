@@ -82,6 +82,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			ImageFactoryManager.UnregisterTile(tile);
 		}
 
+		protected override void OnClearTile(UnityTile tile)
+		{
+			ImageFactoryManager.ClearTile(tile);
+		}
+
 		private void OnFetchingError(UnityTile tile, RasterTile rasterTile, TileErrorEventArgs errorEventArgs)
 		{
 			OnErrorOccurred(errorEventArgs);
