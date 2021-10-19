@@ -102,7 +102,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			VectorFactoryManager.DataReceived += OnFetcherDataReceived;
 			VectorFactoryManager.FetchingError += OnFetchingError;
 
-			CreatePOILayerVisualizers();
 			CreateLayerVisualizers();
 		}
 
@@ -113,7 +112,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				RemoveAllLayerVisualiers();
 
-				CreatePOILayerVisualizers();
 				CreateLayerVisualizers();
 			}
 		}
@@ -332,14 +330,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		private void CreatePOILayerVisualizers()
-		{
-			foreach (var item in _properties.locationPrefabList)
-			{
-				AddPOIVectorLayerVisualizer(item);
-			}
-		}
-
 		private void CreateLayerVisualizers()
 		{
 			foreach (var sublayer in _properties.vectorSubLayers)
@@ -395,32 +385,6 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			{
 				_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase> { visualizer });
 			}
-			return visualizer;
-		}
-
-		public virtual LayerVisualizerBase AddPOIVectorLayerVisualizer(PrefabItemOptions poiSubLayer)
-		{
-			LayerVisualizerBase visualizer = ScriptableObject.CreateInstance<LocationPrefabsLayerVisualizer>();
-			poiSubLayer.performanceOptions = _properties.performanceOptions;
-			((LocationPrefabsLayerVisualizer)visualizer).SetProperties((PrefabItemOptions)poiSubLayer);
-
-			visualizer.LayerVisualizerHasChanged += UpdateTileFactory;
-
-			visualizer.Initialize();
-			if (visualizer == null)
-			{
-				return null;
-			}
-
-			if (_layerBuilder.ContainsKey(visualizer.Key))
-			{
-				_layerBuilder[visualizer.Key].Add(visualizer);
-			}
-			else
-			{
-				_layerBuilder.Add(visualizer.Key, new List<LayerVisualizerBase>() { visualizer });
-			}
-
 			return visualizer;
 		}
 

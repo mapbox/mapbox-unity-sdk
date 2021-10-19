@@ -36,3 +36,4 @@ MonoBehaviour:
         - {fileID: 2100000, guid: e78e1586147401a4da708148236957a6, type: 2}
       atlasInfo: {fileID: 0}
       colorPalette: {fileID: 0}
+    RenderQueue: 2501

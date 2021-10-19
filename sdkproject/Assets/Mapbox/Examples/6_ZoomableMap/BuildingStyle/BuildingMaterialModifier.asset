@@ -31,8 +31,9 @@ MonoBehaviour:
       texturingType: 0
       materials:
       - Materials:
-        - {fileID: 2100000, guid: 0457baf9091bafc40ac66d1e31a7a537, type: 2}
+        - {fileID: 2100000, guid: f8eca684167e44540a84b268abee52b2, type: 2}
       - Materials:
-        - {fileID: 2100000, guid: 0457baf9091bafc40ac66d1e31a7a537, type: 2}
+        - {fileID: 2100000, guid: f8eca684167e44540a84b268abee52b2, type: 2}
       atlasInfo: {fileID: 0}
       colorPalette: {fileID: 0}
+    RenderQueue: 2400

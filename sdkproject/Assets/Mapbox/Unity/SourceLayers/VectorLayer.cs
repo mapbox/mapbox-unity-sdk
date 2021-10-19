@@ -74,12 +74,7 @@ namespace Mapbox.Unity.Map
 		private void AddVectorLayer(object sender, EventArgs args)
 		{
 			VectorLayerUpdateArgs layerUpdateArgs = args as VectorLayerUpdateArgs;
-			if (layerUpdateArgs.property is PrefabItemOptions)
-			{
-				layerUpdateArgs.visualizer =
-					_vectorTileFactory.AddPOIVectorLayerVisualizer((PrefabItemOptions)layerUpdateArgs.property);
-			}
-			else if (layerUpdateArgs.property is VectorSubLayerProperties)
+			if (layerUpdateArgs.property is VectorSubLayerProperties)
 			{
 				layerUpdateArgs.visualizer =
 					_vectorTileFactory.AddVectorLayerVisualizer((VectorSubLayerProperties)layerUpdateArgs.property);

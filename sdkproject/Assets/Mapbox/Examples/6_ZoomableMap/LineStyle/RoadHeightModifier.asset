@@ -13,12 +13,30 @@ MonoBehaviour:
   m_Name: RoadHeightModifier
   m_EditorClassIdentifier: 
   Active: 1
-  _options:
+  HeightModifierType: 0
+  _basicOptions:
     _selectedLayerName: 
     extrusionType: 5
     extrusionGeometryType: 1
     propertyName: height
     propertyDescription: 
     minimumHeight: 0
-    maximumHeight: 0.1
+    maximumHeight: 10
     extrusionScaleFactor: 1
+  _texturedOptions:
+    texturingType: 0
+    atlasInfo: {fileID: 0}
+    extrusionType: 0
+    extrusionGeometryType: 0
+    propertyName: height
+    propertyDescription: 
+    minimumHeight: 0
+    maximumHeight: 0
+    extrusionScaleFactor: 1
+    CenterSegments: 1
+    SeparateSubmesh: 1
+  _chamferOptions:
+    FlatTops: 0
+    Height: 0
+    ForceHeight: 0
+    Offset: 0.2

@@ -599,7 +599,7 @@ namespace Mapbox.Unity.Map
 			var activeTiles = _mapVisualizer.ActiveTiles;
 			var tilesToProcess = new List<UnwrappedTileId>();
 
-			if (currentExtent?.ZoomInTileRelationships != null)
+			if (currentExtent?.ZoomInTileRelationships?.Count > 0)
 			{
 				foreach (var pair in currentExtent.ZoomInTileRelationships)
 				{
@@ -615,11 +615,12 @@ namespace Mapbox.Unity.Map
 						}
 
 						ZoomInTracker[parent].Add(child);
+						_mapVisualizer.StopTile(parent);
 					}
 				}
 			}
 
-			if (currentExtent?.ZoomOutTileRelationships != null)
+			if (currentExtent?.ZoomOutTileRelationships?.Count > 0)
 			{
 				foreach (var pair in currentExtent.ZoomOutTileRelationships)
 				{
@@ -668,7 +669,7 @@ namespace Mapbox.Unity.Map
 			{
 				// Reposition tiles in case we panned.
 				TileProvider_OnTileRepositioned(tile.Key);
-				tile.Value.SetRenderDepth((int)Zoom - tile.Key.Z );
+				tile.Value.SetRenderDepth(tile.Key.Z );
 			}
 
 			//add new tiles

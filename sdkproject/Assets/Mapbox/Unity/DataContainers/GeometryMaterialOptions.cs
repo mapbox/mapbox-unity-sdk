@@ -10,6 +10,7 @@ namespace Mapbox.Unity.DataContainers
 	[Serializable]
 	public class CustomStyleBundle
 	{
+
 		public UvMapType texturingType = UvMapType.Tiled;
 		public MaterialList[] materials = new MaterialList[2];
 		public AtlasInfo atlasInfo;
@@ -164,6 +165,7 @@ namespace Mapbox.Unity.DataContainers
 
 		[SerializeField]
 		public CustomStyleBundle customStyleOptions;
+		public int RenderQueue = 2000;
 
 		public GeometryMaterialOptions()
 		{

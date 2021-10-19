@@ -94,6 +94,9 @@ namespace Mapbox.Editor
 				LoadDefaultStyleIcons();
 				EditorGUI.BeginProperty(position, label, property);
 
+				var renderQueue = property.FindPropertyRelative("RenderQueue");
+				EditorGUILayout.PropertyField(renderQueue);
+
 				var styleTypeLabel = new GUIContent { text = "Style Type", tooltip = "Texturing style for feature; choose from sample style or create your own by choosing Custom. " };
 				var styleType = property.FindPropertyRelative("style");
 

@@ -1,6 +1,8 @@
+using System.Collections;
 using System.Threading;
 using System.Threading.Tasks;
 using Mapbox.Unity.MeshGeneration.Modifiers;
+using Mapbox.Unity.Utilities;
 using Mapbox.VectorTile.Geometry;
 using UnityEngine.Rendering;
 
@@ -24,7 +26,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 	public class VectorLayerVisualizer : LayerVisualizerBase
 	{
-
 		public override VectorSubLayerProperties SubLayerProperties
 		{
 			get
@@ -36,7 +37,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				_sublayerProperties = value;
 			}
 		}
-
+		public override bool Active => _sublayerProperties.coreOptions.isActive;
 		private ObjectPool<VectorEntity> _pool;
 		private ObjectPool<List<VectorEntity>> _listPool;
 		private Dictionary<UnityTile, List<VectorEntity>> _activeObjects;
@@ -58,11 +59,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			_activeIds = new HashSet<ulong>();
 			_idPool = new Dictionary<CanonicalTileId, List<ulong>>();
 			_tempLayerProperties = GetLayerTempProperties();
-
-			if (_defaultStack != null)
-			{
-				_defaultStack.Initialize();
-			}
 
 			foreach (var modifierStack in _modifierStacks)
 			{
@@ -107,11 +103,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 		protected override void OnUnregisterTile(UnityTile tile)
 		{
-			if (_defaultStack != null)
-			{
-				_defaultStack.UnregisterTile(tile);
-			}
-
 			ClearTasksOnUnregister(tile);
 			ClearIdsOnUnregister(tile);
 
@@ -126,34 +117,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 		public override void Clear()
 		{
 			_idPool.Clear();
-			_defaultStack.Clear();
-
-			foreach (var mod in _defaultStack.MeshModifiers)
-			{
-				if (mod == null)
-				{
-					continue;
-				}
-
-				if (_coreModifiers.Contains(mod))
-				{
-					DestroyImmediate(mod);
-				}
-			}
-
-			foreach (var mod in _defaultStack.GoModifiers)
-			{
-				if (mod == null)
-				{
-					continue;
-				}
-
-				mod.Clear();
-				if (_coreModifiers.Contains(mod))
-				{
-					DestroyImmediate(mod);
-				}
-			}
 
 			foreach (var vectorEntity in _pool.GetQueue())
 			{
@@ -179,8 +142,6 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			_pool.Clear();
 			_activeObjects.Clear();
 			_pool.Clear();
-
-			DestroyImmediate(_defaultStack);
 		}
 
 		public override void Create(UnityTile tile, Action<UnityTile, LayerVisualizerBase> callback)
@@ -612,35 +573,8 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			return (layerProperties.buildingsWithUniqueIds && _activeIds.Contains(featureId));
 		}
 
-		public override bool Active => _sublayerProperties.coreOptions.isActive;
+
 
 		#endregion
-		//used for pois or something, to be removed
-		protected void Build(VectorFeatureUnity feature, UnityTile tile, GameObject parent)
-		{
-			if (feature.Properties.ContainsKey("extrude") && !Convert.ToBoolean(feature.Properties["extrude"]))
-				return;
-
-			if (feature.Points.Count < 1)
-				return;
-
-			//this will be improved in next version and will probably be replaced by filters
-			var styleSelectorKey = _sublayerProperties.coreOptions.sublayerName;
-
-			var meshData = new MeshData();
-			meshData.TileRect = tile.Rect;
-
-			//and finally, running the modifier stack on the feature
-			var processed = false;
-
-			if (!processed)
-			{
-				if (_defaultStack != null)
-				{
-					_defaultStack.Execute(tile, feature, meshData, parent, styleSelectorKey);
-				}
-			}
-		}
-
 	}
 }

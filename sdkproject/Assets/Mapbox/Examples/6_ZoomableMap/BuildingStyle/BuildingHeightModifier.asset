@@ -34,7 +34,7 @@ MonoBehaviour:
     maximumHeight: 0
     extrusionScaleFactor: 1
     CenterSegments: 1
-    SeparateSubmesh: 1
+    SeparateSubmesh: 0
   _chamferOptions:
     FlatTops: 0
     Height: 0
