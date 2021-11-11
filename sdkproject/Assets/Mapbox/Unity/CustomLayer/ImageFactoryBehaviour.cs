@@ -61,16 +61,6 @@ namespace Mapbox.Unity.CustomLayer
 					ImageFactoryManager.UnregisterTile(t);
 				}
 			};
-			Map.OnTileStopping += unityTile =>
-			{
-				//if (enabled)
-				{
-					if (unityTile != null && unityTile.Tiles.Count > 0)
-					{
-						ImageFactoryManager.UnregisterTile(unityTile);
-					}
-				}
-			};
 		}
 
 		private void OnValidate()

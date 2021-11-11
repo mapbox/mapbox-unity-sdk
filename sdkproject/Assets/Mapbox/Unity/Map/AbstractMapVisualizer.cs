@@ -348,11 +348,6 @@ namespace Mapbox.Unity.Map
 
 			ActiveTiles.Add(tileId, unityTile);
 
-			// foreach (var factory in Factories)
-			// {
-			// 	factory.Register(unityTile);
-			// }
-
 			if (ImageryLayer.IsLayerActive)
 			{
 				ImageryLayer.Register(unityTile);
@@ -530,7 +525,6 @@ namespace Mapbox.Unity.Map
 				}
 			}
 		}
-
 
 		public void UnregisterAndRedrawTilesFromLayer(VectorTileFactory factory, LayerVisualizerBase layerVisualizer)
 		{

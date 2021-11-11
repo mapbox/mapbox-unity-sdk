@@ -924,16 +924,7 @@ namespace Mapbox.Unity.Map
 		/// <seealso cref="OnInitialized"/>
 		/// </summary>
 		public event Action OnUpdated = delegate { };
-		public event Action OnMapRedrawn = delegate { };
 
-		/// <summary>
-		/// Event delegate, gets called when map preview is enabled
-		/// </summary>
-		public event Action OnEditorPreviewEnabled = delegate { };
-		/// <summary>
-		/// Event delegate, gets called when map preview is disabled
-		/// </summary>
-		public event Action OnEditorPreviewDisabled = delegate { };
 		/// <summary>
 		/// Event delegate, gets called when a tile is completed.
 		/// </summary>
@@ -947,7 +938,6 @@ namespace Mapbox.Unity.Map
 		/// </summary>
 		//public event Action<UnwrappedTileId> OnTileDisposing = delegate { };
 		public event Action<UnityTile> OnTileDisposing = delegate { };
-		public event Action<UnityTile> OnTileStopping = delegate { };
 
 		public event Action<UnityTile> OnTileRegisteredToFactories = delegate { };
 
