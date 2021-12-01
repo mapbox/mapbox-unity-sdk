@@ -29,7 +29,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			TerrainFactoryManager = new MapboxTerrainFactoryManager(
 				_properties,
 				Strategy,
-				false);
+				true);
 			TerrainFactoryManager.FetchingError += OnFetchingError;
 		}
 

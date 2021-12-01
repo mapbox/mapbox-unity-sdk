@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Mapbox.Map;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
@@ -15,6 +16,10 @@ namespace Mapbox.Unity.CustomLayer
 		private ElevationLayerProperties _elevationSettings;
 		private bool _isUsingShaderSolution = true;
 
+		private Dictionary<UnityTile, Tile> _tileTracker = new Dictionary<UnityTile, Tile>();
+		private Dictionary<CanonicalTileId, RasterTile> _requestedTiles = new Dictionary<CanonicalTileId, RasterTile>();
+		private Dictionary<int, HashSet<UnityTile>> _tileWaitingList = new Dictionary<int, HashSet<UnityTile>>();
+
 		public MapboxTerrainFactoryManager(
 			ElevationLayerProperties elevationSettings,
 			TerrainStrategy terrainStrategy,
@@ -27,6 +32,11 @@ namespace Mapbox.Unity.CustomLayer
 
 		public override void RegisterTile(UnityTile tile)
 		{
+			if (_tileTracker.ContainsKey(tile))
+			{
+				Debug.Log("Tile is already in tracking list?");
+			}
+
 			if (TerrainStrategy is IElevationBasedTerrainStrategy)
 			{
 				if (_isUsingShaderSolution)
@@ -34,13 +44,45 @@ namespace Mapbox.Unity.CustomLayer
 					ApplyParentTexture(tile);
 				}
 
-				var dataTile = CreateTile(tile.CanonicalTileId, _sourceSettings.Id);
-				if (tile != null)
+				RasterTile dataTile = null;
+				var parentId = tile.UnwrappedTileId.Parent.Parent.Canonical;
+				if (_requestedTiles.ContainsKey(parentId))
 				{
-					tile.AddTile(dataTile);
+					dataTile = _requestedTiles[parentId];
+					if (tile != null)
+					{
+						tile.AddTile(dataTile);
+					}
+					if (!_tileWaitingList.ContainsKey(dataTile.Key))
+					{
+						_tileWaitingList.Add(dataTile.Key, new HashSet<UnityTile>());
+					}
+					_tileTracker.Add(tile, dataTile);
+					_tileWaitingList[dataTile.Key].Add(tile);
+				}
+				else
+				{
+					dataTile = CreateTile(parentId, _sourceSettings.Id);
+					_requestedTiles.Add(parentId, dataTile);
+					if (tile != null)
+					{
+						tile.AddTile(dataTile);
+					}
+					if (!_tileWaitingList.ContainsKey(dataTile.Key))
+					{
+						_tileWaitingList.Add(dataTile.Key, new HashSet<UnityTile>());
+					}
+					_tileWaitingList[dataTile.Key].Add(tile);
+					_tileTracker.Add(tile, dataTile);
+					_fetcher.FetchData(dataTile, _sourceSettings.Id, tile.CanonicalTileId, tile);
 				}
 
-				_fetcher.FetchData(dataTile, _sourceSettings.Id, tile.CanonicalTileId, tile);
+				// if (!_tileWaitingList.ContainsKey(dataTile.Key))
+				// {
+				// 	_tileWaitingList.Add(dataTile.Key, new List<UnityTile>());
+				// }
+				// _tileWaitingList[dataTile.Key].Add(tile);
+				// _fetcher.FetchData(dataTile, _sourceSettings.Id, tile.CanonicalTileId, tile);
 			}
 			else
 			{
@@ -50,10 +92,43 @@ namespace Mapbox.Unity.CustomLayer
 			}
 		}
 
+		protected override void OnTextureReceived(UnityTile unityTile, RasterTile dataTile)
+		{
+			if (_tileWaitingList.ContainsKey(dataTile.Key))
+			{
+				foreach (var utile in _tileWaitingList[dataTile.Key])
+				{
+					SetTexture(utile, dataTile);
+				}
+				_tileWaitingList.Remove(dataTile.Key);
+			}
+
+			TextureReceived(unityTile, dataTile);
+		}
+
 		public override void UnregisterTile(UnityTile tile, bool clearData = true)
 		{
-			base.UnregisterTile(tile, clearData);
-			TerrainStrategy.UnregisterTile(tile);
+			if (_tileTracker.ContainsKey(tile))
+			{
+				var requestedTile = _tileTracker[tile];
+				if (_tileWaitingList.ContainsKey(requestedTile.Key))
+				{
+					if (_tileWaitingList[requestedTile.Key].Contains(tile))
+					{
+						_tileWaitingList[requestedTile.Key].Remove(tile);
+
+					}
+
+					if (_tileWaitingList[requestedTile.Key].Count == 0)
+					{
+						_fetcher.CancelFetching(tile.UnwrappedTileId, _sourceSettings.Id);
+						MapboxAccess.Instance.CacheManager.TileDisposed(tile, _sourceSettings.Id);
+					}
+				}
+				tile.RemoveTile(_tileTracker[tile]);
+				TerrainStrategy.UnregisterTile(tile);
+				_tileTracker.Remove(tile);
+			}
 		}
 
 		protected override RasterTile CreateTile(CanonicalTileId tileId, string tilesetId)
@@ -92,8 +167,53 @@ namespace Mapbox.Unity.CustomLayer
 				//no elevated mesh is generated
 				if (_isUsingShaderSolution)
 				{
+					var tileZoom = unityTile.UnwrappedTileId.Z;
+					var parentZoom = dataTile.Id.Z;
+					var scale = 1f;
+					var offsetX = 0f;
+					var offsetY = 0f;
+
+					var current = unityTile.UnwrappedTileId;
+					var currentParent = current.Parent;
+
+					for (int i = tileZoom - 1; i >= parentZoom; i--)
+					{
+						scale /= 2;
+
+						var bottomLeftChildX = currentParent.X * 2;
+						var bottomLeftChildY = currentParent.Y * 2;
+
+						//top left
+						if (current.X == bottomLeftChildX && current.Y == bottomLeftChildY)
+						{
+							offsetY = 0.5f + (offsetY/2);
+							offsetX = offsetX / 2;
+						}
+						//top right
+						else if (current.X == bottomLeftChildX + 1 && current.Y == bottomLeftChildY)
+						{
+							offsetX = 0.5f + (offsetX / 2);
+							offsetY = 0.5f + (offsetY / 2);
+						}
+						//bottom left
+						else if (current.X == bottomLeftChildX && current.Y == bottomLeftChildY + 1)
+						{
+							offsetX = offsetX / 2;
+							offsetY = offsetY / 2;
+						}
+						//bottom right
+						else if (current.X == bottomLeftChildX + 1 && current.Y == bottomLeftChildY + 1)
+						{
+							offsetX = 0.5f + (offsetX / 2);
+							offsetY = offsetY / 2;
+						}
+
+						current = currentParent;
+						currentParent = currentParent.Parent;
+					}
+
 					unityTile.MeshRenderer.sharedMaterial.SetTexture(ShaderElevationTextureFieldName, dataTile.Texture2D);
-					unityTile.MeshRenderer.sharedMaterial.SetVector(ShaderElevationTextureScaleOffsetFieldName, new Vector4(1, 1, 0, 0));
+					unityTile.MeshRenderer.sharedMaterial.SetVector(ShaderElevationTextureScaleOffsetFieldName, new Vector4(scale, scale, offsetX, offsetY));
 					unityTile.MeshRenderer.sharedMaterial.SetFloat("_TileScale", unityTile.TileScale);
 					unityTile.MeshRenderer.sharedMaterial.SetFloat("_ElevationMultiplier", _elevationSettings.requiredOptions.exaggerationFactor);
 					unityTile.SetHeightData(dataTile, _elevationSettings.requiredOptions.exaggerationFactor, _elevationSettings.modificationOptions.useRelativeHeight, _elevationSettings.colliderOptions.addCollider);

@@ -227,7 +227,7 @@ namespace Mapbox.Map
 				param.TilesetId = this.tilesetId;
 				param.Fs = this.fs;
 
-				tile.Initialize(param, () => { this.NotifyNext(tile); });
+				//tile.Initialize(param, () => { this.NotifyNext(tile); });
 
 				this.tiles.Add(tile);
 			}

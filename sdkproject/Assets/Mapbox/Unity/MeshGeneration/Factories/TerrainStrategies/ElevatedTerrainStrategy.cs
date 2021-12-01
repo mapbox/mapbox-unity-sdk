@@ -7,6 +7,7 @@ using Mapbox.Unity.Map;
 using Mapbox.Map;
 using Mapbox.Unity.DataContainers;
 using Mapbox.Utils;
+using UnityEngine.Rendering;
 using Debug = UnityEngine.Debug;
 
 namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
@@ -232,22 +233,25 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			_newUvList.Clear();
 			_newTriangleList.Clear();
 
+			var bufferedSampleCount = sampleCount + 2;
 			//012
 			//345
 			//678
-			for (float y = 0; y < sampleCount; y++)
+			for (float y = -1; y < sampleCount + 1; y++)
 			{
 				var yrat = y / (sampleCount - 1);
-				for (float x = 0; x < sampleCount; x++)
+				for (float x = -1; x < sampleCount + 1; x++)
 				{
 					var xrat = x / (sampleCount - 1);
 
-					var xx = Mathd.Lerp(-half, half, xrat);
-					var yy = Mathd.Lerp(half, -half, yrat);
+					var xx = Mathf.LerpUnclamped(-half, half, xrat);
+					var yy = Mathf.LerpUnclamped(half, -half, yrat);
+
+					var elevation = x < 0 || y < 0 || x == bufferedSampleCount-2 || y == bufferedSampleCount-2 ? -50 : 0;
 
 					_newVertexList.Add(new Vector3(
 						(float) xx,
-						0,
+						elevation,
 						(float) yy));
 					_newNormalList.Add(Mapbox.Unity.Constants.Math.Vector3Up);
 					_newUvList.Add(new Vector2(x * 1f / (sampleCount - 1), 1 - (y * 1f / (sampleCount - 1))));
@@ -255,20 +259,21 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			}
 
 			int vertA, vertB, vertC;
-			for (int y = 0; y < sampleCount - 1; y++)
+
+			for (int y = 0; y < sampleCount + 1; y++)
 			{
-				for (int x = 0; x < sampleCount - 1; x++)
+				for (int x = 0; x < sampleCount + 1; x++)
 				{
-					vertA = (y * sampleCount) + x;
-					vertB = (y * sampleCount) + x + sampleCount + 1;
-					vertC = (y * sampleCount) + x + sampleCount;
+					vertA = (y * bufferedSampleCount) + x;
+					vertB = (y * bufferedSampleCount) + x + bufferedSampleCount + 1;
+					vertC = (y * bufferedSampleCount) + x + bufferedSampleCount;
 					_newTriangleList.Add(vertA);
 					_newTriangleList.Add(vertB);
 					_newTriangleList.Add(vertC);
 
-					vertA = (y * sampleCount) + x;
-					vertB = (y * sampleCount) + x + 1;
-					vertC = (y * sampleCount) + x + sampleCount + 1;
+					vertA = (y * bufferedSampleCount) + x;
+					vertB = (y * bufferedSampleCount) + x + 1;
+					vertC = (y * bufferedSampleCount) + x + bufferedSampleCount + 1;
 					_newTriangleList.Add(vertA);
 					_newTriangleList.Add(vertB);
 					_newTriangleList.Add(vertC);
@@ -309,8 +314,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				}
 			}
 
-			FixStitches(tile.UnwrappedTileId, _verts, _normals);
+			//FixStitches(tile.UnwrappedTileId, _verts, _normals);
 
+			tile.MeshFilter.sharedMesh.indexFormat = IndexFormat.UInt32;
 			tile.MeshFilter.sharedMesh.vertices = _verts;
 			tile.MeshFilter.sharedMesh.RecalculateNormals();
 
@@ -342,15 +348,34 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 				tile.MeshFilter.sharedMesh.GetVertices(_currentTileMeshData.Vertices);
 				tile.MeshFilter.sharedMesh.GetNormals(_currentTileMeshData.Normals);
 
-				_counter = _currentTileMeshData.Vertices.Count;
-				for (int i = 0; i < _counter; i++)
+				var sampleCount = Mathf.Sqrt(_currentTileMeshData.Vertices.Count) - 2;
+				var bufferedSampleCount = sampleCount + 2;
+				//012
+				//345
+				//678
+				for (float y = -1; y < sampleCount + 1; y++)
 				{
-					_currentTileMeshData.Vertices[i] = new Vector3(
-						_currentTileMeshData.Vertices[i].x,
-						0,
-						_currentTileMeshData.Vertices[i].z);
-					_currentTileMeshData.Normals[i] = Mapbox.Unity.Constants.Math.Vector3Up;
+					for (float x = -1; x < sampleCount + 1; x++)
+					{
+						var elevation = x < 0 || y < 0 || x == bufferedSampleCount-2 || y == bufferedSampleCount-2 ? -50 : 0;
+
+						var index = (int) ((x+1) + (y+1) * bufferedSampleCount);
+						_currentTileMeshData.Vertices[index] = new Vector3(
+							_currentTileMeshData.Vertices[index].x,
+							elevation,
+							_currentTileMeshData.Vertices[index].z);
+						_currentTileMeshData.Normals[index] = Mapbox.Unity.Constants.Math.Vector3Up;
+					}
 				}
+				// _counter = _currentTileMeshData.Vertices.Count;
+				// for (int i = 0; i < _counter; i++)
+				// {
+				// 	_currentTileMeshData.Vertices[i] = new Vector3(
+				// 		_currentTileMeshData.Vertices[i].x,
+				// 		0,
+				// 		_currentTileMeshData.Vertices[i].z);
+				// 	_currentTileMeshData.Normals[i] = Mapbox.Unity.Constants.Math.Vector3Up;
+				// }
 
 				tile.MeshFilter.sharedMesh.SetVertices(_currentTileMeshData.Vertices);
 				tile.MeshFilter.sharedMesh.SetNormals(_currentTileMeshData.Normals);

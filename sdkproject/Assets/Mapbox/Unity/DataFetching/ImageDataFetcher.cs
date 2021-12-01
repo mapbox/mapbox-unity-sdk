@@ -135,7 +135,7 @@ namespace Mapbox.Unity.DataFetching
 			//FileCacheCheck
 			MapboxAccess.Instance.CacheManager.GetTextureItemFromFile(
 				tilesetId,
-				tileId,
+				tile.Id,
 				tile.IsTextureNonreadable,
 				TextureReadCallback,
 				TextureInfoUpdatedCallback,
@@ -197,7 +197,7 @@ namespace Mapbox.Unity.DataFetching
 #if UNITY_EDITOR
 					if (rasterTile.Texture2D != null)
 					{
-						rasterTile.Texture2D.name = string.Format("{0}_{1}", tileId.ToString(), rasterTile.TilesetId);
+						rasterTile.Texture2D.name = string.Format("{0}_{1}", rasterTile.Id.ToString(), rasterTile.TilesetId);
 					}
 #endif
 

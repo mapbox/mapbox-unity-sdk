@@ -58,7 +58,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			parameters.Id = new CanonicalTileId(1, 1, 1);
 
 			var tile = new RawPngRasterTile(parameters.Id, "");
-			tile.Initialize(parameters, () => { data = tile.Data; });
+			//tile.Initialize(parameters, () => { data = tile.Data; });
 
 #if UNITY_5_6_OR_NEWER
 			IEnumerator enumerator = _fs.WaitForAllRequests();
@@ -87,7 +87,7 @@ namespace Mapbox.MapboxSdkCs.UnitTest
 			var tile = new RawPngRasterTile(parameters.Id, "");
 			Assert.AreEqual(TileState.New, tile.CurrentTileState);
 
-			tile.Initialize(parameters, () => { });
+			//tile.Initialize(parameters, () => { });
 			Assert.AreEqual(TileState.Loading, tile.CurrentTileState);
 
 #if UNITY_5_6_OR_NEWER

@@ -82,7 +82,7 @@ namespace Mapbox.Map
 			Cancel();
 
 			TileState = TileState.Loading;
-			Id = canonicalTileId;
+			//Id = canonicalTileId;
 			TilesetId = tilesetId;
 			_callback = p;
 

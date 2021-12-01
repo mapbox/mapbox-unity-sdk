@@ -120,14 +120,14 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		private float _relativeScale;
 		#endregion
 
-		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, bool isElevationActive)
+		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, float scale, bool isElevationActive)
 		{
 			IsStopped = false;
 			gameObject.hideFlags = HideFlags.DontSave;
 			TileSize = map.UnityTileSize;
 			_isElevationActive = isElevationActive;
 			ElevationType = TileTerrainType.None;
-			TileScale = map.WorldRelativeScale;
+			TileScale = scale;
 			_relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
 			Rect = Conversions.TileBounds(tileId);
 			UnwrappedTileId = tileId;

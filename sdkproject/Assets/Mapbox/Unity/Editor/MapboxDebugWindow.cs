@@ -7,6 +7,7 @@ using Mapbox.Unity;
 using Mapbox.Unity.DataFetching;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
+using Mapbox.Unity.QuadTree;
 using UnityEngine;
 using UnityEditor;
 
@@ -483,10 +484,22 @@ public class MemoryTabDebugView
 
 public class UnityTilesTabDebugView
 {
-	private AbstractMap _map;
+	private AbstractMapVisualizer _map;
 	public UnityTilesTabDebugView()
 	{
-		_map = GameObject.FindObjectOfType<AbstractMap>();
+		var map = GameObject.FindObjectOfType<AbstractMap>();
+		if (map != null)
+		{
+			_map = map.MapVisualizer;
+		}
+		else
+		{
+			var map2 = GameObject.FindObjectOfType<QuadTreeMap>();
+			if (map2 != null)
+			{
+				_map = map2.MapVisualizer;
+			}
+		}
 	}
 
 	private Tile _openDataTile;
@@ -498,8 +511,8 @@ public class UnityTilesTabDebugView
 	public void Draw()
 	{
 		GUILayout.Label("Unity Tiles", EditorStyles.boldLabel);
-		var tiles = _map.MapVisualizer.ActiveTiles;
-		var inactiveTiles = _map.MapVisualizer.GetInactiveTiles;
+		var tiles = _map.ActiveTiles;
+		var inactiveTiles = _map.GetInactiveTiles;
 
 		GUILayout.Label(string.Format("{0} : {1}", "Unity Tile Count", tiles.Count), EditorStyles.miniLabel);
 

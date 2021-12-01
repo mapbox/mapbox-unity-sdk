@@ -186,7 +186,7 @@ namespace Mapbox.Map
 			Cancel();
 
 			TileState = TileState.Loading;
-			Id = canonicalTileId;
+			//Id = canonicalTileId;
 			_callback = p;
 			TilesetId = tilesetId;
 

@@ -335,9 +335,14 @@ namespace Mapbox.Unity.Map
 		/// <param name="tileId"></param>
 		public virtual UnityTile LoadTile(UnwrappedTileId tileId, bool enableTile = false)
 		{
+			if (ActiveTiles.ContainsKey(tileId))
+				return null;
+
 			var unityTile = _tilePool.GetObject();
 
-			unityTile.Initialize(_map, tileId, TerrainLayer.IsLayerActive && TerrainLayer.ElevationType != ElevationLayerType.FlatTerrain);
+			var referenceTileRect = Conversions.TileBounds(tileId);
+			var scale = (float)(100 / referenceTileRect.Size.x);
+			unityTile.Initialize(_map, tileId, scale, TerrainLayer.IsLayerActive && TerrainLayer.ElevationType != ElevationLayerType.FlatTerrain);
 
 			PlaceTile(tileId, unityTile, _map);
 
