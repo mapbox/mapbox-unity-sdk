@@ -9,6 +9,16 @@ using UnityEngine;
 
 namespace Mapbox.Unity.CustomLayer
 {
+	//important note
+	//relationship between Factory manager and data fetcher can be a little messy.
+	//factory manager creates a dataTile object and passes it to dataFetcher
+	//initial idea was that dataFetcher would fill&complete this object and returns it
+	//but we also use same dataTile for caching so IF dataFetcher finds same data (in another dataTile object)
+	//in memory, it returns that instance.
+	//So factory manager should be ready to handle situations where it sends one dataTile instance and returns whole another
+	//but with same tileId, tilesetId etc of course.
+	//shortly, you will not always get the same item you send, this is why it's using (int)Key instead of RasterTile references in tracker lists
+	//(see MapboxTerrainFactoryManager)
 	public abstract class ImageFactoryManager
 	{
 		public Action<UnityTile, RasterTile> TextureReceived = (t, s) => { };
@@ -33,7 +43,7 @@ namespace Mapbox.Unity.CustomLayer
 		protected abstract RasterTile CreateTile(CanonicalTileId tileId, string tilesetId);
 		protected abstract void SetTexture(UnityTile unityTile, RasterTile dataTile);
 
-		private Dictionary<UnityTile, Tile> _tileTracker = new Dictionary<UnityTile, Tile>();
+		private Dictionary<UnityTile, RasterTile> _tileTracker = new Dictionary<UnityTile, RasterTile>();
 
 		public virtual void RegisterTile(UnityTile tile)
 		{
@@ -47,6 +57,7 @@ namespace Mapbox.Unity.CustomLayer
 			if (tile != null)
 			{
 				tile.AddTile(dataTile);
+				dataTile.AddUser(tile.CanonicalTileId);
 			}
 
 			_fetcher.FetchData(dataTile, _sourceSettings.Id, tile.CanonicalTileId, tile);
@@ -56,11 +67,13 @@ namespace Mapbox.Unity.CustomLayer
 		{
 			if (_tileTracker.ContainsKey(tile))
 			{
+				MapboxAccess.Instance.CacheManager.TileDisposed(_tileTracker[tile], _sourceSettings.Id);
 				tile.RemoveTile(_tileTracker[tile]);
+				_tileTracker[tile].RemoveUser(tile.CanonicalTileId);
 				_tileTracker.Remove(tile);
 			}
 			_fetcher.CancelFetching(tile.UnwrappedTileId, _sourceSettings.Id);
-			MapboxAccess.Instance.CacheManager.TileDisposed(tile, _sourceSettings.Id);
+			//MapboxAccess.Instance.CacheManager.TileDisposed(tile, _sourceSettings.Id);
 		}
 
 		public virtual void ClearTile(UnityTile tile)
@@ -85,7 +98,7 @@ namespace Mapbox.Unity.CustomLayer
 			TextureReceived(unityTile, dataTile);
 		}
 
-		private void OnFetcherError(UnityTile unityTile, RasterTile dataTile, TileErrorEventArgs errorEventArgs)
+		protected virtual void OnFetcherError(UnityTile unityTile, RasterTile dataTile, TileErrorEventArgs errorEventArgs)
 		{
 			FetchingError(unityTile, dataTile, errorEventArgs);
 		}

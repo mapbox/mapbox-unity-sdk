@@ -183,6 +183,7 @@ namespace Mapbox.Platform.Cache
         public void GetTextureItemFromFile(
             string tilesetId,
             CanonicalTileId tileId,
+            CanonicalTileId ownerTileId,
             bool isTextureNonreadable,
             Action<TextureCacheItem> textureReadCallback,
             Action<TextureCacheItem> textureInfoReadyCallback,
@@ -221,6 +222,7 @@ namespace Mapbox.Platform.Cache
                 MapboxAccess.Instance.TaskManager.AddTask(
                     new TaskWrapper(tileId.GenerateKey(tilesetId, "GetTextureItemInfoSql"))
                     {
+                        OwnerTileId = ownerTileId,
                         TileId = tileId,
                         TilesetId = tilesetId,
                         Action = () => { cacheItem = _sqLiteCache.Get(tilesetId, tileId); },
@@ -360,6 +362,12 @@ namespace Mapbox.Platform.Cache
         {
             _memoryCache?.TileDisposed(tile, tilesetId);
             _textureFileCache?.TileDisposed(tile, tilesetId);
+        }
+
+        public void TileDisposed(RasterTile tileTerrainData, string tilesetId)
+        {
+            _memoryCache?.TileDisposed(tileTerrainData, tilesetId);
+            _textureFileCache?.TileDisposed(tileTerrainData, tilesetId);
         }
     }
 }

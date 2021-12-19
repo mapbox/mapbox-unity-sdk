@@ -2,6 +2,7 @@ using Mapbox.Map;
 using Mapbox.Unity.Utilities;
 using Mapbox.Utils;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Mapbox.Unity.QuadTree
 {
@@ -20,6 +21,7 @@ namespace Mapbox.Unity.QuadTree
 		public float ZoomSpeed = 0.25f;
 		public float RotationSpeed = 50.0f;
 		public float CameraDistance;
+		public AnimationCurve CameraCurve;
 
 		public void Initialize(float worldScale, Camera cam, QuadTreeMap map)
 		{
@@ -35,8 +37,13 @@ namespace Mapbox.Unity.QuadTree
 		private float deltaAngleV;
 		private bool _viewChanged;
 
+		private float _prevCameraDistance = 0;
+
 		public bool UpdateCamera()
 		{
+			if (EventSystem.current.IsPointerOverGameObject())
+				return false;
+
 			_viewChanged = false;
 			if (Input.mouseScrollDelta.magnitude > 0)
 			{
@@ -86,6 +93,7 @@ namespace Mapbox.Unity.QuadTree
 
 			_lastMousePos = Input.mousePosition;
 
+			_prevCameraDistance = CameraDistance;
 			return _viewChanged;
 		}
 
@@ -99,9 +107,12 @@ namespace Mapbox.Unity.QuadTree
 
 		private float CalculateCameraDistance(float zoom)
 		{
-			var floorCamDistance = CamDistanceMultiplier * (float) Conversions.TileBounds(Conversions.LatitudeLongitudeToTileId(_map.CenterLatitudeLongitude.x, _map.CenterLatitudeLongitude.y, (int)zoom)).Size.x / _worldScale;
-			var nextCamDistance = CamDistanceMultiplier * (float) Conversions.TileBounds(Conversions.LatitudeLongitudeToTileId(_map.CenterLatitudeLongitude.x, _map.CenterLatitudeLongitude.y, (int)zoom - 1)).Size.x / _worldScale;
-			return Mathf.Lerp(nextCamDistance, floorCamDistance, zoom % 1);
+			//return Mathf.Pow((20 - zoom), 2) * 100 / _worldScale;
+			// var floorCamDistance = CamDistanceMultiplier * (float) Conversions.TileBounds(Conversions.LatitudeLongitudeToTileId(_map.CenterLatitudeLongitude.x, _map.CenterLatitudeLongitude.y, (int)zoom)).Size.x / _worldScale;
+			// var nextCamDistance = CamDistanceMultiplier * (float) Conversions.TileBounds(Conversions.LatitudeLongitudeToTileId(_map.CenterLatitudeLongitude.x, _map.CenterLatitudeLongitude.y, (int)zoom - 1)).Size.x / _worldScale;
+			// return Mathf.Lerp(nextCamDistance, floorCamDistance, zoom % 1);
+			var distance = CameraCurve.Evaluate(zoom);
+			return CamDistanceMultiplier * distance / _worldScale;
 		}
 
 		private Vector2d WorldToMeterPosition(Vector3 worldPos)

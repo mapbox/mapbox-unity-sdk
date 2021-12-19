@@ -115,6 +115,22 @@ namespace Mapbox.Unity.DataFetching
 		{
 			return Time.time - queueTime >= maturationAge;
 		}
+
+		public void CancelFetching(Tile tile, string tilesetId)
+		{
+			var key = tile.Id.GenerateKey(tilesetId);
+			if (_tileFetchInfos.ContainsKey(key))
+			{
+				_tileFetchInfos.Remove(key);
+			}
+
+			if (_globalActiveRequests.ContainsKey(key))
+			{
+				_globalActiveRequests[key].Cancel();
+				_globalActiveRequests.Remove(key);
+			}
+			_localQueuedRequests.Remove(key);
+		}
 	}
 
 	public class EditorDataFetchingManager : DataFetchingManager

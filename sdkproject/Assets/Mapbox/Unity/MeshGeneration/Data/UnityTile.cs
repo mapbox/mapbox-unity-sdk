@@ -1,4 +1,5 @@
 using Mapbox.Unity.DataContainers;
+using Mapbox.Unity.QuadTree;
 using UnityEditor;
 using UnityEngine.Rendering;
 

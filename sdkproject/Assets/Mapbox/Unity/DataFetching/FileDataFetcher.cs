@@ -23,7 +23,7 @@ namespace Mapbox.Unity.DataFetching
 
 					var textureCacheItem = new TextureCacheItem
 					{
-						TileId = tileId,
+						TileId = tile.Id,
 						TilesetId = tilesetId,
 						Texture2D = tile.Texture2D,
 						FilePath = tile.FilePath,

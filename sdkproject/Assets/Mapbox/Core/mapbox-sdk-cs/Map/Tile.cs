@@ -43,7 +43,8 @@ namespace Mapbox.Map
 		/// <summary> Data has been loaded before and got updated. </summary>
 		Updated,
 
-		Processing
+		Processing,
+		Destroyed
 	}
 
 	/// <summary>
@@ -88,6 +89,8 @@ namespace Mapbox.Map
 
 		protected UnityWebRequest _unityRequest;
 		protected Action _callback;
+
+		public List<string> Logs = new List<string>();
 
 		protected Tile()
 		{
@@ -335,6 +338,46 @@ namespace Mapbox.Map
 
 			/// <summary> The data source abstraction. </summary>
 			public IFileSource Fs;
+		}
+
+		public void Prune()
+		{
+			TileState = TileState.Destroyed;
+		}
+
+
+		protected HashSet<CanonicalTileId> _userTiles = new HashSet<CanonicalTileId>();
+		public void AddUser(CanonicalTileId tileId)
+		{
+			if (!_userTiles.Contains(tileId))
+			{
+				_userTiles.Add(tileId);
+			}
+		}
+		public void RemoveUser(CanonicalTileId tileId)
+		{
+			if (_userTiles.Contains(tileId))
+			{
+				_userTiles.Remove(tileId);
+			}
+		}
+		public bool UsedByTile(CanonicalTileId tileId)
+		{
+			return _userTiles.Contains(tileId);
+		}
+		public bool IsInUse()
+		{
+			return _userTiles.Count > 0;
+		}
+
+		public string UsersCSV()
+		{
+			return string.Join(" | ", _userTiles);
+		}
+
+		public HashSet<CanonicalTileId> GetUsers()
+		{
+			return _userTiles;
 		}
 	}
 }

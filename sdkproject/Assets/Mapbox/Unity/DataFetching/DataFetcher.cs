@@ -23,6 +23,11 @@ namespace Mapbox.Unity.DataFetching
 		{
 			MapboxAccess.Instance.DataManager.CancelFetching(tileUnwrappedTileId, tilesetId);
 		}
+
+		public void CancelFetching(Tile tile, string tilesetId)
+		{
+			MapboxAccess.Instance.DataManager.CancelFetching(tile, tilesetId);
+		}
 	}
 
 	public class DataFetcherParameters

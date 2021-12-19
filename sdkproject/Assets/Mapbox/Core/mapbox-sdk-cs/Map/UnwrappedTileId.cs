@@ -153,6 +153,23 @@ namespace Mapbox.Map
 			}
 		}
 
+		public UnwrappedTileId ParentAt(int i)
+		{
+			if (Z < i)
+			{
+				return this;
+			}
+
+			var delta = Z - i; //zoom level diff
+			var parent = this;
+			for (int j = 0; j < delta; j++)
+			{
+				parent = parent.Parent;
+			}
+
+			return parent;
+		}
+
 		public IEnumerable<UnwrappedTileId> Children
 		{
 			get
@@ -166,5 +183,7 @@ namespace Mapbox.Map
 				};
 			}
 		}
+
+
 	}
 }

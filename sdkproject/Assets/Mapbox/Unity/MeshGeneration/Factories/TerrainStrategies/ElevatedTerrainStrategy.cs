@@ -40,7 +40,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 
 		public override int RequiredVertexCount
 		{
-			get { return _elevationOptions.modificationOptions.sampleCount * _elevationOptions.modificationOptions.sampleCount; }
+			get { return (_elevationOptions.modificationOptions.sampleCount + 2) * (_elevationOptions.modificationOptions.sampleCount + 2); }
 		}
 
 		public override void Initialize(ElevationLayerProperties elOptions)

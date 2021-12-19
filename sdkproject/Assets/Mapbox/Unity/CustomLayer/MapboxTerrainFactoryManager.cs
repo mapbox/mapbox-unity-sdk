@@ -7,6 +7,19 @@ using UnityEngine;
 
 namespace Mapbox.Unity.CustomLayer
 {
+	//important note
+	//relationship between Factory manager and data fetcher can be a little messy.
+	//factory manager creates a dataTile object and passes it to dataFetcher
+	//initial idea was that dataFetcher would fill&complete this object and returns it
+	//but we also use same dataTile for caching so IF dataFetcher finds same data (in another dataTile object)
+	//in memory, it returns that instance.
+	//So factory manager should be ready to handle situations where it sends one dataTile instance and returns whole another
+	//but with same tileId, tilesetId etc of course.
+	//shortly, you will not always get the same item you send, this is why it's using (int)Key instead of RasterTile references in tracker lists
+	//(see MapboxTerrainFactoryManager)
+
+	//_tileTracker uses RasterTile reference as these are the returned instances, in other words the instances used in cache/memory etc.
+	//so at that point, it's final object/instance.
 	public sealed class MapboxTerrainFactoryManager : ImageFactoryManager
 	{
 		public TerrainStrategy TerrainStrategy;
@@ -16,7 +29,11 @@ namespace Mapbox.Unity.CustomLayer
 		private ElevationLayerProperties _elevationSettings;
 		private bool _isUsingShaderSolution = true;
 
-		private Dictionary<UnityTile, Tile> _tileTracker = new Dictionary<UnityTile, Tile>();
+		//this is in-use unity tile to raster tile
+		private Dictionary<UnityTile, RasterTile> _tileTracker = new Dictionary<UnityTile, RasterTile>();
+		private Dictionary<int, HashSet<UnityTile>> _tileUserTracker = new Dictionary<int, HashSet<UnityTile>>();
+		//this is grand parent id to raster tile
+		//so these two are vastly separate, don't try to optimize
 		private Dictionary<CanonicalTileId, RasterTile> _requestedTiles = new Dictionary<CanonicalTileId, RasterTile>();
 		private Dictionary<int, HashSet<UnityTile>> _tileWaitingList = new Dictionary<int, HashSet<UnityTile>>();
 
@@ -28,6 +45,11 @@ namespace Mapbox.Unity.CustomLayer
 			_elevationSettings = elevationSettings;
 			TerrainStrategy = terrainStrategy;
 			_isUsingShaderSolution = !_elevationSettings.colliderOptions.addCollider;
+
+			if (DownloadFallbackImagery)
+			{
+				DownloadAndCacheBaseTiles(_sourceSettings.Id, true);
+			}
 		}
 
 		public override void RegisterTile(UnityTile tile)
@@ -45,13 +67,19 @@ namespace Mapbox.Unity.CustomLayer
 				}
 
 				RasterTile dataTile = null;
-				var parentId = tile.UnwrappedTileId.Parent.Parent.Canonical;
+				var parentId = tile.UnwrappedTileId.Z > 4
+					? tile.UnwrappedTileId.Parent.Parent.Canonical
+					: tile.UnwrappedTileId.ParentAt(2).Canonical;
+
+
 				if (_requestedTiles.ContainsKey(parentId))
 				{
 					dataTile = _requestedTiles[parentId];
+					dataTile.Logs.Add("data tile reused " + tile.CanonicalTileId);
 					if (tile != null)
 					{
 						tile.AddTile(dataTile);
+						dataTile.AddUser(tile.CanonicalTileId);
 					}
 					if (!_tileWaitingList.ContainsKey(dataTile.Key))
 					{
@@ -63,10 +91,12 @@ namespace Mapbox.Unity.CustomLayer
 				else
 				{
 					dataTile = CreateTile(parentId, _sourceSettings.Id);
+					dataTile.Logs.Add("data tile created " + tile.CanonicalTileId);
 					_requestedTiles.Add(parentId, dataTile);
 					if (tile != null)
 					{
 						tile.AddTile(dataTile);
+						dataTile.AddUser(tile.CanonicalTileId);
 					}
 					if (!_tileWaitingList.ContainsKey(dataTile.Key))
 					{
@@ -77,12 +107,7 @@ namespace Mapbox.Unity.CustomLayer
 					_fetcher.FetchData(dataTile, _sourceSettings.Id, tile.CanonicalTileId, tile);
 				}
 
-				// if (!_tileWaitingList.ContainsKey(dataTile.Key))
-				// {
-				// 	_tileWaitingList.Add(dataTile.Key, new List<UnityTile>());
-				// }
-				// _tileWaitingList[dataTile.Key].Add(tile);
-				// _fetcher.FetchData(dataTile, _sourceSettings.Id, tile.CanonicalTileId, tile);
+				tile.MeshRenderer.sharedMaterial.SetFloat("_TileScale", tile.TileScale);
 			}
 			else
 			{
@@ -96,38 +121,88 @@ namespace Mapbox.Unity.CustomLayer
 		{
 			if (_tileWaitingList.ContainsKey(dataTile.Key))
 			{
+				if (!_tileUserTracker.ContainsKey(dataTile.Key))
+				{
+					_tileUserTracker.Add(dataTile.Key, new HashSet<UnityTile>());
+				}
+
 				foreach (var utile in _tileWaitingList[dataTile.Key])
 				{
 					SetTexture(utile, dataTile);
+					_tileUserTracker[dataTile.Key].Add(utile);
 				}
 				_tileWaitingList.Remove(dataTile.Key);
-			}
 
-			TextureReceived(unityTile, dataTile);
+				_requestedTiles.Remove(dataTile.Id);
+				TextureReceived(unityTile, dataTile);
+			}
+			else
+			{
+				//this means tile is unregistered during fetching... but somehow it didn't get cancelled?
+			}
+		}
+
+		protected override void OnFetcherError(UnityTile unityTile, RasterTile dataTile, TileErrorEventArgs errorEventArgs)
+		{
+			FetchingError(unityTile, dataTile, errorEventArgs);
 		}
 
 		public override void UnregisterTile(UnityTile tile, bool clearData = true)
 		{
 			if (_tileTracker.ContainsKey(tile))
 			{
+				var noTileIsWaitingForIt = false;
 				var requestedTile = _tileTracker[tile];
+				requestedTile.Logs.Add("cancelling " + tile.CanonicalTileId);
 				if (_tileWaitingList.ContainsKey(requestedTile.Key))
 				{
 					if (_tileWaitingList[requestedTile.Key].Contains(tile))
 					{
 						_tileWaitingList[requestedTile.Key].Remove(tile);
-
 					}
 
 					if (_tileWaitingList[requestedTile.Key].Count == 0)
 					{
-						_fetcher.CancelFetching(tile.UnwrappedTileId, _sourceSettings.Id);
-						MapboxAccess.Instance.CacheManager.TileDisposed(tile, _sourceSettings.Id);
+						_tileWaitingList.Remove(requestedTile.Key);
+						noTileIsWaitingForIt = true;
 					}
 				}
+				else
+				{
+					noTileIsWaitingForIt = true;
+				}
+
+				if (_tileUserTracker.ContainsKey(requestedTile.Key))
+				{
+					_tileUserTracker[requestedTile.Key].Remove(tile);
+					if (_tileUserTracker[requestedTile.Key].Count == 0 && noTileIsWaitingForIt)
+					{
+						requestedTile.Logs.Add("disposing 1 " + tile.CanonicalTileId);
+						_tileUserTracker.Remove(requestedTile.Key);
+						_fetcher.CancelFetching(requestedTile, _sourceSettings.Id);
+						_requestedTiles.Remove(requestedTile.Id);
+						MapboxAccess.Instance.CacheManager.TileDisposed(requestedTile, _sourceSettings.Id);
+					}
+				}
+				else if(noTileIsWaitingForIt)
+				{
+					requestedTile.Logs.Add("disposing 2 " + tile.CanonicalTileId);
+					_fetcher.CancelFetching(requestedTile, _sourceSettings.Id);
+					_requestedTiles.Remove(requestedTile.Id);
+					MapboxAccess.Instance.CacheManager.TileDisposed(requestedTile, _sourceSettings.Id);
+				}
+
 				tile.RemoveTile(_tileTracker[tile]);
+				_tileTracker[tile].RemoveUser(tile.CanonicalTileId);
 				TerrainStrategy.UnregisterTile(tile);
 				_tileTracker.Remove(tile);
+			}
+			else
+			{
+				if (_tileUserTracker.ContainsKey(tile.TerrainData.Key))
+				{
+					Debug.Log("here");
+				}
 			}
 		}
 

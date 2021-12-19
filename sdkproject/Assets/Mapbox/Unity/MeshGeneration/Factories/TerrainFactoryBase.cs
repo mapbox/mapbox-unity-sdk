@@ -108,7 +108,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			if (tile != null)
 			{
 				_tilesWaitingResponse.Remove(tile);
-				Strategy.DataErrorOccurred(tile, e);
+				//Strategy.DataErrorOccurred(tile, e);
 			}
 		}
 

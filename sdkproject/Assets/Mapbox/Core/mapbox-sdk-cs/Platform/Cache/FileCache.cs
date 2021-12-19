@@ -33,6 +33,7 @@ namespace Mapbox.Platform.Cache
 		void DeleteTileFile(string filePath);
 		HashSet<string> GetFileList();
 		void Clear();
+		void TileDisposed(RasterTile tileTerrainData, string tilesetId);
 	}
 
 	public class FileCache : IFileCache
@@ -121,6 +122,11 @@ namespace Mapbox.Platform.Cache
 			//this should be unnecessary as fetching should be already cancelled at this point
 			//by main factory manager/factory and data fetcher (image data fetcher, vector data fetcher etc).
 			//_fileDataFetcher.CancelFetching(tile.UnwrappedTileId, tilesetId);
+		}
+
+		public void TileDisposed(RasterTile tileTerrainData, string tilesetId)
+		{
+
 		}
 
 		public virtual void ClearAll()

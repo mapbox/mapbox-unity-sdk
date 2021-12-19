@@ -36,6 +36,7 @@ namespace Mapbox.Unity.CustomLayer
 			{
 				//Debug.Log(string.Format("{0} - {1}",tile.CanonicalTileId, "add Vector"));
 				tile.AddTile(dataTile);
+				dataTile.AddUser(tile.CanonicalTileId);
 			}
 
 			_fetcher.FetchData(dataTile, _properties.sourceOptions.Id, tile.CanonicalTileId, tile);
@@ -49,11 +50,12 @@ namespace Mapbox.Unity.CustomLayer
 				var dataTile = _tileTracker[tile];
 				dataTile.Cancel();
 				tile.RemoveTile(dataTile);
+				_tileTracker[tile].RemoveUser(tile.CanonicalTileId);
 				_tileTracker.Remove(tile);
 			}
 
 			_fetcher.CancelFetching(tile.UnwrappedTileId, _properties.sourceOptions.Id);
-			MapboxAccess.Instance.CacheManager.TileDisposed(tile, _properties.sourceOptions.Id);
+			//MapboxAccess.Instance.CacheManager.TileDisposed(tile, _properties.sourceOptions.Id);
 		}
 
 		private void OnFetcherDataRecieved(UnityTile unityTile, Mapbox.Map.VectorTile vectorTile)

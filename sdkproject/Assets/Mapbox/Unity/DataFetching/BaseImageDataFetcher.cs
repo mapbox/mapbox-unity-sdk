@@ -104,6 +104,7 @@ namespace Mapbox.Unity.DataFetching
 			//FileCacheCheck
 			MapboxAccess.Instance.CacheManager.GetTextureItemFromFile(
 				tilesetId,
+				tile.Id,
 				tileId,
 				tile.IsTextureNonreadable,
 				TextureReadCallback,
@@ -125,6 +126,7 @@ namespace Mapbox.Unity.DataFetching
 				rasterTile.Texture2D.name += "_fallbackImage";
 			}
 #endif
+			
 			MapboxAccess.Instance.CacheManager.MarkFallback(rasterTile.Id, rasterTile.TilesetId);
 		}
 	}

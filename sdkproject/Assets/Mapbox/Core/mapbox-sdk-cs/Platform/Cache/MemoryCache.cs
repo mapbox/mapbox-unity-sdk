@@ -17,6 +17,7 @@ namespace Mapbox.Platform.Cache
 		void MarkFallback(CanonicalTileId tileId, string tilesetId);
 		void UpdateExpiration(string tilesetId, CanonicalTileId tileId, DateTime expirationDate);
 		void TileDisposed(UnityTile tile, string tilesetId);
+		void TileDisposed(RasterTile tileTerrainData, string tilesetId);
 	}
 
 	public class MemoryCache : IMemoryCache
@@ -156,6 +157,22 @@ namespace Mapbox.Platform.Cache
 			}
 		}
 
+		public void TileDisposed(RasterTile tileTerrainData, string tilesetId)
+		{
+			if (tileTerrainData == null)
+				return;
+
+			var key = tileTerrainData.Id.GenerateKey(tilesetId);
+			if (!_fallbackItems.ContainsKey(key))
+			{
+				if (_cachedItems.ContainsKey(key) && !_destructionHashset.Contains(key))
+				{
+					_destructionHashset.Add(key);
+					_destructionQueue.Enqueue(key);
+				}
+			}
+		}
+
 		public virtual void Clear()
 		{
 			if (_cachedItems != null)
@@ -262,9 +279,10 @@ namespace Mapbox.Platform.Cache
 			_cachedItems.Remove(keyToRemove);
 			if (item is TextureCacheItem)
 			{
+				item.Tile.Logs.Add("destroying texture");
 				(item as TextureCacheItem).Texture2D.Destroy();
 			}
-
+			item.Tile.Prune();
 			item.Data = null;
 		}
 

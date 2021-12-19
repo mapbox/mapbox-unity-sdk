@@ -69,10 +69,10 @@ namespace Mapbox.Unity
 						{
 							wrapper = _allTasks[wrapperId];
 							_allTasks.Remove(wrapperId);
-							_tasksByTile[wrapper.TileId].Remove(wrapperId);
-							if (_tasksByTile[wrapper.TileId].Count == 0)
+							_tasksByTile[wrapper.OwnerTileId].Remove(wrapperId);
+							if (_tasksByTile[wrapper.OwnerTileId].Count == 0)
 							{
-								_tasksByTile.Remove(wrapper.TileId);
+								_tasksByTile.Remove(wrapper.OwnerTileId);
 							}
 						}
 
@@ -108,22 +108,22 @@ namespace Mapbox.Unity
 						taskWrapper.EnqueueFrame = Time.frameCount;
 						_allTasks.Add(taskWrapper.Id, taskWrapper);
 
-						if (!_tasksByTile.ContainsKey(taskWrapper.TileId))
+						if (!_tasksByTile.ContainsKey(taskWrapper.OwnerTileId))
 						{
-							_tasksByTile.Add(taskWrapper.TileId, new HashSet<int>());
+							_tasksByTile.Add(taskWrapper.OwnerTileId, new HashSet<int>());
 						}
-						_tasksByTile[taskWrapper.TileId].Add(taskWrapper.Id);
+						_tasksByTile[taskWrapper.OwnerTileId].Add(taskWrapper.Id);
 						_taskQueue.Enqueue(taskWrapper.Id);
 					}
 					else
 					{
 						_allTasks.Remove(taskWrapper.Id);
-						if (_tasksByTile.ContainsKey(taskWrapper.TileId))
+						if (_tasksByTile.ContainsKey(taskWrapper.OwnerTileId))
 						{
-							_tasksByTile[taskWrapper.TileId].Remove(taskWrapper.Id);
-							if (_tasksByTile[taskWrapper.TileId].Count == 0)
+							_tasksByTile[taskWrapper.OwnerTileId].Remove(taskWrapper.Id);
+							if (_tasksByTile[taskWrapper.OwnerTileId].Count == 0)
 							{
-								_tasksByTile.Remove(taskWrapper.TileId);
+								_tasksByTile.Remove(taskWrapper.OwnerTileId);
 							}
 						}
 						else
@@ -134,11 +134,11 @@ namespace Mapbox.Unity
 						taskWrapper.EnqueueFrame = Time.frameCount;
 						_allTasks.Add(taskWrapper.Id, taskWrapper);
 
-						if (!_tasksByTile.ContainsKey(taskWrapper.TileId))
+						if (!_tasksByTile.ContainsKey(taskWrapper.OwnerTileId))
 						{
-							_tasksByTile.Add(taskWrapper.TileId, new HashSet<int>());
+							_tasksByTile.Add(taskWrapper.OwnerTileId, new HashSet<int>());
 						}
-						_tasksByTile[taskWrapper.TileId].Add(taskWrapper.Id);
+						_tasksByTile[taskWrapper.OwnerTileId].Add(taskWrapper.Id);
 						_taskQueue.Enqueue(taskWrapper.Id);
 					}
 				}
@@ -147,22 +147,22 @@ namespace Mapbox.Unity
 			//_taskPriorityQueue.Enqueue(taskWrapper, priority);
 		}
 
-		public virtual void CancelTile(CanonicalTileId tileId)
+		public virtual void CancelTile(CanonicalTileId cancelledTileId)
 		{
-			if (_tasksByTile.ContainsKey(tileId))
+			if (_tasksByTile.ContainsKey(cancelledTileId))
 			{
-				foreach (var taskId in _tasksByTile[tileId])
+				foreach (var taskId in _tasksByTile[cancelledTileId])
 				{
 					if (_allTasks.ContainsKey(taskId))
 					{
 						var task = _allTasks[taskId];
-						TaskCancelled(tileId);
+						TaskCancelled(cancelledTileId);
 						_allTasks.Remove(taskId);
 						task.OnCancelled?.Invoke();
 					}
 				}
 
-				_tasksByTile.Remove(tileId);
+				_tasksByTile.Remove(cancelledTileId);
 			}
 		}
 	}
@@ -176,6 +176,7 @@ namespace Mapbox.Unity
 		// public Action<TaskWrapper> Cancelled = (t) => { };
 		// public Action<TaskWrapper> Finished = (t) => { };
 		public CanonicalTileId TileId;
+		public CanonicalTileId OwnerTileId;
 		public Action Action;
 		public CancellationTokenSource Token;
 		public Action<Task> ContinueWith;
@@ -187,6 +188,7 @@ namespace Mapbox.Unity
 		}
 
 		public string Info;
+
 	}
 
 	public class EditorTaskManager : TaskManager
@@ -230,23 +232,23 @@ namespace Mapbox.Unity
 			base.AddTask(taskWrapper, priorityLevel);
 		}
 
-		public override void CancelTile(CanonicalTileId tileId)
+		public override void CancelTile(CanonicalTileId cancelledTileId)
 		{
 			if (EnableLogging)
 			{
 				var taskCount = 0;
 				var tileTypes = "";
-				if (_tasksByTile.ContainsKey(tileId))
+				if (_tasksByTile.ContainsKey(cancelledTileId))
 				{
-					taskCount = _tasksByTile[tileId].Count;
-					tileTypes = string.Join(" | ", _tasksByTile[tileId].Select(x => _allTasks[x].Info));
+					taskCount = _tasksByTile[cancelledTileId].Count;
+					tileTypes = string.Join(" | ", _tasksByTile[cancelledTileId].Select(x => _allTasks[x].Info));
 				}
 
-				Logs.Add(string.Format("{0,-10} {1,-15} {2,-30}; ({3}) {4}", Time.frameCount, tileId, "cancel", taskCount, tileTypes));
+				Logs.Add(string.Format("{0,-10} {1,-15} {2,-30}; ({3}) {4}", Time.frameCount, cancelledTileId, "cancel", taskCount, tileTypes));
 				TotalCancelledCount += taskCount;
 			}
 
-			base.CancelTile(tileId);
+			base.CancelTile(cancelledTileId);
 		}
 
 		public void ClearLogsAndStats()

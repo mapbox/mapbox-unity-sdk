@@ -474,9 +474,15 @@ public class MemoryTabDebugView
 			EditorGUILayout.LabelField(string.Format("Tileset {0}", cacheItem.TilesetId), EditorStyles.label);
 			EditorGUILayout.LabelField(string.Format("From {0}", cacheItem.From), EditorStyles.label);
 			EditorGUILayout.LabelField(string.Format("Expiration {0}", cacheItem.ExpirationDate), EditorStyles.label);
+			EditorGUILayout.LabelField(string.Format("Users : {0}", cacheItem.Tile.UsersCSV()), EditorStyles.label);
 			if (cacheItem is TextureCacheItem && (cacheItem as TextureCacheItem).Texture2D != null)
 			{
 				EditorGUILayout.ObjectField((cacheItem as TextureCacheItem).Texture2D, typeof(Texture2D), true);
+			}
+
+			foreach (var log in cacheItem.Tile.Logs)
+			{
+				EditorGUILayout.LabelField(log, EditorStyles.label);
 			}
 		}
 	}

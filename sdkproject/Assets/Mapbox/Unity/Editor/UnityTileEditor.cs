@@ -131,21 +131,20 @@ public class UnityTileEditor : Editor
 
 	private void DrawLogs(Tile dataTile, int i)
 	{
-		// _logFold[i] = EditorGUILayout.Foldout(_logFold[i], string.Format("Logs ({0})", dataTile.Logs.Count));
-		// if (_logFold[i])
-		// {
-		// 	using (var h = new EditorGUILayout.HorizontalScope())
-		// 	{
-		// 		using (var scrollView = new EditorGUILayout.ScrollViewScope(_logScrollPos[i], GUILayout.Height(300)))
-		// 		{
-		// 			_logScrollPos[i] = scrollView.scrollPosition;
-		// 			foreach (var log in dataTile.Logs)
-		// 			{
-		// 				EditorGUILayout.LabelField(string.Format(log), EditorStyles.miniLabel);
-		// 			}
-		// 		}
-		// 	}
-		// }
-
+		_logFold[i] = EditorGUILayout.Foldout(_logFold[i], string.Format("Logs ({0})", dataTile.Logs.Count));
+		if (_logFold[i])
+		{
+			using (var h = new EditorGUILayout.HorizontalScope())
+			{
+				using (var scrollView = new EditorGUILayout.ScrollViewScope(_logScrollPos[i], GUILayout.Height(300)))
+				{
+					_logScrollPos[i] = scrollView.scrollPosition;
+					foreach (var log in dataTile.Logs)
+					{
+						EditorGUILayout.LabelField(string.Format(log), EditorStyles.miniLabel);
+					}
+				}
+			}
+		}
 	}
 }
