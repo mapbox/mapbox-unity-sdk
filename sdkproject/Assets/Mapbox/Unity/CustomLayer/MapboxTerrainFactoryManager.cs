@@ -61,50 +61,68 @@ namespace Mapbox.Unity.CustomLayer
 
 			if (TerrainStrategy is IElevationBasedTerrainStrategy)
 			{
-				if (_isUsingShaderSolution)
-				{
-					ApplyParentTexture(tile);
-				}
-
-				RasterTile dataTile = null;
 				var parentId = tile.UnwrappedTileId.Z > 4
 					? tile.UnwrappedTileId.Parent.Parent.Canonical
 					: tile.UnwrappedTileId.ParentAt(2).Canonical;
 
-
-				if (_requestedTiles.ContainsKey(parentId))
+				var memoryCacheItem = _fetcher.FetchDataInstant(parentId, _sourceSettings.Id);
+				if (memoryCacheItem != null)
 				{
-					dataTile = _requestedTiles[parentId];
-					dataTile.Logs.Add("data tile reused " + tile.CanonicalTileId);
-					if (tile != null)
+					var dataTile = (RasterTile) memoryCacheItem.Tile;
+					memoryCacheItem.Tile.Logs.Add("data tile instant " + tile.CanonicalTileId);
+					tile.AddTile(dataTile);
+					memoryCacheItem.Tile.AddUser(tile.CanonicalTileId);
+					SetTexture(tile, dataTile);
+					if (!_tileUserTracker.ContainsKey(memoryCacheItem.Tile.Key))
 					{
-						tile.AddTile(dataTile);
-						dataTile.AddUser(tile.CanonicalTileId);
+						_tileUserTracker.Add(memoryCacheItem.Tile.Key, new HashSet<UnityTile>());
 					}
-					if (!_tileWaitingList.ContainsKey(dataTile.Key))
-					{
-						_tileWaitingList.Add(dataTile.Key, new HashSet<UnityTile>());
-					}
+					_tileUserTracker[memoryCacheItem.Tile.Key].Add(tile);
 					_tileTracker.Add(tile, dataTile);
-					_tileWaitingList[dataTile.Key].Add(tile);
+					TextureReceived(dataTile);
 				}
 				else
 				{
-					dataTile = CreateTile(parentId, _sourceSettings.Id);
-					dataTile.Logs.Add("data tile created " + tile.CanonicalTileId);
-					_requestedTiles.Add(parentId, dataTile);
-					if (tile != null)
+					if (_isUsingShaderSolution)
 					{
-						tile.AddTile(dataTile);
-						dataTile.AddUser(tile.CanonicalTileId);
+						ApplyParentTexture(tile);
 					}
-					if (!_tileWaitingList.ContainsKey(dataTile.Key))
+
+					RasterTile dataTile = null;
+					if (_requestedTiles.ContainsKey(parentId))
 					{
-						_tileWaitingList.Add(dataTile.Key, new HashSet<UnityTile>());
+						dataTile = _requestedTiles[parentId];
+						dataTile.Logs.Add("data tile reused " + tile.CanonicalTileId);
+						if (tile != null)
+						{
+							tile.AddTile(dataTile);
+							dataTile.AddUser(tile.CanonicalTileId);
+						}
+						if (!_tileWaitingList.ContainsKey(dataTile.Key))
+						{
+							_tileWaitingList.Add(dataTile.Key, new HashSet<UnityTile>());
+						}
+						_tileTracker.Add(tile, dataTile);
+						_tileWaitingList[dataTile.Key].Add(tile);
 					}
-					_tileWaitingList[dataTile.Key].Add(tile);
-					_tileTracker.Add(tile, dataTile);
-					_fetcher.FetchData(dataTile, _sourceSettings.Id, tile.CanonicalTileId, tile);
+					else
+					{
+						dataTile = CreateTile(parentId, _sourceSettings.Id);
+						dataTile.Logs.Add("data tile created " + tile.CanonicalTileId);
+						_requestedTiles.Add(parentId, dataTile);
+						if (tile != null)
+						{
+							tile.AddTile(dataTile);
+							dataTile.AddUser(tile.CanonicalTileId);
+						}
+						if (!_tileWaitingList.ContainsKey(dataTile.Key))
+						{
+							_tileWaitingList.Add(dataTile.Key, new HashSet<UnityTile>());
+						}
+						_tileWaitingList[dataTile.Key].Add(tile);
+						_tileTracker.Add(tile, dataTile);
+						_fetcher.FetchData(dataTile, _sourceSettings.Id, tile.CanonicalTileId);
+					}
 				}
 
 				tile.MeshRenderer.sharedMaterial.SetFloat("_TileScale", tile.TileScale);
@@ -117,7 +135,7 @@ namespace Mapbox.Unity.CustomLayer
 			}
 		}
 
-		protected override void OnTextureReceived(UnityTile unityTile, RasterTile dataTile)
+		protected override void OnTextureReceived(RasterTile dataTile)
 		{
 			if (_tileWaitingList.ContainsKey(dataTile.Key))
 			{
@@ -134,7 +152,7 @@ namespace Mapbox.Unity.CustomLayer
 				_tileWaitingList.Remove(dataTile.Key);
 
 				_requestedTiles.Remove(dataTile.Id);
-				TextureReceived(unityTile, dataTile);
+				TextureReceived(dataTile);
 			}
 			else
 			{
@@ -142,9 +160,9 @@ namespace Mapbox.Unity.CustomLayer
 			}
 		}
 
-		protected override void OnFetcherError(UnityTile unityTile, RasterTile dataTile, TileErrorEventArgs errorEventArgs)
+		protected override void OnFetcherError(RasterTile dataTile, TileErrorEventArgs errorEventArgs)
 		{
-			FetchingError(unityTile, dataTile, errorEventArgs);
+			FetchingError(dataTile, errorEventArgs);
 		}
 
 		public override void UnregisterTile(UnityTile tile, bool clearData = true)

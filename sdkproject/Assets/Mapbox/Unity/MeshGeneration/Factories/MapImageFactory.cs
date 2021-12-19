@@ -87,7 +87,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			ImageFactoryManager.ClearTile(tile);
 		}
 
-		private void OnFetchingError(UnityTile tile, RasterTile rasterTile, TileErrorEventArgs errorEventArgs)
+		private void OnFetchingError(RasterTile rasterTile, TileErrorEventArgs errorEventArgs)
 		{
 			OnErrorOccurred(errorEventArgs);
 		}

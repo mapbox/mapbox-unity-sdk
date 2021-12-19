@@ -54,7 +54,7 @@ public class VectorDataFetcher : DataFetcher
 
         void CancelledCallback()
         {
-	        FetchingError(unityTile, tile, new TileErrorEventArgs(tileId, tile.GetType(), unityTile, tile.Exceptions));
+	        FetchingError(unityTile, tile, new TileErrorEventArgs(tileId, tile.GetType(), tile.Exceptions));
         }
 
         void SuccessCallback(CacheItem vectorCacheItemFromSqlite)
@@ -96,16 +96,16 @@ public class VectorDataFetcher : DataFetcher
 		{
 			//rasterTile.Clear();
 			//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
-			FetchingError(unityTile, vectorTile, new TileErrorEventArgs(tileId, vectorTile.GetType(), unityTile, vectorTile.Exceptions));
+			FetchingError(unityTile, vectorTile, new TileErrorEventArgs(tileId, vectorTile.GetType(), vectorTile.Exceptions));
 		}
 
 		if (vectorTile.CurrentTileState == TileState.Canceled)
 		{
-			FetchingError(unityTile, vectorTile, new TileErrorEventArgs(tileId, vectorTile.GetType(), unityTile, vectorTile.Exceptions));
+			FetchingError(unityTile, vectorTile, new TileErrorEventArgs(tileId, vectorTile.GetType(), vectorTile.Exceptions));
 		}
 		else if (vectorTile.HasError)
 		{
-			FetchingError(unityTile, vectorTile, new TileErrorEventArgs(tileId, vectorTile.GetType(), unityTile, vectorTile.Exceptions));
+			FetchingError(unityTile, vectorTile, new TileErrorEventArgs(tileId, vectorTile.GetType(), vectorTile.Exceptions));
 		}
 		else
 		{

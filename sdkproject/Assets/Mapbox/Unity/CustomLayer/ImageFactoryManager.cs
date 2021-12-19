@@ -21,8 +21,8 @@ namespace Mapbox.Unity.CustomLayer
 	//(see MapboxTerrainFactoryManager)
 	public abstract class ImageFactoryManager
 	{
-		public Action<UnityTile, RasterTile> TextureReceived = (t, s) => { };
-		public Action<UnityTile, RasterTile, TileErrorEventArgs> FetchingError = (t, r, s) => { };
+		public Action<RasterTile> TextureReceived = (s) => { };
+		public Action<RasterTile, TileErrorEventArgs> FetchingError = (r, s) => { };
 		public bool DownloadFallbackImagery = false;
 
 		protected BaseImageDataFetcher _baseImageDataFetcher;
@@ -44,32 +44,60 @@ namespace Mapbox.Unity.CustomLayer
 		protected abstract void SetTexture(UnityTile unityTile, RasterTile dataTile);
 
 		private Dictionary<UnityTile, RasterTile> _tileTracker = new Dictionary<UnityTile, RasterTile>();
+		private Dictionary<int, HashSet<UnityTile>> _tileUserTracker = new Dictionary<int, HashSet<UnityTile>>();
+
+		private void ConnectTiles(UnityTile unityTile, Tile dataTile)
+		{
+			unityTile.AddTile(dataTile);
+			dataTile.AddUser(unityTile.CanonicalTileId);
+			_tileTracker.Add(unityTile, (RasterTile) dataTile);
+
+			if(!_tileUserTracker.ContainsKey(dataTile.Key))
+			{
+				_tileUserTracker.Add(dataTile.Key, new HashSet<UnityTile>());
+			}
+			_tileUserTracker[dataTile.Key].Add(unityTile);
+		}
 
 		public virtual void RegisterTile(UnityTile tile)
 		{
-			if (_tileTracker.ContainsKey(tile))
+			var memoryCacheItem = _fetcher.FetchDataInstant(tile.CanonicalTileId, _sourceSettings.Id);
+			if (memoryCacheItem != null)
 			{
-				Debug.Log("Tile is already in tracking list?");
+				var dataTile = (RasterTile) memoryCacheItem.Tile;
+				ConnectTiles(tile, dataTile);
+				SetTexture(tile, dataTile);
+				TextureReceived(dataTile);
 			}
-			ApplyParentTexture(tile);
-			var dataTile = CreateTile(tile.CanonicalTileId, _sourceSettings.Id);
-			_tileTracker.Add(tile, dataTile);
-			if (tile != null)
+			else
 			{
-				tile.AddTile(dataTile);
-				dataTile.AddUser(tile.CanonicalTileId);
-			}
+				ApplyParentTexture(tile);
 
-			_fetcher.FetchData(dataTile, _sourceSettings.Id, tile.CanonicalTileId, tile);
+				var dataTile = CreateTile(tile.CanonicalTileId, _sourceSettings.Id);
+				ConnectTiles(tile, dataTile);
+
+				_fetcher.FetchData(dataTile, _sourceSettings.Id, tile.CanonicalTileId);
+			}
 		}
 
 		public virtual void UnregisterTile(UnityTile tile, bool clearData = true)
 		{
 			if (_tileTracker.ContainsKey(tile))
 			{
-				MapboxAccess.Instance.CacheManager.TileDisposed(_tileTracker[tile], _sourceSettings.Id);
-				tile.RemoveTile(_tileTracker[tile]);
-				_tileTracker[tile].RemoveUser(tile.CanonicalTileId);
+				var dataTile = _tileTracker[tile];
+				if (_tileUserTracker.ContainsKey(dataTile.Key))
+				{
+					_tileUserTracker[dataTile.Key].Remove(tile);
+				}
+
+				if (_tileUserTracker[dataTile.Key].Count == 0)
+				{
+					_tileUserTracker.Remove(dataTile.Key);
+					MapboxAccess.Instance.CacheManager.TileDisposed(dataTile, _sourceSettings.Id);
+				}
+
+				tile.RemoveTile(dataTile);
+				dataTile.RemoveUser(tile.CanonicalTileId);
 				_tileTracker.Remove(tile);
 			}
 			_fetcher.CancelFetching(tile.UnwrappedTileId, _sourceSettings.Id);
@@ -81,26 +109,18 @@ namespace Mapbox.Unity.CustomLayer
 			SetTexture(tile, null);
 		}
 
-		protected virtual void OnTextureReceived(UnityTile unityTile, RasterTile dataTile)
+		protected virtual void OnTextureReceived(RasterTile dataTile)
 		{
-			//unity tile can be null here in some cases like base maps (basemap is z2 imagery we download for fallback)
-			//base/fallback images doesn't require unitytile object, they are just pulled and cached
-			if (unityTile != null && unityTile.CanonicalTileId != dataTile.Id)
+			foreach (var tile in _tileUserTracker[dataTile.Key])
 			{
-				Debug.Log("wtf");
+				SetTexture(tile, dataTile);
 			}
-
-			if (unityTile != null)
-			{
-				SetTexture(unityTile, dataTile);
-			}
-
-			TextureReceived(unityTile, dataTile);
+			TextureReceived(dataTile);
 		}
 
-		protected virtual void OnFetcherError(UnityTile unityTile, RasterTile dataTile, TileErrorEventArgs errorEventArgs)
+		protected virtual void OnFetcherError(RasterTile dataTile, TileErrorEventArgs errorEventArgs)
 		{
-			FetchingError(unityTile, dataTile, errorEventArgs);
+			FetchingError(dataTile, errorEventArgs);
 		}
 
 		protected virtual void ApplyParentTexture(UnityTile tile)

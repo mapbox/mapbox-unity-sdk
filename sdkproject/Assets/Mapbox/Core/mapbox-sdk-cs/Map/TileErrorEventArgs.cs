@@ -17,10 +17,6 @@
 		/// </summary>
 		public List<Exception> Exceptions;
 		/// <summary>
-		/// The unity tile instance.
-		/// </summary>
-		public UnityTile UnityTileInstance;
-		/// <summary>
 		/// The type of the tile.
 		/// </summary>
 		public Type TileType;
@@ -32,11 +28,10 @@
 		/// <param name="TileType">Tile type.</param>
 		/// <param name="UnityTileInstance">Unity tile instance.</param>
 		/// <param name="Exceptions">Exceptions as a List</param>
-		public TileErrorEventArgs(CanonicalTileId TileId, Type TileType, UnityTile UnityTileInstance, List<System.Exception> Exceptions)
+		public TileErrorEventArgs(CanonicalTileId TileId, Type TileType, List<System.Exception> Exceptions)
 		{
 			this.TileId = TileId;
 			this.Exceptions = Exceptions;
-			this.UnityTileInstance = UnityTileInstance;
 			this.TileType = TileType;
 		}
 
@@ -47,7 +42,7 @@
 		/// <param name="TileType">Tile type.</param>
 		/// <param name="UnityTileInstance">Unity tile instance.</param>
 		/// <param name="Exceptions">Exceptions as a ReadOnlyCollection</param>
-		public TileErrorEventArgs(CanonicalTileId TileId, Type TileType, UnityTile UnityTileInstance, ReadOnlyCollection<Exception> Exceptions)
+		public TileErrorEventArgs(CanonicalTileId TileId, Type TileType, ReadOnlyCollection<Exception> Exceptions)
 		{
 			this.TileId = TileId;
 			if (Exceptions != null)
@@ -59,8 +54,6 @@
 				}
 				this.Exceptions = _exceptions;
 			}
-
-			this.UnityTileInstance = UnityTileInstance;
 			this.TileType = TileType;
 		}
 	}

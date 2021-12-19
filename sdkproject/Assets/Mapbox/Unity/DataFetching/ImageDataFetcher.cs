@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Mapbox.Map;
 using Mapbox.Platform;
 using Mapbox.Platform.Cache;
@@ -10,42 +11,57 @@ namespace Mapbox.Unity.DataFetching
 {
 	public class ImageDataFetcher : DataFetcher
 	{
-		public Action<UnityTile, RasterTile> TextureReceived = (t, s) => { };
-		public Action<UnityTile, RasterTile, TileErrorEventArgs> FetchingError = (t, r, s) => { };
+		public Action<RasterTile> TextureReceived = (s) => { };
+		public Action<RasterTile, TileErrorEventArgs> FetchingError = (r, s) => { };
 
-		public virtual void FetchData(RasterTile tile, string tilesetId, CanonicalTileId tileId, UnityTile unityTile = null)
+		public virtual TextureCacheItem FetchDataInstant(CanonicalTileId tileId, string tileset)
+		{
+			var response = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(tileset, tileId);
+			if (response != null)
+			{
+				MapboxAccess.Instance.CacheManager.AddTextureItemToMemory(
+					response.TilesetId,
+					response.Tile.Id,
+					response,
+					true);
+			}
+
+			return response;
+		}
+
+		public virtual void FetchData(RasterTile tile, string tilesetId, CanonicalTileId tileId)
 		{
 			//MemoryCacheCheck
 			//we do not check for tile expiration of memory cached items
 			//we only do expiration check for item from file/sql
-			var textureItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(tilesetId, tile.Id);
-			if (textureItem != null)
-			{
-				tile.Logs.Add("found in memory");
-				tile.SetTextureFromCache(textureItem.Texture2D);
-#if UNITY_EDITOR
-				tile.FromCache = CacheType.MemoryCache;
-#endif
-
-				if (tile.Texture2D == null)
-				{
-					Debug.Log("null texture from memory cache?");
-				}
-
-				//this is mostly to update the caching time
-				MapboxAccess.Instance.CacheManager.AddTextureItemToMemory(
-					textureItem.TilesetId,
-					textureItem.Tile.Id,
-					textureItem,
-					true);
-				TextureReceived(unityTile, tile);
-				return;
-			}
+// 			var textureItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(tilesetId, tile.Id);
+// 			if (textureItem != null)
+// 			{
+// 				tile.Logs.Add("found in memory");
+// 				tile.SetTextureFromCache(textureItem.Texture2D);
+// #if UNITY_EDITOR
+// 				tile.FromCache = CacheType.MemoryCache;
+// #endif
+//
+// 				if (tile.Texture2D == null)
+// 				{
+// 					Debug.Log("null texture from memory cache?");
+// 				}
+//
+// 				//this is mostly to update the caching time
+// 				MapboxAccess.Instance.CacheManager.AddTextureItemToMemory(
+// 					textureItem.TilesetId,
+// 					textureItem.Tile.Id,
+// 					textureItem,
+// 					true);
+// 				TextureReceived(unityTile, tile);
+// 				return;
+// 			}
 
 			void TextureReadCallback(TextureCacheItem textureCacheItem)
 			{
 				tile.Logs.Add("callback TextureReadCallback");
-				if (unityTile != null && !tile.IsInUse())
+				if (!tile.IsInUse())
 				{
 					tile.Logs.Add("dropped due to id mismatch");
 					//rasterTile.Clear();
@@ -77,7 +93,7 @@ namespace Mapbox.Unity.DataFetching
 						Debug.Log("here");
 					}
 
-					TextureReceived(unityTile, tile);
+					TextureReceived(tile);
 
 					//IMPORTANT file is read from file cache and it's not automatically
 					//moved to memory cache. we have to do it here.
@@ -90,7 +106,7 @@ namespace Mapbox.Unity.DataFetching
 					//file is probably deleted so cannot find it anymore.
 					EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, String.Empty) {Callback = () =>
 					{
-						FetchingCallback(tileId, tile, unityTile);
+						FetchingCallback(tileId, tile);
 					}});
 				}
 			}
@@ -98,7 +114,7 @@ namespace Mapbox.Unity.DataFetching
 			void TextureInfoUpdatedCallback(TextureCacheItem textureCacheItem)
 			{
 				tile.Logs.Add("callback TextureInfoUpdatedCallback");
-				if (unityTile != null && !tile.IsInUse())
+				if (!tile.IsInUse())
 				{
 					//rasterTile.Clear();
 					//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
@@ -121,7 +137,7 @@ namespace Mapbox.Unity.DataFetching
 						{
 							Callback = () =>
 							{
-								FetchingCallback(tileId, tile, unityTile);
+								FetchingCallback(tileId, tile);
 							}
 						});
 					}
@@ -131,7 +147,7 @@ namespace Mapbox.Unity.DataFetching
 			void FailureCallback()
 			{
 				tile.Logs.Add("callback FailureCallback");
-				if (unityTile != null && !tile.IsInUse())
+				if (!tile.IsInUse())
 				{
 					//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
 					return;
@@ -139,21 +155,21 @@ namespace Mapbox.Unity.DataFetching
 
 				EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, string.Empty) {Callback = () =>
 				{
-					FetchingCallback(tileId, tile, unityTile);
+					FetchingCallback(tileId, tile);
 				}});
 			}
 
 			void CancelledCallback()
 			{
 				tile.Logs.Add("callback CancelledCallback");
-				FetchingError(unityTile, tile, new TileErrorEventArgs(tileId, tile.GetType(), unityTile, tile.Exceptions));
+				FetchingError(tile, new TileErrorEventArgs(tileId, tile.GetType(), tile.Exceptions));
 			}
 
 			void FileNotFoundCallback()
 			{
 				EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, String.Empty)
 				{
-					Callback = () => { FetchingCallback(tileId, tile, unityTile); }
+					Callback = () => { FetchingCallback(tileId, tile); }
 				});
 			}
 
@@ -177,17 +193,17 @@ namespace Mapbox.Unity.DataFetching
 			{
 				//rasterTile.Clear();
 				//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
-				FetchingError(unityTile, rasterTile, new TileErrorEventArgs(tileId, rasterTile.GetType(), unityTile, rasterTile.Exceptions));
+				FetchingError( rasterTile, new TileErrorEventArgs(tileId, rasterTile.GetType(), rasterTile.Exceptions));
 			}
 
 			if (rasterTile.CurrentTileState == TileState.Canceled)
 			{
-				FetchingError(unityTile, rasterTile, new TileErrorEventArgs(tileId, rasterTile.GetType(), unityTile, rasterTile.Exceptions));
+				FetchingError(rasterTile, new TileErrorEventArgs(tileId, rasterTile.GetType(), rasterTile.Exceptions));
 			}
 			else
 			if (rasterTile.HasError)
 			{
-				FetchingError(unityTile, rasterTile, new TileErrorEventArgs(tileId, rasterTile.GetType(), unityTile, rasterTile.Exceptions));
+				FetchingError(rasterTile, new TileErrorEventArgs(tileId, rasterTile.GetType(), rasterTile.Exceptions));
 			}
 			else
 			{
@@ -252,7 +268,7 @@ namespace Mapbox.Unity.DataFetching
 						newTextureCacheItem,
 						true);
 
-					TextureReceived(unityTile, rasterTile);
+					TextureReceived(rasterTile);
 				}
 			}
 		}

@@ -44,7 +44,7 @@ namespace Mapbox.Unity.DataFetching
 
 			if (rasterTile.HasError)
 			{
-				FetchingError(unityTile, rasterTile, new TileErrorEventArgs(tileId, rasterTile.GetType(), unityTile, rasterTile.Exceptions));
+				FetchingError(rasterTile, new TileErrorEventArgs(tileId, rasterTile.GetType(), rasterTile.Exceptions));
 			}
 			else
 			{
@@ -60,7 +60,7 @@ namespace Mapbox.Unity.DataFetching
 
 				if (rasterTile.StatusCode != 304) //NOT MODIFIED
 				{
-					TextureReceived(unityTile, rasterTile);
+					TextureReceived(rasterTile);
 				}
 			}
 		}

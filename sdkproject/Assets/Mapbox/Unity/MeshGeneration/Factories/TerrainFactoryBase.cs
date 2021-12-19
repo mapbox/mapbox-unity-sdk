@@ -97,19 +97,19 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			TerrainFactoryManager.PregenerateTileMesh(tile);
 		}
 
-		private void OnFetchingError(UnityTile tile, RasterTile rasterTile, TileErrorEventArgs errorEventArgs)
+		private void OnFetchingError(RasterTile rasterTile, TileErrorEventArgs errorEventArgs)
 		{
-			OnDataError(tile, rasterTile, errorEventArgs);
+			OnDataError(rasterTile, errorEventArgs);
 		}
 
-		private void OnDataError(UnityTile tile, RasterTile rawTile, TileErrorEventArgs e)
+		private void OnDataError(RasterTile rawTile, TileErrorEventArgs e)
 		{
-			base.OnErrorOccurred(tile, e);
-			if (tile != null)
-			{
-				_tilesWaitingResponse.Remove(tile);
-				//Strategy.DataErrorOccurred(tile, e);
-			}
+			// base.OnErrorOccurred(tile, e);
+			// if (tile != null)
+			// {
+			// 	_tilesWaitingResponse.Remove(tile);
+			// 	//Strategy.DataErrorOccurred(tile, e);
+			// }
 		}
 
 		protected override void OnPostProcess(UnityTile tile)

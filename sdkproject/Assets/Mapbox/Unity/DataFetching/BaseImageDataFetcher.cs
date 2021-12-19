@@ -23,7 +23,7 @@ namespace Mapbox.Unity.DataFetching
 					textureItem.TileId,
 					textureItem,
 					true);
-				TextureReceived(unityTile, rasterTile);
+				TextureReceived(rasterTile);
 				return;
 			}
 
@@ -36,18 +36,17 @@ namespace Mapbox.Unity.DataFetching
 				if (textureCacheItem != null)
 				{
 					textureCacheItem.Tile = tile;
-					var rasterTile = new RasterTile(tileId, tilesetId, tile.IsTextureNonreadable);
-					rasterTile.SetTextureFromCache(textureCacheItem.Texture2D);
+					tile.SetTextureFromCache(textureCacheItem.Texture2D);
 #if UNITY_EDITOR
-					rasterTile.FromCache = CacheType.FileCache;
-					textureCacheItem.From = rasterTile.FromCache;
+					tile.FromCache = CacheType.FileCache;
+					textureCacheItem.From = tile.FromCache;
 #endif
 					tile.ETag = textureCacheItem.ETag;
 					if (textureCacheItem.ExpirationDate.HasValue)
 					{
 						tile.ExpirationDate = textureCacheItem.ExpirationDate.Value;
 					}
-					TextureReceived(unityTile, rasterTile);
+					TextureReceived(tile);
 					MapboxAccess.Instance.CacheManager.AddTextureItemToMemory(tilesetId, tileId, textureCacheItem, true);
 					MapboxAccess.Instance.CacheManager.MarkFallback(tileId, tilesetId);
 				}
@@ -90,7 +89,7 @@ namespace Mapbox.Unity.DataFetching
 
 			void CancelledCallback()
 			{
-				FetchingError(unityTile, tile, new TileErrorEventArgs(tileId, tile.GetType(), unityTile, tile.Exceptions));
+				FetchingError(tile, new TileErrorEventArgs(tileId, tile.GetType(), tile.Exceptions));
 			}
 
 			void FileNotFoundCallback()
@@ -126,7 +125,7 @@ namespace Mapbox.Unity.DataFetching
 				rasterTile.Texture2D.name += "_fallbackImage";
 			}
 #endif
-			
+
 			MapboxAccess.Instance.CacheManager.MarkFallback(rasterTile.Id, rasterTile.TilesetId);
 		}
 	}

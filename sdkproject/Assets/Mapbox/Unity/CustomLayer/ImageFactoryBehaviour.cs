@@ -42,7 +42,7 @@ namespace Mapbox.Unity.CustomLayer
 			};
 
 			ImageFactoryManager = new CustomImageFactoryManager(UrlFormat, imageSettings, DownloadFallbackImagery, TextureFieldName, TextureScaleOffsetFieldName);
-			ImageFactoryManager.FetchingError += (tile, rasterTile, args) =>
+			ImageFactoryManager.FetchingError += (rasterTile, args) =>
 			{
 				//Debug.Log(args.Exceptions[0]);
 			};
