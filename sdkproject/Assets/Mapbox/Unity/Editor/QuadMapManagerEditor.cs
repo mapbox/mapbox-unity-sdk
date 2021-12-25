@@ -167,8 +167,8 @@ namespace Mapbox.Editor
 
 		void DrawMapOptions(SerializedObject mapObject)
 		{
-			EditorGUILayout.PropertyField(mapObject.FindProperty("QuadCameraSettings"));
-			EditorGUILayout.PropertyField(mapObject.FindProperty("QuadTreeCameraController"));
+			EditorGUILayout.PropertyField(mapObject.FindProperty("QuadTreeGenerator"));
+			EditorGUILayout.PropertyField(mapObject.FindProperty("CameraController"));
 			EditorGUILayout.PropertyField(mapObject.FindProperty("WorldScale"));
 
 			var property = mapObject.FindProperty("_options");

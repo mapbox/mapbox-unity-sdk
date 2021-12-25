@@ -31,6 +31,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				Strategy,
 				true);
 			TerrainFactoryManager.FetchingError += OnFetchingError;
+			//TerrainFactoryManager.ElevationUpdated += TileElevationUpdated;
 		}
 
 		public string TilesetId
@@ -161,5 +162,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 					break;
 			}
 		}
+
+
+		public Action<UnityTile> TileElevationUpdated = (s) => { };
 	}
 }

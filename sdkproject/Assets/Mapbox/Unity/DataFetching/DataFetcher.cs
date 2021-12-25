@@ -39,7 +39,6 @@ namespace Mapbox.Unity.DataFetching
 
 	public class FetchInfo
 	{
-		public CanonicalTileId TileId;
 		public string TilesetId;
 		public Action Callback;
 		public Tile RasterTile;
@@ -48,7 +47,6 @@ namespace Mapbox.Unity.DataFetching
 
 		public FetchInfo(CanonicalTileId tileId, string tilesetId, Tile tile, string eTag = "", Action callback = null)
 		{
-			TileId = tileId;
 			TilesetId = tilesetId;
 			RasterTile = tile;
 			ETag = eTag;

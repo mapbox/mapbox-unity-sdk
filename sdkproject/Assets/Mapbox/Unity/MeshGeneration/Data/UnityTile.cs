@@ -1,3 +1,5 @@
+using System.Collections;
+using JetBrains.Annotations;
 using Mapbox.Unity.DataContainers;
 using Mapbox.Unity.QuadTree;
 using UnityEditor;
@@ -21,32 +23,33 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public TileTerrainType ElevationType;
 
+		public RasterTile _parentRasterTile;
 		private RasterTile _rasterTile;
 		public RasterTile BaseRasterData => _rasterTile;
 
-		private RasterTile _terrainTile;
-		public RasterTile TerrainData => _terrainTile;
+		public RasterTile _parentTerrainTile;
+		private RawPngRasterTile _terrainTile;
+		public RawPngRasterTile TerrainData => _terrainTile;
 		private bool _terrainReady = false;
 		public bool IsTerrainReady => _terrainReady;
-		public float[] HeightData;
+		public float[] HeightData => _terrainTile?.HeightData;
+		protected Vector4 _terrainTextureScaleOffset;
 
 		private VectorTile _vectorTile;
 		public VectorTile VectorData => _vectorTile;
 
 		private Action<UnityTile, Action> _createMeshCallback;
-		private bool _isElevationActive;
 
-		private int _heightDataResolution = 100;
+		//private int _heightDataResolution = 100;
 		//keeping track of tile objects to be able to cancel them safely if tile is destroyed before data fetching finishes
 		public HashSet<Tile> Tiles = new HashSet<Tile>();
 		private HashSet<Tile> _finishConditionTiles = new HashSet<Tile>();
 		public bool IsRecycled = false;
-		public bool BackgroundImageInUse = false;
-		public UnwrappedTileId BackgroundImageTile;
 		public bool IsStopped = false;
 
 		#region CachedUnityComponents
-		MeshRenderer _meshRenderer;
+		private Material _material => _meshRenderer.material;
+		private MeshRenderer _meshRenderer;
 		public MeshRenderer MeshRenderer
 		{
 			get
@@ -62,6 +65,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				return _meshRenderer;
 			}
 		}
+
 
 		private MeshFilter _meshFilter;
 		public MeshFilter MeshFilter
@@ -92,7 +96,10 @@ namespace Mapbox.Unity.MeshGeneration.Data
 					_collider = gameObject.GetComponent<MeshCollider>();
 					if (_collider == null)
 					{
-						_collider = gameObject.AddComponent<MeshCollider>();
+						var meshCollider = gameObject.AddComponent<MeshCollider>();
+						meshCollider.cookingOptions = MeshColliderCookingOptions.None;
+						_collider = meshCollider;
+
 					}
 				}
 				return _collider;
@@ -119,22 +126,64 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		public CanonicalTileId CanonicalTileId { get; private set; }
 
 		private float _relativeScale;
+
+		private string _elevationMultiplierFieldNameID = "_ElevationMultiplier";
+		private string _shaderElevationTextureFieldNameID = "_HeightTexture";
+		private string _textureChangeTimerFieldNameID = "_ElevationChangeTime";
+		private string _previousMainTextureFieldNameID = "_PreviousMainTexture";
+		private string _mainTextureChangeTimeFieldNameID = "_MainTextureChangeTime";
+		private string _mainTexFieldNameID = "_MainTex";
+		private string _mainTexStFieldNameID = "_MainTex_ST";
+		private string _previousMainTextureScaleOffsetFieldNameID = "_PreviousMainTextureScaleOffset";
+		private string _tileScaleFieldNameID = "_TileScale";
+		private string _previousShaderElevationTextureFieldNameID = "_PreviousHeightTexture";
+		private string _previousShaderElevationTextureScaleOffsetFieldNameID = "_PreviousHeightTexture_ST";
+		private string _shaderElevationTextureScaleOffsetFieldNameID = "_HeightTexture_ST";
+
+		// private static int _previousMainTextureFieldNameID = 0;
+		// private static int _mainTextureChangeTimeFieldNameID = 0;
+		// private static int _mainTexFieldNameID = 0;
+		// private static int _mainTexStFieldNameID = 0;
+		// private static int _previousMainTextureScaleOffsetFieldNameID = 0;
+		// private static int _tileScaleFieldNameID;
+		// private static int _previousShaderElevationTextureFieldNameID;
+		// private static int _previousShaderElevationTextureScaleOffsetFieldNameID;
+		// private static int _shaderElevationTextureScaleOffsetFieldNameID;
+		// private static int _elevationMultiplierFieldNameID = 0;
+		// private static int _shaderElevationTextureFieldNameID;
+		// private static int _textureChangeTimerFieldNameID;
+
 		#endregion
 
 		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, float scale, bool isElevationActive)
 		{
+			// {
+			// 	if (_previousMainTextureFieldNameID == 0)
+			// 	{
+			// 		_previousMainTextureFieldNameID = Shader.PropertyToID(_previousMainTextureFieldName);
+			// 		_mainTextureChangeTimeFieldNameID = Shader.PropertyToID(_mainTextureChangeTimeFieldName);
+			// 		_mainTexFieldNameID = Shader.PropertyToID(_mainTexFieldName);
+			// 		_mainTexStFieldNameID = Shader.PropertyToID(_mainTexStFieldName);
+			// 		_previousMainTextureScaleOffsetFieldNameID = Shader.PropertyToID(_previousMainTextureScaleOffsetFieldName);
+			// 		_tileScaleFieldNameID = Shader.PropertyToID(_tileScaleFieldName);
+			// 		_previousShaderElevationTextureFieldNameID = Shader.PropertyToID(_previousShaderElevationTextureFieldName);
+			// 		_previousShaderElevationTextureScaleOffsetFieldNameID = Shader.PropertyToID(_previousShaderElevationTextureScaleOffsetFieldName);
+			// 		_elevationMultiplierFieldNameID = Shader.PropertyToID(_elevationMultiplierFieldName);
+			// 		_shaderElevationTextureFieldNameID = Shader.PropertyToID(_shaderElevationTextureFieldName);
+			// 		_textureChangeTimerFieldNameID = Shader.PropertyToID(_textureChangeTimerFieldName);
+			// 	}
+			// }
+
 			IsStopped = false;
 			gameObject.hideFlags = HideFlags.DontSave;
 			TileSize = map.UnityTileSize;
-			_isElevationActive = isElevationActive;
 			ElevationType = TileTerrainType.None;
 			TileScale = scale;
 			_relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
 			Rect = Conversions.TileBounds(tileId);
 			UnwrappedTileId = tileId;
 			CanonicalTileId = tileId.Canonical;
-			BackgroundImageTile = UnwrappedTileId;
-			
+
 			float scaleFactor = 1.0f;
 			CurrentZoom = map.AbsoluteZoom;
 			scaleFactor = Mathf.Pow(2, (map.InitialZoom - CurrentZoom));
@@ -150,18 +199,18 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		internal void Recycle()
 		{
-			if (MeshRenderer != null && MeshRenderer.sharedMaterial != null)
-			{
-				MeshRenderer.sharedMaterial.mainTexture = null;
-			}
+			// MeshRenderer.GetPropertyBlock(_propertyBlock);
+			// if (!_propertyBlock.isEmpty)
+			// {
+			// 	_propertyBlock.SetTexture("_MainTex", null);
+			// 	MeshRenderer.SetPropertyBlock(_propertyBlock);
+			// }
 
 			_terrainReady = false;
 			_createMeshCallback = null;
 			IsStopped = false;
 			gameObject.SetActive(false);
 			IsRecycled = true;
-			BackgroundImageTile = UnwrappedTileId;
-			BackgroundImageInUse = false;
 
 			Cancel();
 
@@ -175,14 +224,60 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				tile.Clear();
 			}
 			Tiles.Clear();
+
+			if (_parentRasterTile != null)
+			{
+				_parentRasterTile.RemoveUser(CanonicalTileId);
+				_parentRasterTile = null;
+			}
+
+			if (_parentTerrainTile != null)
+			{
+				_parentTerrainTile.RemoveUser(CanonicalTileId);
+				_parentTerrainTile = null;
+			}
 		}
 
 		public void SetHeightData(RasterTile terrainTile, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false, Action<UnityTile> callback = null)
 		{
+			if (terrainTile == null)
+				return;
+
+			_terrainTile = (RawPngRasterTile) terrainTile;
+			_terrainTextureScaleOffset = CalculateScaleOffset(terrainTile.Id.Z);
+
+			if (_material != null)
+			{
+				if (_material.GetTexture(_previousShaderElevationTextureFieldNameID) == null)
+				{
+					Debug.Log("fixed missing elevation texture for " + CanonicalTileId);
+					_material.SetTexture(_previousShaderElevationTextureFieldNameID, terrainTile.Texture2D);
+					_material.SetVector(_previousShaderElevationTextureScaleOffsetFieldNameID, _terrainTextureScaleOffset);
+				}
+
+				_material.SetTexture(_shaderElevationTextureFieldNameID, terrainTile.Texture2D);
+				_material.SetFloat(_textureChangeTimerFieldNameID, Time.time);
+				_material.SetVector(_shaderElevationTextureScaleOffsetFieldNameID, _terrainTextureScaleOffset);
+				_material.SetFloat(_tileScaleFieldNameID, TileScale);
+				_material.SetFloat(_elevationMultiplierFieldNameID, heightMultiplier);
+			}
+
+			if (_parentTerrainTile != null)
+			{
+				Runnable.Run(DelayedAction(() =>
+				{
+					if (_parentTerrainTile != null)
+					{
+						_parentTerrainTile.RemoveUser(CanonicalTileId);
+						//_parentTerrainTile = null;
+					}
+				}, 2));
+			}
+
 			//reset height data
 			if (terrainTile == null || terrainTile.Texture2D == null)
 			{
-				HeightData = new float[_heightDataResolution * _heightDataResolution];
+				//HeightData = new float[_heightDataResolution * _heightDataResolution];
 				if (_createMeshCallback != null && _vectorTile != null)
 				{
 					CallCreateMeshCallback();
@@ -190,123 +285,117 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				return;
 			}
 
-			if (HeightData == null)
-			{
-				HeightData = new float[_heightDataResolution * _heightDataResolution];
-			}
-
-			_terrainTile = terrainTile;
-
-			var tileId = terrainTile.Id;
-
-			if (SystemInfo.supportsAsyncGPUReadback)
-			{
-				AsyncGpuReadbackForElevation(terrainTile, heightMultiplier, useRelative, callback, tileId);
-			}
-			else
-			{
-				SyncReadForElevation(terrainTile, heightMultiplier, useRelative, callback);
-			}
+			//var tileId = terrainTile.Id;
+			// if (SystemInfo.supportsAsyncGPUReadback)
+			// {
+			// 	AsyncGpuReadbackForElevation(terrainTile, scaleOffset, heightMultiplier, useRelative, callback, tileId);
+			// }
+			// else
+			// {
+			// 	SyncReadForElevation(terrainTile, scaleOffset, heightMultiplier, useRelative, callback);
+			// }
 		}
 
-		private void SyncReadForElevation(RasterTile terrainTile, float heightMultiplier, bool useRelative, Action<UnityTile> callback)
-		{
-			_terrainTile = terrainTile;
-			byte[] rgbData = _terrainTile.Texture2D.GetRawTextureData();
-			//var rgbData = _heightTexture.GetRawTextureData<Color32>();
-			var relativeScale = useRelative ? _relativeScale : 1f;
-			var width = _terrainTile.Texture2D.width;
-			for (float yy = 0; yy < _heightDataResolution; yy++)
-			{
-				for (float xx = 0; xx < _heightDataResolution; xx++)
-				{
-					var index = (((int) ((yy / _heightDataResolution) * width) * width) + (int) ((xx / _heightDataResolution) * width));
-
-					float r = rgbData[index * 4 + 1];
-					float g = rgbData[index * 4 + 2];
-					float b = rgbData[index * 4 + 3];
-					//var color = rgbData[index];
-					// float r = color.g;
-					// float g = color.b;
-					// float b = color.a;
-					//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
-					HeightData[(int) (yy * _heightDataResolution + xx)] = relativeScale * heightMultiplier * (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
-					//678 ==> 012345678
-					//345
-					//012
-				}
-			}
-			_terrainReady = true;
-			if (callback != null)
-			{
-				callback(this);
-			}
-
-			CheckFinishedCondition(_terrainTile);
-			if (_createMeshCallback != null && _vectorTile?.CurrentTileState == TileState.Loaded)
-			{
-				CallCreateMeshCallback();
-			}
-		}
-
-		private void AsyncGpuReadbackForElevation(RasterTile terrainTile, float heightMultiplier, bool useRelative, Action<UnityTile> callback, CanonicalTileId tileId)
-		{
-			_terrainTile = terrainTile;
-			AsyncGPUReadback.Request(_terrainTile.Texture2D, 0, (t) =>
-			{
-				if (CanonicalTileId != tileId || IsRecycled)
-				{
-					return;
-				}
-
-				var width = t.width;
-				var data = t.GetData<Color32>().ToArray();
-
-				if (HeightData == null || HeightData.Length != _heightDataResolution * _heightDataResolution)
-				{
-					HeightData = new float[_heightDataResolution * _heightDataResolution];
-				}
-
-				var relativeScale = useRelative ? _relativeScale : 1f;
-				//tt = new Texture2D(_heightDataResolution, _heightDataResolution, TextureFormat.RGBA32, false);
-				for (float yy = 0; yy < _heightDataResolution; yy++)
-				{
-					for (float xx = 0; xx < _heightDataResolution; xx++)
-					{
-						var xx2 = (xx / _heightDataResolution) * width;
-						var yy2 = (yy / _heightDataResolution) * width;
-						var index = (((int) yy2 * width) + (int) xx2);
-						//var color = _heightTexture.GetPixel((int)xx2, (int)yy2);
-						//var index = (int)(((float)xx / _heightDataResolution) * 255 * 256 + (((float)yy / _heightDataResolution) * 255));
-
-						float r = data[(int) index].g;
-						float g = data[(int) index].b;
-						float b = data[(int) index].a;
-						//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
-						HeightData[(int) (yy * _heightDataResolution + xx)] = relativeScale * heightMultiplier * (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
-						//678 ==> 012345678
-						//345
-						//012
-
-						//tt.SetPixel((int) xx, (int) yy, new Color(r/256, g/256, b/256));
-						//tt.SetPixel((int) xx, (int) yy, color); //new Color(rgbData[index * 4 + 1] / 256f, rgbData[index * 4 + 2] / 256f, rgbData[index * 4 + 3] / 256f, 1));
-					}
-				}
-
-				_terrainReady = true;
-				//tt.Apply();
-				if (callback != null)
-				{
-					callback(this);
-				}
-
-				CheckFinishedCondition(_terrainTile);
-				if (_createMeshCallback != null && _vectorTile?.CurrentTileState == TileState.Loaded)
-				{
-					CallCreateMeshCallback();
-				}
-			});
-		}
+		// private void SyncReadForElevation(RasterTile terrainTile, Vector4 scaleOffset, float heightMultiplier, bool useRelative, Action<UnityTile> callback)
+		// {
+		// 	_terrainTile = terrainTile;
+		// 	byte[] rgbData = _terrainTile.Texture2D.GetRawTextureData();
+		// 	//var rgbData = _heightTexture.GetRawTextureData<Color32>();
+		// 	var relativeScale = useRelative ? _relativeScale : 1f;
+		// 	var width = _terrainTile.Texture2D.width;
+		// 	var padding = _heightDataResolution * new Vector2(scaleOffset.z, scaleOffset.w);
+		// 	for (float yy = 0; yy < _heightDataResolution * scaleOffset.y; yy++)
+		// 	{
+		// 		for (float xx = 0; xx < _heightDataResolution * scaleOffset.x; xx++)
+		// 		{
+		// 			var index = (((int) (((padding.y + yy) / _heightDataResolution) * width) * width) + (int) (((padding.x + xx) / _heightDataResolution) * width));
+		//
+		// 			float r = rgbData[index * 4 + 1];
+		// 			float g = rgbData[index * 4 + 2];
+		// 			float b = rgbData[index * 4 + 3];
+		// 			//var color = rgbData[index];
+		// 			// float r = color.g;
+		// 			// float g = color.b;
+		// 			// float b = color.a;
+		// 			//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
+		// 			HeightData[(int) (yy * _heightDataResolution + xx)] = relativeScale * heightMultiplier * (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
+		// 			//678 ==> 012345678
+		// 			//345
+		// 			//012
+		// 		}
+		// 	}
+		// 	_terrainReady = true;
+		// 	if (callback != null)
+		// 	{
+		// 		callback(this);
+		// 	}
+		//
+		// 	CheckFinishedCondition(_terrainTile);
+		// 	if (_createMeshCallback != null && _vectorTile?.CurrentTileState == TileState.Loaded)
+		// 	{
+		// 		CallCreateMeshCallback();
+		// 	}
+		// }
+		//
+		// private void AsyncGpuReadbackForElevation(RasterTile terrainTile, Vector4 scaleoffset, float heightMultiplier, bool useRelative, Action<UnityTile> callback, CanonicalTileId tileId)
+		// {
+		// 	_terrainTile = terrainTile;
+		// 	AsyncGPUReadback.Request(_terrainTile.Texture2D, 0, (t) =>
+		// 	{
+		// 		if (IsRecycled)
+		// 		{
+		// 			return;
+		// 		}
+		//
+		// 		var width = t.width;
+		// 		var data = t.GetData<Color32>().ToArray();
+		//
+		// 		if (HeightData == null || HeightData.Length != _heightDataResolution * _heightDataResolution)
+		// 		{
+		// 			HeightData = new float[_heightDataResolution * _heightDataResolution];
+		// 		}
+		//
+		// 		var relativeScale = useRelative ? _relativeScale : 1f;
+		// 		var padding = width * new Vector2(scaleoffset.z, scaleoffset.w);
+		// 		//tt = new Texture2D(_heightDataResolution, _heightDataResolution, TextureFormat.RGBA32, false);
+		// 		for (float yy = 0; yy < _heightDataResolution; yy++)
+		// 		{
+		// 			for (float xx = 0; xx < _heightDataResolution; xx++)
+		// 			{
+		// 				var xx2 = padding.x + (xx / _heightDataResolution) * (width * scaleoffset.x);
+		// 				var yy2 = padding.y + (yy / _heightDataResolution) * (width * scaleoffset.y);
+		// 				var index = (int) (((int) yy2 * width) + (int) xx2);
+		// 				//var color = _heightTexture.GetPixel((int)xx2, (int)yy2);
+		// 				//var index = (int)(((float)xx / _heightDataResolution) * 255 * 256 + (((float)yy / _heightDataResolution) * 255));
+		//
+		// 				float r = data[index].g;
+		// 				float g = data[index].b;
+		// 				float b = data[index].a;
+		// 				//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
+		// 				HeightData[(int) (yy * _heightDataResolution + xx)] = relativeScale * heightMultiplier * (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
+		// 				//678 ==> 012345678
+		// 				//345
+		// 				//012
+		//
+		// 				//tt.SetPixel((int) xx, (int) yy, new Color(r/256, g/256, b/256));
+		// 				//tt.SetPixel((int) xx, (int) yy, color); //new Color(rgbData[index * 4 + 1] / 256f, rgbData[index * 4 + 2] / 256f, rgbData[index * 4 + 3] / 256f, 1));
+		// 			}
+		// 		}
+		//
+		// 		_terrainReady = true;
+		// 		//tt.Apply();
+		// 		if (callback != null)
+		// 		{
+		// 			callback(this);
+		// 		}
+		//
+		// 		CheckFinishedCondition(_terrainTile);
+		// 		if (_createMeshCallback != null && _vectorTile?.CurrentTileState == TileState.Loaded)
+		// 		{
+		// 			CallCreateMeshCallback();
+		// 		}
+		// 	});
+		// }
 
 		public void SetRasterData(RasterTile rasterTile, bool useMipMap = false, bool useCompression = false)
 		{
@@ -314,7 +403,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 			if (_rasterTile == null || (_rasterTile.Texture2D == null && _rasterTile.Data == null))
 			{
-				MeshRenderer.material.mainTexture = null;
+				//MeshRenderer.material.mainTexture = null;
 				return;
 			}
 
@@ -334,10 +423,31 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				}
 			}
 
-			MeshRenderer.sharedMaterial.mainTexture = rasterTile.Texture2D;
-			MeshRenderer.sharedMaterial.mainTextureScale = Unity.Constants.Math.Vector3One;
-			MeshRenderer.sharedMaterial.mainTextureOffset = Unity.Constants.Math.Vector3Zero;
-			BackgroundImageInUse = false;
+			//MeshRenderer.GetPropertyBlock(_propertyBlock);
+			if (_material.GetTexture(_previousMainTextureFieldNameID) == null)
+			{
+				Debug.Log("fixed missing main texture for " + CanonicalTileId);
+				_material.SetTexture(_previousMainTextureFieldNameID, rasterTile.Texture2D);
+				_material.SetVector(_previousMainTextureScaleOffsetFieldNameID, new Vector4(1, 1, 0, 0));
+			}
+
+			if (_parentRasterTile != null)
+			{
+				Runnable.Run(DelayedAction(() =>
+				{
+					if (_parentRasterTile != null)
+					{
+						_parentRasterTile.AddLog("removed from parent ", CanonicalTileId);
+						_parentRasterTile.RemoveUser(CanonicalTileId);
+						//_parentRasterTile = null;
+					}
+				}, 2));
+			}
+
+			_material.SetFloat(_mainTextureChangeTimeFieldNameID, Time.time);
+			_material.SetTexture(_mainTexFieldNameID, rasterTile.Texture2D);
+			_material.SetVector(_mainTexStFieldNameID, new Vector4(1, 1, 0, 0));
+			//MeshRenderer.SetPropertyBlock(_propertyBlock);
 
 			CheckFinishedCondition(_rasterTile);
 		}
@@ -411,8 +521,21 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		{
 			if (HeightData != null && HeightData.Length > 0)
 			{
-				return HeightData[(int) (Mathf.Clamp01(y) * (_heightDataResolution - 1)) * _heightDataResolution + (int) (Mathf.Clamp01(x) * (_heightDataResolution - 1))] * _tileScale;
+				var width = _terrainTile.ExtractedDataResolution;
+				var sectionWidth = width * _terrainTextureScaleOffset.x;
+				var padding = _terrainTile.ExtractedDataResolution * new Vector2(_terrainTextureScaleOffset.z, _terrainTextureScaleOffset.w);
+				var xx = padding.x + (x * sectionWidth);
+				var yy = padding.y + (y * sectionWidth);
+
+				return HeightData[(int) yy * _terrainTile.ExtractedDataResolution
+				                         + (int) xx] * _tileScale;
 			}
+
+			// if (HeightData != null && HeightData.Length > 0)
+			// {
+			// 	return HeightData[(int) (Mathf.Clamp01(y) * (_terrainTile.ExtractedDataResolution - 1)) * _terrainTile.ExtractedDataResolution
+			// 	                  + (int) (Mathf.Clamp01(x) * (_terrainTile.ExtractedDataResolution - 1))] * _tileScale;
+			// }
 			return 0;
 		}
 
@@ -426,11 +549,16 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		/// <returns></returns>
 		public float QueryHeightDataNonclamped(float x, float y)
 		{
-			if (HeightData != null)
+			if (HeightData != null && HeightData.Length > 0)
 			{
-				return HeightData[(int)(y * 255) * 256 + (int)(x * 255)] * _tileScale;
-			}
+				var width = _terrainTile.ExtractedDataResolution;
+				var padding = _terrainTile.ExtractedDataResolution * new Vector2(_terrainTextureScaleOffset.z, _terrainTextureScaleOffset.w);
+				var xx = padding.x + (x / width) * (width * _terrainTextureScaleOffset.x);
+				var yy = padding.y + (y / width) * (width * _terrainTextureScaleOffset.y);
 
+				return HeightData[(int) (y * (_terrainTile.ExtractedDataResolution - 1)
+				                  + (int) (x * (_terrainTile.ExtractedDataResolution - 1)))] * _tileScale;
+			}
 			return 0;
 		}
 
@@ -461,7 +589,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				// DestroyImmediate(_heightTexture, true);
 				// DestroyImmediate(_rasterData, true);
 				DestroyImmediate(_meshFilter.sharedMesh);
-				DestroyImmediate(_meshRenderer.sharedMaterial);
 			}
 		}
 
@@ -479,29 +606,56 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			Cancel();
 		}
 
-		public void SetParentTexture(UnwrappedTileId parent, Texture2D parentTexture, string textureName = "", string textureScaleOffsetName = "")
+		public void SetParentTexture(UnwrappedTileId parent, RasterTile parentTile, int textureNameID = 0, int textureScaleOffsetNameID = 0)
 		{
-			if (string.IsNullOrEmpty(textureName))
+			_parentRasterTile = parentTile;
+			_parentRasterTile.AddUser(CanonicalTileId);
+			_parentRasterTile.AddLog("using as main texture parent ", CanonicalTileId);
+
+			if (textureNameID == 0)
 			{
-				MeshRenderer.sharedMaterial.mainTexture = parentTexture;
+				_material.SetTexture(_mainTexFieldNameID, _parentRasterTile.Texture2D);
+				_material.SetTexture(_previousMainTextureFieldNameID, _parentRasterTile.Texture2D);
 			}
 			else
 			{
-				MeshRenderer.sharedMaterial.SetTexture(textureName, parentTexture);
+				_material.SetTexture(textureNameID, _parentRasterTile.Texture2D);
 			}
 
-			BackgroundImageTile = parent;
+			var scaleOffset = CalculateScaleOffset(parent.Z);
+
+			_material.SetVector(_previousMainTextureScaleOffsetFieldNameID, scaleOffset);
+			_material.SetVector(_mainTexStFieldNameID, scaleOffset);
+		}
+
+		public void SetParentElevationTexture(UnwrappedTileId parent, RawPngRasterTile parentTile, bool isUsingShaderSolution)
+		{
+			_parentTerrainTile = parentTile;
+			_parentTerrainTile.AddUser(CanonicalTileId);
+			_parentTerrainTile.AddLog("using as elevation parent ", CanonicalTileId);
+
+			_material.SetTexture(_shaderElevationTextureFieldNameID, _parentTerrainTile.Texture2D);
+
+			var scaleOffset = CalculateScaleOffset(parent.Z);
+
+			_material.SetTexture(_previousShaderElevationTextureFieldNameID, _parentTerrainTile.Texture2D);
+			_material.SetVector(_previousShaderElevationTextureScaleOffsetFieldNameID, scaleOffset);
+			_material.SetFloat(_tileScaleFieldNameID, TileScale);
+			_material.SetVector(_shaderElevationTextureScaleOffsetFieldNameID, scaleOffset);
+		}
+
+		private Vector4 CalculateScaleOffset(int zoomDiff)
+		{
 			var tileZoom = this.UnwrappedTileId.Z;
-			var parentZoom = parent.Z;
 
 			var scale = 1f;
 			var offsetX = 0f;
 			var offsetY = 0f;
 
-			var current = this.UnwrappedTileId;
+			var current = UnwrappedTileId;
 			var currentParent = current.Parent;
 
-			for (int i = tileZoom - 1; i >= parentZoom; i--)
+			for (int i = tileZoom - 1; i >= zoomDiff; i--)
 			{
 				scale /= 2;
 
@@ -511,7 +665,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				//top left
 				if (current.X == bottomLeftChildX && current.Y == bottomLeftChildY)
 				{
-					offsetY = 0.5f + (offsetY/2);
+					offsetY = 0.5f + (offsetY / 2);
 					offsetX = offsetX / 2;
 				}
 				//top right
@@ -537,17 +691,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				currentParent = currentParent.Parent;
 			}
 
-			if (string.IsNullOrEmpty(textureName))
-			{
-				MeshRenderer.sharedMaterial.mainTextureScale = new Vector2(scale, scale);
-				MeshRenderer.sharedMaterial.mainTextureOffset = new Vector2(offsetX, offsetY);
-			}
-			else
-			{
-				MeshRenderer.sharedMaterial.SetVector(textureScaleOffsetName, new Vector4(scale, scale, offsetX, offsetY));
-			}
-
-			BackgroundImageInUse = (parentTexture != null);
+			return new Vector4(scale, scale, offsetX, offsetY);
 		}
 
 		private void CheckFinishedCondition(Tile tile)
@@ -581,7 +725,18 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void SetRenderDepth(int depth)
 		{
-			_meshRenderer.material.renderQueue = 2000 - (10 * depth);
+			//_meshRenderer.material.renderQueue = 2000 - (10 * depth);
+		}
+
+		private IEnumerator DelayedAction(Action act, int timer)
+		{
+			yield return new WaitForSeconds(timer);
+			act();
+		}
+
+		public void ElevationDataParsingCompleted(RasterTile dataTile)
+		{
+
 		}
 	}
 }

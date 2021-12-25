@@ -5,15 +5,17 @@ using Mapbox.Map;
 using Mapbox.Unity;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
+using Mapbox.Unity.Utilities;
 using Unity.Collections;
+using UnityEditor;
 using UnityEngine;
 
 namespace Mapbox.Unity.QuadTree
 {
     public class QuadTreeMap : MapCore
     {
-        public QuadTreeCameraController QuadTreeCameraController;
-        public QuadTreeGenerator QuadCameraSettings;
+        public QuadTreeCameraController CameraController;
+        public QuadTreeGenerator QuadTreeGenerator;
         public AbstractMapVisualizer MapVisualizer => _mapVisualizer;
         public float WorldScale = 1000f;
 
@@ -26,15 +28,15 @@ namespace Mapbox.Unity.QuadTree
         {
             base.Start();
             _camera = Camera.main;
-            QuadTreeCameraController.Initialize(WorldScale, _camera, this);
-            QuadCameraSettings.Initialize(WorldScale, _camera, this);
+            CameraController.Initialize(WorldScale, _camera, this);
+            QuadTreeGenerator.Initialize(WorldScale, _camera, this);
 
             // _mapVisualizer.OnTileFinished -= OnMapVisualizerOnOnTileFinished;
             // _mapVisualizer.OnTileDisposing -= OnMapVisualizerOnOnTileDisposing;
             // _mapVisualizer.OnTileFinished += OnMapVisualizerOnOnTileFinished;
             // _mapVisualizer.OnTileDisposing += OnMapVisualizerOnOnTileDisposing;
 
-            RedrawMap();
+            _isDirty = true;
         }
 
         private void OnMapVisualizerOnOnTileDisposing(UnityTile t)
@@ -110,29 +112,10 @@ namespace Mapbox.Unity.QuadTree
             if (!Application.isPlaying)
                 return;
 
-            var viewChanged = QuadTreeCameraController.UpdateCamera();
+            var viewChanged = CameraController.UpdateCamera();
             if (viewChanged || _isDirty)
             {
                 RedrawMap();
-            }
-
-            if (_currentView != null)
-            {
-                foreach (var viewTile in _currentView.Tiles)
-                {
-                    foreach (var edge in viewTile.Value.Edges())
-                    {
-                        Debug.DrawLine(edge.Item1, edge.Item2);
-                    }
-                }
-
-                if (_currentView.CenterRect != null)
-                {
-                    foreach (var edge in _currentView.CenterRect.Edges())
-                    {
-                        Debug.DrawLine(edge.Item1, edge.Item2, Color.red);
-                    }
-                }
             }
 
             // var elevationUnity = 0f;
@@ -154,9 +137,27 @@ namespace Mapbox.Unity.QuadTree
 
         public void RedrawMap()
         {
-            _currentView = QuadCameraSettings.UpdateQuadTree();
+            var elevationAtCenter = GetElevationAtCenter(WorldScale) * MapVisualizer.TerrainLayer.ExaggerationFactor;
+            Debug.DrawLine(new Vector3(0, elevationAtCenter, 0), new Vector3(0, 100, 0), Color.red);
+            _currentView = QuadTreeGenerator.UpdateQuadTree(elevationAtCenter);
             RequestTiles(_currentView);
             UpdateTilePositions(_currentView);
+        }
+
+        private float GetElevationAtCenter(float worldScale)
+        {
+            var meters = Conversions.LatLonToMeters(_centerLatitudeLongitude.x, _centerLatitudeLongitude.y);
+            UnityTile tile = null;
+            bool foundTile = MapVisualizer.ActiveTiles.TryGetValue(Conversions.LatitudeLongitudeToTileId(_centerLatitudeLongitude.x, _centerLatitudeLongitude.y, (int)Zoom), out tile);
+            if (foundTile)
+            {
+                var rect = tile.Rect;
+                return tile.QueryHeightData((float) ((meters - rect.TopLeft).x / rect.Size.x), (float) ((meters.y - rect.BottomRight.y) / rect.Size.y)) * tile.transform.localScale.x;
+            }
+            else
+            {
+                return 0f;
+            }
         }
 
         private void UpdateTilePositions(QuadTreeView view)
@@ -168,6 +169,8 @@ namespace Mapbox.Unity.QuadTree
                 {
                     var rect = view.Tiles[tile.UnwrappedTileId];
                     tile.transform.localPosition = rect.Center;
+
+                    tile.MeshRenderer.bounds.SetMinMax(rect.UnityBounds.min, rect.UnityBounds.max);
                 }
             }
 
@@ -248,6 +251,7 @@ namespace Mapbox.Unity.QuadTree
             //     _mapVisualizer.DisposeTile(id);
             // }
 
+
             var disposeList = new List<UnwrappedTileId>();
             foreach (var tilePair in _mapVisualizer.ActiveTiles)
             {
@@ -280,9 +284,31 @@ namespace Mapbox.Unity.QuadTree
                         tile.transform.position = rect.Value.Center;
                         tile.transform.SetParent(transform);
                         tile.transform.localScale = Vector3.one * rect.Value.UnityBounds.size.x / 100;
-                        tile.MeshRenderer.sharedMaterial.SetFloat("_ObjectScale", rect.Value.UnityBounds.size.x / 100);
+                        //tile.MeshRenderer.sharedMaterial.SetFloat("_ObjectScale", rect.Value.UnityBounds.size.x / 100);
                         //tile.gameObject.SetActive(true);
                     }
+                }
+            }
+        }
+
+        void OnDrawGizmos()
+        {
+            if (_currentView != null)
+            {
+                foreach (var tile in _currentView.Tiles.Values)
+                {
+                    Gizmos.color = Color.green;
+                    Gizmos.DrawWireCube(tile.Center, tile.UnityBounds.size);
+
+                }
+            }
+
+            if (MapVisualizer != null && MapVisualizer.ActiveTiles != null)
+            {
+                foreach (var tile in MapVisualizer.ActiveTiles.Values)
+                {
+                    Gizmos.color = Color.blue;
+                    Gizmos.DrawWireCube(tile.transform.position, tile.MeshRenderer.bounds.size);
                 }
             }
         }

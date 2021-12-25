@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using Mapbox.Map;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Mapbox.Unity.CustomLayer
 {
@@ -23,19 +25,11 @@ namespace Mapbox.Unity.CustomLayer
 	public sealed class MapboxTerrainFactoryManager : ImageFactoryManager
 	{
 		public TerrainStrategy TerrainStrategy;
-		public string ShaderElevationTextureFieldName = "_HeightTexture";
-		public string ShaderElevationTextureScaleOffsetFieldName = "_HeightTexture_ST";
-
+		private bool _shaderIdsInitialized = false;
 		private ElevationLayerProperties _elevationSettings;
 		private bool _isUsingShaderSolution = true;
 
-		//this is in-use unity tile to raster tile
-		private Dictionary<UnityTile, RasterTile> _tileTracker = new Dictionary<UnityTile, RasterTile>();
-		private Dictionary<int, HashSet<UnityTile>> _tileUserTracker = new Dictionary<int, HashSet<UnityTile>>();
-		//this is grand parent id to raster tile
-		//so these two are vastly separate, don't try to optimize
-		private Dictionary<CanonicalTileId, RasterTile> _requestedTiles = new Dictionary<CanonicalTileId, RasterTile>();
-		private Dictionary<int, HashSet<UnityTile>> _tileWaitingList = new Dictionary<int, HashSet<UnityTile>>();
+		protected Dictionary<int, HashSet<UnityTile>> _elevationWaitingList = new Dictionary<int, HashSet<UnityTile>>();
 
 		public MapboxTerrainFactoryManager(
 			ElevationLayerProperties elevationSettings,
@@ -54,13 +48,14 @@ namespace Mapbox.Unity.CustomLayer
 
 		public override void RegisterTile(UnityTile tile)
 		{
-			if (_tileTracker.ContainsKey(tile))
-			{
-				Debug.Log("Tile is already in tracking list?");
-			}
 
 			if (TerrainStrategy is IElevationBasedTerrainStrategy)
 			{
+				if (_isUsingShaderSolution)
+				{
+					ApplyParentTexture(tile);
+				}
+
 				var parentId = tile.UnwrappedTileId.Z > 4
 					? tile.UnwrappedTileId.Parent.Parent.Canonical
 					: tile.UnwrappedTileId.ParentAt(2).Canonical;
@@ -69,63 +64,31 @@ namespace Mapbox.Unity.CustomLayer
 				if (memoryCacheItem != null)
 				{
 					var dataTile = (RasterTile) memoryCacheItem.Tile;
-					memoryCacheItem.Tile.Logs.Add("data tile instant " + tile.CanonicalTileId);
-					tile.AddTile(dataTile);
-					memoryCacheItem.Tile.AddUser(tile.CanonicalTileId);
+					ConnectTiles(tile, dataTile);
+					memoryCacheItem.Tile.AddLog("data tile instant ", tile.CanonicalTileId);
 					SetTexture(tile, dataTile);
-					if (!_tileUserTracker.ContainsKey(memoryCacheItem.Tile.Key))
-					{
-						_tileUserTracker.Add(memoryCacheItem.Tile.Key, new HashSet<UnityTile>());
-					}
-					_tileUserTracker[memoryCacheItem.Tile.Key].Add(tile);
-					_tileTracker.Add(tile, dataTile);
 					TextureReceived(dataTile);
 				}
 				else
 				{
-					if (_isUsingShaderSolution)
-					{
-						ApplyParentTexture(tile);
-					}
-
 					RasterTile dataTile = null;
 					if (_requestedTiles.ContainsKey(parentId))
 					{
 						dataTile = _requestedTiles[parentId];
-						dataTile.Logs.Add("data tile reused " + tile.CanonicalTileId);
-						if (tile != null)
-						{
-							tile.AddTile(dataTile);
-							dataTile.AddUser(tile.CanonicalTileId);
-						}
-						if (!_tileWaitingList.ContainsKey(dataTile.Key))
-						{
-							_tileWaitingList.Add(dataTile.Key, new HashSet<UnityTile>());
-						}
-						_tileTracker.Add(tile, dataTile);
-						_tileWaitingList[dataTile.Key].Add(tile);
+						dataTile.AddLog("data tile reused ", tile.CanonicalTileId);
+						ConnectTiles(tile, dataTile);
 					}
 					else
 					{
 						dataTile = CreateTile(parentId, _sourceSettings.Id);
-						dataTile.Logs.Add("data tile created " + tile.CanonicalTileId);
+						ConnectTiles(tile, dataTile);
+						dataTile.AddLog("data tile created ", tile.CanonicalTileId);
 						_requestedTiles.Add(parentId, dataTile);
-						if (tile != null)
-						{
-							tile.AddTile(dataTile);
-							dataTile.AddUser(tile.CanonicalTileId);
-						}
-						if (!_tileWaitingList.ContainsKey(dataTile.Key))
-						{
-							_tileWaitingList.Add(dataTile.Key, new HashSet<UnityTile>());
-						}
-						_tileWaitingList[dataTile.Key].Add(tile);
-						_tileTracker.Add(tile, dataTile);
 						_fetcher.FetchData(dataTile, _sourceSettings.Id, tile.CanonicalTileId);
 					}
 				}
 
-				tile.MeshRenderer.sharedMaterial.SetFloat("_TileScale", tile.TileScale);
+				//tile.MeshRenderer.sharedMaterial.SetFloat(_tileScaleFieldNameID, tile.TileScale);
 			}
 			else
 			{
@@ -133,6 +96,12 @@ namespace Mapbox.Unity.CustomLayer
 				tile.SetHeightData( null);
 				TerrainStrategy.RegisterTile(tile, false);
 			}
+		}
+
+		public override void UnregisterTile(UnityTile tile, bool clearData = true)
+		{
+			base.UnregisterTile(tile, clearData);
+			TerrainStrategy.UnregisterTile(tile);
 		}
 
 		protected override void OnTextureReceived(RasterTile dataTile)
@@ -144,84 +113,85 @@ namespace Mapbox.Unity.CustomLayer
 					_tileUserTracker.Add(dataTile.Key, new HashSet<UnityTile>());
 				}
 
-				foreach (var utile in _tileWaitingList[dataTile.Key])
+				if (SystemInfo.supportsAsyncGPUReadback)
 				{
-					SetTexture(utile, dataTile);
-					_tileUserTracker[dataTile.Key].Add(utile);
+					var pngRawRasterTile = (RawPngRasterTile) dataTile;
+					var _heightDataResolution = 100;
+
+					if (!_elevationWaitingList.ContainsKey(dataTile.Key))
+					{
+						_elevationWaitingList.Add(dataTile.Key, new HashSet<UnityTile>());
+					}
+
+					foreach (var utile in _tileWaitingList[dataTile.Key])
+					{
+						_elevationWaitingList[dataTile.Key].Add(utile);
+					}
+
+					AsyncGPUReadback.Request(dataTile.Texture2D, 0, (t) =>
+					{
+						var width = t.width;
+						var data = t.GetData<Color32>().ToArray();
+
+						if (pngRawRasterTile.HeightData == null || pngRawRasterTile.HeightData.Length != _heightDataResolution * _heightDataResolution)
+						{
+							pngRawRasterTile.ExtractedDataResolution = _heightDataResolution;
+							pngRawRasterTile.HeightData = new float[_heightDataResolution * _heightDataResolution];
+						}
+
+						//tt = new Texture2D(_heightDataResolution, _heightDataResolution, TextureFormat.RGBA32, false);
+						for (float yy = 0; yy < _heightDataResolution; yy++)
+						{
+							for (float xx = 0; xx < _heightDataResolution; xx++)
+							{
+								var xx2 =(xx / _heightDataResolution) * width;
+								var yy2 =(yy / _heightDataResolution) * width;
+								var index = (int) (((int) yy2 * width) + (int) xx2);
+								//var color = _heightTexture.GetPixel((int)xx2, (int)yy2);
+								//var index = (int)(((float)xx / _heightDataResolution) * 255 * 256 + (((float)yy / _heightDataResolution) * 255));
+
+								float r = data[index].g;
+								float g = data[index].b;
+								float b = data[index].a;
+								//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
+								pngRawRasterTile.HeightData[(int) (yy * _heightDataResolution + xx)] = (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
+								//678 ==> 012345678
+								//345
+								//012
+
+								//tt.SetPixel((int) xx, (int) yy, new Color(r/256, g/256, b/256));
+								//tt.SetPixel((int) xx, (int) yy, color); //new Color(rgbData[index * 4 + 1] / 256f, rgbData[index * 4 + 2] / 256f, rgbData[index * 4 + 3] / 256f, 1));
+							}
+						}
+
+						foreach (var unityTile in _elevationWaitingList[dataTile.Key])
+						{
+							unityTile.ElevationDataParsingCompleted(dataTile);
+						}
+
+						_elevationWaitingList.Remove(dataTile.Key);
+					});
+				}
+
+				foreach (var unityTile in _tileWaitingList[dataTile.Key])
+				{
+					SetTexture(unityTile, dataTile);
+					_tileUserTracker[dataTile.Key].Add(unityTile);
 				}
 				_tileWaitingList.Remove(dataTile.Key);
-
-				_requestedTiles.Remove(dataTile.Id);
 				TextureReceived(dataTile);
 			}
 			else
 			{
 				//this means tile is unregistered during fetching... but somehow it didn't get cancelled?
 			}
+
+			_requestedTiles.Remove(dataTile.Id);
 		}
 
 		protected override void OnFetcherError(RasterTile dataTile, TileErrorEventArgs errorEventArgs)
 		{
 			FetchingError(dataTile, errorEventArgs);
-		}
-
-		public override void UnregisterTile(UnityTile tile, bool clearData = true)
-		{
-			if (_tileTracker.ContainsKey(tile))
-			{
-				var noTileIsWaitingForIt = false;
-				var requestedTile = _tileTracker[tile];
-				requestedTile.Logs.Add("cancelling " + tile.CanonicalTileId);
-				if (_tileWaitingList.ContainsKey(requestedTile.Key))
-				{
-					if (_tileWaitingList[requestedTile.Key].Contains(tile))
-					{
-						_tileWaitingList[requestedTile.Key].Remove(tile);
-					}
-
-					if (_tileWaitingList[requestedTile.Key].Count == 0)
-					{
-						_tileWaitingList.Remove(requestedTile.Key);
-						noTileIsWaitingForIt = true;
-					}
-				}
-				else
-				{
-					noTileIsWaitingForIt = true;
-				}
-
-				if (_tileUserTracker.ContainsKey(requestedTile.Key))
-				{
-					_tileUserTracker[requestedTile.Key].Remove(tile);
-					if (_tileUserTracker[requestedTile.Key].Count == 0 && noTileIsWaitingForIt)
-					{
-						requestedTile.Logs.Add("disposing 1 " + tile.CanonicalTileId);
-						_tileUserTracker.Remove(requestedTile.Key);
-						_fetcher.CancelFetching(requestedTile, _sourceSettings.Id);
-						_requestedTiles.Remove(requestedTile.Id);
-						MapboxAccess.Instance.CacheManager.TileDisposed(requestedTile, _sourceSettings.Id);
-					}
-				}
-				else if(noTileIsWaitingForIt)
-				{
-					requestedTile.Logs.Add("disposing 2 " + tile.CanonicalTileId);
-					_fetcher.CancelFetching(requestedTile, _sourceSettings.Id);
-					_requestedTiles.Remove(requestedTile.Id);
-					MapboxAccess.Instance.CacheManager.TileDisposed(requestedTile, _sourceSettings.Id);
-				}
-
-				tile.RemoveTile(_tileTracker[tile]);
-				_tileTracker[tile].RemoveUser(tile.CanonicalTileId);
-				TerrainStrategy.UnregisterTile(tile);
-				_tileTracker.Remove(tile);
-			}
-			else
-			{
-				if (_tileUserTracker.ContainsKey(tile.TerrainData.Key))
-				{
-					Debug.Log("here");
-				}
-			}
 		}
 
 		protected override RasterTile CreateTile(CanonicalTileId tileId, string tilesetId)
@@ -256,68 +226,81 @@ namespace Mapbox.Unity.CustomLayer
 			var cachedTileIdForCallbackCheck = unityTile.CanonicalTileId;
 			if (dataTile != null && dataTile.Texture2D != null)
 			{
-				//if collider is disabled, we switch to a shader based solution
-				//no elevated mesh is generated
+				// var tileZoom = unityTile.UnwrappedTileId.Z;
+				// var parentZoom = dataTile.Id.Z;
+				// var scale = 1f;
+				// var offsetX = 0f;
+				// var offsetY = 0f;
+				//
+				// var current = unityTile.UnwrappedTileId;
+				// var currentParent = current.Parent;
+				//
+				// for (int i = tileZoom - 1; i >= parentZoom; i--)
+				// {
+				// 	scale /= 2;
+				//
+				// 	var bottomLeftChildX = currentParent.X * 2;
+				// 	var bottomLeftChildY = currentParent.Y * 2;
+				//
+				// 	//top left
+				// 	if (current.X == bottomLeftChildX && current.Y == bottomLeftChildY)
+				// 	{
+				// 		offsetY = 0.5f + (offsetY/2);
+				// 		offsetX = offsetX / 2;
+				// 	}
+				// 	//top right
+				// 	else if (current.X == bottomLeftChildX + 1 && current.Y == bottomLeftChildY)
+				// 	{
+				// 		offsetX = 0.5f + (offsetX / 2);
+				// 		offsetY = 0.5f + (offsetY / 2);
+				// 	}
+				// 	//bottom left
+				// 	else if (current.X == bottomLeftChildX && current.Y == bottomLeftChildY + 1)
+				// 	{
+				// 		offsetX = offsetX / 2;
+				// 		offsetY = offsetY / 2;
+				// 	}
+				// 	//bottom right
+				// 	else if (current.X == bottomLeftChildX + 1 && current.Y == bottomLeftChildY + 1)
+				// 	{
+				// 		offsetX = 0.5f + (offsetX / 2);
+				// 		offsetY = offsetY / 2;
+				// 	}
+				//
+				// 	current = currentParent;
+				// 	currentParent = currentParent.Parent;
+				// }
+				// //if collider is disabled, we switch to a shader based solution
+				// //no elevated mesh is generated
+				//
+				// var scaleOffset = new Vector4(scale, scale, offsetX, offsetY);
 				if (_isUsingShaderSolution)
 				{
-					var tileZoom = unityTile.UnwrappedTileId.Z;
-					var parentZoom = dataTile.Id.Z;
-					var scale = 1f;
-					var offsetX = 0f;
-					var offsetY = 0f;
-
-					var current = unityTile.UnwrappedTileId;
-					var currentParent = current.Parent;
-
-					for (int i = tileZoom - 1; i >= parentZoom; i--)
-					{
-						scale /= 2;
-
-						var bottomLeftChildX = currentParent.X * 2;
-						var bottomLeftChildY = currentParent.Y * 2;
-
-						//top left
-						if (current.X == bottomLeftChildX && current.Y == bottomLeftChildY)
+					unityTile.SetHeightData(
+						dataTile,
+						_elevationSettings.requiredOptions.exaggerationFactor,
+						_elevationSettings.modificationOptions.useRelativeHeight,
+						_elevationSettings.colliderOptions.addCollider,
+						(tile) =>
 						{
-							offsetY = 0.5f + (offsetY/2);
-							offsetX = offsetX / 2;
-						}
-						//top right
-						else if (current.X == bottomLeftChildX + 1 && current.Y == bottomLeftChildY)
-						{
-							offsetX = 0.5f + (offsetX / 2);
-							offsetY = 0.5f + (offsetY / 2);
-						}
-						//bottom left
-						else if (current.X == bottomLeftChildX && current.Y == bottomLeftChildY + 1)
-						{
-							offsetX = offsetX / 2;
-							offsetY = offsetY / 2;
-						}
-						//bottom right
-						else if (current.X == bottomLeftChildX + 1 && current.Y == bottomLeftChildY + 1)
-						{
-							offsetX = 0.5f + (offsetX / 2);
-							offsetY = offsetY / 2;
-						}
-
-						current = currentParent;
-						currentParent = currentParent.Parent;
-					}
-
-					unityTile.MeshRenderer.sharedMaterial.SetTexture(ShaderElevationTextureFieldName, dataTile.Texture2D);
-					unityTile.MeshRenderer.sharedMaterial.SetVector(ShaderElevationTextureScaleOffsetFieldName, new Vector4(scale, scale, offsetX, offsetY));
-					unityTile.MeshRenderer.sharedMaterial.SetFloat("_TileScale", unityTile.TileScale);
-					unityTile.MeshRenderer.sharedMaterial.SetFloat("_ElevationMultiplier", _elevationSettings.requiredOptions.exaggerationFactor);
-					unityTile.SetHeightData(dataTile, _elevationSettings.requiredOptions.exaggerationFactor, _elevationSettings.modificationOptions.useRelativeHeight, _elevationSettings.colliderOptions.addCollider);
+							ElevationUpdated(tile);
+						});
 					TerrainStrategy.RegisterTile(unityTile, false);
 				}
 				else
 				{
-					unityTile.SetHeightData(dataTile, _elevationSettings.requiredOptions.exaggerationFactor, _elevationSettings.modificationOptions.useRelativeHeight, _elevationSettings.colliderOptions.addCollider, (tile) =>
-					{
-						TerrainStrategy.RegisterTile(unityTile, true);
-					});
+					unityTile.SetHeightData(dataTile,
+						_elevationSettings.requiredOptions.exaggerationFactor,
+						_elevationSettings.modificationOptions.useRelativeHeight,
+						_elevationSettings.colliderOptions.addCollider,
+						(tile) =>
+						{
+							if (tile.CanonicalTileId == cachedTileIdForCallbackCheck)
+							{
+								TerrainStrategy.RegisterTile(unityTile, true);
+								ElevationUpdated(tile);
+							}
+						});
 				}
 			}
 			else
@@ -325,29 +308,34 @@ namespace Mapbox.Unity.CustomLayer
 				if (_isUsingShaderSolution)
 				{
 					//unityTile.MeshRenderer.sharedMaterial.SetTexture(ShaderElevationTextureFieldName, null);
-					unityTile.MeshRenderer.sharedMaterial.SetVector(ShaderElevationTextureScaleOffsetFieldName, new Vector4(1, 1, 0, 0));
-					unityTile.MeshRenderer.sharedMaterial.SetFloat("_TileScale", unityTile.TileScale);
-					unityTile.MeshRenderer.sharedMaterial.SetFloat("_ElevationMultiplier", 0);
-					unityTile.SetHeightData(
-						dataTile,
+					//unityTile.MeshRenderer.sharedMaterial.SetVector(ShaderElevationTextureScaleOffsetFieldName, new Vector4(1, 1, 0, 0));
+					// var probBlock = unityTile.PropertyBlock;
+					// unityTile.MeshRenderer.GetPropertyBlock(probBlock);
+					// probBlock.SetFloat(_tileScaleFieldNameID, unityTile.TileScale);
+					// probBlock.SetFloat(_elevationMultiplierFieldNameID, 0);
+					// unityTile.MeshRenderer.SetPropertyBlock(probBlock);
+
+					unityTile.SetHeightData(dataTile,
 						_elevationSettings.requiredOptions.exaggerationFactor,
 						_elevationSettings.modificationOptions.useRelativeHeight,
-						_elevationSettings.colliderOptions.addCollider);
+						_elevationSettings.colliderOptions.addCollider,
+						(tile) => { ElevationUpdated(tile); });
+
 					TerrainStrategy.RegisterTile(unityTile, false);
 				}
 				else
 				{
-					unityTile.SetHeightData(
-						dataTile,
-						0,
+					unityTile.SetHeightData(dataTile, 0,
 						_elevationSettings.modificationOptions.useRelativeHeight,
 						_elevationSettings.colliderOptions.addCollider,
-						(tile) => {
-						if (tile.CanonicalTileId == cachedTileIdForCallbackCheck)
+						(tile) =>
 						{
-							TerrainStrategy.RegisterTile(unityTile, true);
-						}
-					});
+							if (tile.CanonicalTileId == cachedTileIdForCallbackCheck)
+							{
+								TerrainStrategy.RegisterTile(unityTile, true);
+								ElevationUpdated(tile);
+							}
+						});
 				}
 			}
 		}
@@ -359,24 +347,28 @@ namespace Mapbox.Unity.CustomLayer
 
 		protected override void ApplyParentTexture(UnityTile tile)
 		{
+			var parentFound = false;
 			var parent = tile.UnwrappedTileId.Parent;
 			for (int i = tile.CanonicalTileId.Z - 1; i > 0; i--)
 			{
 				var cacheItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(_sourceSettings.Id, parent.Canonical, true);
 				if (cacheItem != null && cacheItem.Texture2D != null)
 				{
-					tile.SetParentTexture(parent, cacheItem.Texture2D, ShaderElevationTextureFieldName, ShaderElevationTextureScaleOffsetFieldName);
+					tile.SetParentElevationTexture(parent, (RawPngRasterTile) cacheItem.Tile, _isUsingShaderSolution);
 
-					if (_isUsingShaderSolution)
-					{
-						tile.MeshRenderer.sharedMaterial.SetFloat("_TileScale", tile.TileScale);
-						tile.MeshRenderer.sharedMaterial.SetFloat("_ElevationMultiplier", _elevationSettings.requiredOptions.exaggerationFactor);
-					}
+					parentFound = true;
 					break;
 				}
 
 				parent = parent.Parent;
 			}
+
+			if (!parentFound)
+			{
+				Debug.Log("no parent? " + tile.CanonicalTileId);
+			}
 		}
+
+		public Action<UnityTile> ElevationUpdated = (s) => { };
 	}
 }

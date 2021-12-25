@@ -83,6 +83,7 @@ namespace Mapbox.Map
 		public DateTime ExpirationDate;
 		public string ETag;
 
+		protected HashSet<CanonicalTileId> _userTiles = new HashSet<CanonicalTileId>();
 		protected List<Exception> _exceptions;
 		protected TileState TileState = TileState.New;
 		protected IAsyncRequest _request;
@@ -90,7 +91,7 @@ namespace Mapbox.Map
 		protected UnityWebRequest _unityRequest;
 		protected Action _callback;
 
-		public List<string> Logs = new List<string>();
+		protected List<string> _logs;
 
 		protected Tile()
 		{
@@ -101,6 +102,9 @@ namespace Mapbox.Map
 		{
 			TilesetId = tilesetId;
 			Id = tileId;
+#if DEBUG
+			_logs = new List<string>();
+#endif
 		}
 
 		/// <summary> Gets the <see cref="T:Mapbox.Map.CanonicalTileId"/> identifier. </summary>
@@ -345,8 +349,7 @@ namespace Mapbox.Map
 			TileState = TileState.Destroyed;
 		}
 
-
-		protected HashSet<CanonicalTileId> _userTiles = new HashSet<CanonicalTileId>();
+#region UserTracking
 		public void AddUser(CanonicalTileId tileId)
 		{
 			if (!_userTiles.Contains(tileId))
@@ -369,15 +372,36 @@ namespace Mapbox.Map
 		{
 			return _userTiles.Count > 0;
 		}
-
-		public string UsersCSV()
-		{
-			return string.Join(" | ", _userTiles);
-		}
-
 		public HashSet<CanonicalTileId> GetUsers()
 		{
 			return _userTiles;
 		}
+		public string UsersCSV()
+		{
+			return string.Join(" | ", _userTiles);
+		}
+#endregion
+
+
+#region Logs
+		public List<string> GetLogs => _logs;
+		public void AddLog(string text)
+		{
+	#if DEBUG
+			_logs.Add(text);
+	#endif
+		}
+
+		public void AddLog(string text, CanonicalTileId relatedTileId)
+		{
+	#if DEBUG
+			if (false)
+			{
+				_logs.Add(string.Format("{0} - {1}", text, relatedTileId));
+			}
+	#endif
+		}
+#endregion
+
 	}
 }

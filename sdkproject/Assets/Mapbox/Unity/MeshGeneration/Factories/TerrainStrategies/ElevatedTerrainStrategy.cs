@@ -155,7 +155,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 
 		public override void DataErrorOccurred(UnityTile t, TileErrorEventArgs e)
 		{
-			ResetToFlatMesh(t);
+			//ResetToFlatMesh(t);
 		}
 
 		public override void PostProcessTile(UnityTile tile)
@@ -296,21 +296,31 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 		private void GenerateTerrainMesh(UnityTile tile)
 		{
 			_verts = _dataArrays[tile.UnwrappedTileId].Vertices;
+			var tris = _dataArrays[tile.UnwrappedTileId].Triangles;
 			_normals = _dataArrays[tile.UnwrappedTileId].Normals;
 
-			var _sampleCount = _elevationOptions.modificationOptions.sampleCount;
+			var sampleCount = _elevationOptions.modificationOptions.sampleCount;
+			var bufferedSampleCount = sampleCount + 2;
 			var hd = tile.HeightData;
 			var heightDataRowSize = (int)Mathf.Sqrt(hd.Length);
 			var ts = tile.TileScale;
-			for (float y = 0; y < _sampleCount; y++)
+
+			for (float y = -1; y < sampleCount + 1; y++)
 			{
-				for (float x = 0; x < _sampleCount; x++)
+				var yFixed = y+1;
+				for (float x = -1; x < sampleCount + 1; x++)
 				{
-					_verts[(int) (y * _sampleCount + x)] = new Vector3(
-						_verts[(int) (y * _sampleCount + x)].x,
-						hd[((int)((1 - y / (_sampleCount - 1)) * (heightDataRowSize-1)) * heightDataRowSize) + ((int)(x / (_sampleCount - 1) * (heightDataRowSize-1)))] * ts,
-						_verts[(int) (y * _sampleCount + x)].z);
-					_normals[(int) (y * _sampleCount + x)] = Mapbox.Unity.Constants.Math.Vector3Zero;
+					var xFixed = x + 1;
+
+					var elevation = x < 0 || y < 0 || x == bufferedSampleCount-2 || y == bufferedSampleCount-2
+						? -50
+						: hd[((int)((1 - yFixed / (bufferedSampleCount - 1)) * (heightDataRowSize-1)) * heightDataRowSize) + ((int)(xFixed / (bufferedSampleCount - 1) * (heightDataRowSize-1)))] * ts;
+
+					_verts[(int) (yFixed * bufferedSampleCount + xFixed)] = new Vector3(
+						_verts[(int) (yFixed * bufferedSampleCount + xFixed)].x,
+						elevation,
+						_verts[(int) (yFixed * bufferedSampleCount + xFixed)].z);
+					_normals[(int) (yFixed * bufferedSampleCount + xFixed)] = Mapbox.Unity.Constants.Math.Vector3Zero;
 				}
 			}
 
@@ -318,6 +328,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 
 			tile.MeshFilter.sharedMesh.indexFormat = IndexFormat.UInt32;
 			tile.MeshFilter.sharedMesh.vertices = _verts;
+			tile.MeshFilter.sharedMesh.SetTriangles(tris, 0);
 			tile.MeshFilter.sharedMesh.RecalculateNormals();
 
 			tile.MeshFilter.sharedMesh.RecalculateBounds();

@@ -10,12 +10,17 @@ namespace Mapbox.Unity.CustomLayer
 		private string _urlFormat;
 		private string CustomTextureFieldName;
 		private string CustomTextureScaleOffsetFieldName;
+		private int CustomTextureFieldNameID;
+		private int CustomTextureScaleOffsetFieldNameID;
 
 		public CustomImageFactoryManager(string urlFormat, ImageryLayerProperties settings, bool downloadFallbackImagery, string textureFieldName = "_MainTex", string textureScaleOffsetFieldName = "_MainTex_ST") : base(settings.sourceOptions, downloadFallbackImagery)
 		{
 			_urlFormat = urlFormat;
 			CustomTextureFieldName = textureFieldName;
+			CustomTextureFieldNameID = Shader.PropertyToID(CustomTextureFieldName);
+
 			CustomTextureScaleOffsetFieldName = textureScaleOffsetFieldName;
+			CustomTextureScaleOffsetFieldNameID = Shader.PropertyToID(CustomTextureScaleOffsetFieldName);
 
 			if (DownloadFallbackImagery)
 			{
@@ -34,16 +39,16 @@ namespace Mapbox.Unity.CustomLayer
 			unityTile.MeshRenderer.sharedMaterial.SetVector(CustomTextureScaleOffsetFieldName, new Vector4(1, 1, 0, 0));
 		}
 
-		protected override void ApplyParentTexture(UnityTile tile)
+		protected override void ApplyParentTexture(UnityTile unityTile)
 		{
-			var parent = tile.UnwrappedTileId.Parent;
-			tile.SetParentTexture(parent, null, CustomTextureFieldName, CustomTextureScaleOffsetFieldName);
-			for (int i = tile.CanonicalTileId.Z - 1; i > 0; i--)
+			var parent = unityTile.UnwrappedTileId.Parent;
+			unityTile.SetParentTexture(parent, null, CustomTextureFieldNameID, CustomTextureScaleOffsetFieldNameID);
+			for (int i = unityTile.CanonicalTileId.Z - 1; i > 0; i--)
 			{
 				var cacheItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(_sourceSettings.Id, parent.Canonical, true);
 				if (cacheItem != null && cacheItem.Texture2D != null)
 				{
-					tile.SetParentTexture(parent, cacheItem.Texture2D, CustomTextureFieldName, CustomTextureScaleOffsetFieldName);
+					unityTile.SetParentTexture(parent, (RasterTile) cacheItem.Tile, CustomTextureFieldNameID, CustomTextureScaleOffsetFieldNameID);
 					break;
 				}
 

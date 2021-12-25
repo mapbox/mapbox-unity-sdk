@@ -43,24 +43,30 @@ namespace Mapbox.Unity.CustomLayer
 		protected abstract RasterTile CreateTile(CanonicalTileId tileId, string tilesetId);
 		protected abstract void SetTexture(UnityTile unityTile, RasterTile dataTile);
 
-		private Dictionary<UnityTile, RasterTile> _tileTracker = new Dictionary<UnityTile, RasterTile>();
-		private Dictionary<int, HashSet<UnityTile>> _tileUserTracker = new Dictionary<int, HashSet<UnityTile>>();
+		//this is in-use unity tile to raster tile
+		protected Dictionary<UnityTile, RasterTile> _tileTracker = new Dictionary<UnityTile, RasterTile>();
+		protected Dictionary<int, HashSet<UnityTile>> _tileUserTracker = new Dictionary<int, HashSet<UnityTile>>();
+		//this is grand parent id to raster tile
+		//so these two are vastly separate, don't try to optimize
+		protected Dictionary<CanonicalTileId, RasterTile> _requestedTiles = new Dictionary<CanonicalTileId, RasterTile>();
+		protected Dictionary<int, HashSet<UnityTile>> _tileWaitingList = new Dictionary<int, HashSet<UnityTile>>();
 
-		private void ConnectTiles(UnityTile unityTile, Tile dataTile)
+		protected virtual void ConnectTiles(UnityTile unityTile, RasterTile dataTile)
 		{
 			unityTile.AddTile(dataTile);
 			dataTile.AddUser(unityTile.CanonicalTileId);
-			_tileTracker.Add(unityTile, (RasterTile) dataTile);
-
-			if(!_tileUserTracker.ContainsKey(dataTile.Key))
+			if(!_tileWaitingList.ContainsKey(dataTile.Key))
 			{
-				_tileUserTracker.Add(dataTile.Key, new HashSet<UnityTile>());
+				_tileWaitingList.Add(dataTile.Key, new HashSet<UnityTile>());
 			}
-			_tileUserTracker[dataTile.Key].Add(unityTile);
+			_tileWaitingList[dataTile.Key].Add(unityTile);
+			_tileTracker.Add(unityTile, dataTile);
 		}
 
 		public virtual void RegisterTile(UnityTile tile)
 		{
+			ApplyParentTexture(tile);
+
 			var memoryCacheItem = _fetcher.FetchDataInstant(tile.CanonicalTileId, _sourceSettings.Id);
 			if (memoryCacheItem != null)
 			{
@@ -71,11 +77,8 @@ namespace Mapbox.Unity.CustomLayer
 			}
 			else
 			{
-				ApplyParentTexture(tile);
-
 				var dataTile = CreateTile(tile.CanonicalTileId, _sourceSettings.Id);
 				ConnectTiles(tile, dataTile);
-
 				_fetcher.FetchData(dataTile, _sourceSettings.Id, tile.CanonicalTileId);
 			}
 		}
@@ -84,24 +87,58 @@ namespace Mapbox.Unity.CustomLayer
 		{
 			if (_tileTracker.ContainsKey(tile))
 			{
-				var dataTile = _tileTracker[tile];
-				if (_tileUserTracker.ContainsKey(dataTile.Key))
+				var noTileIsWaitingForIt = false;
+				var requestedTile = _tileTracker[tile];
+				requestedTile.AddLog("cancelling ", tile.CanonicalTileId);
+				if (_tileWaitingList.ContainsKey(requestedTile.Key))
 				{
-					_tileUserTracker[dataTile.Key].Remove(tile);
+					if (_tileWaitingList[requestedTile.Key].Contains(tile))
+					{
+						_tileWaitingList[requestedTile.Key].Remove(tile);
+					}
+
+					if (_tileWaitingList[requestedTile.Key].Count == 0)
+					{
+						_tileWaitingList.Remove(requestedTile.Key);
+						noTileIsWaitingForIt = true;
+					}
+				}
+				else
+				{
+					noTileIsWaitingForIt = true;
 				}
 
-				if (_tileUserTracker[dataTile.Key].Count == 0)
+				if (_tileUserTracker.ContainsKey(requestedTile.Key))
 				{
-					_tileUserTracker.Remove(dataTile.Key);
-					MapboxAccess.Instance.CacheManager.TileDisposed(dataTile, _sourceSettings.Id);
+					_tileUserTracker[requestedTile.Key].Remove(tile);
+					if (_tileUserTracker[requestedTile.Key].Count == 0 && noTileIsWaitingForIt)
+					{
+						requestedTile.AddLog("disposing 1 ", tile.CanonicalTileId);
+						_tileUserTracker.Remove(requestedTile.Key);
+						_fetcher.CancelFetching(requestedTile, _sourceSettings.Id);
+						_requestedTiles.Remove(requestedTile.Id);
+						MapboxAccess.Instance.CacheManager.TileDisposed(requestedTile, _sourceSettings.Id);
+					}
+				}
+				else if(noTileIsWaitingForIt)
+				{
+					requestedTile.AddLog("disposing 2 ", tile.CanonicalTileId);
+					_fetcher.CancelFetching(requestedTile, _sourceSettings.Id);
+					_requestedTiles.Remove(requestedTile.Id);
+					MapboxAccess.Instance.CacheManager.TileDisposed(requestedTile, _sourceSettings.Id);
 				}
 
-				tile.RemoveTile(dataTile);
-				dataTile.RemoveUser(tile.CanonicalTileId);
+				tile.RemoveTile(_tileTracker[tile]);
+				_tileTracker[tile].RemoveUser(tile.CanonicalTileId);
 				_tileTracker.Remove(tile);
 			}
-			_fetcher.CancelFetching(tile.UnwrappedTileId, _sourceSettings.Id);
-			//MapboxAccess.Instance.CacheManager.TileDisposed(tile, _sourceSettings.Id);
+			else
+			{
+				if (_tileUserTracker.ContainsKey(tile.TerrainData.Key))
+				{
+					Debug.Log("here");
+				}
+			}
 		}
 
 		public virtual void ClearTile(UnityTile tile)
@@ -111,11 +148,25 @@ namespace Mapbox.Unity.CustomLayer
 
 		protected virtual void OnTextureReceived(RasterTile dataTile)
 		{
-			foreach (var tile in _tileUserTracker[dataTile.Key])
+			if (_tileWaitingList.ContainsKey(dataTile.Key))
 			{
-				SetTexture(tile, dataTile);
+				if (!_tileUserTracker.ContainsKey(dataTile.Key))
+				{
+					_tileUserTracker.Add(dataTile.Key, new HashSet<UnityTile>());
+				}
+
+				foreach (var utile in _tileWaitingList[dataTile.Key])
+				{
+					SetTexture(utile, dataTile);
+					_tileUserTracker[dataTile.Key].Add(utile);
+				}
+				_tileWaitingList.Remove(dataTile.Key);
+				TextureReceived(dataTile);
 			}
-			TextureReceived(dataTile);
+			else
+			{
+				//this means tile is unregistered during fetching... but somehow it didn't get cancelled?
+			}
 		}
 
 		protected virtual void OnFetcherError(RasterTile dataTile, TileErrorEventArgs errorEventArgs)
@@ -126,13 +177,13 @@ namespace Mapbox.Unity.CustomLayer
 		protected virtual void ApplyParentTexture(UnityTile tile)
 		{
 			var parent = tile.UnwrappedTileId;
-			tile.SetParentTexture(parent, null);
+			//tile.SetParentTexture(parent, null);
 			for (int i = tile.CanonicalTileId.Z - 1; i > 0; i--)
 			{
 				var cacheItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(_sourceSettings.Id, parent.Canonical, true);
 				if (cacheItem != null && cacheItem.Texture2D != null)
 				{
-					tile.SetParentTexture(parent, cacheItem.Texture2D);
+					tile.SetParentTexture(parent, (RasterTile) cacheItem.Tile);
 					break;
 				}
 

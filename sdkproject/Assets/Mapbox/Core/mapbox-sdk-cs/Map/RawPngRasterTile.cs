@@ -31,6 +31,9 @@ namespace Mapbox.Map
 	/// </example>
 	public class RawPngRasterTile : RasterTile
 	{
+		public int ExtractedDataResolution;
+		public float[] HeightData;
+
 		internal override TileResource MakeTileResource(string tilesetId)
 		{
 			return TileResource.MakeRawPngRaster(Id, tilesetId);

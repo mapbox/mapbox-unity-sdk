@@ -60,10 +60,10 @@ namespace Mapbox.Unity.DataFetching
 
 			void TextureReadCallback(TextureCacheItem textureCacheItem)
 			{
-				tile.Logs.Add("callback TextureReadCallback");
+				tile.AddLog("callback TextureReadCallback");
 				if (!tile.IsInUse())
 				{
-					tile.Logs.Add("dropped due to id mismatch");
+					tile.AddLog("dropped due to id mismatch");
 					//rasterTile.Clear();
 					//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
 					return;
@@ -113,7 +113,7 @@ namespace Mapbox.Unity.DataFetching
 
 			void TextureInfoUpdatedCallback(TextureCacheItem textureCacheItem)
 			{
-				tile.Logs.Add("callback TextureInfoUpdatedCallback");
+				tile.AddLog("callback TextureInfoUpdatedCallback");
 				if (!tile.IsInUse())
 				{
 					//rasterTile.Clear();
@@ -146,7 +146,7 @@ namespace Mapbox.Unity.DataFetching
 
 			void FailureCallback()
 			{
-				tile.Logs.Add("callback FailureCallback");
+				tile.AddLog("callback FailureCallback");
 				if (!tile.IsInUse())
 				{
 					//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
@@ -161,7 +161,7 @@ namespace Mapbox.Unity.DataFetching
 
 			void CancelledCallback()
 			{
-				tile.Logs.Add("callback CancelledCallback");
+				tile.AddLog("callback CancelledCallback");
 				FetchingError(tile, new TileErrorEventArgs(tileId, tile.GetType(), tile.Exceptions));
 			}
 
@@ -234,7 +234,7 @@ namespace Mapbox.Unity.DataFetching
 				else
 				{
 					//IMPORTANT This is where we create a Texture2D
-					rasterTile.Logs.Add("extracting texture " + rasterTile.Id);
+					rasterTile.AddLog("extracting texture ", rasterTile.Id);
 					rasterTile.ExtractTextureFromRequest();
 
 #if UNITY_EDITOR

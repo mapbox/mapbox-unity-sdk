@@ -16,7 +16,7 @@ namespace Mapbox.Unity.DataFetching
 		protected IFileSource _fileSource;
 		protected Queue<int> _tileOrder;
 		protected Dictionary<int, FetchInfo> _tileFetchInfos;
-		private Dictionary<int, Tile> _localQueuedRequests;
+		//private Dictionary<int, Tile> _localQueuedRequests;
 		protected Dictionary<int, Tile> _globalActiveRequests;
 		protected int _activeRequestLimit = 10;
 
@@ -26,24 +26,21 @@ namespace Mapbox.Unity.DataFetching
 			_tileOrder = new Queue<int>();
 			_tileFetchInfos = new Dictionary<int, FetchInfo>();
 			_globalActiveRequests = new Dictionary<int, Tile>();
-			_localQueuedRequests = new Dictionary<int, Tile>();
 			Runnable.Run(UpdateTick());
 		}
 
 		public virtual void EnqueueForFetching(FetchInfo info)
 		{
-			var key = info.TileId.GenerateKey(info.TilesetId);
+			var key = info.RasterTile.Id.GenerateKey(info.TilesetId);
 
-			if (!_localQueuedRequests.ContainsKey(key))
+			if (!_tileFetchInfos.ContainsKey(key))
 			{
 				info.Callback += () =>
 				{
 					_globalActiveRequests.Remove(key);
-					_localQueuedRequests.Remove(key);
 				};
 
 				_tileOrder.Enqueue(key);
-				_localQueuedRequests.Add(key, info.RasterTile);
 				info.QueueTime = Time.time;
 				_tileFetchInfos.Add(key, info);
 			}
@@ -61,19 +58,19 @@ namespace Mapbox.Unity.DataFetching
 
 		public virtual void CancelFetching(UnwrappedTileId tileUnwrappedTileId, string tilesetId)
 		{
-			var canonical = tileUnwrappedTileId.Canonical;
-			var key = canonical.GenerateKey(tilesetId);
-			if (_tileFetchInfos.ContainsKey(key))
-			{
-				_tileFetchInfos.Remove(key);
-			}
-
-			if (_globalActiveRequests.ContainsKey(key))
-			{
-				_globalActiveRequests[key].Cancel();
-				_globalActiveRequests.Remove(key);
-			}
-			_localQueuedRequests.Remove(key);
+			// var canonical = tileUnwrappedTileId.Canonical;
+			// var key = canonical.GenerateKey(tilesetId);
+			// if (_tileFetchInfos.ContainsKey(key))
+			// {
+			// 	_tileFetchInfos.Remove(key);
+			// }
+			//
+			// if (_globalActiveRequests.ContainsKey(key))
+			// {
+			// 	_globalActiveRequests[key].Cancel();
+			// 	_globalActiveRequests.Remove(key);
+			// }
+			// _localQueuedRequests.Remove(key);
 		}
 
 		private IEnumerator UpdateTick()
@@ -99,7 +96,7 @@ namespace Mapbox.Unity.DataFetching
 						_globalActiveRequests.Add(tileKey, fi.RasterTile);
 						fi.RasterTile.Initialize(
 							_fileSource,
-							fi.TileId,
+							fi.RasterTile.Id,
 							fi.TilesetId,
 							fi.Callback);
 						TileInitialized(fi);
@@ -129,7 +126,6 @@ namespace Mapbox.Unity.DataFetching
 				_globalActiveRequests[key].Cancel();
 				_globalActiveRequests.Remove(key);
 			}
-			_localQueuedRequests.Remove(key);
 		}
 	}
 
@@ -147,7 +143,7 @@ namespace Mapbox.Unity.DataFetching
 				TotalRequestCount++;
 				if (EnableLogging)
 				{
-					Logs.Add(string.Format("{0,-15} | {1,-30} {3,-30} {2, -10}", f.TileId, f.TilesetId, (Time.time - f.QueueTime), "initialized after"));
+					Logs.Add(string.Format("{0,-15} | {1,-30} {3,-30} {2, -10}", f.RasterTile.Id, f.TilesetId, (Time.time - f.QueueTime), "initialized after"));
 				}
 			};
 		}
@@ -156,7 +152,7 @@ namespace Mapbox.Unity.DataFetching
 		{
 			if (EnableLogging)
 			{
-				Logs.Add(string.Format("{0,-15} | {1,-30} {3,-30} {2, -10}", info.TileId, info.TilesetId, Time.time, "enqueued at"));
+				Logs.Add(string.Format("{0,-15} | {1,-30} {3,-30} {2, -10}", info.RasterTile.Id, info.TilesetId, Time.time, "enqueued at"));
 			}
 
 			base.EnqueueForFetching(info);
@@ -171,7 +167,7 @@ namespace Mapbox.Unity.DataFetching
 				if (EnableLogging)
 				{
 					var f = _tileFetchInfos[key];
-					Logs.Add(string.Format("{0,-15} | {1,-30} {3,-30} {2, -10}", f.TileId, f.TilesetId, (Time.time - f.QueueTime), "cancelled after"));
+					Logs.Add(string.Format("{0,-15} | {1,-30} {3,-30} {2, -10}", f.RasterTile.Id, f.TilesetId, (Time.time - f.QueueTime), "cancelled after"));
 				}
 			}
 			base.CancelFetching(tileUnwrappedTileId, tilesetId);

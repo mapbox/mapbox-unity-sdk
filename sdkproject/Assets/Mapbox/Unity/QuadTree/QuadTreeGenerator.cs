@@ -29,11 +29,11 @@ namespace Mapbox.Unity.QuadTree
 			_view = new QuadTreeView();
 		}
 
-		public QuadTreeView UpdateQuadTree()
+		public QuadTreeView UpdateQuadTree(float elevationAtCenter)
 		{
 			_view.Clear();
 			var planes = GeometryUtility.CalculateFrustumPlanes(_camera);
-			var worldBaseBounds = new UnityRectD(new UnwrappedTileId(0, 0, 0), -_map.CenterMercator, WorldScale);
+			var worldBaseBounds = new UnityRectD(new UnwrappedTileId(0, 0, 0), -_map.CenterMercator, WorldScale, elevationAtCenter);
 			var stack = new Stack<UnityRectD>();
 			stack.Push(worldBaseBounds);
 			while (stack.Count > 0)

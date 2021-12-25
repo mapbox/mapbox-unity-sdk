@@ -1159,8 +1159,8 @@ MonoBehaviour:
       scalingType: 1
       unityTileSize: 100
     tileMaterial: {fileID: 2100000, guid: 764fa5e39b2479249af645452ac5d740, type: 2}
-  QuadTreeCameraController: {fileID: 1885181998}
-  QuadCameraSettings: {fileID: 1885181999}
+  CameraController: {fileID: 1885181998}
+  QuadTreeGenerator: {fileID: 1885181999}
   WorldScale: 1000
 --- !u!4 &1885181997
 Transform:

@@ -108,7 +108,8 @@ namespace Mapbox.Unity.Map
 			_tilePool = new ObjectPool<UnityTile>(() =>
 			{
 				var tile = new GameObject().AddComponent<UnityTile>();
-				tile.MeshRenderer.sharedMaterial = Instantiate(_map.TileMaterial);
+				//tile.MeshRenderer.sharedMaterial = Instantiate(_map.TileMaterial);
+				tile.MeshRenderer.material = _map.TileMaterial;
 				tile.transform.SetParent(_map.Root, false);
 				tile.gameObject.SetActive(false);
 				if (TerrainLayer.Factory != null)

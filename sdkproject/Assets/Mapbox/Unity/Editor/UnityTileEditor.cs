@@ -70,7 +70,6 @@ public class UnityTileEditor : Editor
 
 		EditorGUILayout.LabelField("Tile Id", _tile.CanonicalTileId.ToString(), EditorStyles.label);
 		EditorGUILayout.LabelField("Tile Scale", _tile.TileScale.ToString(), EditorStyles.label);
-		EditorGUILayout.LabelField("Fallback Image Tile", _tile.BackgroundImageTile.ToString(), EditorStyles.label);
 		//EditorGUILayout.LabelField("Waiting to Finish", _tile._finishConditionTiles.Count.ToString(), EditorStyles.label);
 
 
@@ -84,7 +83,17 @@ public class UnityTileEditor : Editor
 			}
 
 			var index = 0;
-			foreach (var dataTile in _tile.Tiles)
+			var tiles = new List<Tile>(_tile.Tiles);
+			if (_tile._parentRasterTile != null)
+			{
+				tiles.Add(_tile._parentRasterTile);
+			}
+
+			if (_tile._parentTerrainTile != null)
+			{
+				tiles.Add(_tile._parentTerrainTile);
+			}
+			foreach (var dataTile in tiles)
 			{
 				_tileTabs[index] = EditorGUILayout.Foldout(_tileTabs[index], dataTile.GetType().ToString());
 				if (_tileTabs[index])
@@ -121,8 +130,6 @@ public class UnityTileEditor : Editor
 				index++;
 			}
 
-
-
 			EditorGUI.indentLevel--;
 		}
 
@@ -131,7 +138,8 @@ public class UnityTileEditor : Editor
 
 	private void DrawLogs(Tile dataTile, int i)
 	{
-		_logFold[i] = EditorGUILayout.Foldout(_logFold[i], string.Format("Logs ({0})", dataTile.Logs.Count));
+		var logs = dataTile.GetLogs;
+		_logFold[i] = EditorGUILayout.Foldout(_logFold[i], string.Format("Logs ({0})", logs.Count));
 		if (_logFold[i])
 		{
 			using (var h = new EditorGUILayout.HorizontalScope())
@@ -139,7 +147,7 @@ public class UnityTileEditor : Editor
 				using (var scrollView = new EditorGUILayout.ScrollViewScope(_logScrollPos[i], GUILayout.Height(300)))
 				{
 					_logScrollPos[i] = scrollView.scrollPosition;
-					foreach (var log in dataTile.Logs)
+					foreach (var log in logs)
 					{
 						EditorGUILayout.LabelField(string.Format(log), EditorStyles.miniLabel);
 					}

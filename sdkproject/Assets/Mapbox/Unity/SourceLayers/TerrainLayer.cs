@@ -54,6 +54,7 @@ namespace Mapbox.Unity.Map
 		public void Initialize()
 		{
 			_elevationFactory = new TerrainFactoryBase(_layerProperty);
+			_elevationFactory.TileElevationUpdated += TileElevationUpdated;
 			//terrain factory uses strategy objects and they are controlled by layer
 			//so we have to refresh that first
 			_elevationFactory.OnTileError += delegate(object sender, TileErrorEventArgs args) { FactoryError(_elevationFactory, args); };
@@ -271,5 +272,7 @@ namespace Mapbox.Unity.Map
 
 
 		#endregion
+
+		public Action<UnityTile> TileElevationUpdated = (s) => { };
 	}
 }

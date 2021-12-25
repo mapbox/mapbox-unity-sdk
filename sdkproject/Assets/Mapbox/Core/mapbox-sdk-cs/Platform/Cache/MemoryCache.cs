@@ -251,7 +251,7 @@ namespace Mapbox.Platform.Cache
 					while (_destructionQueue.Count > 0 && removed > 0)
 					{
 						var keyToRemove = _destructionQueue.Dequeue();
-						if (_destructionHashset.Contains(keyToRemove))
+						if (_destructionHashset.Contains(keyToRemove) && !_cachedItems[keyToRemove].Tile.IsInUse())
 						{
 							_destructionHashset.Remove(keyToRemove);
 							RemoveItemCacheItem(keyToRemove);
@@ -279,7 +279,7 @@ namespace Mapbox.Platform.Cache
 			_cachedItems.Remove(keyToRemove);
 			if (item is TextureCacheItem)
 			{
-				item.Tile.Logs.Add("destroying texture");
+				item.Tile.AddLog("destroying texture");
 				(item as TextureCacheItem).Texture2D.Destroy();
 			}
 			item.Tile.Prune();
@@ -293,6 +293,7 @@ namespace Mapbox.Platform.Cache
 
 	public class EditorMemoryCache : MemoryCache
 	{
+		public bool EnableLogging = false;
 		public Action<CanonicalTileId, string, CacheItem, bool> TileAdded = (s, id, arg3, arg4) => { };
 		public Action<CanonicalTileId, string> TileReleased = (s, id) => { };
 		public Action<CanonicalTileId, string> TileRead = (s, id) => { };
@@ -310,18 +311,27 @@ namespace Mapbox.Platform.Cache
 		public override void Add(CanonicalTileId tileId, string tilesetId, CacheItem cacheItem, bool forceInsert)
 		{
 			base.Add(tileId, tilesetId, cacheItem, forceInsert);
-			TileAdded(tileId, tilesetId, cacheItem, forceInsert);
+			if (EnableLogging)
+			{
+				TileAdded(tileId, tilesetId, cacheItem, forceInsert);
+			}
 		}
 
 		public override void TileDisposed(UnityTile tile, string tilesetId)
 		{
 			base.TileDisposed(tile, tilesetId);
-			TileReleased(tile.CanonicalTileId, tilesetId);
+			if(EnableLogging)
+			{
+				TileReleased(tile.CanonicalTileId, tilesetId);
+			}
 		}
 
 		public override CacheItem Get(CanonicalTileId tileId, string tilesetId, bool b)
 		{
-			TileRead(tileId, tilesetId);
+			if (EnableLogging)
+			{
+				TileRead(tileId, tilesetId);
+			}
 			return base.Get(tileId, tilesetId);
 		}
 
@@ -341,7 +351,10 @@ namespace Mapbox.Platform.Cache
 			{
 				var item = _cachedItems[keyToRemove];
 				base.RemoveItemCacheItem(keyToRemove);
-				TilePruned(item.TileId, item.TilesetId);
+				if (EnableLogging)
+				{
+					TilePruned(item.TileId, item.TilesetId);
+				}
 			}
 			else
 			{
@@ -352,7 +365,15 @@ namespace Mapbox.Platform.Cache
 		public override void MarkFallback(CanonicalTileId tileId, string tilesetId)
 		{
 			base.MarkFallback(tileId, tilesetId);
-			TileSetFallback(tileId, tilesetId);
+			if (EnableLogging)
+			{
+				TileSetFallback(tileId, tilesetId);
+			}
+		}
+
+		public void ToggleLogging()
+		{
+			EnableLogging = !EnableLogging;
 		}
 	}
 }

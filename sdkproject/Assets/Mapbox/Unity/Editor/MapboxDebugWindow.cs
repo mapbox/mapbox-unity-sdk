@@ -298,6 +298,11 @@ public class MemoryTabDebugView
 
 		FixedFold(_fixedList);
 
+		if (GUILayout.Button("Toggle Logging (" + _memoryCache.EnableLogging +")"))
+		{
+			_memoryCache.ToggleLogging();
+		}
+
 		DrawLogs();
 	}
 
@@ -480,7 +485,7 @@ public class MemoryTabDebugView
 				EditorGUILayout.ObjectField((cacheItem as TextureCacheItem).Texture2D, typeof(Texture2D), true);
 			}
 
-			foreach (var log in cacheItem.Tile.Logs)
+			foreach (var log in cacheItem.Tile.GetLogs)
 			{
 				EditorGUILayout.LabelField(log, EditorStyles.label);
 			}
