@@ -110,6 +110,14 @@ namespace Mapbox.Map
 			return _fileNameStringCache;
 		}
 
+		public CanonicalTileId Parent
+		{
+			get
+			{
+				return new CanonicalTileId(Z - 1, X >> 1, Y >> 1);
+			}
+		}
+
 		#region Equality 
 		public bool Equals(CanonicalTileId other)
 		{
@@ -161,7 +169,7 @@ namespace Mapbox.Map
 			unchecked // Overflow is fine, just wrap
 			{
 				int hash = 17;
-				hash = hash * 23 + "mapbox".GetHashCode();
+				hash = hash * 23 + tileId.Parent.GetHashCode();
 				hash = hash * 23 + tilesetId.GetHashCode();
 				hash = hash * 23 + tileId.GetHashCode();
 				return hash;

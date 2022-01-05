@@ -157,8 +157,11 @@ namespace Mapbox.Unity.CustomLayer
 
 				foreach (var utile in _tileWaitingList[dataTile.Key])
 				{
-					SetTexture(utile, dataTile);
-					_tileUserTracker[dataTile.Key].Add(utile);
+					if (utile.ContainsDataTile(dataTile))
+					{
+						SetTexture(utile, dataTile);
+						_tileUserTracker[dataTile.Key].Add(utile);
+					}
 				}
 				_tileWaitingList.Remove(dataTile.Key);
 				TextureReceived(dataTile);
