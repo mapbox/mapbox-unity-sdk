@@ -348,7 +348,11 @@ namespace Mapbox.Unity.CustomLayer
 		protected override void ApplyParentTexture(UnityTile tile)
 		{
 			var parentFound = false;
-			var parent = tile.UnwrappedTileId.Parent;
+			var parent = tile.UnwrappedTileId.Z > 4
+				? tile.UnwrappedTileId.Parent.Parent
+				: tile.UnwrappedTileId.ParentAt(2);
+
+			parent = parent.Parent;
 			for (int i = tile.CanonicalTileId.Z - 1; i > 0; i--)
 			{
 				var cacheItem = MapboxAccess.Instance.CacheManager.GetTextureItemFromMemory(_sourceSettings.Id, parent.Canonical, true);
