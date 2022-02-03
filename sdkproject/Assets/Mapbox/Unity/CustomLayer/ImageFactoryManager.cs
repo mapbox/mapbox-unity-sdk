@@ -65,6 +65,11 @@ namespace Mapbox.Unity.CustomLayer
 
 		public virtual void RegisterTile(UnityTile tile)
 		{
+			if (_tileTracker.ContainsKey(tile))
+			{
+				return;
+			}
+			
 			ApplyParentTexture(tile);
 
 			var memoryCacheItem = _fetcher.FetchDataInstant(tile.CanonicalTileId, _sourceSettings.Id);
@@ -134,10 +139,20 @@ namespace Mapbox.Unity.CustomLayer
 			}
 			else
 			{
-				if (_tileUserTracker.ContainsKey(tile.TerrainData.Key))
-				{
-					Debug.Log("here");
-				}
+				// if (_tileUserTracker.ContainsKey(tile.TerrainData.Key))
+				// {
+				// 	Debug.Log("here");
+				// }
+			}
+		}
+
+		public void Stop(UnityTile tile)
+		{
+			if (_tileTracker.ContainsKey(tile))
+			{
+				var noTileIsWaitingForIt = false;
+				var requestedTile = _tileTracker[tile];
+				_fetcher.CancelFetching(requestedTile, _sourceSettings.Id);
 			}
 		}
 

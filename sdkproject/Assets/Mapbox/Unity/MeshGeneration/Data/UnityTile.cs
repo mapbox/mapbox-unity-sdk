@@ -43,7 +43,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		//private int _heightDataResolution = 100;
 		//keeping track of tile objects to be able to cancel them safely if tile is destroyed before data fetching finishes
 		public HashSet<Tile> Tiles = new HashSet<Tile>();
-		private HashSet<Tile> _finishConditionTiles = new HashSet<Tile>();
+		public HashSet<Tile> _finishConditionTiles = new HashSet<Tile>();
 		public bool IsRecycled = false;
 		public bool IsStopped = false;
 
@@ -191,7 +191,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			//gameObject.SetActive(true);
 
 			IsRecycled = false;
-
+			Logs.Add(string.Format("{0} - {1}", Time.frameCount, "initialized " + UnwrappedTileId));
 			// Setup Loading as initial state - Unregistered
 			// When tile registers with factories, it will set the appropriate state.
 			// None, if Factory source is None, Loading otherwise.
@@ -236,6 +236,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				_parentTerrainTile.RemoveUser(CanonicalTileId);
 				_parentTerrainTile = null;
 			}
+
+			Logs.Add(string.Format("{0} - {1}", Time.frameCount, "recycled"));
 		}
 
 		public void SetHeightData(RasterTile terrainTile, float heightMultiplier = 1f, bool useRelative = false, bool addCollider = false, Action<UnityTile> callback = null)
@@ -284,6 +286,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				}
 				return;
 			}
+
+			CheckFinishedCondition(_terrainTile);
 
 			//var tileId = terrainTile.Id;
 			// if (SystemInfo.supportsAsyncGPUReadback)
@@ -454,6 +458,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void SetVectorData(VectorTile vectorTile, Action<UnityTile, Action> createMeshCallback = null)
 		{
+			Logs.Add("set vector data");
 			_vectorTile = vectorTile;
 			if (_vectorTile == null)
 			{
@@ -468,21 +473,36 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				{
 					if (_terrainTile == null || _terrainReady)
 					{
+						Logs.Add("CallCreateMeshCallback 1");
 						CallCreateMeshCallback();
 					}
 				}
 				else
 				{
-					_vectorTile.DataProcessingFinished += (success) =>
+					if (_vectorTile.CurrentTileState == TileState.Processing)
 					{
-						if (success)
+						_vectorTile.DataProcessingFinished += (success) =>
 						{
-							if (_terrainTile == null || _terrainReady)
+							if (success)
 							{
-								CallCreateMeshCallback();
+								if (_terrainTile == null || _terrainReady)
+								{
+									Logs.Add("CallCreateMeshCallback 2");
+									CallCreateMeshCallback();
+								}
 							}
-						}
-					};
+							else
+							{
+								Logs.Add("vector failed");
+								CheckFinishedCondition(_vectorTile);
+							}
+						};
+					}
+					else
+					{
+						Logs.Add("vector was ready");
+						CheckFinishedCondition(_vectorTile);
+					}
 				}
 			}
 			// _createMeshCallback = createMeshCallback;
@@ -501,7 +521,10 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void CallCreateMeshCallback()
 		{
-			_createMeshCallback(this, VectorGenerationCompleted);
+			if (_createMeshCallback != null)
+			{
+				_createMeshCallback(this, VectorGenerationCompleted);
+			}
 		}
 
 		public void VectorGenerationCompleted()
@@ -580,6 +603,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		internal void RemoveTile(Tile tile)
 		{
 			Tiles.Remove(tile);
+			if (_finishConditionTiles.Contains(tile))
+			{
+				_finishConditionTiles.Remove(tile);
+			}
+			CheckFinishedCondition();
 		}
 
 		public void ClearAssets()
@@ -699,10 +727,15 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			if (_finishConditionTiles.Contains(tile))
 			{
 				_finishConditionTiles.Remove(tile);
-				if (_finishConditionTiles.Count == 0)
-				{
-					TileFinished(this);
-				}
+				CheckFinishedCondition();
+			}
+		}
+
+		private void CheckFinishedCondition()
+		{
+			if (_finishConditionTiles.Count == 0)
+			{
+				TileFinished(this);
 			}
 		}
 

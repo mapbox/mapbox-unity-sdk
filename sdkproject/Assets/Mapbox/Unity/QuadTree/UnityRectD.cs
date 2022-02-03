@@ -22,8 +22,8 @@ namespace Mapbox.Unity.QuadTree
 		private Vector2d _offset;
 		private float _worldScale;
 		private float _currentElevationSample;
-		private Vector3 UnityBoundsMin;
-		private Vector3 UnityBoundsMax;
+		public Vector3 UnityBoundsMin;
+		public Vector3 UnityBoundsMax;
 
 		// public bool OneCornerInView(Camera camera)
 		// {
@@ -71,8 +71,13 @@ namespace Mapbox.Unity.QuadTree
 			BottomRight = new Vector3((float)(boundsTopLeft.x + boundsSize.x) / worldScale, 0, (float)(boundsTopLeft.y - boundsSize.y) / worldScale);
 			//BottomRight = ((new Vector2d(boundsTopLeft.x + boundsSize.x, boundsTopLeft.y - boundsSize.y)) / worldScale).ToVector3xz();
 			Center = (BottomLeft + TopRight) / 2;
-			UnityBounds = new Bounds(Center, new Vector3((float)boundsSize.x / worldScale, boundHeight * 2, (float)boundsSize.y / worldScale));
-			UnityBoundsMin = new Vector3(BottomLeft.x, -boundHeight, BottomLeft.z);
+			UnityBounds = new Bounds(
+				new Vector3(Center.x, boundHeight/2, Center.z),
+				new Vector3(
+					(float)boundsSize.x / worldScale,
+					boundHeight,
+					(float)boundsSize.y / worldScale));
+			UnityBoundsMin = new Vector3(BottomLeft.x, 0, BottomLeft.z);
 			UnityBoundsMax = new Vector3(TopRight.x, boundHeight, TopRight.z);
 		}
 

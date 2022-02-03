@@ -52,7 +52,7 @@ namespace Mapbox.Unity.QuadTree
 		#region SET STUFF
 		public void SetZoom(float zoom)
 		{
-			Options.locationOptions.zoom = zoom;
+			Options.locationOptions.zoom = Mathf.Min(Options.locationOptions.MaxZoom, Mathf.Max(Options.locationOptions.MinZoom, zoom));
 		}
 		public void SetWorldRelativeScale(float scale)
 		{

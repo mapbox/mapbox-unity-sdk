@@ -530,10 +530,22 @@ public class UnityTilesTabDebugView
 		DrawActiveTiles(tiles);
 
 		DrawInactiveTiles(inactiveTiles);
+
+		GUILayout.Label("Tiles waiting to finish");
+		foreach (var tile in _map.ActiveTiles)
+		{
+			if (tile.Value._finishConditionTiles.Count > 0)
+			{
+				GUILayout.Label(tile.Key.ToString(), EditorStyles.miniLabel);
+			}
+		}
 	}
 
 	private void DrawInactiveTiles(Queue<UnityTile> tiles)
 	{
+		if (tiles == null)
+			return;
+		
 		_inactiveTilesFold = EditorGUILayout.Foldout(_inactiveTilesFold, string.Format("Inactive Tiles ({0})", tiles.Count));
 		if (_inactiveTilesFold)
 		{

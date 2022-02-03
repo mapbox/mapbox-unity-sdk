@@ -79,6 +79,7 @@ namespace Mapbox.Unity.Map
 		public abstract void ClearTile(UnityTile tile);
 		public abstract void Register(UnityTile tile);
 		public abstract void Unregister(UnityTile tile);
+		public abstract void Stop(UnityTile tile);
 
 		public Action<AbstractLayer> OnDisabled = (f) => { };
 		public Action<AbstractLayer> OnEnabled = (f) => { };

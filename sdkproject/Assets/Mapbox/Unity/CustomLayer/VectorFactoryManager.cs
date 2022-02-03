@@ -30,6 +30,11 @@ namespace Mapbox.Unity.CustomLayer
 				return;
 			}
 
+			if (_tileTracker.ContainsKey(tile))
+			{
+				return;
+			}
+			
 			var dataTile = CreateDataTile(tile.CanonicalTileId, _properties.sourceOptions.Id);
 			_tileTracker.Add(tile, dataTile);
 			if (tile != null)
@@ -52,10 +57,15 @@ namespace Mapbox.Unity.CustomLayer
 				tile.RemoveTile(dataTile);
 				_tileTracker[tile].RemoveUser(tile.CanonicalTileId);
 				_tileTracker.Remove(tile);
+				MapboxAccess.Instance.CacheManager.TileDisposed(tile, _properties.sourceOptions.Id);
 			}
 
 			_fetcher.CancelFetching(tile.UnwrappedTileId, _properties.sourceOptions.Id);
-			//MapboxAccess.Instance.CacheManager.TileDisposed(tile, _properties.sourceOptions.Id);
+		}
+
+		public void StopTile(UnityTile tile)
+		{
+			_fetcher.CancelFetching(tile.UnwrappedTileId, _properties.sourceOptions.Id);
 		}
 
 		private void OnFetcherDataRecieved(UnityTile unityTile, Mapbox.Map.VectorTile vectorTile)

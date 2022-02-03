@@ -36,6 +36,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		private Vector3 _prevNormal;
 		private Vector3 _nextNormal;
 		private float _distance = 0f;
+		private float _multi;
 
 		public ModifierType Type
 		{
@@ -68,6 +69,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		public void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null)
 		{
 			_tileSize = Convert.ToSingle(tile.Rect.Size.x * tile.TileScale);
+			_multi = Mathf.Pow(2, tile.CurrentZoom - tile.CanonicalTileId.Z);
 			ExtrudeLine(feature, md, tile.CurrentZoom);
 		}
 
@@ -412,8 +414,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 		{
 			var triIndexStart = md.Vertices.Count;
 			var extrude = normal * (lineTurnsLeft ? -1 : 1);
-			_vertexList.Add(vertexPosition + extrude * WidthCurve.Evaluate(zoom));
-			_normalList.Add(Constants.Math.Vector3Up);
+			_vertexList.Add(vertexPosition + extrude * WidthCurve.Evaluate(zoom)/_multi);
+			_normalList.Add(extrude.normalized);
 			_uvList.Add(new Vector2(1, dist));
 			_tangentList.Add(normal.Perpendicular() * -1);
 
@@ -454,9 +456,9 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				extrude -= (normal.Perpendicular() * endLeft);
 			}
 
-			var vert = vertexPosition + extrude * WidthCurve.Evaluate(zoom);
+			var vert = vertexPosition + extrude * WidthCurve.Evaluate(zoom)/_multi;
 			_vertexList.Add(vert);
-			_normalList.Add(Constants.Math.Vector3Up);
+			_normalList.Add(extrude.normalized);
 			_uvList.Add(new Vector2(1, dist));
 			_tangentList.Add(normal.Perpendicular() * -1);
 
@@ -480,8 +482,8 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 				extrude -= normal.Perpendicular() * endRight;
 			}
 
-			_vertexList.Add(vertexPosition + extrude * WidthCurve.Evaluate(zoom));
-			_normalList.Add(Constants.Math.Vector3Up);
+			_vertexList.Add(vertexPosition + extrude * WidthCurve.Evaluate(zoom)/_multi);
+			_normalList.Add(extrude.normalized);
 			_uvList.Add(new Vector2(0, dist));
 			_tangentList.Add(normal.Perpendicular() * -1);
 

@@ -123,7 +123,173 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!21 &96280564
+--- !u!114 &230684677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 526c8a90df31d41fe8057a6f85c7a3e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TerrainLayer:
+    _layerProperty:
+      sourceType: 0
+      sourceOptions:
+        isActive: 1
+        layerSource:
+          Name: 
+          Id: mapbox.terrain-rgb
+          Modified: 
+          UserName: 
+      elevationLayerType: 1
+      requiredOptions:
+        exaggerationFactor: 1
+      colliderOptions:
+        addCollider: 0
+      modificationOptions:
+        sampleCount: 100
+        useRelativeHeight: 0
+        earthRadius: 1000
+      unityLayerOptions:
+        addToLayer: 0
+        layerId: 0
+      sideWallOptions:
+        isActive: 0
+        wallHeight: 10
+        wallMaterial: {fileID: 0}
+      TileMeshSize: 10
+  ImageryLayer:
+    _layerProperty:
+      sourceType: 4
+      sourceOptions:
+        isActive: 1
+        layerSource:
+          Name: Satellite
+          Id: mapbox.satellite
+          Modified: 
+          UserName: 
+      rasterOptions:
+        useRetina: 1
+        useCompression: 0
+        useMipMap: 0
+  VectorLayer:
+    _layerProperty:
+      tileJsonData:
+        tileJSONLoaded: 0
+        LayerDisplayNames:
+        - admin
+        - aeroway
+        - airport_label
+        - building
+        - housenum_label
+        - landuse
+        - landuse_overlay
+        - motorway_junction
+        - natural_label
+        - place_label
+        - poi_label
+        - road
+        - structure
+        - transit_stop_label
+        - water
+        - waterway
+      _sourceType: 3
+      sourceOptions:
+        isActive: 0
+        layerSource:
+          Name: Mapbox Streets v7
+          Id: mapbox.mapbox-streets-v8
+          Modified: 
+          UserName: 
+      useOptimizedStyle: 0
+      optimizedStyle:
+        Name: 
+        Id: 
+        Modified: 
+        UserName: 
+      performanceOptions:
+        isEnabled: 1
+        entityPerCoroutine: 20
+      vectorSubLayers:
+      - coreOptions:
+          sourceId: 
+          isActive: 1
+          sublayerName: Untitled
+          geometryType: 3
+          layerName: road
+          snapToTerrain: 1
+          combineMeshes: 0
+        lineGeometryOptions:
+          Width:
+            serializedVersion: 2
+            m_Curve: []
+            m_PreInfinity: 0
+            m_PostInfinity: 0
+            m_RotationOrder: 0
+          MiterLimit: 0.2
+          RoundLimit: 1.05
+          JoinType: 1
+          CapType: 1
+        filterOptions:
+          _selectedLayerName: 
+          filters: []
+          combinerType: 0
+        extrusionOptions:
+          _selectedLayerName: 
+          extrusionType: 0
+          extrusionGeometryType: 0
+          propertyName: height
+          propertyDescription: 
+          minimumHeight: 0
+          maximumHeight: 1
+          extrusionScaleFactor: 1
+        colliderOptions:
+          colliderType: 0
+        materialOptions:
+          style: 0
+          texturingType: 0
+          materials:
+          - Materials:
+            - {fileID: 0}
+          - Materials:
+            - {fileID: 0}
+          atlasInfo: {fileID: 0}
+          lightStyleOpacity: 1
+          darkStyleOpacity: 1
+          colorStyleColor: {r: 0.1764706, g: 0.8509805, b: 1, a: 1}
+          samplePalettes: 0
+          colorPalette: {fileID: 0}
+          customStyleOptions:
+            texturingType: 0
+            materials:
+            - Materials:
+              - {fileID: 735181620}
+            - Materials:
+              - {fileID: 325722553}
+            atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21,
+              type: 2}
+            colorPalette: {fileID: 11400000, guid: 57bdfa37edf7a4f7f999d19443497554,
+              type: 2}
+          RenderQueue: 0
+        performanceOptions:
+          isEnabled: 0
+          entityPerCoroutine: 0
+        honorBuildingIdSetting: 0
+        buildingsWithUniqueIds: 0
+        moveFeaturePositionTo: 0
+        MeshModifiers: []
+        GoModifiers: []
+        presetFeatureType: 4
+        ModifierStacks:
+        - {fileID: 11400000, guid: df4611145bfc34e679e578fec3a57473, type: 2}
+        _maskValue: 0
+        selectedTypes: 
+      locationPrefabList: []
+--- !u!21 &325722553
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
@@ -199,178 +365,6 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []
---- !u!114 &230684677
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 526c8a90df31d41fe8057a6f85c7a3e4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TerrainLayer:
-    _layerProperty:
-      sourceType: 0
-      sourceOptions:
-        isActive: 1
-        layerSource:
-          Name: 
-          Id: mapbox.terrain-rgb
-          Modified: 
-          UserName: 
-      elevationLayerType: 1
-      requiredOptions:
-        exaggerationFactor: 2
-      colliderOptions:
-        addCollider: 0
-      modificationOptions:
-        sampleCount: 100
-        useRelativeHeight: 0
-        earthRadius: 1000
-      unityLayerOptions:
-        addToLayer: 0
-        layerId: 0
-      sideWallOptions:
-        isActive: 0
-        wallHeight: 10
-        wallMaterial: {fileID: 0}
-      TileMeshSize: 100
-  ImageryLayer:
-    _layerProperty:
-      sourceType: 4
-      sourceOptions:
-        isActive: 1
-        layerSource:
-          Name: Satellite
-          Id: mapbox.satellite
-          Modified: 
-          UserName: 
-      rasterOptions:
-        useRetina: 1
-        useCompression: 0
-        useMipMap: 0
-  VectorLayer:
-    _layerProperty:
-      tileJsonData:
-        tileJSONLoaded: 0
-        LayerDisplayNames:
-        - admin
-        - aeroway
-        - airport_label
-        - barrier_line
-        - building
-        - country_label
-        - housenum_label
-        - landuse
-        - landuse_overlay
-        - marine_label
-        - motorway_junction
-        - mountain_peak_label
-        - place_label
-        - poi_label
-        - rail_station_label
-        - road
-        - road_label
-        - state_label
-        - water
-        - water_label
-        - waterway
-        - waterway_label
-      _sourceType: 3
-      sourceOptions:
-        isActive: 0
-        layerSource:
-          Name: Mapbox Streets v7
-          Id: mapbox.mapbox-streets-v7
-          Modified: 
-          UserName: 
-      useOptimizedStyle: 0
-      optimizedStyle:
-        Name: 
-        Id: 
-        Modified: 
-        UserName: 
-      performanceOptions:
-        isEnabled: 1
-        entityPerCoroutine: 20
-      vectorSubLayers:
-      - coreOptions:
-          sourceId: 
-          isActive: 1
-          sublayerName: Untitled
-          geometryType: 3
-          layerName: building
-          snapToTerrain: 1
-          combineMeshes: 0
-        lineGeometryOptions:
-          Width:
-            serializedVersion: 2
-            m_Curve: []
-            m_PreInfinity: 0
-            m_PostInfinity: 0
-            m_RotationOrder: 0
-          MiterLimit: 0.2
-          RoundLimit: 1.05
-          JoinType: 1
-          CapType: 1
-        filterOptions:
-          _selectedLayerName: 
-          filters: []
-          combinerType: 0
-        extrusionOptions:
-          _selectedLayerName: 
-          extrusionType: 0
-          extrusionGeometryType: 0
-          propertyName: height
-          propertyDescription: 
-          minimumHeight: 0
-          maximumHeight: 1
-          extrusionScaleFactor: 1
-        colliderOptions:
-          colliderType: 0
-        materialOptions:
-          style: 0
-          texturingType: 0
-          materials:
-          - Materials:
-            - {fileID: 0}
-          - Materials:
-            - {fileID: 0}
-          atlasInfo: {fileID: 0}
-          lightStyleOpacity: 1
-          darkStyleOpacity: 1
-          colorStyleColor: {r: 0.1764706, g: 0.8509805, b: 1, a: 1}
-          samplePalettes: 0
-          colorPalette: {fileID: 0}
-          customStyleOptions:
-            texturingType: 0
-            materials:
-            - Materials:
-              - {fileID: 830101743}
-            - Materials:
-              - {fileID: 96280564}
-            atlasInfo: {fileID: 11400000, guid: 414754d7155df47beb52ca117a774f21,
-              type: 2}
-            colorPalette: {fileID: 11400000, guid: 57bdfa37edf7a4f7f999d19443497554,
-              type: 2}
-          RenderQueue: 0
-        performanceOptions:
-          isEnabled: 0
-          entityPerCoroutine: 0
-        honorBuildingIdSetting: 0
-        buildingsWithUniqueIds: 0
-        moveFeaturePositionTo: 0
-        MeshModifiers: []
-        GoModifiers: []
-        presetFeatureType: 0
-        ModifierStacks:
-        - {fileID: 11400000, guid: 33602c6677363b84dbaa74314d2eae89, type: 2}
-        _maskValue: 0
-        selectedTypes: 
-      locationPrefabList: []
 --- !u!1 &472501532
 GameObject:
   m_ObjectHideFlags: 0
@@ -437,7 +431,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!21 &830101743
+--- !u!21 &735181620
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
@@ -1034,7 +1028,7 @@ Camera:
   m_GameObject: {fileID: 1787361570}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
+  m_ClearFlags: 2
   m_BackGroundColor: {r: 0.13235295, g: 0.13235295, b: 0.13235295, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
@@ -1049,7 +1043,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.1
-  far clip plane: 10001
+  far clip plane: 1000
   field of view: 50
   orthographic: 0
   orthographic size: 256
@@ -1111,6 +1105,7 @@ GameObject:
   - component: {fileID: 1885181996}
   - component: {fileID: 1885181999}
   - component: {fileID: 1885181998}
+  - component: {fileID: 1885182000}
   m_Layer: 0
   m_Name: Map2
   m_TagString: Untagged
@@ -1157,7 +1152,7 @@ MonoBehaviour:
       placementType: 1
     scalingOptions:
       scalingType: 1
-      unityTileSize: 100
+      unityTileSize: 10
     tileMaterial: {fileID: 2100000, guid: 764fa5e39b2479249af645452ac5d740, type: 2}
   CameraController: {fileID: 1885181998}
   QuadTreeGenerator: {fileID: 1885181999}
@@ -1190,7 +1185,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Pitch: 30
   Bearing: 0
-  CamDistanceMultiplier: 2
+  CamDistanceMultiplier: 1
   ZoomSpeed: 0.5
   RotationSpeed: 50
   CameraDistance: 0
@@ -1385,6 +1380,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinZoom: 2
   LevelDecisionMultiplier: 2
+--- !u!114 &1885182000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1885181995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94bc74bfa14cf7140b49b47f91b90d29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Multiplier: 0.02
 --- !u!1 &1929197852
 GameObject:
   m_ObjectHideFlags: 0

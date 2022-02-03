@@ -94,9 +94,14 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
+		protected override void OnStopped(UnityTile tile)
+		{
+			VectorFactoryManager.StopTile(tile);
+		}
+
 		protected override void OnClearTile(UnityTile tile)
 		{
-			tile.SetVectorData(null);
+			//tile.SetVectorData(null);
 			if (_layerBuilder != null)
 			{
 				foreach (var layer in _layerBuilder.Values)
@@ -135,7 +140,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			if (tile != null)
 			{
 				_tilesWaitingResponse.Remove(tile);
-				tile.SetVectorData(null);
+				tile.SetVectorData(vectorTile);
 				OnErrorOccurred(e);
 			}
 		}

@@ -73,6 +73,11 @@ namespace Mapbox.Unity.Map
 			Factory.Unregister(tile);
 		}
 
+		public override void Stop(UnityTile tile)
+		{
+			Factory.Stop(tile);
+		}
+
 		public override void ClearTile(UnityTile tile)
 		{
 			Factory.ClearTile(tile);

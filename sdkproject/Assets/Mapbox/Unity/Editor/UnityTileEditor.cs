@@ -18,12 +18,15 @@ public class UnityTileEditor : Editor
 	private bool _tilesFold;
 	private Vector2[] _logScrollPos = new Vector2[3];
 	private bool[] _logFold = new bool[3];
+	private Vector2 _unityTilelogScrollPos = new Vector2();
 
 	//SerializedProperty lookAtPoint;
 	private bool[] _tileTabs;
 
 	void OnEnable()
 	{
+		if (target == null)
+			return;
 		//lookAtPoint = serializedObject.FindProperty("lookAtPoint");
 		_tile = (UnityTile) target;
 		_tileTabs = new bool[10];
@@ -70,6 +73,7 @@ public class UnityTileEditor : Editor
 
 		EditorGUILayout.LabelField("Tile Id", _tile.CanonicalTileId.ToString(), EditorStyles.label);
 		EditorGUILayout.LabelField("Tile Scale", _tile.TileScale.ToString(), EditorStyles.label);
+		EditorGUILayout.LabelField("Waiting For", string.Join(",",_tile._finishConditionTiles.Select(x => x.GetType().ToString()).ToArray()), EditorStyles.label);
 		//EditorGUILayout.LabelField("Waiting to Finish", _tile._finishConditionTiles.Count.ToString(), EditorStyles.label);
 
 
@@ -131,6 +135,18 @@ public class UnityTileEditor : Editor
 			}
 
 			EditorGUI.indentLevel--;
+		}
+
+		using (var h = new EditorGUILayout.HorizontalScope())
+		{
+			using (var scrollView = new EditorGUILayout.ScrollViewScope(_unityTilelogScrollPos, GUILayout.Height(300)))
+			{
+				_unityTilelogScrollPos = scrollView.scrollPosition;
+				foreach (var log in _tile.Logs)
+				{
+					EditorGUILayout.LabelField(string.Format(log), EditorStyles.miniLabel);
+				}
+			}
 		}
 
 		serializedObject.ApplyModifiedProperties();

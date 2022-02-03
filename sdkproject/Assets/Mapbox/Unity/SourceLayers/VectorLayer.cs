@@ -66,6 +66,11 @@ namespace Mapbox.Unity.Map
 			_vectorTileFactory.Unregister(tile);
 		}
 
+		public override void Stop(UnityTile tile)
+		{
+			_vectorTileFactory.Stop(tile);
+		}
+
 		public override void ClearTile(UnityTile tile)
 		{
 			_vectorTileFactory.ClearTile(tile);

@@ -93,7 +93,14 @@ namespace Mapbox.Unity.DataFetching
 						tileKey = _tileOrder.Dequeue();
 						var fi = _tileFetchInfos[tileKey];
 						_tileFetchInfos.Remove(tileKey);
-						_globalActiveRequests.Add(tileKey, fi.RasterTile);
+						if (!_globalActiveRequests.ContainsKey(tileKey))
+						{
+							_globalActiveRequests.Add(tileKey, fi.RasterTile);
+						}
+						else
+						{
+							Debug.Log("here");
+						}
 						fi.RasterTile.Initialize(
 							_fileSource,
 							fi.RasterTile.Id,

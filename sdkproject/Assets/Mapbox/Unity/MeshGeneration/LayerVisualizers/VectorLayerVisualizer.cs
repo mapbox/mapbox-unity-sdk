@@ -156,6 +156,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				return;
 			}
 
+			tile.Logs.Add("ProcessLayer");
 			var cachedTileId = tile.CanonicalTileId;
 			var cachedCallback = callback;
 
@@ -243,6 +244,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 			}
 			void ContinueWith(Task t)
 			{
+				tile.Logs.Add("ContinueWith");
 				if (_activeObjects.ContainsKey(tile))
 				{
 					ClearObjectOnUnregister(tile);
@@ -257,6 +259,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 					//is there a better way to check this?
 					if (tile.CanonicalTileId == cachedTileId && !tile.IsRecycled)
 					{
+						tile.Logs.Add("creating objects");
 						foreach (var pair in meshDataList)
 						{
 							foreach (var meshTuples in pair.Value)
@@ -283,6 +286,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				Action = Action,
 				Token = source,
 				ContinueWith = ContinueWith,
+				OnCancelled = () => { cachedCallback(tile, this);},
 				#if UNITY_EDITOR
 				Info = "VectorLayerVisualizer.ProcessLayer"
 				#endif
@@ -306,6 +310,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				var st = mergedData.Vertices.Count;
 				mergedData.Vertices.AddRange(currentData.Vertices);
 				mergedData.Normals.AddRange(currentData.Normals);
+				mergedData.Tangents.AddRange(currentData.Tangents);
 
 				var c2 = currentData.UV.Count;
 				for (int j = 0; j < c2; j++)

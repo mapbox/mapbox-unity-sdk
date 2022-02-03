@@ -77,6 +77,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
+		protected override void OnStopped(UnityTile tile)
+		{
+			ImageFactoryManager.Stop(tile);
+		}
+
 		protected override void OnUnregistered(UnityTile tile)
 		{
 			ImageFactoryManager.UnregisterTile(tile);

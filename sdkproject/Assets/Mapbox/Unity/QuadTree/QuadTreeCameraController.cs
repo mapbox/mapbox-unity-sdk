@@ -49,7 +49,10 @@ namespace Mapbox.Unity.QuadTree
 			{
 				var mouseWorld = GetPlaneIntersection(Input.mousePosition);
 				var preMeters = WorldToMeterPosition(mouseWorld);
-				var postZoom = Mathf.Max(0.0f, Mathf.Min(_map.Zoom + Input.GetAxis("Mouse ScrollWheel") * ZoomSpeed, 21.0f));
+				var postZoom = _map.Zoom + Input.GetAxis("Mouse ScrollWheel") * ZoomSpeed;
+				postZoom =
+					Mathf.Max(_map.Options.locationOptions.MinZoom,
+						Mathf.Min(postZoom, _map.Options.locationOptions.MaxZoom));
 
 
 				var camDistanceAfterZoom = CalculateCameraDistance(postZoom);

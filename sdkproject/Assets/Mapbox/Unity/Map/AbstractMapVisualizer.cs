@@ -340,9 +340,9 @@ namespace Mapbox.Unity.Map
 				return null;
 
 			var unityTile = _tilePool.GetObject();
-
+			unityTile.gameObject.SetActive(enableTile);
 			var referenceTileRect = Conversions.TileBounds(tileId);
-			var scale = (float)(100 / referenceTileRect.Size.x);
+			var scale = (float)(_map.UnityTileSize / referenceTileRect.Size.x);
 			unityTile.Initialize(_map, tileId, scale, TerrainLayer.IsLayerActive && TerrainLayer.ElevationType != ElevationLayerType.FlatTerrain);
 
 			PlaceTile(tileId, unityTile, _map);
@@ -371,10 +371,11 @@ namespace Mapbox.Unity.Map
 
 			unityTile.SetFinishCondition();
 
-			if (enableTile)
-			{
-				unityTile.gameObject.SetActive(true);
-			}
+
+			// if (enableTile)
+			// {
+			// 	unityTile.gameObject.SetActive(true);
+			// }
 
 			return unityTile;
 		}
@@ -385,6 +386,7 @@ namespace Mapbox.Unity.Map
 			{
 				var unityTile = _activeTiles[tileId];
 				StopTile(unityTile);
+				unityTile.Logs.Add(string.Format("{0} - {1}", Time.frameCount, "Stopped"));
 			}
 		}
 
@@ -397,6 +399,7 @@ namespace Mapbox.Unity.Map
 				// 	factory.Unregister(unityTile);
 				// }
 
+				unityTile.IsStopped = true;
 				if (ImageryLayer.IsLayerActive)
 				{
 					ImageryLayer.Unregister(unityTile);
@@ -412,7 +415,6 @@ namespace Mapbox.Unity.Map
 					VectorLayer.Unregister(unityTile);
 				}
 
-				unityTile.IsStopped = true;
 			}
 		}
 
@@ -422,8 +424,10 @@ namespace Mapbox.Unity.Map
 			{
 				return;
 			}
-			
+
 			var unityTile = ActiveTiles[tileId];
+			unityTile.Logs
+				.Add(string.Format("{0} - {1}", Time.frameCount, "DisposeTile"));
 
 			if (unityTile != null)
 			{
@@ -591,6 +595,6 @@ namespace Mapbox.Unity.Map
 
 		#endregion
 
-		public Queue<UnityTile> GetInactiveTiles => _tilePool.GetQueue() as Queue<UnityTile>;
+		public Queue<UnityTile> GetInactiveTiles => _tilePool?.GetQueue() as Queue<UnityTile>;
 	}
 }

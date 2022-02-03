@@ -88,6 +88,11 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			TerrainFactoryManager.UnregisterTile(tile);
 		}
 
+		protected override void OnStopped(UnityTile tile)
+		{
+			TerrainFactoryManager.Stop(tile);
+		}
+
 		protected override void OnClearTile(UnityTile tile)
 		{
 			TerrainFactoryManager.ClearTile(tile);
