@@ -139,8 +139,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 		{
 			if (tile != null)
 			{
+				tile.Logs.Add("vector OnFetchingError");
 				_tilesWaitingResponse.Remove(tile);
-				tile.SetVectorData(vectorTile);
 				OnErrorOccurred(e);
 			}
 		}

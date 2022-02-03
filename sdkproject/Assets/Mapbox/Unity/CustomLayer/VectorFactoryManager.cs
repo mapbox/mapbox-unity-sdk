@@ -13,7 +13,7 @@ namespace Mapbox.Unity.CustomLayer
 
 		protected VectorLayerProperties _properties;
 		protected VectorDataFetcher _fetcher;
-		protected Dictionary<UnityTile, Tile> _tileTracker = new Dictionary<UnityTile, Tile>();
+		protected Dictionary<UnityTile, Mapbox.Map.VectorTile> _tileTracker = new Dictionary<UnityTile, Mapbox.Map.VectorTile>();
 
 		public VectorFactoryManager(VectorLayerProperties properties)
 		{

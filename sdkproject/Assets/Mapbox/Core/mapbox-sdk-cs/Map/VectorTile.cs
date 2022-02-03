@@ -65,6 +65,8 @@ namespace Mapbox.Map
 		private bool isDisposed = false;
 
 		private byte[] byteData;
+		private TaskWrapper _task;
+
 		public byte[] ByteData
 		{
 			get { return this.byteData; }
@@ -117,6 +119,15 @@ namespace Mapbox.Map
 			_unityRequest = fileSource.MapboxImageRequest(MakeTileResource(tilesetId).GetUrl(), HandleTileResponse, 2);
 		}
 
+		public override void Cancel()
+		{
+			base.Cancel();
+			if (_task != null)
+			{
+				MapboxAccess.Instance.TaskManager.CancelTask(_task);
+			}
+		}
+
 		private void HandleTileResponse(TextureResponse response)
 		{
 			_unityRequest = null;
@@ -151,7 +162,7 @@ namespace Mapbox.Map
 				byteData = response.Data;
 
 
-				var task = new TaskWrapper(Id.GenerateKey(TilesetId, "VectorTile"))
+				_task = new TaskWrapper(Id.GenerateKey(TilesetId, "VectorTile"))
 				{
 					TileId = Id,
 					Action = () =>
@@ -165,8 +176,12 @@ namespace Mapbox.Map
 						if (TileState != TileState.Canceled)
 						{
 							TileState = TileState.Loaded;
+							DataProcessingFinished(true);
 						}
-						DataProcessingFinished(true);
+						else
+						{
+							DataProcessingFinished(false);
+						}
 					},
 					OnCancelled = () =>
 					{
@@ -179,7 +194,7 @@ namespace Mapbox.Map
 				};
 
 				TileState = TileState.Processing;
-				MapboxAccess.Instance.TaskManager.AddTask(task);
+				MapboxAccess.Instance.TaskManager.AddTask(_task);
 				//first add the parsing task,
 				//THEN call the callback which will lead into caching etc.
 				_callback();

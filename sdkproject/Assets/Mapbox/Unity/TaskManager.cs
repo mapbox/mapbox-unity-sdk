@@ -165,6 +165,12 @@ namespace Mapbox.Unity
 				_tasksByTile.Remove(cancelledTileId);
 			}
 		}
+
+		public virtual void CancelTask(TaskWrapper task)
+		{
+			_allTasks.Remove(task.Id);
+			task.OnCancelled?.Invoke();
+		}
 	}
 
 	public class TaskWrapper
