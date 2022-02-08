@@ -352,9 +352,9 @@ namespace Mapbox.Unity
 		[NonSerialized] private MapboxAccounts mapboxAccounts = new MapboxAccounts();
 
 		public string AccessToken;
-		public uint MemoryCacheSize = 500;
-		public uint FileCacheSize = 2500;
-		public int DefaultTimeout = 30;
+		public uint MemoryCacheSize = 200;
+		public uint FileCacheSize = 500;
+		public int DefaultTimeout = 10;
 
 		public string GetMapsSkuToken()
 		{
