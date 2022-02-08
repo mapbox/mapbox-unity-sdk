@@ -41,8 +41,6 @@ namespace Mapbox.Unity.Map
 		protected Vector2d _centerMercator;
 		protected float _worldRelativeScale;
 		protected Vector3 _mapScaleFactor;
-		const float MIN_ZOOM = 0;
-		const float MAX_ZOOM = 20;
 
 		protected Dictionary<UnwrappedTileId, HashSet<UnwrappedTileId>> TileTracker = new Dictionary<UnwrappedTileId, HashSet<UnwrappedTileId>>();
 		protected HashSet<UnwrappedTileId> _destructionList = new HashSet<UnwrappedTileId>();
@@ -192,9 +190,9 @@ namespace Mapbox.Unity.Map
 		/// <param name="zoom">Zoom level.</param>
 		public virtual void UpdateMap(Vector2d latLon, float zoom)
 		{
-			if (zoom > MAX_ZOOM || zoom < MIN_ZOOM)
+			if (zoom > Options.locationOptions.MaxZoom || zoom < Options.locationOptions.MinZoom)
 			{
-				zoom = Mathf.Clamp(zoom, MIN_ZOOM, MAX_ZOOM);
+				zoom = Mathf.Clamp(zoom, Options.locationOptions.MinZoom, Options.locationOptions.MaxZoom);
 				//throw new Exception($"AbstractMap must stay within {MIN_ZOOM}, {MAX_ZOOM} zoom level.");
 			}
 

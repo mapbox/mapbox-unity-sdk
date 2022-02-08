@@ -347,7 +347,7 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 
 	public interface IHeightModifier
 	{
-		public void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null);
+		void Run(VectorFeatureUnity feature, MeshData md, UnityTile tile = null);
 	}
 
 	public enum HeightModifierTypes
