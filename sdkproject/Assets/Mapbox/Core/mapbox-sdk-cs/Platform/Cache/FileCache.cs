@@ -46,18 +46,13 @@ namespace Mapbox.Platform.Cache
 
 		protected FileDataFetcher _fileDataFetcher;
 		protected Dictionary<string, CacheItem> _cachedResponses;
-		protected Queue<InfoWrapper> _infosToSave;
-		protected HashSet<int> _infoKeys;
 		protected Dictionary<string, string> MapIdToFolderNameDictionary;
 
 		public FileCache()
 		{
 			_fileDataFetcher = new FileDataFetcher();
 			_cachedResponses = new Dictionary<string, CacheItem>();
-			_infosToSave = new Queue<InfoWrapper>();
-			_infoKeys = new HashSet<int>();
 			MapIdToFolderNameDictionary = new Dictionary<string, string>();
-			Runnable.Run(FileScheduler());
 
 			if (!Directory.Exists(PersistantCacheRootFolderPath))
 			{
@@ -83,17 +78,8 @@ namespace Mapbox.Platform.Cache
 		public virtual void Add(CanonicalTileId tileId, string tilesetId, TextureCacheItem textureCacheItem, bool forceInsert)
 		{
 			var key = tileId.GenerateKey(tilesetId);
-			if (_infoKeys.Contains(key))
-			{
-				if (Debug.isDebugBuild) Debug.Log(string.Format("This image file ({0}) is already queued for saving. Removing (and destroying) first instance, adding new one.", key));
-				//we can't find the first info object here in O(n) but we are removing it from _infoKeys
-				//so we can find it and destroy the texture inside on update below
-				_infoKeys.Remove(key);
-			}
-
-			_infoKeys.Add(key);
 			var infoWrapper = new InfoWrapper(key, tilesetId, tileId, textureCacheItem);
-			_infosToSave.Enqueue(infoWrapper);
+			SaveInfo(infoWrapper);
 		}
 
 		public virtual bool GetAsync(CanonicalTileId tileId, string tilesetId, bool isTextureNonreadable, Action<TextureCacheItem> callback)
@@ -176,36 +162,6 @@ namespace Mapbox.Platform.Cache
 			else
 			{
 				_cachedResponses = new Dictionary<string, CacheItem>();
-			}
-		}
-
-		private IEnumerator FileScheduler()
-		{
-			while (true)
-			{
-				SaveFromQueue();
-				yield return null;
-			}
-		}
-
-		private void SaveFromQueue()
-		{
-			if (_infosToSave.Count > 0)
-			{
-				var info = _infosToSave.Dequeue();
-				if (_infoKeys.Contains(info.Key))
-				{
-					_infoKeys.Remove(info.Key);
-					SaveInfo(info);
-				}
-				else
-				{
-					//this object was removed from queue, probably updates
-					//texture inside should be destroyed
-					GameObject.Destroy(info.TextureCacheItem.Texture2D);
-					info.TextureCacheItem.Data = null;
-					if (Debug.isDebugBuild) Debug.Log("Destroying the first copy of the same tile in file save queue");
-				}
 			}
 		}
 
@@ -303,11 +259,6 @@ namespace Mapbox.Platform.Cache
 				TextureCacheItem = textureCacheItem;
 			}
 		}
-
-		public int GetInfosToSaveListCount()
-		{
-			return _infosToSave.Count;
-		}
 	}
 
 	public class EditorFileCache : FileCache
@@ -316,11 +267,6 @@ namespace Mapbox.Platform.Cache
 		public Action<CanonicalTileId, string> TileRequested = (id, s) => { };
 		public Action<CanonicalTileId, string> SavingInfo = (id, s) => { };
 		public new Action<CanonicalTileId, string, TextureCacheItem> FileSaved = (s, id, item) => { };
-
-		public new int GetInfosToSaveListCount()
-		{
-			return _infosToSave.Count;
-		}
 
 		public override void Add(CanonicalTileId tileId, string tilesetId, TextureCacheItem textureCacheItem, bool forceInsert)
 		{

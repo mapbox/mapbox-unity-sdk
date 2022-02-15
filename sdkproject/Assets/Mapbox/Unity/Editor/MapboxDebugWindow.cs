@@ -865,10 +865,6 @@ public class FileCacheDebugView
 			return;
 		}
 
-		var infosToSaveCount = _fileCache.GetInfosToSaveListCount();
-
-		GUILayout.Label(string.Format("Info in queue for saving : {0}", infosToSaveCount), EditorStyles.label);
-
 		EditorGUILayout.BeginHorizontal();
 		_logsScrollPos = EditorGUILayout.BeginScrollView(_logsScrollPos, GUILayout.Height(300), GUILayout.ExpandWidth(true));
 
