@@ -134,9 +134,65 @@ namespace Mapbox.Unity.QuadTree
             // }
         }
 
+        protected class ParentTileChildren
+        {
+            public UnwrappedTileId ParentId;
+            public HashSet<UnwrappedTileId> Children;
+            public int LoadingChildren;
+            public Action<ParentTileChildren> Finalize;
+
+            public ParentTileChildren(UnwrappedTileId parentId, Action<ParentTileChildren> finalize)
+            {
+                ParentId = parentId;
+                Children = new HashSet<UnwrappedTileId>();
+                LoadingChildren = 0;
+                Finalize = finalize;
+            }
+
+            public int Count => Children.Count;
+
+            public void Add(UnwrappedTileId newChild)
+            {
+                if (!Children.Contains(newChild))
+                {
+                    Children.Add(newChild);
+                    LoadingChildren++;
+                }
+            }
+
+            public void TileCompleted(UnwrappedTileId parentId)
+            {
+                if (Children.Contains(parentId))
+                {
+                    LoadingChildren--;
+
+                    if (LoadingChildren <= 0)
+                    {
+                        if (Finalize != null)
+                            Finalize(this);
+                    }
+                }
+            }
+
+            public void RemoveTile(UnwrappedTileId parentId)
+            {
+                if (Children.Contains(parentId))
+                {
+                    Children.Remove(parentId);
+                    LoadingChildren--;
+
+                    if (LoadingChildren <= 0)
+                    {
+                        if (Finalize != null)
+                            Finalize(this);
+                    }
+                }
+            }
+        }
+
         protected Dictionary<UnwrappedTileId, HashSet<UnwrappedTileId>> ZoomOutTracker = new Dictionary<UnwrappedTileId, HashSet<UnwrappedTileId>>();
         private Dictionary<UnwrappedTileId, UnwrappedTileId> _childParentRelationships = new Dictionary<UnwrappedTileId, UnwrappedTileId>();
-        protected Dictionary<UnwrappedTileId, HashSet<UnwrappedTileId>> _parentsWaitingForChildren = new Dictionary<UnwrappedTileId, HashSet<UnwrappedTileId>>();
+        protected Dictionary<UnwrappedTileId, ParentTileChildren> _parentsWaitingForChildren = new Dictionary<UnwrappedTileId, ParentTileChildren>();
         private HashSet<UnwrappedTileId> _zoomOutChildTilesOnHold = new HashSet<UnwrappedTileId>();
 
         private void OnMapVisualizerOnOnTileDisposing(UnityTile t)
@@ -174,19 +230,7 @@ namespace Mapbox.Unity.QuadTree
                 _childParentRelationships.Remove(tileId);
                 if (_parentsWaitingForChildren.ContainsKey(parent))
                 {
-                    _parentsWaitingForChildren[parent].Remove(tileId);
-                    if (_parentsWaitingForChildren[parent].Count == 0)
-                    {
-                        _parentsWaitingForChildren.Remove(parent);
-                        if (_zoomOutChildTilesOnHold.Contains(parent))
-                        {
-                            _zoomOutChildTilesOnHold.Remove(parent);
-                        }
-                        // if (!_previousView.Tiles.ContainsKey(parent))
-                        // {
-                        //     toDispose.Add(parent);
-                        // }
-                    }
+                    _parentsWaitingForChildren[parent].RemoveTile(tileId);
                 }
 
             }
@@ -204,31 +248,7 @@ namespace Mapbox.Unity.QuadTree
 
                 if (_parentsWaitingForChildren.ContainsKey(parent))
                 {
-                    _parentsWaitingForChildren[parent].Remove(t.UnwrappedTileId);
-                    if (_parentsWaitingForChildren[parent].Count == 0)
-                    {
-                        _parentsWaitingForChildren.Remove(parent);
-                        foreach (var tileId in parent.Children)
-                        {
-                            if (!_childParentRelationships.ContainsKey(tileId) &&
-                                !_parentsWaitingForChildren.ContainsKey(tileId) &&
-                                _mapVisualizer.ActiveTiles.ContainsKey(tileId) &&
-                                _previousView.Tiles.ContainsKey(tileId))
-                            {
-                                _mapVisualizer.ActiveTiles[tileId].gameObject.SetActive(true);
-                            }
-                        }
-
-                        if (_mapVisualizer.ActiveTiles.ContainsKey(parent))
-                        {
-                            _mapVisualizer.ActiveTiles[parent].Logs
-                                .Add(string.Format("{0} - {1}", Time.frameCount, "OnMapVisualizerOnOnTileFinished parent"));
-                            _mapVisualizer.ActiveTiles[parent].gameObject.SetActive(false);
-                            _mapVisualizer.ActiveTiles[parent].Logs
-                                .Add(string.Format("{0} - {1}", Time.frameCount, "set active false"));
-                            _mapVisualizer.DisposeTile(parent);
-                        }
-                    }
+                    _parentsWaitingForChildren[parent].TileCompleted(t.UnwrappedTileId);
                 }
                 else
                 {
@@ -264,129 +284,173 @@ namespace Mapbox.Unity.QuadTree
             }
         }
 
+        private void FinalizeZoomInTile(ParentTileChildren rel)
+        {
+            foreach (var tileId in rel.Children)
+            {
+                if (!_childParentRelationships.ContainsKey(tileId) &&
+                    !_parentsWaitingForChildren.ContainsKey(tileId) &&
+                    _mapVisualizer.ActiveTiles.ContainsKey(tileId) &&
+                    _previousView.Tiles.ContainsKey(tileId))
+                {
+                    _mapVisualizer.ActiveTiles[tileId].gameObject.SetActive(true);
+                }
+            }
+            rel.Children.Clear();
+            _parentsWaitingForChildren.Remove(rel.ParentId);
+
+            if (_mapVisualizer.ActiveTiles.ContainsKey(rel.ParentId))
+            {
+                _mapVisualizer.ActiveTiles[rel.ParentId].Logs
+                    .Add(string.Format("{0} - {1}", Time.frameCount, "OnMapVisualizerOnOnTileFinished parent"));
+                _mapVisualizer.ActiveTiles[rel.ParentId].gameObject.SetActive(false);
+                _mapVisualizer.ActiveTiles[rel.ParentId].Logs
+                    .Add(string.Format("{0} - {1}", Time.frameCount, "set active false"));
+                _mapVisualizer.DisposeTile(rel.ParentId);
+            }
+
+            if (_zoomOutChildTilesOnHold.Contains(rel.ParentId))
+            {
+                _zoomOutChildTilesOnHold.Remove(rel.ParentId);
+            }
+        }
+
         private void RequestTiles(QuadTreeView newView)
         {
-            var toAdd = new List<Tuple<UnwrappedTileId, UnityRectD, bool>>();
+            var toAdd = new List<Tuple<UnwrappedTileId, UnityRectD, bool, List<string>>>();
             var toRemove = new HashSet<UnwrappedTileId>();
             var toStop = new HashSet<UnwrappedTileId>();
-
             foreach (var newViewTile in newView.Tiles)
             {
+                var tileLogs = new List<string>();
+                tileLogs.Add(Time.frameCount.ToString());
                 if (_mapVisualizer.ActiveTiles.ContainsKey(newViewTile.Key))
                 {
                     continue;
                 }
 
                 var enableTile = true;
-                var newViewRect = newViewTile.Value;
                 var newId = newViewTile.Key;
                 var parentId = newViewTile.Key.Parent;
                 if (newId == parentId)
                     continue;
-                //zoom out
-                for (int i = 0; i < 4; i++)
+
+                if (_previousView != null)
                 {
-                    var child = newViewTile.Value.QuadrantTileId(i);
-                    if (_previousView != null && _previousView.Tiles.ContainsKey(child))
+                    //zoom out
+                    var childrenInView = new List<UnwrappedTileId>();
+                    if (ChildrenInPreviousView(ref newId, ref childrenInView))
                     {
-                        if (!ZoomOutTracker.ContainsKey(newId))
+                        foreach (var child in childrenInView)
                         {
-                            ZoomOutTracker.Add(newId, new HashSet<UnwrappedTileId>());
+                            if (!ZoomOutTracker.ContainsKey(newId))
+                            {
+                                ZoomOutTracker.Add(newId, new HashSet<UnwrappedTileId>());
+                            }
+
+                            enableTile = false;
+                            if (_mapVisualizer.ActiveTiles.ContainsKey(child))
+                            {
+                                if (ZoomOutTracker.ContainsKey(child))
+                                {
+                                    tileLogs.Add("nested zoom out");
+                                    foreach (var grandChild in ZoomOutTracker[child])
+                                    {
+                                        ZoomOutTracker[newId].Add(grandChild);
+                                    }
+
+                                    ZoomOutTracker.Remove(child);
+                                    _zoomOutChildTilesOnHold.Remove(child);
+                                    toRemove.Add(child);
+                                }
+                                else
+                                {
+                                    tileLogs.Add("child added to zoom out tracker & hold " + child);
+                                    ZoomOutTracker[newId].Add(child);
+                                    _zoomOutChildTilesOnHold.Add(child);
+                                    toStop.Add(child);
+                                }
+                            }
+
+                            if (_childParentRelationships.ContainsKey(child))
+                            {
+                                tileLogs.Add("child was in zoom in tracker " + child);
+                                var zoomInParent = _childParentRelationships[child];
+                                _childParentRelationships.Remove(child);
+                                if (_parentsWaitingForChildren.ContainsKey(zoomInParent))
+                                {
+                                    _parentsWaitingForChildren[zoomInParent].RemoveTile(child);
+                                }
+                                else
+                                {
+                                    Debug.Log("this shouldn't happen");
+                                }
+                            }
                         }
 
-                        enableTile = false;
-                        if (_mapVisualizer.ActiveTiles.ContainsKey(child))
-                        {
-                            if (ZoomOutTracker.ContainsKey(child))
-                            {
-                                foreach (var grandChild in ZoomOutTracker[child])
-                                {
-                                    ZoomOutTracker[newId].Add(grandChild);
-                                }
+                    }
 
-                                ZoomOutTracker.Remove(child);
-                                _zoomOutChildTilesOnHold.Remove(child);
-                                toRemove.Add(child);
+                    //zoom in
+                    if (ParentInPreviousView(ref newId, ref parentId))
+                    {
+                        toStop.Add(parentId);
+                        enableTile = false;
+
+                        tileLogs.Add("zoom in");
+                        if (_childParentRelationships.ContainsKey(parentId))
+                        {
+                            var grandParent = _childParentRelationships[parentId];
+                            _parentsWaitingForChildren.Remove(parentId);
+                            _childParentRelationships.Add(newId, grandParent);
+                            if (_parentsWaitingForChildren.ContainsKey(grandParent))
+                            {
+                                _parentsWaitingForChildren[grandParent].Add(newId);
+                                _parentsWaitingForChildren[grandParent].RemoveTile(parentId);
                             }
                             else
                             {
-                                ZoomOutTracker[newId].Add(child);
-                                _zoomOutChildTilesOnHold.Add(child);
-                                toStop.Add(child);
+                                Debug.Log("this shouldn't happen, right?");
                             }
-                        }
 
-                        //this part is important for cases where we zoom out before
-                        //a zoom in operation using same tiles finishes.
-                        //so when you zoom in and before all children is loaded, you zoom out
-                        //this should clear leftovers from first zoom-in action
-
-                        if (_childParentRelationships.ContainsKey(child))
-                        {
-                            var zoomInParent = _childParentRelationships[child];
-                            _childParentRelationships.Remove(child);
-                            _parentsWaitingForChildren[zoomInParent].Remove(child);
-                            if (_parentsWaitingForChildren[zoomInParent].Count == 0)
-                            {
-                                _parentsWaitingForChildren.Remove(zoomInParent);
-                            }
-                        }
-                    }
-                }
-
-                //zoom in
-                if (_previousView != null && _previousView.Tiles.ContainsKey(parentId))
-                {
-                    toStop.Add(parentId);
-                    if (_childParentRelationships.ContainsKey(parentId))
-                    {
-                        var grandParent = _childParentRelationships[parentId];
-                        _parentsWaitingForChildren.Remove(parentId);
-                        _childParentRelationships.Add(newId, grandParent);
-                        if (_parentsWaitingForChildren.ContainsKey(grandParent))
-                        {
-                            _parentsWaitingForChildren[grandParent].Remove(parentId);
-                            _parentsWaitingForChildren[grandParent].Add(newId);
+                            toRemove.Add(parentId);
                         }
                         else
                         {
-                            Debug.Log("this shouldn't happen, right?");
+                            _childParentRelationships.Add(newId, parentId);
+                            if (!_parentsWaitingForChildren.ContainsKey(parentId))
+                            {
+                                _parentsWaitingForChildren.Add(parentId, new ParentTileChildren(parentId, FinalizeZoomInTile));
+                            }
+
+                            _parentsWaitingForChildren[parentId].Add(newId);
+                            tileLogs.Add("added to parents waiting list " + newId);
                         }
 
-                        toRemove.Add(parentId);
-                    }
-                    else
-                    {
-                        _childParentRelationships.Add(newId, parentId);
-                        if (!_parentsWaitingForChildren.ContainsKey(parentId))
+                        if (ZoomOutTracker.ContainsKey(parentId))
                         {
-                            _parentsWaitingForChildren.Add(parentId, new HashSet<UnwrappedTileId>());
-                        }
-                        _parentsWaitingForChildren[parentId].Add(newId);
-                    }
-                    enableTile = false;
+                            tileLogs.Add("hmm ZoomOutTracker.ContainsKey(parentId)");
+                            foreach (var tileId in ZoomOutTracker[parentId])
+                            {
+                                _zoomOutChildTilesOnHold.Remove(tileId);
+                            }
 
-                    if(ZoomOutTracker.ContainsKey(parentId))
-                    {
-                        foreach (var tileId in ZoomOutTracker[parentId])
-                        {
-                            _zoomOutChildTilesOnHold.Remove(tileId);
+                            ZoomOutTracker.Remove(parentId);
                         }
-                        ZoomOutTracker.Remove(parentId);
+
+                        if (ZoomOutTracker.ContainsKey(newId))
+                        {
+                            tileLogs.Add("hmm ZoomOutTracker.ContainsKey(newId)");
+                            foreach (var tileId in ZoomOutTracker[newId])
+                            {
+                                _zoomOutChildTilesOnHold.Remove(tileId);
+                            }
+
+                            ZoomOutTracker.Remove(newId);
+                        }
                     }
 
-                    if (ZoomOutTracker.ContainsKey(newId))
-                    {
-                        foreach (var tileId in ZoomOutTracker[newId])
-                        {
-                            _zoomOutChildTilesOnHold.Remove(tileId);
-                        }
-                        ZoomOutTracker.Remove(newId);
-                    }
                 }
-
-                toAdd.Add(new Tuple<UnwrappedTileId, UnityRectD, bool>(newId, newViewRect, enableTile));
-
+                toAdd.Add(new Tuple<UnwrappedTileId, UnityRectD, bool, List<string>>(newId, newViewTile.Value, enableTile, tileLogs));
             }
 
             foreach (var tile in _mapVisualizer.ActiveTiles.Values)
@@ -426,6 +490,21 @@ namespace Mapbox.Unity.QuadTree
                     newChildTile.Logs
                         .Add(string.Format("{0} - {1}", Time.frameCount, "brand new tile"));
                 }
+
+                foreach (var log in tuple.Item4)
+                {
+                    newChildTile.Logs.Add(log);
+                }
+
+                if (ZoomOutTracker.ContainsKey(tuple.Item1))
+                {
+                    newChildTile.Logs.Add("waiting for children: " + string.Join(",", ZoomOutTracker[tuple.Item1]));
+                }
+
+                if (_childParentRelationships.ContainsKey(tuple.Item1))
+                {
+                    newChildTile.Logs.Add("waiting for parent: " + string.Join(",", _childParentRelationships[tuple.Item1]));
+                }
             }
             foreach (var unwrappedTileId in toRemove)
             {
@@ -440,6 +519,39 @@ namespace Mapbox.Unity.QuadTree
             {
                 _mapVisualizer.StopTile(unwrappedTileId);
             }
+        }
+
+        private bool ChildrenInPreviousView(ref UnwrappedTileId newId, ref List<UnwrappedTileId> childrenInView)
+        {
+            foreach (var pair in _previousView.Tiles)
+            {
+                var id = pair.Key;
+                if (id.Z > newId.Z)
+                {
+                    if (newId == id.ParentAt(newId.Z))
+                    {
+                        childrenInView.Add(id);
+                    }
+                }
+            }
+
+            return childrenInView.Count > 0;
+        }
+
+        private bool ParentInPreviousView(ref UnwrappedTileId newId, ref UnwrappedTileId parentId)
+        {
+            parentId = newId.Parent;
+            while (parentId.Z > 1)
+            {
+                if(_previousView.Tiles.ContainsKey(parentId))
+                {
+                    return true;
+                }
+
+                parentId = parentId.Parent;
+            }
+
+            return false;
         }
 
         void OnDrawGizmos()

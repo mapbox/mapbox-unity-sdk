@@ -288,7 +288,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				ContinueWith = ContinueWith,
 				OnCancelled = () => { cachedCallback(tile, this);},
 				#if UNITY_EDITOR
-				Info = "VectorLayerVisualizer.ProcessLayer"
+				Info = "VectorLayerVisualizer.ProcessLayer " + Key
 				#endif
 			};
 

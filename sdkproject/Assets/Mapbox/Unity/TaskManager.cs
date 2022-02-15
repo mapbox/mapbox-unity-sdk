@@ -248,10 +248,10 @@ namespace Mapbox.Unity
 				{
 					taskCount = _tasksByTile[cancelledTileId].Count;
 					tileTypes = string.Join(" | ", _tasksByTile[cancelledTileId].Select(x => _allTasks[x].Info));
-				}
 
-				Logs.Add(string.Format("{0,-10} {1,-15} {2,-30}; ({3}) {4}", Time.frameCount, cancelledTileId, "cancel", taskCount, tileTypes));
-				TotalCancelledCount += taskCount;
+					Logs.Add(string.Format("{0,-10} {1,-15} {2,-30}; ({3}) {4}", Time.frameCount, cancelledTileId, "cancel", taskCount, tileTypes));
+					TotalCancelledCount += taskCount;
+				}
 			}
 
 			base.CancelTile(cancelledTileId);

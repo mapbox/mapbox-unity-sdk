@@ -188,9 +188,28 @@ namespace Mapbox.Unity.Utilities
 
 		public static RectD TileBounds(UnwrappedTileId unwrappedTileId)
 		{
-			var min = PixelsToMeters(new Vector2d(unwrappedTileId.X * TileSize, unwrappedTileId.Y * TileSize), unwrappedTileId.Z);
-			var max = PixelsToMeters(new Vector2d((unwrappedTileId.X + 1) * TileSize, (unwrappedTileId.Y + 1) * TileSize), unwrappedTileId.Z);
+			var min = PixelsToMeters(
+				unwrappedTileId.X * TileSize,
+				unwrappedTileId.Y * TileSize,
+				unwrappedTileId.Z);
+			var max = PixelsToMeters(
+				(unwrappedTileId.X + 1) * TileSize,
+				(unwrappedTileId.Y + 1) * TileSize,
+				unwrappedTileId.Z);
 			return new RectD(min, max - min);
+		}
+
+		public static Tuple<float, float, float> TileBoundsTuple(UnwrappedTileId unwrappedTileId)
+		{
+			var min = PixelsToMeters(
+				unwrappedTileId.X * TileSize,
+				unwrappedTileId.Y * TileSize,
+				unwrappedTileId.Z);
+			var max = PixelsToMeters(
+				(unwrappedTileId.X + 1) * TileSize,
+				(unwrappedTileId.Y + 1) * TileSize,
+				unwrappedTileId.Z);
+			return new Tuple<float, float, float>((float)min.y, (float)min.x, (float)(max.x - min.x));
 		}
 
 		/// <summary>
@@ -401,9 +420,14 @@ namespace Mapbox.Unity.Utilities
 		private static Vector2d PixelsToMeters(Vector2d p, int zoom)
 		{
 			var res = Resolution(zoom);
-			var met = new Vector2d();
-			met.x = (p.x * res - OriginShift);
-			met.y = -(p.y * res - OriginShift);
+			var met = new Vector2d((p.x * res - OriginShift), -(p.y * res - OriginShift));
+			return met;
+		}
+
+		private static Vector2d PixelsToMeters(float p1, float p2, int zoom)
+		{
+			var res = Resolution(zoom);
+			var met = new Vector2d((p1 * res - OriginShift), -(p2 * res - OriginShift));
 			return met;
 		}
 

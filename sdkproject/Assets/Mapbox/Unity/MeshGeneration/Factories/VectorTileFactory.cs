@@ -239,10 +239,10 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				builder.Create(tile, (t, b) =>
 				{
 					LayerFinishedCallback(t, b);
-					if (callback != null)
-					{
-						callback();
-					}
+					// if (callback != null)
+					// {
+					// 	callback();
+					// }
 				});
 			}
 		}
@@ -260,6 +260,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				{
 					_layerProgress.Remove(tile);
 					_tilesWaitingProcessing.Remove(tile);
+					tile.VectorGenerationCompleted();
 				}
 			}
 		}

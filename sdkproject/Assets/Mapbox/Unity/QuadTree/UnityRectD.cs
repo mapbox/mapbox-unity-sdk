@@ -10,14 +10,10 @@ namespace Mapbox.Unity.QuadTree
 	public class UnityRectD
 	{
 		public UnwrappedTileId Id;
-		public RectD TileBounds;
-		public Vector3 BottomLeft;
-		public Vector3 BottomRight;
-		public Vector3 TopLeft;
-		public Vector3 TopRight;
+		//public RectD TileBounds;
 		public Vector3 Center;
 		public Bounds UnityBounds;
-		public float DistanceToCamera;
+		//public float DistanceToCamera;
 
 		private Vector2d _offset;
 		private float _worldScale;
@@ -58,28 +54,50 @@ namespace Mapbox.Unity.QuadTree
 		// 	}, Matrix4x4.identity);
 		// }
 
-		private void UnityFlatSpaceCalculations(RectD bounds, float worldScale, float boundHeight)
+		private void UnityFlatSpaceCalculations(Tuple<double,double,double> bounds, float worldScale, float boundHeight)
 		{
-			var boundsTopLeft = bounds.TopLeft;
-			TopLeft = (boundsTopLeft / worldScale).ToVector3xz();
-			var boundsSize = bounds.Size;
+			//var boundsTopLeft = bounds.TopLeft;
+			var topleftX = (float) (bounds.Item1 / worldScale);
+			var toplefty = (float) (bounds.Item2 / worldScale);
+			//TopLeft = new Vector3(topleftX, 0, toplefty); //(boundsTopLeft / worldScale).ToVector3xz();
+			var boundsSize = (float)(bounds.Item3 / worldScale);
 
-			TopRight = new Vector3((float)(boundsTopLeft.x + boundsSize.x) / worldScale, 0, (float)boundsTopLeft.y / worldScale);
-			//TopRight = ((new Vector2d(boundsTopLeft.x + boundsSize.x, boundsTopLeft.y)) / worldScale).ToVector3xz();
-			BottomLeft = new Vector3((float) boundsTopLeft.x / worldScale, 0, (float) (boundsTopLeft.y - boundsSize.y) / worldScale);
-			//BottomLeft = ((new Vector2d(boundsTopLeft.x, boundsTopLeft.y - boundsSize.y)) / worldScale).ToVector3xz();
-			BottomRight = new Vector3((float)(boundsTopLeft.x + boundsSize.x) / worldScale, 0, (float)(boundsTopLeft.y - boundsSize.y) / worldScale);
-			//BottomRight = ((new Vector2d(boundsTopLeft.x + boundsSize.x, boundsTopLeft.y - boundsSize.y)) / worldScale).ToVector3xz();
-			Center = (BottomLeft + TopRight) / 2;
+			// TopRight = new Vector3(topleftX + boundsSize, 0, toplefty);
+			// _bottomLeft = new Vector3 (topleftX, 0, toplefty - boundsSize);
+			// BottomRight = new Vector3(topleftX + boundsSize, 0, toplefty - boundsSize);
+			Center = new Vector3(topleftX + boundsSize / 2, 0, toplefty - boundsSize / 2); //(_bottomLeft + TopRight) / 2;
 			UnityBounds = new Bounds(
 				new Vector3(Center.x, boundHeight/2, Center.z),
 				new Vector3(
-					(float)boundsSize.x / worldScale,
+					boundsSize,
 					boundHeight,
-					(float)boundsSize.y / worldScale));
-			UnityBoundsMin = new Vector3(BottomLeft.x, 0, BottomLeft.z);
-			UnityBoundsMax = new Vector3(TopRight.x, boundHeight, TopRight.z);
+					boundsSize));
+			UnityBoundsMin = new Vector3(topleftX, 0, toplefty - boundsSize);
+			UnityBoundsMax = new Vector3(topleftX + boundsSize, boundHeight, toplefty);
 		}
+
+		// private void UnityFlatSpaceCalculations(RectD bounds, float worldScale, float boundHeight)
+		// {
+		// 	var boundsTopLeft = bounds.TopLeft;
+		// 	TopLeft = (boundsTopLeft / worldScale).ToVector3xz();
+		// 	var boundsSize = bounds.Size;
+		//
+		// 	TopRight = new Vector3((float)(boundsTopLeft.x + boundsSize.x) / worldScale, 0, (float)boundsTopLeft.y / worldScale);
+		// 	//TopRight = ((new Vector2d(boundsTopLeft.x + boundsSize.x, boundsTopLeft.y)) / worldScale).ToVector3xz();
+		// 	_bottomLeft = new Vector3((float) boundsTopLeft.x / worldScale, 0, (float) (boundsTopLeft.y - boundsSize.y) / worldScale);
+		// 	//BottomLeft = ((new Vector2d(boundsTopLeft.x, boundsTopLeft.y - boundsSize.y)) / worldScale).ToVector3xz();
+		// 	BottomRight = new Vector3((float)(boundsTopLeft.x + boundsSize.x) / worldScale, 0, (float)(boundsTopLeft.y - boundsSize.y) / worldScale);
+		// 	//BottomRight = ((new Vector2d(boundsTopLeft.x + boundsSize.x, boundsTopLeft.y - boundsSize.y)) / worldScale).ToVector3xz();
+		// 	Center = (_bottomLeft + TopRight) / 2;
+		// 	UnityBounds = new Bounds(
+		// 		new Vector3(Center.x, boundHeight/2, Center.z),
+		// 		new Vector3(
+		// 			(float)boundsSize.x / worldScale,
+		// 			boundHeight,
+		// 			(float)boundsSize.y / worldScale));
+		// 	UnityBoundsMin = new Vector3(_bottomLeft.x, 0, _bottomLeft.z);
+		// 	UnityBoundsMax = new Vector3(TopRight.x, boundHeight, TopRight.z);
+		// }
 
 		private Vector3 LatLngToSphere(Vector2d ll, float radius = 100)
 		{
@@ -99,11 +117,20 @@ namespace Mapbox.Unity.QuadTree
 			_offset = vector2d;
 			_worldScale = worldScale;
 			Id = id;
-			var bound = Conversions.TileBounds(Id);
-			TileBounds = new RectD(new Vector2d(bound.TopLeft.x + vector2d.x, bound.TopLeft.y + vector2d.y), bound.Size);
+			var bound = Conversions.TileBoundsTuple(Id);
+			var newbound = new Tuple<double, double, double>(
+				bound.Item2 + vector2d.x,
+				bound.Item1 + vector2d.y,
+				bound.Item3);
+			UnityFlatSpaceCalculations(newbound, worldScale, _currentElevationSample);
+
+			//var oldbound = Conversions.TileBounds(Id);
+			//var TileBounds = new RectD(new Vector2d(oldbound.TopLeft.x + vector2d.x, oldbound.TopLeft.y + vector2d.y), oldbound.Size);
 			//UnitySphereSpaceCalculations(TileBounds, worldScale);
-			UnityFlatSpaceCalculations(TileBounds, worldScale, _currentElevationSample);
+			//UnityFlatSpaceCalculations(TileBounds, worldScale, _currentElevationSample);
 		}
+
+
 
 		public UnityRectD Quadrant(int i)
 		{

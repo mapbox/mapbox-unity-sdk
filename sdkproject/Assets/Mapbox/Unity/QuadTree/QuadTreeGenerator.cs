@@ -17,10 +17,7 @@ namespace Mapbox.Unity.QuadTree
 		private Vector3[] _frustumCorners;
 
 		public int MinZoom;
-		public int MaxZoom
-		{
-			get { return _map.AbsoluteZoom; }
-		}
+		public int MaxZoom;
 
 		public float LevelDecisionMultiplier = 1;
 
@@ -41,6 +38,7 @@ namespace Mapbox.Unity.QuadTree
 		public QuadTreeView UpdateQuadTree(float elevationAtCenter)
 		{
 			_view = new QuadTreeView();
+			MaxZoom = _map.AbsoluteZoom;
 			_planes = GeometryUtility.CalculateFrustumPlanes(_camera);
 			var worldBaseBounds = new UnityRectD(new UnwrappedTileId(0, 0, 0), -_map.CenterMercator, WorldScale, elevationAtCenter);
 			var stack = new Stack<UnityRectD>();
@@ -59,22 +57,23 @@ namespace Mapbox.Unity.QuadTree
 				// 		Vector3.up,
 				// 		(Quaternion.Euler(0,-rot, 0) * Vector3.forward).normalized);
 				//if (!GeometryUtility.TestPlanesAABB(planes, tile.UnityBounds))
-				_camera.CalculateFrustumCorners(new Rect(0, 0, 1, 1), _camera.nearClipPlane, Camera.MonoOrStereoscopicEye.Mono, _nearFrustumCorners);
-				_camera.CalculateFrustumCorners(new Rect(0, 0, 1, 1), _camera.farClipPlane, Camera.MonoOrStereoscopicEye.Mono, _farFrustumCorners);
+				// _camera.CalculateFrustumCorners(new Rect(0, 0, 1, 1), _camera.nearClipPlane, Camera.MonoOrStereoscopicEye.Mono, _nearFrustumCorners);
+				// _camera.CalculateFrustumCorners(new Rect(0, 0, 1, 1), _camera.farClipPlane, Camera.MonoOrStereoscopicEye.Mono, _farFrustumCorners);
 
-				for (int i = 0; i < 4; i++)
-				{
-					_frustumCorners[i] = _camera.transform.TransformPoint(_nearFrustumCorners[i]);
-					_frustumCorners[i + 4] = _camera.transform.TransformPoint(_farFrustumCorners[i]);
-				}
+				// for (int i = 0; i < 4; i++)
+				// {
+				// 	_frustumCorners[i] = _camera.transform.TransformPoint(_nearFrustumCorners[i]);
+				// 	_frustumCorners[i + 4] = _camera.transform.TransformPoint(_farFrustumCorners[i]);
+				// }
+				//
+				// for (int i = 0; i < 7; i++)
+				// {
+				// 	Debug.DrawLine(_frustumCorners[i], _frustumCorners[i + 1], Color.red);
+				// }
 
-				for (int i = 0; i < 7; i++)
-				{
-					Debug.DrawLine(_frustumCorners[i], _frustumCorners[i + 1], Color.red);
-				}
 
-
-				if(!TestPlanesAABBGLJS(_planes, _frustumCorners, ref tile.UnityBounds))
+				//if(!TestPlanesAABBGLJS(_planes, _frustumCorners, ref tile.UnityBounds))
+				if (!GeometryUtility.TestPlanesAABB(_planes, tile.UnityBounds))
 				{
 					continue;
 				}
