@@ -64,7 +64,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		protected override void OnRegistered(UnityTile tile)
+		protected override void OnRegistered(UnityTile tile, bool loadParent)
 		{
 			_tilesWaitingResponse.Add(tile);
 			VectorFactoryManager.RegisterTile(tile);

@@ -65,7 +65,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			ImageFactoryManager?.SetSourceOptions(_properties.sourceOptions);
 		}
 
-		protected override void OnRegistered(UnityTile tile)
+		protected override void OnRegistered(UnityTile tile, bool loadParent)
 		{
 			if (_properties.sourceType == ImagerySourceType.None)
 			{
@@ -73,7 +73,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 			else
 			{
-				ImageFactoryManager.RegisterTile(tile);
+				ImageFactoryManager.RegisterTile(tile, loadParent);
 			}
 		}
 

@@ -119,7 +119,7 @@ namespace Mapbox.Unity.Map
 
 				tile.TileFinished += (t) =>
 				{
-					t.gameObject.SetActive(true);
+					//t.gameObject.SetActive(true);
 					OnTileFinished(t);
 				};
 				return tile;
@@ -356,12 +356,12 @@ namespace Mapbox.Unity.Map
 
 			if (ImageryLayer.IsLayerActive)
 			{
-				ImageryLayer.Register(unityTile);
+				ImageryLayer.Register(unityTile, enableTile);
 			}
 
 			if (TerrainLayer.IsLayerActive)
 			{
-				TerrainLayer.Register(unityTile);
+				TerrainLayer.Register(unityTile, enableTile);
 			}
 
 			if (VectorLayer.IsLayerActive)
@@ -372,10 +372,10 @@ namespace Mapbox.Unity.Map
 			unityTile.SetFinishCondition();
 
 
-			// if (enableTile)
-			// {
-			// 	unityTile.gameObject.SetActive(true);
-			// }
+			if (enableTile)
+			{
+				unityTile.gameObject.SetActive(true);
+			}
 
 			return unityTile;
 		}

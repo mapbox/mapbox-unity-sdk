@@ -51,32 +51,49 @@ namespace Mapbox.Unity.CustomLayer
 		protected Dictionary<CanonicalTileId, RasterTile> _requestedTiles = new Dictionary<CanonicalTileId, RasterTile>();
 		protected Dictionary<int, HashSet<UnityTile>> _tileWaitingList = new Dictionary<int, HashSet<UnityTile>>();
 
-		protected virtual void ConnectTiles(UnityTile unityTile, RasterTile dataTile)
+		protected virtual void ConnectTiles(UnityTile unityTile, RasterTile dataTile, bool addToWaitingList = true)
 		{
 			unityTile.AddTile(dataTile);
 			dataTile.AddUser(unityTile.CanonicalTileId);
-			if(!_tileWaitingList.ContainsKey(dataTile.Key))
+
+			if(addToWaitingList)
 			{
-				_tileWaitingList.Add(dataTile.Key, new HashSet<UnityTile>());
+				if(!_tileWaitingList.ContainsKey(dataTile.Key))
+				{
+					_tileWaitingList.Add(dataTile.Key, new HashSet<UnityTile>());
+				}
+				_tileWaitingList[dataTile.Key].Add(unityTile);
 			}
-			_tileWaitingList[dataTile.Key].Add(unityTile);
+			else
+			{
+				if (!_tileUserTracker.ContainsKey(dataTile.Key))
+				{
+					_tileUserTracker.Add(dataTile.Key, new HashSet<UnityTile>());
+				}
+
+				_tileUserTracker[dataTile.Key].Add(unityTile);
+			}
+
 			_tileTracker.Add(unityTile, dataTile);
 		}
 
-		public virtual void RegisterTile(UnityTile tile)
+		public virtual void RegisterTile(UnityTile tile, bool loadParent = false)
 		{
 			if (_tileTracker.ContainsKey(tile))
 			{
 				return;
 			}
-			
-			ApplyParentTexture(tile);
+
+			if (loadParent)
+			{
+				ApplyParentTexture(tile);
+			}
 
 			var memoryCacheItem = _fetcher.FetchDataInstant(tile.CanonicalTileId, _sourceSettings.Id);
 			if (memoryCacheItem != null)
 			{
 				var dataTile = (RasterTile) memoryCacheItem.Tile;
-				ConnectTiles(tile, dataTile);
+				ConnectTiles(tile, dataTile, false);
 				SetTexture(tile, dataTile);
 				TextureReceived(dataTile);
 			}
@@ -184,11 +201,53 @@ namespace Mapbox.Unity.CustomLayer
 			else
 			{
 				//this means tile is unregistered during fetching... but somehow it didn't get cancelled?
+				dataTile.AddLog("tile is unregistered during fetching?");
 			}
 		}
 
 		protected virtual void OnFetcherError(RasterTile dataTile, TileErrorEventArgs errorEventArgs)
 		{
+			dataTile.AddLog("OnFetcherError ImageFactoryManager");
+
+			if (_requestedTiles.ContainsKey(dataTile.Id))
+			{
+				_requestedTiles.Remove(dataTile.Id);
+
+				if (_tileWaitingList.ContainsKey(dataTile.Key))
+				{
+					foreach (var unityTile in _tileWaitingList[dataTile.Key])
+					{
+						unityTile.RemoveTile(dataTile);
+						dataTile.RemoveUser(unityTile.CanonicalTileId);
+
+						if (_tileTracker.ContainsKey(unityTile))
+						{
+							_tileTracker.Remove(unityTile);
+						}
+					}
+					_tileWaitingList.Remove(dataTile.Key);
+				}
+				else
+				{
+					Debug.Log("fetching failed but no tile was waiting for it?");
+				}
+
+				if (_tileUserTracker.ContainsKey(dataTile.Key))
+				{
+					Debug.Log("fetching failed but there was already tiles using it?");
+					//this shouldn't happen, adding this check just to see everything is in order
+					_tileUserTracker.Remove(dataTile.Key);
+				}
+			}
+			else
+			{
+				//Debug.Log("fetching failed but it was requested?");
+				//not really, tile was unregistered and datatile associated with it are cancelled
+				//data tiles were removed from _requestedTiles during unregistration
+				//tiles cancelled eventually fires FetchingError
+				//so tile is removed from this list properly
+			}
+
 			FetchingError(dataTile, errorEventArgs);
 		}
 

@@ -70,7 +70,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			Strategy.Initialize(_properties);
 		}
 
-		protected override void OnRegistered(UnityTile tile)
+		protected override void OnRegistered(UnityTile tile, bool loadParent)
 		{
 			if (Properties.sourceType == ElevationSourceType.None)
 			{
@@ -80,7 +80,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				return;
 			}
 
-			TerrainFactoryManager.RegisterTile(tile);
+			TerrainFactoryManager.RegisterTile(tile, loadParent);
 		}
 
 		protected override void OnUnregistered(UnityTile tile)

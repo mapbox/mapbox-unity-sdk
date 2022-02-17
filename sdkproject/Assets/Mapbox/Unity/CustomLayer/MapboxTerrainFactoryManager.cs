@@ -46,12 +46,12 @@ namespace Mapbox.Unity.CustomLayer
 			}
 		}
 
-		public override void RegisterTile(UnityTile tile)
+		public override void RegisterTile(UnityTile tile, bool loadParent)
 		{
 
 			if (TerrainStrategy is IElevationBasedTerrainStrategy)
 			{
-				if (_isUsingShaderSolution)
+				if (_isUsingShaderSolution && loadParent)
 				{
 					ApplyParentTexture(tile);
 				}
@@ -64,7 +64,7 @@ namespace Mapbox.Unity.CustomLayer
 				if (memoryCacheItem != null)
 				{
 					var dataTile = (RasterTile) memoryCacheItem.Tile;
-					ConnectTiles(tile, dataTile);
+					ConnectTiles(tile, dataTile, false);
 					memoryCacheItem.Tile.AddLog("data tile instant ", tile.CanonicalTileId);
 					SetTexture(tile, dataTile);
 					TextureReceived(dataTile);
@@ -189,10 +189,20 @@ namespace Mapbox.Unity.CustomLayer
 			_requestedTiles.Remove(dataTile.Id);
 		}
 
-		protected override void OnFetcherError(RasterTile dataTile, TileErrorEventArgs errorEventArgs)
-		{
-			FetchingError(dataTile, errorEventArgs);
-		}
+		// protected override void OnFetcherError(RasterTile dataTile, TileErrorEventArgs errorEventArgs)
+		// {
+		// 	dataTile.AddLog("OnFetcherError TerrainFactoryManager");
+		// 	if (_requestedTiles.ContainsKey(dataTile.Id))
+		// 	{
+		// 		_requestedTiles.Remove(dataTile.Id);
+		// 		_tileWaitingList.Remove(dataTile.Key);
+		// 	}
+		// 	else
+		// 	{
+		// 		Debug.Log("fetching failed but it was requested?");
+		// 	}
+		// 	FetchingError(dataTile, errorEventArgs);
+		// }
 
 		protected override RasterTile CreateTile(CanonicalTileId tileId, string tilesetId)
 		{

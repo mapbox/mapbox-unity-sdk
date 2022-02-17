@@ -63,7 +63,7 @@ namespace Mapbox.Unity.DataFetching
 				tile.AddLog("callback TextureReadCallback");
 				if (!tile.IsInUse())
 				{
-					tile.AddLog("dropped due to id mismatch");
+					tile.AddLog("TextureReadCallback dropped due to id mismatch");
 					//rasterTile.Clear();
 					//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
 					return;
@@ -116,6 +116,7 @@ namespace Mapbox.Unity.DataFetching
 				tile.AddLog("callback TextureInfoUpdatedCallback");
 				if (!tile.IsInUse())
 				{
+					tile.AddLog("TextureInfoUpdatedCallback dropped due to id mismatch");
 					//rasterTile.Clear();
 					//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
 					return;
@@ -149,6 +150,7 @@ namespace Mapbox.Unity.DataFetching
 				tile.AddLog("callback FailureCallback");
 				if (!tile.IsInUse())
 				{
+					tile.AddLog("FailureCallback dropped due to id mismatch");
 					//this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
 					return;
 				}

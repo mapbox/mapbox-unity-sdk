@@ -62,9 +62,9 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		public virtual void Register(UnityTile tile)
+		public virtual void Register(UnityTile tile, bool loadParent = false)
 		{
-			OnRegistered(tile);
+			OnRegistered(tile, loadParent);
 		}
 
 		public virtual void PostProcess(UnityTile tile)
@@ -102,7 +102,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		protected abstract void OnRegistered(UnityTile tile);
+		protected abstract void OnRegistered(UnityTile tile, bool loadParent);
 
 		protected abstract void OnClearTile(UnityTile tile);
 		protected virtual void OnPostProcess(UnityTile tile){}

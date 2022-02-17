@@ -68,6 +68,11 @@ namespace Mapbox.Unity.Map
 			Factory.Register(tile);
 		}
 
+		public override void Register(UnityTile tile, bool loadParent = false)
+		{
+			Factory.Register(tile, loadParent);
+		}
+
 		public override void Unregister(UnityTile tile)
 		{
 			Factory.Unregister(tile);
