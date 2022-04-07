@@ -26,7 +26,7 @@ namespace Mapbox.Unity.Map
 		public ElevationModificationOptions modificationOptions = new ElevationModificationOptions();
 		public UnityLayerOptions unityLayerOptions = new UnityLayerOptions();
 		public TerrainSideWallOptions sideWallOptions = new TerrainSideWallOptions();
-		public float TileMeshSize = 100;
+		public float TileMeshSize = 1;
 
 		public override bool NeedsForceUpdate()
 		{

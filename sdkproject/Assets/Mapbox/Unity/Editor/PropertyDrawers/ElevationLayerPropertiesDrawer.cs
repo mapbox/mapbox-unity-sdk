@@ -143,13 +143,13 @@ namespace Mapbox.Editor
 				EditorHelper.CheckForModifiedProperty(property);
 			}
 
-			EditorGUI.BeginChangeCheck();
-			var tileSizeProperty = property.FindPropertyRelative("TileMeshSize");
-			tileSizeProperty.floatValue = EditorGUILayout.FloatField("Tile Mesh Size", tileSizeProperty.floatValue);
-			if (EditorGUI.EndChangeCheck())
-			{
-				EditorHelper.CheckForModifiedProperty(property);
-			}
+			//EditorGUI.BeginChangeCheck();
+			// var tileSizeProperty = property.FindPropertyRelative("TileMeshSize");
+			// tileSizeProperty.floatValue = EditorGUILayout.FloatField("Tile Mesh Size", tileSizeProperty.floatValue);
+			// if (EditorGUI.EndChangeCheck())
+			// {
+			// 	EditorHelper.CheckForModifiedProperty(property);
+			// }
 
 			ShowPosition = EditorGUILayout.Foldout(ShowPosition, "Others");
 

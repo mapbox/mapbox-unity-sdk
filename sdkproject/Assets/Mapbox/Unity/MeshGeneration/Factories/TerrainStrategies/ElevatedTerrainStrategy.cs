@@ -95,9 +95,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 					else
 					{
 						//TODO remoev tile dependency from CreateBaseMesh method
-						var newMesh = TileSize != 0
-							? CreateBaseMesh(TileSize, _elevationOptions.modificationOptions.sampleCount)
-							: CreateBaseMesh(tile, _elevationOptions.modificationOptions.sampleCount);
+						var newMesh = CreateBaseMesh(TileSize, _elevationOptions.modificationOptions.sampleCount);
 						_meshSamples.Add(_elevationOptions.modificationOptions.sampleCount, newMesh);
 						tile.MeshFilter.sharedMesh.vertices = newMesh.Vertices;
 						tile.MeshFilter.sharedMesh.normals = newMesh.Normals;
@@ -119,8 +117,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 					}
 					else
 					{
-						//TODO remove tile dependency from CreateBaseMesh method
-						newMesh = CreateBaseMesh(tile, _elevationOptions.modificationOptions.sampleCount);
+						newMesh = CreateBaseMesh(TileSize, _elevationOptions.modificationOptions.sampleCount);
 						_meshSamples.Add(_elevationOptions.modificationOptions.sampleCount, newMesh);
 					}
 
@@ -176,64 +173,64 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 
 		#region mesh gen
 
-		private MeshDataArray CreateBaseMesh(UnityTile tile, int sampleCount)
-		{
-			//TODO use arrays instead of lists
-			_newVertexList.Clear();
-			_newNormalList.Clear();
-			_newUvList.Clear();
-			_newTriangleList.Clear();
-
-			//012
-			//345
-			//678
-			for (float y = 0; y < sampleCount; y++)
-			{
-				var yrat = y / (sampleCount - 1);
-				for (float x = 0; x < sampleCount; x++)
-				{
-					var xrat = x / (sampleCount - 1);
-
-					var xx = Mathd.Lerp(tile.Rect.TopLeft.x, tile.Rect.BottomRight.x, xrat);
-					var yy = Mathd.Lerp(tile.Rect.TopLeft.y, tile.Rect.BottomRight.y, yrat);
-
-					_newVertexList.Add(new Vector3(
-						(float) (xx - tile.Rect.Center.x) * tile.TileScale,
-						0,
-						(float) (yy - tile.Rect.Center.y) * tile.TileScale));
-					_newNormalList.Add(Mapbox.Unity.Constants.Math.Vector3Up);
-					_newUvList.Add(new Vector2(x * 1f / (sampleCount - 1), 1 - (y * 1f / (sampleCount - 1))));
-				}
-			}
-
-			int vertA, vertB, vertC;
-			for (int y = 0; y < sampleCount - 1; y++)
-			{
-				for (int x = 0; x < sampleCount - 1; x++)
-				{
-					vertA = (y * sampleCount) + x;
-					vertB = (y * sampleCount) + x + sampleCount + 1;
-					vertC = (y * sampleCount) + x + sampleCount;
-					_newTriangleList.Add(vertA);
-					_newTriangleList.Add(vertB);
-					_newTriangleList.Add(vertC);
-
-					vertA = (y * sampleCount) + x;
-					vertB = (y * sampleCount) + x + 1;
-					vertC = (y * sampleCount) + x + sampleCount + 1;
-					_newTriangleList.Add(vertA);
-					_newTriangleList.Add(vertB);
-					_newTriangleList.Add(vertC);
-				}
-			}
-
-			var mesh = new MeshDataArray();
-			mesh.Vertices = _newVertexList.ToArray();
-			mesh.Normals = _newNormalList.ToArray();
-			mesh.Uvs = _newUvList.ToArray();
-			mesh.Triangles = _newTriangleList.ToArray();
-			return mesh;
-		}
+		// private MeshDataArray CreateBaseMesh(UnityTile tile, int sampleCount)
+		// {
+		// 	//TODO use arrays instead of lists
+		// 	_newVertexList.Clear();
+		// 	_newNormalList.Clear();
+		// 	_newUvList.Clear();
+		// 	_newTriangleList.Clear();
+		//
+		// 	//012
+		// 	//345
+		// 	//678
+		// 	for (float y = 0; y < sampleCount; y++)
+		// 	{
+		// 		var yrat = y / (sampleCount - 1);
+		// 		for (float x = 0; x < sampleCount; x++)
+		// 		{
+		// 			var xrat = x / (sampleCount - 1);
+		//
+		// 			var xx = Mathd.Lerp(tile.Rect.TopLeft.x, tile.Rect.BottomRight.x, xrat);
+		// 			var yy = Mathd.Lerp(tile.Rect.TopLeft.y, tile.Rect.BottomRight.y, yrat);
+		//
+		// 			_newVertexList.Add(new Vector3(
+		// 				(float) (xx - tile.Rect.Center.x) * tile.TileScale,
+		// 				0,
+		// 				(float) (yy - tile.Rect.Center.y) * tile.TileScale));
+		// 			_newNormalList.Add(Mapbox.Unity.Constants.Math.Vector3Up);
+		// 			_newUvList.Add(new Vector2(x * 1f / (sampleCount - 1), 1 - (y * 1f / (sampleCount - 1))));
+		// 		}
+		// 	}
+		//
+		// 	int vertA, vertB, vertC;
+		// 	for (int y = 0; y < sampleCount - 1; y++)
+		// 	{
+		// 		for (int x = 0; x < sampleCount - 1; x++)
+		// 		{
+		// 			vertA = (y * sampleCount) + x;
+		// 			vertB = (y * sampleCount) + x + sampleCount + 1;
+		// 			vertC = (y * sampleCount) + x + sampleCount;
+		// 			_newTriangleList.Add(vertA);
+		// 			_newTriangleList.Add(vertB);
+		// 			_newTriangleList.Add(vertC);
+		//
+		// 			vertA = (y * sampleCount) + x;
+		// 			vertB = (y * sampleCount) + x + 1;
+		// 			vertC = (y * sampleCount) + x + sampleCount + 1;
+		// 			_newTriangleList.Add(vertA);
+		// 			_newTriangleList.Add(vertB);
+		// 			_newTriangleList.Add(vertC);
+		// 		}
+		// 	}
+		//
+		// 	var mesh = new MeshDataArray();
+		// 	mesh.Vertices = _newVertexList.ToArray();
+		// 	mesh.Normals = _newNormalList.ToArray();
+		// 	mesh.Uvs = _newUvList.ToArray();
+		// 	mesh.Triangles = _newTriangleList.ToArray();
+		// 	return mesh;
+		// }
 
 		private MeshDataArray CreateBaseMesh(float tileSize, int sampleCount)
 		{
@@ -434,7 +431,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 		{
 			if (tile.MeshFilter.sharedMesh.vertexCount == 0)
 			{
-				CreateBaseMesh(tile, _elevationOptions.modificationOptions.sampleCount);
+				CreateBaseMesh(TileSize, _elevationOptions.modificationOptions.sampleCount);
 			}
 			else
 			{

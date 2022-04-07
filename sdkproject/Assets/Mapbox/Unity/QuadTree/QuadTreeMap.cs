@@ -18,7 +18,8 @@ namespace Mapbox.Unity.QuadTree
         public QuadTreeCameraController CameraController;
         public QuadTreeGenerator QuadTreeGenerator;
         public AbstractMapVisualizer MapVisualizer => _mapVisualizer;
-        public float WorldScale = 1000f;
+        [Tooltip("Generated world will be 1/WorldScale of Spherical Mercator")]
+        public float WorldScale = 10000f;
 
         //private Dictionary<UnityTile, UnityRectD> _tiles = new Dictionary<UnityTile, UnityRectD>();
         private QuadTreeView _previousView;
@@ -271,7 +272,7 @@ namespace Mapbox.Unity.QuadTree
 
         private void RequestTiles(QuadTreeView newView)
         {
-            var toAdd = new List<Tuple<UnwrappedTileId, UnityRectD, bool, List<string>>>();
+            var toAdd = new List<NewTileParameters>();
             var toRemove = new HashSet<UnwrappedTileId>();
             var toStop = new HashSet<UnwrappedTileId>();
             foreach (var newViewTile in newView.Tiles)
@@ -404,7 +405,7 @@ namespace Mapbox.Unity.QuadTree
                     }
 
                 }
-                toAdd.Add(new Tuple<UnwrappedTileId, UnityRectD, bool, List<string>>(newId, newViewTile.Value, enableTile, tileLogs));
+                toAdd.Add(new NewTileParameters(newId, newViewTile.Value, enableTile, tileLogs));
             }
 
             foreach (var tile in _mapVisualizer.ActiveTiles.Values)
@@ -433,33 +434,23 @@ namespace Mapbox.Unity.QuadTree
                 toRemove.Add(tile.UnwrappedTileId);
             }
 
-            foreach (var tuple in toAdd)
+            foreach (var tileParameters in toAdd)
             {
-                var newChildTile = _mapVisualizer.LoadTile(tuple.Item1, tuple.Item3);
+                var newChildTile = _mapVisualizer.LoadTile(tileParameters);
 
-
-                if (newChildTile != null)
-                {
-                    newChildTile.transform.position = tuple.Item2.Center;
-                    newChildTile.transform.SetParent(transform);
-                    newChildTile.transform.localScale = Vector3.one * tuple.Item2.UnityBounds.size.x / 10;
-                    newChildTile.Logs
-                        .Add(string.Format("{0} - {1}", Time.frameCount, "brand new tile"));
-                }
-
-                foreach (var log in tuple.Item4)
+                foreach (var log in tileParameters.Logs)
                 {
                     newChildTile.Logs.Add(log);
                 }
 
-                if (ZoomOutTracker.ContainsKey(tuple.Item1))
+                if (ZoomOutTracker.ContainsKey(tileParameters.TileId))
                 {
-                    newChildTile.Logs.Add("waiting for children: " + string.Join(",", ZoomOutTracker[tuple.Item1]));
+                    newChildTile.Logs.Add("waiting for children: " + string.Join(",", ZoomOutTracker[tileParameters.TileId]));
                 }
 
-                if (_childParentRelationships.ContainsKey(tuple.Item1))
+                if (_childParentRelationships.ContainsKey(tileParameters.TileId))
                 {
-                    newChildTile.Logs.Add("waiting for parent: " + string.Join(",", _childParentRelationships[tuple.Item1]));
+                    newChildTile.Logs.Add("waiting for parent: " + string.Join(",", _childParentRelationships[tileParameters.TileId]));
                 }
             }
             foreach (var unwrappedTileId in toRemove)
@@ -490,6 +481,17 @@ namespace Mapbox.Unity.QuadTree
                     }
                 }
             }
+            // foreach (var idChild in newId.Children)
+            // {
+            //     if (_previousView.Tiles.ContainsKey(idChild))
+            //     {
+            //         childrenInView.Add(idChild);
+            //     }
+            //     else
+            //     {
+            //         return false;
+            //     }
+            // }
 
             return childrenInView.Count > 0;
         }
@@ -588,6 +590,22 @@ namespace Mapbox.Unity.QuadTree
                     }
                 }
             }
+        }
+    }
+
+    public class NewTileParameters
+    {
+        public UnwrappedTileId TileId;
+        public UnityRectD UnityRectD;
+        public bool InitializeVisible;
+        public List<string> Logs;
+
+        public NewTileParameters(UnwrappedTileId tileId, UnityRectD rect, bool visible, List<string> tileLogs)
+        {
+            TileId = tileId;
+            UnityRectD = rect;
+            InitializeVisible = visible;
+            Logs = tileLogs;
         }
     }
 }

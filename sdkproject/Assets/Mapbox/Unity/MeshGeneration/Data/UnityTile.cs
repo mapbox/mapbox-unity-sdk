@@ -155,7 +155,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		#endregion
 
-		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, float scale, bool isElevationActive)
+		internal void Initialize(IMapReadable map, UnwrappedTileId tileId, bool isElevationActive)
 		{
 			// {
 			// 	if (_previousMainTextureFieldNameID == 0)
@@ -178,7 +178,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			gameObject.hideFlags = HideFlags.DontSave;
 			TileSize = map.UnityTileSize;
 			ElevationType = TileTerrainType.None;
-			TileScale = scale;
+			TileScale = (float) (1 / Conversions.TileBounds(tileId).Size.x);
 			_relativeScale = 1 / Mathf.Cos(Mathf.Deg2Rad * (float)map.CenterLatitudeLongitude.x);
 			Rect = Conversions.TileBounds(tileId);
 			UnwrappedTileId = tileId;

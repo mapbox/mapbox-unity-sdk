@@ -34,16 +34,16 @@ namespace Mapbox.Editor
 			}
 
 			// Draw label.
-			var scalingTypeLabel = new GUIContent { text = label.text, tooltip = "Scale of map in game units.", };
+			// var scalingTypeLabel = new GUIContent { text = label.text, tooltip = "Scale of map in game units.", };
+			//
+			// scalingType.enumValueIndex = EditorGUILayout.Popup(scalingTypeLabel, scalingType.enumValueIndex, scalingTypeContent);
 
-			scalingType.enumValueIndex = EditorGUILayout.Popup(scalingTypeLabel, scalingType.enumValueIndex, scalingTypeContent);
-
-			if ((MapScalingType)scalingType.enumValueIndex == MapScalingType.Custom)
-			{
-				position.y += lineHeight;
-				var sizeLabel = new GUIContent { text = "Tile Spacing"};
-				EditorGUILayout.PropertyField(property.FindPropertyRelative("unityTileSize"), sizeLabel);
-			}
+			// if ((MapScalingType)scalingType.enumValueIndex == MapScalingType.Custom)
+			// {
+			// 	position.y += lineHeight;
+			// 	var sizeLabel = new GUIContent { text = "Tile Spacing"};
+			// 	EditorGUILayout.PropertyField(property.FindPropertyRelative("unityTileSize"), sizeLabel);
+			// }
 		}
 	}
 }

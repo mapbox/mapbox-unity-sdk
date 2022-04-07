@@ -9,7 +9,7 @@ namespace Mapbox.Unity.DataContainers
 	{
 		public MapScalingType scalingType = MapScalingType.Custom;
 		[Tooltip("Size of each tile in Unity units.")]
-		public float unityTileSize = 100f;
+		public float unityTileSize = 1f;
 
 		public IMapScalingStrategy scalingStrategy;
 	}

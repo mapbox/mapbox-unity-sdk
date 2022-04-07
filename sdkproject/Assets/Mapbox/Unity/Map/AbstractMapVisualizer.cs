@@ -1,5 +1,6 @@
 using Mapbox.Unity.DataContainers;
 using Mapbox.Unity.Map.Interfaces;
+using Mapbox.Unity.QuadTree;
 using UnityEngine.UI;
 
 namespace Mapbox.Unity.Map
@@ -330,6 +331,57 @@ namespace Mapbox.Unity.Map
 		}
 		#endregion
 
+		public virtual UnityTile LoadTile(NewTileParameters parameters)
+		{
+			var tileId = parameters.TileId;
+			var enableTile = parameters.InitializeVisible;
+
+			if (ActiveTiles.ContainsKey(parameters.TileId))
+				return null;
+
+			var unityTile = _tilePool.GetObject();
+			var tileTransform = unityTile.transform;
+			unityTile.gameObject.SetActive(enableTile);
+			unityTile.Initialize(_map, tileId, TerrainLayer.IsLayerActive && TerrainLayer.ElevationType != ElevationLayerType.FlatTerrain);
+			tileTransform.position = parameters.UnityRectD.Center;
+			tileTransform.SetParent(_map.Root);
+			tileTransform.localScale = Vector3.one * parameters.UnityRectD.UnityBounds.size.x;
+
+			//PlaceTile(tileId, unityTile, _map);
+
+			// Don't spend resources naming objects, as you shouldn't find objects by name anyway!
+#if UNITY_EDITOR
+			unityTile.gameObject.name = unityTile.CanonicalTileId.ToString();
+#endif
+
+			ActiveTiles.Add(tileId, unityTile);
+
+			if (ImageryLayer.IsLayerActive)
+			{
+				ImageryLayer.Register(unityTile, enableTile);
+			}
+
+			if (TerrainLayer.IsLayerActive)
+			{
+				TerrainLayer.Register(unityTile, enableTile);
+			}
+
+			if (VectorLayer.IsLayerActive)
+			{
+				VectorLayer.Register(unityTile);
+			}
+
+			unityTile.SetFinishCondition();
+
+
+			if (enableTile)
+			{
+				unityTile.gameObject.SetActive(true);
+			}
+
+			return unityTile;
+		}
+
 		/// <summary>
 		/// Registers requested tiles to the factories
 		/// </summary>
@@ -341,9 +393,7 @@ namespace Mapbox.Unity.Map
 
 			var unityTile = _tilePool.GetObject();
 			unityTile.gameObject.SetActive(enableTile);
-			var referenceTileRect = Conversions.TileBounds(tileId);
-			var scale = (float)(_map.UnityTileSize / referenceTileRect.Size.x);
-			unityTile.Initialize(_map, tileId, scale, TerrainLayer.IsLayerActive && TerrainLayer.ElevationType != ElevationLayerType.FlatTerrain);
+			unityTile.Initialize(_map, tileId, TerrainLayer.IsLayerActive && TerrainLayer.ElevationType != ElevationLayerType.FlatTerrain);
 
 			PlaceTile(tileId, unityTile, _map);
 
