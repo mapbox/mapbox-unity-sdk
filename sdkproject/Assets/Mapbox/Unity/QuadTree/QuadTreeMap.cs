@@ -21,19 +21,14 @@ namespace Mapbox.Unity.QuadTree
         [Tooltip("Generated world will be 1/WorldScale of Spherical Mercator")]
         public float WorldScale = 10000f;
 
-        //private Dictionary<UnityTile, UnityRectD> _tiles = new Dictionary<UnityTile, UnityRectD>();
         private QuadTreeView _previousView;
-
-        private Camera _camera;
-
-        private Material LineMaterial;
 
         public override void Start()
         {
             base.Start();
-            _camera = Camera.main;
-            CameraController.Initialize(WorldScale, _camera, this);
-            QuadTreeGenerator.Initialize(WorldScale, _camera, this);
+            var mainCamera = Camera.main;
+            CameraController.Initialize(WorldScale, mainCamera, this);
+            QuadTreeGenerator.Initialize(WorldScale, mainCamera, this);
 
             _mapVisualizer.OnTileFinished -= OnMapVisualizerOnOnTileFinished;
             _mapVisualizer.OnTileDisposing -= OnMapVisualizerOnOnTileDisposing;
@@ -523,16 +518,6 @@ namespace Mapbox.Unity.QuadTree
 
                 }
             }
-
-
-            // if (MapVisualizer != null && MapVisualizer.ActiveTiles != null)
-            // {
-            //     foreach (var tile in MapVisualizer.ActiveTiles.Values)
-            //     {
-            //         Gizmos.color = Color.blue;
-            //         Gizmos.DrawWireCube(tile.transform.position, tile.MeshRenderer.bounds.size);
-            //     }
-            // }
         }
 
 
@@ -590,22 +575,6 @@ namespace Mapbox.Unity.QuadTree
                     }
                 }
             }
-        }
-    }
-
-    public class NewTileParameters
-    {
-        public UnwrappedTileId TileId;
-        public UnityRectD UnityRectD;
-        public bool InitializeVisible;
-        public List<string> Logs;
-
-        public NewTileParameters(UnwrappedTileId tileId, UnityRectD rect, bool visible, List<string> tileLogs)
-        {
-            TileId = tileId;
-            UnityRectD = rect;
-            InitializeVisible = visible;
-            Logs = tileLogs;
         }
     }
 }
