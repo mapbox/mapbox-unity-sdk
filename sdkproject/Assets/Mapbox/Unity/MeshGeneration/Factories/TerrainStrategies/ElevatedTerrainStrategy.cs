@@ -5,6 +5,7 @@ using UnityEngine;
 using Mapbox.Unity.MeshGeneration.Data;
 using Mapbox.Unity.Map;
 using Mapbox.Map;
+using Mapbox.Platform.Cache;
 using Mapbox.Unity.DataContainers;
 using Mapbox.Utils;
 using UnityEngine.Rendering;
@@ -36,11 +37,21 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 		private int _vertA, _vertB, _vertC;
 		private int _counter;
 
-
+		private bool _useTileSkirts = true;
 
 		public override int RequiredVertexCount
 		{
-			get { return (_elevationOptions.modificationOptions.sampleCount + 2) * (_elevationOptions.modificationOptions.sampleCount + 2); }
+			get
+			{
+				if (_useTileSkirts)
+				{
+					return (_elevationOptions.modificationOptions.sampleCount + 2) * (_elevationOptions.modificationOptions.sampleCount + 2);
+				}
+				else
+				{
+					return (_elevationOptions.modificationOptions.sampleCount) * (_elevationOptions.modificationOptions.sampleCount);
+				}
+			}
 		}
 
 		public override void Initialize(ElevationLayerProperties elOptions)
@@ -225,6 +236,77 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 		}
 
 		private MeshDataArray CreateBaseMesh(float tileSize, int sampleCount)
+		{
+			return
+				_useTileSkirts
+					? CreateBaseMeshSkirts(tileSize, sampleCount)
+					: CreateBaseMeshWithoutSkirts(tileSize, sampleCount);
+		}
+
+		private MeshDataArray CreateBaseMeshWithoutSkirts(float tileSize, int sampleCount)
+		{
+			var half = tileSize/2;
+			//TODO use arrays instead of lists
+			_newVertexList.Clear();
+			_newNormalList.Clear();
+			_newUvList.Clear();
+			_newTriangleList.Clear();
+
+			//012
+			//345
+			//678
+			for (float y = 0; y < sampleCount; y++)
+			{
+				var yrat = y / (sampleCount - 1);
+				for (float x = 0; x < sampleCount; x++)
+				{
+					var xrat = x / (sampleCount - 1);
+
+					var xx = Mathf.LerpUnclamped(-half, half, xrat);
+					var yy = Mathf.LerpUnclamped(half, -half, yrat);
+
+					var elevation = 0;
+
+					_newVertexList.Add(new Vector3(
+						(float) xx,
+						elevation,
+						(float) yy));
+					_newNormalList.Add(Mapbox.Unity.Constants.Math.Vector3Up);
+					_newUvList.Add(new Vector2(x * 1f / (sampleCount - 1), 1 - (y * 1f / (sampleCount - 1))));
+				}
+			}
+
+			int vertA, vertB, vertC;
+
+			for (int y = 0; y < sampleCount - 1; y++)
+			{
+				for (int x = 0; x < sampleCount - 1; x++)
+				{
+					vertA = (y * sampleCount) + x;
+					vertB = (y * sampleCount) + x + sampleCount + 1;
+					vertC = (y * sampleCount) + x + sampleCount;
+					_newTriangleList.Add(vertA);
+					_newTriangleList.Add(vertB);
+					_newTriangleList.Add(vertC);
+
+					vertA = (y * sampleCount) + x;
+					vertB = (y * sampleCount) + x + 1;
+					vertC = (y * sampleCount) + x + sampleCount + 1;
+					_newTriangleList.Add(vertA);
+					_newTriangleList.Add(vertB);
+					_newTriangleList.Add(vertC);
+				}
+			}
+
+			var mesh = new MeshDataArray();
+			mesh.Vertices = _newVertexList.ToArray();
+			mesh.Normals = _newNormalList.ToArray();
+			mesh.Uvs = _newUvList.ToArray();
+			mesh.Triangles = _newTriangleList.ToArray();
+			return mesh;
+		}
+
+		private MeshDataArray CreateBaseMeshSkirts(float tileSize, int sampleCount)
 		{
 			var half = tileSize/2;
 			//TODO use arrays instead of lists

@@ -42,11 +42,9 @@ namespace Mapbox.Map
 			return Constants.BaseAPI + "styles/v1/" + user + "/" + style + draft + "/tiles";
 		}
 
-		public static string NormalizeDemStyleURL(string url)
+		public static string NormalizeDemStyleURL(string id)
 		{
-			string[] split = url.Split('/');
-			var style = split[2];
-			return "https://api.mapbox.com/raster/v1/" + style;
+			return "https://api.mapbox.com/raster/v1/" + id;
 		}
 
 		/// <summary>

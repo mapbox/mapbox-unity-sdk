@@ -137,12 +137,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		private void OnFetchingError(UnityTile tile, Mapbox.Map.VectorTile vectorTile, TileErrorEventArgs e)
 		{
-			if (tile != null)
-			{
-				tile.Logs.Add("vector OnFetchingError");
-				_tilesWaitingResponse.Remove(tile);
-				OnErrorOccurred(e);
-			}
+			_tilesWaitingResponse.Remove(tile);
 		}
 
 		public override void UpdateTileProperty(UnityTile tile, LayerUpdateArgs updateArgs)

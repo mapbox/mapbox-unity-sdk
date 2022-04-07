@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Mapbox.Map;
+using Mapbox.Platform.Cache;
+using Mapbox.Unity.Utilities;
+using Mapbox.Utils;
 using UnityEngine;
 
 namespace Mapbox.Unity.QuadTree
@@ -34,7 +37,7 @@ namespace Mapbox.Unity.QuadTree
 			_farFrustumCorners = new Vector3[4];
 			_frustumCorners = new Vector3[8];
 		}
-
+		
 		public QuadTreeView UpdateQuadTree(float elevationAtCenter)
 		{
 			_view = new QuadTreeView();
@@ -46,7 +49,6 @@ namespace Mapbox.Unity.QuadTree
 			while (stack.Count > 0)
 			{
 				var tile = stack.Pop();
-
 
 				// var rot = _camera.transform.rotation.eulerAngles.y;
 				// var result =
@@ -70,8 +72,7 @@ namespace Mapbox.Unity.QuadTree
 				// {
 				// 	Debug.DrawLine(_frustumCorners[i], _frustumCorners[i + 1], Color.red);
 				// }
-
-
+				
 				//if(!TestPlanesAABBGLJS(_planes, _frustumCorners, ref tile.UnityBounds))
 				if (!GeometryUtility.TestPlanesAABB(_planes, tile.UnityBounds))
 				{
@@ -110,8 +111,13 @@ namespace Mapbox.Unity.QuadTree
 				return false;
 			}
 
-			var dist = tile.ShortestDistanceTo(Vector3.zero);
+			//var dist = tile.ShortestDistanceTo(Vector3.zero);
+			var dist = tile.UnityBounds.SqrDistance(Vector3.zero);
+			return dist < Mathf.Pow(tile.UnityBounds.size.x * .5f, 2);
+			
 			var camDistance = _camera.transform.position.magnitude;
+			var distToSplit = (1 << (MaxZoom - tile.Id.Z)) * (camDistance / 100);
+			//return dist < distToSplit;
 			var levelDiff = Mathf.Floor(dist * LevelDecisionMultiplier / camDistance);
 			return tile.Id.Z < MaxZoom - levelDiff;
 		}

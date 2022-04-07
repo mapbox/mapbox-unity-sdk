@@ -1761,10 +1761,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1885181995}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94bc74bfa14cf7140b49b47f91b90d29, type: 3}
+  m_Script: {fileID: 11500000, guid: 64b23d8771b732342b42b35c3f9c1608, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Multiplier: 0.02
+  Multiplier: 1
 --- !u!1 &1929197852
 GameObject:
   m_ObjectHideFlags: 0

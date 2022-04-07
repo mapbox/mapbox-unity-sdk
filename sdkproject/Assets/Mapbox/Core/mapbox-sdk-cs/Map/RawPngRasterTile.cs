@@ -43,4 +43,19 @@ namespace Mapbox.Map
 		{
 		}
 	}
+
+	public class DemRasterTile : RasterTile
+	{
+		public int ExtractedDataResolution;
+		public float[] HeightData;
+
+		internal override TileResource MakeTileResource(string tilesetId)
+		{
+			return TileResource.MakeDemRaster(Id, tilesetId);
+		}
+
+		public DemRasterTile(CanonicalTileId tileId, string tilesetId, bool useReadonlyTexture = false) : base(tileId, tilesetId, useReadonlyTexture)
+		{
+		}
+	}
 }

@@ -129,17 +129,16 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		private string _elevationMultiplierFieldNameID = "_ElevationMultiplier";
 		private string _shaderElevationTextureFieldNameID = "_HeightTexture";
+		private string _textureChangeTimerFieldNameID = "_ElevationChangeTime";
+		private string _previousMainTextureFieldNameID = "_PreviousMainTexture";
 		private string _mainTextureChangeTimeFieldNameID = "_MainTextureChangeTime";
 		private string _mainTexFieldNameID = "_MainTex";
 		private string _mainTexStFieldNameID = "_MainTex_ST";
+		private string _previousMainTextureScaleOffsetFieldNameID = "_PreviousMainTextureScaleOffset";
 		private string _tileScaleFieldNameID = "_TileScale";
+		private string _previousShaderElevationTextureFieldNameID = "_PreviousHeightTexture";
+		private string _previousShaderElevationTextureScaleOffsetFieldNameID = "_PreviousHeightTexture_ST";
 		private string _shaderElevationTextureScaleOffsetFieldNameID = "_HeightTexture_ST";
-
-		//private string _textureChangeTimerFieldNameID = "_ElevationChangeTime";
-		//private string _previousMainTextureFieldNameID = "_PreviousMainTexture";
-		//private string _previousMainTextureScaleOffsetFieldNameID = "_PreviousMainTextureScaleOffset";
-		// private string _previousShaderElevationTextureFieldNameID = "_PreviousHeightTexture";
-		// private string _previousShaderElevationTextureScaleOffsetFieldNameID = "_PreviousHeightTexture_ST";
 
 		// private static int _previousMainTextureFieldNameID = 0;
 		// private static int _mainTextureChangeTimeFieldNameID = 0;
@@ -196,8 +195,6 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			// Setup Loading as initial state - Unregistered
 			// When tile registers with factories, it will set the appropriate state.
 			// None, if Factory source is None, Loading otherwise.
-
-			//SetRenderDepth(2000 - (10 * (20 - CanonicalTileId.Z)));
 		}
 
 		internal void Recycle()
@@ -208,6 +205,9 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			// 	_propertyBlock.SetTexture("_MainTex", null);
 			// 	MeshRenderer.SetPropertyBlock(_propertyBlock);
 			// }
+
+			_material.SetTexture(_previousShaderElevationTextureFieldNameID, null);
+			_material.SetTexture(_previousMainTextureFieldNameID, null);
 
 			_terrainReady = false;
 			_createMeshCallback = null;
@@ -253,15 +253,14 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 			if (_material != null)
 			{
-				// if (_material.GetTexture(_previousShaderElevationTextureFieldNameID) == null)
-				// {
-				// 	Debug.Log("fixed missing elevation texture for " + CanonicalTileId);
-				// 	_material.SetTexture(_previousShaderElevationTextureFieldNameID, terrainTile.Texture2D);
-				// 	_material.SetVector(_previousShaderElevationTextureScaleOffsetFieldNameID, _terrainTextureScaleOffset);
-				// }
+				if (_material.GetTexture(_previousShaderElevationTextureFieldNameID) == null)
+				{
+					_material.SetTexture(_previousShaderElevationTextureFieldNameID, terrainTile.Texture2D);
+					_material.SetVector(_previousShaderElevationTextureScaleOffsetFieldNameID, _terrainTextureScaleOffset);
+				}
 
 				_material.SetTexture(_shaderElevationTextureFieldNameID, terrainTile.Texture2D);
-				//_material.SetFloat(_textureChangeTimerFieldNameID, Time.time);
+				_material.SetFloat(_textureChangeTimerFieldNameID, Time.time);
 				_material.SetVector(_shaderElevationTextureScaleOffsetFieldNameID, _terrainTextureScaleOffset);
 				_material.SetFloat(_tileScaleFieldNameID, TileScale);
 				_material.SetFloat(_elevationMultiplierFieldNameID, heightMultiplier);
@@ -269,9 +268,14 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 			if (_parentTerrainTile != null)
 			{
-				_parentTerrainTile.AddLog("removed from parent ", CanonicalTileId);
-				_parentTerrainTile.RemoveUser(CanonicalTileId);
-				//_parentTerrainTile = null;
+				Runnable.Run(DelayedAction(() =>
+				{
+					if (_parentTerrainTile != null)
+					{
+						_parentTerrainTile.RemoveUser(CanonicalTileId);
+						//_parentTerrainTile = null;
+					}
+				}, 2));
 			}
 
 			//reset height data
@@ -426,18 +430,23 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 
 			//MeshRenderer.GetPropertyBlock(_propertyBlock);
-			// if (_material.GetTexture(_previousMainTextureFieldNameID) == null)
-			// {
-			// 	Debug.Log("fixed missing main texture for " + CanonicalTileId);
-			// 	_material.SetTexture(_previousMainTextureFieldNameID, rasterTile.Texture2D);
-			// 	_material.SetVector(_previousMainTextureScaleOffsetFieldNameID, new Vector4(1, 1, 0, 0));
-			// }
+			if (_material.GetTexture(_previousMainTextureFieldNameID) == null)
+			{
+				_material.SetTexture(_previousMainTextureFieldNameID, rasterTile.Texture2D);
+				_material.SetVector(_previousMainTextureScaleOffsetFieldNameID, new Vector4(1, 1, 0, 0));
+			}
 
 			if (_parentRasterTile != null)
 			{
-				_parentRasterTile.AddLog("removed from parent ", CanonicalTileId);
-				_parentRasterTile.RemoveUser(CanonicalTileId);
-				//_parentRasterTile = null;
+				Runnable.Run(DelayedAction(() =>
+				{
+					if (_parentRasterTile != null)
+					{
+						_parentRasterTile.AddLog("removed from parent ", CanonicalTileId);
+						_parentRasterTile.RemoveUser(CanonicalTileId);
+						//_parentRasterTile = null;
+					}
+				}, 2));
 			}
 
 			_material.SetFloat(_mainTextureChangeTimeFieldNameID, Time.time);
@@ -635,7 +644,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			if (textureNameID == 0)
 			{
 				_material.SetTexture(_mainTexFieldNameID, _parentRasterTile.Texture2D);
-				//_material.SetTexture(_previousMainTextureFieldNameID, _parentRasterTile.Texture2D);
+				_material.SetTexture(_previousMainTextureFieldNameID, _parentRasterTile.Texture2D);
 			}
 			else
 			{
@@ -644,7 +653,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 			var scaleOffset = CalculateScaleOffset(parent.Z);
 
-			//_material.SetVector(_previousMainTextureScaleOffsetFieldNameID, scaleOffset);
+			_material.SetVector(_previousMainTextureScaleOffsetFieldNameID, scaleOffset);
 			_material.SetVector(_mainTexStFieldNameID, scaleOffset);
 		}
 
@@ -658,8 +667,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 			var scaleOffset = CalculateScaleOffset(parent.Z);
 
-			//_material.SetTexture(_previousShaderElevationTextureFieldNameID, _parentTerrainTile.Texture2D);
-			//_material.SetVector(_previousShaderElevationTextureScaleOffsetFieldNameID, scaleOffset);
+			_material.SetTexture(_previousShaderElevationTextureFieldNameID, _parentTerrainTile.Texture2D);
+			_material.SetVector(_previousShaderElevationTextureScaleOffsetFieldNameID, scaleOffset);
 			_material.SetFloat(_tileScaleFieldNameID, TileScale);
 			_material.SetVector(_shaderElevationTextureScaleOffsetFieldNameID, scaleOffset);
 		}
@@ -750,7 +759,13 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void SetRenderDepth(int depth)
 		{
-			_meshRenderer.material.renderQueue = depth;
+			//_meshRenderer.material.renderQueue = 2000 - (10 * depth);
+		}
+
+		private IEnumerator DelayedAction(Action act, int timer)
+		{
+			yield return new WaitForSeconds(timer);
+			act();
 		}
 
 		public void ElevationDataParsingCompleted(RasterTile dataTile)
