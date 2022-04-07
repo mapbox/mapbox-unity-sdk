@@ -161,7 +161,7 @@ MonoBehaviour:
         isActive: 0
         wallHeight: 10
         wallMaterial: {fileID: 0}
-      TileMeshSize: 10
+      TileMeshSize: 1
   ImageryLayer:
     _layerProperty:
       sourceType: 4
@@ -1162,7 +1162,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac10f9c4452ce264899d90fb347d0a12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Button: {fileID: 1736926907}
 --- !u!114 &1736926907
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1478,7 +1477,7 @@ GameObject:
   - component: {fileID: 1885181998}
   - component: {fileID: 1885182000}
   m_Layer: 0
-  m_Name: Map2
+  m_Name: Map
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1523,7 +1522,7 @@ MonoBehaviour:
       placementType: 1
     scalingOptions:
       scalingType: 1
-      unityTileSize: 10
+      unityTileSize: 1
     tileMaterial: {fileID: 2100000, guid: 764fa5e39b2479249af645452ac5d740, type: 2}
   CameraController: {fileID: 1885181998}
   QuadTreeGenerator: {fileID: 1885181999}

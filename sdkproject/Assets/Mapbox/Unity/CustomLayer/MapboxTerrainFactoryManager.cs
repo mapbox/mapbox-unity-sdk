@@ -115,62 +115,11 @@ namespace Mapbox.Unity.CustomLayer
 
 				if (SystemInfo.supportsAsyncGPUReadback)
 				{
-					var pngRawRasterTile = (RawPngRasterTile) dataTile;
-					var _heightDataResolution = 100;
-
-					if (!_elevationWaitingList.ContainsKey(dataTile.Key))
-					{
-						_elevationWaitingList.Add(dataTile.Key, new HashSet<UnityTile>());
-					}
-
-					foreach (var utile in _tileWaitingList[dataTile.Key])
-					{
-						_elevationWaitingList[dataTile.Key].Add(utile);
-					}
-
-					AsyncGPUReadback.Request(dataTile.Texture2D, 0, (t) =>
-					{
-						var width = t.width;
-						var data = t.GetData<Color32>().ToArray();
-
-						if (pngRawRasterTile.HeightData == null || pngRawRasterTile.HeightData.Length != _heightDataResolution * _heightDataResolution)
-						{
-							pngRawRasterTile.ExtractedDataResolution = _heightDataResolution;
-							pngRawRasterTile.HeightData = new float[_heightDataResolution * _heightDataResolution];
-						}
-
-						//tt = new Texture2D(_heightDataResolution, _heightDataResolution, TextureFormat.RGBA32, false);
-						for (float yy = 0; yy < _heightDataResolution; yy++)
-						{
-							for (float xx = 0; xx < _heightDataResolution; xx++)
-							{
-								var xx2 =(xx / _heightDataResolution) * width;
-								var yy2 =(yy / _heightDataResolution) * width;
-								var index = (int) (((int) yy2 * width) + (int) xx2);
-								//var color = _heightTexture.GetPixel((int)xx2, (int)yy2);
-								//var index = (int)(((float)xx / _heightDataResolution) * 255 * 256 + (((float)yy / _heightDataResolution) * 255));
-
-								float r = data[index].g;
-								float g = data[index].b;
-								float b = data[index].a;
-								//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
-								pngRawRasterTile.HeightData[(int) (yy * _heightDataResolution + xx)] = (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
-								//678 ==> 012345678
-								//345
-								//012
-
-								//tt.SetPixel((int) xx, (int) yy, new Color(r/256, g/256, b/256));
-								//tt.SetPixel((int) xx, (int) yy, color); //new Color(rgbData[index * 4 + 1] / 256f, rgbData[index * 4 + 2] / 256f, rgbData[index * 4 + 3] / 256f, 1));
-							}
-						}
-
-						foreach (var unityTile in _elevationWaitingList[dataTile.Key])
-						{
-							unityTile.ElevationDataParsingCompleted(dataTile);
-						}
-
-						_elevationWaitingList.Remove(dataTile.Key);
-					});
+					AsyncExtractElevationArray((RawPngRasterTile) dataTile);
+				}
+				else
+				{
+					SyncExtractElevationArray((RawPngRasterTile) dataTile);
 				}
 
 				foreach (var unityTile in _tileWaitingList[dataTile.Key])
@@ -187,6 +136,100 @@ namespace Mapbox.Unity.CustomLayer
 			}
 
 			_requestedTiles.Remove(dataTile.Id);
+		}
+
+		private void SyncExtractElevationArray(RawPngRasterTile dataTile)
+		{
+			var _heightDataResolution = 100;
+			byte[] rgbData = dataTile.Texture2D.GetRawTextureData();
+			var width = dataTile.Texture2D.width;
+
+			if (dataTile.HeightData == null || dataTile.HeightData.Length != _heightDataResolution * _heightDataResolution)
+			{
+				dataTile.ExtractedDataResolution = _heightDataResolution;
+				dataTile.HeightData = new float[_heightDataResolution * _heightDataResolution];
+			}
+
+			for (float y = 0; y < _heightDataResolution; y++)
+			{
+				for (float x = 0; x < _heightDataResolution; x++)
+				{
+					var xx = (x / _heightDataResolution) * width;
+					var yy = (y / _heightDataResolution) * width;
+					var index = ((int) yy * width) + (int) xx;
+
+					float r = rgbData[index * 4 + 1];
+					float g = rgbData[index * 4 + 2];
+					float b = rgbData[index * 4 + 3];
+					//var color = rgbData[index];
+					// float r = color.g;
+					// float g = color.b;
+					// float b = color.a;
+					//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
+					dataTile.HeightData[(int) (y * _heightDataResolution + x)] = (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
+					//678 ==> 012345678
+					//345
+					//012
+				}
+			}
+
+			foreach (var unityTile in _tileWaitingList[dataTile.Key])
+			{
+				unityTile.ElevationDataParsingCompleted(dataTile);
+			}
+		}
+
+		private void AsyncExtractElevationArray(RawPngRasterTile dataTile)
+		{
+			var _heightDataResolution = 100;
+
+			if (!_elevationWaitingList.ContainsKey(dataTile.Key))
+			{
+				_elevationWaitingList.Add(dataTile.Key, new HashSet<UnityTile>());
+			}
+
+			foreach (var utile in _tileWaitingList[dataTile.Key])
+			{
+				_elevationWaitingList[dataTile.Key].Add(utile);
+			}
+
+			AsyncGPUReadback.Request(dataTile.Texture2D, 0, (t) =>
+			{
+				var width = t.width;
+				var data = t.GetData<Color32>().ToArray();
+
+				if (dataTile.HeightData == null || dataTile.HeightData.Length != _heightDataResolution * _heightDataResolution)
+				{
+					dataTile.ExtractedDataResolution = _heightDataResolution;
+					dataTile.HeightData = new float[_heightDataResolution * _heightDataResolution];
+				}
+
+				for (float y = 0; y < _heightDataResolution; y++)
+				{
+					for (float x = 0; x < _heightDataResolution; x++)
+					{
+						var xx = (x / _heightDataResolution) * width;
+						var yy = (y / _heightDataResolution) * width;
+						var index = ((int) yy * width) + (int) xx;
+
+						float r = data[index].g;
+						float g = data[index].b;
+						float b = data[index].a;
+						//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
+						dataTile.HeightData[(int) (y * _heightDataResolution + x)] = (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
+						//678 ==> 012345678
+						//345
+						//012
+					}
+				}
+
+				foreach (var unityTile in _elevationWaitingList[dataTile.Key])
+				{
+					unityTile.ElevationDataParsingCompleted(dataTile);
+				}
+
+				_elevationWaitingList.Remove(dataTile.Key);
+			});
 		}
 
 		// protected override void OnFetcherError(RasterTile dataTile, TileErrorEventArgs errorEventArgs)
@@ -208,9 +251,11 @@ namespace Mapbox.Unity.CustomLayer
 		{
 			RasterTile rasterTile;
 
-			// if (tilesetId.StartsWith("mapbox://", StringComparison.Ordinal))
+
+			// //TODO fix this obviously
+			// if (tilesetId == "mapbox.mapbox-terrain-dem-v1")
 			// {
-			// 	  dem tiles will be here in the future
+			// 	rasterTile = new DemRasterTile(tileId, tilesetId, true);
 			// }
 			// else
 			{
