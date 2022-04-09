@@ -395,10 +395,7 @@ namespace Mapbox.Map
 		public void AddLog(string text, CanonicalTileId relatedTileId)
 		{
 	#if DEBUG
-			if (false)
-			{
-				_logs.Add(string.Format("{0} - {1}", text, relatedTileId));
-			}
+			_logs.Add(string.Format("{0} - {1}", text, relatedTileId));
 	#endif
 		}
 #endregion

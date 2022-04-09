@@ -130,9 +130,10 @@ namespace Mapbox.Unity.DataFetching
 
 			if (_globalActiveRequests.ContainsKey(key))
 			{
-				_globalActiveRequests[key].Cancel();
 				_globalActiveRequests.Remove(key);
 			}
+
+			tile.Cancel();
 		}
 	}
 

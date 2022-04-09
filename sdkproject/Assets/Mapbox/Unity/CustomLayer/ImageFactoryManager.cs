@@ -99,9 +99,17 @@ namespace Mapbox.Unity.CustomLayer
 			}
 			else
 			{
-				var dataTile = CreateTile(tile.CanonicalTileId, _sourceSettings.Id);
-				ConnectTiles(tile, dataTile);
-				_fetcher.FetchData(dataTile, _sourceSettings.Id, tile.CanonicalTileId);
+				if (!_requestedTiles.ContainsKey(tile.CanonicalTileId))
+				{
+					var dataTile = CreateTile(tile.CanonicalTileId, _sourceSettings.Id);
+					ConnectTiles(tile, dataTile);
+					_fetcher.FetchData(dataTile, _sourceSettings.Id, tile.CanonicalTileId);
+					_requestedTiles.Add(tile.CanonicalTileId, dataTile);
+				}
+				else
+				{
+					Debug.Log("can this happen? shouldn't with imagery");
+				}
 			}
 		}
 
@@ -109,67 +117,102 @@ namespace Mapbox.Unity.CustomLayer
 		{
 			if (_tileTracker.ContainsKey(tile))
 			{
-				var noTileIsWaitingForIt = false;
+				var noTileIsWaitingForIt = true;
 				var requestedTile = _tileTracker[tile];
 				requestedTile.AddLog("cancelling ", tile.CanonicalTileId);
+
+				//remove this unityTile from list of unityTiles waiting for
+				//that particular data tile
 				if (_tileWaitingList.ContainsKey(requestedTile.Key))
 				{
 					if (_tileWaitingList[requestedTile.Key].Contains(tile))
 					{
 						_tileWaitingList[requestedTile.Key].Remove(tile);
-					}
 
-					if (_tileWaitingList[requestedTile.Key].Count == 0)
-					{
-						_tileWaitingList.Remove(requestedTile.Key);
-						noTileIsWaitingForIt = true;
+						if (_tileWaitingList[requestedTile.Key].Count == 0)
+						{
+							_tileWaitingList.Remove(requestedTile.Key);
+						}
+						else
+						{
+							noTileIsWaitingForIt = false;
+						}
 					}
-				}
-				else
-				{
-					noTileIsWaitingForIt = true;
 				}
 
 				if (_tileUserTracker.ContainsKey(requestedTile.Key))
 				{
 					_tileUserTracker[requestedTile.Key].Remove(tile);
-					if (_tileUserTracker[requestedTile.Key].Count == 0 && noTileIsWaitingForIt)
+					if (_tileUserTracker[requestedTile.Key].Count == 0)
 					{
-						requestedTile.AddLog("disposing 1 ", tile.CanonicalTileId);
 						_tileUserTracker.Remove(requestedTile.Key);
-						_fetcher.CancelFetching(requestedTile, _sourceSettings.Id);
-						_requestedTiles.Remove(requestedTile.Id);
-						MapboxAccess.Instance.CacheManager.TileDisposed(requestedTile, _sourceSettings.Id);
+					}
+					else
+					{
+						noTileIsWaitingForIt = false;
 					}
 				}
-				else if(noTileIsWaitingForIt)
+
+				if(noTileIsWaitingForIt)
 				{
 					requestedTile.AddLog("disposing 2 ", tile.CanonicalTileId);
 					_fetcher.CancelFetching(requestedTile, _sourceSettings.Id);
-					_requestedTiles.Remove(requestedTile.Id);
 					MapboxAccess.Instance.CacheManager.TileDisposed(requestedTile, _sourceSettings.Id);
 				}
 
 				tile.RemoveTile(_tileTracker[tile]);
 				_tileTracker[tile].RemoveUser(tile.CanonicalTileId);
 				_tileTracker.Remove(tile);
-			}
-			else
-			{
-				// if (_tileUserTracker.ContainsKey(tile.TerrainData.Key))
-				// {
-				// 	Debug.Log("here");
-				// }
+
+				//can't use tile.CanonicalTileId here because tile might be using
+				//lower level (parent) data, like terrain/elevation does.
+				//so tile.CanonicalTileId != requestedTile.Id
+				if (_requestedTiles.ContainsKey(requestedTile.Id))
+				{
+					_requestedTiles.Remove(requestedTile.Id);
+				}
 			}
 		}
 
-		public void Stop(UnityTile tile)
+		public virtual void Stop(UnityTile tile)
 		{
 			if (_tileTracker.ContainsKey(tile))
 			{
-				var noTileIsWaitingForIt = false;
+				var noTileIsWaitingForIt = true;
 				var requestedTile = _tileTracker[tile];
-				_fetcher.CancelFetching(requestedTile, _sourceSettings.Id);
+
+				if (_tileWaitingList.ContainsKey(requestedTile.Key))
+				{
+					_tileWaitingList[requestedTile.Key].Remove(tile);
+					if (_tileWaitingList[requestedTile.Key].Count == 0)
+					{
+						_tileWaitingList.Remove(requestedTile.Key);
+					}
+					else
+					{
+						noTileIsWaitingForIt = false;
+					}
+				}
+
+				if (_tileUserTracker.ContainsKey(requestedTile.Key))
+				{
+					_tileUserTracker[requestedTile.Key].Remove(tile);
+					if (_tileUserTracker[requestedTile.Key].Count == 0)
+					{
+						_tileUserTracker.Remove(requestedTile.Key);
+					}
+					else
+					{
+						noTileIsWaitingForIt = false;
+					}
+				}
+
+				if (noTileIsWaitingForIt)
+				{
+					_requestedTiles.Remove(tile.CanonicalTileId);
+					requestedTile.AddLog("cancelling for stop call");
+					_fetcher.CancelFetching(requestedTile, _sourceSettings.Id);
+				}
 			}
 		}
 
@@ -203,49 +246,46 @@ namespace Mapbox.Unity.CustomLayer
 				//this means tile is unregistered during fetching... but somehow it didn't get cancelled?
 				dataTile.AddLog("tile is unregistered during fetching?");
 			}
+
+			if (_requestedTiles.ContainsKey(dataTile.Id))
+			{
+				_requestedTiles.Remove(dataTile.Id);
+			}
 		}
 
 		protected virtual void OnFetcherError(RasterTile dataTile, TileErrorEventArgs errorEventArgs)
 		{
 			dataTile.AddLog("OnFetcherError ImageFactoryManager");
 
+			//cancelled tiles are removed from this list as soon as cancellation order is received
+			//so this is only for failed web calls
+			if (_tileWaitingList.ContainsKey(dataTile.Key))
+			{
+				foreach (var unityTile in _tileWaitingList[dataTile.Key])
+				{
+					unityTile.RemoveTile(dataTile);
+					dataTile.RemoveUser(unityTile.CanonicalTileId);
+
+					if (_tileTracker.ContainsKey(unityTile))
+					{
+						_tileTracker.Remove(unityTile);
+					}
+				}
+				_tileWaitingList.Remove(dataTile.Key);
+			}
+
+			if (_tileUserTracker.ContainsKey(dataTile.Key))
+			{
+				Debug.Log("fetching failed but there was already tiles using it?");
+				//this shouldn't happen, adding this check just to see everything is in order
+				_tileUserTracker.Remove(dataTile.Key);
+			}
+
+			//cancelled tiles are removed from this list as soon as cancellation order is received
+			//so this is only for failed web calls
 			if (_requestedTiles.ContainsKey(dataTile.Id))
 			{
 				_requestedTiles.Remove(dataTile.Id);
-
-				if (_tileWaitingList.ContainsKey(dataTile.Key))
-				{
-					foreach (var unityTile in _tileWaitingList[dataTile.Key])
-					{
-						unityTile.RemoveTile(dataTile);
-						dataTile.RemoveUser(unityTile.CanonicalTileId);
-
-						if (_tileTracker.ContainsKey(unityTile))
-						{
-							_tileTracker.Remove(unityTile);
-						}
-					}
-					_tileWaitingList.Remove(dataTile.Key);
-				}
-				else
-				{
-					Debug.Log("fetching failed but no tile was waiting for it?");
-				}
-
-				if (_tileUserTracker.ContainsKey(dataTile.Key))
-				{
-					Debug.Log("fetching failed but there was already tiles using it?");
-					//this shouldn't happen, adding this check just to see everything is in order
-					_tileUserTracker.Remove(dataTile.Key);
-				}
-			}
-			else
-			{
-				//Debug.Log("fetching failed but it was requested?");
-				//not really, tile was unregistered and datatile associated with it are cancelled
-				//data tiles were removed from _requestedTiles during unregistration
-				//tiles cancelled eventually fires FetchingError
-				//so tile is removed from this list properly
 			}
 
 			FetchingError(dataTile, errorEventArgs);
