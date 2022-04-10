@@ -133,6 +133,7 @@ namespace Mapbox.Unity.CustomLayer
 			else
 			{
 				//this means tile is unregistered during fetching... but somehow it didn't get cancelled?
+				dataTile.AddLog("tile is unregistered during fetching?");
 			}
 
 			_requestedTiles.Remove(dataTile.Id);

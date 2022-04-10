@@ -21,11 +21,12 @@ namespace Mapbox.Unity.DataFetching
 
 		public virtual void CancelFetching(UnwrappedTileId tileUnwrappedTileId, string tilesetId)
 		{
-			MapboxAccess.Instance.DataManager.CancelFetching(tileUnwrappedTileId, tilesetId);
+			//MapboxAccess.Instance.DataManager.CancelFetching(tileUnwrappedTileId, tilesetId);
 		}
 
 		public void CancelFetching(Tile tile, string tilesetId)
 		{
+			tile.AddLog(Time.frameCount + " CancelFetching");
 			MapboxAccess.Instance.DataManager.CancelFetching(tile, tilesetId);
 		}
 	}

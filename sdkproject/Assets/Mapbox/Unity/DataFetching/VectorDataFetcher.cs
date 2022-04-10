@@ -43,17 +43,23 @@ public class VectorDataFetcher : DataFetcher
 
         void FailureCallback()
         {
-	        if (unityTile != null && !unityTile.ContainsDataTile(tile))
+	        tile.AddLog("callback FailureCallback");
+	        if (!tile.IsInUse())
 	        {
+		        tile.AddLog("FailureCallback dropped due to id mismatch");
 		        //this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
 		        return;
 	        }
 
-	        EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, string.Empty) {Callback = () => { FetchingCallback(tileId, tile, unityTile); }});
+	        EnqueueForFetching(new FetchInfo(tileId, tilesetId, tile, string.Empty) {Callback = () =>
+	        {
+		        FetchingCallback(tileId, tile, unityTile);
+	        }});
         }
 
         void CancelledCallback()
         {
+	        tile.AddLog("callback CancelledCallback");
 	        FetchingError(unityTile, tile, new TileErrorEventArgs(tileId, tile.GetType(), tile.Exceptions));
         }
 
