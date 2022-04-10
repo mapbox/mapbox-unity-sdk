@@ -37,7 +37,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 		private int _vertA, _vertB, _vertC;
 		private int _counter;
 
-		private bool _useTileSkirts = true;
+		private bool _useTileSkirts = false;
 
 		public override int RequiredVertexCount
 		{

@@ -405,6 +405,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void SetRasterData(RasterTile rasterTile, bool useMipMap = false, bool useCompression = false)
 		{
+			gameObject.layer = LayerMask.NameToLayer("Tile");
 			_rasterTile = rasterTile;
 
 			if (_rasterTile == null || (_rasterTile.Texture2D == null && _rasterTile.Data == null))
@@ -449,7 +450,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				}, 2));
 			}
 
-			_material.SetFloat(_mainTextureChangeTimeFieldNameID, Time.time);
+			//_material.SetFloat(_mainTextureChangeTimeFieldNameID, Time.time);
 			_material.SetTexture(_mainTexFieldNameID, rasterTile.Texture2D);
 			_material.SetVector(_mainTexStFieldNameID, new Vector4(1, 1, 0, 0));
 			//MeshRenderer.SetPropertyBlock(_propertyBlock);
@@ -637,6 +638,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void SetParentTexture(UnwrappedTileId parent, RasterTile parentTile, int textureNameID = 0, int textureScaleOffsetNameID = 0)
 		{
+			gameObject.layer = LayerMask.NameToLayer("BackgroundTile");
+
 			_parentRasterTile = parentTile;
 			_parentRasterTile.AddUser(CanonicalTileId);
 			_parentRasterTile.AddLog("using as main texture parent ", CanonicalTileId);

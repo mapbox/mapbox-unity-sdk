@@ -298,7 +298,7 @@ namespace Mapbox.Unity.QuadTree
                                 ZoomOutTracker.Add(newId, new HashSet<UnwrappedTileId>());
                             }
 
-                            enableTile = false;
+                            enableTile = true;
                             if (_mapVisualizer.ActiveTiles.ContainsKey(child))
                             {
                                 if (ZoomOutTracker.ContainsKey(child))
