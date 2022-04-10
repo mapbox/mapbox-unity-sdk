@@ -156,6 +156,13 @@ namespace Mapbox.Unity.CustomLayer
 				if(noTileIsWaitingForIt)
 				{
 					requestedTile.AddLog("disposing 2 ", tile.CanonicalTileId);
+					//can't use tile.CanonicalTileId here because tile might be using
+					//lower level (parent) data, like terrain/elevation does.
+					//so tile.CanonicalTileId != requestedTile.Id
+					if (_requestedTiles.ContainsKey(requestedTile.Id))
+					{
+						_requestedTiles.Remove(requestedTile.Id);
+					}
 					_fetcher.CancelFetching(requestedTile, _sourceSettings.Id);
 					MapboxAccess.Instance.CacheManager.TileDisposed(requestedTile, _sourceSettings.Id);
 				}
@@ -164,13 +171,7 @@ namespace Mapbox.Unity.CustomLayer
 				_tileTracker[tile].RemoveUser(tile.CanonicalTileId);
 				_tileTracker.Remove(tile);
 
-				//can't use tile.CanonicalTileId here because tile might be using
-				//lower level (parent) data, like terrain/elevation does.
-				//so tile.CanonicalTileId != requestedTile.Id
-				if (_requestedTiles.ContainsKey(requestedTile.Id))
-				{
-					_requestedTiles.Remove(requestedTile.Id);
-				}
+
 			}
 		}
 
