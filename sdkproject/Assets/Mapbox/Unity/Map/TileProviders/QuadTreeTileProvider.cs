@@ -48,7 +48,11 @@ namespace Mapbox.Unity.Map.TileProviders
 				_cbtpOptions.camera = Camera.main;
 			}
 			_cbtpOptions.camera.transform.hasChanged = false;
-			_groundPlane = new Plane(Vector3.up, 0);
+			_groundPlane = new Plane(
+				_map.GeoToWorldPosition(_map.CenterLatitudeLongitude, false),
+				_map.GeoToWorldPosition(_map.CenterLatitudeLongitude + new Vector2d(0, 1), false),
+				_map.GeoToWorldPosition(_map.CenterLatitudeLongitude + new Vector2d(1, 0), false)
+			);
 			_shouldUpdate = true;
 			_currentExtent.activeTiles = new HashSet<UnwrappedTileId>();
 		}
