@@ -110,6 +110,7 @@ namespace Mapbox.Platform.Cache
 
             var task = new TaskWrapper(tileId.GenerateKey(localTilesetId, "GetVectorItemSqlite"))
             {
+                OwnerTileId = localTileId,
                 TileId = localTileId,
                 TilesetId = tilesetId,
                 Action = () =>

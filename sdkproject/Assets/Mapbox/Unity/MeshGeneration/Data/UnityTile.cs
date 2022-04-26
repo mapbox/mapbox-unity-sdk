@@ -2,6 +2,7 @@ using System.Collections;
 using JetBrains.Annotations;
 using Mapbox.Unity.DataContainers;
 using Mapbox.Unity.QuadTree;
+using Unity.UNetWeaver;
 using UnityEditor;
 using UnityEngine.Rendering;
 
@@ -290,7 +291,10 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			}
 
 			CheckFinishedCondition(_terrainTile);
-
+			if (callback != null)
+			{
+				callback(this);
+			}
 			//var tileId = terrainTile.Id;
 			// if (SystemInfo.supportsAsyncGPUReadback)
 			// {
@@ -405,11 +409,11 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void SetRasterData(RasterTile rasterTile, bool useMipMap = false, bool useCompression = false)
 		{
-			gameObject.layer = LayerMask.NameToLayer("Tile");
 			_rasterTile = rasterTile;
 
 			if (_rasterTile == null || (_rasterTile.Texture2D == null && _rasterTile.Data == null))
 			{
+				CheckFinishedCondition(_rasterTile);
 				//MeshRenderer.material.mainTexture = null;
 				return;
 			}
@@ -430,30 +434,34 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				}
 			}
 
-			//MeshRenderer.GetPropertyBlock(_propertyBlock);
-			if (_material.GetTexture(_previousMainTextureFieldNameID) == null)
+			if (rasterTile.Texture2D != null)
 			{
-				_material.SetTexture(_previousMainTextureFieldNameID, rasterTile.Texture2D);
-				_material.SetVector(_previousMainTextureScaleOffsetFieldNameID, new Vector4(1, 1, 0, 0));
-			}
 
-			if (_parentRasterTile != null)
-			{
-				Runnable.Run(DelayedAction(() =>
+				//MeshRenderer.GetPropertyBlock(_propertyBlock);
+				if (_material.GetTexture(_previousMainTextureFieldNameID) == null)
 				{
-					if (_parentRasterTile != null)
-					{
-						_parentRasterTile.AddLog("removed from parent ", CanonicalTileId);
-						_parentRasterTile.RemoveUser(CanonicalTileId);
-						//_parentRasterTile = null;
-					}
-				}, 2));
-			}
+					_material.SetTexture(_previousMainTextureFieldNameID, rasterTile.Texture2D);
+					_material.SetVector(_previousMainTextureScaleOffsetFieldNameID, new Vector4(1, 1, 0, 0));
+				}
 
-			//_material.SetFloat(_mainTextureChangeTimeFieldNameID, Time.time);
-			_material.SetTexture(_mainTexFieldNameID, rasterTile.Texture2D);
-			_material.SetVector(_mainTexStFieldNameID, new Vector4(1, 1, 0, 0));
-			//MeshRenderer.SetPropertyBlock(_propertyBlock);
+				if (_parentRasterTile != null)
+				{
+					Runnable.Run(DelayedAction(() =>
+					{
+						if (_parentRasterTile != null)
+						{
+							_parentRasterTile.AddLog("removed from parent ", CanonicalTileId);
+							_parentRasterTile.RemoveUser(CanonicalTileId);
+							//_parentRasterTile = null;
+						}
+					}, 2));
+				}
+
+				//_material.SetFloat(_mainTextureChangeTimeFieldNameID, Time.time);
+				_material.SetTexture(_mainTexFieldNameID, rasterTile.Texture2D);
+				_material.SetVector(_mainTexStFieldNameID, new Vector4(1, 1, 0, 0));
+				//MeshRenderer.SetPropertyBlock(_propertyBlock);
+			}
 
 			CheckFinishedCondition(_rasterTile);
 		}
@@ -592,9 +600,18 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			return _rasterTile.Texture2D;
 		}
 
-		internal void AddTile(Tile tile)
+		public void AddTile(Tile tile)
 		{
 			Tiles.Add(tile);
+		}
+
+		public void DataTileStopped(Tile tile)
+		{
+			if (_finishConditionTiles.Contains(tile))
+			{
+				_finishConditionTiles.Remove(tile);
+				CheckFinishedCondition();
+			}
 		}
 
 		public bool ContainsDataTile(Tile tile)
@@ -638,6 +655,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 
 		public void SetParentTexture(UnwrappedTileId parent, RasterTile parentTile, int textureNameID = 0, int textureScaleOffsetNameID = 0)
 		{
+			Logs.Add("added to background tile layer");
 			gameObject.layer = LayerMask.NameToLayer("BackgroundTile");
 
 			_parentRasterTile = parentTile;
@@ -739,6 +757,8 @@ namespace Mapbox.Unity.MeshGeneration.Data
 		{
 			if (_finishConditionTiles.Count == 0)
 			{
+				Logs.Add("added to tile layer");
+				gameObject.layer = LayerMask.NameToLayer("Tile");
 				TileFinished(this);
 			}
 		}

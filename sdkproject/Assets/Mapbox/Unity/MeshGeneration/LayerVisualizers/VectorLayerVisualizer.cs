@@ -281,6 +281,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 			var taskWrapper = new TaskWrapper(tile.CanonicalTileId.GenerateKey(Key))
 			{
+				OwnerTileId = tile.CanonicalTileId,
 				TileId = tile.CanonicalTileId,
 				TilesetId = Key,
 				Action = Action,

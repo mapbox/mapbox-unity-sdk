@@ -125,19 +125,26 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 			}
 		}
 
-		private void OnFetcherDataReceived(UnityTile tile, Mapbox.Map.VectorTile vectorTile)
+		private void OnFetcherDataReceived(UnityTile unityTile, Mapbox.Map.VectorTile vectorTile)
 		{
 			if (vectorTile.CurrentTileState != TileState.Canceled &&
-			    tile.ContainsDataTile(vectorTile) &&
-			    _tilesWaitingResponse.Contains(tile))
+			    unityTile.ContainsDataTile(vectorTile))
 			{
-				tile.SetVectorData(vectorTile, CreateMeshes);
+				vectorTile.AddLog("factory setting data");
+				unityTile.SetVectorData(vectorTile, CreateMeshes);
+			}
+			else
+			{
+				unityTile.RemoveTile(vectorTile);
+				vectorTile.RemoveUser(unityTile.CanonicalTileId);
 			}
 		}
 
-		private void OnFetchingError(UnityTile tile, Mapbox.Map.VectorTile vectorTile, TileErrorEventArgs e)
+		private void OnFetchingError(UnityTile unityTile, Mapbox.Map.VectorTile vectorTile, TileErrorEventArgs e)
 		{
-			_tilesWaitingResponse.Remove(tile);
+			unityTile.RemoveTile(vectorTile);
+			vectorTile.RemoveUser(unityTile.CanonicalTileId);
+			_tilesWaitingResponse.Remove(unityTile);
 		}
 
 		public override void UpdateTileProperty(UnityTile tile, LayerUpdateArgs updateArgs)

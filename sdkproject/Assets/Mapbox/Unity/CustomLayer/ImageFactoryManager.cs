@@ -170,8 +170,6 @@ namespace Mapbox.Unity.CustomLayer
 				tile.RemoveTile(_tileTracker[tile]);
 				_tileTracker[tile].RemoveUser(tile.CanonicalTileId);
 				_tileTracker.Remove(tile);
-
-
 			}
 		}
 
@@ -181,17 +179,22 @@ namespace Mapbox.Unity.CustomLayer
 			{
 				var noTileIsWaitingForIt = true;
 				var requestedTile = _tileTracker[tile];
+				requestedTile.AddLog("stopping  ", tile.CanonicalTileId);
 
 				if (_tileWaitingList.ContainsKey(requestedTile.Key))
 				{
-					_tileWaitingList[requestedTile.Key].Remove(tile);
-					if (_tileWaitingList[requestedTile.Key].Count == 0)
+					if (_tileWaitingList[requestedTile.Key].Contains(tile))
 					{
-						_tileWaitingList.Remove(requestedTile.Key);
-					}
-					else
-					{
-						noTileIsWaitingForIt = false;
+						_tileWaitingList[requestedTile.Key].Remove(tile);
+
+						if (_tileWaitingList[requestedTile.Key].Count == 0)
+						{
+							_tileWaitingList.Remove(requestedTile.Key);
+						}
+						else
+						{
+							noTileIsWaitingForIt = false;
+						}
 					}
 				}
 
@@ -210,10 +213,15 @@ namespace Mapbox.Unity.CustomLayer
 
 				if (noTileIsWaitingForIt)
 				{
-					_requestedTiles.Remove(tile.CanonicalTileId);
+					if (_requestedTiles.ContainsKey(requestedTile.Id))
+					{
+						_requestedTiles.Remove(requestedTile.Id);
+					}
 					requestedTile.AddLog("cancelling for stop call");
 					_fetcher.CancelFetching(requestedTile, _sourceSettings.Id);
 				}
+
+				tile.DataTileStopped(_tileTracker[tile]);
 			}
 		}
 

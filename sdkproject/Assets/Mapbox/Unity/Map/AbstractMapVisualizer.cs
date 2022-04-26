@@ -452,17 +452,17 @@ namespace Mapbox.Unity.Map
 				unityTile.IsStopped = true;
 				if (ImageryLayer.IsLayerActive)
 				{
-					ImageryLayer.Unregister(unityTile);
+					ImageryLayer.Stop(unityTile);
 				}
 
 				if (TerrainLayer.IsLayerActive)
 				{
-					TerrainLayer.Unregister(unityTile);
+					TerrainLayer.Stop(unityTile);
 				}
 
 				if (VectorLayer.IsLayerActive)
 				{
-					VectorLayer.Unregister(unityTile);
+					VectorLayer.Stop(unityTile);
 				}
 
 			}
@@ -489,23 +489,21 @@ namespace Mapbox.Unity.Map
 				// 	factory.Unregister(unityTile);
 				// }
 
-				if (!unityTile.IsStopped)
+				if (ImageryLayer.IsLayerActive)
 				{
-					if (ImageryLayer.IsLayerActive)
-					{
-						ImageryLayer.Unregister(unityTile);
-					}
-
-					if (TerrainLayer.IsLayerActive)
-					{
-						TerrainLayer.Unregister(unityTile);
-					}
-
-					if (VectorLayer.IsLayerActive)
-					{
-						VectorLayer.Unregister(unityTile);
-					}
+					ImageryLayer.Unregister(unityTile);
 				}
+
+				if (TerrainLayer.IsLayerActive)
+				{
+					TerrainLayer.Unregister(unityTile);
+				}
+
+				if (VectorLayer.IsLayerActive)
+				{
+					VectorLayer.Unregister(unityTile);
+				}
+
 				ImageryLayer.ClearTile(unityTile);
 				TerrainLayer.ClearTile(unityTile);
 				VectorLayer.ClearTile(unityTile);

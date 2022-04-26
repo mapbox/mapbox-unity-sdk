@@ -115,6 +115,7 @@ public class UnityTileEditor : Editor
 						}
 					}
 
+					EditorGUILayout.LabelField(string.Format("{0} : {1}", "Tile Key", dataTile.Key), EditorStyles.label);
 					EditorGUILayout.LabelField(string.Format("{0} : {1}", "Tile Id", dataTile.Id), EditorStyles.label);
 					EditorGUILayout.LabelField(string.Format("{0} : {1}", "Tileset", dataTile.TilesetId), EditorStyles.label);
 					EditorGUILayout.LabelField(string.Format("{0} : {1}", "From", dataTile.FromCache), EditorStyles.label);

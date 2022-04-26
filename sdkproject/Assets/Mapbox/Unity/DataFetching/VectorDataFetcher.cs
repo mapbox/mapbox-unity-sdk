@@ -48,6 +48,7 @@ public class VectorDataFetcher : DataFetcher
 	        {
 		        tile.AddLog("FailureCallback dropped due to id mismatch");
 		        //this means tile object is recycled and reused. Returned data doesn't belong to this tile but probably the previous one. So we're trashing it.
+		        FetchingError(unityTile, tile, new TileErrorEventArgs(tileId, tile.GetType(), tile.Exceptions));
 		        return;
 	        }
 
@@ -98,6 +99,7 @@ public class VectorDataFetcher : DataFetcher
 
 	protected virtual void FetchingCallback(CanonicalTileId tileId, VectorTile vectorTile, UnityTile unityTile = null)
 	{
+		vectorTile.AddLog("FetchingCallback " + vectorTile.CurrentTileState.ToString());
 		if (unityTile != null && !unityTile.ContainsDataTile(vectorTile))
 		{
 			//rasterTile.Clear();

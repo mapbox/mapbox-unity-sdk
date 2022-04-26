@@ -44,11 +44,8 @@ namespace Mapbox.Map
 		}
 	}
 
-	public class DemRasterTile : RasterTile
+	public class DemRasterTile : RawPngRasterTile
 	{
-		public int ExtractedDataResolution;
-		public float[] HeightData;
-
 		internal override TileResource MakeTileResource(string tilesetId)
 		{
 			return TileResource.MakeDemRaster(Id, tilesetId);

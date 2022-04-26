@@ -39,7 +39,6 @@ namespace Mapbox.Unity.CustomLayer
 			_tileTracker.Add(tile, dataTile);
 			if (tile != null)
 			{
-				//Debug.Log(string.Format("{0} - {1}",tile.CanonicalTileId, "add Vector"));
 				tile.AddTile(dataTile);
 				dataTile.AddUser(tile.CanonicalTileId);
 			}
@@ -54,22 +53,32 @@ namespace Mapbox.Unity.CustomLayer
 				//Debug.Log(string.Format("{0} - {1}",tile.CanonicalTileId, "remove Vector"));
 				var dataTile = _tileTracker[tile];
 				dataTile.Cancel();
+				_fetcher.CancelFetching(dataTile, _properties.sourceOptions.Id);
 				tile.RemoveTile(dataTile);
 				_tileTracker[tile].RemoveUser(tile.CanonicalTileId);
 				_tileTracker.Remove(tile);
 				MapboxAccess.Instance.CacheManager.TileDisposed(tile, _properties.sourceOptions.Id);
 			}
-
-			_fetcher.CancelFetching(tile.UnwrappedTileId, _properties.sourceOptions.Id);
 		}
 
 		public void StopTile(UnityTile tile)
 		{
-			_fetcher.CancelFetching(tile.UnwrappedTileId, _properties.sourceOptions.Id);
+			if (_tileTracker.ContainsKey(tile))
+			{
+				//Debug.Log(string.Format("{0} - {1}",tile.CanonicalTileId, "remove Vector"));
+				var dataTile = _tileTracker[tile];
+				dataTile.Cancel();
+				tile.DataTileStopped(dataTile);
+				_fetcher.CancelFetching(dataTile, _properties.sourceOptions.Id);
+				//_tileTracker[tile].RemoveUser(tile.CanonicalTileId);
+				//_tileTracker.Remove(tile);
+				//MapboxAccess.Instance.CacheManager.TileDisposed(tile, _properties.sourceOptions.Id);
+			}
 		}
 
 		private void OnFetcherDataRecieved(UnityTile unityTile, Mapbox.Map.VectorTile vectorTile)
 		{
+			vectorTile.AddLog("manager OnFetcherDataRecieved");
 			DataReceived(unityTile, vectorTile);
 		}
 

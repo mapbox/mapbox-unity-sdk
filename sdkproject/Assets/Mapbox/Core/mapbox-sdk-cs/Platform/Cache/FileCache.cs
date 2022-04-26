@@ -185,6 +185,7 @@ namespace Mapbox.Platform.Cache
 			MapboxAccess.Instance.TaskManager.AddTask(
 				new TaskWrapper(info.TileId.GenerateKey(info.TilesetId, "FileCache"))
 				{
+					OwnerTileId = info.TileId,
 					TileId = info.TileId,
 					TilesetId = info.TilesetId,
 					Action = () =>

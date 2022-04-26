@@ -137,21 +137,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TerrainLayer:
     _layerProperty:
-      sourceType: 0
+      sourceType: 1
       sourceOptions:
         isActive: 1
         layerSource:
           Name: 
-          Id: mapbox.terrain-rgb
+          Id: mapbox.mapbox-terrain-dem-v1
           Modified: 
           UserName: 
-      elevationLayerType: 1
+      elevationLayerType: 0
       requiredOptions:
         exaggerationFactor: 1
       colliderOptions:
         addCollider: 0
       modificationOptions:
-        sampleCount: 100
+        sampleCount: 64
         useRelativeHeight: 0
         earthRadius: 1000
       unityLayerOptions:
@@ -197,9 +197,9 @@ MonoBehaviour:
         - transit_stop_label
         - water
         - waterway
-      _sourceType: 3
+      _sourceType: -2
       sourceOptions:
-        isActive: 0
+        isActive: 1
         layerSource:
           Name: Mapbox Streets v7
           Id: mapbox.mapbox-streets-v8
@@ -1266,7 +1266,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 257
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0

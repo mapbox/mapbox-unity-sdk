@@ -164,6 +164,7 @@ namespace Mapbox.Map
 
 				_task = new TaskWrapper(Id.GenerateKey(TilesetId, "VectorTile"))
 				{
+					OwnerTileId = Id,
 					TileId = Id,
 					Action = () =>
 					{
@@ -172,6 +173,7 @@ namespace Mapbox.Map
 					},
 					ContinueWith = (t) =>
 					{
+						AddLog("processing finished");
 						// Cancelled is not the same as loaded!
 						if (TileState != TileState.Canceled)
 						{

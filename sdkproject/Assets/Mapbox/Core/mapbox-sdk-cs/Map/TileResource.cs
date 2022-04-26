@@ -45,7 +45,7 @@ namespace Mapbox.Map
 
 		public static TileResource MakeDemRaster(CanonicalTileId id, string tilesetId)
 		{
-			return new TileResource(string.Format("{0}/{1}.webp", MapUtils.NormalizeDemStyleURL(tilesetId), id));
+			return new TileResource(string.Format("{0}/{1}.png", MapUtils.NormalizeDemStyleURL(tilesetId), id));
 		}
 
 		public static TileResource MakeVector(CanonicalTileId id, string tilesetId)

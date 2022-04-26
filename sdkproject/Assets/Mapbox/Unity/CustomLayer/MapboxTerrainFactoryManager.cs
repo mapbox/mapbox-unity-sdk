@@ -113,7 +113,7 @@ namespace Mapbox.Unity.CustomLayer
 					_tileUserTracker.Add(dataTile.Key, new HashSet<UnityTile>());
 				}
 
-				if (SystemInfo.supportsAsyncGPUReadback)
+				if (SystemInfo.supportsAsyncGPUReadback && _isUsingShaderSolution)
 				{
 					AsyncExtractElevationArray((RawPngRasterTile) dataTile);
 				}
@@ -254,11 +254,19 @@ namespace Mapbox.Unity.CustomLayer
 
 
 			// //TODO fix this obviously
-			// if (tilesetId == "mapbox.mapbox-terrain-dem-v1")
-			// {
-			// 	rasterTile = new DemRasterTile(tileId, tilesetId, true);
-			// }
-			// else
+			if (tilesetId == "mapbox.mapbox-terrain-dem-v1")
+			{
+				if (SystemInfo.supportsAsyncGPUReadback)
+				{
+					rasterTile = new DemRasterTile(tileId, tilesetId, true);
+				}
+				else
+				{
+					rasterTile = new DemRasterTile(tileId, tilesetId, false);
+				}
+
+			}
+			else
 			{
 				if (SystemInfo.supportsAsyncGPUReadback)
 				{

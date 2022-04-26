@@ -45,7 +45,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			{
 				if (_useTileSkirts)
 				{
-					return (_elevationOptions.modificationOptions.sampleCount + 2) * (_elevationOptions.modificationOptions.sampleCount + 2);
+					return (_elevationOptions.modificationOptions.sampleCount) * (_elevationOptions.modificationOptions.sampleCount);
 				}
 				else
 				{
@@ -305,6 +305,71 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 
 		private MeshDataArray CreateBaseMeshSkirts(float tileSize, int sampleCount)
 		{
+			var delta = (1f / (sampleCount - 1)) / 2;
+			var half = (tileSize/2) + delta;
+			//TODO use arrays instead of lists
+			_newVertexList.Clear();
+			_newNormalList.Clear();
+			_newUvList.Clear();
+			_newTriangleList.Clear();
+
+			//var bufferedSampleCount = sampleCount + 2;
+			//012
+			//345
+			//678
+			for (float y = 0; y < sampleCount; y++)
+			{
+				var yrat = y / (sampleCount - 1);
+				for (float x = 0; x < sampleCount; x++)
+				{
+					var xrat = x / (sampleCount - 1);
+
+					var xx = Mathf.LerpUnclamped(-half, half, xrat);
+					var yy = Mathf.LerpUnclamped(half, -half, yrat);
+
+					var elevation = 0;
+
+					_newVertexList.Add(new Vector3(
+						(float) xx,
+						elevation,
+						(float) yy));
+					_newNormalList.Add(Mapbox.Unity.Constants.Math.Vector3Up);
+					_newUvList.Add(new Vector2(x * 1f / (sampleCount - 1), 1 - (y * 1f / (sampleCount - 1))));
+				}
+			}
+
+			int vertA, vertB, vertC;
+
+			for (int y = 0; y < sampleCount - 1; y++)
+			{
+				for (int x = 0; x < sampleCount - 1; x++)
+				{
+					vertA = (y * sampleCount) + x;
+					vertB = (y * sampleCount) + x + sampleCount + 1;
+					vertC = (y * sampleCount) + x + sampleCount;
+					_newTriangleList.Add(vertA);
+					_newTriangleList.Add(vertB);
+					_newTriangleList.Add(vertC);
+
+					vertA = (y * sampleCount) + x;
+					vertB = (y * sampleCount) + x + 1;
+					vertC = (y * sampleCount) + x + sampleCount + 1;
+					_newTriangleList.Add(vertA);
+					_newTriangleList.Add(vertB);
+					_newTriangleList.Add(vertC);
+				}
+			}
+
+			var mesh = new MeshDataArray();
+			mesh.Vertices = _newVertexList.ToArray();
+			mesh.Normals = _newNormalList.ToArray();
+			mesh.Uvs = _newUvList.ToArray();
+			mesh.Triangles = _newTriangleList.ToArray();
+			return mesh;
+		}
+
+		private MeshDataArray CreateBaseMeshSkirts2(float tileSize, int sampleCount)
+		{
 			var half = tileSize/2;
 			//TODO use arrays instead of lists
 			_newVertexList.Clear();
@@ -379,27 +444,42 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			_normals = _dataArrays[tile.UnwrappedTileId].Normals;
 
 			var sampleCount = _elevationOptions.modificationOptions.sampleCount;
-			var bufferedSampleCount = sampleCount + 2;
 			var hd = tile.HeightData;
 			var heightDataRowSize = (int)Mathf.Sqrt(hd.Length);
 			var ts = tile.TileScale;
 
-			for (float y = -1; y < sampleCount + 1; y++)
+			// 	var padding = _heightDataResolution * new Vector2(scaleOffset.z, scaleOffset.w);
+			// 	for (float yy = 0; yy < _heightDataResolution * scaleOffset.y; yy++)
+			// 	{
+			// 		for (float xx = 0; xx < _heightDataResolution * scaleOffset.x; xx++)
+			// 		{
+			// 			var index = (((int) (((padding.y + yy) / _heightDataResolution) * width) * width) + (int) (((padding.x + xx) / _heightDataResolution) * width));
+			//
+			// 			float r = rgbData[index * 4 + 1];
+			// 			float g = rgbData[index * 4 + 2];
+			// 			float b = rgbData[index * 4 + 3];
+			// 			//var color = rgbData[index];
+			// 			// float r = color.g;
+			// 			// float g = color.b;
+			// 			// float b = color.a;
+			// 			//the formula below is the same as Conversions.GetAbsoluteHeightFromColor but it's inlined for performance
+			// 			HeightData[(int) (yy * _heightDataResolution + xx)] = relativeScale * heightMultiplier * (-10000f + ((r * 65536f + g * 256f + b) * 0.1f));
+			// 			//678 ==> 012345678
+			// 			//345
+			// 			//012
+			// 		}
+			// 	}
+			for (float y = 0; y < sampleCount; y++)
 			{
-				var yFixed = y+1;
-				for (float x = -1; x < sampleCount + 1; x++)
+				for (float x = 0; x < sampleCount; x++)
 				{
-					var xFixed = x + 1;
+					var elevation = hd[((int)((1 - y / (sampleCount - 1)) * (heightDataRowSize-1)) * heightDataRowSize) + ((int)(x / (sampleCount - 1) * (heightDataRowSize-1)))] * ts;
 
-					var elevation = x < 0 || y < 0 || x == bufferedSampleCount-2 || y == bufferedSampleCount-2
-						? -50
-						: hd[((int)((1 - yFixed / (bufferedSampleCount - 1)) * (heightDataRowSize-1)) * heightDataRowSize) + ((int)(xFixed / (bufferedSampleCount - 1) * (heightDataRowSize-1)))] * ts;
-
-					_verts[(int) (yFixed * bufferedSampleCount + xFixed)] = new Vector3(
-						_verts[(int) (yFixed * bufferedSampleCount + xFixed)].x,
+					_verts[(int) (y * sampleCount + x)] = new Vector3(
+						_verts[(int) (y * sampleCount + x)].x,
 						elevation,
-						_verts[(int) (yFixed * bufferedSampleCount + xFixed)].z);
-					_normals[(int) (yFixed * bufferedSampleCount + xFixed)] = Mapbox.Unity.Constants.Math.Vector3Zero;
+						_verts[(int) (y * sampleCount + x)].z);
+					_normals[(int) (y * sampleCount + x)] = Mapbox.Unity.Constants.Math.Vector3Zero;
 				}
 			}
 
