@@ -178,6 +178,11 @@ namespace Mapbox.Unity.QuadTree
 
         private void OnMapVisualizerOnOnTileFinished(UnityTile t)
         {
+            if (!t.IsRecycled && !t.IsStopped)
+            {
+                t.gameObject.SetActive(true);
+            }
+
             t.Logs.Add(string.Format("{0} - {1}", Time.frameCount, "finished"));
             if (_childParentRelationships.ContainsKey(t.UnwrappedTileId))
             {
