@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Mapbox.Map;
 using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Data;
+using UnityEngine;
 
 namespace Mapbox.Unity.CustomLayer
 {
@@ -58,6 +59,7 @@ namespace Mapbox.Unity.CustomLayer
 				_tileTracker[tile].RemoveUser(tile.CanonicalTileId);
 				_tileTracker.Remove(tile);
 				MapboxAccess.Instance.CacheManager.TileDisposed(tile, _properties.sourceOptions.Id);
+				MapboxAccess.Instance.TaskManager.CancelTile(tile.CanonicalTileId);
 			}
 		}
 
@@ -70,6 +72,7 @@ namespace Mapbox.Unity.CustomLayer
 				dataTile.Cancel();
 				tile.DataTileStopped(dataTile);
 				_fetcher.CancelFetching(dataTile, _properties.sourceOptions.Id);
+				MapboxAccess.Instance.TaskManager.CancelTile(tile.CanonicalTileId);
 				//_tileTracker[tile].RemoveUser(tile.CanonicalTileId);
 				//_tileTracker.Remove(tile);
 				//MapboxAccess.Instance.CacheManager.TileDisposed(tile, _properties.sourceOptions.Id);
