@@ -184,11 +184,14 @@ namespace Mapbox.Map
 						{
 							DataProcessingFinished(false);
 						}
+
+						_task = null;
 					},
 					OnCancelled = () =>
 					{
 						TileState = TileState.Canceled;
 						DataProcessingFinished(false);
+						_task = null;
 					},
 #if UNITY_EDITOR
 					Info = "VectorTile.HandleTileResponse"
@@ -196,7 +199,7 @@ namespace Mapbox.Map
 				};
 
 				TileState = TileState.Processing;
-				MapboxAccess.Instance.TaskManager.AddTask(_task);
+				MapboxAccess.Instance.TaskManager.AddTask(_task, 0);
 				//first add the parsing task,
 				//THEN call the callback which will lead into caching etc.
 				_callback();
