@@ -279,7 +279,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 				cachedCallback?.Invoke(tile, this);
 			}
 
-			var taskWrapper = new TaskWrapper(tile.CanonicalTileId.GenerateKey(Key))
+			var taskWrapper = new TaskWrapper(tile.CanonicalTileId.GenerateKey(Key + SubLayerProperties.coreOptions.sublayerName))
 			{
 				OwnerTileId = tile.CanonicalTileId,
 				TileId = tile.CanonicalTileId,
@@ -295,7 +295,7 @@ namespace Mapbox.Unity.MeshGeneration.Interfaces
 
 
 
-			MapboxAccess.Instance.TaskManager.AddTask(taskWrapper);
+			MapboxAccess.Instance.TaskManager.AddTask(taskWrapper, 1);
 		}
 
 		private static MeshData CombineMeshData(List<Tuple<VectorFeatureUnity, MeshData>> meshDataList)
