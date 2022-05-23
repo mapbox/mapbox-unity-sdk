@@ -183,6 +183,12 @@ namespace Mapbox.Unity.QuadTree
                 t.gameObject.SetActive(true);
             }
 
+
+            foreach (var tile in t.Tiles)
+            {
+                tile.AddLog(string.Format("{0} - {1}", Time.unscaledTime, " tile visible"));
+            }
+
             t.Logs.Add(string.Format("{0} - {1}", Time.frameCount, "finished"));
             if (_childParentRelationships.ContainsKey(t.UnwrappedTileId))
             {

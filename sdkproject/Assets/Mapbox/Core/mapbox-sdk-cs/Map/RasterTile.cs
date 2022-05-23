@@ -79,6 +79,7 @@ namespace Mapbox.Map
 
 		internal override void Initialize(IFileSource fileSource, CanonicalTileId canonicalTileId, string tilesetId, Action p)
 		{
+			AddLog(string.Format("{0} - {1}", Time.unscaledTime, " tile initialized"));
 			Cancel();
 
 			TileState = TileState.Loading;
@@ -124,7 +125,7 @@ namespace Mapbox.Map
 					TileState = TileState.Loaded;
 				}
 			}
-
+			AddLog(string.Format("{0} - {1}", Time.unscaledTime, " tile finished"));
 			_callback();
 			_unityRequest = null;
 			//have to null the unity request AFTER the callback as texture itself is kept

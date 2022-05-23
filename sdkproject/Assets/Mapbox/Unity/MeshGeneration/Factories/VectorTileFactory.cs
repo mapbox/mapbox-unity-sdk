@@ -251,6 +251,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 
 		private void LayerFinishedCallback(UnityTile tile, LayerVisualizerBase builder)
 		{
+
+
 			if (_layerProgress.ContainsKey(tile))
 			{
 				if (_layerProgress[tile].Contains(builder))
@@ -262,6 +264,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories
 				{
 					_layerProgress.Remove(tile);
 					_tilesWaitingProcessing.Remove(tile);
+					tile.VectorData.AddLog(string.Format("{0} - {1}", Time.unscaledTime, " meshe creation finished"));
 					tile.VectorGenerationCompleted();
 				}
 			}

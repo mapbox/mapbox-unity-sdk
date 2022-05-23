@@ -104,6 +104,7 @@ namespace Mapbox.Map
 			Id = tileId;
 #if DEBUG
 			_logs = new List<string>();
+			AddLog(string.Format("{0} - {1}", Time.unscaledTime, " tile created"));
 #endif
 		}
 
