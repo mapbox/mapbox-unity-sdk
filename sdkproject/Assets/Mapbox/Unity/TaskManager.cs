@@ -25,7 +25,8 @@ namespace Mapbox.Unity
 		protected HashSet<TaskWrapper> _runningTasks;
 
 		protected Dictionary<int, TaskWrapper> _allTasks;
-		public Queue<int> _taskQueue;
+		//public Queue<int> _taskQueue;
+		public Queue<int>[] _taskQueueList;
 
 		// protected Dictionary<int, TaskWrapper> _tasksInQueue;
 		// protected Queue<int> _taskQueue;
@@ -37,7 +38,15 @@ namespace Mapbox.Unity
 		public TaskManager()
 		{
 			_runningTasks = new HashSet<TaskWrapper>();
-			_taskQueue = new Queue<int>();
+			//_taskQueue = new Queue<int>();
+			_taskQueueList = new Queue<int>[5]
+			{
+				new Queue<int>(),
+				new Queue<int>(),
+				new Queue<int>(),
+				new Queue<int>(),
+				new Queue<int>()
+			};
 			_allTasks = new Dictionary<int, TaskWrapper>();
 
 			_tasksByTile = new Dictionary<CanonicalTileId, HashSet<int>>();
@@ -45,13 +54,50 @@ namespace Mapbox.Unity
 			Runnable.Run(UpdateTaskManager());
 		}
 
+		public bool TaskQueueAny()
+		{
+			foreach (var queue in _taskQueueList)
+			{
+				if (queue.Any())
+					return true;
+			}
+
+			return false;
+		}
+
+		public int TaskQueuePeek()
+		{
+			foreach (var queue in _taskQueueList)
+			{
+				if (queue.Any())
+				{
+					return queue.Peek();
+				}
+			}
+
+			return -1;
+		}
+
+		public int TaskQueueDequeue()
+		{
+			foreach (var queue in _taskQueueList)
+			{
+				if (queue.Any())
+				{
+					return queue.Dequeue();
+				}
+			}
+
+			return -1;
+		}
+
 		public IEnumerator UpdateTaskManager()
 		{
 			while (true)
 			{
-				while (_taskQueue.Count > 0 && _runningTasks.Count <= ActiveTaskLimit)
+				while (TaskQueueAny() && _runningTasks.Count <= ActiveTaskLimit)
 				{
-					var firstPeek = _taskQueue.Peek();
+					var firstPeek = TaskQueuePeek();
 					if (_allTasks.ContainsKey(firstPeek) &&
 						_allTasks[firstPeek].EnqueueFrame > Time.frameCount - 15)
 					{
@@ -59,7 +105,7 @@ namespace Mapbox.Unity
 					}
 					else
 					{
-						var wrapperId = _taskQueue.Dequeue();
+						var wrapperId = TaskQueueDequeue();
 						TaskWrapper wrapper;
 						if (!_allTasks.ContainsKey(wrapperId))
 						{
@@ -75,16 +121,33 @@ namespace Mapbox.Unity
 								_tasksByTile.Remove(wrapper.OwnerTileId);
 							}
 						}
-
+						
+						wrapper.StartTime = Time.frameCount;
+						TaskStarting(wrapper);
 						var task = Task.Run(wrapper.Action);
 						_runningTasks.Add(wrapper);
-						task.ContinueWith((t) => { ContinueWrapper(t, wrapper); }, TaskScheduler.FromCurrentSynchronizationContext());
+						task.ContinueWith((t) =>
+						{
+							wrapper.EndTime = Time.frameCount;
+							TaskFinished(wrapper);
+							ContinueWrapper(t, wrapper);
+						}, TaskScheduler.FromCurrentSynchronizationContext());
 						TaskStarted(wrapper);
 					}
 				}
 
 				yield return null;
 			}
+		}
+
+		protected virtual void TaskStarting(TaskWrapper task)
+		{
+
+		}
+
+		protected virtual void TaskFinished(TaskWrapper task)
+		{
+
 		}
 
 		private void ContinueWrapper(Task task, TaskWrapper taskWrapper)
@@ -113,7 +176,8 @@ namespace Mapbox.Unity
 							_tasksByTile.Add(taskWrapper.OwnerTileId, new HashSet<int>());
 						}
 						_tasksByTile[taskWrapper.OwnerTileId].Add(taskWrapper.Id);
-						_taskQueue.Enqueue(taskWrapper.Id);
+						//_taskQueue.Enqueue(taskWrapper.Id);
+						_taskQueueList[priorityLevel].Enqueue(taskWrapper.Id);
 					}
 					else
 					{
@@ -139,7 +203,8 @@ namespace Mapbox.Unity
 							_tasksByTile.Add(taskWrapper.OwnerTileId, new HashSet<int>());
 						}
 						_tasksByTile[taskWrapper.OwnerTileId].Add(taskWrapper.Id);
-						_taskQueue.Enqueue(taskWrapper.Id);
+						//_taskQueue.Enqueue(taskWrapper.Id);
+						_taskQueueList[priorityLevel].Enqueue(taskWrapper.Id);
 					}
 				}
 			}
@@ -195,6 +260,8 @@ namespace Mapbox.Unity
 
 		public string Info;
 
+		public float StartTime;
+		public float EndTime;
 	}
 
 	public class EditorTaskManager : TaskManager
@@ -205,8 +272,8 @@ namespace Mapbox.Unity
 		public List<string> Logs = new List<string>();
 
 		public int ActiveTaskCount => _runningTasks.Count;
-		public int TaskQueueSize => _taskQueue.Count; //_taskQueue.Count;
-		public int TasksInQueue => _taskQueue.Count;
+		public int TaskQueueSize => 0; // _taskQueue.Count; //_taskQueue.Count;
+		public int TasksInQueue => 0; //_taskQueue.Count;
 
 		public Dictionary<string, int> TaskType = new Dictionary<string, int>();
 
@@ -268,6 +335,22 @@ namespace Mapbox.Unity
 		public void ToggleLogging()
 		{
 			EnableLogging = !EnableLogging;
+		}
+
+		protected override void TaskStarting(TaskWrapper task)
+		{
+			if (EnableLogging)
+			{
+				Logs.Add(string.Format("{0,-10} {1, -30}", Time.frameCount, task.Info));
+			}
+		}
+
+		protected override void TaskFinished(TaskWrapper task)
+		{
+			if (EnableLogging)
+			{
+				Logs.Add(string.Format("{0,-10} {1, -30}", Time.frameCount, task.Info));
+			}
 		}
 	}
 }

@@ -156,6 +156,8 @@ CONSTRAINT tileAssignmentConstraint UNIQUE (tileId, mapId)
 			// inserting 1,000 tiles takes 1-2 sec as opposed to ~20 sec
 			string[] cmds = new string[]
 			{
+				"PRAGMA vacuum",
+				"PRAGMA optimize",
 				"PRAGMA synchronous=OFF",
 				"PRAGMA count_changes=OFF",
 				"PRAGMA journal_mode=MEMORY",
@@ -327,6 +329,7 @@ CONSTRAINT tileAssignmentConstraint UNIQUE (tileId, mapId)
 			MapboxAccess.Instance.TaskManager.AddTask(
 				new TaskWrapper(tileId.GenerateKey(tilesetName, "SqliteCache"))
 				{
+					OwnerTileId = tileId,
 					TileId = tileId,
 					Action = () =>
 					{
