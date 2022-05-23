@@ -51,7 +51,7 @@ namespace Mapbox.Unity.DataFetching
 				//ensure all data fetchers (including unorthodox ones like file data fetcher) handling
 				//tile cancelling properly
 #if DEPLOY_DEV || UNITY_EDITOR
-				Debug.Log("tile request is already in queue. This most likely means first request was supposed to be cancelled but not.");
+				Debug.Log("tile request is already in queue. This most likely means first request was supposed to be cancelled but not. " + info.RasterTile.Id + " " + info.TilesetId);
 #endif
 			}
 		}
