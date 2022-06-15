@@ -18,7 +18,7 @@ namespace Mapbox.Unity.DataFetching
 		protected Dictionary<int, FetchInfo> _tileFetchInfos;
 		//private Dictionary<int, Tile> _localQueuedRequests;
 		protected Dictionary<int, Tile> _globalActiveRequests;
-		protected int _activeRequestLimit = 10;
+		protected int _activeRequestLimit = 30;
 
 		public DataFetchingManager(IFileSource fileSource)
 		{
@@ -56,29 +56,14 @@ namespace Mapbox.Unity.DataFetching
 			}
 		}
 
-		public virtual void CancelFetching(UnwrappedTileId tileUnwrappedTileId, string tilesetId)
-		{
-			// var canonical = tileUnwrappedTileId.Canonical;
-			// var key = canonical.GenerateKey(tilesetId);
-			// if (_tileFetchInfos.ContainsKey(key))
-			// {
-			// 	_tileFetchInfos.Remove(key);
-			// }
-			//
-			// if (_globalActiveRequests.ContainsKey(key))
-			// {
-			// 	_globalActiveRequests[key].Cancel();
-			// 	_globalActiveRequests.Remove(key);
-			// }
-			// _localQueuedRequests.Remove(key);
-		}
-
 		private IEnumerator UpdateTick()
 		{
 			while (true)
 			{
 				var fallbackCounter = 0;
-				while (_tileOrder.Count > 0 && _globalActiveRequests.Count < _activeRequestLimit && fallbackCounter < _activeRequestLimit)
+				while (_tileOrder.Count > 0 &&
+				       _globalActiveRequests.Count < _activeRequestLimit &&
+				       fallbackCounter < _activeRequestLimit)
 				{
 					fallbackCounter++;
 					var tileKey = _tileOrder.Peek(); //we just peek first as we might want to hold it until delay timer runs out
@@ -92,6 +77,10 @@ namespace Mapbox.Unity.DataFetching
 					{
 						tileKey = _tileOrder.Dequeue();
 						var fi = _tileFetchInfos[tileKey];
+
+						if (fi.RasterTile.CurrentTileState == TileState.Canceled)
+							continue;
+
 						_tileFetchInfos.Remove(tileKey);
 						if (!_globalActiveRequests.ContainsKey(tileKey))
 						{
@@ -101,12 +90,12 @@ namespace Mapbox.Unity.DataFetching
 						{
 							Debug.Log("here");
 						}
+						TileInitialized(fi);
 						fi.RasterTile.Initialize(
 							_fileSource,
 							fi.RasterTile.Id,
 							fi.TilesetId,
 							fi.Callback);
-						TileInitialized(fi);
 						yield return null;
 					}
 				}
@@ -120,7 +109,7 @@ namespace Mapbox.Unity.DataFetching
 			return Time.time - queueTime >= maturationAge;
 		}
 
-		public void CancelFetching(Tile tile, string tilesetId)
+		public virtual void CancelFetching(Tile tile, string tilesetId)
 		{
 			var key = tile.Id.GenerateKey(tilesetId);
 			if (_tileFetchInfos.ContainsKey(key))
@@ -151,7 +140,12 @@ namespace Mapbox.Unity.DataFetching
 				TotalRequestCount++;
 				if (EnableLogging)
 				{
-					Logs.Add(string.Format("{0,-15} | {1,-30} {3,-30} {2, -10}", f.RasterTile.Id, f.TilesetId, (Time.time - f.QueueTime), "initialized after"));
+					Logs.Add(string.Format("{4, -5} | {0,-15} | {1,-30} {3,-30} {2, -10}",
+						f.RasterTile.Id,
+						f.TilesetId,
+						(Time.time - f.QueueTime),
+						"initialized after",
+						Time.frameCount));
 				}
 			};
 		}
@@ -160,25 +154,34 @@ namespace Mapbox.Unity.DataFetching
 		{
 			if (EnableLogging)
 			{
-				Logs.Add(string.Format("{0,-15} | {1,-30} {3,-30} {2, -10}", info.RasterTile.Id, info.TilesetId, Time.time, "enqueued at"));
+				Logs.Add(string.Format("{4, -5} | {0,-15} | {1,-30} {3,-30} {2, -10}",
+					info.RasterTile.Id,
+					info.TilesetId,
+					Time.time,
+					"enqueued at",
+					Time.frameCount));
 			}
 
 			base.EnqueueForFetching(info);
 		}
 
-		public override void CancelFetching(UnwrappedTileId tileUnwrappedTileId, string tilesetId)
+		public override void CancelFetching(Tile tile, string tilesetId)
 		{
-			var key = tileUnwrappedTileId.Canonical.GenerateKey(tilesetId);
-			if (_tileFetchInfos.ContainsKey(key))
+			if (_tileFetchInfos.ContainsKey(tile.Key))
 			{
 				TotalCancelledCount++;
 				if (EnableLogging)
 				{
-					var f = _tileFetchInfos[key];
-					Logs.Add(string.Format("{0,-15} | {1,-30} {3,-30} {2, -10}", f.RasterTile.Id, f.TilesetId, (Time.time - f.QueueTime), "cancelled after"));
+					var f = _tileFetchInfos[tile.Key];
+					Logs.Add(string.Format("{4, -5} | {0,-15} | {1,-30} {3,-30} {2, -10}",
+						f.RasterTile.Id,
+						f.TilesetId,
+						(Time.time - f.QueueTime),
+						"cancelled after",
+						Time.frameCount));
 				}
 			}
-			base.CancelFetching(tileUnwrappedTileId, tilesetId);
+			base.CancelFetching(tile, tilesetId);
 		}
 
 		public Queue<int> GetTileOrderQueue()

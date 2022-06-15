@@ -4,6 +4,8 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using Unity.Mathematics;
+
 namespace Mapbox.Unity.Utilities
 {
 	using Mapbox.Map;
@@ -89,7 +91,7 @@ namespace Mapbox.Unity.Utilities
 		/// <param name="scale"> Scale in meters. (default scale = 1) </param>
 		/// <returns> A <see cref="T:UnityEngine.Vector2d"/> xy tile ID. </returns>
 		/// <example>
-		/// Converts a Lat/Lon of (37.7749, 122.4194) into Unity coordinates for a map centered at (10,10) and a scale of 2.5 meters for every 1 Unity unit 
+		/// Converts a Lat/Lon of (37.7749, 122.4194) into Unity coordinates for a map centered at (10,10) and a scale of 2.5 meters for every 1 Unity unit
 		/// <code>
 		/// var worldPosition = Conversions.GeoToWorldPosition(37.7749, 122.4194, new Vector2d(10, 10), (float)2.5);
 		/// // worldPosition = ( 11369163.38585, 34069138.17805 )
@@ -137,7 +139,7 @@ namespace Mapbox.Unity.Utilities
 		/// <returns> The <see cref="T:Mapbox.Utils.Vector2d"/> in lat/lon. </returns>
 
 		/// <example>
-		/// Converts EPSG:900913 xy meter coordinates to lat lon 
+		/// Converts EPSG:900913 xy meter coordinates to lat lon
 		/// <code>
 		/// var worldPosition =  new Vector2d (4547675.35434,13627665.27122);
 		/// var latlon = Conversions.MetersToLatLon(worldPosition);
@@ -158,7 +160,7 @@ namespace Mapbox.Unity.Utilities
 		/// <param name="m"> <see cref="T:UnityEngine.Vector2d"/> XY coords in meters. </param>
 		/// <param name="zoom"> Zoom level. </param>
 		/// <returns> A <see cref="T:UnityEngine.Vector2d"/> xy tile ID. </returns>
-		/// 
+		///
 		/// <example>
 		/// Converts EPSG:900913 xy meter coordinates to web mercator tile XY coordinates at zoom 12.
 		/// <code>
@@ -227,6 +229,24 @@ namespace Mapbox.Unity.Utilities
 					+ 1.0 / Math.Cos(latitude * Math.PI / 180.0)) / Math.PI) / 2.0 * Math.Pow(2.0, zoom));
 
 			return new UnwrappedTileId(zoom, x, y);
+		}
+
+		public static Vector2d ToThing(Vector2d latlng)
+		{
+			return new Vector2d(
+				(180 + latlng.y) / 360,
+				(180 - (180 / Math.PI * Math.Log(Math.Tan(Math.PI/4 + latlng.x * Math.PI / 360)))) / 360
+			);
+		}
+
+		public static double MercatorZFromAltitude(int altitude, double latitude)
+		{
+			return altitude / circumferenceAtLatitude(latitude);
+		}
+
+		private static double circumferenceAtLatitude(double latitude)
+		{
+			return EarthRadius * Math.Cos(latitude * Math.PI / 180);
 		}
 
 

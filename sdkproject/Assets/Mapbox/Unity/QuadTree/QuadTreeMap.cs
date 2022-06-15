@@ -181,6 +181,8 @@ namespace Mapbox.Unity.QuadTree
             if (!t.IsRecycled && !t.IsStopped)
             {
                 t.gameObject.SetActive(true);
+                t.Logs.Add("added to tile layer");
+                t.gameObject.layer = LayerMask.NameToLayer("Tile");
             }
 
 
@@ -443,6 +445,7 @@ namespace Mapbox.Unity.QuadTree
             foreach (var tileParameters in toAdd)
             {
                 var newChildTile = _mapVisualizer.LoadTile(tileParameters);
+                newChildTile.MeshFilter.mesh.bounds = new Bounds(Vector3.zero, new Vector3(1,100,1)); //tileParameters.UnityRectD.UnityBounds;
 
                 foreach (var log in tileParameters.Logs)
                 {

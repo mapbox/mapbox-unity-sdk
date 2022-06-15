@@ -8,7 +8,8 @@ namespace Mapbox.Unity.QuadTree
 {
 	public class QuadTreeCameraController : MonoBehaviour
 	{
-		private Camera _camera;
+		public Camera ControlCamera;
+		public Camera ViewCamera;
 		private QuadTreeMap _map;
 		private float _worldScale;
 
@@ -26,10 +27,10 @@ namespace Mapbox.Unity.QuadTree
 		public void Initialize(float worldScale, Camera cam, QuadTreeMap map)
 		{
 			_worldScale = worldScale;
-			_camera = cam;
+			//_camera = cam;
 			_map = map;
-			_camera.transform.position = new Vector3(0, 1, 0);
-			_camera.transform.rotation = Quaternion.Euler(Pitch, Bearing, 0);
+			ControlCamera.transform.position = new Vector3(0, 1, 0);
+			ControlCamera.transform.rotation = Quaternion.Euler(Pitch, Bearing, 0);
 		}
 
 		private Vector3 _lastMousePos;
@@ -76,23 +77,38 @@ namespace Mapbox.Unity.QuadTree
 				_viewChanged = true;
 			}
 
-			if (Input.GetMouseButton(1) && !Input.GetKey(KeyCode.LeftShift))
+			if (Input.GetMouseButton(1) )
 			{
-				var deltaMousePos = (Input.mousePosition - _lastMousePos);
-				deltaAngleH = deltaMousePos.x;
-				deltaAngleV = deltaMousePos.y;
-				if (deltaAngleH != 0 || deltaAngleV != 0)
+				if (!Input.GetKey(KeyCode.LeftShift))
 				{
-					Pitch -= deltaAngleV * Time.deltaTime * RotationSpeed;
-					Pitch = Mathf.Min(90, Mathf.Max(15, Pitch));
-					Bearing += deltaAngleH * Time.deltaTime * RotationSpeed;
-					_viewChanged = true;
+					var deltaMousePos = (Input.mousePosition - _lastMousePos);
+					deltaAngleH = deltaMousePos.x;
+					deltaAngleV = deltaMousePos.y;
+					if (deltaAngleH != 0 || deltaAngleV != 0)
+					{
+						Pitch -= deltaAngleV * Time.deltaTime * RotationSpeed;
+						Pitch = Mathf.Min(90, Mathf.Max(15, Pitch));
+						Bearing += deltaAngleH * Time.deltaTime * RotationSpeed;
+						_viewChanged = true;
+					}
+				}
+				else
+				{
+					var deltaMousePos = (Input.mousePosition - _lastMousePos);
+					deltaAngleH = deltaMousePos.x;
+					deltaAngleV = deltaMousePos.y;
+					var dv = ViewCamera.transform.rotation.eulerAngles.x - deltaAngleV * Time.deltaTime* RotationSpeed;
+					var dh = ViewCamera.transform.rotation.eulerAngles.y + deltaAngleH * Time.deltaTime* RotationSpeed;
+					ViewCamera.transform.rotation = Quaternion.Euler(dv, dh, 0);
 				}
 			}
 
-			CameraDistance = CalculateCameraDistance(_map.Zoom);
-			_camera.transform.rotation = Quaternion.Euler(Pitch, Bearing, 0);
-			_camera.transform.position = Vector3.zero + _camera.transform.forward * (-1f * CameraDistance);
+			if (Input.GetMouseButton(0) || Input.GetMouseButton(1) || Input.mouseScrollDelta.magnitude > 0)
+			{
+				CameraDistance = CalculateCameraDistance(_map.Zoom);
+				ControlCamera.transform.rotation = Quaternion.Euler(Pitch, Bearing, 0);
+				ControlCamera.transform.position = Vector3.zero + ControlCamera.transform.forward * (-1f * CameraDistance);
+			}
 
 			_lastMousePos = Input.mousePosition;
 
@@ -102,7 +118,7 @@ namespace Mapbox.Unity.QuadTree
 
 		private Vector3 GetPlaneIntersection(Vector3 screenPosition)
 		{
-			var ray = _camera.ScreenPointToRay(screenPosition);
+			var ray = ControlCamera.ScreenPointToRay(screenPosition);
 			var dirNorm = ray.direction / ray.direction.y;
 			var intersectionPos = ray.origin - dirNorm * ray.origin.y;
 			return intersectionPos;

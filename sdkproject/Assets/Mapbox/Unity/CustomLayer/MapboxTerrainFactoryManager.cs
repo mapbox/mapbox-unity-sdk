@@ -141,7 +141,7 @@ namespace Mapbox.Unity.CustomLayer
 
 		private void SyncExtractElevationArray(RawPngRasterTile dataTile)
 		{
-			var _heightDataResolution = 100;
+			var _heightDataResolution = 514;
 			byte[] rgbData = dataTile.Texture2D.GetRawTextureData();
 			var width = dataTile.Texture2D.width;
 

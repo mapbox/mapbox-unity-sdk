@@ -303,7 +303,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			return mesh;
 		}
 
-		private MeshDataArray CreateBaseMeshSkirts(float tileSize, int sampleCount)
+		private MeshDataArray CreateBaseMeshSkirts2(float tileSize, int sampleCount)
 		{
 			var delta = (1f / (sampleCount - 1)) / 2;
 			var half = (tileSize/2) + delta;
@@ -368,7 +368,7 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			return mesh;
 		}
 
-		private MeshDataArray CreateBaseMeshSkirts2(float tileSize, int sampleCount)
+		private MeshDataArray CreateBaseMeshSkirts(float tileSize, int sampleCount)
 		{
 			var half = tileSize/2;
 			//TODO use arrays instead of lists
@@ -398,7 +398,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 						elevation,
 						(float) yy));
 					_newNormalList.Add(Mapbox.Unity.Constants.Math.Vector3Up);
-					_newUvList.Add(new Vector2(x * 1f / (sampleCount - 1), 1 - (y * 1f / (sampleCount - 1))));
+					_newUvList.Add(new Vector2(xrat, 1 - yrat));
+					//_newUvList.Add(new Vector2((1f/514) + (xrat * 512)/514, 1 - ((1f/514) + (yrat * 512)/514)));
 				}
 			}
 
@@ -473,7 +474,8 @@ namespace Mapbox.Unity.MeshGeneration.Factories.TerrainStrategies
 			{
 				for (float x = 0; x < sampleCount; x++)
 				{
-					var elevation = hd[((int)((1 - y / (sampleCount - 1)) * (heightDataRowSize-1)) * heightDataRowSize) + ((int)(x / (sampleCount - 1) * (heightDataRowSize-1)))] * ts;
+					//var elevation = hd[((int)((1 - y / (sampleCount - 1)) * (heightDataRowSize-1)) * heightDataRowSize) + ((int)(x / (sampleCount - 1) * (heightDataRowSize-1)))] * ts;
+					var elevation = tile.QueryHeightData(((x / (sampleCount - 1f))) , (1f - y / (sampleCount - 1f)));
 
 					_verts[(int) (y * sampleCount + x)] = new Vector3(
 						_verts[(int) (y * sampleCount + x)].x,

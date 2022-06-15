@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Mapbox.Map;
 using Mapbox.Unity;
 using Mapbox.Unity.MeshGeneration.Data;
+using Unity.Profiling;
 using UnityEngine;
 
 namespace Mapbox.Platform.Cache
@@ -108,47 +109,49 @@ namespace Mapbox.Platform.Cache
             var localCopy = tile;
             CacheItem cacheItem = null;
 
-            var task = new TaskWrapper(tileId.GenerateKey(localTilesetId, "GetVectorItemSqlite"))
+            if (_sqLiteCache.TileExists(localTilesetId, localTileId))
             {
-                OwnerTileId = localTileId,
-                TileId = localTileId,
-                TilesetId = tilesetId,
-                Action = () =>
+                var task = new TaskWrapper(tileId.GenerateKey(localTilesetId, "GetVectorItemSqlite"))
                 {
-                    cacheItem = _sqLiteCache.Get(localTilesetId, localTileId);
-                    if (cacheItem.Data != null)
+                    OwnerTileId = localTileId,
+                    TileId = localTileId,
+                    TilesetId = tilesetId,
+                    Action = () =>
                     {
-                        localCopy.SetByteData(cacheItem.Data);
-                    }
-                },
-                ContinueWith = (t) =>
-                {
-                    if (t.Exception != null)
+                        cacheItem = _sqLiteCache.Get(localTilesetId, localTileId);
+                        if (cacheItem.Data != null)
+                        {
+                            localCopy.SetByteData(cacheItem.Data);
+                        }
+                    },
+                    ContinueWith = (t) =>
                     {
-                        failureCallback();
-                    }
-                    else
-                    {
+                        if (t.Exception != null)
+                        {
+                            failureCallback();
+                        }
+                        else
+                        {
 #if UNITY_EDITOR
-                        localCopy.FromCache = CacheType.SqliteCache;
-                        cacheItem.From = localCopy.FromCache;
+                            localCopy.FromCache = CacheType.SqliteCache;
+                            cacheItem.From = localCopy.FromCache;
 #endif
-                        localCopy.ETag = cacheItem.ETag;
-                        cacheItem.Tile = localCopy;
-                        successCallback(cacheItem);
-                    }
-                },
-                OnCancelled = () =>
-                {
-                    cancelledCallback();
-                },
+                            localCopy.ETag = cacheItem.ETag;
+                            cacheItem.Tile = localCopy;
+                            successCallback(cacheItem);
+                        }
+                    },
+                    OnCancelled = () => { cancelledCallback(); },
 #if UNITY_EDITOR
-                Info = "MapboxCacheManager.GetVectorItemFromSqlite"
+                    Info = "MapboxCacheManager.GetVectorItemFromSqlite"
 #endif
-            };
-            MapboxAccess.Instance.TaskManager.AddTask(task);
-
-
+                };
+                MapboxAccess.Instance.TaskManager.AddTask(task, 0);
+            }
+            else
+            {
+                failureCallback();
+            }
             // if (cacheItem != null)
             // {
             //     _memoryCache.Add(tileId, tilesetId, cacheItem, true);

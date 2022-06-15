@@ -2,7 +2,6 @@ using System.Collections;
 using JetBrains.Annotations;
 using Mapbox.Unity.DataContainers;
 using Mapbox.Unity.QuadTree;
-using Unity.UNetWeaver;
 using UnityEditor;
 using UnityEngine.Rendering;
 
@@ -252,7 +251,7 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			_terrainTile = (RawPngRasterTile) terrainTile;
 			_terrainTextureScaleOffset = CalculateScaleOffset(terrainTile.Id.Z);
 
-			if (_material != null)
+			if (_material != null && !addCollider)
 			{
 				if (_material.GetTexture(_previousShaderElevationTextureFieldNameID) == null)
 				{
@@ -265,6 +264,10 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				_material.SetVector(_shaderElevationTextureScaleOffsetFieldNameID, _terrainTextureScaleOffset);
 				_material.SetFloat(_tileScaleFieldNameID, TileScale);
 				_material.SetFloat(_elevationMultiplierFieldNameID, heightMultiplier);
+			}
+			else
+			{
+				_material.SetFloat(_elevationMultiplierFieldNameID, 0);
 			}
 
 			if (_parentTerrainTile != null)
@@ -279,15 +282,16 @@ namespace Mapbox.Unity.MeshGeneration.Data
 				}, 2));
 			}
 
+			_terrainReady = true;
 			//reset height data
-			if (terrainTile == null || terrainTile.Texture2D == null)
+			//if (terrainTile == null || terrainTile.Texture2D == null)
 			{
 				//HeightData = new float[_heightDataResolution * _heightDataResolution];
 				if (_createMeshCallback != null && _vectorTile != null)
 				{
 					CallCreateMeshCallback();
 				}
-				return;
+				//return;
 			}
 
 			CheckFinishedCondition(_terrainTile);
@@ -555,13 +559,23 @@ namespace Mapbox.Unity.MeshGeneration.Data
 			if (HeightData != null && HeightData.Length > 0)
 			{
 				var width = _terrainTile.ExtractedDataResolution;
-				var sectionWidth = width * _terrainTextureScaleOffset.x;
+				var sectionWidth = width * _terrainTextureScaleOffset.x - 1;
 				var padding = _terrainTile.ExtractedDataResolution * new Vector2(_terrainTextureScaleOffset.z, _terrainTextureScaleOffset.w);
 				var xx = padding.x + (x * sectionWidth);
 				var yy = padding.y + (y * sectionWidth);
 
-				return HeightData[(int) yy * _terrainTile.ExtractedDataResolution
-				                         + (int) xx] * _tileScale;
+				var index = (int) yy * _terrainTile.ExtractedDataResolution
+				            + (int) xx;
+				if (HeightData.Length <= index)
+				{
+					Debug.Log("here");
+					return 0;
+				}
+				else
+				{
+					return HeightData[(int) yy * _terrainTile.ExtractedDataResolution
+					                  + (int) xx] * _tileScale;
+				}
 			}
 
 			// if (HeightData != null && HeightData.Length > 0)
