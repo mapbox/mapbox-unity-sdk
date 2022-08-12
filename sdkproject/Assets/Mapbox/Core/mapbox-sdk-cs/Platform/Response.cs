@@ -315,7 +315,7 @@ namespace Mapbox.Platform
 			int statusCode = (int)apiResponse.responseCode;
 			response.StatusCode = statusCode;
 
-			if (statusCode != 200)
+			if (statusCode != 200 && statusCode != 304)
 			{
 				response.AddException(new Exception(string.Format("Status Code {0}", apiResponse.responseCode)));
 			}
