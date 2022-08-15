@@ -9,21 +9,15 @@
 
 	public class QuadTreeCameraMovement : MonoBehaviour
 	{
-		[SerializeField]
-		[Range(1, 20)]
-		public float _panSpeed = 1.0f;
+		[SerializeField] [Range(1, 20)] public float _panSpeed = 1.0f;
 
-		[SerializeField]
-		float _zoomSpeed = 0.25f;
+		[SerializeField] float _zoomSpeed = 0.25f;
 
-		[SerializeField]
-		public Camera _referenceCamera;
+		[SerializeField] public Camera _referenceCamera;
 
-		[SerializeField]
-		AbstractMap _mapManager;
+		[SerializeField] AbstractMap _mapManager;
 
-		[SerializeField]
-		bool _useDegreeMethod;
+		[SerializeField] bool _useDegreeMethod;
 
 		private Vector3 _origin;
 		private Vector3 _mousePosition;
@@ -38,12 +32,13 @@
 			if (null == _referenceCamera)
 			{
 				_referenceCamera = GetComponent<Camera>();
-				if (null == _referenceCamera) { Debug.LogErrorFormat("{0}: reference camera not set", this.GetType().Name); }
+				if (null == _referenceCamera)
+				{
+					Debug.LogErrorFormat("{0}: reference camera not set", this.GetType().Name);
+				}
 			}
-			_mapManager.OnInitialized += () =>
-			{
-				_isInitialized = true;
-			};
+
+			_mapManager.OnInitialized += () => { _isInitialized = true; };
 		}
 
 		public void Update()
@@ -62,7 +57,10 @@
 
 		private void LateUpdate()
 		{
-			if (!_isInitialized) { return; }
+			if (!_isInitialized)
+			{
+				return;
+			}
 
 			if (!_dragStartedOnUI)
 			{
@@ -103,27 +101,27 @@
 			switch (Input.touchCount)
 			{
 				case 1:
-					{
-						PanMapUsingTouchOrMouse();
-					}
+				{
+					PanMapUsingTouchOrMouse();
+				}
 					break;
 				case 2:
-					{
-						// Store both touches.
-						Touch touchZero = Input.GetTouch(0);
-						Touch touchOne = Input.GetTouch(1);
+				{
+					// Store both touches.
+					Touch touchZero = Input.GetTouch(0);
+					Touch touchOne = Input.GetTouch(1);
 
-						// Find the position in the previous frame of each touch.
-						Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
-						Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
+					// Find the position in the previous frame of each touch.
+					Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
+					Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
 
-						// Find the magnitude of the vector (the distance) between the touches in each frame.
-						float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
-						float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
+					// Find the magnitude of the vector (the distance) between the touches in each frame.
+					float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
+					float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
 
-						// Find the difference in the distances between each frame.
-						zoomFactor = 0.01f * (touchDeltaMag - prevTouchDeltaMag);
-					}
+					// Find the difference in the distances between each frame.
+					zoomFactor = 0.01f * (touchDeltaMag - prevTouchDeltaMag);
+				}
 					ZoomMapUsingTouchOrMouse(zoomFactor);
 					break;
 				default:
@@ -136,7 +134,19 @@
 			var zoom = Mathf.Max(0.0f, Mathf.Min(_mapManager.Zoom + zoomFactor * _zoomSpeed, 21.0f));
 			if (Math.Abs(zoom - _mapManager.Zoom) > 0.0f)
 			{
+
+				var mousePosScreen = Input.mousePosition;
+				mousePosScreen.z = _referenceCamera.transform.localPosition.y;
+				_mousePosition = _referenceCamera.ScreenToWorldPoint(mousePosScreen);
+				var geo = _mapManager.WorldToGeoPosition(_mousePosition);
+				var pos1 = Conversions.LatLonToMeters(geo);
+
 				_mapManager.UpdateMap(_mapManager.CenterLatitudeLongitude, zoom);
+				geo = _mapManager.WorldToGeoPosition(_mousePosition);
+
+				var pos2 = Conversions.LatLonToMeters(geo);
+				var delta = pos2 - pos1;
+				_mapManager.UpdateMap(Conversions.MetersToLatLon(_mapManager.CenterMercator - new Vector2d(delta.x, delta.y)));
 			}
 		}
 
@@ -148,7 +158,7 @@
 				// Divide it by the tile width in pixels ( 256 in our case)
 				// to get degrees represented by each pixel.
 				// Keyboard offset is in pixels, therefore multiply the factor with the offset to move the center.
-				float factor = _panSpeed * (Conversions.GetTileScaleInDegrees((float)_mapManager.CenterLatitudeLongitude.x, _mapManager.AbsoluteZoom));
+				float factor = _panSpeed * (Conversions.GetTileScaleInDegrees((float) _mapManager.CenterLatitudeLongitude.x, _mapManager.AbsoluteZoom));
 
 				var latitudeLongitude = new Vector2d(_mapManager.CenterLatitudeLongitude.x + zMove * factor * 2.0f, _mapManager.CenterLatitudeLongitude.y + xMove * factor * 4.0f);
 
@@ -213,13 +223,14 @@
 					{
 						if (null != _mapManager)
 						{
-							float factor = _panSpeed * Conversions.GetTileScaleInMeters((float)0, _mapManager.AbsoluteZoom) / _mapManager.UnityTileSize;
-							var latlongDelta = Conversions.MetersToLatLon(new Vector2d(offset.x * factor, offset.z * factor));
-							var newLatLong = _mapManager.CenterLatitudeLongitude + latlongDelta;
-
+							var offset2D = new Vector2d(offset.x, offset.z);
+							var gameobjectScalingMultiplier = _mapManager.transform.localScale.x * (Mathf.Pow(2, (_mapManager.InitialZoom - _mapManager.AbsoluteZoom)));
+							var newLatLong = Conversions.MetersToLatLon(
+								Conversions.LatLonToMeters(_mapManager.CenterLatitudeLongitude) + (offset2D / _mapManager.WorldRelativeScale) / gameobjectScalingMultiplier);
 							_mapManager.UpdateMap(newLatLong, _mapManager.Zoom);
 						}
 					}
+
 					_origin = _mousePosition;
 				}
 				else
@@ -228,6 +239,7 @@
 					{
 						return;
 					}
+
 					_mousePositionPrevious = _mousePosition;
 					_origin = _mousePosition;
 				}
@@ -271,12 +283,13 @@
 							// Divide it by the tile width in pixels ( 256 in our case)
 							// to get degrees represented by each pixel.
 							// Mouse offset is in pixels, therefore multiply the factor with the offset to move the center.
-							float factor = _panSpeed * Conversions.GetTileScaleInDegrees((float)_mapManager.CenterLatitudeLongitude.x, _mapManager.AbsoluteZoom) / _mapManager.UnityTileSize;
+							float factor = _panSpeed * Conversions.GetTileScaleInDegrees((float) _mapManager.CenterLatitudeLongitude.x, _mapManager.AbsoluteZoom) / _mapManager.UnityTileSize;
 
 							var latitudeLongitude = new Vector2d(_mapManager.CenterLatitudeLongitude.x + offset.z * factor, _mapManager.CenterLatitudeLongitude.y + offset.x * factor);
 							_mapManager.UpdateMap(latitudeLongitude, _mapManager.Zoom);
 						}
 					}
+
 					_origin = _mousePosition;
 				}
 				else
@@ -285,6 +298,7 @@
 					{
 						return;
 					}
+
 					_mousePositionPrevious = _mousePosition;
 					_origin = _mousePosition;
 				}
@@ -294,7 +308,11 @@
 		private Vector3 getGroundPlaneHitPoint(Ray ray)
 		{
 			float distance;
-			if (!_groundPlane.Raycast(ray, out distance)) { return Vector3.zero; }
+			if (!_groundPlane.Raycast(ray, out distance))
+			{
+				return Vector3.zero;
+			}
+
 			return ray.GetPoint(distance);
 		}
 	}
