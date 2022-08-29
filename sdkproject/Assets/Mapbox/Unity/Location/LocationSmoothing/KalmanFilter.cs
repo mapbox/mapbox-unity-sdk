@@ -4,20 +4,20 @@ From SackOverflow: Smooth GPS data https://stackoverflow.com/a/15657798
 General Kalman filter theory is all about estimates for vectors, with the accuracy of the estimates
 represented by covariance matrices. However, for estimating location on Android devices the general
 theory reduces to a very simple case. Android location providers give the location as a latitude and
-longitude, together with an accuracy which is specified as a single number measured in metres. 
+longitude, together with an accuracy which is specified as a single number measured in metres.
 This means that instead of a covariance matrix, the accuracy in the Kalman filter can be measured by
 a single number, even though the location in the Kalman filter is a measured by two numbers. Also the
-fact that the latitude, longitude and metres are effectively all different units can be ignored, 
-because if you put scaling factors into the Kalman filter to convert them all into the same units, 
+fact that the latitude, longitude and metres are effectively all different units can be ignored,
+because if you put scaling factors into the Kalman filter to convert them all into the same units,
 then those scaling factors end up cancelling out when converting the results back into the original units.
 
 The code could be improved, because it assumes that the best estimate of current location is the last
-known location, and if someone is moving it should be possible to use Android's sensors to produce a 
-better estimate. The code has a single free parameter Q, expressed in metres per second, which describes 
-how quickly the accuracy decays in the absence of any new location estimates. A higher Q parameter means 
-that the accuracy decays faster. Kalman filters generally work better when the accuracy decays a bit 
-quicker than one might expect, so for walking around with an Android phone I find that Q=3 metres per 
-second works fine, even though I generally walk slower than that. But if travelling in a fast car a much 
+known location, and if someone is moving it should be possible to use Android's sensors to produce a
+better estimate. The code has a single free parameter Q, expressed in metres per second, which describes
+how quickly the accuracy decays in the absence of any new location estimates. A higher Q parameter means
+that the accuracy decays faster. Kalman filters generally work better when the accuracy decays a bit
+quicker than one might expect, so for walking around with an Android phone I find that Q=3 metres per
+second works fine, even though I generally walk slower than that. But if travelling in a fast car a much
 larger number should obviously be used.
 */
 
@@ -94,7 +94,7 @@ namespace Mapbox.Unity.Location
 			{
 				// else apply Kalman filter methodology
 
-				long TimeInc_milliseconds = TimeStamp_milliseconds - TimeStamp_milliseconds;
+				long TimeInc_milliseconds = TimeStamp_milliseconds - _timeStampMilliseconds;
 				if (TimeInc_milliseconds > 0)
 				{
 					// time has moved on, so the uncertainty in the current position increases
@@ -109,7 +109,7 @@ namespace Mapbox.Unity.Location
 				// apply K
 				_lat += K * (lat_measurement - _lat);
 				_lng += K * (lng_measurement - _lng);
-				// new Covarariance  matrix is (IdentityMatrix - K) * Covarariance 
+				// new Covarariance  matrix is (IdentityMatrix - K) * Covarariance
 				_variance = (1 - K) * _variance;
 			}
 		}
