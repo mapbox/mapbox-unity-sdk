@@ -15,5 +15,7 @@ namespace Mapbox.Platform.Cache
 		public string ETag;
 		/// <summary> Can be 'null' as not all APIs populated this value. Last-Modified value of API response in GMT: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Last-Modified </summary>
 		public DateTime? LastModified;
+
+		public DateTime ExpirationDate;
 	}
 }
