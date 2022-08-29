@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking.PlayerConnection;
-using Utils;
+using UnityEngine.XR.iOS.Utils;
 using System.Collections;
 using UnityEngine.XR;
 

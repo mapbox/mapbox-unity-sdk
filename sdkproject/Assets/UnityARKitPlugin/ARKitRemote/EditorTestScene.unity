@@ -418,53 +418,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5587c957048494a2f96db36e0995449e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1001 &632713106
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4661046637869644, guid: 8ce7d6271a01a4274a00066492aed04a, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4661046637869644, guid: 8ce7d6271a01a4274a00066492aed04a, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4661046637869644, guid: 8ce7d6271a01a4274a00066492aed04a, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4661046637869644, guid: 8ce7d6271a01a4274a00066492aed04a, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4661046637869644, guid: 8ce7d6271a01a4274a00066492aed04a, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4661046637869644, guid: 8ce7d6271a01a4274a00066492aed04a, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4661046637869644, guid: 8ce7d6271a01a4274a00066492aed04a, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4661046637869644, guid: 8ce7d6271a01a4274a00066492aed04a, type: 2}
-      propertyPath: m_RootOrder
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 114217095398060286, guid: 8ce7d6271a01a4274a00066492aed04a,
-        type: 2}
-      propertyPath: getPointCloud
-      value: 1
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 100100000, guid: 8ce7d6271a01a4274a00066492aed04a, type: 2}
-  m_IsPrefabParent: 0
 --- !u!1 &754164519
 GameObject:
   m_ObjectHideFlags: 0
@@ -574,7 +527,7 @@ Transform:
   m_Children:
   - {fileID: 1428923966}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1428923965
 GameObject:
@@ -588,7 +541,6 @@ GameObject:
   - component: {fileID: 1428923970}
   - component: {fileID: 1428923969}
   - component: {fileID: 1428923968}
-  - component: {fileID: 1428923967}
   m_Layer: 0
   m_Name: HitCube
   m_TagString: Untagged
@@ -609,22 +561,6 @@ Transform:
   m_Father: {fileID: 1320907943}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1428923967
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1428923965}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6e5621b71c5c74d94ac88603287035e2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_HitTransform: {fileID: 1320907943}
-  maxRayDistance: 30
-  collisionLayerMask:
-    serializedVersion: 2
-    m_Bits: 1024
 --- !u!114 &1428923968
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -637,6 +573,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_HitTransform: {fileID: 1320907943}
+  maxRayDistance: 30
+  collisionLayer:
+    serializedVersion: 2
+    m_Bits: 1024
 --- !u!23 &1428923969
 MeshRenderer:
   m_ObjectHideFlags: 0

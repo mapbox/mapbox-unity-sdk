@@ -8,17 +8,20 @@ namespace UnityEngine.XR.iOS
 		/** Result type from intersecting the nearest feature point. */
 		ARHitTestResultTypeFeaturePoint     = (1 << 0),
 
-		/** Result type from detecting and intersecting a new horizontal plane. */
-		ARHitTestResultTypeHorizontalPlane  = (1 << 1),
+		/** A real-world planar surface detected by the search (without a corresponding anchor), whose orientation is perpendicular to gravity. */
+		ARHitTestResultTypeEstimatedHorizontalPlane  = (1 << 1),
 
-		/** Result type from detecting and intersecting a new vertical plane. */
-		ARHitTestResultTypeVerticalPlane    = (1 << 2),
+		/** A real-world planar surface detected by the search, whose orientation is parallel to gravity. */
+		ARHitTestResultTypeEstimatedVerticalPlane    = (1 << 2),
 
 		/** Result type from intersecting with an existing plane anchor. */
         ARHitTestResultTypeExistingPlane    = (1 << 3),
 
         /** Result type from intersecting with an existing plane anchor, taking into account the plane's extent. */
-        ARHitTestResultTypeExistingPlaneUsingExtent  = ( 1 << 4)
+        ARHitTestResultTypeExistingPlaneUsingExtent  = ( 1 << 4),
+
+		/** A plane anchor already in the scene (detected with the planeDetection option), respecting the plane's estimated size and shape. **/
+		ARHitTestResultTypeExistingPlaneUsingGeometry = (1 << 5)
 
 	}
 }

@@ -15,6 +15,9 @@ namespace UnityEngine.XR.iOS
 
         /** Tracking is limited due to a lack of features visible to the camera. */
         ARTrackingStateReasonInsufficientFeatures,
+
+		/** Tracking is limited due to a relocalization in progress. */
+		ARTrackingStateReasonRelocalizing,
     }
 }
 
