@@ -17,54 +17,21 @@ namespace Mapbox.Utils
 		/// <param name="p">The point that is to be tested.</param>
 		public static bool PointInPolygon(Point2d<float> p, List<List<Point2d<float>>> polygon)
 		{
-			List<Point2d<float>> poly = polygon[0];
-
-			Point2d<float> p1;
-			Point2d<float> p2;
 			bool inside = false;
-
-			if (poly.Count < 3)
-			{
-				return inside;
-			}
-
-			var oldPoint = new Point2d<float>(
-				poly[poly.Count - 1].X
-				, poly[poly.Count - 1].Y
-			);
-
+			int j = poly.Count - 1;
 			for (int i = 0; i < poly.Count; i++)
 			{
-				var newPoint = new Point2d<float>(poly[i].X, poly[i].Y);
-
-				if (newPoint.X > oldPoint.X)
+				if (poly[i].Y < p.Y && poly[j].Y >= p.Y || poly[j].Y < p.Y && poly[i].Y >= p.Y)
 				{
-					p1 = oldPoint;
-					p2 = newPoint;
+					if (poly[i].X + (p.Y - poly[i].Y) / (poly[j].Y - poly[i].Y) * (poly[j].X - poly[i].X) < p.X)
+					{
+						inside = !inside;
+					}
 				}
-				else
-				{
-					p1 = newPoint;
-					p2 = oldPoint;
-				}
-
-				if (
-					(newPoint.X < p.X) == (p.X <= oldPoint.X)
-					&& (p.Y - (long)p1.Y) * (p2.X - p1.X) < (p2.Y - (long)p1.Y) * (p.X - p1.X)
-				)
-				{
-					inside = !inside;
-				}
-
-				oldPoint = newPoint;
+				j = i;
 			}
 
 			return inside;
 		}
-
-
-
 	}
-
 }
-
