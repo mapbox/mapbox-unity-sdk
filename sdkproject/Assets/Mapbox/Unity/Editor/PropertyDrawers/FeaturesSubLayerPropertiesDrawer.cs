@@ -19,6 +19,7 @@
 		GUIContent[] _sourceTypeContent;
 		bool _isGUIContentSet = false;
 		bool _isInitialized = false;
+		private bool _showPerformance;
 		private TileJsonData tileJSONData;
 		private static TileJSONResponse tileJSONResponse;
 		static TileJsonData tileJsonData = new TileJsonData();
@@ -501,6 +502,7 @@
 		void DrawLayerVisualizerProperties(VectorSourceType sourceType, SerializedProperty layerProperty, SerializedProperty property)
 		{
 			var subLayerCoreOptions = layerProperty.FindPropertyRelative("coreOptions");
+			var subLayerPerformanceOptions = layerProperty.FindPropertyRelative("performanceOptions");
 
 			var subLayerName = subLayerCoreOptions.FindPropertyRelative("sublayerName").stringValue;
 			var visualizerLayer = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
@@ -529,6 +531,14 @@
 
 			EditorGUI.indentLevel++;
 
+			_showPerformance = EditorGUILayout.Foldout(_showPerformance, new GUIContent { text = "Performance" });
+			if (_showPerformance)
+			{
+				GUILayout.Space(-_lineHeight);
+				EditorGUILayout.PropertyField(subLayerPerformanceOptions);
+			}
+
+
 			//*********************** FILTERS SECTION BEGINS ***********************************//
 			var filterOptions = layerProperty.FindPropertyRelative("filterOptions");
 			filterOptions.FindPropertyRelative("_selectedLayerName").stringValue = subLayerCoreOptions.FindPropertyRelative("layerName").stringValue;
@@ -541,7 +551,6 @@
 			//*********************** MODELING SECTION BEGINS ***********************************//
 			_modelingSectionDrawer.DrawUI(subLayerCoreOptions, layerProperty, primitiveTypeProp);
 			//*********************** MODELING SECTION ENDS ***********************************//
-
 
 			//*********************** TEXTURING SECTION BEGINS ***********************************//
 			if (primitiveTypeProp != VectorPrimitiveType.Point && primitiveTypeProp != VectorPrimitiveType.Custom)

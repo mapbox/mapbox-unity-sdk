@@ -352,12 +352,10 @@ namespace Mapbox.Editor
 				{
 					EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("optimizedStyle"), new GUIContent("Style Options"));
 				}
-				GUILayout.Space(-_lineHeight);
-				EditorGUILayout.PropertyField(layerProperty.FindPropertyRelative("performanceOptions"), new GUIContent("Perfomance Options"));
 			}
 
 			EditorGUILayout.Space();
-			ShowSepartor();
+			EditorGUILayout.Space();
 
 			_vectorLayerDrawer.DrawUI(layerProperty);
 
