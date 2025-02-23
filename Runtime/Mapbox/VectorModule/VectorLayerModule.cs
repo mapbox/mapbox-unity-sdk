@@ -140,6 +140,11 @@ namespace Mapbox.VectorModule
 		{
 			VectorData tileData = null;
 			yield return _vectorSource.LoadTileCoroutine(tile, data => tileData = data);
+			if (tileData == null)
+			{
+				Debug.LogWarning("Loaded tile data is null");
+				yield break;
+			}
 			yield return CreateVisualCoroutine(tile, tileData);
 		}
 		
