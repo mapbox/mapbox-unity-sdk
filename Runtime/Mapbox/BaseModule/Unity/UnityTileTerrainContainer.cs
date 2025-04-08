@@ -43,6 +43,44 @@ namespace Mapbox.BaseModule.Unity
             TerrainData.ElevationValuesUpdated += OnElevationValuesUpdated;
 
             _unityMapTile.Material.SetFloat(_elevationMultiplierFieldNameID, useShaderElevation ? 1 : 0);
+            FixMeshBounds(useShaderElevation);
+        }
+
+        private void FixMeshBounds(bool useShaderElevation)
+        {
+            Mesh mesh = _unityMapTile.MeshFilter.mesh;
+            if (mesh == null)
+            {
+                return;
+            }
+
+            float elevation = useShaderElevation ? GetMaxExtent() : 0f;
+            Vector3 newExtents = mesh.bounds.extents;
+            newExtents.y = elevation;
+            mesh.bounds = new Bounds(mesh.bounds.center, newExtents);
+        }
+
+        private float GetMaxExtent()
+        {
+            if (TerrainData == null || TerrainData.ElevationValues == null)
+            {
+                return 0;
+            }
+
+            float max = 0;
+            float min = float.MaxValue;
+            for (int i = 0; i < TerrainData.ElevationValues.Length; i++)
+            {
+                if (TerrainData.ElevationValues[i] > max)
+                {
+                    max = TerrainData.ElevationValues[i];
+                }
+                if (TerrainData.ElevationValues[i] < min)
+                {
+                    min = TerrainData.ElevationValues[i];
+                }
+            }
+            return Mathf.Max(Mathf.Abs(min), max);
         }
 
         public void OnTerrainUpdated()
