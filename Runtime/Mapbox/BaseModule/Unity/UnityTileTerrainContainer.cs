@@ -10,7 +10,7 @@ namespace Mapbox.BaseModule.Unity
     public class UnityTileTerrainContainer
     {
         public TileContainerState State = TileContainerState.Final;
-        public Action<UnityMapTile> ElevationValuesUpdated = (t) => { };
+        public static Action<UnityTileTerrainContainer> ElevationValuesUpdated = (t) => { };
         
         private string _elevationMultiplierFieldNameID = "_ElevationMultiplier";
         private string _elevationChangeTimerFieldNameID = "_ElevationChangeTime";
@@ -106,7 +106,7 @@ namespace Mapbox.BaseModule.Unity
                 return;
             }
             TerrainData.IsElevationDataReady = true;
-            ElevationValuesUpdated(_unityMapTile);
+            ElevationValuesUpdated(this);
         }
 
         public TerrainData GetAndClearTerrainData()
