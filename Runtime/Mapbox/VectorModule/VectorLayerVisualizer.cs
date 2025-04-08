@@ -219,6 +219,7 @@ namespace Mapbox.VectorModule
                     if(!_results.ContainsKey(canonicalTileId))
                         _results.Add(canonicalTileId, new List<VectorEntity>());
                     _results[canonicalTileId].Add(entity);
+                    entity.Mesh.RecalculateBounds();
                     OnVectorMeshCreated(entity.GameObject);
                 }
             }
