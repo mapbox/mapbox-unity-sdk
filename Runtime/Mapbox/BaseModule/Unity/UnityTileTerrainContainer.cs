@@ -1,5 +1,4 @@
 using System;
-using Mapbox.BaseModule.Data.DataFetchers;
 using Mapbox.BaseModule.Data.Tiles;
 using UnityEngine;
 using TerrainData = Mapbox.BaseModule.Data.DataFetchers.TerrainData;
@@ -43,6 +42,40 @@ namespace Mapbox.BaseModule.Unity
             TerrainData.ElevationValuesUpdated += OnElevationValuesUpdated;
 
             _unityMapTile.Material.SetFloat(_elevationMultiplierFieldNameID, useShaderElevation ? 1 : 0);
+            FixMeshBounds(useShaderElevation);
+        }
+
+        private void FixMeshBounds(bool useShaderElevation)
+        {
+            Mesh mesh = _unityMapTile.MeshFilter.mesh;
+            if (mesh != null && useShaderElevation)
+            {
+                mesh.RecalculateBounds();
+                mesh.bounds = GetBoundsAdjustedForElevation();
+            }
+        }
+
+        private Bounds GetBoundsAdjustedForElevation()
+        {
+            Mesh mesh = _unityMapTile.MeshFilter.mesh;
+            if (TerrainData == null || TerrainData.ElevationValues == null)
+            {
+                return mesh.bounds;
+            }
+
+            float maxY = float.MinValue;
+            float minY = float.MaxValue;
+            foreach (float t in TerrainData.ElevationValues)
+            {
+                float elevationScaled = t * _unityMapTile.TileScale;
+                maxY = Mathf.Max(maxY, elevationScaled);
+                minY = Mathf.Min(minY, elevationScaled);
+            }
+            Vector3 center = mesh.bounds.center;
+            center.y = (maxY + minY) / 2;
+            Vector3 size = mesh.bounds.size;
+            size.y = maxY - minY;
+            return new Bounds(center, size);
         }
 
         public void OnTerrainUpdated()
