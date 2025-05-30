@@ -61,7 +61,26 @@ namespace Mapbox.BaseModule.Data.DataFetchers
             }
             else
             {
-                return ElevationValues[(int) yy * width + (int) xx];
+                // Bilinear interpolation
+                int x1 = (int) xx;
+                int y1 = (int) yy;
+                int x2 = x1 + 1;
+                int y2 = y1 + 1;
+                if (x2 >= width)
+                {
+                    x2 = x1;
+                }
+                if (y2 >= width)
+                {
+                    y2 = y1;
+                }
+                float x2y1 = ElevationValues[y1 * width + x2];
+                float x1y2 = ElevationValues[y2 * width + x1];
+                float x2y2 = ElevationValues[y2 * width + x2];
+                float x1y1 = ElevationValues[y1 * width + x1];
+                float x1y = Mathf.Lerp(x1y1, x2y1, xx - x1);
+                float x2y = Mathf.Lerp(x1y2, x2y2, xx - x1);
+                return Mathf.Lerp(x1y, x2y, yy - y1);
             }
         }
 

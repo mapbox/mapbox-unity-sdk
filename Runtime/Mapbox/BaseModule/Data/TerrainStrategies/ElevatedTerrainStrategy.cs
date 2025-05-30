@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Mapbox.BaseModule.Data.Tiles;
 using Mapbox.BaseModule.Map;
 using Mapbox.BaseModule.Unity;
 using Mapbox.BaseModule.Utilities;
@@ -85,6 +86,7 @@ namespace Mapbox.ImageModule.Terrain.TerrainStrategies
 					sharedMesh.SetTriangles(triangle, i);
 				}
 				sharedMesh.uv = newMesh.Uvs;
+				tile.TerrainContainer.FixMeshBounds(!createElevatedMesh);
 			}
 			
 			// if (_elevationOptions.sideWallOptions.isActive)
@@ -289,6 +291,112 @@ namespace Mapbox.ImageModule.Terrain.TerrainStrategies
 			//mesh.Triangles.Add(_newTriangleList.ToArray());
 			return mesh;
 		}
+
+
+		/// <summary>
+		/// Checkes all neighbours of the given tile and stitches the edges to achieve a smooth mesh surface.
+		/// </summary>
+		/// <param name="tile">UnityMapTile of the tile being processed.</param>
+		/// <param name="allTiles">All tiles, including this tile, used to find neighbors</param>
+		///
+		public void FixStitches(UnityMapTile tile, Dictionary<UnwrappedTileId, UnityMapTile> allTiles)
+		{
+			UnwrappedTileId tileId = tile.UnwrappedTileId;
+			int sampleCount =  _useTileSkirts 
+				? _elevationOptions.modificationOptions.sampleCount + 3 
+				: _elevationOptions.modificationOptions.sampleCount + 1;
+
+			Vector3[] targetVerts;
+			Vector3[] verts = tile.MeshFilter.sharedMesh.vertices;
+			var meshVertCount = verts.Length;
+			if (allTiles.ContainsKey(tileId.North) && allTiles[tileId.North].TerrainContainer.State == TileContainerState.Final)
+			{
+				targetVerts = allTiles[tileId.North].MeshFilter.sharedMesh.vertices;
+
+				for (int i = 0; i < sampleCount; i++)
+				{
+                    int source_i = meshVertCount - sampleCount + i;
+                    int target_i = i;
+					verts[source_i] = new Vector3(verts[source_i].x, targetVerts[target_i].y, verts[source_i].z);
+				}
+                allTiles[tileId.North].MeshFilter.sharedMesh.vertices = targetVerts;
+			}
+
+			if (allTiles.ContainsKey(tileId.South) && allTiles[tileId.South].TerrainContainer.State == TileContainerState.Final)
+			{
+				targetVerts = allTiles[tileId.South].MeshFilter.sharedMesh.vertices;
+
+				for (int i = 0; i < sampleCount; i++)
+				{
+                    int source_i = i;
+                    int target_i = meshVertCount - sampleCount + i;
+					verts[source_i] = new Vector3(verts[source_i].x, targetVerts[target_i].y, verts[source_i].z);
+				}
+			}
+
+			if (allTiles.ContainsKey(tileId.West) && allTiles[tileId.West].TerrainContainer.State == TileContainerState.Final)
+			{
+				targetVerts = allTiles[tileId.West].MeshFilter.sharedMesh.vertices;
+
+				for (int i = 0; i < sampleCount; i++)
+				{
+                    int target_i = i * sampleCount + sampleCount - 1;
+                    int source_i = i * sampleCount;
+					verts[source_i] = new Vector3(verts[source_i].x, targetVerts[target_i].y, verts[source_i].z);
+				}
+			}
+
+			if (allTiles.ContainsKey(tileId.East) && allTiles[tileId.East].TerrainContainer.State == TileContainerState.Final)
+			{
+				targetVerts = allTiles[tileId.East].MeshFilter.sharedMesh.vertices;
+
+				for (int i = 0; i < sampleCount; i++)
+				{
+                    int target_i = i * sampleCount;
+                    int source_i = i * sampleCount + sampleCount - 1;
+					verts[source_i] = new Vector3(verts[source_i].x, targetVerts[target_i].y, verts[source_i].z);
+				}
+			}
+
+			if (allTiles.ContainsKey(tileId.NorthWest) && allTiles[tileId.NorthWest].TerrainContainer.State == TileContainerState.Final)
+			{
+				targetVerts = allTiles[tileId.NorthWest].MeshFilter.sharedMesh.vertices;
+
+                int source_i = meshVertCount - sampleCount;
+                int target_i = sampleCount - 1;
+                verts[source_i] = new Vector3(verts[source_i].x, targetVerts[target_i].y, verts[source_i].z);
+			}
+
+			if (allTiles.ContainsKey(tileId.NorthEast) && allTiles[tileId.NorthEast].TerrainContainer.State == TileContainerState.Final)
+			{
+				targetVerts = allTiles[tileId.NorthEast].MeshFilter.sharedMesh.vertices;
+
+                int source_i = meshVertCount - 1;
+                int target_i = 0;
+                verts[source_i] = new Vector3(verts[source_i].x, targetVerts[target_i].y, verts[source_i].z);
+			}
+
+			if (allTiles.ContainsKey(tileId.SouthWest) && allTiles[tileId.SouthWest].TerrainContainer.State == TileContainerState.Final)
+			{
+				targetVerts = allTiles[tileId.SouthWest].MeshFilter.sharedMesh.vertices;
+
+                int source_i = 0;
+                int target_i = meshVertCount - 1;
+                verts[source_i] = new Vector3(verts[source_i].x, targetVerts[target_i].y, verts[source_i].z);
+			}
+
+			if (allTiles.ContainsKey(tileId.SouthEast) && allTiles[tileId.SouthEast].TerrainContainer.State == TileContainerState.Final)
+			{
+				targetVerts = allTiles[tileId.SouthEast].MeshFilter.sharedMesh.vertices;
+                int source_i = sampleCount - 1;
+                int target_i = meshVertCount - sampleCount;
+                verts[source_i] = new Vector3(verts[source_i].x, targetVerts[target_i].y, verts[source_i].z);
+			}
+
+			tile.MeshFilter.sharedMesh.vertices = verts;
+			tile.MeshFilter.sharedMesh.RecalculateNormals();
+		}
+
 		#endregion
 	}
 }

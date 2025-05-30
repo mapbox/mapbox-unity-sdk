@@ -43,6 +43,11 @@ namespace Mapbox.GeocodingApi
 				geocode.GetUrl(),
 				(Response response) =>
 				{
+					if (response.Data == null)
+					{
+						callback(null);
+						return;
+					}
 					var str = Encoding.UTF8.GetString(response.Data);
 
 					var data = Deserialize<ReverseGeocodeResponse>(str);

@@ -21,12 +21,12 @@ namespace Mapbox.ImageModule.Terrain
         private TerrainStrategy _terrainStrategy;
         
         //Terrain module doesn't support cpu elevation now after TileCreator changes
-        public TerrainLayerModule(Source<TerrainData> source, TerrainLayerModuleSettings settings) : base()
+        public TerrainLayerModule(Source<TerrainData> source, TerrainLayerModuleSettings settings, TerrainStrategy terrainStrategy) : base()
         {
             _settings = settings;
             _retainedTerrainTiles = new HashSet<CanonicalTileId>();
             _rasterSource = source;
-            _terrainStrategy = new ElevatedTerrainStrategy();
+            _terrainStrategy = terrainStrategy;
         }
         
         public virtual IEnumerator Initialize()

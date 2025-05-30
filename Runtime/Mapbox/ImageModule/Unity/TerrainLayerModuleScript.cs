@@ -43,7 +43,8 @@ namespace Mapbox.Example.Scripts.ModuleBehaviours
 			var module =
 				new TerrainLayerModule(
 					service.GetTerrainRasterSource(Settings.DataSettings),
-					Settings);
+					Settings,
+					new ElevatedTerrainStrategy());
 
 			mapInformation.QueryElevation = module.QueryElevation;
 			ModuleImplementation = module;

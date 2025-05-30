@@ -32,6 +32,11 @@ namespace Mapbox.BaseModule.Data.Platform.Cache
 			
         public void Add(T data)
         {
+            if (_cacheHash == null)
+            {
+                Debug.LogWarning("Function called after TypeMemoryCache destroyed");
+                return;
+            }
             if (_cacheHash.TryGetValue(data.TileId, out var node))
             {
                 _cache.Remove(node);
@@ -78,6 +83,11 @@ namespace Mapbox.BaseModule.Data.Platform.Cache
 
         public bool Exists(CanonicalTileId tileId)
         {
+            if (_cacheHash == null)
+            {
+                Debug.LogWarning("Function called after TypeMemoryCache destroyed");
+                return false;
+            }
             return _cacheHash.ContainsKey(tileId) || _fallbackDatas.ContainsKey(tileId);
             //return _datas.ContainsKey(tileId) || _fallbackDatas.ContainsKey(tileId);
         }
@@ -85,6 +95,12 @@ namespace Mapbox.BaseModule.Data.Platform.Cache
         public bool Get(CanonicalTileId tileId, out T outData)
         {
             outData = null;
+            if (_cacheHash == null)
+            {
+                Debug.LogWarning("Function called after TypeMemoryCache destroyed");
+                return false;
+            }
+
             if (_cacheHash.TryGetValue(tileId, out var linkedNode))
             {
                 outData = linkedNode.Value;
@@ -108,11 +124,21 @@ namespace Mapbox.BaseModule.Data.Platform.Cache
 
         public IEnumerable<T> GetAllDatas()
         {
+            if (_cacheHash == null)
+            {
+                Debug.LogWarning("Function called after TypeMemoryCache destroyed");
+                return new List<T>();
+            }
             return _cacheHash.Values.Select(x => x.Value);
         }
 
         public void Remove(CanonicalTileId tileId)
         {
+            if (_cacheHash == null)
+            {
+                Debug.LogWarning("Function called after TypeMemoryCache destroyed");
+                return;
+            }
             if (_cacheHash.TryGetValue(tileId, out var linkedListNode))
             {
                 DropItem(linkedListNode);
@@ -127,6 +153,11 @@ namespace Mapbox.BaseModule.Data.Platform.Cache
 
         public void MarkFallback(CanonicalTileId dataTileId)
         {
+            if (_cacheHash == null)
+            {
+                Debug.LogWarning("Function called after TypeMemoryCache destroyed");
+                return;
+            }
             if (_cacheHash.TryGetValue(dataTileId, out var data))
             {
                 _cacheHash.Remove(dataTileId);
