@@ -25,6 +25,7 @@ namespace Mapbox.VectorModule
 		private HashSet<CanonicalTileId> _retainedTiles;
 		private HashSet<CanonicalTileId> _activeTiles;
 		private HashSet<CanonicalTileId> _readyTiles;
+		private HashSet<CanonicalTileId> _visibleTiles;
 		
 		public VectorLayerModule(IMapInformation mapInformation, Source<VectorData> source, MeshGenerationUnit meshGenerator, VectorModuleSettings vectorModuleSettings = null) : base()
 		{
@@ -36,6 +37,7 @@ namespace Mapbox.VectorModule
 			_vectorSource.CacheItemDisposed += ClearDisposedDataVisual;
 			_retainedTiles = new HashSet<CanonicalTileId>();
 			_activeTiles = new HashSet<CanonicalTileId>();
+			_visibleTiles = new HashSet<CanonicalTileId>();
 		}
 
 		public virtual IEnumerator Initialize()
@@ -79,12 +81,28 @@ namespace Mapbox.VectorModule
 			
 			foreach (var tileId in _readyTiles)
 			{
-				_meshGenerationUnit.SetVisualActive(tileId, _activeTiles.Contains(tileId) || _retainedTiles.Contains(tileId), _mapInformation);
+				var isRetained = _activeTiles.Contains(tileId) || _retainedTiles.Contains(tileId);
+				UpdateVisibilityCallbacks(tileId,isRetained);
+				_meshGenerationUnit.SetVisualActive(tileId, isRetained, _mapInformation);
 			}
 
 			_meshGenerationUnit.RetainTiles(_retainedTiles);
 			var isReady = _vectorSource.RetainTiles(_retainedTiles);
 			return isReady;
+		}
+		private void UpdateVisibilityCallbacks(CanonicalTileId tileId, bool isRetained)
+		{
+			if (isRetained && !_visibleTiles.Contains(tileId))
+			{
+				OnVectorMeshTurnVisible(tileId);
+				_visibleTiles.Add(tileId);
+				return;
+			}
+			if (!isRetained &&_visibleTiles.Contains(tileId))
+			{
+				OnVectorMeshTurnInvisible(tileId);
+				_visibleTiles.Remove(tileId);
+			}
 		}
 
 		private void UpdateActiveTileList(Dictionary<UnwrappedTileId, UnityMapTile> activeTiles)
@@ -265,28 +283,35 @@ namespace Mapbox.VectorModule
 			{
 				_meshGenerationUnit.MeshGeneration(vectorData, (result =>
 				{
-					if (result != null && result.ResultType == TaskResultType.Success)
+					if (result != null)
 					{
-						_readyTiles.Add(tileId);
-						OnVectorMeshCreated(result.GeneratedObjects);
-						_meshGenerationUnit.UpdateForView(tileId, _mapInformation);
-					}
-					else if (result.ResultType == TaskResultType.DataProcessingFailure)
-					{
-						_vectorSource.InvalidateData(vectorData.TileId);
-						Debug.Log(result.ExceptionsAsString);
-					}
-					else if (result.ResultType == TaskResultType.Cancelled)
-					{
-						if (result.GeneratedObjects != null)
+						switch (result.ResultType)
 						{
-							foreach (var gameObject in result.GeneratedObjects)
+							case TaskResultType.Success:
+								_readyTiles.Add(tileId);
+								_meshGenerationUnit.UpdateForView(tileId, _mapInformation);
+								UpdateVisibilityCallbacks(tileId, true);
+								OnVectorMeshCreated(vectorData.TileId, result.GeneratedObjects);
+								break;
+							case TaskResultType.DataProcessingFailure:
+								_vectorSource.InvalidateData(vectorData.TileId);
+								Debug.Log(result.ExceptionsAsString);
+								break;
+							case TaskResultType.Cancelled:
 							{
-								GameObject.Destroy(gameObject);
+								if (result.GeneratedObjects != null)
+								{
+									foreach (var gameObject in result.GeneratedObjects)
+									{
+										GameObject.Destroy(gameObject);
+									}
+								}
+
+								break;
 							}
 						}
 					}
-					callback?.Invoke(result);;
+					callback?.Invoke(result);
 				}));
 			}
 		}
@@ -309,12 +334,12 @@ namespace Mapbox.VectorModule
 		{
 			_readyTiles.Remove(tileId);
 			_meshGenerationUnit.ClearDisposedDataVisual(tileId);
-
+			OnVectorMeshDestroyed(tileId);
 		}
 
-		public Action<IEnumerable<GameObject>> OnVectorMeshCreated = list => { };
-		public Action<GameObject> OnVectorMeshDestroyed = go => { };
-		public Action<GameObject> OnVectorMeshTurnVisible = go => { };
-		public Action<GameObject> OnVectorMeshTurnInvisible = go => { };
+		public Action<CanonicalTileId, IEnumerable<GameObject>> OnVectorMeshCreated = (_, _) => {};
+		public Action<CanonicalTileId> OnVectorMeshDestroyed = _ => {};
+		public Action<CanonicalTileId> OnVectorMeshTurnVisible = _ => {};
+		public Action<CanonicalTileId> OnVectorMeshTurnInvisible = _ => {};
 	}
 }
