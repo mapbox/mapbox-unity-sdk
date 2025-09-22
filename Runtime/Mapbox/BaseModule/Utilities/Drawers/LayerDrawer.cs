@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+using System;
 using Mapbox.BaseModule.Utilities.Attributes;
 using UnityEditor;
 using UnityEngine;
@@ -71,3 +72,4 @@ namespace Mapbox.BaseModule.Utilities.Drawers
         }
     }
 }
+#endif
