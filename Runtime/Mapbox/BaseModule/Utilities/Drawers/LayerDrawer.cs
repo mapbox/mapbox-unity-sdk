@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Mapbox.BaseModule.Utilities.Drawers
 {
     [CustomPropertyDrawer(typeof(LayerAttribute))]
-    public class LayerPropertyDrawer : PropertyDrawer
+    public class LayerDrawer : PropertyDrawer
     {
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
