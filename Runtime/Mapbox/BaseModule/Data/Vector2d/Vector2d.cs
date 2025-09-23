@@ -265,38 +265,4 @@ namespace Mapbox.BaseModule.Data.Vector2d
 			return array;
 		}
 	}
-
-	[Serializable]
-	public struct LatitudeLongitude
-	{
-		public double Latitude;
-		public double Longitude;
-
-		public LatitudeLongitude(double latitude, double longitude)
-		{
-			Latitude = latitude;
-			Longitude = longitude;
-		}
-		
-		public override string ToString()
-		{
-			return string.Format(NumberFormatInfo.InvariantInfo, "{0},{1}", this.Latitude, this.Longitude);
-		}
-		
-		public string ToStringLonLat()
-		{
-			return string.Format(NumberFormatInfo.InvariantInfo, "{0:F5},{1:F5}", this.Longitude, this.Latitude);
-		}
-
-		public static double Dot(LatitudeLongitude lhs, LatitudeLongitude rhs)
-		{
-			return lhs.Latitude * rhs.Latitude + lhs.Longitude * rhs.Longitude;
-		}
-		
-		public static LatitudeLongitude operator -(LatitudeLongitude a, LatitudeLongitude b)
-		{
-			return new LatitudeLongitude(a.Longitude - b.Longitude, a.Latitude - b.Latitude);
-		}
-
-	}
 }
