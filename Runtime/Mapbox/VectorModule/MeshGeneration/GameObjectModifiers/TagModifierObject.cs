@@ -8,7 +8,7 @@ namespace Mapbox.VectorModule.MeshGeneration.GameObjectModifiers
     [CreateAssetMenu(menuName = "Mapbox/Modifiers/Tag Modifier")]
     public class TagModifierObject : ScriptableGameObjectModifierObject
     {
-        [GameobjectTag]public string tag;
+        [GameObjectTag]public string tag;
         
         private TagModifier _prefabModifierImplementation;
         protected override GameObjectModifier _gameObjectModifierImplementation => _prefabModifierImplementation;

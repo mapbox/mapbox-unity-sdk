@@ -6,8 +6,8 @@ using UnityEngine;
 
 namespace Mapbox.BaseModule.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(GameobjectTagAttribute))]
-    public class GameobjectTagDrawer : PropertyDrawer
+    [CustomPropertyDrawer(typeof(GameObjectTagAttribute))]
+    public class GameObjectTagDrawer : PropertyDrawer
     {
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {

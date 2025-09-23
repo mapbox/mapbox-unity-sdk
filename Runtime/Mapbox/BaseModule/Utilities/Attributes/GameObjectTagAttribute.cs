@@ -5,5 +5,5 @@ namespace Mapbox.BaseModule.Utilities.Attributes
 {
 
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-    public class GameobjectTagAttribute : PropertyAttribute {}
+    public class GameObjectTagAttribute : PropertyAttribute {}
 }
