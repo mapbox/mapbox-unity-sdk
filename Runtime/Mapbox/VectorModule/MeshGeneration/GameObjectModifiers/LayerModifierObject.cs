@@ -8,7 +8,7 @@ namespace Mapbox.VectorModule.MeshGeneration.GameObjectModifiers
     [CreateAssetMenu(menuName = "Mapbox/Modifiers/LayerMask Modifier")]
     public class LayerModifierObject : ScriptableGameObjectModifierObject
     {
-        [GameobjectLayer]public int layer;
+        [GameObjectLayer]public int layer;
         private LayerModifier _prefabModifierImplementation;
         protected override GameObjectModifier _gameObjectModifierImplementation => _prefabModifierImplementation;
 
