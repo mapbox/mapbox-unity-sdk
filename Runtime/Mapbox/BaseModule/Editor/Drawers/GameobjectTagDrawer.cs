@@ -1,14 +1,13 @@
-﻿#if UNITY_EDITOR
-
-using System;
+﻿using System;
+using Mapbox.BaseModule.Utilities.Attributes;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace Mapbox.BaseModule.Utilities.Attributes
+namespace Mapbox.BaseModule.Editor.Drawers
 {
-    [CustomPropertyDrawer(typeof(TagAttribute))]
-    public class TagDrawer : PropertyDrawer
+    [CustomPropertyDrawer(typeof(GameobjectTagAttribute))]
+    public class GameobjectTagDrawer : PropertyDrawer
     {
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
@@ -48,4 +47,3 @@ namespace Mapbox.BaseModule.Utilities.Attributes
         }
     }
 }
-#endif
