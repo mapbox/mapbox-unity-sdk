@@ -108,9 +108,9 @@ namespace Mapbox.VectorModule
             yield return null;
         }
 
-        public void AddModifierStacks(IEnumerable<ModifierStack> stack)
+        public void AddModifierStacks(IEnumerable<ModifierStack> stacks)
         {
-            foreach (var modifierStack in stack)
+            foreach (var modifierStack in stacks)
             {
                 _stackList.Add(modifierStack.GetHashCode(), modifierStack);
             }
