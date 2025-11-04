@@ -32,7 +32,8 @@ namespace Mapbox.VectorModule.Unity
 			{
 				modifierStackObject.Initialize(unityContext);
 			}
-			_layerVisualizer.AddModifierStack(_modifierStackObjects.Select(x => x.GetModifierStack).ToList());
+			_layerVisualizer.AddModifierStacks(_modifierStackObjects.Select((x, i) => x?.GetModifierStack 
+				?? throw new NullReferenceException($"{name} ({nameof(VectorLayerVisualizerObject)}) is missing {nameof(ModifierStackObject)} reference @ element {i}")));
 
 			_layerVisualizer.OnVectorMeshCreated += OnVectorMeshCreated;
 			_layerVisualizer.OnVectorMeshDestroyed += OnVectorMeshDestroyed;
