@@ -9,6 +9,8 @@ namespace Mapbox.BaseModule.Map
 {
     public class MapboxContext : IMapboxContext
     {
+        public static string AccessTokenOverride;
+        public static bool SkipTokenValidation;
         public MapboxConfiguration Configuration;
         private ITelemetryLibrary _telemetryLibrary;
 
@@ -48,7 +50,26 @@ namespace Mapbox.BaseModule.Map
             }
 
             var config = JsonUtility.FromJson<MapboxConfiguration>(configurationTextAsset.text);
+            if (!string.IsNullOrEmpty(AccessTokenOverride))
+            {
+                config.AccessToken = AccessTokenOverride;
+                Debug.Log("MapboxContext: Using access token override.");
+            }
+            else if (string.IsNullOrEmpty(config.AccessToken))
+            {
+                Debug.LogWarning("MapboxContext: Access token is empty. Map tiles will not load.");
+            }
             config.Initialize();
+
+            if (SkipTokenValidation)
+            {
+                Debug.Log("MapboxContext: Skipping token validation.");
+                _mapboxToken = new MapboxToken { Status = MapboxTokenStatus.TokenValid };
+                Configuration = config;
+                ConfigureTelemetry();
+                return;
+            }
+
             var tokenValidator = new MapboxTokenApi();
             tokenValidator.Retrieve(config.GetMapsSkuToken, config.AccessToken, (response) =>
             {

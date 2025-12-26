@@ -117,7 +117,7 @@ namespace Mapbox.BaseModule.Data.Platform.Cache
 							callback(response);
 							yield break;
 						}
-						Debug.Log("what else is here? " + response.StatusCode);
+						Debug.LogWarning($"Mapbox request unexpected status {webRequest.responseCode} for {webRequest.RawUri}");
 					}
 					else if (webRequest.result == UnityWebRequest.Result.DataProcessingError)
 					{
@@ -137,7 +137,7 @@ namespace Mapbox.BaseModule.Data.Platform.Cache
 						}
 						else
 						{
-							Debug.Log("Data processing error but it's not 304? " + response.StatusCode);
+							Debug.LogWarning($"Mapbox data processing error with status {webRequest.responseCode} for {webRequest.RawUri}");
 						}
 					}
 					else if (webRequest.result == UnityWebRequest.Result.ConnectionError) //retry
@@ -163,6 +163,7 @@ namespace Mapbox.BaseModule.Data.Platform.Cache
 						response.Result = WebResponseResult.Failed;
 						response.IsRetrying = false;
 						response.AddException(new Exception(webRequest.error));
+						Debug.LogError($"Mapbox request failed ({webRequest.responseCode}) for {webRequest.RawUri}: {webRequest.error}");
 						callback(response);
 						yield break;
 					}

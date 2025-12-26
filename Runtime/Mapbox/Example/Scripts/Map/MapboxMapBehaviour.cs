@@ -46,6 +46,17 @@ namespace Mapbox.Example.Scripts.Map
             MapInformation.Initialize();
             UnityContext.Initialize();
             
+            var moduleScripts = GetComponents<ModuleConstructorScript>();
+            if (moduleScripts == null || moduleScripts.Length == 0)
+            {
+                Debug.LogError("MapboxMapBehaviour: No ModuleConstructorScript components found. Add a map layer module (e.g., VectorLayerModuleScript or StaticApiLayerModuleScript) to render tiles.");
+            }
+            else
+            {
+                int enabledCount = moduleScripts.Count(m => m != null && m.enabled);
+                Debug.Log($"MapboxMapBehaviour: Found {moduleScripts.Length} module script(s), enabled {enabledCount}.");
+            }
+
             var mapboxContext = new MapboxContext();
             _mapService = GetMapService(mapboxContext, UnityContext);
             MapServiceReady(_mapService);

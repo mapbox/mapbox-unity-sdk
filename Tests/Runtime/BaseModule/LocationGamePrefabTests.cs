@@ -31,6 +31,7 @@ namespace Mapbox.BaseModuleTests.PlayModeTests
         [UnityTest, Order(2)]
         public IEnumerator FindAndRegisterToMapNoInitialize()
         {
+            
             _firstViewLoaded = false;
             _mapCore = GameObject.FindObjectOfType<MapboxMapBehaviour>();
             void OnMapCoreInitialized(MapboxMap mapboxMap)

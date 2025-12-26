@@ -96,6 +96,16 @@ namespace Mapbox.BaseModule.Utilities
 				var billingService = billingServiceFactory.CallStatic<AndroidJavaObject>(_mapboxBillingFactoryGetMethodName);
 				return billingService.Call<string>(_mapboxSkuTokenMethodName, _unityEnum);
 			}
+		#else
+			public void Initialize()
+			{
+			
+			}
+			
+			public string GetMapsSkuToken()
+			{
+				return "mapbox.mazutka";
+			}
 		#endif
 		
 	}

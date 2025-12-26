@@ -78,7 +78,9 @@ namespace Mapbox.BaseModule.Map
         {
             var hashsetTiles = new HashSet<CanonicalTileId>(tileCover.Tiles.Select(x => x.Canonical));
             var coroutines = LayerModules.SelectMany(x => x.GetTileCoverCoroutines(hashsetTiles).Where(x => x != null));
+            Debug.Log($"MapboxMapVisualizer: LoadTileCoverToMemory tiles={hashsetTiles.Count} coroutines={coroutines.Count()}");
             yield return coroutines.WaitForAll();
+            Debug.Log("MapboxMapVisualizer: LoadTileCoverToMemory completed");
         }
       
         /// <summary>
