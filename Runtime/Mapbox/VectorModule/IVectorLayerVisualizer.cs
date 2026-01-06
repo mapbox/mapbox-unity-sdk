@@ -12,7 +12,7 @@ namespace Mapbox.VectorModule
     public interface IVectorLayerVisualizer
     {
         string VectorLayerName { get; }
-        void AddModifierStack(List<ModifierStack> stack);
+        void AddModifierStacks(IEnumerable<ModifierStack> stacks);
         Dictionary<int, HashSet<MeshData>> CreateMesh(CanonicalTileId tileId, VectorTileLayer layer);
         List<GameObject> CreateGo(CanonicalTileId tileId, Dictionary<int, HashSet<MeshData>> meshData);
         void UnregisterTile(CanonicalTileId tileId);
