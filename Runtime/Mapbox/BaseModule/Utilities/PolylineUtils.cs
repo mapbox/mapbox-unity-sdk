@@ -25,6 +25,11 @@ namespace Mapbox.BaseModule.Utilities
 		/// <returns>List of <see cref="Vector2d"/> making up the line.</returns>
 		public static List<Vector2d> Decode(string encodedPath, int precision = 5)
 		{
+			if (string.IsNullOrEmpty(encodedPath))
+			{
+				return new List<Vector2d>();
+			}
+
 			int len = encodedPath.Length;
 
 			double factor = Math.Pow(10, precision);

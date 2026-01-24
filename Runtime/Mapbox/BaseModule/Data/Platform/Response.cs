@@ -28,7 +28,7 @@ namespace Mapbox.BaseModule.Data.Platform
 	{
 
 
-		private Response() { }
+		public Response() { }
 
 
 		public IAsyncRequest Request { get; private set; }
