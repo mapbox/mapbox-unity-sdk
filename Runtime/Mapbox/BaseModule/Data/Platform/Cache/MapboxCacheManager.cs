@@ -50,6 +50,7 @@ namespace Mapbox.BaseModule.Data.Platform.Cache
             if (_sqLiteCache != null && _textureFileCache != null)
             {
                 _sqLiteCache.DataPrunedForFile += path => _textureFileCache.DeleteByFileRelativePath(path);
+                _sqLiteCache.DatabaseCleared += _textureFileCache.ClearAll;
             }
             
             if (_sqLiteCache != null)
@@ -69,7 +70,11 @@ namespace Mapbox.BaseModule.Data.Platform.Cache
             }
         }
 
-        
+        public void ClearCachedData()
+        {
+            _sqLiteCache.ClearDatabase();
+            _sqLiteCache.ReadySqliteDatabase();
+        }
         
         public virtual void SaveImage(RasterData textureCacheItem, bool forceInsert)
         {

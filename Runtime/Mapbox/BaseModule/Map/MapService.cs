@@ -44,6 +44,11 @@ namespace Mapbox.BaseModule.Map
         public bool GetTelemetryCollectionState() => _mapboxContext.GetTelemetryCollectiongState();
         public virtual bool SetTelemetryCollectionState(bool state) => _mapboxContext.SetTelemetryCollectionState(state);
 
+        public virtual void ClearCachedData()
+        {
+            
+        }
+        
         public virtual void OnDestroy()
         {
             

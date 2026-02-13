@@ -16,6 +16,7 @@ namespace Mapbox.BaseModule.Data.Platform.Cache.SQLiteCache
 	public class SqliteCache : ISqliteCache, IDisposable
 	{
 		public event Action<string> DataPrunedForFile = s => { };
+		public event Action DatabaseCleared = () => { };
 
 		public const int PruneCacheDelta = 20;
 		
@@ -379,6 +380,7 @@ CONSTRAINT tileAssignmentConstraint UNIQUE (tileId, mapId)
 				return false;
 			}
 
+			DatabaseCleared();
 			return true;
 		}
 
@@ -415,6 +417,7 @@ CONSTRAINT tileAssignmentConstraint UNIQUE (tileId, mapId)
 				Debug.LogError(error);
 			}
 
+			DatabaseCleared();
 			return isDeletedSuccesfully;
 		}
 		
