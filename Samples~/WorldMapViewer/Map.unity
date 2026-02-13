@@ -332,7 +332,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Settings:
-    ElevationLayerType: 1
     LoadBackgroundTextures: 1
     UseShaderTerrain: 1
     DataSettings:
@@ -340,7 +339,7 @@ MonoBehaviour:
       UseNonReadableTextures: 1
       CacheSize: 100
       ClampDataLevelToMax: 14
-    RejectTilesOutsideZoom: {x: 10, y: 25}
+    RejectTilesOutsideZoom: {x: 2, y: 25}
     ElevationLayerProperties:
       modificationOptions:
         SimplificationFactor: 1
