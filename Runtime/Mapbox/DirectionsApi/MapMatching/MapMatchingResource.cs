@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Mapbox.BaseModule.Data.Platform;
 using Mapbox.BaseModule.Data.Vector2d;
+using Mapbox.BaseModule.Utilities;
+using Mapbox.VectorTile.ExtensionMethods;
 
 namespace Mapbox.DirectionsApi.MapMatching
 {
@@ -163,23 +165,22 @@ namespace Mapbox.DirectionsApi.MapMatching
 
 			Dictionary<string, string> options = new Dictionary<string, string>();
 
-			return null;
-			// if (Geometries.HasValue) { options.Add("geometries", Geometries.Value.Description()); }
-			// if (null != _radiuses) { options.Add("radiuses", GetUrlQueryFromArray(_radiuses, ";")); }
-			// if (Steps.HasValue) { options.Add("steps", Steps.ToString().ToLower()); }
-			// if (Overview.HasValue) { options.Add("overview", Overview.Value.Description()); }
-			// if (null != _timestamps) { options.Add("timestamps", GetUrlQueryFromArray(_timestamps, ";")); }
-			// if (Annotations.HasValue) { options.Add("annotations", getUrlQueryFromAnnotations(Annotations.Value, ",")); }
-			// if (Tidy.HasValue) { options.Add("tidy", Tidy.Value.ToString().ToLower()); }
-			// if (Language.HasValue) { options.Add("language", Language.Value.Description()); }
-			//
-			// return
-			// 	Constants.Map.BaseAPI
-			// 	+ _apiEndpoint
-			// 	+ Profile.Description() + "/"
-			// 	+ GetUrlQueryFromArray<Vector2d>(_coordinates, ";")
-			// 	+ ".json"
-			// 	+ EncodeQueryString(options);
+			if (Geometries.HasValue) { options.Add("geometries", Geometries.Value.MapboxTypeDescription()); }
+			if (null != _radiuses) { options.Add("radiuses", GetUrlQueryFromArray(_radiuses, ";")); }
+			if (Steps.HasValue) { options.Add("steps", Steps.ToString().ToLower()); }
+			if (Overview.HasValue) { options.Add("overview", Overview.Value.MapboxTypeDescription()); }
+			if (null != _timestamps) { options.Add("timestamps", GetUrlQueryFromArray(_timestamps, ";")); }
+			if (Annotations.HasValue) { options.Add("annotations", getUrlQueryFromAnnotations(Annotations.Value, ",")); }
+			if (Tidy.HasValue) { options.Add("tidy", Tidy.Value.ToString().ToLower()); }
+			if (Language.HasValue) { options.Add("language", Language.Value.MapboxTypeDescription()); }
+
+			return
+				Constants.Map.BaseAPI
+				+ _apiEndpoint
+				+ Profile.MapboxTypeDescription() + "/"
+				+ GetUrlQueryFromArray<Vector2d>(_coordinates, ";")
+				+ ".json"
+				+ EncodeQueryString(options);
 		}
 
 
@@ -198,7 +199,7 @@ namespace Mapbox.DirectionsApi.MapMatching
 			foreach (var a in Enum.GetValues(typeof(Annotations)).Cast<Annotations>())
 			{
 				//if current value is set, add its description
-				//if (a == (anno & a)) { descriptions.Add(a.Description()); }
+				if (a == (anno & a)) { descriptions.Add(a.MapboxTypeDescription()); }
 			}
 
 			return string.Join(separator, descriptions.ToArray());

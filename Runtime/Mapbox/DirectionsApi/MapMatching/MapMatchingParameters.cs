@@ -12,13 +12,13 @@ namespace Mapbox.DirectionsApi.MapMatching
 	/// <summary>Directions profile id</summary>
 	public enum Profile
 	{
-		[Description("mapbox/driving")]
+		[MapboxRequestString("mapbox/driving")]
 		MapboxDriving,
-		[Description("mapbox/driving-traffic")]
+		[MapboxRequestString("mapbox/driving-traffic")]
 		MapboxDrivingTraffic,
-		[Description("mapbox/walking")]
+		[MapboxRequestString("mapbox/walking")]
 		MapboxWalking,
-		[Description("mapbox/cycling")]
+		[MapboxRequestString("mapbox/cycling")]
 		MapboxCycling
 	}
 
@@ -27,13 +27,13 @@ namespace Mapbox.DirectionsApi.MapMatching
 	public enum Geometries
 	{
 		/// <summary>Default, precision 5.</summary>
-		[Description("polyline")]
+		[MapboxRequestString("polyline")]
 		Polyline,
 		/// <summary>Precision 6.</summary>
-		[Description("polyline6")]
+		[MapboxRequestString("polyline6")]
 		Polyline6,
 		/// <summary>Geojson.</summary>
-		[Description("geojson")]
+		[MapboxRequestString("geojson")]
 		GeoJson
 	}
 
@@ -42,13 +42,13 @@ namespace Mapbox.DirectionsApi.MapMatching
 	public enum Overview
 	{
 		/// <summary>The most detailed geometry available </summary>
-		[Description("full")]
+		[MapboxRequestString("full")]
 		Full,
 		/// <summary>A simplified version of the full geometry</summary>
-		[Description("simplified")]
+		[MapboxRequestString("simplified")]
 		Simplified,
 		/// <summary>No overview geometry </summary>
-		[Description("false")]
+		[MapboxRequestString("false")]
 		None
 	}
 
@@ -57,13 +57,13 @@ namespace Mapbox.DirectionsApi.MapMatching
 	[System.Flags]
 	public enum Annotations
 	{
-		[Description("duration")]
+		[MapboxRequestString("duration")]
 		Duration,
-		[Description("distance")]
+		[MapboxRequestString("distance")]
 		Distance,
-		[Description("speed")]
+		[MapboxRequestString("speed")]
 		Speed,
-		[Description("congestion")]
+		[MapboxRequestString("congestion")]
 		Congestion
 	}
 
@@ -73,41 +73,41 @@ namespace Mapbox.DirectionsApi.MapMatching
 	/// </summary>
 	public enum InstructionLanguages
 	{
-		[Description("de")]
+		[MapboxRequestString("de")]
 		German,
-		[Description("en")]
+		[MapboxRequestString("en")]
 		English,
-		[Description("eo")]
+		[MapboxRequestString("eo")]
 		Esperanto,
-		[Description("es")]
+		[MapboxRequestString("es")]
 		Spanish,
-		[Description("es-ES")]
+		[MapboxRequestString("es-ES")]
 		SpanishSpain,
-		[Description("fr")]
+		[MapboxRequestString("fr")]
 		French,
-		[Description("id")]
+		[MapboxRequestString("id")]
 		Indonesian,
-		[Description("it")]
+		[MapboxRequestString("it")]
 		Italian,
-		[Description("nl")]
+		[MapboxRequestString("nl")]
 		Dutch,
-		[Description("pl")]
+		[MapboxRequestString("pl")]
 		Polish,
-		[Description("pt-BR")]
+		[MapboxRequestString("pt-BR")]
 		PortugueseBrazil,
-		[Description("ro")]
+		[MapboxRequestString("ro")]
 		Romanian,
-		[Description("ru")]
+		[MapboxRequestString("ru")]
 		Russian,
-		[Description("sv")]
+		[MapboxRequestString("sv")]
 		Swedish,
-		[Description("tr")]
+		[MapboxRequestString("tr")]
 		Turkish,
-		[Description("uk")]
+		[MapboxRequestString("uk")]
 		Ukrainian,
-		[Description("vi")]
+		[MapboxRequestString("vi")]
 		Vietnamese,
-		[Description("zh-Hans")]
+		[MapboxRequestString("zh-Hans")]
 		ChineseSimplified
 	}
 
