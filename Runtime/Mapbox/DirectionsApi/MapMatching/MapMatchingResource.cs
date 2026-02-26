@@ -167,7 +167,7 @@ namespace Mapbox.DirectionsApi.MapMatching
 
 			if (Geometries.HasValue) { options.Add("geometries", Geometries.Value.MapboxTypeDescription()); }
 			if (null != _radiuses) { options.Add("radiuses", GetUrlQueryFromArray(_radiuses, ";")); }
-			if (Steps.HasValue) { options.Add("steps", Steps.ToString().ToLower()); }
+			if (Steps.HasValue) { options.Add("steps", Steps.Value.ToString().ToLower()); }
 			if (Overview.HasValue) { options.Add("overview", Overview.Value.MapboxTypeDescription()); }
 			if (null != _timestamps) { options.Add("timestamps", GetUrlQueryFromArray(_timestamps, ";")); }
 			if (Annotations.HasValue) { options.Add("annotations", getUrlQueryFromAnnotations(Annotations.Value, ",")); }

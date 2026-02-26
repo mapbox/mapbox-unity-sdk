@@ -58,13 +58,13 @@ namespace Mapbox.DirectionsApi.MapMatching
 	public enum Annotations
 	{
 		[MapboxRequestString("duration")]
-		Duration,
+		Duration = 1,
 		[MapboxRequestString("distance")]
-		Distance,
+		Distance = 2,
 		[MapboxRequestString("speed")]
-		Speed,
+		Speed = 4,
 		[MapboxRequestString("congestion")]
-		Congestion
+		Congestion = 8
 	}
 
 
