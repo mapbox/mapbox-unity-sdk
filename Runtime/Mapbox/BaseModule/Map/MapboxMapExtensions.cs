@@ -27,6 +27,10 @@ namespace Mapbox.BaseModule.Map
                 {
                     return true;
                 }
+                else
+                {
+                    maxTileId = maxTileId.Parent;
+                }
             }
 
             tile = null;
@@ -51,6 +55,10 @@ namespace Mapbox.BaseModule.Map
                 if (map.MapVisualizer.ActiveTiles.TryGetValue(maxTileId, out tile))
                 {
                     break;
+                }
+                else
+                {
+                    maxTileId = maxTileId.Parent;
                 }
             }
 

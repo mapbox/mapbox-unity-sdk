@@ -328,6 +328,11 @@ namespace MapboxUnitySDK.Editor
 			if (Application.isPlaying)
 			{
 				var core = GameObject.FindObjectOfType<MapBehaviourCore>();
+				if (core == null)
+				{
+					Debug.LogError("No Map Core found");
+					return;
+				}
 				core.MapboxMap.ClearCachedData();
 			}
 			else
