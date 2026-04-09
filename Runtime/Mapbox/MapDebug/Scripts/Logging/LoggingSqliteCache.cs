@@ -21,6 +21,11 @@ namespace Mapbox.MapDebug.Scripts.Logging
         private int _getCount = 0;
         private int _updateCount = 0;
         private int _removeCount = 0;
+
+        public int AddCount => _addCount;
+        public int GetCount => _getCount;
+        public int UpdateCount => _updateCount;
+        public int RemoveCount => _removeCount;
         
         public LoggingSqliteCache(TaskManager taskManager, uint? maxTileCount = null, string folderNamePostFix = "") : base(taskManager, maxTileCount, folderNamePostFix)
         {

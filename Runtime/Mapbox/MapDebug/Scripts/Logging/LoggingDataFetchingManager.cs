@@ -4,6 +4,7 @@ using Mapbox.BaseModule.Data.DataFetchers;
 using Mapbox.BaseModule.Data.Platform;
 using Mapbox.BaseModule.Data.Platform.TileJSON;
 using Mapbox.BaseModule.Data.Tiles;
+using Mapbox.MapDebug.Scripts.Benchmark;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ namespace Mapbox.MapDebug.Scripts.Logging
 {
     public class LoggingDataFetchingManager : DataFetchingManager, ILogWriter
     {
-        public LoggingResilientWebRequestFileSource FileSource => _fileSource as LoggingResilientWebRequestFileSource;
+        public LoggingResilientWebRequestFileSource FileSource => (_cacheOnlySource != null ? _cacheOnlySource.Inner : _fileSource) as LoggingResilientWebRequestFileSource;
         public Queue<FetchInfo> GetFetchingQueue() => _fetchQueue;
         public int FetchQueueCount => _fetchQueue.Count;
         public int ActiveFetchCount => _globalActiveRequests.Count;
@@ -21,10 +22,15 @@ namespace Mapbox.MapDebug.Scripts.Logging
 
         public Dictionary<string, HashSet<FetchInfo>> _infosByTileset;
         public Dictionary<FetchInfo, InfoRecord> Records;
-		
+
+        private CacheOnlyFileSource _cacheOnlySource;
+        public CacheOnlyFileSource CacheOnlySource => _cacheOnlySource;
+
         public LoggingDataFetchingManager(string getAccessToken, Func<string> getSkuToken) : base(getAccessToken, getSkuToken)
         {
-            _fileSource = new LoggingResilientWebRequestFileSource(getAccessToken, getSkuToken);
+            var loggingSource = new LoggingResilientWebRequestFileSource(getAccessToken, getSkuToken);
+            _cacheOnlySource = new CacheOnlyFileSource(loggingSource);
+            _fileSource = _cacheOnlySource;
             _infosByTileset = new Dictionary<string, HashSet<FetchInfo>>();
             Records = new Dictionary<FetchInfo, InfoRecord>();
 			

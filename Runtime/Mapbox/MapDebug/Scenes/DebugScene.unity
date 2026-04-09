@@ -776,7 +776,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -966,70 +966,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 479cc577c72ab461e9808c2768401acc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &1263211402
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1263211404}
-  - component: {fileID: 1263211403}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1263211403
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1263211402}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: defaaf886f6a45359874b07a2bca6ea7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Settings:
-    ElevationLayerType: 1
-    LoadBackgroundTextures: 1
-    UseShaderTerrain: 1
-    DataSettings:
-      UseRetinaTextures: 1
-      UseNonReadableTextures: 1
-      CacheSize: 100
-      ClampDataLevelToMax: 14
-    RejectTilesOutsideZoom: {x: 10, y: 25}
-    ElevationLayerProperties:
-      modificationOptions:
-        SimplificationFactor: 1
-      unityLayerOptions:
-        addToLayer: 0
-        layerId: 0
-      sideWallOptions:
-        isActive: 0
-        wallHeight: 0.1
-      TileMeshSize: 1
---- !u!4 &1263211404
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1263211402}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 14.142136, z: -14.142134}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1316629397
 GameObject:
   m_ObjectHideFlags: 0
@@ -1043,6 +979,9 @@ GameObject:
   - component: {fileID: 1316629398}
   - component: {fileID: 1316629405}
   - component: {fileID: 1316629406}
+  - component: {fileID: 1316629407}
+  - component: {fileID: 1316629408}
+  - component: {fileID: 1316629409}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -1064,6 +1003,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TileMaterials:
   - {fileID: 2100000, guid: f2816af7f49d74c41ad118fd2a83f442, type: 2}
+  InstanceMaterials: 1
   CacheSize: 25
 --- !u!114 &1316629399
 MonoBehaviour:
@@ -1084,13 +1024,15 @@ MonoBehaviour:
     _latitudeLongitudeString: 60.1715079,24.944684
     _zoom: 12
   UnityContext:
+    LocationPermissionState: 0
     MapRoot: {fileID: 1316629400}
     BaseTileRoot: {fileID: 1316629400}
     RuntimeGenerationRoot: {fileID: 1316629400}
-  CacheManager: {fileID: 0}
-  InitializeOnStart: 1
   _tileCreatorBehaviour: {fileID: 1316629398}
-  TileProvider: {fileID: 2054936219}
+  TileProvider: {fileID: 0}
+  CacheManagerBehaviour: {fileID: 0}
+  LocationFactory: {fileID: 0}
+  InitializeOnStart: 1
 --- !u!4 &1316629400
 Transform:
   m_ObjectHideFlags: 0
@@ -1127,6 +1069,7 @@ MonoBehaviour:
       UseNonReadableTextures: 1
       CacheSize: 100
       ClampDataLevelToMax: 25
+    RejectTilesOutsideZoom: {x: 2, y: 25}
 --- !u!114 &1316629406
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1136,65 +1079,89 @@ MonoBehaviour:
   m_GameObject: {fileID: 1316629397}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e26018fdf6f744a8f91d39af05c9e3f0, type: 3}
+  m_Script: {fileID: 11500000, guid: e13965577acb456182a04c56586cb36e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ModuleConstructorScripts:
-  - {fileID: 1263211403}
-  - {fileID: 1319891868}
---- !u!1 &1319891867
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1319891869}
-  - component: {fileID: 1319891868}
-  m_Layer: 0
-  m_Name: GameObject (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1319891868
+  _layerVisualizers:
+  - {fileID: 11400000, guid: 8d3d5aeafe2ec4bceac941f750c1f21d, type: 2}
+--- !u!114 &1316629407
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1319891867}
+  m_GameObject: {fileID: 1316629397}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 13ef846e428d4d41b3827620e39b8a6a, type: 3}
+  m_Script: {fileID: 11500000, guid: 060ed83d953754ec59af198ae193d333, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vectorModuleSettings:
-    SourceType: 0
-    CustomSourceId: 
-    DataSettings:
-      CacheSize: 100
-      ClampDataLevelToMax: 16
-    RejectTilesOutsideZoom: {x: 12, y: 16}
-  _layerVisualizers:
-  - {fileID: 11400000, guid: 93ded54f2ef0640809b3d199fe06e961, type: 2}
---- !u!4 &1319891869
-Transform:
+  MapBehaviour: {fileID: 1316629399}
+  ShowOverlay: 1
+  MaxFrames: 36000
+  Standalone: 0
+  DumpKey: 288
+--- !u!114 &1316629408
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1319891867}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 14.142136, z: -14.142134}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_GameObject: {fileID: 1316629397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76f36d3b7abbd46ff8189f90b112bc84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MapBehaviour: {fileID: 0}
+  ShowOverlay: 1
+  Standalone: 0
+  DumpKey: 291
+--- !u!114 &1316629409
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1316629397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fab4bf2e7d348403d92dbf251e67b833, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Map: {fileID: 1316629399}
+  StartLat: 40.7128
+  StartLng: -74.006
+  EndLat: 40.758
+  EndLng: -73.9855
+  StartZoom: 16
+  EndZoom: 16
+  StartPitch: 45
+  EndPitch: 45
+  StartBearing: 0
+  EndBearing: 90
+  AnimationDuration: 10
+  PingPong: 1
+  PingPongCycles: 2
+  CollectNetworkStats: 1
+  CollectCacheStats: 1
+  CollectTaskStats: 1
+  CollectTileStats: 1
+  CollectSystemStats: 1
+  PreCacheData: 1
+  CacheOnlyMode: 1
+  ShowStatsOverlay: 1
+  AutoStart: 1
+  StopKey: 293
+  OutputDirectory: 
+  PreCacher: {fileID: 0}
+  VideoRecorder: {fileID: 0}
+  NetworkStats: {fileID: 0}
+  CacheStats: {fileID: 1316629408}
+  TaskStats: {fileID: 0}
+  TileStats: {fileID: 0}
+  SystemStats: {fileID: 1316629407}
+  CurrentPhase: 0
 --- !u!1 &1343896679
 GameObject:
   m_ObjectHideFlags: 0
@@ -1541,12 +1508,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2054936215}
-  - component: {fileID: 2054936217}
   - component: {fileID: 2054936216}
-  - component: {fileID: 2054936218}
-  - component: {fileID: 2054936219}
-  - component: {fileID: 2054936214}
-  - component: {fileID: 2054936220}
+  - component: {fileID: 2054936221}
   m_Layer: 0
   m_Name: Utility
   m_TagString: Untagged
@@ -1554,18 +1517,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2054936214
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2054936213}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a4890611d70ec425e8901751ad503087, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &2054936215
 Transform:
   m_ObjectHideFlags: 0
@@ -1596,7 +1547,7 @@ MonoBehaviour:
   MapBehaviour: {fileID: 1316629399}
   Camera: {fileID: 985205834}
   ShiftRange: {x: 2000, y: 2000}
---- !u!114 &2054936217
+--- !u!114 &2054936221
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1605,72 +1556,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 2054936213}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c673659314f1548f590cf1f8ba13da92, type: 3}
+  m_Script: {fileID: 11500000, guid: 0439abe6d989b44a38eb2f8b633769fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MapBehaviour: {fileID: 1316629399}
   Camera: {fileID: 985205834}
   Core:
-    Pitch: 30
+    Pitch: 15
     Bearing: 0
-    CameraDistance: 20
-    PanEnabled: 1
-    _rotationSettings:
-      Enabled: 1
-      Speed: 50
-      rotationMode: 0
-      MapRoot: {fileID: 0}
-    _zoomSettings:
-      Enabled: 1
-      Speed: 0.25
-      ZoomAtCursor: 1
---- !u!114 &2054936218
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2054936213}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: acc29dd13133c204f9e5ac8c53f4d266, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MapBehaviour: {fileID: 1316629399}
-  Width: 5
---- !u!114 &2054936219
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2054936213}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2da0fe21ba3934f29b8bc45ce25425c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Settings:
-    Camera: {fileID: 985205834}
-    MinimumZoomLevel: 3
-    MaximumZoomLevel: 22
---- !u!114 &2054936220
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2054936213}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ebdd7f26e97e24a81ba627ec6de69bd8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Camera: {fileID: 985205834}
-  MapBehaviour: {fileID: 1316629399}
-  Color: {r: 1, g: 1, b: 1, a: 1}
-  Color2: {r: 0, g: 0, b: 0, a: 0}
-  TileIdFontSize: 40
+    Speed: -1
+    CameraDistance: 0
+    _targetPosition: {x: 0, y: 0, z: 0}
+    RotationSpeed: 50
+    CameraCurve: {fileID: 11400000, guid: e887d93d4b690437fa30a6cc54adc7e8, type: 2}
+    CamDistanceMultiplier: 2
+    ZoomSpeed: 0.25
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1681,5 +1581,3 @@ SceneRoots:
   - {fileID: 2054936215}
   - {fileID: 166616397}
   - {fileID: 1863849552}
-  - {fileID: 1263211404}
-  - {fileID: 1319891869}
