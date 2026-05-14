@@ -115,7 +115,11 @@ namespace Mapbox.LocationModule
 			}
 #endif
 
-			Input.location.Start();
+			// Don't call Input.location.Start() here — PollLocationRoutine below calls
+			// _locationService.Start(_desiredAccuracyInMeters, _updateDistanceInMeters)
+			// at line ~182 with the configured accuracy/distance. The eager parameterless
+			// Start() in Awake triggers [CLLocationManager authorizationStatus] on the
+			// main thread, producing the iOS "method can cause UI unresponsiveness" warning.
 			_currentLocation.Provider = "unity";
 			_wait1sec = new WaitForSeconds(1f);
 			_waitUpdateTime = _updateTimeInMilliSeconds < 500 ? new WaitForSeconds(0.5f) : new WaitForSeconds((float)_updateTimeInMilliSeconds / 1000.0f);

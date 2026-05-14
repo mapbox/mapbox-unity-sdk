@@ -49,15 +49,11 @@ namespace Mapbox.BaseModule.Telemetry
 
 		public void SetLocationCollectionState(bool enable)
 		{
-			if (enable)
-			{
-				Input.location.Start();
-			}
-			else
-			{
-				Input.location.Stop();
-			}
-
+			// Don't call Input.location.Start()/Stop() here — DeviceLocationProvider owns the
+			// location service for map rendering, and the parameterless Start() triggers
+			// [CLLocationManager authorizationStatus] on the main thread (iOS warns about
+			// UI unresponsiveness). This used to enable telemetry-side location collection;
+			// telemetry is non-essential and is already gated by setEventsCollectionState below.
 			setEventsCollectionStateForEnableCollection(enable);
 		}
 	}
