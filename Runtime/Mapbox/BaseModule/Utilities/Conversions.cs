@@ -132,16 +132,15 @@ namespace Mapbox.BaseModule.Utilities
 		{
 			return LatitudeLongitudeToWorldPosition(latLong.Latitude, latLong.Longitude, refPoint, scale);
 		}
-		
-		
-		
-		/// <summary>
-		/// Convert a simple string to a latitude longitude.
-		/// Expects format: latitude, longitude
-		/// </summary>
-		/// <returns>The lat/lon as Vector2d.</returns>
-		/// <param name="s">string.</param>
-		public static LatitudeLongitude StringToLatLon(string s)
+
+
+        /// <summary>
+        /// Convert a simple string to a latitude longitude.
+        /// Expects format: latitude, longitude
+        /// </summary>
+        /// <returns>The lat/lon as Vector2d.</returns>
+        /// <param name="s">string.</param>
+        public static LatitudeLongitude StringToLatLon(string s)
 		{
 			var latLonSplit = s.Split(',');
 			if (latLonSplit.Length != 2)
@@ -219,7 +218,9 @@ namespace Mapbox.BaseModule.Utilities
 		public static Vector3 TileTopLeftInUnitySpace(CanonicalTileId unwrappedTileId, Vector2d worldCenter, float scale)
 		{
 			var res = InitialResolution / PowerTable2[unwrappedTileId.Z];
-			var minX = (float)(((unwrappedTileId.X * TileSize) * res - OriginShift) - worldCenter.x) / scale;
+			var xMeters = (unwrappedTileId.X * TileSize) * res - OriginShift;
+			xMeters = WrapWorldX(xMeters, worldCenter.x);
+			var minX = (float)((xMeters - worldCenter.x) / scale);
 			var minY = (float)((-((unwrappedTileId.Y * TileSize * res) - OriginShift)) - worldCenter.y) / scale;
 			return new Vector3(minX, 0, minY);
 		}
@@ -239,6 +240,13 @@ namespace Mapbox.BaseModule.Utilities
 				(unwrappedTileId.X + 1) * TileSize,
 				(unwrappedTileId.Y + 1) * TileSize,
 				unwrappedTileId.Z);
+			var centerX = (min.x + max.x) * 0.5;
+			var shift = Math.Round((centerX - worldCenter.x) / (OriginShift * 2.0)) * (OriginShift * 2.0);
+			if (shift != 0.0)
+			{
+				min.x -= shift;
+				max.x -= shift;
+			}
 			return new RectD((min - worldCenter)/scale, (max - min)/scale);
 		}
 		
@@ -256,6 +264,13 @@ namespace Mapbox.BaseModule.Utilities
 			return (40075017f / PowerTable2[unwrappedTileId.Z]);
 		}
 
+		private static double WrapWorldX(double x, double worldCenterX)
+		{
+			var worldWidth = OriginShift * 2.0;
+			var shift = Math.Round((x - worldCenterX) / worldWidth) * worldWidth;
+			return x - shift;
+		}
+
 		public static RectD TileBoundsInUnitySpace(UnwrappedTileId unwrappedTileId, Vector2d worldCenter, float scale)
 		{
 			var min = PixelsToMeters(
@@ -266,6 +281,13 @@ namespace Mapbox.BaseModule.Utilities
 				(unwrappedTileId.X + 1) * TileSize,
 				(unwrappedTileId.Y + 1) * TileSize,
 				unwrappedTileId.Z);
+			var centerX = (min.x + max.x) * 0.5;
+			var shift = Math.Round((centerX - worldCenter.x) / (OriginShift * 2.0)) * (OriginShift * 2.0);
+			if (shift != 0.0)
+			{
+				min.x -= shift;
+				max.x -= shift;
+			}
 			return new RectD((min - worldCenter)/scale, (max - min)/scale);
 		}
 		
