@@ -71,3 +71,8 @@ Runtime/Mapbox/VectorModule/MeshGeneration/.idea
 # Internal benchmark tool, kept local-only
 Runtime/Mapbox/Example/Scripts/TileProviderBenchmark.cs
 Runtime/Mapbox/Example/Scripts/TileProviderBenchmark.cs.meta
+
+# Claude Code local config, kept local-only
+CLAUDE.md
+CLAUDE.md.meta
+.claude/
