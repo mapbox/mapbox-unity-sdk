@@ -1,5 +1,36 @@
 ## CHANGELOG
 
+### v3.1.1
+
+Patch release. Reclassifies `com.unity.inputsystem` from a soft to a **hard** package dependency and switches the example-assembly `#if` gate from package presence to Player Settings, restoring compilation on Unity 6+ projects where the input system package ships preinstalled. Existing legacy-input projects updating from 3.1.0 see no runtime behavior change.
+
+#### Why this exists
+
+In 3.1.0 the SDK declared `com.unity.inputsystem` as a soft dependency: source code branched on a `MAPBOX_NEW_INPUT_SYSTEM` define wired via `versionDefines` (set when the package is installed), but `MapboxExamples.asmdef` did not actually reference `Unity.InputSystem`. On Unity 6+ — where the input system package is installed by default — the `#if MAPBOX_NEW_INPUT_SYSTEM` branch activated, the `using UnityEngine.InputSystem` failed to resolve at the asmdef level, and the entire Examples assembly failed to compile.
+
+The mirror failure mode (asmdef referencing `Unity.InputSystem` without the package installed → unresolved-reference compile error in 2022.3 legacy projects) ruled out simply restoring the reference. Source-side `#if` cannot bridge this because asmdef reference resolution happens before C# preprocessing.
+
+This release resolves the trade-off by treating the package as a hard dependency that's always installed, and gating the source-side branch on a Unity built-in define that's only set when the user explicitly opts in via Player Settings.
+
+#### Changed
+
+- `com.unity.inputsystem` (>= 1.7.0) is declared in `package.json` `dependencies`. UPM auto-installs it on next package refresh. The package coexists with legacy input; installation alone does not change runtime behavior.
+- `PointerInput.cs` now gates on Unity's built-in `ENABLE_INPUT_SYSTEM` define (set by Player → Active Input Handling = "New" or "Both") instead of `MAPBOX_NEW_INPUT_SYSTEM`. Existing legacy-input projects keep running the `#else` branch until the user explicitly switches Active Input Handling.
+- `MapboxExamples.asmdef` references `Unity.InputSystem` directly and drops the `MAPBOX_NEW_INPUT_SYSTEM` `versionDefines` block (no longer used).
+
+#### Upgrading an existing project
+
+For the common case — Unity 2022.3 project, Active Input Handling = "Old", no prior `com.unity.inputsystem` install — no action is required. After the SDK update, UPM installs the input system package (~2 MB), Active Input Handling stays "Old", and every code path runs the same legacy implementation it did before.
+
+If the upgrade goes wrong, in roughly decreasing order of likelihood:
+
+- **Stale compile errors that mention `UnityEngine.InputSystem` or `MAPBOX_NEW_INPUT_SYSTEM`** — Unity's `Library/` cache hasn't picked up the new package. Close Unity, delete `Library/`, reopen. Unity re-resolves packages and reimports.
+- **Package Manager reports "cannot resolve com.unity.inputsystem"** — the project is on Unity < 2022.3, which the SDK does not support, or a project-side `Packages/manifest.json` override pins an incompatible version. Bump the project's Unity version or relax the version constraint.
+- **Map cameras stop responding to mouse / touch after the update** — should not happen if Active Input Handling matches what it was before; if it does, verify Project Settings → Player → Active Input Handling is still set to your prior choice. Unity does not change this setting when a package is auto-installed, but a manual setting flip during the update would explain the symptom.
+- **Yellow Inspector warning on `StandaloneInputModule` asking to "Replace with InputSystemUIInputModule"** — cosmetic, appears only under Active Input Handling = "New" / "Both". One-click swap on the EventSystem inspector if you want to clear it; runtime is unaffected.
+- **UGUI throws `InvalidOperationException: You are trying to read Input using the UnityEngine.Input class…` under Active Input Handling = "New" only** — Unity's default `StandaloneInputModule` reads through `UnityEngine.Input.*`, which throws under New-only. Either set Active Input Handling to "Both" (legacy stays available for UGUI), or click "Replace with InputSystemUIInputModule" on the EventSystem inspector.
+- **You want to remove `com.unity.inputsystem` entirely from your project** — UPM blocks removal because the SDK declares it as a dependency. The de facto opt-out is to leave it installed and set Active Input Handling = "Old"; the package is then dead weight on disk but runtime is identical to legacy-only. For a true physical removal, edit the SDK's `package.json` to drop the `com.unity.inputsystem` line and remove the matching GUID reference from `MapboxExamples.asmdef`. Requires the SDK to be in an editable location (e.g. embedded under `Packages/`, not in `Library/PackageCache/`).
+
 ### v3.1.0
 
 Minor-version bump per semver: this release contains source-breaking API changes (listed below) alongside substantial feature work in camera/input, tile LOD, and terrain rendering. The 3.0.7 designation was previously used in development; published 3.0.7 builds, if any, are superseded by 3.1.0.
