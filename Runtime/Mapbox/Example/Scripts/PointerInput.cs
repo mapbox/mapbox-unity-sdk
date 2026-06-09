@@ -1,5 +1,5 @@
 using UnityEngine;
-#if MAPBOX_NEW_INPUT_SYSTEM
+#if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 using NewTouch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 using NewTouchPhase = UnityEngine.InputSystem.TouchPhase;
@@ -24,10 +24,15 @@ namespace Mapbox.Example.Scripts.MapInput
 
 	/// <summary>
 	/// Thin abstraction over Unity's two input backends. <see cref="PointerInput"/>
-	/// has exactly one of two implementations compiled in, selected by the
-	/// MAPBOX_NEW_INPUT_SYSTEM define (which the asmdef's versionDefines sets when
-	/// com.unity.inputsystem is installed). MapInput.cs talks only to this interface,
-	/// so the rest of the camera/input layer stays free of #if branching.
+	/// has exactly one of two implementations compiled in, selected by Unity's
+	/// built-in <c>ENABLE_INPUT_SYSTEM</c> define (set when Active Input Handling
+	/// in Player Settings is "New" or "Both"). Gating on <c>ENABLE_INPUT_SYSTEM</c>
+	/// rather than package presence is intentional: <c>com.unity.inputsystem</c> is
+	/// a hard dependency of this package, so it's always installed, but existing
+	/// legacy-input projects must keep running the <c>#else</c> branch until the
+	/// user explicitly opts in via Active Input Handling. MapInput.cs talks only
+	/// to this interface, so the rest of the camera/input layer stays free of
+	/// #if branching.
 	/// </summary>
 	internal interface IPointerInput
 	{
@@ -62,7 +67,7 @@ namespace Mapbox.Example.Scripts.MapInput
 		float MouseScrollY { get; }
 	}
 
-#if MAPBOX_NEW_INPUT_SYSTEM
+#if ENABLE_INPUT_SYSTEM
 	internal sealed class PointerInput : IPointerInput
 	{
 		public void EnableTouchSupport()
