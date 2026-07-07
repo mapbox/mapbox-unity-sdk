@@ -47,7 +47,7 @@ Resolved automatically by UPM:
 | `com.unity.render-pipelines.universal` | `10.10.1` | Yes | Terrain and building shaders ship as URP Shader Graphs. |
 | `com.unity.nuget.newtonsoft-json` | `3.2.1` | Yes | JSON parsing for tile metadata and API responses. |
 | `com.unity.burst` | `1.8.12` | Yes | Burst-compiled terrain decode and collider job. First-time domain reload pays a one-shot AOT compile. |
-| `com.unity.inputsystem` | any | Optional | If installed, camera input uses the new Input System (auto-set `MAPBOX_NEW_INPUT_SYSTEM` define). If absent, falls back to legacy `UnityEngine.Input`. |
+| `com.unity.inputsystem` | `1.7.0` | Yes | Camera input backend selection is controlled by Player Settings → Active Input Handling, not by this dependency; "Old" (default) keeps legacy `UnityEngine.Input` behavior. See `Documentation~/CameraSystem.md`. |
 
 ---
 

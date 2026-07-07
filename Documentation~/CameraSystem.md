@@ -102,12 +102,12 @@ Zoom at cursor works with both mouse and touch — when using pinch, the zoom ce
 
 ## Input System Support
 
-The cameras work with both Unity's legacy Input Manager and the new Input System package. The active path is selected at compile time:
+The cameras work with both Unity's legacy Input Manager and the new Input System package. `com.unity.inputsystem` is a hard dependency of the SDK (UPM installs it automatically), but the active code path is selected by Player Settings, not by package presence:
 
-- **Default (no Input System package installed)** — uses the legacy `UnityEngine.Input` API. No action needed.
-- **With `com.unity.inputsystem` installed** — the example asmdef declares a `versionDefines` entry that automatically defines `MAPBOX_NEW_INPUT_SYSTEM`. The new-input branch activates and reads pointer state via `Mouse.current` / `Touch.activeTouches`.
+- **Active Input Handling = "Input Manager (Old)" (default)** — uses the legacy `UnityEngine.Input` API. No action needed, and this is unchanged by the package being installed.
+- **Active Input Handling = "Input System Package (New)" or "Both"** — Unity defines the built-in `ENABLE_INPUT_SYSTEM` symbol, which activates the new-input branch. Pointer state is read via `Mouse.current` / `Touch.activeTouches`.
 
-The Input System package is *not* a hard dependency of the SDK — projects that don't install it keep the legacy path with no extra setup. Projects that set **Active Input Handling** to "Input System Package (New)" only must install the package; otherwise `UnityEngine.Input` is unavailable at runtime.
+Installing `com.unity.inputsystem` alone does not change which path runs — only flipping Active Input Handling does. See the [CHANGELOG](../CHANGELOG.md#v311) for why the SDK moved from a soft dependency gated on package presence to this model.
 
 ---
 

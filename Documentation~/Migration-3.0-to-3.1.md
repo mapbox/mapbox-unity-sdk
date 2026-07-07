@@ -23,7 +23,7 @@ The new dependency is resolved automatically by UPM:
 | Dependency | Status | Why |
 | --- | --- | --- |
 | `com.unity.burst@1.8.12` | **New required dep** | Terrain-RGB decode and collider vertex fill are now Burst jobs. |
-| `com.unity.inputsystem` | **Soft dep (unchanged)** | If installed, the SDK auto-uses the new Input System via a `MAPBOX_NEW_INPUT_SYSTEM` define from `versionDefines`. If absent, the SDK falls back to legacy `UnityEngine.Input`. No project-side action either way. |
+| `com.unity.inputsystem@1.7.0` | **New required dep (as of v3.1.1)** | Hard dependency, auto-installed by UPM. Which input path runs is controlled by Player Settings → Active Input Handling, not by package presence — see [CameraSystem.md](CameraSystem.md#input-system-support). Projects on "Input Manager (Old)" (the default) see no behavior change. |
 
 ---
 
