@@ -22,6 +22,7 @@ namespace Mapbox.Example.Editor
         private GUIStyle _boxStyle;
 
         private bool _overrideModulesFold = false;
+        private bool _settingsFold = false;
 
         private void OnEnable()
         {
@@ -74,7 +75,7 @@ namespace Mapbox.Example.Editor
             using (new EditorGUILayout.VerticalScope(_boxStyle))
             {
                 _overrideModulesFold = EditorGUILayout.Foldout(_overrideModulesFold, "Override Modules");
-                if (!_overrideModulesFold)
+                if (_overrideModulesFold)
                 {
                     EditorGUILayout.PropertyField(_tileCreatorProp, new GUIContent("Tile Creator Behaviour"));
                     EditorGUILayout.PropertyField(_tileProviderProp, new GUIContent("Tile Provider"));
@@ -93,8 +94,8 @@ namespace Mapbox.Example.Editor
             EditorGUILayout.Space(8);
             using (new EditorGUILayout.VerticalScope(_boxStyle))
             {
-                _overrideModulesFold = EditorGUILayout.Foldout(_overrideModulesFold, "Settings");
-                if (!_overrideModulesFold)
+                _settingsFold = EditorGUILayout.Foldout(_settingsFold, "Settings");
+                if (_settingsFold)
                 {
                     EditorGUILayout.PropertyField(_initializeOnStart, new GUIContent("Initialize On Start"));
                     EditorGUILayout.PropertyField(_defaultTileMaterialProp, new GUIContent("Default Tile Material"));
