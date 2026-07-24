@@ -77,8 +77,6 @@ namespace Mapbox.DirectionsApi.Samples
 		{
 			if (_mapboxDirections == null) return;
 
-			Label.transform.position = _camera.WorldToScreenPoint(FirstPoint);
-
 			if (Input.GetKey(KeyCode.LeftCommand) && Input.GetMouseButtonDown(0))
 			{
 				if (!IsFirstPointSet)
@@ -88,7 +86,7 @@ namespace Mapbox.DirectionsApi.Samples
 					startMarker.transform.position = FirstPoint;
 					startMarker.SetActive(true);
 					finishMarker.SetActive(false);
-					Label.SetActive(false);
+					if (Label != null) Label.SetActive(false);
 					foreach (var go in _gos)
 					{
 						Destroy(go);
@@ -113,6 +111,13 @@ namespace Mapbox.DirectionsApi.Samples
 					IsSecondPointSet = false;
 				}
 			}
+		}
+
+		public void LateUpdate()
+		{
+			if (_mapboxDirections == null || Label == null) return;
+
+			Label.transform.position = _camera.WorldToScreenPoint(FirstPoint);
 		}
 
 		private void CreateRequest()
@@ -170,8 +175,11 @@ namespace Mapbox.DirectionsApi.Samples
 					_gos.Add(vectorEntity.GameObject);
 				}
 
-				Label.GetComponentInChildren<Text>().text = string.Format(_labelFormat, response.Routes[0].Distance);
-				Label.SetActive(true);
+				if (Label != null)
+				{
+					Label.GetComponentInChildren<Text>().text = string.Format(_labelFormat, response.Routes[0].Distance);
+					Label.SetActive(true);
+				}
 			});
 		}
 
