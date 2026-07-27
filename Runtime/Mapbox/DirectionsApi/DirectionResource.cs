@@ -44,6 +44,9 @@ namespace Mapbox.DirectionsApi
 		// Optional
 		private bool? steps;
 
+		// Optional
+		private AnnotationOptions? annotations;
+
 		/// <summary> Initializes a new instance of the <see cref="DirectionResource" /> class.</summary>
 		/// <param name="coordinates">
 		///     Array of LatLng points along route, between 2 and 25 elements in length.
@@ -200,6 +203,23 @@ namespace Mapbox.DirectionsApi
 		}
 
 		/// <summary>
+		///     Gets or sets the annotations option. Requests additional per-segment metadata along the route,
+		///     exposed on <see cref="Response.Leg.Annotation"/>. Requesting annotations requires
+		///     <see cref="Overview"/> to be set to <see cref="Overview.Full"/>, otherwise the API returns an error.
+		///     Congestion annotations are only available for the <c>mapbox/driving-traffic</c> profile
+		///     (<see cref="RoutingProfile.DrivingTraffic"/>).
+		/// </summary>
+		public AnnotationOptions? Annotations {
+			get {
+				return this.annotations;
+			}
+
+			set {
+				this.annotations = value;
+			}
+		}
+
+		/// <summary>
 		/// Gets the URL string.
 		/// </summary>
 		/// <returns>The URL string.</returns>
@@ -235,6 +255,11 @@ namespace Mapbox.DirectionsApi
 			if (this.Steps != null)
 			{
 				opts.Add("steps", this.Steps.ToString().ToLower());
+			}
+
+			if (this.Annotations != null && this.Annotations.Value != AnnotationOptions.None)
+			{
+				opts.Add("annotations", this.Annotations.Value.ToQueryString());
 			}
 
 			return Constants.Map.BaseAPI +

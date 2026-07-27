@@ -349,5 +349,73 @@ namespace Mapbox.DirectionsApiTests
 
             Assert.IsTrue(url.Contains("mapbox/cycling/"));
         }
+
+        [Test]
+        public void Annotations_DefaultsToNull()
+        {
+            var resource = new DirectionResource(_validCoordinates, RoutingProfile.DrivingTraffic);
+            Assert.IsNull(resource.Annotations);
+        }
+
+        [Test]
+        public void Annotations_CanBeSet()
+        {
+            var resource = new DirectionResource(_validCoordinates, RoutingProfile.DrivingTraffic);
+            resource.Annotations = AnnotationOptions.Congestion;
+
+            Assert.AreEqual(AnnotationOptions.Congestion, resource.Annotations.Value);
+        }
+
+        [Test]
+        public void GetUrl_IncludesAnnotationsWhenSet()
+        {
+            var resource = new DirectionResource(_validCoordinates, RoutingProfile.DrivingTraffic);
+            resource.Annotations = AnnotationOptions.Congestion;
+            var url = resource.GetUrl();
+
+            Assert.IsTrue(url.Contains("annotations=congestion"));
+        }
+
+        [Test]
+        public void GetUrl_OmitsAnnotationsWhenNone()
+        {
+            var resource = new DirectionResource(_validCoordinates, RoutingProfile.DrivingTraffic);
+            resource.Annotations = AnnotationOptions.None;
+            var url = resource.GetUrl();
+
+            Assert.IsFalse(url.Contains("annotations="));
+        }
+
+        [Test]
+        public void GetUrl_CombinesMultipleAnnotations()
+        {
+            var resource = new DirectionResource(_validCoordinates, RoutingProfile.DrivingTraffic);
+            resource.Annotations = AnnotationOptions.Congestion | AnnotationOptions.Speed;
+            var url = resource.GetUrl();
+
+            Assert.IsTrue(url.Contains("annotations="));
+            Assert.IsTrue(url.Contains("congestion"));
+            Assert.IsTrue(url.Contains("speed"));
+        }
+
+        [Test]
+        public void AnnotationOptions_ToQueryString_JoinsSetFlagsInApiOrder()
+        {
+            var value = (AnnotationOptions.Speed | AnnotationOptions.Congestion).ToQueryString();
+            Assert.AreEqual("speed,congestion", value);
+        }
+
+        [Test]
+        public void AnnotationOptions_ToQueryString_UsesSnakeCaseTokens()
+        {
+            var value = (AnnotationOptions.CongestionNumeric | AnnotationOptions.MaxSpeed).ToQueryString();
+            Assert.AreEqual("congestion_numeric,maxspeed", value);
+        }
+
+        [Test]
+        public void AnnotationOptions_ToQueryString_ReturnsEmptyForNone()
+        {
+            Assert.AreEqual(string.Empty, AnnotationOptions.None.ToQueryString());
+        }
     }
 }
