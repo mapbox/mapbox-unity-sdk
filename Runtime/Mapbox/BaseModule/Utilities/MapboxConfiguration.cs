@@ -42,12 +42,8 @@ namespace Mapbox.BaseModule.Utilities
 			private string _mapboxBillingServiceClassName = "com.mapbox.common.BillingService";
 			private string _mapboxBillingServiceFactoryClassName = "com.mapbox.common.BillingServiceFactory";
 			private string _mapboxBillingFactoryGetMethodName = "getInstance";
-			private string _mapboxSdkInformationClassName = "com.mapbox.common.SdkInformation";
 			private string _mapboxUserSkuIdentifierClassName = "com.mapbox.common.UserSKUIdentifier";
 			private string _unityMausEnumName = "UNITY_MAUS";
-			private string _mapboxSdkInformationName = "Unity_SDK";
-			private string _mapboxSdkInformationVersion = "3.0.0";
-			private string _mapboxSdkInformationPackageName = "package_Name";
 			private string _mapboxSkuTokenMethodName = "getUserSKUToken";
 		
 			//Mapbox Options

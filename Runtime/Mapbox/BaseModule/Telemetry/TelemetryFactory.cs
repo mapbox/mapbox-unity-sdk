@@ -10,8 +10,8 @@
 			return TelemetryAndroid.Instance;
 #elif UNITY_IOS
 			return TelemetryIos.Instance;
-#elif UNITY_WEBGL
-			return TelemetryWebgl.Instance;
+#elif UNITY_STANDALONE_WIN
+			return TelemetryWindows.Instance;
 #else
 			return TelemetryFallback.Instance;
 #endif

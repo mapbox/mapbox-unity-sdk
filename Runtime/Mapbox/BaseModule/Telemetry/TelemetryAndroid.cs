@@ -19,7 +19,6 @@ namespace Mapbox.BaseModule.Telemetry
 
 		//Telemetry
 		private AndroidJavaObject _telemInstance = null;
-		private bool _telemetryInitializationState = false;
 		private string _mapboxTelemetryServiceClassName = "com.mapbox.common.TelemetryService";
 		private string _mapboxTelemetryServiceGetMethodName = "getOrCreate";
 		private string _couldNotGetClassMapboxTelemetryMessage = "Could not get class 'MapboxTelemetry'";
@@ -173,12 +172,10 @@ namespace Mapbox.BaseModule.Telemetry
 			if (_telemInstance == null)
 			{
 				Debug.LogError(_couldNotGetClassMapboxTelemetryMessage);
-				return;
 			}
-			else
-			{
-				_telemetryUtilsClass.CallStatic(_setEventsCollectionStatMethodName, _telemetryInitializationState, null);
-			}
+			// The events-collection state is set immediately after Initialize by
+			// ConfigureTelemetry -> SetLocationCollectionState(Configuration.TelemetryEnabled),
+			// so there is no need to force it here.
 		}
 	}
 }
