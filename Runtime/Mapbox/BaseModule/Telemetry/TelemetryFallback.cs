@@ -23,7 +23,7 @@ namespace Mapbox.BaseModule.Telemetry
 			}
 		}
 
-		public void Initialize(string accessToken)
+		public void Initialize(string accessToken, Func<string> getSkuToken)
 		{
 			_url = string.Format("{0}events/v2?access_token={1}", Constants.Map.EventsAPI, accessToken);
 		}

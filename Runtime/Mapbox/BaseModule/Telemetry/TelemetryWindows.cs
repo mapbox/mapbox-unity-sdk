@@ -20,6 +20,8 @@ namespace Mapbox.BaseModule.Telemetry
 	public class TelemetryWindows : ITelemetryLibrary
 	{
 		string _url;
+		string _accessToken;
+		Func<string> _getSkuToken;
 
 		// Reflects the user's telemetry opt-in/out (set via SetLocationCollectionState).
 		// Defaults to the same value as MapboxConfiguration.TelemetryEnabled.
@@ -31,8 +33,10 @@ namespace Mapbox.BaseModule.Telemetry
 			get { return _instance; }
 		}
 
-		public void Initialize(string accessToken)
+		public void Initialize(string accessToken, Func<string> getSkuToken)
 		{
+			_accessToken = accessToken;
+			_getSkuToken = getSkuToken;
 			_url = string.Format("{0}events/v2?access_token={1}", Constants.Map.EventsAPI, accessToken);
 		}
 
@@ -54,7 +58,30 @@ namespace Mapbox.BaseModule.Telemetry
 
 		public void SendSdkEvent()
 		{
-			// No SDK/billing event on the C# path (native-only, as on the Editor path).
+			// Billing/session ping — the C# equivalent of the native triggerUserBillingEvent.
+			// GET api.mapbox.com/sdk-sessions/v1?access_token=..&sku=<user SKU token>. Fires once
+			// per session (each map-context init / app launch), NOT throttled like the turnstile.
+			if (_getSkuToken == null || string.IsNullOrEmpty(_accessToken))
+			{
+				return;
+			}
+
+			var url = string.Format("{0}sdk-sessions/v1?access_token={1}&sku={2}",
+				Constants.Map.BaseAPI, _accessToken, _getSkuToken());
+			Runnable.Run(GetSdkSession(url));
+		}
+
+		IEnumerator GetSdkSession(string url)
+		{
+			using (var request = UnityWebRequest.Get(url))
+			{
+				yield return request.SendWebRequest();
+				if (request.result != UnityWebRequest.Result.Success)
+				{
+					Debug.LogWarning(string.Format("Mapbox SDK event failed: {0} {1}",
+						request.responseCode, request.error));
+				}
+			}
 		}
 
 		string GetPostBody()

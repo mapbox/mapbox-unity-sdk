@@ -131,7 +131,7 @@ namespace Mapbox.BaseModule.Map
             try
             {
                 _telemetryLibrary = TelemetryFactory.GetTelemetryInstance();
-                _telemetryLibrary.Initialize(Configuration.AccessToken);
+                _telemetryLibrary.Initialize(Configuration.AccessToken, Configuration.GetMapsSkuToken);
                 _telemetryLibrary.SetLocationCollectionState(Configuration.TelemetryEnabled);
                 _telemetryLibrary.SendTurnstile();
                 _telemetryLibrary.SendSdkEvent();

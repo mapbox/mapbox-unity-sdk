@@ -65,9 +65,10 @@ namespace Mapbox.BaseModule.Telemetry
 		private AndroidJavaObject _sdkInformation;
 		private AndroidJavaObject _unityEnum;
 		
-		public void Initialize(string accessToken)
+		public void Initialize(string accessToken, Func<string> getSkuToken)
 		{
-			
+			// getSkuToken is unused on Android — the native BillingService generates the SKU
+			// token internally for the billing event and tile requests.
 			_telemetryUtilsClass = new AndroidJavaClass(_mapboxTelemetryUtilsClassName);
 			
 			if (string.IsNullOrEmpty(accessToken))

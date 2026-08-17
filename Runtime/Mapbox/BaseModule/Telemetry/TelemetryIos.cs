@@ -28,8 +28,10 @@ namespace Mapbox.BaseModule.Telemetry
 		
 		[DllImport("__Internal")] private static extern string getUserSKUToken();
 		
-		public void Initialize(string accessToken)
+		public void Initialize(string accessToken, Func<string> getSkuToken)
 		{
+			// getSkuToken is unused on iOS — the native BillingService generates the SKU
+			// token internally for the billing event and tile requests.
 			_telemetryService = getOrCreateTelemetryService();
 			registerSdkInfo(Constants.SDK_IDENTIFIER, Constants.SDK_VERSION, Constants.PACKAGE_NAME);
 		}
