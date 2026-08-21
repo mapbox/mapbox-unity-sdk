@@ -52,6 +52,11 @@
             "displayName": "LandmarkDemoWithVector",
             "description": "Landmark Demo With Vector",
             "path": "Samples~/LandmarkDemoWithVector"
+        },
+        {
+            "displayName": "LandmarkTour",
+            "description": "Landmark Tour",
+            "path": "Samples~/LandmarkTour"
         }
     ]
 }

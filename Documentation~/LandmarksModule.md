@@ -86,6 +86,24 @@ Both connectors handle the case where landmarks and buildings load in either ord
 
 ---
 
+### The Landmark Tour Sample
+
+`LandmarkTour` is a third sample that shows the landmark set rather than a single landmark. It opens looking straight down on continental Europe and flies the camera to a chosen landmark when you press one of the buttons on the left. Satellite imagery supplies the ground, vector buildings and landmarks fill in close up, and there is no terrain module.
+
+Four things in that scene are worth understanding before you copy the pattern.
+
+**Module order decides whether a tile can show its texture.** `MapboxMapVisualizer.CreateTile` asks each layer module in turn whether it is ready and **breaks on the first one that says no**, so a module earlier in the list can stop a later one from running at all. `StaticApiLayerModule.LoadInstant` is the only code that binds a tile's own imagery, so if it sits behind a module that is still fetching, the tile shows a placeholder for as long as that module is busy. Modules are collected with `GetComponents`, which returns inspector order — so in this scene the imagery module is deliberately placed **above** the vector and landmark modules. This ordering is invisible in the Inspector and easy to lose by adding a component; if a scene ever goes uniformly flat-coloured while loading, check it first.
+
+**The Components module's zoom range is a trade.** `RejectTilesOutsideZoom` is `(12, 16)` here, its shipped default. `VectorLayerModule.LoadInstant` short-circuits to "ready" for tiles outside that range, so below zoom 12 the module is transparent and never holds a tile up. Widening it to draw vector content at continental zooms is possible — that is what `LandmarkTourComponentsModuleScript` exists for — but it turns the module into a gate across every zoom in the range, and Mapbox Streets has little to offer below zoom 12 beyond water and landuse. Widen it only if you actually need what it draws there.
+
+**Flights step through zoom and wait for tiles.** `MapFlightController` climbs, cruises and descends, but the climb and descent advance in steps of `ZoomLevelsPerStep` and wait up to `TileWaitTimeout` after each one for that level's tiles to arrive, via `MapboxMap.LoadTileCoverToMemory`. A continuous sweep does not work: the tile cover changes at every integer zoom crossing, while the fetch pipeline holds a queued request for 0.2 s before it may start and then starts only one per frame, so a fast sweep has each level's requests aborted at roughly the moment they become eligible. Nothing lands, and the placeholder falls back to the pinned zoom 0–2 world tiles, which magnified that far is a single flat colour. Stepping keeps detail within `ZoomLevelsPerStep` of the camera — at the default 2 that is about 256 source pixels across the view, which still reads as sharp. A typical flight is 2 to 3 seconds when the levels are cached and up to 7 or 8 when every step has to wait. `TileWaitTimeout: 0` restores the old racing behaviour if you want to see the difference.
+
+**The camera is never moved directly.** Every frame the flight pushes an interpolated view into `MapboxMap.ChangeView`, and `Moving3dCamera` follows because it subscribes to the map information's view events when it initializes. The flight disables `Moving3dCameraBehaviour` for its duration to keep user input out of the way, and writes the arrival zoom back into `Core.ZoomValue` afterwards so the first scroll does not jump. `MapCameraClipPlaneDriver` scales the near and far planes with the camera's distance from the map, which a scene spanning zoom 4 to 17 needs — and it runs off `ViewChanged` rather than `Update`, because the tile provider culls against the far plane and `ViewChanged` fires before the map redraws.
+
+Landmarks only load at zoom 14 and above, so every destination uses 17 or higher.
+
+---
+
 ### Further Reading
 
 For technical details on the collision detection algorithms, coordinate space transforms, tile edge handling, event lifecycle, and architecture, see [Landmarks Module Internals](LandmarksModuleInternals.md).
