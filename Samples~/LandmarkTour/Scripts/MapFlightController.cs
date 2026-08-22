@@ -13,15 +13,27 @@ namespace Mapbox.Samples.LandmarkTour
 {
     /// <summary>
     /// Flies the map view from wherever it is to a target view the way a globe viewer does
-    /// it: climb until the whole route is on screen, travel at that altitude, then descend
-    /// and tilt over the destination.
+    /// it: tilt to looking straight down, climb until the whole route is on screen, travel
+    /// at that altitude, descend, then tilt onto the destination's own pitch.
     ///
-    /// The three phases are explicit rather than blended, and that is the point. A single
-    /// eased interpolation from one close-up to another never actually climbs — both ends
-    /// are at zoom 17, so the map pans a thousand kilometres at street level and asks the
-    /// tile pipeline for every z16/z17 tile along the corridor. Pinning the centre during
-    /// the climb and descent, and only moving it at cruise altitude, means the tiles
-    /// requested are a few dozen coarse ones per zoom level over two fixed locations.
+    /// The phases are explicit rather than blended, and that is the point in two separate
+    /// ways. First, a single eased interpolation from one close-up to another never
+    /// actually climbs — both ends are at zoom 17, so the map pans a thousand kilometres at
+    /// street level and asks the tile pipeline for every z16/z17 tile along the corridor.
+    /// Pinning the centre during the climb and descent, and only moving it at cruise
+    /// altitude, means the tiles requested are a few dozen coarse ones per zoom level over
+    /// two fixed locations. Second, zoom and pitch are never animated in the same phase —
+    /// tilting always happens at a fixed zoom, and zoom-walking always happens at a fixed
+    /// pitch. See the note on <see cref="WalkZoom"/> for why: blending them let
+    /// <c>UnityTileProvider</c>'s quadtree split decision flip between "split into 4
+    /// children" and "don't split" across consecutive frames — and each flip drops tiles out
+    /// of the retained set for a frame, which is enough for the fetch pipeline to cancel an
+    /// in-flight request that happens to be sitting in it. That silently killed landmark
+    /// building-tile fetches mid-flight, with nothing to retry them afterward (nothing calls
+    /// <see cref="MapboxMap.ChangeView"/> again once the flight ends until the user provides
+    /// real input), so landmarks would only ever appear after a manual pan or click, never
+    /// from the scripted flight itself — manual mouse-wheel zoom never touches pitch, so it
+    /// never triggers the flip-flop.
     ///
     /// The camera is never moved directly. Every frame this pushes an interpolated view
     /// into <see cref="MapboxMap.ChangeView"/>, and the camera follows because
@@ -152,8 +164,15 @@ namespace Mapbox.Samples.LandmarkTour
 
             if (CameraBehaviour != null) CameraBehaviour.enabled = false;
 
-            // Phase 1 — climb over the starting point to cruise altitude, one step at a time.
-            yield return WalkZoom(start, startZoom, cruiseZoom, startPitch, cruisePitch, startBearing);
+            // Phase 1a — tilt to looking straight down, before any zoom change, at the
+            // starting point. See the note on UnityTileProvider's near-90 pitch behaviour
+            // on TiltPitch and WalkZoom below for why this has to be a separate phase
+            // rather than blended with the zoom-out.
+            yield return TiltPitch(start, startZoom, startPitch, cruisePitch, startBearing);
+
+            // Phase 1b — climb over the starting point to cruise altitude, one step at a
+            // time, pitch held at cruisePitch throughout.
+            yield return WalkZoom(start, startZoom, cruiseZoom, cruisePitch, startBearing);
 
             // Phase 2 — travel at cruise altitude. The only phase that moves the centre, so
             // the only one that can stream a corridor of tiles, and it runs at the zoom where
@@ -174,8 +193,12 @@ namespace Mapbox.Samples.LandmarkTour
             // begins from a loaded view rather than from whatever the cruise left behind.
             yield return WaitForTiles();
 
-            // Phase 3 — descend onto the destination, centre already fixed.
-            yield return WalkZoom(target, cruiseZoom, targetZoom, cruisePitch, targetPitch, targetBearing);
+            // Phase 3a — descend onto the destination, centre already fixed, pitch held at
+            // cruisePitch throughout.
+            yield return WalkZoom(target, cruiseZoom, targetZoom, cruisePitch, targetBearing);
+
+            // Phase 3b — tilt onto the destination's own pitch only once zoom has settled.
+            yield return TiltPitch(target, targetZoom, cruisePitch, targetPitch, targetBearing);
 
             // Land exactly on the requested view rather than wherever the last frame fell.
             _map.ChangeView(target, targetZoom, targetPitch, targetBearing);
@@ -186,7 +209,8 @@ namespace Mapbox.Samples.LandmarkTour
 
         /// <summary>
         /// Changes zoom in steps rather than one continuous sweep, waiting after each step
-        /// for that level's tiles to actually arrive. The centre is held still throughout.
+        /// for that level's tiles to actually arrive. The centre AND the pitch are held
+        /// still throughout — see the pitch note below.
         ///
         /// A continuous sweep is what made the transition go flat: the tile cover changes on
         /// every integer zoom crossing, and the fetch pipeline holds a queued request for
@@ -195,11 +219,33 @@ namespace Mapbox.Samples.LandmarkTour
         /// aborted at roughly the moment they become eligible to run. Nothing lands, the
         /// placeholder falls back to the pinned z0-z2 world tiles, and a z2 texture magnified
         /// this far is a single colour. Stepping and waiting keeps the lag bounded instead.
+        ///
+        /// Pitch is a single fixed value, not a from/to pair, and that is deliberate.
+        /// UnityTileProvider.ShouldSplit special-cases a camera looking straight down: with
+        /// no horizontal forward component, every tile's corners project to ~zero distance
+        /// along that forward, which the split test treats as "behind the camera" and
+        /// force-splits regardless of actual distance. As pitch tilts away from that, some
+        /// corners cross to "in front" and the tile falls back to ordinary distance-based
+        /// splitting — a real, but one-time and monotonic, transition. Doing that at the
+        /// same time zoom is changing (thus changing tile size, thus the split threshold
+        /// itself, every single step) let the two shift against each other, and the split
+        /// decision for a tile could flip between "split into 4 children" and "don't split"
+        /// across consecutive frames. Each flip is fully valid the instant its frame's
+        /// ChangeView runs, but it also means a tile can drop out of the retained set for
+        /// just that one frame — and PbfSource.RetainTiles cancels any in-flight fetch for a
+        /// tile that isn't retained, so a landmark's building-tile request sitting in that
+        /// window gets killed mid-flight, permanently: nothing retries it once the flight
+        /// ends, since nothing calls ChangeView again until the user provides real input.
+        /// That is why landmarks would silently fail to load on the scripted flight and only
+        /// ever appear after a manual pan or click — manual mouse-wheel zoom never touches
+        /// pitch at all, so it never triggers the flip-flop. Callers tilt to the cruise pitch
+        /// before starting a zoom walk and tilt away from it only after the walk finishes, so
+        /// pitch and zoom are never both moving in the same frame.
         /// </summary>
         private IEnumerator WalkZoom(
             LatitudeLongitude center,
             float fromZoom, float toZoom,
-            float fromPitch, float toPitch,
+            float pitch,
             float bearing)
         {
             var span = Mathf.Abs(toZoom - fromZoom);
@@ -217,12 +263,29 @@ namespace Mapbox.Samples.LandmarkTour
                     _map.ChangeView(
                         center,
                         Mathf.Lerp(fromZoom, toZoom, t),
-                        Mathf.Lerp(fromPitch, toPitch, t),
+                        pitch,
                         bearing);
                 });
 
                 yield return WaitForTiles();
             }
+        }
+
+        /// <summary>
+        /// Tilts pitch at a fixed zoom and centre. Kept separate from WalkZoom so the two
+        /// never animate at once — see the pitch note on WalkZoom for why that matters.
+        /// </summary>
+        private IEnumerator TiltPitch(LatitudeLongitude center, float zoom, float fromPitch, float toPitch, float bearing)
+        {
+            if (Mathf.Approximately(fromPitch, toPitch)) yield break;
+
+            yield return RunPhase(SecondsPerStep, progress =>
+            {
+                var eased = Mathf.SmoothStep(0f, 1f, progress);
+                _map.ChangeView(center, zoom, Mathf.Lerp(fromPitch, toPitch, eased), bearing);
+            });
+
+            yield return WaitForTiles();
         }
 
         /// <summary>
