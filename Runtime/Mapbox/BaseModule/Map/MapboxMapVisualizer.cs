@@ -383,17 +383,50 @@ namespace Mapbox.BaseModule.Map
                     if (ActiveTiles.TryGetValue(quadrant, out var unityMapTile))
                     {
                         _toRemove.Remove(quadrant);
-                        unityMapTile.LoadingState = LoadingState.Filler;
-                        activeChildren.Add(unityMapTile);
-                        if (unityMapTile.Children != null && unityMapTile.Children.Count > 0)
+
+                        // A tile with a non-empty Children list is itself still hidden and
+                        // covered by those (more detailed) children — it was created
+                        // Temporary, its own DelveInto exploration found something, and it
+                        // was never shown (Load()'s "if (!coveredByQuadrants) ShowTile(...)"
+                        // skipped it). Passing those children through, instead of collapsing
+                        // to this tile's own not-yet-loaded imagery, is what keeps the most
+                        // detailed data actually available on screen during a fast zoom
+                        // rather than replacing it with a coarser fallback the moment an
+                        // ancestor happens to explore this far down. unityMapTile's own state
+                        // and TempTiles membership are left untouched: it can still promote
+                        // normally later, and InternalUpdateCoroutine's promotion path already
+                        // shows it and pools these same child objects together, atomically, so
+                        // there is never a frame where both are visible. The existing "protect
+                        // filler children of temp tiles" pass at the top of Load() keeps
+                        // reprotecting these children each frame for as long as unityMapTile
+                        // stays in TempTiles, exactly as it already did before this tile was
+                        // ever found by an ancestor's search.
+                        if (unityMapTile.LoadingState == LoadingState.Temporary
+                            && unityMapTile.Children != null && unityMapTile.Children.Count > 0)
                         {
-                            foreach (var subchild in unityMapTile.Children)
-                            {
-                                activeChildren.Add(subchild);
-                            }
-                            unityMapTile.Children.Clear();
+                            activeChildren.Add(unityMapTile);
                         }
-                        ShowTile(unityMapTile);
+                        else
+                        {
+                            // Nothing more detailed hiding behind this one — it is already
+                            // showing its own data (Finished, or a filler adopted earlier by
+                            // a different ancestor search). Show it, and pool any children it
+                            // might still be holding (shouldn't happen given the invariant
+                            // above, kept defensively) instead of leaving them dangling.
+                            TempTiles.Remove(unityMapTile);
+                            unityMapTile.LoadingState = LoadingState.Filler;
+                            if (unityMapTile.Children != null && unityMapTile.Children.Count > 0)
+                            {
+                                foreach (var subchild in unityMapTile.Children)
+                                {
+                                    PoolTile(subchild);
+                                }
+                                unityMapTile.Children.Clear();
+                            }
+                            ShowTile(unityMapTile);
+                            activeChildren.Add(unityMapTile);
+                        }
+
                         frame.Found |= 1 << slot;
                         _delveStack[frameIdx] = frame;
                     }
