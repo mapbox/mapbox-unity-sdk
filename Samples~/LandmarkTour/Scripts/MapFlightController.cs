@@ -203,6 +203,20 @@ namespace Mapbox.Samples.LandmarkTour
             // Land exactly on the requested view rather than wherever the last frame fell.
             _map.ChangeView(target, targetZoom, targetPitch, targetBearing);
 
+            // One more settling pass now that the view has completely stopped moving. A
+            // tile whose fetch got cancelled by cover churn during the final animated
+            // frames (RetainTiles cancels anything that drops out of the retained set for
+            // even a single frame, and a fixed pitch alone doesn't rule that out near a
+            // split threshold) never gets retried on its own: nothing calls ChangeView
+            // again after a flight ends until the user provides real input, so a cancelled
+            // request just sits dead. This call re-requests it against a now-static view,
+            // where nothing can cancel it a second time. Landmarks and base tiles both pick
+            // the result up automatically once it lands (LandmarksLayerModule's generation
+            // callback fires on its own; MapboxMapVisualizer's per-frame temp-tile retry
+            // promotes the tile) even if this wait itself times out first — the retry
+            // outlives the wait, only the cancellation risk needed removing.
+            yield return WaitForTiles();
+
             _flight = null;
             EndFlight(targetZoom);
         }
