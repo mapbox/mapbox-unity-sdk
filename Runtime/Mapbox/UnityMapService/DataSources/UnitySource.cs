@@ -69,11 +69,30 @@ namespace Mapbox.UnityMapService.DataSources
         protected void WebRequestData(Tile tile, Action<DataFetchingResult> callback) => RequestData(tile, callback, false);
         protected void WebRequestUpdate(Tile tile, Action<DataFetchingResult> callback) => RequestData(tile, callback, true);
         
+        /// <summary>
+        /// Enqueues a fetch for the tile. The callback is invoked exactly once, always - that is
+        /// the contract callers depend on, because several of them park a coroutine on a flag the
+        /// callback sets (see ImageSource and PbfSource's "while (working) yield return null").
+        ///
+        /// A second request for a tile id already in flight joins the existing fetch instead of
+        /// starting a new one, so it receives that fetch's real outcome. It used to return here
+        /// without invoking the callback at all, which read to the caller as "nothing happened,
+        /// ever" and left those coroutines spinning for the rest of the session - and with them
+        /// LoadTileCoverToMemory, and so LoadViewCompleted, which never fired.
+        ///
+        /// Note the join is keyed on tile id alone, so a conditional-GET refresh (WebRequestUpdate)
+        /// and a real data fetch (WebRequestData) collide and whichever arrived first wins. The
+        /// joiner is handed a result for a tile instance it does not own, so it will see its own
+        /// tile as unloaded and report no data - correct, if pessimistic, and it can request again.
+        /// </summary>
         private void RequestData(Tile tile, Action<DataFetchingResult> callback, bool isUpdate)
         {
-            if (_activeRequests.ContainsKey(tile.Id))
+            if (_activeRequests.TryGetValue(tile.Id, out var inFlight))
+            {
+                inFlight.Callback += callback;
                 return;
-            
+            }
+
             var fetchInfo = new FetchInfo(tile, (result) =>
             {
                 _activeRequests.Remove(tile.Id);
