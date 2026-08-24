@@ -51,13 +51,13 @@ namespace Mapbox.Samples.LandmarkTour
         [Tooltip("Interactive camera to suspend while a flight plays, so a stray drag or scroll cannot fight it. Also supplies the distance curve used to pick the cruise altitude. Found in the scene if left empty.")]
         public Moving3dCameraBehaviour CameraBehaviour;
 
-        [Tooltip("Zoom levels covered per step while climbing or descending. Detail is allowed to lag the camera by about this much, so keep it at 2 or below: a 512px tile stretched over a 3-level lag still leaves ~148 source pixels on screen, but 5 levels leaves 37 and reads as a smear.")]
+        [Tooltip("Zoom levels between tile-cover refreshes while climbing or descending. This no longer chops up the camera motion — the climb is one continuous sweep either way — it only sets how often the tile pipeline is nudged along the way. Keep it at 2 or below: a 512px tile stretched over a 3-level lag still leaves ~148 source pixels on screen, but 5 levels leaves 37 and reads as a smear.")]
         public float ZoomLevelsPerStep = 2f;
 
-        [Tooltip("Seconds the camera takes to travel one step. This is camera motion only; the wait for that step's tiles is separate.")]
+        [Tooltip("Seconds of camera motion per zoom step. The climb or descent lasts this times the number of steps it spans, run as one uninterrupted eased sweep.")]
         public float SecondsPerStep = 0.35f;
 
-        [Tooltip("Longest to wait for a step's tiles before carrying on regardless, in seconds. 0 disables waiting entirely and restores the old behaviour of racing the tile pipeline. Requests keep running in the background when a wait times out, so the next step still benefits.")]
+        [Tooltip("Longest a background tile refresh may run before it is abandoned, in seconds. 0 disables tile refreshing entirely. The camera never waits on this — it only bounds how long a refresh keeps polling.")]
         public float TileWaitTimeout = 0.8f;
 
         [Tooltip("Seconds of cruise per 1000 km travelled, before the range clamp below.")]
@@ -82,6 +82,7 @@ namespace Mapbox.Samples.LandmarkTour
         private MapboxMap _map;
         private Coroutine _flight;
         private Coroutine _coverWait;
+        private Coroutine _backgroundRefresh;
 
         private void Awake()
         {
@@ -134,6 +135,12 @@ namespace Mapbox.Samples.LandmarkTour
             {
                 StopCoroutine(_coverWait);
                 _coverWait = null;
+            }
+
+            if (_backgroundRefresh != null)
+            {
+                StopCoroutine(_backgroundRefresh);
+                _backgroundRefresh = null;
             }
 
             EndFlight(_map.MapInformation.Zoom);
@@ -189,9 +196,11 @@ namespace Mapbox.Samples.LandmarkTour
                     Mathf.LerpAngle(startBearing, targetBearing, eased));
             });
 
-            // Let the destination's coarse tiles arrive before starting down, so the descent
-            // begins from a loaded view rather than from whatever the cruise left behind.
-            yield return WaitForTiles();
+            // Nudge the destination's coarse tiles along before starting down, but do not
+            // hold the camera for them: a blocking wait here is a dead stop of up to
+            // TileWaitTimeout right at the top of the arc, which is the most visible place
+            // in the whole flight to stop moving.
+            RefreshTilesInBackground();
 
             // Phase 3a — descend onto the destination, centre already fixed, pitch held at
             // cruisePitch throughout.
@@ -222,17 +231,27 @@ namespace Mapbox.Samples.LandmarkTour
         }
 
         /// <summary>
-        /// Changes zoom in steps rather than one continuous sweep, waiting after each step
-        /// for that level's tiles to actually arrive. The centre AND the pitch are held
-        /// still throughout — see the pitch note below.
+        /// Sweeps zoom from one value to another in a single continuous eased motion, with
+        /// the centre AND the pitch held still throughout — see the pitch note below.
         ///
-        /// A continuous sweep is what made the transition go flat: the tile cover changes on
-        /// every integer zoom crossing, and the fetch pipeline holds a queued request for
-        /// 0.2s before it may start and then starts only one per frame, so a sweep that
-        /// crosses a level every couple of hundred milliseconds has each level's requests
-        /// aborted at roughly the moment they become eligible to run. Nothing lands, the
-        /// placeholder falls back to the pinned z0-z2 world tiles, and a z2 texture magnified
-        /// this far is a single colour. Stepping and waiting keeps the lag bounded instead.
+        /// The sweep is deliberately one phase rather than one phase per zoom step. Stepping
+        /// the camera was an earlier attempt at the tile problem below, and it cost far more
+        /// than it bought: each step ran its own <see cref="Mathf.SmoothStep"/>, and
+        /// SmoothStep has zero derivative at both ends, so zoom velocity dropped to zero at
+        /// every single step boundary. A four-step climb was four accelerate-decelerate
+        /// cycles, which is exactly the ratcheting "zooming in and out step by step" the
+        /// stepping was supposed to hide. Easing once across the whole span keeps velocity
+        /// continuous from the first frame to the last.
+        ///
+        /// The tile problem itself is real and is still handled, just without stopping the
+        /// camera. The tile cover changes on every integer zoom crossing, and the fetch
+        /// pipeline holds a queued request for 0.2s before it may start and then starts only
+        /// one per frame, so a fast sweep can have each level's requests aborted at roughly
+        /// the moment they become eligible to run. So the sweep still fires a background
+        /// cover refresh every ZoomLevelsPerStep levels as it passes them — the pipeline gets
+        /// the same periodic nudge it got from stepping, and the camera never waits for it.
+        /// Detail lags the camera by up to a step's worth of levels while it catches up,
+        /// which is the trade: a lagging texture reads far better than a stalling camera.
         ///
         /// Pitch is a single fixed value, not a from/to pair, and that is deliberate.
         /// UnityTileProvider.ShouldSplit special-cases a camera looking straight down: with
@@ -266,31 +285,32 @@ namespace Mapbox.Samples.LandmarkTour
             var perStep = Mathf.Max(0.25f, ZoomLevelsPerStep);
             var steps = Mathf.Max(1, Mathf.CeilToInt(span / perStep));
 
-            for (var step = 1; step <= steps; step++)
+            // Steps now only pace the tile refreshes, so the sweep keeps the same overall
+            // duration it had when each step was animated separately.
+            var duration = steps * Mathf.Max(0f, SecondsPerStep);
+            var nextRefreshStep = 1;
+
+            RefreshTilesInBackground();
+
+            yield return RunPhase(duration, progress =>
             {
-                var from = (float)(step - 1) / steps;
-                var to = (float)step / steps;
+                var t = Mathf.SmoothStep(0f, 1f, progress);
+                _map.ChangeView(
+                    center,
+                    Mathf.Lerp(fromZoom, toZoom, t),
+                    pitch,
+                    bearing);
 
-                yield return RunPhase(SecondsPerStep, progress =>
+                // Fired as the sweep passes each step boundary rather than on a timer, so
+                // the refreshes track zoom levels actually crossed. The easing means the
+                // middle boundaries are crossed quickly and the outer ones slowly, which is
+                // the right shape anyway: the cover barely changes at the eased ends.
+                if (t * steps >= nextRefreshStep)
                 {
-                    var t = Mathf.Lerp(from, to, Mathf.SmoothStep(0f, 1f, progress));
-                    _map.ChangeView(
-                        center,
-                        Mathf.Lerp(fromZoom, toZoom, t),
-                        pitch,
-                        bearing);
-                });
-
-                // Not awaited: yielding on WaitForTiles here stops the camera dead for up to
-                // TileWaitTimeout after every single step, which is what read as "waiting
-                // for tiles at each zoom level." Refreshing in the background instead keeps
-                // the camera moving continuously through the walk while still giving a tile
-                // whose fetch got cancelled by this step's cover churn a chance to land —
-                // it'll be picked up again by the very next step's ChangeView/RetainTiles if
-                // this refresh doesn't finish in time, rather than being stranded the way a
-                // cancelled fetch used to be before the pitch/zoom decoupling fix.
-                RefreshTilesInBackground();
-            }
+                    nextRefreshStep++;
+                    RefreshTilesInBackground();
+                }
+            });
         }
 
         /// <summary>
@@ -307,7 +327,10 @@ namespace Mapbox.Samples.LandmarkTour
                 _map.ChangeView(center, zoom, Mathf.Lerp(fromPitch, toPitch, eased), bearing);
             });
 
-            yield return WaitForTiles();
+            // Background, not awaited: a tilt is immediately followed by a zoom sweep (or by
+            // the landing settle), and stopping between the two is what made the flight read
+            // as a sequence of moves rather than one flight.
+            RefreshTilesInBackground();
         }
 
         /// <summary>
@@ -348,17 +371,21 @@ namespace Mapbox.Samples.LandmarkTour
 
         /// <summary>
         /// Fire-and-forget counterpart to <see cref="WaitForTiles"/>: starts the same
-        /// tile-cover refresh but doesn't hold up the caller. Not tracked through
-        /// <see cref="_coverWait"/>, since more than one of these can be in flight at once (a
-        /// new one starts every WalkZoom step before the previous one necessarily finishes)
-        /// — <see cref="Cancel"/> won't stop these mid-flight, but each one caps itself at
-        /// TileWaitTimeout regardless, so a cancelled flight leaves at most one short-lived
-        /// background poll behind rather than a leak.
+        /// tile-cover refresh but never holds up the caller. This is what every mid-flight
+        /// call site uses; the blocking <see cref="WaitForTiles"/> is left only for the
+        /// landing settle, where the camera has already stopped and a wait costs nothing.
+        ///
+        /// Only one runs at a time. Refreshes are fired from inside the zoom sweep, so
+        /// without the guard a slow one would still be polling when the next boundary came
+        /// round and they would stack up, each one re-walking the whole cover through
+        /// <see cref="MapboxMap.LoadTileCoverToMemory"/> every frame. Skipping while one is
+        /// already in flight loses nothing: it re-reads <see cref="MapboxMap.TileCover"/>
+        /// when it starts, so the next one picks up wherever the view has got to by then.
         /// </summary>
         private void RefreshTilesInBackground()
         {
-            if (TileWaitTimeout <= 0f || _map == null) return;
-            StartCoroutine(BackgroundLoadCurrentCover());
+            if (TileWaitTimeout <= 0f || _map == null || _backgroundRefresh != null) return;
+            _backgroundRefresh = StartCoroutine(BackgroundLoadCurrentCover());
         }
 
         private IEnumerator BackgroundLoadCurrentCover()
@@ -374,6 +401,7 @@ namespace Mapbox.Samples.LandmarkTour
             }
 
             if (!loaded) StopCoroutine(load);
+            _backgroundRefresh = null;
         }
 
         private static IEnumerator RunPhase(float duration, Action<float> apply)
