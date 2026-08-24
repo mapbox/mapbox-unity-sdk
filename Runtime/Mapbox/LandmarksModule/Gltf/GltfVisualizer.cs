@@ -139,8 +139,16 @@ namespace Mapbox.LandmarkModule
             // Dispatched outside the try so a throwing callback cannot re-enter the failure paths.
             if (loaded && success)
             {
+                // Pairs each building with its footprint now that every node has been visited. The
+                // two are siblings, so neither ordering can be assumed during AddPrimitive.
+                gameObjectInstantiator.ResolveFootprints();
+
                 //LandmarkMeshResults(vectorData.TileId, footPrints);
-                callback(new GltfGenerationTaskResult(TaskResultType.Success, new List<GameObject>() {buildingRoot}, gameObjectInstantiator.FootprintResults));
+                callback(new GltfGenerationTaskResult(
+                    TaskResultType.Success,
+                    new List<GameObject>() {buildingRoot},
+                    gameObjectInstantiator.FootprintResults,
+                    gameObjectInstantiator.AnchorResults));
                 return;
             }
 
@@ -196,6 +204,30 @@ namespace Mapbox.LandmarkModule
         private class MapboxGltfInstantiator : GameObjectInstantiator
         {
             public List<Vector3[]> FootprintResults = new List<Vector3[]>();
+
+            /// <summary>
+            /// One entry per building node, for terrain snapping. Footprint outlines are attached in
+            /// <see cref="ResolveFootprints"/> once the whole scene has been walked, since a
+            /// building node and its footprint node are siblings and either may be visited first.
+            /// </summary>
+            public readonly List<LandmarkAnchor> AnchorResults = new List<LandmarkAnchor>();
+
+            // Candidate anchors by node index, narrowed to actual root nodes in ResolveFootprints.
+            // AddPrimitive fires for nodes at any depth, but the matrix translation it reads is
+            // relative to the node's parent, so it only means "position within the tile" for a root.
+            private readonly Dictionary<uint, LandmarkAnchor> _anchorsByNode =
+                new Dictionary<uint, LandmarkAnchor>();
+
+            // Root node indices, captured in EndScene - the only place glTFast reports them.
+            private readonly HashSet<uint> _rootNodes = new HashSet<uint>();
+
+            // Footprint rings by landmark id, kept only to pair them with building nodes at the end
+            // of instantiation. Rings also go into FootprintResults for the existing consumers, but
+            // that list is flat and unkeyed, so it cannot answer "which rings belong to this
+            // building" - a footprint with a hole contributes several.
+            private readonly Dictionary<string, List<Vector3[]>> _footprintsById =
+                new Dictionary<string, List<Vector3[]>>();
+
             private MapboxGltfImport _gltf;
             private IMapInformation _mapInformation;
             private FeatureIdColorTable _featureIds;
@@ -226,8 +258,142 @@ namespace Mapbox.LandmarkModule
                 // after FlipYZ, so the vertices are already in tile-local space.
                 if (IsFootprint(node))
                 {
+                    // Record where this call's rings start so they can also be filed by id, without
+                    // ExtractBoundaryRings needing to know anything about the pairing.
+                    var firstRing = FootprintResults.Count;
                     MapboxGeometryUtilities.ExtractBoundaryRings(meshResult.mesh, FootprintResults);
+                    IndexFootprintRings(node, firstRing);
                 }
+                else
+                {
+                    CaptureAnchor(node, nodeIndex);
+                }
+            }
+
+            /// <summary>
+            /// Files the rings just appended to <see cref="FootprintResults"/> under the landmark id
+            /// they belong to, so a building node can find them at the end of instantiation.
+            /// </summary>
+            private void IndexFootprintRings(GLTFast.Newtonsoft.Schema.Node node, int firstRing)
+            {
+                if (FootprintResults.Count <= firstRing) return;
+
+                var id = GetLandmarkId(node);
+                if (string.IsNullOrEmpty(id)) return;
+
+                if (!_footprintsById.TryGetValue(id, out var rings))
+                {
+                    rings = new List<Vector3[]>();
+                    _footprintsById[id] = rings;
+                }
+
+                for (var i = firstRing; i < FootprintResults.Count; i++)
+                {
+                    rings.Add(FootprintResults[i]);
+                }
+            }
+
+            /// <summary>
+            /// Records the ground point of a building node.
+            ///
+            /// Read from the node matrix rather than the tile's own <c>extras["anchor"]</c>, which
+            /// holds the identical pair of numbers: the matrix translation is what FlipYZ already
+            /// relies on, so it is guaranteed to be present and correctly typed, whereas the extras
+            /// value would need JSON coercion and can legitimately be absent.
+            /// </summary>
+            private void CaptureAnchor(GLTFast.Newtonsoft.Schema.Node node, uint nodeIndex)
+            {
+                // AddPrimitive fires once per primitive, so a multi-primitive building node arrives
+                // here several times. One anchor per node, not per primitive.
+                if (_anchorsByNode.ContainsKey(nodeIndex)) return;
+
+                var matrix = node.matrix;
+                if (matrix == null || matrix.Length < 14) return;
+
+                if (!m_Nodes.TryGetValue(nodeIndex, out var go) || go == null) return;
+
+                // Same expressions FlipYZ uses for the vertex origin: x eastward in 0..1, z from 0
+                // at the north edge to -1 at the south. GroundUv stores the elevation-sampling form,
+                // so z becomes 1 + z.
+                var x01 = matrix[12] / 8192f;
+                var z01 = -matrix[13] / 8192f;
+
+                _anchorsByNode[nodeIndex] = new LandmarkAnchor
+                {
+                    Transform = go.transform,
+                    GroundUv = new Vector2(x01, 1f + z01),
+                    LandmarkId = GetLandmarkId(node)
+                };
+            }
+
+            /// <summary>
+            /// Attaches each building's footprint outline to its anchor. Called once instantiation
+            /// has finished, because the two nodes of a landmark are siblings with no ordering
+            /// guarantee - the building may well be visited before its footprint exists.
+            /// </summary>
+            public void ResolveFootprints()
+            {
+                AnchorResults.Clear();
+
+                foreach (var pair in _anchorsByNode)
+                {
+                    // Root nodes only. A nested mesh node's matrix translation is relative to its
+                    // parent, so treating it as a tile-space position would place the building
+                    // somewhere arbitrary. (FlipYZ has the same limitation for the vertices it
+                    // rewrites, so such a tile would already render wrong - this just avoids
+                    // compounding it with a bogus elevation lookup.)
+                    if (!_rootNodes.Contains(pair.Key)) continue;
+
+                    var anchor = pair.Value;
+                    if (!string.IsNullOrEmpty(anchor.LandmarkId) &&
+                        _footprintsById.TryGetValue(anchor.LandmarkId, out var rings))
+                    {
+                        anchor.FootprintUvs = ToGroundUvs(rings);
+                    }
+
+                    AnchorResults.Add(anchor);
+                }
+            }
+
+            /// <summary>
+            /// Flattens footprint rings into elevation-sampling UVs, dropping the Y component -
+            /// footprint meshes are planar at ground level, so it carries no height information.
+            /// </summary>
+            private static Vector2[] ToGroundUvs(List<Vector3[]> rings)
+            {
+                var total = 0;
+                for (var r = 0; r < rings.Count; r++)
+                {
+                    if (rings[r] != null) total += rings[r].Length;
+                }
+
+                if (total == 0) return null;
+
+                var result = new Vector2[total];
+                var w = 0;
+                for (var r = 0; r < rings.Count; r++)
+                {
+                    var ring = rings[r];
+                    if (ring == null) continue;
+                    for (var v = 0; v < ring.Length; v++)
+                    {
+                        result[w++] = new Vector2(ring[v].x, 1f + ring[v].z);
+                    }
+                }
+
+                return result;
+            }
+
+            /// <summary>
+            /// The landmark id shared by a building node and its footprint node. They publish it
+            /// under different keys, which is the only reason this needs two lookups.
+            /// </summary>
+            private static string GetLandmarkId(GLTFast.Newtonsoft.Schema.Node node)
+            {
+                if (node.extras == null) return null;
+                if (node.extras.TryGetValue<string>("mapbox:footprint:id", out var footprintId)) return footprintId;
+                if (node.extras.TryGetValue<string>("id", out var id)) return id;
+                return null;
             }
 
             public override void EndScene(uint[] rootNodeIndices)
@@ -240,6 +406,10 @@ namespace Mapbox.LandmarkModule
                 var sourceRoot = _gltf.GetSourceRoot();
                 foreach (var nodeIndex in rootNodeIndices)
                 {
+                    // Recorded for anchor filtering; this is the only point glTFast says which
+                    // nodes are roots.
+                    _rootNodes.Add(nodeIndex);
+
                     var node = sourceRoot.nodes[nodeIndex];
                     var go = m_Nodes[nodeIndex];
                     if (go == null) continue;
@@ -314,6 +484,8 @@ namespace Mapbox.LandmarkModule
             
             private bool IsFootprint(GLTFast.Newtonsoft.Schema.Node node)
             {
+                // extras is optional in glTF, so a node without any would have thrown here.
+                if (node.extras == null) return false;
                 return node.extras.TryGetValue<string>("mapbox:footprint:id", out var value);
             }
         }

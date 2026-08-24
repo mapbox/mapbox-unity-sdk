@@ -19,11 +19,19 @@ namespace Mapbox.LandmarkModule
         /// </summary>
         public List<Vector3[]> FootprintResults;
 
-        public GltfGenerationTaskResult(TaskResultType result, IEnumerable<GameObject> visuals = null, List<Vector3[]> footprintResults = null)
+        /// <summary>
+        /// One entry per building in the tile, giving the transform to lift and the ground point to
+        /// sample elevation at. Never null; empty when the tile produced no buildings, or when
+        /// generation failed before instantiation.
+        /// </summary>
+        public List<LandmarkAnchor> Anchors;
+
+        public GltfGenerationTaskResult(TaskResultType result, IEnumerable<GameObject> visuals = null, List<Vector3[]> footprintResults = null, List<LandmarkAnchor> anchors = null)
         {
             ResultType = result;
             GeneratedObjects = visuals;
             FootprintResults = footprintResults ?? new List<Vector3[]>();
+            Anchors = anchors ?? new List<LandmarkAnchor>();
         }
     }
 }

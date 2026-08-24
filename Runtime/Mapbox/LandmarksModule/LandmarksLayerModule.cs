@@ -33,6 +33,11 @@ namespace Mapbox.LandmarkModule
 
 		private HashSet<CanonicalTileId> _retainedBuildingTiles;
 
+		// Constructed in Initialize from the tile-lifecycle source handed in there, disposed in
+		// OnDestroy. Null when no source was supplied, so every use is guarded - landmarks then
+		// simply stay at ground level, which is the pre-terrain behaviour.
+		private LandmarkTerrainSnapper _terrainSnapper;
+
 		public LandmarksLayerModule(UnityContext unityContext, IMapInformation mapInformation, MapService mapService,
 			string sourceId, Material buildingMaterial) : base()
 		{
@@ -55,6 +60,14 @@ namespace Mapbox.LandmarkModule
 
 		public virtual IEnumerator Initialize(ITileLifecycleSource tileLifecycle)
 		{
+			// Before the first yield, so the snapper is watching tile loads while the rest of this
+			// method waits on network work. Idempotent: a second snapper would double-subscribe
+			// TileLoaded and leak the first one's coroutine.
+			if (_terrainSnapper == null && tileLifecycle != null)
+			{
+				_terrainSnapper = new LandmarkTerrainSnapper(tileLifecycle, _mapInformation);
+			}
+
 			yield return _buildingSource.Initialize();
 			yield return _meshGenerationUnit.Initialize();
 		}
@@ -131,10 +144,20 @@ namespace Mapbox.LandmarkModule
 					PositionBuilding(pair.Key, gameObject.transform);
 				}
 			}
+
+			// PositionBuilding only places tile roots, and their Y is always 0. Each building's own
+			// height above that root is derived from map scale, so it has to be recomputed here or
+			// every landmark would sit at the elevation of whatever scale was current when its
+			// terrain was first sampled - visibly wrong after one zoom step under
+			// DynamicScalingMapInformation, where Scale tracks zoom.
+			_terrainSnapper?.ReapplyForViewChange();
 		}
 
 		public void OnDestroy()
 		{
+			_terrainSnapper?.Dispose();
+			_terrainSnapper = null;
+
 			// Subscribed in the constructor, so it has to come off here or a destroyed module keeps
 			// being called back by a source that outlives it.
 			_buildingSource.CacheItemDisposed -= ClearDisposedDataVisual;
@@ -282,6 +305,11 @@ namespace Mapbox.LandmarkModule
 				}
 
 				_visualCache.Add(tileId, result.GeneratedObjects);
+
+				// After the roots are positioned, since snapping writes each building's local Y
+				// relative to a root that PositionBuilding has already placed.
+				_terrainSnapper?.Register(tileId, result.Anchors);
+
 				TileFinished(tileId, result.FootprintResults);
 			});
 		}
@@ -299,6 +327,11 @@ namespace Mapbox.LandmarkModule
 
 		private void ClearDisposedDataVisual(CanonicalTileId tileId)
 		{
+			// Unconditionally, and before the cache check: the snapper holds transforms that are
+			// about to be destroyed, and a tile can have anchors registered even on a path where
+			// the visual cache entry has already gone.
+			_terrainSnapper?.Unregister(tileId);
+
 			if (_visualCache.TryGetValue(tileId, out var gameObjects))
 			{
 				foreach (var o in gameObjects)
