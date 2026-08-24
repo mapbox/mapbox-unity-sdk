@@ -162,7 +162,13 @@ namespace Mapbox.BaseModule.Data.Platform.Cache
         {
             if (_textureFileCache != null)
             {
-                yield return _textureFileCache.GetCoroutine(tileId, tilesetId, isTextureNonreadable, callback);
+                // Mirrors the HasError translation GetImageAsync does: a read that errored is a
+                // cache miss, not a hit that happens to carry no texture. Without this the
+                // coroutine path handed the unusable item back as if it were real, while its
+                // async sibling correctly reported nothing - the two disagreeing on the same
+                // question is how a texture-less item got into the memory cache in the first place.
+                yield return _textureFileCache.GetCoroutine<T>(tileId, tilesetId, isTextureNonreadable,
+                    (item) => callback(item != null && item.HasError ? null : item));
             }
             else
             {
