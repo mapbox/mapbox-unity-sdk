@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Mapbox.BaseModule.Data.DataFetchers;
 using Mapbox.BaseModule.Data.Interfaces;
@@ -17,6 +18,16 @@ namespace Mapbox.LandmarkModule
 		private Source<BuildingData> _buildingSource;
 		private UnityContext _unityContext;
 		private IMapInformation _mapInformation;
+		/// <summary>
+		/// Landmark visuals per data tile. Presence of a key means the tile is resolved and needs
+		/// no further generation; the value is the visuals it produced.
+		///
+		/// Values are never null - a resolved tile with no visuals holds an empty collection. That
+		/// is an invariant, not a coincidence: three of the four readers here iterate the value
+		/// directly without a null check, so a null would NRE on the next reposition, cull, or
+		/// dispose. An empty collection carries the same information ("resolved, nothing to show")
+		/// and every reader handles it correctly for free.
+		/// </summary>
 		private Dictionary<CanonicalTileId, IEnumerable<GameObject>> _visualCache;
 		private GltfVisualizer _meshGenerationUnit;
 
@@ -165,8 +176,8 @@ namespace Mapbox.LandmarkModule
 				}
 				else if (_visualCache.TryGetValue(tileId, out var visuals))
 				{
-					if (visuals == null) continue;
-
+					// No null check needed: cached values are never null, and a resolved tile with
+					// no visuals is an empty collection this loop simply skips.
 					foreach (var visual in visuals)
 					{
 						visual.SetActive(true);
@@ -201,6 +212,16 @@ namespace Mapbox.LandmarkModule
 		{
 			return _meshGenerationUnit.Generate(vectorData, result =>
 			{
+				// Another call owns the in-flight generation and will report its outcome to its
+				// own callback, so there is nothing to record here. Returning early is not just
+				// tidiness: this result carries no objects, so without it the null check below
+				// would cache a null visual for a tile that is mid-generation, and the owning
+				// call's own _visualCache.Add would then throw on the duplicate key.
+				if (result.ResultType == TaskResultType.AlreadyInProgress)
+				{
+					return;
+				}
+
 				if (result.ResultType == TaskResultType.DataProcessingFailure ||
 				    result.ResultType == TaskResultType.GameObjectFailure)
 				{
@@ -208,9 +229,18 @@ namespace Mapbox.LandmarkModule
 					return;
 				}
 
-				if (result.ResultType == TaskResultType.GameObjectFailure || result.GeneratedObjects == null)
+				// Defensive: no current producer reports a result with null objects that reaches
+				// here, but if one ever does, the tile still has to be recorded as resolved or it
+				// would be regenerated forever. Cached as an empty collection rather than null so
+				// the readers that iterate this value without a null check stay correct - see the
+				// invariant on _visualCache. The old code stored null here, which is what made
+				// UpdatePositioning, ClearModelsUnusedTiles and ClearDisposedDataVisual able to NRE.
+				//
+				// The GameObjectFailure test the condition used to carry was dead: the guard above
+				// returns on that value before ever reaching this line.
+				if (result.GeneratedObjects == null)
 				{
-					_visualCache.Add(tileId, null);
+					_visualCache.Add(tileId, Enumerable.Empty<GameObject>());
 					return;
 				}
 

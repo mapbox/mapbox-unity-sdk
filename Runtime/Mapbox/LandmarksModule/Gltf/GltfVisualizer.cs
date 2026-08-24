@@ -54,12 +54,24 @@ namespace Mapbox.LandmarkModule
         {
             if (_activeTasks.ContainsKey(vectorData.TileId))
             {
+                // Generation is already running for this tile, started by an earlier call, and
+                // that call reports the real outcome to its own callback. Previously this
+                // returned without invoking the callback at all, so the second caller was told
+                // nothing whatsoever and silently carried on as if it had never asked.
+                // AlreadyInProgress at least says which of the two it is: nothing to start, and
+                // nothing ready yet either.
+                callback(new GltfGenerationTaskResult(TaskResultType.AlreadyInProgress));
                 return;
             }
-			
+
             if (vectorData.Data == null || vectorData.Data.Length == 0)
             {
-                callback(new GltfGenerationTaskResult(TaskResultType.Success, Enumerable.Empty<GameObject>()));
+                // An empty tile, not a failure - most tiles simply hold no landmarks. Reported
+                // as NoData rather than Success so a caller can tell "there is nothing here" from
+                // "here is a building", which Success plus an empty collection could not express.
+                // The empty collection is kept rather than left null because consumers iterate
+                // cached visuals without null-checking them.
+                callback(new GltfGenerationTaskResult(TaskResultType.NoData, Enumerable.Empty<GameObject>()));
                 return;
             }
 

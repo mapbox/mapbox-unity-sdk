@@ -82,6 +82,17 @@ namespace Mapbox.BaseModule.Data.Tasks
         /// one. A caller must not treat this as completion or start work that depends on the
         /// tile being finished. It only means "you don't need to start this yourself."
         /// </summary>
-        AlreadyInProgress
+        AlreadyInProgress,
+
+        /// <summary>
+        /// The source had nothing to build for this tile, so there is no visual and never will
+        /// be. A legitimate, common outcome - most tiles contain no landmarks - and explicitly
+        /// NOT a failure: the data is correct and must not be invalidated or re-fetched. This
+        /// is what separates it from DataProcessingFailure, and reporting Success instead made
+        /// "this tile is genuinely empty" indistinguishable from "this tile produced a
+        /// building", which is the difference a caller deciding whether to retry needs.
+        /// Callers should still record the tile as resolved, or they will regenerate it forever.
+        /// </summary>
+        NoData
     }
 }
