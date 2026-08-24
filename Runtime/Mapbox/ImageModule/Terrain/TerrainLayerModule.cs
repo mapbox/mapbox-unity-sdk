@@ -217,6 +217,34 @@ namespace Mapbox.ImageModule.Terrain
         /// <returns></returns>
         public float QueryElevation(CanonicalTileId tileId, float x, float y)
         {
+            // Lossy by design: 0 is returned both for genuine sea level and for "no data", and the
+            // caller cannot tell which. Kept for the many callers that have no useful response to
+            // "unknown" anyway. Anything that would act differently should use TryQueryElevation.
+            TryQueryElevation(tileId, x, y, out var elevation);
+            return elevation;
+        }
+
+        /// <summary>
+        /// Elevation at a point, and whether it is actually known.
+        ///
+        /// Only searches the memory cache, exactly as <see cref="QueryElevation"/> does - it walks
+        /// up to 5 levels of ancestors looking for a loaded data tile. The difference is the return
+        /// value: false means no data was found (not loaded yet, or CPU elevation extraction is
+        /// switched off entirely), where QueryElevation reports that as 0 - indistinguishable from
+        /// a real sea-level reading. That distinction matters because mesh generation is one-shot:
+        /// SnapTerrainModifier writes whatever it gets straight into vertex positions and nothing
+        /// re-snaps them when terrain arrives later, so a 0 that meant "not loaded yet" is baked in
+        /// permanently and reads as a building sunk into a hillside.
+        /// </summary>
+        /// <param name="tileId">TileId of the elevation data</param>
+        /// <param name="x">Point in texture coordinate space, origin is bottom left.</param>
+        /// <param name="y">Point in texture coordinate space, origin is bottom left.</param>
+        /// <param name="elevation">The elevation, or 0 when this returns false.</param>
+        /// <returns>True if elevation data for this point was available.</returns>
+        public bool TryQueryElevation(CanonicalTileId tileId, float x, float y, out float elevation)
+        {
+            elevation = 0f;
+
             if (!_settings.NeedsCpuElevation && !_elevationDisabledWarningLogged)
             {
                 _elevationDisabledWarningLogged = true;
@@ -229,12 +257,13 @@ namespace Mapbox.ImageModule.Terrain
             {
                 if (_rasterSource.GetInstantData(targetTileId, out var instantData))
                 {
-                    return instantData.QueryHeightData(originalTileId, x, y);
+                    elevation = instantData.QueryHeightData(originalTileId, x, y);
+                    return true;
                 }
                 targetTileId.MoveToParent();
             }
 
-            return 0;
+            return false;
         }
         
         /// <summary>
@@ -271,6 +300,25 @@ namespace Mapbox.ImageModule.Terrain
         /// <returns></returns>
         public IEnumerator GetElevationData(LatitudeLongitude latLng, Action<float> callback = null)
         {
+            // Lossy wrapper: drops the "was it actually found" flag, so an unavailable elevation
+            // arrives as 0. Use TryGetElevationData when that matters.
+            return TryGetElevationData(latLng, (found, elevation) => callback?.Invoke(elevation));
+        }
+
+        /// <summary>
+        /// Elevation at a location, fetching the terrain tile if it is not already in memory, and
+        /// reporting whether a real value was obtained.
+        ///
+        /// The callback is invoked exactly once on every path, including failure - that is the
+        /// contract, because callers park coroutines on it. The fetching path used to dereference
+        /// the loaded data without checking it, and a failed, 404'd or cancelled terrain fetch
+        /// arrives there as null: the lambda threw, so the caller's callback was never invoked at
+        /// all and anything waiting on an elevation answer waited for good.
+        /// </summary>
+        /// <param name="latLng">Latitude longitude of the location you want to query</param>
+        /// <param name="callback">Receives whether elevation was found, and the elevation (0 when not).</param>
+        public IEnumerator TryGetElevationData(LatitudeLongitude latLng, Action<bool, float> callback)
+        {
             var tileId = Conversions.LatitudeLongitudeToTileId(latLng, 14).Canonical;
             var dataFound = false;
             for (int i = 14; i >= 2; i--)
@@ -279,7 +327,7 @@ namespace Mapbox.ImageModule.Terrain
                 {
                     var tilePos = Conversions.LatitudeLongitudeToInTile01(latLng, instantData.TileId);
                     var elevation = instantData.QueryHeightData(tilePos);
-                    callback?.Invoke(elevation);
+                    callback?.Invoke(true, elevation);
                     dataFound = true;
                     break;
                 }
@@ -294,9 +342,15 @@ namespace Mapbox.ImageModule.Terrain
                 tileId = Conversions.LatitudeLongitudeToTileId(latLng, 14).Canonical;
                 yield return LoadTileData(tileId, terrainData =>
                 {
+                    if (terrainData == null)
+                    {
+                        callback?.Invoke(false, 0f);
+                        return;
+                    }
+
                     var tilePos = Conversions.LatitudeLongitudeToInTile01(latLng, terrainData.TileId);
                     var elevation = terrainData.QueryHeightData(tilePos);
-                    callback?.Invoke(elevation);
+                    callback?.Invoke(true, elevation);
                 });
             }
         }
