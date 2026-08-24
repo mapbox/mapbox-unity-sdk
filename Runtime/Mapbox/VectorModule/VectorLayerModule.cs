@@ -350,7 +350,11 @@ namespace Mapbox.VectorModule
 		{
 			if (_readyTiles.Contains(tileId))
 			{
-				callback?.Invoke(new MeshGenerationTaskResult(TaskResultType.Success));
+				//AlreadyGenerated rather than Success: nothing was generated here, so there are
+				//no GeneratedObjects to hand back, and Success is the one member that promises
+				//there are. The tile is ready either way, which is what separates this from
+				//AlreadyInProgress below.
+				callback?.Invoke(new MeshGenerationTaskResult(TaskResultType.AlreadyGenerated));
 			}
 			else if (!IsMeshGenInWork(vectorData.TileId))
 			{
@@ -387,6 +391,20 @@ namespace Mapbox.VectorModule
 
 					callback?.Invoke(result);;
 				}));
+			}
+			else
+			{
+				//mesh generation for this tile is already running, started by an earlier caller.
+				//that caller owns the in-flight task and reports the real outcome to its own
+				//callback; all this one can honestly say is "you don't have to start it".
+				//deliberately NOT Success - the tile isn't ready, and a caller that treated this
+				//as completion would start dependent work against a visual that doesn't exist yet.
+				//
+				//the callback has to be invoked with something, though. without this branch it was
+				//dropped entirely, and CreateVisualCoroutine's "while (!isMeshGenDone) yield return
+				//null" then spun forever on Runnable - one dead per-frame coroutine per tile, every
+				//time LoadTileCoverToMemory was called while a generation was already under way.
+				callback?.Invoke(new MeshGenerationTaskResult(TaskResultType.AlreadyInProgress));
 			}
 		}
 
