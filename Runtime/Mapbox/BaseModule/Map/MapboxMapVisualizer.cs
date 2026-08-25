@@ -98,18 +98,11 @@ namespace Mapbox.BaseModule.Map
                 yield return _tileCreator.Initialize(terrainStrategy);
             }
 
-            // Give layer modules a chance to wire bookkeeping that observes tile lifecycle
-            // (terrain bounds tracker, etc) BEFORE their own Initialize runs — so any
-            // subscriptions are in place when the first tiles start loading.
-            foreach (var module in LayerModules)
-            {
-                if (module is ITileLifecycleObserver observer)
-                {
-                    observer.AttachToMapVisualizer(this);
-                }
-            }
-
-            yield return LayerModules.Select(x => x.Initialize()).WaitForAll();
+            // Modules that keep bookkeeping in step with tiles (the terrain bounds tracker, for
+            // one) subscribe from inside Initialize, using the source passed here. Handing it over
+            // at this point is what makes a second attachment pass unnecessary: a module reaches
+            // its subscription before its first yield, so it is watching before any tile loads.
+            yield return LayerModules.Select(x => x.Initialize(this)).WaitForAll();
         }
 
         /// <summary>

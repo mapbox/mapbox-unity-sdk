@@ -16,11 +16,15 @@ public class CompositeLayerModule : ILayerModule
         LayerModules = layerModules;
     }
     
-    public virtual IEnumerator Initialize()
+    /// <summary>
+    /// Initializes each child in turn, passing the tile-lifecycle source straight through so a
+    /// nested module can observe tiles exactly as a top-level one does.
+    /// </summary>
+    public virtual IEnumerator Initialize(ITileLifecycleSource tileLifecycle)
     {
         foreach (var module in LayerModules)
         {
-            yield return module.Initialize();
+            yield return module.Initialize(tileLifecycle);
         }
     }
 

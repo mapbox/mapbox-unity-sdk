@@ -7,8 +7,9 @@ namespace Mapbox.BaseModule.Map
 {
     /// <summary>
     /// Read-only "subject" surface of the tile-lifecycle observer pattern. Implemented
-    /// by <see cref="MapboxMapVisualizer"/>; consumed by <see cref="ITileLifecycleObserver"/>
-    /// implementations (and helpers they own, e.g. terrain bounds tracking).
+    /// by <see cref="MapboxMapVisualizer"/> and handed to every layer module through
+    /// <c>ILayerModule.Initialize</c>; consumed by the modules that want it (and helpers they own,
+    /// e.g. terrain bounds tracking). Modules with no interest in tile lifecycle ignore it.
     ///
     /// Carrying only what an observer needs lets helpers depend on this narrow contract
     /// instead of the full <see cref="MapboxMapVisualizer"/>, which simplifies testing

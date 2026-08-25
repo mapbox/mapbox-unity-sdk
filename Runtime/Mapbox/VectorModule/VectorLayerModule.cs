@@ -52,7 +52,7 @@ namespace Mapbox.VectorModule
 			_tilesToRemove = new List<CanonicalTileId>(10);
 		}
 
-		public virtual IEnumerator Initialize()
+		public virtual IEnumerator Initialize(ITileLifecycleSource tileLifecycle)
 		{
 			if (_vectorSource != null)
 			{

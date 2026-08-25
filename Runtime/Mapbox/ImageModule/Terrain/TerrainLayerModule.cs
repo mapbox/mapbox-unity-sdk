@@ -22,15 +22,15 @@ namespace Mapbox.ImageModule.Terrain
     /// settings, and hands each tile through a <see cref="TerrainStrategy"/> that produces
     /// render + optional collider meshes.
     /// </summary>
-    public class TerrainLayerModule : ITerrainLayerModule, ITileLifecycleObserver
+    public class TerrainLayerModule : ITerrainLayerModule
     {
         private TerrainLayerModuleSettings _settings;
         private Source<TerrainData> _rasterSource;
         private HashSet<CanonicalTileId> _retainedTerrainTiles;
         private TerrainStrategy _terrainStrategy;
         // Owns the Min/MaxElevation bookkeeping that used to live in MapboxMapVisualizer.
-        // Constructed in AttachToMapVisualizer once the visualizer is available, disposed
-        // in OnDestroy. The visualizer never references this directly.
+        // Constructed in Initialize, from the tile-lifecycle source handed in there, and
+        // disposed in OnDestroy. The visualizer never references this directly.
         private TerrainBoundsTracker _boundsTracker;
         // One-shot guard so QueryElevation doesn't spam the console on every call when the
         // user genuinely disabled CPU extraction.
@@ -39,14 +39,6 @@ namespace Mapbox.ImageModule.Terrain
         // plus iterator chain from Where/Select/Distinct on every tile-cover update.
         private readonly HashSet<CanonicalTileId> _dataIdScratch = new HashSet<CanonicalTileId>();
 
-        public void AttachToMapVisualizer(ITileLifecycleSource source)
-        {
-            // Idempotent: if a tracker is already running (re-init scenarios), keep it.
-            // Constructing a second one would leak the first (coroutine + subscriptions).
-            if (_boundsTracker != null) return;
-            _boundsTracker = new TerrainBoundsTracker(source);
-        }
-        
         public TerrainLayerModule(Source<TerrainData> source, TerrainLayerModuleSettings settings) : base()
         {
             _settings = settings;
@@ -55,8 +47,17 @@ namespace Mapbox.ImageModule.Terrain
             _terrainStrategy = new ElevatedTerrainStrategy();
         }
         
-        public virtual IEnumerator Initialize()
+        public virtual IEnumerator Initialize(ITileLifecycleSource tileLifecycle)
         {
+            // Subscribed before the first yield, so the tracker is watching before any tile can
+            // load - the rest of this method waits on network work.
+            // Idempotent: if a tracker is already running (re-init scenarios), keep it.
+            // Constructing a second one would leak the first (coroutine + subscriptions).
+            if (_boundsTracker == null && tileLifecycle != null)
+            {
+                _boundsTracker = new TerrainBoundsTracker(tileLifecycle);
+            }
+
             yield return _rasterSource.Initialize();
             if (_rasterSource is TerrainSource terrainSource)
             {
