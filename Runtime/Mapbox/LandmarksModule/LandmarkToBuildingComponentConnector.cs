@@ -134,12 +134,18 @@ public class LandmarkToBuildingComponentConnector : MonoBehaviour
         foreach (var tile in tiles)
         {
             var landmarkData = _landmarksPerTile[tile];
-            foreach (var tileId in AllChildrenOf14(landmarkData.TileId))
+
+            // Walk the buildings and ask which z14 tile each belongs to, rather than enumerating
+            // the z14 tile's descendants and probing for them. The descendant enumeration only
+            // reached z15 and z16, so a building rendered at z17 or deeper - or at z14 itself - was
+            // never revisited when its landmark arrived later, and stayed visible through the
+            // landmark. Extending the enumeration is the wrong shape anyway: it grows 4^depth (256
+            // ids at z18, 1024 at z19), whereas this is bounded by the buildings actually loaded,
+            // and needs no assumption about render zoom at all.
+            foreach (var pair in _buildingsPerTile)
             {
-                if (_buildingsPerTile.TryGetValue(tileId, out var buildingData))
-                {
-                    HandleCollision(buildingData, landmarkData);
-                }
+                if (!IsUnderLandmarkTile(pair.Key, landmarkData.TileId)) continue;
+                HandleCollision(pair.Value, landmarkData);
             }
         }
     }
@@ -353,19 +359,19 @@ public class LandmarkToBuildingComponentConnector : MonoBehaviour
         _landmarksPerTile[neighbourId].Sources.Add(originalId);
     }
 
-    private IEnumerable<CanonicalTileId> AllChildrenOf14(CanonicalTileId tileId)
+    /// <summary>
+    /// Whether a building tile sits inside the given z14 landmark tile, at any render zoom.
+    /// </summary>
+    private static bool IsUnderLandmarkTile(CanonicalTileId buildingTileId, CanonicalTileId landmarkTileId)
     {
-        for (int i = 0; i < 4; i++)
-        {
-            var child = tileId.Quadrant(i);
-            yield return child;
+        if (buildingTileId.Z < landmarkTileId.Z) return false;
 
-            for (int j = 0; j < 4; j++)
-            {
-                var grandchild = child.Quadrant(j);
-                yield return grandchild;
-            }
-        }
+        // Fresh copy: ParentAt walks the struct up in place and returns it, so calling it on the
+        // dictionary key itself would corrupt the key we are iterating.
+        var parent = new CanonicalTileId(buildingTileId.Z, buildingTileId.X, buildingTileId.Y)
+            .ParentAt(landmarkTileId.Z);
+
+        return parent.Equals(landmarkTileId);
     }
 
     private class BuildingData
