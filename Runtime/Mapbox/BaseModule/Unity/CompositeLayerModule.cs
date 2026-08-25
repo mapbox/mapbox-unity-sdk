@@ -82,7 +82,7 @@ public class CompositeLayerModule : ILayerModule
     /// <summary>
     /// Retains the given tiles in every child module, reporting true only if all of them are ready.
     /// It used to discard each child's answer and hardcode true, so a composite claimed readiness
-    /// even while a child said otherwise - LandmarksLayerModule, for one, computes a real value.
+    /// even while a child said otherwise, and some modules compute a real value there.
     /// </summary>
     public virtual bool RetainTiles(HashSet<CanonicalTileId> retainedTiles)
     {

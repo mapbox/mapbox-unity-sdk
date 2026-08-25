@@ -70,7 +70,7 @@ namespace Mapbox.BaseModule.Data.Tasks
         /// ones that exist belong to whichever call generated them. The tile IS usable, so a
         /// caller that only needs it present can proceed. Distinct from Success because
         /// GeneratedObjects is null here, and consumers key off that to mean "no visual for
-        /// this tile" (see LandmarksLayerModule's generation callback) - reporting Success
+        /// this tile" - some consumers key off that - so reporting Success
         /// would have them cache a null visual over a tile that has a perfectly good one.
         /// </summary>
         AlreadyGenerated,
