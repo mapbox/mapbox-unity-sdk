@@ -10,23 +10,29 @@ namespace Mapbox.LandmarkModule
     [CreateAssetMenu(menuName = "Mapbox/Filters/Landmark Polygon Filter")]
     public class LandmarkPolygonFilterObject : FilterBaseObject
     {
-        private LandmarkPolygonFilter _filter;
+        // volatile + lock: the getter is reachable from mesh-generation worker threads (the filter
+        // stack is evaluated inside VectorLayerModule's DataAction, which TaskManager runs on
+        // Task.Run) as well as from the main thread, so an unsynchronised lazy create could hand two
+        // callers two different filters and lose whichever set of polygons went into the loser.
+        private volatile LandmarkPolygonFilter _filter;
+        private readonly object _filterLock = new object();
 
-        public override ILayerFeatureFilterComparer Filter
+        public override ILayerFeatureFilterComparer Filter => GetOrCreateFilter();
+
+        private LandmarkPolygonFilter GetOrCreateFilter()
         {
-            get
+            var filter = _filter;
+            if (filter != null) return filter;
+
+            lock (_filterLock)
             {
-                if (_filter == null)
-                    _filter = new LandmarkPolygonFilter();
-                return _filter;
+                return _filter ?? (_filter = new LandmarkPolygonFilter());
             }
         }
 
         public void AddLandmarkPolygons(CanonicalTileId z14TileId, List<Vector3[]> polygons)
         {
-            // Ensure the filter instance exists
-            _ = Filter;
-            _filter.AddLandmarkPolygons(z14TileId, polygons);
+            GetOrCreateFilter().AddLandmarkPolygons(z14TileId, polygons);
         }
 
         public void RemoveLandmarkPolygonsFromSource(CanonicalTileId z14TileId)
@@ -48,15 +54,40 @@ namespace Mapbox.LandmarkModule
     /// </summary>
     public class LandmarkPolygonFilter : FilterBase
     {
-        private readonly Dictionary<CanonicalTileId, LandmarkTileData> _landmarksAtZ14 =
+        /// <summary>
+        /// Current polygon set, treated as immutable once published. Readers take the reference once
+        /// and never look at the field again; writers build a replacement and swap it in.
+        ///
+        /// This is a real concurrency requirement, not caution. Try() runs on a mesh-generation
+        /// worker thread - VectorLayerVisualizer evaluates the filter stack inside
+        /// VectorLayerModule's DataAction, which TaskManager dispatches through Task.Run - while
+        /// AddLandmarkPolygons and RemoveLandmarkPolygonsFromSource are called from the main thread
+        /// as landmark tiles finish and are disposed. Structurally modifying a Dictionary or List
+        /// while another thread enumerates it gives torn reads, InvalidOperationException, or an
+        /// outright hang inside the dictionary.
+        ///
+        /// Copy-on-write rather than a lock because the ratio is lopsided: reads happen per feature
+        /// per tile on several worker threads, writes once per landmark tile completion. Readers
+        /// never block, and writers pay one dictionary copy plus a clone of only the tiles they
+        /// touch.
+        /// </summary>
+        private volatile Dictionary<CanonicalTileId, LandmarkTileData> _landmarksAtZ14 =
             new Dictionary<CanonicalTileId, LandmarkTileData>();
 
-        // Reusable buffer for transformed feature vertices, avoids per-call allocation
-        private Vector3[] _transformBuffer = Array.Empty<Vector3>();
+        // Serialises writers against each other; readers never take it.
+        private readonly object _writeLock = new object();
+
+        // Scratch for transformed feature vertices. Per-thread rather than per-instance: several
+        // mesh-generation tasks run at once and a single shared array had them overwriting each
+        // other's vertices mid-comparison.
+        [ThreadStatic] private static Vector3[] _transformBuffer;
 
         public override bool Try(VectorFeatureUnity feature)
         {
-            if (_landmarksAtZ14.Count == 0)
+            // One read of the field; everything below works off this snapshot, so a concurrent
+            // write cannot change the collection under us.
+            var landmarks = _landmarksAtZ14;
+            if (landmarks.Count == 0)
                 return true;
 
             // IMPORTANT: CanonicalTileId is a struct and ParentAt() mutates it in place.
@@ -76,7 +107,7 @@ namespace Mapbox.LandmarkModule
             // Neighbor tile coverage is handled by polygon replication in AddLandmarkPolygons —
             // polygons that extend beyond tile boundaries are copied into neighboring z14 tiles,
             // so a single lookup here is sufficient.
-            if (!_landmarksAtZ14.TryGetValue(z14Parent, out var landmarkData))
+            if (!landmarks.TryGetValue(z14Parent, out var landmarkData))
                 return true;
 
             if (FeatureIntersectsLandmarks(feature, landmarkData, scaleOffset))
@@ -155,8 +186,12 @@ namespace Mapbox.LandmarkModule
         /// </summary>
         private Vector3[] TransformToZ14(List<Vector3> vertices, Vector4 scaleOffset)
         {
-            if (_transformBuffer.Length != vertices.Count)
-                _transformBuffer = new Vector3[vertices.Count];
+            var buffer = _transformBuffer;
+            if (buffer == null || buffer.Length != vertices.Count)
+            {
+                buffer = new Vector3[vertices.Count];
+                _transformBuffer = buffer;
+            }
 
             var scaleX = scaleOffset[0];
             var scaleZ = scaleOffset[1];
@@ -165,30 +200,38 @@ namespace Mapbox.LandmarkModule
 
             for (int i = 0; i < vertices.Count; i++)
             {
-                ref var target = ref _transformBuffer[i];
+                ref var target = ref buffer[i];
                 target.x = vertices[i].x * scaleX + offsetX;
                 target.y = vertices[i].y;
                 target.z = vertices[i].z * scaleZ - offsetZ;
             }
 
-            return _transformBuffer;
+            return buffer;
         }
 
         public void AddLandmarkPolygons(CanonicalTileId z14TileId, List<Vector3[]> polygons)
         {
-            if (!_landmarksAtZ14.ContainsKey(z14TileId))
-                _landmarksAtZ14[z14TileId] = new LandmarkTileData();
+            if (polygons == null || polygons.Count == 0) return;
 
-            var tileData = _landmarksAtZ14[z14TileId];
-            foreach (var polygon in polygons)
+            lock (_writeLock)
             {
-                tileData.Polygons.Add(polygon);
-                tileData.BoundingBoxes.Add(MapboxGeometryUtilities.BoundsOfVertices(polygon));
-                tileData.Sources.Add(z14TileId);
-            }
+                // Build a replacement rather than editing in place. Anything already published may
+                // be mid-enumeration on a worker thread, so neither the dictionary nor a tile's
+                // lists may be touched once they are visible - only the tiles this call actually
+                // changes get cloned, the rest are shared by reference and stay immutable.
+                var next = new Dictionary<CanonicalTileId, LandmarkTileData>(_landmarksAtZ14);
 
-            // Replicate polygons that extend beyond tile boundaries into neighbor tiles
-            ReplicateToNeighbors(z14TileId, polygons);
+                foreach (var polygon in polygons)
+                {
+                    if (polygon == null || polygon.Length == 0) continue;
+                    AppendPolygon(next, z14TileId, z14TileId, polygon);
+                }
+
+                // Replicate polygons that extend beyond tile boundaries into neighbor tiles
+                ReplicateToNeighbors(next, z14TileId, polygons);
+
+                _landmarksAtZ14 = next;
+            }
         }
 
         /// <summary>
@@ -197,37 +240,59 @@ namespace Mapbox.LandmarkModule
         /// </summary>
         public void RemoveLandmarkPolygonsFromSource(CanonicalTileId sourceTileId)
         {
-            var tilesToRemove = new List<CanonicalTileId>();
-            foreach (var pair in _landmarksAtZ14)
+            lock (_writeLock)
             {
-                var tileData = pair.Value;
-                for (int i = tileData.Sources.Count - 1; i >= 0; i--)
+                var current = _landmarksAtZ14;
+                Dictionary<CanonicalTileId, LandmarkTileData> next = null;
+
+                foreach (var pair in current)
                 {
-                    if (tileData.Sources[i].Equals(sourceTileId))
+                    var tileData = pair.Value;
+                    if (!tileData.HasSource(sourceTileId)) continue;
+
+                    // First affected tile: only now is a copy worth making.
+                    next = next ?? new Dictionary<CanonicalTileId, LandmarkTileData>(current);
+
+                    var trimmed = tileData.WithoutSource(sourceTileId);
+                    if (trimmed.Polygons.Count == 0)
                     {
-                        tileData.Polygons.RemoveAt(i);
-                        tileData.BoundingBoxes.RemoveAt(i);
-                        tileData.Sources.RemoveAt(i);
+                        next.Remove(pair.Key);
+                    }
+                    else
+                    {
+                        next[pair.Key] = trimmed;
                     }
                 }
 
-                if (tileData.Polygons.Count == 0)
-                    tilesToRemove.Add(pair.Key);
+                if (next != null) _landmarksAtZ14 = next;
             }
-
-            foreach (var tile in tilesToRemove)
-                _landmarksAtZ14.Remove(tile);
         }
 
         /// <summary>
-        /// Replicates landmark polygons to neighboring z14 tiles when they extend beyond tile boundaries.
-        /// Landmark footprints in 0-1 tile space can exceed these bounds near tile edges.
-        /// Same pattern as LandmarkToBuildingComponentConnector.AddLandmarkData/AddPolyTo.
+        /// Adds one polygon to a tile in the pending set, cloning that tile's entry first so the
+        /// version already published to readers is left untouched.
         /// </summary>
-        private void ReplicateToNeighbors(CanonicalTileId originalId, List<Vector3[]> polygons)
+        private static void AppendPolygon(Dictionary<CanonicalTileId, LandmarkTileData> pending,
+            CanonicalTileId tileId, CanonicalTileId sourceId, Vector3[] polygon)
+        {
+            var tileData = pending.TryGetValue(tileId, out var existing)
+                ? existing.Clone()
+                : new LandmarkTileData();
+
+            tileData.Polygons.Add(polygon);
+            tileData.BoundingBoxes.Add(MapboxGeometryUtilities.BoundsOfVertices(polygon));
+            tileData.Sources.Add(sourceId);
+
+            pending[tileId] = tileData;
+        }
+
+        private static void ReplicateToNeighbors(Dictionary<CanonicalTileId, LandmarkTileData> pending,
+            CanonicalTileId originalId, List<Vector3[]> polygons)
         {
             foreach (var polygon in polygons)
             {
+                if (polygon == null || polygon.Length == 0) continue;
+
                 var minX = float.MaxValue;
                 var maxX = float.MinValue;
                 var minZ = float.MaxValue;
@@ -248,41 +313,42 @@ namespace Mapbox.LandmarkModule
 
                 // Cardinal neighbors
                 if (extendsLeft)
-                    AddPolyToNeighbor(originalId, new CanonicalTileId(originalId.Z, originalId.X - 1, originalId.Y),
+                    AddPolyToNeighbor(pending, originalId, new CanonicalTileId(originalId.Z, originalId.X - 1, originalId.Y),
                         polygon);
 
                 if (extendsRight)
-                    AddPolyToNeighbor(originalId, new CanonicalTileId(originalId.Z, originalId.X + 1, originalId.Y),
+                    AddPolyToNeighbor(pending, originalId, new CanonicalTileId(originalId.Z, originalId.X + 1, originalId.Y),
                         polygon);
 
                 if (extendsTop)
-                    AddPolyToNeighbor(originalId, new CanonicalTileId(originalId.Z, originalId.X, originalId.Y - 1),
+                    AddPolyToNeighbor(pending, originalId, new CanonicalTileId(originalId.Z, originalId.X, originalId.Y - 1),
                         polygon);
 
                 if (extendsBottom)
-                    AddPolyToNeighbor(originalId, new CanonicalTileId(originalId.Z, originalId.X, originalId.Y + 1),
+                    AddPolyToNeighbor(pending, originalId, new CanonicalTileId(originalId.Z, originalId.X, originalId.Y + 1),
                         polygon);
 
                 // Diagonal neighbors — polygon extends beyond both X and Z boundaries
                 if (extendsLeft && extendsTop)
-                    AddPolyToNeighbor(originalId, new CanonicalTileId(originalId.Z, originalId.X - 1, originalId.Y - 1),
+                    AddPolyToNeighbor(pending, originalId, new CanonicalTileId(originalId.Z, originalId.X - 1, originalId.Y - 1),
                         polygon);
 
                 if (extendsRight && extendsTop)
-                    AddPolyToNeighbor(originalId, new CanonicalTileId(originalId.Z, originalId.X + 1, originalId.Y - 1),
+                    AddPolyToNeighbor(pending, originalId, new CanonicalTileId(originalId.Z, originalId.X + 1, originalId.Y - 1),
                         polygon);
 
                 if (extendsLeft && extendsBottom)
-                    AddPolyToNeighbor(originalId, new CanonicalTileId(originalId.Z, originalId.X - 1, originalId.Y + 1),
+                    AddPolyToNeighbor(pending, originalId, new CanonicalTileId(originalId.Z, originalId.X - 1, originalId.Y + 1),
                         polygon);
 
                 if (extendsRight && extendsBottom)
-                    AddPolyToNeighbor(originalId, new CanonicalTileId(originalId.Z, originalId.X + 1, originalId.Y + 1),
+                    AddPolyToNeighbor(pending, originalId, new CanonicalTileId(originalId.Z, originalId.X + 1, originalId.Y + 1),
                         polygon);
             }
         }
 
-        private void AddPolyToNeighbor(CanonicalTileId originalId, CanonicalTileId neighborId, Vector3[] polygon)
+        private static void AddPolyToNeighbor(Dictionary<CanonicalTileId, LandmarkTileData> pending,
+            CanonicalTileId originalId, CanonicalTileId neighborId, Vector3[] polygon)
         {
             var dif = new Vector3(neighborId.X - originalId.X, 0, neighborId.Y - originalId.Y);
             var newPoly = new Vector3[polygon.Length];
@@ -291,19 +357,53 @@ namespace Mapbox.LandmarkModule
                 newPoly[i] = new Vector3(polygon[i].x - dif.x, polygon[i].y, polygon[i].z + dif.z);
             }
 
-            if (!_landmarksAtZ14.ContainsKey(neighborId))
-                _landmarksAtZ14[neighborId] = new LandmarkTileData();
-
-            _landmarksAtZ14[neighborId].Polygons.Add(newPoly);
-            _landmarksAtZ14[neighborId].BoundingBoxes.Add(MapboxGeometryUtilities.BoundsOfVertices(newPoly));
-            _landmarksAtZ14[neighborId].Sources.Add(originalId);
+            AppendPolygon(pending, neighborId, originalId, newPoly);
         }
 
+        /// <summary>
+        /// Polygons for one z14 tile. Mutated only while still private to a writer; once stored in a
+        /// published dictionary it is treated as immutable, which is what lets readers enumerate it
+        /// without locking.
+        /// </summary>
         private class LandmarkTileData
         {
             public readonly List<Vector3[]> Polygons = new List<Vector3[]>();
             public readonly List<Bounds> BoundingBoxes = new List<Bounds>();
             public readonly List<CanonicalTileId> Sources = new List<CanonicalTileId>();
+
+            public LandmarkTileData Clone()
+            {
+                var copy = new LandmarkTileData();
+                copy.Polygons.AddRange(Polygons);
+                copy.BoundingBoxes.AddRange(BoundingBoxes);
+                copy.Sources.AddRange(Sources);
+                return copy;
+            }
+
+            public bool HasSource(CanonicalTileId sourceId)
+            {
+                for (var i = 0; i < Sources.Count; i++)
+                {
+                    if (Sources[i].Equals(sourceId)) return true;
+                }
+
+                return false;
+            }
+
+            /// <summary>A copy with every entry contributed by the given source tile left out.</summary>
+            public LandmarkTileData WithoutSource(CanonicalTileId sourceId)
+            {
+                var copy = new LandmarkTileData();
+                for (var i = 0; i < Sources.Count; i++)
+                {
+                    if (Sources[i].Equals(sourceId)) continue;
+                    copy.Polygons.Add(Polygons[i]);
+                    copy.BoundingBoxes.Add(BoundingBoxes[i]);
+                    copy.Sources.Add(Sources[i]);
+                }
+
+                return copy;
+            }
         }
     }
 }

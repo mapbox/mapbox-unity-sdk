@@ -14,6 +14,7 @@ namespace Mapbox.LandmarkModule.Unity
 {
 	public class LandmarksLayerModuleScript : ModuleConstructorScript
 	{
+		[Tooltip("Material every landmark mesh is rendered with. Must be a glTF-compatible material that exposes baseColorFactor - use the shipped LandmarkMaterialGLTF unless you have built your own from the same subgraphs, since landmark tiles supply PBR textures the standard URP shaders will not bind.")]
 		public Material BaseMaterial;
 
 		public override ILayerModule ModuleImplementation { get; protected set; }

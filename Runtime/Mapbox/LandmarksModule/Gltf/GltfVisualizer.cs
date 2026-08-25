@@ -26,22 +26,34 @@ namespace Mapbox.LandmarkModule
         // public Action<CanonicalTileId, List<Vector3[]>> LandmarkFootprintCreated = (id, results) => { };
         
         private Material _baseMaterial;
-        private Dictionary<CanonicalTileId, TaskWrapper> _activeTasks;
+        // In-flight tile ids. A HashSet rather than the Dictionary<CanonicalTileId, TaskWrapper>
+        // this used to be: the dictionary only ever stored null, so it read as though a task were
+        // being kept for cancellation when nothing here can cancel a glTF load. If landmark
+        // generation ever does become cancellable, that wants a real handle and an un-retain hook -
+        // see the note on Generate.
+        private HashSet<CanonicalTileId> _activeTasks;
         private ObjectPool<GameObject> _objectPool;
         private Transform _gltfRoot;
         private IMapInformation _mapInformation;
         
 
-        public bool IsInWork(CanonicalTileId tileId) { return _activeTasks.ContainsKey(tileId); }
+        public bool IsInWork(CanonicalTileId tileId) { return _activeTasks.Contains(tileId); }
 		
         public GltfVisualizer(UnityContext unityContext, IMapInformation mapInformation, Material baseMaterial)
         {
             _mapInformation = mapInformation;
             _baseMaterial = baseMaterial;
-            _activeTasks = new Dictionary<CanonicalTileId, TaskWrapper>();
+            _activeTasks = new HashSet<CanonicalTileId>();
             _objectPool = new ObjectPool<GameObject>(PoolObjectGenerator);
             var go = new GameObject("gltf root");
-            go.transform.SetParent(unityContext.RuntimeGenerationRoot);
+            // worldPositionStays: false, matching VectorLayerVisualizer. A new GameObject sits at
+            // world origin with identity rotation, so the default (true) makes Unity write
+            // localPosition = inverse(parent) * 0 and counter-rotate localRotation to preserve that
+            // world pose - every landmark then ends up offset and counter-rotated relative to the
+            // base tiles under a translated or rotated MapRoot, such as one anchored to an AR rig.
+            go.transform.SetParent(unityContext.RuntimeGenerationRoot, worldPositionStays: false);
+            go.transform.localPosition = Vector3.zero;
+            go.transform.localRotation = Quaternion.identity;
             _gltfRoot = go.transform;
         }
         
@@ -50,9 +62,18 @@ namespace Mapbox.LandmarkModule
             return _objectPool.InitializeItems(20);
         }
 		
+        /// <summary>
+        /// Loads and instantiates one landmark tile.
+        ///
+        /// Note there is no cancellation. When RetainTiles drops a tile the vector and pbf sources
+        /// cancel their in-flight fetches, but a glTF load already under way here runs to
+        /// completion and reports a tile the map no longer wants - the module then caches a visual
+        /// for an un-retained tile until the next sweep releases it. Wasted work rather than a
+        /// correctness problem, and most visible during fast zoom sweeps where the cover churns.
+        /// </summary>
         public async Task Generate(BuildingData vectorData, Action<GltfGenerationTaskResult> callback)
         {
-            if (_activeTasks.ContainsKey(vectorData.TileId))
+            if (_activeTasks.Contains(vectorData.TileId))
             {
                 // Generation is already running for this tile, started by an earlier call, and
                 // that call reports the real outcome to its own callback. Previously this
@@ -75,7 +96,7 @@ namespace Mapbox.LandmarkModule
                 return;
             }
 
-            _activeTasks.Add(vectorData.TileId, null);
+            _activeTasks.Add(vectorData.TileId);
 
             var gltf = new MapboxGltfImport(null, null, new MapboxGltfMaterialGenerator(_baseMaterial), new ConsoleLogger());
             var buildingRoot = _objectPool.GetObject(); //new GameObject("building " + vectorData.TileId);
@@ -142,6 +163,28 @@ namespace Mapbox.LandmarkModule
         }
         
         
+
+        /// <summary>
+        /// Releases everything this visualizer owns: the pooled GameObjects, the pool's own queue,
+        /// and the "gltf root" container. Without it, re-initializing a map in the same session left
+        /// behind a gltf root and a full pre-warmed pool each time, since nothing else has a
+        /// reference to either.
+        /// </summary>
+        public void OnDestroy()
+        {
+            foreach (var pooled in _objectPool.GetQueue())
+            {
+                if (pooled != null) GameObject.Destroy(pooled);
+            }
+            _objectPool.Clear();
+
+            // Anything still parented here belongs to tiles the module has not released; destroying
+            // the root takes them with it, which is what we want on teardown.
+            if (_gltfRoot != null) GameObject.Destroy(_gltfRoot.gameObject);
+            _gltfRoot = null;
+
+            _activeTasks.Clear();
+        }
 
         private GameObject PoolObjectGenerator()
         {

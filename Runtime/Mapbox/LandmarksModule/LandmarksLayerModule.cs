@@ -135,6 +135,25 @@ namespace Mapbox.LandmarkModule
 
 		public void OnDestroy()
 		{
+			// Subscribed in the constructor, so it has to come off here or a destroyed module keeps
+			// being called back by a source that outlives it.
+			_buildingSource.CacheItemDisposed -= ClearDisposedDataVisual;
+
+			// Visuals for tiles never released through ClearDisposedDataVisual are still parented
+			// under the generation root. GltfVisualizer.OnDestroy takes its own root with it, but
+			// these are the ones tracked here, so clearing them keeps the two views consistent.
+			foreach (var pair in _visualCache)
+			{
+				foreach (var visual in pair.Value)
+				{
+					if (visual != null) GameObject.Destroy(visual);
+				}
+			}
+			_visualCache.Clear();
+
+			// Owns a GameObject and a pre-warmed pool of 20, neither of which anything else
+			// references - re-initializing a map in one session used to leak a full set each time.
+			_meshGenerationUnit.OnDestroy();
 			_buildingSource.OnDestroy();
 		}
 

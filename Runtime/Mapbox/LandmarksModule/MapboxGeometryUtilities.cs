@@ -26,6 +26,12 @@ namespace Mapbox.BaseModule.Utilities
             // NOTE: Bbox check is skipped here because it's already done by the caller
             // This avoids redundant bounding box calculations
 
+            // Both indexing below and the edge walk assume a non-empty ring. ExtractBoundaryRings
+            // can legitimately produce nothing for degenerate geometry, and an empty ring cannot
+            // intersect anything, so answer that rather than throwing on polygonA[0].
+            if (polygonA == null || polygonA.Length == 0 || polygonB == null || polygonB.Length == 0)
+                return false;
+
             // Strategy 1: Check if any vertex of one polygon is inside the other
             // This handles the case where one polygon is completely inside the other
             // OPTIMIZATION: Only check first vertex of each polygon initially

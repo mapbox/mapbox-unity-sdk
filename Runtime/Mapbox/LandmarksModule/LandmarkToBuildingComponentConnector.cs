@@ -9,10 +9,17 @@ using Mapbox.VectorModule.ComponentSystem.BuildingComponentVisualizer;
 using Mapbox.VectorModule.ComponentSystem.Data;
 using UnityEngine;
 
+namespace Mapbox.LandmarkModule
+{
 public class LandmarkToBuildingComponentConnector : MonoBehaviour
 {
+    [Tooltip("Map whose initialization gates the wiring below. Required - leave it unassigned and this connector does nothing.")]
     public MapBehaviourCore Map;
+
+    [Tooltip("Landmarks module supplying the footprints to test against. Required.")]
     public LandmarksLayerModuleScript LandmarksLayerModuleScript;
+
+    [Tooltip("Building visualizer whose meshes get their overlapping vertices collapsed. Required.")]
     public BuildingComponentVisualizerObject BuildingLayerVisualizerObject;
 
     private Dictionary<CanonicalTileId, BuildingData> _buildingsPerTile;
@@ -29,23 +36,37 @@ public class LandmarkToBuildingComponentConnector : MonoBehaviour
         _buildingsPerTile = new Dictionary<CanonicalTileId, BuildingData>();
         _landmarksPerTile = new Dictionary<CanonicalTileId, LandmarkData>();
 
-        Map.Initialized += _ =>
+        if (Map == null || LandmarksLayerModuleScript == null || BuildingLayerVisualizerObject == null)
         {
-            _landmarksLayerModule = (LandmarksLayerModule)LandmarksLayerModuleScript.ModuleImplementation;
-            _landmarksLayerModule.TileFinished += LandmarkFootprintResults;
-            _landmarksLayerModule.TileDisposed += OnLandmarkTileDisposed;
+            Debug.LogWarning($"{nameof(LandmarkToBuildingComponentConnector)} needs Map, Landmarks Layer Module Script and Building Layer Visualizer Object assigned. Landmark/building overlap suppression is disabled.", this);
+            enabled = false;
+            return;
+        }
 
-            _buildingVisualizer = (BuildingComponentVisualizer)BuildingLayerVisualizerObject.GetLayerVisualizer();
-            if (_buildingVisualizer != null)
-            {
-                _buildingVisualizer.OnBuildingMeshCreated += OnBuildingMeshCreated;
-                _buildingVisualizer.OnBuildingMeshDestroyed += OnBuildingMeshDestroyed;
-            }
-        };
+        // Named method rather than a lambda so OnDestroy can detach it. As a closure it could not
+        // be unsubscribed, so destroying this component before the map initialized left the body to
+        // run against a dead component.
+        Map.Initialized += OnMapInitialized;
+    }
+
+    private void OnMapInitialized(MapboxMap mapboxMap)
+    {
+        _landmarksLayerModule = (LandmarksLayerModule)LandmarksLayerModuleScript.ModuleImplementation;
+        _landmarksLayerModule.TileFinished += LandmarkFootprintResults;
+        _landmarksLayerModule.TileDisposed += OnLandmarkTileDisposed;
+
+        _buildingVisualizer = (BuildingComponentVisualizer)BuildingLayerVisualizerObject.GetLayerVisualizer();
+        if (_buildingVisualizer != null)
+        {
+            _buildingVisualizer.OnBuildingMeshCreated += OnBuildingMeshCreated;
+            _buildingVisualizer.OnBuildingMeshDestroyed += OnBuildingMeshDestroyed;
+        }
     }
 
     private void OnDestroy()
     {
+        if (Map != null) Map.Initialized -= OnMapInitialized;
+
         if (_landmarksLayerModule != null)
         {
             _landmarksLayerModule.TileFinished -= LandmarkFootprintResults;
@@ -130,6 +151,7 @@ public class LandmarkToBuildingComponentConnector : MonoBehaviour
     private void HandleCollision(BuildingData buildingData, LandmarkData landmarkData)
     {
         var meshData = buildingData.MeshData;
+        var hidAnything = false;
 
         for (var i = 0; i < meshData.MeshInfo.vertexRanges.Length; i++)
         {
@@ -165,12 +187,27 @@ public class LandmarkToBuildingComponentConnector : MonoBehaviour
                 if (MapboxGeometryUtilities.PolygonsIntersect(landmarkData.Polygons[landmarkIndex], transformedBuildingFootprint))
                 {
                     HideBuildingVertices(vertexSpan);
+                    hidAnything = true;
                     break;
                 }
             }
         }
 
-        buildingData.GameObject.GetComponent<MeshFilter>().mesh.SetVertices(meshData.Vertices);
+        // Only re-upload when something actually moved. This runs for every (building,
+        // landmark tile) pair, and the overwhelmingly common outcome is that nothing intersects -
+        // pushing the whole vertex buffer back to the mesh in that case re-uploaded every retained
+        // building on every landmark tile completion for no change at all.
+        if (!hidAnything) return;
+
+        // The visualizer may have pooled or destroyed this building between the mesh being
+        // registered and this landmark tile finishing; OnBuildingMeshDestroyed only unhooks the
+        // exact tile id, so the entry can outlive the GameObject.
+        if (buildingData.GameObject == null) return;
+
+        var meshFilter = buildingData.GameObject.GetComponent<MeshFilter>();
+        if (meshFilter == null || meshFilter.mesh == null) return;
+
+        meshFilter.mesh.SetVertices(meshData.Vertices);
     }
 
     /// <summary>
@@ -353,4 +390,5 @@ public class LandmarkToBuildingComponentConnector : MonoBehaviour
             Sources = new List<CanonicalTileId>();
         }
     }
+}
 }
