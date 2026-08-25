@@ -116,6 +116,13 @@ namespace Mapbox.VectorModule.ComponentSystem.AreaComponent
                     // identically and the feature was dropped without a word. Low-zoom
                     // coastline and ocean rings are exactly that shape, which is why water
                     // went missing in patches when zoomed out.
+                    // The capacity that actually just failed, captured before the buffer is
+                    // replaced. Not replacementCapacity: on the second failure the sizing
+                    // block above is skipped, so that variable holds poolSize rather than the
+                    // worst-case capacity the retry was really attempted against - which made
+                    // the warning report a number the code had never tried.
+                    var attemptedCapacity = triList.Length;
+
                     var replacementCapacity = poolSize;
                     if (retryCount == 0)
                     {
@@ -137,7 +144,7 @@ namespace Mapbox.VectorModule.ComponentSystem.AreaComponent
                     // the low-zoom water problem hard to see.
                     Debug.LogWarning(
                         $"AreaComponentVisualizer: skipped a '{VectorLayerName}' feature in tile {tileId} that could not be " +
-                        $"triangulated into {replacementCapacity} indices ({featureResult.VertexData.VertexCount} vertices, " +
+                        $"triangulated into {attemptedCapacity} indices ({featureResult.VertexData.VertexCount} vertices, " +
                         $"{Mathf.Max(0, featureResult.VertexData.Submeshes.Count - 1)} rings).");
                     retryCount = 0;
                     continue;

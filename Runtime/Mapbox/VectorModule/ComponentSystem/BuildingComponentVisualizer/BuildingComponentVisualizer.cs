@@ -118,6 +118,13 @@ namespace Mapbox.VectorModule.ComponentSystem.BuildingComponentVisualizer
                     // is a guard rather than an observed failure — but it is the same defect
                     // that lost low-zoom water in AreaComponentVisualizer, and the extrusion
                     // path below already sizes to its requirement this way.
+                    // The capacity that actually just failed, captured before the buffer is
+                    // replaced. Not replacementCapacity: on the second failure the sizing
+                    // block above is skipped, so that variable holds poolSize rather than the
+                    // worst-case capacity the retry was really attempted against - which made
+                    // the warning report a number the code had never tried.
+                    var attemptedCapacity = triList.Length;
+
                     var replacementCapacity = poolSize;
                     if (retryCount == 0)
                     {
@@ -136,7 +143,7 @@ namespace Mapbox.VectorModule.ComponentSystem.BuildingComponentVisualizer
                     // degenerate rather than merely large. Skip it, but say so.
                     Debug.LogWarning(
                         $"BuildingComponentVisualizer: skipped a '{VectorLayerName}' feature in tile {tileId} that could not be " +
-                        $"triangulated into {replacementCapacity} indices ({featureResult.VertexData.VertexCount} vertices, " +
+                        $"triangulated into {attemptedCapacity} indices ({featureResult.VertexData.VertexCount} vertices, " +
                         $"{Mathf.Max(0, featureResult.VertexData.Submeshes.Count - 1)} rings).");
                     retryCount = 0;
                     continue;

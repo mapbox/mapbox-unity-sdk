@@ -246,17 +246,31 @@ namespace Mapbox.ImageModule.Terrain
         {
             elevation = 0f;
 
-            if (!_settings.NeedsCpuElevation && !_elevationDisabledWarningLogged)
+            // No CPU elevation will ever exist in this configuration, so say so immediately rather
+            // than walking the ancestors and reporting a found-but-undecoded tile as a real answer.
+            if (!_settings.NeedsCpuElevation)
             {
-                _elevationDisabledWarningLogged = true;
-                Debug.LogWarning("[Mapbox] QueryElevation was called but TerrainLayerModuleSettings.ExtractCpuElevationData is disabled, so no CPU elevation data exists. Returning 0 for every query. Enable ExtractCpuElevationData if anything in your scene snaps to terrain (vector features, buildings, colliders, custom elevation lookups).");
+                if (!_elevationDisabledWarningLogged)
+                {
+                    _elevationDisabledWarningLogged = true;
+                    Debug.LogWarning("[Mapbox] QueryElevation was called but TerrainLayerModuleSettings.ExtractCpuElevationData is disabled, so no CPU elevation data exists. Returning 0 for every query. Enable ExtractCpuElevationData if anything in your scene snaps to terrain (vector features, buildings, colliders, custom elevation lookups).");
+                }
+
+                return false;
             }
 
             var originalTileId = tileId;
             var targetTileId = tileId;
             for (int i = 0; i < 5; i++)
             {
-                if (_rasterSource.GetInstantData(targetTileId, out var instantData))
+                // IsElevationDataReady, not merely "a data tile exists". The texture arrives before
+                // the elevation array: TerrainSource decodes elevation asynchronously, and
+                // QueryHeightData answers a silent 0 while ElevationValues is still null. Returning
+                // true there would report "sea level" for every tile whose decode is in flight -
+                // precisely the case this method exists to tell apart from a real reading, and the
+                // one a caller is most likely to hit, since it is the window right after a fetch.
+                if (_rasterSource.GetInstantData(targetTileId, out var instantData) &&
+                    instantData.IsElevationDataReady)
                 {
                     elevation = instantData.QueryHeightData(originalTileId, x, y);
                     return true;

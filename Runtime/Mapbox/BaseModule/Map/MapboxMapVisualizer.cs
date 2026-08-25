@@ -503,6 +503,19 @@ namespace Mapbox.BaseModule.Map
 
             TileUnloading(tile);
             ActiveTiles.Remove(tile.UnwrappedTileId);
+
+            // A pooled tile must not stay in TempTiles. Every caller that pools a tile it looked up
+            // itself already removed it first, but the two paths that pool a tile's CHILDREN did
+            // not - and children can be Temporary tiles, since DelveInto's pass-through branch
+            // adopts one. The stale entry is usually swept next frame by the
+            // !ActiveTiles.ContainsKey check at the top of InternalUpdateCoroutine, but not if the
+            // pool re-issues this instance for a tile that IS active before that sweep runs: the
+            // guard then passes and TempTiles holds the same object twice, after which a single
+            // Remove clears only one and the leftover drives CreateTile/ShowTile on a tile it no
+            // longer owns. Removing here makes pooling and TempTiles membership impossible to
+            // desynchronise, whichever path did the pooling.
+            TempTiles.Remove(tile);
+
             tile.Recycle();
             tile.LoadingState = LoadingState.None;
             _tileCreator.PutTile(tile);
