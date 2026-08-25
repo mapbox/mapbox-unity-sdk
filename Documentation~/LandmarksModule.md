@@ -107,3 +107,5 @@ Landmarks only load at zoom 14 and above, so every destination uses 17 or higher
 ### Further Reading
 
 For technical details on the collision detection algorithms, coordinate space transforms, tile edge handling, event lifecycle, and architecture, see [Landmarks Module Internals](LandmarksModuleInternals.md).
+
+For what the module does not do yet — including the fact that **dynamic map scaling is unsupported**, and that click-to-select ships as code but is not wired into any scene — see [Known Gaps](LandmarksModuleKnownGaps.md).

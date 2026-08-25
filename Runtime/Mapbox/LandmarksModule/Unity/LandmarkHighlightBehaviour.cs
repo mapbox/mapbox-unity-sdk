@@ -15,6 +15,12 @@ namespace Mapbox.LandmarkModule
         [Tooltip("Colour applied to the landmark under the cursor when clicked. A saturated hue reads best against the untinted neighbours; red is the default.")]
         public Color HightlightColor = Color.red;
 
+        [Tooltip("Build a MeshCollider per landmark so clicks can hit them. ON is required for selection to work at all. Turn it OFF if you only want the events and are doing your own hit-testing - mesh colliders are the most expensive part of loading a landmark, and every landmark in the cover gets one.")]
+        public bool AddCollidersForSelection = true;
+
+        [Tooltip("Cook the collider as a convex hull rather than the exact building geometry. Much cheaper, and enough when a click only needs to identify which building was hit. Turn OFF if clicks must follow the real silhouette - a concave building (a courtyard, an arch) will register hits in the gaps with this on.")]
+        public bool UseConvexColliders = true;
+
         private readonly int _shaderColorPropertyName = Shader.PropertyToID("baseColorFactor");
 
         // Tinting through a property block rather than Renderer.material. Touching .material
@@ -48,7 +54,7 @@ namespace Mapbox.LandmarkModule
                 _module.BuildingLoaded += o =>
                 {
                     o.AddComponent<LandmarkComponent>();
-                    AddCollidersToVisuals(o);
+                    if (AddCollidersForSelection) AddCollidersToVisuals(o);
                 };
             };
         }
@@ -64,11 +70,12 @@ namespace Mapbox.LandmarkModule
                     var buildingComponent = hit.transform.gameObject.GetComponent<LandmarkComponent>();
                     if (buildingComponent != null)
                     {
-                        if (_visualSelectedEvent != null)
-                        {
-                            BuildingSelected(hit.transform.gameObject);
-                            _visualSelectedEvent.Invoke(hit.transform.gameObject);
-                        }
+                        // Highlighting is not conditional on anything being subscribed. This used to
+                        // sit inside a null check on the event, so with nothing wired in the
+                        // Inspector clicking a landmark did nothing at all and the component looked
+                        // broken.
+                        BuildingSelected(hit.transform.gameObject);
+                        _visualSelectedEvent?.Invoke(hit.transform.gameObject);
                     }
                     else
                     {
@@ -88,6 +95,17 @@ namespace Mapbox.LandmarkModule
             if (meshFilter == null || meshFilter.mesh == null) return;
 
             var mc = go.AddComponent<MeshCollider>();
+
+            // Cooking an exact MeshCollider from the render mesh is the most expensive single step
+            // in bringing a landmark on screen, and it is paid for every landmark in the cover
+            // whether or not anyone ever clicks one. A convex hull identifies the building just as
+            // well for a pick, at a fraction of the cost. Set on the collider before sharedMesh, so
+            // the cook happens once with the setting already applied.
+            if (UseConvexColliders)
+            {
+                mc.convex = true;
+            }
+
             mc.sharedMesh = meshFilter.mesh;
         }
 
