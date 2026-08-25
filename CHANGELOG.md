@@ -26,7 +26,7 @@ Correctness work across the tile pipeline, independent of any one feature module
 
 - `TaskResultType` gained `AlreadyGenerated` and `AlreadyInProgress`, so "nothing to do because it is done" and "nothing to do because someone else is doing it" are no longer both reported as `Success` - the one member that promises generated objects are attached.
 
-- `MapboxComponentsModuleScript.GetVectorLayerModule` is now virtual. It built its `VectorModuleSettings` in code with `RejectTilesOutsideZoom` pinned to (12, 16), so the Components module drew nothing below zoom 12 and there was no way to widen it.
+- `MapboxComponentsModuleScript` exposes `RejectTilesOutsideZoom`, `ClampDataLevelToMax` and `CacheSize` as serialized fields. It built its `VectorModuleSettings` entirely in code, so the Components module drew nothing below zoom 12 and the only way to change that was to subclass it and reimplement the whole build method. Defaults match the previous hardcoded values, so existing scenes are unaffected. `GetVectorLayerModule` remains virtual for what the Inspector cannot express, such as a different tileset.
 
 #### Added
 
