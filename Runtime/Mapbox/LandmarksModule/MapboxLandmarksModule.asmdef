@@ -1,0 +1,27 @@
+{
+    "name": "MapboxLandmarksModule",
+    "rootNamespace": "",
+    "references": [
+        "GUID:093b9fb2cd4794a8c94472d55c8bb0a9",
+        "GUID:a42927d1d4a3b4cda9b076a7adecb9cc",
+        "GUID:25ace1f7ded6f48c0a8abf5ef590456e",
+        "GUID:2400806fb903448e5b7e737b92f1e434",
+        "GUID:5aef8304858a8459cb2204d15bf75ab9",
+        "Unity.Meshopt.Decompress"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.meshopt.decompress",
+            "expression": "0.2.0-exp.1",
+            "define": "MESHOPT_IS_RECENT"
+        }
+    ],
+    "noEngineReferences": false
+}

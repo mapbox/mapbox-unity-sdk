@@ -16,6 +16,9 @@ namespace Mapbox.BaseModule.Utilities
 
 			public const string EventsAPI = "https://events.mapbox.com/";
 
+			/// <summary> Tileset serving 3D landmark meshes as meshopt-compressed glTF binaries. </summary>
+			public const string LandmarksTilesetId = "mapbox.mapbox-3dbuildings-v1-meshopt";
+
 			/// <summary> Mercator projection max latitude limit. </summary>
 			public const double LatitudeMax = 85.0511;
 

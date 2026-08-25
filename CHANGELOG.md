@@ -82,6 +82,40 @@ Correctness work across the tile pipeline, independent of any one feature module
 - `Mapbox.BaseModule.Utilities.MvtProperties.NormalizeIntegers`, public for anyone reading feature properties off their own decode path and hitting the same unsigned-int64 problem described above.
 
 - `UnitySource<T>.TilesetId`, so a caller can see which tileset - or which composed, comma-separated list of tilesets - a source it was handed actually fetches.
+### v3.2.0 (unreleased)
+
+Adds the Landmarks Module: 3D landmark meshes fetched from the Mapbox 3D Buildings tileset, with overlap suppression against both the Vector and Components building pipelines. glTFast is consumed as a normal package dependency rather than bundled, and two new hard dependencies are declared: `com.unity.cloud.gltfast` and `com.unity.meshopt.decompress`.
+
+#### Why the dependency shape matters
+
+Landmark tiles are glTF binaries whose buffer views are compressed with `EXT_meshopt_compression`, and the extension is listed in the tiles' `extensionsRequired`. glTFast logs an error and aborts the load when a required extension has no decoder available, so `com.unity.meshopt.decompress` is a hard requirement, not an optional accelerator.
+
+Feature IDs (`_FEATURE_ID_RGBA4444`) arrive in their own dedicated meshopt buffer view — roughly 7 KB compressed per tile — and are needed after glTFast has released its load-time buffers. Rather than patching glTFast to extend that buffer lifetime, the module decompresses that single buffer view directly from the tile bytes it already holds, using the same public meshoptimizer API glTFast itself calls. This duplicates none of glTFast's geometry decoding and keeps glTFast an unmodified package dependency.
+
+The decompressed bytes are held for the duration of scene instantiation and unpacked to `Color` exactly once, straight into each mesh's final vertex buffer. On a representative z14 tile that is about 430 KB held plus a single 1.7 MB color write, rather than materializing a `Color` array per primitive and copying it again to group by mesh.
+
+#### Added
+
+- `MapboxLandmarksModule` assembly: `LandmarksLayerModule` plus its `LandmarksLayerModuleScript` MonoBehaviour wrapper, driven by `Constants.Map.LandmarksTilesetId`.
+- Overlap suppression: `LandmarkToVectorConnector` + `LandmarkPolygonFilterObject` reject colliding footprints before mesh generation; `LandmarkToBuildingComponentConnector` zeroes colliding vertices after generation, since the Components module merges buildings into a single mesh.
+- Feature ID support, split across `FeatureIdSchema` (captures the custom vertex attribute via `JsonExtensionData`), `GlbBinaryChunk`, `MeshoptBufferViewDecoder`, `FeatureIdColorTable`, `FeatureIdDecoder`, and `FeatureIdMeshWriter` (adds Color as an extra vertex stream, because glTFast builds meshes through the low-level mesh API).
+- `LandmarkDemo` and `LandmarkDemoWithVector` samples.
+- Documentation: `LandmarksModule.md` and `LandmarksModuleInternals.md`.
+
+#### Fixed
+
+- Landmarks did not reliably hide the basic OSM buildings they overlap. `GltfVisualizer` published each landmark footprint as the footprint mesh's raw vertex array, which is in storage order rather than boundary order, while every consumer — `MapboxGeometryUtilities.PolygonsIntersect` via both `LandmarkToBuildingComponentConnector` and `LandmarkPolygonFilterObject` — requires consecutive vertices to be adjacent along the outline. A four-vertex quad footprint survived that by luck; a detailed one described a self-intersecting scribble, so overlap tests against it were unreliable and some overlapping buildings stayed visible. Reported at the Eiffel Tower, whose footprint is exactly the detailed case.
+
+  Footprints are now published as true outlines. `MapboxGeometryUtilities.ExtractBoundaryRings` welds coincident positions (exporters split vertices for differing normals and UVs, and without welding every edge looks like a boundary edge), keeps the directed triangle edges whose reverse is absent, and walks them into ordered rings. A closed mesh has no boundary edge at all, so it falls back to the convex hull of the X-Z projection rather than contributing nothing.
+
+  Two related defects in the same method are fixed alongside. Footprints are now collected in `AddPrimitive` rather than `EndScene`, which means a footprint node with more than one primitive contributes all of them instead of only primitive 0, and a footprint node nested below a root node is collected instead of being missed entirely. `EndScene` now walks the node hierarchy to deactivate nested footprint geometry, while still normalising only root-level transforms — rewriting a child's transform would detach it from its parent's placement.
+
+#### Dependencies
+
+- `com.unity.cloud.gltfast` (6.18.0). 6.18.0 is the last release supporting Unity 2022.3; 6.19.0 and later require Unity 6.0 LTS. This is declared as a minimum, not a pin: the module uses no glTFast API that changed in 6.19.0 and no API marked obsolete, so projects on Unity 6 may raise the version in their own manifest without further changes.
+- `com.unity.meshopt.decompress` (0.2.0-exp.1). `MapboxLandmarksModule.asmdef` gates feature ID decoding on a `MESHOPT_IS_RECENT` `versionDefines` entry, so removing the package degrades to landmarks without feature IDs rather than a compile error.
+
+Note that the dependency on glTFast is not code-only: `glTF-pbrMetallicRoughness-Clearcoat_MAPBOX.shadergraph` and `PBR_metallic_roughness_advanced_MAPBOX.shadersubgraph` reference seven of glTFast's shader subgraphs (`ScreenGrab`, `MetallicRoughness`, `Clearcoat`, `Normal`, `TextureTransform`, `Occlusion`, `Emission`) by asset GUID, so glTFast's `Runtime/Shader` tree is load-bearing for the landmark material.
 
 - `IMapInformation.TryGetViewCenterPosition` / `TryGetViewCenterMercator` / `TryGetViewCenterLatLng`, reporting what the camera is actually looking at - where a ray through the centre of the viewport meets the map plane. The map's own centre is not always the view centre: a camera that pans by recentring the map keeps the two together, while one that keeps the map origin fixed and moves itself does not, and then `CenterMercator` is the world origin rather than anything on screen. They report `false` instead of a placeholder when there is no such point, which is the honest answer for a camera pitched at or above the horizon, where the centre ray is parallel to the plane or points away from it. Computed on demand rather than cached on the map, so no reader can see a stale value. The plane is world y = 0, matching the rest of the SDK's screen-to-map math, so a moved, rotated or reparented MapRoot is not accounted for, and terrain height is ignored.
 

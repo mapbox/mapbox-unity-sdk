@@ -1,0 +1,291 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!181963792 &2655988077585873504
+Preset:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: road
+  m_TargetType:
+    m_NativeTypeID: 114
+    m_ManagedTypePPtr: {fileID: 11500000, guid: bf8c281932374fb0b5c80fa7fbca2b5b, type: 3}
+    m_ManagedTypeFallback: 
+  m_Properties:
+  - target: {fileID: 0}
+    propertyPath: m_Enabled
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_EditorHideFlags
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_EditorClassIdentifier
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.size
+    value: 5
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[0].Name
+    value: secondary,tertiary
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[0].Filters.Filters.Array.size
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[0].Filters.Filters.Array.data[0]
+    value: 5722777937161748527
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[0].Filters.Type
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[0].Width
+    value: 4.8
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[0].PushUp
+    value: 0.0008
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[0].Material
+    value: 
+    objectReference: {fileID: 2100000, guid: 8917c0d338e58481388fbe080cf36caf, type: 2}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[1].Name
+    value: primary
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[1].Filters.Filters.Array.size
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[1].Filters.Filters.Array.data[0]
+    value: 5722777937161748529
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[1].Filters.Type
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[1].Width
+    value: 5.2
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[1].PushUp
+    value: 0.001
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[1].Material
+    value: 
+    objectReference: {fileID: 2100000, guid: 8917c0d338e58481388fbe080cf36caf, type: 2}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[2].Name
+    value: street,street_limited
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[2].Filters.Filters.Array.size
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[2].Filters.Filters.Array.data[0]
+    value: 5722777937161748530
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[2].Filters.Type
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[2].Width
+    value: 3.6
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[2].PushUp
+    value: 0.0004
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[2].Material
+    value: 
+    objectReference: {fileID: 2100000, guid: 8917c0d338e58481388fbe080cf36caf, type: 2}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[3].Name
+    value: service
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[3].Filters.Filters.Array.size
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[3].Filters.Filters.Array.data[0]
+    value: 5722777937161748531
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[3].Filters.Type
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[3].Width
+    value: 1.8
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[3].PushUp
+    value: 0.0002
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[3].Material
+    value: 
+    objectReference: {fileID: 2100000, guid: d449f6eb93a644716baa6f1f4c730813, type: 2}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[4].Name
+    value: path
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[4].Filters.Filters.Array.size
+    value: 3
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[4].Filters.Filters.Array.data[0]
+    value: 5722777987101753359
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[4].Filters.Filters.Array.data[1]
+    value: 5722777987101753361
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[4].Filters.Filters.Array.data[2]
+    value: 5722777987101753362
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[4].Filters.Type
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[4].Width
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[4].PushUp
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: Styles.Array.data[4].Material
+    value: 
+    objectReference: {fileID: 2100000, guid: c3c69f315ce7c4100a0ff6f40305bfe9, type: 2}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777937161748527]
+    value: MapboxComponentSystem Mapbox.VectorModule.ComponentSystem.RoadComponentVisualizer.RoadClassFilter
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777937161748527].CheckOperation
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777937161748527].FilterString
+    value: secondary,tertiary
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777937161748527].Invert
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777937161748529]
+    value: MapboxComponentSystem Mapbox.VectorModule.ComponentSystem.RoadComponentVisualizer.RoadClassFilter
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777937161748529].CheckOperation
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777937161748529].FilterString
+    value: primary
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777937161748529].Invert
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777937161748530]
+    value: MapboxComponentSystem Mapbox.VectorModule.ComponentSystem.RoadComponentVisualizer.RoadClassFilter
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777937161748530].CheckOperation
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777937161748530].FilterString
+    value: street,street_limited
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777937161748530].Invert
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777937161748531]
+    value: MapboxComponentSystem Mapbox.VectorModule.ComponentSystem.RoadComponentVisualizer.RoadClassFilter
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777937161748531].CheckOperation
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777937161748531].FilterString
+    value: service
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777937161748531].Invert
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777987101753359]
+    value: MapboxComponentSystem Mapbox.VectorModule.ComponentSystem.RoadComponentVisualizer.RoadClassFilter
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777987101753359].CheckOperation
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777987101753359].FilterString
+    value: path
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777987101753359].Invert
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777987101753361]
+    value: MapboxComponentSystem Mapbox.VectorModule.ComponentSystem.RoadComponentVisualizer.RoadStructureFilter
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777987101753361].CheckOperation
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777987101753361].FilterString
+    value: tunnel
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777987101753361].Invert
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777987101753362]
+    value: MapboxComponentSystem Mapbox.VectorModule.ComponentSystem.RoadComponentVisualizer.RoadTypeFilter
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777987101753362].CheckOperation
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777987101753362].FilterString
+    value: steps
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: managedReferences[5722777987101753362].Invert
+    value: 1
+    objectReference: {fileID: 0}
+  m_ExcludedProperties: []
