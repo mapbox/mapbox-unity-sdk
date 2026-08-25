@@ -18,7 +18,13 @@ namespace Mapbox.VectorModule.ComponentSystem
 			
         }
         
-        protected VectorLayerModule GetVectorLayerModule(IMapInformation mapInformation, UnityContext unityContext, MapService service, Dictionary<string, List<IVectorLayerVisualizer>> dictionary)
+        /// <summary>
+        /// Builds the module and its settings. Virtual so a project can supply its own
+        /// <see cref="VectorModuleSettings"/> — most usefully a wider
+        /// <c>RejectTilesOutsideZoom</c>, since the default (12, 16) means the module
+        /// draws nothing at continental zoom levels.
+        /// </summary>
+        protected virtual VectorLayerModule GetVectorLayerModule(IMapInformation mapInformation, UnityContext unityContext, MapService service, Dictionary<string, List<IVectorLayerVisualizer>> dictionary)
         {
             var tilesetId = MapboxDefaultVector.GetParameters(VectorSourceType.MapboxStreetsV8).Id;
             var settings = new VectorModuleSettings()

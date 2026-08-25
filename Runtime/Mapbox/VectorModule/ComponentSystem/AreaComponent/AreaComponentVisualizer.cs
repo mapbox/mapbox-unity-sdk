@@ -108,7 +108,21 @@ namespace Mapbox.VectorModule.ComponentSystem.AreaComponent
 
                     meshData.Triangles.Add(triList);
                     meshData.Materials.Add(style.Material);
-                    triangles[si] = new int[poolSize];
+
+                    // Replace the buffer that was just handed to the mesh. On the first
+                    // failure, size it to what this feature can actually need rather than
+                    // to poolSize again: a fresh buffer of the same size is no help to a
+                    // feature whose own triangulation exceeds it, so the retry overflowed
+                    // identically and the feature was dropped without a word. Low-zoom
+                    // coastline and ocean rings are exactly that shape, which is why water
+                    // went missing in patches when zoomed out.
+                    var replacementCapacity = poolSize;
+                    if (retryCount == 0)
+                    {
+                        replacementCapacity = Mathf.Max(poolSize, ArrayPolygon.WorstCaseIndexCount(featureResult.VertexData));
+                    }
+
+                    triangles[si] = new int[replacementCapacity];
                     baseTriIndices[si] += triList.Length;
                     triIndices[si] = 0;
                     if (retryCount++ < 1)
@@ -116,7 +130,15 @@ namespace Mapbox.VectorModule.ComponentSystem.AreaComponent
                         i--;
                         continue;
                     }
-                    // Degenerate feature — skip it
+
+                    // Retried against a buffer sized for this feature's worst case and it
+                    // still would not fit, so the geometry is degenerate rather than merely
+                    // large. Skip it, but say so — silently dropping features is what made
+                    // the low-zoom water problem hard to see.
+                    Debug.LogWarning(
+                        $"AreaComponentVisualizer: skipped a '{VectorLayerName}' feature in tile {tileId} that could not be " +
+                        $"triangulated into {replacementCapacity} indices ({featureResult.VertexData.VertexCount} vertices, " +
+                        $"{Mathf.Max(0, featureResult.VertexData.Submeshes.Count - 1)} rings).");
                     retryCount = 0;
                     continue;
                 }
