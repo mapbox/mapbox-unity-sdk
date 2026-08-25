@@ -53,7 +53,7 @@ namespace Mapbox.LandmarkModule
 			// };
 		}
 
-		public virtual IEnumerator Initialize()
+		public virtual IEnumerator Initialize(ITileLifecycleSource tileLifecycle)
 		{
 			yield return _buildingSource.Initialize();
 			yield return _meshGenerationUnit.Initialize();
