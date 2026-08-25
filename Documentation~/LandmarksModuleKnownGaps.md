@@ -55,8 +55,21 @@ Doing this properly needs a real task handle stored per tile and an un-retain ho
 ### Optimizations not taken
 
 - **No GPU instancing.** `LandmarkMaterialGLTF` has `m_EnableInstancingVariants: 0`. Landmarks are distinct meshes so instancing cannot merge draw calls between them, but it also rules out the property-block batching path, which matters if per-landmark tinting is ever used at scale.
+- **Colliders could use the footprint mesh.** Collider cooking is opt-in and defaults to a convex hull, which is cheap. The already-extracted planar footprint would be cheaper still, but it is not reachable from `LandmarkHighlightBehaviour` today — it arrives on the module's `TileFinished`, keyed by tile, while the footprint GameObjects are deactivated children.
 - **`FlipYZ` round-trips managed arrays.** It reads `mesh.vertices` and `mesh.normals` (a full copy each), rewrites them, assigns both back, and calls `RecalculateBounds` — once per primitive, on the load path. Going through the mesh data API, or folding the transform into what glTFast already applies, would remove two array allocations per mesh.
 - **Colliders could use the footprint mesh.** Collider cooking is now opt-in and defaults to a convex hull, which is cheap. Using the already-extracted planar footprint instead would be cheaper still, but the footprint geometry is not reachable from `LandmarkHighlightBehaviour` today — it arrives on the module's `TileFinished`, keyed by tile, while the footprint GameObjects are deactivated children.
+
+---
+
+### Settled: the snapper's z14 elevation query is correct at every render zoom
+
+Recorded because it looks wrong and is not. `LandmarkTerrainSnapper` samples elevation using the **z14** landmark tile id, and `TryQueryElevation` only ever walks *upward* from the id it is given. Terrain data tiles are normally `render zoom - 2`, which at render z17+ would be deeper than z14 and so never consulted — landmarks would silently stay at y=0 at exactly the zooms they are most visible.
+
+That does not happen because `TerrainLayerModuleScript` sets the terrain source's `ClampDataLevelToMax` to 14, and `TerrainLayerModule.GetDataId` returns `tileId.ParentAt(maxZoom)` once `render - 2` reaches it. Terrain data is therefore never deeper than z14 at any render zoom, and the upward walk always reaches it (at render z14 the data is z12, two steps up, well inside the 5-step limit).
+
+The dependency is worth knowing: **raising the terrain source's `ClampDataLevelToMax` above 14 would silently break landmark snapping.** If that ever changes, the snapper must sample with a tile id at or below the terrain data zoom, with UVs remapped into it, rather than with the z14 landmark id.
+
+Note also that the "move the divisor out of the vertices" option above is constrained by this class: it writes each building's local Y assuming the tile root's Y scale is exactly 1.
 
 ---
 

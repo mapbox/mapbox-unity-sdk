@@ -50,6 +50,10 @@ namespace Mapbox.LandmarkModule
 		private readonly List<(TerrainData data, Action handler)> _pendingWatches =
 			new List<(TerrainData, Action)>();
 
+		// Terrain data tiles whose elevation has just become available, so a drain only revisits the
+		// landmark tiles those actually cover instead of re-walking every registered tile.
+		private readonly HashSet<CanonicalTileId> _terrainArrivals = new HashSet<CanonicalTileId>();
+
 		private ITileLifecycleSource _source;
 		private Coroutine _drainCoroutine;
 		private bool _dirty;
@@ -95,6 +99,7 @@ namespace Mapbox.LandmarkModule
 			}
 			_pendingWatches.Clear();
 			_entriesByTile.Clear();
+			_terrainArrivals.Clear();
 
 			if (_drainCoroutine != null && Runnable.Instance != null)
 			{
@@ -160,7 +165,7 @@ namespace Mapbox.LandmarkModule
 				if (_dirty)
 				{
 					_dirty = false;
-					ResolveAllPending();
+					ResolveArrivals();
 				}
 
 				yield return null;
@@ -180,6 +185,7 @@ namespace Mapbox.LandmarkModule
 
 			if (terrainData.IsElevationDataReady)
 			{
+				_terrainArrivals.Add(terrainData.TileId);
 				_dirty = true;
 			}
 			else
@@ -205,7 +211,10 @@ namespace Mapbox.LandmarkModule
 				data.ElevationValuesUpdated -= handler;
 				data.RemoveDisposeCallback(onDispose);
 				RemoveWatch(data, handler);
-				if (!_disposed) _dirty = true;
+				if (_disposed) return;
+
+				_terrainArrivals.Add(data.TileId);
+				_dirty = true;
 			};
 
 			// Dispose does not raise ElevationValuesUpdated, so without this the entry would keep
@@ -236,12 +245,44 @@ namespace Mapbox.LandmarkModule
 			}
 		}
 
-		private void ResolveAllPending()
+		/// <summary>
+		/// Re-samples only the landmark tiles the newly decoded terrain actually covers.
+		///
+		/// One terrain data tile is shared by up to 16 render tiles, so a single decode arrives as a
+		/// burst of TileLoaded events - which is what the dirty flag coalesces. Without also
+		/// narrowing by coverage, each burst re-walked every registered landmark tile and every
+		/// footprint vertex in it, almost all of them for terrain that had not changed.
+		/// </summary>
+		private void ResolveArrivals()
 		{
 			foreach (var pair in _entriesByTile)
 			{
+				if (!IsCoveredByArrival(pair.Key)) continue;
 				ResolveTile(pair.Key, pair.Value);
 			}
+
+			_terrainArrivals.Clear();
+		}
+
+		/// <summary>
+		/// Whether any just-arrived terrain tile is one an elevation query for this landmark tile
+		/// would actually consult - that is, the landmark tile itself or one of its ancestors, since
+		/// TryQueryElevation walks upward from the id it is given.
+		/// </summary>
+		private bool IsCoveredByArrival(CanonicalTileId landmarkTileId)
+		{
+			foreach (var terrainTileId in _terrainArrivals)
+			{
+				if (terrainTileId.Z > landmarkTileId.Z) continue;
+
+				// Fresh copy: ParentAt walks the struct up in place and returns it.
+				var ancestor = new CanonicalTileId(landmarkTileId.Z, landmarkTileId.X, landmarkTileId.Y)
+					.ParentAt(terrainTileId.Z);
+
+				if (ancestor.Equals(terrainTileId)) return true;
+			}
+
+			return false;
 		}
 
 		/// <summary>
