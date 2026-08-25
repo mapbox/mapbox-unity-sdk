@@ -30,7 +30,7 @@ Correctness work across the tile pipeline, independent of any one feature module
 
 #### Added
 
-- `ITerrainLayerModule.TryQueryElevation` and `IMapInformation.TryQueryElevation`, which report whether an elevation is actually known rather than returning 0 for both "sea level" and "no data". `TerrainLayerModule.TryGetElevationData` is the fetching counterpart. The existing lossy forms remain for callers with no useful response to "unknown".
+- `IMapInformation.TryQueryElevation`, which reports whether an elevation is actually known rather than returning 0 for both "sea level" and "no data". The existing `QueryElevation` remains for callers with no useful response to "unknown".
 
 ### v3.1.1
 

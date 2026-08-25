@@ -309,30 +309,16 @@ namespace Mapbox.ImageModule.Terrain
 
         /// <summary>
         /// This method will cause tile requests if data isn't already available on memory cache. Use with caution.
+        ///
+        /// The callback is invoked exactly once on every path, including failure - callers park
+        /// coroutines on it. Note 0 is reported both for genuine sea level and for a fetch that
+        /// failed, 404'd or was cancelled; there is no caller today that could act on the
+        /// difference, so it is not surfaced.
         /// </summary>
         /// <param name="latLng">Latitude longitude of the location you want to query</param>
         /// <param name="callback">Callback method returning the elevation in float</param>
         /// <returns></returns>
         public IEnumerator GetElevationData(LatitudeLongitude latLng, Action<float> callback = null)
-        {
-            // Lossy wrapper: drops the "was it actually found" flag, so an unavailable elevation
-            // arrives as 0. Use TryGetElevationData when that matters.
-            return TryGetElevationData(latLng, (found, elevation) => callback?.Invoke(elevation));
-        }
-
-        /// <summary>
-        /// Elevation at a location, fetching the terrain tile if it is not already in memory, and
-        /// reporting whether a real value was obtained.
-        ///
-        /// The callback is invoked exactly once on every path, including failure - that is the
-        /// contract, because callers park coroutines on it. The fetching path used to dereference
-        /// the loaded data without checking it, and a failed, 404'd or cancelled terrain fetch
-        /// arrives there as null: the lambda threw, so the caller's callback was never invoked at
-        /// all and anything waiting on an elevation answer waited for good.
-        /// </summary>
-        /// <param name="latLng">Latitude longitude of the location you want to query</param>
-        /// <param name="callback">Receives whether elevation was found, and the elevation (0 when not).</param>
-        public IEnumerator TryGetElevationData(LatitudeLongitude latLng, Action<bool, float> callback)
         {
             var tileId = Conversions.LatitudeLongitudeToTileId(latLng, 14).Canonical;
             var dataFound = false;
@@ -341,8 +327,7 @@ namespace Mapbox.ImageModule.Terrain
                 if (_rasterSource.GetInstantData(tileId, out var instantData))
                 {
                     var tilePos = Conversions.LatitudeLongitudeToInTile01(latLng, instantData.TileId);
-                    var elevation = instantData.QueryHeightData(tilePos);
-                    callback?.Invoke(true, elevation);
+                    callback?.Invoke(instantData.QueryHeightData(tilePos));
                     dataFound = true;
                     break;
                 }
@@ -357,15 +342,17 @@ namespace Mapbox.ImageModule.Terrain
                 tileId = Conversions.LatitudeLongitudeToTileId(latLng, 14).Canonical;
                 yield return LoadTileData(tileId, terrainData =>
                 {
+                    // A failed, 404'd or cancelled fetch arrives here as null. Dereferencing it threw
+                    // inside this lambda, which meant the caller's callback was never invoked at all
+                    // and anything awaiting an elevation answer waited for good.
                     if (terrainData == null)
                     {
-                        callback?.Invoke(false, 0f);
+                        callback?.Invoke(0f);
                         return;
                     }
 
                     var tilePos = Conversions.LatitudeLongitudeToInTile01(latLng, terrainData.TileId);
-                    var elevation = terrainData.QueryHeightData(tilePos);
-                    callback?.Invoke(true, elevation);
+                    callback?.Invoke(terrainData.QueryHeightData(tilePos));
                 });
             }
         }
