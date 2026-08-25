@@ -600,7 +600,24 @@ namespace Mapbox.BaseModule.Map
         {
             foreach (var tilePair in ActiveTiles)
             {
-                ShowTile(tilePair.Value);
+                var tile = tilePair.Value;
+
+                // A Temporary tile with non-empty Children is a DelveInto pass-through:
+                // it is deliberately kept hidden while its own (already active, more
+                // detailed) children stand in for it - see the identical check in
+                // DelveInto's adoption branch. Showing it here as well would make the
+                // tile and its children active at the same time, which is exactly the
+                // overlap/z-fighting that invariant exists to prevent. Skipping the
+                // reposition is safe: every transition out of this state (promotion in
+                // InternalUpdateCoroutine, or adoption as a Filler in DelveInto) already
+                // calls ShowTile at that same moment, which repositions it before it is
+                // ever actually shown.
+                if (tile.LoadingState == LoadingState.Temporary && tile.Children != null && tile.Children.Count > 0)
+                {
+                    continue;
+                }
+
+                ShowTile(tile);
             }
 
             foreach (var module in LayerModules)
