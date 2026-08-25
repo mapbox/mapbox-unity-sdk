@@ -493,10 +493,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1316629397}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c4bdcb3d58ec47ccad685e7e691a50ee, type: 3}
+  m_Script: {fileID: 11500000, guid: e13965577acb456182a04c56586cb36e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RejectTilesOutsideZoom: {x: 12, y: 16}
+  RejectTilesOutsideZoom: {x: 2, y: 16}
   ClampDataLevelToMax: 15
   CacheSize: 100
   _layerVisualizers:
