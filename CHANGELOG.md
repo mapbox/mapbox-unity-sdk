@@ -1,5 +1,37 @@
 ## CHANGELOG
 
+### Unreleased
+
+Correctness work across the tile pipeline, independent of any one feature module. The theme is results that told the caller less than they knew: callbacks that were never invoked, failures reported as successes, and single values standing in for several different outcomes.
+
+#### Fixed
+
+- Callbacks that were silently dropped, each of which could park a coroutine forever. `VectorLayerModule.CreateVisual` returned without invoking its callback when mesh generation for the tile was already in flight, leaving `CreateVisualCoroutine` spinning on `Runnable` for the rest of the session and hanging `LoadTileCoverToMemory` with it, so `LoadViewCompleted` never fired. `UnitySource.RequestData` did the same for a tile id already being fetched; a second request now joins the in-flight fetch and receives its real outcome.
+
+- Failed texture cache reads were delivered as ordinary cache items carrying a null `Texture`, indistinguishable from a hit. `MapboxCacheManager.GetImageAsync` already had the code to turn that into a miss, but `MapboxTileData.HasError` was never assigned anywhere in the SDK, so the branch was dead and the unusable item was cached as real - a permanently blank imagery tile, or a terrain tile stuck `Temporary` and re-polled every frame. `GetImageCoroutine` gained the same translation its async sibling already had.
+
+- `DataTaskWrapper` ignored both signals `TaskManager` gives it, so a cancelled task, a task that threw, and a genuine cache miss all arrived as an identical null result - which `ImageSource` then dereferenced. Its sibling `MeshGenTaskWrapper` already made the distinction.
+
+- Elevation queries could not express "I don't know". `QueryElevation` returned 0 for genuine sea level, for terrain not loaded yet, and for CPU elevation extraction being switched off. `TerrainLayerModule.GetElevationData` additionally dereferenced its loaded data without checking it, so a failed or cancelled terrain fetch threw inside the callback and the caller's own callback was never invoked at all.
+
+- `CompositeLayerModule.LoadTiles` called each child and discarded the returned `IEnumerator`. Every implementation is an iterator method, so no child module ever loaded anything and the composite reported itself finished immediately. `RetainTiles` likewise discarded each child's readiness and hardcoded `true`.
+
+- Area and building triangulation silently dropped features too large for the index buffer. The retry allocated a buffer of the same size, so a feature whose own triangulation exceeded it failed identically and was skipped without a message - visible as water disappearing in patches at low zoom, where a single coastline ring needs more indices than the pool provides.
+
+- `MapboxMapVisualizer` could show a tile and its own children simultaneously during a fast multi-level zoom-out, producing flickering coplanar geometry at the map centre. `DelveInto`'s filler-adoption branch hoisted an adopted tile's already-visible children instead of pooling them, and `ShowTiles` then repositioned and showed pass-through tiles that were meant to stay hidden.
+
+#### Changed
+
+- `ILayerModule.Initialize` now takes an `ITileLifecycleSource`, replacing the separate `ITileLifecycleObserver` hook. A module previously had no reference to whatever was driving it - neither the constructor nor `ConstructModule` supplies one - so an extra opt-in interface existed purely to hand the visualizer over. **Breaking** for anyone implementing `ILayerModule` directly or subclassing an SDK module and overriding `Initialize`. Nothing here is serialized, so no scene or prefab data is affected.
+
+- `TaskResultType` gained `AlreadyGenerated` and `AlreadyInProgress`, so "nothing to do because it is done" and "nothing to do because someone else is doing it" are no longer both reported as `Success` - the one member that promises generated objects are attached.
+
+- `MapboxComponentsModuleScript.GetVectorLayerModule` is now virtual. It built its `VectorModuleSettings` in code with `RejectTilesOutsideZoom` pinned to (12, 16), so the Components module drew nothing below zoom 12 and there was no way to widen it.
+
+#### Added
+
+- `ITerrainLayerModule.TryQueryElevation` and `IMapInformation.TryQueryElevation`, which report whether an elevation is actually known rather than returning 0 for both "sea level" and "no data". `TerrainLayerModule.TryGetElevationData` is the fetching counterpart. The existing lossy forms remain for callers with no useful response to "unknown".
+
 ### v3.1.1
 
 Patch release. Reclassifies `com.unity.inputsystem` from a soft to a **hard** package dependency and switches the example-assembly `#if` gate from package presence to Player Settings, restoring compilation on Unity 6+ projects where the input system package ships preinstalled. Existing legacy-input projects updating from 3.1.0 see no runtime behavior change.
