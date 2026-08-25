@@ -73,7 +73,17 @@ namespace Mapbox.LandmarkModule
 			{
 				if (GetDataId(tileId, out var targetId))
 				{
-					yield return LoadAndProcessTileCoroutine(targetId);
+					// Skip tiles whose mesh is already generated or already being generated.
+					// Without this, every call to LoadTileCoverToMemory (e.g. MapFlightController
+					// re-checking readiness after each animated step) re-ran the full glTF mesh
+					// generation for every already-finished landmark in the cover, not just new
+					// ones - GenerateTask has no guard of its own and even calling it again would
+					// have thrown on the second _visualCache.Add for the same key. Mirrors the
+					// same check EnsureRetainedTilesReady already uses for the RetainTiles path.
+					if (!_visualCache.ContainsKey(targetId) && !_meshGenerationUnit.IsInWork(targetId))
+					{
+						yield return LoadAndProcessTileCoroutine(targetId);
+					}
 				}
 			}
 		}

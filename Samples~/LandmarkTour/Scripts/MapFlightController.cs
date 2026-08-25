@@ -281,7 +281,15 @@ namespace Mapbox.Samples.LandmarkTour
                         bearing);
                 });
 
-                yield return WaitForTiles();
+                // Not awaited: yielding on WaitForTiles here stops the camera dead for up to
+                // TileWaitTimeout after every single step, which is what read as "waiting
+                // for tiles at each zoom level." Refreshing in the background instead keeps
+                // the camera moving continuously through the walk while still giving a tile
+                // whose fetch got cancelled by this step's cover churn a chance to land —
+                // it'll be picked up again by the very next step's ChangeView/RetainTiles if
+                // this refresh doesn't finish in time, rather than being stranded the way a
+                // cancelled fetch used to be before the pitch/zoom decoupling fix.
+                RefreshTilesInBackground();
             }
         }
 
@@ -336,6 +344,36 @@ namespace Mapbox.Samples.LandmarkTour
         {
             yield return _map.LoadTileCoverToMemory(_map.TileCover);
             onComplete();
+        }
+
+        /// <summary>
+        /// Fire-and-forget counterpart to <see cref="WaitForTiles"/>: starts the same
+        /// tile-cover refresh but doesn't hold up the caller. Not tracked through
+        /// <see cref="_coverWait"/>, since more than one of these can be in flight at once (a
+        /// new one starts every WalkZoom step before the previous one necessarily finishes)
+        /// — <see cref="Cancel"/> won't stop these mid-flight, but each one caps itself at
+        /// TileWaitTimeout regardless, so a cancelled flight leaves at most one short-lived
+        /// background poll behind rather than a leak.
+        /// </summary>
+        private void RefreshTilesInBackground()
+        {
+            if (TileWaitTimeout <= 0f || _map == null) return;
+            StartCoroutine(BackgroundLoadCurrentCover());
+        }
+
+        private IEnumerator BackgroundLoadCurrentCover()
+        {
+            var loaded = false;
+            var load = StartCoroutine(LoadCurrentCover(() => loaded = true));
+
+            var waited = 0f;
+            while (!loaded && waited < TileWaitTimeout)
+            {
+                waited += Time.deltaTime;
+                yield return null;
+            }
+
+            if (!loaded) StopCoroutine(load);
         }
 
         private static IEnumerator RunPhase(float duration, Action<float> apply)
