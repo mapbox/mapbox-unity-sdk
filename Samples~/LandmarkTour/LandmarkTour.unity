@@ -502,8 +502,6 @@ MonoBehaviour:
   _layerVisualizers:
   - {fileID: 11400000, guid: c60db86df29841078304b0d1b38308f4, type: 2}
   - {fileID: 11400000, guid: 86920e71cca748dbbdc8cf1854a97a6d, type: 2}
-  - {fileID: 11400000, guid: 32b9bdbf2c294aa8b09678c75e68c3e7, type: 2}
-  - {fileID: 11400000, guid: 6dcaf9a2221c44b8861fc79ecd3b38bb, type: 2}
   - {fileID: 11400000, guid: 776a5976ee5740b799a09b7185c993d5, type: 2}
 --- !u!114 &1316629407
 MonoBehaviour:
