@@ -411,19 +411,31 @@ namespace Mapbox.VectorModule.MeshGeneration.MeshModifiers
             // Solve for t1 and t2
             float denominator = (dy12 * dx34 - dx12 * dy34);
 
+            // Tested on the denominator rather than on float.IsInfinity(t1). A zero denominator
+            // with a zero numerator divides to NaN, not infinity, so the fully degenerate corner -
+            // a duplicated footprint point - slipped past the old check entirely.
+            if (Mathf.Abs(denominator) < 1e-8f)
+            {
+                // Parallel, which is simply what a collinear corner looks like and not an error;
+                // redundant points in a footprint produce them constantly. There is no single
+                // crossing point, and the corner's own offset (p2) is the correct chamfer vertex.
+                //
+                // Returning that rather than the NaN triple this used to emit: neither caller acts
+                // on lines_intersect - one ignores it, the other only Debug.Asserts, which is
+                // stripped from a release build - so the NaN went straight into the vertex buffer.
+                // A building then carried NaN in X and Z with a finite Y, and Unity reported it
+                // later as "abnormal mesh bounds" on an anonymous mesh, nowhere near here.
+                lines_intersect = false;
+                segments_intersect = false;
+                intersection = p2;
+                close_p1 = p2;
+                close_p2 = p2;
+                return;
+            }
+
             float t1 =
                 ((p1.x - p3.x) * dy34 + (p3.z - p1.z) * dx34)
                 / denominator;
-            if (float.IsInfinity(t1))
-            {
-                // The lines are parallel (or close enough to it).
-                lines_intersect = false;
-                segments_intersect = false;
-                intersection = new Vector3(float.NaN, 0, float.NaN);
-                close_p1 = new Vector3(float.NaN, 0, float.NaN);
-                close_p2 = new Vector3(float.NaN, 0, float.NaN);
-                return;
-            }
             lines_intersect = true;
 
             float t2 =

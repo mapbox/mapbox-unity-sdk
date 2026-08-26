@@ -160,9 +160,11 @@ namespace Mapbox.VectorModule.ComponentSystem.Modifiers
                     pjk2.z = next.z - n2.z * scaledOffset;
 
                     // ---- intersection ----
-                    if (pij2.x != pjk1.x || pij2.z != pjk1.z)
-                        FindIntersection(pij1, pij2, pjk1, pjk2, out poi);
-                    else
+                    // Parallel offset edges have no single crossing point, and that is not an error:
+                    // it is what a collinear corner looks like, which redundant points in a footprint
+                    // make common. The corner's own offset is the right chamfer vertex there - the
+                    // same answer the exactly-coincident case gives.
+                    if (!TryFindIntersection(pij1, pij2, pjk1, pjk2, out poi))
                         poi = pij2;
 
                     int vertBase = secondRingStartIndex + vertPerStep * j;
@@ -258,10 +260,22 @@ namespace Mapbox.VectorModule.ComponentSystem.Modifiers
             return triIndex;
         }
         
-        private static void FindIntersection(
+        /// <summary>
+        /// Crossing point of two XZ lines, or false when they are parallel or nearly so.
+        ///
+        /// This used to answer a NaN-filled vector for the parallel case, and every caller wrote the
+        /// result straight into the vertex buffer. A collinear corner - two consecutive footprint
+        /// edges pointing the same way, which redundant OSM points produce constantly - therefore
+        /// put NaN into a building's X and Z while its Y stayed finite, and Unity reported it later
+        /// as "abnormal mesh bounds" against an anonymous mesh, far from here. Returning false makes
+        /// the caller choose a fallback instead of silently propagating a non-number.
+        /// </summary>
+        private static bool TryFindIntersection(
             Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4,
             out Vector3 intersection)
         {
+            intersection = default;
+
             float dx12 = p2.x - p1.x;
             float dz12 = p2.z - p1.z;
             float dx34 = p4.x - p3.x;
@@ -269,11 +283,10 @@ namespace Mapbox.VectorModule.ComponentSystem.Modifiers
 
             float denominator = dz12 * dx34 - dx12 * dz34;
 
-            // Check for parallel or nearly parallel lines
+            // Parallel or nearly parallel: no single intersection exists.
             if (Mathf.Abs(denominator) < 1e-8f)
             {
-                intersection = new Vector3(float.NaN, 0f, float.NaN);
-                return;
+                return false;
             }
 
             float dx13 = p1.x - p3.x;
@@ -286,6 +299,8 @@ namespace Mapbox.VectorModule.ComponentSystem.Modifiers
                 0f,
                 p1.z + dz12 * t1
             );
+
+            return true;
         }
         
         public int CalculateTriCountFor(int totalPointCount)
