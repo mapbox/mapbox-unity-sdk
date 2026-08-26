@@ -92,7 +92,10 @@ namespace Mapbox.LandmarkModule
         private void AddCollidersToVisuals(GameObject go)
         {
             var meshFilter = go.GetComponent<MeshFilter>();
-            if (meshFilter == null || meshFilter.mesh == null) return;
+
+            // sharedMesh throughout: reading MeshFilter.mesh duplicates the mesh and leaks the copy,
+            // and a collider only needs to read the geometry, never to own it.
+            if (meshFilter == null || meshFilter.sharedMesh == null) return;
 
             var mc = go.AddComponent<MeshCollider>();
 
@@ -106,7 +109,7 @@ namespace Mapbox.LandmarkModule
                 mc.convex = true;
             }
 
-            mc.sharedMesh = meshFilter.mesh;
+            mc.sharedMesh = meshFilter.sharedMesh;
         }
 
         private void ClearSelectedBuilding()

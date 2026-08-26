@@ -211,9 +211,15 @@ public class LandmarkToBuildingComponentConnector : MonoBehaviour
         if (buildingData.GameObject == null) return;
 
         var meshFilter = buildingData.GameObject.GetComponent<MeshFilter>();
-        if (meshFilter == null || meshFilter.mesh == null) return;
+        if (meshFilter == null || meshFilter.sharedMesh == null) return;
 
-        meshFilter.mesh.SetVertices(meshData.Vertices);
+        // sharedMesh, not mesh. Reading MeshFilter.mesh makes Unity duplicate sharedMesh, hand the
+        // filter the copy and leak it - nothing destroys it - while the pooled mesh the visualizer
+        // owns is orphaned until the entity is recycled and reassigns it. That is one leaked Mesh per
+        // building that overlaps a landmark, and the old null check leaked one just by asking.
+        // Writing sharedMesh is safe here because each pooled VectorEntity gets its own
+        // `new Mesh()` from VectorEntityGenerator, so it is not shared between buildings.
+        meshFilter.sharedMesh.SetVertices(meshData.Vertices);
     }
 
     /// <summary>
