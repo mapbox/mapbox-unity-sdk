@@ -181,6 +181,7 @@ namespace Mapbox.VectorModule.ComponentSystem.AreaComponent
 
             var mesh = entity.Mesh;
             mesh.Clear();
+            WarnOnNonFiniteVertices(tileId, meshData);
             mesh.SetVertices(meshData.Vertices);
             mesh.SetNormals(meshData.Normals);
             mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;

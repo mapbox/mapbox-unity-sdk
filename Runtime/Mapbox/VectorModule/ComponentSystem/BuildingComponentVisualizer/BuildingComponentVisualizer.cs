@@ -223,6 +223,7 @@ namespace Mapbox.VectorModule.ComponentSystem.BuildingComponentVisualizer
 
             var mesh = entity.Mesh;
             mesh.Clear();
+            WarnOnNonFiniteVertices(tileId, meshData);
             mesh.SetVertices(meshData.Vertices);
             mesh.SetNormals(meshData.Normals);
             mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;

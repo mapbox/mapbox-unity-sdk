@@ -474,6 +474,7 @@ namespace Mapbox.VectorModule.ComponentSystem.RoadComponentVisualizer
 
             var mesh = entity.Mesh;
             mesh.Clear();
+            WarnOnNonFiniteVertices(tileId, meshData);
             mesh.SetVertices(meshData.Vertices);
             mesh.SetNormals(meshData.Normals);
             mesh.SetUVs(0, meshData.UVs);

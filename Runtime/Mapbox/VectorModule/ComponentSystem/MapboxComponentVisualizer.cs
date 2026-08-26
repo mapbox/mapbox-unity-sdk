@@ -101,5 +101,59 @@ namespace Mapbox.VectorModule.ComponentSystem
         
         public Action<CanonicalTileId, GameObject, MeshData> OnBuildingMeshCreated = (id, list, info) => { };
         public Action<CanonicalTileId, GameObject> OnBuildingMeshDestroyed = (id, list) => { };
+
+        /// <summary>
+        /// Reports a vertex buffer containing NaN or infinity, naming the tile and the feature it
+        /// falls in, then leaves it alone.
+        ///
+        /// Unity's own complaint ("abnormal mesh bounds ... invalid vertices") is raised by whichever
+        /// call happens to trigger a bounds recalculation, which can be far from the code that
+        /// produced the bad value - and the mesh it names is anonymous, so the report on its own does
+        /// not say which visualizer or feature is at fault. Every CreateGo calls this just before
+        /// uploading, so whichever one built the bad geometry is the one that says so.
+        ///
+        /// Deliberately reports and continues rather than skipping or repairing: substituting a
+        /// value would hide a generation bug, and the mesh is already wrong by this point.
+        /// </summary>
+        protected void WarnOnNonFiniteVertices(CanonicalTileId tileId, MeshData meshData)
+        {
+            var vertices = meshData?.Vertices;
+            if (vertices == null) return;
+
+            for (var i = 0; i < vertices.Length; i++)
+            {
+                var v = vertices[i];
+                if (!float.IsNaN(v.x) && !float.IsInfinity(v.x) &&
+                    !float.IsNaN(v.y) && !float.IsInfinity(v.y) &&
+                    !float.IsNaN(v.z) && !float.IsInfinity(v.z))
+                {
+                    continue;
+                }
+
+                // Map the vertex back to the feature that wrote it, so the report is actionable.
+                var featureIndex = -1;
+                var ranges = meshData.MeshInfo?.vertexRanges;
+                var sizes = meshData.MeshInfo?.vertexSize;
+                if (ranges != null && sizes != null)
+                {
+                    for (var f = 0; f < ranges.Length; f++)
+                    {
+                        if (i >= ranges[f] && i < ranges[f] + sizes[f])
+                        {
+                            featureIndex = f;
+                            break;
+                        }
+                    }
+                }
+
+                Debug.LogWarning(
+                    $"{GetType().Name} ('{VectorLayerName}'): tile {tileId} produced a non-finite vertex " +
+                    $"at index {i} of {vertices.Length} ({v.x}, {v.y}, {v.z}), in feature {featureIndex} " +
+                    $"of {ranges?.Length ?? 0}. The mesh will render with abnormal bounds. " +
+                    "Reported once per mesh.");
+                return;
+            }
+        }
+
     }
 }
