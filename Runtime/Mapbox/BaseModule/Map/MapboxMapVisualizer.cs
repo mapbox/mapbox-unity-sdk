@@ -43,6 +43,11 @@ namespace Mapbox.BaseModule.Map
         // Reusable scratch array to avoid per-frame allocation in InternalUpdateCoroutine
         private readonly UnwrappedTileId[] _quadrants = new UnwrappedTileId[4];
 
+        // Snapshot of TempTiles for InternalUpdateCoroutine to walk. PoolTile removes the tile
+        // it pools from TempTiles, and the loop pools its tiles' children, so the live list can
+        // shrink mid-iteration. Reused rather than allocated per frame.
+        private readonly List<UnityMapTile> _tempTileScratch = new List<UnityMapTile>();
+
         // Explicit stack for the iterative DelveInto (was recursive with per-call new bool[4]
         // and new UnwrappedTileId[4] allocations). Bounded by recursion depth × 4, so the
         // List reaches its peak size after one large call and never re-allocates after.
@@ -205,12 +210,23 @@ namespace Mapbox.BaseModule.Map
         {
             //finish temp tiles from tempTiles list
             _toRemove.Clear();
-            for (var index = TempTiles.Count - 1; index >= 0; index--)
+
+            // Walk a snapshot and remove by reference, never by index. PoolTile takes the tile it
+            // pools out of TempTiles - it has to, or a pooled instance stays listed and can be
+            // re-issued while a stale entry still points at it - and the promotion branch below
+            // pools this tile's children, which may themselves be Temporary. So the live list can
+            // shrink at any point in the body, which made a saved index both wrong and, when the
+            // list shrank past it, out of range.
+            _tempTileScratch.Clear();
+            _tempTileScratch.AddRange(TempTiles);
+
+            for (var index = _tempTileScratch.Count - 1; index >= 0; index--)
             {
-                var tilePair = TempTiles[index];
+                var tilePair = _tempTileScratch[index];
                 if (!ActiveTiles.ContainsKey(tilePair.UnwrappedTileId))
                 {
-                    TempTiles.RemoveAt(index);
+                    // May already be gone, if pooling an earlier tile's children took it out.
+                    TempTiles.Remove(tilePair);
                     continue;
                 }
 
@@ -227,7 +243,7 @@ namespace Mapbox.BaseModule.Map
                         tilePair.Children.Clear();
                     }
 
-                    TempTiles.RemoveAt(index);
+                    TempTiles.Remove(tilePair);
 
                     _quadrants[0] = tilePair.UnwrappedTileId.Quadrant(0);
                     _quadrants[1] = tilePair.UnwrappedTileId.Quadrant(1);
