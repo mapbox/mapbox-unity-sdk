@@ -148,8 +148,29 @@ namespace Mapbox.BaseModule.Data.Tasks
 
 		public virtual void AddTask(TaskWrapper taskWrapper, int priorityLevel = 3)
 		{
+			if (taskWrapper == null) return;
+
 			lock (_lock)
 			{
+				if (_isDestroying)
+				{
+					// Teardown has begun, so nothing will ever run this. Web requests in flight when
+					// the app stops still deliver their callbacks, and several of those enqueue
+					// bookkeeping work (SqliteCache.UpdateExpiration, for one) - which is why this
+					// arrives repeatedly on exit rather than once.
+					//
+					// Marked completed rather than dropped, so anything polling IsCompleted unwinds
+					// instead of spinning. Completion callbacks are deliberately NOT invoked: they
+					// would run against objects that are already being destroyed.
+					taskWrapper.IsCompleted = true;
+					return;
+				}
+
+				if (priorityLevel < 0 || priorityLevel >= _taskQueue.Count)
+				{
+					priorityLevel = Mathf.Clamp(priorityLevel, 0, _taskQueue.Count - 1);
+				}
+
 				taskWrapper.EnqueueFrame = Time.time;
 				_taskQueue[priorityLevel].Enqueue(taskWrapper);
 				//Debug.Log(taskWrapper.Info);
@@ -160,12 +181,25 @@ namespace Mapbox.BaseModule.Data.Tasks
 		{
 			_globalCancellationTokenSource.Cancel();
 			_isDestroying = true;
-			// _allTasks.Clear();
-			// _allTasks = null;
-			// _tasksByTile.Clear();
-			// _tasksByTile = null;
-			//_taskQueueList = null;
-			_taskQueue.Clear();
+
+			lock (_lock)
+			{
+				// Drain the queues, keep the list OF queues. Clearing the list itself left
+				// _taskQueue.Count at zero, so anything enqueued afterwards indexed an empty list and
+				// threw - and the queue slots are structural, created once in the constructor, not
+				// per-session state.
+				foreach (var queue in _taskQueue)
+				{
+					foreach (var pending in queue)
+					{
+						// Release pollers without running their callbacks, as AddTask does.
+						if (pending != null) pending.IsCompleted = true;
+					}
+
+					queue.Clear();
+				}
+			}
+
 			TaskStarting = null;
 			TaskCancelled = null;
 		}
