@@ -15,6 +15,18 @@ namespace Mapbox.BaseModule.Data.Interfaces
 		
 		IEnumerable<IEnumerator> GetTileCoverCoroutines(IEnumerable<CanonicalTileId> tiles);
 		
+		/// <summary>
+		/// Declares the tiles the map still wants; everything absent from the set may be dropped.
+		/// Return false to report the module is not finished with them yet.
+		///
+		/// Called from every <c>ChangeView</c>, so potentially every frame while the camera moves.
+		/// Implementations should treat it as a hot path: reuse a scratch collection rather than
+		/// allocating one per call, as TerrainLayerModule does when it maps render ids to data ids.
+		///
+		/// <paramref name="retainedTiles"/> is owned and reused by the caller - it is cleared and
+		/// refilled before the next call - so a module must not hold onto the reference. Copy what it
+		/// needs to keep, and finish iterating before returning.
+		/// </summary>
 		bool RetainTiles(HashSet<CanonicalTileId> retainedTiles);
 		/// <summary>
 		/// Prepares the module for use.
