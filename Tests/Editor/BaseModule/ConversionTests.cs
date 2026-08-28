@@ -98,6 +98,58 @@ namespace Mapbox.BaseModuleTests
         }
 
         [Test]
+        public void Tile01_CornersMapToTheMatchingTileCorners()
+        {
+            // The centre-only tests above pass either way round, because a mirrored longitude
+            // cancels at x = 0.5. Corners are where the argument order shows.
+            var tileId = new CanonicalTileId(14, 9647, 12321);
+            var bounds = Conversions.TileIdToBounds(tileId);
+
+            var southWest = Conversions.Tile01ToLatitudeLongitude(new Vector2(0f, 0f), tileId);
+            var northEast = Conversions.Tile01ToLatitudeLongitude(new Vector2(1f, 1f), tileId);
+
+            Assert.AreEqual(bounds.South, southWest.Latitude, 1e-6);
+            Assert.AreEqual(bounds.West, southWest.Longitude, 1e-6);
+            Assert.AreEqual(bounds.North, northEast.Latitude, 1e-6);
+            Assert.AreEqual(bounds.East, northEast.Longitude, 1e-6);
+        }
+
+        [Test]
+        public void Tile01_RoundTripsAnOffCentrePoint()
+        {
+            // TileIdToCenterLatLngToTile01ToLatlng round-trips the tile centre, which is the one
+            // point that survives a mirrored axis. Use a point well off centre in both axes.
+            var tileId = new CanonicalTileId(16, 37309, 18968);
+            var bounds = Conversions.TileIdToBounds(tileId);
+            var offCentre = new LatitudeLongitude(
+                Mathd.Lerp(bounds.South, bounds.North, 0.2),
+                Mathd.Lerp(bounds.West, bounds.East, 0.8));
+
+            var zeroOne = Conversions.LatitudeLongitudeToInTile01(offCentre, tileId);
+            var roundTripped = Conversions.Tile01ToLatitudeLongitude(zeroOne, tileId);
+
+            Assert.AreEqual(offCentre.Latitude, roundTripped.Latitude, 1e-6);
+            Assert.AreEqual(offCentre.Longitude, roundTripped.Longitude, 1e-6);
+        }
+
+        [Test]
+        public void Tile01_Vector3OverloadReadsUnityTileSpace()
+        {
+            // (0,0,0) is the north-west corner and z runs to -1 southwards - a different space
+            // from the Vector2 overload, deliberately.
+            var tileId = new CanonicalTileId(14, 9647, 12321);
+            var bounds = Conversions.TileIdToBounds(tileId);
+
+            var northWest = Conversions.Tile01ToLatitudeLongitude(new Vector3(0f, 0f, 0f), tileId);
+            var southEast = Conversions.Tile01ToLatitudeLongitude(new Vector3(1f, 0f, -1f), tileId);
+
+            Assert.AreEqual(bounds.North, northWest.Latitude, 1e-6);
+            Assert.AreEqual(bounds.West, northWest.Longitude, 1e-6);
+            Assert.AreEqual(bounds.South, southEast.Latitude, 1e-6);
+            Assert.AreEqual(bounds.East, southEast.Longitude, 1e-6);
+        }
+
+        [Test]
         public void Tile01_CenterMapsToTileCenter()
         {
             // (0.5, 0.5) maps to the tile's center regardless of any convention
