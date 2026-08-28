@@ -596,14 +596,26 @@ namespace Mapbox.BaseModule.Map
             tile.Initialize(tileId, (float)rectd.Size.x * _mapInformation.Scale);
         }
 
+        /// <summary>
+        /// Offers the tile to every module and reports whether all of them finished with it.
+        ///
+        /// Deliberately not short-circuiting on the first module that says "not yet". This used to
+        /// break out of the loop, so one unready module starved every module registered after it of
+        /// its chance to make progress on that tile - and since the loop runs again from the start
+        /// on the next update, it starved them for as long as the first module stayed unready.
+        /// "I need more time" is not "abort this tile". <see cref="CompositeLayerModule.RetainTiles"/>
+        /// already worked this way for the same reason.
+        ///
+        /// Every LoadInstant implementation is a cheap, idempotent guard - it either takes instant
+        /// data and returns true, or reports that it is still waiting - so calling all of them costs
+        /// little and is safe to repeat.
+        /// </summary>
         protected bool CreateTile(UnityMapTile unityMapTile)
         {
             var tileFinished = true;
             foreach (var module in LayerModules)
             {
-                var moduleFinished = module.LoadInstant(unityMapTile);
-                tileFinished &= moduleFinished;
-                if (!moduleFinished) break;
+                tileFinished &= module.LoadInstant(unityMapTile);
             }
 
             if (tileFinished)

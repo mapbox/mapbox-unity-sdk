@@ -36,15 +36,23 @@ public class CompositeLayerModule : ILayerModule
         }
     }
 
+    /// <summary>
+    /// Offers the tile to every child module, reporting true only if all of them finished with it.
+    /// Like <see cref="RetainTiles"/>, deliberately not short-circuiting: returning on the first
+    /// child that is still waiting denied every later child its chance to progress on that tile.
+    /// </summary>
     public virtual bool LoadInstant(UnityMapTile unityTile)
     {
+        var allDone = true;
         foreach (var module in LayerModules)
         {
-            var moduleDone = module.LoadInstant(unityTile);
-            if (!moduleDone) return false;
+            if (!module.LoadInstant(unityTile))
+            {
+                allDone = false;
+            }
         }
 
-        return true;
+        return allDone;
     }
 
     /// <summary>
