@@ -32,6 +32,15 @@ Correctness work across the tile pipeline, independent of any one feature module
 
 - `MapboxComponentsModuleScript` exposes `RejectTilesOutsideZoom`, `ClampDataLevelToMax` and `CacheSize` as serialized fields. It built its `VectorModuleSettings` entirely in code, so the Components module drew nothing below zoom 12 and the only way to change that was to subclass it and reimplement the whole build method. Defaults match the previous hardcoded values, so existing scenes are unaffected. `GetVectorLayerModule` remains virtual for what the Inspector cannot express, such as a different tileset.
 
+#### Removed
+
+- The public surfaces that looked like the answer to "how do I read tile data" and were never wired to anything. **Breaking** as API, inert in behaviour - none of them could return data, and nothing in the SDK called them:
+  - `ByteArrayTile.Data`, `LayerNames()`, `GetLayer()`, `SetVectorFromCache()` and `Dispose(bool)`. The backing field was never assigned by the pipeline - vector bytes are decoded into `VectorData` by the vector module instead - so `LayerNames()` and `GetLayer()` threw `NullReferenceException` on any tile the SDK produced, despite the class documenting a worked example of consuming `Data`. The class doc now describes what the type actually holds: undecoded bytes.
+  - `Source<T>.DataFetched`, `DataFetchedWithCallback` and `FetchingError`, declared but never invoked and with no subscribers anywhere, and `SetMeshGenerationMethod`, which had neither an override nor a caller. `TileErrorEventArgs` went with `FetchingError`, its only consumer.
+  - `UnityTileVectorContainer`, along with `UnityMapTile.VectorContainer`. Nothing ever populated it: `SetVectorData` had no callers, so `Data` was permanently null and `GetAndClearVectorData()` was called once, in `Recycle`, purely to discard nothing. `ImageContainer` and `TerrainContainer` are unaffected.
+
+  A read path for vector features is worth having; these were not it, and a developer could reasonably spend hours believing otherwise.
+
 #### Added
 
 - `IMapInformation.TryQueryElevation`, which reports whether an elevation is actually known rather than returning 0 for both "sea level" and "no data". The existing `QueryElevation` remains for callers with no useful response to "unknown".
