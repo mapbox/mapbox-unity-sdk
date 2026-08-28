@@ -35,7 +35,9 @@ namespace Mapbox.VectorModule.Filters
 
         public override bool Try(VectorFeatureUnity feature)
         {
-            return feature.Properties.ContainsKey(_value);
+            // A feature can arrive with no properties at all - whole layers of them do - and that is
+            // an answer of "no", not a NullReferenceException.
+            return feature.Properties != null && feature.Properties.ContainsKey(_value);
         }
     }
 }

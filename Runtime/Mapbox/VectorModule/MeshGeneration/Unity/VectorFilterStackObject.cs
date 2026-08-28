@@ -54,19 +54,42 @@ namespace Mapbox.VectorModule.MeshGeneration.Unity
             }
         }
 
+        /// <summary>
+        /// Runs on every feature of every tile, so index loops rather than LINQ: `Any`/`All` with a
+        /// lambda capturing the feature allocated a closure, a delegate and an enumerator per
+        /// feature, and filtering is pure overhead on top of the mesh work it gates.
+        /// <c>ComponentFilterStack</c> has always done it this way.
+        /// </summary>
         public bool Try(VectorFeatureUnity feature)
         {
-            if (Filters == null || Filters.Count == 0)
+            var filters = Filters;
+            if (filters == null)
+                return true;
+
+            var count = filters.Count;
+            if (count == 0)
                 return true;
 
             switch (Type)
             {
                 case LayerFilterCombinerOperationType.Any:
-                    return Filters.Any(m => m.Try(feature));
+                    for (var i = 0; i < count; i++)
+                    {
+                        if (filters[i].Try(feature)) return true;
+                    }
+                    return false;
                 case LayerFilterCombinerOperationType.All:
-                    return Filters.All(m => m.Try(feature));
+                    for (var i = 0; i < count; i++)
+                    {
+                        if (!filters[i].Try(feature)) return false;
+                    }
+                    return true;
                 case LayerFilterCombinerOperationType.None:
-                    return !Filters.Any(m => m.Try(feature));
+                    for (var i = 0; i < count; i++)
+                    {
+                        if (filters[i].Try(feature)) return false;
+                    }
+                    return true;
                 default:
                     return false;
             }
