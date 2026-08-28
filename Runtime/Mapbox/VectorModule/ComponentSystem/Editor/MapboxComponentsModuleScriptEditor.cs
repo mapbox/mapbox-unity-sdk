@@ -32,6 +32,8 @@ namespace Mapbox.VectorModule.ComponentSystem.Editor
         {
             serializedObject.Update();
 
+            DrawPropertiesOtherThanVisualizerList();
+
             if (_boxStyle == null)
             {
                 _boxStyle = new GUIStyle(GUI.skin.box)
@@ -105,6 +107,33 @@ namespace Mapbox.VectorModule.ComponentSystem.Editor
             EditorGUILayout.EndHorizontal();
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        /// <summary>
+        /// Draws every serialized field except the visualizer list, which gets its own custom UI
+        /// below. Enumerated rather than listed by name so a field added to
+        /// <see cref="MapboxComponentsModuleScript"/> shows up without anyone remembering this file -
+        /// RejectTilesOutsideZoom, ClampDataLevelToMax and CacheSize were invisible here for exactly
+        /// that reason, which left subclassing as the only way to change them.
+        /// </summary>
+        private void DrawPropertiesOtherThanVisualizerList()
+        {
+            var iterator = serializedObject.GetIterator();
+            var drewAny = false;
+
+            // enterChildren on the first step only: we want top-level fields, and their own children
+            // are drawn by PropertyField's foldout.
+            for (var enterChildren = true; iterator.NextVisible(enterChildren); enterChildren = false)
+            {
+                if (iterator.propertyPath == "m_Script") continue;
+                if (iterator.propertyPath == _layerVisualizersProp.propertyPath) continue;
+
+                EditorGUILayout.PropertyField(iterator, true);
+                drewAny = true;
+            }
+
+            if (drewAny)
+                EditorGUILayout.Space(8);
         }
 
         private void AddEmptySlot()

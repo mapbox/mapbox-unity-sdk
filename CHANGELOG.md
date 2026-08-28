@@ -20,6 +20,8 @@ Correctness work across the tile pipeline, independent of any one feature module
 
 - `MapboxMapVisualizer` could show a tile and its own children simultaneously during a fast multi-level zoom-out, producing flickering coplanar geometry at the map centre. `DelveInto`'s filler-adoption branch hoisted an adopted tile's already-visible children instead of pooling them, and `ShowTiles` then repositioned and showed pass-through tiles that were meant to stay hidden.
 
+- The Components module's serialized settings never reached its Inspector. `MapboxComponentsModuleScriptEditor` drew the visualizer list and its two buttons and never called `DrawDefaultInspector`, so `RejectTilesOutsideZoom`, `ClampDataLevelToMax` and `CacheSize` were invisible - subclassing remained the only way to change the zoom range, which is precisely what promoting them to serialized fields was meant to remove. The editor now enumerates the serialized properties rather than naming them, so a field added to the script appears without anyone remembering the editor file.
+
 #### Changed
 
 - `ILayerModule.Initialize` now takes an `ITileLifecycleSource`, replacing the separate `ITileLifecycleObserver` hook. A module previously had no reference to whatever was driving it - neither the constructor nor `ConstructModule` supplies one - so an extra opt-in interface existed purely to hand the visualizer over. **Breaking** for anyone implementing `ILayerModule` directly or subclassing an SDK module and overriding `Initialize`. Nothing here is serialized, so no scene or prefab data is affected.
