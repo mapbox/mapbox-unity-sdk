@@ -18,7 +18,10 @@ namespace Mapbox.VectorModule.MeshGeneration.Unity
         {
             return new VectorFilterStack()
             {
-                Filters = Filters.Where(x => x != null).Select(x => x?.Filter).ToList(),
+                // Inactive filters are dropped here rather than skipped per feature: the Inspector's
+                // enable toggle used to be drawn and never read, so unticking a filter left it
+                // filtering.
+                Filters = Filters.Where(x => x != null && x.Active).Select(x => x.Filter).ToList(),
                 Type = this.Type
             };
         }
@@ -35,9 +38,20 @@ namespace Mapbox.VectorModule.MeshGeneration.Unity
             
         }
 
+        /// <summary>
+        /// Initializes every filter in the stack. This was an empty body, and the only code that
+        /// actually initialized filters was <c>ModifierStack.Initialize</c>, reaching in through
+        /// this object's <c>Filters</c> list - so a filter stack used without a modifier stack
+        /// initialized nothing, and the reach-in dereferenced <c>Filters</c> without a null check.
+        /// </summary>
         public void Initialize()
         {
-            
+            if (Filters == null) return;
+
+            foreach (var filter in Filters)
+            {
+                filter?.Initialize();
+            }
         }
 
         public bool Try(VectorFeatureUnity feature)

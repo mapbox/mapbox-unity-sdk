@@ -48,13 +48,8 @@ namespace Mapbox.VectorModule.MeshGeneration
         
         public void Initialize(Transform layerRootObject = null)
         {
-            if (Filters != null && Filters.Filters != null)
-            {
-                foreach (var filter in Filters.Filters)
-                {
-                    filter.Initialize();
-                }
-            }
+            // Ask the stack to initialize its own filters instead of reaching into its list.
+            Filters?.Initialize();
 
             _objectPool = new ObjectPool<VectorEntity>(() => VectorEntityGenerator(layerRootObject));
             _objectPool.InitializeItems(_defaultPoolSize);
