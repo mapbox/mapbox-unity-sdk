@@ -282,6 +282,7 @@ namespace Mapbox.VectorModule
             var layerExtent = (float)layer.Extent;
             var featureResult = new VectorFeatureUnity();
             featureResult.Properties = feature.GetProperties();
+            MvtProperties.NormalizeIntegers(featureResult.Properties);
 
             var geometry = feature.Geometry<float>(0);
             var points = new List<List<Vector3>>();

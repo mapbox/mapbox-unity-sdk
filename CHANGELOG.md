@@ -2,7 +2,7 @@
 
 ### Unreleased
 
-Correctness work across the tile pipeline, independent of any one feature module. The theme is results that told the caller less than they knew: callbacks that were never invoked, failures reported as successes, and single values standing in for several different outcomes.
+Correctness work across the tile pipeline, independent of any one feature module. The theme is results that told the caller less than they knew: callbacks that were never invoked, failures reported as successes, single values standing in for several different outcomes, and - in the removals below - public surfaces that advertised access to tile data they could never return.
 
 #### Fixed
 
@@ -19,6 +19,8 @@ Correctness work across the tile pipeline, independent of any one feature module
 - Area and building triangulation silently dropped features too large for the index buffer. The retry allocated a buffer of the same size, so a feature whose own triangulation exceeded it failed identically and was skipped without a message - visible as water disappearing in patches at low zoom, where a single coastline ring needs more indices than the pool provides.
 
 - `MapboxMapVisualizer` could show a tile and its own children simultaneously during a fast multi-level zoom-out, producing flickering coplanar geometry at the map centre. `DelveInto`'s filler-adoption branch hoisted an adopted tile's already-visible children instead of pooling them, and `ShowTiles` then repositioned and showed pass-through tiles that were meant to stay hidden.
+
+- Negative integer feature properties were unreadable. `vector-tile-cs` reads every varint as unsigned, so an MVT `int_value` - a signed int64 - arrives boxed as `ulong` and a contour band 200 m below sea level read as 18446744073709551416 instead of -200. Both San Francisco and the Amazon ship those bands, so `Convert.ToInt32(properties["ele"])` returned garbage on real data. `VectorLayerVisualizer.GetFeature` now normalizes integers to `long` through `MvtProperties.NormalizeIntegers`, which allocates nothing for the common case of a feature carrying no unsigned value. The Components module's own reader already boxed these as `long` and is unchanged.
 
 - The Components module's serialized settings never reached its Inspector. `MapboxComponentsModuleScriptEditor` drew the visualizer list and its two buttons and never called `DrawDefaultInspector`, so `RejectTilesOutsideZoom`, `ClampDataLevelToMax` and `CacheSize` were invisible - subclassing remained the only way to change the zoom range, which is precisely what promoting them to serialized fields was meant to remove. The editor now enumerates the serialized properties rather than naming them, so a field added to the script appears without anyone remembering the editor file.
 
@@ -44,6 +46,8 @@ Correctness work across the tile pipeline, independent of any one feature module
 #### Added
 
 - `IMapInformation.TryQueryElevation`, which reports whether an elevation is actually known rather than returning 0 for both "sea level" and "no data". The existing `QueryElevation` remains for callers with no useful response to "unknown".
+
+- `Mapbox.BaseModule.Utilities.MvtProperties.NormalizeIntegers`, public for anyone reading feature properties off their own decode path and hitting the same unsigned-int64 problem described above.
 
 ### v3.1.1
 
