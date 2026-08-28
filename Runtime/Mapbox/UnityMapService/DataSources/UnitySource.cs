@@ -19,6 +19,14 @@ namespace Mapbox.UnityMapService.DataSources
         }
 
         protected string _tilesetId;
+
+        /// <summary>
+        /// The tileset this source fetches. For vector sources this can be a composed,
+        /// comma-separated list of tileset ids, which the Vector Tiles API returns as one tile
+        /// carrying the union of their layers.
+        /// </summary>
+        public string TilesetId => _tilesetId;
+
         private bool _isTileJsonReady;
         private TileJSONResponse _tileJsonResponse;
         protected int[] _sourceZoomRange;

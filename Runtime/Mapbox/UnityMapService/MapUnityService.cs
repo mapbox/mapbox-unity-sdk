@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Mapbox.BaseModule;
 using Mapbox.BaseModule.Data.DataFetchers;
@@ -78,16 +79,67 @@ namespace Mapbox.UnityMapService
 			return staticRasterSource;
 		}
 
+		/// <summary>
+		/// Returns the one shared vector source, creating it on the first call.
+		///
+		/// One source per map is deliberate: the Vector Tiles API composes tilesets, so
+		/// "{a},{b}/{z}/{x}/{y}.vector.pbf" fetches the union of their layers in a single request,
+		/// and a second source would mean a second request and a second cache entry per tile.
+		///
+		/// The consequence is that whoever calls first defines the tileset for everyone after them.
+		/// A later caller asking for a tileset the existing source does not carry used to receive it
+		/// silently and then find none of its layers in any tile; it is now told, naming both ids.
+		/// Composing them for the caller is not something this method can do - the source is already
+		/// fetching - so the fix on the caller's side is to compose the ids up front, which
+		/// VectorModuleSettingsDrawer's "Add Mapbox Streets V8" button exists to help with.
+		/// </summary>
 		public override Source<VectorData> GetVectorSource(VectorSourceSettings settings)
 		{
-			if (_dataSources.Any(s => s is VectorSource))
+			var existing = _dataSources.FirstOrDefault(x => x is VectorSource) as VectorSource;
+			if (existing != null)
 			{
-				return _dataSources.First(x => x is VectorSource) as Source<VectorData>;
+				WarnIfTilesetIsMissing(existing.TilesetId, settings.TilesetId);
+				return existing;
 			}
-			
+
 			var vectorSource = new VectorSource(_fetchingManager, _cacheManager, settings);
 			_dataSources.Add(vectorSource);
 			return vectorSource;
+		}
+
+		/// <summary>
+		/// Reports every requested tileset the shared source does not carry. Both ids can be
+		/// composed, comma-separated lists, so this is a set comparison rather than string equality.
+		/// </summary>
+		private static void WarnIfTilesetIsMissing(string existingTilesetId, string requestedTilesetId)
+		{
+			if (string.IsNullOrEmpty(requestedTilesetId) || existingTilesetId == requestedTilesetId)
+			{
+				return;
+			}
+
+			var carried = new HashSet<string>((existingTilesetId ?? string.Empty)
+				.Split(',')
+				.Select(id => id.Trim())
+				.Where(id => id.Length > 0));
+
+			var missing = requestedTilesetId
+				.Split(',')
+				.Select(id => id.Trim())
+				.Where(id => id.Length > 0 && !carried.Contains(id))
+				.ToList();
+
+			if (missing.Count == 0)
+			{
+				return;
+			}
+
+			Debug.LogError(string.Format(
+				"A vector source for '{0}' already exists and is the only one this map will have, so " +
+				"the request for '{1}' returns it unchanged. None of the tiles it produces will carry " +
+				"a layer from {2}. Compose the tileset ids into one comma-separated id " +
+				"(\"{0},{2}\") on whichever module constructs the source first.",
+				existingTilesetId, requestedTilesetId, string.Join(",", missing)));
 		}
 		
 		public override Source<BuildingData> GetBuildingSource(VectorSourceSettings settings)

@@ -20,6 +20,8 @@ Correctness work across the tile pipeline, independent of any one feature module
 
 - `MapboxMapVisualizer` could show a tile and its own children simultaneously during a fast multi-level zoom-out, producing flickering coplanar geometry at the map centre. `DelveInto`'s filler-adoption branch hoisted an adopted tile's already-visible children instead of pooling them, and `ShowTiles` then repositioned and showed pass-through tiles that were meant to stay hidden.
 
+- Asking for a vector tileset the map does not carry failed silently. `MapUnityService.GetVectorSource` returns the one shared vector source - deliberate, since the Vector Tiles API composes tilesets and a second source means a second request and cache entry per tile - but whoever calls first defines the tileset for everyone after them. A module asking for `mapbox-terrain-v2` after something took `mapbox-streets-v8` received a source that would never carry a layer it needed, with no error and its tileset id discarded. It now logs an error naming both ids, the tilesets actually missing, and the composed id to use instead. Behaviour is unchanged otherwise; composing the ids is still the caller's job.
+
 - The Inspector's enable toggle on filters and modifiers did nothing. `FilterBaseObject`, `ScriptableMeshModifierObject` and `ScriptableGameObjectModifierObject` each carry an `m_Active` field that the filter- and modifier-stack Inspectors draw as a tickbox, and no runtime code read it - so an unticked filter still filtered and an unticked modifier still ran. Inactive entries are now dropped when the stack is built, which also costs nothing per feature. Empty slots in `GoModifiers` are dropped with them: `ModifierStack.RunGoModifiers` does not null-check, unlike its mesh counterpart.
 
 - `GeometryTypeFilter` could not match polygons by their multi-part name, and half its cases were unreachable. It switched on `GeometryType.ToString().ToLowerInvariant()` against GeoJSON-style names, but an MVT `GeomType` is only `UNKNOWN`, `POINT`, `LINESTRING` or `POLYGON` - multi-part geometry arrives as several rings on one feature, not as a distinct type - so the `multipolygon`, `multilinestring` and `multipoint` arms could never match. The first of those also had a space inside the case literal. Now switches on the enum, which drops a `ToString` plus `ToLowerInvariant` per feature as well.
@@ -60,6 +62,8 @@ Correctness work across the tile pipeline, independent of any one feature module
 - `IMapInformation.TryQueryElevation`, which reports whether an elevation is actually known rather than returning 0 for both "sea level" and "no data". The existing `QueryElevation` remains for callers with no useful response to "unknown".
 
 - `Mapbox.BaseModule.Utilities.MvtProperties.NormalizeIntegers`, public for anyone reading feature properties off their own decode path and hitting the same unsigned-int64 problem described above.
+
+- `UnitySource<T>.TilesetId`, so a caller can see which tileset - or which composed, comma-separated list of tilesets - a source it was handed actually fetches.
 
 ### v3.1.1
 
