@@ -86,7 +86,7 @@ namespace Mapbox.BaseModule.Data.Tasks
 		{
 			while (!_isDestroying)
 			{
-				while (TaskQueueAny() && _runningTasks.Count <= ActiveTaskLimit)
+				while (TaskQueueAny() && _runningTasks.Count < ActiveTaskLimit)
 				{
 					var task = TaskQueuePeek();
 					if (task.IsCancelled)
@@ -99,7 +99,6 @@ namespace Mapbox.BaseModule.Data.Tasks
 					else if (QueueTimeHasMatured(task.EnqueueFrame, _requestDelay) || !Application.isPlaying)
 					{
 						TaskQueueDequeue();
-						_runningTasks.Add(task);
 						HandleTask(task);
 					}
 					else
@@ -125,8 +124,13 @@ namespace Mapbox.BaseModule.Data.Tasks
 			{
 				if (t.IsFaulted)
 				{
-					Debug.Log(t.Exception?.Message);
-					Debug.Break();
+					// Unwrap before logging: t.Exception is an AggregateException whose own Message
+					// is the useless "One or more errors occurred.", and LogException keeps the
+					// stack that .Message discards. Faults are reported to the wrapper's own
+					// Completed path below, so this only needs to be visible, not fatal - the
+					// Debug.Break() that used to live here halted the Editor on any worker throw.
+					Exception fault = t.Exception?.GetBaseException() ?? t.Exception;
+					if (fault != null) Debug.LogException(fault);
 				}
 				OnTaskFinished(wrapper);
 				_runningTasks.Remove(wrapper);
@@ -201,6 +205,7 @@ namespace Mapbox.BaseModule.Data.Tasks
 			}
 
 			TaskStarting = null;
+			TaskFinished = null;
 			TaskCancelled = null;
 		}
 	}
