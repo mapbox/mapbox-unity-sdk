@@ -52,6 +52,7 @@ namespace Mapbox.MapDebug.Scripts.Benchmark
         private float _peakMemoryMB;
         private float _peakManagedHeapMB;
         private int _startGCCount;
+        private long _startAllocatedBytes;
 
         private IMapInformation _mapInfo;
 
@@ -85,6 +86,10 @@ namespace Mapbox.MapDebug.Scripts.Benchmark
             _peakMemoryMB = 0;
             _peakManagedHeapMB = 0;
             _startGCCount = GC.CollectionCount(0);
+            // Cumulative managed bytes allocated, which gcCollections only hints at: a run can
+            // allocate heavily and collect rarely, or the reverse. This is the number the
+            // per-feature allocations in the mesh-modifier stack move.
+            _startAllocatedBytes = GC.GetTotalAllocatedBytes(false);
             _mapInfo = MapBehaviour != null ? MapBehaviour.MapInformation : null;
             _recording = true;
         }
@@ -140,6 +145,7 @@ namespace Mapbox.MapDebug.Scripts.Benchmark
             int count = _frameIndex;
             float avgFps = count > 0 ? (float)(_fpsSum / count) : 0;
             int gcCollections = GC.CollectionCount(0) - _startGCCount;
+            long allocatedBytes = GC.GetTotalAllocatedBytes(false) - _startAllocatedBytes;
 
             // Compute percentiles from sorted FPS values
             float p1Fps = 0, p5Fps = 0, p99FrameTimeMs = 0;
@@ -183,7 +189,9 @@ namespace Mapbox.MapDebug.Scripts.Benchmark
                 },
                 ["peakMemoryMB"] = Math.Round(_peakMemoryMB, 1),
                 ["peakManagedHeapMB"] = Math.Round(_peakManagedHeapMB, 1),
-                ["gcCollections"] = gcCollections
+                ["gcCollections"] = gcCollections,
+                ["managedAllocatedMB"] = Math.Round(allocatedBytes / (1024.0 * 1024.0), 1),
+                ["managedAllocatedBytes"] = allocatedBytes
             };
 
             return result;
