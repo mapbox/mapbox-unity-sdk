@@ -1,4 +1,5 @@
 using Mapbox.BaseModule.Data;
+using Mapbox.BaseModule.Data.Tiles;
 using Mapbox.BaseModule.Map;
 using Mapbox.BaseModule.Unity;
 using Mapbox.BaseModule.Utilities;
@@ -33,6 +34,21 @@ namespace Mapbox.VectorModule.MeshGeneration.Unity
         public void Run(VectorFeatureUnity feature, MeshData md, IMapInformation mapInfo)
         {
             _meshModifierImplementation.Run(feature, md, mapInfo);
+        }
+
+        public void BeginTile(CanonicalTileId tileId)
+        {
+            _meshModifierImplementation.BeginTile(tileId);
+        }
+
+        public void EndTile(CanonicalTileId tileId)
+        {
+            _meshModifierImplementation.EndTile(tileId);
+        }
+
+        public void UnregisterTile(CanonicalTileId tileId)
+        {
+            _meshModifierImplementation.UnregisterTile(tileId);
         }
     }
 }

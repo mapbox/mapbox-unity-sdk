@@ -213,31 +213,45 @@ namespace Mapbox.VectorModule
 
         protected void MeshModifications(CanonicalTileId canonicalTileId, VectorTileLayer layer, Dictionary<int, HashSet<MeshData>> meshDataList)
         {
-            for (int i = 0; i < layer.FeatureCount(); i++)
+            foreach (var stack in _stackList)
             {
-                var featureResult = GetFeature(layer, i);
-                if (featureResult == null)
-                    continue;
-                featureResult.TileId = canonicalTileId;
-
-                foreach (var stack in _stackList)
-                {
-                    if (stack.Value.Filters != null && !stack.Value.Filters.Try(featureResult))
-                        continue;
-                    
-                    var meshData = new MeshData();
-                    meshData.Feature = featureResult;
-                    meshData = stack.Value.RunMeshModifiers(featureResult, meshData, _mapInformation);
-                    
-                    if (!meshDataList.ContainsKey(stack.Key)) meshDataList.Add(stack.Key, new HashSet<MeshData>());
-                    meshDataList[stack.Key].Add(meshData);
-                    if (_settings.StackExecutionMode == ModifierStackExecutionMode.FirstHit)
-                        break;
-                }
+                stack.Value.BeginTile(canonicalTileId);
             }
 
-            // if (!tile.IsActive)
-            //     return;
+            try
+            {
+                for (int i = 0; i < layer.FeatureCount(); i++)
+                {
+                    var featureResult = GetFeature(layer, i);
+                    if (featureResult == null)
+                        continue;
+                    featureResult.TileId = canonicalTileId;
+
+                    foreach (var stack in _stackList)
+                    {
+                        if (stack.Value.Filters != null && !stack.Value.Filters.Try(featureResult))
+                            continue;
+                    
+                        var meshData = new MeshData();
+                        meshData.Feature = featureResult;
+                        meshData = stack.Value.RunMeshModifiers(featureResult, meshData, _mapInformation);
+                    
+                        if (!meshDataList.ContainsKey(stack.Key)) meshDataList.Add(stack.Key, new HashSet<MeshData>());
+                        meshDataList[stack.Key].Add(meshData);
+                        if (_settings.StackExecutionMode == ModifierStackExecutionMode.FirstHit)
+                            break;
+                    }
+                }
+            }
+            finally
+            {
+                // In a finally so a throwing modifier still hands back whatever BeginTile acquired;
+                // otherwise one bad feature leaks a tile's scratch for the life of the session.
+                foreach (var stack in _stackList)
+                {
+                    stack.Value.EndTile(canonicalTileId);
+                }
+            }
 
             foreach (var meshResult in meshDataList)
             {

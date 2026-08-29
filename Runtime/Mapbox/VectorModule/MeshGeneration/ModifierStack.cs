@@ -55,6 +55,35 @@ namespace Mapbox.VectorModule.MeshGeneration
             _objectPool.InitializeItems(_defaultPoolSize);
         }
 
+        /// <summary>
+        /// Bracket a tile's features. Both calls happen on the worker thread that runs the tile's
+        /// modifiers, and <see cref="EndTile"/> runs even if the tile yielded no features, so a
+        /// modifier holding per-tile scratch always gets it back.
+        /// </summary>
+        public void BeginTile(CanonicalTileId tileId)
+        {
+            var counter = MeshModifiers.Count;
+            for (int i = 0; i < counter; i++)
+            {
+                if (MeshModifiers[i] != null)
+                {
+                    MeshModifiers[i].BeginTile(tileId);
+                }
+            }
+        }
+
+        public void EndTile(CanonicalTileId tileId)
+        {
+            var counter = MeshModifiers.Count;
+            for (int i = 0; i < counter; i++)
+            {
+                if (MeshModifiers[i] != null)
+                {
+                    MeshModifiers[i].EndTile(tileId);
+                }
+            }
+        }
+
         public MeshData RunMeshModifiers(VectorFeatureUnity feature, MeshData meshData, IMapInformation mapInfo)
         {
             var counter = MeshModifiers.Count;
@@ -82,6 +111,15 @@ namespace Mapbox.VectorModule.MeshGeneration
             foreach (var goModifier in GoModifiers)
             {
                 goModifier.Unregister(tileId);
+            }
+
+            var counter = MeshModifiers.Count;
+            for (int i = 0; i < counter; i++)
+            {
+                if (MeshModifiers[i] != null)
+                {
+                    MeshModifiers[i].UnregisterTile(tileId);
+                }
             }
         }
 
