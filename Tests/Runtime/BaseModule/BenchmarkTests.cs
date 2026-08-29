@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using Mapbox.BaseModule.Data.Vector2d;
@@ -342,7 +341,7 @@ namespace Tests.Runtime.BaseModule
                     legDuration);
 
                 bool legDone = false;
-                Action handler = () => legDone = true;
+                System.Action handler = () => legDone = true;
                 preCacher.PreCacheCompleted += handler;
                 yield return preCacher.PreCacheAllTiles(_mapBehaviour.MapboxMap);
                 while (!legDone)
