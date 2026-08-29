@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Mapbox.BaseModule.Data.Vector2d;
@@ -291,6 +292,114 @@ namespace Tests.Runtime.BaseModule
                 $"Expected 0 successful network requests in cache-only mode, got {requestsSucceeded}");
 
             loggingFetcher.CacheOnlySource.BlockNetwork = false;
+
+            yield return Cleanup();
+        }
+
+        /// <summary>
+        /// Records an allocation baseline that a later run can be compared against.
+        ///
+        /// <see cref="BenchmarkFullRun"/> re-fetches over the network, so its allocations and
+        /// timings carry network variance and two runs of it do not compare. This one pre-caches the
+        /// whole route first and then blocks the network for the recorded pass, so what gets measured
+        /// is decode, mesh generation and rendering out of cache - which is what the mesh-modifier
+        /// rework is meant to move.
+        ///
+        /// The orchestrator's own PreCacheData path is deliberately not used:
+        /// <c>ComputeTilesForPath</c> interpolates a straight line between two points at a single
+        /// zoom, which cannot cover a multi-waypoint route that changes zoom on every leg. It also
+        /// reads the orchestrator's scalar Start/End fields, which the waypoint routes never set - so
+        /// enabling it here would pre-cache the default coordinates and then block the network over
+        /// an empty cache. This walks the legs itself instead.
+        /// </summary>
+        [UnityTest]
+        [TestCaseSource(nameof(CityNames))]
+        public IEnumerator AllocationBaseline(string city)
+        {
+            yield return SetupForCity(city);
+
+            var waypoints = _orchestrator.Waypoints;
+            var preCacher = _benchmarkRoot.AddComponent<BenchmarkPreCacher>();
+            _orchestrator.PreCacher = preCacher;
+
+            // _tilesToCache resets on every ComputeTilesForPath call, so each leg has to be computed
+            // and fetched before the next one starts. The tile cache accumulates across them.
+            float legDuration = _orchestrator.AnimationDuration / Mathf.Max(1, waypoints.Count - 1);
+            for (int i = 0; i < waypoints.Count - 1; i++)
+            {
+                var a = waypoints[i];
+                var b = waypoints[i + 1];
+
+                // A waypoint zoom of 0 means "inherit", so fall back to where the map currently is.
+                float legZoom = Mathf.Max(a.Zoom, b.Zoom);
+                if (legZoom <= 0)
+                    legZoom = _mapBehaviour.MapInformation.Zoom;
+
+                preCacher.ComputeTilesForPath(
+                    new LatitudeLongitude(a.Lat, a.Lng),
+                    new LatitudeLongitude(b.Lat, b.Lng),
+                    legZoom,
+                    legDuration);
+
+                bool legDone = false;
+                Action handler = () => legDone = true;
+                preCacher.PreCacheCompleted += handler;
+                yield return preCacher.PreCacheAllTiles(_mapBehaviour.MapboxMap);
+                while (!legDone)
+                    yield return null;
+                preCacher.PreCacheCompleted -= handler;
+            }
+
+            yield return WaitForFetchesToComplete(120f);
+
+            // Put the camera back where the route starts, so the recorded pass begins from the same
+            // place the waypoint animation does.
+            var first = waypoints[0];
+            _mapBehaviour.MapboxMap.ChangeView(
+                new LatitudeLongitude(first.Lat, first.Lng), first.Zoom, first.Pitch, first.Bearing);
+            yield return WaitForFetchesToComplete(60f);
+
+            var loggingFetcher = _mapBehaviour.DataFetchingManager as LoggingDataFetchingManager;
+            Assert.IsNotNull(loggingFetcher?.CacheOnlySource,
+                "Expected a CacheOnlySource to block the network with");
+            loggingFetcher.CacheOnlySource.BlockNetwork = true;
+
+            // Both off: this test has already pre-cached, and the orchestrator only honours
+            // CacheOnlyMode inside its PreCacheData branch.
+            _orchestrator.PreCacheData = false;
+            _orchestrator.CacheOnlyMode = false;
+
+            yield return _orchestrator.RunBenchmark();
+
+            loggingFetcher.CacheOnlySource.BlockNetwork = false;
+
+            Assert.AreEqual(BenchmarkOrchestrator.Phase.Complete, _orchestrator.CurrentPhase);
+
+            var networkJson = _orchestrator.NetworkStats.Export();
+            Assert.AreEqual(0, (int)networkJson["requestsSucceeded"],
+                "The recorded pass reached the network, so this run is not a comparable baseline. " +
+                "Pre-caching probably did not cover the route.");
+
+            var systemJson = _orchestrator.SystemStats.Export();
+            Assert.IsTrue(systemJson.ContainsKey("managedAllocatedBytes"),
+                "Missing managedAllocatedBytes - is SystemStatsCollector up to date?");
+
+            long allocatedBytes = (long)systemJson["managedAllocatedBytes"];
+            Assert.IsTrue(allocatedBytes > 0, "Expected the run to allocate something");
+
+            var tileJson = _orchestrator.TileStats.Export();
+            int tileChanges = (int)tileJson["totalTileChanges"];
+            int totalFrames = (int)systemJson["totalFrames"];
+
+            double allocatedMB = allocatedBytes / (1024.0 * 1024.0);
+            double kbPerTileChange = tileChanges > 0 ? allocatedBytes / 1024.0 / tileChanges : 0;
+            double kbPerFrame = totalFrames > 0 ? allocatedBytes / 1024.0 / totalFrames : 0;
+
+            // One greppable line per city - this is the baseline to record before the rework.
+            Debug.Log(
+                $"[AllocationBaseline] {city}: {allocatedMB:F1} MB allocated over {tileChanges} tile " +
+                $"changes and {totalFrames} frames " +
+                $"({kbPerTileChange:F1} KB per tile change, {kbPerFrame:F1} KB per frame).");
 
             yield return Cleanup();
         }
