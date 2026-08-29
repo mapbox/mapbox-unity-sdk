@@ -19,6 +19,9 @@ namespace Mapbox.MapDebug.Scripts.Logging
     {
         private int _savedCount = 0;
         private int _readCount = 0;
+
+        public int SavedCount => _savedCount;
+        public int ReadCount => _readCount;
 		
         public LoggingFileCache(TaskManager taskManager, string folderNamePostFix = "") : base(taskManager, folderNamePostFix)
         {

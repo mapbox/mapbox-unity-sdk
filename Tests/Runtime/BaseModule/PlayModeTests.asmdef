@@ -13,14 +13,13 @@
         "MapboxImageryModule",
         "MapboxVectorModule"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
         "nunit.framework.dll",
+        "Newtonsoft.Json.dll",
         "Mapbox.VectorTile.VectorTileReader.dll",
         "Mapbox.VectorTile.Geometry.dll"
     ],
@@ -28,12 +27,6 @@
     "defineConstraints": [
         "UNITY_INCLUDE_TESTS"
     ],
-    "versionDefines": [
-        {
-            "name": "com.unity.recorder",
-            "expression": "",
-            "define": "UNITY_RECORDER"
-        }
-    ],
+    "versionDefines": [],
     "noEngineReferences": false
 }

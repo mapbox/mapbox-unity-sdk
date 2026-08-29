@@ -9,7 +9,7 @@ namespace Mapbox.MapDebug.Scripts.Logging
     {
         private List<string> _logs;
         private TileCover _tileCover;
-        public LoggingMapVisualizer(MapInformation mapInformation, UnityContext unityContext, ITileCreator tileCreator) : base(mapInformation, unityContext, tileCreator)
+        public LoggingMapVisualizer(IMapInformation mapInformation, UnityContext unityContext, ITileCreator tileCreator) : base(mapInformation, unityContext, tileCreator)
         {
             _logs = new List<string>();
         }
