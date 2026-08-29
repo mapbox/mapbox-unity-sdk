@@ -541,27 +541,39 @@ namespace Mapbox.VectorModule
                     }
                     
 					
-                    var resultGameObjects = new List<GameObject>();
-                    foreach (var layerName in data.VectorTileData.LayerNames())
+                    try
                     {
-                        if (_layerVisualizers.TryGetValue(layerName, out var layerVisualizers))
-                        {
-	                        for (var vi = 0; vi < layerVisualizers.Count; vi++)
+	                    var resultGameObjects = new List<GameObject>();
+	                    foreach (var layerName in data.VectorTileData.LayerNames())
+	                    {
+	                        if (_layerVisualizers.TryGetValue(layerName, out var layerVisualizers))
 	                        {
-		                        var key = layerVisualizers.Count > 1 ? $"{layerName}_{vi}" : layerName;
-		                        if (!taskResult.Data.TryGetValue(key, out var tileMeshData))
-			                        continue;
-		                        var layerVisualizer = layerVisualizers[vi];
-		                        var layerGameObjects = layerVisualizer.CreateGo(data.TileId, tileMeshData);
-		                        foreach (var gameObject in layerGameObjects)
+		                        for (var vi = 0; vi < layerVisualizers.Count; vi++)
 		                        {
-			                        gameObject.SetActive(false);
-			                        resultGameObjects.Add(gameObject);
+			                        var key = layerVisualizers.Count > 1 ? $"{layerName}_{vi}" : layerName;
+			                        if (!taskResult.Data.TryGetValue(key, out var tileMeshData))
+				                        continue;
+			                        var layerVisualizer = layerVisualizers[vi];
+			                        if (layerVisualizer.ContainsVisualFor(data.TileId))
+				                        continue;
+			                        var layerGameObjects = layerVisualizer.CreateGo(data.TileId, tileMeshData);
+			                        foreach (var gameObject in layerGameObjects)
+			                        {
+				                        gameObject.SetActive(false);
+				                        resultGameObjects.Add(gameObject);
+			                        }
 		                        }
 	                        }
-                        }
+	                    }
+	                    callback(new MeshGenerationTaskResult(TaskResultType.Success, resultGameObjects));
                     }
-                    callback(new MeshGenerationTaskResult(TaskResultType.Success, resultGameObjects));
+                    catch (Exception e)
+                    {
+	                    Debug.LogError($"[VLM] CreateGo failed for tile {data.TileId}: {e}");
+	                    var failResult = new MeshGenerationTaskResult(TaskResultType.MeshGenerationFailure);
+	                    failResult.AddException(e);
+	                    callback(failResult);
+                    }
                     
                 }
             };
