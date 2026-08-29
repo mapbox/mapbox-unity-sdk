@@ -13,7 +13,7 @@ namespace Mapbox.VectorModule.MeshGeneration.MeshModifiers
 	}
 
 	[Serializable]
-	public class PolygonMeshModifier : MeshModifier, IPolygonMeshModifier
+	public class PolygonMeshModifier : MeshModifier<PolyMeshCore>, IPolygonMeshModifier
 	{
         private float _height = 0f;
 
@@ -21,11 +21,12 @@ namespace Mapbox.VectorModule.MeshGeneration.MeshModifiers
         {
 	        _height = height;
         }
-        
+
+        protected override PolyMeshCore CreateCore() => new PolyMeshCore(_height);
+
         public override void Run(VectorFeatureUnity feature, MeshData md, IMapInformation mapInfo)
         {
-            var core = new PolyMeshCore(_height);
-            core.Run(feature, md);
+            Core.Run(feature, md);
         }
     }
     

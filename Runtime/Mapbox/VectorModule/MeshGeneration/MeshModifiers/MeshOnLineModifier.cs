@@ -11,7 +11,7 @@ using UnityEngine.Serialization;
 namespace Mapbox.VectorModule.MeshGeneration.MeshModifiers
 {
 	[Serializable]
-	public class MeshOnLineModifier : MeshModifier
+	public class MeshOnLineModifier : MeshModifier<MeshOnLineModifierCore>
 	{
 		private PrefabSet _prefabSet;
 
@@ -57,15 +57,16 @@ namespace Mapbox.VectorModule.MeshGeneration.MeshModifiers
 			}
 		}
 		
+		protected override MeshOnLineModifierCore CreateCore() => new MeshOnLineModifierCore(_prefabSet);
+
 		public override void Run(VectorFeatureUnity feature, MeshData md, IMapInformation mapInfo)
 		{
-			var core = new MeshOnLineModifierCore(_prefabSet);
-			core.Run(feature, md, mapInfo);
+			Core.Run(feature, md, mapInfo);
 		}
 	}
 
 	[Serializable]
-	public class MeshOnLineModifierCore : MeshModifier
+	public class MeshOnLineModifierCore
 	{
 		private float _distance;
 		private PrefabSet _prefabSet;
@@ -86,7 +87,7 @@ namespace Mapbox.VectorModule.MeshGeneration.MeshModifiers
 				_doRotate = true;
 		}
 
-		public override void Run(VectorFeatureUnity feature, MeshData md, IMapInformation mapInfo)
+		public void Run(VectorFeatureUnity feature, MeshData md, IMapInformation mapInfo)
 		{
 			if (_prefabSet?.MeshDatas == null) return;
 			

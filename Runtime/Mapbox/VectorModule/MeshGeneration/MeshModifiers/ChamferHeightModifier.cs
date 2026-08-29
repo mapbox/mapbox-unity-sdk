@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Mapbox.VectorModule.MeshGeneration.MeshModifiers
 {
-    public class ChamferHeightModifier : MeshModifier
+    public class ChamferHeightModifier : MeshModifier<ChamferHeightCore>
     {
         private ChamferModifierSettings _chamferOptions;
 	    
@@ -17,9 +17,11 @@ namespace Mapbox.VectorModule.MeshGeneration.MeshModifiers
             _chamferOptions = chamferSettings ?? new ChamferModifierSettings();
         }
 
+        protected override ChamferHeightCore CreateCore() => new ChamferHeightCore(_chamferOptions);
+
         public override void Run(VectorFeatureUnity feature, MeshData md, IMapInformation mapInfo)
         {
-            new ChamferHeightCore(_chamferOptions).Run(feature, md, mapInfo);
+            Core.Run(feature, md, mapInfo);
         }
     }
     

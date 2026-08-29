@@ -10,7 +10,7 @@ using Debug = UnityEngine.Debug;
 namespace Mapbox.VectorModule.MeshGeneration.MeshModifiers
 {
     [Serializable]
-    public class HeightModifier : MeshModifier
+    public class HeightModifier : MeshModifier<BasicHeightModifierCore>
     {
         private GeometryExtrusionOptions _basicOptions;
         
@@ -19,9 +19,11 @@ namespace Mapbox.VectorModule.MeshGeneration.MeshModifiers
             _basicOptions = options ?? new GeometryExtrusionOptions();
         }
 
+        protected override BasicHeightModifierCore CreateCore() => new BasicHeightModifierCore(_basicOptions);
+
         public override void Run(VectorFeatureUnity feature, MeshData md, IMapInformation mapInfo)
         {
-	        new BasicHeightModifierCore(_basicOptions).Run(feature, md, mapInfo);
+	        Core.Run(feature, md, mapInfo);
         }
     }
 

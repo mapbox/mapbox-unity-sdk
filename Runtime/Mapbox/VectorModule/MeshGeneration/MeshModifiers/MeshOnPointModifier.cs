@@ -75,7 +75,7 @@ namespace Mapbox.VectorModule.MeshGeneration.MeshModifiers
 		}
 	}
 
-	public class MeshOnPointModifier : MeshModifier
+	public class MeshOnPointModifier : MeshModifier<MeshOnPointModifierCore>
 	{
 		private MeshOnPointSettings _meshOnPointSettings;
 	
@@ -84,10 +84,11 @@ namespace Mapbox.VectorModule.MeshGeneration.MeshModifiers
 			_meshOnPointSettings = meshOnPointSettings;
 		}
 	
+		protected override MeshOnPointModifierCore CreateCore() => new MeshOnPointModifierCore(_meshOnPointSettings);
+
 		public override void Run(VectorFeatureUnity feature, MeshData md, IMapInformation mapInfo)
 		{
-			var core = new MeshOnPointModifierCore(_meshOnPointSettings);
-			core.Run(feature, md, mapInfo);
+			Core.Run(feature, md, mapInfo);
 		}
 	}
 
