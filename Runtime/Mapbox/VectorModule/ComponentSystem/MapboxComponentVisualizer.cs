@@ -46,6 +46,12 @@ namespace Mapbox.VectorModule.ComponentSystem
             }
         }
         
+        /// <summary>
+        /// Component visualizers build their visuals directly and carry no GameObject modifier
+        /// stack, so there is nothing here to Finalize or Unregister. If a subclass ever adds a
+        /// stack, its per-entity Finalize belongs beside the pool Put below, and its per-tile
+        /// Unregister at the end of this method.
+        /// </summary>
         public override void UnregisterTile(CanonicalTileId tileId)
         {
             if (_results.ContainsKey(tileId))
@@ -54,15 +60,12 @@ namespace Mapbox.VectorModule.ComponentSystem
                 {
                     entity.GameObject.SetActive(false);
                     _buildingObjectPool.Put(entity);
-                    //TODO call finalize for gameobject modifiers here
-                    
+
                     OnBuildingMeshDestroyed(tileId, entity.GameObject);
                 }
 
                 _results.Remove(tileId);
             }
-
-            //TODO call unregister for gameobject modifiers here
         }
 
         public override void SetActive(CanonicalTileId canonicalTileId, bool isActive, IMapInformation mapInformation)

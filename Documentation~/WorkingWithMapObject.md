@@ -46,3 +46,34 @@ private void Update()
 ```
 
 This setup guarantees that any scripts depending on the map will only run when the system is prepared, preventing null references and timing issues during initialization.
+## Tile zoom levels and uniform grids
+
+`UnityTileProvider` is a quadtree LOD provider. It subdivides tiles that are close to the camera and
+leaves distant ones coarse, so **a single frame's tile cover normally mixes zoom levels**. This is the
+right default for a map you fly a camera over: near ground stays detailed and the horizon stays cheap.
+
+It is the wrong default if your project assumes a uniform grid — a hex or square world laid over the
+map, a per-tile simulation step, or anything that indexes tiles by a fixed `(x, y)` at one zoom. Under
+LOD, neighbouring cells arrive at different zooms and your indices stop lining up.
+
+To get a uniform cover, pin both ends of the range to the same value on
+`UnityTileProviderSettings`:
+
+```csharp
+tileProvider.Settings.MinimumZoomLevel = 14;
+tileProvider.Settings.MaximumZoomLevel = 14;
+```
+
+Both are also exposed on `UnityTileProviderBehaviour` in the Inspector. With the two equal, every tile
+in the cover is at that zoom and the quadtree stops subdividing.
+
+Two caveats:
+
+- `MaximumZoomLevel` is clamped by the map's `AbsoluteZoom` and, internally, to 30. Pinning above the
+  map's current zoom will not raise it.
+- Setting `MinimumZoomLevel` *above* `MaximumZoomLevel` is a misconfiguration, not a way to force
+  detail: tiles are force-split to the absolute cap and the provider logs a warning.
+
+Data tiles are a separate matter from render tiles. Terrain in particular is fetched at a lower zoom
+than the tiles that render it and shared across them, so pinning the render zoom does not by itself
+give you one data tile per rendered tile.

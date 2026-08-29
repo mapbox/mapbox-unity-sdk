@@ -259,6 +259,10 @@ namespace Mapbox.VectorModule
                 foreach (var meshData in pair.Value)
                 {
                     var entity = _stackList[pair.Key].CreateEntity(meshData);
+                    // CreateEntity returns null when the scene changed mid-generation and Unity
+                    // destroyed the pooled GameObject. There is nothing left to parent or modify.
+                    if (entity == null)
+                        continue;
                     entity.GameObject.transform.SetParent(_layerRootObject, worldPositionStays: false);
                     entity.StackId = pair.Key;
                     entity.Feature = meshData.Feature;
