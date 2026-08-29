@@ -37,6 +37,7 @@ namespace Mapbox.MapDebug.Scripts.Benchmark
             public float TotalMemoryMB;
             public float ManagedHeapMB;
             public int GCCollectionCount;
+            public long AllocatedBytes;
             public Vector3 CameraPosition;
             public double Lat, Lng;
             public float Zoom, Pitch, Bearing;
@@ -118,8 +119,9 @@ namespace Mapbox.MapDebug.Scripts.Benchmark
             frame.TotalMemoryMB = totalMem;
             frame.ManagedHeapMB = managedMem;
             frame.GCCollectionCount = GC.CollectionCount(0);
-            if (_gcAllocRecorder.Valid)
-                _allocatedBytes += _gcAllocRecorder.LastValue;
+            long frameAlloc = _gcAllocRecorder.Valid ? _gcAllocRecorder.LastValue : 0;
+            frame.AllocatedBytes = frameAlloc;
+            _allocatedBytes += frameAlloc;
 
             var cam = Camera.main;
             if (cam != null)
@@ -181,6 +183,30 @@ namespace Mapbox.MapDebug.Scripts.Benchmark
             for (int i = 0; i < count; i++)
                 durationSeconds += _frames[i].DeltaTimeMs / 1000f;
 
+            // Distribution of per-frame allocation. A flat ~15 KB on every frame and a few frames
+            // allocating megabytes produce the same total; only the shape says which one this is.
+            var allocPerFrame = new JObject();
+            if (count > 0)
+            {
+                var allocValues = new long[count];
+                int framesOverA100KB = 0;
+                int framesAllocatingNothing = 0;
+                for (int i = 0; i < count; i++)
+                {
+                    allocValues[i] = _frames[i].AllocatedBytes;
+                    if (allocValues[i] == 0) framesAllocatingNothing++;
+                    if (allocValues[i] > 100 * 1024) framesOverA100KB++;
+                }
+                Array.Sort(allocValues);
+
+                allocPerFrame["medianBytes"] = allocValues[count / 2];
+                allocPerFrame["p95Bytes"] = allocValues[Math.Min(count - 1, (int)(count * 0.95f))];
+                allocPerFrame["p99Bytes"] = allocValues[Math.Min(count - 1, (int)(count * 0.99f))];
+                allocPerFrame["maxBytes"] = allocValues[count - 1];
+                allocPerFrame["framesAllocatingNothing"] = framesAllocatingNothing;
+                allocPerFrame["framesOver100KB"] = framesOverA100KB;
+            }
+
             var result = new JObject
             {
                 ["totalFrames"] = count,
@@ -203,7 +229,10 @@ namespace Mapbox.MapDebug.Scripts.Benchmark
                 ["peakManagedHeapMB"] = Math.Round(_peakManagedHeapMB, 1),
                 ["gcCollections"] = gcCollections,
                 ["managedAllocatedMB"] = Math.Round(allocatedBytes / (1024.0 * 1024.0), 1),
-                ["managedAllocatedBytes"] = allocatedBytes
+                ["managedAllocatedBytes"] = allocatedBytes,
+                // An average says nothing about whether allocation is a steady per-frame floor or a
+                // handful of spikes, and those two want completely different fixes.
+                ["allocPerFrame"] = allocPerFrame
             };
 
             return result;

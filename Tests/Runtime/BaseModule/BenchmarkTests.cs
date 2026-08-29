@@ -403,6 +403,20 @@ namespace Tests.Runtime.BaseModule
                 $"changes and {totalFrames} frames " +
                 $"({kbPerTileChange:F1} KB per tile change, {kbPerFrame:F1} KB per frame).");
 
+            // The shape matters more than the total: a steady per-frame floor and a few enormous
+            // spikes sum to the same number but call for completely different fixes.
+            var perFrame = systemJson["allocPerFrame"];
+            if (perFrame != null)
+            {
+                Debug.Log(
+                    $"[AllocationBaseline] {city} per frame: median {(long)perFrame["medianBytes"] / 1024.0:F1} KB, "
+                    + $"p95 {(long)perFrame["p95Bytes"] / 1024.0:F1} KB, "
+                    + $"p99 {(long)perFrame["p99Bytes"] / 1024.0:F1} KB, "
+                    + $"max {(long)perFrame["maxBytes"] / 1024.0:F1} KB; "
+                    + $"{(int)perFrame["framesAllocatingNothing"]} frames allocated nothing, "
+                    + $"{(int)perFrame["framesOver100KB"]} allocated over 100 KB.");
+            }
+
             yield return Cleanup();
         }
     }
