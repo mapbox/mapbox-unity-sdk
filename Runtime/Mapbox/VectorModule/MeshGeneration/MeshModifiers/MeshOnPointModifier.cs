@@ -75,6 +75,14 @@ namespace Mapbox.VectorModule.MeshGeneration.MeshModifiers
 		}
 	}
 
+	/// <summary>
+	/// Places a prefab mesh on a point feature.
+	///
+	/// UNFINISHED, and deliberately kept rather than deleted. Like <see cref="MeshOnLineModifier"/>
+	/// it has no ScriptableObject wrapper in MeshModifiers/ScriptableObjects, so it cannot be added
+	/// to a modifier stack from the Inspector, and nothing in the package constructs it. Adding the
+	/// wrapper is the whole of what it needs.
+	/// </summary>
 	public class MeshOnPointModifier : MeshModifier<MeshOnPointModifierCore>
 	{
 		private MeshOnPointSettings _meshOnPointSettings;
