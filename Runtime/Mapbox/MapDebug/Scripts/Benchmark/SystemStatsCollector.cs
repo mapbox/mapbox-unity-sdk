@@ -3,6 +3,7 @@ using System.IO;
 using Mapbox.BaseModule.Map;
 using Mapbox.BaseModule.Utilities;
 using Newtonsoft.Json.Linq;
+using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.Profiling;
 
@@ -52,7 +53,11 @@ namespace Mapbox.MapDebug.Scripts.Benchmark
         private float _peakMemoryMB;
         private float _peakManagedHeapMB;
         private int _startGCCount;
-        private long _startAllocatedBytes;
+        // GC.GetTotalAllocatedBytes needs .NET Standard 2.1 and the SDK has to compile at 2.0, so
+        // the per-frame profiler counter is summed instead. It reports only when the profiler is
+        // available - Editor and development builds - which is where benchmarks are run anyway.
+        private ProfilerRecorder _gcAllocRecorder;
+        private long _allocatedBytes;
 
         private IMapInformation _mapInfo;
 
@@ -89,7 +94,10 @@ namespace Mapbox.MapDebug.Scripts.Benchmark
             // Cumulative managed bytes allocated, which gcCollections only hints at: a run can
             // allocate heavily and collect rarely, or the reverse. This is the number the
             // per-feature allocations in the mesh-modifier stack move.
-            _startAllocatedBytes = GC.GetTotalAllocatedBytes(false);
+            _allocatedBytes = 0;
+            if (_gcAllocRecorder.Valid)
+                _gcAllocRecorder.Dispose();
+            _gcAllocRecorder = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "GC Allocated In Frame");
             _mapInfo = MapBehaviour != null ? MapBehaviour.MapInformation : null;
             _recording = true;
         }
@@ -110,6 +118,8 @@ namespace Mapbox.MapDebug.Scripts.Benchmark
             frame.TotalMemoryMB = totalMem;
             frame.ManagedHeapMB = managedMem;
             frame.GCCollectionCount = GC.CollectionCount(0);
+            if (_gcAllocRecorder.Valid)
+                _allocatedBytes += _gcAllocRecorder.LastValue;
 
             var cam = Camera.main;
             if (cam != null)
@@ -138,6 +148,8 @@ namespace Mapbox.MapDebug.Scripts.Benchmark
         public void End()
         {
             _recording = false;
+            if (_gcAllocRecorder.Valid)
+                _gcAllocRecorder.Dispose();
         }
 
         public JObject Export()
@@ -145,7 +157,7 @@ namespace Mapbox.MapDebug.Scripts.Benchmark
             int count = _frameIndex;
             float avgFps = count > 0 ? (float)(_fpsSum / count) : 0;
             int gcCollections = GC.CollectionCount(0) - _startGCCount;
-            long allocatedBytes = GC.GetTotalAllocatedBytes(false) - _startAllocatedBytes;
+            long allocatedBytes = _allocatedBytes;
 
             // Compute percentiles from sorted FPS values
             float p1Fps = 0, p5Fps = 0, p99FrameTimeMs = 0;

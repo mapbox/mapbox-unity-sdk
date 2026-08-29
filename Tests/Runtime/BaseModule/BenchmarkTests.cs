@@ -385,7 +385,10 @@ namespace Tests.Runtime.BaseModule
                 "Missing managedAllocatedBytes - is SystemStatsCollector up to date?");
 
             long allocatedBytes = (long)systemJson["managedAllocatedBytes"];
-            Assert.IsTrue(allocatedBytes > 0, "Expected the run to allocate something");
+            Assert.IsTrue(allocatedBytes > 0,
+                "No allocations were recorded. The counter comes from ProfilerRecorder, which "
+                + "only reports in the Editor or a development build - check that before "
+                + "concluding the run allocated nothing.");
 
             var tileJson = _orchestrator.TileStats.Export();
             int tileChanges = (int)tileJson["totalTileChanges"];
