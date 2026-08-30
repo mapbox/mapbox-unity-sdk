@@ -8,6 +8,7 @@ using Mapbox.BaseModule.Map;
 using Mapbox.BaseModule.Unity;
 using Mapbox.BaseModule.Utilities;
 using Mapbox.BaseModule.Data.Interfaces;
+using Mapbox.BaseModule.Data.Tasks;
 using Mapbox.ImageModule;
 using Mapbox.ImageModule.Terrain;
 using Mapbox.MapDebug.Scripts.Logging;
@@ -95,9 +96,11 @@ namespace Mapbox.PerformanceTests
             _dataManager = new DataFetchingManager(_mapboxContext.GetAccessToken(), _mapboxContext.GetSkuToken);
         }
 
+        // ValueSource rather than TestCaseSource: a TestCaseSource feeding a [UnityTest] has to
+        // return TestCaseData marked .Returns(null), or NUnit rejects the IEnumerator with
+        // "Method has non-void return value, but no result is expected".
         [UnityTest, Performance]
-        [TestCaseSource(nameof(Setups))]
-        public IEnumerator MapLoad(string setup)
+        public IEnumerator MapLoad([ValueSource(nameof(Setups))] string setup)
         {
             Runnable.EnableRunnableInEditor();
 
