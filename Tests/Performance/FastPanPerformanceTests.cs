@@ -195,8 +195,22 @@ namespace Mapbox.PerformanceTests
             // contribute - it has nothing to cancel, which is the whole point of measuring separately.
             var startedCount = 0;
             var cancelledCount = 0;
-            void OnStarting(TaskWrapper _) => startedCount++;
-            void OnCancelled(TaskWrapper _) => cancelledCount++;
+            // Broken down by wrapper type: an aggregate of zero cancellations means nothing until you
+            // know which queues the tasks were on. Mesh generation enqueues at priority 0, whose
+            // dispatch delay is zero, so those can never be cancelled before running - counting them
+            // together with cache reads would hide that.
+            var startedByType = new Dictionary<string, int>();
+            var cancelledByType = new Dictionary<string, int>();
+
+            void Count(Dictionary<string, int> into, TaskWrapper t)
+            {
+                var name = t.GetType().Name;
+                into.TryGetValue(name, out var n);
+                into[name] = n + 1;
+            }
+
+            void OnStarting(TaskWrapper t) { startedCount++; Count(startedByType, t); }
+            void OnCancelled(TaskWrapper t) { cancelledCount++; Count(cancelledByType, t); }
             _taskManager.TaskStarting += OnStarting;
             _taskManager.TaskCancelled += OnCancelled;
 
@@ -239,6 +253,10 @@ namespace Mapbox.PerformanceTests
 
                 Assert.Greater(startedCount + cancelledCount, 0,
                     "The pan queued no tasks at all, so nothing about the debounce can be concluded from it.");
+                UnityEngine.Debug.Log(
+                    $"[{(zoom ? "FastZoom" : "FastPan")}] started by type: {Describe(startedByType)} | "
+                    + $"cancelled by type: {Describe(cancelledByType)}");
+
                 Assert.Greater(stopwatch.Elapsed.TotalMilliseconds, 1000,
                     "The pan finished in under a second. It has to outlast several dispatch delays, or "
                     + "zero started tasks means the pan was too short rather than the debounce working.");
@@ -246,5 +264,14 @@ namespace Mapbox.PerformanceTests
 
             map.OnDestroy();
         }
+
+        private static string Describe(Dictionary<string, int> counts)
+        {
+            if (counts.Count == 0) return "none";
+            var parts = new List<string>();
+            foreach (var pair in counts) parts.Add($"{pair.Key}={pair.Value}");
+            return string.Join(", ", parts);
+        }
+
     }
 }
